@@ -97,7 +97,7 @@ Bibindex supports stopword removal by not adding words which exists in a given s
 list to the index. Stopword removal makes the index smaller by removing much used words.
 
 Which stopword list that should be used can be configured in the bibindex_engine_config.py
-file by changing the value of the variable cfg_path_stopwordlist. If no stopword list should
+file by changing the value of the variable cfg_path_to_stopwords_file. If no stopword list should
 be used, the value should be None.
 </pre>
 
@@ -119,7 +119,7 @@ If another than the default stemmer should be used, the file '<b>bibindex_engine
 must be changed to support the desired stemmers interface.
 
 To change the default language to use for the stemmer, change the variable 
-'<b>cfg_use_stemmer_lang</b>' in '<b>bibindex_engine_config.py</b>'. 
+'<b>cfg_stemmer_default_language</b>' in '<b>bibindex_engine_config.py</b>'. 
 To disable use of stemmer, set the value to None.
 </pre>
 <a name="3.5"></a><h3>3.5 Configure Word Length</h3>
