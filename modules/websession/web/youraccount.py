@@ -92,7 +92,7 @@ def send_email(req,p_email=None):
                     keywords="CDS, personalize",
                     uid=uid)
 	
-    fromaddr = "From:cds.support@cern.ch"
+    fromaddr = "From:cds.alert@cdsware.cern.ch"
     toaddrs  = "To:" + p_email
     to = toaddrs + "\n"
     sub = "Subject:Registration for cds.cern.ch\n\n"
