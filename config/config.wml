@@ -169,8 +169,8 @@ cds.support@cern.ch
        <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
-       <td class="headermoduleboxbodyselected">
-             <a class=headerselected href="<WEBURL>">search</a>
+       <td class="headermoduleboxbody">
+             <a class=header href="<WEBURL>">search</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
