@@ -275,12 +275,13 @@ to get more precisely at what you are looking for, as is mentioned <a
 href="#boolean">below</a>.
 
 <p>The <strong>advanced search</strong> interface provides you with
-explicit tools to play with: you can change the matching type from
-the default word matching to phrase searching or the regular matching;
-you can use boolean queries in several indexes, etc.  For example, to
-find all the documents written by <em>Ellis, J</em> that contain
-either of the words <em>muon</em> or <em>neutrino</em> in the title
-and that were published in <em>2001</em>, you would type:
+explicit tools to play with: you can change the matching type from the
+default word matching to phrase searching or the regular matching; you
+can use boolean queries in several indexes, etc.  For example, to find
+all the documents written by <em>Ellis, J</em> spelled exactly that
+way that contain either of the words <em>muon</em> or
+<em>neutrino</em> in the title and that were published in
+<em>2001</em>, you would type:
 
 <blockquote>
 <form action="<WEBURL>/search.py" method="get">
