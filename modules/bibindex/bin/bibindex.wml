@@ -21,6 +21,8 @@
 ## read config variables:
 #include "config.wml"
 #include "configbis.wml"
+#include "cdswmllib.wml"
+
 ## start Python:
 <protect>#!</protect><PYTHON>
 <protect># -*- coding: utf-8 -*-</protect>
@@ -64,6 +66,8 @@ Examples:
  -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
 """
 
+__version__ = "<: print generate_pretty_version_string('$Id$'); :>"
+
 ## fill config variables:
 pylibdir = "<LIBDIR>/python"
 
@@ -82,10 +86,6 @@ conv_programs_helpers =  {"html": "<HTMLTOTEXT>",
 ## okay, rest of the Python code goes below
 #######
 
-## version number:
-__version__ = "$Id$"
-
-    
 ## import interesting modules:
 try:
     from marshal import loads,dumps

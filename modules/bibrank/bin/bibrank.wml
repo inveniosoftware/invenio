@@ -20,8 +20,9 @@
 ## read config variables:
 #include "config.wml"
 #include "configbis.wml"
-## start Python:
+#include "cdswmllib.wml"
 
+## start Python:
 <protect>#!</protect><PYTHON>
 <protect># -*- coding: utf-8 -*-</protect>
 <protect>## $Id$</protect>
@@ -56,9 +57,10 @@ Usage: %s [options]
  -v, --verbose=LEVEL       verbose level (from 0 to 9, default 1)
     """
 
+__version__ = "<: print generate_pretty_version_string('$Id$'); :>"
+
 ## fill config variables:
 pylibdir = "<LIBDIR>/python"
-__version__ = "$Id$"
 
 try:
     from marshal import loads,dumps

@@ -21,6 +21,8 @@
 ## read config variables:
 #include "config.wml"
 #include "configbis.wml"
+#include "cdswmllib.wml"
+
 ## start Python:
 <protect>#!</protect><PYTHON>
 <protect># -*- coding: utf-8 -*-</protect>
@@ -30,14 +32,13 @@
 Guest user sessions garbage collector.  To be run via cron once per day. (say)
 """
 
+__version__ = "<: print generate_pretty_version_string('$Id$'); :>"
+
 ## fill config variables:
 pylibdir = "<LIBDIR>/python"
 
 ## okay, rest of the Python code goes below
 #######
-
-## version number:
-__version__ = "$Id$"
 
 import sys
 try:
