@@ -502,7 +502,7 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
                     config = ConfigParser.ConfigParser()
                     config.readfp(open("%s/bibrank/%s.cfg" % (etcdir, rnkcode), 'r'))
                     table = config.get(config.get('rank_method', "function"), "table")
-                except StandardError, e:
+                except Exception:
                     pass
                 result = delete_rnk(rnkID, table)
                 subtitle = "Step 2 - Result"
