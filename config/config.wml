@@ -45,7 +45,6 @@
 ## don't want to change these things here, the real language selection
 ## will be chosen further down.)
 #include "messages.wml"
-#use wml::fmt::isolatin
 #use wml::std::lang
 <lang:new id=de short>
 <lang:new id=en short>
