@@ -67,14 +67,14 @@ def page_not_authorized(req, referer='', uid=''):
         if res and res[0][0]:
             return page(title='Authorization failure',
                         uid=getUid(req),
-                        body=brl.adderrorbox('Reason:',
+                        body=brl.adderrorbox('',
                         datalist=["%s %s" % (cfg_webaccess_warning_msgs[9] % res[0][0], ("%s %s" % (cfg_webaccess_msgs[0] % referer, cfg_webaccess_msgs[1])))]))
         else:
             return page(title='Authorization failure',
                 uid=getUid(req),
                 body="""Guest users are not allowed, please <a href="%s/youraccount.py/login">login</a>.""" % weburl)
     else:
-        return page(title='%s is closed' % cdsname,
+        return page(title='%s temporarily closed' % cdsname,
                     uid=getUid(req),
                     body=brl.adderrorbox('',
                     datalist=["%s %s" % (cfg_webaccess_warning_msgs[10], cfg_webaccess_msgs[2])]))
