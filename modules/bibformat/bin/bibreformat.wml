@@ -63,49 +63,59 @@ except ImportError, e:
     sys.exit(1)
 
 sql_queries   = []
-mysql_queries = []
-process_hb    = 0
-process       = 1
-fmt           = "hb"
-sleeptime     = ""
+cds_query     = {}                   # holds CDS query parameters (fields, collection, pattern)
+process_hb    = 0                    # flag, process records without created format
+process       = 1                    # flag, process records (unless count only)
+fmt           = "hb"                 # default format to be processed
+sleeptime     = ""                   # default sleeptime
 format_string = "%Y-%m-%d %H:%M:%S"
 sched_time    = time.strftime(format_string)
 
-def bibreformat_task(sql_queries, mysql_queries, process_hb):
+sql = {
+
+ "all" : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt,
+ "last": "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='%s' and bf.last_updated < br.modification_date" % fmt,
+ "q1"  : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='xm'",
+ "q2"  : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt
+
+}
+
+
+def bibreformat_task(sql_queries, cds_query, process_hb):
     
     global process, fmt
 
     t1 = os.times()[4]
 
-### Options, parameters
+### Query the database
 ###
 
-    if len(sql_queries)+len(mysql_queries) == 0:
-        print_info()
-        sys.exit()
-
-    print "Querying the database.."
-
     if process_hb:
+        print "Querying database for records with missing format ..."
         without_hb = withouthb()
 
     recIDs = []
 
-    if (mysql_queries[0] != "") or (mysql_queries[1] != "") or (mysql_queries[2] != ""):
+    if  cds_query['field']      != "" or  \
+        cds_query['collection'] != "" or  \
+        cds_query['pattern']    != "":
 
-        res = perform_request_search(req=None, of='id', c=mysql_queries[0], p=mysql_queries[2], f=mysql_queries[1]).tolist()
+        print "Querying database for records with old format (CDS query)..."
+
+        res = perform_request_search(req=None, of='id', c=cds_query['collection'], p=cds_query['pattern'], f=cds_query['field']).tolist()
 
         for item in res:
             recIDs.append(item)
 
     for sql_query in sql_queries:
+        print "Querying database for records with old format (SQL query) ..."
         res = run_sql(sql_query)
         for item in res:
             recIDs.append(item[0])
 
 ### list of corresponding record IDs was retrieved
 ### bibformat the records selected
-    
+
     if process_hb:
         print "Records to be processed: %d" % (len(recIDs)+len(without_hb))
         print "Out of it records without created format: %d" % len(without_hb)
@@ -118,15 +128,17 @@ def bibreformat_task(sql_queries, mysql_queries, process_hb):
     xml_content = ''		# hold the contents
     tbibformat  = 0		# time taken up by external call
     tbibupload  = 0		# time taken up by external call
-#    weburl      = "<WEBURL>"
+
 
 ### Iterate over all records prepared in lists I (option)
     if process:
         iterate_over(recIDs, weburl, fmt)
 
+
 ### Iterate over all records prepared in list II (no_hb)
     if process_hb and process:
         iterate_over(without_hb, weburl, fmt)
+
 
 ### Final statistics
 
@@ -148,6 +160,7 @@ def bibreformat_task(sql_queries, mysql_queries, process_hb):
     message = " bibupload: %2f sec" % tbibupload
     print message
 
+
 ### MySQL Search by recID
 ###
 
@@ -156,6 +169,7 @@ def read_xml_input(weburl, query):
     
     url = "%s/search.py?%s" % (weburl, query)
     return urllib.urlopen(url).read()
+
 
 ### Result set operations
 ###
@@ -171,6 +185,7 @@ def lhdiff(l1, l2):
             ld.append(e)
     return ld
 
+
 ### Result set operations
 ###
 
@@ -183,6 +198,7 @@ def ldiff(l1, l2):
             ld.append(e)
     return ld
 
+
 ### Identify recIDs of records with missing hb
 ###
 
@@ -193,8 +209,8 @@ def withouthb():
 
     xm1, xm2, hb1, hb2 = [],[],[],[]
     
-    q1 = "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='xm'"
-    q2 = "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt
+    q1 = sql['q1'] # "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='xm'"
+    q2 = sql['q2'] # "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt
 
     ## get complete recID list of xm formatted records
     xm1 = run_sql(q1)
@@ -210,6 +226,7 @@ def withouthb():
 
     return lhdiff(xm2,hb2)
 
+
 ### Bibreformat all selected records
 ###
 
@@ -222,8 +239,6 @@ def iterate_over(list, weburl, fmt):
     xml_content = ''		# hold the contents
     tbibformat  = 0		# time taken up by external call
     tbibupload  = 0		# time taken up by external call
-#    tmpdir      = "<TMPDIR>"
-#    bindir      = "<BINDIR>"
 
     for record in list:
 
@@ -240,6 +255,7 @@ def iterate_over(list, weburl, fmt):
 
             if n_rec >= n_max:
 
+    	        finalfilename = "%s/rec_fmt_%s.xml" % (tmpdir,time.strftime('%Y%m%d_%H%M%S'))
                 filename = "%s/bibreformat.xml" % tmpdir
                 filehandle = open(filename ,"w")
                 filehandle.write(xml_content)
@@ -252,7 +268,7 @@ def iterate_over(list, weburl, fmt):
                 message = "START bibformat external call"
                 print message
 
-                command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s/rec_fmt.xml 2> %s/bibreformat.err" % (bindir,string.upper(fmt),tmpdir,tmpdir,tmpdir)
+                command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s 2> %s/bibreformat.err" % (bindir,string.upper(fmt),tmpdir,finalfilename,tmpdir)
                 os.system(command)
 
                 t22 = os.times()[4]
@@ -269,7 +285,7 @@ def iterate_over(list, weburl, fmt):
                 message = "START bibupload external call"
                 print message
 
-                command = "%s/bibupload -f %s/rec_fmt.xml" % (bindir,tmpdir)
+                command = "%s/bibupload -f %s" % (bindir,finalfilename)
                 os.system(command)
 		
                 t22 = os.times()[4]
@@ -288,6 +304,7 @@ def iterate_over(list, weburl, fmt):
 
         print "Processing last record set (%d)" % n_rec
 
+        finalfilename = "%s/rec_fmt_%s.xml" % (tmpdir,time.strftime('%Y%m%d_%H%M%S'))
         filename = "%s/bibreformat.xml" % tmpdir
         filehandle = open(filename ,"w")
         filehandle.write(xml_content)
@@ -300,7 +317,7 @@ def iterate_over(list, weburl, fmt):
         message = "START bibformat external call"
         print message
 
-        command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s/rec_fmt.xml 2> %s/bibreformat.err" % (bindir,string.upper(fmt),tmpdir,tmpdir,tmpdir)
+        command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s 2> %s/bibreformat.err" % (bindir,string.upper(fmt),tmpdir,finalfilename,tmpdir)
         os.system(command)
 
         t22 = os.times()[4]
@@ -316,7 +333,7 @@ def iterate_over(list, weburl, fmt):
         message = "START bibupload external call"
         print message
 
-        command = "%s/bibupload -f %s/rec_fmt.xml" % (bindir,tmpdir)
+        command = "%s/bibupload -f %s" % (bindir,finalfilename)
         os.system(command)
 
         t22 = os.times()[4]
@@ -326,6 +343,7 @@ def iterate_over(list, weburl, fmt):
         tbibupload = tbibupload + (t22- t11)
 
     return
+
 
 ### Bibshed compatibility procedures
 ###
@@ -351,6 +369,7 @@ def get_date(var, format_string = "%Y-%m-%d %H:%M:%S"):
 
     return date
 
+
 def write_message(msg, stream=sys.stdout):
     """Prints message and flush output stream (may be sys.stdout or sys.stderr).  Useful for debugging stuff."""
     if stream == sys.stdout or stream == sys.stderr:
@@ -360,16 +379,19 @@ def write_message(msg, stream=sys.stdout):
     else:
         sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
 
+
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
     write_message("sleeping...")
     task_update_state("SLEEPING")
     signal.pause() # wait for wake-up signal
 
+
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
     write_message("continuing...")
     task_update_state("CONTINUING")
+
 
 def task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
@@ -382,6 +404,7 @@ def task_sig_stop(sig, frame):
     write_message("stopped")
     task_update_state("STOPPED")
     sys.exit(0)
+
     
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
@@ -391,9 +414,11 @@ def task_sig_suicide(sig, frame):
     task_update_state("SUICIDED")
     sys.exit(0)
 
+
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
     write_message("unknown signal %d ignored" % sig) # do nothing for other signals
+
 
 def getpass(prompt = "Password: "):
     """Prompts for a password without echoing it back to the screen"""
@@ -410,6 +435,7 @@ def getpass(prompt = "Password: "):
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old)
     return passwd
+
 
 def authenticate(user):
     """Authenticates a user against the user database.
@@ -441,6 +467,7 @@ def authenticate(user):
         print "Sorry, %s seems to be unauthorized user.  Exiting." % user
         sys.exit(1)
 
+
 def task_submit(options):
     """Submits task to the BibSched task queue.  This is what people will be invoking via command line."""
 
@@ -461,15 +488,18 @@ def task_submit(options):
     write_message("Task #%d submitted." % task_id)
     return task_id
 
+
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
     global task_id
     return run_sql("UPDATE schTASKS SET progress=%s where id=%s", (msg, task_id))
 
+
 def task_update_state(val):
     """Updates state information in the BibSched task table."""
     global task_id
-    return run_sql("UPDATE schTASKS SET state=%s where id=%s", (val, task_id))    
+    return run_sql("UPDATE schTASKS SET state=%s where id=%s", (val, task_id))
+
 
 def task_read_state(task_id):
     """Read state information in the BibSched task table."""
@@ -479,6 +509,7 @@ def task_read_state(task_id):
     except:
         out = 'UNKNOWN'
     return out
+
 
 def task_get_options(id):
     """Returns options for the task 'id' read from the BibSched task queue table."""
@@ -490,6 +521,7 @@ def task_get_options(id):
         write_message("Error: BibReformat task %d does not seem to exist." % id)
         sys.exit(1)
     return out
+
 
 def task_run(process_hb):
     """Runs the task by fetching arguments from the BibSched task queue.  This is what BibSched will be invoking via daemon call."""
@@ -504,34 +536,34 @@ def task_run(process_hb):
     ## initialize parameters
 
     if options.has_key("all"):
-        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt)
-
-    if options.has_key("new"):
+#        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt)
+        sql_queries.append(sql['all'])
+    if options.has_key("without"):
         process_hb = 1
 
     if options.has_key("noprocess"):
         process = 0
 
     if options.has_key("last"):
-        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='%s' and bf.last_updated < br.modification_date" % fmt)
-
+#        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='%s' and bf.last_updated < br.modification_date" % fmt)
+         sql_queries.append(sql['last'])
     if options.has_key("collection"):
-        mysql_queries.append(options["collection"])
+        cds_query['collection'] = options['collection']
     else:
-        mysql_queries.append("")
+        cds_query['collection'] = ""
 
     if options.has_key("field"):
-        mysql_queries.append(options["field"])
+        cds_query['field']      = options['field']
     else:
-        mysql_queries.append("")
+        cds_query['field']      = ""
 
-    if options.has_key("phrase"):
-        mysql_queries.append(options["phrase"])
+    if options.has_key("pattern"):
+        cds_query['pattern']      = options['pattern']
     else:
-        mysql_queries.append("")
+        cds_query['pattern']      = ""
 
     if options.has_key("format"):
-        fmt = options["format"]        
+        fmt = options["format"]
 
     ## check task state:
     task_state = task_read_state(task_id)
@@ -548,11 +580,12 @@ def task_run(process_hb):
     signal.signal(signal.SIGINT, task_sig_unknown)
     ## run the task:
 
-    bibreformat_task(sql_queries, mysql_queries, process_hb)
+    bibreformat_task(sql_queries, cds_query, process_hb)
 
     ## we are done:
     task_update_state("DONE")
     return
+
 
 def usage(exitcode=1, msg=""):
     """Prints usage info."""
@@ -569,7 +602,7 @@ def usage(exitcode=1, msg=""):
     sys.stderr.write("  -a,  --all            \t\t All records\n")
     sys.stderr.write("  -c,  --collection     \t\t Select records by collection\n")
     sys.stderr.write("  -f,  --field          \t\t Select records by field.\n")
-    sys.stderr.write("  -p,  --pattern        \t\t Select records by phrase.\n")
+    sys.stderr.write("  -p,  --pattern        \t\t Select records by pattern.\n")
     sys.stderr.write("  -o,  --format         \t\t Specify output format to be (re-)created. (default HB)\n")
     sys.stderr.write("  -n,  --noprocess      \t\t Count records to be processed only (no processing done)\n")
     sys.stderr.write("\n")
@@ -577,6 +610,7 @@ def usage(exitcode=1, msg=""):
     sys.stderr.write("\n")
 
     sys.exit(exitcode)
+
 
 def main():
     """Main function that analyzes command line input and calls whatever is appropriate.
@@ -593,13 +627,13 @@ def main():
         process_hb = 0
         options = {} # will hold command-line options
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "hVdu:ac:f:s:p:lo:nt:", ["help", "version", "debug","user=","all","collection=","field=","sleeptime=","pattern=","format=","noprocess","time="])
+            opts, args = getopt.getopt(sys.argv[1:], "hVdu:ac:f:s:p:lo:nt:wl", ["help", "version", "debug","user=","all","collection=","field=","sleeptime=","pattern=","format=","noprocess","time=","without","last"])
         except getopt.GetoptError, err:
             usage(1, err)
 
         if len(sys.argv) == 1:                       # default
 
-            options["new"]    = 1
+            options["without"]    = 1
             options["last"]   = 1
 
         try:
@@ -616,18 +650,18 @@ def main():
                     options["debug"]  = 1
                 elif opt[0] in ["-a", "--all"]:
                     options["all"]    = 1
-                    options["new"]    = 1
+                    options["without"]    = 1
                 elif opt[0] in ["-c", "--collection"]:
                     options["collection"]=opt[1]
                 elif opt[0] in ["-n", "--noprocess"]:
                     options["noprocess"] = 1
                     if len(sys.argv) == 2:
-                        options["new"]    = 1
+                        options["without"]    = 1
                         options["last"]   = 1
                 elif opt[0] in ["-f", "--field"]:
                     options["field"]  = opt[1]
                 elif opt[0] in ["-p","--pattern"]:
-                    options["phrase"] = opt[1]
+                    options["pattern"] = opt[1]
                 elif opt[0] in ["-o","--format"]:
                     options["format"] = opt[1]
                 elif opt[0] in ["-s", "--sleeptime" ]:
@@ -640,6 +674,7 @@ def main():
             usage(e)
         task_submit(options)
     return
+
 
 ### okay, here we go:
 if __name__ == '__main__':
