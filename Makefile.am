@@ -7,11 +7,12 @@ uninstall-local:
 
 load-sample-data: install ./dbutil/tabfill.sql
 	./dbutil/dbexec < ./dbutil/samplecfgdata.sql
-	(cd ./dbutil; ./bibformat < ./samplebibdata.xml > ./samplebibdatafmt.xml)
+	(cd ./dbutil; ./bibupload ./samplebibdata.xml)
+	(cd ./dbutil; ./bibformat otype=HB,HD,HP,HC < ./samplebibdata.xml > ./samplebibdatafmt.xml)
 	(cd ./dbutil; ./bibupload ./samplebibdatafmt.xml)
 	rm -f ./dbutil/samplebibdatafmt.xml
 	./cgibin/create_collection_pages ""+
-	./dbutil/bibwords add 1-70
+	./dbutil/bibwords add 1-74
 	@echo "*******************************************************************************"
 	@echo "** The sample data has been successfully loaded.                             **"
 	@echo "** Please point your browser to @HTDOCSURL@ "
