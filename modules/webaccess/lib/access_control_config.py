@@ -98,7 +98,7 @@ cfg_webaccess_msgs = {
 
 
 cfg_webaccess_warning_msgs = {
-           			0: '' ,
+           			0: 'User authorized' ,
            			1: 'Error (1): You are not a user authorized to perform this admin task.',
                                 2: 'Error (2): You are not a user authorized to perform administrative tasks.',
            			3: 'Error (3): The action specified (%s) is not known.',

@@ -79,8 +79,8 @@ def main():
         sys.stderr.write("%s\n" % __version__)
         sys.exit(0)    
     if alen < 3 or alen % 2 == 0:
-        print "7;%s" % cfg_webaccess_warning_msgs[7]
-        return "7;%s" % cfg_webaccess_warning_msgs[7]
+        print "7 , %s" % cfg_webaccess_warning_msgs[7]
+        return "7 , %s" % cfg_webaccess_warning_msgs[7]
 
     # try to authorize
     else:
@@ -96,8 +96,8 @@ def main():
         (auth_code, auth_message) = acc_authorize_action(id_user, name_action, **dict)
    
     # print and return 
-    print "%s;%s" % (auth_code, auth_message)
-    return "%s;%s" % (auth_code, auth_message)
+    print "%s , %s" % (auth_code, auth_message)
+    return "%s , %s" % (auth_code, auth_message)
 
 
 if __name__ == '__main__':

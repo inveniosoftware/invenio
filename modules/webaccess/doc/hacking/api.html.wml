@@ -48,7 +48,7 @@ Contents:
       def acc_authorize_action(id_user, name_action, dict={}, **arguments):
           """ Check if user is allowed to perform action
 	  with given list of arguments.
-	  Return (0, "") if authentication succeeds, (error_code, error_message) if it fails.
+	  Return (0, message) if authentication succeeds, (error_code, error_message) if it fails.
 
 	  The arguments are as follows:
     
@@ -70,13 +70,13 @@ Contents:
 >>> from access_control_engine import *
 >>> # authorize user 109 for action WebSearch_search with collection="LHC"
 >>> acc_authorize_action(109, 'cfgwebsearch', collection="LHC")
-      (0, "")
+      (0, "User authorized")
 >>> # authorize user 109 for action WebSearch_search with collection="fail this"
 >>> acc_authorize_action(109, 'cfgwebsearch', collection="fail this")
       (8, "Error (8): Incorrect keyword given for specified action.")
 >>> # authorize user 109 for action BibFormat_modify with format="htmlbrief"
 >>> acc_authorize_action(109, 'cfgbibformat', format="htmlbrief")
-      (0, "")
+      (0, "User authorized")
 
 2. Command Line Interface
 
@@ -107,11 +107,11 @@ Contents:
 
       These are the same ones as for the regular API:
       $ authaction 109 cfgwebsearch collection LHC
-        0;
+        0 , User authorized
       $ authaction 109 cfgwebsearch collection 'fail this'
-        8;Error (8): Incorrect keyword given for specified action.
+        8 , Error (8): Incorrect keyword given for specified action.
       $ authaction 109 cfgbibformat format htmlbrief
-        0;
+        0 , User authorized
 
 
 3. Program Flow

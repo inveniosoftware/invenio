@@ -40,7 +40,7 @@ except ImportError, e:
 def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
     """Check if user is allowed to perform action
     with given list of arguments.
-    Return (0, "") if authentication succeeds, (error code, error message) if it fails.
+    Return (0, message) if authentication succeeds, (error code, error message) if it fails.
 
     The arguments are as follows:
     
