@@ -64,6 +64,7 @@ $(cdspageheaderadd)
          <navbar:render nohints name=$(navbar_name) select=$(navbar_select)> 
         </td>
        </tr>
+
          ## first common "left top" CDS page box
          <: if ('<CDSPAGEBOXLEFTTOP>' =~ /\w/) {
                print '<tr class="pageboxlefttop" valign=top><td width=100%><CDSPAGEBOXLEFTTOP></td></tr>';

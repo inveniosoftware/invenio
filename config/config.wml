@@ -251,8 +251,102 @@ oai:cdswaredemo:101
 ## "cdsnavbar.wml" file.  You may want to modify it now, if you
 ## really know what you are doing. :-)
 
+#####################################
+## Part 5: WebSubmit Configuration ##
+#####################################
+
+<define-tag ADMINEMAIL whitespace=delete>
+thomas.baron@cern.ch
+</define-tag>
+
+<define-tag AUTHENTICATE whitespace=delete>
+TRUE
+</define-tag>
+
+<define-tag SUMMARYON whitespace=delete>
+TRUE
+</define-tag>
+
+<define-tag STORAGE whitespace=delete>
+<HTDOCSDIR>submit/storage
+</define-tag>
+
+<define-tag LYNX whitespace=delete>
+/usr/bin/lynx
+</define-tag>
+
+<define-tag GZIP whitespace=delete>
+/bin/gzip
+</define-tag>
+
+<define-tag GUNZIP whitespace=delete>
+/bin/gunzip
+</define-tag>
+
+<define-tag TAR whitespace=delete>
+/bin/tar
+</define-tag>
+
+<define-tag ACROREAD whitespace=delete>
+//usr/bin/acroread
+</define-tag>
+
+<define-tag DISTILLER whitespace=delete>
+/usr/bin/ps2pdf
+</define-tag>
+
+<define-tag GFILE whitespace=delete>
+/usr/bin/file
+</define-tag>
+
+<define-tag DJPEG whitespace=delete>
+</define-tag>
+
+<define-tag CONVERT whitespace=delete>
+</define-tag>
+
+<define-tag GIFTEXT whitespace=delete>
+</define-tag>
+
+<define-tag JPEGSIZE whitespace=delete>
+</define-tag>
+
+<define-tag PNMSCALE whitespace=delete>
+</define-tag>
+
+<define-tag PPMQUANT whitespace=delete>
+</define-tag>
+
+<define-tag PPMTOGIF whitespace=delete>
+</define-tag>
+
+<define-tag GIFINTER whitespace=delete>
+</define-tag>
+
+<define-tag GIFRSIZE whitespace=delete>
+</define-tag>
+
+<define-tag PHP whitespace=delete>
+/soft/bin/php
+</define-tag>
+
+<define-tag TMPDIR whitespace=delete>
+/tmp
+</define-tag>
+
+<define-tag ARCHIVE whitespace=delete>
+/archive
+</define-tag>
+
+<define-tag COUNTERS whitespace=delete>
+<HTDOCSDIR>submit/counters
+</define-tag>
+
+<define-tag SUBMITSUPPORTEMAIL whitespace=delete>
+thomas.baron@cern.ch
+</define-tag>
+
 ## And this is the end of "config.wml" WML configuration phase.  Now
 ## please return to the main CDS source directory and type 'make'.
 ## (Note: if you have bravely edited the "cdsnavbar.wml" file too,
 ## then please do "make clean" before doing "make".)
-
