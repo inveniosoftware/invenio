@@ -524,11 +524,10 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
 
     lwords_old = lwords
     lwords = []
-    words_removed = ""
     #Check terms, remove non alphanumeric characters. Use both unstemmed and stemmed version of all terms.
     for i in range(0, len(lwords_old)):
         term = string.lower(lwords_old[i])
-        if not methods[rank_method_code]["stopwords"] or methods[rank_method_code]["stopwords"] and not is_stopword_force(term):
+        if not methods[rank_method_code]["stopwords"] == "True" or methods[rank_method_code]["stopwords"] and not is_stopword_force(term):
             lwords.append((term, methods[rank_method_code]["rnkWORD_table"]))
             terms = string.split(string.lower(re.sub(methods[rank_method_code]["chars_alphanumericseparators"], ' ', term)))  
             for term in terms: 
@@ -536,8 +535,6 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
                     term = stem_by_lang(string.replace(term, ' ', ''), methods[rank_method_code]["stemmer"])
                 if lwords_old[i] != term: #add if stemmed word is different than original word
 	            lwords.append((term, methods[rank_method_code]["rnkWORD_table"]))
-        else:  
-            words_removed += "%s " % term
     if verbose > 0 and words_removed:
         voutput += "The following words are very common and were not included in ranking the documents: %s<br>" % words_removed
 
@@ -595,7 +592,6 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, ver
         #Only accept records existing in the hitset received from the search engine
         for (j, tf) in invidx.iteritems():
             if hitset.contains(j):
-                #recdict[j] = recdict.get(j, 0) + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
                 recdict[j] = recdict.get(j, 0) + int(math.log(tf[0] * Gi * tf[1] * qtf))
                 rec_termcount[j] = rec_termcount.get(j, 0) + 1
         #Multiply with the number of terms of the total number of terms in the query existing in the records 
@@ -603,7 +599,6 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, ver
         for (j, tf) in recdict.iteritems():
             if invidx.has_key(j):
                 tf = invidx[j]
-                #recdict[j] = recdict[j] + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
                 recdict[j] = recdict.get(j, 0) + int(math.log(tf[0] * Gi * tf[1] * qtf))
                 rec_termcount[j] = rec_termcount.get(j, 0) + 1
 
@@ -632,7 +627,6 @@ def calculate_record_relevance_findsimilar(term, invidx, hitset, recdict, rec_te
         for (j, tf) in invidx.iteritems():
             if hitset.contains(j):
                 recdict[j] = recdict.get(j, 0) + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
-                #recdict[j] = recdict.get(j, 0) + int(math.log(tf[0] * Gi * tf[1] * qtf))
                 rec_termcount[j] = rec_termcount.get(j, 0) + 1
         #Multiply with the number of terms of the total number of terms in the query existing in the records 
     elif quick: #much used term, do not include all records, only use already existing ones
@@ -640,7 +634,6 @@ def calculate_record_relevance_findsimilar(term, invidx, hitset, recdict, rec_te
             if invidx.has_key(j):
                 tf = invidx[j]
                 recdict[j] = recdict[j] + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
-                #recdict[j] = recdict.get(j, 0) + int(math.log(tf[0] * Gi * tf[1] * qtf))
                 rec_termcount[j] = rec_termcount.get(j, 0) + 1
 
     return (recdict, rec_termcount)
@@ -653,14 +646,9 @@ def sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, 
 
     startCreate = time.time()
     global voutput
+
     reclist = []
-    #Multiply with the number of terms of the total number of terms in the query existing in the records
-    for j in recdict.keys():
-        hitset.remove(j)
-        #if recdict[j] > 0:
-        #    recdict[j] = math.log((recdict[j] * rec_termcount[j]))
-       	#    recdict[j] = recdict[j] * rec_termcount[j]
- 
+    hitset.removemany(recdict.keys()) 
     divideby = max(recdict.values())
     for (j, w) in recdict.iteritems():
         w = int(w * 100 / divideby)
@@ -687,7 +675,6 @@ def sort_record_relevance_findsimilar(recdict, rec_termcount, hitset, rank_limit
         hitset.remove(j)
         if recdict[j] > 0:
             recdict[j] = math.log((recdict[j] * rec_termcount[j]))
-       	#    recdict[j] = recdict[j] * rec_termcount[j]
  
     divideby = max(recdict.values())
     for (j, w) in recdict.iteritems():
