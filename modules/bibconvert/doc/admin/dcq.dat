@@ -1,0 +1,34 @@
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<META NAME="DC.Title" LANG="eng" CONTENT="Title"> <LINK REL="SCHEMA.dc" HREF="http://purl.org/DC/about/element_set.htm">
+<META NAME="DC.Creator.PersonalName" CONTENT="Surname, Name">
+<META NAME="DC.Creator.PersonalName.DateOfBirth" SCHEME="ISO8601" CONTENT="1950-01-01">
+<META NAME="DC.Subject" SCHEME="DNB" CONTENT="33">
+<META NAME="DC.Subject" SCHEME="SWD" CONTENT="Lungenemphysem"> <LINK REL="SCHEMA.SWD" HREF="http://www.ddb.de/partner/swd.htm">
+<META NAME="DC.Subject" SCHEME="UDC" CONTENT="Pathogenese">
+<META NAME="DC.Subject" SCHEME="SWD" CONTENT="Chlamydia">
+<META NAME="DC.Subject" SCHEME="SWD" CONTENT="Bronchiolitis">
+<META NAME="DC.Subject" SCHEME="SWD" CONTENT="Elektronenmikroskopy">
+<META NAME="DC.Description" LANG="eng" CONTENT="Abstract">
+<META NAME="DC.Publisher.CorporateName" CONTENT="University">
+<META NAME="DC.Publisher.CorporateName.Address" CONTENT="Address">
+<META NAME="DC.Date.Accepted" SCHEME="ISO8601" CONTENT="2000-01-01"> <LINK REL="ISO8601" HREF="http://www.w3.org/TR/NOTE-datetime">
+<META NAME="DC.Type" CONTENT="Text.Thesis.Habilitation">
+<META NAME="DC.Identifier" SCHEME="URL" CONTENT="http://www.foo.com/Diss/habil.pdf">
+<META NAME="DC.Format" SCHEME="IMT" CONTENT="application/pdf"> <LINK REL="SCHEMA.imt" HREF="http://sunsite.auc.dk/RFC/rfc/rfc2046.html">
+<META NAME="DC.Format.Extent" CONTENT="XXX MB">
+<META NAME="DC.Language" SCHEME="ISO639-2" CONTENT="eng">
+
+
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<META NAME="DC.Title" LANG="eng" CONTENT="Thesis Title"> <LINK REL="SCHEMA.dc" HREF="http://purl.org/DC/about/element_set.htm">
+<META NAME="DC.Title.Translated" LANG="eng" CONTENT=" ">
+<META NAME="DC.Creator.PersonalName" CONTENT="Surname, Name">
+<META NAME="DC.Description" LANG="eng" CONTENT="Abstract">
+<META NAME="DC.Publisher.CorporateName" CONTENT="University Library">
+<META NAME="DC.Publisher.CorporateName.Address" CONTENT="Street, Town, State">
+<META NAME="DC.Date.Accepted" SCHEME="ISO8601" CONTENT="2002-01-01"> <LINK REL="ISO8601" HREF="http://www.w3.org/TR/NOTE-datetime">
+<META NAME="DC.Type" CONTENT="Text.Thesis.Doctoral">
+<META NAME="DC.Identifier" SCHEME="URL" CONTENT="http://www.foo.com/index.html">
+<META NAME="DC.Format" SCHEME="IMT" CONTENT="application/pdf"> <LINK REL="SCHEMA.imt" HREF="http://sunsite.auc.dk/RFC/rfc/rfc2046.html">
+<META NAME="DC.Format.Extent" CONTENT="ca. 1,6 MB">
+<META NAME="DC.Language" SCHEME="ISO639-2" CONTENT="eng">
