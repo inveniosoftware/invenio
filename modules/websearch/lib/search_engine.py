@@ -66,6 +66,7 @@ except ImportError, e:
         
 search_cache = {} # will cache results of previous searches
 dbg = 0 # are we debugging?
+cfg_nb_browse_seen_records = 100 # limit of the number of records to check when browsing certain collection
 
 ## precompile some often-used regexp for speed reasons:
 re_a = re.compile('[бавд]')
@@ -355,9 +356,9 @@ def create_inputdate_box(name="d1", selected_year="", selected_month="", selecte
     return box
 
 def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1, p2, f2, m2, op2, p3, f3, m3, sc,
-                      d1y, d1m, d1d, d2y, d2m, d2d):
+                      d1y, d1m, d1d, d2y, d2m, d2d, action="SEARCH"):
     "Create search box for 'search again in the results page' functionality."
-    out = ""
+    out = ""    
     # print search box prolog:
     out += """
     <form action="%s/search.py" method="get">
@@ -373,7 +374,11 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
     # possibly print external search engines links (Google box):
     if cfg_google_box:
         out += create_google_box(p, f, p1, p2, p3)
-    # firstly, print Query box:
+    # decide upon leading text:
+    leadingtext = "Search"
+    if action == "Browse":
+        leadingtext = "Browse"
+    ## firstly, print Query box:
     if as==1:
         # print Advanced Search form:
         # define search box elements:
@@ -396,7 +401,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
          <thead>
           <tr>
            <th colspan="3" class="searchboxheader">
-            Search for:
+            %s for:
            </th>
           </tr> 
          </thead>
@@ -422,7 +427,8 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
          </tbody>
         </table>
         """ % \
-         (cell_1_left, cell_1_right, cell_1_moreright, \
+         (leadingtext,
+          cell_1_left, cell_1_right, cell_1_moreright, \
           cell_2_left, cell_2_right, cell_2_moreright, \
           cell_3_left, cell_3_right, cell_3_moreright,
           cell_4)         
@@ -440,7 +446,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
          <thead>
           <tr>
            <th colspan="3" class="searchboxheader">
-            Search for:
+            %s for:
            </th>
           </tr> 
          </thead>
@@ -455,21 +461,22 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
           </tr>
          </tbody>
         </table> 
-        """ % (cell_1_left, cell_1_middle, cell_1_right,
+        """ % (leadingtext,
+               cell_1_left, cell_1_middle, cell_1_right,
                cell_2)
-    # secondly, print Collection(s) box:
+    ## secondly, print Collection(s) box:
     out += """
         <table class="searchbox">
          <thead>
           <tr>
            <th colspan="3" class="searchboxheader">
-            Search collections:
+            %s collections:
            </th>
           </tr> 
          </thead>
          <tbody>
           <tr valign="bottom">
-           <td valign="top" class="searchboxbody">"""
+           <td valign="top" class="searchboxbody">""" % leadingtext
     colls_nicely_ordered = get_nicely_ordered_collection_list()    
     if colls and colls[0] != cdsname:
         # some collections are defined, so print these first, and only then print 'add another collection' heading:
@@ -493,8 +500,8 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
     </tr>
     </tbody>
     </table>"""
-    # thirdly, print from/until date boxen, if applicable:
-    if d1y=="" and d1m=="" and d1d=="" and d2y=="" and d2m=="" and d2d=="":
+    ## thirdly, print from/until date boxen, if applicable:
+    if action=="Browse" or (d1y=="" and d1m=="" and d1d=="" and d2y=="" and d2m=="" and d2d==""):
         pass # do not need it
     else:
         cell_6_a = create_inputdate_box("d1", d1y, d1m, d1d)
@@ -518,78 +525,79 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
                    </tbody>
                   </table>""" % \
            (cell_6_a, cell_6_b)        
-    # fourthly, print Display/Sort box:
-    cell_1_left = """
-    <select name="sf">
-    <option value="">- latest first -"""
-    query = """SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
-                WHERE cff.type='soo' AND cff.id_field=f.id
-                ORDER BY cff.score DESC, f.name ASC""" 
-    res = run_sql(query)
-    for code, name in res:
-        # propose found sort options:
-        cell_1_left += """<option value="%s"%s>%s""" % (code, is_selected(sf,code), name)
-    cell_1_left += """</select>"""
-    cell_1_left += """<select name="so">
-                      <option value="a"%s>asc.
-                      <option value="d"%s>desc.
-                      </select>""" % (is_selected(so,"a"),is_selected(so,"d"))
-    cell_1_right = """
-    <select name="of">"""
-    query = """SELECT code,name FROM format ORDER BY name ASC""" 
-    res = run_sql(query)
-    if res:
-        # propose found formats:
+    ## fourthly, print Display/Sort box:
+    if action != "Browse":
+        cell_1_left = """
+        <select name="sf">
+        <option value="">- latest first -"""
+        query = """SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
+                    WHERE cff.type='soo' AND cff.id_field=f.id
+                    ORDER BY cff.score DESC, f.name ASC""" 
+        res = run_sql(query)
         for code, name in res:
-            cell_1_right += """<option value="%s"%s>%s""" % (code, is_selected(of,code), name)
-    else:
-        # no formats are found, so propose the default HTML one:
-        cell_1_right += """<option value="hb"%s>HTML brief""" % (is_selected(of,"hb"))
-    # is format made of numbers only? if yes, then propose it too:
-    if of and str(of[0:3]).isdigit():
-        cell_1_right += """<option value="%s" selected>%s MARC tag""" % (of, of)
-    cell_1_right += """</select>"""
-    ## okay, formats ended
-    cell_1_middle = """
-    <select name="rg">
-    <option value="10"%s>10 results
-    <option value="25"%s>25 results
-    <option value="50"%s>50 results
-    <option value="100"%s>100 results
-    <option value="250"%s>250 results
-    <option value="500"%s>500 results
-    </select>
-    <select name="sc">
-    <option value="0"%s>grouped together 
-    <option value="1"%s>split by collection
-    </select>
-    """ % (is_selected(rg,"10"), is_selected(rg,"25"), is_selected(rg,"50"), \
-           is_selected(rg,"100"), is_selected(rg,"250"), is_selected(rg,"500"),\
-           is_selected(sc,"0"), is_selected(sc,"1"))
-    out += """
-        <table class="searchbox">
-         <thead>
-          <tr>
-           <th class="searchboxheader">
-            Sort by:
-           </th>
-           <th class="searchboxheader">
-            Display results:
-           </th>
-           <th class="searchboxheader">
-            Output format:
-           </th>
-          </tr> 
-         </thead>
-         <tbody>
-          <tr valign="bottom">
-           <td valign="top" class="searchboxbody">%s</td>
-           <td valign="top" class="searchboxbody">%s</td>
-           <td valign="top" class="searchboxbody">%s</td>
-          </tr>
-         </tbody>
-        </table>""" % (cell_1_left, cell_1_middle, cell_1_right)
-    # print end of search box:
+            # propose found sort options:
+            cell_1_left += """<option value="%s"%s>%s""" % (code, is_selected(sf,code), name)
+        cell_1_left += """</select>"""
+        cell_1_left += """<select name="so">
+                          <option value="a"%s>asc.
+                          <option value="d"%s>desc.
+                          </select>""" % (is_selected(so,"a"),is_selected(so,"d"))
+        cell_1_right = """
+        <select name="of">"""
+        query = """SELECT code,name FROM format ORDER BY name ASC""" 
+        res = run_sql(query)
+        if res:
+            # propose found formats:
+            for code, name in res:
+                cell_1_right += """<option value="%s"%s>%s""" % (code, is_selected(of,code), name)
+        else:
+            # no formats are found, so propose the default HTML one:
+            cell_1_right += """<option value="hb"%s>HTML brief""" % (is_selected(of,"hb"))
+        # is format made of numbers only? if yes, then propose it too:
+        if of and str(of[0:3]).isdigit():
+            cell_1_right += """<option value="%s" selected>%s MARC tag""" % (of, of)
+        cell_1_right += """</select>"""
+        ## okay, formats ended
+        cell_1_middle = """
+        <select name="rg">
+        <option value="10"%s>10 results
+        <option value="25"%s>25 results
+        <option value="50"%s>50 results
+        <option value="100"%s>100 results
+        <option value="250"%s>250 results
+        <option value="500"%s>500 results
+        </select>
+        <select name="sc">
+        <option value="0"%s>grouped together 
+        <option value="1"%s>split by collection
+        </select>
+        """ % (is_selected(rg,"10"), is_selected(rg,"25"), is_selected(rg,"50"), \
+               is_selected(rg,"100"), is_selected(rg,"250"), is_selected(rg,"500"),\
+               is_selected(sc,"0"), is_selected(sc,"1"))
+        out += """
+            <table class="searchbox">
+             <thead>
+              <tr>
+               <th class="searchboxheader">
+                Sort by:
+               </th>
+               <th class="searchboxheader">
+                Display results:
+               </th>
+               <th class="searchboxheader">
+                Output format:
+               </th>
+              </tr> 
+             </thead>
+             <tbody>
+              <tr valign="bottom">
+               <td valign="top" class="searchboxbody">%s</td>
+               <td valign="top" class="searchboxbody">%s</td>
+               <td valign="top" class="searchboxbody">%s</td>
+              </tr>
+             </tbody>
+            </table>""" % (cell_1_left, cell_1_middle, cell_1_right)
+    ## last but not least, print end of search box:
     out += """</table></form>
     """
     return out
@@ -1113,51 +1121,8 @@ def browse_pattern(req, colls, p, f, rg):
     ## do we search in words indexes?
     if not f:
         return browse_in_bibwords(req, p, f)
-    ## okay, "real browse" follows:
-    browsed_words_hits = browse_in_bibxxx(colls, p, f, rg)
-    while not browsed_words_hits:
-        # try again and again with shorter and shorter pattern:
-        try:
-            p = p[:-1]
-            browsed_words_hits = browse_in_bibxxx(colls, p, f, rg)
-        except:
-            # probably there are no hits at all:
-            req.write("<p>No values found.")
-            return         
-    ## display results now:
-    out = """<table class="searchresultsbox">
-              <thead>
-               <tr>
-                <th class="searchresultsboxheader" align="left">
-                  hits
-                </th>
-                <th class="searchresultsboxheader" width="15">
-                  &nbsp;
-                </th>
-                <th class="searchresultsboxheader" align="left">
-                  %s
-                </th>
-               </tr>
-              </thead>
-              <tbody>""" % f
-    wlist = browsed_words_hits.keys()
-    wlist.sort()
-    for word in wlist:
-        out += """<tr>
-                   <td class="searchresultsboxbody" align="right">
-                    %s
-                   </td>
-                   <td class="searchresultsboxbody" width="15">
-                    &nbsp;
-                   </td>
-                   <td class="searchresultsboxbody" align="left">
-                    <a href="%s/search.py?p=%s&f=%s">%s</a>
-                   </td>
-                  </tr>""" % (browsed_words_hits[word], weburl, urllib.quote(word), urllib.quote(f), word)
-    out += """</tbody>
-        </table>"""        
-    req.write(out)
-    return 
+    else:
+        return browse_in_bibxxx(req, colls, p, f, rg)
 
 def browse_in_bibwords(req, p, f):
     """Browse inside words indexes."""
@@ -1169,11 +1134,15 @@ def browse_in_bibwords(req, p, f):
     req.write(create_nearest_words_links(url, p, f))
     return
 
-def browse_in_bibxxx(colls, p, f, rg):
+def browse_in_bibxxx(req, colls, p, f, rg):
     """Browse bibliographic phrases for the given pattern in the given field."""
     ## determine browse field:
     if string.find(p, ":") > 0: # does 'p' contain ':'?
         f, p = split(p, ":", 2)
+    ## prepare collection urlargument for later printing:
+    urlarg_colls = ""
+    for coll in colls:
+        urlarg_colls += "&c=%s" % urllib.quote(coll)
     ## wash 'p' argument:
     p = re_quotes.sub("", p)
     ## construct 'tl' which defines the tag list (MARC tags) to search in:
@@ -1184,35 +1153,124 @@ def browse_in_bibxxx(colls, p, f, rg):
         # deduce desired MARC tags on the basis of chosen 'f'
         tl = get_field_tags(f)
     ## start browsing to fetch list of hits:
-    browsed_words_hits = {} # will hold dict of {'word' : nbhits}
     for t in tl:
+        # print header for this tag:
+        out = """<table class="searchresultsbox">
+                  <thead>
+                   <tr>
+                    <th class="searchresultsboxheader" align="left">
+                      <strong>#</strong>
+                    </th>
+                    <th class="searchresultsboxheader" width="15">
+                      &nbsp;
+                    </th>
+                    <th class="searchresultsboxheader" align="left">
+                      <strong>%s</strong> %s
+                    </th>
+                   </tr>
+                  </thead>
+                  <tbody>""" % (f, get_tag_name(t,"[","]"))
+        req.write(out)
         # deduce into which bibxxx table we will search:
         digit1, digit2 = int(t[0]), int(t[1])
         bx = "bib%d%dx" % (digit1, digit2)
         bibx = "bibrec_bib%d%dx" % (digit1, digit2)
-        # construct query:
-        if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
-            query = "SELECT bx.id, bx.value FROM %s AS bx WHERE bx.value >= '%s' AND bx.tag LIKE '%s%%' ORDER BY bx.value ASC LIMIT %d" \
-                    % (bx, p, t, rg)
+        p_t = p
+        while 1: # try quering until some hits can be found:
+            # construct query:
+            if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
+                query = "SELECT bx.id, bx.value FROM %s AS bx WHERE bx.value >= '%s' AND bx.tag LIKE '%s%%' ORDER BY bx.value ASC LIMIT %d" \
+                        % (bx, p_t, t, cfg_nb_browse_seen_records+2)
+            else:
+                query = "SELECT bx.id, bx.value FROM %s AS bx WHERE bx.value >= '%s' AND bx.tag='%s' ORDER BY bx.value ASC LIMIT %d" \
+                        % (bx, p_t, t, cfg_nb_browse_seen_records+2)
+            # launch the query:
+            res = run_sql(query)
+            if res:
+                # some hits found, good
+                break 
+            else:
+                # no hits found, so try to shorten the browse string by a letter
+                if len(p_t)>1:
+                    p_t = p_t[:-1]
+                else:
+                    break # cannot shorten more, so exit with no results found
+        # print results:
+        nb_hits = 0
+        word_current_hit = ""
+        word_next_hit = ""
+        for word_id,word in res:
+            # detect how many hits has word in these particular collections:
+            word_hitlist = HitList()
+            word_hitlists = search_pattern("", word, f, colls, 'e')
+            for coll in colls:
+                word_hitlist.union(word_hitlists[coll])
+            word_hitlist.calculate_nbhits()
+            if word_hitlist._nbhits > 0:
+                # okay, it has some hits in colls, so print it:
+                word_current_hit = word
+                nb_hits += 1
+                if nb_hits > rg:
+                    word_next_hit = word
+                    break
+                out = """<tr>
+                           <td class="searchresultsboxbody" align="right">
+                            %s
+                           </td>
+                           <td class="searchresultsboxbody" width="15">
+                            &nbsp;
+                           </td>
+                           <td class="searchresultsboxbody" align="left">
+                            <a href="%s/search.py?p=%%22%s%%22&f=%s%s">%s</a>
+                           </td>
+                          </tr>""" % (word_hitlist._nbhits, weburl, urllib.quote(word), urllib.quote(f), urlarg_colls, word)
+                req.write(out)
+        # propose 'next word' link:
+        if word_next_hit:
+            req.write("""<tr><td colspan="2" class="normal">
+                               &nbsp;
+                             </td>
+                             <td class="normal">
+                               <img src="%s/img/sn.gif" alt="" border="0">
+                               next %s: <a href="%s/search.py?search=Browse&p=%s&f=%s%s">%s</a>
+                             </td>
+                         </tr>"""\
+                      % (weburl, get_tag_name(t), weburl, urllib.quote(word_next_hit), urllib.quote(f), urlarg_colls, word_next_hit))
         else:
-            query = "SELECT bx.id, bx.value FROM %s AS bx WHERE bx.value >= '%s' AND bx.tag='%s' ORDER BY bx.value ASC LIMIT %d" \
-                    % (bx, p, t, rg)
-        # launch the query:
-        res = run_sql(query)
-        # display results:
-        for row in res:
-            bx_id, bx_val = row[0], row[1]
-            # deduce number of hits (=different RECIDs) for 'bx_val':
-            query_bis = "SELECT COUNT(DISTINCT(bibx.id_bibrec)) FROM %s AS bibx WHERE bibx.id_bibxxx='%s'" % (bibx, bx_id)
-            query_bis_hits = 0
-            res_bis = run_sql(query_bis, None, 1)
-            if res_bis:
-                query_bis_hits = res_bis[0][0]
-            try:
-                browsed_words_hits[bx_val] += query_bis_hits
-            except:
-                browsed_words_hits[bx_val] = query_bis_hits
-    return browsed_words_hits
+            # we don't have 'next word hit', so print only 'try out' proposals if they apply
+            if res:
+                word_try = res[len(res)-1][1]
+                if word_try == p_t or word_try == word_current_hit:
+                    req.write("""<tr><td colspan="2" class="normal">
+                                       &nbsp;
+                                     </td>
+                                     <td class="normal">
+                                      <img src="%s/img/sn.gif" alt="" border="0">
+                                       nothing found below %s.
+                                     </td>
+                                 </tr>""" % (weburl, word_try))
+                else:
+                    req.write("""<tr><td colspan="2" class="normal">
+                                       &nbsp;
+                                     </td>
+                                     <td class="normal">
+                                      <img src="%s/img/sn.gif" alt="" border="0">
+                                       try again below <a href="%s/search.py?search=Browse&p=%s&f=%s%s">%s</a>
+                                     </td>
+                                 </tr>"""\
+                              % (weburl, weburl, urllib.quote(word_try), urllib.quote(f), urlarg_colls, word_try))
+            else:
+                req.write("""<tr><td colspan="2" class="normal">
+                                   &nbsp;
+                                 </td>
+                                 <td class="normal">
+                                   nothing found below %s.
+                                 </td>
+                             </tr>""" % p_t)            
+        # print footer for this tag:
+        req.write("""</tbody>
+            </table>""")
+    return 
 
 def search_pattern(req, p=None, f=None, colls=None, m=None, hit_hints=0):
     """Searches for pattern 'p' and field 'f' and returns dict of recIDs HitLists per each collection in 'colls'.
@@ -1554,6 +1612,16 @@ def get_mysql_recid_from_aleph_sysno(sysno):
     res = run_sql(query, None, 1)
     if res:        
         out = res[0][0]
+    return out
+
+def get_tag_name(tag_value, prolog="", epilog=""):
+    """Return tag name from the known tag value, by looking up the 'tag' table.
+       Return empty string in case of failure.
+       Example: input='100__%', output=first author'."""    
+    out = ""
+    res = run_sql("SELECT name FROM tag WHERE value=%s", (tag_value,))
+    if res:
+        out = prolog + res[0][0] + epilog
     return out
 
 def get_field_tags(field):
@@ -1924,7 +1992,15 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', decompress=zli
         else:
             # we are doing HTML output:
             req.write("""<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
-            if format != "hb":
+            if format.startswith("hb"):
+                req.write("\n<table>")            
+                for irec in range(irec_max,irec_min,-1):
+                    req.write("""\n<tr><td valign="top"><input name="recid" type="checkbox" value="%s"></td>""" % recIDs[irec])
+                    req.write("""<td valign="top" align="right">%d.</td><td valign="top">""" % (jrec+irec_max-irec))
+                    req.write(print_record(recIDs[irec], format, ot))
+                    req.write("</td></tr>")
+                req.write("\n</table>")
+            else:
                 # deduce url without 'of' argument:
                 url_args = re.sub(r'(^|\&)of=.*?(\&|$)',r'\1',req.args)
                 url_args = re.sub(r'^\&+', '', url_args)
@@ -1939,14 +2015,6 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', decompress=zli
                 for irec in range(irec_max,irec_min,-1):
                     req.write(print_record(recIDs[irec], format, ot))
                     req.write("<p><p>")
-            else:                
-                req.write("\n<table>")            
-                for irec in range(irec_max,irec_min,-1):
-                    req.write("""\n<tr><td valign="top"><input name="recid" type="checkbox" value="%s"></td>""" % recIDs[irec])
-                    req.write("""<td valign="top" align="right">%d.</td><td valign="top">""" % (jrec+irec_max-irec))
-                    req.write(print_record(recIDs[irec], format, ot))
-                    req.write("</td></tr>")
-                req.write("\n</table>")
             #req.write("""<div align="right"><input type="submit" name="action" value="ADD TO BASKET"></div>""")
             req.write("""<br><input class="formbutton" type="submit" name="action" value="ADD TO BASKET">""")
             req.write("""</form>""")
@@ -2153,6 +2221,18 @@ def print_record(recID, format='hb', ot='', decompress=zlib.decompress):
                     <small><strong>%s:</strong> <a href="%s">%s</a></small>""" % (link_text, urls_u[idx], urls_u[idx])
                 # print some white space at the end:
                 out += "<p><p>"
+
+    elif format == "hb-fly":
+        # HTML brief called on the fly; suitable for testing brief formats
+        out += call_bibformat(recID, "BRIEF_HTML")
+        out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?id=%s">Detailed record</a></span>""" \
+               % (weburl, recID)
+
+    elif format == "hd-ejournalsite":
+        # HTML brief called on the fly; suitable for testing brief formats
+        out += call_bibformat(recID, "EJOURNALSITE")
+        out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?id=%s">Detailed record</a></span>""" \
+               % (weburl, recID)
 
     else:
         # HTML brief format by default
@@ -2394,7 +2474,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 p = wash_pattern(p)
                 f = wash_field(f)
                 req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
-                                            p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d))
+                                            p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d, search))
                 print_warning(req, "Requested record does not seem to exist.", None, "<p>")
     elif search == "Browse":
         ## 2 - browse needed
@@ -2404,7 +2484,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         # write search box:
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d, search))
         if as==1 or (p1 or p2 or p3):
             browse_pattern(req, colls_to_search, p1, f1, rg)
             browse_pattern(req, colls_to_search, p2, f2, rg)
@@ -2420,7 +2500,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         # write search box:
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d, search))
         # run search:
         t1 = os.times()[4]
         if as == 1 or (p1 or p2 or p3):
@@ -2636,4 +2716,5 @@ def perform_request_log(req, date=""):
 #print search_in_bibrec('2002-12-01','2002-12-12')
 #print wash_dates('1980', '', '28', '2003','02','')
 #print type(wash_url_argument("-1",'int'))
+#print browse_in_bibxxx(["Reports"], "z", "author", 10)
 </protect>
