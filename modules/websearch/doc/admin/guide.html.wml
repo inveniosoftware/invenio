@@ -21,54 +21,51 @@
     title="WebSearch Admin Guide" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websearch/>WebSearch Admin</a>" \
     navbar_name="admin" \
-    navbar_select="websearch"
+    navbar_select="websearch-admin-guide"
 
    <p><table class="errorbox">
    <thead>
    <tr>
    <th class="errorboxheader">
-     WARNING: WEBSEARCH ADMIN GUIDE IS NOT FULLY COMPLETED
+     WARNING: THIS ADMIN GUIDE IS NOT FULLY COMPLETED
    </th>
    </tr>
    </thead>
    <tbody>
    <tr>
    <td class="errorboxbody">
-
-     WebSearch Admin Guide is not yet completed.  Moreover, some
-     admin-level functionality for WebSearch exists only in
-     commandline mode.  We are in the process of developing both the
+     This Admin Guide is not yet completed.  Moreover, some
+     admin-level functionality for this module exists only in the form of
+     manual recipes.  We are in the process of developing both the
      guide as well as the web admin interface.  If you are interested
      in seeing some specific things implemented with high priority,
-     please contact us at <SUPPORTEMAIL>.  Thanks for your interest!
-     
+     please contact us at <SUPPORTEMAIL>.  Thanks for your interest!     
    </td>
    </tr>
    </tbody>
    </table>
 
-
-<h3>Index</h3>
-<strong>1.<a href="#1">Overview</a></strong></br>
-<strong>2. <a href="#2">Edit Collection Tree</a></strong></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.1 <a href="#2.1">Add new collection</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.2 <a href="#2.2">Add collection to tree</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.3 <a href="#2.3">Modify existing tree</a></br>
-<strong>3. <a href="#3">Edit Collection Parameters</a></strong></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1. <a href="#3.1">Modify collection query</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2. <a href="#3.2">Modify access restrictions</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3. <a href="#3.3">Modify translations</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4. <a href="#3.4">Delete collection</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5. <a href="#3.5">Modify portalboxes</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.6. <a href="#3.6">Modify search fields</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.7. <a href="#3.7">Modify search options</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.8. <a href="#3.8">Modify sort options</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.9. <a href="#3.9">Modify rank options</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.10.<a href="#3.10">Modify output formats</a></br>
-<strong>4. <a href="#4">Run WebColl Daemon</a></strong></br>
-<strong>5. <a href="#5">Edit Search Engine Parameters</a></strong></br>
-<strong>6. <a href="#6">Search Engine Cache</a></strong></br>
-<strong>7. <a href="#7">Additional Information</a></strong></br>
+<h2>Contents</h2>
+<strong>1. <a href="#1">Overview</a></strong><br>
+<strong>2. <a href="#2">Edit Collection Tree</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.1 <a href="#2.1">Add new collection</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.2 <a href="#2.2">Add collection to tree</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.3 <a href="#2.3">Modify existing tree</a><br>
+<strong>3. <a href="#3">Edit Collection Parameters</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1. <a href="#3.1">Modify collection query</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2. <a href="#3.2">Modify access restrictions</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3. <a href="#3.3">Modify translations</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4. <a href="#3.4">Delete collection</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5. <a href="#3.5">Modify portalboxes</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.6. <a href="#3.6">Modify search fields</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.7. <a href="#3.7">Modify search options</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.8. <a href="#3.8">Modify sort options</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.9. <a href="#3.9">Modify rank options</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.10.<a href="#3.10">Modify output formats</a><br>
+<strong>4. <a href="#4">Run WebColl Daemon</a></strong><br>
+<strong>5. <a href="#5">Edit Search Engine Parameters</a></strong><br>
+<strong>6. <a href="#6">Search Engine Cache</a></strong><br>
+<strong>7. <a href="#7">Additional Information</a></strong><br>
 
 <a name="1"></a><h2>1. Overview</h2>
 
