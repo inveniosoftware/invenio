@@ -130,6 +130,7 @@ msg_please_contact_and_quote = {}
 msg_search_options = {}
 msg_latest_additions = {}
 msg_more = {}
+msg_collection_contains_no_records = {}
 
 ## English:
 <en>
@@ -233,6 +234,7 @@ msg_please_contact_and_quote['en'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
 msg_search_options['en'] = """<MSG_SEARCH_OPTIONS>"""
 msg_latest_additions['en'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['en'] = """<MSG_MORE>"""
+msg_collection_contains_no_records['en'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 </en>
 
 ## French:
@@ -337,6 +339,7 @@ msg_please_contact_and_quote['fr'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
 msg_search_options['fr'] = """<MSG_SEARCH_OPTIONS>"""
 msg_latest_additions['fr'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['fr'] = """<MSG_MORE>"""
+msg_collection_contains_no_records['fr'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 </fr>
 
 ## German:
@@ -441,6 +444,7 @@ msg_please_contact_and_quote['de'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
 msg_search_options['de'] = """<MSG_SEARCH_OPTIONS>"""
 msg_latest_additions['de'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['de'] = """<MSG_MORE>"""
+msg_collection_contains_no_records['de'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 </de>
 
 ## Spanish:
@@ -545,6 +549,7 @@ msg_please_contact_and_quote['es'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
 msg_search_options['es'] = """<MSG_SEARCH_OPTIONS>"""
 msg_latest_additions['es'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['es'] = """<MSG_MORE>"""
+msg_collection_contains_no_records['es'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 </es>
 
 ## Portuguese:
@@ -649,6 +654,7 @@ msg_please_contact_and_quote['pt'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
 msg_search_options['pt'] = """<MSG_SEARCH_OPTIONS>"""
 msg_latest_additions['pt'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['pt'] = """<MSG_MORE>"""
+msg_collection_contains_no_records['pt'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 </pt>
 
 ## Italian:
@@ -753,6 +759,7 @@ msg_please_contact_and_quote['it'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
 msg_search_options['it'] = """<MSG_SEARCH_OPTIONS>"""
 msg_latest_additions['it'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['it'] = """<MSG_MORE>"""
+msg_collection_contains_no_records['it'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 </it>
 
 ## Russian:
@@ -857,6 +864,7 @@ msg_please_contact_and_quote['ru'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
 msg_search_options['ru'] = """<MSG_SEARCH_OPTIONS>"""
 msg_latest_additions['ru'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['ru'] = """<MSG_MORE>"""
+msg_collection_contains_no_records['ru'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 </ru>
 
 ## Slovak:
@@ -961,6 +969,7 @@ msg_please_contact_and_quote['sk'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
 msg_search_options['sk'] = """<MSG_SEARCH_OPTIONS>"""
 msg_latest_additions['sk'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['sk'] = """<MSG_MORE>"""
+msg_collection_contains_no_records['sk'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 </sk>
 
 ## Czech:
@@ -1065,6 +1074,7 @@ msg_please_contact_and_quote['cz'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
 msg_search_options['cz'] = """<MSG_SEARCH_OPTIONS>"""
 msg_latest_additions['cz'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['cz'] = """<MSG_MORE>"""
+msg_collection_contains_no_records['cz'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 </cz>
 
 ## Norwegian:
@@ -1169,6 +1179,7 @@ msg_please_contact_and_quote['no'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
 msg_search_options['no'] = """<MSG_SEARCH_OPTIONS>"""
 msg_latest_additions['no'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['no'] = """<MSG_MORE>"""
+msg_collection_contains_no_records['no'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 </no>
 
 ## I18N messages oriented functions:

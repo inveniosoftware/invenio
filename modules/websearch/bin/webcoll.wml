@@ -544,7 +544,7 @@ class Collection:
                 if self.nbrecs > rg:
                     box += """<div align="right"><small><a href="%s&amp;ln=%s">[&gt;&gt; %s]</a></small></div>""" % (url, ln, msg_more[ln])
             else:
-                box += """<small><strong>No records! </strong></small><br> This collection does not contain any document yet."""
+                box += msg_collection_contains_no_records[ln]
         return box
 
     def create_searchoptions(self):

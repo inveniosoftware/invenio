@@ -464,7 +464,7 @@
   <es>Buscar %s registros por:</es>
   <pt>Buscar %s registros por:</pt>
   <it>Ricerca %s registrazioni:</it>
-  <ru>Искать %s запускоб для:</ru>
+  <ru>Искать %s запусков для:</ru>
   <sk>Hľadaj v %s záznamoch:</sk>
   <cz>Hledej v %s záznamech:</cz>
   <no>Søk i %s poster etter:</no>
@@ -1693,6 +1693,19 @@
   <sk>viac</sk>
   <cz>více</cz>
   <no>mer</no>
+</define-tag>
+
+<define-tag MSG_COLLECTION_CONTAINS_NO_RECORDS>
+  <en>This collection does not contain any document yet.</en>
+  <fr>Cette collection ne contient pas encore de document.</fr>
+  <de>This collection does not contain any document yet.</de>
+  <es>This collection does not contain any document yet.</es>
+  <pt>This collection does not contain any document yet.</pt>
+  <it>This collection does not contain any document yet.</it>
+  <ru>Ета коллекция не содержит еще запусков.</ru>
+  <sk>Táto kolekcia ešte neobsahuje žiadne záznamy.</sk>
+  <cz>Tato kolekce ješte neobsahuje žádné záznamy.</cz>
+  <no>This collection does not contain any document yet.</no>
 </define-tag>
 
 ## end of file
