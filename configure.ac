@@ -187,6 +187,7 @@ AC_OUTPUT(Makefile \
 	  htdocs/bibformat/core/Makefile \
 	  htdocs/bibformat/common/Makefile \
 	  htdocs/admin/Makefile \
+	  htdocs/admin/howto/Makefile \
 	  htdocs/admin/bibconvert/Makefile \
 	  htdocs/admin/bibdata/Makefile \
 	  htdocs/admin/bibformat/Makefile \
