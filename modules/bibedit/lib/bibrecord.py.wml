@@ -84,7 +84,7 @@ else:
         except ImportError,e :
             err2=e
             j=0
-    else:
+    elif 0 in parsers:
         try:
             from xml.dom.minidom import parseString
             parser = 0
