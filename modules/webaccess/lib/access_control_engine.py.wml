@@ -29,7 +29,6 @@ __version__ = "$Id$"
 
 ## import interesting modules:
 try:
-    from ace_extrafunctions import * 
     import cgi
     import sys
     import time
