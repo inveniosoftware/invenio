@@ -1315,7 +1315,7 @@ def perform_rearrangefield(colID, ln, fmeth, callback='yes', confirm=-1):
     colID - the collection
     """
  
-    subtitle = "Order values alphabetically"
+    subtitle = "Order fields alphabetically"
     output  = ""
     col_fld = dict(map(lambda x: (x[0], x[1]), get_col_fld(colID, fmeth)))
     fld_names =  get_def_name('', "field")
@@ -1538,7 +1538,7 @@ def perform_showsearchfields(colID, ln, callback='yes', content='', confirm=-1):
      <dd>Go to the BibIndex interface to modify the available search fields</dd>
      <dt>Collection specific actions
      <dd><a href="addexistingfield?colID=%s&amp;ln=%s&amp;fmeth=sew#6.2">Add search field to collection</a></dd>
-     <dd><a href="rearrangefield?colID=%s&amp;ln=%s&amp;fmeth=sew#6.2">Ordersearch fields alphabetically</a></dd>
+     <dd><a href="rearrangefield?colID=%s&amp;ln=%s&amp;fmeth=sew#6.2">Order search fields alphabetically</a></dd>
     </dl>
     """  % (colID, ln, colID, ln)
 
