@@ -591,15 +591,13 @@ def order_items(uid, id_basket,idup,ordup,iddown,orddown):
     #check that the user which is changing the basket name is the owner of it
     if not is_basket_owner( uid, id_basket ):
         raise NotBasketOwner("You are not the owner of this basket")
-    # move up the item
-    ordup = str(int(ordup)+1)
+    # move up the item idup (by switching its order number with the other item):
     query_result = run_sql("UPDATE basket_record SET nb_order=%s WHERE id_basket=%s AND id_record=%s",
-                           (ordup,id_basket,idup))
+                           (orddown,id_basket,idup))
 
-    #move down the item
-    orddown = str(int(orddown)-1)
+    # move down the item iddown (by switching its order number with the other item):
     query_result = run_sql("UPDATE basket_record SET nb_order=%s WHERE id_basket=%s AND id_record=%s",
-                           (orddown,id_basket,iddown))
+                           (ordup,id_basket,iddown))
     
     return id_basket
 
