@@ -5,6 +5,25 @@ Revision: $Id$
 
 Here is a short summary of most notable changes in CDSware releases:
 
+CDSware v0.3.0 -- March 5th, 2004
+  * new development branch release (important SQL table changes)
+  * introducing a new submission engine and the end-user web
+    interface (WebSubmit)
+  * bibupload is now a BibSched task with new options (BibUpload)
+  * BibWords renamed into BibIndex in the view of future phrase
+    indexing changes (BibIndex)
+  * more secure DB server connectivity (BibSched)
+  * record matching functionality (BibConvert)
+  * character encoding conversion tables (BibConvert)
+  * Qualified Dublin Core conversion example (BibConvert)
+  * OAI deleted recods policy can now be specified (BibHarvest)
+  * multi-language collection portalboxes (WebSearch)
+  * HTML pages now respect language selections (WebSearch, WebHelp)
+  * minor layout changes (WebStyle)
+  * updated Russian and other translations
+  * ChangeLog is now generated from CVS log messages
+  * plus the usual set of bugfixes (see ChangeLog)
+
 CDSware v0.1.2 -- December 21st, 2003
   * development branch release
   * fix BibReformat task launching problem (BibFormat)
