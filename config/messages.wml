@@ -57,9 +57,10 @@
   <it>Pagina principale</it>
   <ru>Главная страница</ru>
   <sk>Hlavná stránka</sk>
-  <cz>Hlavní stránka</cz>
+  <cs>Hlavní stránka</cs>
   <no>Hovedsiden</no>
-  <se>Första sidan</se>
+  <sv>Första sidan</sv>
+  <el>Αρχική Σελίδα</el>
 </define-tag>
 
 <define-tag MSG_SEARCH whitespace=delete>
@@ -71,9 +72,10 @@
   <it>Ricercare</it>
   <ru>Искать</ru>
   <sk>Hľadaj</sk>
-  <cz>Hledej</cz>
+  <cs>Hledej</cs>
   <no>Søk</no>
-  <se>Sök</se>
+  <sv>Sök</sv>
+  <el>Αναζήτηση</el>
 </define-tag>
 
 <define-tag MSG_SUBMIT whitespace=delete>
@@ -85,9 +87,10 @@
   <it>Sottomettere</it>
   <ru>Внести</ru>
   <sk>Pridaj</sk>
-  <cz>Přidej</cz>
+  <cs>Přidej</cs>
   <no>Send inn</no>
-  <se>Skicka in</se>
+  <sv>Skicka in</sv>
+  <el>Υποβολή</el>
 </define-tag>
 
 <define-tag MSG_HELP whitespace=delete>
@@ -99,9 +102,10 @@
   <it>Aiuto</it>
   <ru>Помощь</ru>
   <sk>Pomoc</sk>
-  <cz>Nápověda</cz>
+  <cs>Nápověda</cs>
   <no>Hjelp</no>
-  <se>Hjälp</se>
+  <sv>Hjälp</sv>
+  <el>Βοήθεια</el>
 </define-tag>
 
 <define-tag MSG_HELP_CENTRAL whitespace=delete>
@@ -113,9 +117,10 @@
   <it>Aiuto</it>
   <ru>Центральная Помощь</ru>
   <sk>Centrála Pomoci</sk>
-  <cz>Centrála Nápovědy</cz>
+  <cs>Centrála Nápovědy</cs>
   <no>Hjelpesentral</no>
-  <se>Hjälpcentral</se>
+  <sv>Hjälpcentral</sv>
+  <el>Βοήθεια</el>
 </define-tag>
 
 <define-tag MSG_SEARCH_HELP whitespace=delete>
@@ -127,9 +132,10 @@
   <it>Aiuto alla Ricerca</it>
   <ru>Помощь для поиска</ru>
   <sk>Pomoc pre vyhľadávanie</sk>
-  <cz>Nápověda pro vyhledávaní</cz>
+  <cs>Nápověda pro vyhledávaní</cs>
   <no>Søkehjelp</no>
-  <se>Hjälp med sökning</se>
+  <sv>Hjälp med sökning</sv>
+  <el>Βοήθεια αναζήτησης</el>
 </define-tag>
 
 <define-tag MSG_SEARCH_TIPS whitespace=delete>
@@ -141,9 +147,10 @@
   <it>Consigli per la Ricerca</it>
   <ru>Указания для поиска</ru>
   <sk>Tipy pre vyhľadávanie</sk>
-  <cz>Tipy pro vyhledávaní</cz>
+  <cs>Tipy pro vyhledávaní</cs>
   <no>Søketips</no>
-  <se>Söktips</se>
+  <sv>Söktips</sv>
+  <el>Παραδείγματα αναζήτησης</el>
 </define-tag>
 
 <define-tag MSG_PERSONALIZE whitespace=delete>
@@ -155,9 +162,10 @@
   <it>Personalizzazione</it>
   <ru>Персонализовать</ru>
   <sk>Personalizácia</sk>
-  <cz>Personalizace</cz>
+  <cs>Personalizace</cs>
   <no>Brukerinnstillinger</no>
-  <se>Inställningar</se>
+  <sv>Inställningar</sv>
+  <el>Ρυθμίσεις</el>
 </define-tag>
 
 <define-tag MSG_PAGE_BEING_TRANSLATED_HEAD whitespace=delete>
@@ -169,9 +177,10 @@
   <it>TRADUZIONE ITALIANA DISPONIBILE PROSSIMAMENTE</it>
   <ru>ПЕРЕВОД НА РУССКИЙ ЯЗЫК ГОТОВИТСЯ</ru>
   <sk>PREKLAD DO SLOVENČINY SA PRIPRAVUJE</sk>
-  <cz>PŘEKLAD DO ČEŠTINY SE PŘIPRAVUJE</cz>
+  <cs>PŘEKLAD DO ČEŠTINY SE PŘIPRAVUJE</cs>
   <no>NORSK OVERSETTELSE UNDERVEIS</no>
-  <se>ÖVERSÄTTNING TILL SVENSKA PÅGÅR</se>
+  <sv>ÖVERSÄTTNING TILL SVENSKA PÅGÅR</sv>
+  <el>ΕΛΛΗΝΙΚΗ ΜΕΤΑΦΡΑΣΗ ΣΕ ΕΞΕΛΙΞΗ</el>
 </define-tag>
 
 <define-tag MSG_PAGE_BEING_TRANSLATED_BODY>
@@ -214,19 +223,24 @@
      Prosíme použite anglickú verziu uvedenú nižšie.
      Ďakujeme za pochopenie.
   </sk>
-  <cz>
+  <cs>
      Český překlad této stránky není ukončen.
      Prosíme použijte anglickou verzi uvedenou níže.
      Děkujeme za pochopení.
-  </cz>
+  </cs>
   <no>
    For øyeblikket er ikke den norske oversettelsen klar. 
    Vennligst bruk versjonen som er presentert under.
   </no>
-  <se>
+  <sv>
    För närvarande finns ingen svensk översättning.
    V.g. välj ett annat språk nedan.
-  </se>
+  </sv>
+  <el>
+     Η Ελληνική μετάφραση της παρούσας σελίδας δεν είναι διαθέσιμη.
+     Παρακαλούμε συμβουλευτείτε την Αγγλική σελίδα. Ευχαριστούμε
+     για την καταννόηση.
+  </el>
 </define-tag>
 
 <define-tag MSG_POWERED_BY whitespace=delete>
@@ -238,9 +252,10 @@
   <it>Powered by</it>
   <ru>Powered by</ru>
   <sk>Powered by</sk>
-  <cz>Powered by</cz>
+  <cs>Powered by</cs>
   <no>Powered by</no>
-  <se>Powered by</se>
+  <sv>Powered by</sv>
+  <el>Βασίζεται στο</el>
 </define-tag>
 
 <define-tag MSG_MAINTAINED_BY whitespace=delete>
@@ -252,9 +267,10 @@
   <it>Mantenuto da</it>
   <ru>Поддерживает</ru>
   <sk>Spravuje</sk>
-  <cz>Spravuje</cz>
+  <cs>Spravuje</cs>
   <no>Vedlikeholdt av</no>
-  <se>Underhålls av</se>
+  <sv>Underhålls av</sv>
+  <el>Συντηρείται από</el>
 </define-tag>
 
 <define-tag MSG_LAST_UPDATED whitespace=delete>
@@ -266,9 +282,10 @@
   <it>Ultimo aggiornamento</it>
   <ru>Последнее изменение</ru>
   <sk>Posledná aktualizácia</sk>
-  <cz>Poslední aktualizace</cz>
+  <cs>Poslední aktualizace</cs>
   <no>Sist oppdatert</no>
-  <se>Senast uppdaterad</se>
+  <sv>Senast uppdaterad</sv>
+  <el>Τελευταία ενημέρωση</el>
 </define-tag>
 
 # FIXME
@@ -281,9 +298,10 @@
   <it>Ricerca ristretta:</it>
   <ru>Сократить набор:</ru>
   <sk>Zúžiť podľa kolekciе:</sk>
-  <cz>Zúžit podle kolekcе:</cz>
+  <cs>Zúžit podle kolekcе:</cs>
   <no>Begrens til samling:</no>
-  <se>Avgränsad sökning:</se>
+  <sv>Avgränsad sökning:</sv>
+  <el>Περιορισμός αναζήτησης:</el>
 </define-tag>
 
 <define-tag MSG_FOCUS_ON whitespace=delete>
@@ -295,9 +313,10 @@
   <it>Focus on:</it>
   <ru>Указание на:</ru>
   <sk>Zamerať sa na:</sk>
-  <cz>Zaměřit se na:</cz>
+  <cs>Zaměřit se na:</cs>
   <no>Utvalgte samlinger:</no>
-  <se>Utvalda samlingar:</se>
+  <sv>Utvalda samlingar:</sv>
+  <el>Επικέντρωση σε:</el>
 </define-tag>
 
 <define-tag MSG_SIMPLE_SEARCH whitespace=delete>
@@ -309,9 +328,10 @@
   <it>Ricerca Semplice</it>
   <ru>Простой Поиск</ru>
   <sk>Jednoduché Hľadanie</sk>
-  <cz>Jednoduché Hledání</cz>
+  <cs>Jednoduché Hledání</cs>
   <no>Enkelt Søk</no>
-  <se>Enkel sökning</se>
+  <sv>Enkel sökning</sv>
+  <el>Απλή αναζήτηση</el>
 </define-tag>
 
 <define-tag MSG_ADVANCED_SEARCH whitespace=delete>
@@ -323,9 +343,10 @@
   <it>Ricerca Avanzata</it>
   <ru>Расширенный Поиск</ru>
   <sk>Rozšírené Hľadanie</sk>
-  <cz>Rozšířené Hledání</cz>
+  <cs>Rozšířené Hledání</cs>
   <no>Avansert Søk</no>
-  <se>Avancerad sökning</se>
+  <sv>Avancerad sökning</sv>
+  <el>Σύνθετη αναζήτηση</el>
 </define-tag>
 
 <define-tag MSG_COLLECTION_NOT_FOUND_HEAD whitespace=delete>
@@ -337,9 +358,10 @@
   <it>Collezione %s Non Trovata</it>
   <ru>Набор %s не существует</ru>
   <sk>Kolekcia %s Nenájdená</sk>
-  <cz>Kolekcia %s Nenalezena</cz>
+  <cs>Kolekcia %s Nenalezena</cs>
   <no>Samling %s ikke funnet</no>
-  <se>Samlingen %s finns inte</se>
+  <sv>Samlingen %s finns inte</sv>
+  <el>Η συλλογή %s δεν βρέθηκε</el>
 </define-tag>
 
 <define-tag MSG_COLLECTION_NOT_FOUND_BODY>
@@ -375,18 +397,22 @@
     <p>Ľutujeme, kolekcia <strong>%s</strong> neexistuje.
     <p>Skúste začať hľadať od <a href=\"%s\">%s</a>.     
   </sk>
-  <cz>
+  <cs>
     <p>Litujeme, kolekce <strong>%s</strong> neexistuje.
     <p>Zkuste začít hledat od <a href=\"%s\">%s</a>.     
-  </cz>
+  </cs>
   <no>
     <p>Beklager, samlingen <strong>%s</strong> ser ikke ut til å finnes.
     <p>Du ønsker kanskje å starte å søket fra <a href=\"%s\">%s</a>.
   </no>
-  <se>
+  <sv>
     <p>Beklager, samlingen <strong>%s</strong> ser ikke ut til å finnes.
     <p>Du ønsker kanskje å starte å søket fra <a href=\"%s\">%s</a>.
-  </se>
+  </sv>
+  <el>
+    <p>Δυστυχώς η συλλογή <strong>%s</strong> δεν υπάρχει.
+    <p>Ενδεχομένως να ενδιαφέρεστε να ξεκινήσετε την έρευνα από <a href=\"%s\">%s</a>.
+  </el>
 </define-tag>
 
 <define-tag MSG_ACCOUNT whitespace=delete>
@@ -398,9 +424,10 @@
   <it>conto</it>
   <ru>счёт</ru>
   <sk>konto</sk>
-  <cz>konto</cz>
+  <cs>konto</cs>
   <no>konto</no>
-  <se>konto</se>
+  <sv>konto</sv>
+  <el>Λογαριασμός</el>
 </define-tag>
 
 <define-tag MSG_ALERTS whitespace=delete>
@@ -412,9 +439,10 @@
   <it>allerta</it>
   <ru>сообщения</ru>
   <sk>avíza</sk>
-  <cz>avíza</cz>
+  <cs>avíza</cs>
   <no>varsler</no>
-  <se>alerts</se>
+  <sv>alerts</sv>
+  <el>ειδοποιήσεις</el>
 </define-tag>
 
 <define-tag MSG_BASKETS whitespace=delete>
@@ -426,9 +454,10 @@
   <it>paniere</it>
   <ru>корзины</ru>
   <sk>košíky</sk>
-  <cz>košíky</cz>
+  <cs>košíky</cs>
   <no>kurver</no>
-  <se>korgar</se>
+  <sv>korgar</sv>
+  <el>καλάθι</el>
 </define-tag>
 
 # FIXME
@@ -441,9 +470,10 @@
   <it>submissions</it>
   <ru>записи</ru>
   <sk>pridania</sk>
-  <cz>přidání</cz>
+  <cs>přidání</cs>
   <no>innsendte</no>
-  <se>bidrag</se>
+  <sv>bidrag</sv>
+  <el>submissions</el>
 </define-tag>
 
 # FIXME
@@ -456,9 +486,10 @@
   <it>approvazioni</it>
   <ru>подтверждения</ru>
   <sk>schválenia</sk>
-  <cz>schválení</cz>
+  <cs>schválení</cs>
   <no>godkjente</no>
-  <se>godkända</se>
+  <sv>godkända</sv>
+  <el>approvals</el>
 </define-tag>
 
 <define-tag MSG_SESSION whitespace=delete>
@@ -470,9 +501,10 @@
   <it>sessione</it>
   <ru>сеанс</ru>
   <sk>seansa</sk>
-  <cz>seance</cz>
+  <cs>seance</cs>
   <no>økt</no>
-  <se>användarsession</se>
+  <sv>användarsession</sv>
+  <el>συνεδρία</el>
 </define-tag>
 
 <define-tag MSG_LOGIN whitespace=delete>
@@ -484,9 +516,10 @@
   <it>login</it>
   <ru>записаться</ru>
   <sk>prihlásiť</sk>
-  <cz>přihlásit</cz>
+  <cs>přihlásit</cs>
   <no>logg inn</no>
-  <se>logga in</se>
+  <sv>logga in</sv>
+  <el>είσοδος</el>
 </define-tag>
 
 <define-tag MSG_LOGOUT whitespace=delete>
@@ -498,9 +531,10 @@
   <it>logout</it>
   <ru>выход</ru>
   <sk>odhlásiť</sk>
-  <cz>odhlásit</cz>
+  <cs>odhlásit</cs>
   <no>logg ut</no>
-  <se>logga ut</se>
+  <sv>logga ut</sv>
+  <el>αποσύνδεση</el>
 </define-tag>
 
 <define-tag MSG_LANGUAGE whitespace=delete>
@@ -512,9 +546,10 @@
   <it>lingua</it>
   <ru>язык</ru>
   <sk>jazyk</sk>
-  <cz>jazyk</cz>
+  <cs>jazyk</cs>
   <no>språk</no>
-  <se>språk</se>
+  <sv>språk</sv>
+  <el>γλώσσα</el>
 </define-tag>
 
 <define-tag MSG_BROWSE whitespace=delete>
@@ -526,9 +561,10 @@
   <it>Sfogliare</it>
   <ru>Просмотреть</ru>
   <sk>Prelistuj</sk>
-  <cz>Prolistuj</cz>
+  <cs>Prolistuj</cs>
   <no>Bla gjennom</no>
-  <se>Bläddra</se>
+  <sv>Bläddra</sv>
+  <el>Φυλλομέτρηση</el>
 </define-tag>
 
 <define-tag MSG_SEARCH_RECORDS_FOR whitespace=delete>
@@ -540,9 +576,10 @@
   <it>Ricerca in %s registrazioni:</it>
   <ru>Искать до %s записей для:</ru>
   <sk>Hľadaj v %s záznamoch:</sk>
-  <cz>Hledej v %s záznamech:</cz>
+  <cs>Hledej v %s záznamech:</cs>
   <no>Søk i %s poster etter:</no>
-  <se>Sök i %s poster efter:</se>
+  <sv>Sök i %s poster efter:</sv>
+  <el>Αναζήτηση σε %s εγγραφές για:</el>
 </define-tag>
 
 <define-tag MSG_ALL_OF_THE_WORDS whitespace=delete>
@@ -554,9 +591,10 @@
   <it>Tutte le parole:</it>
   <ru>Все слова:</ru>
   <sk>Všetky tieto slová:</sk>
-  <cz>Všechna tato slova:</cz>
+  <cs>Všechna tato slova:</cs>
   <no>Alle ordene:</no>
-  <se>Samtliga ord:</se>
+  <sv>Samtliga ord:</sv>
+  <el>Όλες οι λέξεις</el>
 </define-tag>
 
 <define-tag MSG_ANY_OF_THE_WORDS whitespace=delete>
@@ -568,9 +606,10 @@
   <it>Almeno una parola:</it>
   <ru>Любое из слов:</ru>
   <sk>Jedno zo slov:</sk>
-  <cz>Jedno ze slov:</cz>
+  <cs>Jedno ze slov:</cs>
   <no>Minst ett av ordene:</no>
-  <se>Minst ett av orden:</se>
+  <sv>Minst ett av orden:</sv>
+  <el>Οποιαδήποτε από τις λέξεις</el>
 </define-tag>
 
 <define-tag MSG_EXACT_PHRASE whitespace=delete>
@@ -582,9 +621,10 @@
   <it>Frase esatta:</it>
   <ru>Точная фраза:</ru>
   <sk>Presná veta:</sk>
-  <cz>Přesná věta:</cz>
+  <cs>Přesná věta:</cs>
   <no>Nøyaktig uttrykk:</no>
-  <se>Exakt fras:</se>
+  <sv>Exakt fras:</sv>
+  <el>Ακριβής φράση:</el>
 </define-tag>
 
 <define-tag MSG_PARTIAL_PHRASE whitespace=delete>
@@ -596,9 +636,10 @@
   <it>Parte di frase:</it>
   <ru>Часть фразы:</ru>
   <sk>Čiastočná veta:</sk>
-  <cz>Částečná věta:</cz>
+  <cs>Částečná věta:</cs>
   <no>Delvis uttrykk:</no>
-  <se>Del av fras:</se>
+  <sv>Del av fras:</sv>
+  <el>Επιμέρους φράση:</el>
 </define-tag>
 
 <define-tag MSG_REGULAR_EXPRESSION whitespace=delete>
@@ -610,9 +651,10 @@
   <it>Regular expression:</it>
   <ru>Регулярное выражение:</ru>
   <sk>Regulárny výraz:</sk>
-  <cz>Regulární výraz:</cz>
+  <cs>Regulární výraz:</cs>
   <no>Regulært uttrykk:</no>
-  <se>Reguljärt uttryck:</se>
+  <sv>Reguljärt uttryck:</sv>
+  <el>Regular expression:</el>
 </define-tag>
 
 <define-tag MSG_AND whitespace=delete>
@@ -624,9 +666,10 @@
   <it>E</it>
   <ru>И</ru>
   <sk>A</sk>
-  <cz>A</cz>
+  <cs>A</cs>
   <no>OG</no>
-  <se>OCH</se>
+  <sv>OCH</sv>
+  <el>ΚΑΙ</el>
 </define-tag>
 
 <define-tag MSG_OR whitespace=delete>
@@ -638,9 +681,10 @@
   <it>OPPURE</it>
   <ru>ИЛИ</ru>
   <sk>ALEBO</sk>
-  <cz>NEBO</cz>
+  <cs>NEBO</cs>
   <no>ELLER</no>
-  <se>ELLER</se>
+  <sv>ELLER</sv>
+  <el>Ή</el>
 </define-tag>
 
 <define-tag MSG_AND_NOT whitespace=delete>
@@ -652,9 +696,10 @@
   <it>E NON</it>
   <ru>И НЕТ</ru>
   <sk>A NIE</sk>
-  <cz>A NE</cz>
+  <cs>A NE</cs>
   <no>OG IKKE</no>
-  <se>INTE</se>
+  <sv>INTE</sv>
+  <el>ΚΑΙ ΟΧΙ</el>
 </define-tag>
 
 <define-tag MSG_SEARCH_RESULTS whitespace=delete>
@@ -666,9 +711,10 @@
   <it>Risultato della ricerca</it>
   <ru>Результаты поиска</ru>
   <sk>Výsledky hľadania</sk>
-  <cz>Výsledky hledání</cz>
+  <cs>Výsledky hledání</cs>
   <no>Søkeresultater</no>
-  <se>Sökresultat</se>
+  <sv>Sökresultat</sv>
+  <el>Αποτελέσματα αναζήτησης</el>
 </define-tag>
 
 <define-tag MSG_TRY_YOUR_SEARCH_ON whitespace=delete>
@@ -680,9 +726,10 @@
   <it>Provate la ricerca su...</it>
   <ru>Попробуйте искать с...</ru>
   <sk>Skúste hľadať na...</sk>
-  <cz>Zkuste hledat na...</cz>
+  <cs>Zkuste hledat na...</cs>
   <no>Prøv søket på...</no>
-  <se>Pröva att söka efter...</se>
+  <sv>Pröva att söka efter...</sv>
+  <el>Δοκιμάστε την έρευνά σας στο...</el>
 </define-tag>
 
 # FIXME
@@ -695,9 +742,10 @@
   <it>Non avete trovato quello che cercavate? Provate la ricerca su:</it>
   <ru>Haven't found what you were looking for?  Попробуйте искать с:</ru>
   <sk>Nenašli ste čo ste hľadali?  Skúste Vašu otázku na iných serveroch:</sk>
-  <cz>Nenalezli jste co jste hledali?  Zkuste Váš dotaz na jiných servrech:</cz>
+  <cs>Nenalezli jste co jste hledali?  Zkuste Váš dotaz na jiných servrech:</cs>
   <no>Ikke funnet hva du søkte etter?  Prøv søket på:</no>
-  <se>Har du inte funnit vad du söker efter?  Försök med:</se>
+  <sv>Har du inte funnit vad du söker efter?  Försök med:</sv>
+  <el>Δεν βρήκατε αυτό που αναζητούσατε; Δοκιμάστε την έρευνά σας σε άλλους servers:</el>
 </define-tag>
 
 # FIXME
@@ -710,9 +758,10 @@
   <it>Vedi anche: autori con nomi simili</it>
   <ru>Смотрите также: similar author names</ru>
   <sk>Viď tiež: podobné mená autorov</sk>
-  <cz>Viz též: podobná jména autorů</cz>
+  <cs>Viz též: podobná jména autorů</cs>
   <no>Se også: lignende forfatternavn</no>
-  <se>Se också: liknande författarnamn</se>
+  <sv>Se också: liknande författarnamn</sv>
+  <el>Δείτε ακόμη: παρόμοια ονόματα συγγραφέων</el>
 </define-tag>
 
 # FIXME
@@ -725,9 +774,10 @@
   <it>on</it>
   <ru>в</ru>
   <sk>v</sk>
-  <cz>v</cz>
+  <cs>v</cs>
   <no>i</no>
-  <se>i</se>
+  <sv>i</sv>
+  <el>σε</el>
 </define-tag>
 
 <define-tag MSG_SORT_BY whitespace=delete>
@@ -739,9 +789,10 @@
   <it>Ordinamento per:</it>
   <ru>Классифицировать по:</ru>
   <sk>Utriediť podľa:</sk>
-  <cz>Setřídit podle:</cz>
+  <cs>Setřídit podle:</cs>
   <no>Sorter etter:</no>
-  <se>Sortera efter:</se>
+  <sv>Sortera efter:</sv>
+  <el>Ταξινόμηση με:</el>
 </define-tag>
 
 <define-tag MSG_LATEST_FIRST whitespace=delete>
@@ -753,9 +804,10 @@
   <it>Le ultime all'inizio</it>
   <ru>сначала последний запрос</ru>
   <sk>posledný záznam najskôr</sk>
-  <cz>poslední záznam nejdříve</cz>
+  <cs>poslední záznam nejdříve</cs>
   <no>siste først</no>
-  <se>senaste först</se>
+  <sv>senaste först</sv>
+  <el>Το τελευταίο, πρώτο</el>
 </define-tag>
 
 <define-tag MSG_ASCENDING whitespace=delete>
@@ -767,9 +819,10 @@
   <it>asc.</it>
   <ru>восх.</ru>
   <sk>vzost.</sk>
-  <cz>vzest.</cz>
+  <cs>vzest.</cs>
   <no>stigende</no>
-  <se>stigande</se>
+  <sv>stigande</sv>
+  <el>αύξ.</el>
 </define-tag>
 
 <define-tag MSG_DESCENDING whitespace=delete>
@@ -781,9 +834,10 @@
   <it>disc.</it>
   <ru>нисх.</ru>
   <sk>zost.</sk>
-  <cz>sest.</cz>
+  <cs>sest.</cs>
   <no>synkende</no>
-  <se>fallande</se>
+  <sv>fallande</sv>
+  <el>φθίν.</el>
 </define-tag>
 
 # FIXME
@@ -796,9 +850,10 @@
   <it>ordinare per</it>
   <ru>упорядочить по</ru>
   <sk>zoradiť podľa</sk>
-  <cz>seřadit podle</cz>
+  <cs>seřadit podle</cs>
   <no>ranger etter</no>
-  <se>rangordna efter</se>
+  <sv>rangordna efter</sv>
+  <el>ταξινόμηση με</el>
 </define-tag>
 
 <define-tag MSG_DISPLAY_RESULTS whitespace=delete>
@@ -810,9 +865,10 @@
   <it>Visualizzare:</it>
   <ru>Представить результаты:</ru>
   <sk>Zobraziť výsledky:</sk>
-  <cz>Zobrazit výsledky:</cz>
+  <cs>Zobrazit výsledky:</cs>
   <no>Vis resultater:</no>
-  <se>Visa sökresultat:</se>
+  <sv>Visa sökresultat:</sv>
+  <el>Παρουσίαση αποτελεσμάτων:</el>
 </define-tag>
 
 <define-tag MSG_RESULTS whitespace=delete>
@@ -824,9 +880,10 @@
   <it>risultati</it>
   <ru>результаты</ru>
   <sk>výsledky</sk>
-  <cz>výsledky</cz>
+  <cs>výsledky</cs>
   <no>resultater</no>
-  <se>resultat</se>
+  <sv>resultat</sv>
+  <el>αποτελέσματα</el>
 </define-tag>
 
 <define-tag MSG_SINGLE_LIST whitespace=delete>
@@ -838,9 +895,10 @@
   <it>lista unica</it>
   <ru>один лист</ru>
   <sk>jediný list</sk>
-  <cz>jediný list</cz>
+  <cs>jediný list</cs>
   <no>enkel liste</no>
-  <se>enkel lista</se>
+  <sv>enkel lista</sv>
+  <el>απλή λίστα</el>
 </define-tag>
 
 <define-tag MSG_SPLIT_BY_COLLECTION whitespace=delete>
@@ -852,9 +910,10 @@
   <it>raggruppati per collezione</it>
   <ru>разделить по наборам</ru>
   <sk>zoskupené podľa kolekcií</sk>
-  <cz>seskupené podle kolekcí</cz>
+  <cs>seskupené podle kolekcí</cs>
   <no>oppdelt etter samling</no>
-  <se>uppdelat efter samling</se>
+  <sv>uppdelat efter samling</sv>
+  <el>διαχωρισμός κατά συλλογή</el>
 </define-tag>
 
 <define-tag MSG_OUTPUT_FORMAT whitespace=delete>
@@ -866,9 +925,10 @@
   <it>Formato di visualizzazione:</it>
   <ru>Формат представления:</ru>
   <sk>Výstupný formát:</sk>
-  <cz>Výstupní formát:</cz>
+  <cs>Výstupní formát:</cs>
   <no>Visningsformat:</no>
-  <se>Visningsformat:</se>
+  <sv>Visningsformat:</sv>
+  <el>Μορφή αποτελεσμάτων:</el>
 </define-tag>
 
 <define-tag MSG_BRIEF whitespace=delete>
@@ -880,9 +940,10 @@
   <it>breve</it>
   <ru>краткий</ru>
   <sk>stručný</sk>
-  <cz>stručný</cz>
+  <cs>stručný</cs>
   <no>kort</no>
-  <se>kort</se>
+  <sv>kort</sv>
+  <el>σύντομη</el>
 </define-tag>
 
 <define-tag MSG_DETAILED whitespace=delete>
@@ -894,9 +955,10 @@
   <it>dettagliato</it>
   <ru>подробный</ru>
   <sk>podrobný</sk>
-  <cz>podrobný</cz>
+  <cs>podrobný</cs>
   <no>detaljert</no>
-  <se>detaljerat</se>
+  <sv>detaljerat</sv>
+  <el>αναλυτική</el>
 </define-tag>
 
 <define-tag MSG_DETAILED_RECORD whitespace=delete>
@@ -908,9 +970,10 @@
   <it>Registrazione dettagliata</it>
   <ru>Подробная запись</ru>
   <sk>Úplný záznam</sk>
-  <cz>Úplný záznam</cz>
+  <cs>Úplný záznam</cs>
   <no>Full post</no>
-  <se>Fullständig post</se>
+  <sv>Fullständig post</sv>
+  <el>Αναλυτική εγγραφή</el>
 </define-tag>
 
 <define-tag MSG_RESULTS_OVERVIEW_FOUND_X_RECORDS_IN_Y_SECONDS whitespace=delete>
@@ -938,15 +1001,18 @@
   <sk>
     <strong>Prehľad výsledkov:</strong> Nájdených <strong>%s</strong> záznamov za %.2f sekúnd.
   </sk>
-  <cz>
+  <cs>
     <strong>Přehled výsledků:</strong> Nalezeno <strong>%s</strong> záznamů za %.2f vteřin.
-  </cz>
+  </cs>
   <no>
     <strong>Resultatoversikt:</strong> Fant <strong>%s</strong> poster på %.2f sekunder.
   </no>
-  <se>
+  <sv>
     <strong>Resultat:</strong> Hittade <strong>%s</strong> poster på %.2f sekunder.
-  </se>
+  </sv>
+  <el>
+  <strong>Αποτελέσμα έρευνας:</strong> Βρέθηκαν <strong>%s</strong> εγγραφές σε %.2f δευτερόλεπτα.
+  </el>
 </define-tag>
 
 <define-tag MSG_X_RECORDS_FOUND whitespace=delete>
@@ -958,9 +1024,10 @@
   <it><strong>%s</strong> registrazioni trovate</it>
   <ru><strong>%s</strong> найденных записей</ru>
   <sk><strong>%s</strong> záznamov nájdených</sk>
-  <cz><strong>%s</strong> záznamů nalezeno</cz>
+  <cs><strong>%s</strong> záznamů nalezeno</cs>
   <no><strong>%s</strong> poster funnet</no>
-  <se><strong>%s</strong> poster hittades</se>
+  <sv><strong>%s</strong> poster hittades</sv>
+  <el><strong>%s</strong> εγγραφές βρέθηκαν</el>
 </define-tag>
 
 <define-tag MSG_JUMP_TO_RECORD whitespace=delete>
@@ -972,9 +1039,10 @@
   <it>andare alla registrazione:</it>
   <ru>идти к записи:</ru>
   <sk>skoč na záznam:</sk>
-  <cz>skoč na záznam:</cz>
+  <cs>skoč na záznam:</cs>
   <no>gå til post:</no>
-  <se>gå till post:</se>
+  <sv>gå till post:</sv>
+  <el>μετάβαση στην εγγραφή:</el>
 </define-tag>
 
 <define-tag MSG_SEARCH_TOOK_X_SECONDS whitespace=delete>
@@ -986,9 +1054,10 @@
   <it>La ricerca ha preso %.2f secondi.</it>
   <ru>Поиск длился %.2f секунд.</ru>
   <sk>Hľadanie trvalo %.2f sekúnd.</sk>
-  <cz>Hledání trvalo %.2f vteřin.</cz>
+  <cs>Hledání trvalo %.2f vteřin.</cs>
   <no>Søket tok %.2f sekunder.</no>
-  <se>Sökningen tog %.2f sekunder.</se>
+  <sv>Sökningen tog %.2f sekunder.</sv>
+  <el>Η έρευνα πήρε %.2f δευτερόλεπτα.</el>
 </define-tag>
 
 <define-tag MSG_ADD_TO_BASKET whitespace=delete>
@@ -1000,9 +1069,10 @@
   <it>AGGIUNGERE AL PANIERE</it>
   <ru>ДОБАВИТь В КОРЗИНУ</ru>
   <sk>PRIDAŤ DO KOŠÍKA</sk>
-  <cz>PŘIDAT DO KOŠÍKU</cz>
+  <cs>PŘIDAT DO KOŠÍKU</cs>
   <no>LEGG TIL I KURV</no>
-  <se>LÄGG I KORGEN</se>
+  <sv>LÄGG I KORGEN</sv>
+  <el>ΠΡΟΣΘΗΚΗ ΣΤΟ ΚΑΛΑΘΙ</el>
 </define-tag>
 
 <define-tag MSG_COLLECTIONS whitespace=delete>
@@ -1014,9 +1084,10 @@
   <it>collezioni</it>
   <ru>наборы</ru>
   <sk>kolekcie</sk>
-  <cz>kolekce</cz>
+  <cs>kolekce</cs>
   <no>samlinger</no>
-  <se>samlingar</se>
+  <sv>samlingar</sv>
+  <el>συλλογές</el>
 </define-tag>
 
 <define-tag MSG_ANY_COLLECTION whitespace=delete>
@@ -1028,9 +1099,10 @@
   <it>tutte le collezioni</it>
   <ru>любой набор</ru>
   <sk>všetky kolekcie</sk>
-  <cz>všechny kolekce</cz>
+  <cs>všechny kolekce</cs>
   <no>alle samlinger</no>
-  <se>alla samlingar</se>
+  <sv>alla samlingar</sv>
+  <el>οποιαδήποτε συλλογή</el>
 </define-tag>
 
 <define-tag MSG_ADD_ANOTHER_COLLECTION whitespace=delete>
@@ -1042,9 +1114,10 @@
   <it>aggiungere un'altra collezione</it>
   <ru>добавить другой набор</ru>
   <sk>pridať kolekciu</sk>
-  <cz>přidat kolekci</cz>
+  <cs>přidat kolekci</cs>
   <no>legg til ny samling</no>
-  <se>lägg till ny samling</se>
+  <sv>lägg till ny samling</sv>
+  <el>προσθήκη συλλογής</el>
 </define-tag>
 
 <define-tag MSG_GUEST whitespace=delete>
@@ -1056,9 +1129,10 @@
   <it>guest</it>
   <ru>гость</ru>
   <sk>hosť</sk>
-  <cz>host</cz>
+  <cs>host</cs>
   <no>gjest</no>
-  <se>gäst</se>
+  <sv>gäst</sv>
+  <el>επισκέπτης</el>
 </define-tag>
 
 <define-tag MSG_SUBMIT_HELP whitespace=delete>
@@ -1070,9 +1144,10 @@
   <it>Aiuto per la Sottomissione</it>
   <ru>Помощь при внесении</ru>
   <sk>Pomoc pre pridávanie</sk>
-  <cz>Nápověda pro přidávání</cz>
+  <cs>Nápověda pro přidávání</cs>
   <no>Innsendingshjelp</no>
-  <se>Hjälp med publicering</se>
+  <sv>Hjälp med publicering</sv>
+  <el>Υποβολή Βοήθειας</el>
 </define-tag>
 
 # FIXME
@@ -1085,9 +1160,10 @@
   <it>amministrazione</it>
   <ru>администрация</ru>
   <sk>administrácia</sk>
-  <cz>administrace</cz>
+  <cs>administrace</cs>
   <no>administrasjon</no>
-  <se>administration</se>
+  <sv>administration</sv>
+  <el>διαχείριση</el>
 </define-tag>
 
 <define-tag MSG_ADMIN_AREA whitespace=delete>
@@ -1099,9 +1175,10 @@
   <it>Area dell&quot;Amministratore</it>
   <ru>Область Администратора</ru>
   <sk>Areál Administrátora</sk>
-  <cz>Areál Administrátora</cz>
+  <cs>Areál Administrátora</cs>
   <no>Administratorområde</no>
-  <se>Administrationsområde</se>
+  <sv>Administrationsområde</sv>
+  <el>Περιοχή Διαχειριστή</el>
 </define-tag>
 
 <define-tag MSG_ADMIN_SUBMIT whitespace=delete>
@@ -1113,9 +1190,10 @@
   <it>Amministrazione Websubmit</it>
   <ru>Администрация Внесения</ru>
   <sk>Administrácia Pridávania</sk>
-  <cz>Administrace Přidávání</cz>
+  <cs>Administrace Přidávání</cs>
   <no>Innsendingsadministrasjon</no>
-  <se>Publiceringsadministration</se>
+  <sv>Publiceringsadministration</sv>
+  <el>Διαχείριση WebSubmit</el>
 </define-tag>
 
 <define-tag MSG_GUIDE whitespace=delete>
@@ -1127,9 +1205,10 @@
   <it>Guida</it>
   <ru>Руководство</ru>
   <sk>Príručka</sk>
-  <cz>Příručka</cz>
+  <cs>Příručka</cs>
   <no>Guide</no>
-  <se>Guide</se>
+  <sv>Guide</sv>
+  <el>Οδηγός</el>
 </define-tag>
 
 <define-tag MSG_ADDED_SINCE whitespace=delete>
@@ -1141,9 +1220,10 @@
   <it>Aggiunto dal:</it>
   <ru>Добавлено с:</ru>
   <sk>Pridané od:</sk>
-  <cz>Přidánо od:</cz>
+  <cs>Přidánо od:</cs>
   <no>Lagt til fra:</no>
-  <se>Tillagt sedan:</se>
+  <sv>Tillagt sedan:</sv>
+  <el>Προστέθηκαν από:</el>
 </define-tag>
 
 <define-tag MSG_UNTIL whitespace=delete>
@@ -1155,9 +1235,10 @@
   <it>fino al:</it>
   <ru>до:</ru>
   <sk>do:</sk>
-  <cz>do:</cz>
+  <cs>do:</cs>
   <no>til:</no>
-  <se>till:</se>
+  <sv>till:</sv>
+  <el>έως:</el>
 </define-tag>
 
 <define-tag MSG_ANY_DAY whitespace=delete>
@@ -1169,9 +1250,10 @@
   <it>qualsiasi giorno</it>
   <ru>любой день</ru>
   <sk>hocaký deň</sk>
-  <cz>jakýkoli den</cz>
+  <cs>jakýkoli den</cs>
   <no>alle dager</no>
-  <se>alla dagar</se>
+  <sv>alla dagar</sv>
+  <el>οποιαδήποτε ημέρα</el>
 </define-tag>
 
 <define-tag MSG_ANY_MONTH whitespace=delete>
@@ -1183,9 +1265,10 @@
   <it>qualsiasi mese</it>
   <ru>любой месяц</ru>
   <sk>hocaký mesiac</sk>
-  <cz>jakýkoli měsíc</cz>
+  <cs>jakýkoli měsíc</cs>
   <no>alle måneder</no>
-  <se>alla månader</se>
+  <sv>alla månader</sv>
+  <el>οποιονδήποτε μήνα</el>
 </define-tag>
 
 <define-tag MSG_ANY_YEAR whitespace=delete>
@@ -1197,9 +1280,10 @@
   <it>qualsiasi anno</it>
   <ru>любой год</ru>
   <sk>hocaký rok</sk>
-  <cz>jakýkoli rok</cz>
+  <cs>jakýkoli rok</cs>
   <no>alle år</no>
-  <se>alla år</se>
+  <sv>alla år</sv>
+  <el>οποιονδήποτε χρόνο</el>
 </define-tag>
 
 <define-tag MSG_JANUARY whitespace=delete>
@@ -1211,9 +1295,10 @@
   <it>Gennaio</it>
   <ru>январь</ru>
   <sk>január</sk>
-  <cz>leden</cz>
+  <cs>leden</cs>
   <no>januar</no>
-  <se>januari</se>
+  <sv>januari</sv>
+  <el>Ιανουάριος</el>
 </define-tag>
 
 <define-tag MSG_FEBRUARY whitespace=delete>
@@ -1225,9 +1310,10 @@
   <it>Febbraio</it>
   <ru>февраль</ru>
   <sk>február</sk>
-  <cz>únor</cz>
+  <cs>únor</cs>
   <no>februar</no>
-  <se>februari</se>
+  <sv>februari</sv>
+  <el>Φεβρουάριος</el>
 </define-tag>
 
 <define-tag MSG_MARCH whitespace=delete>
@@ -1239,9 +1325,10 @@
   <it>Marzo</it>
   <ru>март</ru>
   <sk>marec</sk>
-  <cz>březen</cz>
+  <cs>březen</cs>
   <no>mars</no>
-  <se>mars</se>
+  <sv>mars</sv>
+  <el>Μάρτιος</el>
 </define-tag>
 
 <define-tag MSG_APRIL whitespace=delete>
@@ -1253,9 +1340,10 @@
   <it>Aprile</it>
   <ru>апрель</ru>
   <sk>apríl</sk>
-  <cz>duben</cz>
+  <cs>duben</cs>
   <no>april</no>
-  <se>april</se>
+  <sv>april</sv>
+  <el>Απρίλιος</el>
 </define-tag>
 
 <define-tag MSG_MAY whitespace=delete>
@@ -1267,9 +1355,10 @@
   <it>Maggio</it>
   <ru>май</ru>
   <sk>máj</sk>
-  <cz>květen</cz>
+  <cs>květen</cs>
   <no>mai</no>
-  <se>maj</se>
+  <sv>maj</sv>
+  <el>Μάιος</el>
 </define-tag>
 
 <define-tag MSG_JUNE whitespace=delete>
@@ -1281,9 +1370,10 @@
   <it>Giugno</it>
   <ru>июнь</ru>
   <sk>jún</sk>
-  <cz>červen</cz>
+  <cs>červen</cs>
   <no>juni</no>
-  <se>juni</se>
+  <sv>juni</sv>
+  <el>Ιούνιος</el>
 </define-tag>
 
 <define-tag MSG_JULY whitespace=delete>
@@ -1295,9 +1385,10 @@
   <it>Luglio</it>
   <ru>июль</ru>
   <sk>júl</sk>
-  <cz>červenec</cz>
+  <cs>červenec</cs>
   <no>juli</no>
-  <se>juli</se>
+  <sv>juli</sv>
+  <el>Ιούλιος</el>
 </define-tag>
 
 <define-tag MSG_AUGUST whitespace=delete>
@@ -1309,9 +1400,10 @@
   <it>Agosto</it>
   <ru>август</ru>
   <sk>august</sk>
-  <cz>srpen</cz>
+  <cs>srpen</cs>
   <no>august</no>
-  <se>augusti</se>
+  <sv>augusti</sv>
+  <el>Άυγουστος</el>
 </define-tag>
 
 <define-tag MSG_SEPTEMBER whitespace=delete>
@@ -1323,9 +1415,10 @@
   <it>Settembre</it>
   <ru>сентябрь</ru>
   <sk>september</sk>
-  <cz>září</cz>
+  <cs>září</cs>
   <no>september</no>
-  <se>september</se>
+  <sv>september</sv>
+  <el>Σεπτέμβριος</el>
 </define-tag>
 
 <define-tag MSG_OCTOBER whitespace=delete>
@@ -1337,9 +1430,10 @@
   <it>Ottobre</it>
   <ru>октябрь</ru>
   <sk>október</sk>
-  <cz>říjen</cz>
+  <cs>říjen</cs>
   <no>oktober</no>
-  <se>oktober</se>
+  <sv>oktober</sv>
+  <el>Οκτώβριος</el>
 </define-tag>
 
 <define-tag MSG_NOVEMBER whitespace=delete>
@@ -1351,9 +1445,10 @@
   <it>Novembre</it>
   <ru>ноябрь</ru>
   <sk>november</sk>
-  <cz>listopad</cz>
+  <cs>listopad</cs>
   <no>november</no>
-  <se>november</se>
+  <sv>november</sv>
+  <el>Νοέμβριος</el>
 </define-tag>
 
 <define-tag MSG_DECEMBER whitespace=delete>
@@ -1365,9 +1460,10 @@
   <it>Dicembre</it>
   <ru>декабрь</ru>
   <sk>december</sk>
-  <cz>prosinec</cz>
+  <cs>prosinec</cs>
   <no>desember</no>
-  <se>december</se>
+  <sv>december</sv>
+  <el>Δεκέμβριος</el>
 </define-tag>
 
 <define-tag MSG_SEARCH_TERM whitespace=delete>
@@ -1379,9 +1475,10 @@
   <it>Termine di ricerca <em>%s</em></it>
   <ru>Искомый термин <em>%s</em></ru>
   <sk>Hľadaný výraz <em>%s</em></sk>
-  <cz>Hledaný výraz <em>%s</em></cz>
+  <cs>Hledaný výraz <em>%s</em></cs>
   <no>Søketerm <em>%s</em></no>
-  <se>Sökord <em>%s</em></se>
+  <sv>Sökord <em>%s</em></sv>
+  <el>Όρος αναζήτησης <em>%s</em></el>
 </define-tag>
 
 <define-tag MSG_INSIDE_INDEX whitespace=delete>
@@ -1393,9 +1490,10 @@
   <it>nell'indice <em>%s</em></it>
   <ru>в индексе <em>%s</em></ru>
   <sk>v indexe <em>%s</em></sk>
-  <cz>v indexu <em>%s</em></cz>
+  <cs>v indexu <em>%s</em></cs>
   <no>innen <em>%s</em>indeks</no>
-  <se>i <em>%s</em>index</se>
+  <sv>i <em>%s</em>index</sv>
+  <el>στο <em>%s</em> ευρετήριο</el>
 </define-tag>
 
 <define-tag MSG_DID_NOT_MATCH whitespace=delete>
@@ -1407,9 +1505,10 @@
   <it>non ha dato risultati. I termini piu` prossimi in tutte le collezioni sono:</it>
   <ru>не найден. Возможные термины:</ru>
   <sk>neodpovedá žiadnemu záznamu.  Najbližšie termíny nezávisle na kolekcii sú:</sk>
-  <cz>neodpovídá žádnému záznamu.  Nejbližší termíny nezávisle na kolekci jsou:</cz>
+  <cs>neodpovídá žádnému záznamu.  Nejbližší termíny nezávisle na kolekci jsou:</cs>
   <no>passet ingen poster.  Næreste term i hvilken som helst samling er:</no>
-  <se>matchade inga poster. Närmaste term i vilken som helst samling är:</se>
+  <sv>matchade inga poster. Närmaste term i vilken som helst samling är:</sv>
+  <el>δεν ταίριαξε με κάποια εγγραφή. Παραπλήσιοι όροι σε όλες τις συλλογές:</el>
 </define-tag>
 
 <define-tag MSG_NO_WORDS_INDEX_AVAILABLE whitespace=delete>
@@ -1421,9 +1520,10 @@
   <it>Nessun indice per parola è disponibile per</it>
   <ru>Не найден лексический индекс для</ru>
   <sk>Index slov nie je dostupný pre</sk>
-  <cz>Index slov není k dispozici pro</cz>
+  <cs>Index slov není k dispozici pro</cs>
   <no>Ingen ordindeks tilgjengelig for</no>
-  <se>Inget index tillgängligt för</se>
+  <sv>Inget index tillgängligt för</sv>
+  <el>Δεν υπάρχει ευρετήριο λέξεων για</el>
 </define-tag>
 
 <define-tag MSG_NO_PHRASE_INDEX_AVAILABLE whitespace=delete>
@@ -1435,9 +1535,10 @@
   <it>Nessun indice per frase è disponibile per</it>
   <ru>Не найден фразовый индех для</ru>
   <sk>Index viet nie je dostupný pre</sk>
-  <cz>Index frází není k dispozici pro</cz>
+  <cs>Index frází není k dispozici pro</cs>
   <no>Ingen uttrykksindeks tilgjengelig for</no>
-  <se>Inget index tillgängligt för</se>
+  <sv>Inget index tillgängligt för</sv>
+  <el>Δεν υπάρχει ευρετήριο φράσεων για</el>
 </define-tag>
 
 # FIXME
@@ -1474,18 +1575,22 @@
     Žiaden záznam nebol nájdený v kolekcii %s.
     Ostatné verejne dostupné kolekcie dali <a class="nearestterms" href="%s/search.py?%s">%d záznamov</a>.
   </sk>
-  <cz>
+  <cs>
     Žádný záznam nebyl nalezen v kolekci %s.
     Ostatní veřejně dostupné kolekce dali <a class="nearestterms" href="%s/search.py?%s">%d záznamů</a>.
-  </cz>
+  </cs>
   <no>
     Ingen nøyaktige treff funnet i samling %s.
     Andre offentlige samlinger gav <a class="nearestterms" href="%s/search.py?%s">%d treff</a>.
   </no>
-  <se>
+  <sv>
     Inga poster hittades i samling %s.
     Other public collections gave <a class="nearestterms" href="%s/search.py?%s">%d hits</a>.
-  </se>
+  </sv>
+  <el>
+    Κανένα αποτέλεσμα στην συλλογή %s.
+    Άλλες συλλογές έδωσαν <a class="nearestterms" href="%s/search.py?%s">%d αποτελέσματα</a>.
+  </el>
 </define-tag>
 
 <define-tag MSG_NO_PUBLIC_HITS>
@@ -1527,19 +1632,23 @@
     hľadali dokumenty verejne neprístupné, zvoľte prosím najskôr
     príslušnú neverejnú kolekciu.
   </Sk>
-  <cz>
+  <cs>
     Žádná veřejně přístupná kolekce nevyhovuje Vašemu dotazu.  Jestliže
     jste hledali dokumenty veřejně nepřístupné, zvolte prosím nejdříve
     příslušnou neveřejnou kolekci.    
-  </cz>
+  </cs>
   <no>
     Ingen offentlige samlinger passet ditt søk. Dersom du så etter et 
     ikke-offentlig dokument, vennligst velg den ønskede adgangsbegrensede
     samlingen først.
   </no>
-  <se>
+  <sv>
     Inga öppna samlingar motsvarar din sökning. Välj de åtkomstbegränsade samlingarna först.
-  </se>
+  </sv>
+  <el>
+    Καμιά ανοιχτή συλλογή δεν ικανοποίησε την έρευνά σας. Άν ψάχνετε και
+    σε κλειστές συλλογές, παρακαλώ επιλέξτε τις στην αρχή.
+  </el>
 </define-tag>
 
 <define-tag MSG_NO_MATCH_WITHIN_TIME_LIMIT>
@@ -1573,16 +1682,19 @@
     Žiaden výsledok nevyhovuje Vašim časovým kritériám, podmienka
     nie je vzatá do úvahy...
   </sk>
-  <cz>
+  <cs>
     Žádný výsledek nevyhovuje Vašim časovým kritériím, podmínka
     není vzata v úvahu...
-  </cz>
+  </cs>
   <no>
     Ingen treff innen angitt tidsbegrensning, forkaster dette kriteriet...
   </no>
-  <se>
+  <sv>
     Inga poster hittades inom den angivna tidsramen. Använder ej detta kriterium...
-  </se>
+  </sv>
+  <el>
+    Κανένα αποτέλεσμα στα χρονικά περιθώρια, θα γίνει παράβλεψη του κριτηρίου αυτού...
+  </el>
 </define-tag>
 
 <define-tag MSG_NO_MATCH_WITHIN_SEARCH_LIMITS>
@@ -1616,17 +1728,20 @@
     Žiaden výsledok nevyhovuje Vašim limitným kritériám, podmienky
     nie sú vzaté do úvahy...
   </sk>
-  <cz>
+  <cs>
     Žádný výsledek nevyhovuje Vašim omezujícím kritériím, podmínky
     nejsou vzaty v úvahu...
-  </cz>
+  </cs>
   <no>
     Ingen treff innen dine søkebegrensninger, forkaster dette
     kriteriet...
   </no>
-  <se>
+  <sv>
     Inga poster hittades i den begränsade sökningen, använder ej dessa kriterier...
-  </se>
+  </sv>
+  <el>
+    Κανένα αποτέλεσμα στα όρια έρευνας, θα γίνει παράβλεψη του κριτηρίου αυτού...
+  </el>
 </define-tag>
 
 # FIXME
@@ -1663,18 +1778,22 @@
     Booleovská otázka nevrátila žiaden výsledok.
     Skúste skombinovať dané termíny inakšie.
   </sk>
-  <cz>
+  <cs>
     Booleovský dotaz nevrátil žádný výsledek.
     Zkuste zkombinovat dané termíny jiným způsobem.
-  </cz>
+  </cs>
   <no>
     Bolske søk returnerte ingen treff.
     Vennligst kombiner søketermenene dine annerledes.
   </no>
-  <se>
+  <sv>
     Den booleska sökningen returnerade inga poster.
     Kombinera dina söktermer annorlunda.
-  </se>
+  </sv>
+  <el>
+    Η λογική ερώτηση δεν επέστρεψε αποτελέσματα.
+    Παρακαλούμε δοκιμάστε διαφορετικό συνδιασμό των όρων.
+  </el>
 </define-tag>
 
 <define-tag MSG_NO_EXACT_MATCH_FOR_FOO_USING_BAR_INSTEAD>
@@ -1706,16 +1825,20 @@
     Žiaden presný výsledok pre <em>%s</em> nebol nájdený, skúsme
     použiť <em>%s</em> namiesto neho...
   </sk>
-  <cz>
+  <cs>
     Žádný přesný výsledek pro <em>%s</em> nebyl nalezen, zkusme
     místo něj použít <em>%s</em>...
-  </cz>
+  </cs>
   <no>
     Ingen nøyaktige treff funnet for <em>%s</em>, bruker <em>%s</em> i stedet...
   </no>
-  <se>
+  <sv>
     Inga träffar för <em>%s</em>, använder <em>%s</em> i stället...
-  </se>
+  </sv>
+  <el>
+    Δεν βρέθηκε κανένα αποτέλεσμα για <em>%s</em>, θα γίνει χρήση
+    του <em>%s</em> στην θέση του...
+  </el>
 </define-tag>
 
 <define-tag MSG_INTERNAL_ERROR whitespace=delete>
@@ -1727,9 +1850,10 @@
   <it>Errore Interno</it>
   <ru>Внутренная Ошибка</ru>
   <sk>Vnútorná Chyba</sk>
-  <cz>Vnitřní Chyba</cz>
+  <cs>Vnitřní Chyba</cs>
   <no>Intern Feil</no>
-  <se>Internt Fel</se>
+  <sv>Internt Fel</sv>
+  <el>Εσωτερικό Σφάλμα</el>
 </define-tag>
 
 <define-tag MSG_PLEASE_CONTACT_AND_QUOTE>
@@ -1762,16 +1886,20 @@
     Prosíme kontaktujte <a href=\"mailto:%s\">%s</a> a uveďte nasledovné
     informácie:
   </sk>
-  <cz>
+  <cs>
     Prosíme kontaktujte <a href=\"mailto:%s\">%s</a> a uveďte následující
     informace:
-  </cz>
+  </cs>
   <no>
     Vennligst kontakt <a href=\"mailto:%s\">%s</a> og ta med følgenede informasjon:
   </no>
-  <se>
+  <sv>
     Vänligen kontakta <a href=\"mailto:%s\">%s</a> och ta med följande information:
-  </se>
+  </sv>
+  <el>
+    Παρακαλώ επικοινωνήστε με τον <a href=\"mailto:%s\">%s</a> αναφέροντας
+    τα παρακάτω στοιχεία:
+  </el>
 </define-tag>
 
 <define-tag MSG_SEARCH_OPTIONS whitespace=delete>
@@ -1783,9 +1911,10 @@
   <it>Opzioni di ricerca:</it>
   <ru>Опции поиска:</ru>
   <sk>Voľby hľadania:</sk>
-  <cz>Volby hledání:</cz>
+  <cs>Volby hledání:</cs>
   <no>Søkevalg:</no>
-  <se>Sökalternativ:</se>
+  <sv>Sökalternativ:</sv>
+  <el>Επιλογές αναζήτησης:</el>
 </define-tag>
 
 <define-tag MSG_LATEST_ADDITIONS whitespace=delete>
@@ -1797,9 +1926,10 @@
   <it>Ultimi arrivi:</it>
   <ru>Последние добавления:</ru>
   <sk>Posledne pridané:</sk>
-  <cz>Posledně přidáno:</cz>
+  <cs>Posledně přidáno:</cs>
   <no>Siste tillagte poster:</no>
-  <se>Senast inlagda poster:</se>
+  <sv>Senast inlagda poster:</sv>
+  <el>Πρόσφατες προσθήκες:</el>
 </define-tag>
 
 <define-tag MSG_MORE whitespace=delete>
@@ -1811,9 +1941,10 @@
   <it>ancora</it>
   <ru>ещё</ru>
   <sk>viac</sk>
-  <cz>více</cz>
+  <cs>více</cs>
   <no>mer</no>
-  <se>mer</se>
+  <sv>mer</sv>
+  <el>περισσότερα</el>
 </define-tag>
 
 <define-tag MSG_COLLECTION_CONTAINS_NO_RECORDS whitespace=delete>
@@ -1825,9 +1956,10 @@
   <it>Questa collezione non contiene ancora alcun documento.</it>
   <ru>Этот набор не содержит пока ни одной записи.</ru>
   <sk>Táto kolekcia ešte neobsahuje žiadne záznamy.</sk>
-  <cz>Tato kolekce ješte neobsahuje žádné záznamy.</cz>
+  <cs>Tato kolekce ješte neobsahuje žádné záznamy.</cs>
   <no>Denne samlingen inneholder fremdeles ingen dokumenter.</no>
-  <se>Denna samling innehåller ännu inga dokument.</se>
+  <sv>Denna samling innehåller ännu inga dokument.</sv>
+  <el>Η συλλογή αυτή δεν περιέχει κάποιο έγγραφο ακόμη.</el>
 </define-tag>
 
 <define-tag MSG_COLLECTION_RESTRICTED_CONTENT whitespace=delete>
@@ -1839,9 +1971,10 @@
   <it>Il contenuto di questa collezione è riservato.</it>
   <ru>Содержание етого набора ограничено.</ru>
   <sk>Obsah tejto kolekcie je chránený.</sk>
-  <cz>Obsah této kolekce je chráněn.</cz>
+  <cs>Obsah této kolekce je chráněn.</cs>
   <no>Innholdet i denne samlingen er adgangsbegrenset.</no>
-  <se>Åtkomsten till denna samling är begränsad.</se>
+  <sv>Åtkomsten till denna samling är begränsad.</sv>
+  <el>Τα περιεχόμενα της παρούσας συλλογής είναι προστατευμένα</el>
 </define-tag>
 
 <define-tag MSG_CONVERT whitespace=delete>
@@ -1853,9 +1986,10 @@
   <it>Convertire</it>
   <ru>Конвертировать</ru>
   <sk>Konvertovať</sk>
-  <cz>Konvertovat</cz>
+  <cs>Konvertovat</cs>
   <no>Konverter</no>
-  <se>Konvertera</se>
+  <sv>Konvertera</sv>
+  <el>Μετατροπή</el>
 </define-tag>
 
 <define-tag MSG_AGENDA whitespace=delete>
@@ -1867,9 +2001,10 @@
   <it>Agenda</it>
   <ru>Повестка</ru>
   <sk>Agenda</sk>
-  <cz>Agenda</cz>
+  <cs>Agenda</cs>
   <no>Agenda</no>
-  <se>Agenda</se>
+  <sv>Agenda</sv>
+  <el>Ατζέντα</el>
 </define-tag>
 
 <define-tag MSG_WEBCAST whitespace=delete>
@@ -1881,9 +2016,10 @@
   <it>Webcast</it>
   <ru>Вэбкаст</ru>
   <sk>Webcast</sk>
-  <cz>Webcast</cz>
+  <cs>Webcast</cs>
   <no>Webtv</no>
-  <se>Webbtv</se>
+  <sv>Webbtv</sv>
+  <el>Webcast</el>
 </define-tag>
 
 <define-tag MSG_BULLETIN whitespace=delete>
@@ -1895,9 +2031,10 @@
   <it>Bulletin</it>
   <ru>Бюллетень</ru>
   <sk>Buletín</sk>
-  <cz>Buletín</cz>
+  <cs>Buletín</cs>
   <no>Budstikke</no>
-  <se>Bulletin</se>
+  <sv>Bulletin</sv>
+  <el>Bulletin</el>
 </define-tag>
 
 <define-tag MSG_LIBRARY whitespace=delete>
@@ -1909,9 +2046,10 @@
   <it>Biblioteca</it>
   <ru>Библиотека</ru>
   <sk>Knižnica</sk>
-  <cz>Knihovna</cz>
+  <cs>Knihovna</cs>
   <no>Bibliotek</no>
-  <se>Bibliotek</se>
+  <sv>Bibliotek</sv>
+  <el>Βιβλιοθήκη</el>
 </define-tag>
 
 <define-tag MSG_THIS_PAGE_IN_LANGUAGES whitespace=delete>
@@ -1923,9 +2061,10 @@
   <it>Questo sito è disponibile anche nelle lingue seguenti: </it>
   <ru>Этот сайт также доступен на следующих языках:</ru>
   <sk>Táto stránka je tiež dostupná v nasledujúcich jazykoch:</sk>
-  <cz>Tato stránka je také dostupná v následujících jazycích:</cz>
+  <cs>Tato stránka je také dostupná v následujících jazycích:</cs>
   <no>Denne siden er også tilgjengelig på følgende språk:</no>
-  <se>Denna webbplats finns även tillgänglig på följande språk:</se>
+  <sv>Denna webbplats finns även tillgänglig på följande språk:</sv>
+  <el>Η σελίδα αυτή είναι διαθέσιμη και στις εξής γλώσσες:</el>
 </define-tag>
 
 # FIXME
@@ -1938,9 +2077,10 @@
   <it>.</it>
   <ru>,</ru>
   <sk>,</sk>
-  <cz>,</cz>
+  <cs>,</cs>
   <no>,</no>
-  <se>,</se>
+  <sv>,</sv>
+  <el>,</el>
 </define-tag>
 
 # FIXME
@@ -1953,9 +2093,10 @@
   <it>The record has been deleted.</it>
   <ru>The record has been deleted.</ru>
   <sk>Záznam bol vymazaný.</sk>
-  <cz>Záznam byl vymazán.</cz>
+  <cs>Záznam byl vymazán.</cs>
   <no>Posten har blitt slettet.</no>
-  <se>The record has been deleted.</se>
+  <sv>The record has been deleted.</sv>
+  <el>Η εγγραφή έχει διαγραφεί.</el>
 </define-tag>
 
 # FIXME
@@ -1968,9 +2109,10 @@
   <it>riservato</it>
   <ru>ограничено</ru>
   <sk>chránené</sk>
-  <cz>chráněno</cz>
+  <cs>chráněno</cs>
   <no>adgangsbegrenset</no>
-  <se>begränsad</se>
+  <sv>begränsad</sv>
+  <el>περιορισμένο</el>
 </define-tag>
 
 # FIXME
@@ -1983,9 +2125,10 @@
   <it>Record created %s, last modified %s</it>
   <ru>Record created %s, last modified %s</ru>
   <sk>Záznam vytvorený %s, modifikovaný %s</sk>
-  <cz>Záznam vytvořen %s, modifikován %s</cz>
+  <cs>Záznam vytvořen %s, modifikován %s</cs>
   <no>Posten vart laget %s, sist endret %s</no>
-  <se>Record created %s, last modified %s</se>
+  <sv>Record created %s, last modified %s</sv>
+  <el>Δημιουργία εγγραφής %s, τελευταία αλλαγή %s</el>
 </define-tag>
 
 # FIXME
@@ -1998,9 +2141,10 @@
   <it>Similar records</it>
   <ru>Similar records</ru>
   <sk>Podobné záznamy</sk>
-  <cz>Podobné záznamy</cz>
+  <cs>Podobné záznamy</cs>
   <no>Lignende sider</no>
-  <se>Similar records</se>
+  <sv>Similar records</sv>
+  <el>Παρόμοιες εγγραφές</el>
 </define-tag>
 
 # FIXME
@@ -2013,9 +2157,10 @@
   <it>word similarity</it>
   <ru>word similarity</ru>
   <sk>podobnosť slov</sk>
-  <cz>podobnost slov</cz>
+  <cs>podobnost slov</cs>
   <no>ord-likhet</no>
-  <se>ord-likhet</se>
+  <sv>ord-likhet</sv>
+  <el>ομοιότητα λέξης</el>
 </define-tag>
 
 ## end of file
