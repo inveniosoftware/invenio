@@ -3,170 +3,344 @@ CERN DOCUMENT SERVER SOFTWARE (CDSware) NEWS
 
 Revision: $Id$
 
-Here is a short summary of most notable changes in CDSware releases:
+Here is a short summary of the most notable changes in CDSware
+releases.  For more info about the current release, please consult
+RELEASE-NOTES.  For more info about changes, please consult ChangeLog.
+
+
+CDSware v0.5.0 -- released 2004-12-17
+-------------------------------------
+  
+ *) new rank engine, featuring word similarity rank method and the
+    journal impact factor rank demo (BibRank)
+
+ *) search engine includes ranking option (WebSearch) 
+
+ *) record similarity search based on word frequency (WebSearch,
+    BibRank)
+
+ *) stopwords possibility when ranking and indexing (BibRank, BibIndex)
+
+ *) stemming possibility when ranking and indexing (BibRank, BibIndex)
+
+ *) search engine boolean query processing stages improved (WebSearch)
+
+ *) search engine accent matching in phrase searches (WebSearch)
+
+ *) regular expression searching mode introduced into the Simple
+    Search interface too (WebSearch)
+
+ *) Search Tips split into a brief Search Tips page and detailed
+    Search Guide page (WebSearch)
+
+ *) improvements to the ``Try your search on'' hints (WebSearch)
+
+ *) author search hints introduced (WebSearch)
+
+ *) search interface respects title prologue/epilogue portalboxes
+    (WebSearch)
+
+ *) improvements to admin interfaces (WebSearch, BibIndex, BibRank,
+    WebAccess)
+
+ *) basket item ordering problem fixed (WebBasket)
+
+ *) access error messages introduced (WebAccess and its clients)
+
+ *) new account management to enable/disable guest users and
+    automatic vs to-be-approved account registration (WebAccess)
+
+ *) possibility for temporary read-only access to, and closure of, the
+    site; useful for backups (WebAccess and its clients)
+
+ *) possibility for external authentication login methods (WebAccess)
+
+ *) new XML MARC handling library (BibEdit)
+
+ *) when uploading, bad XML records are marked as errors (BibUpload)
+
+ *) improvements to the submission engine and its admin interface,
+    thanks to Tiberiu Dondera (WebSubmit)
+
+ *) preparations for electronic mail submission feature, not yet
+    functional (ElmSubmit)
+
+ *) added example on MARC usage at CERN (WebHelp)
+
+ *) legacy compatibility with MySQL 3.23.x assured (BibUpload)
+
+ *) legacy compatibility with Python 2.2 assured (WebSubmit)
+
+ *) test suite additions and corrections (BibRank, BibIndex,
+    WebSearch, BibEdit)
+
+ *) French translation fixes, thanks to Eric Grand
+
+ *) minor Czech and Slovak translation cleanup
+
 
 CDSware v0.3.3 (DEVELOPMENT) -- released 2004-07-16
+---------------------------------------------------
 
-  * new international phrases, collection and field names; thanks to
+ *) new international phrases, collection and field names; thanks to
     Guido, Flavio, Tullio
-  * collection international names are now respected by the search
+
+ *) collection international names are now respected by the search
     engine and interfaces (WebSearch)
-  * field international names are now respected by the search
+
+ *) field international names are now respected by the search
     engine and interfaces (WebSearch)
-  * when no hits found in a given collection, do not display all
+
+ *) when no hits found in a given collection, do not display all
     public hits straight away but only link to them (WebSearch)
-  * records marked as DELETED aren't shown anymore in XML MARC and
+
+ *) records marked as DELETED aren't shown anymore in XML MARC and
     other formats (WebSearch)
-  * detailed record page now features record creation and modification
+
+ *) detailed record page now features record creation and modification
     times (WebSearch)
-  * improved XML MARC parsing and cumulative record count in case of
+
+ *) improved XML MARC parsing and cumulative record count in case of
     uploading of several files in one go (BibUpload)
-  * personal `your admin activities' page introduced (WebSession)
-  * added option to fulltext-index local files only (BibIndex)
-  * initial release of the BibIndex Admin interface (BibIndex)
-  * checking of mandatory selection box definitions (WebSubmit)
-  * WebSearch Admin interface cleanup (WebSearch)
-  * introducing common test suite infrastructure (WebSearch, BibIndex,
+
+ *) personal `your admin activities' page introduced (WebSession)
+
+ *) added option to fulltext-index local files only (BibIndex)
+
+ *) initial release of the BibIndex Admin interface (BibIndex)
+
+ *) checking of mandatory selection box definitions (WebSubmit)
+
+ *) WebSearch Admin interface cleanup (WebSearch)
+
+ *) introducing common test suite infrastructure (WebSearch, BibIndex,
     MiscUtil, WebHelp)
-  * fixed accent and link problems for photo demo records (MiscUtil)
-  * conference title exported via OAI XML DC (BibHarvest)
-  * enabled building out of source directory; thanks to Frederic
+
+ *) fixed accent and link problems for photo demo records (MiscUtil)
+
+ *) conference title exported via OAI XML DC (BibHarvest)
+
+ *) enabled building out of source directory; thanks to Frederic
+
 
 CDSware v0.3.2 (DEVELOPMENT) -- released 2004-05-12
+---------------------------------------------------
 
-  * admin area improved: all the modules have now Admin Guides; some
+ *) admin area improved: all the modules have now Admin Guides; some
     guides were updated, some are still to be updated (WebHelp,
     BibConvert, BibFormat, BibIndex, BibSched, WebAlert, WebSession,
     WebSubmit, BibEdit, BibHarvest, BibRank, BibUpload, WebAccess,
     WebBasket, WebSearch, WebStyle)
-  * initial release of the WebSearch Admin interface (WebSearch)
-  * initial release of the BibRank Admin interface (BibRank)
-  * search cache expiry after insertion of new records (WebSearch)
-  * search engine now does on-the-fly formatting via BibFormat CLI
+
+ *) initial release of the WebSearch Admin interface (WebSearch)
+
+ *) initial release of the BibRank Admin interface (BibRank)
+
+ *) search cache expiry after insertion of new records (WebSearch)
+
+ *) search engine now does on-the-fly formatting via BibFormat CLI
+
     call to handle restricted site situations (WebSearch)
-  * webcoll default verbosity decreased for efficiency (WebSearch)
-  * added BibConvert configuration example for converting XML Dublin
+ *) webcoll default verbosity decreased for efficiency (WebSearch)
+
+ *) added BibConvert configuration example for converting XML Dublin
     Core to XML MARC (BibConvert)
-  * BibConvert knowledge base mode extended by various case-sensitive
+
+ *) BibConvert knowledge base mode extended by various case-sensitive
     matching possibilities (BibConvert)
-  * fixed various problems with fulltext file names and the submission
+
+ *) fixed various problems with fulltext file names and the submission
     from MS Windows platform (WebSubmit)
-  * fixed problem with bibupload append mode not updating XML MARC
+
+ *) fixed problem with bibupload append mode not updating XML MARC
     properly (BibUpload)
-  * fixed small problems with the submission interface such as
+
+ *) fixed small problems with the submission interface such as
     multiple fields selection (WebSubmit)
-  * session revoking and session expiry strengthened (WebSession)
-  * page design and style sheet updated to better fit large variety of
+
+ *) session revoking and session expiry strengthened (WebSession)
+
+ *) page design and style sheet updated to better fit large variety of
     browsers (WebStyle)
-  * added output format argument for basket display (WebBasket)
-  * new Swedish translation and updated German, Russian, and Spanish
+
+ *) added output format argument for basket display (WebBasket)
+
+ *) new Swedish translation and updated German, Russian, and Spanish
     translations; thanks to Urban, Guido, Lyuba, and Magaly
-  * faster creation of I18N static HTML and PHP files during make
+
+ *) faster creation of I18N static HTML and PHP files during make
+
 
 CDSware v0.3.1 (DEVELOPMENT) -- released 2004-03-12
+---------------------------------------------------
 
-  * security fix preventing exposure of local configuration variables
+ *) security fix preventing exposure of local configuration variables
     by malicious URL crafting (WebSearch, WebSubmit, WebAlert,
     WebBasket, WebSession, BibHarvest, MiscUtil)
-  * initial release of the ranking engine (BibRank)
-  * new guide on HOWTO Run Your CDSware Installation (WebHelp)
-  * fixed submit configurations with respect to fulltext links and
+
+ *) initial release of the ranking engine (BibRank)
+
+ *) new guide on HOWTO Run Your CDSware Installation (WebHelp)
+
+ *) fixed submit configurations with respect to fulltext links and
     metadata tags (WebSubmit, MiscUtil)
-  * Your Account personal corner now shows the list and the status
+
+ *) Your Account personal corner now shows the list and the status
     of submissions and approvals (WebSession)
-  * uniform help and version number option for CLI executables
+
+ *) uniform help and version number option for CLI executables
     (WebSearch, BibSched, BibIndex, BibRank, BibHarvest, BibConvert,
     WebAccess, BibFormat, WebSession, WebAlert)
-  * uniform technique for on-the-fly formatting of search results via
+
+ *) uniform technique for on-the-fly formatting of search results via
     `hb_' and `hd_' output format parameters (WebSearch)
-  * check for presence of pcntl and mysql PHP libraries (BibUpload)
+
+ *) check for presence of pcntl and mysql PHP libraries (BibUpload)
+
 
 CDSware v0.3.0 (DEVELOPMENT) -- released 2004-03-05
+---------------------------------------------------
 
-  * new development branch release (important SQL table changes)
-  * introducing a new submission engine and the end-user web
+ *) new development branch release (important SQL table changes)
+
+ *) introducing a new submission engine and the end-user web
     interface (WebSubmit)
-  * bibupload is now a BibSched task with new options (BibUpload)
-  * BibWords renamed into BibIndex in the view of future phrase
+
+ *) bibupload is now a BibSched task with new options (BibUpload)
+
+ *) BibWords renamed into BibIndex in the view of future phrase
     indexing changes (BibIndex)
-  * more secure DB server connectivity (BibSched)
-  * record matching functionality (BibConvert)
-  * character encoding conversion tables (BibConvert)
-  * Qualified Dublin Core conversion example (BibConvert)
-  * OAI deleted records policy can now be specified (BibHarvest)
-  * multi-language collection portalboxes (WebSearch)
-  * HTML pages now respect language selections (WebSearch, WebHelp)
-  * minor layout changes (WebStyle)
-  * updated Russian and other translations
-  * ChangeLog is now generated from CVS log messages
-  * plus the usual set of bugfixes (see ChangeLog)
+
+ *) more secure DB server connectivity (BibSched)
+
+ *) record matching functionality (BibConvert)
+
+ *) character encoding conversion tables (BibConvert)
+
+ *) Qualified Dublin Core conversion example (BibConvert)
+
+ *) OAI deleted records policy can now be specified (BibHarvest)
+
+ *) multi-language collection portalboxes (WebSearch)
+
+ *) HTML pages now respect language selections (WebSearch, WebHelp)
+
+ *) minor layout changes (WebStyle)
+
+ *) updated Russian and other translations
+
+ *) ChangeLog is now generated from CVS log messages
+
+ *) plus the usual set of bugfixes (see ChangeLog)
+
 
 CDSware v0.1.2 (DEVELOPMENT) -- released 2003-12-21
+---------------------------------------------------
 
-  * development branch release
-  * fix BibReformat task launching problem (BibFormat)
-  * fix BibTeX -> XML MARC conversion example (BibConvert)
-  * updated Spanish translation
+ *) development branch release
+
+ *) fix BibReformat task launching problem (BibFormat)
+
+ *) fix BibTeX -> XML MARC conversion example (BibConvert)
+
+ *) updated Spanish translation
+
 
 CDSware v0.1.1 (DEVELOPMENT) -- released 2003-12-19
+---------------------------------------------------
 
-  * development branch release
-  * access control engine now used by BibWords, BibFormat (admin and
+ *) development branch release
+
+ *) access control engine now used by BibWords, BibFormat (admin and
     bibreformat), WebSearch (webcoll), and BibTaskEx
-  * access control engine admin guide started (WebAccess)
-  * search engine support for sorting by more than one field (WebSearch)
-  * more internationalization of the search engine messages (WebSearch)
-  * new language: Norwegian (bokmål) 
-  * simple example for converting BibTeX into XML MARC (BibConvert)
-  * new optional --with-python configuration option
-  * Python module detection during configure 
-  * bugfixes: os.tempnam() warning, login page referer, and others
+
+ *) access control engine admin guide started (WebAccess)
+
+ *) search engine support for sorting by more than one field (WebSearch)
+
+ *) more internationalization of the search engine messages (WebSearch)
+
+ *) new language: Norwegian (bokmål) 
+
+ *) simple example for converting BibTeX into XML MARC (BibConvert)
+
+ *) new optional --with-python configuration option
+
+ *) Python module detection during configure 
+
+ *) bugfixes: os.tempnam() warning, login page referer, and others
+
 
 CDSware v0.1.0 (DEVELOPMENT) -- released 2003-12-04
+---------------------------------------------------
 
-  * development branch release
-  * search engine redesign to yield five times more search performance 
+ *) development branch release
+
+ *) search engine redesign to yield five times more search performance 
     for larger sites (WebSearch, BibWords)
-  * fulltext indexation of PDF, PostScript, MS Word, MS PowerPoint and
+
+ *) fulltext indexation of PDF, PostScript, MS Word, MS PowerPoint and
     MS Excel files (WebSearch)
-  * integrated combined metadata/fulltext/citation search (WebSearch)
-  * multi-stage search guidance in cases of no exact match (WebSearch)
-  * OAI-PMH harvestor (BibHarvest)
-  * bibliographic task scheduler (BibSched)
-  * automatic daemon mode of the indexer, the formatter and the
+
+ *) integrated combined metadata/fulltext/citation search (WebSearch)
+
+ *) multi-stage search guidance in cases of no exact match (WebSearch)
+
+ *) OAI-PMH harvestor (BibHarvest)
+
+ *) bibliographic task scheduler (BibSched)
+
+ *) automatic daemon mode of the indexer, the formatter and the
     collection cache generator (BibWords, BibFormat, WebSearch)
-  * user management and session handling rewrite (WebSession)
-  * user personalization, document baskets and notification alert
+
+ *) user management and session handling rewrite (WebSession)
+
+ *) user personalization, document baskets and notification alert
     system (WebBasket, WebAlert)
-  * role-based access control engine (WebAccess)
-  * internationalization of the interface started (currently with
+
+ *) role-based access control engine (WebAccess)
+
+ *) internationalization of the interface started (currently with
     Czech, German, English, Spanish, French, Italian, Portuguese,
     Russian, and Slovak support)
-  * web page design update (WebStyle)
-  * introduction of programmer-oriented technical documentation corner
+
+ *) web page design update (WebStyle)
+
+ *) introduction of programmer-oriented technical documentation corner
     (WebHelp)
-  * source tree reorganization, mod_python technology adopted for most
+
+ *) source tree reorganization, mod_python technology adopted for most
     of the modules
 
-CDSware v0.0.9 (STABLE) -- released 2002-08-01
 
-  * first "public" alpha release of CDSware
-  * recently standardized Library of Congress' MARC XML schema adopted
+CDSware v0.0.9 (STABLE) -- released 2002-08-01
+----------------------------------------------
+
+ *) first "public" alpha release of CDSware
+
+ *) recently standardized Library of Congress' MARC XML schema adopted
     in all CDSware modules as the new default internal XML file format
     (BibConvert, BibFormat, BibUpload, WebSubmit, WebSearch)
-  * support for OAI-PMH v2.0 in addition to OAI-PMH v1.1 (WebSearch)
-  * search interface now honors multiple output formats per collection
+
+ *) support for OAI-PMH v2.0 in addition to OAI-PMH v1.1 (WebSearch)
+
+ *) search interface now honors multiple output formats per collection
     (BibFormat, WebSearch)
-  * search interface now honors search fields, search options, and
+
+ *) search interface now honors search fields, search options, and
     sort options from the database config tables (WebSearch,
     WebSearch Admin)
-  * search interface now honors words indexes from the database config
+
+ *) search interface now honors words indexes from the database config
     tables (BibWords, WebSearch)
-  * easy reformatting of already uploaded bibliographic records via
+
+ *) easy reformatting of already uploaded bibliographic records via
     web admin. tool (BibFormat Admin/Reformat Records)
-  * new submission form field type ("response") allowing
+
+ *) new submission form field type ("response") allowing
     greater flexibility (WebSubmit) [thanks to Frank Sudholt]
-  * demo site "Atlantis Institute of Science" updated to demonstrate:
+
+ *) demo site "Atlantis Institute of Science" updated to demonstrate:
     Pictures collection of photographs; specific per-collection
     formats; references inside Articles and Preprints; "cited by"
     search link; published version linking; subject category
