@@ -1026,7 +1026,7 @@
 <define-tag MSG_ADMIN_AREA whitespace=delete>
   <en>Administrator&quot;s Area</en>
   <fr>Coin d&quot;Administrateur</fr>
-  <de>Administrator&quot;s Area</de> 
+  <de>Verwaltungsraum</de> 
   <es>Administrator&quot;s Area</es> 
   <pt>Área do Administrador</pt>
   <it>Administrator&quot;s Area</it> 
@@ -1039,7 +1039,7 @@
 <define-tag MSG_ADMIN_SUBMIT whitespace=delete>
   <en>WebSubmit Administration</en>
   <fr>Administration de Soumission</fr>
-  <de>WebSubmit Administration</de> 
+  <de>WebSubmit Verwaltung</de> 
   <es>WebSubmit Administration</es> 
   <pt>Administração de Envios</pt>
   <it>WebSubmit Administration</it> 
@@ -1052,8 +1052,8 @@
 <define-tag MSG_GUIDE whitespace=delete>
   <en>Guide</en>
   <fr>Guide</fr>
-  <de>Guide</de> 
-  <es>Guide</es> 
+  <de>Führer</de> 
+  <es>Guide</es>
   <pt>Guia</pt>
   <it>Guide</it> 
   <ru>Руководитель</ru>
@@ -1065,7 +1065,7 @@
 <define-tag MSG_ADDED_SINCE whitespace=delete>
   <en>Added since:</en>
   <fr>Ajouté depuis:</fr>
-  <de>Added since:</de>
+  <de>Hinzufügt seit:</de>
   <es>Added since:</es>
   <pt>Adicionada desde:</pt>
   <it>Added since:</it>
@@ -1078,7 +1078,7 @@
 <define-tag MSG_UNTIL whitespace=delete>
   <en>until:</en>
   <fr>jusqu'à:</fr>
-  <de>until:</de>
+  <de>nach:</de>
   <es>until:</es>
   <pt>até:</pt>
   <it>until:</it>
@@ -1091,7 +1091,7 @@
 <define-tag MSG_ANY_DAY whitespace=delete>
   <en>any day</en>
   <fr>tous les jours</fr>
-  <de>any day</de>
+  <de>beliebiger Tag</de>
   <es>any day</es>
   <pt>qualquer dia</pt>
   <it>any day</it>
@@ -1104,7 +1104,7 @@
 <define-tag MSG_ANY_MONTH whitespace=delete>
   <en>any month</en>
   <fr>tous les mois</fr>
-  <de>any month</de>
+  <de>beliebiger Monat</de>
   <es>any month</es>
   <pt>qualquer mês</pt>
   <it>any month</it>
@@ -1117,7 +1117,7 @@
 <define-tag MSG_ANY_YEAR whitespace=delete>
   <en>any year</en>
   <fr>toutes les années</fr>
-  <de>any year</de>
+  <de>beliebiges Jahr</de>
   <es>any year</es>
   <pt>qualquer ano</pt>
   <it>any year</it>
@@ -1130,7 +1130,7 @@
 <define-tag MSG_JANUARY whitespace=delete>
   <en>January</en>
   <fr>janvier</fr>
-  <de>January</de>
+  <de>Januar</de>
   <es>January</es>
   <pt>Janeiro</pt>
   <it>January</it>
@@ -1143,7 +1143,7 @@
 <define-tag MSG_FEBRUARY whitespace=delete>
   <en>February</en>
   <fr>février</fr>
-  <de>February</de>
+  <de>Februar</de>
   <es>February</es>
   <pt>Fevereiro</pt>
   <it>February</it>
@@ -1156,7 +1156,7 @@
 <define-tag MSG_MARCH whitespace=delete>
   <en>March</en>
   <fr>mars</fr>
-  <de>March</de>
+  <de>März</de>
   <es>March</es>
   <pt>Março</pt>
   <it>March</it>
@@ -1182,7 +1182,7 @@
 <define-tag MSG_MAY whitespace=delete>
   <en>May</en>
   <fr>mai</fr>
-  <de>May</de>
+  <de>Mai</de>
   <es>May</es>
   <pt>Maio</pt>
   <it>May</it>
@@ -1195,7 +1195,7 @@
 <define-tag MSG_JUNE whitespace=delete>
   <en>June</en>
   <fr>juin</fr>
-  <de>June</de>
+  <de>Juni</de>
   <es>June</es>
   <pt>Junho</pt>
   <it>June</it>
@@ -1208,7 +1208,7 @@
 <define-tag MSG_JULY whitespace=delete>
   <en>July</en>
   <fr>juillet</fr>
-  <de>July</de>
+  <de>Juli</de>
   <es>July</es>
   <pt>Julho</pt>
   <it>July</it>
@@ -1273,7 +1273,7 @@
 <define-tag MSG_DECEMBER whitespace=delete>
   <en>December</en>
   <fr>décembre</fr>
-  <de>December</de>
+  <de>Dezember</de>
   <es>December</es>
   <pt>Dezembro</pt>
   <it>December</it>
@@ -1286,7 +1286,7 @@
 <define-tag MSG_SEARCH_TERM whitespace=delete>
   <en>Search term <em>%s</em></en>
   <fr>Le terme de recherche <em>%s</em></fr>
-  <de>Search term <em>%s</em></de>
+  <de>Suchbegriff <em>%s</em></de>
   <es>Search term <em>%s</em></es>
   <pt>Termo de busca <em>%s</em></pt>
   <it>Search term <em>%s</em></it>
@@ -1299,24 +1299,24 @@
 <define-tag MSG_INSIDE_INDEX whitespace=delete>
   <en>inside <em>%s</em> index</en>
   <fr>dans l'index <em>%s</em></fr>
-  <de>inside <em>%s</em> index</de>
+  <de>im Index von <em>%s</em></de>
   <es>inside <em>%s</em> index</es>
   <pt>no <em>%s</em> índice</pt>
   <it>inside <em>%s</em> index</it>
   <ru>в индексе <em>%s</em></ru>
   <sk>v indexe <em>%s</em></sk>
-  <cz>v indexu em>%s</em></cz>
+  <cz>v indexu <em>%s</em></cz>
   <no>innen <em>%s</em>indeks</no>
 </define-tag>
 
 <define-tag MSG_DID_NOT_MATCH whitespace=delete>
   <en>did not match any record.  Nearest terms in any collection are:</en>
   <fr>ne se trouve dans aucune notice.  Les termes les plus proches de toutes les collections sont:</fr>
-  <de>did not match any record.  Nearest terms in any collection are:</de>
+  <de>hat keine Datensätze gekriegt.  Die nächste Begriffe in allen Kollektionen sind:</de>
   <es>did not match any record.  Nearest terms in any collection are:</es>
   <pt>não está presente em nenhum registro.  Os termos mais similares em todas as coleções são:</pt>
   <it>did not match any record.  Nearest terms in any collection are:</it>
-  <ru>did not match any record.  Nearest terms in any collection are:</ru>
+  <ru>не найден. Ближайшие термины:</ru>
   <sk>neodpovedá žiadnemu záznamu.  Najbližšie termíny nezávisle na kolekcii sú:</sk>
   <cz>neodpovídá žádnému záznamu.  Nejbližší termíny nezávisle na kolekci jsou:</cz>
   <no>passet ingen poster.  næreste term i hvilken som helst samling er:</no>
@@ -1325,11 +1325,11 @@
 <define-tag MSG_NO_WORDS_INDEX_AVAILABLE whitespace=delete>
   <en>No words index available for</en>
   <fr>Aucun index des mots n'est disponible pour</fr>
-  <de>No words index available for</de>
+  <de>Kein Wordindex steht zur Verfügung für</de>
   <es>No words index available for</es>
   <pt>Nenhum índice de palavras está disponível para</pt>
   <it>No words index available for</it>
-  <ru>No words index available for</ru>
+  <ru>Никакой лексическый индех не найден для</ru>
   <sk>Index slov nie je dostupný pre</sk>
   <cz>Index slov není k dispozici pro</cz>
   <no>Ingen ordindeks tilgjengelig for</no>
@@ -1338,13 +1338,13 @@
 <define-tag MSG_NO_PHRASE_INDEX_AVAILABLE whitespace=delete>
   <en>No phrase index available for</en>
   <fr>Aucun index des phrases n'est disponible pour</fr>
-  <de>No phrase index available for</de>
+  <de>Kein Begriffindex steht zur Verfügung für</de>
   <es>No phrase index available for</es>
   <pt>Nenhum índice de frases está disponível para</pt>
   <it>No phrase index available for</it>
-  <ru>No phrase index available for</ru>
+  <ru>Фразный индех не найден для</ru>
   <sk>Index viet nie je dostupný pre</sk>
-  <cz>Index vět není k dispozici pro</cz>
+  <cz>Index frází není k dispozici pro</cz>
   <no>Ingen uttrykksindeks tilgjengelig for</no>
 </define-tag>
 
@@ -1355,11 +1355,11 @@
   </en>
   <fr>
     Aucun résultat exact n'a été trouvé dans les collections
-    sélectionnées.  Les résultats de toutes la base publique suivent.    
+    sélectionnées.  Les résultats de toutes la base publique suivent.
   </fr>
   <de>
-    No exact match found in selected collection(s).
-    Results from the whole public database follow.
+    Kein genaues Resultat wurde gefunden.
+    Resultate von der ganzen offenen Datenbank folgen:
   </de>
   <es>
     No exact match found in selected collection(s).
@@ -1375,6 +1375,7 @@
     Results from the whole public database follow.
   </it>
   <ru>
+    Никакый аккуратный результат наиден во выбранней коллекции.
     No exact match found in selected collection(s).
     Results from the whole public database follow.
   </ru>
@@ -1383,7 +1384,7 @@
     Výsledky z celej verejne prístupnej databázy nasledujú.
   </sk>
   <cz>
-    Žádný přesný výsledek nebyl ve zvolených kolekcích nalezen.
+    Žádný přesný výsledek nebyl nalezen ve zvolených kolekcích.
     Výsledky z celé veřejně přístupné databáze následují.
   </cz>
   <no>
@@ -1404,6 +1405,9 @@
     la collection restreinte.
   </fr>
   <de>
+    Keine offene Kollektion hat Ihre Suche abgefunden. 
+    Wenn Sie die private Dokumente durchsuchen möchten, 
+    wählen Sie bitte zuerst die private Kollektion aus.
   </de>
   <es>  
     No public collection matched your query.  If you were looking for
@@ -1421,9 +1425,7 @@
     collection first.    
   </it>
   <ru>
-    No public collection matched your query.  If you were looking for
-    a non-public document, please choose the desired restricted
-    collection first.
+    никакая гласная коллекция найдена. поиск для приватного документа через выбрание приватней коллекции.
   </ru>
   <sk>  
     Žiadna verejne prístupná kolekcia nevyhovuje Vašej otázke.  Ak ste
@@ -1431,8 +1433,8 @@
     príslušnú neverejnú kolekciu.
   </Sk>
   <cz>  
-    Žádná veřejně přístupná kolekce nevyhovuje Vaší otázce.  Jestliže
-    jste hledali dokumenty veřejně nepřístupné, zvolte prosím nejdřív
+    Žádná veřejně přístupná kolekce nevyhovuje Vašemu dotazu.  Jestliže
+    jste hledali dokumenty veřejně nepřístupné, zvolte prosím nejdříve
     příslušnou neveřejnou kolekci.    
   </cz>
   <no>  
@@ -1451,7 +1453,8 @@
     n'est pas prise en compte...
   </fr>
   <de>
-    No match within your time limits, discarding this condition...
+    Kein Resultat in der eingegebene Zeitbeschränkung wurde erreicht, 
+    diese Bedingung wird ignoriert...
   </de>
   <es>
     No match within your time limits, discarding this condition...
@@ -1464,7 +1467,7 @@
     No match within your time limits, discarding this condition...
   </it>
   <ru>
-    No match within your time limits, discarding this condition...
+    Никакой результат для бременного лимита, условие отменено...
   </ru>
   <sk>
     Žiaden výsledok nevyhovuje Vašim časovým kritériám, podmienka
@@ -1472,7 +1475,7 @@
   </sk>
   <cz>
     Žádný výsledek nevyhovuje Vašim časovým kritériím, podmínka
-    není vzata do úvahy...
+    není vzata v úvahu...
   </cz>
   <no>
     Ingen treff innen angitt tidsbegrensning, forkaster dette kriteriet...
@@ -1488,7 +1491,8 @@
     sont pas prise en compte...
   </fr>
   <de>
-    No match within your time limits, discarding this condition...
+    Kein Resultat in der eingegebene Suchebeschränkung wurde erreicht, 
+    diese Bedingung wird ignoriert...
   </de>
   <es>
     No match within your time limits, discarding this condition...
@@ -1501,15 +1505,15 @@
     No match within your time limits, discarding this condition...
   </it>
   <ru>
-    No match within your time limits, discarding this condition...
+    Никакой результат для поицкового лимита, условие отменено...
   </ru>
   <sk>
     Žiaden výsledok nevyhovuje Vašim limitným kritériám, podmienky
     nie sú vzaté do úvahy...
   </sk>
   <cz>
-    Žádný výsledek nevyhovuje Vašim limitným kritériím, podmínky
-    nejsou vzaty do úvahy...
+    Žádný výsledek nevyhovuje Vašim omezujícím kritériím, podmínky
+    nejsou vzaty v úvahu...
   </cz>
   <no>
     Ingen treff innen dine søkebegrensninger, forkaster dette
@@ -1527,8 +1531,8 @@
     n'a rien donnée.  Essayez de combiner ces termes différamment.
   </fr>
   <de>
-    All search terms matched but boolean query returned no hits.
-    Please combine your search terms differently.
+    Alle eingegebene Begriffe wurden gefunden, aber die boolsche Suchfrage hat keine Datensätze gekriegt.
+    Kombinieren Sie, bitte, Ihre Suchfrage anders.
   </de>
   <es>
     All search terms matched but boolean query returned no hits.
@@ -1544,17 +1548,17 @@
     Please combine your search terms differently.
   </it>
   <ru>
-    All search terms matched but boolean query returned no hits.
-    Please combine your search terms differently.
+    Бце исканные термины найдены, но боолеаный вопрос не даеть резултат.
+    Упрашиваем комбинировать исканные термины иначе.
+
   </ru>
   <sk>
     Všetky termíny hľadania boli nájdené, ale boolean otázka nevrátila
     žiaden výsledok.  Skúste skombinovať dané termíny inakšie.
   </sk>
   <cz>
-    Všechny termíny hledání byli nalezeny, avšak boolean otázka
-    nevrátila žádný výsledek. Skuste skombinovat dané termíny
-    jiným spůsobem.
+    Všechny vyhledávací termíny byly nalezeny, avšak booleovský dotaz
+    nevrátil žádný výsledek. zkuste zkombinovat dané termíny jiným způsobem.
   </cz>
   <no>
     Alle søketermer traff men ditt bolske søk returnerte ingen treff.
@@ -1571,7 +1575,7 @@
     utilisons <em>%s</em> à la place...
   </fr>
   <de>
-    No exact match found for <em>%s</em>, using <em>%s</em> instead...
+    Kein genaues Resultat für <em>%s</em> wurde gefunden, <em>%s</em> wird verwendet anstatt...
   </de>
   <es>
     No exact match found for <em>%s</em>, using <em>%s</em> instead...
@@ -1584,15 +1588,15 @@
     No exact match found for <em>%s</em>, using <em>%s</em> instead...
   </it>
   <ru>
-    No exact match found for <em>%s</em>, using <em>%s</em> instead...
+    Никакой результат не найден для: <em>%s</em>, употребуем <em>%s</em> взамен...
   </ru>
   <sk>
     Žiaden presný výsledok pre <em>%s</em> nebol nájdený, skúsme
     použiť <em>%s</em> namiesto neho...
   </sk>
   <cz>
-    Žádný přesný výsledek pro <em>%s</em> nebyl nalezen, skusme
-    použít <em>%s</em> místo něj...
+    Žádný přesný výsledek pro <em>%s</em> nebyl nalezen, zkusme
+    místo něj použít <em>%s</em>...
   </cz>
   <no>
     Ingen nøyaktige treff funnet for <em>%s</em>, bruker <em>%s</em> i stedet...
@@ -1602,11 +1606,11 @@
 <define-tag MSG_INTERNAL_ERROR>
   <en>Internal Error</en>
   <fr>Erreur Interne</fr>
-  <de>Internal Error</de>
+  <de>interner Fehler</de>
   <es>Internal Error</es>
   <pt>Erro Interno</pt>
   <it>Internal Error</it>
-  <ru>Internal Error</ru>
+  <ru>Внутренная ошибка</ru>
   <sk>Interná Chyba</sk>
   <cz>Interní Chyba</cz>
   <no>Intern feil</no>
@@ -1622,8 +1626,7 @@
     l'information suivante:        
   </fr>
   <de>
-    Please contact <a href="mailto:%s">%s</a> quoting the following
-    information:
+    Kontaktieren Sie <a href="mailto:%s">%s</a>, bitte, und geben Sie die folgende Auskunft an:
   </de>
   <es>
     Please contact <a href="mailto:%s">%s</a> quoting the following
@@ -1638,8 +1641,7 @@
     information:
   </it>
   <ru>
-    Please contact <a href="mailto:%s">%s</a> quoting the following
-    information:
+    Упрашиваем контакт <a href="mailto:%s">%s</a> и привестит цледуюсщаю информацию:
   </ru>
   <sk>
     Prosíme kontaktujte <a href="mailto:%s">%s</a> a uveďte nasledovné
