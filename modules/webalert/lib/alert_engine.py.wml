@@ -61,6 +61,8 @@ def update_date_lastrun(alert):
 def get_alert_queries(frequency):
     return run_sql('select distinct id, urlargs from query q, user_query_basket uqb where q.id=uqb.id_query and uqb.frequency=%s and uqb.date_lastrun <= now();', (frequency,))
     
+def get_alert_queries_for_user(uid):
+    return run_sql('select distinct id, urlargs, uqb.frequency from query q, user_query_basket uqb where q.id=uqb.id_query and uqb.id_user=%s and uqb.date_lastrun <= now();', (uid,))
 
 def get_alerts(query, frequency):
     r = run_sql('select id_user, id_query, id_basket, frequency, date_lastrun, alert_name, notification from user_query_basket where id_query=%s and frequency=%s;', (query['id_query'], frequency,))
@@ -348,6 +350,18 @@ def run_alerts():
         
     process_alert_queries('day')
 
+def process_alert_queries_for_user(uid):
+    alert_queries = get_alert_queries_for_user(uid)
+    
+    for aq in alert_queries:
+        frequency = aq[2]
+        q = run_query(aq, frequency)
+        alerts = get_alerts(q, frequency)
+        process_alerts(alerts)
 
+    
+def run_alerts(uid):
+    process_alert_queries_for_user(uid)
+    
 if __name__ == '__main__':
-    run_alerts()
+    run_alerts_queries_for_user(60)
