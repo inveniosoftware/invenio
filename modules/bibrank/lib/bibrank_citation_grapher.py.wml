@@ -97,7 +97,7 @@ def get_citation_history_html(recid):
     if cfg_bibrank_print_citation_history:
         coordinates = get_citation_history_coordinates(recid)
         if coordinates:
-            html_head = """</br><table><tr><td class="blocknote">Citation&nbsp;History</td></tr></table>"""
+            html_head = """</br><table><tr><td class="blocknote">Citation&nbsp;history:</td></tr></table>"""
             graphe_file_name = 'citation_%s_stats.png' % str(recid)
             remove_old_img(graphe_file_name)
             years = get_citation_graphe_x_coordinates(recid)
