@@ -51,6 +51,9 @@ Contents
       $ mysql -h sqlserver.domain.com -u root -p mysql
           mysql> CREATE DATABASE cdsware;
           mysql> GRANT ALL PRIVILEGES ON cdsware.* TO cdsware@webserver.domain.com IDENTIFIED BY 'myp1ss';
+      $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
+      $ sudo vi /path/to/php/conf/php.ini ## see below in part 2
+      $ sudo /path/to/apache/bin/apachectl graceful
       $ cd /usr/local/src/
       $ wget http://cdsware.cern.ch/download/cdsware-0.9.tar.gz
       $ tar xvfz cdsware-0.9.tar.gz
@@ -92,6 +95,44 @@ Contents
 
           (Of course, you are free to choose your own user credentials
            and database names; the above values were just an example.)
+
+      $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
+
+          Please ask your webserver administrator to put the following
+          lines in your "httpd.conf" configuration file:
+
+              AddType application/x-httpd-php .php .shtml
+              AddType application/x-httpd-php-source .phps .shtmls
+              DirectoryIndex index.shtml index.php index.html
+
+          This is to ensure that "*.shtml" files will be interpreted
+          by the web server as PHP files, and that "index.shtml" will
+          be considered as directory index file.
+
+      $ sudo vi /path/to/php/conf/php.ini ## see below in part 2
+
+          Please ask your webserver administrator to put the following
+          lines in your "php.ini" configuration file:
+          
+              session.save_handler = user
+              session.auto_start = 0
+              session.name = SESSIONID
+              session.gc_probability = 0
+              session.gc_maxlifetime = 60000
+              session.cookie_lifetime = 0
+              log_errors = on
+              display_errors = off
+              expose_php = off
+              max_execution_time = 160
+
+          This is to tell PHP that we will be using our own session
+          handler and our own garbage collector.  Also, it sets up
+          some other relevant PHP variables.
+           
+      $ sudo /path/to/apache/bin/apachectl graceful
+
+          Please ask your webserver admin to restart the Apache server
+          after the above "httpd.conf" and "php.ini" changes.
 
       $ cd /usr/local/src/
  
