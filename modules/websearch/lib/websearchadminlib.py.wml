@@ -1760,8 +1760,8 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     <td>1.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_addcollection">Create new collection</a></small></td>
     <td>2.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_addcollectiontotree">Attach collection to tree</a></small></td>
     <td>3.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_modifycollectiontree">Modify collection tree</a></small></td>
-    <td>4.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_runwebcoll">Webcoll overview</a></small></td>
-    <td>5.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_validateconf">Collections overview</a></small></td>
+    <td>4.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_runwebcoll">Webcoll Status</a></small></td>
+    <td>5.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_validateconf">Collections Status</a></small></td>
     </tr>
     </table>
     """ % (weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln)
@@ -2104,46 +2104,89 @@ def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
     colID - the collection id of the current collection.
     fmtID - the format id to delete."""
  
-    subtitle = """<a name="11"></a>Webcoll overview"""
+    subtitle = """<a name="11"></a>Webcoll Status"""
     output  = ""
 
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
 
-    res = run_sql("select proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='webcoll' and runtime< now() ORDER by runtime")
-    output += """<b>Last run:</b><br>"""
-    if len(res) > 0:
-        (proc, host, user, runtime, sleeptime, arguments, status, progress) = res[len(res) - 1]
-        output += "Task: %s<br>" % proc
-        output += "User: %s<br>" % user
-        output += "Runtime: %s<br>" % runtime
-        output += "Sleeptime: %s<br>" % sleeptime
-        output += "Status: %s<br>" % status
-        output += "Progress: %s<br>" % progress
-        output += "<b>Options:</b><br>"
-        options = marshal.loads(arguments)
-        for (key, value) in options.iteritems():
-            output += "&nbsp;%s: %s <br>" % (key,value)
-    else:
-        output += """<span class="info">Not yet run.</span><br>"""
-
-    res = run_sql("select proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='webcoll' and runtime> now() ORDER by runtime")
-    output += """<br><b>Next scheduled run:</b> (when changes to the collections will be prosessed.)<br>"""
-    if len(res) > 0:
-        (proc, host, user, runtime, sleeptime, arguments, status, progress) = res[0]
-        output += "Task: %s<br>" % proc
-        output += "User: %s<br>" % user
-        output += "Runtime: %s<br>" % runtime
-        output += "Sleeptime: %s<br>" % sleeptime
-        output += "Status: %s<br>" % status
-        output += "Progress: %s<br>" % progress
-        output += "<b>Options:</b><br>"
-        options = marshal.loads(arguments)
-        for (key, value) in options.iteritems():
-            output += "&nbsp;%s: %s <br>" % (key,value)
-    else:
-        output += """<span class="info">No webcoll tasks scheduled in the future. If changes has been made to the collections they will not be visible until webcoll has been executed for the changed collections.</soan><br>"""
+    output += """<br><b>Last updates:</b><br>"""
+    collection_table_update_time = ""
+    collection_web_update_time = ""
     
+    res = run_sql("SHOW TABLE STATUS LIKE 'collection'")
+    if res:
+        collection_table_update_time = str(res[0][11])[0:len(collection_table_update_time) - 3]
+        output += "Collection table last updated: %s<br>" % collection_table_update_time
+    try:
+        
+        file = open("%s/collections/1/last-updated-ln=en.html" % cachedir)
+        collection_web_update_time = str(file.readline())
+        output += "Collection webpage last updated: %s<br>" % collection_web_update_time
+        file.close()
+    except StandardError, e:
+        pass
+
+    import datetime
+    import time
+    tabletime = time.strptime(collection_table_update_time, "%Y-%m-%d %H:%M:%S")
+    webtime = time.strptime(collection_web_update_time, "%d %B %Y %H:%M:%S %Z")
+    
+    if tabletime > webtime:
+        output += """<br><b><span class="info">Warning: The collections has been modified since last time Webcoll was executed, to process the changes, Webcoll must be executed.</span></b><br>"""
+
+    header = ['ID', 'Name', 'Time', 'Status', 'Progress']
+    actions = []
+    output += """<br><b>Last BibSched tasks:</b><br>"""
+
+    res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='webcoll' and runtime< now() ORDER by runtime")
+    if len(res) > 0:
+        (id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[len(res) - 1]
+        webcoll__update_time = runtime
+        actions.append([id, proc, runtime, status, progress])
+    else:
+        actions.append(['', 'webcoll', '', '', 'Not executed yet'])
+
+    res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='bibindex' and runtime< now() ORDER by runtime")
+    if len(res) > 0:
+        (id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[len(res) - 1]
+        actions.append([id, proc, runtime, status, progress])
+    else:
+        actions.append(['', 'bibindex', '', '', 'Not executed yet'])
+        
+    output += tupletotable(header=header, tuple=actions)
+        
+    output += """<br><b>Next scheduled BibSched run:</b><br>"""
+    actions = []
+    
+    res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='webcoll' and runtime > now() ORDER by runtime")
+
+    webcoll_future = ""
+    if len(res) > 0:
+        (id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[0]
+        webcoll__update_time = runtime
+        actions.append([id, proc, runtime, status, progress])
+        webcoll_future = "yes"
+    else:
+        actions.append(['', 'webcoll', '', '', 'Not scheduled'])
+        
+    res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='bibindex' and runtime > now() ORDER by runtime")
+
+    bibindex_future = ""
+    if len(res) > 0:
+        (id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[0]
+        actions.append([id, proc, runtime, status, progress])
+        bibindex_future = "yes"
+    else:
+        actions.append(['', 'bibindex', '', '', 'Not scheduled'])
+
+    output += tupletotable(header=header, tuple=actions)
+
+    if webcoll_future == "":
+        output += """<br><b><span class="info">Warning: Webcoll is not scheduled for a future run by bibsched, any updates to the collection will not be processed.</span></b><br>"""
+    if bibindex_future == "":
+        output += """<br><b><span class="info">Warning: Bibindex is not scheduled for a future run by bibsched, any updates to the records will not be processed.</span></b><br>"""
+        
     try:
         body = [output, extra]
     except NameError:
@@ -2159,7 +2202,7 @@ def perform_validateconf(colID, ln, confirm=0, callback='yes'):
     colID - the collection id of the current collection.
     fmtID - the format id to delete."""
  
-    subtitle = """<a name="11"></a>Collections Overview"""
+    subtitle = """<a name="11"></a>Collections Status"""
     output  = ""
 
     colID = int(colID)
@@ -2184,9 +2227,11 @@ def perform_validateconf(colID, ln, confirm=0, callback='yes'):
             i8n = """<b><span class="info">None</span></b>"""
 
         if (reg_sons > 1 and dbquery) or dbquery=="":
-            status = """<b><span class="warning">ERROR (Query)</span></b>"""
-        elif (dbquery is None or dbquery == "") and reg_sons == 1:
-            status = """<b><span class="warning">ERROR (Query)</span></b>"""
+            status = """<b><span class="warning">ERROR 1:Query</span></b>"""
+        elif dbquery is None and reg_sons == 1:
+            status = """<b><span class="warning">ERROR 2:Query</span></b>"""
+        elif dbquery == "" and reg_sons == 1:
+            status = """<b><span class="warning">ERROR 3:Query</span></b>"""
 
         if (reg_sons > 1 or vir_sons > 1):
             subs = """<b><span class="info">Yes</span></b>"""
@@ -2199,9 +2244,9 @@ def perform_validateconf(colID, ln, confirm=0, callback='yes'):
         if restricted == "":
             restricted = ""
             if status:
-                status += """<b><span class="warning">(Restricted)</span></b>"""
+                status += """<b><span class="warning">,4:Restricted</span></b>"""
             else:
-                status += """<b><span class="warning">ERROR (Restricted)</span></b>"""
+                status += """<b><span class="warning">ERROR 4:Restricted</span></b>"""
         elif restricted is None:
             restricted = """<b><span class="info">No</span></b>"""
 
