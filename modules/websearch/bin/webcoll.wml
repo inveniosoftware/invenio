@@ -39,6 +39,7 @@ pylibdir = "<LIBDIR>/python"
 try:
     import copy
     import getopt
+    import getpass
     import marshal
     import signal
     import sys
@@ -65,6 +66,7 @@ try:
     from cdsware.search_engine import HitSet, search_pattern, get_modification_date
     from cdsware.search_engine_config import cfg_author_et_al_threshold, cfg_instant_browse, cfg_max_recID, cfg_narrow_search_show_grandsons
     from cdsware.dbquery import run_sql    
+    from cdsware.access_control_engine import acc_authorize_action
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -527,7 +529,7 @@ class Collection:
         "Searches database and produces list of last 'rg' records."
         box = ""
         if self.restricted_p():
-            box += """<small><strong>Restricted!</strong></small><br> This collection has restricted content."""
+            box += msg_collection_restricted_content[ln]
         else:
             url = "%s/search.py?cc=%s&jrec=%d" % (weburl, urllib.quote_plus(self.name), rg+1)
             if self.nbrecs and self.reclist:
@@ -1062,50 +1064,39 @@ def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
     write_message("unknown signal %d ignored" % sig) # do nothing for other signals
 
-def getpass(prompt = "Password: "):
-    """Prompts for a password without echoing it back to the screen"""
-    import termios, sys
-    fd = sys.stdin.fileno()
-    old = termios.tcgetattr(fd)
-    new = termios.tcgetattr(fd)
-    new[3] = new[3] & ~termios.ECHO          # lflags
-    passwd = ""
-    try:
-        termios.tcsetattr(fd, termios.TCSADRAIN, new)
-        passwd = raw_input(prompt)
-        print 
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old)
-    return passwd
-
-def authenticate(user):
-    """Authenticates a user against the user database.
-       NOTE: Access might be more complex in the future"""
-    print "WebColl Task Submission"
-    print "======================="
+def authenticate(user, header="WebColl Task Submission", action="runwebcoll"):
+    """Authenticate the user against the user database.
+       Check for its password, if it exists.
+       Check for action access rights.
+       Return user name upon authorization success,
+       do system exit upon authorization failure.
+       """
+    print header
+    print "=" * len(header)
     if user == "":
         print >> sys.stdout, "\rUsername: ",
         user = string.strip(string.lower(sys.stdin.readline()))
     else:
-        print >> sys.stdout, "\rUsername:", user        
-    res = run_sql("select password from user where email=%s", (user,), 1)
-    if res:
-        row = res[0]
-        password_db = row[0]
-        if password_db != '':
-            # authentication needed
-            password_entered = getpass()
-            if password_db == password_entered:
-                return user
-            else:
-                print "Sorry, you seem to be unauthorized user.  Exiting."
-                sys.exit(1)
-        else:
-            # no authentication needed
-            return user
-    else:
-        print "Sorry, %s seems to be unauthorized user.  Exiting." % user
+        print >> sys.stdout, "\rUsername: ", user        
+    ## first check user pw:
+    res = run_sql("select id,password from user where email=%s", (user,), 1)
+    if not res:
+        print "Sorry, %s does not exist." % user
         sys.exit(1)        
+    else:
+        (uid_db, password_db) = res[0]
+        if password_db:
+            password_entered = getpass.getpass()
+            if password_db == password_entered:
+                pass
+            else:
+                print "Sorry, wrong credentials for %s." % user
+                sys.exit(1)
+        ## secondly check authorization for the action:
+        if not acc_authorize_action(uid_db, action):
+            print "Sorry, %s has no right to %s." % (user, action)
+            sys.exit(1)
+    return user
 
 def task_submit(options):
     """Submits task to the BibSched task queue.  This is what people will be invoking via command line."""
