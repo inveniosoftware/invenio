@@ -1316,10 +1316,10 @@
   <es>did not match any record.  Nearest terms in any collection are:</es>
   <pt>não está presente em nenhum registro.  Os termos mais similares em todas as coleções são:</pt>
   <it>did not match any record.  Nearest terms in any collection are:</it>
-  <ru>не найден. Ближайшие термины:</ru>
+  <ru>не найденo. Ближайшие термины:</ru>
   <sk>neodpovedá žiadnemu záznamu.  Najbližšie termíny nezávisle na kolekcii sú:</sk>
   <cz>neodpovídá žádnému záznamu.  Nejbližší termíny nezávisle na kolekci jsou:</cz>
-  <no>passet ingen poster.  næreste term i hvilken som helst samling er:</no>
+  <no>passet ingen poster.  Næreste term i hvilken som helst samling er:</no>
 </define-tag>
 
 <define-tag MSG_NO_WORDS_INDEX_AVAILABLE whitespace=delete>
@@ -1329,7 +1329,7 @@
   <es>No words index available for</es>
   <pt>Nenhum índice de palavras está disponível para</pt>
   <it>No words index available for</it>
-  <ru>Никакой лексическый индех не найден для</ru>
+  <ru>Лексическый индекс не найден для</ru>
   <sk>Index slov nie je dostupný pre</sk>
   <cz>Index slov není k dispozici pro</cz>
   <no>Ingen ordindeks tilgjengelig for</no>
@@ -1375,9 +1375,8 @@
     Results from the whole public database follow.
   </it>
   <ru>
-    Никакый аккуратный результат наиден во выбранней коллекции.
-    No exact match found in selected collection(s).
-    Results from the whole public database follow.
+    Никакый аккуратный результат не найден во выбранной коллекции.
+    Результаты из всех публичных коллекций следуют.
   </ru>
   <sk>
     Žiaden presný výsledok nebol vo zvolených kolekciách nájdený.
@@ -1425,7 +1424,9 @@
     collection first.    
   </it>
   <ru>
-    никакая гласная коллекция найдена. поиск для приватного документа через выбрание приватней коллекции.
+    Никакая публичная коллекция недала результата.  Если искаете 
+    приватные документы, узберите сначала данную приватную коллекцию
+    и только затем искайте.    
   </ru>
   <sk>  
     Žiadna verejne prístupná kolekcia nevyhovuje Vašej otázke.  Ak ste
@@ -1467,7 +1468,7 @@
     No match within your time limits, discarding this condition...
   </it>
   <ru>
-    Никакой результат для бременного лимита, условие отменено...
+    Никакой результат для временного лимита, условие отменено...
   </ru>
   <sk>
     Žiaden výsledok nevyhovuje Vašim časovým kritériám, podmienka
@@ -1548,9 +1549,8 @@
     Please combine your search terms differently.
   </it>
   <ru>
-    Бце исканные термины найдены, но боолеаный вопрос не даеть резултат.
+    Бце исканные термины найдены, но боолеанный вопрось не дал результата.
     Упрашиваем комбинировать исканные термины иначе.
-
   </ru>
   <sk>
     Všetky termíny hľadania boli nájdené, ale boolean otázka nevrátila
@@ -1588,7 +1588,7 @@
     No exact match found for <em>%s</em>, using <em>%s</em> instead...
   </it>
   <ru>
-    Никакой результат не найден для: <em>%s</em>, употребуем <em>%s</em> взамен...
+    Никакой результат не найден для <em>%s</em>, употребуем <em>%s</em> взамен...
   </ru>
   <sk>
     Žiaden presný výsledok pre <em>%s</em> nebol nájdený, skúsme
@@ -1610,7 +1610,7 @@
   <es>Internal Error</es>
   <pt>Erro Interno</pt>
   <it>Internal Error</it>
-  <ru>Внутренная ошибка</ru>
+  <ru>Интерная ошибка</ru>
   <sk>Interná Chyba</sk>
   <cz>Interní Chyba</cz>
   <no>Intern feil</no>
@@ -1641,7 +1641,7 @@
     information:
   </it>
   <ru>
-    Упрашиваем контакт <a href="mailto:%s">%s</a> и привестит цледуюсщаю информацию:
+    Упрашаем выходить на <a href="mailto:%s">%s</a> и указать следующую информацию:
   </ru>
   <sk>
     Prosíme kontaktujte <a href="mailto:%s">%s</a> a uveďte nasledovné
@@ -1654,6 +1654,45 @@
   <no>
     Vennligst kontakt <a href="mailto:%s">%s</a> og ta med følgenede informasjon:
   </no>
+</define-tag>
+
+<define-tag MSG_SEARCH_OPTIONS>
+  <en>Search options:</en>
+  <fr>Options de la recherche:</fr>
+  <de>Search options:</de>
+  <es>Search options:</es>
+  <pt>Search options:</pt>
+  <it>Search options:</it>
+  <ru>Выборы поиска:</ru>
+  <sk>Voľby hľadania:</sk>
+  <cz>Volby hledání:</cz>
+  <no>Søkevalg:</no>
+</define-tag>
+
+<define-tag MSG_LATEST_ADDITIONS>
+  <en>Latest additions:</en>
+  <fr>Dernières ajouts:</fr>
+  <de>Latest additions:</de>
+  <es>Latest additions:</es>
+  <pt>Latest additions:</pt>
+  <it>Latest additions:</it>
+  <ru>Последнее добавления:</ru>
+  <sk>Posledne pridané:</sk>
+  <cz>Posledně přidáno:</cz>
+  <no>Siste tillagte poster:</no>
+</define-tag>
+
+<define-tag MSG_MORE>
+  <en>more</en>
+  <fr>davantage</fr>
+  <de>mehr</de>
+  <es>more</es>
+  <pt>more</pt>
+  <it>more</it>
+  <ru>более</ru>
+  <sk>viac</sk>
+  <cz>více</cz>
+  <no>mer</no>
 </define-tag>
 
 ## end of file
