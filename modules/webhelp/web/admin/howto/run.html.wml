@@ -60,7 +60,7 @@ run periodically with a sleeping period of, say, 1 hour:
    <pre>
    $ bibindex -s1h
    $ bibreformat -oHB,HD -s1h
-   $ webcoll -s1h
+   $ webcoll -s1h -v0
    </pre>
    </blockquote>
 
@@ -126,6 +126,24 @@ to call <code>alertengine</code> each day.
 
 <h3>Cleaning Up the Filesystem</h3>
 
+<p>FIXME.  BibSched log files.
+
+   <blockquote>
+   <pre>
+   $ find /usr/local/cdsware-DEMO/var/log -name "bibsched_task_*" -size 0c -exec \rm -f {} \;   
+   $ find /usr/local/cdsware-DEMO/var/log -name "bibsched_task_*" -atime +28 -exec \rm -f {} \;
+   $ find /usr/local/cdsware-DEMO/var/log -name "bibsched_task_*" -atime +7 -exec gzip -9 {} \;
+   </pre>
+   </blockquote>
+
 <p>FIXME.  BibReformat temorary XML files. 
+
+   <blockquote>
+   <pre>   
+   $ find /usr/local/cdsware-DEMO/var/tmp -name "rec_fmt_*.xml" -size 0c -exec \rm -f {} \;   
+   $ find /usr/local/cdsware-DEMO/var/tmp -name "rec_fmt_*.xml" -atime +28 -exec \rm -f {} \;
+   $ find /usr/local/cdsware-DEMO/var/tmp -name "rec_fmt_*.xml" -atime +7 -exec gzip -9 {} \;
+   </pre>
+   </blockquote>
 
 <p>FIXME.  WebSubmit archives, what to keep, what not.
