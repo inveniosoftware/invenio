@@ -420,6 +420,8 @@ def bibrank_engine(row, run):
                 rank_method_code_statistics(rank_method_code)
             elif options["cmd"] == "check":
                 check_method(rank_method_code)
+            elif options["cmd"] == "repair":
+                pass
             else:
                 write_message("Invalid command found processing %s" % rank_method_code, sys.stderr)
                 raise StandardError
