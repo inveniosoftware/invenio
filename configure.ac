@@ -372,6 +372,9 @@ AC_CONFIG_FILES([Makefile \
 	  modules/bibrank/doc/admin/Makefile \
 	  modules/bibrank/doc/hacking/Makefile \
 	  modules/bibrank/etc/Makefile \
+	  modules/bibrank/lib/Makefile \
+	  modules/bibrank/web/Makefile \
+	  modules/bibrank/web/admin/Makefile \
 	  modules/bibsched/Makefile \
 	  modules/bibsched/bin/Makefile \
 	  modules/bibupload/Makefile \
