@@ -41,8 +41,8 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> </navbar:prolog>
 
-  <navbar:button id=searchbiblinfo txt="Search" url="<HTDOCSURL>" hint="CDSware Search" menu="search">
-  <navbar:button id=submit txt="Submit" url="<HTDOCSURL>/submit/" hint="CDSware Submit" menu="submit">
+  <navbar:button id=searchbiblinfo txt="Search" url="<WEBURL>" hint="CDSware Search" menu="search">
+  <navbar:button id=submit txt="Submit" url="<WEBURL>/submit/" hint="CDSware Submit" menu="submit">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
   <navbar:epilog type=S> </small></td><td></td></tr></navbar:epilog>
@@ -60,9 +60,9 @@
   </navbar:header>
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> </navbar:prolog>
-  <navbar:button id=submit_submit txt="Submit Documents" url="<HTDOCSURL>submit/" hint="Submit Documents">
-  <navbar:button id=submit_referee txt="Check Documents Status" url="<HTDOCSURL>submit/publiline/inotes/DAMStat.shtml" hint="Refereeing Process">
-  <navbar:button id=submit_doc txt="Documentation" url="<HTDOCSURL>/submit/docs/english" hint="Documentation">
+  <navbar:button id=submit_submit txt="Submit Documents" url="<WEBURL>/submit/" hint="Submit Documents">
+  <navbar:button id=submit_referee txt="Check Documents Status" url="<WEBURL>/submit/publiline/inotes/DAMStat.shtml" hint="Refereeing Process">
+  <navbar:button id=submit_doc txt="Documentation" url="<WEBURL>/submit/docs/english" hint="Documentation">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
@@ -79,7 +79,7 @@
   </navbar:header>
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> </navbar:prolog>
-  <navbar:button id=documentation txt="Documentation" url="<HTDOCSURL>docs/" hint="Documentation" menu="documentation">
+  <navbar:button id=documentation txt="Documentation" url="<WEBURL>/docs/" hint="Documentation" menu="documentation">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
@@ -97,10 +97,10 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=youralerts txt="Your Alerts" url="<HTDOCSURL>personalize/youralerts.shtml" hint="Your Alerts">
-  <navbar:button id=yourbaskets txt="Your Baskets" url="<HTDOCSURL>personalize/yourbaskets.shtml" hint="Your Baskets">
-  <navbar:button id=yoursearches txt="Your Searches" url="<HTDOCSURL>personalize/yoursearches.shtml" hint="Your Searches">
-  <navbar:button id=yoursettings txt="Your Settings" url="<HTDOCSURL>personalize/yoursettings.shtml" hint="Your Settings">
+  <navbar:button id=youralerts txt="Your Alerts" url="<WEBURL>/personalize/youralerts.shtml" hint="Your Alerts">
+  <navbar:button id=yourbaskets txt="Your Baskets" url="<WEBURL>/personalize/yourbaskets.shtml" hint="Your Baskets">
+  <navbar:button id=yoursearches txt="Your Searches" url="<WEBURL>/personalize/yoursearches.shtml" hint="Your Searches">
+  <navbar:button id=yoursettings txt="Your Settings" url="<WEBURL>/personalize/yoursettings.shtml" hint="Your Settings">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
@@ -118,9 +118,9 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=about txt="About" url="<HTDOCSURL>docs/about.shtml" hint="About">
-  <navbar:button id=userguide txt="User Guide" url="<HTDOCSURL>docs/userguide.shtml" hint="User Guide">
-  <navbar:button id=faq txt="FAQ" url="<HTDOCSURL>docs/faq.shtml" hint="FAQ">
+  <navbar:button id=about txt="About" url="<WEBURL>/docs/about.shtml" hint="About">
+  <navbar:button id=userguide txt="User Guide" url="<WEBURL>/docs/userguide.shtml" hint="User Guide">
+  <navbar:button id=faq txt="FAQ" url="<WEBURL>/docs/faq.shtml" hint="FAQ">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
@@ -138,21 +138,21 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> </navbar:prolog>
 
-  <navbar:button id=admin txt="<strong>ADMINS' AREA</strong>" url="<HTDOCSURL>/admin/" hint="CDSware Administrators Area">
-  <navbar:button id=howto txt="HOWTOs" url="<HTDOCSURL>/admin/howto/" hint="CDSware Admins HOWTO Documents" menu="howto">
+  <navbar:button id=admin txt="<strong>ADMINS' AREA</strong>" url="<WEBURL>/admin/" hint="CDSware Administrators Area">
+  <navbar:button id=howto txt="HOWTOs" url="<WEBURL>/admin/howto/" hint="CDSware Admins HOWTO Documents" menu="howto">
   <navbar:button id=foo txt="<strong>SYSTEM&nbsp;LIB</strong>">
-  <navbar:button id=bibdata txt="BibData Admin" url="<HTDOCSURL>/admin/bibdata/" hint="CDSware BibData Admin" menu="bibdata">
-  <navbar:button id=bibwords txt="BibWords Admin" url="<HTDOCSURL>/admin/bibwords/" hint="CDSware BibWords Admin">
+  <navbar:button id=bibdata txt="BibData Admin" url="<WEBURL>/admin/bibdata/" hint="CDSware BibData Admin" menu="bibdata">
+  <navbar:button id=bibwords txt="BibWords Admin" url="<WEBURL>/admin/bibwords/" hint="CDSware BibWords Admin">
   <navbar:button id=foo txt="<strong>ARCHIVE&nbsp;MGMT</strong>">
-  <navbar:button id=bibharvest txt="BibHarvest Admin" url="<HTDOCSURL>/admin/bibharvest/" hint="CDSware BibHarvest Admin">
-  <navbar:button id=bibconvert txt="BibConvert Admin" url="<HTDOCSURL>/admin/bibconvert/" hint="CDSware BibConvert Admin">
-  <navbar:button id=bibupload txt="BibUpload Admin" url="<HTDOCSURL>/admin/bibupload/" hint="CDSware BibUpload Admin">
+  <navbar:button id=bibharvest txt="BibHarvest Admin" url="<WEBURL>/admin/bibharvest/" hint="CDSware BibHarvest Admin">
+  <navbar:button id=bibconvert txt="BibConvert Admin" url="<WEBURL>/admin/bibconvert/" hint="CDSware BibConvert Admin">
+  <navbar:button id=bibupload txt="BibUpload Admin" url="<WEBURL>/admin/bibupload/" hint="CDSware BibUpload Admin">
   <navbar:button id=foo txt="<strong>WEB&nbsp;INTERFACE</strong>">
-  <navbar:button id=bibformat txt="BibFormat Admin" url="<HTDOCSURL>/admin/bibformat/" hint="CDSware BibFormat Admin" menu="bibformat">
-  <navbar:button id=webaccess txt="WebAccess Admin" url="<HTDOCSURL>/admin/webaccess/" hint="CDSware Web Access Rights Admin" menu="webaccess">
-  <navbar:button id=websearch txt="WebSearch Admin" url="<HTDOCSURL>/admin/websearch/" hint="CDSware Web Search Interface Admin">
-  <navbar:button id=websubmit txt="WebSubmit Admin" url="<HTDOCSURL>/admin/websubmit/" hint="CDSware Web Submit Interface Admin" menu="websubmit">
-  <navbar:button id=webperso txt="WebPerso Admin" url="<HTDOCSURL>/admin/webperso/" hint="CDSware Web Personal Features Admin">
+  <navbar:button id=bibformat txt="BibFormat Admin" url="<WEBURL>/admin/bibformat/" hint="CDSware BibFormat Admin" menu="bibformat">
+  <navbar:button id=webaccess txt="WebAccess Admin" url="<WEBURL>/admin/webaccess/" hint="CDSware Web Access Rights Admin" menu="webaccess">
+  <navbar:button id=websearch txt="WebSearch Admin" url="<WEBURL>/admin/websearch/" hint="CDSware Web Search Interface Admin">
+  <navbar:button id=websubmit txt="WebSubmit Admin" url="<WEBURL>/admin/websubmit/" hint="CDSware Web Submit Interface Admin" menu="websubmit">
+  <navbar:button id=webperso txt="WebPerso Admin" url="<WEBURL>/admin/webperso/" hint="CDSware Web Personal Features Admin">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
   <navbar:epilog type=S> </small></td><td></td></tr></navbar:epilog>
@@ -171,15 +171,15 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=websubmit_newdoctype txt="New&nbsp;Doctype" url="<HTDOCSURL>admin/websubmit/newDoctypeEDS.shtml" hint="New Type of Document">
-  <navbar:button id=websubmit_deldoctype txt="Remove&nbsp;Doctype" url="<HTDOCSURL>admin/websubmit/removeDoctypeEDS.shtml" hint="Remove Type of Document">
-  <navbar:button id=websubmit_listactions txt="Available&nbsp;Actions" url="<HTDOCSURL>admin/websubmit/allActionsEDS.shtml" hint="List Available Actions">
-  <navbar:button id=websubmit_listchecks txt="Available&nbsp;Javascript&nbsp;Checks" url="<HTDOCSURL>admin/websubmit/allChecksEDS.shtml" hint="List Available Javascript Checking functions">
-  <navbar:button id=websubmit_listelements txt="Available&nbsp;Element&nbsp;Descriptions" url="<HTDOCSURL>admin/websubmit/allElementsEDS.shtml" hint="List Available Element Descriptions">
-  <navbar:button id=websubmit_listmodify txt="Available&nbsp;Modification&nbsp;Texts" url="<HTDOCSURL>admin/websubmit/allModifyEDS.shtml" hint="List Available Modification Texts">
-  <navbar:button id=websubmit_listfunctions txt="Available&nbsp;Functions" url="<HTDOCSURL>admin/websubmit/listFunctions.shtml" hint="List Available Functions">
-  <navbar:button id=websubmit_organise txt="Organise&nbsp;Main&nbsp;Page" url="<HTDOCSURL>admin/websubmit/editCatalogues.shtml" hint="Main Page Organisation">
-  <navbar:button id=websubmit_doc txt="Documentation" url="<HTDOCSURL>admin/websubmit/docs/english" hint="Websubmit Documentation">
+  <navbar:button id=websubmit_newdoctype txt="New&nbsp;Doctype" url="<WEBURL>/admin/websubmit/newDoctypeEDS.shtml" hint="New Type of Document">
+  <navbar:button id=websubmit_deldoctype txt="Remove&nbsp;Doctype" url="<WEBURL>/admin/websubmit/removeDoctypeEDS.shtml" hint="Remove Type of Document">
+  <navbar:button id=websubmit_listactions txt="Available&nbsp;Actions" url="<WEBURL>/admin/websubmit/allActionsEDS.shtml" hint="List Available Actions">
+  <navbar:button id=websubmit_listchecks txt="Available&nbsp;Javascript&nbsp;Checks" url="<WEBURL>/admin/websubmit/allChecksEDS.shtml" hint="List Available Javascript Checking functions">
+  <navbar:button id=websubmit_listelements txt="Available&nbsp;Element&nbsp;Descriptions" url="<WEBURL>/admin/websubmit/allElementsEDS.shtml" hint="List Available Element Descriptions">
+  <navbar:button id=websubmit_listmodify txt="Available&nbsp;Modification&nbsp;Texts" url="<WEBURL>/admin/websubmit/allModifyEDS.shtml" hint="List Available Modification Texts">
+  <navbar:button id=websubmit_listfunctions txt="Available&nbsp;Functions" url="<WEBURL>/admin/websubmit/listFunctions.shtml" hint="List Available Functions">
+  <navbar:button id=websubmit_organise txt="Organise&nbsp;Main&nbsp;Page" url="<WEBURL>/admin/websubmit/editCatalogues.shtml" hint="Main Page Organisation">
+  <navbar:button id=websubmit_doc txt="Documentation" url="<WEBURL>/admin/websubmit/docs/english" hint="Websubmit Documentation">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
@@ -197,13 +197,13 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=webaccess_superusers txt="Superusers" url="<HTDOCSURL>admin/webaccess/superusers.shtml" hint="Superusers">
-  <navbar:button id=webaccess_submit txt="Authorizations&nbsp;on&nbsp;Submit" url="<HTDOCSURL>admin/webaccess/submit.shtml" hint="Authorizations on Submit">
-  <navbar:button id=webaccess_websubmit txt="Authorizations&nbsp;on&nbsp;WebSubmit&nbsp;Admin" url="<HTDOCSURL>admin/webaccess/submitmanager.shtml" hint="Authorizations on WebSubmit Admin">
-  <navbar:button id=webaccess_websearch txt="Authorizations&nbsp;on&nbsp;WebSearch&nbsp;Admin" url="<HTDOCSURL>admin/webaccess/searchmanager.shtml" hint="Authorizations on WebSearch Admin">
-  <navbar:button id=webaccess_webaccess txt="Authorizations&nbsp;on&nbsp;WebAccess&nbsp;Admin" url="<HTDOCSURL>admin/webaccess/accessmanager.shtml" hint="Authorizations on WebAccess Admin">
-  <navbar:button id=webaccess_bibdata txt="Authorizations&nbsp;on&nbsp;BibData&nbsp;Admin" url="<HTDOCSURL>admin/webaccess/bibmanager.shtml" hint="Authorizations on BibData Admin">
-  <navbar:button id=webaccess_bibformat txt="Authorizations&nbsp;on&nbsp;BibFormat&nbsp;Admin" url="<HTDOCSURL>admin/webaccess/bibformatmanager.shtml" hint="Authorizations on BibFormat Admin">
+  <navbar:button id=webaccess_superusers txt="Superusers" url="<WEBURL>/admin/webaccess/superusers.shtml" hint="Superusers">
+  <navbar:button id=webaccess_submit txt="Authorizations&nbsp;on&nbsp;Submit" url="<WEBURL>/admin/webaccess/submit.shtml" hint="Authorizations on Submit">
+  <navbar:button id=webaccess_websubmit txt="Authorizations&nbsp;on&nbsp;WebSubmit&nbsp;Admin" url="<WEBURL>/admin/webaccess/submitmanager.shtml" hint="Authorizations on WebSubmit Admin">
+  <navbar:button id=webaccess_websearch txt="Authorizations&nbsp;on&nbsp;WebSearch&nbsp;Admin" url="<WEBURL>/admin/webaccess/searchmanager.shtml" hint="Authorizations on WebSearch Admin">
+  <navbar:button id=webaccess_webaccess txt="Authorizations&nbsp;on&nbsp;WebAccess&nbsp;Admin" url="<WEBURL>/admin/webaccess/accessmanager.shtml" hint="Authorizations on WebAccess Admin">
+  <navbar:button id=webaccess_bibdata txt="Authorizations&nbsp;on&nbsp;BibData&nbsp;Admin" url="<WEBURL>/admin/webaccess/bibmanager.shtml" hint="Authorizations on BibData Admin">
+  <navbar:button id=webaccess_bibformat txt="Authorizations&nbsp;on&nbsp;BibFormat&nbsp;Admin" url="<WEBURL>/admin/webaccess/bibformatmanager.shtml" hint="Authorizations on BibFormat Admin">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
@@ -221,8 +221,8 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=howto_marc txt="HOWTO MARC" url="<HTDOCSURL>admin/howto/marc.shtml" hint="Admin's HOWTO Guides - How to MARC your medatada">
-  <navbar:button id=howto_migrate txt="HOWTO Migrate" url="<HTDOCSURL>admin/howto/migrate.shtml" hint="Admin's HOWTO Guides - How to Migrate your old documents into CDSware">
+  <navbar:button id=howto_marc txt="HOWTO MARC" url="<WEBURL>/admin/howto/marc.shtml" hint="Admin's HOWTO Guides - How to MARC your medatada">
+  <navbar:button id=howto_migrate txt="HOWTO Migrate" url="<WEBURL>/admin/howto/migrate.shtml" hint="Admin's HOWTO Guides - How to Migrate your old documents into CDSware">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
@@ -240,8 +240,8 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=bibdata_edit_record txt="Edit Record" url="<HTDOCSURL>admin/bibdata/displayRec.shtml" hint="BibData Admin - Edit Record">
-  <navbar:button id=bibdata_global_replace txt="Global Replace" url="<HTDOCSURL>admin/bibdata/globalReplace.shtml" hint="BibData Admin - Global Replace">
+  <navbar:button id=bibdata_edit_record txt="Edit Record" url="<WEBURL>/admin/bibdata/displayRec.shtml" hint="BibData Admin - Edit Record">
+  <navbar:button id=bibdata_global_replace txt="Global Replace" url="<WEBURL>/admin/bibdata/globalReplace.shtml" hint="BibData Admin - Global Replace">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
@@ -259,15 +259,15 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=BEH_display txt="Behaviours" url="<HTDOCSURL>admin/bibformat/BEH_display.shtml" hint="BibFormat Admin - Behaviours">
-  <navbar:button id=OAIER_display txt="Extraction&nbsp;Rules" url="<HTDOCSURL>admin/bibformat/OAIER_display.shtml" hint="BibFormat Admin - Extraction Rules">
-  <navbar:button id=LINK_display txt="Link Rules" url="<HTDOCSURL>admin/bibformat/LINK_display.shtml" hint="BibFormat Admin - Link Rules">
-  <navbar:button id=LINK_FORMAT_display txt="File Formats" url="<HTDOCSURL>admin/bibformat/LINK_FORMAT_display.shtml" hint="BibFormat Admin - File Formats">
-  <navbar:button id=UDF_display txt="UDFs" url="<HTDOCSURL>admin/bibformat/UDF_display.shtml" hint="BibFormat Admin - User Defined Functions">
-  <navbar:button id=FORMAT_display txt="Formats" url="<HTDOCSURL>admin/bibformat/FORMAT_display.shtml" hint="BibFormat Admin - Formats">
-  <navbar:button id=KB_display txt="KBs" url="<HTDOCSURL>admin/bibformat/KB_display.shtml" hint="BibFormat Admin - Knowledge Bases">
-  <navbar:button id=test txt="Execution Test" url="<HTDOCSURL>admin/bibformat/test.shtml" hint="BibFormat Admin - Execution Test">
-  <navbar:button id=BIBREFORMAT_display txt="Reformat Records" url="<HTDOCSURL>admin/bibformat/BIBREFORMAT_display.shtml" hint="BibFormat Admin - Reformat Records">
+  <navbar:button id=BEH_display txt="Behaviours" url="<WEBURL>/admin/bibformat/BEH_display.shtml" hint="BibFormat Admin - Behaviours">
+  <navbar:button id=OAIER_display txt="Extraction&nbsp;Rules" url="<WEBURL>/admin/bibformat/OAIER_display.shtml" hint="BibFormat Admin - Extraction Rules">
+  <navbar:button id=LINK_display txt="Link Rules" url="<WEBURL>/admin/bibformat/LINK_display.shtml" hint="BibFormat Admin - Link Rules">
+  <navbar:button id=LINK_FORMAT_display txt="File Formats" url="<WEBURL>/admin/bibformat/LINK_FORMAT_display.shtml" hint="BibFormat Admin - File Formats">
+  <navbar:button id=UDF_display txt="UDFs" url="<WEBURL>/admin/bibformat/UDF_display.shtml" hint="BibFormat Admin - User Defined Functions">
+  <navbar:button id=FORMAT_display txt="Formats" url="<WEBURL>/admin/bibformat/FORMAT_display.shtml" hint="BibFormat Admin - Formats">
+  <navbar:button id=KB_display txt="KBs" url="<WEBURL>/admin/bibformat/KB_display.shtml" hint="BibFormat Admin - Knowledge Bases">
+  <navbar:button id=test txt="Execution Test" url="<WEBURL>/admin/bibformat/test.shtml" hint="BibFormat Admin - Execution Test">
+  <navbar:button id=BIBREFORMAT_display txt="Reformat Records" url="<WEBURL>/admin/bibformat/BIBREFORMAT_display.shtml" hint="BibFormat Admin - Reformat Records">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 

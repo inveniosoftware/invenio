@@ -24,7 +24,7 @@
 
 ## include navigation trail and bar definitions:
 #include "cdsnavtrail.wml" \
-   header="<br><table width=100% border=0 cellpadding=0 cellspacing=0><tr class=navtrail><td width=3%>&nbsp;</td><td><small><small><a class=navtrail href='<HTDOCSURL>'><CDSNAME></a> &gt; " \
+   header="<br><table width=100% border=0 cellpadding=0 cellspacing=0><tr class=navtrail><td width=3%>&nbsp;</td><td><small><small><a class=navtrail href='<WEBURL>'><CDSNAME></a> &gt; " \
    prolog="" \
    epilog="&gt;" \
    footer="$(title)</small></small></td></tr></table>"
@@ -37,7 +37,7 @@
 <head>
  <title><CDSNAME>: $(title)</title>
  <link rev="made" href="mailto:<SUPPORTEMAIL>">
- <link rel="stylesheet" href="<HTDOCSURL>img/cds.css">
+ <link rel="stylesheet" href="<WEBURL>/img/cds.css">
  <meta name="description" content="$(description)">
  <meta name="keywords" content="$(keywords)">
 </head>
