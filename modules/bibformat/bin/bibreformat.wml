@@ -393,35 +393,35 @@ def write_message(msg, stream=sys.stdout):
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
     write_message("sleeping...")
-    task_update_state("SLEEPING")
+    task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
 
 
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
     write_message("continuing...")
-    task_update_state("CONTINUING")
+    task_update_status("CONTINUING")
 
 
 def task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
     write_message("stopping...")
-    task_update_state("STOPPING")
+    task_update_status("STOPPING")
     write_message("flushing cache or whatever...")
     time.sleep(3)
     write_message("closing tables or whatever...")
     time.sleep(1)
     write_message("stopped")
-    task_update_state("STOPPED")
+    task_update_status("STOPPED")
     sys.exit(0)
 
     
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
     write_message("suiciding myself now...")
-    task_update_state("SUICIDING")
+    task_update_status("SUICIDING")
     write_message("suicided")
-    task_update_state("SUICIDED")
+    task_update_status("SUICIDED")
     sys.exit(0)
 
 
@@ -490,11 +490,11 @@ def task_submit(options):
     user = authenticate(options.get("user", ""))
     ## submit task:
 
-    task_id = run_sql("""INSERT INTO schTASKS (id,proc,user,state,arguments,sleeptime,date) VALUES (NULL,'bibreformat',%s,'WAITING',%s,%s,%s)""",
+    task_id = run_sql("""INSERT INTO schTASK (id,proc,user,status,arguments,sleeptime,runtime) VALUES (NULL,'bibreformat',%s,'WAITING',%s,%s,%s)""",
                       (user, marshal.dumps(options),sleeptime,MySQLdb.escape_string(sched_time)))
     ## update task number:
     options["task"] = task_id
-    run_sql("""UPDATE schTASKS SET arguments=%s WHERE id=%s""", (marshal.dumps(options),task_id))
+    run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""", (marshal.dumps(options),task_id))
     write_message("Task #%d submitted." % task_id)
     return task_id
 
@@ -502,18 +502,18 @@ def task_submit(options):
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
     global task_id
-    return run_sql("UPDATE schTASKS SET progress=%s where id=%s", (msg, task_id))
+    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, task_id))
 
 
-def task_update_state(val):
-    """Updates state information in the BibSched task table."""
+def task_update_status(val):
+    """Updates status information in the BibSched task table."""
     global task_id
-    return run_sql("UPDATE schTASKS SET state=%s where id=%s", (val, task_id))
+    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, task_id))
 
 
-def task_read_state(task_id):
-    """Read state information in the BibSched task table."""
-    res = run_sql("SELECT state FROM schTASKS where id=%s", (task_id,), 1)
+def task_read_status(task_id):
+    """Read status information in the BibSched task table."""
+    res = run_sql("SELECT status FROM schTASK where id=%s", (task_id,), 1)
     try:
         out = res[0][0]
     except:
@@ -524,7 +524,7 @@ def task_read_state(task_id):
 def task_get_options(id):
     """Returns options for the task 'id' read from the BibSched task queue table."""
     out = {}
-    res = run_sql("SELECT arguments FROM schTASKS WHERE id=%s AND proc='bibreformat'", (id,))
+    res = run_sql("SELECT arguments FROM schTASK WHERE id=%s AND proc='bibreformat'", (id,))
     try:
         out = marshal.loads(res[0][0])
     except:
@@ -575,13 +575,13 @@ def task_run(process_format):
     if options.has_key("format"):
         fmt = options["format"]
 
-    ## check task state:
-    task_state = task_read_state(task_id)
-    if task_state != "WAITING":
-        write_message("Error: The task #%d is %s.  I expected WAITING." % (task_id, task_state))
+    ## check task status:
+    task_status = task_read_status(task_id)
+    if task_status != "WAITING":
+        write_message("Error: The task #%d is %s.  I expected WAITING." % (task_id, task_status))
         return
-    ## update task state:
-    task_update_state("RUNNING")
+    ## update task status:
+    task_update_status("RUNNING")
     ## initialize signal handler:
     signal.signal(signal.SIGUSR1, task_sig_sleep)
     signal.signal(signal.SIGTERM, task_sig_stop)
@@ -593,7 +593,7 @@ def task_run(process_format):
     bibreformat_task(sql_queries, cds_query, process_format)
 
     ## we are done:
-    task_update_state("DONE")
+    task_update_status("DONE")
     return
 
 
