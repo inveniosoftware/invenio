@@ -2002,11 +2002,10 @@ def record_exists(recID):
         out = 1
     return out    
 
-def get_creation_date(recID):
+def get_creation_date(recID, fmt="%Y-%m-%d"):
     "Returns the creation date of the record 'recID'."
     out = ""
-    query = "SELECT DATE_FORMAT(creation_date,'%%Y-%%m-%%d') FROM bibrec WHERE id='%s'" % (recID)
-    res = run_sql(query, None, 1)
+    res = run_sql("SELECT DATE_FORMAT(creation_date,%s) FROM bibrec WHERE id=%s", (fmt, recID), 1)
     if res:        
         out = res[0][0]
     return out
@@ -2014,7 +2013,7 @@ def get_creation_date(recID):
 def get_modification_date(recID, fmt="%Y-%m-%d"):
     "Returns the date of last modification for the record 'recID'."
     out = ""
-    res = run_sql("SELECT DATE_FORMAT(modification_date,%s) FROM bibrec WHERE id='%s'", (fmt, recID), 1)
+    res = run_sql("SELECT DATE_FORMAT(modification_date,%s) FROM bibrec WHERE id=%s", (fmt, recID), 1)
     if res:        
         out = res[0][0]
     return out
