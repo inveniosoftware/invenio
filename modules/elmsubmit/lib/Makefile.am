@@ -23,7 +23,7 @@ pylibdir = $(libdir)/python/cdsware
 pylib_DATA = elmsubmit.py elmsubmit_misc.py config2pyobj.py elmsubmit_doctype_test.py elmsubmit_enriched2txt.py elmsubmit_EZArchive.py elmsubmit_EZEmail.py elmsubmit_field_validation.py elmsubmit_filename_generator.py elmsubmit_html2txt.py elmsubmit_misc.py elmsubmit_richtext2txt.py elmsubmit_submission_parser.py lex.py lextab.py myhtmlentitydefs.py parsetab.py yacc.py mime.types.edited parser.out
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) mime.types.edited 
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) mime.types.edited parser.out
 
 CLEANFILES = *.py *~ *.tmp *.pyc
 
