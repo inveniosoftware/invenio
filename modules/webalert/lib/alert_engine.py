@@ -138,7 +138,7 @@ def send_email(fromaddr, toaddr, body, attempt=0):
         server.quit()
     except:
         if (DEBUGLEVEL > 1):
-            print 'Error connecting to SMTP server, attempt %s retrying in 5 minutes.' % attempt
+            print 'Error connecting to SMTP server, attempt %s retrying in 5 minutes. Exception raised: %s' % (attempt, sys.exc_info()[0])
         sleep(300)
         send_email(fromaddr, toaddr, body, attempt+1)
         return
@@ -168,7 +168,7 @@ def print_records(record_ids):
         c += 1
 
     if c > MAXIDS:
-        msg += '\n\n' + wrap('Only the first %s records are displayed above. Please consult the URL below to see all the results.' % MAXIDS)
+        msg += '\n\n' + wrap('Only the first %s records were displayed.  Please consult the search URL given at the top of this email to see all the results.' % MAXIDS)
 
     return msg
 
@@ -186,7 +186,7 @@ def email_notify(alert, records, argstr):
     msg = ""
     
     if DEBUGLEVEL > 0:
-        msg = "*** THIS MESSAGE WAS SENT IN DEBUG MODE, DON'T TAKE IT INTO ACCOUNT ***\n\n"
+        msg = "*** THIS MESSAGE WAS SENT IN DEBUG MODE ***\n\n"
 
     msg += "Hello\n\n"
     msg += wrap("Below are the results of the email alert that you set up with the CERN Document Server.  This is an automatic message, please don't reply to its address.  For any question, use <%s> instead." % supportemail)
