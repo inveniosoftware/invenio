@@ -18,7 +18,7 @@
 
 docdir = $(WEBDIR)/admin/bibindex
 
-doc_DATA=index.html guide.html
+doc_DATA=guide.html
 
 EXTRA_DIST = $(wildcard *.wml)
 
