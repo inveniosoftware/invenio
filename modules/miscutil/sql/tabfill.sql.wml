@@ -23,7 +23,7 @@
 #include "configbis.wml"
 
 ## local defaults, i.e. WML config variables are to be used:
-INSERT INTO collection VALUES (1,'<CDSNAME>','<CDSNAME>',NULL,NULL,NULL,NULL);
+INSERT INTO collection VALUES (1,'<CDSNAME>','<CDSNAME>',NULL,NULL,NULL,NULL,NULL);
 INSERT INTO user VALUES (1, '<ADMINEMAIL>', '', NULL, NULL);
 INSERT INTO flxLINKTYPES VALUES ('AUTHOR_SEARCH','N','EXT','','');
 INSERT INTO flxLINKTYPES VALUES ('KEYWORD_SEARCH','N','EXT','','');
@@ -48,6 +48,7 @@ INSERT INTO field VALUES (9,'fulltext','fulltext','fulltext');
 INSERT INTO field VALUES (10,'collection','collection','collection');
 INSERT INTO field VALUES (11,'division','division','division');
 INSERT INTO field VALUES (12,'year','year','year');
+INSERT INTO field VALUES (13,'experiment','experiment','experiment');
 
 INSERT INTO field_tag VALUES (2,3,100);
 INSERT INTO field_tag VALUES (2,4,90);
@@ -64,6 +65,7 @@ INSERT INTO field_tag VALUES (8,10,100);
 INSERT INTO field_tag VALUES (10,11,100);
 INSERT INTO field_tag VALUES (11,14,100);
 INSERT INTO field_tag VALUES (12,15,10);
+INSERT INTO field_tag VALUES (13,116,10);
 INSERT INTO field_tag VALUES (1,16,10);
 INSERT INTO field_tag VALUES (1,17,10);
 INSERT INTO field_tag VALUES (1,18,10);
@@ -288,6 +290,7 @@ INSERT INTO tag VALUES (112,'96%');
 INSERT INTO tag VALUES (113,'97%');
 INSERT INTO tag VALUES (114,'98%');
 INSERT INTO tag VALUES (115,'8564_u');
+INSERT INTO tag VALUES (116,'909C0e');
 
 INSERT INTO wordsindex VALUES (1,'global','This word index contains words from global fields.','0000-00-00 00:00:00');
 INSERT INTO wordsindex VALUES (2,'collection','This word index contains words from collection identifiers fields.','0000-00-00 00:00:00');

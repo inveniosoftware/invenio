@@ -1905,6 +1905,7 @@ CREATE TABLE IF NOT EXISTS collection (
   dbquery text,
   nbrecs int(10) unsigned default '0',
   reclist longblob,
+  restricted varchar(255) default NULL,
   PRIMARY KEY  (id),
   UNIQUE KEY name (name)
 ) TYPE=MyISAM;
@@ -1912,6 +1913,7 @@ CREATE TABLE IF NOT EXISTS collection (
 CREATE TABLE IF NOT EXISTS collection_collection (
   id_dad mediumint(9) unsigned NOT NULL,
   id_son mediumint(9) unsigned NOT NULL,
+  type char(1) NOT NULL default 'r',
   score tinyint(4) unsigned NOT NULL default '0',
   PRIMARY KEY (id_dad,id_son)
 ) TYPE=MyISAM;
