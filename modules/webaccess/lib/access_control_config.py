@@ -46,10 +46,11 @@ DELEGATEADDUSERROLE = 'accdelegaterole'
 MAXSELECTUSERS = 25
 # max number of users to display in a page (mainly for user area)
 MAXPAGEUSERS = 25
-# site open or closed for all access 
-#0 = open
-#1 = closed
-CFG_ACCESS_CONTROL_SITE_TEMPORARILY_CLOSED = 0
+# defines how open the site is
+#0 = normal operation of the site
+#1 = read-only site, all write operations temporarily closed 
+#2 = site fully closed
+CFG_ACCESS_CONTROL_LEVEL_SITE = 0
 # access policy for guests. 
 #0 = Allow guests to search, 
 #1 = Guests cannot search (all users must login)
@@ -120,12 +121,13 @@ def_auths = (
 cfg_webaccess_msgs = {
                                 0: 'Try to <a href="%s/youraccount.py/login?referer=%s/admin/%s/">login</a> with another account.' % (weburl, weburl, "%s"),
                                 1: '<br>If you think this is not correct, please contact: <a href="mailto:%s">%s</a>' % (supportemail, supportemail),
-                                2: '<br>Any questions should be sent to: <a href="mailto:%s">%s</a>' % (supportemail, supportemail),
+                                2: '<br>If you have any questions, please write to <a href="mailto:%s">%s</a>' % (supportemail, supportemail),
 				3: 'Guest users are not allowed, please <a href="%s/youraccount.py/login">login</a>.' % weburl,
 				4: 'The site is temporarily closed for maintenance.  Please come back soon.',
  				5: 'Authorization failure',
-                                6: '%s temporarily closed' % cdsname
-
+                                6: '%s temporarily closed' % cdsname,
+                                7: 'This functionality is temporarily closed due to server maintenance. Please use only the search engine in the meantime.',
+                                8: 'Functionality temporarily closed'
 		} 
 
 

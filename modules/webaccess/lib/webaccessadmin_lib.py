@@ -525,9 +525,13 @@ def perform_accesspolicy(req, callback='yes', confirm=0):
     account_policy[0] = "Users can register new accounts. New accounts automatically activated." 
     account_policy[1] = "Users can register new accounts. Admin users must activate the accounts."
     account_policy[2] = "Only admin can register new accounts. User cannot edit email address."
+    site_policy = {}
+    site_policy[0] = "Normal operation of the site."
+    site_policy[1] = "Read-only site, all write operations temporarily closed."
+    site_policy[2] = "Site fully closed."
 
     output = "<br><b>Current settings:</b><br>"
-    output += "Site open: %s<br>" % (CFG_ACCESS_CONTROL_SITE_TEMPORARILY_CLOSED == 0 and "Yes" or "No")
+    output += "Site status: %s<br>" % (site_policy[CFG_ACCESS_CONTROL_LEVEL_SITE])
     output += "Guest accounts allowed: %s<br>" % (CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0 and "Yes" or "No")
     output += "Account policy: %s<br>" % (account_policy[CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS])
     output += "Allowed email addresses limited: %s<br>" % (CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN and CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN or "Not limited")
