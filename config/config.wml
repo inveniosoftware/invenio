@@ -73,6 +73,17 @@ cds.support@cern.ch
 50
 </define-tag>
 
+## LINKTOABSTRACT -- URL location to retrieve document abstracts by reportnumber (optional)
+##  (example: "")
+<define-tag LINKTOABSTRACT whitespace=delete>
+</define-tag>
+
+## FIELDCODES -- (optional)
+## (example: "['037__a','088__a']")
+<define-tag FIELDCODES whitespace=delete>
+[]
+</define-tag>
+
 ################################
 ## Part 2: CDS OAI parameters ##
 ################################
@@ -89,7 +100,7 @@ oai:mpg
 ## OAISAMPLEIDENTIFIER -- OAI sample identifier:  
 ##  (example: "oai:mpg:101")
 <define-tag OAISAMPLEIDENTIFIER whitespace=delete>
-oai:mpg:1001
+oai:mpg:identifier
 </define-tag>
 
 ## OAIURLCONTENT -- OAI URL content:  
@@ -104,10 +115,9 @@ http://foo.com/
 Free and unlimited use by anybody with obligation to refer to original record
 </define-tag>
 
-## OAIMETADATAPOLICYURL -- URL of the OAI metadata policy:  
+## OAIMETADATAPOLICYURL -- URL of the OAI metadata policy (optional):  
 ##  (example: "http://foo.com/")
 <define-tag OAIMETADATAPOLICYURL whitespace=delete>
-http://foo.com/
 </define-tag>
 
 ## OAIDATAPOLICY -- OAI data policy:  
@@ -116,10 +126,44 @@ http://foo.com/
 Full content, i.e. preprints may not be harvested by robots
 </define-tag>
 
-## OAISUBMISSIONPOLICYURL -- OAI data policy:  
+## OAIDATAPOLICYURL -- URL of the OAI data policy (optional):  
+##  (example: "http://foo.com")
+<define-tag OAIDATAPOLICYURL whitespace=delete>
+</define-tag>
+
+## OAISUBMISSIONPOLICY -- OAI submission policy:
+##  (example: "Submission restricted. Submitted documents are subject of approval by OAI repository admins.")
+<define-tag OAISUBMISSIONPOLICY whitespace=delete>
+Submission restricted. Submitted documents are subject of approval by OAI repository admins.
+</define-tag>
+
+## OAISUBMISSIONPOLICYURL -- URL of the OAI submission policy (optional):  
 ##  (example: "http://foo.com/")
 <define-tag OAISUBMISSIONPOLICYURL whitespace=delete>
-http://foo.com/
+</define-tag>
+
+## OAIIDENTIFYDESCRIPTION -- description to Identify (optional)
+## (example:"")
+<define-tag OAIIDENTIFYDESCRIPTION whitespace=delete>
+ <description>
+  <eprints xmlns="http://www.openarchives.org/OAI/eprints"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.openarchives.org/OAI/1.1/eprints
+                              http://www.openarchives.org/OAI/1.1/eprints.xsd">
+      <content>
+       <URL>http://foo.com</URL>
+      </content>
+      <metadataPolicy>
+       <text>Free and unlimited use by anybody with obligation to refer to original record</text>
+      </metadataPolicy>
+      <dataPolicy>
+       <text>Full content, i.e. preprints may not be harvested by robots</text>
+      </dataPolicy>
+      <submissionPolicy>
+       <text>Submission restricted. Submitted documents are subject of approval by OAI repository admins.</text>
+      </submissionPolicy>
+  </eprints>
+ </description>
 </define-tag>
 
 ################################
