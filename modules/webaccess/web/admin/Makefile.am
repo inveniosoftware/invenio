@@ -17,13 +17,16 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-webappdir = $(WEBDIR)
+webappdir = $(WEBDIR)/admin/webaccess
 
-webapp_DATA=webaccessadmin.py
+webapp_DATA=webaccessadmin.py index.html
 
 EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(webapp_DATA) *~ *.tmp
 
 %.py: %.py.wml ../../../../config/config.wml ../../../../config/configbis.wml
+	$(WML) -o $@ $<
+
+%.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml
 	$(WML) -o $@ $<
