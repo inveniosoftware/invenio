@@ -345,8 +345,6 @@ class Collection:
             body += """<td valign="top">""" + self.create_narrowsearch(as) + "</td>"
             body_focuson = self.create_narrowsearch(as, "Focus on:","v")
             if body_focuson:
-                #body += """<td valign="top" width="15" style="border-right: 1px dotted #999999;">&nbsp;</td>"""
-                body += """<td valign="top" width="30">&nbsp;</td>"""
                 body += """<td valign="top">""" + body_focuson + """</td>"""
             body += "</tr></table>"
             body += "</form>"
@@ -428,10 +426,10 @@ class Collection:
             style_epilog = ""
         # are there some sons?
         if len(sons):
-            narrowsearch += """<table class="searchbox">
+            narrowsearch += """<table class="narrowsearchbox">
                                 <thead>
                                  <tr>
-                                  <th colspan="2" align="left" class="searchboxheader">
+                                  <th colspan="2" align="left" class="narrowsearchboxheader">
                                     %s
                                   </th>
                                  </tr>
@@ -439,7 +437,7 @@ class Collection:
                                 <tbody>""" % title
             # iterate through sons:
             for son in sons:
-                narrowsearch += """<tr><td class="searchboxbody" valign="top">"""
+                narrowsearch += """<tr><td class="narrowsearchboxbody" valign="top">"""
                 if type=='r':
                     if son.restricted_p():
                         narrowsearch += """<input type=checkbox name="c" value="%s">&nbsp;</td>""" % son.name
@@ -463,17 +461,17 @@ class Collection:
         else:
             if type == 'r':
                 # no sons, and type 'r', so print info on collection content:
-                narrowsearch += """<table class="searchbox">
+                narrowsearch += """<table class="narrowsearchbox">
                                     <thead>
                                      <tr>
-                                      <th class="searchboxheader">
+                                      <th class="narrowsearchboxheader">
                                         Latest additions:
                                       </th>
                                      </tr>
                                     </thead>
                                     <tbody>
                                      <tr>
-                                      <td class="searchboxbody">%s</td>
+                                      <td class="narrowsearchboxbody">%s</td>
                                      </tr>
                                     <tbody>
                                    </table>""" % self.create_instant_browse()
