@@ -37,6 +37,7 @@ import access_control_admin as acca
 import cgi
 import re
 
+from bibrank_config import adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform
 from access_control_config import * 
 from dbquery import run_sql
 from config import *
@@ -2360,230 +2361,6 @@ def deleteselected(id_role=0, id_action=0,  authids=[]):
 
     return result
 
-
-def addadminbox(header='', datalist=[], cls="admin_wvar"):
-    """used to create table around main data on a page, row based.
-
-      header - header on top of the table
-
-    datalist - list of the data to be added row by row
-
-         cls - possible to select wich css-class to format the look of the table."""
-
-    try: per = str(100 // len(datalist)) + '%'
-    except ZeroDivisionError: per = 1
-
-    output  = '<table class="%s" ' % (cls, ) + 'width="100%">\n'
-    output += """
-     <thead>
-      <tr>
-       <th class="adminheaderleft" colspan="%s">%s</th>
-      </tr>
-     </thead>
-     <tbody>
-    """ % (len(datalist), header)
-    for row in [datalist]:
-        output += '      <tr>\n'
-        for data in row:
-            output += """
-            <td style="vertical-align: top; margin-top: 5px; width: %s;">
-             %s 
-            </td>
-            """ % (per, data)
-        output += '      </tr>\n'
-    output += """
-     </tbody>
-    </table>
-    """
-
-    return output
-
-
-def addadminbox(header='', datalist=[], cls="admin_wvar"):
-    """used to create table around main data on a page, row based.
-
-      header - header on top of the table
-
-    datalist - list of the data to be added row by row
-
-         cls - possible to select wich css-class to format the look of the table."""
-
-    if len(datalist) == 1: per = '100'
-    else: per = '75'
-    
-    output  = '<table class="%s" ' % (cls, ) + 'width="100%">\n'
-    output += """
-     <thead>
-      <tr>
-       <th class="adminheaderleft" colspan="%s">%s</th>
-      </tr>
-     </thead>
-     <tbody>
-    """ % (len(datalist), header)
-
-    output += '      <tr>\n'
-
-    output += """
-    <td style="vertical-align: top; margin-top: 5px; width: %s;">
-     %s 
-    </td>
-    """ % (per+'%', datalist[0])
-
-    if len(datalist) > 1:
-        output += """
-        <td style="vertical-align: top; margin-top: 5px; width: %s;">
-         %s 
-        </td>
-        """ % ('25%', datalist[1])
-        
-    output += '      </tr>\n'
-    
-    output += """
-     </tbody>
-    </table>
-    """
-
-    return output
-
-
-def adderrorbox(header='', datalist=[]):
-    """used to create table around main data on a page, row based"""
-
-    try: perc= str(100 // len(datalist)) + '%'
-    except ZeroDivisionError: perc= 1
-
-    output  = '<table class="errorbox" width="100%">'
-    output += '<thead><tr><th class="errorboxheader" colspan="%s">%s</th></tr></thead>' % (len(datalist), header)
-    output += '<tbody>'
-    for row in [datalist]:
-        output += '<tr>'
-        for data in row:
-            output += '<td style="vertical-align: top; margin-top: 5px; width: %s;">' % (perc, )
-            output += data
-            output += '</td>'
-        output += '</tr>'
-    output += '</tbody></table>'
-
-    return output
-
-
-def tupletotable(header=[], tuple=[], start='', end='', extracolumn=''):
-    """create html table for a tuple.
-
-         header - optional header for the columns
-     
-          tuple - create table of this
-     
-          start - text to be added in the beginning, most likely beginning of a form
-     
-            end - text to be added in the end, mot likely end of a form.
-     
-    extracolumn - mainly used to put in a button. """
-
-    # study first row in tuple for alignment
-    align = []
-    try: 
-        firstrow = tuple[0]
-    
-        if type(firstrow) in [int, long]: 
-            align = ['admintdright']
-        elif type(firstrow) in [str, dict]:
-            align = ['admintdleft']
-        else:
-            for item in firstrow:
-                try: align.append(type(int(item)) is int and 'admintdright')
-                except ValueError: align.append('admintdleft')
-    except IndexError:
-        firstrow = []
-                    
-    
-    tblstr = ''
-    for h in header + ['']:
-        tblstr += '  <th class="adminheader">%s</th>\n' % (h, )
-    if tblstr: tblstr = ' <tr>\n%s\n </tr>\n' % (tblstr, )
-    
-    tblstr = start + '<table class="admin_wvar_nomargin">\n' + tblstr
-
-    # extra column
-    try: 
-        extra = '<tr>'
-
-        if type(firstrow) not in [int, long, str, dict]:
-            # for data in firstrow: extra += '<td class="%s">%s</td>\n' % ('admintd', data)
-            for i in range(len(firstrow)): extra += '<td class="%s">%s</td>\n' % (align[i], firstrow[i])
-        else:
-            extra += '  <td class="%s">%s</td>\n' % (align[0], firstrow)
-        extra += '<td rowspan="%s" style="vertical-align: bottom">\n%s\n</td>\n</tr>\n' % (len(tuple), extracolumn)
-    except IndexError:
-        extra = ''
-    tblstr += extra
-
-    # for i in range(1, len(tuple)):
-    for row in tuple[1:]:
-        tblstr += ' <tr>\n'
-        # row = tuple[i]
-        if type(row) not in [int, long, str, dict]:
-            # for data in row: tblstr += '<td class="admintd">%s</td>\n' % (data,)
-            for i in range(len(row)): tblstr += '<td class="%s">%s</td>\n' % (align[i], row[i])
-        else:
-            tblstr += '  <td class="%s">%s</td>\n' % (align[0], row)
-        tblstr += ' </tr> \n'
-
-    tblstr += '</table> \n '
-    tblstr += end
-    
-    return tblstr
-
-
-def tupletotable_onlyselected(header=[], tuple=[], selected=[], start='', end='', extracolumn=''):
-    """create html table for a tuple.
-
-        header - optional header for the columns
-
-         tuple - create table of this
-
-      selected - indexes of selected rows in the tuple
-
-         start - put this in the beginning
-
-           end - put this in the beginning
-
-   extracolumn - mainly used to put in a button"""
-
-    tuple2 = []
-
-    for index in selected:
-        tuple2.append(tuple[int(index)-1])
-
-    return tupletotable(header=header,
-                        tuple=tuple2,
-                        start=start,
-                        end=end,
-                        extracolumn=extracolumn)
-
-
-def addcheckboxes(datalist=[], name='authids', startindex=1, checked=[]):
-    """adds checkboxes in front of the listdata.
-
-      datalist - add checkboxes in front of this list
-
-          name - name of all the checkboxes, values will be associated with this name
-
-    startindex - usually 1 because of the header
-
-       checked - values of checkboxes to be pre-checked """
-    
-    if not type(checked) is list: checked = [checked]
-    for row in datalist:
-        if 1 or row[0] not in [-1, "-1", 0, "0"]: # always box, check another place
-            chkstr = str(startindex) in checked and 'checked="checked"' or ''
-            row.insert(0, '<input type="checkbox" name="%s" value="%s" %s />' % (name, startindex, chkstr))
-        else:
-            row.insert(0, '')
-        startindex += 1
-    return datalist
-
-
 def headeritalic(**ids):
     """transform keyword=value pairs to string with value in italics.
 
@@ -2680,6 +2457,8 @@ def startpage():
 
     return body
 
+def rankarea():
+    return "Rankmethod area"
 
 def perform_simpleauthorization(req, id_role=0, id_action=0):
     """show a page with simple overview of authorizations between a
@@ -2737,32 +2516,7 @@ def perform_showroleusers(req, id_role=0):
                  adminarea=3)
                
 
-def createhiddenform(action="", text="", button="confirm", cnfrm='', **hidden):
-    """create select with hidden values and submit button
 
-      action - name of the action to perform on submit
-
-        text - additional text, can also be used to add non hidden input
-
-      button - value/caption on the submit button
-
-       cnfrm - if given, must check checkbox to confirm
-
-    **hidden - dictionary with name=value pairs for hidden input """
-    
-    output  = '<form action="%s" method="POST">\n' % (action, )
-    output += '<table>\n<tr><td>'
-    output += text
-    if cnfrm:
-        output += ' <input type="checkbox" name="confirm" value="1" />' 
-    for key in hidden.keys():
-        output += ' <input type="hidden" name="%s" value="%s" />\n' % (key, hidden[key])
-    output += '</td><td style="vertical-align: bottom">'
-    output += ' <input class="adminbutton" type="submit" value="%s" />\n' % (button, )
-    output += '</td></tr></table>'
-    output += '</form>\n'
-
-    return output
 
 
 def createselect(id_input="0", label="", step=0, name="",
