@@ -37,7 +37,11 @@ web interface but searches bibliographic data.)
 Follows a brief description of what each module does.  After the
 description we shall present the module relationship diagram.
 
+  - BibConvert
+
   - BibFormat    
+
+  - BibHarvest
   
   - BibSched
   
@@ -63,7 +67,5 @@ description we shall present the module relationship diagram.
   
   - WebSubmit
   
-
-
 - end of file -
 </pre>
