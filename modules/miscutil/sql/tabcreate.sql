@@ -2090,6 +2090,47 @@ CREATE TABLE IF NOT EXISTS user_rule (
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
+-- tables for access control engine
+
+CREATE TABLE IF NOT EXISTS aceROLE (
+  id int(15) unsigned NOT NULL, 
+  name varchar(32), 
+  description varchar(255), 
+  PRIMARY KEY (id)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS user_aceROLE (
+  id_user int(15) unsigned NOT NULL,
+  id_aceROLE int(15) unsigned NOT NULL,
+  PRIMARY KEY (id_user, id_aceROLE)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS aceACTION (
+  id int(15) unsigned NOT NULL,
+  name varchar(32),
+  description varchar(255),
+  allowedkeywords varchar(255),
+  PRIMARY KEY (id), 
+  UNIQUE KEY name (name)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS aceARGUMENT (
+  id int(15) unsigned NOT NULL,
+  keyword varchar (15),
+  value varchar(15),
+  PRIMARY KEY (id)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS aceROLE_aceACTION_aceARGUMENT (
+  id_aceROLE int(15),
+  id_aceACTION int(15),
+  id_aceARGUMENT int(15),
+  argumentlistid mediumint(8),
+  KEY id_aceROLE     (id_aceROLE),
+  KEY id_aceACTION   (id_aceACTION),
+  KEY id_aceARGUMENT (id_aceARGUMENT)
+) TYPE=MyISAM;
+
 -- tables for personal features (baskets, alerts, searches):
 
 CREATE TABLE IF NOT EXISTS user_query (
