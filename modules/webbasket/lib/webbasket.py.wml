@@ -197,10 +197,9 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
                    """<INPUT type="text" name="newname" size="10" maxlength="50">&nbsp;"""\
                    """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="CREATE NEW"></CODE><BR><BR>"""
 
-            if ((id_basket != '0') and (id_basket != 0)):
+            if id_basket:
                 out += """<TABLE style="background-color:F1F1F1; border:thin groove grey" """\
-                       """cellspacing="0" cellpadding="0" width="650">\n<TR><TD>"""
-                out += """<TABLE border="0" cellpadding="0" cellspacing ="10" width="100%">"""
+                       """cellspacing="0" cellpadding="4">\n<TR><TD>"""
 
                 # buttons for actions: display basket content, delete, rename, create a new basket
                 # basket delete
@@ -219,40 +218,41 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
                 if (i < len(permission)):
                     if (permission[i][1] == "n"):
                         public_basket="no"
-                        out += """<TD colspan="2">Basket access is set to <I>private</I>, convert to <I>public</I>?</TD><TD>"""\
+                        out += """<TR><TD colspan="2">Basket access is set to <I>private</I>, convert to <I>public</I>?</TD><TD>"""\
                                """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="SET PUBLIC"></CODE></TD></TR>\n"""
                     else :
                         public_basket="yes"
-                        out += """<TD colspan="2">Basket access is set to <I>public</I>, convert to <I>private</I>?<BR></TD><TD>"""\
+                        out += """<TR><TD colspan="2">Basket access is set to <I>public</I>, convert to <I>private</I>?<BR></TD><TD>"""\
                                """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="SET PRIVATE"></CODE></TD></TR>\n"""
                     if (public_basket=="yes"):
                         url_public_basket = """%s/yourbaskets.py/display_public?id_basket=%s""" \
                                             % (weburl, id_basket)
                         out += """<TR><TD colspan="3">Public URL: <FONT size="-1"><NOBR><A href="%s">%s</A></NOBR></FONT></TD></TR>""" \
                                % (url_public_basket, url_public_basket)
-            
-            # is basket related to some alerts?
-            alert_query_result = run_sql("SELECT alert_name FROM user_query_basket WHERE id_user=%s AND id_basket=%s",
-                                         (uid, id_basket))
-            out += """<TR><TD colspan="3">"""
-            if len(alert_query_result) == 0:
-                out += """There isn't any alert related to this basket."""
-            else:
-                out += """The following <A href="../youralerts.py/list_alerts">alerts</A> are related to this basket:&nbsp;"""
-                i = 1
-                for row in alert_query_result:
-                    if i == 1:
-                        out += """<B>%s</B>""" % row[0]
-                        i+=1
-                    else:
-                        out += """, <B>%s</B>""" % row[0]
-                        i+=1
-                out += """<BR>"""
-            out += """</TD><TR>"""
+
+                # is basket related to some alerts?
+                alert_query_result = run_sql("SELECT alert_name FROM user_query_basket WHERE id_user=%s AND id_basket=%s",
+                                             (uid, id_basket))
+                out += """<TR><TD colspan="3">"""
+                if len(alert_query_result) == 0:
+                    out += """There isn't any alert related to this basket."""
+                else:
+                    out += """The following <A href="../youralerts.py/list_alerts">alerts</A> are related to this basket:&nbsp;"""
+                    i = 1
+                    for row in alert_query_result:
+                        if i == 1:
+                            out += """<B>%s</B>""" % row[0]
+                            i+=1
+                        else:
+                            out += """, <B>%s</B>""" % row[0]
+                            i+=1
+                    out += """<BR>"""
+                out += """</TD></TR></TABLE>"""
 
             # hidden parameters
-            out += """<INPUT type="hidden" name="bname" value="%s"></TD></TR>""" % basket_name   
-            out += """</TABLE></TD></TR></TABLE></FORM>"""            
+            out += """<INPUT type="hidden" name="bname" value="%s">""" % basket_name   
+
+        out += """</FORM>"""            
 
     # display the content of the selected basket
     if ((id_basket != '0') and (id_basket != 0)):
@@ -325,14 +325,14 @@ def display_basket_content(uid, id_basket, basket_name):
                            """<IMG src="%s/arrow_up.gif" border="0">""" % (i,row[0],imagesurl)
                 else:
                     # complete display previous item
-                    out += """<A href="display?id_basket=%s&action=ORDER&idup=%s&ordup=%s&iddown=%s&orddown=%s" border="0">"""\
+                    out += """<A href="display?id_basket=%s&amp;action=ORDER&amp;idup=%s&amp;ordup=%s&amp;iddown=%s&amp;orddown=%s">"""\
                            """<IMG src="%s/arrow_down.gif" border="0"></A>"""\
                            """</TD>"""\
                            """<TD>%s</TD></TR>"""\
                            """<TR colspan="2"><TD></TD></TR>""" % (id_basket,row[0],row[1],preid,preord,imagesurl,zlib.decompress(preabstract))                    
                     # display current item
                     out += """<TR valign="top"><TD width="60">%s<input type="checkbox" name="mark" value="%s">"""\
-                           """<A href="display?id_basket=%s&action=ORDER&idup=%s&ordup=%s&iddown=%s&orddown=%s" border="0">"""\
+                           """<A href="display?id_basket=%s&amp;action=ORDER&amp;idup=%s&amp;ordup=%s&amp;iddown=%s&amp;orddown=%s">"""\
                            """<IMG src="%s/arrow_up.gif" border="0"></A>""" % (i,row[0],id_basket,row[0],row[1],preid,preord,imagesurl)              
                 preid = row[0]
                 preord = row[1]
@@ -682,14 +682,14 @@ def perform_display_public(uid, id_basket, basket_name, action, to_basket, mark,
                            """<IMG src="%s/arrow_up.gif" border="0">""" % (i,row[0],imagesurl)
                 else:
                     # complete display previous item
-                    out += """<A href="display?id_basket=%s&action=ORDER&idup=%s&ordup=%s&iddown=%s&orddown=%s" border="0">"""\
+                    out += """<A href="display?id_basket=%s&action=ORDER&idup=%s&ordup=%s&iddown=%s&orddown=%s">"""\
                            """<IMG src="%s/arrow_down.gif" border="0"></A>"""\
                            """</TD>"""\
                            """<TD>%s</TD></TR>"""\
                            """<TR colspan="2"><TD></TD></TR>""" % (id_basket,row[0],row[1],preid,preord,imagesurl,zlib.decompress(preabstract))                    
                     # display current item
                     out += """<TR valign="top"><TD width="60">%s<input type="checkbox" name="mark" value="%s">"""\
-                           """<A href="display?id_basket=%s&action=ORDER&idup=%s&ordup=%s&iddown=%s&orddown=%s" border="0">"""\
+                           """<A href="display?id_basket=%s&action=ORDER&idup=%s&ordup=%s&iddown=%s&orddown=%s">"""\
                            """<IMG src="%s/arrow_up.gif" border="0"></A>""" % (i,row[0],id_basket,row[0],row[1],preid,preord,imagesurl)              
                 preid = row[0]
                 preord = row[1]
