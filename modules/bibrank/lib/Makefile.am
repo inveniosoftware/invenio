@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir=$(libdir)/python/cdsware
-pylib_DATA=bibrankadminlib.py bibrank_tag_based_indexer.py bibrank_record_sorter.py bibrank_word_indexer.py bibrank_tests.py
+pylib_DATA=bibrankadminlib.py bibrank_tag_based_indexer.py bibrank_record_sorter.py bibrank_word_indexer.py bibrank_record_sorter_tests.py bibrank_tag_based_indexer_tests.py
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)

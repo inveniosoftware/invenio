@@ -28,30 +28,11 @@ __lastupdated__ = """<: print `date +"%d %b %Y %H:%M:%S %Z"`; :>"""
 
 __version__ = "$Id$"
 
-import bibrank_record_sorter
 import bibrank_tag_based_indexer
-import bibrank_word_indexer
 import unittest
-from cdsware.search_engine import HitSet
 
 class TestListSetOperations(unittest.TestCase):
     """Test list set operations."""
-
-    def test_record_sorter(self):
-        """bibrank_record_sorter sort_record_relevance"""
-        self.assertEqual([(1, 71), (3, 100)], bibrank_record_sorter.sort_record_relevance({1: 50, 2:30, 3:70, 4:10}, 50, 0))
-    def test_calculate_record_relevance(self):
-        """bibrank_record_sorter calculate_record_relevance"""
-        hitset = HitSet()
-        hitset.addlist((1,2,5))
-        self.assertEqual(({1: 839, 2: 1193, 5: 350}, {1: 1, 2: 1, 5: 1}),  bibrank_record_sorter.calculate_record_relevance(("testterm", 2.0), {"Gi":(0, 50.0), 1: (3, 4.0), 2: (4, 5.0), 5: (1, 3.5)}, hitset, {}, {}, 0, None))
-
-    def test_post_calculate_record_relevance(self):
-        """bibrank_record_sorter post_calculate_record_relevance"""
-        hitset = HitSet()
-        hitset.addlist((1,2,5))
-        (returned_dict, returned_hitset) = bibrank_record_sorter.post_calculate_record_relevance({1: 839, 2: 1193, 5: 350}, {1: 1, 2: 1, 5: 1}, hitset, 0)
-        self.assertEqual(({1: 6.7322107064672059, 2: 7.0842264220979159, 5: 5.857933154483459}, []), (returned_dict, returned_hitset.tolist()))
 
     def test_union_dicts(self):
         """bibrank_tag_based_indexer union_dicts"""
