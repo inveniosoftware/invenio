@@ -19,9 +19,9 @@
 
 #include "cdspage.wml" \
     title="Search Engine API" \
-    navbar_name="search-new" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/>Help Central</a> &gt; <a class=navtrail href=<WEBURL>/help/search/>Search Help</a> &gt; <a class=navtrail href=<WEBURL>/help/search/internals.html>Search Internals</a> " \
-    navbar_select="search-internals-api" 
+    navbar_name="hacking-websearch" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt; <a class=navtrail href=internals.html>WebSearch Internals</a> " \
+    navbar_select="websearch-internals-api" 
 
 <protect>
 <pre>

@@ -18,10 +18,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
-    title="Search Internals" \
-    navbar_name="search-new" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/>Help Central</a> &gt; <a class=navtrail href=<WEBURL>/help/search/>Search Help</a>" \
-    navbar_select="search-internals" 
+    title="WebSearch Internals" \
+    navbar_name="hacking-websearch" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a>" \
+    navbar_select="websearch-internals" 
 
 This page summarizes all the information suitable to dig inside
 Search Engine internals.
