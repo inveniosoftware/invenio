@@ -1480,7 +1480,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         if basic_search_unit_hitset._nbhits>0 or \
            ap==0 or \
            (idx_unit>0 and bsu_o=="|") or \
-           (idx_unit<len(basic_search_units) and basic_search_units[idx_unit+1][0]=="|"):
+           ((idx_unit+1)<len(basic_search_units) and basic_search_units[idx_unit+1][0]=="|"):
             # stage 2-1: this basic search unit is retained, since
             # either the hitset is non-empty, or the approximate
             # pattern treatment is switched off, or the search unit
