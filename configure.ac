@@ -365,9 +365,11 @@ AC_CONFIG_FILES([Makefile \
 	  modules/bibconvert/doc/hacking/Makefile \
 	  modules/bibconvert/etc/Makefile \
 	  modules/bibedit/Makefile \
+	  modules/bibedit/bin/Makefile \
 	  modules/bibedit/doc/Makefile \
 	  modules/bibedit/doc/admin/Makefile \
 	  modules/bibedit/doc/hacking/Makefile \
+	  modules/bibedit/etc/Makefile \
 	  modules/bibedit/lib/Makefile \
 	  modules/bibharvest/Makefile \
 	  modules/bibharvest/bin/Makefile \
