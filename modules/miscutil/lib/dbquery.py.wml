@@ -21,12 +21,17 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+#include "configbis.wml"
+
 """CDSware utility to run SQL queries."""
 
 import MySQLdb
 import string
 
-from config import *
+dbhost = "<DBHOST>"
+dbname = "<DBNAME>"
+dbuser = "<DBUSER>"
+dbpass = "<DBPASS>"
 
 __version__ = "$Id$"
 
