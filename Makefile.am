@@ -17,60 +17,105 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = modules
+SUBDIRS = config modules
 
 EXTRA_DIST = UNINSTALL .wmlrc
 
-## submit stuff for sample data link creation
-sbmdir = $(HTDOCSDIR)submit/access/protected
+## submit stuff for demo data link creation
+sbmdir = $(WEBDIR)submit/access/protected
 sbmdat = SBITEXT MBITEXT FTTTEXT SRVTEXT TFUTEXT \
 	 SBIRTEXT MBIRTEXT FTTRTEXT SRVRTEXT TFURTEXT APPRTEXT \
 	 SBIPICT MBIPICT FTTPICT \
          SBIRPICT MBIRPICT FTTRPICT APPRPICT
 
+install-data-local:
+	mkdir -p @prefix@/var
+	mkdir -p @prefix@/var/cache
+	mkdir -p @prefix@/var/log
+	chmod -R ug=rwx @prefix@/var
+
 uninstall-local:
-	rm -rf @RTLOGSDIR@
+	rm -rf @prefix@/var
 
-load-sample-data: install ./dbutil/tabfill.sql
-	for f in $(sbmdat); do \
-	    if [ ! -e $(sbmdir)/$$f.shtml ]; then \
-		ln -s $(sbmdir)/go.shtml $(sbmdir)/$$f.shtml ; \
-	    else \
-		echo "link $(sbmdir)/$$f.shtml already exists"; \
-	    fi \
-	done
-	exit 0
-	./dbutil/dbexec < ./dbutil/samplecfgdata.sql
-	(cd ./dbutil; ./bibupload ./samplebibdata.xml)
-	(cd ./dbutil; ./bibformat otype=HB,HD,HP,HC < ./samplebibdata.xml > ./samplebibdatafmt.xml)
-	(cd ./dbutil; ./bibupload ./samplebibdatafmt.xml)
-	rm -f ./dbutil/samplebibdatafmt.xml
-	./cgibin/create_collection_pages ""+
-	./dbutil/bibwords -ucds.support@cern.ch
-	./dbutil/bibwords 1
-	./cgibin/create_collection_pages ""+
-	@echo "*******************************************************************************"
-	@echo "** The sample data has been successfully loaded.                             **"
-	@echo "** Please point your browser to @HTDOCSURL@ "
-	@echo "** You should be able to see sample collections and to do some searches.     **"
-	@echo "** Note that you can do 'gmake clean-sample-data' to remove the sample data. **"
-	@echo "*******************************************************************************"
+create-tables: local-dbexec local-tabfill
+	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabcreate.sql
+	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
 
-clean-sample-data: install ./dbutil/tabfill.sql
-	./dbutil/dbexec < ./dbutil/tabdrop.sql
-	./dbutil/dbexec < ./dbutil/tabcreate.sql
-	./dbutil/dbexec < ./dbutil/tabfill.sql
+drop-tables: local-dbexec 
+	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabdrop.sql
+
+local-dbexec: ./modules/miscutil/bin/dbexec.wml
+	(cd ./modules/miscutil/bin; make)
+
+local-tabfill: ./modules/miscutil/sql/tabfill.sql.wml
+	(cd ./modules/miscutil/sql; make)
+
+create-demo-site: install
+# 	for f in $(sbmdat); do \
+# 	    if [ ! -e $(sbmdir)/$$f.shtml ]; then \
+# 		ln -s $(sbmdir)/go.shtml $(sbmdir)/$$f.shtml ; \
+# 	    else \
+# 		echo "link $(sbmdir)/$$f.shtml already exists"; \
+# 	    fi \
+# 	done
+	./modules/miscutil/bin/dbexec < ./modules/miscutil/demo/democfgdata.sql
+	${prefix}/bin/create_collection_pages
+	rm -f index.wml
+	@echo "***********************************************************************"
+	@echo "** The demo site has been successfully created.                      **"
+	@echo "** Please point your browser to @WEBURL@ "
+	@echo "** It should ressemble our 'Atlantis Institute of Science' demo site **"
+	@echo "** that is available at <http://cdsware.cern.ch/DEMO/>,              **"
+	@echo "** with the exception that no demo records have been loaded yet.     **"
+	@echo "**                                                                   **"
+	@echo "** To load demo records, you can run 'make load-demo-records'.       **"
+	@echo "** To destroy the demo site, you can run 'make destroy-demo-site'.   **"
+	@echo "***********************************************************************"
+
+load-demo-records: install
+	${prefix}/bin/bibupload ./modules/miscutil/demo/demobibdata.xml
+	${prefix}/bin/bibwords -ucds.support@cern.ch
+	${prefix}/bin/bibwords 1
+	@LYNX@ -source '@WEBURL@/search.py?rg=100&of=xm' > z.xml
+	${prefix}/bin/bibformat otype=HB,HD,HP,HC < ./z.xml > ./zf.xml
+	${prefix}/bin/bibupload -f ./zf.xml
+	rm -f z.xml zf.xml
+	${prefix}/bin/create_collection_pages
+	rm -f index.wml
+	@echo "***********************************************************************"
+	@echo "** The demo records have been successfully loaded.                   **"
+	@echo "** Please point your browser to @WEBURL@ "
+	@echo "** It should ressemble our 'Atlantis Institute of Science' demo site **"
+	@echo "** that is available at <http://cdsware.cern.ch/DEMO/>.              **"
+	@echo "** You should be able to do some searches, etc.                      **"
+	@echo "**                                                                   **"
+	@echo "** To remove demo records, you can run 'make remove-demo-records'.   **"
+	@echo "** To remove also the demo site collection etc configurations,       **"
+	@echo "** you can run 'make destroy-demo-site'.                             **"
+	@echo "***********************************************************************"
+
+destroy-demo-site: install
+	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabdrop.sql
+	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabcreate.sql
+	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
+	${prefix}/bin/create_collection_pages
+	rm -f index.wml
 	for f in $(sbmdat); do rm -f $(sbmdir)/$$f.shtml ; done
-	./cgibin/create_collection_pages ""+
-	@echo "****************************************************"
-	@echo "** The sample data has been successfully cleaned. **"
-	@echo "****************************************************"
+	@echo "*****************************************************************"
+	@echo "** The demo site and records have been successfully destroyed. **"
+	@echo "*****************************************************************"
 
-create-tables: ./dbutil/tabfill.sql
-	./dbutil/dbexec < ./dbutil/tabcreate.sql
-	./dbutil/dbexec < ./dbutil/tabfill.sql
-
-drop-tables:
-	./dbutil/dbexec < ./dbutil/tabdrop.sql
+remove-demo-records: install
+	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabbibclean.sql
+	${prefix}/bin/create_collection_pages
+	rm -f index.wml
+	@echo "**************************************************************"
+	@echo "** The demo records have been successfully removed.         **"
+	@echo "** The demo collection and submit configurations            **"
+	@echo "** have been preserved.                                     **"
+	@echo "**                                                          **"
+	@echo "** Note that you can run 'make destroy-demo-site' to remove **"
+	@echo "** the demo site fully.                                     **"
+	@echo "**************************************************************"
 
 CLEANFILES = *~ index.wml
