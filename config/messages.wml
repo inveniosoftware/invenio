@@ -105,7 +105,7 @@
 
 <define-tag MSG_HELP_CENTRAL whitespace=delete>
   <en>Help Central</en>
-  <fr>Centre d&rsquo;Aide</fr>
+  <fr>Centre d&rsquo;aide</fr>
   <de>Hilfezentrale</de>
   <es>Ayuda</es>
   <pt>Central de Ajuda</pt>
@@ -119,7 +119,7 @@
 
 <define-tag MSG_SEARCH_HELP whitespace=delete>
   <en>Search Help</en>
-  <fr>Aide de Recherche</fr>
+  <fr>Aide de recherche</fr>
   <de>Suchhilfe</de>
   <es>Ayuda a la Búsqueda</es>
   <pt>Ajuda de Busca</pt>
@@ -133,7 +133,7 @@
 
 <define-tag MSG_SEARCH_TIPS whitespace=delete>
   <en>Search Tips</en>
-  <fr>Conseils de Recherche</fr>
+  <fr>Conseils de recherche</fr>
   <de>Suchtipps</de>
   <es>Consejos para la Búsqueda</es>
   <pt>Sugestões de busca</pt>
@@ -301,7 +301,7 @@
 
 <define-tag MSG_SIMPLE_SEARCH whitespace=delete>
   <en>Simple Search</en>
-  <fr>Recherche Simple</fr>
+  <fr>Recherche simple</fr>
   <de>Einfache Suche</de>
   <es>Búsqueda Simple</es>
   <pt>Busca Básica</pt>
@@ -315,7 +315,7 @@
 
 <define-tag MSG_ADVANCED_SEARCH whitespace=delete>
   <en>Advanced Search</en>
-  <fr>Recherche Avancée</fr>
+  <fr>Recherche avancée</fr>
   <de>Erweiterte Suche</de>
   <es>Búsqueda Avanzada</es>
   <pt>Busca Avançada</pt>
@@ -329,7 +329,7 @@
 
 <define-tag MSG_COLLECTION_NOT_FOUND_HEAD whitespace=delete>
   <en>Collection %s Not Found</en>
-  <fr>Collection %s Introuvable</fr>
+  <fr>Collection %s introuvable</fr>
   <de>Sammlung %s nicht gefunden</de>
   <es>Colección %s no encontrada</es>
   <pt>A coleção %s não foi encontrada</pt>
@@ -347,8 +347,8 @@
     <p>You may want to start browsing from <a href=\"%s\">%s</a>.
   </en>
   <fr>
-    <p>Désolé, collection <strong>%s</strong> n'est pas trouvable.
-    <p>Essaiez de naviguer à partir de <a href=\"%s\">%s</a>.
+    <p>Désolé, la collection <strong>%s</strong> n'existe pas.
+    <p>Essayez de naviguer à partir de <a href=\"%s\">%s</a>.
   </fr>
   <de>
     <p>Entschuldigung, Sammlung <strong>%s</strong> scheint nicht zu existieren.
@@ -602,7 +602,7 @@
 
 <define-tag MSG_REGULAR_EXPRESSION whitespace=delete>
   <en>Regular expression:</en>
-  <fr>Expression régulaire:</fr>
+  <fr>Expression régulière:</fr>
   <de>Regulärer Ausdruck:</de>
   <es>Expresión regular:</es>
   <pt>Expressão regular:</pt>
@@ -933,7 +933,7 @@
 
 <define-tag MSG_SEARCH_TOOK_X_SECONDS whitespace=delete>
   <en>Search took %.2f seconds.</en>
-  <fr>La recherche a durée %.2f seconds.</fr>
+  <fr>La recherche a duré %.2f secondes.</fr>
   <de>Die Suche hat %.2f Sekunden gedauert.</de>
   <es>La búsqueda tardó %.2f segundos.</es>
   <pt>A busca levou %.2f segundos.</pt>
@@ -1017,7 +1017,7 @@
 
 <define-tag MSG_SUBMIT_HELP whitespace=delete>
   <en>Submit Help</en>
-  <fr>Aide de Soumission</fr>
+  <fr>Aide pour soumission</fr>
   <de>Eintragehilfe</de>
   <es>Ayuda para el Envio</es>
   <pt>Ajuda sobre Envio</pt>
@@ -1046,7 +1046,7 @@
 
 <define-tag MSG_ADMIN_AREA whitespace=delete>
   <en>Admin Area</en>
-  <fr>Coin Administrateur</fr>
+  <fr>Coin administrateur</fr>
   <de>Verwaltungsraum</de>
   <es>Área del Administrador</es>
   <pt>Área do Administrador</pt>
@@ -1060,7 +1060,7 @@
 
 <define-tag MSG_ADMIN_SUBMIT whitespace=delete>
   <en>WebSubmit Administration</en>
-  <fr>Administration de Soumission</fr>
+  <fr>Administration des soumissions</fr>
   <de>WebSubmit Verwaltung</de>
   <es>Administración de WebSubmit</es>
   <pt>Administração de Envios</pt>
@@ -1368,7 +1368,7 @@
 
 <define-tag MSG_NO_WORDS_INDEX_AVAILABLE whitespace=delete>
   <en>No words index available for</en>
-  <fr>Aucun index des mots n'est disponible pour</fr>
+  <fr>Aucun index de mots n'est disponible pour</fr>
   <de>Kein Wortindex steht zur Verfügung für</de>
   <es>No hay ningún índice de palabras disponible</es>
   <pt>Nenhum índice de palavras está disponível para</pt>
@@ -1382,7 +1382,7 @@
 
 <define-tag MSG_NO_PHRASE_INDEX_AVAILABLE whitespace=delete>
   <en>No phrase index available for</en>
-  <fr>Aucun index des phrases n'est disponible pour</fr>
+  <fr>Aucun index de phrases n'est disponible pour</fr>
   <de>Kein Begriffindex steht zur Verfügung für</de>
   <es>No hay ningún índice de frases disponible</es>
   <pt>Nenhum índice de frases está disponível para</pt>
@@ -1450,7 +1450,7 @@
   </en>
   <fr>
     Aucune collection publique ne satisfait votre requête.  Si vous
-    avez cherché des documents non-publiques, veuillez choisir d'abord
+    avez cherché des documents non publics, veuillez choisir d'abord
     la collection restreinte.
   </fr>
   <de>
@@ -1501,7 +1501,7 @@
     No match within your time limits, discarding this condition...
   </en>
   <fr>
-    Pas de résultat pour l'interval de temps spécifé, la condition
+    Pas de résultat pour l'intervalle de temps spécifé, la condition
     n'est pas prise en compte...
   </fr>
   <de>
@@ -1545,7 +1545,7 @@
   </en>
   <fr>
     Pas de résultat pour les limites spécifiées, les conditions ne
-    sont pas prise en compte...
+    sont pas prises en compte...
   </fr>
   <de>
     Kein Resultat in der eingegebene Suchebeschränkung, 
@@ -1589,8 +1589,8 @@
     Please combine your search terms differently.
   </en>
   <fr>
-    Tous les termes de recherche ont été trouvés mais la requête booleane
-    n'a rien donnée.  Essayez de combiner ces termes différamment.
+    Tous les termes de recherche ont été trouvés mais la requête booléenne
+    n'a rien donné.  Essayez de combiner ces termes différamment.
   </fr>
   <de>
     Alle Suchbegriffe gefunden, aber die boolsche Suchfrage hat keine Datensätze gefunden.
@@ -1636,7 +1636,7 @@
     No exact match found for <em>%s</em>, using <em>%s</em> instead...
   </en>
   <fr>
-    Aucun résultat précis pour <em>%s</em> n'a pas été trouvé,
+    Aucun résultat précis pour <em>%s</em> n'a été trouvé,
     utilisons <em>%s</em> à la place...
   </fr>
   <de>
@@ -1674,7 +1674,7 @@
 
 <define-tag MSG_INTERNAL_ERROR whitespace=delete>
   <en>Internal Error</en>
-  <fr>Erreur Interne</fr>
+  <fr>Erreur interne</fr>
   <de>Interner Fehler</de>
   <es>Error Interno</es>
   <pt>Erro Interno</pt>
@@ -1730,7 +1730,7 @@
 
 <define-tag MSG_SEARCH_OPTIONS whitespace=delete>
   <en>Search options:</en>
-  <fr>Options de la recherche:</fr>
+  <fr>Options de recherche:</fr>
   <de>Suchoptionen:</de>
   <es>Opciones de búsqueda:</es>
   <pt>Opções de busca:</pt>
@@ -1744,7 +1744,7 @@
 
 <define-tag MSG_LATEST_ADDITIONS whitespace=delete>
   <en>Latest additions:</en>
-  <fr>Dernières ajouts:</fr>
+  <fr>Derniers ajouts:</fr>
   <de>Letzte Einträge:</de>
   <es>Últimas adquisiciones:</es>
   <pt>Ítens mais recentes:</pt>
