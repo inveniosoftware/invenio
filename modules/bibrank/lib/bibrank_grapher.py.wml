@@ -63,8 +63,10 @@ def write_coordinates_in_tmp_file(lists_coordinates):
         #prepare data and store them in a file 
         for key_value in list_elem: 
             file_dest.write("%s %s\n"%(key_value[0], key_value[1])) 
-            y_axe.append(key_value[1]) 
-        max_tmp = max(y_axe) 
+            y_axe.append(key_value[1])
+        max_tmp = 0
+        if y_axe:
+            max_tmp = max(y_axe) 
         if max_tmp > max_y_datas: 
             max_y_datas = max_tmp 
         file_dest.write("\n\n") 
