@@ -426,9 +426,10 @@ class BibDocFile:
         if format == "":
             self.mime = "text/plain"
             self.encoding = ""
+            self.fullname = name
         else:
-            fullname = "%s.%s" % (name,format)
-            (self.mime,self.encoding) = mimetypes.guess_type(fullname)
+            self.fullname = "%s.%s" % (name,format)
+            (self.mime,self.encoding) = mimetypes.guess_type(self.fullname)
             if self.mime == None:
               self.mime = "text/plain"
         
@@ -467,7 +468,8 @@ class BibDocFile:
         if os.path.exists(self.fullpath):
             req.content_type = self.mime
             req.encoding = self.encoding
-            req.filename = self.name
+            req.filename = self.fullname
+            req.headers_out["Content-Disposition"] = "file; filename=%s" % self.fullname
             req.send_http_header()
             fp = file(self.fullpath,"r")
             content = fp.read()
