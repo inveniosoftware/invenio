@@ -101,9 +101,9 @@ def perform_set(email,password):
 	<form method="post" action="../youraccount.py/change">
 		<p>If you want to change your email address or password, please set new values in the form below.
 		<table>
-			<tr><td align=right><strong>New email address:</strong><br><small class=important>(mandatory)</small></td><td><input type="text" size="25" name="email" value="%s"><br><img src="/img/r.gif" alt="">&nbsp<small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td><td></td></tr>
-			<tr><td align=right><strong>New password:</strong></td><td align=left><input type="password" size="25" name="password" value="%s"><br><img src="/img/r.gif" alt="">&nbsp<small><span class=quicknote>Note:</span> The password phrase may contain punctuation, spaces, etc.</small></td><td><input type="hidden" name="action" value="edit"></td></tr>
-			<tr><td align=center colspan=3><code class=blocknote><input type="submit" value="Set new values"></code>&nbsp;&nbsp;&nbsp;</td></tr>
+			<tr><td align=right><strong>New email address:</strong><br><small class=important>(mandatory)</small></td><td><input type="text" size="25" name="email" value="%s"><br><small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td><td></td></tr>
+			<tr><td align=right><strong>New password:</strong></td><td align=left><input type="password" size="25" name="password" value="%s"><br><small><span class=quicknote>Note:</span> The password phrase may contain punctuation, spaces, etc.</small></td><td><input type="hidden" name="action" value="edit"></td></tr>
+			<tr><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" value="Set new values"></code>&nbsp;&nbsp;&nbsp;</td></tr>
 		</table>
         </form>
       </body>
@@ -124,12 +124,11 @@ def perform_ask():
 		 <td align=right><strong>Email address:</strong><br><small class=important>(mandatory)</small>
 		 </td>
                  <td><input type="text" size="25" name="p_email" value="">
-			<br><img src="/img/r.gif" alt="">&nbsp<small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td><td></td></tr><tr><td align=right><strong>Password:</strong>
+			<br><small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td><td></td></tr><tr><td align=right><strong>Password:</strong>
 			<br><small class=quicknote>(optional)</small>	
 		</td>
 		<td align=left><input type="password" size="25" name="p_pw" value="">
-			<br> <img src="/img/r.gif" alt="">&nbsp
-				<small><span class=quicknote>Note:
+			<br><small><span class=quicknote>Note:
 					</span> The password phrase may contain punctuation, spaces, etc.
 				</small>
 		 </td>
@@ -137,7 +136,7 @@ def perform_ask():
 		 </td>
                 </tr>
                 <tr>
-		 <td align=center colspan=3><code class=blocknote><input type="submit" name="action" value="login"></code>&nbsp;&nbsp;&nbsp;<code class=blocknote><input type="submit" name="action" value="register"></code>&nbsp;&nbsp;&nbsp;
+		 <td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>&nbsp;&nbsp;&nbsp;<code class=blocknote><input class="formbutton" type="submit" name="action" value="register"></code>&nbsp;&nbsp;&nbsp;
 		 </td>
                 </tr>
               </table>
