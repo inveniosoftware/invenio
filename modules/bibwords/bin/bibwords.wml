@@ -1311,7 +1311,7 @@ class WordTable:
 def task_run(row):
     """Run the indexing task.  The row argument is the BibSched task
     queue row, containing if, arguments, etc.
-    Return 1 in case of success and 0 in case of failure."""
+    Return 1 in case of success and 0 in case of failure.
     """
     
     global opts_dict, task_id, wordTables
@@ -1597,52 +1597,6 @@ def test_word_separators(phrase="hep-th/0101001"):
     for word in get_words_from_phrase(phrase):
         print "\t-> %s" % word
 
-def test_really_run():
-    """Test by really running words indexing not via task scheduler but directly.  Useful for debugging/profiling."""
-    opts_dict = { "wordsindex": get_word_tables("author"),
-                  "cmd" : "add",
-                  "id" : [[1,1000]],
-                  "verbose" : 9,
-                  "flush" : 50000,
-                }
-    for table in opts_dict["wordsindex"]:
-        wordTable = WordTable(table.keys()[0], table.values()[0])
-        wordTable.report_on_table_consistency()
-        try:
-            if opts_dict["cmd"] == "del":
-                if opts_dict["id"]:
-                    wordTable.del_recIDs(opts_dict["id"])
-                else:
-                    wordTable.del_date(opts_dict["modified"])
-
-            elif opts_dict["cmd"] == "add":
-                if opts_dict["id"]:
-                    wordTable.add_recIDs(opts_dict["id"])
-                else:
-                    wordTable.add_date(opts_dict["modified"])
-            elif opts_dict["cmd"] == "repair":
-                wordTable.repair()
-            else:
-                write_message("Invalid command found processing %s" % \
-                     wordTable.tablename, sys.stderr)
-                raise StandardError
-
-            id = wordTable.tablename[len("bibwords"):]
-            query = """UPDATE wordsindex SET last_updated=NOW()
-            WHERE id='%s'""" %  id
-            if opts_dict["verbose"] >= 9:
-                write_message(query)
-            run_sql(query)
-
-        except StandardError, e:
-            write_message("Exception caught: %s" % e, sys.stderr)
-            traceback.print_tb(sys.exc_info()[2])
-            task_update_status("ERROR")
-            task_sig_stop_commands()
-            sys.exit(1)
-            
-        wordTable.report_on_table_consistency()
-
 def main():
     """Reads arguments and either runs the task, or starts user-interface (command line)."""
     if len(sys.argv) == 2:
@@ -1676,5 +1630,4 @@ if __name__ == "__main__":
     #test_word_separators("?C++.NET")
     #test_word_separators("\x4C\x6F\xC3\xAF\x65\x7A")
     #test_word_separators("O'Neil and pi- in real.business")
-    #test_really_run()
     main()
