@@ -138,6 +138,7 @@ msg_thousands_separator = {}
 msg_record_deleted = {}
 msg_restricted = {}
 msg_record_last_modified = {}
+msg_similar_records = {}
 
 ## English:
 <en>
@@ -249,6 +250,7 @@ msg_thousands_separator['en'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['en'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['en'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['en'] = """<MSG_RECORD_LAST_MODIFIED>"""
+msg_similar_records['en'] = """<MSG_SIMILAR_RECORDS>"""
 </en>
 
 ## French:
@@ -361,6 +363,7 @@ msg_thousands_separator['fr'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['fr'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['fr'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['fr'] = """<MSG_RECORD_LAST_MODIFIED>"""
+msg_similar_records['fr'] = """<MSG_SIMILAR_RECORDS>"""
 </fr>
 
 ## German:
@@ -473,6 +476,7 @@ msg_thousands_separator['de'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['de'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['de'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['de'] = """<MSG_RECORD_LAST_MODIFIED>"""
+msg_similar_records['de'] = """<MSG_SIMILAR_RECORDS>"""
 </de>
 
 ## Spanish:
@@ -585,6 +589,7 @@ msg_thousands_separator['es'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['es'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['es'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['es'] = """<MSG_RECORD_LAST_MODIFIED>"""
+msg_similar_records['es'] = """<MSG_SIMILAR_RECORDS>"""
 </es>
 
 ## Portuguese:
@@ -697,6 +702,7 @@ msg_thousands_separator['pt'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['pt'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['pt'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['pt'] = """<MSG_RECORD_LAST_MODIFIED>"""
+msg_similar_records['pt'] = """<MSG_SIMILAR_RECORDS>"""
 </pt>
 
 ## Italian:
@@ -809,6 +815,7 @@ msg_thousands_separator['it'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['it'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['it'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['it'] = """<MSG_RECORD_LAST_MODIFIED>"""
+msg_similar_records['it'] = """<MSG_SIMILAR_RECORDS>"""
 </it>
 
 ## Russian:
@@ -921,6 +928,7 @@ msg_thousands_separator['ru'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['ru'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['ru'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['ru'] = """<MSG_RECORD_LAST_MODIFIED>"""
+msg_similar_records['ru'] = """<MSG_SIMILAR_RECORDS>"""
 </ru>
 
 ## Slovak:
@@ -1033,6 +1041,7 @@ msg_thousands_separator['sk'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['sk'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['sk'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['sk'] = """<MSG_RECORD_LAST_MODIFIED>"""
+msg_similar_records['sk'] = """<MSG_SIMILAR_RECORDS>"""
 </sk>
 
 ## Czech:
@@ -1145,6 +1154,7 @@ msg_thousands_separator['cz'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['cz'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['cz'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['cz'] = """<MSG_RECORD_LAST_MODIFIED>"""
+msg_similar_records['cz'] = """<MSG_SIMILAR_RECORDS>"""
 </cz>
 
 ## Norwegian:
@@ -1257,6 +1267,7 @@ msg_thousands_separator['no'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['no'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['no'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['no'] = """<MSG_RECORD_LAST_MODIFIED>"""
+msg_similar_records['no'] = """<MSG_SIMILAR_RECORDS>"""
 </no>
 
 ## Swedish:
@@ -1369,6 +1380,7 @@ msg_thousands_separator['se'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['se'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['se'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['se'] = """<MSG_RECORD_LAST_MODIFIED>"""
+msg_similar_records['se'] = """<MSG_SIMILAR_RECORDS>"""
 </se>
 
 ## I18N messages oriented functions:
