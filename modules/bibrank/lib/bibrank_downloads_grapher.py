@@ -30,16 +30,22 @@ from config import weburl
 from dbquery import run_sql
 from bibrank_downloads_indexer import database_tuples_to_single_list
 from bibrank_grapher import *
+
 color_line_list = ['9', '19', '10', '15', '21', '18']
 cfg_id_bibdoc_id_bibrec = 5
 cfg_bibrank_print_download_history = 1
 cfg_bibrank_print_download_split_by_id = 0
 
-def downloads_statistics(id_bibrec):
-    """ if id_bibrec=0 : its an oustide-stored document and it has no id_bibdoc --> only one line
+def create_download_history_graph_and_box(id_bibrec):
+    """Create graph with citation history for record ID_BIBREC (into a
+       temporary file) and return HTML box refering to that image.
+       Called by Detailed record pages.
+       Notes:
+        if id_bibrec=0 : its an oustide-stored document and it has no id_bibdoc --> only one line
         if nb_id_bibdoc <= cfg_id_bibdoc_id_bibrec draw one line per id_bibdoc
         if nb_id_bibdoc > cfg_id_bibdoc_id_bibrec draw only one line which hold simultaneously the downloads per id_bibdoc
-        Each time this function is called, all the images older than 10 minutes are deleted."""
+        Each time this function is called, all the images older than 10 minutes are deleted.
+    """
     html_code = ""
     html_content = ""
     users_analysis_text = ""
