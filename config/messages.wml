@@ -432,16 +432,16 @@
 </define-tag>
 
 <define-tag MSG_LANGUAGE whitespace=delete>
-  <en>language:</en>
-  <fr>langue:</fr>
-  <de>Sprache:</de>
-  <es>idioma:</es>
-  <pt>idioma:</pt>
-  <it>lingua:</it>
+  <en>language</en>
+  <fr>langue</fr>
+  <de>sprache</de>
+  <es>idioma</es>
+  <pt>idioma</pt>
+  <it>lingua</it>
   <ru>язык</ru>
-  <sk>jazyk:</sk>
-  <cz>jazyk:</cz>
-  <no>språk:</no>
+  <sk>jazyk</sk>
+  <cz>jazyk</cz>
+  <no>språk</no>
 </define-tag>
 
 <define-tag MSG_BROWSE whitespace=delete>
@@ -1784,6 +1784,19 @@
   <sk>Knižnica</sk>
   <cz>Knihovna</cz>
   <no>Bibliotek</no>
+</define-tag>
+
+<define-tag MSG_THIS_PAGE_IN_LANGUAGES whitespace=delete>
+  <en>This page is also available in the following languages:</en>
+  <fr>Cette page est aussi disponible dans les langues suivantes:</fr>
+  <de>Diese Seite gibt es auch in den folgenden Sprachen:</de>
+  <es>Esta página también está disponible en los siguientes idiomas: </es>
+  <pt>Esta página também está disponível nos seguintes idiomas: </pt>
+  <it>Questa pagina è disponibile anche nelle lingue seguenti: </it>
+  <ru>Ета страница также доступна на следующих языках:</ru>
+  <sk>Táto stránka je tiež dostupná v nasledujúcich jazykoch:</sk>
+  <cz>Tato stránka je také dostupná v následujících jazycích:</cz>
+  <no>Denne siden er også tilgjengelig på følgende språk:</no>
 </define-tag>
 
 ## end of file
