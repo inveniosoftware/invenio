@@ -19,7 +19,7 @@
 
 #include "cdspage.wml" \
     title="Admin HOWTOs" \
-    navbar_name="howto" \
+    navbar_name="admin" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/>Admin Area</a>" \
     navbar_select="howto"
 

@@ -19,7 +19,7 @@
 
 #include "cdspage.wml" \
     title="HOWTO MARC Your Bibliographic Data" \
-    navbar_name="howto" \
+    navbar_name="admin" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/>Admin Area</a> &gt; <a class=navtrail href=<WEBURL>/admin/howto/>Admin HOWTOs</a>" \
     navbar_select="howto_marc"
 
