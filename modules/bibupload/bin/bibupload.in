@@ -1056,17 +1056,24 @@ function insert ($rec)
 
     if ($recid == "000") {
 
-        // test on the old aleph sysno field
+        // test on A300 system number
         $oldsysno = $rec->get_subfield("909","C","0","o");
         $oldsysnoExists = Test_In_DB($oldsysno,"909C0o","bib90x");
         if ($oldsysnoExists)
             $recid = $oldsysnoExists;
         else {
-            // test on the ER field
-            $er = $rec->get_subfield("037","_","_","a");
-            $ERExists = Test_In_DB($er,"037__a","bib03x");
-            if ($ERExists)
-                $recid = $ERExists;
+            // test on A500 system number
+            $oldsysno = $rec->get_subfield("970","","","a");
+            $oldsysnoExists = Test_In_DB($oldsysno,"970__a","bib90x");
+            if ($oldsysnoExists)
+                $recid = $oldsysnoExists;
+            else {
+                // test on the ER field
+                $er = $rec->get_subfield("037","_","_","a");
+                $ERExists = Test_In_DB($er,"037__a","bib03x");
+                if ($ERExists)
+                    $recid = $ERExists;
+            }
         }
 	
         // display record name
