@@ -178,7 +178,7 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
                    """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="CREATE NEW"></CODE>"""
         else:
             # display the list of baskets
-            out += """You have defined <B>%s</B> baskets.<BR>""" % len(query_result)            
+            out += """You own <B>%s</B> baskets.<BR>""" % len(query_result)            
             out += """Select&nbsp;an&nbsp;existing&nbsp;basket:&nbsp;"""\
                    """<SELECT name="id_basket"><OPTION value="0">- basket name -</OPTION>"""            
             for row in query_result :
@@ -491,6 +491,7 @@ def is_basket_owner(uid, bid):
     """
     return run_sql("select id_basket from user_basket where id_user=%s and id_basket=%s",
                    (uid, bid))
+    
 
 def get_basket_name(bid):
     """returns the name of the basket corresponding to the given id
@@ -716,8 +717,13 @@ def perform_request_add(uid=-1, recid=[], bid=[], bname=[]):
     """Add records recid to baskets bid for user uid. If bid isn't set, it'll ask user into which baskets to add them.
     If bname is set, it'll create new basket with this name, and add records there rather than to bid."""
     out = ""
+    # wash arguments:
     recIDs = recid
     bskIDs = bid
+    if not type(recid) is list:
+        recIDs = [recid]
+    if not type(bid) is list:
+        bskIDs = [bid]
     # sanity checking:
     if recIDs == []:
         return "<p>No records to add."
@@ -745,7 +751,7 @@ def perform_request_add(uid=-1, recid=[], bid=[], bname=[]):
             out += """</form>"""
         else:
             # user have to create a basket first
-            out += """<p>You don't have any baskets defined yet."""
+            out += """<p>You don't own baskets defined yet."""
             out += """<form action="%s/yourbaskets.py/add" method="post">""" % weburl
             for recID in recIDs:
                 out += """<input type="hidden" name="recid" value="%s">""" % recID
@@ -766,7 +772,7 @@ def perform_request_add(uid=-1, recid=[], bid=[], bname=[]):
                         pass # maybe records were already there? page reload happened?
                 out += """<span class="info">done.</span>"""
             else:
-                out += """<span class="info">sorry, you are not the owner of the basket.</span>"""
+                out += """<span class="info">sorry, you are not the owner of this basket.</span>"""
         out += perform_display(uid=uid, id_basket=bskIDs[0])
     return out 
 
