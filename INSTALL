@@ -112,7 +112,8 @@ Contents
                     --with-dbhost=sqlserver.domain.com \
                     --with-dbname=cdsware \
                     --with-dbuser=cdsware \
-                    --with-dbpass=myp1ss 
+                    --with-dbpass=myp1ss \
+                    --with-python=/opt/python/bin/python2.3
       $ vi ./config/config.wml   ## optional, but strongly recommended
       $ make
       $ mysql -h sqlserver.domain.com -u root -p mysql
@@ -161,7 +162,8 @@ Contents
                     --with-dbhost=sqlserver.domain.com \
                     --with-dbname=cdsware \
                     --with-dbuser=cdsware \
-                    --with-dbpass=myp1ss 
+                    --with-dbpass=myp1ss \
+                    --with-python=/opt/python/bin/python2.3
 
           Configure essential CDSware parameters, with the following
           signification:
@@ -200,6 +202,14 @@ Contents
 
                  The database server host, the database name, and the
                  database user credentials.
+
+              --with-python=/opt/python/bin/python2.3
+
+                 Optionally, specify a path to some specific Python
+                 binary.  This is useful if you have more than one
+                 Python installation on your system.  If you don't set
+                 this option, then the first Python that will be found
+                 in your PATH will be chosen for running CDSware.
 
           CDSware won't install to any other directory but to the two
           mentioned in this configuration line.  Do not use trailing
