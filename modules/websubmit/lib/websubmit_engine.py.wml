@@ -885,12 +885,7 @@ def simpleendaction(doctype="", act="", startPg=1, indir="", access="",step=1,mo
     action_score = action_details(doctype,act)
     current_level = get_level(doctype, act)
     # Calls all the function's actions
-    try:
-        print_function_calls(doctype, act, step, "") 
-    except functionError,e:
-        return e.value
-    except functionStop,e:
-	return "premature function stop"
+    print_function_calls(doctype, act, step, "") 
     return "ok"
     
 
