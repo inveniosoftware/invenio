@@ -86,17 +86,17 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
         fp = open("%s/collections/%d/body-as=%d-ln=%s.html" % (cachedir, colID, as, ln), "r")
         c_body = fp.read()
         fp.close()
+        fp = open("%s/collections/%d/portalbox-tp-ln=%s.html" % (cachedir, colID, ln), "r")
+        c_portalbox_tp = fp.read()
+        fp.close()
+        fp = open("%s/collections/%d/portalbox-te-ln=%s.html" % (cachedir, colID, ln), "r")
+        c_portalbox_te = fp.read()
+        fp.close()
         fp = open("%s/collections/%d/portalbox-lt-ln=%s.html" % (cachedir, colID, ln), "r")
         c_portalbox_lt = fp.read()
         fp.close()
-        fp = open("%s/collections/%d/portalbox-lb-ln=%s.html" % (cachedir, colID, ln), "r")
-        c_portalbox_lb = fp.read()
-        fp.close()
         fp = open("%s/collections/%d/portalbox-rt-ln=%s.html" % (cachedir, colID, ln), "r")
         c_portalbox_rt = fp.read()
-        fp.close()
-        fp = open("%s/collections/%d/portalbox-rb-ln=%s.html" % (cachedir, colID, ln), "r")
-        c_portalbox_rb = fp.read()
         fp.close()
         fp = open("%s/collections/%d/last-updated-ln=%s.html" % (cachedir, colID, ln), "r")
         c_last_updated = fp.read()
@@ -114,7 +114,10 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
                     uid=uid,
                     language=ln,
                     urlargs=req.args,
+                    cdspageboxlefttopadd=c_portalbox_lt,
                     cdspageboxrighttopadd=c_portalbox_rt,
+                    titleprologue=c_portalbox_tp,
+                    titleepilogue=c_portalbox_te,
                     lastupdated=c_last_updated)                    
     except:        
         if verbose >= 9:
