@@ -47,7 +47,7 @@ from mod_python import apache
 __version__ = "$Id$"
 
 def getnavtrail(previous = ''):
-    navtrail = """<a class=navtrail href="%s/admin/">Administrator's Area</a> &gt; <a class=navtrail href="%s/admin/bibrank/">BibRank Admin</a> """ % (weburl, weburl)
+    navtrail = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/bibrank/">BibRank Admin</a> """ % (weburl, weburl)
     navtrail = navtrail + previous
     return navtrail
 

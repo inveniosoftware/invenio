@@ -51,7 +51,7 @@ __version__ = "$Id$"
 def getnavtrail(previous = ''):
     """Get the navtrail"""
     
-    navtrail = """<a class=navtrail href="%s/admin/">Administrator's Area</a> &gt; <a class=navtrail href="%s/admin/websearch/">WebSearch Admin</a> """ % (weburl, weburl)
+    navtrail = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/websearch/">WebSearch Admin</a> """ % (weburl, weburl)
     navtrail = navtrail + previous
     return navtrail
 
@@ -2629,9 +2629,9 @@ def remove_fmt(colID,fmtID):
         return ""
 
 def remove_fld(colID,fldID, fldvID=''):
-    """Removes a format from the collection given.
+    """Removes a field from the collection given.
     colID - the collection the format is connected to
-    fmtID - the format which should be removed from the collection."""
+    fldID - the field which should be removed from the collection."""
     
     try:
         sql = "DELETE FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s" % (colID, fldID)
@@ -2762,7 +2762,7 @@ def add_col_fmt(colID, fmtID, score=''):
         return ""
 
 def add_col_fld(colID, fldID, type, fldvID=''):
-    """Add a output format to the collection.
+    """Add a sort/search/field to the collection.
     colID - the id of the collection involved
     fmtID - the id of the format.
     score - the score of the format, decides sorting, if not given, place the format on top"""
@@ -2836,7 +2836,7 @@ def modify_pbx(colID, pbxID, sel_ln, score='', position='', title='', body=''):
         return ""
 
 def switch_fld_score(colID, id_1, id_2):
-    """Switch the scores of id_1 and id_2 in the table given by the argument.
+    """Switch the scores of id_1 and id_2 in collection_field_fieldvalue
     colID - collection the id_1 or id_2 is connected to
     id_1/id_2 - id field from tables like format..portalbox...
     table - name of the table"""
@@ -2851,7 +2851,7 @@ def switch_fld_score(colID, id_1, id_2):
         return ()
 
 def switch_fld_value_score(colID, id_1, fldvID_1, fldvID_2):
-    """Switch the scores of id_1 and id_2 in the table given by the argument.
+    """Switch the scores of two field_value
     colID - collection the id_1 or id_2 is connected to
     id_1/id_2 - id field from tables like format..portalbox...
     table - name of the table"""
