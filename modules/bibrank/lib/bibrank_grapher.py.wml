@@ -70,7 +70,7 @@ def write_coordinates_in_tmp_file(lists_coordinates):
         if max_tmp > max_y_datas: 
             max_y_datas = max_tmp 
         file_dest.write("\n\n") 
-    file_dest.close() 
+    file_dest.close()
     return [fname, max_y_datas] 
  
 def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, origin_tuple, y_max, docid_list, graphe_titles, intervals):
@@ -93,7 +93,7 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
     intervals      - x tics location"""
     
     if cfg_gnuplot_available==0: 
-        return (None, None) 
+        return (None, None)
     #For different curves 
     color_line_list = ['4', '3', '2', '9', '6'] 
     #Gnuplot graphe object 
@@ -132,7 +132,7 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
         g('set xrange ["%s":"%s"]' % (intervals[0], intervals[len_intervals-1])) 
         y_offset = max(3, float(y_max)/60)
         g('set yrange [0:%s]' %str(y_max + y_offset))
-        if len_intervals <= 12: 
+        if len_intervals > 1 and len_intervals <= 12: 
             g('set xtics rotate %s' % str(tuple(intervals)))#to prevent duplicate tics 
         elif len_intervals > 12 and len_intervals <= 24: 
             g('set xtics rotate "%s", 7776000, "%s"' % (intervals[0], intervals[len_intervals-1]))#3 months intervalls 
@@ -154,7 +154,7 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
         g('set xrange [0:4]') 
         g('set yrange [0:100]') 
         g('set format y "%g %%"') 
-        g("""set xtics ("" 0, "Cern\\n Users" 1, "Other\\n Users" 3, "" 4)""") 
+        g("""set xtics ("" 0, "CERN\\n Users" 1, "Other\\n Users" 3, "" 4)""") 
         g('set ytics 0,10,100')         
         g('set boxwidth 0.7 relative') 
         g('set style fill solid 0.25') 
