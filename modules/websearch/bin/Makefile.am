@@ -23,9 +23,9 @@ EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(bin_SCRIPTS) *~ *.tmp index.wml
 
-%.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml
+%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o $@ $<
 
-%: %.wml ../../../config/config.wml ../../../config/configbis.wml ../../../config/cdswmllib.wml
+%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdswmllib.wml
 	$(WML) -o $@ $<
 	chmod u+x $@

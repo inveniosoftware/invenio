@@ -27,9 +27,9 @@ EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(bin_SCRIPTS) $(webapp_DATA) *~ *.tmp search.pyc
 
-%.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml
+%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o $@ $<
 
-%: %.wml ../../../config/config.wml ../../../config/configbis.wml
+%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o $@ $<
 	chmod u+x $@

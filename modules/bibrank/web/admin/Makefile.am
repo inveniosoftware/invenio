@@ -25,8 +25,8 @@ EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(webapp_DATA) *~ *.tmp
 
-%.py: %.py.wml ../../../../config/config.wml ../../../../config/configbis.wml
+%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o $@ $<
 
-%.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml
+%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<

@@ -28,8 +28,8 @@ EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 
-%.en.html %.fr.html %.de.html %.es.html %.pt.html %.it.html %.ru.html %.sk.html %.cz.html %.no.html %.se.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
-           ../../../config/messages.wml
+%.en.html %.fr.html %.de.html %.es.html %.pt.html %.it.html %.ru.html %.sk.html %.cz.html %.no.html %.se.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
+           $(top_srcdir)/config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$*.en.html \
 	       -o\(ALL-LANG_*\)+LANG_FR:$*.fr.html \
 	       -o\(ALL-LANG_*\)+LANG_DE:$*.de.html \

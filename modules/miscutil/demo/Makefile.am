@@ -23,5 +23,5 @@ EXTRA_DIST = $(wildcard *.wml) demobibdata.xml
 
 CLEANFILES = $(noinst_DATA) *~ *.tmp democfgdata.sql 
 
-%: %.wml ../../../config/config.wml ../../../config/configbis.wml
+%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o $@ $<

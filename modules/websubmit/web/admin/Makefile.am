@@ -26,9 +26,9 @@ EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(webapp_DATA) *~ *.tmp
 
-%.php: %.php.wml ../../../../config/config.wml ../../../../config/configbis.wml \
-           ../../../../config/messages.wml
+%.php: %.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
+           $(top_srcdir)/config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-%.py: %.py.wml ../../../../config/config.wml ../../../../config/configbis.wml \
-           ../../../../config/messages.wml
+%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
+           $(top_srcdir)/config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<

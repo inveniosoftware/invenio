@@ -82,6 +82,9 @@ if test -z "$WML"; then
    Available from <http://www.engelschall.com/sw/wml/>.])
 fi
 
+## Set option -c in WML so that it can work from a separate build tree
+WML="${WML} -c"
+
 ## Check for MySQL client:
 AC_PATH_PROG(MYSQL, mysql)
 if test -z "$MYSQL"; then
@@ -107,7 +110,7 @@ fi
 
 ## Check for Python version and modules:
 AC_MSG_CHECKING(for required Python modules)
-$PYTHON configure-tests.py
+$PYTHON ${srcdir}/configure-tests.py
 if test $? -ne 0; then
    AC_MSG_ERROR([Please fix the above Python problems before continuing.])
 fi
@@ -476,6 +479,12 @@ AC_CONFIG_FILES([Makefile \
 	  modules/miscutil/demo/Makefile \
 	  modules/miscutil/sql/Makefile \
 	  ])
+
+AC_CONFIG_COMMANDS(.wmlrc, [
+cat<<EOF>.wmlrc
+-Iconfig -I${srcdir}/config
+EOF
+])
 
 ## Finally, write output files:
 AC_OUTPUT

@@ -24,5 +24,5 @@ EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(web_DATA) *~ *.tmp
 
-%: %.wml ../../../config/config.wml ../../../config/configbis.wml ../../../config/cdspage.wml
+%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
 	$(WML) -o $@ $<

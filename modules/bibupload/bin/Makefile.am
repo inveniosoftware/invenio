@@ -23,6 +23,6 @@ EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(bin_SCRIPTS) *~ *.tmp 
 
-%: %.wml ../../../config/config.wml ../../../config/configbis.wml
+%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o $@ $<
 	chmod u+x $@

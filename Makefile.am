@@ -65,7 +65,7 @@ uninstall-local:
 	rm -rf @prefix@/var
 
 create-tables: local-dbexec local-tabfill
-	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabcreate.sql
+	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
 
 update-v0.3.0-tables update-v0.3.1-tables: local-dbexec
@@ -78,12 +78,12 @@ update-v0.3.0-tables update-v0.3.1-tables: local-dbexec
 	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgbibrank','configure BibRank','','no');" | ./modules/miscutil/bin/dbexec 
 
 drop-tables: local-dbexec 
-	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabdrop.sql
+	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
 
-local-dbexec: ./modules/miscutil/bin/dbexec.wml
+local-dbexec: $(srcdir)/modules/miscutil/bin/dbexec.wml
 	(cd ./modules/miscutil/bin; make)
 
-local-tabfill: ./modules/miscutil/sql/tabfill.sql.wml
+local-tabfill: $(srcdir)/modules/miscutil/sql/tabfill.sql.wml
 	(cd ./modules/miscutil/sql; make)
 
 create-demo-site: install
@@ -116,9 +116,9 @@ create-demo-site: install
 	@echo "***********************************************************************"
 
 load-demo-records: install
-	${prefix}/bin/dbexec < ./modules/miscutil/sql/tabbibclean.sql
+	${prefix}/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabbibclean.sql
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
-	${prefix}/bin/bibupload -i ./modules/miscutil/demo/demobibdata.xml
+	${prefix}/bin/bibupload -i $(srcdir)/modules/miscutil/demo/demobibdata.xml
 	${prefix}/bin/bibupload 1
 	@echo ""
 	@echo "***********************************************************************"
@@ -155,8 +155,8 @@ load-demo-records: install
 	@echo "***********************************************************************"
 
 drop-demo-site: install
-	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabdrop.sql
-	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabcreate.sql
+	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
+	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabcreate.sql
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
 	@echo ""
@@ -172,7 +172,7 @@ drop-demo-site: install
 	@echo "***************************************************************"
 
 remove-demo-records: install
-	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabbibclean.sql
+	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabbibclean.sql
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
 	@echo ""
 	@echo "***********************************************************************"
