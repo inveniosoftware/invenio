@@ -24,7 +24,7 @@
 
 from config import *
 from messages import *
-from webuser import create_user_infobox
+from webuser import create_userinfobox_body
 import re
 import string
 import sys
@@ -67,29 +67,32 @@ page_template_footer = """
 
 page_template_body = """
 <div class="pagebody">
-<table border="0" cellspacing="0" cellpadding="0" width="100%%">
- <tr valign="top">
-  <td class="pagestripemiddle" align="left">
-   %s
-   <h1 class="headline">%s</h1>
-   %s
-  </td>
-  <td class="pagestriperight" align="right" valign="top">
-    <CDSPAGEBOXRIGHTTOP>
+  <div class="pagestripeleft">
+    <div class="pageboxlefttop"><CDSPAGEBOXLEFTTOP></div>
+    <div class="pageboxlefttopadd">%s</div>
+    <div class="pageboxleftbottomadd">%s</div>
+    <div class="pageboxleftbottom"><CDSPAGEBOXLEFTBOTTOM></div>
+  </div>
+  <div class="pagestriperight">
+    <div class="pageboxrighttop"><CDSPAGEBOXRIGHTTOP></div>
+    <div class="pageboxrighttopadd">%s</div>
+    <div class="pageboxrightbottomadd">%s</div>
+    <div class="pageboxrightbottom"><CDSPAGEBOXRIGHTBOTTOM></div>
+  </div>
+  <div class="pagestripemiddle">
+    <h1 class="headline">%s</h1>
     %s
-  </td>
- </tr>
-</table>
+  </div>
 </div>
 """
 
-def create_navtrail(title,
-                    previous_links,
-                    prolog="", 
-                    separator=""" &gt; """,
-                    epilog="",
-                    language=cdslang):
-    """create_navtrail(): create navigation trail table box
+def create_navtrailbox_body(title,
+                            previous_links,
+                            prolog="", 
+                            separator=""" &gt; """,
+                            epilog="",
+                            language=cdslang):
+    """Create navigation trail box body
        input: title = page title;
               previous_links = the trail content from site title until current page (both ends exlusive).
        output: text containing the navtrail
@@ -110,17 +113,22 @@ def create_navtrail(title,
             out += title
     return prolog + out + epilog
 
-def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagerightstripeadd="", cdspageheaderadd="", cdspagebodyadd="", cdspagefooteradd="", lastupdated="", language=cdslang, urlargs="", verbose=1):
-    """page(): display the cds page
-        input: title of the page;
-               body of the page in html format;
+def page(title, body, navtrail="", description="", keywords="", uid=0, cdspageheaderadd="", cdspageboxlefttopadd="", cdspageboxleftbottomadd="", cdspageboxrighttopadd="", cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="", language=cdslang, urlargs="", verbose=1):
+    """page(): display CDS web page
+        input: title of the page
+               body of the page in html format
                description goes to the metadata in the header of the HTML page
                keywords goes to the metadata in the header of the html page
                cdspageheaderadd is a message to be displayed just under the page header
+               cdspageboxlefttopadd is a message to be displayed in the page body on left top
+               cdspageboxleftbottomadd is a message to be displayed in the page body on left bottom
+               cdspageboxrighttopadd is a message to be displayed in the page body on right top
+               cdspageboxrightbottomadd is a message to be displayed in the page body on right bottom
                cdspagefooteradd is a message to be displayed on the top of the page footer
                lastupdated is a text containing the info on last update (optional)
                language is the language version of the page
                urlargs are the URL arguments of the page to display (useful to affect languages)
+               verbose is verbosity of the page (useful for debugging)
        output: the final cds page with header, footer, etc.
     """
     if title == cdsnameintl[language]:
@@ -128,7 +136,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspageri
     else:
         headerstitle = title
     out = page_template_header % (headerstitle, description, keywords, cdspageheader, cdspageheaderadd)
-    out += page_template_body % (cdspagebodyadd, title, body, cdspagerightstripeadd)
+    out += page_template_body % (cdspageboxlefttopadd, cdspageboxleftbottomadd, cdspageboxrighttopadd, cdspageboxrightbottomadd, title, body)
     out += page_template_footer % (cdspagefooteradd, cdspagefooter)
     out = re.sub(r"<!--CDSNAMEINTL-->", cdsnameintl[language], out)
     out = re.sub(r"<!--MSGSEARCH-->", msg_search[language], out)
@@ -141,8 +149,8 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspageri
     out = re.sub(r"<!--MSGHELP-->", msg_help[language], out)
     out = re.sub(r"<!--MSGPERSONALIZE-->", msg_personalize[language], out)
     out = re.sub(r"<!--LN-->", language, out)
-    out = re.sub(r"<!--NAVTRAILBOX-->", create_navtrail(title, navtrail, language=language), out)
-    out = re.sub(r"<!--USERINFOBOX-->", create_user_infobox(uid, language), out)
+    out = re.sub(r"<!--NAVTRAILBOXBODY-->", create_navtrailbox_body(title, navtrail, language=language), out)
+    out = re.sub(r"<!--USERINFOBOXBODY-->", create_userinfobox_body(uid, language), out)
     out = re.sub(r"<!--LANGUAGESELECTIONBOX-->", create_language_selection_box(urlargs, language), out)
     out = re.sub(r"<!--POWEREDBY-->", msg_powered_by[language], out)
     out = re.sub(r"<!--MAINTAINEDBY-->", msg_maintained_by[language], out)
@@ -164,8 +172,8 @@ def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspa
     out = re.sub(r"<!--MSGLIBRARY-->", msg_library[language], out)
     out = re.sub(r"<!--MSGHELP-->", msg_help[language], out)
     out = re.sub(r"<!--LN-->", language, out)
-    out = re.sub(r"<!--NAVTRAILBOX-->", create_navtrail(title, navtrail, language=language), out)
-    out = re.sub(r"<!--USERINFOBOX-->", create_user_infobox(uid, language), out)
+    out = re.sub(r"<!--NAVTRAILBOXBODY-->", create_navtrailbox_body(title, navtrail, language=language), out)
+    out = re.sub(r"<!--USERINFOBOXBODY-->", create_userinfobox_body(uid, language), out)
     out = re.sub(r"<!--LANGUAGESELECTIONBOX-->", create_language_selection_box(urlargs, language), out)
     return out
 
