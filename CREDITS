@@ -10,8 +10,9 @@ contributed to the project:
     Patches for compiling CDSware on FreeBSD.
   
   - Frédéric Gobry <frederic.gobry@epfl.ch>
-    Patches for building CDSware out of its source tree, together with
-    wildcard expansion and localstatedir patch.
+    Patches for building CDSware out of its source tree, with
+    wildcard expansion and localstatedir patch, and numerous other
+    patches.
 
   - Tiberiu Dondera <tiberiu.dondera@pronet-consulting.com>
     Patches for the WebSubmit engine and the admin interface.  
@@ -42,6 +43,12 @@ contributed to the project:
 
   - Eric Grand <eric.grand@rero.ch>
     Contributions to the French translation.
+
+  - Theodoros Theodoropoulos <theod@physics.auth.gr>
+    Contributions to the Greek translation.   
+
+  - Vasyl Ostrovskyi <vo@imath.kiev.ua>
+    Contributions to the Ukrainian translation.   
 
 Their help is greatly appreciated.
 
