@@ -2030,7 +2030,7 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
             out += "<a class=\"img\" href=\"%s&amp;jrec=1&amp;rg=%d\"><img src=\"%s/img/sb.gif\" alt=\"begin\" border=0></a>" % (url, rg, weburl)
         if jrec > 1:
             out += "<a class=\"img\" href=\"%s&amp;jrec=%d&amp;rg=%d\"><img src=\"%s/img/sp.gif\" alt=\"previous\" border=0></a>" % (url, max(jrec-rg,1), rg, weburl)
-        if nb_found > rg:
+        if jrec+rg-1 < nb_found:
             out += "%d - %d" % (jrec, jrec+rg-1)
         else:
             out += "%d - %d" % (jrec, nb_found)
