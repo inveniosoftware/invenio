@@ -1,0 +1,55 @@
+Hello
+
+The CDSware v0.0.9 was released on August 1st, 2002.
+
+What's new:
+   * first "public" alpha release of CDSware
+   * recently standardized Library of Congress' MARC XML schema adopted
+     in all CDSware modules as the new default internal XML file format
+     (BibConvert, BibFormat, BibUpload, WebSubmit, WebSearch)
+   * support for OAI-PMH v2.0 in addition to OAI-PMH v1.1 (WebSearch)
+   * search interface now honors multiple output formats per collection
+     (BibFormat, WebSearch)
+   * search interface now honors search fields, search options, and
+     sort options from the database config tables (WebSearch,
+     WebSearch Admin)
+   * search interface now honors words indexes from the database config
+     tables (BibWords, WebSearch)
+   * easy reformatting of already uploaded bibliographic records via
+     web admin. tool (BibFormat Admin/Reformat Records)
+   * new submission form field type ("response") allowing
+     greater flexibility (WebSubmit) [thanks to Frank Sudholt]
+   * demo site "Atlantis Institute of Science" updated to demonstrate:
+     Pictures collection of photographs; specific per-collection
+     formats; references inside Articles and Preprints; "cited by"
+     search link; published version linking; subject category
+     searching; search within, search options, sort options in the web
+     collection pages.
+
+Download:
+   <http://cdsware.cern.ch/download/cdsware-0.0.9.tar.gz>
+
+Notes:
+   As of release v0.0.9 the CDSware uses recently standardized MARC
+   XML schema provided by the Library of Congress. The default
+   configurations of nearly all CDSware modules have been changed
+   accordingly. We recommend you to install from scratch rather than
+   over an existing previous v0.01preX installations. However, in case
+   you want to keep your existing configuration and data, please feel
+   free to contact us for assistance.
+
+Known problems:
+   The admin interface is missing some functionality (e.g. there is no
+   BibWords Admin yet).  The interaction between WebSubmit and
+   WebSearch is missing some functionality (e.g. search pages are not
+   updated automatically when new documents are submitted).  We plan
+   to concentrate on these problems now.
+
+What's next:
+   The v0.0.9 release should be the last one in the v0.0.x series. We
+   plan to complete various missing admin interface functionality and
+   to release v0.1 during August 2002.
+
+See also:
+   <http://cdsware.cern.ch/news/index.shtml#20020801>
+
