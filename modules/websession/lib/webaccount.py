@@ -27,6 +27,7 @@
 
 try:
     import sys
+    import cgi
     from config import *
     from webpage import page
     from dbquery import run_sql	
@@ -160,13 +161,13 @@ def perform_set(email,password):
     return text                    				
 		
 ##  perform_ask(): ask for the user's email and password, for login into the system
-def perform_ask():
+def perform_ask(referer=''):
     text = """
               <p>If you already have an account, please log in by choosing the <strong class=headline>login
               </strong> button below. <br>If you don't own an account yet, please enter the values of your preference and choose the <strong class=headline>register</strong> button.
 
               <form method="post" action="../youraccount.py/login">
-
+              <input type="hidden" name="referer" value="%s">
 
               <table>
                 <tr>
@@ -193,9 +194,9 @@ def perform_ask():
 		 </td>
                 </tr>
               </table>
-              <p><strong>Note:</strong> It is not recommended to use valuable passwords as CERN AFS or NICE accounts with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you in the CERN Document Server personal services. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.
+              <p><strong>Note:</strong> Please do not use valuable passwords such as your Unix, AFS or NICE passwords with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you for personal services of %s. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.
              </form>
-           """
+           """ % (cgi.escape(referer), cdsname)
     return text
 
 
@@ -203,7 +204,7 @@ def perform_ask():
 def perform_logout(req):
     out =""
     out+="""    
-            You are not longer recognized.  If you wish you can login here <A href="./login">here</A>.
+            You are no longer recognized.  If you wish you can <A href="./login">login here</A>.
          """
     return out
 
