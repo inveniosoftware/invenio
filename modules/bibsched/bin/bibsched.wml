@@ -609,7 +609,7 @@ class Bibsched:
             else:
                 self.set_state(id,"ERROR")
         query="""SELECT id,proc,user,UNIX_TIMESTAMP(date),sleeptime,
-        arguments,state,score,output,error FROM schTASKS"""
+        arguments,state,score,output,error FROM schTASKS order by date asc"""
         self.cursor.execute(query)
         rows=self.cursor.fetchall()
         while 1:
