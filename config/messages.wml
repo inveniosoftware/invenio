@@ -1,0 +1,690 @@
+## $Id$
+
+## This file enables you to configure the messages that CDSware emits
+## to the end user.  This enables the internationalisation of the
+## interface.
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+## ########################
+## About "messages.wml"  ##
+## ########################
+
+## Messages emited by CDSware are contained in the WML elements below.
+## Please feel free to edit them to your needs.  Note that some
+## elements may contain things like ``%s'' which are ``templates'' for
+## future use: please preserve such elements exactly in place and only
+## edit the text.  When done, return to the main CDSware source
+## directory and type 'make'.  Good luck! :-)
+
+<define-tag MSG_HOME whitespace=delete>
+  <en>Home</en>
+  <fr>Accueil</fr>
+  <de>Hauptseite</de>
+  <es>Página principal</es>
+  <it>Pagina principale</it>
+  <ru>Главная страница</ru>
+</define-tag>
+
+<define-tag MSG_SEARCH whitespace=delete>
+  <en>Search</en>
+  <fr>Recherche</fr>
+  <de>Suchen</de>
+  <es>Buscar</es>
+  <it>Ricercare</it>
+  <ru>Поиск</ru>
+</define-tag>
+
+<define-tag MSG_SUBMIT whitespace=delete>
+  <en>Submit</en>
+  <fr>Soumission</fr>
+  <de>Eintragen</de>
+  <es>Someta</es>
+  <it>Invio</it>
+  <ru>Придать</ru>
+</define-tag>
+
+<define-tag MSG_HELP whitespace=delete>
+  <en>Help</en>
+  <fr>Aide</fr>
+  <de>Hilfe</de>
+  <es>Ayuda</es>
+  <it>Aiuto</it>
+  <ru>Помощь</ru>
+</define-tag>
+
+<define-tag MSG_HELP_CENTRAL whitespace=delete>
+  <en>Help Central</en>
+  <fr>Centre d&rsquo;Aide</fr>
+  <de>Hilfezentrale</de>
+  <es>Central de la Ayuda</es>
+  <it>Aiuto</it>
+  <ru>Централа помощи</ru>
+</define-tag>
+
+<define-tag MSG_SEARCH_HELP whitespace=delete>
+  <en>Search Help</en>
+  <fr>Aide de Recherche</fr>
+  <de>Suchhilfe</de>
+  <es>Ayuda de Búsqueda</es>
+  <it>Aiuto alla Ricerca</it>
+  <ru>Помощь для поиска</ru>
+</define-tag>
+
+<define-tag MSG_SEARCH_TIPS whitespace=delete>
+  <en>Search Tips</en>
+  <fr>Conseils de Recherche</fr>
+  <de>Suchtipps</de>
+  <es>Sugerencias de búsqueda</es>
+  <it>Consigli per la Ricerca</it>
+  <ru>Указания дла поиска</ru>
+</define-tag>
+
+<define-tag MSG_PERSONALIZE whitespace=delete>
+  <en>Personalize</en>
+  <fr>Personnaliser</fr>
+  <de>Personalisieren</de>
+  <es>Personalice</es>
+  <it>Personalizzazione</it>
+  <ru>Персоналузовать</ru>
+</define-tag>
+
+<define-tag MSG_PAGE_BEING_TRANSLATED_HEAD whitespace=delete>
+  <en>ENGLISH TRANSLATION UNDER WAY</en>
+  <fr>TRADUCTION FRANÇAISE EN COURS</fr>
+  <de>ÜBERSETZUNG AUF DEUTSCH WIRD GERADE VORBEREITET</de>
+  <es>VERSIÓN EN ESPAÑOL DISPONIBLE PRÓXIMAMENTE</es>
+  <it>TRADUZIONE ITALIANA DISPONIBLE PROSSIMAMENTE</it>
+  <ru>ПЕРЕВОД НА РУЦЦКИЙ ЯЗЫК НЕ ГОТОВ</ru>
+</define-tag>
+
+<define-tag MSG_PAGE_BEING_TRANSLATED_BODY>
+  <en>
+     At the moment the English version of this page isn't available yet.
+     Please use the version presented below.  Thanks for your understanding.
+  </en>  
+  <fr>
+     Pour le moment, la traduction française de cette page n'est pas
+     achevée.  Nous vous prions de bien vouloir consulter la version
+     anglaise qui suit.  Merci de votre compréhension.
+  </fr>
+  <de>
+     Zur Zeit gibt es keine deutsche Übersetzung von dieser Seite.
+     Wir bitten Sie inzwischen sich der englischen Version zu bedienen.
+     Wir danken Ihnen für Ihr Verständnis.   
+  </de>
+  <es>
+     De momento la versión en español de esta página no está
+     disponible. Le rogamos utilice la versión en inglés mostrada a
+     continuación. Gracias por su consideración.
+  </es>
+  <it>
+     Attualmente la traduzione italiana di questa pagina non è disponibile.
+     Vi preghiamo di consultare la versione inglese.
+     Grazie per la comprenzione.
+  </it>
+  <ru>
+     At the moment the Russian version of this page isn't available yet.
+     Please use the version presented below.  Thanks for your understanding.
+  </ru>
+</define-tag>
+
+<define-tag MSG_POWERED_BY whitespace=delete>
+  <en>Powered by</en>
+  <fr>Powered by</fr>
+  <de>Powered by</de>
+  <es>Powered by</es>
+  <it>Powered by</it>
+  <ru>Powered by</ru>
+</define-tag>
+
+<define-tag MSG_MAINTAINED_BY whitespace=delete>
+  <en>Maintained by</en>
+  <fr>Maintenu par</fr>
+  <de>Verwaltet von</de>
+  <es>Mantenido cerca</es>
+  <it>Mantenuto da</it>
+  <ru>Содержаиет</ru>
+</define-tag>
+
+<define-tag MSG_LAST_UPDATED whitespace=delete>
+  <en>Last updated</en>
+  <fr>Dernière mise à jour</fr>
+  <de>Letzte Aktualisierung</de>
+  <es>Última modificación</es>
+  <it>Ultimo aggiornamento</it>
+  <ru>Последнеие изменение</ru>
+</define-tag>
+
+<define-tag MSG_NARROW_SEARCH whitespace=delete>
+  <en>Narrow search:</en>
+  <fr>Limite recherche aux:</fr>
+  <de>Eingeschränkte Suche:</de>
+  <es>Narrow search:</es>
+  <it>Ricerca ristretta:</it>
+  <ru>Narrow search:</ru>
+</define-tag>
+
+<define-tag MSG_FOCUS_ON whitespace=delete>
+  <en>Focus on:</en>
+  <fr>Focus sur:</fr>
+  <de>Hinweis:</de>
+  <es>Focus on:</es>
+  <it>Focus on:</it>
+  <ru>Focus on:</ru>
+</define-tag>
+
+<define-tag MSG_SIMPLE_SEARCH whitespace=delete>
+  <en>Simple Search</en>
+  <fr>Recherche Simple</fr>
+  <de>Einfache Suche</de>
+  <es>Búsqueda Básica</es>
+  <it>Ricerca Semplice</it>
+  <ru>Простой поиск</ru>
+</define-tag>
+
+<define-tag MSG_ADVANCED_SEARCH whitespace=delete>
+  <en>Advanced Search</en>
+  <fr>Recherche Avancée</fr>
+  <de>Erweiterte Suche</de>
+  <es>Búsqueda Avanzada</es>
+  <it>Ricerca Avanzata</it>
+  <ru>Расширенный поиск</ru>
+</define-tag>
+
+<define-tag MSG_COLLECTION_NOT_FOUND_HEAD whitespace=delete>
+  <en>Collection %s Not Found</en>
+  <fr>Collection %s Introuvable</fr>
+  <de>Kollektion %s nicht gefunden</de>
+  <es>Collection %s Not Found</es>
+  <it>Raccolta %s Non Trouvata</it>
+  <ru>Коллекция %s не существует</ru>
+</define-tag>
+
+<define-tag MSG_COLLECTION_NOT_FOUND_BODY whitespace=delete>
+  <en>
+    <p>Sorry, collection <strong>%s</strong> does not seem to exist.
+    <p>You may want to start browsing from <a href="%s">%s</a>.
+  </en> 
+  <fr>
+    <p>Désolé, collection <strong>%s</strong> n'est pas trouvable.
+    <p>Essaiez de naviguer à partir de <a href="%s">%s</a>.
+  </fr>
+  <de>
+    <p>Entschuldigung, die Kollektion <strong>%s</strong> scheint nicht zu existieren.
+    <p>Sie können von <a href="%s">%s</a> durchsuchen beginnen.
+  </de>
+  <es>
+    <p>Sorry, collection <strong>%s</strong> does not seem to exist.
+    <p>You may want to start browsing from <a href="%s">%s</a>.
+  </es>
+  <it>
+    <p>Spiacenti, la raccolta <strong>%s</strong> non sembra esistere.
+    <p>Provate a tare la ricera a partire da <a href="%s">%s</a>.
+  </it>
+  <ru>
+    <p>Sorry, collection <strong>%s</strong> does not seem to exist.
+    <p>You may want to start browsing from <a href="%s">%s</a>.
+  </ru>
+</define-tag>
+
+<define-tag MSG_ACCOUNT whitespace=delete>
+  <en>account</en>
+  <fr>compte</fr>
+  <de>Konto</de>
+  <es>account</es>
+  <it>conto</it>
+  <ru>счёт</ru>
+</define-tag>
+
+<define-tag MSG_ALERTS whitespace=delete>
+  <en>alerts</en>
+  <fr>alertes</fr>
+  <de>Anzeigen</de>
+  <es>alerts</es>
+  <it>allerta</it>
+  <ru>alert</ru>
+</define-tag>
+
+<define-tag MSG_BASKETS whitespace=delete>
+  <en>baskets</en>
+  <fr>paniers</fr>
+  <de>Körbe</de>
+  <es>baskets</es>
+  <it>paniere</it>
+  <ru>корзины</ru>
+</define-tag>
+
+<define-tag MSG_SESSION whitespace=delete>
+  <en>session</en>
+  <fr>session</fr>
+  <de>Session</de>
+  <es>session</es>
+  <it>sessione</it>
+  <ru>session</ru>
+</define-tag>
+
+<define-tag MSG_LOGIN whitespace=delete>
+  <en>login</en>
+  <fr>login</fr>
+  <de>Anmelden</de>
+  <es>login</es>
+  <it>login</it>
+  <ru>login</ru>
+</define-tag>
+
+<define-tag MSG_LOGOUT whitespace=delete>
+  <en>logout</en>
+  <fr>logout</fr>
+  <de>Abmelden</de>
+  <es>logout</es>
+  <it>logout</it>
+  <ru>logout</ru>
+</define-tag>
+
+<define-tag MSG_LANGUAGE whitespace=delete>
+  <en>language:</en>
+  <fr>langue:</fr>
+  <de>Sprache:</de>
+  <es>lengua:</es>
+  <it>lingua:</it>
+  <ru>язык</ru>
+</define-tag>
+
+<define-tag MSG_BROWSE whitespace=delete>
+  <en>Browse</en>
+  <fr>Liste</fr>
+  <de>Durchblättern</de>
+  <es>Hojee</es>
+  <it>Sfogliare</it>
+  <ru>Листать</ru>
+</define-tag>
+
+<define-tag MSG_SEARCH_RECORDS_FOR whitespace=delete>
+  <en>Search %s records for:</en>
+  <fr>Cherchez dans %s notices:</fr>
+  <de>Suchen durch %s Datensätze für:</de>
+  <es>Buscar %s records for:</es>
+  <it>Ricerca %s for:</it>
+  <ru>Search %s records for:</ru>
+</define-tag>
+
+<define-tag MSG_ANY_FIELD whitespace=delete>
+  <en>any field</en>
+  <fr>tous les champs</fr>
+  <de>alle Felder</de>
+  <es>any field</es>
+  <it>tutti i campi</it>
+  <ru>any field</ru>
+</define-tag>
+
+<define-tag MSG_TITLE whitespace=delete>
+  <en>title</en>
+  <fr>titre</fr>
+  <de>Titel</de>
+  <es>title</es>
+  <it>titolo</it>
+  <ru>title</ru>
+</define-tag>
+
+<define-tag MSG_AUTHOR whitespace=delete>
+  <en>author</en>
+  <fr>auteur</fr>
+  <de>Autor</de>
+  <es>author</es>
+  <it>autore</it>
+  <ru>author</ru>
+</define-tag>
+
+<define-tag MSG_REPORT_NUMBER whitespace=delete>
+  <en>report number</en>
+  <fr>numéro de rapport</fr>
+  <de>Reportnummer</de>
+  <es>report number</es>
+  <it>numero del rapporto</it>
+  <ru>report number</ru>
+</define-tag>
+
+<define-tag MSG_YEAR whitespace=delete>
+  <en>year</en>
+  <fr>année</fr>
+  <de>Jahr</de>
+  <es>year</es>
+  <it>anno</it>
+  <ru>год</ru>
+</define-tag>
+
+<define-tag MSG_ABSTRACT whitespace=delete>
+  <en>abstract</en>
+  <fr>abstract</fr>
+  <de>Abstrakt</de>
+  <es>abstract</es>
+  <it>riasunto</it>
+  <ru>abstract</ru>
+</define-tag>
+
+<define-tag MSG_KEYWORD whitespace=delete>
+  <en>keyword</en>
+  <fr>mot clé</fr>
+  <de>Kennwort</de>
+  <es>keyword</es>
+  <it>parola chiave</it>
+  <ru>keyword</ru>
+</define-tag>
+
+<define-tag MSG_FULLTEXT whitespace=delete>
+  <en>fulltext</en>
+  <fr>fulltext</fr>
+  <de>Volltext</de>
+  <es>fulltext</es>
+  <it>testo completo</it>
+  <ru>fulltext</ru>
+</define-tag>
+
+<define-tag MSG_REFERENCE whitespace=delete>
+  <en>reference</en>
+  <fr>référence</fr>
+  <de>Referenz</de>
+  <es>reference</es>
+  <it>referenza</it>
+  <ru>reference</ru>
+</define-tag>
+
+<define-tag MSG_ALL_OF_THE_WORDS whitespace=delete>
+  <en>All of the words:</en>
+  <fr>Tous les mots:</fr>
+  <de>Alle Worte:</de>
+  <es>All of the words:</es>
+  <it>Tutte la parole:</it>
+  <ru>All of the words:</ru>
+</define-tag>
+
+<define-tag MSG_ANY_OF_THE_WORDS whitespace=delete>
+  <en>Any of the words:</en>
+  <fr>Au moins un des mots:</fr>
+  <de>Mindestens die Worte:</de>
+  <es>Any of the words:</es>
+  <it>Almeno una parola:</it>
+  <ru>Any of the words:</ru>
+</define-tag>
+
+<define-tag MSG_EXACT_PHRASE whitespace=delete>
+  <en>Exact phrase:</en>
+  <fr>Phrase exacte:</fr>
+  <de>Genaue Phrase:</de>
+  <es>Exact phrase:</es>
+  <it>Espressione esatta:</it>
+  <ru>Exact phrase:</ru>
+</define-tag>
+
+<define-tag MSG_PARTIAL_PHRASE whitespace=delete>
+  <en>Partial phrase:</en>
+  <fr>Phrase partielle:</fr>
+  <de>Partielle Phrase:</de>
+  <es>Partial phrase:</es>
+  <it>Espressione parziale:</it>
+  <ru>Partial phrase:</ru>
+</define-tag>
+
+<define-tag MSG_REGULAR_EXPRESSION whitespace=delete>
+  <en>Regular expression:</en>
+  <fr>Expression régulaire:</fr>
+  <de>Reguläres Ausdruck:</de>
+  <es>Regular expression:</es>
+  <it>Espressione regulare:</it>
+  <ru>Regular expression:</ru>
+</define-tag>
+
+<define-tag MSG_AND whitespace=delete>
+  <en>AND</en>
+  <fr>ET</fr>
+  <de>UND</de>
+  <es>AND</es>
+  <it>AND</it>
+  <ru>AND</ru>
+</define-tag>
+
+<define-tag MSG_OR whitespace=delete>
+  <en>OR</en>
+  <fr>OU</fr>
+  <de>ODER</de>
+  <es>OU</es>
+  <it>OR</it>
+  <ru>OR</ru>
+</define-tag>
+
+<define-tag MSG_AND_NOT whitespace=delete>
+  <en>AND NOT</en>
+  <fr>ET NON PAS</fr>
+  <de>UND NICHT</de>
+  <es>AND NOT</es>
+  <it>AND NOT</it>
+  <ru>AND NOT</ru>
+</define-tag>
+
+<define-tag MSG_SEARCH_RESULTS whitespace=delete>
+  <en>Search Results</en>
+  <fr>Résultats de recherche</fr>
+  <de>Suchergebnisse</de>
+  <es>Search Results</es>
+  <it>Risultato della ricerca</it>
+  <ru>Результаты Поиска</ru>
+</define-tag>
+
+<define-tag MSG_TRY_YOUR_SEARCH_ON whitespace=delete>
+  <en>Try your search on:</en>
+  <fr>Essaiez votre requête sur:</fr>
+  <de>Versuchen Sie Ihre Suche mit:</de>
+  <es>Try your search on:</es>
+  <it>Provate la ricerca su</it>
+  <ru>Испробуйте искать на:</ru>
+</define-tag>
+
+<define-tag MSG_SORT_BY whitespace=delete>
+  <en>Sort by:</en>
+  <fr>Trier par:</fr>
+  <de>Sortieren nach:</de>
+  <es>Sort by:</es>
+  <it>Selezione per:</it>
+  <ru>Сортировать по:</ru>
+</define-tag>
+
+<define-tag MSG_LATEST_FIRST whitespace=delete>
+  <en>latest first</en>
+  <fr>derniers en premier</fr>
+  <de>das Letzte zuerst</de>
+  <es>latest first</es>
+  <it>latest first</it>
+  <ru>XXX</ru>
+</define-tag>
+
+<define-tag MSG_ASCENDING whitespace=delete>
+  <en>asc.</en>
+  <fr>asc.</fr>
+  <de>aufw.</de>
+  <es>asc.</es>
+  <it>asc.</it>
+  <ru>XXX</ru>
+</define-tag>
+
+<define-tag MSG_DESCENDING whitespace=delete>
+  <en>desc.</en>
+  <fr>desc.</fr>
+  <de>abw.</de>
+  <es>desc.</es>
+  <it>desc.</it>
+  <ru>XXX</ru>
+</define-tag>
+
+<define-tag MSG_DISPLAY_RESULTS whitespace=delete>
+  <en>Display results</en>
+  <fr>Afficher:</fr>
+  <de>Ergebnisse darstellen:</de>
+  <es>Display results:</es>
+  <it>Visualizzare:</it>
+  <ru>XXX</ru>
+</define-tag>
+
+<define-tag MSG_RESULTS whitespace=delete>
+  <en>results</en>
+  <fr>résultats</fr>
+  <de>Ergebnisse</de>
+  <es>results</es>
+  <it>risultati</it>
+  <ru>XXX</ru>
+</define-tag>
+
+<define-tag MSG_SINGLE_LIST whitespace=delete>
+  <en>single list</en>
+  <fr>liste unique</fr>
+  <de>einzige Liste</de>
+  <es>single list</es>
+  <it>elenco unico</it>
+  <ru>XXX</ru>
+</define-tag>
+
+<define-tag MSG_SPLIT_BY_COLLECTION whitespace=delete>
+  <en>split by collection</en>
+  <fr>regroupés par collection</fr>
+  <de>vertailen in Kollektionen</de>
+  <es>split by collection</es>
+  <it>raggrupato per collezione</it>
+  <ru>XXX</ru>
+</define-tag>
+
+<define-tag MSG_OUTPUT_FORMAT whitespace=delete>
+  <en>Output format:</en>
+  <fr>Format de sortie:</fr>
+  <de>Darstellungsformat:</de>
+  <es>Output format:</es>
+  <it>Formato d'uscita</it>
+  <ru>XXX</ru>
+</define-tag>
+
+<define-tag MSG_BRIEF whitespace=delete>
+  <en>brief</en>
+  <fr>bref</fr>
+  <de>kurz</de>
+  <es>brief</es>
+  <it>corto</it>
+  <ru>XXX</ru>
+</define-tag>
+
+<define-tag MSG_DETAILED whitespace=delete>
+  <en>detailed</en>
+  <fr>détaillé</fr>
+  <de>detailliert</de>
+  <es>detailed</es>
+  <it>dettagliato</it>
+  <ru>XXX</ru>
+</define-tag>
+
+<define-tag MSG_DETAILED_RECORD whitespace=delete>
+  <en>Detailed record</en>
+  <fr>Notice détaillée</fr>
+  <de>Details vom Eintrag</de>
+  <es>Detailed record</es>
+  <it>Detailed record</it>
+  <ru>XXX</ru>
+</define-tag>
+
+<define-tag MSG_RESULTS_OVERVIEW_FOUND_X_RECORDS_IN_Y_SECONDS whitespace=delete>
+  <en>
+    <strong>Results overview:</strong> Found <strong>%s</strong> records in %.2f seconds.
+  </en>
+  <fr>
+    <strong>Vue d'ensemble sur des résultats:</strong> Trouvé <strong>%s</strong> notices en %.2f secondes.
+  </fr>
+  <de>
+    <strong>Übersicht von Ergebnissen:</strong> <strong>%s</strong> Datensätze wurden in %.2f Sekunden gefunden.
+  </de>
+  <es>
+    <strong>Results overview:</strong> Found <strong>%s</strong> records in %.2f seconds.
+  </es>
+  <it>
+    <strong>Results overview:</strong> Found <strong>%s</strong> records in %.2f seconds.
+  </it>
+  <ru>
+    <strong>Results overview:</strong> Found <strong>%s</strong> records in %.2f seconds.
+  </ru>
+</define-tag>
+
+<define-tag MSG_X_RECORDS_FOUND whitespace=delete>
+  <en><strong>%s</strong> records found</en>
+  <fr><strong>%s</strong> notices trouvées</fr>
+  <de><strong>%s</strong> Datensätze gefunden</de>
+  <es><strong>%s</strong> records found</es>
+  <it><strong>%s</strong> records found</it>
+  <ru><strong>%s</strong> records found</ru>
+</define-tag>
+
+<define-tag MSG_JUMP_TO_RECORD whitespace=delete>
+  <en>jump to record:</en>
+  <fr>allez sur la notice:</fr>
+  <de>gehen zum Satz:</de>
+  <es>jump to record:</es>
+  <it>andare al record:</it>
+  <ru>XXX</ru>
+</define-tag>
+
+<define-tag MSG_SEARCH_TOOK_X_SECONDS whitespace=delete>
+  <en>Search took %.2f seconds.</en>
+  <fr>La recherche a durée %.2f seconds.</fr>
+  <de>Die Suche hat %.2f Sekunden gedauert.</de>
+  <es>Search took %.2f seconds.</es>
+  <it>La ricerta ha preso %.2f secondi.</it>
+  <ru>Search took %.2f seconds.</ru>
+</define-tag>
+
+<define-tag MSG_ADD_TO_BASKET whitespace=delete>
+  <en>ADD TO BASKET</en>
+  <fr>AJOUTEZ DANS PANIER</fr>
+  <de>IN DEN KORB HINZUFÜGEN</de>
+  <es>ADD TO BASKET</es>
+  <it>AGGIUNGERE AL PANIERE</it>
+  <ru>XXX</ru>
+</define-tag>
+
+<define-tag MSG_COLLECTIONS whitespace=delete>
+  <en>collections</en>
+  <fr>collections</fr>
+  <de>Kollektionen</de>
+  <es>collections</es>
+  <it>collections</it>
+  <ru>XXX</ru>
+</define-tag>
+
+<define-tag MSG_ANY_COLLECTION whitespace=delete>
+  <en>any collection</en>
+  <fr>toutes les collections</fr>
+  <de>alle Kollektionen</de>
+  <es>any collection</es>
+  <it>any collection</it>
+  <ru>XXX</ru>
+</define-tag>
+
+<define-tag MSG_ADD_ANOTHER_COLLECTION whitespace=delete>
+  <en>add another collection</en>
+  <fr>ajouter une nouvelle collection</fr>
+  <de>Neue Kollektion hinzufügen</de>
+  <es>add another collection</es>
+  <it>add another collection</it>
+  <ru>XXX</ru>
+</define-tag>
+
+## end of file
