@@ -151,6 +151,19 @@
 <define-tag HTMLTOTEXT whitespace=delete>
 @HTMLTOTEXT@
 </define-tag>
+<define-tag CLISP whitespace=delete>
+@CLISP@
+</define-tag>
+<define-tag CMUCL whitespace=delete>
+@CMUCL@
+</define-tag>
+<define-tag SBCL whitespace=delete>
+@SBCL@
+</define-tag>
+<define-tag GNUPLOT whitespace=delete>
+@GNUPLOT@
+</define-tag>
+
 
 
 
