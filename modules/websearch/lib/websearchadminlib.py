@@ -38,7 +38,7 @@ import Numeric
 import os
 import urllib
 from zlib import compress,decompress
-from bibrankadminlib import get_current_name,get_name,get_rnk_nametypes,get_rnk_mainnametype,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
+from bibrankadminlib import modify_translations, get_current_name,get_name,get_rnk_nametypes,get_rnk_mainnametype,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
 from messages import *
 from dbquery import run_sql
 from config import *
@@ -59,10 +59,8 @@ def perform_modifytranslations(colID, ln=cdslang, sel_type='', trans=[], confirm
     output = ''
     subtitle = ''
     cdslangs = get_languages()
-    cdslangs.sort()
     if confirm in ["2", 2] and colID:
         finresult = modify_translations(colID, cdslangs, sel_type, trans, "collection")
-        
     col_dict = dict(get_current_name('', ln, get_col_mainnametype(), "collection"))
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
@@ -74,16 +72,14 @@ def perform_modifytranslations(colID, ln=cdslang, sel_type='', trans=[], confirm
             sel_type = get_col_mainnametype()
             
         header = ['Language', 'Translation']
-
         actions = []
-                        
-        text  = """
-        <span class="adminlabel">Name type</span>
-        <select name="sel_type" class="admin_w200">
-        """
-    
+                            
         types = get_col_nametypes()
         if len(types) > 1:
+            text  = """
+            <span class="adminlabel">Name type</span>
+            <select name="sel_type" class="admin_w200">
+            """
             for col in types:
                 key = col[0][0]
                 value = col[0][1]
@@ -104,7 +100,7 @@ def perform_modifytranslations(colID, ln=cdslang, sel_type='', trans=[], confirm
 
         if confirm in [-1, "-1", 0, "0"]:
             trans = []
-            for key, value in cdslangs:
+            for (key, value) in cdslangs:
                 try:
                     trans_names = get_name(colID, key, sel_type, "collection")
                     trans.append(trans_names[0][0])
@@ -142,14 +138,15 @@ def perform_modifytranslations(colID, ln=cdslang, sel_type='', trans=[], confirm
                 else:
                     output += """<b><span class="info">Sorry, could not modify translations for collection '%s'.</span></b>""" % (col_dict[colID])
                     
-        try:
-            body = [output, extra]
-        except NameError:
-            body = [output]
-        if callback:
-            return perform_editcollection(colID, ln, "perform_modifytranslations", addadminbox(subtitle, body))
-        else:
-            return addadminbox(subtitle, body)
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_editcollection(colID, ln, "perform_modifytranslations", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
 
 def perform_modifyrankmethods(colID, ln=cdslang, func='', rnkID='', confirm=0, callback='yes'):
     """Modify which rank methods is visible to the collection"""
@@ -185,21 +182,20 @@ def perform_modifyrankmethods(colID, ln=cdslang, func='', rnkID='', confirm=0, c
         else:
             for id, name in rnkmethods:
                 output += """%s, """ % name
-        output += """</dd>"""
-        output += """
+        output += """</dd>
         </dl>
         """
      
-        rnkmethods = get_current_name('',ln, get_rnk_mainnametype(), "rnkMETHOD")
-        rnkmethods2 = dict(get_col_rnk(colID, ln))
-        rnkmethods = filter(lambda x: not rnkmethods2.has_key(x[0]), rnkmethods)
-        if rnkmethods:
+        rnk_list = get_current_name('',ln, get_rnk_mainnametype(), "rnkMETHOD")
+        rnk_dict_in_col = dict(get_col_rnk(colID, ln))
+        rnk_list = filter(lambda x: not rnk_dict_in_col.has_key(x[0]), rnk_list)
+        if rnk_list:
             text  = """
             <span class="adminlabel">Enable:</span>
             <select name="rnkID" class="admin_w200">
             <option value="-1">- select rank method-</option>
             """
-            for id, name in rnkmethods:
+            for (id, name) in rnk_list:
                 text += """<option value="%s" %s>%s</option>""" % (id, (func in ["0", 0] and confirm in ["0", 0] and int(rnkID) == int(id)) and 'selected="selected"' or '' , name)
             text += """</select>"""
             output += createhiddenform(action="modifyrankmethods#9",
@@ -210,9 +206,8 @@ def perform_modifyrankmethods(colID, ln=cdslang, func='', rnkID='', confirm=0, c
                                        func=0,
                                        confirm=0)
 
-
         if confirm in ["0", 0] and func in ["0", 0] and int(rnkID) != -1:
-            text = "<b>Please confirm to enable rank method '%s' for the collection '%s'</b>" % (dict(rnkmethods)[int(rnkID)], col_dict[colID])
+            text = "<b>Please confirm to enable rank method '%s' for the collection '%s'</b>" % (dict(rnk_list)[int(rnkID)], col_dict[colID])
             output += createhiddenform(action="modifyrankmethods#9",
                                        text=text,
                                        button="Confirm",
@@ -227,16 +222,16 @@ def perform_modifyrankmethods(colID, ln=cdslang, func='', rnkID='', confirm=0, c
                 output += """<b><span class="info">Rank method '%s' enabled for collection '%s'</span></b>""" % (rnk_dict[int(rnkID)], col_dict[colID]) 
             else:
                 output += """<b><span class="info">Rank method '%s' could not be enabled for collection '%s'</span></b>""" % (rnk_dict[int(rnkID)], col_dict[colID])
-                
-        coll = get_col_rnk(colID, ln)
-        if coll:
+    
+        coll_list = get_col_rnk(colID, ln)
+        if coll_list:
             text  = """
             <span class="adminlabel">Disable:</span>
             <select name="rnkID" class="admin_w200">
             <option value="-1">- select rank method-</option>
             """
         
-            for id, name in coll:
+            for (id, name) in coll_list:
                 text += """<option value="%s" %s>%s</option>""" % (id, (func in ["1", 1] and confirm in ["0", 0] and int(rnkID) == int(id)) and 'selected="selected"' or '' , name)
             text += """</select>"""
             output += createhiddenform(action="modifyrankmethods#9",
@@ -1161,7 +1156,7 @@ def perform_showoutputformats(colID, ln=cdslang, callback='yes', content='', con
      <dt>Output format actions (not specific to the chosen collection)
      <dd><a href="addoutputformat?colID=%s&amp;ln=%s#10.1">Create new output format</a></dd>
      <dd><a href="deleteoutputformat?colID=%s&amp;ln=%s#10.3">Delete an unused output format</a></dd>
-     <dd><a href="modifyoutputformat?colID=%s&amp;ln=%s#10.4">Modify an output format</a></dd>
+     <dd><a href="modifyoutputformat?colID=%s&amp;ln=%s#10.4">Modify the translations of an output format</a></dd>
      <dt>Collection specific actions
      <dd><a href="addexistingoutputformat?colID=%s&amp;ln=%s#10.2">Add existing output format to collection</a></dd>
     </dl>
