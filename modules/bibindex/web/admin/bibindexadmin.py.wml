@@ -439,7 +439,7 @@ def error_page(req):
 def auth_failed(uid, navtrail_previous_links, message=""):
     return page(title='Authorization failure',
                 uid=uid,
-                body=bic.adderrorbox('Not logged in',
+                body=bic.adderrorbox('Reason:',
                                      datalist=[message]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)

@@ -102,7 +102,7 @@ def mustloginpage(req, message):
 
     return page(title='Authorization failure',
                 uid=getUid(req),
-                body=adderrorbox('Not logged in',
+                body=adderrorbox('Reason:',
                                  datalist=[message]),
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)                
