@@ -26,8 +26,8 @@ stem_if_avail = yes
 stem_query_language = <CDSLANG>
 table = rnkWORD01F
 stopword = <ETCDIR>/bibrank/stopwords.kb
-prefix = (
-postfix = )
+relevance_number_output_prologue = (
+relevance_number_output_epilogue = )
 #MARC tag,tag points, tag language
 tag1 = 6531_a, 1, <CDSLANG>
 tag2 = 695__a, 1, <CDSLANG>
