@@ -619,7 +619,25 @@ a.footer:hover {
    color: #000;
    background: #fff;
    font-size: x-small;
-;}
+}
+.adminbox {
+   color: #000;
+   background: #f1f1f1;
+   margin: 0px;
+   padding: 0px;
+   width: 120px;
+}
+.adminboxheader {
+   color: #000;
+   background: #f1f1f1;
+   font-size: x-small;
+   text-align: left;
+}
+.adminboxbody {
+   color: #000;
+   background: #f1f1f1;
+   font-size: x-small;
+}
 .formbutton {
    color: #fff;
    background: #36c;
