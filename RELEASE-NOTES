@@ -1,58 +1,40 @@
 --------------------------------------------------------------------
-CDSware News: CDSware v0.1.0 released
-December 4, 2003
+CDSware News: CDSware v0.1.1 released
+December 19, 2003
 http://cdsware.cern.ch/news/
 --------------------------------------------------------------------
 
-CDSware v0.1.0 was released on December 4th, 2003.
+CDSware v0.1.1 was released on December 19th, 2003.
 
 What's new:
   * development branch release
-  * search engine redesign to yield five times more search performance
-    for larger sites (WebSearch, BibWords)
-  * fulltext indexation of PDF, PostScript, MS Word, MS PowerPoint and
-    MS Excel files (WebSearch)
-  * integrated combined metadata/fulltext/citation search (WebSearch)
-  * multi-stage search guidance in cases of no exact match (WebSearch)
-  * OAI-PMH harvestor (BibHarvest)
-  * bibliographic task scheduler (BibSched)
-  * automatic daemon mode of the indexer, the formatter and the
-    collection cache generator (BibWords, BibFormat, WebSearch)
-  * user management and session handling rewrite (WebSession)
-  * user personalization, document baskets and notification alert
-    system (WebBasket, WebAlert)
-  * role-based access control engine (WebAccess)
-  * internationalization of the interface started (currently with
-    Czech, German, English, Spanish, French, Italian, Portuguese,
-    Russian, and Slovak support)
-  * web page design update (WebStyle)
-  * introduction of programmer-oriented technical documentation corner
-    (WebHelp)
-  * source tree reorganization, mod_python technology adopted for most
-    of the modules
-
+  * access control engine now used by BibWords, BibFormat (admin and
+    bibreformat), WebSearch (webcoll), and BibTaskEx
+  * access control engine admin guide started (WebAccess)
+  * search engine support for sorting by more than one field (WebSearch)
+  * more internationalization of the search engine messages (WebSearch)
+  * new language: Norwegian (bokmål) 
+  * simple example for converting BibTeX into XML MARC (BibConvert)
+  * new optional --with-python configuration option
+  * Python module detection during configure 
+  * bugfixes: os.tempnam() warning, login page referer, and others
+  
 Download:
-   <http://cdsware.cern.ch/download/cdsware-0.1.0.tar.gz>
+   http://cdsware.cern.ch/download/cdsware-0.1.1.tar.gz
 
-Notes:
-   This is a development branch release.  It is not meant to replace
-   CDSware 0.0.9.  Users of 0.0.9 are advised to wait for the next
-   stable release.  Users of 0.0.9+ are advised to upgrade to 0.1.0.
+Notes: 
+   This is a development branch release.  Users of 0.0.9 are advised
+   to wait for the next stable release.  Users of 0.1.0 may upgrade to
+   0.1.1 if the above features are important to them.
 
-   As of this release we are adopting the classical stable/development
-   branch version numbering scheme spread in the GNU/Linux world and
-   elsewhere, with even minor versions denoting stable branch releases
-   and odd minor versions denoting development releases.  For more
-   details, see <http://cdsware.cern.ch:8000/hacking/releases.html>.
-
-Known problems:
+Known problems: 
    WebSubmit is not working properly yet.  Several admin-level
    functionality of 0.0.9 is missing in 0.1.0 yet.  The task scheduler
-   and RBAC authentication engines are functional but not yet called
-   by all the clients.  These issues will be subsequently dealt with
-   in the next releases of the 0.1.x development branch.
+   is functional but not yet fully tested.  These issues will be
+   subsequently dealt with in the next releases of the 0.1.x
+   development branch.
 
-What's next:
+What's next: 
    Fixing known problems described above.  Stabilizing the 0.1.x tree.
    Continuing with the internationalization of the interface.
    Introducing BibIndex for better phrase indexing and browsing.
