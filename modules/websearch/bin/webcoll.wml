@@ -235,8 +235,8 @@ def print_record(recID, format='hb', ln=cdslang):
             out += """<br><small class="note"><a class="note" href="%s">%s</a></small>""" % (urls_u[idx], urls_u[idx])
 
     # at the end of HTML mode, print "Detailed record" and "Mark record" functions:
-    out +=  """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">%s</a>""" \
-           % (weburl, recID, msg_detailed_record[ln])
+    out +=  """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s&amp;ln=%s">%s</a>""" \
+           % (weburl, recID, ln, msg_detailed_record[ln])
     #out += """<- <input name="mark[]" type="checkbox" value="%s"> Mark record""" % recID
     out += "</span>"
     return out
