@@ -18,6 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 noinst_SCRIPTS=configbis.wml
+wmlincludedir = $(libdir)/wml/cdsware
+wmlinclude_DATA = cdsnavbar.wml cdsnavtrail.wml cdspage.wml config.wml configbis.wml
 
 EXTRA_DIST = cdsnavbar.wml cdsnavtrail.wml cdspage.wml config.wml configbis.wml.in
 
