@@ -402,9 +402,8 @@ class BibDoc:
         return len(self.files)
 
     def registerDownload(self,addressIp,version,format,userid=0):
-        ipp = "INET_ATON('%s');" % addressIp
-        return run_sql("insert into rnkDOWNLOADS (date,recid,docid,userIp,noVersion,file_Format) values(NOW(),%s,%s,%s,%s,%s)",
-                       (self.recid,self.id,ipp,version,string.upper(format),))
+        return run_sql("INSERT INTO rnkDOWNLOADS (id_bibrec,id_bibdoc,file_version,file_format,id_user,client_host,download_time) VALUES (%s,%s,%s,%s,%s,INET_ATON(%s),NOW())",
+                       (self.recid,self.id,version,string.upper(format),userid,addressIp,))
 class BibDocFile:
     """this class represents a physical file in the CDSware filesystem"""
     
