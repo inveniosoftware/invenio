@@ -49,6 +49,7 @@ INSERT INTO field VALUES (10,'collection','collection');
 INSERT INTO field VALUES (11,'division','division');
 INSERT INTO field VALUES (12,'year','year');
 INSERT INTO field VALUES (13,'experiment','experiment');
+INSERT INTO field VALUES (14,'record ID','recid');
 
 INSERT INTO field_tag VALUES (1,100,10);
 INSERT INTO field_tag VALUES (1,101,10);
@@ -166,6 +167,7 @@ INSERT INTO field_tag VALUES (7,12,100);
 INSERT INTO field_tag VALUES (7,13,90);
 INSERT INTO field_tag VALUES (8,10,100);
 INSERT INTO field_tag VALUES (9,115,100);
+INSERT INTO field_tag VALUES (14,117,100);
 
 INSERT INTO format VALUES (1,'HTML brief','hb');
 INSERT INTO format VALUES (2,'HTML detailed','hd');
@@ -291,6 +293,7 @@ INSERT INTO tag VALUES (113,'97x','97%');
 INSERT INTO tag VALUES (114,'98x','98%');
 INSERT INTO tag VALUES (115,'url','8564_u');
 INSERT INTO tag VALUES (116,'experiment','909C0e');
+INSERT INTO tag VALUES (117,'record ID','001');
 
 INSERT INTO idxINDEX VALUES (1,'global','This index contains words/phrases from global fields.','0000-00-00 00:00:00');
 INSERT INTO idxINDEX VALUES (2,'collection','This index contains words/phrases from collection identifiers fields.','0000-00-00 00:00:00');
