@@ -280,7 +280,7 @@
 
 <define-tag MSG_FOCUS_ON whitespace=delete>
   <en>Focus on:</en>
-  <fr>Focalizer sur:</fr>
+  <fr>Focaliser sur:</fr>
   <de>Hinweis auf:</de>
   <es>Enfocado a:</es>
   <pt>Ênfase em:</pt>
@@ -1146,6 +1146,21 @@
   <cz>Nápověda pro přidávání</cz>
   <no>Innsendingshjelp</no>
   <se>Hjälp med publicering</se>
+</define-tag>
+
+# FIXME
+<define-tag MSG_ADMINISTRATION whitespace=delete>
+  <en>administration</en>
+  <fr>administration</fr>
+  <de>Verwaltung</de> 
+  <es>administración</es> 
+  <pt>administração</pt>
+  <it>amministrazione</it> 
+  <ru>администрация</ru>
+  <sk>administrácia</sk>
+  <cz>administrace</cz>
+  <no>administrasjon</no>
+  <se>administration</se>
 </define-tag>
 
 <define-tag MSG_ADMIN_AREA whitespace=delete>
