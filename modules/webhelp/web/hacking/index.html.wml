@@ -36,11 +36,15 @@ href="<WEBURL>/admin/">admin-level</a> documentation as well.  And now, back to 
 <dt><a href="concepts.html">Common Concepts</a>
 <dd>Summarizing common terms you will encounter here and there.
 
-<dt><a href="modules.html">Modules Overview</a>
-<dd>Presenting a summary of various CDSware modules and their relationships.
-
 <dt><a href="style.html">Coding Style</a>
 <dd>A policy we try to follow, for good or bad.
+
+<dt><a href="directory.html">Directory Organization</a>
+<dd>How the source and target directories are organized, where the
+sources get installed to, what is the visible URL policy, etc.
+
+<dt><a href="modules.html">Modules Overview</a>
+<dd>Presenting a summary of various CDSware modules and their relationships.
 
 </dl>
 </blockquote>
@@ -50,12 +54,12 @@ href="<WEBURL>/admin/">admin-level</a> documentation as well.  And now, back to 
 <blockquote>
 <dl>
 
-<dt><a href="<WEBURL>/help/search/internals.html">Search Internals</a>
+<dt><a href="websearch/index.html">WebSearch Internals</a>
 <dd>Describes information useful to understand the search process
 internals, like the different search stages, the high- and low-level
 API, etc.
 
-<dt><a href="<WEBURL>/help/webaccess/internals.html">WebAccess Internals</a>
+<dt><a href="webaccess/index.html">WebAccess Internals</a>
 <dd>Describes information useful to understand the access control process
 internals, its API, etc.
 

@@ -19,7 +19,7 @@
 
 docdir = $(WEBDIR)/hacking
 
-doc_DATA=index.html modules.html style.html concepts.html cdsware.el
+doc_DATA=index.html modules.html style.html concepts.html directory.html cdsware.el
 
 EXTRA_DIST = $(wildcard *.wml) $(wildcard *.el)
 
