@@ -442,6 +442,18 @@ cds.support@cern.ch
 oai
 </define-tag>
 
+## OAIIDTAG -- OAI identifier tag:  
+##  (example: "0248_a")
+<define-tag OAIIDSCHEME whitespace=delete>
+0248_a
+</define-tag>
+
+## OAISETTAG -- OAI set tag:  
+##  (example: "0248_p")
+<define-tag OAIIDSCHEME whitespace=delete>
+0248_p
+</define-tag>
+
 ## OAIIDPREFIX -- OAI identifier prefix:  
 ##  (example: "cds.cern.ch")
 <define-tag OAIIDPREFIX whitespace=delete>
