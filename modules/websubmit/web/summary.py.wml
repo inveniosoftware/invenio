@@ -35,7 +35,6 @@ import string
 import os
 import sys
 import time
-import MySQLdb
 
 sys.path.append('%s' % pylibdir)
 from cdsware.config import *
