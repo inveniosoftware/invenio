@@ -161,6 +161,21 @@ of values that correspond to each other:
 <BR>KB(file,0) searches the KB code inside the value passed.
 <BR>KB(file,2) as 0 but not case sensitive
 <BR>KB(file,R) replacements are applied on substrings/characters only.
+<BR/>
+<BR/>    bibconvert look-up value in KB_file in one of following modes:
+<BR/>    ===========================================================
+<BR/>    1                           - case sensitive     / match  (default)
+<BR/>    2                           - not case sensitive / search
+<BR/>    3                           - case sensitive     / search
+<BR/>    4                           - not case sensitive / match
+<BR/>    5                           - case sensitive     / search (in KB)
+<BR/>    6                           - not case sensitive / search (in KB)
+<BR/>    7                           - case sensitive     / search (reciprocal)
+<BR/>    8                           - not case sensitive / search (reciprocal)
+<BR/>    9                           - replace by _DEFAULT_ only
+<BR/>    R                           - not case sensitive / search (reciprocal)  replace
+<BR/> 						
+<BR/> 
 <P>Edge spaces are not considered.
 Output value is not further formated.</BLOCKQUOTE>
 
