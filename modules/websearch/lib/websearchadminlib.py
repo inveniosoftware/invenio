@@ -1286,7 +1286,7 @@ def perform_rearrangefieldvalue(colID, fldID, ln, callback='yes', confirm=-1):
     fldID - the field to rearrange the fieldvalue for
     """
  
-    subtitle = "Rearranging values by name"
+    subtitle = "Order values alphabetically"
     output  = ""
     col_fldv = get_col_fld(colID, 'seo', fldID)
     col_fldv = dict(map(lambda x: (x[1], x[0]), col_fldv))
@@ -1300,7 +1300,7 @@ def perform_rearrangefieldvalue(colID, fldID, ln, callback='yes', confirm=-1):
                 vscore -= 1
         output += write_outcome((1, ""))
     else:
-        output += write_outcome((0, (0, "No values to rearrange")))
+        output += write_outcome((0, (0, "No values to order")))
 
     try:
         body = [output, extra]
@@ -1315,7 +1315,7 @@ def perform_rearrangefield(colID, ln, fmeth, callback='yes', confirm=-1):
     colID - the collection
     """
  
-    subtitle = "Rearranging fields by name"
+    subtitle = "Order values alphabetically"
     output  = ""
     col_fld = dict(map(lambda x: (x[0], x[1]), get_col_fld(colID, fmeth)))
     fld_names =  get_def_name('', "field")
@@ -1328,7 +1328,7 @@ def perform_rearrangefield(colID, ln, fmeth, callback='yes', confirm=-1):
                 score -= 1
         output += write_outcome((1, ""))
     else:
-        output += write_outcome((0, (0, "No fields to rearrange")))
+        output += write_outcome((0, (0, "No fields to order")))
         
     try:
         body = [output, extra]
@@ -1475,7 +1475,7 @@ def perform_showsortoptions(colID, ln, callback='yes', content='', confirm=-1):
      <dd>Go to the BibIndex interface to modify the available sort options</dd>
      <dt>Collection specific actions
      <dd><a href="addexistingfield?colID=%s&amp;ln=%s&amp;fmeth=soo#8.2">Add sort option to collection</a></dd>
-     <dd><a href="rearrangefield?colID=%s&amp;ln=%s&amp;fmeth=soo#8.2">Rearrange sort options by name</a></dd>
+     <dd><a href="rearrangefield?colID=%s&amp;ln=%s&amp;fmeth=soo#8.2">Order sort options alphabetically</a></dd>
     </dl>
     """  % (colID, ln, colID, ln)
 
@@ -1538,7 +1538,7 @@ def perform_showsearchfields(colID, ln, callback='yes', content='', confirm=-1):
      <dd>Go to the BibIndex interface to modify the available search fields</dd>
      <dt>Collection specific actions
      <dd><a href="addexistingfield?colID=%s&amp;ln=%s&amp;fmeth=sew#6.2">Add search field to collection</a></dd>
-     <dd><a href="rearrangefield?colID=%s&amp;ln=%s&amp;fmeth=sew#6.2">Rearrange search fields by name</a></dd>
+     <dd><a href="rearrangefield?colID=%s&amp;ln=%s&amp;fmeth=sew#6.2">Ordersearch fields alphabetically</a></dd>
     </dl>
     """  % (colID, ln, colID, ln)
 
@@ -1601,7 +1601,7 @@ def perform_showsearchoptions(colID, ln, callback='yes', content='', confirm=-1)
      <dd>Go to the BibIndex interface to modify the available search options</dd>
      <dt>Collection specific actions
      <dd><a href="addexistingfield?colID=%s&amp;ln=%s&amp;fmeth=seo#7.2">Add search option to collection</a></dd>
-     <dd><a href="rearrangefield?colID=%s&amp;ln=%s&amp;fmeth=seo#7.2">Rearrange search options by name</a></dd>
+     <dd><a href="rearrangefield?colID=%s&amp;ln=%s&amp;fmeth=seo#7.2">Order search options alphabetically</a></dd>
     </dl>
     """  % (colID, ln, colID, ln)
 
@@ -1665,7 +1665,7 @@ def perform_modifyfield(colID, fldID, fldvID='', ln=cdslang, content='',callback
      <dt>Value specific actions
      <dd><a href="addexistingfieldvalue?colID=%s&amp;ln=%s&amp;fldID=%s#7.4">Add existing value to search option</a></dd>
      <dd><a href="addnewfieldvalue?colID=%s&amp;ln=%s&amp;fldID=%s#7.4">Add new value to search option</a></dd>
-     <dd><a href="rearrangefieldvalue?colID=%s&amp;ln=%s&amp;fldID=%s#7.4">Rearrange values by name</a></dd>
+     <dd><a href="rearrangefieldvalue?colID=%s&amp;ln=%s&amp;fldID=%s#7.4">Order values alphabetically</a></dd>
     </dl>
     """  % (colID, ln, fldID, colID, ln, fldID, colID, ln, fldID)
     header = ['', 'Value name', 'Actions']
