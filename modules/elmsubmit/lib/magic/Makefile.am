@@ -21,7 +21,7 @@ pylibdir = $(libdir)/python/cdsware/magic
 pylib_DATA =  __init__.py compile_magic.py magic.ext magic.ext.mgc
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) magic.ext magic.ext.mgc
 
 CLEANFILES = *.py *~ *.tmp *.pyc
 
