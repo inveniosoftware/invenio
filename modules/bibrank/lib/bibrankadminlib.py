@@ -13,7 +13,7 @@
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
-## You should have received a copy of the GNU General Public License
+## Youshould have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
@@ -62,8 +62,8 @@ def is_adminuser(uid, role):
 def perform_index(ln=cdslang):
     """create the bibrank main area menu page."""
     
-    header = ['Name', 'Translations', 'Collections', 'Rank method']
-    rnk_list = get_current_name('', ln, get_rnk_nametypes()[0][0], "rnkMETHOD")
+    header = ['Code', 'Translations', 'Collections', 'Rank method']
+    rnk_list = get_def_name('', "rnkMETHOD")
     actions = []
     
     for (rnkID, name) in rnk_list:
@@ -92,7 +92,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
     subtitle = ""
 
     if rnkID:
-        rnkNAME = get_current_name(rnkID, ln, get_rnk_nametypes()[0][0], "rnkMETHOD")[0][1]
+        rnkNAME = get_def_name(rnkID, "rnkMETHOD")[0][1]
 
         if func in ["0", 0] and confirm in ["1", 1]:
                 finresult = attach_col_rnk(rnkID, colID)
@@ -100,7 +100,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
                 finresult = detach_col_rnk(rnkID, colID)
 
         if colID:
-            colNAME = get_current_name(colID, ln, get_col_nametypes()[0][0], "collection")[0][1]
+            colNAME = get_def_name(colID, "collection")[0][1]
         subtitle = """Step 1 - Select collection to enable/disable rank method '%s' for""" % rnkNAME
         output  = """
         <dl>
@@ -117,7 +117,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
         </dl>
         """
                         
-        col_list = get_current_name('', ln, get_col_nametypes()[0][0], "collection")
+        col_list = get_def_name('', "collection")
         col_rnk = dict(get_rnk_col(rnkID))
         col_list = filter(lambda x: not col_rnk.has_key(x[0]), col_list)
 
@@ -214,10 +214,11 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
     if confirm in ["2", 2] and rnkID:
         finresult = modify_translations(rnkID, cdslangs, sel_type, trans, "rnkMETHOD")
         
-    rnk_dict = dict(get_current_name('', ln, get_rnk_nametypes()[0][0], "rnkMETHOD"))
+    rnk_name = get_def_name(rnkID, "rnkMETHOD")[0][1]
+    rnk_dict = dict(get_i8n_name('', ln, get_rnk_nametypes()[0][0], "rnkMETHOD"))
     if rnkID and rnk_dict.has_key(int(rnkID)):
         rnkID = int(rnkID)
-        subtitle = """<a name="3">3. Modify translations for rank method '%s'</a>""" % rnk_dict[rnkID]
+        subtitle = """<a name="3">3. Modify translations for rank method '%s'</a>""" % rnk_name
         
         if type(trans) is str:
             trans = [trans]
@@ -286,9 +287,9 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
 
             elif confirm in ["2", 2]:
                 if finresult:
-                    output += """<b><span class="info">Translations modified for rank method '%s'.</span></b>""" % (rnk_dict[rnkID])
+                    output += """<b><span class="info">Translations modified for rank method.</span></b>"""
                 else:
-                    output += """<b><span class="info">Sorry, could not modify translations for rank method '%s'.</span></b>""" % (rnk_dict[rnkID])
+                    output += """<b><span class="info">Sorry, could not modify translations for rank method.</span></b>"""
                     
     try:
         body = [output, extra]
@@ -427,30 +428,13 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
                                rnkID=rnkID,
                                button="Modify",
                                confirm=1)
-
-    text = ""
-    if rnkcode and confirm in ["0", 0] and get_rnk_code(rnkID)[0][0] != rnkcode:
-            subtitle = 'Step 2 - Confirm modification of configuration'
-            text += "<b>Modify rank method '%s' with old code '%s' and set new code '%s'.</b>" % (get_current_name(rnkID, ln, get_rnk_nametypes()[0][0], "rnkMETHOD")[0][0], get_rnk_code(rnkID)[0][0], rnkcode)         
-    if cfgfile and confirm in ["0", 0]:
-            subtitle = 'Step 2 - Confirm modification of configuration'
-            text += "<br><b>Modify configuration file</b>"
             
-    if (rnkcode or cfgfile) and confirm in ["0", 0] and not template:
-        output += createhiddenform(action="modifyrank",
-                                   text=text,
-                                   rnkID=rnkID,
-                                   rnkcode=rnkcode,
-                                   cfgfile=cfgfile,
-                                   button="Confirm",
-                                   confirm=1)
-
     if rnkcode and confirm in ["1", 1] and get_rnk_code(rnkID)[0][0] != rnkcode:
         oldcode = get_rnk_code(rnkID)[0][0]
         result = modify_rnk(rnkID, rnkcode)
         subtitle = "Step 3 - Result"
         if result:
-            text = """<b><span class="info">Rank method '%s' modified, new code is '%s'.</span></b>""" % (get_current_name(rnkID, ln, get_rnk_nametypes()[0][0], "rnkMETHOD")[0][0], rnkcode)
+            text = """<b><span class="info">Rank method modified.</span></b>"""
             try:
                 file =  open("%s/bibrank/%s.cfg" % (etcdir, oldcode), 'r')
                 file2 =  open("%s/bibrank/%s.cfg" % (etcdir, rnkcode), 'w')
@@ -531,7 +515,7 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
     
     if rnkID:
         if confirm in ["0", 0]:
-            rnkNAME = get_current_name(rnkID, ln, get_rnk_nametypes()[0][0], "rnkMETHOD")[0][1]
+            rnkNAME = get_def_name(rnkID, "rnkMETHOD")[0][1]
             subtitle = 'Step 1 - Confirm deletion'
             text = """Delete rank method '%s'.""" % (rnkNAME)
             output += createhiddenform(action="deleterank",
@@ -541,19 +525,19 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
                                       confirm=1)
         elif confirm in ["1", 1]:
             try:
-                rnkNAME = get_current_name(rnkID, ln, get_rnk_nametypes()[0][0], "rnkMETHOD")[0][1]
+                rnkNAME = get_def_name(rnkID, "rnkMETHOD")[0][1]
                 rnkcode = get_rnk_code(rnkID)[0][0]
                 result = delete_rnk(rnkID)
                 subtitle = "Step 2 - Result"
                 if result:
-                    text = """<b><span class="info">Rank method '%s' deleted</span></b>""" % rnkNAME
+                    text = """<b><span class="info">Rank method deleted</span></b>"""
                     try:
                         os.remove("%s/bibrank/%s.cfg" % (etcdir, rnkcode))
                         text += """<br><b><span class="info">Configuration file deleted: '%s/bibrank/%s.cfg'.</span></b>"""  % (etcdir, rnkcode)
                     except StandardError, e:
                         text += """<br><b><span class="info">Sorry, could not delete configuration file: '%s/bibrank/%s.cfg'.</span><br>Please delete the file manually.</span></b>""" % (etcdir, rnkcode)
                 else:
-                    text = """<b><span class="info">Sorry, could not delete rank method '%s'</span></b>""" % rnkNAME
+                    text = """<b><span class="info">Sorry, could not delete rank method</span></b>"""
             except StandardError, e:
                 text = """<b><span class="info">Sorry, could not delete rank method, most likely already deleted</span></b>"""
             output = text
@@ -704,7 +688,7 @@ def get_rnk_col(rnkID, ln=cdslang):
     
     try:
         res1 = dict(run_sql("SELECT id_collection, '' FROM collection_rnkMETHOD WHERE id_rnkMETHOD=%s" % rnkID))
-        res2 = get_current_name('',ln, get_col_nametypes()[0][0], "collection")
+        res2 = get_def_name('', "collection")
         result = filter(lambda x: res1.has_key(x[0]), res2)
         return result
     except StandardError, e:
@@ -1016,7 +1000,26 @@ def get_languages():
     languages.sort()
     return languages
 
-def get_current_name(ID, ln, rtype, table):
+def get_def_name(ID, table):
+    """Returns a list of the names, either with the name in the current language, the default language, or just the name from the given table
+    ln - a language supported by cdsware
+    type - the type of value wanted, like 'ln', 'sn'"""
+
+    name = "name"
+    if table == "rnkMETHOD":
+        name = "NAME"
+    try:
+        if ID:
+            res = run_sql("SELECT id,name FROM %s where id=%s" % (table, ID))
+        else:
+            res = run_sql("SELECT id,name FROM %s" % table)
+        res = list(res)
+	res.sort(compare_on_val) 
+        return res
+    except StandardError, e:
+        return []
+        
+def get_i8n_name(ID, ln, rtype, table):
     """Returns a list of the names, either with the name in the current language, the default language, or just the name from the given table
     ln - a language supported by cdsware
     type - the type of value wanted, like 'ln', 'sn'"""
