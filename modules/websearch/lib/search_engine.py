@@ -2953,7 +2953,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             try:
                 results_in_any_collection = search_pattern(req, p1, f1, m1, ap=ap, of=of, verbose=verbose, ln=ln)
                 if results_in_any_collection._nbhits == 0:                
-                    return page_end(req, of)                
+                    return page_end(req, of, ln)                
                 if p2:
                     results_tmp = search_pattern(req, p2, f2, m2, ap=ap, of=of, verbose=verbose, ln=ln)
                     if op1 == "a": # add
@@ -2967,7 +2967,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                             print_warning(req, "Invalid set operation %s." % op1, "Error")
                     results_in_any_collection.calculate_nbhits()
                     if results_in_any_collection._nbhits == 0:                
-                        return page_end(req, of)                
+                        return page_end(req, of, ln)                
                 if p3:
                     results_tmp = search_pattern(req, p3, f3, m3, ap=ap, of=of, verbose=verbose, ln=ln)
                     if op2 == "a": # add
@@ -2983,7 +2983,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
-                return page_end(req, of)                            
+                return page_end(req, of, ln)                            
         else:
             ## 3B - simple search
             try:
@@ -2991,10 +2991,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
-                return page_end(req, of)
+                return page_end(req, of, ln)
 
         if results_in_any_collection._nbhits == 0:                
-            return page_end(req, of)
+            return page_end(req, of, ln)
                 
 #             search_cache_key = p+"@"+f+"@"+string.join(colls_to_search,",")
 #             if search_cache.has_key(search_cache_key): # is the result in search cache?
@@ -3011,10 +3011,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         except:
             if of.startswith("h"):
                 req.write(create_error_box(req, verbose=verbose, ln=ln))
-            return page_end(req, of)
+            return page_end(req, of, ln)
         
         if results_final == {}:
-            return page_end(req, of)
+            return page_end(req, of, ln)
         
         # search stage 5: apply search option limits and restrictions:
         if day1 != "":
@@ -3027,9 +3027,9 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
-                return page_end(req, of)                            
+                return page_end(req, of, ln)                            
             if results_final == {}:
-                return page_end(req, of)
+                return page_end(req, of, ln)
 
         if pl:
             try:
@@ -3041,9 +3041,9 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
-                return page_end(req, of)                            
+                return page_end(req, of, ln)                            
             if results_final == {}:
-                return page_end(req, of)
+                return page_end(req, of, ln)
 
         t2 = os.times()[4]
         cpu_time = t2 - t1
