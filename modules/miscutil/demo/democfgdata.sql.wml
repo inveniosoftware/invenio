@@ -430,11 +430,6 @@ INSERT INTO collection_format VALUES (1,3,80);
 INSERT INTO collection_format VALUES (1,4,70);
 INSERT INTO collection_format VALUES (1,5,60);
 
-INSERT INTO rnkMETHOD (id,name,last_updated,star_category_ranges) VALUES (1,'jif','0000-00-00 00:00:00',NULL);
-INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (6,1,100);
-INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,1,100);
-INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,1,100);
-
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,1,'en','rt',100);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,2,'en','rt',90);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (6,3,'en','rt',100);
@@ -1034,3 +1029,6 @@ INSERT INTO sbmPARAMETERS VALUES ('RTEXT','type','fulltext');
 INSERT INTO sbmPARAMETERS VALUES ('TEXT','type','fulltext');
 INSERT INTO sbmPARAMETERS VALUES ('PICT','type','picture');
 INSERT INTO sbmPARAMETERS VALUES ('RPICT','type','picture');
+
+INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (2,'demo_jif','0000-00-00 00:00:00');
+INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,2,90);
