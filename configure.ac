@@ -383,8 +383,8 @@ AC_OUTPUT(Makefile \
 	  htdocs/submit/MESS/Makefile \
 	  htdocs/submit/MESS/functions/Makefile \
 	  htdocs/submit/mycds/Makefile \
-	  htdocs/submit/bibformat/Makefile \
-	  htdocs/submit/bibformat/config/Makefile \
+	  htdocs/submit/bibconvert/Makefile \
+	  htdocs/submit/bibconvert/config/Makefile \
 	  htdocs/submit/publiline/Makefile \
 	  htdocs/submit/publiline/inotes/Makefile \
 	  htdocs/personalize/Makefile \
