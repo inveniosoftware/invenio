@@ -80,6 +80,7 @@ def getUid (req):
 
        getUid(req) -> userId	 
     """
+
     guest = 0
     sm = session.MPSessionManager(pSession, pSessionMapping())
     try:
@@ -90,6 +91,7 @@ def getUid (req):
     userId = s.getUid()
     if userId == -1: # first time, so create a guest user
         s.setUid(createGuestUser())
+        userId = s.getUid()
         guest = 1
     sm.maintain_session(req,s)
     
