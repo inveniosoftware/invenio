@@ -137,7 +137,7 @@ except:
     pass
 
 ## safety parameters concerning MySQL thread-multiplication problem:
-cfg_check_mysql_threads = 1 # to check or not to check the problem? 
+cfg_check_mysql_threads = 0 # to check or not to check the problem? 
 cfg_max_mysql_threads = 60 # how many threads (connections) we consider as still safe
 cfg_mysql_thread_timeout = 40 # we'll kill threads that were sleeping for more than X seconds
 
@@ -950,7 +950,12 @@ class WordTable:
                 i_high = min(i_low+chunksize-chunksize_count-1, i_high)
                 try:
                     self.chk_recID_range(i_low, i_high)
-                except StandardError:
+                except StandardError, e:
+                    write_message("Exception caught: %s" % e, sys.stderr)
+                    if opts_dict["verbose"] >= 9:        
+                        traceback.print_tb(sys.exc_info()[2])
+                    task_update_status("ERROR")
+                    task_sig_stop_commands()
                     sys.exit(1)
                 if opts_dict["verbose"]:
                     write_message("%s adding records #%d-#%d started" % \
@@ -1243,8 +1248,13 @@ class WordTable:
 
                 try:
                     self.fix_recID_range(i_low, i_high)
-                except StandardError:
-                    sys.exit(1)                            
+                except StandardError, e:
+                    write_message("Exception caught: %s" % e, sys.stderr)
+                    if opts_dict["verbose"] >= 9:        
+                        traceback.print_tb(sys.exc_info()[2])
+                    task_update_status("ERROR")
+                    task_sig_stop_commands()
+                    sys.exit(1)
 
                 flush_count = flush_count + i_high - i_low + 1
                 chunksize_count = chunksize_count + i_high - i_low + 1
@@ -1432,7 +1442,8 @@ def task_run(row):
 
         except StandardError, e:
             write_message("Exception caught: %s" % e, sys.stderr)
-            traceback.print_tb(sys.exc_info()[2])
+            if opts_dict["verbose"] >= 9:        
+                traceback.print_tb(sys.exc_info()[2])
             task_update_status("ERROR")
             task_sig_stop_commands()
             sys.exit(1)
@@ -1659,8 +1670,8 @@ def main():
                 write_message("Error occurred.  Exiting.", sys.stderr)
         except StandardError, e:
             write_message("Unexpected error occurred: %s." % e, sys.stderr)
-            write_message("Traceback is:")
-            traceback.print_tb(sys.exc_info()[2])
+            if opts_dict["verbose"] >= 9:        
+                traceback.print_tb(sys.exc_info()[2])
             write_message("Exiting.")
             task_update_status("ERROR")                                               
     else:
