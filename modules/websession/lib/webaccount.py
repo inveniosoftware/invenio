@@ -312,12 +312,6 @@ def create_login_page_box(referer=''):
             logmethtext = """%s<input type="hidden" name="login_method" value="%s">""" % (system, system)
     text += """
               <table>
-	       <tr>
-		 <td align=right><strong>Login via:</strong>		
-		</td>
-		<td align=left>%s
-		 </td>
-               </tr>
               <tr>
 		 <td align=right><input type="hidden" name="referer" value="%s"><strong>Username:</strong>
 		 </td>
@@ -333,7 +327,7 @@ def create_login_page_box(referer=''):
 		 </td>
                 </tr>
                 <tr>
-		 <td></td><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>""" % (logmethtext, cgi.escape(referer))
+		 <td></td><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>""" % (cgi.escape(referer))
     if internal:
         text += """&nbsp;&nbsp;&nbsp;(<a href="./lost">Lost your password?</a>)"""
     text += """
