@@ -21,9 +21,9 @@ docdir = $(WEBDIR)/hacking
 
 doc_DATA=index.html modules.html style.html concepts.html cdsware.el
 
-EXTRA_DIST = $(wildcard *.wml)
+EXTRA_DIST = $(wildcard *.wml) $(wildcard *.el)
 
-CLEANFILES = $(doc_DATA) *~ *.tmp
+CLEANFILES = $(wildcard *.shtml) *~ *.tmp
 
 %.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml
 	$(WML) -o $@ $<
