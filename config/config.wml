@@ -171,8 +171,8 @@ oai:mpg:identifier
 ##  (example: "")
 <define-tag CDSPAGEHEADER>
 <center>
- <span class=address>The <CDSNAME> website is in active development.  
- Some of its functionalities may not work fully yet.</span>
+ <span class=address><small>The <CDSNAME> website is in active development.  
+ Some of its functionalities may not work fully yet.</small></span>
 </center>
 </define-tag>
 
@@ -221,16 +221,16 @@ oai:mpg:identifier
   <a class=note href="<HTDOCSURL>docs/">Sitemap</a>.
   </td>
   <td align=right class="address">
-  URL: <? echo "&lt;http://" . $HTTP_HOST . $PHP_SELF . "&gt;."?>
+  URL: <? echo "http://" . $HTTP_HOST . $PHP_SELF ?>
   </td>
   </tr>
   <tr>
   <td class="address">
-  Powered by <a class=note href="http://cdsware.cern.ch/">CDSware</a> <VERSION>.
+  Powered by <a class=note href="http://cdsware.cern.ch/">CDSware</a> v<VERSION>.
   </td>
   <td align=right class="address">
   Revised <: print `date +"%d %b %Y %H:%M:%S %Z"`; :>
-  by &lt;<a class=note href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a>&gt;.
+  by <a class=note href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a>
   </td>
   </tr>
   </table>
