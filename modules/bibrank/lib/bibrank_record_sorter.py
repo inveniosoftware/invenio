@@ -330,6 +330,8 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
         results_similar_recIDs = map(lambda x: x[0], result[0])
         results_similar_relevances = map(lambda x: x[1], result[0])
         result[0] = (results_similar_recIDs, results_similar_relevances)
+    else:
+        result[0] = (None, None)
 
     if verbose > 0:
         print string.replace(voutput, "<br>", "\n")
