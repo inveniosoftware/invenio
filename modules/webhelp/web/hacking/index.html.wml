@@ -57,6 +57,10 @@ sources get installed to, what is the visible URL policy, etc.
 <blockquote>
 <dl>
 
+<dt><a href="bibrank/index.html">BibRank Internals</a>
+<dd>Describes information useful to understand how the various
+ranking methods available in bibrank works, and how they can
+be tweaked to give various output.
 <dt><a href="websearch/index.html">WebSearch Internals</a>
 <dd>Describes information useful to understand the search process
 internals, like the different search stages, the high- and low-level
