@@ -109,12 +109,14 @@ def isUserReferee(uid):
     for row in res:
         doctype = row[0]
         categ = "*"
-        if acc_authorize_action(uid, "referee",doctype=doctype, categ=categ):
+        (auth_code, auth_message) = acc_authorize_action(uid, "referee",doctype=doctype, categ=categ)
+        if auth_code == 0:
             return 1
         res2 = run_sql("select sname from sbmCATEGORIES where doctype=%s",(doctype,))
         for row2 in res2:
             categ = row2[0]
-            if acc_authorize_action(uid, "referee",doctype=doctype, categ=categ):
+            (auth_code, auth_message) = acc_authorize_action(uid, "referee",doctype=doctype, categ=categ)
+            if auth_code == 0:
                 return 1
     return 0
 

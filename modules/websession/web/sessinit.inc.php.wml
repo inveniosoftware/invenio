@@ -111,7 +111,9 @@ function acc_authorize_action($uid, $action) {
     ## Python CLI API of WebAccess.
     ## Return 1 when allowed, 0 otherwise.
     global $BINDIR;
-    return exec($BINDIR."/authaction ". escapeshellarg($uid) . " " . escapeshellarg($action));
+
+    $auth = exec($BINDIR."/authaction ". escapeshellarg($uid) . " " . escapeshellarg($action));
+    return split(";",$auth);
 }
 
 function authenticate($email,$rule,$doctype="*",$action="*")
