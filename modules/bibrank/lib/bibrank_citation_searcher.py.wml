@@ -58,29 +58,15 @@ def init_reference_list_dictionary():
         ref_dic = loads(decompress(compressed_ref_dic[0][0]))
     return ref_dic
 
-cbd = init_cited_by_dictionary()
-rld = init_reference_list_dictionary()
-
-def get_cited_by_dictionary():
-    """return citation list dictionary from rnkCITATIONDATA
-    """
-    global cbd
-    return cbd
-
-def get_reference_list_dictionary():
-    """return reference list dictionary from rnkCITATIONDATA
-    """
-    global rld
-    return rld
+cache_cited_by_dictionary = init_cited_by_dictionary()
+cache_reference_list_dictionary = init_reference_list_dictionary()
 
 def get_cited_by_list(record_id):
     """return citation list dictionary of record_id
     """
     citation_list = []
-    try:
-        citation_list = get_cited_by_dictionary().get(record_id, [])
-    except TypeError:
-        pass
+    if cache_cited_by_dictionary:
+        citation_list = cache_cited_by_dictionary.get(record_id, [])
     return citation_list
 
 def get_co_cited_with_list(record_id):
@@ -88,12 +74,12 @@ def get_co_cited_with_list(record_id):
     result = []
     result_intermediate = {}
     citation_list = []
-    try:
-        citation_list = get_cited_by_dictionary().get(record_id, [])
-    except TypeError:
-        pass
+    if cache_cited_by_dictionary:
+        citation_list = cache_cited_by_dictionary.get(record_id, [])
     for cit_id in citation_list:
-        reference_list = get_reference_list_dictionary()[cit_id]
+        reference_list = []
+        if cache_reference_list_dictionary:
+            reference_list = cache_reference_list_dictionary.get(cit_id, [])
         for ref_id in reference_list:
             if not result_intermediate.has_key(ref_id):
                 result_intermediate[ref_id] = 1
