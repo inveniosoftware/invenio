@@ -52,6 +52,7 @@ try:
     from cdsware.dbquery import run_sql
     from cdsware.bibindex_engine_stemmer import stem_by_lang, lang_available
     from cdsware.bibindex_engine_stopwords import is_stopword_force
+    from cdsware.search_engine_config import cfg_max_recID
 except ImportError, e:
     pass
 
@@ -268,7 +269,7 @@ def is_method_valid(colID, rank_method_code):
 def get_bibrank_methods(collection, ln=cdslang):
     """Returns a list of rank methods and the name om them in the language defined by the ln parameter, if collection is given, only methods enabled for that collection is returned."""
 
-    if not vars().has_key('methods'):
+    if not globals().has_key('methods'):
         create_rnkmethod_cache()
 
     avail_methods = []
@@ -297,10 +298,11 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
 
     global voutput
     voutput = ""
+    configcreated = ""
 
     try:
         hitset = copy.deepcopy(hitset_global) #we are receiving a global hitset
-        if not vars().has_key('methods'):
+        if not globals().has_key('methods'):
             create_rnkmethod_cache()
 
         function = methods[rank_method_code]["function"]
@@ -317,7 +319,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     if result[0] and result[1]:
         results_similar_recIDs = map(lambda x: x[0], result[0])
         results_similar_relevances = map(lambda x: x[1], result[0])
-        result = (results_similar_recIDs, results_similar_relevances, result[1], result[2], result[3])
+        result = (results_similar_recIDs, results_similar_relevances, result[1], result[2], "%s" % configcreated + result[3])
     else:
         result = (None, None, result[1], result[2], result[3])
 
@@ -476,45 +478,14 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     stime = time.time()
     (recdict, rec_termcount) = ({}, {})
 
-    #testvalue = methods[rank_method_code]["max_nr_words_upper"]
-    testvalue = 20
-
     for (t, tf) in tf_values: #t=term, tf=term frequency
-        #term_recs = run_sql("SELECT term, hitlist FROM %s WHERE term='%s'" % (methods[rank_method_code]["rnkWORD_table"], t))
         term_recs = deserialize_via_marshal(terms_recs[t])
         if len(tf_values) <= methods[rank_method_code]["max_nr_words_lower"] or (len(term_recs) >= methods[rank_method_code]["min_nr_words_docs"] and (((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) <=  methods[rank_method_code]["max_word_occurence"]) and ((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) >= methods[rank_method_code]["min_word_occurence"]))):
              lwords.append((t, methods[rank_method_code]["rnkWORD_table"]))
              (recdict, rec_termcount) = calculate_record_relevance_findsimilar((t, round(tf, 4)) , term_recs, hitset, recdict, rec_termcount, verbose, "true")
-        if len(tf_values) > methods[rank_method_code]["max_nr_words_lower"] and (len(lwords) ==  testvalue or tf < 0):
+        if len(tf_values) > methods[rank_method_code]["max_nr_words_lower"] and (len(lwords) ==  methods[rank_method_code]["max_nr_words_upper"] or tf < 0):
             break
 
-    methods[rank_method_code]["rnkWORD_table"] = "rnkWORD02F"
-    try:
-        rec_terms = run_sql("SELECT termlist FROM %sR WHERE id_bibrec=%s" % (methods[rank_method_code]["rnkWORD_table"][:-1], recID))
-    except:
-        rec_terms = []
-
-    if 1==0: #rec_terms:
-        rec_terms = deserialize_via_marshal(rec_terms[0][0])
-        #Get all documents using terms from the selected documents
-        if len(rec_terms) > 0:
-            terms = "%s" % rec_terms.keys()
-            terms_recs = dict(run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (methods[rank_method_code]["rnkWORD_table"], terms[1:len(terms) - 1])))
-
-            tf_values = {}
-            #Calculate all terms/bigrams
-            for (term, tf) in rec_terms.iteritems():
-                if terms_recs.has_key(term):
-                    tf_values[term] =  int((1 + math.log(tf[0])) *  tf[1])
-            tf_values = tf_values.items()
-            tf_values.sort(lambda x, y: cmp(y[1], x[1])) 
-
-            #Use only most important terms
-            for (t, tf) in tf_values:
-                term_recs = deserialize_via_marshal(terms_recs[t])
-                lwords.append((t, methods[rank_method_code]["rnkWORD_table"]))
-                (recdict, rec_termcount) = calculate_record_relevance((t, round(tf, 4)) , term_recs, hitset, recdict, rec_termcount, verbose, "true") 
-    methods[rank_method_code]["rnkWORD_table"] = "rnkWORD01F"
     if len(recdict) == 0 or len(lwords) == 0:
         return (None, "Could not find any similar documents, possibly because of error in ranking data.", "", voutput)
     else:
@@ -581,39 +552,6 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
                 (recdict, rec_termcount) = calculate_record_relevance((term, int(term_recs["Gi"][1])) , term_recs, hitset, recdict, rec_termcount, verbose, quick=None)
             del term_recs
 
-    #if len(recdict) == 0:
-    #    pass
- 
-    if len(lwords) < 0:
-        bigram_table = "rnkWORD02F"
-        bigrams = {}
-        lwords_dict = {}
-        i = 1
-        for (term, table) in lwords:
-            lwords_dict[term] = i
-            i += 1
-
-        for (term, table) in lwords:
-            try:
-                res = run_sql("SELECT term FROM %s WHERE term like '%% %s' or term like '%s %%'" % (bigram_table, term, term))
-            except:
-                res = []
-            for bigram in res:
-                bigram = bigram[0]
-                splitted_bigram = string.split(bigram, " ")
-                if lwords_dict.has_key(splitted_bigram[0]) and lwords_dict.has_key(splitted_bigram[1]) and splitted_bigram[0] != splitted_bigram[1] and not bigrams.has_key(bigram):
-                    if lwords_dict[splitted_bigram[0]] < lwords_dict[splitted_bigram[1]]:
-                        bigrams[bigram] = 1
-                    else:
-                        bigrams[bigram] = 0.5
- 
-        for (bigram, w) in bigrams.iteritems():
-            lwords.append((bigram, bigram_table))
-	    hitlist = run_sql("SELECT hitlist FROM %s WHERE term='%s'" % (bigram_table, MySQLdb.escape_string(bigram)))
-	    hitlist = deserialize_via_marshal(hitlist[0][0])
-            (recdict, rec_termcount) = calculate_record_relevance((bigram, int(hitlist["Gi"][1]) * w) , hitlist, hitset, recdict, rec_termcount, verbose, quick="true")
-            del hitlist
-
     if len(recdict) == 0 or (len(lwords) == 1 and lwords[0] == ""):
         return (None, "Records not ranked. The query is not detailed enough, or not enough records found, for ranking to be possible.", "", voutput)
     else: 
@@ -634,34 +572,6 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
         rank_method_stat(rank_method_code, reclist, lwords)
 
     return (reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
-
-def test():
-    import random
-    queries = 5
-    query_recs = 120000
-    hitset = HitSet()
-    q_invidx = []
-    rank_limit_relevance = 0
-    for i in range(0, queries):
-        invidx = {}
-        invidx["Gi"] = (0, random.randint(1, 100))
-        for j in range(0, query_recs):
-            invidx[j] = (random.randint(1, 10), random.randint(1, 100))
-            hitset.add(j)
-        q_invidx.append(invidx)
-    recdict = {}
-    rec_termcount = {}
-    verbose = 0
-    quick = None
-    stimetotal = time.time()
-    for i in range(0, queries):
-        stime = time.time()
-        (recdict, rec_termcount) = calculate_record_relevance(("term", random.randint(1, 5)), q_invidx[i], hitset, recdict, rec_termcount, verbose, quick=None)
-        print "Query: %s" % (time.time() - stime)
-    stime = time.time()
-    (reclist, hitset) = sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, verbose)
-    print len(reclist), (time.time() - stime)
-    print (time.time() - stimetotal)
 
 def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, verbose, quick=None):
     """Calculating the relevance of the documents based on the input, calculates only one word

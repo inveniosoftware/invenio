@@ -179,13 +179,13 @@ def get_words_from_phrase(phrase, weight, lang="",
     phrase = lower(phrase)
     #By doing this like below, characters standing alone, like c a b is not added to the inedx, but when they are together with characters like c++ or c$ they are added.
     for word in split(phrase):    
-        if not is_stopword_force(word) and check_term(word, 0):
+        if options["remove_stopword"] == "True" and not is_stopword_force(word) and check_term(word, 0):
             if lang and lang !="none" and options["use_stemming"]:
                 word = stem_by_lang(word, lang)
             if not words.has_key(word):
                 words[word] = (0,0)
             words[word] = (words[word][0] + weight, 0)
-        elif not is_stopword_force(word):  
+        elif options["remove_stopword"] == "True" and not is_stopword_force(word):  
             phrase = re.sub(chars_alphanumericseparators, ' ', word) 
             for word_ in split(phrase):   
                 if lang and lang !="none" and options["use_stemming"]:
@@ -194,8 +194,6 @@ def get_words_from_phrase(phrase, weight, lang="",
                     if not words.has_key(word_):
                         words[word_] = (0,0)
                     words[word_] = (words[word_][0] + weight, 0)
- 
-    print words
     return words
 
 def split_ranges(parse_string):
@@ -1011,6 +1009,7 @@ def word_index(row, run):
         options["modified_words"] = {}
         options["table"] = config.get(config.get("rank_method", "function"), "table")
         options["use_stemming"] = config.get(config.get("rank_method","function"),"stemming")
+        options["remove_stopword"] = config.get(config.get("rank_method","function"),"stopword")
         tags = get_tags(config) #get the tags to include
         options["validset"] = get_valid_range(rank_method_code) #get the records from the collections the method is enabled for
         function = config.get("rank_method","function")
