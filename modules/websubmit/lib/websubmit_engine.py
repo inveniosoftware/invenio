@@ -858,7 +858,7 @@ var allLoaded = 1;
 </SCRIPT>
  <table class="searchbox" width="100%" summary="">
     <tr>
-        <th class="portalboxheader">Catalogues available for submission</th>
+        <th class="portalboxheader">Document types available for submission:</th>
     </tr>
     <tr>
         <td class="portalboxbody">
@@ -905,7 +905,7 @@ def makeCataloguesTable():
             text = text + displayCatalogueBranch(row[0],1,catalogues)
         text = text + "</UL>\n"
     else:
-        text = "<h3>No catalogues yet...</h3>\n"
+        text = "<h3>No document types yet...</h3>\n"
     return text
 
 def displayCatalogueBranch(id_father,level,catalogues):
