@@ -130,7 +130,7 @@ A brief description of things we strive at, more or less unsuccessfully.
    the <a href="testsuite.html">test suite strategy</a> for details.
 
    Speed-critical parts should be profiled with pyprof.  Do not forget
-   to use tricks like psycho.
+   to use tricks like psyco.
 
    For more hints, thoughts, and other ruminations, see <a
    href="http://simko.info/vademecum/">Vademecum and Essays</a>.
