@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cdsware, 0.0.9+, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.0.9+)
+AC_INIT(cdsware, 0.0.9+.CVS.20031128, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.0.9+.CVS.20031128)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -497,7 +497,22 @@ AC_CONFIG_FILES([Makefile \
 	  modules/webalert/web/Makefile \
 	  modules/webalert/bin/Makefile \
 	  modules/websubmit/Makefile \
+	  modules/websubmit/bin/Makefile \
+	  modules/websubmit/etc/Makefile \
+	  modules/websubmit/etc/bibconvert/Makefile \
+	  modules/websubmit/etc/bibconvert/KB/Makefile \
+	  modules/websubmit/etc/bibconvert/config/Makefile \
+	  modules/websubmit/doc/Makefile \
+	  modules/websubmit/doc/admin/Makefile \
+	  modules/websubmit/lib/Makefile \
+	  modules/websubmit/lib/functions/Makefile \
 	  modules/websubmit/web/Makefile \
+	  modules/websubmit/web/access/Makefile \
+	  modules/websubmit/web/access/protected/Makefile \
+	  modules/websubmit/web/admin/Makefile \
+	  modules/websubmit/web/publiline/Makefile \
+	  modules/websubmit/web/publiline/inotes/Makefile \
+	  modules/websubmit/web/personal/Makefile \
 	  modules/webaccess/Makefile \
 	  modules/webaccess/bin/Makefile \
 	  modules/webaccess/doc/Makefile \
