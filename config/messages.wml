@@ -1004,7 +1004,7 @@
   <es>guest</es> 
   <pt>visitante</pt>
   <it>guest</it> 
-  <ru>guest</ru>
+  <ru>гость</ru>
   <sk>hosť</sk>
   <cz>host</cz>
   <no>gjest</no>
@@ -1015,7 +1015,7 @@
   <fr>Aide de Soumission</fr>
   <de>Eintragehilfe</de> 
   <es>Submit Help</es> 
-  <pt>Submit Help</pt>
+  <pt>Ajuda sobre Envio</pt>
   <it>Submit Help</it> 
   <ru>Помощь для приданья</ru>
   <sk>Pomoc pre pridávanie</sk>
@@ -1028,7 +1028,7 @@
   <fr>Coin d&quot;Administrateur</fr>
   <de>Administrator&quot;s Area</de> 
   <es>Administrator&quot;s Area</es> 
-  <pt>Administrator&quot;s Area</pt>
+  <pt>Área do Administrador</pt>
   <it>Administrator&quot;s Area</it> 
   <ru>Ареал Администратора</ru>
   <sk>Areál Administrátora</sk>
@@ -1041,7 +1041,7 @@
   <fr>Administration de Soumission</fr>
   <de>WebSubmit Administration</de> 
   <es>WebSubmit Administration</es> 
-  <pt>WebSubmit Administration</pt>
+  <pt>Administração de Envios</pt>
   <it>WebSubmit Administration</it> 
   <ru>Администрация Придания</ru>
   <sk>Administrácia Pridávania</sk>
@@ -1052,10 +1052,10 @@
 <define-tag MSG_GUIDE whitespace=delete>
   <en>Guide</en>
   <fr>Guide</fr>
-  <de>WebSubmit Administration</de> 
-  <es>WebSubmit Administration</es> 
-  <pt>WebSubmit Administration</pt>
-  <it>WebSubmit Administration</it> 
+  <de>Guide</de> 
+  <es>Guide</es> 
+  <pt>Guia</pt>
+  <it>Guide</it> 
   <ru>Руководитель</ru>
   <sk>Príručka</sk>
   <cz>Příručka</cz>
@@ -1067,11 +1067,11 @@
   <fr>Ajouté depuis:</fr>
   <de>Added since:</de>
   <es>Added since:</es>
-  <pt>Added since:</pt>
+  <pt>Adicionada desde:</pt>
   <it>Added since:</it>
-  <ru>Added since:</ru>
+  <ru>Придано из:</ru>
   <sk>Pridané od:</sk>
-  <cz>Přidané od:</cz>
+  <cz>Přidánо od:</cz>
   <no>Lagt til fra:</no>
 </define-tag>
 
@@ -1080,9 +1080,9 @@
   <fr>jusqu'à:</fr>
   <de>until:</de>
   <es>until:</es>
-  <pt>until:</pt>
+  <pt>até:</pt>
   <it>until:</it>
-  <ru>until:</ru>
+  <ru>в:</ru>
   <sk>do:</sk>
   <cz>do:</cz>
   <no>til:</no>
@@ -1093,9 +1093,9 @@
   <fr>tous les jours</fr>
   <de>any day</de>
   <es>any day</es>
-  <pt>any day</pt>
+  <pt>qualquer dia</pt>
   <it>any day</it>
-  <ru>any day</ru>
+  <ru>любой день</ru>
   <sk>hocaký deň</sk>
   <cz>jakýkoli den</cz>
   <no>alle dager</no>
@@ -1106,9 +1106,9 @@
   <fr>tous les mois</fr>
   <de>any month</de>
   <es>any month</es>
-  <pt>any month</pt>
+  <pt>qualquer mês</pt>
   <it>any month</it>
-  <ru>any month</ru>
+  <ru>любой месяц</ru>
   <sk>hocaký mesiac</sk>
   <cz>jakýkoli měsíc</cz>
   <no>alle måneder</no>
@@ -1119,9 +1119,9 @@
   <fr>toutes les années</fr>
   <de>any year</de>
   <es>any year</es>
-  <pt>any year</pt>
+  <pt>qualquer ano</pt>
   <it>any year</it>
-  <ru>any year</ru>
+  <ru>любой год</ru>
   <sk>hocaký rok</sk>
   <cz>jakýkoli rok</cz>
   <no>alle år</no>
@@ -1132,9 +1132,9 @@
   <fr>janvier</fr>
   <de>January</de>
   <es>January</es>
-  <pt>January</pt>
+  <pt>Janeiro</pt>
   <it>January</it>
-  <ru>January</ru>
+  <ru>январь</ru>
   <sk>január</sk>
   <cz>leden</cz>
   <no>januar</no>
@@ -1145,9 +1145,9 @@
   <fr>février</fr>
   <de>February</de>
   <es>February</es>
-  <pt>February</pt>
+  <pt>Fevereiro</pt>
   <it>February</it>
-  <ru>February</ru>
+  <ru>февраль</ru>
   <sk>február</sk>
   <cz>únor</cz>
   <no>februar</no>
@@ -1158,9 +1158,9 @@
   <fr>mars</fr>
   <de>March</de>
   <es>March</es>
-  <pt>March</pt>
+  <pt>Março</pt>
   <it>March</it>
-  <ru>March</ru>
+  <ru>март</ru>
   <sk>marec</sk>
   <cz>březen</cz>
   <no>mars</no>
@@ -1171,9 +1171,9 @@
   <fr>avril</fr>
   <de>April</de>
   <es>April</es>
-  <pt>April</pt>
+  <pt>Abril</pt>
   <it>April</it>
-  <ru>April</ru>
+  <ru>апрель</ru>
   <sk>apríl</sk>
   <cz>duben</cz>
   <no>april</no>
@@ -1184,9 +1184,9 @@
   <fr>mai</fr>
   <de>May</de>
   <es>May</es>
-  <pt>May</pt>
+  <pt>Maio</pt>
   <it>May</it>
-  <ru>May</ru>
+  <ru>май</ru>
   <sk>máj</sk>
   <cz>květen</cz>
   <no>mai</no>
@@ -1197,9 +1197,9 @@
   <fr>juin</fr>
   <de>June</de>
   <es>June</es>
-  <pt>June</pt>
+  <pt>Junho</pt>
   <it>June</it>
-  <ru>June</ru>
+  <ru>июнь</ru>
   <sk>jún</sk>
   <cz>červen</cz>
   <no>juni</no>
@@ -1210,9 +1210,9 @@
   <fr>juillet</fr>
   <de>July</de>
   <es>July</es>
-  <pt>July</pt>
+  <pt>Julho</pt>
   <it>July</it>
-  <ru>July</ru>
+  <ru>июль</ru>
   <sk>júl</sk>
   <cz>červenec</cz>
   <no>juli</no>
@@ -1223,9 +1223,9 @@
   <fr>août</fr>
   <de>August</de>
   <es>August</es>
-  <pt>August</pt>
+  <pt>Agosto</pt>
   <it>August</it>
-  <ru>August</ru>
+  <ru>август</ru>
   <sk>august</sk>
   <cz>srpen</cz>
   <no>august</no>
@@ -1236,9 +1236,9 @@
   <fr>septembre</fr>
   <de>September</de>
   <es>September</es>
-  <pt>September</pt>
+  <pt>Setembro</pt>
   <it>September</it>
-  <ru>September</ru>
+  <ru>сентябрь</ru>
   <sk>september</sk>
   <cz>září</cz>
   <no>september</no>
@@ -1249,9 +1249,9 @@
   <fr>octobre</fr>
   <de>October</de>
   <es>October</es>
-  <pt>October</pt>
+  <pt>Outubro</pt>
   <it>October</it>
-  <ru>October</ru>
+  <ru>октябрь</ru>
   <sk>október</sk>
   <cz>říjen</cz>
   <no>oktober</no>
@@ -1262,9 +1262,9 @@
   <fr>novembre</fr>
   <de>November</de>
   <es>November</es>
-  <pt>November</pt>
+  <pt>Novembro</pt>
   <it>November</it>
-  <ru>November</ru>
+  <ru>ноябрь</ru>
   <sk>november</sk>
   <cz>listopad</cz>
   <no>november</no>
@@ -1275,9 +1275,9 @@
   <fr>décembre</fr>
   <de>December</de>
   <es>December</es>
-  <pt>December</pt>
+  <pt>Dezembro</pt>
   <it>December</it>
-  <ru>December</ru>
+  <ru>декабрь</ru>
   <sk>december</sk>
   <cz>prosinec</cz>
   <no>desember</no>
@@ -1288,9 +1288,9 @@
   <fr>Le terme de recherche <em>%s</em></fr>
   <de>Search term <em>%s</em></de>
   <es>Search term <em>%s</em></es>
-  <pt>Search term <em>%s</em></pt>
+  <pt>Termo de busca <em>%s</em></pt>
   <it>Search term <em>%s</em></it>
-  <ru>Search term <em>%s</em></ru>
+  <ru>Искомое выражение <em>%s</em></ru>
   <sk>Hľadaný výraz <em>%s</em></sk>
   <cz>Hledaný výraz <em>%s</em></cz>
   <no>Søketerm <em>%s</em></no>
@@ -1301,9 +1301,9 @@
   <fr>dans l'index <em>%s</em></fr>
   <de>inside <em>%s</em> index</de>
   <es>inside <em>%s</em> index</es>
-  <pt>inside <em>%s</em> index</pt>
+  <pt>no <em>%s</em> índice</pt>
   <it>inside <em>%s</em> index</it>
-  <ru>inside <em>%s</em> index</ru>
+  <ru>в индексе <em>%s</em></ru>
   <sk>v indexe <em>%s</em></sk>
   <cz>v indexu em>%s</em></cz>
   <no>innen <em>%s</em>indeks</no>
@@ -1314,7 +1314,7 @@
   <fr>ne se trouve dans aucune notice.  Les termes les plus proches de toutes les collections sont:</fr>
   <de>did not match any record.  Nearest terms in any collection are:</de>
   <es>did not match any record.  Nearest terms in any collection are:</es>
-  <pt>did not match any record.  Nearest terms in any collection are:</pt>
+  <pt>não está presente em nenhum registro.  Os termos mais similares em todas as coleções são:</pt>
   <it>did not match any record.  Nearest terms in any collection are:</it>
   <ru>did not match any record.  Nearest terms in any collection are:</ru>
   <sk>neodpovedá žiadnemu záznamu.  Najbližšie termíny nezávisle na kolekcii sú:</sk>
@@ -1327,7 +1327,7 @@
   <fr>Aucun index des mots n'est disponible pour</fr>
   <de>No words index available for</de>
   <es>No words index available for</es>
-  <pt>No words index available for</pt>
+  <pt>Nenhum índice de palavras está disponível para</pt>
   <it>No words index available for</it>
   <ru>No words index available for</ru>
   <sk>Index slov nie je dostupný pre</sk>
@@ -1340,7 +1340,7 @@
   <fr>Aucun index des phrases n'est disponible pour</fr>
   <de>No phrase index available for</de>
   <es>No phrase index available for</es>
-  <pt>No phrase index available for</pt>
+  <pt>Nenhum índice de frases está disponível para</pt>
   <it>No phrase index available for</it>
   <ru>No phrase index available for</ru>
   <sk>Index viet nie je dostupný pre</sk>
@@ -1366,8 +1366,9 @@
     Results from the whole public database follow.
   </es>
   <pt>
-    No exact match found in selected collection(s).
-    Results from the whole public database follow.
+    Nenhum resultado exato foi encontrado na(s) coleção(ões)
+    selecionada(s).  Seguem resultados para todo o banco de dados
+    público.
   </pt>
   <it>
     No exact match found in selected collection(s).
@@ -1410,9 +1411,9 @@
     collection first.
   </es>
   <pt>  
-    No public collection matched your query.  If you were looking for
-    a non-public document, please choose the desired restricted
-    collection first.    
+    Nenhuma coleção pública corresponde à sua busca. Se você está 
+    procurando um documento que não é público, por favor escolha 
+    a coleção restrita desejada primeiro.
   </pt>
   <it>
     No public collection matched your query.  If you were looking for
@@ -1456,7 +1457,8 @@
     No match within your time limits, discarding this condition...
   </es>
   <pt>
-    No match within your time limits, discarding this condition...
+    Nenhum resultado dentro do período de tempo especificado,
+    desconsiderando esta condição...
   </pt>
   <it>
     No match within your time limits, discarding this condition...
@@ -1492,7 +1494,8 @@
     No match within your time limits, discarding this condition...
   </es>
   <pt>
-    No match within your time limits, discarding this condition...
+    Nenhum resultado dentro dos limites de busca especificados, 
+    descartando esta condição...
   </pt>
   <it>
     No match within your time limits, discarding this condition...
@@ -1508,7 +1511,10 @@
     Žádný výsledek nevyhovuje Vašim limitným kritériím, podmínky
     nejsou vzaty do úvahy...
   </cz>
-  <no>Ingen treff innen dine søkebegrensninger, forkaster dette kriteriet...</no>
+  <no>
+    Ingen treff innen dine søkebegrensninger, forkaster dette
+    kriteriet...
+  </no>
 </define-tag>
 
 <define-tag MSG_NO_BOOLEAN_HITS>
@@ -1529,14 +1535,18 @@
     Please combine your search terms differently.
   </es>
   <pt>
-    All search terms matched but boolean query returned no hits.
-    Please combine your search terms differently.</pt>
+    Foram encontrados resultados para todos os termos de busca 
+    mas a consulta booleana não gerou resultados. Por favor 
+    combine seus termos de outra maneira.
+  </pt>  
   <it>
     All search terms matched but boolean query returned no hits.
-    Please combine your search terms differently.</it>
+    Please combine your search terms differently.
+  </it>
   <ru>
     All search terms matched but boolean query returned no hits.
-    Please combine your search terms differently.</ru>
+    Please combine your search terms differently.
+  </ru>
   <sk>
     Všetky termíny hľadania boli nájdené, ale boolean otázka nevrátila
     žiaden výsledok.  Skúste skombinovať dané termíny inakšie.
@@ -1567,7 +1577,8 @@
     No exact match found for <em>%s</em>, using <em>%s</em> instead...
   </es>
   <pt>
-    No exact match found for <em>%s</em>, using <em>%s</em> instead...
+    Nenhum resultado exato foi encontrado para <em>%s</em>, usando
+    <em>%s</em> em substituição...
   </pt>
   <it>
     No exact match found for <em>%s</em>, using <em>%s</em> instead...
@@ -1593,7 +1604,7 @@
   <fr>Erreur Interne</fr>
   <de>Internal Error</de>
   <es>Internal Error</es>
-  <pt>Internal Error</pt>
+  <pt>Erro Interno</pt>
   <it>Internal Error</it>
   <ru>Internal Error</ru>
   <sk>Interná Chyba</sk>
@@ -1619,8 +1630,8 @@
     information:
   </es>
   <pt>
-    Please contact <a href="mailto:%s">%s</a> quoting the following
-    information:
+    Por favor entre em contato com <a href="mailto:%s">%s</a>
+    mencionando a seguinte informação:       
   </pt>
   <it>
     Please contact <a href="mailto:%s">%s</a> quoting the following
