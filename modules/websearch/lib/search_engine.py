@@ -2606,9 +2606,12 @@ def encode_for_xml(s):
 def call_bibformat(id, otype="HD"):
     """Calls BibFormat for the record 'id'.  Desired BibFormat output type is passed in 'otype' argument.
        This function is mainly used to display full format, if they are not stored in the 'bibfmt' table."""
-    f = urllib.urlopen("%s/bibformat/bibformat.php?id=%s&otype=%s" % (weburl, id, otype))
-    out = f.read()
-    f.close()
+    pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % bindir, "otype=%s" % otype], 'rw')
+    pipe_input.write(print_record(id, "xm"))
+    pipe_input.close()
+    out = pipe_output.read()
+    pipe_output.close()
+    pipe_error.close()
     return out
 
 def log_query(hostname, query_args, uid=-1):
@@ -3217,6 +3220,7 @@ def profile(p="", f="", c=cdsname):
 #print wash_dates('1980', '', '28', '2003','02','')
 #print type(wash_url_argument("-1",'int'))
 #print get_nearest_terms_in_bibxxx("ellis", "author", 5, 5)
+#print call_bibformat(68, "HB_FLY")
 
 ## profiling:
 #profile("of the this")
