@@ -1,12 +1,26 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML>
-<HEAD>
-   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-   <META NAME="GENERATOR" CONTENT="Mozilla/4.08 [en] (X11; I; AIX 4.3) [Netscape]">
-</HEAD>
-<BODY>
+## $Id$
 
-<H2>BibConvert Admin Guide</H2>
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="BibConvert Admin Guide" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/bibconvert/>BibConvert Admin</a>" \
+    navbar_select="bibconvert"
 
 <p/>
 <A HREF="#1">Guide to BibConvert Configuration</a>
@@ -811,6 +825,3 @@ OAI</H4>
 <p/>Inserts  OAI identifier incremented by one for earch record
 Starting value that is used in the first record in the batch job can be specified on the command line using the -o&lt;starting_value> option.
 </BLOCKQUOTE>
-
-</BODY>
-</HTML>

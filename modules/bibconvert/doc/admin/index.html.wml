@@ -90,7 +90,7 @@ AU::CONF(AU,,0)---&lt;datafield id="700" ind1="" ind2="">&lt;subfield code="a">&
 <p>Having prepared a configuration, the BibConvert will convert the
 source data file according to it in a batch mode. The BibConvert is
 fully compatible with the Uploader1.x configuration language. For more
-information, have a look at the <a href="BibConvertAdminGuide.html">BibConvert Admin Guide</a>.
+information, have a look at the <a href="guide.html">BibConvert Admin Guide</a>.
 <br><small class="example">BEWARE: At present, BibConvert Admin
 Guide is a snapshot of an internal document.  You may have a look at
 it but please do not distribute it further.  We'll upgrade it
