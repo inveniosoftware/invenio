@@ -19,7 +19,7 @@
 
 docdir = $(WEBDIR)/hacking/webaccess
 
-doc_DATA=index.html api.html admin-internals.html
+doc_DATA=index.html api.html admin-internals.html table-structure.html
 
 EXTRA_DIST = $(wildcard *.wml)
 
