@@ -354,7 +354,6 @@ a.navtrail:hover {
    color: #000;
    background: #ffcccc;
    padding: 3px;
-   font-size: normal;
 }
 .searchbox {
    color: #000;
@@ -380,7 +379,6 @@ a.navtrail:hover {
    color: #000;
    background: transparent;
    padding: 3px;
-   font-size: normal;
 }
 .narrowsearchbox {
    color: #000;
@@ -406,7 +404,6 @@ a.navtrail:hover {
    color: #000;
    background: transparent;
    padding: 3px;
-   font-size: normal;
 }
 .latestadditionsbox {
    color: #000;
@@ -803,7 +800,6 @@ input,select {
     border-left: 2px solid #039;
     border-right: 2px solid #039;
     vertical-align: middle;
-    horizontal-align: center;
     font-size: small;
     padding-top: 5px;
     padding-right: 5px;
@@ -820,7 +816,6 @@ input,select {
     border-left: 2px solid #039;
     border-right: 2px solid #039;
     vertical-align: middle;
-    horizontal-align: center;
     font-size: small;
     padding-top: 5px;
     padding-right: 5px;
