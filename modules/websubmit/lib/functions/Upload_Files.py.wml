@@ -77,11 +77,6 @@ def Upload_Files(parameters,curdir,form):
             if fileAction == "AddMain":
                 if not bibrecdocs.checkFileExists(fullpath,"Main"):
                     bibdoc = bibrecdocs.addNewFile(fullpath,"Main")
-            if fileAction == "AddMainFormat":
-                bibdoc = bibrecdocs.addNewFormat(fullpath,bibrecdocs.listBibDocs("Main")[0].getId())
-            if fileAction == "ReviseMain":
-                if not bibrecdocs.checkFileExists(fullpath,"Main"):
-                    bibdoc = bibrecdocs.addNewVersion(fullpath,bibrecdocs.listBibDocs("Main")[0].getId())
             if fileAction == "AddAdditional":
                 if not bibrecdocs.checkFileExists(fullpath,"Additional"):
                     bibdoc = bibrecdocs.addNewFile(fullpath,"Additional")
@@ -125,8 +120,7 @@ def Display_File_List(bibrecdocs):
             for bibdoc in bibdocs:
                 if mytype == bibdoc.getType():
                     t+="<table cellpadding=0 cellspacing=1 border=0><tr><td bgcolor=\"white\">"
-                    if mytype != "Main":
-                        t+="<center><input type=radio name=mybibdocid value=%s><br><br><A href=\"\" onClick=\"if (confirm('Are you sure you want to delete this file?')) { document.forms[0].deletedfile.value='%s';document.forms[0].deleted.value='yes';document.forms[0].submit();return false;} else { return false; }\"><IMG src=%s/smallbin.gif border=0 align=center></a><br></small></center>" % (bibdoc.getId(),bibdoc.getId(),images)
+                    t+="<center><input type=radio name=mybibdocid value=%s><br><br><A href=\"\" onClick=\"if (confirm('Are you sure you want to delete this file?')) { document.forms[0].deletedfile.value='%s';document.forms[0].deleted.value='yes';document.forms[0].submit();return false;} else { return false; }\"><IMG src=%s/smallbin.gif border=0 align=center></a><br></small></center>" % (bibdoc.getId(),bibdoc.getId(),images)
                     t+="</td><td>"
                     t+=bibdoc.display()
                     t+="</td></tr></table>"
@@ -155,13 +149,10 @@ def Display_Form(bibrecdocs):
         <option selected> Select:"""
     if len(bibrecdocs.listBibDocs("Main")) == 0:
         t+="\n<option value=AddMain> Add Main Document"
-    else:
-        t+="\n<option value=ReviseMain> Revise Main Document"
-        t+="\n<option value=AddMainFormat> Add new format to Main Document"
     t+= "<option value=AddAdditional> Add Additional Document"
-    if len(bibrecdocs.listBibDocs("Additional")) != 0:
-        t+="\n<option value=ReviseAdditional> Revise Additional Document"
-        t+="\n<option value=AddAdditionalFormat> Add new Format to Additional Document"
+    if len(bibrecdocs.listBibDocs()) != 0:
+        t+="\n<option value=ReviseAdditional> Revise Document"
+        t+="\n<option value=AddAdditionalFormat> Add new Format to Document"
     t+="""
         </SELECT></small>
     </TD>
