@@ -1,5 +1,5 @@
 CERN DOCUMENT SERVER SOFTWARE (CDSware) AUTHORS
-============================================
+===============================================
 
 Revision: $Id$
 
@@ -9,19 +9,19 @@ The CDS Development Group consists of several people:
    Head of the team.
 
  - Tibor Simko <tibor.simko@cern.ch>
-   Search interface, search engine, personalization.
-
+   Search interface, search engine, user personalization, software packaging, web design.
+  
  - Thomas Baron <thomas.baron@cern.ch>
-   Submit interface.
+   Submit interface, most of Admin interfaces, BibUpload.
 
  - Martin Vesely <martin.vesely@cern.ch>
-   Compliance with Open Archive Initiative.
+   Compliance with Open Archive Initiative, BibConvert, BibHarvest.
 
  - Hector Sanchez <hector.sanchez@cern.ch>
-   FlexElink, output formatting and reference linking tool.
+   BibFormat, output formatting and automated link creating tool.
 
 Moreover, several students have worked on the project, including
-Marcin Kuta and Eric Simon (personalization), and others.
+Marcin Kuta and Eric Simon (user personalization), and others.
 
        - CDS Development Group
          <cds.support@cern.ch>
