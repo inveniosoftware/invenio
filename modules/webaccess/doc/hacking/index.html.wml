@@ -27,10 +27,13 @@ This page summarizes all the information suitable to dig inside
 the WebAccess internals.
 
 <blockquote>
-<dl>
-
-<dt><a href="api.html">Access Control Engine API</a> <dd>Explains how to call
-access control engine from your Python programs.
-
-</dl>
+ <dl>
+  <dt><a href="api.html">Access Control Engine API</a> </dt>
+  <dd>Explains how to call access control engine from your Python programs.<br>
+      In addition the program flow is explained briefly.</dd>
+  <dt><a href="admin-internals.html">Access Control Admin Internals</a> </dt>
+  <dd>Explains how to administrate the authorizations stored in the database for <br>
+      WebAccess. Not all functions are mentioned. All mentioned functions are  <br>
+      represented with signatures, some with additional explanations as well.</dd>
+ </dl>
 </blockquote>
