@@ -433,10 +433,6 @@ TRUE
 TRUE
 </define-tag>
 
-<define-tag TMPDIR whitespace=delete>
-/tmp
-</define-tag>
-
 <define-tag ARCHIVE whitespace=delete>
 <WEBDIR>/submit/archive
 </define-tag>
