@@ -254,21 +254,24 @@ class Collection:
         self.reclist_with_nonpublic_subcolls = HitSet()
         if not name:
             self.name = cdsname # by default we are working on the home page
+            self.nameshort = cdsname
+            self.namesuffix = None
             self.id = 1
             self.dbquery = None
             self.nbrecs = None
             self.reclist = HitSet()
         else:
             self.name = name
-            query = "SELECT id,name,nameshort,dbquery,nbrecs,reclist FROM collection WHERE name='%s'" % escape_string(name)
+            query = "SELECT id,name,nameshort,namesuffix,dbquery,nbrecs,reclist FROM collection WHERE name='%s'" % escape_string(name)
             try:
                 res = run_sql(query, None, 1)
                 if res:
                     self.id = res[0][0]
                     self.name = res[0][1]
                     self.nameshort = res[0][2]
-                    self.dbquery = res[0][3]
-                    self.nbrecs = res[0][4]
+                    self.namesuffix = res[0][3]
+                    self.dbquery = res[0][4]
+                    self.nbrecs = res[0][5]
                     try:
                         self.reclist = HitSet(Numeric.loads(zlib.decompress(res[0][5])))
                     except:
@@ -276,12 +279,22 @@ class Collection:
                 else: # collection does not exist!
                     self.id = None
                     self.nameshort = None
+                    self.namesuffix = None
                     self.dbquery = None
                     self.nbrecs = None
                     self.reclist = HitSet()
             except MySQLdb.Error, e:
                 print "Error %d: %s" % (e.args[0], e.args[1])
                 sys.exit(1)
+
+    def get_namefull(self, prolog="", epilog="", prolog_suffix=" ", epilog_suffix=""):
+        "Return nicely formatted full collection name (including prefix and suffixes)."
+        out = prolog
+        out += self.name
+        if self.namesuffix:
+            out += prolog_suffix + self.namesuffix + epilog_suffix
+        out += epilog
+        return out
 
     def get_ancestors(self):
         "Returns list of ancestors of the current collection."
@@ -490,7 +503,7 @@ class Collection:
                     else:
                         narrowsearch += """<input type=checkbox name="c" value="%s" checked>&nbsp;</td>""" % son.name
                 narrowsearch += """<td valign="top"><a href="%s/?c=%s&amp;as=%d&amp;ln=%s">%s%s%s</a>%s """ % \
-                                (weburl, urllib.quote_plus(son.name), as, ln, style_prolog, son.name, style_epilog, son.create_nbrecs_info())
+                                (weburl, urllib.quote_plus(son.name), as, ln, style_prolog, son.get_namefull(), style_epilog, son.create_nbrecs_info())
                 if son.restricted_p():
                     narrowsearch += """ <small class="warning">[restricted]</small>"""
                 if cfg_narrow_search_show_grandsons:
@@ -501,7 +514,7 @@ class Collection:
                         narrowsearch += """<br>"""
                         for i in range(0,nb_grandsons):
                             narrowsearch += """<a href="%s/?c=%s&amp;as=%d&amp;ln=%s">%s</a>%s """ % \
-                                            (weburl, urllib.quote_plus(grandsons[i].name), as, ln, grandsons[i].name, \
+                                            (weburl, urllib.quote_plus(grandsons[i].name), as, ln, grandsons[i].get_namefull(), \
                                              grandsons[i].create_nbrecs_info())
                 narrowsearch += """</td></tr>"""
             narrowsearch += "</tbody></table>"            
@@ -594,7 +607,8 @@ class Collection:
         # year
         box += """<select name="%sy">""" % name
         box += """<option value="">%s""" % msg_any_year[ln]
-        for year in range(1980,2004):
+        this_year = int(time.strftime("%Y", time.localtime()))       
+        for year in range(this_year-20, this_year+1):
             box += """<option value="%d">%d""" % (year, year)
         box += """</select>"""        
         return box
