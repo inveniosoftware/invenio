@@ -19,7 +19,7 @@
 
 docdir = $(WEBDIR)/admin/webaccess
 
-#doc_DATA=index.html
+doc_DATA=guide.html
 
 EXTRA_DIST = $(wildcard *.wml)
 
