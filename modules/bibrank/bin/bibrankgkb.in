@@ -69,11 +69,8 @@ try:
     import copy
     import types
     import ConfigParser
-
 except ImportError, e:
-    print "Error: %s" % e
     import sys
-    sys.exit(1)
 
 try:
     sys.path.append('%s' % pylibdir)
@@ -85,9 +82,8 @@ try:
     from cdsware.access_control_engine import acc_authorize_action
     from bisect import bisect
 except ImportError, e:
-    print "Error: %s" % e
     import sys
-    sys.exit(1)
+
 try:
     import psyco
     psyco.bind(serialize_via_numeric_array)
@@ -204,7 +200,8 @@ def get_from_source(type, data):
         data = input.readlines()
         datastruct = {}
         for line in data:
-            if not line[0:2] == "//":
+            #print line
+            if not line[0:1] == "#":
                 key = string.strip((string.split(string.strip(line),"---"))[0])
                 value = (string.split(string.strip(line), "---"))[1]
                 datastruct[key] = value
@@ -218,7 +215,6 @@ def get_from_source(type, data):
                 write_message(data[0][link])
             page = urllib.urlopen(data[0][link])
             input = page.read()
- 
             #Using the regexp from config file
             reg = re.compile(data[1])
             iterator = re.finditer(reg, input)
@@ -227,7 +223,8 @@ def get_from_source(type, data):
                     key = string.strip(match.group("key"))
                     value = string.replace(match.group("value"),",",".")
                     datastruct[key] = value
-                    #print "%s---%s" % (key,value)
+                    if opts_dict["verbose"] == 9:
+                        print "%s---%s" % (key,value)
     return datastruct
 
 def convert(convstruct, journals):
