@@ -18,10 +18,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 docdir = $(WEBDIR)/hacking
+imgdir = $(WEBDIR)/img
 
 doc_DATA=index.html modules.html style.html concepts.html directory.html cdsware.el
+img_DATA=modules.jpeg
 
-EXTRA_DIST = $(wildcard *.wml) $(wildcard *.el)
+EXTRA_DIST = $(wildcard *.wml) $(wildcard *.el) $(wildcard *.jpeg)
 
 CLEANFILES = $(wildcard *.html) *~ *.tmp
 
