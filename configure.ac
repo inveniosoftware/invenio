@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 dnl Initialize autoconf and automake:
-AC_INIT(cdsware, 0.01-pre4, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.01-pre4)
+AC_INIT(cdsware, 0.01-pre5, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.01-pre5)
 
 dnl Check for install:
 AC_PROG_INSTALL
