@@ -287,7 +287,7 @@ def create_basic_search_units(req, p, f, m=None):
     ## return search units:
     return opfts
 
-def page_start(req, of, cc, as, ln, uid):
+def page_start(req, of, cc, as, ln, uid, title_message=msg_search_results[cdslang]):
     "Start page according to given output format."
     if of.startswith('x'):
         # we are doing XML output:
@@ -308,7 +308,7 @@ def page_start(req, of, cc, as, ln, uid):
         # we are doing HTML output:
         req.content_type = "text/html"
         req.send_http_header()
-        req.write(pageheaderonly(title=msg_search_results[ln],
+        req.write(pageheaderonly(title=title_message,
                                  navtrail=create_navtrail_links(cc, as, ln, 1),
                                  description="%s %s." % (cc, msg_search_results[ln]),
                                  keywords="CDSware, WebSearch, %s" % cc,
@@ -321,7 +321,7 @@ def page_end(req, of="hb", ln=cdslang):
     "End page according to given output format: e.g. close XML tags, add HTML footer, etc."
     if of.startswith('h'):
         req.write("""</div>""") # pagebody end
-        req.write(pagefooteronly(lastupdated=__lastupdated__, language=ln))
+        req.write(pagefooteronly(lastupdated=__lastupdated__, language=ln, urlargs=req.args))
     elif of.startswith('x'):
         req.write("""</collection>\n""")
     if of == "id":
@@ -2931,9 +2931,9 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
     except:
         uid = 0
     ## 0 - start output
-    page_start(req, of, cc, as, ln, uid)
     if recid>0:
         ## 1 - detailed record display
+        page_start(req, of, cc, as, ln, uid, msg_detailed_record[ln] + " #%d" % recid)
         if of == "hb":
             of = "hd"
         if record_exists(recid):
@@ -2945,6 +2945,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 print_warning(req, "Requested record does not seem to exist.")
     elif action == msg_browse[ln]:
         ## 2 - browse needed
+        page_start(req, of, cc, as, ln, uid, msg_browse[ln])
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
@@ -2962,6 +2963,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
 
     else:
         ## 3 - search needed
+        page_start(req, of, cc, as, ln, uid, msg_search_results[ln])
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
