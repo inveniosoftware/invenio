@@ -81,7 +81,7 @@ Atlantis Institute of Fictive Science
 ## CDSLANG -- the default interface language:
 ##  (example: "en")
 <define-tag CDSLANG whitespace=delete>
-de
+en
 </define-tag>
 
 ## ALERTENGINEEMAIL -- the email address from which the alert emails will appear to be send:
