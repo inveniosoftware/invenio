@@ -55,6 +55,18 @@ cfg_mysql_thread_timeout = 20 # we'll kill threads that were sleeping for more t
 ## do we want to fulltext-index local files only, or also remote URLs?
 cfg_fulltext_index_local_files_only = 0
 
+## access credentials to access restricted URLs:
+## (this may be interesting if you are fulltext-indexing files located
+## on a remote server and when files on that server are only available
+## via username/password; but it's probably better to handle this case
+## via IP or some convention; this part needs more work to be done;
+## the current scheme is mostly therein order to make the
+## fulltext-indexing mode non-interactive only)
+cfg_urlopener_username = "mysuperuser"
+cfg_urlopener_password = "mysuperpass"
+## FIXME: design a nice approach to fulltext-index (local/remote)
+## restricted URLs
+
 ## FIXME: put these to the global WML config file one day
 
 

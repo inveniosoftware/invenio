@@ -69,13 +69,13 @@ except:
 class MyFancyURLopener(urllib.FancyURLopener):
     def prompt_user_passwd(self, host, realm):
         # supply some dummy credentials by default
-        return ("mysuperuser", "mysuperpass")
+        return (cfg_urlopener_username, cfg_urlopener_password)
     def http_error_401(self, url, fp, errcode, errmsg, headers):
         # do not bother with protected pages
         raise IOError, (999, 'unauthorized access')  
         return None
     
-#urllib._urlopener = MyFancyURLopener()
+urllib._urlopener = MyFancyURLopener()
 
 def write_message(msg, stream=sys.stdout):
     """Write message and flush output stream (may be sys.stdout or sys.stderr)."""
