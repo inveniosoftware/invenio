@@ -259,6 +259,10 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         # We retrieve its HTML description
         res3 = run_sql("SELECT * FROM sbmFIELDDESC WHERE  name=%s", (arr[3],))
         arr3 = res3[0]
+        if arr3[8]==None:
+            val=""
+        else:
+            val=arr3[8]
         # we also retrieve and add the javascript code of the checking function, if needed
         if arr[7] != '':
             res2 = run_sql("SELECT chdesc FROM sbmCHECKS WHERE  chname=%s", (arr[7],))
@@ -267,16 +271,16 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             t=t+"</SCRIPT>\n"
         # If the field is a textarea
         if arr3[3] == 'T':
-            text="<TEXTAREA name=\"%s\" rows=%s cols=%s>%s</TEXTAREA>" % (arr[3],arr3[5],arr3[6],arr3[8])
+            text="<TEXTAREA name=\"%s\" rows=%s cols=%s>%s</TEXTAREA>" % (arr[3],arr3[5],arr3[6],val)
         # If the field is a file upload
         elif arr3[3] == 'F':
             text="<INPUT TYPE=file name=\"%s\" size=%s maxlength=%s>" % (arr[3],arr3[4],arr3[7]);
         # If the field is a text input
         elif arr3[3] == 'I':
-            text="<INPUT name=\"%s\" size=%s value=\"%s\">" % (arr[3],arr3[4],arr3[8])
+            text="<INPUT name=\"%s\" size=%s value=\"%s\">" % (arr[3],arr3[4],val)
         # If the field is a hidden input
         elif arr3[3] == 'H':
-            text="<INPUT type=\"hidden\" name=\"%s\" value=\"%s\">" % (arr[3],arr3[8])
+            text="<INPUT type=\"hidden\" name=\"%s\" value=\"%s\">" % (arr[3],val)
         # If the field is user-defined
         elif arr3[3] == 'D':
             text=arr3[9]
