@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cdsware, 0.1.0.20031218, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.1.0.20031218)
+AC_INIT(cdsware, 0.1.1, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.1.1)
 
 ## Check for install:
 AC_PROG_INSTALL

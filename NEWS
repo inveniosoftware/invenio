@@ -3,7 +3,20 @@ CERN DOCUMENT SERVER SOFTWARE (CDSware) NEWS
 
 Revision: $Id$
 
-Here is a short summary of most notable changes in CDSware releases.
+Here is a short summary of most notable changes in CDSware releases:
+
+CDSware v0.1.1 -- December 19th, 2003
+  * development branch release
+  * access control engine now used by BibWords, BibFormat (admin and
+    bibreformat), WebSearch (webcoll), and BibTaskEx
+  * access control engine admin guide started (WebAccess)
+  * search engine support for sorting by more than one field (WebSearch)
+  * more internationalization of the search engine messages (WebSearch)
+  * new language: Norwegian (bokmål) 
+  * simple example for converting BibTeX into XML MARC (BibConvert)
+  * new optional --with-python configuration option
+  * Python module detection during configure 
+  * bugfixes: os.tempnam() warning, login page referer, and others
 
 CDSware v0.1.0 -- December 4th, 2003
   * development branch release
