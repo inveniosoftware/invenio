@@ -55,22 +55,27 @@ cfg_mysql_thread_timeout = 20 # we'll kill threads that were sleeping for more t
 ## do we want to fulltext-index local files only, or also remote URLs?
 cfg_fulltext_index_local_files_only = 0
 
-## which language should we use as default?
-##{'fr': 'french', 'en': 'english', 'no':'norwegian', 'se':'swedish', 'de': 'german', 'it':'italian', 'pt':'portuguese'}
-## None = No stemming
-cfg_use_stemmer_lang = None
+## which language should the stemmer use as default?
+## use 'fr' for French, 'en' for English, 'no' for Norwegian, 'se' for
+## Swedish, 'de' for German, 'it' for Italian, 'pt' for Portuguese'
+## (None = no stemming)
+cfg_stemmer_default_language = None
 
-##Remove stopwords? False = no stopword removal
-cfg_remove_stopwords = True
+## remove stopwords? (True/False)
+cfg_remove_stopwords = False
+
 ## path to stopword list, used by bibrank also, should be given even if stopwordremoval is not used
-cfg_path_stopwordlist = "<ETCDIR>/bibrank/stopwords.kb"
+cfg_path_to_stopwords_file = "<ETCDIR>/bibrank/stopwords.kb"
 
-##used by get_words_from_phrase
+## what is considerede alphanumeric separator and what a punctuation char?
+## (used for getting words out of phrases)
 cfg_chars_alphanumericseparators = r"[\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
 cfg_chars_punctuation = r"[\.\,\:\;\?\!\"]"
-##Remove HTML tags from text
+
+## try removing HTML tags from text? (True/False)
 cfg_remove_html_code = True
-##Minimum word length allowed to be added to index
+
+## minimum word length allowed to be added to index:
 cfg_min_word_length = 0
 
 ## access credentials to access restricted URLs:
