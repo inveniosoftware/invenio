@@ -44,9 +44,9 @@
                 or whatever type of document you may invent. A document type is always defined by its metadata. It may or
                 may not have a fulltext file attached to it.<br><br>
                 &nbsp;<span class="guideheader">T</span>his tool leaves you free to create the web forms adapted to whatever type of document you want to 
-                create (see "<a href=actionform.<lang:star: *>.html>Create and Maintain the Web Form</a>") as well as free 
+                create (see "<a href=implementwebform.<lang:star: *>.html>Create and Maintain the Web Form</a>") as well as free 
                 to determine what treatment you wish to apply to the collected data (see 
-                 "<a href=actiontreatment.<lang:star: *>.html>Create and Maintain the Data Treatment</a>").
+                 "<a href=implementfunctions.<lang:star: *>.html>Create and Maintain the Data Treatment</a>").
             </UL>
         </BLOCKQUOTE>
 
