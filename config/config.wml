@@ -56,6 +56,7 @@
 <lang:new id=sk short>
 <lang:new id=cz short>
 <lang:new id=no short>
+<lang:new id=se short>
 
 ###################################
 ## Part 1:  Essential parameters ##
@@ -86,6 +87,7 @@ Atlantis Institute of Fictive Science
  <sk>Atlantis Inštitút Fiktívnych Vied</sk>
  <cz>Atlantis Institut Fiktivních Věd</cz>
  <no>Atlantis Institutt for Fiktiv Vitenskap</no>
+ <se>Atlantis Institut för Fiktiv Vetenskap</se>
 </define-tag>
 
 ## CDSLANG -- the default language of the interface:
@@ -99,11 +101,12 @@ en
 ## be respected on the interface pages.  A good default would be to
 ## use the alphabetical order.  Currently supported languages include
 ## Czech, German, English, Spanish, French, Italian, Norwegian,
-## Portuguese, Russian, and Slovak, so that the current eventual
-## maximum you can select is "cz,de,en,es,fr,it,no,pt,ru,sk".
+## Portuguese, Russian, Slovak, and Swedish, so that the current
+## eventual maximum you can select is
+## "cz,de,en,es,fr,it,no,pt,ru,sk,se".
 ##  (example: "de,en,fr,it")
 <define-tag CDSLANGS whitespace=delete>
-cz,de,en,es,fr,it,no,pt,ru,sk
+cz,de,en,es,fr,it,no,pt,ru,sk,se
 </define-tag>
 
 ## ALERTENGINEEMAIL -- the email address from which the alert emails will appear to be send:
@@ -239,6 +242,12 @@ cds.support@cern.ch
              &nbsp;
        </td>
        <td class="headermoduleboxbody">
+             <a class=header href="<WEBURL>/youraccount.py/display?ln=<!--LN-->"><!--MSGPERSONALIZE--></a>
+       </td>
+       <td class="headermoduleboxbodyblank">
+             &nbsp;
+       </td>
+       <td class="headermoduleboxbody">
              <a class=header href="<WEBURL>/help/index.<!--LN-->.html"><!--MSGHELP--></a>
        </td>
        <td class="headermoduleboxbodyblank">
@@ -281,17 +290,19 @@ cds.support@cern.ch
 
 ## CDSPAGEFOOTER -- eventual global HTML page footer:
 ##  (example: "")
-<define-tag CDSPAGEFOOTER>  
-  <table class="footerbox">
-  <tr valign="top">
-  <td valign="top">
-  <!--LANGUAGESELECTIONBOX--><br><!--CDSNAMEINTL-->&nbsp;::&nbsp;<a class=note href="<WEBURL>/?ln=<!--LN-->"><!--MSGSEARCH--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/submit.py?ln=<!--LN-->"><!--MSGSUBMIT--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/help/index.<!--LN-->.html"><!--MSGHELP--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/youraccount.py/display?ln=<!--LN-->"><!--MSGPERSONALIZE--></a><br><!--POWEREDBY--> <a class=note href="http://cdsware.cern.ch/">CDSware</a> v<VERSION>
-  </td>
-  <td align="right" valign="top">
-  <!--LASTUPDATED--><br><!--MAINTAINEDBY--> <a class=note href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a>
-  </td>
-  </tr>
-  </table>
+<define-tag CDSPAGEFOOTER>
+ <div class="pagefooterstripeleft">
+  <!--CDSNAMEINTL-->&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/?ln=<!--LN-->"><!--MSGSEARCH--></a>&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/submit.py?ln=<!--LN-->"><!--MSGSUBMIT--></a>&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/youraccount.py/display?ln=<!--LN-->"><!--MSGPERSONALIZE--></a>&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/help/index.<!--LN-->.html"><!--MSGHELP--></a>
+  <br>
+  <!--POWEREDBY--> <a class="footer" href="http://cdsware.cern.ch/">CDSware</a> v<VERSION>
+  <br>
+  <!--MAINTAINEDBY--> <a class="footer" href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a>
+  <br>
+  <!--LASTUPDATED-->
+ </div>
+ <div class="pagefooterstriperight">
+  <!--LANGUAGESELECTIONBOX-->
+ </div>
 </define-tag>
 
 ################################
