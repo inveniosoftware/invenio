@@ -42,7 +42,7 @@ class SanityTest(unittest.TestCase):
         yy=expandtabs(y)
         xxx = xx.replace(' ','')
         yyy = yy.replace(' ','')
-        #self.assertEqual(xxx,yyy)
+        #self.assertEqual(xxx,yyy) # FIXME: UTF-8 parsing is not working
 
 ### testing for success
         
