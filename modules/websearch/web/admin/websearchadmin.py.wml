@@ -32,7 +32,7 @@ pylibdir = "<LIBDIR>/python"
 import sys
 sys.path.append('%s' % pylibdir)
 import cdsware.websearchadminlib as wsc
-reload(wsc)
+#reload(wsc)
 from cdsware.webpage import page, create_error_box
 from cdsware.config import weburl,cdslang
 from cdsware.webuser import getUid
