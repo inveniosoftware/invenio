@@ -1072,19 +1072,18 @@ def perform_showportalboxes(colID, ln=cdslang, callback='yes', content='', confi
     lang = dict(get_languages())
 
     cdslang = get_languages()
-    for (key, value) in cdslang:
-        res = get_col_pbx(colID, key)
-        i = 0
-        for (pbxID, colID_pbx, tln, score, position, title, body) in res:  
-            actions.append([pos[position], lang[tln], score, title])
 
-            for col in [(('Modify', 'modifyportalbox'), ('Remove', 'removeportalbox'),)]:
-                actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;pbxID=%s&amp;sel_ln=%s#5.4">%s</a>' % (weburl, col[0][1], colID, ln, pbxID, tln, col[0][0]))
-                for (str, function) in col[1:]:
-                    actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;pbxID=%s&amp;sel_ln=%s#5.5">%s</a>' % (weburl, function, colID, ln, pbxID, tln, str)        
+    for (pbxID, colID_pbx, tln, score, position, title, body) in res:  
+        actions.append([pos[position], lang[tln], score, title])
+        for col in [(('Modify', 'modifyportalbox'), ('Remove', 'removeportalbox'),)]:
+            actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;pbxID=%s&amp;sel_ln=%s#5.4">%s</a>' % (weburl, col[0][1], colID, ln, pbxID, tln, col[0][0]))
+            for (str, function) in col[1:]:
+                actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;pbxID=%s&amp;sel_ln=%s#5.5">%s</a>' % (weburl, function, colID, ln, pbxID, tln, str)        
 
     output += tupletotable(header=header, tuple=actions)
-
+    if len(res) == 0:
+        output += """No portalboxes exists for this collection"""
+        
     output += content
     try:
         body = [output, extra]
@@ -1140,11 +1139,11 @@ def perform_removeportalbox(colID, ln=cdslang, pbxID='', sel_ln='', callback='ye
 def perform_switchscore(colID, type, id_1, id_2, ln=cdslang):
     frm_dict = dict(get_current_name('', ln, get_frm_mainnametype(), "format"))
     
-    if switch_rank(colID, id_1, id_2, type):
-        output = """</br><b><span class="info">Switched the scores of '%s' and '%s'</span></b>
+    if switch_score(colID, id_1, id_2, type):
+        output = """</br><b><span class="info">'%s' changed position with '%s'</span></b>
         """ % (frm_dict[int(id_1)], frm_dict[int(id_2)])
     else:
-        output = """</br><b><span class="info">Could not switch the scores.</span></b>"""
+        output = """</br><b><span class="info">Could not complete the operation.</span></b>"""
 
     return perform_showoutputformats(colID, ln, content=output)
 
@@ -1190,6 +1189,9 @@ def perform_showoutputformats(colID, ln=cdslang, callback='yes', content='', con
             for (str, function) in col[1:]:
                 actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;frmID=%s#10">%s</a>' % (weburl, function, colID, ln, id_format, str)        
     output += tupletotable(header=header, tuple=actions)
+
+    if len(col_frm) == 0:
+        output += """No output formats exists for this collection"""
     output += content
     try:
         body = [output, extra]
@@ -1822,7 +1824,7 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
     elif mtype == "perform_showoutputformats" or not mtype:
         fin_output += perform_showoutputformats(colID, ln, callback='')
     
-    return addadminbox("Overview of edit options", [fin_output])
+    return addadminbox("Overview of edit options for collection '%s'" % col_dict[colID],  [fin_output])
 
 def perform_deletecollection(colID, ln=cdslang, confirm=-1, callback='yes'):
     """form to delete a collection
@@ -2214,10 +2216,10 @@ def modify_pbx(colID, pbxID, sel_ln, score='', position='', title='', body=''):
 
 def switch_score(colID, id_1, id_2, table):
     try:
-        res1 = run_sql("SELECT score FROM collection_%s WHERE id_collection=%s and id_%s=%s" % (type, colID, table, id_1))
-        res2 = run_sql("SELECT score FROM collection_%s WHERE id_collection=%s and id_%s=%s" % (type, colID, table, id_2))
-        res = run_sql("UPDATE collection_%s SET score=%s WHERE id_collection=%s and id_%s=%s" % (type, res2[0][0], colID, table, id_1))
-        res = run_sql("UPDATE collection_%s SET score=%s WHERE id_collection=%s and id_%s=%s" % (type, res1[0][0], colID, table, id_2))
+        res1 = run_sql("SELECT score FROM collection_%s WHERE id_collection=%s and id_%s=%s" % (table, colID, table, id_1))
+        res2 = run_sql("SELECT score FROM collection_%s WHERE id_collection=%s and id_%s=%s" % (table, colID, table, id_2))
+        res = run_sql("UPDATE collection_%s SET score=%s WHERE id_collection=%s and id_%s=%s" % (table, res2[0][0], colID, table, id_1))
+        res = run_sql("UPDATE collection_%s SET score=%s WHERE id_collection=%s and id_%s=%s" % (table, res1[0][0], colID, table, id_2))
         return "true"
     except StandardError, e:
         return ()
