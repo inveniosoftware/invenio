@@ -22,7 +22,8 @@ SUBDIRS = admin hacking
 docdir = $(WEBDIR)/help/search
 
 doc_DATA=index.en.html index.fr.html index.de.html index.es.html index.pt.html index.it.html index.ru.html index.sk.html index.cz.html index.no.html index.se.html \
-         tips.en.html tips.fr.html tips.de.html tips.pt.html tips.es.html tips.it.html tips.ru.html tips.sk.html tips.cz.html tips.no.html tips.se.html 
+	tips.en.html tips.fr.html tips.de.html tips.pt.html tips.es.html tips.it.html tips.ru.html tips.sk.html tips.cz.html tips.no.html tips.se.html \
+	guide.en.html guide.fr.html guide.de.html guide.pt.html guide.es.html guide.it.html guide.ru.html guide.sk.html guide.cz.html guide.no.html guide.se.html
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)

@@ -1,0 +1,1706 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="Search Guide" \
+    navbar_name="search-new" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a> &gt; <a class=navtrail href=<WEBURL>/help/search/<lang:star: index.*.html>><MSG_SEARCH_HELP></a>" \
+    navbar_select="guide"
+
+<fr>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</fr>
+<de>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</de>
+<es>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</es>
+<it>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</it>
+<pt>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</pt>
+<ru>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</ru>
+<sk>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</sk>
+<cz>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</cz>
+<no>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</no>
+<se>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</se>
+
+<en>
+<p>Our search engine tries to offer today's typical web searching
+experience, as gained with popular search engines such as <a
+href="http://google.com/">Google</a>.  The nature of bibliographic
+searching differs from that of a web page searching, though.  We
+provide many extensions to enable a complex and precise structured
+search, including an combined metadata, fulltext and reference search
+in one go.  This page lists several tips and tricks that you may find
+useful to this effect.
+</en>
+<fr>
+<p>Our search engine tries to offer today's typical web searching
+experience, as gained with popular search engines such as <a
+href="http://google.com/">Google</a>.  The nature of bibliographic
+searching differs from that of a web page searching, though.  We
+provide many extensions to enable a complex and precise structured
+search, including an combined metadata, fulltext and reference search
+in one go.  This page lists several tips and tricks that you may find
+useful to this effect.
+</fr>
+<de>
+<p>Unsere Suchmaschine bietet den heutigen Stand der Web-Such
+Technologie, die auch von bekannten Suchmaschinen wie zum Beispiel
+<a href="http://google.com/">Google</a> angeboten werden. Im Detail
+unterscheidet sich jedoch die bibliographische Suche von einer
+Web-Suche. Wir bieten mehrere Erweiterungen an, damit eine komplexe
+und genau strukturierte Suche möglich wird, inklusiv einer
+kombinierten Metadatensuche, Volltextsuche und Referenzsuche. Diese
+Seite stellt Tipps und Tricks vor, die für eine effektive Suche
+nützlich sind.
+</de>
+<es>
+<p>Our search engine tries to offer today's typical web searching
+experience, as gained with popular search engines such as <a
+href="http://google.com/">Google</a>.  The nature of bibliographic
+searching differs from that of a web page searching, though.  We
+provide many extensions to enable a complex and precise structured
+search, including an combined metadata, fulltext and reference search
+in one go.  This page lists several tips and tricks that you may find
+useful to this effect.
+</es>
+<pt>
+<p>Our search engine tries to offer today's typical web searching
+experience, as gained with popular search engines such as <a
+href="http://google.com/">Google</a>.  The nature of bibliographic
+searching differs from that of a web page searching, though.  We
+provide many extensions to enable a complex and precise structured
+search, including an combined metadata, fulltext and reference search
+in one go.  This page lists several tips and tricks that you may find
+useful to this effect.
+</pt>
+<it>
+<p>Our search engine tries to offer today's typical web searching
+experience, as gained with popular search engines such as <a
+href="http://google.com/">Google</a>.  The nature of bibliographic
+searching differs from that of a web page searching, though.  We
+provide many extensions to enable a complex and precise structured
+search, including an combined metadata, fulltext and reference search
+in one go.  This page lists several tips and tricks that you may find
+useful to this effect.
+</it>
+<ru>
+<p>Our search engine tries to offer today's typical web searching
+experience, as gained with popular search engines such as <a
+href="http://google.com/">Google</a>.  The nature of bibliographic
+searching differs from that of a web page searching, though.  We
+provide many extensions to enable a complex and precise structured
+search, including an combined metadata, fulltext and reference search
+in one go.  This page lists several tips and tricks that you may find
+useful to this effect.
+</ru>
+<sk>
+<p>Our search engine tries to offer today's typical web searching
+experience, as gained with popular search engines such as <a
+href="http://google.com/">Google</a>.  The nature of bibliographic
+searching differs from that of a web page searching, though.  We
+provide many extensions to enable a complex and precise structured
+search, including an combined metadata, fulltext and reference search
+in one go.  This page lists several tips and tricks that you may find
+useful to this effect.
+</sk>
+<cz>
+<p>Our search engine tries to offer today's typical web searching
+experience, as gained with popular search engines such as <a
+href="http://google.com/">Google</a>.  The nature of bibliographic
+searching differs from that of a web page searching, though.  We
+provide many extensions to enable a complex and precise structured
+search, including an combined metadata, fulltext and reference search
+in one go.  This page lists several tips and tricks that you may find
+useful to this effect.
+</cz>
+<no>
+<p>Our search engine tries to offer today's typical web searching
+experience, as gained with popular search engines such as <a
+href="http://google.com/">Google</a>.  The nature of bibliographic
+searching differs from that of a web page searching, though.  We
+provide many extensions to enable a complex and precise structured
+search, including an combined metadata, fulltext and reference search
+in one go.  This page lists several tips and tricks that you may find
+useful to this effect.
+</no>
+<se>
+<p>Our search engine tries to offer today's typical web searching
+experience, as gained with popular search engines such as <a
+href="http://google.com/">Google</a>.  The nature of bibliographic
+searching differs from that of a web page searching, though.  We
+provide many extensions to enable a complex and precise structured
+search, including an combined metadata, fulltext and reference search
+in one go.  This page lists several tips and tricks that you may find
+useful to this effect.
+</se>
+
+<en>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</en>
+<fr>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</fr>
+<de>
+<h3><strong class="headerboxbodylogo">Inhaltsverzeichnis</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Einfache versus erweiterte Suche</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Grundlagen</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Suche nach Wörtern und Wortgruppen</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolsche Suche</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Spezielle Zeichen und Notation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">Internationale Zeichen</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Trunkierung</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Strukturierte Metadatensuche</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Bereichs-Recherche</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Kombinierte Metadaten-/Volltext-/Zitatsuche</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">FAQ</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">Wie wähle ich am geschicktesten meinen Suchbegriff</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">Wie suche ich nach Publikationen eines bestimmten Autors</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">Wie lasse ich Ergebnisse auf eine bestimmte Weise sortieren</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">Wie bekomme ich Dokumente anderer Server (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">Wie kann ich in verknüpften Volltextdateien suchen</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">Wie kann ich nach Zitaten suchen</a>
+</de>
+<es>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</es>
+<pt>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</pt>
+<it>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</it>
+<ru>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</ru>
+<sk>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</sk>
+<cz>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</cz>
+<no>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</no>
+<se>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</se>
+
+<h3><a name="simpleadvanced">
+<en>Simple versus advanced search</en>
+<fr>Simple versus advanced search</fr>
+<de>Einfache versus erweiterte Suche</de>
+<es>Simple versus advanced search</es>
+<pt>Simple versus advanced search</pt>
+<it>Simple versus advanced search</it>
+<ru>Simple versus advanced search</ru>
+<sk>Simple versus advanced search</sk>
+<cz>Simple versus advanced search</cz>
+<no>Simple versus advanced search</no>
+<se>Simple versus advanced search</se>
+</a></h3>
+
+<p>The default search mode is <strong>simple search</strong> that
+basically provides you with one input box where you can type your
+query, followed by a possibility to choose one of the common indexes
+to search within.  You would usually simply type the keywords you are
+interested in and hit return.  For example, if you are interested in
+documents on <em>standard model</em> that are written by (or mention)
+<em>Ellis</em>, you would type:
+
+    <form action="<WEBURL>/search.py" method="get">
+    <blockquote>
+    <input size=40 type="text" name="p" value="ellis standard model">
+    <select name="f"><option value="">any field<option>title<option>author</select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    </blockquote>
+    </form>
+
+and on the search results page you could further add/remove keywords
+to get more precisely at what you are looking for, as is mentioned <a
+href="#boolean">below</a>.
+
+<p>The <strong>advanced search</strong> interface provides you with
+explicit tools to play with: you can change the matching type from the
+default word matching to phrase searching or the regular matching; you
+can use boolean queries in several indexes, etc.  For example, to find
+all the documents written by <em>Ellis, J</em> spelled exactly that
+way that contain either of the words <em>muon</em> or
+<em>neutrino</em> in the title and that were published in
+<em>2001</em>, you would type:
+
+<blockquote>
+<form action="<WEBURL>/search.py" method="get">
+    <input type="hidden" name="cc" value="Atlantis Institute of Science"> 
+    <input type="hidden" name="as" value="1">
+        <table>
+         <tbody>
+          <tr valign="bottom">
+            <td>
+    <select name="m1">
+    <option value="a">All of the words:
+    <option value="o">Any of the words:
+    <option value="e" selected>Exact phrase:
+    <option value="p">Partial phrase:
+    <option value="r">Regular expression:
+    </select>
+    <input type="text" name="p1" size="30" value="Ellis, J"></td>
+            <td class="searchboxbody"><select name="f1"><option value="">any field<option value="abstract">abstract<option value="author" selected>author<option value="collection">collection<option value="division">division<option value="experiment">experiment<option value="fulltext">fulltext<option value="keyword">keyword<option value="reference">reference<option value="reportnumber">report number<option value="subject">subject<option value="title">title<option value="year">year</select></td>
+
+            <td class="searchboxbody">
+    <select name="op1">
+    <option value="a">AND
+    <option value="o">OR
+    <option value="n">AND NOT
+    </select>
+    </td>
+          </tr>
+          <tr valign="bottom">
+            <td class="searchboxbody">
+
+    <select name="m2">
+    <option value="a">All of the words:
+    <option value="o" selected>Any of the words:
+    <option value="e">Exact phrase:
+    <option value="p">Partial phrase:
+    <option value="r">Regular expression:
+    </select>
+    <input type="text" name="p2" size="30" value="muon neutrino"></td>
+            <td class="searchboxbody"><select name="f2"><option value="">any field<option value="abstract">abstract<option value="author">author<option value="collection">collection<option value="division">division<option value="experiment">experiment<option value="fulltext">fulltext<option value="keyword">keyword<option value="reference">reference<option value="reportnumber">report number<option value="subject">subject<option value="title" selected>title<option value="year">year</select></td>
+
+            <td class="searchboxbody">
+    <select name="op2">
+    <option value="a">AND
+    <option value="o">OR
+    <option value="n">AND NOT
+    </select>
+    </td>
+          </tr>
+          <tr valign="bottom">
+            <td class="searchboxbody">
+
+    <select name="m3">
+    <option value="a">All of the words:
+    <option value="o">Any of the words:
+    <option value="e">Exact phrase:
+    <option value="p">Partial phrase:
+    <option value="r">Regular expression:
+    </select>
+    <input type="text" name="p3" size="30" value="2001"></td>
+            <td class="searchboxbody"><select name="f3"><option value="">any field<option value="abstract">abstract<option value="author">author<option value="collection">collection<option value="division">division<option value="experiment">experiment<option value="fulltext">fulltext<option value="keyword">keyword<option value="reference">reference<option value="reportnumber">report number<option value="subject">subject<option value="title">title<option value="year" selected>year</select></td>
+
+            <td class="searchboxbody"><input class="formbutton" type="submit" name="action" value="SEARCH"><input class="formbutton" type="submit" name="action" value="Browse">&nbsp;</td>
+          </tr>
+         </tbody>
+        </table>
+        </form>
+</blockquote>
+
+<p>Note that Simple Search can provide you basically the same
+functionality, if you make use of special syntax that is explained in
+the text below.  The simple-versus-advanced does not refer to the
+functionality that is being provided but rather to the amount of
+parametrization you can "tweak".  We conform to the common
+use of the simple/advanced terms as found in other search engines.
+
+<p>Much of what follows will deal with a question on "how a power user
+would use the simple search interface".  Recall that you can always go
+to the Advanced Search for more query assistance.
+        
+<h3><a name="guidance">
+<en>Search guidance</en>
+<fr>Search guidance</fr>
+<de>Grundlagen</de>
+<es>Search guidance</es>
+<pt>Search guidance</pt>
+<it>Search guidance</it>
+<ru>Search guidance</ru>
+<sk>Search guidance</sk>
+<cz>Search guidance</cz>
+<no>Search guidance</no>
+<se>Search guidance</se>
+</a></h3>
+
+<p>After you submit your query, the search engine will analyze it and
+will try to always guide you in case no exact match could be found.
+For example, it would print you a list of closest indexed terms in
+case of spelling troubles:
+
+    <form action="<WEBURL>/search.py" method="get">
+    <blockquote>
+    <input size=40 type="text" name="p" value="elllis muon">
+    <select name="f"><option value="">any field<option>title<option>author</select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    </blockquote>
+    </form>
+
+<p>Alternative choices will be printed in red.  The search engine
+will similarly warn you when your search terms could not be
+found, or when they could but your boolean query couldn't be met.  The
+search engine will also silently try to search for alternative forms
+(e.g. remove punctuation), etc.
+
+<p>Thanks to multiple search stages and the guidance provided at each
+stage, it is usually sufficient to simple type what you are looking
+for and see what the system says in return.  If you aren't satisfied,
+you would then add/remove words from your query until the satisfactory
+reply.
+
+<h3><a name="words-vs-phrases">
+<en>Searching for words versus phrases</en>
+<fr>Searching for words versus phrases</fr>
+<de>Suche nach Wörtern und Wortgruppen</de>
+<es>Searching for words versus phrases</es>
+<pt>Searching for words versus phrases</pt>
+<it>Searching for words versus phrases</it>
+<ru>Searching for words versus phrases</ru>
+<sk>Searching for words versus phrases</sk>
+<cz>Searching for words versus phrases</cz>
+<no>Searching for words versus phrases</no>
+<se>Searching for words versus phrases</se>
+</a></h3>
+
+<p>The default search mode is a <strong>search for words</strong>.  This
+means that any whitespace you type is not significant, but is rather
+interpreted to mean "add an automatic boolean AND between words", like
+Google does.  For example, to find all records that contain both the
+word <em>ellis</em> and the word <em>muon</em> anywhere in the record,
+type:
+
+    <form action="<WEBURL>/search.py" method="get">
+    <blockquote>
+    <input size=40 type="text" name="p" value="ellis muon">
+    <select name="f"><option value="">any field<option>title<option>author</select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    </blockquote>
+    </form>
+
+The whitespace would be significant if you include it within quotes.
+There are two phrase searching modes:
+
+<ol>
+
+<li>The double quotes instruct the search engine to <strong>search for
+    exact phrase</strong>.  This phrase search mode will match if and
+    only if the given metadata field is exactly equal to the input
+    pattern.  For example, to find all documents written by <em>Ellis,
+    J</em> spelled exactly that way, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="&quot;Ellis, J&quot;">
+      <select name="f"><option value="">any field<option>title<option selected>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+<li>The single quotes instruct the search engine to <strong>search for
+    partial phrase</strong>.  Unlike the exact phrase search, this
+    mode allows for an extra text appearing before/after given
+    pattern.  This is somewhat similar to the "phrase search mode"
+    common on Google and other fulltext engines that search for phrase
+    expressions inside Web pages.  For example, to find all the titles
+    containing the expression <em>muon decay</em> regardless of the
+    position of the expression in the title, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="'muon decay'">
+      <select name="f"><option value="">any field<option selected>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+    Now you see how to search for an author spelled sometimes as
+    <em>Ellis, J</em> and sometimes as <em>Ellis, Jonathan
+    Richard</em> (and other authors, such as <em>De Lellis, Jim</em>)
+    at the same time:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="'Ellis, J'">
+      <select name="f"><option value="">any field<option>title<option selected>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+    (See also our specific <a href="#howto-search-for-author">author
+    searching tips</a>.)
+
+</ol>
+
+The difference between exact and partial phrase searching modes may
+not be obvious upon first look.  While the latter is more similar to
+what ``phrase search'' usually means in the context of web page search
+engines, the former one is usually an order of magnitude faster if you
+know the precise values you are looking for.
+
+<h3><a name="boolean">
+<en>Boolean queries</en>
+<fr>Boolean queries</fr>
+<de>Boolsche Suche</de>
+<es>Boolean queries</es>
+<pt>Boolean queries</pt>
+<it>Boolean queries</it>
+<ru>Boolean queries</ru>
+<sk>Boolean queries</sk>
+<cz>Boolean queries</cz>
+<no>Boolean queries</no>
+<se>Boolean queries</se>
+</a></h3>
+
+We have already seen how whitespace adds a silent boolean AND in the
+search for words.  The other boolean operators include:
+
+<blockquote>
+<table border="1" cellpadding=10>
+<tr>
+<td rowspan=3 align=center>
+<strong>+<br>AND</strong>
+</td>
+<td>
+   <code>ellis +muon</code>
+</td>
+<td>
+  matches all records that contain both the word
+  <em>ellis</em> and the the word <em>muon</em>
+</td>
+</tr>
+<tr>
+<td>
+   <code>ellis muon</code>
+</td>
+<td>
+ ditto, syntactic sugar
+</td>
+</tr>
+<tr>
+<td>
+   <code>ellis and muon</code>
+</td>
+<td>
+ ditto, syntactic sugar
+</td>
+</tr>
+<tr>
+<td rowspan=2 align=center>
+<strong>-<br>NOT</strong>
+</td>
+<td>
+ <code>ellis -muon</code>
+</td>
+<td>
+matches all records that contain the word
+                        <em>ellis</em> but that do not contain the word
+                        <em>muon</em>
+</td>
+</tr>
+<tr>
+<td>
+   <code>ellis not muon</code>
+</td>
+<td>
+ditto, syntactic sugar
+</td>
+</tr>
+<tr>
+<td rowspan=2 align=center>
+<strong>|<br>OR</strong>
+</td>
+<td>
+   <code>ellis |muon</code>
+</td>
+<td>
+matches all records that contain at least one
+                       of the words
+</td>
+</tr>
+<tr>
+<td>
+  <code>ellis or muon</code>
+</td>
+<td>
+ditto, syntactic sugar
+</td>
+</tr>
+</table>
+</blockquote>
+
+<p>Logical operations are automatically chained from left to right.
+For example, if you want to search for documents written by Ellis on
+muons or kaons, write:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="muon or kaon and ellis">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+which looks for <code>(muon or kaon) and ellis</code>.  Note that this
+gives different results from:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="ellis and muon or kaon">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+which would search for <code>(ellis and muon) or kaon</code>.
+
+<p>The left-to-right chaining behaviour permits you to easily refine
+your search by adding/removing words with and/not or +/- operators.
+For example, to exclude the documents on decay from the above search,
+append <code>-decay</code>:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="muon or kaon and ellis -decay">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+to get a refined list.  Keep adding/removing terms until you are
+satisfied.
+
+
+<h3><a name="punctuation">
+<en>Special characters and punctuation</en>
+<fr>Special characters and punctuation</fr>
+<de>Spezielle Zeichen und Notation</de>
+<es>Special characters and punctuation</es>
+<pt>Special characters and punctuation</pt>
+<it>Special characters and punctuation</it>
+<ru>Special characters and punctuation</ru>
+<sk>Special characters and punctuation</sk>
+<cz>Special characters and punctuation</cz>
+<no>Special characters and punctuation</no>
+<se>Special characters and punctuation</se>
+</a></h3>
+
+<p>When indexing words, an attention is paid to index it both with and
+   without punctuation, so that you should be able to search for terms
+   containing special characters, such as <em>C++</em>, verbatim:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="C++">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="O'Shea">
+      <select name="f"><option value="">any field<option>title<option selected>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+   For example, to find records containing the LaTeX expression
+   <code>$e^{+}e^{-}$</code> in the title, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="$e^{+}e^{-}$">
+      <select name="f"><option value="">any field<option selected>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+   For example, to find document with the report number
+   <em>hep-ph/0204133</em>, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="hep-ph/0204133">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+   Note that the search is case-insensitive:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="BlaCK hOlEs">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+<h3><a name="unicode">
+<en>International characters</en>
+<fr>International characters</fr>
+<de>Internationale Zeichen</de>
+<es>International characters</es>
+<pt>International characters</pt>
+<it>International characters</it>
+<ru>International characters</ru>
+<sk>International characters</sk>
+<cz>International characters</cz>
+<no>International characters</no>
+<se>International characters</se>
+</a></h3>
+
+<p>The search engine works with Unicode UTF-8 so you can type your
+   query strings in any language stored in the database.  For
+   example, to find the documents written by (or on) Пушкин, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="пушкин">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+   Note that you don't have to type accents to find accented results.  For example,
+   type <code>Lemaitre</code> to find papers by <em>Lemaître</em>:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="Lemaitre">
+      <select name="f"><option value="">any field<option>title<option selected>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+<ifeq "<CFG_CERN_SITE>" "1" "
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+   IMPORTANT NOTE
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+      Currently, words that include accented characters can only be retrieved by entering
+      accented characters in the query.
+   </td>
+   </tr>
+   </tbody>
+   </table>
+">
+
+<h3><a name="wildcard">
+<en>Word truncation/stemming</en>
+<fr>Word truncation/stemming</fr>
+<de>Trunkierung</de>
+<es>Word truncation/stemming</es>
+<pt>Word truncation/stemming</pt>
+<it>Word truncation/stemming</it>
+<ru>Word truncation/stemming</ru>
+<sk>Word truncation/stemming</sk>
+<cz>Word truncation/stemming</cz>
+<no>Word truncation/stemming</no>
+<se>Word truncation/stemming</se>
+</a></h3>
+
+<p>The word truncation is supported via asterisk (*) wildcard
+   character.  The wildcard instructs the search engine to match any
+   number of characters in that place.  For example, to find records
+   that contain words <em>muon</em>, <em>muons</em>, <em>muonic</em>
+   etc, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="muon*">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+   The wildcard query works both in prefix and infix position.  For
+   example, to get all the words that start by <em>CERN-TH</em> and
+   end by <em>31</em>, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="CERN-TH*31">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+   Note that the wildcard will be ignored if you try to apply it to
+   very short words, such as <em>a*</em>:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="a*">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+   The wildcard character can be used also in the phrase searching
+   mode.  For example, to find all the documents whose title starts by
+   "Neutrino mass", type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="&quot;Neutrino mass*&quot;">
+      <select name="f"><option value="">any field<option selected>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+   Recall that we have introduced exact and partial phrase search
+   modes.  Actually, a partial phrase search mode launches an exact
+   search enclosed within wildcards: we could say that <code>'foo bar
+   baz'</code> equals to <code>"*foo bar baz*"</code>.  Now you can
+   see why the partial phrase search is slow: due to the usage of two
+   asterisks in front and after the text, each and every title in the
+   database has to be looked up to determine whether it matches or
+   not.  (There are currently no partial phrase indexes.)
+
+<h3><a name="structured">
+<en>Structured metadata search</en>
+<fr>Structured metadata search</fr>
+<de>Strukturierte Metadatensuche</de>
+<es>Structured metadata search</es>
+<pt>Structured metadata search</pt>
+<it>Structured metadata search</it>
+<ru>Structured metadata search</ru>
+<sk>Structured metadata search</sk>
+<cz>Structured metadata search</cz>
+<no>Structured metadata search</no>
+<se>Structured metadata search</se>
+</a></h3>
+
+<p>Searching within various bibliograpic fields (such as title,
+   author) is supported via Google's <code>"site:"</code> like syntax.
+   If a search term is preceded by a field name and a colon, then the
+   term is searched for inside this field only.  For example, to find
+   documents containing the word <em>ellis</em> within author index,
+   type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="author:ellis">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+   To select documents written by <em>Ellis</em> that contain words
+   like <em>muon</em>, <em>muons</em>, <em>muonic</em> within title,
+   type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="author:ellis title:muon*">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+   To select documents written by the <em>NA60</em> experiment from
+   the year <em>2001</em>, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="experiment:NA60 year:2001">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+    The most common fields you may want to use are
+    <code>author</code>, <code>title</code>,
+    <code>reportnumber</code>, <code>abstract</code>,
+    <code>keyword</code>, <code>year</code>, <code>experiment</code>,
+    <code>fulltext</code>, and <code>reference</code>.
+
+<h3><a name="span">
+<en>Span queries</en>
+<fr>Span queries</fr>
+<de>Bereichs-Recherche</de>
+<es>Span queries</es>
+<pt>Span queries</pt>
+<it>Span queries</it>
+<ru>Span queries</ru>
+<sk>Span queries</sk>
+<cz>Span queries</cz>
+<no>Span queries</no>
+<se>Span queries</se>
+</a></h3>
+
+<p>The span query is provided via a <code>-></code> sign.  For
+example, to search for all documents on <em>muon decay</em> published
+between <em>1983</em> and <em>1992</em>, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=60 type="text" name="p" value="muon decay year:1983->1992">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+To find all documents by authors with names ranging from <em>Ellis,
+J</em> to <em>Ellis, Qqq</em>, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=60 type="text" name="p" value="author:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+<h3><a name="combined">
+<en>Combined metadata/fulltext/citation search</en>
+<fr>Combined metadata/fulltext/citation search</fr>
+<de>Kombinierte Metadaten-/Volltext-/Zitatsuche</de>
+<es>Combined metadata/fulltext/citation search</es>
+<pt>Combined metadata/fulltext/citation search</pt>
+<it>Combined metadata/fulltext/citation search</it>
+<ru>Combined metadata/fulltext/citation search</ru>
+<sk>Combined metadata/fulltext/citation search</sk>
+<cz>Combined metadata/fulltext/citation search</cz>
+<no>Combined metadata/fulltext/citation search</no>
+<se>Combined metadata/fulltext/citation search</se>
+</a></h3>
+
+<p>All the syntax mentioned above can be combined together in one
+   query.  For example, to find documents that have the word
+   <em>ellis</em> inside author fields, that do not contain words like
+   <em>muon</em>, 'muonic' etc in any field, that contain the phrase
+   (or the substring, to be more precise) 'dense quark matter' inside
+   abstract fields, and that were published in year starting by digits
+   '200', type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=60 type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+   Note that the default "any field" global index does contain only the metadata terms,
+   not the citation nor fulltext terms.  You have to explicitely mention <code>fulltext</code>
+   or <code>reference</code> index to search there.  For example, to find the term <em>Higgs</em>
+   in either metadata, references or fulltext files, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=60 type="text" name="p" value="higgs or reference:higgs or fulltext:higgs">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>       
+
+   This permits an interesting combination of metadata, fulltext and citation search in
+   the same query.  For example, to get all documents written by
+   <em>Lin</em> whose fulltext files contain the words
+   <em>Schwarzschild</em> and <em>AdS</em>, and who cite journal
+   <em>Adv. Theor. Math. Phys.</em>, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=60 type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+<ifeq "<CFG_CERN_SITE>" "1" "
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+   IMPORTANT NOTE
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+      Currently, fulltext files and references are not fully searchable on the CERN site.
+      Assumed operational time: Q1 2004.
+   </td>
+   </tr>
+   </tbody>
+   </table>
+">
+
+
+<h3><a name="howto">
+<en>Frequently asked questions</en>
+<fr>Frequently asked questions</fr>
+<de>FAQ</de>
+<es>Frequently asked questions</es>
+<pt>Frequently asked questions</pt>
+<it>Frequently asked questions</it>
+<ru>Frequently asked questions</ru>
+<sk>Frequently asked questions</sk>
+<cz>Frequently asked questions</cz>
+<no>Frequently asked questions</no>
+<se>Frequently asked questions</se>
+</a></h3>
+
+<h4><a name="howto-choose-terms">
+<en>How to wisely choose your search terms (speed-wise)</en>
+<fr>How to wisely choose your search terms (speed-wise)</fr>
+<de>Wie wähle ich am geschicktesten meinen Suchbegriff</de>
+<es>How to wisely choose your search terms (speed-wise)</es>
+<pt>How to wisely choose your search terms (speed-wise)</pt>
+<it>How to wisely choose your search terms (speed-wise)</it>
+<ru>How to wisely choose your search terms (speed-wise)</ru>
+<sk>How to wisely choose your search terms (speed-wise)</sk>
+<cz>How to wisely choose your search terms (speed-wise)</cz>
+<no>How to wisely choose your search terms (speed-wise)</no>
+<se>How to wisely choose your search terms (speed-wise)</se>
+</a></h4>
+<p>
+<ul>
+<li>Whenever possible, prefer word searches instead of phrase searches.
+    Search rather for <code>black hole</code> than for <code>"black hole"</code>.
+<li>Avoid common terms such as <code>and</code>, <code>of</code>, or <code>CERN</code>.
+<li>If you are searching for a specific metadata information, such
+    as a <em>report number</em>, choose corresponding index.
+<li>If you are looking for a specific document collection, such
+    as <em>Theses</em>, choose the
+    <a href="<WEBURL>/?c=Theses">Theses</a> collection first, and start your search from there.
+</ul>
+
+<h4><a name="howto-search-for-author">
+<en>How to search for publications by a given author</en>
+<fr>How to search for publications by a given author</fr>
+<de>Wie suche ich nach Publikationen eines bestimmten Autors</de>
+<es>How to search for publications by a given author</es>
+<pt>How to search for publications by a given author</pt>
+<it>How to search for publications by a given author</it>
+<ru>How to search for publications by a given author</ru>
+<sk>How to search for publications by a given author</sk>
+<cz>How to search for publications by a given author</cz>
+<no>How to search for publications by a given author</no>
+<se>How to search for publications by a given author</se>
+</a></h4>
+
+<p>You can search for an author in many ways, each having its own
+advantages and disadvantages.
+
+<ol>
+
+<li>First of all, note that searching for words isn't usually what you
+would want here.  If you choose to search for the words <code>Ellis
+J</code> within the author index, it means that two queries (for the
+words <code>Ellis</code> and <code>J</code>) are effected first and a
+boolean AND is performed next:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="Ellis J">
+      <select name="f"><option value="">any field<option>title<option selected>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+<p>Such a query would match also a document whose first author is
+<em>Ellis, R</em> and the second author <em>Finch, A J</em>, which is
+probably not what you wanted.  While the search is very fast and you
+would have found the results for the author you were looking for, such
+a technique could have returned you many false positives, as the one
+cited above.  Instead of searching for words, a more suitable
+technique to apply in this case is to search for phrases which will
+permit you to achieve higher search precisions.
+
+<li>The author names are usually stored in a form containing initials
+only, such as <em>Ellis, J</em>.  To get the list of publications of
+an author whose name is spelled exactly that way, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="author:&quot;Ellis, J&quot;">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+<p>This way of searching gives you the highest precision and no false
+positives.  (Assuming there are no other authors whose names are
+spelled <em>Ellis, J</em>, an assumption that is often false<a
+href="#author-full-names"><sup>*</sup></a>.)  The search is very fast.
+
+<li> Sometimes an author's first name may be spelled abbreviated on
+some documents (such as <em>Ellis, J</em>) and sometimes full on
+others (such as <em>Ellis, John</em>; eventually also with the middle
+name: <em>Ellis, John Rolfe</em>).  To get the list of publications
+for all these forms at the same time, you could use a boolean OR
+query:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=60 type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+<p>This way of searching still keeps the highest precision and no
+false positives.  (Assuming there are no other authors whose names are
+spelled <em>Ellis, J</em> or <em>Ellis, John</em>, an assumption that
+is often false<a href="#author-full-names"><sup>*</sup></a>.)  The search is
+fast.
+
+<li>To match all of the above forms in a single search term, you can
+try to use a wildcard query:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="author:&quot;Ellis, J*&quot;">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+<p>It would match all author names that start by the text
+<code>Ellis, J</code>, i.e. not only the wanted forms <em>Ellis,
+J</em> and <em>Ellis, John</em>, but also <em>Ellis, Jim</em>, or
+<em>Ellis, John Rolfe</em>, or <em>Ellis, Jonathan Richard</em>.
+
+<p>This way of searching returns you more results, which may be
+suitable in case you don't know how the names are spelled in the
+database.  But you also risk the eventuality of getting false
+positives.  The search is relatively fast.
+
+<li>Yet another, the most general alternative is to use a partial
+phrase matching:
+    
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="author:'Ellis, J'">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+<p>It would find not only all the authors mentioned above, but also
+the ones whose names contain the expression <code>Ellis, J</code>
+anywhere inside the name, such as <em>De Lellis, Jim</em>.  It thus
+gives you the largest possible number of hits at the largest risk of
+false positives.  The search is relatively slow.
+
+<p>(Note though that this way of searching may be very handy in case
+of compound family names such <em>Pepe-Altarelli, M</em> or <em>'t
+Hooft, G</em> where a casual user query for <em>Hooft, G</em> would
+match the wanted author, unlike the methods mentioned above.)
+
+</ol>
+
+<p><a name="author-full-names"><strong><sup>*</sup>NOTE:</strong></a>
+If you produce your own list of publications and you notice that
+sometimes your first name is spelled abbreviated and sometimes in
+full, or if you want to identify your publications among several
+authors with the same abbreviation, please contact the <a
+href="mailto:<ADMINEMAIL>">administrators</a> of <CDSNAMEINTL> so that
+they could work with you on inputting a consistently spelled and
+properly formatted first name everywhere.  Only the consistent
+database content will ensure a proper author searching behaviour.
+
+<h4><a name="howto-sort-pattern">
+<en>How to sort according to a certain pattern</en>
+<fr>How to sort according to a certain pattern</fr>
+<de>Wie lasse ich Ergebnisse auf eine bestimmte Weise sortieren</de>
+<es>How to sort according to a certain pattern</es>
+<pt>How to sort according to a certain pattern</pt>
+<it>How to sort according to a certain pattern</it>
+<ru>How to sort according to a certain pattern</ru>
+<sk>How to sort according to a certain pattern</sk>
+<cz>How to sort according to a certain pattern</cz>
+<no>How to sort according to a certain pattern</no>
+<se>How to sort according to a certain pattern</se>
+</a></h4>
+
+<p>You may select a certain field according to which sort the search
+   results, for example to sort the results by main title.  However,
+   sometimes you may want to sort by a report number and it happens
+   that your documents have several of them.  For example, the report
+   numbers <em>hep-ph/0204140</em>, <em>CERN-TH-2002-069</em> and
+   <em>RM3-TH-02-4</em> all denote <a
+   href="<WEBURL>/search.py?p=CERN-TH-2002-069&amp;f=reportnumber">the
+   same document</a>.  Now if you sort your search results set
+   containing this document, the system will take into consideration
+   the first report number, that may be either of these three.
+   Sometimes you may want to classify this document under its
+   <em>hep-ph</em> number, sometimes under its <em>CERN</em> number,
+   depending on whether you produce a list of CERN or hep-ph
+   publications.  How can you influence the search engine to prefer
+   one report number rather than the other?
+
+   <p>In other words, the search engine by default answers a query
+   like "sort by first author" or "sort by first report number", but
+   sometimes you may want to ask the search engine to "sort by first
+   report number that starts by the text <em>CERN-</em>".  The latter
+   possibility is available via a "silent" sort parameter called
+   <code>sp</code> (for "sort pattern") that sorts preferentially
+   according to the given textual pattern if they can be found.  The
+   parameter is "silent" in a way that it is not present in the search
+   interface, you have to add it manually to your search URL.
+
+   For example, to get all CERN-TH publications of the year 2001
+   sorted by their CERN-TH numbers, you would search for
+   <code>CERN-TH-2001*</code> within <code>reportnumber</code> index,
+   and on the search results page, being satisfied with the results,
+   you would add <code>&sp=CERN-TH</code> to the URL to sort the
+   results preferentially by CERN-TH report numbers, to get a <a
+   href="<WEBURL>/search.py?p=reportnumber%3A%22CERN-TH-2001*%22&sf=reportnumber&so=a&sp=CERN-TH">nicely
+   sorted list</a> of all CERN-TH 2001 publications.
+
+<h4><a name="howto-hepdoc">
+<en>How to get documents from other servers (Google, SPIRES, KEK)</en>
+<fr>How to get documents from other servers (Google, SPIRES, KEK)</fr>
+<de>Wie bekomme ich Dokumente anderer Server (Google, SPIRES, KEK)</de>
+<es>How to get documents from other servers (Google, SPIRES, KEK)</es>
+<pt>How to get documents from other servers (Google, SPIRES, KEK)</pt>
+<it>How to get documents from other servers (Google, SPIRES, KEK)</it>
+<ru>How to get documents from other servers (Google, SPIRES, KEK)</ru>
+<sk>How to get documents from other servers (Google, SPIRES, KEK)</sk>
+<cz>How to get documents from other servers (Google, SPIRES, KEK)</cz>
+<no>How to get documents from other servers (Google, SPIRES, KEK)</no>
+<se>How to get documents from other servers (Google, SPIRES, KEK)</se>
+</a></h4>
+
+<p>On the search results page, links to other servers like <a
+href="http://google.com/">Google</a>, <a
+href="http://www.slac.stanford.edu/spires/hep/">SPIRES</a> or <a
+href="http://www-lib.kek.jp/KISS/kiss_prepri.html">KEK</a> are
+automatically proposed in a box entitled "Try your search on".  You
+can simply click on the proposed links to run your query on these
+search engines.
+
+<p>Note that the links aren't printed if the search engine doesn't
+support it.  For example, SPIRES or KEK cannot search for terms within
+"any field", so we don't link to them in these cases.
+
+<ifeq "<CFG_CERN_SITE>" "1" "
+
+   <p>Note also that KEK has scanned a lot of old CERN reports.  If
+    you find that we don't have fulltext to some old CERN report, it
+    may be worthy to look there.  For example, search for <em>CERN
+    ISR-MA/73-17</em> in our system:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="CERN ISR-MA/73-17">
+      <select name="f"><option value="">any field<option>title<option>author<option selected>reportnumber</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+   and you will see that CDS contains the document in the archives only, i.e. not in a electronic format.
+   However, if you follow the proposed <a href="http://www-lib.kek.jp/cgi-bin/kiss_prepri?RP=CERN%20ISR-MA/73-17">KEK search link</a>,
+   you will see that KEK proposes &quot;scanned images&quot; that you can download.
+">
+
+<h4><a name="howto-fulltext">
+<en>How to search in fulltext files</en>
+<fr>How to search in fulltext files</fr>
+<de>Wie kann ich in verknüpften Volltextdateien suchen</de>
+<es>How to search in fulltext files</es>
+<pt>How to search in fulltext files</pt>
+<it>How to search in fulltext files</it>
+<ru>How to search in fulltext files</ru>
+<sk>How to search in fulltext files</sk>
+<cz>How to search in fulltext files</cz>
+<no>How to search in fulltext files</no>
+<se>How to search in fulltext files</se>
+</a></h4>
+
+<p>If a metadata record contains some associated fulltext files, <CDSNAMEINTL>
+tries to extract the textual information from the files and index it into a separate <code>fulltext</code> index.
+To search for all records that contain the term <em>e-</em> in their fulltext files,
+type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="fulltext:e-">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+Recall that fulltext words aren't included in the default global ``any field'' index,
+but that you may freely combine a fulltext and metadata search.  For example, to find all
+articles written by <em>Ellis</em> that contain the word <em>muon</em> either in the
+metadata or in the fulltext, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="muon or fulltext:muon and author:ellis">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+    
+
+<ifeq "<CFG_CERN_SITE>" "1" "
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+   IMPORTANT NOTE
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+      Currently, the fulltext indexes aren't available on the CERN site.  
+      Assumed operational time: Q1 2004.
+      Please use the
+      <a href="http://weblib.cern.ch/fulltext.shtml">old fulltext interface</a>
+      instead in the meantime.
+   </td>
+   </tr>
+   </tbody>
+   </table>
+">
+
+<h4><a name="howto-citations">
+<en>How to search for citations</en>
+<fr>How to search for citations</fr>
+<de>Wie kann ich nach Zitaten suchen</de>
+<es>How to search for citations</es>
+<pt>How to search for citations</pt>
+<it>How to search for citations</it>
+<ru>How to search for citations</ru>
+<sk>How to search for citations</sk>
+<cz>How to search for citations</cz>
+<no>How to search for citations</no>
+<se>How to search for citations</se>
+</a></h4>
+
+<p>If a metadata record contains an associated fulltext file, <CDSNAMEINTL>
+tries to extract references automatically from that file and index
+them into a separate <code>reference</code> index.  To search for
+all records that cite <em>Ellis</em> in their reference lists,
+type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="reference:Ellis">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+To search for all records that cite preprint <em>hep-ph/0103062</em>
+in their reference lists, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="reference:hep-ph/0103062">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+To search for all records that cite an article from <em>Giddings</em> and <em>Ross</em> published in 
+<em>Physical Review D</em> in volume <em>61</em> in year <em>2000</em>, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=70 type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:2000">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+Recall that citation terms aren't included in the default global "any field" index,
+but that you may freely combine a citation search with a metadata search.
+For example, to find all articles on <em>standard model</em> that aren't written by
+<em>Ellis</em> but that do cite him, type: 
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="standard model -author:ellis reference:ellis">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+<ifeq "<CFG_CERN_SITE>" "1" "
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+   IMPORTANT NOTE
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+      Currently, the reference indexes aren't available on the CERN site.
+      The citation search is therefore impossible at the moment.
+      Assumed operational time: Q1 2004.
+   </td>
+   </tr>
+   </tbody>
+   </table>
+">
+
