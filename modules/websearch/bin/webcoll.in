@@ -569,26 +569,26 @@ class Collection:
                     box += """</select>"""
         return box
 
-    def create_inputdate(self, name="d1"):
+    def create_inputdate(self, name="d1", ln=cdslang):
         "Produces 'From Date', 'Until Date' kind of selection box.  Suitable for search options."
         box = ""
         # day
         box += """<select name="%sd">""" % name
-        box += """<option value="">any day"""
+        box += """<option value="">%s""" % msg_any_day[ln]
         for day in range(1,32):
             box += """<option value="%02d">%02d""" % (day, day)
         box += """</select>"""
         # month
         box += """<select name="%sm">""" % name
-        box += """<option value="">any month"""
-        for mm, month in [('01','January'), ('02','February'), ('03','March'), ('04','April'), \
-                          ('05','May'), ('06','June'), ('07','July'), ('08','August'), \
-                          ('09','September'), ('10','October'), ('11','November'), ('12','December')]:
-            box += """<option value="%s">%s""" % (mm, month)
+        box += """<option value="">%s""" % msg_any_month[ln]
+        for mm, month in [(1,msg_january[ln]), (2,msg_february[ln]), (3,msg_march[ln]), (4,msg_april[ln]), \
+                          (5,msg_may[ln]), (6,msg_june[ln]), (7,msg_july[ln]), (8,msg_august[ln]), \
+                          (9,msg_september[ln]), (10,msg_october[ln]), (11,msg_november[ln]), (12,msg_december[ln])]:
+            box += """<option value="%02d">%s""" % (mm, month)
         box += """</select>"""
         # year
         box += """<select name="%sy">""" % name
-        box += """<option value="">any year"""
+        box += """<option value="">%s""" % msg_any_year[ln]
         for year in range(1980,2004):
             box += """<option value="%d">%d""" % (year, year)
         box += """</select>"""        
@@ -863,16 +863,16 @@ class Collection:
             if self.create_publishedin():
                 out += self.create_publishedin()
         # arrival date: from/until:
-        cell_6_a = self.create_inputdate("d1")
-        cell_6_b = self.create_inputdate("d2")
+        cell_6_a = self.create_inputdate("d1", ln=ln)
+        cell_6_b = self.create_inputdate("d2", ln=ln)
         out += """<table class="searchbox">
                    <thead> 
                     <tr>
                       <th class="searchboxheader">
-                        Added since:
+                        %s
                       </th>
                       <th class="searchboxheader">
-                        until:
+                        %s
                       </th>                      
                     </tr>
                    </thead>
@@ -883,7 +883,7 @@ class Collection:
                     </tr>
                    </tbody>
                   </table>""" % \
-           (cell_6_a, cell_6_b)        
+           (msg_added_since[ln], msg_until[ln], cell_6_a, cell_6_b)        
         # format options, etc in the last table:
         cell_7_a = self.create_sortoptions(ln)
         cell_7_b = self.create_displayoptions(ln)
