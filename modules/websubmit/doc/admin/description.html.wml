@@ -37,7 +37,7 @@
         <BLOCKQUOTE>
             <UL>
                 &nbsp;<span class="guideheader">o</span>n the websubmit admin <a href="<WEBURL>/admin/websubmit/">main page</a> you will find:<br><br>
-                <IMG src="<WEBURL>/img/guide_adm_main_page.png" class="guideimg"><br><br>
+                <IMG src="<WEBURL>/img/sbm_admin_guide_mainpage.png" class="guideimg"><br><br>
                 <UL>
                     <LI>The list of all existing document type in the middle of the page. Click on one line in the list to have
                      access to the main document modification panel</SMALL>

@@ -45,7 +45,7 @@
             &nbsp;<span class="guideheader">Y</span>ou then go back to the document type manager page where you 
             can see that in the bottom array your newly implemented action appears (check the acronym in the first 
             column).<br><br>
-            <img src="<WEBURL>/img/guide_implement.jpg" class="guideimg"><br><br>
+            <img src="<WEBURL>/img/sbm_admin_guide_implement.png" class="guideimg"><br><br>
             <ul>
                 <li>Clicking on the action acronym will allow you to modify the general data about the action (remember 
                 in this case that all the other implementations of this particular action will also be changed).

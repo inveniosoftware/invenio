@@ -41,7 +41,7 @@
         </BLOCKQUOTE>
 
     <h3>The user reaches WebSubmit main page.</h3>
-    <IMG src="<WEBURL>/img/guide_mainmenu.png" alt="Main Page" class="guideimg" align="left">
+    <IMG src="<WEBURL>/img/sbm_admin_guide_mainmenu.png" alt="Main Page" class="guideimg" align="left">
     &nbsp;<span class="guideheader">T</span>o add a document type to WebSubmit, you should go to the <a target=top href="<WEBURL>/admin/websubmit/index.php">main page</a>
      and click on "New Doctype" in the left blue panel.<br><br>
     &nbsp;<span class="guideheader">E</span>ven once created, a document type will not appear automatically on this page. To configure the list of catalogues and document
@@ -49,7 +49,7 @@
       page. (see the <a href=catalogues.<lang:star: *>.html>guide section</a>)<br>
 
     <h3>The user can then click on the document type he is interested in.</h3>
-    <IMG src="<WEBURL>/img/guide_menudoc.png" alt="Document type Page" class="guideimg" align="left">
+    <IMG src="<WEBURL>/img/sbm_admin_guide_menudoc.png" alt="Document type Page" class="guideimg" align="left">
     &nbsp;<span class="guideheader">T</span>he text appearing under the header containing the name of the document
      can be configured by going to the <a target=top href="<WEBURL>/admin/websubmit/">main page</a>, click on 
      the title of the document type then on the "Edit Document Types Details" button.<br><br>
@@ -69,16 +69,16 @@
     line of the desired action. There you can set the "buttonorder" form field.<br><br>
 
     <h3>The user now may choose a category, then click on the action button he wishes.<br>The submission starts, the first page of the web form appears.</h3>
-    <IMG src="<WEBURL>/img/guide_form.png" alt="Document type Page" class="guideimg" align="left">
+    <IMG src="<WEBURL>/img/sbm_admin_guide_form.png" alt="Document type Page" class="guideimg" align="left">
     &nbsp;<span class="guideheader">T</span>his web form is composed of several pages, on each of these 
     pages form fields can be found. To modify the number of pages, add or withdraw form fields and modify 
     the texts before each form field, you shall go to the <a target=top href="<WEBURL>/admin/websubmit">main page</a>, 
     click on the title of the document type then on the icon in the "Edit Submission Pages" column and in the line of the 
-    desired action. (see the <a href=actionimplement.<lang:star: *>.html>guide section</a>)<br>
+    desired action. (see the <a href=actionimplement.<lang:star: *>.html>guide section</a>)<br><br>
 
     <h3>On the last page of the submission, there should be a button like in the following image which will 
     trigger the end script</h3>
-    <IMG src="<WEBURL>/img/guide_endaction.png" alt="Document type End Page" class="guideimg" align="left">
+    <IMG src="<WEBURL>/img/sbm_admin_guide_endaction.png" alt="Document type End Page" class="guideimg" align="left">
     &nbsp;<span class="guideheader">T</span>his button is defined like any other form field. Its definition should include
      a <i> onclick="finish();"</i> javascript attribute.<br><br>
     &nbsp;<span class="guideheader">A</span>fter clicking this button, WebSubmit will apply the end script functions 

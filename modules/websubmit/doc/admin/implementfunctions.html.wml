@@ -39,7 +39,7 @@
         <BLOCKQUOTE>
             &nbsp;<span class="guideheader">H</span>ere is what you may see then (this is the end script list of functions 
             for a document type named "TEST" and action "FTT" - Fulltext Transfer):<br><br>
-            <IMG src="<WEBURL>/img/guide_listfunctions.jpg" class="guideimg"><br><br>
+            <IMG src="<WEBURL>/img/sbm_admin_guide_listfunctions.png" class="guideimg"><br><br>
             &nbsp;<span class="guideheader">Y</span>ou can see the ordered list of all the functions in the end script. 
             This end script is composed of 2 steps (see the "step" column). The functions composing the first step are called,
              then there should be  action from the user which would trigger step 2 - in the present case the 
