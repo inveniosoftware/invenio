@@ -21,10 +21,11 @@
 function = word_similarity
 
 [word_similarity]
-stem_if_avail = yes
-stem_query_language = <CDSLANG>
+#None = no stemming
+stemming = <CDSLANG>
 table = rnkWORD01F
 #using stopword list from /bibindex/bibindex_engine_config
+#False = no stopword removal
 stopword = True
 relevance_number_output_prologue = (
 relevance_number_output_epilogue = )

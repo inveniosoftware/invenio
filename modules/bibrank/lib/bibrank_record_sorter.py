@@ -222,9 +222,9 @@ def create_rnkmethod_cache():
             methods[rank_method_code]["rnkWORD_table"] = config.get(cfg_function, "table")
             methods[rank_method_code]["col_size"] = run_sql("SELECT count(*) FROM %sR" % methods[rank_method_code]["rnkWORD_table"][:-1])[0][0]
 
-        if config.has_option(cfg_function, "stem_if_avail") and config.get(cfg_function, "stem_if_avail") == "yes":
+        if config.has_option(cfg_function, "stemming") and config.get(cfg_function, "stemming"):
             try:
-                methods[rank_method_code]["stemmer"] = config.get(cfg_function, "stem_query_language")
+                methods[rank_method_code]["stemmer"] = config.get(cfg_function, "stemming")
             except Exception,e:
                 pass
 

@@ -180,7 +180,7 @@ def get_words_from_phrase(phrase, weight, lang="",
     #By doing this like below, characters standing alone, like c a b is not added to the inedx, but when they are together with characters like c++ or c$ they are added.
     for word in split(phrase):    
         if not is_stopword_force(word) and check_term(word, 0):
-            if lang and lang !="none" and options["use_stemming"] == "yes":
+            if lang and lang !="none" and options["use_stemming"]:
                 word = stem_by_lang(word, lang)
             if not words.has_key(word):
                 words[word] = (0,0)
@@ -188,7 +188,7 @@ def get_words_from_phrase(phrase, weight, lang="",
         elif not is_stopword_force(word):  
             phrase = re.sub(chars_alphanumericseparators, ' ', word) 
             for word_ in split(phrase):   
-                if lang and lang !="none" and options["use_stemming"] == "yes":
+                if lang and lang !="none" and options["use_stemming"]:
                     word_ = stem_by_lang(word_, lang)
                 if word_:
                     if not words.has_key(word_):
@@ -1010,7 +1010,7 @@ def word_index(row, run):
         options["current_run"] = rank_method_code
         options["modified_words"] = {}
         options["table"] = config.get(config.get("rank_method", "function"), "table")
-        options["use_stemming"] = config.get(config.get("rank_method","function"),"stem_if_avail")
+        options["use_stemming"] = config.get(config.get("rank_method","function"),"stemming")
         tags = get_tags(config) #get the tags to include
         options["validset"] = get_valid_range(rank_method_code) #get the records from the collections the method is enabled for
         function = config.get("rank_method","function")
@@ -1087,11 +1087,11 @@ def get_tags(config):
             tag[2] = string.strip(tag[2])
   
             #check if stemmer for language is available
-            if config.get(function,"stem_if_avail") == "yes" and stem_by_lang("information", "en") != "inform":
+            if config.get(function,"stemming") and stem_by_lang("information", "en") != "inform":
                 if shown_error == 0:
                     write_message("Warning: PyStemmer not found. Please read INSTALL.")
                     shown_error = 1
-            elif tag[2] and tag[2] != "none" and config.get(function,"stem_if_avail") == "yes" and not lang_available(tag[2]): 
+            elif tag[2] and tag[2] != "none" and config.get(function,"stemming") and not lang_available(tag[2]): 
                 write_message("Warning: Language '%s' not available in PyStemmer." % tag[2])
             tags.append(tag)
             i += 1
