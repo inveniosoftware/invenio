@@ -104,7 +104,9 @@ $(cdspageheaderadd)
    <br>
    <strong class=headline><span class="h1">$(title)</span></strong>
 <:    
-    if ('$(navtrail_body)' =~ /\w/) {
+    if ('$(navtrail_position)' =~ /\w/) {
+        print '<br><table width="100%" class="navtrail" border=0 cellspacing=0 cellpadding=0><tr class="navtrail"><td width="3%">&nbsp;</td><td align=left><small>$(navtrail_position) &gt; $(title)</small></td></tr></table>';
+    } elsif ('$(navtrail_body)' =~ /\w/) {
         print '<br><table width="100%" class="navtrail" border=0 cellspacing=0 cellpadding=0><tr class="navtrail"><td width="3%">&nbsp;</td><td align=left><small>$(navtrail_body)</small></td></tr></table>';
     } elsif ('$(navtrail_body:-undef)' eq 'undef'){
          &navTrail();
