@@ -1,5 +1,7 @@
+## -*- mode: html; coding: utf-8; -*-
+##
 ## $Id$
-
+##
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002 CERN.
 ##
@@ -321,6 +323,7 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
@@ -341,6 +344,7 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
@@ -361,6 +365,7 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Einfache versus erweiterte Suche</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Grundlagen</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Suche nach Wörtern und Wortgruppen</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolsche Suche</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Spezielle Zeichen und Notation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">Internationale Zeichen</a>
@@ -381,6 +386,7 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
@@ -401,6 +407,7 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
@@ -421,6 +428,7 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
@@ -441,6 +449,7 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
@@ -461,6 +470,7 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
@@ -481,6 +491,7 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
@@ -501,6 +512,7 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
@@ -521,6 +533,7 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
@@ -785,6 +798,45 @@ not be obvious upon first look.  While the latter is more similar to
 what ``phrase search'' usually means in the context of web page search
 engines, the former one is usually an order of magnitude faster if you
 know the precise values you are looking for.
+
+<h3><a name="regexp">
+<en>Searching for regular expressions</en>
+<fr>Searching for regular expressions</fr>
+<de>Searching for regular expressions</de>
+<es>Searching for regular expressions</es>
+<pt>Searching for regular expressions</pt>
+<it>Searching for regular expressions</it>
+<ru>Searching for regular expressions</ru>
+<sk>Searching for regular expressions</sk>
+<cz>Searching for regular expressions</cz>
+<no>Searching for regular expressions</no>
+<se>Searching for regular expressions</se>
+</a></h3>
+
+<p>Another interesting searching mode besides the word and phrase
+searches mentioned above is the <strong>regular expression
+search</strong>.  In the Simple Search interface you can trigger it by
+using slashes instead of quotes:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="/^E.*s$/">
+      <select name="f"><option value="">any field<option selected>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+while in the Advanced Search interface you can select the matching
+type explicitely by using the selection box menu, as described above.
+
+<p>The regular expression searching mode is mostly for the power users
+acquainted with the traditional Unix regexp syntax.  The above example
+<code>/^E.*s$/</code> will find all the titles that start by the
+letter <em>E</em>, followed by any number of any characters, and end
+by the letter <em>s</em>.  To learn more about the regular expression
+syntax, please consult for example <a
+href="http://en.wikipedia.org/wiki/Regular_expression">Wikipedia
+regexp article</a> and the references therein.
 
 <h3><a name="boolean">
 <en>Boolean queries</en>
