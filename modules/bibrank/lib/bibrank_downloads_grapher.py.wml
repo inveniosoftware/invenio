@@ -232,8 +232,8 @@ def write_html(content_text, user_analysis_text=""):
     """Html code which contains 2 images :
     The left part represents the history of the downloads since the document creation
     The right part reprsents the repartition (cern's user or not) of the users who have downloaded the document """
-    text = """<br/><br/><table class="searchbox" summary=""><tr><td class="blocknote">
-    Downloads History %s</td></tr><tr><td">
+    text = """<br/><br/><table><tr><td class="blocknote">
+    Downloads history: %s</td></tr><tr><td>
     <table border=0 cellspacing=1 cellpadding=1>""" %  user_analysis_text
     text += content_text
     text += "</table></td></tr></table>"
