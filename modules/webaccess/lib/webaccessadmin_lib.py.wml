@@ -49,7 +49,7 @@ from webpage import page, pageheaderonly, pagefooteronly
 from webuser import getUid, get_email, page_not_authorized
 from mod_python import apache
 from search_engine import print_record
-from cdsware.webuser import checkemail, get_user_preferences, set_user_preferences
+from webuser import checkemail, get_user_preferences, set_user_preferences
 
 __version__ = "$Id$"
 
