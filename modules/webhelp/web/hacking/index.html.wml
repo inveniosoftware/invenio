@@ -39,6 +39,9 @@ href="<WEBURL>/admin/">admin-level</a> documentation as well.  And now, back to 
 <dt><a href="style.html">Coding Style</a>
 <dd>A policy we try to follow, for good or bad.
 
+<dt><a href="releases.html">Release Numbering Scheme</a>
+<dd>Presenting the version numbering scheme adopted for CDSware stable and development releases.
+
 <dt><a href="directory.html">Directory Organization</a>
 <dd>How the source and target directories are organized, where the
 sources get installed to, what is the visible URL policy, etc.
