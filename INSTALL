@@ -39,9 +39,14 @@ Contents
      d) WML - Website META Language:
           <http://www.engelschall.com/sw/wml/>
 
-     e) Python v2.x, featuring recent MySQLdb v0.9x module:
+     e) Python v2.x, featuring recent MySQLdb v0.9x module
+        (it is recommended to use Python v2.2 that gives ~30% faster
+         search speed than Python v2.1; also, it is recommended to
+         install optional Psyco module that further increases the
+         speed of Set operations by about ~20%):
           <http://python.org/>
           <http://sourceforge.net/projects/mysql-python>
+          <http://psyco.sourceforge.net/>
 
      f) If you want to be able to search for words in the fulltext files 
         (i.e. to have fulltext indexing), then you need as well to install 
@@ -81,9 +86,9 @@ Contents
       $ wget http://cdsware.cern.ch/download/cdsware-0.9.tar.gz
       $ tar xvfz cdsware-0.9.tar.gz
       $ cd cdsware-0.9
-      $ ./configure --with-htdocsdir=/www/data/ \
-                    --with-cgibindir=/www/cgi-bin/ \
-                    --with-dbutildir=/usr/local/bin/ \
+      $ ./configure --with-htdocsdir=/www/data/CDSware/ \
+                    --with-cgibindir=/www/cgi-bin/CDSware/ \
+                    --with-dbutildir=/usr/local/bin/CDSware/ \
                     --with-htdocsurl=http://webserver.domain.com/CDSware/ \
                     --with-cgibinurl=http://webserver.domain.com/cgi-bin/CDSware/ \
                     --with-dbhost=sqlserver.domain.com \
@@ -177,9 +182,9 @@ Contents
    
           Go to the source directory.
 
-      $ ./configure --with-htdocsdir=/www/data/ \
-                    --with-cgibindir=/www/cgi-bin/ \
-                    --with-dbutildir=/usr/local/bin/ \
+      $ ./configure --with-htdocsdir=/www/data/CDSware/ \
+                    --with-cgibindir=/www/cgi-bin/CDSware/ \
+                    --with-dbutildir=/usr/local/bin/CDSware/ \
                     --with-htdocsurl=http://webserver.domain.com/CDSware/ \
                     --with-cgibinurl=http://webserver.domain.com/cgi-bin/CDSware/ \
                     --with-dbhost=sqlserver.domain.com \
@@ -193,10 +198,10 @@ Contents
           database name, and database user credentials.
           
           The first two directories must be within the Apache's htdocs
-          and cgi-bin paths.  The DB utilities may be installed
-          anywhere on the system.  Note that CDSware won't install in any
-          other directories but the three mentioned in the above
-          configure line.
+          and cgi-bin paths, respectively.  The DB utilities may be
+          installed anywhere on the system.  Note that CDSware won't
+          install in any other directories but the three mentioned in
+          the above configure line.
 
           This configuration step is mandatory, and is referred to as
           "pre-compile time configuration step a)" in the elucidative
