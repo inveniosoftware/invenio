@@ -231,18 +231,18 @@ def create_user_infobox(uid):
     """Create info box on currenly logged user.""" 
     out = ""
     if isGuestUser(uid):
-        out +=  """guest :: <a class="userinfo" href="%s/youraccount.py/display">info</a>::
+        out +=  """guest :: <a class="userinfo" href="%s/youraccount.py/display">session</a> |
 		    	    <a class="userinfo" href="%s/youraccount.py/login">login</a>
 		"""%(weburl,weburl)
 	   	
     else:
         out += """%s ::
-	       <a class="userinfo" href="%s/youraccount.py/display">account</a></strong> ::
-               <a class="userinfo" href="%s/yourbaskets.py/display">baskets</a></strong> ::
-               <a class="userinfo" href="%s/youralerts.py/list">alerts</a></strong> ::
+	       <a class="userinfo" href="%s/youraccount.py/display">account</a> |
+               <a class="userinfo" href="%s/youralerts.py/list">alerts</a> |
+               <a class="userinfo" href="%s/yourbaskets.py/display">baskets</a> |
                <a class="userinfo" href="%s/youraccount.py/logout">logout</a>""" % \
                (get_email(uid), weburl, weburl, weburl, weburl)
-    return """<strong>USER:</strong> %s""" % out
+    return """<img src="%s/img/head.gif" border="0"> %s""" % (weburl, out)
 
 ## --- follow some functions for Apache user/group authentication
 
