@@ -18,25 +18,49 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
-    title="CDSware Modules" \
+    title="Modules Overview" \
     navbar_name="hacking-modules" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking Corner</a> " \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> " \
     navbar_select="hacking-modules" 
 
 <pre>
 CDSWARE MODULE OVERVIEW / $Date$
 
-bibformat
-bibsched
-bibupload
-bibwords
-miscutil
-webalert
-webbasket
-webhelp
-websearch
-websession
-webstyle
-websubmit
+CDSware consists of several more or less independent modules with
+precisely defined functionality.  The general criterion for module
+names is to use the ``Bib'' prefix to denote modules that work more
+with the bibliographic data, and the ``Web'' prefix to denote modules
+that work more with the Web interface.  (The difference is of course
+blurred in some cases, as in the case of search engine that has got a
+web interface but searches bibliographic data.)
+
+Follows a brief description of what each module does.  After the
+description we shall present the module relationship diagram.
+
+  - BibFormat    
+  
+  - BibSched
+  
+  - BibUpload
+  
+  - BibWords
+  
+  - MiscUtil
+  
+  - WebAlert
+  
+  - WebBasket
+  
+  - WebHelp
+  
+  - WebSearch
+  
+  - WebSession
+  
+  - WebStyle
+  
+  - WebSubmit
+  
+
 
 </pre>
