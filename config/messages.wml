@@ -105,8 +105,8 @@
   <pt>Ajuda de Busca</pt>
   <it>Aiuto alla Ricerca</it>
   <ru>Помощь для поиска</ru>
-  <sk>Pomoc pri vyhľadávaní</sk>
-  <cz>Pomoc při vyhledávaní</cz>
+  <sk>Pomoc pre vyhľadávanie</sk>
+  <cz>Nápověda pro vyhledávaní</cz>
   <no></no>
 </define-tag>
 
@@ -994,6 +994,58 @@
   <ru>guest</ru>
   <sk>hosť</sk>
   <cz>host</cz>
+  <no></no>
+</define-tag>
+
+<define-tag MSG_SUBMIT_HELP whitespace=delete>
+  <en>Submit Help</en>
+  <fr>Aide de Soumission</fr>
+  <de>Eintragehilfe</de> 
+  <es>Submit Help</es> 
+  <pt>Submit Help</pt>
+  <it>Submit Help</it> 
+  <ru>Помощь для приданья</ru>
+  <sk>Pomoc pre pridávanie</sk>
+  <cz>Nápověda pro přidávání</cz>
+  <no></no>
+</define-tag>
+
+<define-tag MSG_ADMIN_AREA whitespace=delete>
+  <en>Administrator&quot;s Area</en>
+  <fr>Coin d&quot;Administrateur</fr>
+  <de>Administrator&quot;s Area</de> 
+  <es>Administrator&quot;s Area</es> 
+  <pt>Administrator&quot;s Area</pt>
+  <it>Administrator&quot;s Area</it> 
+  <ru>Ареал Администратора</ru>
+  <sk>Areál Administrátora</sk>
+  <cz>Areál Administrátora</cz>
+  <no></no>
+</define-tag>
+
+<define-tag MSG_ADMIN_SUBMIT whitespace=delete>
+  <en>WebSubmit Administration</en>
+  <fr>Administration de Soumission</fr>
+  <de>WebSubmit Administration</de> 
+  <es>WebSubmit Administration</es> 
+  <pt>WebSubmit Administration</pt>
+  <it>WebSubmit Administration</it> 
+  <ru>Администрация Придания</ru>
+  <sk>Administrácia Pridávania</sk>
+  <cz>Administrace Přidávání</cz>
+  <no></no>
+</define-tag>
+
+<define-tag MSG_GUIDE whitespace=delete>
+  <en>Guide</en>
+  <fr>Guide</fr>
+  <de>WebSubmit Administration</de> 
+  <es>WebSubmit Administration</es> 
+  <pt>WebSubmit Administration</pt>
+  <it>WebSubmit Administration</it> 
+  <ru>Руководитель</ru>
+  <sk>Príručka</sk>
+  <cz>Příručka</cz>
   <no></no>
 </define-tag>
 
