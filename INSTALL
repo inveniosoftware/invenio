@@ -125,7 +125,7 @@ Contents
       $ make create-demo-site    ## optional
       $ make load-demo-records   ## optional
       $ make remove-demo-records ## optional
-      $ make destroy-demo-site   ## optional
+      $ make drop-demo-site   ## optional
       $ netscape http://webserver.domain.com/cdsware/admin/ ## optional
 
 2. Detailed instructions for the patient CDSware admin
@@ -326,9 +326,9 @@ Contents
           etc configurations that you may reuse and modify for
           production purposes.
 
-      $ make destroy-demo-site ## optional
+      $ make drop-demo-site ## optional
 
-          Optionally, destroy also all the demo configuration so that
+          Optionally, drop also all the demo configuration so that
           you'll have a blank CDSware system for your production
           purposes.
 
