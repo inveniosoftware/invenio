@@ -338,7 +338,6 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             level.append(arr[5])
             txt.append(arr[6])
             fullDesc.append(arr[4])
-            txt.append(arr[6])
             check.append(arr[7])
             fieldhtml.append(text)
             nbFields = nbFields+1
