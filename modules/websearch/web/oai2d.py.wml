@@ -1,4 +1,4 @@
-## $Id$
+## $Id$ 
 ## OAI interface for CDSware/MySQL written in Python compliant with OAI-PMH2.0
 
 ## This file is part of the CERN Document Server Software (CDSware).
@@ -32,7 +32,7 @@ __version__ = "$Id$"
 
 
 ## fill config variables:
-pylibdir = "<LIBDIR>/python" 
+pylibdir = "<LIBDIR>/python"
 
 ## OAI config variables
 oaiidprefix            =   "<OAIIDPREFIX>"
@@ -43,7 +43,7 @@ oaisetfield            =   "909COp"
 
 try:
     import sys
-    import cgi
+    import urllib
     sys.path.append('%s' % pylibdir)
     from cdsware.config import *
     from cdsware.dbquery import run_sql
@@ -52,51 +52,87 @@ except ImportError, e:
     import sys
     sys.stderr.write("Error: %s" % e)
     sys.exit(1)
- 
+
 
 def index (req):
     "OAI repository interface"
 
-## parse input parameters passed via GET/POST method
+
+## parse input parameters
+
+    args = ""
 
     if req.method == "GET":
-        arguments = req.args
+        args = req.args
 
     elif req.method == "POST":
-        len = int(req.headers_in["content-length"])
-        if len > 0:
-            arguments = req.read(len)
-        else:
-            arguments = "verb=Identify"
+        params = {}
+        for key in req.form.keys():
+            params[key] = req.form[key]
+        args = urllib.urlencode(params)    
+
+    arg = oai_repository.parse_args(args)
 
 
-    arg = oai_repository.parse_args(arguments)
- 
-## check OAI compliancy
+## check request for OAI compliancy
 
     oai_error = oai_repository.check_args(arg)
 
-## run for compliant input
+
+## create OAI response
+
+    req.content_type = "text/xml"
+    req.send_http_header()
 
     if oai_error == "":
-  
+
+## OAI Identify 
+
         if arg['verb']   == "Identify":
-            req.write(oai_repository.OAIIdentify(arguments))
+            req.write(oai_repository.OAIIdentify(args))
+
+
+## OAI ListSets
+
         elif arg['verb'] == "ListSets":
-            req.write(oai_repository.OAIListSets(arguments, arg['resumptionToken']))
+            req.write(oai_repository.OAIListSets(args))
+
+
+## OAI ListIdentifiers
+
         elif arg['verb'] == "ListIdentifiers":
-            req.write(oai_repository.OAIListIdentifiers(arguments, arg['metadataPrefix'], arg['from'], arg['until'], arg['set'], arg['resumptionToken']))
-        elif arg['verb'] == "ListRecords": 
-            req.write(oai_repository.OAIListRecords(arguments, arg['metadataPrefix'], arg['from'], arg['until'], arg['set'], arg['resumptionToken']))
-        elif arg['verb'] == "GetRecord":
-            req.write(oai_repository.OAIGetRecord(arguments, arg['identifier'], arg['metadataPrefix']))
+            req.write(oai_repository.OAIListIdentifiers(args))
+
+
+## OAI ListRecords
+
+        elif arg['verb'] == "ListRecords":  
+            req.write(oai_repository.OAIListRecords(args))
+
+
+## OAI GetRecord
+
+        elif arg['verb'] == "GetRecord": 
+            req.write(oai_repository.OAIGetRecord(args))
+
+
+## OAI ListMetadataFormats
+
         elif arg['verb'] == "ListMetadataFormats":
-            req.write(oai_repository.OAIListMetadataFormats(arguments, arg['identifier'], arg['resumptionToken']))
+            req.write(oai_repository.OAIListMetadataFormats(args))
+
+
+## Unknown verb
+
         else:
             req.write(oai_repository.oai_error("badVerb","Illegal OAI verb"))
-    else:
-        req.write(oai_repository.oai_header(arguments,""))
+
+
+## OAI error
+
+    else: 
+        req.write(oai_repository.oai_header(args,""))
         req.write(oai_error)
         req.write(oai_repository.oai_footer(""))
 
-    return "\n" 
+    return "\n"

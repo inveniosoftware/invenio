@@ -31,6 +31,7 @@
 ## fill config variables:
 pylibdir = "<LIBDIR>/python"
 
+
 ## OAI config variables
 oaiidprefix            =   "<OAIIDPREFIX>"
 oaisampleidentifier    =   "<OAISAMPLEIDENTIFIER>"
@@ -70,79 +71,74 @@ verbs = {
 <protect>
 
 def encode_for_xml(s):
-    "Encode special chars in string so that it would be XML-compliant."
+    "Encode special chars in string for XML-compliancy."
 
     s = string.replace(s, '&', '&amp;')
     s = string.replace(s, '<', '&lt;')
     return s
 
 def encode_for_url(s):
-    "Encode special chars in string so that it would be URL-compliant."
+    "Encode special chars in string for URL-compliancy."
 
     s = string.replace(s, ' ', '%20')
-#    s = string.replace(s, '/', '%2F')
     s = string.replace(s, '?', '%3F')
     s = string.replace(s, '#', '%23')
     s = string.replace(s, '=', '%3D')
     s = string.replace(s, '&', '%26')
-#    s = string.replace(s, ':', '%3A')
-#    s = string.replace(s, ';', '%3B')
     s = string.replace(s, '%', '%25')
-#    s = string.replace(s, '+', '%2B')
 
     return s
 
 def oai_header(args, verb):
     "Print OAI header"
 
-    out_stream = ""
+    out = ""
 
-###    out_stream = "Content-Type: text/xml\n\n"
-    out_stream = out_stream + "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n"
-    out_stream = out_stream + "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">\n"
+    out = out + "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n"
+    out = out + "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">\n"
 
-    out_stream = out_stream + " <responseDate>" + OAIGetResponseDate() + "</responseDate>\n"
+    out = out + " <responseDate>" + OAIGetResponseDate() + "</responseDate>\n"
 
     if verb:
-        out_stream = out_stream + " <request verb=\"%s\">%s</request>\n" % (verb,OAIGetRequestURL(args))
-        out_stream = out_stream + " <%s>\n" % verb
+        out = out + " <request verb=\"%s\">%s</request>\n" % (verb,OAIGetRequestURL(args))
+        out = out + " <%s>\n" % verb
     else:
-        out_stream = out_stream + " <request>%s</request>\n" % (OAIGetRequestURL(args))
+        out = out + " <request>%s</request>\n" % (OAIGetRequestURL(args))
 
-    return out_stream
+    return out
 
 def oai_footer(verb):
     "Print OAI footer"
 
-    out_stream = ""
+    out = ""
 
     if verb:
-        out_stream = "%s </%s>\n" % (out_stream, verb)
-    out_stream = out_stream + "</OAI-PMH>\n"
+        out = "%s </%s>\n" % (out, verb)
+    out = out + "</OAI-PMH>\n"
 
-    return out_stream
+    return out
 
 def oai_error_header(args, verb):
     "Print OAI header"
 
-    out_stream = ""
+    out = ""
 
-###    out_stream = "Content-Type: text/xml\n\n"
-    out_stream = out_stream + "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n"
-    out_stream = out_stream + "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">\n"
+###    out = "Content-Type: text/xml\n\n"
+    out = out + "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n"
+    out = out + "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">\n"
 
-    out_stream = out_stream + " <responseDate>" + OAIGetResponseDate() + "</responseDate>\n"
-    out_stream = out_stream + " <request verb=\"%s\">%s</request>\n" % (verb,OAIGetRequestURL(args))
+    out = out + " <responseDate>" + OAIGetResponseDate() + "</responseDate>\n"
+    out = out + " <request verb=\"%s\">%s</request>\n" % (verb,OAIGetRequestURL(args))
 
-    return out_stream
+    return out
 
 def oai_error_footer(verb):
     "Print OAI footer"
 
-    out_stream = ""
-    out_stream = out_stream + "</OAI-PMH>\n"
+    out = ""
+    out = out + "</OAI-PMH>\n"
 
-    return out_stream
+    return out
 
 def get_field(sysno, field):
     "Gets list of field 'field' for the record with 'sysno' system number."
@@ -222,6 +218,16 @@ def get_modification_date(sysno):
         out = row[0]
     return localtime_to_UTC(out)
 
+def get_earliest_datestamp():
+    "Get earliest datestamp in the database"
+
+    out = ""
+
+    query = "SELECT MIN(DATE_FORMAT(creation_date,'%Y-%m-%d %H:%i:%s')) FROM bibrec"
+
+    res = run_sql(query)
+    return localtime_to_UTC(res[0][0])
+
 def check_date(date, time="T00:00:00Z"):
     "Check if the date has a correct format"
 
@@ -251,11 +257,10 @@ def record_exists(sysno):
 
     return out
 
-
 def print_record(sysno, format='marcxml'):
     "Prints record 'sysno' formatted accoding to 'format'."
 
-    out_stream = ""
+    out = ""
 
     # sanity check:
     if not record_exists(sysno):
@@ -266,24 +271,24 @@ def print_record(sysno, format='marcxml'):
 
     # print record opening tags:
     
-    out_stream = out_stream + "  <record>\n"
-    out_stream = out_stream + "   <header>\n"
+    out = out + "  <record>\n"
+    out = out + "   <header>\n"
     for id in get_field(sysno,oaiidfield):
-        out_stream = "%s    <identifier>%s</identifier>\n" % (out_stream, encode_for_url(id))
-    out_stream = "%s    <datestamp>%s</datestamp>\n" % (out_stream, get_modification_date(sysno))
+        out = "%s    <identifier>%s</identifier>\n" % (out, encode_for_url(id))
+    out = "%s    <datestamp>%s</datestamp>\n" % (out, get_modification_date(sysno))
     for set in get_field(sysno,oaisetfield):
-        out_stream = "%s    <setSpec>%s</setSpec>\n" % (out_stream, set)
-    out_stream = out_stream + "   </header>\n"
-    out_stream = out_stream + "   <metadata>\n"
+        out = "%s    <setSpec>%s</setSpec>\n" % (out, set)
+    out = out + "   </header>\n"
+    out = out + "   <metadata>\n"
 
     if format == "marcxml":
-        out_stream = out_stream + "    <record xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\" type=\"Bibliographic\">"
-        out_stream = out_stream + "     <leader>00000coc  2200000uu 4500</leader>"
+        out = out + "    <record xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\" type=\"Bibliographic\">"
+        out = out + "     <leader>00000coc  2200000uu 4500</leader>"
        ## MARC21 and XML formats, possibley OAI -- they are not in "bibfmt" table; so fetch all the data from "bibXXx" tables:
 
         if format == "marcxml":
 
-            out_stream = "%s     <controlfield tag=\"001\">%d</controlfield>\n" % (out_stream, int(sysno))
+            out = "%s     <controlfield tag=\"001\">%d</controlfield>\n" % (out, int(sysno))
 
         for digit1 in range(0,10):
             for digit2 in range(0,10):
@@ -309,62 +314,61 @@ def print_record(sysno, format='marcxml'):
                             fieldid = encode_for_xml(field[0:3])
 
                             if field_number_old != -999:
-                                out_stream = out_stream + "     </datafield>\n"
+                                out = out + "     </datafield>\n"
 
-                            out_stream = "%s     <datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">\n" % (out_stream, encode_for_xml(field[0:3]), encode_for_xml(ind1).lower(), encode_for_xml(ind2).lower())
+                            out = "%s     <datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">\n" % (out, encode_for_xml(field[0:3]), encode_for_xml(ind1).lower(), encode_for_xml(ind2).lower())
 
                         field_number_old = field_number
                         field_old = field
                     # print subfield value
                     if format == "marcxml":
                         value = encode_for_xml(value)
-                        out_stream = "%s      <subfield code=\"%s\">%s</subfield>\n" % (out_stream, encode_for_xml(field[-1:]), value)
+                        out = "%s      <subfield code=\"%s\">%s</subfield>\n" % (out, encode_for_xml(field[-1:]), value)
    
                     # fetch next subfield
                 # all fields/subfields printed in this run, so close the tag:
                 if (format == "marcxml") and field_number_old != -999:
-                    out_stream = out_stream + "     </datafield>\n"
-        out_stream = out_stream + "    </record>\n"
+                    out = out + "     </datafield>\n"
+        out = out + "    </record>\n"
 
     elif format == "xd":
         # XML Dublin Core format, possibly OAI -- select only some bibXXx fields:
-        out_stream = out_stream + "       <oaidc:dc xmlns=\"http://purl.org/dc/elements/1.1/\" xmlns:oaidc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">\n"
+        out = out + "       <oaidc:dc xmlns=\"http://purl.org/dc/elements/1.1/\" xmlns:oaidc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">\n"
 
         for f in get_field(sysno, "041__a"):
-            out_stream =  "%s         <language>%s</language>\n" % (out_stream, f)
+            out =  "%s         <language>%s</language>\n" % (out, f)
 
         for f in get_field(sysno, "100__a"):
-            out_stream =  "%s         <creator>%s</creator>\n" % (out_stream, encode_for_xml(f))
+            out =  "%s         <creator>%s</creator>\n" % (out, encode_for_xml(f))
 
         for f in get_field(sysno, "700__a"):
-            out_stream =  "%s         <creator>%s</creator>\n" % (out_stream, encode_for_xml(f))
+            out =  "%s         <creator>%s</creator>\n" % (out, encode_for_xml(f))
 
         for f in get_field(sysno, "245__a"):
-            out_stream =  "%s         <title>%s</title>\n" % (out_stream, encode_for_xml(f))
+            out =  "%s         <title>%s</title>\n" % (out, encode_for_xml(f))
 
         for f in get_field(sysno, "65017a"):
-            out_stream =  "%s         <subject>%s</subject>\n" % (out_stream, encode_for_xml(f))
+            out =  "%s         <subject>%s</subject>\n" % (out, encode_for_xml(f))
 
         for f in get_field(sysno, "8564_u"):
-            out_stream =  "%s         <identifier>%s</identifier>\n" % (out_stream, encode_for_xml(encode_for_url(f)))
+            out =  "%s         <identifier>%s</identifier>\n" % (out, encode_for_xml(encode_for_url(f)))
         
         for f in get_field(sysno, "520__a"):
-            out_stream = "%s         <description>%s</description>\n" % (out_stream, encode_for_xml(f))
+            out = "%s         <description>%s</description>\n" % (out, encode_for_xml(f))
 
         date = get_creation_date(sysno)
 
-        out_stream = "%s         <date>%s</date>\n" % (out_stream, date)
-        out_stream = out_stream + "    </oaidc:dc>\n"
+        out = "%s         <date>%s</date>\n" % (out, date)
+        out = out + "    </oaidc:dc>\n"
 
     # print record closing tags:
     
-    out_stream = out_stream + "   </metadata>\n"
-    out_stream = out_stream + "  </record>\n"
+    out = out + "   </metadata>\n"
+    out = out + "  </record>\n"
 
-    return out_stream
+    return out
 
-
-def OAIListMetadataFormats(args, identifier="",resumptionToken=""):
+def OAIListMetadataFormats(args):
     "Generates response to OAIListMetadataFormats verb."
 
 </protect>
@@ -374,15 +378,17 @@ def OAIListMetadataFormats(args, identifier="",resumptionToken=""):
 
 <protect>
 
-    out_stream = ""
+    arg = parse_args(args)
+
+    out = ""
 
     flag = 1 # list or not depending on identifier
 
-    if identifier:
+    if arg['identifier'] != "":
 
         flag = 0
 
-        sysno = OAIGetSysno(identifier)
+        sysno = OAIGetSysno(arg['identifier'])
 
         if record_exists(sysno):
 
@@ -390,27 +396,27 @@ def OAIListMetadataFormats(args, identifier="",resumptionToken=""):
 
         else:
 
-            out_stream = out_stream + oai_error("badArgument","invalid record Identifier")
-            out_stream = oai_error_header(args, "ListMetadataFormats") + out_stream + oai_error_footer("ListMetadataFormats")
-            return out_stream
+            out = out + oai_error("badArgument","invalid record Identifier")
+            out = oai_error_header(args, "ListMetadataFormats") + out + oai_error_footer("ListMetadataFormats")
+            return out
 
     if flag:
-        out_stream = out_stream + "   <metadataFormat>\n"
-        out_stream = out_stream + "    <metadataPrefix>oai_dc</metadataPrefix>\n"
-        out_stream = out_stream + "    <schema>http://www.openarchives.org/OAI/1.1/dc.xsd</schema>\n"
-        out_stream = out_stream + "    <metadataNamespace>http://purl.org/dc/elements/1.1/</metadataNamespace>\n"
-        out_stream = out_stream + "   </metadataFormat>\n"
-        out_stream = out_stream + "   <metadataFormat>\n"
-        out_stream = out_stream + "    <metadataPrefix>marcxml</metadataPrefix>\n"
-        out_stream = out_stream + "    <schema>http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd</schema>\n"
-        out_stream = out_stream + "    <metadataNamespace>http://www.loc.gov/MARC21/slim</metadataNamespace>\n"
-        out_stream = out_stream + "   </metadataFormat>\n"
+        out = out + "   <metadataFormat>\n"
+        out = out + "    <metadataPrefix>oai_dc</metadataPrefix>\n"
+        out = out + "    <schema>http://www.openarchives.org/OAI/1.1/dc.xsd</schema>\n"
+        out = out + "    <metadataNamespace>http://purl.org/dc/elements/1.1/</metadataNamespace>\n"
+        out = out + "   </metadataFormat>\n"
+        out = out + "   <metadataFormat>\n"
+        out = out + "    <metadataPrefix>marcxml</metadataPrefix>\n"
+        out = out + "    <schema>http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd</schema>\n"
+        out = out + "    <metadataNamespace>http://www.loc.gov/MARC21/slim</metadataNamespace>\n"
+        out = out + "   </metadataFormat>\n"
 
-    out_stream = oai_header(args,"ListMetadataFormats") + out_stream + oai_footer("ListMetadataFormats")
-    return out_stream
+    out = oai_header(args,"ListMetadataFormats") + out + oai_footer("ListMetadataFormats")
+    return out
 
 
-def OAIListRecords(args, metadataPrefix, fromDate, untilDate, set, resumptionToken):
+def OAIListRecords(args):
     "Generates response to OAIListRecords verb."
 
 </protect>
@@ -418,30 +424,32 @@ def OAIListRecords(args, metadataPrefix, fromDate, untilDate, set, resumptionTok
     nb_records_in_resume = <OAILOAD>
 <protect>
 
-    out_stream = ""
+    arg = parse_args(args)
+
+    out = ""
 
     sysnos = []
     sysno  = []
 
     # check if the resumptionToken did not expire
-    if resumptionToken:
-        filename = "%s/RTdata/%s" % (logdir, resumptionToken)
+    if arg['resumptionToken']:
+        filename = "%s/RTdata/%s" % (logdir, arg['resumptionToken'])
         if os.path.exists(filename) == 0:
-             out_stream = oai_error("badResumptionToken","ResumptionToken expired")
-             out_stream = oai_error_header(args, "ListRecords") + out_stream + oai_error_footer("ListRecords")
-             return out_stream
+             out = oai_error("badResumptionToken","ResumptionToken expired")
+             out = oai_error_header(args, "ListRecords") + out + oai_error_footer("ListRecords")
+             return out
 
-    if resumptionToken:
-        sysnos = OAICacheOut(resumptionToken)
-        metadataPrefix = sysnos.pop()
+    if arg['resumptionToken'] != "":
+        sysnos = OAICacheOut(arg['resumptionToken'])
+        arg['metadataPrefix'] = sysnos.pop()
     else:
-        sysnos = OAIGetSysnoList(set, fromDate, untilDate)
+        sysnos = OAIGetSysnoList(arg['set'], arg['from'], arg['until'])
 
     if len(sysnos) == 0: # noRecordsMatch error
         
-        out_stream = out_stream + oai_error("noRecordsMatch","no records correspond to the request")
-        out_stream = oai_error_header(args, "ListRecords") + out_stream + oai_error_footer("ListRecords")
-        return out_stream
+        out = out + oai_error("noRecordsMatch","no records correspond to the request")
+        out = oai_error_header(args, "ListRecords") + out + oai_error_footer("ListRecords")
+        return out
 
     i = 0
     for s in sysnos:
@@ -449,29 +457,28 @@ def OAIListRecords(args, metadataPrefix, fromDate, untilDate, set, resumptionTok
             i = i + 1
             if i > nb_records_in_resume:          # cache or write?
                 if i == nb_records_in_resume + 1: # resumptionToken?
-                    resumptionToken = OAIGenResumptionToken()
+                    arg['resumptionToken'] = OAIGenResumptionToken()
                     extdate = OAIGetResponseDate(oai_rt_expire)
                     if extdate:
-                        out_stream = "%s <resumptionToken expirationDate=\"%s\">%s</resumptionToken>\n" % (out_stream,extdate,resumptionToken)
+                        out = "%s <resumptionToken expirationDate=\"%s\">%s</resumptionToken>\n" % (out,extdate,arg['resumptionToken'])
                     else:
-                        out_stream = "%s <resumptionToken>%s</resumptionToken>\n" % (out_stream, resumptionToken)
+                        out = "%s <resumptionToken>%s</resumptionToken>\n" % (out, arg['resumptionToken'])
                 sysno.append(s)
             else:
                 done = 0
                 for f in get_field(s, "245__a"):
                     if done == 0:
-                        out_stream = out_stream + print_record(s, metadataPrefix)
+                        out = out + print_record(s, arg['metadataPrefix'])
 
     if i > nb_records_in_resume:
         OAICacheClean()
-        sysno.append(metadataPrefix)
-        OAICacheIn(resumptionToken,sysno)
+        sysno.append(arg['metadataPrefix'])
+        OAICacheIn(arg['resumptionToken'],sysno)
 
-    out_stream = oai_header(args,"ListRecords") + out_stream + oai_footer("ListRecords")
-    return out_stream
+    out = oai_header(args,"ListRecords") + out + oai_footer("ListRecords")
+    return out
 
-
-def OAIListSets(args, resumptionToken=""):
+def OAIListSets(args):
     "Lists available sets for OAI metadata harvesting."
 
 </protect>
@@ -479,43 +486,49 @@ def OAIListSets(args, resumptionToken=""):
     nb_sets_in_resume = <OAILOAD>
 <protect>
 
-    out_stream = ""
+    arg = parse_args(args)
+
+    out = ""
 
     # note: no flow control in ListSets
-    
+
     sets = get_sets()
 
     for s in sets:
 
-        out_stream = out_stream + "  <set>\n"
-        out_stream = "%s    <setSpec>%s</setSpec>\n" % (out_stream, s[0])
-        out_stream = "%s    <setName>%s</setName>\n" % (out_stream, s[1])
+        out = out + "  <set>\n"
+        out = "%s    <setSpec>%s</setSpec>\n" % (out, s[0])
+        out = "%s    <setName>%s</setName>\n" % (out, s[1])
         if s[2]:
-            out_stream = "%s    <setDescription>%s</setDescription>\n" % (out_stream, s[2])
-        out_stream = out_stream + "   </set>\n"
+            out = "%s    <setDescription>%s</setDescription>\n" % (out, s[2])
+        out = out + "   </set>\n"
 
-    out_stream = oai_header(args,"ListSets") + out_stream + oai_footer("ListSets")
+    out = oai_header(args,"ListSets") + out + oai_footer("ListSets")
 
-    return out_stream
+    return out
 
     
-def OAIGetRecord(args, identifier, metadataPrefix):
+def OAIGetRecord(args):
     """Returns record 'identifier' according to 'metadataPrefix' format for OAI metadata harvesting."""
     
-    out_stream = ""
-    sysno = OAIGetSysno(identifier)
+    arg = parse_args(args)
+    out = ""
+    sysno = OAIGetSysno(arg['identifier'])
 
-    if record_exists(sysno):
+    if record_exists(sysno): 
         datestamp = get_modification_date(sysno)
-        out_stream = out_stream + print_record(sysno, metadataPrefix)
+        out = out + print_record(sysno, arg['metadataPrefix'])
     else:
-        out_stream = out_stream + oai_error("badArgument","invalid record Identifier")
+        out = out + oai_error("badArgument","invalid record Identifier")
+        out = oai_error_header(args, "GetRecord") + out + oai_error_footer("GetRecord")
+        return out
 
-    out_stream = oai_header(args,"GetRecord") + out_stream + oai_footer("GetRecord")
+    out = oai_header(args,"GetRecord") + out + oai_footer("GetRecord")
 
-    return out_stream
+    return out
 
-def OAIListIdentifiers(args, metadataPrefix, fromDate,untilDate,set,resumptionToken):
+
+def OAIListIdentifiers(args):
     "Prints OAI response to the ListIdentifiers verb."
 
 </protect>
@@ -523,27 +536,29 @@ def OAIListIdentifiers(args, metadataPrefix, fromDate,untilDate,set,resumptionTo
     nb_identifiers_in_resume = <OAILOAD>
 <protect>
 
-    out_stream = ""
+    arg = parse_args(args)
+
+    out = ""
 
     sysno  = []
     sysnos = []
 
-    if resumptionToken:
-        filename = "%s/RTdata/%s" % (logdir, resumptionToken)
+    if arg['resumptionToken']:
+        filename = "%s/RTdata/%s" % (logdir, arg['resumptionToken'])
         if os.path.exists(filename) == 0:
-             out_stream = out_stream + oai_error("badResumptionToken","ResumptionToken expired")
-             out_stream = oai_error_header(args, "ListIdentifiers") + out_stream + oai_error_footer("ListIdentifiers")
-             return out_stream
+             out = out + oai_error("badResumptionToken","ResumptionToken expired")
+             out = oai_error_header(args, "ListIdentifiers") + out + oai_error_footer("ListIdentifiers")
+             return out
 
-    if resumptionToken:
-        sysnos = OAICacheOut(resumptionToken)
+    if arg['resumptionToken']:
+        sysnos = OAICacheOut(arg['resumptionToken'])
     else:
-        sysnos = OAIGetSysnoList(set, fromDate, untilDate)
-
+        sysnos = OAIGetSysnoList(arg['set'], arg['from'], arg['until'])
+ 
     if len(sysnos) == 0: # noRecordsMatch error
-        out_stream = out_stream + oai_error("noRecordsMatch","no records correspond to the request")
-        out_stream = oai_error_header(args, "ListIdentifiers") + out_stream + oai_error_footer("ListIdentifiers")
-        return out_stream
+        out = out + oai_error("noRecordsMatch","no records correspond to the request")
+        out = oai_error_header(args, "ListIdentifiers") + out + oai_error_footer("ListIdentifiers")
+        return out
 
     i = 0
     for s in sysnos:
@@ -551,62 +566,62 @@ def OAIListIdentifiers(args, metadataPrefix, fromDate,untilDate,set,resumptionTo
             i = i + 1
             if i > nb_identifiers_in_resume:           # cache or write?
                 if i ==  nb_identifiers_in_resume + 1: # resumptionToken?
-                    resumptionToken = OAIGenResumptionToken()
+                    arg['resumptionToken'] = OAIGenResumptionToken()
                     extdate = OAIGetResponseDate(oai_rt_expire)
                     if extdate:
-                        out_stream = "%s  <resumptionToken expirationDate=\"%s\">%s</resumptionToken>\n" % (out_stream, extdate,resumptionToken)
+                        out = "%s  <resumptionToken expirationDate=\"%s\">%s</resumptionToken>\n" % (out, extdate,arg['resumptionToken'])
                     else:
-                        out_stream = "%s  <resumptionToken>%s</resumptionToken>\n" % (out_stream, resumptionToken)
+                        out = "%s  <resumptionToken>%s</resumptionToken>\n" % (out, arg['resumptionToken'])
                 sysno.append(s)
             else:
                 done = 0
                 for f in get_field(s, "245__a"):
                     if done == 0:
                         for id in get_field(s,oaiidfield):
-                            out_stream = out_stream + "    <header>\n"
-                            out_stream = "%s      <identifier>%s</identifier>\n" % (out_stream, encode_for_url(id))
-                            out_stream = "%s      <datestamp>%s</datestamp>\n" % (out_stream, get_modification_date(OAIGetSysno(id)))
+                            out = out + "    <header>\n"
+                            out = "%s      <identifier>%s</identifier>\n" % (out, encode_for_url(id))
+                            out = "%s      <datestamp>%s</datestamp>\n" % (out, get_modification_date(OAIGetSysno(id)))
                             for set in get_field(s,oaisetfield):
-                                out_stream = "%s      <setSpec>%s</setSpec>\n" % (out_stream, set)
-                            out_stream = out_stream + "    </header>\n"
+                                out = "%s      <setSpec>%s</setSpec>\n" % (out, arg['set'])
+                            out = out + "    </header>\n"
                         done = 1
 
     if i > nb_identifiers_in_resume:
         OAICacheClean() # clean cache from expired resumptionTokens
-        OAICacheIn(resumptionToken,sysno)
+        OAICacheIn(arg['resumptionToken'],sysno)
 
-    out_stream = oai_header(args,"ListIdentifiers") + out_stream + oai_footer("ListIdentifiers")
+    out = oai_header(args,"ListIdentifiers") + out + oai_footer("ListIdentifiers")
 
-    return out_stream
+    return out
 
 
 def OAIIdentify(args):
     "Generates response to OAIIdentify verb."
         
-    out_stream = ""
+    out = ""
 
     repositoryName        = "  <repositoryName>" + cdsname + "</repositoryName>\n"
     baseURL               = "  <baseURL>%s/oai2d.py/</baseURL>\n" % weburl
     protocolVersion       = "  <protocolVersion>2.0</protocolVersion>\n"
     adminEmail            = "  <adminEmail>mailto:%s</adminEmail>\n" % supportemail
-#    earliestDST		  = "  <earliestDatestamp>%s</earliestDatestamp>\n" % get_earliest_datestamp()               
+    earliestDST		  = "  <earliestDatestamp>%s</earliestDatestamp>\n" % get_earliest_datestamp()               
     repositoryIdentifier  = "%s" % oaiidprefix
     sampleIdentifier      = oaisampleidentifier
     identifyDescription   = oaiidentifydescription + "\n"
 
-    out_stream = out_stream + repositoryName
-    out_stream = out_stream + baseURL
-    out_stream = out_stream + protocolVersion
-    out_stream = out_stream + adminEmail
-#    out_stream = out_stream + earliest
-    out_stream = out_stream + "  <deletedRecord>no</deletedRecord>\n"
-    out_stream = out_stream + "  <granularity>YYYY-MM-DDThh:mm:ssZ</granularity>\n"
+    out = out + repositoryName
+    out = out + baseURL
+    out = out + protocolVersion
+    out = out + adminEmail
+    out = out + earliestDST
+    out = out + "  <deletedRecord>no</deletedRecord>\n"
+    out = out + "  <granularity>YYYY-MM-DDThh:mm:ssZ</granularity>\n"
     #    print "  <compression></compression>\n"
-    out_stream = out_stream + oaiidentifydescription
+    out = out + oaiidentifydescription
 
-    out_stream = oai_header(args,"Identify") + out_stream + oai_footer("Identify")
+    out = oai_header(args,"Identify") + out + oai_footer("Identify")
 
-    return out_stream
+    return out
 
      
 def OAIGetRequestURL(args):
@@ -700,6 +715,10 @@ def OAICacheOut(resumptionToken):
 def OAICacheClean():
     "Removes cached resumptionTokens older than specified"
     
+</protect>
+    oai_rt_expire = <OAIEXPIRE>
+<protect>
+
     directory = "%s/RTdata" % logdir
 
     files = os.listdir(directory)
@@ -725,22 +744,6 @@ def OAICacheStatus(resumptionToken):
             return 0
     else:
         return 0
-
-
-def get_earliest_datestamp():
-    "Returns earliest datestamp"
-
-    out = ""
-
-    query = "SELECT MIN(creation_date) FROM bibrec"
-
-    res = run_sql(query)
-
-    row = res[0][0]
-  
-    out = "%s 00:00:00" % row[0][:10]
-
-    return localtime_to_UTC(out)
 
 
 def get_sets():
@@ -789,7 +792,7 @@ def parse_args(args=""):
 def check_args(arguments):
     "Check OAI arguments"
 
-    out_stream = ""
+    out = ""
 
 ## principal argument required
 #
@@ -797,14 +800,14 @@ def check_args(arguments):
     if verbs.has_key(arguments['verb']):
         pass
     else:
-        out_stream = out_stream + oai_error("badArgument","Malformed request.")
+        out = out + oai_error("badArgument","Malformed request")
 
 ## resumptionToken exclusive
 #
 #
     if ((arguments['from']!="" or arguments['until']!="" or arguments['metadataPrefix']!="" or arguments['identifier']!="" or arguments['set']!="") and arguments['resumptionToken']!=""):
 
-        out_stream = out_stream + oai_error("badArgument","The request includes illegal arguments")
+        out = out + oai_error("badArgument","The request includes illegal arguments")
 
 ## datestamp formats
 #
@@ -812,48 +815,48 @@ def check_args(arguments):
     if arguments['from']!="" and arguments['from']!="":
         from_length = len(arguments['from'])
         if check_date(arguments['from'],"T00:00:00Z") == "": 
-            out_stream = out_stream + oai_error("badArgument","Bad datestamp format in from")
+            out = out + oai_error("badArgument","Bad datestamp format in from")
     else:
         from_length = 0
 
     if arguments['until']!="" and arguments['until']!="":
         until_length = len(arguments['until'])
         if check_date(arguments['until'],"T23:59:59Z") == "":
-            out_stream = out_stream + oai_error("badArgument","Bad datestamp format in until")
+            out = out + oai_error("badArgument","Bad datestamp format in until")
     else:
         until_length = 0 
 
     if from_length <> 0:
         if until_length <> 0:
             if from_length <> until_length:
-                out_stream = out_stream + oai_error("badArgument","Bad datestamp format")
+                out = out + oai_error("badArgument","Bad datestamp format")
 
     if arguments['from'] > arguments['until']:
-        out_stream = out_stream + oai_error("badArgument", "Wrong date")
+        out = out + oai_error("badArgument", "Wrong date")
 
 
 ## Identify exclusive
 #
 #
     if (arguments['verb']=="Identify" and (arguments['metadataPrefix']!="" or arguments['identifier']!="" or arguments['set']!="" or arguments['from']!="" or arguments['until']!="" or arguments['resumptionToken']!="")):
-        out_stream = out_stream + oai_error("badArgument","The request includes illegal arguments")
+        out = out + oai_error("badArgument","The request includes illegal arguments")
 
 ## parameters for GetRecord 
 #
 #
     if arguments['verb']=="GetRecord" and arguments['identifier'] == "":
-        out_stream = out_stream + oai_error("badArgument","Record identifier missing")
+        out = out + oai_error("badArgument","Record identifier missing")
 
     if arguments['verb']=="GetRecord" and arguments['metadataPrefix'] == "":
-        out_stream = out_stream + oai_error("badArgument","Missing metadataPrefix")
+        out = out + oai_error("badArgument","Missing metadataPrefix")
 
 
 ## parameters for ListRecords and ListIdentifiers
 #
 #
-    if (arguments['verb']=="ListRecords" or arguments['verb']=="ListIdentifiers") and arguments['metadataPrefix'] == "":
-        out_stream = out_stream + oai_error("badArgument","Missing metadataPrefix")
+    if (arguments['verb']=="ListRecords" or arguments['verb']=="ListIdentifiers") and (arguments['metadataPrefix'] == "" and arguments['resumptionToken'] == ""):
+        out = out + oai_error("badArgument","Missing metadataPrefix")
 
-    return out_stream
+    return out
  
 </protect>
