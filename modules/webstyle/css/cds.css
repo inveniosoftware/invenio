@@ -1,3 +1,25 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "config.wml"
+#include "configbis.wml"
+
 /* CDSware style sheet */
 /* $Id$ */
 body {
@@ -5,13 +27,6 @@ body {
    background: #fff;
    margin: 0px;
    padding: 0px;
-   font-family: helvetica, arial, sans-serif;
-}
-p,br,dl,strong,em,h1,h2,h3,h4,h5,h6,td,blockquote,ol,ul {
-   font-family: helvetica, arial, sans-serif;
-}
-pre,code {
-   font-family: monospace;
 }
 h1 {
    font-size: 173%;
@@ -112,19 +127,19 @@ a.img:active {
    font-weight: normal;
 }
 a.note:link {
-   color: #999;
+   color: #666;
    background: transparent;
 }
 a.note:visited {
-   color: #999;
+   color: #666;
    background: transparent;
 }
 a.note:active {
-   color: #999;
+   color: #666;
    background: transparent;
 }
 a.note:hover {
-   color: #999;
+   color: #666;
    background: transparent;
 }
 .headerbox {
@@ -143,13 +158,13 @@ a.note:hover {
    margin: 0px;
 }
 .headerboxbodylogo {
-   color: #36c;
-   font-weight: bold;
-   font-variant: small-caps;
-   font-size: 20px;
-   letter-spacing: 6px;
    width: 200px;
    padding-left: 5px;
+   color: #36c;
+   font-size: 20px;
+   font-weight: bold;
+   font-variant: small-caps;
+   letter-spacing: 6px;
 }
 .headermodulebox {
    color: #fff;
@@ -167,7 +182,7 @@ a.note:hover {
    text-align: center;
    margin: 0px;
    padding: 0px;
-   width: 65px;
+   width: 75px;
 }
 .headermoduleboxbodyblank {
    width: 12px; 
@@ -185,7 +200,7 @@ a.note:hover {
    border-top: 2px solid #3366cc;
    margin: 5px;
    padding: 0px;
-   width: 65px;
+   width: 75px;
 }
 a.header:link {
    color: #fff;
@@ -286,25 +301,7 @@ a.navtrail:hover {
    padding: 20px;
    margin:  0px;
 }
-.pagefooter {
-   color: #999;
-   background: #fff;
-   font-size: x-small;
-   margin-top: 20px;
-   width: 100%;
-   padding-bottom: 5px;
-}
-.footerbox {
-   color: #999;
-   background: #fff;
-   font-size: x-small;
-   margin-left: 0px;
-   padding-left: 2px;
-   padding-right: 2px;
-   border-top: 1px solid #999;
-   width: 100%;
-}
-.pagestripeleft {
+.pagebodystripeleft {
    color: #000;
    background: #fff;
    font-size: x-small;
@@ -313,11 +310,11 @@ a.navtrail:hover {
    padding-left: 10px;
    float: left;
 }
-.pagestripemiddle {
+.pagebodystripemiddle {
    color: #000;
    background: transparent;
 }
-.pagestriperight {
+.pagebodystriperight {
    color: #000;
    background: #fff;
    font-size: x-small;
@@ -329,33 +326,83 @@ a.navtrail:hover {
 .pageboxlefttop {
    color: #000;
    background: transparent;
+   font-size: x-small;
 }
 .pageboxlefttopadd {
    color: #000;
    background: transparent;
+   font-size: x-small;
 }
 .pageboxleftbottom {
    color: #000;
    background: transparent;
+   font-size: x-small;
 }
 .pageboxleftbottomadd {
    color: #000;
    background: transparent;
+   font-size: x-small;
 }
 .pageboxrighttop {
    color: #000;
    background: transparent;
+   font-size: x-small;
 }
 .pageboxrighttopadd {
    color: #000;
    background: transparent;
+   font-size: x-small;
 }
 .pageboxrightbottom {
    color: #000;
    background: transparent;
+   font-size: x-small;
 }
 .pageboxrightbottomadd {
    color: #000;
+   background: transparent;
+   font-size: x-small;
+}
+.pagefooter {
+   color: #666;
+   background: #fff;
+   font-size: x-small;
+   margin-top: 50px;
+   padding: 0px;
+   border-top: 1px solid #666;
+   width: 100%;
+   clear: both;
+}
+.pagefooterstripeleft {
+   color: #666;
+   background: #fff;
+   font-size: x-small;
+   margin-left: 5px;
+   width: 60%;
+   float: left;
+   text-align: left;
+}
+.pagefooterstriperight {
+   color: #666;
+   background: #fff;
+   margin-right: 5px;
+   font-size: x-small;
+   text-align: right;
+}
+a.footer:link {
+   color: #666;
+   background: transparent;
+}
+a.footer:visited {
+   color: #666;
+   background: transparent;
+}
+a.footer:active {
+   color: #666;
+   background: transparent;
+}
+a.footer:hover {
+   color: #666;
    background: transparent;
 }
 .errorbox {
@@ -722,43 +769,20 @@ a.userinfo:hover {
    color: #039;
    background: transparent;
 }
-.langinfobox {
-   color: #999;
-   background: #fff;
-   font-size: x-small;
-   width: 150px;
-   margin-bottom: 15px;
-}
-.langinfoboxheader {
-   color: #999;
-   background: #fff;
-   font-size: x-small;
-   font-weight: bold;
-   border-top: 1px solid #060; 
-   border-bottom: 1px solid #060; 
-}
-.langinfoboxbody {
-   color: #999;
-   background: #fff;
-   padding-right: 5px;
-   padding-bottom: 2px;
-   font-size: x-small;
-   font-weight: normal;
-}
 a.langinfo:link {
-   color: #999;
+   color: #666;
    background: transparent;
 }
 a.langinfo:visited {
-   color: #999;
+   color: #666;
    background: transparent;
 }
 a.langinfo:active {
-   color: #999;
+   color: #666;
    background: transparent;
 }
 a.langinfo:hover {
-   color: #999;
+   color: #666;
    background: transparent;
 }
 .faq {
@@ -798,12 +822,11 @@ a.langinfo:hover {
    background: #fff;
 }
 .address {
-   font-family: "Helvetica", "Arial", sans-serif;
    font-style: normal;
    font-size: x-small;
 }
 .note {
-   color: #999;
+   color: #666;
    background: transparent;
 }
 .warning {
@@ -815,7 +838,7 @@ a.langinfo:hover {
    background: transparent;
 }
 .nbdoccoll {
-   color: #999;
+   color: #666;
    background: transparent;
 }
 hr {
@@ -831,7 +854,7 @@ input,select {
 .wsactionbutton {
     width: 150px;
     height: 25px;
-    COLOR: #039;
+    color: #039;
     margin: 0px;
     background-color: #fff;
     border-top: 2px solid #039;
@@ -847,7 +870,7 @@ input,select {
 .wsactionbuttonh {
     width: 150px;
     height: 25px;
-    COLOR: #039;
+    color: #039;
     margin: 0px;
     background-color: #9cf;
     border-top: 2px solid #039;
