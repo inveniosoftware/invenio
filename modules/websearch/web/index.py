@@ -31,6 +31,7 @@ pylibdir = "<LIBDIR>/python"
 
 import sys
 import sre
+import MySQLdb
 sys.path.append('%s' % pylibdir)
 from cdsware.config import *
 from cdsware.messages import *
@@ -40,7 +41,7 @@ from cdsware.webuser import getUid
 
 def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
     "Display search interface page for collection c by looking in the collection cache."
-    uid = getUid(req)
+    # wash params:
     try:
         as = int(as)
     except:
@@ -52,6 +53,17 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
     if type(c) is list:
         c = c[0]
     ln = wash_language(ln)
+    # get user ID:
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return page(title="Internal Error",
+                    body = create_error_box(req, verbose=verbose),
+                    description="%s - Internal Error" % cdsname, 
+                    keywords="%s, CDSware, Internal Error" % cdsname,
+                    language=ln,
+                    urlargs=req.args)
+    # start display:
     req.content_type = "text/html"
     req.send_http_header()
     # deduce collection id:

@@ -1143,13 +1143,16 @@ def create_collection_reclist_cache():
     collrecs = {}
     res = run_sql("SELECT name,reclist FROM collection")
     for name,reclist in res:
-        collrecs[name] = None # this will be filled later during runtime by calling get_collection_reclist(coll)        
+        collrecs[name] = None # this will be filled later during runtime by calling get_collection_reclist(coll)
     return collrecs
 
 try:
     collection_reclist_cache.has_key(cdsname)
 except:
-    collection_reclist_cache = create_collection_reclist_cache()
+    try:
+        collection_reclist_cache = create_collection_reclist_cache()
+    except:
+        collection_reclist_cache = {}
 
 def browse_pattern(req, colls, p, f, rg, ln=cdslang):
     """Browse either biliographic phrases or words indexes, and display it."""
