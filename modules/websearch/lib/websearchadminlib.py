@@ -1141,23 +1141,123 @@ def perform_switchfldvaluescore(colID, id_1, id_fldvalue_1, id_fldvalue_2, ln=cd
     colID - the current collection
     id_1/id_2 - the id's to change the score for."""
 
-    name_1 = run_sql("SELECT name from fieldvalue where id=%s" % id_fldvalue_1)
-    name_2 = run_sql("SELECT name from fieldvalue where id=%s" % id_fldvalue_2)
+    name_1 = run_sql("SELECT name from fieldvalue where id=%s" % id_fldvalue_1)[0][0]
+    name_2 = run_sql("SELECT name from fieldvalue where id=%s" % id_fldvalue_2)[0][0]
+
     if switch_fld_value_score(colID, id_1, id_fldvalue_1, id_fldvalue_2):
         output = """<br><b><span class="info">'%s' changed position with '%s'</span></b>
-        """ % (name_1[0][0], name_2[0][0])
+        """ % (name_1, name_2)
     else:
         output = """<br><b><span class="info">Could not complete the operation.</span></b>"""
 
-  
-    return perform_showsearchoptions(colID, ln, content=output)
+    return perform_modifyfield(colID, fldID=id_1, ln=ln, content=output)
+
+def perform_addnewfieldvalue(colID, fldID, ln=cdslang, name='', value='', callback="yes", confirm=-1):
+    """form to add a new fieldvalue.
+    name - the name of the new fieldvalue
+    value - the value of the new fieldvalue
+    """
+
+    output = ""
+    subtitle = """<a name="7.4"></a>Add new value"""
+    text = """
+    <span class="adminlabel">Name</span>
+    <input class="admin_w200" type="text" name="name" value="%s" /><br>
+    <span class="adminlabel">Value</span>
+    <input class="admin_w200" type="text" name="value" value="%s" /><br>
+    """ % (name, value)
+    output = createhiddenform(action="%s/admin/websearch/websearchadmin.py/addnewfieldvalue" % weburl,
+                              text=text,
+                              colID=colID,
+                              fldID=fldID,
+                              ln=ln,
+                              button="Add",
+                              confirm=1)
+    if name and value and confirm in ["1", 1]:
+        res = add_fldv(name, value)
+        if res:
+            ares = add_col_fld(colID, fldID, 'seo', res)
+            output += """<b><span class="info">Added new value to search option.</span></b>"""
+        else:
+            output += """<b><span class="info">Sorry, could not add value.</span></b>"""
+    elif confirm not in ["-1", -1]:
+        output += """<b><span class="info">Please fill in name and value.</span></b>
+        """
+        
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    output = "<br>" + addadminbox(subtitle, body)
+    return perform_modifyfield(colID, fldID=fldID, ln=ln, content=output)
+
+def perform_modifyfieldvalue(colID, fldID, fldvID, ln=cdslang, name='', value='', callback="yes", confirm=-1):
+    """form to add a new fieldvalue.
+    name - the name of the new fieldvalue
+    value - the value of the new fieldvalue
+    """
+
+    if confirm in [-1, "-1"]:
+        res = get_fld_value(fldvID)
+        (id, name, value) = res[0]
+    output = ""
+    subtitle = """<a name="7.4"></a>Modify existing value"""
+
+    output = """<dl>
+     <dt><b><span class="info">Warning: Modifications done below will also inflict on all places the modified data is used.</span></b></dt>
+    </dl>"""
+
+    text = """
+    <span class="adminlabel">Name</span>
+    <input class="admin_w200" type="text" name="name" value="%s" /><br>
+    <span class="adminlabel">Value</span>
+    <input class="admin_w200" type="text" name="value" value="%s" /><br>
+    """ % (name, value)
+    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/modifyfieldvalue" % weburl,
+                              text=text,
+                              colID=colID,
+                              fldID=fldID,
+                              fldvID=fldvID,
+                              ln=ln,
+                              button="Update",
+                              confirm=1)
+    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/modifyfieldvalue" % weburl,
+                              text="Delete value and all associations",
+                              colID=colID,
+                              fldID=fldID,
+                              fldvID=fldvID,
+                              ln=ln,
+                              button="Delete",
+                              confirm=2)
+    if name and value and confirm in ["1", 1]:
+        res = update_fldv(fldvID, name, value)
+        if res:
+            output += """<b><span class="info">Modified value.</span></b>"""
+        else:
+            output += """<b><span class="info">Sorry, could not modify value.</span></b>"""
+    elif confirm in ["2", 2]:
+            res = delete_fldv(fldvID)
+            if res:
+                output += """<b><span class="info">Deleted value and all associations.</span></b>"""
+            else:
+                output += """<b><span class="info">Sorry, could not delete value and all associations completely.</span></b>"""
+    elif confirm not in ["-1", -1]:
+        output += """<b><span class="info">Please fill in name and value.</span></b>"""
+        
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    output = "<br>" + addadminbox(subtitle, body)
+    return perform_modifyfield(colID, fldID=fldID, ln=ln, content=output)
 
 def perform_removefield(colID, ln=cdslang, fldID='', fldvID='', fmeth='', callback='yes', confirm=0):
     """form to remove a field from a collection.
     colID - the current collection, remove the field from this collection.
     sel_ln - remove the field with this language
     fldID - remove the field with this id"""
-
 
     subtitle = """<a name="6.4"><a name="7.4"><a name="8.4"></a>Remove field"""
     output  = ""
@@ -1170,11 +1270,11 @@ def perform_removefield(colID, ln=cdslang, fldID='', fldvID='', fmeth='', callba
     if colID and fldID:
         colID = int(colID)
         fldID = int(fldID)
-        if fldvID:
+        if fldvID and fldvID != "None":
             fldvID = int(fldvID)
 
         if confirm in ["0", 0]:
-            text = """Do you want to remove the field '%s' %s from the collection '%s'.""" % (fld_dict[fldID], (fldvID !="" and "with fieldvalue '%s'" % fldv_dict[fldvID] or ''), col_dict[colID])
+            text = """Do you want to remove the field '%s' %s from the collection '%s'.""" % (fld_dict[fldID], (fldvID not in["", "None"] and "with value '%s'" % fldv_dict[fldvID] or ''), col_dict[colID])
             output += createhiddenform(action="removefield#6.5",
                                        text=text,
                                        button="Confirm",
@@ -1187,11 +1287,10 @@ def perform_removefield(colID, ln=cdslang, fldID='', fldvID='', fmeth='', callba
             res = remove_fld(colID, fldID, fldvID)
             if res:
                 output += """<b><span class="info">Removed the field '%s' %s from the collection '%s'.</span></b>
-                """ % (fld_dict[fldID], (fldvID !="" and "with fieldvalue '%s'" % fldv_dict[fldvID] or ''), col_dict[colID])
+                """ % (fld_dict[fldID], (fldvID not in ["", "None"] and "with fieldvalue '%s'" % fldv_dict[fldvID] or ''), col_dict[colID])
             else:
                 output += """<b><span class="info">Cannot remove the field from the collection '%s'.</span></b>
-                """ % (fldID, col_dict[colID])
- 
+                """ % col_dict[colID]
     try:
         body = [output, extra]
     except NameError:
@@ -1206,12 +1305,117 @@ def perform_removefield(colID, ln=cdslang, fldID='', fldvID='', fmeth='', callba
     elif fmeth == "seo":
         return perform_showsearchoptions(colID, ln, content=output)
 
+def perform_removefieldvalue(colID, ln=cdslang, fldID='', fldvID='', fmeth='', callback='yes', confirm=0):
+    """form to remove a field from a collection.
+    colID - the current collection, remove the field from this collection.
+    sel_ln - remove the field with this language
+    fldID - remove the field with this id"""
+
+    subtitle = """<a name="7.4"></a>Remove field"""
+    output  = ""
+
+    col_dict = dict(get_def_name('', "collection"))
+    fld_dict = dict(get_def_name('', "field"))
+    res = get_fld_value()
+    fldv_dict = dict(map(lambda x: (x[0], x[1]), res))
+    
+    if colID and fldID:
+        colID = int(colID)
+        fldID = int(fldID)
+        if fldvID and fldvID != "None":
+            fldvID = int(fldvID)
+
+        if confirm in ["0", 0]:
+            text = """Do you want to remove the value '%s' from the field '%s'.""" % (fldv_dict[fldvID], fld_dict[fldID])
+            output += createhiddenform(action="removefieldvalue#7.4",
+                                       text=text,
+                                       button="Confirm",
+                                       colID=colID,
+                                       fldID=fldID,
+                                       fldvID=fldvID,
+                                       fmeth=fmeth,
+                                       confirm=1)
+        elif confirm in ["1", 1]:
+            res = remove_fld(colID, fldID, fldvID)
+            if res:
+                output += """<b><span class="info">Removed the value '%s' from the field '%s'.</span></b>
+                """ % (fldv_dict[fldvID], fld_dict[fldID])
+            else:
+                output += """<b><span class="info">Cannot remove the value from the field.</span></b>
+                """
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    output = "<br>" + addadminbox(subtitle, body)
+    return perform_modifyfield(colID, fldID=fldID, ln=ln, content=output)
+
+def perform_addexistingfieldvalue(colID, fldID, fldvID=-1, ln=cdslang, callback='yes', confirm=-1):
+    """form to add an existing fieldvalue to a field.
+    colID - the collection
+    fldID - the field to add the fieldvalue to
+    fldvID - the fieldvalue to add"""
+ 
+    subtitle = """</a><a name="7.4"></a>Add existing value to search option"""
+    output  = ""
+
+    if fldvID not in [-1, "-1"] and confirm in [1, "1"]:
+        fldvID = int(fldvID) 
+        ares = add_col_fld(colID, fldID, 'seo', fldvID)
+        
+    colID = int(colID)
+    fldID = int(fldID)
+    lang = dict(get_languages())
+    res =  get_def_name('', "field")
+    col_dict = dict(get_def_name('', "collection"))
+    fld_dict = dict(res)
+    col_fld = dict(map(lambda x: (x[0], x[1]), get_col_fld(colID, 'seo')))
+    fld_value  = get_fld_value()
+    fldv_dict = dict(map(lambda x: (x[0], x[1]), fld_value))
+
+    text = """
+    <span class="adminlabel">Value</span>
+    <select name="fldvID" class="admin_w200">
+    <option value="-1">- Select value -</option>
+    """
+    
+    res = run_sql("SELECT id,name,value FROM fieldvalue ORDER BY name")
+    for (id, name, value) in res:
+        text += """<option value="%s" %s>%s - %s</option>
+        """ % (id, id  == int(fldvID) and 'selected="selected"' or '', name, value)            
+    text += """</select><br>"""
+    
+    output += createhiddenform(action="addexistingfieldvalue#7.4",
+                               text=text,
+                               button="Add",
+                               colID=colID,
+                               fldID=fldID,
+                               ln=ln,
+                               confirm=1)
+            
+    if fldvID not in [-1, "-1"] and confirm in [1, "1"]:
+        fldvID = int(fldvID)
+        if ares:
+            output += """<b><span class="info">Added the value '%s' to the search option '%s'.</span></b>
+            """ % (fldv_dict[fldvID], fld_dict[fldID])
+        else:
+            output += """<b><span class="info">Cannot add the value to the search option.</span></b>
+            """
+    elif confirm in [1, "1"]:
+        output += """<b><span class="info">Select a value to add and try again.</span></b>"""
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    output = "<br>" + addadminbox(subtitle, body)
+    return perform_modifyfield(colID, fldID, ln, content=output)
+
 def perform_addexistingfield(colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', callback='yes', confirm=-1):
     """form to add an existing field to a collection.
     colID - the collection to add the field to
     fldID - the field to add
-    score - the importance of the field.
-    position - the position of the field on the page
     sel_ln - the language of the field"""
  
     subtitle = """<a name="6.2"></a><a name="7.2"></a><a name="8.2"></a>Add existing field to collection"""
@@ -1244,20 +1448,6 @@ def perform_addexistingfield(colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', c
                 
     text += """</select><br>"""
 
-    if fmeth == 'seo':
-        text += """
-        <span class="adminlabel">Fieldvalue</span>
-        <select name="fldvID" class="admin_w200">
-        <option value="-1">- Select fieldvalue -</option>
-        """
-        
-        res = run_sql("SELECT id,name,value FROM fieldvalue ORDER BY name")
-        for (id, name, value) in res:
-            text += """<option value="%s" %s>%s</option>
-            """ % (id, id  == int(fldvID) and 'selected="selected"' or '', name)
-                
-        text += """</select><br>"""
-    
     output += createhiddenform(action="addexistingfield#6.2",
                                text=text,
                                button="Add",
@@ -1291,7 +1481,6 @@ def perform_addexistingfield(colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', c
     elif fmeth == "seo":
         return perform_showsearchoptions(colID, ln, content=output)
 
-
 def perform_showsortoptions(colID, ln=cdslang, callback='yes', content='', confirm=-1):
     """show the sort fields of this collection.."""
     
@@ -1303,13 +1492,13 @@ def perform_showsortoptions(colID, ln=cdslang, callback='yes', content='', confi
     subtitle = """<a name="8">8. Modify sort options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.8">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
-     <dd>Go to the BibIndex interface to modify</dd>
+     <dd>Go to the BibIndex interface to modify the available sort options</dd>
      <dt>Collection specific actions
-     <dd><a href="addexistingfield?colID=%s&amp;ln=%s&amp;fmeth=soo#8.2">Add field to collection</a></dd>
+     <dd><a href="addexistingfield?colID=%s&amp;ln=%s&amp;fmeth=soo#8.2">Add sort option to collection</a></dd>
     </dl>
     """  % (colID, ln)
 
-    header = ['', 'Fieldname', 'Actions']
+    header = ['', 'Sort option', 'Actions']
 
     actions = []
     cdslang = get_languages()
@@ -1326,7 +1515,7 @@ def perform_showsortoptions(colID, ln=cdslang, callback='yes', content='', confi
 	    if i != 0:
                 move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=soo&amp;rand=%s#8"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, res[i - 1][0], random.randint(0, 1000), weburl)
 	    else:
-		move += "&nbsp;&nbsp;&nbsp;"     
+		move += "&nbsp;&nbsp;&nbsp;&nbsp;"     
 	    move += "</td><td>"
             i += 1
             if i != len(res):
@@ -1335,7 +1524,7 @@ def perform_showsortoptions(colID, ln=cdslang, callback='yes', content='', confi
             
             actions.append([move, fld_dict[int(fldID)]])
                     
-            for col in [(('Remove', 'removefield'),)]:
+            for col in [(('Remove sort option', 'removefield'),)]:
                 actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fmeth=soo#8.4">%s</a>' % (weburl, col[0][1], colID, ln, fldID, col[0][0]))
                 for (str, function) in col[1:]:
                     actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fmeth=soo#8.5">%s</a>' % (weburl, function, colID, ln, fldID, str)
@@ -1353,7 +1542,7 @@ def perform_showsortoptions(colID, ln=cdslang, callback='yes', content='', confi
         return perform_editcollection(colID, ln, "perform_showsortoptions", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
-    
+
 def perform_showsearchfields(colID, ln=cdslang, callback='yes', content='', confirm=-1):
     """show the search fields of this collection.."""
     
@@ -1365,13 +1554,13 @@ def perform_showsearchfields(colID, ln=cdslang, callback='yes', content='', conf
     subtitle = """<a name="6">6. Modify search fields for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.6">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
-     <dd>Go to the BibIndex interface to modify</dd>
+     <dd>Go to the BibIndex interface to modify the available search fields</dd>
      <dt>Collection specific actions
-     <dd><a href="addexistingfield?colID=%s&amp;ln=%s&amp;fmeth=sew#6.2">Add field to collection</a></dd>
+     <dd><a href="addexistingfield?colID=%s&amp;ln=%s&amp;fmeth=sew#6.2">Add search field to collection</a></dd>
     </dl>
     """  % (colID, ln)
 
-    header = ['', 'Fieldname', 'Actions']
+    header = ['', 'Search field', 'Actions']
 
     actions = []
     cdslang = get_languages()
@@ -1397,7 +1586,7 @@ def perform_showsearchfields(colID, ln=cdslang, callback='yes', content='', conf
 
             actions.append([move, fld_dict[int(fldID)]])
                     
-            for col in [(('Remove', 'removefield'),)]:
+            for col in [(('Remove search field', 'removefield'),)]:
                 actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fmeth=sew#6.4">%s</a>' % (weburl, col[0][1], colID, ln, fldID, col[0][0]))
                 for (str, function) in col[1:]:
                     actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s#6.5">%s</a>' % (weburl, function, colID, ln, fldID, str)
@@ -1415,7 +1604,7 @@ def perform_showsearchfields(colID, ln=cdslang, callback='yes', content='', conf
         return perform_editcollection(colID, ln, "perform_showsearchfields", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
-    
+        
 def perform_showsearchoptions(colID, ln=cdslang, callback='yes', content='', confirm=-1):
     """show the sort and search options of this collection.."""
     
@@ -1427,63 +1616,42 @@ def perform_showsearchoptions(colID, ln=cdslang, callback='yes', content='', con
     subtitle = """<a name="7">7. Modify search options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.7">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
-     <dd>Go to the BibIndex interface to modify</dd>
+     <dd>Go to the BibIndex interface to modify the available search options</dd>
      <dt>Collection specific actions
-     <dd><a href="addexistingfield?colID=%s&amp;ln=%s&amp;fmeth=seo#7.2">Add field to collection</a></dd>
+     <dd><a href="addexistingfield?colID=%s&amp;ln=%s&amp;fmeth=seo#7.2">Add search option to collection</a></dd>
     </dl>
     """  % (colID, ln)
 
-    header = ['', 'Fieldname', '', 'Fieldvalue', 'Actions']
+    header = ['', 'Search option', 'Actions']
 
     actions = []
     cdslang = get_languages()
     lang = dict(cdslang)
 
     fld_type_list = fld_type.items()
-    fld_distinct= run_sql("SELECT distinct(id_field) FROM collection_field_fieldvalue WHERE type='seo' AND id_collection=%s ORDER by score desc" % colID)
+    fld_distinct = run_sql("SELECT distinct(id_field) FROM collection_field_fieldvalue WHERE type='seo' AND id_collection=%s ORDER by score desc" % colID)
     
     if len(fld_distinct) > 0:
         i = 0
         for (id) in fld_distinct:
-            col_fld = get_col_fld(colID, 'seo', id)
+            fldID = id[0]
+            col_fld = get_col_fld(colID, 'seo', fldID)
 
-            #move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
 	    move = ""
 	    if i != 0:
-                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=seo&amp;rand=%s#7"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, id[0], fld_distinct[i - 1][0], random.randint(0, 1000), weburl)
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=seo&amp;rand=%s#7"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, fld_distinct[i - 1][0], random.randint(0, 1000), weburl)
 	    else:
 		move += "&nbsp;&nbsp;&nbsp;" 
-            #move += "</td><td>"
+
             i += 1
             if i != len(fld_distinct):
-                move += '<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=seo&amp;rand=%s#7"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>' % (weburl, colID, ln, id[0], fld_distinct[i][0], random.randint(0, 1000), weburl)
-            #move += """</td></tr></table>"""
-
-            j = 0
-            for (fldID, fldvID, stype, score, score_fieldvalue) in col_fld:
-                fieldvalue = get_fld_value(fldvID)
-
-                #move2 = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
-  		move2 = ""
-                if j != 0:
-                    move2 += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, id[0], fldvID, col_fld[j - 1][1], random.randint(0, 1000), weburl)
-	        else:
-		    move2 += "&nbsp;&nbsp;&nbsp;"                
-		#move2 += "</td><td>"
-                j += 1
-                if j != len(col_fld):
-                    move2 += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>""" % (weburl, colID, ln, id[0], fldvID, col_fld[j][1], random.randint(0, 1000), weburl)   
-                #move2 += """</td></tr></table>"""
-   
-                if fieldvalue[0][1] != fieldvalue[0][2]:
-                    actions.append([move, "%s" % (j==1 and fld_dict[int(fldID)] or '&nbsp'), move2, "%s - %s" % (fieldvalue[0][1],fieldvalue[0][2])])
-                else:
-                    actions.append([move, "%s" % (j==1 and fld_dict[int(fldID)] or '&nbsp;'), move2, "%s" % fieldvalue[0][1]])
-                move = ''
-                for col in [(('Remove', 'removefield'),)]:
-                    actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fldvID=%s&amp;fmeth=seo#7.4">%s</a>' % (weburl, col[0][1], colID, ln, fldID, fldvID, col[0][0]))
-                    for (str, function) in col[1:]:
-                        actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s#7.5">%s</a>' % (weburl, function, colID, ln, fldID, fldvID, str)
+                move += '<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=seo&amp;rand=%s#7"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>' % (weburl, colID, ln, fldID, fld_distinct[i][0], random.randint(0, 1000), weburl)
+	    
+            actions.append([move, "%s" % fld_dict[fldID]])
+            for col in [(('Modify values', 'modifyfield'), ('Remove search option', 'removefield'),)]:
+                actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s#7.3">%s</a>' % (weburl, col[0][1], colID, ln, fldID, col[0][0]))
+                for (str, function) in col[1:]:
+                    actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fmeth=seo#7.3">%s</a>' % (weburl, function, colID, ln, fldID, str)
         output += tupletotable(header=header, tuple=actions)
     else:
         output += """No search options exists for this collection"""
@@ -1498,6 +1666,68 @@ def perform_showsearchoptions(colID, ln=cdslang, callback='yes', content='', con
         return perform_editcollection(colID, ln, "perform_showsearchoptions", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
+
+
+def perform_modifyfield(colID, fldID, fldvID='', ln=cdslang, content='',callback='yes', confirm=0):
+    """Modify the fieldvalues for a field"""
+    
+    colID = int(colID)
+    col_dict = dict(get_def_name('', "collection"))
+    fld_dict = dict(get_def_name('', "field"))
+    fld_type = get_sort_nametypes()
+    fldID = int(fldID)
+
+    subtitle = """<a name="7.3">Modify values for field '%s'</a>""" % (fld_dict[fldID])
+    output = """<dl>
+     <dt>Value specific actions
+     <dd><a href="addexistingfieldvalue?colID=%s&amp;ln=%s&amp;fldID=%s#7.4">Add existing value to search option</a></dd>
+     <dd><a href="addnewfieldvalue?colID=%s&amp;ln=%s&amp;fldID=%s#7.4">Add new value to search option</a></dd>
+    </dl>
+    """  % (colID, ln, fldID, colID, ln, fldID)
+    header = ['', 'Value name', 'Actions']
+
+    actions = []
+    cdslang = get_languages()
+    lang = dict(cdslang)
+
+    fld_type_list = fld_type.items()
+    col_fld = list(get_col_fld(colID, 'seo', fldID))
+    if len(col_fld) == 1 and col_fld[0][1] == None:
+        output += """<b><span class="info">No values added for this search option yet</span></b>"""
+    else:
+        j = 0
+        for (fldID, fldvID, stype, score, score_fieldvalue) in col_fld:
+            fieldvalue = get_fld_value(fldvID)
+            move = ""
+            if j != 0:
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7.3"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, fldvID, col_fld[j - 1][1], random.randint(0, 1000), weburl)
+	    else:
+                move += "&nbsp;&nbsp;&nbsp;"            
+
+            j += 1
+            if j != len(col_fld):
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7.3"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>""" % (weburl, colID, ln, fldID, fldvID, col_fld[j][1], random.randint(0, 1000), weburl)   
+
+            if fieldvalue[0][1] != fieldvalue[0][2] and fldvID != None:
+                actions.append([move, "%s - %s" % (fieldvalue[0][1],fieldvalue[0][2])])
+            elif fldvID != None:
+                actions.append([move, "%s" % fieldvalue[0][1]])            
+     
+            move = ''
+            for col in [(('Modify value', 'modifyfieldvalue'), ('Remove value', 'removefieldvalue'),)]:
+                actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fldvID=%s&amp;fmeth=seo#7.4">%s</a>' % (weburl, col[0][1], colID, ln, fldID, fldvID, col[0][0]))
+                for (str, function) in col[1:]:
+                    actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fldvID=%s#7.4">%s</a>' % (weburl, function, colID, ln, fldID, fldvID, str)
+        output += tupletotable(header=header, tuple=actions)
+
+    output += content
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    output = "<br>" + addadminbox(subtitle, body)
+    return perform_showsearchoptions(colID, ln, content=output)
 
 def perform_showoutputformats(colID, ln=cdslang, callback='yes', content='', confirm=-1):
     """shows the outputformats of the current collection
@@ -2637,12 +2867,26 @@ def remove_fld(colID,fldID, fldvID=''):
     try:
         sql = "DELETE FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s" % (colID, fldID)
         if fldvID:
-            sql += " AND id_fieldvalue=%s" % fldvID
+            if fldvID != "None":
+                sql += " AND id_fieldvalue=%s" % fldvID
+            else:
+                sql += " AND id_fieldvalue is NULL"
         res = run_sql(sql)
         return "true"
     except StandardError, e:
         return ""
+
+def delete_fldv(fldvID):
+    """Deletes all data for the given fieldvalue
+    fldvID - delete all data in the tables associated with fieldvalue and this id"""
     
+    try:
+        res = run_sql("DELETE FROM collection_field_fieldvalue WHERE id_fieldvalue=%s" % fldvID)
+        res = run_sql("DELETE FROM fieldvalue WHERE id=%s" % fldvID)
+        return "true"
+    except StandardError, e:
+        return ""
+
 def delete_pbx(pbxID):
     """Deletes all data for the given portalbox
     pbxID - delete all data in the tables associated with portalbox and this id """
@@ -2696,7 +2940,34 @@ def add_fmt(code, name, rtype):
         return fmtID
     except StandardError, e:
         return ""
+
+def update_fldv(fldvID, name, value):
+    """Modify existing fieldvalue
+    fldvID - id of fieldvalue to modify
+    value - the value of the fieldvalue
+    name - the name of the fieldvalue."""
     
+    try:
+        res = run_sql("UPDATE fieldvalue set name='%s' where id=%s" % (MySQLdb.escape_string(name), fldvID))
+        res = run_sql("UPDATE fieldvalue set value='%s' where id=%s" % (MySQLdb.escape_string(value), fldvID))
+        return "true"
+    except StandardError, e:
+        return ""
+ 
+def add_fldv(name, value):
+    """Add a new fieldvalue, returns id of fieldvalue
+    value - the value of the fieldvalue
+    name - the name of the fieldvalue."""
+    
+    try:
+        res = run_sql("SELECT id FROM fieldvalue WHERE name='%s' and value='%s'" % (MySQLdb.escape_string(name), MySQLdb.escape_string(value)))
+        if not res:
+            res = run_sql("INSERT INTO fieldvalue (name, value) values ('%s','%s')" % (MySQLdb.escape_string(name), MySQLdb.escape_string(value)))
+            res = run_sql("SELECT id FROM fieldvalue WHERE name='%s' and value='%s'" % (MySQLdb.escape_string(name), MySQLdb.escape_string(value)))
+        return res[0][0]
+    except StandardError, e:
+        return ""
+
 def add_pbx(title, body):
     try:
         res = run_sql("INSERT INTO portalbox (title, body) values ('%s','%s')" % (MySQLdb.escape_string(title), MySQLdb.escape_string(body)))
@@ -2779,31 +3050,45 @@ def add_col_fmt(colID, fmtID, score=''):
 def add_col_fld(colID, fldID, type, fldvID=''):
     """Add a sort/search/field to the collection.
     colID - the id of the collection involved
-    fmtID - the id of the format.
+    fldID - the id of the field.
+    fldvID - the id of the fieldvalue.
+    type - which type, seo, sew...
     score - the score of the format, decides sorting, if not given, place the format on top"""
     
     try:
         if fldvID and fldvID not in [-1, "-1"]:
-            res = run_sql("SELECT score, score_fieldvalue FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s ORDER BY score desc, score_fieldvalue desc" % (colID, fldID))
-        
+            run_sql("DELETE FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s and type='%s' and id_fieldvalue is NULL" % (colID, fldID, type))
+            res = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s and type='%s' ORDER BY score desc" % (colID, fldID, type))
             if res:
                 score = int(res[0][0])
-                v_score = int(res[0][1])
+                res = run_sql("SELECT score_fieldvalue FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s and type='%s' ORDER BY score_fieldvalue desc" % (colID, fldID, type))
+                if res:
+                    v_score = int(res[0][0])
+                else:
+                    v_score = 0
             else:
-                score = 0
+                res = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s and type='%s' ORDER BY score desc" % (colID, type))
+                if res:
+                    score = int(res[0][0]) + 1
+                else:
+                    score = 1
                 v_score = 0
+
             res = run_sql("SELECT * FROM collection_field_fieldvalue where id_field=%s and id_collection=%s and type='%s' and id_fieldvalue=%s" % (fldID, colID, type, fldvID))
             if not res:
                res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_fieldvalue, id_collection, type, score, score_fieldvalue) values (%s,%s,%s,'%s',%s,%s)" % (fldID, fldvID, colID, type, score, (v_score + 1)))
             else:
                 raise StandardError
         else:
-            res = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s ORDER BY score desc" % (colID, fldID))
+            res = run_sql("SELECT * FROM collection_field_fieldvalue WHERE id_collection=%s AND type='%s' and id_field=%s and id_fieldvalue is NULL" % (colID, type, fldID))
+            if res:
+                raise StandardError
+            res = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s AND type='%s' ORDER BY score desc" % (colID, type))
             if res:
                 score = int(res[0][0])
             else:
                 score = 0
-            res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_collection, type, score) values (%s,%s,'%s',%s)" % (fldID, colID, type, (score + 1)))
+            res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_collection, type, score,score_fieldvalue) values (%s,%s,'%s',%s, 0)" % (fldID, colID, type, (score + 1)))
         return "true"
     except StandardError, e:
         return ""
@@ -2885,7 +3170,7 @@ def switch_fld_value_score(colID, id_1, fldvID_1, fldvID_2):
     colID - collection the id_1 or id_2 is connected to
     id_1/id_2 - id field from tables like format..portalbox...
     table - name of the table"""
-    
+
     try:
         res1 = run_sql("SELECT score_fieldvalue FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (colID, id_1, fldvID_1))
         res2 = run_sql("SELECT score_fieldvalue FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (colID, id_1, fldvID_2))
