@@ -191,11 +191,59 @@ class BadInputTreatmentTest(unittest.TestCase):
                     ee = i
         self.assertEqual(bibrecord.warning((99,'(Tagname : datafield)')),ee)
 
+class GettingFieldValuesTest(unittest.TestCase):
+    """ bibrecord - testing for getting field/subfield values """
+
+    def setUp(self):
+        xml_example_record = """
+        <record>
+        <controlfield tag="001">33</controlfield>
+        <datafield tag="041" ind1="" ind2="">
+        <subfield code="a">eng</subfield>
+        </datafield>
+        <datafield tag="100" ind1="" ind2="">
+        <subfield code="a">Doe1, John</subfield>
+        </datafield>
+        <datafield tag="100" ind1="" ind2="">
+        <subfield code="a">Doe2, John</subfield>
+        <subfield code="b">editor</subfield>
+        </datafield>
+        <datafield tag="245" ind1="" ind2="1">
+        <subfield code="a">On the foo and bar1</subfield>
+        </datafield>
+        <datafield tag="245" ind1="" ind2="2">
+        <subfield code="a">On the foo and bar2</subfield>
+        </datafield>
+        </record>
+        """
+        (self.rec, st, e) = bibrecord.create_record(xml_example_record,1,1)        
+
+    def test_get_field_instances(self):
+        """bibrecord - getting field instances"""
+        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "100", "", ""),
+                         [([('a', 'Doe1, John')], '', '', '', 3), ([('a', 'Doe2, John'), ('b', 'editor')], '', '', '', 4)])
+        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "", "", ""),
+                        [('245', [([('a', 'On the foo and bar1')], '', '1', '', 5), ([('a', 'On the foo and bar2')], '', '2', '', 6)]), ('001', [([], '', '', '33', 1)]), ('100', [([('a', 'Doe1, John')], '', '', '', 3), ([('a', 'Doe2, John'), ('b', 'editor')], '', '', '', 4)]), ('041', [([('a', 'eng')], '', '', '', 2)])]) 
+
+    def test_get_field_values(self):
+        """bibrecord - getting field values"""
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "a"),
+                         ['Doe1, John', 'Doe2, John'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "b"),
+                         ['editor'])
+
+    def test_get_subfield_values(self):
+        """bibrecord - getting subfield values"""
+        fi1, fi2 = bibrecord.record_get_field_instances(self.rec, "100", "", "")
+        self.assertEqual(bibrecord.field_get_subfield_values(fi1, "b"), [])
+        self.assertEqual(bibrecord.field_get_subfield_values(fi2, "b"), ["editor"])
+
 def create_test_suite():
     """Return test suite for the bibrecord module"""
     return unittest.TestSuite((unittest.makeSuite(SanityTest,'test'),
                                unittest.makeSuite(SuccessTest,'test'),
-                               unittest.makeSuite(BadInputTreatmentTest,'test')))
+                               unittest.makeSuite(BadInputTreatmentTest,'test'),
+                               unittest.makeSuite(GettingFieldValuesTest,'test')))
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())
   
