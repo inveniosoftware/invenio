@@ -44,6 +44,14 @@ Contents
         required for the mod_python module (see below).  
           <http://httpd.apache.org/>
 
+        Note for FreeBSD users: Thierry Thomas <thierry@FreeBSD.org>
+        reports troubles with Python open() in the Apache 2 and
+        mod_python context.  The solution is either (1) to compile
+        Apache 2 with --enable-threads (the port has a knob
+        WITH_THREADS to do that); or (2) to add the two following two
+        lines in Apache's envvars file:
+          LD_PRELOAD=/usr/lib/libc_r.so  # or libpthread.so
+          export LD_PRELOAD
 
      d) Python v2.2.2 or above, featuring recent MySQLdb module
         (v0.9.2), and Numeric module (v21 and above).  We recommended
