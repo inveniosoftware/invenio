@@ -1,0 +1,168 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="HOWTO MARC Your Bibliographic Data" \
+    navbar_name="howto" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/>Admin Area</a> &gt; <a class=navtrail href=<WEBURL>/admin/howto/>Admin HOWTOs</a>" \
+    navbar_select="howto_marc"
+
+<h2>Why to MARC at all?</h2>
+
+<p>All the bibliographic data in the CDSware system are
+internally represented in the <a
+href="http://www.carl.org/tlc/crs/bib0001.htm">MARC 21</a> format.
+There are several good reasons for this:
+
+<ul>
+
+<li>MARC format is <em>the</em> standard in the library world.  It is
+well established and has been used since 1960s.
+
+<li>MARC is flexible enough to represent any metadata structure you
+may need now or in the future.  Therefore, CDSware can adapt to your
+needs without altering its internal data structure.
+
+<li>MARC technology, albeit developed in the punch card times
+(1960s!), can be well combined with recent technologies like XML.  In
+fact, whenever the bibliographic data is to be worked with as a file,
+CDSware uses recently standardized <a
+href="http://www.loc.gov/standards/marcxml/">MARC XML</a> schema
+provided by the Library of Congress.
+
+</ul>
+
+<h2>Choosing MARC representation of your metadata</h2>
+
+<p>Basically, you are in one of the following three situations: 
+
+<ol> 
+
+<li><p>You do not care much about MARC or internal CDSware structure
+as far as you can work with "more meaningful" metadata concepts like
+<em>author</em>, <em>abstract</em>, <em>title</em>, etc.  In this case
+we simply recommend you to stick to CDSware defaults that pre-set for
+you the most commonly used metadata fields (in alphabetical order; non-exhaustive list):
+
+<blockquote>
+<pre>
+METADATA CONCEPT             PROPOSED MARC 21 REPRESENTATION
+------------------------     -------------------------------
+Abstract                     520 $a
+Author, first                100 $a
+Author(s), additional        700 $a
+Collection identifier        980 $a
+Email                        8560 $f
+Imprint                      260 $a,b,c; 300 $a 
+Keywords                     6531 $a
+Language                     041 $a
+OAI identifier               909CO $o
+Publication info             909C4 $* [many subfields]
+References                   999C5 $* [many subfields]
+Primary report number        037 $a [unique throughout the system!]
+Additional report number(s)  088 $a
+Series                       490 $a,v
+Subject                      65017 $a
+Title                        245 $a
+URL (e.g. to fulltext)       8564 $u, $z 
+
+</pre>
+</blockquote>
+
+<p>The advantage of using these CDSware defaults is that you can use
+pre-defined configurations of <a href="../bibconvert/">BibConvert</a>,
+<a href="../bibformat/">BibFormat</a>, and <a
+href="../bibwords/">BibWords</a>.
+
+<li><p>You do not care much about MARC or internal CDSware structure,
+so you are using CDSware defaults, but you need to introduce a new
+metadata concept.  For example, you would like to store also the
+document shelf number, and you want to make it separately searchable.
+In this case you are free to choose a MARC tag of your own, for
+example <code>963az $6</code>.  After that you would configure CDSware
+as follows:
+
+<ul> 
+
+<li>configure <a href="../bibwords/">BibWords</a> to create a new
+    field called <em>document shelf</em> and to associate it with
+    <code>963az $6</code> MARC tag;
+
+<li>run <a href="../bibwords/">BibWords</a> to create word tables for
+    the new searchable index; 
+
+<li>configure <a href="../websubmit/">WebSubmit</a> to let the
+    submission interface know of the existence of the new field;
+
+<li>configure <a href="../websubmit/">WebSearch</a> to introduce the
+    new searchable field into collections of your choice;
+
+<li>configure <a href="../bibformat/">BibFormat</a> to include
+    document shelf information in the record display on search results
+    pages.
+
+</ul>
+
+<p>which should give you the functionality you need.
+
+<li><p>You have some constraints on the MARC level, for example you
+would like to use MARC markup scheme of your own.  You are free to
+define your own scheme and even invert the meaning of our default
+configurations.  For each field you would simply follow the
+above-mentioned configuration procedure.
+
+<p>However, when designing your own MARC scheme, you need to think of
+ two CDSware-related restrictions:
+
+<ul> 
+
+<li>There should be no clash in the meaning of the same MARC tag in
+two different collections.  For example, the tag <code>100</code>
+should not mean <em>first author</em> in the Preprints collection and
+<em>title</em> in the Videotapes collection.  The MARC tags are
+considered to be chosen globally, in a collection-independent way.
+This means that we cannot have several collections reusing the same
+MARC code for their own different purposes.  (This should never happen
+in well designed database system anyway, but if you have a merge of
+various databases coming from various groups of users, and if you do
+not have the liberty to remap their MARC tags, this may be a problem.)
+
+<li>Also, our database design assumes that the order of repetitive
+subfields inside the same field instance does not matter.  For
+example, let us consider the tag <code>100</code> with the value
+<code>$a Foo $a Bar $a Baz</code>.  Then, the question "what is the
+second <code>$a</code> of the tag <code>100</code>?" is invalid within
+the CDSware MARC paradigm.  The CDSware would store a tag like that,
+but not the order of repetitive subfields themselves.  In our MARC
+paradigm, we prefer to code that information either (i) into different
+subfields within the same field instance (<code>100 $a Foo $b Bar $c
+Baz</code>), or (ii) into the same subfield but inside several field
+instances (<code>100 $a Foo</code>; <code>100 $a Bar</code>; <code>100
+$a Baz</code>), according to what is more appropriate.  (We think that
+to rely on the order of repetitive subfields inside the same field
+instance is a suspicious database design.)
+
+</ul>
+
+<p>These two restrictions were introduced in order to keep CDSware
+bibliographic tables both simple and fast.  As explained above, we
+believe that any good database design will avoid these techniques
+anyway.
+
+</ol>

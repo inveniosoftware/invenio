@@ -1,0 +1,104 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="HOWTO Migrate Your Old Documents Into CDSware" \
+    navbar_name="howto" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/>Admin Area</a> &gt; <a class=navtrail href=<WEBURL>/admin/howto/>Admin HOWTOs</a>" \
+    navbar_select="howto_migrate"
+
+<p>The CDSware tools come embedded with several independent flexible
+modules that enable you to easily convert your data from any format
+and to upload them into the CDSware system.
+
+<p>This document briefly describes how you proceed.  To learn more on
+each of the steps, simply follow embedded links.
+
+<h2>Quick instructions for the impatient CDSware admin</h2>
+
+<blockquote>
+<pre>
+$ cd /tmp
+$ cp /my/own/doc/system/datadump.txt .
+$ vi dump.cfg
+$ bibconvert -cdatadump.cfg < datadump.txt > datadump.xml
+$ bibformat < datadump.xml > datadump_with_fmt.xml
+$ bibupload datadump_with_fmt.xml
+$ bibwords add 1-1500
+</pre>
+</blockquote>
+
+<h2>Detailed instructions for the patient CDSware admin</h2>
+
+<blockquote>
+<dl>
+
+<dt><code>$ cd /tmp</code>
+
+<dd><blockquote>Go to  a temporary directory.</blockquote>
+
+<dt><code>$ cp /my/own/doc/system/datadump.txt .</code>
+
+<dd><blockquote>Copy your old data into a text file or some other
+format of your choice.  Preferably, the data should be well
+structured.  (Anyhow, even a free text format may be attepmted to be
+matched!)</blockquote>
+
+<dt><code>$ vi dump.cfg</code>
+
+<dd><blockquote>Describe the format of your data in the <a
+href="<WEBURL>/admin/bibconvert/">BibConvert</a> language.  This
+will enable you to transform them into XML MARC format that the
+CDSware system internally uses for bibliographic data handling.  (If
+you have not chosen yet your MARC scheme, please read the <a
+href="marc.shtml">MARC HOWTO</a>.)</blockquote>
+
+<dt><code>$ bibconvert -cdatadump.cfg < datadump.txt > datadump.xml</code>
+
+<dd><blockquote>Convert the data from your own format into XML 
+MARC, using the configuration you just wrote in the previous step.</blockquote>
+
+<dt><code>$ bibformat < datadump.xml > datadump_with_fmt.xml</code>
+
+<dd><blockquote>Create default HTML presentation of the data by using
+<a href="<WEBURL>/admin/bibformat/">BibFormat</a> configurations.
+(You may want to create <a
+href="<WEBURL>/admin/bibformat/FORMAT_display.shtml">new format</a>
+in case your metadata structure is different from what you are used
+to.)  This step enriches the XML MARC file by default HTML formats
+that the search engine will reuse.</blockquote>
+
+<dt><code>$ bibupload datadump_with_fmt.xml</code>
+
+<dd><blockquote>Upload thusly enriched XML file into CDSware
+bibliographic databases.</blockquote>
+
+<dt><code>$ bibwords add 1-1500</code>
+
+<dd><blockquote>Run the <a
+href="<WEBURL>/admin/bibwords/">BibWords</a> procedure on records #1
+to #1500 to create word indexes of the newly inputted data.  (Assuming
+there were 1500 records.)</blockquote>
+
+</dl>
+
+<p>Congratulations!  At this point you should have successfully
+migrated your old data into the CDSware system.
+
+</blockquote>

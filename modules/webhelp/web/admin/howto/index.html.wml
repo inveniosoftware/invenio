@@ -1,0 +1,47 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="Admin HOWTOs" \
+    navbar_name="howto" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/>Admin Area</a>" \
+    navbar_select="howto"
+
+<p>The HOWTO guides will give you both short and not-so-short
+recipes and thoughts on some of the most frequently encountered
+administrative tasks.
+
+<blockquote>
+
+<dl>
+
+<dt><a href="marc.html">HOWTO MARC</a>
+
+<dd>Describes how to choose the MARC representation of your metadata
+and how it will be stored in CDSware.
+
+<dt><a href="migrate.html">HOWTO Migrate</a>
+
+<dd>Describes how to migrate a bunch of your old data from any format
+you might have into CDSware.
+
+</dl>
+</blockquote>
+
+<p>Haven't found what you were looking for?  <a href="mailto:<ADMINEMAIL>" title="CDSware-Suggest-a-HOWTO">Suggest a HOWTO</a>.

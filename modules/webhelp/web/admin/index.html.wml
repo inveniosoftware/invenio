@@ -1,0 +1,179 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="Admin Area" \
+    navbar_name="admin" \
+    navtrail_previous_links="" \
+    navbar_select="admin"
+
+Welcome to the <CDSNAME> Administrator's Area.  Here is a short
+description of what you can do, from the point of view of a system
+librarian, an archive manager, and web interface moderators.
+
+<h2>HOWTOs</h2>
+
+<p>The <a href="howto/">HOWTO guides</a> will give you short recipes
+on some of the most frequently encountered administration tasks.
+
+<h2>System Librarian</h2>
+
+<p>The System Librarian will describe the metadata, decide upon MARC tags,
+etc.  He will ensure that there is a homogeneity between various data
+types and collections.  This is because all the bibliographic data is
+stored in the same common space.  
+
+<p>The system librarian would most probably be interested in the
+following administrative modules:
+
+<blockquote>
+<dl>
+
+<dt><a href="bibdata/">BibData Admin</a>  <small class=note>- partially included</small>
+
+<dd>Enables you to directly manipulate bibliographic data tables.
+
+    <br><em>Example:</em> edit record, change fields, simple
+    cataloguing, global changes, etc.
+
+<dt><a href="bibwords/">BibWords Admin</a> <small class=note>- not included yet</small>
+
+<dd>Enables you to configure "word files", i.e. to define which
+bibliographic fields are indexed into which word indexes.  The word
+indexes are then used by the search interface.  This is an essential
+part of the CDSware system if you have some non-standard data
+structure.  Otherwise, CDSware defines itself some commonly used index
+files (author, title, abstract, keywords, etc).
+
+    <br><em>Example:</em> you can tell that the author index is
+    constructed from <code>100 $a</code> and <code>700 $a</code> bibliographic tags.
+
+</dl>
+</blockquote>
+
+<h2>Archive Manager</h2>
+
+<p>The Archive Manager will work closely with the
+System Librarian and will perform various system tasks like setting up the
+data archives, importing other data sources, converting data formats,
+etc.
+
+<p>The Archive Manager would most probably be interested in the
+following administrative modules:
+
+<blockquote>
+<dl>
+
+<dt><a href="bibharvest/">BibHarvest Admin</a> <small class=note>- not included yet</small>
+
+<dd>Enables you to configure OAI data harvestor for eventual
+periodical batch upload of data.
+
+    <br><em>Example:</em> what to harvest, how to transform data, how
+    to store them into CDSware, etc.
+
+<dt><a href="bibconvert/">BibConvert Admin</a>
+
+<dd>Explains on how to use bibliographic data convertor. Useful for batch upload of data.
+
+    <br><em>Example:</em> migration of data from your old system,
+    automatic acquisitions of non-OAI data and not-so-well-structured
+    data, etc.
+
+<dt><a href="bibupload/">BibUpload Admin</a> <small class=note>- not included yet</small>
+
+<dd>Enables you to configure eventual local special operations to be
+    done on the data being uploaded.
+
+    <br><em>Note:</em> This is usually not needed, as all the data
+    transformation is usually done via <a
+    href="bibharvest/">BibHarvest</a> and <a
+    href="bibconvert/">BibConvert</a>.
+
+</dl>
+</blockquote>
+
+<h2>Web Interface Moderators</h2>
+
+<p>The Web Interface Moderators will work closely with the Archive
+Manager and will determine the way how the data is presented to the
+end user.  They will decide upon output formats, will configure search
+pages for different collections, will decide upon submission and
+approval policies of various data types, etc.
+
+<p>The Web Interface Moderators would most probably be interested
+in the following administrative modules:
+
+<blockquote>
+<dl>
+
+<dt><a href="bibformat/">BibFormat Admin</a>
+
+<dd>Enables you to specify how the bibliographic data is presented to
+    the end user in the search interface.  BibFormat is not only a
+    bibliographic data formatter, but also an external link resolver.
+    e.g. to propose published version links to publishers' sites.
+
+    <br><em>Example:</em> you can decide that titles should be
+    presented in bold font, that for each author an automatic link to
+    author's home page should be created according to some receipt, or
+    that for certain report number a special action should be
+    performed, etc.
+
+<dt><a href="webaccess/">WebAccess Admin</a> <small class=note>- included</small>
+
+<dd>Enables you to define who has got access or admin rights on various CDSware modules.
+
+    <br><em>Example:</em> you can tell that John is the bibliographic
+    data manager, that Jim can modify search interface pages, that
+    Jill is submission approval editor, etc.
+
+<dt><a href="websearch/">WebSearch Admin</a> <small class=note>- partially include</small>
+
+<dd>Enables you to configure the search interface for various data collections.
+
+    <br><em>Example:</em> you can define different page header,
+    footer, and portal boxes (left, right, top, bottom) to describe
+    various data collections.  Also, you can define search options,
+    search fields, and search examples, etc.
+
+    <br><em>Note:</em> This is an essential part of the CDSware system, so
+    you most probably want to configure it.
+
+<dt><a href="websubmit/">WebSubmit Admin</a> <small class=note>- included</small>
+
+<dd>Enables you to configure the submit interface and logic for various data types.
+
+    <br><em>Example:</em> you can define metadata fields for various
+    data types, what to do with the inputted values before uploading,
+    possible peer review and approval strategy, etc.
+
+    <br><em>Note:</em> This is an essential part of the CDSware system, so
+    you most probably want to configure it.
+
+<dt><a href="webperso/">WebPerso Admin</a> <small class=note>- not included yet</small>
+
+<dd>Enables you to manage user accounts and various user personalisation features
+    like user-defined baskets and alert queries.
+
+    <br><em>Example:</em> you can run and/or stop alerting engine,
+    clean user and session tables, modfify user baskets, etc.
+
+</dl>
+</blockquote>
