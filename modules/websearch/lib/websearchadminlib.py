@@ -39,7 +39,6 @@ import os
 import urllib
 import random
 import marshal
-import datetime
 import time
 
 from zlib import compress,decompress
@@ -2406,14 +2405,15 @@ def perform_validateconf(colID, ln, confirm=0, callback='yes'):
     rnk_list = get_def_name('', "rnkMETHOD")
     actions = []
 
+
     for (id, name, dbquery, restricted) in collections:
         reg_sons = len(get_col_tree(id, 'r'))
         vir_sons = len(get_col_tree(id, 'v'))
         status = ""
+
         langs = run_sql("SELECT ln from collectionname where id_collection=%s" % id)
         i8n = ""
-
- 
+        
         if len(langs) > 0:
             for lang in langs:
                 i8n += "%s, " % lang
@@ -2447,12 +2447,14 @@ def perform_validateconf(colID, ln, confirm=0, callback='yes'):
             status = """<b><span class="info">OK</span></b>"""
         actions.append([id, """<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s">%s</a>""" % (weburl, id, ln, name), dbquery, subs, restricted, i8n, status])
 
+    
     output += tupletotable(header=header, tuple=actions)
 
     try:
         body = [output, extra]
     except NameError:
         body = [output]
+    return addadminbox(subtitle, body)
 
     if callback:
         return perform_index(colID, ln, "perform_validateconf", addadminbox(subtitle, body))
@@ -2495,7 +2497,7 @@ def perform_removeoutputformat(colID, ln, fmtID='', callback='yes', confirm=0):
     return perform_showoutputformats(colID, ln, content=output)
 
 def get_col_tree(colID, rtype=''):
-    """Returns a presentation of the tree as a list.
+    """Returns a presentation of the tree as a list. TODO: Add loop detection
     colID - startpoint for the tree
     rtype - get regular or virtual part of the tree"""
     
@@ -2524,7 +2526,7 @@ def get_col_tree(colID, rtype=''):
                 if i == 0:   
                     down = 0
                 else:
-                    down = 1
+                    down = 1 
                 ntree.insert(0, (id_son, up, down, ccolID, rtype))
             tree = tree[0:ssize] + ntree + tree[ssize:len(tree)]
         return tree
