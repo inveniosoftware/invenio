@@ -48,6 +48,14 @@ except ImportError, e:
     import sys
     sys.exit(1)
     
+def relative_redirect( req, relative_url, **args ):
+    tmp = []
+    for param in args.keys():
+        #ToDo: url encoding of the params
+        tmp.append( "%s=%s"%( param, args[param] ) )
+    req.err_headers_out.add("Location", "%s/%s?%s" % (weburl, relative_url, "&".join( tmp ) ))
+    raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
+     
 ### CALLABLE INTERFACE
 
 def display(req, p="n"):
@@ -59,19 +67,25 @@ def display(req, p="n"):
                 keywords="CDS, personalize",
                 uid=uid)
 
-def input(req, idq, name="", freq="week", notif="y", idb=0):
+def input(req, idq, name="", freq="week", notif="y", idb=0, error_msg=""):
     uid = getUid(req)
+    html = webalert.perform_input_alert("add", idq, name, freq, notif, idb,uid)
+    if error_msg != "":
+        html ="""<div class="quicknote">%s</div><br>%s"""%(error_msg, html)
     return page(title="Set a new alert",
-                body=webalert.perform_input_alert("add", idq, name, freq, notif, idb,uid),
+                body=html,
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
                 description="CDS Personalize, Set a new alert",
                 keywords="CDS, personalize",
                 uid=uid)
 
-def modify(req, idq, name="", freq="week", notif="y", idb=0):
+def modify(req, idq, old_idb, name="", freq="week", notif="y", idb=0, error_msg=""):
     uid = getUid(req)
+    html = webalert.perform_input_alert("update", idq, name, freq, notif, idb,uid, old_idb)
+    if error_msg != "":
+        html ="""<div class="quicknote">%s</div><br>%s"""%(error_msg, html)
     return page(title="Modify alert settings",
-                body=webalert.perform_input_alert("update", idq, name, freq, notif, idb,uid),
+                body=html,
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
                 description="CDS Personalize, Modify alert settings",
                 keywords="CDS, personalize",
@@ -88,16 +102,25 @@ def list(req):
 
 def add(req, name, freq, notif, idb, bname, idq):
     uid = getUid(req)
+    try:
+        html=webalert.perform_add_alert(name, freq, notif, idb, bname, idq,uid)
+    except webalert.AlertError, e:
+        return input(req, idq, name, freq, notif, idb, e)
     return page(title="Display alerts",
-                body=webalert.perform_add_alert(name, freq, notif, idb, bname, idq,uid),
+                body=html,
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
                 description="CDS Personalize, Display alerts",
                 keywords="CDS, personalize",
                 uid=uid)
+
 def update(req, name, freq, notif, idb, bname, idq, old_idb):
     uid = getUid(req)
+    try:
+        html=webalert.perform_update_alert(name, freq, notif, idb, bname, idq, old_idb,uid)
+    except webalert.AlertError, e:
+        return modify(req, idq, old_idb, name, freq, notif, idb, e)
     return page(title="Display alerts",
-                body=webalert.perform_update_alert(name, freq, notif, idb, bname, idq, old_idb,uid),
+                body=html,
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
                 description="CDS Personalize, Display alerts",
                 keywords="CDS, personalize",

@@ -54,6 +54,21 @@ except ImportError, e:
 
 ### IMPLEMENTATION
 
+
+class AlertError(Exception):
+    pass
+
+
+def check_alert_name(alert_name, uid):
+    #check this user does not have another alert with this name
+    sql = """select id_query
+           from user_query_basket
+           where id_user=%s and alert_name='%s'"""%(uid, alert_name.strip())
+    res =  run_sql( sql )
+    if len( run_sql( sql ) ) > 0:
+        raise AlertError( "You already have an alert which name is <b>%s</b>"%alert_name )
+
+
 def get_textual_query_info_from_urlargs(urlargs):
     """Return nicely formatted search pattern and catalogue from urlargs of the search query.
     Suitable for 'your searches' display."""
@@ -161,7 +176,7 @@ def perform_display(permanent,uid):
 #         id_query id the identifier of the search to be alerted
 #         for the "modify" action specify old alert_name, frequency of checking, e-mail notification and basket id.
 # output: alert settings input form 
-def perform_input_alert(action, id_query, alert_name, frequency, notification, id_basket,uid):
+def perform_input_alert(action, id_query, alert_name, frequency, notification, id_basket,uid, old_id_basket=None):
 
     # set variables
     out = ""
@@ -243,13 +258,26 @@ def perform_input_alert(action, id_query, alert_name, frequency, notification, i
            """<INPUT type="hidden" name="idq" value="%s">""" % id_query
     if action == "update":
         out += """<TR><TD colspan="2" align="center"><BR>"""\
-               """<INPUT type="hidden" name="old_idb" value="%s">""" % id_basket
+               """<INPUT type="hidden" name="old_idb" value="%s">""" % old_id_basket
     # buttons confirmation/clear    
     out += """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="&nbsp;SET ALERT&nbsp;"></CODE>&nbsp;"""\
            """<CODE class="blocknote"><INPUT class="formbutton" type="reset" value="CLEAR DATA"></CODE>"""\
            """</TD></TR>\n"""
     out += """</TABLE></TD></TR></TABLE></FORM>"""
     return out
+
+
+def check_alert_is_unique( id_basket, id_query, uid ):
+    #check the user does not have another alert for the specied query 
+    #   and basket
+    sql = """select id_query
+            from user_query_basket
+            where id_user = %s and id_query = %s 
+            and id_basket= %s"""%(uid, id_query, id_basket)
+    res =  run_sql( sql )
+    if len( run_sql( sql ) ) > 0:
+        raise AlertError( "You already have an alert defined for the specified query and basket" )
+
 
 
 # perform_add_alert: add an alert to the database
@@ -265,6 +293,15 @@ def perform_add_alert(alert_name, frequency, notification, id_basket, new_basket
     # set variables
     out = ""
     id_user=uid # XXX
+    alert_name = alert_name.strip()
+
+    #check the alert name is not empty
+    if alert_name.strip() == "":
+        raise AlertError( "The alert name cannot be <b>empty</b>." )
+    
+    #check if the alert can be created
+    check_alert_name( alert_name, uid)
+    check_alert_is_unique( id_basket, id_query, uid)
     
     # set the basket identifier
     if new_basket_name != "":
@@ -292,15 +329,6 @@ def perform_list_alerts (uid):
     out += """<P>Set a new alert from <A href="display">your searches</A>, """\
            """the <A href="display?p='y'">most popular searches</A> or the input form.</P>"""
     # query the database
-    #SQL_query = "SELECT q.id, q.urlargs, a.id_user, a.id_query, a.id_basket, "\
-    #            "a.alert_name, a.frequency, a.notification, "\
-    #            "DATE_FORMAT(a.date_creation,'%%d %%b %%Y'), DATE_FORMAT(a.date_lastrun,'%%d %%b %%Y'), "\
-    #            "b.id, b.name "\
-    #            "FROM query q, user_query_basket a, basket b "\
-    #            "WHERE a.id_user='%s' "\
-    #            "AND a.id_query=q.id "\
-    #            "AND a.id_basket=b.id "\
-    #            "ORDER BY a.alert_name ASC " % id_user
     SQL_query = """ SELECT q.id, q.urlargs, a.id_user, a.id_query, 
                             a.id_basket, a.alert_name, a.frequency, 
                             a.notification, 
@@ -343,8 +371,8 @@ def perform_list_alerts (uid):
                 basket_name="""<CENTER>--</CENTER>"""
             else:
                 sql = "select name from basket where id=%s"%row[10]
-                query_result = run_sql(sql)    
-                basket_name=query_result[0][0]
+                res = run_sql(sql)    
+                basket_name=res[0][0]
 
             # id, alert name, frequency, e-mail alert, last run, creation, pattern, catalogue, actions
             out += """<TR><TD><I>#%d</I></TD>"""\ 
@@ -356,10 +384,10 @@ def perform_list_alerts (uid):
                    """<TD><NOBR>%s<NOBR></TD>"""\
                    """<TD>%s</TD>"""\
                    """<TD><A href="./remove?name=%s&idu=%d&idq=%d&idb=%d">Remove</A><BR>"""\
-                   """<A href="./modify?idq=%d&name=%s&freq=%s&notif=%s&idb=%d">Modify</A><BR>"""\
+                   """<A href="./modify?idq=%d&name=%s&freq=%s&notif=%s&idb=%d&old_idb=%d">Modify</A><BR>"""\
                    """<A href="%s/search.py?%s">Execute&nbsp;search</A></TD></TR>"""\
                    % (i,row[5],alert_frequency,email_notification,basket_name,row[9],row[8],
-                      get_textual_query_info_from_urlargs(row[1]),row[5],row[2],row[3],row[4],row[3],row[5],row[6],row[7],row[4],weburl,row[1])
+                      get_textual_query_info_from_urlargs(row[1]),row[5],row[2],row[3],row[4],row[3],row[5],row[6],row[7],row[4], row[4],weburl,row[1])
         out += """</TABLE>\n"""
     out += """<P>You have defined <B>%s</B> alerts.</P>""" % len(query_result)    
     if isGuestUser(uid) :
@@ -401,6 +429,22 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, new_bas
     #set variables
     out = ""
     id_user = uid # XXX
+    
+    #check the alert name is not empty
+    if alert_name.strip() == "":
+        raise AlertError( "The alert name cannot be <b>empty</b>." )
+    
+    #check if the alert can be created
+    sql = """select alert_name
+            from user_query_basket
+            where id_user=%s
+            and id_basket=%s
+            and id_query=%s"""%( uid, old_id_basket, id_query ) 
+    old_alert_name = run_sql( sql )[0][0]
+    if old_alert_name.strip()!="" and old_alert_name != alert_name:
+        check_alert_name( alert_name, uid)
+    if id_basket != old_id_basket:
+        check_alert_is_unique( id_basket, id_query, uid)
 
     # set the basket identifier
     if new_basket_name != "":
