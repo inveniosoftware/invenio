@@ -820,7 +820,7 @@ def check_args(arguments):
     if verbs.has_key(arguments['verb']):
         pass
     else:
-        out = out + oai_error("badArgument","Malformed request")
+        out = out + oai_error("badVerb","Illegal OAI verb")
 
 ## resumptionToken exclusive
 #
