@@ -741,9 +741,9 @@ def crawl_KB(filename,value,mode):
 def FormatField(value,fn):
     """
     bibconvert formatting functions:
-    =============================
+    ================================
     ADD(prefix,suffix)          - add prefix/suffix                             
-    KB(kb_file)                 - lookup in kb_file and replace value           
+    KB(kb_file,mode)            - lookup in kb_file and replace value           
     ABR(N,suffix)               - abbreviate to N places with suffix
     ABRX()                      - abbreviate exclusively words longer
     ABRW()                      - abbreviate word (limit from right)
@@ -769,9 +769,10 @@ def FormatField(value,fn):
     CONFL(substr,0/1)           - confirm validity of output line (check field being processed)
     CUT(prefix,postfix)         - remove substring from side
     RANGE(MIN,MAX)              - select items in repetitive fields
-
+    RE(regexp)                  - regular expressions
+    
     bibconvert character TYPES
-    =======================
+    ==========================
     ALPHA                       - alphabetic
     NALPHA                      - not alpphabetic
     NUM                         - numeric
@@ -785,20 +786,31 @@ def FormatField(value,fn):
     SPACE                       - space
     """
 
-    out = value
-    fn = fn + "()"
+    out     = value
+    fn      = fn + "()"
+    par     = get_pars(fn)[1]
+    fn      = get_pars(fn)[0]
+    regexp  = "//"
+    NRE     = len(regexp)
+    value   = sub_keywd(value)
+    par_tmp = []
 
-    par = get_pars(fn)[1]
-    fn = get_pars(fn)[0]
-    
-    value = sub_keywd(value)
-    par_tmp =[]
     for item in par:
         item = sub_keywd(item)
         par_tmp.append(item)
     par = par_tmp    
    
 
+    if (fn == "RE"):
+
+        new_value = ""
+        par = set_par_defaults(par,".*,0")
+
+        if (re.search(par[0],value) and (par[1] == "0")):
+            new_value = value
+
+        out = new_value
+	
     if (fn == "KB"):
         new_value = ""
         
@@ -879,6 +891,10 @@ def FormatField(value,fn):
 
     elif (fn == "LIMW"):
         par = set_par_defaults(par,",")       
+        if (par[0]!= ""):
+	    if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
+	        par[0] = par[0][NRE:-NRE]
+                par[0] = re.search(par[0],value).group()
         tmp = value.split(par[0])
         if (par[1] == "L"):
             out = par[0] + tmp[1]
@@ -938,7 +954,11 @@ def FormatField(value,fn):
     elif (fn == "REP"):
         set_par_defaults(par,",")
         if (par[0]!= ""):
-           out = value.replace(par[0],par[1])
+            if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
+                par[0] = par[0][NRE:-NRE]
+                out = re.sub(par[0],value)
+            else:
+	        out = value.replace(par[0],par[1])
 
     elif (fn == "SHAPE"):
        
@@ -961,6 +981,14 @@ def FormatField(value,fn):
 
     elif (fn == "IF"):
         par = set_par_defaults(par,",,")
+
+        N = 0
+        while N < 3:
+	    if (par[N][0:NRE] == regexp and par[N][-NRE:] == regexp):
+	        par[N] = par[N][NRE:-NRE]
+	        par[N] = re.search(par[N],value).group()
+            N += 1
+
         if (value == par[0]):
             out = par[1]
         else:
@@ -971,14 +999,24 @@ def FormatField(value,fn):
     elif (fn == "EXP"):
 
         par = set_par_defaults(par,",0")
-        
+	if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
+	    par[0] = par[0][NRE:-NRE]
+	    par[0] = re.search(par[0],value).group()
+						     
         tmp = value.split(" ")
         out2 = []
         for wrd in tmp:
-            if ((len(wrd.split(par[0])) == 1)and(par[1]=="1")):
-                out2.append(wrd)
-            if ((len(wrd.split(par[0])) != 1)and(par[1]=="0")):
-                out2.append(wrd)                
+            if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
+	        par[0] = par[0][NRE:-NRE]
+                if ((re.search(par[0],wrd).group() == wrd) and (par[1]=="1")):
+		    out2.append(wrd)
+                if ((re.search(par[0],wrd).group() != wrd) and (par[1]=="0")):
+                    out2.append(wrd)
+            else:
+                if ((len(wrd.split(par[0])) == 1)and(par[1]=="1")):
+                    out2.append(wrd)
+                if ((len(wrd.split(par[0])) != 1)and(par[1]=="0")):
+                    out2.append(wrd)                
         out = string.join(out2," ")
 
     elif (fn == "EXPW"):
@@ -1039,15 +1077,18 @@ def FormatField(value,fn):
     elif (fn == "SPLITW"):
 
         par = set_par_defaults(par,",0,,1")
+        if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
+	    par[0] = par[0][NRE:-NRE]
 
-        str = par[0]
+        str = re.search(par[0], value)
+
         header = string.atoi(par[1])
         headerplus = par[2]
         starting = string.atoi(par[3])
         counter = 1
         
         tmp2 = []
-        tmp = value.split(par[0])
+        tmp = re.split(par[0],value)
 
         last = tmp.pop()
         
@@ -1055,9 +1096,9 @@ def FormatField(value,fn):
 
             counter = counter + 1
             if (counter >= starting):
-                tmp2.append(value[:header] + headerplus + wrd + par[0])
+                tmp2.append(value[:header] + headerplus + wrd + str)
             else:
-                tmp2.append(value[:header] + wrd + par[0])
+                tmp2.append(value[:header] + wrd + str)
         if (last != ""):
             counter = counter + 1
             if (counter >= starting):
@@ -1072,17 +1113,22 @@ def FormatField(value,fn):
         par = set_par_defaults(par,",,1")
 
         found = 0
- 
+        par1  = ""
+
         data = select_line(par[0],data_parsed)
         
         for line in data:
-            if (par[1] == ""):
-                if (line == ""):
+            if (par[1][0:NRE] == regexp and par[1][-NRE:] == regexp):
+	        par1 = par[1][NRE:-NRE]
+            else:
+	        par1 = par[1]
+
+            if (par1 == ""):
+	        if (line == ""):
                     found = 1
-                    
-                    
-            elif (len(re.split(par[1],line)) > 1):
-                found = 1
+
+            elif (len(re.split(par1,line)) > 1 ):
+	        found = 1
 
         if ((found == 1)and(string.atoi(par[2]) == 1)):
             out = value
@@ -1098,6 +1144,8 @@ def FormatField(value,fn):
     elif (fn == "CONFL"):
 
         set_par_defaults(par,",1")
+        if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
+	    par[0] = par[0][NRE:-NRE]
 
         if (re.search(par[0],value)):
             if (string.atoi(par[1]) == 1):           
@@ -1120,7 +1168,6 @@ def FormatField(value,fn):
             out = out[len(par[0]):]
         if (right == par[1]):
             out = out[:-(len(par[1]))]
-
         
         return out
 
