@@ -33,11 +33,10 @@ There should be one SessionManager instance per process.
 SessionManager is a generic class borrowed from Quixote, the class 
 MPSessionManager provides the session management on top of mod_python requests.
 
-A Session is the umbrella object for a single session (notionally, a
-(user, host, browser_process) triple).  Simple applications can
-probably get away with putting all session data into a Session
-session_object (or, better, into an application-specific subclass
-of Session).
+A Session is the umbrella object for a single session (notionally, a (user,
+host, browser_process) triple).  Simple applications can probably get away
+with putting all session data into a Session object (or, better, into an
+application-specific subclass of Session).
 
 The default implementation provided here is not persistent: when the
 process shuts down, all session data is lost.  You will need to
@@ -52,8 +51,10 @@ DEFAULT_CHECK_SESSION_ADDR = 1
 
 import sys, string, re
 from time import time, localtime, strftime, clock
-import mod_python
-from mod_python import apache
+try:
+    from mod_python import apache
+except ImportError:
+    pass
 
 _qparm_re = re.compile(r'([\0- ]*'
                        r'([^\0- ;,=\"]+)="([^"]*)"'
@@ -344,6 +345,7 @@ class SessionManager:
         maintain_session(), called at the end of a request.
         """
         id = self._get_session_id(request)
+        session = None
         if id is not None:
             session = self.get(id)
             if session is None:
@@ -601,7 +603,7 @@ class MPSessionManager(SessionManager):
            and executes the parent implementation passing the compatible object
         """
         
-        rw = RequestWrapper( request )
+        rw = RequestWrapper.getWrapper( request )
         s = SessionManager.get_session( self, rw )
         rw.setSession( s )
         return s
@@ -611,7 +613,7 @@ class MPSessionManager(SessionManager):
            mod_python request objects in a SessionManager compatible one
            and executes the parent implementation passing the compatible object
         """
-        rw = RequestWrapper( request )
+        rw = RequestWrapper.getWrapper( request )
         SessionManager.maintain_session( self, rw, session )
         
     def has_session_cookie (self, request, must_exist=0):
@@ -619,7 +621,7 @@ class MPSessionManager(SessionManager):
            mod_python request objects in a SessionManager compatible one
            and executes the parent implementation passing the compatible object
         """
-        rw = RequestWrapper( request )
+        rw = RequestWrapper.getWrapper( request )
         return SessionManager.has_session_cookie( self, rw, must_exist )
 
     def expire_session (self, request):
@@ -627,23 +629,15 @@ class MPSessionManager(SessionManager):
            mod_python request objects in a SessionManager compatible one
            and executes the parent implementation passing the compatible object
         """
-        rw = RequestWrapper( request )
+        rw = RequestWrapper.getWrapper( request )
         SessionManager.expire_session(self, rw )
 
-    def create_session (self, request):
-	"""Proxy method to SessionManager create_session. It converts the 
-           mod_python request objects in a SessionManager compatible one
-           and executes the parent implementation passing the compatible object
-        """
-	rw = RequestWrapper( request )
-	return SessionManager._create_session(self,rw)
-
-    def revoke_session_cookie(self, request):
+    def revoke_session_cookie (self, request):
 	"""Proxy method to SessionManager revoke_session_cookie. It converts the 
            mod_python request objects in a SessionManager compatible one
            and executes the parent implementation passing the compatible object
         """
-	rw = RequestWrapper( request)
+	rw = RequestWrapper.getWrapper( request)
 	SessionManager.revoke_session_cookie(self,rw)
 
 class RequestWrapper:
@@ -667,7 +661,8 @@ class RequestWrapper:
     """
 
     def __init__(self, request):
-        """Constructor of the class. Initialises the necessesary values.
+        """Constructor of the class. Initialises the necessesary values. It 
+            should never be used, use getWrapper method instead.
         """
         self.__request = request
         try:
@@ -681,6 +676,24 @@ class RequestWrapper:
             self.session = request.session
         except AttributeError, e:
             self.session = None
+        request.cds_wrapper = self #sticks the current wrapper to the mp request
+                                   # so in succesive request it can be recovered
+
+    def getWrapper( req ):
+        """Returns a RequestWrapper for a given request.
+            
+            The session manager modifies the contents of the wrapper and 
+            therefore its state must be kept. This method returns the request 
+            sticked wrapper (carrying the current status) and if it doesn't
+            have any it creates a new one. The RequestWrapper initialisation
+            method will take care of sticking any new wrapper to the request.
+        """
+        try:
+            w = req.cds_wrapper
+        except AttributeError:
+            w = RequestWrapper( req )
+        return w
+    getWrapper = staticmethod( getWrapper )
 
     def get_environ(self, name):
         """Returns a "environ" variable value
