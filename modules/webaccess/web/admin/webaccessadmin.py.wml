@@ -296,9 +296,9 @@ def simpleauthorization(req, id_role=0, id_action=0):
                                            id_action=id_action)
 
 
-def simpleroleusers(req, id_role=0):
+def showroleusers(req, id_role=0):
     """show a page with simple overview of a role and connected users. """
     
-    return wal.perform_simpleroleusers(req=req,
-                                       id_role=id_role)
+    return wal.perform_showroleusers(req=req,
+                                     id_role=id_role)
 
