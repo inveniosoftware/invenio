@@ -1,0 +1,61 @@
+;;; -*- Mode: TODOO; -*
+
+CDSware TODO list
+=================
+
+Suitable for editing with Emacs ToDoo mode, see
+<http://www.emacswiki.org/cgi-bin/wiki/ToDoo>.
+
+o [tibor] Admin: HOWTO Run guide 
+  Received Wed Dec 17 16:20:35 2003 
+
+o [tibor] Installation: upgrade instructions
+  Received Wed Dec 17 16:20:35 2003 
+
+o [tibor] WebSession: garbage collection and guest session check
+  Received Wed Dec 17 16:20:35 2003 
+
+* WebSession account edit bugs 
+- email unique
+- pw edit: retype functionality
+  Received Wed Dec 17 16:20:35 2003 
+
+o [tibor] BibSched: test periodicity
+  Received Wed Dec 17 16:20:35 2003 
+
+o [tibor] BibSched: enable multiple hosts
+  Received Wed Dec 17 16:20:35 2003 
+
+o [tibor] WebSearch: search cache back
+  Received Wed Dec 17 16:20:35 2003 
+
+o [tibor] WebSearch: sort pattern test
+  Received Wed Dec 17 16:20:35 2003 
+
+* import/adapt old admin interfaces
+  Received Wed Dec 17 16:20:35 2003 
+
+o [thomas] BibUpload: adaptation
+  Received Wed Dec 17 16:20:35 2003 
+
+o [thomas] WebSubmit: adaptation 
+  Received Wed Dec 17 16:20:35 2003 
+
+o [martin] BibConvert: DC2MARC21 
+  Received Wed Dec 17 16:20:35 2003 
+
+o [martin] BibConvert: MEDLINE, BibTeX examples
+  Received Wed Dec 17 16:20:35 2003 
+
+o [tibor] WebSearch: add RSS output for recent additions to the collections.
+  Received Wed Dec 17 16:20:35 2003 
+
+o [tibor] WebSearch: cross-searching of various CDSware installations
+  Received Wed Dec 17 16:20:35 2003 
+
+o [tibor] BibIndex: make our own ACC indexes
+  Received Wed Dec 17 16:20:35 2003 
+  Study phrase index generation from XML MARC.
+  Related to bibXXx table abolition.
+
+;; end of file
