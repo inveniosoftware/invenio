@@ -798,4 +798,52 @@ hr {
 input,select {
     background: #fff;
 }
+.wsactionbutton {
+    width: 150px;
+    height: 25px;
+    COLOR: #039;
+    margin: 0px;
+    background-color: #fff;
+    border-top: 2px solid #039;
+    border-bottom: 2px solid #039;
+    border-left: 2px solid #039;
+    border-right: 2px solid #039;
+    vertical-align: middle;
+    horizontal-align: center;
+    font-size: small;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+.wsactionbuttonh {
+    width: 150px;
+    height: 25px;
+    COLOR: #039;
+    margin: 0px;
+    background-color: #fff;
+    border-top: 3px solid #039;
+    border-bottom: 3px solid #039;
+    border-left: 3px solid #039;
+    border-right: 3px solid #039;
+    vertical-align: middle;
+    horizontal-align: center;
+    font-size: small;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+.textbutton {
+    color: #039;
+    font-weight: bold;
+    text-decoration: none;
+}
+.submitBody {
+   color: #000; 
+   background: #9cf; 
+} 
+.submitHeader {
+   color: #fff; 
+   background: #006; 
+} 
+
 /* end of cds.css */
