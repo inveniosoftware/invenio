@@ -209,7 +209,7 @@ def email_notify(alert, records, argstr):
 
     msg += wrap_records(print_records(records))
 
-    msg += "-- \nCERN Document Server Alert Service <%s>\nUnsubscribe at <%s>\nNeed human intervention? Contact <%s>" % (weburl, ALERTURL, supportemail)
+    msg += "\n-- \nCERN Document Server Alert Service <%s>\nUnsubscribe at <%s>\nNeed human intervention? Contact <%s>" % (weburl, ALERTURL, supportemail)
 
     subject = 'Alert %s run on %s' % (alert[5], time)
     
