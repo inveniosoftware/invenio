@@ -91,16 +91,22 @@ cds.support@cern.ch
 ## This part defines OAI parameters for the current installation of
 ## CDSware OAI repository.
 
+## OAIIDSCHEME -- OAI identifier scheme:  
+##  (example: "oai")
+<define-tag OAIIDSCHEME whitespace=delete>
+oai
+</define-tag>
+
 ## OAIIDPREFIX -- OAI identifier prefix:  
-##  (example: "oai:cdswaredemo")
+##  (example: "cds.cern.ch")
 <define-tag OAIIDPREFIX whitespace=delete>
-oai:cdsdev.cern.ch
+cds.cern.ch
 </define-tag>
 
 ## OAISAMPLEIDENTIFIER -- OAI sample identifier:  
-##  (example: "oai:cdswaredemo:101")
+##  (example: "oai:cds.cern.ch:CERN-TH-4036")
 <define-tag OAISAMPLEIDENTIFIER whitespace=delete>
-oai:cdsdev.cern.ch:101
+<OAIIDSCHEME>:<OAIIDPREFIX>:CERN-TH-4036
 </define-tag>
 
 ## OAIIDENTIFYDESCRIPTION -- description for the OAI Identify verb (optional):
@@ -113,10 +119,10 @@ oai:cdsdev.cern.ch:101
                    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier
                                        http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">
       <scheme>
-       oai
+       <OAIIDSCHEME>
       </scheme>
       <repositoryIdentifier>
-       cdsdev.cern.ch
+       <OAIIDPREFIX>
       </repositoryIdentifier>
       <delimiter>
        :
