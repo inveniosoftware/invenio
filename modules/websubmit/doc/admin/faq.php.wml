@@ -34,20 +34,11 @@
 ?>
 <SMALL>
 		<BR>
-		<a href="#Q1">Q1. I don't want to use dynamic html on the CDS Submit site. How can I do this?</a><br>
-		<a href="#Q2">Q2. I'd like to be warned each time there is an error, or an important action is made through the manager. Is this possible?</a><br>
+		<a href="#Q1">Q1. I'd like to be warned each time there is an error, or an important action is made through the manager. Is this possible?</a><br>
 
 
 
-		<a name=Q1><H3><i>Q1. I don't want to use dynamic html on the CDS Submit site. How can I do this?
-		</i></H3>
-		<BLOCKQUOTE>
-		<UL>
-			Edit the config.wml file in CDSware distribution, find the "SUMMARYON" definition and set it to FALSE. This will suppress the "Summary" window from the interface which was implemented in dynamic html.
-		</UL>
-		</BLOCKQUOTE>
-
-		<a name=Q2><H3><i>Q2. I'd like to be warned each time there is an error, or an important action is made through the manager. Is this possible?
+		<a name=Q1><H3><i>Q1. I'd like to be warned each time there is an error, or an important action is made through the manager. Is this possible?
 		</i></H3>
 		<BLOCKQUOTE>
 		<UL>

@@ -355,30 +355,6 @@
 
 
 
-		<br><br><A NAME="Get_TFU_Files">
-		<TABLE border=1>
-		<TR><TD colspan=2 bgcolor=#ddddff><SMALL><b>Get_TFU_Files</b></SMALL></TD></TR>
-		<TR><TD colspan=2 bgcolor=#eeeeff align=center><SMALL>description</SMALL></TD></TR>
-		<TR>
-			<TD colspan=2>
-				<SMALL>
-				This function takes the URLs contained in the [fieldnameTFU] file, retrieves the files using lynx and stores them in the submission directory.<br>
-				The first URL is stored in the [submissiondirectory]/files/MainFile dir.<br>
-				The following ones in [submissiondirectory]/files/IncludedFiles dir.
-				</SMALL>
-			</TD>
-		</TR>
-		<TR><TD colspan=2 bgcolor=#eeeeff align=center><SMALL>parameters</SMALL></TD></TR>
-		<TR>
-			<TD valign=top><SMALL><b>fieldnameTFU</b></SMALL></TD>
-			<TD><SMALL>
-				Name of the file containing the URLS. There should be one URL per line.
-			</SMALL></TD>
-		</TR>
-		</TABLE>
-
-
-
 		<br><br><A NAME="Insert_Record">
 		<TABLE border=1>
 		<TR><TD colspan=2 bgcolor=#ddddff><SMALL><b>Insert_Record</b></SMALL></TD></TR>

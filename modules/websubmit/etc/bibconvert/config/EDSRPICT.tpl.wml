@@ -10,7 +10,6 @@ NO---<:NO:>
 Rep---<:Rep:>
 act---<:act:>
 BN---<:BN:>
-RNPHO---<:RNPHO:>
 RNPHO2---<:RNPHO2:>
 comboRPICT---<:comboRPICT:>
 SN---<:SN:>
