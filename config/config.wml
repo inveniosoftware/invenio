@@ -539,33 +539,41 @@ atlantis.cern.ch
 ## below are the ones that you do not probably want to modify during
 ## the runtime.
 
-## v0.0.9: you probably do not want to change these
-<define-tag AUTHENTICATE whitespace=delete>
-TRUE
+## CFG_SUBMIT_COUNTER -- indicates where the counters used by websubmit
+## are stored
+<define-tag CFG_SUBMIT_COUNTER whitespace=delete>
+<DATADIR>/submit/counters
 </define-tag>
 
-<define-tag SUMMARYON whitespace=delete>
-TRUE
+## CFG_SUBMIT_DIR -- this indicates where the websubmit system will
+## keep each submissions running data
+<define-tag CFG_SUBMIT_DIR whitespace=delete>
+<DATADIR>/submit/storage
 </define-tag>
 
-<define-tag ARCHIVE whitespace=delete>
-<WEBDIR>/submit/archive
+#############################################
+## Part 7: Fulltext Archive WML Parameters ##
+#############################################
+
+## This section contains some WML-based configuration parameters for
+## fulltext archive.
+
+## CFG_FILE_DIR -- this indicates where the fulltext files will be 
+## stored
+<define-tag CFG_FILE_DIR whitespace=delete>
+<DATADIR>/files
 </define-tag>
 
-<define-tag ARCHIVEURL whitespace=delete>
-<WEBURL>/submit/archive
-</define-tag>
-
-<define-tag COUNTERS whitespace=delete>
-<WEBDIR>/submit/counters
-</define-tag>
-
-<define-tag STORAGE whitespace=delete>
-<WEBDIR>/submit/storage
+## CFG__FILE_DIR_SIZE -- all attached fulltext files are stored
+## under the CFG_FILE_DIR directory, inside subdirectories called gX
+## this variable indicates the maximum number of files stored in each
+## subdirectories
+<define-tag CFG_FILE_DIR_SIZE whitespace=delete>
+5000
 </define-tag>
 
 ######################################
-## Part 7: BibFormat WML Parameters ##
+## Part 8: BibFormat WML Parameters ##
 ######################################
 
 ## This section contains some WML-based configuration parameters for

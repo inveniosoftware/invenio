@@ -55,6 +55,9 @@
 <define-tag CACHEDIR whitespace=delete>
 @prefix@/var/cache
 </define-tag>
+<define-tag DATADIR whitespace=delete>
+@prefix@/var/data
+</define-tag>
 <define-tag WEBDIR whitespace=delete>
 @WEBDIR@
 </define-tag>
