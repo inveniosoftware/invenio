@@ -455,69 +455,85 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
 
     startCreate = time.time()
     global voutput
- 
+
     if verbose > 0:
         voutput += "<br>Running rank method: %s, using find_similar/word_frequency in bibrank_record_sorter<br>" % rank_method_code
     if methods[rank_method_code]["override_default_min_relevance"] == "no":
         rank_limit_relevance = methods[rank_method_code]["default_min_relevance"]
 
-    query_terms = {} 
     try:
         recID = int(recID)
     except Exception,e :
         return (None, "Warning: Error in record number, please check that a number is given.", "", voutput) 
 
-    res = run_sql("SELECT termlist FROM %sR WHERE id_bibrec=%s" % (methods[rank_method_code]["rnkWORD_table"][:-1], recID))
-    if not res:
+    rec_terms = run_sql("SELECT termlist FROM %sR WHERE id_bibrec=%s" % (methods[rank_method_code]["rnkWORD_table"][:-1], recID))
+    if not rec_terms:
         return (None, "Warning: Requested record does not seem to exist.", "", voutput) 
-    rec_terms = deserialize_via_marshal(res[0][0])
+    rec_terms = deserialize_via_marshal(rec_terms[0][0])
 
     #Get all documents using terms from the selected documents
-    if len(rec_terms) > 0:
-        terms = "%s" % dict(rec_terms).keys()
-        terms = terms[1:len(terms) - 1]
-        terms_recs = dict(run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (methods[rank_method_code]["rnkWORD_table"], terms)))
-    else:
+    if len(rec_terms) == 0:
         return (None, "Warning: Record spesified has no content indexed for use with this method.", "", voutput)
+    else:
+        terms = "%s" % rec_terms.keys()
+        terms_recs = dict(run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (methods[rank_method_code]["rnkWORD_table"], terms[1:len(terms) - 1])))
 
-    #Calculate all terms
+    tf_values = {}
+    #Calculate all term frequencies
     for (term, tf) in rec_terms.iteritems():
 	if len(term) >= methods[rank_method_code]["min_word_length"] and terms_recs.has_key(term):
-            query_terms[term] =  int((1 + math.log(tf[0])) *  tf[1])
+            tf_values[term] =  int((1 + math.log(tf[0])) *  tf[1])
+    tf_values = tf_values.items()
+    tf_values.sort(lambda x, y: cmp(y[1], x[1])) 
 
-    query_terms_old = query_terms.items()
-    query_terms_old.sort(lambda x, y: cmp(y[1], x[1])) 
-    query_terms = {}
-
+    lwords = []
     stime = time.time()
     (recdict, rec_termcount) = ({}, {})
-
     #Use only most important terms
-    for (t, tf) in query_terms_old:
+    for (t, tf) in tf_values: #t=term, tf=term frequency
         term_recs = deserialize_via_marshal(terms_recs[t])
-        if len(query_terms_old) <= methods[rank_method_code]["max_nr_words_lower"] or (len(term_recs) >= methods[rank_method_code]["min_nr_words_docs"] and (((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) <=  methods[rank_method_code]["max_word_occurence"]) and ((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) >= methods[rank_method_code]["min_word_occurence"]))):
-             query_terms[t] = round(tf, 4) 
-             (recdict, rec_termcount) = calculate_record_relevance((t, query_terms[t]) , term_recs, hitset, recdict, rec_termcount, verbose, "yes") 
-             if verbose > 0:
-                 voutput += "Term: %s,Number of records: %s, %s<br>" % (t, len(recdict), tf)
-
-        if len(query_terms_old) > methods[rank_method_code]["max_nr_words_lower"] and (len(query_terms) ==  methods[rank_method_code]["max_nr_words_upper"] or tf < 0):
+        if len(tf_values) <= methods[rank_method_code]["max_nr_words_lower"] or (len(term_recs) >= methods[rank_method_code]["min_nr_words_docs"] and (((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) <=  methods[rank_method_code]["max_word_occurence"]) and ((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) >= methods[rank_method_code]["min_word_occurence"]))):
+             lwords.append((t, methods[rank_method_code]["rnkWORD_table"]))
+             (recdict, rec_termcount) = calculate_record_relevance((t, round(tf, 4)) , term_recs, hitset, recdict, rec_termcount, verbose, "true")
+        if len(tf_values) > methods[rank_method_code]["max_nr_words_lower"] and (len(lwords) ==  methods[rank_method_code]["max_nr_words_upper"] or tf < 0):
             break
-
-    if len(query_terms) == 0: #not enough terms to get a good result
+   
+    if len(tf_values) == 0: #not enough terms to get a good result
         return (None, "Warning, Selected record does not contain enough information to find similar records.", "", voutput)
-    if verbose > 0:
-        voutput += "<br>Number of terms: %s<br>" % run_sql("SELECT count(id) FROM %s" % methods[rank_method_code]["rnkWORD_table"])[0][0]
-        voutput += "Number of terms to use for query: %s<br>" % (len(query_terms))
-        voutput += "Current number of recIDs: %s<br>" % (methods[rank_method_code]["col_size"])
-        voutput += "Prepare time: %s<br>" % (str(time.time() - startCreate))
+  #  methods[rank_method_code]["rnkWORD_table"] = "rnkWORD02F"
+  #  rec_terms = run_sql("SELECT termlist FROM %sR WHERE id_bibrec=%s" % (methods[rank_method_code]["rnkWORD_table"][:-1], recID))
+  #  if rec_terms:
+  #      rec_terms = deserialize_via_marshal(rec_terms[0][0])
+   #     #Get all documents using terms from the selected documents
+    #    if len(rec_terms) > 0:
+   #         terms = "%s" % rec_terms.keys()
+   #         terms_recs = dict(run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (methods[rank_method_code]["rnkWORD_table"], terms[1:len(terms) - 1])))
+
+   #         tf_values = {}
+   #         #Calculate all terms/bigrams
+   #         for (term, tf) in rec_terms.iteritems():
+   #             if terms_recs.has_key(term):
+   #                 tf_values[term] =  int((1 + math.log(tf[0])) *  tf[1])
+   #         tf_values = tf_values.items()
+   #         tf_values.sort(lambda x, y: cmp(y[1], x[1])) 
+#
+   #         #Use only most important terms
+   #         for (t, tf) in tf_values:
+   #             term_recs = deserialize_via_marshal(terms_recs[t])
+   #             lwords.append((t, methods[rank_method_code]["rnkWORD_table"]))
+   #             (recdict, rec_termcount) = calculate_record_relevance((t, round(tf, 4)) , term_recs, hitset, recdict, rec_termcount, verbose, "true") 
 
     (recdict, hitset) = post_calculate_record_relevance(recdict, rec_termcount, hitset, verbose)
     reclist = sort_record_relevance(recdict, rank_limit_relevance, verbose)
 
     if verbose > 0:
+        voutput += "<br>Number of terms: %s<br>" % run_sql("SELECT count(id) FROM %s" % methods[rank_method_code]["rnkWORD_table"])[0][0]
+        voutput += "Number of terms to use for query: %s<br>" % len(lwords)
+        voutput += "Terms: %s<br>" % lwords
+        voutput += "Current number of recIDs: %s<br>" % (methods[rank_method_code]["col_size"])
+        voutput += "Prepare time: %s<br>" % (str(time.time() - startCreate))
         voutput += "Total time used: %s<br>" % (str(time.time() - startCreate))
-        rank_method_stat(rank_method_code, reclist, query_terms)
+        rank_method_stat(rank_method_code, reclist, lwords)
 
     return (reclist[:len(reclist)], methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
 
@@ -540,45 +556,62 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
 
     if verbose > 0:
         voutput += "<br>Running rank method: %s, using word_frequency function in bibrank_record_sorter<br>" % rank_method_code
-    query_terms = {}
     lwords_old = lwords
     lwords = []
     #Check terms, remove non alphanumeric characters. Use both unstemmed and stemmed version of all terms.
     for i in range(0, len(lwords_old)):
         term = string.lower(lwords_old[i])
-        use_term = 0
         if not methods[rank_method_code]["stopwords"].has_key(term):
-            lwords.append(term)
+            lwords.append((term, methods[rank_method_code]["rnkWORD_table"]))
             terms = string.split(string.lower(re.sub(methods[rank_method_code]["chars_alphanumericseparators"], ' ', term)))  
             for term in terms: 
                 if methods[rank_method_code].has_key("stemmer"): # stem word
                     term = methods[rank_method_code]["stemmer"].stem(string.replace(term, ' ', ''))
                 if lwords_old[i] != term: #add if stemmed word is different than original word
-	            lwords.append(term)
+	            lwords.append((term, methods[rank_method_code]["rnkWORD_table"]))
 
     (recdict, rec_termcount, lrecIDs_remove) = ({}, {}, {})
     #For each term, if accepted, get a list of the records using the term
     #calculate then relevance for each term before sorting the list of records
-    for term in lwords:
+    for (term, table) in lwords:
 	term_recs = run_sql("SELECT term, hitlist FROM %s WHERE term='%s'" % (methods[rank_method_code]["rnkWORD_table"], MySQLdb.escape_string(term)))
         if term_recs:
 	    term_recs = deserialize_via_marshal(term_recs[0][1])
             if check_term({}, term, methods[rank_method_code]["col_size"], len(term_recs), 1.0, 0.00, 0):
-                query_terms[term] = int(query_terms.get(term, 0) + term_recs["Gi"][1])
-                (recdict, rec_termcount) = calculate_record_relevance((term, query_terms[term]) , term_recs, hitset, recdict, rec_termcount, verbose)
+                (recdict, rec_termcount) = calculate_record_relevance((term, int(term_recs["Gi"][1])) , term_recs, hitset, recdict, rec_termcount, verbose, None)
+
             del term_recs
+
+    #if len(recdict) == 0 or (len(lwords) == 1 and lwords[0] == ""):
+    #    return (None, "Records not ranked. The query is not detailed enough for ranking to be possible.", "", voutput)
+            
+    #if len(lwords) > 1:
+    #    methods[rank_method_code]["rnkWORD_table"] = "rnkWORD02F"
+    #    bigrams = {}
+    #    lwords_dict = {}
+    #    for (term, table) in lwords:
+    #        lwords_dict[term] = 1
+
+ #       for (term, table) in lwords:
+ #           res = run_sql("SELECT term FROM %s WHERE term like '%% %s' or term like '%s %%'" % ("rnkWORD02F", term, term))
+ #           for bigram in res:
+ #               bigram = bigram[0]
+ #               splitted_bigram = string.split(bigram, " ")
+ #               if lwords_dict.has_key(splitted_bigram[0]) and lwords_dict.has_key(splitted_bigram[1]) and splitted_bigram[0] != splitted_bigram[1] and not bigrams.has_key(bigram):
+ #                   bigrams[bigram] = 1
+  
+ #       for bigram in bigrams.keys():
+ #           lwords.append((bigram, methods[rank_method_code]["rnkWORD_table"]))
+#	    hitlist = run_sql("SELECT hitlist FROM %s WHERE term='%s'" % (methods[rank_method_code]["rnkWORD_table"], MySQLdb.escape_string(bigram)))
+#	    hitlist = deserialize_via_marshal(hitlist[0][0])
+ #           (recdict, rec_termcount) = calculate_record_relevance((bigram, int(hitlist["Gi"][1])) , hitlist, hitset, recdict, rec_termcount, verbose, "true")
+  #          del hitlist
 
     if len(recdict) == 0 or (len(lwords) == 1 and lwords[0] == ""):
         return (None, "Records not ranked. The query is not detailed enough for ranking to be possible.", "", voutput)
-
-    if verbose > 0:
-        voutput += "<br>Current number of recIDs: %s<br>" % (methods[rank_method_code]["col_size"])
-        voutput += "Number of terms: %s<br>" % run_sql("SELECT count(id) FROM %s" % methods[rank_method_code]["rnkWORD_table"])[0][0]
-        voutput += "Terms: %s<br>" % query_terms
-        voutput += "Prepare and pre calculate time: %s<br>" % (str(time.time() - startCreate))
-
-    (recdict, hitset) = post_calculate_record_relevance(recdict, rec_termcount, hitset, verbose)
-    reclist = sort_record_relevance(recdict, rank_limit_relevance, verbose)
+    else:
+        (recdict, hitset) = post_calculate_record_relevance(recdict, rec_termcount, hitset, verbose)
+        reclist = sort_record_relevance(recdict, rank_limit_relevance, verbose)
 
     #Add any documents not ranked to the end of the list
     if hitset:
@@ -587,8 +620,12 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
         reclist = zip(lrecIDs, [0] * len(lrecIDs)) + reclist      #using 6mb
 
     if verbose > 0:
+        voutput += "<br>Current number of recIDs: %s<br>" % (methods[rank_method_code]["col_size"])
+        voutput += "Number of terms: %s<br>" % run_sql("SELECT count(id) FROM %s" % methods[rank_method_code]["rnkWORD_table"])[0][0]
+        voutput += "Terms: %s<br>" % lwords
+        voutput += "Prepare and pre calculate time: %s<br>" % (str(time.time() - startCreate))
         voutput += "Total time used: %s<br>" % (str(time.time() - startCreate))
-        rank_method_stat(rank_method_code, reclist, query_terms)
+        rank_method_stat(rank_method_code, reclist, lwords)
 
     return (reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
 
@@ -622,7 +659,7 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, ver
                 tf = invidx[j]
                 recdict[j] = recdict[j] + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
                 rec_termcount[j] = rec_termcount.get(j, 0) + 1
-        
+
     return (recdict, rec_termcount)
 
 def post_calculate_record_relevance(recdict, rec_termcount, hitset, verbose):
@@ -683,11 +720,11 @@ def rank_method_stat(rank_method_code, reclist, lwords):
     voutput += "<br>Rank statistics:<br>"
     for i in range(1, j):
    	voutput += "%s,Recid:%s,Score:%s<br>" % (i,reclist[len(reclist) - i][0],reclist[len(reclist) - i][1])
-	res = run_sql("SELECT termlist FROM %sR WHERE id_bibrec=%s" % (methods[rank_method_code]["rnkWORD_table"][:-1], reclist[len(reclist) - i][0]))
-	termlist = deserialize_via_marshal(res[0][0])
-        for term in lwords:
-            if termlist.has_key(term):
-                voutput += "%s-%s / " % (term, termlist[term][0])
+        for (term, table) in lwords:
+	    term_recs = run_sql("SELECT hitlist FROM %s WHERE term='%s'" % (table, term))
+            term_recs = deserialize_via_marshal(term_recs[0][0])
+            if term_recs.has_key(reclist[len(reclist) - i][0]):
+                voutput += "%s-%s / " % (term, term_recs[reclist[len(reclist) - i][0]][0])
         voutput += "<br>"
 
     voutput += "<br>Score variation:<br>"

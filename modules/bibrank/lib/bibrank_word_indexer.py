@@ -621,6 +621,7 @@ class WordTable:
 
         self.recIDs_in_mem.append([recID1,recID2])
         # secondly fetch all needed tags:
+        
         for (tag, weight, lang) in self.fields_to_index:
 	    if tag in tagToWordsFunctions.keys():
                 get_words_function = tagToWordsFunctions[ tag ]
