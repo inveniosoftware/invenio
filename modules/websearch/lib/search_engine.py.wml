@@ -69,14 +69,30 @@ cfg_nb_browse_seen_records = 100 # limit of the number of records to check when 
 cfg_nicely_ordered_collection_list = 0 # do we propose collection list nicely ordered or alphabetical?
 
 ## precompile some often-used regexp for speed reasons:
-re_word = sre.compile('[\s]')
-re_quotes = sre.compile('[\'\"]')
-re_doublequote = sre.compile('\"')
-re_equal = sre.compile('\=')
-re_logical_and = sre.compile('\sand\s', sre.I)
-re_logical_or = sre.compile('\sor\s', sre.I)
-re_logical_not = sre.compile('\snot\s', sre.I)
-re_operators = sre.compile(r'\s([\+\-\|])\s')
+sre_word = sre.compile('[\s]')
+sre_quotes = sre.compile('[\'\"]')
+sre_doublequote = sre.compile('\"')
+sre_equal = sre.compile('\=')
+sre_logical_and = sre.compile('\sand\s', sre.I)
+sre_logical_or = sre.compile('\sor\s', sre.I)
+sre_logical_not = sre.compile('\snot\s', sre.I)
+sre_operators = sre.compile(r'\s([\+\-\|])\s')
+sre_pattern_wildcards_at_beginning = sre.compile(r'(\s)[\*\%]+')
+sre_pattern_single_quotes = sre.compile("'(.*?)'")
+sre_pattern_double_quotes = sre.compile("\"(.*?)\"")
+sre_pattern_regexp_quotes = sre.compile("\/(.*?)\/")
+sre_pattern_short_words = sre.compile(r'([\s\"]\w{1,3})[\*\%]+')
+sre_pattern_space = sre.compile("__SPACE__")
+sre_pattern_today = sre.compile("\$TODAY\$")
+sre_unicode_a = sre.compile(unicode(r"(?u)[áàäâãå]", "utf-8"), sre.I)
+sre_unicode_ae = sre.compile(unicode(r"(?u)[æ]", "utf-8"), sre.I)
+sre_unicode_e = sre.compile(unicode(r"(?u)[éèëê]", "utf-8"), sre.I)
+sre_unicode_i = sre.compile(unicode(r"(?u)[íìïî]", "utf-8"), sre.I)
+sre_unicode_o = sre.compile(unicode(r"(?u)[óòöôõø]", "utf-8"), sre.I)
+sre_unicode_u = sre.compile(unicode(r"(?u)[úùüû]", "utf-8"), sre.I)
+sre_unicode_y = sre.compile(unicode(r"(?u)[ýÿ]", "utf-8"), sre.I)
+sre_unicode_c = sre.compile(unicode(r"(?u)[ç]", "utf-8"), sre.I)
+sre_unicode_n = sre.compile(unicode(r"(?u)[ñ]", "utf-8"), sre.I)
 
 def get_alphabetically_ordered_collection_list(collid=1, level=0):
     """Returns nicely ordered (score respected) list of collections, more exactly list of tuples
@@ -208,19 +224,17 @@ def create_basic_search_units(req, p, f, m=None):
             ## B3 - doing WRD search, but maybe ACC too
             # search units are separated by spaces unless the space is within single or double quotes
             # so, let us replace temporarily any space within quotes by '__SPACE__'
-            p = sre.sub("'(.*?)'", lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p) 
-            p = sre.sub("\"(.*?)\"", lambda x: "\""+string.replace(x.group(1), ' ', '__SPACEBIS__')+"\"", p)
-            p = sre.sub("\/(.*?)\/", lambda x: "/"+string.replace(x.group(1), ' ', '__SPACETER__')+"/", p)
+            p = sre_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p) 
+            p = sre_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", p) 
+            p = sre_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", p)
             # wash argument:
-            p = re_equal.sub(":", p)
-            p = re_logical_and.sub(" ", p)
-            p = re_logical_or.sub(" |", p)
-            p = re_logical_not.sub(" -", p)
-            p = re_operators.sub(r' \1', p)
+            p = sre_equal.sub(":", p)
+            p = sre_logical_and.sub(" ", p)
+            p = sre_logical_or.sub(" |", p)
+            p = sre_logical_not.sub(" -", p)
+            p = sre_operators.sub(r' \1', p)
             for pi in split(p): # iterate through separated units (or items, as "pi" stands for "p item")
-                pi = sre.sub("__SPACE__", " ", pi) # replace back '__SPACE__' by ' ' 
-                pi = sre.sub("__SPACEBIS__", " ", pi) # replace back '__SPACEBIS__' by ' '
-                pi = sre.sub("__SPACETER__", " ", pi) # replace back '__SPACETER__' by ' '
+                pi = sre_pattern_space.sub(" ", pi) # replace back '__SPACE__' by ' '
                 # firstly, determine set operator
                 if pi[0] == '+' or pi[0] == '-' or pi[0] == '|':
                     if len(opfts) or pi[0] == '-': # either not first unit, or '-' for the first unit
@@ -244,10 +258,10 @@ def create_basic_search_units(req, p, f, m=None):
                 if fi and cfg_fields_convert.has_key(string.lower(fi)):
                     fi = cfg_fields_convert[string.lower(fi)]
                 # wash 'pi' argument:
-                if re_quotes.match(pi):
+                if sre_quotes.match(pi):
                     # B3a - quotes are found => do ACC search (phrase search)
                     if fi:
-                        if re_doublequote.match(pi):
+                        if sre_doublequote.match(pi):
                             pi = string.replace(pi, '"', '') # get rid of quotes
                             opfts.append([oi,pi,fi,'a'])
                         else:
@@ -391,27 +405,27 @@ def create_google_box(cc, p, f, p1, p2, p3, ln=cdslang,
     if cfg_google_box_servers.get('Amazon', 0):
         if string.find(cc, "Book") >= 0:
             if f == "author":
-                out_links.append("""<a class="google" href="http://www.amazon.com/exec/obidos/external-search/?field-author=%s&tag=cern">%s in Amazon</a>""" % (p_quoted, p))                
+                out_links.append("""<a class="google" href="http://www.amazon.com/exec/obidos/external-search/?field-author=%s&tag=cern">%s %s Amazon</a>""" % (p_quoted, p, msg_in[ln]))                
             else:
-                out_links.append("""<a class="google" href="http://www.amazon.com/exec/obidos/external-search/?keyword=%s&tag=cern">%s in Amazon</a>""" % (p_quoted, p))
+                out_links.append("""<a class="google" href="http://www.amazon.com/exec/obidos/external-search/?keyword=%s&tag=cern">%s %s Amazon</a>""" % (p_quoted, p, msg_in[ln]))
     # CERN Intranet:
     if cfg_google_box_servers.get('CERN Intranet', 0):
-        out_links.append("""<a class="google" href="http://search.cern.ch/query.html?qt=%s">%s in CERN&nbsp;Intranet</a>""" % (urllib.quote(string.replace(p, ' ', ' +')), p))
+        out_links.append("""<a class="google" href="http://search.cern.ch/query.html?qt=%s">%s %s CERN&nbsp;Intranet</a>""" % (urllib.quote(string.replace(p, ' ', ' +')), p, msg_in[ln]))
     # CERN Agenda:
     if cfg_google_box_servers.get('CERN Agenda', 0):
         if f == "author":
-            out_links.append("""<a class="google" href="http://agenda.cern.ch/search.php?field=speaker&keywords=%s&search=Search">%s in CERN&nbsp;Agenda</a>""" % (p_quoted, p))
+            out_links.append("""<a class="google" href="http://agenda.cern.ch/search.php?field=speaker&keywords=%s&search=Search">%s %s CERN&nbsp;Agenda</a>""" % (p_quoted, p, msg_in[ln]))
         elif f == "title":
-            out_links.append("""<a class="google" href="http://agenda.cern.ch/search.php?field=title&keywords=%s&search=Search">%s in CERN&nbsp;Agenda</a>""" % (p_quoted, p))
+            out_links.append("""<a class="google" href="http://agenda.cern.ch/search.php?field=title&keywords=%s&search=Search">%s %s CERN&nbsp;Agenda</a>""" % (p_quoted, p, msg_in[ln]))
     # CiteSeer:
     if cfg_google_box_servers.get('CiteSeer', 0):
-        out_links.append("""<a class="google" href="http://citeseer.ist.psu.edu/cs?q=%s">%s in CiteSeer</a>""" % (p_quoted, p))        
+        out_links.append("""<a class="google" href="http://citeseer.ist.psu.edu/cs?q=%s">%s %s CiteSeer</a>""" % (p_quoted, p, msg_in[ln]))        
     # Google Scholar:
     if cfg_google_box_servers.get('Google Scholar', 0):
         if f == "author":
-            out_links.append("""<a class="google" href="http://scholar.google.com/scholar?q=author%%3A%s">%s in Google Scholar</a>""" % (p_quoted, p))
+            out_links.append("""<a class="google" href="http://scholar.google.com/scholar?q=author%%3A%s">%s %s Google Scholar</a>""" % (p_quoted, p, msg_in[ln]))
         else:
-            out_links.append("""<a class="google" href="http://scholar.google.com/scholar?q=%s">%s in Google Scholar</a>""" % (p_quoted, p))
+            out_links.append("""<a class="google" href="http://scholar.google.com/scholar?q=%s">%s %s Google Scholar</a>""" % (p_quoted, p, msg_in[ln]))
     # Google Web:
     if cfg_google_box_servers.get('Google Web', 0):
         if f == "author":
@@ -419,33 +433,33 @@ def create_google_box(cc, p, f, p1, p2, p3, ln=cdslang,
             if string.find(p, ",") >= 0 and (not p.startswith('"')) and (not p.endswith('"')):
                 p_lastname, p_firstnames = string.split(p, ",", 1)
                 p_google = '"%s %s" OR "%s %s"' % (p_lastname, p_firstnames, p_firstnames, p_lastname) 
-            out_links.append("""<a class="google" href="http://google.com/search?q=%s">%s in Google Web</a>""" % (urllib.quote(p_google), p_google))
+            out_links.append("""<a class="google" href="http://google.com/search?q=%s">%s %s Google Web</a>""" % (urllib.quote(p_google), p_google, msg_in[ln]))
         else:
-            out_links.append("""<a class="google" href="http://google.com/search?q=%s">%s in Google Web</a>""" % (p_quoted, p))
+            out_links.append("""<a class="google" href="http://google.com/search?q=%s">%s %s Google Web</a>""" % (p_quoted, p, msg_in[ln]))
     # IEC
     if cfg_google_box_servers.get('IEC', 0):
         if string.find(cc, "Standard") >= 0:
-            out_links.append("""<a class="google" href="http://www.iec.ch/cgi-bin/procgi.pl/www/iecwww.p?wwwlang=E&wwwprog=sea22.p&search=text&searchfor=%s">%s in IEC</a>""" % (p_quoted, p))
+            out_links.append("""<a class="google" href="http://www.iec.ch/cgi-bin/procgi.pl/www/iecwww.p?wwwlang=E&wwwprog=sea22.p&search=text&searchfor=%s">%s %s IEC</a>""" % (p_quoted, p, msg_in[ln]))
     # IHS
     if cfg_google_box_servers.get('IHS', 0):
         if string.find(cc, "Standard") >= 0:
-            out_links.append("""<a class="google" href="http://global.ihs.com/search_res.cfm?&input_doc_title=%s">%s in IHS</a>""" % (p_quoted, p))
+            out_links.append("""<a class="google" href="http://global.ihs.com/search_res.cfm?&input_doc_title=%s">%s %s IHS</a>""" % (p_quoted, p, msg_in[ln]))
     # INSPEC
     if cfg_google_box_servers.get('INSPEC', 0):
         if f == "author":
             p_inspec = sre.sub(r'(, )| ', '-', p)
             p_inspec = sre.sub(r'(-\w)\w+$', '\\1', p_inspec)
-            out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.au.">%s in INSPEC</a>""" % (urllib.quote(p_inspec), p_inspec)) 
+            out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.au.">%s %s INSPEC</a>""" % (urllib.quote(p_inspec), p_inspec, msg_in[ln])) 
         elif f == "title":
-            out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.ti.">%s in INSPEC</a>""" % (p_quoted, p))
+            out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.ti.">%s %s INSPEC</a>""" % (p_quoted, p, msg_in[ln]))
         elif f == "abstract":
-            out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.ab.">%s in INSPEC</a>""" % (p_quoted, p))               
+            out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.ab.">%s %s INSPEC</a>""" % (p_quoted, p, msg_in[ln]))               
         elif f == "year":
-            out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.yr.">%s in INSPEC</a>""" % (p_quoted, p))
+            out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.yr.">%s %s INSPEC</a>""" % (p_quoted, p, msg_in[ln]))
     # ISO
     if cfg_google_box_servers.get('ISO', 0):
         if string.find(cc, "Standard") >= 0:
-            out_links.append("""<a class="google" href="http://www.iso.org/iso/en/StandardsQueryFormHandler.StandardsQueryFormHandler?languageCode=en&keyword=%s&lastSearch=false&title=true&isoNumber=&isoPartNumber=&isoDocType=ALL&isoDocElem=ALL&ICS=&stageCode=&stagescope=Current&repost=1&stagedatepredefined=&stageDate=&committee=ALL&subcommittee=&scopecatalogue=CATALOGUE&scopeprogramme=PROGRAMME&scopewithdrawn=WITHDRAWN&scopedeleted=DELETED&sortOrder=ISO">%s in ISO</a>""" % (p_quoted, p))
+            out_links.append("""<a class="google" href="http://www.iso.org/iso/en/StandardsQueryFormHandler.StandardsQueryFormHandler?languageCode=en&keyword=%s&lastSearch=false&title=true&isoNumber=&isoPartNumber=&isoDocType=ALL&isoDocElem=ALL&ICS=&stageCode=&stagescope=Current&repost=1&stagedatepredefined=&stageDate=&committee=ALL&subcommittee=&scopecatalogue=CATALOGUE&scopeprogramme=PROGRAMME&scopewithdrawn=WITHDRAWN&scopedeleted=DELETED&sortOrder=ISO">%s %s ISO</a>""" % (p_quoted, p, msg_in[ln]))
     # KEK
     if cfg_google_box_servers.get('KEK', 0):
         kek_search_title = "KEK KISS Preprints"
@@ -457,23 +471,23 @@ def create_google_box(cc, p, f, p1, p2, p3, ln=cdslang,
             kek_search_title = "KEK Library Journals"
             kek_search_baseurl = "http://www-lib.kek.jp/cgi-bin/kiss_book?DSP=2&"
         if f == "author":
-            out_links.append("""<a class="google" href="%sAU=%s">%s in %s</a>""" % \
-                             (kek_search_baseurl, p_quoted, p, kek_search_title))       
+            out_links.append("""<a class="google" href="%sAU=%s">%s %s %s</a>""" % \
+                             (kek_search_baseurl, p_quoted, p, msg_in[ln], kek_search_title))       
         elif f == "title":
-            out_links.append("""<a class="google" href="%sTI=%s">%s in %s</a>""" % \
-                             (kek_search_baseurl, p_quoted, p, kek_search_title))        
+            out_links.append("""<a class="google" href="%sTI=%s">%s %s %s</a>""" % \
+                             (kek_search_baseurl, p_quoted, p, msg_in[ln], kek_search_title))        
         elif f == "reportnumber":
-            out_links.append("""<a class="google" href="%sRP=%s">%s in %s</a>""" % \
-                             (kek_search_baseurl, p_quoted, p, kek_search_title))        
+            out_links.append("""<a class="google" href="%sRP=%s">%s %s %s</a>""" % \
+                             (kek_search_baseurl, p_quoted, p, msg_in[ln], kek_search_title))        
     # NEBIS
     if cfg_google_box_servers.get('NEBIS', 0):
         if string.find(cc, "Book") >= 0:
             if f == "author":
-                out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WAU">%s in NEBIS</a>""" % (p_quoted, p))                
+                out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WAU">%s %s NEBIS</a>""" % (p_quoted, p, msg_in[ln]))                
             elif f == "title":
-                out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WTI">%s in NEBIS</a>""" % (p_quoted, p))               
+                out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WTI">%s %s NEBIS</a>""" % (p_quoted, p, msg_in[ln]))               
             else:
-                out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WRD">%s in NEBIS</a>""" % (p_quoted, p))
+                out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WRD">%s %s NEBIS</a>""" % (p_quoted, p, msg_in[ln]))
     # SPIRES
     if cfg_google_box_servers.get('SPIRES', 0):
         spires_search_title = "SLAC SPIRES HEP"
@@ -485,20 +499,20 @@ def create_google_box(cc, p, f, p1, p2, p3, ln=cdslang,
             spires_search_title = "SLAC Library Journals"
             spires_search_baseurl = "http://www.slac.stanford.edu/spires/find/tserials/"            
         if f == "author":
-            out_links.append("""<a class="google" href="%swww?AUTHOR=%s">%s in %s</a>""" % \
-                   (spires_search_baseurl, p_quoted, p, spires_search_title))
+            out_links.append("""<a class="google" href="%swww?AUTHOR=%s">%s %s %s</a>""" % \
+                   (spires_search_baseurl, p_quoted, p, msg_in[ln], spires_search_title))
         elif f == "title":
-            out_links.append("""<a class="google" href="%swww?TITLE=%s">%s in %s</a>""" % \
-                   (spires_search_baseurl, p_quoted, p, spires_search_title))
+            out_links.append("""<a class="google" href="%swww?TITLE=%s">%s %s %s</a>""" % \
+                   (spires_search_baseurl, p_quoted, p, msg_in[ln], spires_search_title))
         elif f == "reportnumber":
-            out_links.append("""<a class="google" href="%swww?REPORT-NUM=%s">%s in %s</a>""" % \
-                   (spires_search_baseurl, p_quoted, p, spires_search_title))
+            out_links.append("""<a class="google" href="%swww?REPORT-NUM=%s">%s %s %s</a>""" % \
+                   (spires_search_baseurl, p_quoted, p, msg_in[ln], spires_search_title))
         elif f == "keyword":
-            out_links.append("""<a class="google" href="%swww?k=%s">%s in %s</a>""" % \
-                   (spires_search_baseurl, p_quoted, p, spires_search_title))
+            out_links.append("""<a class="google" href="%swww?k=%s">%s %s %s</a>""" % \
+                   (spires_search_baseurl, p_quoted, p, msg_in[ln], spires_search_title))
         else: # invent a poor man's any field search since SPIRES doesn't support one
-            out_links.append("""<a class="google" href="%swww?rawcmd=find+t+%s+or+a+%s+or+k+%s+or+s+%s+or+r+%s">%s in %s</a>""" % \
-            (spires_search_baseurl, p_quoted, p_quoted, p_quoted, p_quoted, p_quoted, p, spires_search_title))
+            out_links.append("""<a class="google" href="%swww?rawcmd=find+t+%s+or+a+%s+or+k+%s+or+s+%s+or+r+%s">%s %s %s</a>""" % \
+            (spires_search_baseurl, p_quoted, p_quoted, p_quoted, p_quoted, p_quoted, p, msg_in[ln], spires_search_title))
     # okay, so print the box now:
     out = ""
     if out_links:
@@ -1100,26 +1114,16 @@ def strip_accents(x):
         y = unicode(x, "utf-8")
     except:
         return x # something went wrong, probably the input wasn't UTF-8
-    # asciify Latin-1 lowercase:
-    y = sre.sub(unicode(r"(?u)[áàäâãå]", "utf-8"), "a", y)
-    y = sre.sub(unicode(r"(?u)[æ]", "utf-8"), "ae", y)
-    y = sre.sub(unicode(r"(?u)[éèëê]", "utf-8"), "e", y)
-    y = sre.sub(unicode(r"(?u)[íìïî]", "utf-8"), "i", y)
-    y = sre.sub(unicode(r"(?u)[óòöôõø]", "utf-8"), "o", y)
-    y = sre.sub(unicode(r"(?u)[úùüû]", "utf-8"), "u", y)
-    y = sre.sub(unicode(r"(?u)[ýÿ]", "utf-8"), "y", y)
-    y = sre.sub(unicode(r"(?u)[ç]", "utf-8"), "c", y)
-    y = sre.sub(unicode(r"(?u)[ñ]", "utf-8"), "n", y)
-    # asciify Latin-1 uppercase:
-    y = sre.sub(unicode(r"(?u)[ÁÀÄÂÃÅ]", "utf-8"), "A", y)
-    y = sre.sub(unicode(r"(?u)[Æ]", "utf-8"), "AE", y)
-    y = sre.sub(unicode(r"(?u)[ÉÈËÊ]", "utf-8"), "E", y)
-    y = sre.sub(unicode(r"(?u)[ÍÌÏÎ]", "utf-8"), "I", y)
-    y = sre.sub(unicode(r"(?u)[ÓÒÖÔÕØ]", "utf-8"), "O", y)
-    y = sre.sub(unicode(r"(?u)[ÚÙÜÛ]", "utf-8"), "U", y)
-    y = sre.sub(unicode(r"(?u)[Ý]", "utf-8"), "Y", y)
-    y = sre.sub(unicode(r"(?u)[Ç]", "utf-8"), "C", y)
-    y = sre.sub(unicode(r"(?u)[Ñ]", "utf-8"), "N", y)
+    # asciify Latin-1 characters:
+    y = sre_unicode_a.sub("a", y)
+    y = sre_unicode_ae.sub("ae", y)
+    y = sre_unicode_e.sub("e", y)
+    y = sre_unicode_i.sub("i", y)
+    y = sre_unicode_o.sub("o", y)
+    y = sre_unicode_u.sub("u", y)
+    y = sre_unicode_y.sub("y", y)
+    y = sre_unicode_c.sub("c", y)
+    y = sre_unicode_n.sub("n", y)
     # return UTF-8 representation of the Unicode string:
     return y.encode("utf-8")
  
@@ -1134,19 +1138,17 @@ def wash_pattern(p):
     # add leading/trailing whitespace for the two following wildcard-sanity checking regexps:
     p = " " + p + " " 
     # get rid of wildcards at the beginning of words:
-    p = sre.sub(r'(\s)[\*\%]+', "\\1", p)
+    p = sre_pattern_wildcards_at_beginning.sub("\\1", p)
     # replace spaces within quotes by __SPACE__ temporarily:
-    p = sre.sub("'(.*?)'", lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p) 
-    p = sre.sub("\"(.*?)\"", lambda x: "\""+string.replace(x.group(1), ' ', '__SPACEBIS__')+"\"", p) 
-    p = sre.sub("\/(.*?)\/", lambda x: "/"+string.replace(x.group(1), ' ', '__SPACETER__')+"/", p)
+    p = sre_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p) 
+    p = sre_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", p) 
+    p = sre_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", p)
     # get rid of extremely short words (1-3 letters with wildcards): 
-    p = sre.sub(r'([\s\"]\w{1,3})[\*\%]+', "\\1", p)
+    p = sre_pattern_short_words.sub("\\1", p)
     # replace back __SPACE__ by spaces:
-    p = sre.sub("__SPACE__", " ", p)
-    p = sre.sub("__SPACEBIS__", " ", p)
-    p = sre.sub("__SPACETER__", " ", p)
+    p = sre_pattern_space.sub(" ", p)
     # replace special terms:
-    p = sre.sub("\$TODAY\$", time.strftime("%04Y-%02m-%02d", time.localtime()), p)
+    p = sre_pattern_today.sub(time.strftime("%04Y-%02m-%02d", time.localtime()), p)
     # remove unnecessary whitespace:
     p = string.strip(p)
     return p
@@ -1201,7 +1203,6 @@ def wash_dates(d1y, d1m, d1d, d2y, d2m, d2d):
 
 def get_colID(c):
     "Return collection ID for collection name C.  Return None if no match found."
-    from cdsware.dbquery import run_sql
     colID = None
     res = run_sql("SELECT id FROM collection WHERE name=%s", (c,), 1)
     if res:
@@ -1729,11 +1730,11 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
     word = string.replace(word, '*', '%') # we now use '*' as the truncation character
     words = string.split(word, "->", 1) # check for span query
     if len(words) == 2:
-        word0 = re_word.sub('', words[0])
-        word1 = re_word.sub('', words[1])
+        word0 = sre_word.sub('', words[0])
+        word1 = sre_word.sub('', words[1])
         query = "SELECT term,hitlist FROM %s WHERE term BETWEEN '%s' AND '%s'" % (bibwordsX, escape_string(word0[:50]), escape_string(word1[:50]))
     else:
-        word = re_word.sub('', word)
+        word = sre_word.sub('', word)
         if string.find(word, '%') >= 0: # do we have wildcard in the word?
             query = "SELECT term,hitlist FROM %s WHERE term LIKE '%s'" % (bibwordsX, escape_string(word[:50]))
         else:
@@ -2052,7 +2053,7 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
     if not f and string.find(p, ":") > 0: # does 'p' contain ':'?
         f, p = split(p, ":", 1)
     ## wash 'p' argument:
-    p = re_quotes.sub("", p)
+    p = sre_quotes.sub("", p)
     ## We are going to take max(n_below, n_above) as the number of
     ## values to ferch from bibXXx.  This is needed to work around
     ## MySQL UTF-8 sorting troubles in 4.0.x.  Proper solution is to
@@ -2133,7 +2134,7 @@ def get_nbhits_in_bibxxx(p, f):
     if not f and string.find(p, ":") > 0: # does 'p' contain ':'?
         f, p = split(p, ":", 1)
     ## wash 'p' argument:
-    p = re_quotes.sub("", p)
+    p = sre_quotes.sub("", p)
     ## construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
     if str(f[0]).isdigit() and str(f[1]).isdigit():
@@ -3403,7 +3404,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
             return page_end(req, of, ln)
                 
-#             search_cache_key = p+"@"+f+"@"+string.join(colls_to_search,",")
+#             search_cache_key = p+"@+f+"@"+string.join(colls_to_search,",")
 #             if search_cache.has_key(search_cache_key): # is the result in search cache?
 #                 results_final = search_cache[search_cache_key]        
 #             else:       
