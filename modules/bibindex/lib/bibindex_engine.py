@@ -861,7 +861,7 @@ class WordTable:
         if options["verbose"] >= 9:
             write_message("updating last_updated to %s...", starting_time)            
         return run_sql("UPDATE idxINDEX SET last_updated=%s WHERE id=%s",
-                       (starting_time, self.tablename[len("idxWORD"):-1],))
+                       (starting_time, self.tablename[-3:-1],))
 
     def add_recIDs(self, recIDs):
         """Fetches records which id in the recIDs range list and adds
@@ -928,7 +928,7 @@ class WordTable:
         # If date is not set, then retrieve it from the database.
         # Reindex all formats newer than the modification date
         if not date:
-            id = self.tablename[len("bibindex"):]
+            id = self.tablename[-3:-1]
             query = """SELECT last_updated FROM idxINDEX WHERE id='%s'
             """ % id
             res = run_sql(query)
