@@ -76,6 +76,26 @@ a.moreinfo:hover {
    color: #060;
    background: transparent;
 }
+a.header:link {
+   color: #fff;
+   background: transparent;
+   text-decoration: none;
+}
+a.header:visited {
+   color: #fff;
+   background: transparent;
+   text-decoration: none;
+}
+a.header:active {
+   color: #fff;
+   background: transparent;
+   text-decoration: none;
+}
+a.header:hover {
+   color: #fff;
+   background: transparent;
+   text-decoration: none;
+}
 a.img:hover {
    color: #00c;
    background: transparent;
@@ -101,9 +121,20 @@ a.note:hover {
    color: #999;
    background: transparent;
 }
-.navtrail {
+.navtrailbox {
    color: #666;
-   background: #f2f2f2;
+   background: transparent;
+   padding: 0px;
+   border-spacing: 0px;
+   border-collapse: collapse;
+   font-size: x-small;
+}
+.navtrailboxbody {
+   color: #666;
+   padding: 0px;
+   border-spacing: 0px;
+   background: #f1f1f1;
+   font-size: x-small;
 }
 a.navtrail:link {
    color: #666;
@@ -180,33 +211,101 @@ a.userinfobox:hover {
 .pageboxrighttop {
    color: #000;
    background: #dee;
+   border-left: 1px dotted #999999;
 }
 .pageboxrighttopadd {
    color: #000;
    background: #dee;
+   border-left: 1px dotted #999999;
 }
 .pageboxrightbottom {
    color: #000;
    background: #dee;
+   border-left: 1px dotted #999999;
 }
 .pageboxrightbottomadd {
    color: #000;
    background: #dee;
+   border-left: 1px dotted #999999;
 }
 .searchbox {
    color: #000;
-   background: #f2f2f2;
+   background: transparent;
+   padding: 1px;
+   margin-bottom: 5px;
+   border-spacing: 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #3366cc; 
 }
-.narrowsearchbox {
+.searchboxheader {
    color: #000;
-   background: #f2f2f2;
+   background: #f1f1f1;
+   padding: 3px;
+   border-spacing: 0px;
+   /* border-bottom: 1px solid #999999; */
+   font-size: small;
+   text-align: left;
 }
-.focusonsearchbox {
+.searchboxbody {
    color: #000;
-   background: #f2f2f2;
+   background: transparent;
+   padding: 3px;
+   font-size: small;
+;}
+.portalbox {
+   color: #000;
+   background: transparent;
+   padding: 0px;
+   margin-bottom: 15px;
+   border-spacing: 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #aabbbb; 
+   font-size: x-small;
+}
+.portalboxheader {
+   color: #000;
+   background: #f1f1f1;
+   padding: 2px;
+   border-spacing: 0px;
+   border-bottom: 1px solid #999999;
+   text-align: left;
+}
+.portalboxbody {
+   color: #000;
+   background: transparent;
+   padding: 2px;
+}
+.googlebox {
+   color: #000;
+   background: #ddeeee;
+   padding: 1px;
+   margin-bottom: 5px;
+   border-spacing: 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #999999; 
+}
+.googleboxheader {
+   color: #000;
+   background: #f1f1f1;
+   padding: 3px;
+   border-spacing: 0px;
+   border-bottom: 1px solid #999999;
+   font-size: x-small;
+   text-align: left;
+}
+.googleboxbody {
+   color: #000;
+   background: transparent;
+   padding: 3px;
+   font-size: x-small;
+;}
+.formbutton {
+   color: #fff;
+   background: #36c;
+   font-weight: bold;
 }
 .headline {
-   color: #006;
+   color: #36c;
    background: transparent;
 }
 .quicknote {
@@ -221,13 +320,29 @@ a.userinfobox:hover {
    color: #fff;
    background: #006;
 }
-.results {
-   color: #000;
-   background: #ffc;
-}
-.resultsbis {
+.searchresultsbox {
    color: #000;
    background: #ffe;
+   padding: 0px;
+   margin-bottom: 15px;
+   border-spacing: 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #fc0; 
+   border-bottom: 1px solid #fc0; 
+}
+.searchresultsboxheader {
+   color: #000;
+   background: #ffc;
+   padding: 2px;
+   border-spacing: 0px;
+   text-align: left;
+   font-weight: normal;
+}
+.searchresultsboxbody {
+   color: #000;
+   background: transparent;
+   border-top: 1px solid #fc0; 
+   padding: 2px;
 }
 .moreinfo {
    color: #060;
@@ -235,15 +350,16 @@ a.userinfobox:hover {
 }
 .userinfobox {
    color: #060;
-   background: transparent;
+   background: #dee;
+   font-size: x-small;
 }
 .header {
    color: #000;
-   background: #9cf;
+   background: #36c;
 }
 .headerselected {
    color: #fff;
-   background: #006;
+   background: #36c;
 }
 .headerselectedmodule {
    color: #000;
@@ -312,5 +428,8 @@ hr {
     color: #999;
     background-color: #999;
     border-width: 0;    
+}
+input,select {
+    background: #fff;
 }
 /* end of cds.css */
