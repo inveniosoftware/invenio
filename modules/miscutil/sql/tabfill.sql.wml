@@ -1159,10 +1159,10 @@ INSERT INTO flxUDFPARAMS VALUES ('LFILL','str',0);
 INSERT INTO flxUDFPARAMS VALUES ('COPY','length',2);
 INSERT INTO flxUSERS VALUES (1);
 
-INSERT INTO sbmACTION VALUES ('Submit Bibliographic Information','SBI','running','1998-08-17','2001-08-08','submit_button.gif','Submit a Document');
-INSERT INTO sbmACTION VALUES ('Modify Bibliographic Information','MBI','modify','1998-08-17','2001-11-07','modify_button.gif','Modify a Document');
-INSERT INTO sbmACTION VALUES ('Submit a Revised Version','SRV','revise','0000-00-00','2001-11-07','revision_button.gif','Submit a Revised Version');
-INSERT INTO sbmACTION VALUES ('Approve a Document','APP','approve','2001-11-08','2002-06-11','approve_button','approve a document');
+INSERT INTO sbmACTION VALUES ('Submit New Record','SBI','running','1998-08-17','2001-08-08','','Submit New Record');
+INSERT INTO sbmACTION VALUES ('Modify Record','MBI','modify','1998-08-17','2001-11-07','','Modify Record');
+INSERT INTO sbmACTION VALUES ('Submit New File','SRV','revise','0000-00-00','2001-11-07','','Submit New File');
+INSERT INTO sbmACTION VALUES ('Approve Record','APP','approve','2001-11-08','2002-06-11','','Approve Record');
 
 INSERT INTO sbmALLFUNCDESCR VALUES ('CaseEDS','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Create_Modify_Interface',NULL);
