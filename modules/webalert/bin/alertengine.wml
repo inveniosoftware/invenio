@@ -82,5 +82,4 @@ if __name__ == "__main__":
     t0 = time()
     main()	
     t1 = time()
-    dt = t1 - t0
-    print 'Alert engine finished in %s seconds' % dt
+    print 'Alert engine finished in %.2f seconds' % (t1 - t0)
