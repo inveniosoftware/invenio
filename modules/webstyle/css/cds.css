@@ -430,7 +430,7 @@ a.navtrail:hover {
 }
 .admin_wvar, .admin_w200, .admin_wvar_nomargin {
    color: #000;
-   background: transparent;
+   background: white;
    padding: 1px;
    margin-top: 5px;
    margin-bottom: 5px;
@@ -477,10 +477,16 @@ a.navtrail:hover {
    border-collapse: collapse;
    border-top: 1px solid #36c;
 }
-.admintd {
+.admintd, .admintdleft, .admintdright {
    font-size: small;
    padding: 0px 10px;
    text-align: center;
+}
+.admintdleft {
+   text-align: left;
+}
+.admintdright {
+   text-align: right;
 }
 .googlebox {
    color: #000;
