@@ -682,7 +682,7 @@ def crawl_KB(filename,value,mode):
     7                           - case sensitive     / search (reciprocal)
     8                           - not case sensitive / search (reciprocal)
     9                           - replace by _DEFAULT_ only
-
+    R                           - not case sensitive / search (reciprocal) (8) replace
     """
 
     if (os.path.isfile(filename) != 1):
@@ -746,6 +746,13 @@ def crawl_KB(filename,value,mode):
             elif (mode == "9"):
                 if (code[0]=="_DEFAULT_"):
                     value = code[1]
+                    return value
+
+            elif (mode == "R"):
+                value_to_cmp   = string.lower(value)
+                code[0]        = string.lower(code[0])
+                if ((len(string.split(code[0],value_to_cmp)) > 1)or(len(string.split(value_to_cmp,code[0]))>1)or(code[0]=="_DEFAULT_")):
+                    value = value.replace(code[0],code[1])
                     return value
 
             else:
