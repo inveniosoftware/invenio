@@ -203,10 +203,11 @@ def record_get_field_instances(rec, tag="", ind1="", ind2=""):
        When TAG is an emtpy string, then return all field instances."""
     out = []
     if tag:
-        for possible_field_instance in rec[tag]:
-            if possible_field_instance[1] == ind1 and \
-               possible_field_instance[2] == ind2:
-                   out.append(possible_field_instance)
+        if record_had_field(rec, tag):
+            for possible_field_instance in rec[tag]:
+                if possible_field_instance[1] == ind1 and \
+                   possible_field_instance[2] == ind2:
+                       out.append(possible_field_instance)
     else:
         return rec.items()
     return out
@@ -811,7 +812,6 @@ def encode_for_xml(s):
     "Encode special chars in string so that it would be XML-compliant."
     s = string.replace(s, '&', '&amp;')
     s = string.replace(s, '<', '&lt;')
-    s = string.replace(s, '>', '&gt;')
     return s
 
 
