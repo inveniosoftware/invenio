@@ -40,17 +40,13 @@
 ## WML elements below.  Feel free to edit as many as you need.  When done,
 ## return to the main CDSware source directory and type 'make'.  Good luck! :-)
 
-###################################
-## Part 1:  Essential parameters ##
-###################################
-
-## First off, let's include messages and define various languages for
-## the international multi-language interface:
-## (You probably do not want to change this.)
-
+## Before starting, let's include messages and define available
+## languages for the international multi-language interface.  (You
+## don't want to change these things here, the real language selection
+## will be chosen further down.)
 #include "messages.wml"
-#use wml::std::lang
 #use wml::fmt::isolatin
+#use wml::std::lang
 <lang:new id=de short>
 <lang:new id=en short>
 <lang:new id=es short>
@@ -62,18 +58,24 @@
 <lang:new id=cz short>
 <lang:new id=no short>
 
+###################################
+## Part 1:  Essential parameters ##
+###################################
+
 ## This part defines essential CDSware internal parameters that
 ## everybody should modify, like the name of the server or the email
 ## address of the local CDSware administrator.  
 
-## CDSNAME -- the name of this particular CDSware installation:  
-##  (example: "CERN Document Server")
+## CDSNAME -- the visible name of your CDSware installation:
+##  (example: "My Document Server")
 <define-tag CDSNAME whitespace=delete>
 Atlantis Institute of Fictive Science
 </define-tag>
 
-## CDSNAMEINTL -- the international versions of CDSNAME:
-##  (example: "CERN Document Server")
+## CDSNAMEINTL -- the international versions of CDSNAME in various
+## languages, defined using the standard locale-like language codes.
+##  (example: "<fr>Mon Serveur des Documents</fr>")
+
 <define-tag CDSNAMEINTL whitespace=delete>
  <en>Atlantis Institute of Fictive Science</en>
  <fr>Atlantis Institut des Sciences Fictives</fr>
@@ -86,10 +88,22 @@ Atlantis Institute of Fictive Science
  <cz>Atlantis Institut Fiktivních Věd</cz>
 </define-tag>
 
-## CDSLANG -- the default interface language:
+## CDSLANG -- the default language of the interface:
 ##  (example: "en")
 <define-tag CDSLANG whitespace=delete>
 en
+</define-tag>
+
+## CDSLANGS -- list of all languages the user interface should be
+## available in, separated by commas.  The order specified below will
+## be respected on the interface pages.  A good default would be to
+## use the alphabetical order.  Currently supported languages include
+## Czech, German, English, Spanish, French, Italian, Portuguese,
+## Russian, and Slovak, so the eventual maximum is
+## "cz,de,en,es,fr,it,pt,ru,sk".
+##  (example: "de,en,fr")
+<define-tag CDSLANGS whitespace=delete>
+cz,de,en,es,fr,it,pt,ru,sk
 </define-tag>
 
 ## ALERTENGINEEMAIL -- the email address from which the alert emails will appear to be send:
