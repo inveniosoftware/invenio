@@ -1042,6 +1042,8 @@ def wash_pattern(p):
     # replace back __SPACE__ by spaces:
     p = sre.sub("__SPACE__", " ", p)
     p = sre.sub("__SPACEBIS__", " ", p)
+    # replace special terms:
+    p = sre.sub("\$TODAY\$", time.strftime("%04Y-%02m-%02d", time.localtime()), p)
     # remove unnecessary whitespace:
     p = string.strip(p)
     return p
@@ -1153,20 +1155,30 @@ def get_coll_real_descendants(coll):
     return coll_sons
 
 def get_collection_reclist(coll):
-    """Return hitset of recIDs that belong to the collection 'coll'."""
+    """Return hitset of recIDs that belong to the collection 'coll'.
+       But firstly check the last updated date of the collection table.
+       If it's newer than the cache timestamp, then empty the cache,
+       since new records could have been added."""
     global collection_reclist_cache
+    global collection_reclist_cache_timestamp
+    # firstly, check whether the collection table was modified:
+    res = run_sql("SHOW TABLE STATUS LIKE 'collection'")
+    if res and res[0][11]>collection_reclist_cache_timestamp:
+        # yes it was, cache clear-up needed:
+        collection_reclist_cache = create_collection_reclist_cache()
+    # secondly, read reclist from either the cache or the database:
     if not collection_reclist_cache[coll]:
+        # not yet it the cache, so calculate it and fill the cache:
         set = HitSet()
         query = "SELECT nbrecs,reclist FROM collection WHERE name='%s'" % coll
-        # launch the query:
         res = run_sql(query, None, 1)
-        # fill the result set:
         if res:
             try:
                 set._nbhits, set._set = res[0][0], Numeric.loads(zlib.decompress(res[0][1]))
             except:
                 set._nbhits = 0
         collection_reclist_cache[coll] = set
+    # finally, return reclist:
     return collection_reclist_cache[coll]
 
 def coll_restricted_p(coll):
@@ -1194,10 +1206,16 @@ def coll_restricted_group(coll):
 def create_collection_reclist_cache():
     """Creates list of records belonging to collections.  Called on startup
     and used later for intersecting search results with collection universe."""
+    global collection_reclist_cache_timestamp
     collrecs = {}
     res = run_sql("SELECT name,reclist FROM collection")
     for name,reclist in res:
         collrecs[name] = None # this will be filled later during runtime by calling get_collection_reclist(coll)
+    # update timestamp
+    try:
+        collection_reclist_cache_timestamp = time.strftime("%04Y-%02m-%02d %02H:%02M:%02S", time.localtime())
+    except NameError:
+        collection_reclist_cache_timestamp = 0
     return collrecs
 
 try:
@@ -3127,6 +3145,11 @@ def perform_request_cache(req, action="show"):
         collection_reclist_cache = create_collection_reclist_cache()
     # show collection cache:
     out += "<h3>Collection Cache</h3>"
+    out += "- collection cache timestamp: %s" % collection_reclist_cache_timestamp
+    res = run_sql("SHOW TABLE STATUS LIKE 'collection'")
+    if res:
+        out += "<br>- collection table last updated: %s" % res[0][11]
+    out += "<br>- collection cache contents:"
     out += "<blockquote>"
     for coll in collection_reclist_cache.keys():
         if collection_reclist_cache[coll]:
