@@ -37,19 +37,24 @@ h2 {
 h3 {
    font-size: 120%;
    font-weight: 600;
-   font-style: italic;
+   font-variant: small-caps;
+   margin-top: 40px;
+   margin-bottom: 10px;
    color: #36c;
    background: transparent;
+   border-bottom: dotted 2px #36c;
+   width: 50%;
 }
 h4 {
    font-size: 110%;
    font-weight: 600;
+   font-style: italic;
    color: #36c;
    background: transparent;
 }
 h5 {
    font-size: 110%;
-   font-weight: 300;
+   font-weight: 400;
    color: #36c;
    background: transparent;
 }
