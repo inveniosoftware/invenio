@@ -33,7 +33,6 @@ define("DOCS_DATABASE", "<DBNAME>");
 define("MYSQLDOCMACHINE","<DBHOST>");
 define("MYSQLDOCUSERID","<DBUSER>");
 define("MYSQLDOCPASSWORD","<DBPASS>");
-define("AUTHENTICATION","<AUTHENTICATE>");
 define("ADMIN_EMAIL","<ADMINEMAIL>");
 $IMAGES="<WEBURL>/img";
 ## okay, config variables loaded, the script can continue:
@@ -68,14 +67,9 @@ $IMAGES="<WEBURL>/img";
    /*********************Authentication*******************************/
    function canUseWebSubmitAdmin($uid,$doctype='%')
    {
-	if (AUTHENTICATION)
-	{
-		$uid_email = getEmail($uid);
-		if(acc_authorize_action($uid, "cfgwebsubmit") != 1)
-		   return false;
-		else
-		   return true;
-	}
+	$uid_email = getEmail($uid);
+	if(acc_authorize_action($uid, "cfgwebsubmit") != 1)
+	   return false;
 	else
 	   return true;
    }
