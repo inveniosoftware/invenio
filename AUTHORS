@@ -36,6 +36,9 @@ The CDS Development Group consists of:
 Several students and temporary group members contributed to the
 project.  In the decreasing chronological order:
 
+ - Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+     Ranking engine, the BibRank module.
+
  - Mikael Vik <mikael.vik@cern.ch>
      Role-based access control engine and its admin interface, 
      the WebAccess module.  Guest user sessions garbage collector,
