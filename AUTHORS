@@ -9,9 +9,9 @@ The CDS Development Group consists of:
      Head of the team.  Strategic planning and lead.
 
  - Tibor Simko <tibor.simko@cern.ch>
-     Search engine, indexing engine, task scheduling system, user
-     interface and personalization, general system architecture,
-     release management.
+     Head Developer.  Search engine, indexing engine, task scheduling
+     system, user interface and personalization, general system
+     architecture, release management.
      Maintains mostly: WebSearch, BibWords, BibSched, WebStyle,
                        WebHelp, WebAlert, WebBasket, MiscUtils.
   
@@ -36,8 +36,13 @@ The CDS Development Group consists of:
 Several students and temporary group members contributed to the
 project.  In the decreasing chronological order:
 
+ - Alexandra Silva <xana@correio.ci.uminho.pt>
+     Rewriting and enhancing BibRecord XML MARC and record handling
+     library, for the BibEdit module.
+
  - Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
-     Ranking engine, the BibRank module.
+     Ranking engine, the BibRank module.  Administration interfaces to
+     WebSearch, BibIndex.
 
  - Mikael Vik <mikael.vik@cern.ch>
      Role-based access control engine and its admin interface, 
