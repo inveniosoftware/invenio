@@ -484,6 +484,7 @@ AC_CONFIG_FILES([Makefile \
 	  modules/webalert/Makefile \
 	  modules/webalert/lib/Makefile \
 	  modules/webalert/web/Makefile \
+	  modules/webalert/bin/Makefile \
 	  modules/websubmit/Makefile \
 	  modules/websubmit/web/Makefile \
 	  modules/miscutil/Makefile \
