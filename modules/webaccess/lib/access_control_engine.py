@@ -25,29 +25,25 @@
 __version__ = "$Id$"
 
 
-# check this: def ace_addUserRole(id_user, id_role=0, name_role=0):
-
 ## import interesting modules:
 try:
-    import cgi
     import sys
-    import time
 except ImportError, e:
     print "Error: %s" % e
     import sys
     sys.exit(1)
-
 try:
     from config import *
     from dbquery import run_sql
     from MySQLdb import ProgrammingError
+    from access_control_variables import SUPERADMINROLE
 except ImportError, e:
     print "Error: %s" % e
     import sys
     sys.exit(1)
 
 
-def ace_authorize_action(id_user, name_action, **arguments):
+def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
     """ Check if user is allowed to perform action
     with given list of arguments.
     Return 1 if authentication succeeds, 0 if it fails.
@@ -62,69 +58,114 @@ def ace_authorize_action(id_user, name_action, **arguments):
                     by python on the extra arguments. these depend on the
                     given action.
     """
-    
-    # TASK 1: find id of action (and other data: name, allowedkeywords)
 
-    query1 = """select a.id, a.allowedkeywords
-                from aceACTION a
+    # TASK 0: find id and allowedkeywords of action
+    if verbose: print 'task 0 - get action info'
+    query1 = """select a.id, a.allowedkeywords, a.optional
+                from accACTION a
                 where a.name = '%s'""" % (name_action)
 
-    try: aid, aallowedkeywords = run_sql(query1)[0]
+    try: id_action, aallowedkeywords, optional = run_sql(query1)[0]
     except (ProgrammingError, IndexError): return 0
+
+    defkeys = aallowedkeywords.split(',')
+    for key in arguments.keys():
+        if key not in defkeys: return 0
     # -------------------------------------------
     
     
-    # TASK 2: find all the user's roles and create or-string
+    # TASK 1: check if this is a superadmin, we know the action exists.
+    # no connection between them is necessary
+    # arguments passed must have allowed keywords, no check to see
+    # if the argument exists.
+    if verbose: print 'task 1 - is user %s' % (SUPERADMINROLE, )
     
-    query2 = """select ur.id_aceROLE from user_aceROLE ur where ur.id_user = %s""" % (id_user)
+    if run_sql("""SELECT *
+    FROM accROLE r, user_accROLE ur
+    WHERE r.name = '%s' AND
+    r.id = ur.id_accROLE AND
+    ur.id_user = %s """ % (SUPERADMINROLE, id_user)):
+        return 1
+    # ------------------------------------------
+    
+    
+    # TASK 2: find all the user's roles and create or-string
+    if verbose: print 'task 2 - find userroles'
+    
+    query2 = """SELECT ur.id_accROLE FROM user_accROLE ur WHERE ur.id_user = %s ORDER BY ur.id_accROLE """ % (id_user)
     try: res2 = run_sql(query2)
     except ProgrammingError: return 0
     
     if not res2: return 0 #user has no roles
     # -------------------------------------------
 
-    # create or-string with roles (add default value? roles='(raa.id_aceROLE='def' or ')
-    str_roles = '('
-    for (role,) in res2:
-        str_roles += """raa.id_aceROLE = %s or """ % (role)
-    str_roles = str_roles[:-4] + ')'
+    # create role string (add default value? roles='(raa.id_accROLE='def' or ')
+    str_roles = ''
+    for (role, ) in res2:
+        if str_roles: str_roles += ','
+        str_roles += '%s' % (role, )
 
-    # TASK 3: find list of keyword and values that satisfy part of the authentication and create or-string
+    # TASK 3: authorizations with no arguments given
+    if verbose: print 'task 3 - checks with no arguments'
+    if not arguments: 
+        # 3.1
+        if optional == 'no':
+            if verbose: print ' - action with zero arguments'
+            connection = run_sql("""SELECT * FROM accROLE_accACTION_accARGUMENT
+            WHERE id_accROLE IN (%s) AND
+            id_accACTION = %s AND
+            argumentlistid = 0 AND
+            id_accARGUMENT = 0 """ % (str_roles, id_action))
+    
+            return connection and 1 or 0
+    
+        # 3.2
+        if optional == 'yes':
+            if verbose: print ' - action with optional arguments'
+            connection = run_sql("""SELECT * FROM accROLE_accACTION_accARGUMENT
+            WHERE id_accROLE IN (%s) AND
+            id_accACTION = %s AND
+            id_accARGUMENT = -1 AND
+            argumentlistid = -1 """ % (str_roles, id_action))
+    
+            return connection and 1 or 0
+        # none of the zeroargs tests succeded
+        if verbose: print ' - not authorization without arguments'
+        return 0
         
+    # TASK 4: create list of keyword and values that satisfy part of the authentication and create or-string
+    if verbose: print 'task 4 - create keyword=value pairs'
+    
     # create dictionary with default values and replace entries from input arguments
-    defdict = cgi.parse_qs(aallowedkeywords)
-    defkeys = defdict.keys()
-
-    for key in defkeys: defdict[key] = defdict[key][0]
-    
-    for key in arguments.keys():
-        try: defdict[key] = arguments[key]
-        except KeyError: return 0
-    
-    # create or-string with arguments
-    str_args  = 'and ('
+    defdict = {}
 
     for key in defkeys:
-        str_args = """%s(arg.keyword = '%s' and arg.value = '%s') or """ % (str_args, key, defdict[key])
+        try: defdict[key] = arguments[key]
+        except KeyError: return 0 # all keywords must be present
+        # except KeyError: defdict[key] = 'x' # default value, this is not in use...
     
-    str_args = str_args[:-4] + ')'
-    if len(str_args) < 8: str_args = ''
+    # create or-string from arguments
+    str_args = ''
+    for key in defkeys:
+        if str_args: str_args += ' OR '
+        str_args += """(arg.keyword = '%s' AND arg.value = '%s')""" % (key, defdict[key])
 
 
-    # TASK 4: create querystring for for roles, action and keyword=value pairs
+    # TASK 5: find all the table entries that partially authorize the action in question
+    if verbose: print 'task 5 - find table entries that are part of the result'
 
-    query4 = """select raa.id_aceROLE, raa.id_aceACTION, raa.argumentlistid,
-                raa.id_aceARGUMENT, arg.keyword, arg.value
-                from aceROLE_aceACTION_aceARGUMENT raa, aceARGUMENT arg
-                where raa.id_aceACTION = %s and
-                %s
-                %s and
-                raa.id_aceARGUMENT = arg.id  """ % (aid, str_roles, str_args)                
-    
+    query4 = """SELECT DISTINCT raa.id_accROLE, raa.id_accACTION, raa.argumentlistid,
+    raa.id_accARGUMENT, arg.keyword, arg.value
+    FROM accROLE_accACTION_accARGUMENT raa, accARGUMENT arg
+    WHERE raa.id_accACTION = %s AND
+    raa.id_accROLE IN (%s) AND
+    (%s) AND
+    raa.id_accARGUMENT = arg.id  """ % (id_action, str_roles, str_args)                
+
     try: res4 = run_sql(query4)
     except ProgrammingError: return 0
 
-    if not res4: return 0
+    if not res4: return 0 # no entries at all
     
     res5 = []
     for res in res4:
@@ -134,10 +175,11 @@ def ace_authorize_action(id_user, name_action, **arguments):
     # USER AUTHENTICATED TO PERFORM ACTION WITH ONE ARGUMENT
     if len(defdict) == 1: return 1
 
-    # check with more than one argument: 
 
+    # CHECK WITH MORE THAN 1 ARGUMENT
 
-    # TASK 5: run through the result and try to satisfy authentication
+    # TASK 6: run through the result and try to satisfy authentication
+    if verbose: print 'task 6 - combine results and try to satisfy'
 
     cur_role = cur_action = cur_arglistid = 0
     
@@ -147,8 +189,9 @@ def ace_authorize_action(id_user, name_action, **arguments):
     # run through the results
 
     for (role, action, arglistid, arg, keyword, val) in res5 + [(-1, -1, -1, -1, -1, -1)]:
-        # not the same role or argumentlist, i.e. check if thing are satisfied
-        if cur_arglistid != arglistid or cur_role != role or cur_action != action:
+        # not the same role or argumentlist (authorization group), i.e. check if thing are satisfied
+        # if cur_arglistid != arglistid or cur_role != role or cur_action != action:
+        if (cur_arglistid, cur_role, cur_action) != (arglistid, role, action):
 
             # test if all keywords are satisfied
             for value in booldict.values():
@@ -164,8 +207,8 @@ def ace_authorize_action(id_user, name_action, **arguments):
         # set keyword qualified for the action, (whatever result of the test)
         booldict[keyword] = 1
 
+    if verbose: print 'finished'
     # authentication failed
     return 0
 
 </protect>
-
