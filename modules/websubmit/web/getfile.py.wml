@@ -45,12 +45,13 @@ from cdsware.messages import *
 from mod_python import apache
 from cdsware.websubmit_config import *
 from cdsware.file import *
+from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
 def index(req,c=cdsname,ln=cdslang,recid="",docid="",version="",name="",format=""):
     # get user ID:
     try:
         uid = getUid(req)
-        if uid == -1: 
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../getfile.py/index")
         uid_email = get_email(uid)
     except MySQLdb.Error, e:

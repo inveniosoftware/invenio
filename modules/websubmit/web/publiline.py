@@ -47,6 +47,7 @@ from cdsware.webuser import getUid, get_email, list_registered_users, page_not_a
 from cdsware.messages import *
 from cdsware.websubmit_config import *
 from cdsware.search_engine import search_pattern
+from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
 execfile("%s/cdsware/websubmit_functions/Retrieve_Data.py" % pylibdir)
 execfile("%s/cdsware/websubmit_functions/mail.py" % pylibdir)
@@ -58,7 +59,7 @@ def index(req,c=cdsname,ln=cdslang,doctype="",categ="",RN="",send=""):
     # get user ID:
     try:
         uid = getUid(req)
-        if uid == -1: 
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../publiline.py/index")
         uid_email = get_email(uid)
     except MySQLdb.Error, e:

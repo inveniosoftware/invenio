@@ -44,11 +44,12 @@ from cdsware.messages import *
 from mod_python import apache
 from cdsware.websubmit_config import *
 from cdsware.websubmit_engine import *
+from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
 def index(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="", access="",mainmenu="",fromdir="",file="",nextPg="",nbPg="",curpage=1,step=0,mode="U"):
 
     uid = getUid(req)
-    if uid == -1: 
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return page_not_authorized(req, "../submit.py/index")
 
     if doctype=="":

@@ -44,11 +44,12 @@ from cdsware.webpage import page, create_error_box
 from cdsware.webuser import getUid, get_email, page_not_authorized
 from cdsware.messages import *
 from mod_python import apache
+from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
 def index(req,c=cdsname,ln=cdslang):
 
     uid = getUid(req)
-    if uid == -1: 
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return page_not_authorized(req, "../approve.py/index")
 
     ln = wash_language(ln)
