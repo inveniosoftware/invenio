@@ -3,17 +3,17 @@ CERN DOCUMENT SERVER SOFTWARE (CDSware) AUTHORS
 
 Revision: $Id$
 
-The CDS Development Group consists of several people:
+The CDS Development Group consists of:
 
  - Jean-Yves Le Meur <jean-yves.le.meur@cern.ch>
      Head of the team.
 
  - Tibor Simko <tibor.simko@cern.ch>
-     Search interface, search and indexing engine, user
-     personalization, system architecture, release management.
+     Search engine, indexing engine, task scheduling system, user
+     interface and personalization, general system architecture and
+     release management.
      Maintains mostly: WebSearch, BibWords, BibSched, WebStyle,
-                       WebHelp, WebAlert, WebBasket, WebAccess, 
-                       MiscUtils.
+                       WebHelp, WebAlert, WebBasket, MiscUtils.
   
  - Thomas Baron <thomas.baron@cern.ch>
      Submit interface, batch upload, administrative modules.
@@ -24,7 +24,7 @@ The CDS Development Group consists of several people:
      Maintains mostly: BibConvert, BibHarvest.
 
  - Hector Sanchez <hector.sanchez@cern.ch>
-     Metadata output formatter and automated link-generator.
+     Metadata output formatter and session management.
      Maintains mostly: BibFormat, WebSession.
 
  - Maja Gracco <maja.gracco@cern.ch>
@@ -33,11 +33,29 @@ The CDS Development Group consists of several people:
  - Chris Montarbaud <christiane.montarbaud@cern.ch>
      Multimedia and photo treatment.
 
-Several students and temporary group members worked on the project:
-Eric Simon (WebAlert), Eduardo Margallo (BibWords, BibSched), Mikael
-Vik (WebAccess), Roberta Faggian (WebBasket, WebAlert), Julio Pernia
-Aznar (WebSession), Franck Grenier (WebStyle).
+Several students and temporary group members contributed to the
+project.  In the decreasing chronological order:
 
-       - CDS Development Group
-         <cds.support@cern.ch>
-         <http://cds.cern.ch/>
+ - Mikael Vik <mikael.vik@cern.ch>
+     Role-based access control engine and its admin interface,
+     the WebAccess module.  Guest user sessions garbage collection,
+     for the WebSession module.
+
+ - Erik Simon <erik@mifasol.net>
+     Alert engine, for the WebAlert module.
+
+ - Roberta Faggian <roberta.faggian@cern.ch>
+     Alert and basket user interfaces, for the WebAlert and the
+     WebBasket modules.
+
+ - Julio Pernia Aznar <jpernia@altransdb.com>
+     Parts of user and session management, for the WebSession module.
+
+ - Franck Grenier 
+     Parts of web design and graphics, for the WebStyle module.
+
+ - Eduardo Margallo 
+     Parts of the indexing engine and the task scheduler, for the
+     BibWords and the BibSched modules.
+
+- end of file -
