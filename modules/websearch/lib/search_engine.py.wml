@@ -621,7 +621,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
         cell_7_a += """
         <select name="rm" class="address">
         <option value="">- %s %s -""" % (string.lower(msg_or[ln]), msg_rank_by[ln])
-        for (code,name) in get_bibrank_methods(cc, ln):
+        for (code,name) in get_bibrank_methods(get_colID(cc), ln):
             # propose found rank methods:
             cell_7_a += """<option value="%s"%s>%s""" % (code, is_selected(rm,code), name)
         cell_7_a += """</select>"""
@@ -1086,6 +1086,15 @@ def wash_dates(d1y, d1m, d1d, d2y, d2m, d2d):
                       # needed, 31 will always do
     # okay, return constructed YYYY-MM-DD dates
     return (day1, day2)
+
+def get_colID(c):
+    "Return collection ID for collection name C.  Return None if no match found."
+    from cdsware.dbquery import run_sql
+    colID = None
+    res = run_sql("SELECT id FROM collection WHERE name=%s", (c,), 1)
+    if res:
+        colID = res[0][0]
+    return colID 
 
 def get_coll_i18nname(c, ln=cdslang):
     """Return nicely formatted collection name (of name type 'ln',

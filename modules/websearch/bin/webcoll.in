@@ -660,7 +660,7 @@ class Collection:
         box=""
         box += """<select name="rm" class="address">"""
         box += """  <option value="">- %s %s -""" % (string.lower(msg_or[ln]), msg_rank_by[ln])
-        for (code,name) in get_bibrank_methods(self.name, ln):
+        for (code,name) in get_bibrank_methods(self.id, ln):
             box += """  <option value="%s">%s""" % (code, name)                
         box += """</select>"""
         return box 
