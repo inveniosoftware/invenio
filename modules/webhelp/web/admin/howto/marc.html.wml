@@ -23,6 +23,8 @@
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/>Admin Area</a> &gt; <a class=navtrail href=<WEBURL>/admin/howto/>Admin HOWTOs</a>" \
     navbar_select="howto_marc"
 
+Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
 <h2>Why to MARC at all?</h2>
 
 <p>All the bibliographic data in the CDSware system are
