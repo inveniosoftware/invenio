@@ -67,7 +67,7 @@ href="<WEBURL>/admin/bibconvert/">BibConvert</a> language.  This
 will enable you to transform them into XML MARC format that the
 CDSware system internally uses for bibliographic data handling.  (If
 you have not chosen yet your MARC scheme, please read the <a
-href="marc.shtml">MARC HOWTO</a>.)</blockquote>
+href="marc.html">MARC HOWTO</a>.)</blockquote>
 
 <dt><code>$ bibconvert -cdatadump.cfg < datadump.txt > datadump.xml</code>
 
@@ -79,7 +79,7 @@ MARC, using the configuration you just wrote in the previous step.</blockquote>
 <dd><blockquote>Create default HTML presentation of the data by using
 <a href="<WEBURL>/admin/bibformat/">BibFormat</a> configurations.
 (You may want to create <a
-href="<WEBURL>/admin/bibformat/FORMAT_display.shtml">new format</a>
+href="<WEBURL>/admin/bibformat/FORMAT_display.php">new format</a>
 in case your metadata structure is different from what you are used
 to.)  This step enriches the XML MARC file by default HTML formats
 that the search engine will reuse.</blockquote>

@@ -2593,7 +2593,7 @@ def encode_for_xml(s):
 def call_bibformat(id, otype="HD"):
     """Calls BibFormat for the record 'id'.  Desired BibFormat output type is passed in 'otype' argument.
        This function is mainly used to display full format, if they are not stored in the 'bibfmt' table."""
-    f = urllib.urlopen("%s/bibformat/bibformat.shtml?id=%s&otype=%s" % (weburl, id, otype))
+    f = urllib.urlopen("%s/bibformat/bibformat.php?id=%s&otype=%s" % (weburl, id, otype))
     out = f.read()
     f.close()
     return out

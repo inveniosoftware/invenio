@@ -112,7 +112,6 @@
 <dl>
 
 <dt><a href="search/<lang:star: index.*.html>"><MSG_SEARCH_HELP></a>
-
 <dd><en>Get help with searching <CDSNAMEINTL>.</en>
     <fr>Obtenez de l'aide avec la recherche sur <CDSNAMEINTL>.</fr>
     <de>Hier können Sie die Suchhilfe für den <CDSNAMEINTL> konsultieren.</de>
@@ -120,8 +119,19 @@
     <pt>Get help with searching <CDSNAMEINTL>.</pt>
     <it>Get help with searching <CDSNAMEINTL>.</it>
     <ru>Get help with searching <CDSNAMEINTL>.</ru>
-    <sk>Pomoc pri hľadaní <CDSNAMEINTL>.</sk>
-    <cz>Pomoc při hledání <CDSNAMEINTL>.</cz>
+    <sk>Pomoc pre hľadanie <CDSNAMEINTL>.</sk>
+    <cz>Nápověda pro hledání <CDSNAMEINTL>.</cz>
+
+<dt><a href="submit/<lang:star: index.*.php>"><MSG_SUBMIT_HELP></a>
+<dd><en>Get help with submitting to <CDSNAMEINTL>.</en>
+    <fr>Obtenez de l'aide avec la soumission dans <CDSNAMEINTL>.</fr>
+    <de>Hier können Sie die Eintragehilfe für den <CDSNAMEINTL> konsultieren.</de>
+    <es>Get help with submitting to <CDSNAMEINTL>.</es>
+    <pt>Get help with submitting to <CDSNAMEINTL>.</pt>
+    <it>Get help with submitting to <CDSNAMEINTL>.</it>
+    <ru>Get help with submitting to <CDSNAMEINTL>.</ru>
+    <sk>Pomoc pre pridávanie do <CDSNAMEINTL>.</sk>
+    <cz>Nápověda pro přidávaní do <CDSNAMEINTL>.</cz>
 
 </dl>
 </blockquote>
