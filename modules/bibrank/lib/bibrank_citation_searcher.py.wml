@@ -39,24 +39,29 @@ def get_citing_recidrelevance(rank_method_code, citing_recids):
     result = []
     query = "select relevance_data from rnkMETHODDATA, rnkMETHOD WHERE rnkMETHOD.id = rnkMETHODDATA.id_rnkMETHOD and rnkMETHOD.name = '%s'"% rank_method_code
     compressed_citation_weight_dic = run_sql(query)
-    citation_dic = loads(decompress(compressed_citation_weight_dic[0][0]))
-    for id in citing_recids:
-        tmp = [id, citation_dic[id]]
-        result.append(tmp)
+    if compressed_citation_weight_dic and compressed_citation_weight_dic[0]:
+        citation_dic = loads(decompress(compressed_citation_weight_dic[0][0]))
+        for id in citing_recids:
+            tmp = [id, citation_dic[id]]
+            result.append(tmp)
     return result
 def init_cited_by_dictionary():
     """return citation list dictionary from rnkCITATIONDATA
     """
     query = "select citation_data from rnkCITATIONDATA"
     compressed_citation_dic = run_sql(query)
-    citation_dic = loads(decompress(compressed_citation_dic[0][0]))
+    citation_dic = None
+    if compressed_citation_dic and compressed_citation_dic[0]:
+        citation_dic = loads(decompress(compressed_citation_dic[0][0]))
     return citation_dic
 def init_reference_list_dictionary():
     """return reference list dictionary from rnkCITATIONDATA
     """
     query = "select citation_data_reversed from rnkCITATIONDATA"
     compressed_ref_dic = run_sql(query)
-    ref_dic = loads(decompress(compressed_ref_dic[0][0]))
+    ref_dic = None
+    if compressed_ref_dic and compressed_ref_dic[0]:
+        ref_dic = loads(decompress(compressed_ref_dic[0][0]))
     return ref_dic
 
 cbd = init_cited_by_dictionary()
