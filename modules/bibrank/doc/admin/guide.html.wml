@@ -80,7 +80,7 @@ order to create different kinds of ranking methods for the search engine to use.
 The bibrank web interface enables you to modify the configuration of most aspects of BibRank. For full functionality, it is advised to
 let the http-daemon have write/read access to your cdsware/etc/bibrank directory. If this is not wanted, you have to edit the configuration files from the console using your favourite text editor.
 <a name="mi"></a><h3>3.1 Main interface</h3>
-In the main interface screen, you see a list of all rank methods currently added. If you have added the translation in the current chosen language for a rank method, you will see this name, if not, and the default cdsware language translation exists, it will be used instead. And if no translation exists, the bibrank code will be used. To find out about the functionality available, check out the topics below.
+In the main interface screen, you see a list of all rank methods currently added. Each rank method is identified by the rank method code. To find out about the functionality available, check out the topics below.
 
 </br></br><b>Explanation of concepts</b>
 <blockquote>
@@ -273,6 +273,15 @@ kb_src = /log/cdsware-DEMODEV/etc/bibrank/jif.kb
 check_mandatory_tags = 909C4c,909C4v,909C4y
 </protect>
 </blockquote>
+The kb_src file must contain data on the form:
+<blockquote>
+Phys. Rev., D---3.838
+Phys. Rev. Lett.---6.462
+Phys. Lett., B---4.213
+Nucl. Instrum. Methods Phys. Res., A---0.964
+J. High Energy Phys.---8.664
+</blockquote>
+The left side must match the content of the tag mentioned in the tag variable.
 </pre>
 <a name="wrd"></a><h3>5.2 Word Similarity/Similar Records</h3>
 The Word Similarity/Similar Records method uses the content of the tags selected to determine which records is most relevant to a query, or most similar to a selected record. This method got a lot of parameters to configure, and it may need some tweaking to get the best result. The BibRank code for this method has to be 'wrd' for it to work. For best result, it is adviced to install the stemming module mentioned in INSTALL, and use a stopword list containing stopwords in the languages the records exists in. The stemmer and stopword list is used to get better results and to limit the size of the index, thus making ranking faster and more accurate. For best result with the stemmer, it is important to mark each tag to be used with the most common language the value of the tag may be in. It is adviced to not change the 'function','table' and the parameters under [find_similar]. If the stemmer is not installed, to assure that no problems exists, the 'stem_if_avail' parameter should be set to 'no'. Each tag to be used by the method has to be given a point. The number of points describes how important one word is in this tag.
@@ -286,17 +295,19 @@ When running BibRank to update the index for this rank method, it is not necessa
 function = word_similarity
 
 [word_similarity]
-stem_if_avail = yes
-stem_query_language = en
+stemming = en
 table = rnkWORD01F
-stopword = /soft/cdsware-CDSCERNWIENERDEV/etc/bibrank/stopwords.kb
+stopword = True
 relevance_number_output_prologue = (
 relevance_number_output_epilogue = )
-tag1 = 6531_a, 1, en
+#relevance_number_output_prologue = <!-
+#relevance_number_output_epilogue = -->
+#MARC tag,tag points, tag language
+tag1 = 6531_a, 2, en
 tag2 = 695__a, 1, en
 tag3 = 6532_a, 1, en
 tag4 = 245__%, 10, en
-tag5 = 246_% , 1, fr
+tag5 = 246_%, 1, fr
 tag6 = 250__a, 1, en
 tag7 = 711__a, 1, en
 tag8 = 210__a, 1, en
@@ -304,9 +315,10 @@ tag9 = 222__a, 1, en
 tag10 = 520__%, 1, en
 tag11 = 590__%, 1, fr
 tag12 = 111__a, 1, en
-tag13 = 100__%, 1, none
+tag13 = 100__%, 2, none
 tag14 = 700__%, 1, none
 tag15 = 721__a, 1, none
+
 
 [find_similar]
 max_word_occurence = 0.05
@@ -315,7 +327,6 @@ min_word_length = 3
 min_nr_words_docs = 3
 max_nr_words_upper = 20
 max_nr_words_lower = 10
-override_default_min_relevance = no
 default_min_relevance = 75
 </protect>
 </blockquote>
@@ -330,21 +341,21 @@ default_min_relevance = 75
 function = word_similarity
 
 [word_similarity]
-#if stemmer is available, use it. Adviced to turn off if not installed
-stem_if_avail = yes
-#the default language to stem the search query in
-stem_query_language = en
+#if stemmer is available, default stemminglanguage should be given here. Adviced to turn off if not installed
+stemming = en
 #the internal table to load the index tables from.
 table = rnkWORD01F
-#the path to the stopword list. One word per line, words in the file will not be indexed.
-stopword = <ETCDIR>/bibrank/stopwords.kb
+#remove stopwords? 
+stopword = True
 #text to show before the rank value when the search result is presented. <-- to hide result
 relevance_number_output_prologue = (
 #text to show after the rank value when the search result is presented. --> to hide result
 relevance_number_output_epilogue = )
 
 #MARC tag,tag points, tag language
-#a list of the tags to be used, together with a number describing the importance of the tag, and the most common language for the content. Not all languages are supported. Among the supported ones are: fr/french, en/english, no/norwegian, se/swedish, de/german, it/italian, pt/portugese
+#a list of the tags to be used, together with a number describing the importance of the tag, and the 
+#most common language for the content. Not all languages are supported. Among the supported ones are: 
+#fr/french, en/english, no/norwegian, se/swedish, de/german, it/italian, pt/portugese
 
 #keyword
 tag1 = 6531_a, 1, en #keyword
@@ -370,16 +381,17 @@ min_nr_words_docs = 3
 max_nr_words_upper = 20
 #if a document contains less than 10 terms, use much used terms too, if not ignore them
 max_nr_words_lower = 10
-#override minimum relevance value and use the one from search_engine?
-override_default_min_relevance = no
 #default minimum relevance value to use for find similar
 default_min_relevance = 75
 </protect>
 </blockquote>
+Tip: When executing a search using a ranking method, you can add "verbose=1" to the list of parameteres
+in the URL to see which terms have been used in the ranking.
 </pre>
 
 <a name="cmb"></a><h3>5.3 Combine method</h3>
-The 'Combine method' is running each method mentioned in the config file and adding the score together.
+The 'Combine method' is running each method mentioned in the config file and adding the score together
+based on the importance of the method given by the percentage.
 <br><br><b>Example</b>
 <pre>
 <blockquote>
@@ -404,7 +416,8 @@ relevance_number_output_epilogue = )
 #tells which method to use, do not change
 function = combine_method
 [combine_method]
-#each line tells which method to use, the code is the same as in the BibRank interface, the number describes how much of the total score the method should count.
+#each line tells which method to use, the code is the same as in the BibRank interface, the number describes how 
+#much of the total score the method should count.
 method1 = jif,50
 method2 = wrd,50
 #text to be shown before the rank value on the search result screen.
