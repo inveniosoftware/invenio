@@ -42,7 +42,8 @@ class TestListSetOperations(unittest.TestCase):
         hitset2 = HitSet()
         hitset2.add(5)
         rec_termcount = {1: 1, 2: 1, 5: 1}
-        #self.assertEqual(([(1, 71), (3, 100)], hitset2), bibrank_record_sorter.sort_record_relevance({1: 50, 2:30, 3:70,4:10},rec_termcount,hitset, 50,0))
+        (res1, res2) = bibrank_record_sorter.sort_record_relevance({1: 50, 2:30, 3:70,4:10},rec_termcount,hitset, 50,0)
+        self.assertEqual(([(1, 71), (3, 100)], hitset2.tolist()), (res1, res2.tolist()))
     
     def test_calculate_record_relevance(self):
         """bibrank record sorter - calculating relevances"""
