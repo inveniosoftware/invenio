@@ -269,11 +269,17 @@ def get_fulltext_urls_from_html_page(htmlpagebody):
        """
     out = []
     for ext in conv_programs.keys():
-        expr = sre.compile( r"(\"http://[\w]+\.+[\w]+[^\"'><]*\.)(" + \
+        expr = sre.compile( r"\"(http://[\w]+\.+[\w]+[^\"'><]*\.)(" + \
                            ext + r")\"") 
         match =  expr.search(htmlpagebody)
         if match:
             out.append([ext,match.group()])
+        else: # FIXME: workaround for getfile, should use bibdoc tables
+            print ext
+            expr_getfile = sre.compile(r"\"(http://.*getfile\.py\?.*format=" + ext + r"&version=.*)\"")
+            match =  expr_getfile.search(htmlpagebody)
+            if match:
+                out.append([ext,match.group()])            
     return out
 
 def get_words_from_fulltext(url_indirect,separators="[^\w]",split=string.split):
@@ -301,6 +307,8 @@ def get_words_from_fulltext(url_indirect,separators="[^\w]",split=string.split):
             sys.stderr.write("Error: Cannot read %s.\n" % url_indirect)
             return []
         fulltext_urls = get_fulltext_urls_from_html_page(htmlpagebody)
+        if opts_dict["verbose"] >= 9:
+            write_message("... fulltext_urls = %s" % fulltext_urls)
 
     words = {}
 
