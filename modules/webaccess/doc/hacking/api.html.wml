@@ -33,6 +33,7 @@ Contents:
  1. Regular API
  2. Command Line Interface
  3. Program Flow
+ 4. External login methods
 
 1. Regular API
 
@@ -156,5 +157,14 @@ Contents:
        (countinue loop)
 
    VIII. all the above failed
-     -> authorization failed      
+     -> authorization failed   
+
+5. External login methods
+
+   If you want to call defined external loginmethods, it can be done by:
+   
+   import cdsware.external_authentication
+   example_method = cdsware.external_authentication.example()
+   example_method.auth_user("testuser", "testpassword")
+ 
 </pre>
