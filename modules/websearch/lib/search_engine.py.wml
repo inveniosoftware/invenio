@@ -982,17 +982,25 @@ def strip_accents(x):
     except:
         return x # something went wrong, probably the input wasn't UTF-8
     # asciify Latin-1 lowercase:
-    y = sre.sub(unicode(r"(?u)[áàäâã]", "utf-8"), "a", y)
+    y = sre.sub(unicode(r"(?u)[áàäâãå]", "utf-8"), "a", y)
+    y = sre.sub(unicode(r"(?u)[æ]", "utf-8"), "ae", y)
     y = sre.sub(unicode(r"(?u)[éèëê]", "utf-8"), "e", y)
     y = sre.sub(unicode(r"(?u)[íìïî]", "utf-8"), "i", y)
-    y = sre.sub(unicode(r"(?u)[óòöôõ]", "utf-8"), "o", y)
+    y = sre.sub(unicode(r"(?u)[óòöôõø]", "utf-8"), "o", y)
     y = sre.sub(unicode(r"(?u)[úùüû]", "utf-8"), "u", y)
+    y = sre.sub(unicode(r"(?u)[ýÿ]", "utf-8"), "y", y)
+    y = sre.sub(unicode(r"(?u)[ç]", "utf-8"), "c", y)
+    y = sre.sub(unicode(r"(?u)[ñ]", "utf-8"), "n", y)
     # asciify Latin-1 uppercase:
-    y = sre.sub(unicode(r"(?u)[ÁÀÄÂÃ]", "utf-8"), "A", y)
+    y = sre.sub(unicode(r"(?u)[ÁÀÄÂÃÅ]", "utf-8"), "A", y)
+    y = sre.sub(unicode(r"(?u)[Æ]", "utf-8"), "AE", y)
     y = sre.sub(unicode(r"(?u)[ÉÈËÊ]", "utf-8"), "E", y)
     y = sre.sub(unicode(r"(?u)[ÍÌÏÎ]", "utf-8"), "I", y)
-    y = sre.sub(unicode(r"(?u)[ÓÒÖÔÕ]", "utf-8"), "O", y)
+    y = sre.sub(unicode(r"(?u)[ÓÒÖÔÕØ]", "utf-8"), "O", y)
     y = sre.sub(unicode(r"(?u)[ÚÙÜÛ]", "utf-8"), "U", y)
+    y = sre.sub(unicode(r"(?u)[Ý]", "utf-8"), "Y", y)
+    y = sre.sub(unicode(r"(?u)[Ç]", "utf-8"), "C", y)
+    y = sre.sub(unicode(r"(?u)[Ñ]", "utf-8"), "N", y)
     # return UTF-8 representation of the Unicode string:
     return y.encode("utf-8")
  
