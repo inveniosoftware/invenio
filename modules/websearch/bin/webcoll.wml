@@ -388,9 +388,9 @@ class Collection:
             for as in range(0,2): # do both simple search and advanced search pages:
                 body = ""
                 body += """<form action="%s/search.py" method="get">""" % weburl
-                body += self.create_portalbox('te')
+                body += self.create_portalbox(lang, 'te')
                 body += "" + self.create_searchfor(as, lang)
-                body += self.create_portalbox('np')
+                body += self.create_portalbox(lang, 'np')
                 body += """<table cellspacing="0" cellpadding="0" border="0">"""
                 body += """<tr>"""
                 body += """<td valign="top">""" + self.create_narrowsearch(as, lang, msg_narrow_search[lang]) + "</td>"
@@ -398,14 +398,14 @@ class Collection:
                 if body_focuson:
                     body += """<td valign="top">""" + body_focuson + """</td>"""
                 body += "</tr></table>"
-                body += self.create_portalbox('ne')
+                body += self.create_portalbox(lang, 'ne')
                 body += "</form>"
                 self.write_cache_file("body-as=%s-ln=%s" % (as, lang), body)
             ## third, write portalboxes:
-            self.write_cache_file("portalbox-lt-ln=%s" % lang, self.create_portalbox("lt"))
-            self.write_cache_file("portalbox-lb-ln=%s" % lang, self.create_portalbox("lb"))
-            self.write_cache_file("portalbox-rt-ln=%s" % lang, self.create_portalbox("rt"))
-            self.write_cache_file("portalbox-rb-ln=%s" % lang, self.create_portalbox("rb"))
+            self.write_cache_file("portalbox-lt-ln=%s" % lang, self.create_portalbox(lang, "lt"))
+            self.write_cache_file("portalbox-lb-ln=%s" % lang, self.create_portalbox(lang, "lb"))
+            self.write_cache_file("portalbox-rt-ln=%s" % lang, self.create_portalbox(lang, "rt"))
+            self.write_cache_file("portalbox-rb-ln=%s" % lang, self.create_portalbox(lang, "rb"))
             ## fourth, write 'last updated' information:
             self.write_cache_file("last-updated-ln=%s" % lang, time.strftime("%02d %b %04Y %02H:%02M:%02S %Z", time.localtime()))
         return
@@ -433,14 +433,14 @@ class Collection:
             out = prolog + nice_number(self.nbrecs) + epilog
         return out
 
-    def create_portalbox(self, position="rt"):
-        """Creates portalboxes of the position 'position' by consulting MySQL configuration database.
+    def create_portalbox(self, lang=cdslang, position="rt"):
+        """Creates portalboxes of language CDSLANG of the position POSITION by consulting MySQL configuration database.
            The position may be: 'lt'='left top', 'lb'='left bottom', 'rt'='right top', 'rb'='right bottom',
            'tl'='top left', 'tr'='top right', 'bl'='bottom left', 'br='bottom right'."""
         out = ""
         query = "SELECT p.title,p.body FROM portalbox AS p, collection_portalbox AS cp "\
-                " WHERE cp.id_collection=%d AND p.id=cp.id_portalbox AND cp.position='%s' "\
-                " ORDER BY cp.score DESC" % (self.id, position)
+                " WHERE cp.id_collection=%d AND p.id=cp.id_portalbox AND cp.ln='%s' AND cp.position='%s' "\
+                " ORDER BY cp.score DESC" % (self.id, lang, position)
         res = run_sql(query)
         for row in res:
             title, body = row[0], row[1]
