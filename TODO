@@ -7,6 +7,13 @@ CDSware TODO list
 Suitable for editing with Emacs ToDoo mode, see
 <http://www.emacswiki.org/cgi-bin/wiki/ToDoo>.
 
+* bibsched task sleeping sometimes cannot be done directly
+  Sometimes when you try to make bibsched task sleeping, you cannot do
+  it because MySQL is active for the task elsewhere:
+   _mysql_exceptions.ProgrammingError: (2014, "Commands out of
+   sync;You can't run this command now")
+  Received Tue Mar  2 10:22:33 2004
+
 o [simko] language-dependent portalboxes 
   Received Wed Feb 11 12:53:13 2004
 
