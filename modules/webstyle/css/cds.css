@@ -137,6 +137,10 @@ a.userinfobox:hover {
    color: #060;
    background: transparent;
 }
+.info {
+   color: #060;
+   background: transparent;    
+}
 .pageheader {
    color: #999;
    background: transparent;
