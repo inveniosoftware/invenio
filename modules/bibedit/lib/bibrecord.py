@@ -631,7 +631,7 @@ def create_record_4suite(xmltext,verbose=verbose,correct=correct):
         s = controlfield.getAttributeNS(None,"tag")
 
         text_nodes = controlfield.childNodes
-        v = u''.join([ n.data for n in text_nodes ])
+        v = u''.join([ n.data for n in text_nodes ]).encode("utf-8")
 
         name = type(v).__name__
         if (name in ["int","long"]) :
@@ -657,9 +657,9 @@ def create_record_4suite(xmltext,verbose=verbose,correct=correct):
 
         for subfield in get_childs_by_tag_name(datafield,"subfield"):
              text_nodes = subfield.childNodes
-             v = u''.join([ n.data for n in text_nodes ])
+             v = u''.join([ n.data for n in text_nodes ]).encode("utf-8")
 
-             code = subfield.getAttributeNS(None,'code')
+             code = subfield.getAttributeNS(None,'code').encode("utf-8")
              if code != '':
                  subfields.append((code,v))
              else:
@@ -669,9 +669,9 @@ def create_record_4suite(xmltext,verbose=verbose,correct=correct):
         if s == '':
             s = '!'
             
-        ind1 = datafield.getAttributeNS(None,"ind1")
+        ind1 = datafield.getAttributeNS(None,"ind1").encode("utf-8")
         
-        ind2 = datafield.getAttributeNS(None,"ind2")
+        ind2 = datafield.getAttributeNS(None,"ind2").encode("utf-8")
                      
   
         if record.has_key(s):
