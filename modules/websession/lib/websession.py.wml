@@ -27,6 +27,7 @@ by using a MySQL table. Consists of the following classes:
 	- pSessionMapping: Implements only the necessary methods to make it work with the session manager 
 """
 import cPickle
+import time
 from dbquery import run_sql
 import session
 from session import Session
@@ -71,7 +72,7 @@ class pSession(Session):
 
     def setUid( self, newUid ):
         self.__uid = int(newUid)
-        self.__dirty = 1
+        self.__dirty = 1    
 
     def retrieve( cls, sessionId ):
         """method for retrieving a session from the DB for the given id. If the
@@ -109,6 +110,11 @@ class pSession(Session):
             res = run_sql(sql)
             self.__dirty=0
 
+    def _set_access_time (self, resolution):
+        now = time.time()
+        if now - self._Session__access_time > resolution:
+            self._Session__access_time = now
+            run_sql("UPDATE session SET session_expiry=%d WHERE session_key='%s'" % (now+60*60*24*2, self.id))
 
 class pSessionMapping(UserDict):
     """Only the necessary methods to make it work with the session manager 
