@@ -29,4 +29,4 @@ CLEANFILES = $(webapp_DATA) *~ *.tmp
 	$(WML) -o $@ $<
 
 %.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml
-	$(WML) -o $@ $<
+	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
