@@ -26,8 +26,9 @@ import time
 import tempfile
 from marshal import loads
 from zlib import decompress
-from config import weburl
+from config import weburl, cdslang
 from dbquery import run_sql    
+from messages import msg_citation_history
 from bibrank_grapher import create_temporary_image, write_coordinates_in_tmp_file, remove_old_img
 from bibrank_citation_searcher import calculate_cited_by_list
 
@@ -89,7 +90,7 @@ def html_command(file):
     #t += "</table></td></tr></table>"
     return t
 
-def create_citation_history_graph_and_box(recid):
+def create_citation_history_graph_and_box(recid, ln=cdslang):
     """Create graph with citation history for record RECID (into a
        temporary file) and return HTML box refering to that image.
        Called by Detailed record pages.
@@ -98,7 +99,7 @@ def create_citation_history_graph_and_box(recid):
     if cfg_bibrank_print_citation_history:
         coordinates = calculate_citation_history_coordinates(recid)
         if coordinates:
-            html_head = """</br><table><tr><td class="blocknote">Citation&nbsp;history:</td></tr></table>"""
+            html_head = """</br><table><tr><td class="blocknote">%s</td></tr></table>""" % msg_citation_history[ln]
             graphe_file_name = 'citation_%s_stats.png' % str(recid)
             remove_old_img(graphe_file_name)
             years = calculate_citation_graphe_x_coordinates(recid)
