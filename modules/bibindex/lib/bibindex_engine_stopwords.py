@@ -23,44 +23,35 @@
 #include "configbis.wml"
 #include "cdswmllib.wml"
 
-try:
-    import sre
-    import string
-    import os
-    import sys
-except ImportError, e:
-    import sys
+import string
 
 from bibindex_engine_config import *
 
 stopwords = {}
-def get_stopwords(file=cfg_path_stopwordlist):
-    """Get stopword list"""
+def create_stopwords_dict(filename=cfg_path_to_stopwords_file):
+    """Create stopword dictionary out of FILENAME."""
     try:
-        file = open(file, 'r')
+        filename = open(filename, 'r')
     except:
         return {}
-    lines = file.readlines()
-    file.close()
+    lines = filename.readlines()
+    filename.close()
     stopdict  = {}
     for line in lines:
        stopdict[string.rstrip(line)] = 1
     return stopdict
 
-def is_stopword(word): 
-    """returns False if not stopword, True if stopword"""
-
-    #inputword must be lowercase
-    if cfg_remove_stopwords and stopwords.has_key(word):
-        return True
-    return False
-
-def is_stopword_force(word): 
-    """returns False if not stopword, True if stopword"""
-
-    #inputword must be lowercase
-    if stopwords.has_key(word):
-        return True
-    return False
-
 stopwords = get_stopwords()
+
+def is_stopword(word, force_check=0): 
+    """Return true if WORD is found among stopwords, false otherwise.
+       Also, return false if BibIndex wasn't configured to use
+       stopwords.  However, if FORCE_CHECK is set to 1, then do not
+       pay attention to whether the admin disabled stopwords
+       functionality, but look up the word anyway.  This mode is
+       useful for ranking.
+    """    
+    # note: input word is assumed to be in lowercase
+    if (cfg_remove_stopwords or force_check) and stopwords.has_key(word):
+        return True
+    return False
