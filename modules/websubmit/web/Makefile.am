@@ -20,7 +20,7 @@
 SUBDIRS = admin personal
 
 docdir = $(WEBDIR)
-doc_DATA=approve.py direct.py submit.py summary.py sub.py archive.py publiline.py
+doc_DATA=approve.py direct.py submit.py summary.py sub.py archive.py publiline.py personal.py
 
 EXTRA_DIST = $(wildcard *.wml)
 

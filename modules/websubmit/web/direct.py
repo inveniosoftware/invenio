@@ -56,16 +56,22 @@ def index(req,c=cdsname,ln=cdslang,sub=""):
         doctype = res[0][0]
         # get action name
         action = res[0][1]
-    # create 'unique' access number
-    pid = os.getpid()
-    now = time.time()
-    access = "%i_%s" % (now,pid)
     # retrieve other parameter values
     params = re.sub("sub=[^&]*","",myQuery)
+    # find existing access number
+    result = re.search("access=([^&]*)",params)
+    if result != None:
+        access = result.group(1)
+        params = re.sub("access=[^&]*","",params)
+    else:
+        # create 'unique' access number
+        pid = os.getpid()
+        now = time.time()
+        access = "%i_%s" % (now,pid)
     # retrieve 'dir' value
     res = run_sql ("select dir from sbmACTION where sactname=%s",(action,))
     dir = res[0][0]
-    url = "%s/Main.py?doctype=%s&dir=%s&access=%s&act=%s&startPg=1%s" % (urlpath,doctype,dir,access,action,params)
+    url = "submit.py?doctype=%s&dir=%s&access=%s&act=%s&startPg=1%s" % (doctype,dir,access,action,params)
     req.err_headers_out.add("Location", url)
     raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
     return ""
