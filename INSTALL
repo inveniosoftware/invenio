@@ -35,14 +35,16 @@ Contents
         recommended due to its superior mod_python support, see below.
           <http://httpd.apache.org/>
 
-     c) Python v2.x, featuring recent MySQLdb v0.9.2 module.
-        We recommended to use Python v2.2 and above.  Also, we
-        recommend to optionally install also the Psyco module that
-        increases performance of some operations.  (Note that CDSware
-        will work without Psyco, though.)
+     c) Python v2.x, featuring recent MySQLdb module (v0.9.2), and
+        Numeric module (v21 and above).  We recommended to use Python
+        v2.2 and above.  Also, we recommend to optionally install also
+        the Psyco module that increases performance of some Pythonic
+        operations. (Note that CDSware will work without Psyco,
+        though.)
 
           <http://python.org/>
           <http://sourceforge.net/projects/mysql-python>
+          <http://sourceforge.net/projects/numpy>
           <http://psyco.sourceforge.net/>
 
      d) mod_python compiled as Apache module.  Tested mainly with
