@@ -200,7 +200,7 @@ def email_notify(alert, records, argstr):
     if get_catalogue_num(argstr) > 1:
         catword += 's'
     
-    time = strftime("%d-%m-%Y")
+    time = strftime("%Y-%m-%d")
 
     msg += '\n' + wrap('alert name: %s' % alert[5])
     if pattern:
@@ -208,7 +208,7 @@ def email_notify(alert, records, argstr):
     if catalogue:
         msg += wrap('%s: %s' % (catword, catalogue))
     msg += wrap('frequency: %s ' % format_frequency(alert[3]))
-    msg += wrap('run time: %s ' % strftime("%a %d-%m-%Y %H:%M:%S"))
+    msg += wrap('run time: %s ' % strftime("%a %Y-%m-%d %H:%M:%S"))
     recword = 'record'
     if len(records) > 1:
         recword += 's'
