@@ -108,7 +108,7 @@ except ImportError, e:
 try:
     import psyco
     psyco.bind(sort())
-    psyco.bind(Journalimpact())
+    psyco.bind(single_tag_kb())
     psyco.bind(serialize_via_numeric_array)
     psyco.bind(Authorimpact())
     psyco.bind(Merge())
@@ -305,7 +305,7 @@ def accessimpact(methname, starsets, config):
     intoDB(starset)
     showtime((time.time() - startCreate))
 
-def single_tag_kb_impact(methname, starsets, config):
+def single_tag_kb_method(methname, starsets, config):
     """Creating rankset"""
     startCreate = time.time()
     starset = starsets[methname]
@@ -520,8 +520,9 @@ def showtime(timeused):
         write_message("Time used: %d second(s)." % timeused)
 
 def stats(starset):
-    total = 0
+    """Print statistics"""
     try:
+        total = 0
         write_message("Statistics: %s , Star 1 size: %s%% , Overall Importance: %s%%" % (starset.getName(), round(float(starset.getTopStar()) * 100,2), round(float(starset.getWeigth())*100, 2)))
         for nr in range(0, starset.getSize() + 1):
             write_message("%s star(s): Range >= \t%s\t%s" % (nr, round(starset.getThreshold()[nr],3), (starset.getStar(nr))._nbhits))
@@ -532,14 +533,13 @@ def stats(starset):
 
 def check(starset):
     """Check if rebalancing is necessary"""
-    total = 0
     try:
-            size = cfg_max_recID + 1 - starset.getStar(0)._nbhits
-            if opts_dict["verbose"] >= 9:
-                for nr in range(1, starset.getSize() + 1):
-                    write_message("%s---%f" % (nr, float(starset.getStar(nr)._nbhits) / float(size)))
-            if (float(starset.getStar(starset.getSize())._nbhits) / float(size)) > starset.getTopStar() * 1.25:
-                write_message("Rebalance: %s" % starset.getName())
+        size = cfg_max_recID + 1 - starset.getStar(0)._nbhits
+        if opts_dict["verbose"] >= 9:
+            for nr in range(1, starset.getSize() + 1):
+                write_message("%s---%f" % (nr, float(starset.getStar(nr)._nbhits) / float(size)))
+        if (float(starset.getStar(starset.getSize())._nbhits) / float(size)) > starset.getTopStar() * 1.25:
+            write_message("Rebalance: %s" % starset.getName())
     except StandardError, e:
         write_message("Error checking: %s" % starset.getName())
         
@@ -1051,6 +1051,7 @@ def task_run(row):
                     
         for key in opts_dict["run"]:
             file = etcdir + "/bibrank/" + key + ".cfg"
+            print file
             if opts_dict["verbose"] >=9:
                 write_message("Getting configuration from file: %s" % file)
             config = ConfigParser.ConfigParser()
@@ -1063,8 +1064,9 @@ def task_run(row):
             cfg_importance = config.getfloat("rank_method", "overall_importance")
             sets[key] = StarSet(cfg_name, cfg_short, cfg_function, cfg_importance, cfg_stars, cfg_star)
             
-            if opts_dict["verbose"] >= 3:
+            if opts_dict["verbose"] >= 9:
                 print ""
+            print cfg_function
             func_object = globals().get(cfg_function)
             func_object(key,sets,config)
             if opts_dict["stat"]:
