@@ -69,7 +69,7 @@ def change(req,email=None,password=None):
     else :
         return display(req)
 
-def lost(req):	#Metodo para mostrar el mensaje de perdida! perform_lostmandarle el email al usuario user el cliente smtp de python
+def lost(req):
     uid = webuser.getUid(req)
     return page(title="Your Account",
                 body=webaccount.perform_lost(),
