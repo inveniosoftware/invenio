@@ -54,10 +54,70 @@ from config import *
 from search_engine_config import cfg_max_recID
 from search_engine import perform_request_search, strip_accents
 from search_engine import HitSet, get_index_id, create_basic_search_units
+from bibrank_citation_indexer import get_citation_weight
+from bibrank_downloads_indexer import *
 from dbquery import run_sql
 
 options = {}
-
+def citation_exec(rank_method_code, name, config):
+    """Creating the rank method data for citation"""
+    dict = get_citation_weight(rank_method_code)
+    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    if dict: intoDB(dict, date, rank_method_code)
+    else: print "no need to update the indexes for citations"
+def single_tag_rank_method_exec(rank_method_code, name, config):
+    """Creating the rank method data"""
+    startCreate = time.time()
+    rnkset = {}
+    rnkset_old = fromDB(rank_method_code)
+    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    rnkset_new = single_tag_rank(config)
+    rnkset = union_dicts(rnkset_old, rnkset_new)
+    intoDB(rnkset, date, rank_method_code)
+def download_weight_filtering_user(row,run):
+    return bibrank_engine(row,run)
+def download_weight_total(row,run):
+    return bibrank_engine(row,run)
+def file_similarity_by_times_downloaded(row,run):
+    return bibrank_engine(row,run)
+def download_weight_filtering_user_exec (rank_method_code, name, config):
+    """Ranking by number of downloads per User.
+    Only one full Text Download is taken in account for one specific userIP address"""
+    time1 = time.time()
+    dic = fromDB(rank_method_code)
+    last_updated = get_lastupdated(rank_method_code)
+    keys = new_downloads_to_index(last_updated)
+    filter_downloads_per_hour(keys,last_updated)
+    dic = get_download_weight_filtering_user(dic, keys)
+    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    intoDB(dic, date, rank_method_code)
+    time2 = time.time()
+    return {"time":time2-time1}
+def download_weight_total_exec(rank_method_code, name, config):
+    """rankink by total number of downloads without check the user ip
+    if users downloads 3 time the same full text document it has to be count as 3 downloads"""
+    time1 = time.time()
+    dic = fromDB(rank_method_code)
+    last_updated = get_lastupdated(rank_method_code)
+    keys = new_downloads_to_index(last_updated)
+    filter_downloads_per_hour(keys,last_updated)
+    dic = get_download_weight_total(dic, keys)
+    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    intoDB(dic, date, rank_method_code)
+    time2 = time.time()
+    return {"time":time2-time1}
+def file_similarity_by_times_downloaded_exec(rank_method_code, name, config):
+    """update dictionnary {recid:[(recid,nb page similarity),()..]}"""
+    time1 = time.time()
+    dic = fromDB(rank_method_code)
+    last_updated = get_lastupdated(rank_method_code)
+    keys = new_downloads_to_index(last_updated)
+    filter_downloads_per_hour(keys,last_updated)
+    dic = get_file_similarity_by_times_downloaded(dic, keys)
+    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    intoDB(dic, date, rank_method_code)
+    time2 = time.time()
+    return {"time":time2-time1}
 def single_tag_rank_method_exec(rank_method_code, name, config):
     """Creating the rank method data"""
     startCreate = time.time()
@@ -535,3 +595,5 @@ def showtime(timeused):
     """Show time used for method"""
     if options["verbose"] >= 9:
         write_message("Time used: %d second(s)." % timeused)
+def citation(row,run):
+    return bibrank_engine(row, run)
