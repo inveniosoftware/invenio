@@ -187,7 +187,8 @@ def registerUser(request,user,passw):
     if userOnSystem(user) and  user !='':
 	return -1	
     if checkRegister(user,passw) and checkemail(user):
-	setUid(request, run_sql("INSERT INTO user (email, password) VALUES (%s,%s)", (user,passw))
+	setUid(request, run_sql("INSERT INTO user (email, password) VALUES (%s,%s)",
+                                (user,passw)))
 	return 1
     return 0
 
