@@ -486,7 +486,7 @@ def account_list_alerts(uid, action="", id_alert=0, id_basket=0,newname=""):
     query_result = run_sql(SQL_query)    
     out += """<FORM name="displayalert" action="../youralerts.py/list" method="post">"""
         # display the list of baskets
-    out += """You own following shelves:"""
+    out += """You own following alerts: """
     out += """<SELECT name="id_alert"><OPTION value="0">- alert name -</OPTION>"""            
     for row in query_result :
 		if len(query_result)>0:
