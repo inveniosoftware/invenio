@@ -97,11 +97,11 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
     #For different curves 
     color_line_list = ['4', '3', '2', '9', '6'] 
     #Gnuplot graphe object 
-    g = Gnuplot.Gnuplot(debug=1) 
-    g.clear() 
-    #Graphe name 
+    g = Gnuplot.Gnuplot() 
+    #Graphe name: file to store graph 
     graphe_name = "tmp_%s_%s_stats.png" % (kind_of_graphe, recid) 
-     
+    g('set terminal png small') 
+    g('set output "%s/img/%s"' % (webdir, graphe_name)) 
     len_intervals = len(intervals) 
     len_docid_list = len(docid_list) 
     # Standard options 
@@ -115,9 +115,6 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
         g('unset ylabel') 
     else: 
         g.ylabel(s = y_label) 
-    #file to store graph 
-    g('set output "%s/img/%s"' % (webdir, graphe_name)) 
-    g('set terminal png small') 
     g('set bmargin 5') 
     #let a place at the top of the graph 
     g('set tmargin 1') 
