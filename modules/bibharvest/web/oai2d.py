@@ -44,7 +44,6 @@ oaisetfield            =   "<OAISETTAG>"
 import sys
 import urllib
 sys.path.append('%s' % pylibdir)
-from cdsware.config import *
 from cdsware.dbquery import run_sql
 from cdsware import oai_repository
 
