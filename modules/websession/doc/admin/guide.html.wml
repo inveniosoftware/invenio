@@ -45,6 +45,8 @@
    </tbody>
    </table>
 
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
 <h2>Guest User Sessions</h2>
 
 <p>Guest users create a lot of entries in <CDSNAME> tables that are

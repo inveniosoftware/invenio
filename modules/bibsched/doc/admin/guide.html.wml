@@ -42,7 +42,11 @@
    </tbody>
    </table>
 
-BibSched -- the bibliographic task scheduler -- is central unit of the
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
+<h2>Overview</h2>
+
+<p>BibSched -- the bibliographic task scheduler -- is central unit of the
 system that allows all other modules to access the bibliographic
 database in a controlled manner, preventing sharing violation threats
 and assuring the coherent execution of the database update tasks.  The

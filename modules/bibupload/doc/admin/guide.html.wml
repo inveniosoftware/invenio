@@ -45,7 +45,11 @@
    </tbody>
    </table>
 
-BibUpload enables you to upload bibliographic data in XML MARC
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
+<h2>Overview</h2>
+
+<p>BibUpload enables you to upload bibliographic data in XML MARC
 format into CDSware bibliographic database.
 
 <h2>Configuring BibUpload</h2>

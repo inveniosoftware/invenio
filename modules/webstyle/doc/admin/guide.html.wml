@@ -23,6 +23,8 @@
     navbar_name="admin" \
     navbar_select="webstyle-admin-guide"
 
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
 <h2>Compile-time Configuration of Page Layout</h2>
 
 <p>The style of the CDSware installation is defined largely also

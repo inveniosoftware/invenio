@@ -34,6 +34,8 @@
     <cz><MSG_PAGE_BEING_TRANSLATED_BODY></cz>
     <no><MSG_PAGE_BEING_TRANSLATED_BODY></no>
 
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
         <h3>Table of Contents</STRONG></h3>
 
         <UL>

@@ -23,6 +23,8 @@
     navbar_name="admin" \
     navbar_select="bibedit-admin-guide"
 
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
 <h2>Contents</h2>
 <strong>1. <a href="#1">Overview</a></strong><br>
 <strong>2. <a href="#2">Edit records via Web interface</a></strong><br>

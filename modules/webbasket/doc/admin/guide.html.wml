@@ -23,5 +23,7 @@
     navbar_name="admin" \
     navbar_select="webbasket-admin-guide"
 
-Not implemented yet.  If you want to manipulate user baskets, see
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
+<p>Not implemented yet.  If you want to manipulate user baskets, see
 tables <code>user_basket, basket, basket_record</code>. 

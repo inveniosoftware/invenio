@@ -22,10 +22,9 @@
     navbar_name="admin" \
     navbar_select="webaccess-admin-guide" 
 
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
 <pre>
-WEBACCESS ADMIN GUIDE / $Date$
-
 1. Introduction, using roles
 2. WebAccess admin interface
 3. Example pages, illustrating snapshots
