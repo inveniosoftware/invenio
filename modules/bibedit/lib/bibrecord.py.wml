@@ -129,6 +129,7 @@ def create_records(xmltext,verbose=verbose,correct=correct):
 	"""
         global import_error
         err = []
+
         if import_error == 1:
             err.append((6,imperr))
         else:
@@ -169,7 +170,8 @@ def create_record(xmltext,verbose = verbose, correct=correct):
 
     (i,errors) = testImports(parser)
     if i==0:
-        return (None,0,errors)
+        print "Error: no suitable XML parsers found.  Please read INSTALL file."
+        sys.exit()
 
     try:
         if parser==2:
