@@ -321,7 +321,7 @@ def page_end(req, of="hb"):
         return []
     else: return "\n"    
 
-def create_inputdate_box(name="d1", selected_year="", selected_month="", selected_day=""):
+def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_day=0):
     "Produces 'From Date', 'Until Date' kind of selection box.  Suitable for search options."
     box = ""
     # day
@@ -333,10 +333,10 @@ def create_inputdate_box(name="d1", selected_year="", selected_month="", selecte
     # month
     box += """<select name="%sm">""" % name
     box += """<option value="">any month"""
-    for mm, month in [('01','January'), ('02','February'), ('03','March'), ('04','April'), \
-                      ('05','May'), ('06','June'), ('07','July'), ('08','August'), \
-                      ('09','September'), ('10','October'), ('11','November'), ('12','December')]:
-        box += """<option value="%s"%s>%s""" % (mm, is_selected(mm, selected_month), month)
+    for mm, month in [(1,'January'), (2,'February'), (3,'March'), (4,'April'), \
+                      (5,'May'), (6,'June'), (7,'July'), (8,'August'), \
+                      (9,'September'), (10,'October'), (11,'November'), (12,'December')]:
+        box += """<option value="%d"%s>%s""" % (mm, is_selected(mm, selected_month), month)
     box += """</select>"""
     # year
     box += """<select name="%sy">""" % name
@@ -556,7 +556,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
                    </tbody>
                   </table>""" % cgi.escape(pl, 1)
     ## fourthly, print from/until date boxen, if applicable:
-    if action=="Browse" or (d1y=="" and d1m=="" and d1d=="" and d2y=="" and d2m=="" and d2d==""):
+    if action=="Browse" or (d1y==0 and d1m==0 and d1d==0 and d2y==0 and d2m==0 and d2d==0):
         pass # do not need it
     else:
         cell_6_a = create_inputdate_box("d1", d1y, d1m, d1d)
@@ -741,12 +741,14 @@ def nice_number(num):
 
 def is_selected(var, fld):
     "Checks if the two are equal, and if yes, returns ' selected'.  Useful for select boxes."
-    if str(var) == str(fld):
+    if type(var) is int and type(fld) is int:
+        if var == fld:
+            return " selected"
+    elif str(var) == str(fld):
         return " selected"
     elif fld and len(fld)==3 and fld[0] == "w" and var == fld[1:]:
         return " selected"
-    else:
-        return ""
+    return ""
 
 def urlargs_replace_text_in_arg(urlargs, regexp_argname, text_old, text_new):
     """Analyze `urlargs' (URL CGI GET query arguments) and for each
@@ -987,32 +989,32 @@ def wash_dates(d1y, d1m, d1d, d2y, d2m, d2d):
     according to if it's the starting or the ending date, etc."""    
     day1, day2 =  "", ""
     # sanity checking:
-    if d1y=="" and d1m=="" and d1d=="" and d2y=="" and d2m=="" and d2d=="":
+    if d1y==0 and d1m==0 and d1d==0 and d2y==0 and d2m==0 and d2d==0:
         return ("", "") # nothing selected, so return empty values
     # construct day1 (from):
     if d1y:
-        day1 += "%04d" % int(d1y)
+        day1 += "%04d" % d1y
     else:
         day1 += "0000"
     if d1m:
-        day1 += "-%02d" % int(d1m)
+        day1 += "-%02d" % d1m
     else:
         day1 += "-01"
     if d1d:
-        day1 += "-%02d" % int(d1d)
+        day1 += "-%02d" % d1d
     else:
         day1 += "-01"
     # construct day2 (until):
     if d2y:
-        day2 += "%04d" % int(d2y)
+        day2 += "%04d" % d2y
     else:
         day2 += "9999"
     if d2m:
-        day2 += "-%02d" % int(d2m)
+        day2 += "-%02d" % d2m
     else:
         day2 += "-12"
     if d2d:
-        day2 += "-%02d" % int(d2d)
+        day2 += "-%02d" % d2d
     else:
         day2 += "-31" # NOTE: perhaps we should add max(datenumber) in
                       # given month, but for our quering it's not
@@ -1960,7 +1962,7 @@ def print_warning(req, msg, type='', prologue='<br>', epilogue='<br>'):
 
 def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1, jrec=1, rg=10,
                       as=0, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
-                      d1y="", d1m="", d1d="", d2y="", d2m="", d2d="",
+                      d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0,
                       cpu_time=-1, middle_only=0):
     """Prints stripe with the information on 'collection' and 'nb_found' results oand CPU time.
        Also, prints navigation links (beg/next/prev/end) inside the results set.
@@ -1998,7 +2000,7 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
         url = '%s/search.py?p=%s&amp;c=%s&amp;f=%s&amp;sf=%s&amp;so=%s&amp;sp=%s&amp;of=%s&amp;ot=%s' % (weburl, urllib.quote(p), urllib.quote(collection), f, sf, so, sp, of, ot)
         url += '&amp;as=%s&amp;p1=%s&amp;p2=%s&amp;p3=%s&amp;f1=%s&amp;f2=%s&amp;f3=%s&amp;m1=%s&amp;m2=%s&amp;m3=%s&amp;op1=%s&amp;op2=%s' \
                % (as, urllib.quote(p1), urllib.quote(p2), urllib.quote(p3), f1, f2, f3, m1, m2, m3, op1, op2)
-        url += '&amp;d1y=%s&amp;d1m=%s&amp;d1d=%s&amp;d2y=%s&amp;d2m=%s&amp;d2d=%s' \
+        url += '&amp;d1y=%d&amp;d1m=%d&amp;d1d=%d&amp;d2y=%d&amp;d2m=%d&amp;d2d=%d' \
                % (d1y, d1m, d1d, d2y, d2m, d2d)
         if jrec-rg > 1:
             out += "<a class=\"img\" href=\"%s&amp;jrec=1&amp;rg=%d\"><img src=\"%s/img/sb.gif\" alt=\"begin\" border=0></a>" % (url, rg, weburl)
@@ -2037,12 +2039,12 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
         out += "<input type=\"hidden\" name=\"m3\" value=\"%s\">" % m3
         out += "<input type=\"hidden\" name=\"op1\" value=\"%s\">" % op1
         out += "<input type=\"hidden\" name=\"op2\" value=\"%s\">" % op2
-        out += "<input type=\"hidden\" name=\"d1y\" value=\"%s\">" % d1y
-        out += "<input type=\"hidden\" name=\"d1m\" value=\"%s\">" % d1m
-        out += "<input type=\"hidden\" name=\"d1d\" value=\"%s\">" % d1d
-        out += "<input type=\"hidden\" name=\"d2y\" value=\"%s\">" % d2y
-        out += "<input type=\"hidden\" name=\"d2m\" value=\"%s\">" % d2m
-        out += "<input type=\"hidden\" name=\"d2d\" value=\"%s\">" % d2d
+        out += "<input type=\"hidden\" name=\"d1y\" value=\"%d\">" % d1y
+        out += "<input type=\"hidden\" name=\"d1m\" value=\"%d\">" % d1m
+        out += "<input type=\"hidden\" name=\"d1d\" value=\"%d\">" % d1d
+        out += "<input type=\"hidden\" name=\"d2y\" value=\"%d\">" % d2y
+        out += "<input type=\"hidden\" name=\"d2m\" value=\"%d\">" % d2m
+        out += "<input type=\"hidden\" name=\"d2d\" value=\"%d\">" % d2d
         out += "&nbsp; or jump to record: <input type=\"text\" name=\"jrec\" size=\"4\" value=\"%d\">" % jrec
     if not middle_only:
         out += "</td>"
@@ -2601,7 +2603,7 @@ def wash_url_argument(var, new_type):
 def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="id", ot="", as="0",
                            p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
                            recid="-1", recidb="-1", sysno="", id="-1", idb="-1", sysnb="", action="SEARCH",
-                           d1y="", d1m="", d1d="", d2y="", d2m="", d2d="", dbg="0", ap="0"):
+                           d1y="0", d1m="0", d1d="0", d2y="0", d2m="0", d2d="0", dbg="0", ap="0"):
     """Perform search or browse request, without checking for
        authentication.  Return list of recIDs found, if of=id.
        Otherwise create web page.
@@ -2780,12 +2782,12 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
     idb = wash_url_argument(idb, 'int')
     sysnb = wash_url_argument(sysnb, 'str')
     action = wash_url_argument(action, 'str')
-    d1y = wash_url_argument(d1y, 'str')
-    d1m = wash_url_argument(d1m, 'str')
-    d1d = wash_url_argument(d1d, 'str')
-    d2y = wash_url_argument(d2y, 'str')
-    d2m = wash_url_argument(d2m, 'str')
-    d2d = wash_url_argument(d2d, 'str')
+    d1y = wash_url_argument(d1y, 'int')
+    d1m = wash_url_argument(d1m, 'int')
+    d1d = wash_url_argument(d1d, 'int')
+    d2y = wash_url_argument(d2y, 'int')
+    d2m = wash_url_argument(d2m, 'int')
+    d2d = wash_url_argument(d2d, 'int')
     day1, day2 = wash_dates(d1y, d1m, d1d, d2y, d2m, d2d)
     dbg = wash_url_argument(dbg, 'int')
     ap = wash_url_argument(ap, 'int')

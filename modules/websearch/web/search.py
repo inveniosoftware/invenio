@@ -46,7 +46,7 @@ __version__ = "$Id$"
 def index(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
           p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
           recid="-1", recidb="-1", sysno="", id="-1", idb="-1", sysnb="", action="SEARCH",
-          d1y="", d1m="", d1d="", d2y="", d2m="", d2d="", dbg="0", ap="1"):
+          d1y="0", d1m="0", d1d="0", d2y="0", d2m="0", d2d="0", dbg="0", ap="1"):
     """Main entry point to WebSearch search engine.  See the docstring
        of search_engine.perform_request_search for the detailed
        explanation of arguments.
@@ -85,7 +85,7 @@ def index(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of
 def authenticate(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
                  p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
                  recid="-1", recidb="-1", sysno="", id="-1", idb="-1", sysnb="", action="SEARCH",
-                 d1y="", d1m="", d1d="", d2y="", d2m="", d2d="", dbg="0", ap="1"):
+                 d1y="0", d1m="0", d1d="0", d2y="0", d2m="0", d2d="0", dbg="0", ap="1"):
     """Authenticate the user before launching the search.  See the
        docstring of search_engine.perform_request_search for the
        detailed explanation of arguments.
