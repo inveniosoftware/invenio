@@ -61,9 +61,9 @@
          # Output the Javascript functions...
          print("<SCRIPT TYPE='text/javascript'>\n\n<!-" . "- hide\n\n"
                . "function verifyChanges(curRows, sugRows, curCols,"
-               . " sugCols, curCode, sugCode, curMarc, sugMarc, curCoo, sugCoo)"
+               . " sugCols, curCode, sugCode, curMarc, sugMarc, curCoo, sugCoo, curMod, sugMod)"
                . "\n{\n   if((curRows == sugRows) && (curCols == "
-               . "sugCols) && (curCoo == sugCoo) && (curCode == sugCode) && (curMarc == sugMarc))\n   "
+               . "sugCols) && (curCoo == sugCoo) && (curCode == sugCode) && (curMarc == sugMarc) && (curMod == sugMod))\n   "
                . "{\n   alert('No Change In The Data Has Been Made!  Can"
                . "not Submit.');\n      return false;\n   }\n   else\n"   
                . "   {\n      return true;\n   }\n}\n\n// -->"
@@ -92,7 +92,7 @@
             print("0");
          } // END else
                
-         print("'), escape(cookie[i].value))) { submit(); }\">\n</TD>\n"
+         print("'), escape(cookie[i].value), escape('" . ereg_replace("'","\\'",htmlspecialchars($dataRow["modifytext"])) . "'), escape(modifytext.value))) { submit(); }\">\n</TD>\n"
          . "<TD ALIGN='left'>\n<INPUT TYPE='button' VALUE='RESET CHANGES'"
          . " onClick=\"reset();\">\n</TD>\n</TR>\n</TABLE>\n</FORM>\n");
       } // END if
@@ -100,10 +100,10 @@
       {
          print("<SCRIPT TYPE='text/javascript'>\n\n<!-" . "- hide\n\n"
                . "function verifyChanges(curSize, sugSize, curMaxlength,"
-               . " sugMaxlength, curVal, sugVal, curCode, sugCode, curMarc, sugMarc, curCoo, sugCoo)"
+               . " sugMaxlength, curVal, sugVal, curCode, sugCode, curMarc, sugMarc, curCoo, sugCoo, curMod, sugMod)"
                . "\n{\n   if((curSize == sugSize) && (curMaxlength == "
                . "sugMaxlength) && (curVal == sugVal) && (curCode == sugCode) && (curCoo == "
-               . "sugCoo) && (curMarc == sugMarc))\n   "
+               . "sugCoo) && (curMarc == sugMarc) && (curMod == sugMod))\n   "
                . "{\n   alert('No Change In The Data Has Been Made!  Can"
                . "not Submit.');\n   return false;\n   }\n   else\n"   
                . "   {\n     return true;\n   }\n}\n\n// -->"
@@ -138,15 +138,15 @@
             print("0");
          } // END else
 
-         print("'), escape(cookie[i].value))) { submit(); }\">\n</TD>\n"
+         print("'), escape(cookie[i].value), escape('" . ereg_replace("'","\\'",htmlspecialchars($dataRow["modifytext"])) . "'), escape(modifytext.value))) { submit(); }\">\n</TD>\n"
          . "<TD ALIGN='left'>\n<INPUT TYPE='button' VALUE='RESET CHANGES'"
          . " onClick=\"reset();\">\n</TD>\n</TR>\n</TABLE>\n</FORM>\n");
       } // END elseif
       elseif($elementType == "H")
       {         
          print("<SCRIPT TYPE='text/javascript'>\n\n<!-" . "- hide\n\n"
-               . "function verifyChanges(curVal, sugVal, curCode, sugCode, curMarc, sugMarc, curCoo, sugCoo)"
-               . "\n{\n   if((curVal == sugVal) && (curCoo == sugCoo) && (curCode == sugCode) && (curMarc == sugMarc))\n " 
+               . "function verifyChanges(curVal, sugVal, curCode, sugCode, curMarc, sugMarc, curCoo, sugCoo, curMod, sugMod)"
+               . "\n{\n   if((curVal == sugVal) && (curCoo == sugCoo) && (curCode == sugCode) && (curMarc == sugMarc) && (curMod == sugMod))\n " 
                . "  {\n   alert('No Change In The Data Has Been Made!  "
                . "Can not Submit.');\n      return false;\n   }\n   "
                . "else\n"   
@@ -177,7 +177,7 @@
             print("0");
          } // END else
          
-         print("'), escape(cookie[i].value))) { submit(); }\">\n</TD>\n"
+         print("'), escape(cookie[i].value), escape('" . ereg_replace("'","\\'",htmlspecialchars($dataRow["modifytext"])) . "'), escape(modifytext.value))) { submit(); }\">\n</TD>\n"
          . "<TD ALIGN='left'>\n<INPUT TYPE='button' VALUE='RESET CHANGES'"
          . " onClick=\"reset();\">\n</TD>\n</TR>\n</TABLE>\n</FORM>\n");
       } // END elseif
@@ -185,9 +185,9 @@
       {
          print("<SCRIPT TYPE='text/javascript'>\n\n<!-" . "- hide\n\n"
                . "function verifyChanges(curSize, sugSize, curMaxlength,"
-               . " sugMaxlength, curCode, sugCode, curMarc, sugMarc, curCoo, sugCoo)"
+               . " sugMaxlength, curCode, sugCode, curMarc, sugMarc, curCoo, sugCoo, curMod, sugMod)"
                . "\n{\n   if((curSize == sugSize) && (curMaxlength == " 
-               . "sugMaxlength) && (curCoo == sugCoo) && (curCode == sugCode) && (curMarc == sugMarc))\n   "
+               . "sugMaxlength) && (curCoo == sugCoo) && (curCode == sugCode) && (curMarc == sugMarc) && (curMod == sugMod))\n   "
                . "{\n   alert('No Change In The Data Has Been Made!  Can"
                . "not Submit.');\n      return false;\n   }\n   else\n"
                . "   {\n      return true;\n   }\n}\n\n// -->"
@@ -216,17 +216,16 @@
             print("0");
          } // END else
        
-         print("'), escape(cookie[i].value))) { submit(); }\">\n</TD>\n"
+         print("'), escape(cookie[i].value), escape('" . ereg_replace("'","\\'",htmlspecialchars($dataRow["modifytext"])) . "'), escape(modifytext.value))) { submit(); }\">\n</TD>\n"
          . "<TD ALIGN='left'>\n<INPUT TYPE='button' VALUE='RESET CHANGES'"
          . " onClick=\"reset();\">\n</TD>\n</TR>\n</TABLE>\n</FORM>\n");
       } // END elseif
       elseif($elementType == "D")
       {
          print("<SCRIPT TYPE='text/javascript'>\n\n<!-" . "- hide\n\n"
-               . "function verifyChanges(curFidesc, sugFidesc, curCode, sugCode, curMarc, sugMarc, curCoo, "  
-               . "sugCoo)"
+               . "function verifyChanges(curFidesc, sugFidesc, curCode, sugCode, curMarc, sugMarc, curCoo, sugCoo, curMod, sugMod)"
                . "\n{\n   if(curFidesc == sugFidesc && curCoo == "
-               . "sugCoo && sugCode == curCode && sugMarc == curMarc)\n   "
+               . "sugCoo && sugCode == curCode && sugMarc == curMarc && sugMod == curMod)\n   "
                . "{\n   alert('No Change In The Data Has Been Made!  Can" 
                . "not Submit.');\n      return false;\n   }\n   else\n"
                . "   {\n      return true;\n   }\n}\n\n// -->"
@@ -255,17 +254,16 @@
             print("0");
          } // END else
       
-         print("'), escape(cookie[i].value))) { submit(); }\">\n</TD>\n"
+         print("'), escape(cookie[i].value), escape('" . ereg_replace("'","\\'",htmlspecialchars($dataRow["modifytext"])) . "'), escape(modifytext.value))) { submit(); }\">\n</TD>\n"
          . "<TD ALIGN='left'>\n<INPUT TYPE='button' VALUE='RESET CHANGES'"
          . " onClick=\"reset();\">\n</TD>\n</TR>\n</TABLE>\n</FORM>\n");
       } // END elseif
       elseif($elementType == "S")
       {
          print("<SCRIPT TYPE='text/javascript'>\n\n<!-" . "- hide\n\n"
-               . "function verifyChanges(curFidesc, sugFidesc, curCode, sugCode, curMarc, sugMarc, curCoo, "  
-               . "sugCoo)"
+               . "function verifyChanges(curFidesc, sugFidesc, curCode, sugCode, curMarc, sugMarc, curCoo, sugCoo, curMod, sugMod)"
                . "\n{\n   if(curFidesc == sugFidesc && curCoo == "
-               . "sugCoo && sugCode == curCode && sugMarc == curMarc)\n   "
+               . "sugCoo && sugCode == curCode && sugMarc == curMarc && sugMod == curMod)\n   "
                . "{\n   alert('No Change In The Data Has Been Made!  Can" 
                . "not Submit.');\n      return false;\n   }\n   else\n"
                . "   {\n      return true;\n   }\n}\n\n// -->"
@@ -294,7 +292,7 @@
             print("0");
          } // END else
       
-         print("'), escape(cookie[i].value))) { submit(); }\">\n</TD>\n"
+         print("'), escape(cookie[i].value), escape('" . ereg_replace("'","\\'",htmlspecialchars($dataRow["modifytext"])) . "'), escape(modifytext.value))) { submit(); }\">\n</TD>\n"
          . "<TD ALIGN='left'>\n<INPUT TYPE='button' VALUE='RESET CHANGES'"
          . " onClick=\"reset();\">\n</TD>\n</TR>\n</TABLE>\n</FORM>\n");
       } // END elseif
@@ -615,12 +613,20 @@
             . $dataRow["alephcode"] . "' SIZE="
             . mysql_field_len($columns, 1) . ">\n</TD>\n</TR>\n";
 
-            # Now make the alephcode field...
+            # Now make the marccode field...
             $tblHead .= "<TR>\n<TH "
             . "BGCOLOR='#87CEFA' ALIGN='right' WIDTH='20%'>\nMarc Code:"
             . "&nbsp;</TH>\n<TD ALIGN='left' BGCOLOR='#FFFFCC' WIDTH='80%"
             . "'><INPUT TYPE='text' NAME='marccode' VALUE='"
             . $dataRow["marccode"] . "' SIZE="
+            . mysql_field_len($columns, 2) . ">\n</TD>\n</TR>\n";
+
+            # Now make the modifytext field...
+            $tblHead .= "<TR>\n<TH "
+            . "BGCOLOR='#87CEFA' ALIGN='right' WIDTH='20%'>\nModification Text:"
+            . "&nbsp;</TH>\n<TD ALIGN='left' BGCOLOR='#FFFFCC' WIDTH='80%"
+            . "'><INPUT TYPE='text' NAME='modifytext' VALUE='"
+            . $dataRow["modifytext"] . "' SIZE="
             . mysql_field_len($columns, 2) . ">\n</TD>\n</TR>\n";
 
             # Now it is possible to show the rest of the data that will be
@@ -1035,7 +1041,7 @@
 
    function displayPage()
    {
-      global $doctype,$update,$rows,$cols,$cookie,$alephcode,$marccode,$type,$size,$maxlength,$fidesc,$name,$subname,$pageNumber,$nPgs,$caller;
+      global $doctype,$update,$rows,$cols,$cookie,$alephcode,$marccode,$type,$size,$maxlength,$fidesc,$name,$subname,$pageNumber,$nPgs,$caller,$modifytext;
 
       # Conduct a test to see if this is the first call to this page, or a
       # recursive call whereby the user is attempting to update the
@@ -1057,34 +1063,34 @@
             # In this case, the element is a <TEXTAREA> element.
 
             $updtStr .="rows = '$rows', cols = '$cols', cookie = "
-                  . "'$cookie', alephcode = '$alephcode', marccode = '$marccode'";
+                  . "'$cookie', alephcode = '$alephcode', marccode = '$marccode', modifytext = '$modifytext'";
          } // END if
          elseif($type == "I")
          {
             # Our item is a normal html text input
             $updtStr .= "size = '$size', maxlength = '$maxlength', val = "
-            . "'$val', cookie = '$cookie', alephcode = '$alephcode', marccode = '$marccode'";
+            . "'$val', cookie = '$cookie', alephcode = '$alephcode', marccode = '$marccode', modifytext = '$modifytext'";
          } // END elseif
          elseif($type == "H")
          {
             # Our item is a hidden input field.
-            $updtStr .= "val = '$val', cookie = '$cookie', alephcode = '$alephcode', marccode = '$marccode'";
+            $updtStr .= "val = '$val', cookie = '$cookie', alephcode = '$alephcode', marccode = '$marccode', modifytext = '$modifytext'";
          } // END elseif
          elseif($type == "F")
          {
             # Our item is a file input type.
             $updtStr .= "size = '$size', maxlength = '$maxlength', cookie"
-            . " = '$cookie', alephcode = '$alephcode', marccode = '$marccode'";
+            . " = '$cookie', alephcode = '$alephcode', marccode = '$marccode', modifytext = '$modifytext'";
          } // END elseif
          elseif($type == "D")
          {
             # Our item is a user defined input type.
-            $updtStr .= "fidesc = '$fidesc', cookie = '$cookie', alephcode = '$alephcode', marccode = '$marccode'";
+            $updtStr .= "fidesc = '$fidesc', cookie = '$cookie', alephcode = '$alephcode', marccode = '$marccode', modifytext = '$modifytext'";
          } // END elseif
          elseif($type == "S")
          {
             # Our item is a select box input type.
-            $updtStr .= "fidesc = '$fidesc', cookie = '$cookie', alephcode = '$alephcode', marccode = '$marccode'";
+            $updtStr .= "fidesc = '$fidesc', cookie = '$cookie', alephcode = '$alephcode', marccode = '$marccode', modifytext = '$modifytext'";
          } // END elseif
          else
          {

@@ -35,7 +35,7 @@
 
    function enterEDSelementDescr($elename = "", $alephcode = "",
        $size = "", $rows = "", $cols = "", $maxlength = "", $val = "",
-       $fidesc = "", $cookie = 0, $type = "")
+       $fidesc = "", $cookie = 0, $type = "", $modifytext = "")
    {
       /*******************************************************************
          This function has the task of creating the form that allows a
@@ -100,8 +100,16 @@
                htmlspecialchars($elename))
       . "'>\n</TD>\n</TR>\n");
 
-      # Make the type field...
+      # Make the modify text field...
+      print("<TR>\n<TH BGCOLOR='#87CEFA' ALIGN='right' WIDTH='20%'>\n"
+      . "Modification Text:&nbsp;</TH>\n<TD ALIGN='left' WIDTH='80%' "
+      . "BGCOLOR='#FFFFCC'>\n<INPUT TYPE='text' NAME='modifytext' SIZE="
+      . mysql_field_len($columns, 0) . " VALUE='"
+      . ereg_replace("'", "&#39;",
+               htmlspecialchars($modifytext))
+      . "'>\n</TD>\n</TR>\n");
 
+      # Make the type field...
       print("<TR>\n<TH BGCOLOR='#87CEFA' ALIGN='right' WIDTH='20%'>\n"
        . "Element Type <EM STYLE=\"font-size: small\">(Req'd)</EM>:&nbsp;"
        . "</TH>\n<TD ALIGN='left' WIDTH='80%' BGCOLOR='#FFFFCC'>\n"
@@ -183,7 +191,7 @@
          # Ensure we dont once again print certain fields
          if(($currentField != "cd") && ($currentField != "md")
             && ($currentField != "name") && ($currentField != "type")
-            && ($currentField != "cookie") && ($currentField != "fddfi1")
+            && ($currentField != "cookie") && ($currentField != "modifytext")
             && ($currentField != "fddfi2"))
          {
             # First display the form field label...
@@ -412,7 +420,7 @@
 
    function displayPage()
    {
-      global $commitElement,$elename,$alephcode,$size,$rows,$cols,$maxlength,$val,$fidesc,$cookie,$type;
+      global $commitElement,$elename,$alephcode,$size,$rows,$cols,$maxlength,$val,$fidesc,$cookie,$type,$modifytext;
 
       if($commitElement)
       {
@@ -435,7 +443,7 @@
 
              enterEDSelementDescr($elename, $alephcode, $size,
                 $rows, $cols, $maxlength, stripslashes($val),
-                               stripslashes($fidesc), $cookie);
+                               stripslashes($fidesc), $cookie, "",$modifytext);
          } // END if
          else
          {
@@ -451,7 +459,7 @@
 
                enterEDSelementDescr($elename, $alephcode, $size,
                   $rows, $cols, $maxlength, stripslashes($val),
-                  stripslashes($fidesc), $cookie, $type);
+                  stripslashes($fidesc), $cookie, $type, $modifytext);
             } // END if
             else
             {
@@ -467,7 +475,7 @@
 
                   enterEDSelementDescr("", $alephcode, $size,   
                      $rows, $cols, $maxlength, stripslashes($val),
-                     stripslashes($fidesc), $cookie, $type);
+                     stripslashes($fidesc), $cookie, $type,$modifytext);
                } // END if
                else
                {
@@ -496,7 +504,7 @@
                            $alephcode,
                            $size, "", $cols, $maxlength,
                            stripslashes($val), stripslashes($fidesc),
-                           $cookie, $type);
+                           $cookie, $type,$modifytext);
                         } // END if
                      } // END if
 
@@ -517,7 +525,7 @@
                            enterEDSelementDescr($elename,
                             $alephcode, $size, $rows, "", $maxlength,
                             stripslashes($val),
-                            stripslashes($fidesc), $cookie, $type);
+                            stripslashes($fidesc), $cookie, $type,$modifytext);
                         } // END if
                      } // END if
 
@@ -530,7 +538,7 @@
 
                         $insStr = "INSERT INTO sbmFIELDDESC (name, alephcode"
                         . ", marccode,  type, size, rows, cols, maxlength, val, "
-                        . "fidesc, cd, md, fddfi1, fddfi2, cookie) VALUES"
+                        . "fidesc, cd, md, modifytext, fddfi2, cookie) VALUES"
                         . "('$elename', '$alephcode', '$marccode', '$type', NULL, ";
 
                         # Deal with rows
@@ -557,8 +565,7 @@
                            $insStr .= "NULL, ";
                         } // END else
 
-                        $insStr .= "NULL, NULL, NULL, '$cd', '$md', NULL,"
-                         . " NULL, '$cookie')";
+                        $insStr .= "NULL, NULL, NULL, '$cd', '$md', ".(isset($modifytext)?"'$modifytext', ":"NULL, ") . " NULL, '$cookie')";
 
                         # Execute the insertion
                         $insRes = mysql_query($insStr);
@@ -602,7 +609,7 @@
                            enterEDSelementDescr($elename,
                             $alephcode, "", $rows, $cols, $maxlength,
                             stripslashes($val), stripslashes($fidesc),
-                            $cookie, $type);
+                            $cookie, $type,$modifytext);
                         } // END if
                      } // END if
 
@@ -622,7 +629,7 @@
                            enterEDSelementDescr($elename,
                             $alephcode, $size, $rows, $cols, "",
                             stripslashes($val), stripslashes($fidesc),
-                            $cookie, $type);
+                            $cookie, $type,$modifytext);
                         } // END if
                      } // END if
 
@@ -635,7 +642,7 @@
 
                         $insStr = "INSERT INTO sbmFIELDDESC (name, alephcode, marccode"
                         . ", type, size, rows, cols, maxlength, val, "
-                        . "fidesc, cd, md, fddfi1, fddfi2, cookie) "
+                        . "fidesc, cd, md, modifytext, fddfi2, cookie) "
                         . "VALUES('$elename', '$alephcode', '$marccode', '$type', ";
 
                         # Deal with size
@@ -676,7 +683,7 @@
                            $insStr .= "NULL, ";
                         } // END else
 
-                        $insStr .= "NULL, '$cd', '$md', NULL, NULL, "
+                        $insStr .= "NULL, '$cd', '$md', ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
                          . "'$cookie')";
 
                         # Execute the insertion
@@ -705,7 +712,7 @@
 
                      $insStr = "INSERT INTO sbmFIELDDESC (name, alephcode, marccode, "
                       . "type, size, rows, cols, maxlength, val, fidesc, "
-                      . "cd, md, fddfi1, fddfi2, cookie) VALUES('"
+                      . "cd, md, modifytext, fddfi2, cookie) VALUES('"
                       . "$elename', '$alephcode', '$marccode', '$type', NULL, NULL, "
                       . "NULL, NULL, ";
 
@@ -721,7 +728,7 @@
                         $insStr .= "NULL, ";
                      } // END else
 
-                     $insStr .= "NULL, '$cd', '$md', NULL, NULL, "
+                     $insStr .= "NULL, '$cd', '$md', ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
                       . "'$cookie')";
 
                      # Execute the insertion
@@ -764,7 +771,7 @@
                            enterEDSelementDescr($elename,
                             $alephcode, "", $rows, $cols, $maxlength,
                             stripslashes($val), stripslashes($fidesc),
-                            $cookie, $type);
+                            $cookie, $type,$modifytext);
                         } // END if
                      } // END if
 
@@ -784,7 +791,7 @@
                            enterEDSelementDescr($elename,
                             $alephcode, $size, $rows, $cols, "",
                             stripslashes($val), stripslashes($fidesc),
-                            $cookie, $type);
+                            $cookie, $type,$modifytext);
                         } // END if
                      } // END if
 
@@ -797,7 +804,7 @@
 
                         $insStr = "INSERT INTO sbmFIELDDESC (name, alephcode"
                         . ", marccode, type, size, rows, cols, maxlength, val, "
-                        . "fidesc, cd, md, fddfi1, fddfi2, cookie) "
+                        . "fidesc, cd, md, modifytext, fddfi2, cookie) "
                         . "VALUES('$elename', '$alephcode', '$marccode', '$type', ";
 
                         # Deal with size
@@ -826,7 +833,7 @@
                            $insStr .= "NULL, ";
                         } // END else
 
-                        $insStr .= "NULL, NULL, '$cd', '$md', NULL, NULL,"
+                        $insStr .= "NULL, NULL, '$cd', '$md', ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL,"
                          . " '$cookie')";
 
                         # Execute the insertion
@@ -855,11 +862,11 @@
 
                      $insStr = "INSERT INTO sbmFIELDDESC (name, alephcode, marccode, "
                       . "type, size, rows, cols, maxlength, val, fidesc, "
-                      . "cd, md, fddfi1, fddfi2, cookie) VALUES('"
+                      . "cd, md, modifytext, fddfi2, cookie) VALUES('"
                       . "$elename', '$alephcode', '$marccode', '$type', NULL, NULL, " 
                       . "NULL, NULL, NULL, ";
 
-                     $insStr .= "'$fidesc', '$cd', '$md', NULL, NULL, "
+                     $insStr .= "'$fidesc', '$cd', '$md', ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
                       . "'$cookie')";
 
                      # Execute the insertion
@@ -887,11 +894,11 @@
 
                      $insStr = "INSERT INTO sbmFIELDDESC (name, alephcode, marccode, "
                       . "type, size, rows, cols, maxlength, val, fidesc, "
-                      . "cd, md, fddfi1, fddfi2, cookie) VALUES('"
+                      . "cd, md, modifytext, fddfi2, cookie) VALUES('"
                       . "$elename', '$alephcode', '$marccode', '$type', NULL, NULL, " 
                       . "NULL, NULL, NULL, ";
 
-                     $insStr .= "'$fidesc', '$cd', '$md', NULL, NULL, "
+                     $insStr .= "'$fidesc', '$cd', '$md', ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
                       . "'$cookie')";
 
                      # Execute the insertion
@@ -919,11 +926,11 @@
 
                      $insStr = "INSERT INTO sbmFIELDDESC (name, alephcode, marccode, "
                       . "type, size, rows, cols, maxlength, val, fidesc, "
-                      . "cd, md, fddfi1, fddfi2, cookie) VALUES('"
+                      . "cd, md, modifytext, fddfi2, cookie) VALUES('"
                       . "$elename', '$alephcode', '$marccode', '$type', NULL, NULL, " 
                       . "NULL, NULL, NULL, ";
 
-                     $insStr .= "'$fidesc', '$cd', '$md', NULL, NULL, "
+                     $insStr .= "'$fidesc', '$cd', '$md', ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
                       . "'$cookie')";
 
                      # Execute the insertion
@@ -958,7 +965,7 @@
                      enterEDSelementDescr($elename, $alephcode,
                        $size, $rows, $cols, $maxlength,
                        stripslashes($val), stripslashes($fidesc),
-                       $cookie);
+                       $cookie,"",$modifytext);
                   } // END else
                } // END else
             } // END else

@@ -61,7 +61,6 @@
 				<LI><SMALL>"Available Actions": Lists all existing actions</SMALL>
 				<LI><SMALL>"Available Javascript Checks": Lists all existing Javascript checking functions.</SMALL>
 				<LI><SMALL>"Available Element Description": Lists all existing html form element descriptions.</SMALL>
-				<LI><SMALL>"Available Modification Texts": Lists all existing modification texts.</SMALL>
 				</UL>
 			<LI>
 			<SMALL>Functions</SMALL>
