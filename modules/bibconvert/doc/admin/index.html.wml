@@ -119,3 +119,10 @@ and see the XML MARC output file.
 <a href="../bibformat/">BibFormat</a>, <a
 href="../bibupload/">BibUpload</a>, and <a
 href="../bibwords/">BibWords</a>.)
+
+<p>Other useful BibConvert configuration examples:
+
+<blockquote>
+<a href="bibtex.cfg">bibtex.cfg</a> -- BibTeX to XML MARC example
+</blockquote>
+
