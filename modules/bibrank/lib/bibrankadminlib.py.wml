@@ -622,7 +622,7 @@ def get_rnk_nametypes():
     
     type = []
     type.append(('ln', 'Long name'))
-    type.append(('sn', 'Short name'))
+    #type.append(('sn', 'Short name'))
     return type
 
 def get_col_nametypes():
@@ -638,9 +638,9 @@ def get_rnk_set(rnkID=''):
     
     try:
         if rnkID:
-            res = run_sql("SELECT id_rnkMETHOD,star_category,hitset from rnkSET WHERE id_rnkMETHOD=%s ORDER BY star_category" % rnkID)
+            res = run_sql("SELECT id_rnkMETHOD,star_category,relevance_data from rnkMETHODDATA WHERE id_rnkMETHOD=%s ORDER BY star_category" % rnkID)
         else:
-            res = run_sql("SELECT id_rnkMETHOD,star_category,hitset from rnkSET order by id_rnkMETHOD,starcategory")
+            res = run_sql("SELECT id_rnkMETHOD,star_category,relevance_data from rnkMETHODDATA order by id_rnkMETHOD,starcategory")
         return res
     except StandardError, e:
         return ()
@@ -697,7 +697,7 @@ def delete_rnk(rnkID):
         res = run_sql("DELETE FROM rnkMETHOD WHERE id=%s" % rnkID)
         res = run_sql("DELETE FROM rnkMETHODNAME WHERE id_rnkMETHOD=%s" % rnkID)
         res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_rnkMETHOD=%s" % rnkID)
-        res = run_sql("DELETE FROM rnkSET WHERE id_rnkMETHOD=%s" % rnkID)
+        res = run_sql("DELETE FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s" % rnkID)
         return (1, "")
     except StandardError, e:
         return (0, e)
