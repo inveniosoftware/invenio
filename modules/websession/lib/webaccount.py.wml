@@ -209,20 +209,19 @@ def perform_set(email,password):
       </body>	
       """%(email,password)
     return text                    				
-		
-##  perform_ask(): ask for the user's email and password, for login into the system
-def perform_ask(referer=''):
-    text = """
-              <p>If you already have an account, please log in by choosing the <strong class=headline>login
-              </strong> button below. <br>"""
+
+##  create_register_page_box(): register a new account
+def create_register_page_box(referer=''):
+
+    text = ""
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1:
-        text += """If you don't own an account yet, please enter the values of your preference and choose the <strong class=headline>register</strong> button."""
+        text += """Please enter the values of your preference and choose the <strong class=headline>register</strong> button."""
         if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
             text += "The account will not be possible to use before it has been verified and activated."  
     elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
         text += """It is not possible to create an account yourself. Contact <a href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a> if you want an account."""
     text += """ 
-              <form method="post" action="../youraccount.py/login">
+              <form method="post" action="../youraccount.py/register">
               <input type="hidden" name="referer" value="%s">
 
               <table>
@@ -245,8 +244,45 @@ def perform_ask(referer=''):
                  <td>
 		 </td>
                 </tr>
+                <tr>""" % (cgi.escape(referer))
+    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1:
+        text += """<td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="register"></code></td>"""
+    text += """</tr>
+              </table>
+              <p><strong>Note:</strong> Please do not use valuable passwords such as your Unix, AFS or NICE passwords with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you for personal services of %s. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.
+           """ % (cdsname)
+    return text
+	
+##  create_login_page_box(): ask for the user's email and password, for login into the system
+def create_login_page_box(referer=''):
+    text = """
+              <p>If you already have an account, please log in by choosing the <strong class=headline>login
+              </strong> button below. <br>"""
+    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1:
+        text += """If you don't own an account yet, please choose the <strong class=headline>register</strong> button."""
+    elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
+        text += """It is not possible to create an account yourself. Contact <a href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a> if you want an account."""
+    text += """ 
+              <form method="post" action="../youraccount.py/login">
+              <input type="hidden" name="referer" value="%s">
+
+              <table>
                 <tr>
-		 <td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>&nbsp;&nbsp;&nbsp;""" % (cgi.escape(referer))
+		 <td align=right><strong>Email address:</strong>
+		 </td>
+                 <td><input type="text" size="25" name="p_email" value=""></td>
+		 <td></td>
+	       </tr>
+	       <tr>
+		 <td align=right><strong>Password:</strong>		
+		</td>
+		<td align=left><input type="password" size="25" name="p_pw" value="">
+		 </td>
+                 <td>
+		 </td>
+                </tr>
+                <tr>
+		 <td align=center colspan=3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>""" % (cgi.escape(referer))
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1:
         text += """<code class=blocknote><input class="formbutton" type="submit" name="action" value="register"></code>"""
     text += """&nbsp;&nbsp;&nbsp;(<a href="./lost">Lost your password?</a>)
@@ -254,7 +290,6 @@ def perform_ask(referer=''):
                 </tr>
               </table>
               <p><strong>Note:</strong> Please do not use valuable passwords such as your Unix, AFS or NICE passwords with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you for personal services of %s. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.
-             </form>
            """ % (cdsname)
     return text
 

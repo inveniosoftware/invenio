@@ -220,11 +220,19 @@ def logout(req, ln=cdslang):
 def login(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
 
     uid = webuser.getUid(req)
-    if action =='login':
-        
+    if action =='register':
+        return page(title="Register",
+                    body=webaccount.create_register_page_box(referer),
+                    navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln), 
+                    description="CDS Personalize, Main page",
+                    keywords="CDS, personalize",
+                    uid=uid,
+                    language=ln,
+                    lastupdated=__lastupdated__)
+    elif action =='login':
        if p_email==None:
            return  page(title="Login",
-                        body=webaccount.perform_ask(referer),
+                        body=webaccount.create_login_page_box(referer),
                         navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
                         description="CDS Personalize, Main page",
                         keywords="CDS, personalize",
@@ -260,30 +268,47 @@ def login(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
                        uid=uid,
                        language=ln,
                        lastupdated=__lastupdated__)
+
+def register(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
+    uid = webuser.getUid(req)
+
+    if p_email==None:
+        return  page(title="Register",
+                     body=webaccount.create_register_page_box(referer),
+                     navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
+                     description="CDS Personalize, Main page",
+                     keywords="CDS, personalize",
+                     uid=uid,
+                     language=ln,
+                     lastupdated=__lastupdated__)
+    
+    mess=""
+    act=""
+    ruid=webuser.registerUser(req,p_email,p_pw)
+    if ruid==1:
+        uid=webuser.update_Uid(req,p_email,p_pw)
+        mess = "Your account has been successfully created."
+        title = "Account created"
+        if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
+            mess += " An email has been sent to the given address with the account information."
+        if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
+            mess += " A second email will be sent when the account has been activated and can be used."
+        else:
+            mess += """ To continue to your account, press <a href="%s/youraccount.py/display?ln=%s">here</a>""" % (weburl, ln)
+    elif  ruid ==-1 :
+        mess ="The user already exists in the database, please try again"
+	act = "register"
+        title = "Register failure"
     else:
-        mess=""
-	act=""
-	ruid=webuser.registerUser(req,p_email,p_pw)
-        if ruid==1:
-		uid=webuser.update_Uid(req,p_email,p_pw)
-                mess = "Your account has been successfully created."
-                if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
-                    mess += " An email has been sent to the given address with the account information."
-                if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
-                    mess += " A second email will be sent when the account has been activated and can be used."
-                else:
-                    mess += """ To continue to your account, press <a href="%s/youraccount.py/display?ln=%s">here</a>""" % (weburl, ln)
-        elif  ruid ==-1 :
-		mess ="The user already exists in the database, please try again"
-		act = "login"
-	else:
-            mess ="Your are not registered into the system please try again"
-       	    act = "login"
-	return page(title="Register failure",
- 	            body=webaccount.perform_back(mess,act),
-                    navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
-                    description="CDS Personalize, Main page",
-                    keywords="CDS, personalize",
-                    uid=uid,
-                    language=ln,
-                    lastupdated=__lastupdated__)
+        mess ="Your are not registered into the system please try again"
+       	act = "register"
+        title = "Register failure"
+
+    return page(title=title,
+ 	        body=webaccount.perform_back(mess,act),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
+                description="CDS Personalize, Main page",
+                keywords="CDS, personalize",
+                uid=uid,
+                language=ln,
+                lastupdated=__lastupdated__)
