@@ -64,10 +64,11 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.8. <a href="#3.8">Modify sort options</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.9. <a href="#3.9">Modify rank options</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.10.<a href="#3.10">Modify output formats</a><br>
-<strong>4. <a href="#4">Run WebColl Daemon</a></strong><br>
-<strong>5. <a href="#5">Edit Search Engine Parameters</a></strong><br>
-<strong>6. <a href="#6">Search Engine Cache</a></strong><br>
-<strong>7. <a href="#7">Additional Information</a></strong><br>
+<strong>4. <a href="#4">Webcoll Status</a></strong><br>
+<strong>4. <a href="#5">Collections Status</a></strong><br>
+<strong>5. <a href="#6">Edit Search Engine Parameters</a></strong><br>
+<strong>6. <a href="#7">Search Engine Cache</a></strong><br>
+<strong>7. <a href="#8">Additional Information</a></strong><br>
 
 <a name="1"></a><h2>1. Overview</h2>
 
@@ -468,12 +469,38 @@ changed using the 'move' arrows.
 modify existing output format, you have to use the <a
 href="<WEBURL>/admin/bibformat/">BibFormat Admin</a> interface.
 
-<a name="4"></a><h2>4. Run WebColl Daemon</h2>
+<a name="4"></a><h2>4. Webcoll Status</h2>
 
-<a name="5"></a><h2>5. Edit Search Engine Parameters</h2>
+Shows when the collections were last updated, and when the collections and indexes are
+scheduled to be updated next time. Also warning messages are shown at the end if needed.
 
-<a name="6"></a><h2>6. Search Engine Cache</h2>
+<a name="5"></a><h2>5. Collections Status</h2>
 
-<a name="7"></a><h2>7. Additional Information</h2>
+Shows a list of all collections, and if there is anything wrong regarding
+configuration of the collections, together with the languages the collection
+name has been translated into.
+<br><br><b>Query:</b><br>
+The Query should be empty if a collection got subcollections, if not, a query is needed.<br>
+<br><b>Subcollections:</b><br>
+A collection which got a query, should not have any subcollections.<br>
+<br><b>Restricted:</b><br>
+A restricted collection can only be accessed by users belonging to the group mentioned.<br>
+<br><b>i8n:</b><br>
+Show which languages this translation has been translated into.<br>
+<br><b>Status:</b><br>
+If no errors was found, "OK" is displayed for each collection, if not, a number and a errormessage 
+is shown.<br>
+1: Query = Collection got query and got subcollections<br>
+2: Query = Collection got no query and no subcollections
+
+
+Show which languages this translation has been translated into.<br>
+
+
+<a name="6"></a><h2>6. Edit Search Engine Parameters</h2>
+
+<a name="7"></a><h2>7. Search Engine Cache</h2>
+
+<a name="8"></a><h2>8. Additional Information</h2>
 
 <a href="<WEBURL>/hacking/websearch/">WebSearch Internals</a>
