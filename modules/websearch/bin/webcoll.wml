@@ -62,7 +62,7 @@ try:
     sys.path.append('%s' % pylibdir)
     from cdsware.config import *
     from cdsware.messages import *
-    from cdsware.search_engine import HitSet, search_pattern
+    from cdsware.search_engine import HitSet, search_pattern, get_modification_date
     from cdsware.search_engine_config import cfg_author_et_al_threshold, cfg_instant_browse, cfg_max_recID, cfg_narrow_search_show_grandsons
     from cdsware.dbquery import run_sql    
 except ImportError, e:
@@ -510,7 +510,7 @@ class Collection:
                                     <thead>
                                      <tr>
                                       <th class="narrowsearchboxheader">
-                                        Latest additions:
+                                        %s
                                       </th>
                                      </tr>
                                     </thead>
@@ -519,11 +519,11 @@ class Collection:
                                       <td class="narrowsearchboxbody">%s</td>
                                      </tr>
                                     <tbody>
-                                   </table>""" % self.create_instant_browse()
+                                   </table>""" % (msg_latest_additions[ln], self.create_instant_browse(ln=ln))
 
         return narrowsearch
 
-    def create_instant_browse(self, rg=cfg_instant_browse):
+    def create_instant_browse(self, rg=cfg_instant_browse, ln=cdslang):
         "Searches database and produces list of last 'rg' records."
         box = ""
         if self.restricted_p():
@@ -532,14 +532,17 @@ class Collection:
             url = "%s/search.py?cc=%s&jrec=%d" % (weburl, urllib.quote_plus(self.name), rg+1)
             if self.nbrecs and self.reclist:
                 # firstly, get last 'rg' records:
-                box += "<ol>"
+                box += """<table class="latestadditionsbox">"""
                 recIDs = Numeric.nonzero(self.reclist._set)
                 for idx in range(self.nbrecs-1, self.nbrecs-rg-1, -1):
                     if idx>=0:
-                        box += """<li><p><small>""" + print_record(recIDs[idx]) + "</small></p>"
-                box += "</ol>"
+                        box += """<tr>
+                                    <td class="latestadditionstimebody">%s</td>
+                                    <td class="latestadditionsrecordbody">%s</td>
+                                  </tr>""" % (get_modification_date(recIDs[idx],fmt="%Y-%m-%d<br>%T"), print_record(recIDs[idx]))
+                box += "</table>"
                 if self.nbrecs > rg:
-                    box += """<div align="right"><small><a href="%s">[&gt;&gt; more]</a></small></div>""" % url
+                    box += """<div align="right"><small><a href="%s&amp;ln=%s">[&gt;&gt; %s]</a></small></div>""" % (url, ln, msg_more[ln])
             else:
                 box += """<small><strong>No records! </strong></small><br> This collection does not contain any document yet."""
         return box
@@ -848,7 +851,7 @@ class Collection:
                        <thead> 
                         <tr>
                           <th class="searchboxheader">
-                            Search options:
+                            %s
                           </th>
                         </tr>
                        </thead>
@@ -857,7 +860,7 @@ class Collection:
                          <td class="searchboxbody">%s</td>
                         </tr>
                        <tbody> 
-                      </table>""" % self.create_searchoptions()
+                      </table>""" % (msg_search_options[ln], self.create_searchoptions())
         if 0:
             # TODO: create published in, if appropriate:
             if self.create_publishedin():
