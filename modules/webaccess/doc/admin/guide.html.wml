@@ -806,10 +806,11 @@ II. Example - connecting role and user</a>
   Here you can administrate the accounts and the access policy for your CDSware installation.
 
   - Access policy:
-    To change the access policy, the access_control_config.py file must be edited manually. You can 
-    edit the access policy level for guest accounts, registered accounts and decide when to warn
-    the owner of the account when something happens with it, either when it is created, deleted or
-    approved. The apache server must be restarted after modifying these settings.
+    To change the access policy, the access_control_config.py file must be edited manually in a 
+    text editor. You can edit the access policy level for guest accounts, registered accounts 
+    and decide when to warn the owner of the account when something happens with it, either when 
+    it is created, deleted or approved. The apache server must be restarted after modifying these 
+    settings.
 
     The two levels for guest account, are:
        0 - Allow guest accounts
@@ -847,15 +848,15 @@ II. Example - connecting role and user</a>
 
 
   - Account overview:
-    Here you find a overview of the number of guest accounts, registered accounts and accounts
+    Here you find an overview of the number of guest accounts, registered accounts and accounts
     awaiting activation, with a link to the activation page.
 
   - Create account:
-    For creating new accounts, email must be unique, if configured to do so, an email will be
-    sent to the given address when account is created.
+    For creating new accounts, the email address must be unique. If configured to do so, an email 
+    will be sent to the given address when an account is created.
 
   - Edit accounts:
-    For activating or rejecting accounts in addition to modify them. An activated account can be
+    For activating or rejecting accounts in addition to modifying them. An activated account can be
     inactivated for a short period of time, but this will not warn the account owner. To find accounts
     enter a part of the email address of the account and then search. This may take some time. If there
     are more than the selected number of accounts per page, you can use the next/prev links to switch
