@@ -134,7 +134,7 @@ when debugging newly created formats.
 </blockquote>
 
 <p>To learn more on BibFormat configuration, you can consult the <a
-href="BibFormatAdminGuide.php">BibFormat Admin Guide</a>.</small>
+href="guide.html">BibFormat Admin Guide</a>.</small>
 
 <h2>Running BibFormat</h2>
 
