@@ -126,7 +126,7 @@ def send_email(req,p_email=None):
            eMsg = "The entered e-mail address is incorrect, please check that it is written correctly (e.g. johndoe@example.com)"
 	   return page(title="Your Account",
                        body=webaccount.perform_emailMessage(eMsg),
-        	       navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+        	       navtrail="""<a class="navtrail" href="%s/youraccount.py/account">Your Account</a>""" % weburl,
                        description="CDS Personalize, Main page",
                        keywords="CDS, personalize",
                        uid=uid)
@@ -134,7 +134,7 @@ def send_email(req,p_email=None):
     server.quit()
     return page(title="Your Account",
                 body=webaccount.perform_emailSent(p_email),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/account">Your Account</a>""" % weburl,
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid)
@@ -143,7 +143,7 @@ def delete(req):
     uid = webuser.getUid(req)	
     return page(title="Delete Account",
                 body=webaccount.perform_delete(),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/account">Your Account</a>""" % weburl,
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid)
@@ -153,7 +153,7 @@ def logout(req):
     uid = webuser.logoutUser(req)
     return page(title="Logout",
                 body=webaccount.perform_logout(req),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/account">Your Account</a>""" % weburl,
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid)
@@ -166,7 +166,7 @@ def login(req,p_email=None,p_pw=None,action='login'):
        if p_email==None:
            return  page(title="Login",
                         body=webaccount.perform_ask(),
-                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                        navtrail="""<a class="navtrail" href="%s/youraccount.py/account">Your Account</a>""" % weburl,
                         description="CDS Personalize, Main page",
                         keywords="CDS, personalize",
                         uid=uid)
@@ -174,12 +174,7 @@ def login(req,p_email=None,p_pw=None,action='login'):
     
        if len(iden)>0:
            uid=webuser.update_Uid(req,p_email,p_pw)
-           return  page(title="Login",
-                        body=webaccount.perform_display(req),
-                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
-                        description="CDS Personalize, Main page",
-                        keywords="CDS, personalize",
-                        uid=uid)
+           return account(req)	
        else:
       	   if webuser.userNotExist(p_email,p_pw) or p_email=='':
                mess ="Your are not logged into the system.User unknown.<BR><BR> if you wish you can login again "
