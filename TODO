@@ -7,6 +7,55 @@ CDSware TODO list
 Suitable for editing with Emacs ToDoo mode, see
 <http://www.emacswiki.org/cgi-bin/wiki/ToDoo>.
 
+* FreeBSD ps patch
+
+> Another patch is for modules/bibsched/bin/bibsched.wml: "ps -C %s o
+> '%%p%%a'" does not exist on FreeBSD, and I have replaced it by "ps
+> -o pid,command | grep %s"
+
+We'll rewrite the offending part.  We've actually been thinking about
+replacing the bibsched daemon behaviour via a more traditional
+``apachectl start/stop'' kind of approach.
+
+* language-dependent BibFormat behaviour
+
+> - le premier concerne la fonction link() dans la définition des
+> formats (BibFormat Admin).  Le paramètre de langue "ln" n'est pas
+> transmis dans l'URL. Ce qui signifie que lorsque tu cliques par
+> exemple sur un auteur pour faire une recherche par auteur, l'URL ne
+> contient pas le paramètre "ln".
+
+Oui, BibFormat a le problème de multilinguisme, car il a été développé
+avant... il faudra que l'on y ajoute la langue comme paramètre dans
+plusieurs endroits.
+
+* collection cache
+
+> URI:
+> http://cdsweb.cern.ch/search.py?sc=1&ln=en&p=slow+ejection&f=title&action=Search+&cc=Articles+%26+Preprints&c=Published+Articles&c=Preprints&c=Theses&c=Reports&c=CERN+Internal+Notes
+> Time: 24/Jun/2004:18:16:53 +0200 Browser: Mozilla/4.0 (compatible;
+> MSIE 6.0; Windows NT 5.0) Client: 137.138.169.154
+> 
+> Please fix, thanks, K.Hübner
+
+The problem is connected to temporary cache.  If it happens again,
+please just try to reload the page after a while.  We'll fix the
+problem to prevent it from happening.
+
+* of=nn for the search engine
+
+On Tue, 22 Jun 2004, pelzer@hbz-nrw.de wrote:
+>> If this is not feasible (e.g. huuuge result sets), then we may
+>> invent another output behaviour, e.g. ``of=nn'' that would return
+>> you only the number of hits, that is ``12'' for the example above.
+> 
+> another output behaviour would be the best solution.
+
+don't you think it's difficult for a user to search with xml output. the user 
+don't see in xml - "mode", how many records are found. i think, it's helpful 
+to write the hit number at the beginning of the first xml data record.
+what do you think about this?
+
 * the Personalization part is not I18N-ized yet, and there are not
   very many personalization options.  We plan to expand it at some
   point in the future, like a possibility to select default
@@ -20,31 +69,8 @@ Suitable for editing with Emacs ToDoo mode, see
    sync;You can't run this command now")
   Received Tue Mar  2 10:22:33 2004
 
-o [simko] language-dependent collection names
-  Received Mon Mar  8 19:22:46 2004
-
-Upon first look I don't see any problem with your setup.  Apart from
-an eventual end-user problem of seeing a collection named ``EPFL
-Library Catalogue'' on the search results page, but when she clicks on
-this collection name the name changes to ``Swiss Federal Institute of
-Technology Lausanne'', which may be confusing.  To avoid this problem,
-we usually call CDSNAME the same way as the collection #1 and the same
-way as the default language of the interface.
-
-Anyhow, this touches clearly a more general problem with translations
-of collection names.  CDSware v0.3.0 now contains a possibility to
-name the same collection in many different languages in a clean way.
-I'll prepare a demo for v0.3.1.  This possibility will solve the above
-mentioned end-user confusion-prone display in a clean way.
-
 o [tibor] in search for ``title: goo'' the space should be ignored
   Received Wed Jan 21 11:09:00 2004
-
-o [tibor] CDSware DEMO formats
-   - picture links should use recid not sysnb
-   - use /search.py  not /search in e.g. citation search links
-   - print creation/modification dates in HTML Detailed format
-  Received Mon Jan 19 10:41:18 2004
 
 o [tibor] RTdata dir should be created during `make install` ?
   Received Mon Jan 19 10:41:18 2004
@@ -89,12 +115,6 @@ in my TODO file to do more investigations.  In any case, you may run
 o [tibor] WebSearch: sort pattern test
   Received Wed Dec 17 16:20:35 2003 
 
-* import/adapt old admin interfaces
-  Received Wed Dec 17 16:20:35 2003 
-
-  Updated Wed May 12 12:01:52 2004 - admin area revisited for v0.3.2,
-  some admin interfaces still to be done (ongoing task)
-
 o [martin] BibConvert: MEDLINE, BibTeX examples
   Received: Wed Dec 17 16:20:35 2003 
   Progress: BibTeX example done, MEDLINE pending
@@ -111,7 +131,7 @@ o [tibor] BibIndex: make our own ACC indexes
   Related to bibXXx table abolition.
   Progress: table structure prepared for v0.3.0
 
-o [tibor] add restricted mode (guest users not allowed)
+* add restricted mode (guest users not allowed)
   On Wed, 17 Mar 2004, Filippos N. Kolovos wrote:
   > 1. Yes, we would like unregistered users not to be able to use AT
   > ALL the search facilities of the system (including the initial
@@ -131,69 +151,27 @@ o [tibor] add restricted mode (guest users not allowed)
   > for example to be able to change only his/her password, but not the
   > username, since we would like to have the control on the usernames
   > of our users
+
+> I would like new users receive a confirmation mail before they can
+> login (and submit documents), as seen in all internet forum systems.
+>
+> I would like to limit registration only to people that has a valid
+> @mydomain.it email address.  
+>
+> It seems to me that there is no way to do this in cdsware 0.3.2, do
+> you have any suggestion?
+
+There is no predefined functionality in CDSware to do these things
+yet.  However, we have had a similar feature request from another
+installation, with an even stronger requirement not to permit guest
+users at all, for example.  It is in our TODO list to introduce a
+flexible user registration system in order to be able to handle
+various open-close usage scenarios.
+
+Note that if you are mostly interested in not letting untrusted people
+submit documents, then you may take advantage of an already existing
+access control mechanism and restrict submission to trusted users
+only, as explained briefly in the WebSubmit Admin Guide at
+<http://cdsware.cern.ch:8000/admin/websubmit/guide/protection.en.html>.
   
-
-DONE
-====
-
-o [tibor] BibSched must use run_sql()
-  Received Fri Jan 16 10:17:11 2004
-  Done Tue Jan 27 16:15:17 2004
-
-o [tibor] Get rid of isolatin stuff (for RH9)
-  Received Thu Jan 15 16:16:49 2004
-  Done Tue Jan 27 16:16:45 2004
-
-o [tibor] BibSched: test periodicity
-  Received Wed Dec 17 16:20:35 2003 
-  Used in production at CERN. 
-  Done Tue Jan 27 16:17:20 2004
-
-o [simko] language-dependent portalboxes 
-  Received Wed Feb 11 12:53:13 2004
-  Done in CDSware v0.3.0
-
-o [tibor] WebSession: garbage collection and guest session check
-  Received Wed Dec 17 16:20:35 2003 
-  Done for v0.3.0
-
-o [thomas] BibUpload: adaptation
-  Received Wed Dec 17 16:20:35 2003 
-  Done for v0.3.0
-
-o [thomas] WebSubmit: adaptation 
-  Received Wed Dec 17 16:20:35 2003 
-  Done for v0.3.0
-
-o [tibor] Admin: HOWTO Run guide 
-  Received Wed Dec 17 16:20:35 2003 
-  Done for v0.3.1
-
-o [tibor] Internal Error exceptions.KeyError 'Articles & Preprints' 
-  ``Fixed'' by restarting Apache.  It appears that you contacted a
-  server process exactly when it was being restarted, as the cache is
-  usually filled upon Apache startup.  I'll have a closer look and fix
-  it properly later.
-  Seems to be connected to the runaway client number problem.
-  Maybe run_sql() should be revised.
-  Received Tue Jan 20 10:56:02 2004
-  
-  Possibly done by improving run_sql() for v0.3.0 and by fixing search
-  cache thingie for v0.3.2
-
-o [tibor] static HTML pages should not get created all languages
-  Static HTML pages should not get created all languages when user
-  selected only some languages in his config.wml.
-  Received Mon Jan 26 19:21:35 2004
-
-  They are now shown only in the language of the installation.
-  And I18N creation is now faster, so I'll keep creating them all.
-  Done for v0.3.2
-
-o [martin] BibConvert: DC2MARC21 
-  Received Wed Dec 17 16:20:35 2003 
-  Progress: DCQ example done, XML OAI DC pending
-  Updated Wed May 12 12:02:18 2004 - done for v0.3.2
-
-
 ;; end of file
