@@ -57,9 +57,9 @@ from messages import *
 from search_engine_config import * 
 from dbquery import run_sql
 from bibrank_record_sorter import get_bibrank_methods,rank_records
-from bibrank_downloads_similarity import get_reading_similarity
+from bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 if cfg_experimental_features:
-    from bibrank_citation_searcher import get_cited_by_list, get_citing_recidrelevance, get_co_cited_with_list
+    from bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
     from bibrank_citation_grapher import create_citation_history_graph_and_box
     from bibrank_downloads_grapher import create_download_history_graph_and_box
 try:
@@ -2711,43 +2711,50 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                         # print similarity boxen:
                         if cfg_experimental_features:
                             req.write("""<table>""")
-                            # citation similarity box:
-                            citing_list = get_cited_by_list(recIDs[irec])
+                            # cited by box:
+                            citing_list = calculate_cited_by_list(recIDs[irec])
                             if citing_list:
                                 req.write("""<tr><td>""")
-                                reclist = get_citing_recidrelevance('cit', citing_list)
-                                reclist.sort(lambda x, y: cmp(x[1], y[1]))                       
-                                list_title ="Cited by: %s records"% len(citing_list)
-                                reclist.reverse()
-                                print_record_list_for_similarity_boxen(req, list_title, reclist)                           
-                                req.write("""&nbsp;<a  href="%s/search.py?p=recid:%d&amp;rm=cit&amp;ln=%s">more</a><br><br>\n""" %  (weburl, recIDs[irec], ln) )
-                                reclist = get_co_cited_with_list(recIDs[irec])
-                                reclist.sort(lambda x, y: cmp(x[1], y[1]))
-                                list_title ="Co-cited with: %s records"% len(reclist)
-                                reclist.reverse()
-                                print_record_list_for_similarity_boxen(req, list_title, reclist)                           
-                                req.write("""&nbsp;<a href="%s/search.py?p=cociting:%d&amp;ln=%s">more</a><br>\n""" %  (weburl, recIDs[irec], ln) )
+                                print_record_list_for_similarity_boxen(req,
+                                                                       "Cited by: %s records" % len(citing_list),
+                                                                       citing_list)                           
+                                req.write("""&nbsp;<a  href="%s/search.py?p=recid:%d&amp;rm=cit&amp;ln=%s">more</a><br><br>\n""" % \
+                                          (weburl, recIDs[irec], ln))
+                                req.write("""</td><tr>""")
+                            # co-cited with box:
+                            co_cited_list = calculate_co_cited_with_list(recIDs[irec])
+                            if co_cited_list:
+                                req.write("""<tr><td>""")
+                                print_record_list_for_similarity_boxen(req,
+                                                                       "Co-cited with: %s records" % len(co_cited_list),
+                                                                       co_cited_list)                           
+                                req.write("""&nbsp;<a href="%s/search.py?p=cocitedwith:%d&amp;ln=%s">more</a><br>\n""" % \
+                                          (weburl, recIDs[irec], ln))
                                 req.write("""</td></tr>""")
+                            # citation history graph:
+                            if citing_list:
                                 req.write("""<tr><td>""")
                                 req.write(create_citation_history_graph_and_box(recIDs[irec]))
                                 req.write("""</td></tr>""")
                             # download similarity box:
-                            download_list = get_reading_similarity(recIDs[irec], "rnkDOWNLOADS")
-                            if download_list:
+                            download_similarity_list = calculate_reading_similarity_list(recIDs[irec], "downloads")
+                            if download_similarity_list:
                                 req.write("""<tr><td>""")
                                 req.write(create_download_history_graph_and_box(recIDs[irec]))
                                 req.write("""</td><tr>""")
                                 req.write("""<tr><td>""")
-                                list_title = "People who downloaded this record also downloaded:"
-                                print_record_list_for_similarity_boxen(req, list_title, download_list)
+                                print_record_list_for_similarity_boxen(req,
+                                                                       "People who downloaded this record also downloaded:",
+                                                                       download_similarity_list)
                                 req.write("""</td></tr>""")
                             req.write("""</table>""")   
                         # print page view similarity box:
-                        page_viewed_list = get_reading_similarity(recIDs[irec], "rnkPAGEVIEWS")
-                        if page_viewed_list:
+                        page_view_similarity_list = calculate_reading_similarity_list(recIDs[irec], "pageviews")
+                        if page_view_similarity_list:
                             req.write("<p>&nbsp;")
-                            list_title = "People who viewed this page also viewed:"
-                            print_record_list_for_similarity_boxen(req, list_title, page_viewed_list)
+                            print_record_list_for_similarity_boxen(req,
+                                                                   "People who viewed this page also viewed:",
+                                                                   page_view_similarity_list)
                     req.write("<p>&nbsp;")
     else:        
         print_warning(req, 'Use different search terms.')        
@@ -3430,10 +3437,9 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             if recidb<=recid: # sanity check
                 recidb=recid+1
             print_records(req, range(recid,recidb), -1, -9999, of, ot, ln)            
-            if req and of.startswith("h"): # record detailed page view event
+            if req and of.startswith("h"): # register detailed record page view event
                 client_ip_address = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
-                run_sql("INSERT INTO rnkPAGEVIEWS (id_bibrec,id_user,client_host,view_time) VALUES (%s,%s,INET_ATON(%s),NOW())",
-                        (recid, uid, client_ip_address))
+                register_page_view_event(recid, uid, client_ip_address)
         else: # record does not exist
             if of.startswith("h"):
                 print_warning(req, "Requested record does not seem to exist.")
@@ -3494,35 +3500,34 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 if of == "id":
                     return []
 
-    elif cfg_experimental_features and p.startswith("cociting:"):
+    elif cfg_experimental_features and p.startswith("cocitedwith:"):
         ## 3-terter - cited by search needed
         page_start(req, of, cc, as, ln, uid, msg_search_results[ln]) 
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
-        recID = p[7:]
+        recID = p[12:]
         if record_exists(recID) != 1:
             # record does not exist
             if of.startswith("h"):
-                print_warning(req, "***Requested record does not seem to exist.")
+                print_warning(req, "Requested record does not seem to exist.")
             if of == "id":
                 return []
         else:
-            # record well exists, so find citing ones
+            # record well exists, so find co-cited ones:
             t1 = os.times()[4]
-            results_citing_recIDs = get_co_cited_with_list(int(recID))
-            #results_citing_recIDs = [1, 2, 3, 5, 8]
-            if results_citing_recIDs:
+            results_cocited_recIDs = map(lambda x: x[0], calculate_co_cited_with_list(int(recID)))
+            if results_cocited_recIDs:
                 t2 = os.times()[4]
                 cpu_time = t2 - t1
                 if of.startswith("h"):
-                    req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, cdsname, len(results_citing_recIDs),
+                    req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, cdsname, len(results_cocited_recIDs),
                                                 jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                 sc, pl_in_url,
                                                 d1y, d1m, d1d, d2y, d2m, d2d, cpu_time))
-                    print_records(req, results_citing_recIDs, jrec, rg, of, ot, ln)
+                    print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln)
                 elif of=="id":
-                    return results_citing_recIDs
+                    return results_cocited_recIDs
             else:
                 # cited rank_records failed and returned some error message to display:
                 if of.startswith("h"):
@@ -3743,6 +3748,11 @@ def perform_request_cache(req, action="show"):
     """Manipulates the search engine cache."""
     global search_cache
     global collection_reclist_cache
+    global collection_reclist_cache_timestamp
+    global field_i18nname_cache
+    global field_i18nname_cache_timestamp
+    global collection_i18nname_cache
+    global collection_i18nname_cache_timestamp
     req.content_type = "text/html"
     req.send_http_header() 
     out = ""
