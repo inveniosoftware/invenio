@@ -20,6 +20,8 @@
 
 """CDSware Search Engine in mod_python."""
 
+__lastupdated__ = """<: print `date +"%d %b %Y %H:%M:%S %Z"`; :>"""
+
 <protect> ## okay, rest of the Python code goes below #######
 
 __version__ = "$Id$"
@@ -314,7 +316,7 @@ def page_end(req, of="hb"):
     "End page according to given output format: e.g. close XML tags, add HTML footer, etc."
     if of.startswith('h'):
         req.write("""</div>""") # pagebody end
-        req.write(pagefooteronly())
+        req.write(pagefooteronly(lastupdated=__lastupdated__))
     elif of.startswith('x'):
         req.write("""</collection>\n""")
     if of == "id":

@@ -88,13 +88,17 @@ def index(req, c=cdsname, as="0", verbose="1"):
         fp = open("%s/collections/%d/portalbox-rb.html" % (cachedir, collid), "r")
         c_portalbox_rb = fp.read()
         fp.close()
+        fp = open("%s/collections/%d/last-updated.html" % (cachedir, collid), "r")
+        c_last_updated = fp.read()
+        fp.close()
         return page(title=c,
                     body=c_body,
                     navtrail=c_navtrail,
                     description="CERN Document Server - %s" % c,
                     keywords="CDS, CDSware, %s" % c,
                     uid=uid,
-                    cdspagerightstripeadd=c_portalbox_rt)
+                    cdspagerightstripeadd=c_portalbox_rt,
+                    lastupdated=c_last_updated)
     except:        
         if verbose >= 9:
             req.write("<br>c=%s" % c)
