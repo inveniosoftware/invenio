@@ -423,6 +423,126 @@ a.navtrail:hover {
    background: #fff;
    padding: 2px;
 }
+.admintext {
+   color: #000;
+   background: transparent;
+   padding: 1px;
+   margin-top: 5px;
+   margin-bottom: 5px;
+   margin-left: 60px;
+   margin-right: 60px;
+   border-spacing: 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #36c;
+}
+.admintextarea {
+   color: #000;
+   background: transparent;
+   padding: 1px;
+   margin-top: 5px;
+   margin-bottom: 5px;
+   margin-left: 60px;
+   margin-right: 60px;
+   border-spacing: 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #36;
+}
+.adminpassword {
+   color: #000;
+   background: transparent;
+   width: 200px;
+   padding: 1px;
+   margin-top: 5px;
+   margin-bottom: 5px;
+   margin-left: 60px;
+   margin-right: 60px;
+   border-spacing: 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #36c;
+}
+.adminselect {
+   color: #000;
+   background: #fff;
+   width: 200px;
+   padding: 1px;
+   margin-top: 5px;
+   margin-bottom: 5px;
+   margin-left: 60px;
+   margin-right: 60px;
+   border-spacing: 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #36;
+}
+.admindropdown {
+   color: #000;
+   background: #fff;
+   padding: 1px;
+   width: 200px;
+   margin-top: 5px;
+   margin-bottom: 5px;
+   margin-left: 60px;
+   margin-right: 60px;
+   border-spacing: 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #36;
+}
+.adminboxheader {
+   color: #000;
+   background: #f1f1f1;
+   padding: 3px;
+   border-spacing: 0px;
+   font-size: small;
+   text-align: left;
+}
+.adminboxbody {
+   color: #000;
+   background: transparent;
+   padding: 3px;
+   font-size: normal;
+}
+.adminboxbody td {
+   vertical-align: top;
+}
+.adminbutton {
+   color: #fff;
+   background: #36c;
+   font-weight: bold;
+   margin-top: 5px;
+   margin-bottom: 5px;
+   margin-left: 10px;
+   margin-right: 10px;
+   border-spacing: 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #36c;
+}
+.adminlabel {
+   width: 100px;
+   font-size: x-small;
+   background: #f1f1f1;
+   
+}
+.admintable {
+   margin-top: 10px;
+   color: #000;
+   background: transparent;
+   padding: 1px;
+   border-spacing: 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #36c;
+}
+.admintableheader {
+   font-size: small;
+   color: #000;
+   background: #f1f1f1;
+   border-spacing: 0px;
+   margin: 0px;
+   padding: 3px 5px;
+}
+.admintabledata {
+   font-size: small;
+   padding: 0px 10px;
+   text-align: center;
+}
 .googlebox {
    color: #000;
    background: #fff;
