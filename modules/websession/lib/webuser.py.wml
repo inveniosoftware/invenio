@@ -78,7 +78,8 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail=''):
 
     return page(title=title,
                 uid=getUid(req),
-                body=body)
+                body=body,
+                navtrail=navtrail)
         
 def getUid (req):
     """It gives the userId taking it from the cookie of the request,also has the control mechanism for the guest users,
