@@ -139,9 +139,9 @@ def create_matchtype_box(name='m', value=''):
     <select name="%s">
     <option value="a"%s>All of the words:
     <option value="o"%s>Any of the words:
-    <option value="p"%s>Phrase/substring:
+    <option value="e"%s>Exact phrase:
+    <option value="p"%s>Partial phrase:
     <option value="r"%s>Regular expression:
-    <option value="e"%s>Exact value:
     </select>
     """ % (name, is_selected('a', value), is_selected('o', value), is_selected('p', value), 
                  is_selected('r', value), is_selected('e', value))
@@ -665,9 +665,11 @@ class Collection:
             # no 'search within' fields are defined for this collection, so propose default ones:
             out += """<option value="title"%s>title""" % is_selected("title", value)
             out += """<option value="author"%s>author""" % is_selected("author", value)
-            out += """<option value="abstract"%s>abstract""" % is_selected("abstract", value)
+            if not cfg_cern_site:
+                out += """<option value="abstract"%s>abstract""" % is_selected("abstract", value)
+                out += """<option value="keyword"%s>keyword""" % is_selected("keyword", value)                
             out += """<option value="reportnumber"%s>report number""" % is_selected("reportnumber", value)
-            out += """<option value="keyword"%s>keyword""" % is_selected("keyword", value)
+            out += """<option value="year"%s>year""" % is_selected("year", value)
         out += """</select>""" 
         return out
 
