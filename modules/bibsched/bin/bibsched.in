@@ -114,9 +114,6 @@ def get_output_channelnames(task_id):
 class Manager:
     def __init__(self):
         self.helper_modules = cfg_valid_processes
-        self.db = MySQLdb.connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
-        self.cursor = self.db.cursor()
-        self.cursor_bis = self.db.cursor()
         self.running = 1
         self.footer_move_mode = "[KeyUp/KeyDown Move] [M Select mode] [Q Quit]"
         self.footer_auto_mode = "[A Manual mode] [1/2 Display Type] [Q Quit]"
@@ -142,10 +139,10 @@ class Manager:
         if chr == -1:
             return
         if self.auto_mode and (chr not in (curses.KEY_UP,curses.KEY_DOWN,curses.KEY_PPAGE,curses.KEY_NPAGE,ord("q"),ord("Q"),ord("a"),ord("A"),ord("1"),ord("2"))):
-            self.put_footer("in automatic mode")
+            self.display_in_footer("in automatic mode")
             self.stdscr.refresh()
         elif self.move_mode and (chr not in (curses.KEY_UP,curses.KEY_DOWN,ord("m"),ord("M"),ord("q"),ord("Q"))):
-            self.put_footer("in move mode")
+            self.display_in_footer("in move mode")
             self.stdscr.refresh()
         else:
             if chr == curses.KEY_UP:
@@ -193,12 +190,12 @@ class Manager:
                 self.display = 1
                 self.first_visible_line = 0
                 self.selected_line = 2
-                self.put_footer("only done processes are displayed")
+                self.display_in_footer("only done processes are displayed")
             elif chr == ord("2"):
                 self.display = 2
                 self.first_visible_line = 0
                 self.selected_line = 2
-                self.put_footer("only not done processes are displayed")
+                self.display_in_footer("only not done processes are displayed")
             elif chr in (ord("q"), ord("Q")):
                 if curses.panel.top_panel() == self.panel:
                     self.panel.bottom()
@@ -208,12 +205,10 @@ class Manager:
                     return
 
     def set_status(self, id, status):
-        update_query = "UPDATE schTASK set status='%s' WHERE id='%d'" % (status, id)
-        self.cursor.execute( update_query )
+        return run_sql("UPDATE schTASK set status=%s WHERE id=%s", (status, id))
         
     def set_progress(self, id, progress):
-        update_query = "UPDATE schTASK set progress='%s' WHERE id='%d'" % (progress, id)
-        self.cursor.execute( update_query )
+        return run_sql("UPDATE schTASK set progress=%s WHERE id=%s", (progress, id))
         
     def openlog(self):
         self.win = curses.newwin( self.height-2, self.width-2, 1, 1 )
@@ -225,13 +220,13 @@ class Manager:
         curses.panel.update_panels()
 
     def count_processes(self,status):
-        query = "SELECT COUNT(id) FROM schTASK WHERE status='%s' GROUP BY status" % status
-        self.cursor.execute(query)
-        row = self.cursor.fetchone()
-        if row:
-            return row[0]
-        else:
-            return 0
+        out = 0
+        res = run_sql("SELECT COUNT(id) FROM schTASK WHERE status=%s GROUP BY status", (status,))
+        try:
+            out = res[0][0]
+        except:
+            pass
+        return out
 
     def wakeup(self):
         id = self.currentrow[0]
@@ -242,14 +237,14 @@ class Manager:
         else:
             arg2 = ""
         if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
-            self.put_footer("a process is already running!")
+            self.display_in_footer("a process is already running!")
         elif status == "SLEEPING":
             mypid = get_my_pid(process,"%s%s" % (arg2, str(id)))
             if mypid!=0:
                 os.kill(mypid, signal.SIGCONT)
-            self.put_footer("process woken up")
+            self.display_in_footer("process woken up")
         else:
-            self.put_footer("process is not sleeping")
+            self.display_in_footer("process is not sleeping")
         self.stdscr.refresh()
 
     def run(self):
@@ -258,7 +253,7 @@ class Manager:
         status = self.currentrow[5]
         sleeptime = self.currentrow[4]
         if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
-            self.put_footer("a process is already running!")
+            self.display_in_footer("a process is already running!")
         elif status == "STOPPED" or status == "WAITING":
             if process in self.helper_modules:
                 program=os.path.join( bindir, process )
@@ -272,12 +267,11 @@ class Manager:
                 Log("manually running task #%d (%s)" % (id, process))
                 if sleeptime:
                     next_runtime=get_datetime(sleeptime)
-                    insert_query="""INSERT INTO schTASK(
-                    proc, user, runtime, sleeptime, arguments, status)
-                    VALUES ('%s','%s','%s','%s','%s','WAITING')""" % (process,self.currentrow[2], MySQLdb.escape_string(next_runtime),sleeptime,self.currentrow[7])
-                    self.cursor.execute(insert_query)
+                    run_sql("INSERT INTO schTASK (proc, user, runtime, sleeptime, arguments, status) "\
+                            " VALUES (%s,%s,%s,%s,%s,'WAITING')",
+                            (process,self.currentrow[2], next_runtime,sleeptime,self.currentrow[7]))
         else:
-            self.put_footer("process status should be STOPPED or WAITING!")
+            self.display_in_footer("process status should be STOPPED or WAITING!")
         self.stdscr.refresh()
 
     def sleep(self):
@@ -289,15 +283,15 @@ class Manager:
         else:
             arg2 = ""
         if status!='RUNNING' and status!='CONTINUING':
-            self.put_footer("this process is not running!")
+            self.display_in_footer("this process is not running!")
         else:
             mypid = get_my_pid(process,"%s%s" % (arg2, str(id)))
             if mypid!=0:
                 os.kill(mypid, signal.SIGUSR1)
-                self.put_footer("SLEEP signal sent to process #%s" % mypid)
+                self.display_in_footer("SLEEP signal sent to process #%s" % mypid)
             else:
                 self.set_status(id,'STOPPED')
-                self.put_footer("cannot find process...")
+                self.display_in_footer("cannot find process...")
         self.stdscr.refresh()
         
     def kill(self):
@@ -312,10 +306,10 @@ class Manager:
         if mypid!=0:
             os.kill(mypid, signal.SIGKILL)
             self.set_status(id,'STOPPED')
-            self.put_footer("KILL signal sent to process #%s" % mypid)
+            self.display_in_footer("KILL signal sent to process #%s" % mypid)
         else:
             self.set_status(id,'STOPPED')
-            self.put_footer("cannot find process...")
+            self.display_in_footer("cannot find process...")
         self.stdscr.refresh()
     
     def stop(self):
@@ -329,10 +323,10 @@ class Manager:
         mypid = get_my_pid(process,"%s%s" % (arg2, str(id)))
         if mypid!=0:
             os.kill(mypid, signal.SIGINT)
-            self.put_footer("INT signal sent to process #%s" % mypid)
+            self.display_in_footer("INT signal sent to process #%s" % mypid)
         else:
             self.set_status(id,'STOPPED')
-            self.put_footer("cannot find process...")
+            self.display_in_footer("cannot find process...")
         self.stdscr.refresh()
     
     def delete(self):
@@ -341,10 +335,10 @@ class Manager:
         status = self.currentrow[5]
         if status!='RUNNING' and status!='CONTINUING' and status!='SLEEPING':
             self.set_status(id,"%s_DELETED" % status)
-            self.put_footer("process deleted")
-            self.selected_line = max(self.selected_line - 1, 2)
+            self.display_in_footer("process deleted")
+            self.selected_line = max(self.selected_line, 2)
         else:
-            self.put_footer("cannot delete running processes")
+            self.display_in_footer("cannot delete running processes")
         self.stdscr.refresh()
     
     def init(self):
@@ -354,9 +348,9 @@ class Manager:
         if status!='RUNNING' and status!='CONTINUING' and status!='SLEEPING':
             self.set_status(id,"WAITING")
             self.set_progress(id,"None")
-            self.put_footer("process initialised")
+            self.display_in_footer("process initialised")
         else:
-            self.put_footer("cannot initialise running processes")
+            self.display_in_footer("cannot initialise running processes")
         self.stdscr.refresh()
 
     def change_select_mode(self):
@@ -365,7 +359,7 @@ class Manager:
         else:
             status = self.currentrow[5]
             if status in ( "RUNNING" , "CONTINUING" , "SLEEPING" ):
-                self.put_footer("cannot move running processes!")
+                self.display_in_footer("cannot move running processes!")
             else:
                 self.move_mode = 1
         self.stdscr.refresh()
@@ -376,7 +370,7 @@ class Manager:
                 os.kill(self.bibsched_daemon_id,signal.SIGKILL)
                 Log("daemon stopped")
             else:
-                self.put_footer('Cannot find daemon process')
+                self.display_in_footer('Cannot find daemon process')
             self.auto_mode = 0
         else:
             program = os.path.join( bindir, "bibsched")
@@ -388,11 +382,11 @@ class Manager:
         self.stdscr.refresh()
 
     def move_up(self):
-        self.put_footer("not implemented yet")
+        self.display_in_footer("not implemented yet")
         self.stdscr.refresh()
 
     def move_down(self):
-        self.put_footer("not implemented yet")
+        self.display_in_footer("not implemented yet")
         self.stdscr.refresh()
     
     def put_line(self, row):
@@ -437,7 +431,7 @@ class Manager:
         self.stdscr.addnstr(self.y, 0, myline, maxx, attr)
         self.y = self.y+1
 
-    def put_footer(self, footer, i = 0):
+    def display_in_footer(self, footer, i = 0):
         maxx = self.stdscr.getmaxyx()[1]
         footer = footer.ljust(maxx)
         if self.auto_mode:
@@ -465,11 +459,11 @@ class Manager:
             self.put_line( row )
         self.y = self.stdscr.getmaxyx()[0] - 1
         if self.auto_mode:
-            self.put_footer(self.footer_auto_mode)
+            self.display_in_footer(self.footer_auto_mode)
         elif self.move_mode:
-            self.put_footer(self.footer_move_mode)
+            self.display_in_footer(self.footer_move_mode)
         else:
-            self.put_footer(self.footer_select_mode)
+            self.display_in_footer(self.footer_select_mode)
             footer2 = ""
             if self.item_status == "DONE" or self.item_status == "ERROR" or self.item_status == "STOPPED":
                  footer2 += self.footer_stopped_item
@@ -479,7 +473,7 @@ class Manager:
                  footer2 += self.footer_sleeping_item
             elif self.item_status == "WAITING":
                  footer2 += self.footer_waiting_item
-            self.put_footer(footer2,1)
+            self.display_in_footer(footer2,1)
         self.stdscr.refresh()
         
     def start(self, stdscr):
@@ -509,9 +503,8 @@ class Manager:
         else:
             where = "and status!='DONE'"
             order = "ASC"
-        query = "SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK WHERE status NOT LIKE '%%DELETED%%' %s order by runtime %s" % (where,order)
-        self.cursor.execute(query)
-        self.rows = self.cursor.fetchall()
+        self.rows = run_sql("SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK "\
+                            " WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s" % (where,order))
         self.repaint()
         while self.running:
             time.sleep( 0.1 )
@@ -523,9 +516,8 @@ class Manager:
                 else:
                     where = "and status!='DONE'"
                     order = "ASC"
-                query = "SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK WHERE status NOT LIKE '%%DELETED%%' %s order by runtime %s" % (where,order)
-                self.cursor.execute(query)
-                self.rows = self.cursor.fetchall()
+                self.rows = run_sql("SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK "\
+                                    " WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s" % (where,order))
                 ring = 0
                 self.repaint()
             else:
@@ -535,9 +527,6 @@ class Manager:
 class BibSched:
     def __init__(self):
         self.helper_modules = cfg_valid_processes
-        self.db = MySQLdb.connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
-        self.cursor = self.db.cursor()
-        self.cursor_bis = self.db.cursor()
         self.running = {}
         self.sleep_done = {}
         self.sleep_sent ={}
@@ -545,20 +534,20 @@ class BibSched:
         self.suicide_sent = {}
         
     def set_status(self, id, status):
-        update_query = "UPDATE schTASK set status='%s' WHERE id='%d'" % (status, id)
-        self.cursor.execute( update_query )
+        return run_sql("UPDATE schTASK set status=%s WHERE id=%s", (status, id))
         
     def can_run( self, proc ):
         return len( self.running.keys() ) == 0
     
     def get_running_processes(self):
-        query = "SELECT id,proc,user,UNIX_TIMESTAMP(runtime),sleeptime,arguments,status FROM schTASK WHERE status='RUNNING' or status='CONTINUING' LIMIT 1"
-        self.cursor.execute(query)
-        row = self.cursor.fetchone()
-        if row:
-            return row
-        else:
-            return 0
+        row = None
+        res = run_sql("SELECT id,proc,user,UNIX_TIMESTAMP(runtime),sleeptime,arguments,status FROM schTASK "\
+                      " WHERE status='RUNNING' or status='CONTINUING' LIMIT 1")
+        try:
+            row = res[0]
+        except:
+            pass
+        return row
 
     def handle_row( self, row ):
         id,proc,user,runtime,sleeptime,arguments,status = row
@@ -610,10 +599,9 @@ class BibSched:
                 self.running[id] = get_my_pid(proc,"%s%s" % (arg2, str(id)))
             if sleeptime:
                 next_runtime=get_datetime(sleeptime)
-                insert_query="""INSERT INTO schTASK(
-                proc, user, runtime, sleeptime, arguments, status)
-                VALUES ('%s','%s','%s','%s','%s','WAITING')""" % (proc,user, MySQLdb.escape_string(next_runtime),sleeptime,arguments)
-                self.cursor.execute(insert_query)
+                run_sql("INSERT INTO schTASK (proc, user, runtime, sleeptime, arguments, status) "\
+                        " VALUES (%s,%s,%s,%s,%s,'WAITING')",
+                        (proc, user, next_runtime, sleeptime, arguments))
                 
     def watch_loop(self):
         running_process = self.get_running_processes()
@@ -628,16 +616,12 @@ class BibSched:
             	self.running[id] = get_my_pid(proc,"%s%s" % (arg2, str(id)))
             else:
                 self.set_status(id,"ERROR")
-        query="""SELECT id,proc,user,UNIX_TIMESTAMP(runtime),sleeptime,
-        arguments,status FROM schTASK order by runtime asc"""
-        self.cursor.execute(query)
-        rows=self.cursor.fetchall()
+        rows = []
         while 1:
             for row in rows:
                 self.handle_row( row )
             time.sleep( 1 )
-            self.cursor.execute(query)
-            rows=self.cursor.fetchall()
+            rows = run_sql("SELECT id,proc,user,UNIX_TIMESTAMP(runtime),sleeptime,arguments,status FROM schTASK ORDER BY runtime ASC")
 
 def Log(message):
     log=open(logdir + "/bibsched.log","a")
