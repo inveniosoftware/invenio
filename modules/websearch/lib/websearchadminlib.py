@@ -1726,6 +1726,10 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
 
     fin_output = ""
     output = ""
+    if not col_dict.has_key(1):
+        fin_output += """<b><span class="info">Before collections can be created, a root collection must be given.</span></b><br>"""
+        fin_output += perform_addcollection(colID=colID, ln=ln, callback='')
+        return fin_output
  
     if mtype == "perform_addcollection":
         fin_output += content
@@ -2450,7 +2454,11 @@ def add_col(colNAME, dbquery, rest):
 
     try:
         rtype = get_col_nametypes()[0][0]
-        sql = "INSERT INTO collection(name,dbquery,restricted) VALUES('%s'" % MySQLdb.escape_string(colNAME)
+        colID = run_sql("SELECT id FROM collection WHERE id=1")
+        if colID:
+            sql = "INSERT INTO collection(name,dbquery,restricted) VALUES('%s'" % MySQLdb.escape_string(colNAME)
+        else:
+            sql = "INSERT INTO collection(id,name,dbquery,restricted) VALUES(1,'%s'" % MySQLdb.escape_string(colNAME)
         if dbquery:
             sql += ",'%s'" % MySQLdb.escape_string(dbquery)
         else:
