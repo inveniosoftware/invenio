@@ -1096,6 +1096,8 @@ def get_tags(config):
     tags = []
     function = config.get("rank_method","function")
     i = 1
+    shown_error = 0
+  
     try:
         while config.has_option(function,"tag%s"% i):
             tag = config.get(function, "tag%s" % i)
@@ -1110,10 +1112,13 @@ def get_tags(config):
                 if tag[2] and tag[2] != "none" and languages.has_key(tag[2]) and config.get(function,"stem_if_avail") == "yes" and not stemmer.has_key(tag[2]): 
                     stemmer[tag[2]] = Stemmer.Stemmer(languages[tag[2]])
                     if options["verbose"] >=9:
-                        write_message("Stemmer for language %s initiated" % tag[2])
-            except Exception:
-                write_message("PyStemmer not found. May cause lower rank precision.")
-                write_message("Continuing anyway. To enable stemming, check INSTALL.")
+                        write_message("Stemmer for language '%s' initiated" % tag[2])
+                elif tag[2] != "none" and config.get(function,"stem_if_avail") == "yes" and not stemmer.has_key(tag[2]):
+                    write_message("Warning: Language '%s' not available in PyStemmer." % tag[2])
+            except NameError:
+                if shown_error = 0:
+                    write_message("Warning: PyStemmer not found. Please read INSTALL.")
+                    shown_error = 1
             tags.append(tag)
             i += 1
     except Exception:
