@@ -348,7 +348,8 @@ def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_
     # year
     box += """<select name="%sy">""" % name
     box += """<option value="">%s""" % msg_any_year[ln]
-    for year in range(1980,2004):
+    this_year = int(time.strftime("%Y", time.localtime()))
+    for year in range(this_year-20, this_year+1):
         box += """<option value="%d"%s>%d""" % (year, is_selected(year, selected_year), year)
     box += """</select>"""        
     return box
