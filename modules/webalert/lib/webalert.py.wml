@@ -32,11 +32,12 @@
 pylibdir = "<LIBDIR>/python"
 
 try:
+    import cgi
+    import string
     import sys
     import time
-    import zlib
     import urllib
-    import time
+    import zlib
     sys.path.append('%s' % pylibdir)
     from config import *
     from webpage import page
@@ -51,6 +52,33 @@ except ImportError, e:
 
 ### IMPLEMENTATION
 
+def get_textual_query_info_from_urlargs(urlargs):
+    """Return nicely formatted search pattern and catalogue from urlargs of the search query.
+    Suitable for 'your searches' display."""
+    out = ""
+    args = cgi.parse_qs(urlargs)
+    if args.has_key('p'):
+        out += "<strong>Pattern:</strong> " + string.join(args['p'], "; ") + "<br>"
+    if args.has_key('f'):
+        out += "<strong>Field:</strong> " + string.join(args['f'], "; ") + "<br>"
+    if args.has_key('p1'):
+        out += "<strong>Pattern 1:</strong> " + string.join(args['p1'], "; ") + "<br>"
+    if args.has_key('f1'):
+        out += "<strong>Field 1:</strong> " + string.join(args['f1'], "; ") + "<br>"
+    if args.has_key('p2'):
+        out += "<strong>Pattern 2:</strong> " + string.join(args['p2'], "; ") + "<br>"
+    if args.has_key('f2'):
+        out += "<strong>Field 2:</strong> " + string.join(args['f2'], "; ") + "<br>"
+    if args.has_key('p3'):
+        out += "<strong>Pattern 3:</strong> " + string.join(args['p3'], "; ") + "<br>"
+    if args.has_key('f3'):
+        out += "<strong>Field 3:</strong> " + string.join(args['f3'], "; ") + "<br>"
+    if args.has_key('c'):
+        out += "<strong>Collections:</strong> " + string.join(args['c'], "; ") + "<br>"
+    elif args.has_key('cc'):
+        out += "<strong>Collection:</strong> " + string.join(args['cc'], "; ") + "<br>"
+    return out
+
 # perform_display(): display the searches performed by the current user
 # input:  default permanent="n"; permanent="y" display permanent queries(most popular) 
 # output: list of searches in formatted html
@@ -62,14 +90,14 @@ def perform_display(permanent,uid):
 
     # query the database
     if permanent=="n":
-        SQL_query = "SELECT q.id,q.pattern,q.base,q.url, DATE_FORMAT(uq.date,'%%d %%b %%Y<BR>%%H:%%i') "\
+        SQL_query = "SELECT q.id,q.urlargs, DATE_FORMAT(uq.date,'%%d %%b %%Y<BR>%%H:%%i') "\
                     "FROM query q, user_query uq "\
                     "WHERE uq.id_user='%s' "\
                     "AND uq.id_query=q.id "\
                     "ORDER BY uq.date DESC" % id_user
     else:
         # permanent="y"
-        SQL_query = "SELECT q.id,q.pattern,q.base,q.url "\
+        SQL_query = "SELECT q.id,q.urlargs "\
                     "FROM query q "\
                     "WHERE q.type='p'"        
     query_result = run_sql(SQL_query)    
@@ -86,7 +114,7 @@ def perform_display(permanent,uid):
         # display the list of searches
         out += """<TABLE border="1" cellspacing="0" cellpadding="3" width="100%">\n"""
         # no, pattern, catalogue, action, date
-        out += """<TR class="pageboxlefttop"><TD><B>No</B></TD><TD><B>Pattern</B></TD><TD><B>Catalogue</B></TD>"""\
+        out += """<TR class="pageboxlefttop"><TD><B>No</B></TD><TD><B>Query</B></TD>"""\
                """<TD><B>Action</B></TD>"""
         if permanent=="n":
             out += """<TD><B>Date</B></TD>"""
@@ -97,11 +125,10 @@ def perform_display(permanent,uid):
             # id, pattern, base, search url and search set alert, date
             out += """<TR><TD><I>#%d</I></TD>"""\ 
                    """<TD>%s</TD>"""\
-                   """<TD>%s</TD>"""\
-                   """<TD><A href="%s">Execute&nbsp;search</A><BR><A href="./input_alert?idq=%d">Set&nbsp;new&nbsp;alert</A></TD>"""\
-                   % (i, row[1], row[2], row[3], row[0])
+                   """<TD><A href="%s/search.py?%s">Execute&nbsp;search</A><BR><A href="./input_alert?idq=%d">Set&nbsp;new&nbsp;alert</A></TD>"""\
+                   % (i, get_textual_query_info_from_urlargs(row[1]), weburl, row[1], row[0])
             if permanent=="n":
-                out += """<TD>%s</TD>""" % row[4]
+                out += """<TD>%s</TD>""" % row[2]
             out += """</TR>\n"""
         out += """</TABLE><BR>\n"""
 
@@ -125,15 +152,16 @@ def perform_input_alert(action, id_query, alert_name, frequency, notification, i
     id_user = uid # XXX
 
     # display query information
-    SQL_query = "SELECT base,pattern FROM query WHERE id='%s'" % id_query    
-    query_result = run_sql(SQL_query)
+    res = run_sql("SELECT urlargs FROM query WHERE id=%s", (id_query,))
+    try:
+        urlargs = res[0][0]
+    except:
+        urlargs = "UNKNOWN"
     out += """<TABLE border="0" cellspacing="0" cellpadding="2" width="650">\n"""
     out += """<TR><TD colspan="3">This alert will notify you each time/only if a new item satisfy the following query </TD></TR>"""
-    for row in query_result :
-        out += """<TR><TD>&nbsp;&nbsp;</TD><TD align="left" width="10"><B>Search&nbsp;pattern:</B></TD>"""\
-               """<TD align="left" width="500">%s</TD></TR>\n""" % row[1]
-        out += """<TR><TD>&nbsp;&nbsp;</TD><TD align="left" width="10"><B>in&nbsp;catalogue:</B></TD>"""\
-               """<TD align="left" width="500">%s</TD></TR>\n""" % row[0]
+    for row in res:
+        out += """<TR><TD>&nbsp;&nbsp;</TD><TD align="left" valign="top" width="10"><B>QUERY:</B></TD>"""\
+               """<TD align="left" valign="top" width="500">%s</TD></TR>\n""" % get_textual_query_info_from_urlargs(urlargs)
     out += """</TABLE>"""
     
     # define alert settings
@@ -243,7 +271,7 @@ def perform_list_alerts (uid):
     out += """<P>Set a new alert from <A href="display">your searches</A>, """\
            """the <A href="display?p='y'">most popular searches</A> or the input form.</P>"""
     # query the database
-    SQL_query = "SELECT q.id,q.pattern,q.base,q.url, a.id_user, a.id_query, a.id_basket, "\
+    SQL_query = "SELECT q.id, q.urlargs, a.id_user, a.id_query, a.id_basket, "\
                 "a.alert_name, a.frequency, a.notification, "\
                 "DATE_FORMAT(a.date_creation,'%%d %%b %%Y'), DATE_FORMAT(a.date_lastrun,'%%d %%b %%Y'), "\
                 "b.id, b.name "\
@@ -260,33 +288,33 @@ def perform_list_alerts (uid):
         out += """<TABLE border="1" cellspacing="0" cellpadding="3" width="100%">\n"""
         out += """<TR class="pageboxlefttop" align="center"><TD><B>No</B></TD><TD><B>Name</B></TD><TD><B>Search&nbsp;checking<BR>frequency</B></TD>"""\
                """<TD><B>Notification<BR><NOBR>by e-mail<NOBR></B></TD><TD><B>Result&nbsp;in<BR>basket</B></TD><TD><B>Date<BR>last&nbsp;run</B></TD>"""\
-               """<TD><B>Creation<BR>date</B></TD><TD><B>Search<BR>pattern</B></TD><TD><B>Search<BR>catalogue</B></TD><TD><B>Action</B></TD></TR>\n"""
+               """<TD><B>Creation<BR>date</B></TD><TD><B>Query</B></TD><TD><B>Action</B></TD></TR>\n"""
         i = 0
         for row in query_result :
             i += 1
 
             # set frequency of checking: daily, weekly, monthly
-            if row[8]=="day":
+            if row[6]=="day":
                 alert_frequency = "daily"
             else:
-                if row[8]=="week":
+                if row[6]=="week":
                     alert_frequency = "weekly"
                 else:
-                    # row[8]="month"
+                    # row[6]="month"
                     alert_frequency = "monthly"
                     
             # set notification by email field: yes or no
-            if row[9] == "y":
+            if row[7] == "y":
                 email_notification = "yes"
             else:
-                # row[9] == "n"
+                # row[7] == "n"
                 email_notification = "no"            
                         
             # set basket name
-            if row[13] =="":
+            if row[11] =="":
                 basket_name="""<CENTER>--</CENTER>"""
             else:
-                basket_name=row[13]
+                basket_name=row[11]
             
             # id, alert name, frequency, e-mail alert, last run, creation, pattern, catalogue, actions
             out += """<TR><TD><I>#%d</I></TD>"""\ 
@@ -297,12 +325,11 @@ def perform_list_alerts (uid):
                    """<TD><NOBR>%s<NOBR></TD>"""\
                    """<TD><NOBR>%s<NOBR></TD>"""\
                    """<TD>%s</TD>"""\
-                   """<TD>%s</TD>"""\
                    """<TD><A href="./remove_alert?name=%s&idu=%d&idq=%d&idb=%d">Remove</A><BR>"""\
                    """<A href="./modify_alert?idq=%d&name=%s&freq=%s&notif=%s&idb=%d">Modify</A><BR>"""\
                    """<A href="%s">Execute&nbsp;search</A></TD></TR>"""\
-                   % (i,row[7],alert_frequency,email_notification,basket_name,row[11],row[10],
-                      row[1],row[2],row[7],row[4],row[5],row[6],row[5],row[7],row[8],row[9],row[6],row[3])
+                   % (i,row[5],alert_frequency,email_notification,basket_name,row[9],row[8],
+                      get_textual_query_info_from_urlargs(row[1]),row[5],row[2],row[3],row[4],row[3],row[5],row[6],row[7],row[4],row[1])
         out += """</TABLE>\n"""
     out += """<P>You have defined <B>%s</B> alerts.</P>""" % len(query_result)    
     return out

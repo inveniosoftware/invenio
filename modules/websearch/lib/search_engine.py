@@ -2028,6 +2028,21 @@ def call_bibformat(id, otype="HD"):
     f.close()
     return out
 
+def log_query(hostname, query_args, uid=-1):
+    """Log query into the query and user_query tables."""
+    if uid > 0:
+        # log the query only if uid is reasonable
+        res = run_sql("SELECT id FROM query WHERE urlargs=%s", (query_args,), 1)
+        try:
+            id_query = res[0][0]
+        except:
+            id_query = run_sql("INSERT INTO query (type, urlargs) VALUES ('r', %s)", (query_args,))        
+        if id_query:
+            run_sql("INSERT INTO user_query (id_user, id_query, hostname, date) VALUES (%s, %s, %s, %s)",
+                    (uid, id_query, hostname,
+                     time.strftime("%04Y-%02m-%02d %02H%:02M:%02S", time.localtime())))
+    return
+
 def log_query_info(action, p, f, colls, nb_records_found_total=-1):
     """Write some info to the log file for later analysis."""
     try:
@@ -2225,6 +2240,11 @@ def perform_request_search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", 
                     if of.startswith("h"):
                         req.write(print_search_info(p, f, sf, so, sp, of, ot, coll, results_final_nb[coll], jrec, rg, as, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2, cpu_time, 1))
             # log query:
+            try:
+                log_query(req.get_remote_host(), req.args, uid)
+            except:
+                # do not log query if req is None (used by CLI interface)
+                pass
             log_query_info("ss", p, f, colls_to_search, results_final_nb_total)
     # 4 -- write footer:
     if of.startswith('h'):

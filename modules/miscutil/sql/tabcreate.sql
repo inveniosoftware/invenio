@@ -2085,10 +2085,9 @@ CREATE TABLE IF NOT EXISTS user_query (
 CREATE TABLE IF NOT EXISTS query (
   id int(15) unsigned NOT NULL auto_increment,
   type char(1) NOT NULL default 'r',
-  base text,
-  pattern text,
-  url blob NOT NULL,
-  PRIMARY KEY  (id)
+  urlargs text NOT NULL,
+  PRIMARY KEY  (id),
+  KEY urlargs (urlargs(100))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS user_basket (
