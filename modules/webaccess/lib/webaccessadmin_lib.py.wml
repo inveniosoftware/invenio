@@ -534,6 +534,7 @@ def perform_accesspolicy(req, callback='yes', confirm=0):
     account_policy[2] = "Only admin can register new accounts. User cannot edit email address."
 
     output = "<br><b>Current settings:</b><br>"
+    output += "Site open: %s<br>" % (CFG_SITE_OPEN == 1 and "Yes" or "No")
     output += "Guest accounts allowed: %s<br>" % (CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0 and "Yes" or "No")
     output += "Account policy: %s<br>" % (account_policy[CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS])
     output += "Allowed email addresses limited: %s<br>" % (CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN and CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN or "Not limited")

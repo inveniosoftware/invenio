@@ -46,6 +46,10 @@ DELEGATEADDUSERROLE = 'accdelegaterole'
 MAXSELECTUSERS = 25
 # max number of users to display in a page (mainly for user area)
 MAXPAGEUSERS = 25
+# site open or closed for all access 
+#0 = closed
+#1 = open
+CFG_SITE_OPEN = 1
 # access policy for guests. 
 #0 = Allow guests to search, 
 #1 = Guests cannot search (all users must login)
@@ -115,7 +119,8 @@ def_auths = (
             )
 cfg_webaccess_msgs = {
                                 0: 'Try to <a href="%s/youraccount.py/login?referer=%s/admin/%s/">login</a> with another account.' % (weburl, weburl, "%s"),
-                                1: '<br>If you think this is not correct, please contact: <a href="mailto:%s">%s</a>' % (supportemail, supportemail)
+                                1: '<br>If you think this is not correct, please contact: <a href="mailto:%s">%s</a>' % (supportemail, supportemail),
+                                2: '<br>Any questions should be sent to: <a href="mailto:%s">%s</a>' % (supportemail, supportemail)
 
 		} 
 
@@ -130,6 +135,7 @@ cfg_webaccess_warning_msgs = {
                                 6: 'Error(6): Guest accounts are not authorized to perform this action.',
                                 7: 'Error(7): Not enough arguments, user ID and action name required.',
                                 8: 'Error(8): Incorrect keyword argument(s) for this action.',
-                                9: """Error(9): Account '%s' is not yet activated."""
+                                9: """Error(9): Account '%s' is not yet activated.""",
+                               10: """The site is currently closed for maintenance."""
 		} 
 </protect>

@@ -807,10 +807,10 @@ II. Example - connecting role and user</a>
 
   - Access policy:
     To change the access policy, the access_control_config.py file must be edited manually in a 
-    text editor. You can edit the access policy level for guest accounts, registered accounts 
-    and decide when to warn the owner of the account when something happens with it, either when 
-    it is created, deleted or approved. The apache server must be restarted after modifying these 
-    settings.
+    text editor. The site can here be defined as opened or closed, you can edit the access policy 
+    level for guest accounts, registered accounts and decide when to warn the owner of the 
+    account when something happens with it, either when it is created, deleted or approved. 
+    The apache server must be restarted after modifying these settings.
 
     The two levels for guest account, are:
        0 - Allow guest accounts
@@ -826,6 +826,10 @@ II. Example - connecting role and user</a>
        4. To the owner of an account when it is deleted
 
   - The variables in access_control_config.py:
+    - Site open or closed for all access
+      0 = closed
+      1 = open
+      CFG_SITE_OPEN = 1
     - Access policy for guests.
       0 = Allow guests to search,
       1 = Guests cannot search (all users must login)
