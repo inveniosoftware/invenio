@@ -53,6 +53,7 @@
 <lang:new id=de short>
 <lang:new id=en short>
 <lang:new id=es short>
+<lang:new id=pt short>
 <lang:new id=fr short>
 <lang:new id=it short>
 <lang:new id=ru short>
@@ -77,6 +78,7 @@ Atlantis Institute of Fictive Science
  <fr>Atlantis Institut des Sciences Fictives</fr>
  <de>Atlantis Institut der fiktiven Wissenschaft</de>
  <es>Atlantis Instituto de la Ciencia Fictive</es>
+ <pt>Atlantis Instituto de da Ciência Fictive</pt>
  <it>Atlantis Istituto di Scienza Fictive</it>
  <ru>Атлантис Институт фиктивных Наук</ru>
  <sk>Atlantis Inštitút Fiktívnych Vied</sk>

@@ -37,6 +37,7 @@
   <fr>Accueil</fr>
   <de>Hauptseite</de>
   <es>Página principal</es>
+  <pt>Página principal</pt>
   <it>Pagina principale</it>
   <ru>Главная страница</ru>
   <sk>Hlavná stránka</sk>
@@ -49,6 +50,7 @@
   <fr>Recherche</fr>
   <de>Suchen</de>
   <es>Buscar</es>
+  <pt>Buscar</pt>  
   <it>Ricercare</it>
   <ru>Поиск</ru>
   <sk>Hľadaj</sk>
@@ -61,6 +63,7 @@
   <fr>Soumission</fr>
   <de>Eintragen</de>
   <es>Enviar</es>
+  <pt>Enviar</pt>  
   <it>Invio</it>
   <ru>Придать</ru>
   <sk>Pridaj</sk>
@@ -73,6 +76,7 @@
   <fr>Aide</fr>
   <de>Hilfe</de>
   <es>Ayuda</es>
+  <pt>Ajuda</pt>
   <it>Aiuto</it>
   <ru>Помощь</ru>
   <sk>Pomoc</sk>
@@ -85,6 +89,7 @@
   <fr>Centre d&rsquo;Aide</fr>
   <de>Hilfezentrale</de>
   <es>Ayuda General</es>
+  <pt>Central de Ajuda</pt>
   <it>Aiuto</it>
   <ru>Централа Помощи</ru>
   <sk>Centrála Pomoci</sk>
@@ -97,6 +102,7 @@
   <fr>Aide de Recherche</fr>
   <de>Suchhilfe</de>
   <es>Ayuda de Búsqueda</es>
+  <pt>Ajuda de Busca</pt>
   <it>Aiuto alla Ricerca</it>
   <ru>Помощь для поиска</ru>
   <sk>Pomoc pri vyhľadávaní</sk>
@@ -109,6 +115,7 @@
   <fr>Conseils de Recherche</fr>
   <de>Suchtipps</de>
   <es>Sugerencias de búsqueda</es>
+  <pt>Sugestões de busca</pt>
   <it>Consigli per la Ricerca</it>
   <ru>Указания дла поиска</ru>
   <sk>Tipy pre vyhľadávanie</sk>
@@ -121,6 +128,7 @@
   <fr>Personnaliser</fr>
   <de>Personalisieren</de>
   <es>Personalizar</es>
+  <pt>Personalizar</pt>
   <it>Personalizzazione</it>
   <ru>Персоналузовать</ru>
   <sk>Personalizácia</sk>
@@ -133,6 +141,7 @@
   <fr>TRADUCTION FRANÇAISE EN COURS</fr>
   <de>ÜBERSETZUNG AUF DEUTSCH WIRD GERADE VORBEREITET</de>
   <es>VERSIÓN EN ESPAÑOL DISPONIBLE PRÓXIMAMENTE</es>
+  <pt>VERSÃO EM PORTUGUÊS ESTARÁ DISPONÍVEL EM BREVE</pt>
   <it>TRADUZIONE ITALIANA DISPONIBLE PROSSIMAMENTE</it>
   <ru>ПЕРЕВОД НА РУССКИЙ ЯЗЫК НЕ ГОТОВ</ru>
   <sk>PREKLAD DO SLOVENČINY SA PRIPRAVUJE</sk>
@@ -160,6 +169,11 @@
      disponible. Le rogamos utilice la versión en inglés mostrada a
      continuación. Gracias por su consideración.
   </es>
+  <pt>
+     No momento a versão em português desta página não encontra-se
+     disponível. Favor utilizar a versão em inglês apresentada
+     abaixo. Grato por sua compreensão.
+  </pt>
   <it>
      Attualmente la traduzione italiana di questa pagina non è disponibile.
      Vi preghiamo di consultare la versione inglese.
@@ -187,6 +201,7 @@
   <fr>Powered by</fr>
   <de>Powered by</de>
   <es>Powered by</es>
+  <pt>Powered by</pt>
   <it>Powered by</it>
   <ru>Powered by</ru>
   <sk>Powered by</sk>
@@ -199,6 +214,7 @@
   <fr>Maintenu par</fr>
   <de>Verwaltet von</de>
   <es>Mantenido por</es>
+  <pt>Mantido por</pt>
   <it>Mantenuto da</it>
   <ru>Содержаиет</ru>
   <sk>Spravuje</sk>
@@ -211,6 +227,7 @@
   <fr>Dernière mise à jour</fr>
   <de>Letzte Aktualisierung</de>
   <es>Última modificación</es>
+  <pt>Última atualização</pt>
   <it>Ultimo aggiornamento</it>
   <ru>Последнеие изменение</ru>
   <sk>Posledná aktualizácia</sk>
@@ -223,6 +240,7 @@
   <fr>Limite recherche aux:</fr>
   <de>Eingeschränkte Suche:</de>
   <es>Búsqueda limitada:</es>
+  <pt>Busca limitada:</pt>
   <it>Ricerca ristretta:</it>
   <ru>Сузить поиск:</ru>
   <sk>Zúžiť hľadanie na:</sk>
@@ -235,6 +253,7 @@
   <fr>Focus sur:</fr>
   <de>Hinweis:</de>
   <es>Enfocado a:</es>
+  <pt>Ênfase em:</pt>
   <it>Focus on:</it>
   <ru>Устремление для:</ru>
   <sk>Zameranie na:</sk>
@@ -247,6 +266,7 @@
   <fr>Recherche Simple</fr>
   <de>Einfache Suche</de>
   <es>Búsqueda Básica</es>
+  <pt>Busca Básica</pt>
   <it>Ricerca Semplice</it>
   <ru>Простой Поиск</ru>
   <sk>Jednoduché Hľadanie</sk>
@@ -259,6 +279,7 @@
   <fr>Recherche Avancée</fr>
   <de>Erweiterte Suche</de>
   <es>Búsqueda Avanzada</es>
+  <pt>Busca Avançada</pt>
   <it>Ricerca Avanzata</it>
   <ru>Расширенный поиск</ru>
   <sk>Rozšírené Hľadanie</sk>
@@ -271,6 +292,7 @@
   <fr>Collection %s Introuvable</fr>
   <de>Kollektion %s nicht gefunden</de>
   <es>No se ha encontrado la colección %s</es>
+  <pt>A coleção %s não foi encontrada</pt>
   <it>Collezione %s Non Trouvata</it>
   <ru>Коллекция %s не существует</ru>
   <sk>Kolekcia %s Nenájdená</sk>
@@ -295,6 +317,10 @@
     <p>Lo sentimos, la colección <strong>%s</strong> no parece existir.
     <p>Inténtelo empezando desde <a href="%s">%s</a>.
   </es>
+  <pt>
+    <p>Sinto muito, mas a coleção <strong>%s</strong> parece não existir.
+    <p>Experimente explorar a partir de <a href="%s">%s</a>.
+  </pt>
   <it>
     <p>Spiacenti, collezione <strong>%s</strong> non sembra esistere.
     <p>Provate a tare la ricera a partire da <a href="%s">%s</a>.
@@ -320,6 +346,7 @@
   <fr>compte</fr>
   <de>Konto</de>
   <es>cuenta</es>
+  <pt>conta</pt>
   <it>conto</it>
   <ru>счёт</ru>
   <sk>konto</sk>
@@ -332,6 +359,7 @@
   <fr>alertes</fr>
   <de>Anzeigen</de>
   <es>avisos</es>
+  <pt>avisos</pt>
   <it>allerta</it>
   <ru>авизо</ru>
   <sk>avíza</sk>
@@ -344,6 +372,7 @@
   <fr>paniers</fr>
   <de>Körbe</de>
   <es>cestas</es>
+  <pt>cestas</pt>
   <it>paniere</it>
   <ru>корзины</ru>
   <sk>košíky</sk>
@@ -356,6 +385,7 @@
   <fr>session</fr>
   <de>Session</de>
   <es>sesión</es>
+  <pt>sessão</pt>
   <it>sessione</it>
   <ru>сеанс</ru>
   <sk>seansa</sk>
@@ -368,6 +398,7 @@
   <fr>login</fr>
   <de>Anmelden</de>
   <es>identificación</es>
+  <pt>identificação</pt>
   <it>login</it>
   <ru>записатсья</ru>
   <sk>prihlásiť</sk>
@@ -380,6 +411,7 @@
   <fr>logout</fr>
   <de>Abmelden</de>
   <es>salir</es>
+  <pt>sair</pt>
   <it>logout</it>
   <ru>выписатсья</ru>
   <sk>odhlásiť</sk>
@@ -392,6 +424,7 @@
   <fr>langue:</fr>
   <de>Sprache:</de>
   <es>idioma:</es>
+  <pt>idioma:</pt>
   <it>lingua:</it>
   <ru>язык</ru>
   <sk>jazyk:</sk>
@@ -404,6 +437,7 @@
   <fr>Liste</fr>
   <de>Durchblättern</de>
   <es>Ojear</es>
+  <pt>Explorar</pt>
   <it>Sfogliare</it>
   <ru>Просмотрить</ru>
   <sk>Prelistuj</sk>
@@ -416,6 +450,7 @@
   <fr>Cherchez dans %s notices:</fr>
   <de>Suchen durch %s Datensätze für:</de>
   <es>Buscar %s registros por:</es>
+  <pt>Buscar %s registros por:</pt>
   <it>Ricerca %s registrazioni:</it>
   <ru>Искать %s запускоб для:</ru>
   <sk>Hľadaj v %s záznamoch:</sk>
@@ -428,6 +463,7 @@
   <fr>tous les champs</fr>
   <de>alle Felder</de>
   <es>cualquier campo</es>
+  <pt>qualquer campo</pt>
   <it>tutti i campi</it>
   <ru>любое поле</ru>
   <sk>všetky polia</sk>
@@ -440,6 +476,7 @@
   <fr>titre</fr>
   <de>Titel</de>
   <es>título</es>
+  <pt>título</pt>
   <it>titolo</it>
   <ru>титр</ru>
   <sk>názov</sk>
@@ -452,6 +489,7 @@
   <fr>auteur</fr>
   <de>Autor</de>
   <es>autor</es>
+  <pt>autor</pt>
   <it>autore</it>
   <ru>автор</ru>
   <sk>autor</sk>
@@ -464,6 +502,7 @@
   <fr>numéro de rapport</fr>
   <de>Reportnummer</de>
   <es>número de registro</es>
+  <pt>número de registro</pt>
   <it>numero del rapporto</it>
   <ru>номер рапорта</ru>
   <sk>číslo správy</sk>
@@ -476,6 +515,7 @@
   <fr>année</fr>
   <de>Jahr</de>
   <es>año</es>
+  <pt>ano</pt>
   <it>anno</it>
   <ru>год</ru>
   <sk>rok</sk>
@@ -488,6 +528,7 @@
   <fr>abstract</fr>
   <de>Abstrakt</de>
   <es>sumario</es>
+  <pt>resumo</pt>
   <it>riasunto</it>
   <ru>абстракт</ru>
   <sk>abstrakt</sk>
@@ -500,6 +541,7 @@
   <fr>mot clé</fr>
   <de>Kennwort</de>
   <es>palabra clave</es>
+  <pt>palavra chave</pt>
   <it>parola chiave</it>
   <ru>клюцевое слово</ru>
   <sk>kľúčové slovo</sk>
@@ -512,6 +554,7 @@
   <fr>fulltext</fr>
   <de>Volltext</de>
   <es>texto completo</es>
+  <pt>texto completo</pt>
   <it>testo completo</it>
   <ru>польный текст</ru>
   <sk>plný text</sk>
@@ -524,6 +567,7 @@
   <fr>référence</fr>
   <de>Referenz</de>
   <es>referencia</es>
+  <pt>referência</pt>
   <it>referenza</it>
   <ru>референция</ru>
   <sk>referencie</sk>
@@ -536,6 +580,7 @@
   <fr>Tous les mots:</fr>
   <de>Alle Worte:</de>
   <es>Todas las palabras:</es>
+  <pt>Todas as palavras:</pt>
   <it>Tutte la parole:</it>
   <ru>Все слова:</ru>
   <sk>Všetky tieto slová:</sk>
@@ -548,6 +593,7 @@
   <fr>Au moins un des mots:</fr>
   <de>Mindestens die Worte:</de>
   <es>Alguna palabra:</es>
+  <pt>Qualquer das palavras:</pt>
   <it>Almeno una parola:</it>
   <ru>Любое слова:</ru>
   <sk>Jedno zo slov:</sk>
@@ -560,6 +606,7 @@
   <fr>Phrase exacte:</fr>
   <de>Genaue Phrase:</de>
   <es>Expresión exacta:</es>
+  <pt>Expressão exata:</pt>
   <it>Espressione esatta:</it>
   <ru>Тоцная фраза:</ru>
   <sk>Presná veta:</sk>
@@ -572,6 +619,7 @@
   <fr>Phrase partielle:</fr>
   <de>Partielle Phrase:</de>
   <es>Expresión aproximada:</es>
+  <pt>Expressão aproximada:</pt>
   <it>Espressione parziale:</it>
   <ru>Парциальная фраза:</ru>
   <sk>Čiastočná veta:</sk>
@@ -584,6 +632,7 @@
   <fr>Expression régulaire:</fr>
   <de>Reguläres Ausdruck:</de>
   <es>Expresión regular:</es>
+  <pt>Expressão regular:</pt>
   <it>Espressione regulare:</it>
   <ru>Регулярное выраение:</ru>
   <sk>Regulárny výraz:</sk>
@@ -596,6 +645,7 @@
   <fr>ET</fr>
   <de>UND</de>
   <es>Y</es>
+  <pt>E</pt>
   <it>E</it>
   <ru>И</ru>
   <sk>A</sk>
@@ -608,6 +658,7 @@
   <fr>OU</fr>
   <de>ODER</de>
   <es>O</es>
+  <pt>OU</pt>
   <it>OPPURE</it>
   <ru>ИЛИ</ru>
   <sk>ALEBO</sk>
@@ -620,6 +671,7 @@
   <fr>ET NON PAS</fr>
   <de>UND NICHT</de>
   <es>Y NO</es>
+  <pt>E NÃO</pt>
   <it>E NON</it>
   <ru>И НЕТ</ru>
   <sk>A NIE</sk>
@@ -632,6 +684,7 @@
   <fr>Résultats de recherche</fr>
   <de>Suchergebnisse</de>
   <es>Resultados de búsqueda</es>
+  <pt>Resultados da busca</pt>
   <it>Risultato della ricerca</it>
   <ru>Результаты Поиска</ru>
   <sk>Výsledky hľadania</sk>
@@ -644,6 +697,7 @@
   <fr>Essaiez votre requête sur:</fr>
   <de>Versuchen Sie Ihre Suche mit:</de>
   <es>Intentar su búsqueda en:</es>
+  <pt>Tentar sua busca em:</pt>
   <it>Provate la ricerca su</it>
   <ru>Испробуйте искать на:</ru>
   <sk>Skúste hľadať na:</sk>
@@ -656,6 +710,7 @@
   <fr>Trier par:</fr>
   <de>Sortieren nach:</de>
   <es>Ordenar por:</es>
+  <pt>Ordenar por:</pt>
   <it>Selezione per:</it>
   <ru>Сортировать по:</ru>
   <sk>Utrieďte podľa:</sk>
@@ -668,6 +723,7 @@
   <fr>derniers en premier</fr>
   <de>das Letzte zuerst</de>
   <es>el último primero</es>
+  <pt>Último primeiro</pt>
   <it>latest first</it>
   <ru>последний запуск сперва</ru>
   <sk>posledný záznam najskôr</sk>
@@ -680,6 +736,7 @@
   <fr>asc.</fr>
   <de>aufw.</de>
   <es>asc.</es>
+  <pt>asc.</pt>
   <it>asc.</it>
   <ru>восх.</ru>
   <sk>vzost.</sk>
@@ -692,6 +749,7 @@
   <fr>desc.</fr>
   <de>abw.</de>
   <es>desc.</es>
+  <pt>desc.</pt>
   <it>desc.</it>
   <ru>нисх.</ru>
   <sk>zost.</sk>
@@ -704,6 +762,7 @@
   <fr>Afficher:</fr>
   <de>Ergebnisse darstellen:</de>
   <es>Mostrar resultados:</es>
+  <pt>Mostrar resultados:</pt>
   <it>Visualizzare:</it>
   <ru>Изобразить результаты:</ru>
   <sk>Zobraziť výsledky:</sk>
@@ -716,6 +775,7 @@
   <fr>résultats</fr>
   <de>Ergebnisse</de>
   <es>resultados</es>
+  <pt>resultados</pt>
   <it>risultati</it>
   <ru>результаты</ru>
   <sk>výsledky</sk>
@@ -728,6 +788,7 @@
   <fr>liste unique</fr>
   <de>einzige Liste</de>
   <es>lista indival</es>
+  <pt>lista única</pt>
   <it>elenco unico</it>
   <ru>один опись</ru>
   <sk>jediný list</sk>
@@ -740,6 +801,7 @@
   <fr>regroupés par collection</fr>
   <de>vertailen in Kollektionen</de>
   <es>agrupar por colección</es>
+  <pt>agrupar por coleção</pt>
   <it>raggrupato per collezione</it>
   <ru>поделит дла коллекции</ru>
   <sk>zhromaždené podľa kolekcií</sk>
@@ -752,6 +814,7 @@
   <fr>Format de sortie:</fr>
   <de>Darstellungsformat:</de>
   <es>Formato de salida:</es>
+  <pt>Formato de saída:</pt>
   <it>Formato d'uscita</it>
   <ru>Выходной формат</ru>
   <sk>Výstupný formát:</sk>
@@ -764,6 +827,7 @@
   <fr>bref</fr>
   <de>kurz</de>
   <es>breve</es>
+  <pt>breve</pt>
   <it>corto</it>
   <ru>краткий</ru>
   <sk>stručný</sk>
@@ -776,6 +840,7 @@
   <fr>détaillé</fr>
   <de>detailliert</de>
   <es>detallado</es>
+  <pt>detalhado</pt>
   <it>dettagliato</it>
   <ru>подробный</ru>
   <sk>podrobný</sk>
@@ -788,6 +853,7 @@
   <fr>Notice détaillée</fr>
   <de>Details vom Eintrag</de>
   <es>Registro detallo</es>
+  <pt>Registro detalhado</pt>
   <it>Registrazione dettagliata</it>
   <ru>Подробный запуск</ru>
   <sk>Podrobný záznam</sk>
@@ -808,6 +874,9 @@
   <es>
     <strong>Resultados globales:</strong> Encontrados <strong>%s</strong> registros en %.2f segundos.
   </es>
+  <pt>
+    <strong>Resultados globais:</strong> Encontrados <strong>%s</strong> registros em %.2f segundos.
+  </pt>
   <it>
     <strong>Vista d'insieme dei resultati:</strong> Trovati <strong>%s</strong> registrazioni in %.2f seconds.
   </it>
@@ -829,6 +898,7 @@
   <fr><strong>%s</strong> notices trouvées</fr>
   <de><strong>%s</strong> Datensätze gefunden</de>
   <es><strong>%s</strong> registros encontrados</es>
+  <pt><strong>%s</strong> registros encontrados</pt>
   <it><strong>%s</strong> registrazioni found</it>
   <ru><strong>%s</strong> запусков найдено</ru>
   <sk><strong>%s</strong> záznamov nájdených</sk>
@@ -841,6 +911,7 @@
   <fr>allez sur la notice:</fr>
   <de>gehen zum Satz:</de>
   <es>ir al registro:</es>
+  <pt>ir para o registro:</pt>
   <it>andare alla registrazione:</it>
   <ru>идти к запуску</ru>
   <sk>skoč na záznam:</sk>
@@ -853,6 +924,7 @@
   <fr>La recherche a durée %.2f seconds.</fr>
   <de>Die Suche hat %.2f Sekunden gedauert.</de>
   <es>La búsqueda tardó %.2f segundos.</es>
+  <pt>A busca levou %.2f segundos.</pt>
   <it>La ricerta ha preso %.2f secondi.</it>
   <ru>Пуск длил %.2f секунд.</ru>
   <sk>Hľadanie trvalo %.2f sekúnd.</sk>
@@ -865,6 +937,7 @@
   <fr>AJOUTEZ DANS PANIER</fr>
   <de>IN DEN KORB HINZUFÜGEN</de>
   <es>AÑADIR A LA CESTA</es>
+  <pt>ADICIONAR À CESTA</pt>
   <it>AGGIUNGERE AL PANIERE</it>
   <ru>ПРИДАТ В КОРЗИНУ</ru>
   <sk>PRIDAŤ DO KOŠÍKA</sk>
@@ -877,6 +950,7 @@
   <fr>collections</fr>
   <de>Kollektionen</de>
   <es>colecciones</es>
+  <pt>coleções</pt>
   <it>collezioni</it>
   <ru>коллекции</ru>
   <sk>kolekcie</sk>
@@ -889,6 +963,7 @@
   <fr>toutes les collections</fr>
   <de>alle Kollektionen</de>
   <es>alguna colección</es>
+  <pt>qualquer coleção</pt>
   <it>una qualunque collezione</it>
   <ru>любая коллекция</ru>
   <sk>všetky kolekcie</sk>
@@ -901,6 +976,7 @@
   <fr>ajouter une nouvelle collection</fr>
   <de>Neue Kollektion hinzufügen</de>
   <es>añadir otra coleción</es>
+  <pt>adicionar outra coleção</pt>
   <it>aggiungere un'altra collezione</it>
   <ru>придат коллекцию</ru>
   <sk>pridať kolekciu</sk>
@@ -913,6 +989,7 @@
   <fr>visiteur</fr>
   <de>Gast</de> 
   <es>guest</es> 
+  <pt>visitante</pt>
   <it>guest</it> 
   <ru>guest</ru>
   <sk>hosť</sk>
