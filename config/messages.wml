@@ -26,11 +26,19 @@
 ## ########################
 
 ## Messages emited by CDSware are contained in the WML elements below.
-## Please feel free to edit them to your needs.  Note that some
-## elements may contain things like ``%s'' which are ``templates'' for
-## future use: please preserve such elements exactly in place and only
-## edit the text.  When done, return to the main CDSware source
-## directory and type 'make'.  Good luck! :-)
+## You may want to customize them, if the default messages does not
+## suit you.  Note that some elements may contain things like ``%s''
+## which are ``templates'' for future use: you have to preserve such
+## elements exactly and only edit the text, so be careful.
+
+## If you make changes to this file that may be of general interest,
+## please consider donating them back to the CDSware project.  If you
+## want to fix existing translation or to introduce a new language,
+## please contact <cds.support@cern.ch>.  
+
+## Several people located all around the world have contributed to the
+## present translation.  See the CREDITS file included with the
+## distribution for details.  Their help is greatly appreciated.
 
 <define-tag MSG_HOME whitespace=delete>
   <en>Home</en>
