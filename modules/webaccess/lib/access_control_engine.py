@@ -26,25 +26,15 @@ __version__ = "$Id$"
 
 
 ## import interesting modules:
-try:
-    import sys
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
-try:
-    from config import *
-    from dbquery import run_sql
-    from MySQLdb import ProgrammingError
-    from access_control_config import SUPERADMINROLE
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+from config import *
+from dbquery import run_sql
+from MySQLdb import ProgrammingError
+from access_control_config import SUPERADMINROLE
 
 
+## access controle engine function
 def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
-    """ Check if user is allowed to perform action
+    """Check if user is allowed to perform action
     with given list of arguments.
     Return 1 if authentication succeeds, 0 if it fails.
 
@@ -74,17 +64,17 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
     # -------------------------------------------
     
     
-    # TASK 1: check if this is a superadmin, we know the action exists.
-    # no connection between them is necessary
-    # arguments passed must have allowed keywords, no check to see
-    # if the argument exists.
+    # TASK 1: check if user is a superadmin
+    # we know the action exists. no connection with role is necessary
+    # passed arguments must have allowed keywords
+    # no check to see if the argument exists
     if verbose: print 'task 1 - is user %s' % (SUPERADMINROLE, )
     
     if run_sql("""SELECT *
-    FROM accROLE r, user_accROLE ur
+    FROM accROLE r LEFT JOIN user_accROLE ur
+    ON r.id = ur.id_accROLE
     WHERE r.name = '%s' AND
-    r.id = ur.id_accROLE AND
-    ur.id_user = %s """ % (SUPERADMINROLE, id_user)):
+    ur.id_user = '%s' """ % (SUPERADMINROLE, id_user)):
         return 1
     # ------------------------------------------
     
@@ -160,7 +150,7 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
     WHERE raa.id_accACTION = %s AND
     raa.id_accROLE IN (%s) AND
     (%s) AND
-    raa.id_accARGUMENT = arg.id  """ % (id_action, str_roles, str_args)                
+    raa.id_accARGUMENT = arg.id """ % (id_action, str_roles, str_args)                
 
     try: res4 = run_sql(query4)
     except ProgrammingError: return 0
@@ -192,11 +182,16 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
         # not the same role or argumentlist (authorization group), i.e. check if thing are satisfied
         # if cur_arglistid != arglistid or cur_role != role or cur_action != action:
         if (cur_arglistid, cur_role, cur_action) != (arglistid, role, action):
+            if verbose: print ' : checking new combination', 
 
             # test if all keywords are satisfied
             for value in booldict.values():
                 if not value: break
-            else: return 1 # USER AUTHENTICATED TO PERFORM ACTION
+            else:
+                if verbose: print '-> found satisfying combination'
+                return 1 # USER AUTHENTICATED TO PERFORM ACTION
+
+            if verbose: print '-> not this one'
 
             # assign the values for the current tuple from the query
             cur_arglistid, cur_role, cur_action = arglistid, role, action

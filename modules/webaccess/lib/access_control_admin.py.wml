@@ -28,24 +28,14 @@ __version__ = "$Id$"
 # check this: def acc_addUserRole(id_user, id_role=0, name_role=0):
 
 ## import interesting modules:
-try:
-    # import cgi
-    import sys
-    import time
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
-try:
-    from access_control_engine import acc_authorize_action	
-    from access_control_config import SUPERADMINROLE, WEBACCESSACTION, DELEGATEADDUSERROLE
-    from config import *
-    from dbquery import run_sql
-    from MySQLdb import ProgrammingError
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+
+import sys
+import time
+from access_control_engine import acc_authorize_action	
+from access_control_config import *
+from config import *
+from dbquery import run_sql
+from MySQLdb import ProgrammingError
 
 
 # ACTIONS
@@ -217,8 +207,27 @@ def acc_deleteRole(id_role=0, name_role=0):
     # try to delete
     if run_sql("""DELETE FROM accROLE WHERE id = %s  """ % (id_role, )):
         # delete everything related
+        # authorization entries
         count += 1 + run_sql("""DELETE FROM accROLE_accACTION_accARGUMENT WHERE id_accROLE = %s""" % (id_role, ))
+        # connected users
         count += run_sql("""DELETE FROM user_accROLE WHERE id_accROLE = %s """ % (id_role, ))
+
+        # delegated rights over the role
+        rolenames = run_sql("""SELECT name FROM accROLE""")
+        # string of rolenames
+        roles_str = ''
+        for (name, ) in rolenames: roles_str += (roles_str and ',' or '') + '"%s"' % (name, )
+        print 'rolestr:', roles_str
+        # arguments with non existing rolenames
+        not_valid = run_sql("""SELECT ar.id FROM accARGUMENT ar WHERE keyword = 'role' AND value NOT IN (%s)""" % (roles_str, ))
+        print 'notvalid', not_valid
+        if not_valid:
+            nv_str = ''
+            for (id, ) in not_valid: nv_str += (nv_str and ',' or '') + '%s' % (id, )
+            print 'nvstr:', nv_str
+            # delete entries
+            count += run_sql("""DELETE FROM accROLE_accACTION_accARGUMENT
+            WHERE id_accACTION = %s AND id_accARGUMENT IN (%s) """ % (acc_getActionId(name_action=DELEGATEADDUSERROLE), nv_str))
 
     # return number of deletes
     return count
@@ -332,7 +341,116 @@ def acc_deleteArgument_names(keyword='', value=''):
 
 # AUTHORIZATIONS
 
-# ADD WITH ID OR NAMES
+# ADD WITH names and keyval list
+
+def acc_addAuthorization(name_role='', name_action='', optional=0, **keyval): 
+    """ function inserts entries in accROLE_accACTION_accARGUMENT if all references are valid.
+    this function is made specially for the webaccessadmin web interface.
+    always inserting only one authorization. 
+
+    id_role, id_action - self explanatory, preferably used
+
+    name_role, name_action - self explanatory, used if id not given
+
+    optional - if this is set to 1, check that function can have optional
+                arguments and add with arglistid -1 and id_argument -1 
+       
+    **keyval - dictionary of keyword=value pairs, used to find ids. """
+    
+    inserted = []
+    print 'checking info'
+
+    # check that role and action exist
+    id_role = run_sql("""SELECT id FROM accROLE where name = '%s'""" % (name_role, ))
+    action_details = run_sql("""SELECT * from accACTION where name = '%s' """ % (name_action, ))
+    if not id_role or not action_details: return []
+
+    print 'checked info'
+
+    # get role id and action id and details
+    id_role, id_action = id_role[0][0], action_details[0][0]
+    allowedkeywords_str = action_details[0][3]
+    print action_details
+    allowedkeywords_lst = acc_getActionKeywords(id_action=id_action)
+    optional_action = action_details[0][4] == 'yes' and 1 or 0
+    optional = int(optional)
+
+    print 'ready for insertion'
+    
+    # this action does not take arguments
+    if not optional and not keyval:
+        print 'no args'
+        # can not add if user is doing a mistake
+        if allowedkeywords_str: return []
+        # check if entry exists
+        if not run_sql("""SELECT * FROM accROLE_accACTION_accARGUMENT
+                       WHERE id_accROLE = %s AND id_accACTION = %s AND argumentlistid = %s AND id_accARGUMENT = %s"""
+                       % (id_role, id_action, 0, 0)):
+            # insert new authorization
+            run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT values (%s, %s, %s, %s)""" % (id_role, id_action, 0, 0))
+            return [[id_role, id_action, 0, 0], ]
+        return []
+
+
+    # try to add authorization without the optional arguments
+    elif optional:
+        print 'optional'
+        # optional not allowed for this action
+        if not optional_action: return []
+        # check if authorization already exists
+        if not run_sql("""SELECT * FROM accROLE_accACTION_accARGUMENT
+        WHERE id_accROLE = %s AND
+        id_accACTION = %s AND
+        id_accARGUMENT = -1 AND
+        argumentlistid = -1""" % (id_role, id_action, )):
+            # insert new authorization
+            run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT (id_accROLE, id_accACTION, id_accARGUMENT, argumentlistid) VALUES (%s, %s, -1, -1) """ % (id_role, id_action))
+            return [[id_role, id_action, -1, -1], ]
+        return []    
+
+
+    else:
+        print 'regular'
+        # regular authorization
+        
+        # get list of ids, if they don't exist, create arguments
+        id_arguments = []
+        argstr = ''
+        for key in keyval.keys():
+            if key not in allowedkeywords_lst: return []
+            id_argument = (acc_getArgumentId(key, keyval[key])
+                           or
+                           run_sql("""INSERT INTO accARGUMENT (keyword, value) values ('%s', '%s') """ % (key, keyval[key])))
+            id_arguments.append(id_argument)
+            argstr += (argstr and ',' or '') + str(id_argument)
+    
+        # check if equal authorization exists
+        for (id_trav, ) in run_sql("""SELECT DISTINCT argumentlistid FROM accROLE_accACTION_accARGUMENT WHERE id_accROLE = '%s' AND id_accACTION = '%s' """% (id_role, id_action)):
+            listlength = run_sql("""SELECT COUNT(*) FROM accROLE_accACTION_accARGUMENT
+            WHERE id_accROLE = '%s' AND id_accACTION = '%s' AND argumentlistid = '%s' AND
+            id_accARGUMENT IN (%s) """ % (id_role, id_action, id_trav, argstr))[0][0]
+            notlist = run_sql("""SELECT COUNT(*) FROM accROLE_accACTION_accARGUMENT
+            WHERE id_accROLE = '%s' AND id_accACTION = '%s' AND argumentlistid = '%s' AND
+            id_accARGUMENT NOT IN (%s) """ % (id_role, id_action, id_trav, argstr))[0][0]
+            # this means that a duplicate already exists
+            if not notlist and listlength == len(id_arguments): return []
+    
+        # find new arglistid, highest + 1
+        try: arglistid = 1 + run_sql("""SELECT MAX(argumentlistid) FROM accROLE_accACTION_accARGUMENT WHERE id_accROLE = %s AND id_accACTION = %s """
+                                     % (id_role, id_action))[0][0]
+        except (IndexError, TypeError): arglistid = 1
+        if arglistid <= 0: arglistid = 1
+        
+        # insert
+        for id_argument in id_arguments:
+            run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT values (%s, %s, %s, %s) """
+                    % (id_role, id_action, id_argument, arglistid))
+            inserted.append([id_role, id_action, id_argument, arglistid])
+
+    print 'last one'
+    
+    return inserted
+
 
 def acc_addRoleActionArguments(id_role=0, id_action=0, arglistid=-1, optional=0, verbose=0, id_arguments=[]): 
     """ function inserts entries in accROLE_accACTION_accARGUMENT if all references are valid.
@@ -414,7 +532,7 @@ def acc_addRoleActionArguments(id_role=0, id_action=0, arglistid=-1, optional=0,
             else:
                 if argstr: argstr += ','
                 argstr += '%s' % (id_argument, )
-    
+
         # arglistid = -1 means that the user wants a new group
         if verbose: print 'ids: find arglistid'
         if arglistid < 0:
@@ -1182,13 +1300,25 @@ def acc_add_default_settings(superusers=[]):
 
     superusers - list of superuser emails """
 
-    # add default roles
-    #           name          description
-    roles = ((SUPERADMINROLE, 'all rights'),
-             ('photoadmin',   'administrator of the photo collections'))
+    # imported from config
+    global supportemail
+    # imported from access_control_config
+    global def_roles
+    global def_users
+    global def_actions
+    global def_auths
+    
+    # from superusers: allow input formats ['email1', 'email2'] and [['email1'], ['email2']] and [['email1', id], ['email2', id]]
+    for user in superusers:
+        if type(user) is str: user = [user]
+        def_users.append(user[0])
+    if supportemail not in def_users: def_users.append(supportemail)
 
+    # add data
+    
+    # add roles
     insroles = []
-    for (name, description) in roles:
+    for (name, description) in def_roles:
         # try to add, don't care if description is different
         id = acc_addRole(name_role=name,
                          description=description)
@@ -1197,19 +1327,15 @@ def acc_add_default_settings(superusers=[]):
             acc_updateRole(id_role=id, description=description)
         insroles.append([id, name, description])
 
-    # add default actions
-    #            name,         desc, al lowedkeywords, optional
-    actions = (('cfgwebsearch',         '',       '',           'no'),
-               ('cfgbibformat',         '',       '',           'no'),
-               ('runbibwords',          '',       '',           'no'),
-               ('runbibupload',         '',       '',           'no'),
-               ('runwebcoll',           '',       'collection', 'yes'),
-               ('runbibformat',         '',       'format',     'yes'),
-               (WEBACCESSACTION,        '',       '',           'no'),
-               (DELEGATEADDUSERROLE,    '',       'role',       'no'))
+    # add users to superadmin
+    insuserroles = []
+    for user in def_users:
+        insuserroles.append(acc_addUserRole(email=user,
+                                            name_role=SUPERADMINROLE))
 
+    # add actions
     insactions = []
-    for (name, description, allkeys, optional) in actions:
+    for (name, description, allkeys, optional) in def_actions:
         # try to add action as new
         id = acc_addAction(name, description, optional, allkeys)
         # action with the name exist
@@ -1219,31 +1345,10 @@ def acc_add_default_settings(superusers=[]):
             acc_updateAction(id_action=id, optional=optional, allowedkeywords=allkeys)
         # keep track of inserted actions
         insactions.append([id, name, description, allkeys])
-    
-    # add users to superadmin
-    insuserroles = []
-    for user in superusers:
-        # allow both ['email1', 'email2'] and [['email1'], ['email2']] and [['email1', id], ['email2', id]]
-        if type(user) is str: user = [user]
-        if user[0] == '<SUPPORTEMAIL>': continue
-        insuserroles.append(acc_addUserRole(email=user[0],
-                                            name_role=SUPERADMINROLE))
-    # default superadmin user
-    insuserroles.append(acc_addUserRole(email='<SUPPORTEMAIL>',
-                                        name_role=SUPERADMINROLE))
 
     # add authorizations
-    #          role           action   arglistid  optional   arguments
-    auths = ((SUPERADMINROLE, 'cfgwebsearch',         -1, 0, {}),
-             (SUPERADMINROLE, 'cfgbibformat',         -1, 0, {}),
-             (SUPERADMINROLE, 'runbibwords',          -1, 0, {}),
-             (SUPERADMINROLE, 'runbibupload',         -1, 0, {}),
-             (SUPERADMINROLE, 'runbibformat',         -1, 1, {}),
-             (SUPERADMINROLE, WEBACCESSACTION,        -1, 1, {}), 
-             ('photoadmin',   'runwebcoll',           -1, 0, {'collection': 'Photos'}))
-
     insauths = []
-    for (name_role, name_action, arglistid, optional, args) in auths:
+    for (name_role, name_action, arglistid, optional, args) in def_auths:
         # add the authorization
         acc_addRoleActionArguments_names(name_role=name_role,
                                          name_action=name_action,
@@ -1255,6 +1360,31 @@ def acc_add_default_settings(superusers=[]):
 
     
     return insroles, insactions, insuserroles, insauths
+
+
+def acc_find_delegated_roles(id_role_admin=0):
+    """find all the roles the admin role has delegation rights over.
+    return tuple of all the roles.
+
+    id_role_admin - id of the admin role """
+    # 
+    id_action_delegate = acc_getActionId(name_action=DELEGATEADDUSERROLE)
+    # 
+    rolenames = run_sql("""SELECT DISTINCT(ar.value)
+    FROM accROLE_accACTION_accARGUMENT raa LEFT JOIN accARGUMENT ar
+    ON raa.id_accARGUMENT = ar.id
+    WHERE raa.id_accROLE = '%s' AND
+    raa.id_accACTION = '%s'
+    """ % (id_role_admin, id_action_delegate))
+    # 
+    result = []
+    # 
+    for (name_role, ) in rolenames:
+        roledetails = run_sql("""SELECT * FROM accROLE WHERE name = '%s' """ % (name_role, ))
+        if roledetails: result.append(roledetails)
+    # 
+    # print run_sql("""SELECT DISTINCT(ar.value) FROM accROLE_accACTION_accARGUMENT raa LEFT JOIN accARGUMENT ar ON raa.id_accARGUMENT = ar.id WHERE raa.id_accROLE = '%s' AND raa.id_accACTION = '%s' """ % (7,8))
+    return result
 
 
 def acc_cleanupArguments():
@@ -1313,6 +1443,8 @@ def acc_cleanupUserRoles():
     return (count, ids2)
 
 
+def acc_cleanDatabase():
+    return
 
 </protect>
 
