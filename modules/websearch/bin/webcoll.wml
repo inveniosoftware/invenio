@@ -51,6 +51,7 @@ try:
     import MySQLdb
     import Numeric
     import time
+    import traceback
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -67,8 +68,9 @@ except ImportError, e:
     import sys
     sys.exit(1)
 
-## will hold collections we treat in this run of the program 
-collection_house = {} # dict of {collname2, collobject1}, ...
+## global vars
+collection_house = {} # will hold collections we treat in this run of the program; a dict of {collname2, collobject1}, ...
+options = {} # will hold task options
 
 ## TODO: still leaving live SQL queries here and there in the code; a
 ## ``real way'' of doing this would be to grab a snapshot of the
@@ -127,18 +129,15 @@ def is_selected(var, fld):
     else:
         return ""
 
-def Log(msg, type=""):
-    "Logs a message to the database."
-    if type == "Error":
-        out = sys.stderr
+def write_message(msg, stream=sys.stdout):
+    """Write message and flush output stream (may be sys.stdout or sys.stderr).  Useful for debugging stuff."""
+    if stream == sys.stdout or stream == sys.stderr:
+        stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
+        stream.write("%s\n" % msg)
+        stream.flush()
     else:
-        out = sys.stdout                           
-    out.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
-    out.write(str(msg))
-    if type:
-        out.write(" (" + type + ")")
-    out.write("\n")
-    out.flush()
+        sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
+    return
 
 def create_andornot_box(name='op', value=''):
     "Returns HTML code for the AND/OR/NOT selection box."
@@ -341,7 +340,8 @@ class Collection:
             print "I/O Error: " + str(message) + " (" + str(code) + ")"
             sys.exit(1)
         # print user info:
-        Log("... creating %s" % fullfilename)
+        if options["verbose"]:
+            write_message("... creating %s" % fullfilename)
         sys.stdout.flush()
         # print page body:
         f.write(filebody)
@@ -899,7 +899,8 @@ class Collection:
         if self.calculate_reclist_run_already:
             # do we have to recalculate?
             return (self.reclist, self.reclist_with_nonpublic_subcolls)
-        Log("... calculating reclist of %s" % self.name)
+        if options["verbose"]:
+            write_message("... calculating reclist of %s" % self.name)
         reclist = HitSet() # will hold results for public sons only; good for storing into DB
         reclist_with_nonpublic_subcolls = HitSet() # will hold results for both public and nonpublic sons; good for deducing total
                                                   # number of documents
@@ -931,7 +932,8 @@ class Collection:
         if self.update_reclist_run_already:
             # do we have to reupdate?
             return 0
-        Log("... updating reclist of %s" % self.name)
+        if options["verbose"]:
+            write_message("... updating reclist of %s (%s recs)" % (self.name, self.nbrecs))
         sys.stdout.flush()
         try:
             query = "UPDATE collection SET nbrecs=%d, reclist='%s' WHERE id=%d" % \
@@ -943,7 +945,6 @@ class Collection:
             sys.exit(1)        
         # last but not least, update the speed-up flag:
         self.update_reclist_run_already = 1
-        Log("... updated %d records" % self.nbrecs)
         return 0
 
 def usage(code, msg=''):
@@ -987,7 +988,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
     return date
 
 def write_message(msg, stream=sys.stdout):
-    """Prints message and flush output stream (may be sys.stdout or sys.stderr).  Useful for debugging stuff."""
+    """Prints message and flush output stream (may be sys.stdout or sys.stderr)."""
     if stream == sys.stdout or stream == sys.stderr:
         stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
         stream.write("%s\n" % msg)
@@ -997,29 +998,33 @@ def write_message(msg, stream=sys.stdout):
 
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("got signal %d" % sig)
     write_message("sleeping...")
     task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
 
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("got signal %d" % sig)
     write_message("continuing...")
     task_update_status("CONTINUING")
 
 def task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("got signal %d" % sig)
     write_message("stopping...")
     task_update_status("STOPPING")
-    write_message("flushing cache or whatever...")
-    time.sleep(3)
-    write_message("closing tables or whatever...")
-    time.sleep(1)
-    write_message("stopped")
+    pass # FIXME: is there anything to be done?
     task_update_status("STOPPED")
     sys.exit(0)
     
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("got signal %d" % sig)
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
     write_message("suicided")
@@ -1083,6 +1088,9 @@ def task_submit(options):
     ## authenticate user:
     user = authenticate(options.get("user", ""))
     ## submit task:
+    if options["verbose"] >= 9:
+        print ""
+        write_message("storing task options %s\n" % options)
     task_id = run_sql("""INSERT INTO schTASK (id,proc,user,runtime,sleeptime,status,arguments)
                          VALUES (NULL,'webcoll',%s,%s,%s,'WAITING',%s)""",
                       (user, options["runtime"], options["sleeptime"], marshal.dumps(options)))
@@ -1127,19 +1135,22 @@ def task_run():
        This is what BibSched will be invoking via daemon call.
        The task will update collection reclist cache and collection web pages for
        given collection. (default is all).
-       Arguments described in usage() function."""
-    global task_id
+       Arguments described in usage() function.
+       Return 1 in case of success and 0 in case of failure."""
+    global task_id, options
     options = task_get_options(task_id) # get options from BibSched task table
     ## check task id:
     if not options.has_key("task"):
         write_message("Error: The task #%d does not seem to be a WebColl task." % task_id)
-        return
+        return 0
     ## check task status:
     task_status = task_read_status(task_id)
     if task_status != "WAITING":
         write_message("Error: The task #%d is %s.  I expected WAITING." % (task_id, task_status))
-        return
-    ## update task status:
+        return 0
+    ## we can run the task now:
+    if options["verbose"]:
+        write_message("Task #%d started." % task_id)
     task_update_status("RUNNING")
     ## initialize signal handler:
     signal.signal(signal.SIGUSR1, task_sig_sleep)
@@ -1147,10 +1158,8 @@ def task_run():
     signal.signal(signal.SIGABRT, task_sig_suicide)
     signal.signal(signal.SIGCONT, task_sig_wakeup)
     signal.signal(signal.SIGINT, task_sig_unknown)
-    ## run the task:
     colls = []
     # firstly, decide which collections to do:
-    Log("... creating collection list")
     if options.has_key("collection"):
         coll = get_collection(options["collection"])
         if coll.id == None:
@@ -1160,11 +1169,13 @@ def task_run():
         res = run_sql("SELECT name FROM collection ORDER BY id")
         for row in res:
             colls.append(get_collection(row[0]))
+            
     # secondly, update collection reclist cache:
     i = 0
     for coll in colls:
         i += 1
-        Log("%s" % coll.name)
+        if options["verbose"]:
+            write_message("%s / reclist cache update" % coll.name)
         coll.calculate_reclist()
         coll.update_reclist()
         task_update_progress("Part 1/2: done %d/%d." % (i,len(colls)))
@@ -1172,13 +1183,16 @@ def task_run():
     i = 0
     for coll in colls:
         i += 1
-        Log("%s" % coll.name)
+        if options["verbose"]:
+            write_message("%s / web cache update" % coll.name)
         coll.update_webpage_cache()
         task_update_progress("Part 2/2: done %d/%d." % (i,len(colls)))
     ## we are done:
     task_update_progress("Done.")
     task_update_status("DONE")
-    return
+    if options["verbose"]:
+        write_message("Task #%d finished." % task_id)
+    return 1
 
 def usage(exitcode=1, msg=""):
     """Prints usage info."""
@@ -1194,7 +1208,7 @@ def usage(exitcode=1, msg=""):
     sys.stderr.write("General options:\n")
     sys.stderr.write("  -h, --help      \t\t Print this help.\n")
     sys.stderr.write("  -V, --version   \t\t Print version information.\n")
-    sys.stderr.write("  -d, --debug     \t\t Print debugging information.\n")
+    sys.stderr.write("  -v, --verbose=LEVEL   \t Verbose level (from 0 to 9, default 1).\n")
     sys.stderr.write("""Description: %s updates the collection cache
     (record universe for a given collection plus web page elements)
     based on WML and MySQL configuration parameters.  
@@ -1212,15 +1226,25 @@ def main():
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
         ## A - run the task
         task_id = int(sys.argv[1])
-        task_run()
+        try:
+            if not task_run():
+                write_message("Error occurred.  Exiting.", sys.stderr)
+        except StandardError, e:
+            write_message("Unexpected error occurred: %s." % e, sys.stderr)
+            write_message("Traceback is:", sys.stderr)
+            traceback.print_tb(sys.exc_info()[2])
+            write_message("Exiting.", sys.stderr)
+            task_update_status("ERROR")                                   
     else:
         ## B - submit the task
-        options = {} # will hold command-line options
+        # set default values:
         options["runtime"] = time.strftime("%Y-%m-%d %H:%M:%S") 
+        options["verbose"] = 1
         options["sleeptime"] = 0
+        # set user-defined options:
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "hVdn:u:s:t:c:",
-                                       ["help", "version", "debug","number=","user=","sleep=","time=","collection="])
+            opts, args = getopt.getopt(sys.argv[1:], "hVv:u:s:t:c:",
+                                       ["help", "version", "verbose=","user=","sleep=","time=","collection="])
         except getopt.GetoptError, err:
             usage(1, err)
         try:
@@ -1232,10 +1256,8 @@ def main():
                     sys.exit(0)
                 elif opt[0] in [ "-u", "--user"]:
                     options["user"] = opt[1]
-                elif opt[0] in ["-d", "--debug"]:
-                    options["debug"]=1
-                elif opt[0] in ["-n", "--number"]:
-                    options["number"]=int(opt[1])
+                elif opt[0] in ["-v", "--verbose"]:
+                    options["verbose"] = int(opt[1])
                 elif opt[0] in [ "-s", "--sleeptime" ]:
                     get_datetime(opt[1]) # see if it is a valid shift
                     options["sleeptime"] = opt[1]

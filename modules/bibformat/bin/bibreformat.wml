@@ -605,7 +605,7 @@ def usage(exitcode=1, msg=""):
     sys.stderr.write("  -u,  --user=USER      \t\t User name to submit the task as, password needed.\n")
     sys.stderr.write("  -h,  --help           \t\t Print this help.\n")
     sys.stderr.write("  -V,  --version        \t\t Print version information.\n")
-    sys.stderr.write("  -d,  --debug          \t\t Print debugging information.\n")
+    sys.stderr.write("  -v,  --verbose=LEVEL  \t\t Verbose level (0=min,1=normal,9=max).\n")
     sys.stderr.write("  -s,  --sleeptime=SLEEP\t\t Time after which to repeat tasks (no)\n")
     sys.stderr.write("  -t,  --time=DATE      \t\t Moment for the task to be active (now).\n")
 
@@ -636,8 +636,9 @@ def main():
         ## B - submit the task
         process_format = 0
         options = {} # will hold command-line options
+        options["verbose"] = 1
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "hVdu:ac:f:s:p:lo:nt:wl", ["help", "version", "debug","user=","all","collection=","field=","sleeptime=","pattern=","format=","noprocess","time=","without","last"])
+            opts, args = getopt.getopt(sys.argv[1:], "hVv:u:ac:f:s:p:lo:nt:wl", ["help", "version", "verbose=","user=","all","collection=","field=","sleeptime=","pattern=","format=","noprocess","time=","without","last"])
         except getopt.GetoptError, err:
             usage(1, err)
 
@@ -653,8 +654,8 @@ def main():
                     sys.exit(0)
                 elif opt[0] in [ "-u", "--user"]:
                     options["user"]   = opt[1]
-                elif opt[0] in ["-d", "--debug"]:
-                    options["debug"]  = 1
+                elif opt[0] in ["-v", "--verbose"]:
+                    options["verbose"]  = int(opt[1])
                 elif opt[0] in ["-a", "--all"]:
                     options["all"]        = 1
                     options["without"]    = 1

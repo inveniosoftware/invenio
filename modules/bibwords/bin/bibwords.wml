@@ -31,21 +31,26 @@ BibWords bibliographic data, reference and fulltext indexing utility.
 Usage: bibwords %s [options] 
 Examples:
        bibwords -a -i 234-250,293,300-500 -u admin@cdsware
-       bibwords -a -w author,fulltext -M 8192 -d
-       bibwords -x -m +4d -A on --flush=10000
+       bibwords -a -w author,fulltext -M 8192 -v3
+       bibwords -d -m +4d -A on --flush=10000
 
- Command options:
- -a,  --add                add or update selected records
- -x,  --del                delete selected records
+ Indexing options:
+ -a,  --add                add or update words for selected records
+ -d,  --del                delete words for selected records
  -i,  --id=low[-high]      select according to record recID.
  -m,  --modified=from[,to] select according to modification date
- -w,  --wordsindex=w1[,w2] words indexes to consider (all)
+ -c,  --collection=c1[,c2] select according to collection
+
+ Repairing options:
+ -k,  --check              check consistency for all records in the table(s)
+ -r,  --repair             try to repair all records in the table(s)
 
  Specific options:
+ -w,  --wordsindex=w1[,w2] words indexes to consider (all)
  -M,  --maxmem=XXX         maximum memory usage in kB (no limit)
  -f,  --flush=NNN          full consistent table flush after NNN records (5000)
       
- Scheduler options:
+ Scheduling options:
  -u,  --user=USER          user name to store task, password needed
  -s,  --sleeptime=SLEEP    time after which to repeat task (no)
                            e.g.: 1s, 30m, 24h, 7d
@@ -53,10 +58,9 @@ Examples:
                            e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26
 
  General options:
- -h,  --help               print this help
- -v,  --version            print version
- -d,  --debug              log debugging information
- -V,  --verbose            log extra debugging information verbose
+ -h,  --help               print this help and exit
+ -V,  --version            print version and exit
+ -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
 """
 
 ## fill config variables:
@@ -109,6 +113,7 @@ try:
     sys.path.append('%s' % pylibdir)
     from cdsware.config import *
     from cdsware.search_engine_config import cfg_max_recID
+    from cdsware.search_engine import perform_request_search
     from cdsware.dbquery import run_sql
 except ImportError, e:
     print "Error: %s" % e
@@ -140,24 +145,15 @@ class MyFancyURLopener(urllib.FancyURLopener):
     
 #urllib._urlopener = MyFancyURLopener()
 
-def Log(msg, type=""):
-    "Logs a message to the database."
-    if type == "Debug" and not opts_dict["debug"]:
-        return
-    if type == "Verbose" and not (opts_dict["debug"] or opts_dict["verbose"]):
-        return
-
-    if type == "Error":
-        out = sys.stderr
+def write_message(msg, stream=sys.stdout):
+    """Write message and flush output stream (may be sys.stdout or sys.stderr).  Useful for debugging stuff."""
+    if stream == sys.stdout or stream == sys.stderr:
+        stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
+        stream.write("%s\n" % msg)
+        stream.flush()
     else:
-        out = sys.stdout
-                               
-    out.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
-    out.write(str(msg))
-    if type:
-        out.write(" (" + type + ")")
-    out.write("\n")
-    out.flush()
+        sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
+    return
 
 ## precompile some often-used regexp for speed reasons:
 re_subfields = sre.compile('\$\$\w');
@@ -165,7 +161,7 @@ re_subfields = sre.compile('\$\$\w');
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
 wordTables = []
-taskid = -1
+task_id = -1
 base_process_size = 4500 # process base size
 opts_dict = {} # will hold task options
 
@@ -213,7 +209,6 @@ def list_union(list1, list2):
 def get_fieldvalues(recID, tag):
     """Returns list of values of the MARC-21 'tag' fields for the record
        'recID'."""
-
     out = []
     bibXXx = "bib" + tag[0] + tag[1] + "x"
     bibrec_bibXXx = "bibrec_" + bibXXx
@@ -260,7 +255,8 @@ def get_words_from_fulltext(url_indirect,separators="[^\w]",split=string.split):
        Please note the double indirection. url_indirect
        returns a document that has to be parsed to get the actual
        urls."""
-
+    if opts_dict["verbose"] >= 2:
+        write_message("... reading fulltext files from %s started" % url_indirect)
     url_direct = None
     fulltext_urls = None
     # check for direct link in url
@@ -284,8 +280,8 @@ def get_words_from_fulltext(url_indirect,separators="[^\w]",split=string.split):
     # process as many urls as they were found:
     for (ext,url_direct) in fulltext_urls:
 
-        if opts_dict["debug"]:
-            print "Debug: processing %s from %s" % (ext,url_direct)
+        if opts_dict["verbose"] >= 2:
+            write_message(".... processing %s from %s started" % (ext,url_direct))
         
         # sanity check:
         if not url_direct:
@@ -362,17 +358,16 @@ def get_words_from_fulltext(url_indirect,separators="[^\w]",split=string.split):
                     sys.stderr.write("Error: Do not know how to handle %s conversion program.\n" % conv_program)
                 # try to run it:
                 try:
-                    if opts_dict["debug"]:
-                        print "Debug: launching %s" % cmd
+                    if opts_dict["verbose"] >= 9:
+                        write_message("..... launching %s" % cmd)
                     errcode = os.system(cmd)
                     if errcode == 0 and os.path.exists("%s.txt" % tmp_name):
                         bingo = 1
                         break # bingo!
                     else:
-                        sys.stderr.write("Error: while running %s for %s.\n" % (cmd, url_direct))
+                        write_message("Error while running %s for %s.\n" % (cmd, url_direct), sys.stderr)
                 except:
-                    if opts_dict["debug"]:
-                        sys.stderr.write("Debug: Error running %s for %s.\n" % (cmd, url_direct))
+                    write_message("Error running %s for %s.\n" % (cmd, url_direct), sys.stderr)
 
         # were we successful?
         if bingo:
@@ -383,20 +378,22 @@ def get_words_from_fulltext(url_indirect,separators="[^\w]",split=string.split):
                         words[word] = 1;
             tmp_name_txt_file.close()
         else:
-            if opts_dict["debug"]:
-                sys.stderr.write("Debug: No conversion success for %s.\n" % (url_direct))
+            if opts_dict["verbose"]:
+                write_message("No conversion success for %s.\n" % (url_direct), sys.stderr)
 
         # delete temp files (they might not exist):
         try:
             os.unlink(tmp_name)
             os.unlink(tmp_name + ".txt")
         except StandardError:
-            Log("Could not delete file. It didn't exist","Error") 
+            write_message("Error: Could not delete file. It didn't exist", sys.stderr) 
 
-        # print interesting info:
-        if opts_dict["debug"]:
-            print "Debug: words table size is %d" % len(words)
+        if opts_dict["verbose"] >= 2:
+            write_message(".... processing %s from %s ended" % (ext,url_direct))
+        
 
+    if opts_dict["verbose"] >= 2:
+        write_message("... reading fulltext files from %s ended" % url_indirect)
         
     return words.keys()
 
@@ -491,23 +488,26 @@ def usage(code, msg=''):
     """ Usage: %s [options] 
      Examples:
        %s -a -i 234-250,293,300-500 -u admin@cdsware
-       %s -a -w author,fulltext -M 8192 -d
-       %s -x -m +4d -A on --flush=10000
+       %s -a -w author,fulltext -M 8192 -v3
+       %s -d -m +4d -A on --flush=10000
 
- Command options:
- -a,  --add                add or update selected records
- -x,  --del                delete selected records
- -c,  --check              check consistency for all records in the table(s)
- -r,  --repair             try to repair all records in the table(s)
- -i,  --id=low[-high]      select according to doc recID.
+ Indexing options:
+ -a,  --add                add or update words for selected records
+ -d,  --del                delete words for selected records
+ -i,  --id=low[-high]      select according to doc recID
  -m,  --modified=from[,to] select according to modification date
- -w,  --wordsindex=w1[,w2] words indexes to consider (all)
+ -c,  --collection=c1[,c2] select according to collection
+
+ Repairing options:
+ -k,  --check              check consistency for all records in the table(s)
+ -r,  --repair             try to repair all records in the table(s)
 
  Specific options:
+ -w,  --wordsindex=w1[,w2] words indexes to consider (all)
  -M,  --maxmem=XXX         maximum memory usage in kB (no limit)
  -f,  --flush=NNN          full consistent table flush after NNN records (5000)
       
- Scheduler options:
+ Scheduling options:
  -u,  --user=USER          user name to store task, password needed
  -s,  --sleeptime=SLEEP    time after which to repeat tasks (no)
                            e.g.: 1s, 30m, 24h, 7d
@@ -515,10 +515,9 @@ def usage(code, msg=''):
                            e.g.: +15s, 5m, 3h , 2002-10-27 13:57:26
 
  General options:
- -h,  --help               print this help
- -V,  --version            print version
- -d,  --debug              log debugging information
- -v,  --verbose            log extra debugging information verbose
+ -h,  --help               print this help and exit
+ -V,  --version            print version and exit
+ -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
     """ % ((sys.argv[0],) * 4)
 </protect>
     sys.exit(code)
@@ -597,7 +596,7 @@ def get_word_tables(tables):
                 wordTables.append({"bibwords%d" % wordsindex_id: \
                                    get_wordsindex_tags(wordsindex)})
             else:                
-                Log("There is no %s words table." % wordsindex, "Error")
+                write_message("Error: There is no %s words table." % wordsindex, sys.stderr)
     else:
         for wordsindex in get_all_wordsindexes():
             wordsindex_id = get_wordsindex_id(wordsindex)
@@ -628,7 +627,6 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
         sign = m.groups()[0] == "-" and -1 or 1
         factor = factors[m.groups()[2]]
         value = float(m.groups()[1])
-        print value
         date = time.localtime(date + sign * factor * value)
         date = time.strftime(format_string, date)
     else:
@@ -729,9 +727,10 @@ class WordTable:
            bibwordsX table.  Mode 'normal' means normal execution,
            mode 'emergency' means words index reverting to old state.
            """
-        Log("%s %s wordtable flush started" % (self.tablename,mode) )
-        Log('...updating %d words into %s started' % \
-            (len(self.value), self.tablename), "Verbose")
+        if opts_dict["verbose"]:
+            write_message("%s %s wordtable flush started" % (self.tablename,mode))
+            write_message('...updating %d words into %s started' % \
+                (len(self.value), self.tablename))
             
         self.recIDs_in_mem = beautify_range_list(self.recIDs_in_mem)
 
@@ -740,7 +739,8 @@ class WordTable:
                 query = """UPDATE %sr SET type='TEMPORARY' WHERE id_bibrec
                 BETWEEN '%d' AND '%d' AND type='CURRENT'""" % \
                 (self.tablename, group[0], group[1])
-                Log(query, "Debug")
+                if opts_dict["verbose"] >= 9:
+                    write_message(query)
                 run_sql(query)
 
         nb_words_total = len(self.value)
@@ -750,45 +750,56 @@ class WordTable:
             self.put_word_into_db(word)
             nb_words_done += 1
             if nb_words_report!=0 and ((nb_words_done % nb_words_report) == 0):
-                Log('......updated %d/%d words' % (nb_words_done, nb_words_total))
-        Log('...updating %d words into %s ended' % \
-            (nb_words_total, self.tablename))
+                if opts_dict["verbose"]:
+                    write_message('......processed %d/%d words' % (nb_words_done, nb_words_total))
+        if opts_dict["verbose"] >= 9:
+            write_message('...updating %d words into %s ended' % \
+                (nb_words_total, self.tablename))
                 
-        Log('...updating reverse table %sr started' % self.tablename)
+        if opts_dict["verbose"]:
+            write_message('...updating reverse table %sr started' % self.tablename)
         if mode == "normal":
             for group in self.recIDs_in_mem:
                 query = """UPDATE %sr SET type='CURRENT' WHERE id_bibrec
                 BETWEEN '%d' AND '%d' AND type='FUTURE'""" % \
                 (self.tablename, group[0], group[1])
-                Log(query, "Debug")
+                if opts_dict["verbose"] >= 9:
+                    write_message(query)
                 run_sql(query)
                 query = """DELETE FROM %sr WHERE id_bibrec
                 BETWEEN '%d' AND '%d' AND type='TEMPORARY'""" % \
                 (self.tablename, group[0], group[1])
-                Log(query, "Debug")
+                if opts_dict["verbose"] >= 9:
+                    write_message(query)
                 run_sql(query)
-            Log('End of updating wordTable into %s' % self.tablename, "Debug")
+            if opts_dict["verbose"] >= 9:
+                write_message('End of updating wordTable into %s' % self.tablename)
         elif mode == "emergency":
             for group in self.recIDs_in_mem:
                 query = """UPDATE %sr SET type='CURRENT' WHERE id_bibrec
                 BETWEEN '%d' AND '%d' AND type='TEMPORARY'""" % \
                 (self.tablename, group[0], group[1])
-                Log(query, "Debug")
+                if opts_dict["verbose"] >= 9:
+                    write_message(query)
                 run_sql(query)
                 query = """DELETE FROM %sr WHERE id_bibrec
                 BETWEEN '%d' AND '%d' AND type='FUTURE'""" % \
                 (self.tablename, group[0], group[1])
-                Log(query, "Debug")
+                if opts_dict["verbose"] >= 9:
+                    write_message(query)
                 run_sql(query)
-            Log('End of emergency flushing wordTable into %s' % self.tablename,
-                "Debug")
-        Log('...updating reverse table %sr ended' % self.tablename)
+            if opts_dict["verbose"] >= 9:
+                write_message('End of emergency flushing wordTable into %s' % self.tablename)
+        if opts_dict["verbose"]:
+            write_message('...updating reverse table %sr ended' % self.tablename)
 
         self.clean()
         self.recIDs_in_mem = []
-        Log("%s %s wordtable flush ended" % (self.tablename, mode) )
+        if opts_dict["verbose"]:
+            write_message("%s %s wordtable flush ended" % (self.tablename, mode))
 
     def load_old_recIDs(self,word):
+        """Load existing hitlist for the word from the database index files."""
         query = "SELECT hitlist FROM %s WHERE word='%s'" % \
                 (self.tablename, MySQLdb.escape_string(word))
         res = run_sql(query)
@@ -813,22 +824,36 @@ class WordTable:
 
         set = self.load_old_recIDs(word)
         if set: # merge the word recIDs found in memory:
+            set_old = set
             self.merge_with_old_recIDs(word,set)
-            query = "UPDATE %s SET hitlist='%s' WHERE word='%s'" % \
-                    (self.tablename, serialize_via_numeric_array(set),
-                     MySQLdb.escape_string(word))            
+            if set_old == set:
+                # nothing to update:
+                if opts_dict["verbose"] >= 9:
+                    write_message("......... unchanged hitlist for ``%s''" % word)
+                pass
+            else:
+                # yes there were some new words:
+                if opts_dict["verbose"] >= 9:
+                    write_message("......... updating hitlist for ``%s''" % word)
+                query = "UPDATE %s SET hitlist='%s' WHERE word='%s'" % \
+                        (self.tablename, serialize_via_numeric_array(set),
+                         MySQLdb.escape_string(word))            
+                run_sql(query)
+                
         else: # the word is new, will create new set:
             set = Numeric.zeros(cfg_max_recID+1, Numeric.Int0)
             Numeric.put(set, self.value[word].keys(), 1)
+            if opts_dict["verbose"] >= 9:
+                write_message("......... inserting hitlist for ``%s''" % word)
             query = "INSERT INTO %s (word, hitlist) VALUES ('%s', '%s')" %\
                     (self.tablename, MySQLdb.escape_string(word),
                      serialize_via_numeric_array(set))
+            run_sql(query)
 
         if not set: # never store empty words
             query = "DELETE from %s WHERE word='%s'" % \
                     (self.tablename, MySQLdb.escape_string(word))
-
-        run_sql(query)
+            run_sql(query)
  
         del self.value[word]
             
@@ -837,7 +862,8 @@ class WordTable:
         keys = self.value.keys()
         keys.sort()
         for k in keys:
-            Log("%s: %s" % (k, self.value[k]))
+            if opts_dict["verbose"]:
+                write_message("%s: %s" % (k, self.value[k]))
 
     def count(self):
         "Returns the number of words in the table."
@@ -845,7 +871,8 @@ class WordTable:
 
     def info(self):
         "Prints some information on the words table."
-        Log("The words table contains %d words." % self.count())
+        if opts_dict["verbose"]:
+            write_message("The words table contains %d words." % self.count())
 
     def lookup_words(self, word=""):
         "Lookup word from the words table."
@@ -860,15 +887,19 @@ class WordTable:
                     return
 
         if self.value.has_key(word):
-            Log("The word '%s' is found %d times." \
+            if opts_dict["verbose"]:
+                write_message("The word '%s' is found %d times." \
                 % (word, len(self.value[word])))
         else:
-            Log("The word '%s' does not exist in the word file."\
-                % word)
+            if opts_dict["verbose"]:
+                write_message("The word '%s' does not exist in the word file."\
+                              % word)
 
     def add_recIDs(self, recIDs):
         """Fetches records which id in the recIDs range list and adds
-        them to the wordTable."""
+        them to the wordTable.  The recIDs range list is of the form:
+        [[i1_low,i1_high],[i2_low,i2_high], ..., [iN_low,iN_high]].
+        """
         global chunksize
         flush_count = 0
         records_done = 0
@@ -887,15 +918,17 @@ class WordTable:
                 i_high = min(i_low+chunksize-chunksize_count-1, i_high)
                 
                 self.chk_recID_range(i_low, i_high)
-                Log("%s adding records #%d-#%d started" % \
-                    (self.tablename, i_low, i_high))
+                if opts_dict["verbose"]:
+                    write_message("%s adding records #%d-#%d started" % \
+                        (self.tablename, i_low, i_high))
                 self.del_recID_range(i_low, i_high)
                 just_processed = self.add_recID_range(i_low, i_high)
                 flush_count = flush_count + i_high - i_low + 1
                 chunksize_count = chunksize_count + i_high - i_low + 1
                 records_done = records_done + just_processed
-                Log("%s adding records #%d-#%d ended  " % \
-                    (self.tablename, i_low, i_high))
+                if opts_dict["verbose"]:
+                    write_message("%s adding records #%d-#%d ended  " % \
+                        (self.tablename, i_low, i_high))
 
                 if chunksize_count >= chunksize:
                     chunksize_count = 0
@@ -903,7 +936,8 @@ class WordTable:
                 if flush_count >= opts_dict["flush"]:
                     self.put_into_db()
                     self.clean()
-                    Log("%s backing up" % (self.tablename))
+                    if opts_dict["verbose"]:
+                        write_message("%s backing up" % (self.tablename))
                     flush_count = 0
                     self.log_progress(time_started,records_done,records_to_go)
                 # iterate:
@@ -915,7 +949,6 @@ class WordTable:
     def add_date(self, date):
         # If date is not set, then retrieve it from the database.
         # Reindex all formats newer than the modification date
-        global Log
         if not date:
             id = self.tablename[len("bibwords"):]
             query = """SELECT last_updated FROM wordsindex WHERE id='%s'
@@ -932,7 +965,8 @@ class WordTable:
         res = run_sql(query)        
         list = create_range_list(res)
         if not list:
-            Log( "No new records added. %s is up to date" % self.tablename )
+            if opts_dict["verbose"]:
+                write_message( "No new records added. %s is up to date" % self.tablename)
         else:
             self.add_recIDs(list)
         
@@ -961,6 +995,9 @@ class WordTable:
 
         if len(wlist) == 0: return 0
         recIDs = wlist.keys()
+        if opts_dict["verbose"] >= 9:
+            for recID in recIDs:
+                write_message("... record %d, wordlist: %s" % (recID, wlist[recID]))
 
         # Using cStringIO for speed.
         query_factory = cStringIO.StringIO()
@@ -1028,12 +1065,14 @@ class WordTable:
             return
 
         time_recs_per_min = done/(time_elapsed/60.0)
-        Log("%d records took %.1f seconds to complete.(%1.f recs/min)"\
-            % (done, time_elapsed, time_recs_per_min))
+        if opts_dict["verbose"]:
+            write_message("%d records took %.1f seconds to complete.(%1.f recs/min)"\
+                % (done, time_elapsed, time_recs_per_min))
         
         if time_recs_per_min:
-            Log("Estimated runtime: %.1f minutes" % \
-                ((todo-done)/time_recs_per_min))
+            if opts_dict["verbose"]:
+                write_message("Estimated runtime: %.1f minutes" % \
+                    ((todo-done)/time_recs_per_min))
 
     def put(self, recID, word, sign):
         "Adds/deletes a word to the word list."        
@@ -1045,12 +1084,14 @@ class WordTable:
             else:
                 self.value[word] = {recID: sign}
         except:
-            Log("Cannot put word %s with sign %d for recID %s." % (word, sign, recID))
+            write_message("Error: Cannot put word %s with sign %d for recID %s." % (word, sign, recID))
 
 
     def del_recIDs(self, recIDs):
         """Fetches records which id in the recIDs range list and adds
-        them to the wordTable."""
+        them to the wordTable.  The recIDs range list is of the form:
+        [[i1_low,i1_high],[i2_low,i2_high], ..., [iN_low,iN_high]].
+        """
         count = 0
         for range in recIDs:
             self.del_recID_range(range[0],range[1])
@@ -1060,6 +1101,9 @@ class WordTable:
     def del_recID_range(self, low, high):
         """Deletes records with 'recID' system number between low
            and high from memory words index table."""
+        if opts_dict["verbose"]:
+            write_message("%s deleting records #%d-#%d started" % \
+                (self.tablename, low, high))
         self.recIDs_in_mem.append([low,high])
         query = """SELECT id_bibrec,wordlist FROM %sr as bb WHERE bb.id_bibrec
         BETWEEN '%d' AND '%d'""" % (self.tablename, low, high)
@@ -1069,13 +1113,15 @@ class WordTable:
             wlist = deserialize_via_marshal(recID_row[1])
             for word in wlist:
                 self.put(recID, word, -1)
+        if opts_dict["verbose"]:
+            write_message("%s deleting records #%d-#%d ended" % \
+                (self.tablename, low, high))
 
     def report_on_table_consistency(self):
         """Check reverse words index tables (e.g. bibwords1r) for
         interesting states such as 'TEMPORARY' state.
         Prints small report (no of words, no of bad words).
         """
-
         # find number of words:
         query = """SELECT COUNT(*) FROM %s""" % (self.tablename)
         res = run_sql(query, None, 1)
@@ -1093,7 +1139,8 @@ class WordTable:
             nb_records = 0
 
         # report stats:
-        Log("%s contains %d words from %d records" % (self.tablename, nb_words, nb_records))
+        if opts_dict["verbose"]:
+            write_message("%s contains %d words from %d records" % (self.tablename, nb_words, nb_records))
 
         # find possible bad states in reverse tables:
         query = """SELECT COUNT(DISTINCT(id_bibrec)) FROM %sr WHERE type <> 'CURRENT'""" % (self.tablename)
@@ -1103,10 +1150,11 @@ class WordTable:
         else:
             nb_bad_records = 999999999
         if nb_bad_records:
-            Log("%s needs to repair %d of %d records" % \
-                (self.tablename, nb_bad_records, nb_records), "EMERGENCY")
+            write_message("EMERGENCY: %s needs to repair %d of %d records" % \
+                (self.tablename, nb_bad_records, nb_records))
         else:
-            Log("%s is in consistent state" % (self.tablename))
+            if opts_dict["verbose"]:
+                write_message("%s is in consistent state" % (self.tablename))
         
         return nb_bad_records
 
@@ -1168,7 +1216,7 @@ class WordTable:
         if flush_count > 0:
             self.put_into_db("emergency")
             self.log_progress(time_started,records_done,records_to_go)
-        Log("%s inconsistencies repaired." % self.tablename, "EMERGENCY")
+        write_message("%s inconsistencies repaired." % self.tablename)
 
 
 
@@ -1179,14 +1227,14 @@ class WordTable:
         AND id_bibrec BETWEEN '%d' AND '%d'""" % (self.tablename, low, high)
         res = run_sql(query, None, 1)
         if res[0][0]==0:
-            Log("%s for %d-%d is in consistent state"%(self.tablename,low,high))
+            if opts_dict["verbose"]:
+                write_message("%s for %d-%d is in consistent state"%(self.tablename,low,high))
             return # okay, words table is consistent
 
         ## inconsistency detected!
-        Log("%s inconsistencies detected..." % self.tablename, "EMERGENCY")
-        Log("""Errors found. You should check consistency of the %s - %sr tables.\nRunning 'bibwords --repair' is recommended.""" \
-            % (self.tablename, self.tablename),
-            "EMERGENCY!")
+        write_message("EMERGENCY: %s inconsistencies detected..." % self.tablename)
+        write_message("""EMERGENCY: Errors found. You should check consistency of the %s - %sr tables.\nRunning 'bibwords --repair' is recommended.""" \
+            % (self.tablename, self.tablename))
         raise StandardError
 
         
@@ -1218,16 +1266,14 @@ class WordTable:
             if not 'TEMPORARY' in state[recID]:
                 if 'FUTURE' in state[recID]:
                     if 'CURRENT' not in state[recID]:
-                        Log("Record %d is in inconsistent state. Can't repair it",
-                            "EMERGENCY")
+                        write_message("EMERGENCY: Record %d is in inconsistent state. Can't repair it")
                         ok = 0
                     else:
-                        Log("Inconsistency in record %d detected" % recID,
-                            "EMERGENCY")
+                        write_message("EMERGENCY: Inconsistency in record %d detected" % recID)
                         query = """DELETE FROM %sr
                         WHERE id_bibrec='%d'""" % (self.tablename, recID)
                         run_sql(query)
-                        Log("Inconsistency in record %d repaired." % recID)
+                        write_message("EMERGENCY: Inconsistency in record %d repaired." % recID)
 
             else:
                 if 'FUTURE' in state[recID] and not 'CURRENT' in state[recID]:
@@ -1236,11 +1282,13 @@ class WordTable:
                     # Get the words file
                     query = """SELECT type,wordlist FROM %sr
                     WHERE id_bibrec='%d'""" % (self.tablename, recID)
-                    Log(query, "Debug")
+                    if opts_dict["verbose"] >= 9:
+                        write_message(query)
                     res = run_sql(query)
                     for row in res:
                         wlist = deserialize_via_marshal(row[1])
-                        Log("Words are %s " % wlist, "Debug")
+                        if opts_dict["verbose"] >= 9:
+                            write_message("Words are %s " % wlist)
                         if row[0] == 'TEMPORARY':
                             sign = 1
                         else:
@@ -1249,15 +1297,13 @@ class WordTable:
                             self.put(recID, word, sign)
 
                 else:
-                    Log("%s for %d is in inconsistent state. Couldn't repair it." % (self.tablename, recID),
-                        "EMERGENCY")
+                    write_message("EMERGENCY: %s for %d is in inconsistent state. Couldn't repair it." % (self.tablename, recID))
                     ok = 0
 
         if not ok:
-            Log("""Unrepairable errors found. You should check consistency
+            write_message("""EMERGENCY: Unrepairable errors found. You should check consistency
                 of the %s - %sr tables. Deleting affected records is
-                recommended.""" % (self.tablename, self.tablename),
-                "EMERGENCY")
+                recommended.""" % (self.tablename, self.tablename))
             raise StandardError
                 
 
@@ -1265,24 +1311,28 @@ class WordTable:
 def task_run(row):
     """Run the indexing task.  The row argument is the BibSched task
     queue row, containing if, arguments, etc.
+    Return 1 in case of success and 0 in case of failure."""
     """
     
-    global opts_dict, taskid, wordTables
+    global opts_dict, task_id, wordTables
 
     # read from SQL row:
-    taskid = row[0]
+    task_id = row[0]
     task_proc = row[1]
     opts_dict = loads(row[6])
     task_status = row[7]
 
     # sanity check:
     if task_proc != "bibwords":
-        Log("The task #%d does not seem to be a BibWords task." % taskid, "Error")
-        return
+        write_message("The task #%d does not seem to be a BibWords task." % task_id, sys.stderr)
+        return 0
     if task_status != "WAITING":
-        Log("The task #%d is %s.  I expected WAITING." % (taskid, task_status), "Error")
-        return
+        write_message("The task #%d is %s.  I expected WAITING." % (task_id, task_status), sys.stderr)
+        return 0
 
+    # we can run the task now:
+    if opts_dict["verbose"]:
+        write_message("Task #%d started." % task_id)
     task_update_status("RUNNING")
 
     # install signal handlers
@@ -1300,29 +1350,44 @@ def task_run(row):
             if opts_dict["cmd"] == "del":
                 if opts_dict["id"]:
                     wordTable.del_recIDs(opts_dict["id"])
+                elif opts_dict["collection"]:
+                    l_of_colls = string.split(opts_dict["collection"], ",")
+                    recIDs = perform_request_search(c=l_of_colls)
+                    recIDs_range = []
+                    for recID in recIDs:
+                        recIDs_range.append([recID,recID])
+                    wordTable.del_recIDs(recIDs_range)
                 else:
                     wordTable.del_date(opts_dict["modified"])
 
             elif opts_dict["cmd"] == "add":
                 if opts_dict["id"]:
                     wordTable.add_recIDs(opts_dict["id"])
+                elif opts_dict["collection"]:
+                    l_of_colls = string.split(opts_dict["collection"], ",")
+                    recIDs = perform_request_search(c=l_of_colls)
+                    recIDs_range = []
+                    for recID in recIDs:
+                        recIDs_range.append([recID,recID])
+                    wordTable.add_recIDs(recIDs_range)
                 else:
                     wordTable.add_date(opts_dict["modified"])
             elif opts_dict["cmd"] == "repair":
                 wordTable.repair()
             else:
-                Log("Invalid command found processing %s" % \
-                     wordTable.tablename, "Error")
+                write_message("Invalid command found processing %s" % \
+                     wordTable.tablename, sys.stderr)
                 raise StandardError
 
             id = wordTable.tablename[len("bibwords"):]
             query = """UPDATE wordsindex SET last_updated=NOW()
             WHERE id='%s'""" %  id
-            Log(query, "Debug")
+            if opts_dict["verbose"] >= 9:
+                write_message(query)
             run_sql(query)
 
         except StandardError, e:
-            Log("Exception caught: %s" % e, "Error")
+            write_message("Exception caught: %s" % e, sys.stderr)
             traceback.print_tb(sys.exc_info()[2])
             task_update_status("ERROR")
             task_sig_stop_commands()
@@ -1332,30 +1397,30 @@ def task_run(row):
 
     # We are done. State it in the database, close and quit
     task_update_status("DONE")
-    Log("Done. Finished processing.")
-    sys.exit(0)
+    if opts_dict["verbose"]:
+        write_message("Task #%d finished." % task_id)
+    return 1
         
 def command_line():
     global opts_dict
-    long_flags =["add","del","check","repair","id=","modified=","wordsindex=",
-                 "maxmem=", "flush=","user=","sleeptime=",
-                 "time=","help", "version", "debug", "verbose"]
-    short_flags ="axcri:m:w:M:f:u:s:t:hvdD"
+    long_flags =["add","del","id=","modified=","collection=", "wordsindex=",
+                 "check","repair","maxmem=", "flush=","user=","sleeptime=",
+                 "time=","help", "version", "verbose="]
+    short_flags ="adi:m:c:w:krM:f:u:s:t:hVv:"
     format_string = "%Y-%m-%d %H:%M:%S"
     tables = None
     sleeptime = ""
-    tmp_name = os.tempnam()
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], short_flags, long_flags)
     except getopt.GetoptError, err:
-        Log(err, "Error")
+        write_message(err, sys.stderr)
         usage(1)
     if args:
         usage(1)
         
-    opts_dict={"cmd":"add", "id":[], "modified":[], "maxmem":0,
-               "flush":5000, "sleeptime":0, "debug":0, "verbose":0 }
+    opts_dict={"cmd":"add", "id":[], "modified":[], "collection":[], "maxmem":0, 
+               "flush":5000, "sleeptime":0, "verbose":1 }
     sched_time = time.strftime(format_string)
     
     user = ""
@@ -1365,27 +1430,27 @@ def command_line():
         for opt in opts:
             if opt == ("-h","")  or opt == ("--help",""):
                 usage(1)
-            elif opt == ("-v","")  or opt == ("--version",""):
+            elif opt == ("-V","")  or opt == ("--version",""):
                 print __version__
                 sys.exit(1)
-            elif opt == ("-d","")  or opt == ("--debug",""):
-                opts_dict["debug"] = 1
-            elif opt == ("--verbose","") or opt == ("-V",""):
-                opts_dict["verbose"] = 1
+            elif opt[0] in ["--verbose", "-v"]:
+                opts_dict["verbose"] = int(opt[1])
             elif opt == ("-a","") or opt == ("--add",""):
                 opts_dict["cmd"] = "add"
                 if ("-x","") in opts or ("--del","") in opts:
                     usage(1)
-            elif opt == ("-c","") or opt == ("--check",""):
+            elif opt == ("-k","") or opt == ("--check",""):
                 opts_dict["cmd"] = "check"
             elif opt == ("-r","") or opt == ("--repair",""):
                 opts_dict["cmd"] = "repair"
-            elif opt == ("-x","") or opt == ("--del",""):            
+            elif opt == ("-d","") or opt == ("--del",""):            
                 opts_dict["cmd"]="del"
             elif opt[0] in [ "-i", "--id" ]:
                 opts_dict["id"] = opts_dict["id"] + split_ranges(opt[1])
             elif opt[0] in [ "-m", "--modified" ]:
                 opts_dict["modified"] = get_date_range(opt[1]) 
+            elif opt[0] in [ "-c", "--collection" ]:
+                opts_dict["collection"] = opt[1]
             elif opt[0] in [ "-w", "--wordsindex" ]:
                 tables = opt[1]
             elif opt[0] in [ "-M", "--maxmem"]:
@@ -1403,7 +1468,7 @@ def command_line():
                 sched_time= get_datetime(opt[1])
             else: usage(1)
     except StandardError, e:
-        Log(e, "Error")
+        write_message(e, sys.stderr)
         sys.exit(1)
 
     opts_dict["wordsindex"]=get_word_tables(tables)
@@ -1412,22 +1477,25 @@ def command_line():
         for table in opts_dict["wordsindex"]:
             wordTable = WordTable(table.keys()[0], table.values()[0])
             wordTable.report_on_table_consistency()
-        return
+        return 
 
     user = authenticate(user)
 
+    if opts_dict["verbose"] >= 9:
+        print ""
+        write_message("storing task options %s\n" % opts_dict)
+    
     query = """INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status)
                VALUES ('bibwords','%s',CAST('%s' AS DATE),'%s','%s','WAITING')""" % \
                  (MySQLdb.escape_string(user),MySQLdb.escape_string(sched_time), sleeptime, \
                   MySQLdb.escape_string(dumps(opts_dict)))
     new_task_id = run_sql(query)
-    if opts_dict["debug"]:
-        print opts_dict
+
     print "Task #%d was successfully scheduled for execution." % new_task_id
     return
 
 def write_message(msg, stream=sys.stdout):
-    """Prints message and flush output stream (may be sys.stdout or sys.stderr).  Useful for debugging stuff."""
+    """Prints message and flush output stream (may be sys.stdout or sys.stderr)."""
     if stream == sys.stdout or stream == sys.stderr:
         stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
         stream.write("%s\n" % msg)
@@ -1437,7 +1505,7 @@ def write_message(msg, stream=sys.stdout):
 
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
-    if opts_dict["debug"]:
+    if opts_dict["verbose"] >= 9:
         write_message("got signal %d" % sig)
     write_message("sleeping...")
     task_update_status("SLEEPING")
@@ -1445,14 +1513,14 @@ def task_sig_sleep(sig, frame):
 
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
-    if opts_dict["debug"]:
+    if opts_dict["verbose"] >= 9:
         write_message("got signal %d" % sig)
     write_message("continuing...")
     task_update_status("CONTINUING")
 
 def task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
-    if opts_dict["debug"]:
+    if opts_dict["verbose"] >= 9:
         write_message("got signal %d" % sig)
     write_message("stopping...")
     task_update_status("STOPPING")
@@ -1478,7 +1546,7 @@ def task_sig_stop_commands():
     
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
-    if opts_dict["debug"]:
+    if opts_dict["verbose"] >= 9:
         write_message("got signal %d" % sig)
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
@@ -1488,22 +1556,22 @@ def task_sig_suicide(sig, frame):
 
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
-    if opts_dict["debug"]:
+    if opts_dict["verbose"] >= 9:
         write_message("got signal %d" % sig)    
     write_message("unknown signal %d ignored" % sig) # do nothing for other signals
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
-    query = "UPDATE schTASK SET progress='%s' where id=%d" % (MySQLdb.escape_string(msg), taskid)
-    if opts_dict["debug"]:
+    query = "UPDATE schTASK SET progress='%s' where id=%d" % (MySQLdb.escape_string(msg), task_id)
+    if opts_dict["verbose"] >= 9:
         write_message(query)
     run_sql(query)    
     return    
 
 def task_update_status(val):
     """Updates state information in the BibSched task table."""
-    query = "UPDATE schTASK SET status='%s' where id=%d" % (MySQLdb.escape_string(val), taskid)
-    if opts_dict["debug"]:
+    query = "UPDATE schTASK SET status='%s' where id=%d" % (MySQLdb.escape_string(val), task_id)
+    if opts_dict["verbose"] >= 9:
         write_message(query)
     run_sql(query)    
     return    
@@ -1514,9 +1582,8 @@ def test_fulltext_indexing():
     integrate anything into the database.  Useful when debugging
     problems with fulltext indexing: call this function instead of main().
     """
-    global opts_dict
     opts_dict = {}
-    opts_dict["debug"] = 1
+    opts_dict["verbose"] = 9
     print get_words_from_fulltext("http://doc.cern.ch/cgi-bin/setlink?base=atlnot&categ=Communication&id=com-indet-2002-012") # protected URL
     print get_words_from_fulltext("http://doc.cern.ch/cgi-bin/setlink?base=agenda&categ=a00388&id=a00388s2t7") # XLS
     print get_words_from_fulltext("http://doc.cern.ch/cgi-bin/setlink?base=agenda&categ=a02883&id=a02883s1t6/transparencies") # PPT
@@ -1532,12 +1599,10 @@ def test_word_separators(phrase="hep-th/0101001"):
 
 def test_really_run():
     """Test by really running words indexing not via task scheduler but directly.  Useful for debugging/profiling."""
-    global opts_dict
     opts_dict = { "wordsindex": get_word_tables("author"),
                   "cmd" : "add",
                   "id" : [[1,1000]],
-                  "debug" : 0,
-                  "verbose" : 0,
+                  "verbose" : 9,
                   "flush" : 50000,
                 }
     for table in opts_dict["wordsindex"]:
@@ -1558,18 +1623,19 @@ def test_really_run():
             elif opts_dict["cmd"] == "repair":
                 wordTable.repair()
             else:
-                Log("Invalid command found processing %s" % \
-                     wordTable.tablename, "Error")
+                write_message("Invalid command found processing %s" % \
+                     wordTable.tablename, sys.stderr)
                 raise StandardError
 
             id = wordTable.tablename[len("bibwords"):]
             query = """UPDATE wordsindex SET last_updated=NOW()
             WHERE id='%s'""" %  id
-            Log(query, "Debug")
+            if opts_dict["verbose"] >= 9:
+                write_message(query)
             run_sql(query)
 
         except StandardError, e:
-            Log("Exception caught: %s" % e, "Error")
+            write_message("Exception caught: %s" % e, sys.stderr)
             traceback.print_tb(sys.exc_info()[2])
             task_update_status("ERROR")
             task_sig_stop_commands()
@@ -1588,9 +1654,17 @@ def main():
         
         res = run_sql("SELECT * FROM schTASK WHERE id='%d'" % (id), None, 1)
         if not res:
-            Log("Selected task not found.", "Error")
+            write_message("Selected task not found.", sys.stderr)
             sys.exit(1)
-        task_run(res[0])
+        try:
+            if not task_run(res[0]):
+                write_message("Error occurred.  Exiting.", sys.stderr)
+        except StandardError, e:
+            write_message("Unexpected error occurred: %s." % e, sys.stderr)
+            write_message("Traceback is:")
+            traceback.print_tb(sys.exc_info()[2])
+            write_message("Exiting.")
+            task_update_status("ERROR")                                               
     else:
         command_line()
 
