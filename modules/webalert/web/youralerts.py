@@ -42,6 +42,7 @@ from cdsware.webpage import page
 from cdsware import webalert
 from cdsware.webuser import getUid, page_not_authorized
 from mod_python import apache
+from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
     
 def relative_redirect( req, relative_url, **args ):
     tmp = []
@@ -56,7 +57,7 @@ def relative_redirect( req, relative_url, **args ):
 def display(req, p="n"):
     uid = getUid(req)	
 
-    if uid == -1: 
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return page_not_authorized(req, "../youralerts.py/display")
 
     return page(title="Display searches",
@@ -70,7 +71,7 @@ def display(req, p="n"):
 def input(req, idq, name="", freq="week", notif="y", idb=0, error_msg=""):
     uid = getUid(req)
 
-    if uid == -1: 
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return page_not_authorized(req, "../youralerts.py/input")
 
     html = webalert.perform_input_alert("add", idq, name, freq, notif, idb,uid)
@@ -87,7 +88,7 @@ def input(req, idq, name="", freq="week", notif="y", idb=0, error_msg=""):
 def modify(req, idq, old_idb, name="", freq="week", notif="y", idb=0, error_msg=""):
     uid = getUid(req)
 
-    if uid == -1: 
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return page_not_authorized(req, "../youralerts.py/modify")
 
     html = webalert.perform_input_alert("update", idq, name, freq, notif, idb,uid, old_idb)
@@ -104,7 +105,7 @@ def modify(req, idq, old_idb, name="", freq="week", notif="y", idb=0, error_msg=
 def list(req):
     uid = getUid(req)
 
-    if uid == -1: 
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return page_not_authorized(req, "../youralerts.py/list")
 
     return page(title="Display alerts",
@@ -118,7 +119,7 @@ def list(req):
 def add(req, name, freq, notif, idb, bname, idq):
     uid = getUid(req)
 
-    if uid == -1: 
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return page_not_authorized(req, "../youralerts.py/add")
 
     try:
@@ -136,7 +137,7 @@ def add(req, name, freq, notif, idb, bname, idq):
 def update(req, name, freq, notif, idb, bname, idq, old_idb):
     uid = getUid(req)
 
-    if uid == -1: 
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return page_not_authorized(req, "../youralerts.py/update")
 
     try:
@@ -154,7 +155,7 @@ def update(req, name, freq, notif, idb, bname, idq, old_idb):
 def remove(req, name, idu, idq, idb):
     uid = getUid(req) 
 
-    if uid == -1: 
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return page_not_authorized(req, "../youralerts.py/remove")
 
     return page(title="Display alerts",
