@@ -102,7 +102,7 @@ try:
     import Numeric
     import urllib
     import signal
-    import threading 
+    import tempfile
     import unicodedata
     import traceback
     import cStringIO
@@ -297,7 +297,7 @@ def get_words_from_fulltext(url_indirect,separators="[^\w]",split=string.split):
             sys.stderr.write("Error: Cannot read %s.\n" % url_direct[1:-1])
             break # try other fulltext files...
         
-        tmp_name = os.tempnam()
+        tmp_name = tempfile.mktemp('cdsware.tmp')
         tmp_fd = open(tmp_name, "w")
         data_chunk = url.read(8*1024)
         while data_chunk:
