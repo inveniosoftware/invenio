@@ -197,7 +197,7 @@ def task_update_status(val):
     """Updates status information in the BibSched task table."""
     global task_id, options
     if options["verbose"] >= 9:
-        write_message("Updating task status to %s." % msg)
+        write_message("Updating task status to %s." % val)
     return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, task_id))    
 
 def task_read_status(task_id):
