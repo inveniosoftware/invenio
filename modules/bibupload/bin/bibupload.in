@@ -1236,15 +1236,14 @@ function integrate ($rec)
 	    // a record matching the additional criteria was found
             if ($options['DISPLAY'])
                 display($rec);
-            else
-                update($rec,$recid,$logfp);
+            update($rec,$recid,$logfp);
             $nbUpdatedRecords++;
         }
         else {
             // no matching record was found
             if ($options['DISPLAY'])
                 display($rec);
-            else if (!$options['FORMAT'])
+            if (!$options['FORMAT']) {
                 if (!$options['INSERT']) {
                     	fwrite($errorfp,"Error: Cannot update record. Record not found\n");
                	    	fwrite($errorfp,$xml."\n");
@@ -1255,14 +1254,14 @@ function integrate ($rec)
                 	insert($rec,$logfp);
 			$nbInsertedRecords++;
                 }
+	     }
         }
     }
     else {
         // this is an update
         if ($options['DISPLAY'])
             display($rec);
-        else
-            update($rec,$recid,$logfp);
+        update($rec,$recid,$logfp);
     }
 }
 
@@ -1335,11 +1334,16 @@ function parse_command($argv)
    $options['DATE'] = "";
 
    $i = 1;
-   if (count($argv) <= 1)
+   if (count($argv) < 2)
    {
       fwrite($errorfp, "Bad parameter count!\n");
       displayhelp();
       exit;
+   }
+   elseif (count($argv) == 2 && $argv[1] == strval(intval($argv[1])))
+   {
+         $options['TASKRUN']  = $argv[1];
+         return;
    }
    else
    {
@@ -1350,25 +1354,23 @@ function parse_command($argv)
             displayhelp();
             exit;
          }
-         else if ($argv[$i] == "-t" || $argv[$i] == "--task") {
-             $i++;
-             $options['TASKRUN']  = $argv[$i];
-             return;
-         }
-         else if ($argv[$i] == "-d" || $argv[$i] == "--display")
-            $options['DISPLAY']  = TRUE;
-         else if ($argv[$i] == "-b" || $argv[$i] == "--database")
-            $options['PRINTDB']  = TRUE;
          else if ($argv[$i] == "-u" || $argv[$i] == "--user") {
 	    $i++;
             $options['USER'] = $argv[$i];
 	 }
-         else if ($argv[$i] == "-e" || $argv[$i] == "--date") {
+         else if ($argv[$i] == "-t" || $argv[$i] == "--time") {
 	    $i++;
             $options['DATE'] = $argv[$i];
  	 }
-         else if ($argv[$i] == "-m" || $argv[$i] == "--mute")
-            $options['MUTE']     = TRUE;
+         else if ($argv[$i] == "-v" || $argv[$i] == "--verbose")
+	    $i++;
+            $verbosity = $argv[$i];
+	    if ($verbosity == 0) 
+            	$options['MUTE']    = TRUE;
+	    if ($verbosity > 0) 
+		$options['DISPLAY'] = TRUE;
+	    if ($verbosity > 1)
+		$options['PRINTDB'] = TRUE;
          else if ($argv[$i] == "-w" || $argv[$i] == "--bibwords")
             $options['BIBWORDS'] = TRUE;
          else if ($argv[$i] == "-r" || $argv[$i] == "--record_update" )
@@ -1381,7 +1383,7 @@ function parse_command($argv)
             $options['FORMAT']   = TRUE;
 	 else if ($argv[$i] == "-n" || $argv[$i] == "--notimechange")
 	    $options['NOTIMECHANGE'] = TRUE;
-	 else if ($argv[$i] == "-g" || $argv[$i] == "--brieffmtupdate")
+	 else if ($argv[$i] == "-b" || $argv[$i] == "--brieffmtupdate")
 	    $options['HBFMTUPDATE'] = TRUE;
 	 else if ($argv[$i] == "-i" || $argv[$i] == "--record_insert")
 	    $options['INSERT'] = TRUE;
@@ -1439,16 +1441,14 @@ function displayhelp()
   Options: 
    -h, --help     print this help
    -u, --user     choose user
-   -d, --display  display records analysis - no integration
-   -b, --database display integration requests - integration
-   -m, --mute     Silent mode.
+   -v, --verbose  verbosity level (0=mute, 1=display record analysis, 2=display integration requests, 9=max information)
    -w, --bibwords call bibwords on integration or modification	of a record.
    -n, --notimechange 
                   do not change record last modification date when updating
-   -g, --brieffmtupdate
+   -b, --brieffmtupdate
                   force brief format recreation at next reformatting
                   (sets bibfmt hb last_update to 1970)
-   -e, --date     sets date/time of execution (format 'yyyy-mm-dd hh:mm:ss')
+   -t, --time     sets date/time of execution (format 'yyyy-mm-dd hh:mm:ss')
   UPDATE Modes:
    -r, --record_update The existing record is entirely replaced by the new one 
    -a, --field_insert  New fields are appended to the existing record
@@ -1458,7 +1458,7 @@ function displayhelp()
   INSERT Modes
    -i, --record_insert Unmatched records are added as new. This can be mixed with -r. 
   Example:
-       ./bibupload -e '2004-10-24 05:00' -i toto.xml\n");
+       ./bibupload -t '2004-10-24 05:00' -i toto.xml\n");
 }
 
 

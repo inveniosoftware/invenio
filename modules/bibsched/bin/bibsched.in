@@ -232,14 +232,10 @@ class Manager:
         id = self.currentrow[0]
         process = self.currentrow[1]
         status = self.currentrow[5]
-        if process == "bibupload":
-            arg2 = "-t "
-        else:
-            arg2 = ""
         if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
             self.display_in_footer("a process is already running!")
         elif status == "SLEEPING":
-            mypid = get_my_pid(process,"%s%s" % (arg2, str(id)))
+            mypid = get_my_pid(process,str(id))
             if mypid!=0:
                 os.kill(mypid, signal.SIGCONT)
             self.display_in_footer("process woken up")
@@ -257,12 +253,8 @@ class Manager:
         elif status == "STOPPED" or status == "WAITING":
             if process in self.helper_modules:
                 program=os.path.join( bindir, process )
-                if process == "bibupload":
-                    arg2 = "-t "
-                else:
-                    arg2 = ""
                 fdout, fderr = get_output_channelnames(id)
-                COMMAND = "%s %s %s >> %s 2>> %s &" % (program, arg2, str(id), fdout, fderr)
+                COMMAND = "%s %s >> %s 2>> %s &" % (program, str(id), fdout, fderr)
                 os.system(COMMAND)
                 Log("manually running task #%d (%s)" % (id, process))
                 if sleeptime:
@@ -278,14 +270,10 @@ class Manager:
         id = self.currentrow[0]
         process = self.currentrow[1]
         status = self.currentrow[5]
-        if process == "bibupload":
-            arg2 = "-t "
-        else:
-            arg2 = ""
         if status!='RUNNING' and status!='CONTINUING':
             self.display_in_footer("this process is not running!")
         else:
-            mypid = get_my_pid(process,"%s%s" % (arg2, str(id)))
+            mypid = get_my_pid(process,str(id))
             if mypid!=0:
                 os.kill(mypid, signal.SIGUSR1)
                 self.display_in_footer("SLEEP signal sent to process #%s" % mypid)
@@ -298,11 +286,7 @@ class Manager:
         id = self.currentrow[0]
         process = self.currentrow[1]
         status = self.currentrow[5]
-        if process == "bibupload":
-            arg2 = "-t "
-        else:
-            arg2 = ""
-        mypid = get_my_pid(process,"%s%s" % (arg2, str(id)))
+        mypid = get_my_pid(process,str(id))
         if mypid!=0:
             os.kill(mypid, signal.SIGKILL)
             self.set_status(id,'STOPPED')
@@ -316,11 +300,7 @@ class Manager:
         id = self.currentrow[0]
         process = self.currentrow[1]
         status = self.currentrow[5]
-        if process == "bibupload":
-            arg2 = "-t "
-        else:
-            arg2 = ""
-        mypid = get_my_pid(process,"%s%s" % (arg2, str(id)))
+        mypid = get_my_pid(process,str(id))
         if mypid!=0:
             os.kill(mypid, signal.SIGINT)
             self.display_in_footer("INT signal sent to process #%s" % mypid)
@@ -587,16 +567,12 @@ class BibSched:
         elif self.can_run(proc) and status == "WAITING" and runtime <= time.time():
             if proc in self.helper_modules:
                 program=os.path.join( bindir, proc )
-                if proc == "bibupload":
-                    arg2 = "-t "
-                else:
-                    arg2 = ""
                 fdout, fderr = get_output_channelnames(id)
-                COMMAND = "%s %s%s >> %s 2>> %s" % (program, arg2, str(id), fdout, fderr)
+                COMMAND = "%s %s >> %s 2>> %s" % (program, str(id), fdout, fderr)
                 Log("task #%d (%s) started" % (id, proc))
                 os.system(COMMAND)
                 Log("task #%d (%s) ended" % (id, proc))
-                self.running[id] = get_my_pid(proc,"%s%s" % (arg2, str(id)))
+                self.running[id] = get_my_pid(proc,str(id))
             if sleeptime:
                 next_runtime=get_datetime(sleeptime)
                 run_sql("INSERT INTO schTASK (proc, user, runtime, sleeptime, arguments, status) "\
@@ -608,12 +584,8 @@ class BibSched:
         if running_process:
             proc = running_process[ 1 ]
             id   = running_process[ 0 ]
-            if proc == "bibupload":
-                arg2 = "-t "
-            else:
-                arg2 = ""
-            if get_my_pid(proc,"%s%s" % (arg2, str(id))):
-            	self.running[id] = get_my_pid(proc,"%s%s" % (arg2, str(id)))
+            if get_my_pid(proc,str(id)):
+            	self.running[id] = get_my_pid(proc,str(id))
             else:
                 self.set_status(id,"ERROR")
         rows = []
