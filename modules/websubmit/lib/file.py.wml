@@ -400,7 +400,11 @@ class BibDoc:
 
     def getFileNumber(self):
         return len(self.files)
-        
+
+    def registerDownload(self,addressIp,version,format,userid=0):
+        ipp = "INET_ATON('%s');" % addressIp
+        return run_sql("insert into rnkDOWNLOADS (date,recid,docid,userIp,noVersion,file_Format) values(NOW(),%s,%s,%s,%s,%s)",
+                       (self.recid,self.id,ipp,version,string.upper(format),))
 class BibDocFile:
     """this class represents a physical file in the CDSware filesystem"""
     
@@ -471,14 +475,13 @@ class BibDocFile:
             fp.close()
             return content
     
-    
 def readfile(path):
     if os.path.exists(path):
         fp = open(path,"r")
         content = fp.read()
         fp.close()
     return content
-    
+
 def listTypesFromArray(bibdocs):
     types = []
     for bibdoc in bibdocs:

@@ -34,18 +34,16 @@ import sys
 import time
 import types
 import re
-
-sys.path.append('%s' % pylibdir)
-from cdsware.config import cdsname,cdslang
-from cdsware.access_control_engine import acc_authorize_action
-from cdsware.access_control_admin import acc_isRole
-from cdsware.webpage import page, create_error_box
-from cdsware.webuser import getUid, get_email, page_not_authorized
-from cdsware.messages import *
+from config import cdsname,cdslang
+from access_control_engine import acc_authorize_action
+from access_control_admin import acc_isRole
+from webpage import page, create_error_box
+from webuser import getUid, get_email, page_not_authorized
+from messages import *
 from mod_python import apache
-from cdsware.websubmit_config import *
-from cdsware.file import *
-from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
+from websubmit_config import *
+from file import *
+from access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
 def index(req,c=cdsname,ln=cdslang,recid="",docid="",version="",name="",format=""):
     # get user ID:
@@ -59,15 +57,18 @@ def index(req,c=cdsname,ln=cdslang,recid="",docid="",version="",name="",format="
     docfiles = []
     t=""
     filelist=""
+    ip=str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
     # if a precise file is requested, we stream it
     if name!="":
         if docid=="":
             return errorMsg("Parameter docid missing",req)
         else:
-            docfile = BibDoc(bibdocid=docid).getFile(name,format,version)
+            doc = BibDoc(bibdocid=docid)
+            docfile=doc.getFile(name,format,version)
             if docfile == None:
                 return warningMsg("can't find file...",req)
             else:
+                res = doc.registerDownload(ip, version, format, uid)
                 return docfile.stream(req)
     # all files attached to a record
     elif recid!="":
