@@ -259,14 +259,14 @@ Contents
           lines in your "httpd.conf" configuration file:
 
               AddDefaultCharset UTF-8
-              AddType application/x-httpd-php .php .shtml
-              AddType application/x-httpd-php-source .phps .shtmls
-              DirectoryIndex index.en.html index.html index.py index.en.shtml index.shtml index.en.php index.php 
+              AddType application/x-httpd-php .php
+              AddType application/x-httpd-php-source .phps
+              DirectoryIndex index.en.html index.html index.py index.en.php index.php 
 
           This is to ensure that the browsers will get UTF-8 as
-          the default page encoding, that "*.shtml" files will be
+          the default page encoding, that "*.php" files will be
           interpreted by the web server as PHP files, and that
-          "index.py" and "index.shtml" will be considered as directory
+          "index.py" or "index.en.php" will be considered as directory
           index file.
 
           In addition, you have to ask Apache to interpret .py files
