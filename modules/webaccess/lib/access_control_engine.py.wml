@@ -36,7 +36,7 @@ try:
     from config import *
     from dbquery import run_sql
     from MySQLdb import ProgrammingError
-    from access_control_variables import SUPERADMINROLE
+    from access_control_config import SUPERADMINROLE
 except ImportError, e:
     print "Error: %s" % e
     import sys

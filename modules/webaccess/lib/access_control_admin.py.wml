@@ -38,7 +38,7 @@ except ImportError, e:
     sys.exit(1)
 try:
     from access_control_engine import acc_authorize_action	
-    from access_control_variables import SUPERADMINROLE, WEBACCESSACTION, DELEGATEADDUSERROLE
+    from access_control_config import SUPERADMINROLE, WEBACCESSACTION, DELEGATEADDUSERROLE
     from config import *
     from dbquery import run_sql
     from MySQLdb import ProgrammingError
