@@ -304,7 +304,7 @@ def main():
         # set default values:
         options = {}
         options["runtime"] = time.strftime("%Y-%m-%d %H:%M:%S") 
-        options["sleeptime"] = "0"
+        options["sleeptime"] = ""
         options["verbose"] = 1
         # set user-defined options:
         try:

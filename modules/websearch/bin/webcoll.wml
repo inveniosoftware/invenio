@@ -1272,7 +1272,7 @@ def main():
         # set default values:
         options["runtime"] = time.strftime("%Y-%m-%d %H:%M:%S") 
         options["verbose"] = 1
-        options["sleeptime"] = 0
+        options["sleeptime"] = ""
         # set user-defined options:
         try:
             opts, args = getopt.getopt(sys.argv[1:], "hVv:u:s:t:c:",
