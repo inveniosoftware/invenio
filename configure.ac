@@ -133,6 +133,62 @@ if test -z "$PS2PDF"; then
    <http://www.cs.wisc.edu/~ghost/doc/AFPL/6.50/Ps2pdf.htm>.])
 fi
 
+## Check for Pdftotext programs:
+AC_CHECK_PROGS(PDFTOTEXT,[pdftotext pstotext])
+if test -z "$PDFTOTEXT"; then
+   AC_MSG_WARN([
+   Neither Pstotext nor Pdftotext were found in your path. Either
+   of them can be used to index fulltext PDF files and make them
+   searchable.
+   You can continue without it but you will miss some CDSware
+   functionality. We recomend you to install one of them first
+   (Pdftotext preferred) and to rerun the configure script. Pdftotext 
+   is available from <http://www.foolabs.com/xpdf/home.html>. Pstotext
+   is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
+   ])
+fi
+
+AC_CHECK_PROGS(PSTOTEXT,[pstotext pstoascii])
+if test -z "$PSTOTEXT"; then
+   AC_MSG_WARN([
+   Neither Pstotext nor Pstoascii were found in your path. Either
+   of them can be used to index fulltext PS files and make them
+   searchable.
+   You can continue without it but you will miss some CDSware
+   functionality. We recomend you to install one of them first
+   and to rerun the configure script. Both are available as part
+   of Aladdin PS from <http://www.cs.wisc.edu/~ghost/doc/AFPL>.
+   ])
+fi
+
+
+AC_CHECK_PROGS(WORDTOTEXT,[wvText antiword catdoc])
+if test -z "$WORDTOTEXT"; then
+   AC_MSG_WARN([
+   None of WvText, Antiword or Catdoc was found in your path. One
+   of them is needed to index fulltext Word files and make them
+   searchable.
+   You can continue without it but you will miss some CDSware
+   functionality. We recomend you to install one of them first
+   and to rerun the configure script. WvText is available from
+   <http://sourceforge.net/projects/wvware>. Antiword is available
+   from <http://www.winfield.demon.nl/index.html>. Catdoc is 
+   available from <http://www.ice.ru/~vitus/catdoc/index.html>
+   ])
+fi
+
+## Check for Giftext:
+AC_PATH_PROG(GIFTEXT, giftext)
+if test -z "$GIFTEXT"; then
+   AC_MSG_WARN([
+   Giftext was not found in your path.  It is used in 
+   the WebSubmit module to create an icon from a submitted picture.
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  Giftext is available from
+   <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>.])
+fi
+
 ## Check for File:
 AC_PATH_PROG(FILE, file)
 if test -z "$FILE"; then
@@ -341,6 +397,9 @@ AC_SUBST(DBHOST)
 AC_SUBST(DBNAME)
 AC_SUBST(DBUSER)
 AC_SUBST(DBPASS)
+AC_SUBST(PDFTOTEXT)
+AC_SUBST(PSTOTEXT)
+AC_SUBST(WORDTOTEXT)
 
 ## Write help:
 AC_CONFIG_COMMANDS([default], [echo "****************************************************************************";\
