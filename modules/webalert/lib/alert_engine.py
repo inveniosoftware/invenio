@@ -138,8 +138,8 @@ def send_email(fromaddr, toaddr, body, attempt=0):
         server.quit()
     except:
         if (DEBUGLEVEL > 1):
-            print 'Error connecting to SMTP server, attempt %s retrying in 10 seconds.' % attempt
-        sleep(10)
+            print 'Error connecting to SMTP server, attempt %s retrying in 5 minutes.' % attempt
+        sleep(300)
         send_email(fromaddr, toaddr, body, attempt+1)
         return
 
@@ -203,7 +203,8 @@ def email_notify(alert, records, argstr):
     time = strftime("%d-%m-%Y")
 
     msg += '\n' + wrap('alert name: %s' % alert[5])
-    msg += wrap('pattern: %s' % pattern)
+    if pattern:
+        msg += wrap('pattern: %s' % pattern)
     if catalogue:
         msg += wrap('%s: %s' % (catword, catalogue))
     msg += wrap('frequency: %s ' % format_frequency(alert[3]))
@@ -332,7 +333,9 @@ def run_query(query, frequency):
 
     recs = get_record_ids(query[1], date_from, date_until)
 
-    log('query %08s produced %08s records' % (query[0], len(recs)))
+    n = len(recs)
+    if n:
+        log('query %08s produced %08s records' % (query[0], len(recs)))
     
     if DEBUGLEVEL > 2:
         print "[%s] run query: %s with dates: from=%s, until=%s\n  found rec ids: %s" % (strftime("%c"), query, date_from, date_until, recs)
