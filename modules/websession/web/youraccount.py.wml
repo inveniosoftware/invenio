@@ -151,6 +151,17 @@ def send_email(req, p_email=None, ln=cdslang):
                 language=ln,
                 lastupdated=__lastupdated__)
 
+def youradminactivities(req, ln=cdslang):
+    uid = webuser.getUid(req)	
+    return page(title="Your Administrative Activities",
+                body=webaccount.perform_youradminactivities(uid),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
+                description="CDS Personalize, Main page",
+                keywords="CDS, personalize",
+                uid=uid,
+                language=ln,
+                lastupdated=__lastupdated__)
+
 def delete(req, ln=cdslang):
     uid = webuser.getUid(req)	
     return page(title="Delete Account",

@@ -26,11 +26,13 @@
 #include "configbis.wml"
 
 import sys
+import string
 import cgi
 from config import *
 from webpage import page
 from dbquery import run_sql	
 from webuser import getUid,isGuestUser
+from access_control_admin import acc_findUserRoleActions
 
 imagesurl = "%s/img" % weburl
 
@@ -77,6 +79,52 @@ def perform_info(req):
 
     return out
 
+def perform_youradminactivities(uid):
+    """Return text for the `Your Admin Activities' box.  Analyze
+       whether user UID has some admin roles, and if yes, then print
+       suitable links for the actions he can do.  If he's not admin,
+       print a simple non-authorized message."""
+    if isGuestUser(uid):
+        return """You seem to be the guest user.  You have to <a href="../youraccount.py/login">login</a> first."""
+    out = ""
+    your_role_actions = acc_findUserRoleActions(uid)
+    your_roles = []
+    your_admin_activities = []
+    for (role, action) in your_role_actions:
+        if role not in your_roles:
+            your_roles.append(role)
+    if not your_roles:
+        out += "<p>You are not authorized to access administrative functions."
+    else:
+        out += "<p>You seem to be <em>%s</em>. " % string.join(your_roles, ", ")
+        out += "Here are some interesting web admin links for you:"
+        # add actions found by the RBAC:
+        for (role, action) in your_role_actions:
+            if action not in your_admin_activities:
+                your_admin_activities.append(action)
+        # add all actions if user is superadmin, to make sure he'll see all
+        # (since it is not necessary for the superadmin to be connected to actions in RBAC tables):
+        if "superadmin" in your_roles:
+            for action in ["cfgbibformat", "cfgbibrank", "cfgbibindex", "cfgwebaccess", "cfgwebsearch", "cfgwebsubmit"]:
+                if action not in your_admin_activities:            
+                    your_admin_activities.append(action)
+        # print proposed links:
+        for action in your_admin_activities:
+            if action == "cfgbibformat":
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/">Configure BibFormat</a>""" % weburl
+            if action == "cfgbibrank":
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibrank/bibrankadmin.py">Configure BibRank</a>""" % weburl
+            if action == "cfgbibindex":
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibindex/bibindexadmin.py">Configure BibIndex</a>""" % weburl
+            if action == "cfgwebaccess":
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/webaccessadmin.py">Configure WebAccess</a>""" % weburl
+            if action == "cfgwebsearch":
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py">Configure WebSearch</a>""" % weburl
+            if action == "cfgwebsubmit":
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/">Configure WebSubmit</a>""" % weburl
+        out += """<br>For more admin-level activities, see the complete <a href="%s/admin/">Admin Area</a>.""" % weburl
+    return out
+        
 # perform_display_account(): display a dynamic page that shows the user's account
 def perform_display_account(req,data,bask,aler,sear):
     uid = getUid(req)
@@ -103,6 +151,7 @@ def perform_display_account(req,data,bask,aler,sear):
     out +=template_account("Your Approvals",
                            """You can consult the list of <a href="%s/yourapprovals.py">your approvals</a>
                               with the documents you approved or refereed.""" % weburl)
+    out +=template_account("Your Administrative Activities", perform_youradminactivities(uid))
     return out
 
 # template_account() : it is a template for print each of the options from the user's account	
