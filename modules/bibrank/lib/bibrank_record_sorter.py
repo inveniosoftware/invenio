@@ -543,7 +543,6 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
 	term_recs = run_sql("SELECT term, hitlist FROM %s WHERE term='%s'" % (methods[rank_method_code]["rnkWORD_table"], MySQLdb.escape_string(term)))
         if term_recs:
 	    term_recs = deserialize_via_marshal(term_recs[0][1])
-            voutput += "%s" % term_recs
             if check_term(term, methods[rank_method_code]["col_size"], len(term_recs), 1.0, 0.00, 0):
                 (recdict, rec_termcount) = calculate_record_relevance((term, int(term_recs["Gi"][1])) , term_recs, hitset, recdict, rec_termcount, verbose, quick=None)
             del term_recs
