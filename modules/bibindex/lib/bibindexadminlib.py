@@ -40,7 +40,7 @@ import urllib
 import time
 import random
 from zlib import compress,decompress
-from bibrankadminlib import modify_translations, get_current_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
+from bibrankadminlib import modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
 from messages import *
 from dbquery import run_sql
 from config import *
@@ -99,7 +99,7 @@ def perform_index(ln=cdslang, mtype='', content=''):
 def perform_showfields(ln=cdslang, callback='yes', content='', confirm=-1):
     """show the sort fields of this collection.."""
     
-    fld_dict = dict(get_current_name('', ln, get_fld_nametypes()[0][0], "field"))
+    fld_dict = dict(get_def_name('', "field"))
     fld_type = get_fld_nametypes()
     subtitle = """<a name="1"></a>1. Edit logical field&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (weburl)
 
@@ -143,7 +143,7 @@ def perform_showfield(fldID, ln=cdslang, mtype='', content='', callback='yes', c
     mtype - the method that called this method.
     content - the output from that method."""
 
-    fld_dict = dict(get_current_name('', ln, get_fld_nametypes()[0][0], "field"))
+    fld_dict = dict(get_def_name('', "field"))
     if fldID in [-1, "-1"]:
          return addadminbox("Edit logical field",  ["""<b><span class="info">Please go back and select a logical field</span></b>"""])
         
@@ -202,8 +202,7 @@ def perform_modifytranslations(fldID, ln=cdslang, sel_type='', trans=[], confirm
     cdslangs = get_languages()
     if confirm in ["2", 2] and fldID:
         finresult = modify_translations(fldID, cdslangs, sel_type, trans, "field")
-    fld_dict = dict(get_current_name('', ln, get_fld_nametypes()[0][0], "field"))
-
+    fld_dict = dict(get_def_name('', "field"))
     if fldID and fld_dict.has_key(int(fldID)):
         fldID = int(fldID)
         subtitle = """<a name="3"></a>3. Modify translations for logical field '%s'&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (fld_dict[fldID], weburl)
@@ -293,7 +292,7 @@ def perform_showdetailsfieldtag(fldID, tagID, ln=cdslang, callback="yes", confir
     fldNAME - the name of the new field
     code - the field code"""
 
-    fld_dict = dict(get_current_name('', ln, get_fld_nametypes()[0][0], "field"))
+    fld_dict = dict(get_def_name('', "field"))
     fldID = int(fldID)
     tagname = run_sql("SELECT name from tag where id=%s" % tagID)[0][0]
     
@@ -335,8 +334,8 @@ def perform_showdetailsfield(fldID, ln=cdslang, callback="yes", confirm=-1):
     fldNAME - the name of the new field
     code - the field code"""
 
-    fld_dict = dict(get_current_name('', ln, get_fld_nametypes()[0][0], "field"))
-    col_dict = dict(get_current_name('', ln, get_col_nametypes()[0][0], "collection"))
+    fld_dict = dict(get_def_name('', "field"))
+    col_dict = dict(get_def_name('', "collection"))
     fldID = int(fldID)
     col_fld = get_col_fld('', '', fldID)
     sort_types = dict(get_sort_nametypes())
@@ -417,7 +416,7 @@ def perform_deletefield(fldID, ln=cdslang, callback='yes', confirm=0):
     fldID - the field id from table field.
     """
 
-    fld_dict = dict(get_current_name('', ln, get_fld_nametypes()[0][0], "field"))
+    fld_dict = dict(get_def_name('', "field"))
     subtitle = """<a name="5"></a>4. Delete the logical field '%s'&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (fld_dict[int(fldID)], weburl)
     output  = ""
 
@@ -461,7 +460,7 @@ def perform_showdetails(ln=cdslang, callback='', confirm=0):
     output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>""" % ("Field", "MARC Tags", "Translations")
     query = "SELECT id,name FROM field"
     res = run_sql(query)
-    col_dict = dict(get_current_name('', ln, get_col_nametypes()[0][0], "collection"))
+    col_dict = dict(get_def_name('', "collection"))
 
     for field_id,field_name in res:
         query = "SELECT tag.value FROM tag, field_tag WHERE tag.id=field_tag.id_tag AND field_tag.id_field=%d ORDER BY field_tag.score DESC,tag.value ASC" % field_id
@@ -483,7 +482,7 @@ def perform_showdetails(ln=cdslang, callback='', confirm=0):
         if lang.endswith(", "):
             lang = lang [:-2]
         if len(exists) == 0:
-            lang = """<span class="info">None</span>"""
+            lang = """<b><span class="info">None</span></b>"""
             
         col_fld = get_col_fld('', '', field_id)
         cols = ''
@@ -533,7 +532,7 @@ def perform_modifyfield(fldID, ln=cdslang, code='', callback='yes', confirm=-1):
     subtitle  = ""
     output  = ""
 
-    fld_dict = dict(get_current_name('', ln, get_fld_nametypes()[0][0], "field"))
+    fld_dict = dict(get_def_name('', "field"))
 
     if fldID not in [-1, "-1"]:
         if confirm in [-1, "-1"]:
@@ -584,7 +583,7 @@ def perform_showfieldtags(fldID, ln=cdslang, callback='yes', content='', confirm
     
     output = ''
     
-    fld_dict = dict(get_current_name('', ln, get_fld_nametypes()[0][0], "field"))
+    fld_dict = dict(get_def_name('', "field"))
     fld_type = get_fld_nametypes()
     fldID = int(fldID)
     
@@ -703,7 +702,7 @@ def perform_modifytag(fldID, tagID, ln=cdslang, name='', value='', callback='yes
     subtitle  = ""
     output  = ""
 
-    fld_dict = dict(get_current_name('', ln, get_fld_nametypes()[0][0], "field"))
+    fld_dict = dict(get_def_name('', "field"))
 
     fldID = int(fldID)
     tagID = int(tagID)
@@ -758,7 +757,7 @@ def perform_removefieldtag(fldID, tagID, ln=cdslang, callback='yes', confirm=0):
     subtitle = """<a name="4.1"></a>Remove MARC tag from logical field"""
     output  = ""
 
-    fld_dict = dict(get_current_name('', ln, get_fld_nametypes()[0][0], "field"))
+    fld_dict = dict(get_def_name('', "field"))
     
     if fldID and tagID:
         fldID = int(fldID)
