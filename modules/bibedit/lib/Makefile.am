@@ -18,7 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir = $(libdir)/python/cdsware
-pylib_DATA = bibrecord.py bibrecord_config.py bibrecord_tests.py
+pylib_DATA = bibrecord.py bibrecord_config.py bibrecord_tests.py \
+             refextract.py refextract_config.py
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)

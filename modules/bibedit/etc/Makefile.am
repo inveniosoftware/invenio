@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 etcdir = $(sysconfdir)/bibedit/
-etc_DATA = MARC21slim.dtd
+etc_DATA = MARC21slim.dtd refextract-journal-titles.kb refextract-report-numbers.kb
 
 EXTRA_DIST = $(etc_DATA)
 
