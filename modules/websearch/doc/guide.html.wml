@@ -150,7 +150,7 @@
    </tbody>
    </table>
 </sk>
-<cz>
+<cs>
    <p><table class="errorbox">
    <thead>
    <tr>
@@ -167,7 +167,7 @@
    </tr>
    </tbody>
    </table>
-</cz>
+</cs>
 <no>
    <p><table class="errorbox">
    <thead>
@@ -186,7 +186,7 @@
    </tbody>
    </table>
 </no>
-<se>
+<sv>
    <p><table class="errorbox">
    <thead>
    <tr>
@@ -203,7 +203,25 @@
    </tr>
    </tbody>
    </table>
-</se>
+</sv>
+<el>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</el>
 
 <en>
 <p>Our search engine tries to offer today's typical web searching
@@ -286,7 +304,7 @@ search, including an combined metadata, fulltext and reference search
 in one go.  This page lists several tips and tricks that you may find
 useful to this effect.
 </sk>
-<cz>
+<cs>
 <p>Our search engine tries to offer today's typical web searching
 experience, as gained with popular search engines such as <a
 href="http://google.com/">Google</a>.  The nature of bibliographic
@@ -295,7 +313,7 @@ provide many extensions to enable a complex and precise structured
 search, including an combined metadata, fulltext and reference search
 in one go.  This page lists several tips and tricks that you may find
 useful to this effect.
-</cz>
+</cs>
 <no>
 <p>Our search engine tries to offer today's typical web searching
 experience, as gained with popular search engines such as <a
@@ -306,7 +324,7 @@ search, including an combined metadata, fulltext and reference search
 in one go.  This page lists several tips and tricks that you may find
 useful to this effect.
 </no>
-<se>
+<sv>
 <p>Our search engine tries to offer today's typical web searching
 experience, as gained with popular search engines such as <a
 href="http://google.com/">Google</a>.  The nature of bibliographic
@@ -315,7 +333,17 @@ provide many extensions to enable a complex and precise structured
 search, including an combined metadata, fulltext and reference search
 in one go.  This page lists several tips and tricks that you may find
 useful to this effect.
-</se>
+</sv>
+<el>
+<p>Our search engine tries to offer today's typical web searching
+experience, as gained with popular search engines such as <a
+href="http://google.com/">Google</a>.  The nature of bibliographic
+searching differs from that of a web page searching, though.  We
+provide many extensions to enable a complex and precise structured
+search, including an combined metadata, fulltext and reference search
+in one go.  This page lists several tips and tricks that you may find
+useful to this effect.
+</el>
 
 <en>
 <h3><strong class="headerboxbodylogo">Index</strong></h3>
@@ -485,7 +513,7 @@ useful to this effect.
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
 </sk>
-<cz>
+<cs>
 <h3><strong class="headerboxbodylogo">Index</strong></h3>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
@@ -505,7 +533,7 @@ useful to this effect.
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
-</cz>
+</cs>
 <no>
 <h3><strong class="headerboxbodylogo">Index</strong></h3>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
@@ -527,7 +555,7 @@ useful to this effect.
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
 </no>
-<se>
+<sv>
 <h3><strong class="headerboxbodylogo">Index</strong></h3>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
@@ -547,7 +575,28 @@ useful to this effect.
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
-</se>
+</sv>
+<el>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Regular expressions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</el>
 
 <h3><a name="simpleadvanced">
 <en>Simple versus advanced search</en>
@@ -558,9 +607,10 @@ useful to this effect.
 <it>Simple versus advanced search</it>
 <ru>Simple versus advanced search</ru>
 <sk>Simple versus advanced search</sk>
-<cz>Simple versus advanced search</cz>
+<cs>Simple versus advanced search</cs>
 <no>Simple versus advanced search</no>
-<se>Simple versus advanced search</se>
+<sv>Simple versus advanced search</sv>
+<el>Simple versus advanced search</el>
 </a></h3>
 
 <p>The default search mode is <strong>simple search</strong> that
@@ -679,9 +729,10 @@ to the Advanced Search for more query assistance.
 <it>Search guidance</it>
 <ru>Search guidance</ru>
 <sk>Search guidance</sk>
-<cz>Search guidance</cz>
+<cs>Search guidance</cs>
 <no>Search guidance</no>
-<se>Search guidance</se>
+<sv>Search guidance</sv>
+<el>Search guidance</el>
 </a></h3>
 
 <p>After you submit your query, the search engine will analyze it and
@@ -718,9 +769,10 @@ reply.
 <it>Searching for words versus phrases</it>
 <ru>Searching for words versus phrases</ru>
 <sk>Searching for words versus phrases</sk>
-<cz>Searching for words versus phrases</cz>
+<cs>Searching for words versus phrases</cs>
 <no>Searching for words versus phrases</no>
-<se>Searching for words versus phrases</se>
+<sv>Searching for words versus phrases</sv>
+<el>Searching for words versus phrases</el>
 </a></h3>
 
 <p>The default search mode is a <strong>search for words</strong>.  This
@@ -816,9 +868,10 @@ href="#regexp">regular expression</a> section of this guide.
 <it>Boolean queries</it>
 <ru>Boolean queries</ru>
 <sk>Boolean queries</sk>
-<cz>Boolean queries</cz>
+<cs>Boolean queries</cs>
 <no>Boolean queries</no>
-<se>Boolean queries</se>
+<sv>Boolean queries</sv>
+<el>Boolean queries</el>
 </a></h3>
 
 We have already seen how whitespace adds a silent boolean AND in the
@@ -949,9 +1002,10 @@ satisfied.
 <it>Special characters and punctuation</it>
 <ru>Special characters and punctuation</ru>
 <sk>Special characters and punctuation</sk>
-<cz>Special characters and punctuation</cz>
+<cs>Special characters and punctuation</cs>
 <no>Special characters and punctuation</no>
-<se>Special characters and punctuation</se>
+<sv>Special characters and punctuation</sv>
+<el>Special characters and punctuation</el>
 </a></h3>
 
 <p>When indexing words, an attention is paid to index it both with and
@@ -1015,9 +1069,10 @@ satisfied.
 <it>International characters</it>
 <ru>International characters</ru>
 <sk>International characters</sk>
-<cz>International characters</cz>
+<cs>International characters</cs>
 <no>International characters</no>
-<se>International characters</se>
+<sv>International characters</sv>
+<el>International characters</el>
 </a></h3>
 
 <p>The search engine works with Unicode UTF-8 so you can type your
@@ -1072,9 +1127,10 @@ satisfied.
 <it>Word truncation/stemming</it>
 <ru>Word truncation/stemming</ru>
 <sk>Word truncation/stemming</sk>
-<cz>Word truncation/stemming</cz>
+<cs>Word truncation/stemming</cs>
 <no>Word truncation/stemming</no>
-<se>Word truncation/stemming</se>
+<sv>Word truncation/stemming</sv>
+<el>Word truncation/stemming</el>
 </a></h3>
 
 <p>The word truncation is supported via asterisk (*) wildcard
@@ -1144,9 +1200,10 @@ satisfied.
 <it>Structured metadata search</it>
 <ru>Structured metadata search</ru>
 <sk>Structured metadata search</sk>
-<cz>Structured metadata search</cz>
+<cs>Structured metadata search</cs>
 <no>Structured metadata search</no>
-<se>Structured metadata search</se>
+<sv>Structured metadata search</sv>
+<el>Structured metadata search</el>
 </a></h3>
 
 <p>Searching within various bibliograpic fields (such as title,
@@ -1202,9 +1259,10 @@ satisfied.
 <it>Regular expressions</it>
 <ru>Regular expressions</ru>
 <sk>Regular expressions</sk>
-<cz>Regular expressions</cz>
+<cs>Regular expressions</cs>
 <no>Regular expressions</no>
-<se>Regular expressions</se>
+<sv>Regular expressions</sv>
+<el>Regular expressions</el>
 </a></h3>
 
 <p>The regular expression searching mode is mostly for the power users
@@ -1289,9 +1347,10 @@ documentation</a>.
 <it>Span queries</it>
 <ru>Span queries</ru>
 <sk>Span queries</sk>
-<cz>Span queries</cz>
+<cs>Span queries</cs>
 <no>Span queries</no>
-<se>Span queries</se>
+<sv>Span queries</sv>
+<el>Span queries</el>
 </a></h3>
 
 <p>The span query is provided via a <code>-></code> sign.  For
@@ -1326,9 +1385,10 @@ J</em> to <em>Ellis, Qqq</em>, type:
 <it>Combined metadata/fulltext/citation search</it>
 <ru>Combined metadata/fulltext/citation search</ru>
 <sk>Combined metadata/fulltext/citation search</sk>
-<cz>Combined metadata/fulltext/citation search</cz>
+<cs>Combined metadata/fulltext/citation search</cs>
 <no>Combined metadata/fulltext/citation search</no>
-<se>Combined metadata/fulltext/citation search</se>
+<sv>Combined metadata/fulltext/citation search</sv>
+<el>Combined metadata/fulltext/citation search</el>
 </a></h3>
 
 <p>All the syntax mentioned above can be combined together in one
@@ -1404,9 +1464,10 @@ J</em> to <em>Ellis, Qqq</em>, type:
 <it>Frequently asked questions</it>
 <ru>Frequently asked questions</ru>
 <sk>Frequently asked questions</sk>
-<cz>Frequently asked questions</cz>
+<cs>Frequently asked questions</cs>
 <no>Frequently asked questions</no>
-<se>Frequently asked questions</se>
+<sv>Frequently asked questions</sv>
+<el>Frequently asked questions</el>
 </a></h3>
 
 <h4><a name="howto-choose-terms">
@@ -1418,9 +1479,10 @@ J</em> to <em>Ellis, Qqq</em>, type:
 <it>How to wisely choose your search terms (speed-wise)</it>
 <ru>How to wisely choose your search terms (speed-wise)</ru>
 <sk>How to wisely choose your search terms (speed-wise)</sk>
-<cz>How to wisely choose your search terms (speed-wise)</cz>
+<cs>How to wisely choose your search terms (speed-wise)</cs>
 <no>How to wisely choose your search terms (speed-wise)</no>
-<se>How to wisely choose your search terms (speed-wise)</se>
+<sv>How to wisely choose your search terms (speed-wise)</sv>
+<el>How to wisely choose your search terms (speed-wise)</el>
 </a></h4>
 <p>
 <ul>
@@ -1443,9 +1505,10 @@ J</em> to <em>Ellis, Qqq</em>, type:
 <it>How to search for publications by a given author</it>
 <ru>How to search for publications by a given author</ru>
 <sk>How to search for publications by a given author</sk>
-<cz>How to search for publications by a given author</cz>
+<cs>How to search for publications by a given author</cs>
 <no>How to search for publications by a given author</no>
-<se>How to search for publications by a given author</se>
+<sv>How to search for publications by a given author</sv>
+<el>How to search for publications by a given author</el>
 </a></h4>
 
 <p>You can search for an author in many ways, each having its own
@@ -1594,9 +1657,10 @@ database content will ensure a proper author searching behaviour.
 <it>How to sort according to a certain pattern</it>
 <ru>How to sort according to a certain pattern</ru>
 <sk>How to sort according to a certain pattern</sk>
-<cz>How to sort according to a certain pattern</cz>
+<cs>How to sort according to a certain pattern</cs>
 <no>How to sort according to a certain pattern</no>
-<se>How to sort according to a certain pattern</se>
+<sv>How to sort according to a certain pattern</sv>
+<el>How to sort according to a certain pattern</el>
 </a></h4>
 
 <p>You may select a certain field according to which sort the search
@@ -1643,9 +1707,10 @@ database content will ensure a proper author searching behaviour.
 <it>How to get documents from other servers (Google, SPIRES, KEK)</it>
 <ru>How to get documents from other servers (Google, SPIRES, KEK)</ru>
 <sk>How to get documents from other servers (Google, SPIRES, KEK)</sk>
-<cz>How to get documents from other servers (Google, SPIRES, KEK)</cz>
+<cs>How to get documents from other servers (Google, SPIRES, KEK)</cs>
 <no>How to get documents from other servers (Google, SPIRES, KEK)</no>
-<se>How to get documents from other servers (Google, SPIRES, KEK)</se>
+<sv>How to get documents from other servers (Google, SPIRES, KEK)</sv>
+<el>How to get documents from other servers (Google, SPIRES, KEK)</el>
 </a></h4>
 
 <p>On the search results page, links to other servers like <a
@@ -1689,9 +1754,10 @@ support it.  For example, SPIRES or KEK cannot search for terms within
 <it>How to search in fulltext files</it>
 <ru>How to search in fulltext files</ru>
 <sk>How to search in fulltext files</sk>
-<cz>How to search in fulltext files</cz>
+<cs>How to search in fulltext files</cs>
 <no>How to search in fulltext files</no>
-<se>How to search in fulltext files</se>
+<sv>How to search in fulltext files</sv>
+<el>How to search in fulltext files</el>
 </a></h4>
 
 <p>If a metadata record contains some associated fulltext files, <CDSNAMEINTL>
@@ -1753,9 +1819,10 @@ metadata or in the fulltext, type:
 <it>How to search for citations</it>
 <ru>How to search for citations</ru>
 <sk>How to search for citations</sk>
-<cz>How to search for citations</cz>
+<cs>How to search for citations</cs>
 <no>How to search for citations</no>
-<se>How to search for citations</se>
+<sv>How to search for citations</sv>
+<el>How to search for citations</el>
 </a></h4>
 
 <p>If a metadata record contains an associated fulltext file, <CDSNAMEINTL>

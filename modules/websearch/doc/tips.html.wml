@@ -24,6 +24,205 @@
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a> &gt; <a class=navtrail href=<WEBURL>/help/search/<lang:star: index.*.html>><MSG_SEARCH_HELP></a>" \
     navbar_select="tips"
 
+<fr>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</fr>
+<de>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</de>
+<es>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</es>
+<it>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</it>
+<pt>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</pt>
+<ru>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</ru>
+<sk>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</sk>
+<cs>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</cs>
+<no>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</no>
+<sv>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</sv>
+<el>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</el>
+
 <h5>How to find any value in any field:</h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">

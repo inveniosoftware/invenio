@@ -77,6 +77,24 @@
    </tbody>
    </table>
 </ru>
+<el>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</el>
 
 <p><en>Find out all about searching</en>
    <fr>Trouvez tout sur la recherche de</fr>
@@ -86,9 +104,10 @@
    <it>Tutto quanto vi serve per poter ricercare in</it>
    <ru>Find out all about searching</ru>
    <sk>Tu nájdete všetko čo sa týka hľadania na serveri</sk>
-   <cz>Zde naleznete vše co se týče vyhledávání na serveru</cz>
+   <cs>Zde naleznete vše co se týče vyhledávání na serveru</cs>
    <no>Finn ut alt om søking i</no>
-   <se>Finn ut allt om sökning av</se>
+   <sv>Finn ut allt om sökning av</sv>
+   <el>Find out all about searching</el>
    <CDSNAMEINTL>:
 
 <blockquote>
@@ -129,18 +148,22 @@
       Táto stránka Vám ponúka užitočné tipy a triky ktoré Vám umožnia
       plne využívať možností <CDSNAMEINTL>.
     </sk>  
-    <cz>
+    <cs>
       Tato stránka Vám nabízí užitečné tipy a triky které Vám umožní
       plně využívat možností <CDSNAMEINTL>.
-    </cz>  
+    </cs>  
     <no>
       Denne siden presenter nyttige tips og teknikker slik at du lettere kan få
       fullt utbytte av <CDSNAMEINTL> sine sider.
     </no>  
-    <se>
+    <sv>
       Denna sida ger dig användbara tips och tekniker för att hjälpa dig att
       till fullo använda denna webbplats som <CDSNAMEINTL> erbjuder dig.
-    </se>  
+    </sv>  
+    <el>
+      This page presents you with useful tips and techniques in order to
+      help you use the <CDSNAMEINTL> site to the full.
+    </el>  
 
 <dt><a href="<lang:star: guide.*.html>">Search Guide</a>
 
