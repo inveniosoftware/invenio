@@ -221,11 +221,14 @@ def create_rnkmethod_cache():
             pass
 
         cfg_function = config.get("rank_method", "function")
-        methods[rank_method_code] = {}
-        methods[rank_method_code]["function"] = cfg_function
-        methods[rank_method_code]["prefix"] = config.get(cfg_function, "relevance_number_output_prologue")
-        methods[rank_method_code]["postfix"] = config.get(cfg_function, "relevance_number_output_epilogue")
-        methods[rank_method_code]["chars_alphanumericseparators"] = r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
+        if config.has_section(cfg_function):
+            methods[rank_method_code] = {}
+            methods[rank_method_code]["function"] = cfg_function
+            methods[rank_method_code]["prefix"] = config.get(cfg_function, "relevance_number_output_prologue")
+            methods[rank_method_code]["postfix"] = config.get(cfg_function, "relevance_number_output_epilogue")
+            methods[rank_method_code]["chars_alphanumericseparators"] = r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
+        else:
+            raise Exception("Error in configuration file: %s" % (etcdir + "/bibrank/" + rank_method_code + ".cfg"))
 
         i8n_names = run_sql("SELECT ln,value from rnkMETHODNAME,rnkMETHOD where id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" % (rank_method_code))
         for (ln, value) in i8n_names:
@@ -281,10 +284,7 @@ def is_method_valid(colID, rank_method_code):
 def get_bibrank_methods(collection, ln=cdslang):
     """Returns a list of rank methods and the name om them in the language defined by the ln parameter, if collection is given, only methods enabled for that collection is returned."""
 
-    try:
-        if methods:
-            pass
-    except Exception:
+    if not vars().has_key('methods'):
         create_rnkmethod_cache()
 
     avail_methods = []
@@ -311,17 +311,13 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
        postfix
        verbose_output"""
 
-    hitset = copy.deepcopy(hitset_global) #we are receiving a global hitset
-
-    try:
-        if methods:  
-            pass
-    except Exception, e:
-        create_rnkmethod_cache()
-
     global voutput
     voutput = ""
+
     try:
+        hitset = copy.deepcopy(hitset_global) #we are receiving a global hitset
+        if not vars().has_key('methods'):
+            create_rnkmethod_cache()
         function = methods[rank_method_code]["function"]
         func_object = globals().get(function)
         if func_object and pattern and pattern[0][0:6] == "recid:" and function == "word_similarity":
@@ -350,22 +346,26 @@ def combine_method(rank_method_code, pattern, hitset, rank_limit_relevance,verbo
 
     #global voutput
     result = {}
-    for (method, percent) in methods[rank_method_code]["combine_method"]:
-        function = methods[method]["function"]
-        func_object = globals().get(function)
-        percent = int(percent)
-        if func_object:
-            this_result = dict(func_object(method, pattern, hitset, rank_limit_relevance, verbose)[0])
-        else:
-            this_result = dict(rank_by_method(method, pattern, hitset, rank_limit_relevance, verbose)[0])
-        divideby = float(max(this_result.values()))
-        for (recID, value) in this_result.iteritems():
-            if value > 0:
-                result[recID] = result.get(recID, 0) + int(((value / divideby) * 100) / 100.0 * percent)
+    try:
+        for (method, percent) in methods[rank_method_code]["combine_method"]:
+            function = methods[method]["function"]
+            func_object = globals().get(function)
+            percent = int(percent)
+            if func_object:
+                this_result = dict(func_object(method, pattern, hitset, rank_limit_relevance, verbose)[0])
+            else:
+                this_result = dict(rank_by_method(method, pattern, hitset, rank_limit_relevance, verbose)[0])
+            divideby = float(max(this_result.values()))
+            for (recID, value) in this_result.iteritems():
+                if value > 0:
+                    result[recID] = result.get(recID, 0) + int(((value / divideby) * 100) / 100.0 * percent)
 
-    result = result.items()
-    result.sort(lambda x, y: cmp(x[1], y[1]))
-    return (result, "(", ")", voutput)
+        result = result.items()
+        result.sort(lambda x, y: cmp(x[1], y[1]))
+        return (result, "(", ")", voutput)
+    except Exception, e:
+        return (None, "Warning, method can not be used for ranking your query.", "", voutput)
+        
 
 def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbose):
     """Ranking of records based on predetermined values.
@@ -419,7 +419,7 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     if not lwords_hitset:
         for recID in lrecIDs:
             if rnkdict.has_key(recID):
-                reclist.append((recID, rnkdict[recID][1]))
+                reclist.append((recID, rnkdict[recID]))
                 del rnkdict[recID]
             else:
                 reclist_addend.append((recID, 0))
@@ -427,7 +427,7 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
         lwords_lrecIDs = lwords_hitset.items()
         for recID in lwords_lrecIDs:
             if rnkdict.has_key(recID) and hitset.contains(recID):
-                reclist.append((recID, rnkdict[recID][1]))
+                reclist.append((recID, rnkdict[recID]))
                 del rnkdict[recID]
             elif hitset.contains(recID):
                 reclist_addend.append((recID, 0))

@@ -121,12 +121,12 @@ def single_tag_rank(config):
     for key,value in records:
         if kb_data.has_key(value):
             if not rnkset.has_key(key):
-                rnkset[key] = (value, float(kb_data[value]))
+                rnkset[key] = float(kb_data[value])
             else:
                 if kb_data.has_key(rnkset[key]) and float(kb_data[value]) > float((rnkset[key])[1]):
-                    rnkset[key] = (value, float(kb_data[value]))
+                    rnkset[key] = float(kb_data[value])
         else:
-            rnkset[key] = (value, 0)
+            rnkset[key] = 0
 
     write_message("Number of records available in rank method: %s" % len(rnkset))
     return rnkset
@@ -196,15 +196,15 @@ def rank_method_code_statistics(rank_method_code):
     mincount = 0
 
     for (recID, value) in method.iteritems():
-        if value[1] < min[1] and value[1] > 0:
+        if value < min and value > 0:
             min = value
-        if value[1] > max[1]:
+        if value > max:
             max = value
          
     for (recID, value) in method.iteritems():
-        if value[1] == min[1]:
+        if value == min:
             mincount += 1
-        if value[1] == max[1]:
+        if value == max:
             maxcount += 1
 
     write_message("Showing statistic for selected method")
@@ -212,18 +212,18 @@ def rank_method_code_statistics(rank_method_code):
     write_message("Short name: %s" % rank_method_code)
     write_message("Last run: %s" % get_lastupdated(rank_method_code))
     write_message("Number of records: %s" % len(method))
-    write_message("Lowest value: %s (%s) - Number of records: %s" % (min[0], min[1], mincount))
-    write_message("Highest value: %s (%s) - Number of records: %s" % (max[0], max[1], maxcount))
+    write_message("Lowest value: %s - Number of records: %s" % (min, mincount))
+    write_message("Highest value: %s - Number of records: %s" % (max, maxcount))
     write_message("Divided into 10 sets:")
     for i in range(1,11):
          setcount = 0
          distinct_values = {}
-         lower = -1.0 + ((float(max[1] + 1) / 10)) * (i - 1)
-         upper = -1.0 + ((float(max[1] + 1) / 10)) * i
+         lower = -1.0 + ((float(max + 1) / 10)) * (i - 1)
+         upper = -1.0 + ((float(max + 1) / 10)) * i
          for (recID, value) in method.iteritems():
-             if value[1] >= lower and value[1] <= upper:
+             if value >= lower and value <= upper:
                  setcount += 1
-                 distinct_values[value[1]] = 1
+                 distinct_values[value] = 1
          write_message("Set %s (%s-%s) %s Distinct values: %s" % (i, lower, upper, len(distinct_values), setcount)) 
 
 def check_method(rank_method_code):
@@ -617,9 +617,9 @@ def accessimpact_exec(rank_method_code, name, config):
                         key3 = data[key2]
 
                     if tempdoc.has_key(key3):
-                        tempdoc[key3] = ("", int(tempdoc[key3][1] + float(impacc[key])))
+                        tempdoc[key3] = int(tempdoc[key3] + float(impacc[key]))
                     else:
-                        tempdoc[key3] = ("", int(impacc[key]))
+                        tempdoc[key3] = int(impacc[key])
             else:
                 notcount = notcount + int(impacc[key])
 
