@@ -22,9 +22,8 @@
 #include "cdspage.wml" \
     title="Edit the <I><protect><?print $fidesc;?></protect></I> Element on page <protect><?print $pageNumber;?></protect> of <protect><?print $subname;?></protect>" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a>" \ 
-    navbar_name="admin" \
-    navbar_select="websubmit" \
-    cdspageboxlefttopadd="<protect><?displayLoginMenu('submit');?></protect>"
+    navbar_name="websubmit_admin" \
+    navbar_select="websubmit"
 	    	    
 <?
 <protect>

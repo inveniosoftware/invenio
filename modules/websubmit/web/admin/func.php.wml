@@ -22,9 +22,8 @@
 #include "cdspage.wml" \
     title="List of parameters of function <I><protect><?print $functionName;?></protect></i> for the <I><protect><?print $doctype;?></protect></i> document type" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a>" \ 
-    navbar_name="admin" \
-    navbar_select="websubmit" \
-    cdspageboxlefttopadd="<protect><?displayLoginMenu('submit');?></protect>"
+    navbar_name="websubmit_admin" \
+    navbar_select="websubmit"
 	    	    
 <?
 <protect>
