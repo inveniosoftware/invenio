@@ -1316,7 +1316,7 @@ function integrate ($rec)
         // this is an update
         if ($options['DISPLAY'])
             display($rec);
-        if ($options['REPLACE'] || $options['CORRECT'] || $options['APPEND']) {
+        if ($options['REPLACE'] || $options['CORRECT'] || $options['APPEND'] || $options['FORMAT']) {
           update($rec,$recid,$logfp);
           $nbUpdatedRecords++;
         }
