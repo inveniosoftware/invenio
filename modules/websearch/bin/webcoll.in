@@ -1099,8 +1099,9 @@ def authenticate(user, header="WebColl Task Submission", action="runwebcoll"):
                 print "Sorry, wrong credentials for %s." % user
                 sys.exit(1)
         ## secondly check authorization for the action:
-        if not acc_authorize_action(uid_db, action):
-            print "Sorry, %s has no right to %s." % (user, action)
+        (auth_code, auth_message) = acc_authorize_action(uid_db, action)
+        if auth_code != 0:
+            print auth_message
             sys.exit(1)
     return user
 
