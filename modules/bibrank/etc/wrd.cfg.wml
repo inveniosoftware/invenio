@@ -42,3 +42,18 @@ tag12 = 111__a, 1, <CDSLANG>
 tag13 = 100__%, 1, none
 tag14 = 700__%, 1, none
 tag15 = 721__a, 1, none
+
+[find_similar]
+max_word_occurence = 0.05
+min_word_occurence = 0.00
+min_word_length = 3
+min_nr_words = 3
+min_nr_words_docs = 3
+max_nr_words = 20
+max_nr_words2 = 10
+override_default_min_relevance = no
+default_min_relevance = 2
+low_high_threshold = 5
+
+
+ 

@@ -178,7 +178,7 @@ def get_stopwords(file='stopwords.kb'):
         stopwords[string.rstrip(line)] = 1
     return stopwords
 
-def get_config(rnkMETHOD): #needs some work
+def get_config(rnkMETHOD_code): #needs some work
     """Load common data into memory"""
     global stopwords
     global stemmer
@@ -191,16 +191,16 @@ def get_config(rnkMETHOD): #needs some work
         if stemmer and stopwords:     
             pass
     except StandardError, e:
-        rnkWORD_table = methods[rnkMETHOD]["rnkWORD_table"]
+        rnkWORD_table = methods[rnkMETHOD_code]["rnkWORD_table"]
         try:
-            if methods[rnkMETHOD].has_key("stem_lang"):
-                stemmer = Stemmer.Stemmer(languages[methods[rnkMETHOD]["stem_lang"]])
+            if methods[rnkMETHOD_code].has_key("stem_lang"):
+                stemmer = Stemmer.Stemmer(languages[methods[rnkMETHOD_code]["stem_lang"]])
             else: 
                 stemmer = None         
         except Exception, e:
             stemmer = None
-        if methods[rnkMETHOD].has_key("stopword"):
-            stopwords = get_stopwords("%s" % methods[rnkMETHOD]["stopword"]) 
+        if methods[rnkMETHOD_code].has_key("stopword"):
+            stopwords = get_stopwords("%s" % methods[rnkMETHOD_code]["stopword"]) 
         else:
             stopwords = {}
         chars_alphanumericseparators = r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
@@ -212,26 +212,38 @@ def create_rnkmethod_cache():
     global methods
     bibrank_meths = run_sql("SELECT name from rnkMETHOD")
     methods = {}
-    for (rnkMETHOD,) in bibrank_meths:
+    for (rnkMETHOD_code,) in bibrank_meths:
         try:
-            file = etcdir + "/bibrank/" + rnkMETHOD + ".cfg"
+            file = etcdir + "/bibrank/" + rnkMETHOD_code + ".cfg"
             config = ConfigParser.ConfigParser()
             config.readfp(open(file))
         except StandardError, e:
             pass
         cfg_function = config.get("rank_method", "function")
-        methods[rnkMETHOD] = {}
-        methods[rnkMETHOD]["function"] = cfg_function
+        methods[rnkMETHOD_code] = {}
+        methods[rnkMETHOD_code]["function"] = cfg_function
         if config.has_option(cfg_function, "table"):
-            methods[rnkMETHOD]["rnkWORD_table"] = config.get(cfg_function, "table")
+            methods[rnkMETHOD_code]["rnkWORD_table"] = config.get(cfg_function, "table")
         if  config.has_option(cfg_function, "stem_if_avail") and config.get(cfg_function, "stem_if_avail") == "yes":
-            methods[rnkMETHOD]["stem_lang"] = config.get(cfg_function, "stem_query_language")
+            methods[rnkMETHOD_code]["stem_lang"] = config.get(cfg_function, "stem_query_language")
 
         if config.has_option(cfg_function, "stopword"):
-            methods[rnkMETHOD]["stopword"] = config.get(cfg_function, "stopword")
-        i8n_names = run_sql("SELECT ln,value from rnkMETHODNAME,rnkMETHOD where id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" % (rnkMETHOD))
+            methods[rnkMETHOD_code]["stopword"] = config.get(cfg_function, "stopword")
+        if config.has_section("find_similar"):
+            methods[rnkMETHOD_code]["max_word_occurence"] = float(config.get("find_similar", "max_word_occurence"))
+            methods[rnkMETHOD_code]["min_word_occurence"] = float(config.get("find_similar", "min_word_occurence"))
+            methods[rnkMETHOD_code]["min_word_length"] = int(config.get("find_similar", "min_word_length"))
+            methods[rnkMETHOD_code]["min_nr_words_docs"] = int(config.get("find_similar", "min_nr_words_docs"))
+            methods[rnkMETHOD_code]["min_nr_words"] = int(config.get("find_similar", "min_nr_words"))
+            methods[rnkMETHOD_code]["max_nr_words"] = int(config.get("find_similar", "max_nr_words"))
+            methods[rnkMETHOD_code]["max_nr_words2"] = int(config.get("find_similar", "max_nr_words2"))
+            methods[rnkMETHOD_code]["override_default_min_relevance"] = config.get("find_similar", "override_default_min_relevance")
+            methods[rnkMETHOD_code]["low_high_threshold"] = int(config.get("find_similar", "low_high_threshold"))
+            methods[rnkMETHOD_code]["default_min_relevance"] = int(config.get("find_similar", "default_min_relevance"))
+
+        i8n_names = run_sql("SELECT ln,value from rnkMETHODNAME,rnkMETHOD where id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" % (rnkMETHOD_code))
         for (ln, value) in i8n_names:
-            methods[rnkMETHOD][ln] = value
+            methods[rnkMETHOD_code][ln] = value
             
 def get_bibrank_methods(ln=cdslang):
     """Returns a list of rank methods and the name om them in the language defined by the ln parameter"""
@@ -243,15 +255,15 @@ def get_bibrank_methods(ln=cdslang):
         create_rnkmethod_cache()
 
     avail_methods = []
-    for (rnkMETHOD, options) in methods.iteritems():
-        if options.has_key("function"): #and is_method_valid(collection, rnkMETHOD):
+    for (rnkMETHOD_code, options) in methods.iteritems():
+        if options.has_key("function"): #and is_method_valid(collection, rnkMETHOD_code):
             if options.has_key(ln):
-                avail_methods.append((options[ln], rnkMETHOD))
+                avail_methods.append((rnkMETHOD_code, options[ln]))
             else:
-                avail_methods.append(("Not translated", rnkMETHOD))               
+                avail_methods.append((rnkMETHOD_code, "Not translated"))              
     return avail_methods
 
-def rank_records(rnkMETHOD, rank_limit_relevance, lrecIDs=None, pattern="", verbose=0):
+def rank_records(rnkMETHOD_code, rank_limit_relevance, lrecIDs=None, pattern="", verbose=0):
     """rank_method, e.g. `jif' or `sbr' (word frequency vector model)                    
        rank_limit_relevance, e.g. `23' for `nbc' (number of citations) or `0.10' for `vec'                   
        hitset, search engine hits; optional                   
@@ -266,34 +278,35 @@ def rank_records(rnkMETHOD, rank_limit_relevance, lrecIDs=None, pattern="", verb
         create_rnkmethod_cache()
 
     try:
-        function = methods[rnkMETHOD]["function"]
+    #if 1:
+        function = methods[rnkMETHOD_code]["function"]
         func_object = globals().get(function)
         if func_object and string.find(pattern[0], "recid:") > -1:
-            get_config(rnkMETHOD)
-            result = find_similar(pattern[0][6:], lrecIDs, rank_limit_relevance, verbose)
+            get_config(rnkMETHOD_code)
+            result = find_similar(rnkMETHOD_code, pattern[0][6:], lrecIDs, rank_limit_relevance, verbose)
         elif func_object:
-            get_config(rnkMETHOD)
-            result = func_object(pattern, lrecIDs, rank_limit_relevance, verbose)
+            get_config(rnkMETHOD_code)
+            result = func_object(rnkMETHOD_code, pattern, lrecIDs, rank_limit_relevance, verbose)
         else:
-            result = rank_by_method(pattern, lrecIDs, rank_limit_relevance, rnkMETHOD,verbose)
+            result = rank_by_method(rnkMETHOD_code, pattern, lrecIDs, rank_limit_relevance, verbose)
         return result
     except StandardError, e:
         return []
 
-def find_similar(recID, lrecIDs, min_relevance=10,verbose=0):
+def find_similar(rnkMETHOD_code, recID, lrecIDs, rank_limit_relevance=10,verbose=0):
     """Finding terms to use for calculating similarity. Terms are taken from the recid given, returns a list of recids's and relevance, [[23,34], [344,24], [1,01]]
     recID - record to use for find similar
-    min_relevance - find all similar document above given percentage (0-100)
+    rank_limit_relevance - find all similar document above given percentage (0-100)
     verbose - how much debug information to show, 0-9"""
     
     startCreate = time.time()
-    min_rel = 1
+    if methods[rnkMETHOD_code]["override_default_min_relevance"] == "no":
+        rank_limit_relevance = methods[rnkMETHOD_code]["default_min_relevance"]
+
     query_terms = {}
     recID = int(recID)
     if type(recID) != int:
     	return []
-    max_occ = 0.05
-    min_occ = 0.00
 
     res = run_sql("SELECT id_bibrec, termlist FROM %sR WHERE id_bibrec=%s" % (rnkWORD_table[:-1], recID))
     if not res:
@@ -310,9 +323,9 @@ def find_similar(recID, lrecIDs, min_relevance=10,verbose=0):
 
     #Calculate all terms
     for (term, tf) in rec_terms.iteritems():
-	if len(term) > 2 and terms_recs.has_key(term):
+	if len(term) >= methods[rnkMETHOD_code]["min_word_length"] and terms_recs.has_key(term):
             query_terms[term] =  (1 + math.log(tf[0])) *  tf[1]
-    if len(query_terms) <= 2:
+    if len(query_terms) < methods[rnkMETHOD_code]["min_nr_words"]:
         return []
 
     query_terms_old = query_terms.items()
@@ -321,13 +334,15 @@ def find_similar(recID, lrecIDs, min_relevance=10,verbose=0):
 
     stime = time.time()#
     (recdict, rec_termcount, lrecIDs_remove) = ({}, {}, {})
-    #Use only most important terms, limit: 20 terms
+    #Use only most important terms
     for (term, tf) in query_terms_old:
         term_recs = deserialize_via_marshal(terms_recs[term])
-        if len(query_terms_old) <= 10 or (len(term_recs) > 2 and (len(term_recs) <= 5 or (len(term_recs) > 5 and tf > 0)) and (((float(len(term_recs)) / float(col_size)) <= max_occ) and ((float(len(term_recs)) / float(col_size)) >= min_occ))):
+        #to be fixed
+        if len(query_terms_old) <= methods[rnkMETHOD_code]["max_nr_words2"] or (len(term_recs) >= methods[rnkMETHOD_code]["min_nr_words_docs"] and (len(term_recs) <= methods[rnkMETHOD_code]["low_high_threshold"] or (len(term_recs) > methods[rnkMETHOD_code]["low_high_threshold"] and tf > 0)) and (((float(len(term_recs)) / float(col_size)) <=  methods[rnkMETHOD_code]["max_word_occurence"]) and ((float(len(term_recs)) / float(col_size)) >= methods[rnkMETHOD_code]["min_word_occurence"]))):
+
              query_terms[term] = round(tf, 4)
              (recdict, rec_termcount, lrecIDs_remove) = calculate_record_relevance((term, query_terms[term]) , term_recs, None, recdict, rec_termcount, lrecIDs_remove, verbose) 
-        if len(query_terms_old) > 10 and (len(query_terms) == 20 or tf < 0): #or (time.time() - stime) > 2.0:
+        if len(query_terms_old) > methods[rnkMETHOD_code]["max_nr_words2"] and (len(query_terms) ==  methods[rnkMETHOD_code]["max_nr_words"] or tf < 0):
             break
 
     if len(recdict) == 0:
@@ -341,7 +356,7 @@ def find_similar(recID, lrecIDs, min_relevance=10,verbose=0):
         print "Prepare time: %s" % (str(time.time() - startCreate))
 
     recdict = post_calculate_record_relevance(recdict, rec_termcount, lrecIDs_remove, None, verbose)
-    reclist = sort_record_relevance(recdict, min_relevance,recID, verbose)
+    reclist = sort_record_relevance(recdict, rank_limit_relevance,recID, verbose)
 
     i = 0
     if len(reclist) > 30:
@@ -354,15 +369,15 @@ def find_similar(recID, lrecIDs, min_relevance=10,verbose=0):
 
     if verbose == 9:
         stat(reclist, query_terms)
-    return reclist[i + 1:len(reclist)]
+    return (reclist[i + 1:len(reclist)], 1, "(", "%)")
 
-def rank_by_method(lwords, lrecIDs, min_relevance,rnkMETHOD,verbose=0):
+def rank_by_method(lwords, lrecIDs, rank_limit_relevance,rnkMETHOD_code,verbose=0):
     """input: list of words, ['ellis', 'muon']          
     optional list of recIDs
     output: sorted list of recIDs based on rank method given, e.g. [[23,34], [344,24], [1,01]]           
     if not possible, then return empty list""" 
 
-    rnkdict = run_sql("SELECT relevance_data FROM rnkMETHODDATA,rnkMETHOD where rnkMETHOD.id=id_rnkMETHOD and rnkMETHOD.name='%s'" % rnkMETHOD)
+    rnkdict = run_sql("SELECT relevance_data FROM rnkMETHODDATA,rnkMETHOD where rnkMETHOD.id=id_rnkMETHOD and rnkMETHOD.name='%s'" % rank_method_code)
     rnkdict = deserialize_via_marshal(rnkdict[0][0])
     lrecIDs = lrecIDs.items()
     reclist = []
@@ -375,9 +390,9 @@ def rank_by_method(lwords, lrecIDs, min_relevance,rnkMETHOD,verbose=0):
         else:
             reclist_addend.append((recID, 0))
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
-    return (reclist_addend + reclist)
+    return (reclist_addend + reclist, 1, "", "")
 
-def word_frequency(lwords, lrecIDs, min_relevance,verbose=0):
+def word_frequency(rank_method_code, lwords, lrecIDs, rank_limit_relevance,verbose=0):
     """input: list of words, ['ellis', 'muon']          
     optional list of recIDs
     output: sorted list of recIDs by summary word frequencies, e.g. [[23,34], [344,24], [1,01]]           
@@ -424,7 +439,7 @@ def word_frequency(lwords, lrecIDs, min_relevance,verbose=0):
         print "Prepare and calculate time: %s" % (str(time.time() - startCreate))
 
     recdict = post_calculate_record_relevance(recdict, rec_termcount, lrecIDs_remove, lrecIDs, verbose)
-    reclist = sort_record_relevance(recdict, min_relevance, 0, verbose)
+    reclist = sort_record_relevance(recdict, rank_limit_relevance, 0, verbose)
     
     #Add any documents not ranked to the end of the list
     if lrecIDs:
@@ -437,7 +452,7 @@ def word_frequency(lwords, lrecIDs, min_relevance,verbose=0):
         print query_terms
         print col_size
         stat(reclist, query_terms)
-    return reclist
+    return (reclist, 1, "(", "%)")
 
 def calculate_record_relevance(term, invidx, lrecIDs, recdict, rec_termcount, lrecIDs_remove, verbose):
     """Calculating the relevance of the documents based on the input"""
@@ -491,7 +506,7 @@ def post_calculate_record_relevance(recdict, rec_termcount, lrecIDs_remove, lrec
         print "Post Calculation time: %s" % (str(time.time() - startCreate)) 
     return recdict
 
-def sort_record_relevance(recdict, min_relevance,recID, verbose):
+def sort_record_relevance(recdict, rank_limit_relevance,recID, verbose):
     """Sorts the dictionary and returns records with a relevance higher than the given value."""
 
     startCreate = time.time()
@@ -500,7 +515,7 @@ def sort_record_relevance(recdict, min_relevance,recID, verbose):
     reclist = []
     for (recid, w) in recdict.iteritems():
 	w = int((w * 100 / divideby))
-	if w >= min_relevance:
+	if w >= rank_limit_relevance:
             reclist.append((recid,w))
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
 
