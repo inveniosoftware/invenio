@@ -566,10 +566,12 @@ class WordTable:
             self.put_into_db()
             self.log_progress(time_started,records_done,records_to_go)
 
-    def add_date(self, date=""):
-        # If date is not set, then retrieve it from the database.
-        # Reindex all formats newer than the modification date
-        if not date:
+    def add_recIDs_by_date(self, dates=""):
+        """Add recIDs modified between DATES[0] and DATES[1].
+           If DATES is not set, then add records modified since the last run of
+           the ranking method.
+        """
+        if not dates:
             write_message("Using the last update time for the rank method")
             query = """SELECT last_updated FROM rnkMETHOD WHERE name='%s'
             """ % options["current_run"]
@@ -578,14 +580,14 @@ class WordTable:
             if not res:
                 return
             if not res[0][0]:
-                date = ("0000-00-00",'')
+                dates = ("0000-00-00",'')
             else:
-                date = (res[0][0],'')
+                dates = (res[0][0],'')
 
         query = """SELECT b.id FROM bibrec AS b WHERE b.modification_date >=
-        '%s'""" % date[0]
-        if date[1]:
-            query += "and b.modification_date <= '%s'" % date[1]
+        '%s'""" % dates[0]
+        if dates[1]:
+            query += "and b.modification_date <= '%s'" % dates[1]
         query += "ORDER BY b.id ASC"""
         res = run_sql(query)        
 
@@ -1025,12 +1027,13 @@ def word_index(row, run):
                         recIDs_range.append([recID,recID])
                     wordTable.add_recIDs(recIDs_range)
                 elif options["last_updated"]:
-                    wordTable.add_date("")
+                    wordTable.add_recIDs_by_date("")
+                    # only update last_updated if run via automatic mode:
                     wordTable.update_last_updated(rank_method_code, method_starting_time)
+                elif options["modified"]:
+                    wordTable.add_recIDs_by_date(options["modified"])
                 else:
                     wordTable.add_recIDs([[0,cfg_max_recID]])
-                    #wordTable.add_date(options["modified"])
-                    # only update last_updated if run via automatic mode:
             elif options["cmd"] == "repair":
                 wordTable.repair()
                 check_rnkWORD(options["table"])
