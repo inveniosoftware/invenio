@@ -104,6 +104,9 @@ def change(req,email=None,password=None,password2=None,ln=cdslang):
                 lastupdated=__lastupdated__)
 
 def lost(req, ln=cdslang):
+    if not CFG_SITE_OPEN:
+        return webuser.page_not_authorized(req, "../youraccount.py/lost")
+
     uid = webuser.getUid(req)
 
     if uid == -1:
@@ -247,6 +250,9 @@ def logout(req, ln=cdslang):
     
 def login(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
 
+    if not CFG_SITE_OPEN:
+        return webuser.page_not_authorized(req, "../youraccount.py/login")
+        
     uid = webuser.getUid(req)
 
     if action =='login':
@@ -290,6 +296,10 @@ def login(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
                        lastupdated=__lastupdated__)
 
 def register(req, p_email=None, p_pw=None, p_pw2=None, action='login', referer='', ln=cdslang):
+
+    if not CFG_SITE_OPEN:
+        return webuser.page_not_authorized(req, "../youraccount.py/register")
+
     uid = webuser.getUid(req)
 
     if p_email==None:
