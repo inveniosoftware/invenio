@@ -388,7 +388,7 @@ class Manager:
             attr = curses.color_pair(5) + curses.A_BOLD
         elif row[5] == "STOPPED":
             attr = curses.color_pair(6) + curses.A_BOLD
-        elif row[5] == "ERROR":
+        elif sre.search("ERROR",row[5]):
             attr = curses.color_pair(4) + curses.A_BOLD
         elif row[5] == "WAITING":
             attr = curses.color_pair(3) + curses.A_BOLD
@@ -443,7 +443,7 @@ class Manager:
         else:
             self.display_in_footer(self.footer_select_mode, print_time_p=1)
             footer2 = ""
-            if self.item_status == "DONE" or self.item_status == "ERROR" or self.item_status == "STOPPED":
+            if sre.search("DONE",self.item_status) or self.item_status == "ERROR" or self.item_status == "STOPPED":
                  footer2 += self.footer_stopped_item
             elif self.item_status == "RUNNING" or self.item_status == "CONTINUING":
                  footer2 += self.footer_running_item
@@ -481,8 +481,7 @@ class Manager:
         else:
             where = "and status!='DONE'"
             order = "ASC"
-        self.rows = run_sql("SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK "\
-                            " WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s" % (where,order))
+        self.rows = run_sql("SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s" % (where,order))
         self.repaint()
         while self.running:
             time.sleep( 0.1 )
@@ -494,8 +493,7 @@ class Manager:
                 else:
                     where = "and status!='DONE'"
                     order = "ASC"
-                self.rows = run_sql("SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK "\
-                                    " WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s" % (where,order))
+                self.rows = run_sql("SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s" % (where,order))
                 ring = 0
                 self.repaint()
             else:
@@ -560,7 +558,7 @@ class BibSched:
                 del self.running[id]
         elif status == "SUICIDED" and id in self.suicide_sent.keys():
             del self.suicide_sent[ id ]
-        elif status == "DONE" and id in self.running.keys():
+        elif sre.search("DONE",status) and id in self.running.keys():
             del self.running[id]
         elif self.can_run(proc) and status == "WAITING" and runtime <= time.time():
             if proc in self.helper_modules:
