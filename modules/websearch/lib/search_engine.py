@@ -1104,7 +1104,7 @@ def get_coll_i18nname(c, ln=cdslang):
     global collection_i18nname_cache_timestamp
     # firstly, check whether the collectionname table was modified:
     res = run_sql("SHOW TABLE STATUS LIKE 'collectionname'")
-    if res and res[0][11]>collection_i18nname_cache_timestamp:
+    if res and str(res[0][11])>collection_i18nname_cache_timestamp:
         # yes it was, cache clear-up needed:
         collection_i18nname_cache = create_collection_i18nname_cache()
     # secondly, read i18n name from either the cache or return common name:
@@ -1122,7 +1122,7 @@ def get_field_i18nname(f, ln=cdslang):
     global field_i18nname_cache_timestamp
     # firstly, check whether the fieldname table was modified:
     res = run_sql("SHOW TABLE STATUS LIKE 'fieldname'")
-    if res and res[0][11]>field_i18nname_cache_timestamp:
+    if res and str(res[0][11])>field_i18nname_cache_timestamp:
         # yes it was, cache clear-up needed:
         field_i18nname_cache = create_field_i18nname_cache()
     # secondly, read i18n name from either the cache or return common name:
@@ -1200,7 +1200,7 @@ def get_collection_reclist(coll):
     global collection_reclist_cache_timestamp
     # firstly, check whether the collection table was modified:
     res = run_sql("SHOW TABLE STATUS LIKE 'collection'")
-    if res and res[0][11]>collection_reclist_cache_timestamp:
+    if res and str(res[0][11])>collection_reclist_cache_timestamp:
         # yes it was, cache clear-up needed:
         collection_reclist_cache = create_collection_reclist_cache()
     # secondly, read reclist from either the cache or the database:
@@ -3283,7 +3283,7 @@ def perform_request_cache(req, action="show"):
     # show collection reclist cache:
     out += "<h3>Collection reclist cache</h3>"
     res = run_sql("SHOW TABLE STATUS LIKE 'collection'")
-    out += "- collection table last updated: %s" % res[0][11]
+    out += "- collection table last updated: %s" % str(res[0][11])
     out += "<br>- reclist cache timestamp: %s" % collection_reclist_cache_timestamp
     out += "<br>- reclist cache contents:"
     out += "<blockquote>"
@@ -3312,7 +3312,7 @@ def perform_request_cache(req, action="show"):
     # show field i18nname cache:
     out += "<h3>Field I18N names cache</h3>"
     res = run_sql("SHOW TABLE STATUS LIKE 'fieldname'")
-    out += "- fieldname table last updated: %s" % res[0][11]
+    out += "- fieldname table last updated: %s" % str(res[0][11])
     out += "<br>- i18nname cache timestamp: %s" % field_i18nname_cache_timestamp
     out += "<br>- i18nname cache contents:"
     out += "<blockquote>"
@@ -3323,7 +3323,7 @@ def perform_request_cache(req, action="show"):
     # show collection i18nname cache:
     out += "<h3>Collection I18N names cache</h3>"
     res = run_sql("SHOW TABLE STATUS LIKE 'collectionname'")
-    out += "- collectionname table last updated: %s" % res[0][11]
+    out += "- collectionname table last updated: %s" % str(res[0][11])
     out += "<br>- i18nname cache timestamp: %s" % collection_i18nname_cache_timestamp
     out += "<br>- i18nname cache contents:"
     out += "<blockquote>"
