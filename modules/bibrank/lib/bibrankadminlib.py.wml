@@ -83,7 +83,7 @@ def perform_index(ln=cdslang):
     """ % (weburl, ln)
     
     output += tupletotable(header=header, tuple=actions)
-    return addadminbox("""Overview of rank methodss&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mi">?</a>]</small>""" % weburl, datalist=[output, ''])
+    return addadminbox("""Overview of rank methods&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mi">?</a>]</small>""" % weburl, datalist=[output, ''])
 
 def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0):
     """Modify which collections the rank method is visible to"""
@@ -137,7 +137,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
                                        rnkID=rnkID,
                                        ln=ln,
                                        func=0,
-                                       confirm=0)
+                                       confirm=1)
 
         if confirm in ["0", 0] and func in ["0", 0] and colID:
             subtitle = "Step 2 - Confirm to enable rank method for the chosen collection"
@@ -156,7 +156,9 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
                 output += """<b><span class="info">Rank method '%s' enabled for collection '%s'</span></b>""" % (rnkNAME, colNAME) 
             else:
                 output += """<b><span class="info">Rank method '%s' could not be enabled for collection '%s'</span></b>""" % (rnkNAME[0], colNAME)
-                
+        elif confirm not in ["0", 0] and func in ["0", 0]:
+             output += """<b><span class="info">Please select a collection.</span></b>"""
+        
         col_list = get_rnk_col(rnkID, ln)
         if col_list:
             text  = """
@@ -174,7 +176,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
                                        rnkID=rnkID,
                                        ln=ln,
                                        func=1,
-                                       confirm=0)
+                                       confirm=1)
              
         if confirm in ["0", 0] and func in ["1", 1] and colID:
             subtitle = "Step 2 - Confirm to disable rank method for collection"
@@ -193,6 +195,8 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
                 output += """<b><span class="info">Rank method '%s' disabled for collection '%s'</span></b>""" % (rnkNAME, colNAME)
             else:
                 output += """<b><span class="info">Rank method '%s' could not be disabled for collection '%s'</span></b>""" % (rnkNAME, colNAME)
+        elif confirm not in ["0", 0] and func in ["1", 1]:
+             output += """<b><span class="info">Please select a collection.</span></b>"""
     try:
         body = [output, extra]
     except NameError:
@@ -266,7 +270,7 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
                                    rnkID=rnkID,
                                    sel_type=sel_type,
                                    ln=ln,
-                                   confirm=1)
+                                   confirm=2)
 
         if sel_type and len(trans):
             if confirm in ["1", 1]:
@@ -326,7 +330,7 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
                                text=text,
                                button="Add rank method",
                                ln=ln,
-                               confirm=0)
+                               confirm=1)
     
     if rnkcode:
         if confirm in ["0", 0]:
@@ -370,7 +374,7 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
             else:
                 text = """<b><span class="info">Sorry, could not add rank method, rank method with the same BibRank code probably exists.</span></b>"""
             output += text
-    elif not rnkcode and confirm in ["0", 0]:
+    elif not rnkcode and confirm not in [-1, "-1"]:
         output += """<b><span class="info">Sorry, could not add rank method, not enough data submitted.</span></b>"""
             
     try:
@@ -422,7 +426,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
                                text=text,
                                rnkID=rnkID,
                                button="Modify",
-                               confirm=0)
+                               confirm=1)
 
     text = ""
     if rnkcode and confirm in ["0", 0] and get_rnk_code(rnkID)[0][0] != rnkcode:
@@ -532,6 +536,7 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
             text = """Delete rank method '%s'.""" % (rnkNAME)
             output += createhiddenform(action="deleterank",
                                       text=text,
+                                      button="Confirm",
                                       rnkID=rnkID,
                                       confirm=1)
         elif confirm in ["1", 1]:
