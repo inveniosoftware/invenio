@@ -50,7 +50,7 @@ EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 CLEANFILES = $(doc_DATA) *~ *.tmp *.php
 
 %.en.html %.fr.html %.de.html %.es.html %.pt.html %.it.html %.ru.html %.sk.html %.cs.html %.no.html %.sv.html %.el.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-           $(top_srcdir)/config/messages.wml $(top_builddir)/config/cdsnavbar.wml
+           $(top_srcdir)/config/messages.wml $(top_srcdir)/config/cdsnavbar.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$*.en.html \
 	       -o\(ALL-LANG_*\)+LANG_FR:$*.fr.html \
 	       -o\(ALL-LANG_*\)+LANG_DE:$*.de.html \
