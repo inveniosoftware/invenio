@@ -41,6 +41,7 @@ try:
     from cdsware import webbasket
     from cdsware import webalert
     from cdsware import webuser
+    from mod_python import apache    
     import smtplib
 except ImportError, e:
     print "Error: %s" % e
@@ -170,14 +171,14 @@ def logout(req):
                 uid=uid,
                 lastupdated=__lastupdated__)
     
-def login(req,p_email=None,p_pw=None,action='login'):
+def login(req, p_email=None, p_pw=None, action='login', referer=''):
 
     uid = webuser.getUid(req)
     if action =='login':
         
        if p_email==None:
            return  page(title="Login",
-                        body=webaccount.perform_ask(),
+                        body=webaccount.perform_ask(referer),
                         navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
                         description="CDS Personalize, Main page",
                         keywords="CDS, personalize",
@@ -187,7 +188,12 @@ def login(req,p_email=None,p_pw=None,action='login'):
     
        if len(iden)>0:
            uid=webuser.update_Uid(req,p_email,p_pw)
-           return display(req)	
+           # login successful!
+           if referer:
+               req.err_headers_out.add("Location", referer)
+               raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY               
+           else:
+               return display(req)
        else:
       	   if webuser.userNotExist(p_email,p_pw) or p_email=='' or p_email==' ':
                mess ="Your are not logged into the system, because this user is unknown."
