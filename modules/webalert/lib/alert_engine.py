@@ -229,12 +229,12 @@ def get_record_ids(argstr, date_from, date_until):
     f3      = get_argument(args, 'f3')
     m3      = get_argument(args, 'm3')
     sc      = get_argument(args, 'sc')
-    search  = get_argument(args, 'search')
+    # search  = get_argument(args, 'search')
 
     d1y, d1m, d1d = date_from
     d2y, d2m, d2d = date_until
 
-    return perform_request_search(of='id', p=p, c=c, cc=cc, f=f, so=so, sp=sp, ot=ot, as=as, p1=p1, f1=f1, m1=m1, op1=op1, p2=p2, f2=f2, m2=m2, op2=op2, p3=p3, f3=f3, m3=m3, sc=sc, search=search, d1y=d1y, d1m=d1m, d1d=d1d, d2y=d2y, d2m=d2m, d2d=d2d)
+    return perform_request_search(of='id', p=p, c=c, cc=cc, f=f, so=so, sp=sp, ot=ot, as=as, p1=p1, f1=f1, m1=m1, op1=op1, p2=p2, f2=f2, m2=m2, op2=op2, p3=p3, f3=f3, m3=m3, sc=sc, d1y=d1y, d1m=d1m, d1d=d1d, d2y=d2y, d2m=d2m, d2d=d2d)
 
 
 def get_argument_as_string(argstr, argname):
@@ -352,7 +352,8 @@ def run_alerts():
 
 def process_alert_queries_for_user(uid):
     alert_queries = get_alert_queries_for_user(uid)
-    
+    print alert_queries
+
     for aq in alert_queries:
         frequency = aq[2]
         q = run_query(aq, frequency)
@@ -364,4 +365,4 @@ def run_alerts(uid):
     process_alert_queries_for_user(uid)
     
 if __name__ == '__main__':
-    process_alert_queries_for_user(60)
+    process_alert_queries_for_user(2530836)
