@@ -91,12 +91,9 @@ re_amp = re.compile('&')
 
 def encode_for_xml(s):
     "Encode special chars in string so that it would be XML-compliant."
-
     s = string.replace(s, '&', '&amp;')
     s = string.replace(s, '<', '&lt;')
-    e = unicode(s,'latin-1','ignore').encode('utf-8','replace')
-
-    return e
+    return s
 
 def print_header(cc=cdsname):
     "Prints CDS header and info on URL and date."

@@ -87,9 +87,7 @@ def encode_for_xml(s):
 
     s = string.replace(s, '&', '&amp;')
     s = string.replace(s, '<', '&lt;')
-    e = unicode(s,'latin-1','ignore').encode('utf-8','replace')
-
-    return e
+    return s
 
 
 def print_oai_header(verb):
