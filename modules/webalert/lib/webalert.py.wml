@@ -316,7 +316,7 @@ def perform_list_alerts (uid):
                 basket_name="""<CENTER>--</CENTER>"""
             else:
                 basket_name=row[11]
-            
+
             # id, alert name, frequency, e-mail alert, last run, creation, pattern, catalogue, actions
             out += """<TR><TD><I>#%d</I></TD>"""\ 
                    """<TD><B><NOBR>%s<NOBR></B></TD>"""\
@@ -328,9 +328,9 @@ def perform_list_alerts (uid):
                    """<TD>%s</TD>"""\
                    """<TD><A href="./remove_alert?name=%s&idu=%d&idq=%d&idb=%d">Remove</A><BR>"""\
                    """<A href="./modify_alert?idq=%d&name=%s&freq=%s&notif=%s&idb=%d">Modify</A><BR>"""\
-                   """<A href="%s">Execute&nbsp;search</A></TD></TR>"""\
+                   """<A href="%s/search.py?%s">Execute&nbsp;search</A></TD></TR>"""\
                    % (i,row[5],alert_frequency,email_notification,basket_name,row[9],row[8],
-                      get_textual_query_info_from_urlargs(row[1]),row[5],row[2],row[3],row[4],row[3],row[5],row[6],row[7],row[4],row[1])
+                      get_textual_query_info_from_urlargs(row[1]),row[5],row[2],row[3],row[4],row[3],row[5],row[6],row[7],row[4],weburl,row[1])
         out += """</TABLE>\n"""
     out += """<P>You have defined <B>%s</B> alerts.</P>""" % len(query_result)    
     return out
