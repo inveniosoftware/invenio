@@ -917,6 +917,10 @@ LIMIT 1";
 	// delete the xml format
 	deletexmformat($recid);
     }
+    if ($options['APPEND']) {
+	// delete the xml format
+	deletexmformat($recid);
+    }
 
     if($options['REPLACE'] && !$onlyFMT) {
         for ($i=0;$i<100;$i++) {
