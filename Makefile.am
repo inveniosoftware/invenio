@@ -88,6 +88,7 @@ update-v0.3.3-tables: local-dbexec
 	echo "ALTER TABLE schTASK CHANGE status status varchar(50);" | ./modules/miscutil/bin/dbexec
 
 update-v0.5.0-tables: local-dbexec 
+	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "ALTER TABLE session ADD INDEX uid (uid);" | ./modules/miscutil/bin/dbexec 
 
 drop-tables: local-dbexec 
