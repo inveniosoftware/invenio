@@ -22,7 +22,7 @@
     navbar_name="search-new" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a> &gt; <a class=navtrail href=<WEBURL>/help/search/<lang:star: index.*.html>><MSG_SEARCH_HELP></a>" \
     navbar_select="tips" \
-    cdspageheaderadd="<div align=right><a href=tips.en.html>EN</a> | <a href=tips.fr.html>FR</a> | <a href=tips.de.html>DE</a> | <a href=tips.es.html>ES</a>| <a href=tips.it.html>IT</a> | <a href=tips.ru.html>RU</a> | <a href=tips.sk.html>SK</a> | <a href=tips.cz.html>CZ</a></div>"
+    cdspageheaderadd="<div align=right><a href=tips.cz.html>CZ</a> | <a href=tips.de.html>DE</a> | <a href=tips.en.html>EN</a> | <a href=tips.es.html>ES</a> | <a href=tips.fr.html>FR</a>| <a href=tips.it.html>IT</a> | <a href=tips.pt.html>PT</a> | <a href=tips.ru.html>RU</a> | <a href=tips.sk.html>SK</a></div>"
 
 <fr>
    <p><table class="errorbox">
@@ -96,6 +96,24 @@
    </tbody>
    </table>
 </it>
+<pt>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</pt>
 <ru>
    <p><table class="errorbox">
    <thead>
@@ -192,6 +210,16 @@ search, including an combined metadata, fulltext and reference search
 in one go.  This page lists several tips and tricks that you may find
 useful to this effect.
 </es>
+<pt>
+<p>Our search engine tries to offer today's typical web searching
+experience, as gained with popular search engines such as <a
+href="http://google.com/">Google</a>.  The nature of bibliographic
+searching differs from that of a web page searching, though.  We
+provide many extensions to enable a complex and precise structured
+search, including an combined metadata, fulltext and reference search
+in one go.  This page lists several tips and tricks that you may find
+useful to this effect.
+</pt>
 <it>
 <p>Our search engine tries to offer today's typical web searching
 experience, as gained with popular search engines such as <a
@@ -313,6 +341,26 @@ useful to this effect.
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
 </es>
+<pt>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</pt>
 <it>
 <h3><strong class="headerboxbodylogo">Index</strong></h3>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
@@ -399,6 +447,7 @@ useful to this effect.
 <fr>Simple versus advanced search</fr>
 <de>Einfache versus erweiterte Suche</de>
 <es>Simple versus advanced search</es>
+<pt>Simple versus advanced search</pt>
 <it>Simple versus advanced search</it>
 <ru>Simple versus advanced search</ru>
 <sk>Simple versus advanced search</sk>
@@ -517,6 +566,7 @@ to the Advanced Search for more query assistance.
 <fr>Search guidance</fr>
 <de>Grundlagen</de>
 <es>Search guidance</es>
+<pt>Search guidance</pt>
 <it>Search guidance</it>
 <ru>Search guidance</ru>
 <sk>Search guidance</sk>
@@ -553,6 +603,7 @@ reply.
 <fr>Searching for words versus phrases</fr>
 <de>Suche nach Wörtern und Wortgruppen</de>
 <es>Searching for words versus phrases</es>
+<pt>Searching for words versus phrases</pt>
 <it>Searching for words versus phrases</it>
 <ru>Searching for words versus phrases</ru>
 <sk>Searching for words versus phrases</sk>
@@ -639,6 +690,7 @@ know the precise values you are looking for.
 <fr>Boolean queries</fr>
 <de>Boolsche Suche</de>
 <es>Boolean queries</es>
+<pt>Boolean queries</pt>
 <it>Boolean queries</it>
 <ru>Boolean queries</ru>
 <sk>Boolean queries</sk>
@@ -761,6 +813,7 @@ ellis</code>.
 <fr>Special characters and punctuation</fr>
 <de>Spezielle Zeichen und Notation</de>
 <es>Special characters and punctuation</es>
+<pt>Special characters and punctuation</pt>
 <it>Special characters and punctuation</it>
 <ru>Special characters and punctuation</ru>
 <sk>Special characters and punctuation</sk>
@@ -824,6 +877,7 @@ ellis</code>.
 <fr>International characters</fr>
 <de>Internationale Zeichen</de>
 <es>International characters</es>
+<pt>International characters</pt>
 <it>International characters</it>
 <ru>International characters</ru>
 <sk>International characters</sk>
@@ -878,6 +932,7 @@ ellis</code>.
 <fr>Word truncation/stemming</fr>
 <de>Trunkierung</de>
 <es>Word truncation/stemming</es>
+<pt>Word truncation/stemming</pt>
 <it>Word truncation/stemming</it>
 <ru>Word truncation/stemming</ru>
 <sk>Word truncation/stemming</sk>
@@ -947,6 +1002,7 @@ ellis</code>.
 <fr>Structured metadata search</fr>
 <de>Strukturierte Metadatensuche</de>
 <es>Structured metadata search</es>
+<pt>Structured metadata search</pt>
 <it>Structured metadata search</it>
 <ru>Structured metadata search</ru>
 <sk>Structured metadata search</sk>
@@ -991,6 +1047,7 @@ ellis</code>.
 <fr>Span queries</fr>
 <de>Bereichs-Recherche</de>
 <es>Span queries</es>
+<pt>Span queries</pt>
 <it>Span queries</it>
 <ru>Span queries</ru>
 <sk>Span queries</sk>
@@ -1025,6 +1082,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
 <fr>Combined metadata/fulltext/citation search</fr>
 <de>Kombinierte Metadaten-/Volltext-/Zitatsuche</de>
 <es>Combined metadata/fulltext/citation search</es>
+<pt>Combined metadata/fulltext/citation search</pt>
 <it>Combined metadata/fulltext/citation search</it>
 <ru>Combined metadata/fulltext/citation search</ru>
 <sk>Combined metadata/fulltext/citation search</sk>
@@ -1100,6 +1158,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
 <fr>Frequently asked questions</fr>
 <de>FAQ</de>
 <es>Frequently asked questions</es>
+<pt>Frequently asked questions</pt>
 <it>Frequently asked questions</it>
 <ru>Frequently asked questions</ru>
 <sk>Frequently asked questions</sk>
@@ -1111,6 +1170,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
 <fr>How to wisely choose your search terms (speed-wise)</fr>
 <de>Wie wähle ich am geschicktesten meinen Suchbegriff</de>
 <es>How to wisely choose your search terms (speed-wise)</es>
+<pt>How to wisely choose your search terms (speed-wise)</pt>
 <it>How to wisely choose your search terms (speed-wise)</it>
 <ru>How to wisely choose your search terms (speed-wise)</ru>
 <sk>How to wisely choose your search terms (speed-wise)</sk>
@@ -1133,6 +1193,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
 <fr>How to search for publications by a given author</fr>
 <de>Wie suche ich nach Publikationen eines bestimmten Autors</de>
 <es>How to search for publications by a given author</es>
+<pt>How to search for publications by a given author</pt>
 <it>How to search for publications by a given author</it>
 <ru>How to search for publications by a given author</ru>
 <sk>How to search for publications by a given author</sk>
@@ -1265,6 +1326,7 @@ database content will ensure a proper author searching behaviour.
 <fr>How to sort according to a certain pattern</fr>
 <de>Wie lasse ich Ergebnisse auf eine bestimmte Weise sortieren</de>
 <es>How to sort according to a certain pattern</es>
+<pt>How to sort according to a certain pattern</pt>
 <it>How to sort according to a certain pattern</it>
 <ru>How to sort according to a certain pattern</ru>
 <sk>How to sort according to a certain pattern</sk>
@@ -1311,6 +1373,7 @@ database content will ensure a proper author searching behaviour.
 <fr>How to get documents from other servers (Google, SPIRES, KEK)</fr>
 <de>Wie bekomme ich Dokumente anderer Server (Google, SPIRES, KEK)</de>
 <es>How to get documents from other servers (Google, SPIRES, KEK)</es>
+<pt>How to get documents from other servers (Google, SPIRES, KEK)</pt>
 <it>How to get documents from other servers (Google, SPIRES, KEK)</it>
 <ru>How to get documents from other servers (Google, SPIRES, KEK)</ru>
 <sk>How to get documents from other servers (Google, SPIRES, KEK)</sk>
@@ -1354,6 +1417,7 @@ support it.  For example, SPIRES or KEK cannot search for terms within
 <fr>How to search in fulltext files</fr>
 <de>Wie kann ich in verknüpften Volltextdateien suchen</de>
 <es>How to search in fulltext files</es>
+<pt>How to search in fulltext files</pt>
 <it>How to search in fulltext files</it>
 <ru>How to search in fulltext files</ru>
 <sk>How to search in fulltext files</sk>
@@ -1415,6 +1479,7 @@ metadata or in the fulltext, type:
 <fr>How to search for citations</fr>
 <de>Wie kann ich nach Zitaten suchen</de>
 <es>How to search for citations</es>
+<pt>How to search for citations</pt>
 <it>How to search for citations</it>
 <ru>How to search for citations</ru>
 <sk>How to search for citations</sk>

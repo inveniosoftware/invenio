@@ -22,7 +22,7 @@
     navbar_name="search-new" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a>" \
     navbar_select="tips" \
-    cdspageheaderadd="<div align=right><a href=index.en.html>EN</a> | <a href=index.fr.html>FR</a> | <a href=index.de.html>DE</a> | <a href=index.es.html>ES</a> | <a href=index.it.html>IT</a> | <a href=index.ru.html>RU</a> | <a href=index.sk.html>SK</a> | <a href=index.cz.html>CZ</a></div>"
+    cdspageheaderadd="<div align=right><a href=index.cz.html>CZ</a> | <a href=index.de.html>DE</a> | <a href=index.en.html>EN</a> | <a href=index.es.html>ES</a> | <a href=index.fr.html>FR</a> | <a href=index.it.html>IT</a> | <a href=index.pt.html>PT</a> | <a href=index.ru.html>RU</a> | <a href=index.sk.html>SK</a></div>"
 
 <es>
    <p><table class="errorbox">
@@ -60,6 +60,24 @@
    </tbody>
    </table>
 </it>
+<pt>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</pt>
 <ru>
    <p><table class="errorbox">
    <thead>
@@ -83,6 +101,7 @@
    <fr>Trouvez tout sur la recherche de</fr>
    <de>Lernen Sie alles über den Suchemöglichkeiten beim</de>
    <es>Find out all about searching</es>
+   <pt>Find out all about searching</pt>
    <it>Find out all about searching</it>
    <ru>Find out all about searching</ru>
    <sk>Tu nájdete všetko čo sa týka hľadania na serveri</sk>
@@ -111,6 +130,10 @@
       This page presents you with useful tips and techniques in order to
       help you use the <CDSNAMEINTL> site to the full.
     </es>  
+    <pt>
+      This page presents you with useful tips and techniques in order to
+      help you use the <CDSNAMEINTL> site to the full.
+    </pt>  
     <it>
       This page presents you with useful tips and techniques in order to
       help you use the <CDSNAMEINTL> site to the full.

@@ -22,7 +22,7 @@
     navbar_name="help" \
     navtrail_previous_links="" \
     navbar_select="tips" \
-    cdspageheaderadd="<div align=right><a href=index.en.html>EN</a> | <a href=index.fr.html>FR</a> | <a href=index.de.html>DE</a> | <a href=index.es.html>ES</a> | <a href=index.it.html>IT</a> | <a href=index.ru.html>RU</a> | <a href=index.cz.html>CZ</a> | <a href=index.sk.html>SK</a></div>"
+    cdspageheaderadd="<div align=right><a href=index.cz.html>CZ</a> | <a href=index.de.html>DE</a> | <a href=index.en.html>EN</a> | <a href=index.es.html>ES</a> | <a href=index.fr.html>FR</a> | <a href=index.it.html>IT</a> | <a href=index.pt.html>PT</a> | <a href=index.ru.html>RU</a> | <a href=index.sk.html>SK</a></div>"
 
 <es>
    <p><table class="errorbox">
@@ -60,6 +60,24 @@
    </tbody>
    </table>
 </it>
+<pt>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</pt>
 <ru>
    <p><table class="errorbox">
    <thead>
@@ -84,6 +102,7 @@
 <fr>Bienvenu au <MSG_HELP_CENTRAL> de <CDSNAMEINTL>.</fr>
 <de>Willkommen Sie bei der <MSG_HELP_CENTRAL> vom <CDSNAMEINTL>.</de>
 <es>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</es>
+<pt>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</pt>
 <it>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</it>
 <ru>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</ru>
 <sk>Víta Vás <MSG_HELP_CENTRAL> <CDSNAMEINTL>.</sk>
@@ -98,6 +117,7 @@
     <fr>Obtenez de l'aide avec la recherche sur <CDSNAMEINTL>.</fr>
     <de>Hier können Sie die Suchhilfe für den <CDSNAMEINTL> konsultieren.</de>
     <es>Get help with searching <CDSNAMEINTL>.</es>
+    <pt>Get help with searching <CDSNAMEINTL>.</pt>
     <it>Get help with searching <CDSNAMEINTL>.</it>
     <ru>Get help with searching <CDSNAMEINTL>.</ru>
     <sk>Pomoc pri hľadaní <CDSNAMEINTL>.</sk>
