@@ -35,11 +35,11 @@ class TestListSetOperations(unittest.TestCase):
     """Test list set operations."""
 
     def test_union_dicts(self):
-        """bibrank_tag_based_indexer union_dicts"""
+        """bibrank tag based indexer union dicts"""
         self.assertEqual({1: 5, 2: 6, 3: 9, 4: 10, 10: 1}, bibrank_tag_based_indexer.union_dicts({1: 5, 2: 6, 3: 9}, {3:9, 4:10, 10: 1}))
 
     def test_split_ranges(self):
-        """bibrank_tag_based_indexer split_ranges"""
+        """bibrank tag based indexer split ranges"""
         self.assertEqual([[0, 500], [600, 1000]], bibrank_tag_based_indexer.split_ranges("0-500,600-1000"))
 
 def create_test_suite():
