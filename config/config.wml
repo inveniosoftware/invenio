@@ -271,6 +271,10 @@ TRUE
 <HTDOCSDIR>submit/archive
 </define-tag>
 
+<define-tag ARCHIVEURL whitespace=delete>
+<HTDOCSURL>submit/archive
+</define-tag>
+
 <define-tag COUNTERS whitespace=delete>
 <HTDOCSDIR>submit/counters
 </define-tag>
