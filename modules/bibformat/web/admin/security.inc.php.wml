@@ -21,32 +21,19 @@
 *********************************************************************/
   
    /*********************Authentication*******************************/
-   function canUseBibFormatAdmin($uid,$doctype='%')
-   {
-	if (AUTHENTICATION)
-	{
-		$uid_email = getEmail($uid);
-		if (!authenticate("$uid_email","bibformatmanager",$doctype))
-		   return false;
-		else
-		   return true;
-	}
-	else
-	   return true;
-   }
 
-  $uid_email = getEmail($uid);
+  $uid_email = getEmail($uid);  
 
   if ($uid_email == "guest")
   {
-    outWarning("Please log in using the left menu.");
+    outWarning('You seem to be guest.  Please <a href="'.$WEBURL.'/youraccount.py/login?referer='.$WEBURL.$PHP_SELF.'">login</a> first.');
     print "</td></tr></table>";
     exit;
   }
 
-  if(!canUseBibFormatAdmin($uid))
+  if(acc_authorize_action($uid, "cfgbibformat") != 1)
   {
-    outWarning("Sorry, you are not allowed to use bibFormat Admin. <br> If you think this is not correct, please contact $ADMINEMAIL");
+    outWarning('Sorry, '.$uid_email.' is not allowed to use BibFormat Admin. <br> If you think this is not correct, please contact '.$ADMINEMAIL);
     print "</td></tr></table>";
     exit;
   }
