@@ -67,31 +67,39 @@ def get_alerts(query, frequency):
     return {'alerts': r, 'records': query['records'], 'argstr': query['argstr']}
 
     
-# def add_record_to_basket(record_id, basket_id):
-#     try:
-#         return run_sql('insert into basket_record (id_basket, id_record) values(%s, %s);', (basket_id, record_id,))
-#     except:
-#         return 0
+def add_record_to_basket(record_id, basket_id):
+    if DEBUGLEVEL > 0:
+        print "-> adding record %s into basket %s" % (record_id, basket_id)
+    try:
+        return run_sql('insert into basket_record (id_basket, id_record) values(%s, %s);', (basket_id, record_id,))
+    except:
+        return 0
 
     
 def add_records_to_basket(record_ids, basket_id):
-    global DEBUGLEVEL
-    
-    nrec = len(record_ids)
-    if nrec > 0:
-        vals = '(%s,%s)' % (basket_id, record_ids[0])
-        if nrec > 1:
-            for i in record_ids[1:]:
-                vals += ',(%s, %s)' % (basket_id, i)
+    # TBD: generate the list and all all records in one step
+    for i in record_ids:
+        add_record_to_basket(i, basket_id)
 
-        if DEBUGLEVEL > 0:
-            print "-> adding %s records into basket %s: %s" % (nrec, basket_id, vals)
-        try:
-            return run_sql('insert into basket_record (id_basket, id_record) values %s;', (vals,))
-        except:
-            return 0
-    else:
-        return 0
+    
+# def add_records_to_basket(record_ids, basket_id):
+#     global DEBUGLEVEL
+    
+#     nrec = len(record_ids)
+#     if nrec > 0:
+#         vals = '(%s,%s)' % (basket_id, record_ids[0])
+#         if nrec > 1:
+#             for i in record_ids[1:]:
+#                 vals += ',(%s, %s)' % (basket_id, i)
+
+#         if DEBUGLEVEL > 0:
+#             print "-> adding %s records into basket %s: %s" % (nrec, basket_id, vals)
+#         try:
+#             return run_sql('insert into basket_record (id_basket, id_record) values %s;', (vals,))
+#         except:
+#             return 0
+#     else:
+#         return 0
     
 
 def get_email(uid):
