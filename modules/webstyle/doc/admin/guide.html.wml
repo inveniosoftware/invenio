@@ -1,0 +1,54 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="WebStyle Admin Guide" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/webstyle/>WebStyle Admin</a>" \
+    navbar_name="admin" \
+    navbar_select="webstyle-admin-guide"
+
+<h2>Compile-time Configuration of Page Layout</h2>
+
+<p>The style of the CDSware installation is defined largely also
+during the configuration time, as explained in the <a
+href="http://cdsware.cern.ch/download/INSTALL">INSTALL</a> guide.  You
+can modify page header, footer, general portalboxes, etc.  See the
+installation guide for more details.
+
+<p>Messages emited by the web interface are to be edited during
+configuration time in the <code>messages.wml</code> file.  
+
+<h2>Run-time Configuration of Page Layout</h2>
+
+<p>During runtime you most probably want to modify mostly the <a
+href="<WEBURL>/img/cds.css">CDS style sheet</a> and <a
+href="<WEBURL>/img/">images</a>.
+
+<p>The look of the search interface pages may be modify to a very
+large extent in the <a href="<WEBURL>/admin/websearch">WebSearch Admin
+Interface</a> by adding portalboxes on various places on the page.
+
+<h2>Advanced Page Layout Changes</h2>
+
+<p>More advanced changes to the web page layout have to be carried out
+on the programming level.  For example, most mod_python dynamic pages
+are using the <code>page()</code> function defined in the
+<code>webpage.py</code> file.
+
+
