@@ -31,7 +31,7 @@
 __version__ = "$Id$"
 
 try:
-    #from config import *
+    from config import *
     from search_engine import print_record
     from HTMLParser import HTMLParser
 except ImportError, e:
@@ -89,10 +89,14 @@ class RecordHTMLParser(HTMLParser):
 
 def get_as_text(record_id):
     """Return the plain text from RecordHTMLParser of the record."""
+
     rec = print_record(record_id)
     htparser = RecordHTMLParser()
-    htparser.feed(rec)
-    return htparser.result
+    try:
+        htparser.feed(rec)
+        return htparser.result
+    except:
+        return htparser.result + '\n**HTML Error detected in record <http://cdsweb.cern.ch/search.py?recid=%s>, contact <%s>.' % (record_id, supportemail)
 
 
 if __name__ == "__main__":

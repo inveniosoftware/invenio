@@ -33,7 +33,7 @@ __version__ = "$Id$"
 try:
     from cgi import parse_qs
     from sre import search, sub
-    from time import localtime, strftime, mktime
+    from time import localtime, strftime, mktime, sleep
     import smtplib
     from config import *
     from search_engine import perform_request_search
@@ -47,11 +47,15 @@ except ImportError, e:
 MAXIDS = 50
 FROMADDR = 'CDS Alert Engine <%s>' % alertengineemail
 ALERTURL = weburl + '/youralerts.py/list'
+DEVELOPERADDR = ['erik.simon@cern.ch', 'tibor.simko@cern.ch']
+
+# Debug levels:
 # 0 = production, nothing on the console, email sent
 # 1 = messages on the console, email sent
 # 2 = messages on the console, but no email sent
 # 3 = many messages on the console, no email sent
-DEBUGLEVEL = 1
+# 4 = many messages on the console, email sent to DEVELOPERADDR
+DEBUGLEVEL = 4
 
 
 def update_date_lastrun(alert):
@@ -96,7 +100,11 @@ def add_records_to_basket(record_ids, basket_id):
         if DEBUGLEVEL > 0:
             print "-> adding %s records into basket %s: %s" % (nrec, basket_id, vals)
         try:
-            return run_sql('insert into basket_record (id_basket, id_record) values %s;' % vals) # Cannot use the run_sql(<query>, (<arg>,)) form for some reason
+            if DEBUGLEVEL < 4:
+                return run_sql('insert into basket_record (id_basket, id_record) values %s;' % vals) # Cannot use the run_sql(<query>, (<arg>,)) form for some reason
+            else:
+                print '   NOT ADDED, DEBUG LEVEL == 4'
+                return 0
         except:
             return 0
     else:
@@ -113,13 +121,19 @@ def get_query(alert_id):
 
 def send_email(fromaddr, toaddr, body):
     global DEBUGLEVEL
-    server = smtplib.SMTP('smtp.cern.ch')
-    if DEBUGLEVEL > 2:
-        server.set_debuglevel(1)
-    else:
-        server.set_debuglevel(0)
-    server.sendmail(fromaddr, toaddr, body)
-    server.quit()
+    try:
+        server = smtplib.SMTP('smtp.cern.ch')
+        if DEBUGLEVEL > 2:
+            server.set_debuglevel(1)
+        else:
+            server.set_debuglevel(0)
+            
+        server.sendmail(fromaddr, toaddr, body)
+        server.quit()
+    except:
+        print 'Error connecting to SMTP server, retrying in 10 seconds.'
+        sleep(10)
+        send_email(fromaddr, toaddr, body)
 
 
 def forge_email(fromaddr, toaddr, subject, content):
@@ -146,7 +160,7 @@ def print_records(record_ids):
         c += 1
 
     if c > MAXIDS:
-        msg += '\n\n' + 'Only the first %s records are displayed above. Please consult your basket or the URL below to see all the results.' % MAXIDS
+        msg += '\n\n' + 'Only the first %s records are displayed above. Please consult the URL below to see all the results.' % MAXIDS
 
     return msg
 
@@ -155,6 +169,7 @@ def email_notify(alert, records, argstr):
     global FROMADDR
     global ALERTURL
     global DEBUGLEVEL
+    global DEVELOPERADDR
 
     if len(records) == 0:
         return
@@ -168,6 +183,7 @@ def email_notify(alert, records, argstr):
     msg += "This is an automatic message, please don't reply to its address. For any question, use <%s> instead.\n" % supportemail
 
     email = get_email(alert[0])
+        
     url = weburl + "/search.py?" + argstr
     pattern = get_pattern(argstr)
     catalogue = get_catalogue(argstr)
@@ -200,7 +216,9 @@ def email_notify(alert, records, argstr):
 
     if DEBUGLEVEL < 2:
         send_email(FROMADDR, email, body)
-
+    if DEBUGLEVEL == 4:
+        for a in DEVELOPERADDR:
+            send_email(FROMADDR, a, body)
 
 def get_argument(args, argname):
     if args.has_key(argname):
@@ -397,10 +415,6 @@ def process_alert_queries_for_user(uid):
         alerts = get_alerts(q, frequency)
         process_alerts(alerts)
 
-    
-def run_alerts(uid):
-    """Run the alerts for the specified user id."""
-    process_alert_queries_for_user(uid)
     
 if __name__ == '__main__':
     process_alert_queries_for_user(2530836) # eric
