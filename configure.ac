@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 dnl Initialize autoconf and automake:
-AC_INIT(cdsware, 0.01-pre1, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.01-pre1)
+AC_INIT(cdsware, 0.01-pre2, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.01-pre2)
 
 dnl Check for install:
 AC_PROG_INSTALL
@@ -46,13 +46,6 @@ if test -z "$PHP"; then
    AC_MSG_ERROR([
    PHP standalone command-line executable (i.e. not compiled as Apache module!) is required too.  
    Available from <http://www.php.net/manual/en/install.commandline.php>.])
-fi
-
-dnl Check for Perl:
-AC_PATH_PROG(PERL, perl)
-if test -z "$PERL"; then
-   AC_MSG_ERROR([
-   Perl is required.  Available from <http://cpan.org/>.])
 fi
 
 dnl Check for Python:
@@ -137,6 +130,7 @@ fi
 dnl Test supplied DB user credentials:
 
 dnl Substitute variables:
+AC_SUBST(VERSION)
 AC_SUBST(WML)
 AC_SUBST(MYSQL)
 AC_SUBST(PHP)
