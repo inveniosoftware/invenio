@@ -190,7 +190,7 @@ def get_field(recID, tag):
         out.append(row[0])
     return out
 
-def print_record(recID, format='hb'):
+def print_record(recID, format='hb', ln=cdslang):
     "Prints record 'recID' formatted accoding to 'format'."
 
     out = ""
@@ -238,8 +238,8 @@ def print_record(recID, format='hb'):
             out += """<br><small class="note"><a class="note" href="%s">%s</a></small>""" % (urls_u[idx], urls_u[idx])
 
     # at the end of HTML mode, print "Detailed record" and "Mark record" functions:
-    out +=  """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">Detailed record</a>""" \
-           % (weburl, recID)
+    out +=  """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">%s</a>""" \
+           % (weburl, recID, msg_detailed_record[ln])
     #out += """<- <input name="mark[]" type="checkbox" value="%s"> Mark record""" % recID
     out += "</span>"
     return out
@@ -554,7 +554,7 @@ class Collection:
                         box += """<tr>
                                     <td class="latestadditionsboxtimebody">%s</td>
                                     <td class="latestadditionsboxrecordbody">%s</td>
-                                  </tr>""" % (get_creation_date(recIDs[idx],fmt="%Y-%m-%d<br>%H:%i"), print_record(recIDs[idx]))
+                                  </tr>""" % (get_creation_date(recIDs[idx],fmt="%Y-%m-%d<br>%H:%i"), print_record(recIDs[idx], ln=ln))
                 box += "</table>"
                 if self.nbrecs > rg:
                     box += """<div align="right"><small><a href="%s&amp;ln=%s">[&gt;&gt; %s]</a></small></div>""" % (url, ln, msg_more[ln])
