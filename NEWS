@@ -5,6 +5,37 @@ Revision: $Id$
 
 Here is a short summary of most notable changes in CDSware releases:
 
+CDSware v0.3.2 (DEVELOPMENT) -- released 2004-05-12
+
+  * admin area improved: all the modules have now Admin Guides; some
+    guides were updated, some are still to be updated (WebHelp,
+    BibConvert, BibFormat, BibIndex, BibSched, WebAlert, WebSession,
+    WebSubmit, BibEdit, BibHarvest, BibRank, BibUpload, WebAccess,
+    WebBasket, WebSearch, WebStyle)
+  * initial release of the WebSearch Admin interface (WebSearch)
+  * initial release of the BibRank Admin interface (BibRank)
+  * search cache expiry after insertion of new records (WebSearch)
+  * search engine now does on-the-fly formatting via BibFormat CLI
+    call to handle restricted site situations (WebSearch)
+  * webcoll default verbosity decreased for efficiency (WebSearch)
+  * added BibConvert configuration example for converting XML Dublin
+    Core to XML MARC (BibConvert)
+  * BibConvert knowledge base mode extended by various case-sensitive
+    matching possibilities (BibConvert)
+  * fixed various problems with fulltext file names and the submission
+    from MS Windows platform (WebSubmit)
+  * fixed problem with bibupload append mode not updating XML MARC
+    properly (BibUpload)
+  * fixed small problems with the submission interface such as
+    multiple fields selection (WebSubmit)
+  * session revoking and session expiry strengthened (WebSession)
+  * page design and style sheet updated to better fit large variety of
+    browsers (WebStyle)
+  * added output format argument for basket display (WebBasket)
+  * new Swedish translation and updated German, Russian, and Spanish
+    translations; thanks to Urban, Guido, Lyuba, and Magaly
+  * faster creation of I18N static HTML and PHP files during make
+
 CDSware v0.3.1 (DEVELOPMENT) -- released 2004-03-12
 
   * security fix preventing exposure of local configuration variables
