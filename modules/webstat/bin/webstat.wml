@@ -72,7 +72,7 @@ if [ "$LISP" == "lisp" ]; then
     $LISP -core ${LISPIMAGEDIR}/webstat.$LISP.core -quiet -batch \
           -eval "(progn (analyze-httpd-log-file \"$FILECFG\" \"$FILELOG\")(quit))"
 elif [ "$LISP" == "sbcl" ]; then
-    $LISP --noinform --core ${LISPIMAGEDIR}/webstat.$LISP.core --disable-debugger \
+    $LISP --noinform --core ${LISPIMAGEDIR}/webstat.$LISP.core \
           --eval "(progn (analyze-httpd-log-file \"$FILECFG\" \"$FILELOG\")(quit))"
 elif [ "$LISP" == "clisp" ]; then
     $LISP -q -M ${LISPIMAGEDIR}/webstat.$LISP.mem \

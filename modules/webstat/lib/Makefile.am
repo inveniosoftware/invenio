@@ -40,7 +40,7 @@ webstat.cmucl.core: $(FILESLISP)
 
 webstat.sbcl.core: $(FILESLISP)
 	if [ -x "${SBCL}" ]; then \
-	    sbcl --noinform --disable-debugger --eval "(progn (load \"load.lisp\")(sb-ext:save-lisp-and-die \"webstat.sbcl.core\"))"; \
+	    sbcl --noinform --eval "(progn (load \"load.lisp\")(sb-ext:save-lisp-and-die \"webstat.sbcl.core\"))"; \
         else \
             echo "Warning: cannot find SBCL, hoping you have CLISP or CMUCL instead."; \
         fi
