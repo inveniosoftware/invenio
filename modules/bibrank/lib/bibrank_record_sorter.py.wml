@@ -288,6 +288,8 @@ def get_bibrank_methods(collection='',ln=cdslang):
     return avail_methods
 
 def format_output(output):
+    """Format output for html"""
+
     new_output = ""
     for line in output:
         new_output += "<br>" + line
@@ -322,8 +324,6 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset, pattern=[], ver
             lrecIDs = hitset.items()
             result = (zip(lrecIDs, [0] * len(lrecIDs)), "", "")  
     except Exception, e:
-        #from webpage import create_error_box
-        #req.write(create_error_box(req, verbose=verbose, ln=ln))
         result = (None, "", adderrorbox("An error occured when trying to rank the search result", ["Unexpected error: %s<br><b>Traceback:</b>%s" % (e, format_output(traceback.format_tb(sys.exc_info()[2])))]))
     return result
 
@@ -340,11 +340,11 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance=10,verbos
     query_terms = {} 
     recID = int(recID)
     if type(recID) != int:
-        return (None, "Warning", "An error has occured") 
+        return (None, "Warning, An error has occured (1)", "") 
 
     res = run_sql("SELECT id_bibrec, termlist FROM %sR WHERE id_bibrec=%s" % (rnkWORD_table[:-1], recID))
     if not res:
-        return (None, "Warning", "An error has occured") 
+        return (None, "Warning, An error has occured (2)", "") 
 
     rec_terms = deserialize_via_marshal(res[0][1])
     #Get all documents using terms from the selected documents
@@ -353,7 +353,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance=10,verbos
         terms = terms[1:len(terms) - 1]
         terms_recs = dict(run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (rnkWORD_table,terms)))
     else:
-        return (None, "Warning", "An error has occured")
+        return (None, "Warning, An error has occured (3)", "")
   
     #Calculate all terms
     for (term, tf) in rec_terms.iteritems():
@@ -377,7 +377,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance=10,verbos
             break
 
     if len(recdict) <= 2: #not enough terms to get a good result
-        return (None, "Warning", "An error has occured")
+        return (None, "Warning, An error has occured (4)", "")
 
     if verbose > 0:
         print "Number of terms: %s" % run_sql("SELECT count(id) FROM %s" % rnkWORD_table)[0][0]
@@ -412,7 +412,7 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
 
     rnkdict = run_sql("SELECT relevance_data FROM rnkMETHODDATA,rnkMETHOD where rnkMETHOD.id=id_rnkMETHOD and rnkMETHOD.name='%s'" % rank_method_code)
     if not rnkdict:
-        return (None, "Warning", "An error has occured")
+        return (None, "Warning, An error has occured (5)", "")
  
     rnkdict = deserialize_via_marshal(rnkdict[0][0])
     lrecIDs = hitset.items()
@@ -467,7 +467,7 @@ def word_frequency(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
             del term_recs
 
     if len(recdict) == 0 or len(lwords) == 1 and lwords[0] == "":
-        return (None, "Warning", "An error has occured")
+        return (None, "Warning, An error has occured (6)", "")
 
     if verbose > 0:
         print "Current number of recIDs: %s" % (col_size)
@@ -514,19 +514,6 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, lre
                 recdict[j] = recdict.get(j,0) + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
                 lrecIDs_remove[j] = 1 
                 rec_termcount[j] = rec_termcount.get(j,0) + 1
-
-    #else:
-    #    #Use all records
-    #    if qtf >= 0 or (qtf < 0 and len(recdict) == 0):
-    #        for (j, tf) in invidx.iteritems():
-    #            recdict[j] = recdict.get(j,0) + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
-    #            rec_termcount[j] = rec_termcount.get(j,0) + 1
-    #    else: #much used term, do not include all records, only use already existing ones
-    #        for (j, tf) in recdict.iteritems():
-    #            if invidx.has_key(j):
-    #                tf = invidx[j]
-    #                recdict[j] = recdict.get(j,0) + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
-    #                rec_termcount[j] = rec_termcount.get(j,0) + 1
         
     if verbose > 0:
         print "Calculation time: %s,%s" % (str(time.time() - startCreate), term) 
@@ -540,11 +527,6 @@ def post_calculate_record_relevance(recdict, rec_termcount, lrecIDs_remove, hits
     for j in lrecIDs_remove.keys():
         hitset.remove(j)
         recdict[j] = recdict[j] * rec_termcount[j]  
- 
-    #else:
-    #    #Multiply with the number of terms of the total number of terms in the query existing in the records
-    #    for (j, tf) in rec_termcount.iteritems():
-    #        recdict[j] = recdict[j] * rec_termcount[j]
 
     if verbose > 0:
         print "Post Calculation time: %s" % (str(time.time() - startCreate)) 
