@@ -972,7 +972,7 @@ def word_index(row, run):
         psyco.bind(update_rnkWORD)
         psyco.bind(check_rnkWORD)
     except StandardError,e:
-        print "ERROR PSYCO", e
+        print "Warning: Psyco", e
         pass
 
     global options, task_id, wordTables, stopwords, stemmer, languages 
