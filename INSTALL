@@ -193,9 +193,10 @@ Contents
                     --with-dbpass=myp1ss 
 
           Configure essential CDSware parameters, as the installation
-          directories for HTDOCS files, CGI scripts and DB utilities,
-          the URL of the homepage and CGI scripts, and database host,
-          database name, and database user credentials.
+          directories for CDSware HTDOCS files, CGI scripts and DB
+          utilities, the corresponding URLs for the CDSware homepage
+          and CGI scripts, and finally the database host, database
+          name, and database user credentials.
           
           The first two directories must be within the Apache's htdocs
           and cgi-bin paths, respectively.  The DB utilities may be
