@@ -71,7 +71,7 @@ except ImportError, e:
 
 sql_query_for_recIDs = {
 
-   'a' : "select id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='hb'",
+   'a' : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='hb'",
    'b1': "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='xm'",
    'b2': "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='hb'",
    'c1': "select a.id_bibrec from bibrec_bib98x as a left join bib98x as b on a.id_bibxxx=b.id where b.tag='980__a' and b.value='XXX'",
@@ -294,7 +294,7 @@ def main():
     for option, value in options:
         if option in ("-a","--all"):
 
-            sql_queries.append("select id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='hb'")
+            sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='hb'")
 
         if option in ("-l","--last"):
 
