@@ -72,16 +72,23 @@ def get_cited_by_dictionary():
     """
     global cbd
     return cbd
+
 def get_reference_list_dictionary():
     """return reference list dictionary from rnkCITATIONDATA
     """
     global rld
     return rld
+
 def get_cited_by_list(record_id):
     """return citation list dictionary of record_id
     """
-    citation_list = get_cited_by_dictionary()[record_id]
+    citation_list = None
+    try:
+        citation_list = get_cited_by_dictionary()[record_id]
+    except TypeError:
+        pass
     return citation_list
+
 def get_co_cited_with_list(record_id):
     """return a tuple of list([id,co-cited weitht],[...,....]) for record_id"""
     result = []
