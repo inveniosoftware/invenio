@@ -102,11 +102,10 @@ def create_navtrail(title,
             out += title
     return prolog + out + epilog
 
-def page(title, body, navtrail="", url="", description="", keywords="", uid=0, cdspagerightstripeadd="", cdspageheaderadd="", cdspagebodyadd="", cdspagefooteradd=""):
+def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagerightstripeadd="", cdspageheaderadd="", cdspagebodyadd="", cdspagefooteradd=""):
     """page(): display the cds page
         input: title of the page;
                body of the page in html format;
-               url to be displayed at the bottom right corner;
                description goes to the metadata in the header of the HTML page
                keywords goes to the metadata in the header of the html page
                cdspageheaderadd is a message to be displayed just under the page header
@@ -117,7 +116,7 @@ def page(title, body, navtrail="", url="", description="", keywords="", uid=0, c
     out = re.sub("<!--NAVTRAILBOX-->", create_navtrail(title, navtrail), out)
     out = re.sub("<!--USERINFOBOX-->", create_user_infobox(uid), out)
     out += page_template_body % (cdspagebodyadd, title, body, cdspagerightstripeadd)
-    out += page_template_footer % (cdspagefooteradd, re.sub("<!--URL-->", url, cdspagefooter))
+    out += page_template_footer % (cdspagefooteradd, cdspagefooter)
     return out
 
 def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspageheaderadd=""):
@@ -127,7 +126,7 @@ def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspa
     out = re.sub("<!--USERINFOBOX-->", create_user_infobox(uid), out)
     return out
 
-def pagefooteronly(url="", cdspagefooteradd=""):
+def pagefooteronly(cdspagefooteradd=""):
     """Return just the beginning of page()."""
-    out = page_template_footer % (cdspagefooteradd, re.sub("<!--URL-->", url, cdspagefooter))
+    out = page_template_footer % (cdspagefooteradd, cdspagefooter)
     return out
