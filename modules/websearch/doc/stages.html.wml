@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
-    title="Search Internals" \
+    title="Search Processing Stages" \
     navbar_name="search-new" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/>Help Central</a> &gt; <a class=navtrail href=<WEBURL>/help/search/>Search Help</a> &gt; <a class=navtrail href=<WEBURL>/help/search/internals.html>Search Internals</a> " \
     navbar_select="search-internals-stages" 
