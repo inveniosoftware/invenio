@@ -779,7 +779,7 @@ def perform_modifyindex(idxID, ln=cdslang, idxNAME='', idxDESC='', callback='yes
         <span class="adminlabel">Index name</span>
         <input class="admin_w200" type="text" name="idxNAME" value="%s" /><br>
         <span class="adminlabel">Index description</span>
-        <input class="admin_w200" type="text" name="idxDESC" value="%s" /><br>
+        <textarea class="admin_w200" name="idxDESC">%s</textarea><br>
         """ % (idxNAME, idxDESC)
         
         output += createhiddenform(action="modifyindex#1",
