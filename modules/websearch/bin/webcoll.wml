@@ -437,18 +437,10 @@ class Collection:
         for row in res:
             title, body = row[0], row[1]
             if title:
-                out += """<table class="portalbox">        
-                           <thead>
-                            <tr>
-                             <th class="portalboxheader">%s</th>
-                            </tr> 
-                           </thead>
-                           <tbody>
-                            <tr>
-                             <td class="portalboxbody">%s</td>
-                            </tr> 
-                           </tbody>
-                          </table>""" % (title, body)
+                out += """<div class="portalbox">        
+                             <div class="portalboxheader">%s</div>
+                             <div class="portalboxbody">%s</div>
+                          </div>""" % (title, body)
             else:
                 # no title specified, so print body ``as is'' only:
                 out += body
