@@ -31,7 +31,7 @@ __lastupdated__ = """<: print `date +"%d %b %Y %H:%M:%S %Z"`; :>"""
 pylibdir = "<LIBDIR>/python"
 import sys
 sys.path.append('%s' % pylibdir)
-import cdsware.bibrank_config as brc
+import cdsware.bibrankadminlib as brc
 reload(brc)
 from cdsware.webpage import page, create_error_box
 from cdsware.config import weburl,cdslang
