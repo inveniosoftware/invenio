@@ -841,6 +841,59 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
                     language=ln,
                     urlargs=req.args)
     
+
+def simpleendaction(doctype="", act="", startPg=1, indir="", access="",step=1,mode="U"):
+    global rn,sysno,dismode,curdir,uid,uid_email,lats_step,action_score
+    dismode = mode
+
+    # check we have minimum fields
+    if doctype=="" or act=="" or access=="":
+        return "invalid parameter"
+    # retrieve the action and doctype data
+    if indir == "":
+        res = run_sql("select dir from sbmACTION where sactname=%s", (act,))
+        if len(res) == 0:
+            return "cannot find submission directory"
+        else:
+            row = res[0]
+            indir = row[0]
+    # This defines the path to the directory containing the action data
+    curdir = "%s/%s/%s/%s" % (storage,indir,doctype,access)
+    # If the submission directory still does not exist, we create it
+    if not os.path.exists(curdir):
+        return "submission directory %s does not exist" % curdir
+    # retrieve the name of the file in which the reference of 
+    # the submitted document will be stored
+    res = run_sql("SELECT value FROM sbmPARAMETERS WHERE  doctype=%s and name='edsrn'",(doctype,))
+    if len(res) == 0:
+        edsrn = ""
+    else:
+        edsrn = res[0][0]
+    # Get document name
+    res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname=%s", (doctype,))
+    if len(res) > 0:
+       docname = res[0][0]
+    else:
+        return "unknown type of document %s" % doctype
+    # Get action name
+    res = run_sql("SELECT lactname FROM sbmACTION WHERE  sactname=%s", (act,))
+    if len(res) > 0:
+       actname = res[0][0]
+    else:
+        return "unknown action %s" % act
+    # Prints the action details, returning the mandatory score
+    action_score = action_details(doctype,act)
+    current_level = get_level(doctype, act)
+    # Calls all the function's actions
+    try:
+        print_function_calls(doctype, act, step, "") 
+    except functionError,e:
+        return e.value
+    except functionStop,e:
+	return "premature function stop"
+    return "ok"
+    
+
 def home(req,c=cdsname,ln=cdslang):
     ln = wash_language(ln)
     # get user ID:
