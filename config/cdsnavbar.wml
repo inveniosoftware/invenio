@@ -223,6 +223,7 @@
 
   <navbar:button id=howto_marc txt="HOWTO MARC" url="<WEBURL>/admin/howto/marc.html" hint="Admin's HOWTO Guides - How to MARC your medatada">
   <navbar:button id=howto_migrate txt="HOWTO Migrate" url="<WEBURL>/admin/howto/migrate.html" hint="Admin's HOWTO Guides - How to Migrate your old documents into CDSware">
+  <navbar:button id=howto_run txt="HOWTO Run" url="<WEBURL>/admin/howto/run.html" hint="Admin's HOWTO Guides - How to Run your CDSware installation day-by-day">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
