@@ -143,8 +143,7 @@ def display(req, ln=cdslang):
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/display")
 
-    if webuser.isGuestUser(uid):
-		
+    if webuser.isGuestUser(uid):		
 	return page(title="Your Account",
                     body=webaccount.perform_info(req),
 	            description="CDS Personalize, Main page",

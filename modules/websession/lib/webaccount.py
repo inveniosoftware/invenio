@@ -30,7 +30,7 @@ import string
 import cgi
 from config import *
 from webpage import page
-from dbquery import run_sql	
+from dbquery import run_sql
 from webuser import getUid,isGuestUser, get_user_preferences, set_user_preferences
 from access_control_admin import acc_findUserRoleActions
 from access_control_config import CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, CFG_EXTERNAL_AUTHENTICATION
@@ -47,16 +47,19 @@ def perform_info(req):
     results by email.</P>
 
     <blockquote>
-    <dl>
+    <dl>"""
 
-    <dt>
-    <A href="./edit">Your Settings</A>
-    <dd>Set or change your account Email address or password.
-    Specify your preferences about the way the interface looks like.
+    if not isGuestUser(uid):
+        out += """    
+               <dt>
+               <A href="./edit">Your Settings</A>
+               <dd>Set or change your account Email address or password.
+               Specify your preferences about the way the interface looks like."""
     
+    out += """
     <dt><A href="../youralerts.py/display">Your Searches</A>
     <dd>View all the searches you performed during the last 30 days.
-
+     
     <dt><A href="../yourbaskets.py/display">Your Baskets</A>
     <dd>With baskets you can define specific collections of items,
     store interesting records you want to access later or share with others."""
@@ -309,19 +312,27 @@ def create_login_page_box(referer=''):
 
     text += """<form method="post" action="../youraccount.py/login">"""
     if len(CFG_EXTERNAL_AUTHENTICATION) > 1: 
-        logmethtext = """<select name="login_method">"""
+        logmethdata = """<select name="login_method">"""
         methods = CFG_EXTERNAL_AUTHENTICATION.keys()
         methods.sort()
         for system in methods:
-            logmethtext += """<option value="%s" %s>%s</option>""" % (system, (CFG_EXTERNAL_AUTHENTICATION[system][1]== True and "selected" or ""), system)
-        logmethtext += "</select>"
+            logmethdata += """<option value="%s" %s>%s</option>""" % (system, (CFG_EXTERNAL_AUTHENTICATION[system][1]== True and "selected" or ""), system)
+        logmethdata += "</select>"
+        logmethtitle = """<strong>Login via:</strong>"""
     else:
         for system in CFG_EXTERNAL_AUTHENTICATION.keys():
-            logmethtext = """%s<input type="hidden" name="login_method" value="%s">""" % (system, system)
+            logmethdata = """<input type="hidden" name="login_method" value="%s">""" % (system)
+            logmethtitle = ""
     text += """
               <table>
               <tr>
-		 <td align=right><input type="hidden" name="login_method" value="%s"><input type="hidden" name="referer" value="%s"><strong>Username:</strong>
+		 <td align=right>%s
+		 </td>
+                 <td>%s</td>
+		 <td></td>
+	       </tr>
+              <tr>
+		 <td align=right><input type="hidden" name="referer" value="%s"><strong>Username:</strong>
 		 </td>
                  <td><input type="text" size="25" name="p_email" value=""></td>
 		 <td></td>
@@ -335,7 +346,7 @@ def create_login_page_box(referer=''):
 		 </td>
                 </tr>
                 <tr>
-		 <td></td><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>""" % (system, cgi.escape(referer))
+		 <td></td><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>""" % (logmethtitle, logmethdata, cgi.escape(referer))
     if internal:
         text += """&nbsp;&nbsp;&nbsp;(<a href="./lost">Lost your password?</a>)"""
     text += """
