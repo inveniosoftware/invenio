@@ -1,3 +1,4 @@
+
 ## $Id$
 
 ## This file is part of the CERN Document Server Software (CDSware).
@@ -748,6 +749,7 @@ a.nearesttermsselected:hover {
 }
 .moreinfo {
    color: #060;
+   font-size: small;
    background: transparent;
 }
 .userinfobox {
