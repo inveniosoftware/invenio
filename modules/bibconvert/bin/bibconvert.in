@@ -1210,7 +1210,7 @@ def create_record():
                                         FF = field_tpl_item_STRING.split("::")
                                         if (len(FF) > 2):
                                             FF = FF[2:]
-                                            for fn in FF:
+                                            for fn2 in FF:
 
                                                 DATAFORMATTED = []
 
