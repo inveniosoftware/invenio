@@ -21,6 +21,7 @@
 ## include local config and customization of this CDS installation:
 #include "config.wml"
 #include "configbis.wml"
+#include "cdswmllib.wml"
 
 ## include navigation trail and bar definitions:
 #include "cdsnavtrail.wml" \
@@ -121,6 +122,7 @@ $(cdspagefooteradd)
     $footer =~ s/<!--LASTUPDATED-->/<MSG_LAST_UPDATED> $lastupdated/g;
     $footer =~ s/<!--MAINTAINEDBY-->/<MSG_MAINTAINED_BY>/g;
     $footer =~ s/<!--POWEREDBY-->/<MSG_POWERED_BY>/g;
+    $footer =~ s/<!--LANGUAGESELECTIONBOX-->/&generate_language_selection_box_for_html;/ge;
     print $footer;
 :>
 </div>
