@@ -32,15 +32,17 @@
 ## fill config variables:
 pylibdir = "<LIBDIR>/python"
 
-cfg_update_recinfo = 0 ## TODO: make this a command-line option
-
 ### okay, rest of the Python code goes below ###
 
 ## import modules:
 try:
+    import copy
+    import getopt
+    import marshal
+    import signal
     import sys
     import cgi
-    import re
+    import sre
     import os
     import math
     import string
@@ -64,6 +66,22 @@ except ImportError, e:
     print "Error: %s" % e
     import sys
     sys.exit(1)
+
+## will hold collections we treat in this run of the program 
+collection_house = {} # dict of {collname2, collobject1}, ...
+
+## TODO: still leaving live SQL queries here and there in the code; a
+## ``real way'' of doing this would be to grab a snapshot of the
+## database, initiate our own classes, work on memory, and flush the
+## results back.  Refactoring needed, but time is low.
+
+def get_collection(colname):
+    """Return collection object from the collection house for given colname.
+       If does not exist, then create it."""
+    if not collection_house.has_key(colname):
+        colobject = Collection(colname)
+        collection_house[colname] = colobject
+    return collection_house[colname]
 
 ## auxiliary functions:
 def mymkdir(newdir, mode=0777):
@@ -216,18 +234,20 @@ def print_record(recID, format='hb'):
     out += "</span>"
     return out
 
-## class Collection:
 class Collection:
     "Holds the information on collections (id,name,nameshort,dbquery)."
 
     def __init__(self, name=""):
         "Creates collection instance by querying the MySQL configuration database about 'name'."
+        self.calculate_reclist_run_already = 0 # to speed things up wihtout much refactoring
+        self.update_reclist_run_already = 0 # to speed things up wihtout much refactoring
+        self.reclist_with_nonpublic_subcolls = HitList()
         if not name:
             self.name = cdsname # by default we are working on the home page
             self.id = 1
             self.dbquery = None
             self.nbrecs = None
-            self.reclist = None
+            self.reclist = HitList()
         else:
             self.name = name
             query = "SELECT id,name,nameshort,dbquery,nbrecs,reclist FROM collection WHERE name='%s'" % escape_string(name)
@@ -240,15 +260,15 @@ class Collection:
                     self.dbquery = res[0][3]
                     self.nbrecs = res[0][4]
                     try:
-                        self.reclist = Numeric.loads(zlib.decompress(res[0][5]))
+                        self.reclist = HitList(Numeric.loads(zlib.decompress(res[0][5])))
                     except:
-                        self.reclist = Numeric.zeros(cfg_max_recID+1, Numeric.Int0)
+                        self.reclist = HitList()
                 else: # collection does not exist!
                     self.id = None
                     self.nameshort = None
                     self.dbquery = None
                     self.nbrecs = None
-                    self.reclist = None
+                    self.reclist = HitList()
             except MySQLdb.Error, e:
                 print "Error %d: %s" % (e.args[0], e.args[1])
                 sys.exit(1)
@@ -262,7 +282,7 @@ class Collection:
                     "WHERE cc.id_son=%d AND c.id=cc.id_dad" % int(id_son)
             res = run_sql(query, None, 1)
             if res:
-                col_ancestor = Collection(res[0][1])
+                col_ancestor = get_collection(res[0][1])
                 ancestors.append(col_ancestor)
                 id_son = res[0][0]
             else:
@@ -287,7 +307,7 @@ class Collection:
                 "WHERE cc.id_dad=%d AND cc.type='%s' AND c.id=cc.id_son ORDER BY score DESC, c.name ASC" % (int(id_dad), type)
         res = run_sql(query)
         for row in res:
-            sons.append(Collection(row[1]))
+            sons.append(get_collection(row[1]))
         return sons
 
     def get_descendants(self, type='r'):
@@ -298,7 +318,7 @@ class Collection:
                 "WHERE cc.id_dad=%d AND cc.type='%s' AND c.id=cc.id_son ORDER BY score DESC" % (int(id_dad), type)
         res = run_sql(query)
         for row in res:
-            col_desc = Collection(row[1])
+            col_desc = get_collection(row[1])
             descendants.append(col_desc)
             descendants += col_desc.get_descendants()
         return descendants
@@ -321,7 +341,7 @@ class Collection:
             print "I/O Error: " + str(message) + " (" + str(code) + ")"
             sys.exit(1)
         # print user info:
-        Log("...... creating %s" % fullfilename)
+        Log("... creating %s" % fullfilename)
         sys.stdout.flush()
         # print page body:
         f.write(filebody)
@@ -331,7 +351,6 @@ class Collection:
     def update_webpage_cache(self):
         """Create collection page header, navtrail, body (including left and right stripes) and footer, and 
            call write_cache_file() afterwards to update the collection webpage cache."""
-        Log("%s" % self.name)
         ## first, update navtrail:
         for as in range(0,2):
             self.write_cache_file("navtrail-as=%s" % as, self.create_navtrail_links(as))
@@ -496,7 +515,7 @@ class Collection:
             if self.nbrecs and self.reclist:
                 # firstly, get last 'rg' records:
                 box += "<ol>"
-                recIDs = Numeric.nonzero(self.reclist)
+                recIDs = Numeric.nonzero(self.reclist._set)
                 for idx in range(self.nbrecs-1, self.nbrecs-rg-1, -1):
                     if idx>=0:
                         box += """<li><p><small>""" + print_record(recIDs[idx]) + "</small></p>"
@@ -671,13 +690,20 @@ class Collection:
                 out += """<option value="%s"%s>%s""" % (row[0], is_selected(row[0], value), row[1])
         else:
             # no 'search within' fields are defined for this collection, so propose default ones:
-            out += """<option value="title"%s>title""" % is_selected("title", value)
-            out += """<option value="author"%s>author""" % is_selected("author", value)
-            if not cfg_cern_site:
-                out += """<option value="abstract"%s>abstract""" % is_selected("abstract", value)
-                out += """<option value="keyword"%s>keyword""" % is_selected("keyword", value)                
-            out += """<option value="reportnumber"%s>report number""" % is_selected("reportnumber", value)
-            out += """<option value="year"%s>year""" % is_selected("year", value)
+            if cfg_cern_site:
+                out += """<option value="title"%s>title""" % is_selected("title", value)
+                out += """<option value="author"%s>author""" % is_selected("author", value)
+                out += """<option value="reportnumber"%s>report number""" % is_selected("reportnumber", value)
+                out += """<option value="year"%s>year""" % is_selected("year", value)
+            else:
+                out += """<option value="title"%s>- title""" % is_selected("title", value)
+                out += """<option value="author"%s>- author""" % is_selected("author", value)
+                out += """<option value="abstract"%s>- abstract""" % is_selected("abstract", value)
+                out += """<option value="keyword"%s>- keyword""" % is_selected("keyword", value)                
+                out += """<option value="reportnumber"%s>- report number""" % is_selected("reportnumber", value)
+                out += """<option value="year"%s>- year""" % is_selected("year", value)
+                out += """<option value="fulltext"%s>fulltext""" % is_selected("fulltext", value)
+                out += """<option value="reference"%s>reference""" % is_selected("reference", value)                
         out += """</select>""" 
         return out
 
@@ -869,40 +895,64 @@ class Collection:
         return out
 
     def calculate_reclist(self):
-        "Calculates the reclist universe for given collection."
-        reclist = HitList()
+        """Calculate, set and return the (reclist, reclist_with_nonpublic_subcolls) tuple for given collection."""        
+        if self.calculate_reclist_run_already:
+            # do we have to recalculate?
+            return (self.reclist, self.reclist_with_nonpublic_subcolls)
+        Log("... calculating reclist of %s" % self.name)
+        reclist = HitList() # will hold results for public sons only; good for storing into DB
+        reclist_with_nonpublic_subcolls = HitList() # will hold results for both public and nonpublic sons; good for deducing total
+                                                  # number of documents
         if not self.dbquery:
             # A - collection does not have dbquery, so query recursively all its non-restricted sons:
             for coll in self.get_sons():
-                if not coll.restricted_p():
-                    reclist.union(coll.calculate_reclist())
+                coll_reclist, coll_reclist_with_nonpublic_subcolls = coll.calculate_reclist()
+                if not coll.restricted_p(): # add this reclist ``for real'' only if it is public
+                    reclist.union(coll_reclist) 
+                reclist_with_nonpublic_subcolls.union(coll_reclist_with_nonpublic_subcolls)
         else:
-            # B - collection does have dbquery, so compute and return number of documents found:
+            # B - collection does have dbquery, so compute it:
             reclist = search_pattern(None,self.dbquery)
+            reclist_with_nonpublic_subcolls = copy.deepcopy(reclist)
+        # deduce the number of records:
         reclist.calculate_nbhits()
-        self.nbrecs = reclist._nbhits
-        self.reclist = reclist._set        
-        return reclist
+        reclist_with_nonpublic_subcolls.calculate_nbhits()
+        # store the results:
+        self.nbrecs = reclist_with_nonpublic_subcolls._nbhits
+        self.reclist = reclist
+        self.reclist_with_nonpublic_subcolls = reclist_with_nonpublic_subcolls
+        # last but not least, update the speed-up flag:
+        self.calculate_reclist_run_already = 1
+        # return the two sets:
+        return (self.reclist, self.reclist_with_nonpublic_subcolls)
 
-    def update_reclist_in_db(self):
+    def update_reclist(self):
         "Update the record universe for given collection; nbrecs, reclist of the collection table."
-        Log("%s" % self.name)
+        if self.update_reclist_run_already:
+            # do we have to reupdate?
+            return 0
+        Log("... updating reclist of %s" % self.name)
         sys.stdout.flush()
         try:
             query = "UPDATE collection SET nbrecs=%d, reclist='%s' WHERE id=%d" % \
-                    (self.nbrecs, escape_string(zlib.compress(Numeric.dumps(self.reclist))), self.id)
+                    (self.nbrecs, escape_string(zlib.compress(Numeric.dumps(self.reclist._set))), self.id)
             res = run_sql(query)
+            self.reclist_updated_since_start = 1
         except MySQLdb.Error, e:
             print "Database Query Error %d: %s." % (e.args[0], e.args[1])
-            sys.exit(1)            
-        Log("...... updated %d records" % self.nbrecs)
+            sys.exit(1)        
+        # last but not least, update the speed-up flag:
+        self.update_reclist_run_already = 1
+        Log("... updated %d records" % self.nbrecs)
+        return 0
 
 def usage(code, msg=''):
     "Prints usage info."
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
     sys.stderr.write("Usage: %s <action> [collection][+]\n" % sys.argv[0])
-    sys.stderr.write("""Description: %s updates the collection cache
+    sys.stderr.write("""Description:
+    %s updates the collection cache
     (record universe for a given collection plus web page elements)
     based on WML and MySQL configuration parameters.  
     If the collection name is passed as the second argument, it'll update
@@ -917,49 +967,288 @@ def usage(code, msg=''):
     sys.stderr.write("Example: %s update-reclist \"\"+\n" % sys.argv[0])
     sys.exit(code)
 
-def main():
-    "Main function to call creation of collection pages.  Arguments described in usage() function."
-    ## 1 - firstly, try to read arguments:
-    if len(sys.argv) < 2 or len(sys.argv) > 3:        
-        usage(0)
-    action = sys.argv[1]
-    if action != "update-reclist" and action != "update-webpage":
-        usage(1, "Unknown action '%s'." % action)
+def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
+    """Returns a date string according to the format string.
+       It can handle normal date strings and shifts with respect
+       to now."""
+    date = time.time()
+    shift_re=sre.compile("([-\+]{0,1})([\d]+)([dhms])")
+    factors = {"d":24*3600, "h":3600, "m":60, "s":1}
+    m = shift_re.match(var)
+    if m:
+        sign = m.groups()[0] == "-" and -1 or 1
+        factor = factors[m.groups()[2]]
+        value = float(m.groups()[1])
+        date = time.localtime(date + sign * factor * value)
+        date = time.strftime(format_string, date)
+    else:
+        date = time.strptime(var, format_string)
+        date = time.strftime(format_string, date)        
+    return date
 
-    ## 2 - secondly, construct collection list to treat:
-    colls = [] 
-    if len(sys.argv) == 3:
-        # 2a - we start from certain collection only, so construct partial collection list:
-        coll_sons_too = 0 # we don't treat collection descendants by default
-        coll_name = sys.argv[2] 
-        if coll_name[-1:] == '+': # do we do also descendants?
-            coll_name = coll_name[:-1]
-            coll_sons_too = 1
-        # only now add the page in question:
-        coll = Collection(coll_name)
+def write_message(msg, stream=sys.stdout):
+    """Prints message and flush output stream (may be sys.stdout or sys.stderr).  Useful for debugging stuff."""
+    if stream == sys.stdout or stream == sys.stderr:
+        stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
+        stream.write("%s\n" % msg)
+        stream.flush()
+    else:
+        sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
+
+def task_sig_sleep(sig, frame):
+    """Signal handler for the 'sleep' signal sent by BibSched."""
+    write_message("sleeping...")
+    task_update_status("SLEEPING")
+    signal.pause() # wait for wake-up signal
+
+def task_sig_wakeup(sig, frame):
+    """Signal handler for the 'wakeup' signal sent by BibSched."""
+    write_message("continuing...")
+    task_update_status("CONTINUING")
+
+def task_sig_stop(sig, frame):
+    """Signal handler for the 'stop' signal sent by BibSched."""
+    write_message("stopping...")
+    task_update_status("STOPPING")
+    write_message("flushing cache or whatever...")
+    time.sleep(3)
+    write_message("closing tables or whatever...")
+    time.sleep(1)
+    write_message("stopped")
+    task_update_status("STOPPED")
+    sys.exit(0)
+    
+def task_sig_suicide(sig, frame):
+    """Signal handler for the 'suicide' signal sent by BibSched."""
+    write_message("suiciding myself now...")
+    task_update_status("SUICIDING")
+    write_message("suicided")
+    task_update_status("SUICIDED")
+    sys.exit(0)
+
+def task_sig_unknown(sig, frame):
+    """Signal handler for the other unknown signals sent by shell or user."""
+    write_message("unknown signal %d ignored" % sig) # do nothing for other signals
+
+def getpass(prompt = "Password: "):
+    """Prompts for a password without echoing it back to the screen"""
+    import termios, sys
+    fd = sys.stdin.fileno()
+    old = termios.tcgetattr(fd)
+    new = termios.tcgetattr(fd)
+    new[3] = new[3] & ~termios.ECHO          # lflags
+    passwd = ""
+    try:
+        termios.tcsetattr(fd, termios.TCSADRAIN, new)
+        passwd = raw_input(prompt)
+        print 
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+    return passwd
+
+def authenticate(user):
+    """Authenticates a user against the user database.
+       NOTE: Access might be more complex in the future"""
+    print "WebColl Task Submission"
+    print "======================="
+    if user == "":
+        print >> sys.stdout, "\rUsername: ",
+        user = string.strip(string.lower(sys.stdin.readline()))
+    else:
+        print >> sys.stdout, "\rUsername:", user        
+    res = run_sql("select password from user where email=%s", (user,), 1)
+    if res:
+        row = res[0]
+        password_db = row[0]
+        if password_db != '':
+            # authentication needed
+            password_entered = getpass()
+            if password_db == password_entered:
+                return user
+            else:
+                print "Sorry, you seem to be unauthorized user.  Exiting."
+                sys.exit(1)
+        else:
+            # no authentication needed
+            return user
+    else:
+        print "Sorry, %s seems to be unauthorized user.  Exiting." % user
+        sys.exit(1)        
+
+def task_submit(options):
+    """Submits task to the BibSched task queue.  This is what people will be invoking via command line."""
+    ## sanity check: remove eventual "task" option:
+    if options.has_key("task"):
+        del options["task"]
+    ## authenticate user:
+    user = authenticate(options.get("user", ""))
+    ## submit task:
+    task_id = run_sql("""INSERT INTO schTASK (id,proc,user,runtime,sleeptime,status,arguments)
+                         VALUES (NULL,'webcoll',%s,%s,%s,'WAITING',%s)""",
+                      (user, options["runtime"], options["sleeptime"], marshal.dumps(options)))
+    ## update task number: 
+    options["task"] = task_id
+    run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""", (marshal.dumps(options),task_id))
+    write_message("Task #%d submitted." % task_id)    
+    return task_id
+
+def task_update_progress(msg):
+    """Updates progress information in the BibSched task table."""
+    global task_id
+    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, task_id))
+
+def task_update_status(val):
+    """Updates status information in the BibSched task table."""
+    global task_id
+    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, task_id))    
+
+def task_read_status(task_id):
+    """Read status information in the BibSched task table."""
+    res = run_sql("SELECT status FROM schTASK where id=%s", (task_id,), 1)
+    try:
+        out = res[0][0]
+    except:
+        out = 'UNKNOWN'
+    return out
+
+def task_get_options(id):
+    """Returns options for the task 'id' read from the BibSched task queue table."""
+    out = {}
+    res = run_sql("SELECT arguments FROM schTASK WHERE id=%s AND proc='webcoll'", (id,))
+    try:
+        out = marshal.loads(res[0][0])
+    except:
+        write_message("Error: WebColl task %d does not seem to exist." % id)
+        sys.exit(1)
+    return out
+
+def task_run():
+    """Run the WebColl task by fetching arguments from the BibSched task queue.
+       This is what BibSched will be invoking via daemon call.
+       The task will update collection reclist cache and collection web pages for
+       given collection. (default is all).
+       Arguments described in usage() function."""
+    global task_id
+    options = task_get_options(task_id) # get options from BibSched task table
+    ## check task id:
+    if not options.has_key("task"):
+        write_message("Error: The task #%d does not seem to be a WebColl task." % task_id)
+        return
+    ## check task status:
+    task_status = task_read_status(task_id)
+    if task_status != "WAITING":
+        write_message("Error: The task #%d is %s.  I expected WAITING." % (task_id, task_status))
+        return
+    ## update task status:
+    task_update_status("RUNNING")
+    ## initialize signal handler:
+    signal.signal(signal.SIGUSR1, task_sig_sleep)
+    signal.signal(signal.SIGTERM, task_sig_stop)
+    signal.signal(signal.SIGABRT, task_sig_suicide)
+    signal.signal(signal.SIGCONT, task_sig_wakeup)
+    signal.signal(signal.SIGINT, task_sig_unknown)
+    ## run the task:
+    colls = []
+    # firstly, decide which collections to do:
+    Log("... creating collection list")
+    if options.has_key("collection"):
+        coll = get_collection(options["collection"])
         if coll.id == None:
             usage(1, 'Collection %s does not exist' % coll_name)
         colls.append(coll)
-        if coll_sons_too:
-            colls.extend(coll.get_descendants())
     else:
-        # 2b - do all collections:
-        query = """SELECT name FROM collection ORDER BY id"""
-        res = run_sql(query)
+        res = run_sql("SELECT name FROM collection ORDER BY id")
         for row in res:
-            colls.append(Collection(row[0]))
+            colls.append(get_collection(row[0]))
+    # secondly, update collection reclist cache:
+    i = 0
+    for coll in colls:
+        i += 1
+        Log("%s" % coll.name)
+        coll.calculate_reclist()
+        coll.update_reclist()
+        task_update_progress("Part 1/2: done %d/%d." % (i,len(colls)))
+    # thirdly, update collection webpage cache:
+    i = 0
+    for coll in colls:
+        i += 1
+        Log("%s" % coll.name)
+        coll.update_webpage_cache()
+        task_update_progress("Part 2/2: done %d/%d." % (i,len(colls)))
+    ## we are done:
+    task_update_progress("Done.")
+    task_update_status("DONE")
+    return
 
-    ## 3 - thirdly, check and perform action
-    action = sys.argv[1]
-    if action == "update-reclist":
-        for coll in colls:
-            coll.calculate_reclist()
-            coll.update_reclist_in_db()
-    elif action == "update-webpage":
-        for coll in colls:
-            coll.update_webpage_cache()
+def usage(exitcode=1, msg=""):
+    """Prints usage info."""
+    if msg:
+        sys.stderr.write("Error: %s.\n" % msg)
+    sys.stderr.write("Usage: %s [options]\n" % sys.argv[0])
+    sys.stderr.write("Command options:\n")
+    sys.stderr.write("  -c, --collection\t Update only given collection. [all]\n")
+    sys.stderr.write("Scheduling options:\n")
+    sys.stderr.write("  -u, --user=USER \t User name to submit the task as, password needed.\n")
+    sys.stderr.write("  -t, --runtime=TIME \t Time to execute the task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26\n")
+    sys.stderr.write("  -s, --sleeptime=SLEEP \t Sleeping frequency after which to repeat task (no), e.g.: 30m, 2h, 1d\n")
+    sys.stderr.write("General options:\n")
+    sys.stderr.write("  -h, --help      \t\t Print this help.\n")
+    sys.stderr.write("  -V, --version   \t\t Print version information.\n")
+    sys.stderr.write("  -d, --debug     \t\t Print debugging information.\n")
+    sys.stderr.write("""Description: %s updates the collection cache
+    (record universe for a given collection plus web page elements)
+    based on WML and MySQL configuration parameters.  
+    If the collection name is passed as the second argument, it'll update
+    this collection only.  If the collection name is immediately followed
+    by a plus sign, it will also update all its desdendants.  The
+    top-level collection name may be entered as the void string.\n""" % sys.argv[0])    
+    sys.exit(exitcode)
+
+def main():
+    """Main function that analyzes command line input and calls whatever is appropriate.
+       Useful for learning on how to write BibSched tasks."""
+    global task_id
+    ## parse command line:
+    if len(sys.argv) == 2 and sys.argv[1].isdigit():
+        ## A - run the task
+        task_id = int(sys.argv[1])
+        task_run()
     else:
-        usage(1, "Unknown action '%s'." % action)
+        ## B - submit the task
+        options = {} # will hold command-line options
+        options["runtime"] = time.strftime("%Y-%m-%d %H:%M:%S") 
+        options["sleeptime"] = 0
+        try:
+            opts, args = getopt.getopt(sys.argv[1:], "hVdn:u:s:t:c:",
+                                       ["help", "version", "debug","number=","user=","sleep=","time=","collection="])
+        except getopt.GetoptError, err:
+            usage(1, err)
+        try:
+            for opt in opts:
+                if opt[0] in ["-h", "--help"]:
+                    usage(0)
+                elif opt[0] in ["-V", "--version"]:
+                    print __version__
+                    sys.exit(0)
+                elif opt[0] in [ "-u", "--user"]:
+                    options["user"] = opt[1]
+                elif opt[0] in ["-d", "--debug"]:
+                    options["debug"]=1
+                elif opt[0] in ["-n", "--number"]:
+                    options["number"]=int(opt[1])
+                elif opt[0] in [ "-s", "--sleeptime" ]:
+                    get_datetime(opt[1]) # see if it is a valid shift
+                    options["sleeptime"] = opt[1]
+                elif opt[0] in [ "-t", "--runtime" ]:
+                    options["runtime"] = get_datetime(opt[1])
+                elif opt[0] in [ "-c", "--collection"]:
+                    options["collection"] = opt[1]
+                else:
+                    usage(1)
+        except StandardError, e:
+            usage(e)        
+        task_submit(options)
+    return
 
 ### okay, here we go:
 if __name__ == '__main__':    
