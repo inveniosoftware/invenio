@@ -18,15 +18,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "configbis.wml"
-<?
-   require("<LIBDIR>/php/cdsware/websubmit/commonPhpFunctions.php");
-?>
 #include "cdspage.wml" \
     title="<MSG_GUIDE>" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a>" \ 
     navbar_name="admin" \
-    navbar_select="websubmit_doc" \
-    cdspageboxlefttopadd="<protect><?displayLoginMenu('submit');?></protect>"
+    navbar_select="websubmit_doc" 
+
 <?    	
 
 ## $Id$
