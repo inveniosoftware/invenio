@@ -102,6 +102,7 @@ def bibreformat_task(sql_queries, mysql_queries, process_hb):
     
     if process_hb:
         print "Records to be processed: %d" % (len(recIDs)+len(without_hb))
+        print "Out of it records without HB format: %d" % len(without_hb)
     else:
         print "Records to be processed: %d" % (len(recIDs))
 
@@ -186,7 +187,7 @@ def withouthb():
     xm1, xm2, hb1, hb2 = [],[],[],[]
     
     q1 = "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='xm'"
-    q2 = "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt
+    q2 = "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='hb'"
 
     ## get complete recID list of xm formatted records
     xm1 = run_sql(q1)
@@ -236,7 +237,6 @@ def iterate_over(list, weburl):
                 filehandle = open(filename ,"w")
                 filehandle.write(xml_content)
                 filehandle.close()
-
 
 ### bibformat external call
 ###
@@ -293,7 +293,7 @@ def iterate_over(list, weburl):
         message = "START bibformat external call"
         print message
 
-        command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s/rec_fmt.xml 2> %s/bibreformat.err" % (bindir,string.upper(fmt),tmpdir,tmpdir,tmpdir)
+        command = "%s/bibformat otype='HB' < %s/bibreformat.xml > %s/rec_fmt.xml 2> %s/bibreformat.err" % (bindir,tmpdir,tmpdir,tmpdir)
         os.system(command)
 
         t22 = os.times()[4]
@@ -459,7 +459,7 @@ def task_get_options(id):
         sys.exit(1)
     return out
 
-def task_run(process_hb, fmt):
+def task_run(process_hb):
     """Runs the task by fetching arguments from the BibSched task queue.  This is what BibSched will be invoking via daemon call."""
 
     global task_id, process
@@ -472,7 +472,7 @@ def task_run(process_hb, fmt):
     ## initialize parameters
 
     if options.has_key("all"):
-        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt)
+        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='hb'")
 
     if options.has_key("new"):
         process_hb = 1
@@ -481,7 +481,7 @@ def task_run(process_hb, fmt):
         process = 0
 
     if options.has_key("last"):
-        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='%s' and bf.last_updated < br.modification_date" % fmt)
+        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='hb' and bf.last_updated < br.modification_date")
 
     if options.has_key("collection"):
         mysql_queries.append(options["collection"])
@@ -551,8 +551,7 @@ def main():
         ## A - run the task
         task_id = int(sys.argv[1])
         process_hb = 0
-        fmt = "hb"
-        task_run(process_hb, fmt)
+        task_run(process_hb)
     else:
         ## B - submit the task
         process_hb = 0
