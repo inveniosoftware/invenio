@@ -824,6 +824,28 @@ II. Example - connecting role and user</a>
        3. To the owner of an account when it is activated
        4. To the owner of an account when it is deleted
 
+  - The variables in access_control_config.py:
+    - Access policy for guests.
+      0 = Allow guests to search,
+      1 = Guests cannot search (all users must login)
+      CFG_ACCESS_CONTROL_LEVEL_GUESTS = 0
+    - Access policy for accounts.
+      0 = Users can register, automatically acticate accounts
+      1 = Users can register, but admin must activate the accounts
+      2 = Users cannot register, only admin can register accounts.
+      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS = 0
+    - Send an email when a new account is created by an user
+      CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS = 0
+    - Send it to this email-address
+      CFG_ACCESS_CONTROL_SEND_TO_EMAIL = adminemail
+    - Send an email to the user notifying when the account is created
+      CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT = 0
+    - Send an email to the user notifying when the account is activated
+      CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION = 0
+    - Send an email to the user notifying when the account is deleted/rejected
+      CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION = 0 
+
+
   - Account overview:
     Here you find a overview of the number of guest accounts, registered accounts and accounts
     awaiting activation, with a link to the activation page.

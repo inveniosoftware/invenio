@@ -528,28 +528,22 @@ def perform_accesspolicy(req, callback='yes', confirm=0):
 
     subtitle = """<a name="1"></a>1. Access policy.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
-    output = "<b>Currently, all changes must be done from command line, and the webserver restarted for changes to take effect</b><br>"
-    output += "Options in access_control_config.py to modify:<br><br>"
-    output += """<protect>
-    # Access policy for guests.<br> 
-    # 0 = Allow guests to search,<br> 
-    # 1 = Guests cannot search (all users must login)<br> 
-    CFG_ACCESS_CONTROL_LEVEL_GUESTS = 0<br>  
-    # Access policy for accounts.<br>  
-    # 0 = Users can register, automatically acticate accounts<br> 
-    # 1 = Users can register, but admin must activate the accounts<br> 
-    # 2 = Users cannot register, only admin can register accounts.<br> 
-    CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS = 0<br> 
-    # Send an email when a new account is created by an user<br> 
-    CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS = 0<br>
-    # Send it to this email-address<br> 
-    CFG_ACCESS_CONTROL_SEND_TO_EMAIL = adminemail<br> 
-    # Send an email to the user notifying when the account is created<br> 
-    CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT = 0<br> 
-    # Send an email to the user notifying when the account is activated<br> 
-    CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION = 0<br> 
-    # Send an email to the user notifying when the account is deleted/rejected<br> 
-    CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION = 0</protect>"""
+    account_policy = {}
+    account_policy[0] = "Users can register new accounts. New accounts automatically activated" 
+    account_policy[1] = "Users can register new accounts. Admin users must activate the accounts"
+    account_policy[2] = "Only admin can register new accounts. "
+
+    output = "<br><b>Current settings:</b><br>"
+    output += "Guest accounts allowed: %s<br>" % (CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0 and "Yes" or "No")
+    output += "Account policy: %s<br>" % (account_policy[CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS])
+    output += "Send email to admin when new account: %s<br>" % (CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS == 1 and "Yes" or "No")
+    output += "Use which email address: %s<br>" % (CFG_ACCESS_CONTROL_SEND_TO_EMAIL)
+    output += "Send email to user after creating new account: %s<br>" % (CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1 and "Yes" or "No")
+    output += "Send email to user when account is activated: %s<br>" % (CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION == 1 and "Yes" or "No")
+    output += "Send email to user when account is deleted/rejected: %s<br>" % (CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION == 1 and "Yes" or "No")
+ 
+    output += "<br><b>Changing the settings:</b><br>"
+    output += "Currently, all changes must be done using your favourite editor, and the webserver restarted for changes to take effect. For the settings to change, either look in the guide or in access_control_config.py ."
 
     try:
         body = [output, extra]
