@@ -537,8 +537,8 @@ class Collection:
                 for idx in range(self.nbrecs-1, self.nbrecs-rg-1, -1):
                     if idx>=0:
                         box += """<tr>
-                                    <td class="latestadditionstimebody">%s</td>
-                                    <td class="latestadditionsrecordbody">%s</td>
+                                    <td class="latestadditionsboxtimebody">%s</td>
+                                    <td class="latestadditionsboxrecordbody">%s</td>
                                   </tr>""" % (get_modification_date(recIDs[idx],fmt="%Y-%m-%d<br>%T"), print_record(recIDs[idx]))
                 box += "</table>"
                 if self.nbrecs > rg:
