@@ -111,7 +111,7 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
                     uid=uid,
                     language=ln,
                     urlargs=req.args,
-                    cdspagerightstripeadd=c_portalbox_rt,
+                    cdspageboxrighttopadd=c_portalbox_rt,
                     lastupdated=c_last_updated)                    
     except:        
         if verbose >= 9:
