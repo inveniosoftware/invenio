@@ -16,7 +16,8 @@ pre,code {
 h1 {
    font-size: 173%;
    font-weight: 700;
-   margin-left: 60px;
+   margin-top: 5px;
+   margin-left: 0px;
    color: #36c;
    background: transparent;
 }
@@ -129,14 +130,17 @@ a.note:hover {
 .headerbox {
    color: #000;
    width: 100%;
-   margin-top: 2px;
-   border-collapse: separate;
+   padding: 0px;
+   margin-top: 0px;
+   margin-bottom: 0px;
+   border-collapse: collapse;
    border-spacing: 0px;
    border-bottom: 2px solid #3366cc;
 }
 .headerboxbody {
    color: #000;
-   padding-top: 2px;
+   padding: 0px;
+   margin: 0px;
 }
 .headerboxbodylogo {
    color: #36c;
@@ -150,9 +154,10 @@ a.note:hover {
 .headermodulebox {
    color: #fff;
    background: transparent;
-   border-collapse: separate;
+   border-collapse: collapse;
    border-spacing: 0px;
    margin: 0px;
+   padding: 0px;
 }
 .headermoduleboxbody {
    color: #000;
@@ -160,12 +165,14 @@ a.note:hover {
    font-size: x-small;
    font-weight: bold;
    text-align: center;
+   margin: 0px;
    padding: 0px;
    width: 65px;
 }
 .headermoduleboxbodyblank {
    width: 12px; 
    padding: 0px;
+   margin: 0px;
 }
 .headermoduleboxbodyselected {
    color: #000;
@@ -176,6 +183,7 @@ a.note:hover {
    border-left: 2px solid #3366cc;
    border-right: 2px solid #3366cc;
    border-top: 2px solid #3366cc;
+   margin: 5px;
    padding: 0px;
    width: 65px;
 }
@@ -223,9 +231,9 @@ a.headerselected:hover {
    color: #36c;
    background: #fff;
    padding: 0px;
+   margin-top: 7px;
    border-spacing: 0px;
    border-collapse: collapse;
-   margin-top: 7px;
    font-size: x-small;
 }
 .navtrailboxbody {
@@ -256,31 +264,34 @@ a.navtrail:hover {
    color: #060;
    background: transparent;    
 }
+.snapshot {
+   color: #000;
+   background: transparent;
+   border: 2px solid #999999; 
+   margin-left: 40px;
+   margin-top: 10px;
+   margin-right: 10px;
+}
 .pageheader {
    color: #999;
    font-size: x-small;
    background: transparent;
+   padding: 0px;
+   margin: 0px;
+   width: 100%;
 }
 .pagebody {
-    color: #000;
-    background: transparent;
-    margin-left: 10px;
-    margin-top: 10px;
-    margin-right: 10px;
-}
-.snapshot {
-    color: #000;
-    background: transparent;
-    border: 2px solid #999999; 
-    margin-left: 40px;
-    margin-top: 10px;
-    margin-right: 10px;
+   color: #000;
+   background: transparent;
+   padding: 20px;
+   margin:  0px;
 }
 .pagefooter {
    color: #999;
    background: #fff;
    font-size: x-small;
    margin-top: 20px;
+   width: 100%;
    padding-bottom: 5px;
 }
 .footerbox {
@@ -288,36 +299,48 @@ a.navtrail:hover {
    background: #fff;
    font-size: x-small;
    margin-left: 0px;
-   padding-left: 5px;
-   padding-right: 5px;
+   padding-left: 2px;
+   padding-right: 2px;
    border-top: 1px solid #999;
+   width: 100%;
+}
+.pagestripeleft {
+   color: #000;
+   background: #fff;
+   font-size: x-small;
+   width: 120px;
+   margin: 0px;
+   padding-left: 10px;
+   float: left;
 }
 .pagestripemiddle {
    color: #000;
-   background: #fff;
+   background: transparent;
 }
 .pagestriperight {
    color: #000;
-   background: transparent;
+   background: #fff;
    font-size: x-small;
    width: 120px;
-   padding-left: 3px;
+   margin: 0px;
+   padding-left: 10px;
+   float: right;
 }
 .pageboxlefttop {
    color: #000;
-   background: #dee;
+   background: transparent;
 }
 .pageboxlefttopadd {
    color: #000;
-   background: #dee;
+   background: transparent;
 }
 .pageboxleftbottom {
    color: #000;
-   background: #dee;
+   background: transparent;
 }
 .pageboxleftbottomadd {
    color: #000;
-   background: #dee;
+   background: transparent;
 }
 .pageboxrighttop {
    color: #000;
@@ -366,8 +389,8 @@ a.navtrail:hover {
    padding: 1px;
    margin-top: 5px;
    margin-bottom: 5px;
-   margin-left: 60px;
-   margin-right: 60px;
+   margin-left: 0px;
+   margin-right: 0px;
    border-spacing: 0px;
    border-collapse: collapse;
    border-top: 1px solid #36c;
@@ -391,7 +414,7 @@ a.navtrail:hover {
    padding: 1px;
    margin-top: 20px;
    margin-bottom: 5px;
-   margin-left: 20px;
+   margin-left: 0px;
    margin-right: 20px;
    border-spacing: 0px;
    border-collapse: collapse;
@@ -416,7 +439,7 @@ a.navtrail:hover {
    padding: 5px;
    margin-top: 5px;
    margin-bottom: 5px;
-   margin-left: 20px;
+   margin-left: 0px;
    margin-right: 20px;
    border-spacing: 5px;
 }
@@ -442,10 +465,13 @@ a.navtrail:hover {
    color: #000;
    background: #fff;
    margin-bottom: 15px;
+   margin-left: 0px;
+   margin-right: 0px;
    border-spacing: 0px;
    border-collapse: collapse;
    border-top: 1px solid #aabbbb;
    font-size: x-small;
+   width: 100%;
 }
 .portalboxheader {
    color: #000;
@@ -454,11 +480,13 @@ a.navtrail:hover {
    border-spacing: 0px;
    border-bottom: 1px solid #999999;
    text-align: left;
+   font-size: x-small;
 }
 .portalboxbody {
    color: #000;
    background: #fff;
    padding: 2px;
+   font-size: x-small;
 }
 .admin_wvar, .admin_w200, .admin_wvar_nomargin {
    color: #000;
@@ -466,8 +494,8 @@ a.navtrail:hover {
    padding: 1px;
    margin-top: 5px;
    margin-bottom: 5px;
-   margin-left: 60px;
-   margin-right: 60px;
+   margin-left: 0px;
+   margin-right: 0px;
    border-spacing: 0px;
    border-collapse: collapse;
    border-top: 1px solid #36c;
@@ -526,10 +554,11 @@ a.navtrail:hover {
    background: #fff;
    margin-top: 5px;
    margin-bottom: 5px;
+   padding: 0px;
    border-spacing: 0px;
    border-collapse: collapse;
    border-top: 1px solid #999999;
-   width: 150px;
+   width: 120px;
 }
 .googleboxheader {
    color: #000;
@@ -572,6 +601,7 @@ a.navtrail:hover {
    border-spacing: 0px;
    border-collapse: collapse;
    border-top: 1px solid #fc0; 
+   width: 100%;
 }
 .searchresultsboxheader {
    color: #000;
@@ -591,7 +621,7 @@ a.navtrail:hover {
 .searchresultsboxrecords {
    color: #000;
    background: transparent;
-   margin-left: 20px;
+   margin-left: 0px;
    margin-right: 20px;
 }
 .nearesttermsbox {
@@ -868,7 +898,6 @@ input,select {
     border: 2px dotted #777777;
     padding: 5px;
     margin: 5px;
-    horizontal-align: left;
 }
 .guideheader {
    font-size: 120%;
