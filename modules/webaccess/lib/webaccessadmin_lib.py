@@ -42,7 +42,7 @@ try:
     import re
     
     from cdsware.dbquery import run_sql
-    from cdsware.access_control_config import SUPERADMINROLE, WEBACCESSACTION, DELEGATEADDUSERROLE
+    from cdsware.access_control_config import SUPERADMINROLE, WEBACCESSACTION, DELEGATEADDUSERROLE, MAXSELECTUSERS, MAXPAGEUSERS
     from cdsware.config import *
     from cdsware.webpage import page, pageheaderonly, pagefooteronly
     from cdsware.webuser import getUid, get_email
@@ -111,7 +111,7 @@ def mustloginpage(req):
                 uid=getUid(req),
                 body=adderrorbox('try to login first',
                                  datalist=["""You are not a user authorized to perform admin tasks, try to
-                                 <a href="http://cdsdev.cern.ch:8000/DEMODEV/youraccount.py/login">login</a>."""]),
+                                 <a href="<WEBURL>/youraccount.py/login">login</a>."""]),
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)                
 
@@ -248,7 +248,7 @@ def perform_userarea(req, email_user_pattern=''):
                                button="search for users")
 
     if email_user_pattern:
-        users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE '%s' ORDER BY id LIMIT 26""" % (email_user_pattern, ))
+        users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE '%s' ORDER BY email LIMIT %s""" % (email_user_pattern, MAXPAGEUSERS+1))
 
         if not users1:
             output += '<p>no matching users</p>'
@@ -265,7 +265,7 @@ def perform_userarea(req, email_user_pattern=''):
                     for (str, function) in col[1:]:
                         users[-1][-1] += ' / <a href="%s?email_user_pattern=%s&amp;id_user=%s&amp;reverse=1">%s</a>' % (function, email_user_pattern, id, str)
     
-            output += '<p>found <strong>%s</strong> matching users</p>' % (len(users1), )
+            output += '<p>found <strong>%s</strong> matching users:</p>' % (len(users1), )
             output += tupletotable(header=['id', 'email', 'roles', ''], tuple=users)
 
             if len(users1) > 25:
@@ -553,16 +553,20 @@ def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=
             # pattern is entered
             if email_user_pattern:
                 # users with matching email-address
-                users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE '%s' ORDER BY id """ % (email_user_pattern, ))
+                users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE '%s' ORDER BY email """ % (email_user_pattern, ))
                 # users that are connected
                 users2 = run_sql("""SELECT DISTINCT u.id, u.email
                 FROM user u LEFT JOIN user_accROLE ur ON u.id = ur.id_user
                 WHERE ur.id_accROLE = '%s' AND u.email RLIKE '%s'
-                ORDER BY u.id """ % (id_role, email_user_pattern))
+                ORDER BY u.email """ % (id_role, email_user_pattern))
     
                 # no users that match the pattern
                 if not (users1 or users2):
-                    output += 'no qualified users, try new search'
+                    output += '<p>no qualified users, try new search.</p>'
+                # to many matching users
+                elif len(users1) > MAXSELECTUSERS:
+                    output += '<p><strong>%s hits</strong>, to many qualified users, specify more narrow search.</p>' % (len(users1), )
+
                 # show matching users
                 else:
                     subtitle = 'step 3 - select a user'
@@ -877,8 +881,14 @@ def perform_showactiondetails(req, id_action):
 
     if not is_adminuser(req): return mustloginpage(req)
 
+    output = createactionselect(id_action=id_action,
+                                action="showactiondetails",
+                                step=1,
+                                actions=acca.acc_getAllActions(),
+                                button="select action")
+
     if id_action not in [0, '0']:
-        output = actiondetails(id_action=id_action)
+        output += actiondetails(id_action=id_action)
 
         extra = """
         <dl>
@@ -891,7 +901,8 @@ def perform_showactiondetails(req, id_action):
         body = [output, extra]
         
     else:
-        body = ['<p>no details to show</p>']
+        output += '<p>no details to show</p>'
+        body = [output]
 
     return index(req=req,
                  title='Show Action Details',
@@ -1058,13 +1069,21 @@ def perform_showroledetails(req, id_role):
 
     if not is_adminuser(req): return mustloginpage(req)
 
+    output = createroleselect(id_role=id_role,
+                              action="showroledetails",
+                              step=1,
+                              roles=acca.acc_getAllRoles(),
+                              button="select role")
+
     if id_role not in [0, '0']:
-        output = roledetails(id_role=id_role)
+        output += roledetails(id_role=id_role)
             
         extra = """
         <dl>
          <dt><a href="adduserrole?id_role=%s">Connect user</a></dt>
          <dd>connect a user to the role.</dd>
+        </dl>
+        <dl>
          <dt><a href="addauthorization?id_role=%s">Add new authorization</a></dt>
          <dd>add an authorization.</dd>
          <dt><a href="modifyauthorizations?id_role=%s">Modify authorizations</a></dt>
@@ -1074,7 +1093,8 @@ def perform_showroledetails(req, id_role):
         body = [output, extra]
     
     else:
-        body = ['<p>no details to show</p>']
+        output += '<p>no details to show</p>'
+        body = [output]
     
     return index(req=req,
                  title='Show Role Details',
@@ -1167,16 +1187,19 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
         # pattern is entered
         if email_user_pattern:
             # users with matching email-address
-            users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE '%s' ORDER BY id """ % (email_user_pattern, ))
+            users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE '%s' ORDER BY email """ % (email_user_pattern, ))
             # users that are connected
             users2 = run_sql("""SELECT DISTINCT u.id, u.email
             FROM user u LEFT JOIN user_accROLE ur ON u.id = ur.id_user
             WHERE ur.id_accROLE = '%s' AND u.email RLIKE '%s'
-            ORDER BY u.id """ % (id_role, email_user_pattern))
+            ORDER BY u.email """ % (id_role, email_user_pattern))
 
             # no users that match the pattern
             if not (users1 or users2):
-                output += 'no qualified users, try new search'
+                output += '<p>no qualified users, try new search.</p>'
+            elif len(users1) > MAXSELECTUSERS:
+                output += '<p><strong>%s hits</strong>, to many qualified users, specify more narrow search.</p>' % (len(users1), )
+                
             # show matching users
             else:
                 subtitle = 'step 3 - select a user'
@@ -1273,12 +1296,17 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
     if email_user_pattern:
         subtitle = 'step 2 - select user'
 
-        users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE '%s' ORDER BY id """ % (email_user_pattern, ))
+        users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE '%s' ORDER BY email """ % (email_user_pattern, ))
         users = []
         for (id, email) in users1: users.append([id, email, ''])
 
+        # no users 
         if not users:
-            output += '<p>no qualified users, try new search</p>'
+            output += '<p>no qualified users, try new search.</p>'
+        # to many users
+        elif len(users) > MAXSELECTUSERS:
+            output += '<p><strong>%s hits</strong>, to many qualified users, specify more narrow search.</p>' % (len(users), )
+        # ok number of users
         else:
             output += createuserselect(id_user=id_user,
                                        action='addroleuser',
@@ -1292,7 +1320,7 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
 
                 # roles the user is connected to
                 role_ids = acca.acc_getUserRoles(id_user=id_user)
-                # all the roles
+                # all the roles, lists are sorted on the background of these...
                 all_roles = acca.acc_getAllRoles()
 
                 # sort the roles in connected and not connected roles
@@ -1348,7 +1376,7 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
     extra += """
     </dl>
     """
-
+    
     return index(req=req,
                  title=title,
                  subtitle=subtitle,
@@ -1389,24 +1417,25 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
 
     else:
         adminarea = 5
-        # show only users connected to a role
+        # show only if user is connected to a role, get users connected to roles
         users = run_sql("""SELECT DISTINCT(u.id), u.email, u.note
         FROM user u LEFT JOIN user_accROLE ur
         ON u.id = ur.id_user
         WHERE ur.id_accROLE != 'NULL' AND u.email != ''
-        ORDER BY id """)
+        ORDER BY u.email """)
 
         has_roles = 1
         
         # check if the user is connected to any roles
         for (id, email, note) in users:
             if str(id) == str(id_user): break
+        # user not connected to a role
         else:
             subtitle = 'step 1 - user not connected'
             output += '<p>no need to remove roles from this user,<br>user <strong>%s</strong> is not connected to any roles.</p>' % (email_user, )
             has_roles, id_user = 0, '0' # stop the rest of the output below...
             
-        
+        # user connected to roles
         if has_roles:
             output += createuserselect(id_user=id_user,
                                       action="deleteuserrole",
@@ -1415,10 +1444,10 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
                                       reverse=reverse)
         
             if id_user != "0":
-                subtitle = 'step 2 - select the user'
+                subtitle = 'step 2 - select the role'
     
                 role_ids = acca.acc_getUserRoles(id_user=id_user)
-                all_roles = run_sql("""SELECT id, name, description FROM accROLE ORDER BY id """)
+                all_roles = acca.acc_getAllRoles()
                 roles = []
                 for (id, name, desc) in all_roles:
                     if (id, ) in role_ids: roles.append([id, name, desc])
@@ -2029,14 +2058,18 @@ def modifyauthorizationsmenu(id_role, id_action, tuple=[], header=[], checked=[]
     output += hdrstr
     output += '<tr><td>%s</td></tr>\n' % (hidden, )
 
-    output += '<tr>'
-    for data in tuple2[0]: output += '<td class="admintd">%s</td>\n' % (data,)
-    output += '<td rowspan="%s" style="vertical-align: bottom">\n%s\n</td>\n' % (len(tuple2), button)
+    align = ['admintdleft'] * len(tuple2[0])
+    try: align[1] = 'admintdright'
+    except IndexError: pass
 
+    output += '<tr>'
+    for i in range(len(tuple2[0])): output += '<td class="%s">%s</td>\n' % (align[i], tuple2[0][i])
+    output += '<td rowspan="%s" style="vertical-align: bottom">\n%s\n</td>\n' % (len(tuple2), button)
+    
     output += '</tr>\n'
     for row in tuple2[1:]:
         output += ' <tr>\n'
-        for data in row: output += '<td class="admintd">%s</td>\n' % (data,)
+        for i in range(len(row)): output += '<td class="%s">%s</td>\n' % (align[i], row[i])
         output += ' </tr>\n'
 
     output += '</table>\n</form>\n'
@@ -2174,8 +2207,8 @@ def addadminbox(header='', datalist=[], cls="admin_wvar"):
 
          cls - possible to select wich css-class to format the look of the table."""
 
-    if len(datalist) == 1: per = 100
-    else: per = 75
+    if len(datalist) == 1: per = '100'
+    else: per = '75'
     
     output  = '<table class="%s" ' % (cls, ) + 'width="100%">\n'
     output += """
@@ -2193,7 +2226,7 @@ def addadminbox(header='', datalist=[], cls="admin_wvar"):
     <td style="vertical-align: top; margin-top: 5px; width: %s;">
      %s 
     </td>
-    """ % (per, datalist[0])
+    """ % (per+'%', datalist[0])
 
     if len(datalist) > 1:
         output += """
@@ -2245,6 +2278,23 @@ def tupletotable(header=[], tuple=[], start='', end='', extracolumn=''):
             end - text to be added in the end, mot likely end of a form.
      
     extracolumn - mainly used to put in a button. """
+
+    # study first row in tuple for alignment
+    align = []
+    try: 
+        firstrow = tuple[0]
+    
+        if type(firstrow) in [int, long]: 
+            align = ['admintdright']
+        elif type(firstrow) in [str, dict]:
+            align = ['admintdleft']
+        else:
+            for item in firstrow:
+                try: align.append(int(item) and 'admintdright')
+                except ValueError: align.append('admintdleft')
+    except IndexError:
+        firstrow = []
+                    
     
     tblstr = ''
     for h in header + ['']:
@@ -2256,23 +2306,26 @@ def tupletotable(header=[], tuple=[], start='', end='', extracolumn=''):
     # extra column
     try: 
         extra = '<tr>'
-        row = tuple[0]
-        if type(row) not in [int, long, str, dict]:
-            for data in row: extra += '<td class="admintd">%s</td>\n' % (data,)
+
+        if type(firstrow) not in [int, long, str, dict]:
+            # for data in firstrow: extra += '<td class="%s">%s</td>\n' % ('admintd', data)
+            for i in range(len(firstrow)): extra += '<td class="%s">%s</td>\n' % (align[i], firstrow[i])
         else:
-            extra += '  <td class="admintd">%s</td>\n' % (row, )
+            extra += '  <td class="%s">%s</td>\n' % (align[0], firstrow)
         extra += '<td rowspan="%s" style="vertical-align: bottom">\n%s\n</td>\n</tr>\n' % (len(tuple), extracolumn)
     except IndexError:
         extra = ''
     tblstr += extra
 
-    
+    # for i in range(1, len(tuple)):
     for row in tuple[1:]:
         tblstr += ' <tr>\n'
+        # row = tuple[i]
         if type(row) not in [int, long, str, dict]:
-            for data in row: tblstr += '<td class="admintd">%s</td>\n' % (data,)
+            # for data in row: tblstr += '<td class="admintd">%s</td>\n' % (data,)
+            for i in range(len(row)): tblstr += '<td class="%s">%s</td>\n' % (align[i], row[i])
         else:
-            tblstr += '  <td class="admintd">%s</td>\n' % (row, )
+            tblstr += '  <td class="%s">%s</td>\n' % (align[0], row)
         tblstr += ' </tr> \n'
 
     tblstr += '</table> \n '

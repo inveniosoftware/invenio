@@ -24,7 +24,14 @@
 
 <p>
  This is the gate to the admin area for WebAccess. You need to 
- <a href="http://cdsdev.cern.ch:8000/DEMODEV/youraccount.py/login">login</a> to enter.
+ <a href="http://<WEBURL>/youraccount.py/login">login</a> to enter.
+</p>
+
+<p>
+ Reduce text size for better view (much info): <br>
+ - Mozilla:           View -> Text Zoom -> Smaller. <br>
+ - Internet Explorer: View -> Text Size -> Smaller. <br>
+ - Opera:             use + (plus) and - (minus) keys.
 </p>
 
 <dl>
@@ -36,5 +43,5 @@
      Everything you can do here is also allowed in the Main Admin Area. <br>
      Contact Main Administrator for delegation rights.</dd>
  <dt><a href="<WEBURL>/admin/webaccess/guide.html">Guide</a>.</dt>
- <dd>how to administrate WebAccess.</dd>
+ <dd>How to administrate WebAccess.</dd>
 </dl>
