@@ -15,7 +15,9 @@ INSERT INTO collection VALUES (13,'ISOLDE','ISOLDE',NULL,'experiment:ISOLDE',NUL
 INSERT INTO collection VALUES (14,'ALEPH','ALEPH',NULL,'experiment:ALEPH',NULL,NULL,NULL);
 INSERT INTO collection VALUES (15,'Articles & Preprints','Articles & Preprints',NULL,NULL,NULL,NULL,NULL);
 INSERT INTO collection VALUES (16,'Books & Reports','Books & Reports',NULL,NULL,NULL,NULL,NULL);
-INSERT INTO collection VALUES (17,'Multimedia','Multimedia',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO collection VALUES (17,'Multimedia & Outreach','Multimedia & Outreach',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO collection VALUES (18,'Poetry','Poetry',NULL,'collection:POETRY',NULL,NULL,NULL);
+
 INSERT INTO collection_collection VALUES (1,15,'r',60);
 INSERT INTO collection_collection VALUES (1,16,'r',40);
 INSERT INTO collection_collection VALUES (1,17,'r',30);
@@ -24,7 +26,8 @@ INSERT INTO collection_collection VALUES (15,2,'r',10);
 INSERT INTO collection_collection VALUES (16,3,'r',30);
 INSERT INTO collection_collection VALUES (16,4,'r',20);
 INSERT INTO collection_collection VALUES (16,5,'r',10);
-INSERT INTO collection_collection VALUES (17,8,'r',10);
+INSERT INTO collection_collection VALUES (17,8,'r',20);
+INSERT INTO collection_collection VALUES (17,18,'r',10);
 
 INSERT INTO collection_collection VALUES (1,9,'v',20);
 INSERT INTO collection_collection VALUES (1,10,'v',10);
@@ -256,6 +259,7 @@ INSERT INTO collection_portalbox VALUES (14,20,'rt',100);
 INSERT INTO collection_portalbox VALUES (15,21,'rt',100);
 INSERT INTO collection_portalbox VALUES (16,22,'rt',100);
 INSERT INTO collection_portalbox VALUES (17,23,'rt',100);
+INSERT INTO collection_portalbox VALUES (18,24,'rt',100);
 
 
 INSERT INTO example VALUES (1,'author search','Search for <span class=example>Ellis, J</span> within <span class=example>author</span> field.');
@@ -331,7 +335,8 @@ INSERT INTO portalbox VALUES (19,'ABOUT ISOLDE','This virtual collection groups 
 INSERT INTO portalbox VALUES (20,'ABOUT ALEPH','This virtual collection groups together all the documents about ALEPH CERN experiment.');
 INSERT INTO portalbox VALUES (21,'ABOUT ARTICLES AND PREPRINTS','This collection groups together all published and non-published articles, many of which in electronic fulltext form.');
 INSERT INTO portalbox VALUES (22,'ABOUT BOOKS AND REPORTS','This collection groups together all monograph-like publications, be they books, theses, reports, book chapters, proceedings, and so on.');
-INSERT INTO portalbox VALUES (23,'ABOUT MULTIMEDIA','This collection groups together all multimedia- and outreach- oriented material.');
+INSERT INTO portalbox VALUES (23,'ABOUT MULTIMEDIA & OUTREACH','This collection groups together all multimedia- and outreach- oriented material.');
+INSERT INTO portalbox VALUES (24,'ABOUT POETRY','This collection presents poetry excerpts, mainly to demonstrate and test the treatment of various languages.<p>Vitrum edere possum; mihi non nocet.<br>Μπορώ να φάω σπασμένα γυαλιά χωρίς να πάθω τίποτα.<br>Pòdi manjar de veire, me nafrariá pas.<br>Ég get etið gler án þess að meiða mig.<br>Ic mæg glæs eotan ond hit ne hearmiað me.<br>ᛁᚳ᛫ᛗᚨᚷ᛫ᚷᛚᚨᛋ᛫ᛖᚩᛏᚪᚾ᛫ᚩᚾᛞ᛫ᚻᛁᛏ᛫ᚾᛖ᛫ᚻᛖᚪᚱᛗᛁᚪᚧ᛫ᛗᛖ᛬<br>⠊⠀⠉⠁⠝⠀⠑⠁⠞⠀⠛⠇⠁⠎⠎⠀⠁⠝⠙⠀⠊⠞⠀⠙⠕⠑⠎⠝⠞⠀⠓⠥⠗⠞⠀⠍⠑<br>Pot să mănânc sticlă și ea nu mă rănește.<br>Meg tudom enni az üveget, nem lesz tőle bajom.<br>Môžem jesť sklo. Nezraní ma.<br><span dir="rtl" lang="he">אני יכול לאכול זכוכית וזה לא מזיק לי.</span><br><span dir="rtl" lang="ji">איך קען עסן גלאָז און עס טוט מיר נישט װײ.</span><br><span dir="RTL" lang=AR>أنا قادر على أكل الزجاج و هذا لا يؤلمني.</span><br>Я могу есть стекло, оно мне не вредит.<br>მინას ვჭამ და არა მტკივა.<br>Կրնամ ապակի ուտել և ինծի անհանգիստ չըներ։<br>मैं काँच खा सकता हूँ, मुझे उस से कोई पीडा नहीं होती.<br>काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥<br>ฉันกินกระจกได้ แต่มันไม่ทำให้ฉันเจ็บ<br>Tôi có thể ăn thủy tinh mà không hại gì.<br><span lang="zh">我能吞下玻璃而不伤身体。</span><br><span lang=ja>私はガラスを食べられます。それは私を傷つけません。</span><br><span lang=ko>나는 유리를 먹을 수 있어요. 그래도 아프지 않아요</span><br>(<a href="http://www.columbia.edu/kermit/utf8.html">http://www.columbia.edu/kermit/utf8.html</a>)');
 
 INSERT INTO sbmCOLLECTION VALUES (36,'Catalogues');
 
