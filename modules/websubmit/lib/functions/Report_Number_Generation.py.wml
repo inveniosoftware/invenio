@@ -79,7 +79,7 @@ def Report_Number_Generation(parameters,curdir,form):
             fp = open("%s/%s" % (curdir,parameters['edsrn']),"r")
             oldrn = fp.read()
             fp.close()
-            if oldrn != "" and not re.match("\?\?\?",oldrn):
+            if oldrn != "" and not re.search("\?\?\?",oldrn):
                 rn = oldrn
                 return ""
         # create it
