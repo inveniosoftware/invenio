@@ -49,35 +49,35 @@ def createGuestUser():
     """    
     return run_sql("insert into user (email) values ('')")
 
-def getUid ( request ):
+def getUid (req):
     """It gives the userId taking it from the cookie of the request,also has the control mechanism for the guest users,
        inserting in the MySql table when need it, and raise the cookie to the client.
 
-       getUid(request) -> userId	 
+       getUid(req) -> userId	 
     """
     sm = session.MPSessionManager(pSession, pSessionMapping())
     try:
-	s = sm.get_session(request)
+	s = sm.get_session(req)
     except SessionError,e:
-	sm.revoke_session_cookie (request)
-	s = sm.get_session(request)
+	sm.revoke_session_cookie (req)
+	s = sm.get_session(req)
     userId = s.getUid()
     if userId == -1: # first time, so create a guest user
         s.setUid(createGuestUser())
-    sm.maintain_session(request,s)
+    sm.maintain_session(req,s)
     return userId
 
-def setUid(request,uid):
+def setUid(req,uid):
     """It sets the userId into the session, and raise the cookie to the client.
     """
     sm = session.MPSessionManager(pSession, pSessionMapping())
     try:
-	s = sm.get_session(request)
+	s = sm.get_session(req)
     except SessionError,e:
-	sm.revoke_session_cookie (request)
-	s = sm.get_session(request)
+	sm.revoke_session_cookie (req)
+	s = sm.get_session(req)
     s.setUid(uid)
-    sm.maintain_session(request,s)
+    sm.maintain_session(req,s)
     return uid
     
 def isGuestUser(uid):
@@ -153,11 +153,11 @@ def checkemail(email):
         return 1
     return 0    
 
-def getDataUid(request,uid):
+def getDataUid(req,uid):
     """It takes the email and password from a given userId, from the MySQL database, if don't exist it just returns
        guest values for email and password	
 	
-       getDataUid(request,uid) -> [email,password]
+       getDataUid(req,uid) -> [email,password]
 
     """	
 
@@ -177,17 +177,17 @@ def getDataUid(request,uid):
     return list
 
 
-def registerUser(request,user,passw):
+def registerUser(req,user,passw):
     """It registers the user, inserting into the user table of MySQL database, the email and the pasword 
 	of the user. It returns 1 if the insertion is done, 0 if there is any failure with the email 
 	and -1 if the user is already on the data base
    
-       registerUser(request,user,passw) -> int 
+       registerUser(req,user,passw) -> int 
     """ 
     if userOnSystem(user) and  user !='':
 	return -1	
     if checkRegister(user,passw) and checkemail(user):
-	setUid(request, run_sql("INSERT INTO user (email, password) VALUES (%s,%s)",
+	setUid(req, run_sql("INSERT INTO user (email, password) VALUES (%s,%s)",
                                 (user,passw)))
 	return 1
     return 0
@@ -211,10 +211,10 @@ def logoutUser(req):
     """
     sm = session.MPSessionManager(pSession, pSessionMapping())
     try:
-	s = sm.get_session(request)
+	s = sm.get_session(req)
     except SessionError,e:
-	sm.revoke_session_cookie (request)
-	s = sm.get_session(request)
+	sm.revoke_session_cookie (req)
+	s = sm.get_session(req)
     id1 = createGuestUser()
     s.setUid(id1)
     sm.maintain_session(req,s)
