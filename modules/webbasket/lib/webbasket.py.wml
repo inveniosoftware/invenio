@@ -219,17 +219,36 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
                 if (i < len(permission)):
                     if (permission[i][1] == "n"):
                         public_basket="no"
-                        out += """<TD colspan="2">basket access is set to <I>private</I>, convert to <I>public</I>?</TD><TD>"""\
+                        out += """<TD colspan="2">Basket access is set to <I>private</I>, convert to <I>public</I>?</TD><TD>"""\
                                """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="SET PUBLIC"></CODE></TD></TR>\n"""
                     else :
                         public_basket="yes"
-                        out += """<TD colspan="2">basket access is set to <I>public</I>, convert to <I>private</I>?<BR></TD><TD>"""\
+                        out += """<TD colspan="2">Basket access is set to <I>public</I>, convert to <I>private</I>?<BR></TD><TD>"""\
                                """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="SET PRIVATE"></CODE></TD></TR>\n"""
                     if (public_basket=="yes"):
                         url_public_basket = """%s/yourbaskets.py/display_public?id_basket=%s""" \
                                             % (weburl, id_basket)
-                        out += """<TR><TD colspan="3">public URL: <FONT size="-1"><NOBR><A href="%s">%s</A></NOBR></FONT></TD></TR>""" \
+                        out += """<TR><TD colspan="3">Public URL: <FONT size="-1"><NOBR><A href="%s">%s</A></NOBR></FONT></TD></TR>""" \
                                % (url_public_basket, url_public_basket)
+            
+            # is basket related to some alerts?
+            alert_query_result = run_sql("SELECT alert_name FROM user_query_basket WHERE id_user=%s AND id_basket=%s",
+                                         (uid, id_basket))
+            out += """<TR><TD colspan="3">"""
+            if len(alert_query_result) == 0:
+                out += """There isn't any alert related to this basket."""
+            else:
+                out += """The following <A href="../youralerts.py/list_alerts">alerts</A> are related to this basket:&nbsp;"""
+                i = 1
+                for row in alert_query_result:
+                    if i == 1:
+                        out += """<B>%s</B>""" % row[0]
+                        i+=1
+                    else:
+                        out += """, <B>%s</B>""" % row[0]
+                        i+=1
+                out += """<BR>"""
+            out += """</TD><TR>"""
 
             # hidden parameters
             out += """<INPUT type="hidden" name="bname" value="%s"></TD></TR>""" % basket_name   
@@ -259,23 +278,6 @@ def display_basket_content(uid, id_basket, basket_name):
     out = ""
     out_tmp=""
     
-    # search for related alerts
-    query_result = run_sql("SELECT alert_name FROM user_query_basket WHERE id_user=%s AND id_basket=%s",
-                           (uid, id_basket))
-    if len(query_result) == 0:
-        out_tmp = """There isn't any alert related to this basket.<BR>"""
-    else:
-        out_tmp = """The following <A href="../youralerts.py/list_alerts">alerts</A> are related to this basket:&nbsp;"""
-        i = 1
-        for row in query_result:
-            if i == 1:
-                out_tmp += """<B>%s</B>""" % row[0]
-                i+=1
-            else:
-                out_tmp += """, <B>%s</B>""" % row[0]
-                i+=1
-        out_tmp += """<BR>"""
-        
     # search for basket's items    
     if (id_basket != '0') and (id_basket != 0):
         query_result = run_sql("SELECT br.id_record,br.nb_order, fmt.value "\
@@ -284,7 +286,6 @@ def display_basket_content(uid, id_basket, basket_name):
                                "ORDER BY br.nb_order DESC ",
                                (id_basket,))
         if len(query_result) > 0:
-            out += """Content of the basket <B>%s</B> :<BR>""" % basket_name                     
             out += out_tmp
             
             # display the list of items
