@@ -29,10 +29,6 @@
 """CDSware config file, to be read by all Python programs."""
 
 ## fill all the generally-interesting config variables from WML:
-dbhost = "<DBHOST>"
-dbname = "<DBNAME>"
-dbuser = "<DBUSER>"
-dbpass = "<DBPASS>"
 cdsname = "<CDSNAME>"
 cdslang = "<CDSLANG>"
 supportemail = "<SUPPORTEMAIL>"
