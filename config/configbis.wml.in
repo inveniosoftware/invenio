@@ -20,6 +20,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## read autoconf parameters and define new WML tags out of them:
+<define-tag VERSION whitespace=delete>
+@VERSION@
+</define-tag>
 <define-tag WML whitespace=delete>
 @WML@
 </define-tag>
@@ -28,9 +31,6 @@
 </define-tag>
 <define-tag PHP whitespace=delete>
 @PHP@
-</define-tag>
-<define-tag PERL whitespace=delete>
-@PERL@
 </define-tag>
 <define-tag PYTHON whitespace=delete>
 @PYTHON@
