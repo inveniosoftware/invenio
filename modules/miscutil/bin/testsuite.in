@@ -45,6 +45,7 @@ try:
     from cdsware.config import version
     from cdsware import search_engine_tests 
     from cdsware import bibindex_engine_tests 
+    from cdsware import bibindex_engine_stemmer_tests 
     from cdsware import bibrank_record_sorter_tests
     from cdsware import bibrank_tag_based_indexer_tests
     from cdsware import bibrecord_tests 
@@ -57,6 +58,7 @@ def create_all_test_suites():
     """Return all tests suites for all CDSware modules."""
     return unittest.TestSuite((search_engine_tests.create_test_suite(),
                                bibindex_engine_tests.create_test_suite(),
+                               bibindex_engine_stemmer_tests.create_test_suite(),
                                bibrecord_tests.create_test_suite(),
                                bibrank_record_sorter_tests.create_test_suite(),
                                bibrank_tag_based_indexer_tests.create_test_suite()))
