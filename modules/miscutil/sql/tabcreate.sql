@@ -1736,7 +1736,8 @@ CREATE TABLE IF NOT EXISTS bibfmt (
   last_updated datetime NOT NULL default '0000-00-00',
   value longblob,
   PRIMARY KEY  (id),
-  KEY format (format,id_bibrec)
+  KEY id_bibrec (id_bibrec),
+  KEY format (format)
 ) TYPE=MyISAM;
 
 -- tables for word files:
@@ -1922,7 +1923,8 @@ CREATE TABLE IF NOT EXISTS collection (
   reclist longblob,
   restricted varchar(255) default NULL,
   PRIMARY KEY  (id),
-  UNIQUE KEY name (name)
+  UNIQUE KEY name (name),
+  KEY dbquery (dbquery(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS collection_collection (
@@ -2531,18 +2533,16 @@ CREATE TABLE IF NOT EXISTS sbmSUBMISSIONS (
 
 -- Scheduler tables
 
-CREATE TABLE IF NOT EXISTS schTASKS (
-  id int(10) unsigned NOT NULL auto_increment,
+CREATE TABLE IF NOT EXISTS schTASK (
+  id int(15) unsigned NOT NULL auto_increment,
   proc varchar(20) NOT NULL,
+  host varchar(255) NOT NULL,
   user varchar(50) NOT NULL,
-  date DATETIME NOT NULL,
+  runtime datetime NOT NULL,
   sleeptime varchar(20),
   arguments text,
-  state varchar(20),
+  status varchar(20),
   progress varchar(255),
-  output varchar(255),
-  error varchar(255),
-  score int(11) NOT NULL default '0',
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
