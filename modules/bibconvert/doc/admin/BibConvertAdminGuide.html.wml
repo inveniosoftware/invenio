@@ -706,6 +706,9 @@ AU field
 the AU field
 <BR>&nbsp;</BLOCKQUOTE>
 
+<H4><A NAME="DEFP"></A>DEFP() - default print</H4>
+<BLOCKQUOTE>The value is printed by default even if it does not contain any variable input from the source file.</BLOCKQUOTE>
+
 <H2>
 <A NAME="52"></A>Generated values</H2>
 
