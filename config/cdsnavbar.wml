@@ -79,7 +79,8 @@
   </navbar:header>
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> </navbar:prolog>
-  <navbar:button id=documentation txt="Documentation" url="<WEBURL>/docs/" hint="Documentation" menu="documentation">
+  <navbar:button id=help txt="Search Help" url="<WEBURL>/help/search/" hint="Search Help">
+  <navbar:button id=tips txt="Search Tips" url="<WEBURL>/help/search/tips.html" hint="Search Tips">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
