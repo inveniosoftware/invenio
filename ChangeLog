@@ -3,6 +3,15 @@ CDSware v0.3.1 (released 2004-03-12)
 
 2004-03-12  Tibor Simko <tibor.simko@cern.ch>
 
+        * modules/bibrank/doc/admin/Makefile.am: Added sample files to the
+        release.
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+        * ChangeLog: Release of v0.3.1.
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
 	* NEWS: Release of v0.3.1.
 
 2004-03-12  Tibor Simko <tibor.simko@cern.ch>
