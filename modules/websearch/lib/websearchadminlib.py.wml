@@ -628,6 +628,8 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
         return addadminbox(subtitle, body)
 
 def perform_showtree(colID, ln):
+    """create collection tree/hiarchy"""
+  
     col_dict = dict(get_def_name('', "collection"))
     subtitle = "Collection tree: %s" % col_dict[int(colID)]
     output = """<table border ="0" width="100%">
@@ -1117,9 +1119,9 @@ def perform_addnewfieldvalue(colID, fldID, ln, name='', value='', callback="yes"
     return perform_modifyfield(colID, fldID=fldID, ln=ln, content=output)
 
 def perform_modifyfieldvalue(colID, fldID, fldvID, ln, name='', value='', callback="yes", confirm=-1):
-    """form to add a new fieldvalue.
-    name - the name of the new fieldvalue
-    value - the value of the new fieldvalue
+    """form to modify a fieldvalue.
+    name - the name of the fieldvalue
+    value - the value of the fieldvalue
     """
 
     if confirm in [-1, "-1"]:
@@ -1992,6 +1994,8 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     return addadminbox('<b>Menu</b>', body)
     
 def show_coll_not_in_tree(colID, ln, col_dict):
+    """Returns collections not in tree"""
+
     tree = get_col_tree(colID)
     in_tree = {}
     output = "These collections are not in the tree, and should be added:<br>"
@@ -2196,7 +2200,7 @@ def perform_deletecollection(colID, ln, confirm=-1, callback='yes'):
         return addadminbox(subtitle, body)
     
 def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
-    """form to modify a collection. this method is calling other methods which again is calling this and sending back the output of the method.
+    """interface to modify a collection. this method is calling other methods which again is calling this and sending back the output of the method.
     if callback, the method will call perform_editcollection, if not, it will just return its output.
     colID - id of the collection
     mtype - the method that called this method.
@@ -3049,7 +3053,7 @@ def add_col_fld(colID, fldID, type, fldvID=''):
         return (0, e)
         
 def modify_restricted(colID, rest):
-    """Modify the dwhich apache group is allowed to use the collection.
+    """Modify which apache group is allowed to use the collection.
     colID - the id of the collection involved
     restricted - the new group"""
     
