@@ -1,3 +1,4 @@
+## $Id$
 ## Administrator interface for WebSearch
 
 ## This file is part of the CERN Document Server Software (CDSware).
@@ -122,9 +123,9 @@ def runwebcoll(req, colID, ln=cdslang, confirm=0):
     auth = wsc.check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Collection Management",
-                    body=wsc.perform_runwebcoll(colID=colID,
-                                                ln=ln,
-                                                confirm=confirm),
+                    body=wsc.perform_checkwebcollstatus(colID=colID,
+                                                        ln=ln,
+                                                        confirm=confirm),
                     uid=uid,
                     language=ln,
                     urlargs=req.args,
