@@ -145,7 +145,7 @@ Usage: %s [options]
 </pre>
 </blockquote>
 
-<a name="ubd"></a><h3>4.2 Using BibRank</h2>
+<a name="ubd"></a><h3>4.2 Using BibRank</h3>
 
 <h4>Step 1 - Adding the rank option to the search interface</h4>
 To be able to add the needed ranking data to the database, you first have to add the rank method to the database, and
