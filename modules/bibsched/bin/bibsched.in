@@ -242,10 +242,14 @@ class Manager:
         id = self.currentrow[0]
         process = self.currentrow[1]
         state = self.currentrow[5]
+        if process == "bibupload":
+            arg2 = "-t "
+        else:
+            arg2 = ""
         if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
             self.put_footer("a process is already running!")
         elif state == "SLEEPING":
-            mypid = get_my_pid(process)
+            mypid = get_my_pid(process,"%s%s" % (arg2, str(id)))
             if mypid!=0:
                 os.kill(mypid, signal.SIGCONT)
             self.put_footer("process woken up")
@@ -285,10 +289,14 @@ class Manager:
         id = self.currentrow[0]
         process = self.currentrow[1]
         state = self.currentrow[5]
+        if process == "bibupload":
+            arg2 = "-t "
+        else:
+            arg2 = ""
         if state!='RUNNING' and state!='CONTINUING':
             self.put_footer("this process is not running!")
         else:
-            mypid = get_my_pid(process)
+            mypid = get_my_pid(process,"%s%s" % (arg2, str(id)))
             if mypid!=0:
                 os.kill(mypid, signal.SIGUSR1)
                 self.put_footer("SLEEP signal sent to process #%s" % mypid)
@@ -301,7 +309,11 @@ class Manager:
         id = self.currentrow[0]
         process = self.currentrow[1]
         state = self.currentrow[5]
-        mypid = get_my_pid(process)
+        if process == "bibupload":
+            arg2 = "-t "
+        else:
+            arg2 = ""
+        mypid = get_my_pid(process,"%s%s" % (arg2, str(id)))
         if mypid!=0:
             os.kill(mypid, signal.SIGKILL)
             self.set_state(id,'STOPPED')
@@ -315,7 +327,11 @@ class Manager:
         id = self.currentrow[0]
         process = self.currentrow[1]
         state = self.currentrow[5]
-        mypid = get_my_pid(process)
+        if process == "bibupload":
+            arg2 = "-t "
+        else:
+            arg2 = ""
+        mypid = get_my_pid(process,"%s%s" % (arg2, str(id)))
         if mypid!=0:
             os.kill(mypid, signal.SIGINT)
             self.put_footer("INT signal sent to process #%s" % mypid)
