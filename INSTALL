@@ -39,7 +39,7 @@ Contents
      d) WML - Website META Language:
           <http://www.engelschall.com/sw/wml/>
 
-     e) Python, featuring MySQLdb module:
+     e) Python v2.x, featuring recent MySQLdb v0.9x module:
           <http://python.org/>
           <http://sourceforge.net/projects/mysql-python>
 
