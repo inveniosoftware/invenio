@@ -1130,18 +1130,19 @@ def get_tags(config):
 def get_valid_range(key):
     """Returns which records are valid for this rank method, according to which collections it is enabled for."""
 
-    if options["verbose"] >=9:
-        write_message("Getting records from collections enabled for rank method.")
-    res = run_sql("SELECT collection.name FROM collection,collection_rnkMETHOD,rnkMETHOD WHERE collection.id=id_collection and id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" %  key)
-    l_of_colls = []
-    for coll in res:
-        l_of_colls.append(coll[0])
+    #if options["verbose"] >=9:
+    #    write_message("Getting records from collections enabled for rank method.")
+    #res = run_sql("SELECT collection.name FROM collection,collection_rnkMETHOD,rnkMETHOD WHERE collection.id=id_collection and id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" %  key)
+    #l_of_colls = []
+    #for coll in res:
+    #    l_of_colls.append(coll[0])
     #if len(l_of_colls) > 0:
-    recIDs = perform_request_search(c="")
+    #recIDs = perform_request_search(c="")
     #else:
     #    recIDs = []
-    valid = HitSet() 
-    valid.addlist(recIDs)
+    
+    valid = HitSet(Numeric.ones(cfg_max_recID+1, Numeric.Int0))
+    #valid.addlist(recIDs)
     return valid
 
 def write_message(msg, stream=sys.stdout):
