@@ -38,6 +38,8 @@ descriptions the module relationship diagram is presented.
 
 <ul>
 
+ <li><strong>BibCheck</strong>: FIXME 
+
  <li><strong>BibConvert</strong> allows metadata conversion from any
  structured or semi-structured proprietary format into any other
  format, typically the <a
@@ -63,6 +65,8 @@ descriptions the module relationship diagram is presented.
  several steps including record separation and field extraction upto
  transformation of source field values and their formatting.
 
+ <li><strong>BibEdit</strong>: FIXME.
+
  <li><strong>BibFormat</strong> presents a powerful module to format
  the bibliographic metadata in numerous ways. This truly enables the
  separation of data content administration and formatting layout,
@@ -86,6 +90,23 @@ descriptions the module relationship diagram is presented.
  cross-archive and cross-disciplinary services provision, as for
  example the ARC service provider.
   
+ <li><strong>BibIndex</strong> module takes care of the indexation of
+ metadata, references and full text files.  Two kinds of indexes --
+ word and phrase index -- are being maintained.  The user can define
+ several logical indexes (e.g. author index, title index, etc.) and
+ the correspondence of which physical MARC21 metadata tag goes into
+ which logical field index.  An index consists of two parts: (i) a
+ forward index listing various words (or phrases) found in the given
+ field, with the set of record identifiers where the given word can be
+ found; and (ii) a reverse index listing record identifiers, with the
+ set of words of the given record that go to the forward index.  Such
+ a two-part indexing technique allows one to rapidly update only those
+ words that have changed in the input metadata record.  The indexes
+ were designed with the aim to provide fast user-response search times
+ and are faster than native MySQL (full text) indexes.
+
+ <li><strong>BibRank</strong>: FIXME 
+  
  <li><strong>BibSched</strong> The bibliographic task scheduler is
  central unit of the system that allows all other modules to access
  the bibliographic database in a controlled manner, preventing sharing
@@ -101,21 +122,8 @@ descriptions the module relationship diagram is presented.
  selection schema. Usually, the properly structured input files of
  BibUpload come from the BibConvert utility.
   
- <li><strong>BibIndex</strong> module takes care of the indexation of
- metadata, references and full text files.  Two kinds of indexes --
- word and phrase index -- are being maintained.  The user can define
- several logical indexes (e.g. author index, title index, etc.) and
- the correspondence of which physical MARC21 metadata tag goes into
- which logical field index.  An index consists of two parts: (i) a
- forward index listing various words (or phrases) found in the given
- field, with the set of record identifiers where the given word can be
- found; and (ii) a reverse index listing record identifiers, with the
- set of words of the given record that go to the forward index.  Such
- a two-part indexing technique allows one to rapidly update only those
- words that have changed in the input metadata record.  The indexes
- were designed with the aim to provide fast user-response search times
- and are faster than native MySQL (full text) indexes.
-  
+ <li><strong>ElmSubmit</strong>: FIXME
+ 
  <li><strong>MiscUtil</strong> is a collection of miscellaneous
  utilities that other modules are using, like the international
  messages, etc.
@@ -178,6 +186,8 @@ descriptions the module relationship diagram is presented.
  personalization of the interface and services like personal baskets
  and alerts.
   
+ <li><strong>WebStat</strong>: FIXME 
+  
  <li><strong>WebStyle</strong> is a library of design-related modules
  that defines look and feel of CDSware pages.
   
@@ -197,5 +207,5 @@ descriptions the module relationship diagram is presented.
 <p>Relationship between the modules:
 
 <center><img src="<WEBURL>/img/modules.jpeg" border=0></center>
-  
+
 - end of file -
