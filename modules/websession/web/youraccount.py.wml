@@ -96,7 +96,7 @@ def login(req,p_email=None,p_pw=None,action='login'):
                         "","CDS Personalize, Main page", "CDS, personalize",webuser.create_user_infobox(uid), "")
        else:
         
-           return page("Your Account", perform_display(req),"&gt;",
+           return page("Your Account", webaccount.perform_display(req),"&gt;",
                        "", "CDS Personalize, Main page", "CDS, personalize", webuser.create_user_infobox(uid), "")
     if action == 'register':
         
