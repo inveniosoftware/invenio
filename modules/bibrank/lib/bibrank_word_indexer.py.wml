@@ -571,7 +571,6 @@ class WordTable:
         # Reindex all formats newer than the modification date
         if not date:
             write_message("Using the last update time for the rank method")
-            id = self.tablename[len("bibindex"):]
             query = """SELECT last_updated FROM rnkMETHOD WHERE name='%s'
             """ % options["current_run"]
             res = run_sql(query)
