@@ -105,7 +105,7 @@ Contents
       $ wget http://cdsware.cern.ch/download/cdsware-0.9.tar.gz
       $ tar xvfz cdsware-0.9.tar.gz
       $ cd cdsware-0.9
-      $ ./configure --with-prefix=/usr/local/cdsware-demo \
+      $ ./configure --prefix=/usr/local/cdsware-demo \
                     --with-webdir=/var/www/DEMO \
                     --with-weburl=http://webserver.domain.com/DEMO \
                     --with-dbhost=sqlserver.domain.com \
@@ -154,7 +154,7 @@ Contents
    
           Go to the source directory.
 
-      $ ./configure --with-prefix=/usr/local/cdsware-demo \
+      $ ./configure --prefix=/usr/local/cdsware-demo \
                     --with-webdir=/var/www/DEMO \
                     --with-weburl=http://webserver.domain.com/DEMO \
                     --with-dbhost=sqlserver.domain.com \
@@ -163,7 +163,7 @@ Contents
                     --with-dbpass=myp1ss 
 
           Configure essential CDSware parameters, such as the generic 
-          installation directory (--with-prefix), the home directory
+          installation directory (--prefix), the home directory
           for Web scripts and documents (--with-webdir, must be inside
           Apache htdocs path) and the corresponding URL for the
           CDSware home web directory (--with-weburl); finally, we
