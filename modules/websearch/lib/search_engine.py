@@ -1835,6 +1835,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', decompress=zli
                     req.write('\n')
         else:
             # we are doing HTML output:
+            req.write("""<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
             if format != "hb":
                 # deduce url without 'of' argument:
                 url_args = re.sub(r'(^|\&)of=.*?(\&|$)',r'\1',req.args)
@@ -1851,12 +1852,16 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', decompress=zli
                     req.write(print_record(recIDs[irec], format, ot))
                     req.write("<p><p>")
             else:                
-                req.write("\n<ol start=\"%d\">" % jrec)            
+                req.write("\n<table>")            
                 for irec in range(irec_max,irec_min,-1):
-                    req.write("\n<li>")
+                    req.write("""\n<tr><td valign="top"><input name="recid" type="checkbox" value="%s"></td>""" % recIDs[irec])
+                    req.write("""<td valign="top" align="right">%d.</td><td valign="top">""" % (jrec+irec_max-irec))
                     req.write(print_record(recIDs[irec], format, ot))
-                    req.write("<p>")
-                req.write("\n</ol>")
+                    req.write("</td></tr>")
+                req.write("\n</table>")
+            #req.write("""<div align="right"><input type="submit" name="action" value="ADD TO BASKET"></div>""")
+            req.write("""<br><input type="submit" name="action" value="ADD TO BASKET">""")
+            req.write("""</form>""")
 
     else:        
         print_warning(req, 'Use different search terms.')        
@@ -2104,22 +2109,21 @@ def print_record(recID, format='hb', ot='', decompress=zlib.decompress):
             for idx in range(0,len(urls_u)):
                 out += """<br><small class="note"><a class="note" href="%s">%s</a></small>""" % (urls_u[idx], urls_u[idx])
 
-        # at the end of HTML mode, print "Detailed record" and "Mark record" functions:
+        # at the end of HTML mode, print the "Detailed record" functionality:
         if cfg_use_aleph_sysnos:
             alephsysnos = get_fieldvalues(recID, "909C0o")
             if len(alephsysnos)>0:
                 alephsysno = alephsysnos[0]
                 out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?sysnb=%s">Detailed record</a></span>""" \
                        % (weburl, alephsysno)
-                #out += """<span class="moreinfo"> - <input name="mark[]" type="checkbox" value="%s"> Mark record</span>""" % alephsysno
             else:
                 out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?id=%s">Detailed record</a></span>""" \
                        % (weburl, recID)
-                #out += """<span class="moreinfo"> - <input name="mark[]" type="checkbox" value="%s"> Mark record</span>""" % recID
         else:
             out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?id=%s">Detailed record</a></span>""" \
                    % (weburl, recID)
-            #out += """<span class="moreinfo"> - <input name="mark[]" type="checkbox" value="%s"> Mark record</span>""" % recID
+        # ...and the "Mark record" functionality:
+        #out += """<span class="moreinfo"> - <input name="recid" type="checkbox" value="%s"> Mark record</span>""" % recID
 
     # print record closing tags, if needed:
     if format == "marcxml" or format == "oai_dc":
@@ -2176,6 +2180,45 @@ def log_query_info(action, p, f, colls, nb_records_found_total=-1):
         pass
     return
 
+def wash_url_argument(var, new_type):
+    """Wash list argument into 'new_type', that can be 'list',
+       'str', or 'int'.  Useful for washing mod_python passed
+       arguments, that are all lists of strings (URL args may be
+       multiple), but we sometimes want only to take the first value,
+       and sometimes to represent it as string or numerical value."""
+    out = []
+    if new_type == 'list':  # return lst
+        if type(var) is list:
+            out = var
+        else:
+            out = [var]
+    elif new_type == 'str':  # return str
+        if type(var) is list:
+            try:
+                out = "%s" % var[0]
+            except:
+                out = ""
+        elif type(var) is str:
+            out = var
+        else:
+            out = "%s" % var
+    elif new_type == 'int': # return int
+        if type(var) is list:
+            try:
+                out = string.atoi(var[0])
+            except:
+                out = 0
+        elif type(var) is int:
+            pass
+        elif type(var) is str:
+            try:
+                out = string.atoi(var)
+            except:
+                out = 0
+        else:
+            out = 0
+    return out       
+
 ### CALLABLES
 
 def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
@@ -2183,23 +2226,44 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                            id="-1", idb="-1", sysnb="", search="SEARCH",
                            d1y="", d1m="", d1d="", d2y="", d2m="", d2d=""):
     """Perform search, without checking for authentication.  Return list of recIDs found, if of=id.  Otherwise create web page."""    
-    # wash passed numerical arguments:
-    try:
-        id = string.atoi(id)
-        idb = string.atoi(idb)
-    except:
-        id = cfg_max_recID + 1
-        idb = cfg_max_recID + 1
-    sc = string.atoi(sc)
-    jrec = string.atoi(jrec)
-    rg = string.atoi(rg)
-    as = string.atoi(as)
-    # wash dates:
-    day1, day2 = wash_dates(d1y, d1m, d1d, d2y, d2m, d2d)    
-    if type(of) is list:
-        of = of[0]
+    # wash all passed arguments:
+    cc = wash_url_argument(cc, 'str')
+    p = wash_url_argument(p, 'str')
+    f = wash_url_argument(f, 'str')
+    rg = wash_url_argument(rg, 'int')
+    sf = wash_url_argument(sf, 'str')
+    so = wash_url_argument(so, 'str')
+    sp = wash_url_argument(sp, 'string')
+    of = wash_url_argument(of, 'str')
     if type(ot) is list:
         ot = string.join(ot,",")
+    ot = wash_url_argument(ot, 'str')
+    as = wash_url_argument(as, 'int')
+    p1 = wash_url_argument(p1, 'str')
+    f1 = wash_url_argument(f1, 'str')
+    m1 = wash_url_argument(m1, 'str')
+    op1 = wash_url_argument(op1, 'str')
+    p2 = wash_url_argument(p2, 'str')
+    f2 = wash_url_argument(f2, 'str')
+    m2 = wash_url_argument(m2, 'str')
+    op2 = wash_url_argument(op2, 'str')
+    p3 = wash_url_argument(p3, 'str')
+    f3 = wash_url_argument(f3, 'str')
+    m3 = wash_url_argument(m3, 'str')
+    sc = wash_url_argument(sc, 'int')
+    jrec = wash_url_argument(jrec, 'int')
+    id = wash_url_argument(id, 'int')
+    idb = wash_url_argument(idb, 'int')
+    sysnb = wash_url_argument(sysnb, 'int')
+    search = wash_url_argument(search, 'str')
+    d1y = wash_url_argument(d1y, 'str')
+    d1m = wash_url_argument(d1m, 'str')
+    d1d = wash_url_argument(d1d, 'str')
+    d2y = wash_url_argument(d2y, 'str')
+    d2m = wash_url_argument(d2m, 'str')
+    d2d = wash_url_argument(d2d, 'str')
+    day1, day2 = wash_dates(d1y, d1m, d1d, d2y, d2m, d2d)
+    # start output
     if of.startswith('x'):
         # we are doing XML output:
         req.content_type = "text/xml"
@@ -2492,4 +2556,5 @@ def perform_request_log(req, date=""):
 #print log(sys.stdin)
 #print search_in_bibrec('2002-12-01','2002-12-12')
 #print wash_dates('1980', '', '28', '2003','02','')
+#print type(wash_url_argument("-1",'int'))
 </protect>
