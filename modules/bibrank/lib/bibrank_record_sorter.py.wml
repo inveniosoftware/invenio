@@ -194,10 +194,10 @@ def get_config(rnkMETHOD): #needs some work
         rnkWORD_table = methods[rnkMETHOD]["rnkWORD_table"]
         try:
             if methods[rnkMETHOD].has_key("stem_lang"):
-                stemmer = Stemmer.Stemmer(languages[[methods[rnkMETHOD]["stem_lang"]]])
-            else:
+                stemmer = Stemmer.Stemmer(languages[methods[rnkMETHOD]["stem_lang"]])
+            else: 
                 stemmer = None         
-        except Exception:
+        except Exception, e:
             stemmer = None
         if methods[rnkMETHOD].has_key("stopword"):
             stopwords = get_stopwords("%s" % methods[rnkMETHOD]["stopword"]) 
@@ -353,7 +353,7 @@ def find_similar(recID, lrecIDs, min_relevance=10,verbose=0):
             i = len(reclist) - 31
 
     if verbose == 9:
-        stat(reclist, col_size, query_terms_old)
+        stat(reclist, query_terms)
     return reclist[i + 1:len(reclist)]
 
 def rank_by_method(lwords, lrecIDs, min_relevance,rnkMETHOD,verbose=0):
@@ -398,9 +398,9 @@ def word_frequency(lwords, lrecIDs, min_relevance,verbose=0):
             for term in terms: 
                 if stemmer: # stem word
                     term = stemmer.stem(string.replace(term, ' ', ''))
-                if terms != term: #add if stemmed word is different than original word
+                if lwords_old[i] != term: #add if stemmed word is different than original word
 	            lwords.append(term)
- 
+
     (recdict, rec_termcount, lrecIDs_remove) = ({}, {}, {})
     #For each term, if accepted, get a list of the records using the term
     #calculate then relevance for each term before sorting the list of records
@@ -434,7 +434,9 @@ def word_frequency(lwords, lrecIDs, min_relevance,verbose=0):
         reclist = zip(lrecIDs, [0] * len(lrecIDs)) + reclist      #using 6mb
 
     if verbose == 9:
-        stat(reclist, query_terms, col_size, lwords)
+        print query_terms
+        print col_size
+        stat(reclist, query_terms)
     return reclist
 
 def calculate_record_relevance(term, invidx, lrecIDs, recdict, rec_termcount, lrecIDs_remove, verbose):
@@ -509,7 +511,7 @@ def sort_record_relevance(recdict, min_relevance,recID, verbose):
 
     return reclist
 
-def stat(reclist, col_size, lwords):
+def stat(reclist, lwords):
     """Shows some statistics about the searchresult."""
 
     if len(reclist) > 20:
