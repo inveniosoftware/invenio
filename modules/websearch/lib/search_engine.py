@@ -2332,6 +2332,8 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
                 tags.append("245__a")
     if verbose >= 3:
         print_warning(req, "Sorting by tags %s." % tags)
+        if sort_pattern:
+            print_warning(req, "Sorting preferentially by %s." % sort_pattern)
         
     ## check if we have sorting tag defined:
     if tags:
