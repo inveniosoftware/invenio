@@ -20,7 +20,7 @@
 #include "cdspage.wml" \
     title="CDSware Modules" \
     navbar_name="hacking-modules" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> " \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking Corner</a> " \
     navbar_select="hacking-modules" 
 
 <pre>

@@ -18,12 +18,15 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
-    title="Hacking CDSware" \
+    title="Hacking Corner" \
     navbar_name="hacking" \
     navtrail_previous_links="" \
     navbar_select="hacking"
 
-Welcome to the CDSware Developer's corner.  Today's menu:
+Welcome to the CDSware developers' corner.  Before diving into the
+source, make sure you don't miss our <a
+href="<WEBURL>/help/">user-level</a> and <a
+href="<WEBURL>/admin/">admin-level</a> documentation as well.  And now, back to the source, and happy hacking!
 
 <h2>General information, coding practices</h2>
 
@@ -31,17 +34,13 @@ Welcome to the CDSware Developer's corner.  Today's menu:
 <dl>
 
 <dt><a href="modules.html">CDSware Modules</a>
-<dd>This page summarizes various CDSware modules and their relationship.
+<dd>Presenting a summary of various CDSware modules and their relationships.
 
 <dt><a href="concepts.html">CDSware Common Concepts</a>
-<dd>This page summarizes a common terms you will encounter here and there.
+<dd>Summarizing common terms you will encounter here and there.
 
 <dt><a href="style.html">CDSware Coding Style</a>
-<dd>This page summarizes a policy we try to follow, for good or bad.
-
-<dt><a href="<WEBURL>/admin/howto/">CDSware HOWTOs</a> <dd>Not
-directly related to hacking, strictly speaking, but contains some
-useful information on MARC-21 usage inside CDSware, for example.
+<dd>A policy we try to follow, for good or bad.
 
 </dl>
 </blockquote>
@@ -57,5 +56,3 @@ internals.
 
 </dl>
 </blockquote>
-
-Happy hacking!
