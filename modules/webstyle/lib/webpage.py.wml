@@ -108,14 +108,15 @@ def create_navtrail(title,
             out += title
     return prolog + out + epilog
 
-def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagerightstripeadd="", cdspageheaderadd="", cdspagebodyadd="", cdspagefooteradd=""):
+def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagerightstripeadd="", cdspageheaderadd="", cdspagebodyadd="", cdspagefooteradd="", lastupdated=""):
     """page(): display the cds page
         input: title of the page;
                body of the page in html format;
                description goes to the metadata in the header of the HTML page
                keywords goes to the metadata in the header of the html page
                cdspageheaderadd is a message to be displayed just under the page header
-               cdspagefooteradd is a message to be dusplayed on the top of the page footer
+               cdspagefooteradd is a message to be displayed on the top of the page footer
+               lastupdated is a text containing the info on last update (optional)
        output: the final cds page with header, footer, etc.
     """
     out = page_template_header % (title, description, keywords, cdspageheader, cdspageheaderadd)
@@ -123,18 +124,24 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspageri
     out = re.sub("<!--USERINFOBOX-->", create_user_infobox(uid), out)
     out += page_template_body % (cdspagebodyadd, title, body, cdspagerightstripeadd)
     out += page_template_footer % (cdspagefooteradd, cdspagefooter)
+    if lastupdated:
+        out = re.sub("<!--LASTUPDATED-->", "Last updated " + lastupdated, out)
     return out
 
 def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspageheaderadd=""):
-    """Return just the beginning of page()."""
+    """Return just the beginning of page(), with full headers.
+       Suitable for the search results page and any long-taking scripts."""
     out = page_template_header % (title, description, keywords, cdspageheader, cdspageheaderadd)
     out = re.sub("<!--NAVTRAILBOX-->", create_navtrail(title, navtrail), out)
     out = re.sub("<!--USERINFOBOX-->", create_user_infobox(uid), out)
     return out
 
-def pagefooteronly(cdspagefooteradd=""):
-    """Return just the beginning of page()."""
+def pagefooteronly(cdspagefooteradd="", lastupdated=""):
+    """Return just the ending of page(), with full footer.
+       Suitable for the search results page and any long-taking scripts."""
     out = page_template_footer % (cdspagefooteradd, cdspagefooter)
+    if lastupdated:
+        out = re.sub("<!--LASTUPDATED-->", "Last updated " + lastupdated, out)
     return out
 
 def create_error_box(req, title="<strong>Internal Error:</strong>"):
