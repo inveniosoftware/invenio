@@ -57,7 +57,7 @@ from messages import *
 from search_engine_config import *
 from dbquery import run_sql
 try:
-    from webuser import getUid, create_user_infobox
+    from webuser import getUid
     from webpage import pageheaderonly, pagefooteronly, create_error_box
 except ImportError, e:
     pass # ignore user personalisation, needed e.g. for command-line
@@ -355,7 +355,7 @@ def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_
     return box
 
 def create_google_box(p, f, p1, p2, p3, ln=cdslang,
-                      prolog_start="""<table class="googlebox"><tr><th class="googleboxheader">""",
+                      prolog_start="""<table class="googlebox" align="right"><tr><th class="googleboxheader">""",
                       prolog_end="""</th></tr><tr><td class="googleboxbody">""",
                       separator= """<br>""",
                       epilog="""</td></tr></table>"""):
@@ -453,7 +453,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
           </tr> 
          </thead>
          <tbody>
-          <tr valign="bottom">
+          <tr valign="top">
             <td class="searchboxbody">%s</td>
             <td class="searchboxbody">%s</td>
             <td class="searchboxbody">%s</td>
@@ -498,7 +498,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
           </tr> 
          </thead>
          <tbody>
-          <tr valign="bottom">
+          <tr valign="top">
             <td class="searchboxbody">%s</td>
             <td class="searchboxbody">%s</td>
             <td class="searchboxbody">%s</td>
@@ -694,16 +694,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
     ## last but not least, print end of search box:
     out += """</form>"""
     ## now return the search box nicely framed with the google_box:
-    return """<table width="100%%" cellspacing="0" cellpadding="0" border="0">
-                <tr valign="top">
-                 <td>
-                   %s
-                 </td>
-                 <td class="pagestriperight">
-                  %s
-                 </td>
-                </tr>
-               </table>""" % (out, create_google_box(p, f, p1, p2, p3, ln))
+    return """%s%s""" % (create_google_box(p, f, p1, p2, p3, ln), out)
 
 def create_navtrail_links(cc=cdsname,
                           as=0,
@@ -2066,7 +2057,7 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=cdsname, nb_found
     if not middle_only:
         out += "\n<a name=\"%s\"></a>" \
               "\n<form action=\"%s/search.py\" method=\"get\">"\
-              "\n<table width=\"100%%\" class=\"searchresultsbox\"><tr><td class=\"searchresultsboxheader\" align=\"left\">" \
+              "\n<table class=\"searchresultsbox\"><tr><td class=\"searchresultsboxheader\" align=\"left\">" \
               "<strong><big>" \
               "<a href=\"%s/?c=%s&amp;as=%d&amp;ln=%s\">%s</a></big></strong></td>\n" % \
               (urllib.quote(collection), weburl, weburl, urllib.quote_plus(collection), as, ln, collection)
@@ -2169,7 +2160,7 @@ def print_results_overview(colls, results_final_nb_total, results_final_nb, cpu_
         # if one collection only, print nothing:
         return out
     # first find total number of hits:
-    out += "<p><table class=\"searchresultsbox\" width=\"100%%\">" \
+    out += "<p><table class=\"searchresultsbox\">" \
            "<thead><tr><th class=\"searchresultsboxheader\">%s</th></tr></thead>" % \
              (msg_results_overview_found_x_records_in_y_seconds[ln] % (nice_number(results_final_nb_total), cpu_time))
     # then print hits per collection:
@@ -2450,6 +2441,10 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
 
         out += "        <date>%s</date>\n" % get_creation_date(recID)
         out += "    </dc>\n"                    
+
+    elif format.startswith("x_"):
+        # underscore means that XML formats should be called on-the-fly; suitable for testing formats
+        out += call_bibformat(recID, format)
 
     elif str(format[0:3]).isdigit():
         # user has asked to print some fields only
