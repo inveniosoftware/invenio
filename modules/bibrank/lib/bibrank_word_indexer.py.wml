@@ -511,7 +511,7 @@ class WordTable:
                 write_message("The word '%s' does not exist in the word file."\
                               % word)
 
-    def update_last_updated(self, starting_time=None):
+    def update_last_updated(self, rnkMETHOD, starting_time=None):
         """Update last_updated column of the index table in the database.
         Puts starting time there so that if the task was interrupted for record download,
         the records will be reindexed next time."""
@@ -519,8 +519,8 @@ class WordTable:
             return None
         if options["verbose"] >= 9:
             write_message("updating last_updated to %s...", starting_time)            
-        return run_sql("UPDATE idxINDEX SET last_updated=%s WHERE id=%s",
-                       (starting_time, self.tablename[len("idxWORD"):-1],))
+        return run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s",
+                       (starting_time, rnkMETHOD,))
 
     def add_recIDs(self, recIDs):
         """Fetches records which id in the recIDs range list and adds
@@ -763,7 +763,7 @@ class WordTable:
                 (self.tablename, low, high))
 
     def report_on_table_consistency(self):
-        """Check reverse words index tables (e.g. idxWORD01R) for
+        """Check reverse words index tables (e.g. rnkWORD01R) for
         interesting states such as 'TEMPORARY' state.
         Prints small report (no of words, no of bad words).
         """
@@ -889,7 +889,7 @@ class WordTable:
         raise StandardError
 
     def fix_recID_range(self, low, high):
-        """Try to fix reverse index database consistency (e.g. table idxWORD01R) in the low,high doc-id range.
+        """Try to fix reverse index database consistency (e.g. table rnkWORD01R) in the low,high doc-id range.
 
         Possible states for a recID follow:
         CUR TMP FUT: very bad things have happened: warn!
@@ -1009,24 +1009,24 @@ def word_index(row, run):
 
     options["run"] = []
     options["run"].append(run)
-    for key in options["run"]:
+    for rnkMETHOD in options["run"]:
         method_starting_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        write_message("Running rank method: %s" % getName(key))
+        write_message("Running rank method: %s" % getName(rnkMETHOD))
         try:
             if options["verbose"] >= 9:
                 write_message("Getting configuration from file: %s" % file)
-            file = etcdir + "/bibrank/" + key + ".cfg"
+            file = etcdir + "/bibrank/" + rnkMETHOD + ".cfg"
             config = ConfigParser.ConfigParser()
             config.readfp(open(file))
         except StandardError, e:
             write_message("Cannot find configurationfile: %s" % file, sys.stderr)
             raise StandardError
 
-        options["current_run"] = key
+        options["current_run"] = rnkMETHOD
         options["modified_words"] = {}
         options["table"] = config.get(config.get("rank_method", "function"), "table")
         (stopwords, tags) = get_tags(config) #get the tags to include
-        options["validset"] = get_valid_range(key) #get the records from the collections the method is enabled for
+        options["validset"] = get_valid_range(rnkMETHOD) #get the records from the collections the method is enabled for
 
         wordTable = WordTable(options["table"], tags)
         wordTable.report_on_table_consistency()
@@ -1057,12 +1057,11 @@ def word_index(row, run):
                     wordTable.add_recIDs(recIDs_range)
                 elif options["last_updated"]:
                     wordTable.add_date("")
+                    wordTable.update_last_updated(rnkMETHOD, method_starting_time)
                 else:
                     wordTable.add_recIDs([[0,cfg_max_recID]])
                     #wordTable.add_date(options["modified"])
                     # only update last_updated if run via automatic mode:
-                    #wordTable.update_last_updated(task_starting_time)
-                
             elif options["cmd"] == "repair":
                 wordTable.repair()
                 check_rnkWORD(options["table"])
@@ -1076,7 +1075,6 @@ def word_index(row, run):
                      wordTable.tablename, sys.stderr)
                 raise StandardError
             update_rnkWORD(options["table"], options["modified_words"])
-            run_sql("UPDATE rnkMETHOD SET last_updated='%s' WHERE name='%s'" % (method_starting_time, key))
         except StandardError, e:
             write_message("Exception caught: %s" % e, sys.stderr)
             if options["verbose"] >= 9:        
@@ -1127,17 +1125,17 @@ def get_tags(config):
 
     return (stopwords, tags)
 
-def get_valid_range(key):
+def get_valid_range(rnkMETHOD):
     """Returns which records are valid for this rank method, according to which collections it is enabled for."""
 
     #if options["verbose"] >=9:
     #    write_message("Getting records from collections enabled for rank method.")
-    #res = run_sql("SELECT collection.name FROM collection,collection_rnkMETHOD,rnkMETHOD WHERE collection.id=id_collection and id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" %  key)
+    #res = run_sql("SELECT collection.name FROM collection,collection_rnkMETHOD,rnkMETHOD WHERE collection.id=id_collection and id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" %  rnkMETHOD)
     #l_of_colls = []
     #for coll in res:
     #    l_of_colls.append(coll[0])
     #if len(l_of_colls) > 0:
-    #recIDs = perform_request_search(c="")
+    #    recIDs = perform_request_search(c=l_of_colls)
     #else:
     #    recIDs = []
     
