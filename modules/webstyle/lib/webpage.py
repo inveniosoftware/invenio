@@ -74,7 +74,7 @@ page_template_body = """
    <h1 class="headline">%s</h1>
    %s
   </td>
-  <td class="pagestriperight" width="<CDSPAGESTRIPEWIDTH>" align="right" valign="top">
+  <td class="pagestriperight" align="right" valign="top">
     <CDSPAGEBOXRIGHTTOP>
     %s
   </td>
@@ -110,7 +110,7 @@ def create_navtrail(title,
             out += title
     return prolog + out + epilog
 
-def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagerightstripeadd="", cdspageheaderadd="", cdspagebodyadd="", cdspagefooteradd="", lastupdated="", language=cdslang, urlargs=""):
+def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagerightstripeadd="", cdspageheaderadd="", cdspagebodyadd="", cdspagefooteradd="", lastupdated="", language=cdslang, urlargs="", verbose=1):
     """page(): display the cds page
         input: title of the page;
                body of the page in html format;
@@ -150,7 +150,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspageri
         out = re.sub(r"<!--LASTUPDATED-->", msg_last_updated[language] + " " + lastupdated, out)
     return out
 
-def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspageheaderadd="", language=cdslang, urlargs=""):
+def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspageheaderadd="", language=cdslang, urlargs="", verbose=1):
     """Return just the beginning of page(), with full headers.
        Suitable for the search results page and any long-taking scripts."""
     out = page_template_header % (title, description, keywords, cdspageheader, cdspageheaderadd)
@@ -169,7 +169,7 @@ def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspa
     out = re.sub(r"<!--LANGUAGESELECTIONBOX-->", create_language_selection_box(urlargs, language), out)
     return out
 
-def pagefooteronly(cdspagefooteradd="", lastupdated="", language=cdslang):
+def pagefooteronly(cdspagefooteradd="", lastupdated="", language=cdslang, verbose=1):
     """Return just the ending of page(), with full footer.
        Suitable for the search results page and any long-taking scripts."""
     out = page_template_footer % (cdspagefooteradd, cdspagefooter)
