@@ -344,7 +344,7 @@ def perform_addindex(ln=cdslang, idxNAME='', callback="yes", confirm=-1):
                               confirm=1)
     if idxNAME and confirm in ["1", 1]:
         res = add_idx(idxNAME)
-        output += write_outcome(res) + """<br>To configure this index, go <a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&ln=%s">here</a>.""" % (weburl, res[1], ln)
+        output += write_outcome(res) + """<br><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&ln=%s">Configure this index</a>.""" % (weburl, res[1], ln)
     elif confirm not in ["-1", -1]:
         output += """<b><span class="info">Please give the index a name.</span></b>
         """

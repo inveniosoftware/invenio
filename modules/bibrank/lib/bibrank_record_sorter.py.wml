@@ -615,7 +615,7 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
 
         for (term, table) in lwords:
             try:
-                res = run_sql("SELECT term FROM %s WHERE term like '%% %s' or term like '%s %%'" % ("idxfff", term, term))
+                res = run_sql("SELECT term FROM %s WHERE term like '%% %s' or term like '%s %%'" % (bigram_table, term, term))
             except:
                 res = []
             for bigram in res:

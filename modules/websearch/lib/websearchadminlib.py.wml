@@ -678,7 +678,7 @@ def perform_addportalbox(colID, ln, title='', body='', callback='yes', confirm=-
         res = add_pbx(title, body)
         output += write_outcome(res)
         if res[1] == 1:
-            output += """<b><span class="info">To add the portalbox to the collection, go <a href="addexistingportalbox?colID=%s&amp;ln=%s&amp;pbxID=%s#5">here</a>.</span></b>""" % (colID, ln, res[1])
+            output += """<b><span class="info"><a href="addexistingportalbox?colID=%s&amp;ln=%s&amp;pbxID=%s#5">Add portalbox to collection</a></span></b>""" % (colID, ln, res[1])
     elif confirm not in [-1, "-1"]:
         output  += """<b><span class="info">Body field must be filled.</span></b>
         """
