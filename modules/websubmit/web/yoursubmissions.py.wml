@@ -39,7 +39,7 @@ import MySQLdb
 import shutil
 import operator
 sys.path.append('%s' % pylibdir)
-from cdsware.config import cdsname,cdslang
+from cdsware.config import weburl,cdsname,cdslang
 from cdsware.dbquery import run_sql
 from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import *
@@ -176,12 +176,13 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
     t+="</table></td></tr></table></form>"
     
     return page(title="Your Submissions",
-                    body=t,
-                    description="",
-                    keywords="",
-                    uid=uid,
-                    language=ln,
-                    urlargs=req.args)
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                body=t,
+                description="",
+                keywords="",
+                uid=uid,
+                language=ln,
+                urlargs=req.args)
  
 def deleteSubmission(id, action, doctype, u_email):
     global storage
