@@ -106,7 +106,7 @@ class BibRecDocs:
         return bibdoc
         
     def addNewFile(self,fullpath,type="Main"):
-        filename = re.sub("\..*","",os.path.basename(fullpath))
+        filename = re.sub("\..*","",re.sub(r".*[\\/:]", "", fullpath))
         bibdoc = self.addBibDoc(type,filename)
         if bibdoc != None:
             bibdoc.addFilesNewVersion(files=[fullpath])
@@ -117,7 +117,7 @@ class BibRecDocs:
         bibdoc = self.getBibDoc(bibdocid)
         if bibdoc != None:
             bibdoc.addFilesNewVersion(files=[fullpath])
-            docname = re.sub("\..*","",os.path.basename(fullpath))
+            docname = re.sub("\..*","",re.sub(r".*[\\/:]", "", fullpath))
             if docname != bibdoc.getDocName():
                 while docname in self.getBibDocNames(bibdoc.getType()):
                     match = re.match("(.*_)([^_]*)",docname)
@@ -244,7 +244,7 @@ class BibDoc:
             myversion = str(int(latestVersion)+1)
         for file in files:
             if os.path.exists(file):
-                filename = os.path.basename(file)
+                filename = re.sub(r".*[\\/:]", "", file)
                 shutil.copy(file,"%s/%s;%s" % (self.basedir,filename,myversion))
         self.BuildFileList()
                
@@ -254,7 +254,7 @@ class BibDoc:
             version = self.getLatestVersion()
         for file in files:
             if os.path.exists(file):
-                filename = os.path.basename(file)
+                filename = re.sub(r".*[\\/:]", "", file)
                 shutil.copy(file,"%s/%s;%s" % (self.basedir,filename,version))
         self.BuildFileList()
                
@@ -271,7 +271,7 @@ class BibDoc:
         if existingIcon != None:
             existingIcon.delete()
         #then add the new one
-        filename = re.sub("\..*","",os.path.basename(file))
+        filename = re.sub("\..*","",re.sub(r".*[\\/:]", "", file))
         newicon = BibDoc(type='Icon',docname=filename)
         if newicon != None:
             newicon.addFilesNewVersion(files=[file])
