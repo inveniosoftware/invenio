@@ -65,7 +65,6 @@ def display(req, action="", title="Your Baskets", delete_alerts="", confirm_acti
                 """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,
                 "", "CDS Personalize, Display baskets", "CDS, personalize", create_user_infobox(uid), "")
 
-
 def display_public(req, id_basket=0, name="", action="", to_basket="", mark=[], newname=""):
     title = "Display basket"
     uid = getUid(req)    
@@ -73,3 +72,11 @@ def display_public(req, id_basket=0, name="", action="", to_basket="", mark=[], 
                 """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,
                 "", "CDS Personalize, Display baskets", "CDS, personalize", create_user_infobox(uid), "")
 
+def add(req, recid=[], bid=[], bname=[]):
+    """Add records to basket.  If bid isn't set, it'll ask user into which baskets to add them.
+    If bname is set, it'll create new basket with this name, and add records there rather than to bid."""
+    title = "Adding records to baskets"
+    uid = getUid(req)
+    return page(title, webbasket.perform_request_add(uid, recid, bid, bname),
+                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt; <a class="navtrail" href="%s/yourbaskets.py/display">Your Baskets</a> &gt;""" % (weburl, weburl),
+                "", "CDS Personalize, Add records to basket", "CDS, personalize", create_user_infobox(uid), "")

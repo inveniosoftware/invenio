@@ -61,7 +61,7 @@ imagesurl = "%s/img" % webdir
 #         idup, ordup are the identifier and the order of the item to be moved up
 #         iddown, orddown are the identifier and the order of the item to be moved down
 # output: list of baskets in formatted html+content of the selected basket
-def perform_display(uid, action, delete_alerts, confirm_action, id_basket, bname, newname, newbname, mark, to_basket, copy_move, idup, ordup, iddown, orddown):
+def perform_display(uid, action="", delete_alerts="", confirm_action="", id_basket=0, bname="", newname="", newbname="", mark=[], to_basket="", copy_move="", idup="", ordup="", iddown="", orddown=""):
 
     # set variables
     out = ""
@@ -78,7 +78,7 @@ def perform_display(uid, action, delete_alerts, confirm_action, id_basket, bname
                 msg = perform_delete(uid, delete_alerts, confirm_action, id_basket)
                 out += "%s<BR>" % msg
             except BasketException, e:
-                out += "The basket has not been deleted: %s"%e
+                out += "The basket has not been deleted: %s" % e
             show_actions = 1
         else:
             # goes to the form which deletes the selected basket
@@ -97,7 +97,7 @@ def perform_display(uid, action, delete_alerts, confirm_action, id_basket, bname
                     id_basket = perform_create_basket(uid, newname)
                     out += """The <I>private</I> basket <B>%s</B> has been created.<BR>\n""" % newname
                 except BasketException, e:
-                    out += """The basket has not been created: %s"""%e
+                    out += """The basket %s has not been created: %s""" % (newname, e)
             else:
                 out += """The basket has not been created: specify a basket name."""
         else:
@@ -567,7 +567,7 @@ def check_copy(idbask,i):
 # input: original basket identifier, list of selected items,
 #        destination basket identifier, copy or move option: "1"=copy, "2"=move
 #output: basket identifier
-def move_items(uid, id_basket, mark, to_basket, copy_move):
+def move_items(uid, id_basket, mark, to_basket, copy_move="1"):
     if type(mark)==list:
         selected_items=mark
     else:
@@ -704,5 +704,72 @@ def perform_display_public(uid, id_basket, basket_name, action, to_basket, mark,
              
     return out
 
+## --- new stuff starts here ---
 
+def perform_request_add(uid=-1, recid=[], bid=[], bname=[]):
+    """Add records recid to baskets bid for user uid. If bid isn't set, it'll ask user into which baskets to add them.
+    If bname is set, it'll create new basket with this name, and add records there rather than to bid."""
+    out = ""
+    recIDs = recid
+    bskIDs = bid
+    # sanity checking:
+    if recIDs == []:
+        return "<p>No records to add."
+    # do we have to create some baskets?
+    if bname:
+        try:
+            new_basket_ID = perform_create_basket(uid, bname)
+            bskIDs = [new_basket_ID]
+        except BasketException, e:
+            out += """The basket %s has not been created: %s""" % (bname, e)
+    if bskIDs == []:
+        # A - propose list of baskets to choose from
+        basket_id_name_list = get_list_of_user_baskets(uid)
+        if basket_id_name_list != []:
+            # there are some baskets; good
+            out += "<p>Please choose the basket you want to add %d records to:" % len(recIDs)
+            out += """<form action="%s/yourbaskets.py/add" method="post">""" % weburl
+            for recID in recIDs:
+                out += """<input type="hidden" name="recid" value="%s">""" % recID
+            out += """<select name="bid">"""
+            for basket_id, basket_name in get_list_of_user_baskets(uid):
+                out += """<option value="%s">%s""" % (basket_id, basket_name)
+            out += """</select>"""
+            out += """<input type="submit" name="action" value="ADD TO BASKET">"""
+            out += """</form>"""
+        else:
+            # user have to create a basket first
+            out += """<p>You don't have any baskets defined yet."""
+            out += """<form action="%s/yourbaskets.py/add" method="post">""" % weburl
+            for recID in recIDs:
+                out += """<input type="hidden" name="recid" value="%s">""" % recID
+            out += """New basket name: """
+            out += """<input type="text" size="30" name="bname" value="">"""
+            out += """<input type="submit" name="action" value="CREATE NEW BASKET">"""
+            out += """</form>"""            
+    else:
+        # B - we have baskets IDs; good
+        out += """<p><span class="info">Adding %s records to basket(s)...</span>""" % len(recIDs)
+        for bskID in bskIDs:
+            for recID in recIDs:
+                try:
+                    res = run_sql("INSERT INTO basket_record(id_basket,id_record,nb_order) VALUES (%s,%s,%s)",
+                                  (bskID,recID,'0'))
+                except:
+                    pass # maybe records already existed? (page reload)
+        out += """<span class="info">done.</span>"""
+        out += perform_display(uid=uid, id_basket=bskIDs[0])
+    return out 
+
+def get_list_of_user_baskets(uid):
+    """Return list of (basket_id, basket_name) for the given user."""
+    out = []
+    res = run_sql("SELECT b.id, b.name "\
+                  "FROM basket b, user_basket ub "\
+                  "WHERE ub.id_user=%s AND b.id=ub.id_basket "\
+                  "ORDER BY b.name ASC ",
+                  (uid,))
+    for row in res:
+        out.append([row[0], row[1]])
+    return out
 
