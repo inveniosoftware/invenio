@@ -136,7 +136,7 @@ def displayRefereesPage(doctype,warningText):
     </TD></TR></TABLE>
 <!-- End submissionuser rule -->
     <SMALL>
-    <INPUT TYPE=submit VALUE='FINISHED' onclick="document.forms[0].action='documentEDS.php';document.forms[0].submit();">
+    <INPUT class=\"adminbutton\" TYPE=submit VALUE='FINISHED' onclick="document.forms[0].action='documentEDS.php';document.forms[0].submit();">
     </SMALL>
     </FORM>"""
     return t
@@ -145,9 +145,10 @@ def displayUserTable(doctype):
     t=""
     # start displaying the table which will contain the list of email addresses.
     t+= """
-    <TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0 bgcolor=#eeeeee>
-    <TR><Td align=center colspan=2><small><b>Referees</b></small><hr></Td></TR>"""
-    
+    <table class="searchbox" summary="">
+        <tr>
+            <th class="portalboxheader" colspan="2">Referees</th>
+        </tr>"""
     roles = acc_getAllRoles()
     referees = {}
     for role in roles:
@@ -191,10 +192,12 @@ def displayAddUser(doctype):
     t=""
     # start displaying the table which will contain the add form
     t+= """
-    <TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0 BGCOLOR=#DDDDDD>
-    <TR><TD><small>
-    <CENTER><b>Add</b></CENTER>
-    <hr>
+    <table class="searchbox" summary="">
+        <tr>
+            <th class="portalboxheader">Add</th>
+        </tr>
+        <tr>
+            <td>
     User:<br>"""
     users = list_registered_users()
     if len(users) < 20:
@@ -212,7 +215,7 @@ def displayAddUser(doctype):
     for row in res:
         t+= "<OPTION value=%s>%s" % (row[1],row[0])
     t+= "</SELECT><br>"
-    t+= "<INPUT type=button onClick=\"document.forms[0].todo.value='adduser';document.forms[0].submit();\" VALUE=\"ADD\">"
+    t+= "<INPUT class=\"adminbutton\" type=button onClick=\"document.forms[0].todo.value='adduser';document.forms[0].submit();\" VALUE=\"ADD\">"
     t+= "</small></TD></TR></TABLE>"
     return t
 
