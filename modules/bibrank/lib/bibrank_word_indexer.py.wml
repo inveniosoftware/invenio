@@ -984,20 +984,6 @@ def word_index(row, run):
     task_id = row[0]
     task_proc = row[1]
     options = marshal.loads(row[6])
-    task_status = row[7]
-
-    # sanity check:
-    if task_proc != "runbibrank":
-        write_message("The task #%d does not seem to be a BibRank task." % task_id, sys.stderr)
-        return 0
-    if task_status != "WAITING":
-        write_message("The task #%d is %s.  I expected WAITING." % (task_id, task_status), sys.stderr)
-        return 0
-
-    # we can run the task now:
-    if options["verbose"]:
-        write_message("Task #%d started." % task_id)
-    task_update_status("RUNNING")
 
     # install signal handlers
     signal.signal(signal.SIGUSR1, task_sig_sleep)
@@ -1014,8 +1000,6 @@ def word_index(row, run):
         write_message("Running rank method: %s" % getName(rank_method_code))
         try:
             file = etcdir + "/bibrank/" + rank_method_code + ".cfg"
-            if options["verbose"] >= 9:
-                write_message("Getting configuration from file: %s" % file)
             config = ConfigParser.ConfigParser()
             config.readfp(open(file))
         except StandardError, e:
@@ -1079,14 +1063,10 @@ def word_index(row, run):
             write_message("Exception caught: %s" % e, sys.stderr)
             if options["verbose"] >= 9:        
                 traceback.print_tb(sys.exc_info()[2])
-            task_update_status("ERROR")
-            task_sig_stop_commands()
             sys.exit(1)
         wordTable.report_on_table_consistency()
     # We are done. State it in the database, close and quit
-    task_update_status("DONE")
-    if options["verbose"]:
-        write_message("Task #%d finished." % task_id)
+
     return 1
        
 def get_tags(config):

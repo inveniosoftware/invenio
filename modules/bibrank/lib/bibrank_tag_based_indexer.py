@@ -76,16 +76,11 @@ def single_tag_rank_method_exec(rank_method_code, name, config):
     """Creating the rank method data"""
     startCreate = time.time()
     rnkset = {}
-
-    if options["verbose"] >= 1:
-        write_message("Running: %s." % name)
-
     rnkset_old = fromDB(rank_method_code)
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     rnkset_new = single_tag_rank(config)
     rnkset = union_dicts(rnkset_old, rnkset_new)
     intoDB(rnkset, date, rank_method_code)
-    showtime((time.time() - startCreate))
 
 def single_tag_rank(config):
     """Connect the given tag with the data from the kb file given"""
@@ -93,12 +88,15 @@ def single_tag_rank(config):
         write_message("Loading knowledgebase file")
     kb_data = {}
     records = []
+
+    write_message("Reading knowledgebase file: %s" % config.get(config.get("rank_method", "function"), "kb_src"))
     input = open(config.get(config.get("rank_method", "function"), "kb_src"), 'r')
     data = input.readlines()
-        
     for line in data:
         if not line[0:1] == "#":
             kb_data[string.strip((string.split(string.strip(line),"---"))[0])] = (string.split(string.strip(line), "---"))[1]
+    write_message("Number of lines read from knowledgebase file: %s" % len(kb_data))
+
     tag = config.get(config.get("rank_method", "function"),"tag")
     tags = split(config.get(config.get("rank_method", "function"), "check_mandatory_tags"),",")
     if tags == ['']:
@@ -116,6 +114,7 @@ def single_tag_rank(config):
         if tags:
             recs = filter(lambda x: valid.contains(x[0]), recs)
         records = records + list(recs)
+        write_message("Number of records found with the necessary tags: %s" % len(records))
 
     records = filter(lambda x: options["validset"].contains(x[0]), records)
     rnkset = {}
@@ -127,7 +126,9 @@ def single_tag_rank(config):
                 if kb_data.has_key(rnkset[key]) and float(kb_data[value]) > float((rnkset[key])[1]):
                     rnkset[key] = (value, float(kb_data[value]))
         else:
-            rnkset[key] = (value, - 1.0)
+            rnkset[key] = (value, 0)
+
+    write_message("Number of records available in rank method: %s" % len(rnkset))
     return rnkset
 
 def get_lastupdated(rank_method_code):
@@ -375,18 +376,8 @@ def bibrank_engine(row, run):
     task_id = row[0]
     task_proc = row[1]
     options = loads(row[6])
-    task_status = row[7]
 
-    if task_proc != "runbibrank":
-        write_message("-The task #%d does not seem to be a BibRank task." % task_id, sys.stderr)
-        return 0
-    if task_status != "WAITING":
-        write_message("The task #%d is %s. I expected WAITING." % (task_id, task_status), sys.stderr)
-        return 0
-    if options["verbose"]:
-        write_message("Task #%d started." % task_id)
     task_starting_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    task_update_status("RUNNING")
     signal.signal(signal.SIGUSR1, task_sig_sleep)
     signal.signal(signal.SIGTERM, task_sig_stop)
     signal.signal(signal.SIGABRT, task_sig_suicide)
@@ -399,10 +390,10 @@ def bibrank_engine(row, run):
         options["run"].append(run)
         for rank_method_code in options["run"]:
             cfg_name = getName(rank_method_code)
-                
+            if options["verbose"] >= 0:
+                write_message("Running rank method: %s." % cfg_name)
+
             file = etcdir + "/bibrank/" + rank_method_code + ".cfg"
-            if options["verbose"] >= 9:
-                write_message("Getting configuration from file: %s" % file)
             config = ConfigParser.ConfigParser()
             try:
                 config.readfp(open(file))
@@ -453,14 +444,11 @@ def bibrank_engine(row, run):
                 raise StandardError
     except StandardError, e:
         write_message("\nException caught: %s" % e, sys.stderr)
-        traceback.print_tb(sys.exc_info()[2])
-        task_update_status("ERROR")
-        task_sig_stop_commands()
-        sys.exit(1)
+        if options["verbose"] >= 9:      
+            traceback.print_tb(sys.exc_info()[2])
+        raise StandardError
 
-    task_update_status("DONE")
     if options["verbose"]:
-        write_message("Task #%d finished." % task_id)
         showtime((time.time() - startCreate))
     return 1
 
@@ -498,7 +486,7 @@ def add_date(rank_method_code, date=""):
     list = create_range_list(res)
     if not list:
         if options["verbose"]:
-            write_message( "No new records added. '%s' is up to date" % getName(rank_method_code))
+            write_message("No new records added since last time method was run")
     return list
 
 def getName(rank_method_code, ln=cdslang, type='ln'):
@@ -568,22 +556,22 @@ def accessimpact_exec(rank_method_code, name, config):
     options["dbname"] = config.get("accessimpact", "dbname")
     options["dbuser"] = config.get("accessimpact", "dbuser")
     options["dbpass"] = config.get("accessimpact", "dbpass")
-    if options["verbose"] >= 1:
-        write_message("Running: %s." % name)
-    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
+    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     sysno_tag = config.get("accessimpact", "sysnr_tag")
     curr_repnr_tag = config.get("accessimpact", "curr_tag")
     old_repnr_tag = config.get("accessimpact", "old_tag")
-    if not options["modified"]:
-        if options["verbose"] >= 9:
-            write_message("Rebalancing")
+
+    impacc = {}
+    if 1: #not options["modified"]:
         imprec = run_sql2("SELECT imprecno,base,bsysno,bref FROM imprec")
         impacc = dict(run_sql2("SELECT imprecno,SUM(nbaccess) FROM impacc group BY imprecno"))
         cdssysno = run_sql("SELECT value,id_bibrec FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id" % (sysno_tag[0:2], sysno_tag[0:2], sysno_tag))
     else:
+        fromDB(starset)
         impacc = {}
- 
+        if options["verbose"] >= 9:
+            write_message("Updating records modified after: %s" % options["modified"])
         pre_impacc = dict(run_sql2("SELECT distinct imprecno,'' FROM impacc WHERE sdate >=%s", (options["modified"],)))
         imprec = []
         cdssysno = []
@@ -596,9 +584,11 @@ def accessimpact_exec(rank_method_code, name, config):
                 for key2 in data2:
                     imprec.append((key2, data[0][1], data[0][2], data[0][3]))
                 sysno = '0' * (9 - len(str(data[0][2]))) + str(data[0][2]) + data[0][1][0:3]
-                data = run_sql("SELECT value,id_bibrec FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id AND value='%s'" % sysno_tag[0:2], sysno_tag[0:2], sysno_tag, sysno)
+                data = run_sql("SELECT value,id_bibrec FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id AND value='%s'" % sysno_tag[0:2], sysno_tag
+[0:2], sysno_tag, sysno)
                 for key2,value in data:
                     cdssysno.append((key2, value))
+
     tempdict = {}
     for value,key in cdssysno:
         if not tempdict.has_key(value):
@@ -636,12 +626,12 @@ def accessimpact_exec(rank_method_code, name, config):
 
     if options["verbose"] >= 9:
         try:
-            write_message("Percentage match: %s%%,(%s/%s)" % (round((float(count) / float(count+notcount)) * 100, 3), notcount, count))
+            write_message("Percentage of accesses matched with a record: %s%%,(%s/%s)" % (round((float(count) / float(count+notcount)) * 100, 3), notcount, count))
+            write_message("Number of records available in rank method: %s" % len(tempdoc))
         except:
             print count, notcount
 
     intoDB(tempdoc, date, rank_method_code)
-    showtime((time.time() - startCreate))
 
 #------------------------------------------------------------
 #---------------BELOW IS OLD CODE, NOT WORKING ATM-----------

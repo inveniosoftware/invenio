@@ -221,9 +221,8 @@ def create_rnkmethod_cache():
         cfg_function = config.get("rank_method", "function")
         methods[rank_method_code] = {}
         methods[rank_method_code]["function"] = cfg_function
-        methods[rank_method_code]["prefix"] = config.get(cfg_function, "prefix")
-        methods[rank_method_code]["postfix"] = config.get(cfg_function, "postfix")
-
+        methods[rank_method_code]["prefix"] = config.get(cfg_function, "relevance_number_output_prologue")
+        methods[rank_method_code]["postfix"] = config.get(cfg_function, "relevance_number_output_epilogue")
         methods[rank_method_code]["chars_alphanumericseparators"] = r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
 
         i8n_names = run_sql("SELECT ln,value from rnkMETHODNAME,rnkMETHOD where id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" % (rank_method_code))
@@ -270,7 +269,7 @@ def is_method_valid(colID, rank_method_code):
                 colID = colID[0][0]
     return 0
 
-def get_bibrank_methods(collection,ln=cdslang):
+def get_bibrank_methods(collection, ln=cdslang):
     """Returns a list of rank methods and the name om them in the language defined by the ln parameter, if collection is given, only methods enabled for that collection is returned."""
 
     try:
@@ -285,7 +284,7 @@ def get_bibrank_methods(collection,ln=cdslang):
             if options.has_key(ln):
                 avail_methods.append((rank_method_code, options[ln]))
             else:
-                avail_methods.append((rank_method_code, "Not translated"))              
+                avail_methods.append((rank_method_code, rank_method_code))              
     return avail_methods
     
 def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=[], verbose=0):
@@ -408,9 +407,11 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
 
     global voutput
     rnkdict = run_sql("SELECT relevance_data FROM rnkMETHODDATA,rnkMETHOD where rnkMETHOD.id=id_rnkMETHOD and rnkMETHOD.name='%s'" % rank_method_code)
+
     if not rnkdict:
-        return (None, "Warning, An error has occured (5)", "", voutput)
- 
+        return (None, "Warning, Could not load ranking data for method.", "", voutput)
+    if verbose > 0:
+        voutput += "Ranking data loaded, size of structure: %s" % len(rnkdict)
     rnkdict = deserialize_via_marshal(rnkdict[0][0])
     lrecIDs = hitset.items()
     reclist = []
@@ -422,6 +423,10 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
             del rnkdict[recID]
         else:
             reclist_addend.append((recID, 0))
+
+    if verbose > 0:
+        voutput += "Number of records ranked: %S" % len(reclist)
+        voutput += "Number of records not ranked: %S" % len(reclist_addend)
 
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
     return (reclist_addend + reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], "")
