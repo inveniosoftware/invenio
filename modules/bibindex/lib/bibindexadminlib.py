@@ -72,8 +72,8 @@ def perform_index(ln=cdslang, mtype='', content=''):
     <tr>
     <td>0.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s">Show all</a></small></td>
     <td>1.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_showfields#1">Edit logical field</a></small></td>
-    <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_addfield#2">Add logical field</a></small></td>
-    <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_showdetails#2">Show field definitions</a></small></td>
+    <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_addfield#2">Add new logical field</a></small></td>
+    <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_showdetails#2">Logical fields overview</a></small></td>
 
     </tr>
     </table>
@@ -101,7 +101,7 @@ def perform_showfields(ln=cdslang, callback='yes', content='', confirm=-1):
     
     fld_dict = dict(get_current_name('', ln, get_fld_nametypes()[0][0], "field"))
     fld_type = get_fld_nametypes()
-    subtitle = """<a name="1"></a>1. Show logical fields&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (weburl)
+    subtitle = """<a name="1"></a>1. Edit logical field&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (weburl)
 
     fin_output = ''
 
@@ -126,12 +126,10 @@ def perform_showfields(ln=cdslang, callback='yes', content='', confirm=-1):
     else:
         output += """No logical fields exists"""
 
-    
-    fin_output += addadminbox('Edit logical field', [output])
     try:
-        body = [fin_output, extra]
+        body = [output, extra]
     except NameError:
-        body = [fin_output]
+        body = [output]
 
     if callback:
         return perform_index(ln, "perform_showfields", addadminbox(subtitle, body))
@@ -159,7 +157,7 @@ def perform_showfield(fldID, ln=cdslang, mtype='', content='', callback='yes', c
     <td>0.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/showfield?fldID=%s&amp;ln=%s">Show all</a></small></td>
     <td>1.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/showfield?fldID=%s&amp;ln=%s&amp;mtype=perform_modifyfield">Modify field code</a></small></td>
     <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/showfield?fldID=%s&amp;ln=%s&amp;mtype=perform_modifytranslations">Modify translations</a></small></td>
-    <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/showfield?fldID=%s&amp;ln=%s&amp;mtype=perform_showfieldtags">Show MARC tags</a></small></td>
+    <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/showfield?fldID=%s&amp;ln=%s&amp;mtype=perform_showfieldtags">Modify MARC tags</a></small></td>
     </tr><tr>
     <td>4.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/showfield?fldID=%s&amp;ln=%s&amp;mtype=perform_deletefield">Delete field</a></small></td>
     <td>5.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/showfield?fldID=%s&amp;ln=%s&amp;mtype=perform_showdetailsfield">Show field usage</a></small></td>
@@ -192,7 +190,7 @@ def perform_showfield(fldID, ln=cdslang, mtype='', content='', callback='yes', c
     elif mtype == "perform_showdetailsfield" or not mtype:
         fin_output += perform_showdetailsfield(fldID,ln, callback='')
         
-    return addadminbox("Overview of edit options for the logical field '%s'" % fld_dict[int(fldID)],  [fin_output])
+    return addadminbox("Edit logical field '%s'" % fld_dict[int(fldID)],  [fin_output])
         
 def perform_modifytranslations(fldID, ln=cdslang, sel_type='', trans=[], confirm=-1, callback='yes'):
     """Modify the translations of a field
@@ -458,7 +456,7 @@ def perform_deletefield(fldID, ln=cdslang, callback='yes', confirm=0):
 
 def perform_showdetails(ln=cdslang, callback='', confirm=0):
     
-    subtitle = """<a name="3"></a>3. Show field definitions / %s""" % time.strftime("%04Y-%02m-%02d %02H:%02M:%02S", time.localtime())
+    subtitle = """<a name="3"></a>3. Logical fields overview"""
     output = """<table cellpadding="3" border="1">"""
     output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>""" % ("Field", "MARC Tags", "Translations")
     query = "SELECT id,name FROM field"
@@ -590,9 +588,9 @@ def perform_showfieldtags(fldID, ln=cdslang, callback='yes', content='', confirm
     fld_type = get_fld_nametypes()
     fldID = int(fldID)
     
-    subtitle = """<a name="4"></a>3. Show MARC tags for the logical field '%s'&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (fld_dict[int(fldID)], weburl)
+    subtitle = """<a name="4"></a>3. Modify MARC tags for the logical field '%s'&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (fld_dict[int(fldID)], weburl)
     output = """<dl>
-     <dt>MARC tag actions:</dt>
+     <dt>Menu</dt>
      <dd><a href="%s/admin/bibindex/bibindexadmin.py/addtag?fldID=%s&amp;ln=%s#4.1">Add MARC tag</a></dd>
      <dd><a href="%s/admin/bibindex/bibindexadmin.py/deletetag?fldID=%s&amp;ln=%s#4.1">Delete unused MARC tags</a></dd>
     </dl>
