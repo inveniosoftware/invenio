@@ -474,12 +474,6 @@ it's hard to .  I'll rewrite the wildcard handling part in order to
 retain cases with <200 words, say, and then I'll pass you the full
 list.
 
-** WebSearch-016: webcoll can relax if nothing was updated
-
-WebColl can relax if no record was modified/added since the last run
-and if no collection definifion/options/portalboxes/etc were updated
-since the last run.
-
 ** WebSearch-017: clearer output messages
 Mon Jan 10 19:28:30 2005
 
