@@ -753,7 +753,7 @@ def crawl_KB(filename,value,mode):
                 code[0]        = string.lower(code[0])
                 if ((len(string.split(code[0],value_to_cmp)) > 1)or(len(string.split(value_to_cmp,code[0]))>1)or(code[0]=="_DEFAULT_")):
                     value = value.replace(code[0],code[1])
-                    return value
+#                    return value
 
             else:
                 if ((code[0] == value)or(code[0]=="_DEFAULT_")):
