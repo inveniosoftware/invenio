@@ -1,0 +1,118 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="CDSware Coding Style" \
+    navbar_name="hacking-coding-style" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> " \
+    navbar_select="hacking-coding-style" 
+
+
+<pre>
+CDSWARE CODING STYLE / $Date$
+
+A brief description of things we strive at, more or less unsuccessfully.
+
+1. Packaging  
+
+   We use the classical GNU Autoconf/Automake approach, for tutorial
+   see e.g. <a href="http://www.amath.washington.edu/~lf/tutorials/autoconf/tutorial_toc.html">Learning the GNU development tools</a> or the <a href="http://sources.redhat.com/autobook/autobook/autobook_toc.html">AutoBook</a>.
+
+2. Modules
+
+   CDSware started as a set of pretty independent modules developed by
+   independent people with independent styles.  This was even more
+   pronounced by the original use of many different languages
+   (e.g. Python, PHP, Perl).  Now the CDSware code base is striving to
+   use Python everywhere, except in speed-critical parts when a
+   compiled language such as Common Lisp may come to the rescue in the
+   near future.
+
+   When modifying an existing module, we propose to strictly continue
+   using whatever coding style the module was originally written into.
+   When writing new modules, we propose to stick to the
+   below-mentioned standards.
+
+   The code integration across modules is happening, but is slow.
+   Therefore, don't be surprised to see that there is a lot of room to
+   refactor.
+
+3. WML/ePerl/etc 
+
+   This is not so important, because not many lines-of-code were
+   written in WML/ePerl.  We prefer to loosely follow the GNU way, as
+   always.
+
+4. Python 
+
+   We aim at following recommendations from <a
+   href="http://www.python.org/peps/pep-0008.html">PEP 8</a>, although
+   the existing code surely do not fulfil them here and there.
+
+   The most easily notable exception from PEP 8 is perhaps the line
+   width, that usually exceeds 72 characters per line in our sources,
+   as we tend to use fullscreen editors.  The code indentation is done
+   via spaces only, please do not use tabs.  One tab counts as four
+   spaces.  Emacs users can look into our <a
+   href="cdsware.el">cdsware.el</a> for inspiration.
+
+   All the Python code should be extensively documented via
+   docstrings, so you can always try to run ``pydoc file.py'' to
+   peruse a module's documentation in one go.
+
+5. PHP 
+
+   We are moving slowly away out of PHP so that there may be several
+   practices in place with the PHP code present in CDSware.  Usually
+   this is consistent within modules but inconsistent across modules.
+   For example, some old code used Emacs' perl-mode, following
+   traditional K&R C style, while some other old code tried to stick
+   to <a href="http://pear.php.net/manual/en/standards.php">PEAR recommendations</a>.
+
+6. MySQL 
+
+   Table naming policy is, roughly and briefly:
+
+      - "foo": table names in lowercase, without prefix, used by me
+         for WebSearch
+     
+      - "foo_bar": underscores represent M:N relationship between
+        "foo" and "bar", to tie the two tables together
+     
+      - "bib*": many tables to hold metadata and relationships between
+         them
+     
+      - "bibwords*": many tables to hold words indexes
+     
+      - "collection*": many tables to describe collections and serach
+        interface pages
+     
+      - "user*" : many tables to describe personal features (baskets,
+        alerts)
+     
+      - "flx*": flx is the prefix used by FlexElink (also known as
+         BibFormat)
+     
+      - "sbm*": sbm is the prefix used by WebSubmit
+     
+      - "sch*": sch is the prefix used by BibSched
+     
+- end of file -
+
+</pre>

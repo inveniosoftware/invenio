@@ -1,0 +1,61 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="Hacking CDSware" \
+    navbar_name="hacking" \
+    navtrail_previous_links="" \
+    navbar_select="hacking"
+
+Welcome to the CDSware Developer's corner.  Today's menu:
+
+<h2>General information, coding practices</h2>
+
+<blockquote>
+<dl>
+
+<dt><a href="modules.html">CDSware Modules</a>
+<dd>This page summarizes various CDSware modules and their relationship.
+
+<dt><a href="concepts.html">CDSware Common Concepts</a>
+<dd>This page summarizes a common terms you will encounter here and there.
+
+<dt><a href="style.html">CDSware Coding Style</a>
+<dd>This page summarizes a policy we try to follow, for good or bad.
+
+<dt><a href="<WEBURL>/admin/howto/">CDSware HOWTOs</a> <dd>Not
+directly related to hacking, strictly speaking, but contains some
+useful information on MARC-21 usage inside CDSware, for example.
+
+</dl>
+</blockquote>
+
+<h2>Module-specific information</h2>
+
+<blockquote>
+<dl>
+
+<dt><a href="<WEBURL>/help/search/internals.html">WebSearch Internals</a>
+<dd>Describes information useful to understand the search process
+internals.
+
+</dl>
+</blockquote>
+
+Happy hacking!
