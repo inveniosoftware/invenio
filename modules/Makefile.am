@@ -17,6 +17,6 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = bibconvert bibharvest bibsched bibindex bibrank bibupload bibformat miscutil webstyle websession webhelp webbasket webalert websearch websubmit webaccess 
+SUBDIRS = bibconvert bibedit bibharvest bibsched bibindex bibrank bibupload bibformat miscutil webstyle websession webhelp webbasket webalert websearch websubmit webaccess 
 
 CLEANFILES = *~
