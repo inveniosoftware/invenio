@@ -139,9 +139,6 @@ class XMLSimpleRecSeparator {
       fclose($this->fh);
     }
 
-    // decode utf8 to iso-8859-1
-    $record = utf8_decode($record);
-    
     return $record;
   }
 }
