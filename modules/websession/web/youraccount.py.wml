@@ -175,10 +175,10 @@ def login(req,p_email=None,p_pw=None,action='login'):
            uid=webuser.update_Uid(req,p_email,p_pw)
            return display(req)	
        else:
-      	   if webuser.userNotExist(p_email,p_pw) or p_email=='':
-               mess ="Your are not logged into the system. User unknown."
+      	   if webuser.userNotExist(p_email,p_pw) or p_email=='' or p_email==' ':
+               mess ="Your are not logged into the system, because this user is unknown."
            else:
-               mess ="Your are not logged into the system. Wrong password."
+               mess ="Your are not logged into the system, because you have introduced a wrong password."
            act = "login"    
 	   return page(title="Login",
                        body=webaccount.perform_back(mess,act),

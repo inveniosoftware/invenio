@@ -175,7 +175,11 @@ def perform_ask():
 		 <td align=right><strong>Email address:</strong><br><small class=important>(mandatory)</small>
 		 </td>
                  <td><input type="text" size="25" name="p_email" value="">
-			<br><small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td><td></td></tr><tr><td align=right><strong>Password:</strong>	
+			<br><small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td>
+		 <td></td>
+	       </tr>
+	       <tr>
+		 <td align=right><strong>Password:</strong>	
 			<br><small class=quicknote>(optional)</small>	
 		</td>
 		<td align=left><input type="password" size="25" name="p_pw" value="">
@@ -191,7 +195,7 @@ def perform_ask():
 		 </td>
                 </tr>
               </table>
-              <p><strong>Note:</strong> It is not recommended to use valuable passwords as CERN AFS or NICE accounts with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you in the CERN Document Server personal services. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.
+              <p><strong>Note:</strong> It is not recommended to use valuable passwords as CERN AFS or NICE accounts with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you in the CERN Document Server personal services. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.esto es un 
              </form>
            """
     return text
@@ -201,8 +205,7 @@ def perform_ask():
 def perform_logout(req):
     out =""
     out+="""    
-            <p>You are not longer recognized.  If you wish you can login here <A href="./login">here</A>.
-            
+            You are not longer recognized.  If you wish you can login here <A href="./login">here</A>.
          """
     return out
 
@@ -211,13 +214,12 @@ def perform_lost():
     out =""
     out +="""
 	  <body>
-		<p><big><strong class=headline>Lost your password?</strong></big>
+		<big><strong class=headline>Lost your password?</strong></big>
 		<form  method="post" action="../youraccount.py/send_email">
-		<p>If you have lost your password string, please enter the email address of your cds.cern.ch account. 
+		 If you have lost your password string, please enter the email address of your cds.cern.ch account. 
 		 The lost password will be emailed to the owner of that account.
-
-		<table>			
-			<tr>
+		<table>		
+	    		<tr>
 				<td align=right><strong>Email address:</strong></td>
 				<td><input type="text" size="25" name="p_email" value=""><br><IMG src="%s/r.gif" alt="">&nbsp<small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td>
 				<td><input type="hidden" name="action" value="lost"></td>
@@ -236,12 +238,7 @@ def perform_lost():
 def perform_emailSent(email):
 
     out =""
-    out +="""
-	  <body>
-		  <p>Okay, password has been emailed to %s
-          </body>
-
-   	  """%email
+    out +="Okay, password has been emailed to %s"%email
     return out
 
 # peform_emailMessage : display a error message when the email introduced is not correct, and sugest to try again
