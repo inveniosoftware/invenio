@@ -195,13 +195,11 @@ def checkemail(email):
        
        checkemail(email) -> boolean
     """
-
-    if (string.find(email, "@") <= 0) or (string.find(email, " ") > 0) or not (email[-5:-4] == "." or email[-3:-2] == "." or email[-4:-3] == "."):
+    if (string.find(email, "@") <= 0) or (string.find(email, " ") > 0):
        return 0
     elif CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN:
         if not email.endswith(CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN):
-            return 0 
-        
+            return 0         
     return 1
 
 def getDataUid(req,uid):
