@@ -78,7 +78,7 @@ class MyFancyURLopener(urllib.FancyURLopener):
 #urllib._urlopener = MyFancyURLopener()
 
 def write_message(msg, stream=sys.stdout):
-    """Write message and flush output stream (may be sys.stdout or sys.stderr).  Useful for debugging stuff."""
+    """Write message and flush output stream (may be sys.stdout or sys.stderr)."""
     if stream == sys.stdout or stream == sys.stderr:
         stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
         stream.write("%s\n" % msg)
@@ -540,11 +540,11 @@ def get_date_range(var):
     "Returns the two dates contained as a low,high tuple"
     limits = string.split(var, ",")
     if len(limits)==1:
-        low = get_date(limits[0])
+        low = get_datetime(limits[0])
         return low,None
     if len(limits)==2:
-        low = get_date(limits[0])
-        high = get_date(limits[1])
+        low = get_datetime(limits[0])
+        high = get_datetime(limits[1])
         return low,high
 
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
@@ -601,15 +601,9 @@ def beautify_range_list(range_list):
                 
     return ret_list
 
-def serialize_via_numeric_array_dumps(arr):
-    return Numeric.dumps(arr)
-
-def serialize_via_numeric_array_compr(str):
-    return compress(str)
-
 def serialize_via_numeric_array(arr):
     """Serialize Numeric array into a compressed string."""
-    return serialize_via_numeric_array_compr(serialize_via_numeric_array_dumps(arr))
+    return compress(Numeric.dumps(arr))
 
 def deserialize_via_numeric_array(string):
     """Decompress and deserialize string into a Numeric array."""
@@ -1459,15 +1453,6 @@ def command_line():
 
     print "Task #%d was successfully scheduled for execution." % new_task_id
     return
-
-def write_message(msg, stream=sys.stdout):
-    """Prints message and flush output stream (may be sys.stdout or sys.stderr)."""
-    if stream == sys.stdout or stream == sys.stderr:
-        stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
-        stream.write("%s\n" % msg)
-        stream.flush()
-    else:
-        sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
 
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
