@@ -18,9 +18,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
-    title="CDSware Common Concepts" \
+    title="Common Concepts" \
     navbar_name="hacking-common-concepts" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking Corner</a> " \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> " \
     navbar_select="hacking-common-concepts" 
 
 
