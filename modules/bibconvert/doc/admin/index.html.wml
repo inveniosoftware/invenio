@@ -109,16 +109,12 @@ soon.</small>
 
 <blockquote>
 <pre>
-$ bibconvert -csample.cfg < sample.dat > /tmp/sample.xml
+$ bibconvert -b'&lt;collection>' -csample.cfg -e'&lt;/collection>' < sample.dat > /tmp/sample.xml
 <pre>
 </blockquote>
 
-and see the XML MARC output file.  
-
-<p>(You would then continue the upload procedure by calling successively
-<a href="../bibformat/">BibFormat</a>, <a
-href="../bibupload/">BibUpload</a>, and <a
-href="../bibwords/">BibWords</a>.)
+and see the XML MARC output file.  You would then continue the upload procedure by calling <a
+href="../bibupload/">BibUpload</a>.
 
 <p>Other useful BibConvert configuration examples:
 
