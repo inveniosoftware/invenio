@@ -339,7 +339,9 @@ class Collection:
         for as in range(0,2): # do both simple search and advanced search pages:
             body = ""
             body += """<form action="%s/search.py" method="get">""" % weburl
+            body += self.create_portalbox('te')
             body += "" + self.create_searchfor(as)
+            body += self.create_portalbox('np')
             body += """<table cellspacing="0" cellpadding="0" border="0">"""
             body += """<tr>"""
             body += """<td valign="top">""" + self.create_narrowsearch(as) + "</td>"
@@ -347,6 +349,7 @@ class Collection:
             if body_focuson:
                 body += """<td valign="top">""" + body_focuson + """</td>"""
             body += "</tr></table>"
+            body += self.create_portalbox('ne')
             body += "</form>"
             self.write_cache_file("body-as=%s" % as, body)
         ## third, write portalboxes:
@@ -389,18 +392,23 @@ class Collection:
                 " ORDER BY cp.score DESC" % (self.id, position)
         res = run_sql(query)
         for row in res:
-            out += """<table class="portalbox" width="100%%">        
-                       <thead>
-                        <tr>
-                         <th class="portalboxheader">%s</th>
-                        </tr> 
-                       </thead>
-                       <tbody>
-                        <tr>
-                         <td class="portalboxbody">%s</td>
-                        </tr> 
-                       </tbody>
-                      </table>""" % (row[0], row[1]) 
+            title, body = row[0], row[1]
+            if title:
+                out += """<table class="portalbox" width="100%%">        
+                           <thead>
+                            <tr>
+                             <th class="portalboxheader">%s</th>
+                            </tr> 
+                           </thead>
+                           <tbody>
+                            <tr>
+                             <td class="portalboxbody">%s</td>
+                            </tr> 
+                           </tbody>
+                          </table>""" % (title, body)
+            else:
+                # no title specified, so print body ``as is'' only:
+                out += body
         return out
 
     def create_narrowsearch(self, as=0, title="Narrow search:", type="r"):
