@@ -87,7 +87,7 @@ def perform_display_account(req,data,bask,aler,sear):
 	sear="No queries found"
     else:
  	user = data[0]
-        accBody ="""You are logged in as %s. You may want to a) <A href="../youraccount.py/logout">logout</A>; b) edit your <A href="../youraccount.py/set">email address or password.<BR><BR>
+        accBody ="""You are logged in as %s. You may want to a) <A href="../youraccount.py/logout">logout</A>; b) edit your <A href="../youraccount.py/set">email address or password</a>.<BR><BR>
 		 """%user			
     out =""
     out +=template_account("Your Account",accBody)
