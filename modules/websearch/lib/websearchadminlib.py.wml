@@ -264,7 +264,7 @@ def perform_addcollectiontotree(colID, ln=cdslang, add_dad='', add_son='', rtype
                 """
             elif check_col(add_dad, add_son):
                 if add_col_dad_son(add_dad, add_son, rtype):
-                    output2 += """<b><span class="info">Added the collection '%s' as a %s subcollection of '%s'.</span></b><br><br>
+                    output2 += """<b><span class="info">Added the collection '%s' as a %s subcollection of '%s'.<br> It will appear on your website after the next webcoll run.  You can   either run it manually or wait until bibsched does it for you.</span></b><br><br>
                     """ % (col_dict[add_son], (rtype=="r" and 'regular' or 'virtual'), col_dict[add_dad])
                 else:
                     output2 += """<b><span class="info">Could not add the collection '%s' as a %s subcollection of '%s'.</span></b><br><br>
@@ -281,18 +281,18 @@ def perform_addcollectiontotree(colID, ln=cdslang, add_dad='', add_son='', rtype
     col_list.sort(compare_on_val)
     
     text = """
-    <span class="adminlabel">Attach which</span>
+    <span class="adminlabel">Add which</span>
     <select name="add_son" class="admin_w200">
-    <option value="">- select son -</option>
+    <option value="">- select collection -</option>
     """
     for (id, name) in col_list:
         if id != colID:
             text += """<option value="%s" %s>%s</option>""" % (id, str(id)==add_son and 'selected="selected"' or '', name)
     text += """
     </select><br>
-    <span class="adminlabel">Attach to</span>
+    <span class="adminlabel">Add to</span>
     <select name="add_dad" class="admin_w200">
-    <option value="">- select father -</option>
+    <option value="">- select parent collection -</option>
     """
     
     for (id, name) in col_list:
