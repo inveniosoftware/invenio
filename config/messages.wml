@@ -742,21 +742,21 @@
 
 # FIXME
 <define-tag MSG_RANK_BY whitespace=delete>
-  <en>Rank by:</en>
-  <fr>Ranger par:</fr>
-  <de>Ranking:</de>
-  <es>Rank by:</es>
-  <pt>Ordenado por:</pt>
-  <it>Ordinare per:</it>
-  <ru>Упорядочить по:</ru>
-  <sk>Zoradiť podľa:</sk>
-  <cz>Seřadit podle:</cz>
-  <no>Ranger etter:</no>
-  <se>Rangordna efter:</se>
+  <en>rank by</en>
+  <fr>ranger par</fr>
+  <de>ranking</de>
+  <es>rank by</es>
+  <pt>ordenado por</pt>
+  <it>ordinare per</it>
+  <ru>упорядочить по</ru>
+  <sk>zoradiť podľa</sk>
+  <cz>seřadit podle</cz>
+  <no>ranger etter</no>
+  <se>rangordna efter</se>
 </define-tag>
 
 <define-tag MSG_DISPLAY_RESULTS whitespace=delete>
-  <en>Display results</en>
+  <en>Display results:</en>
   <fr>Afficher:</fr>
   <de>Ergebnisse darstellen:</de>
   <es>Mostrar resultados:</es>
@@ -861,8 +861,8 @@
   <pt>Registro detalhado</pt>
   <it>Registrazione dettagliata</it>
   <ru>Подробная запись</ru>
-  <sk>Podrobný záznam</sk>
-  <cz>Podrobný záznam</cz>
+  <sk>Úplný záznam</sk>
+  <cz>Úplný záznam</cz>
   <no>Full post</no>
   <se>Fullständig post</se>
 </define-tag>
@@ -1442,7 +1442,7 @@
   </se>
 </define-tag>
 
-<define-tag MSG_NO_PUBLIC_HITS whitespace=delete>
+<define-tag MSG_NO_PUBLIC_HITS>
   <en>
     No public collection matched your query.  If you were looking for
     a non-public document, please choose the desired restricted
@@ -1583,50 +1583,50 @@
   </se>
 </define-tag>
 
+# FIXME
 <define-tag MSG_NO_BOOLEAN_HITS>
   <en>
-    All search terms matched but boolean query returned no hits.
+    Boolean query returned no hits.
     Please combine your search terms differently.
   </en>
   <fr>
-    Tous les termes de recherche ont été trouvés mais la requête booléenne
-    n'a rien donné.  Essayez de combiner ces termes différamment.
+    La requête booléenne n'a rien donné.
+    Essayez de combiner les termes de recherche différemment.
   </fr>
   <de>
-    Alle Suchbegriffe gefunden, aber die boolsche Suchfrage hat keine Datensätze gefunden.
+    Die boolsche Suchfrage hat keine Datensätze gefunden.
     Bitte kombinieren Sie Ihre Suchfrage anders.
   </de>
   <es>
-    Todos los términos de la búsqueda han sido encontrados pero la combinación
-    booleana no ha dado resultados.  Por favor combien
-    los términos de búsqueda de otra manera.
+    La combinación booleana no ha dado resultados.
+    Por favor combien los términos de búsqueda de otra manera.
   </es>
   <pt>
-    Foram encontrados resultados para todos os termos de busca 
-    mas a consulta booleana não gerou resultados. Por favor 
-    combine seus termos de outra maneira.
+    A consulta booleana não gerou resultados.
+    Por favor combine seus termos de outra maneira.
   </pt>
   <it>
-    Tutti i termini di ricerca sono stati trovati ma la ricerca booleana non ha dato risultati. Vi preghiamo di combinare differentemente i termini.
+    La ricerca booleana non ha dato risultati.
+    Vi preghiamo di combinare differentemente i termini.
   </it>
   <ru>
-    Все термины поиска найдены, но болеанный запрос не дал никакого результата.
+    Болеанный запрос не дал никакого результата.
     Пожалуйста сформулируйте ваш запрос иначе.
   </ru>
   <sk>
-    Všetky termíny hľadania boli nájdené, ale boolean otázka nevrátila
-    žiaden výsledok.  Skúste skombinovať dané termíny inakšie.
+    Booleovská otázka nevrátila žiaden výsledok.
+    Skúste skombinovať dané termíny inakšie.
   </sk>
   <cz>
-    Všechny vyhledávací termíny byly nalezeny, avšak booleovský dotaz
-    nevrátil žádný výsledek. zkuste zkombinovat dané termíny jiným způsobem.
+    Booleovský dotaz nevrátil žádný výsledek.
+    Zkuste zkombinovat dané termíny jiným způsobem.
   </cz>
   <no>
-    Alle søketermer traff men ditt bolske søk returnerte ingen treff.
+    Bolske søk returnerte ingen treff.
     Vennligst kombiner søketermenene dine annerledes.
   </no>
   <se>
-    Samtliga sökternmer hittades, men den booleska sökningen returnerade inga poster.
+    Den booleska sökningen returnerade inga poster.
     Kombinera dina söktermer annorlunda.
   </se>
 </define-tag>
@@ -1940,6 +1940,36 @@
   <cz>Záznam vytvořen %s, modifikován %s</cz>
   <no>Posten vart laget %s, sist endret %s</no>
   <se>Record created %s, last modified %s</se>
+</define-tag>
+
+# FIXME
+<define-tag MSG_SIMILAR_RECORDS whitespace=delete>
+  <en>Similar records</en>
+  <fr>Notices similaires</fr>
+  <de>Similar records</de>
+  <es>Similar records</es>
+  <pt>Similar records</pt>
+  <it>Similar records</it>
+  <ru>Similar records</ru>
+  <sk>Podobné záznamy</sk>
+  <cz>Podobné záznamy</cz>
+  <no>Lignende sider</no>
+  <se>Similar records</se>
+</define-tag>
+
+# FIXME
+<define-tag MSG_WORD_SIMILARITY whitespace=delete>
+  <en>word similarity</en>
+  <fr>similarité de mots</fr>
+  <de>word similarity</de>
+  <es>word similarity</es>
+  <pt>word similarity</pt>
+  <it>word similarity</it>
+  <ru>word similarity</ru>
+  <sk>podobnosť slov</sk>
+  <cz>podobnost slov</cz>
+  <no></no>
+  <se>word similarity</se>
 </define-tag>
 
 ## end of file
