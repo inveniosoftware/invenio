@@ -53,29 +53,6 @@
 ;; Pythonic things:
 (autoload 'python-mode "python-mode" "Python editing mode." t)
 (setq interpreter-mode-alist (cons '("python" . python-mode) interpreter-mode-alist))
-; add customization by <gb@cs.unc.edu>
-(add-hook 'python-mode-hook 'my-python-hook)
-; this gets called by outline to deteremine the level. Just use the length of the whitespace
-(defun py-outline-level ()
-  (let (buffer-invisibility-spec)
-    (save-excursion
-      (skip-chars-forward "\t ")
-      (current-column))))
-; this get called after python mode is enabled
-(defun my-python-hook ()
-  ; outline uses this regexp to find headers. I match lines with no indent and indented "class"
-  ; and "def" lines.
-  (setq outline-regexp "[^ \t]\\|[ \t]*\\(def\\|class\\) ")
-  ; enable our level computation
-  (setq outline-level 'py-outline-level)
-  ; do not use their \C-c@ prefix, too hard to type. Note this overides some python mode bindings
-  (setq outline-minor-mode-prefix "\C-c")
-  ; turn on outline mode
-  (outline-minor-mode t)
-  ; initially hide all but the headers
-  (hide-body)
-  ; make paren matches visible
-  (show-paren-mode 1))              
 
 ;; choosing version control software:
 (setq vc-default-back-end 'CVS)
