@@ -33,7 +33,7 @@
 #use wml::des::navbar
 
 ## navbar main:
-<navbar:define name=main
+<navbar:define name=main-old
         imgbase="img/" urlbase="$(ROOT)">
   <navbar:header>
     <table cellspacing=0 cellpadding=1 border=0>
