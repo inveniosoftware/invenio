@@ -139,6 +139,10 @@ href="../bibupload/">BibUpload</a>.
 </blockquote>
 
 <blockquote>
+<a href="dcxml-to-marcxml.cfg">dcxml-to-marcxml.cfg</a> -- OAI XML Dublin Core to XML MARC example
+</blockquote>
+
+<blockquote>
 <a href="bibtex.cfg">bibtex.cfg</a> -- BibTeX to XML MARC example
 </blockquote>
 
@@ -191,8 +195,8 @@ field definition
 fields:
 <pre>
 ===   data source configuration template   ===
-TI---&lt:TI:>
-AU---&lt:FIRSTNAME:>-&lt;:SURNAME:>
+TI---&lt;:TI:>
+AU---&lt;:FIRSTNAME:>-&lt;:SURNAME:>
 </pre>
 
 <H3>
