@@ -515,8 +515,7 @@ function getSearchExample($id_collection, $all=0) {
                 if ($out) {
                     $out .= "<br>";
                 }
-                $out .= "<img src=\"".$WEBURL."/img/r.gif\" alt=\"\">&nbsp;<small>" .
-                        "<span class=quicknote>Example (".$example_type[$indxs[$i]]."):</span> " .
+                $out .= "<small><em>Example (".$example_type[$indxs[$i]]."):</em> " .
                         $example_body[$indxs[$i]]."&nbsp;&nbsp;&nbsp;";
                 if ($all) {
                     $out .= "[<a href=\"".$PHP_SELF."?se=0\">close</a>]</small>";
