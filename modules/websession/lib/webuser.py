@@ -37,6 +37,7 @@ import string
 import session
 import websession
 from websession import pSession, pSessionMapping
+from session import SessionError
 from config import *
 
 def create_GuestUser():
@@ -55,7 +56,15 @@ def getUid ( request ):
        getUid(request) -> userId	 
     """
     sm = session.MPSessionManager(pSession, pSessionMapping())
-    s = sm.get_session(request)
+    try :
+	s = sm.get_session(request)
+    except SessionError,e:
+        s = sm.create_session(request)
+	sm.revoke_session_cookie (request)
+	idg = create_GuestUser()
+        s.setUid(idg)
+        return idg
+
     userId = s.getUid()
     if userId == -1:# first time,create a guest_user
         id1 = create_GuestUser()
@@ -246,3 +255,4 @@ def auth_apache_user_collection_p(user, password, coll):
         return 1
     else:
         return 0
+

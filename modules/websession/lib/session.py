@@ -630,6 +630,21 @@ class MPSessionManager(SessionManager):
         rw = RequestWrapper( request )
         SessionManager.expire_session(self, rw )
 
+    def create_session (self, request):
+	"""Proxy method to SessionManager create_session. It converts the 
+           mod_python request objects in a SessionManager compatible one
+           and executes the parent implementation passing the compatible object
+        """
+	rw = RequestWrapper( request )
+	return SessionManager._create_session(self,rw)
+
+    def revoke_session_cookie(self, request):
+	"""Proxy method to SessionManager revoke_session_cookie. It converts the 
+           mod_python request objects in a SessionManager compatible one
+           and executes the parent implementation passing the compatible object
+        """
+	rw = RequestWrapper( request)
+	SessionManager.revoke_session_cookie(self,rw)
 
 class RequestWrapper:
     """This class implements a HTTP request which is compatible with Quixote's
