@@ -27,21 +27,37 @@ table = rnkWORD01F
 stopword = <ETCDIR>/bibrank/stopwords.kb
 relevance_number_output_prologue = (
 relevance_number_output_epilogue = )
+
 #MARC tag,tag points, tag language
-tag1 = 6531_a, 1, <CDSLANG>
-tag2 = 695__a, 1, <CDSLANG>
-tag3 = 6532_a, 1, <CDSLANG>
-tag4 = 245__%, 10, <CDSLANG>
+#keyword
+tag1 = 6531_a, 1, <cdslang>
+#keyword
+tag2 = 695__a, 1, <cdslang>
+#keyword
+tag3 = 6532_a, 1, <cdslang>
+#title
+tag4 = 245__%, 10, <cdslang>
+#title
 tag5 = 246_% , 1, fr
-tag6 = 250__a, 1, <CDSLANG>
-tag7 = 711__a, 1, <CDSLANG>
-tag8 = 210__a, 1, <CDSLANG>
-tag9 = 222__a, 1, <CDSLANG>
-tag10 = 520__%, 1, <CDSLANG>
+#title
+tag6 = 250__a, 1, <cdslang>
+#title
+tag7 = 711__a, 1, <cdslang>
+#abbreviated
+tag8 = 210__a, 1, <cdslang>
+#key title
+tag9 = 222__a, 1, <cdslang>
+#abstract
+tag10 = 520__%, 1, <cdslang>
+#abstract
 tag11 = 590__%, 1, fr
-tag12 = 111__a, 1, <CDSLANG>
+#conference
+tag12 = 111__a, 1, <cdslang>
+#author
 tag13 = 100__%, 1, none
+#author
 tag14 = 700__%, 1, none
+#author
 tag15 = 721__a, 1, none
 
 [find_similar]
@@ -61,6 +77,3 @@ max_nr_words_lower = 10
 override_default_min_relevance = no
 #default minimum relevance value to use for find similar
 default_min_relevance = 75
-
-
- 
