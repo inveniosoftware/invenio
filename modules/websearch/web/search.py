@@ -38,7 +38,7 @@ from mod_python import apache
 
 __version__ = "$Id$"
 
-def index(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
+def index(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", rm="", of="hb", ot="", as="0",
           p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
           recid="-1", recidb="-1", sysno="", id="-1", idb="-1", sysnb="", action="",
           d1y="0", d1m="0", d1d="0", d2y="0", d2m="0", d2d="0", verbose="0", ap="1", ln="en"):
@@ -71,12 +71,12 @@ def index(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of
         req.err_headers_out.add("Location", "%s/search.py/authenticate?%s" % (weburl, req.args))
         raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
     else:
-        return search_engine.perform_request_search(req, cc, c, p, f, rg, sf, so, sp, of, ot, as,
+        return search_engine.perform_request_search(req, cc, c, p, f, rg, sf, so, sp, rm, of, ot, as,
                                                     p1, f1, m1, op1, p2, f2, m2, op2, p3, f3, m3, sc, jrec,
                                                     recid, recidb, sysno, id, idb, sysnb, action,
                                                     d1y, d1m, d1d, d2y, d2m, d2d, verbose, ap, ln) 
 
-def authenticate(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
+def authenticate(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", rm="", of="hb", ot="", as="0",
                  p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
                  recid="-1", recidb="-1", sysno="", id="-1", idb="-1", sysnb="", action="",
                  d1y="0", d1m="0", d1d="0", d2y="0", d2m="0", d2d="0", verbose="0", ap="1", ln="en"):
@@ -104,7 +104,7 @@ def authenticate(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp
                 return 0
         return 1
 
-    return search_engine.perform_request_search(req, cc, c, p, f, rg, sf, so, sp, of, ot, as,
+    return search_engine.perform_request_search(req, cc, c, p, f, rg, sf, so, sp, rm, of, ot, as,
                                                 p1, f1, m1, op1, p2, f2, m2, op2, p3, f3, m3, sc, jrec,
                                                 recid, recidb, sysno, id, idb, sysnb, action,
                                                 d1y, d1m, d1d, d2y, d2m, d2d, verbose, ap, ln)
