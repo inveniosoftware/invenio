@@ -70,14 +70,24 @@
     }
 
     sub generate_pretty_version_string {
-        ## Input: CVS $Id$ string
+        ## Input: CVS DOLLAR Id DOLLAR string
         ## Output: nicely formatted version number suitable for `bibtaskex --version'
-        ## Example: ``$Id$''
-        ##          will generate ``webcoll 1.36 (CDSware 0.3.0)''
+        ## Example: ``DOLLAR Id: webcoll.wml,v 1.41 2004/04/21 11:20:06 tibor Exp DOLLAR''
+        ##          will generate output like ``CDSware/0.3.2 webcoll/1.41''
         ($out) = @_;
-        ($junk, $filename, $revision, $junk) = split / /, $out;
+        ($junk, $filename, $revision, $date, $junk) = split / /, $out;
         $filename =~ s/\.wml,v//g;
         return "CDSware/<VERSION> " . $filename . "/" . $revision;
+    }
+
+    sub generate_pretty_revision_date_string {
+        ## Input: CVS DOLLAR Id DOLLAR string
+        ## Output: nicely formatted revision/date number suitable for Admin Guides
+        ## Example: ``DOLLAR Id: webcoll.wml,v 1.41 2004/04/21 11:20:06 tibor Exp DOLLAR''
+        ##          will generate output like ``CDSware/0.3.2 webcoll/1.41''
+        ($out) = @_;
+        ($junk, $filename, $revision, $date, $junk) = split / /, $out;
+        return $revision . ", " . $date;
     }
 
 :>
