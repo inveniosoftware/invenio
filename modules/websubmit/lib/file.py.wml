@@ -298,13 +298,13 @@ class BibDoc:
             docfiles = self.listLatestFiles()
         existingIcon = self.getIcon()
         if existingIcon != None:
-            imagepath = "getfile.py?docid=%s&name=%s&format=gif" % (existingIcon.getId(),existingIcon.getDocName())
+            imagepath = "%s/getfile.py?docid=%s&name=%s&format=gif" % (weburl,existingIcon.getId(),existingIcon.getDocName())
         else:
             imagepath = "%s/smallfiles.gif" % images
         t+="<table border=0 cellspacing=1 class=\"searchbox\"><tr><td align=left colspan=2 class=\"portalboxheader\"><img src='%s' border=0>&nbsp;&nbsp;%s</td></tr>" % (imagepath,self.docname)
         for version in listVersionsFromArray(docfiles):
             if version == self.getLatestVersion() and version != "1":
-                versiontext =  "<br>(see <a href=\"getfile.py?docid=%s&version=all\">previous</a>)" % self.id
+                versiontext =  "<br>(see <a href=\"%s/getfile.py?docid=%s&version=all\">previous</a>)" % (weburl,self.id)
             else:
                 versiontext = ""
             t+="<tr><td class=\"portalboxheader\"><font size=-2>version %s%s</td><td>" % (version,versiontext)
@@ -435,7 +435,7 @@ class BibDocFile:
             format = ".%s" % self.format
         else:
             format = ""
-        return "<tr><td valign=top><small><a href='getfile.py?docid=%s&name=%s&format=%s&version=%s'>%s%s</a></td><td valign=top><font size=-2 color=green>[%s o]</font></td></tr>\n""" % (self.bibdocid,self.name,self.format,self.version,self.name,format,self.size)
+        return "<tr><td valign=top><small><a href=\"%s/getfile.py?docid=%s&name=%s&format=%s&version=%s\">%s%s</a></td><td valign=top><font size=-2 color=green>[%s B]</font></td></tr>\n""" % (weburl,self.bibdocid,self.name,self.format,self.version,self.name,format,self.size)
  
     def getType(self):
         return self.type
