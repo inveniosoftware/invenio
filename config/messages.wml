@@ -60,7 +60,7 @@
   <es>Buscar</es>
   <pt>Buscar</pt>  
   <it>Ricercare</it>
-  <ru>Поиск</ru>
+  <ru>Искать</ru>
   <sk>Hľadaj</sk>
   <cz>Hledej</cz>
   <no>Søk</no>
@@ -138,7 +138,7 @@
   <es>Personalizar</es>
   <pt>Personalizar</pt>
   <it>Personalizzazione</it>
-  <ru>Персоналузовать</ru>
+  <ru>Персонализовать</ru>
   <sk>Personalizácia</sk>
   <cz>Personalizace</cz>
   <no>Brukerinnstillinger</no>
@@ -188,7 +188,7 @@
      Grazie per la comprensione.
   </it>
   <ru>
-     Перевод етой страницы на русский язык не готов. Упрашаем пользоваться английским вариантом. Спосибо дла сознания.
+     Перевод етой страницы на русский язык не готов. Упрашаем пользоваться английским вариантом. Спосибо для сознания.
   </ru>
   <sk>
      Slovenský preklad tejto stránky nie je ukončený.
@@ -226,7 +226,7 @@
   <es>Mantenido por</es>
   <pt>Mantido por</pt>
   <it>Mantenuto da</it>
-  <ru>Содержаиет</ru>
+  <ru>Содержает</ru>
   <sk>Spravuje</sk>
   <cz>Spravuje</cz>
   <no>Vedlikeholdt av</no>
@@ -239,7 +239,7 @@
   <es>Última modificación</es>
   <pt>Última atualização</pt>
   <it>Ultimo aggiornamento</it>
-  <ru>Последнеие изменение</ru>
+  <ru>Последнее изменение</ru>
   <sk>Posledná aktualizácia</sk>
   <cz>Poslední aktualizace</cz>
   <no>Sist oppdatert</no>
@@ -336,7 +336,7 @@
     <p>Provate a cercare a partire da <a href="%s">%s</a>.
   </it>
   <ru>
-    <p>Извините, коллекция <strong>%s</strong> неествует.
+    <p>Извините, коллекция <strong>%s</strong> не существует.
     <p>Испробуйте начать просмотривать из <a href="%s">%s</a>.
   </ru>
   <sk>
@@ -412,7 +412,7 @@
   <es>identificación</es>
   <pt>identificação</pt>
   <it>login</it>
-  <ru>записатсья</ru>
+  <ru>записаться</ru>
   <sk>prihlásiť</sk>
   <cz>přihlásit</cz>
   <no>logg inn</no>
@@ -425,7 +425,7 @@
   <es>salir</es>
   <pt>sair</pt>
   <it>logout</it>
-  <ru>выписатсья</ru>
+  <ru>выписаться</ru>
   <sk>odhlásiť</sk>
   <cz>odhlásit</cz>
   <no>logg ut</no>
@@ -607,7 +607,7 @@
   <es>Alguna palabra:</es>
   <pt>Qualquer das palavras:</pt>
   <it>Almeno una parola:</it>
-  <ru>Любое слова:</ru>
+  <ru>Любое из слов:</ru>
   <sk>Jedno zo slov:</sk>
   <cz>Jedno ze slov:</cz>
   <no>Minst ett av ordene:</no>
@@ -646,7 +646,7 @@
   <es>Expresión regular:</es>
   <pt>Expressão regular:</pt>
   <it>Regular expression:</it>
-  <ru>Регулярное выраение:</ru>
+  <ru>Регулярное выражение:</ru>
   <sk>Regulárny výraz:</sk>
   <cz>Regulární výraz:</cz>
   <no>Regulært uttrykk:</no>
@@ -815,7 +815,7 @@
   <es>agrupar por colección</es>
   <pt>agrupar por coleção</pt>
   <it>raggruppati per collezione</it>
-  <ru>поделит дла коллекции</ru>
+  <ru>поделить по коллекциям</ru>
   <sk>zoskupené podľa kolekcií</sk>
   <cz>seskupené podle kolekcí</cz>
   <no>oppdelt etter samling</no>
@@ -828,7 +828,7 @@
   <es>Formato de salida:</es>
   <pt>Formato de saída:</pt>
   <it>Formato di visualizzazione:</it>
-  <ru>Выходной формат</ru>
+  <ru>Выходный формат:</ru>
   <sk>Výstupný formát:</sk>
   <cz>Výstupní formát:</cz>
   <no>Visningsformat:</no>
@@ -893,7 +893,7 @@
     <strong>Risultato globale:</strong> Trovate <strong>%s</strong> registrazioni in %.2f secondi.
   </it>
   <ru>
-    <strong>Конспект результата:</strong> Найдено <strong>%s</strong> запускоб за %.2f секунды.
+    <strong>Конспект результата:</strong> Найдено <strong>%s</strong> запусков за %.2f секунды.
   </ru>
   <sk>
     <strong>Prehľad výsledkov:</strong> Nájdených <strong>%s</strong> záznamov za %.2f sekúnd.
@@ -939,7 +939,7 @@
   <es>La búsqueda tardó %.2f segundos.</es>
   <pt>A busca levou %.2f segundos.</pt>
   <it>La ricerca ha preso %.2f secondi.</it>
-  <ru>Пуск длил %.2f секунд.</ru>
+  <ru>Поиск длил %.2f секунд.</ru>
   <sk>Hľadanie trvalo %.2f sekúnd.</sk>
   <cz>Hledání trvalo %.2f vteřin.</cz>
   <no>Søket tok %.2f sekunder.</no>
@@ -952,7 +952,7 @@
   <es>AÑADIR A LA CESTA</es>
   <pt>ADICIONAR À CESTA</pt>
   <it>AGGIUNGERE AL PANIERE</it>
-  <ru>ПРИДАТ В КОРЗИНУ</ru>
+  <ru>ПРИДАТь В КОРЗИНУ</ru>
   <sk>PRIDAŤ DO KOŠÍKA</sk>
   <cz>PŘIDAT DO KOŠÍKU</cz>
   <no>LEGG TIL I KURV</no>
@@ -991,7 +991,7 @@
   <es>añadir otra colección</es>
   <pt>adicionar outra coleção</pt>
   <it>aggiungere un'altra collezione</it>
-  <ru>придат коллекцию</ru>
+  <ru>придать коллекцию</ru>
   <sk>pridať kolekciu</sk>
   <cz>přidat kolekci</cz>
   <no>legg til ny samling</no>
@@ -1467,7 +1467,7 @@
     Nessun risultato nell'arco di tempo specificato, il criterio viene ignorato...
   </it>
   <ru>
-    Никакой результат для временного лимита, условие отменено...
+    Никакий результат для временного лимита, условие отметено...
   </ru>
   <sk>
     Žiaden výsledok nevyhovuje Vašim časovým kritériám, podmienka
@@ -1506,7 +1506,7 @@
     Nessun risultato trovato nei limiti specificati, i criteri vengono ignorati...
   </it>
   <ru>
-    Никакой результат для поицкового лимита, условие отменено...
+    Никакий результат для поискового лимита, условие отметено...
   </ru>
   <sk>
     Žiaden výsledok nevyhovuje Vašim limitným kritériám, podmienky
@@ -1549,8 +1549,8 @@
     Tutti i termini di ricerca sono stati trovati ma la ricerca booleana non ha dato risultati. Vi preghiamo di combinare differentemente i termini.
   </it>
   <ru>
-    Бце исканные термины найдены, но боолеанный вопрось не дал результата.
-    Упрашиваем комбинировать исканные термины иначе.
+    Все исканные термины найдены, но боолеанный вопрось не дал результата.
+    Упрашаем комбинировать исканные термины иначе.
   </ru>
   <sk>
     Všetky termíny hľadania boli nájdené, ale boolean otázka nevrátila
@@ -1589,7 +1589,7 @@
     Nessun risultato trovato cercando <em>%s</em>, uso <em>%s</em> al suo posto...
   </it>
   <ru>
-    Никакой результат не найден для <em>%s</em>, употребуем <em>%s</em> взамен...
+    Никакий результат не найден для <em>%s</em>, употребуем <em>%s</em> взамен...
   </ru>
   <sk>
     Žiaden presný výsledok pre <em>%s</em> nebol nájdený, skúsme
@@ -1611,10 +1611,10 @@
   <es>Error Interno</es>
   <pt>Erro Interno</pt>
   <it>Errore Interno</it>
-  <ru>Интерная ошибка</ru>
+  <ru>Интерная Ошибка</ru>
   <sk>Interná Chyba</sk>
   <cz>Interní Chyba</cz>
-  <no>Intern feil</no>
+  <no>Intern Feil</no>
 </define-tag>
 
 <define-tag MSG_PLEASE_CONTACT_AND_QUOTE>
@@ -1726,12 +1726,12 @@
   <fr>Conversion</fr>
   <de>Konvertieren</de>
   <es>Convert</es>
-  <pt>Convert</pt>  
-  <it>Convert</it>
+  <pt>Converter</pt>  
+  <it>Convertire</it>
   <ru>Обратить</ru>
   <sk>Konvertovať</sk>
   <cz>Konvertovat</cz>
-  <no>Convert</no>
+  <no>Konverter</no>
 </define-tag>
 
 <define-tag MSG_AGENDA whitespace=delete>
@@ -1757,7 +1757,7 @@
   <ru>Вебкаст</ru>
   <sk>Webcast</sk>
   <cz>Webcast</cz>
-  <no>Webcast</no>
+  <no>Webtv</no>
 </define-tag>
 
 <define-tag MSG_BULLETIN whitespace=delete>
@@ -1765,12 +1765,12 @@
   <fr>Bulletin</fr>
   <de>Bulletin</de>
   <es>Bulletin</es>
-  <pt>Bulletin</pt>  
+  <pt>Boletim</pt>  
   <it>Bulletin</it>
   <ru>Бюллетен</ru>
   <sk>Buletín</sk>
   <cz>Buletín</cz>
-  <no>Bulletin</no>
+  <no>Budstikke</no>
 </define-tag>
 
 <define-tag MSG_LIBRARY whitespace=delete>
@@ -1778,12 +1778,12 @@
   <fr>Bibliothèque</fr>
   <de>Bibliothek</de>
   <es>Library</es>
-  <pt>Library</pt>  
-  <it>Library</it>
+  <pt>Biblioteca</pt>  
+  <it>Biblioteca</it>
   <ru>Библиотека</ru>
   <sk>Knižnica</sk>
   <cz>Knihovna</cz>
-  <no>Library</no>
+  <no>Bibliotek</no>
 </define-tag>
 
 ## end of file
