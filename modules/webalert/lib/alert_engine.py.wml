@@ -32,7 +32,7 @@ __version__ = "$Id$"
 
 try:
     from cgi import parse_qs
-    from re import search
+    from sre import search, sub
     from time import localtime, strftime, mktime
     import smtplib
     from config import *
@@ -45,13 +45,13 @@ except ImportError, e:
     sys.exit(1)    
 
 MAXIDS = 50
-FROMADDR = 'CDS Alert Service <%s>' % supportemail
+FROMADDR = 'CDS Alert Engine <%s>' % alertengineemail
 ALERTURL = weburl + '/youralerts.py/list'
 # 0 = production, nothing on the console, email sent
 # 1 = messages on the console, email sent
 # 2 = messages on the console, but no email sent
 # 3 = many messages on the console, no email sent
-DEBUGLEVEL = 3
+DEBUGLEVEL = 1
 
 
 def update_date_lastrun(alert):
@@ -66,42 +66,41 @@ def get_alert_queries_for_user(uid):
 
 def get_alerts(query, frequency):
     r = run_sql('select id_user, id_query, id_basket, frequency, date_lastrun, alert_name, notification from user_query_basket where id_query=%s and frequency=%s;', (query['id_query'], frequency,))
-    return {'alerts': r, 'records': query['records'], 'argstr': query['argstr']}
+    return {'alerts': r, 'records': query['records'], 'argstr': query['argstr'], 'date_from': query['date_from'], 'date_until': query['date_until']}
 
     
-def add_record_to_basket(record_id, basket_id):
-    if DEBUGLEVEL > 0:
-        print "-> adding record %s into basket %s" % (record_id, basket_id)
-    try:
-        return run_sql('insert into basket_record (id_basket, id_record) values(%s, %s);', (basket_id, record_id,))
-    except:
-        return 0
-
-    
-def add_records_to_basket(record_ids, basket_id):
-    # TBD: generate the list and all all records in one step
-    for i in record_ids:
-        add_record_to_basket(i, basket_id)
+# def add_record_to_basket(record_id, basket_id):
+#     if DEBUGLEVEL > 0:
+#         print "-> adding record %s into basket %s" % (record_id, basket_id)
+#     try:
+#         return run_sql('insert into basket_record (id_basket, id_record) values(%s, %s);', (basket_id, record_id,))
+#     except:
+#         return 0
 
     
 # def add_records_to_basket(record_ids, basket_id):
-#     global DEBUGLEVEL
-    
-#     nrec = len(record_ids)
-#     if nrec > 0:
-#         vals = '(%s,%s)' % (basket_id, record_ids[0])
-#         if nrec > 1:
-#             for i in record_ids[1:]:
-#                 vals += ',(%s, %s)' % (basket_id, i)
+#     # TBD: generate the list and all all records in one step (see below)
+#     for i in record_ids:
+#         add_record_to_basket(i, basket_id)
 
-#         if DEBUGLEVEL > 0:
-#             print "-> adding %s records into basket %s: %s" % (nrec, basket_id, vals)
-#         try:
-#             return run_sql('insert into basket_record (id_basket, id_record) values %s;', (vals,))
-#         except:
-#             return 0
-#     else:
-#         return 0
+# Optimized version:
+def add_records_to_basket(record_ids, basket_id):
+    global DEBUGLEVEL
+  
+    nrec = len(record_ids)
+    if nrec > 0:
+        vals = '(%s,%s)' % (basket_id, record_ids[0])
+        if nrec > 1:
+            for i in record_ids[1:]:
+                vals += ',(%s, %s)' % (basket_id, i)
+        if DEBUGLEVEL > 0:
+            print "-> adding %s records into basket %s: %s" % (nrec, basket_id, vals)
+        try:
+            return run_sql('insert into basket_record (id_basket, id_record) values %s;' % vals) # Cannot use the run_sql(<query>, (<arg>,)) form for some reason
+        except:
+            return 0
+    else:
+        return 0
     
 
 def get_email(uid):
@@ -124,7 +123,7 @@ def send_email(fromaddr, toaddr, body):
 
 
 def forge_email(fromaddr, toaddr, subject, content):
-    body = 'From: %s\nTo: %s\nSubject: %s\n%s' % (fromaddr, toaddr, subject, content)
+    body = 'From: %s\nTo: %s\nContent-Type: text/plain; charset=utf-8\nSubject: %s\n%s' % (fromaddr, toaddr, subject, content)
     return body
 
 
@@ -147,7 +146,7 @@ def print_records(record_ids):
         c += 1
 
     if c > MAXIDS:
-        msg += '\n\n' + 'Only the first %s records are displayed above. Please consult your basket to see all the results.' % MAXIDS
+        msg += '\n\n' + 'Only the first %s records are displayed above. Please consult your basket or the URL below to see all the results.' % MAXIDS
 
     return msg
 
@@ -164,29 +163,33 @@ def email_notify(alert, records, argstr):
     
     if DEBUGLEVEL > 0:
         msg = "*** THIS MESSAGE WAS SENT IN DEBUG MODE, DON'T TAKE IT INTO ACCOUNT ***\n\n"
-        
-    msg += "Hello\n\nBelow are the results of the email alert that you set up with the CERN Document Server:\n"
+
+    msg += "Hello\n\nBelow are the results of the email alert that you set up with the CERN Document Server.\n"
+    msg += "This is an automatic message, please don't reply to its address. For any question, use <%s> instead.\n" % supportemail
 
     email = get_email(alert[0])
     url = weburl + "/search.py?" + argstr
     pattern = get_pattern(argstr)
     catalogue = get_catalogue(argstr)
     
+    time = strftime("%c")
+
     msg += '\nalert name: \'%s\'' % alert[5]
     msg += '\npattern: \'%s\'' % pattern
     msg += '\ncatalogue(s): %s' % catalogue
     msg += '\nfrequency: %s ' % format_frequency(alert[3])
-    msg += '\nrun time: %s ' % strftime("%c")
+    msg += '\nrun time: %s ' % time
     msg += '\nfound: %s record(s)' % len(records)
     
     msg += print_records(records)
 
-    msg += "\n\nThe search URL for this alert is <%s>\n\n" % url
+    msg += "\n\nThe Search URL is <%s/search.py?%s>\n" % (weburl, argstr)
+    # msg += "The URL for this alert is <%s>\n" % url
 
-    msg += "To modify your alerts: <%s>" % ALERTURL
+    msg += "\nTo modify your alerts: <%s>" % ALERTURL
     msg += "\n\n-- \nCERN Document Server Alert Service <%s>\nEmail: <%s>" % (weburl, supportemail)
 
-    subject = 'Search for \'%s\' in %s' % (pattern, catalogue)
+    subject = 'Alert \'%s\' run on %s' % (alert[5], time)
     
     body = forge_email(FROMADDR, email, subject, msg)
 
@@ -313,6 +316,35 @@ def process_alert_queries(frequency):
         process_alerts(alerts)
 
 
+def replace_argument(argstr, argname, argval):
+    """Replace the given date argument value with the new one.
+
+    If the argument is missing, it is added."""
+    
+    if search('%s=\d+' % argname, argstr):
+        r = sub('%s=\d+' % argname, '%s=%s' % (argname, argval), argstr)
+    else:
+        r = argstr + '&%s=%s' % (argname, argval)
+        
+    return r
+    
+def update_arguments(argstr, date_from, date_until):
+    """Replace date arguments in argstr with the ones specified by date_from and date_until.
+
+    Absent arguments are added."""
+    
+    d1y, d1m, d1d = date_from
+    d2y, d2m, d2d = date_until
+
+    r = replace_argument(argstr, 'd1y', d1y)
+    r = replace_argument(r, 'd1m', d1m)
+    r = replace_argument(r, 'd1d', d1d)
+    r = replace_argument(r, 'd2y', d2y)
+    r = replace_argument(r, 'd2m', d2m)
+    r = replace_argument(r, 'd2d', d2d)
+        
+    return r
+
 def process_alerts(alerts):
     # TBD: do not generate the email each time, forge it once and then
     # send it to all appropriate people
@@ -321,7 +353,8 @@ def process_alerts(alerts):
         if alert_use_basket_p(a):
             add_records_to_basket(alerts['records'], a[2])
         if alert_use_notification_p(a):
-            email_notify(a, alerts['records'], alerts['argstr'])
+            argstr = update_arguments(alerts['argstr'], alerts['date_from'], alerts['date_until'])
+            email_notify(a, alerts['records'], argstr)
             
         update_date_lastrun(a)
 
@@ -351,6 +384,10 @@ def run_alerts():
     process_alert_queries('day')
 
 def process_alert_queries_for_user(uid):
+    """Process the alerts for the given user id.
+
+    All alerts are with reference date set as the current local time."""
+    
     alert_queries = get_alert_queries_for_user(uid)
     print alert_queries
 
@@ -362,7 +399,10 @@ def process_alert_queries_for_user(uid):
 
     
 def run_alerts(uid):
+    """Run the alerts for the specified user id."""
     process_alert_queries_for_user(uid)
     
 if __name__ == '__main__':
-    process_alert_queries_for_user(2530836)
+    process_alert_queries_for_user(2530836) # eric
+    process_alert_queries_for_user(109) # tibor
+    # process_alert_queries_for_user(11040) # jean-yves

@@ -96,9 +96,9 @@ def get_as_text(record_id):
 
 
 if __name__ == "__main__":
-    rec = print_record(1)
+    rec = print_record(619028)
     print rec
     
     print "***"
     
-    print get_as_text(1)
+    print get_as_text(619028)
