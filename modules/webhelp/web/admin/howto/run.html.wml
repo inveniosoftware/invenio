@@ -106,6 +106,25 @@ hungry:
    </pre>
    </blockquote>
 
+<h2>Recalculate ranking weights</h2>
+
+<p>When you are adding new records to the system, the word frequency
+ranking weights for old records aren't recalculated by default in
+order to speed up the insertion of new records.  This may influence a
+bit the precision of word similarity searches.  It is therefore
+advised to expressely run bibrank in the recalculating mode once in a
+while by doing:
+
+   <blockquote>
+   <pre>
+   $ bibrank -wwrd -R
+   </pre>
+   </blockquote>
+
+You may want to do this either (i) periodically, say once per month,
+or (ii) depending on the number of newly added records, say when the
+database size grows by 2-3 percent.
+
 <h2>Guest Users Cleanup</h2>
 
 <p>Guest users create a lot of entries in <CDSNAME> tables that are
