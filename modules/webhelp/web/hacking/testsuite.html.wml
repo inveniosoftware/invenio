@@ -1,0 +1,392 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="Test Suite Strategy" \
+    navbar_name="hacking-test-suite-strategy" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> " \
+    navbar_select="hacking-test-suite-strategy" 
+
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
+<h2>Contents</h2>
+<strong>1. <a href="#1">General considerations</a></strong><br>
+<strong>2. <a href="#2">Running test suite</a></strong><br>
+<strong>3. <a href="#3">Writing test code</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1 <a href="#3.1">Testing core code logic (Unit Testing)</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2 <a href="#3.2">Testing overall functionality (Regression Testing)</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3 <a href="#3.3">Testing user interface pages</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4 <a href="#3.4">File organization</a><br>
+<strong>7. <a href="#4">Conclusions</a></strong><br>
+<strong>8. <a href="#5">Additional information</a></strong><br>
+
+<a name="1"></a><h2>1. General considerations</h2>
+
+<p>This documents presents guidelines for unit testing and regression
+testing homogenisation throughout all CDSware modules.
+
+<p>Testing is an important coding activity.  Most authors believe that
+writing test cases should take between 10% and 30% of the project
+time.  But, even with such a large fraction, don't put too much belief
+on such a testing.  It cannot find bugs that aren't tested for.  So,
+while testing is an important activity inherent to safe software
+development practices, it cannot become a substitute for pro-active
+bug hunting, source code inspection, and bugfree-driven development
+approach from the start.
+
+<p>Testing should happen alongside with coding.  If you write a
+function, immediately load it into your toplevel, evaluate its
+definition, and call it for a couple of arguments to make sure the
+function works as expected.  If not, then change the function
+definition, re-evaluate it, re-call it, etc.  Dynamic languages with
+interactive toplevel such as Common Lisp or Python makes this easy for
+you.  Dynamic redefinition capabilities (full in Common Lisp, partial
+in Python) are very programmer-friendly in this respect.  If your test
+cases are interesting to be kept, then keep them in a test file.
+(It's almost all the time a good idea to store them in the test file,
+since you cannot predict whether you won't want to change something in
+the future.)  We'll see below how to store your tests in a test file.
+
+<p>When testing, it is nice to know some rules of thumb, like: check
+your edge cases (e.g. null array), check atypical input values
+(e.g. laaarge array instead of typically 5-6 elements only), check
+your termination conditions, ask whether your arguments have already
+been safe-proofed or whether it is in your mandate to check them,
+write a test case for each `if-else' branch of the code to explore all
+the possibilites, etc.  Another interesting rule of thumb is the bug
+frequency distribution.  Experience has shown that the bugs tend to
+cluster.  If you discover a bug, there are chances that other bugs are
+in the neighborhood.  The famous 80/20 rule of thumb applies here too:
+about 80% of bugs are located in about 20% of the code.  Another rule
+of thumb: if you find a bug caused by some coding practice pattern
+thay may be used elsewhere too, look and fix other pattern instances.
+
+<p>In a nutshell, the best advice to write bug-free code is: <em>think
+ahead</em>.  Try to prepare in advance for unusual usage scenarios, to
+foresee problems before they happen.  Don't rely on typical input and
+typical usage scenarios.  Things have a tendency to become atypical
+one day.  Recall that testing is necessary, but not sufficient, to
+write good code.  Therefore, think ahead!
+
+<a name="2"></a><h2>2. Running test suite</h2>
+
+<p>The CDSware test suite can be run in the source directory:
+
+<blockquote>
+<pre>
+$ make test
+</pre>
+</blockquote>
+
+or anytime after the installation:
+
+<blockquote>
+<pre>
+$ /usr/local/cdsware-DEMO/bin/testsuite
+</pre>
+</blockquote>
+
+The ``testsuite'' executable will run all available unit tests,
+regression tests, and all the other kind of tests provided with
+CDSware.
+
+<p>The informative output is of the form:
+
+<blockquote>
+<pre>
+$ make test
+CDSware v0.3.2.20040519 test suite results:
+===========================================
+search engine washing of query patterns ... ok
+search engine washing of URL arguments ... ok
+search engine stripping of accented letters ... ok
+bibindex engine list union ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.121s
+
+OK
+</pre>
+</blockquote>
+
+In case of problems you will see failures like:
+
+<blockquote>
+<pre>
+CDSware v0.3.2.20040519 test suite results:
+===========================================
+search engine washing of query patterns ... FAIL
+search engine washing of URL arguments ... ok
+search engine stripping of accented letters ... ok
+bibindex engine list union ... ok
+
+======================================================================
+FAIL: search engine washing of query patterns
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/local/cdsware-DEMO/lib/python/cdsware/search_engine_tests.py", line 25, in test_wash_pattern
+    self.assertEqual("ell*", search_engine.wash_pattern('ell*'))
+  File "/usr/lib/python2.3/unittest.py", line 302, in failUnlessEqual
+    raise self.failureException, \
+AssertionError: 'ell*' != 'ell'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.091s
+
+FAILED (failures=1)
+</pre>
+</blockquote>
+
+The test suite compliance should be checked before each CVS commit.
+(And, obviously, double-checked before each CDSware release.)
+
+<a name="3"></a><h2>3. Writing test code</h2>
+
+In this section, we shall firstly briefly touch ideas behind various
+kinds of test code.  Then we'll discuss more earthly matters, like how
+to write the test code, where to put it, etc.
+
+<a name="3.1"></a><h3>3.1 Testing core code logic (Unit Testing)</h3>
+
+<p>Core functionality, such as the hit set intersection for the search
+engine, or the text input manipulating functions of the BibConvert
+language, should come with a couple of test cases to assure proper
+behaviour of the core functionality.  The test cases should cover
+typical input (e.g. hit set corresponding to the query for ``ellis''),
+as well as the edge cases (e.g. empty/full hit set) and other unusual
+situations (e.g. non-UTF-8 accented input for BibConvert functions to
+test a situation of different number of bytes per char).
+
+<p>The test cases should be written for most important core
+functionality.  Not every function or class in the code is to be
+throughly tested.  Common sense will tell.
+
+<p>For more information on Pythonic unit testing, see the
+documentation to the unittest module at <a
+href="http://docs.python.org/lib/module-unittest.html">http://docs.python.org/lib/module-unittest.html</a>.
+For a tutorial, see for example <a
+href="http://diveintopython.org/unit_testing/">http://diveintopython.org/unit_testing/</a>.
+
+<a name="3.2"></a><h3>3.2 Testing overall functionality (Regression Testing)</h3>
+
+<p>In addition to the above-mentioned unit testing of important
+functions, a regression testing should ensure that the existing
+program's overall functionality is not altered by new changes.  This
+is especially important if a bug had been previously found.  Then a
+regression test case should be written to assure that it will never
+reapper.  (It also helps to scan the neighborhood of the bug, see the
+80/20 thumb rule cited above.)
+
+<p>As an example of a regression test, we have several BibConvert
+example configurations (*.cfg) in CDSware already.  For each
+configuration, we could write more or less complex input examples
+(*.dat) -- some of them are already in the distribution -- that would
+trigger a use of many or all BibConvert functionality.  In addition we
+would provide in the distribution the expected results file (*.res or
+*.out or whatever) for that particular config file and that particular
+input file.  The test suite would then simply run a shell process to
+run bibconvert with the sample configuration on the sample data and
+would compare the output to the known one.
+
+<p>For more information on regression testing, see for example <a
+href="http://c2.com/cgi/wiki?RegressionTesting">http://c2.com/cgi/wiki?RegressionTesting</a>.
+
+<a name="3.3"></a><h3>3.3 Testing user interface pages</h3>
+
+<p>Web interfaces are an important part of our application, so that we
+should possibly test the most important user interface pages too.
+
+<p>It may be hard to test GUI stuff, though there are ways, see for
+example <a
+href="http://www.xp123.com/xplor/xp0001/index.shtml">http://www.xp123.com/xplor/xp0001/index.shtml</a>.
+In our case mod_python is very unfriendly in this direction, it's
+impossible to run code from within Emacs or command line.  But, if the
+GUI code is structured in the usual CDSware way, then it may be done
+via string comparisons.  That is, for functionality like printing of a
+basket we typically have a web-seen function
+<code>print_basket()</code> that looks, schematically:
+
+<blockquote>
+<pre>
+$ cat /path/to/apache/htdocs/yourbaskets.py
+[...]
+from cdsware.webbasketlib import perform_print_basket
+def print_basket(req, basket_name)
+     uid = getUid(req)
+     return perform_print_basket(uid, basket_name)
+[...] 
+</pre>
+</blockquote>
+
+with all the logic being done inside the library
+<code>perform_print_basket()</code>:
+
+<blockquote>
+<pre>
+$ cat /path/to/cdsware/lib/python/cdsware/webbasketlib.py
+[...]
+def perform_print_basket(uid, basket_name):    
+    out = ""
+    ## function body goes here
+    return out
+[...]
+</pre>
+</blockquote>
+
+
+The latter function can run outside of Apache, it accepts `normal'
+input variables and returns `normal' text.  The function can therefore
+be easily tested via unit testing technique described above.
+
+<p>Usually, when testing GUIs, we don't want to go as far as to test
+sessions, logins, redirections and stuff.  In case it is interesting
+to automate these tests too, we could look at, for example, WebUnit
+that could be used for these purposes. <a
+href="http://webunit.sourceforge.net/">http://webunit.sourceforge.net/</a>.
+
+<a name="3.4"></a><h3>3.4 File organization</h3>
+
+<p>Each core file that is located in the lib directory (such as the
+<code>webbasketlib.py</code> in the example above) should come with a
+testing file where the test cases are stored.  The test file is to be
+named identically as the lib file it tests, but with the suffix
+<code>_tests</code> (in our example,
+<code>webbasketlib_tests.py</code>).
+
+<p>The test cases are written using Pythonic unittest TestCase class.
+An example for testing search engine query parameter washing function:
+
+<blockquote>
+<pre>
+$ cat /path/to/cdsware/lib/python/cdsware/search_engine_tests.py
+[...]
+import search_engine
+import unittest
+
+class TestWashQueryParameters(unittest.TestCase):
+    """Test for washing of search query parameters."""
+
+    def test_wash_url_argument(self):
+        """search engine washing of URL arguments"""
+        self.assertEqual(1, search_engine.wash_url_argument(['1'],'int'))
+        self.assertEqual("1", search_engine.wash_url_argument(['1'],'str'))
+        self.assertEqual(['1'], search_engine.wash_url_argument(['1'],'list'))
+        self.assertEqual(0, search_engine.wash_url_argument('ellis','int'))
+        self.assertEqual("ellis", search_engine.wash_url_argument('ellis','str'))
+        self.assertEqual(["ellis"], search_engine.wash_url_argument('ellis','list'))
+        self.assertEqual(0, search_engine.wash_url_argument(['ellis'],'int'))
+        self.assertEqual("ellis", search_engine.wash_url_argument(['ellis'],'str'))
+        self.assertEqual(["ellis"], search_engine.wash_url_argument(['ellis'],'list'))
+[...] 
+</pre>
+</blockquote>
+
+<p>In addition, each test file is supposed to define a
+<code>create_test_suite()</code> function that will return test suite
+with all the tests available in this file:
+
+<blockquote>
+<pre>
+$ cat /path/to/cdsware/lib/python/cdsware/search_engine_tests.py
+[...]
+def create_test_suite():
+    """Return test suite for the search engine."""
+    return unittest.TestSuite((unittest.makeSuite(TestWashQueryParameters,'test'),
+                               unittest.makeSuite(TestStripAccents,'test')))
+[...] 
+</pre>
+</blockquote>
+
+<p>This will enable us to later include this file into
+<code>testsuite</code> executable:
+
+<blockquote>
+<pre>
+$ cat /path/to/cdsware/source/modules/miscutil/bin/testsuite.wml
+[...]
+from cdsware import search_engine_tests
+    from cdsware import bibindex_engine_tests 
+
+def create_all_test_suites():
+    """Return all tests suites for all CDSware modules."""
+    return unittest.TestSuite((search_engine_tests.create_test_suite(),
+                               bibindex_engine_tests.create_test_suite()))
+[...] 
+</pre>
+</blockquote>
+    
+<p>In this way, all the test cases defined in the file
+<code>search_engine_tests.py</code> will be executed when the global
+<code>testcase</code> executable is called.
+
+<p>Note that it may be time-consuming to run all the tests in one go.
+If you are interested in running tests only on a certain file (say
+<code>search_engine_tests.py</code>), then launch:
+
+<blockquote>
+<pre>
+$ python /path/to/cdsware/lib/python/cdsware/search_engine_tests.py
+</pre>
+</blockquote>
+    
+<p>For feature-full examples, consult the following files in the
+source distribution:
+    
+    <pre>
+    ./modules/websearch/lib/search_engine.py.wml
+    ./modules/websearch/lib/search_engine_tests.py.wml
+    ./modules/bibindex/lib/bibindex_engine.py.wml
+    ./modules/bibindex/lib/bibindex_engine_tests.py.wml
+    ./modules/miscutil/bin/testsuite.wml
+    </pre>
+
+<a name="4"></a><h2>4. Conclusions</h2>
+
+A uniform testing technique and a test suite for CDSware is
+introduced.  Python unittest module is used for both unit testing and
+regression testing, with proper calling of external scripts.  The
+functional core code is the most obvious candidate to start the
+testing process with, but we should also remeber to test the most
+important web page elements too.  Each programmer should plan to write
+the test code alongside the core code development.  The guidelines
+were given as to how to do it in a uniform way.
+
+<a name="5"></a><h2>5. Additional information</h2>
+
+<dl>
+<dt>More information can be found on the URLs mentioned above:
+<dd>
+<pre>
+<a href="http://c2.com/cgi/wiki?UnitTest">http://c2.com/cgi/wiki?UnitTest</a>
+<a href="http://c2.com/cgi/wiki?RegressionTesting">http://c2.com/cgi/wiki?RegressionTesting</a>
+<a href="http://docs.python.org/lib/module-unittest.html">http://docs.python.org/lib/module-unittest.html</a>
+<a href="http://diveintopython.org/unit_testing/">http://diveintopython.org/unit_testing/</a>
+<a href="http://www.xp123.com/xplor/xp0001/index.shtml">http://www.xp123.com/xplor/xp0001/index.shtml</a>
+<a href="http://webunit.sourceforge.net/">http://webunit.sourceforge.net/</a>
+</pre>
+</dl>
+
+<dl>
+<dt>and elsewhere:
+<dd>
+<pre>
+Steve McConnell: "Code Complete"
+FIXME: list of other interesting references, like Kent Beck papers, etc
+</pre>
+</dl>

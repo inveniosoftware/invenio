@@ -49,6 +49,9 @@ sources get installed to, what is the visible URL policy, etc.
 <dt><a href="modules.html">Modules Overview</a>
 <dd>Presenting a summary of various CDSware modules and their relationships.
 
+<dt><a href="testsuite.html">Test Suite Strategy</a>
+<dd>Describes our test suite strategy.
+
 </dl>
 </blockquote>
 

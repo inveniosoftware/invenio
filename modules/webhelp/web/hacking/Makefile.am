@@ -21,7 +21,7 @@ docdir = $(WEBDIR)/hacking
 imgdir = $(WEBDIR)/img
 
 doc_DATA=index.html modules.html style.html concepts.html directory.html cdsware.el \
-         releases.html
+         releases.html testsuite.html
 img_DATA=modules.jpeg
 
 EXTRA_DIST = $(wildcard *.wml) $(wildcard *.el) $(wildcard *.jpeg)
