@@ -20,16 +20,13 @@
 webappdir = $(WEBDIR)
 
 bin_SCRIPTS=oai1d oai2d
-webapp_DATA=search.py goto.shtml
+webapp_DATA=search.py index.py
 
 EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(bin_SCRIPTS) $(webapp_DATA) *~ *.tmp search.pyc
 
 %.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml
-	$(WML) -o $@ $<
-
-%.shtml: %.shtml.wml ../../../config/config.wml ../../../config/configbis.wml
 	$(WML) -o $@ $<
 
 %: %.wml ../../../config/config.wml ../../../config/configbis.wml
