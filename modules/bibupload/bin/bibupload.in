@@ -100,16 +100,22 @@ function task_submit()
     else
 	$date = "'".$options['DATE']."'";
 
+    $cwd = getcwd();
+    $totalrecs = 0;
+    $fullrecordfiles = array();
+    chdir("/");
     foreach ($options['recordfiles'] as $originalrecordfile) {
 	$recordfile = $originalrecordfile;
         if (!file_exists("$recordfile"))
-            $recordfile = getcwd()."/$recordfile";
+            $recordfile = $cwd."/$recordfile";
         if (!file_exists("$recordfile")) {
-            fwrite($errorfp,"Error: Cannot find file $originalrecordfile.\n");
+            fwrite($errorfp,"Error: Cannot find file $recordfile.\n");
 	    exit(1);
         }
-        $totalrecs = trim(`grep -a "<record" $recordfile | wc -l`);
+        array_push($fullrecordfiles,$recordfile);
+        $totalrecs += trim(`grep -a "<record" $recordfile | wc -l`);
     }
+    $options['recordfiles'] = $fullrecordfiles;
 
     // submit task
     $query = "INSERT INTO schTASK (id,proc,user,runtime,arguments,status,progress)
@@ -1537,9 +1543,6 @@ function task_run()
 
     foreach ($options['recordfiles'] as $recordfile) {
         
-        if (!file_exists("$recordfile"))
-            $recordfile = getcwd()."/$recordfile";
-        
         //open xml file
         $fp = @fopen("$recordfile","r");
         if (!$fp) {
@@ -1618,7 +1621,10 @@ function task_run()
         printf("Average record treatment time: %.2f seconds", $meantreatment);
     }
 
-    task_update_state("DONE");
+    if ($nbErrorRecords==0)
+    	task_update_state("DONE");
+    else 
+	task_update_state("DONE WITH ERRORS");
 }
 	
 
