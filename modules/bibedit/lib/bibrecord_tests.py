@@ -42,7 +42,8 @@ class SanityTest(unittest.TestCase):
         yy=expandtabs(y)
         xxx = xx.replace(' ','')
         yyy = yy.replace(' ','')
-        #self.assertEqual(xxx,yyy) # FIXME: UTF-8 parsing is not working
+        xxx = xxx.replace('<!DOCTYPEcollectionSYSTEM"file:///soft/cdsware-CDSCERNWIENERDEV/etc/bibedit/MARC21slim.dtd"><collection>', '<collectionxmlns="http://www.loc.gov/MARC21/slim">')
+        self.assertEqual(xxx,yyy) # FIXME: UTF-8 parsing is not working
 
 ### testing for success
         
