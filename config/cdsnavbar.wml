@@ -272,7 +272,7 @@
   <navbar:button id=FORMAT_display txt="Formats" url="<WEBURL>/admin/bibformat/FORMAT_display.php" hint="BibFormat Admin - Formats">
   <navbar:button id=KB_display txt="KBs" url="<WEBURL>/admin/bibformat/KB_display.php" hint="BibFormat Admin - Knowledge Bases">
   <navbar:button id=test txt="Execution Test" url="<WEBURL>/admin/bibformat/test.php" hint="BibFormat Admin - Execution Test">
-  <navbar:button id=BIBREFORMAT_display txt="Reformat Records" url="<WEBURL>/admin/bibformat/BIBREFORMAT_display.php" hint="BibFormat Admin - Reformat Records">
+  <navbar:button id=BIBREFORMAT_display txt="Reformat&nbsp;Records" url="<WEBURL>/admin/bibformat/BIBREFORMAT_display.php" hint="BibFormat Admin - Reformat Records">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
