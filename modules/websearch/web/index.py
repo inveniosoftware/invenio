@@ -72,7 +72,7 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
     colID = get_colID(c)
     if type(colID) is not int:
          return page(title=msg_collection_not_found_head[ln] % c,
-                     body=msg_collection_not_found_body[ln] % (c, weburl, cdsname),
+                     body=msg_collection_not_found_body[ln] % (c, "%s?ln=%s" % (weburl, ln), cdsnameintl[ln]),
                      description="%s - Not found: %s " % (cdsname, c),
                      keywords="%s, CDSware" % cdsname,
                      uid=uid,
