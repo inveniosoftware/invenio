@@ -3,13 +3,30 @@ CERN DOCUMENT SERVER SOFTWARE (CDSware) NEWS
 
 Revision: $Id$
 
-User visible changes in the CDSware:
+Here is a short summary of most notable changes in CDSware releases.
 
-version 0.9 -- aimed at spring 2002
+CDSware v0.0.9 -- August 1st, 2002
+  * first "public" alpha release of CDSware
+  * recently standardized Library of Congress' MARC XML schema adopted
+    in all CDSware modules as the new default internal XML file format
+    (BibConvert, BibFormat, BibUpload, WebSubmit, WebSearch)
+  * support for OAI-PMH v2.0 in addition to OAI-PMH v1.1 (WebSearch)
+  * search interface now honors multiple output formats per collection
+    (BibFormat, WebSearch)
+  * search interface now honors search fields, search options, and
+    sort options from the database config tables (WebSearch,
+    WebSearch Admin)
+  * search interface now honors words indexes from the database config
+    tables (BibWords, WebSearch)
+  * easy reformatting of already uploaded bibliographic records via
+    web admin. tool (BibFormat Admin/Reformat Records)
+  * new submission form field type ("response") allowing
+    greater flexibility (WebSubmit) [thanks to Frank Sudholt]
+  * demo site "Atlantis Institute of Science" updated to demonstrate:
+    Pictures collection of photographs; specific per-collection
+    formats; references inside Articles and Preprints; "cited by"
+    search link; published version linking; subject category
+    searching; search within, search options, sort options in the web
+    collection pages.
 
-  * first public release of CDSware
-
-
-       - CDS Development Group
-         <cds.support@cern.ch>
-         <http://cds.cern.ch/>
+- end of file -
