@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir=$(libdir)/python/cdsware
-pylib_DATA=access_control_engine.py access_control_admin.py
+pylib_DATA=access_control_variables.py access_control_engine.py access_control_admin.py webaccessadmin_lib.py
 
 EXTRA_DIST = $(wildcard *.wml)
 
