@@ -18,11 +18,9 @@
 
 [rank_method]
 function = single_tag_rank_method
-top_star_percentage = 0.10
 overall_importance = 1.0
 
 [single_tag_rank]
 tag = 909C4p
 kb_src = <ETCDIR>/bibrank/jif.kb
 check_mandatory_tags = 909C4c,909C4v,909C4y
-enable_modified = yes

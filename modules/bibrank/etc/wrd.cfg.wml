@@ -30,7 +30,7 @@ stopword = <ETCDIR>/bibrank/stopwords.kb
 tag1 = 6531_a, 1, <CDSLANG>
 tag2 = 695__a, 1, <CDSLANG>
 tag3 = 6532_a, 1, <CDSLANG>
-tag4 = 245__%, 5, <CDSLANG>
+tag4 = 245__%, 10, <CDSLANG>
 tag5 = 246_% , 1, fr
 tag6 = 250__a, 1, <CDSLANG>
 tag7 = 711__a, 1, <CDSLANG>
@@ -39,9 +39,9 @@ tag9 = 222__a, 1, <CDSLANG>
 tag10 = 520__%, 1, <CDSLANG>
 tag11 = 590__%, 1, fr
 tag12 = 111__a, 1, <CDSLANG>
-tag13 = 100__%, 1, none
-tag14 = 700__%, 1, none
-tag15 = 721__a, 1, none
+#tag13 = 100__%, 1, none
+#tag14 = 700__%, 1, none
+#tag15 = 721__a, 1, none
 
 [find_similar]
 #term should exist in maximum X/100% of documents
