@@ -70,9 +70,9 @@ def main():
     action = ''
 
     # print help if wrong arguments
-    if sys.argv[1] in ["-h", "--help"]:
+    if alen > 1 and sys.argv[1] in ["-h", "--help"]:
         usage(0)
-    elif sys.argv[1] in ["-V", "--version"]:
+    elif alen > 1 and sys.argv[1] in ["-V", "--version"]:
         print __version__
         sys.exit(0)    
     if alen != 2 or sys.argv[1] not in ['reset-default-settings', 'add-default-settings']: 
