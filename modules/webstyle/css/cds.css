@@ -864,4 +864,18 @@ input,select {
 .mycdscell {
     border-right: 1px solid #fff;
 }
+.guideimg {
+    border: 2px dotted #777777;
+    padding: 5px;
+    margin: 5px;
+    horizontal-align: left;
+}
+.guideheader {
+   font-size: 120%;
+   font-weight: 600;
+   font-variant: small-caps;
+   color: #36c;
+   margin-left: 10px;
+   background: transparent;
+}
 /* end of cds.css */
