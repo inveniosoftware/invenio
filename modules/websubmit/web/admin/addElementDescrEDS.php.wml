@@ -419,7 +419,7 @@
 
    function displayPage()
    {
-      global $commitElement,$elename,$alephcode,$size,$rows,$cols,$maxlength,$val,$fidesc,$cookie,$type,$modifytext;
+      global $commitElement,$elename,$alephcode,$marccode,$size,$rows,$cols,$maxlength,$val,$fidesc,$cookie,$type,$modifytext;
 
       if($commitElement)
       {
