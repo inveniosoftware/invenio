@@ -259,7 +259,7 @@ def create_login_page_box(referer=''):
               <p>If you already have an account, please log in by choosing the <strong class=headline>login
               </strong> button below. <br>"""
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1:
-        text += """If you don't own an account yet, please choose the <strong class=headline>register</strong> button."""
+        text += """If you don't own an account yet, please <a href="./register">register</a>."""
     elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
         text += """It is not possible to create an account yourself. Contact <a href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a> if you want an account."""
     text += """ 
@@ -283,8 +283,6 @@ def create_login_page_box(referer=''):
                 </tr>
                 <tr>
 		 <td align=center colspan=3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>""" % (cgi.escape(referer))
-    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1:
-        text += """<code class=blocknote><input class="formbutton" type="submit" name="action" value="register"></code>"""
     text += """&nbsp;&nbsp;&nbsp;(<a href="./lost">Lost your password?</a>)
 		 </td>
                 </tr>

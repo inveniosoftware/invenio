@@ -220,16 +220,8 @@ def logout(req, ln=cdslang):
 def login(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
 
     uid = webuser.getUid(req)
-    if action =='register':
-        return page(title="Register",
-                    body=webaccount.create_register_page_box(referer),
-                    navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln), 
-                    description="CDS Personalize, Main page",
-                    keywords="CDS, personalize",
-                    uid=uid,
-                    language=ln,
-                    lastupdated=__lastupdated__)
-    elif action =='login':
+
+    if action =='login':
        if p_email==None:
            return  page(title="Login",
                         body=webaccount.create_login_page_box(referer),
