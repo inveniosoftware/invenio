@@ -43,17 +43,22 @@ except ImportError, e:
 
 def display(req):
     uid = webuser.getUid(req)
-    return page("Your Account", webaccount.perform_display(req),
-                """&gt;""",
-                "", "CDS Personalize, Main page", "CDS, personalize", webuser.create_user_infobox(uid), "")
+    return page(title="Your Account",
+                body=webaccount.perform_display(req),
+                description="CDS Personalize, Main page",
+                keywords="CDS, personalize",
+                uid=uid)
 def set(req):
     uid = webuser.getUid(req)
     data = webuser.getDataUid(req,uid)
     email = data[0]
     passw = data[1]
-    return page("Your Settings", webaccount.perform_set(email,passw),
-                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
-                "", "CDS Personalize, Your Settings", "CDS, personalize", webuser.create_user_infobox(uid), "")
+    return page(title="Your Settings",
+                body=webaccount.perform_set(email,passw),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                description="CDS Personalize, Your Settings",
+                keywords="CDS, personalize",
+                uid=uid)
 
 def change(req,email=None,password=None):
     uid = webuser.getUid(req)
@@ -66,10 +71,12 @@ def change(req,email=None,password=None):
 
 def lost(req):	#Metodo para mostrar el mensaje de perdida! perform_lostmandarle el email al usuario user el cliente smtp de python
     uid = webuser.getUid(req)
-    return page("Your Account", webaccount.perform_lost(),
-                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
-                "","CDS Personalize, Main page", "CDS, personalize",
-                webuser.create_user_infobox(uid), "")	
+    return page(title="Your Account",
+                body=webaccount.perform_lost(),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                description="CDS Personalize, Main page",
+                keywords="CDS, personalize",
+                uid=uid)
 
 def send_email(req,p_email=None):
     
@@ -78,10 +85,12 @@ def send_email(req,p_email=None):
     passw = webuser.givePassword(p_email) 
     if passw == -999:
 	eMsg = "The entered e-mail address doesn't exist in the database"
-	return page("Your Account", webaccount.perform_emailMessage(eMsg),
-        	        """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
-                	"","CDS Personalize, Main page", "CDS, personalize",
-		        webuser.create_user_infobox(uid), "") 
+	return page(title="Your Account",
+                    body=webaccount.perform_emailMessage(eMsg),
+                    navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                    description="CDS Personalize, Main page",
+                    keywords="CDS, personalize",
+                    uid=uid)
 	
     fromaddr = "From:cds.support@cern.ch"
     toaddrs  = "To:" + p_email
@@ -99,32 +108,40 @@ def send_email(req,p_email=None):
 
     except smtplib.SMTPRecipientsRefused,e:
            eMsg = "The entered e-mail address is incorrect, please check that it is written correctly (e.g. johndoe@example.com)"
-	   return page("Your Account", webaccount.perform_emailMessage(eMsg),
-        	        """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
-                	"","CDS Personalize, Main page", "CDS, personalize",
-		        webuser.create_user_infobox(uid), "") 
+	   return page(title="Your Account",
+                       body=webaccount.perform_emailMessage(eMsg),
+        	       navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                       description="CDS Personalize, Main page",
+                       keywords="CDS, personalize",
+                       uid=uid)
 
     server.quit()
-    return page("Your Account", webaccount.perform_emailSent(p_email),
-                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
-                "","CDS Personalize, Main page", "CDS, personalize",
-                webuser.create_user_infobox(uid), "") 
+    return page(title="Your Account",
+                body=webaccount.perform_emailSent(p_email),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                description="CDS Personalize, Main page",
+                keywords="CDS, personalize",
+                uid=uid)
 
 def delete(req):
     uid = webuser.getUid(req)	
-    return page("Delete Account", webaccount.perform_delete(),
-                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
-                "","CDS Personalize, Main page", "CDS, personalize",
-                webuser.create_user_infobox(uid), "")
+    return page(title="Delete Account",
+                body=webaccount.perform_delete(),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                description="CDS Personalize, Main page",
+                keywords="CDS, personalize",
+                uid=uid)
 
 def logout(req):
     
     uid = webuser.getUid(req)
     webuser.logoutUser(req,uid)
-    return page("Logout", webaccount.perform_logout(req),
-                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
-                "","CDS Personalize, Main page", "CDS, personalize",
-                webuser.create_user_infobox(uid), "")
+    return page(title="Logout",
+                body=webaccount.perform_logout(req),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                description="CDS Personalize, Main page",
+                keywords="CDS, personalize",
+                uid=uid)
     
 def login(req,p_email=None,p_pw=None,action='login'):
 
@@ -132,26 +149,34 @@ def login(req,p_email=None,p_pw=None,action='login'):
     if action =='login':
         
        if p_email==None:
-           return  page("Login", webaccount.perform_ask(),
-                        """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,
-                        "", "CDS Personalize, Main page", "CDS, personalize", webuser.create_user_infobox(uid), "")
+           return  page(title="Login",
+                        body=webaccount.perform_ask(),
+                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                        description="CDS Personalize, Main page",
+                        keywords="CDS, personalize",
+                        uid=uid)
        iden = webuser.loginUser(p_email,p_pw)
     
        if len(iden)>0:
            webuser.update_Uid(req,p_email,p_pw,uid)
-           return  page("Login", webaccount.perform_display(req),
-                        """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,
-                        "","CDS Personalize, Main page", "CDS, personalize",webuser.create_user_infobox(uid), "")
+           return  page(title="Login",
+                        body=webaccount.perform_display(req),
+                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                        description="CDS Personalize, Main page",
+                        keywords="CDS, personalize",
+                        uid=uid)
        else:
       	   if webuser.userNotExist(p_email,p_pw) or p_email=='':
                mess ="Your are not logged into the system.User unknown.<BR><BR> if you wish you can login again "
            else:
                mess ="Your are not logged into the system.Wrong password.<BR><BR> if you wish you can login again"
            act = "login"    
-	   return page("Wrong login", webaccount.perform_back(mess,act),
-                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
-                "","CDS Personalize, Main page", "CDS, personalize",
-                webuser.create_user_infobox(uid), "")
+	   return page(title="Wrong login",
+                       body=webaccount.perform_back(mess,act),
+                       navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                       description="CDS Personalize, Main page",
+                       keywords="CDS, personalize",
+                       uid=uid)
     if action == 'register':
         
         if webuser.registerUser(req,p_email,p_pw):
@@ -159,8 +184,14 @@ def login(req,p_email=None,p_pw=None,action='login'):
         else :
             mess ="Your are not registered into the system please try again"
             act = "login"
-            return page("Register failure",webaccount.perform_back(mess,act),"""&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
-                "","CDS Personalize, Main page", "CDS, personalize",
-                webuser.create_user_infobox(uid), "")
-    return  page("Your Account", webaccount.perform_display(req), "&gt;",
-                 "","CDS Personalize, Main page", "CDS, personalize",webuser.create_user_infobox(uid),"")
+            return page(title="Register failure",
+                        body=webaccount.perform_back(mess,act),
+                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                        description="CDS Personalize, Main page",
+                        keywords="CDS, personalize",
+                        uid=uid)
+    return  page(title="Your Account",
+                 body=webaccount.perform_display(req), 
+                 description="CDS Personalize, Main page",
+                 keywords="CDS, personalize",
+                 uid=uid)
