@@ -154,3 +154,19 @@ def perform_logout(req):
             
          """
     return out
+
+# perform_back(): template for return to a previous page, used for login,register and setting
+def perform_back(mess,act):
+    out =""
+    out+="""
+          <body>
+             <table>
+                <tr>
+                  <td align=center>%s
+                   <A href="./%s">%s</A></td>
+                </tr>
+             </table>
+            </body>
+         """%(mess,act,act)
+    
+    return out
