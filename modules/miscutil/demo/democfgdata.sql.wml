@@ -1032,3 +1032,14 @@ INSERT INTO sbmPARAMETERS VALUES ('RPICT','type','picture');
 
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (2,'demo_jif','0000-00-00 00:00:00');
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,2,90);
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'en','ln','journal impact factor');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'fr','ln','journal impact factor');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'de','ln','journal impact factor');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'es','ln','journal impact factor');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'pt','ln','journal impact factor');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'it','ln','journal impact factor');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'ru','ln','journal impact factor');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'sk','ln','journal impact factor');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'cz','ln','journal impact factor');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'no','ln','journal impact factor');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'se','ln','journal impact factor');
