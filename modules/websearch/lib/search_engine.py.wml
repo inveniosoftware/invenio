@@ -1631,16 +1631,18 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
         results_in_Home.calculate_nbhits()
         if results_in_Home._nbhits > 0:
             # some hits found in Home, so propose this search:
-            if ap:
-                if of.startswith("h"):
-                    print_warning(req, msg_no_hits_in_given_collection[ln])
-                results = {}
-                results[cdsname] = results_in_Home
-            else:
-                results = {}
+            url_args = req.args
+            url_args = sre.sub(r'(^|\&)cc=.*?(\&|$)', r'\2', url_args)
+            url_args = sre.sub(r'(^|\&)c=.*?(\&[^c]+=|$)', r'\2', url_args)
+            url_args = sre.sub(r'^\&+', '', url_args)
+            url_args = sre.sub(r'\&+$', '', url_args)
+            if of.startswith("h"):
+                print_warning(req, msg_no_hits_in_given_collection[ln] %
+                              (string.join(colls, ","), weburl, url_args, results_in_Home._nbhits))
+            results = {}
         else:
             # no hits found in Home, recommend different search terms:
-            if of.startswith("h"):            
+            if of.startswith("h"):
                 print_warning(req, msg_no_public_hits[ln])
             results = {}
     if verbose:

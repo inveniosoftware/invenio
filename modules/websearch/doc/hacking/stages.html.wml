@@ -138,8 +138,8 @@ The search engine proceeds as follows.
 
         4-2-1. If this gives some hits, we warn the user that no match
                could have been found in his c_j choice but that there
-               are hits in other public collections, and retaining
-               these hits we proceed to stage 5.
+               are hits in other public collections.  We propose a
+               link to get them and we stop.
 
         4-2-2. If this does not give any hit, then there must have
                been some hits in some of the restricted collections.
