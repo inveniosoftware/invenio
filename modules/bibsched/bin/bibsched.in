@@ -256,6 +256,7 @@ class Manager:
         id = self.currentrow[0]
         process = self.currentrow[1]
         state = self.currentrow[5]
+        sleeptime = self.currentrow[4]
         if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
             self.put_footer("a process is already running!")
         elif state == "STOPPED" or state == "WAITING":
@@ -276,6 +277,12 @@ class Manager:
                     arg2 = ""
                 COMMAND = "%s %s %s >> %s 2>> %s &" % (program, arg2, str(id), fdout, fderr)
                 os.system(COMMAND)
+                next_date=MySQLdb.escape_string(get_date(sleeptime))
+                if next_date:
+                    insert_query="""INSERT INTO schTASKS(
+                    proc, user, date, sleeptime, arguments, state, score)
+                    VALUES ('%s','%s','%s','%s','%s','WAITING','%d')""" % (process,self.currentrow[2], MySQLdb.escape_string(get_date(sleeptime)),sleeptime,self.currentrow[7],self.currentrow[8])
+                    self.cursor.execute(insert_query)
         else:
             self.put_footer("process state should be STOPPED or WAITING!")
         self.stdscr.refresh()
@@ -463,7 +470,7 @@ class Manager:
         if self.selected_line < self.first_visible_line + 2:
             self.first_visible_line = self.selected_line - 2
         for row in self.rows[self.first_visible_line:self.first_visible_line+maxy-2]:
-            id,proc,user,date,sleeptime,state,progress = row
+            id,proc,user,date,sleeptime,state,progress,arguments,score = row
             self.put_line( row )
         self.y = self.stdscr.getmaxyx()[0] - 1
         if self.auto_mode:
@@ -511,7 +518,7 @@ class Manager:
         else:
             where = "and state!='DONE'"
             order = "ASC"
-        query = "SELECT id,proc,user,date,sleeptime,state,progress FROM schTASKS WHERE state NOT LIKE '%%DELETED%%' %s order by date %s" % (where,order)
+        query = "SELECT id,proc,user,date,sleeptime,state,progress,arguments,score FROM schTASKS WHERE state NOT LIKE '%%DELETED%%' %s order by date %s" % (where,order)
         self.cursor.execute(query)
         self.rows = self.cursor.fetchall()
         self.repaint()
@@ -525,7 +532,7 @@ class Manager:
                 else:
                     where = "and state!='DONE'"
                     order = "ASC"
-                query = "SELECT id,proc,user,date,sleeptime,state,progress FROM schTASKS WHERE state NOT LIKE '%%DELETED%%' %s order by date %s" % (where,order)
+                query = "SELECT id,proc,user,date,sleeptime,state,progress,arguments,score FROM schTASKS WHERE state NOT LIKE '%%DELETED%%' %s order by date %s" % (where,order)
                 self.cursor.execute(query)
                 self.rows = self.cursor.fetchall()
                 ring = 0
