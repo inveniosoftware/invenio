@@ -416,7 +416,6 @@ AC_CONFIG_FILES([Makefile \
 	  modules/websubmit/lib/functions/Makefile \
 	  modules/websubmit/web/Makefile \
 	  modules/websubmit/web/admin/Makefile \
-	  modules/websubmit/web/personal/Makefile \
 	  modules/webaccess/Makefile \
 	  modules/webaccess/bin/Makefile \
 	  modules/webaccess/doc/Makefile \
