@@ -483,8 +483,9 @@ AC_CONFIG_FILES([Makefile \
 	  modules/websearch/web/Makefile \
 	  modules/websearch/web/admin/Makefile \
 	  modules/websession/Makefile \
-	  modules/websession/web/Makefile \
+	  modules/websession/bin/Makefile \
 	  modules/websession/lib/Makefile \
+	  modules/websession/web/Makefile \
 	  modules/webstyle/Makefile \
 	  modules/webstyle/css/Makefile \
 	  modules/webstyle/img/Makefile \
