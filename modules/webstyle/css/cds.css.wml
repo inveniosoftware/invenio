@@ -23,14 +23,14 @@ h1 {
 .h1 {
    font-size: 173%;
    font-weight: 700;
-   margin-left: 0%;
+   margin-left: 0px;
    color: #36c;
    background: transparent;
 }
 h2 {
    font-size: 144%;
    font-weight: 650;
-   margin-left: 0%;
+   margin-left: 0px;
    color: #36c;
    background: transparent;
 }
@@ -39,6 +39,7 @@ h3 {
    font-weight: 600;
    font-variant: small-caps;
    margin-top: 40px;
+   margin-left: 0px;
    margin-bottom: 10px;
    color: #36c;
    background: transparent;
@@ -50,12 +51,14 @@ h4 {
    font-weight: 600;
    font-style: italic;
    color: #36c;
+   margin-left: 0px;
    background: transparent;
 }
 h5 {
    font-size: 110%;
    font-weight: 400;
    color: #36c;
+   margin-left: 0px;
    background: transparent;
 }
 h6 {
@@ -63,6 +66,7 @@ h6 {
    font-weight: 200;
    font-style: italic;
    color: #36c;
+   margin-left: 0px;
    background: transparent;
 }
 a:link {
