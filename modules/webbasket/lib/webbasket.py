@@ -269,10 +269,9 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
     if (id_user == 1):
 	 out += """<br><br><FONT color="red"> You are logged in as a <B>guest</B> user, so your baskets
         will disappear at the end of the current session. If you wish you can login or register
-        <A href="./login">here</A>.</FONT>"""	
+        <A href="../youraccount.py/login">here</A>.</FONT>"""	
  
     return out
-
     
 
 # display_basket_content: display the content of the selected basket
