@@ -38,7 +38,6 @@ try:
     from cdsware.config import *
     from cdsware.webpage import page
     from cdsware import webbasket
-    webbasket = reload( webbasket )
     from cdsware.dbquery import run_sql
     from cdsware.webuser import getUid
     from mod_python import apache
