@@ -362,12 +362,12 @@ def find_similar(rank_method_code, recID, lrecIDs, rank_limit_relevance=10,verbo
         while reclist[i][1] > w and i > 0:
             i -= 1
         if len(reclist) - 30 < i:
-            i = len(reclist) - 31
+            i = len(reclist) - 30
 
     if verbose == 9:
         stat(reclist, query_terms)
-    return reclist[i + 1:len(reclist)]
-    #return (reclist[i + 1:len(reclist)], "(", "%)")
+    #return reclist[i:len(reclist)]
+    return (reclist[i:len(reclist)], "(", "%)")
 
 def rank_by_method(lwords, lrecIDs, rank_limit_relevance,rank_method_code,verbose=0):
     """input: list of words, ['ellis', 'muon']          
