@@ -34,6 +34,8 @@ install-data-local:
 	mkdir -p @prefix@/var/log
 	mkdir -p @prefix@/var/tmp
 	chmod -R ug=rwx @prefix@/var
+	${prefix}/bin/webcoll update-reclist
+	${prefix}/bin/webcoll update-webpage
 
 uninstall-local:
 	rm -rf @prefix@/var
@@ -62,7 +64,6 @@ create-demo-site: install
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/demo/democfgdata.sql
 	${prefix}/bin/webcoll update-reclist
 	${prefix}/bin/webcoll update-webpage
-	rm -f index.wml
 	@echo "***********************************************************************"
 	@echo "** The demo site has been successfully created.                      **"
 	@echo "** Please point your browser to @WEBURL@ "
@@ -84,7 +85,6 @@ load-demo-records: install
 	rm -f z.xml zf.xml
 	${prefix}/bin/webcoll update-reclist
 	${prefix}/bin/webcoll update-webpage
-	rm -f index.wml
 	@echo "***********************************************************************"
 	@echo "** The demo records have been successfully loaded.                   **"
 	@echo "** Please point your browser to @WEBURL@ "
@@ -103,7 +103,6 @@ destroy-demo-site: install
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
 	${prefix}/bin/webcoll update-reclist
 	${prefix}/bin/webcoll update-webpage
-	rm -f index.wml
 	for f in $(sbmdat); do rm -f $(sbmdir)/$$f.shtml ; done
 	@echo "*****************************************************************"
 	@echo "** The demo site and records have been successfully destroyed. **"
@@ -113,7 +112,6 @@ remove-demo-records: install
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabbibclean.sql
 	${prefix}/bin/webcoll update-reclist
 	${prefix}/bin/webcoll update-webpage
-	rm -f index.wml
 	@echo "**************************************************************"
 	@echo "** The demo records have been successfully removed.         **"
 	@echo "** The demo collection and submit configurations            **"
@@ -123,4 +121,4 @@ remove-demo-records: install
 	@echo "** the demo site fully.                                     **"
 	@echo "**************************************************************"
 
-CLEANFILES = *~ index.wml
+CLEANFILES = *~
