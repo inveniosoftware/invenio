@@ -173,7 +173,7 @@
             . '><INPUT TYPE=button VALUE="VIEW CATEGORIES" onClick'
             . '="submit();"></TD></FORM>');
                   
-            print('<FORM ACTION="referees.php" METHOD="'
+            print('<FORM ACTION="referees.py" METHOD="'
             . 'post"'
             . '><INPUT TYPE=hidden NAME=doctype VALUE='.$doctype
             . '><TD ALIGN=center'

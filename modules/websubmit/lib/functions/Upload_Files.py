@@ -188,7 +188,7 @@ def displayFile(filepath,file):
     t=t+ "<TD><small><IMG src=%s/smallfiles.gif>&nbsp;%s</small></TD>" % (images,file)
     t=t+ "<TD><small>&nbsp;<font color=green>["+str(os.path.getsize("%s/%s" %(filepath,file)))+"&nbsp;o]</font></small></TD>"
     t=t+ "<TD><small>&nbsp;<font color=green>["+time.strftime("%d/%m/%Y %H:%M",time.gmtime(os.path.getmtime("%s/%s" %(filepath,file))))+"]</font></small></TD>"
-    fileurl = "%s/storage/%s/%s" % (urlpath,filepath.replace(storage,""),file)
+    fileurl = "%s/submit/storage/%s/%s" % (urlpath,filepath.replace(storage,""),file)
     t=t+ "<TD><small>[&nbsp;<A href=\"%s\"><IMG src=%s/iconeye.gif border=0></a>&nbsp;<A href=\"\" onClick=\"if (confirm('Are you sure you want to delete %s?')) { document.forms[0].deletedfile.value='%s/%s';document.forms[0].deleted.value='yes';document.forms[0].submit();return false;} else { return false; }\"><IMG src=%s/smallbin.gif border=0></a>&nbsp;]<br></small></TD>" % (fileurl,images,file,filepath,file,images)
     return t
 

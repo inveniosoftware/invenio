@@ -1,10 +1,5 @@
 
-try:
-    import smtplib
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)    
+import smtplib
     
 def send_email(fromaddr, toaddr, body, attempt=0):
     if toaddr != "":

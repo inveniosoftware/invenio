@@ -27,13 +27,6 @@
 """CDSware Submission Web Interface."""
 <protect>
 
-try:
-    import shutil
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)    
-
 def Get_Existing_Files(parameters,curdir,form):
     t=""
     if os.path.exists("%s/files/MainFiles" % curdir):

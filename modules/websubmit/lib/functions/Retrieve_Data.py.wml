@@ -29,12 +29,7 @@
    ## PARAMETERS:    fieldname: marc21 code
    ##                bibrec: system number of the bibliographic record
 
-try:
-    from cdsware.search_engine import search_pattern, perform_request_search, print_record
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+from cdsware.search_engine import search_pattern, perform_request_search, print_record
 
 def Get_Field(fieldname,bibrec):
     value = string.strip(print_record(int(bibrec),'tm',fieldname))

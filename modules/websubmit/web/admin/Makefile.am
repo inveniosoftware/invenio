@@ -29,3 +29,6 @@ CLEANFILES = $(webapp_DATA) *~ *.tmp
 %.php: %.php.wml ../../../../config/config.wml ../../../../config/configbis.wml \
            ../../../../config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
+%.py: %.py.wml ../../../../config/config.wml ../../../../config/configbis.wml \
+           ../../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<

@@ -32,12 +32,7 @@
    ## OUTPUT: HTML
    ##
 
-try:
-    from cdsware.search_engine import search_pattern
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+from cdsware.search_engine import search_pattern
     
 def Get_Sysno(parameters,curdir,form):
     global rn,sysno

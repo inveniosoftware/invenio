@@ -39,6 +39,7 @@ import time
 import types
 import re
 import MySQLdb
+import shutil
 
 sys.path.append('%s' % pylibdir)
 from cdsware.config import *
@@ -141,7 +142,7 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         mainmenu = fp.read()
         fp.close()
     else:
-        mainmenu = urlpath;
+        mainmenu = "%s/submit.py" %urlpath
     # various authentication related tasks...
     if uid_email != "guest" and uid_email != "":
         #First save the username (email address) in the SuE file. This way bibconvert will be able to use it if needed
@@ -631,7 +632,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         mainmenu = fp.read()
         fp.close()
     else:
-        mainmenu = urlpath;
+        mainmenu = "%s/submit.py" % urlpath
     # retrieve the name of the file in which the reference of 
     # the submitted document will be stored
     res = run_sql("SELECT value FROM sbmPARAMETERS WHERE  doctype='%s' and name='edsrn'" % doctype)
