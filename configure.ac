@@ -515,7 +515,6 @@ AC_CONFIG_FILES([Makefile \
 	  modules/webalert/web/Makefile \
 	  modules/webalert/bin/Makefile \
 	  modules/websubmit/Makefile \
-	  modules/websubmit/bin/Makefile \
 	  modules/websubmit/etc/Makefile \
 	  modules/websubmit/etc/bibconvert/Makefile \
 	  modules/websubmit/etc/bibconvert/KB/Makefile \
@@ -525,8 +524,6 @@ AC_CONFIG_FILES([Makefile \
 	  modules/websubmit/lib/Makefile \
 	  modules/websubmit/lib/functions/Makefile \
 	  modules/websubmit/web/Makefile \
-	  modules/websubmit/web/access/Makefile \
-	  modules/websubmit/web/access/protected/Makefile \
 	  modules/websubmit/web/admin/Makefile \
 	  modules/websubmit/web/publiline/Makefile \
 	  modules/websubmit/web/publiline/inotes/Makefile \
