@@ -62,7 +62,7 @@ try:
     from cdsware.config import *
     from cdsware.messages import *
     from cdsware.search_engine import HitSet, search_pattern
-    from cdsware.search_engine_config import cfg_author_et_al_threshold, cfg_instant_browse, cfg_max_recID
+    from cdsware.search_engine_config import cfg_author_et_al_threshold, cfg_instant_browse, cfg_max_recID, cfg_narrow_search_show_grandsons
     from cdsware.dbquery import run_sql    
 except ImportError, e:
     print "Error: %s" % e
@@ -490,15 +490,16 @@ class Collection:
                                 (weburl, urllib.quote_plus(son.name), as, ln, style_prolog, son.name, style_epilog, son.create_nbrecs_info())
                 if son.restricted_p():
                     narrowsearch += """ <small class="warning">[restricted]</small>"""
-                grandsons = son.get_sons()
-                nb_grandsons = len(grandsons)
-                if nb_grandsons:
-                    # print all grandsons:
-                    narrowsearch += """<br>"""
-                    for i in range(0,nb_grandsons):
-                        narrowsearch += """<a href="%s/?c=%s&amp;as=%d&amp;ln=%s">%s</a>%s """ % \
-                                        (weburl, urllib.quote_plus(grandsons[i].name), as, ln, grandsons[i].name, \
-                                         grandsons[i].create_nbrecs_info())
+                if cfg_narrow_search_show_grandsons:
+                    # iterate trough grandsons:
+                    grandsons = son.get_sons()
+                    nb_grandsons = len(grandsons)
+                    if nb_grandsons:
+                        narrowsearch += """<br>"""
+                        for i in range(0,nb_grandsons):
+                            narrowsearch += """<a href="%s/?c=%s&amp;as=%d&amp;ln=%s">%s</a>%s """ % \
+                                            (weburl, urllib.quote_plus(grandsons[i].name), as, ln, grandsons[i].name, \
+                                             grandsons[i].create_nbrecs_info())
                 narrowsearch += """</td></tr>"""
             narrowsearch += "</tbody></table>"            
         else:

@@ -39,3 +39,4 @@ cfg_fields_convert = <CFG_FIELDS_CONVERT>
 cfg_google_box = <CFG_GOOGLE_BOX> # are we are proposing links to other search engines like google by default?
 cfg_simplesearch_pattern_box_width = <CFG_SIMPLESEARCH_PATTERN_BOX_WIDTH> # width of the search pattern window in the simple search interface
 cfg_advancedsearch_pattern_box_width = <CFG_ADVANCEDSEARCH_PATTERN_BOX_WIDTH> # width of the search pattern window in the advanced search interface
+cfg_narrow_search_show_grandsons = <CFG_NARROW_SEARCH_SHOW_GRANDSONS> # show or not grandsons in Narrow Search boxes?

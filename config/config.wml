@@ -398,6 +398,16 @@ cds.support@cern.ch
 3
 </define-tag>
 
+## CFG_NARROW_SEARCH_SHOW_GRANDSONS -- whether to show or not
+## collection grandsons in Narrow Search boxes (sons are shown
+## by default, grandsons are configurable here).  Use 0 for no
+## and 1 for yes.
+##  (example: "0")
+<define-tag CFG_NARROW_SEARCH_SHOW_GRANDSONS whitespace=delete>
+1
+</define-tag>
+
+
 ######################################
 ## Part 5: WebSearch OAI parameters ##
 ######################################
