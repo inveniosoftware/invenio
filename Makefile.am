@@ -35,4 +35,4 @@ create-tables:
 drop-tables:
 	./dbutil/dbexec < ./dbutil/tabdrop.sql
 
-CLEANFILES = *~
+CLEANFILES = *~ index.wml
