@@ -18,7 +18,7 @@
 
 docdir = $(WEBDIR)/admin/bibupload
 
-doc_DATA=index.html
+doc_DATA=index.html guide.html
 
 EXTRA_DIST = $(wildcard *.wml)
 
