@@ -168,9 +168,9 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
             t+= "<tr bgcolor=\"#e0e0e0\">\n"
         else:
             t+= "<tr bgcolor=\"#eeeeee\">\n"
-        t+="<td align=center><small>%s</small></td>\n<td align=center><small>%s</small></td>\n<td><small>" % (lactname,status)
-        t+="%s</small></td>\n<td><small>&nbsp;%s" % (idtext,reference)
-        t+="</small></td>\n<td><small>%s</small></td>\n<td><small>" % cdate
+        t+="<td align=center class=mycdscell><small>%s</small></td>\n<td align=center class=mycdscell><small>%s</small></td>\n<td class=mycdscell><small>" % (lactname,status)
+        t+="%s</small></td>\n<td class=mycdscell><small>&nbsp;%s" % (idtext,reference)
+        t+="</small></td>\n<td class=mycdscell><small>%s</small></td>\n<td class=mycdscell><small>" % cdate
         t+="%s</small></td>\n</tr>\n" % mdate
         num+=1
     t+="</table></td></tr></table></form>"
