@@ -21,6 +21,7 @@
 ## read config variables:
 #include "config.wml"
 #include "configbis.wml"
+#include "messages.wml"
 
 ## local defaults, i.e. WML config variables are to be used:
 INSERT INTO collection VALUES (1,'<CDSNAME>',NULL,NULL,NULL,NULL);
@@ -45,7 +46,21 @@ INSERT INTO flxLINKTYPECONDITIONSACTIONS VALUES ('KEYWORD_SEARCH',0,0,'\"<WEBURL
 INSERT INTO flxLINKTYPEPARAMS VALUES ('AUTHOR_SEARCH','AUTHOR',0);
 INSERT INTO flxLINKTYPEPARAMS VALUES ('KEYWORD_SEARCH','KEYWORD',0);
 
-# generally suitable defaults:
+## generally suitable defaults:
+INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (1,'wrd','0000-00-00 00:00:00');
+INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,1,100);
+<en>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'en','ln','<MSG_WORD_SIMILARITY>');</en>
+<fr>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'fr','ln','<MSG_WORD_SIMILARITY>');</fr>
+<de>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'de','ln','<MSG_WORD_SIMILARITY>');</de>
+<es>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'es','ln','<MSG_WORD_SIMILARITY>');</es>
+<pt>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'pt','ln','<MSG_WORD_SIMILARITY>');</pt>
+<it>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'it','ln','<MSG_WORD_SIMILARITY>');</it>
+<ru>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'ru','ln','<MSG_WORD_SIMILARITY>');</ru>
+<sk>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'sk','ln','<MSG_WORD_SIMILARITY>');</sk>
+<cz>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'cz','ln','<MSG_WORD_SIMILARITY>');</cz>
+<no>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'no','ln','<MSG_WORD_SIMILARITY>');</no>
+<se>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'se','ln','<MSG_WORD_SIMILARITY>');</se>
+
 <protect>
 INSERT INTO field VALUES (1,'any field','anyfield');
 INSERT INTO field VALUES (2,'title','title');
