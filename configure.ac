@@ -450,6 +450,8 @@ AC_CONFIG_FILES([Makefile \
 	  config/Makefile \
 	  config/configbis.wml \
 	  modules/Makefile \
+	  modules/bibsched/Makefile \
+	  modules/bibsched/bin/Makefile \
 	  modules/bibwords/Makefile \
 	  modules/bibwords/bin/Makefile \
 	  modules/bibupload/Makefile \
@@ -476,6 +478,14 @@ AC_CONFIG_FILES([Makefile \
 	  modules/webstyle/css/Makefile \
 	  modules/webstyle/img/Makefile \
 	  modules/webstyle/lib/Makefile \
+	  modules/webbasket/Makefile \
+	  modules/webbasket/lib/Makefile \
+	  modules/webbasket/web/Makefile \
+	  modules/webalert/Makefile \
+	  modules/webalert/lib/Makefile \
+	  modules/webalert/web/Makefile \
+	  modules/websubmit/Makefile \
+	  modules/websubmit/web/Makefile \
 	  modules/miscutil/Makefile \
 	  modules/miscutil/bin/Makefile \
 	  modules/miscutil/lib/Makefile \
