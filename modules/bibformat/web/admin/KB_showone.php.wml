@@ -1,0 +1,98 @@
+<?
+/*********************************************************************
+   This file is part of the CERN Document Server Software (CDSware).
+   Copyright (C) 2002 CERN.
+   1211 Geneva 23 - Switzerland
+   <cds.support@cern.ch>
+
+    The CDSware is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    The CDSware is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with CDSware; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+*********************************************************************/
+
+//==========================================================================
+//  File: KB_showone.php (flexElink WI)
+//  Description: Shows the list of values for a given KB (it also shows complete
+//	KB reated data: documentation, DB table name). It allows to add or
+//	delete values to the displayed KB
+//  POST parameters:
+//      name --> (required) Name (id) of the KB to be shown
+//  Requires:  DB, ERROR
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+  include("localconf.inc.php");
+
+  include(DB);
+  include(ERROR);
+
+  if( (!isset($name)) or (trim($name)=="") )
+  {
+    errorpage("<b>KB name</b> hasn't been specified");
+    exit;
+  }
+
+  $cBorder="#CCCCCC";
+  $cHeaders="#FFCC33";
+  $cCells="#FFFFFF";
+  $cImpCells="#FFCC99";
+
+  $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD );
+  mysql_selectdb( $DB_DB );
+
+  $qry="select kb_table, doc from flxKBS where kb_name='$name'";
+  $res=mysql_query( $qry, $db );
+  list($table, $doc)=mysql_fetch_array( $res );
+  $doc=str_replace("\n", "<br>", $doc);
+  $doc=str_replace(" ", "&nbsp;", $doc);
+
+  $qry="select vkey, value from $table order by vkey";
+  $res=mysql_query( $qry, $db );
+  print "<form action=\"KB_VALUE_add.php\" method=\"POST\">";
+  print "<input type=\"hidden\" name=\"kb_name\" value=\"$name\">";
+  print '<table bgcolor="'.$cBorder.'" width="100%" border="1">';
+  print "<tr bgcolor=\"$cHeaders\">";
+  print "<td colspan=\"3\" align=\"center\"><font size=\"4\">Values of KB <b>'$name'</b> ".mysql_num_rows($res)." values</font></td>";
+  print "</tr>";
+  print "<tr>";
+  print "<td bgcolor=\"$cImpCells\"><b>Table Name</b></td>";
+  print "<td colspan=\"2\" bgcolor=\"$cCells\">$table</td>";
+  print "</tr>";
+  print "<tr>";
+  print "<td bgcolor=\"$cImpCells\"><b>Documentation</b></td>";
+  print "<td colspan=\"2\" bgcolor=\"$cCells\"><font size=\"2\">$doc</font></td>";
+  print "</tr>";
+
+  print "<tr bgcolor=\"#CCCCCC\">";
+  print "<td bgcolor=\"$cImpCells\" colspan=\"3\" align=\"center\">ADD <b>VALUE</b>: 
+	      <i>Key</i> <input type=\"text\" name=\"key\">
+	      <i>Value</i> <input type=\"text\" name=\"value\">
+	      <input type=\"submit\" value=\"Add value\">
+	  </td>";
+  print "</tr>";
+  while($row=mysql_fetch_array($res))
+  {
+    list($key, $value)=$row;
+    print "<tr bgcolor=\"$cCells\">";
+    print "<td width=\"50%\">$key</td>";
+    print "<td width=\"50%\">$value</td>";
+    print "<td align=\"center\"><a href=\"KB_VALUE_del.php?kb_name=".urlencode($name)."&key=".urlencode($key)."\"><font size=\"2\">[Delete]</font></a></td>";
+    print "</tr>";
+  }
+  print "</table>";
+  print "</form>";
+
+
+  mysql_close( $db );
+
+?>

@@ -1,0 +1,189 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+<?
+  include("localconf.inc.php");
+?>
+
+#include "cdspage.wml" \
+    title="Execution Test" \
+    navbar_name="admin" \
+    navbar_select="test"  \
+    cdspageboxlefttopadd="<protect><?displayLoginMenu('admin');?> </protect>"
+
+<?
+  include("security.inc.php");
+<protect>## $Id$</protect>
+
+
+  include(DB);
+  
+  $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD );
+  mysql_selectdb( $DB_DB );
+
+//---DISPLAY
+  if(!isset($process))
+  {
+    include(HEADER);
+    
+
+    $qry="select distinct(type) from flxXMLMARCEXTRULES";
+    $qh=mysql_query($qry, $db);
+    $itype_opts="";
+    while($row=mysql_fetch_array($qh))
+    {
+      $itype_opts.="<option value=\"".$row[0]."\">".$row[0]."</option>";
+    }
+    $qry="select name from flxBEHAVIORS";
+    $qh=mysql_query($qry, $db);
+    $otype_opts="";
+    while($row=mysql_fetch_array($qh))
+    {
+      $otype_opts.="<option value=\"".$row[0]."\">".$row[0]."</option>";
+    }
+?>
+<p>Enables you to test your formats on your sample data file.  Useful
+when debugging newly created formats.
+
+<p align="center">
+  <table width="60%" border=1>
+    <tr>
+      <td>
+        <font size="2">From this page you'll be able to launch BibFormat over a file which contains bibliographic MARC21 XML
+        </font>
+      </td>
+    </tr>
+  </table>
+</p>
+<br>
+<p align="center">
+<form action="test.php" method="POST">  
+  <table> 
+    <tr>
+      <td bgcolor="#FFFFCC">
+	<b>XML File (URL)</b>
+      </td>
+      <td>
+	<input type="text" name="file" size="50">
+      </td>
+    </tr>
+    <tr>
+      <td bgcolor="#FFFFCC">
+	<b>Input Type</b>
+      </td>
+      <td align="left">
+	<select name="itype"><?echo $itype_opts;?></select>
+      </td>
+    </tr>
+    <tr>
+      <td bgcolor="#FFFFCC">
+	<b>Output Type</b>
+      </td>
+      <td align="left">
+	<select name="otype"><?echo $otype_opts;?></select>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" align="left">
+	<input type="checkbox" name="debug" checked>
+	  <font size="2">Print debug information</font>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" colspan="2">
+	<input type="hidden" name="process" value="oo">
+	<input type="submit" value="LAUNCH!!">
+      </td>
+    </tr>
+  </table>
+</form>
+</p>
+<?
+    include(FOOTER);
+  }
+//---PROCESS
+  else
+  {
+    include_once(ERROR);
+    if( (!isset($file)) || (trim($file)=="") )
+    {
+      outWarning("The <b>XML file</b> hasn't been specified");
+      print "</td></tr></table>";
+      mysql_close($db);
+      exit;
+    }
+    if( (!isset($itype)) || (trim($itype)=="") )
+    {
+      outWarning("The <b>input type</b> hasn't been specified");
+      print "</td></tr></table>";
+      mysql_close($db);
+      exit;
+    }
+    if( (!isset($otype)) || (trim($otype)=="") )
+    {
+      outWarning("The <b>ouput type</b> hasn't been specified");
+      print "</td></tr></table>";
+      mysql_close($db);
+      exit;
+    }
+
+    $qry="select type from flxBEHAVIORS where name='$otype'";
+    $qh=mysql_query($qry, $db);
+    $modeshow="NORMAL";
+    list($modeshow)=mysql_fetch_array($qh);
+
+    include_once(MAIN);
+
+    include_once(CORE_DIR."Timing.inc.php");
+
+    $timing=new Timing();
+    
+    $fxk=new FlexElink();
+    $error=$fxk->initialise("OAIMARC", $file);
+
+    if($error)
+    {
+      errorpage("Error initialising: $error");
+      exit;
+    }
+    
+    $code=0;
+    while(1)
+    {
+      $timing->start("TOTAL");
+      list($code, $res)=$fxk->getRecordResult(array($otype), $debug);
+      $timing->end("TOTAL");
+      if($code<0) break;
+      if($code==0)
+      {
+        print "ERROR: $res<br>";
+      }
+      else
+      {
+        if(isset($debug)&&($modeshow=="NORMAL"))
+          print "<br>".text2HTML($res)."<br><hr><br>";
+        if($modeshow=="IENRICH")
+	  print text2HTML($res)."<br>";
+        else
+	  print $res."<br>";
+      }
+      $timing->debug();
+      print "<hr><hr>";
+    }
+  }
+?>

@@ -1,0 +1,96 @@
+<?
+/*********************************************************************
+   This file is part of the CERN Document Server Software (CDSware).
+   Copyright (C) 2002 CERN.
+   1211 Geneva 23 - Switzerland
+   <cds.support@cern.ch>
+
+    The CDSware is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    The CDSware is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with CDSware; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+*********************************************************************/
+
+//==========================================================================
+//  File: KB_add.php (flexElink WI)
+//  Description: Adds a new KB to the DB. It also creates a table in the 
+//	configuration DB that will keep the KB values.
+//  POST parameters:
+//      name --> (required) Name (id) of the KB to be added
+//	table -> (optional) DB table name; if it is not provided (normal i
+//		situation), the script will generate it automatically ensuring
+//		that is unique in this DB
+//      doc ----> (optional) Description of the purpose of the KB
+//  Notes: If the KB is succesfully added to the DB it redirects the current
+//      browser to the KB display list
+//  Requires:  DB, ERROR, EXECUTOR
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+  include("localconf.inc.php");
+
+  include(DB);
+  include(ERROR);
+
+  if( (!isset($name)) or (trim($name)=="") )
+  {
+    errorpage("<b>KB name</b> hasn't been specified");
+    exit;
+  }
+
+  if( !isset($table) )
+    $table="";
+  
+  if( !isset($doc) )
+    $doc="";
+  
+  $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD ) 
+	or errormsg("Couldn't connect to mySQL");
+  mysql_selectdb( $DB_DB );
+  
+  $name=trim(strtoupper($name));
+  $table=trim(strtoupper($table));
+  if($table=="")
+  {
+    $table="flxKB$name";
+  }
+  
+  $qry="create table $table(
+	  vkey varchar(255) not null,
+	  value text default '',
+	  primary key(vkey))";
+  if(!mysql_query( $qry ))
+  {
+    errorpage("Impossible to create KB table:<br> ".mysql_error());
+    mysql_close( $db );
+    exit;
+  }
+
+  if(!get_magic_quotes_gpc())
+  {
+    $doc=addslashes($doc);
+  }
+  $qry="insert into flxKBS(kb_name, kb_table, doc)
+	values ('$name', '$table', '$doc')";
+  if(!mysql_query( $qry ))
+  {
+    errorpage("Impossible to insert new KB:<br> ".mysql_error());
+    $qry="drop table $table";
+    mysql_query( $qry );
+    mysql_close( $db );
+    exit;
+  }
+
+  mysql_close( $db );
+
+  header("location: KB_display.php");
+?>

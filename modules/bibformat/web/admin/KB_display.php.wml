@@ -1,0 +1,138 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+<?
+  include("localconf.inc.php");
+?>
+
+#include "cdspage.wml" \
+    title="Knowledge Bases (KBs)" \
+    navbar_name="admin" \
+    navbar_select="KB_display"  \
+    cdspageboxlefttopadd="<protect><?displayLoginMenu('admin');?> </protect>"
+
+<?
+  include("security.inc.php");
+<protect>## $Id$</protect>
+
+//==========================================================================
+//  File: KB_display.php (flexElink WI)
+//  Description: Shows a list of the existing KBs in the DB, and allows to
+//      access to their list of values, add new ones or delete existing ones
+//  POST parameters:
+//  Notes: 
+//  Requires:  DB, ERROR
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+  include(DB);
+  include(ERROR);
+  
+  include(HEADER);
+?>
+
+<p>Define one or more knowledge bases that enables you to transform
+various forms of input data values into the unique standard form on
+the output.
+
+<em>Example:</em> You can tell that <em>Phys Rev D</em> and
+<em>Physical Review D</em> are both the same journal and that these
+names should be standardized to <em>Phys Rev : D</em>.<p>
+
+<script language="javascript">
+<!---
+function openwindowlink( addr, name )
+{
+  window.open( addr, "Window"+name, "height=320,witdh=320,scrollbars,resizable")
+}
+//-->
+</script>
+
+<?
+
+  $cBorder="#CCCCCC";
+  $cHeaders="#FFCC33";
+  $cCells="#FFFFFF";
+  $cImpCells="#FFCC99";
+
+  $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD );
+  mysql_selectdb( $DB_DB );
+
+  $qry="select kb_name, kb_table, doc from flxKBS order by kb_name";
+  $res=mysql_query( $qry, $db );
+  print '<table bgcolor="'.$cBorder.'" border="1" width="100%">';
+  print "<tr bgcolor=\"$cHeaders\">";
+  print "<td align=\"center\"><b>KB name</b></td>";
+  print "<td align=\"center\"><b>Table name</b></td>";
+  print "<td align=\"center\"><b>Documentation</b></td>";
+  print "<td colspan=\"3\">&nbsp;</td>";
+  print "</tr>";
+  while($row=mysql_fetch_array($res))
+  {
+    list($kb_name, $kb_table, $doc)=$row;
+    $doc=str_replace("\n", "<br>", $doc);
+    $doc=str_replace(" ", "&nbsp;", $doc);
+    print "<tr bgcolor=\"$cCells\">";
+    print "<td bgcolor=\"$cImpCells\">
+	      <strong>$kb_name</strong>
+	   </td>";
+    print "<td>$kb_table</td>";
+    print "<td width=\"100%\"><font size=\"2\">$doc&nbsp;</font></td>";
+    print "<td><font size=\"2\">
+	      <a href=\"JavaScript:openwindowlink( 'KB_showone.php?name=".urlencode($kb_name)."', 'KBSv$kb_name' )\">[Values]</a></font></td>";
+    print "<td><font size=\"2\">
+	      <a href=\"JavaScript:openwindowlink( 'KB_edit.php?name=".urlencode($kb_name)."', 'KBSe$kb_name' )\">[Modify]</a></font></td>";
+    print "<td><font size=\"2\">
+	      <a href=\"KB_del.php?name=".urlencode($kb_name)."\">[Delete]</a>
+	       </font></td>";
+    print "</tr>";
+  }
+  print "</table>";
+
+
+  mysql_close( $db );
+
+?>
+  <br>
+  <form action="KB_add.php" method="POST">
+    <table width="70%" align="center">
+      <tr>
+        <td bgcolor="#000000" width="100%" align="center" colspan="2">
+          <font color="#FFFFFF">Add new KNOWLEDGE BASE</font>
+        </td>
+      </tr>
+      <tr>
+        <td align="right">Knowledge base name</td>
+        <td><input type="text" name="name"></td>
+      </tr>
+      <tr>
+        <td align="right">Knowledge base table name (normally leave it blank)</td>
+        <td><input type="text" name="table"></td>
+      </tr>
+      <tr>
+	<td align="right">KB documentation</td>
+	<td><textarea name="doc" cols="50" rows="5"></textarea><td>
+      </tr>
+      <tr>
+	<td colspan="2" align="center"><input type="submit" value="Add"></td>
+      </tr>
+    </table>
+  </form>
+<?
+  include(FOOTER);
+?>

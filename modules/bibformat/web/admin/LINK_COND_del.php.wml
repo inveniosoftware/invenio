@@ -1,0 +1,92 @@
+<?
+/*********************************************************************
+   This file is part of the CERN Document Server Software (CDSware).
+   Copyright (C) 2002 CERN.
+   1211 Geneva 23 - Switzerland
+   <cds.support@cern.ch>
+
+    The CDSware is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    The CDSware is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with CDSware; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+*********************************************************************/
+
+//==========================================================================
+//  File: LINK_COND_del.php (flexElink WI)
+//  Description: Deletes an existing condition(and all its depending
+//      items) for a given link definition from the DB.
+//  POST parameters:
+//      linktype --> (required) Name (id) of the link definition the condition
+//		belongs to
+//	eorder ----> (required) Condition evaluation order number for the given 
+//		link definition
+//  Notes: If the format is succesfully added to the DB the current browser is
+//      redirectred to the link detailed definition display 
+//  Requires:  DB, ERROR
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+
+  include("localconf.inc.php");
+
+  include(DB);
+  include(ERROR);
+
+  if( (!isset($linktype)) or (trim($linktype)=="") )
+  {
+    errorpage("<b>Link type</b> hasn't been specified");
+    exit();
+  }
+  if( (!isset($eorder)) or (trim($eorder)=="") )
+  {
+    errorpage("<b>Evaluation order</b> hasn't been specified");
+    exit();
+  }
+
+  $linktype=strtoupper(trim($linktype));
+  
+  $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD ) 
+	or errormsg("Couldn't connect to mySQL") or exit;
+  mysql_selectdb( $DB_DB );
+
+  $qry="delete from flxLINKTYPECONDITIONSACTIONS
+        where linktype='$linktype'
+	and eval_order='$eorder'";
+  if(!mysql_query( $qry ))
+  {
+    errorpage("Impossible to delete actions related to this condition:<br> ".mysql_error());
+    mysql_close( $db );
+    exit;
+  }
+  
+  $qry="delete from flxLINKTYPECONDITIONSFILEFORMATS
+        where linktype='$linktype'
+	and eval_order='$eorder'";
+  if(!mysql_query( $qry ))
+  {
+    errorpage("Impossible to delete formats related to this condition:<br> ".mysql_error());
+    mysql_close( $db );
+    exit;
+  }
+  
+  $qry="delete from flxLINKTYPECONDITIONS 
+	where linktype='$linktype' and eval_order='$eorder'";
+  if(!mysql_query( $qry ))
+  {
+    errorpage("Impossible to delete conditions related to this link type:<br> ".mysql_error());
+    mysql_close( $db );
+    exit;
+  }
+  mysql_close( $db );
+
+  header("location: LINK_showone.php?linktype=".urlencode($linktype));
+?>

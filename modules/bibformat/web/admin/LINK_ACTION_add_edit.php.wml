@@ -1,0 +1,221 @@
+<?
+/*********************************************************************
+   This file is part of the CERN Document Server Software (CDSware).
+   Copyright (C) 2002 CERN.
+   1211 Geneva 23 - Switzerland
+   <cds.support@cern.ch>
+
+    The CDSware is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    The CDSware is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with CDSware; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+*********************************************************************/
+
+//==========================================================================
+//  File: LINK_ACTION_add_edit.php (flexElink WI)
+//  Description: Adds a new action to an existing link condtion or allows to 
+//	modify the data of an existing action of a link condition.
+//  POST parameters:
+//      linktype --> (required) Name (id) of the link definition which the
+//              action's condition belongs (or will belong) to
+//      eorder ----> (required) Action's condition evaluation order number for 
+//              the given link definition 
+//      action ----> (optional, possible values: ADD, EDIT) Determines which
+//              operations wants to be performed: adding a new action or 
+//              editing an existing one. When is set, the update or insert is
+//              made in the DB; if not, the needed controls for the adding or
+//              modifying are displayed
+//      aorder ---> (required if action is EDIT) Apply order of the 
+//              cation inside the corresponding link condition. When adding,
+//              if this parameter is not set the script will look for the last
+//              apply order number assigned in this link action
+//      el_code -> (optional) Action's EL code
+//  Notes: If the condition is succesfully added to the DB it closes the current
+//      browser and refreshes the opener one
+//  Requires:  DB, ERROR
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+  include("localconf.inc.php");
+
+  include(DB);
+  include(ERROR);
+
+  if( (!isset($linktype)) or (trim($linktype)=="") )
+  {
+    print "<b>Link type</b> hasn't been specified";
+    print "<hr>";
+    print "<a align=\"center\" href=\"JavaScript:window.close();\">[Close]</a>";
+    exit;
+  }
+  if( (!isset($eorder)) or (trim($eorder)=="") )
+  {
+    print "<b>Link condition evaluation order</b> hasn't been specified";
+    print "<hr>";
+    print "<a align=\"center\" href=\"JavaScript:window.close();\">[Close]</a>";
+    exit;
+  }
+  if(get_magic_quotes_gpc())
+    $linktype=stripslashes($linktype);
+  $linktype=trim(strtoupper($linktype));
+  
+  if(!isset($action))
+  {
+    $action="ADD";
+    if( (isset($aorder)) or (trim($aorder)!="") )
+    {
+      $action="EDIT";
+    }
+    else
+    {
+      $aorder="";
+    }
+    $el_code="";
+    
+    $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD );
+    mysql_selectdb( $DB_DB );
+
+    if($action=="EDIT")
+    {
+      $qry="select el_code
+   	  from flxLINKTYPECONDITIONSACTIONS
+	  where linktype='$linktype'
+	  and eval_order='$eorder'
+          and apply_order=$aorder";
+      $qh=mysql_query($qry);
+      if(mysql_num_rows($qh)<=0)
+      {
+        print "<b>Action not found</b>";
+        print "<hr>";
+        print "<a align=\"center\" href=\"JavaScript:window.close();\">[Close]</a>";
+        mysql_close($db);
+        exit;
+      }
+      list($el_code)=mysql_fetch_array($qh);
+    }
+    mysql_close($db);
+?>
+<form action="LINK_ACTION_add_edit.php" method="POST">
+  <table>
+    <tr>
+      <td colspan="2" bgcolor="black">
+	<font color="white" align="center">
+	  <? echo $action; ?> action for linktype '
+	    <? echo $linktype;?> - <?echo $eorder;?>'</font>
+      </td>
+    </tr>
+    <tr>
+      <td>Apply order: </td>
+      <td><input type="text" name="<?
+        if($action=="EDIT")
+          print "";
+        else
+          print "aorder";?>" value="<?echo $aorder;?>"></td>
+    </tr>
+    <tr>
+      <td>Action EL Code: </td>
+      <td><textarea name="el_code" cols="80" rows="15"><?echo $el_code;?></textarea></td>
+    </tr>
+    <tr>
+      <td colspan="2" align="center"><input type="submit"></td>
+    </tr>
+  </table>
+  <input type="hidden" name="linktype" value="<?echo $linktype;?>">
+  <input type="hidden" name="eorder" value="<?echo $eorder;?>">
+  <input type="hidden" name="process" value="oo">
+  <input type="hidden" name="action" value="<?echo $action;?>">
+  <?if($action=="EDIT"){
+      print "<input type=\"hidden\" name=\"aorder\" value=\"$aorder\">";
+    }?>
+</form>
+<?
+  }
+  else
+  {
+    if( (!isset($el_code)) )
+      $el_code="";
+    else
+    {
+      $temp_code=$el_code;
+      if(get_magic_quotes_gpc())
+        $temp_code=stripslashes($temp_code);
+      include(EXECUTOR);
+      $a=new AELExecutor();
+      list($ok, $msg)=$a->checkCode( $temp_code );
+      if(!$ok)
+      {
+        print "Action code incorrect: <b>$msg</b><hr>
+          <a href=\"JavaScript:window.history.go(-1)\">[Go Back]</a>";
+        exit;
+      }
+    }
+    
+    $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD );
+    mysql_selectdb( $DB_DB );
+
+    if( (!isset($aorder)) or (trim($aorder)==""))
+    {
+      $qry="select max(apply_order)+1 
+	    from flxLINKTYPECONDITIONSACTIONS
+	    where linktype='$linktype'
+	    and eval_order=$eorder";
+      $qh=mysql_query($qry, $db);
+      list($aorder)=mysql_fetch_array( $qh );
+      if($aorder==null)
+	$aorder=0;
+    }
+
+    if(!get_magic_quotes_gpc())
+    {
+      $el_code=addslashes($el_code);
+    }
+
+    $qry="";
+    if($action=="ADD")
+    {
+      $qry="insert into flxLINKTYPECONDITIONSACTIONS
+	      (linktype, eval_order, apply_order, el_code) 
+            values
+	      ('$linktype', '$eorder', '$aorder', '$el_code')";
+    }
+    elseif($action=="EDIT")
+    {
+      $qry="update flxLINKTYPECONDITIONSACTIONS
+	    set linktype='$linktype',
+		eval_order='$eorder',
+		apply_order='$aorder',
+		el_code='$el_code'
+            where linktype='$linktype'
+	    and eval_order='$eorder'
+	    and apply_order='$aorder'";
+    }
+
+    if(!mysql_query( $qry ))
+    {
+      print "Impossible to $action action:<br> ".mysql_error()."<br>".
+          "<a href=\"JavaScript:window.history.go(-1)\">[Go Back]</a>";
+      mysql_close($db);
+      exit;
+    }
+
+    mysql_close($db);
+
+
+?>
+<script language="JavaScript">
+  opener.location.reload(false);
+  window.close();
+</script>
+<?
+  }
+
+?>

@@ -1,0 +1,89 @@
+<?
+/*********************************************************************
+   This file is part of the CERN Document Server Software (CDSware).
+   Copyright (C) 2002 CERN.
+   1211 Geneva 23 - Switzerland
+   <cds.support@cern.ch>
+
+    The CDSware is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    The CDSware is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with CDSware; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+*********************************************************************/
+
+//==========================================================================
+//  File: BEH_showone.php (flexElink WI)
+//  Description: Shows the details for a given format (code and documentation). 
+//  POST parameters:
+//      fname --> (required) Name (id) of the format to be shown
+//  Requires:  DB, ERROR, FUNCTION_LIB
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+  include("localconf.inc.php");
+
+  include(DB);
+  include(ERROR);
+  include(FUNCTION_LIB);
+
+  if( (!isset($fname)) or (trim($fname)=="") )
+  {
+    errorpage("<b>Format name</b> hasn't been specified");
+    exit;
+  }
+
+  $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD ) 
+	or errormsg("Couldn't connect to mySQL") or exit;
+  mysql_selectdb( $DB_DB );
+  
+  $fname=trim(strtoupper($fname));
+  $qry="select value, doc from flxFORMATS where name='$fname'";
+  $res=mysql_query( $qry );
+  list($code, $doc) =mysql_fetch_array( $res );
+  $code=text2HTML($code);
+  $doc=str_replace("\n","<br>",$doc);
+  $doc=str_replace(" ","&nbsp;",$doc);
+
+?>
+<html>
+  <head>
+    <title>Format <?print $fname;?></title>
+  </head>
+  <body>
+    <table width="100%" bgcolor="#808080">
+      <tr align="center">
+        <td colspan="2" bgcolor="#66CCFF">
+          <font size="4">Details of format <b>'<? echo $fname;?>'</b></font>
+        </td>
+      </tr>
+      <tr>
+	<td width="15%" valign="middle" bgcolor="#CCFFFF">
+            <b>Documentation</b>
+        </td>
+	<td bgcolor="#FFFFFFFF">
+            <font size="2"><?print $doc; ?></font>
+        </td>
+      </tr>
+      <tr>
+	<td width="15%" valign="middle" bgcolor="#CCFFFF">
+           <b>EL Code</b>
+	</td>
+	<td bgcolor="#FFFFFFFF">
+	   <?print $code;?>
+	</td>
+      </tr>
+    </table>
+</html>
+<?
+    mysql_close( $db );
+
+?>

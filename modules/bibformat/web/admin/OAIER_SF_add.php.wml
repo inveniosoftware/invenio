@@ -1,0 +1,144 @@
+# $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+<?
+  include("localconf.inc.php");
+?>
+
+#include "cdspage.wml" \
+    title="Extraction Rules" \
+    navbar_name="admin" \
+    navbar_select="OAIER_display"  \
+    cdspageboxlefttopadd="<protect><?displayLoginMenu('admin');?> </protect>"
+
+<?
+  include("security.inc.php");
+<protect>## $Id$</protect>
+
+//==========================================================================
+//  File: OAIER_SF_add.php (flexElink WI)
+//  Description: Adds a new field and its ER to the DB for a defined variable. 
+//  POST parameters:
+//      type -----> (required) Input type the variable belongs to
+//      varname --> (required) Internal variable name the field is going to be
+//		added to
+//	process --> (optional) When is set, it adds the field and its ER to
+//		the DB according to the values specified via the parameters
+//	sfname ---> (required when process is set) Name of the field to be 
+//		added
+//      label ---> (optional) subfield element attribute LABEL value
+//  Notes: If the field-ER is succesfully added to the DB the current browser
+//      is closed and the opener one is refreshed
+//  Requires:  DB, ERROR
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+
+  include(DB);
+  include(ERROR);
+  
+  if( (!isset($type)) or (trim($type)=="") )
+  {
+    print "<b>Input type</b> hasn't been specified";
+    print "<hr>";
+    print "<a align=\"center\" href=\"JavaScript:window.close();\">[Close]</a>";
+    exit;
+  }
+  $otype=trim(strtoupper($otype));
+  
+  if( (!isset($varname)) or (trim($varname)=="") )
+  {
+    print "<b>Variable name</b> hasn't been specified";
+    print "<hr>";
+    print "<a align=\"center\" href=\"JavaScript:window.close();\">[Close]</a>";
+    exit;
+  }
+  $varname=trim(strtoupper($varname));
+
+    if(!isset($process))
+    {
+?>
+<form action="OAIER_SF_add.php" method="POST">
+  <table>
+    <tr>
+      <td colspan="2" bgcolor="black">
+        <font color="white" align="center">
+          Add new subfield to variable'<? echo "$type - $varname";?>'</font>
+      </td>
+    </tr>
+    <tr>
+      <td>Subfield name: </td>
+      <td><input type="text" name="sfname"></td>
+    </tr>
+    <tr>
+      <td>Attribute "label" value: </td>
+      <td><input type="text" name="label"></td>
+    </tr>
+    <tr>
+      <td colspan="2" align="center"><input type="submit"></td>
+    </tr>
+  </table>
+  <input type="hidden" name="process" value="oo">
+  <input type="hidden" name="type" value="<?echo $type;?>">
+  <input type="hidden" name="varname" value="<?echo $varname;?>">
+</form>
+<?
+    }
+    else
+    {
+      if( (!isset($sfname)) or (trim($sfname)=="") )
+      {
+        outWarning( "<b>Subfield name</b> hasn't been specified");
+	print "</td></tr></table>";
+        exit;
+      }
+      $sfname=trim(strtoupper($sfname));
+
+      if( (!isset($label)) or (trim($label)=="") )
+      {
+        outWarning( "<b>Attribute 'label' value</b> hasn't been specified");
+	print "</td></tr></table>";
+        exit;
+      }
+      $label=trim($label);
+
+      $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD ) 
+	  or errormsg("Couldn't connect to mySQL") or exit;
+      mysql_selectdb( $DB_DB );
+  
+      $qry="insert into flxXMLMARCEXTRULESUBFIELDS(type, varname, sfname, att_label)
+	           values ('$type', '$varname', '$sfname', '$label')";
+      if(!mysql_query( $qry ))
+      {
+        print "Impossible to insert new subfield rule:<br> ".mysql_error();
+        print "<hr>";
+        print "<a align=\"center\" href=\"JavaScript:window.history.go(-1);\">[Go Back]</a>";
+        mysql_close( $db );
+        exit;
+      }
+  
+      mysql_close( $db );
+?>
+<script language="JavaScript">
+  opener.location.reload(true);
+  window.close();
+</script>
+<?
+  }
+?>
+

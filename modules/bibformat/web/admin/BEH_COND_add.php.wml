@@ -1,0 +1,154 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+<?
+  include("localconf.inc.php");
+?>
+
+#include "cdspage.wml" \
+    title="Behaviours" \
+    navbar_name="admin" \
+    navbar_select="BEH_display" \
+    cdspageboxlefttopadd="<protect><?displayLoginMenu('admin');?> </protect>"
+
+<?
+  include("security.inc.php");
+<protect>## $Id$</protect>
+
+//==========================================================================
+//  File: BEH_COND_add.php (flexElink WI)
+//  Description: Displays necessary controls to define a new behaviour condition
+//      or adds a defined behavior condition (by the values passed as
+//	parameters) to the DB
+//  POST parameters:
+//      otype --> (required) Behavior label the condition corresponds to
+//      process -> (optional) If defined (value not relevant) the script adds
+//              the condition to the DB.
+//      eorder -> (optional) Evaluation order of the condition inside the owner
+//              behaviour. If this parameter is not set, the script will look
+//		for the last evaluation order value inside the corresponding
+//		behaviour
+//      code ----> (optional) Action's EL code 
+//  Notes: If an action is succesfully added to the DB it closes the current
+//	browser and refreshes the opener one
+//  Requires:  DB, ERROR
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+
+  include(DB);
+  include(ERROR);
+  
+  if( (!isset($otype)) or (trim($otype)=="") )
+  {
+    print "<b>Output type</b> hasn't been specified";
+    print "<hr>";
+    print "<a align=\"center\" href=\"JavaScript:window.close();\">[Close]</a>";
+    exit;
+
+  }
+  $otype=trim(strtoupper($otype));
+
+    if(!isset($process))
+    {
+?>
+<form action="BEH_COND_add.php" method="POST">
+  <table>
+    <tr>
+      <td colspan="2" bgcolor="black">
+        <font color="white" align="center">
+          Add new condition for output type'<? echo $otype;?>'</font>
+      </td>
+    </tr>
+    <tr>
+      <td>Evaluation order: </td>
+      <td><input type="text" name="eorder"></td>
+    </tr>
+    <tr>
+      <td>EL Code: </td>
+      <td><textarea name="code" cols="80" rows="9"></textarea></td>
+    </tr>
+    <tr>
+      <td colspan="2" align="center"><input type="submit"></td>
+    </tr>
+  </table>
+  <input type="hidden" name="process" value="oo">
+  <input type="hidden" name="otype" value="<?echo $otype;?>">
+</form>
+<?
+    }
+    else
+    {
+      if( (!isset($code)) )
+        $code="";
+      else
+      {
+        $temp_code=$code;
+        if(get_magic_quotes_gpc())
+          $temp_code=stripslashes($temp_code);
+        include(EXECUTOR);
+        $a=new AELExecutor();
+        list($ok, $msg)=$a->checkCode( $temp_code );
+        if(!$ok)
+        {
+          print "Condition code incorrect: <b>$msg</b><hr>
+          <a href=\"JavaScript:window.history.go(-1)\">[Go Back]</a>";
+          exit;
+        }
+      }
+      if(!get_magic_quotes_gpc())
+        $code=addslashes($code);
+
+      $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD ) 
+	  or errormsg("Couldn't connect to mySQL") or exit;
+      mysql_selectdb( $DB_DB );
+  
+      if( (!isset($eorder)) or (trim($eorder)=="") )
+      {
+        $qry="select max(eval_order)+1 
+	      from flxBEHAVIORCONDITIONS 
+	      where otype='$otype'";
+        $res=mysql_query( $qry );
+        $order=mysql_fetch_array( $res );
+        $order=$order[0];
+        if($order==null)
+        {
+          $order=0;
+        }
+      }
+      $qry="insert into flxBEHAVIORCONDITIONS (otype, eval_order, el_condition)
+	                             values ('$otype', '$order', '$code')";
+      if(!mysql_query( $qry ))
+      {
+        print "Impossible to insert new condition:<br> ".mysql_error();
+        print "<hr>";
+        print "<a align=\"center\" href=\"JavaScript:window.history.go(-1);\">[Go Back]</a>";
+        mysql_close( $db );
+        exit;
+      }
+  
+      mysql_close( $db );
+?>
+<script language="JavaScript">
+  opener.location.reload(false);
+  window.close();
+</script>
+<?
+  }
+?>
+

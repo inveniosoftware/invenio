@@ -24,7 +24,7 @@ web_DATA=$(FILESWML:.wml=)
 
 EXTRA_DIST = $(wildcard *.wml)
 
-CLEANFILES = $(wildcard *.shtml) *~ *.tmp
+CLEANFILES = $(wildcard *.php) *~ *.tmp
 
-%.shtml: %.shtml.wml ../../../../config/config.wml ../../../../config/configbis.wml ../../../../config/cdspage.wml ../../../../config/cdsnavbar.wml
+%.php: %.php.wml ../../../../config/config.wml ../../../../config/configbis.wml ../../../../config/cdspage.wml ../../../../config/cdsnavbar.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
