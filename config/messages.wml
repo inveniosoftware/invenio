@@ -392,6 +392,32 @@
   <no>kurver</no>
 </define-tag>
 
+<define-tag MSG_SUBMISSIONS whitespace=delete>
+  <en>submissions</en>
+  <fr>soumissions</fr>
+  <de>Eintragungen</de>
+  <es>submissions</es>
+  <pt>submissions</pt>
+  <it>submissions</it>
+  <ru>придания</ru>
+  <sk>pridania</sk>
+  <cz>přidání</cz>
+  <no>innsendte</no>
+</define-tag>
+
+<define-tag MSG_APPROVALS whitespace=delete>
+  <en>approvals</en>
+  <fr>approbations</fr>
+  <de>Bestätigungen</de>
+  <es>approvals</es>
+  <pt>approvals</pt>
+  <it>approvals</it>
+  <ru>апробации</ru>
+  <sk>schválenia</sk>
+  <cz>schválení</cz>
+  <no>godkjente</no>
+</define-tag>
+
 <define-tag MSG_SESSION whitespace=delete>
   <en>session</en>
   <fr>session</fr>
