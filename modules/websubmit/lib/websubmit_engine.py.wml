@@ -1302,4 +1302,26 @@ def specialchars(text):
     text = string.replace(text,"&#133;","\056\056\056");
     return text
 
+def isUserSubmitter(uid):
+    u_email = get_email(uid)
+    res = run_sql("select * from sbmSUBMISSIONS where email=%s",(u_email,))
+    if len(res) > 0:
+        return 1
+    else:
+        return 0
+    
+def isUserReferee(uid):
+    res = run_sql("select sdocname from sbmDOCTYPE")
+    for row in res:
+        doctype = row[0]
+        categ = "*"
+        if acc_authorize_action(uid, "referee",doctype=doctype, categ=categ):
+            return 1
+        res2 = run_sql("select sname from sbmCATEGORIES where doctype=%s",(doctype,))
+        for row2 in res2:
+            categ = row2[0]
+            if acc_authorize_action(uid, "referee",doctype=doctype, categ=categ):
+                return 1
+    return 0
+
 </protect>
