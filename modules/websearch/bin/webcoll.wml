@@ -375,17 +375,20 @@ class Collection:
             body = "<!--pagebody-simplesearch-->"
             body += """<form action="%s/search.py" method="get">""" % weburl
             body += "" + self.create_searchfor(as)
-            body += """<br><table cellspacing="5" cellpadding="5" border="0"><tr>"""
-            body += """<td valign="top" class="narrowsearchbox">""" + self.create_narrowsearch(as) + "</td>"
-            body_focuson = self.create_narrowsearch(as, "Focus on","v")
+            body += """<table cellspacing="0" cellpadding="0" border="0">"""
+            body += """<tr>"""
+            body += """<td valign="top">""" + self.create_narrowsearch(as) + "</td>"
+            body_focuson = self.create_narrowsearch(as, "Focus on:","v")
             if body_focuson:
-                body += """<td valign="top" class="focusonsearchbox">""" + body_focuson + """</td>"""
+                body += """<td valign="top" width="15" style="border-right: 1px dotted #999999;">&nbsp;</td>"""
+                body += """<td valign="top" width="15">&nbsp;</td>"""
+                body += """<td valign="top">""" + body_focuson + """</td>"""
             body += "</tr></table>"
             body += """</form>"""
             body += "<!--/pagebody-simplesearch-->"
             self.run_wml_and_write_page("as=%d" % as,
                                         create_html_header(self.name,
-                                                           self.create_navtrail(as, "","","&gt;","","",1),
+                                                           self.create_navtrail(as, "","","&gt;","","",0),
                                                            self.create_portalbox("lt"),
                                                            self.create_portalbox("lb"),
                                                            self.create_portalbox("rt"),
@@ -395,11 +398,11 @@ class Collection:
 
     def create_navtrail(self, \
                         as=0,
-                        header="""<table width="100%" border=0 cellspacing=0 cellpadding=2><tr><td class="navtrail"><small><small>""", \
+                        header="""<table class="navtrailbox" border=0 cellspacing=0 cellpadding=0><tr><td width="15">&nbsp;</td><td class="navtrailboxbody">""", \
                         prolog="", \
                         separator="&gt;", \
                         epilog="", \
-                        footer="</small></small></td></tr></table>",
+                        footer="</td></tr></table>",
                         exclude_root=0):
         """Creates navigation trail, i.e. links to collection ancestors.
         If as==1, then links to Advanced Search interfaces; otherwise Simple Search.        
@@ -409,7 +412,7 @@ class Collection:
         # first, list list of ancestors:
         for dad in self.get_ancestors():
             if dad.name != cdsname:
-                navtrail += """%s <a class="navtrail" href="%s/?c=%s&as=%d">%s</a> %s %s """ % \
+                navtrail += """%s <a class="navtrail" href="%s/?c=%s&amp;as=%d">%s</a> %s %s """ % \
                             (prolog, weburl, urllib.quote_plus(dad.name), as, dad.name, epilog, separator)
             else: # hide cdsname for aesthetical reasons
                 navtrail += """%s <a class="navtrail" href="%s/?as=%d">%s</a> %s %s """ % \
@@ -441,12 +444,21 @@ class Collection:
                 " ORDER BY cp.score DESC" % (self.id, position)
         res = run_sql(query)
         for row in res:
-            if out:
-                out += "<br>"
-            out += "<strong>" + row[0] + "</strong><br>" + row[1]
+            out += """<table class="portalbox" width="100%%">        
+                       <thead>
+                        <tr>
+                         <th class="portalboxheader">%s</th>
+                        </tr> 
+                       </thead>
+                       <tbody>
+                        <tr>
+                         <td class="portalboxbody">%s</td>
+                        </tr> 
+                       </tbody>
+                      </table>""" % (row[0], row[1]) 
         return out
 
-    def create_narrowsearch(self, as=0, title="Narrow search", type="r"):
+    def create_narrowsearch(self, as=0, title="Narrow search:", type="r"):
         """Creates list of collection descendants of type 'type' under title 'title'.
         If as==1, then links to Advanced Search interfaces; otherwise Simple Search.        
         Suitable for 'Narrow search' and 'Focus on' boxes."""        
@@ -469,16 +481,24 @@ class Collection:
             style_epilog = ""
         # are there some sons?
         if len(sons):
-            narrowsearch += "<small><strong>%s:</strong></small>" % title
+            narrowsearch += """<table class="searchbox">
+                                <thead>
+                                 <tr>
+                                  <th colspan="2" align="left" class="searchboxheader">
+                                    %s
+                                  </th>
+                                 </tr>
+                                </thead>
+                                <tbody>""" % title
             # iterate through sons:
             for son in sons:
-                narrowsearch += """<table><tr><td valign="top">"""
+                narrowsearch += """<tr><td class="searchboxbody" valign="top">"""
                 if type=='r':
                     if son.restricted_p():
                         narrowsearch += """<input type=checkbox name="c" value="%s">&nbsp;</td>""" % son.name
                     else:
                         narrowsearch += """<input type=checkbox name="c" value="%s" checked>&nbsp;</td>""" % son.name
-                narrowsearch += """<td valign="top"><a href="%s/?c=%s&as=%d">%s%s%s</a>%s """ % \
+                narrowsearch += """<td valign="top"><a href="%s/?c=%s&amp;as=%d">%s%s%s</a>%s """ % \
                                 (weburl, urllib.quote_plus(son.name), as, style_prolog, son.name, style_epilog, son.create_nbrecs_info())
                 if son.restricted_p():
                     narrowsearch += """ <small class="warning">[restricted]</small>"""
@@ -488,14 +508,28 @@ class Collection:
                     # print all grandsons:
                     narrowsearch += """<br>"""
                     for i in range(0,nb_grandsons):
-                        narrowsearch += """<a href="%s/?c=%s&as=%d">%s</a>%s """ % \
+                        narrowsearch += """<a href="%s/?c=%s&amp;as=%d">%s</a>%s """ % \
                                         (weburl, urllib.quote_plus(grandsons[i].name), as, grandsons[i].name, \
                                          grandsons[i].create_nbrecs_info())
-                narrowsearch += """</td></tr></table>""" 
+                narrowsearch += """</td></tr>"""
+            narrowsearch += "</tbody></table>"            
         else:
             if type == 'r':
                 # no sons, and type 'r', so print info on collection content:
-                narrowsearch += self.create_instant_browse()
+                narrowsearch += """<table class="searchbox">
+                                    <thead>
+                                     <tr>
+                                      <th class="searchboxheader">
+                                        Latest additions:
+                                      </th>
+                                     </tr>
+                                    </thead>
+                                    <tbody>
+                                     <tr>
+                                      <td class="searchboxbody">%s</td>
+                                     </tr>
+                                    <tbody>
+                                   </table>""" % self.create_instant_browse()
 
         return narrowsearch
 
@@ -507,7 +541,6 @@ class Collection:
         else:
             url = "%s/search.py?cc=%s&jrec=%d" % (weburl, urllib.quote_plus(self.name), rg+1)
             if self.nbrecs and self.reclist:
-                box += """<small><strong>Latest additions: </strong>"""
                 # firstly, get last 'rg' records:
                 box += "<ol>"
                 recIDs = Numeric.nonzero(self.reclist)
@@ -530,7 +563,6 @@ class Collection:
                    ORDER BY cff.score DESC""" % self.id
         res = run_sql(query)
         if res:
-            box += "<small><strong>Search options:</strong></small><br>"
             for row in res:
                 field_id = row[0]
                 field_code = row[1]
@@ -547,10 +579,9 @@ class Collection:
                     box += """</select>"""
         return box
 
-    def create_inputdate(self, title="From date", name="d1"):
+    def create_inputdate(self, name="d1"):
         "Produces 'From Date', 'Until Date' kind of selection box.  Suitable for search options."
         box = ""
-        box += "<small><strong>%s:</strong></small><br>" % title
         # day
         box += """<select name="%sd">""" % name
         box += """<option value="">any day"""
@@ -618,24 +649,25 @@ class Collection:
         query = """SELECT f.code,f.nameshort FROM field AS f, collection_field_fieldvalue AS cff
                    WHERE id_collection=%d AND cff.type='soo' AND cff.id_field=f.id
                    ORDER BY cff.score DESC, f.name ASC""" % self.id
+        box += """<select name="sf">"""
+        box += """  <option value="">- latest first -"""
         res = run_sql(query)
         if res:
-            box += "<small><strong>Sort results:</strong></small><br>"
-            box += """<select name="sf">"""
-            box += """<option value="">no sort"""
             for row in res:
-                box += """<option value="%s">sort by %s""" % (row[0], row[1])
-            box += """</select>"""
-            box += """<select name="so">
-                      <option value="a">asc.
-                      <option value="d">desc.
-                      </select>"""
+                box += """  <option value="%s">%s""" % (row[0], row[1])
+        else:
+            for field in ('title','author','report number','year'):
+                box += """  <option value="%s">%s""" % (field, field)                
+        box += """</select>"""
+        box += """<select name="so">
+                    <option value="a">asc.
+                    <option value="d">desc.
+                  </select>"""
         return box
 
     def create_displayoptions(self):
         "Produces 'Display options' portal box."
         box=""
-        box += "<small><strong>Display results:</strong></small><br>"
         # firstly, display hits per collection selection box:
         box += """<select name="rg">
            <option value=10>10 results
@@ -648,14 +680,14 @@ class Collection:
         # secondly, display split by collection selection box:
         if self.get_sons():
             box += """<select name="sc">
-            <option value="0">grouped together
+            <option value="0">all together
             <option value="1">split by collection
             </select>"""        
         return box
 
     def create_formatoptions(self):
         "Produces 'Output format options' portal box."
-        box = "<small><strong>Output format:</strong></small><br>"
+        box = ""
         box += """<select name="of">
            """
         query = """SELECT f.code,f.name FROM format AS f, collection_format AS cf
@@ -712,28 +744,39 @@ class Collection:
         out = "<!--create_searchfor_simple()-->"
         # define URL add-ons for simple and advanced search boxen:
         if self.name != cdsname:
-            ssearchurl = "?c=%s&as=0" % urllib.quote_plus(self.name)
-            asearchurl = "?c=%s&as=1" % urllib.quote_plus(self.name)
+            ssearchurl = "?c=%s&amp;as=0" % urllib.quote_plus(self.name)
+            asearchurl = "?c=%s&amp;as=1" % urllib.quote_plus(self.name)
         else: # hide cdsname for aesthetical reasons
             ssearchurl = "?as=0"
             asearchurl = "?as=1"
         # define search box elements:
-        cell_1_left = """<small><strong>Search %s for:</strong></small>
-                         <br><input type="text" name="p" size="40" value="">""" % self.create_nbrecs_info(""," records")
-        cell_1_middle = "<small><strong>within:</strong></small><br>%s" % self.create_searchwithin_selection_box()
-        cell_1_right = """<input type="submit" name="search" value="SEARCH"><input type="submit" name="search" value="Browse">&nbsp;"""
-        cell_1_farright = """<small class="light"><a href="%s">Advanced Search</a></small>
-                             <br><small><a href="%s/help/search/tips.html">Search Tips</a></small>""" % (asearchurl, weburl)
+        header = """Search %s for:""" % self.create_nbrecs_info(""," records")
+        cell_1_left = """<input type="text" name="p" size="40" value="">"""
+        cell_1_middle = "%s" % self.create_searchwithin_selection_box()
+        cell_1_right = """<input class="formbutton" type="submit" name="search" value="SEARCH"><input class="formbutton" type="submit" name="search" value="Browse">"""
+        cell_2 = """<small><a href="%s/help/search/tips.html">search tips</a> :: <a href="%s">advanced search</a></small>""" \
+        % (weburl, asearchurl)
         # merge them:
-        out += """<table>
-                    <tr valign="bottom">
-                      <td align="left">%s</td>
-                      <td align="left">%s</td>
-                      <td align="left">%s</td>
-                      <td align="left">%s</td>
+        out += """<table class="searchbox">
+                   <thead>
+                    <tr align="left">
+                     <th colspan="3" class="searchboxheader">%s</th>
                     </tr>
-                   </table>""" % \
-              (cell_1_left, cell_1_middle, cell_1_right, cell_1_farright)
+                   </thead>
+                   <tbody>
+                    <tr valign="baseline">
+                     <td class="searchboxbody" align="left">%s</td>
+                     <td class="searchboxbody" align="left">%s</td>
+                     <td class="searchboxbody" align="left">%s</td>
+                    </tr>
+                    <tr valign="baseline">
+                     <td class="searchboxbody" colspan="3" align="right">%s</td>
+                    </tr>
+                   </tbody>
+                  </table>""" % \
+              (header, 
+               cell_1_left, cell_1_middle, cell_1_right,
+               cell_2)
         # print commentary end:
         out += "<!--/create_searchfor_simple()-->"
         return out
@@ -745,94 +788,125 @@ class Collection:
         out += """<input type="hidden" name="as" value="1">"""
         # define URL add-ons for simple and advanced search boxen:
         if self.name != cdsname:
-            ssearchurl = "?c=%s&as=0" % urllib.quote_plus(self.name)
-            asearchurl = "?c=%s&as=1" % urllib.quote_plus(self.name)
+            ssearchurl = "?c=%s&amp;as=0" % urllib.quote_plus(self.name)
+            asearchurl = "?c=%s&amp;as=1" % urllib.quote_plus(self.name)
         else: # hide cdsname for aesthetical reasons
             ssearchurl = "?as=0"
             asearchurl = "?as=1"
         # define search box elements:
-        cell_1_left = """<small><strong>Search %s for:</strong></small><br>""" % self.create_nbrecs_info("", " records") + \
-                      create_matchtype_box('m1') + """<input type="text" name="p1" size="40" value="">""" 
-        cell_1_middle = "<small><strong>within:</strong></small><br>%s" % self.create_searchwithin_selection_box('f1')
+        header = """Search %s for:""" % self.create_nbrecs_info("", " records") 
+        cell_1_left = create_matchtype_box('m1') + """<input type="text" name="p1" size="40" value="">""" 
+        cell_1_middle = self.create_searchwithin_selection_box('f1')
         cell_1_right = create_andornot_box('op1')
-        cell_1_farright = ""
         cell_2_left = create_matchtype_box('m2') + """<input type="text" name="p2" size="40" value="">"""
         cell_2_middle = self.create_searchwithin_selection_box('f2')
         cell_2_right = create_andornot_box('op2')
-        cell_2_farright = ""
         cell_3_left = create_matchtype_box('m3') + """<input type="text" name="p3" size="40" value="">"""
         cell_3_middle = self.create_searchwithin_selection_box('f3')
-        cell_3_right = """<input type="submit" name="search" value="SEARCH"><input type="submit" name="search" value="Browse">&nbsp;"""
-        cell_3_farright = """<small class="light"><a href="%s">Simple Search</a></small>
-                             <br><small><a href="%s/help/search/tips.html">Search Tips</a></small>""" % (ssearchurl, weburl)
+        cell_3_right = """<input class="formbutton" type="submit" name="search" value="SEARCH"><input class="formbutton" type="submit" name="search" value="Browse">&nbsp;"""
+        cell_4 = """<small><a href="%s/help/search/tips.html">search tips</a> :: <a href="%s">simple search</a></small>""" \
+                 % (weburl, ssearchurl)
         # merge them:
-        out += """<table>
+        out += """<table class="searchbox">
+                   <thead>
+                    <tr>
+                     <th class="searchboxheader" colspan="3">%s</th>
+                    </tr>
+                   </thead>
+                   <tbody>
                     <tr valign="bottom">
                       <td nowrap>%s</td>
-                      <td>%s</td>
-                      <td>%s</td>
-                      <td>%s</td>
+                      <td class="searchboxbody">%s</td>
+                      <td class="searchboxbody">%s</td>
                     </tr>
                     <tr valign="bottom">
-                      <td nowrap>%s</td>
-                      <td>%s</td>
-                      <td>%s</td>
-                      <td>%s</td>
+                      <td class="searchboxbody" nowrap>%s</td>
+                      <td class="searchboxbody">%s</td>
+                      <td class="searchboxbody">%s</td>
                     </tr>
                     <tr valign="bottom">
-                      <td nowrap>%s</td>
-                      <td>%s</td>
-                      <td nowrap>%s</td>
-                      <td nowrap>%s</td>
+                      <td class="searchboxbody" nowrap>%s</td>
+                      <td class="searchboxbody">%s</td>
+                      <td class="searchboxbody" nowrap>%s</td>
                     </tr>
-                   </table>""" % \
-              (cell_1_left, cell_1_middle, cell_1_right, cell_1_farright, \
-               cell_2_left, cell_2_middle, cell_2_right, cell_2_farright, \
-               cell_3_left, cell_3_middle, cell_3_right, cell_3_farright)
+                    <tr valign="bottom">
+                      <td colspan="3" class="searchboxbody" align="right">%s</td>
+                    </tr>
+                   </tbody> 
+                  </table>""" % \                    
+              (header,
+               cell_1_left, cell_1_middle, cell_1_right, \
+               cell_2_left, cell_2_middle, cell_2_right, \
+               cell_3_left, cell_3_middle, cell_3_right, \
+               cell_4)
         # create more search options, if any:
         if self.create_searchoptions():
-            out += """<table cellpadding="3" cellspacing="0">
+            out += """<table class="searchbox">
+                       <thead> 
                         <tr>
-                          <td colspan="3" height="3">
-                          </td>
+                          <th class="searchboxheader">
+                            Search options:
+                          </th>
                         </tr>
-                        <tr valign="bottom" class="searchbox">
-                         <td>%s</td>
+                       </thead>
+                       <tbody>
+                        <tr valign="bottom">
+                         <td class="searchboxbody">%s</td>
                         </tr>
+                       <tbody> 
                       </table>""" % self.create_searchoptions()
         if 0:
             # TODO: create published in, if appropriate:
             if self.create_publishedin():
                 out += self.create_publishedin()
         # arrival date: from/until:
-        cell_6_a = self.create_inputdate("Added since", "d1")
-        cell_6_b = self.create_inputdate("until", "d2")
-        out += """<table cellpadding="3" cellspacing="0">
+        cell_6_a = self.create_inputdate("d1")
+        cell_6_b = self.create_inputdate("d2")
+        out += """<table class="searchbox">
+                   <thead> 
                     <tr>
-                      <td colspan="3" height="3">
-                      </td>
+                      <th class="searchboxheader">
+                        Added since:
+                      </th>
+                      <th class="searchboxheader">
+                        until:
+                      </th>                      
                     </tr>
-                    <tr valign="bottom" class="searchbox">
-                      <td>%s</td>
-                      <td>%s</td>
+                   </thead>
+                   <tbody>
+                    <tr valign="bottom">
+                      <td class="searchboxbody">%s</td>
+                      <td class="searchboxbody">%s</td>
                     </tr>
-                   </table>""" % \
+                   </tbody>
+                  </table>""" % \
            (cell_6_a, cell_6_b)        
         # format options, etc in the last table:
-        cell_7_a = self.create_formatoptions()
+        cell_7_a = self.create_sortoptions()
         cell_7_b = self.create_displayoptions()
-        cell_7_c = self.create_sortoptions()
-        out += """<table cellpadding="3" cellspacing="0">
+        cell_7_c = self.create_formatoptions()
+        out += """<table class="searchbox">
+                   <thead>
                     <tr>
-                      <td colspan="3" height="3">
-                      </td>
+                      <th class="searchboxheader">
+                        Sort results by:
+                      </th>
+                      <th class="searchboxheader">
+                        Display results:
+                      </th>
+                      <th class="searchboxheader">
+                        Output format:
+                      </th>
                     </tr>
-                    <tr valign="bottom" class="searchbox">
-                      <td>%s</td>
-                      <td>%s</td>
-                      <td>%s</td>
+                   </thead>
+                   <tbody>
+                    <tr valign="bottom">
+                      <td class="searchboxbody">%s</td>
+                      <td class="searchboxbody">%s</td>
+                      <td class="searchboxbody">%s</td>
                     </tr>
-                   </table>""" % \
+                   </tbody>
+                  </table>""" % \
            (cell_7_a, cell_7_b, cell_7_c)        
         # print commentary end:
         out += "<!--/create_searchfor_advanced()-->"

@@ -36,7 +36,7 @@ except ImportError, e:
     import sys
     sys.exit(1)
 
-imagesurl = "%s/img" % webdir
+imagesurl = "%s/img" % weburl
 
 ### IMPLEMENTATION
 
@@ -174,7 +174,7 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
             out += """No baskets have been defined.<BR>"""
             out += """New basket name:&nbsp;"""\
                    """<INPUT type="text" name="newname" size="20" maxlength="50">&nbsp;"""\
-                   """<CODE class="blocknote"><INPUT type="submit" name="action" value="CREATE NEW"></CODE>"""
+                   """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="CREATE NEW"></CODE>"""
         else:
             # display the list of baskets
             out += """You have defined <B>%s</B> baskets.<BR>""" % len(query_result)            
@@ -192,10 +192,10 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
                         
             # buttons for basket's selection or creation
             out += """&nbsp;<CODE class="blocknote">"""\
-                   """<INPUT type="submit" name="action" value="SELECT"></CODE>\n"""
+                   """<INPUT class="formbutton" type="submit" name="action" value="SELECT"></CODE>\n"""
             out += """&nbsp;&nbsp;or&nbsp;"""\
                    """<INPUT type="text" name="newname" size="10" maxlength="50">&nbsp;"""\
-                   """<CODE class="blocknote"><INPUT type="submit" name="action" value="CREATE NEW"></CODE><BR><BR>"""
+                   """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="CREATE NEW"></CODE><BR><BR>"""
 
             if ((id_basket != '0') and (id_basket != 0)):
                 out += """<TABLE style="background-color:F1F1F1; border:thin groove grey" """\
@@ -205,9 +205,9 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
                 # buttons for actions: display basket content, delete, rename, create a new basket
                 # basket delete
                 out += """<TR><TD colspan="2">The&nbsp;selected&nbsp;basket&nbsp;is&nbsp;<B>%s</B>.</TD>"""\
-                       """<TD><CODE class="blocknote"><INPUT type="submit" name="action" value="DELETE"></CODE>&nbsp;""" % basket_name
+                       """<TD><CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="DELETE"></CODE>&nbsp;""" % basket_name
                 # basket rename
-                out += """<br><CODE class="blocknote"><input type="text" name="newbname"><INPUT type="submit" name="action" value="RENAME"></CODE></TD></TR>"""
+                out += """<br><CODE class="blocknote"><input type="text" name="newbname"><INPUT class="formbutton" type="submit" name="action" value="RENAME"></CODE></TD></TR>"""
 
                 
                 # basket permission private/public
@@ -220,11 +220,11 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
                     if (permission[i][1] == "n"):
                         public_basket="no"
                         out += """<TD colspan="2">basket access is set to <I>private</I>, convert to <I>public</I>?</TD><TD>"""\
-                               """<CODE class="blocknote"><INPUT type="submit" name="action" value="SET PUBLIC"></CODE></TD></TR>\n"""
+                               """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="SET PUBLIC"></CODE></TD></TR>\n"""
                     else :
                         public_basket="yes"
                         out += """<TD colspan="2">basket access is set to <I>public</I>, convert to <I>private</I>?<BR></TD><TD>"""\
-                               """<CODE class="blocknote"><INPUT type="submit" name="action" value="SET PRIVATE"></CODE></TD></TR>\n"""
+                               """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="SET PRIVATE"></CODE></TD></TR>\n"""
                     if (public_basket=="yes"):
                         url_public_basket = """%s/yourbaskets.py/display_public?id_basket=%s""" \
                                             % (weburl, id_basket)
@@ -294,7 +294,7 @@ def display_basket_content(uid, id_basket, basket_name):
 
             # display operations on the selected items: delete, copy or move
             out += """<TR><TD colspan="2">Selected items:&nbsp;"""\
-                   """<CODE class="blocknote"><INPUT type="submit" name="action" value="REMOVE"></CODE>\n"""
+                   """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="REMOVE"></CODE>\n"""
             out += """&nbsp;&nbsp;or&nbsp;&nbsp;<SELECT name="copy_move"><OPTION value="1">Copy</OPTION>"""\
                    """<OPTION value="2">Move</OPTION></SELECT>to"""
             # query the database for the list of baskets
@@ -309,7 +309,7 @@ def display_basket_content(uid, id_basket, basket_name):
                 for row1 in query_result1 :
                     out += """<OPTION value="%s">%s</OPTION>""" % (row1[0], row1[1])
                 out += """</SELECT>\n"""
-            out +="""<CODE class="blocknote"><INPUT type="submit" name="action" value="EXECUTE"></CODE><BR><BR></TD></TR>\n"""
+            out +="""<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="EXECUTE"></CODE><BR><BR></TD></TR>\n"""
             # display the list of items
             i = 1
             preid = 0
@@ -385,8 +385,8 @@ def delete_basket(uid, id_basket, basket_name):
 
     # confirm delete action? yes or no
     out += """<TR><TD align="right" width="400">Delete the basket <NOBR><B>%s</B></NOBR> ?</TD>""" % basket_name
-    out += """<TD>&nbsp;<CODE class="blocknote"><INPUT type="submit" name="confirm_action" value="CONFIRM"></CODE>"""\
-           """&nbsp;<CODE class="blocknote"><INPUT type="submit" name="confirm_action" value="CANCEL"></CODE>"""
+    out += """<TD>&nbsp;<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="confirm_action" value="CONFIRM"></CODE>"""\
+           """&nbsp;<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="confirm_action" value="CANCEL"></CODE>"""
     # hidden parameters
     out += """<INPUT type="hidden" name="id_basket" value="%s"></TD></TR>""" % id_basket
     out += """<INPUT type="hidden" name="action" value="DELETE"></TD></TR>"""
@@ -664,7 +664,7 @@ def perform_display_public(uid, id_basket, basket_name, action, to_basket, mark,
                 out += """Copy the selected items to new basket&nbsp;"""
                 
             out += """<INPUT type="text" name="newname" size="10" maxlength="50">&nbsp;&nbsp;"""
-            out += """<CODE class="blocknote"><INPUT type="submit" name="action" value="EXECUTE"></CODE><BR><BR></TD></TR>\n"""
+            out += """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="EXECUTE"></CODE><BR><BR></TD></TR>\n"""
 
             # display the list of items
             i = 1
@@ -735,7 +735,7 @@ def perform_request_add(uid=-1, recid=[], bid=[], bname=[]):
             for basket_id, basket_name in get_list_of_user_baskets(uid):
                 out += """<option value="%s">%s""" % (basket_id, basket_name)
             out += """</select>"""
-            out += """<input type="submit" name="action" value="ADD TO BASKET">"""
+            out += """<input class="formbutton" type="submit" name="action" value="ADD TO BASKET">"""
             out += """</form>"""
         else:
             # user have to create a basket first
@@ -745,7 +745,7 @@ def perform_request_add(uid=-1, recid=[], bid=[], bname=[]):
                 out += """<input type="hidden" name="recid" value="%s">""" % recID
             out += """New basket name: """
             out += """<input type="text" size="30" name="bname" value="">"""
-            out += """<input type="submit" name="action" value="CREATE NEW BASKET">"""
+            out += """<input class="formbutton" type="submit" name="action" value="CREATE NEW BASKET">"""
             out += """</form>"""            
     else:
         # B - we have baskets IDs, so we can add records
@@ -765,7 +765,7 @@ def perform_request_add(uid=-1, recid=[], bid=[], bname=[]):
     return out 
 
 def get_list_of_user_baskets(uid):
-    """Return list of (basket_id, basket_name) for the given user."""
+    """Return list of lists [[basket_id, basket_name],[basket_id, basket_name],...] for the given user."""
     out = []
     res = run_sql("SELECT b.id, b.name "\
                   "FROM basket b, user_basket ub "\

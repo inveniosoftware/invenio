@@ -243,8 +243,8 @@ def perform_input_alert(action, id_query, alert_name, frequency, notification, i
         out += """<TR><TD colspan="2" align="center"><BR>"""\
                """<INPUT type="hidden" name="old_idb" value="%s">""" % id_basket
     # buttons confirmation/clear    
-    out += """<CODE class="blocknote"><INPUT type="submit" name="action" value="&nbsp;SET ALERT&nbsp;"></CODE>&nbsp;"""\
-           """<CODE class="blocknote"><INPUT type="reset" value="CLEAR DATA"></CODE>"""\
+    out += """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="&nbsp;SET ALERT&nbsp;"></CODE>&nbsp;"""\
+           """<CODE class="blocknote"><INPUT class="formbutton" type="reset" value="CLEAR DATA"></CODE>"""\
            """</TD></TR>\n"""
     out += """</TABLE></TD></TR></TABLE></FORM>"""
     return out

@@ -45,9 +45,10 @@ page_template_header = """
 <body>
 <div class="pageheader">
 %s
-   <table width="100%%" border="0" cellspacing="0" cellpadding="2">
-     <tr class="navtrail">
-      <td>
+   <table class="navtrailbox" border="0" cellspacing="0" cellpadding="0">
+     <tr>
+      <td width="15">&nbsp;</td>
+      <td class="navtrailboxbody">
         <small><small>
           <a class="navtrail" href="%s">%s</a>
           %s
