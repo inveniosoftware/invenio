@@ -138,7 +138,7 @@ def perform_display(permanent,uid):
             # id, pattern, base, search url and search set alert, date
             out += """<TR><TD><I>#%d</I></TD>"""\ 
                    """<TD>%s</TD>"""\
-                   """<TD><A href="%s/search.py?%s">Execute&nbsp;search</A><BR><A href="./input_alert?idq=%d">Set&nbsp;new&nbsp;alert</A></TD>"""\
+                   """<TD><A href="%s/search.py?%s">Execute&nbsp;search</A><BR><A href="./input?idq=%d">Set&nbsp;new&nbsp;alert</A></TD>"""\
                    % (i, get_textual_query_info_from_urlargs(row[1]), weburl, row[1], row[0])
             if permanent=="n":
                 # find out the date of last run for this query:
@@ -185,7 +185,7 @@ def perform_input_alert(action, id_query, alert_name, frequency, notification, i
     
     # define alert settings
     if action == "update":        
-        out +=  """<FORM name="setalert" action="../youralerts.py/update_alert" method="get">"""
+        out +=  """<FORM name="setalert" action="../youralerts.py/update" method="get">"""
         if frequency == "month":
             frequency_month = " selected"
         else:
@@ -201,7 +201,7 @@ def perform_input_alert(action, id_query, alert_name, frequency, notification, i
             notification_no = " selected"
     else:
         # action = "add"
-        out += """<FORM name="setalert" action="../youralerts.py/add_alert" method="get">"""
+        out += """<FORM name="setalert" action="../youralerts.py/add" method="get">"""
         frequency_week = " selected"
         notification_yes = " selected"
     out += """<TABLE style="background-color:F1F1F1; border:thin groove grey" cellspacing="0" cellpadding="0"><TR><TD>"""
@@ -344,8 +344,8 @@ def perform_list_alerts (uid):
                    """<TD><NOBR>%s<NOBR></TD>"""\
                    """<TD><NOBR>%s<NOBR></TD>"""\
                    """<TD>%s</TD>"""\
-                   """<TD><A href="./remove_alert?name=%s&idu=%d&idq=%d&idb=%d">Remove</A><BR>"""\
-                   """<A href="./modify_alert?idq=%d&name=%s&freq=%s&notif=%s&idb=%d">Modify</A><BR>"""\
+                   """<TD><A href="./remove?name=%s&idu=%d&idq=%d&idb=%d">Remove</A><BR>"""\
+                   """<A href="./modify?idq=%d&name=%s&freq=%s&notif=%s&idb=%d">Modify</A><BR>"""\
                    """<A href="%s/search.py?%s">Execute&nbsp;search</A></TD></TR>"""\
                    % (i,row[5],alert_frequency,email_notification,basket_name,row[9],row[8],
                       get_textual_query_info_from_urlargs(row[1]),row[5],row[2],row[3],row[4],row[3],row[5],row[6],row[7],row[4],weburl,row[1])

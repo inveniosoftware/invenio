@@ -46,7 +46,7 @@ except ImportError, e:
 
 MAXIDS = 50
 FROMADDR = 'CDS Alert Service <%s>' % supportemail
-ALERTURL = weburl + '/youralerts.py/list_alerts'
+ALERTURL = weburl + '/youralerts.py/list'
 # 0 = production, nothing on the console, email sent
 # 1 = messages on the console, email sent
 # 2 = messages on the console, but no email sent
