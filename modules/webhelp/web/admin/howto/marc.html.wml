@@ -41,9 +41,9 @@ needs without altering its internal data structure.
 
 <li>MARC technology, albeit developed in the punch card times
 (1960s!), can be well combined with recent technologies like XML.  In
-fact, whenever the bibliographic data is to be worked with as a file,
-CDSware uses recently standardized <a
-href="http://www.loc.gov/standards/marcxml/">MARC XML</a> schema
+fact, whenever bibliographic metadata are to be worked with externally
+in a file format, CDSware uses recently standardized <a
+href="http://www.loc.gov/standards/marcxml/">MARC XML</a> format
 provided by the Library of Congress.
 
 </ul>
@@ -54,11 +54,12 @@ provided by the Library of Congress.
 
 <ol> 
 
-<li><p>You do not care much about MARC or internal CDSware structure
-as far as you can work with "more meaningful" metadata concepts like
+<li><p>You do not care much about internal MARC metadata structure as
+far as you can work with "more meaningful" metadata concepts like
 <em>author</em>, <em>abstract</em>, <em>title</em>, etc.  In this case
-we simply recommend you to stick to CDSware defaults that pre-set for
-you the most commonly used metadata fields (in alphabetical order; non-exhaustive list):
+we simply recommend you to stick to CDSware defaults that preset for
+you the most commonly used metadata fields (in alphabetical order;
+non-exhaustive list):
 
 <blockquote>
 <pre>
@@ -88,29 +89,29 @@ URL (e.g. to fulltext)       8564 $u, $z
 <p>The advantage of using these CDSware defaults is that you can use
 pre-defined configurations of <a href="../bibconvert/">BibConvert</a>,
 <a href="../bibformat/">BibFormat</a>, and <a
-href="../bibwords/">BibWords</a>.
+href="../bibindex/">BibIndex</a>.
 
-<li><p>You do not care much about MARC or internal CDSware structure,
-so you are using CDSware defaults, but you need to introduce a new
+<li><p>You do not care much about internal MARC metadata structure, so
+you are using CDSware defaults, but you need to introduce a new
 metadata concept.  For example, you would like to store also the
 document shelf number, and you want to make it separately searchable.
-In this case you are free to choose a MARC tag of your own, for
-example <code>963az $6</code>.  After that you would configure CDSware
+In this case you are free to choose any MARC tag of your own, for
+example <code>963 $6</code>.  After that you would configure CDSware
 as follows:
 
 <ul> 
 
-<li>configure <a href="../bibwords/">BibWords</a> to create a new
-    field called <em>document shelf</em> and to associate it with
-    <code>963az $6</code> MARC tag;
+<li>configure <a href="../bibindex/">BibIndex</a> to create a new
+    logical field called <em>document shelf</em> and associate it with
+    <code>963 $6</code> physical MARC tag;
 
-<li>run <a href="../bibwords/">BibWords</a> to create word tables for
+<li>run <a href="../bibindex/">BibIndex</a> to create word tables for
     the new searchable index; 
 
 <li>configure <a href="../websubmit/">WebSubmit</a> to let the
     submission interface know of the existence of the new field;
 
-<li>configure <a href="../websubmit/">WebSearch</a> to introduce the
+<li>configure <a href="../websearch/">WebSearch</a> to introduce the
     new searchable field into collections of your choice;
 
 <li>configure <a href="../bibformat/">BibFormat</a> to include
