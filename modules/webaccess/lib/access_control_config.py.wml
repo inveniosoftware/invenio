@@ -136,6 +136,6 @@ cfg_webaccess_warning_msgs = {
                                 7: 'Error(7): Not enough arguments, user ID and action name required.',
                                 8: 'Error(8): Incorrect keyword argument(s) for this action.',
                                 9: """Error(9): Account '%s' is not yet activated.""",
-                               10: """The site is currently closed for maintenance."""
+                               10: """The site is temporarily closed for maintenance.  Please come back soon."""
 		} 
 </protect>
