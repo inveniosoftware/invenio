@@ -24,23 +24,23 @@
     navbar_select="bibrank"
 
 <h3>Index</h3>
-1.<a href="#o">Overview</a></br>
-2.<a href="#c">Configuration Conventions</a></br>
-3.<a href="#bai">bibrank Admin Interface</a></br>
-3.1.<a href="#mi">Main interface</a></br>
-3.2.<a href="#ar">Add rank method</a></br>
-3.3.<a href="#sd">Show details of rank method</a></br>
-3.4.<a href="#mr">Modify rank method</a></br>
-3.5.<a href="#dr">Delete rank method</a></br>
-3.6.<a href="#mt">Modify translations</a></br>
-3.7.<a href="#mc">Modify visibility toward collections</a></br>
-4.<a href="#bd">bibrank Daemon</a></br>
-4.1.<a href="#cli1">Command Line Interface</a></br>
-4.2.<a href="#ubd">Using bibrank</a></br>
-5.<a href="#bt">bibrankgkb Tool</a></br>
-5.1.<a href="#cli2">Command Line Interface</a></br>
-5.2.<a href="#ubt">Using bibrankgkb</a></br>
-6.<a href="#ainf">Additional Information</a></br>
+<strong>1.<a href="#o">Overview</a></strong></br>
+<strong>2.<a href="#c">Configuration Conventions</a></strong></br>
+<strong>3.<a href="#bai">BibRank Admin Interface</a></strong></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1.<a href="#mi">Main interface</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2.<a href="#ar">Add rank method</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3.<a href="#sd">Show details of rank method</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4.<a href="#mr">Modify rank method</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5.<a href="#dr">Delete rank method</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.6.<a href="#mt">Modify translations</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.7.<a href="#mc">Modify visibility toward collections</a></br>
+<strong>4.<a href="#bd">BibRank Daemon</a></strong></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1.<a href="#cli1">Command Line Interface</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.2.<a href="#ubd">Using BibRank</a></br>
+<strong>5.<a href="#bt">bibrankgkb Tool</a></strong></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.1.<a href="#cli2">Command Line Interface</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.2.<a href="#ubt">Using bibrankgkb</a></br>
+<strong>6.<a href="#ainf">Additional Information</a></strong></br>
 
 <a name="o"></a><h3>Overview</h3>
 <p>The bibrank module consist currently of two tools:
@@ -106,6 +106,8 @@ Usage: %s [options]
 
  Ranking options:
  -c, --collection=c1,c2    Collections to include in this rank method
+                            if not given, the collections the method is
+                            enabled for will be used.
  -i, --id=idr1,idr2        Record ranges to include in this rank method
  -m, --modified=[from]     Update records modified after date
  -k, --check=value         Check if the rank method  needs rebalancing, (if the top
@@ -176,16 +178,44 @@ enable_modified = yes
 </protect>
 For other functions than the single_tag_rank_method, you may need different configuration files, which will be added <a href="<WEBURL>/hacking/bibrank/">here</a> when
 supported by CDSware.
-<h4>Step 4 - Full update, rebalancing</h4>
+
+<h4>Step 4 - Add the ranking method as a scheduled task</h4>
+When the configuration is okay, you can add the bibrank daemon to the task scheduler using the scheduling options. The daemon can then do a update of the rank method once each day or similar automatically.
+</br></br><b>Example</b>
+<blockquote>
+<pre>
+$ bibrank -wjif -r
+Task #53 was successfully scheduled for execution.
+</pre>
+</blockquote>
+
+<h4>Step 5 - Full update, rebalancing</h4>
 For the first run of a new ranking method, a full update is needed (not default) to establish the ranges to be used for the categories.
 A full update/rebalance can be run by using the --rebalance/-r option. Sometimes you may want to run the program with the rebalance option,
 to balance the categories. To check if it is necessary, run the bibrank daemon using the --check/-k option together with the max size allowed for the top star , a message will then be given on screen if a rebalance is needed.
-<h4>Step 5 - Fast update of modified records</h4>
+
+</br></br><b>Example</b>
+<blockquote>
+<pre>
+$ bibrank 53      
+2004-03-09 14:28:47 --> Task #53 started.
+2004-03-09 14:28:47 --> Running: Journal Impact Factor.
+2004-03-09 14:28:47 --> Statistics: Journal Impact Factor , Top Star size: 10.0% , Overall Importance: 100.0%,
+2004-03-09 14:28:47 --> 0 star(s): Range>=      -9.9    7990
+2004-03-09 14:28:47 --> 1 star(s): Range>=      -1.0    1
+2004-03-09 14:28:47 --> 2 star(s): Range>=      0.964   2
+2004-03-09 14:28:47 --> 3 star(s): Range>=      2.047   0
+2004-03-09 14:28:47 --> 4 star(s): Range>=      3.13    2
+2004-03-09 14:28:47 --> 5 star(s): Range>=      4.213   6
+2004-03-09 14:28:47 --> Total: 8001
+</pre>
+</blockquote>
+
+<h4>Step 6 - Fast update of modified records</h4>
 If you just want to update the latest additions or modified records, you may want to do a faster update by running the daemon without the rebalance option.
 If you don't mention anything, the daemon will try to update the records modified after the last run. If you want to update records modified after a certain
 time, you can do this with the '--modified=date' option.
-<h4>Step 6 - Add the ranking method as a scheduled task</h4>
-When the configuration is okay, you can add the bibrank daemon to the task scheduler using the scheduling options. The daemon can then do a update of the rank method once each day or similar automatically.
+
 <a name="bt"></a><h2> bibrankgkb Tool</h2>
 Before the bibrank daemon can be used, a knowledgebase file (kb) with the needed data in the correct format
 needs to be created. This file can be created using the bibrankgkb tool which can read the data either from

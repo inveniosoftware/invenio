@@ -21,7 +21,7 @@
     title="BibRank Internals" \
     navbar_name="hacking-bibrank" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a>" \
-    navbar_select="hacking-bibrank-index" 
+    navbar_select="hacking-bibrank-index"
 
 This page summarizes all the information suitable to dig inside
 BibRank and it's different ranking methods.
@@ -31,6 +31,8 @@ BibRank and it's different ranking methods.
 
 <dt><a href="single_tag_rank.html">Single tag rank method</a> <dd>Ex. of use: Journal Impact Factor. Explains what this
 ranking method does to create the star categories for use when ranking based on Journal Impact Factor or similar methods.
+<dt><a href="merge_rank_methods.html">Merg rank methods</a> <dd>Explains what this
+ranking method does.
 <dt><a href="sort.html">Sort method</a> <dd>Ex. of use: Sorting of the records based on their rank value into star categories. Explains how the records are
 sorted into the different star categories.
 ##<dt><a href="citation_mehod.html">Citation method</a> <dd>Explains what this
@@ -39,8 +41,7 @@ sorted into the different star categories.
 ##ranking method does.
 ##<dt><a href="access_method.html">Access method</a> <dd>Explains what this
 ##ranking method does.
-##<dt><a href="merge_merhod.html">Merg method</a> <dd>Explains what this
-##ranking method does.
+
 <dt><a href="bibrankgkb.html">Create knowledgebase files (bibrankgkb)</a> <dd>Explains how to create knowledgebase files using the bibrankgkb tool
 </dl>
 </blockquote>

@@ -19,12 +19,9 @@
 
 docdir = $(WEBDIR)/admin/bibrank
 
-doc_DATA = index.html guide.html
+doc_DATA = guide.html
 
-sampledir=$(WEBDIR)/admin/bibrank
-sample_DATA=jif.cfg jif.kb
-
-EXTRA_DIST = $(wildcard *.wml) $(sample_DATA)
+EXTRA_DIST = $(wildcard *.wml) 
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 

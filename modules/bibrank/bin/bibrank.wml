@@ -866,7 +866,9 @@ def usage(code, msg=''):
        %s --rebalance --collection=Articles --run=jif
 
  Ranking options:
- -c, --collection=c1,c2    Collections to include in this set
+ -c, --collection=c1,c2    Collections to include in this set,
+                            if not given, the collections the method is
+                            enabled for will be used.
  -i, --id=idr1,idr2        Record ranges to include in this set
  -m, --modified=[from]     Update records modified after date
  -k, --check=value         Check if set needs rebalancing, (if the top
@@ -1040,6 +1042,18 @@ def task_run(row):
         for key in opts_dict["run"]:
             #file = "/home/trondaks/w/cdsware/modules/bibrank/etc/" + key + ".cfg"
             cfg_name = getName(key)
+            
+            if not opts_dict["collection"]:
+                if opts_dict["verbose"] >=9:
+                    write_message("Getting records from collections enabled for rank method.")
+                res = run_sql("SELECT collection.name FROM collection,collection_rnkMETHOD,rnkMETHOD WHERE collection.id=id_collection and id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" %  key)
+                l_of_colls = ""
+                for coll in res:
+                    l_of_colls += coll[0] + ","
+                recIDs = perform_request_search(c=l_of_colls)
+                opts_dict["validset"] = HitSet()
+                opts_dict["validset"].addlist(recIDs)
+                
             file = etcdir + "/bibrank/" + key + ".cfg"
             if opts_dict["verbose"] >=9:
                 write_message("Getting configuration from file: %s" % file)
@@ -1152,59 +1166,6 @@ def command_line():
     print "Task #%d was successfully scheduled for execution." % new_task_id
     return
 
-def create_doc_vector():
-    startCreate = time.time()
-    words = {}
-    docs = {}
-    docsnr = run_sql("SELECT count(*) FROM bibrec")[0][0]
-    for nr in range(0, cfg_max_recID + 1):
-        docs[nr] = []
-        
-    write_message("Total possible xnumber of docs: %s" % (cfg_max_recID + 1))
-    write_message("Current number of docs: %s" % (docsnr))
-    res = run_sql("SELECT id,term, hitlist FROM idxWORD01F")
-    write_message("Number of terms: %s" % len(res))
-
-    file1 = open("no.txt", 'w')
-    file2 = open("yes.txt", 'w')
-    nr = 0
-    for id, term, hitlist in res:
-        if not words.has_key(term):
-            hitset = HitSet(Numeric.loads(decompress(hitlist)))
-            hitset.calculate_nbhits()
-            if check_term(term, hitset, docsnr):
-                file2.write(term + "\n")
-                words[term] = nr
-                reclist = hitset.tolist()
-                for recid in reclist:
-                    docs[recid].append(id)
-                nr = nr + 1
-            else:
-                file1.write(term + "\n")
-        else:
-            print "ERROR"
-    file1.close()
-    file2.close()
-    write_message("Done, Number of terms: %s" % nr)
-    return (docs,words)
-    
-def check_term(term, set, docsnr):
-    termlength = 3
-    stopwords = 0.80
-    
-    try:
-        if int(term):
-            return ""
-    except StandardError, e:
-        if len(term) <= termlength:
-            return ""
-        if (float(set._nbhits) / float(docsnr)) >= stopwords:
-            return ""
-        reg = re.compile(r'[{}()\><!#?/$%^*=+;:]')
-        if re.search(reg, term):
-            return ""
-    return "true"
-    
 def main():
     if len(sys.argv) == 2:
         try:

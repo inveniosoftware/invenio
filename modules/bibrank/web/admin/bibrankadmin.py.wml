@@ -102,7 +102,7 @@ def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def modifytranslation(req, rnkid='', ln=cdslang, sel_lang='', trans = [], confirm=0):
+def modifytranslation(req, rnkID='', ln=cdslang, sel_lang='', trans = [], confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
     
     try:
@@ -117,7 +117,7 @@ def modifytranslation(req, rnkid='', ln=cdslang, sel_lang='', trans = [], confir
 
     if not brc.check_user(uid):
         return page(title="Modify translations",
-                body=brc.perform_modifytranslation(rnkid=rnkid,
+                body=brc.perform_modifytranslation(rnkID=rnkID,
                                              ln=ln,
                                              sel_lang=sel_lang,
                                              trans=trans,
@@ -136,7 +136,7 @@ def modifytranslation(req, rnkid='', ln=cdslang, sel_lang='', trans = [], confir
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def modifycollection(req, ln=cdslang, rnkid='', func='', collid='', confirm=0):
+def modifycollection(req, ln=cdslang, rnkID='', func='', colID='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
     
     try:
@@ -151,10 +151,10 @@ def modifycollection(req, ln=cdslang, rnkid='', func='', collid='', confirm=0):
 
     if not brc.check_user(uid):
         return page(title="Modify visibility toward collections",
-                body=brc.perform_modifycollection(rnkid=rnkid,
+                body=brc.perform_modifycollection(rnkID=rnkID,
                                                  ln=ln,
                                                  func=func,
-                                                 collid=collid,
+                                                 colID=colID,
                                                  confirm=confirm),
                 uid=uid,
                 language=ln,
@@ -170,7 +170,7 @@ def modifycollection(req, ln=cdslang, rnkid='', func='', collid='', confirm=0):
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def deleterank(req, ln=cdslang, rnkid='', confirm=0):
+def deleterank(req, ln=cdslang, rnkID='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
     
     try:
@@ -185,7 +185,7 @@ def deleterank(req, ln=cdslang, rnkid='', confirm=0):
 
     if not brc.check_user(uid):
         return page(title="Delete rank method",
-                body=brc.perform_deleterank(rnkid=rnkid,
+                body=brc.perform_deleterank(rnkID=rnkID,
                                                  ln=ln,
                                                  confirm=confirm),
                 uid=uid,
@@ -204,7 +204,7 @@ def deleterank(req, ln=cdslang, rnkid='', confirm=0):
 
 
 
-def modifyrank(req, ln=cdslang, rnkid='', rnkcode='', template='', cfgfile='', confirm=0):
+def modifyrank(req, ln=cdslang, rnkID='', rnkcode='', template='', cfgfile='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
     
     try:
@@ -219,7 +219,7 @@ def modifyrank(req, ln=cdslang, rnkid='', rnkcode='', template='', cfgfile='', c
 
     if not brc.check_user(uid):
         return page(title="Modify rank method",
-                body=brc.perform_modifyrank(rnkid=rnkid,
+                body=brc.perform_modifyrank(rnkID=rnkID,
                                             ln=ln,
                                             rnkcode=rnkcode,
                                             cfgfile=cfgfile,
@@ -239,7 +239,7 @@ def modifyrank(req, ln=cdslang, rnkid='', rnkcode='', template='', cfgfile='', c
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def showrankdetails(req, ln=cdslang, rnkid=''):
+def showrankdetails(req, ln=cdslang, rnkID=''):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
     
     try:
@@ -254,7 +254,7 @@ def showrankdetails(req, ln=cdslang, rnkid=''):
 
     if not brc.check_user(uid):
         return page(title="Rank method details",
-                body=brc.perform_showrankdetails(rnkid=rnkid,
+                body=brc.perform_showrankdetails(rnkID=rnkID,
                                                  ln=ln),
                 uid=uid,
                 language=ln,
