@@ -1219,7 +1219,7 @@ def create_record():
                                         item = FormatField(item,fn)
                                         DATAFORMATTED.append(item)
   
-                                    DATA = DATAFORMATTED
+                                DATA = DATAFORMATTED
 
                             if (len(DATA) > rows):
 
