@@ -52,5 +52,9 @@ bibwords       = "<BINDIR>/bibwords"
 bibconvert     = "<BINDIR>/bibconvert"
 bibconvertconf = "<ETCDIR>/bibconvert/config"
 htdocsurl      = "<WEBURL>"
-## okay, config variables loaded, the script can continue:
 
+## known compressed file extensions: 
+cfg_compressed_file_extensions = ["z", "gz", "tar", "tgz", "tar", "tar.gz",
+                                  "zip", "rar", "arj", "arc", "pak", "lha", "lhz",
+                                  "sit", "sea", "sitx", "cpt", "hqx", "uu", "uue", 
+                                  "bz", "bz2", "bzip", "tbz", "tbz2", "tar.bz", "tar.bz2"]
