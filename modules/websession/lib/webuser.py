@@ -192,10 +192,18 @@ def update_Uid(req,p_email,p_pw,uid):
     """It updates the userId of the session. It is used when a guest user is logged in succesfully in the system 
     with a given email and password
     """	
-    ## clean the guest user line which id = uid, previously inserted as guest user
     query_ID = int(run_sql("select id from user where email=%s and password=%s",
                            (p_email,p_pw))[0][0])
     setUid(req,query_ID)
+
+def givePassword(email):
+    """ It checks in the database the password for a given email. It is used to send the password to the email of the user.It returns 
+	the password if the user exists, otherwise it returns -999
+    """
+    query_pass = run_sql("select password from user where email =%s",(email,))
+    if len(query_pass)>0:
+	return query_pass[0][0]
+    return -999
 
 def create_user_infobox(uid):
     """Create info box on currenly logged user.""" 

@@ -35,6 +35,8 @@ except ImportError, e:
     import sys
     sys.exit(1)
 
+imagesurl = "%s/img" % weburl
+
 # perform_display(): display the main features of CDS personalize
 def perform_display(req):
     out = ""
@@ -130,7 +132,7 @@ def perform_ask():
 		 </td>
                 </tr>
                 <tr>
-		 <td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>&nbsp;&nbsp;&nbsp;<code class=blocknote><input class="formbutton" type="submit" name="action" value="register"></code>&nbsp;&nbsp;&nbsp;
+		 <td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>&nbsp;&nbsp;&nbsp;<code class=blocknote><input class="formbutton" type="submit" name="action" value="register"></code>&nbsp;&nbsp;&nbsp;(<a href="./lost">Lost your password?</a>)
 		 </td>
                 </tr>
               </table>
@@ -147,6 +149,58 @@ def perform_logout(req):
             <p>You are not longer recognized.  If you wish you can login here <A href="./login">here</A>.
             
          """
+    return out
+
+#def perform_lost: ask the user for his email, in order to send him the lost password
+def perform_lost():
+    out =""
+    out +="""
+	  <body>
+		<p><big><strong class=headline>Lost your password?</strong></big>
+		<form  method="post" action="../youraccount.py/send_email">
+		<p>If you have lost your password string, please enter the email address of your cds.cern.ch account. 
+		 The lost password will be emailed to the owner of that account.
+
+		<table>
+			<tr>
+				<td align=right><strong>Email address:</strong></td>
+				<td><input type="text" size="25" name="p_email" value=""><br><IMG src="%s/r.gif" alt="">&nbsp<small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td>
+				<td><input type="hidden" name="action" value="lost"></td>
+			</tr>
+			<tr>
+				<td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" value="Fetch password"></code></td>
+			</tr>
+		</table>
+
+		</form>
+	  </body>
+	  """%imagesurl
+    return out
+
+# perform_emailSent(email): confirm that the password has been emailed to 'email' address
+def perform_emailSent(email):
+
+    out =""
+    out +="""
+	  <body>
+		  <p>Okay, password has been emailed to %s
+          </body>
+
+   	  """%email
+    return out
+
+# peform_emailMessage : display a error message when the email introduced is not correct, and sugest to try again
+def perform_emailMessage(eMsg):
+
+    out =""
+    out +="""
+	  <body>
+		  <br> %s
+                  <br><A href="../youraccount.py/lost">Try again</A>
+
+          </body>
+
+   	  """%eMsg
     return out
 
 # perform_back(): template for return to a previous page, used for login,register and setting
