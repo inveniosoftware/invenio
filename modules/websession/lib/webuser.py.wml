@@ -254,8 +254,8 @@ def get_email(uid):
         out = res[0][0]
     return out
 
-def create_user_infobox(uid, language="en"):
-    """Create info box on currenly logged user.""" 
+def create_userinfobox_body(uid, language="en"):
+    """Create user info box body for user UID in language LANGUAGE.""" 
     out = ""
     if isGuestUser(uid):
         out += """%s ::
