@@ -54,7 +54,9 @@ try:
     import string
     import sys
     import os
+    import re
     import time
+    import MySQLdb
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -65,6 +67,9 @@ mysql_queries = []
 process_hb    = 0
 process       = 1
 fmt           = "hb"
+sleeptime     = ""
+format_string = "%Y-%m-%d %H:%M:%S"
+sched_time    = time.strftime(format_string)
 
 def bibreformat_task(sql_queries, mysql_queries, process_hb):
     
@@ -325,6 +330,27 @@ def iterate_over(list, weburl, fmt):
 ### Bibshed compatibility procedures
 ###
 
+def get_date(var, format_string = "%Y-%m-%d %H:%M:%S"):
+    """Returns a date string according to the format string.
+       It can handle normal date strings and shifts with respect
+       to now."""
+    date = time.time()
+    shift_re=re.compile("([-\+]{0,1})([\d]+)([dhms])")
+    factors = {"d":24*3600, "h":3600, "m":60, "s":1}
+    m = shift_re.match(var)
+    if m:
+        sign = m.groups()[0] == "-" and -1 or 1
+        factor = factors[m.groups()[2]]
+        value = float(m.groups()[1])
+        print value
+        date = time.localtime(date + sign * factor * value)
+        date = time.strftime(format_string, date)
+    else:
+        date = time.strptime(var, format_string)
+        date = time.strftime(format_string, date)
+
+    return date
+
 def write_message(msg, stream=sys.stdout):
     """Prints message and flush output stream (may be sys.stdout or sys.stderr).  Useful for debugging stuff."""
     if stream == sys.stdout or stream == sys.stderr:
@@ -417,14 +443,18 @@ def authenticate(user):
 
 def task_submit(options):
     """Submits task to the BibSched task queue.  This is what people will be invoking via command line."""
+
+    global sched_time, sleep_time
+
     ## sanity check: remove eventual "task" option:
     if options.has_key("task"):
         del options["task"]
     ## authenticate user:
     user = authenticate(options.get("user", ""))
     ## submit task:
-    task_id = run_sql("""INSERT INTO schTASKS (id,proc,user,state,date,arguments) VALUES (NULL,'bibreformat',%s,'WAITING',NOW(),%s)""",
-                      (user, marshal.dumps(options)))
+
+    task_id = run_sql("""INSERT INTO schTASKS (id,proc,user,state,arguments,sleeptime,date) VALUES (NULL,'bibreformat',%s,'WAITING',%s,%s,%s)""",
+                      (user, marshal.dumps(options),sleeptime,MySQLdb.escape_string(sched_time)))
     ## update task number:
     options["task"] = task_id
     run_sql("""UPDATE schTASKS SET arguments=%s WHERE id=%s""", (marshal.dumps(options),task_id))
@@ -464,7 +494,7 @@ def task_get_options(id):
 def task_run(process_hb):
     """Runs the task by fetching arguments from the BibSched task queue.  This is what BibSched will be invoking via daemon call."""
 
-    global task_id, process, fmt
+    global task_id, process, fmt, sched_time
     options = task_get_options(task_id) # get options from BibSched task table
     ## check task id:
     if not options.has_key("task"):
@@ -529,25 +559,29 @@ def usage(exitcode=1, msg=""):
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
     sys.stderr.write("Usage: %s [options]\n" % sys.argv[0])
-    sys.stderr.write("  -u,  --user=USER \t\t User name to submit the task as, password needed.\n")
-    sys.stderr.write("  -h,  --help      \t\t Print this help.\n")
-    sys.stderr.write("  -V,  --version   \t\t Print version information.\n")
-    sys.stderr.write("  -d,  --debug     \t\t Print debugging information.\n")
-    sys.stderr.write("  -a,  --all       \t\t All records\n")
-    sys.stderr.write("  -c,  --collection\t\t Select records by collection\n")
-    sys.stderr.write("  -f,  --field     \t\t Select records by field.\n")
-    sys.stderr.write("  -p,  --phrase    \t\t Select records by phrase.\n")
-    sys.stderr.write("  -o,  --format    \t\t Specify output format to be (re-)created. (default HB)\n")
-    sys.stderr.write("  -n,  --noprocess \t\t Count records to be processed only (no processing done)\n")
+    sys.stderr.write("  -u,  --user=USER      \t\t User name to submit the task as, password needed.\n")
+    sys.stderr.write("  -h,  --help           \t\t Print this help.\n")
+    sys.stderr.write("  -V,  --version        \t\t Print version information.\n")
+    sys.stderr.write("  -d,  --debug          \t\t Print debugging information.\n")
+    sys.stderr.write("  -s,  --sleeptime=SLEEP\t\t Time after which to repeat tasks (no)\n")
+    sys.stderr.write("  -t,  --time=DATE      \t\t Moment for the task to be active (now).\n")
+
+    sys.stderr.write("  -a,  --all            \t\t All records\n")
+    sys.stderr.write("  -c,  --collection     \t\t Select records by collection\n")
+    sys.stderr.write("  -f,  --field          \t\t Select records by field.\n")
+    sys.stderr.write("  -p,  --pattern        \t\t Select records by phrase.\n")
+    sys.stderr.write("  -o,  --format         \t\t Specify output format to be (re-)created. (default HB)\n")
+    sys.stderr.write("  -n,  --noprocess      \t\t Count records to be processed only (no processing done)\n")
     sys.stderr.write("\n")
     sys.stderr.write(" Example: bibreformat -n  Show how many records are to be bibreformated.")
+    sys.stderr.write("\n")
 
     sys.exit(exitcode)
 
 def main():
     """Main function that analyzes command line input and calls whatever is appropriate.
        Useful for learning on how to write BibSched tasks."""
-    global task_id
+    global task_id, sched_time, sleeptime
     ## parse command line:
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
         ## A - run the task
@@ -559,7 +593,7 @@ def main():
         process_hb = 0
         options = {} # will hold command-line options
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "hVdu:ac:f:p:lo:n", ["help", "version", "debug","user=","all","collection=","field=","phrase=","format=","noprocess"])
+            opts, args = getopt.getopt(sys.argv[1:], "hVdu:ac:f:s:p:lo:nt:", ["help", "version", "debug","user=","all","collection=","field=","sleeptime=","pattern=","format=","noprocess","time="])
         except getopt.GetoptError, err:
             usage(1, err)
 
@@ -590,13 +624,17 @@ def main():
                     if len(sys.argv) == 2:
                         options["new"]    = 1
                         options["last"]   = 1
-
                 elif opt[0] in ["-f", "--field"]:
                     options["field"]  = opt[1]
-                elif opt[0] in ["-p","--phrase"]:
+                elif opt[0] in ["-p","--pattern"]:
                     options["phrase"] = opt[1]
                 elif opt[0] in ["-o","--format"]:
                     options["format"] = opt[1]
+                elif opt[0] in ["-s", "--sleeptime" ]:
+                    get_date(opt[1])    # see if it is a valid shift
+                    sleeptime  = opt[1]
+                elif opt[0] in [ "-t", "--time" ]:
+                    sched_time = get_date(opt[1])
 
         except StandardError, e:
             usage(e)
