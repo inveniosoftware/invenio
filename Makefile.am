@@ -19,7 +19,7 @@
 
 SUBDIRS = config modules
 
-EXTRA_DIST = UNINSTALL .wmlrc
+EXTRA_DIST = UNINSTALL .wmlrc configure-tests.py
 
 ## submit stuff for demo data link creation
 sbmdir = $(WEBDIR)submit/access/protected
