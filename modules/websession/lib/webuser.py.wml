@@ -241,8 +241,8 @@ def create_user_infobox(uid):
                <a class="userinfo" href="%s/yourbaskets.py/display">baskets</a></strong> ::
                <a class="userinfo" href="%s/youralerts.py/list">alerts</a></strong> ::
                <a class="userinfo" href="%s/youraccount.py/logout">logout</a>""" % \
-               (get_email(uid),weburl, weburl, weburl, weburl)
-    return """<td class="userinfoboxbody">%s</td>""" % out
+               (get_email(uid), weburl, weburl, weburl, weburl)
+    return """<strong>USER:</strong> %s""" % out
 
 ## --- follow some functions for Apache user/group authentication
 
