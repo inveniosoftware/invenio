@@ -92,7 +92,7 @@ BibSched system.
 
 <h3>Guest Users Cleanup</h3>
 
-<p>Guest users create a log of entries in <CDSNAME> tables that are
+<p>Guest users create a lot of entries in <CDSNAME> tables that are
 related to their web sessions, their search history, personal baskets,
 etc.  This data has to be garbage-collected periodically.  At the
 moment this is done via a command line program:
@@ -104,9 +104,8 @@ moment this is done via a command line program:
    </blockquote>
 
 <strong>HINT:</strong> You may want to launch this command every day.
-
-<p>FIXME. In the future the garbage collection may be done via BibSched task
-queue.
+In the future the garbage collection task may be done via BibSched task
+queue. <!--FIXME-->
 
 <h3>Alert Engine</h3>
 
@@ -126,7 +125,8 @@ to call <code>alertengine</code> each day.
 
 <h3>Cleaning Up the Filesystem</h3>
 
-<p>FIXME.  BibSched log files.
+<p>BibSched creates log and err files in <code>&lt;prefix&gt;/var/log</code>
+directory that is good to clean up from time to time.  For example:
 
    <blockquote>
    <pre>
@@ -136,7 +136,9 @@ to call <code>alertengine</code> each day.
    </pre>
    </blockquote>
 
-<p>FIXME.  BibReformat temorary XML files. 
+<p>BibReformat creates temorary XML files in
+<code><prefix>/var/tmp</code> that may be deleted after they are
+uploaded.  For example:
 
    <blockquote>
    <pre>   
@@ -146,4 +148,4 @@ to call <code>alertengine</code> each day.
    </pre>
    </blockquote>
 
-<p>FIXME.  WebSubmit archives, what to keep, what not.
+<p>FIXME: Thoughts on WebSubmit log archives, what to keep, what not.
