@@ -816,8 +816,8 @@
   <pt>agrupar por coleção</pt>
   <it>raggrupato per collezione</it>
   <ru>поделит дла коллекции</ru>
-  <sk>zhromaždené podľa kolekcií</sk>
-  <cz>shromážděné podle kolekcí</cz>
+  <sk>zoskupené podľa kolekcií</sk>
+  <cz>seskupené podle kolekcí</cz>
   <no>oppdelt etter samling</no>
 </define-tag>
 
@@ -1060,6 +1060,591 @@
   <sk>Príručka</sk>
   <cz>Příručka</cz>
   <no>Guide</no>
+</define-tag>
+
+<define-tag MSG_ADDED_SINCE whitespace=delete>
+  <en>Added since:</en>
+  <fr>Ajouté depuis:</fr>
+  <de>Added since:</de>
+  <es>Added since:</es>
+  <pt>Added since:</pt>
+  <it>Added since:</it>
+  <ru>Added since:</ru>
+  <sk>Pridané od:</sk>
+  <cz>Přidané od:</cz>
+  <no>Added since:</no>
+</define-tag>
+
+<define-tag MSG_UNTIL whitespace=delete>
+  <en>until:</en>
+  <fr>jusqu'à:</fr>
+  <de>until:</de>
+  <es>until:</es>
+  <pt>until:</pt>
+  <it>until:</it>
+  <ru>until:</ru>
+  <sk>do:</sk>
+  <cz>do:</cz>
+  <no>until:</no>
+</define-tag>
+
+<define-tag MSG_ANY_DAY whitespace=delete>
+  <en>any day</en>
+  <fr>tous les jours</fr>
+  <de>any day</de>
+  <es>any day</es>
+  <pt>any day</pt>
+  <it>any day</it>
+  <ru>any day</ru>
+  <sk>hocaký deň</sk>
+  <cz>jakýkoli den</cz>
+  <no>any day</no>
+</define-tag>
+
+<define-tag MSG_ANY_MONTH whitespace=delete>
+  <en>any month</en>
+  <fr>tous les mois</fr>
+  <de>any month</de>
+  <es>any month</es>
+  <pt>any month</pt>
+  <it>any month</it>
+  <ru>any month</ru>
+  <sk>hocaký mesiac</sk>
+  <cz>jakýkoli měsíc</cz>
+  <no>any month</no>
+</define-tag>
+
+<define-tag MSG_ANY_YEAR whitespace=delete>
+  <en>any year</en>
+  <fr>toutes les années</fr>
+  <de>any year</de>
+  <es>any year</es>
+  <pt>any year</pt>
+  <it>any year</it>
+  <ru>any year</ru>
+  <sk>hocaký rok</sk>
+  <cz>jakýkoli rok</cz>
+  <no>any year</no>
+</define-tag>
+
+<define-tag MSG_JANUARY whitespace=delete>
+  <en>January</en>
+  <fr>janvier</fr>
+  <de>January</de>
+  <es>January</es>
+  <pt>January</pt>
+  <it>January</it>
+  <ru>January</ru>
+  <sk>január</sk>
+  <cz>leden</cz>
+  <no>January</no>
+</define-tag>
+
+<define-tag MSG_FEBRUARY whitespace=delete>
+  <en>February</en>
+  <fr>février</fr>
+  <de>February</de>
+  <es>February</es>
+  <pt>February</pt>
+  <it>February</it>
+  <ru>February</ru>
+  <sk>február</sk>
+  <cz>únor</cz>
+  <no>February</no>
+</define-tag>
+
+<define-tag MSG_MARCH whitespace=delete>
+  <en>March</en>
+  <fr>mars</fr>
+  <de>March</de>
+  <es>March</es>
+  <pt>March</pt>
+  <it>March</it>
+  <ru>March</ru>
+  <sk>marec</sk>
+  <cz>březen</cz>
+  <no>March</no>
+</define-tag>
+
+<define-tag MSG_APRIL whitespace=delete>
+  <en>April</en>
+  <fr>avril</fr>
+  <de>April</de>
+  <es>April</es>
+  <pt>April</pt>
+  <it>April</it>
+  <ru>April</ru>
+  <sk>apríl</sk>
+  <cz>duben</cz>
+  <no>April</no>
+</define-tag>
+
+<define-tag MSG_MAY whitespace=delete>
+  <en>May</en>
+  <fr>mai</fr>
+  <de>May</de>
+  <es>May</es>
+  <pt>May</pt>
+  <it>May</it>
+  <ru>May</ru>
+  <sk>máj</sk>
+  <cz>květen</cz>
+  <no>May</no>
+</define-tag>
+
+<define-tag MSG_JUNE whitespace=delete>
+  <en>June</en>
+  <fr>juin</fr>
+  <de>June</de>
+  <es>June</es>
+  <pt>June</pt>
+  <it>June</it>
+  <ru>June</ru>
+  <sk>jún</sk>
+  <cz>červen</cz>
+  <no>June</no>
+</define-tag>
+
+<define-tag MSG_JULY whitespace=delete>
+  <en>July</en>
+  <fr>juillet</fr>
+  <de>July</de>
+  <es>July</es>
+  <pt>July</pt>
+  <it>July</it>
+  <ru>July</ru>
+  <sk>júl</sk>
+  <cz>červenec</cz>
+  <no>July</no>
+</define-tag>
+
+<define-tag MSG_AUGUST whitespace=delete>
+  <en>August</en>
+  <fr>août</fr>
+  <de>August</de>
+  <es>August</es>
+  <pt>August</pt>
+  <it>August</it>
+  <ru>August</ru>
+  <sk>august</sk>
+  <cz>srpen</cz>
+  <no>August</no>
+</define-tag>
+
+<define-tag MSG_SEPTEMBER whitespace=delete>
+  <en>September</en>
+  <fr>septembre</fr>
+  <de>September</de>
+  <es>September</es>
+  <pt>September</pt>
+  <it>September</it>
+  <ru>September</ru>
+  <sk>september</sk>
+  <cz>září</cz>
+  <no>September</no>
+</define-tag>
+
+<define-tag MSG_OCTOBER whitespace=delete>
+  <en>October</en>
+  <fr>octobre</fr>
+  <de>October</de>
+  <es>October</es>
+  <pt>October</pt>
+  <it>October</it>
+  <ru>October</ru>
+  <sk>október</sk>
+  <cz>říjen</cz>
+  <no>October</no>
+</define-tag>
+
+<define-tag MSG_NOVEMBER whitespace=delete>
+  <en>November</en>
+  <fr>novembre</fr>
+  <de>November</de>
+  <es>November</es>
+  <pt>November</pt>
+  <it>November</it>
+  <ru>November</ru>
+  <sk>november</sk>
+  <cz>listopad</cz>
+  <no>November</no>
+</define-tag>
+
+<define-tag MSG_DECEMBER whitespace=delete>
+  <en>December</en>
+  <fr>décembre</fr>
+  <de>December</de>
+  <es>December</es>
+  <pt>December</pt>
+  <it>December</it>
+  <ru>December</ru>
+  <sk>december</sk>
+  <cz>prosinec</cz>
+  <no>December</no>
+</define-tag>
+
+<define-tag MSG_SEARCH_TERM whitespace=delete>
+  <en>Search term <em>%s</em></en>
+  <fr>Le terme de recherche <em>%s</em></fr>
+  <de>Search term <em>%s</em></de>
+  <es>Search term <em>%s</em></es>
+  <pt>Search term <em>%s</em></pt>
+  <it>Search term <em>%s</em></it>
+  <ru>Search term <em>%s</em></ru>
+  <sk>Hľadaný výraz <em>%s</em></sk>
+  <cz>Hledaný výraz <em>%s</em></cz>
+  <no>Search term <em>%s</em></no>
+</define-tag>
+
+<define-tag MSG_INSIDE_INDEX whitespace=delete>
+  <en>inside <em>%s</em> index</en>
+  <fr>dans l'index <em>%s</em></fr>
+  <de>inside <em>%s</em> index</de>
+  <es>inside <em>%s</em> index</es>
+  <pt>inside <em>%s</em> index</pt>
+  <it>inside <em>%s</em> index</it>
+  <ru>inside <em>%s</em> index</ru>
+  <sk>v indexe <em>%s</em></sk>
+  <cz>v indexu em>%s</em></cz>
+  <no>inside <em>%s</em> index</no>
+</define-tag>
+
+<define-tag MSG_DID_NOT_MATCH whitespace=delete>
+  <en>did not match any record.  Nearest terms in any collection are:</en>
+  <fr>ne se trouve dans aucune notice.  Les termes les plus proches de toutes les collections sont:</fr>
+  <de>did not match any record.  Nearest terms in any collection are:</de>
+  <es>did not match any record.  Nearest terms in any collection are:</es>
+  <pt>did not match any record.  Nearest terms in any collection are:</pt>
+  <it>did not match any record.  Nearest terms in any collection are:</it>
+  <ru>did not match any record.  Nearest terms in any collection are:</ru>
+  <sk>neodpovedá žiadnemu záznamu.  Najbližšie termíny nezávisle na kolekcii sú:</sk>
+  <cz>neodpovídá žádnému záznamu.  Nejbližší termíny nezávisle na kolekci jsou:</cz>
+  <no>did not match any record.  Nearest terms in any collection are:</no>
+</define-tag>
+
+<define-tag MSG_NO_WORDS_INDEX_AVAILABLE whitespace=delete>
+  <en>No words index available for</en>
+  <fr>Aucun index des mots n'est disponible pour</fr>
+  <de>No words index available for</de>
+  <es>No words index available for</es>
+  <pt>No words index available for</pt>
+  <it>No words index available for</it>
+  <ru>No words index available for</ru>
+  <sk>Index slov nie je dostupný pre</sk>
+  <cz>Index slov není k dispozici pro</cz>
+  <no>No words index available for</no>
+</define-tag>
+
+<define-tag MSG_NO_PHRASE_INDEX_AVAILABLE whitespace=delete>
+  <en>No phrase index available for</en>
+  <fr>Aucun index des phrases n'est disponible pour</fr>
+  <de>No phrase index available for</de>
+  <es>No phrase index available for</es>
+  <pt>No phrase index available for</pt>
+  <it>No phrase index available for</it>
+  <ru>No phrase index available for</ru>
+  <sk>Index viet nie je dostupný pre</sk>
+  <cz>Index vět není k dispozici pro</cz>
+  <no>No phrase index available for</no>
+</define-tag>
+
+<define-tag MSG_NO_HITS_IN_GIVEN_COLLECTION>
+  <en>
+    No exact match found in selected collection(s).
+    Results from the whole public database follow.
+  </en>
+  <fr>
+    Aucun résultat exact n'a été trouvé dans les collections
+    sélectionnées.  Les résultats de toutes la base publique suivent.    
+  </fr>
+  <de>
+    No exact match found in selected collection(s).
+    Results from the whole public database follow.
+  </de>
+  <es>
+    No exact match found in selected collection(s).
+    Results from the whole public database follow.
+  </es>
+  <pt>
+    No exact match found in selected collection(s).
+    Results from the whole public database follow.
+  </pt>
+  <it>
+    No exact match found in selected collection(s).
+    Results from the whole public database follow.
+  </it>
+  <ru>
+    No exact match found in selected collection(s).
+    Results from the whole public database follow.
+  </ru>
+  <sk>
+    Žiaden presný výsledok nebol vo zvolených kolekciách nájdený.
+    Výsledky z celej verejne prístupnej databázy nasledujú.
+  </sk>
+  <cz>
+    Žádný přesný výsledek nebyl ve zvolených kolekcích nalezen.
+    Výsledky z celé veřejně přístupné databáze následují.
+  </cz>
+  <no>
+    No exact match found in selected collection(s).
+    Results from the whole public database follow.
+  </no>
+</define-tag>
+
+<define-tag MSG_NO_PUBLIC_HITS>
+  <en>
+    No public collection matched your query.  If you were looking for
+    a non-public document, please choose the desired restricted
+    collection first.    
+  </en>
+  <fr>
+    Aucune collection publique ne satisfait votre requête.  Si vous
+    avez cherché des documents non-publiques, veuillez choisir d'abord
+    la collection restreinte.
+  </fr>
+  <de>
+    No public collection matched your query.  If you were looking for
+    a non-public document, please choose the desired restricted
+    collection first.    
+  </de>
+  <es>  
+    No public collection matched your query.  If you were looking for
+    a non-public document, please choose the desired restricted
+    collection first.
+  </es>
+  <pt>  
+    No public collection matched your query.  If you were looking for
+    a non-public document, please choose the desired restricted
+    collection first.    
+  </pt>
+  <it>
+    No public collection matched your query.  If you were looking for
+    a non-public document, please choose the desired restricted
+    collection first.    
+  </it>
+  <ru>
+    No public collection matched your query.  If you were looking for
+    a non-public document, please choose the desired restricted
+    collection first.
+  </ru>
+  <sk>  
+    Žiadna verejne prístupná kolekcia nevyhovuje Vašej otázke.  Ak ste
+    hľadali dokumenty verejne neprístupné, zvoľte prosím najskôr
+    príslušnú neverejnú kolekciu.
+  </Sk>
+  <cz>  
+    Žádná veřejně přístupná kolekce nevyhovuje Vaší otázce.  Jestliže
+    jste hledali dokumenty veřejně nepřístupné, zvolte prosím nejdřív
+    příslušnou neveřejnou kolekci.    
+  </cz>
+  <no>  
+    No public collection matched your query.  If you were looking for
+    a non-public document, please choose the desired restricted
+    collection first.
+  </no>
+</define-tag>
+
+<define-tag MSG_NO_MATCH_WITHIN_TIME_LIMITS>
+  <en>
+    No match within your time limits, discarding this condition...
+  </en>
+  <fr>
+    Pas de résultat pour l'interval de temps spécifé, la condition
+    n'est pas prise en compte...
+  </fr>
+  <de>
+    No match within your time limits, discarding this condition...
+  </de>
+  <es>
+    No match within your time limits, discarding this condition...
+  </es>
+  <pt>
+    No match within your time limits, discarding this condition...
+  </pt>
+  <it>
+    No match within your time limits, discarding this condition...
+  </it>
+  <ru>
+    No match within your time limits, discarding this condition...
+  </ru>
+  <sk>
+    Žiaden výsledok nevyhovuje Vašim časovým kritériám, podmienka
+    nie je vzatá do úvahy...
+  </sk>
+  <cz>
+    Žádný výsledek nevyhovuje Vašim časovým kritériím, podmínka
+    není vzata do úvahy...
+  </cz>
+  <no>
+    No match within your time limits, discarding this condition...
+  </no>
+</define-tag>
+
+<define-tag MSG_NO_MATCH_WITHIN_SEARCH_LIMITS>
+  <en>
+    No match within your search limits, discarding this condition...
+  </en>
+  <fr>
+    Pas de résultat pour les limites spécifiées, les conditions ne
+    sont pas prise en compte...
+  </fr>
+  <de>
+    No match within your time limits, discarding this condition...
+  </de>
+  <es>
+    No match within your time limits, discarding this condition...
+  </es>
+  <pt>
+    No match within your time limits, discarding this condition...
+  </pt>
+  <it>
+    No match within your time limits, discarding this condition...
+  </it>
+  <ru>
+    No match within your time limits, discarding this condition...
+  </ru>
+  <sk>
+    Žiaden výsledok nevyhovuje Vašim limitným kritériám, podmienky
+    nie sú vzaté do úvahy...
+  </sk>
+  <cz>
+    Žádný výsledek nevyhovuje Vašim limitným kritériím, podmínky
+    nejsou vzaty do úvahy...
+  </cz>
+  <no>No match within your time limits, discarding this condition...</no>
+</define-tag>
+
+<define-tag MSG_NO_BOOLEAN_HITS>
+  <en>
+    All search terms matched but boolean query returned no hits.
+    Please combine your search terms differently.
+  </en>
+  <fr>
+    Tous les termes de recherche ont été trouvés mais la requête booleane
+    n'a rien donnée.  Essayez de combiner ces termes différamment.
+  </fr>
+  <de>
+    All search terms matched but boolean query returned no hits.
+    Please combine your search terms differently.
+  </de>
+  <es>
+    All search terms matched but boolean query returned no hits.
+    Please combine your search terms differently.
+  </es>
+  <pt>
+    All search terms matched but boolean query returned no hits.
+    Please combine your search terms differently.</pt>
+  <it>
+    All search terms matched but boolean query returned no hits.
+    Please combine your search terms differently.</it>
+  <ru>
+    All search terms matched but boolean query returned no hits.
+    Please combine your search terms differently.</ru>
+  <sk>
+    Všetky termíny hľadania boli nájdené, ale boolean otázka nevrátila
+    žiaden výsledok.  Skúste skombinovať dané termíny inakšie.
+  </sk>
+  <cz>
+    Všechny termíny hledání byli nalezeny, avšak boolean otázka
+    nevrátila žádný výsledek. Skuste skombinovat dané termíny
+    jiným spůsobem.
+  </cz>
+  <no>
+    All search terms matched but boolean query returned no hits.
+    Please combine your search terms differently.
+  </no>
+</define-tag>
+
+<define-tag MSG_NO_EXACT_MATCH_FOR_FOO_USING_BAR_INSTEAD>
+  <en>
+    No exact match found for <em>%s</em>, using <em>%s</em> instead...
+  </en>
+  <fr>
+    Aucun résultat précis pour <em>%s</em> n'a pas été trouvé,
+    utilisons <em>%s</em> à la place...
+  </fr>
+  <de>
+    No exact match found for <em>%s</em>, using <em>%s</em> instead...
+  </de>
+  <es>
+    No exact match found for <em>%s</em>, using <em>%s</em> instead...
+  </es>
+  <pt>
+    No exact match found for <em>%s</em>, using <em>%s</em> instead...
+  </pt>
+  <it>
+    No exact match found for <em>%s</em>, using <em>%s</em> instead...
+  </it>
+  <ru>
+    No exact match found for <em>%s</em>, using <em>%s</em> instead...
+  </ru>
+  <sk>
+    Žiaden presný výsledok pre <em>%s</em> nebol nájdený, skúsme
+    použiť <em>%s</em> namiesto neho...
+  </sk>
+  <cz>
+    Žádný přesný výsledek pro <em>%s</em> nebyl nalezen, skusme
+    použít <em>%s</em> místo něj...
+  </cz>
+  <no>
+    No exact match found for <em>%s</em>, using <em>%s</em> instead...
+  </no>
+</define-tag>
+
+<define-tag MSG_INTERNAL_ERROR>
+  <en>Internal Error</en>
+  <fr>Erreur Interne</fr>
+  <de>Internal Error</de>
+  <es>Internal Error</es>
+  <pt>Internal Error</pt>
+  <it>Internal Error</it>
+  <ru>Internal Error</ru>
+  <sk>Interná Chyba</sk>
+  <cz>Interní Chyba</cz>
+  <no>Internal Error</no>
+</define-tag>
+
+<define-tag MSG_PLEASE_CONTACT_AND_QUOTE>
+  <en>
+    Please contact <a href="mailto:%s">%s</a> quoting the following
+    information:
+  </en>
+  <fr>
+    Veuillez contacter <a href="mailto:%s">%s</a> en mentionnant
+    l'information suivante:        
+  </fr>
+  <de>
+    Please contact <a href="mailto:%s">%s</a> quoting the following
+    information:
+  </de>
+  <es>
+    Please contact <a href="mailto:%s">%s</a> quoting the following
+    information:
+  </es>
+  <pt>
+    Please contact <a href="mailto:%s">%s</a> quoting the following
+    information:
+  </pt>
+  <it>
+    Please contact <a href="mailto:%s">%s</a> quoting the following
+    information:
+  </it>
+  <ru>
+    Please contact <a href="mailto:%s">%s</a> quoting the following
+    information:
+  </ru>
+  <sk>
+    Prosíme kontaktujte <a href="mailto:%s">%s</a> a uveďte nasledovné
+    informácie:
+  </sk>
+  <cz>
+    Prosíme kontaktujte <a href="mailto:%s">%s</a> a uveďte následující
+    informace:
+  </cz>
+  <no>
+    Please contact <a href="mailto:%s">%s</a> quoting the following
+    information:
+  </no>
 </define-tag>
 
 ## end of file
