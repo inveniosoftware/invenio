@@ -1,5 +1,4 @@
 ## $Id$
-## CDSware Search Engine in mod_python.
 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002 CERN.
@@ -20,7 +19,7 @@
 
 <protect># -*- coding: utf-8 -*-</protect>
 
-"""Unit tests for the document impact hit parade tests."""
+"""Unit tests for the citation searcher."""
 
 __lastupdated__ = """<: print `date +"%d %b %Y %H:%M:%S %Z"`; :>"""
 
@@ -31,25 +30,31 @@ __version__ = "$Id$"
 import bibrank_citation_searcher
 import unittest
 
-class TestListSetOperations(unittest.TestCase):
-
+class TestCitationSearcher(unittest.TestCase):
     def setUp(self):
         self.recid = 339705
         self.recids = [339705, 339706]
         self.rank_method_code = 'cit'
        
     def test_init_cited_by_dictionary(self):
+        """bibrank citation searcher - init cited-by data"""
         self.assert_(bibrank_citation_searcher.init_cited_by_dictionary()) 
+
     def test_init_reference_list_dictionary(self):
+        """bibrank citation searcher - init reference data"""
         self.assert_(bibrank_citation_searcher.init_reference_list_dictionary())
-    def test_get_citing_recidrelevanc(self):
+
+    def test_get_citing_recidrelevance(self):
+        """bibrank citation searcher - get citing relevance"""
         self.assert_(bibrank_citation_searcher.get_citing_recidrelevance(self.rank_method_code, self.recids))    
+
     def test_get_co_cited_with_list(self):
+        """bibrank citation searcher - get co-cited-with data"""
         self.assert_(bibrank_citation_searcher.get_co_cited_with_list(self.recid))    
             
 def create_test_suite():
-    """Return test suite for the indexing engine.""" 
-    return unittest.TestSuite((unittest.makeSuite(TestListSetOperations,'test'),))
+    """Return test suite for the citation searcher.""" 
+    return unittest.TestSuite((unittest.makeSuite(TestCitationSearcher,'test'),))
 
 if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())
