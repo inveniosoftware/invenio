@@ -28,15 +28,15 @@ Contents
           <http://httpd.apache.org/>
           <http://www.php.net/>
 
-     b) MySQL server (may be on a remote machine), and MySQL client
+     b) PHP compiled as standalone command-line executable is required too:
+          <http://www.php.net/manual/en/install.commandline.php>
+
+     c) MySQL server (may be on a remote machine), and MySQL client
         (must be available locally too):
           <http://mysql.com/>
 
-     c) WML - Website META Language:
+     d) WML - Website META Language:
           <http://www.engelschall.com/sw/wml/>
-
-     d) Perl, featuring DBI::mysql module:
-          <http://cpan.org/>
 
      e) Python, featuring MySQLdb module:
           <http://python.org/>
@@ -46,13 +46,13 @@ Contents
    you to continue unless everything is in order.)
 
 1. Quick instructions for the impatient CDSware admin
-==================================================
+=====================================================
 
       $ mysql -h sqlserver.domain.com -u root -p mysql
           mysql> CREATE DATABASE cdsware;
           mysql> GRANT ALL PRIVILEGES ON cdsware.* TO cdsware@webserver.domain.com IDENTIFIED BY 'myp1ss';
       $ cd /usr/local/src/
-      $ wget http://cds.cern.ch/download/cdsware-0.9.tar.gz
+      $ wget http://cdsware.cern.ch/download/cdsware-0.9.tar.gz
       $ tar xvfz cdsware-0.9.tar.gz
       $ cd cdsware-0.9
       $ ./configure --with-htdocsdir=/www/data/ \
@@ -73,7 +73,7 @@ Contents
       $ netscape http://webserver.domain.com/CDSware/admin/ ## optional
 
 2. Detailed instructions for the patient CDSware admin
-===================================================
+======================================================
 
    The CERN Document Server Software (CDSware) uses standard GNU autoconf
    method to build and install its files.  This means that you proceed
@@ -99,7 +99,7 @@ Contents
           CDS Software.  (The built files will be installed later on
           into Apache htdocs and cgi-bin trees.)
 
-      $ wget http://cds.cern.ch/download/cdsware-0.9.tar.gz
+      $ wget http://cdsware.cern.ch/download/cdsware-0.9.tar.gz
 
           Fetch CDSware package from the CDSware distribution server.
 
@@ -139,12 +139,12 @@ Contents
       $ vi ./config/config.wml  ## optional, but strongly recommended
 
           Optionally, customize your CDSware installation.  Unlike the
-          installation direcories and other essential parameters that
+          installation directories and other essential parameters that
           were defined in the previous step, the "config.wml" file
           enables you to change the CDSware web page look and feel, and
           otherwise to influence its behaviour and default parameters.
 
-          This configuration step is optional, but stringly
+          This configuration step is optional, but strongly
           recommended.  It is referred to as "compile time
           configuration step b)" in the elucidative explanatory
           commentary below.
@@ -177,7 +177,7 @@ Contents
 
       $ gmake clean-sample-data ## optional
 
-          Optionally, removes the sample data and prepares the CDSware
+          Optionally, remove the sample data and prepare a blank CDSware
           installation for production purposes.
 
       $ netscape http://webserver.domain.com/CDSware/admin/ ## optional
@@ -193,13 +193,13 @@ Contents
 3. Configuration philosophy explained and elucidated
 ====================================================
 
-   As you could see from the above, the condiguration of the CDSware is
+   As you could see from the above, the configuration of the CDSware is
    threefold: 
 
       (a) pre-compile time configuration phase 
           [uses command line options / while doing "configure"]
       (b) compile time configuration phase 
-          [uses WML / after "configure", while doing "&& make install"]
+          [uses WML / after "configure", while doing "make && make install"]
       (c) runtime configuration phase 
           [uses MySQL / after "make install", while doing "netscape http://webserver.domain.com/CDSware/admin/"]
 
