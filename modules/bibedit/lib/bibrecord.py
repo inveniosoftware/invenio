@@ -469,7 +469,7 @@ def create_record_RXP(xmltext, verbose=verbose, correct=correct):
         
         if name in ["int","long"] :
             st = str(value)
-        elif name == 'str':
+        elif name in ['str', 'unicode']:
             st = value
         else:
             if verbose:
@@ -563,7 +563,7 @@ def create_record_minidom(xmltext, verbose=verbose, correct=correct):
         name = type(v).__name__
         if (name in ["int","long"]) :
             field = ([],"","",str(v),ord) # field = (subfields, ind1, ind2,value)
-        elif name == 'str':
+        elif name in ['str', 'unicode']:
             field = ([],"","",v,ord)
         else:
             if verbose:
@@ -636,7 +636,7 @@ def create_record_4suite(xmltext,verbose=verbose,correct=correct):
         name = type(v).__name__
         if (name in ["int","long"]) :
             field = ([],"","",str(v),ord) # field = (subfields, ind1, ind2,value)
-        elif name == 'str':
+        elif name in ['str','unicode']:
             field = ([],"","",v,ord)
         else:
             if verbose:
@@ -715,7 +715,7 @@ def create_field(value,ind1="",ind2="",subfields=[],ord=-1):
     name = type(value).__name__
     if name in ["int","long"] :
         s = str(value)
-    elif name == 'str':
+    elif name in ['str', 'unicode']:
         s = value
     else:
         err.append((7,'Type found: ' + name))
