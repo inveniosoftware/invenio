@@ -544,7 +544,6 @@ a.footer:hover {
    margin-left: 20px;
    margin-right: 0px;
    border-spacing: 0px;
-   border-collapse: collapse;
    border-top: 1px solid #36c;
 }
 .admin_w200 {
