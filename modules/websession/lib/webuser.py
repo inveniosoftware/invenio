@@ -293,3 +293,9 @@ def auth_apache_user_collection_p(user, password, coll):
     else:
         return 0
 
+def list_registered_users():
+    """list all users"""
+    
+    try: return run_sql("""SELECT id,email FROM user where email!=''""")
+    except IndexError: return []
+    

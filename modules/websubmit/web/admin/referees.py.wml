@@ -41,7 +41,7 @@ from cdsware.dbquery import run_sql
 from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import *
 from cdsware.webpage import page, create_error_box
-from cdsware.webuser import getUid, get_email
+from cdsware.webuser import getUid, get_email, list_registered_users
 from cdsware.messages import *
 from cdsware.websubmit_config import *
 
@@ -187,7 +187,7 @@ def displayAddUser(doctype):
     <CENTER><b>Add</b></CENTER>
     <hr>
     User:<br>"""
-    users = acc_listUsers()
+    users = list_registered_users()
     if len(users) < 20:
         numrows = len(users)
     else:

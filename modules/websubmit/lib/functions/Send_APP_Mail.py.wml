@@ -84,6 +84,9 @@ def Send_APP_Mail (parameters,curdir,form):
     # Try to retrieve the referee's email from the referee's database
     for user in acc_getRoleUsers(acc_getRoleId("referee_%s_%s" % (doctype,category))):
         refereeaddress += user[1] + ","
+    # And if there is a general referee
+    for user in acc_getRoleUsers(acc_getRoleId("referee_%s_*" % doctype)):
+        refereeaddress += user[1] + ","
     refereeaddress = re.sub(",$","",refereeaddress)
     # Creation of the mail for the referee
     otheraddresses = otheraddresses.replace("<CATEG>",category)

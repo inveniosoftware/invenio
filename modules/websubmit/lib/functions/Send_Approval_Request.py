@@ -91,6 +91,9 @@ def Send_Approval_Request (parameters,curdir,form):
     # Try to retrieve the referee's email from the referee's database
     for user in acc_getRoleUsers(acc_getRoleId("referee_%s_%s" % (doctype,category))):
         refereeaddress += user[1] + ","
+    # And if there are general referees
+    for user in acc_getRoleUsers(acc_getRoleId("referee_%s_*" % doctype)):
+        refereeaddress += user[1] + ","
     refereeaddress = re.sub(",$","",refereeaddress)
     # Creation of the mail for the referee
     addresses = ""
