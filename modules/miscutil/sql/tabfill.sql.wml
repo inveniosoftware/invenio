@@ -1296,6 +1296,8 @@ INSERT INTO accACTION VALUES (9,'runbibtaskex','run BibTaskEx example', '','no')
 INSERT INTO accACTION VALUES (11,'submit','use webSubmit','doctype,act','no');
 INSERT INTO accACTION VALUES (12,'cfgwebsubmit','configure webSubmit','','no');
 INSERT INTO accACTION VALUES (13,'referee','referee document type doctype','doctype,categ','yes');
+INSERT INTO accACTION VALUES (14,'runbibrank','run BibRank','','no');
+INSERT INTO accACTION VALUES (15,'cfgbibrank','configure BibRank','','no');
 
 INSERT INTO accARGUMENT VALUES (1,'collection','Pictures');
 

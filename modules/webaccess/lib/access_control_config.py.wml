@@ -51,7 +51,8 @@ def_roles = ((SUPERADMINROLE, 'superuser with all rights'),
 def_users = []
 # actions
 #            name                  desc     allowedkeywords   optional
-def_actions = (('cfgwebsearch',         'configure WebSearch',       '',              'no'),
+def_actions = (
+               ('cfgwebsearch',         'configure WebSearch',       '',              'no'),
                ('cfgbibformat',         'configure BibFormat',       '',              'no'),
                ('cfgwebsubmit',         'configure WebSubmit',       '',              'no'),
                ('runbibindex',          'run BibIndex',       '',              'no'),
@@ -62,10 +63,14 @@ def_actions = (('cfgwebsearch',         'configure WebSearch',       '',        
                (DELEGATEADDUSERROLE,    'delegate subroles inside WebAccess',       'role',          'no'),
                ('runbibtaskex',         'run BibTaskEx example',       '',              'no'),
                ('referee',                  'referee document type doctype/category categ', 'doctype,categ',    'yes'),
-               ('submit',                   'use webSubmit',    'doctype,act',  'yes'))
+               ('submit',                   'use webSubmit',    'doctype,act',  'yes'),
+               ('runbibrank',         'run BibRank',       '',              'no'),
+               ('cfgbibrank',         'configure BibRank',       '',              'no'),
+              )
 # authorizations
 #          role              action          arglistid  optional   arguments
-def_auths = ((SUPERADMINROLE,    'cfgwebsearch',         -1,      0,       {}),
+def_auths = (
+             (SUPERADMINROLE,    'cfgwebsearch',         -1,      0,       {}),
              (SUPERADMINROLE,    'cfgbibformat',         -1,      0,       {}),
              (SUPERADMINROLE,    'cfgwebsubmit',         -1,      0,       {}),
              (SUPERADMINROLE,    'runbibindex',          -1,      0,       {}),
@@ -76,5 +81,8 @@ def_auths = ((SUPERADMINROLE,    'cfgwebsearch',         -1,      0,       {}),
              (WEBACCESSADMINROLE,WEBACCESSACTION,        -1,      0,       {}),
              (SUPERADMINROLE,    'runtaskex',            -1,      0,       {}),
              (SUPERADMINROLE,    'referee',         -1,      1,       {}),
-             (SUPERADMINROLE,    'submit',         -1,      1,       {}))
+             (SUPERADMINROLE,    'submit',         -1,      1,       {}),
+             (SUPERADMINROLE,    'runbibrank',           -1,      0,       {}),
+             (SUPERADMINROLE,    'cfgbibrank',           -1,      0,       {}),
+            )
 </protect>
