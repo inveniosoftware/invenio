@@ -30,16 +30,11 @@
 ## fill config variables:
 pylibdir = "<LIBDIR>/python"
 
-try:
-    import sys    
-    sys.path.append('%s' % pylibdir)
-    from cdsware.config import *
-    from cdsware import search_engine
-    from mod_python import apache    
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+import sys    
+sys.path.append('%s' % pylibdir)
+from cdsware.config import *
+from cdsware import search_engine
+from mod_python import apache    
 
 __version__ = "$Id$"
 
