@@ -72,7 +72,7 @@
   <de>Eintragen</de>
   <es>Enviar</es>
   <pt>Enviar</pt>  
-  <it>Invio</it>
+  <it>Sottomettere</it>
   <ru>Придать</ru>
   <sk>Pridaj</sk>
   <cz>Přidej</cz>
@@ -150,7 +150,7 @@
   <de>ÜBERSETZUNG AUF DEUTSCH WIRD GERADE VORBEREITET</de>
   <es>VERSIÓN EN ESPAÑOL DISPONIBLE PRÓXIMAMENTE</es>
   <pt>VERSÃO EM PORTUGUÊS ESTARÁ DISPONÍVEL EM BREVE</pt>
-  <it>TRADUZIONE ITALIANA DISPONIBLE PROSSIMAMENTE</it>
+  <it>TRADUZIONE ITALIANA DISPONIBILE PROSSIMAMENTE</it>
   <ru>ПЕРЕВОД НА РУССКИЙ ЯЗЫК НЕ ГОТОВ</ru>
   <sk>PREKLAD DO SLOVENČINY SA PRIPRAVUJE</sk>
   <cz>PŘEKLAD DO ČEŠTINY SE PŘIPRAVUJE</cz>
@@ -185,7 +185,7 @@
   <it>
      Attualmente la traduzione italiana di questa pagina non è disponibile.
      Vi preghiamo di consultare la versione inglese.
-     Grazie per la comprenzione.
+     Grazie per la comprensione.
   </it>
   <ru>
      Перевод етой страницы на русский язык не готов. Упрашаем пользоваться английским вариантом. Спосибо дла сознания.
@@ -303,7 +303,7 @@
   <de>Kollektion %s nicht gefunden</de>
   <es>No se ha encontrado la colección %s</es>
   <pt>A coleção %s não foi encontrada</pt>
-  <it>Collezione %s Non Trouvata</it>
+  <it>Collezione %s Non Trovata</it>
   <ru>Коллекция %s не существует</ru>
   <sk>Kolekcia %s Nenájdená</sk>
   <cz>Kolekcia %s Nenalezena</cz>
@@ -332,8 +332,8 @@
     <p>Experimente explorar a partir de <a href="%s">%s</a>.
   </pt>
   <it>
-    <p>Spiacenti, collezione <strong>%s</strong> non sembra esistere.
-    <p>Provate a tare la ricera a partire da <a href="%s">%s</a>.
+    <p>Spiacenti, la collezione <strong>%s</strong> non sembra esistere.
+    <p>Provate a cercare a partire da <a href="%s">%s</a>.
   </it>
   <ru>
     <p>Извините, коллекция <strong>%s</strong> неествует.
@@ -463,7 +463,7 @@
   <de>Suchen durch %s Datensätze für:</de>
   <es>Buscar %s registros por:</es>
   <pt>Buscar %s registros por:</pt>
-  <it>Ricerca %s registrazioni:</it>
+  <it>Ricerca in %s registrazioni:</it>
   <ru>Искать %s запусков для:</ru>
   <sk>Hľadaj v %s záznamoch:</sk>
   <cz>Hledej v %s záznamech:</cz>
@@ -541,7 +541,7 @@
   <de>Abstrakt</de>
   <es>sumario</es>
   <pt>resumo</pt>
-  <it>riasunto</it>
+  <it>riassunto</it>
   <ru>абстракт</ru>
   <sk>abstrakt</sk>
   <cz>abstrakt</cz>
@@ -593,7 +593,7 @@
   <de>Alle Worte:</de>
   <es>Todas las palabras:</es>
   <pt>Todas as palavras:</pt>
-  <it>Tutte la parole:</it>
+  <it>Tutte le parole:</it>
   <ru>Все слова:</ru>
   <sk>Všetky tieto slová:</sk>
   <cz>Všechna tato slova:</cz>
@@ -619,7 +619,7 @@
   <de>Genaue Phrase:</de>
   <es>Expresión exacta:</es>
   <pt>Expressão exata:</pt>
-  <it>Espressione esatta:</it>
+  <it>Frase esatta:</it>
   <ru>Тоцная фраза:</ru>
   <sk>Presná veta:</sk>
   <cz>Přesná věta:</cz>
@@ -632,7 +632,7 @@
   <de>Partielle Phrase:</de>
   <es>Expresión aproximada:</es>
   <pt>Expressão aproximada:</pt>
-  <it>Espressione parziale:</it>
+  <it>Parte di frase:</it>
   <ru>Парциальная фраза:</ru>
   <sk>Čiastočná veta:</sk>
   <cz>Částečná věta:</cz>
@@ -645,7 +645,7 @@
   <de>Reguläres Ausdruck:</de>
   <es>Expresión regular:</es>
   <pt>Expressão regular:</pt>
-  <it>Espressione regulare:</it>
+  <it>Regular expression:</it>
   <ru>Регулярное выраение:</ru>
   <sk>Regulárny výraz:</sk>
   <cz>Regulární výraz:</cz>
@@ -710,7 +710,7 @@
   <de>Versuchen Sie Ihre Suche mit:</de>
   <es>Intentar su búsqueda en:</es>
   <pt>Tentar sua busca em:</pt>
-  <it>Provate la ricerca su</it>
+  <it>Provate la ricerca su:</it>
   <ru>Испробуйте искать на:</ru>
   <sk>Skúste hľadať na:</sk>
   <cz>Zkuste hledat na:</cz>
@@ -723,7 +723,7 @@
   <de>Sortieren nach:</de>
   <es>Ordenar por:</es>
   <pt>Ordenar por:</pt>
-  <it>Selezione per:</it>
+  <it>Ordinamento per:</it>
   <ru>Сортировать по:</ru>
   <sk>Utrieďte podľa:</sk>
   <cz>Setřiďte podle:</cz>
@@ -736,7 +736,7 @@
   <de>das Letzte zuerst</de>
   <es>el último primero</es>
   <pt>Último primeiro</pt>
-  <it>latest first</it>
+  <it>Le ultime all'inizio</it>
   <ru>последний запуск сперва</ru>
   <sk>posledný záznam najskôr</sk>
   <cz>poslední záznam nejdříve</cz>
@@ -762,7 +762,7 @@
   <de>abw.</de>
   <es>desc.</es>
   <pt>desc.</pt>
-  <it>desc.</it>
+  <it>disc.</it>
   <ru>нисх.</ru>
   <sk>zost.</sk>
   <cz>sest.</cz>
@@ -801,7 +801,7 @@
   <de>einzige Liste</de>
   <es>lista indival</es>
   <pt>lista única</pt>
-  <it>elenco unico</it>
+  <it>lista unica</it>
   <ru>один опись</ru>
   <sk>jediný list</sk>
   <cz>jediný list</cz>
@@ -814,7 +814,7 @@
   <de>vertailen in Kollektionen</de>
   <es>agrupar por colección</es>
   <pt>agrupar por coleção</pt>
-  <it>raggrupato per collezione</it>
+  <it>raggruppati per collezione</it>
   <ru>поделит дла коллекции</ru>
   <sk>zoskupené podľa kolekcií</sk>
   <cz>seskupené podle kolekcí</cz>
@@ -827,7 +827,7 @@
   <de>Darstellungsformat:</de>
   <es>Formato de salida:</es>
   <pt>Formato de saída:</pt>
-  <it>Formato d'uscita</it>
+  <it>Formato di visualizzazione:</it>
   <ru>Выходной формат</ru>
   <sk>Výstupný formát:</sk>
   <cz>Výstupní formát:</cz>
@@ -840,7 +840,7 @@
   <de>kurz</de>
   <es>breve</es>
   <pt>breve</pt>
-  <it>corto</it>
+  <it>breve</it>
   <ru>краткий</ru>
   <sk>stručný</sk>
   <cz>stručný</cz>
@@ -890,7 +890,7 @@
     <strong>Resultados globais:</strong> Encontrados <strong>%s</strong> registros em %.2f segundos.
   </pt>
   <it>
-    <strong>Vista d'insieme dei resultati:</strong> Trovati <strong>%s</strong> registrazioni in %.2f seconds.
+    <strong>Risultato globale:</strong> Trovate <strong>%s</strong> registrazioni in %.2f secondi.
   </it>
   <ru>
     <strong>Конспект результата:</strong> Найдено <strong>%s</strong> запускоб за %.2f секунды.
@@ -912,7 +912,7 @@
   <de><strong>%s</strong> Datensätze gefunden</de>
   <es><strong>%s</strong> registros encontrados</es>
   <pt><strong>%s</strong> registros encontrados</pt>
-  <it><strong>%s</strong> registrazioni found</it>
+  <it><strong>%s</strong> registrazioni trovate</it>
   <ru><strong>%s</strong> запусков найдено</ru>
   <sk><strong>%s</strong> záznamov nájdených</sk>
   <cz><strong>%s</strong> záznamů nalezeno</cz>
@@ -938,7 +938,7 @@
   <de>Die Suche hat %.2f Sekunden gedauert.</de>
   <es>La búsqueda tardó %.2f segundos.</es>
   <pt>A busca levou %.2f segundos.</pt>
-  <it>La ricerta ha preso %.2f secondi.</it>
+  <it>La ricerca ha preso %.2f secondi.</it>
   <ru>Пуск длил %.2f секунд.</ru>
   <sk>Hľadanie trvalo %.2f sekúnd.</sk>
   <cz>Hledání trvalo %.2f vteřin.</cz>
@@ -977,7 +977,7 @@
   <de>alle Kollektionen</de>
   <es>alguna colección</es>
   <pt>qualquer coleção</pt>
-  <it>una qualunque collezione</it>
+  <it>tutte le collezioni</it>
   <ru>любая коллекция</ru>
   <sk>všetky kolekcie</sk>
   <cz>všechny kolekce</cz>
@@ -1016,7 +1016,7 @@
   <de>Eintragehilfe</de> 
   <es>Submit Help</es> 
   <pt>Ajuda sobre Envio</pt>
-  <it>Submit Help</it> 
+  <it>Aiuto per la Sottomissione</it> 
   <ru>Помощь для приданья</ru>
   <sk>Pomoc pre pridávanie</sk>
   <cz>Nápověda pro přidávání</cz>
@@ -1029,7 +1029,7 @@
   <de>Verwaltungsraum</de> 
   <es>Administrator&quot;s Area</es> 
   <pt>Área do Administrador</pt>
-  <it>Administrator&quot;s Area</it> 
+  <it>Area dell&quot;Amministratore</it> 
   <ru>Ареал Администратора</ru>
   <sk>Areál Administrátora</sk>
   <cz>Areál Administrátora</cz>
@@ -1042,7 +1042,7 @@
   <de>WebSubmit Verwaltung</de> 
   <es>WebSubmit Administration</es> 
   <pt>Administração de Envios</pt>
-  <it>WebSubmit Administration</it> 
+  <it>Amministrazione Websubmit</it> 
   <ru>Администрация Придания</ru>
   <sk>Administrácia Pridávania</sk>
   <cz>Administrace Přidávání</cz>
@@ -1055,7 +1055,7 @@
   <de>Führer</de> 
   <es>Guide</es>
   <pt>Guia</pt>
-  <it>Guide</it> 
+  <it>Guida</it> 
   <ru>Руководитель</ru>
   <sk>Príručka</sk>
   <cz>Příručka</cz>
@@ -1068,7 +1068,7 @@
   <de>Hinzufügt seit:</de>
   <es>Added since:</es>
   <pt>Adicionada desde:</pt>
-  <it>Added since:</it>
+  <it>Aggiunto dal:</it>
   <ru>Придано из:</ru>
   <sk>Pridané od:</sk>
   <cz>Přidánо od:</cz>
@@ -1081,7 +1081,7 @@
   <de>nach:</de>
   <es>until:</es>
   <pt>até:</pt>
-  <it>until:</it>
+  <it>fino al:</it>
   <ru>в:</ru>
   <sk>do:</sk>
   <cz>do:</cz>
@@ -1094,7 +1094,7 @@
   <de>beliebiger Tag</de>
   <es>any day</es>
   <pt>qualquer dia</pt>
-  <it>any day</it>
+  <it>qualsiasi giorno</it>
   <ru>любой день</ru>
   <sk>hocaký deň</sk>
   <cz>jakýkoli den</cz>
@@ -1107,7 +1107,7 @@
   <de>beliebiger Monat</de>
   <es>any month</es>
   <pt>qualquer mês</pt>
-  <it>any month</it>
+  <it>qualsiasi mese</it>
   <ru>любой месяц</ru>
   <sk>hocaký mesiac</sk>
   <cz>jakýkoli měsíc</cz>
@@ -1120,7 +1120,7 @@
   <de>beliebiges Jahr</de>
   <es>any year</es>
   <pt>qualquer ano</pt>
-  <it>any year</it>
+  <it>qualsiasi anno</it>
   <ru>любой год</ru>
   <sk>hocaký rok</sk>
   <cz>jakýkoli rok</cz>
@@ -1133,7 +1133,7 @@
   <de>Januar</de>
   <es>January</es>
   <pt>Janeiro</pt>
-  <it>January</it>
+  <it>Gennaio</it>
   <ru>январь</ru>
   <sk>január</sk>
   <cz>leden</cz>
@@ -1146,7 +1146,7 @@
   <de>Februar</de>
   <es>February</es>
   <pt>Fevereiro</pt>
-  <it>February</it>
+  <it>Febbraio</it>
   <ru>февраль</ru>
   <sk>február</sk>
   <cz>únor</cz>
@@ -1159,7 +1159,7 @@
   <de>März</de>
   <es>March</es>
   <pt>Março</pt>
-  <it>March</it>
+  <it>Marzo</it>
   <ru>март</ru>
   <sk>marec</sk>
   <cz>březen</cz>
@@ -1172,7 +1172,7 @@
   <de>April</de>
   <es>April</es>
   <pt>Abril</pt>
-  <it>April</it>
+  <it>Aprile</it>
   <ru>апрель</ru>
   <sk>apríl</sk>
   <cz>duben</cz>
@@ -1185,7 +1185,7 @@
   <de>Mai</de>
   <es>May</es>
   <pt>Maio</pt>
-  <it>May</it>
+  <it>Maggio</it>
   <ru>май</ru>
   <sk>máj</sk>
   <cz>květen</cz>
@@ -1198,7 +1198,7 @@
   <de>Juni</de>
   <es>June</es>
   <pt>Junho</pt>
-  <it>June</it>
+  <it>Giugno</it>
   <ru>июнь</ru>
   <sk>jún</sk>
   <cz>červen</cz>
@@ -1211,7 +1211,7 @@
   <de>Juli</de>
   <es>July</es>
   <pt>Julho</pt>
-  <it>July</it>
+  <it>Luglio</it>
   <ru>июль</ru>
   <sk>júl</sk>
   <cz>červenec</cz>
@@ -1224,7 +1224,7 @@
   <de>August</de>
   <es>August</es>
   <pt>Agosto</pt>
-  <it>August</it>
+  <it>Agosto</it>
   <ru>август</ru>
   <sk>august</sk>
   <cz>srpen</cz>
@@ -1237,7 +1237,7 @@
   <de>September</de>
   <es>September</es>
   <pt>Setembro</pt>
-  <it>September</it>
+  <it>Settembre</it>
   <ru>сентябрь</ru>
   <sk>september</sk>
   <cz>září</cz>
@@ -1250,7 +1250,7 @@
   <de>October</de>
   <es>October</es>
   <pt>Outubro</pt>
-  <it>October</it>
+  <it>Ottobre</it>
   <ru>октябрь</ru>
   <sk>október</sk>
   <cz>říjen</cz>
@@ -1263,7 +1263,7 @@
   <de>November</de>
   <es>November</es>
   <pt>Novembro</pt>
-  <it>November</it>
+  <it>Novembre</it>
   <ru>ноябрь</ru>
   <sk>november</sk>
   <cz>listopad</cz>
@@ -1276,7 +1276,7 @@
   <de>Dezember</de>
   <es>December</es>
   <pt>Dezembro</pt>
-  <it>December</it>
+  <it>Dicembre</it>
   <ru>декабрь</ru>
   <sk>december</sk>
   <cz>prosinec</cz>
@@ -1289,7 +1289,7 @@
   <de>Suchbegriff <em>%s</em></de>
   <es>Search term <em>%s</em></es>
   <pt>Termo de busca <em>%s</em></pt>
-  <it>Search term <em>%s</em></it>
+  <it>Termine di ricerca <em>%s</em></it>
   <ru>Искомое выражение <em>%s</em></ru>
   <sk>Hľadaný výraz <em>%s</em></sk>
   <cz>Hledaný výraz <em>%s</em></cz>
@@ -1302,7 +1302,7 @@
   <de>im Index von <em>%s</em></de>
   <es>inside <em>%s</em> index</es>
   <pt>no <em>%s</em> índice</pt>
-  <it>inside <em>%s</em> index</it>
+  <it>nell'indice <em>%s</em></it>
   <ru>в индексе <em>%s</em></ru>
   <sk>v indexe <em>%s</em></sk>
   <cz>v indexu <em>%s</em></cz>
@@ -1315,7 +1315,7 @@
   <de>hat keine Datensätze gekriegt.  Die nächste Begriffe in allen Kollektionen sind:</de>
   <es>did not match any record.  Nearest terms in any collection are:</es>
   <pt>não está presente em nenhum registro.  Os termos mais similares em todas as coleções são:</pt>
-  <it>did not match any record.  Nearest terms in any collection are:</it>
+  <it>non ha dato risultati. I termini piu` prossimi in tutte le collezioni sono:</it>
   <ru>не найденo. Ближайшие термины:</ru>
   <sk>neodpovedá žiadnemu záznamu.  Najbližšie termíny nezávisle na kolekcii sú:</sk>
   <cz>neodpovídá žádnému záznamu.  Nejbližší termíny nezávisle na kolekci jsou:</cz>
@@ -1328,7 +1328,7 @@
   <de>Kein Wordindex steht zur Verfügung für</de>
   <es>No words index available for</es>
   <pt>Nenhum índice de palavras está disponível para</pt>
-  <it>No words index available for</it>
+  <it>Nessun indice per parola è disponibile per</it>
   <ru>Лексическый индекс не найден для</ru>
   <sk>Index slov nie je dostupný pre</sk>
   <cz>Index slov není k dispozici pro</cz>
@@ -1341,7 +1341,7 @@
   <de>Kein Begriffindex steht zur Verfügung für</de>
   <es>No phrase index available for</es>
   <pt>Nenhum índice de frases está disponível para</pt>
-  <it>No phrase index available for</it>
+  <it>Nessun indice per frase è disponibile per</it>
   <ru>Фразный индех не найден для</ru>
   <sk>Index viet nie je dostupný pre</sk>
   <cz>Index frází není k dispozici pro</cz>
@@ -1371,8 +1371,7 @@
     público.
   </pt>
   <it>
-    No exact match found in selected collection(s).
-    Results from the whole public database follow.
+    Nessun risultato trovato nelle collezioni selezionate. Seguono risultati trovati in tutta la base dati pubblica.
   </it>
   <ru>
     Никакый аккуратный результат не найден во выбранной коллекции.
@@ -1419,9 +1418,7 @@
     a coleção restrita desejada primeiro.
   </pt>
   <it>
-    No public collection matched your query.  If you were looking for
-    a non-public document, please choose the desired restricted
-    collection first.    
+    Nessuna collezione pubblica ha dato risultati. Se cercate un documento non pubblico, vi preghiamo di interrogare la collezione riservata di vostro interesse.
   </it>
   <ru>
     Никакая публичная коллекция недала результата.  Если искаете 
@@ -1465,7 +1462,7 @@
     desconsiderando esta condição...
   </pt>
   <it>
-    No match within your time limits, discarding this condition...
+    Nessun risultato nell'arco di tempo specificato, il criterio viene ignorato...
   </it>
   <ru>
     Никакой результат для временного лимита, условие отменено...
@@ -1503,7 +1500,7 @@
     descartando esta condição...
   </pt>
   <it>
-    No match within your time limits, discarding this condition...
+    Nessun risultato trovato nei limiti specificati, i criteri vengono ignorati...
   </it>
   <ru>
     Никакой результат для поицкового лимита, условие отменено...
@@ -1545,8 +1542,7 @@
     combine seus termos de outra maneira.
   </pt>  
   <it>
-    All search terms matched but boolean query returned no hits.
-    Please combine your search terms differently.
+    Tutti i termini di ricerca sono stati trovati ma la ricerca booleana non ha dato risultati. Vi preghiamo di combinare differentemente i termini.
   </it>
   <ru>
     Бце исканные термины найдены, но боолеанный вопрось не дал результата.
@@ -1585,7 +1581,7 @@
     <em>%s</em> em substituição...
   </pt>
   <it>
-    No exact match found for <em>%s</em>, using <em>%s</em> instead...
+    Nessun risultato trovato cercando <em>%s</em>, uso <em>%s</em> al suo posto...
   </it>
   <ru>
     Никакой результат не найден для <em>%s</em>, употребуем <em>%s</em> взамен...
@@ -1609,7 +1605,7 @@
   <de>Interner Fehler</de>
   <es>Internal Error</es>
   <pt>Erro Interno</pt>
-  <it>Internal Error</it>
+  <it>Errore Interno</it>
   <ru>Интерная ошибка</ru>
   <sk>Interná Chyba</sk>
   <cz>Interní Chyba</cz>
@@ -1637,8 +1633,7 @@
     mencionando a seguinte informação:       
   </pt>
   <it>
-    Please contact <a href="mailto:%s">%s</a> quoting the following
-    information:
+    Vi preghiamo di contattare <a href="mailto:%s">%s</a> citando l'informazione seguente:
   </it>
   <ru>
     Упрашаем выходить на <a href="mailto:%s">%s</a> и указать следующую информацию:
@@ -1662,7 +1657,7 @@
   <de>Suche Wahlen:</de>
   <es>Search options:</es>
   <pt>Opções de busca:</pt>
-  <it>Search options:</it>
+  <it>Opzioni di ricerca:</it>
   <ru>Выборы поиска:</ru>
   <sk>Voľby hľadania:</sk>
   <cz>Volby hledání:</cz>
@@ -1675,7 +1670,7 @@
   <de>Letzte Eintrage:</de>
   <es>Latest additions:</es>
   <pt>Ítens mais recentes:</pt>
-  <it>Latest additions:</it>
+  <it>Ultimi arrivi:</it>
   <ru>Последнее добавления:</ru>
   <sk>Posledne pridané:</sk>
   <cz>Posledně přidáno:</cz>
@@ -1688,7 +1683,7 @@
   <de>mehr</de>
   <es>more</es>
   <pt>mais</pt>
-  <it>more</it>
+  <it>ancora</it>
   <ru>более</ru>
   <sk>viac</sk>
   <cz>více</cz>
@@ -1701,7 +1696,7 @@
   <de>Diese Kollektion enthält zur Zeit keine Dokumente.</de>
   <es>This collection does not contain any document yet.</es>
   <pt>Esta coleção ainda não contém nenhum documento.</pt>
-  <it>This collection does not contain any document yet.</it>
+  <it>Questa collezione non contiene ancora alcun documento.</it>
   <ru>Ета коллекция не содержит еще запусков.</ru>
   <sk>Táto kolekcia ešte neobsahuje žiadne záznamy.</sk>
   <cz>Tato kolekce ješte neobsahuje žádné záznamy.</cz>
@@ -1714,7 +1709,7 @@
   <de>Der Inhalt von dieser Kollektion ist privat.</de>
   <es>The contents of this collection is restricted.</es>
   <pt>O conteúdo desta coleção é restrito.</pt>
-  <it>The contents of this collection is restricted.</it>
+  <it>Il contenuto di questa collezione è riservato.</it>
   <ru>Содержание етой коллекции приватно.</ru>
   <sk>Obsah tejto kolekcie je chránený.</sk>
   <cz>Obsah této kolekce je chráněn.</cz>
