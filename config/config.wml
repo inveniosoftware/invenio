@@ -17,7 +17,7 @@
 ## The CDSware is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
@@ -444,13 +444,13 @@ oai
 ## OAIIDTAG -- OAI identifier tag:  
 ##  (example: "0248_a")
 <define-tag OAIIDTAG whitespace=delete>
-0248_a
+909COo
 </define-tag>
 
 ## OAISETTAG -- OAI set tag:  
 ##  (example: "0248_p")
 <define-tag OAISETTAG whitespace=delete>
-0248_p
+909COp
 </define-tag>
 
 ## OAIIDPREFIX -- OAI identifier prefix:  
