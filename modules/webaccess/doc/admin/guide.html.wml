@@ -106,7 +106,7 @@ I. Role area
    <div class="pagebody">
     <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
      <tr valign="top">
-      <td class="pagestripemiddle" align="left">
+      <td class="pagebodystripemiddle" align="left">
       
        <h1 class="headline">Role Administration</h1>
        <table class="admin_wvar" width="100%" summary="">
@@ -279,7 +279,7 @@ II. Example - connecting role and user
    <div class="pagebody">
     <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
      <tr valign="top">
-      <td class="pagestripemiddle" align="left">
+      <td class="pagebodystripemiddle" align="left">
        <h1 class="headline">Connect user to role </h1>
        <table class="admin_wvar" width="100%" summary="">
         <thead>
@@ -313,7 +313,7 @@ II. Example - connecting role and user
         </tbody>
        </table>
       </td>
-      <td class="pagestriperight" width="120" align="right" valign="top">
+      <td class="pagebodystriperight" width="120" align="right" valign="top">
       </td>
      </tr>
     </table>
@@ -352,7 +352,7 @@ II. Example - connecting role and user
    <div class="pagebody">
     <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
      <tr valign="top">
-      <td class="pagestripemiddle" align="left">
+      <td class="pagebodystripemiddle" align="left">
        <h1 class="headline">Connect user to role </h1>
        <table class="admin_wvar" width="100%" summary="">
         <thead>
@@ -410,7 +410,7 @@ II. Example - connecting role and user
         </tbody>
        </table>
       </td>
-      <td class="pagestriperight" width="120" align="right" valign="top">
+      <td class="pagebodystriperight" width="120" align="right" valign="top">
       </td>
      </tr>
     </table>
@@ -445,7 +445,7 @@ II. Example - connecting role and user
    <div class="pagebody">
     <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
      <tr valign="top">
-      <td class="pagestripemiddle" align="left">
+      <td class="pagebodystripemiddle" align="left">
        <h1 class="headline">Connect user to role </h1>
        <table class="admin_wvar" width="100%" summary="">
         <thead>
@@ -518,7 +518,7 @@ II. Example - connecting role and user
         </tbody>
        </table>
       </td>
-      <td class="pagestriperight" width="120" align="right" valign="top">
+      <td class="pagebodystriperight" width="120" align="right" valign="top">
       </td>
      </tr>
     </table>
@@ -553,7 +553,7 @@ II. Example - connecting role and user
    <div class="pagebody">
     <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
      <tr valign="top">
-      <td class="pagestripemiddle" align="left">
+      <td class="pagebodystripemiddle" align="left">
        <h1 class="headline">Connect user to role </h1>
        <table class="admin_wvar" width="100%" summary="">
         <thead>
@@ -642,7 +642,7 @@ II. Example - connecting role and user
         </tbody>
        </table>
       </td>
-      <td class="pagestriperight" width="120" align="right" valign="top">
+      <td class="pagebodystriperight" width="120" align="right" valign="top">
       </td>
      </tr>
     </table>
@@ -675,7 +675,7 @@ II. Example - connecting role and user
    <div class="pagebody">
     <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
      <tr valign="top">
-      <td class="pagestripemiddle" align="left">
+      <td class="pagebodystripemiddle" align="left">
        <h1 class="headline">Connect user to role </h1>
        <table class="admin_wvar" width="100%" summary="">
         <thead>
@@ -767,7 +767,7 @@ II. Example - connecting role and user
         </tbody>
        </table>
       </td>
-      <td class="pagestriperight" width="120" align="right" valign="top">
+      <td class="pagebodystriperight" width="120" align="right" valign="top">
       </td>
      </tr>
     </table>
