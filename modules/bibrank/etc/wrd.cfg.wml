@@ -44,16 +44,22 @@ tag14 = 700__%, 1, none
 tag15 = 721__a, 1, none
 
 [find_similar]
+#term should exist in maximum X/100% of documents
 max_word_occurence = 0.05
+#term should exist in minimum X/100% of documents
 min_word_occurence = 0.00
+#term should be atleast 3 characters long
 min_word_length = 3
-min_nr_words = 3
+#term should be in atleast 3 documents or more
 min_nr_words_docs = 3
-max_nr_words = 20
-max_nr_words2 = 10
+#do not use more than 20 terms for "find similar"
+max_nr_words_upper = 20
+#if a document contains less than 10 terms, use much used terms too, if not ignore them
+max_nr_words_lower = 10
+#override minimum relevance value and use the one from search_engine?
 override_default_min_relevance = no
-default_min_relevance = 2
-low_high_threshold = 5
+#default minimum relevance value to use for find similar
+default_min_relevance = 1
 
 
  

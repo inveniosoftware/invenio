@@ -511,7 +511,7 @@ class WordTable:
                 write_message("The word '%s' does not exist in the word file."\
                               % word)
 
-    def update_last_updated(self, rnkMETHOD, starting_time=None):
+    def update_last_updated(self, rank_method_code, starting_time=None):
         """Update last_updated column of the index table in the database.
         Puts starting time there so that if the task was interrupted for record download,
         the records will be reindexed next time."""
@@ -520,7 +520,7 @@ class WordTable:
         if options["verbose"] >= 9:
             write_message("updating last_updated to %s...", starting_time)            
         return run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s",
-                       (starting_time, rnkMETHOD,))
+                       (starting_time, rank_method_code,))
 
     def add_recIDs(self, recIDs):
         """Fetches records which id in the recIDs range list and adds
@@ -1009,24 +1009,24 @@ def word_index(row, run):
 
     options["run"] = []
     options["run"].append(run)
-    for rnkMETHOD in options["run"]:
+    for rank_method_code in options["run"]:
         method_starting_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        write_message("Running rank method: %s" % getName(rnkMETHOD))
+        write_message("Running rank method: %s" % getName(rank_method_code))
         try:
             if options["verbose"] >= 9:
                 write_message("Getting configuration from file: %s" % file)
-            file = etcdir + "/bibrank/" + rnkMETHOD + ".cfg"
+            file = etcdir + "/bibrank/" + rank_method_code + ".cfg"
             config = ConfigParser.ConfigParser()
             config.readfp(open(file))
         except StandardError, e:
             write_message("Cannot find configurationfile: %s" % file, sys.stderr)
             raise StandardError
 
-        options["current_run"] = rnkMETHOD
+        options["current_run"] = rank_method_code
         options["modified_words"] = {}
         options["table"] = config.get(config.get("rank_method", "function"), "table")
         (stopwords, tags) = get_tags(config) #get the tags to include
-        options["validset"] = get_valid_range(rnkMETHOD) #get the records from the collections the method is enabled for
+        options["validset"] = get_valid_range(rank_method_code) #get the records from the collections the method is enabled for
 
         wordTable = WordTable(options["table"], tags)
         wordTable.report_on_table_consistency()
@@ -1057,7 +1057,7 @@ def word_index(row, run):
                     wordTable.add_recIDs(recIDs_range)
                 elif options["last_updated"]:
                     wordTable.add_date("")
-                    wordTable.update_last_updated(rnkMETHOD, method_starting_time)
+                    wordTable.update_last_updated(rank_method_code, method_starting_time)
                 else:
                     wordTable.add_recIDs([[0,cfg_max_recID]])
                     #wordTable.add_date(options["modified"])
@@ -1069,7 +1069,7 @@ def word_index(row, run):
                 check_rnkWORD(options["table"])
                 options["modified_words"] = {}
             elif options["cmd"] == "stat":
-                rnkMETHOD_statistics(options["table"])
+                rank_method_code_statistics(options["table"])
             else:
                 write_message("Invalid command found processing %s" % \
                      wordTable.tablename, sys.stderr)
@@ -1125,12 +1125,12 @@ def get_tags(config):
 
     return (stopwords, tags)
 
-def get_valid_range(rnkMETHOD):
+def get_valid_range(rank_method_code):
     """Returns which records are valid for this rank method, according to which collections it is enabled for."""
 
     #if options["verbose"] >=9:
     #    write_message("Getting records from collections enabled for rank method.")
-    #res = run_sql("SELECT collection.name FROM collection,collection_rnkMETHOD,rnkMETHOD WHERE collection.id=id_collection and id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" %  rnkMETHOD)
+    #res = run_sql("SELECT collection.name FROM collection,collection_rnkMETHOD,rnkMETHOD WHERE collection.id=id_collection and id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" %  rank_method_code)
     #l_of_colls = []
     #for coll in res:
     #    l_of_colls.append(coll[0])
@@ -1219,7 +1219,7 @@ def check_rnkWORD(table):
         write_message("%s errors found during integrity check, repair and rebalancing recommended." % len(errors))
     options["modified_words"] = errors
 
-def rnkMETHOD_statistics(table):
+def rank_method_code_statistics(table):
     """Shows some statistics about this rank method."""
 
     maxID = run_sql("select max(id) from %s" % table)
