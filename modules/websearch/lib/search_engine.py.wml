@@ -2274,8 +2274,6 @@ def print_record(recID, format='hb', ot='', decompress=zlib.decompress):
                     query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
                             "WHERE bb.id_bibrec='%s' AND b.id=bb.id_bibxxx AND b.tag LIKE '%s%%' "\
                             "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx, recID, str(digit1)+str(digit2))
-                    if dbg:
-                        out += "<br>Debug: " + query
                     res = run_sql(query)
                     field_number_old = -999
                     field_old = ""
