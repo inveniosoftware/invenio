@@ -171,15 +171,15 @@ a.navtrail:hover {
 }
 .searchbox {
    color: #000;
-   background: #eee;
+   background: #f2f2f2;
 }
 .narrowsearchbox {
    color: #000;
-   background: #eee;
+   background: #f2f2f2;
 }
 .focusonsearchbox {
    color: #000;
-   background: #eee;
+   background: #f2f2f2;
 }
 .headline {
    color: #006;
