@@ -161,11 +161,11 @@ def perform_display(uid, action, delete_alerts, confirm_action, id_basket, bname
     if (show_actions):
 
         # query the database for the list of baskets
-        SQL_query = "SELECT b.id, b.name, b.public, ub.date_modification "\
-                    "FROM basket b, user_basket ub "\
-                    "WHERE ub.id_user='%s' AND b.id=ub.id_basket "\
-                    "ORDER BY b.name ASC " % uid
-        query_result = run_sql(SQL_query)
+        query_result = run_sql("SELECT b.id, b.name, b.public, ub.date_modification "\
+                               "FROM basket b, user_basket ub "\
+                               "WHERE ub.id_user=%s AND b.id=ub.id_basket "\
+                               "ORDER BY b.name ASC ",
+                               (uid,))
 
         out += """<FORM name="displaybasket" action="display" method="post">"""
 
@@ -260,8 +260,8 @@ def display_basket_content(uid, id_basket, basket_name):
     out_tmp=""
     
     # search for related alerts
-    SQL_query = "SELECT alert_name FROM user_query_basket WHERE id_user=%s AND id_basket=%s" % (uid, id_basket)
-    query_result = run_sql(SQL_query)
+    query_result = run_sql("SELECT alert_name FROM user_query_basket WHERE id_user=%s AND id_basket=%s",
+                           (uid, id_basket))
     if len(query_result) == 0:
         out_tmp = """There isn't any alert related to this basket.<BR>"""
     else:
@@ -278,11 +278,11 @@ def display_basket_content(uid, id_basket, basket_name):
         
     # search for basket's items    
     if (id_basket != '0') and (id_basket != 0):
-        SQL_query = "SELECT br.id_record,br.nb_order, fmt.value "\
-                    "FROM basket_record br, bibfmt fmt "\
-                    "WHERE br.id_basket='%s' AND br.id_record=fmt.id_bibrec AND fmt.format='hb'"\
-                    "ORDER BY br.nb_order DESC " % id_basket
-        query_result = run_sql(SQL_query)
+        query_result = run_sql("SELECT br.id_record,br.nb_order, fmt.value "\
+                               "FROM basket_record br, bibfmt fmt "\
+                               "WHERE br.id_basket=%s AND br.id_record=fmt.id_bibrec AND fmt.format='hb'"\
+                               "ORDER BY br.nb_order DESC ",
+                               (id_basket,))
         if len(query_result) > 0:
             out += """Content of the basket <B>%s</B> :<BR>""" % basket_name                     
             out += out_tmp
@@ -298,11 +298,11 @@ def display_basket_content(uid, id_basket, basket_name):
             out += """&nbsp;&nbsp;or&nbsp;&nbsp;<SELECT name="copy_move"><OPTION value="1">Copy</OPTION>"""\
                    """<OPTION value="2">Move</OPTION></SELECT>to"""
             # query the database for the list of baskets
-            SQL_query = "SELECT b.id, b.name "\
-                        "FROM basket b, user_basket ub "\
-                        "WHERE ub.id_user='%s' AND b.id=ub.id_basket AND b.id<>%s "\
-                        "ORDER BY b.name ASC " % (uid,id_basket)
-            query_result1 = run_sql(SQL_query)
+            query_result1 = run_sql("SELECT b.id, b.name "\
+                                    "FROM basket b, user_basket ub "\
+                                    "WHERE ub.id_user=%s AND b.id=ub.id_basket AND b.id<>%s "\
+                                    "ORDER BY b.name ASC ",
+                                    (uid,id_basket))
             # display the list of baskets
             if len(query_result1) > 0:
                 out +="""<SELECT name="to_basket"><OPTION value="0">- select basket -</OPTION>"""
@@ -363,8 +363,8 @@ def delete_basket(uid, id_basket, basket_name):
     out += """<TABLE style="background-color:F1F1F1; border:thin groove grey" cellspacing="0" """\
            """cellpadding="0" width="650">\n<TR><TD>"""
     out += """<TABLE border="0" cellpadding="0" cellspacing ="10">"""
-    SQL_query = "SELECT alert_name FROM user_query_basket WHERE id_user=%s AND id_basket=%s" % (uid, id_basket)
-    query_result = run_sql(SQL_query)
+    query_result = run_sql("SELECT alert_name FROM user_query_basket WHERE id_user=%s AND id_basket=%s",
+                           (uid, id_basket))
     if len(query_result) == 0:
         Msg = """There isn't any alert related to this basket."""
         out += """<TR><TD colspan="2" align="left">%s</TD></TR>""" % Msg
@@ -414,32 +414,29 @@ def perform_delete(uid, delete_alerts, confirm_action, id_basket,):
 
         if (delete_alerts=='y'):
             # delete the related alerts, remove from the alerts table: user_query_basket 
-            SQL_query = "DELETE FROM user_query_basket WHERE id_user='%s' AND id_basket='%s'" % (uid, id_basket)
-            query_result = run_sql(SQL_query)
+            query_result = run_sql("DELETE FROM user_query_basket WHERE id_user=%s AND id_basket=%s",
+                                   (uid, id_basket))
             msg += " The related alerts have been removed."
         else:
             # replace the basket identifier with 0
             # select the records to update
-            SQL_query = "SELECT id_query,alert_name,frequency,notification,date_creation,date_lastrun "\
-                        "FROM user_query_basket WHERE id_user=%s AND id_basket=%s" % (uid, id_basket)
-            query_result = run_sql(SQL_query)
+            query_result = run_sql("SELECT id_query,alert_name,frequency,notification,date_creation,date_lastrun "\
+                                   "FROM user_query_basket WHERE id_user=%s AND id_basket=%s",
+                                   (uid, id_basket))
             # update the records
             for row in query_result:
-                SQL_query = "UPDATE user_query_basket "\
-                            "SET alert_name='%s',frequency='%s',notification='%s',date_creation='%s',date_lastrun='%s',id_basket='0' "\
-                            "WHERE id_user='%s' AND id_query='%s' AND id_basket='%s'" \                                            
-                            % (row[1],row[2],row[3],row[4],row[5],uid,row[0],id_basket)
-                query_result_temp = run_sql(SQL_query)
+                query_result_temp = run_sql("UPDATE user_query_basket "\
+                                            "SET alert_name=%s,frequency=%s,notification=%s,"\
+                                            "date_creation=%s,date_lastrun=%s,id_basket='0' "\
+                                            "WHERE id_user=%s AND id_query=%s AND id_basket=%s",                                    
+                                            (row[1],row[2],row[3],row[4],row[5],uid,row[0],id_basket))
 
         # delete the relation with the user table
-        SQL_query = "DELETE FROM user_basket WHERE id_user='%s' AND id_basket='%s'" % (uid, id_basket)
-        query_result = run_sql(SQL_query)
+        query_result = run_sql("DELETE FROM user_basket WHERE id_user=%s AND id_basket=%s", (uid, id_basket))
         # delete the basket information
-        SQL_query = "DELETE FROM basket WHERE id='%s'" % id_basket
-        query_result = run_sql(SQL_query)
+        query_result = run_sql("DELETE FROM basket WHERE id=%s", (id_basket,))
         # delete the basket content
-        SQL_query = "DELETE FROM basket_record WHERE id_basket='%s'" % id_basket
-        query_result = run_sql(SQL_query)        
+        query_result = run_sql("DELETE FROM basket_record WHERE id_basket=%s", (id_basket,))        
         
     else:        
         msg=""
@@ -457,8 +454,7 @@ def perform_rename_basket(uid, id_basket, newname):
     if not is_basket_owner( uid, id_basket ):
         raise NotBasketOwner("You are not the owner of this basket")
     # update a row to the basket table   
-    SQL_query = "UPDATE basket SET name='%s' WHERE id='%s'" % (newname, id_basket)
-    tmp = run_sql(SQL_query)
+    tmp = run_sql("UPDATE basket SET name=%s WHERE id=%s", (newname, id_basket))
 
     return id_basket
 
@@ -481,28 +477,19 @@ class NotBasketOwner(BasketException):
 def has_user_basket(uid, basket_name):
     """checks if a user (uid) already has a basket which name is 'basket_name' (case-sensitive)
     """
-    SQL_query = """select b.id 
-                   from basket b, user_basket ub 
-                   where ub.id_user='%s' and 
-                         b.id=ub.id_basket and 
-                         b.name='%s'"""%(uid, basket_name.strip())
-    return run_sql(SQL_query)
+    return run_sql("select b.id from basket b, user_basket ub where ub.id_user=%s and b.id=ub.id_basket and b.name=%s",
+                   (uid, basket_name.strip()))
 
 def is_basket_owner(uid, bid):
     """checks whether or not the user (uid) is owner for the indicated basket (bid)
     """
-    SQL_query = """select id_basket 
-                   from user_basket 
-                   where id_user='%s' and id_basket='%s'"""%(uid, bid)
-    return run_sql(SQL_query)
+    return run_sql("select id_basket from user_basket where id_user=%s and id_basket=%s",
+                   (uid, bid))
 
 def get_basket_name(bid):
     """returns the name of the basket corresponding to the given id
     """
-    SQL_query = """select name
-                   from basket 
-                   where id='%s'"""%bid
-    res = run_sql(SQL_query)
+    res = run_sql("select name from basket where id=%s", (bid,))
     if not res:
         return ""
     return res[0][0]
@@ -513,17 +500,14 @@ def get_basket_name(bid):
 # output: basket identifier
 def perform_create_basket(uid, basket_name):
     # check that there's no basket owned by this user with the same name
-    if has_user_basket( uid, basket_name ):
+    if has_user_basket(uid, basket_name):
         raise BasketNameAlreadyExists("You already have a basket which name is '%s'"%basket_name)
     # add a row to the basket table   
-    SQL_query = "INSERT INTO basket(id,name,public) VALUES ('0','%s','n')" % basket_name
-    id_basket = run_sql(SQL_query)
+    id_basket = run_sql("INSERT INTO basket(id,name,public) VALUES ('0',%s,'n')", (basket_name,))
     
-    # create the relation between the user and the basket: user_basket
-    SQL_query = "INSERT INTO user_basket(id_user,id_basket,date_modification) VALUES ('%s','%s','%s') " \
-                % (uid, id_basket, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-    query_result = run_sql(SQL_query)
-
+    # create the relation between the user and the basket: user_basket                 
+    query_result = run_sql("INSERT INTO user_basket(id_user,id_basket,date_modification) VALUES (%s,%s,%s)",
+                           (uid, id_basket, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
     return id_basket
 
 
@@ -531,11 +515,11 @@ def perform_create_basket(uid, basket_name):
 # input:  the name of the basket
 # output: the id of the basket if it exists, 0 otherwise
 def basket_exists (basket_name, uid):
-    SQL_query = "SELECT b.id FROM basket b, user_basket ub "\
-                "WHERE b.name='%s' "\
-                "AND b.id=ub.id_basket "\
-                "AND ub.id_user='%s'" % basket_name, uid
-    id_basket = run_sql(SQL_query)
+    id_basket = run_sql("SELECT b.id FROM basket b, user_basket ub "\
+                        "WHERE b.name=%s "\
+                        "AND b.id=ub.id_basket "\
+                        "AND ub.id_user=%s",
+                        (basket_name, uid))
     return id_basket
 
 # set_permission: set access permission on a basket
@@ -546,8 +530,7 @@ def set_permission(uid, id_basket, permission):
     if not is_basket_owner( uid, id_basket ):
         raise NotBasketOwner("You are not the owner of this basket")
     # update a row to the basket table   
-    SQL_query = "UPDATE basket SET public='%s' WHERE id='%s'" % (permission, id_basket)
-    id_basket = run_sql(SQL_query)
+    id_basket = run_sql("UPDATE basket SET public=%s WHERE id=%s", (permission, id_basket))
 
     return id_basket
 
@@ -564,8 +547,8 @@ def remove_items(uid, id_basket, mark):
         selected_items=[mark]
     for i in selected_items:
         # delete the basket content
-        SQL_query = "DELETE FROM basket_record WHERE id_basket='%s' AND id_record=%s" % (id_basket, i)
-        query_result = run_sql(SQL_query)
+        query_result = run_sql("DELETE FROM basket_record WHERE id_basket=%s AND id_record=%s",
+                               (id_basket, i))
         
     return id_basket
 
@@ -574,8 +557,8 @@ def remove_items(uid, id_basket, mark):
 # output: boolean
 def check_copy(idbask,i):
 
-    SQL_query="select * from basket_record where id_basket=%s and id_record=%s"%(idbask,i)
-    query_result = yourgoodies.run_sql(SQL_query)
+    query_result = run_sql("select * from basket_record where id_basket=%s and id_record=%s",
+                           (idbask,i))
     if len(query_result)>0 :
         return 0
     return 1
@@ -591,8 +574,8 @@ def move_items(uid, id_basket, mark, to_basket, copy_move):
         selected_items=[mark]
     for i in selected_items:    
 	if check_copy(to_basket,i):
-            SQL_query="INSERT INTO basket_record(id_basket,id_record,nb_order) VALUES ('%s','%s','0')" % (to_basket, i)
-            query_result = run_sql(SQL_query)
+            query_result = run_sql("INSERT INTO basket_record(id_basket,id_record,nb_order) VALUES (%s,%s,'0')",
+                                   (to_basket, i))
     
     if copy_move=="2":
         #delete from previous basket
@@ -610,13 +593,13 @@ def order_items(uid, id_basket,idup,ordup,iddown,orddown):
         raise NotBasketOwner("You are not the owner of this basket")
     # move up the item
     ordup = str(int(ordup)+1)
-    SQL_query="UPDATE basket_record SET nb_order='%s' WHERE id_basket='%s' AND id_record='%s'" % (ordup,id_basket,idup)
-    query_result = run_sql(SQL_query)
+    query_result = run_sql("UPDATE basket_record SET nb_order=%s WHERE id_basket=%s AND id_record=%s",
+                           (ordup,id_basket,idup))
 
     #move down the item
     orddown = str(int(orddown)-1)
-    SQL_query="UPDATE basket_record SET nb_order='%s' WHERE id_basket='%s' AND id_record='%s'" % (orddown,id_basket,iddown)
-    query_result = run_sql(SQL_query)
+    query_result = run_sql("UPDATE basket_record SET nb_order=%s WHERE id_basket=%s AND id_record=%s",
+                           (orddown,id_basket,iddown))
     
     return id_basket
 
@@ -642,21 +625,18 @@ def perform_display_public(uid, id_basket, basket_name, action, to_basket, mark,
 
     # search for basket's items    
     if (id_basket != '0') and (id_basket != 0):
-        SQL_query = """select public
-                        from basket 
-                        where id='%s'"""%id_basket
-        res = run_sql(SQL_query)
+        res = run_sql("select public from basket where id=%s", (id_basket,))
         if len(res) == 0:
             out += """Non existing basket"""
             return out
         if str(res[0][0]).strip() != 'y':
             out += """The basket is private"""
             return out
-        SQL_query = """SELECT br.id_record,br.nb_order, fmt.value 
-                       FROM basket_record br, bibfmt fmt 
-                       WHERE br.id_basket='%s' AND br.id_record=fmt.id_bibrec AND fmt.format='hb' 
-                       ORDER BY br.nb_order DESC """ % id_basket
-        query_result = run_sql(SQL_query)
+        query_result = run_sql("SELECT br.id_record,br.nb_order, fmt.value "\
+                               "FROM basket_record br, bibfmt fmt "\
+                               "WHERE br.id_basket=%s AND br.id_record=fmt.id_bibrec AND fmt.format='hb'"\
+                               "ORDER BY br.nb_order DESC ",
+                               (id_basket,))
         if len(query_result) > 0:
             out += """Content of the public basket <B>%s</B> :<BR>""" % basket_name                     
             
@@ -667,11 +647,11 @@ def perform_display_public(uid, id_basket, basket_name, action, to_basket, mark,
 
 
             # copy selected items to basket
-            SQL_query = "SELECT b.id, b.name "\
-                        "FROM basket b, user_basket ub "\
-                        "WHERE ub.id_user='%s' AND b.id=ub.id_basket "\
-                        "ORDER BY b.name ASC " % uid
-            query_result1 = run_sql(SQL_query)
+            query_result1 = run_sql("SELECT b.id, b.name "\
+                                    "FROM basket b, user_basket ub "\
+                                    "WHERE ub.id_user=%s AND b.id=ub.id_basket "\
+                                    "ORDER BY b.name ASC ",
+                                    (uid,))
             if len(query_result1) > 0:
                 out += """Copy the selected items to """
                 out += """<SELECT name="to_basket"><OPTION value="0">- select basket -</OPTION>"""
