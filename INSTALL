@@ -230,13 +230,16 @@ Contents
           Please ask your webserver administrator to put the following
           lines in your "httpd.conf" configuration file:
 
+              AddDefaultCharset UTF-8
               AddType application/x-httpd-php .php .shtml
               AddType application/x-httpd-php-source .phps .shtmls
               DirectoryIndex index.html index.py index.shtml index.php 
 
-          This is to ensure that "*.shtml" files will be interpreted
-          by the web server as PHP files, and that "index.py" and 
-          "index.shtml" will be considered as directory index file.
+          This is to ensure that the browsers will get UTF-8 as
+          the default page encoding, that "*.shtml" files will be
+          interpreted by the web server as PHP files, and that
+          "index.py" and "index.shtml" will be considered as directory
+          index file.
 
           In addition, you have to ask Apache to interpret .py files
           in the installation place via mod_python:
