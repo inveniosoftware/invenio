@@ -40,6 +40,7 @@ from websession import pSession, pSessionMapping
 from session import SessionError
 from config import *
 from messages import *
+from cdsware.access_control_engine import acc_authorize_action
 
 def create_GuestUser():
     """Create a guest user , insert into user null values in all fields 
@@ -96,6 +97,28 @@ def isGuestUser(uid):
     except:
         pass
     return out
+
+def isUserSubmitter(uid):
+    u_email = get_email(uid)
+    res = run_sql("select * from sbmSUBMISSIONS where email=%s",(u_email,))
+    if len(res) > 0:
+        return 1
+    else:
+        return 0
+    
+def isUserReferee(uid):
+    res = run_sql("select sdocname from sbmDOCTYPE")
+    for row in res:
+        doctype = row[0]
+        categ = "*"
+        if acc_authorize_action(uid, "referee",doctype=doctype, categ=categ):
+            return 1
+        res2 = run_sql("select sname from sbmCATEGORIES where doctype=%s",(doctype,))
+        for row2 in res2:
+            categ = row2[0]
+            if acc_authorize_action(uid, "referee",doctype=doctype, categ=categ):
+                return 1
+    return 0
 
 def checkRegister(user,passw):
     """It checks if the user is register with the correct password
@@ -246,10 +269,17 @@ def create_user_infobox(uid, language="en"):
         out += """%s ::
 	       <a class="userinfo" href="%s/youraccount.py/display?ln=%s">%s</a> |
                <a class="userinfo" href="%s/youralerts.py/list?ln=%s">%s</a> |
-               <a class="userinfo" href="%s/yourbaskets.py/display?ln=%s">%s</a> |
-               <a class="userinfo" href="%s/youraccount.py/logout?ln=%s">%s</a>""" % \
+               <a class="userinfo" href="%s/yourbaskets.py/display?ln=%s">%s</a> | """ % \
                (get_email(uid), weburl, language, msg_account[language], weburl, language, msg_alerts[language],
-                weburl, language, msg_baskets[language], weburl, language, msg_logout[language])
+                weburl, language, msg_baskets[language])
+        if isUserSubmitter(uid):
+            out += """<a class="userinfo" href="%s/yoursubmissions.py?ln=%s">%s</a> | """ % \
+                   (weburl, language, msg_submissions[language])            
+        if isUserReferee(uid):
+            out += """<a class="userinfo" href="%s/yourapprovals.py?ln=%s">%s</a> | """ % \
+                   (weburl, language, msg_approvals[language])                        
+        out += """<a class="userinfo" href="%s/youraccount.py/logout?ln=%s">%s</a>""" % \
+               (weburl, language, msg_logout[language])
     return """<img src="%s/img/head.gif" border="0"> %s""" % (weburl, out) 
 
 ## --- follow some functions for Apache user/group authentication
