@@ -254,11 +254,11 @@ def create_rnkmethod_cache():
             methods[rank_method_code]["override_default_min_relevance"] = config.get("find_similar", "override_default_min_relevance")
             methods[rank_method_code]["default_min_relevance"] = int(config.get("find_similar", "default_min_relevance"))
             
-        if config.has_section("merge_methods"):
+        if config.has_section("combine_method"):
             i = 1
-            methods[rank_method_code]["merge_methods"] = []
-            while config.has_option("merge_methods", "method%s" % i):
-                methods[rank_method_code]["merge_methods"].append(string.split(config.get("merge_methods", "method%s" % i), ","))
+            methods[rank_method_code]["combine_method"] = []
+            while config.has_option("combine_method", "method%s" % i):
+                methods[rank_method_code]["combine_method"].append(string.split(config.get("combine_method", "method%s" % i), ","))
                 i += 1
 
 def is_method_valid(colID, rank_method_code):
@@ -345,12 +345,12 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
 
     return result
 
-def merge_methods(rank_method_code, pattern, hitset, rank_limit_relevance,verbose):
-    """Merging several methods"""
+def combine_method(rank_method_code, pattern, hitset, rank_limit_relevance,verbose):
+    """combining several methods"""
 
     #global voutput
     result = {}
-    for (method, percent) in methods[rank_method_code]["merge_methods"]:
+    for (method, percent) in methods[rank_method_code]["combine_method"]:
         function = methods[method]["function"]
         func_object = globals().get(function)
         percent = int(percent)
