@@ -39,10 +39,11 @@ Contents
         max_allowed_packet to at least 4M in your my.cnf.
           <http://mysql.com/>
 
-     c) Apache 2 server, with support for loading DSO modules.  
+     c) Apache 2 server, with support for loading DSO modules.
         Tested mainly with version 2.0.43 and above.  Apache 2 is
-        required for the mod_python module (see below).
+        required for the mod_python module (see below).  
           <http://httpd.apache.org/>
+
 
      d) Python v2.2.2 or above, featuring recent MySQLdb module
         (v0.9.2), and Numeric module (v21 and above).  We recommended
@@ -50,7 +51,6 @@ Contents
         optionally install the Psyco module that increases performance
         of some Pythonic operations. (Note though that CDSware will
         work fine even without Psyco.)
-
           <http://python.org/>
           <http://sourceforge.net/projects/mysql-python>
           <http://sourceforge.net/projects/numpy>
@@ -110,9 +110,13 @@ Contents
 =====================================================
 
       $ cd /usr/local/src/
-      $ wget http://cdsware.cern.ch/download/cdsware-0.9.tar.gz
-      $ tar xvfz cdsware-0.9.tar.gz
-      $ cd cdsware-0.9
+      $ wget http://cdsware.cern.ch/download/cdsware-0.3.2.tar.gz
+      $ wget http://cdsware.cern.ch/download/cdsware-0.3.2.tar.gz.md5
+      $ wget http://cdsware.cern.ch/download/cdsware-0.3.2.tar.gz.sig
+      $ md5sum -v -c cdsware-0.3.2.tar.gz.md5 
+      $ gpg --verify cdsware-0.3.2.tar.gz.sig cdsware-0.3.2.tar.gz
+      $ tar xvfz cdsware-0.3.2.tar.gz
+      $ cd cdsware-0.3.2
       $ ./configure --prefix=/usr/local/cdsware-DEMO \
                     --with-webdir=/var/www/DEMO \
                     --with-weburl=http://webserver.domain.com/DEMO \
@@ -151,15 +155,36 @@ Contents
           CDS Software.  (The built files will be installed into
           different "target" directories later.)
 
-      $ wget http://cdsware.cern.ch/download/cdsware-0.9.tar.gz
+      $ wget http://cdsware.cern.ch/download/cdsware-0.3.2.tar.gz
+      $ wget http://cdsware.cern.ch/download/cdsware-0.3.2.tar.gz.md5
+      $ wget http://cdsware.cern.ch/download/cdsware-0.3.2.tar.gz.sig
 
-          Fetch CDSware package from the CDSware distribution server.
+          Fetch CDSware source tarball from the CDSware distribution
+          server, together with MD5 checksum and GnuPG cryptographic
+          signature files useful for verifying the integrity of the
+          tarball.
 
-      $ tar xvfz cdsware-0.9.tar.gz
+      $ md5sum -v -c cdsware-0.3.2.tar.gz.md5
 
-          Untar the distriburion tarball.    
+          Verify MD5 checksum.
 
-      $ cd cdsware-0.9
+      $ gpg --verify cdsware-0.3.2.tar.gz.sig cdsware-0.3.2.tar.gz
+
+          Verify GnuPG cryptographic signature.  Note that you may
+          first have to import my public key into your keyring, if you
+          haven't done that already:
+            $ gpg --keyserver wwwkeys.pgp.net --recv-keys 0xBA5A2B67
+          The output of the gpg --verify command should then read:
+            Good signature from "Tibor Simko <tibor@simko.info>"
+          You can safely ignore any trusted signature certification
+          warning that may follow after the signature has been
+          successfully verified.
+
+      $ tar xvfz cdsware-0.3.2.tar.gz
+
+          Untar the distribution tarball.    
+
+      $ cd cdsware-0.3.2
    
           Go to the source directory.
 
