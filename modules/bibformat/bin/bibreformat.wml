@@ -93,7 +93,7 @@ def bibreformat_task(sql_queries, mysql_queries, process_hb):
             recIDs.append(item)
 
     for sql_query in sql_queries:
-        res = run_sql(sql_query) 
+        res = run_sql(sql_query)
         for item in res:        
             recIDs.append(item[0])
 
@@ -113,7 +113,6 @@ def bibreformat_task(sql_queries, mysql_queries, process_hb):
     tbibformat  = 0		# time taken up by external call
     tbibupload  = 0		# time taken up by external call
     weburl      = "<WEBURL>"
-
 
 ### Iterate over all records prepared in lists I (option)
     if process:
@@ -538,7 +537,7 @@ def usage(exitcode=1, msg=""):
     sys.stderr.write("  -o,  --format    \t\t Specify output format to be (re-)created. (default HB)\n")
     sys.stderr.write("  -n,  --noprocess \t\t Count records to be processed only (no processing done)\n")
     sys.stderr.write("\n")
-    sys.stderr.write(" Example: bibreformat -l -b  Standard synchronization bibreformat run.")
+    sys.stderr.write(" Example: bibreformat -n  Show how many records are to be bibreformated.")
 
     sys.exit(exitcode)
 
@@ -561,10 +560,13 @@ def main():
         except getopt.GetoptError, err:
             usage(1, err)
 
-        if len(sys.argv) == 1:
+        if len(sys.argv) == 1:                       # default
+
             options["new"]    = 1
             options["last"]   = 1
+
         try:
+
             for opt in opts:
                 if opt[0] in ["-h", "--help"]:
                     usage(0)
@@ -582,14 +584,17 @@ def main():
                     options["collection"]=opt[1]
                 elif opt[0] in ["-n", "--noprocess"]:
                     options["noprocess"] = 1
+                    if len(sys.argv) == 2:
+                        options["new"]    = 1
+                        options["last"]   = 1
+
                 elif opt[0] in ["-f", "--field"]:
                     options["field"]  = opt[1]
                 elif opt[0] in ["-p","--phrase"]:
                     options["phrase"] = opt[1]
                 elif opt[0] in ["-o","--format"]:
                     options["format"] = opt[1]
-                elif opt[0] in ["-n","--noprocess"]:
-                    options["noproces"] = 1
+
         except StandardError, e:
             usage(e)
         task_submit(options)
