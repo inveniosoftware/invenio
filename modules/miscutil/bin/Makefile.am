@@ -27,6 +27,6 @@ install-data-local:
 
 CLEANFILES = $(bin_SCRIPTS) $(noinst_SCRIPTS) *~ *.tmp
 
-%: %.wml ../../../config/config.wml ../../../config/configbis.wml
+%: %.wml ../../../config/config.wml ../../../config/configbis.wml ../../../config/cdswmllib.wml
 	$(WML) -o $@ $<
 	chmod u+x $@
