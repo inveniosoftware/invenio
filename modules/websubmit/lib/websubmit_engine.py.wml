@@ -703,7 +703,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
                 fp.close()
         # if the found field is the reference of the document
         # we save this value in the "journal of submissions"
-        if authentication and uid_email != "" and uid_email != "guest":
+        if uid_email != "" and uid_email != "guest":
             if key == edsrn:
                 run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (value,doctype,access,uid_email,))
         # Now deal with the cookies
@@ -997,7 +997,7 @@ var checked=0;
 function tester()
 {
 """
-    if authentication and (uid_email == "" or uid_email == "guest"):
+    if (uid_email == "" or uid_email == "guest"):
         t = t + "alert(\"please log in first.\\nUse the top right menu to log in.\");return false;\n";
    
     t = t + """

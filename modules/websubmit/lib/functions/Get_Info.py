@@ -95,8 +95,9 @@ def Get_Info_In_DB(rn,parameters,curdir):
 def DocumentNotFound(repno):
     raise functionStop("""
 <SCRIPT>
-   document.forms[0].action="Main.py";
+   document.forms[0].action="submit.py";
    document.forms[0].curpage.value = 1;
+   document.forms[0].step.value = 0;
    document.forms[0].submit();
    alert('The document %s cannot be found in our database.\\nAnyway, you can still choose another document if you wish.');
 </SCRIPT>""" % repno)

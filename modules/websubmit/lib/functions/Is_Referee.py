@@ -34,8 +34,9 @@ def Is_Referee(parameters,curdir,form):
     if not acc_authorize_action(uid, "referee",doctype=doctype, categ=categ):
         raise functionStop("""
 <SCRIPT> 
-        document.forms[0].action="Main.py";
+        document.forms[0].action="submit.py";
         document.forms[0].curpage.value = 1;
+        document.forms[0].step.value = 0;
         document.forms[0].submit();
         alert('Sorry you (%s) have not been recognized as a referee for this type of document.\\nIf you think this is an error, please contact %s');
 </SCRIPT>""" % (uid_email,supportemail))

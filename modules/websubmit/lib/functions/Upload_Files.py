@@ -99,8 +99,9 @@ def Upload_Files(parameters,curdir,form):
                 if iconpath != None and bibdoc != None:
                     bibdoc.addIcon(iconpath)
                     os.unlink(iconpath)
-                else:
+                elif bibdoc !=None:
                     bibdoc.deleteIcon()
+                bibrecdocs.buildBibDocList()
             os.unlink(fullpath)
             os.unlink("%s/myfile" % curdir)
     t+="<form>"
@@ -123,9 +124,9 @@ def Display_File_List(bibrecdocs):
             t+="<small><b>%s</b> document%s:</small>" % (mytype,plural)
             for bibdoc in bibdocs:
                 if mytype == bibdoc.getType():
-                    t+="<table><tr><td bgcolor=\"white\">"
+                    t+="<table cellpadding=0 cellspacing=1 border=0><tr><td bgcolor=\"white\">"
                     if mytype != "Main":
-                        t+="<input type=radio name=mybibdocid value=%s><br><A href=\"\" onClick=\"if (confirm('Are you sure you want to delete this file?')) { document.forms[0].deletedfile.value='%s';document.forms[0].deleted.value='yes';document.forms[0].submit();return false;} else { return false; }\"><IMG src=%s/smallbin.gif border=0 align=center></a>&nbsp;<br></small>" % (bibdoc.getId(),bibdoc.getId(),images)
+                        t+="<center><input type=radio name=mybibdocid value=%s><br><br><A href=\"\" onClick=\"if (confirm('Are you sure you want to delete this file?')) { document.forms[0].deletedfile.value='%s';document.forms[0].deleted.value='yes';document.forms[0].submit();return false;} else { return false; }\"><IMG src=%s/smallbin.gif border=0 align=center></a><br></small></center>" % (bibdoc.getId(),bibdoc.getId(),images)
                     t+="</td><td>"
                     t+=bibdoc.display()
                     t+="</td></tr></table>"
@@ -171,7 +172,7 @@ def Display_Form(bibrecdocs):
         <small><b>2</B></small>
     </TD>
     <TD>
-        <small><INPUT NAME=myfile TYPE=\"file\"> </small>
+        <small><INPUT NAME=myfile TYPE="file"> </small>
     </TD>
 </TR>
 <TR>
@@ -179,12 +180,41 @@ def Display_Form(bibrecdocs):
         <small><B>3</B></small>
     </TD>
     <TD ALIGN=LEFT>
-        <small><INPUT TYPE=\"Submit\" WIDTH=150 VALUE=\"Click to send file\"></small>
+        <small><INPUT TYPE="Submit" WIDTH=150 VALUE="Click to send file" onClick="return checkAdd();"></small>
     </TD>
 </TR>
 </TABLE>
 </TD></TR></TABLE>
-<SCRIPT LANGUAGE=\"JavaScript\" TYPE=\"text/javascript\">
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+function checkAdd()
+{
+    if (document.forms[0].fileAction.value == "ReviseAdditional" || document.forms[0].fileAction.value =="AddAdditionalFormat")
+    {
+        if (getRadioValue(document.forms[0].mybibdocid) == null) {
+            alert("please choose the document you wish to modify");
+            return false;
+        }
+        else
+            return true;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+function getRadioValue (radioButtonOrGroup) {
+  var value = null;
+  if (radioButtonOrGroup.length) { // group 
+    for (var b = 0; b < radioButtonOrGroup.length; b++)
+      if (radioButtonOrGroup[b].checked)
+        value = radioButtonOrGroup[b].value;
+  }
+  else if (radioButtonOrGroup.checked)
+    value = radioButtonOrGroup.value;
+  return value;
+}
+
 function step2()
 {    
       if(confirm(\"You are about to submit the files and end the upload process.\"))
@@ -217,7 +247,7 @@ def createRelatedFormats(fullpath):
         #gunzip file
         os.system("%s %s" % (gunzip,fullpath))
         # Create PDF
-        os.system("%s %s %s/%s.pdf" % (distiller,fullpath,basedir,filename))
+        os.system("%s %s/%s.ps %s/%s.pdf" % (distiller,basedir,filename,basedir,filename))
         if os.path.exists("%s/%s.pdf" % (basedir,filename)):
             createdpaths.append("%s/%s.pdf" % (basedir,filename))
         #gzip file

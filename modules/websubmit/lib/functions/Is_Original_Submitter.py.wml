@@ -46,8 +46,9 @@ def Is_Original_Submitter(parameters,curdir,form):
     if re.search(uid_email,email,re.IGNORECASE) == None and not acc_authorize_action(uid, "submit",verbose=0,doctype=doctype, act=act):
         raise functionStop("""
 <SCRIPT>
-   document.forms[0].action="Main.py";
+   document.forms[0].action="submit.py";
    document.forms[0].curpage.value = 1;
+   document.forms[0].step.value = 0;
    document.forms[0].submit();
    alert('Only the submitter of this document has the right to do this action. \\nYour login (%s) is different from the one of the submitter (%s).');
 </SCRIPT>""" % (uid_email,email))

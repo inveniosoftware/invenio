@@ -36,6 +36,6 @@ def Insert_Modify_Record(parameters,curdir,form):
     initialfile = "%s/%s" % (curdir,recfile)
     finalfile = "%s/%s_%s" % (tmpdir,rn,time.strftime("%Y-%m-%d_%H:%M:%S"))
     shutil.copy(initialfile,finalfile)
-    os.system("%s -w -c %s" % (bibupload,finalfile))
+    os.system("%s -c %s" % (bibupload,finalfile))
     return ""
 </protect>

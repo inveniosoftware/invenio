@@ -49,8 +49,8 @@ from cdsware.messages import *
 from mod_python import apache
 from cdsware.websubmit_config import *
 
-archivepath = "/soft/cdsware/var/data/files"
-archivesize = 5000
+archivepath = filedir
+archivesize = filedirsize
 
 class BibRecDocs:
     """this class represents all the files attached to one record"""
@@ -95,7 +95,7 @@ class BibRecDocs:
             match = re.match("(.*_)([^_]*)",docname)
             if match:
                 try:
-                    docname = match.group(0)+str(int(match.group(1)) + 1)
+                    docname = match.group(1)+str(int(match.group(2)) + 1)
                 except:
                     docname = docname + "_2"
             else:
@@ -123,7 +123,7 @@ class BibRecDocs:
                     match = re.match("(.*_)([^_]*)",docname)
                     if match:
                         try:
-                            docname = match.group(0)+str(int(match.group(1)) + 1)
+                            docname = match.group(1)+str(int(match.group(2)) + 1)
                         except:
                             docname = docname + "_2"
                     else:
@@ -184,17 +184,22 @@ class BibDoc:
         # bibdocid is known, the document already exists
         if bibdocid != "":
             if recid == "":
-                res = run_sql("select id_bibrec from bibrec_bibdoc where id_bibdoc=%s",(bibdocid,))
+                res = run_sql("select id_bibrec,type from bibrec_bibdoc where id_bibdoc=%s",(bibdocid,))
                 if len(res) > 0:
                     recid = res[0][0]
+                    self.type = res[0][1]
                 else:
                     recid = None
+                    self.type = ""
+            else:
+                res = run_sql("select type from bibrec_bibdoc where id_bibrec=%s and id_bibdoc=%s",(recid,bibdocid,))
+                self.type = res[0][0]
+            # gather the other information
             res = run_sql("select * from bibdoc where id=%s", (bibdocid,))
-            self.cd = res[0][4]
-            self.md = res[0][5]
-            self.type = res[0][1]
+            self.cd = res[0][3]
+            self.md = res[0][4]
             self.recid = recid
-            self.docname = res[0][3]
+            self.docname = res[0][2]
             self.id = bibdocid
             group = "g"+str(int(int(self.id)/archivesize))
             self.basedir = "%s/%s/%s" % (archivepath,group,self.id)
@@ -206,11 +211,11 @@ class BibDoc:
                 self.recid = recid
                 self.type = type
                 self.docname = docname
-                self.id = run_sql("insert into bibdoc (type,docname,creation_date,modification_date) values(%s,%s,NOW(),NOW())", (type,docname,))
+                self.id = run_sql("insert into bibdoc (docname,creation_date,modification_date) values(%s,NOW(),NOW())", (docname,))
                 if self.id != None:
                     #we link the document to the record if a recid was specified
                     if self.recid != "":
-                        run_sql("insert into bibrec_bibdoc values(%s,%s)", (recid,self.id,))
+                        run_sql("insert into bibrec_bibdoc values(%s,%s,%s)", (recid,self.id,self.type,))
                 else:
                     return None
                 group = "g"+str(int(int(self.id)/archivesize))
@@ -281,6 +286,7 @@ class BibDoc:
         existingIcon = self.getIcon()
         if existingIcon != None:
             existingIcon.delete()
+        self.BuildRelatedFileList()
         
     def display(self,version=""):
         t=""

@@ -44,8 +44,9 @@ def Test_Status(parameters,curdir,form):
 def printNotRequested(rn):
     t="""
 <SCRIPT>
-   document.forms[0].action="Main.py";
+   document.forms[0].action="submit.py";
    document.forms[0].curpage.value = 1;
+   document.forms[0].step.value = 0;
    document.forms[0].submit();
    alert('The document %s has never been asked for approval.\\nAnyway, you can still choose another document if you wish.');
 </SCRIPT>""" % rn
@@ -54,8 +55,9 @@ def printNotRequested(rn):
 def printApproved(rn):
     t="""
 <SCRIPT>
-   document.forms[0].action="Main.py";
+   document.forms[0].action="submit.py";
    document.forms[0].curpage.value = 1;
+   document.forms[0].step.value = 0;
    document.forms[0].submit();
    alert('The document %s has already been approved.\\nAnyway, you can still choose another document if you wish.');
 </SCRIPT>""" % rn
@@ -64,8 +66,9 @@ def printApproved(rn):
 def printRejected(rn):
     t="""
 <SCRIPT>
-   document.forms[0].action="Main.py";
+   document.forms[0].action="submit.py";
    document.forms[0].curpage.value = 1;
+   document.forms[0].step.value = 0;
    document.forms[0].submit();
    alert('The document %s has already been rejected.\\nAnyway, you can still choose another document if you wish.');
 </SCRIPT>""" % rn

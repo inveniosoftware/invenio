@@ -28,16 +28,16 @@
 </protect>
 
 ## load config variables:
-authentication = "<AUTHENTICATE>"
 adminemail     = "<ADMINEMAIL>"
 supportemail   = "<SUPPORTEMAIL>"
 test           = "FALSE"
 images         = "<WEBURL>/img"
 urlpath        = "<WEBURL>"
 accessurl      = "<WEBURL>/search.py"
-archive        = "<ARCHIVE>"
-counters       = "<COUNTERS>"
-storage        = "<STORAGE>"
+counters       = "<CFG_SUBMIT_COUNTER>"
+storage        = "<CFG_SUBMIT_DIR>"
+filedir	       = "<CFG_FILE_DIR>"
+filedirsize    = <CFG_FILE_DIR_SIZE>
 gfile          = "<GFILE>"
 gzip           = "<GZIP>"
 tar            = "<TAR>"

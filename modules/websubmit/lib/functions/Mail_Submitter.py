@@ -48,7 +48,7 @@
 execfile("%s/cdsware/websubmit_functions/mail.py" % pylibdir)
 
 def Mail_Submitter (parameters,curdir,form): 
-    FROMADDR = 'CDSwareSubmission Interface <%s>' % supportemail
+    FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
     # retrieve report number
     edsrn = parameters['edsrn']
     newrnin = parameters['newrnin']
@@ -93,7 +93,7 @@ def Mail_Submitter (parameters,curdir,form):
         email_txt =  email_txt + "An email has been sent to the referee. You will be warned by email as soon as the referee takes his/her decision regarding your document.\n\n"
     elif parameters['status'] == "ADDED":
         email_txt = email_txt + "It will be soon added to our Document Server.\n\nOnce inserted, you will be able to check the  bibliographic information and the quality of the electronic documents at this URL:\n<%s/search.py?recid=%s>\nIf you detect an error please let us know by sending an email to %s. \n\n" % (htdocsurl,sysno,supportemail)
-    email_txt = email_txt + "Thank you for using %s Submission Interface.\nThe Electronic Submission team." % cdsname
+    email_txt = email_txt + "Thank you for using %s Submission Interface.\n" % cdsname
     # send the mail
     body = forge_email(FROMADDR,m_recipient,adminemail,"%s: Document Received" % fullrn,email_txt)
     send_email(FROMADDR,m_recipient,body,0)
