@@ -532,7 +532,8 @@ def perform_accesspolicy(req, callback='yes', confirm=0):
     site_policy[1] = "Read-only site, all write operations temporarily closed."
     site_policy[2] = "Site fully closed."
 
-    output = "<br><b>Current settings:</b><br>"
+    output = "(Modifications must be done in access_control_config.py)<br>"
+    output += "<br><b>Current settings:</b><br>"
     output += "Site status: %s<br>" % (site_policy[CFG_ACCESS_CONTROL_LEVEL_SITE])
     output += "Guest accounts allowed: %s<br>" % (CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0 and "Yes" or "No")
     output += "Account policy: %s<br>" % (account_policy[CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS])
@@ -542,6 +543,13 @@ def perform_accesspolicy(req, callback='yes', confirm=0):
     output += "Send email to user after creating new account: %s<br>" % (CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1 and "Yes" or "No")
     output += "Send email to user when account is activated: %s<br>" % (CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION == 1 and "Yes" or "No")
     output += "Send email to user when account is deleted/rejected: %s<br>" % (CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION == 1 and "Yes" or "No")
+
+    output += "<br>"
+    output += "<b>Available 'login via' methods:</b><br>"
+    methods = CFG_EXTERNAL_AUTHENTICATION.keys()
+    methods.sort()
+    for system in methods:
+        output += """%s %s<br>""" % (system, (CFG_EXTERNAL_AUTHENTICATION[system][1] and "(Default)" or ""))
  
     output += "<br><b>Changing the settings:</b><br>"
     output += "Currently, all changes must be done using your favourite editor, and the webserver restarted for changes to take effect. For the settings to change, either look in the guide or in access_control_config.py ."

@@ -51,8 +51,8 @@ MAXPAGEUSERS = 25
 # Atleast one must be added
 # Adviced not to change the name, since it is used to identify the account
 # Format is:   System name: (System class, Default True/Flase), atleast one must be default
-CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % cdsname: (None, True)}
-#CFG_EXTERNAL_AUTHENTICATION = {"CERN Document Server (internal)": (None, True), "CERN NICE (external)": (external_auth_nice(), False)}
+#CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % cdsname: (None, True)}
+CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % cdsname: (None, True), "CERN NICE (external)": (external_auth_nice(), False)}
 # defines how open the site is
 #0 = normal operation of the site
 #1 = read-only site, all write operations temporarily closed 
