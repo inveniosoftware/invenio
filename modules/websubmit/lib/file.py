@@ -363,11 +363,14 @@ class BibDoc:
                     filepath = "%s/%s" % (self.basedir,fil)
                     fileversion = re.sub(".*;","",fil)
                     fullname = fil.replace(";%s" % fileversion,"")
-                    format = re.sub("^[^\.]*\.","",fullname)
-                    if format == fullname:
-                        format = ""
-                    filename = re.sub("\.%s" % format,"",fullname)
-                    self.docfiles.append(BibDocFile(filepath,self.type,fileversion,filename,format,self.id))
+                    fullname_last_dot_postition = fullname.rfind(".")
+                    if fullname_last_dot_postition == -1:
+                        fullname_basename = fullname
+                        fullname_extension = ""
+                    else:
+                        fullname_basename = fullname[:fullname_last_dot_postition]
+                        fullname_extension = fullname[fullname_last_dot_postition+1:]
+                    self.docfiles.append(BibDocFile(filepath,self.type,fileversion,fullname_basename,fullname_extension,self.id))
     
     def BuildRelatedFileList(self):
         res = run_sql("select ln.id_bibdoc2,ln.type from bibdoc_bibdoc as ln,bibdoc where id=ln.id_bibdoc2 and ln.id_bibdoc1=%s and status!='deleted'",(self.id,))
