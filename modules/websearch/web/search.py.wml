@@ -88,7 +88,7 @@ def authenticate(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp
         import sys 
         sys.path.append("<LIBDIR>/python")
         from cdsware.config import cdsname
-        from cdsware.websession import auth_apache_user_collection_p
+        from cdsware.user import auth_apache_user_collection_p
         from cgi import parse_qs
         # let's parse collection list from given URL request:
         parsed_args = parse_qs(req.args)
