@@ -654,7 +654,7 @@ def generate(keyword):
     if (fn == "XDATE"):
         par = set_par_defaults(par,"%w%H%M%S," + ",%d" % conv_setting[1])
         out = strftime(par[0],localtime())
-        out = string.atoi(par[1]) + out[:string.atoi(par[2])]
+        out = par[1] + out[:string.atoi(par[2])]
     if (fn == "OAI"):
         oai_prefix = "</protect><OAIIDPREFIX><protect>"
         out = "%s:%d" % (oai_prefix,tcounter + oai_identifier_from)
@@ -1322,7 +1322,7 @@ def create_record(begin_record_header, ending_record_footer, query_string, match
     field_data_item_LIST = []
     ssn5cnt = "%3d" % Xcount
     sysno                = generate("DATE(%w%H%M%S)")
-    sysno500             = generate("XDATE(%w%H%M%S),%s" % ssn5cnt)
+    sysno500             = generate("XDATE(%w%H%M%S)," + ssn5cnt)
 
     for T_tpl_item_LIST in target_tpl_parsed:
         # the line is printed only if the variables inside are not empty
