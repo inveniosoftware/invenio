@@ -35,6 +35,8 @@ Purpose:
   Walk through the Apache combined log and analyse the usage of the
   site with respect to the searching habits, alert/basket pages, etc.
 
+  Note: Please analyze only moderately-sized logs, e.g. for a day or a week.
+
 Usage:
 ------
 
@@ -57,7 +59,7 @@ Configuration:
 
 Edit the config file:
 
-   $ vim <ETCDIC>/webstat/webstat.cfg
+   $ vim <ETCDIR>/webstat/webstat.cfg
 
 The file is self-explanatory.
 
