@@ -19,7 +19,7 @@
 
 #include "configbis.wml"
 #include "cdspage.wml" \
-    title="Philosophy of the relation between a catalogue and a submission" \
+    title="Philosophy behind the document submission system" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a> &gt; <a class=navtrail href=<lang:star: index.*.html>><MSG_GUIDE></a>"  \
     navbar_name="admin" \
     navbar_select="websubmit-admin-guide"
@@ -34,19 +34,79 @@
     <cz><MSG_PAGE_BEING_TRANSLATED_BODY></cz>
     <no><MSG_PAGE_BEING_TRANSLATED_BODY></no>
 
-        <h3>Philosophy of the relation between a catalogue and a submission:</h3>
+<p>This page will explain some philosophical issues behind the document submission system.
+
+        <h3>On the relation between a search collection and a submission doctype:</h3>
         <BLOCKQUOTE>
             <UL>
-                &nbsp;<span class="guideheader">T</span>he relation between a search catalogue and a submission is usually unclear for CDSware administrators. This comes from the fact that there is actually no direct relation between them. Here is an explanation of the general philosophy behind this answer.<br><br>
-		&nbsp;<span class="guideheader">A</span> catalogue in CDSware is defined through a search query. For example, "all records which FFF field contains the value VVV belong to catalogue CCC". Several assertions can be deduced from this definition:<br>
-		&nbsp;1/ A single record can appear in several collections <br>
-		&nbsp;2/ There is no limitation to the number of collections in which a record can appear.<br>
-		&nbsp;3/ Any query can be used to build a catalogue. The query can also be a complex one using logical operators, hence can rely on the value of several fields.<br>
-		&nbsp;<span class="guideheader">A</span> submission basically creates an XML-MARC record and stores it in the database. So the belonging of this new record to a collection exclusively depends on the content of the XML-MARC record. This XML-MARC record is created by the <a href="functiondescription.<lang:star: *>.html#Make_Record">Make_Record</a> function. So the secret of the matching of a record and a collection lies in the configuration of this function. Some examples will clarify this point:<br><br>
-		&nbsp;<span class="guideheader">E</span>xample 1: Let's consider a "Preprints" collection which is defined by this query: "980__a=PREPRINTS". We can create a submission from which all records will go to this "Preprints" collection. For this, the Make_Record function will be configured so that a 980__a field containing "PREPRINTS" will always be created.<br>
-		&nbsp;<span class="guideheader">E</span>xample 2: Let's still consider the same "Preprints" collection, and an additional "Thesis" collection based on a slightly different query "980__a=THESIS". We can create a single submission from which the records will go in the "Preprints" or "Thesis" collections depending on a field chosen by the submitter. In this case, the Make_Record function will be configured so that a 980__a field will contain "PREPRINTS" or "THESIS" depending on the value of a field entered by the submitter.<br><br>
 
-		&nbsp;<span class="guideheader">T</span>his apparent disconnection between a submission and a collection  allows a great flexibility, allowing administrators to create 1 to 1, 1 to n, n to 1 or even 1 to 0 (not very useful!) relations.
+                &nbsp;<span class="guideheader">T</span>he relation
+                between a search collection and a submission document
+                type may be prone to certain confusion for CDSware
+                administrators. This comes from the fact that there is
+                no one-to-one direct mapping between them, as is usual
+                elsewhere.  The relation is more flexible than that.<br><br>
+
+		&nbsp;<span class="guideheader">A</span> search
+		collection in CDSware is defined through a search
+		query. For example, "all records where field F
+		contains the value V belong to collection C". Several
+		assertions can be deduced from this definition:<br>
+
+		&nbsp;1/ A single record can appear in several collections.<br>
+
+		&nbsp;2/ There is no limitation to the number of
+		collections in which a record can appear.<br>
+
+		&nbsp;3/ Any query can be used to build a
+		collection. The query can also be a complex one using
+		logical operators, hence can rely on the value of
+		several fields.<br><br>
+
+                &nbsp;(In addition, a search collection can be defined
+                via a set of its subcollections in the hierarchy tree.
+                Refer to the <a
+                href="<WEBURL>/admin/websearch/guide.html">WebSearch
+                Admin Guide</a> for that matter.)<br><br>
+
+		&nbsp;<span class="guideheader">T</span>he submission
+		system basically creates an XML MARC record and stores
+		it in the database.  To which collection this new
+		record belongs depends exclusively on the content of
+		the XML MARC record. This XML MARC record is created
+		by the <a href="functiondescription.<lang:star:
+		*>.html#Make_Record">Make_Record</a> function. So the
+		secret of the matching of a submitted record to a
+		particular collection lies in the configuration of
+		this function. Some examples will clarify this
+		point:<br><br>
+
+		&nbsp;<span class="guideheader">E</span>xample 1:
+		Let's consider a "Preprints" collection which is
+		defined by this query: "980__a:PREPRINT". We want to
+		create a submission document type from which all
+		records will go to this "Preprints" collection. For
+		this, the Make_Record function should be configured so
+		that a 980__a field containing "PREPRINT" will always
+		be created.<br>
+
+		&nbsp;<span class="guideheader">E</span>xample 2:
+		Let's still consider the same "Preprints" collection,
+		and an additional "Theses" collection based on a
+		slightly different query "980__a:THESIS". We want to
+		create a single submission type from which the records
+		will go in the "Preprints" or "Theses" collections
+		depending on a field chosen by the submitter. In this
+		case, the Make_Record function should be configured so
+		that a 980__a field will contain either "PREPRINT" or
+		"THESIS" depending on the value entered by
+		the submitter.<br><br>
+
+		&nbsp;<span class="guideheader">T</span>he apparent
+		disconnection between a submission document type and a
+		search collection allows a great flexibility, allowing
+		administrators to create 1 to 1, 1 to n, n to 1 or
+		even 1 to 0 (not very useful!) relations.
 
             </UL>
         </BLOCKQUOTE>
