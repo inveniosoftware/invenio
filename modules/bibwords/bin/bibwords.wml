@@ -810,23 +810,29 @@ class WordTable:
     
     def merge_with_old_recIDs(self,word,set):
         """Merge the system numbers stored in memory (hash of recIDs with value +1 or -1
-        according to where to add/delete them) with those stored in the database index
-        and received in set universe of recIDs for the given word. """
-        
+        according to whether to add/delete them) with those stored in the database index
+        and received in set universe of recIDs for the given word.
+
+        Return 0 in case no change was done to SET, return 1 in case SET was changed.
+        """
+        set_changed_p = 0
         for recID,sign in self.value[word].items():
-            if sign == -1:
+            if sign == -1 and set[recID]==1:
+                # delete recID if existent in set and if marked as to be deleted
                 set[recID] = 0
-            else:
+                set_changed_p = 1
+            elif set[recID] == 0:
+                # add recID if not existent in set and if marked as to be added
                 set[recID] = 1
+                set_changed_p = 1
+        return set_changed_p
 
     def put_word_into_db(self, word, split=string.split):
         """Flush a single word to the database and delete it from memory"""
 
         set = self.load_old_recIDs(word)
         if set: # merge the word recIDs found in memory:
-            set_old = set
-            self.merge_with_old_recIDs(word,set)
-            if set_old == set:
+            if self.merge_with_old_recIDs(word,set) == 0:
                 # nothing to update:
                 if opts_dict["verbose"] >= 9:
                     write_message("......... unchanged hitlist for ``%s''" % word)
