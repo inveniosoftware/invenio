@@ -145,21 +145,15 @@ def userOnSystem(user):
     return 0
 	
 def checkemail(email):
-    """It is a first intent for cheking the email,whith this first version it just checks if the email 
-       written by the user doesn't contain blanks and that contains '@'
+    """Check whether the EMAIL address supplied by the user is valid.
+       At the moment we just check whether it contains ampersand and
+       whether it doesn't contain blanks.
        
        checkemail(email) -> boolean
-  """
-    setArr = -1
-    setSpac = 0
-    for i in range(0,len(email)):
-        if email[i] == '@':
-            setArr =1
-        if email[i]== ' ':
-            setSpac =1
-    if setArr==1 and setSpac==0:
-        return 1
-    return 0    
+    """
+    if (string.find(email, "@") <= 0) or (string.find(email, " ") > 0):
+       return 0
+    return 1
 
 def getDataUid(req,uid):
     """It takes the email and password from a given userId, from the MySQL database, if don't exist it just returns
