@@ -24,3 +24,5 @@ overall_importance = 1.0
 tag = 773__p
 kb_src = <ETCDIR>/bibrank/demo_jif.kb
 check_mandatory_tags = 
+prefix = (
+postfix = )

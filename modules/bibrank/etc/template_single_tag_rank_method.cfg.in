@@ -20,7 +20,9 @@
 function = single_tag_rank_method
 overall_importance = 1.0
 
-[single_tag_rank]
+[single_tag_rank_method]
 tag = 909C4p
 kb_src = <ETCDIR>/bibrank/jif.kb
 check_mandatory_tags = 909C4c,909C4v,909C4y
+prefix = (
+postfix = )
