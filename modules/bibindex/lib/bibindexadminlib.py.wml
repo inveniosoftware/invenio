@@ -869,8 +869,9 @@ def perform_modifyindexfields(idxID, ln=cdslang, callback='yes', content='', con
     output = """<dl>
      <dt>Menu</dt>
      <dd><a href="%s/admin/bibindex/bibindexadmin.py/addindexfield?idxID=%s&amp;ln=%s#3.1">Add field to index</a></dd>
+     <dd><a href="%s/admin/bibindex/bibindexadmin.py/field?ln=%s">Manage fields</a></dd>
     </dl>
-    """  % (weburl, idxID, ln)
+    """  % (weburl, idxID, ln, weburl, ln)
 
     header = ['Field', '']
     actions = []
