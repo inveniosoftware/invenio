@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cdsware, 0.1-pre1, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.1-pre1)
+AC_INIT(cdsware, 0.0.9+, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.0.9+)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -475,43 +475,18 @@ AC_SUBST(HTMLTOTEXT)
 AC_CONFIG_FILES([Makefile \
 	  config/Makefile \
 	  config/configbis.wml \
-	  cgibin/Makefile \
-	  dbutil/Makefile \
-	  htdocs/Makefile \
-	  htdocs/img/Makefile \
-	  htdocs/errors/Makefile \
-	  htdocs/submit/Makefile \
-	  htdocs/submit/docs/Makefile \
-	  htdocs/submit/docs/english/Makefile \
-	  htdocs/submit/access/Makefile \
-	  htdocs/submit/access/protected/Makefile \
-	  htdocs/submit/MESS/Makefile \
-	  htdocs/submit/MESS/functions/Makefile \
-	  htdocs/submit/mycds/Makefile \
-	  htdocs/submit/bibconvert/Makefile \
-	  htdocs/submit/bibconvert/config/Makefile \
-	  htdocs/submit/bibconvert/KB/Makefile \
-	  htdocs/submit/publiline/Makefile \
-	  htdocs/submit/publiline/inotes/Makefile \
-	  htdocs/personalize/Makefile \
-	  htdocs/docs/Makefile \
-	  htdocs/bibformat/Makefile \
-	  htdocs/bibformat/core/Makefile \
-	  htdocs/bibformat/common/Makefile \
-	  htdocs/admin/Makefile \
-	  htdocs/admin/howto/Makefile \
-	  htdocs/admin/bibconvert/Makefile \
-	  htdocs/admin/bibdata/Makefile \
-	  htdocs/admin/bibformat/Makefile \
-	  htdocs/admin/bibharvest/Makefile \
-	  htdocs/admin/bibupload/Makefile \
-	  htdocs/admin/bibwords/Makefile \
-	  htdocs/admin/webaccess/Makefile \
-	  htdocs/admin/websearch/Makefile \
-	  htdocs/admin/websubmit/Makefile \
-	  htdocs/admin/websubmit/docs/Makefile \
-	  htdocs/admin/websubmit/docs/english/Makefile \
-	  htdocs/admin/webperso/Makefile])
+	  modules/Makefile \
+	  modules/websearch/Makefile \
+	  modules/websearch/admin/Makefile \
+	  modules/websearch/cli/Makefile \
+	  modules/websearch/web/Makefile \
+	  modules/bibwords/Makefile \
+	  modules/bibwords/admin/Makefile \
+	  modules/bibwords/cli/Makefile \
+	  modules/bibupload/Makefile \
+	  modules/bibupload/admin/Makefile \
+	  modules/bibupload/cli/Makefile \
+	  ])
 
 ## Finally, write output files:
 AC_OUTPUT
