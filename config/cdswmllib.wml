@@ -51,7 +51,7 @@
         ($out) = @_;
         ($junk, $filename, $revision, $junk) = split / /, $out;
         $filename =~ s/\.wml,v//g;
-        return $filename . " " . $revision . " (CDSware <VERSION>)";
+        return "CDSware/<VERSION> " . $filename . "/" . $revision;
     }
 
 :>
