@@ -1,0 +1,52 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="Philosophy of the relation between a catalogue and a submission" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a> &gt; <a class=navtrail href=<lang:star: index.*.html>><MSG_GUIDE></a>"  \
+    navbar_name="admin" \
+    navbar_select="websubmit-admin-guide"
+
+    <fr><MSG_PAGE_BEING_TRANSLATED_BODY></fr>
+    <de><MSG_PAGE_BEING_TRANSLATED_BODY></de>
+    <es><MSG_PAGE_BEING_TRANSLATED_BODY></es>
+    <pt><MSG_PAGE_BEING_TRANSLATED_BODY></pt>
+    <it><MSG_PAGE_BEING_TRANSLATED_BODY></it>
+    <ru><MSG_PAGE_BEING_TRANSLATED_BODY></ru>
+    <sk><MSG_PAGE_BEING_TRANSLATED_BODY></sk>
+    <cz><MSG_PAGE_BEING_TRANSLATED_BODY></cz>
+    <no><MSG_PAGE_BEING_TRANSLATED_BODY></no>
+
+        <h3>Philosophy of the relation between a catalogue and a submission:</h3>
+        <BLOCKQUOTE>
+            <UL>
+                &nbsp;<span class="guideheader">T</span>he relation between a search catalogue and a submission is usually unclear for CDSware administrators. This comes from the fact that there is actually no direct relation between them. Here is an explanation of the general philosophy behind this answer.<br><br>
+		&nbsp;<span class="guideheader">A</span> catalogue in CDSware is defined through a search query. For example, "all records which FFF field contains the value VVV belong to catalogue CCC". Several assertions can be deduced from this definition:<br>
+		&nbsp;1/ A single record can appear in several collections <br>
+		&nbsp;2/ There is no limitation to the number of collections in which a record can appear.<br>
+		&nbsp;3/ Any query can be used to build a catalogue. The query can also be a complex one using logical operators, hence can rely on the value of several fields.<br>
+		&nbsp;<span class="guideheader">A</span> submission basically creates an XML-MARC record and stores it in the database. So the belonging of this new record to a collection exclusively depends on the content of the XML-MARC record. This XML-MARC record is created by the <a href="functiondescription.<lang:star: *>.html#Make_Record">Make_Record</a> function. So the secret of the matching of a record and a collection lies in the configuration of this function. Some examples will clarify this point:<br><br>
+		&nbsp;<span class="guideheader">E</span>xample 1: Let's consider a "Preprints" collection which is defined by this query: "980__a=PREPRINTS". We can create a submission from which all records will go to this "Preprints" collection. For this, the Make_Record function will be configured so that a 980__a field containing "PREPRINTS" will always be created.<br>
+		&nbsp;<span class="guideheader">E</span>xample 2: Let's still consider the same "Preprints" collection, and an additional "Thesis" collection based on a slightly different query "980__a=THESIS". We can create a single submission from which the records will go in the "Preprints" or "Thesis" collections depending on a field chosen by the submitter. In this case, the Make_Record function will be configured so that a 980__a field will contain "PREPRINTS" or "THESIS" depending on the value of a field entered by the submitter.<br><br>
+
+		&nbsp;<span class="guideheader">T</span>his apparent disconnection between a submission and a collection  allows a great flexibility, allowing administrators to create 1 to 1, 1 to n, n to 1 or even 1 to 0 (not very useful!) relations.
+
+            </UL>
+        </BLOCKQUOTE>
