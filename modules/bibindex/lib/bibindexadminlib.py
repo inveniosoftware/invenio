@@ -58,29 +58,20 @@ def getnavtrail(previous = ''):
     return navtrail
 
 def perform_index(ln=cdslang, mtype='', content=''):
-    """form to modify a collection. this method is calling other methods which again is calling this and sending back the output of the method.
-    if callback, the method will call perform_editcollection, if not, it will just return its output.
-    colID - id of the collection
+    """start area for modifying indexes
     mtype - the method that called this method.
     content - the output from that method."""
     
     fin_output = """
     <table>
     <tr>
-    <td><b>Menu</b></td>
-    </tr>
-    <tr>
-    <td>0.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s">Show all</a></small></td>
-    <td>1.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_showindexoverview#1">Overview of indexes</a></small></td>
-    <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_editindexes#2">Edit index</a></small></td>
-    <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_addindex#3">Add new index</a></small></td>
-    <td>4.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_showfieldoverview#4">Overview of logical fields</a></small></td>
-    </tr><tr>
-    <td>5.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_editfields#2">Edit logical field</a></small></td>
-    <td>6.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_addfield#3">Add new logical field</a></small></td>
+    <td>0.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/index?ln=%s">Show all</a></small></td>
+    <td>1.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/index?ln=%s&amp;mtype=perform_showindexoverview#1">Overview of indexes</a></small></td>
+    <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/index?ln=%s&amp;mtype=perform_editindexes#2">Edit index</a></small></td>
+    <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/index?ln=%s&amp;mtype=perform_addindex#3">Add new index</a></small></td>
     </tr>
     </table>
-    """ % (weburl, ln, weburl, ln, weburl, ln, weburl, ln, weburl, ln, weburl, ln, weburl, ln)
+    """ % (weburl, ln, weburl, ln, weburl, ln, weburl, ln)
 
     if mtype == "perform_showindexoverview" and content:
         fin_output += content
@@ -97,6 +88,24 @@ def perform_index(ln=cdslang, mtype='', content=''):
     elif mtype == "perform_addindex" or not mtype:
         fin_output += perform_addindex(ln, callback='')
 
+    return addadminbox("<b>Menu</b>",  [fin_output])
+
+def perform_field(ln=cdslang, mtype='', content=''):
+    """Start area for modifying fields
+    mtype - the method that called this method.
+    content - the output from that method."""
+    
+    fin_output = """
+    <table>
+    <tr>
+    <td>0.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/field?ln=%s">Show all</a></small></td>
+    <td>1.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/field?ln=%s&amp;mtype=perform_showfieldoverview#1">Overview of logical fields</a></small></td>
+    <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/field?ln=%s&amp;mtype=perform_editfields#2">Edit logical field</a></small></td>
+    <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/field?ln=%s&amp;mtype=perform_addfield#3">Add new logical field</a></small></td>
+    </tr>
+    </table>
+    """ % (weburl, ln, weburl, ln, weburl, ln, weburl, ln)
+
     if mtype == "perform_editfields" and content:
         fin_output += content
     elif mtype == "perform_editfields" or not mtype:
@@ -112,7 +121,7 @@ def perform_index(ln=cdslang, mtype='', content=''):
     elif mtype == "perform_showfieldoverview" or not mtype:
         fin_output += perform_showfieldoverview(ln, callback='')
 
-    return addadminbox("Overview of BibIndex Interface",  [fin_output])
+    return addadminbox("<b>Menu</b>",  [fin_output])
 
 def perform_editfield(fldID, ln=cdslang, mtype='', content='', callback='yes', confirm=-1):
     """form to modify a field. this method is calling other methods which again is calling this and sending back the output of the method.
@@ -323,7 +332,7 @@ def perform_editfields(ln=cdslang, callback='yes', content='', confirm=-1):
         body = [output]
 
     if callback:
-        return perform_index(ln, "perform_editfields", addadminbox(subtitle, body))
+        return perform_field(ln, "perform_editfields", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
 
@@ -637,7 +646,7 @@ def perform_addfield(ln=cdslang, fldNAME='', code='', callback="yes", confirm=-1
         body = [output]
 
     if callback:
-        return perform_index(ln, "perform_addfield", addadminbox(subtitle, body))
+        return perform_field(ln, "perform_addfield", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
  
@@ -752,7 +761,7 @@ def perform_showfieldoverview(ln=cdslang, callback='', confirm=0):
         body = [output]
 
     if callback:
-        return perform_index(fldID, ln, "perform_showfieldoverview", addadminbox(subtitle, body))
+        return perform_field(fldID, ln, "perform_showfieldoverview", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body) 
 
@@ -1023,7 +1032,7 @@ def perform_modifytag(fldID, tagID, ln=cdslang, name='', value='', callback='yes
     <input class="admin_w200" type="text" name="value" value="%s" /><br>
     <span class="adminlabel">Comment</span>
     <input class="admin_w200" type="text" name="name" value="%s" /><br>
-    """ % (name, value)
+    """ % (value, name)
 
     output += createhiddenform(action="modifytag#4.1",
                                text=text,

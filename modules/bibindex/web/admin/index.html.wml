@@ -23,14 +23,19 @@
     navbar_name="admin" \
     navbar_select="bibindex" 
      
+
 <p>
- This is the gate to the admin area for BibIndex. You need to 
+ This is the gate to the admin area for BibIndex. You need to
  <a href="<WEBURL>/youraccount.py/login?referer=<WEBURL>/admin/bibindex/">login</a> to enter.
 </p>
 
 <dl>
- <dt><a href="bibindexadmin.py">BibIndex Admin Interface</a></dt>
- <dd>Start area for BibIndex administration.</dd>
+ <dt><a href="bibindexadmin.py/index">Manage indexes</a></dt>
+ <dd>For modifying indexes.</dd>
+</dl>
+<dl>
+ <dt><a href="bibindexadmin.py/field">Manage logical fields</a></dt>
+ <dd>For modifying logical fields.</dd>
 </dl>
 <dl>
  <dt><a href="guide.html">BibIndex Admin Guide</a></dt>
