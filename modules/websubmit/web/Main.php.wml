@@ -1,0 +1,927 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+<?
+   require("commonPhpFunctions.php");
+   include ("specialchars.php");
+
+    ///////////////////////
+   // Functions	        //
+  ///////////////////////
+
+function displayPage()
+{
+?>
+#include "cdspage.wml" \
+    title="Submitting..." \
+    navbar_name="main" \
+    navbar_select="submit" \
+    cdspageboxlefttopadd="<protect><?displayLoginMenu('submit');?></protect>"
+	    	  
+<?
+}
+
+    ///////////////////////
+   // Preliminary tasks //
+  ///////////////////////
+
+   // Authentication
+   if (AUTHENTICATION)
+   {
+      // set the cookie for remembering the user name next time the user
+      // connects
+      setcookie("SuE","$uid_email",time()+31104000);
+   }
+
+   // database connection
+   connectDB(DOCS_DATABASE);
+
+   // retrieve the action's long name
+   if ($dir == "")
+   {
+      $res = mysql_query("select dir from sbmACTION where sactname='$act'");
+      $row = mysql_fetch_row($res);
+      $dir = $row[0];
+   }
+
+   // now we want to test if all needed directories exist, if not we create
+   // them
+   umask(000);
+   $rundir="$STORAGE/$dir/$doctypes/$access";
+   if (!is_dir("$STORAGE"))
+      if (!mkdir ("$STORAGE", 0777))
+      {
+	 displayPage();
+         outError("File System: Cannot create working directory $STORAGE");
+      }
+   if (!is_dir("$STORAGE/$dir"))
+      if (!mkdir("$STORAGE/$dir", 0777))
+      {
+	 displayPage();
+         outError("File System: Cannot create working directory ".
+            "$STORAGE/$dir");
+      }
+   if (!is_dir("$STORAGE/$dir/$doctypes"))
+      if (!mkdir("$STORAGE/$dir/$doctypes", 0777))
+      {
+	 displayPage();
+         outError("File System: Cannot create working directory ".
+            "$STORAGE/$dir/$doctypes");
+      }
+
+   // if this submission comes from another one ($fromdir is then set)
+   // We retrieve the previous submission directory and put it 
+   // in the proper one
+   if ($fromdir != "")
+      if (is_dir("$STORAGE/$fromdir/$doctypes/$access"))
+         rename("$STORAGE/$fromdir/$doctypes/$access",
+                "$STORAGE/$dir/$doctypes/$access");
+
+   // If the submission directory still does not exist, we create it
+   if (!is_dir("$STORAGE/$dir/$doctypes/$access"))
+      if (!mkdir("$STORAGE/$dir/$doctypes/$access", 0777))
+      {
+	 displayPage();
+         outError("File System: Cannot create working directory ".
+            "$STORAGE/$dir/$doctypes/$access");
+      }
+
+
+   // various authentication tasks...
+   if (AUTHENTICATION && $uid_email != "guest" && $uid_email != "")
+   {
+      // First save the username (email address) in the SuE file
+      // This way the uploader will be able to use it if needed
+      // (for storing the submitter's email in the database record for example
+      $fp = fopen("$STORAGE/$dir/$doctypes/$access/SuE","w+");
+      fwrite($fp,$uid_email);
+      fclose($fp);
+
+      // then we update the "journal of submission" 
+      $res = mysql_query("
+SELECT * 
+FROM   sbmSUBMISSIONS 
+WHERE  doctype='$doctypes' and 
+       action='$act' and 
+       id='$access' and 
+       email='$uid_email'");
+
+      if (mysql_num_rows($res) == 0)
+         mysql_query("
+INSERT 
+INTO   sbmSUBMISSIONS 
+values ('$uid_email','$doctypes','$act','pending','$access','',NOW(),NOW())");
+      else
+         mysql_query("
+UPDATE sbmSUBMISSIONS 
+SET    md=NOW() 
+WHERE  doctype='$doctypes' and 
+       action='$act' and 
+       id='$access' and 
+       email='$uid_email'");
+
+      // finally, we retrieve the name of the file in which the reference of 
+      // the submitted document will be stored
+      $res = mysql_query("
+SELECT value 
+FROM   sbmPARAMETERS 
+WHERE  doctype='$doctypes' and 
+       name='edsrn'");
+      $row = mysql_fetch_row($res);
+      $edsrn = $row[0];
+   }
+
+   // retrieve the original main menu url ans save it in the "mainmenu" file
+   if (isset($mainmenu))
+   {
+      $fp = fopen("$STORAGE/$dir/$doctypes/$access/mainmenu","w+");
+      fwrite($fp,$mainmenu);
+      fclose($fp);
+   }
+
+   // and if the file containing the URL to the main menu exists
+   // we retrieve it and store it in the $mainmenu variable
+   if (is_file("$STORAGE/$dir/$doctypes/$access/mainmenu"))
+   {
+      $fp = fopen("$STORAGE/$dir/$doctypes/$access/mainmenu","r");
+      $mainmenu = fread($fp,filesize("$STORAGE/$dir/$doctypes/$access/".
+         "mainmenu"));
+      fclose($fp);
+   }
+   else
+      $mainmenu = "$URLPATH/access/index.php";
+
+
+
+    //////////////////////////////////////////////////////////////////
+   // Save the form fields entered in the previous submission page //
+  //////////////////////////////////////////////////////////////////
+
+   // If the form was sent with the GET method
+   if (isset($HTTP_GET_VARS) && count($HTTP_GET_VARS) != 0)
+      $varArray = $HTTP_GET_VARS;
+   else
+      $varArray = $HTTP_POST_VARS;
+
+   // we parse all the form variables
+   reset ($varArray);
+   while ((list ($key, $val) = each ($varArray)) && $key != "stop") 
+   {
+      if (!is_array($val) && $val != "" && $val != "Select:")
+      {
+         // simple variables (text inputs, textareas...)
+         $val = stripslashes($val);
+         $val = specialchars($val);
+         $fp = fopen("$rundir/$key","w+");
+         fwrite($fp,"$val");
+         fclose($fp);
+      }
+      elseif (is_array($val))
+      {
+         // array variables (selects)
+         reset ($val);
+         $fp = fopen("$rundir/$key","w+");
+         while ($value = each ($val))
+         {
+            $value[1] = stripslashes($value[1]);
+            $value[1] = specialchars($value[1]);
+            fwrite($fp,"$value[1]\n");
+         }
+         fclose($fp);
+      }
+
+      // if the found field is the reference of the document
+      // we save this value in the "journal of submissions"
+      if (AUTHENTICATION && $uid_email != "" && $uid_email != "guest")
+         if ($key == "$edsrn")
+            mysql_query("
+UPDATE sbmSUBMISSIONS 
+SET    reference='$val' 
+WHERE  doctype='$doctypes' and 
+       id='$access' and 
+       email='$uid_email'");
+
+      // Now deal with the cookies
+      // If the fields must be saved as a cookie, we do so
+      // In this case, the value of the field will be retrieved and 
+      // displayed as the default value of the field next time the user
+      // does a submission	
+      $res = mysql_query("
+SELECT cookie 
+FROM   sbmFIELDDESC 
+WHERE  name='$key'");
+      $arr = mysql_fetch_row($res);
+      if ( $arr[0] == 1 )
+         setcookie("$key","$val",time()+31104000);
+   }
+
+   // Now we will save the files transfered by file upload
+   if (isset($HTTP_POST_FILES))
+   {
+      reset ($HTTP_POST_FILES);
+      // by parsing the array of uploaded files
+      while (list ($key, $val) = each ($HTTP_POST_FILES)) 
+      {
+         $key = ereg_replace(".*/","",$key);
+         if (is_file(${$key}))
+         {
+            if (! is_dir("$rundir/files"))
+               mkdir ("$rundir/files", 0777);
+            if (! is_dir("$rundir/files/$key"))
+               mkdir ("$rundir/files/$key", 0777);
+            $val[name] = stripslashes($val[name]);
+            $val[name] = ereg_replace(" ","_",$val[name]);
+            $fp = fopen("$rundir/$key","w+");
+            fwrite($fp,"$val[name]");
+            fclose($fp);
+            // and saving each of them in the proper place
+            copy("${$key}","$rundir/files/$key/$val[name]");
+         }
+      }
+   }
+
+   displayPage();
+
+      if ($uid_email == ""
+       || $uid_email == "guest")
+      {
+         // if the user is not logged in, display a log in form
+         printLogIn();
+         exit;
+      }
+
+<protect>
+## $Id$
+## DO NOT EDIT THIS FILE!  IT WAS AUTOMATICALLY GENERATED FROM CDSware WML SOURCES.
+
+
+
+
+   if (SUMMARYON)
+      // If the SUMMARYON variable is set, this means the summary dockable
+      // window is allowed and we have to include the file containing the
+      // dynamic html functions which deal with this window.
+      include("Navigation_Functions.php");
+   else
+      // Else, we include the same functions, but empty.
+      include("Fake_Navigation_Functions.php");
+?>
+<SCRIPT LANGUAGE="JavaScript1.1" TYPE="text/javascript">
+	document.onMouseUp = "enddrag(event)";
+	document.onmousemove = "drag(event)";
+</SCRIPT>
+<?
+   print "<br><br>";
+
+   // Get document name
+   $res = mysql_query("
+SELECT ldocname 
+FROM   sbmDOCTYPE 
+WHERE  sdocname='$doctypes'");
+   $row = mysql_fetch_row($res);
+   $docname = $row[0];
+   $docname = ereg_replace(" ","&nbsp;",$docname);
+
+   // Get action name
+   $res = mysql_query("
+SELECT lactname 
+FROM   sbmACTION 
+WHERE  sactname='$act'");
+   $row = mysql_fetch_row($res);
+   $actname = $row[0];
+   $actname = ereg_replace(" ","&nbsp;",$actname);
+	
+   // Get number of pages
+   $res = mysql_query("
+SELECT nbpg 
+FROM   sbmIMPLEMENT 
+WHERE  subname='$act$doctypes'");
+   $row = mysql_fetch_row($res);
+   $nbpages = $row[0];
+
+   // Get current page
+   if ($startPg != "")
+      $page = "$startPg";
+	
+
+    //////////////////////////////
+   // Display the table header //
+  //////////////////////////////
+   print "
+<FORM method=\"POST\" action=\"Main.php\" onSubmit=\"setSummary();return tester();\">
+<center>
+<TABLE cellspacing=0 cellpadding=0 border=0>
+<TR>
+	<TD class=headerselected><B>$docname&nbsp;</B></TD>
+	<TD class=headerselected><small>&nbsp;$actname&nbsp;</small></TD>
+	<TD valign=bottom>
+		<TABLE cellspacing=0 cellpadding=0 border=0>
+		<TR>
+			<TD class=headerselected>
+				<IMG SRC=\"".$IMAGES."/right-part-topless-trans.gif\" border=0 align=top alt=\"onglet\"></TD>";
+
+
+   for ($i=1;$i<=$nbpages;$i++)
+   {
+      if ($i == $page && $i == 1)
+         $leftimage = "<TD class=header><IMG SRC=\"".$IMAGES."/left-part-topless-".
+            "trans.gif\" border=0 align=middle alt=\"onglet\"></TD>";
+      elseif ($i == $page)
+         $leftimage = "<TD class=header><IMG SRC=\"".$IMAGES."/left-part-trans.".
+            "gif\" border=0 align=middle alt=\"onglet\"></TD>";
+      elseif ($i == 1)
+         $leftimage = "<TD><IMG SRC=\"".$IMAGES."/left-part-topless-trans.gif\" ".
+            "border=0 align=middle alt=\"onglet\"></TD>";
+      else
+         $leftimage = "";
+
+      if ($i == $page && $i == $nbpages)
+         $rightimage = "<TD class=header><IMG SRC=\"".$IMAGES."/last-right-part-".
+            "trans.gif\" border=0 align=middle alt=\"onglet\"></TD>";
+      elseif ($i == $page)
+         $rightimage = "<TD class=header><IMG SRC=\"".$IMAGES."/right-part-trans.".
+            "gif\" border=0 align=middle alt=\"onglet\"></TD>";
+      elseif ($i == $nbpages)
+         $rightimage = "<TD><IMG SRC=\"".$IMAGES."/last-right-part-trans.gif\" ".
+            "border=0 align=middle alt=\"onglet\"></TD>";
+      elseif ($i != $page-1)
+         $rightimage = "<TD><IMG SRC=\"".$IMAGES."/right-part-trans.gif\" border=0".
+            " align=middle alt=\"onglet\"></TD>";
+      else
+         $rightimage = "";
+
+      if ($i == $page)
+         print "$leftimage<TD class=header><TABLE cellspacing=0 cellpadding=0".
+            " border=0><TR><TD bgcolor=black><IMG SRC=\"".$IMAGES."/line.gif\" ".
+            "border=0 align=top alt=\"onglet\"></TD></TR><TR><TD><IMG ".
+            "SRC=\"".$IMAGES."/line-up-trans.gif\" border=0 align=top ".
+            "alt=\"onglet\"><small>page:$page</small></TD></TR></TABLE></TD>".
+            "$rightimage";
+      else
+         print "$leftimage<TD><TABLE cellspacing=0 cellpadding=0 border=0>".
+            "<TR><TD bgcolor=black width=\"20\"><IMG SRC=\"".$IMAGES."/line.gif\" ".
+            "border=0 align=top alt=\"onglet\"></TD></TR><TR align=center>".
+            "<TD><small> <A HREF='' onClick=\"if (tester2() == 1){".
+            "document.forms[1].page.value=$i;setSummary();".
+            "document.forms[1].submit();return false;} ".
+            "else { return false; }\">$i</A> </small><IMG ".
+            "SRC=\"".$IMAGES."/line-up-trans.gif\" border=0 align=top ".
+            "alt=\"onglet\"></TD></TR></TABLE></TD>$rightimage";
+   }
+
+   print "</TR></TABLE>";
+   print "</TD>\n";
+	
+
+   if (SUMMARYON)
+      print "<TD align=right valign=bottom><TABLE cellspacing=0 cellpadding=0".
+         " border=0><TR><TD class=headerselected ><IMG SRC=\"".$IMAGES."/".
+         "left-part-topless-trans.gif\" border=0 align=top alt=\"onglet\">".
+         "</TD></TR></TABLE></TD><TD class=headerselected align=right>".
+         "<A HREF='' onClick=\"popUp('Summary',true,event);".
+         "document.forms[1].summary.value = 'show';return false;\">".
+         "<font color=white><small>SUMMARY(2)</small>&nbsp;</font>".
+         "<IMG SRC=\"".$IMAGES."/down-trans.gif\" border=0 align=bottom ".
+         "alt=\"down\"></A>&nbsp;</TD>\n";
+
+   print "</TR>";
+	
+
+
+    ///////////////////////////
+   // Display the main cell //
+  ///////////////////////////
+
+   print "<TR><TD colspan=5 class=headerselected><TABLE border=0 ".
+      "cellspacing=0 cellpadding=15 width=\"100%\" class=header><TR><TD><BR>";
+
+   // For each field to be displayed on the page
+   $res = mysql_query("
+SELECT * 
+FROM   sbmFIELD 
+WHERE  subname='$act$doctypes' and 
+       pagenb=$page 
+ORDER BY fieldnb,
+         fieldnb");
+   $nbFields = 0;
+   while ($arr = mysql_fetch_row($res))
+   {
+      // We retrieve its HTML description
+      $res3 = mysql_query("
+SELECT * 
+FROM   sbmFIELDDESC 
+WHERE  name='$arr[3]'");
+      $arr3 = mysql_fetch_array($res3);
+
+      // If the field is a non-form field
+      if ($arr3['type'] == 'D' 
+         && !eregi("select",$arr3['fidesc']) 
+         && !eregi("input",$arr3['fidesc']) )
+      {
+          // we just display the texts
+          print "$arr[4]";
+          print "$arr3[fidesc]";
+      }
+      // else the work is easier, everything is collected from the database
+      else
+      {
+         $field[$nbFields] = $arr[3];
+         $level[$nbFields] = $arr[5];
+         $fullDesc[$nbFields] = $arr[4];
+         $txt[$nbFields] = $arr[6];
+         $check[$nbFields] = $arr[7];
+
+         // we also retrieve and add the javascript code of the checking
+         // function, if needed
+         if ($check[$nbFields] != '')
+         {
+            $res2 = mysql_query("
+SELECT chdesc 
+FROM   sbmCHECKS 
+WHERE  chname='$arr[7]'");
+            print "<SCRIPT LANGUAGE=\"JavaScript1.1\"  ".
+               "TYPE=\"text/javascript\">\n";
+            $arr2 = mysql_fetch_row($res2);
+            print "$arr2[0]";
+            print "</SCRIPT>\n";
+         }
+
+         // Then if the field is a textarea
+         if ($arr3['type'] == 'T')
+            $text="<TEXTAREA name=\"$arr[3]\" rows=$arr3[rows] ".
+               "cols=$arr3[cols]>$arr3[val]</TEXTAREA>";
+
+         // If the field is a file upload
+         elseif ($arr3['type'] == 'F')
+            $text="<INPUT TYPE=file name=\"$arr[3]\" size=$arr3[size] ".
+               "maxlength=$arr3[maxlength]>";
+
+         // If the field is a text input
+         elseif ($arr3['type'] == 'I')
+            $text="<INPUT name=\"$arr[3]\" size=$arr3[size] ".
+               "value=\"$arr3[val]\">";
+
+         // If the field is a hidden input
+         elseif ($arr3['type'] == 'H')
+            $text="<INPUT type=\"hidden\" name=\"$arr[3]\" ".
+               "value=\"$arr3[val]\">";
+
+         // If the field is user-defined
+         elseif ($arr3['type'] == 'D')
+            $text="$arr3[fidesc]";
+
+         //If the field is a select box
+         elseif ($arr3['type'] == 'S')
+            $text="$arr3[fidesc]";
+
+         //If the field is an evaluated script
+         elseif ($arr3['type'] == 'R')
+            $text="$arr3[fidesc]";
+
+         // If the field type is not recognized
+         else
+            $text="$arr[1]: unknown field type";
+
+
+         print "$fullDesc[$nbFields]\n";
+
+         if ($arr3['type'] != 'D')
+         {
+            // If the field is not user-defined, we try to determine its type
+            // (select, radio, file upload...)
+            $select[$nbFields]=0;
+            $radio[$nbFields]=0;
+            $upload[$nbFields]=0;
+
+            // check whether it is a select field or not
+            if (eregi("SELECT",$text))
+               $select[$nbFields]++;
+	
+            // checks whether it is a radio field or not
+            if (eregi("TYPE=radio",$text))
+               $radio[$nbFields]++;
+
+            // checks whether it is a file upload or not
+            if (eregi("TYPE=file",$text))
+               $upload[$nbFields]++;
+
+            // if the field description contains the "<COMBO>" string, replace
+            // it by the category selected on the document page submission page
+            $tmp = "combo$doctypes";
+            if (${$tmp} != "")
+               $combo = ${$tmp};
+            else
+               $combo="";
+            $text = ereg_replace("<COMBO>",$combo,$text);
+
+            // if there is a <YYYY> tag in it, replace it by the current year
+            $year = strftime("%Y");
+            $text = str_replace("<YYYY>",$year,$text);
+	
+            $nbFields++;
+         }
+         else
+         // case of a user-defined field which contains multiple form fields
+         {
+            $formfields = explode(">",$text);
+            while(list($key,$formfield) = each($formfields))
+            {
+               if (eregi("name=([^ <>]+)",$formfield,$names))
+               {
+                  next($names);
+                  while(list($key,$value) = each($names))
+                  {
+                     if ($value != "")
+                     {
+                        $value = ereg_replace("[\"']+","",$value);
+                        $select[$nbFields]=0;
+                        $radio[$nbFields]=0;
+                        $upload[$nbFields]=0;
+                        $field[$nbFields] = $value;
+                        $level[$nbFields] = $arr[5];
+                        $txt[$nbFields] = $arr[6];
+                        $nbFields = $nbFields+1;
+                     }
+                  }
+               }
+            }    
+         }
+
+	 if ($arr3['type'] != 'R')
+            print "$text";
+         else
+            eval("$text");
+      }
+   }
+
+   // those fields are necessary for the navigation
+   print "<INPUT type=\"hidden\" name=\"stop\" value=\"now\">\n";
+   print "<INPUT type=\"hidden\" name=\"file\" value=\"$file\">\n";
+   print "<INPUT type=\"hidden\" name=\"nextPg\" value=\"$nextPg\">\n";
+   print "<INPUT type=\"hidden\" name=\"access\" value=\"$access\">\n";
+   print "<INPUT type=\"hidden\" name=\"page\" value=\"$page\">\n";
+   print "<INPUT type=\"hidden\" name=\"nbPg\" value=\"$nbPg\">\n";
+   print "<INPUT type=\"hidden\" name=\"doctypes\" value=\"$doctypes\">\n";
+   print "<INPUT type=\"hidden\" name=\"doctype\" value=\"$doctypes\">\n";
+   print "<INPUT type=\"hidden\" name=\"act\" value=\"$act\">\n";
+   print "<INPUT type=\"hidden\" name=\"dir\" value=\"$dir\">\n";
+   print "<INPUT type=\"hidden\" name=\"summary\" value=\"$summary\">\n";
+   print "<INPUT type=\"hidden\" name=\"summaryX\">\n";
+   print "<INPUT type=\"hidden\" name=\"summaryY\">\n";
+   print "<INPUT type=\"hidden\" name=\"mode\" value=\"U\">\n";
+   print "<INPUT type=\"hidden\" name=\"step\" value=\"1\">\n";
+   print "<SCRIPT LANGUAGE=\"JavaScript1.1\" TYPE=\"text/javascript\">\n";
+
+   // if there is a file upload field, we change the encoding type
+   for ($i=0;$i<$nbFields;$i++)
+      if ($upload[$i])
+         print "document.forms[1].encoding = \"multipart/form-data\";\n";
+
+   // we don't want the form to be submitted if the user enters 'Return'
+   print "function tester(){\n";
+   print "    if (document.forms[1].file.value == ''){return false;}\n}\n";
+
+   // tests if mandatory fields are well filled
+   print "function tester2(){\n";
+   for ($i=0;$i<$nbFields;$i++)
+   {
+      print "
+	if (document.forms[1].elements[0].name==\"SESSIONID\")
+		var element = $i+1;
+	else
+		var element = $i;\n";
+
+      // If the field must be checked we call the checking function 
+      if ($check[$i] != '')
+      {
+         print "    if ($check[$i](document.forms[1].elements[element].value)".
+            " == 0){\n";
+         print "         document.forms[1].$field[$i].focus();\n";
+         print "         return 0;\n";
+         print "    }\n";
+      }	 
+
+      // If the field is mandatory, we check a value has been selected
+      if ($level[$i] == 'M')
+      {
+         if ($select[$i] != 0)
+         {
+            // If the field is a select box
+            print "     if ((document.forms[1].elements[element].".
+               "selectedIndex == -1)||(document.forms[1].elements[element].".
+               "selectedIndex == 0)){\n";
+            print "         alert(\"The field `$txt[$i]` is Mandatory.\\n ".
+               "Please make a choice in the 'Select:' box\");\n";
+            print "         return 0;\n";
+            print "    }\n";
+            print "    else \n";
+         }
+         else if ($radio[$i] != 0)
+         {
+            // If the field is a radio button set
+            print "var check=0;\n";
+            print "for (var j=0;j<document.forms[1].elements[element].length;".
+               "j++){\n";
+            print "    if (document.forms[1].elements[element]\[j].checked)".
+               "{check++;}\n";
+            print "}\n";
+            print "    if (check == 0){\n";
+            print "         alert(\"Please press a button.\");\n";
+            print "         return 0;\n";
+            print "    }\n";
+            print "    else \n";
+         }
+         else
+         {
+            // If the field is a text input
+            print "    if (document.forms[1].elements[element].value == '')".
+               "{\n";
+            print "         alert(\"The field `$txt[$i]` is Mandatory. Please".
+               " fill it in.\");\n";
+            print "         return 0;\n";
+            print "    }\n";
+            print "    else \n";
+         }
+      }
+   }
+   print "\n{return 1;}\n";
+   print "}\n";
+   print "</SCRIPT><BR>&nbsp;<BR>&nbsp;</TD></TR></TABLE></TD></TR>\n";
+
+
+
+    /////////////////////////////////
+   // Display the navigation cell //
+  /////////////////////////////////
+
+   // Display "previous page" navigation arrows
+   print "<TR><TD colspan=5><TABLE border=0 cellpadding=0 cellspacing=0 ".
+      "width=\"100%\"><TR>\n";
+   if ($page != 1)
+   {
+      print "		<TD class=headerselected align=left>&nbsp;\n";
+      print "			<A HREF='' onClick=\"if (tester2() == 1)".
+         "{document.forms[1].page.value=" . ($page - 1) . ";setSummary();".
+         "document.forms[1].submit();return false;} else { return false; }\">";
+      print "			<IMG SRC=\"".$IMAGES."/left-trans.gif\" ".
+         "alt=\"previous page\" border=0>\n";
+      print "			<strong><font color=white>previous page</A>".
+         "</font></strong></TD>\n";
+   }
+   else
+      print " <TD class=headerselected>&nbsp;</TD>\n";
+
+   // Display the submission number
+   print " <TD class=headerselected align=center><small>Submission no(1): ".
+      "$access</small></TD>\n";
+
+   // Display the "next page" navigation arrow
+   if ($page != $nbpages)
+   {
+      print "		<TD class=headerselected align=right>\n";
+      print "			<A HREF='' onClick=\"if (tester2()){".
+         "document.forms[1].page.value=" . ($page + 1) . ";setSummary();".
+         "document.forms[1].submit();return false;} else {return false;}; ".
+         "return false;\">\n";
+      print "			<strong><font color=white> next page</font>".
+         "</strong>\n";
+      print "			<IMG SRC=\"".$IMAGES."/right-trans.gif\" ".
+         "alt=\"next page\" border=0></A>&nbsp;";
+   }
+   else
+      print " <TD class=headerselected>&nbsp;</TD>\n";
+
+   print "</TR></TABLE></TD></TR></TABLE></center></FORM>";
+
+
+
+    //////////////////////////////////////////////////////
+   // Fill the fields with the previously saved values //
+  //////////////////////////////////////////////////////
+
+   print "<SCRIPT LANGUAGE=\"JavaScript1.1\" TYPE=\"text/javascript\">\n";
+   print "<!-- Fill the fields in with the previous saved values-->\n";
+
+   // For each field
+   for ($i=0;$i<$nbFields;$i++) 
+   {
+      $text = '';
+      print "	if (document.forms[1].elements[0].name==\"SESSIONID\")\n";
+      print "		var element = $i+1;\n";
+      print "	else\n";
+      print "		var element = $i;\n";
+
+      // If a file exists we extract the saved value
+      if (file_exists("$rundir/$field[$i]"))
+      {
+         $file = fopen("$rundir/$field[$i]","r");
+         $text = fread($file,filesize ("$rundir/$field[$i]"));
+         $text = ereg_replace("[\n\r ]*$","",$text);
+         $text = ereg_replace("\n","\\n",$text);
+         $text = ereg_replace("\r","",$text);	
+         fclose($file);
+      }
+      // Or if a cookie is set
+      // If a cookie is found corresponding to the name of the current
+      // field, we set the value of the field to the cookie's value
+      elseif(isset($HTTP_COOKIE_VARS["$field[$i]"]))
+      {
+         ${$field[$i]} = str_replace("\r","",${$field[$i]});
+         ${$field[$i]} = str_replace("\n","\\n",${$field[$i]});
+         $text = "${$field[$i]}";
+      }
+
+      // If the value isn't empty
+      if ($text != '')
+      {
+         if ($select[$i] != 0)
+         {
+            // if the field is a SELECT element
+            $items = explode("\\n",$text);
+            reset ($items);
+            while ($val = each($items))
+            {
+               print "\n<!--SELECT field found-->\n";
+               print "for (var j=0;".
+                  "j<document.forms[1].elements[element].length;j++){\n";
+               print "    if ((document.forms[1].elements[element].".
+                  "options[j].value == \"$val[1]\") || (document.forms[1].".
+                  "elements[element].options[j].text == \"$val[1]\")){\n";
+               print "        document.forms[1].elements[element].".
+                  "options[j].selected = true;}}\n";
+            }
+         }
+         elseif ($radio[$i] != 0)
+         {
+            // if the field is a RADIO element
+            print "\n<!--RADIO field found-->\n";
+            print "if (document.forms[1].elements[element].value".
+               " == \"$text\"){\n";
+            print "	document.forms[1].elements[element].checked=true;}\n";
+         }
+         elseif ($upload[$i] == 0)
+         {
+            // if the field is not an upload element
+            print "\n<!--INPUT field found-->\n";
+            $text = str_replace('"','\"',$text);
+            print "document.forms[1].elements[element].value=\"$text\";\n";
+         }
+      }
+   }
+   print "<!--End Fill in section-->\n";
+
+
+
+
+       //////////////////////////////////////////////////////////////////
+      // JS function finish                                           //
+     // This function tests each mandatory field and checks whether  // 
+    // the field has been correctly filled in or not                //
+   // This function is called when the user presses the "End       //
+  // Submission" button                                           //
+ //////////////////////////////////////////////////////////////////
+
+   print "\n\nfunction finish() {\n";
+   $res = mysql_query("
+SELECT * 
+FROM   sbmFIELD 
+WHERE  subname='$act$doctypes' and 
+       pagenb!=$page");
+   $nbFields=0;
+   $message = "";
+   while ($arr = mysql_fetch_row($res)) 
+   {
+      $res2 = mysql_query("
+SELECT * 
+FROM   sbmFIELDDESC 
+WHERE  name='".$arr[3]."'");
+      $row2 = mysql_fetch_array($res2);
+      if ($row2[type] == "D")
+      {
+         $formfields = explode(">",$row2[fidesc]);
+         while(list($key,$formfield) = each($formfields))
+         {
+            if (eregi("name=([^ <>]+)",$formfield,$names))
+            {
+               next($names);
+               while(list($key,$value) = each($names))
+               {
+                  if ($value != "")
+                  {
+                     $value = ereg_replace("[\"']+","",$value);
+                     $noPage[$nbFields]=$arr[1];
+                     $field[$nbFields]=$value;
+                     $level[$nbFields]=$arr[5];
+                     $txt[$nbFields]=$arr[6];
+                     $check[$nbFields++]=$arr[7];
+                  }
+               }
+            }
+         }
+      }
+      else
+      {
+         $noPage[$nbFields]=$arr[1];
+         $field[$nbFields]=$arr[3];
+         $level[$nbFields]=$arr[5];
+         $txt[$nbFields]=$arr[6];
+         $check[$nbFields++]=$arr[7];
+      }
+   }
+
+
+   // tests each mandatory field
+   for ($i=$nbFields-1;$i>-1;$i--)
+   {
+      if ($level[$i] == 'M')
+      {
+         $res = 1;
+         if (!is_file("$rundir/$field[$i]"))
+            $res=0;
+         else 
+         {
+            $file = fopen("$rundir/$field[$i]","r");
+            $text = fread($file,filesize ("$rundir/$field[$i]"));
+            if ($text == '')
+               $res=0;
+            else
+               if ($text == "Select:")
+                  $res=0;
+	 }
+	 if ($res==0)
+         {
+            $message = "	alert (\"The field '$txt[$i]' is mandatory.".
+               "\\nGoing back to page $noPage[$i]\");\n";
+            $message .= "	document.forms[1].page.value=".
+               "\"$noPage[$i]\";\n";
+            $message .= "	document.forms[1].submit();\n";
+         }
+      }
+   }
+
+   if ($message != "")
+      print $message;
+   else
+   {
+      print "if (tester2()){\n";
+      print "		document.forms[1].action=\"MESS/pro.php\";\n";
+      print "		document.forms[1].submit();\n";
+      print "		} \n";
+      print "		else \n";
+      print "		{ \n";
+      print "		return false;\n";
+      print "		}\n";
+   }
+   print "}\n";
+?>
+</SCRIPT>
+<BR>
+<BR>
+
+
+<?
+   // Display the "back to main menu" button
+   print "<A HREF=\"$mainmenu\" onClick=\"return confirm('Are you sure you ".
+      "want to quit this submission?')\">\n";
+   print "<IMG SRC=\"".$IMAGES."/mainmenu.gif\" border=0 ALT=\"back to main ".
+      "menu\" align=right></A><BR><BR>\n";
+?>
+
+<HR>
+	<small>(1) you should take note of this number at the beginning of the submission, it will allow you to get your information back in case your browser crashes before the end of the submission.</small><BR>
+
+<?
+   // Add the summary window definition if needed
+   if (SUMMARYON)
+   {
+      print "	<small>(2) mandatory fields appear in red in the 'Summary'".
+         " window.</small><BR>\n";
+      include("Print_Summary.php");
+   }
+
+   // This function is used to display a login form if the user has not logged
+   // in yet
+   function printLogIn()
+   {
+	outWarning("Please log in using the left menu");
+	print"</td></tr></table>";
+   }
+
+</protect>
+?>
+		

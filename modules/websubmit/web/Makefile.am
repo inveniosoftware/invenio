@@ -17,13 +17,19 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-docdir = $(WEBDIR)/submit
+SUBDIRS = admin access personal publiline
 
-doc_DATA=index.en.html index.fr.html index.de.html index.es.html index.pt.html index.it.html index.ru.html index.sk.html index.cz.html
+docdir = $(WEBDIR)/submit
+doc_DATA=index.en.html index.fr.html index.de.html index.es.html index.pt.html index.it.html index.ru.html index.sk.html index.cz.html \
+         Access.php Main.php approve.php direct.php index.php pro.php submit.php
 
 EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
+
+%.php: %.php.wml ../../../config/config.wml ../../../config/configbis.wml \
+           ../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
 
 %.en.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
            ../../../config/messages.wml
