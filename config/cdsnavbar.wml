@@ -267,7 +267,7 @@
   <navbar:button id=FORMAT_display txt="Formats" url="<HTDOCSURL>admin/bibformat/FORMAT_display.shtml" hint="BibFormat Admin - Formats">
   <navbar:button id=KB_display txt="KBs" url="<HTDOCSURL>admin/bibformat/KB_display.shtml" hint="BibFormat Admin - Knowledge Bases">
   <navbar:button id=test txt="Execution Test" url="<HTDOCSURL>admin/bibformat/test.shtml" hint="BibFormat Admin - Execution Test">
-  <navbar:button id=REFLEX_display txt="Reformat Records" url="<HTDOCSURL>admin/bibformat/REFLEX_display.shtml" hint="BibFormat Admin - Reformat Records">
+  <navbar:button id=BIBREFORMAT_display txt="Reformat Records" url="<HTDOCSURL>admin/bibformat/BIBREFORMAT_display.shtml" hint="BibFormat Admin - Reformat Records">
   <navbar:button id=USER_display txt="BibFormat Admins" url="<HTDOCSURL>admin/bibformat/USER_display.shtml" hint="BibFormat Admin - BibFormat Administrators Management">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
