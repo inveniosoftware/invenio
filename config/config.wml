@@ -51,15 +51,15 @@ Atlantis Institute of Science
 </define-tag>
 
 ## RUNTIMELOGDIR -- the dir of the CDS and OAI runtime log files:
-##  (example: "/log/cdsdev/mpgruntimelogs")
+##  (example: "/log/cdsweb/cdsdemoruntimelogs")
 <define-tag RUNTIMELOGDIR whitespace=delete>
-/log/cdsdev/cdsdemoruntimelogs
+/log/cdsweb/cdsdemoruntimelogs
 </define-tag>
 
 ## ALERTENGINEEMAIL -- the email address from which the alert emails will appear to be send:
-##  (example: "cds.alert@cdsdev.cern.ch")
+##  (example: "cds.alert@cdsweb.cern.ch")
 <define-tag ALERTENGINEEMAIL whitespace=delete>
-cds.alert@cdsdev.cern.ch
+cds.alert@cdsweb.cern.ch
 </define-tag>
 
 ## SUPPORTEMAIL -- the email address of the support team for this installation:
