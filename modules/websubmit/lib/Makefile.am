@@ -21,7 +21,7 @@ SUBDIRS = functions
 
 FILESWML=$(wildcard *.wml)
 pylibdir=$(libdir)/python/cdsware
-pylib_DATA=__init__.py websubmit_config.py specialchars.py 
+pylib_DATA=websubmit_config.py specialchars.py 
 
 EXTRA_DIST = $(wildcard *.wml)
 
