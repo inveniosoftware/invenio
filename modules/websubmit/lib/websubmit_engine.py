@@ -45,7 +45,6 @@ from cdsware.config import *
 from cdsware.dbquery import run_sql
 from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import acc_isRole
-from cdsware.specialchars import *
 from cdsware.webpage import page, create_error_box
 from cdsware.webuser import getUid, get_email
 from cdsware.messages import *
@@ -1286,4 +1285,19 @@ def setCookie(name,value,uid):
     else:
         run_sql("insert into sbmCOOKIES(name,value,uid) values('%s','%s',%s)" % (name,value,uid))
     return 1
+    
+def specialchars(text):
+    text = string.replace(text,"&#147;","\042");
+    text = string.replace(text,"&#148;","\042");
+    text = string.replace(text,"&#146;","\047");
+    text = string.replace(text,"&#151;","\055");
+    text = string.replace(text,"\221","\047"); #single-quote left
+    text = string.replace(text,"\222","\047"); #apostrophe
+    text = string.replace(text,"\223","\042"); #double quote left
+    text = string.replace(text,"\224","\042"); #double quote right
+    text = string.replace(text,"\226","\055"); #long dash
+    text = string.replace(text,"\205","\056\056\056"); #ellipse
+    text = string.replace(text,"&#133;","\056\056\056");
+    return text
+
 </protect>

@@ -25,7 +25,7 @@ pylib_DATA=websubmit_config.py specialchars.py websubmit_engine.py
 
 EXTRA_DIST = $(wildcard *.wml)
 
-CLEANFILES = $(wildcard *.php) *~ *.tmp *.php
+CLEANFILES = $(wildcard *.php) *~ *.tmp *.php *.py
 
 %.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml
 	$(WML) -o $@ $<
