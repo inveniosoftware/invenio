@@ -53,6 +53,8 @@ def get_collid(c):
 def index(req, c=cdsname, as="0"):
     "Display search interface page for collection c by looking in the collection cache."
     as = int(as)
+    if type(c) is list:
+        c = c[0]
     req.content_type = "text/html"
     req.send_http_header()
     collid = get_collid(c)
@@ -61,7 +63,7 @@ def index(req, c=cdsname, as="0"):
         body = fp.read()
         fp.close()
     except:
-        body = """<p>Sorry, collection %s does not seem to exist.
-                  <p>Go to <a href="%s">%s</a> instead.""" % (c, weburl, cdsname)
+        body = """<p>Sorry, collection <strong>%s</strong> does not seem to exist.
+                  <p>Start browsing from <a href="%s">%s</a>.""" % (c, weburl, cdsname)
     req.write(body)
     return "\n"
