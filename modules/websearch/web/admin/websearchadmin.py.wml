@@ -47,7 +47,7 @@ def switchfmtscore(req, colID, type, id_1, id_2, ln=cdslang):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_switchfmtscore(colID=colID,
                                                 ln=ln,
@@ -70,7 +70,7 @@ def switchfldscore(req, colID, id_1, id_2, fmeth, ln=cdslang):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_switchfldscore(colID=colID,
                                                 ln=ln,
@@ -93,7 +93,7 @@ def switchfldvaluescore(req, colID, id_1, id_fldvalue_1, id_fldvalue_2, ln=cdsla
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_switchfldvaluescore(colID=colID,
                                                 ln=ln,
@@ -116,7 +116,7 @@ def switchpbxscore(req, colID, id_1, id_2, sel_ln,ln=cdslang):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_switchpbxscore(colID=colID,
                                                 ln=ln,
@@ -139,7 +139,7 @@ def modifydbquery(req, colID, ln=cdslang, dbquery='', confirm=-1):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_modifydbquery(colID=colID,
                                                ln=ln,
@@ -161,7 +161,7 @@ def modifyrestricted(req, colID, ln=cdslang, rest='', confirm=-1):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_modifyrestricted(colID=colID,
                                               ln=ln,
@@ -183,7 +183,7 @@ def modifytranslations(req, colID, ln=cdslang, sel_type='', trans = [], confirm=
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_modifytranslations(colID=colID,
                                              ln=ln,
@@ -206,7 +206,7 @@ def addcollectiontotree(req, colID, ln=cdslang, add_dad='', add_son='', rtype=''
     except MySQLdb.Error, e:
         return error_page(req)
   
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection Tree",
                 body=wsc.perform_addcollectiontotree(colID=colID,
                                                ln=cdslang,
@@ -231,7 +231,7 @@ def addcollection(req, colID, ln=cdslang, colNAME='', dbquery='', rest='', callb
     except MySQLdb.Error, e:
         return error_page(req)
     
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection Tree",
                 body=wsc.perform_addcollection(colID=colID,
                                                ln=cdslang,
@@ -256,7 +256,7 @@ def modifyrankmethods(req, colID, ln=cdslang, func='', rnkID='', confirm=0):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_modifyrankmethods(colID=colID,
                                                  ln=ln,
@@ -279,7 +279,7 @@ def deletecollection(req, colID, ln=cdslang, confirm=-1):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_deletecollection(colID=colID,
                                                  ln=ln,
@@ -300,7 +300,7 @@ def editcollection(req, colID=1, ln=cdslang, mtype=''):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_editcollection(colID=colID,
                                                 ln=ln,
@@ -322,7 +322,7 @@ def addoutputformat(req, colID, ln=cdslang, code='', name='', callback='yes', co
         return error_page(req)
    
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_addoutputformat(colID=colID,
                                                  ln=ln,
@@ -346,7 +346,7 @@ def showoutputformats(req, colID, ln=cdslang, callback='yes', confirm=0):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_showoutputformats(colID=colID,
                                                  ln=ln,
@@ -368,7 +368,7 @@ def addexistingoutputformat(req, colID, ln=cdslang, fmtID=-1, callback='yes', co
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_addexistingoutputformat(colID=colID,
                                                          ln=ln,
@@ -391,7 +391,7 @@ def deleteoutputformat(req, colID, ln=cdslang, fmtID=-1, callback='yes', confirm
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_deleteoutputformat(colID=colID,
                                                  ln=ln,
@@ -414,7 +414,7 @@ def removeoutputformat(req, colID, ln=cdslang, fmtID='', callback='yes', confirm
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_removeoutputformat(colID=colID,
                                                     ln=ln,
@@ -437,7 +437,7 @@ def removefield(req, colID, ln=cdslang, fldID='', fldvID='', fmeth='', callback=
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_removefield(colID=colID,
                                              ln=ln,
@@ -462,7 +462,7 @@ def modifyoutputformat(req, colID, ln=cdslang, fmtID=-1, sel_type='', trans=[], 
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_modifyoutputformat(colID=colID,
                                                     ln=ln,
@@ -486,7 +486,7 @@ def showsearchoptions(req, colID, ln=cdslang, callback='yes', confirm=0):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_showsearchoptions(colID=colID,
                                                    ln=ln,
@@ -508,7 +508,7 @@ def addexistingfield(req, colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', call
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_addexistingfield(colID=colID,
                                                   ln=ln,
@@ -539,7 +539,7 @@ def showsearchfields(req, colID, ln=cdslang, callback='yes', confirm=0):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_showsearchfields(colID=colID,
                                                   ln=ln,
@@ -561,7 +561,7 @@ def showsortoptions(req, colID, ln=cdslang, callback='yes', confirm=0):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_showsortoptions(colID=colID,
                                                  ln=ln,
@@ -583,7 +583,7 @@ def modifyportalbox(req, colID, ln=cdslang, pbxID=-1, score='', position='', sel
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_modifyportalbox(colID=colID,
                                                  ln=ln,
@@ -611,7 +611,7 @@ def removeportalbox(req, colID, ln=cdslang, pbxID='', sel_ln='', callback='yes',
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_removeportalbox(colID=colID,
                                                  ln=ln,
@@ -635,7 +635,7 @@ def addexistingportalbox(req, colID, ln=cdslang, pbxID=-1, score=0, position='',
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_addexistingportalbox(colID=colID,
                                                       ln=ln,
@@ -668,7 +668,7 @@ def deleteportalbox(req, colID, ln=cdslang, pbxID=-1, callback='yes', confirm=-1
         return error_page(req)
 
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_deleteportalbox(colID=colID,
                                                  ln=ln,
@@ -693,7 +693,7 @@ def showportalboxes(req, colID, ln=cdslang, callback='yes', confirm=0):
         return error_page(req)
 
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_showportalboxes(colID=colID,
                                                  ln=ln,
@@ -715,7 +715,7 @@ def addportalbox(req, colID, ln=cdslang, title='', body='', callback='yes', conf
     except MySQLdb.Error, e:
         return error_page(req)
    
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection",
                 body=wsc.perform_addportalbox(colID=colID,
                                               ln=ln,
@@ -739,7 +739,7 @@ def modifycollectiontree(req, colID, ln=cdslang, move_up='', move_down='', move_
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection Tree",
                 body=wsc.perform_modifycollectiontree(colID=colID,
                                        ln=ln,
@@ -767,7 +767,7 @@ def index(req, colID=1, ln=cdslang, mtype='', content='', confirm=0):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not wsc.check_user(uid):
+    if not wsc.check_user(uid, 'cfgwebsearch'):
         return page(title="Edit Collection Tree",
                 body=wsc.perform_index(colID=colID,
                                        ln=ln,
