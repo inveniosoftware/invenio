@@ -208,16 +208,23 @@ def givePassword(email):
 def create_user_infobox(uid):
     """Create info box on currenly logged user.""" 
     out = ""
-    out += """<table align="right" class="userinfobox">
-               <tr>
-                <td>
-                 <strong>user:</strong> %s
-                 ::
-                 <a class="userinfobox" href="%s/youraccount.py/login">login</a>
-                 ::
-                 <a class="userinfobox" href="%s/youraccount.py/logout">logout</a>
-                </td>
-               </tr> 
+    out += """<table class="userinfobox" align="right">
+               <thead>
+                <tr>
+                  <td class="userinfoboxheader">
+                    <strong>user:</strong> %s
+                  </td>
+                 </tr> 
+               </thead>
+               <tbody>
+                <tr>
+                 <td class="userinfoboxbody">
+                  <a class="userinfo" href="%s/youraccount.py/login">login</a>
+                  ::
+                  <a class="userinfo" href="%s/youraccount.py/logout">logout</a>
+                 </td>
+                </tr>
+               </tbody> 
               </table>""" % (getDataUid(None, uid)[0], weburl, weburl)
     return out
 
