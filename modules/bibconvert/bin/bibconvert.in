@@ -437,13 +437,14 @@ def parse_input_data_fx(source_tpl):
     field_data_1_in_list = []
     out     = [['',[]]]
 
-    while (count <1):
+    while (count <10):
         line = sys.stdin.readline()
         if (line == ""):
-            if (record == ""):
+            count = count + 1
+        if (record == ""):
                 return (-1)
         if (re.sub("\s","",line) == separator):
-            count = count + 1
+            count = count + 10
         else:
             record = record + line
 
@@ -1361,6 +1362,7 @@ def create_record(begin_record_header, ending_record_footer, query_string, match
     
     return out_to_print
 
+    
 ### MAIN ###
 
 conv_setting         = set_conv()
