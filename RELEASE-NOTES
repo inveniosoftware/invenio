@@ -145,10 +145,10 @@ To upgrade from CDSware v0.3.3, please follow about these steps:
 
      By doing this your table definitions should be fully up to date.
 
-   - Run make install and restart your Apache server.  Restart
-     bibsched in the auto mode.  If you activated some ranking
-     methods, you have to tell bibsched to execute bibrank daemon
-     periodically, for example:
+   - Run make install and webcoll and then restart your Apache server.
+     After that restart bibsched in the auto mode.  If you activated
+     some ranking methods, then you have also tell bibsched to execute
+     bibrank daemon periodically, for example:
 
         $ bibrank -s1h
 
