@@ -786,7 +786,7 @@ def get_sets():
     out = []
     row = ['','']
 
-    query = "SELECT setSpec,setName,setDescription FROM oaiset"
+    query = "SELECT setSpec,setName,setDescription FROM oaiSET"
     res = run_sql(query)
     for row in res:
         row_bis = [row[0],row[1],row[2]]
