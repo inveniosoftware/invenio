@@ -1927,4 +1927,19 @@
   <se>begränsad</se>
 </define-tag>
 
+# FIXME
+<define-tag MSG_RECORD_LAST_MODIFIED whitespace=delete>
+  <en>Record created %s, last modified %s</en>
+  <fr>Notice créée %s, modifiée %s</fr>
+  <de>Record created %s, last modified %s</de>
+  <es>Record created %s, last modified %s</es>
+  <pt>Record created %s, last modified %s</pt>
+  <it>Record created %s, last modified %s</it>
+  <ru>Record created %s, last modified %s</ru>
+  <sk>Záznam vytvorený %s, modifikovaný %s</sk>
+  <cz>Záznam vytvořen %s, modifikován %s</cz>
+  <no>Record created %s, last modified %s</no>
+  <se>Record created %s, last modified %s</se>
+</define-tag>
+
 ## end of file
