@@ -34,13 +34,12 @@ import sre
 import MySQLdb
 sys.path.append('%s' % pylibdir)
 from cdsware.config import weburl,cdsname,cdslang,cachedir,cdsnameintl
-from cdsware.messages import *
-from cdsware.dbquery import run_sql
-from cdsware.webpage import page, create_error_box
-from cdsware.webuser import getUid
 
 def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
     "Display search interface page for collection c by looking in the collection cache."
+    from cdsware.webpage import page, create_error_box
+    from cdsware.webuser import getUid
+    from cdsware.messages import wash_language,msg_internal_error,msg_collection_not_found_head,msg_collection_not_found_body
     # wash params:
     try:
         as = int(as)
@@ -133,6 +132,7 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
 
 def get_collid(c):
     "Return collection ID for given collection name.  Return None if no match found."
+    from cdsware.dbquery import run_sql
     collid = None
     res = run_sql("SELECT id FROM collection WHERE name=%s", (c,), 1)
     if res:
