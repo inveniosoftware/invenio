@@ -17,12 +17,17 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#include "config.wml"
+#include "configbis.wml"
+supportemail = "<SUPPORTEMAIL>"
 
 """CDSware Access Control Config. """
 
 <protect> ## okay, rest of the Python code goes below #######
 
 __version__ = "$Id$"
+
+from config import *
 
 # VALUES TO BE EXPORTED
 # CURRENTLY USED BY THE FILES access_control_engine.py access_control_admin.py webaccessadmin_lib.py
@@ -85,4 +90,23 @@ def_auths = (
              (SUPERADMINROLE,    'runbibrank',           -1,      0,       {}),
              (SUPERADMINROLE,    'cfgbibrank',           -1,      0,       {}),
             )
+cfg_webaccess_msgs = {
+                                0: 'Try to <a href="%s/youraccount.py/login?referer=%s/admin/%s/">login</a> as another user.' % (weburl, weburl, "%s"),
+                                1: '<br>If you think this is not correct, please contact: <a href="mailto:%s">%s</a>' % (supportemail, supportemail)
+
+		} 
+
+
+cfg_webaccess_warning_msgs = {
+           			0: '' ,
+           			1: 'Error (1): You are not a user authorized to perform this admin task.',
+                                2: 'Error (2): You are not a user authorized to perform administrative tasks.',
+           			3: 'Error (3): The action specified (%s) is not known.',
+                                4: 'Error (4): An unexpected error occured when checking username/password.',
+                                5: 'Error (5): Missing keywords necessary for authorization to this admin task to be possible.',
+                                6: 'Error (6): Problems connecting to database. Check that a valid integer value is given as user id.',
+                                7: 'Error (7): Not enough arguments given, id_user and name_action required.',
+                                8: 'Error (8): Incorrect keyword given for specified action.'
+
+		} 
 </protect>

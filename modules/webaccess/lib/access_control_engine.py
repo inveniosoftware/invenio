@@ -17,7 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
 """CDSware Access Control Engine in mod_python."""
 
 <protect> ## okay, rest of the Python code goes below #######
@@ -29,14 +28,19 @@ __version__ = "$Id$"
 from config import *
 from dbquery import run_sql
 from MySQLdb import ProgrammingError
-from access_control_config import SUPERADMINROLE
+from access_control_config import SUPERADMINROLE, cfg_webaccess_warning_msgs, cfg_webaccess_msgs
 
-
+called_from = 1 #1=web,0=cli
+try:
+    import _apache
+except ImportError, e:
+    called_from = 0
+    
 ## access controle engine function
 def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
     """Check if user is allowed to perform action
     with given list of arguments.
-    Return 1 if authentication succeeds, 0 if it fails.
+    Return (0, "") if authentication succeeds, (error code, error message) if it fails.
 
     The arguments are as follows:
     
@@ -56,11 +60,11 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
                 where a.name = '%s'""" % (name_action)
 
     try: id_action, aallowedkeywords, optional = run_sql(query1)[0]
-    except (ProgrammingError, IndexError): return 0
+    except (ProgrammingError, IndexError): return (3, "%s %s" % (cfg_webaccess_warning_msgs[3] % name_action, (called_from and cfg_webaccess_msgs[1] or "")))
 
     defkeys = aallowedkeywords.split(',')
     for key in arguments.keys():
-        if key not in defkeys: return 0
+        if key not in defkeys: return (8, "%s %s" % (cfg_webaccess_warning_msgs[8], (called_from and "%s %s" % (cfg_webaccess_msgs[0] % name_action[3:], cfg_webaccess_msgs[1]) or ""))) #incorrect arguments?
     # -------------------------------------------
     
     
@@ -75,18 +79,18 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
     ON r.id = ur.id_accROLE
     WHERE r.name = '%s' AND
     ur.id_user = '%s' """ % (SUPERADMINROLE, id_user)):
-        return 1
+        return (0, cfg_webaccess_warning_msgs[0])
     # ------------------------------------------
     
     
     # TASK 2: find all the user's roles and create or-string
     if verbose: print 'task 2 - find userroles'
     
-    query2 = """SELECT ur.id_accROLE FROM user_accROLE ur WHERE ur.id_user = %s ORDER BY ur.id_accROLE """ % (id_user)
+    query2 = """SELECT ur.id_accROLE FROM user_accROLE ur WHERE ur.id_user=%s ORDER BY ur.id_accROLE """ % id_user
     try: res2 = run_sql(query2)
-    except ProgrammingError: return 0
+    except Exception: return (6, "%s %s" % (cfg_webaccess_warning_msgs[6], (called_from and "%s %s" % (cfg_webaccess_msgs[0] % name_action[3:], cfg_webaccess_msgs[1]) or "")))
     
-    if not res2: return 0 #user has no roles
+    if not res2: return (2, "%s %s" % (cfg_webaccess_warning_msgs[2], (called_from and "%s %s" % (cfg_webaccess_msgs[0] % name_action[3:], cfg_webaccess_msgs[1]) or ""))) #user has no roles
     # -------------------------------------------
 
     # create role string (add default value? roles='(raa.id_accROLE='def' or ')
@@ -107,7 +111,10 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
             argumentlistid = 0 AND
             id_accARGUMENT = 0 """ % (str_roles, id_action))
     
-            return connection and 1 or 0
+            if connection and 1: 
+                return (0, cfg_webaccess_warning_msgs[0])
+            else:
+		return (1, "%s %s" % (cfg_webaccess_warning_msgs[1], (called_from and "%s %s" % (cfg_webaccess_msgs[0] % name_action[3:], cfg_webaccess_msgs[1]) or "")))
     
         # 3.2
         if optional == 'yes':
@@ -118,10 +125,14 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
             id_accARGUMENT = -1 AND
             argumentlistid = -1 """ % (str_roles, id_action))
     
-            return connection and 1 or 0
+            if connection and 1: 
+                return (0, cfg_webaccess_warning_msgs[0])
+            else:
+                return (1, "%s %s" % (cfg_webaccess_warning_msgs[1], (called_from and "%s %s" % (cfg_webaccess_msgs[0] % name_action[3:], cfg_webaccess_msgs[1]) or "")))
+
         # none of the zeroargs tests succeded
         if verbose: print ' - not authorization without arguments'
-        return 0
+        return (5, "%s %s" % (cfg_webaccess_warning_msgs[5], (called_from and "%s" % (cfg_webaccess_msgs[1] or ""))))
         
     # TASK 4: create list of keyword and values that satisfy part of the authentication and create or-string
     if verbose: print 'task 4 - create keyword=value pairs'
@@ -131,7 +142,7 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
 
     for key in defkeys:
         try: defdict[key] = arguments[key]
-        except KeyError: return 0 # all keywords must be present
+        except KeyError: return (5, "%s %s" % (cfg_webaccess_warning_msgs[5], (called_from and "%s" % (cfg_webaccess_msgs[1] or "")))) # all keywords must be present
         # except KeyError: defdict[key] = 'x' # default value, this is not in use...
     
     # create or-string from arguments
@@ -153,9 +164,9 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
     raa.id_accARGUMENT = arg.id """ % (id_action, str_roles, str_args)                
 
     try: res4 = run_sql(query4)
-    except ProgrammingError: return 0
+    except ProgrammingError: return (3, "%s %s" % (cfg_webaccess_warning_msgs[3], (called_from and "%s" % (cfg_webaccess_msgs[1] or ""))))
 
-    if not res4: return 0 # no entries at all
+    if not res4: return (1, "%s %s" % (cfg_webaccess_warning_msgs[1], (called_from and "%s %s" % (cfg_webaccess_msgs[0] % name_action[3:], cfg_webaccess_msgs[1]) or ""))) # no entries at all
     
     res5 = []
     for res in res4:
@@ -163,7 +174,7 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
     res5.sort()
 
     # USER AUTHENTICATED TO PERFORM ACTION WITH ONE ARGUMENT
-    if len(defdict) == 1: return 1
+    if len(defdict) == 1: return (0, cfg_webaccess_warning_msgs[0])
 
 
     # CHECK WITH MORE THAN 1 ARGUMENT
@@ -189,7 +200,7 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
                 if not value: break
             else:
                 if verbose: print '-> found satisfying combination'
-                return 1 # USER AUTHENTICATED TO PERFORM ACTION
+                return (0, cfg_webaccess_warning_msgs[0]) # USER AUTHENTICATED TO PERFORM ACTION
 
             if verbose: print '-> not this one'
 
@@ -204,6 +215,6 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
 
     if verbose: print 'finished'
     # authentication failed
-    return 0
+    return (4, "%s %s" % (cfg_webaccess_warning_msgs[4], (called_from and "%s %s" % (cfg_webaccess_msgs[0] % name_action[3:], cfg_webaccess_msgs[1]) or "")))
 
 </protect>

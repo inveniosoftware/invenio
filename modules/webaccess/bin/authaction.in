@@ -39,6 +39,7 @@ try:
     sys.path.append('%s' % pylibdir)
     from cdsware.config import *
     from cdsware.access_control_engine import acc_authorize_action
+    from cdsware.access_control_config import cfg_webaccess_warning_msgs
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -67,7 +68,7 @@ def main():
     """CLI to acc_authorize_action. The function finds the needed
     arguments in sys.argv.
     If the number of arguments is wrong it prints help.
-    Return 1 on success, 0 on failure. """
+    Return 0 on success, 9 or higher on failure. """
     
     alen, auth = len(sys.argv), 0
 
@@ -78,7 +79,8 @@ def main():
         sys.stderr.write("%s\n" % __version__)
         sys.exit(0)    
     if alen < 3 or alen % 2 == 0:
-        return 0
+        print "7;%s" % cfg_webaccess_warning_msgs[7]
+        return "7;%s" % cfg_webaccess_warning_msgs[7]
 
     # try to authorize
     else:
@@ -91,11 +93,11 @@ def main():
             dict[sys.argv[i]] = sys.argv[i + 1]
 
         # run ace-function
-        auth = acc_authorize_action(id_user, name_action, **dict)
-
+        (auth_code, auth_message) = acc_authorize_action(id_user, name_action, **dict)
+   
     # print and return 
-    print auth
-    return auth
+    print "%s;%s" % (auth_code, auth_message)
+    return "%s;%s" % (auth_code, auth_message)
 
 
 if __name__ == '__main__':

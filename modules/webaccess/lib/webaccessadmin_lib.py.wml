@@ -80,9 +80,9 @@ def index(req, title='', body='', subtitle='', adminarea=2, authorized=0):
         elif adminarea == 6: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/resetarea>Reset Authorizations</a> ' % (weburl, )
     
     id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if not authorized and auth_code != 0: return mustloginpage(req, auth_message)
 
-    if not authorized and not is_adminuser(req): return mustloginpage(req)
-    
     elif not body:
         title = 'Manage WebAccess'
         body = startpage()
@@ -95,16 +95,15 @@ def index(req, title='', body='', subtitle='', adminarea=2, authorized=0):
                 lastupdated=__lastupdated__)                
 
 
-def mustloginpage(req):
+def mustloginpage(req, message):
     """show a page asking the user to login."""
     
     navtrail_previous_links = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/webaccess/">WebAccess Admin</a> """ % (weburl, weburl)
 
     return page(title='Authorization failure',
                 uid=getUid(req),
-                body=adderrorbox('try to login first',
-                                 datalist=["""You are not a user authorized to perform admin tasks, try to
-                                 <a href="%s/youraccount.py/login?referer=%s/admin/webaccess">login</a> with another account.""" % (weburl, weburl)]),
+                body=adderrorbox('Not logged in',
+                                 datalist=[message]),
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)                
 
@@ -114,12 +113,12 @@ def is_adminuser(req):
 
     id_user = getUid(req)
     return acce.acc_authorize_action(id_user, WEBACCESSACTION)
-     
 
 def perform_rolearea(req):
     """create the role area menu page."""
 
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     header = ['id', 'name', 'description', 'users', 'authorizations / actions', 'role', '']
     roles = acca.acc_getAllRoles()
@@ -172,7 +171,8 @@ def perform_rolearea(req):
 def perform_actionarea(req):
     """create the action area menu page."""
 
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     header = ['id', 'name', 'authorizations/roles', 'action', '']
     actions = acca.acc_getAllActions()
@@ -221,7 +221,8 @@ def perform_actionarea(req):
 def perform_userarea(req, email_user_pattern=''):
     """create area to show info about users. """
 
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     subtitle = 'step 1 - search for users'
 
@@ -274,7 +275,8 @@ def perform_userarea(req, email_user_pattern=''):
 def perform_resetarea(req):
     """create the reset area menu page."""
 
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     output = """
     <dl>
@@ -298,7 +300,8 @@ def perform_resetdefaultsettings(req, superusers=[], confirm=0):
     and add only the default roles.
     only selected users will be added to superadmin, rest is blank """
 
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     # cleaning input
     if type(superusers) == str: superusers = [superusers]
@@ -376,7 +379,8 @@ def perform_adddefaultsettings(req, superusers=[], confirm=0):
     """add the default settings, and keep everything else.
     probably nothing will be deleted, except if there has been made changes to the defaults."""
 
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     # cleaning input
     if type(superusers) == str: superusers = [superusers]
@@ -457,7 +461,7 @@ def perform_delegate_startarea(req):
 
     output = ''
     
-    if is_adminuser(req):
+    if is_adminuser(req)[0] == 0:
         output += """
         <p>
          You are also allowed to be in the <a href="../webaccessadmin.py">Main Admin Area</a> which gives you<br>
@@ -853,7 +857,8 @@ def perform_addaction(req, name_action='', arguments='', optional='no', descript
 
     description - optional description of the action"""
 
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     name_action = cleanstring(name_action)
     arguments = cleanstring(arguments, comma=1)
@@ -946,7 +951,8 @@ def perform_deleteaction(req, id_action="0", confirm=0):
 
     id_action - id of action to delete """
 
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     title='Delete action'
     subtitle='step 1 - select action to delete'
@@ -997,7 +1003,8 @@ def perform_deleteaction(req, id_action="0", confirm=0):
 def perform_showactiondetails(req, id_action):
     """show the details of an action. """
 
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     output = createactionselect(id_action=id_action,
                                 action="showactiondetails",
@@ -1072,7 +1079,8 @@ def perform_addrole(req, name_role='', description='put description here.', conf
 
     description - optional description of the role """
 
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     name_role = cleanstring(name_role)
 
@@ -1149,7 +1157,8 @@ def perform_deleterole(req, id_role="0", confirm=0):
 
     actions - actions with possible authorizations."""
 
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     title = 'Delete role'
     subtitle = 'step 1 - select role to delete'
@@ -1192,7 +1201,8 @@ def perform_deleterole(req, id_role="0", confirm=0):
 def perform_showroledetails(req, id_role):
     """show the details of a role."""
 
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     output = createroleselect(id_role=id_role,
                               action="showroledetails",
@@ -1283,7 +1293,8 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
 
                id_user - id of user to add to the role. """
     
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     email_out = acca.acc_getUserEmail(id_user=id_user)
     name_role = acca.acc_getRoleName(id_role=id_role)
@@ -1411,7 +1422,8 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
 
     id_user - id of user to disconnect. """
     
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     email_out = acca.acc_getUserEmail(id_user=id_user)
     name_role = acca.acc_getRoleName(id_role=id_role)
@@ -1539,7 +1551,8 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
 
     id_user - id of user to disconnect. """
     
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     title = 'Remove user from role'
     email_user = acca.acc_getUserEmail(id_user=id_user)
@@ -1662,7 +1675,8 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
 def perform_showuserdetails(req, id_user=0):
     """show the details of a user. """
     
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     if id_user not in [0, '0']:
         output = userdetails(id_user=id_user)
@@ -1721,7 +1735,8 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
 
       reverse - role or action first? """
     
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     # values that might get used
     name_role = acca.acc_getRoleName(id_role=id_role) or id_role
@@ -1952,7 +1967,8 @@ def perform_deleteroleaction(req, id_role="0", id_action="0", reverse=0, confirm
       reverse - 0: ask for role first
                 1: ask for action first"""
     
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     title = 'Remove action from role '
     
@@ -2050,7 +2066,8 @@ def perform_modifyauthorizations(req, id_role="0", id_action="0", reverse=0, con
     
       authids - ids of checked checkboxes """
 
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     name_role = acca.acc_getRoleName(id_role)
     name_action = acca.acc_getActionName(id_action)
@@ -2464,7 +2481,8 @@ def perform_simpleauthorization(req, id_role=0, id_action=0):
     """show a page with simple overview of authorizations between a
     connected role and action. """
     
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     res = acca.acc_findPossibleActions(id_role, id_action)
     if res:
@@ -2488,7 +2506,8 @@ def perform_simpleauthorization(req, id_role=0, id_action=0):
 def perform_showroleusers(req, id_role=0):
     """show a page with simple overview of a role and connected users. """
 
-    if not is_adminuser(req): return mustloginpage(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
     res = acca.acc_getRoleUsers(id_role=id_role)
     name_role = acca.acc_getRoleName(id_role=id_role)

@@ -48,7 +48,7 @@ Contents:
       def acc_authorize_action(id_user, name_action, dict={}, **arguments):
           """ Check if user is allowed to perform action
 	  with given list of arguments.
-	  Return 1 if authentication succeeds, 0 if it fails.
+	  Return (0, "") if authentication succeeds, (error_code, error_message) if it fails.
 
 	  The arguments are as follows:
     
