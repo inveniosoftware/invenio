@@ -1404,7 +1404,9 @@ def acc_cleanupArguments():
 
 def acc_cleanupUserRoles():
     """remove all entries in user_accROLE referencing non-existing roles.
-    return number of deletes and the ids."""
+    return number of deletes and the ids.
+
+    FIXME: THIS FUNCTION HAS NOT BEEN TESTED """
 
     # find unreferenced arguments
     ids1 = run_sql("""SELECT DISTINCT ur.id_accROLE
@@ -1433,40 +1435,79 @@ def acc_cleanupUserRoles():
 def acc_garbage_collector(verbose=0):
     """clean the entire database for unused data"""
 
-    # keep all deleted entries
+    # keep track of all deleted entries
 
     del_entries = []
 
-    # unused arguments
+    # user_accROLEs without existing role or user
+    count = 0
+    # roles have been deleted
+    id_roles = run_sql("""SELECT DISTINCT r.id FROM accROLE r""")
+    idrolesstr = ''
+    for (id, ) in id_roles:
+        idrolesstr += (idrolesstr and ',' or '') + '%s' % id
+    if idrolesstr: 
+        count += run_sql("""DELETE FROM user_accROLE WHERE id_accROLE NOT IN (%s)""" % (idrolesstr, ))
+    # users have been deleted                         
+    id_users = run_sql("""SELECT DISTINCT u.id FROM user u WHERE email != ''""")
+    idusersstr = ''
+    for (id, ) in id_users:
+        idusersstr += (idusersstr and ',' or '') + '%s' % id
+    if idusersstr: 
+        count += run_sql("""DELETE FROM user_accROLE WHERE id_user NOT IN (%s) """ % (idusersstr, ))
 
-    ids1 = run_sql("""SELECT DISTINCT ar.id
+    del_entries.append([count])                         
+
+    # accROLE_accACTION_accARGUMENT where role is deleted
+    count = 0
+    if idrolesstr:
+        count += run_sql("""DELETE FROM accROLE_accACTION_accARGUMENT WHERE id_accROLE NOT IN (%s)""" % (idrolesstr, ))
+    # accROLE_accACTION_accARGUMENT where action is deleted
+    id_actions = run_sql("""SELECT DISTINCT a.id FROM accACTION a""")
+    idactionsstr = ''
+    for (id, ) in id_actions:
+        idactionsstre += (idactionsstr and ',' or '') + '%s' id
+    if idactionsstr:
+        count += run_sql("""DELETE FROM accROLE_accACTION_accARGUMENT WHERE id_accACTION NOT IN (%s)""" % (idactionsstr, ))
+
+    del_entries.append([count])
+
+    # delegated roles that does not exist
+
+    nameroles = run_sql("""SELECT DISTINCT r.name FROM accROLE r""")
+    namestr = ''
+    for (name, ) in nameroles:
+        namestr += (namestr and ',' or '') + '"%s"' % name
+    if namestr:
+        idargs = run_sql("""SELECT ar.id FROM accARGUMENT WHERE keyword = 'role' AND value NOT IN (%s) """ % (namestr, ))
+        idstr = ''
+        for (id, ) in idargs:
+            idstr += (idstr and ',' or '') + '%s' % id
+            
+    if namestr and idstr:
+        count = run_sql("""DELETE FROM accROLE_accACTION_accARGUMENT WHERE id_accARGUMENT IN (%s) """ % (idstr, ))
+    else: count = 0
+
+    del_entries.append([0])    
+    
+    # delete unreferenced arguments
+    unused_args = run_sql("""SELECT DISTINCT ar.id
     FROM accARGUMENT ar LEFT JOIN accROLE_accACTION_accARGUMENT raa ON ar.id = raa.id_accARGUMENT
     WHERE raa.id_accARGUMENT IS NULL """)
 
-    del_entries.append([])
-    
+    args = []
     idstr = ''
-    for (id, ) in ((3, ), (4, ), (5, ), (5, )): # ids1:
-        del_entries[-1].append(id)
+    for (id, ) in unused_args:
+        args.append(id)
         idstr += (idstr and ',' or '') + '%s' % id
 
-    # delete unreferenced arguments
     count = run_sql("""DELETE FROM accARGUMENT
     WHERE id in (%s)""" % (idstr, ))
     
-    # return count and ids of deleted arguments
-    return (count, ids2)
+    del_entries.append([count, args])
 
-
-    # user_accROLEs without existing role
-
-    # accROLE_accACTION_accARGUMENT where role is deleted
-
-    # accROLE_accACTION_accARGUMENT where action is deleted
-
-    # delegated roles that does not exist
-    
-    return
+    # return statistics
+    return del_entries
 
 </protect>
 
