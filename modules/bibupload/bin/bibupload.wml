@@ -1061,6 +1061,8 @@ function insertFMTfield($recid,$rec)
     }
 
     if ($recid != "000" && $recid != "") {
+	// get rid of existing 001
+	$xml = ereg_replace("<controlfield tag=\"001\">[^<]*</controlfield>","",$xml);
         // add sysno to xml record
         $xml = ereg_replace("<record([^>]*)>","<record\\1>
 	<controlfield tag=\"001\">$recid</controlfield>",$xml);
