@@ -21,7 +21,7 @@ bin_SCRIPTS=bibsched bibtaskex
 
 EXTRA_DIST = $(wildcard *.wml)
 
-CLEANFILES = $(bin_SCRIPTS) *~ *.tmp 
+CLEANFILES = $(bin_SCRIPTS) *~ *.tmp bibtaskexc
 
 %: %.wml ../../../config/config.wml ../../../config/configbis.wml
 	$(WML) -o $@ $<
