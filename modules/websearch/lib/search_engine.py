@@ -1787,10 +1787,10 @@ def get_word_nbhits(word, f):
     return out
 
 def get_mysql_recid_from_aleph_sysno(sysno):
-    """Returns MySQL's recID for ALEPH sysno passed in the argument (e.g. "2209836CERCER").
+    """Returns MySQL's recID for ALEPH sysno passed in the argument (e.g. "002379334CER").
        Returns None in case of failure."""
     out = None
-    query = "SELECT bb.id_bibrec FROM bibrec_bib90x AS bb, bib97x AS b WHERE b.value='%s' AND b.tag='970__a' AND bb.id_bibxxx=b.id" %\
+    query = "SELECT bb.id_bibrec FROM bibrec_bib97x AS bb, bib97x AS b WHERE b.value='%s' AND b.tag='970__a' AND bb.id_bibxxx=b.id" %\
             (escape_string(sysno))
     res = run_sql(query, None, 1)
     if res:        
@@ -2464,7 +2464,7 @@ def print_record(recID, format='hb', ot='', decompress=zlib.decompress):
 
         # at the end of HTML mode, print the "Detailed record" functionality:
         if cfg_use_aleph_sysnos:
-            alephsysnos = get_fieldvalues(recID, "909C0o")
+            alephsysnos = get_fieldvalues(recID, "970__a")
             if len(alephsysnos)>0:
                 alephsysno = alephsysnos[0]
                 out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?sysnb=%s">Detailed record</a></span>""" \
