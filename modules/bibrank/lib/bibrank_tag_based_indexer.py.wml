@@ -277,7 +277,7 @@ def check_method(rank_method_code):
     if len(fromDB(rank_method_code)) == 0:
         write_message("Rank method not yet executed, please run it to create the necessary data.")
     else:
-        if len(add_date(rank_method_code)) > 0:
+        if len(add_recIDs_by_date(rank_method_code)) > 0:
             write_message("Records modified, update recommended")
         else:
             write_message("No records modified, update not necessary")
@@ -458,9 +458,9 @@ def bibrank_engine(row, run):
             elif options["id"]:
                 options["recid_range"] = options["id"]
             elif options["modified"]:
-                options["recid_range"] = add_date(rank_method_code, options["modified"])
+                options["recid_range"] = add_recIDs_by_date(rank_method_code, options["modified"])
             elif options["last_updated"]:
-                options["recid_range"] = add_date(rank_method_code)
+                options["recid_range"] = add_recIDs_by_date(rank_method_code)
             else:
                 if options["verbose"] > 1:
                     write_message("No records specified, updating all")
@@ -512,18 +512,19 @@ def get_valid_range(rank_method_code):
     valid.addlist(recIDs)
     return valid
    
-def add_date(rank_method_code, date=""):
-    """If date is not set, then retrieve it from the database.
-       Reindex all formats newer than the modification date"""
-    if not date:
+def add_recIDs_by_date(rank_method_code, dates=""):
+    """Return recID range from records modified between DATES[0] and DATES[1].
+       If DATES is not set, then add records modified since the last run of
+       the ranking method RANK_METHOD_CODE.
+    """
+    if not dates:
         try:
-            date = (get_lastupdated(rank_method_code),'')
+            dates = (get_lastupdated(rank_method_code),'')
         except Exception, e:
-            date = "0000-00-00 00:00:00"
-    query = """SELECT b.id FROM bibrec AS b WHERE b.modification_date >=
-    '%s'""" % date[0]
-    if date[1]:
-        query += "and b.modification_date <= '%s'" % date[1]
+            dates = ("0000-00-00 00:00:00", '')
+    query = """SELECT b.id FROM bibrec AS b WHERE b.modification_date >= '%s'""" % dates[0]
+    if dates[1]:
+        query += "and b.modification_date <= '%s'" % dates[1]
     query += "ORDER BY b.id ASC"""
     res = run_sql(query)        
     list = create_range_list(res)
