@@ -49,7 +49,7 @@ Examples:
  Specific options:
  -w,  --wordsindex=w1[,w2] words indexes to consider (all)
  -M,  --maxmem=XXX         maximum memory usage in kB (no limit)
- -f,  --flush=NNN          full consistent table flush after NNN records (5000)
+ -f,  --flush=NNN          full consistent table flush after NNN records (10000)
       
  Scheduling options:
  -u,  --user=USER          user name to store task, password needed
@@ -506,7 +506,7 @@ def usage(code, msg=''):
  Specific options:
  -w,  --wordsindex=w1[,w2] words indexes to consider (all)
  -M,  --maxmem=XXX         maximum memory usage in kB (no limit)
- -f,  --flush=NNN          full consistent table flush after NNN records (5000)
+ -f,  --flush=NNN          full consistent table flush after NNN records (10000)
       
  Scheduling options:
  -u,  --user=USER          user name to store task, password needed
@@ -903,6 +903,17 @@ class WordTable:
             if opts_dict["verbose"]:
                 write_message("The word '%s' does not exist in the word file."\
                               % word)
+
+    def update_last_updated(self, starting_time=None):
+        """Update last_updated column of the wordsindex table in the database.
+        Puts starting time there so that if the task was interrupted for record download,
+        the records will be reindexed next time."""
+        if starting_time is None:
+            return None
+        if opts_dict["verbose"] >= 9:
+            write_message("updating last_updated to %s...", starting_time)            
+        return run_sql("UPDATE wordsindex SET last_updated=%s WHERE id=%s",
+                       (starting_time, self.tablename[len("bibwords"):],))
 
     def add_recIDs(self, recIDs):
         """Fetches records which id in the recIDs range list and adds
@@ -1349,6 +1360,7 @@ def task_run(row):
     # we can run the task now:
     if opts_dict["verbose"]:
         write_message("Task #%d started." % task_id)
+    task_starting_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     task_update_status("RUNNING")
 
     # install signal handlers
@@ -1374,8 +1386,9 @@ def task_run(row):
                         recIDs_range.append([recID,recID])
                     wordTable.del_recIDs(recIDs_range)
                 else:
-                    wordTable.del_date(opts_dict["modified"])
-
+                    write_message("Missing IDs of records to delete from index %s.", wordTable.tablename,
+                                  sys.stderr)
+                    raise StandardError
             elif opts_dict["cmd"] == "add":
                 if opts_dict["id"]:
                     wordTable.add_recIDs(opts_dict["id"])
@@ -1388,19 +1401,15 @@ def task_run(row):
                     wordTable.add_recIDs(recIDs_range)
                 else:
                     wordTable.add_date(opts_dict["modified"])
+                    # only update last_updated if run via automatic mode:
+                    wordTable.update_last_updated(task_starting_time)
+                
             elif opts_dict["cmd"] == "repair":
                 wordTable.repair()
             else:
                 write_message("Invalid command found processing %s" % \
                      wordTable.tablename, sys.stderr)
                 raise StandardError
-
-            id = wordTable.tablename[len("bibwords"):]
-            query = """UPDATE wordsindex SET last_updated=NOW()
-            WHERE id='%s'""" %  id
-            if opts_dict["verbose"] >= 9:
-                write_message(query)
-            run_sql(query)
 
         except StandardError, e:
             write_message("Exception caught: %s" % e, sys.stderr)
@@ -1436,7 +1445,7 @@ def command_line():
         usage(1)
         
     opts_dict={"cmd":"add", "id":[], "modified":[], "collection":[], "maxmem":0, 
-               "flush":5000, "sleeptime":0, "verbose":1 }
+               "flush":10000, "sleeptime":0, "verbose":1 }
     sched_time = time.strftime(format_string)
     
     user = ""
