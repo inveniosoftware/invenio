@@ -2308,8 +2308,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, de
                     req.write('\n')
         else:
             # we are doing HTML output:
-            if format.startswith("hb_") or format.startswith("hd_"):
-                # on-the-fly formats:
+            if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
+                # portfolio and on-the-fly formats:
                 for irec in range(irec_max,irec_min,-1):
                     req.write(print_record(recIDs[irec], format, ot, ln))                
             elif format.startswith("hb"):
@@ -2592,8 +2592,8 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 out += """<br><small class="note"><a class="note" href="%s">%s</a></small>""" % (urls_u[idx], urls_u[idx])
 
         # at the end of HTML mode, print the "Detailed record" functionality:
-        if format.startswith("hb_") or format.startswith("hd_"):
-            pass # do nothing for on-the-fly formats
+        if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
+            pass # do nothing for portfolio and on-the-fly formats
         else:
             if cfg_use_aleph_sysnos:
                 alephsysnos = get_fieldvalues(recID, "970__a")
