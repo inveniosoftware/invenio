@@ -246,7 +246,7 @@ def create_register_page_box(referer=''):
                 </tr>
                 <tr>""" % (cgi.escape(referer))
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1:
-        text += """<td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="register"></code></td>"""
+        text += """<td align=left colspan=3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code class=blocknote><input class="formbutton" type="submit" name="action" value="register"></code></td>"""
     text += """</tr>
               </table>
               <p><strong>Note:</strong> Please do not use valuable passwords such as your Unix, AFS or NICE passwords with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you for personal services of %s. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.
