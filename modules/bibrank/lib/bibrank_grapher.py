@@ -34,7 +34,6 @@ import tempfile
 from config import webdir 
 from websubmit_config import * 
  
- 
 ## test gnuplot presence:   
 cfg_gnuplot_available = 1 
 try: 
@@ -53,7 +52,7 @@ def write_coordinates_in_tmp_file(lists_coordinates):
     of the tuple is the element of the first column, and second element of the
     tuple is the element of the second column.
     With gnuplot, first column is used as  x coordinates, and second column as y coordinates.
-    On set represents a curve in the graph.
+    One set represents a curve in the graph.
     """
     max_y_datas = 0 
     tempfile.tempdir = webdir + "/img" 
@@ -140,13 +139,13 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
              
         if len_docid_list <= 1: #Only one curve represented as boxes 
             g('set style fill solid 0.25') 
-            plot_text = plot_commend(1, data_file, (0, 0), "", "steps", color_line_list[0], 3) 
+            plot_text = plot_command(1, data_file, (0, 0), "", "steps", color_line_list[0], 3) 
         elif len_docid_list > 1: #Multiple curves 
-            plot_text = plot_commend(1, data_file, (0, 0), graphe_titles[0], "linespoints", color_line_list[0], 1, "pt 26", "ps 0.5") 
+            plot_text = plot_command(1, data_file, (0, 0), graphe_titles[0], "linespoints", color_line_list[0], 1, "pt 26", "ps 0.5") 
             for d in range(1, len_docid_list): 
-                plot_text += plot_commend(0, data_file, (d, d) , graphe_titles[d], "linespoints", color_line_list[d], 1, "pt 26", "ps 0.5") 
-            plot_text += plot_commend(0, data_file, (len_docid_list, len_docid_list), "", "impulses", 0, 2 ) 
-            plot_text += plot_commend(0, data_file, (len_docid_list, len_docid_list), "TOTAL", "lines", 0, 5) 
+                plot_text += plot_command(0, data_file, (d, d) , graphe_titles[d], "linespoints", color_line_list[d], 1, "pt 26", "ps 0.5") 
+            plot_text += plot_command(0, data_file, (len_docid_list, len_docid_list), "", "impulses", 0, 2 ) 
+            plot_text += plot_command(0, data_file, (len_docid_list, len_docid_list), "TOTAL", "lines", 0, 5) 
              
     elif kind_of_graphe == 'download_users': 
         g('set size 0.25,0.5') 
@@ -177,7 +176,7 @@ def remove_old_img(prefix_file_name):
     command = "find %s/img/ -name tmp_%s*.png -amin +10 -exec rm -f {} \;" % (webdir, prefix_file_name) 
     return os.system(command) 
  
-def plot_commend(first_line, file_source, indexes, title, style, line_type, line_width, point_type="", point_size=""): 
+def plot_command(first_line, file_source, indexes, title, style, line_type, line_width, point_type="", point_size=""): 
     """Return a string of a gnuplot plot command.Particularly useful when multiple curves
     From a temporary file, draw a gnuplot graph
     Return a plot command string as follows:
