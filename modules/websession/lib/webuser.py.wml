@@ -260,24 +260,24 @@ def create_userinfobox_body(uid, language="en"):
     out = ""
     if isGuestUser(uid):
         out += """%s ::
-	       <a class="userinfo" href="%s/youraccount.py/display?ln=%s">%s</a> |
-               <a class="userinfo" href="%s/youralerts.py/list?ln=%s">%s</a> |
-               <a class="userinfo" href="%s/yourbaskets.py/display?ln=%s">%s</a> |
+	       <a class="userinfo" href="%s/youraccount.py/display?ln=%s">%s</a> ::
+               <a class="userinfo" href="%s/youralerts.py/list?ln=%s">%s</a> ::
+               <a class="userinfo" href="%s/yourbaskets.py/display?ln=%s">%s</a> ::
                <a class="userinfo" href="%s/youraccount.py/login?ln=%s">%s</a>""" % \
                (msg_guest[language], weburl, language, msg_session[language], weburl, language, msg_alerts[language],
                 weburl, language, msg_baskets[language], weburl, language, msg_login[language])
     else:
         out += """%s ::
-	       <a class="userinfo" href="%s/youraccount.py/display?ln=%s">%s</a> |
-               <a class="userinfo" href="%s/youralerts.py/list?ln=%s">%s</a> |
-               <a class="userinfo" href="%s/yourbaskets.py/display?ln=%s">%s</a> | """ % \
+	       <a class="userinfo" href="%s/youraccount.py/display?ln=%s">%s</a> ::
+               <a class="userinfo" href="%s/youralerts.py/list?ln=%s">%s</a> ::
+               <a class="userinfo" href="%s/yourbaskets.py/display?ln=%s">%s</a> :: """ % \
                (get_email(uid), weburl, language, msg_account[language], weburl, language, msg_alerts[language],
                 weburl, language, msg_baskets[language])
         if isUserSubmitter(uid):
-            out += """<a class="userinfo" href="%s/yoursubmissions.py?ln=%s">%s</a> | """ % \
+            out += """<a class="userinfo" href="%s/yoursubmissions.py?ln=%s">%s</a> :: """ % \
                    (weburl, language, msg_submissions[language])            
         if isUserReferee(uid):
-            out += """<a class="userinfo" href="%s/yourapprovals.py?ln=%s">%s</a> | """ % \
+            out += """<a class="userinfo" href="%s/yourapprovals.py?ln=%s">%s</a> :: """ % \
                    (weburl, language, msg_approvals[language])                        
         out += """<a class="userinfo" href="%s/youraccount.py/logout?ln=%s">%s</a>""" % \
                (weburl, language, msg_logout[language])
