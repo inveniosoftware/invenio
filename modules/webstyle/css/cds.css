@@ -17,34 +17,48 @@ h1 {
    font-size: 173%;
    font-weight: 700;
    margin-left: 60px;
+   color: #36c;
+   background: transparent;
 }
 .h1 {
    font-size: 173%;
    font-weight: 700;
    margin-left: 0%;
+   color: #36c;
+   background: transparent;
 }
 h2 {
    font-size: 144%;
    font-weight: 650;
    margin-left: 0%;
+   color: #36c;
+   background: transparent;
 }
 h3 {
    font-size: 120%;
    font-weight: 600;
    font-style: italic;
+   color: #36c;
+   background: transparent;
 }
 h4 {
    font-size: 110%;
    font-weight: 600;
+   color: #36c;
+   background: transparent;
 }
 h5 {
    font-size: 110%;
    font-weight: 300;
+   color: #36c;
+   background: transparent;
 }
 h6 {
    font-size: 110%;
    font-weight: 200;
    font-style: italic;
+   color: #36c;
+   background: transparent;
 }
 a:link {
    color: #00c;
