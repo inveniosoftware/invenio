@@ -82,37 +82,37 @@ def index (req):
 ## OAI Identify 
 
         if arg['verb']   == "Identify":
-            req.write(oai_repository.OAIIdentify(args))
+            req.write(oai_repository.oaiidentify(args))
 
 
 ## OAI ListSets
 
         elif arg['verb'] == "ListSets":
-            req.write(oai_repository.OAIListSets(args))
+            req.write(oai_repository.oailistsets(args))
 
 
 ## OAI ListIdentifiers
 
         elif arg['verb'] == "ListIdentifiers":
-            req.write(oai_repository.OAIListIdentifiers(args))
+            req.write(oai_repository.oailistidentifiers(args))
 
 
 ## OAI ListRecords
 
         elif arg['verb'] == "ListRecords":  
-            req.write(oai_repository.OAIListRecords(args))
+            req.write(oai_repository.oailistrecords(args))
 
 
 ## OAI GetRecord
 
         elif arg['verb'] == "GetRecord": 
-            req.write(oai_repository.OAIGetRecord(args))
+            req.write(oai_repository.oaigetrecord(args))
 
 
 ## OAI ListMetadataFormats
 
         elif arg['verb'] == "ListMetadataFormats":
-            req.write(oai_repository.OAIListMetadataFormats(args))
+            req.write(oai_repository.oailistmetadataformats(args))
 
 
 ## Unknown verb
