@@ -1306,12 +1306,14 @@ def search_pattern(req, p=None, f=None, m=None, of='hb', dbg=0):
                 else:
                     # stage 2-3: no hits found either, propose nearest indexed terms:
                     if of.startswith('h'):
-                        print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m))
+                        if req:
+                            print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m))
                     return hitlist_empty
             else:        
                 # stage 2-3: no hits found either, propose nearest indexed terms:
                 if of.startswith('h'):
-                    print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m))
+                    if req:
+                        print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m))
                 return hitlist_empty
     if dbg:
         t2 = os.times()[4]
