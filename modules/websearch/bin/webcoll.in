@@ -65,7 +65,7 @@ try:
     sys.path.append('%s' % pylibdir)
     from cdsware.config import *
     from cdsware.messages import *
-    from cdsware.search_engine import HitSet, search_pattern, get_creation_date
+    from cdsware.search_engine import HitSet, search_pattern, get_creation_date, nice_number
     from cdsware.search_engine_config import cfg_author_et_al_threshold, cfg_instant_browse, cfg_max_recID, cfg_narrow_search_show_grandsons
     from cdsware.dbquery import run_sql    
     from cdsware.access_control_engine import acc_authorize_action
@@ -105,18 +105,6 @@ def mymkdir(newdir, mode=0777):
         if tail:
 	    os.umask(022)
             os.mkdir(newdir, mode)
-
-def nice_number(num):
-    "Returns nice number when using comma as thousands separator."
-    chars_in = list(str(num))
-    num = len(chars_in)
-    chars_out = []
-    for i in range(0,num):
-        if i % 3 == 0 and i != 0:
-            chars_out.append(',')
-        chars_out.append(chars_in[num-i-1])
-    chars_out.reverse()
-    return ''.join(chars_out)
 
 def escape_string(s):
     "Escapes special chars in string.  For MySQL queries."
@@ -418,11 +406,11 @@ class Collection:
                             (weburl, urllib.quote_plus(dad.name), as, ln, dad.name)
         return out
 
-    def create_nbrecs_info(self, prolog="""&nbsp;<small class="nbdoccoll">(""", epilog=""")</small>"""):
+    def create_nbrecs_info(self, ln=cdslang, prolog="""&nbsp;<small class="nbdoccoll">(""", epilog=""")</small>"""):
         "Return information on the number of records."
         out = ""
         if self.nbrecs:
-            out = prolog + nice_number(self.nbrecs) + epilog
+            out = prolog + nice_number(self.nbrecs, ln) + epilog
         return out
 
     def create_portalbox(self, lang=cdslang, position="rt"):
@@ -487,7 +475,7 @@ class Collection:
                     else:
                         narrowsearch += """<input type=checkbox name="c" value="%s" checked>&nbsp;</td>""" % son.name
                 narrowsearch += """<td valign="top"><a href="%s/?c=%s&amp;as=%d&amp;ln=%s">%s%s%s</a>%s """ % \
-                                (weburl, urllib.quote_plus(son.name), as, ln, style_prolog, son.get_namefull(), style_epilog, son.create_nbrecs_info())
+                                (weburl, urllib.quote_plus(son.name), as, ln, style_prolog, son.get_namefull(), style_epilog, son.create_nbrecs_info(ln))
                 if son.restricted_p():
                     narrowsearch += """ <small class="warning">[restricted]</small>"""
                 if cfg_narrow_search_show_grandsons:
@@ -499,7 +487,7 @@ class Collection:
                         for i in range(0,nb_grandsons):
                             narrowsearch += """<a href="%s/?c=%s&amp;as=%d&amp;ln=%s">%s</a>%s """ % \
                                             (weburl, urllib.quote_plus(grandsons[i].name), as, ln, grandsons[i].get_namefull(), \
-                                             grandsons[i].create_nbrecs_info())
+                                             grandsons[i].create_nbrecs_info(ln))
                 narrowsearch += """</td></tr>"""
             narrowsearch += "</tbody></table>"            
         else:
@@ -776,7 +764,7 @@ class Collection:
             ssearchurl = "?as=0&amp;ln=%s" % ln
             asearchurl = "?as=1&amp;ln=%s" % ln
         # define search box elements:
-        header = msg_search_records_for[ln] % self.create_nbrecs_info("","")
+        header = msg_search_records_for[ln] % self.create_nbrecs_info(ln, "","")
         cell_1_left = """<input type="text" name="p" size="40" value="">"""
         cell_1_middle = "%s" % self.create_searchwithin_selection_box(ln=ln)
         cell_1_right = """<input class="formbutton" type="submit" name="action" value="%s"><input class="formbutton" type="submit" name="action" value="%s">""" % (msg_search[ln], msg_browse[ln])
@@ -821,7 +809,7 @@ class Collection:
             ssearchurl = "?as=0&amp;ln=%s" % ln
             asearchurl = "?as=1&amp;ln=%s" % ln
         # define search box elements:
-        header = msg_search_records_for[ln] % self.create_nbrecs_info("", "") 
+        header = msg_search_records_for[ln] % self.create_nbrecs_info(ln, "", "") 
         cell_1_left = create_matchtype_box('m1', ln=ln) + """<input type="text" name="p1" size="40" value="">""" 
         cell_1_middle = self.create_searchwithin_selection_box('f1', ln=ln)
         cell_1_right = create_andornot_box('op1', ln=ln)
