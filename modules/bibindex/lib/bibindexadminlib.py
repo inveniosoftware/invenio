@@ -603,14 +603,17 @@ def perform_showfieldtags(fldID, ln=cdslang, callback='yes', content='', confirm
     if len(res) > 0:
         i = 0
         for (fldID, tagID, tname, tvalue, score) in res:
-            move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
+            #move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
+	    move = ""
             if i != 0:
                 move += """<a href="%s/admin/bibindex/bibindexadmin.py/switchtagscore?fldID=%s&amp;id_1=%s&amp;id_2=%s&amp;ln=%s&amp=rand=%s#4"><img border="0" src="%s/img/smallup.gif" title="Move tag up"></a>""" % (weburl, fldID, tagID, res[i - 1][1], ln, random.randint(0, 1000), weburl)
+	    else:
+		move += "&nbsp;&nbsp;&nbsp;"
             i += 1
-            move += "</td></tr><tr><td>"
+            #move += "</td></tr><tr><td>"
             if i != len(res):
                 move += '<a href="%s/admin/bibindex/bibindexadmin.py/switchtagscore?fldID=%s&amp;id_1=%s&amp;id_2=%s&amp;ln=%s&amp;rand=%s#4"><img border="0" src="%s/img/smalldown.gif" title="Move tag down"></a>' % (weburl, fldID, tagID, res[i][1], ln, random.randint(0, 1000), weburl)
-            move += """</td></tr></table>"""
+            #move += """</td></tr></table>"""
             
             actions.append([move, tvalue, tname])
             for col in [(('Details','showdetailsfieldtag'), ('Modify','modifytag'),('Remove','removefieldtag'),)]:
