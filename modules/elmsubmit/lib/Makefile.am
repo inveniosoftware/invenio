@@ -20,7 +20,7 @@
 SUBDIRS = magic
 
 pylibdir = $(libdir)/python/cdsware
-pylib_DATA = 
+pylib_DATA = elmsubmit_misc.py
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
