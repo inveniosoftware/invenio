@@ -41,6 +41,7 @@ import re
 import MySQLdb
 import shutil
 
+
 sys.path.append('%s' % pylibdir)
 from cdsware.config import *
 from cdsware.dbquery import run_sql
@@ -66,7 +67,7 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     t = ""
     field = []
     fieldhtml = []
-    level = [] 
+    level = []
     fullDesc = []
     text = []
     check = []
@@ -111,7 +112,7 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     #Get current page
     if startPg != "" and (curpage=="" or curpage==0):
         curpage = startPg
-    # retrieve the name of the file in which the reference of 
+    # retrieve the name of the file in which the reference of
     # the submitted document will be stored
     res = run_sql("SELECT value FROM sbmPARAMETERS WHERE  doctype=%s and name='edsrn'", (doctype,))
     if len(res) == 0:
@@ -213,9 +214,9 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
                 run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (value,doctype,access,uid_email,))
         # Now deal with the cookies
         # If the fields must be saved as a cookie, we do so
-        # In this case, the value of the field will be retrieved and 
+        # In this case, the value of the field will be retrieved and
         # displayed as the default value of the field next time the user
-        # does a submission    
+        # does a submission
         if value!="":
             res = run_sql("SELECT cookie FROM sbmFIELDDESC WHERE  name=%s", (key,))
             if len(res) > 0:
@@ -340,7 +341,8 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             select.append(0)
             radio.append(0)
             upload.append(0)
-            field.append(value)
+            # field.append(value) - initial version, not working with JS, taking a submitted value
+            field.append(arr[3])
             level.append(arr[5])
             txt.append(arr[6])
             level.append(arr[5])
@@ -366,8 +368,8 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             fieldname = "%s[]" % field[i]
         else:
             fieldname = field[i]
-        t=t+"  el = document.forms[0].elements['%s'];\n" % fieldname
-        # If the field must be checked we call the checking function 
+        t=t+"  el = document.forms[0].elements['%s'];;;;;\n" % fieldname
+        # If the field must be checked we call the checking function
         if check[i] != "":
             t=t+"if (%s(el.value)== 0){\n" % check[i]
             t=t+"    el.focus();\n"
@@ -421,14 +423,14 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     else:
         t=t+" <TD class=submitHeader>&nbsp;</TD>\n"
     t=t+"</TR></TABLE></TD></TR></TABLE></center></FORM>"
-    
+
     # # # # # # # # # # # # # # # # # # # # # # # # #
     # Fill the fields with the previously saved values
     # # # # # # # # # # # # # # # # # # # # # # # # #
     t=t+"<SCRIPT LANGUAGE=\"JavaScript1.1\" TYPE=\"text/javascript\">\n"
     t=t+"<!-- Fill the fields in with the previous saved values-->\n"
     # For each actual form field
-    for i in range(0,nbFields): 
+    for i in range(0,nbFields):
         if re.search("%s\[\]"%field[i],fieldhtml[i]):
             fieldname = "%s[]" % field[i]
         else:
@@ -483,9 +485,9 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
 
     # JS function finish
     # This function tests each mandatory field in the whole submission and checks whether
-    # the field has been correctly filled in or not                
-    # This function is called when the user presses the "End      
-    # Submission" button                                           
+    # the field has been correctly filled in or not
+    # This function is called when the user presses the "End
+    # Submission" button
     if int(curpage) == int(nbpages):
         t=t+"\n\nfunction finish() {\n"
         subname = "%s%s" % (act,doctype)
@@ -497,7 +499,7 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         upload = []
         field = []
         level = []
-        txt = []        
+        txt = []
         for arr in res:
             if arr[5] == "M":
                 res2 = run_sql("SELECT * FROM   sbmFIELDDESC WHERE  name=%s", (arr[3],));
@@ -582,10 +584,14 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
                     uid=uid,
                     language=ln,
                     urlargs=req.args)
-    
-    
+
+
 def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="", access="",mainmenu="",fromdir="",file="",nextPg="",nbPg="",curpage=1,step=1,mode="U"):
     global rn,sysno,dismode,curdir,uid,uid_email,lats_step,action_score
+    try:
+        rn
+    except NameError:
+        rn = ""
     dismode = mode
     ln = wash_language(ln)
     sys.stdout = req
@@ -634,7 +640,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         fp.close()
     else:
         mainmenu = "%s/submit.py" % urlpath
-    # retrieve the name of the file in which the reference of 
+    # retrieve the name of the file in which the reference of
     # the submitted document will be stored
     res = run_sql("SELECT value FROM sbmPARAMETERS WHERE  doctype=%s and name='edsrn'",(doctype,))
     if len(res) == 0:
@@ -706,9 +712,9 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
                 run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (value,doctype,access,uid_email,))
         # Now deal with the cookies
         # If the fields must be saved as a cookie, we do so
-        # In this case, the value of the field will be retrieved and 
+        # In this case, the value of the field will be retrieved and
         # displayed as the default value of the field next time the user
-        # does a submission    
+        # does a submission
         if value!="":
             res = run_sql("SELECT cookie FROM sbmFIELDDESC WHERE  name=%s", (key,))
             if len(res) > 0:
@@ -763,7 +769,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     if finished == 1:
         t=t+"<TD class=submitCurrentPage>finished!</TD><TD class=submitEmptyPage>&nbsp;&nbsp;</TD></TR></TABLE></TD>\n"
         t=t+"<TD class=submitEmptyPage align=right>&nbsp;</TD>\n"
-    else: 
+    else:
         for i in range(1,nbpages+1):
             t=t+"<TD class=submitPage><small>&nbsp;<A HREF='' onClick=\"document.forms[0].curpage.value=%s;document.forms[0].action='submit.py';document.forms[0].step.value=0;document.forms[0].submit();return false;\">%s</A>&nbsp;</small></TD>" % (i,i)
         t=t+"<TD class=submitCurrentPage>end of action</TD><TD class=submitEmptyPage>&nbsp;&nbsp;</TD></TR></TABLE></TD>\n"
@@ -784,7 +790,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     current_level = get_level(doctype, act)
     # Calls all the function's actions
     try:
-        t=t+print_function_calls(doctype, act, step, form) 
+        t=t+print_function_calls(doctype, act, step, form)
     except functionError,e:
         return errorMsg(e.value,req)
     except functionStop,e:
@@ -831,7 +837,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     # start display:
     req.content_type = "text/html"
     req.send_http_header()
-    
+
     p_navtrail = "<a href=\"submit.py\">Submit</a>&nbsp;>&nbsp;<a href=\"submit.py?doctype=%s\">%s</a>&nbsp;>&nbsp;%s" % (doctype,docname,actname)
     return page(title="",
                     body=t,
@@ -841,7 +847,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
                     uid=uid,
                     language=ln,
                     urlargs=req.args)
-    
+
 
 def simpleendaction(doctype="", act="", startPg=1, indir="", access="",step=1,mode="U"):
     global rn,sysno,dismode,curdir,uid,uid_email,lats_step,action_score
@@ -863,7 +869,7 @@ def simpleendaction(doctype="", act="", startPg=1, indir="", access="",step=1,mo
     # If the submission directory still does not exist, we create it
     if not os.path.exists(curdir):
         return "submission directory %s does not exist" % curdir
-    # retrieve the name of the file in which the reference of 
+    # retrieve the name of the file in which the reference of
     # the submitted document will be stored
     res = run_sql("SELECT value FROM sbmPARAMETERS WHERE  doctype=%s and name='edsrn'",(doctype,))
     if len(res) == 0:
@@ -886,9 +892,9 @@ def simpleendaction(doctype="", act="", startPg=1, indir="", access="",step=1,mo
     action_score = action_details(doctype,act)
     current_level = get_level(doctype, act)
     # Calls all the function's actions
-    print_function_calls(doctype, act, step, "") 
+    print_function_calls(doctype, act, step, "")
     return "ok"
-    
+
 
 def home(req,c=cdsname,ln=cdslang):
     ln = wash_language(ln)
@@ -994,7 +1000,7 @@ def displayDoctypeBranch(doctype,catalogues):
     row = res[0]
     text = "<LI><a href=\"\" onmouseover=\"javascript:popUpTextWindow('%s',true,event);\" onmouseout=\"javascript:popUpTextWindow('%s',false,event);\" onClick=\"document.forms[0].doctype.value='%s';document.forms[0].submit();return false;\">%s</a>\n" % (doctype,doctype,doctype,row[0])
     return text
-    
+
 
 def action(req,c=cdsname,ln=cdslang,doctype=""):
     nbCateg = 0
@@ -1047,9 +1053,9 @@ function tester()
 """
     if (uid_email == "" or uid_email == "guest"):
         t = t + "alert(\"please log in first.\\nUse the top right menu to log in.\");return false;\n";
-   
+
     t = t + """
-    if (checked == 0) 
+    if (checked == 0)
     {
         alert ("please select a category");
         return false;
@@ -1073,13 +1079,13 @@ function selectdoctype(nb)
 <FORM method=get action="submit.py">"""
     t = t + "<INPUT type=\"hidden\" name=\"doctype\" value=\"%s\">\n" % doctype
     t = t + "<INPUT type=\"hidden\" name=\"indir\">"
-    
+
     pid = os.getpid()
     now = time.time()
     t = t + "<input type=hidden name=access value=\"%i_%s\">" % (now,pid)
     t = t + """
 <INPUT type="hidden" name="act">
-<INPUT type="hidden" name="startPg" value=1>""" 
+<INPUT type="hidden" name="startPg" value=1>"""
     t = t + "<INPUT type=hidden name=mainmenu value=\"submit.py?doctype=%s\">\n" % doctype
     t = t + """
  <table class="searchbox" width="100%" summary="">
@@ -1123,7 +1129,7 @@ var nbimg = document.images.length + 1;
 <BR>"""
     if nbCateg != 0:
         t = t + "<STRONG class=headline>Notice:</STRONG><BR>\nSelect a category and then click the button to perform the action you chose.\n"
-    t = t + """ 
+    t = t + """
 <BR><BR>
 <BR>
 </FORM>
@@ -1157,15 +1163,15 @@ def set_report_number (newrn):
         # then we save this value in the "journal of submissions"
         if uid_email != "" and uid_email != "guest":
             run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (newrn,doctype,access,uid_email,))
-    
+
 def get_report_number():
     global rn
     return rn
-    
+
 def set_sysno (newsn) :
     global sysno
     sysno = newsn
-    
+
 def get_sysno() :
     global sysno
     return sysno
@@ -1181,8 +1187,8 @@ def Request_Print(m, txt):
         return txt
     else:
         return ""
-    
-def Evaluate_Parameter (field, doctype): 
+
+def Evaluate_Parameter (field, doctype):
     # Returns the literal value of the parameter. Assumes that the value is
     # uniquely determined by the doctype, i.e. doctype is the primary key in
     # the table
@@ -1227,7 +1233,7 @@ def action_details (doctype, action):
             return -1
     else:
         return -1
-    
+
 def print_function_calls (doctype, action, step, form):
     # Calls the functions required by an "action" action on a "doctype" document
     # In supervisor mode, a table of the function calls is produced
@@ -1241,7 +1247,7 @@ def print_function_calls (doctype, action, step, form):
     if len(res) > 0:
         t=t+Request_Print("S",  "<br><br>Here is the %s function list for %s documents at level %s <P>" % (action,doctype,step))
         t=t+Request_Print("S", "<table border cellpadding = 15><tr><th>Function</th><th>Score</th><th>Running Function</th></tr>")
-        # while there are functions left...    
+        # while there are functions left...
         for  function in res:
             function_name = function[2]
             function_score = function[3]
@@ -1254,7 +1260,7 @@ def print_function_calls (doctype, action, step, form):
                     t=t+"function %s does not exist...<br>" % function_name
                 else:
                     function = globals()[function_name]
-                    # Evaluate the parameters, and place them in an array     
+                    # Evaluate the parameters, and place them in an array
                     parameters = Get_Parameters(function_name,doctype)
                     # Call function
                     t=t+function(parameters,curdir,form)
@@ -1296,7 +1302,7 @@ class functionError(Exception):
         self.value = value
     def __str__(self):
         return repr(self.value)
- 
+
 class functionStop(Exception):
     def __init__(self, value):
         self.value = value
@@ -1306,7 +1312,7 @@ class functionStop(Exception):
 def errorMsg(title,req,c=cdsname,ln=cdslang):
     return page(title="error",
                     body = create_error_box(req, title=title,verbose=0, ln=ln),
-                    description="%s - Internal Error" % c, 
+                    description="%s - Internal Error" % c,
                     keywords="%s, CDSware, Internal Error" % c,
                     language=ln,
                     urlargs=req.args)
@@ -1314,7 +1320,7 @@ def errorMsg(title,req,c=cdsname,ln=cdslang):
 def warningMsg(title,req,c=cdsname,ln=cdslang):
     return page(title="warning",
                     body = title,
-                    description="%s - Internal Error" % c, 
+                    description="%s - Internal Error" % c,
                     keywords="%s, CDSware, Internal Error" % c,
                     language=ln,
                     urlargs=req.args)
@@ -1326,7 +1332,7 @@ def getCookie(name,uid):
         return res[0][0]
     else:
         return None
-    
+
 def setCookie(name,value,uid):
     # these are not real http cookies but are stored in the DB
     res = run_sql("select id from sbmCOOKIES where uid=%s and name=%s", (uid,name,))
@@ -1335,7 +1341,7 @@ def setCookie(name,value,uid):
     else:
         run_sql("insert into sbmCOOKIES(name,value,uid) values(%s,%s,%s)", (name,value,uid,))
     return 1
-    
+
 def specialchars(text):
     text = string.replace(text,"&#147;","\042");
     text = string.replace(text,"&#148;","\042");
