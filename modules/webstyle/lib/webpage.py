@@ -175,14 +175,16 @@ def pagefooteronly(cdspagefooteradd="", lastupdated="", language=cdslang):
         out = re.sub(r"<!--LASTUPDATED-->", msg_last_updated[language] + " " + lastupdated, out)
     return out
 
-def create_error_box(req, title="<strong>Internal Error:</strong>", verbose=1):
+def create_error_box(req, title=None, verbose=1, ln=cdslang):
     """Analyse the req object and the sys traceback and return a text
        message box with internal information that would be suitful to
        display when something bad has happened.
        If TRACEBACK_P is set to 0, then don't print traceback, only the error."""
+    if title == None:
+        title = msg_internal_error[ln]
     boxhead = """<p>%s %s %s""" % (title, sys.exc_info()[0], sys.exc_info()[1])
-    boxbody = """<p>Please contact <a href="mailto:%s">%s</a> 
-                   quoting the following information:<blockquote><pre>""" % (urllib.quote(supportemail), supportemail)
+    boxbody = """<p>""" + msg_please_contact_and_quote[ln] % (urllib.quote(supportemail), supportemail)
+    boxbody += """<blockquote><pre>"""
     boxbody += """URI: http://%s%s\n""" % (req.hostname, req.unparsed_uri)
     boxbody += """Time: %s\n""" % time.strftime("%02d/%b/%Y:%H:%M:%S %z")
     if req.headers_in.has_key('User-Agent'):
