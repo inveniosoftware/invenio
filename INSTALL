@@ -66,10 +66,12 @@ Contents
              <http://sourceforge.net/projects/pystemmer/>
           - (recommended) PyRXP, for very fast XML MARC processing: 
              <http://www.reportlab.org/pyrxp.html>
+          - (recommended) Gnuplot.Py, for producing graphs:
+             <http://gnuplot-py.sourceforge.net/>
           - (optional) 4suite, slower alternative to PyRXP: 
              <http://4suite.org/>
           - (optional) Psyco, to speed up the code at places:
-            <http://psyco.sourceforge.net/>
+             <http://psyco.sourceforge.net/>
  
      e) mod_python Apache module.  Tested mainly with versions
         3.0BETA4 and above.  mod_python 3.x is required for Apache 2.
@@ -122,7 +124,24 @@ Contents
              <http://www.cogsci.ed.ac.uk/~richard/rxp.html>
           - (optional) 4suite:
              <http://4suite.org/>
-     
+
+     k) (recommended) Gnuplot, the command-line driven interactive
+        plotting program.  It is used to display download and citation
+        history graphs on the Detailed record pages on the web
+        interface.  Note that Gnuplot is not required, only
+        recommended.
+          <http://www.gnuplot.info/>                      
+
+     l) (recommended) A Common Lisp implementation, such as CLISP,
+        SBCL or CMUCL.  It is used for the web server log analysing
+        tool and the metadata checking program.  Note that any of the
+        three above implementations will do.  CMUCL produces fastest
+        code, but it does not support UTF-8 yet.  Note that a Common
+        Lisp implementation is not required, only recommended.
+          <http://clisp.cons.org/>
+          <http://www.cons.org/cmucl/>
+          <http://sbcl.sourceforge.net/>     
+
    Note that the configure script checks whether you have all
    the prerequisite software installed and that it won't let
    you to continue unless everything is in order.  It also warns you 
