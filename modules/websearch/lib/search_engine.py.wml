@@ -3001,7 +3001,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 for title in titles:
                     out += "<strong>%s</strong>" % title
             else:
-                out += "<strong>%s %d</strong>" % (msg_record[ln], recID)
+                out += "<strong>%s %d</strong>" % (get_field_i18nname("record ID", ln), recID)
             out += "</a>"
             # secondly, authors:
             authors = get_fieldvalues(recID, "100__a") + get_fieldvalues(recID, "700__a")
