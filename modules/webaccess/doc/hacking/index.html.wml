@@ -35,5 +35,7 @@ the WebAccess internals.
   <dd>Explains how to administrate the authorizations stored in the database for <br>
       WebAccess. Not all functions are mentioned. All mentioned functions are  <br>
       represented with signatures, some with additional explanations as well.</dd>
+  <dt><a href="table-structure.html">Access Control Table Structure</a> </dt>
+  <dd>Explains the structure of the WebAccess tables and how to create authorizations.</dd>
  </dl>
 </blockquote>
