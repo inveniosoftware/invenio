@@ -68,6 +68,10 @@ Contents
                     --with-dbuser=cdsware \
                     --with-dbpass=myp1ss 
       $ vi ./config/config.wml  ## optional, but strongly recommended
+				## fill in the ADMINEMAIL variable with 
+				## the email address of the main responsible
+				## person. He/she will then be considered by
+				## the system as a superuser.
       $ gmake
       $ gmake create-tables     ## optional
       $ gmake install
