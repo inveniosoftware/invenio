@@ -55,5 +55,9 @@ href="<WEBURL>/admin/">admin-level</a> documentation as well.  And now, back to 
 internals, like the different search stages, the high- and low-level
 API, etc.
 
+<dt><a href="<WEBURL>/help/webaccess/internals.html">WebAccess Internals</a>
+<dd>Describes information useful to understand the access control process
+internals, its API, etc.
+
 </dl>
 </blockquote>
