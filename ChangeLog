@@ -1,3 +1,488 @@
+CDSware v0.3.1 (released 2004-03-12)
+====================================
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* NEWS: Release of v0.3.1.
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/sql/tabdrop.sql: Added collection_rnkMETHOD.
+
+2004-03-12  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/.cvsignore: Added bibrankgkb
+
+2004-03-12  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/doc/admin/bibrankadminguide.html.wml,
+	modules/bibrank/doc/admin/index.html.wml,
+	modules/bibrank/doc/admin/jif.cfg,
+	modules/bibrank/doc/admin/jif.kb,
+	modules/bibrank/doc/hacking/bibrankgkb.html.wml,
+	modules/bibrank/doc/hacking/index.html.wml,
+	modules/bibrank/doc/hacking/single_tag_rank.html.wml,
+	modules/bibrank/doc/hacking/sort.html.wml,
+	modules/bibrank/etc/bibrankgkb.cfg.wml: Added first version of
+	documentation, and some example configuration files
+
+2004-03-12  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/bibrankgkb.wml,
+	modules/bibrank/etc/jif2.kb.wml,
+	modules/bibrank/etc/jt_conv.kb.wml: Added file, used as example by
+	bibrankgkb
+
+2004-03-12  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/Makefile.am, modules/bibrank/bin/bibrank.wml,
+	modules/bibrank/doc/admin/Makefile.am,
+	modules/bibrank/doc/hacking/Makefile.am,
+	modules/bibrank/etc/jif.cfg.wml, modules/bibrank/etc/jif.kb.wml:
+	Added documentation, bibrankgkb and some example files, plus
+	bugfixes
+
+2004-03-12  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webhelp/web/hacking/index.html.wml: Added Bibrank
+	Internals to the list under "Module specific information"
+
+2004-03-12  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webhelp/web/admin/index.html.wml: Addded bibrank to the
+	list under "System Librarian"
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac: Version number bumped to 0.3.1.
+
+2004-03-12  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* config/cdsnavbar.wml: Added bibrank to /admin navbar
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/messages.wml: Added `submissions' and `approvals'.
+
+2004-03-12  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/web/publiline.py.wml: renamed from addresses
+	when mail is sent
+
+2004-03-12  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/web/getfile.py.wml: renamed "archive" into
+	"access to fulltext"
+
+2004-03-12  Martin Vesely <martin.vesely@cern.ch>
+
+	* modules/bibconvert/bin/bibconvert.wml: Long options introduced.
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql.wml: Insert JIF rank
+	method.
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/cdswmllib.wml: Print CDSware version number first, to
+	clarify ``CVS $Id$ of CLI interface does not change, of LIB does''
+	problem.
+
+2004-03-12  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/miscutil/sql/tabfill.sql.wml: changed the names of
+	actions in webSubmit deleted actionbutton column in sbmACTION
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/cdsnavbar.wml: Added link to HOWTO Run.
+
+2004-03-12  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/web/admin/addActionEDS.php.wml,
+	modules/websubmit/web/admin/viewActionEDS.php.wml: got rid of the
+	actionbutton form field
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/admin/howto/Makefile.am,
+	modules/webhelp/web/admin/howto/index.html.wml: Added HOWTO Run
+	guide.
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/admin/howto/run.html.wml: Initial release of
+	the `HOWTO Run' guide.	Refinements needed.
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webstyle/css/cds.css.wml: Added margin-left for header
+	elements. (Konqueror centering)
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/messages.py.wml: Added submissions and
+	approvals messages for the page header.
+
+2004-03-12  Martin Vesely <martin.vesely@cern.ch>
+
+	* modules/bibconvert/bin/bibconvert.wml: Options -V, -h modified,
+	getopt module import.  CUT formatting function debug.
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/webaccount.py.wml: Added links to Your
+	Submissions and Your Approvals.
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/webuser.py.wml: Added isUserSubmitter()
+	and isUserReferee() from WebSubmit.  Print submissions and
+	approvals link in the header user box, if appropriate.
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websubmit/lib/websubmit_engine.py.wml: Functions
+	isUserSubmitter() and isUserReferee() moved to webuser.py.
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websubmit/lib/functions/Makefile.am: Don't want to have
+	old *.php laying around anymore.
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websubmit/web/yourapprovals.py.wml,
+	modules/websubmit/web/yoursubmissions.py.wml: Point to Your Account
+	in the navigation trail.
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websubmit/web/yourrefereed.py.wml: Renamed into
+	yourapprovals.py.wml.
+
+2004-03-12  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/lib/functions/Send_APP_Mail.py.wml,
+	modules/websubmit/lib/functions/Send_Approval_Request.py.wml,
+	modules/websubmit/lib/functions/Send_Modify_Mail.py.wml,
+	modules/websubmit/lib/functions/Send_SRV_Mail.py.wml,
+	modules/websubmit/lib/functions/Upload_Files.py.wml: FROM address
+	updated Upload_Files: first form field mandatory (action selection)
+
+2004-03-12  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/etc/bibconvert/config/EDSPICTcreate.tpl.wml,
+	modules/websubmit/etc/bibconvert/config/EDSPICTmodify.tpl.wml,
+	modules/websubmit/etc/bibconvert/config/EDSRPICTcreate.tpl.wml,
+	modules/websubmit/etc/bibconvert/config/EDSRPICTmodify.tpl.wml,
+	modules/websubmit/etc/bibconvert/config/EDSRTEXTcreate.tpl.wml,
+	modules/websubmit/etc/bibconvert/config/EDSRTEXTmodify.tpl.wml,
+	modules/websubmit/etc/bibconvert/config/EDSTEXTcreate.tpl.wml,
+	modules/websubmit/etc/bibconvert/config/EDSTEXTmodify.tpl.wml:
+	capitalised "access to fulltext" keywords go in 6531_a instead of
+	650__a
+
+2004-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibsched/bin/bibsched.wml: Add `bibrank' to the list of
+	valid bibsched processes.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/bin/bibindex.wml: Remove fulltext test print.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/bin/bibindex.wml: Workaround for getfile.py
+	links.	Needs bibdoc treatment in the future.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websubmit/lib/file.py.wml: Use absolute URLs for
+	getfile.py links.  Useful for fulltext indexer.
+
+2004-03-11  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/bibupload/bin/bibupload.wml: check for the mysql php
+	module, else outputs an error message
+
+2004-03-11  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/bibupload/bin/bibupload.wml: check if pcntl php module is
+	installed, otherwise outputs an error message
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* INSTALL: Added info on MTA.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Let us not forget the
+	portfolio.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Call BibFormat
+	on-the-fly for all `hb_*' and `hd_*' `of' arguments.
+
+2004-03-11  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql.wml: language (LANG)
+	FIELDDESC updated to provide alphabetically ordered list
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/web/index.py.wml: Import stuff within functions
+	rather than globally.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websubmit/web/approve.py.wml,
+	modules/websubmit/web/direct.py.wml,
+	modules/websubmit/web/getfile.py.wml,
+	modules/websubmit/web/publiline.py.wml,
+	modules/websubmit/web/sub.py.wml,
+	modules/websubmit/web/submit.py.wml,
+	modules/websubmit/web/summary.py.wml,
+	modules/websubmit/web/yourrefereed.py.wml,
+	modules/websubmit/web/yoursubmissions.py.wml,
+	modules/websubmit/web/admin/referees.py.wml: Do not import * from
+	config.py for security reasons.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/web/youraccount.py.wml: Import also
+	supportemail.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/web/admin/websearchadmin.py.wml: Import also
+	bindir.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibharvest/web/oai2d.py.wml: Remove unnecessary config
+	import.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/web/youraccount.py.wml: Do not import * from
+	config.py for security reasons.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webalert/web/youralerts.py.wml,
+	modules/webbasket/web/yourbaskets.py.wml: Do not import * from
+	config.py for security reasons.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/web/index.py.wml,
+	modules/websearch/web/admin/websearchadmin.py.wml: Import also
+	weburl.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/web/search.py.wml: Import also weburl, needed
+	for restricted collections.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/dbquery.py.wml: Read DB params directly from
+	WML not from the general config.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/config.py.wml: Remove DB related params from
+	the general config.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/web/search.py.wml,
+	modules/websearch/web/admin/websearchadmin.py.wml: Do not import *
+	from config.py for security reasons.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/web/index.py.wml: Do not import * from
+	config.py for security reasons.
+
+2004-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibupload/bin/bibupload.wml,
+	modules/bibformat/bin/bibformat.wml: Added missing newline after
+	version number is printed.
+
+2004-03-11  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/bibformat/bin/bibformat.wml: added -V --version option
+
+2004-03-11  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/bibupload/bin/bibupload.wml: added version output
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/bin/Makefile.am,
+	modules/websession/bin/Makefile.am: Added dependence on cdswmllib.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibrank/bin/Makefile.am: Remove bibrank_gkb that is
+	unknown yet.  Added dependence on cdswmllib.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/bin/Makefile.am,
+	modules/bibformat/bin/Makefile.am: Added dependence on cdswmllib.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webaccess/bin/Makefile.am: Added dependence of cdswmllib.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webalert/bin/Makefile.am,
+	modules/bibconvert/bin/Makefile.am,
+	modules/bibharvest/bin/Makefile.am: Added dependence on cdswmllib.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/cdswmllib.wml: Do not use slashes in pretty version
+	output.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webaccess/bin/authaction.wml: Add -h and -V arguments.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webaccess/bin/webaccessadmin.wml: Fix case of zero CLI
+	args.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webaccess/bin/webaccessadmin.wml: Added -h and -V
+	arguments.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibconvert/bin/bibconvert.wml: Added -V version info
+	argument.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibharvest/bin/bibharvest.wml: Added -V argument.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/bin/dbexec.wml: Added -h and -V options.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/bin/bibstat.wml: Introduced -h and -V options.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/bin/sessiongc.wml,
+	modules/webalert/bin/alertengine.wml,
+	modules/bibformat/bin/bibreformat.wml,
+	modules/bibrank/bin/bibrank.wml, modules/bibindex/bin/bibindex.wml:
+	Make pretty version number.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibsched/bin/bibsched.wml: Make pretty version number.
+	Override stdout/stderr only when needed.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibsched/bin/bibtaskex.wml: Make pretty version number.
+	Add main docstring.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/bin/Makefile.am,
+	modules/websearch/bin/webcoll.wml,
+	modules/bibsched/bin/Makefile.am: Make pretty version string.
+
+2004-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/cdswmllib.wml: Added function to generate pretty version
+	string from CVS $Id$ keyword.
+
+2004-03-09  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/etc/bibconvert/config/EDSPICTcreate.tpl.wml,
+	modules/websubmit/etc/bibconvert/config/EDSRPICTcreate.tpl.wml,
+	modules/websubmit/etc/bibconvert/config/EDSRTEXTcreate.tpl.wml,
+	modules/websubmit/etc/bibconvert/config/EDSTEXTcreate.tpl.wml:
+	replaced docid with recid in 8564 tag
+
+2004-03-09  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/etc/bibconvert/config/EDSPICTcreate.tpl.wml,
+	modules/websubmit/etc/bibconvert/config/EDSRPICTcreate.tpl.wml,
+	modules/websubmit/etc/bibconvert/config/EDSRTEXTcreate.tpl.wml,
+	modules/websubmit/etc/bibconvert/config/EDSTEXTcreate.tpl.wml:
+	added 8564 field for file linking
+
+2004-03-09  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/Makefile.am, modules/bibrank/bin/bibrank.wml,
+	modules/bibrank/etc/jif.cfg.wml: Changed config file and name of
+	function in bibrank
+
+2004-03-08  Tibor Simko <tibor.simko@cern.ch>
+
+	* AUTHORS: Trond added.
+
+2004-03-08  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/.cvsignore: Added *.cfg and *.kb together
+	with usual list of files to ignore.
+
+2004-03-08  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/.cvsignore, modules/bibrank/Makefile.am,
+	modules/bibrank/bin/.cvsignore, modules/bibrank/bin/Makefile.am,
+	modules/bibrank/bin/bibrank.wml, modules/bibrank/doc/.cvsignore,
+	modules/bibrank/doc/Makefile.am,
+	modules/bibrank/doc/admin/.cvsignore,
+	modules/bibrank/doc/admin/Makefile.am,
+	modules/bibrank/doc/hacking/.cvsignore,
+	modules/bibrank/doc/hacking/Makefile.am,
+	modules/bibrank/etc/Makefile.am, modules/bibrank/etc/jif.cfg.wml,
+	modules/bibrank/etc/jif.kb.wml: Initial import of the BibRank
+	module.
+
+2004-03-08  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* configure.ac: Added path to bibrank dirs.
+
+2004-03-08  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/Makefile.am: Add BibRank module.
+
+2004-03-08  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql.wml: got rid of
+	thomas.baron@cern.ch email address in the demo websubmit config
+
+2004-03-05  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac: Bump YYYMMDD snapshot after the release of 0.3.0.
+
+
+CDSware v0.3.0 (released 2004-03-05)
+====================================
+
+2004-03-05  Tibor Simko <tibor.simko@cern.ch>
+
+        * ChangeLog: Started doing changelogs.
+
 2004-03-05  Tibor Simko <tibor.simko@cern.ch>
 
 	* configure.ac: Added path to bibconvert etc.
@@ -1300,6 +1785,10 @@
 
 	* configure.ac: Bump CVS version number.
 
+
+CDSware v0.1.2 (released 2002-12-21)
+====================================
+
 2003-12-21  Tibor Simko <tibor.simko@cern.ch>
 
 	* NEWS: v0.1.2 is released.
@@ -1343,6 +1832,10 @@
 2003-12-19  Tibor Simko <tibor.simko@cern.ch>
 
 	* modules/bibformat/bin/bibreformat.wml: Fixed getpass() call.
+
+
+CDSware v0.1.1 (released 2002-12-19)
+====================================
 
 2003-12-19  Tibor Simko <tibor.simko@cern.ch>
 
@@ -1724,6 +2217,10 @@
 	* modules/webaccess/lib/webaccessadmin_lib.py.wml,
 	modules/webaccess/web/admin/index.html.wml: Fixed bug with
 	<WEBURL>.
+
+
+CDSware v0.1.0 (released 2002-12-04)
+====================================
 
 2003-12-04  Tibor Simko <tibor.simko@cern.ch>
 
@@ -5373,3 +5870,6 @@
 	config/cdsnavtrail.wml, config/cdspage.wml, config/config.wml,
 	config/configbis.wml.in: cdsware
 
+- previous history not logged -
+
+- end of file -
