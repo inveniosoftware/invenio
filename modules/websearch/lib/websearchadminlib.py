@@ -1727,6 +1727,8 @@ def perform_modifyfield(colID, fldID, fldvID='', ln=cdslang, content='',callback
         body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
+    if len(col_fld) == 0:
+        output = content
     return perform_showsearchoptions(colID, ln, content=output)
 
 def perform_showoutputformats(colID, ln=cdslang, callback='yes', content='', confirm=-1):
