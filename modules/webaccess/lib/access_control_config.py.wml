@@ -35,7 +35,7 @@ WEBACCESSADMINROLE  = 'webaccessadmin'
 WEBACCESSACTION     = 'cfgwebaccess'
 # name of the action allowing roles to delegate the rights to other roles
 # ex: libraryadmin to delegate libraryworker
-DELEGATEADDUSERROLE = 'delegate_adduserrole'
+DELEGATEADDUSERROLE = 'accdelegaterole'
 # max number of users to display in the drop down selects
 MAXSELECTUSERS = 25
 # max number of users to display in a page (mainly for user area)
