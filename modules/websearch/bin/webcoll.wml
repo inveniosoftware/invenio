@@ -554,7 +554,7 @@ class Collection:
                         box += """<tr>
                                     <td class="latestadditionsboxtimebody">%s</td>
                                     <td class="latestadditionsboxrecordbody">%s</td>
-                                  </tr>""" % (get_creation_date(recIDs[idx],fmt="%Y-%m-%d<br>%h:%i"), print_record(recIDs[idx]))
+                                  </tr>""" % (get_creation_date(recIDs[idx],fmt="%Y-%m-%d<br>%H:%i"), print_record(recIDs[idx]))
                 box += "</table>"
                 if self.nbrecs > rg:
                     box += """<div align="right"><small><a href="%s&amp;ln=%s">[&gt;&gt; %s]</a></small></div>""" % (url, ln, msg_more[ln])
