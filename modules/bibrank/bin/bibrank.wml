@@ -385,7 +385,7 @@ def command_line():
     user = authenticate(user)
     if options["verbose"]>=9:
         write_message("Storing task options %s" % options)
-    query = """INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status) VALUES ('runbibrank','%s',CAST('%s' AS DATE),'%s','%s','WAITING')""" % (MySQLdb.escape_string(user),MySQLdb.escape_string(sched_time), sleeptime, MySQLdb.escape_string(dumps(options)))
+    query = """INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status) VALUES ('bibrank','%s',CAST('%s' AS DATE),'%s','%s','WAITING')""" % (MySQLdb.escape_string(user),MySQLdb.escape_string(sched_time), sleeptime, MySQLdb.escape_string(dumps(options)))
 
     new_task_id = run_sql(query)
     print "Task #%d was successfully scheduled for execution." % new_task_id
@@ -410,7 +410,7 @@ def task_run(row):
     signal.signal(signal.SIGCONT, task_sig_wakeup)
     signal.signal(signal.SIGINT, task_sig_unknown)
 
-    if task_proc != "runbibrank":
+    if task_proc != "bibrank":
         write_message("-The task #%d does not seem to be a BibRank task." % task_id, sys.stderr)
         return 0
     if task_status != "WAITING":
