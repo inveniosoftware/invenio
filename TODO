@@ -292,6 +292,24 @@ After a new release:
 indicating that bibformat didn't change while bibindex did a lot in
 between the two releases.
 
+** Miscellaneous-010: INSTALL file and root/non-root
+
+>   (o) You forgot to mention that many steps are to be done as
+> root. Some are obvious, others are not. But for clean install file
+> it should be stated, especially when you have before (using the
+> "sudo" shortcut) - make install (obviously) - make XXX-demo-XXX
+> (most likely the /var/www/ directly you propose is not writable for
+> all users!)
+
+Actually, most of the steps shouldn't be done as root.  The /var/www
+was listed only for illustration purposes.  I agree that we may
+describe the installation process in a more howto manner, e.g. how to
+create first a special ``cdsware'' user that will be used later to run
+the system, or how to share permissions with the Apache user via
+groups, etc.  The INSTALL file is silent on this now, each site has
+their own preferences.  I've added a task to our TODO file to improve
+this.
+
 * OAI
 
 ** OAI-001: RTdata dir should be created during `make install` ?
@@ -320,6 +338,19 @@ On Tue, 28 Sep 2004, pelzer@hbz-nrw.de wrote:
 
 ** WebAccess-001: restriction by IP
 Wed Nov  3 11:39:58 2004
+
+** WebAccess-002: passage de CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS inactive les comptes
+Tue Feb 22 18:24:52 2005
+
+Le passage de CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS de 0 a 3 inactive les
+comptes.  Comment fixer le probleme:
+
+  $ echo 'update user set note=1 where id=1' | /<prefix>/bin/dbexec
+
+La raison en est que vous avez utilise un access level different de 3
+avant, et lorsque vous avez passe a 3 le systeme a considere tous les
+comptes existants comme inactifs, y compris celui de superuser.  Nous
+allons fixer cela.
 
 * WebAlert
 
@@ -461,6 +492,23 @@ Mon Jan 10 19:28:30 2005
 
 investigate doing partial phrase match when exact phrase match failed,
 exactly as we were doing some years ago.
+
+** WebSearch-019: better no match messages for phrase queries
+Mon Feb  7 16:22:23 2005
+
+Whenever a search using '...' gives zero, your diagnostic messages all
+have % in place of the '. This is extremely confusing. Surely it would
+be a simple matter to display the diagnostic in the form the query was
+typed in?
+
+** WebSearch-020: wau=ellis -> author:ellis
+Mon Feb  7 16:35:11 2005
+
+Yes, the equal sign has a special meaning in order to translate our
+old syntax such as ``wau=ellis'' into the new one ``author:ellis''.
+As you noticed, currently the search engine only blindly replaces
+``='' with ``:'' everywhere, which is no good.  I'll make it look
+properly for ``wau='', ``wti='', etc places only.
 
 
 * WebSession
