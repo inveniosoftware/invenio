@@ -2029,6 +2029,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', decompress=zli
                 req.write("</small></div>\n")
                 for irec in range(irec_max,irec_min,-1):
                     req.write(print_record(recIDs[irec], format, ot))
+                    req.write("""<input name="recid" type="hidden" value="%s"></td>""" % irec)
                     req.write("<p><p>")
             #req.write("""<div align="right"><input type="submit" name="action" value="ADD TO BASKET"></div>""")
             req.write("""<br><input class="formbutton" type="submit" name="action" value="ADD TO BASKET">""")
@@ -2608,6 +2609,58 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             results_final_nb[coll] = results_final[coll]._nbhits
             results_final_nb_total += results_final_nb[coll]
         # was there at least one hit?
+        if results_final_nb_total == 0:
+            # nope, so try silently dash-slash-etc-less matches first:
+            if as==1 or (p1 or p2 or p3):
+                if re.search(r'\w[^a-zA-Z0-9]\w',p1) or \
+                   re.search(r'\w[^a-zA-Z0-9]\w',p2) or \
+                   re.search(r'\w[^a-zA-Z0-9]\w',p3):
+                    p1 = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1 \\2", p1)
+                    p2 = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1 \\2", p2)
+                    p3 = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1 \\2", p3)
+                    if of.startswith('h'):
+                        print_warning(req, "No match found.  Trying similar queries...", "", "<p>","<p>")
+                    results_final = search_pattern(req, "", "", colls_to_search)
+                    if p1:
+                        results_tmp = search_pattern(req, p1, f1, colls_to_search, m1)
+                        for coll in colls_to_search: # join results for first advanced search boxen
+                            results_final[coll].intersect(results_tmp[coll])
+                    if p2:
+                        results_tmp = search_pattern(req, p2, f2, colls_to_search, m2)
+                        for coll in colls_to_search: # join results for first and second advanced search boxen
+                            if op1 == "a": # add
+                                results_final[coll].intersect(results_tmp[coll])
+                            elif op1 == "o": # or
+                                results_final[coll].union(results_tmp[coll])
+                            elif op1 == "n": # not
+                                results_final[coll].difference(results_tmp[coll])
+                            else:
+                                print_warning(req, "Invalid set operation %s." % op1, "Error")
+                    if p3:
+                        results_tmp = search_pattern(req, p3, f3, colls_to_search, m3)
+                        for coll in colls_to_search: # join results for second and third advanced search boxen
+                            if op2 == "a": # add
+                                results_final[coll].intersect(results_tmp[coll])
+                            elif op2 == "o": # or
+                                results_final[coll].union(results_tmp[coll])
+                            elif op2 == "n": # not
+                                results_final[coll].difference(results_tmp[coll])
+                            else:
+                                print_warning(req, "Invalid set operation %s." % op1, "Error")            
+                    for coll in colls_to_search:
+                        results_final[coll].calculate_nbhits()
+                        results_final_nb[coll] = results_final[coll]._nbhits
+                        results_final_nb_total += results_final_nb[coll]
+            else:
+                if re.search(r'\w[^a-zA-Z0-9]\w',p):
+                    p = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1 \\2", p)
+                    if of.startswith('h'):
+                        print_warning(req, "No match found.  Trying %s..." % p, "", "<p>","<p>")
+                    results_final = search_pattern(req, p, f, colls_to_search, None)
+                    for coll in colls_to_search:
+                        results_final_nb[coll] = results_final[coll]._nbhits
+                        results_final_nb_total += results_final_nb[coll]                
+        # once again, was there at least one hit?
         if results_final_nb_total == 0:
             # nope, so try similar queries:
             if of.startswith('h'):
