@@ -35,7 +35,7 @@ import os
 import sys
 import urllib
 sys.path.append('%s' % pylibdir)
-from cdsware.config import *
+from cdsware.config import cdsname
 from cdsware import search_engine
 from cdsware.webpage import page, pageheaderonly, pagefooteronly
 from cdsware.webuser import getUid
