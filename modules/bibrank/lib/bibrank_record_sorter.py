@@ -333,7 +333,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     except Exception, e:
         result = (None, "", adderrorbox("An error occured when trying to rank the search result", ["Unexpected error: %s<br><b>Traceback:</b>%s" % (e, traceback.format_tb(sys.exc_info()[2]))]), voutput)
 
-    if result[0]:
+    if result[0] and result[1]:
         results_similar_recIDs = map(lambda x: x[0], result[0])
         results_similar_relevances = map(lambda x: x[1], result[0])
         result = (results_similar_recIDs, results_similar_relevances, result[1], result[2], result[3])
@@ -366,6 +366,78 @@ def combine_method(rank_method_code, pattern, hitset, rank_limit_relevance,verbo
     result = result.items()
     result.sort(lambda x, y: cmp(x[1], y[1]))
     return (result, "(", ")", voutput)
+
+def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbose):
+    """Ranking of records based on predetermined values.
+    input:
+    rank_method_code - the code of the method, from the name field in rnkMETHOD, used to get predetermined values from 
+    rnkMETHODDATA
+    lwords - a list of words from the query
+    hitset - a list of hits for the query found by search_engine
+    rank_limit_relevance - show only records with a rank value above this
+    verbose - verbose value
+    output:
+    reclist - a list of sorted records, with unsorted added to the end: [[23,34], [344,24], [1,01]] 
+    prefix - what to show before the rank value 
+    postfix - what to show after the rank value
+    voutput - contains extra information, content dependent on verbose value"""
+
+    global voutput
+    rnkdict = run_sql("SELECT relevance_data FROM rnkMETHODDATA,rnkMETHOD where rnkMETHOD.id=id_rnkMETHOD and rnkMETHOD.name='%s'" % rank_method_code)
+
+    if not rnkdict:
+        return (None, "Warning, Could not load ranking data for method.", "", voutput)
+
+    lwords_hitset = None
+    for j in range(0, len(lwords)):
+        if lwords[j] and lwords[j][:6] == "recid:":
+            if not lwords_hitset:
+                lwords_hitset = HitSet()
+            lword = lwords[j][6:]
+            if string.find(lword, "->") > -1:
+                lword = string.split(lword, "->")
+                if int(lword[0]) >= cfg_max_recID + 1 or int(lword[1]) >= cfg_max_recID + 1:        
+                    return (None, "Warning, The record range given is out of range.", "", voutput)  
+                for i in range(int(lword[0]), int(lword[1])):
+                    lwords_hitset.add(int(i))
+            elif lword < cfg_max_recID + 1:
+                lwords_hitset.add(int(lword))
+            else:
+                return (None, "Warning, The record range given is out of range.", "", voutput)  
+    
+    rnkdict = deserialize_via_marshal(rnkdict[0][0])
+    if verbose > 0:
+        voutput += "<br>Running rank method: %s, using rank_by_method function in bibrank_record_sorter<br>" % rank_method_code
+        voutput += "Ranking data loaded, size of structure: %s<br>" % len(rnkdict)
+    lrecIDs = hitset.items()
+
+    if verbose > 0:
+        voutput += "Number of records to rank: %s<br>" % len(lrecIDs)
+    reclist = []
+    reclist_addend = []
+
+    if not lwords_hitset:
+        for recID in lrecIDs:
+            if rnkdict.has_key(recID):
+                reclist.append((recID, rnkdict[recID][1]))
+                del rnkdict[recID]
+            else:
+                reclist_addend.append((recID, 0))
+    else:
+        lwords_lrecIDs = lwords_hitset.items()
+        for recID in lwords_lrecIDs:
+            if rnkdict.has_key(recID) and hitset.contains(recID):
+                reclist.append((recID, rnkdict[recID][1]))
+                del rnkdict[recID]
+            elif hitset.contains(recID):
+                reclist_addend.append((recID, 0))
+        
+    if verbose > 0:
+        voutput += "Number of records ranked: %s<br>" % len(reclist)
+        voutput += "Number of records not ranked: %s<br>" % len(reclist_addend)
+
+    reclist.sort(lambda x, y: cmp(x[1], y[1]))
+    return (reclist_addend + reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
 
 def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     """Finding terms to use for calculating similarity. Terms are taken from the recid given, returns a list of recids's and relevance,
@@ -448,78 +520,6 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
         rank_method_stat(rank_method_code, reclist, query_terms)
 
     return (reclist[:len(reclist)], methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
-
-def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbose):
-    """Ranking of records based on predetermined values.
-    input:
-    rank_method_code - the code of the method, from the name field in rnkMETHOD, used to get predetermined values from 
-    rnkMETHODDATA
-    lwords - a list of words from the query
-    hitset - a list of hits for the query found by search_engine
-    rank_limit_relevance - show only records with a rank value above this
-    verbose - verbose value
-    output:
-    reclist - a list of sorted records, with unsorted added to the end: [[23,34], [344,24], [1,01]] 
-    prefix - what to show before the rank value 
-    postfix - what to show after the rank value
-    voutput - contains extra information, content dependent on verbose value"""
-
-    global voutput
-    rnkdict = run_sql("SELECT relevance_data FROM rnkMETHODDATA,rnkMETHOD where rnkMETHOD.id=id_rnkMETHOD and rnkMETHOD.name='%s'" % rank_method_code)
-
-    if not rnkdict:
-        return (None, "Warning, Could not load ranking data for method.", "", voutput)
-
-    lwords_hitset = None
-    for j in range(0, len(lwords)):
-        if lwords[j] and lwords[j][:6] == "recid:":
-            if not lwords_hitset:
-                lwords_hitset = HitSet()
-            lword = lwords[j][6:]
-            if string.find(lword, "->") > -1:
-                lword = string.split(lword, "->")
-                if int(lword[0]) >= cfg_max_recID + 1 or int(lword[1]) >= cfg_max_recID + 1:        
-                    return (None, "Warning, The record range given is out of range.", "", voutput)  
-                for i in range(int(lword[0]), int(lword[1])):
-                    lwords_hitset.add(int(i))
-            elif lword < cfg_max_recID + 1:
-                lwords_hitset.add(int(lword))
-            else:
-                return (None, "Warning, The record range given is out of range.", "", voutput)  
-    
-    rnkdict = deserialize_via_marshal(rnkdict[0][0])
-    if verbose > 0:
-        voutput += "<br>Running rank method: %s, using rank_by_method function in bibrank_record_sorter<br>" % rank_method_code
-        voutput += "Ranking data loaded, size of structure: %s<br>" % len(rnkdict)
-    lrecIDs = hitset.items()
-
-    if verbose > 0:
-        voutput += "Number of records to rank: %s<br>" % len(lrecIDs)
-    reclist = []
-    reclist_addend = []
-
-    if not lwords_hitset:
-        for recID in lrecIDs:
-            if rnkdict.has_key(recID):
-                reclist.append((recID, rnkdict[recID][1]))
-                del rnkdict[recID]
-            else:
-                reclist_addend.append((recID, 0))
-    else:
-        lwords_lrecIDs = lwords_hitset.items()
-        for recID in lwords_lrecIDs:
-            if rnkdict.has_key(recID) and hitset.contains(recID):
-                reclist.append((recID, rnkdict[recID][1]))
-                del rnkdict[recID]
-            elif hitset.contains(recID):
-                reclist_addend.append((recID, 0))
-        
-    if verbose > 0:
-        voutput += "Number of records ranked: %s<br>" % len(reclist)
-        voutput += "Number of records not ranked: %s<br>" % len(reclist_addend)
-
-    reclist.sort(lambda x, y: cmp(x[1], y[1]))
-    return (reclist_addend + reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
 
 def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbose):
     """Ranking a records containing specified words and returns a sorted list.
