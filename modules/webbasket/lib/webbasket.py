@@ -30,7 +30,7 @@ try:
     from config import *
     from webpage import page
     from dbquery import run_sql
-    from webuser import getUid, getDataUid
+    from webuser import getUid, getDataUid,isGuestUser
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -68,8 +68,9 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
     basket_name = ""
     public_basket="no"
     permission = []
-
+    id_user = isGuestUser(uid)
     bname = get_basket_name( id_basket )
+
     # execute the requested action
     if (action == "DELETE") and (id_basket != '0') and (id_basket != 0):
 
@@ -264,7 +265,12 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
                     basket_name = newbname                
         
         out += display_basket_content(uid, id_basket, basket_name)
-    
+    # if is guest user print message of relogin
+    if (id_user == 1):
+	 out += """<br><br><FONT color="red"> You are logged in as a <B>guest</B> user, so your baskets
+        will disappear at the end of the current session. If you wish you can login or register
+        <A href="./login">here</A>.</FONT>"""	
+ 
     return out
 
     
