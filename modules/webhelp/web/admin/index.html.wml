@@ -183,7 +183,7 @@ engine.
   can force reindexing of the fulltext index, etc.
 </td>
 <td>
-  <small class=note>not available, but see the guide for the command-line way</small>
+  <a href="bibindex/">BibIndex Admin Interface</a>
 </td>
 <td>
   <a href="bibindex/guide.html">BibIndex Admin Guide</a>
