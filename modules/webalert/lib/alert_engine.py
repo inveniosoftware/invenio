@@ -39,6 +39,7 @@ try:
     from search_engine import perform_request_search
     from dbquery import run_sql
     from htmlparser import *
+    from string import split
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -160,9 +161,10 @@ def print_records(record_ids):
         c += 1
 
     if c > MAXIDS:
-        msg += '\n\n' + 'Only the first %s records are displayed above. Please consult the URL below to see all the results.' % MAXIDS
+        msg += '\n\n' + wrap('Only the first %s records are displayed above. Please consult the URL below to see all the results.' % MAXIDS)
 
     return msg
+
 
 
 def email_notify(alert, records, argstr):
@@ -179,8 +181,8 @@ def email_notify(alert, records, argstr):
     if DEBUGLEVEL > 0:
         msg = "*** THIS MESSAGE WAS SENT IN DEBUG MODE, DON'T TAKE IT INTO ACCOUNT ***\n\n"
 
-    msg += "Hello\n\nBelow are the results of the email alert that you set up with the CERN Document Server.\n"
-    msg += "This is an automatic message, please don't reply to its address. For any question, use <%s> instead.\n" % supportemail
+    msg += "Hello\n\n"
+    msg += wrap("Below are the results of the email alert that you set up with the CERN Document Server. This is an automatic message, please don't reply to its address. For any question, use <%s> instead." % supportemail)
 
     email = get_email(alert[0])
         
@@ -193,20 +195,20 @@ def email_notify(alert, records, argstr):
     
     time = strftime("%d-%m-%Y")
 
-    msg += '\nalert name: %s' % alert[5]
-    msg += '\npattern: \'%s\'' % pattern
+    msg += '\n' + wrap('alert name: %s' % alert[5])
+    msg += wrap('pattern: \'%s\'' % pattern)
     if catalogue:
-        msg += '\n%s: %s' % (catword, catalogue)
-    msg += '\nfrequency: %s ' % format_frequency(alert[3])
-    msg += '\nrun time: %s ' % time
-    msg += '\nfound: %s record' % len(records)
+        msg += wrap('%s: %s' % (catword, catalogue))
+    msg += wrap('frequency: %s ' % format_frequency(alert[3]))
+    msg += wrap('run time: %s ' % time)
+    msg += wrap('found: %s record' % len(records))
     if len(records) > 1:
         msg += 's'
     msg += "\nurl: <%s/search.py?%s>\n" % (weburl, argstr)
 
-    msg += print_records(records)
+    msg += wrap_records(print_records(records))
 
-    msg += "\n\n-- \nCERN Document Server Alert Service <%s>\nUnsubscribe at <%s>\nNeed human intervention? Contact <%s>" % (weburl, ALERTURL, supportemail)
+    msg += "-- \nCERN Document Server Alert Service <%s>\nUnsubscribe at <%s>\nNeed human intervention? Contact <%s>" % (weburl, ALERTURL, supportemail)
 
     subject = 'Alert %s run on %s' % (alert[5], time)
     

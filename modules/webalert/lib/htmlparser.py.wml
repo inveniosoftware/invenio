@@ -34,11 +34,34 @@ try:
     from config import *
     from search_engine import print_record
     from HTMLParser import HTMLParser
+    import textwrap
+    from string import split
 except ImportError, e:
     print "Error: %s" % e
     import sys
     sys.exit(1)    
 
+WRAPWIDTH = 72
+
+def wrap(text):
+    global WRAPWIDTH
+    
+    lines = textwrap.wrap(text, WRAPWIDTH)
+    r = ''
+    for l in lines:
+        r += l + '\n'
+    return r
+
+def wrap_records(text):
+    global WRAPWIDTH
+    
+    lines = split(text, '\n')
+    result = ''
+    for l in lines:
+        newlines = textwrap.wrap(l, WRAPWIDTH)
+        for ll in newlines:
+            result += ll + '\n'
+    return result
 
 class RecordHTMLParser(HTMLParser):
     """A parser for the HTML returned by cdsware.search_engine.print_record.
@@ -87,6 +110,10 @@ class RecordHTMLParser(HTMLParser):
         else:
             self.result += data
 
+    def handle_comment(self, data):
+        pass
+    
+
 def get_as_text(record_id):
     """Return the plain text from RecordHTMLParser of the record."""
 
@@ -96,6 +123,7 @@ def get_as_text(record_id):
         htparser.feed(rec)
         return htparser.result
     except:
+        htparser.close()
         return htparser.result + '\n**HTML Error detected in record <http://cdsweb.cern.ch/search.py?recid=%s>, contact <%s>.' % (record_id, supportemail)
 
 

@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir=$(libdir)/python/cdsware
-pylib_DATA=webalert.py alert_engine.py htmlparser.py
+pylib_DATA=webalert.py alert_engine.py htmlparser.py textwrap.py
 
 EXTRA_DIST = $(wildcard *.wml)
 
