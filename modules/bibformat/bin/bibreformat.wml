@@ -79,6 +79,8 @@ def bibreformat_task(sql_queries, mysql_queries, process_hb):
         print_info()
         sys.exit()
 
+    print "Querying the database.."
+
     if process_hb:
         without_hb = withouthb()
 
@@ -93,7 +95,7 @@ def bibreformat_task(sql_queries, mysql_queries, process_hb):
 
     for sql_query in sql_queries:
         res = run_sql(sql_query)
-        for item in res:        
+        for item in res:
             recIDs.append(item[0])
 
 ### list of corresponding record IDs was retrieved
