@@ -179,7 +179,8 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=howto_migrate txt="HOWTO Migrate" url="<HTDOCSURL>admin/howto/migrate.shtml" hint="Admin's HOWTO Docs - How to Migrate your old documents into CDSware">
+  <navbar:button id=howto_marc txt="HOWTO MARC" url="<HTDOCSURL>admin/howto/marc.shtml" hint="Admin's HOWTO Guides - How to MARC your medatada">
+  <navbar:button id=howto_migrate txt="HOWTO Migrate" url="<HTDOCSURL>admin/howto/migrate.shtml" hint="Admin's HOWTO Guides - How to Migrate your old documents into CDSware">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
