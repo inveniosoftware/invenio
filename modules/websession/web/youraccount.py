@@ -106,7 +106,7 @@ def lost(req, ln=cdslang):
     if uid == -1:
         return webuser.page_not_authorized(req, "../youraccount.py/lost")
 
-    return page(title="Login",
+    return page(title="Lost your password?",
                 body=webaccount.perform_lost(),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
                 description="CDS Personalize, Main page",
@@ -188,7 +188,7 @@ def send_email(req, p_email=None, ln=cdslang):
                        lastupdated=__lastupdated__)
 
     server.quit()
-    return page(title="Your Account",
+    return page(title="Lost password sent",
                 body=webaccount.perform_emailSent(p_email),
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
@@ -314,7 +314,7 @@ def register(req, p_email=None, p_pw=None, p_pw2=None, action='login', referer='
         if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
             mess += " A second email will be sent when the account has been activated and can be used."
         else:
-            mess += """ To continue to your account, press <a href="%s/youraccount.py/display?ln=%s">here</a>""" % (weburl, ln)
+            mess += """ You can now access your <a href="%s/youraccount.py/display?ln=%s">account</a>.""" % (weburl, ln)
     elif ruid == -1:
         mess = "The user already exists in the database, please try again."
 	act = "register"
@@ -324,7 +324,7 @@ def register(req, p_email=None, p_pw=None, p_pw2=None, action='login', referer='
 	act = "register"
         title = "Register failure"
     else:
-        mess = "Your are not registered into the system, please try again."
+        mess = "The email address given is not valid, please try again."
        	act = "register"
         title = "Register failure"
 

@@ -312,24 +312,23 @@ def perform_lost():
     out =""
     out +="""
 	  <body>
-		<big><strong class=headline>Lost your password?</strong></big>
 		<form  method="post" action="../youraccount.py/send_email">
 		 If you have lost your password string, please enter the email address of your cds.cern.ch account. 
 		 The lost password will be emailed to the owner of that account.
 		<table>		
 	    		<tr>
 				<td align=right><strong>Email address:</strong></td>
-				<td><input type="text" size="25" name="p_email" value=""><br><IMG src="%s/r.gif" alt="">&nbsp<small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td>
+				<td><input type="text" size="25" name="p_email" value=""></td>
 				<td><input type="hidden" name="action" value="lost"></td>
 			</tr>
-			<tr>
-				<td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" value="Fetch password"></code></td>
+			<tr><td></td>
+				<td><code class=blocknote><input class="formbutton" type="submit" value="Fetch password"></code></td>
 			</tr>
 		</table>
 			
 		</form>
 	  </body>
-	  """%imagesurl
+	  """
     return out
 
 # perform_emailSent(email): confirm that the password has been emailed to 'email' address
