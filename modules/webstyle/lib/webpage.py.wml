@@ -67,19 +67,19 @@ page_template_footer = """
 
 page_template_body = """
 <div class="pagebody">
-  <div class="pagestripeleft">
+  <div class="pagebodystripeleft">
     <div class="pageboxlefttop"><CDSPAGEBOXLEFTTOP></div>
     <div class="pageboxlefttopadd">%s</div>
     <div class="pageboxleftbottomadd">%s</div>
     <div class="pageboxleftbottom"><CDSPAGEBOXLEFTBOTTOM></div>
   </div>
-  <div class="pagestriperight">
+  <div class="pagebodystriperight">
     <div class="pageboxrighttop"><CDSPAGEBOXRIGHTTOP></div>
     <div class="pageboxrighttopadd">%s</div>
     <div class="pageboxrightbottomadd">%s</div>
     <div class="pageboxrightbottom"><CDSPAGEBOXRIGHTBOTTOM></div>
   </div>
-  <div class="pagestripemiddle">
+  <div class="pagebodystripemiddle">
     <h1 class="headline">%s</h1>
     %s
   </div>
@@ -171,6 +171,7 @@ def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspa
     out = re.sub(r"<!--MSGBULLETIN-->", msg_bulletin[language], out)
     out = re.sub(r"<!--MSGLIBRARY-->", msg_library[language], out)
     out = re.sub(r"<!--MSGHELP-->", msg_help[language], out)
+    out = re.sub(r"<!--MSGPERSONALIZE-->", msg_personalize[language], out)
     out = re.sub(r"<!--LN-->", language, out)
     out = re.sub(r"<!--NAVTRAILBOXBODY-->", create_navtrailbox_body(title, navtrail, language=language), out)
     out = re.sub(r"<!--USERINFOBOXBODY-->", create_userinfobox_body(uid, language), out)
