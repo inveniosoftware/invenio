@@ -993,10 +993,16 @@ class WordTable:
                 new_words = get_words_function(phrase) # ,self.separators
                 wlist[recID] = list_union(new_words,wlist[recID])
 
+        # were there some words for these recIDs found?
         if len(wlist) == 0: return 0
         recIDs = wlist.keys()
-        if opts_dict["verbose"] >= 9:
-            for recID in recIDs:
+        for recID in recIDs:
+            # was this record marked as deleted?
+            if "DELETED" in self.get_field(recID, "980__c"):
+                wlist[recID] = []
+                if opts_dict["verbose"] >= 9:
+                    write_message("... record %d was declared deleted, removing its word list" % recID)
+            if opts_dict["verbose"] >= 9:
                 write_message("... record %d, wordlist: %s" % (recID, wlist[recID]))
 
         # Using cStringIO for speed.
@@ -1630,4 +1636,5 @@ if __name__ == "__main__":
     #test_word_separators("?C++.NET")
     #test_word_separators("\x4C\x6F\xC3\xAF\x65\x7A")
     #test_word_separators("O'Neil and pi- in real.business")
+    #test_word_separators("CERN-TH-1995-001 CERN-TH-95-01 CERN-TH/95-1")
     main()
