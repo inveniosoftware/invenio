@@ -78,7 +78,7 @@ def get_cited_by_list(record_id):
     """
     citation_list = []
     try:
-        citation_list = get_cited_by_dictionary()[record_id]
+        citation_list = get_cited_by_dictionary().get(record_id, [])
     except TypeError:
         pass
     return citation_list
@@ -89,7 +89,7 @@ def get_co_cited_with_list(record_id):
     result_intermediate = {}
     citation_list = []
     try:
-        citation_list = get_cited_by_dictionary()[record_id]
+        citation_list = get_cited_by_dictionary().get(record_id, [])
     except TypeError:
         pass
     for cit_id in citation_list:
