@@ -51,7 +51,7 @@ function checkScoreStep(score, step)
    {
       for(index = 0; index < score.length; index++)  
       {
-         if(!(score[index] >= 0 && score[index] <= 9))
+         if(!(score.charAt(index) >= "0" && score.charAt(index) <= "9"))
          {
             foundNonNumericScore = true;
             break; 
@@ -62,7 +62,7 @@ function checkScoreStep(score, step)
       {
          for(index = 0; index < step.length; index++)
          {
-            if(!(step[index] >= 0 && step[index] <= 9))
+            if(!(step.charAt(index) >= "0" && step.charAt(index) <= "9"))
             {
                foundNonNumericStep = true;
                break;   
