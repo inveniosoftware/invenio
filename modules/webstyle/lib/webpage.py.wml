@@ -175,10 +175,11 @@ def pagefooteronly(cdspagefooteradd="", lastupdated="", language=cdslang):
         out = re.sub(r"<!--LASTUPDATED-->", msg_last_updated[language] + " " + lastupdated, out)
     return out
 
-def create_error_box(req, title="<strong>Internal Error:</strong>"):
+def create_error_box(req, title="<strong>Internal Error:</strong>", verbose=1):
     """Analyse the req object and the sys traceback and return a text
        message box with internal information that would be suitful to
-       display when something bad has happened."""
+       display when something bad has happened.
+       If TRACEBACK_P is set to 0, then don't print traceback, only the error."""
     boxhead = """<p>%s %s %s""" % (title, sys.exc_info()[0], sys.exc_info()[1])
     boxbody = """<p>Please contact <a href="mailto:%s">%s</a> 
                    quoting the following information:<blockquote><pre>""" % (urllib.quote(supportemail), supportemail)
@@ -187,8 +188,10 @@ def create_error_box(req, title="<strong>Internal Error:</strong>"):
     if req.headers_in.has_key('User-Agent'):
         boxbody += """Browser: %s\n""" % req.headers_in['User-Agent']
     boxbody += """Client: %s\n""" % req.connection.remote_ip
-    boxbody += """Error: %s %s\n""" % (sys.exc_info()[0], sys.exc_info()[1])
-    boxbody += "Traceback: \n%s" % string.join(traceback.format_tb(sys.exc_info()[2]),"\n")
+    if verbose >= 1:
+        boxbody += """Error: %s %s\n""" % (sys.exc_info()[0], sys.exc_info()[1])
+    if verbose >= 9:
+        boxbody += "Traceback: \n%s" % string.join(traceback.format_tb(sys.exc_info()[2]),"\n")
     boxbody += """</pre></blockquote>"""
     out = """
         <table class="errorbox">
