@@ -207,18 +207,18 @@ cds.support@cern.ch
 ##  (example: "")
 <define-tag CDSPAGEHEADER>
 <div style="background-image: url(<WEBURL>/img/header_background.gif);">
-<table border="0" cellpadding="0" cellspacing="0" class="headerbox">
+<table class="headerbox">
  <tr>
   <td rowspan="2" class="headerboxbodylogo">
    <!--CDSNAMEINTL-->
   </td>
   <td align="right" class="userinfoboxbody">
-   <!--USERINFOBOX-->
+   <!--USERINFOBOXBODY-->
   </td>
  </tr>
  <tr>
   <td class="headerboxbody" valign="bottom" align="left">
-   <table border="0" cellpadding="0" cellspacing="0" class="headermodulebox">
+   <table class="headermodulebox">
      <tr>
        <td class="headermoduleboxbodyblank">
              &nbsp;
@@ -250,19 +250,13 @@ cds.support@cern.ch
  </tr>
 </table>
 </div>
-<table border=0 cellspacing=0 cellpadding=0 class="navtrailbox" width="100%">
+<table class="navtrailbox">
  <tr>
   <td class="navtrailboxbody">
-   <!--NAVTRAILBOX-->
+   <!--NAVTRAILBOXBODY-->
   </td>
  </tr>
 </table>
-</define-tag>
-
-## CDSPAGESTRIPEWIDTH -- width of CDS page stripe (left, right portal stripes)
-##  (example: "120")
-<define-tag CDSPAGESTRIPEWIDTH whitespace=delete>
-120
 </define-tag>
 
 ## CDSPAGEBOXLEFTTOP -- eventual global HTML left top box:
@@ -288,7 +282,7 @@ cds.support@cern.ch
 ## CDSPAGEFOOTER -- eventual global HTML page footer:
 ##  (example: "")
 <define-tag CDSPAGEFOOTER>  
-  <table cellpadding=0 border=0 cellspacing=0 width="100%" class="footerbox">
+  <table class="footerbox">
   <tr valign="top">
   <td valign="top">
   <!--LANGUAGESELECTIONBOX--><br><!--CDSNAMEINTL-->&nbsp;::&nbsp;<a class=note href="<WEBURL>/?ln=<!--LN-->"><!--MSGSEARCH--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/submit.py?ln=<!--LN-->"><!--MSGSUBMIT--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/help/index.<!--LN-->.html"><!--MSGHELP--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/youraccount.py/display?ln=<!--LN-->"><!--MSGPERSONALIZE--></a><br><!--POWEREDBY--> <a class=note href="http://cdsware.cern.ch/">CDSware</a> v<VERSION>
