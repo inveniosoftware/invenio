@@ -1195,7 +1195,7 @@ def task_run():
     if options.has_key("collection"):
         coll = get_collection(options["collection"])
         if coll.id == None:
-            usage(1, 'Collection %s does not exist' % coll_name)
+            usage(1, 'Collection %s does not exist' % coll.name)
         colls.append(coll)
     else:
         res = run_sql("SELECT name FROM collection ORDER BY id")
