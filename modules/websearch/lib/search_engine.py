@@ -3006,12 +3006,9 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
             # secondly, authors:
             authors = get_fieldvalues(recID, "100__a") + get_fieldvalues(recID, "700__a")
             if authors:
-                out += " - "
-                for i in range (0,cfg_author_et_al_threshold):
-                    if i < len(authors):
-                        out +=  authors[i]
-                if len(authors) > cfg_author_et_al_threshold:
-                        out += " <em>et al</em>"  
+                out += " - %s" % authors[0]
+                if len(authors) > 1:
+                    out += " <em>et al</em>"  
             # thirdly publication info:
             publinfos = get_fieldvalues(recID, "773__s")
             if not publinfos:
@@ -3055,7 +3052,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                         if i < len(authors):
                             out += """<a href="%s/search.py?p=%s&f=author">%s</a> ;""" % (weburl, urllib.quote(authors[i]), authors[i])
                     if len(authors) > cfg_author_et_al_threshold:
-                        out += " <em>et al.</em>"
+                        out += " <em>et al</em>"
                 # thirdly, date of creation:
                 dates = get_fieldvalues(recID, "260__c")
                 for date in dates:
