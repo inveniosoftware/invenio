@@ -41,7 +41,7 @@ try:
     from cdsware.config import *
     from cdsware.webpage import page
     from cdsware import webalert
-    from cdsware.webuser import getUid, create_user_infobox
+    from cdsware.webuser import getUid
     from mod_python import apache
 except ImportError, e:
     print "Error: %s" % e
@@ -52,46 +52,64 @@ except ImportError, e:
 
 def display(req, p="n"):
     uid = getUid(req)	
-    return page("Display searches", webalert.perform_display(p,uid),
-                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,
-                "", "CDS Personalize, Display searches", "CDS, personalize", create_user_infobox(uid), "")
+    return page(title="Display searches",
+                body=webalert.perform_display(p,uid),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                description="CDS Personalize, Display searches",
+                keywords="CDS, personalize",
+                uid=uid)
 
-
-def input_alert(req, idq, name="", freq="week", notif="y", idb=0):
+def input(req, idq, name="", freq="week", notif="y", idb=0):
     uid = getUid(req)
-    return page("Set a new alert", webalert.perform_input_alert("add", idq, name, freq, notif, idb,uid),
-                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,
-                "", "CDS Personalize, Set a new alert", "CDS, personalize", create_user_infobox(uid), "")
+    return page(title="Set a new alert",
+                body=webalert.perform_input_alert("add", idq, name, freq, notif, idb,uid),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                description="CDS Personalize, Set a new alert",
+                keywords="CDS, personalize",
+                uid=uid)
 
-def modify_alert(req, idq, name="", freq="week", notif="y", idb=0):
+def modify(req, idq, name="", freq="week", notif="y", idb=0):
     uid = getUid(req)
-    return page("Modify alert settings", webalert.perform_input_alert("update", idq, name, freq, notif, idb,uid),
-                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
-                "", "CDS Personalize, Modify alert settings", "CDS, personalize", create_user_infobox(uid), "")
+    return page(title="Modify alert settings",
+                body=webalert.perform_input_alert("update", idq, name, freq, notif, idb,uid),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                description="CDS Personalize, Modify alert settings",
+                keywords="CDS, personalize",
+                uid=uid)
 
-
-def list_alerts(req):
+def list(req):
     uid = getUid(req)
-    return page("Display alerts", webalert.perform_list_alerts(uid),
-                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
-                "", "CDS Personalize, Display alerts", "CDS, personalize", create_user_infobox(uid), "")
+    return page(title="Display alerts",
+                body=webalert.perform_list_alerts(uid),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                description="CDS Personalize, Display alerts",
+                keywords="CDS, personalize",
+                uid=uid)
 
-def add_alert(req, name, freq, notif, idb, bname, idq):
+def add(req, name, freq, notif, idb, bname, idq):
     uid = getUid(req)
-    return page("Display alerts", webalert.perform_add_alert(name, freq, notif, idb, bname, idq,uid),
-                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
-                "", "CDS Personalize, Display alerts", "CDS, personalize", create_user_infobox(uid), "")
-
-def update_alert(req, name, freq, notif, idb, bname, idq, old_idb):
+    return page(title="Display alerts",
+                body=webalert.perform_add_alert(name, freq, notif, idb, bname, idq,uid),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                description="CDS Personalize, Display alerts",
+                keywords="CDS, personalize",
+                uid=uid)
+def update(req, name, freq, notif, idb, bname, idq, old_idb):
     uid = getUid(req)
-    return page("Display alerts", webalert.perform_update_alert(name, freq, notif, idb, bname, idq, old_idb,uid),
-                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
-                "", "CDS Personalize, Display alerts", "CDS, personalize", create_user_infobox(uid), "")
+    return page(title="Display alerts",
+                body=webalert.perform_update_alert(name, freq, notif, idb, bname, idq, old_idb,uid),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                description="CDS Personalize, Display alerts",
+                keywords="CDS, personalize",
+                uid=uid)
 
-def remove_alert(req, name, idu, idq, idb):
+def remove(req, name, idu, idq, idb):
     uid = getUid(req) 
-    return page("Display alerts", webalert.perform_remove_alert(name, idu, idq, idb, uid),
-                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
-                "", "CDS Personalize, Display alerts", "CDS, personalize", create_user_infobox(uid), "")
+    return page(title="Display alerts",
+                body=webalert.perform_remove_alert(name, idu, idq, idb, uid),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                description="CDS Personalize, Display alerts",
+                keywords="CDS, personalize",
+                uid=uid)
 
 
