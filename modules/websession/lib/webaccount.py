@@ -222,7 +222,7 @@ def perform_set(email,password):
         current_login_method = prefs['login_method']
 
         text += """<form method="post" action="../youraccount.py/change">"""
-        text += """<big><strong class=headline>Which login method would you like to use as default?</strong></big><table><tr><td valign=top><b>Select account:</b></td><td>"""
+        text += """<big><strong class=headline>Which login method would you like to use as default?</strong></big><br>(Only the selected account can be used to login)<br><br><table><tr><td valign=top><b>Select account:</b></td><td>"""
         methods = CFG_EXTERNAL_AUTHENTICATION.keys()
         methods.sort()
         for system in methods:
