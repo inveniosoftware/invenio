@@ -155,18 +155,34 @@ have the same name as the abbreviation stored in the database.
 <h4>Step 2 - Get necessary external data (ex. jif values)</h4>
 Check out bibrankgkb documentation below.
 
-<br><br><b>Example</b>
+<br><br><b>Example</b> (<code>jif.kb</code> - journal impact factor knowledge base)
 <blockquote>
-<a href="jif.kb">jif.kb</a> -- sample data with the name of the journals and jif values.
+<pre>
+Phys. Rev., D---3.838
+Phys. Rev. Lett.---6.462
+Phys. Lett., B---4.213
+Nucl. Instrum. Methods Phys. Res., A---0.964
+J. High Energy Phys.---8.664
+</pre>
 </blockquote>
 
 <h4>Step 3 - Create the configuration file</h4>
 The configuration files for the different rank methods has different option, so verify that you are using the correct
 configuration file and rank method.
 
-<br><br><b>Example</b>
+<br><br><b>Example</b> (<code>jif.cfg</code> - journal impact factor rank method configuration file)
 <blockquote>
-<a href="jif.cfg">jif.cfg</a> -- sample configuration file, for creating the ranking stars based on journal impact factor
+<pre>
+[rank_method]
+function = single_tag_rank_method
+top_star_percentage = 0.10
+overall_importance = 1.0
+[single_tag_rank]
+tag = 909C4p
+kb_src = /usr/local/cdsware-DEMO/etc/bibrank/jif.kb
+check_mandatory_tags = 909C4c,909C4v,909C4y
+enable_modified = yes
+</pre>
 </blockquote>
 
 Single_tag_rank_method:
