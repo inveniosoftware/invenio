@@ -1,5 +1,4 @@
 ## $Id$
-
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002 CERN.
 ##
@@ -20,14 +19,20 @@
 #include "cdspage.wml" \
     title="Access Control Engine API" \
     navbar_name="hacking-webaccess" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt; <a class=navtrail href=index.html>WebAccess Internals</a>" \
-    navbar_select="hacking-webaccess-api" 
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt;  <a class=navtrail href=<WEBURL>/hacking/webaccess/index.html>WebAccess Internals</a> " \
+    navbar_select="hacking-webaccess-engine-api" 
 
 <pre>
-ACCESS CONTROL ENGINE API / $Date$
+ACCESS CONTROL ENGINE API & FLOW/ $Date$
 
 CDSware Access Control Engine can be called from within your Python programs
-via both a regular API interface and CLI.
+via both a regular Python API and CLI.
+In addition the you get an explanation of the program flow.
+
+Contents:
+ 1. Regular API
+ 2. Command Line Interface
+ 3. Program Flow
 
 1. Regular API
 
@@ -40,55 +45,54 @@ via both a regular API interface and CLI.
 
    Signature:
 
-      def ace_authorize_action(id_user, name_action, dict={}, **arguments):
+      def acc_authorize_action(id_user, name_action, dict={}, **arguments):
           """ Check if user is allowed to perform action
 	  with given list of arguments.
 	  Return 1 if authentication succeeds, 0 if it fails.
 
 	  The arguments are as follows:
     
-                  id_user - currently the id of the user to be authorized in the 
+                  id_user - currently the id of the user to be authorized in the
                             cdsdev database
                             
               name_action - the name of the action
 
                 arguments - dictionary with keyword=value pairs created automatically
                             by python on the extra arguments. these depend on the
-                            given action.
-          """
+                            given action. """
 
-   Examples: 
+   Examples:
 
-      >>> # import the functions from module
-      >>> pylibdir = '/log/cdsware-DEMODEV/lib/python/cdsware/'
-      >>> import sys
-      >>> sys.path.append('%s' % pylibdir)
-      >>> from access_control_engine import *
-      >>> # authorize user 109 for action WebSearch_search with collection="LHC"
-      >>> ace_authorize_action(109, 'WebSearch_search', collection="LHC")
+>>> # import the functions from module
+>>> pylibdir = '/log/cdsware-DEMODEV/lib/python/cdsware/'
+>>> import sys
+>>> sys.path.append('%s' % pylibdir)
+>>> from access_control_engine import *
+>>> # authorize user 109 for action WebSearch_search with collection="LHC"
+>>> acc_authorize_action(109, 'WebSearch_search', collection="LHC")
       1
-      >>> # authorize user 109 for action WebSearch_search with collection="fail this"
-      >>> ace_authorize_action(109, 'WebSearch_search', collection="fail this")
+>>> # authorize user 109 for action WebSearch_search with collection="fail this"
+>>> acc_authorize_action(109, 'WebSearch_search', collection="fail this")
       0
-      >>> # authorize user 109 for action BibFormat_modify with format="htmlbrief"
-      >>> ace_authorize_action(109, 'BibFormat_modify', format="htmlbrief")
+>>> # authorize user 109 for action BibFormat_modify with format="htmlbrief"
+>>> acc_authorize_action(109, 'BibFormat_modify', format="htmlbrief")
       1
 
 2. Command Line Interface
 
    Description:
 
-      The Command Line Interface uses the regular API of ace_authorize_action.
+      The Command Line Interface uses the regular API of acc_authorize_action.
       
    Signature:
 
-      access_control_engine.py id_user name_action keyword1 value1 keyword2 value2 ...
-          """ See description from function ace_authorize_action.
+      authaction id_user name_action keyword1 value1 keyword2 value2 ...
+          """ See description from function acc_authorize_action.
                   id_user - id of user to be authorized
  
 	      name_action - name of the action
  
-	         keyword1 - first keyword like in the keyword=value pairs, 
+	         keyword1 - first keyword like in the keyword=value pairs,
                             same rules for the following ones.
 			    always one word.
  
@@ -102,14 +106,52 @@ via both a regular API interface and CLI.
    Examples:
 
       These are the same ones as for the regular API:
-      $ access_control_engine.py 109 WebSearch_search collection LHC
-      $ access_control_engine.py 109 WebSearch_search collection 'fail this'
-      $ access_control_engine.py 109 Bibformat_modify format htmlbrief
+      $ authaction 109 WebSearch_search collection LHC
+      $ authaction 109 WebSearch_search collection 'fail this'
+      $ authaction 109 Bibformat_modify format htmlbrief
 
-      
-These are the only entry points for authorization and i doubt that 
-any more will be created. Notes on functions to add new authorizations 
-will be added when time allows it.
+
+3. Program Flow
+
+   this is a quick explanation of the different tasks
+   performed by the authorization engine.
+   
+   I. find information for the action
+     use admin API to find info. 
+   
+   II. see if user is a superadmin
+     query the database for connection between user and role superadmin.
+     -> authorize if yes
+   
+   III. find all of the users roles and create string with the ids
+     query the database and build string of ids
+     -> don't authorize if no roles
+   
+   IV. try to authorize without arguments
+     action without arguments: query database
+     -> authorize if yes
+     action with optional arguments
+     -> authorize if yes
+   
+   V. create list of keyword=value pairs to query the database
+     run through dictionary and create string for adding to database query
+   
+   VI. find all table entries from the database
+     query the database for table entries
+     create list of the tuples and sort it
+     -> don't authorize if no entries
+     -> authorize if only 1 argument and result
+   
+   VII. combine entries and try to satisfy authorization
+     dictionary with the arguments as keys, all values 0
+     run throught the list created in VI
+       if moving on to new authorization
+         check dictionary values
+         -> authorize if combination found
+         reset values to 0 if not found
+       set dictionary[keyword] to 1.
+       (countinue loop)
+
+   VIII. all the above failed
+     -> authorization failed      
 </pre>
-
-
