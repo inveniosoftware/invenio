@@ -47,10 +47,10 @@ Examples:
       
  Scheduler options:
  -u,  --user=USER          user name to store task, password needed
- -s,  --sleeptime=SLEEP    time after which to repeat tasks (no)
+ -s,  --sleeptime=SLEEP    time after which to repeat task (no)
                            e.g.: 1s, 30m, 24h, 7d
- -t,  --time=DATE          moment for the task to be active (now)
-                           e.g.: +15s, 5m, 3h , 2002-10-27 13:57:26
+ -t,  --time=TIME          moment for the task to be active (now)
+                           e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26
 
  General options:
  -h,  --help               print this help
@@ -511,7 +511,7 @@ def usage(code, msg=''):
  -u,  --user=USER          user name to store task, password needed
  -s,  --sleeptime=SLEEP    time after which to repeat tasks (no)
                            e.g.: 1s, 30m, 24h, 7d
- -t,  --time=DATE          moment for the task to be active (now)
+ -t,  --time=TIME          moment for the task to be active (now)
                            e.g.: +15s, 5m, 3h , 2002-10-27 13:57:26
 
  General options:
@@ -616,15 +616,13 @@ def get_date_range(var):
         high = get_date(limits[1])
         return low,high
 
-def get_date(var, format_string = "%Y-%m-%d %H:%M:%S"):
+def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
     """Returns a date string according to the format string.
        It can handle normal date strings and shifts with respect
        to now."""
     date = time.time()
     shift_re=sre.compile("([-\+]{0,1})([\d]+)([dhms])")
     factors = {"d":24*3600, "h":3600, "m":60, "s":1}
-
-
     m = shift_re.match(var)
     if m:
         sign = m.groups()[0] == "-" and -1 or 1
@@ -635,8 +633,7 @@ def get_date(var, format_string = "%Y-%m-%d %H:%M:%S"):
         date = time.strftime(format_string, date)
     else:
         date = time.strptime(var, format_string)
-        date = time.strftime(format_string, date)
-        
+        date = time.strftime(format_string, date)        
     return date
 
 def create_range_list(res):
@@ -1271,18 +1268,22 @@ def task_run(row):
     """
     
     global opts_dict, taskid, wordTables
+
+    # read from SQL row:
     taskid = row[0]
-    opts_dict = loads(row[5])
+    task_proc = row[1]
+    opts_dict = loads(row[6])
+    task_status = row[7]
 
     # sanity check:
-    if row[1] != "bibwords":
+    if task_proc != "bibwords":
         Log("The task #%d does not seem to be a BibWords task." % taskid, "Error")
         return
-    if row[6] != "WAITING":
-        Log("The task #%d is %s.  I expected WAITING." % (taskid, row[6]), "Error")
+    if task_status != "WAITING":
+        Log("The task #%d is %s.  I expected WAITING." % (taskid, task_status), "Error")
         return
 
-    task_update_state("RUNNING")
+    task_update_status("RUNNING")
 
     # install signal handlers
     signal.signal(signal.SIGUSR1, task_sig_sleep)
@@ -1323,14 +1324,14 @@ def task_run(row):
         except StandardError, e:
             Log("Exception caught: %s" % e, "Error")
             traceback.print_tb(sys.exc_info()[2])
-            task_update_state("ERROR")
+            task_update_status("ERROR")
             task_sig_stop_commands()
             sys.exit(1)
             
         wordTable.report_on_table_consistency()
 
     # We are done. State it in the database, close and quit
-    task_update_state("DONE")
+    task_update_status("DONE")
     Log("Done. Finished processing.")
     sys.exit(0)
         
@@ -1396,10 +1397,10 @@ def command_line():
             elif opt[0] in [ "-u", "--user"]:
                 user = opt[1]
             elif opt[0] in [ "-s", "--sleeptime" ]:
-                get_date(opt[1])    # see if it is a valid shift
+                get_datetime(opt[1])    # see if it is a valid shift
                 sleeptime= opt[1]
             elif opt[0] in [ "-t", "--time" ]:
-                sched_time= get_date(opt[1])
+                sched_time= get_datetime(opt[1])
             else: usage(1)
     except StandardError, e:
         Log(e, "Error")
@@ -1415,14 +1416,10 @@ def command_line():
 
     user = authenticate(user)
 
-    query = """INSERT INTO schTASKS(
-    proc,user,date,sleeptime,arguments,output, error,state,score)
-    VALUES ('bibwords','%s',CAST('%s' AS DATE),'%s','%s','%s','%s',
-            'WAITING','%d')""" % \
-            (MySQLdb.escape_string(user),MySQLdb.escape_string(sched_time), sleeptime, \
-             MySQLdb.escape_string(dumps(opts_dict)), \
-             tmp_name + ".out", tmp_name + ".err", 100)
-
+    query = """INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status)
+               VALUES ('bibwords','%s',CAST('%s' AS DATE),'%s','%s','WAITING')""" % \
+                 (MySQLdb.escape_string(user),MySQLdb.escape_string(sched_time), sleeptime, \
+                  MySQLdb.escape_string(dumps(opts_dict)))
     new_task_id = run_sql(query)
     if opts_dict["debug"]:
         print opts_dict
@@ -1443,7 +1440,7 @@ def task_sig_sleep(sig, frame):
     if opts_dict["debug"]:
         write_message("got signal %d" % sig)
     write_message("sleeping...")
-    task_update_state("SLEEPING")
+    task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
 
 def task_sig_wakeup(sig, frame):
@@ -1451,22 +1448,22 @@ def task_sig_wakeup(sig, frame):
     if opts_dict["debug"]:
         write_message("got signal %d" % sig)
     write_message("continuing...")
-    task_update_state("CONTINUING")
+    task_update_status("CONTINUING")
 
 def task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
     if opts_dict["debug"]:
         write_message("got signal %d" % sig)
     write_message("stopping...")
-    task_update_state("STOPPING")
+    task_update_status("STOPPING")
     errcode = 0
     try:
         task_sig_stop_commands()
         write_message("stopped")
-        task_update_state("STOPPED")
+        task_update_status("STOPPED")
     except StandardError, err:
         write_message("Error during stopping! %e" % err)
-        task_update_state("STOPPINGFAILED")
+        task_update_status("STOPPINGFAILED")
         errcode = 1
     sys.exit(errcode)
 
@@ -1484,9 +1481,9 @@ def task_sig_suicide(sig, frame):
     if opts_dict["debug"]:
         write_message("got signal %d" % sig)
     write_message("suiciding myself now...")
-    task_update_state("SUICIDING")
+    task_update_status("SUICIDING")
     write_message("suicided")
-    task_update_state("SUICIDED")
+    task_update_status("SUICIDED")
     sys.exit(0)
 
 def task_sig_unknown(sig, frame):
@@ -1497,15 +1494,15 @@ def task_sig_unknown(sig, frame):
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
-    query = "UPDATE schTASKS SET progress='%s' where id=%d" % (MySQLdb.escape_string(msg), taskid)
+    query = "UPDATE schTASK SET progress='%s' where id=%d" % (MySQLdb.escape_string(msg), taskid)
     if opts_dict["debug"]:
         write_message(query)
     run_sql(query)    
     return    
 
-def task_update_state(val):
+def task_update_status(val):
     """Updates state information in the BibSched task table."""
-    query = "UPDATE schTASKS SET state='%s' where id=%d" % (MySQLdb.escape_string(val), taskid)
+    query = "UPDATE schTASK SET status='%s' where id=%d" % (MySQLdb.escape_string(val), taskid)
     if opts_dict["debug"]:
         write_message(query)
     run_sql(query)    
@@ -1574,7 +1571,7 @@ def test_really_run():
         except StandardError, e:
             Log("Exception caught: %s" % e, "Error")
             traceback.print_tb(sys.exc_info()[2])
-            task_update_state("ERROR")
+            task_update_status("ERROR")
             task_sig_stop_commands()
             sys.exit(1)
             
@@ -1589,7 +1586,7 @@ def main():
             command_line()
             sys.exit()
         
-        res = run_sql("SELECT * FROM schTASKS WHERE id='%d'" % (id), None, 1)
+        res = run_sql("SELECT * FROM schTASK WHERE id='%d'" % (id), None, 1)
         if not res:
             Log("Selected task not found.", "Error")
             sys.exit(1)
