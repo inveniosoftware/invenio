@@ -779,7 +779,7 @@
   <ru>Изобразить результаты:</ru>
   <sk>Zobraziť výsledky:</sk>
   <cz>Zobrazit výsledky:</cz>
-  <no>Vis resultater</no>
+  <no>Vis resultater:</no>
 </define-tag>
 
 <define-tag MSG_RESULTS whitespace=delete>
@@ -1661,7 +1661,7 @@
   <fr>Options de la recherche:</fr>
   <de>Search options:</de>
   <es>Search options:</es>
-  <pt>Search options:</pt>
+  <pt>Opções de busca:</pt>
   <it>Search options:</it>
   <ru>Выборы поиска:</ru>
   <sk>Voľby hľadania:</sk>
@@ -1674,7 +1674,7 @@
   <fr>Dernières ajouts:</fr>
   <de>Latest additions:</de>
   <es>Latest additions:</es>
-  <pt>Latest additions:</pt>
+  <pt>Ítens mais recentes:</pt>
   <it>Latest additions:</it>
   <ru>Последнее добавления:</ru>
   <sk>Posledne pridané:</sk>
@@ -1687,7 +1687,7 @@
   <fr>davantage</fr>
   <de>mehr</de>
   <es>more</es>
-  <pt>more</pt>
+  <pt>mais</pt>
   <it>more</it>
   <ru>более</ru>
   <sk>viac</sk>
@@ -1700,12 +1700,25 @@
   <fr>Cette collection ne contient pas encore de document.</fr>
   <de>This collection does not contain any document yet.</de>
   <es>This collection does not contain any document yet.</es>
-  <pt>This collection does not contain any document yet.</pt>
+  <pt>Esta coleção ainda não contém nenhum documento.</pt>
   <it>This collection does not contain any document yet.</it>
   <ru>Ета коллекция не содержит еще запусков.</ru>
   <sk>Táto kolekcia ešte neobsahuje žiadne záznamy.</sk>
   <cz>Tato kolekce ješte neobsahuje žádné záznamy.</cz>
-  <no>This collection does not contain any document yet.</no>
+  <no>Denne samlingen inneholder fremdeles ingen dokumenter.</no>
+</define-tag>
+
+<define-tag MSG_COLLECTION_RESTRICTED_CONTENT>
+  <en>The contents of this collection is restricted.</en>
+  <fr>Le contenu de cette collection est restreint.</fr>
+  <de>The contents of this collection is restricted.</de>
+  <es>The contents of this collection is restricted.</es>
+  <pt>O conteúdo desta coleção é restrito.</pt>
+  <it>The contents of this collection is restricted.</it>
+  <ru>Содержание етой коллекции приватно.</ru>
+  <sk>Obsah tejto kolekcie je chránený.</sk>
+  <cz>Obsah této kolekce je chráněn.</cz>
+  <no>Innholdet i denne samlingen er adgangsbegrenset.</no>
 </define-tag>
 
 ## end of file
