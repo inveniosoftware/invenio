@@ -621,7 +621,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
         cell_7_a += """
         <select name="rm" class="address">
         <option value="">- %s %s -""" % (string.lower(msg_or[ln]), msg_rank_by[ln])
-        for (code,name) in get_bibrank_methods(ln):
+        for (code,name) in get_bibrank_methods(cc, ln):
             # propose found rank methods:
             cell_7_a += """<option value="%s"%s>%s""" % (code, is_selected(rm,code), name)
         cell_7_a += """</select>"""
