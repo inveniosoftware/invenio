@@ -32,12 +32,8 @@ Author:   eduardo.margallo@cern.ch
 Modifyer: thomas.baron@cern.ch
 
 """
-tmpdir = "<TMPDIR>"
-runtimelogdir = tmpdir
-dbhost = "<DBHOST>"
-dbname = "<DBNAME>"
-dbuser = "<DBUSER>"
-dbpass = "<DBPASS>"
+## fill config variables:
+pylibdir = "<LIBDIR>/python"
 
 ## okay, rest of the Python code goes below
 #######
@@ -46,19 +42,38 @@ dbpass = "<DBPASS>"
 __version__ = "$Id$"
 
 
-<protect>
-import os
-import imp
-import string
-import sys
-import MySQLdb
-import time
-import re
-import getopt
-import curses
-import curses.panel
-from curses.wrapper import wrapper
-import signal
+<protect>  
+## import interesting modules:
+try:
+    import os
+    import imp
+    import string
+    import sys
+    import MySQLdb
+    import time
+    import re
+    import getopt
+    import curses
+    import curses.panel
+    from curses.wrapper import wrapper
+    import signal
+except ImportError, e:
+    print "Error: %s" % e
+    import sys
+    sys.exit(1)
+
+try:
+    sys.path.append('%s' % pylibdir)
+    from cdsware.config import *
+    from cdsware.dbquery import run_sql
+except ImportError, e:
+    print "Error: %s" % e
+    import sys
+    sys.exit(1)
+
+runtimelogdir = tmpdir
+
+
 dbg = 1
 path = "."
 
@@ -255,7 +270,7 @@ class Manager:
             error='%s' WHERE id='%d'""" % (fdout, fderr, id )
             self.cursor.execute(update_query)
             if process in self.helper_modules:
-                program=os.path.join( os.getcwd(), process )
+                program=os.path.join( bindir, process )
                 if process == "bibupload":
                     arg2 = "-t"
                 else:
@@ -355,7 +370,7 @@ class Manager:
             name = "%s/bibsched_%s" % (runtimelogdir,time.strftime('%Y%m%d_%H%M%S'))
             fderr = name + ".err"
             fdout = name + ".out"
-            program = os.path.join( os.getcwd(), "bibsched")
+            program = os.path.join( bindir, "bibsched")
             COMMAND = "%s -d >> %s 2>> %s &" % (program, fdout, fderr)
             os.system(COMMAND)
             self.bibsched_daemon_id = get_my_pid("bibsched","-d")
@@ -580,7 +595,7 @@ class Bibsched:
             update_query="""UPDATE schTASKS set output='%s', error='%s' WHERE id='%d'""" % (fdout, fderr, id )
             self.cursor.execute(update_query)
             if proc in self.helper_modules:
-                program=os.path.join( os.getcwd(), proc )
+                program=os.path.join( bindir, proc )
                 if proc == "bibupload":
                     arg2 = "-t "
                 else:
