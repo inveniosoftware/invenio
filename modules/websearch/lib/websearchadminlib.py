@@ -1052,10 +1052,9 @@ def perform_switchfmtscore(colID, type, id_1, id_2, ln=cdslang):
     id_1/id_2 - the id's to change the score for.
     type - like "format" """
 
-    output = ""
     fmt_dict = dict(get_def_name('', "format"))
     res = switch_score(colID, id_1, id_2, type)
-    output += write_outcome(res)
+    output = write_outcome(res)
     return perform_showoutputformats(colID, ln, content=output)
 
 def perform_switchfldscore(colID, id_1, id_2, fmeth, ln=cdslang):
@@ -1065,7 +1064,8 @@ def perform_switchfldscore(colID, id_1, id_2, fmeth, ln=cdslang):
 
     fld_dict = dict(get_def_name('', "field"))
     res = switch_fld_score(colID, id_1, id_2)
-    output += write_outcome(res)
+    
+    output = write_outcome(res)
 
     if fmeth == "soo":
         return perform_showsortoptions(colID, ln, content=output)
@@ -1082,7 +1082,7 @@ def perform_switchfldvaluescore(colID, id_1, id_fldvalue_1, id_fldvalue_2, ln=cd
     name_1 = run_sql("SELECT name from fieldvalue where id=%s" % id_fldvalue_1)[0][0]
     name_2 = run_sql("SELECT name from fieldvalue where id=%s" % id_fldvalue_2)[0][0]
     res = switch_fld_value_score(colID, id_1, id_fldvalue_1, id_fldvalue_2)
-    output += write_outcome(res)
+    output = write_outcome(res)
     return perform_modifyfield(colID, fldID=id_1, ln=ln, content=output)
 
 def perform_addnewfieldvalue(colID, fldID, ln=cdslang, name='', value='', callback="yes", confirm=-1):
@@ -2352,11 +2352,11 @@ def perform_validateconf(colID, ln, confirm=0, callback='yes'):
         else:
             i8n = """<b><span class="info">None</span></b>"""
         if (reg_sons > 1 and dbquery) or dbquery=="":
-            status = """<b><span class="warning">ERROR 1:Query</span></b>"""
+            status = """<b><span class="warning">1:Query</span></b>"""
         elif dbquery is None and reg_sons == 1:
-            status = """<b><span class="warning">ERROR 2:Query</span></b>"""
+            status = """<b><span class="warning">2:Query</span></b>"""
         elif dbquery == "" and reg_sons == 1:
-            status = """<b><span class="warning">ERROR 3:Query</span></b>"""
+            status = """<b><span class="warning">3:Query</span></b>"""
 
         if (reg_sons > 1 or vir_sons > 1):
             subs = """<b><span class="info">Yes</span></b>"""
@@ -2371,7 +2371,7 @@ def perform_validateconf(colID, ln, confirm=0, callback='yes'):
             if status:
                 status += """<b><span class="warning">,4:Restricted</span></b>"""
             else:
-                status += """<b><span class="warning">ERROR 4:Restricted</span></b>"""
+                status += """<b><span class="warning">4:Restricted</span></b>"""
         elif restricted is None:
             restricted = """<b><span class="info">No</span></b>"""
 
