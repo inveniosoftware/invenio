@@ -136,14 +136,14 @@ INSERT INTO fieldname VALUES (6,'se','ln','rapportnummer');
 
 INSERT INTO fieldname VALUES (7,'en','ln','subject');
 INSERT INTO fieldname VALUES (7,'fr','ln','sujet');
-INSERT INTO fieldname VALUES (7,'de','ln','');
+INSERT INTO fieldname VALUES (7,'de','ln','Thema');
 INSERT INTO fieldname VALUES (7,'es','ln','');
-INSERT INTO fieldname VALUES (7,'pt','ln','');
-INSERT INTO fieldname VALUES (7,'it','ln','');
+INSERT INTO fieldname VALUES (7,'pt','ln','assunto');
+INSERT INTO fieldname VALUES (7,'it','ln','soggetto');
 INSERT INTO fieldname VALUES (7,'ru','ln','');
 INSERT INTO fieldname VALUES (7,'sk','ln','predmet');
 INSERT INTO fieldname VALUES (7,'cz','ln','předmět');
-INSERT INTO fieldname VALUES (7,'no','ln','');
+INSERT INTO fieldname VALUES (7,'no','ln','emne');
 INSERT INTO fieldname VALUES (7,'se','ln','');
 
 INSERT INTO fieldname VALUES (8,'en','ln','reference');
@@ -184,14 +184,14 @@ INSERT INTO fieldname VALUES (10,'se','ln','samlingen');
 
 INSERT INTO fieldname VALUES (11,'en','ln','division');
 INSERT INTO fieldname VALUES (11,'fr','ln','division');
-INSERT INTO fieldname VALUES (11,'de','ln','');
+INSERT INTO fieldname VALUES (11,'de','ln','Abteilung');
 INSERT INTO fieldname VALUES (11,'es','ln','');
-INSERT INTO fieldname VALUES (11,'pt','ln','');
-INSERT INTO fieldname VALUES (11,'it','ln','');
+INSERT INTO fieldname VALUES (11,'pt','ln','divisão');
+INSERT INTO fieldname VALUES (11,'it','ln','divisione');
 INSERT INTO fieldname VALUES (11,'ru','ln','');
 INSERT INTO fieldname VALUES (11,'sk','ln','oddelenie');
 INSERT INTO fieldname VALUES (11,'cz','ln','oddělení');
-INSERT INTO fieldname VALUES (11,'no','ln','');
+INSERT INTO fieldname VALUES (11,'no','ln','divisjon');
 INSERT INTO fieldname VALUES (11,'se','ln','');
 
 INSERT INTO fieldname VALUES (12,'en','ln','year');
@@ -208,26 +208,26 @@ INSERT INTO fieldname VALUES (12,'se','ln','år');
 
 INSERT INTO fieldname VALUES (13,'en','ln','experiment');
 INSERT INTO fieldname VALUES (13,'fr','ln','expérience');
-INSERT INTO fieldname VALUES (13,'de','ln','');
+INSERT INTO fieldname VALUES (13,'de','ln','Experiment');
 INSERT INTO fieldname VALUES (13,'es','ln','');
-INSERT INTO fieldname VALUES (13,'pt','ln','');
-INSERT INTO fieldname VALUES (13,'it','ln','');
+INSERT INTO fieldname VALUES (13,'pt','ln','experimento');
+INSERT INTO fieldname VALUES (13,'it','ln','esperimento');
 INSERT INTO fieldname VALUES (13,'ru','ln','');
 INSERT INTO fieldname VALUES (13,'sk','ln','experiment');
 INSERT INTO fieldname VALUES (13,'cz','ln','experiment');
-INSERT INTO fieldname VALUES (13,'no','ln','');
+INSERT INTO fieldname VALUES (13,'no','ln','eksperiment');
 INSERT INTO fieldname VALUES (13,'se','ln','');
 
 INSERT INTO fieldname VALUES (14,'en','ln','record ID');
 INSERT INTO fieldname VALUES (14,'fr','ln','notice ID');
-INSERT INTO fieldname VALUES (14,'de','ln','');
+INSERT INTO fieldname VALUES (14,'de','ln','Datensatz-ID');
 INSERT INTO fieldname VALUES (14,'es','ln','');
-INSERT INTO fieldname VALUES (14,'pt','ln','');
-INSERT INTO fieldname VALUES (14,'it','ln','');
+INSERT INTO fieldname VALUES (14,'pt','ln','ID do registro');
+INSERT INTO fieldname VALUES (14,'it','ln','ID della notizia');
 INSERT INTO fieldname VALUES (14,'ru','ln','');
 INSERT INTO fieldname VALUES (14,'sk','ln','ID záznamu');
 INSERT INTO fieldname VALUES (14,'cz','ln','ID záznamu');
-INSERT INTO fieldname VALUES (14,'no','ln','');
+INSERT INTO fieldname VALUES (14,'no','ln','post ID');
 INSERT INTO fieldname VALUES (14,'se','ln','');
 
 INSERT INTO field_tag VALUES (1,100,10);
