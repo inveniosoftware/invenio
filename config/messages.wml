@@ -460,7 +460,7 @@
 <define-tag MSG_SEARCH_RECORDS_FOR whitespace=delete>
   <en>Search %s records for:</en>
   <fr>Cherchez dans %s notices:</fr>
-  <de>Suchen durch %s Datensätze für:</de>
+  <de>Suchen durch %s Datensätze nach:</de>
   <es>Buscar %s registros por:</es>
   <pt>Buscar %s registros por:</pt>
   <it>Ricerca in %s registrazioni:</it>
