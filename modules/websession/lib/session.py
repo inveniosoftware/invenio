@@ -729,7 +729,7 @@ class SessionError(Exception):
     """
     """
 
-    def __init__(self, **args):
+    def __init__(self, msg="", **args):
         pass
 
 
