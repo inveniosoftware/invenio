@@ -79,6 +79,7 @@ def perform_info(req):
 
     return out
 
+# perform_display_account(): display a dynamic page that shows the user's account
 def perform_display_account(req,data,bask,aler,sear):
     uid = getUid(req)
     #your account 	
@@ -101,7 +102,8 @@ def perform_display_account(req,data,bask,aler,sear):
     out +=template_account("Your Alert Searches",aler)
     out +=template_account("Your Searches",sear)
     return out
-	
+
+# template_account() : it is a template for print each of the options from the user's account	
 def template_account(title,body):	
     out =""	
     out +="""
@@ -109,7 +111,7 @@ def template_account(title,body):
                        <thead>
                         <tr>
                          <th class="portalboxheader">%s</th>
-                        </tr>
+                        </tr>		
                        </thead>
                        <tbody>
                         <tr>
@@ -119,6 +121,7 @@ def template_account(title,body):
                       </table>""" % (title, body)
     return out 
 
+# warning_guest_user(): It returns an alert message,showing that the user is a guest user and should log into the system
 def warning_guest_user(type):
 
     msg="""You are logged in as a guest user, so your %s will disappear at the end of the current session. If you wish you can<br> login
@@ -151,14 +154,14 @@ def perform_set(email,password):
 		<table>
 			<tr><td align=right><strong>New email address:</strong><br><small class=important>(mandatory)</small></td><td><input type="text" size="25" name="email" value="%s"><br><small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td><td></td></tr>
 			<tr><td align=right><strong>New password:</strong></td><td align=left><input type="password" size="25" name="password" value="%s"><br><small><span class=quicknote>Note:</span> The password phrase may contain punctuation, spaces, etc.</small></td><td><input type="hidden" name="action" value="edit"></td></tr>
-			<tr><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" value="Set new values"></code>&nbsp;&nbsp;&nbsp;</td></tr>
+				<tr><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" value="Set new values"></code>&nbsp;&nbsp;&nbsp;</td></tr>
 		</table>
         </form>
       </body>	
       """%(email,password)
     return text                    				
 		
-##  perform_ask(): ask for the user's email and password, for logi in the system
+##  perform_ask(): ask for the user's email and password, for login into the system
 def perform_ask():
     text = """
               <p>If you already have an account, please log in by choosing the <strong class=headline>login
@@ -172,7 +175,7 @@ def perform_ask():
 		 <td align=right><strong>Email address:</strong><br><small class=important>(mandatory)</small>
 		 </td>
                  <td><input type="text" size="25" name="p_email" value="">
-			<br><small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td><td></td></tr><tr><td align=right><strong>Password:</strong>
+			<br><small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td><td></td></tr><tr><td align=right><strong>Password:</strong>	
 			<br><small class=quicknote>(optional)</small>	
 		</td>
 		<td align=left><input type="password" size="25" name="p_pw" value="">
@@ -203,7 +206,7 @@ def perform_logout(req):
          """
     return out
 
-#def perform_lost: ask the user for his email, in order to send him the lost password
+#def perform_lost: ask the user for his email, in order to send him the lost password	
 def perform_lost():
     out =""
     out +="""
