@@ -536,6 +536,7 @@ def usage(exitcode=1, msg=""):
     sys.stderr.write("  -f,  --field     \t\t Select records by field.\n")
     sys.stderr.write("  -p,  --phrase    \t\t Select records by phrase.\n")
     sys.stderr.write("  -o,  --format    \t\t Specify output format to be (re-)created. (default HB)\n")
+    sys.stderr.write("  -n,  --noprocess \t\t Count records to be processed only (no processing done)\n")
     sys.stderr.write("\n")
     sys.stderr.write(" Example: bibreformat -l -b  Standard synchronization bibreformat run.")
 
