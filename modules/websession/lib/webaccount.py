@@ -29,7 +29,7 @@ try:
     import sys
     from config import *
     from webpage import page
-    import user
+    import webuser
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -38,9 +38,9 @@ except ImportError, e:
 # perform_display(): display the main features of CDS personalize
 def perform_display(req):
     out = ""
-    uid = user.getUid(req)
+    uid = webuser.getUid(req)
     id_user = uid # XXX
-    if user.isGuestUser(uid):
+    if webuser.isGuestUser(uid):
         id_user=0
     else:
         id_user=1

@@ -31,7 +31,7 @@ pylibdir = "<LIBDIR>/python"
 try:
     import sys
     sys.path.append('%s' % pylibdir)
-    from cdsware import user
+    from cdsware import webuser
     from cdsware.config import *
     from cdsware.webpage import page
     from cdsware import webaccount
@@ -41,24 +41,24 @@ except ImportError, e:
     sys.exit(1)
 
 def display(req):
-    uid = user.getUid(req)
+    uid = webuser.getUid(req)
     return page("Your Account", webaccount.perform_display(req),
                 """&gt;""",
-                "", "CDS Personalize, Main page", "CDS, personalize", user.create_user_infobox(uid), "")
+                "", "CDS Personalize, Main page", "CDS, personalize", webuser.create_user_infobox(uid), "")
 def set(req):
-    uid = user.getUid(req)
-    data = user.getDataUid(req,uid)
+    uid = webuser.getUid(req)
+    data = webuser.getDataUid(req,uid)
     email = data[0]
     passw = data[1]
     return page("Your Settings", webaccount.perform_set(email,passw),
                 """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
-                "", "CDS Personalize, Your Settings", "CDS, personalize", user.create_user_infobox(uid), "")
+                "", "CDS Personalize, Your Settings", "CDS, personalize", webuser.create_user_infobox(uid), "")
 
 def change(req,email=None,password=None):
-    uid = user.getUid(req)
-    if user.checkemail(email):
+    uid = webuser.getUid(req)
+    if webuser.checkemail(email):
         
-        change = user.updateDataUser(req,uid,email,password)
+        change = webuser.updateDataUser(req,uid,email,password)
         return display(req)
     else :
         return display(req)
@@ -67,41 +67,41 @@ def delete(req):
     return page("Delete Account", webaccount.perform_delete(),
                 """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
                 "","CDS Personalize, Main page", "CDS, personalize",
-                user.create_user_infobox(uid), "")
+                webuser.create_user_infobox(uid), "")
 
 def logout(req):
     
-    uid = user.getUid(req)
-    user.logoutUser(req,uid)
+    uid = webuser.getUid(req)
+    webuser.logoutUser(req,uid)
     return page("Logout", webaccount.perform_logout(req),
                 """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
                 "","CDS Personalize, Main page", "CDS, personalize",
-                user.create_user_infobox(uid), "")
+                webuser.create_user_infobox(uid), "")
     
 def login(req,p_email=None,p_pw=None,action='login'):
 
-    uid = user.getUid(req)
+    uid = webuser.getUid(req)
     if action =='login':
         
        if p_email==None:
            return  page("Login", webaccount.perform_ask(),
                         """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,
-                        "", "CDS Personalize, Main page", "CDS, personalize", user.create_user_infobox(uid), "")
-       iden = user.loginUser(p_email,p_pw)
+                        "", "CDS Personalize, Main page", "CDS, personalize", webuser.create_user_infobox(uid), "")
+       iden = webuser.loginUser(p_email,p_pw)
     
        if len(iden)>0:
-           user.update_Uid(req,p_email,p_pw,uid)
+           webuser.update_Uid(req,p_email,p_pw,uid)
            return  page("Login", webaccount.perform_display(req),
                         """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,
-                        "","CDS Personalize, Main page", "CDS, personalize",user.create_user_infobox(uid), "")
+                        "","CDS Personalize, Main page", "CDS, personalize",webuser.create_user_infobox(uid), "")
        else:
         
            return page("Your Account", perform_display(req),"&gt;",
-                       "", "CDS Personalize, Main page", "CDS, personalize", user.create_user_infobox(uid), "")
+                       "", "CDS Personalize, Main page", "CDS, personalize", webuser.create_user_infobox(uid), "")
     if action == 'register':
         
-        if user.registerUser(req,p_email,p_pw):
-            user.update_Uid(req,p_email,p_pw,uid)
+        if webuser.registerUser(req,p_email,p_pw):
+            webuser.update_Uid(req,p_email,p_pw,uid)
         
     return  page("Your Account", webaccount.perform_display(req), "&gt;",
-                 "","CDS Personalize, Main page", "CDS, personalize",user.create_user_infobox(uid),"")
+                 "","CDS Personalize, Main page", "CDS, personalize",webuser.create_user_infobox(uid),"")

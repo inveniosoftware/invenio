@@ -40,7 +40,7 @@ try:
     from cdsware import webbasket
     webbasket = reload( webbasket )
     from cdsware.dbquery import run_sql
-    from cdsware.user import getUid, create_user_infobox
+    from cdsware.webuser import getUid, create_user_infobox
     from mod_python import apache
 except ImportError, e:
     print "Error: %s" % e

@@ -30,7 +30,7 @@ try:
     from config import *
     from webpage import page
     from dbquery import run_sql
-    from user import getUid, getDataUid
+    from webuser import getUid, getDataUid
 except ImportError, e:
     print "Error: %s" % e
     import sys

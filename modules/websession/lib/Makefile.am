@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir=$(libdir)/python/cdsware
-pylib_DATA=websession.py session.py user.py webaccount.py
+pylib_DATA=websession.py session.py webuser.py webaccount.py
 
 EXTRA_DIST = $(wildcard *.wml)
 

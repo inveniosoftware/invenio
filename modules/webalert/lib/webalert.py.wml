@@ -41,7 +41,7 @@ try:
     from config import *
     from webpage import page
     from dbquery import run_sql
-    from user import getUid, create_user_infobox
+    from webuser import getUid, create_user_infobox
     from mod_python import apache
 except ImportError, e:
     print "Error: %s" % e

@@ -23,8 +23,8 @@ Classes necessary for using in CDSware, as a complement of session, which adds p
 by using a MySQL table. Consists of the following classes:
 
 	- SessionNotInDb: Exception to be raised when a session doesn't exit
-	- websession(Session): Specialisation of the class Session which adds persistence to session
-	- websessionMapping: Implements only the necessary methods to make it work with the session manager 
+	- pSession(Session): Specialisation of the class Session which adds persistence to session
+	- pSessionMapping: Implements only the necessary methods to make it work with the session manager 
 """
 import cPickle
 from dbquery import run_sql
@@ -38,7 +38,7 @@ class SessionNotInDb(Exception):
     pass
 
 
-class websession(Session):
+class pSession(Session):
     """Specialisation of the class Session which adds persistence to sessions 
         by using a MySQL table (it pickles itself into the corresponding row of 
         the table). The class provides methods to save and retrieve an instance 
@@ -110,7 +110,7 @@ class websession(Session):
             self.__dirty=0
 
 
-class websessionMapping(UserDict):
+class pSessionMapping(UserDict):
     """Only the necessary methods to make it work with the session manager 
         have been implemented.
     """
@@ -118,7 +118,7 @@ class websessionMapping(UserDict):
     def __includeItemFromDB(self, key):
         if  key not in self.data.keys():
             try:
-                s = websession.retrieve( key )
+                s = pSession.retrieve( key )
                 self.data[key] = s
             except SessionNotInDb, e:
                 pass
