@@ -1,5 +1,5 @@
 ## $Id$
-## BibWords bibliographic data, reference and fulltext indexing utility.
+## BibIndxes bibliographic data, reference and fulltext indexing utility.
 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002 CERN.
@@ -991,7 +991,7 @@ class WordTable:
         # If date is not set, then retrieve it from the database.
         # Reindex all formats newer than the modification date
         if not date:
-            id = self.tablename[len("bibwords"):]
+            id = self.tablename[len("bibindex"):]
             query = """SELECT last_updated FROM idxINDEX WHERE id='%s'
             """ % id
             res = run_sql(query)
@@ -1165,7 +1165,7 @@ class WordTable:
                 (self.tablename, low, high))
 
     def report_on_table_consistency(self):
-        """Check reverse words index tables (e.g. bibwords1r) for
+        """Check reverse words index tables (e.g. idxWORD01R) for
         interesting states such as 'TEMPORARY' state.
         Prints small report (no of words, no of bad words).
         """
@@ -1288,13 +1288,13 @@ class WordTable:
 
         ## inconsistency detected!
         write_message("EMERGENCY: %s inconsistencies detected..." % self.tablename)
-        write_message("""EMERGENCY: Errors found. You should check consistency of the %s - %sR tables.\nRunning 'bibwords --repair' is recommended.""" \
+        write_message("""EMERGENCY: Errors found. You should check consistency of the %s - %sR tables.\nRunning 'bibindex --repair' is recommended.""" \
             % (self.tablename, self.tablename[:-1]))
         raise StandardError
 
         
     def fix_recID_range(self, low, high):
-        """Try to fix reverse index database consistency (table bibwords1r) in the low,high doc-id range.
+        """Try to fix reverse index database consistency (e.g. table idxWORD01R) in the low,high doc-id range.
 
         Possible states for a recID follow:
         CUR TMP FUT: very bad things have happened: warn!
@@ -1378,8 +1378,8 @@ def task_run(row):
     task_status = row[7]
 
     # sanity check:
-    if task_proc != "bibwords":
-        write_message("The task #%d does not seem to be a BibWords task." % task_id, sys.stderr)
+    if task_proc != "bibindex":
+        write_message("The task #%d does not seem to be a BibIndex task." % task_id, sys.stderr)
         return 0
     if task_status != "WAITING":
         write_message("The task #%d is %s.  I expected WAITING." % (task_id, task_status), sys.stderr)
@@ -1540,7 +1540,7 @@ def command_line():
         write_message("storing task options %s\n" % opts_dict)
     
     query = """INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status)
-               VALUES ('bibwords','%s',CAST('%s' AS DATE),'%s','%s','WAITING')""" % \
+               VALUES ('bibindex','%s',CAST('%s' AS DATE),'%s','%s','WAITING')""" % \
                  (MySQLdb.escape_string(user),MySQLdb.escape_string(sched_time), sleeptime, \
                   MySQLdb.escape_string(dumps(opts_dict)))
     new_task_id = run_sql(query)
