@@ -30,7 +30,6 @@ __lastupdated__ = """<: print `date +"%d %b %Y %H:%M:%S %Z"`; :>"""
 
 ## fill config variables:
 
-import access_control_engine as acce
 import cgi
 import re
 import MySQLdb

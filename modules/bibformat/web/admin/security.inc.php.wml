@@ -22,16 +22,17 @@
   
    /*********************Authentication*******************************/
 
-  if ($uid_email == "guest")
+  ##if ($uid_email == "guest")
+  ##{
+  ##   outWarning('You seem to be guest.  Please <a href="'.$WEBURL.'/youraccount.py/login?referer='.$WEBURL.$PHP_SELF.'">login</a> first.');
+  ##   print "</td></tr></table>";
+  ##   exit;
+  ##}
+ 
+  $auth = acc_authorize_action($uid, "cfgbibformat");
+  if($auth[0] != 0)
   {
-    outWarning('You seem to be guest.  Please <a href="'.$WEBURL.'/youraccount.py/login?referer='.$WEBURL.$PHP_SELF.'">login</a> first.');
-    print "</td></tr></table>";
-    exit;
-  }
-
-  if(acc_authorize_action($uid, "cfgbibformat") != 1)
-  {
-    outWarning('Sorry, '.$uid_email.' is not allowed to use BibFormat Admin. <br> If you think this is not correct, please contact '.$ADMINEMAIL);
+    outWarning($auth[1]);
     print "</td></tr></table>";
     exit;
   }
