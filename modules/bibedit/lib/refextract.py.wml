@@ -45,7 +45,7 @@ class StringBuffer2:
        This version uses a list as a string buffer
     """
     def __init__(self):
-        self._buffer=[]
+        self._buffer = []
     def append(self, itm):
         """Add a new string into the buffer"""
         self._buffer.append(itm)
@@ -68,12 +68,12 @@ class ReferenceSection:
     """
     class ReferenceSectionIterator:
         def __init__(self, reflines):
-            self._mylist=reflines
-            self._listptr=0
+            self._mylist = reflines
+            self._listptr = 0
         def next(self):
             try:
-                item=self._mylist[self._listptr]
-                self._listptr+=1
+                item = self._mylist[self._listptr]
+                self._listptr += 1
                 return item
             except IndexError:
                 raise StopIteration
@@ -101,7 +101,7 @@ class ReferenceSection:
     def gotoNextLine(self):
         """Move the position of the ReferenceLine pointer of a ReferenceSection object to point at the next line"""
         if self.lineExists(self._lnPtr+1):
-            self._lnPtr=self._lnPtr+1
+            self._lnPtr = self._lnPtr+1
             return True
         else:
             return False
@@ -204,14 +204,14 @@ class ReferenceLine:
     def rAppend(self, appendStr):
         """Append a text String to the end of a ReferenceLine object's textual content. Returns True if append successful, False if not"""
         if type(appendStr) is str or type(appendStr) is unicode:
-            self._content=self._content+appendStr
+            self._content=self._content + appendStr
             return True
         else:
             return False
     def lAppend(self, appendStr):
         """Append a text String to the beginning of a ReferenceLine objects textual content. Returns True if append successful False if not"""
         if type(appendStr) is str or type(appendStr) is unicode:
-            self._content=appendStr+self._content
+            self._content = appendStr+self._content
             return True
         else:
             return False
@@ -258,23 +258,23 @@ class RegexWordSpacer:
         newWord = None
         if type(word) is str or type(word) is unicode:
             newWord = u''
-            p_spc=re.compile(unicode(r'\s'),re.UNICODE)
+            p_spc = re.compile(unicode(r'\s'),re.UNICODE)
             for x in word:
                 m_spc = p_spc.match(x)
                 if m_spc is None:
-                    newWord=newWord+x+unicode(r'\s*?')
+                    newWord = newWord+x+unicode(r'\s*?')
                 else:
-                    newWord=newWord+x
+                    newWord = newWord+x
         return newWord
 
 class DocumentSearchPatternListCompiler:
     """Abstract class. Used to get a 'DocumentSearchCompiledPatternList' object, which is used for searching lines of a document for a
        given pattern
     """
-    def getCompiledPatternList(self, prefix=u'', suffix=u''):
+    def getCompiledPatternList(self, prefix = u'', suffix = u''):
         """Return a list of compiled regex patterns"""
         pass
-    def createPatterns(self, prefix=u'', suffix=u''):
+    def createPatterns(self, prefix = u'', suffix = u''):
         """Create the regex patterns (don't compile though)"""
         pass
 
@@ -282,25 +282,25 @@ class RefSecnTitleListCompiler(DocumentSearchPatternListCompiler):
     """Concrete class. Used to return a 'DocumentSearchCompiledPatternList' object containing regex patterns enabling the identification of
        possible reference section titles in a text line
     """
-    def getCompiledPatternList(self, prefix=u'', suffix=u''):
+    def getCompiledPatternList(self, prefix = u'', suffix = u''):
         """Return a list of compiled regex patterns used to ID reference section title"""
-        patterns=self.createPatterns()
+        patterns = self.createPatterns()
         return CompiledPatternList(patterns)
-    def createPatterns(self, prefix=u'', suffix=u''):
+    def createPatterns(self, prefix = u'', suffix = u''):
         """Create the regex patterns (don't compile though)"""
-        patternList=[]
-        titles=self.getTitles()
+        patternList = []
+        titles = self.getTitles()
         sectMarker = unicode(r'^\s*?([\[\-\{\(])?\s*?((\w|\d){1,5}([\.\-\,](\w|\d){1,5})?\s*?[\.\-\}\)\]]\s*?)?(?P<title>')
         lineEnd = unicode(r'(\s+?s\s*?e\s*?c\s*?t\s*?i\s*?o\s*?n\s*?)?)')
-        lineEnd=lineEnd+unicode(r'($|\s*?[\[\{\(\<]\s*?[1a-z]\s*?[\}\)\>\]]|\:)')
+        lineEnd = lineEnd+unicode(r'($|\s*?[\[\{\(\<]\s*?[1a-z]\s*?[\}\)\>\]]|\:)')
         s = RegexWordSpacer()
         for x in titles:
             if (type(x) is str or type(x) is unicode) and len(x) > 1:
-                s=RegexWordSpacer()
-                namePtn=sectMarker+s.space(x)+lineEnd
+                s = RegexWordSpacer()
+                namePtn = sectMarker+s.space(x)+lineEnd
                 patternList.append(namePtn)
             elif (type(x) is str or type(x) is unicode) and len(x) > 0:
-                namePtn=sectMarker+s.space(x)+lineEnd
+                namePtn = sectMarker+s.space(x)+lineEnd
                 patternList.append(namePtn)
         return patternList
     def getTitles(self):
@@ -325,16 +325,16 @@ class PostRefSecnTitleListCompiler(DocumentSearchPatternListCompiler):
     """Concrete class. Used to return a 'DocumentSearchCompiledPatternList' object containing regex patterns enabling the identification of
        possible titles that usually follow the reference section in a doc
     """
-    def getCompiledPatternList(self, prefix='', suffix=''):
+    def getCompiledPatternList(self, prefix = '', suffix = ''):
         """Return a list of compiled regex patterns used to ID post reference section title"""
-        patterns=self.createPatterns()
+        patterns = self.createPatterns()
         return CompiledPatternList(patterns)
-    def createPatterns(self, prefix='', suffix=''):
+    def createPatterns(self, prefix = '', suffix = ''):
         """Create the regex patterns (don't compile though)"""
-        patterns=[]
-        thead=unicode(r'^\s*?([\{\(\<\[]?\s*?(\w|\d)\s*?[\)\}\>\.\-\]]?\s*?)?')
-        ttail=unicode(r'(\s*?\:\s*?)?')
-        numatn=unicode(r'(\d+|\w\b|i{1,3}v?|vi{0,3})[\.\,]?\b')
+        patterns = []
+        thead = unicode(r'^\s*?([\{\(\<\[]?\s*?(\w|\d)\s*?[\)\}\>\.\-\]]?\s*?)?')
+        ttail = unicode(r'(\s*?\:\s*?)?')
+        numatn = unicode(r'(\d+|\w\b|i{1,3}v?|vi{0,3})[\.\,]?\b')
         s = RegexWordSpacer()
         # Section titles:
         patterns.append(thead+s.space(u'appendix')+ttail)
@@ -359,14 +359,14 @@ class PostRefSecnKWListCompiler(DocumentSearchPatternListCompiler):
     """Concrete class. Used to return a 'DocumentSearchCompiledPatternList' object containing regex patterns enabling the identification of
        Key Words/phrases that are often found in lines following the reference section of a document
     """
-    def getCompiledPatternList(self, prefix=u'', suffix=u''):
+    def getCompiledPatternList(self, prefix = u'', suffix = u''):
         """Return a list of compiled regex patterns used to ID keywords usually found in lines after a reference section"""
-        patterns=self.createPatterns()
+        patterns = self.createPatterns()
         return CompiledPatternList(patterns)
-    def createPatterns(self, prefix=u'', suffix=u''):
+    def createPatterns(self, prefix = u'', suffix = u''):
         """Create the regex patterns (don't compile though)"""
-        patterns=[]
-        s=RegexWordSpacer()
+        patterns = []
+        s = RegexWordSpacer()
         patterns.append(unicode(r'(')+s.space(u'prepared')+unicode(r'|')+s.space(u'created')+unicode(r').*?(AAS\s*?)?\sLATEX'))
         patterns.append(unicode(r'AAS\s+?LATEX\s+?')+s.space(u'macros')+u'v')
         patterns.append(unicode(r'^\s*?')+s.space(u'This paper has been produced using'))
@@ -377,11 +377,11 @@ class FirstRefLineNumerationListCompiler(DocumentSearchPatternListCompiler):
     """Concrete class. Used to return a 'DocumentSearchCompiledPatternList' object containing regex patterns enabling the identification of
        the first reference line by its numeration marker
     """
-    def getCompiledPatternList(self, prefix=u'', suffix=u''):
+    def getCompiledPatternList(self, prefix = u'', suffix = u''):
         """Return a list of compiled regex patterns used to ID the first reference line by its numeration marker"""
-        patterns=self.createPatterns()
+        patterns = self.createPatterns()
         return CompiledPatternList(patterns)
-    def createPatterns(self, prefix=u'', suffix=u''):
+    def createPatterns(self, prefix = u'', suffix = u''):
         """Create the regex patterns (don't compile though)"""
         patterns = []
         g_name = unicode(r'(?P<mark>')
@@ -394,17 +394,17 @@ class RefLineNumerationListCompiler(DocumentSearchPatternListCompiler):
     """Concrete class. Used to return a 'DocumentSearchCompiledPatternList' object containing regex patterns enabling the ID of any reference
        line by its numeration marker
     """
-    def getCompiledPatternList(self, prefix=u'', suffix=u''):
+    def getCompiledPatternList(self, prefix = u'', suffix = u''):
         """Return a list of compiled regex patterns used to ID the numeration marker for a reference line"""
-        patterns=self.createPatterns()
+        patterns = self.createPatterns()
         return CompiledPatternList(patterns)
-    def createPatterns(self, prefix=u'', suffix=u''):
+    def createPatterns(self, prefix = u'', suffix = u''):
         """Create the regex patterns (don't compile though)"""
-        patterns=[]
+        patterns = []
         if type(prefix) is str or type(prefix) is unicode:
-            title=prefix
+            title = prefix
         else:
-            title=u''
+            title = u''
         g_name = unicode(r'(?P<mark>')
         g_close = u')'
         space = unicode(r'\s*?')
@@ -427,18 +427,18 @@ class CompiledPatternList:
     """Concrete Class. List of compiled regex patterns, ready to be used for searching through text lines"""
     class CompiledPatternListIterator:
         def __init__(self, ptnlines):
-            self._mylist=ptnlines
-            self._listptr=0
+            self._mylist = ptnlines
+            self._listptr = 0
         def next(self):
             try:
-                item=self._mylist[self._listptr]
-                self._listptr+=1
+                item = self._mylist[self._listptr]
+                self._listptr += 1
                 return item
             except IndexError:
                 raise StopIteration
     def __init__(self, patternList):
         """Accept a list of regex strings and compile them, adding them to the internal list of compiled regex patterns"""
-        self._patterns=[]
+        self._patterns = []
         if type(patternList) is list:
             for x in patternList:
                 self._patterns.append(re.compile(x, re.I|re.UNICODE))
@@ -464,7 +464,7 @@ class LineSearchAlgorithm:
     def doSearch(self, searcher, line, patternList):
         """Search for a pattern in a line of text"""
         match = None
-        unsafe=False
+        unsafe = False
         try: getNumPatterns=patternList.getNumPatterns
         except AttributeError: unsafe=True
         if (type(line) is str or type(line) is unicode) and not unsafe:
@@ -496,13 +496,13 @@ class LineSearcher:
     """Concrete Class. This is the interface through which the user can carry out a line search"""
     def findAtStartLine(self, line, patternList):
         """Test a line of text against a list of patterns to see if any of the patterns match at the start of the line"""
-        al=LineSearchAlgorithm()
-        searcher=MatchSearchExecuter()
+        al = LineSearchAlgorithm()
+        searcher = MatchSearchExecuter()
         return al.doSearch(searcher, line, patternList)
     def findWithinLine(self, line, patternList):
         """Test a line of text against a list of patterns to see if any of the patterns match anywhere within the line"""
-        al=LineSearchAlgorithm()
-        searcher=SearchSearchExecuter()
+        al = LineSearchAlgorithm()
+        searcher = SearchSearchExecuter()
         return al.doSearch(searcher, line, patternList)
 
 class TextLineTransformer:
@@ -534,7 +534,7 @@ class EscapeSequenceTransformer(TextLineTransformer):
         def _addLanguageTagCodePoints(ptnlist):
             """Add all language tag code points to remove from document"""
             # Language Tag Code Points:
-            langTagCPs=[u"\U000E0000",u"\U000E0001",u"\U000E0002",u"\U000E0003",u"\U000E0004",u"\U000E0005",u"\U000E0006",u"\U000E0007",u"\U000E0008",u"\U000E0009",u"\U000E000A",u"\U000E000B",u"\U000E000C",u"\U000E000D",u"\U000E000E",u"\U000E000F",
+            langTagCPs = [u"\U000E0000",u"\U000E0001",u"\U000E0002",u"\U000E0003",u"\U000E0004",u"\U000E0005",u"\U000E0006",u"\U000E0007",u"\U000E0008",u"\U000E0009",u"\U000E000A",u"\U000E000B",u"\U000E000C",u"\U000E000D",u"\U000E000E",u"\U000E000F",
                         u"\U000E0010",u"\U000E0011",u"\U000E0012",u"\U000E0013",u"\U000E0014",u"\U000E0015",u"\U000E0016",u"\U000E0017",u"\U000E0018",u"\U000E0019",u"\U000E001A",u"\U000E001B",u"\U000E001C",u"\U000E001D",u"\U000E001E",u"\U000E001F",
                         u"\U000E0020",u"\U000E0021",u"\U000E0022",u"\U000E0023",u"\U000E0024",u"\U000E0025",u"\U000E0026",u"\U000E0027",u"\U000E0028",u"\U000E0029",u"\U000E002A",u"\U000E002B",u"\U000E002C",u"\U000E002D",u"\U000E002E",u"\U000E002F",
                         u"\U000E0030",u"\U000E0031",u"\U000E0032",u"\U000E0033",u"\U000E0034",u"\U000E0035",u"\U000E0036",u"\U000E0037",u"\U000E0038",u"\U000E0039",u"\U000E003A",u"\U000E003B",u"\U000E003C",u"\U000E003D",u"\U000E003E",u"\U000E003F",
@@ -546,7 +546,7 @@ class EscapeSequenceTransformer(TextLineTransformer):
         def _addMusicNotation(ptnlist):
             """Add all musical notation items to remove from document"""
             # Musical Notation Scoping
-            musicNotation= [u"\U0001D173",u"\U0001D174",u"\U0001D175",u"\U0001D176",u"\U0001D177",u"\U0001D178",u"\U0001D179",u"\U0001D17A"]
+            musicNotation = [u"\U0001D173",u"\U0001D174",u"\U0001D175",u"\U0001D176",u"\U0001D177",u"\U0001D178",u"\U0001D179",u"\U0001D17A"]
             for itm in musicNotation: ptnlist[itm] = u""
         # Control characters not suited to XML:
         plist[u'\u2028'] = u""
@@ -796,7 +796,7 @@ class MultispaceTruncator(TextLineTransformer):
 
 class Document:
     """Abstract class Representing a fulltext document in the system"""
-    def __init__(self, newDocBody = [], filepath=None):
+    def __init__(self, newDocBody = [], filepath = None):
         """Initialise state of a document object"""
         self._content = []
         if filepath is not None:
@@ -828,7 +828,7 @@ class Document:
 
 class TextDocument(Document):
     """Concrete class representing a TextDocument - effectively a list of Strings of plaintext"""
-    def __init__(self,  newDocBody = [], filepath=None):
+    def __init__(self,  newDocBody = [], filepath = None):
         """Initialise a TextDocument object"""
         Document.__init__(self, newDocBody, filepath)
     def displayDocument(self):
@@ -837,24 +837,24 @@ class TextDocument(Document):
         """Get the reference section lines, put them into a ReferenceSectionRebuilder object, ask it to rebuild the
            lines, and return the resulting ReferenceSection object
         """
-        startIdx=None
+        startIdx = None
         if start.firstLineIsTitleAndMarker():
             # Title on same line as 1st ref- take title out!
-            t=start.getTitleString()
-            startIdx=start.getLineNum()
-            newline=None
-            sp=re.compile(unicode(r'^.*?')+t,re.UNICODE)
-            newl=sp.split(self._content[startIdx],1)
-            self._content[startIdx]=newl[1]
+            t = start.getTitleString()
+            startIdx = start.getLineNum()
+            newline = None
+            sp = re.compile(unicode(r'^.*?')+t,re.UNICODE)
+            newl = sp.split(self._content[startIdx],1)
+            self._content[startIdx] = newl[1]
         elif start.titlePresent():
             # Pass title
-            startIdx=start.getLineNum()+1
+            startIdx = start.getLineNum()+1
         else:
-            startIdx=start.getLineNum()
+            startIdx = start.getLineNum()
         if type(end) is int:
-            b=ReferenceSectionRebuilder(self._content[startIdx:end+1])
+            b = ReferenceSectionRebuilder(self._content[startIdx:end+1])
         else:
-            b=ReferenceSectionRebuilder()
+            b = ReferenceSectionRebuilder()
         return b.getRebuiltLines(start)
     def findEndReferenceSection(self, refStart):
         """Find the line number of the end of a TextDocument's reference section. Should be passed a ReferenceSectionStartPoint
@@ -864,55 +864,55 @@ class TextDocument(Document):
         if refStart is None or refStart.getLineNum() is None:
             # No reference section start info!
             return None
-        sectEnded=0
+        sectEnded = 0
         x = refStart.getLineNum()
         if (type(x) is not int) or (x<0) or (x>len(self._content)) or (len(self._content)<1):
             # Cant safely find end of refs with this info - quit!
             return None
         # Get line test patterns:
-        t_patterns=PostRefSecnTitleListCompiler().getCompiledPatternList()
-        kw_patterns=PostRefSecnKWListCompiler().getCompiledPatternList()
+        t_patterns = PostRefSecnTitleListCompiler().getCompiledPatternList()
+        kw_patterns = PostRefSecnKWListCompiler().getCompiledPatternList()
         if refStart.markerCharPresent():
-            mk_patterns=CompiledPatternList([refStart.getMarkerPattern()])
+            mk_patterns = CompiledPatternList([refStart.getMarkerPattern()])
         else:
-            mk_patterns=RefLineNumerationListCompiler().getCompiledPatternList()
-        garbageDigit_pattern=re.compile(unicode(r'^\s*?([\+\-]?\d+?(\.\d+)?\s*?)+?\s*?$'),re.UNICODE)
+            mk_patterns = RefLineNumerationListCompiler().getCompiledPatternList()
+        garbageDigit_pattern = re.compile(unicode(r'^\s*?([\+\-]?\d+?(\.\d+)?\s*?)+?\s*?$'),re.UNICODE)
         searcher=LineSearcher()
 
         while (x<len(self._content)) and (not sectEnded):
-            end_match=searcher.findWithinLine(self._content[x], t_patterns)
+            end_match = searcher.findWithinLine(self._content[x], t_patterns)
             if end_match is None:
-                end_match=searcher.findWithinLine(self._content[x], kw_patterns)
+                end_match = searcher.findWithinLine(self._content[x], kw_patterns)
             if end_match is not None:
                 # End reference section? Check within next 5 lines for other reference numeration markers
-                y=x+1
-                lineFnd=0
+                y = x+1
+                lineFnd = 0
                 while (y<x+6) and (y<len(self._content)) and (not lineFnd):
                     num_match=searcher.findWithinLine(self._content[y], mk_patterns)
                     if num_match is not None and not num_match.group(0).isdigit():
-                        lineFnd=1
-                    y=y+1
+                        lineFnd = 1
+                    y = y + 1
                 if not lineFnd:
                     # No ref line found-end section
-                    sectEnded=1
+                    sectEnded = 1
             if not sectEnded:
                 # Does this & the next 5 lines simply contain numbers? If yes, it's probably the axis
                 # scale of a graph in a fig. End refs section
-                dm=garbageDigit_pattern.match(self._content[x])
+                dm = garbageDigit_pattern.match(self._content[x])
                 if dm is not None:
-                    y=x+1
-                    digitLines=4
-                    numDigitLns=1
+                    y = x + 1
+                    digitLines = 4
+                    numDigitLns = 1
                     while(y<x+digitLines) and (y<len(self._content)):
-                        dm=garbageDigit_pattern.match(self._content[y])
+                        dm = garbageDigit_pattern.match(self._content[y])
                         if dm is not None:
-                            numDigitLns=numDigitLns+1
-                        y=y+1
+                            numDigitLns = numDigitLns + 1
+                        y = y + 1
                     if numDigitLns == digitLines:
-                        sectEnded=1
-                x=x+1
-        return x-1
-    def extractReferences(self,no_rebuild=False):
+                        sectEnded = 1
+                x = x + 1
+        return x - 1
+    def extractReferences(self,no_rebuild = False):
         """Extract references from a TextDocument and return a ReferenceSection object"""
         # Try to remove pagebreaks, headers, footers
         self._removePageBoundaryInformation()
@@ -931,7 +931,7 @@ class TextDocument(Document):
                 refs = ReferenceSection()
             else:
                 # Extract
-                refs=self.getReferences(sectStart, sectEnd)
+                refs = self.getReferences(sectStart, sectEnd)
         return refs
     def findReferenceSectionNoTitle(self):
         """Find the line number of the start of a TextDocument object's reference section by searching for the first reference
@@ -940,37 +940,37 @@ class TextDocument(Document):
         """
         refStartLine = refLineMarker = refStart = None
         if len(self._content) > 0:
-            mk_patterns=FirstRefLineNumerationListCompiler().getCompiledPatternList()
-            searcher=LineSearcher()
+            mk_patterns = FirstRefLineNumerationListCompiler().getCompiledPatternList()
+            searcher = LineSearcher()
 
             p_blank = re.compile(unicode(r'^\s*$'))
-            x=len(self._content)-1
-            foundSect=0
+            x = len(self._content)-1
+            foundSect = 0
             while x >= 0 and not foundSect:
-                mk_match=searcher.findAtStartLine(self._content[x], mk_patterns)
+                mk_match = searcher.findAtStartLine(self._content[x], mk_patterns)
                 if mk_match is not None and string.atoi(mk_match.group('num')) == 1:
                     # Get mark recognition pattern:
                     mk_ptn = mk_match.re.pattern
                
                     # Look for [2] in next 10 lines:
-                    nxtTestLines=10
-                    y=x+1
+                    nxtTestLines = 10
+                    y = x + 1
                     tmpFnd = 0
                     while y < len(self._content) and y < x+nxtTestLines and not tmpFnd:
                         mk_match2=searcher.findAtStartLine(self._content[y], mk_patterns)
                         if (mk_match2 is not None) and (string.atoi(mk_match2.group('num')) == 2) and (mk_match.group('left') == mk_match2.group('left')) and (mk_match.group('right') == mk_match2.group('right')):
                             # Found next line:
-                            tmpFnd=1
-                        elif y == len(self._content)-1:
-                            tmpFnd=1
-                        y=y+1
+                            tmpFnd = 1
+                        elif y == len(self._content) - 1:
+                            tmpFnd = 1
+                        y = y + 1
 
                     if tmpFnd:
-                        foundSect=1
-                        refStartLine=x
-                        refLineMarker=mk_match.group('mark')
+                        foundSect = 1
+                        refStartLine = x
+                        refLineMarker = mk_match.group('mark')
                         refLineMarkerPattern = mk_ptn
-                x=x-1
+                x = x - 1
         if refStartLine is not None:
             # Make ReferenceSectionStartPoint object with ref section start location details
             refStart = ReferenceSectionStartPoint()
@@ -986,91 +986,91 @@ class TextDocument(Document):
         refStartLine = refTitle = refLineMarker = refLineMarkerPattern = None
         refStart = titleMarkerSameLine = foundPart = None
         if len(self._content) > 0:
-            t_patterns=RefSecnTitleListCompiler().getCompiledPatternList()
-            mk_patterns=RefLineNumerationListCompiler().getCompiledPatternList()
-            searcher=LineSearcher()
+            t_patterns = RefSecnTitleListCompiler().getCompiledPatternList()
+            mk_patterns = RefLineNumerationListCompiler().getCompiledPatternList()
+            searcher = LineSearcher()
             p_blank = re.compile(unicode(r'^\s*$'))
             # Try to find refs section title:
-            x=len(self._content)-1
-            foundTitle=0
+            x = len(self._content)-1
+            foundTitle = 0
             while x >= 0 and not foundTitle:
-                title_match=searcher.findWithinLine(self._content[x], t_patterns)
+                title_match = searcher.findWithinLine(self._content[x], t_patterns)
                 if title_match is not None:
-                    temp_refStartLine=x
-                    tempTitle=title_match.group('title')
-                    mk_wtitle_ptrns=RefLineNumerationListCompiler().getCompiledPatternList(tempTitle)
-                    mk_wtitle_match=searcher.findWithinLine(self._content[x], mk_wtitle_ptrns)
+                    temp_refStartLine = x
+                    tempTitle = title_match.group('title')
+                    mk_wtitle_ptrns = RefLineNumerationListCompiler().getCompiledPatternList(tempTitle)
+                    mk_wtitle_match = searcher.findWithinLine(self._content[x], mk_wtitle_ptrns)
                     if mk_wtitle_match is not None:
-                        mk=mk_wtitle_match.group('mark')
+                        mk = mk_wtitle_match.group('mark')
                         mk_ptn = mk_wtitle_match.re.pattern
                         p_num = re.compile(unicode(r'(\d+)'))
                         m_num = p_num.search(mk)
                         if m_num is not None and string.atoi(m_num.group(0)) == 1:
                             # Mark found.
-                            foundTitle=1
+                            foundTitle = 1
                             refTitle = tempTitle
                             refLineMarker = mk
                             refLineMarkerPattern = mk_ptn
                             refStartLine=temp_refStartLine
-                            titleMarkerSameLine=1
+                            titleMarkerSameLine = 1
                         else:
-                            foundPart=1
-                            refStartLine=temp_refStartLine
-                            refLineMarker=mk
+                            foundPart = 1
+                            refStartLine = temp_refStartLine
+                            refLineMarker = mk
                             refLineMarkerPattern = mk_ptn
-                            refTitle=tempTitle
-                            titleMarkerSameLine=1
+                            refTitle = tempTitle
+                            titleMarkerSameLine = 1
                     else:
                         try:
-                            y = x+1
+                            y = x + 1
                             # Move past blank lines
-                            m_blank=p_blank.match(self._content[y])
+                            m_blank = p_blank.match(self._content[y])
                             while m_blank is not None and y < len(self._content):
-                                y=y+1
-                                m_blank=p_blank.match(self._content[y])
+                                y = y+1
+                                m_blank = p_blank.match(self._content[y])
                             # Is this line numerated like a reference line?
-                            mark_match=searcher.findAtStartLine(self._content[y], mk_patterns)
+                            mark_match = searcher.findAtStartLine(self._content[y], mk_patterns)
                             if mark_match is not None:
                                 # Ref line found. What is it?
                                 titleMarkerSameLine=None
-                                mark=mark_match.group('mark')
+                                mark = mark_match.group('mark')
                                 mk_ptn = mark_match.re.pattern
                                 p_num = re.compile(unicode(r'(\d+)'))
                                 m_num = p_num.search(mark)
                                 if m_num is not None and string.atoi(m_num.group(0)) == 1:
                                     # 1st ref truly found
-                                    refStartLine=temp_refStartLine
-                                    refLineMarker=mark
+                                    refStartLine = temp_refStartLine
+                                    refLineMarker = mark
                                     refLineMarkerPattern = mk_ptn
-                                    refTitle=tempTitle
-                                    foundTitle=1
+                                    refTitle = tempTitle
+                                    foundTitle = 1
                                 elif m_num is not None and m_num.groups(0) != 1:
-                                    foundPart=1
-                                    refStartLine=temp_refStartLine
-                                    refLineMarker=mark
+                                    foundPart = 1
+                                    refStartLine = temp_refStartLine
+                                    refLineMarker = mark
                                     refLineMarkerPattern = mk_ptn
-                                    refTitle=tempTitle
+                                    refTitle = tempTitle
                                 else:
                                     if foundPart:
-                                        foundTitle=1
+                                        foundTitle = 1
                                     else:
-                                        foundPart=1
-                                        refStartLine=temp_refStartLine
+                                        foundPart = 1
+                                        refStartLine = temp_refStartLine
                                         refTitle=tempTitle
-                                        refLineMarker=mark
+                                        refLineMarker = mark
                                         refLineMarkerPattern = mk_ptn
                             else:
                                 # No numeration
                                 if foundPart:
-                                    foundTitle=1
+                                    foundTitle = 1
                                 else:
-                                    foundPart=1
-                                    refStartLine=temp_refStartLine
+                                    foundPart = 1
+                                    refStartLine = temp_refStartLine
                                     refTitle=tempTitle
                         except IndexError:
                             # References section title was on last line for some reason. Ignore
                             pass
-                x=x-1
+                x = x - 1
         if refStartLine is not None:
             # Make ReferenceSectionStartPoint object with ref
             # section start location details
@@ -1141,7 +1141,7 @@ class TextDocument(Document):
                     curBreak = curBreak + nxtHead
                 if keepChecking:
                     # Line is a header line: check next
-                    numHeadLns=numHeadLns+1
+                    numHeadLns = numHeadLns+1
                 emptyLine = 0
         return numHeadLns
     def getFootLines(self, breakIndices = []):
@@ -1155,13 +1155,13 @@ class TextDocument(Document):
             while keepChecking:
                 curBreak = 1
                 #m_blankLineTest = p_wordSearch.match(self._content[(breakIndices[curBreak]-numFootLns-1)])
-                m_blankLineTest = re.compile(u'\S',re.UNICODE).search(self._content[(breakIndices[curBreak]-numFootLns-1)])
+                m_blankLineTest = re.compile(u'\S',re.UNICODE).search(self._content[(breakIndices[curBreak] - numFootLns - 1)])
                 if m_blankLineTest == None:
                     emptyLine = 1
                 grps_headLineWords = p_wordSearch.findall(self._content[(breakIndices[curBreak]-numFootLns-1)])
-                curBreak=curBreak+1
+                curBreak=curBreak + 1
                 while (curBreak < numBreaks) and keepChecking:
-                    grps_thisLineWords = p_wordSearch.findall(self._content[(breakIndices[curBreak]-numFootLns-1)])
+                    grps_thisLineWords = p_wordSearch.findall(self._content[(breakIndices[curBreak] - numFootLns - 1)])
                     if emptyLine:
                         if len(grps_thisLineWords) != 0:
                             keepChecking = 0
@@ -1170,7 +1170,7 @@ class TextDocument(Document):
                             keepChecking = 0
                         else:
                             keepChecking = self.checkBoundaryLinesSimilar(grps_headLineWords, grps_thisLineWords)
-                    curBreak=curBreak+1
+                    curBreak = curBreak + 1
                 if keepChecking:
                     numFootLns = numFootLns+1
                 emptyLine = 0
@@ -1180,8 +1180,8 @@ class TextDocument(Document):
         numBreaks = len(breakIndices)
         pageLens = []
         for x in range(0,numBreaks):
-            if x < numBreaks-1:
-                pageLens.append(breakIndices[x+1]-breakIndices[x])
+            if x < numBreaks - 1:
+                pageLens.append(breakIndices[x + 1] - breakIndices[x])
         pageLens.sort()
         if (len(pageLens) > 0) and (headLn+footLn+1 < pageLens[0]):
             # Safe to chop hdrs & ftrs
@@ -1198,8 +1198,8 @@ class TextDocument(Document):
                 self._content[breakIndices[i]:breakIndices[i]+1] = []
                 # Chop footers (unless this is the first page break)
                 if i != len(breakIndices) - 1:
-                    for k in range(1,footLn+1):
-                        self._content[breakIndices[i]-footLn:breakIndices[i]-footLn+1] = []
+                    for k in range(1,footLn + 1):
+                        self._content[breakIndices[i] - footLn:breakIndices[i] - footLn + 1] = []
     def checkBoundaryLinesSimilar(self, l_1, l_2):
         """Compare two lists to see if their elements are roughly the same"""
         numMatches = 0
@@ -1214,7 +1214,7 @@ class TextDocument(Document):
             else:
                 l1_str = l_1[i].lower()
                 l2_str = l_2[i].lower()
-                if (l1_str[0] == l2_str[0]) and (l1_str[len(l1_str)-1] == l2_str[len(l2_str)-1]):
+                if (l1_str[0] == l2_str[0]) and (l1_str[len(l1_str) - 1] == l2_str[len(l2_str) - 1]):
                     numMatches=numMatches+1
         if (len(l_1) == 0) or (float(numMatches)/float(len(l_1)) < 0.9):
             return False
@@ -1245,8 +1245,8 @@ class Ps2asciiEncodedTextDocument(Document):
         def __init__(self, posx, posy, content, diffx):
             """Initialise a dataline's state"""
             self._posnX = self._posnY = 0
-            self._dataContent=''
-            self._diff_posnX=0
+            self._dataContent = ''
+            self._diff_posnX = 0
             self.setPosX(int(posx))
             self.setPosY(int(posy))
             self.setText(content)
@@ -1384,9 +1384,9 @@ class Ps2asciiEncodedTextDocument(Document):
             print i
 
 class ReferenceSectionStartPoint:
-    """Concrete class to hold information about the start line of a document's reference section (e.g. line number, title, etc"""
+    """Concrete class to hold information about the start line of a document's reference section (e.g. line number, title, etc)"""
     def __init__(self):
-        self._lineNum = self._title = self._lineMarkerPresent=None
+        self._lineNum = self._title = self._lineMarkerPresent = None
         self._haveMarkerRegex = self._markerChar = self._markerRegexPattern = self._markerTitleSameLine=None
     def setLineNum(self, num):
         """Set the line number of the references section start"""
@@ -1412,7 +1412,7 @@ class ReferenceSectionStartPoint:
             self._haveMarkerRegex = 0
     def setTitleMarkerSameLine(self):
         """Set a flag to say that the first reference line contains both a title and the first line"""
-        self._markerTitleSameLine=1
+        self._markerTitleSameLine = 1
     def getLineNum(self):
         """Return the line number of the references section start"""
         return self._lineNum
@@ -1466,46 +1466,46 @@ class ReferenceSectionRebuilder:
     def getRebuiltLines(self, refStartInfo):
         """Trigger reference lines rebuilding process & return ReferenceSection object containing rebuilt ReferenceLine objects"""
         # Ensure we have a real 'ReferenceSectionStartPoint'
-        try: getLineNum=refStartInfo.getLineNum
+        try: getLineNum = refStartInfo.getLineNum
         except AttributeError: return ReferenceSection()
         self._removeLeadingGarbageLines()
-        numatnInfo=self._getLineNumerationStyle(refStartInfo)
+        numatnInfo = self._getLineNumerationStyle(refStartInfo)
         return ReferenceSection(self._rebuild(numatnInfo))
     def _testBlankLineRefSeparators(self):
         """Test to see if reference lines are separated by blank lines so that these can be used to rebuild reference lines"""
-        p_ws=re.compile(unicode(r'^\s*$'),re.UNICODE)
-        numblank=0            # No blank lines fnd between non-blanks
-        numline=0             # No ref lines separated by blanks
-        blankLnSep=0          # Flag to indicate if blanks lines separate ref lines
-        multi_nonblanks_fd=0  # Flag to indicate if multiple nonblank lines are found together (used because
-                              # if line is dbl-spaced, it isnt a blank that separates refs & cant be relied upon)
-        x=0
-        max=len(self._dataLines)
+        p_ws = re.compile(unicode(r'^\s*$'),re.UNICODE)
+        numblank = 0            # No blank lines fnd between non-blanks
+        numline = 0             # No ref lines separated by blanks
+        blankLnSep = 0          # Flag to indicate if blanks lines separate ref lines
+        multi_nonblanks_fd = 0  # Flag to indicate if multiple nonblank lines are found together (used because
+                                # if line is dbl-spaced, it isnt a blank that separates refs & cant be relied upon)
+        x = 0
+        max = len(self._dataLines)
         while x < max:
-            m_ws=p_ws.search(self._dataLines[x])
+            m_ws = p_ws.search(self._dataLines[x])
             if m_ws is None:
                 # ! empty line
-                numline=numline+1
-                x=x+1 # Move past line
-                while x<len(self._dataLines) and p_ws.search(self._dataLines[x]) is None:
+                numline = numline+1
+                x = x + 1 # Move past line
+                while x < len(self._dataLines) and p_ws.search(self._dataLines[x]) is None:
                     multi_nonblanks_fd=1
-                    x=x+1
-                x=x-1
+                    x = x + 1
+                x = x - 1
             else:
                 # empty line
-                numblank=numblank+1
-                x=x+1
+                numblank = numblank + 1
+                x = x + 1
                 while x< len(self._dataLines) and p_ws.search(self._dataLines[x]) is not None:
-                    x=x+1
-                if x==len(self._dataLines):
+                    x = x + 1
+                if x == len(self._dataLines):
                     # Blanks at end doc: dont count
-                    numblank=numblank-1
-                x=x-1
-            x=x+1
+                    numblank = numblank-1
+                x = x - 1
+            x = x + 1
         # Now from data of num blank lines & num text lines, if numline>3, & numblank=numline or numblank=numline-1
         # then we hav blank line separators between ref lines
-        if (numline>3) and ((numblank==numline) or (numblank==numline-1)) and (multi_nonblanks_fd):
-            blankLnSep=1
+        if (numline > 3) and ((numblank == numline) or (numblank == numline - 1)) and (multi_nonblanks_fd):
+            blankLnSep = 1
         return blankLnSep
     def _rebuild(self, refNum):
         """Based on whether a reference line numeration pattern was found, either have the reference lines rebuild by the
@@ -1519,9 +1519,9 @@ class ReferenceSectionRebuilder:
             sp = re.compile(unicode(r'^\s*$'),re.UNICODE)
             if sp.match(line) is None:
                 refList.append(line)
-        rebuilt=[]
+        rebuilt = []
         lineTrans = []
-        tl=u''
+        tl = u''
         # List of line transformers to clean up line:
         lineTrans.append(URLRepairer())
         lineTrans.append(EscapeSequenceTransformer())
@@ -1529,42 +1529,42 @@ class ReferenceSectionRebuilder:
         if refNum is None or (type(refNum) is not str and type(refNum) is not unicode):
             if self._testBlankLineRefSeparators():
                 # Use blank lines to separate ref lines
-                refNum=unicode(r'^\s*$')
+                refNum = unicode(r'^\s*$')
             else:
                 # No ref line dividers: unmatchable pattern
-                refNum=unicode(r'^A$^A$$')
-        p_refNum=re.compile(refNum,re.I|re.UNICODE)
-        p_leadingws=re.compile(unicode(r'^\s+'))
-        p_trailingws=re.compile(unicode(r'\s+$'))
+                refNum = unicode(r'^A$^A$$')
+        p_refNum = re.compile(refNum,re.I|re.UNICODE)
+        p_leadingws = re.compile(unicode(r'^\s+'))
+        p_trailingws = re.compile(unicode(r'\s+$'))
         for x in range(len(self._dataLines)-1,-1,-1):
-            tstr=p_leadingws.sub(u'',self._dataLines[x])
-            tstr=p_trailingws.sub(u'',tstr)
-            m=p_refNum.match(tstr)
+            tstr = p_leadingws.sub(u'',self._dataLines[x])
+            tstr = p_trailingws.sub(u'',tstr)
+            m = p_refNum.match(tstr)
             if m is not None:
                 # Ref line start marker
                 if tstr == '':
                     # Blank line to separate refs
-                    tl=p_trailingws.sub(u'',tl)
+                    tl = p_trailingws.sub(u'',tl)
                     cleanAndAppendToRefsList(lineTrans, rebuilt, tl)
-                    tl=u''
+                    tl = u''
                 else:
                     if tstr[len(tstr)-1] == u'-' or tstr[len(tstr)-1] == u' ':
-                        tl=tstr+tl
+                        tl = tstr + tl
                     else:
-                        tl=tstr+u' '+tl
-                    tl=p_trailingws.sub(u'',tl)
+                        tl = tstr + u' ' + tl
+                    tl = p_trailingws.sub(u'',tl)
                     cleanAndAppendToRefsList(lineTrans, rebuilt, tl)
-                    tl=u''
+                    tl = u''
             else:
                 if tstr != u'':
                     # Continuation of line
-                    if tstr[len(tstr)-1] == u'-' or tstr[len(tstr)-1] == u' ':
-                        tl=tstr+tl
+                    if tstr[len(tstr) - 1] == u'-' or tstr[len(tstr) - 1] == u' ':
+                        tl = tstr + tl
                     else:
-                        tl=tstr+u' '+tl
+                        tl = tstr + u' ' + tl
         if tl != u'':
             # Append last line
-            tl=p_trailingws.sub(u'',tl)
+            tl = p_trailingws.sub(u'',tl)
             cleanAndAppendToRefsList(lineTrans, rebuilt, tl)
         rebuilt.reverse()
         d=self._testAndCorrectRebuiltLines(rebuilt, p_refNum)
@@ -1595,44 +1595,44 @@ class ReferenceSectionRebuilder:
                         continue
                     elif len(string.strip(rebuiltlines[x][m.end():])) == 0:
                         # this line consists of a number only. And it is not a coorrect marker. Add it to the last line:
-                        fixed[len(fixed)-1] += rebuiltlines[x]
+                        fixed[len(fixed) - 1] += rebuiltlines[x]
                         continue
                     else:
                         # Problem maybe. May have taken some of the last line into this line. Can we find the next marker in this line?
                         m_fix = p_refmarker.search(rebuiltlines[x])
-                        if m_fix is not None and int(m_fix.group("marknum")) == last_marknum+1:
+                        if m_fix is not None and int(m_fix.group("marknum")) == last_marknum + 1:
                             m_fix_test = re.match(u"%s\s*[A-Z]"%(m_fix.group(),))
                             if m_fix_test is not None:
                                 movesect = rebuiltlines[x][0:m_fix.start()]
                                 rebuiltlines[x] = rebuiltlines[x][m_fix.start():]
-                                fixed[len(fixed)-1] += movesect
+                                fixed[len(fixed) - 1] += movesect
                                 fixed.append(rebuiltlines[x])
                             else:
-                                unsafe=True
+                                unsafe = True
                                 break
                         else:
                             unsafe = True
                             break
                 except AttributeError:
                     # This line does not have a line marker at the start! This line shall be added to the end of the previous line.
-                    fixed[len(fixed)-1] += rebuiltlines[x]
+                    fixed[len(fixed) - 1] += rebuiltlines[x]
                     continue
         except IndexError:
-            unsafe=True
+            unsafe = True
         if unsafe: return None
         else: return fixed
     def _getLineNumerationStyle(self, refStartInfo):
         """Try to determine the numeration marker style for the reference lines"""
-        mkregex=None
+        mkregex = None
         if refStartInfo.markerPatternPresent():
             mkregex = refStartInfo.getMarkerPattern()
         return mkregex
     def _removeLeadingGarbageLines(self):
         """Sometimes, the first lines of the extracted references are completely blank or email addresses. These must be removed as they are not references"""
-        p_emptyline=re.compile(unicode(r'^\s*$'),re.UNICODE)
-        p_email=re.compile(unicode(r'^\s*e\-?mail'),re.UNICODE)
+        p_emptyline = re.compile(unicode(r'^\s*$'),re.UNICODE)
+        p_email = re.compile(unicode(r'^\s*e\-?mail'),re.UNICODE)
         while (len(self._dataLines)>0) and (p_emptyline.match(self._dataLines[0]) is not None or p_email.match(self._dataLines[0]) is not None):
-            self._dataLines[0:1]=[]
+            self._dataLines[0:1] = []
 
 class DocumentConverter:
     """Abstract Class representing a document format conversion
@@ -1690,12 +1690,10 @@ class PDFtoTextDocumentConverter(OSDependentDocumentConverter):
         return self._applicationPath
     def setConvertCommand(self, filePath):
         """Set up the command by which to call pdftotext application"""
-        #self._convertCommand = self.getApplicationPath() +' -raw -q '+filePath+' -'
-        self._convertCommand = self.getApplicationPath() +' -raw -q -enc UTF-8 '+filePath+' -'
+        self._convertCommand = self.getApplicationPath() + ' -raw -q -enc UTF-8 ' + filePath + ' -'
     def getConversionResult(self):
-        mylines=[]
+        mylines = []
         for line in self._converterSessionLink: mylines.append(line.decode("utf-8"))
-        #for line in self._converterSessionLink: mylines.append(line.decode("iso-8859-1"))
         return mylines
     def convertDocument(self, toConvert):
         """Perform a conversion from PDF to text, returning the document contents as a TextDocument object"""
@@ -1768,10 +1766,10 @@ class PS2AsciiDocumentConverter(OSDependentDocumentConverter):
         return self._gsAppPath
     def setUnzippedPSConvertCommand(self, filePath):
         """Set converter command for unzipped PS file conversion"""
-        self._convertCommand = self.getCATapplicationPath() +" "+filePath+" | "+self.getGSapplicationPath()+" -q -dNODISPLAY -dNOBIND -dWRITESYSTEMDICT -c save -f ps2ascii.ps - -c quit"
+        self._convertCommand = self.getCATapplicationPath() + " " + filePath + " | " + self.getGSapplicationPath() + " -q -dNODISPLAY -dNOBIND -dWRITESYSTEMDICT -c save -f ps2ascii.ps - -c quit"
     def setZippedPSConvertCommand(self, filePath):
         """Set converter command for zipped PS file conversion"""
-        self._convertCommand = self.getGUNZIPapplicationPath() +" -c "+filePath+" | "+self.getGSapplicationPath()+" -q -dNODISPLAY -dNOBIND -dWRITESYSTEMDICT -c save -f ps2ascii.ps - -c quit"
+        self._convertCommand = self.getGUNZIPapplicationPath() + " -c " + filePath + " | " + self.getGSapplicationPath() + " -q -dNODISPLAY -dNOBIND -dWRITESYSTEMDICT -c save -f ps2ascii.ps - -c quit"
     def setConvertCommand(self, filePath):
         """Set up the shell command by which to call applications needed to perform the conversion"""
         if re.search(r'(\w{2})$', filePath).group(0) == "ps":
@@ -1789,8 +1787,8 @@ class PS2AsciiDocumentConverter(OSDependentDocumentConverter):
         regexPattern = re.compile(r'(?P<fname>.*?)(\.\w+)?$')
         match = regexPattern.search(filename)
         name = match.group('fname')
-        if self._canAccessConvertFile(name+'.ps'): name = name+'.ps'
-        else: name = name+'.ps.gz'
+        if self._canAccessConvertFile(name+'.ps'): name = name + '.ps'
+        else: name = name + '.ps.gz'
         return name
     def convertDocument(self, toConvert):
         """This method performs a conversion from PS to text. If the file 'toConvert' exists and can be converted, a
@@ -1816,7 +1814,7 @@ class KnowledgeBase:
        These are often found in the text of documents. Replacement terms consist of standardised periodical titles in a standardised case. These will be used to
        replace identified non-standard titles
     """
-    def __init__(self, fn=None):
+    def __init__(self, fn = None):
         self._kb = {}
         self._compiledPatternsKB = {}
         self._unstandardisedTitle = {}
@@ -1831,7 +1829,7 @@ class KnowledgeBase:
             fh=open(fn, 'r')
             p_kbLine = re.compile(unicode('^\s*(?P<seek>\w.*?)\s*---\s*(?P<repl>\w.*?)\s*$'),re.UNICODE)
             for x in fh:
-                y=x.decode("utf-8")
+                y = x.decode("utf-8")
                 y = _mychop(y)
                 m_kbLine = p_kbLine.search(y)
                 if m_kbLine is None:
@@ -1857,12 +1855,12 @@ class KnowledgeBase:
            lowercase letter 'a's if the match was numerical. Return a Tuple containing dictionaries containing information about the substitutions, along with the new line
         """
         def _bytitlelen(a, b):
-            (aa,bb)=(self._unstandardisedTitle[a],self._unstandardisedTitle[b])
+            (aa,bb) = (self._unstandardisedTitle[a],self._unstandardisedTitle[b])
             if len(aa) < len(bb): return 1
             elif len(aa) == len(bb): return 0
             else: return -1
         def _byLen(a, b):
-            (aa,bb)=(a.pattern,b.pattern)
+            (aa,bb) = (a.pattern,b.pattern)
             if len(aa) < len(bb): return 1
             elif len(aa) == len(bb): return 0
             else: return -1
@@ -1904,9 +1902,9 @@ class PreprintClassificationItem:
     def getSearchString(self): return self._srchStr
     def getReplString(self): return self._rpStr
     def getLength(self): return len(self._srchStr)
-    r_str = property(fget=getReplString, fset=setReplString)
-    s_str = property(fget=getSearchString, fset=setSearchString)
-    length = property(fget=getLength)
+    r_str = property(fget = getReplString, fset = setReplString)
+    s_str = property(fget = getSearchString, fset = setSearchString)
+    length = property(fget = getLength)
     del setSearchString, setReplString, getSearchString, getReplString
     del getLength
 
@@ -1984,10 +1982,10 @@ class Institute:
         self._numerationRegex = self._makeOrderedPtns(lenPtns)
 ##
     def _makeOrderedPtnsList(self, ptns):
-        p_list=[]
+        p_list = []
         if len(ptns) > 0:
             for p in ptns:
-                p_itm=u"(?P<numn>"+self._createPattern(p[1])+u")"
+                p_itm = u"(?P<numn>"+self._createPattern(p[1])+u")"
                 p_list.append(p_itm)
         return p_list
     def assignNumerationRegexList(self):
@@ -2070,15 +2068,14 @@ class Institute:
         return (inst_full_len, inst_RN_rep_str, ln)
     def addCategory(self, k, v): self._preprintCatsList.append(PreprintClassificationItem(k,v))
     def addNumerationStyle(self, num): self._numerationList.append(num)
-    name = property(fget=getName, fset=setName)
+    name = property(fget = getName, fset = setName)
     del setName, getName
 
 class InstituteList:
-    def __init__(self, fn=''):
+    def __init__(self, fn = ''):
         self._iList = self._getInstituteList(fn)
         self._buildInstNumtnRegexs()
     def _buildInstNumtnRegexs(self):
-        #for i in self._iList: i.assignNumerationRegex()
         for i in self._iList: i.createTestPatternsList()
     def display(self):
         for x in self._iList: x.display()
@@ -2091,7 +2088,7 @@ class InstituteList:
             p_prepClass = re.compile(unicode(r'^\s*(\w.*?)\s*---\s*(\w.*?)\s*$'),re.UNICODE)
             p_numtn = re.compile(unicode(r'^\<(.+)\>$'),re.UNICODE)
             for x in fh:
-                y=x.decode("utf-8")
+                y = x.decode("utf-8")
                 m_instName = p_instName.search(y)
                 m_prepClass = p_prepClass.search(y)
                 m_numtn = p_numtn.search(y)
@@ -2412,26 +2409,26 @@ class ProcessedReferenceLineBuilder:
             else:
                 # No replacements made in this line before this IBID (its a line with an IBID and
                 # we dont know what the IBID refers to..ignore it
-                rebuiltLine = rebuiltLine + orig_line[true_repidx:true_repidx+titlematch_len[repidx]+extras]
+                rebuiltLine = rebuiltLine + orig_line[true_repidx:true_repidx + titlematch_len[repidx] + extras]
                 start_pos=true_repidx+titlematch_len[repidx]+extras
         else:
             # Normal title replacement - not an IBID
             # Skip past any "[" or "(" chars
             rebuiltLine = rebuiltLine + u"<cds.TITLE>" + self._titleslist[titlematch_str[repidx]] + u"</cds.TITLE>"
             last_match = self._titleslist[titlematch_str[repidx]]
-            start_pos=true_repidx+titlematch_len[repidx]+extras
+            start_pos = true_repidx+titlematch_len[repidx]+extras
             if orig_line[start_pos] == u"." or orig_line[start_pos] == u":" or\
                    orig_line[start_pos] == u";":
                 # Skip past punctuation at end of title
-                start_pos=start_pos+1
+                start_pos = start_pos + 1
         return (rebuiltLine,start_pos,last_match)
     def _replaceLineItemPreprintRef(self,pprintmatch_str,pprintmatch_len,orig_line,rebuiltLine,start_pos,repidx,true_repidx,extras):
         """Replace a Preprint reference item in the line with a marked-up, standardised version of itself"""
         # Often pprint refs are enclosed in "[]" chars which we dont want. Stop 1 char before this if possible:
         if (true_repidx - start_pos - 1) >= 0:
-            rebuiltLine=rebuiltLine+orig_line[start_pos:true_repidx-1]
+            rebuiltLine = rebuiltLine + orig_line[start_pos:true_repidx - 1]
         else:
-            rebuiltLine=rebuiltLine+orig_line[start_pos:true_repidx]
+            rebuiltLine = rebuiltLine + orig_line[start_pos:true_repidx]
         # Is next char a "[" or "("? Skip past it if yes:
         if orig_line[true_repidx] == u"[" or \
                    orig_line[true_repidx] == u"(":
@@ -2449,8 +2446,8 @@ class ProcessedReferenceLineBuilder:
             pass
         return (rebuiltLine, start_pos)
     def _addLineURI(self,urlmatch_str,urldesc_str,urlmatchfull_len,uri_virtual_locations,orig_line,rebuiltLine,start_pos,repidx,true_repidx):
-        rebuiltLine=rebuiltLine+orig_line[start_pos:start_pos+true_repidx-start_pos]
-        rebuiltLine=rebuiltLine+u"<cds.URI value=\"" + urlmatch_str[uri_virtual_locations[repidx]] + u"\">" + urldesc_str[uri_virtual_locations[repidx]] + u"</cds.URI>"
+        rebuiltLine = rebuiltLine + orig_line[start_pos:start_pos + true_repidx - start_pos]
+        rebuiltLine = rebuiltLine + u"<cds.URI value=\"" + urlmatch_str[uri_virtual_locations[repidx]] + u"\">" + urldesc_str[uri_virtual_locations[repidx]] + u"</cds.URI>"
         start_pos = true_repidx + urlmatchfull_len[uri_virtual_locations[repidx]]
         return (rebuiltLine, start_pos)
     def _addExtraStrippedSpaces(self, spacesKeys, removed_spaces, rep_types, pprintmatch_len, titlematch_len, true_repidx, spare_repidx, repidx, extras):
@@ -2567,7 +2564,7 @@ class LineMarker(LineItem):
         else: self._value = u""
     def getSelfMARCXML(self):
         return u"""   <datafield tag="999" ind1="C" ind2="5">
-      <subfield code="o">"""+cgi.escape(self._value)+u"""</subfield>
+      <subfield code="o">""" + cgi.escape(self._value)+u"""</subfield>
    </datafield>\n"""
 
 class LineMiscellaneousText(LineItem):
@@ -2584,7 +2581,7 @@ class Citation(LineItem):
     pass
 
 class TitleCitation(Citation):
-    def __init__(self, title, misc=None, pg=None, vol=None, yr=None):
+    def __init__(self, title, misc = None, pg = None, vol = None, yr = None):
         self._title = title
         if misc is not None: self._misc = misc.strip()
         else: self._misc = misc
@@ -2607,7 +2604,7 @@ class TitleCitation(Citation):
 
 class TitleCitationStandard(Citation):
     """[journal name] [volume] ([year]) [pagination]"""
-    def __init__(self, title, misc=None, pg=None, vol=None, yr=None):
+    def __init__(self, title, misc = None, pg = None, vol = None, yr = None):
         self._title = title
         if misc is not None: self._misc = misc.strip()
         else: self._misc = misc
@@ -2648,12 +2645,12 @@ class TitleCitationStandard(Citation):
             out += u"""</subfield>\n"""
             subfieldOpen=False
         if xtra_subfield is not None:
-             out += xtra_subfield
+            out += xtra_subfield
         out += u"""   </datafield>\n"""
         return out
 
 class InstitutePreprintReferenceCitation(Citation):
-    def __init__(self, rn, misc=None):
+    def __init__(self, rn, misc = None):
         self._rn = rn
         if misc is not None and len(misc.strip("()[], {}-")) > 0: self._misc = misc.strip()
         else: self._misc = None
@@ -2692,31 +2689,30 @@ class URLCitation(Citation):
 class ProcessedReferenceLine:
     """This is a reference line that has been processed for cited items"""
     def __init__(self):
-        self._segments={} # Segments of reference line, each keyed by start point index. Each is a 'LineItem'.
+        self._segments = {} # Segments of reference line, each keyed by start point index. Each is a 'LineItem'.
         self._nextposn = 0
     def getSelfMARCXML(self):
         """Return an XML string containing this lines contents, marked up in XML MARC, as used in CDS"""
-        i=0
+        i = 0
         lenline = len(self._segments)
         out = u""
-#        for i in range(0,lenline): out += self._segments[i].getSelfMARCXML()
         while i < lenline:
             if isinstance(self._segments[i],TitleCitationStandard) and i < lenline-1 and isinstance(self._segments[i+1],InstitutePreprintReferenceCitation) and not self._segments[i+1].hasMisc():
                 # This is a $s (periodical title) reference, followed immediately by its report number ($r). Concat them both under the $s.
                 out += self._segments[i].getSelfMARCXML(self._segments[i+1].getRN_subfield())
-                i=i+1
+                i = i + 1
             elif isinstance(self._segments[i],InstitutePreprintReferenceCitation) and i < lenline-1 and isinstance(self._segments[i+1],TitleCitationStandard) and not self._segments[i+1].hasMisc():
                 # This is a report number ($r) reference followed immediately by its periodical title ($s) reference.  Concat them both under $s.
                 out += self._segments[i].getSelfMARCXML(self._segments[i+1].getS_subfield())
-                i=i+1
+                i = i + 1
             else:
-                 out += self._segments[i].getSelfMARCXML()
-            i=i+1
+                out += self._segments[i].getSelfMARCXML()
+            i = i + 1
         return out
     def addSection(self, newSect):
         if isinstance(newSect,LineItem):
             self._segments[self._nextposn] = newSect
-            self._nextposn+=1
+            self._nextposn += 1
     def getNumberCitations(self):
         numcitations = 0
         numsegments = len(self._segments)
@@ -2864,10 +2860,10 @@ class MultispaceRemover:
 
 def getFileList(fname):
     """Return a list of files to be processed"""
-    flist=[]
+    flist = []
     if os.access(fname, os.R_OK):
         try:
-            f=open(fname, "r")
+            f = open(fname, "r")
             for line in f:
                 flist.append(line.strip())
             f.close()
@@ -2888,7 +2884,7 @@ def getRecidFilenames(args):
     return files
 
 def main():
-    myoptions, myargs=getopt.getopt(sys.argv[1:], "hV", ["help","version"])
+    myoptions, myargs = getopt.getopt(sys.argv[1:], "hV", ["help","version"])
     for o in myoptions:
         if o[0] in ("-V","--version"):
             sys.stderr.write("%s\n" % (SystemMessage().getVersionMessage(),)) # Version message and stop
@@ -2904,8 +2900,8 @@ def main():
         sys.stderr.write("%s\n" % (SystemMessage().getHelpMessage(),)) # Help message and stop
         sys.exit(0)
     converterList=[PDFtoTextDocumentConverter()] # List of document converters to use
-    titles_kb = KnowledgeBase(fn=cfg_refextract_kb_journal_titles)
-    institutes = InstituteList(fn=cfg_refextract_kb_report_numbers)
+    titles_kb = KnowledgeBase(fn = cfg_refextract_kb_journal_titles)
+    institutes = InstituteList(fn = cfg_refextract_kb_report_numbers)
     refSect_processor  = ReferenceSectionMarkupProcessor(institutes, titles_kb)
     openxmltag         = u"""<?xml version="1.0" encoding="UTF-8"?>"""
     opencollectiontag  = u"""<collection xmlns="http://www.loc.gov/MARC21/slim">"""
@@ -2917,14 +2913,14 @@ def main():
             # path to file invalid
             sys.stderr.write("E: File Path %s invalid! Ignored.\n" % (curitem,))
             continue
-        doc=None
+        doc = None
         if len(converterList) < 1:
             sys.stderr.write("E: No document converter tools available - cannot process reference extraction.\n" % (curitem,))
             sys.exit(1)
 
         # Convert file to text:
         for conv in converterList:
-            doc=conv.convertDocument(curitem[1])
+            doc = conv.convertDocument(curitem[1])
             try:
                 if not doc.isEmpty():
                     break
@@ -2944,7 +2940,7 @@ def main():
         if doc is None:
             sys.stderr.write("""W: File "%s" appears to be empty or cannot be read-in. Cannot be processed.\n""" % (curitem,))
             continue
-        refSection=doc.extractReferences()
+        refSection = doc.extractReferences()
         if not done_coltags and not refSection.isEmpty():
             # Output collection tags:
             sys.stdout.write("%s\n" % (openxmltag.encode("utf-8"),))
