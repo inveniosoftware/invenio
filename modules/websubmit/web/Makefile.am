@@ -19,16 +19,12 @@
 
 SUBDIRS = admin personal publiline
 
-docdir = $(WEBDIR)/submit
+docdir = $(WEBDIR)
 doc_DATA=Main.py approve.py direct.py pro.py submit.py index.py action.py summary.py
 
 EXTRA_DIST = $(wildcard *.wml)
 
-CLEANFILES = $(doc_DATA) *~ *.tmp
-
-%.php: %.php.wml ../../../config/config.wml ../../../config/configbis.wml \
-           ../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
+CLEANFILES = $(doc_DATA) *~ *.tmp *.php
 
 %.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml
 	$(WML) -o $@ $<

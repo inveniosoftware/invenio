@@ -71,7 +71,7 @@ def index(req,c=cdsname,ln=cdslang):
         rn = res[0][1]
     res = run_sql("select value from sbmPARAMETERS where name='edsrn' and doctype='%s'" % doctype)
     edsrn = res[0][0]
-    url = "%s/submit.py?%s=%s&password=%s@APP%s" % (urlpath,edsrn,rn,access,doctype)
+    url = "%s/sub.py?%s=%s&password=%s@APP%s" % (urlpath,edsrn,rn,access,doctype)
     req.err_headers_out.add("Location", url)
     raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
     return ""
