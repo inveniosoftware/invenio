@@ -807,11 +807,15 @@ II. Example - connecting role and user</a>
   Here you can administrate the accounts and the access policy for your CDSware installation.
 
   - Access policy:
-    To change the access policy, the access_control_config.py file must be edited manually in a 
-    text editor. The site can here be defined as opened or closed, you can edit the access policy 
-    level for guest accounts, registered accounts and decide when to warn the owner of the 
-    account when something happens with it, either when it is created, deleted or approved. 
-    The apache server must be restarted after modifying these settings.
+
+    To change the access policy, the general config file (or
+    access_control_config.py) must be edited manually in a text
+    editor. The site can there be defined as opened or closed, you can
+    edit the access policy level for guest accounts, registered
+    accounts and decide when to warn the owner of the account when
+    something happens with it, either when it is created, deleted or
+    approved.  The Apache server must be restarted after modifying
+    these settings.
 
     The two levels for guest account, are:
        0 - Allow guest accounts
@@ -828,35 +832,36 @@ II. Example - connecting role and user</a>
        3. To the owner of an account when it is activated
        4. To the owner of an account when it is deleted
 
-  - The variables in access_control_config.py:
-    - Defines how open the site is
+    Define how open the site is:
       0 = normal operation of the site
       1 = read-only site, all write operations temporarily closed 
       2 = site fully closed
       CFG_ACCESS_CONTROL_LEVEL_SITE = 0
-    - Access policy for guests.
+    Access policy for guests:
       0 = Allow guests to search,
       1 = Guests cannot search (all users must login)
       CFG_ACCESS_CONTROL_LEVEL_GUESTS = 0
-    - Access policy for accounts.
+    Access policy for accounts:
       0 = Users can register, automatically acticate accounts
       1 = Users can register, but admin must activate the accounts
       2 = Users cannot register or change email address, only admin can register accounts.
       3 = Users cannot register or update email address or password, only admin can register accounts.
       4 = Same as 3, but user cannot change login method.
-
       CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS = 0
-    - Limit email addresses available to use when register a new account (example: cern.ch).
-      CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN = ""
-    - Send an email when a new account is created by an user
+      
+    Limit email addresses available to use when register a new account (example: cern.ch):
+      CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN = ""
+
+    Send an email when a new account is created by an user:
       CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS = 0
-    - Send it to this email-address
-      CFG_ACCESS_CONTROL_SEND_TO_EMAIL = adminemail
-    - Send an email to the user notifying when the account is created
+
+    Send an email to the user notifying when the account is created:
       CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT = 0
-    - Send an email to the user notifying when the account is activated
+
+    Send an email to the user notifying when the account is activated:
       CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION = 0
-    - Send an email to the user notifying when the account is deleted/rejected
+
+    Send an email to the user notifying when the account is deleted/rejected:
       CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION = 0 
 
   - Account overview:
