@@ -462,7 +462,7 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, new_bas
     query_result = run_sql(SQL_query)
 
     out += """The alert <B>%s</B> has been successfully updated.<BR><BR>\n""" % alert_name
-    out += warning_list_alerts(uid)
+    out += perform_list_alerts(uid)
     return out
 
 # account_list_alerts: list alert for the account page
