@@ -3,7 +3,7 @@ CERN DOCUMENT SERVER SOFTWARE (CDSware) AUTHORS
 
 Revision: $Id$
 
-The CDS Development Group consists of:
+The CDS Development Group currently consists of:
 
  - Jean-Yves Le Meur <jean-yves.le.meur@cern.ch>
      Head of the team.  Strategic planning and lead.
@@ -23,9 +23,11 @@ The CDS Development Group consists of:
      Open Archive Initiative gateway, metadata conversion.
      Maintains mostly: BibConvert, BibHarvest.
 
- - Hector Sanchez <hector.sanchez@cern.ch>
-     Metadata output formatter and session management.
-     Maintains mostly: BibFormat, WebSession.
+ - Nicholas Robinson <nicholas.robinson@cern.ch>
+     Automatic reference extraction.  (upcoming)
+
+ - Alberto Pepe <alberto.pepe@cern.ch>
+     (upcoming)
 
  - Maja Gracco <maja.gracco@cern.ch>
      System librarian, MARC21 expertise.
@@ -33,16 +35,37 @@ The CDS Development Group consists of:
  - Chris Montarbaud <christiane.montarbaud@cern.ch>
      Multimedia and photos.
 
-Several students and temporary group members contributed to the
-project.  In the decreasing chronological order:
+Many former group members (CERN fellows, technical and summer
+students) contributed to the project.  In an approximate decreasing
+chronological order:
+
+ - Diane Berkovits <diane.berkovits@cern.ch>
+     Download stats and ranking, for the BibRank and WebSubmit
+     modules.  (upcoming)
+
+ - Anna Afshar <anna.afshar@cern.ch>
+     Citation ranking, for the BibRank module. (upcoming)
+
+ - Trond Aksel Myklebust <tamyk@online.no>
+     Ranking engine, the BibRank module.  Stemming and stopwords for
+     the BibIndex module.  Site access policies and external
+     authentication methods, for the WebAccess module and its clients.
+     Administration interfaces to WebSearch, BibIndex, BibRank, and 
+     additions to WebAccess.
+
+ - Hector Sanchez <hector.sanchez.sanmartin@gmail.com>
+     Metadata output formatter, the BibFormat module.  Session
+     management, for the WebSession module.
+
+ - Richard Owen <ro@tes.la>
+     Elecronic mail submission system, the ElmSubmit module. 
 
  - Alexandra Silva <xana@correio.ci.uminho.pt>
      Rewriting and enhancing BibRecord XML MARC and record handling
      library, for the BibEdit module.
 
- - Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
-     Ranking engine, the BibRank module.  Administration interfaces to
-     WebSearch, BibIndex.
+ - Arturo Montejo Raez <amontejo@ujaen.es>
+     Automatic text classification and keyword indexing. (upcoming)
 
  - Mikael Vik <mikael.vik@cern.ch>
      Role-based access control engine and its admin interface, 
