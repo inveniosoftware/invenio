@@ -596,7 +596,7 @@ class Bibsched:
             if get_my_pid(proc,"%s%s" % (arg2, str(id))):
             	self.running[id] = get_my_pid(proc,"%s%s" % (arg2, str(id)))
             else:
-		        self.set_state(id,"ERROR")
+                self.set_state(id,"ERROR")
         query="""SELECT id,proc,user,UNIX_TIMESTAMP(date),sleeptime,
         arguments,state,score,output,error FROM schTASKS"""
         self.cursor.execute(query)
@@ -608,19 +608,19 @@ class Bibsched:
             self.cursor.execute(query)
             rows=self.cursor.fetchall()
             running_process = self.get_running_processes()
-	        if running_process:
+            if running_process:
             	proc = running_process[ 1 ]
             	id   = running_process[ 0 ]
             	if proc == "bibupload":
-                	arg2 = "-t"
+                    arg2 = "-t"
             	else:
-                	arg2 = ""
+                    arg2 = ""
 	    	    if get_my_pid(proc,"%s%s" % (arg2, str(id))):
             		self.running[id] = get_my_pid(proc,"%s%s" % (arg2, str(id)))
 	    	    else:
-			        self.set_state(id,"ERROR")
-			        if id in self.running.keys():
-			            del self.running[id]
+                        self.set_state(id,"ERROR")
+                        if id in self.running.keys():
+                            del self.running[id]
 		
 
 def Log(message):
