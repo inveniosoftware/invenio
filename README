@@ -3,24 +3,26 @@ CERN DOCUMENT SERVER SOFTWARE (CDSware) README
 
 Revision: $Id$
 
-CERN Document Server Software (CDSware) is the software developed by,
-maintained by, and used at, the CERN Document Server.  It enables you
-to run your own electronic preprint server, your own online library
-catalogue or a document system on the web.  It complies with the Open
-Archive Initiative metadata harvesting protocol and uses MARC-21 as
-its underlying bibliographic standard.
+CERN Document Server Software (CDSware) enables you to run your own
+electronic preprint server, your own online library catalogue or a
+digital document system on the web.  It complies with the Open Archive
+Initiative metadata harvesting protocol and uses MARC21 as its
+underlying bibliographic standard.
 
-At CERN, the CDSware manages over 350 collections of data, consisting of
-over 450,000 bibliographic records, including 170,000 fulltext
-documents.  (Covering preprints, articles, books, journals,
-photographs, and more.  Consult <http://cds.cern.ch/> for details.)
+CDSware is developed at, and maintained by, the CERN Document Handling
+Group.  At CERN, the CDSware installation manages over 400 collections
+of data, consisting of over 600,000 bibliographic records, including
+250,000 fulltext documents, covering preprints, articles, books,
+journals, photographs, videos, and more.  Please consult
+<http://cdsweb.cern.ch/> for details.
 
 We aim at user friendliness and speed.  Among the features of CDS are:
 
   - Configurable portal-like interfaces for hosting various kind of
     collections.
 
-  - Powerful search engine with Google-like syntax.
+  - Powerful search engine with Google-like syntax and integrated
+    metadata, reference and fulltext searching.
 
   - User personalization, including document baskets and email
     notification alerts.
@@ -31,15 +33,15 @@ please note that a support contract can be arranged with the CDS
 Development Group in which we, the developers, can help you to
 install, configure, and maintain the system (featuring email and
 telnet support throughout the year), including development of new
-local features should a need arise.  If you are interested in
+local features should such a need arise.  If you are interested in
 concluding a support contract with us, please contact the CDS
 Development Group at <cds.support@cern.ch>.
 
-The CDS software runs on top of MySQL database server and Apache/PHP
-web application server.  To install the CDS Software, please consult
-the INSTALL file.
+CDSware runs on Unix-like systems and requires MySQL database server
+and Apache/Python/PHP web application server.  Please consult the
+INSTALL file for more information.
 
-Good luck, and thanks for choosing the CERN Document Server Software.  
+Good luck, and thanks for choosing the CERN Document Server Software.
 
        - CDS Development Group
          <cds.support@cern.ch>
