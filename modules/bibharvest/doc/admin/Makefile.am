@@ -25,5 +25,5 @@ EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 
-%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
+%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_builddir)/config/cdsnavbar.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
