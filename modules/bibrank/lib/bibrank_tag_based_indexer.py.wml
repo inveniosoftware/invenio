@@ -439,19 +439,18 @@ def bibrank_engine(row, run):
             if options["quick"] == "no" and options["verbose"] >= 9:
                 write_message("Rebalance not yet enabled, parameter ignored.")
 
-            if options["recid_range"]:
-                if options["cmd"] == "del":
-                    del_recids(cfg_short, options["recid_range"])
-                elif options["cmd"] == "add":
-                    func_object = globals().get(cfg_function)
-                    func_object(rank_method_code, cfg_name, config)
-                elif options["cmd"] == "stat":
-                    rank_method_code_statistics(rank_method_code)
-                elif options["cmd"] == "check":
-                    check_method(rank_method_code)
-                else:
-                    write_message("Invalid command found processing %s" % rank_method_code, sys.stderr)
-                    raise StandardError
+            if options["cmd"] == "del":
+                del_recids(cfg_short, options["recid_range"])
+            elif options["cmd"] == "add":
+                func_object = globals().get(cfg_function)
+                func_object(rank_method_code, cfg_name, config)
+            elif options["cmd"] == "stat":
+                rank_method_code_statistics(rank_method_code)
+            elif options["cmd"] == "check":
+                check_method(rank_method_code)
+            else:
+                write_message("Invalid command found processing %s" % rank_method_code, sys.stderr)
+                raise StandardError
     except StandardError, e:
         write_message("\nException caught: %s" % e, sys.stderr)
         traceback.print_tb(sys.exc_info()[2])
@@ -629,9 +628,9 @@ def accessimpact_exec(rank_method_code, name, config):
                         key3 = data[key2]
 
                     if tempdoc.has_key(key3):
-                        tempdoc[key3] = ("", tempdoc[key3][1] + float(impacc[key]))
+                        tempdoc[key3] = ("", int(tempdoc[key3][1] + float(impacc[key])))
                     else:
-                        tempdoc[key3] = ("", float(impacc[key]))
+                        tempdoc[key3] = ("", int(impacc[key]))
             else:
                 notcount = notcount + int(impacc[key])
 
