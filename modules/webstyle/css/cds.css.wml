@@ -492,9 +492,9 @@ a.navtrail:hover {
    color: #000;
    background: white;
    padding: 1px;
-   margin-top: 5px;
+   margin-top: 0px;
    margin-bottom: 5px;
-   margin-left: 0px;
+   margin-left: 20px;
    margin-right: 0px;
    border-spacing: 0px;
    border-collapse: collapse;
@@ -510,6 +510,7 @@ a.navtrail:hover {
    width: 100px;
    font-size: small;
    background: #f1f1f1;
+   vertical-align: top;
 }
 .adminheader, .adminheaderleft, .adminheadercenter, .adminheaderright {
    color: #000;
