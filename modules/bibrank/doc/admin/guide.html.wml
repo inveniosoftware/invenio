@@ -44,7 +44,7 @@
 
 <a name="o"></a><h2>1. Overview</h2>
 <p>The bibrank module consist currently of two tools:
-</br></br>bibrank - Generates star categories for ranking searchresults based on methods like:
+<br><br>bibrank - Generates star categories for ranking searchresults based on methods like:
 <blockquote>
 <pre>
 Journal Impact Factor
@@ -54,7 +54,7 @@ Journal Impact Factor
 </blockquote>
 </pre>
 bibrankgkb - For generating knowledgebase files for use with bibrank
-</br></br>
+<br><br>
 The bibrankgkb may not be necessary to use, it depends on which ranking methods you are planning
 to use, and what data you already got. This guide will take you through the necessary steps in detail in order to create different kinds of ranking methods for the search engine to use.
 
@@ -67,11 +67,24 @@ to use, and what data you already got. This guide will take you through the nece
 </blockquote>
 </pre>
 
-<a name="bai"></a><h2>3. bibrank Admin Interface</h2>
+<a name="bai"></a><h2>3. BibRank Admin Interface</h2>
 The bibrank webinterface enables you to modify the configuration of most aspects of BibRank. For full functionality, it is advised to
 let the http-daemon have write/read access to your cdsware/etc/bibrank directory. If this is not wanted, you have to edit the configuration files from the console using your favourite text editor.
 <a name="mi"></a><h3>3.1 Main interface</h3>
-In the main interface screen, you see a list of all rank methods currently added. If you have added the 'long name' translation in the current chosen language for a rank method, you will see this name, if not, and the default cdsware language translation exists, it will be used in stead. And if no translation exists, the bibrank code will be used. To find out about the functionality available, check out the topics below.
+In the main interface screen, you see a list of all rank methods currently added. If you have added the 'long name' translation in the current chosen language for a rank method, you will see this name, if not, and the default cdsware language translation exists, it will be used instead. And if no translation exists, the bibrank code will be used. To find out about the functionality available, check out the topics below.
+
+</br><b>Explanation of concepts</b>
+<blockquote>
+<pre>
+Rank method:
+A method responsible for creating the necessary data to rank a result.
+Translations:
+Each rank method may have many names in many languages.
+Collections:
+Which collections the rank method should be visible in.
+</pre>
+</blockquote>
+
 <a name="ar"></a><h3>3.2 Add rank method</h3>
 When pressing the link in the upper right corner from the main interface, you will see the interface for adding a new rank method. The two available options that needs to be decided upon, are the bibrank code and the template to use, both values can be changed later. The bibrank code is used by the bibrank daemon to run the method, and should be fairly short without spaces. Which template you are using, decides how the ranking will be done, and must before used, be changed to suit your cdsware configuration. When confirming to add a new rank method, it will be added to the list of possible rank methods, and a configuration file will be created if the httpd user has proper rights to the 'cdsware/etc/bibrank' directory. If not, the file has to manually be created with the name 'bibrankcode.cfg' where bibrankcode is the same as given in the interface.
 
@@ -84,10 +97,10 @@ In the rank set section you see how many records there are in each star category
 This interface gives access to modify the bibrank code given when creating the rank method and the configuration file of the rank method, if the file can be accessed. If not, it may not exist, or the httpd user doesn't have enough rights to read the file. On the bottom of the interface, it is possible to choose a template, see it, and copy it over the old rank method configuration if wanted. Remember that the values present in the template is an example, and must be changed where necessary. See this documentation for information about this, and the 'BibRank Internals' link below for additional information.
 
 <a name="dr"></a><h3>3.5 Delete rank method</h3>
-Here you can delete a rank method, and all it's configuration as shown in the 'show details' interface. When deleting a rank method, the configuration file will also be deleted ('cdsware/etc/bibrank/bibrankcode.cfg' where bibrankcode is the code of the rank method) if accessible to the httpd user. If not, the method can be deleted manually from console. Any bibrank tasks scheduled to run the deleted rank method must be modified or deleted manually.
+If it is necessary to delete a rank method, some precautions must be taken since the configuration of the method will be lost. When deleting a rank method, the configuration file will also be deleted ('cdsware/etc/bibrank/bibrankcode.cfg' where bibrankcode is the code of the rank method) if accessible to the httpd user. If not, the file can be deleted manually from console. Any bibrank tasks scheduled to run the deleted rank method must be modified or deleted manually.
 
 <a name="mt"></a><h3>3.6 Modify translations</h3>
-If you want internalization of the rank method names, you have to add them using the 'Modify translations' interface. The interface shows a list of all languages available, which one is the default one, and if the default name in this language has been given. After selecting a language, you get a list of the various nametypes, and a inputbox with any previous value.
+If you want to use internalization of the rank method names, you have to add them using the 'Modify translations' interface. The interface shows a list of the various name types like 'long name' and 'short name' with the 'long name' initially selected. Below a list of all the languages used in the cdsware installation will be shown with the possibility to add the translation for each language.
 
 <a name="mc"></a><h3>3.7 Modify visibility toward collections</h3>
 If a rank method should be visible to the users of the cdsware search interface, it must be enabled for one or several collections. A rank method can be visible in the search interface of the whole site, or just one collection. The collections in the upper listbox does not show the rank method in the search interface to the user. To change this select the wanted collection and press 'Enable' to enable the rank method for this collection. The collections that the method has been activated for, is  shown in the lower listbox. To remove a collection, select it and press the 'Disable' button to remove it from the list of collections which the rank method is enabled for.
@@ -140,7 +153,7 @@ have the same name as the abbreviation stored in the database.
 <h4>Step 2 - Get necessary external data (ex. jif values)</h4>
 Check out bibrankgkb documentation below.
 
-</br></br><b>Example</b>
+<br><br><b>Example</b>
 <blockquote>
 <a href="jif.kb">jif.kb</a> -- sample data with the name of the journals and jif values.
 </blockquote>
@@ -149,7 +162,7 @@ Check out bibrankgkb documentation below.
 The configuration files for the different rank methods has different option, so verify that you are using the correct
 configuration file and rank method.
 
-</br></br><b>Example</b>
+<br><br><b>Example</b>
 <blockquote>
 <a href="jif.cfg">jif.cfg</a> -- sample configuration file, for creating the ranking stars based on journal impact factor
 </blockquote>
@@ -192,7 +205,7 @@ supported by CDSware.
 
 <h4>Step 4 - Add the ranking method as a scheduled task</h4>
 When the configuration is okay, you can add the bibrank daemon to the task scheduler using the scheduling options. The daemon can then do a update of the rank method once each day or similar automatically.
-</br></br><b>Example</b>
+<br><br><b>Example</b>
 <blockquote>
 <pre>
 $ bibrank -wjif -r
@@ -205,7 +218,7 @@ For the first run of a new ranking method, a full update is needed (not default)
 A full update/rebalance can be run by using the --rebalance/-r option. Sometimes you may want to run the program with the rebalance option,
 to balance the categories. To check if it is necessary, run the bibrank daemon using the --check/-k option together with the max size allowed for the top star , a message will then be given on screen if a rebalance is needed.
 
-</br></br><b>Example</b>
+<br><br><b>Example</b>
 <blockquote>
 <pre>
 $ bibrank 53      
@@ -310,7 +323,7 @@ create_1 = file,,%(kb_2_filter)s,,file,,%(kb_2)s
 When you have found a source for the data, created the configuration file, it may be necessary to
 create an convertion file, but this depends on the coversions used in the available data versus
 the convertion used in your cdsware installation.
-</br>
+<br>
 The available data may look like this:
 <pre>
 <blockquote>
