@@ -34,7 +34,8 @@
 ##   Part 3: CDS navigation bar
 ##   Part 5: WebSearch WML parameters 
 ##   Part 4: WebSearch OAI parameters
-##   Part 6: WebSubmit WML parameters 
+##   Part 6: WebSubmit WML parameters
+##   Part 7: BibFormat WML parameters
 ## The configuration is done by editing the content of the "define-tag" 
 ## WML elements below.  Feel free to edit as many as you need.  When done,
 ## return to the main CDSware source directory and type 'make'.  Good luck! :-)
@@ -524,6 +525,24 @@ TRUE
 
 <define-tag STORAGE whitespace=delete>
 <WEBDIR>/submit/storage
+</define-tag>
+
+######################################
+## Part 7: BibFormat WML Parameters ##
+######################################
+
+## This section contains some WML-based configuration parameters for
+## BibFormat module.  Please note that BibFormat is mostly configured
+## on run-time via its BibFormat Admin web interface.  The parameters
+## below are the ones that you do not probably want to modify very
+## often during the runtime.
+
+## CFG_BIBFORMAT_TIME_LIMIT -- the time limit of BibFormat process
+## after which the task will terminate.  This is useful to avoid
+## eventual runaways.
+##  (example: "1000")
+<define-tag CFG_BIBFORMAT_TIME_LIMIT whitespace=delete>
+1000
 </define-tag>
 
 ##########################
