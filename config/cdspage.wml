@@ -56,8 +56,10 @@ $(cdspageheaderadd)
 <tr valign="top">
 <td class="pagestripemiddle" align="left">
 <:    
-    if ('$(navtrail_position)' =~ /\w/) {
-        print '<table class="navtrailbox" border=0 cellspacing=0 cellpadding=0><tr><td width="15">&nbsp;</td><td class="navtrailboxbody" align="left">$(navtrail_position) &gt; $(title)</td></tr></table>';
+    if ('$(navtrail_previous_links)' =~ /\w/) {
+        print '<table class="navtrailbox" border=0 cellspacing=0 cellpadding=0><tr><td width="15">&nbsp;</td><td class="navtrailboxbody" align="left"><a class="navtrail" href="<WEBURL>">Home</a> &gt; $(navtrail_previous_links) &gt; $(title)</td></tr></table>';
+    } elsif ('$(navtrail_body)' eq '') {
+        print '<table class="navtrailbox" border=0 cellspacing=0 cellpadding=0><tr><td width="15">&nbsp;</td><td class="navtrailboxbody" align="left"><a class="navtrail" href="<WEBURL>">Home</a> &gt; $(title)</td></tr></table>';
     } elsif ('$(navtrail_body)' =~ /\w/) {
         print '<table class="navtrailbox" border=0 cellspacing=0 cellpadding=0><tr><td width="15">&nbsp;</td><td class="navtrailboxbody" align="left">$(navtrail_body)</td></tr></table>';
     } elsif ('$(navtrail_body:-undef)' eq 'undef'){
