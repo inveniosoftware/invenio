@@ -2228,7 +2228,9 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=cdsname, nb_found
         if ot:
             out += """<input type="hidden" name="ot" value="%s">""" % ot
         if sp:
-            out += """<input type="hidden" name="sp" value="%s">""" % sp 
+            out += """<input type="hidden" name="sp" value="%s">""" % sp
+        if rm:
+            out += "<input type=\"hidden\" name=\"rm\" value=\"%s\">" % rm
         out += "<input type=\"hidden\" name=\"rg\" value=\"%d\">" % rg
         out += "<input type=\"hidden\" name=\"as\" value=\"%d\">" % as
         out += "<input type=\"hidden\" name=\"ln\" value=\"%s\">" % ln
