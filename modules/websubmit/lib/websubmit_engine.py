@@ -51,6 +51,7 @@ from cdsware.webuser import getUid, get_email
 from cdsware.messages import *
 from mod_python import apache
 from cdsware.websubmit_config import *
+from cdsware.file import *
 
 def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="", access="",mainmenu="",fromdir="",file="",nextPg="",nbPg="",curpage=1):
     ln = wash_language(ln)
