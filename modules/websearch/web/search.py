@@ -31,11 +31,11 @@
 pylibdir = "<LIBDIR>/python"
 
 try:
-    import sys
+    import sys    
     sys.path.append('%s' % pylibdir)
     from cdsware.config import *
     from cdsware import search_engine
-    from mod_python import apache
+    from mod_python import apache    
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -80,7 +80,6 @@ def index(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of
                                                     p1, f1, m1, op1, p2, f2, m2, op2, p3, f3, m3, sc, jrec,
                                                     recid, recidb, sysno, id, idb, sysnb, action,
                                                     d1y, d1m, d1d, d2y, d2m, d2d, verbose, ap) 
-
 
 def authenticate(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
                  p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",

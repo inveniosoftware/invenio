@@ -39,6 +39,7 @@ try:
     import sre
     import sys
     import time
+    import traceback
     import urllib
     import zlib
     import MySQLdb
@@ -62,7 +63,7 @@ except ImportError, e:
 
 try:
     from webuser import getUid, create_user_infobox
-    from webpage import pageheaderonly, pagefooteronly    
+    from webpage import pageheaderonly, pagefooteronly, create_error_box
 except ImportError, e:
     pass # ignore user personalisation, needed e.g. for command-line
         
@@ -2837,12 +2838,18 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
-        if as==1 or (p1 or p2 or p3):
-            browse_pattern(req, colls_to_search, p1, f1, rg)
-            browse_pattern(req, colls_to_search, p2, f2, rg)
-            browse_pattern(req, colls_to_search, p3, f3, rg)
-        else:
-            browse_pattern(req, colls_to_search, p, f, rg)
+        try:
+            if as==1 or (p1 or p2 or p3):
+                browse_pattern(req, colls_to_search, p1, f1, rg)
+                browse_pattern(req, colls_to_search, p2, f2, rg)
+                browse_pattern(req, colls_to_search, p3, f3, rg)
+            else:
+                browse_pattern(req, colls_to_search, p, f, rg)
+        except:
+            if of.startswith("h"):
+                req.write(create_error_box(req))
+            return page_end(req, of)            
+
     else:
         ## 3 - search needed
         if of.startswith("h"):
@@ -2852,38 +2859,48 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         results_in_any_collection = HitSet()
         if as == 1 or (p1 or p2 or p3):
             ## 3A - advanced search
-            results_in_any_collection = search_pattern(req, p1, f1, m1, ap=ap, of=of, verbose=verbose)
-            if results_in_any_collection._nbhits == 0:                
-                return page_end(req, of)                
-            if p2:
-                results_tmp = search_pattern(req, p2, f2, m2, ap=ap, of=of, verbose=verbose)
-                if op1 == "a": # add
-                    results_in_any_collection.intersect(results_tmp)
-                elif op1 == "o": # or
-                    results_in_any_collection.union(results_tmp)
-                elif op1 == "n": # not
-                    results_in_any_collection.difference(results_tmp)
-                else:
-                    if of.startswith("h"):
-                        print_warning(req, "Invalid set operation %s." % op1, "Error")
-                results_in_any_collection.calculate_nbhits()
+            try:
+                results_in_any_collection = search_pattern(req, p1, f1, m1, ap=ap, of=of, verbose=verbose)
                 if results_in_any_collection._nbhits == 0:                
                     return page_end(req, of)                
-            if p3:
-                results_tmp = search_pattern(req, p3, f3, m3, ap=ap, of=of, verbose=verbose)
-                if op2 == "a": # add
-                    results_in_any_collection.intersect(results_tmp)
-                elif op2 == "o": # or
-                    results_in_any_collection.union(results_tmp)
-                elif op2 == "n": # not
-                    results_in_any_collection.difference(results_tmp)
-                else:
-                    if of.startswith("h"):
-                        print_warning(req, "Invalid set operation %s." % op2, "Error")            
-                results_in_any_collection.calculate_nbhits()
+                if p2:
+                    results_tmp = search_pattern(req, p2, f2, m2, ap=ap, of=of, verbose=verbose)
+                    if op1 == "a": # add
+                        results_in_any_collection.intersect(results_tmp)
+                    elif op1 == "o": # or
+                        results_in_any_collection.union(results_tmp)
+                    elif op1 == "n": # not
+                        results_in_any_collection.difference(results_tmp)
+                    else:
+                        if of.startswith("h"):
+                            print_warning(req, "Invalid set operation %s." % op1, "Error")
+                    results_in_any_collection.calculate_nbhits()
+                    if results_in_any_collection._nbhits == 0:                
+                        return page_end(req, of)                
+                if p3:
+                    results_tmp = search_pattern(req, p3, f3, m3, ap=ap, of=of, verbose=verbose)
+                    if op2 == "a": # add
+                        results_in_any_collection.intersect(results_tmp)
+                    elif op2 == "o": # or
+                        results_in_any_collection.union(results_tmp)
+                    elif op2 == "n": # not
+                        results_in_any_collection.difference(results_tmp)
+                    else:
+                        if of.startswith("h"):
+                            print_warning(req, "Invalid set operation %s." % op2, "Error")            
+                    results_in_any_collection.calculate_nbhits()
+            except:
+                if of.startswith("h"):
+                    req.write(create_error_box(req))
+                return page_end(req, of)                            
         else:
             ## 3B - simple search
-            results_in_any_collection = search_pattern(req, p, f, ap=ap, of=of, verbose=verbose)
+            try:
+                results_in_any_collection = search_pattern(req, p, f, ap=ap, of=of, verbose=verbose)
+            except:
+                if of.startswith("h"):
+                    req.write(create_error_box(req))
+                return page_end(req, of)
 
         if results_in_any_collection._nbhits == 0:                
             return page_end(req, of)
@@ -2898,28 +2915,44 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
 #                 search_cache.clear()
 
         # search stage 4: intersection with collection universe:
-        results_final = intersect_results_with_collrecs(req, results_in_any_collection, colls_to_search, ap, of, verbose)
+        try:
+            results_final = intersect_results_with_collrecs(req, results_in_any_collection, colls_to_search, ap, of, verbose)
+        except:
+            if of.startswith("h"):
+                req.write(create_error_box(req))
+            return page_end(req, of)
+        
         if results_final == {}:
             return page_end(req, of)
         
         # search stage 5: apply search option limits and restrictions:
         if day1 != "":
-            results_final = intersect_results_with_hitset(req,
-                                                          results_final,
-                                                          search_unit_in_bibrec(day1, day2),
-                                                          ap,
-                                                          aptext="No match within your time limits, "\
-                                                                 "discarding this condition...")
+            try:
+                results_final = intersect_results_with_hitset(req,
+                                                              results_final,
+                                                              search_unit_in_bibrec(day1, day2),
+                                                              ap,
+                                                              aptext="No match within your time limits, "\
+                                                                     "discarding this condition...")
+            except:
+                if of.startswith("h"):
+                    req.write(create_error_box(req))
+                return page_end(req, of)                            
             if results_final == {}:
                 return page_end(req, of)
 
         if pl:
-            results_final = intersect_results_with_hitset(req,
-                                                          results_final,
-                                                          search_pattern(req, pl, ap=0),
-                                                          ap,
-                                                          aptext="No match within your search limits, "\
-                                                                 "discarding this condition...")
+            try:
+                results_final = intersect_results_with_hitset(req,
+                                                              results_final,
+                                                              search_pattern(req, pl, ap=0),
+                                                              ap,
+                                                              aptext="No match within your search limits, "\
+                                                                     "discarding this condition...")
+            except:
+                if of.startswith("h"):
+                    req.write(create_error_box(req))
+                return page_end(req, of)                            
             if results_final == {}:
                 return page_end(req, of)
 

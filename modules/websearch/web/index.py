@@ -29,25 +29,17 @@
 ## fill config variables:
 pylibdir = "<LIBDIR>/python"
 
-try:
-    import sys
-    import MySQLdb
-    sys.path.append('%s' % pylibdir)
-    from cdsware.config import *
-    from cdsware.dbquery import run_sql
-    from cdsware.webpage import page
-    from cdsware.webuser import getUid
-    from mod_python import apache
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+import sys
+sys.path.append('%s' % pylibdir)
+from cdsware.config import *
+from cdsware.dbquery import run_sql
+from cdsware.webpage import page, create_error_box
+from cdsware.webuser import getUid
 
 def get_collid(c):
     "Return collection ID for given collection name.  Return None if no match found."
     collid = None
-    query = "SELECT id FROM collection WHERE name='%s'" % MySQLdb.escape_string(c)
-    res = run_sql(query, None, 1)
+    res = run_sql("SELECT id FROM collection WHERE name=%s", (c,), 1)
     if res:
         collid = res[0][0]
     return collid 
@@ -64,6 +56,13 @@ def index(req, c=cdsname, as="0"):
     req.content_type = "text/html"
     req.send_http_header()
     collid = get_collid(c)
+    if collid is None:
+         return page(title="Not found: %s" % c,
+                     body="""<p>Sorry, collection <strong>%s</strong> does not seem to exist.
+                             <p>You may want to start browsing from <a href="%s">%s</a>.""" % (c, weburl, cdsname),
+                     description="CERN Document Server - Not found: %s " % c,
+                     keywords="CDS, CDSware",
+                     uid=uid)
     try:
         fp = open("%s/collections/%d/navtrail-as=%d.html" % (cachedir, collid, as), "r")
         c_navtrail = fp.read()
@@ -89,10 +88,14 @@ def index(req, c=cdsname, as="0"):
                     description="CERN Document Server - %s" % c,
                     keywords="CDS, CDSware, %s" % c,
                     uid=uid,
-                    cdspagerightstripeadd=c_portalbox_rt)    
-    except:
-         body = """<p>Sorry, collection <strong>%s</strong> does not seem to exist.
-                   <p>Start browsing from <a href="%s">%s</a>.""" % (c, weburl, cdsname)
-         req.write(body)
+                    cdspagerightstripeadd=c_portalbox_rt)
+    except:        
+        return page(title="Internal Error",
+                    body = create_error_box(req) + 
+                           """<p>You may want to start browsing from <a href="%s">%s</a>.""" % \
+                           (weburl, cdsname),
+                    description="CERN Document Server - Internal Error", 
+                    keywords="CDS, CDSware, Internal Error",
+                    uid=uid)
          
-    return "\n"
+    return "\n"    
