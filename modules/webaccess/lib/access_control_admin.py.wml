@@ -1444,7 +1444,7 @@ def acc_garbage_collector(verbose=0):
     WHERE raa.id_accARGUMENT IS NULL """)
 
     del_entries.append([])
-if 1:
+    
     idstr = ''
     for (id, ) in ((3, ), (4, ), (5, ), (5, )): # ids1:
         del_entries[-1].append(id)
