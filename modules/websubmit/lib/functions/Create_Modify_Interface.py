@@ -114,7 +114,8 @@ def Create_Modify_Interface(parameters,curdir,form):
             elif type == "D":
                 text=fidesc
             elif type == "R":
-                text=eval(fidesc)
+                co = compile(fidesc.replace("\r\n","\n"),"<string>","exec")
+                exec(co)
             else:
                 text="%s: unknown field type" % field
             t = t+"<small>%s</small>" % text
