@@ -24,49 +24,40 @@
 
 __version__ = "$Id$"
 
-## import interesting modules:
-try:
-    import cgi
-    import copy
-    import Cookie
-    import cPickle
-    import marshal
-    import fileinput
-    import getopt
-    import string
-    from string import split
-    import os
-    import sre
-    import sys
-    import time
-    import traceback
-    import urllib
-    import zlib
-    import MySQLdb
-    import Numeric
-    import md5
-    import base64
-    import unicodedata
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)    
+## import general modules:
+import cgi
+import copy
+import Cookie
+import cPickle
+import marshal
+import fileinput
+import getopt
+import string
+from string import split
+import os
+import sre
+import sys
+import time
+import traceback
+import urllib
+import zlib
+import MySQLdb
+import Numeric
+import md5
+import base64
+import unicodedata
 
-try:
-    from config import *
-    from search_engine_config import *
-    from dbquery import run_sql
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
-
+## import CDSware stuff:
+from config import *
+from search_engine_config import *
+from dbquery import run_sql
 try:
     from webuser import getUid, create_user_infobox
     from webpage import pageheaderonly, pagefooteronly, create_error_box
 except ImportError, e:
     pass # ignore user personalisation, needed e.g. for command-line
-        
+
+## global vars:
 search_cache = {} # will cache results of previous searches
 cfg_nb_browse_seen_records = 100 # limit of the number of records to check when browsing certain collection
 cfg_nicely_ordered_collection_list = 0 # do we propose collection list nicely ordered or alphabetical?
@@ -2217,8 +2208,13 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', decompress=zli
                 if x:
                     req.write('\n')
         else:
-            # we are doing HTML output:            
-            if format.startswith("hb"):
+            # we are doing HTML output:
+            if format.startswith("hp"):
+                # portfolio format:
+                for irec in range(irec_max,irec_min,-1):
+                    req.write(print_record(recIDs[irec], format, ot))                
+            elif format.startswith("hb"):
+                # HTML brief format:
                 req.write("""\n<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
                 req.write("""\n<table>""")            
                 for irec in range(irec_max,irec_min,-1):
@@ -2455,7 +2451,11 @@ def print_record(recID, format='hb', ot='', decompress=zlib.decompress):
         out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">Detailed record</a></span>""" \
                % (weburl, recID)
 
-    elif format == "hd-ejournalsite":
+    elif cfg_cern_site and format == "hp":
+        # HTML portfolio format called on the fly
+        out += call_bibformat(recID, "HB_P")
+
+    elif cfg_cern_site and format == "hd-ejournalsite":
         # HTML brief called on the fly; suitable for testing brief formats
         out += call_bibformat(recID, "EJOURNALSITE")
         out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">Detailed record</a></span>""" \
@@ -2505,20 +2505,19 @@ def print_record(recID, format='hb', ot='', decompress=zlib.decompress):
                 out += """<br><small class="note"><a class="note" href="%s">%s</a></small>""" % (urls_u[idx], urls_u[idx])
 
         # at the end of HTML mode, print the "Detailed record" functionality:
-        if cfg_use_aleph_sysnos:
-            alephsysnos = get_fieldvalues(recID, "970__a")
-            if len(alephsysnos)>0:
-                alephsysno = alephsysnos[0]
-                out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?sysno=%s">Detailed record</a></span>""" \
-                       % (weburl, alephsysno)
+        if format != "hp":
+            if cfg_use_aleph_sysnos:
+                alephsysnos = get_fieldvalues(recID, "970__a")
+                if len(alephsysnos)>0:
+                    alephsysno = alephsysnos[0]
+                    out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?sysno=%s">Detailed record</a></span>""" \
+                           % (weburl, alephsysno)
+                else:
+                    out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">Detailed record</a></span>""" \
+                           % (weburl, recID)
             else:
                 out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">Detailed record</a></span>""" \
                        % (weburl, recID)
-        else:
-            out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">Detailed record</a></span>""" \
-                   % (weburl, recID)
-        # ...and the "Mark record" functionality:
-        #out += """<span class="moreinfo"> - <input name="recid" type="checkbox" value="%s"> Mark record</span>""" % recID
 
     # print record closing tags, if needed:
     if format == "marcxml" or format == "oai_dc":
