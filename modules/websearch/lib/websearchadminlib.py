@@ -1734,9 +1734,16 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     fin_output = ""
     if not col_dict.has_key(1):
         res = add_col(cdsname, '', '')
-        if not res:
+        if res:
+	    fin_output += """<b><span class="info">Created root collection '%s'</span></b><br>""" % cdsname
+	else:
             return "Cannot create root collection, please check database."
-
+    if cdsname != run_sql("SELECT name from collection WHERE id=1")[0][0]:
+	res = run_sql("update collection set name='%s' where id=1" % cdsname)
+	if res:
+	    fin_output += """<b><span class="info">The name of the root collection has been modified to be the same as the cdsware installation name given prior to installing cdsware.</span><b><br>"""
+	else:
+	    return "Error renaming root collection."
     fin_output += """
     <table>
     <tr>
@@ -1748,9 +1755,10 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     <td>2.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_addcollectiontotree">Attach collection to tree</a></small></td>
     <td>3.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_modifycollectiontree">Modify collection tree</a></small></td>
     <td>4.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_runwebcoll">Webcoll overview</a></small></td>
+    <td>5.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_validateconf">Validate configuration</a></small></td>
     </tr>
     </table>
-    """ % (weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln)
+    """ % (weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln)
      
     if mtype == "perform_addcollection" and content:
         fin_output += content
@@ -1945,7 +1953,7 @@ def perform_deletecollection(colID, ln=cdslang, confirm=-1, callback='yes'):
     """ % weburl
 
     col_dict = dict(get_current_name('', ln, get_col_nametypes()[0][0], "collection"))
-    if colID and col_dict.has_key(int(colID)):
+    if colID !=1 and colID and col_dict.has_key(int(colID)):
         colID = int(colID)
         subtitle = """<a name="4">4. Delete collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.4">?</a>]</small>""" % (col_dict[colID], weburl)
         res = run_sql("SELECT * from collection_collection WHERE id_dad=%s" % colID)
@@ -2079,6 +2087,60 @@ def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
     fmtID - the format id to delete."""
  
     subtitle = """<a name="11"></a>Webcoll overview"""
+    output  = ""
+
+    colID = int(colID)
+    col_dict = dict(get_current_name('', ln, get_col_nametypes()[0][0], "collection"))
+
+    res = run_sql("select proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='webcoll' and runtime< now() ORDER by runtime")
+    output += """<b>Last run:</b><br>"""
+    if len(res) > 0:
+        (proc, host, user, runtime, sleeptime, arguments, status, progress) = res[len(res) - 1]
+        output += "Task: %s<br>" % proc
+        output += "User: %s<br>" % user
+        output += "Runtime: %s<br>" % runtime
+        output += "Sleeptime: %s<br>" % sleeptime
+        output += "Status: %s<br>" % status
+        output += "Progress: %s<br>" % progress
+        output += "<b>Options:</b><br>"
+        options = marshal.loads(arguments)
+        for (key, value) in options.iteritems():
+            output += "&nbsp;%s: %s <br>" % (key,value)
+    else:
+        output += """<span class="info">Not yet run.</span><br>"""
+
+    res = run_sql("select proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='webcoll' and runtime> now() ORDER by runtime")
+    output += """<br><b>Next scheduled run:</b> (when changes to the collections will be prosessed.)<br>"""
+    if len(res) > 0:
+        (proc, host, user, runtime, sleeptime, arguments, status, progress) = res[0]
+        output += "Task: %s<br>" % proc
+        output += "User: %s<br>" % user
+        output += "Runtime: %s<br>" % runtime
+        output += "Sleeptime: %s<br>" % sleeptime
+        output += "Status: %s<br>" % status
+        output += "Progress: %s<br>" % progress
+        output += "<b>Options:</b><br>"
+        options = marshal.loads(arguments)
+        for (key, value) in options.iteritems():
+            output += "&nbsp;%s: %s <br>" % (key,value)
+    else:
+        output += """<span class="info">No webcoll tasks scheduled in the future. If changes has been made to the collections they will not be visible until webcoll has been executed for the changed collections.</soan><br>"""
+    
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_index(colID, ln, "perform_runwebcoll", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+def perform_validateconf(colID, ln, confirm=0, callback='yes'):
+    """form to delete an output format not in use.
+    colID - the collection id of the current collection.
+    fmtID - the format id to delete."""
+ 
+    subtitle = """<a name="11"></a>Validate configuration"""
     output  = ""
 
     colID = int(colID)
