@@ -26,11 +26,30 @@
 <pre>
 WEBACCESS ADMIN GUIDE / $Date$
 
-1. Introduction to the pages
-2. Example pages, illustrating snapshots
+1. Introduction, using roles
+2. WebAccess admin interface
+3. Example pages, illustrating snapshots
 
 
-1. INTRODUCTION
+1. INTRODUCTION, USING ROLES
+
+  WebAccess is a common RBAC, role based access control, for all of CDSware. This means that users
+  are connected to roles that cover different areas of access. I.e <em>administrator of the photo collection</em>
+  or <em>system librarian</em>. Users can be active in different areas and of course connected to as many 
+  roles as needed.
+  
+  The roles are connected to actions. An action identifies a task you can perform in CDSware. It can be defined
+  to take any number of arguments in order to more clearly describe what you are allowing connected users to do.
+  
+  For example the system librarian can be allowed to run bibwords on the different indexes. To allow system 
+  librarians to run the bibwords indexing on the field author we connect role <em>system librarian</em> with
+  action <em>runbibwords</em> using the argument <em>index='author'</em>.
+  
+  WebAccess is based on allowing users to perform actions. This means that only allowed actions 
+  are stored in the access control engine's database. 
+
+
+2. WEBACCESS ADMIN INTERFACE
 
 All the WebAccess Administration web pages have certain features/design choices in common
 
@@ -56,7 +75,8 @@ All the WebAccess Administration web pages have certain features/design choices 
   the right hand side of these pages. The menu contain links to other relevant admin pages and 
   change according to the page you are on and the information you have selected.
 
-2. EXAMPLE PAGES
+
+3. EXAMPLE PAGES
 
 I. Role area
 II. Example - connecting role and user
@@ -172,6 +192,22 @@ I. Role area
             </tr> 
             
             <tr>
+             <td class="admintdright">4</td>
+             <td class="admintdleft">systemlibrarian</td>
+             <td class="admintdleft">system librarian</td>
+             <td class="admintdleft">
+              <a href="">add</a> / 
+              <a href="">remove</a>
+             </td>
+             <td class="admintdleft"><a href="">add</a> / 
+              <a href="">modify</a> / 
+              <a href="">remove</a>
+             </td>
+             <td class="admintdleft"><a href="">delete</a></td>
+             <td class="admintdleft"><a href="">show details</a></td>
+            </tr> 
+
+            <tr>
              <td class="admintdright">3</td>
              <td class="admintdleft">webaccessadmin</td>
              <td class="admintdleft">access to web administrator in...</td>
@@ -186,6 +222,7 @@ I. Role area
              <td class="admintdleft"><a href="">delete</a></td>
              <td class="admintdleft"><a href="">show details</a></td>
             </tr> 
+
            </table> 
           </td>
           <td style="vertical-align: top; margin-top: 5px; width: 25%;">
@@ -260,6 +297,7 @@ II. Example - connecting role and user
              <option value="2">photoadmin</option>
              <option value="9">submitter</option>
              <option value="1">superadmin</option>
+             <option value="4">systemlibrarian</option>
              <option value="3">webaccessadmin</option>
             </select>
             <input class="adminbutton" type="submit" value="select role">
@@ -332,6 +370,7 @@ II. Example - connecting role and user
              <option value="2">photoadmin</option>
              <option value="9">submitter</option>
              <option value="1" selected="selected">superadmin</option>
+             <option value="4">systemlibrarian</option>
              <option value="3">webaccessadmin</option>
             </select>
             <input class="adminbutton" type="submit" value="select role">
@@ -424,6 +463,7 @@ II. Example - connecting role and user
              <option value="2">photoadmin</option>
              <option value="9">submitter</option>
              <option value="1" selected="selected">superadmin</option>
+             <option value="4">systemlibrarian</option>
              <option value="3">webaccessadmin</option>
             </select>
             <input class="adminbutton" type="submit" value="select role">
@@ -448,17 +488,9 @@ II. Example - connecting role and user
             <span class="adminlabel">3. select user</span>
             <select name="id_user" class="admin_w200">
              <option value="0">*** select user ***</option>
-             <option value="133">arild.vik@cern.ch</option>
              <option value="136">franck.black@cern.ch</option>
-             <option value="130">frode.skaar@cern.ch</option>
-             <option value="142">jan.stowisek@cern.ch</option>
-             <option value="140">kien@cern.ch</option>
-             <option value="132">kristine.vik@cern.ch</option>
              <option value="134">kurt.cobain@cern.ch</option>
-             <option value="141">lasse.isaksen@cern.ch</option>
-             <option value="126">mick.draper@cern.ch</option>
              <option value="100" selected="selected">mikael.vik@cern.ch</option>
-             <option value="181">sjur.kvammen@cern.ch</option>
              <option value="-6">tibor.simko@cern.ch (connected)</option>
             </select>
             <input type="hidden" name="id_role" value="1">
@@ -539,6 +571,7 @@ II. Example - connecting role and user
              <option value="2">photoadmin</option>
              <option value="9">submitter</option>
              <option value="1" selected="selected">superadmin</option>
+             <option value="4">systemlibrarian</option>
              <option value="3">webaccessadmin</option>
             </select>
             <input class="adminbutton" type="submit" value="select role">
@@ -563,17 +596,9 @@ II. Example - connecting role and user
             <span class="adminlabel">3. select user</span>
             <select name="id_user" class="admin_w200">
              <option value="0">*** select user ***</option>
-             <option value="133">arild.vik@cern.ch</option>
              <option value="136">franck.black@cern.ch</option>
-             <option value="130">frode.skaar@cern.ch</option>
-             <option value="142">jan.stowisek@cern.ch</option>
-             <option value="140">kien@cern.ch</option>
-             <option value="132">kristine.vik@cern.ch</option>
              <option value="134">kurt.cobain@cern.ch</option>
-             <option value="141">lasse.isaksen@cern.ch</option>
-             <option value="126">mick.draper@cern.ch</option>
              <option value="100" selected="selected">mikael.vik@cern.ch</option>
-             <option value="181">sjur.kvammen@cern.ch</option>
              <option value="-6">tibor.simko@cern.ch (connected)</option>
             </select>
             <input type="hidden" name="id_role" value="1">
@@ -668,6 +693,7 @@ II. Example - connecting role and user
              <option value="2">photoadmin</option>
              <option value="9">submitter</option>
              <option value="1" selected="selected">superadmin</option>
+             <option value="4">systemlibrarian</option>
              <option value="3">webaccessadmin</option>
             </select>
             <input class="adminbutton" type="submit" value="select role">
@@ -692,17 +718,9 @@ II. Example - connecting role and user
             <span class="adminlabel">3. select user</span>
             <select name="id_user" class="admin_w200">
              <option value="0">*** select user ***</option>
-             <option value="133">arild.vik@cern.ch</option>
              <option value="136">franck.black@cern.ch</option>
-             <option value="130">frode.skaar@cern.ch</option>
-             <option value="142">jan.stowisek@cern.ch</option>
-             <option value="140">kien@cern.ch</option>
-             <option value="132">kristine.vik@cern.ch</option>
              <option value="134">kurt.cobain@cern.ch</option>
-             <option value="141">lasse.isaksen@cern.ch</option>
-             <option value="126">mick.draper@cern.ch</option>
              <option value="100" selected="selected">mikael.vik@cern.ch</option>
-             <option value="181">sjur.kvammen@cern.ch</option>
              <option value="-6">tibor.simko@cern.ch (connected)</option>
             </select>
             <input type="hidden" name="id_role" value="1">
@@ -762,7 +780,7 @@ II. Example - connecting role and user
 - we are done
 
   This example is very similar to all the other pages where you administrate WebAccess. The pages
-  are and easy gateway to maintaing access control rights, and share a lot of features.
+  are an easy gateway to maintaing access control rights and share a lot of features.
   - divided into steps
   - restart from any wanted step (not undo)
   - changes must be confirmed
