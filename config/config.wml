@@ -91,12 +91,19 @@ cds.support@cern.ch
 
 ## CFG_APACHE_PASSWORD_FILE -- where Apache user credentials are stored
 <define-tag CFG_APACHE_PASSWORD_FILE whitespace=delete>
-/soft/httpd/conf/httpd.password
+/soft/httpd-bis/conf/httpd.password
 </define-tag>
 
 ## CFG_APACHE_GROUP_FILE -- where Apache user groups are stored
 <define-tag CFG_APACHE_GROUP_FILE whitespace=delete>
-/soft/httpd/conf/httpd.group
+/soft/httpd-bis/conf/httpd.group
+</define-tag>
+
+## CFG_CERN_SITE -- do we want to enable CERN-specific code, like the
+## one that proposes links to famous HEP sites such as Spires and KEK?
+## Put "1" for "yes" and "0" for "no".  (example: "0")
+<define-tag CFG_CERN_SITE whitespace=delete>
+0
 </define-tag>
 
 ################################
@@ -142,12 +149,18 @@ cds.support@cern.ch
 ## CDSPAGEHEADER -- eventual global HTML page header:
 ##  (example: "")
 <define-tag CDSPAGEHEADER>
+<div style="background-image: url(<WEBURL>/img/header_background.gif);">
 <table border="0" cellpadding="0" cellspacing="0" class="headerbox">
  <tr>
-  <td class="headerboxbodylogo">
+  <td rowspan="2" class="headerboxbodylogo">
    <CDSNAME>
   </td>
-  <td class="headerboxbody" valign="bottom">
+  <td align="right" class="userinfoboxbody">
+   <!--USERINFOBOX-->
+  </td>
+ </tr>
+ <tr>
+  <td class="headerboxbody" valign="bottom" align="left">
    <table border="0" cellpadding="0" cellspacing="0" class="headermodulebox">
      <tr>
        <td class="headermoduleboxbodyblank">
@@ -157,19 +170,19 @@ cds.support@cern.ch
              &nbsp;
        </td>
        <td class="headermoduleboxbodyselected">
-             <a class=headerselected href="<WEBURL>">SEARCH</a>
+             <a class=headerselected href="<WEBURL>">search</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
        <td class="headermoduleboxbody">
-             <a class=header href="<WEBURL>/submit/">SUBMIT</a>
+             <a class=header href="<WEBURL>/submit/">submit</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
        <td class="headermoduleboxbody">
-             <a class=header href="<WEBURL>/help/">HELP</a>
+             <a class=header href="<WEBURL>/help/">help</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
@@ -179,13 +192,11 @@ cds.support@cern.ch
   </td>
  </tr>
 </table>
+</div>
 <table border=0 cellspacing=0 cellpadding=0 class="navtrailbox" width="100%">
- <tr valign="top">
-  <td align="left" class="navtrailboxbody">
+ <tr>
+  <td class="navtrailboxbody">
    <!--NAVTRAILBOX-->
-  </td>
-  <td align="right" class="userinfoboxbody">
-   <!--USERINFOBOX-->
   </td>
  </tr>
 </table>
@@ -286,13 +297,6 @@ cds.support@cern.ch
 ##  (example: "1")
 <define-tag CFG_GOOGLE_BOX whitespace=delete>
 1
-</define-tag>
-
-## CFG_GOOGLE_BOX_CERN -- do we want propose links to some famous HEP
-## sites such as Spires and KEK?  Put "1" for "yes" and "0" for "no".
-##  (example: "0")
-<define-tag CFG_GOOGLE_BOX_CERN whitespace=delete>
-0
 </define-tag>
 
 ## CFG_SIMPLESEARCH_PATTERN_BOX_WIDTH -- width of the search pattern
