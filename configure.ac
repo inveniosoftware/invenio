@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 dnl Initialize autoconf and automake:
-AC_INIT(cdsware, 0.01, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.01)
+AC_INIT(cdsware, 0.01-pre1, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.01-pre1)
 
 dnl Check for install:
 AC_PROG_INSTALL
@@ -38,6 +38,14 @@ AC_PATH_PROG(MYSQL, mysql)
 if test -z "$MYSQL"; then
    AC_MSG_ERROR([
    MySQL client is required.  Available from <http://mysql.com/>.])
+fi
+
+dnl Check for PHP:
+AC_PATH_PROG(PHP, php)
+if test -z "$PHP"; then
+   AC_MSG_ERROR([
+   PHP standalone command-line executable (i.e. not compiled as Apache module!) is required too.  
+   Available from <http://www.php.net/manual/en/install.commandline.php>.])
 fi
 
 dnl Check for Perl:
@@ -131,6 +139,7 @@ dnl Test supplied DB user credentials:
 dnl Substitute variables:
 AC_SUBST(WML)
 AC_SUBST(MYSQL)
+AC_SUBST(PHP)
 AC_SUBST(PERL)
 AC_SUBST(PYTHON)
 AC_SUBST(HTDOCSDIR)
@@ -144,26 +153,26 @@ AC_SUBST(DBUSER)
 AC_SUBST(DBPASS)
 
 dnl Write help:
-AC_OUTPUT_COMMANDS([echo "*******************************************************************************"])
-AC_OUTPUT_COMMANDS([echo "Good, the CERN Document Server Software (CDSware) is now ready for installation!"])
-AC_OUTPUT_COMMANDS([echo "You have entered the following parameters:"])
-AC_OUTPUT_COMMANDS([echo "  * HTML documents install directory: $X1"],X1=$HTDOCSDIR)
-AC_OUTPUT_COMMANDS([echo "  * CGI scripts install directory: $X2"],X2=$CGIBINDIR)
-AC_OUTPUT_COMMANDS([echo "  * DB utilities install directory: $X3"],X3=$DBUTILDIR)
-AC_OUTPUT_COMMANDS([echo "  * HTML documents home URL: $X4"],X4=$HTDOCSURL)
-AC_OUTPUT_COMMANDS([echo "  * CGI scripts home URL: $X5"],X5=$CGIBINURL)
-AC_OUTPUT_COMMANDS([echo "  * DB server: $X6"],X6=$DBHOST)
-AC_OUTPUT_COMMANDS([echo "  * DB table name: $X7"],X7=$DBNAME)
-AC_OUTPUT_COMMANDS([echo "  * DB username: $X8"],X8=$DBUSER)
-AC_OUTPUT_COMMANDS([echo "  * DB password: $X9"],X9=$DBPASS)
-AC_OUTPUT_COMMANDS([echo "Here are the steps to continue the building process:"])
-AC_OUTPUT_COMMANDS([echo "  - Firstly, customize the self-explanatory config file './config/config.wml'."])
-AC_OUTPUT_COMMANDS([echo "  - Secondly, type 'make' to build your customized CDSware installation."])
-AC_OUTPUT_COMMANDS([echo "  - Thirdly, type 'make create-tables' if you have not created CDSware tables yet."])
-AC_OUTPUT_COMMANDS([echo "  - Finally, type 'make install' to install the system."])
-AC_OUTPUT_COMMANDS([echo "Good luck, and thanks for choosing the CERN Document Server Software."])
-AC_OUTPUT_COMMANDS([echo "             -- CDSware Development Group <cds.support@cern.ch>"])
-AC_OUTPUT_COMMANDS([echo "*******************************************************************************"])
+AC_OUTPUT_COMMANDS([echo "****************************************************************************************"])
+AC_OUTPUT_COMMANDS([echo "** Good, the CERN Document Server Software (CDSware) is now ready for installation!   **"])
+AC_OUTPUT_COMMANDS([echo "** You have entered the following parameters:                                         **"])
+AC_OUTPUT_COMMANDS([echo "**   - HTML documents install directory: $X1"],X1=$HTDOCSDIR)
+AC_OUTPUT_COMMANDS([echo "**   - CGI scripts install directory: $X2"],X2=$CGIBINDIR)
+AC_OUTPUT_COMMANDS([echo "**   - DB utilities install directory: $X3"],X3=$DBUTILDIR)
+AC_OUTPUT_COMMANDS([echo "**   - HTML documents home URL: $X4"],X4=$HTDOCSURL)
+AC_OUTPUT_COMMANDS([echo "**   - CGI scripts home URL: $X5"],X5=$CGIBINURL)
+AC_OUTPUT_COMMANDS([echo "**   - DB server: $X6"],X6=$DBHOST)
+AC_OUTPUT_COMMANDS([echo "**   - DB table name: $X7"],X7=$DBNAME)
+AC_OUTPUT_COMMANDS([echo "**   - DB username: $X8"],X8=$DBUSER)
+AC_OUTPUT_COMMANDS([echo "**   - DB password: $X9"],X9=$DBPASS)
+AC_OUTPUT_COMMANDS([echo "** Here are the steps to continue the building process:                               **"])
+AC_OUTPUT_COMMANDS([echo "**   - Firstly, customize the self-explanatory config file './config/config.wml'.     **"])
+AC_OUTPUT_COMMANDS([echo "**   - Secondly, type 'make' to build your customized CDSware installation.           **"])
+AC_OUTPUT_COMMANDS([echo "**   - Thirdly, type 'make create-tables' if you have not created CDSware tables yet. **"])
+AC_OUTPUT_COMMANDS([echo "**   - Finally, type 'make install' to install the system.                            **"])
+AC_OUTPUT_COMMANDS([echo "** Good luck, and thanks for choosing the CERN Document Server Software.              **"])
+AC_OUTPUT_COMMANDS([echo "**              -- CDS Development Group <cds.support@cern.ch>                        **"])
+AC_OUTPUT_COMMANDS([echo "****************************************************************************************"])
 
 dnl Write output files:
 AC_OUTPUT(Makefile \
