@@ -60,7 +60,7 @@ def getnavtrail(previous = ''):
     navtrail = navtrail + previous
     return navtrail
 
-def perform_modifytranslations(colID, ln=cdslang, sel_type='', trans=[], confirm=-1, callback='yes'):
+def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, callback='yes'):
     """Modify the translations of a collection
     sel_type - the nametype to modify
     trans - the translations in the same order as the languages from get_languages()"""
@@ -140,7 +140,7 @@ def perform_modifytranslations(colID, ln=cdslang, sel_type='', trans=[], confirm
     else:
         return addadminbox(subtitle, body)
         
-def perform_modifyrankmethods(colID, ln=cdslang, func='', rnkID='', confirm=0, callback='yes'):
+def perform_modifyrankmethods(colID, ln, func='', rnkID='', confirm=0, callback='yes'):
     """Modify which rank methods is visible to the collection
     func - remove or add rank method
     rnkID - the id of the rank method."""
@@ -233,7 +233,7 @@ def perform_modifyrankmethods(colID, ln=cdslang, func='', rnkID='', confirm=0, c
     else:
         return addadminbox(subtitle, body)
 
-def perform_addcollectiontotree(colID, ln=cdslang, add_dad='', add_son='', rtype='', mtype='', callback='yes', confirm=-1):
+def perform_addcollectiontotree(colID, ln, add_dad='', add_son='', rtype='', mtype='', callback='yes', confirm=-1):
     """Form to add a collection to the tree.
     add_dad - the dad to add the collection to
     add_son - the collection to add
@@ -321,7 +321,7 @@ def perform_addcollectiontotree(colID, ln=cdslang, add_dad='', add_son='', rtype
     else:
         return addadminbox(subtitle, body)
     
-def perform_addcollection(colID, ln=cdslang, colNAME='', dbquery='', rest='', callback="yes", confirm=-1):
+def perform_addcollection(colID, ln, colNAME='', dbquery='', rest='', callback="yes", confirm=-1):
     """form to add a new collection.
     colNAME - the name of the new collection
     dbquery - the dbquery of the new collection
@@ -357,7 +357,7 @@ def perform_addcollection(colID, ln=cdslang, colNAME='', dbquery='', rest='', ca
     else:
         return addadminbox(subtitle, body)
 
-def perform_modifydbquery(colID, ln=cdslang, dbquery='', callback='yes', confirm=-1):
+def perform_modifydbquery(colID, ln, dbquery='', callback='yes', confirm=-1):
     """form to modify the dbquery of the collection.
     dbquery - the dbquery of the collection."""
  
@@ -416,7 +416,7 @@ def perform_modifydbquery(colID, ln=cdslang, dbquery='', callback='yes', confirm
     else:
         return addadminbox(subtitle, body)
     
-def perform_modifyrestricted(colID, ln=cdslang, rest='', callback='yes', confirm=-1):
+def perform_modifyrestricted(colID, ln, rest='', callback='yes', confirm=-1):
     """modify which apache group is allowed to access the collection.
     rest - the groupname"""
 
@@ -465,7 +465,7 @@ def perform_modifyrestricted(colID, ln=cdslang, rest='', callback='yes', confirm
     else:
         return addadminbox(subtitle, body)
 
-def perform_modifycollectiontree(colID, ln=cdslang, move_up='', move_down='', move_from='', move_to='', delete='', rtype='', callback='yes', confirm=0):
+def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from='', move_to='', delete='', rtype='', callback='yes', confirm=0):
     """to modify the collection tree: move a collection up and down, delete a collection, or change the father of the collection.
     colID - the main collection of the tree, the root
     move_up - move this collection up (is not the collection id, but the place in the tree)
@@ -628,7 +628,7 @@ def perform_modifycollectiontree(colID, ln=cdslang, move_up='', move_down='', mo
     else:
         return addadminbox(subtitle, body)
 
-def perform_showtree(colID, ln=cdslang):
+def perform_showtree(colID, ln):
     col_dict = dict(get_def_name('', "collection"))
     subtitle = "Collection tree: %s" % col_dict[int(colID)]
     output = """<table border ="0" width="100%">
@@ -655,7 +655,7 @@ def perform_showtree(colID, ln=cdslang):
 
     return addadminbox(subtitle, body)
     
-def perform_addportalbox(colID, ln=cdslang, title='', body='', callback='yes', confirm=-1):
+def perform_addportalbox(colID, ln, title='', body='', callback='yes', confirm=-1):
     """form to add a new portalbox
     title - the title of the portalbox
     body - the body of the portalbox"""
@@ -692,7 +692,7 @@ def perform_addportalbox(colID, ln=cdslang, title='', body='', callback='yes', c
 
     return perform_showportalboxes(colID, ln, content=addadminbox(subtitle, body))
 
-def perform_addexistingportalbox(colID, ln=cdslang, pbxID=-1, score=0, position='', sel_ln='', callback='yes', confirm=-1):
+def perform_addexistingportalbox(colID, ln, pbxID=-1, score=0, position='', sel_ln='', callback='yes', confirm=-1):
     """form to add an existing portalbox to a collection.
     colID - the collection to add the portalbox to
     pbxID - the portalbox to add
@@ -768,7 +768,7 @@ def perform_addexistingportalbox(colID, ln=cdslang, pbxID=-1, score=0, position=
     output = "<br>" + addadminbox(subtitle, body)
     return perform_showportalboxes(colID, ln, content=output)
 
-def perform_deleteportalbox(colID, ln=cdslang, pbxID=-1, callback='yes', confirm=-1):
+def perform_deleteportalbox(colID, ln, pbxID=-1, callback='yes', confirm=-1):
     """form to delete a portalbox which is not in use.
     colID - the current collection.
     pbxID - the id of the portalbox"""
@@ -837,7 +837,7 @@ def perform_deleteportalbox(colID, ln=cdslang, pbxID=-1, callback='yes', confirm
     output = "<br>" + addadminbox(subtitle, body)
     return perform_showportalboxes(colID, ln, content=output)
 
-def perform_modifyportalbox(colID, ln=cdslang, pbxID=-1, score='', position='', sel_ln='', title='', body='', callback='yes', confirm=-1):
+def perform_modifyportalbox(colID, ln, pbxID=-1, score='', position='', sel_ln='', title='', body='', callback='yes', confirm=-1):
     """form to modify a portalbox in a collection, or change the portalbox itself.
     colID - the id of the collection.
     pbxID - the portalbox to change
@@ -932,7 +932,7 @@ def perform_modifyportalbox(colID, ln=cdslang, pbxID=-1, score='', position='', 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_showportalboxes(colID, ln, content=output)
 
-def perform_switchpbxscore(colID, id_1, id_2, sel_ln, ln=cdslang):
+def perform_switchpbxscore(colID, id_1, id_2, sel_ln, ln):
     """Switch the score of id_1 and id_2 in collection_portalbox.
     colID - the current collection
     id_1/id_2 - the id's to change the score for.
@@ -944,7 +944,7 @@ def perform_switchpbxscore(colID, id_1, id_2, sel_ln, ln=cdslang):
     output += write_outcome(res)
     return perform_showportalboxes(colID, ln, content=output)
 
-def perform_showportalboxes(colID, ln=cdslang, callback='yes', content='', confirm=-1):
+def perform_showportalboxes(colID, ln, callback='yes', content='', confirm=-1):
     """show the portalboxes of this collection.
     colID - the portalboxes to show the collection for."""
     
@@ -1009,7 +1009,7 @@ def perform_showportalboxes(colID, ln=cdslang, callback='yes', content='', confi
     else:
         return addadminbox(subtitle, body)
 
-def perform_removeportalbox(colID, ln=cdslang, pbxID='', sel_ln='', callback='yes', confirm=0):
+def perform_removeportalbox(colID, ln, pbxID='', sel_ln='', callback='yes', confirm=0):
     """form to remove a portalbox from a collection.
     colID - the current collection, remove the portalbox from this collection.
     sel_ln - remove the portalbox with this language
@@ -1046,7 +1046,7 @@ def perform_removeportalbox(colID, ln=cdslang, pbxID='', sel_ln='', callback='ye
     output = "<br>" + addadminbox(subtitle, body)
     return perform_showportalboxes(colID, ln, content=output)
 
-def perform_switchfmtscore(colID, type, id_1, id_2, ln=cdslang):
+def perform_switchfmtscore(colID, type, id_1, id_2, ln):
     """Switch the score of id_1 and id_2 in the table type.
     colID - the current collection
     id_1/id_2 - the id's to change the score for.
@@ -1057,7 +1057,7 @@ def perform_switchfmtscore(colID, type, id_1, id_2, ln=cdslang):
     output = write_outcome(res)
     return perform_showoutputformats(colID, ln, content=output)
 
-def perform_switchfldscore(colID, id_1, id_2, fmeth, ln=cdslang):
+def perform_switchfldscore(colID, id_1, id_2, fmeth, ln):
     """Switch the score of id_1 and id_2 in collection_field_fieldvalue.
     colID - the current collection
     id_1/id_2 - the id's to change the score for."""
@@ -1074,7 +1074,7 @@ def perform_switchfldscore(colID, id_1, id_2, fmeth, ln=cdslang):
     elif fmeth == "seo":
         return perform_showsearchoptions(colID, ln, content=output)
 
-def perform_switchfldvaluescore(colID, id_1, id_fldvalue_1, id_fldvalue_2, ln=cdslang):
+def perform_switchfldvaluescore(colID, id_1, id_fldvalue_1, id_fldvalue_2, ln):
     """Switch the score of id_1 and id_2 in collection_field_fieldvalue.
     colID - the current collection
     id_1/id_2 - the id's to change the score for."""
@@ -1085,7 +1085,7 @@ def perform_switchfldvaluescore(colID, id_1, id_fldvalue_1, id_fldvalue_2, ln=cd
     output = write_outcome(res)
     return perform_modifyfield(colID, fldID=id_1, ln=ln, content=output)
 
-def perform_addnewfieldvalue(colID, fldID, ln=cdslang, name='', value='', callback="yes", confirm=-1):
+def perform_addnewfieldvalue(colID, fldID, ln, name='', value='', callback="yes", confirm=-1):
     """form to add a new fieldvalue.
     name - the name of the new fieldvalue
     value - the value of the new fieldvalue
@@ -1125,7 +1125,7 @@ def perform_addnewfieldvalue(colID, fldID, ln=cdslang, name='', value='', callba
     output = "<br>" + addadminbox(subtitle, body)
     return perform_modifyfield(colID, fldID=fldID, ln=ln, content=output)
 
-def perform_modifyfieldvalue(colID, fldID, fldvID, ln=cdslang, name='', value='', callback="yes", confirm=-1):
+def perform_modifyfieldvalue(colID, fldID, fldvID, ln, name='', value='', callback="yes", confirm=-1):
     """form to add a new fieldvalue.
     name - the name of the new fieldvalue
     value - the value of the new fieldvalue
@@ -1165,10 +1165,11 @@ def perform_modifyfieldvalue(colID, fldID, fldvID, ln=cdslang, name='', value=''
                               confirm=2)
     if name and value and confirm in ["1", 1]:
         res = update_fldv(fldvID, name, value)
-        if res:
-            output += """<b><span class="info">Operation successfully completed.</span></b>"""
-        else:
-            output += """<b><span class="info">Operation failed.</span></b>"""
+        output += write_outcome(res)
+        #if res:
+        #    output += """<b><span class="info">Operation successfully completed.</span></b>"""
+        #else:
+        #    output += """<b><span class="info">Operation failed.</span></b>"""
     elif confirm in ["2", 2]:
             res = delete_fldv(fldvID)
             output += write_outcome(res)
@@ -1183,7 +1184,7 @@ def perform_modifyfieldvalue(colID, fldID, fldvID, ln=cdslang, name='', value=''
     output = "<br>" + addadminbox(subtitle, body)
     return perform_modifyfield(colID, fldID=fldID, ln=ln, content=output)
 
-def perform_removefield(colID, ln=cdslang, fldID='', fldvID='', fmeth='', callback='yes', confirm=0):
+def perform_removefield(colID, ln, fldID='', fldvID='', fmeth='', callback='yes', confirm=0):
     """form to remove a field from a collection.
     colID - the current collection, remove the field from this collection.
     sel_ln - remove the field with this language
@@ -1238,7 +1239,7 @@ def perform_removefield(colID, ln=cdslang, fldID='', fldvID='', fmeth='', callba
     elif fmeth == "seo":
         return perform_showsearchoptions(colID, ln, content=output)
 
-def perform_removefieldvalue(colID, ln=cdslang, fldID='', fldvID='', fmeth='', callback='yes', confirm=0):
+def perform_removefieldvalue(colID, ln, fldID='', fldvID='', fmeth='', callback='yes', confirm=0):
     """form to remove a field from a collection.
     colID - the current collection, remove the field from this collection.
     sel_ln - remove the field with this language
@@ -1278,6 +1279,69 @@ def perform_removefieldvalue(colID, ln=cdslang, fldID='', fldvID='', fmeth='', c
 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_modifyfield(colID, fldID=fldID, ln=ln, content=output)
+
+def perform_rearrangefieldvalue(colID, fldID, ln, callback='yes', confirm=-1):
+    """rearrang the fieldvalues alphabetically
+    colID - the collection
+    fldID - the field to rearrange the fieldvalue for
+    """
+ 
+    subtitle = "Rearranging values by name"
+    output  = ""
+    col_fldv = get_col_fld(colID, 'seo', fldID)
+    col_fldv = dict(map(lambda x: (x[1], x[0]), col_fldv))
+    fldv_names = get_fld_value()
+    fldv_names = map(lambda x: (x[0], x[1]), fldv_names)
+    if not col_fldv.has_key(None):
+        vscore = len(col_fldv)
+        for (fldvID, name) in fldv_names:
+            if col_fldv.has_key(fldvID):
+                run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (vscore, colID, fldID, fldvID))
+                vscore -= 1
+        output += write_outcome((1, ""))
+    else:
+        output += write_outcome((0, (0, "No values to rearrange")))
+
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    output = "<br>" + addadminbox(subtitle, body)
+    return perform_modifyfield(colID, fldID, ln, content=output)
+
+def perform_rearrangefield(colID, ln, fmeth, callback='yes', confirm=-1):
+    """rearrang the fields alphabetically
+    colID - the collection
+    """
+ 
+    subtitle = "Rearranging fields by name"
+    output  = ""
+    col_fld = dict(map(lambda x: (x[0], x[1]), get_col_fld(colID, fmeth)))
+    fld_names =  get_def_name('', "field")
+
+    if len(col_fld) > 0:
+        score = len(col_fld)
+        for (fldID, name) in fld_names:
+            if col_fld.has_key(fldID):
+                run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s" % (score, colID, fldID))
+                score -= 1
+        output += write_outcome((1, ""))
+    else:
+        output += write_outcome((0, (0, "No fields to rearrange")))
+        
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    output = "<br>" + addadminbox(subtitle, body)
+    if fmeth == "soo":
+        return perform_showsortoptions(colID, ln, content=output)
+    elif fmeth == "sew":
+        return perform_showsearchfields(colID, ln, content=output)
+    elif fmeth == "seo":
+        return perform_showsearchoptions(colID, ln, content=output)
 
 def perform_addexistingfieldvalue(colID, fldID, fldvID=-1, ln=cdslang, callback='yes', confirm=-1):
     """form to add an existing fieldvalue to a field.
@@ -1334,7 +1398,7 @@ def perform_addexistingfieldvalue(colID, fldID, fldvID=-1, ln=cdslang, callback=
     output = "<br>" + addadminbox(subtitle, body)
     return perform_modifyfield(colID, fldID, ln, content=output)
 
-def perform_addexistingfield(colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', callback='yes', confirm=-1):
+def perform_addexistingfield(colID, ln, fldID=-1, fldvID=-1, fmeth='', callback='yes', confirm=-1):
     """form to add an existing field to a collection.
     colID - the collection to add the field to
     fldID - the field to add
@@ -1397,7 +1461,7 @@ def perform_addexistingfield(colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', c
     elif fmeth == "seo":
         return perform_showsearchoptions(colID, ln, content=output)
 
-def perform_showsortoptions(colID, ln=cdslang, callback='yes', content='', confirm=-1):
+def perform_showsortoptions(colID, ln, callback='yes', content='', confirm=-1):
     """show the sort fields of this collection.."""
     
     colID = int(colID)
@@ -1411,8 +1475,9 @@ def perform_showsortoptions(colID, ln=cdslang, callback='yes', content='', confi
      <dd>Go to the BibIndex interface to modify the available sort options</dd>
      <dt>Collection specific actions
      <dd><a href="addexistingfield?colID=%s&amp;ln=%s&amp;fmeth=soo#8.2">Add sort option to collection</a></dd>
+     <dd><a href="rearrangefield?colID=%s&amp;ln=%s&amp;fmeth=soo#8.2">Rearrange sort options by name</a></dd>
     </dl>
-    """  % (colID, ln)
+    """  % (colID, ln, colID, ln)
 
     header = ['', 'Sort option', 'Actions']
 
@@ -1459,7 +1524,7 @@ def perform_showsortoptions(colID, ln=cdslang, callback='yes', content='', confi
     else:
         return addadminbox(subtitle, body)
 
-def perform_showsearchfields(colID, ln=cdslang, callback='yes', content='', confirm=-1):
+def perform_showsearchfields(colID, ln, callback='yes', content='', confirm=-1):
     """show the search fields of this collection.."""
     
     colID = int(colID)
@@ -1473,8 +1538,9 @@ def perform_showsearchfields(colID, ln=cdslang, callback='yes', content='', conf
      <dd>Go to the BibIndex interface to modify the available search fields</dd>
      <dt>Collection specific actions
      <dd><a href="addexistingfield?colID=%s&amp;ln=%s&amp;fmeth=sew#6.2">Add search field to collection</a></dd>
+     <dd><a href="rearrangefield?colID=%s&amp;ln=%s&amp;fmeth=sew#6.2">Rearrange search fields by name</a></dd>
     </dl>
-    """  % (colID, ln)
+    """  % (colID, ln, colID, ln)
 
     header = ['', 'Search field', 'Actions']
 
@@ -1521,7 +1587,7 @@ def perform_showsearchfields(colID, ln=cdslang, callback='yes', content='', conf
     else:
         return addadminbox(subtitle, body)
         
-def perform_showsearchoptions(colID, ln=cdslang, callback='yes', content='', confirm=-1):
+def perform_showsearchoptions(colID, ln, callback='yes', content='', confirm=-1):
     """show the sort and search options of this collection.."""
     
     colID = int(colID)
@@ -1535,8 +1601,9 @@ def perform_showsearchoptions(colID, ln=cdslang, callback='yes', content='', con
      <dd>Go to the BibIndex interface to modify the available search options</dd>
      <dt>Collection specific actions
      <dd><a href="addexistingfield?colID=%s&amp;ln=%s&amp;fmeth=seo#7.2">Add search option to collection</a></dd>
+     <dd><a href="rearrangefield?colID=%s&amp;ln=%s&amp;fmeth=seo#7.2">Rearrange search options by name</a></dd>
     </dl>
-    """  % (colID, ln)
+    """  % (colID, ln, colID, ln)
 
     header = ['', 'Search option', 'Actions']
 
@@ -1598,8 +1665,9 @@ def perform_modifyfield(colID, fldID, fldvID='', ln=cdslang, content='',callback
      <dt>Value specific actions
      <dd><a href="addexistingfieldvalue?colID=%s&amp;ln=%s&amp;fldID=%s#7.4">Add existing value to search option</a></dd>
      <dd><a href="addnewfieldvalue?colID=%s&amp;ln=%s&amp;fldID=%s#7.4">Add new value to search option</a></dd>
+     <dd><a href="rearrangefieldvalue?colID=%s&amp;ln=%s&amp;fldID=%s#7.4">Rearrange values by name</a></dd>
     </dl>
-    """  % (colID, ln, fldID, colID, ln, fldID)
+    """  % (colID, ln, fldID, colID, ln, fldID, colID, ln, fldID)
     header = ['', 'Value name', 'Actions']
 
     actions = []
@@ -1647,7 +1715,7 @@ def perform_modifyfield(colID, fldID, fldvID='', ln=cdslang, content='',callback
         output = content
     return perform_showsearchoptions(colID, ln, content=output)
 
-def perform_showoutputformats(colID, ln=cdslang, callback='yes', content='', confirm=-1):
+def perform_showoutputformats(colID, ln, callback='yes', content='', confirm=-1):
     """shows the outputformats of the current collection
     colID - the collection id."""
     
@@ -1703,7 +1771,7 @@ def perform_showoutputformats(colID, ln=cdslang, callback='yes', content='', con
     else:
         return addadminbox(subtitle, body)
 
-def perform_addexistingoutputformat(colID, ln=cdslang, fmtID=-1, callback='yes', confirm=-1):
+def perform_addexistingoutputformat(colID, ln, fmtID=-1, callback='yes', confirm=-1):
     """form to add an existing output format to a collection.
     colID - the collection the format should be added to
     fmtID - the format to add."""
@@ -1753,7 +1821,7 @@ def perform_addexistingoutputformat(colID, ln=cdslang, fmtID=-1, callback='yes',
     output = "<br>" + addadminbox(subtitle, body)
     return perform_showoutputformats(colID, ln, content=output)
 
-def perform_deleteoutputformat(colID, ln=cdslang, fmtID=-1, callback='yes', confirm=-1):
+def perform_deleteoutputformat(colID, ln, fmtID=-1, callback='yes', confirm=-1):
     """form to delete an output format not in use.
     colID - the collection id of the current collection.
     fmtID - the format id to delete."""
@@ -1823,7 +1891,7 @@ def perform_deleteoutputformat(colID, ln=cdslang, fmtID=-1, callback='yes', conf
     output = "<br>" + addadminbox(subtitle, body)
     return perform_showoutputformats(colID, ln, content=output)
 
-def perform_removeoutputformat(colID, ln=cdslang, fmtID='', callback='yes', confirm=0):
+def perform_removeoutputformat(colID, ln, fmtID='', callback='yes', confirm=0):
     """form to remove an output format from a collection.
     colID - the collection id of the current collection.
     fmtID - the format id.
@@ -2078,7 +2146,7 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
 
     return text
 
-def perform_deletecollection(colID, ln=cdslang, confirm=-1, callback='yes'):
+def perform_deletecollection(colID, ln, confirm=-1, callback='yes'):
     """form to delete a collection
     colID - id of collection
     """
@@ -2391,7 +2459,7 @@ def perform_validateconf(colID, ln, confirm=0, callback='yes'):
     else:
         return addadminbox(subtitle, body)
 
-def perform_removeoutputformat(colID, ln=cdslang, fmtID='', callback='yes', confirm=0):
+def perform_removeoutputformat(colID, ln, fmtID='', callback='yes', confirm=0):
     """form to remove an output format from a collection.
     colID - the collection id of the current collection.
     fmtID - the format id.
@@ -2539,7 +2607,7 @@ def get_col_fmt(colID=-1):
     except StandardError, e:
         return ""
 
-def get_col_rnk(colID, ln=cdslang):
+def get_col_rnk(colID, ln):
     """ Returns a list of the rank methods the given collection is attached to
     colID - id from collection"""
     
@@ -2567,6 +2635,7 @@ def get_fld_value(fldvID = ''):
         sql = "SELECT id, name, value FROM fieldvalue"
         if fldvID:
             sql += " WHERE id=%s" % fldvID
+        sql += " ORDER BY name"
         res = run_sql(sql)
         return res
     except StandardError, e:
@@ -3052,7 +3121,7 @@ def switch_fld_score(colID, id_1, id_2):
         res1 = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s" % (colID, id_1))
         res2 = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s" % (colID, id_2))
         if res1[0][0] == res2[0][0]:
-            return (0, (1, "Both fields got the same score"))
+            return (0, (1, "Cannot rearrange the selected fields, either rearrange by name or use the mySQL client to fix the problem."))
         else:
             res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s" % (res2[0][0], colID, id_1))
             res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s" % (res1[0][0], colID, id_2))    
@@ -3070,7 +3139,7 @@ def switch_fld_value_score(colID, id_1, fldvID_1, fldvID_2):
         res1 = run_sql("SELECT score_fieldvalue FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (colID, id_1, fldvID_1))
         res2 = run_sql("SELECT score_fieldvalue FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (colID, id_1, fldvID_2))
         if res1[0][0] == res2[0][0]:
-            return (0, (1, "Both fields got the same score"))
+            return (0, (1, "Cannot rearrange the selected fields, either rearrange by name or use the mySQL client to fix the problem."))
         else:
             res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (res2[0][0], colID, id_1, fldvID_1))
             res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (res1[0][0], colID, id_1, fldvID_2))    
@@ -3087,6 +3156,8 @@ def switch_pbx_score(colID, id_1, id_2, sel_ln):
     try:
         res1 = run_sql("SELECT score FROM collection_portalbox WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (colID, id_1, sel_ln))
         res2 = run_sql("SELECT score FROM collection_portalbox WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (colID, id_2, sel_ln))
+        if res1[0][0] == res2[0][0]:
+            return (0, (1, "Cannot rearrange the selected fields, either rearrange by name or use the mySQL client to fix the problem."))
         res = run_sql("UPDATE collection_portalbox SET score=%s WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (res2[0][0], colID, id_1, sel_ln))
         res = run_sql("UPDATE collection_portalbox SET score=%s WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (res1[0][0], colID, id_2, sel_ln))
         return (1, "")
@@ -3102,6 +3173,8 @@ def switch_score(colID, id_1, id_2, table):
     try:
         res1 = run_sql("SELECT score FROM collection_%s WHERE id_collection=%s and id_%s=%s" % (table, colID, table, id_1))
         res2 = run_sql("SELECT score FROM collection_%s WHERE id_collection=%s and id_%s=%s" % (table, colID, table, id_2))
+        if res1[0][0] == res2[0][0]:
+            return (0, (1, "Cannot rearrange the selected fields, either rearrange by name or use the mySQL client to fix the problem."))
         res = run_sql("UPDATE collection_%s SET score=%s WHERE id_collection=%s and id_%s=%s" % (table, res2[0][0], colID, table, id_1))
         res = run_sql("UPDATE collection_%s SET score=%s WHERE id_collection=%s and id_%s=%s" % (table, res1[0][0], colID, table, id_2))
         return (1, "")
