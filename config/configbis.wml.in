@@ -26,6 +26,9 @@
 <define-tag MYSQL whitespace=delete>
 @MYSQL@
 </define-tag>
+<define-tag PHP whitespace=delete>
+@PHP@
+</define-tag>
 <define-tag PERL whitespace=delete>
 @PERL@
 </define-tag>
