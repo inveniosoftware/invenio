@@ -101,28 +101,29 @@ create-demo-site: install
 load-demo-records: install
 	${prefix}/bin/dbexec < ./modules/miscutil/sql/tabbibclean.sql
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
-	${prefix}/bin/bibupload ./modules/miscutil/demo/demobibdata.xml
+	${prefix}/bin/bibupload -i ./modules/miscutil/demo/demobibdata.xml
+	${prefix}/bin/bibupload 1
 	@echo ""
 	@echo "***********************************************************************"
 	@echo "** You will be asked for a username, please enter admin email below. **"
 	@echo "***********************************************************************"
 	@echo ""
 	${prefix}/bin/bibwords
-	${prefix}/bin/bibwords 1
+	${prefix}/bin/bibwords 2
 	@echo ""
 	@echo "***********************************************************************"
 	@echo "** You will be asked for a username, please enter admin email below. **"
 	@echo "***********************************************************************"
 	@echo ""
 	${prefix}/bin/bibreformat -oHB,HD,HP,HC
-	${prefix}/bin/bibreformat 2
+	${prefix}/bin/bibreformat 3
 	@echo ""
 	@echo "***********************************************************************"
 	@echo "** You will be asked for a username, please enter admin email below. **"
 	@echo "***********************************************************************"
 	@echo ""
 	${prefix}/bin/webcoll
-	${prefix}/bin/webcoll 3
+	${prefix}/bin/webcoll 4
 	@echo "***********************************************************************"
 	@echo "** The demo records have been successfully loaded.                   **"
 	@echo "**                                                                   **"
