@@ -296,6 +296,7 @@ a.navtrail:hover {
    color: #000;
    background: transparent;
    font-size: x-small;
+   width: 120px;
    padding-left: 3px;
 }
 .pageboxlefttop {
