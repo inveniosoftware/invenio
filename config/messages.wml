@@ -2302,4 +2302,123 @@
   <uk>подібні слова</uk>
 </define-tag>
 
+# FIXME
+<define-tag MSG_CITED_BY whitespace=delete>
+  <en>Cited by</en>
+  <fr>Cité par</fr>
+  <de>Zitiert von</de>
+  <es>Citado por</es>
+  <pt>Cited by</pt>
+  <it>Citato da</it>
+  <ru>Cited by</ru>
+  <sk>Citované</sk>
+  <cs>Citováno</cs>
+  <no>Cited by</no>
+  <sv>Cited by</sv>
+  <el>Χρησιμοποιείται από</el>
+  <uk>Cited by</uk>
+</define-tag>
+
+# FIXME
+<define-tag MSG_CITED_BY_X_RECORDS whitespace=delete>
+  <en>Cited by: %s records</en>
+  <fr>Cité par: %s notices</fr>
+  <de>Zitiert von: %s Datensätzen</de>
+  <es>Citado por: %s registros</es>
+  <pt>Cited by: %s records</pt>
+  <it>Citato da: %s articoli</it>
+  <ru>Cited by: %s records</ru>
+  <sk>Citované: %s záznamami</sk>
+  <cs>Citováno: %s záznamy</cs>
+  <no>Cited by: %s records</no>
+  <sv>Cited by: %s records</sv>
+  <el>Χρησιμοποιείται από: %s εγγραφές</el>
+  <uk>Cited by: %s records</uk>
+</define-tag>
+
+# FIXME
+<define-tag MSG_COCITED_WITH_X_RECORDS whitespace=delete>
+  <en>Co-cited with: %s records</en>
+  <fr>Co-cité avec: %s notices</fr>
+  <de>Co-zitiert mit: %s Datensätzen</de>
+  <es>Co-citado con: %s registros</es>
+  <pt>Co-cited with: %s records</pt>
+  <it>Citato con: %s articoli</it>
+  <ru>Co-cited with: %s records</ru>
+  <sk>Spolu citované s: %s záznamami</sk>
+  <cs>Spolu citováno s: %s záznamy</cs>
+  <no>Co-cited with: %s records</no>
+  <sv>Co-cited with: %s records</sv>
+  <el>Χρησιμοποιείται σε συνδιασμό από: %s εγγραφές</el>
+  <uk>Co-cited with: %s records</uk>
+</define-tag>
+
+# FIXME
+<define-tag MSG_CITATION_HISTORY whitespace=delete>
+  <en>Citation history:</en>
+  <fr>Historique des citations:</fr>
+  <de>Historie der Zitationen:</de>
+  <es>Historia de citas:</es>
+  <pt>Citation history:</pt>
+  <it>Cronaca delle citazioni:</it>
+  <ru>Citation history:</ru>
+  <sk>Citačná história:</sk>
+  <cs>Citační historie:</cs>
+  <no>Citation history:</no>
+  <sv>Citation history:</sv>
+  <el>Ιστορικό παραπομπών:</el>
+  <uk>Citation history:</uk>
+</define-tag>
+
+# FIXME
+<define-tag MSG_DOWLOADS_HISTORY whitespace=delete>
+  <en>Dowloads history:</en>
+  <fr>Historique des téléchargements:</fr>
+  <de>Historie der Herunterladen:</de>
+  <es>Historia de descargas:</es>
+  <pt>Dowloads history:</pt>
+  <it>Cronaca dei downloads:</it>
+  <ru>Dowloads history:</ru>
+  <sk>História sťahovania:</sk>
+  <cs>Historie stahování:</cs>
+  <no>Dowloads history:</no>
+  <sv>Dowloads history:</sv>
+  <el>Ιστορικό downloads:</el>
+  <uk>Dowloads history:</uk>
+</define-tag>
+
+# FIXME
+<define-tag MSG_PEOPLE_WHO_VIEWED_THIS_PAGE whitespace=delete>
+  <en>People who viewed this page also viewed:</en>
+  <fr>Les utilisateurs qui ont vu cette page ont aussi vu:</fr>
+  <de>Benutzer, die diese Seite sahen, haben auch dargestellt:</de>
+  <es>La gente que vió esta página también vió:</es>
+  <pt>People who viewed this page also viewed:</pt>
+  <it>Gli utenti che hanno visitato questa pagina hanno anche visitato:</it>
+  <ru>People who viewed this page also viewed:</ru>
+  <sk>Užívatelia ktorí si prehliadli túto stránku si tiež prehliadli:</sk>
+  <cs>Uživatelé kteří prohlédli tuhle stránku si též prohlédli:</cs>
+  <no>People who viewed this page also viewed:</no>
+  <sv>People who viewed this page also viewed:</sv>
+  <el>Όσοι είδαν την σελίδα αυτή, είδαν επίσης:</el>
+  <uk>People who viewed this page also viewed:</uk>
+</define-tag>
+
+# FIXME
+<define-tag MSG_PEOPLE_WHO_DOWNLOADED_THIS_DOCUMENT whitespace=delete>
+  <en>People who downloaded this document also downloaded:</en>
+  <fr>Les utilisateurs qui ont téléchargé ce document ont aussi téléchargé:</fr>
+  <de>Benutzer, die diesen Dokument herunterladeten, haben auch herunterladet:</de>
+  <es>La gente que descargó este documento también descargó:</es>
+  <pt>People who downloaded this document also downloaded:</pt>
+  <it>Gli utenti che hanno scaricato questo documento hanno anche scaricato:</it>
+  <ru>People who downloaded this document also downloaded:</ru>
+  <sk>Užívatelia ktorí si stiahli tento dokument si tiež stiahli:</sk>
+  <cs>Uživatelé kteří si stáhli tento dokument si též stáhli:</cs>
+  <no>People who downloaded this document also downloaded:</no>
+  <sv>People who downloaded this document also downloaded:</sv>
+  <el>Όσοι κατέβασαν το έγγραφο αυτό, κατέβασαν επίσης:</el>
+  <uk>People who downloaded this document also downloaded:</uk>
+</define-tag>
+
 ## end of file
