@@ -1432,7 +1432,7 @@
             <subfield code="a">Smizanska, M</subfield>
         </datafield>
         <datafield tag="700" ind1="" ind2="">
-            <subfield code="a">Lemantre, V</subfield>
+            <subfield code="a">Lemaître, V</subfield>
         </datafield>
         <datafield tag="700" ind1="" ind2="">
             <subfield code="a">Blumenschein, U</subfield>
@@ -1582,7 +1582,7 @@
             <subfield code="a">Boccali, T</subfield>
         </datafield>
         <datafield tag="700" ind1="" ind2="">
-            <subfield code="a">Fo`, L</subfield>
+            <subfield code="a">Foà, L</subfield>
         </datafield>
         <datafield tag="700" ind1="" ind2="">
             <subfield code="a">Giammanco, A</subfield>
@@ -1627,7 +1627,7 @@
             <subfield code="a">Cowan, G</subfield>
         </datafield>
         <datafield tag="700" ind1="" ind2="">
-            <subfield code="a">Garcma-Bellido, A</subfield>
+            <subfield code="a">García-Bellido, A</subfield>
         </datafield>
         <datafield tag="700" ind1="" ind2="">
             <subfield code="a">Green, M G</subfield>
@@ -6009,7 +6009,7 @@
             <subfield code="b">19</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="1">
-            <subfield code="u">Jyvdskld Univ.</subfield>
+            <subfield code="u">Jyväsklä Univ.</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="1">
             <subfield code="c">1990-01-28</subfield>
@@ -15292,6 +15292,42 @@
         </datafield>
         <datafield tag="999" ind1="C" ind2="5">
             <subfield code="m">A. Chamblin, R. Emparan, C. V. Johnson and R. C. Myers, Phys. Rev., D60: 104026 (1999) 5070 90 110 130 150 r+ 130 230 330 50 70 90 110 130 150 r+</subfield>
+        </datafield>
+    </record>
+    <record>
+        <datafield tag="041" ind1="" ind2="">
+            <subfield code="a">rus</subfield>
+        </datafield>
+        <datafield tag="100" ind1="" ind2="">
+            <subfield code="a">Пушкин, А С</subfield>
+        </datafield>
+        <datafield tag="245" ind1="" ind2="">
+            <subfield code="a">Медный всадник</subfield>
+        </datafield>
+        <datafield tag="520" ind1="" ind2="">
+            <subfield code="a">&lt;br&gt;
+Стоял он, дум великих полн,&lt;br&gt;
+И вдаль глядел.  Пред ним широко&lt;br&gt;
+Река неслася; бедный чёлн&lt;br&gt;
+По ней стремился одиноко.&lt;br&gt;
+По мшистым, топким берегам&lt;br&gt;
+Чернели избы здесь и там,&lt;br&gt;
+Приют убогого чухонца;&lt;br&gt;
+И лес, неведомый лучам&lt;br&gt;
+В тумане спрятанного солнца,&lt;br&gt;
+Кругом шумел.&lt;br&gt;
+</subfield>
+        <datafield tag="909" ind1="C" ind2="0">
+            <subfield code="y">1833</subfield>
+        </datafield>
+        <datafield tag="909" ind1="C" ind2="1">
+            <subfield code="c">1990-01-27</subfield>
+            <subfield code="l">00</subfield>
+            <subfield code="m">2002-04-12</subfield>
+            <subfield code="o">BATCH</subfield>
+        </datafield>
+        <datafield tag="980" ind1="" ind2="">
+            <subfield code="a">POETRY</subfield>
         </datafield>
     </record>
 </collection>
