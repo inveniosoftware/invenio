@@ -184,7 +184,8 @@
       foreach($param_names as $pname)
       {
         //$val=addslashes($param_values[$counter]);
-        $val=str_replace("\"", "\\\"", $param_values[$counter]);
+        $val=str_replace("\\", "\\\\", $param_values[$counter]);
+        $val=str_replace("\"", "\\\"", $val);
 	$val=str_replace("\$", "\\\$", $val);
         $excode.='$'."$pname=\"".$val."\";\n";
         $counter++;
