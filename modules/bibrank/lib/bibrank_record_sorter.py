@@ -178,25 +178,31 @@ def get_stopwords(file='stopwords.kb'):
         stopwords[string.rstrip(line)] = 1
     return stopwords
 
-def get_config(rnkMETHOD):
+def get_config(rnkMETHOD): #needs some work
     """Load common data into memory"""
     global stopwords
     global stemmer
     global chars_alphanumericseparators
     global col_size
     global rnkWORD_table
+    languages = {'fr': 'french', 'en': 'porter', 'no':'norwegian', 'se':'swedish', 'de': 'german', 'it':'italian', 'pt':'portugese'}
+
     try: 
-        rnkWORD_table = methods[rnkMETHOD]["rnkWORD_table"]
         if stemmer and stopwords:     
             pass
     except StandardError, e:
-        stopwords = {}
+        rnkWORD_table = methods[rnkMETHOD]["rnkWORD_table"]
         try:
-            stemmer = Stemmer.Stemmer('porter')
+            if methods[rnkMETHOD].has_key("stem_lang"):
+                stemmer = Stemmer.Stemmer(languages[[methods[rnkMETHOD]["stem_lang"]]])
+            else:
+                stemmer = None         
         except Exception:
             stemmer = None
         if methods[rnkMETHOD].has_key("stopword"):
             stopwords = get_stopwords("%s" % methods[rnkMETHOD]["stopword"]) 
+        else:
+            stopwords = {}
         chars_alphanumericseparators = r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
         col_size = run_sql("SELECT count(*) FROM %sR" % rnkWORD_table[:-1])[0][0]
 
@@ -218,6 +224,9 @@ def create_rnkmethod_cache():
         methods[rnkMETHOD]["function"] = cfg_function
         if config.has_option(cfg_function, "table"):
             methods[rnkMETHOD]["rnkWORD_table"] = config.get(cfg_function, "table")
+        if  config.has_option(cfg_function, "stem_if_avail") and config.get(cfg_function, "stem_if_avail") == "yes":
+            methods[rnkMETHOD]["stem_lang"] = config.get(cfg_function, "stem_query_language")
+
         if config.has_option(cfg_function, "stopword"):
             methods[rnkMETHOD]["stopword"] = config.get(cfg_function, "stopword")
         i8n_names = run_sql("SELECT ln,value from rnkMETHODNAME,rnkMETHOD where id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" % (rnkMETHOD))
