@@ -437,7 +437,7 @@ class BibDocFile:
             format = ".%s" % self.format
         else:
             format = ""
-        return "<tr><td valign=top><small><a href=\"%s/getfile.py?docid=%s&name=%s&format=%s&version=%s\">%s%s</a></td><td valign=top><font size=-2 color=green>[%s B]</font></td></tr>\n""" % (weburl,self.bibdocid,self.name,self.format,self.version,self.name,format,self.size)
+        return "<tr><td valign=top><small><a href=\"%s/getfile.py?docid=%s&name=%s&format=%s&version=%s\">%s%s</a></td><td valign=top><font size=-2 color=green>[%s&nbsp;B]</font></td></tr>\n""" % (weburl,self.bibdocid,re.sub("\&","%26",self.name),self.format,self.version,self.name,format,self.size)
  
     def getType(self):
         return self.type
