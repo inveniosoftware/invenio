@@ -35,6 +35,8 @@ try:
     sys.path.append('%s' % pylibdir)
     from cdsware.config import *
     from cdsware.dbquery import run_sql
+    from cdsware.webpage import page
+    from cdsware.webuser import getUid
     from mod_python import apache
 except ImportError, e:
     print "Error: %s" % e
@@ -52,18 +54,45 @@ def get_collid(c):
 
 def index(req, c=cdsname, as="0"):
     "Display search interface page for collection c by looking in the collection cache."
-    as = int(as)
+    uid = getUid(req)
+    try:
+        as = int(as)
+    except:
+        as = 0
     if type(c) is list:
         c = c[0]
     req.content_type = "text/html"
     req.send_http_header()
     collid = get_collid(c)
     try:
-        fp = open("%s/collections/%d/as=%d.html" % (cachedir, collid, as), "r")
-        body = fp.read()
+        fp = open("%s/collections/%d/navtrail-as=%d.html" % (cachedir, collid, as), "r")
+        c_navtrail = fp.read()
         fp.close()
+        fp = open("%s/collections/%d/body-as=%d.html" % (cachedir, collid, as), "r")
+        c_body = fp.read()
+        fp.close()
+        fp = open("%s/collections/%d/portalbox-lt.html" % (cachedir, collid), "r")
+        c_portalbox_lt = fp.read()
+        fp.close()
+        fp = open("%s/collections/%d/portalbox-lb.html" % (cachedir, collid), "r")
+        c_portalbox_lb = fp.read()
+        fp.close()
+        fp = open("%s/collections/%d/portalbox-rt.html" % (cachedir, collid), "r")
+        c_portalbox_rt = fp.read()
+        fp.close()
+        fp = open("%s/collections/%d/portalbox-rb.html" % (cachedir, collid), "r")
+        c_portalbox_rb = fp.read()
+        fp.close()
+        return page(title=c,
+                    body=c_body,
+                    navtrail=c_navtrail,
+                    description="CERN Document Server - %s" % c,
+                    keywords="CDS, CDSware, %s" % c,
+                    uid=uid,
+                    cdspagerightstripeadd=c_portalbox_rt)    
     except:
-        body = """<p>Sorry, collection <strong>%s</strong> does not seem to exist.
-                  <p>Start browsing from <a href="%s">%s</a>.""" % (c, weburl, cdsname)
-    req.write(body)
+         body = """<p>Sorry, collection <strong>%s</strong> does not seem to exist.
+                   <p>Start browsing from <a href="%s">%s</a>.""" % (c, weburl, cdsname)
+         req.write(body)
+         
     return "\n"
