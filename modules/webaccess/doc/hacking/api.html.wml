@@ -69,14 +69,14 @@ Contents:
 >>> sys.path.append('%s' % pylibdir)
 >>> from access_control_engine import *
 >>> # authorize user 109 for action WebSearch_search with collection="LHC"
->>> acc_authorize_action(109, 'WebSearch_search', collection="LHC")
-      1
+>>> acc_authorize_action(109, 'cfgwebsearch', collection="LHC")
+      (0, "")
 >>> # authorize user 109 for action WebSearch_search with collection="fail this"
->>> acc_authorize_action(109, 'WebSearch_search', collection="fail this")
-      0
+>>> acc_authorize_action(109, 'cfgwebsearch', collection="fail this")
+      (8, "Error (8): Incorrect keyword given for specified action.")
 >>> # authorize user 109 for action BibFormat_modify with format="htmlbrief"
->>> acc_authorize_action(109, 'BibFormat_modify', format="htmlbrief")
-      1
+>>> acc_authorize_action(109, 'cfgbibformat', format="htmlbrief")
+      (0, "")
 
 2. Command Line Interface
 
@@ -106,9 +106,12 @@ Contents:
    Examples:
 
       These are the same ones as for the regular API:
-      $ authaction 109 WebSearch_search collection LHC
-      $ authaction 109 WebSearch_search collection 'fail this'
-      $ authaction 109 Bibformat_modify format htmlbrief
+      $ authaction 109 cfgwebsearch collection LHC
+        0;
+      $ authaction 109 cfgwebsearch collection 'fail this'
+        8;Error (8): Incorrect keyword given for specified action.
+      $ authaction 109 cfgbibformat format htmlbrief
+        0;
 
 
 3. Program Flow
