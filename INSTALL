@@ -35,27 +35,27 @@ Contents
         max_allowed_packet to at least 4M in your my.cnf.
           <http://mysql.com/>
 
-     c) Apache server, with support for loading DSO modules.  
-        Tested mainly with version 2.0.43 and above.  Apache2 is
-        recommended due to its superior mod_python support, see below.
+     c) Apache 2 server, with support for loading DSO modules.  
+        Tested mainly with version 2.0.43 and above.  Apache 2 is
+        required for the mod_python module (see below).
           <http://httpd.apache.org/>
 
      d) Python v2.2.2 or above, featuring recent MySQLdb module
         (v0.9.2), and Numeric module (v21 and above).  We recommended
         to use Python v2.3.2 and above.  Also, we recommend to
-        optionally install also the Psyco module that increases
-        performance of some Pythonic operations. (Note that CDSware
-        will work without Psyco, though.)
+        optionally install the Psyco module that increases performance
+        of some Pythonic operations. (Note though that CDSware will
+        work fine even without Psyco.)
 
           <http://python.org/>
           <http://sourceforge.net/projects/mysql-python>
           <http://sourceforge.net/projects/numpy>
           <http://psyco.sourceforge.net/>
 
-     e) mod_python compiled as Apache module.  Tested mainly with
-        versions 3.0BETA4 and above.  mod_python 3.x is recommended
-        due to better Apache2 and MySQL support, as we saw in our
-        experience.
+     e) mod_python Apache module.  Tested mainly with versions
+        3.0BETA4 and above.  mod_python 3.x is required for Apache 2.
+        Previous versions (as well as Apache 1 ones) exhibited some
+        problems with MySQL connectivity in our experience.
           <http://www.modpython.org/>
 
      f) PHP compiled as Apache module, including MySQL support.
@@ -71,7 +71,10 @@ Contents
           <http://www.php.net/manual/en/install.commandline.php>
           <http://www.php.net/manual/en/ref.pcntl.php>
 
-     h) WML - Website META Language:
+     h) WML - Website META Language.  Tested mainly with versions
+        2.0.8 and 2.0.9.  Note that on Red Hat Linux 9 the WML 2.0.9
+        compiled with Perl 5.8.0 exhibits problems, so you better use
+        downgraded/upgraded Perl for compiling WML on that platform.       
           <http://www.engelschall.com/sw/wml/>
 
      i) If you want to be able to search for words in the fulltext files 
