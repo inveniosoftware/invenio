@@ -25,9 +25,8 @@ Contents
    start installing CDSware:
 
      a) MySQL server (may be on a remote machine), and MySQL client
-        (must be available locally too).
-        Version 4.1.0 and superior is recommended due to its UTF-8
-        support.
+        (must be available locally too).  Version 4.1.0 and above is
+        recommended due to its UTF-8 support.
           <http://mysql.com/>
 
      b) Apache server, with support for loading DSO modules.  
