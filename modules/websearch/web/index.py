@@ -33,7 +33,7 @@ import sys
 import sre
 import MySQLdb
 sys.path.append('%s' % pylibdir)
-from cdsware.config import cdsname,cdslang,cachedir,cdsnameintl
+from cdsware.config import weburl,cdsname,cdslang,cachedir,cdsnameintl
 from cdsware.messages import *
 from cdsware.dbquery import run_sql
 from cdsware.webpage import page, create_error_box
