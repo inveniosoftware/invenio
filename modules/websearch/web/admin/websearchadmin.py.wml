@@ -622,7 +622,36 @@ def addexistingfield(req, colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', call
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
     
-def addexistingfieldvalue(req, colID, fldID, fldvID=-1, ln=cdslang, callback='yes', confirm=-1):
+def rearrangefield(req, colID, ln=cdslang, fmeth='', callback='yes', confirm=-1):
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
+ 
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+
+    if not wsc.check_user(uid, 'cfgwebsearch'):
+        return page(title="Edit Collection",
+                body=wsc.perform_rearrangefield(colID=colID,
+                                                  ln=ln,
+                                                  fmeth=fmeth,
+                                                  callback=callback,
+                                                  confirm=confirm),
+                uid=uid,
+                language=ln,
+                urlargs=req.args,
+                navtrail = navtrail_previous_links,
+                lastupdated=__lastupdated__)   
+    else:
+        return page(title='Authorization failure',
+                uid=uid,
+                body=wsc.adderrorbox('try to login first',
+                                     datalist=["""You are not a user authorized to perform admin tasks, try to
+                                     <a href="%s/youraccount.py/login?referer=%s/admin/websearch/">login</a> with another account.""" % (weburl, weburl)]),
+                navtrail= navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def addexistingfieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
  
     try:
@@ -635,7 +664,35 @@ def addexistingfieldvalue(req, colID, fldID, fldvID=-1, ln=cdslang, callback='ye
                 body=wsc.perform_addexistingfieldvalue(colID=colID,
                                                   ln=ln,
                                                   fldID=fldID,
-                                                  fldvID=fldvID,
+                                                  callback=callback,
+                                                  confirm=confirm),
+                uid=uid,
+                language=ln,
+                urlargs=req.args,
+                navtrail = navtrail_previous_links,
+                lastupdated=__lastupdated__)   
+    else:
+        return page(title='Authorization failure',
+                uid=uid,
+                body=wsc.adderrorbox('try to login first',
+                                     datalist=["""You are not a user authorized to perform admin tasks, try to
+                                     <a href="%s/youraccount.py/login?referer=%s/admin/websearch/">login</a> with another account.""" % (weburl, weburl)]),
+                navtrail= navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def rearrangefieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm=-1):
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
+ 
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+
+    if not wsc.check_user(uid, 'cfgwebsearch'):
+        return page(title="Edit Collection",
+                body=wsc.perform_rearrangefieldvalue(colID=colID,
+                                                  ln=ln,
+                                                  fldID=fldID,
                                                   callback=callback,
                                                   confirm=confirm),
                 uid=uid,
