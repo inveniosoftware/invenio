@@ -1,0 +1,65 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="BibSched Admin Guide" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/bibsched/>BibSched Admin</a>" \
+    navbar_name="admin" \
+    navbar_select="bibsched-admin-guide"
+
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     WARNING: THIS ADMIN GUIDE IS NOT FULLY COMPLETED
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     This Admin Guide is not yet completed.  If you are interested
+     in seeing some specific things implemented with high priority,
+     please contact us at <SUPPORTEMAIL>.  Thanks for your interest!     
+   </td>
+   </tr>
+   </tbody>
+   </table>
+
+BibSched -- the bibliographic task scheduler -- is central unit of the
+system that allows all other modules to access the bibliographic
+database in a controlled manner, preventing sharing violation threats
+and assuring the coherent execution of the database update tasks.  The
+module comes with an administrative interface that allows to monitor
+the task queue including various possibilities of a manual
+intervention, for example to re-schedule queued tasks, change the task
+order, etc.
+
+You can run the administrative interface by doing:
+
+<blockquote>
+<pre>
+$ bibsched
+</pre>
+</blockquote>
+
+The <code>bibsched</code> can run in two modes: auto and manual.  In
+the auto mode, it will execute tasks automatically as they arrive in
+the waiting queue.  In the manual mode, the administrator has to
+launch the tasks manually.  

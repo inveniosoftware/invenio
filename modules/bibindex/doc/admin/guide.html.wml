@@ -1,0 +1,71 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="BibIndex Admin Guide" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/bibindex/>BibIndex Admin</a>" \
+    navbar_name="admin" \
+    navbar_select="bibindex-admin-guide"
+
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     WARNING: BIBINDEX ADMIN GUIDE IS UNDER DEVELOPMENT
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+
+     BibIndex Admin Guide is not yet completed.  Most of admin-level
+     functionality for BibIndex exists only in commandline mode.  We
+     are in the process of developing both the guide as well as the
+     web admin interface.  If you are interested in seeing some
+     specific things implemented with high priority, please contact us
+     at <SUPPORTEMAIL>.  Thanks for your interest!
+     
+   </td>
+   </tr>
+   </tbody>
+   </table>
+
+<h2>Contents</h2>
+<strong>1.<a href="#1">Overview</a></strong></br>
+<strong>2. <a href="#2">Configure Metadata Tags and Fields</a></strong></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.1 <a href="#2.1">Configure Physical MARC Tags</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.2 <a href="#2.2">Configure Logical Fields</a></br>
+<strong>3. <a href="#3">Configure Word/Phrase Indexes</a></strong></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1 <a href="#3.1">Define New Index</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2 <a href="#3.2">Configure Word-Breaking Procedure</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3 <a href="#3.3">Configure Stopwords List</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4 <a href="#3.4">Configure Accent Stripping</a></br>
+<strong>4. <a href="#4">Run BibIndex Daemon</a></strong></br>
+
+<a name="1"></a><h2>1. Overview</h2>
+<a name="2"></a><h2>2. Configure Metadata Tags and Fields</h2>
+<a name="2.1"></a><h3>2.1 Configure Physical MARC Tags</h3>
+<a name="2.2"></a><h3>2.2 Configure Logical Fields</h3>
+<a name="3"></a><h2>3. Configure Word/Phrase Indexes</h2>
+<a name="3.1"></a><h3>3.1 Define New Index</h3>
+<a name="3.2"></a><h3>3.2 Configure Word-Breaking Procedure</h3>
+<a name="3.3"></a><h3>3.3 Configure Stopwords List</h3>
+<a name="3.4"></a><h3>3.4 Configure Accent Stripping</h3>
+<a name="4"></a><h2>4. Run BibIndex Daemon</h2>
