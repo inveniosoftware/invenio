@@ -1,5 +1,8 @@
 ## $Id$
-## CDSware utility to run SQL queries.
+
+## CDSware utility to run SQL queries.  The core is taken from
+## modpython FAQ and modified to suit our needs.  The insert_id() is
+## inspired by Erik Forsberg's mod_python slides.
 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002 CERN.
@@ -28,7 +31,7 @@ from config import *
 __version__ = "$Id$"
 
 def _db_login(relogin = 0):
-    """Login to the database"""
+    """Login to the database."""
     global DB_CONN
     if relogin:
         DB_CONN = MySQLdb.connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
@@ -42,17 +45,16 @@ def _db_login(relogin = 0):
             return DB_CONN
 
 def run_sql(sql, param=None, n=0, with_desc=0):
-    """ Runs SQL on the server and returns result"""    
+    """Run SQL on the server and returns result."""    
     db = _db_login()    
     if param:
         param = tuple(param)
     try:
         cur = db.cursor()
         rc = cur.execute(sql, param)   
-    except:
-        # it's possible that mysql connection
-        # timed out. Try one more time.
-        db = _db_login(relogin = 1)
+    except MySQLdb.OperationalError, e: # unexpected disconnect, bad malloc error, etc
+        # FIXME: now reconnect is always forced, we may perhaps want to ping() first?
+        db = _db_login(relogin = 1) 
         cur = db.cursor()        
         rc = cur.execute(sql, param)                 
     if string.upper(string.split(sql)[0]) in ("SELECT", "SHOW", "DESC", "DESCRIBE"):
@@ -68,3 +70,8 @@ def run_sql(sql, param=None, n=0, with_desc=0):
         if string.upper(string.split(sql)[0]) == "INSERT":
             rc =  cur.insert_id()
         return rc
+
+def insert_id():
+    """Get insert ID of the last insert."""
+    db = _db_login()    
+    return db._db.insert_id()
