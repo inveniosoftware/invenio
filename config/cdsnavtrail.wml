@@ -44,7 +44,7 @@ $(header)
 :>
 $(prolog)
 <:
-          print " <a href=\"" . $title . "\">$out</a>";
+          print " <a class=\"navtrail\" href=\"" . $title . "\">$out</a>";
 :>
 $(epilog)
 <:
