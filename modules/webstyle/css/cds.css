@@ -442,7 +442,7 @@ a.navtrail:hover {
    color: #000;
    background: #fff;
    margin-bottom: 15px;
-   border-spacing: 10px;
+   border-spacing: 0px;
    border-collapse: collapse;
    border-top: 1px solid #aabbbb;
    font-size: x-small;
