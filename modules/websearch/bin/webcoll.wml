@@ -31,7 +31,6 @@
 
 ## fill config variables:
 pylibdir = "<LIBDIR>/python"
-wmlexec = "<WML> -I<LIBDIR>/wml/cdsware"
 
 cfg_update_recinfo = 0 ## TODO: make this a command-line option
 
@@ -123,39 +122,6 @@ def Log(msg, type=""):
     out.write("\n")
     out.flush()
 
-def create_html_header(name='Search', navtrail='', cdspageboxlefttopadd='', cdspageboxleftbottomadd='',
-                       cdspageboxrighttopadd='', cdspageboxrightbottomadd=''):
-    "Returns standard HTML header."
-    # NOTE: in order to let 'create_collection_pages' write the
-    # protect tag in 'index.wml' you need to do it in a funny way,
-    # because otherwise WML would interpret the protect tag already
-    # when compiling this program (create_collection_pages.wml)!  This
-    # is because the source file itself it is also handled by WML. :-)
-    out = """#include "cdspage.wml" \\\
-        title="%s" \\\
-        navbar_name="main" \\\
-        navbar_select="searchbiblinfo" """ % name
-    if navtrail:
-        out += """\\\
-        navtrail_body="<%s>%s</%s>" """ % ('protect', navtrail, 'protect')
-    else:
-        out += """\\\
-        navtrail_body="" """
-    if cdspageboxlefttopadd:
-        out += """\\\
-        cdspageboxlefttopadd="<%s>%s</%s>" """ % ('protect', cdspageboxlefttopadd, 'protect')
-    if cdspageboxleftbottomadd:
-        out += """\\\
-        cdspageboxleftbottomadd="<%s>%s</%s>" """ % ('protect', cdspageboxleftbottomadd, 'protect')
-    if cdspageboxrighttopadd:
-        out += """\\\
-        cdspageboxrighttopadd="<%s>%s</%s>" """ % ('protect', cdspageboxrighttopadd, 'protect')
-    if cdspageboxrightbottomadd:
-        out += """\\\
-        cdspageboxrightbottomadd="<%s>%s</%s>" """ % ('protect', cdspageboxrightbottomadd, 'protect')
-    out += "\n\n"
-    return out
-
 def create_andornot_box(name='op', value=''):
     "Returns HTML code for the AND/OR/NOT selection box."
     out = """
@@ -218,7 +184,8 @@ def print_record(recID, format='hb'):
             out += " / "
             for i in range (0,cfg_author_et_al_threshold):
                 if i < len(authors):
-                    out += """<a href="%s/search.py?p=%s&f=author">%s</a> ;""" % (weburl, urllib.quote(authors[i]), cgi.escape(authors[i]))
+                    out += """<a href="%s/search.py?p=%s&f=author">%s</a> ;""" \
+                           % (weburl, urllib.quote(authors[i]), cgi.escape(authors[i]))
             if len(authors) > cfg_author_et_al_threshold:
                 out += " <em>et al.</em>"
         # thirdly, date of creation:
@@ -367,7 +334,7 @@ class Collection:
         Log("%s" % self.name)
         ## first, update navtrail:
         for as in range(0,2):
-            self.write_cache_file("navtrail-as=%s" % as, self.create_navtrail(as, "","", "", "", ""))
+            self.write_cache_file("navtrail-as=%s" % as, self.create_navtrail_links(as))
         ## second, update page body:
         for as in range(0,2): # do both simple search and advanced search pages:
             body = ""
@@ -392,38 +359,20 @@ class Collection:
         ## fourth, write 'last updated' information:
         self.write_cache_file("last-updated", time.strftime("%02d %b %04Y %02H:%02M:%02S %Z", time.localtime()))
 
-    def create_navtrail(self, \
-                        as=0,
-                        header="""<table class="navtrailbox" border=0 cellspacing=0 cellpadding=0><tr><td width="15">&nbsp;</td><td class="navtrailboxbody">""", \
-                        prolog="", \
-                        separator="&gt;", \
-                        epilog="", \
-                        footer="</td></tr></table>",
-                        exclude_root=1,
-                        exclude_self=1):
-        """Creates navigation trail, i.e. links to collection ancestors.
+    def create_navtrail_links(self, \
+                              as=0,
+                              separator=" &gt; "):
+        """Creates navigation trail links, i.e. links to collection ancestors (except Home collection).
         If as==1, then links to Advanced Search interfaces; otherwise Simple Search.        
         """
-        # firstly, display navtrail prologue:
-        navtrail = header        
-        # first, list list of ancestors:
+        out = ""
         for dad in self.get_ancestors():
-            if dad.name != cdsname:
-                navtrail += """%s <a class="navtrail" href="%s/?c=%s&amp;as=%d">%s</a> %s %s """ % \
-                            (prolog, weburl, urllib.quote_plus(dad.name), as, dad.name, epilog, separator)
-            else: # hide cdsname for aesthetical reasons
-                if not exclude_root:
-                    navtrail += """%s <a class="navtrail" href="%s/?as=%d">%s</a> %s %s """ % \
-                                (prolog, weburl, as, "Home", epilog, separator)
-        # then print self:
-        if not exclude_self and (self.id > 1 or (self.id==1 and not exclude_root)):
-            navtrail += """%s %s %s""" % (prolog, self.name, epilog)
-        # last, print navtrail epilogue:
-        navtrail += footer
-        # sanity check:
-        if navtrail == header + prolog + epilog + footer:
-            return ""
-        return navtrail
+            if dad.name != cdsname: # exclude Home collection
+                if out:
+                    out += separator
+                out += """<a class="navtrail" href="%s/?c=%s&amp;as=%d">%s</a>""" % \
+                            (weburl, urllib.quote_plus(dad.name), as, dad.name)
+        return out
 
     def create_nbrecs_info(self, prolog="""&nbsp;<small class="nbdoccoll">(""", epilog=""")</small>"""):
         "Return information on the number of records."
