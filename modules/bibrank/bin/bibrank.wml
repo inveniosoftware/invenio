@@ -31,32 +31,40 @@
 BibRank ranking daemon.
 
 Usage: %s [options]
-     Examples:
-       %s --id=0-30000,30001-860000 --run=jif --verbose=9
-       %s --modified='2002-10-27 13:57:26' --run=jif
-       %s --rebalance --collection=Articles --run=jif
-
+     Ranking examples:
+       %s -wjif -a --id=0-30000,30001-860000 --verbose=9
+       %s -wjif -d --modified='2002-10-27 13:57:26'
+       %s -wjif --rebalance --collection=Articles
+       %s -wsbr -a -i 234-250,293,300-500 -u admin@cdsware
+ 
  Ranking options:
- -c, --collection=c1,c2    Collections to include in this set
- -i, --id=idr1,idr2        Record ranges to include in this set
- -m, --modified=[from]     Update records modified after date
- -k, --check=value         Check if set needs rebalancing, (if the top
-                           star is higher than given percentage 0-1.0)
- -S, --stat                Show statistics
- -w, --run=rm1,rm2         Runs each rank method in the order given
- -r, --rebalance           Rebalance, do full update
+ -w, --run=r1[,r2]         runs each rank method in the order given
+
+ -c, --collection=c1[,c2]  select according to collection
+ -i, --id=low[-high]       select according to doc recID
+ -m, --modified=from[,to]  select according to modification date
+ -l, --lastupdate          select according to last update
+
+ -a, --add                 add or update words for selected records
+ -d, --del                 delete words for selected records
+ -S, --stat                show statistics for a method
+ 
+ -R, --rebalance           rebalancing rank data: does complete update. if not used: quick update
+ Repairing options:
+ -k,  --check              check consistency for all records in the table(s)
+                           check if update of ranking data is necessary
+ -r, --repair              try to repair all records in the table(s)
  Scheduling options:
  -u, --user=USER           user name to store task, password needed
  -s, --sleeptime=SLEEP     time after which to repeat tasks (no)
                             e.g.: 1s, 30m, 24h, 7d
  -t, --time=TIME           moment for the task to be active (now)
                             e.g.: +15s, 5m, 3h , 2002-10-27 13:57:26
-
  General options:
  -h, --help                print this help and exit
  -V, --version             print version and exit
  -v, --verbose=LEVEL       verbose level (from 0 to 9, default 1)
-    """
+"""
 
 __version__ = "<: print generate_pretty_version_string('$Id$'); :>"
 
@@ -75,21 +83,15 @@ try:
     import sys
     import time
     import MySQLdb
-    import Numeric
     import urllib
     import signal
     import tempfile
-    import unicodedata
     import traceback
     import cStringIO
-    import urllib
     import re
     import copy
-    import sys
     import types
-    import gc
     import ConfigParser
-    import zlib
     
 except ImportError, e:
     print "Error: %s" % e
@@ -98,613 +100,20 @@ except ImportError, e:
 
 try:
     sys.path.append('%s' % pylibdir)
-    from cdsware.config import *
-    from cdsware.search_engine_config import cfg_max_recID
-    from cdsware.search_engine import perform_request_search, strip_accents
-    from cdsware.search_engine import HitSet, get_index_id, create_basic_search_units
     from cdsware.dbquery import run_sql
+    from cdsware.bibrank_tag_based_indexer import *
+    from cdsware.bibrank_word_indexer import *
     from cdsware.access_control_engine import acc_authorize_action 
-    from bisect import bisect
 except ImportError, e:
     print "Error: %s" % e
     import sys
     sys.exit(1)
-try:
-    import psyco
-    psyco.bind(sort())
-    psyco.bind(single_tag_rank())
-    psyco.bind(serialize_via_numeric_array)
-    psyco.bind(Authorimpact())
-    psyco.bind(Merge())
-    psyco.bind(Citationimpact())
-    psyco.bind(Accessimpact())
-except:
-    pass   
 
-opts_dict = {}
-task_id = -1
-number_of_stars = 5
-
-def citationimpact(methname, starsets, config):
-    """Calculates rankset based on number of citations each document has"""
-    startCreate = time.time()
-    starset = starsets[methname]
-    tempdoc = {}
-    if opts_dict["verbose"] >= 1:
-        write_message("Running: %s." % starset.getName())
-    citation_tag = config.get("citationimpact", "citation_tag")
-    curr_repnr_tag = config.get("citationimpact", "curr_tag")
-    old_repnr_tag = config.get("citationimpact", "old_tag")
-    
-    if not opts_dict["modified"]:
-        if opts_dict["verbose"] >= 9:
-            write_message("Rebalancing")
-        starset.setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-        citations = run_sql("SELECT id_bibrec,value FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id" %  (citation_tag[0:2], citation_tag[0:2], citation_tag))
-    else:
-        fromDB(starset)
-        if opts_dict["modified"] == "last_updated":
-            opts_dict["modified"] = starset.getLastUpdated()
-        if opts_dict["verbose"] >= 9:
-            write_message("Updating records modified after: %s" % opts_dict["modified"])  
-        starset.setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-        mod_data = run_sql("SELECT id FROM bibrec WHERE modification_date >=%s", (opts_dict["modified"]),)
-        for id in mod_data:
-            citation = run_sql("SELECT id_bibrec,value FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id and id_bibrec=%s" %  (citation_tag[0:2], citation_tag[0:2], citation_tag, id))
-            for id,value in citation:
-                citations.append((id,value))
-
-    for key,value in citations:
-        data = run_sql("SELECT id_bibrec FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id AND value='%s'" % (curr_repnr_tag[0:2], curr_repnr_tag[0:2], curr_repnr_tag, value))
-        data = run_sql("SELECT id_bibrec FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id AND value='%s'"  % (old_repnr_tag[0:2], old_repnr_tag[0:2], old_repnr_tag, value))
-        
-    if not opts_dict["modified"]:
-        starset.setUnsorted(tempdoc)
-        sort(starset)
-    else:
-        merge_two_sets(tempdoc, starset)
-    #intoDB(starset)
-    showtime((time.time() - startCreate))    
-    
-def single_tag_rank(starset, config):
-    """Connect the given tag with the data from the kb file given"""
-    if opts_dict["verbose"] >= 9:
-        write_message("Loading knowledgebase file")
-    kb_data = {}
-    records = []
-
-    input = open(config.get("single_tag_rank", "kb_src"), 'r')
-    data = input.readlines()
-        
-    for line in data:
-        if not line[0:2] == "#":
-            kb_data[string.strip((string.split(string.strip(line),"---"))[0])] = (string.split(string.strip(line), "---"))[1]
-
-    tag = config.get("single_tag_rank","tag")
-    tags = split(config.get("single_tag_rank", "check_mandatory_tags"),",")
-
-    if not opts_dict["modified"] or config.get("single_tag_rank", "enable_modified") == "no":
-        records = run_sql("SELECT id_bibrec,value FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id" % (tag[0:2], tag[0:2], tag))
-        valid = HitSet(Numeric.ones(cfg_max_recID + 1))
-        for key in tags:
-            newset = HitSet()
-            newset.addlist(run_sql("SELECT id_bibrec FROM bib%sx,bibrec_bib%sx WHERE id_bibxxx=id AND tag='%s'" % (tag[0:2], tag[0:2], key)))
-            valid.intersect(newset)
-        if tags:
-            records = filter(lambda x: valid.contains(x[0]), records)
-    else: 
-        mod_data = run_sql("SELECT id FROM bibrec WHERE modification_date >= %s",  (opts_dict["modified"],))
-        for id in mod_data:
-            found = "1"
-            for key in tags:
-                if not run_sql("SELECT id_bibrec FROM bib%sx,bibrec_bib%sx WHERE id_bibxxx=id AND tag='%s' AND id_bibrec='%s'" % (tag[0:2], tag[0:2], key, id[0])):
-                    found = ""
-                    break
-            if found:
-                record = run_sql("SELECT id_bibrec,value FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id AND id_bibrec='%s'" %  (tag[0:2], tag[0:2], tag, id[0]))
-                for id_bibrec, value in record:
-                    records.append((id_bibrec, value))
-
-    documents = {}
-    for key,value in records:
-        if kb_data.has_key(value):
-            if not documents.has_key(key):
-                documents[key] = (value, float(kb_data[value]))
-            else:
-                if journals.has_key(documents[key]) and float(kb_data[value]) > float((documents[key])[1]):
-                    documents[key] = (value, float(kb_data[value]))
-        else:
-            documents[key] = (value, - 1.0)
-    return documents
-
-def accessimpact(methname, starsets, config):
-    """Generating rankset based on number of downloads per document"""
-    startCreate = time.time()
-    starset = starsets[methname]
-    opts_dict["dbhost"] = config.get("accessimpact", "dbhost")
-    opts_dict["dbname"] = config.get("accessimpact", "dbname")
-    opts_dict["dbuser"] = config.get("accessimpact", "dbuser")
-    opts_dict["dbpass"] = config.get("accessimpact", "dbpass")
-    if opts_dict["verbose"] >= 1:
-        write_message("Running: %s." % starset.getName())
-    starset.setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-
-    sysno_tag = config.get("accessimpact", "sysnr_tag")
-    curr_repnr_tag = config.get("accessimpact", "curr_tag")
-    old_repnr_tag = config.get("accessimpact", "old_tag")
-    if not opts_dict["modified"]:
-        if opts_dict["verbose"] >= 9:
-            write_message("Rebalancing")
-        imprec = run_sql2("SELECT imprecno,base,bsysno,bref FROM imprec")
-        impacc = dict(run_sql2("SELECT imprecno,SUM(nbaccess) FROM impacc group BY imprecno"))
-        cdssysno = run_sql("SELECT value,id_bibrec FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id" % (sysno_tag[0:2], sysno_tag[0:2], sysno_tag))
-    else:
-        fromDB(starset)
-        impacc = {}
-        if opts_dict["modified"] == "last_updated":
-            opts_dict["modified"] = starset.getLastUpdated()
-        if opts_dict["verbose"] >= 9:
-            write_message("Updating records modified after: %s" % opts_dict["modified"])  
-        pre_impacc = dict(run_sql2("SELECT distinct imprecno,'' FROM impacc WHERE sdate >=%s", (opts_dict["modified"],)))
-        imprec = []
-        cdssysno = []
-        for key in pre_impacc.keys():
-            test_impacc = run_sql2("SELECT imprecno,SUM(nbaccess) FROM impacc WHERE imprecno=%s GROUP BY imprecno", (key,))
-            impacc[test_impacc[0][0]] = test_impacc[0][1]
-            data = run_sql2("SELECT imprecno,base,bsysno,bref FROM imprec WHERE imprecno=%s", (key,))
-            if data:
-                data2 = run_sql2("SELECT imprecno FROM imprec WHERE bsysn=%s", (data[0][2],))
-                for key2 in data2:
-                    imprec.append((key2, data[0][1], data[0][2], data[0][3]))
-                sysno = '0' * (9 - len(str(data[0][2]))) + str(data[0][2]) + data[0][1][0:3]
-                data = run_sql("SELECT value,id_bibrec FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id AND value=%s" % sysno_tag[0:2], sysno_tag[0:2], sysno_tag, sysno)
-                for key2,value in data:
-                    cdssysno.append((key2, value))
-    tempdict = {}
-    for value,key in cdssysno:
-        if not tempdict.has_key(value):
-            tempdict[value] = [key]
-        else:
-            tempdict[value] = tempdict[value] + [key]
-    tempdoc = {}
-    count = 0
-    notcount = 0
-
-    for key, base, bsysno, value in imprec:
-        if impacc.has_key(key):
-            sysno = '0' * (9 - len(str(bsysno))) + str(bsysno) + base[0:3]
-            data = ()
-            if tempdict.has_key(sysno):
-                data = tempdict[sysno]
-            else:
-                data = run_sql("SELECT id_bibrec FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id AND value=%s" % (curr_repnr_tag[0:2], curr_repnr_tag[0:2], curr_repnr_tag, value))
-                if len(data) == 0:
-                     data = run_sql("SELECT id_bibrec FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id AND value=%s" % (old_repnr_tag[0:2], old_repnr_tag[0:2], old_repnr_tag, value))
-            if len(data) != 0:
-                count = count + int(impacc[key])
-                for key2 in range(0, len(data)):
-                    if type(data[key2]) is tuple:
-                        key3 = data[key2][0]
-                    else:
-                        key3 = data[key2]
-
-                    if tempdoc.has_key(key3):
-                        tempdoc[key3] = ("", tempdoc[key3][1] + float(impacc[key]))
-                    else:
-                        tempdoc[key3] = ("", float(impacc[key]))
-            else:
-                notcount = notcount + int(impacc[key])
-
-    if opts_dict["verbose"] >= 9:
-        try:
-            write_message("Percentage match: %s%%,(%s/%s)" % (round((float(count) / float(count+notcount)) * 100, 3), notcount, count))
-        except:
-            print count, notcount
-            
-    if not opts_dict["modified"]:
-        starset.setUnsorted(tempdoc)
-        sort(starset)
-    else:
-        merge_two_sets(tempdoc,starset)
-    intoDB(starset)
-    showtime((time.time() - startCreate))
-
-def single_tag_rank_method(methname, starsets, config):
-    """Creating rankset"""
-    startCreate = time.time()
-    starset = starsets[methname]
-    if opts_dict["verbose"] >= 1:
-        write_message("Running: %s." % starset.getName())
-    if opts_dict["modified"]:
-        fromDB(starset)
-        if opts_dict["modified"] == "last_updated":
-            opts_dict["modified"] = starset.getLastUpdated()
-        if opts_dict["verbose"] >= 9:
-            write_message("Updating records modified after: %s" % opts_dict["modified"])    
-        starset.setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-        tempdoc = single_tag_rank(starset, config)
-        merge_two_sets(tempdoc, starset)
-    else:
-        starset.setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-        tempdoc = single_tag_rank(starset, config)
-        starset.setUnsorted(tempdoc)
-        sort(starset)
-    intoDB(starset)
-    showtime((time.time() - startCreate))
-
-def merge_two_sets(tempdoc, starset):
-    """Merging two sets into one based on given threshold"""
-    if opts_dict["verbose"] >= 9:
-        write_message("Merging old and new rankset")
-    stars = starset.getStars()
-    threshold = starset.getThreshold()
-    for key in tempdoc.keys():
-        i = starset.getSize()
-        while tempdoc[key][1] < threshold[i]:
-            i = i - 1
-        for key2 in stars:
-            if stars[key2].contains(key):
-                if key2 != i:
-                    stars[key2].remove(key)
-                    stars[i].add(key)
-                break
-            elif key2 == starset.getSize():
-                stars[i].add(key)
-    for key in stars:
-        stars[key].calculate_nbhits()
-
-def authorimpact(methname, starsets, config):
-    """Calculating the rankvalue a document has based on its authors"""
-    startCreate = time.time()
-    starset = starsets[methname]
-    if opts_dict["verbose"] >= 1:
-        write_message("Running: %s" % starset.getName())
-    tempdoc = single_tag_rank(starset, config)
- 
-    Auth1 = {}
-    documents2 = {}
-    authors = {}
-    upd_authors = []
-    sql_src = []
-
-    p_author_tag = config.get("authorimpact", "primary_tag")
-    s_author_tag = config.get("authorimpact", "secondary_tag")
-
-    sql_src.append("SELECT id_bibrec,value FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id" % (p_author_tag[0:2], p_author_tag[0:2], p_author_tag))
-    sql_src.append("SELECT id_bibrec,value FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id" % (s_author_tag[0:2], s_author_tag[0:2], s_author_tag))
-        
-    if not opts_dict["modified"]:
-        increment = 50000
-        if opts_dict["verbose"] >= 9:
-            write_message("Rebalancing")
-        starset.setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-        for key in sql_src:
-            ij = -increment
-            while ij <= (cfg_max_recID):
-                ij = ij + increment
-                data = run_sql(key + " AND id_bibrec>%i AND id_bibrec<=%i" % (ij, (ij + increment)))
-                authorimpact_modified(data, Auth1)
-    else:
-        fromDB(starset)
-        mod_data = run_sql("select id from bibrec where modification_date >= %s", (opts_dict["modified"],))
-        
-        if opts_dict["modified"] == "last_updated":
-            opts_dict["modified"] = starset.getLastUpdated()
-        if opts_dict["verbose"] >= 9:
-            write_message("Updating records modified after: %s" % opts_dict["modified"])
-        starset.setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-
-        for key in sql_src:
-            for id in mod_data:
-                data = run_sql(key + " AND id_bibrec=%s" % id[0])
-                authorimpact_modified(data, Auth1)
-                for key2,value in data:
-                    upd_authors.append((key2,value))
-            
-        for key in Auth1.keys():
-            for key2 in sql_src:
-                data = run_sql(key2 + " AND value=%s", (key,))
-                authorimpact_modified(data, Auth1)
-                del data
-
-    Auth = []
-    for key in Auth1.keys():
-        for key1 in range(0, len(Auth1[key])):
-            Auth.append((Auth1[key][key1], key))
-    del Auth1
-    factor = 0.0
-    for key, value in Auth:
-        if tempdoc.has_key(key) and tempdoc[key][1] > 0.0:
-            factor = tempdoc[key][1]
-        else:
-            factor = 0.0
-
-        if not authors.has_key(value):
-            authors[value] = (factor, 1)
-        else:
-            authors[value] = (authors[value][0] + factor, authors[value][1] + 1)
-
-    if opts_dict["modified"]:
-        Auth = upd_authors
-        tempdoc = {}
-        
-    for key,value in Auth:
-        if documents2.has_key(key) and authors[value][0] > 0.0:
-            documents2[key] = (documents2[key][0] + authors[value][0], documents2[key][1] + authors[value][1])
-        elif authors[value][0] > 0.0:
-            documents2[key] = authors[value]
-    del Auth
-    for key in documents2.keys():
-        tempdoc[key] = ("", float(documents2[key][0]) / float(documents2[key][1]))
-
-    if opts_dict["verbose"] >= 9:
-        write_message("Number of distinct authors: %s" % len(authors))
-
-    if not opts_dict["modified"]:
-        for key in tempdoc.keys():
-            if len(tempdoc[key][0]) != 0:
-                tempdoc[key] = ("", -1.0)
-        starset.setUnsorted(tempdoc)
-        sort(starset)
-    else:
-        merge_two_sets(tempdoc,starset)
-
-    intoDB(starset)
-    showtime((time.time() - startCreate))
-
-def authorimpact_modified(data, Auth):
-    """Adding data to the dictionary"""
-    for key,value in data:
-        if not Auth.has_key(value):
-            Auth[value] = []
-            Auth[value].append(key)
-        else:
-            found=0
-            for key2 in range(0, len(Auth[value])):
-                if Auth[value][key2] == key:
-                    found = 1
-                    break
-            if not found == 1:
-                Auth[value].append(key)
-
-def merge(methname, starsets, config):
-    """Merge several methods into one starset"""
-    startCreate = time.time()
-    if opts_dict["verbose"] >= 1:
-        write_message("Running: %s" % starsets[methname].getName())
-    starsets[methname].setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-    threshold = {}
-    finalset = {}
-    permut = ''
-    for nr in range(0, starsets[methname].getSize() + 1):
-        finalset[nr] = HitSet()
-        permut = permut + "%s" % nr
-    starsets[methname].setWeigth(1.0)
-    sum = 0.0
-    nr = 0
-    convert = {}
-    size=-1
-    for key in starsets:
-        if key != methname:
-            sum = sum + starsets[key].getWeigth()
-            convert[nr] = key
-            nr=nr + 1
-            if size > -1 and size != len(starsets[key].getStars()) -1:
-                write_message("The sets have different sizes, process cancelled")
-                sys.exit()
-            else:
-                size = len(starsets[key].getStars()) -1
-    sum = 1.0 / sum
-    for key in starsets:
-        if key != methname:
-            starsets[key].setWeigth(starsets[key].getWeigth() * sum)
-
-    p = Permutation(permut, len(starsets)-1)
-    for perm in p:
-        tempset = copy.copy(starsets[convert[0]].getStar(int(perm[0])))
-        place = float(perm[0]) * float(starsets[convert[0]].getWeigth())
-        for i in range(1, len(perm)):
-            tempset.intersect(starsets[convert[i]].getStar(int(perm[i])))
-            tempset.calculate_nbhits()
-            place = place+float(perm[i]) * float(starsets[convert[i]].getWeigth())
-        finalset[int(round(place))].union(tempset)
-
-    for i in range(0, starsets[methname].getSize() + 1):
-        finalset[i].calculate_nbhits()
-        threshold[i] = 0
-
-    starsets[methname].setStars(finalset)
-    starsets[methname].setThreshold(threshold)
-    intoDB(starsets[methname])
-    showtime((time.time() - startCreate))
-
-def showtime(timeused):
-    """Show time used for method"""
-    if opts_dict["verbose"] >= 9:
-        write_message("Time used: %d second(s)." % timeused)
-
-def stats(starset):
-    """Print statistics"""
-    try:
-        total = 0
-        write_message("Statistics: %s , Top Star size: %s%% , Overall Importance: %s%%" % (starset.getName(), round(float(starset.getTopStar()) * 100,2), round(float(starset.getWeigth())*100, 2)))
-        for nr in range(0, starset.getSize() + 1):
-            write_message("%s star(s): Range >= \t%s\t%s" % (nr, round(starset.getThreshold()[nr],3), (starset.getStar(nr))._nbhits))
-            total = total + (starset.getStar(nr))._nbhits
-        write_message("Total: %s" % total)
-    except StandardError, e:
-        write_message("Error showing statistics: %s" % starset.getName(), sys.stderr())
-        raise StandardError
-
-def check(starset):
-    """Check if rebalancing is necessary"""
-    try:
-        size = cfg_max_recID + 1 - starset.getStar(0)._nbhits
-        if opts_dict["verbose"] >= 9:
-            for nr in range(1, starset.getSize() + 1):
-                write_message("%s---%f" % (nr, float(starset.getStar(nr)._nbhits) / float(size)))
-        if (float(starset.getStar(starset.getSize())._nbhits) / float(size)) >= float(opts_dict["check"]):
-            write_message("Rebalance: %s" % starset.getName())
-    except StandardError, e:
-        write_message("Error checking: %s" % starset.getName(), sys.stderr)
-        raise StandardError
-    
-def sort(starset):
-    """Sort starset into stars"""
-    tempdoc = starset.getUnsorted()
-    
-    if opts_dict["validset"]:
-        """Removing records from set according to collection/id range given"""
-        for key in tempdoc.keys():
-            if not opts_dict["validset"].contains(key):
-                del tempdoc[key]
-
-    if starset.getSize() > 0:
-        if opts_dict["verbose"] >= 9:
-            write_message("Sorting %s into sets." % starset.getName())
-        sets = {}
-        threshold = {}
-        
-        for nr in range(0, starset.getSize() + 1):
-            sets[nr] = HitSet()
-            threshold[nr] = 0
-
-        for key in tempdoc.keys():
-            """Deletes keys with negative value"""
-            if tempdoc[key][1] <= 0:
-                sets[1].add(key)
-                del tempdoc[key]
-
-        set = map(lambda x: (x[0], x[1][1]), tempdoc.items())
-        set.sort(compare_on_val)
-        if starset.getTopStar() < 1.0 and starset.getTopStar() > 0.0:
-            try:
-                slicevalue = (set[int(round((len(tempdoc) * starset.getTopStar()))) + 1: int(round((len(tempdoc) * starset.getTopStar()))) + 2])[0][1]
-            except StandardError, e:
-                slicevalue = 0.0
-        elif starset.getTopStar() >= 1.0:
-            slicevalue = 0.0
-        else:
-            slicevalue = 999999
-            
-        threshold[starset.getSize()] = slicevalue
-        slice = filter(lambda x: x[1] >= slicevalue, set)
-
-        if len(slice) > 0:
-            ubound = float((tempdoc[slice[len(slice) - 1][0]])[1])
-            sets[starset.getSize()].addlist(map(lambda x: x[0], slice))
-            set = set[int(round((len(slice)))): len(tempdoc)]
-            if len(set) > 0:
-                i = starset.getSize()
-                lbound = float((tempdoc[(set[len(set) - 1])[0]])[1])
-                while i > 2:
-                    i=i-1
-                    mbound = float(lbound + ((ubound - lbound) / (starset.getSize() - 2)) * (i - 2))
-                    threshold[i] = mbound
-                    slice = filter(lambda x: x[1]>=mbound,set)
-                    sets[i].addlist(map(lambda x: x[0], slice))
-                    set = set[len(slice): len(set)]                                                             
-
-        if len(set) != 0:
-            sets[1].addlist(set)
-        threshold[1] = -1.0
-        threshold[0] = -9.9
-        sets[0] = HitSet(Numeric.ones(cfg_max_recID + 1))
-        for i in range(1, starset.getSize() + 1):
-            sets[i].calculate_nbhits()
-            sets[0].difference(sets[i])
-        sets[0].calculate_nbhits()
-        starset.setThreshold(threshold)
-        starset.setStars(sets)
-    else:
-        if opts_dict["verbose"] >= 9:
-            write_message("Nothing to sort.")
-
-def compare_on_val(first, second):
-    return cmp(second[1], first[1])
-
-class StarSet:
-    """A starset, one for each rank method"""
-    sets = {}
-    unsorted = []
-    weigth = 0.0
-    top_star = 0.0
-    name = ""
-    short_name = ""
-    run_function = ""
-    threshold = {}
-    size = 0
-    last_updated = ""
-
-    def __init__(self, name, s_name, r_func,  weigth, sz, top_star):
-        self.name = name
-        self.weigth = weigth
-        self.top_star = top_star
-        self.unsorted = {}
-        self.short_name = s_name
-        self.run_function = r_func
-        self.size = sz
-        for i in range(0, self.size + 1):
-            self.sets[i] = HitSet()
-            self.threshold[i] = 0.0
-    def getStar(self, value):
-            return self.sets[value]
-    def setStars(self, value):
-        self.sets = value
-    def getStars(self):
-        return self.sets
-    def getWeigth(self):
-        return self.weigth
-    def setWeigth(self,value):
-        self.weigth = value
-    def getSize(self):
-        return self.size
-    def setThreshold(self, value):
-        self.threshold = value
-    def getThreshold(self):
-        return self.threshold
-    def getShortName(self):
-        return self.short_name
-    def getRunFunction(self):
-        return self.run_function
-    def getName(self):
-        return self.name
-    def setTopStar(self, value):
-        self.top_star = value
-    def getTopStar(self):
-        return self.top_star
-    def getLastUpdated(self):
-        return self.last_updated
-    def setLastUpdated(self, date):
-        self.last_updated = date
-    def setUnsorted(self, value):
-        if len(self.unsorted) == 0:
-            self.unsorted = value
-        else:
-            for key in value.keys():
-                self.unsorted[key] = value[key]
-    def getUnsorted(self):
-        return self.unsorted
-
-class Permutation:
-    """Creates permutations"""
-    def __init__(self, values, length):
-            self.values = values
-            self.length = length
-            return
-    def __len__(self):
-        return len(self.values) ** self.length
-    def __getitem__(self, n):
-        """permutation number n"""
-        if n >= len(self): raise IndexError
-        res = []
-        lv = len(self.values)
-        vals = self.values
-
-        for ndx in range(self.length):
-            res.append( vals[ n % lv ])
-            n = n / lv
-        return res
+task_id = -1 # the task id
+nb_char_in_line = 50  # for verbose pretty printing
+chunksize = 1000 # default size of chunks that the records will be treated by
+base_process_size = 4500 # process base size
+options = {} # will hold task options
 
 def serialize_via_numeric_array_dumps(arr):
     return Numeric.dumps(arr)
@@ -724,108 +133,6 @@ def serialize_via_marshal(obj):
 def deserialize_via_marshal(string):
     """Decompress and deserialize string into a Python object via marshal."""
     return loads(decompress(string))
-
-def _db_login(relogin = 0):
-    """Login to the database"""
-    global DB_CONN
-    if relogin:
-        DB_CONN = MySQLdb.connect(host=opts_dict["dbhost"], db=opts_dict["dbname"], user=opts_dict["dbuser"], passwd=opts_dict["dbpass"])
-        return DB_CONN
-    else:
-        try:
-            d = DB_CONN
-            return d
-        except NameError:
-            DB_CONN = MySQLdb.connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
-            return DB_CONN
-
-def run_sql2(sql, param=None, n=0, with_desc=0):
-    """ Runs SQL on the server and returns result"""
-    db = _db_login()
-    if param:
-        param = tuple(param)
-    try:
-        cur = db.cursor()
-        rc = cur.execute(sql, param)
-    except:
-        db = _db_login(relogin = 1)
-        cur = db.cursor()
-        rc = cur.execute(sql, param)
-    if string.upper(string.split(sql)[0]) in ("SELECT", "SHOW", "DESC", "DESCRIBE"):
-        if n:
-            recset = cur.fetchmany(n)
-        else:
-            recset = cur.fetchall()
-        if with_desc:
-            return recset, cur.description
-        else:
-            return recset
-    else:
-        if string.upper(string.split(sql)[0]) == "INSERT":
-            rc = cur.insert_id()
-        return rc
-
-def intoDB(starset):
-    """Write set to database""" 
-    try:
-        id = run_sql("SELECT id from rnkMETHOD where name='%s'" % (starset.getShortName()))
-        if len(id) == 0:
-            write_message("Could not find method in database")
-            raise StandardError
-        if opts_dict["verbose"] >= 9:
-            write_message("DELETE FROM rnkSET WHERE id_rnkMETHOD=%s" % id[0][0])
-            write_message("UPDATE rnkMETHOD SET star_category_ranges WHERE id=%s" % id[0][0])
-        sets = starset.getStars()
-        data = run_sql("DELETE FROM rnkSET WHERE id_rnkMETHOD=%s" % id[0][0])
-        data = run_sql("UPDATE rnkMETHOD SET star_category_ranges='%s' WHERE id=%s" % (serialize_via_numeric_array(starset.getThreshold()), id[0][0]))
-        for key2 in sets:
-            data = run_sql("INSERT INTO rnkSET(id_rnkMETHOD,star_category,hitset) VALUES(%d,%d,'%s')" % (id[0][0], key2, serialize_via_numeric_array(sets[key2])))
-            if opts_dict["verbose"] >= 9:
-                write_message("INSERT INTO rnkSET(id_rnkMETHOD,star_category) VALUES(%s,%s)" % (id[0][0], key2))
-            data = run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE id=%s",(starset.getLastUpdated(),id[0][0]))
-    except StandardError, e:
-        write_message("Could not insert rankdata into database, please check that this rank method has been added to the database.", sys.stderr)
-        task_update_status("ERROR")
-        task_sig_stop_commands()
-        sys.exit(1)
-
-def fromDB(starset):
-    """Read from database old starset if it exists"""
-    try:
-        query = "SELECT star_category_ranges,last_updated FROM rnkMETHOD WHERE name='%s'" % (starset.getShortName())
-        if opts_dict["verbose"] >= 9:
-            write_message(query)
-        res = run_sql(query)
-        threshold = deserialize_via_numeric_array(res[0][0])
-        date = res[0][1]
-        query = "SELECT star_category,hitset FROM rnkMETHOD,rnkSET WHERE id=id_rnkMETHOD AND name='%s'" % (starset.getShortName())
-        if opts_dict["verbose"] >= 9:
-            write_message(query)
-        res = run_sql(query)
-        testset = {}
-        if len(res) != starset.getSize() + 1:
-            write_message("Rebalance: %s" % starset.getName())
-            sys.exit()
-        for i in range(0, len(res)):
-            testset[res[i][0]] = deserialize_via_numeric_array(res[i][1])
-        starset.setStars(testset)
-        starset.setLastUpdated(date)
-        starset.setThreshold(threshold)
-    except StandardError, e:
-        write_message("Rebalance: %s" % starset.getName(), sys.stderr)
-        task_update_status("ERROR")
-        task_sig_stop_commands()
-        sys.exit(1)
-        
-def write_message(msg, stream = sys.stdout):
-    """Write message and flush output stream (may be sys.stdout or sys.stderr). Useful for debugging stuff."""
-    if stream == sys.stdout or stream == sys.stderr:
-        stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
-        stream.write("%s\n" % msg)
-        stream.flush()
-    else:
-        sys.stderr.write("Unknown stream %s. [must be sys.stdout or sys.stderr]\n" % stream)
-    return
 
 def authenticate(user, header="BibRank Task Submission", action="runbibrank"):
     print header
@@ -857,38 +164,44 @@ def usage(code, msg=''):
     "Prints usage for this module."
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
-
+<protect>
     print >> sys.stderr, \
     """ Usage: %s [options]
-     Examples:
-       %s --id=0-30000,30001-860000 --run=jif --verbose=9
-       %s --modified='2002-10-27 13:57:26' --run=jif
-       %s --rebalance --collection=Articles --run=jif
-
+     Ranking examples:
+       %s -wjif -a --id=0-30000,30001-860000 --verbose=9
+       %s -wjif -d --modified='2002-10-27 13:57:26'
+       %s -wjif --rebalance --collection=Articles
+       %s -wsbr -a -i 234-250,293,300-500 -u admin@cdsware
+ 
  Ranking options:
- -c, --collection=c1,c2    Collections to include in this set,
-                            if not given, the collections the method is
-                            enabled for will be used.
- -i, --id=idr1,idr2        Record ranges to include in this set
- -m, --modified=[from]     Update records modified after date
- -k, --check=value         Check if set needs rebalancing, (if the top
-                           star is higher than given percentage 0-1.0)
- -S, --stat                Show statistics
- -w, --run=rm1,rm2         Runs each rank method in the order given
- -r, --rebalance           Rebalance
+ -w, --run=r1[,r2]         runs each rank method in the order given
+
+ -c, --collection=c1[,c2]  select according to collection
+ -i, --id=low[-high]       select according to doc recID
+ -m, --modified=from[,to]  select according to modification date
+ -l, --lastupdate          select according to last update
+
+ -a, --add                 add or update words for selected records
+ -d, --del                 delete words for selected records
+ -S, --stat                show statistics for a method
+ 
+ -R, --rebalance           rebalancing rank data: does complete update. if not used: quick update
+ Repairing options:
+ -k,  --check              check consistency for all records in the table(s)
+                           check if update of ranking data is necessary
+ -r, --repair              try to repair all records in the table(s)
  Scheduling options:
  -u, --user=USER           user name to store task, password needed
  -s, --sleeptime=SLEEP     time after which to repeat tasks (no)
                             e.g.: 1s, 30m, 24h, 7d
  -t, --time=TIME           moment for the task to be active (now)
                             e.g.: +15s, 5m, 3h , 2002-10-27 13:57:26
-
  General options:
  -h, --help                print this help and exit
  -V, --version             print version and exit
  -v, --verbose=LEVEL       verbose level (from 0 to 9, default 1)
-    """ % ((sys.argv[0],) * 4)
-
+    """ % ((sys.argv[0],) * 5)
+</protect>
     sys.exit(code)
 
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
@@ -912,7 +225,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
 
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
-    if opts_dict["verbose"]>= 9:
+    if options["verbose"]>= 9:
         write_message("got signal %d" % sig)
     write_message("sleeping...")
     task_update_status("SLEEPING")
@@ -920,14 +233,14 @@ def task_sig_sleep(sig, frame):
 
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
-    if opts_dict["verbose"]>= 9:
+    if options["verbose"]>= 9:
         write_message("got signal %d" % sig)
     write_message("continuing...")
     task_update_status("CONTINUING")
 
 def task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
-    if opts_dict["verbose"]>= 9:
+    if options["verbose"]>= 9:
         write_message("got signal %d" % sig)
     write_message("stopping...")
     task_update_status("STOPPING")
@@ -951,7 +264,7 @@ def task_sig_stop_commands():
 
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
-    if opts_dict["verbose"]>= 9:
+    if options["verbose"]>= 9:
         write_message("got signal %d" % sig)
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
@@ -961,14 +274,14 @@ def task_sig_suicide(sig, frame):
 
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
-    if opts_dict["verbose"]>= 9:
+    if options["verbose"]>= 9:
         write_message("got signal %d" % sig)
     write_message("unknown signal %d ignored" % sig) # do nothing for other signals
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
     query = "UPDATE schTASK SET progress='%s' where id=%d" % (MySQLdb.escape_string(msg), task_id)
-    if opts_dict["verbose"]>= 9:
+    if options["verbose"]>= 9:
         write_message(query)
     run_sql(query)
     return
@@ -976,7 +289,7 @@ def task_update_progress(msg):
 def task_update_status(val):
     """Updates state information in the BibSched task table."""
     query = "UPDATE schTASK SET status='%s' where id=%d" % (MySQLdb.escape_string(val), task_id)
-    if opts_dict["verbose"]>= 9:
+    if options["verbose"]>= 9:
         write_message(query)
     run_sql(query)
     return
@@ -997,116 +310,22 @@ def split_ranges(parse_string):
             recIDs.append([int(tmp_recIDs[0]), int(tmp_recIDs[1])])
     return recIDs
 
-def task_run(row):
-    """Run the indexing task. The row argument is the BibSched task
-    queue row, containing if, arguments, etc.
-    Return 1 in case of success and 0 in case of failure.
-    """
-    startCreate = time.time()
-    global opts_dict, task_id
-    task_id = row[0]
-    task_proc = row[1]
-    opts_dict = loads(row[6])
-    task_status = row[7]
-    if task_proc != "runbibrank":
-        write_message("-The task #%d does not seem to be a BibRank task." % task_id, sys.stderr)
-        return 0
-    if task_status != "WAITING":
-        write_message("The task #%d is %s. I expected WAITING." % (task_id, task_status), sys.stderr)
-        return 0
-    if opts_dict["verbose"]:
-        write_message("Task #%d started." % task_id)
-    task_starting_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    task_update_status("RUNNING")
-    signal.signal(signal.SIGUSR1, task_sig_sleep)
-    signal.signal(signal.SIGTERM, task_sig_stop)
-    signal.signal(signal.SIGABRT, task_sig_suicide)
-    signal.signal(signal.SIGCONT, task_sig_wakeup)
-    signal.signal(signal.SIGINT, task_sig_unknown)
-
-    sets = {}
-    try:
-        if opts_dict["collection"]:
-            if opts_dict["verbose"] >=9:
-                write_message("Getting records from collections")
-            l_of_colls = string.split(opts_dict["collection"], ",")
-            recIDs = perform_request_search(c=l_of_colls)
-            opts_dict["validset"] = HitSet()
-            opts_dict["validset"].addlist(recIDs)
-        elif opts_dict["id"]:
-            opts_dict["validset"] = HitSet()
-            for i in range(0,len(opts_dict["id"])):
-                for j in range(opts_dict["id"][i][0],opts_dict["id"][i][1]):
-                    opts_dict["validset"].add(j)
-                    
-        for key in opts_dict["run"]:
-            #file = "/home/trondaks/w/cdsware/modules/bibrank/etc/" + key + ".cfg"
-            cfg_name = getName(key)
-            
-            if not opts_dict["collection"]:
-                if opts_dict["verbose"] >=9:
-                    write_message("Getting records from collections enabled for rank method.")
-                res = run_sql("SELECT collection.name FROM collection,collection_rnkMETHOD,rnkMETHOD WHERE collection.id=id_collection and id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" %  key)
-                l_of_colls = ""
-                for coll in res:
-                    l_of_colls += coll[0] + ","
-                recIDs = perform_request_search(c=l_of_colls)
-                opts_dict["validset"] = HitSet()
-                opts_dict["validset"].addlist(recIDs)
-                
-            file = etcdir + "/bibrank/" + key + ".cfg"
-            if opts_dict["verbose"] >=9:
-                write_message("Getting configuration from file: %s" % file)
-            config = ConfigParser.ConfigParser()
-            try:
-                config.readfp(open(file))
-            except StandardError, e:
-                write_message("Cannot find configurationfile: %s" % file, sys.stderr)
-                raise StandardError
-            cfg_stars = number_of_stars 
-            cfg_star = config.getfloat("rank_method", "top_star_percentage")
-            cfg_short = key
-            cfg_function = config.get("rank_method", "function")
-            cfg_importance = config.getfloat("rank_method", "overall_importance")
-            sets[key] = StarSet(cfg_name, cfg_short, cfg_function, cfg_importance, cfg_stars, cfg_star)
-            
-            if opts_dict["verbose"] >= 9:
-                print ""
-            func_object = globals().get(cfg_function)
-            func_object(key,sets,config)
-            if opts_dict["stat"]:
-                stats(sets[key])
-            if opts_dict["check"]:
-                check(sets[key])
-    except StandardError, e:
-        write_message("\nException caught: %s" % e, sys.stderr)
-        traceback.print_tb(sys.exc_info()[2])
-        task_update_status("ERROR")
-        task_sig_stop_commands()
-        sys.exit(1)
-    print ""
-    task_update_status("DONE")
-    if opts_dict["verbose"]:
-        write_message("Task #%d finished." % task_id)
-        showtime((time.time() - startCreate))
-    return 1
-
-def getName(rnkname, ln=cdslang, type='ln'):
-    try:
-        rnkid = run_sql("SELECT id FROM rnkMETHOD where name='%s'" % rnkname)
-        rnkid = str(rnkid[0][0])
-        res = run_sql("SELECT value FROM rnkMETHODNAME where type='%s' and ln='%s' and id_rnkMETHOD=%s" % (type, ln, rnkid))
-        if not res:
-            res = run_sql("SELECT value FROM rnkMETHODNAME WHERE ln='%s' and id_rnkMETHOD=%s and type='%s'"  % (cdslang, rnkid, type))
-        return res[0][0]
-    except StandardError, e:
-        write_message("Cannot run rank method, either given code for method is wrong, or it has not been added using the webinterface.")
-        raise StandardError
+def get_date_range(var):
+    "Returns the two dates contained as a low,high tuple"
+    limits = string.split(var, ",")
+    if len(limits)==1:
+        low = get_datetime(limits[0])
+        return low,None
+    if len(limits)==2:
+        low = get_datetime(limits[0])
+        high = get_datetime(limits[1])
+        return low,high
 
 def command_line():
-    global opts_dict
-    long_flags = ["stat", "rebalance", "id=", "collection=", "check=", "modified=", "update", "run=", "user=", "sleeptime=", "time=", "help", "version", "verbose="]
-    short_flags = "Si:c:k:Urm:w:u:s:t:hVv:"
+    """Storing the task together with the parameters given."""
+    global options
+    long_flags = ["lastupdate","add","del","repair","maxmem", "flush","stat", "rebalance", "id=", "collection=", "check", "modified=", "update", "run=", "user=", "sleeptime=", "time=", "help", "version", "verbose="]
+    short_flags = "ladSi:m:c:kUrRM:f:w:u:s:t:hVv:"
     format_string = "%Y-%m-%d %H:%M:%S"
     sleeptime = ""
     try:
@@ -1116,7 +335,7 @@ def command_line():
         usage(1)
     if args:
         usage(1)
-    opts_dict = {"validset":"", "collection":[], "id":[], "check": "", "stat":"", "modified":"last_updated", "run":['jif'], "verbose":1}
+    options = {"quick":"yes","cmd":"","flush":10000,"validset":"", "collection":[], "id":[], "check": "", "stat":"", "modified":"", "last_updated":"","run":"", "verbose":1}
     sched_time = time.strftime(format_string)
     user = ""
     try:
@@ -1127,26 +346,42 @@ def command_line():
                 print __version__
                 sys.exit(1)
             elif opt[0] in ["--verbose", "-v"]:
-                opts_dict["verbose"] = int(opt[1])
+                options["verbose"] = int(opt[1])
+            elif opt == ("-a","") or opt == ("--add",""):
+                options["cmd"] = "add"
+                if ("-x","") in opts or ("--del","") in opts:
+                    usage(1)
             elif opt[0] in ["--run", "-w"]:
-                opts_dict["run"] = []
+                options["run"] = []
                 run = split(opt[1],",")
                 for key in range(0,len(run)):
-                    opts_dict["run"].append(run[key])
+                    options["run"].append(run[key])
+            elif opt == ("-r","") or opt == ("--repair",""):
+                options["cmd"] = "repair"
+            elif opt == ("-d","") or opt == ("--del",""):            
+                options["cmd"]="del"
             elif opt[0] in [ "-u", "--user"]:
                 user = opt[1]
             elif opt[0] in [ "-k", "--check"]:
-                opts_dict["check"]= opt[1]
+                options["cmd"]= "check" 
             elif opt[0] in [ "-S", "--stat"]:
-                opts_dict["stat"] = "true"
+                options["cmd"] = "stat"
             elif opt[0] in [ "-i", "--id" ]:
-                opts_dict["id"] = split_ranges(opt[1])
+                options["id"] = options["id"] + split_ranges(opt[1])
             elif opt[0] in [ "-c", "--collection" ]:
-                opts_dict["collection"] = opt[1]
-            elif opt[0] in [ "-r", "--rebalance"]:
-                 opts_dict["modified"] = ""
+                options["collection"] = opt[1]
+            elif opt[0] in [ "-R", "--rebalance"]: 
+                 options["quick"] = "no"   
+            elif opt[0] in [ "-f", "--flush"]:     
+                options["flush"]=int(opt[1])
+            elif opt[0] in [ "-M", "--maxmem"]:
+                options["maxmem"]=int(opt[1])
+                if options["maxmem"] < base_process_size + 1000:
+                    raise StandardError, "Memory usage should be higher than %d kB" % (base_process_size + 1000)
             elif opt[0] in [ "-m", "--modified" ]:
-                opts_dict["modified"] = get_datetime(opt[1]) #2002-10-27 13:57:26
+                options["modified"] = get_date_range(opt[1]) #2002-10-27 13:57:26
+            elif opt[0] in [ "-l", "--lastupdate" ]:
+                options["last_updated"] = "last_updated"
             elif opt[0] in [ "-s", "--sleeptime" ]:
                 get_datetime(opt[1]) # see if it is a valid shift
                 sleeptime=opt[1]
@@ -1157,14 +392,54 @@ def command_line():
     except StandardError, e:
         write_message(e, sys.stderr)
         sys.exit(1)
+  
+    if len(opts) == 0:
+        options["last_updated"] = "last_updated"
+        options["cmd"] = "add"
+        options["quick"] = "no"   
+        options["flush"]= 100000
+        res = run_sql("SELECT name from rnkMETHOD")
+        options["run"] = []
+        for (name,) in res:
+            options["run"].append(name)
+           
+    #user = authenticate(user)
+    if options["verbose"]>=9:
+        write_message("Storing task options %s" % options)
+    query = """INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status) VALUES ('runbibrank','%s',CAST('%s' AS DATE),'%s','%s','WAITING')""" % (MySQLdb.escape_string(user),MySQLdb.escape_string(sched_time), sleeptime, MySQLdb.escape_string(dumps(options)))
 
-    user = authenticate(user)
-    if opts_dict["verbose"]>=9:
-        write_message("Storing task options %s" % opts_dict)
-    query = """INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status) VALUES ('runbibrank','%s',CAST('%s' AS DATE),'%s','%s','WAITING')""" % (MySQLdb.escape_string(user),MySQLdb.escape_string(sched_time), sleeptime, MySQLdb.escape_string(dumps(opts_dict)))
     new_task_id = run_sql(query)
     print "Task #%d was successfully scheduled for execution." % new_task_id
     return
+
+def task_run(row):
+    """Run the indexing task. The row argument is the BibSched task
+    queue row, containing if, arguments, etc.
+    Return 1 in case of success and 0 in case of failure.
+    """
+
+    try:  
+        options = marshal.loads(row[6])
+        for key in options["run"]:
+            file = etcdir + "/bibrank/" + key + ".cfg"
+            if options["verbose"] >= 9:
+                write_message("Getting configuration from file: %s" % file)
+            config = ConfigParser.ConfigParser()
+            try:
+                config.readfp(open(file))
+            except StandardError, e:
+                write_message("Cannot find configurationfile: %s. The rankmethod may also not be registered using the BibRank Admin Interface." % file, sys.stderr)
+                raise StandardError
+
+            #Using the function variable to call the function related to the rank method
+            cfg_function = config.get("rank_method", "function")
+            func_object = globals().get(cfg_function)
+            func_object(row, key)
+    except StandardError, e:
+        write_message("\nException caught: %s" % e, sys.stderr)
+        traceback.print_tb(sys.exc_info()[2])
+        sys.exit(1)
+    return 1
 
 def main():
     if len(sys.argv) == 2:

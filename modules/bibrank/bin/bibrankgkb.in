@@ -65,12 +65,9 @@ try:
     import unicodedata
     import traceback
     import cStringIO
-    import urllib
     import re
     import copy
-    import sys
     import types
-    import gc
     import ConfigParser
 
 except ImportError, e:
@@ -101,15 +98,21 @@ opts_dict = {}
 task_id = -1
       
 def bibrankgkb(config):
+    """Generates a .kb file based on input from the configuration file"""
+
     if opts_dict["verbose"] >= 1:
         write_message("Running: Generate Knowledgebase.")
     journals = {}
     journal_src = {}
     i = 0
+ 
+    #Reading the configuration file
     while config.has_option("bibrankgkb","create_%s" % i):
         cfg = split(config.get("bibrankgkb", "create_%s" % i),",,")
         conv = {}
         temp = {}
+
+        #Input source 1, either file, www or from db
         if cfg[0] == "file":
             conv = get_from_source(cfg[0], cfg[1])
             del cfg[0:2]
@@ -130,6 +133,7 @@ def bibrankgkb(config):
             if opts_dict["verbose"] >= 9:
                 write_message("Using last resource for converting values.")
             
+        #Input source 2, either file, www or from db
         if cfg[0] == "file":
             temp = get_from_source(cfg[0], cfg[1])
         elif cfg[0] == "www":
@@ -142,6 +146,8 @@ def bibrankgkb(config):
         elif cfg[0] == "db":
             temp = get_from_source(cfg[0], (cfg[1], cfg[2]))
         i = i + 1
+
+        #If a convertion file is given, the names will be converted to the correct convention
         if len(conv) != 0:
             if opts_dict["verbose"] >= 9:
                 write_message("Converting between naming conventions given.")
@@ -153,6 +159,7 @@ def bibrankgkb(config):
         else:
             journals = temp
 
+    #Writing output file
     if opts_dict["output"]:
         f = open(opts_dict["output"], 'w')
         f.write("#Created by %s\n" % __version__)
@@ -174,10 +181,9 @@ def showtime(timeused):
     if opts_dict["verbose"] >= 9:
         write_message("Time used: %d second(s)." % timeused)
 
-def stats(starset):
-    print "Statistic"
-
 def get_from_source(type, data):
+    """Read a source based on the input to the function"""
+
     datastruct = {}
     if type == "db":
         jvalue = run_sql(data[0])
@@ -212,6 +218,8 @@ def get_from_source(type, data):
                 write_message(data[0][link])
             page = urllib.urlopen(data[0][link])
             input = page.read()
+ 
+            #Using the regexp from config file
             reg = re.compile(data[1])
             iterator = re.finditer(reg, input)
             for match in iterator:
@@ -223,6 +231,8 @@ def get_from_source(type, data):
     return datastruct
 
 def convert(convstruct, journals):
+    """Converting between names"""
+
     if len(convstruct) > 0 and len(journals) > 0:
         invconvstruct = dict(map(lambda x: (x[1], x[0]), convstruct.items()))
         tempjour = {}
