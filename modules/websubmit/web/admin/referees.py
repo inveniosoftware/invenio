@@ -54,7 +54,7 @@ def index(req,c=cdsname,ln=cdslang,todo="",id="",doctype="",categ="",addusers=""
     except MySQLdb.Error, e:
         return errorMsg(e.value,req)
     if not acc_authorize_action(uid, "cfgwebsubmit",verbose=0):
-        return errorMsg("You are not authorized to use websubmit admin",req)
+        return errorMsg("You are not authorized to use websubmit admin",req,uid)
     # request for deleting a user
     if todo == "deleteuser":
         acc_deleteUserRole(id,name_role=role)
@@ -220,12 +220,13 @@ def displayAddUser(doctype):
     return t
 
 
-def errorMsg(title,req,c=cdsname,ln=cdslang):
+def errorMsg(title,req,uid,c=cdsname,ln=cdslang):
     return page(title="error",
                     body = create_error_box(req, title=title,verbose=0, ln=ln),
                     description="%s - Internal Error" % c, 
                     keywords="%s, CDSware, Internal Error" % c,
                     language=ln,
+                    uid=uid,
                     urlargs=req.args)
 
 </protect>

@@ -867,7 +867,7 @@ Please select the type of document you want to submit:
 <BR><BR>
 <TABLE width="100%">
 <TR>
-    <TD width="50%">
+    <TD width="50%" class="narrowsearchboxbody">
 """
     finaltext = finaltext + "<FORM method=get action=\"submit.py\">\n"
     finaltext = finaltext + "<INPUT type=\"hidden\" name=\"doctype\">"
@@ -943,7 +943,7 @@ def displayDoctypeBranch(doctype,catalogues):
     text = ""
     res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname=%s", (doctype,))
     row = res[0]
-    text = "<LI><small><a href=\"\" onmouseover=\"javascript:popUpTextWindow('%s',true,event);\" onmouseout=\"javascript:popUpTextWindow('%s',false,event);\" onClick=\"document.forms[0].doctype.value='%s';document.forms[0].submit();return false;\">%s</a></small>\n" % (doctype,doctype,doctype,row[0])
+    text = "<LI><a href=\"\" onmouseover=\"javascript:popUpTextWindow('%s',true,event);\" onmouseout=\"javascript:popUpTextWindow('%s',false,event);\" onClick=\"document.forms[0].doctype.value='%s';document.forms[0].submit();return false;\">%s</a>\n" % (doctype,doctype,doctype,row[0])
     return text
     
 
@@ -1041,7 +1041,7 @@ function selectdoctype(nb)
     <tr>
         <td class="portalboxbody">"""
     if description != "":
-        t = t + "<SMALL>%s</SMALL>" % description
+        t = t + "%s" % description
     t = t + """
 <BR>
 <SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
@@ -1053,7 +1053,7 @@ var nbimg = document.images.length + 1;
     if nbCateg != 0:
         t = t + "<TD align=right>\n"
         for i in range(0,nbCateg):
-            t = t + "<small>%s</small><INPUT TYPE=radio NAME=\"combo%s\" value=\"%s\" onClick=\"clicked()\">&nbsp;<BR>\n" % (lnameCateg[i],doctype,snameCateg[i])
+            t = t + "%s<INPUT TYPE=radio NAME=\"combo%s\" value=\"%s\" onClick=\"clicked()\">&nbsp;<BR>\n" % (lnameCateg[i],doctype,snameCateg[i])
         t = t + "</TD>\n"
     else:
         t = t + "<SCRIPT>checked=1;</SCRIPT>\n"
@@ -1066,27 +1066,16 @@ var nbimg = document.images.length + 1;
     #display list of actions
     for i in range(0,len(actionShortDesc)):
         t+="<input type=\"submit\" class=\"adminbutton\" value=\"%s\" onClick=\"if (tester()){document.forms[0].indir.value='%s';document.forms[0].act.value='%s';document.forms[0].submit();}; return false;\"><br>" % (statustext[i],indir[i],actionShortDesc[i])
-        #t = t + "        <TR>\n"
-        #t = t + "            <TD align=\"center\" class=wsactionbutton onMouseOver=\"this.className='wsactionbuttonh';window.status='%s';\" onMouseOut=\"this.className='wsactionbutton';\" onClick=\"if (tester()){document.forms[0].indir.value='%s';document.forms[0].act.value='%s';document.forms[0].submit();}; return false;\">\n" % (statustext[i],indir[i],actionShortDesc[i])
-        #t = t + "            <A class=\"textbutton\" HREF=\"\" onClick=\"if (tester()){document.forms[0].indir.value='%s';document.forms[0].act.value='%s';document.forms[0].submit();}; return false;\" onmouseover=\"window.status='%s';\">\n" % (indir[i],actionShortDesc[i],statustext[i])
-        #t = t + "            <span class=\"textbutton\">%s</span></A><BR>\n" % statustext[i]
-        #t = t + "            </TD>\n"
-        #t = t + "        </TR>\n"
     t = t + """
         </TABLE>
     </TD>
 </TR>
 </TABLE>
-<BR>
-<SMALL>"""
+<BR>"""
     if nbCateg != 0:
         t = t + "<STRONG class=headline>Notice:</STRONG><BR>\nSelect a category and then click the button to perform the action you chose.\n"
     t = t + """ 
-</SMALL>
 <BR><BR>
-</TD>
-</TR>
-</TABLE>
 <BR>
 </FORM>
 <FORM action="submit.py"><HR>
