@@ -450,6 +450,10 @@ AC_CONFIG_FILES([Makefile \
 	  config/Makefile \
 	  config/configbis.wml \
 	  modules/Makefile \
+	  modules/bibconvert/Makefile \
+	  modules/bibconvert/bin/Makefile \
+	  modules/bibconvert/doc/Makefile \
+	  modules/bibconvert/doc/admin/Makefile \
 	  modules/bibsched/Makefile \
 	  modules/bibsched/bin/Makefile \
 	  modules/bibwords/Makefile \
