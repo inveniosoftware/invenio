@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir=$(libdir)/python/cdsware
-pylib_DATA=search_engine.py search_engine_config.py oai_repository.py
+pylib_DATA=search_engine.py search_engine_config.py
 
 EXTRA_DIST = $(wildcard *.wml)
 
