@@ -1,40 +1,38 @@
 --------------------------------------------------------------------
-CDSware News: CDSware v0.1.1 released
-December 19, 2003
+CDSware News: CDSware v0.1.2 released
+December 21, 2003
 http://cdsware.cern.ch/news/
 --------------------------------------------------------------------
 
-CDSware v0.1.1 was released on December 19th, 2003.
+CDSware v0.1.2 was released on December 21st, 2003.
 
 What's new:
   * development branch release
-  * access control engine now used by BibWords, BibFormat (admin and
-    bibreformat), WebSearch (webcoll), and BibTaskEx
-  * access control engine admin guide started (WebAccess)
-  * search engine support for sorting by more than one field (WebSearch)
-  * more internationalization of the search engine messages (WebSearch)
-  * new language: Norwegian (bokmål) 
-  * simple example for converting BibTeX into XML MARC (BibConvert)
-  * new optional --with-python configuration option
-  * Python module detection during configure 
-  * bugfixes: os.tempnam() warning, login page referer, and others
+  * fix BibReformat task launching problem (BibFormat)
+  * fix BibTeX -> XML MARC conversion example (BibConvert)
+  * updated Spanish translation
   
 Download:
-   http://cdsware.cern.ch/download/cdsware-0.1.1.tar.gz
+   <http://cdsware.cern.ch/download/cdsware-0.1.2.tar.gz>
 
 Notes: 
-   This is a development branch release.  Users of 0.0.9 are advised
-   to wait for the next stable release.  Users of 0.1.0 may upgrade to
-   0.1.1 if the above features are important to them.
+   This development branch release is intended primarily to fix
+   BibReformat's task-launching password-reading problem that slipped
+   into v0.1.1.  Users of v0.1.1 are advised either to patch their
+   running CDSware installation by this one-liner:
+
+      $ perl -pi~ -e 's,getpass\(,getpass.getpass(,g' /path/to/your/cdsware/bin/bibreformat
+
+   or to upgrade to v0.1.2 which brings, as a bonus, updated Spanish
+   translation.
 
 Known problems: 
-   WebSubmit is not working properly yet.  Several admin-level
-   functionality of 0.0.9 is missing in 0.1.0 yet.  The task scheduler
-   is functional but not yet fully tested.  These issues will be
-   subsequently dealt with in the next releases of the 0.1.x
-   development branch.
+   WebSubmit is not working yet.  Several admin-level functionality of
+   v0.0.9 is missing in v0.1.x.  The task scheduler is functional but
+   not fully tested.  These issues will be subsequently dealt with in
+   the next releases of the v0.1.x development branch.
 
 What's next: 
-   Fixing known problems described above.  Stabilizing the 0.1.x tree.
-   Continuing with the internationalization of the interface.
-   Introducing BibIndex for better phrase indexing and browsing.
+   Fixing known problems described above.  Stabilizing the v0.1.x
+   tree.  Continuing with the internationalization of the interface.
+   Introducing BibIndex for better phrase indexing and browsing.  
