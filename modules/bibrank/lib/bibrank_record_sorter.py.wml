@@ -40,7 +40,7 @@ from dbquery import run_sql
 from bibindex_engine_stemmer import stem
 from bibindex_engine_stopwords import is_stopword
 from search_engine_config import cfg_max_recID
-from bibrank_citation_searcher import get_cited_by_list, get_citing_recidrelevance
+from bibrank_citation_searcher import calculate_cited_by_list
 class HitSet:
     """Class describing set of records, implemented as bit vectors of recIDs.
     Using Numeric arrays for speed (1 value = 8 bits), can use later "real"
@@ -340,7 +340,7 @@ def combine_method(rank_method_code, pattern, hitset, rank_limit_relevance,verbo
         result.sort(lambda x, y: cmp(x[1], y[1]))
         return (result, "(", ")", voutput)
     except Exception, e:
-        return (None, "Warning, method cannot be used for ranking your query.", "", voutput)
+        return (None, "Warning: %s method cannot be used for ranking your query." % rank_method_code, "", voutput)
         
 def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbose):
     """Ranking of records based on predetermined values.
@@ -361,7 +361,7 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     rnkdict = run_sql("SELECT relevance_data FROM rnkMETHODDATA,rnkMETHOD where rnkMETHOD.id=id_rnkMETHOD and rnkMETHOD.name='%s'" % rank_method_code)
 
     if not rnkdict:
-        return (None, "Warning, Could not load ranking data for method.", "", voutput)
+        return (None, "Warning: Could not load ranking data for method %s." % rank_method_code, "", voutput)
 
     lwords_hitset = None
     for j in range(0, len(lwords)): #find which docs to search based on ranges..should be done in search_engine...
@@ -372,13 +372,13 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
             if string.find(lword, "->") > -1:
                 lword = string.split(lword, "->")
                 if int(lword[0]) >= cfg_max_recID + 1 or int(lword[1]) >= cfg_max_recID + 1:        
-                    return (None, "Warning, The record range given is out of range.", "", voutput)  
+                    return (None, "Warning: Given record IDs are out of range.", "", voutput)  
                 for i in range(int(lword[0]), int(lword[1])):
                     lwords_hitset.add(int(i))
             elif lword < cfg_max_recID + 1:
                 lwords_hitset.add(int(lword))
             else:
-                return (None, "Warning, The record range given is out of range.", "", voutput)  
+                return (None, "Warning: Given record IDs are out of range.", "", voutput)  
     
     rnkdict = deserialize_via_marshal(rnkdict[0][0])
     if verbose > 0:
@@ -415,18 +415,11 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     return (reclist_addend + reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
     
 def find_citations(rank_method_code, recID, hitset, verbose):
-    reclist = []
-    citing_list = get_cited_by_list(int(recID))
-    if citing_list:
-        reclist = get_citing_recidrelevance(rank_method_code, citing_list)
-        reclist.sort(lambda x, y: cmp(x[1], y[1]))
-
-        return (reclist,"(", ")", "Warning: citation search functionality is experimental!")
+    reclist = calculate_cited_by_list(int(recID), "a")
+    if reclist:
+        return (reclist,"(", ")", "Warning: citation search functionality is experimental.")
     else:
-        return (reclist,"", "", "Warning: citation search functionality is experimental!")
- 
-
-    #return ([[733229,2], [733209,22], [733208,2131]], "(", ")", "Warning: citation search functionality is experimental!")
+        return (reclist,"", "", "Warning: citation search functionality is experimental.")
 
 def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     """Finding terms to use for calculating similarity. Terms are taken from the recid given, returns a list of recids's and relevance,
@@ -452,7 +445,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     try:
         recID = int(recID)
     except Exception,e :
-        return (None, "Warning: Error in record number, please check that a number is given.", "", voutput) 
+        return (None, "Warning: Error in record ID, please check that a number is given.", "", voutput) 
 
     rec_terms = run_sql("SELECT termlist FROM %sR WHERE id_bibrec=%s" % (methods[rank_method_code]["rnkWORD_table"][:-1], recID))
     if not rec_terms:
@@ -461,7 +454,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
 
     #Get all documents using terms from the selected documents
     if len(rec_terms) == 0:
-        return (None, "Warning: Record spesified has no content indexed for use with this method.", "", voutput)
+        return (None, "Warning: Record specified has no content indexed for use with this method.", "", voutput)
     else:
         terms = "%s" % rec_terms.keys()
         terms_recs = dict(run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (methods[rank_method_code]["rnkWORD_table"], terms[1:len(terms) - 1])))
