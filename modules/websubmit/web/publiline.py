@@ -38,7 +38,7 @@ import re
 import MySQLdb
 import shutil
 sys.path.append('%s' % pylibdir)
-from cdsware.config import *
+from cdsware.config import cdsname,cdslang,supportemail
 from cdsware.dbquery import run_sql
 from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import *

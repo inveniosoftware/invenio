@@ -35,7 +35,7 @@ import types
 import re
 
 sys.path.append('%s' % pylibdir)
-from cdsware.config import *
+from cdsware.config import cdsname,cdslang
 from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import acc_isRole
 from cdsware.websubmit_config import *

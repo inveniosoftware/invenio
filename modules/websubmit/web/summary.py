@@ -37,7 +37,7 @@ import sys
 import time
 
 sys.path.append('%s' % pylibdir)
-from cdsware.config import *
+from cdsware.config import cdsname,cdslang
 from cdsware.dbquery import run_sql
 from cdsware.access_control_engine import acc_authorize_action
 from cdsware.websubmit_config import *
