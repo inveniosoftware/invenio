@@ -22,6 +22,7 @@
 ## read config variables:
 #include "config.wml"
 #include "configbis.wml"
+#include "cdswmllib.wml"
 
 ## start Python:
 <protect>#!</protect><PYTHON>
@@ -364,7 +365,7 @@ class Collection:
         """Create collection page header, navtrail, body (including left and right stripes) and footer, and 
            call write_cache_file() afterwards to update the collection webpage cache."""
         ## do this for each language:
-        for lang in ['de', 'en', 'es', 'pt', 'fr', 'it', 'ru', 'sk', 'cz']:
+        for lang in <: print generate_language_list_for_python(); :>:
             ## first, update navtrail:
             for as in range(0,2):
                 self.write_cache_file("navtrail-as=%s-ln=%s" % (as, lang), self.create_navtrail_links(as, lang))
