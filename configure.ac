@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cdsware, 0.1.2.20040223, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.1.2.20040223)
+AC_INIT(cdsware, 0.1.2.20040227, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.1.2.20040227)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -369,6 +369,8 @@ AC_CONFIG_FILES([Makefile \
 	  modules/bibsched/bin/Makefile \
 	  modules/bibupload/Makefile \
 	  modules/bibupload/bin/Makefile \
+	  modules/bibupload/doc/Makefile \
+	  modules/bibupload/doc/admin/Makefile \
 	  modules/bibformat/Makefile \
 	  modules/bibformat/bin/Makefile \
 	  modules/bibformat/lib/Makefile \
