@@ -23,10 +23,9 @@
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> " \
     navbar_select="hacking-common-concepts" 
 
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
 <pre>
-CDSWARE COMMON CONCEPTS / $Date$
-
 The description of concepts you will encounter here and there in the
 CDSware.  Our interpretation may differ from the practice found in
 other products, so please read this carefully.

@@ -23,9 +23,9 @@
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> " \
     navbar_select="hacking-release-version-numbering-scheme" 
 
-<pre>
-CDSWARE RELEASE NUMBERING SCHEME / $Date$
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
+<pre>
 CDSware uses the classical major.minor.patchlevel release version
 numbering scheme that is commonly used in the GNU/Linux world and
 elsewhere.  Each release is labelled by

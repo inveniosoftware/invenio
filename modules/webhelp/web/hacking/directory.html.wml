@@ -23,9 +23,9 @@
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> " \
     navbar_select="hacking-directory-organization" 
 
-<pre>
-DIRECTORY ORGANIZATION / $Date$
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
+<pre>
 Please find some notes below on how the source (as well as the target)
 directory structure is organized, where the sources get installed to,
 and how the visible URLs are organized.
