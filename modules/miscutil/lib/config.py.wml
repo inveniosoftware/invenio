@@ -44,6 +44,7 @@ pylibdir = "<LIBDIR>/python"
 cachedir = "<CACHEDIR>"
 logdir = "<LOGDIR>"
 tmpdir = "<TMPDIR>"
+etcdir = "<ETCDIR>"
 version = "<VERSION>"
 
 ## intl versions of CDSNAME of this installation:
