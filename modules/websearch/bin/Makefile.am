@@ -23,11 +23,6 @@ EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(bin_SCRIPTS) *~ *.tmp index.wml
 
-install-data-local:
-	./webcoll update-reclist
-	./webcoll update-webpage
-	rm -f index.wml
-
 %.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml
 	$(WML) -o $@ $<
 
