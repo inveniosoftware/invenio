@@ -17,13 +17,13 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/cdsware
-pylib_DATA = bibrecord.py bibrecord_config.py bibrecord_tests.py
+bin_SCRIPTS=xmlmarclint
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
-CLEANFILES = $(pylib_DATA) *~ *.tmp *.pyc
+CLEANFILES = $(bin_SCRIPTS) *~ *.tmp xmlmarclintc
 
-%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
+%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdswmllib.wml
 	$(WML) -o $@ $<
+	chmod u+x $@
