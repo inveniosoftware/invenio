@@ -33,8 +33,8 @@
                       'pt' => 'Português',
                       'it' => 'Italiano',
                       'ru' => 'Русский',
-                      'sk' => 'Slovenčina',
-                      'cz' => 'Čeština',
+                      'sk' => 'Slovensky',
+                      'cz' => 'Česky',
                       'no' => 'Norsk/Bokmål',
                       'se' => 'Svenska');
         return $longnames{$ln};
