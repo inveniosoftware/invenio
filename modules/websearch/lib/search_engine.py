@@ -1302,7 +1302,7 @@ def browse_in_bibwords(req, p, f, ln=cdslang):
     if f:
         req.write(" inside <em>%s</em> " % f)
     req.write(" in any collection are:<br>")
-    urlargs = string.replace(req.args, "action=%s" % msg_search[ln],"action=%s" % msg_browse[ln])
+    urlargs = string.replace(req.args, "action=%s" % msg_browse[ln], "action=%s" % msg_search[ln])
     req.write(create_nearest_terms_box(urlargs, p, f, 'w', ln=ln, intro_text_p=0)) 
     return
 
