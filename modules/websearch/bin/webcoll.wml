@@ -360,7 +360,7 @@ class Collection:
             print "I/O Error: " + str(message) + " (" + str(code) + ")"
             sys.exit(1)
         # print user info:
-        if options["verbose"]:
+        if options["verbose"] >= 3:
             write_message("... creating %s" % fullfilename)
         sys.stdout.flush()
         # print page body:
@@ -961,7 +961,7 @@ class Collection:
         if self.calculate_reclist_run_already:
             # do we have to recalculate?
             return (self.reclist, self.reclist_with_nonpublic_subcolls)
-        if options["verbose"]:
+        if options["verbose"] >= 3:
             write_message("... calculating reclist of %s" % self.name)
         reclist = HitSet() # will hold results for public sons only; good for storing into DB
         reclist_with_nonpublic_subcolls = HitSet() # will hold results for both public and nonpublic sons; good for deducing total
@@ -997,7 +997,7 @@ class Collection:
         if self.update_reclist_run_already:
             # do we have to reupdate?
             return 0
-        if options["verbose"]:
+        if options["verbose"] >= 3:
             write_message("... updating reclist of %s (%s recs)" % (self.name, self.nbrecs))
         sys.stdout.flush()
         try:
