@@ -110,8 +110,8 @@ class Manager:
         self.cursor_bis = self.db.cursor()
         self.running = 1
         self.footer_move_mode = "[KeyUp/KeyDown Move] [M Select mode] [Q Quit]"
-        self.footer_auto_mode = "[A Manual mode] [Q Quit]"
-        self.footer_select_mode = "[KeyUp/KeyDown/PgUp/PgDown Select] [L View Log] [1/2/3 Display Type] [M Move mode] [A Auto mode] [Q Quit]"
+        self.footer_auto_mode = "[A Manual mode] [1/2 Display Type] [Q Quit]"
+        self.footer_select_mode = "[KeyUp/KeyDown/PgUp/PgDown Select] [L View Log] [1/2 Display Type] [M Move mode] [A Auto mode] [Q Quit]"
         self.footer_waiting_item = "[R Run] [D Delete]"
         self.footer_running_item = "[S Sleep] [T Stop] [K Kill]"
         self.footer_stopped_item = "[I Initialise] [D Delete]"
@@ -120,7 +120,7 @@ class Manager:
         self.selected_line = 2
         self.rows = []
         self.panel = None
-        self.display = 3
+        self.display = 2
         self.first_visible_line = 0
         self.move_mode = 0
         self.auto_mode = 0
@@ -132,7 +132,7 @@ class Manager:
         chr = self.stdscr.getch()
         if chr == -1:
             return
-        if self.auto_mode and (chr not in (curses.KEY_UP,curses.KEY_DOWN,curses.KEY_PPAGE,curses.KEY_NPAGE,ord("q"),ord("Q"),ord("a"),ord("A"),ord("1"),ord("2"),ord("3"))):
+        if self.auto_mode and (chr not in (curses.KEY_UP,curses.KEY_DOWN,curses.KEY_PPAGE,curses.KEY_NPAGE,ord("q"),ord("Q"),ord("a"),ord("A"),ord("1"),ord("2"))):
             self.put_footer("in automatic mode")
             self.stdscr.refresh()
         elif self.move_mode and (chr not in (curses.KEY_UP,curses.KEY_DOWN,ord("m"),ord("M"),ord("q"),ord("Q"))):
@@ -184,14 +184,9 @@ class Manager:
                 self.display = 1
                 self.first_visible_line = 0
                 self.selected_line = 2
-                self.put_footer("all processes are displayed")
+                self.put_footer("only done processes are displayed")
             elif chr == ord("2"):
                 self.display = 2
-                self.first_visible_line = 0
-                self.selected_line = 2
-                self.put_footer("only done processes are displayed")
-            elif chr == ord("3"):
-                self.display = 3
                 self.first_visible_line = 0
                 self.selected_line = 2
                 self.put_footer("only not done processes are displayed")
@@ -511,12 +506,12 @@ class Manager:
         if self.bibsched_daemon_id != 0:
             self.auto_mode = 1
         if self.display == 1:
-            where = ""
-        elif self.display == 2:
             where = "and state='DONE'"
+            order = "DESC"
         else:
             where = "and state!='DONE'"
-        query = "SELECT id,proc,user,date,sleeptime,state,progress FROM schTASKS WHERE state NOT LIKE '%%DELETED%%' %s order by date asc" % where
+            order = "ASC"
+        query = "SELECT id,proc,user,date,sleeptime,state,progress FROM schTASKS WHERE state NOT LIKE '%%DELETED%%' %s order by date %s" % (where,order)
         self.cursor.execute(query)
         self.rows = self.cursor.fetchall()
         self.repaint()
@@ -525,12 +520,12 @@ class Manager:
             self.handle_keys()
             if ring == 10:
                 if self.display == 1:
-                    where = ""
-                elif self.display == 2:
                     where = "and state='DONE'"
+                    order = "DESC"
                 else:
                     where = "and state!='DONE'"
-                query = "SELECT id,proc,user,date,sleeptime,state,progress FROM schTASKS WHERE state NOT LIKE '%%DELETED%%' %s order by date asc" % where
+                    order = "ASC"
+                query = "SELECT id,proc,user,date,sleeptime,state,progress FROM schTASKS WHERE state NOT LIKE '%%DELETED%%' %s order by date %s" % (where,order)
                 self.cursor.execute(query)
                 self.rows = self.cursor.fetchall()
                 ring = 0
@@ -618,6 +613,7 @@ class Bibsched:
                     arg2 = ""
                 COMMAND = "%s %s%s >> %s 2>> %s &" % (program, arg2, str(id), fdout, fderr)
                 os.system(COMMAND)
+                Log(COMMAND)
                 self.running[id] = get_my_pid(proc,"%s%s" % (arg2, str(id)))
             next_date=MySQLdb.escape_string(get_date(sleeptime))
             if next_date:
