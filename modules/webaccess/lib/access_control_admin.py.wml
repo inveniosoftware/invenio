@@ -945,7 +945,7 @@ def acc_getActionRoles(id_action):
 
 def acc_getRoleId(name_role):
     """get id of role, name given. """
-    try: return run_sql("""SELECT id FROM accROLE WHERE name = '%s'""" % (name_role, ))[0][0]
+    try: return run_sql("""SELECT id FROM accROLE WHERE name = %s""" % (name_role, ))[0][0]
     except IndexError: return 0
 
 
@@ -1008,6 +1008,13 @@ def acc_getArgumentId(keyword, value):
 
 
 # USER RELATED
+
+def acc_listUsers():
+    """list all users"""
+    
+    try: return run_sql("""SELECT id,email FROM user""")
+    except IndexError: return []
+    
 
 def acc_getUserEmail(id_user=0):
     """get email of user, id given."""
