@@ -88,10 +88,13 @@ def isGuestUser(uid):
        isGuestUser(uid) -> boolean
     """
     out = 1
-    res = run_sql("select email from user where id=%s", (uid,))
-    if res:
-        if res[0][0]:
-            out = 0
+    try:
+        res = run_sql("select email from user where id=%s", (uid,))
+        if res:
+            if res[0][0]:
+                out = 0
+    except:
+        pass
     return out
 
 def checkRegister(user,passw):
