@@ -1480,13 +1480,13 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
     if len(words) == 2:
         word0 = re_word.sub('', words[0])
         word1 = re_word.sub('', words[1])
-        query = "SELECT word,hitlist FROM %s WHERE word BETWEEN '%s' AND '%s'" % (bibwordsX, escape_string(word0[:50]), escape_string(word1[:50]))
+        query = "SELECT term,hitlist FROM %s WHERE term BETWEEN '%s' AND '%s'" % (bibwordsX, escape_string(word0[:50]), escape_string(word1[:50]))
     else:
         word = re_word.sub('', word)
         if string.find(word, '%') >= 0: # do we have wildcard in the word?
-            query = "SELECT word,hitlist FROM %s WHERE word LIKE '%s'" % (bibwordsX, escape_string(word[:50]))
+            query = "SELECT term,hitlist FROM %s WHERE term LIKE '%s'" % (bibwordsX, escape_string(word[:50]))
         else:
-            query = "SELECT word,hitlist FROM %s WHERE word='%s'" % (bibwordsX, escape_string(word[:50]))
+            query = "SELECT term,hitlist FROM %s WHERE term='%s'" % (bibwordsX, escape_string(word[:50]))
     # launch the query:
     res = run_sql(query)
     # fill the result set:
@@ -1716,7 +1716,7 @@ def get_nearest_terms_in_bibwords(p, f, n_below, n_above):
         else:
             return nearest_words
     # firstly try to get `n' closest words above `p':
-    query = "SELECT word FROM %s WHERE word<'%s' ORDER BY word DESC LIMIT %d" % (bibwordsX, escape_string(p), n_above)
+    query = "SELECT term FROM %s WHERE term<'%s' ORDER BY term DESC LIMIT %d" % (bibwordsX, escape_string(p), n_above)
     res = run_sql(query)
     for row in res:
         nearest_words.append(row[0])
@@ -1724,7 +1724,7 @@ def get_nearest_terms_in_bibwords(p, f, n_below, n_above):
     # secondly insert given word `p':
     nearest_words.append(p)
     # finally try to get `n' closest words below `p':
-    query = "SELECT word FROM %s WHERE word>'%s' ORDER BY word ASC LIMIT %d" % (bibwordsX, escape_string(p), n_below)
+    query = "SELECT term FROM %s WHERE term>'%s' ORDER BY term ASC LIMIT %d" % (bibwordsX, escape_string(p), n_below)
     res = run_sql(query)
     for row in res:
         nearest_words.append(row[0])        
@@ -1821,7 +1821,7 @@ def get_nbhits_in_bibwords(word, f):
         else:
             return 0
     if word:
-        query = "SELECT hitlist FROM %s WHERE word='%s'" % (bibwordsX, escape_string(word))
+        query = "SELECT hitlist FROM %s WHERE term='%s'" % (bibwordsX, escape_string(word))
         res = run_sql(query)
         for hitlist in res:
             out += Numeric.sum(Numeric.loads(zlib.decompress(hitlist[0])).copy().astype(Numeric.Int))

@@ -815,7 +815,7 @@ class WordTable:
 
     def load_old_recIDs(self,word):
         """Load existing hitlist for the word from the database index files."""
-        query = "SELECT hitlist FROM %s WHERE word=%%s" % self.tablename
+        query = "SELECT hitlist FROM %s WHERE term=%%s" % self.tablename
         res = run_sql(query, (word,))
         if res:
             return deserialize_via_numeric_array(res[0][0])
@@ -855,7 +855,7 @@ class WordTable:
                 # yes there were some new words:
                 if opts_dict["verbose"] >= 9:
                     write_message("......... updating hitlist for ``%s''" % word)
-                query = "UPDATE %s SET hitlist='%s' WHERE word='%s'" % \
+                query = "UPDATE %s SET hitlist='%s' WHERE term='%s'" % \
                         (self.tablename, serialize_via_numeric_array(set),
                          MySQLdb.escape_string(word))            
                 run_sql(query)
@@ -865,13 +865,13 @@ class WordTable:
             Numeric.put(set, self.value[word].keys(), 1)
             if opts_dict["verbose"] >= 9:
                 write_message("......... inserting hitlist for ``%s''" % word)
-            query = "INSERT INTO %s (word, hitlist) VALUES ('%s', '%s')" %\
+            query = "INSERT INTO %s (term, hitlist) VALUES ('%s', '%s')" %\
                     (self.tablename, MySQLdb.escape_string(word),
                      serialize_via_numeric_array(set))
             run_sql(query)
 
         if not set: # never store empty words
-            query = "DELETE from %s WHERE word='%s'" % \
+            query = "DELETE from %s WHERE term='%s'" % \
                     (self.tablename, MySQLdb.escape_string(word))
             run_sql(query)
  
@@ -1044,13 +1044,13 @@ class WordTable:
                 if opts_dict["verbose"] >= 9:
                     write_message("... record %d was declared deleted, removing its word list" % recID)
             if opts_dict["verbose"] >= 9:
-                write_message("... record %d, wordlist: %s" % (recID, wlist[recID]))
+                write_message("... record %d, termlist: %s" % (recID, wlist[recID]))
 
         # Using cStringIO for speed.
         query_factory = cStringIO.StringIO()
         qwrite = query_factory.write
         
-        qwrite( "INSERT INTO %sR (id_bibrec,wordlist,type) VALUES" % self.tablename[:-1])
+        qwrite( "INSERT INTO %sR (id_bibrec,termlist,type) VALUES" % self.tablename[:-1])
         qwrite( "('" )
         qwrite( str(recIDs[0]) )
         qwrite( "','" )
@@ -1071,7 +1071,7 @@ class WordTable:
         query_factory = cStringIO.StringIO()
         qwrite = query_factory.write
         
-        qwrite("INSERT INTO %sR (id_bibrec,wordlist,type) VALUES" % self.tablename[:-1])
+        qwrite("INSERT INTO %sR (id_bibrec,termlist,type) VALUES" % self.tablename[:-1])
         qwrite("('")
         qwrite(str(recIDs[0]))
         qwrite("','")
@@ -1152,7 +1152,7 @@ class WordTable:
             write_message("%s fetching existing words for records #%d-#%d started" % \
                 (self.tablename, low, high))
         self.recIDs_in_mem.append([low,high])
-        query = """SELECT id_bibrec,wordlist FROM %sR as bb WHERE bb.id_bibrec
+        query = """SELECT id_bibrec,termlist FROM %sR as bb WHERE bb.id_bibrec
         BETWEEN '%d' AND '%d'""" % (self.tablename[:-1], low, high)
         recID_rows = run_sql(query)        
         for recID_row in recID_rows:
@@ -1335,7 +1335,7 @@ class WordTable:
                     self.recIDs_in_mem.append([recID,recID])
 
                     # Get the words file
-                    query = """SELECT type,wordlist FROM %sR
+                    query = """SELECT type,termlist FROM %sR
                     WHERE id_bibrec='%d'""" % (self.tablename[:-1], recID)
                     if opts_dict["verbose"] >= 9:
                         write_message(query)
