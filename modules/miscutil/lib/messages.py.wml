@@ -137,6 +137,7 @@ msg_agenda = {}
 msg_webcast = {}
 msg_bulletin = {}
 msg_library = {}
+msg_this_page_in_languages = {}
 
 ## English:
 <en>
@@ -247,6 +248,7 @@ msg_agenda['en'] = """<MSG_AGENDA>"""
 msg_webcast['en'] = """<MSG_WEBCAST>"""
 msg_bulletin['en'] = """<MSG_BULLETIN>""" 
 msg_library['en'] = """<MSG_LIBRARY>"""
+msg_this_page_in_languages['en'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 </en>
 
 ## French:
@@ -358,6 +360,7 @@ msg_agenda['fr'] = """<MSG_AGENDA>"""
 msg_webcast['fr'] = """<MSG_WEBCAST>"""
 msg_bulletin['fr'] = """<MSG_BULLETIN>""" 
 msg_library['fr'] = """<MSG_LIBRARY>"""
+msg_this_page_in_languages['fr'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 </fr>
 
 ## German:
@@ -469,6 +472,7 @@ msg_agenda['de'] = """<MSG_AGENDA>"""
 msg_webcast['de'] = """<MSG_WEBCAST>"""
 msg_bulletin['de'] = """<MSG_BULLETIN>""" 
 msg_library['de'] = """<MSG_LIBRARY>"""
+msg_this_page_in_languages['de'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 </de>
 
 ## Spanish:
@@ -580,6 +584,7 @@ msg_agenda['es'] = """<MSG_AGENDA>"""
 msg_webcast['es'] = """<MSG_WEBCAST>"""
 msg_bulletin['es'] = """<MSG_BULLETIN>""" 
 msg_library['es'] = """<MSG_LIBRARY>"""
+msg_this_page_in_languages['es'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 </es>
 
 ## Portuguese:
@@ -691,6 +696,7 @@ msg_agenda['pt'] = """<MSG_AGENDA>"""
 msg_webcast['pt'] = """<MSG_WEBCAST>"""
 msg_bulletin['pt'] = """<MSG_BULLETIN>""" 
 msg_library['pt'] = """<MSG_LIBRARY>"""
+msg_this_page_in_languages['pt'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 </pt>
 
 ## Italian:
@@ -802,6 +808,7 @@ msg_agenda['it'] = """<MSG_AGENDA>"""
 msg_webcast['it'] = """<MSG_WEBCAST>"""
 msg_bulletin['it'] = """<MSG_BULLETIN>""" 
 msg_library['it'] = """<MSG_LIBRARY>"""
+msg_this_page_in_languages['it'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 </it>
 
 ## Russian:
@@ -913,6 +920,7 @@ msg_agenda['ru'] = """<MSG_AGENDA>"""
 msg_webcast['ru'] = """<MSG_WEBCAST>"""
 msg_bulletin['ru'] = """<MSG_BULLETIN>""" 
 msg_library['ru'] = """<MSG_LIBRARY>"""
+msg_this_page_in_languages['ru'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 </ru>
 
 ## Slovak:
@@ -1024,6 +1032,7 @@ msg_agenda['sk'] = """<MSG_AGENDA>"""
 msg_webcast['sk'] = """<MSG_WEBCAST>"""
 msg_bulletin['sk'] = """<MSG_BULLETIN>""" 
 msg_library['sk'] = """<MSG_LIBRARY>"""
+msg_this_page_in_languages['sk'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 </sk>
 
 ## Czech:
@@ -1135,6 +1144,7 @@ msg_agenda['cz'] = """<MSG_AGENDA>"""
 msg_webcast['cz'] = """<MSG_WEBCAST>"""
 msg_bulletin['cz'] = """<MSG_BULLETIN>""" 
 msg_library['cz'] = """<MSG_LIBRARY>"""
+msg_this_page_in_languages['cz'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 </cz>
 
 ## Norwegian:
@@ -1246,6 +1256,7 @@ msg_agenda['no'] = """<MSG_AGENDA>"""
 msg_webcast['no'] = """<MSG_WEBCAST>"""
 msg_bulletin['no'] = """<MSG_BULLETIN>""" 
 msg_library['no'] = """<MSG_LIBRARY>"""
+msg_this_page_in_languages['no'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 </no>
 
 ## I18N messages oriented functions:
@@ -1276,5 +1287,5 @@ def create_language_selection_box(urlargs="", language="en"):
             else:
                 urlargs = "ln=%s" % lang
             out += """<a class="langinfo" href="?%s">%s</a> | """ % (urlargs, string.upper(lang))
-    return msg_language[language] + " " + out[:-2]
+    return msg_this_page_in_languages[language] + " " + out[:-2]
 
