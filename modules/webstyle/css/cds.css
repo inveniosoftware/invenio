@@ -53,12 +53,12 @@ a:visited {
    background: transparent;
 }
 a:active {
-   color: #fff;
-   background: #006;
+   color: #00c;
+   background: transparent;
 }
 a:hover {
-   color: #fff;
-   background: #006;
+   color: #00c;
+   background: transparent;
 }
 a.moreinfo:link {
    color: #060;
@@ -69,12 +69,12 @@ a.moreinfo:visited {
    background: transparent;
 }
 a.moreinfo:active {
-   color: #fff;
-   background: #060;
+   color: #060;
+   background: transparent;
 }
 a.moreinfo:hover {
-   color: #fff;
-   background: #060;
+   color: #060;
+   background: transparent;
 }
 a.img:hover {
    color: #00c;
@@ -94,12 +94,12 @@ a.note:visited {
    background: transparent;
 }
 a.note:active {
-   color: #fff;
-   background: #999;
+   color: #999;
+   background: transparent;
 }
 a.note:hover {
-   color: #fff;
-   background: #999;
+   color: #999;
+   background: transparent;
 }
 a.navtrail:link {
    color: #006;
@@ -110,12 +110,12 @@ a.navtrail:visited {
    background: transparent;
 }
 a.navtrail:active {
-   color: #fff;
-   background: #006;
+   color: #006;
+   background: transparent;
 }
 a.navtrail:hover {
-   color: #fff;
-   background: #006;
+   color: #006;
+   background: transparent;
 }
 .pageheader {
    color: #999;
@@ -139,33 +139,45 @@ a.navtrail:hover {
 }
 .pageboxlefttop {
    color: #000;
-   background: #eee;
+   background: #dee;
 }
 .pageboxlefttopadd {
    color: #000;
-   background: #eee;
+   background: #dee;
 }
 .pageboxleftbottom {
    color: #000;
-   background: #eee;
+   background: #dee;
 }
 .pageboxleftbottomadd {
    color: #000;
-   background: #eee;
+   background: #dee;
 }
 .pageboxrighttop {
    color: #000;
-   background: #eee;
+   background: #dee;
 }
 .pageboxrighttopadd {
    color: #000;
-   background: #eee;
+   background: #dee;
 }
 .pageboxrightbottom {
    color: #000;
-   background: #eee;
+   background: #dee;
 }
 .pageboxrightbottomadd {
+   color: #000;
+   background: #dee;
+}
+.searchbox {
+   color: #000;
+   background: #eee;
+}
+.narrowsearchbox {
+   color: #000;
+   background: #eee;
+}
+.focusonsearchbox {
    color: #000;
    background: #eee;
 }
@@ -202,8 +214,12 @@ a.navtrail:hover {
    background: #9cf;
 }
 .headerselected {
-   color: #FFF;
+   color: #fff;
    background: #006;
+}
+.headerselectedmodule {
+   color: #000;
+   background: #eee;
 }
 .faq {
    margin-left: 12%;
@@ -212,6 +228,10 @@ a.navtrail:hover {
 .faqq {
    margin-left: 18%;
    margin-right: 3%;
+}
+.exampleleader {
+   color: #060;
+   background: transparent;
 }
 .example {
    color: #039;
@@ -251,7 +271,7 @@ a.navtrail:hover {
    background: transparent;
 }
 .warning {
-   color: #999;
+   color: #603;
    background: transparent;
 }
 .light {
