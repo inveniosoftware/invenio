@@ -251,8 +251,9 @@ def auth_apache_user_p(user, password):
     Apache password data file.  Return 0 in case of failure, 1 in case
     of success."""    
     try:
-        apache_password_line_for_user = os.popen("grep %s %s" % (user,cfg_apache_password_file), 'r').read()
-        password_apache = string.split(string.strip(apache_password_line_for_user),":")[1]
+        pipe_input, pipe_output = os.popen2(["/bin/grep", "^" + user + ":", cfg_apache_password_file], 'r')
+        line =  pipe_output.readlines()[0]
+        password_apache = string.split(string.strip(line),":")[1]
     except: # no pw found, so return not-allowed status	
         return 0	
     salt = password_apache[:2]
