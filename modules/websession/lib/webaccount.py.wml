@@ -86,15 +86,13 @@ def perform_display_account(req,data,bask,aler,sear):
     if isGuestUser(uid):
  	user ="guest"	
 	accBody = """You are logged in as guest. You may want to <A href="../youraccount.py/login">login</A> as a regular user <BR><BR>
-		    You may want to <A href="../"> start a new search</A>
 		  """	
 	bask=aler="""The <strong class=headline>guest</strong> users need to <A href="../youraccount.py/login">register</A>&nbspfirst"""
 	sear="No queries found"
     else:
  	user = data[0]
-        accBody ="""You are logged in as %s. You may want to <A href="../youraccount.py/logout">logout</A><BR><BR>
-	  	    You may want to <A href="../"> start a new search</A>
-		"""%user			
+        accBody ="""You are logged in as %s. You may want to a) <A href="../youraccount.py/logout">logout</A>; b) edit your <A href="../youraccount.py/set">email address or password.<BR><BR>
+		 """%user			
     out =""
     out +=template_account("Your Account",accBody)
     #your baskets
