@@ -38,6 +38,7 @@ INSERT INTO collection VALUES (1,'<CDSNAME>',NULL,NULL,NULL,NULL);
 <no>INSERT INTO collectionname VALUES (1,'no','ln','<CDSNAMEINTL>');</no>
 <sv>INSERT INTO collectionname VALUES (1,'sv','ln','<CDSNAMEINTL>');</sv>
 <el>INSERT INTO collectionname VALUES (1,'el','ln','<CDSNAMEINTL>');</el>
+<uk>INSERT INTO collectionname VALUES (1,'uk','ln','<CDSNAMEINTL>');</uk>
 
 INSERT INTO user VALUES (1, '<ADMINEMAIL>', '', NULL, NULL);
 INSERT INTO flxLINKTYPES VALUES ('AUTHOR_SEARCH','N','EXT','','');
@@ -64,6 +65,7 @@ INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,1,
 <no>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'no','ln','<MSG_WORD_SIMILARITY>');</no>
 <sv>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'sv','ln','<MSG_WORD_SIMILARITY>');</sv>
 <el>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'el','ln','<MSG_WORD_SIMILARITY>');</el>
+<uk>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'uk','ln','<MSG_WORD_SIMILARITY>');</uk>
 
 <protect>
 INSERT INTO field VALUES (1,'any field','anyfield');
@@ -93,6 +95,7 @@ INSERT INTO fieldname VALUES (1,'cs','ln','všechna pole');
 INSERT INTO fieldname VALUES (1,'no','ln','alle felt');
 INSERT INTO fieldname VALUES (1,'sv','ln','samtliga fält');
 INSERT INTO fieldname VALUES (1,'el','ln','οποιοδήποτε πεδίο');
+INSERT INTO fieldname VALUES (1,'uk','ln','всі поля');
 
 INSERT INTO fieldname VALUES (2,'en','ln','title');
 INSERT INTO fieldname VALUES (2,'fr','ln','titre');
@@ -106,6 +109,7 @@ INSERT INTO fieldname VALUES (2,'cs','ln','název');
 INSERT INTO fieldname VALUES (2,'no','ln','tittel');
 INSERT INTO fieldname VALUES (2,'sv','ln','titel');
 INSERT INTO fieldname VALUES (2,'el','ln','τίτλος');
+INSERT INTO fieldname VALUES (2,'uk','ln','назва');
 
 INSERT INTO fieldname VALUES (3,'en','ln','author');
 INSERT INTO fieldname VALUES (3,'fr','ln','auteur');
@@ -119,6 +123,7 @@ INSERT INTO fieldname VALUES (3,'cs','ln','autor');
 INSERT INTO fieldname VALUES (3,'no','ln','forfatter');
 INSERT INTO fieldname VALUES (3,'sv','ln','författare');
 INSERT INTO fieldname VALUES (3,'el','ln','συγγραφέας');
+INSERT INTO fieldname VALUES (3,'uk','ln','автор');
 
 INSERT INTO fieldname VALUES (4,'en','ln','abstract');
 INSERT INTO fieldname VALUES (4,'fr','ln','abstract');
@@ -132,6 +137,7 @@ INSERT INTO fieldname VALUES (4,'cs','ln','abstrakt');
 INSERT INTO fieldname VALUES (4,'no','ln','sammendrag');
 INSERT INTO fieldname VALUES (4,'sv','ln','sammanfattning');
 INSERT INTO fieldname VALUES (4,'el','ln','περίληψη');
+INSERT INTO fieldname VALUES (4,'uk','ln','резюме');
 
 INSERT INTO fieldname VALUES (5,'en','ln','keyword');
 INSERT INTO fieldname VALUES (5,'fr','ln','mot clé');
@@ -145,6 +151,7 @@ INSERT INTO fieldname VALUES (5,'cs','ln','klíčové slovo');
 INSERT INTO fieldname VALUES (5,'no','ln','nøkkelord');
 INSERT INTO fieldname VALUES (5,'sv','ln','nyckelord');
 INSERT INTO fieldname VALUES (5,'el','ln','λέξη κλειδί');
+INSERT INTO fieldname VALUES (5,'uk','ln','ключеве слово');
 
 INSERT INTO fieldname VALUES (6,'en','ln','report number');
 INSERT INTO fieldname VALUES (6,'fr','ln','numéro de rapport');
@@ -158,6 +165,7 @@ INSERT INTO fieldname VALUES (6,'cs','ln','číslo zprávy');
 INSERT INTO fieldname VALUES (6,'no','ln','rapportnummer');
 INSERT INTO fieldname VALUES (6,'sv','ln','rapportnummer');
 INSERT INTO fieldname VALUES (6,'el','ln','αριθμός αναφοράς');
+INSERT INTO fieldname VALUES (6,'uk','ln','номер документа');
 
 INSERT INTO fieldname VALUES (7,'en','ln','subject');
 INSERT INTO fieldname VALUES (7,'fr','ln','sujet');
@@ -171,6 +179,7 @@ INSERT INTO fieldname VALUES (7,'cs','ln','předmět');
 INSERT INTO fieldname VALUES (7,'no','ln','emne');
 INSERT INTO fieldname VALUES (7,'sv','ln','');
 INSERT INTO fieldname VALUES (7,'el','ln','θέμα');
+INSERT INTO fieldname VALUES (7,'uk','ln','тема');
 
 INSERT INTO fieldname VALUES (8,'en','ln','reference');
 INSERT INTO fieldname VALUES (8,'fr','ln','référence');
@@ -184,6 +193,7 @@ INSERT INTO fieldname VALUES (8,'cs','ln','reference');
 INSERT INTO fieldname VALUES (8,'no','ln','referanse');
 INSERT INTO fieldname VALUES (8,'sv','ln','referens');
 INSERT INTO fieldname VALUES (8,'el','ln','αναφορά');
+INSERT INTO fieldname VALUES (8,'uk','ln','посилання');
 
 INSERT INTO fieldname VALUES (9,'en','ln','fulltext');
 INSERT INTO fieldname VALUES (9,'fr','ln','fulltext');
@@ -197,6 +207,7 @@ INSERT INTO fieldname VALUES (9,'cs','ln','plný text');
 INSERT INTO fieldname VALUES (9,'no','ln','fulltekst');
 INSERT INTO fieldname VALUES (9,'sv','ln','fulltext');
 INSERT INTO fieldname VALUES (9,'el','ln','πλήρες κείμενο');
+INSERT INTO fieldname VALUES (9,'uk','ln','повний текст');
 
 INSERT INTO fieldname VALUES (10,'en','ln','collection');
 INSERT INTO fieldname VALUES (10,'fr','ln','collection');
@@ -210,6 +221,7 @@ INSERT INTO fieldname VALUES (10,'cs','ln','kolekce');
 INSERT INTO fieldname VALUES (10,'no','ln','samling');
 INSERT INTO fieldname VALUES (10,'sv','ln','samlingen');
 INSERT INTO fieldname VALUES (10,'el','ln','συλλογή');
+INSERT INTO fieldname VALUES (10,'uk','ln','розділ');
 
 INSERT INTO fieldname VALUES (11,'en','ln','division');
 INSERT INTO fieldname VALUES (11,'fr','ln','division');
@@ -223,6 +235,7 @@ INSERT INTO fieldname VALUES (11,'cs','ln','oddělení');
 INSERT INTO fieldname VALUES (11,'no','ln','divisjon');
 INSERT INTO fieldname VALUES (11,'sv','ln','');
 INSERT INTO fieldname VALUES (11,'el','ln','τμήμα');
+INSERT INTO fieldname VALUES (11,'uk','ln','підрозділ');
 
 INSERT INTO fieldname VALUES (12,'en','ln','year');
 INSERT INTO fieldname VALUES (12,'fr','ln','année');
@@ -236,6 +249,7 @@ INSERT INTO fieldname VALUES (12,'cs','ln','rok');
 INSERT INTO fieldname VALUES (12,'no','ln','år');
 INSERT INTO fieldname VALUES (12,'sv','ln','år');
 INSERT INTO fieldname VALUES (12,'el','ln','έτος');
+INSERT INTO fieldname VALUES (12,'uk','ln','рік');
 
 INSERT INTO fieldname VALUES (13,'en','ln','experiment');
 INSERT INTO fieldname VALUES (13,'fr','ln','expérience');
@@ -249,6 +263,7 @@ INSERT INTO fieldname VALUES (13,'cs','ln','experiment');
 INSERT INTO fieldname VALUES (13,'no','ln','eksperiment');
 INSERT INTO fieldname VALUES (13,'sv','ln','');
 INSERT INTO fieldname VALUES (13,'el','ln','πείραμα');
+INSERT INTO fieldname VALUES (13,'uk','ln','експеримент');
 
 INSERT INTO fieldname VALUES (14,'en','ln','record ID');
 INSERT INTO fieldname VALUES (14,'fr','ln','notice ID');
@@ -262,6 +277,7 @@ INSERT INTO fieldname VALUES (14,'cs','ln','ID záznamu');
 INSERT INTO fieldname VALUES (14,'no','ln','post ID');
 INSERT INTO fieldname VALUES (14,'sv','ln','');
 INSERT INTO fieldname VALUES (14,'el','ln','record ID');
+INSERT INTO fieldname VALUES (14,'uk','ln','номер запису');
 
 INSERT INTO field_tag VALUES (1,100,10);
 INSERT INTO field_tag VALUES (1,101,10);

@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of the CERN Document Server Software (CDSware).
@@ -95,6 +96,24 @@
    </tbody>
    </table>
 </el>
+<uk>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</uk>
 
 <p><en>Find out all about searching</en>
    <fr>Trouvez tout sur la recherche de</fr>
@@ -108,6 +127,7 @@
    <no>Finn ut alt om søking i</no>
    <sv>Finn ut allt om sökning av</sv>
    <el>Find out all about searching</el>
+   <uk>Find out all about searching</uk>
    <CDSNAMEINTL>:
 
 <blockquote>
@@ -164,6 +184,10 @@
       This page presents you with useful tips and techniques in order to
       help you use the <CDSNAMEINTL> site to the full.
     </el>  
+    <uk>
+      This page presents you with useful tips and techniques in order to
+      help you use the <CDSNAMEINTL> site to the full.
+    </uk>  
 
 <dt><a href="<lang:star: guide.*.html>">Search Guide</a>
 

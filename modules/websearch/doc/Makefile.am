@@ -21,16 +21,16 @@ SUBDIRS = admin hacking
 
 docdir = $(WEBDIR)/help/search
 
-doc_DATA=index.en.html index.fr.html index.de.html index.es.html index.pt.html index.it.html index.ru.html index.sk.html index.cs.html index.no.html index.sv.html index.el.html \
-	tips.en.html tips.fr.html tips.de.html tips.pt.html tips.es.html tips.it.html tips.ru.html tips.sk.html tips.cs.html tips.no.html tips.sv.html tips.el.html \
-	guide.en.html guide.fr.html guide.de.html guide.pt.html guide.es.html guide.it.html guide.ru.html guide.sk.html guide.cs.html guide.no.html guide.sv.html guide.el.html
+doc_DATA=index.en.html index.fr.html index.de.html index.es.html index.pt.html index.it.html index.ru.html index.sk.html index.cs.html index.no.html index.sv.html index.el.html index.uk.html \
+	tips.en.html tips.fr.html tips.de.html tips.pt.html tips.es.html tips.it.html tips.ru.html tips.sk.html tips.cs.html tips.no.html tips.sv.html tips.el.html tips.uk.html \
+	guide.en.html guide.fr.html guide.de.html guide.pt.html guide.es.html guide.it.html guide.ru.html guide.sk.html guide.cs.html guide.no.html guide.sv.html guide.el.html guide.uk.html
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 
-%.en.html %.fr.html %.de.html %.es.html %.pt.html %.it.html %.ru.html %.sk.html %.cs.html %.no.html %.sv.html %.el.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
+%.en.html %.fr.html %.de.html %.es.html %.pt.html %.it.html %.ru.html %.sk.html %.cs.html %.no.html %.sv.html %.el.html %.uk.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
            $(top_srcdir)/config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$*.en.html \
 	       -o\(ALL-LANG_*\)+LANG_FR:$*.fr.html \
@@ -43,4 +43,5 @@ CLEANFILES = $(doc_DATA) *~ *.tmp
 	       -o\(ALL-LANG_*\)+LANG_CS:$*.cs.html \
 	       -o\(ALL-LANG_*\)+LANG_NO:$*.no.html \
 	       -o\(ALL-LANG_*\)+LANG_SV:$*.sv.html \
-	       -o\(ALL-LANG_*\)+LANG_EL:$*.el.html $<
+	       -o\(ALL-LANG_*\)+LANG_EL:$*.el.html \
+	       -o\(ALL-LANG_*\)+LANG_UK:$*.uk.html $<

@@ -61,6 +61,7 @@
   <no>Hovedsiden</no>
   <sv>Första sidan</sv>
   <el>Αρχική Σελίδα</el>
+  <uk>Головна сторінка</uk>
 </define-tag>
 
 <define-tag MSG_SEARCH whitespace=delete>
@@ -76,6 +77,7 @@
   <no>Søk</no>
   <sv>Sök</sv>
   <el>Αναζήτηση</el>
+  <uk>Пошук</uk>
 </define-tag>
 
 <define-tag MSG_SUBMIT whitespace=delete>
@@ -91,6 +93,7 @@
   <no>Send inn</no>
   <sv>Skicka in</sv>
   <el>Υποβολή</el>
+  <uk>Додати</uk>
 </define-tag>
 
 <define-tag MSG_HELP whitespace=delete>
@@ -106,6 +109,7 @@
   <no>Hjelp</no>
   <sv>Hjälp</sv>
   <el>Βοήθεια</el>
+  <uk>Допомога</uk>
 </define-tag>
 
 <define-tag MSG_HELP_CENTRAL whitespace=delete>
@@ -121,6 +125,7 @@
   <no>Hjelpesentral</no>
   <sv>Hjälpcentral</sv>
   <el>Βοήθεια</el>
+  <uk>Центр допомоги</uk>
 </define-tag>
 
 <define-tag MSG_SEARCH_HELP whitespace=delete>
@@ -136,6 +141,7 @@
   <no>Søkehjelp</no>
   <sv>Hjälp med sökning</sv>
   <el>Βοήθεια αναζήτησης</el>
+  <uk>Допомога для пошуку</uk>
 </define-tag>
 
 <define-tag MSG_SEARCH_TIPS whitespace=delete>
@@ -151,6 +157,7 @@
   <no>Søketips</no>
   <sv>Söktips</sv>
   <el>Παραδείγματα αναζήτησης</el>
+  <uk>Вказівки для пошуку</uk>
 </define-tag>
 
 <define-tag MSG_PERSONALIZE whitespace=delete>
@@ -166,6 +173,7 @@
   <no>Brukerinnstillinger</no>
   <sv>Inställningar</sv>
   <el>Ρυθμίσεις</el>
+  <uk>Персоналізація</uk>
 </define-tag>
 
 <define-tag MSG_PAGE_BEING_TRANSLATED_HEAD whitespace=delete>
@@ -181,6 +189,7 @@
   <no>NORSK OVERSETTELSE UNDERVEIS</no>
   <sv>ÖVERSÄTTNING TILL SVENSKA PÅGÅR</sv>
   <el>ΕΛΛΗΝΙΚΗ ΜΕΤΑΦΡΑΣΗ ΣΕ ΕΞΕΛΙΞΗ</el>
+  <uk>ПЕРЕКЛАД ГОТУЄТЬСЯ</uk>
 </define-tag>
 
 <define-tag MSG_PAGE_BEING_TRANSLATED_BODY>
@@ -241,6 +250,10 @@
      Παρακαλούμε συμβουλευτείτε την Αγγλική σελίδα. Ευχαριστούμε
      για την καταννόηση.
   </el>
+  <uk>Переклад цієї сторінки не закінчено.
+      Скористайтесь англомовною версією.
+      Дякуємо за розуміння.
+  </uk>
 </define-tag>
 
 <define-tag MSG_POWERED_BY whitespace=delete>
@@ -256,6 +269,7 @@
   <no>Powered by</no>
   <sv>Powered by</sv>
   <el>Βασίζεται στο</el>
+  <uk>Powered by</uk>
 </define-tag>
 
 <define-tag MSG_MAINTAINED_BY whitespace=delete>
@@ -271,6 +285,7 @@
   <no>Vedlikeholdt av</no>
   <sv>Underhålls av</sv>
   <el>Συντηρείται από</el>
+  <uk>Служба підтримки</uk>
 </define-tag>
 
 <define-tag MSG_LAST_UPDATED whitespace=delete>
@@ -286,6 +301,7 @@
   <no>Sist oppdatert</no>
   <sv>Senast uppdaterad</sv>
   <el>Τελευταία ενημέρωση</el>
+  <uk>Останнє поновлення</uk>
 </define-tag>
 
 # FIXME
@@ -302,6 +318,7 @@
   <no>Begrens til samling:</no>
   <sv>Avgränsad sökning:</sv>
   <el>Περιορισμός αναζήτησης:</el>
+  <uk>Вибрати розділ:</uk>
 </define-tag>
 
 <define-tag MSG_FOCUS_ON whitespace=delete>
@@ -317,6 +334,7 @@
   <no>Utvalgte samlinger:</no>
   <sv>Utvalda samlingar:</sv>
   <el>Επικέντρωση σε:</el>
+  <uk>Вибрати з:</uk>
 </define-tag>
 
 <define-tag MSG_SIMPLE_SEARCH whitespace=delete>
@@ -332,6 +350,7 @@
   <no>Enkelt Søk</no>
   <sv>Enkel sökning</sv>
   <el>Απλή αναζήτηση</el>
+  <uk>Простий пошук</uk>
 </define-tag>
 
 <define-tag MSG_ADVANCED_SEARCH whitespace=delete>
@@ -347,6 +366,7 @@
   <no>Avansert Søk</no>
   <sv>Avancerad sökning</sv>
   <el>Σύνθετη αναζήτηση</el>
+  <uk>Розширений пошук</uk>
 </define-tag>
 
 <define-tag MSG_COLLECTION_NOT_FOUND_HEAD whitespace=delete>
@@ -362,6 +382,7 @@
   <no>Samling %s ikke funnet</no>
   <sv>Samlingen %s finns inte</sv>
   <el>Η συλλογή %s δεν βρέθηκε</el>
+  <uk>Розділ %s не існує</uk>
 </define-tag>
 
 <define-tag MSG_COLLECTION_NOT_FOUND_BODY>
@@ -413,6 +434,10 @@
     <p>Δυστυχώς η συλλογή <strong>%s</strong> δεν υπάρχει.
     <p>Ενδεχομένως να ενδιαφέρεστε να ξεκινήσετε την έρευνα από <a href=\"%s\">%s</a>.
   </el>
+  <uk>
+    <p>Вибачте, розділ <strong>%s</strong> не існує.
+    <p>Спробуйте почати ще раз з <a href=\"%s\">%s</a>.
+  </uk>
 </define-tag>
 
 <define-tag MSG_ACCOUNT whitespace=delete>
@@ -428,6 +453,7 @@
   <no>konto</no>
   <sv>konto</sv>
   <el>Λογαριασμός</el>
+  <uk>обліковий запис</uk>
 </define-tag>
 
 <define-tag MSG_ALERTS whitespace=delete>
@@ -443,6 +469,7 @@
   <no>varsler</no>
   <sv>alerts</sv>
   <el>ειδοποιήσεις</el>
+  <uk>повідомлення</uk>
 </define-tag>
 
 <define-tag MSG_BASKETS whitespace=delete>
@@ -458,6 +485,7 @@
   <no>kurver</no>
   <sv>korgar</sv>
   <el>καλάθι</el>
+  <uk>кошики</uk>
 </define-tag>
 
 # FIXME
@@ -474,6 +502,7 @@
   <no>innsendte</no>
   <sv>bidrag</sv>
   <el>submissions</el>
+  <uk>додане</uk>
 </define-tag>
 
 # FIXME
@@ -490,6 +519,7 @@
   <no>godkjente</no>
   <sv>godkända</sv>
   <el>εγκρίσεις</el>
+  <uk>підтвердження</uk>
 </define-tag>
 
 <define-tag MSG_SESSION whitespace=delete>
@@ -505,6 +535,7 @@
   <no>økt</no>
   <sv>användarsession</sv>
   <el>συνεδρία</el>
+  <uk>сеанс</uk>
 </define-tag>
 
 <define-tag MSG_LOGIN whitespace=delete>
@@ -520,6 +551,7 @@
   <no>logg inn</no>
   <sv>logga in</sv>
   <el>είσοδος</el>
+  <uk>увійти</uk>
 </define-tag>
 
 <define-tag MSG_LOGOUT whitespace=delete>
@@ -535,6 +567,7 @@
   <no>logg ut</no>
   <sv>logga ut</sv>
   <el>αποσύνδεση</el>
+  <uk>вийти</uk>
 </define-tag>
 
 <define-tag MSG_LANGUAGE whitespace=delete>
@@ -550,6 +583,7 @@
   <no>språk</no>
   <sv>språk</sv>
   <el>γλώσσα</el>
+  <uk>мова</uk>
 </define-tag>
 
 <define-tag MSG_BROWSE whitespace=delete>
@@ -565,6 +599,7 @@
   <no>Bla gjennom</no>
   <sv>Bläddra</sv>
   <el>Φυλλομέτρηση</el>
+  <uk>Переглянути</uk>
 </define-tag>
 
 <define-tag MSG_SEARCH_RECORDS_FOR whitespace=delete>
@@ -580,6 +615,7 @@
   <no>Søk i %s poster etter:</no>
   <sv>Sök i %s poster efter:</sv>
   <el>Αναζήτηση σε %s εγγραφές για:</el>
+  <uk>Шукати серед %s записів:</uk>
 </define-tag>
 
 <define-tag MSG_ALL_OF_THE_WORDS whitespace=delete>
@@ -595,6 +631,7 @@
   <no>Alle ordene:</no>
   <sv>Samtliga ord:</sv>
   <el>Όλες οι λέξεις</el>
+  <uk>Всі слова</uk>
 </define-tag>
 
 <define-tag MSG_ANY_OF_THE_WORDS whitespace=delete>
@@ -610,6 +647,7 @@
   <no>Minst ett av ordene:</no>
   <sv>Minst ett av orden:</sv>
   <el>Οποιαδήποτε από τις λέξεις</el>
+  <uk>Будь-яке з слів:</uk>
 </define-tag>
 
 <define-tag MSG_EXACT_PHRASE whitespace=delete>
@@ -625,6 +663,7 @@
   <no>Nøyaktig uttrykk:</no>
   <sv>Exakt fras:</sv>
   <el>Ακριβής φράση:</el>
+  <uk>Точна фраза:</uk>
 </define-tag>
 
 <define-tag MSG_PARTIAL_PHRASE whitespace=delete>
@@ -640,6 +679,7 @@
   <no>Delvis uttrykk:</no>
   <sv>Del av fras:</sv>
   <el>Επιμέρους φράση:</el>
+  <uk>Частина фрази:</uk>
 </define-tag>
 
 <define-tag MSG_REGULAR_EXPRESSION whitespace=delete>
@@ -655,6 +695,7 @@
   <no>Regulært uttrykk:</no>
   <sv>Reguljärt uttryck:</sv>
   <el>Regular expression:</el>
+  <uk>Регулярний вираз:</uk>
 </define-tag>
 
 <define-tag MSG_AND whitespace=delete>
@@ -670,6 +711,7 @@
   <no>OG</no>
   <sv>OCH</sv>
   <el>ΚΑΙ</el>
+  <uk>ТА</uk>
 </define-tag>
 
 <define-tag MSG_OR whitespace=delete>
@@ -685,6 +727,7 @@
   <no>ELLER</no>
   <sv>ELLER</sv>
   <el>Ή</el>
+  <uk>АБО</uk>
 </define-tag>
 
 <define-tag MSG_AND_NOT whitespace=delete>
@@ -700,6 +743,7 @@
   <no>OG IKKE</no>
   <sv>INTE</sv>
   <el>ΚΑΙ ΟΧΙ</el>
+  <uk>ТА НЕ</uk>
 </define-tag>
 
 <define-tag MSG_SEARCH_RESULTS whitespace=delete>
@@ -715,6 +759,7 @@
   <no>Søkeresultater</no>
   <sv>Sökresultat</sv>
   <el>Αποτελέσματα αναζήτησης</el>
+  <uk>Результати пошуку</uk>
 </define-tag>
 
 <define-tag MSG_TRY_YOUR_SEARCH_ON whitespace=delete>
@@ -730,6 +775,7 @@
   <no>Prøv søket på...</no>
   <sv>Pröva att söka efter...</sv>
   <el>Δοκιμάστε την έρευνά σας στο...</el>
+  <uk>Спробуйте шукати...</uk>
 </define-tag>
 
 # FIXME
@@ -746,6 +792,7 @@
   <no>Ikke funnet hva du søkte etter?  Prøv søket på:</no>
   <sv>Har du inte funnit vad du söker efter?  Försök med:</sv>
   <el>Δεν βρήκατε αυτό που αναζητούσατε; Δοκιμάστε την έρευνά σας σε άλλους servers:</el>
+  <uk>Не знайшли потрібного? Спробуйте пошуковий сервер:</uk>
 </define-tag>
 
 # FIXME
@@ -762,6 +809,7 @@
   <no>Se også: lignende forfatternavn</no>
   <sv>Se också: liknande författarnamn</sv>
   <el>Δείτε ακόμη: παρόμοια ονόματα συγγραφέων</el>
+  <uk>Див. також: подібні прізвища авторів</uk>
 </define-tag>
 
 # FIXME
@@ -778,6 +826,7 @@
   <no>i</no>
   <sv>i</sv>
   <el>σε</el>
+  <uk>в</uk>
 </define-tag>
 
 <define-tag MSG_SORT_BY whitespace=delete>
@@ -793,6 +842,7 @@
   <no>Sorter etter:</no>
   <sv>Sortera efter:</sv>
   <el>Ταξινόμηση με:</el>
+  <uk>Впорядкувати за:</uk>
 </define-tag>
 
 <define-tag MSG_LATEST_FIRST whitespace=delete>
@@ -808,6 +858,7 @@
   <no>siste først</no>
   <sv>senaste först</sv>
   <el>Το τελευταίο, πρώτο</el>
+  <uk>останні спочатку</uk>
 </define-tag>
 
 <define-tag MSG_ASCENDING whitespace=delete>
@@ -823,6 +874,7 @@
   <no>stigende</no>
   <sv>stigande</sv>
   <el>αύξ.</el>
+  <uk>зрост.</uk>
 </define-tag>
 
 <define-tag MSG_DESCENDING whitespace=delete>
@@ -838,6 +890,7 @@
   <no>synkende</no>
   <sv>fallande</sv>
   <el>φθίν.</el>
+  <uk>спад.</uk>
 </define-tag>
 
 # FIXME
@@ -854,6 +907,7 @@
   <no>ranger etter</no>
   <sv>rangordna efter</sv>
   <el>ταξινόμηση με</el>
+  <uk>впорядкувати за</uk>
 </define-tag>
 
 <define-tag MSG_DISPLAY_RESULTS whitespace=delete>
@@ -869,6 +923,7 @@
   <no>Vis resultater:</no>
   <sv>Visa sökresultat:</sv>
   <el>Παρουσίαση αποτελεσμάτων:</el>
+  <uk>Показати результат:</uk>
 </define-tag>
 
 <define-tag MSG_RESULTS whitespace=delete>
@@ -884,6 +939,7 @@
   <no>resultater</no>
   <sv>resultat</sv>
   <el>αποτελέσματα</el>
+  <uk>результати</uk>
 </define-tag>
 
 <define-tag MSG_SINGLE_LIST whitespace=delete>
@@ -899,6 +955,7 @@
   <no>enkel liste</no>
   <sv>enkel lista</sv>
   <el>απλή λίστα</el>
+  <uk>один список</uk>
 </define-tag>
 
 <define-tag MSG_SPLIT_BY_COLLECTION whitespace=delete>
@@ -914,6 +971,7 @@
   <no>oppdelt etter samling</no>
   <sv>uppdelat efter samling</sv>
   <el>διαχωρισμός κατά συλλογή</el>
+  <uk>розділити за розділами</uk>
 </define-tag>
 
 <define-tag MSG_OUTPUT_FORMAT whitespace=delete>
@@ -929,6 +987,7 @@
   <no>Visningsformat:</no>
   <sv>Visningsformat:</sv>
   <el>Μορφή αποτελεσμάτων:</el>
+  <uk>Формат представлення:</uk>
 </define-tag>
 
 <define-tag MSG_BRIEF whitespace=delete>
@@ -944,6 +1003,7 @@
   <no>kort</no>
   <sv>kort</sv>
   <el>σύντομη</el>
+  <uk>короткий</uk>
 </define-tag>
 
 <define-tag MSG_DETAILED whitespace=delete>
@@ -959,6 +1019,7 @@
   <no>detaljert</no>
   <sv>detaljerat</sv>
   <el>αναλυτική</el>
+  <uk>детальний</uk>
 </define-tag>
 
 <define-tag MSG_DETAILED_RECORD whitespace=delete>
@@ -974,6 +1035,7 @@
   <no>Full post</no>
   <sv>Fullständig post</sv>
   <el>Αναλυτική εγγραφή</el>
+  <uk>Детальний запис</uk>
 </define-tag>
 
 <define-tag MSG_RESULTS_OVERVIEW_FOUND_X_RECORDS_IN_Y_SECONDS whitespace=delete>
@@ -1013,6 +1075,9 @@
   <el>
   <strong>Αποτελέσμα έρευνας:</strong> Βρέθηκαν <strong>%s</strong> εγγραφές σε %.2f δευτερόλεπτα.
   </el>
+  <uk>    
+    <strong>Результат:</strong> Знайдено <strong>%s</strong> записів за %.2f секунд.
+  </uk>
 </define-tag>
 
 <define-tag MSG_X_RECORDS_FOUND whitespace=delete>
@@ -1028,6 +1093,7 @@
   <no><strong>%s</strong> poster funnet</no>
   <sv><strong>%s</strong> poster hittades</sv>
   <el><strong>%s</strong> εγγραφές βρέθηκαν</el>
+  <uk><strong>%s</strong> знайдених записів</uk>
 </define-tag>
 
 <define-tag MSG_JUMP_TO_RECORD whitespace=delete>
@@ -1043,6 +1109,7 @@
   <no>gå til post:</no>
   <sv>gå till post:</sv>
   <el>μετάβαση στην εγγραφή:</el>
+  <uk>перейти до запису:</uk>
 </define-tag>
 
 <define-tag MSG_SEARCH_TOOK_X_SECONDS whitespace=delete>
@@ -1058,6 +1125,7 @@
   <no>Søket tok %.2f sekunder.</no>
   <sv>Sökningen tog %.2f sekunder.</sv>
   <el>Η έρευνα πήρε %.2f δευτερόλεπτα.</el>
+  <uk>Пошук тривав %.2f секунд.</uk>
 </define-tag>
 
 <define-tag MSG_ADD_TO_BASKET whitespace=delete>
@@ -1073,6 +1141,7 @@
   <no>LEGG TIL I KURV</no>
   <sv>LÄGG I KORGEN</sv>
   <el>ΠΡΟΣΘΗΚΗ ΣΤΟ ΚΑΛΑΘΙ</el>
+  <uk>ДОДАТИ ДО КОШИКА</uk>
 </define-tag>
 
 <define-tag MSG_COLLECTIONS whitespace=delete>
@@ -1088,6 +1157,7 @@
   <no>samlinger</no>
   <sv>samlingar</sv>
   <el>συλλογές</el>
+  <uk>розділи</uk>
 </define-tag>
 
 <define-tag MSG_ANY_COLLECTION whitespace=delete>
@@ -1103,6 +1173,7 @@
   <no>alle samlinger</no>
   <sv>alla samlingar</sv>
   <el>οποιαδήποτε συλλογή</el>
+  <uk>будь-який розділ</uk>
 </define-tag>
 
 <define-tag MSG_ADD_ANOTHER_COLLECTION whitespace=delete>
@@ -1118,6 +1189,7 @@
   <no>legg til ny samling</no>
   <sv>lägg till ny samling</sv>
   <el>προσθήκη συλλογής</el>
+  <uk>додати інший розділ</uk>
 </define-tag>
 
 <define-tag MSG_GUEST whitespace=delete>
@@ -1133,6 +1205,7 @@
   <no>gjest</no>
   <sv>gäst</sv>
   <el>επισκέπτης</el>
+  <uk>гість</uk>
 </define-tag>
 
 <define-tag MSG_SUBMIT_HELP whitespace=delete>
@@ -1148,6 +1221,7 @@
   <no>Innsendingshjelp</no>
   <sv>Hjälp med publicering</sv>
   <el>Υποβολή Βοήθειας</el>
+  <uk>Допомога в поданні</uk>
 </define-tag>
 
 # FIXME
@@ -1164,6 +1238,7 @@
   <no>administrasjon</no>
   <sv>administration</sv>
   <el>διαχείριση</el>
+  <uk>адміністрування</uk>
 </define-tag>
 
 <define-tag MSG_ADMIN_AREA whitespace=delete>
@@ -1179,6 +1254,7 @@
   <no>Administratorområde</no>
   <sv>Administrationsområde</sv>
   <el>Περιοχή Διαχειριστή</el>
+  <uk>Область адміністратора</uk>
 </define-tag>
 
 <define-tag MSG_ADMIN_SUBMIT whitespace=delete>
@@ -1194,6 +1270,7 @@
   <no>Innsendingsadministrasjon</no>
   <sv>Publiceringsadministration</sv>
   <el>Διαχείριση WebSubmit</el>
+  <uk>Адміністрування подання</uk>
 </define-tag>
 
 <define-tag MSG_GUIDE whitespace=delete>
@@ -1209,6 +1286,7 @@
   <no>Guide</no>
   <sv>Guide</sv>
   <el>Οδηγός</el>
+  <uk>Керівництво</uk>
 </define-tag>
 
 <define-tag MSG_ADDED_SINCE whitespace=delete>
@@ -1224,6 +1302,7 @@
   <no>Lagt til fra:</no>
   <sv>Tillagt sedan:</sv>
   <el>Προστέθηκαν από:</el>
+  <uk>Додано з:</uk>
 </define-tag>
 
 <define-tag MSG_UNTIL whitespace=delete>
@@ -1239,6 +1318,7 @@
   <no>til:</no>
   <sv>till:</sv>
   <el>έως:</el>
+  <uk>до:</uk>
 </define-tag>
 
 <define-tag MSG_ANY_DAY whitespace=delete>
@@ -1254,6 +1334,7 @@
   <no>alle dager</no>
   <sv>alla dagar</sv>
   <el>οποιαδήποτε ημέρα</el>
+  <uk>будь-який день</uk>
 </define-tag>
 
 <define-tag MSG_ANY_MONTH whitespace=delete>
@@ -1269,6 +1350,7 @@
   <no>alle måneder</no>
   <sv>alla månader</sv>
   <el>οποιονδήποτε μήνα</el>
+  <uk>будь-який місяць</uk>
 </define-tag>
 
 <define-tag MSG_ANY_YEAR whitespace=delete>
@@ -1284,6 +1366,7 @@
   <no>alle år</no>
   <sv>alla år</sv>
   <el>οποιονδήποτε χρόνο</el>
+  <uk>будь-який рік</uk>
 </define-tag>
 
 <define-tag MSG_JANUARY whitespace=delete>
@@ -1299,6 +1382,7 @@
   <no>januar</no>
   <sv>januari</sv>
   <el>Ιανουάριος</el>
+  <uk>січень</uk>
 </define-tag>
 
 <define-tag MSG_FEBRUARY whitespace=delete>
@@ -1314,6 +1398,7 @@
   <no>februar</no>
   <sv>februari</sv>
   <el>Φεβρουάριος</el>
+  <uk>лютий</uk>
 </define-tag>
 
 <define-tag MSG_MARCH whitespace=delete>
@@ -1329,6 +1414,7 @@
   <no>mars</no>
   <sv>mars</sv>
   <el>Μάρτιος</el>
+  <uk>березень</uk>
 </define-tag>
 
 <define-tag MSG_APRIL whitespace=delete>
@@ -1344,6 +1430,7 @@
   <no>april</no>
   <sv>april</sv>
   <el>Απρίλιος</el>
+  <uk>квітень</uk>
 </define-tag>
 
 <define-tag MSG_MAY whitespace=delete>
@@ -1359,6 +1446,7 @@
   <no>mai</no>
   <sv>maj</sv>
   <el>Μάιος</el>
+  <uk>травень</uk>
 </define-tag>
 
 <define-tag MSG_JUNE whitespace=delete>
@@ -1374,6 +1462,7 @@
   <no>juni</no>
   <sv>juni</sv>
   <el>Ιούνιος</el>
+  <uk>червень</uk>
 </define-tag>
 
 <define-tag MSG_JULY whitespace=delete>
@@ -1389,6 +1478,7 @@
   <no>juli</no>
   <sv>juli</sv>
   <el>Ιούλιος</el>
+  <uk>липень</uk>
 </define-tag>
 
 <define-tag MSG_AUGUST whitespace=delete>
@@ -1404,6 +1494,7 @@
   <no>august</no>
   <sv>augusti</sv>
   <el>Άυγουστος</el>
+  <uk>серпень</uk>
 </define-tag>
 
 <define-tag MSG_SEPTEMBER whitespace=delete>
@@ -1419,6 +1510,7 @@
   <no>september</no>
   <sv>september</sv>
   <el>Σεπτέμβριος</el>
+  <uk>вересень</uk>
 </define-tag>
 
 <define-tag MSG_OCTOBER whitespace=delete>
@@ -1434,6 +1526,7 @@
   <no>oktober</no>
   <sv>oktober</sv>
   <el>Οκτώβριος</el>
+  <uk>жовтень</uk>
 </define-tag>
 
 <define-tag MSG_NOVEMBER whitespace=delete>
@@ -1449,6 +1542,7 @@
   <no>november</no>
   <sv>november</sv>
   <el>Νοέμβριος</el>
+  <uk>листопад</uk>
 </define-tag>
 
 <define-tag MSG_DECEMBER whitespace=delete>
@@ -1464,6 +1558,7 @@
   <no>desember</no>
   <sv>december</sv>
   <el>Δεκέμβριος</el>
+  <uk>грудень</uk>
 </define-tag>
 
 <define-tag MSG_SEARCH_TERM whitespace=delete>
@@ -1479,6 +1574,7 @@
   <no>Søketerm <em>%s</em></no>
   <sv>Sökord <em>%s</em></sv>
   <el>Όρος αναζήτησης <em>%s</em></el>
+  <uk>Термін для пошуку <em>%s</em></uk>
 </define-tag>
 
 <define-tag MSG_INSIDE_INDEX whitespace=delete>
@@ -1494,6 +1590,7 @@
   <no>innen <em>%s</em>indeks</no>
   <sv>i <em>%s</em>index</sv>
   <el>στο <em>%s</em> ευρετήριο</el>
+  <uk>у вказівнику <em>%s</em></uk>
 </define-tag>
 
 <define-tag MSG_DID_NOT_MATCH whitespace=delete>
@@ -1509,6 +1606,7 @@
   <no>passet ingen poster.  Næreste term i hvilken som helst samling er:</no>
   <sv>matchade inga poster. Närmaste term i vilken som helst samling är:</sv>
   <el>δεν ταίριαξε με κάποια εγγραφή. Παραπλήσιοι όροι σε όλες τις συλλογές:</el>
+  <uk>не знайдено. Найближчі терміни в розділі:</uk>
 </define-tag>
 
 <define-tag MSG_NO_WORDS_INDEX_AVAILABLE whitespace=delete>
@@ -1524,6 +1622,7 @@
   <no>Ingen ordindeks tilgjengelig for</no>
   <sv>Inget index tillgängligt för</sv>
   <el>Δεν υπάρχει ευρετήριο λέξεων για</el>
+  <uk>Не знайдено лексичний вказівник для</uk>
 </define-tag>
 
 <define-tag MSG_NO_PHRASE_INDEX_AVAILABLE whitespace=delete>
@@ -1539,6 +1638,7 @@
   <no>Ingen uttrykksindeks tilgjengelig for</no>
   <sv>Inget index tillgängligt för</sv>
   <el>Δεν υπάρχει ευρετήριο φράσεων για</el>
+  <uk>Не знайдений вказівник фраз для</uk>
 </define-tag>
 
 # FIXME
@@ -1591,6 +1691,10 @@
     Κανένα αποτέλεσμα στην συλλογή %s.
     Άλλες συλλογές έδωσαν <a class="nearestterms" href="%s/search.py?%s">%d αποτελέσματα</a>.
   </el>
+  <uk>
+    В роділі %s результатів не знайдено.
+    В інших загальнодоступних розділах знайдено <a class="nearestterms" href="%s/search.py?%s">%d співпадінь</a>
+  </uk>
 </define-tag>
 
 <define-tag MSG_NO_PUBLIC_HITS>
@@ -1649,6 +1753,11 @@
     Καμιά ανοιχτή συλλογή δεν ικανοποίησε την έρευνά σας. Άν ψάχνετε και
     σε κλειστές συλλογές, παρακαλώ επιλέξτε τις στην αρχή.
   </el>
+  <uk>
+    Серед загальнодоступних розділів відповідностей запиту не
+    знайдено. Якщо Ви шукаєте документ з обмеженим доступом, спочатку
+    виберіть відповідий розділ з обмеженим доступом.    
+  </uk>
 </define-tag>
 
 <define-tag MSG_NO_MATCH_WITHIN_TIME_LIMIT>
@@ -1695,6 +1804,7 @@
   <el>
     Κανένα αποτέλεσμα στα χρονικά περιθώρια, θα γίνει παράβλεψη του κριτηρίου αυτού...
   </el>
+  <uk>За відведений час результатів не знайдено, умову скасовано</uk>
 </define-tag>
 
 <define-tag MSG_NO_MATCH_WITHIN_SEARCH_LIMITS>
@@ -1742,6 +1852,7 @@
   <el>
     Κανένα αποτέλεσμα στα όρια έρευνας, θα γίνει παράβλεψη του κριτηρίου αυτού...
   </el>
+  <uk>За даних обмежень результатів не знайдено, умова скасовується</uk>
 </define-tag>
 
 # FIXME
@@ -1794,6 +1905,9 @@
     Η λογική ερώτηση δεν επέστρεψε αποτελέσματα.
     Παρακαλούμε δοκιμάστε διαφορετικό συνδιασμό των όρων.
   </el>
+  <uk>Результатів для умовного запиту не знайдено.
+     Виберіть іншу комбінацію термінів.
+  </uk>
 </define-tag>
 
 <define-tag MSG_NO_EXACT_MATCH_FOR_FOO_USING_BAR_INSTEAD>
@@ -1839,6 +1953,10 @@
     Δεν βρέθηκε κανένα αποτέλεσμα για <em>%s</em>, θα γίνει χρήση
     του <em>%s</em> στην θέση του...
   </el>
+  <uk>
+    Точних відповідностей запиту <em>%s</em> не знайдено, замсть цього
+    використано <em>%s</em>...
+  </uk>
 </define-tag>
 
 <define-tag MSG_INTERNAL_ERROR whitespace=delete>
@@ -1854,6 +1972,7 @@
   <no>Intern Feil</no>
   <sv>Internt Fel</sv>
   <el>Εσωτερικό Σφάλμα</el>
+  <uk>Внутрішня помилка</uk>
 </define-tag>
 
 <define-tag MSG_PLEASE_CONTACT_AND_QUOTE>
@@ -1900,6 +2019,9 @@
     Παρακαλώ επικοινωνήστε με τον <a href=\"mailto:%s\">%s</a> αναφέροντας
     τα παρακάτω στοιχεία:
   </el>
+  <uk>
+    Зверніться на адресу <a href=\"mailto:%s\">%s</a> та вкажіть наступну інформацію:
+  </uk>
 </define-tag>
 
 <define-tag MSG_SEARCH_OPTIONS whitespace=delete>
@@ -1915,6 +2037,7 @@
   <no>Søkevalg:</no>
   <sv>Sökalternativ:</sv>
   <el>Επιλογές αναζήτησης:</el>
+  <uk>Опції пошуку</uk>
 </define-tag>
 
 <define-tag MSG_LATEST_ADDITIONS whitespace=delete>
@@ -1930,6 +2053,7 @@
   <no>Siste tillagte poster:</no>
   <sv>Senast inlagda poster:</sv>
   <el>Πρόσφατες προσθήκες:</el>
+  <uk>Останні надходження:</uk>
 </define-tag>
 
 <define-tag MSG_MORE whitespace=delete>
@@ -1945,6 +2069,7 @@
   <no>mer</no>
   <sv>mer</sv>
   <el>περισσότερα</el>
+  <uk>далі</uk>
 </define-tag>
 
 <define-tag MSG_COLLECTION_CONTAINS_NO_RECORDS whitespace=delete>
@@ -1960,6 +2085,7 @@
   <no>Denne samlingen inneholder fremdeles ingen dokumenter.</no>
   <sv>Denna samling innehåller ännu inga dokument.</sv>
   <el>Η συλλογή αυτή δεν περιέχει κάποιο έγγραφο ακόμη.</el>
+  <uk>Цей розділ поки що не містить записів</uk>
 </define-tag>
 
 <define-tag MSG_COLLECTION_RESTRICTED_CONTENT whitespace=delete>
@@ -1975,6 +2101,7 @@
   <no>Innholdet i denne samlingen er adgangsbegrenset.</no>
   <sv>Åtkomsten till denna samling är begränsad.</sv>
   <el>Τα περιεχόμενα της παρούσας συλλογής είναι προστατευμένα</el>
+  <uk>Доступ до змісту цього розділу обмежений</uk>
 </define-tag>
 
 <define-tag MSG_CONVERT whitespace=delete>
@@ -1990,6 +2117,7 @@
   <no>Konverter</no>
   <sv>Konvertera</sv>
   <el>Μετατροπή</el>
+  <uk>Конвертувати</uk>
 </define-tag>
 
 <define-tag MSG_AGENDA whitespace=delete>
@@ -2005,6 +2133,7 @@
   <no>Agenda</no>
   <sv>Agenda</sv>
   <el>Ατζέντα</el>
+  <uk>Оголошення</uk>
 </define-tag>
 
 <define-tag MSG_WEBCAST whitespace=delete>
@@ -2020,6 +2149,7 @@
   <no>Webtv</no>
   <sv>Webbtv</sv>
   <el>Webcast</el>
+  <uk>Webcast</uk>
 </define-tag>
 
 <define-tag MSG_BULLETIN whitespace=delete>
@@ -2035,6 +2165,7 @@
   <no>Budstikke</no>
   <sv>Bulletin</sv>
   <el>Bulletin</el>
+  <uk>Бюлетень</uk>
 </define-tag>
 
 <define-tag MSG_LIBRARY whitespace=delete>
@@ -2050,6 +2181,7 @@
   <no>Bibliotek</no>
   <sv>Bibliotek</sv>
   <el>Βιβλιοθήκη</el>
+  <uk>Бібліотека</uk>
 </define-tag>
 
 <define-tag MSG_THIS_PAGE_IN_LANGUAGES whitespace=delete>
@@ -2065,6 +2197,7 @@
   <no>Denne siden er også tilgjengelig på følgende språk:</no>
   <sv>Denna webbplats finns även tillgänglig på följande språk:</sv>
   <el>Η σελίδα αυτή είναι διαθέσιμη και στις εξής γλώσσες:</el>
+  <uk>Цей сайт також доступний наступними мовами:</uk>
 </define-tag>
 
 # FIXME
@@ -2081,6 +2214,7 @@
   <no>,</no>
   <sv>,</sv>
   <el>,</el>
+  <uk>,</uk>
 </define-tag>
 
 # FIXME
@@ -2097,6 +2231,7 @@
   <no>Posten har blitt slettet.</no>
   <sv>The record has been deleted.</sv>
   <el>Η εγγραφή έχει διαγραφεί.</el>
+  <uk>Запис видалено</uk>
 </define-tag>
 
 # FIXME
@@ -2113,6 +2248,7 @@
   <no>adgangsbegrenset</no>
   <sv>begränsad</sv>
   <el>περιορισμένο</el>
+  <uk>обмежено</uk>
 </define-tag>
 
 # FIXME
@@ -2129,6 +2265,7 @@
   <no>Posten vart laget %s, sist endret %s</no>
   <sv>Record created %s, last modified %s</sv>
   <el>Δημιουργία εγγραφής %s, τελευταία αλλαγή %s</el>
+  <uk>Запис створено %s, остання зміна %s</uk>
 </define-tag>
 
 # FIXME
@@ -2145,6 +2282,7 @@
   <no>Lignende sider</no>
   <sv>Similar records</sv>
   <el>Παρόμοιες εγγραφές</el>
+  <uk>Подібні записи</uk>
 </define-tag>
 
 # FIXME
@@ -2161,6 +2299,7 @@
   <no>ord-likhet</no>
   <sv>ord-likhet</sv>
   <el>ομοιότητα λέξης</el>
+  <uk>подібні слова</uk>
 </define-tag>
 
 ## end of file
