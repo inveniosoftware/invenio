@@ -7,6 +7,54 @@ Here is a short summary of the most notable changes in CDSware
 releases.  For more info about the current release, please consult
 RELEASE-NOTES.  For more info about changes, please consult ChangeLog.
 
+CDSware v0.7.0 -- released 2005-04-06
+-------------------------------------
+
+ *) experimental release of the refextract program for automatic
+    reference extraction from PDF fulltext files (BibEdit)
+
+ *) experimental release of the citation and download ranking tools
+    (BibRank)
+
+ *) new module for gathering usage statistics out of Apache log files
+    (WebStat)
+
+ *) new similar-records-navigation tool exploring end-user viewing
+    habits: "people who viewed this page also viewed" (WebSearch,
+    BibRank)
+
+ *) OAI gateway validated against OAI Repository Explorer (BibHarvest)
+
+ *) fixed modification option for the indexer (BibIndex)
+
+ *) collection cache update speeded up (closing #WebSearch-016)
+    (WebSearch)
+
+ *) cleanup of user login mechanism (WebSession, WebAccess)
+
+ *) fixed uploading of already-existing records in the insertion mode
+    (BibUpload)
+
+ *) fixed submission in UTF-8 languages (WebSubmit)
+
+ *) updated HOWTO Run Your Existing CDSware Installation guide
+    (WebHelp)
+
+ *) test suite improvements (WebSearch, BibHarvest, BibRank,
+    BibConvert)
+
+ *) German translation updated and new German stopwords list added,
+    thanks to Guido Pelzer
+
+ *) new Greek and Ukrainian translations, thanks to Theodoros
+    Theodoropoulos and Vasyl Ostrovskyi
+
+ *) all language codes now comply to RFC 1766 and ISO 639
+
+ *) numerous other small fixes and improvements, with many
+    contributions by the EPFL team headed by Frederic Gobry
+    (BibConvert, BibUpload, WebSearch, WebSubmit, WebSession)
+
 
 CDSware v0.5.0 -- released 2004-12-17
 -------------------------------------

@@ -1,168 +1,162 @@
 --------------------------------------------------------------------
-CDSware v0.5.0 is released
-December 17, 2004
+CDSware v0.7.0 is released
+April 6, 2005
 http://cdsware.cern.ch/news/
 --------------------------------------------------------------------
 
-CDSware v0.5.0 was released on December 17th, 2004.
+CDSware v0.7.0 was released on April 6th, 2005.
 
-This release is recommended to all users of prior DEVELOPMENT versions
-(v0.1.x and v0.3.x), as well as old STABLE v0.0.9 version that becomes
-officially deprecated as of this release.
+This release is recommended to all users of v0.5.0 version.
 
 
 What's new:
 -----------
 
- *) new rank engine, featuring word similarity rank method and the
-    journal impact factor rank demo (BibRank)
+ *) experimental release of the refextract program for automatic
+    reference extraction from PDF fulltext files (BibEdit)
 
- *) search engine includes ranking option (WebSearch) 
+ *) experimental release of the citation and download ranking tools
+    (BibRank)
 
- *) record similarity search based on word frequency (WebSearch,
+ *) new module for gathering usage statistics out of Apache log files
+    (WebStat)
+
+ *) new similar-records-navigation tool exploring end-user viewing
+    habits: "people who viewed this page also viewed" (WebSearch,
     BibRank)
 
- *) stopwords possibility when ranking and indexing (BibRank, BibIndex)
+ *) OAI gateway validated against OAI Repository Explorer (BibHarvest)
 
- *) stemming possibility when ranking and indexing (BibRank, BibIndex)
+ *) fixed modification option for the indexer (BibIndex)
 
- *) search engine boolean query processing stages improved (WebSearch)
-
- *) search engine accent matching in phrase searches (WebSearch)
-
- *) regular expression searching mode introduced into the Simple
-    Search interface too (WebSearch)
-
- *) Search Tips split into a brief Search Tips page and detailed
-    Search Guide page (WebSearch)
-
- *) improvements to the ``Try your search on'' hints (WebSearch)
-
- *) author search hints introduced (WebSearch)
-
- *) search interface respects title prologue/epilogue portalboxes
+ *) collection cache update speeded up (closing #WebSearch-016)
     (WebSearch)
 
- *) improvements to admin interfaces (WebSearch, BibIndex, BibRank,
-    WebAccess)
+ *) cleanup of user login mechanism (WebSession, WebAccess)
 
- *) basket item ordering problem fixed (WebBasket)
+ *) fixed uploading of already-existing records in the insertion mode
+    (BibUpload)
 
- *) access error messages introduced (WebAccess and its clients)
+ *) fixed submission in UTF-8 languages (WebSubmit)
 
- *) new account management to enable/disable guest users and
-    automatic vs to-be-approved account registration (WebAccess)
+ *) updated HOWTO Run Your Existing CDSware Installation guide
+    (WebHelp)
 
- *) possibility for temporary read-only access to, and closure of, the
-    site; useful for backups (WebAccess and its clients)
+ *) test suite improvements (WebSearch, BibHarvest, BibRank,
+    BibConvert)
 
- *) possibility for external authentication login methods (WebAccess)
+ *) German translation updated and new German stopwords list added,
+    thanks to Guido Pelzer
 
- *) new XML MARC handling library (BibEdit)
+ *) new Greek and Ukrainian translations, thanks to Theodoros
+    Theodoropoulos and Vasyl Ostrovskyi
 
- *) when uploading, bad XML records are marked as errors (BibUpload)
+ *) all language codes now comply to RFC 1766 and ISO 639
 
- *) improvements to the submission engine and its admin interface,
-    thanks to Tiberiu Dondera (WebSubmit)
-
- *) preparations for electronic mail submission feature, not yet
-    functional (ElmSubmit)
-
- *) added example on MARC usage at CERN (WebHelp)
-
- *) legacy compatibility with MySQL 3.23.x assured (BibUpload)
-
- *) legacy compatibility with Python 2.2 assured (WebSubmit)
-
- *) test suite additions and corrections (BibRank, BibIndex,
-    WebSearch, BibEdit)
-
- *) French translation fixes, thanks to Eric Grand
-
- *) minor Czech and Slovak translation cleanup
+ *) numerous other small fixes and improvements, with many
+    contributions by the EPFL team headed by Frederic Gobry
+    (BibConvert, BibUpload, WebSearch, WebSubmit, WebSession)
 
 
 Download:
 ---------
 
-  <http://cdsware.cern.ch/download/cdsware-0.5.0.tar.gz>
-  <http://cdsware.cern.ch/download/cdsware-0.5.0.tar.gz.md5>
-  <http://cdsware.cern.ch/download/cdsware-0.5.0.tar.gz.sig>
+  <http://cdsware.cern.ch/download/cdsware-0.7.0.tar.gz>
+  <http://cdsware.cern.ch/download/cdsware-0.7.0.tar.gz.md5>
+  <http://cdsware.cern.ch/download/cdsware-0.7.0.tar.gz.sig>
+
+
+Installation notes:
+-------------------
+
+Please follow the INSTALL file bundled in the distribution tarball.
 
 
 Upgrade notes:
 --------------
 
-To upgrade from CDSware v0.3.3, please follow about these steps:
+If you are upgrading from CDSware v0.5.0, then please follow these
+steps:
 
-   - Stop bibsched daemon and all submission procedures and write
-     operations.  For example, you may want to disable the site
-     completely.  Then backup your current database and CDSware files
-     in the installation directory.
+   - New pre-requisite (optional): if you want to experiment with the
+     automatic reference extraction from PDF fulltext files, then you
+     have to check whether your pdftotext program is of version 3 or
+     later.  (See the INSTALL file, item i.)  Note that you are fully
+     free to skip this step now.
 
-   - Untar new sources and rerun configure --prefix=... with old
-     parameters.
+   - New pre-requisite (optional): if you want to experiment with the
+     download and citation ranking alpha codebase, then we recommend
+     you to firstly install Gnuplot, the command-line driven
+     interactive plotting program.  (See the INSTALL file, item l.)
+     Note that you are fully free to skip this step now.
 
-   - Merge your old config.wml with the new one.  There are new
-     options in the new config.wml, so it is not sufficient just to
-     copy over your old config file.  However, the new config file
-     only adds new options, so merging of your old file should be very
-     straightforward.
+   - New pre-requisite (optional): if you want to experiment with the
+     new WebStat program for gathering usage statistics out of Apache
+     log files, then you should firstly install a Common Lisp
+     implementation.  (See the INSTALL file, item m.)  Note that you
+     are fully free to skip this step now.
 
-   - Run make. 
+   - After optionally updating your prerequisites, launch the bibsched
+     monitor and wait until all active bibsched tasks are finished.
+     Then put bibsched daemon into manual mode.  Stop all submission
+     procedures and other write operations: for example, you may want
+     to switch your site read-only (set CFG_ACCESS_CONTROL_LEVEL_SITE
+     to 1 in access_control_config.py and restart Apache) or you may
+     want to stop Apache completely.
+
+   - Optionally you may want to backup your current MySQL database and
+     your CDSware installation directory.  (This step is not really
+     mandatory for the 0.5.0 -> 0.7.0 transition, since the changes
+     are of minor nature only.)
+
+   - Untar new sources and rerun configure with old arguments.  
+
+   - Merge your old config.wml with the new one.  (The old config.wml
+     can be found in /path/to/cdsware/lib/wml/cdsware/config.wml.)
+     There are some new options in the new config.wml, so it is not
+     sufficient just to copy over your old config file.  However, the
+     new config file only changes two-three language-related things in
+     the beginning of the file, so merging of your old config.wml
+     should be very straightforward.
+
+   - Run make.
+
+   - If you have edited your /path/to/cdsware/etc/ files during or
+     since the last installation (for example to edit the stopwords
+     list or configure language stemmers), then back it up now.
+
+   - Run make install.
+
+   - If you have backed up your old /path/to/cdsware/etc/ directory as
+     mentioned above, then copy the backup over the freshly installed
+     etc directory now.  The old etc directory should be usable `as
+     is', unless you have configured bibrank to use the Swedish
+     stemmer, in which case you should change the language code from
+     `se' to `sv' in /path/to/cdsware/etc/bibrank/wrd.cfg.
 
    - Update your table structure with new definitions:
 
-       $ make update-v0.3.3-tables
+        $ make update-v0.5.0-tables
 
      If you are upgrading from previous releases, you have to run
-     previous update-v0.3.0-tables and friends respectively first.
-     (See Makefile.am for what these commands do.)
+     previous update-xxx-tables commands first, respectively.  (See
+     Makefile.am for what these commands do, and check out old
+     RELEASE-NOTES for previous releases.)
 
-   - Update your table content with new definitions:
+   - Run webcoll.  The update is done now.
 
-       . To activate ranking by word similarity, you have to run SQL
-         statements related to rnkMETHOD tables, e.g. like this:
-       
-             $ echo "TRUNCATE rnkMETHOD; TRUNCATE rnkMETHODDATA;" | \
-               ./modules/miscutil/bin/dbexec
-             $ echo "TRUNCATE rnkMETHODNAME; TRUNCATE collection_rnkMETHOD;" | \
-               ./modules/miscutil/bin/dbexec
-             $ grep rnkMETHOD modules/miscutil/sql/tabfill.sql | \
-               ./modules/miscutil/bin/dbexec
-
-         or you can configure ranking methods via BibRank Admin
-         interface.
-
-       . The EXTRACT_EMAIL BibFormat UDF function has been fixed
-         (thanks to Guido Pelzer) and you are advised to delete the
-         old definition and enter the new one, e.g. like this:
-
-             $ echo "DELETE FROM flxUDFS WHERE fname='EXTRACT_EMAIL';" | \
-               ./modules/miscutil/bin/dbexec
-             $ grep "EXTRACT_EMAIL.*if" modules/miscutil/sql/tabfill.sql | \
-               ./modules/miscutil/bin/dbexec
-
-     By doing this your table definitions should be fully up to date.
-
-   - Run make install and webcoll and then restart your Apache server.
-     After that restart bibsched in the auto mode.  If you activated
-     some ranking methods, then you have also tell bibsched to execute
-     bibrank daemon periodically, for example:
-
-        $ bibrank -s1h
-
-     (See also ``HOWTO Run..'' documentation in the Admin Area.)
-
-   - You are done. Check that everything is running fine.
+   - The final stages are: re-enable write-access if you have disabled
+     it in the previous steps; restart your Apache server; put
+     bibsched back into the auto mode.  You are done.
 
 
 Known problems:
 ---------------
 
  *) Several modules of the this release (e.g. the mail submission
-    system) are experimental and not yet activated.  You may have a
-    peek at what is planned, but please do not rely on them.
+    system, citation and download ranking) are experimental and not
+    yet activated.  You may have a peek at what is planned, but please
+    do not rely on them.
 
  *) The admin-level functionality for several modules is not fully
     developed yet.
@@ -170,24 +164,20 @@ Known problems:
  *) Fulltext file storage management is not yet linked with the
     metadata management.
  
- *) ElmSubmit module not yet activated.
-
 
 What's next:
 ------------
 
  *) Fixing the problems mentioned above.
 
- *) Developing BibIndex for better phrase indexing and browsing.
-
  *) Developing clearer relations and dependencies between metadata
     records and fulltext files.
 
- *) Automatic reference extraction program. 
+ *) Introducing page templating to ease the customization of CDSware
+    interface.
 
- *) Citation search and ranking.
-
- *) Download statistics and ranking.
+ *) Introducing a new tool for matching external XML MARC records
+    against the database content.
 
 
 - end of file -
