@@ -41,7 +41,7 @@ sys.path.append('%s' % pylibdir)
 from config import *
 from webpage import page
 from dbquery import run_sql
-from webuser import getUid, create_user_infobox,isGuestUser
+from webuser import getUid, isGuestUser
 from webaccount import warning_guest_user
 from webbasket import perform_create_basket
 from mod_python import apache
