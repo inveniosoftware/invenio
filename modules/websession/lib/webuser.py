@@ -44,7 +44,7 @@ from websession import pSession, pSessionMapping
 from session import SessionError
 from config import *
 from messages import *
-from cdsware.access_control_engine import acc_authorize_action
+from access_control_engine import acc_authorize_action
 from access_control_admin import acc_findUserRoleActions
 from access_control_config import *
 
@@ -60,7 +60,7 @@ def createGuestUser():
 
 def page_not_authorized(req, referer='', uid='', text='', navtrail=''):
     """Show error message when account is not activated"""
-    from cdsware.webpage import page
+    from webpage import page
 
     if not CFG_ACCESS_CONTROL_LEVEL_SITE:
         title = cfg_webaccess_msgs[5]
