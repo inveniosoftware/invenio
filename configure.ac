@@ -454,6 +454,8 @@ AC_CONFIG_FILES([Makefile \
 	  modules/bibconvert/bin/Makefile \
 	  modules/bibconvert/doc/Makefile \
 	  modules/bibconvert/doc/admin/Makefile \
+	  modules/bibharvest/Makefile \
+	  modules/bibharvest/bin/Makefile \
 	  modules/bibsched/Makefile \
 	  modules/bibsched/bin/Makefile \
 	  modules/bibwords/Makefile \
