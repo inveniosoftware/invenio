@@ -201,9 +201,10 @@ def email_notify(alert, records, argstr):
         msg += wrap('%s: %s' % (catword, catalogue))
     msg += wrap('frequency: %s ' % format_frequency(alert[3]))
     msg += wrap('run time: %s ' % time)
-    msg += wrap('found: %s record' % len(records))
+    recword = 'record'
     if len(records) > 1:
-        msg += 's'
+        recword += 's'
+    msg += wrap('found: %s %s' % (len(records), recword))
     msg += "\nurl: <%s/search.py?%s>\n" % (weburl, argstr)
 
     msg += wrap_records(print_records(records))

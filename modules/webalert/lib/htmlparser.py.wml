@@ -123,8 +123,8 @@ def get_as_text(record_id):
         htparser.feed(rec)
         return htparser.result
     except:
-        htparser.close()
-        return htparser.result + '\n**HTML Error detected in record <http://cdsweb.cern.ch/search.py?recid=%s>, contact <%s>.' % (record_id, supportemail)
+        #htparser.close()
+        return wrap(htparser.result + '\n**HTML Error detected in record <http://cdsweb.cern.ch/search.py?recid=%s>, contact <%s>.' % (record_id, supportemail))
 
 
 if __name__ == "__main__":
