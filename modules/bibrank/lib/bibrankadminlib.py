@@ -973,8 +973,9 @@ def get_def_name(ID, table):
     type - the type of value wanted, like 'ln', 'sn'"""
 
     name = "name"
-    if table == "rnkMETHOD":
+    if table[-1:].isupper():
         name = "NAME"
+
     try:
         if ID:
             res = run_sql("SELECT id,name FROM %s where id=%s" % (table, ID))
@@ -992,7 +993,7 @@ def get_i8n_name(ID, ln, rtype, table):
     type - the type of value wanted, like 'ln', 'sn'"""
 
     name = "name"
-    if table == "rnkMETHOD":
+    if table[-1:].isupper():
         name = "NAME"
     try:
         res = ""
@@ -1029,7 +1030,7 @@ def get_name(ID, ln, rtype, table):
     table - tablename"""
 
     name = "name"
-    if table == "rnkMETHOD":
+    if table[-1:].isupper():
         name = "NAME"
         
     try:
@@ -1047,7 +1048,7 @@ def modify_translations(ID, langs, sel_type, trans, table):
     table - the table"""
 
     name = "name"
-    if table == "rnkMETHOD":
+    if table[-1:].isupper():
         name = "NAME"
     
     try:
