@@ -21,8 +21,7 @@
     title="<MSG_SEARCH_TIPS>" \
     navbar_name="search-new" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a> &gt; <a class=navtrail href=<WEBURL>/help/search/<lang:star: index.*.html>><MSG_SEARCH_HELP></a>" \
-    navbar_select="tips" \
-    cdspageheaderadd="<div align=right><a href=tips.cz.html>CZ</a> | <a href=tips.de.html>DE</a> | <a href=tips.en.html>EN</a> | <a href=tips.es.html>ES</a> | <a href=tips.fr.html>FR</a>| <a href=tips.it.html>IT</a> | <a href=tips.no.html>NO</a> | <a href=tips.pt.html>PT</a> | <a href=tips.ru.html>RU</a> | <a href=tips.sk.html>SK</a></div>"
+    navbar_select="tips"
 
 <fr>
    <p><table class="errorbox">
