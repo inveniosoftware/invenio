@@ -34,11 +34,10 @@ Contents
         various runtime system information, etc.
 
      b) MySQL server (may be on a remote machine), and MySQL client
-        (must be available locally too).  Version 4.1.0 and above is
-        recommended due to its UTF-8 support.  Please run your MySQL
-        server with option ``--default-character-set=utf8'' and set
-        the variable ``max_allowed_packet'' in your ``my.cnf'' init
-        file to at least 4M.
+        (must be available locally too).  MySQL versions 4.0.x are
+        recommended, versions above 4.1.0 may cause troubles.
+        Please set the variable ``max_allowed_packet'' in your
+        ``my.cnf'' init file to at least 4M.
           <http://mysql.com/>
 
      c) Apache 2 server, with support for loading DSO modules.
@@ -55,12 +54,13 @@ Contents
           LD_PRELOAD=/usr/lib/libc_r.so  # or libpthread.so
           export LD_PRELOAD
 
-     d) Python v2.2.2 or above, featuring recent MySQLdb module
-        (v0.9.2), and Numeric module (v21 and above).  We recommended
-        to use Python v2.3.2 and above.  Also, we recommend to
-        optionally install the Psyco module that increases performance
-        of some Pythonic operations. (Note though that CDSware will
-        work fine even without Psyco.)
+     d) Python v2.2.2 or above, featuring MySQLdb version 0.9.2
+        (higher versions like MySQLdb 1.0.0 will not work!), and
+        Numeric module (v21 and above).  We recommend to use Python
+        v2.3.2 and above.  Also, we recommend to optionally install
+        the Psyco module that increases performance of some Pythonic
+        operations.  (Note though that CDSware will work fine even
+        without Psyco.)
           <http://python.org/>
           <http://sourceforge.net/projects/mysql-python>
           <http://sourceforge.net/projects/numpy>
