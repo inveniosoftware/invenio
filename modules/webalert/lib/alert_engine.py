@@ -205,7 +205,7 @@ def email_notify(alert, records, argstr):
     if len(records) > 1:
         recword += 's'
     msg += wrap('found: %s %s' % (len(records), recword))
-    msg += "\nurl: <%s/search.py?%s>\n" % (weburl, argstr)
+    msg += "url: <%s/search.py?%s>\n" % (weburl, argstr)
 
     msg += wrap_records(print_records(records))
 
