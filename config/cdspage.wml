@@ -59,6 +59,14 @@
     $header =~ s/<!--MSGLIBRARY-->/<MSG_LIBRARY>/g;
     $header =~ s/<!--MSGHELP-->/<MSG_HELP>/g;
     $header =~ s/<!--LN-->/<lang:star: *>/g;
+    if ('$(navtrail_previous_links)' =~ /\w/) {
+        $navtrailboxbody = '<a class="navtrail" href="<WEBURL>/?ln=<lang:star: *>"><MSG_HOME></a> &gt; $(navtrail_previous_links) &gt; $(title)';
+    } elsif ('$(navtrail_body)' eq '') {
+        $navtrailboxbody = '<a class="navtrail" href="<WEBURL>/?ln=<lang:star: *>"><MSG_HOME></a> &gt; $(title)';
+    } elsif ('$(navtrail_body)' =~ /\w/) {
+        $navtrailboxbody = '$(navtrail_body)';
+    }     
+    $header =~ s/<!--NAVTRAILBOXBODY-->/$navtrailboxbody/g;    
     print $header;
 :>
 $(cdspageheaderadd)
@@ -67,44 +75,57 @@ $(cdspageheaderadd)
 ## CDS page content:
 
 <div class="pagebody">
-<table width="100%" cellpadding="0" cellspacing="0" border="0">
-<tr valign="top">
-<td class="pagestripemiddle" align="left">
-<:    
-    if ('$(navtrail_previous_links)' =~ /\w/) {
-        print '<table class="navtrailbox" border=0 cellspacing=0 cellpadding=0><tr><td width="15">&nbsp;</td><td class="navtrailboxbody" align="left"><a class="navtrail" href="<WEBURL>/?ln=<lang:star: *>"><MSG_HOME></a> &gt; $(navtrail_previous_links) &gt; $(title)</td></tr></table>';
-    } elsif ('$(navtrail_body)' eq '') {
-        print '<table class="navtrailbox" border=0 cellspacing=0 cellpadding=0><tr><td width="15">&nbsp;</td><td class="navtrailboxbody" align="left"><a class="navtrail" href="<WEBURL>/?ln=<lang:star: *>"><MSG_HOME></a> &gt; $(title)</td></tr></table>';
-    } elsif ('$(navtrail_body)' =~ /\w/) {
-        print '<table class="navtrailbox" border=0 cellspacing=0 cellpadding=0><tr><td width="15">&nbsp;</td><td class="navtrailboxbody" align="left">$(navtrail_body)</td></tr></table>';
-    } elsif ('$(navtrail_body:-undef)' eq 'undef'){
-        print '<br>';
-        &navTrail();
-    }
-:>
-   <h1 class="headline">$(title)</h1>
-   <p>
-   {#BODY#}
-</td>
-<td class="pagestriperight">
-   <navbar:render nohints name=$(navbar_name) select=$(navbar_select)> 
-         <: if ('<CDSPAGEBOXRIGHTTOP>' =~ /\w/) {
-              print '<CDSPAGEBOXRIGHTTOP>';
-            }
-         :> 
-         ## then optional "right top" page box that each page can define on its own
-         <: if ('$(cdspageboxrighttopadd)' =~ /\w/) {
-             print '$(cdspageboxrighttopadd)';
-            }
-         :> 
-         ## then optional "left top" page box that each page can define on its own
-         <: if ('$(cdspageboxlefttopadd)' =~ /\w/) {
-               print '$(cdspageboxlefttopadd)';
-            }
-         :> 
-</td>
-</tr>
-</table>
+  <div class="pagestripeleft">
+    ## first site-wide CDSPAGEBOXLEFTTOP:
+    <: if ('<CDSPAGEBOXLEFTTOP>' =~ /\w/) {
+         print '<div class="pageboxlefttop"><CDSPAGEBOXLEFTTOP></div>';
+       }
+    :> 
+    ## then optional "left top" page box that each page can define on its own:
+    <: if ('$(cdspageboxlefttopadd)' =~ /\w/) {
+        print '<div class="pageboxlefttopadd">$(cdspageboxlefttopadd)</div>';
+       }
+    :> 
+    ## then optoinal "left bottom" page box that each page can define on its own:
+    <: if ('$(cdspageboxleftbottomadd)' =~ /\w/) {
+        print '<div class="pageboxleftbottomadd">$(cdspageboxleftbottomadd)</div>';
+       }
+    :>
+    ## then site-wide CDSPAGEBOXLEFTBOTTOM:
+    <: if ('<CDSPAGEBOXLEFTBOTTOM>' =~ /\w/) {
+         print '<div class="pageboxleftbottom"><CDSPAGEBOXLEFTBOTTOM></div>';
+       }
+    :> 
+  </div>
+  <div class="pagestriperight">
+    ## before everything, print the navbar:
+    <navbar:render nohints name=$(navbar_name) select=$(navbar_select)>
+    ## first site-wide CDSPAGEBOXRIGHTTOP:
+    <: if ('<CDSPAGEBOXRIGHTTOP>' =~ /\w/) {
+         print '<div class="pageboxrighttop"><CDSPAGEBOXRIGHTTOP></div>';
+       }
+    :> 
+    ## then optional "right top" page box that each page can define on its own:
+    <: if ('$(cdspageboxrighttopadd)' =~ /\w/) {
+        print '<div class="pageboxrighttopadd">$(cdspageboxrighttopadd)</div>';
+       }
+    :>
+    ## then optional "right bottom" page box that each page can define on its own:
+    <: if ('$(cdspageboxrightbottomadd)' =~ /\w/) {
+        print '<div class="pageboxrightbottomadd">$(cdspageboxrightbottomadd)</div>';
+       }
+    :>
+    ## then site-wide CDSPAGEBOXRIGHTBOTTOM:
+    <: if ('<CDSPAGEBOXRIGHTBOTTOM>' =~ /\w/) {
+         print '<div class="pageboxrightbottom"><CDSPAGEBOXRIGHTBOTTOM></div>';
+       }
+    :> 
+  </div>
+  <div class="pagestripemiddle">
+    <h1 class="headline">$(title)</h1>
+    <p>
+    {#BODY#}
+  </div>
 </div>
 
 ## CDS page footer (first local, then common):
