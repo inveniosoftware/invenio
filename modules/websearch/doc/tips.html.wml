@@ -685,11 +685,11 @@ case of spelling troubles:
     </blockquote>
     </form>
 
-<p>An alternative choices will be printed in red.  The search engine
-will similarly and will warn you when your search terms could not be
+<p>Alternative choices will be printed in red.  The search engine
+will similarly warn you when your search terms could not be
 found, or when they could but your boolean query couldn't be met.  The
 search engine will also silently try to search for alternative forms
-(e.g. removed punctuation), etc.
+(e.g. remove punctuation), etc.
 
 <p>Thanks to multiple search stages and the guidance provided at each
 stage, it is usually sufficient to simple type what you are looking
