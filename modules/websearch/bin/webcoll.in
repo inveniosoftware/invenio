@@ -378,7 +378,6 @@ class Collection:
             for as in range(0,2): # do both simple search and advanced search pages:
                 body = ""
                 body += """<form action="%s/search.py" method="get">""" % weburl
-                body += self.create_portalbox(lang, 'te')
                 body += "" + self.create_searchfor(as, lang)
                 body += self.create_portalbox(lang, 'np')
                 body += """<table cellspacing="0" cellpadding="0" border="0">"""
@@ -392,10 +391,10 @@ class Collection:
                 body += "</form>"
                 self.write_cache_file("body-as=%s-ln=%s" % (as, lang), body)
             ## third, write portalboxes:
+            self.write_cache_file("portalbox-tp-ln=%s" % lang, self.create_portalbox(lang, "tp"))
+            self.write_cache_file("portalbox-te-ln=%s" % lang, self.create_portalbox(lang, "te"))
             self.write_cache_file("portalbox-lt-ln=%s" % lang, self.create_portalbox(lang, "lt"))
-            self.write_cache_file("portalbox-lb-ln=%s" % lang, self.create_portalbox(lang, "lb"))
             self.write_cache_file("portalbox-rt-ln=%s" % lang, self.create_portalbox(lang, "rt"))
-            self.write_cache_file("portalbox-rb-ln=%s" % lang, self.create_portalbox(lang, "rb"))
             ## fourth, write 'last updated' information:
             self.write_cache_file("last-updated-ln=%s" % lang, time.strftime("%02d %b %04Y %02H:%02M:%02S %Z", time.localtime()))
         return
@@ -425,8 +424,7 @@ class Collection:
 
     def create_portalbox(self, lang=cdslang, position="rt"):
         """Creates portalboxes of language CDSLANG of the position POSITION by consulting MySQL configuration database.
-           The position may be: 'lt'='left top', 'lb'='left bottom', 'rt'='right top', 'rb'='right bottom',
-           'tl'='top left', 'tr'='top right', 'bl'='bottom left', 'br='bottom right'."""
+           The position may be: 'lt'='left top', 'rt'='right top', etc."""
         out = ""
         query = "SELECT p.title,p.body FROM portalbox AS p, collection_portalbox AS cp "\
                 " WHERE cp.id_collection=%d AND p.id=cp.id_portalbox AND cp.ln='%s' AND cp.position='%s' "\
