@@ -26,6 +26,6 @@ CLEANFILES = $(bin_SCRIPTS) *~ *.tmp index.wml
 %.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml
 	$(WML) -o $@ $<
 
-%: %.wml ../../../config/config.wml ../../../config/configbis.wml
+%: %.wml ../../../config/config.wml ../../../config/configbis.wml ../../../config/cdswmllib.wml
 	$(WML) -o $@ $<
 	chmod u+x $@
