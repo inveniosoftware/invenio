@@ -46,7 +46,7 @@
 
 <a name="o"></a><h2>1. Overview</h2>
 <p>The bibrank module consist currently of two tools:
-<br><br>bibrank - Generates star categories for ranking searchresults based on methods like:
+<br><br>bibrank - Generates star categories for ranking search results based on methods like:
 <blockquote>
 <pre>
 Journal Impact Factor
@@ -55,7 +55,7 @@ Journal Impact Factor
 ##Citation Impact
 </blockquote>
 </pre>
-bibrankgkb - For generating knowledgebase files for use with bibrank
+bibrankgkb - For generating knowledge base files for use with bibrank
 <br><br>
 The bibrankgkb may not be necessary to use, it depends on which ranking methods you are planning
 to use, and what data you already got. This guide will take you through the necessary steps in detail in order to create different kinds of ranking methods for the search engine to use.
@@ -70,7 +70,7 @@ to use, and what data you already got. This guide will take you through the nece
 </pre>
 
 <a name="bai"></a><h2>3. BibRank Admin Interface</h2>
-The bibrank webinterface enables you to modify the configuration of most aspects of BibRank. For full functionality, it is advised to
+The bibrank web interface enables you to modify the configuration of most aspects of BibRank. For full functionality, it is advised to
 let the http-daemon have write/read access to your cdsware/etc/bibrank directory. If this is not wanted, you have to edit the configuration files from the console using your favourite text editor.
 <a name="mi"></a><h3>3.1 Main interface</h3>
 In the main interface screen, you see a list of all rank methods currently added. If you have added the 'long name' translation in the current chosen language for a rank method, you will see this name, if not, and the default cdsware language translation exists, it will be used instead. And if no translation exists, the bibrank code will be used. To find out about the functionality available, check out the topics below.
@@ -102,10 +102,10 @@ This interface gives access to modify the bibrank code given when creating the r
 If it is necessary to delete a rank method, some precautions must be taken since the configuration of the method will be lost. When deleting a rank method, the configuration file will also be deleted ('cdsware/etc/bibrank/bibrankcode.cfg' where bibrankcode is the code of the rank method) if accessible to the httpd user. If not, the file can be deleted manually from console. Any bibrank tasks scheduled to run the deleted rank method must be modified or deleted manually.
 
 <a name="mt"></a><h3>3.6 Modify translations</h3>
-If you want to use internalization of the rank method names, you have to add them using the 'Modify translations' interface. The interface shows a list of the various name types like 'long name' and 'short name' with the 'long name' initially selected. Below a list of all the languages used in the cdsware installation will be shown with the possibility to add the translation for each language.
+If you want to use internalisation of the rank method names, you have to add them using the 'Modify translations' interface. The interface shows a list of the various name types like 'long name' and 'short name' with the 'long name' initially selected. Below a list of all the languages used in the cdsware installation will be shown with the possibility to add the translation for each language.
 
 <a name="mc"></a><h3>3.7 Modify visibility toward collections</h3>
-If a rank method should be visible to the users of the cdsware search interface, it must be enabled for one or several collections. A rank method can be visible in the search interface of the whole site, or just one collection. The collections in the upper listbox does not show the rank method in the search interface to the user. To change this select the wanted collection and press 'Enable' to enable the rank method for this collection. The collections that the method has been activated for, is  shown in the lower listbox. To remove a collection, select it and press the 'Disable' button to remove it from the list of collections which the rank method is enabled for.
+If a rank method should be visible to the users of the cdsware search interface, it must be enabled for one or several collections. A rank method can be visible in the search interface of the whole site, or just one collection. The collections in the upper list box does not show the rank method in the search interface to the user. To change this select the wanted collection and press 'Enable' to enable the rank method for this collection. The collections that the method has been activated for, is  shown in the lower list box. To remove a collection, select it and press the 'Disable' button to remove it from the list of collections which the rank method is enabled for.
 
 <a name="bd"></a><h2>4. BibRank Daemon</h2>
 The bibrank daemon read the necessary metadata from the cdsware database and combines the read metadata
@@ -115,8 +115,8 @@ in different ways to output the records ranked into the number of categories (st
 <pre>
 Usage: %s [options]
      Examples:
-       %s --id=0-30000,30001-860000 --run=jif --verbose=9
-       %s --modified='2002-10-27 13:57:26' --run=jif
+       %s --id=0-30000,30001-860000 --run=if --verbose=9
+       %s --modified='2002-10-27 13:57:26' --run=if
        %s --rebalance --collection=Articles --run=jif
 
  Ranking options:
@@ -243,9 +243,9 @@ If you don't mention anything, the daemon will try to update the records modifie
 time, you can do this with the '--modified=date' option.
 
 <a name="bt"></a><h2>5. bibrankgkb Tool</h2>
-Before the bibrank daemon can be used, a knowledgebase file (kb) with the needed data in the correct format
+Before the bibrank daemon can be used, a knowledge base file (kb) with the needed data in the correct format
 needs to be created. This file can be created using the bibrankgkb tool which can read the data either from
-the cdsware database, from several webpages using regular expressions, or from another file. In case one source
+the cdsware database, from several web pages using regular expressions, or from another file. In case one source
 has another naming convention, bibrank can convert between them using a convert file.
 <a name="cli2"></a><h3>5.1 Command Line Interface</h3>
 
@@ -280,7 +280,7 @@ The default configuration file is shown below.
 
 ##The main section
 [bibrankgkb]
-##The url to a webpage with the data to be read, does not need to have the same name as this one, but if there
+##The url to a web page with the data to be read, does not need to have the same name as this one, but if there
 are several links, the url should end with _0-> 
 url_0 = http://www.taelinke.land.ru/impact_A.html
 url_1 = http://www.taelinke.land.ru/impact_B.html
@@ -295,7 +295,7 @@ url_9 = http://www.taelinke.land.ru/impact_RZ.html
 ##The regular expression for the url mentioned should be given here
 url_regexp = 
 
-##The various sources that can be read in, can either be a file, webpage or from the database
+##The various sources that can be read in, can either be a file, web page or from the database
 kb_1 = /home/trondaks/w/cdsware/modules/bibrank/etc/cern_jif.kb
 kb_2 = /home/trondaks/w/cdsware/modules/bibrank/etc/cdsware_jif.kb
 kb_2_filter = /home/trondaks/w/cdsware/modules/bibrank/etc/convert.kb
@@ -305,13 +305,13 @@ kb_4 = SELECT id_bibrec,value FROM bib21x,bibrec_bib21x WHERE tag='210__a' AND i
 kb_5 = url_%s
 
 ##This is the part that will be read by the bibrankgkb tool to determine what to read.
-##The first two part (separated by ,,) gives where to look for the convertion file (which convert
-##the names between to formats), and the second part is the datasource. A convertion file is not
+##The first two part (separated by ,,) gives where to look for the conversion file (which convert
+##the names between to formats), and the second part is the data source. A conversion file is not
 ##needed, as shown in create_0. If the source is from a file, url or the database, it must be
 ##given with file,www or db. If several create lines exists, each will be read in turn, and added
 ##to a common kb file.
 ##So this means that:
-##create_0: Load from file in variable kb_1 without convertion
+##create_0: Load from file in variable kb_1 without converting
 ##create_1: Load from file in variable kb_2 using convertion from file kb_2_filter
 ##create_3: Load from www using url in variable kb_5 and regular expression in url_regexp
 ##create_4: Load from database using sql statements in kb_4 and kb_5
@@ -323,7 +323,7 @@ create_1 = file,,%(kb_2_filter)s,,file,,%(kb_2)s
 </blockquote>
 </protect>
 When you have found a source for the data, created the configuration file, it may be necessary to
-create an convertion file, but this depends on the coversions used in the available data versus
+create an convertion file, but this depends on the conversions used in the available data versus
 the convertion used in your cdsware installation.
 <br>
 The available data may look like this:
@@ -353,12 +353,12 @@ Colloids Surf., A---1.98
 <h4>Step 3 - Run tool</h4>
 When ready to run the tool, you may either use the default file (/etc/bibrank/bibrankgkb.cfg), or use another one by giving it using the input variable '--input'.
 If you want to test the configuration, you can use '--verbose=9' to output on screen, or if you want to save it to a file, use
-'--output=filename', but remember that the file will be saved in the programdirectory.
+'--output=filename', but remember that the file will be saved in the program directory.
 The output may look like this:
 <pre>
 <blockquote>
 $ ./bibrankgkb -v9
-2004-03-11 17:30:17 --> Running: Generate Knowledgebase.
+2004-03-11 17:30:17 --> Running: Generate Knowledge base.
 2004-03-11 17:30:17 --> Reading data from file: /log/cdsware-DEMODEV/etc/bibrank/jif.kb
 2004-03-11 17:30:17 --> Reading data from file: /log/cdsware-DEMODEV/etc/bibrank/conv.kb
 2004-03-11 17:30:17 --> Using last resource for converting values.
