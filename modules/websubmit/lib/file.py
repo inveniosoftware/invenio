@@ -418,7 +418,10 @@ class BibDocFile:
         self.version = version
         self.size = os.path.getsize(fullpath)
         self.md = os.path.getmtime(fullpath)
-        self.cd = os.path.getctime(fullpath)
+	try:
+            self.cd = os.path.getctime(fullpath)
+	except:
+	    self.cd = self.md
         self.name = name
         self.format = format
         self.dir = os.path.dirname(fullpath)
