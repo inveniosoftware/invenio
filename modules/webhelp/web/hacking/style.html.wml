@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of the CERN Document Server Software (CDSware).
@@ -72,8 +73,65 @@ A brief description of things we strive at, more or less unsuccessfully.
    href="cdsware.el">cdsware.el</a> for inspiration.
 
    All the Python code should be extensively documented via
-   docstrings, so you can always try to run ``pydoc file.py'' to
+   docstrings, so you can always try to run pydoc file.py to
    peruse a module's documentation in one go.
+
+   Do not forget to run pylint on your code to check errors like
+   uninitialized variables and to improve its quality and conformance
+   to coding standards.  The typical incantation may be:
+
+       $ cd <LIBDIR>/python/cdsware
+       $ pylint --max-line-length=160 oai_repository.py | most
+
+   Read and implement pylint suggestions.
+
+   Do not hardcode magic constants in your code.  Every magic string or
+   a number should be put into accompanying file_config.py with 
+   symbol name beginning by cfg_modulename_*.
+
+   Separate interfaces from implementation.  Clearly document your
+   interfaces. 
+
+   Create as few new library files as possible.  Do not create many
+   nested files in nested modules; rather put all the lib files in one
+   dir with bibindex_foo and bibindex_bar names.
+
+   Use imperative/functional paradigm rather then OO.  If you do use
+   OO, then stick to as simple class hierarchy as possible.  Recall
+   that method calls and exception handling in Python are quite
+   expensive.
+
+   Use rather the good old foo_bar naming convention for symbols (both
+   variables and function names) instead of fooBar CaMelCaSe
+   convention.  (Except for Class names where UppercaseSymbolNames are
+   to be used.)
+
+   Pay special attention to name your symbols descriptively.  Your
+   code is going to be read and work with by others and its symbols
+   should be self-understandable without any comments and without
+   studying other parts of the code.  For example, use proper English
+   words, not abbreviations that can be misspelled in many a way; use
+   words that go in pair (e.g. create/destroy, start/stop; never
+   create/stop); use self-understandable symbol names
+   (e.g. list_of_file_extensions rather than list2); never misname
+   symbols (e.g. score_list should hold the list of scores and nothing
+   else - if in the course of development you change the semantics of
+   what the symbol holds then change the symbol name too).  Do not be
+   afraid to use long descriptive names; good editors such as Emacs
+   can tab-complete symbols for you.
+
+   When hacking module A, pay close attention to ressemble existing
+   coding convention in A, even if it is legacy-weird and even if we
+   use a different technique elsewhere.  (Unless the whole module A is
+   going to be refactored, of course.)
+
+   All core code should come with a suitable set of test cases, see
+   the <a href="testsuite.html">test suite strategy</a> for details.
+
+   Speed-critical parts should be profiled with pyprof.  Do not forget
+   to use tricks like psycho.
+
+   For more hints and toughts, see Tibor's Vademecum and Essays.
 
 5. PHP 
 
@@ -94,23 +152,25 @@ A brief description of things we strive at, more or less unsuccessfully.
       - "foo_bar": underscores represent M:N relationship between
         "foo" and "bar", to tie the two tables together
      
-      - "bib*": many tables to hold metadata and relationships between
-         them
+      - "bib*": many tables to hold the metadata and relationships
+         between them
      
-      - "bibwords*": many tables to hold words indexes
+      - "idx*": idx is the table name prefix used by BibIndex
      
-      - "collection*": many tables to describe collections and serach
+      - "rnk*": rnk is the table name prefix used by BibRank
+     
+      - "flx*": flx is the table name prefix used by FlexElink (also known as
+         BibFormat)
+     
+      - "sbm*": sbm is the table name prefix used by WebSubmit
+     
+      - "sch*": sch is the table name prefix used by BibSched
+     
+      - "collection*": many tables to describe collections and search
         interface pages
      
       - "user*" : many tables to describe personal features (baskets,
         alerts)
-     
-      - "flx*": flx is the prefix used by FlexElink (also known as
-         BibFormat)
-     
-      - "sbm*": sbm is the prefix used by WebSubmit
-     
-      - "sch*": sch is the prefix used by BibSched
      
 - end of file -
 
