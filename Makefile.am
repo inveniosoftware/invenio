@@ -59,7 +59,8 @@ create-demo-site: install
 # 	    fi \
 # 	done
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/demo/democfgdata.sql
-	${prefix}/bin/create_collection_pages
+	${prefix}/bin/webcoll update-reclist
+	${prefix}/bin/webcoll update-webpage
 	rm -f index.wml
 	@echo "***********************************************************************"
 	@echo "** The demo site has been successfully created.                      **"
@@ -80,7 +81,8 @@ load-demo-records: install
 	${prefix}/bin/bibformat otype=HB,HD,HP,HC < ./z.xml > ./zf.xml
 	${prefix}/bin/bibupload -f ./zf.xml
 	rm -f z.xml zf.xml
-	${prefix}/bin/create_collection_pages
+	${prefix}/bin/webcoll update-reclist
+	${prefix}/bin/webcoll update-webpage
 	rm -f index.wml
 	@echo "***********************************************************************"
 	@echo "** The demo records have been successfully loaded.                   **"
@@ -98,7 +100,8 @@ destroy-demo-site: install
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabdrop.sql
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabcreate.sql
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
-	${prefix}/bin/create_collection_pages
+	${prefix}/bin/webcoll update-reclist
+	${prefix}/bin/webcoll update-webpage
 	rm -f index.wml
 	for f in $(sbmdat); do rm -f $(sbmdir)/$$f.shtml ; done
 	@echo "*****************************************************************"
@@ -107,7 +110,8 @@ destroy-demo-site: install
 
 remove-demo-records: install
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabbibclean.sql
-	${prefix}/bin/create_collection_pages
+	${prefix}/bin/webcoll update-reclist
+	${prefix}/bin/webcoll update-webpage
 	rm -f index.wml
 	@echo "**************************************************************"
 	@echo "** The demo records have been successfully removed.         **"
