@@ -36,7 +36,6 @@ import re
 
 sys.path.append('%s' % pylibdir)
 from cdsware.config import *
-from cdsware.dbquery import run_sql
 from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import acc_isRole
 from cdsware.webpage import page, create_error_box
@@ -55,6 +54,5 @@ def index(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="", acc
         return interface(req,c,ln, doctype, act, startPg, indir, access,mainmenu,fromdir,file,nextPg,nbPg,curpage)
     else:
         return endaction(req,c,ln, doctype, act, startPg, indir, access,mainmenu,fromdir,file,nextPg,nbPg,curpage,step,mode)
-    return errorMsg("Bad parameters", req)
         
 </protect>

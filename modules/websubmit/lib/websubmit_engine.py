@@ -83,25 +83,26 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         return errorMsg("invalid parameter",req)
     # retrieve the action and doctype data
     if indir == "":
-        res = run_sql("select dir from sbmACTION where sactname='%s'" % act)
+        res = run_sql("select dir from sbmACTION where sactname=%s",(act,))
         if len(res) == 0:
             return errorMsg("cannot find submission directory",req)
         else:
             row = res[0]
             indir = row[0]
-    res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE sdocname='%s'" % doctype)
+    res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE sdocname=%s",(doctype,))
     if len(res) == 0:
         return errorMsg("unknown document type",req)
     else:
         docname = res[0][0]
         docname = string.replace(docname," ","&nbsp;")
-    res = run_sql("SELECT lactname FROM sbmACTION WHERE sactname='%s'" % act)
+    res = run_sql("SELECT lactname FROM sbmACTION WHERE sactname=%s",(act,))
     if len(res) == 0:
         return errorMsg("unknown action",req)
     else:
         actname = res[0][0]
         actname = string.replace(actname," ","&nbsp;")
-    res = run_sql("SELECT nbpg FROM sbmIMPLEMENT WHERE  subname='%s%s'" % (act,doctype))
+    subname = "%s%s" % (act,doctype)
+    res = run_sql("SELECT nbpg FROM sbmIMPLEMENT WHERE  subname=%s", (subname,))
     if len(res) == 0:
         return errorMsg("can't figure number of pages",req)
     else:
@@ -111,7 +112,7 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         curpage = startPg
     # retrieve the name of the file in which the reference of 
     # the submitted document will be stored
-    res = run_sql("SELECT value FROM sbmPARAMETERS WHERE  doctype='%s' and name='edsrn'" % doctype)
+    res = run_sql("SELECT value FROM sbmPARAMETERS WHERE  doctype=%s and name='edsrn'", (doctype,))
     if len(res) == 0:
         edsrn = ""
     else:
@@ -153,11 +154,11 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     if acc_isRole("submit",doctype=doctype,act=act) and not acc_authorize_action(uid, "submit",verbose=0,doctype=doctype, act=act):
         return warningMsg("<center><font color=red>Sorry, user %s does not have the right to perform this action. Try logging with another user.</font></center>" % uid_email,req)
     # then we update the "journal of submission" 
-    res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE  doctype='%s' and action='%s' and id='%s' and email='%s'" % (doctype,act,access,uid_email))
+    res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE  doctype=%s and action=%s and id=%s and email=%s", (doctype,act,access,uid_email,))
     if len(res) == 0:
-        run_sql("INSERT INTO sbmSUBMISSIONS values ('%s','%s','%s','pending','%s','',NOW(),NOW())" % (uid_email,doctype,act,access))
+        run_sql("INSERT INTO sbmSUBMISSIONS values (%s,%s,%s,'pending',%s,'',NOW(),NOW())", (uid_email,doctype,act,access,))
     else:
-        run_sql("UPDATE sbmSUBMISSIONS SET md=NOW() WHERE  doctype='%s' and action='%s' and id='%s' and email='%s'" % (doctype,act,access,uid_email))
+        run_sql("UPDATE sbmSUBMISSIONS SET md=NOW() WHERE  doctype=%s and action=%s and id=%s and email=%s", (doctype,act,access,uid_email,))
     # Save the form fields entered in the previous submission page
     # If the form was sent with the GET method
     form = req.form
@@ -207,14 +208,14 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         # we save this value in the "journal of submissions"
         if uid_email != "" and uid_email != "guest":
             if key == edsrn:
-                run_sql("UPDATE sbmSUBMISSIONS SET reference='%s' WHERE  doctype='%s' and id='%s' and email='%s'" % (value,doctype,access,uid_email))
+                run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (value,doctype,access,uid_email,))
         # Now deal with the cookies
         # If the fields must be saved as a cookie, we do so
         # In this case, the value of the field will be retrieved and 
         # displayed as the default value of the field next time the user
         # does a submission    
         if value!="":
-            res = run_sql("SELECT cookie FROM sbmFIELDDESC WHERE  name='%s'" % key)
+            res = run_sql("SELECT cookie FROM sbmFIELDDESC WHERE  name=%s", (key,))
             if len(res) > 0:
                 if res[0][0] == 1:
                     setCookie(key,value,uid)
@@ -251,15 +252,16 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     t=t+"<INPUT type=\"hidden\" name=\"mode\" value=\"U\">\n"
     t=t+"<INPUT type=\"hidden\" name=\"step\" value=\"0\">\n"
     # For each field to be displayed on the page
-    res = run_sql("SELECT * FROM sbmFIELD WHERE  subname='%s%s' and pagenb=%s ORDER BY fieldnb,fieldnb" % (act,doctype,curpage));
+    subname = "%s%s" % (act,doctype)
+    res = run_sql("SELECT * FROM sbmFIELD WHERE  subname=%s and pagenb=%s ORDER BY fieldnb,fieldnb", (subname,curpage,))
     nbFields = 0
     for arr in res:
         # We retrieve its HTML description
-        res3 = run_sql("SELECT * FROM sbmFIELDDESC WHERE  name='%s'" % arr[3])
+        res3 = run_sql("SELECT * FROM sbmFIELDDESC WHERE  name=%s", (arr[3],))
         arr3 = res3[0]
         # we also retrieve and add the javascript code of the checking function, if needed
         if arr[7] != '':
-            res2 = run_sql("SELECT chdesc FROM sbmCHECKS WHERE  chname='%s'" % arr[7])
+            res2 = run_sql("SELECT chdesc FROM sbmCHECKS WHERE  chname=%s", (arr[7],))
             t=t+"<SCRIPT LANGUAGE=\"JavaScript1.1\"  TYPE=\"text/javascript\">\n";
             t=t+res2[0][0]
             t=t+"</SCRIPT>\n"
@@ -488,7 +490,8 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     # Submission" button                                           
     if int(curpage) == int(nbpages):
         t=t+"\n\nfunction finish() {\n"
-        res = run_sql("SELECT * FROM sbmFIELD WHERE  subname='%s%s' and pagenb!=%s" % (act,doctype,curpage))
+        subname = "%s%s" % (act,doctype)
+        res = run_sql("SELECT * FROM sbmFIELD WHERE  subname=%s and pagenb!=%s", (subname,curpage,))
         nbFields=0
         message = ""
         select = []
@@ -499,7 +502,7 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         txt = []        
         for arr in res:
             if arr[5] == "M":
-                res2 = run_sql("SELECT * FROM   sbmFIELDDESC WHERE  name='%s'" % arr[3]);
+                res2 = run_sql("SELECT * FROM   sbmFIELDDESC WHERE  name=%s", (arr[3],));
                 row2 = res2[0]
                 if row2[3] in ['D','R']:
                     if row2[3] == "D":
@@ -604,7 +607,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         return errorMsg("invalid parameter",req,cdsname,ln)
     # retrieve the action and doctype data
     if indir == "":
-        res = run_sql("select dir from sbmACTION where sactname='%s'" % act)
+        res = run_sql("select dir from sbmACTION where sactname=%s", (act,))
         if len(res) == 0:
             return errorMsg("cannot find submission directory",req,cdsname,ln)
         else:
@@ -635,7 +638,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         mainmenu = "%s/submit.py" % urlpath
     # retrieve the name of the file in which the reference of 
     # the submitted document will be stored
-    res = run_sql("SELECT value FROM sbmPARAMETERS WHERE  doctype='%s' and name='edsrn'" % doctype)
+    res = run_sql("SELECT value FROM sbmPARAMETERS WHERE  doctype=%s and name='edsrn'",(doctype,))
     if len(res) == 0:
         edsrn = ""
     else:
@@ -648,7 +651,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     #if reloaded:
     #    return warningMsg("<b> Sorry, this action has already been completed. Please go back to the main menu to start a new action.</b>",req)
     # We must determine if the action is finished (ie there is no other steps after the current one
-    res = run_sql("SELECT step FROM sbmFUNCTIONS WHERE  action='%s' and doctype='%s' and step > %s" % (act,doctype,step))
+    res = run_sql("SELECT step FROM sbmFUNCTIONS WHERE  action=%s and doctype=%s and step > %s", (act,doctype,step,))
     if len(res) == 0:
         finished = 1
     else:
@@ -702,14 +705,14 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         # we save this value in the "journal of submissions"
         if authentication and uid_email != "" and uid_email != "guest":
             if key == edsrn:
-                run_sql("UPDATE sbmSUBMISSIONS SET reference='%s' WHERE  doctype='%s' and id='%s' and email='%s'" % (value,doctype,access,uid_email))
+                run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (value,doctype,access,uid_email,))
         # Now deal with the cookies
         # If the fields must be saved as a cookie, we do so
         # In this case, the value of the field will be retrieved and 
         # displayed as the default value of the field next time the user
         # does a submission    
         if value!="":
-            res = run_sql("SELECT cookie FROM sbmFIELDDESC WHERE  name='%s'" % key)
+            res = run_sql("SELECT cookie FROM sbmFIELDDESC WHERE  name=%s", (key,))
             if len(res) > 0:
                 if res[0][0] == 1:
                     setCookie(key,value,uid)
@@ -733,19 +736,20 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     t=t+"<INPUT type=\"hidden\" name=\"file_path\" value=\"\">\n"
     t=t+"<INPUT type=\"hidden\" name=\"userfile_name\" value=\"\">\n"
     # Get document name
-    res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname='%s'" % doctype)
+    res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname=%s", (doctype,))
     if len(res) > 0:
        docname = res[0][0]
     else:
         return errorMsg("unknown type of document",req,cdsname,ln)
     # Get action name
-    res = run_sql("SELECT lactname FROM sbmACTION WHERE  sactname='%s'" % act)
+    res = run_sql("SELECT lactname FROM sbmACTION WHERE  sactname=%s", (act,))
     if len(res) > 0:
        actname = res[0][0]
     else:
         return errorMsg("unknown action",req,cdsname,ln)
     # Get number of pages
-    res = run_sql("SELECT nbpg FROM sbmIMPLEMENT WHERE  subname='%s%s'" % (act,doctype))
+    subname = "%s%s" % (act,doctype)
+    res = run_sql("SELECT nbpg FROM sbmIMPLEMENT WHERE  subname=%s",(subname,))
     if len(res) > 0:
        nbpages = res[0][0]
     else:
@@ -772,7 +776,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     t=t+"    <TD colspan=5 class=submitBody>\n"
     t=t+"        <small><BR><BR>\n"
     # we specify here whether we are in the last step of the action or not
-    res = run_sql("SELECT step FROM   sbmFUNCTIONS WHERE  action='%s' and doctype='%s' and step>%s" % (act,doctype,step))
+    res = run_sql("SELECT step FROM   sbmFUNCTIONS WHERE  action=%s and doctype=%s and step>%s", (act,doctype,step,))
     if len(res) == 0:
         last_step = 1
     else:
@@ -796,11 +800,11 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     # If we are in the last step of an action, we can update the "journal of submissions"
     if last_step == 1:
         if uid_email != "" and uid_email != "guest" and rn != "":
-            res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE  doctype='%s' and action='%s' and id='%s' and email='%s'" % (doctype,act,access,uid_email))
+            res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE  doctype=%s and action=%s and id=%s and email=%s", (doctype,act,access,uid_email,))
             if len(res) == 0:
-                run_sql("INSERT INTO sbmSUBMISSIONS values('%s','%s','%s','finished','%s','%s',NOW(),NOW())" % (uid_email,doctype,act,access,rn))
+                run_sql("INSERT INTO sbmSUBMISSIONS values(%s,%s,%s,'finished',%s,%s,NOW(),NOW())", (uid_email,doctype,act,access,rn,))
             else:
-               run_sql("UPDATE sbmSUBMISSIONS SET md=NOW(),reference='%s',status='finished' WHERE  doctype='%s' and action='%s' and id='%s' and email='%s'" % (rn,doctype,act,access,uid_email))
+               run_sql("UPDATE sbmSUBMISSIONS SET md=NOW(),reference=%s,status='finished' WHERE  doctype=%s and action=%s and id=%s and email=%s", (rn,doctype,act,access,uid_email,))
     t=t+"""    <BR><BR>
         </TD>
     </TR>
@@ -867,14 +871,6 @@ Please select the type of document you want to submit:
     finaltext = finaltext + makeCataloguesTable()
     finaltext = finaltext + """
     </TD>
-    <TD valign=top>
-        <DIV  ID="TEXTWND"
-            STYLE="POSITION: relative; Z-INDEX: 20; VISIBILITY: hidden;">
-        </DIV>"""
-    for r in run_sql("SELECT sdocname,ldocname,description FROM sbmDOCTYPE"):
-        finaltext = finaltext + "        <DIV ID=\"%s\" STYLE=\"POSITION: absolute; Z-INDEX: 20; VISIBILITY: hidden; WIDTH: 300;\">\n            <SMALL><IMG SRC=\"%s/okay.gif\" ALT=\"\"><STRONG>%s:</STRONG></SMALL><BR><HR><SMALL>%s</SMALL><HR>\n        </DIV>\n\n" % (r[0],images,r[1],r[2])
-    finaltext = finaltext + """
-    </TD>
 </TR>
 </TABLE>
 </FORM>"""
@@ -905,7 +901,7 @@ def makeCataloguesTable():
 
 def displayCatalogueBranch(id_father,level,catalogues):
     text = ""
-    queryResult = run_sql("SELECT name, id FROM   sbmCOLLECTION WHERE  id=%s" % id_father)
+    queryResult = run_sql("SELECT name, id FROM   sbmCOLLECTION WHERE  id=%s", (id_father,))
     if len(queryResult) != 0:
         row = queryResult[0]
         if level == 1:
@@ -917,8 +913,8 @@ def displayCatalogueBranch(id_father,level,catalogues):
                 if level > 2:
                     text = "<LI>%s\n" % row[0]
     # display the son document types
-    res1 = run_sql("SELECT id_son FROM   sbmCOLLECTION_sbmDOCTYPE WHERE  id_father=%s ORDER BY catalogue_order" % id_father)
-    res2 = run_sql("SELECT id_son FROM   sbmCOLLECTION_sbmCOLLECTION WHERE  id_father=%s ORDER BY catalogue_order" % id_father)
+    res1 = run_sql("SELECT id_son FROM   sbmCOLLECTION_sbmDOCTYPE WHERE  id_father=%s ORDER BY catalogue_order", (id_father,))
+    res2 = run_sql("SELECT id_son FROM   sbmCOLLECTION_sbmCOLLECTION WHERE  id_father=%s ORDER BY catalogue_order", (id_father,))
     if len(res1) != 0 or len(res2) != 0:
         text = text + "<UL>\n"
     if len(res1) != 0:
@@ -936,7 +932,7 @@ def displayCatalogueBranch(id_father,level,catalogues):
 
 def displayDoctypeBranch(doctype,catalogues):
     text = ""
-    res = run_sql("SELECT ldocname FROM   sbmDOCTYPE WHERE  sdocname='%s'" % doctype)
+    res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname=%s", (doctype,))
     row = res[0]
     text = "<LI><small><a href=\"\" onmouseover=\"javascript:popUpTextWindow('%s',true,event);\" onmouseout=\"javascript:popUpTextWindow('%s',false,event);\" onClick=\"document.forms[0].doctype.value='%s';document.forms[0].submit();return false;\">%s</a></small>\n" % (doctype,doctype,doctype,row[0])
     return text
@@ -960,16 +956,14 @@ def action(req,c=cdsname,ln=cdslang,doctype=""):
         return errorMsg(e.value, req)
     #parses database to get all data
     #first the list of categories
-    query = "SELECT * FROM sbmCATEGORIES WHERE  doctype='%s' ORDER BY lname" % doctype
-    res = run_sql(query)
+    res = run_sql("SELECT * FROM sbmCATEGORIES WHERE  doctype=%s ORDER BY lname", (doctype,))
     if len(res) > 0:
         for arr in res:
             nbCateg = nbCateg+1
             snameCateg.append(arr[1])
             lnameCateg.append(arr[2])
     #then data about the document type
-    query = "SELECT * FROM sbmDOCTYPE WHERE  sdocname='%s'" % doctype
-    res = run_sql(query)
+    res = run_sql("SELECT * FROM sbmDOCTYPE WHERE  sdocname=%s", (doctype,))
     if len(res) > 0:
         arr = res[0]
         docFullDesc = arr[0]
@@ -978,11 +972,9 @@ def action(req,c=cdsname,ln=cdslang,doctype=""):
     else:
         return errorMsg ("Cannot find document %s" % doctype, req)
     #then data about associated actions
-    query = "SELECT * FROM sbmIMPLEMENT LEFT JOIN sbmACTION on sbmACTION.sactname=sbmIMPLEMENT.actname WHERE  docname='%s' and displayed='Y' ORDER BY sbmIMPLEMENT.buttonorder" % docShortDesc
-    res2 = run_sql(query)
+    res2 = run_sql("SELECT * FROM sbmIMPLEMENT LEFT JOIN sbmACTION on sbmACTION.sactname=sbmIMPLEMENT.actname WHERE  docname=%s and displayed='Y' ORDER BY sbmIMPLEMENT.buttonorder", (docShortDesc,))
     for arr2 in res2:
-        query = "SELECT * FROM   sbmACTION WHERE  sactname='%s'" % arr2[1]
-        res = run_sql(query)
+        res = run_sql("SELECT * FROM   sbmACTION WHERE  sactname=%s", (arr2[1],))
         for arr in res:
             actionShortDesc.append(arr[1])
             indir.append(arr[2])
@@ -1107,7 +1099,7 @@ def set_report_number (newrn):
         rn = newrn
         # then we save this value in the "journal of submissions"
         if uid_email != "" and uid_email != "guest":
-            run_sql("UPDATE sbmSUBMISSIONS SET reference='%s' WHERE  doctype='%s' and id='%s' and email='%s'" % (newrn,doctype,access,uid_email))
+            run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (newrn,doctype,access,uid_email,))
     
 def get_report_number():
     global rn
@@ -1138,10 +1130,10 @@ def Evaluate_Parameter (field, doctype):
     # uniquely determined by the doctype, i.e. doctype is the primary key in
     # the table
     # If the table name is not null, evaluate the parameter
-    res = run_sql("SELECT value FROM sbmPARAMETERS WHERE  doctype = '%s' and name='%s'" % (doctype,field))
+    res = run_sql("SELECT value FROM sbmPARAMETERS WHERE doctype=%s and name=%s", (doctype,field,))
     # If no data is found then the data concerning the DEF(ault) doctype is used
     if len(res) == 0:
-        res = run_sql("SELECT value FROM sbmPARAMETERS WHERE doctype = 'DEF' and name='%s'" % field)
+        res = run_sql("SELECT value FROM sbmPARAMETERS WHERE doctype='DEF' and name=%s", (field,))
     if len(res) == 0:
         return ""
     else:
@@ -1154,14 +1146,14 @@ def Get_Parameters (function, doctype):
     # Returns the function parameters, in an array, for the function
     # Gets a description of the parameter
     parray = {}
-    res = run_sql("SELECT * FROM sbmFUNDESC WHERE  function = '%s' " % function)
+    res = run_sql("SELECT * FROM sbmFUNDESC WHERE function=%s", (function,))
     for i in range(0,len(res)):
         parameter = res[i][1]
         parray[parameter] = Evaluate_Parameter (parameter , doctype)
     return parray
 
 def get_level (doctype, action):
-    res = run_sql("SELECT * FROM   sbmIMPLEMENT  WHERE  docname = '%s' and actname = '%s'" % (doctype,action))
+    res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE docname=%s and actname=%s", (doctype,action,))
     if len(res) > 0:
         return res[0][9]
     else:
@@ -1170,7 +1162,7 @@ def get_level (doctype, action):
 def action_details (doctype, action):
     # Prints whether the action is mandatory or optional. The score of the
     # action is returned (-1 if the action was optional)
-    res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE  docname = '%s' and actname = '%s'" % (doctype,action))
+    res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE docname=%s and actname=%s", (doctype,action,))
     if len(res)>0:
         if res[0][9] != "0":
             return res[0][10]
@@ -1185,10 +1177,10 @@ def print_function_calls (doctype, action, step, form):
     global htdocsdir,storage,access,pylibdir
     t=""
     # Get the list of functions to be called
-    res = run_sql("SELECT * FROM sbmFUNCTIONS WHERE  action='%s' and doctype = '%s' and step = %s ORDER BY score" % (action,doctype,step))
+    res = run_sql("SELECT * FROM sbmFUNCTIONS WHERE action=%s and doctype=%s and step=%s ORDER BY score", (action,doctype,step,))
     # If no data is found then the data concerning the DEF(ault) doctype is used
     if len(res) == 0:
-        res = run_sql("SELECT * FROM sbmFUNCTIONS WHERE  action='%s' and doctype = 'DEF' and step = %s ORDER BY score" % (action,step))
+        res = run_sql("SELECT * FROM sbmFUNCTIONS WHERE action=%s and doctype='DEF' and step=%s ORDER BY score", (action,step,))
     if len(res) > 0:
         t=t+Request_Print("S",  "<br><br>Here is the %s function list for %s documents at level %s <P>" % (action,doctype,step))
         t=t+Request_Print("S", "<table border cellpadding = 15><tr><th>Function</th><th>Score</th><th>Running Function</th></tr>")
@@ -1220,7 +1212,7 @@ def print_function_calls (doctype, action, step, form):
 def Propose_Next_Action (doctype,action_score,access,currentlevel,indir):
     global machine,storage,act,rn
     t=""
-    res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE  docname = '%s' and level != '0' and level = '%s' and score > '%s' ORDER BY score" % (doctype,currentlevel,action_score))
+    res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE docname=%s and level!='0' and level='%s' and score>%s ORDER BY score", (doctype,currentlevel,action_score,))
     if len(res) > 0:
         t=t+Request_Print("A","<BR><BR>You now have to<ul>")
         first_score = res[0][10]
@@ -1229,14 +1221,14 @@ def Propose_Next_Action (doctype,action_score,access,currentlevel,indir):
             if action[10] == first_score:
                 if i > 0:
                     t=t+Request_Print("A"," <b>or</b>");
-                res2 = run_sql("SELECT dir FROM sbmACTION WHERE  sactname='%s'" % action[1])
+                res2 = run_sql("SELECT dir FROM sbmACTION WHERE sactname=%s", (action[1],))
                 nextdir = res2[0][0]
                 t=t+Request_Print("A","<LI><A HREF=\"\" onClick=\"document.forms[0].action='submit.py';document.forms[0].curpage.value='%s';document.forms[0].startPg.value='%s';document.forms[0].act.value='%s';document.forms[0].doctype.value='%s';document.forms[0].indir.value='%s';document.forms[0].access.value='%s';document.forms[0].fromdir.value='%s';document.forms[0].submit();return false;\"> %s </a>" % (action[11],action[11],action[1],doctype,nextdir,access,indir,action[12]))
         t=t+Request_Print("A","</ul>")
     return t
 
 def Test_Reload(uid_email,doctype,act,access):
-    res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE  doctype='%s' and action='%s' and id='%s' and email='%s' and status='finished'" % (doctype,act,access,uid_email))
+    res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE doctype=%s and action=%s and id=%s and email=%s and status='finished'", (doctype,act,access,uid_email,))
     if len(res) > 0:
         return 1
     else:
@@ -1272,7 +1264,7 @@ def warningMsg(title,req,c=cdsname,ln=cdslang):
 
 def getCookie(name,uid):
     # these are not real http cookies but are stored in the DB
-    res = run_sql("select value from sbmCOOKIES where uid=%s and name='%s'" % (uid,name))
+    res = run_sql("select value from sbmCOOKIES where uid=%s and name=%s", (uid,name,))
     if len(res) > 0:
         return res[0][0]
     else:
@@ -1280,11 +1272,11 @@ def getCookie(name,uid):
     
 def setCookie(name,value,uid):
     # these are not real http cookies but are stored in the DB
-    res = run_sql("select id from sbmCOOKIES where uid=%s and name='%s'" % (uid,name))
+    res = run_sql("select id from sbmCOOKIES where uid=%s and name=%s", (uid,name,))
     if len(res) > 0:
-        run_sql("update sbmCOOKIES set value='%s' where uid=%s and name='%s'" % (value,uid,name))
+        run_sql("update sbmCOOKIES set value=%s where uid=%s and name=%s", (value,uid,name,))
     else:
-        run_sql("insert into sbmCOOKIES(name,value,uid) values('%s','%s',%s)" % (name,value,uid))
+        run_sql("insert into sbmCOOKIES(name,value,uid) values(%s,%s,%s)", (name,value,uid,))
     return 1
     
 def specialchars(text):

@@ -51,13 +51,13 @@ def index(req,c=cdsname,ln=cdslang):
     access = form.keys()[0]
     if access == "":
         return errorMsg("approve.py: cannot determine document reference",req)
-    res = run_sql("select doctype,rn from sbmAPPROVAL where access='%s'" % access)
+    res = run_sql("select doctype,rn from sbmAPPROVAL where access=%s",(access,))
     if len(res) == 0:
         return errorMsg("approve.py: cannot find document in database",req)
     else:
         doctype = res[0][0]
         rn = res[0][1]
-    res = run_sql("select value from sbmPARAMETERS where name='edsrn' and doctype='%s'" % doctype)
+    res = run_sql("select value from sbmPARAMETERS where name='edsrn' and doctype=%s",(doctype,))
     edsrn = res[0][0]
     url = "%s/sub.py?%s=%s&password=%s@APP%s" % (urlpath,edsrn,rn,access,doctype)
     req.err_headers_out.add("Location", url)

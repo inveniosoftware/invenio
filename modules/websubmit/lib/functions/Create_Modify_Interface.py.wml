@@ -53,17 +53,17 @@ def Create_Modify_Interface(parameters,curdir,form):
         text = ""
         # retrieve and display the modification text
         t=t+"<FONT color=darkblue>\n"
-        res = run_sql("SELECT modd FROM sbmMODIFY WHERE  modn='%s'" % field)
+        res = run_sql("SELECT modd FROM sbmMODIFY WHERE  modn=%s", (field,))
         if len(res)>0:
             t=t+"<small>%s</small> </FONT>\n" % res[0][0]
         # retrieve the marc code associated with the field
-        res = run_sql("SELECT marccode FROM sbmFIELDDESC WHERE  name='%s'" % field)
+        res = run_sql("SELECT marccode FROM sbmFIELDDESC WHERE name=%s", (field,))
         if len(res) > 0:
             marccode = res[0][0]
         # then retrieve the previous value of the field
         if marccode != "":
             value = Get_Field(marccode,sysno)
-        res = run_sql("SELECT * FROM sbmFIELDDESC WHERE  name = '%s'" % field)
+        res = run_sql("SELECT * FROM sbmFIELDDESC WHERE name=%s", (field,))
         if len(res) > 0:
             type = res[0][3]
             numcols = res[0][6]

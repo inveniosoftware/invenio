@@ -70,7 +70,7 @@ def Send_APP_Mail (parameters,curdir,form):
     else:
         newrn = ""
     # Document name
-    res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname='%s'" % doctype)
+    res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE sdocname=%s", (doctype,))
     docname = res[0][0]
     # retrieve category
     categformat = categformat.replace("<CATEG>","([^-]*)")

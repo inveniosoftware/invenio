@@ -52,11 +52,11 @@ def Update_Approval_DB(parameters,curdir,form):
             category = re.match(categformat,rn).group(1)
         if category == "":
             category = "unknown"
-        sth = run_sql("SELECT status,dFirstReq,dLastReq,dAction FROM sbmAPPROVAL WHERE  doctype='%s' and categ='%s' and rn='%s'" % (doctype,category,rn))
+        sth = run_sql("SELECT status,dFirstReq,dLastReq,dAction FROM sbmAPPROVAL WHERE  doctype=%s and categ=%s and rn=%s", (doctype,category,rn,))
         if len(sth) == 0:
-            run_sql("INSERT INTO  sbmAPPROVAL values('%s','%s','%s','waiting',NOW(),NOW(),'','%s')" % (doctype,category,rn,access))
+            run_sql("INSERT INTO  sbmAPPROVAL values(%s,%s,%s,'waiting',NOW(),NOW(),'',%s)", (doctype,category,rn,access,))
         else:
-            run_sql("UPDATE sbmAPPROVAL SET dLastReq=NOW(), status='waiting' WHERE  doctype='%s' and categ='%s' and rn='%s'" % (doctype,category,rn))
+            run_sql("UPDATE sbmAPPROVAL SET dLastReq=NOW(), status='waiting' WHERE  doctype=%s and categ=%s and rn=%s", (doctype,category,rn,))
     else:
         if os.path.exists("%s/decision" % curdir):
             fp = open("%s/decision" % curdir, "r")
@@ -65,8 +65,8 @@ def Update_Approval_DB(parameters,curdir,form):
         else:
             decision = ""
         if decision == "approve":
-            run_sql("UPDATE sbmAPPROVAL SET dAction=NOW(),status='approved' WHERE  rn='%s'" % rn)
+            run_sql("UPDATE sbmAPPROVAL SET dAction=NOW(),status='approved' WHERE  rn=%s", (rn,))
         else:
-            run_sql("UPDATE sbmAPPROVAL SET dAction=NOW(),status='rejected' WHERE  rn='%s'" % rn)
+            run_sql("UPDATE sbmAPPROVAL SET dAction=NOW(),status='rejected' WHERE  rn=%s", (rn,))
     return ""
 </protect>

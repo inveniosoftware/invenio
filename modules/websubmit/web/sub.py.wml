@@ -36,7 +36,6 @@ import re
 
 sys.path.append('%s' % pylibdir)
 from cdsware.config import *
-from cdsware.dbquery import run_sql
 from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import acc_isRole
 from cdsware.websubmit_config import *

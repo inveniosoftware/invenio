@@ -31,7 +31,7 @@
 
 def Test_Status(parameters,curdir,form):
     global rn
-    res = run_sql("SELECT status, access FROM sbmAPPROVAL WHERE  rn='%s'" % rn)
+    res = run_sql("SELECT status, access FROM sbmAPPROVAL WHERE rn=%s", (rn,))
     if len(res) == 0:
         raise functionStop(printNotRequested(rn))
     else:

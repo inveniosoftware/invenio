@@ -48,7 +48,8 @@ from cdsware.messages import *
 def index(req,doctype="",act="",access="",indir=""):
     t=""    
     curdir = "%s/%s/%s/%s" % (storage,indir,doctype,access)
-    res = run_sql("select sdesc,fidesc,pagenb,level from sbmFIELD where subname='%s%s' order by pagenb,fieldnb" % (act,doctype));
+    subname = "%s%s" % (act,doctype)
+    res = run_sql("select sdesc,fidesc,pagenb,level from sbmFIELD where subname=%s order by pagenb,fieldnb", (subname,))
     nbFields = 0
     t=t+"<body style=\"background-image: url(%s/header_background.gif);\"><table border=0>\n" % images
     for arr in res:

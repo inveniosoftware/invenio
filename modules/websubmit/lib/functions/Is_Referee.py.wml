@@ -25,7 +25,7 @@ def Is_Referee(parameters,curdir,form):
     global uid_email,sysno,rn,uid
     doctype = form['doctype']
     # Get document category
-    res = run_sql("SELECT categ FROM sbmAPPROVAL WHERE  rn='%s'" % rn)
+    res = run_sql("SELECT categ FROM sbmAPPROVAL WHERE rn=%s", (rn,))
     if len(res) >0:
         categ = res[0][0]
     else:

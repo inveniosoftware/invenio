@@ -48,7 +48,7 @@ def index(req,c=cdsname,ln=cdslang,sub=""):
     myQuery = req.args
     if sub == "":
         return errorMsg("Sorry parameter missing...",req)
-    res = run_sql("select docname,actname from sbmIMPLEMENT where subname='%s'" % sub)
+    res = run_sql("select docname,actname from sbmIMPLEMENT where subname=%s", (sub,))
     if len(res)==0:
         return errorMsg("Sorry. Can't analyse parameter",req)
     else:
@@ -63,7 +63,7 @@ def index(req,c=cdsname,ln=cdslang,sub=""):
     # retrieve other parameter values
     params = re.sub("sub=[^&]*","",myQuery)
     # retrieve 'dir' value
-    res = run_sql ("select dir from sbmACTION where sactname='%s'" % action)
+    res = run_sql ("select dir from sbmACTION where sactname=%s",(action,))
     dir = res[0][0]
     url = "%s/Main.py?doctype=%s&dir=%s&access=%s&act=%s&startPg=1%s" % (urlpath,doctype,dir,access,action,params)
     req.err_headers_out.add("Location", url)
