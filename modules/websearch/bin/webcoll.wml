@@ -298,13 +298,17 @@ class Collection:
         return ancestors
 
     def restricted_p(self):
-        "Predicate to test if the collection is restricted or not."
+        """Predicate to test if the collection is restricted or not.  Return the contect of the
+         `restrited' column of the collection table (typically Apache group).  Otherwise return
+         None if the collection is public."""
+        out = None
         query = "SELECT restricted FROM collection WHERE id=%d" % self.id
-        res = run_sql(query, None, 1)
-        if res and res[0][0] != None:       
-            return 1
-        else:
-            return 0
+        res = run_sql(query, None, 1)        
+        try:
+            out = res[0][0]
+        except:
+            pass        
+        return out
 
     def get_sons(self, type='r'):
         "Returns list of direct sons of type 'type' for the current collection."
@@ -478,7 +482,7 @@ class Collection:
             for son in sons:
                 narrowsearch += """<tr><td class="narrowsearchboxbody" valign="top">"""
                 if type=='r':
-                    if son.restricted_p():
+                    if son.restricted_p() and son.restricted_p() != self.restricted_p():
                         narrowsearch += """<input type=checkbox name="c" value="%s">&nbsp;</td>""" % son.name
                     else:
                         narrowsearch += """<input type=checkbox name="c" value="%s" checked>&nbsp;</td>""" % son.name
@@ -917,12 +921,15 @@ class Collection:
             write_message("... calculating reclist of %s" % self.name)
         reclist = HitSet() # will hold results for public sons only; good for storing into DB
         reclist_with_nonpublic_subcolls = HitSet() # will hold results for both public and nonpublic sons; good for deducing total
-                                                  # number of documents
+                                                   # number of documents
         if not self.dbquery:
-            # A - collection does not have dbquery, so query recursively all its non-restricted sons:
+            # A - collection does not have dbquery, so query recursively all its sons
+            #     that are either non-restricted or that have the same restriction rules
             for coll in self.get_sons():
                 coll_reclist, coll_reclist_with_nonpublic_subcolls = coll.calculate_reclist()
-                if not coll.restricted_p(): # add this reclist ``for real'' only if it is public
+                if ((coll.restricted_p() is None) or
+                    (coll.restricted_p() == self.restricted_p())):
+                    # add this reclist ``for real'' only if it is public 
                     reclist.union(coll_reclist) 
                 reclist_with_nonpublic_subcolls.union(coll_reclist_with_nonpublic_subcolls)
         else:
