@@ -1,0 +1,104 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="Release Numbering Scheme" \
+    navbar_name="hacking-release-version-numbering-scheme" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> " \
+    navbar_select="hacking-release-version-numbering-scheme" 
+
+<pre>
+CDSWARE RELEASE NUMBERING SCHEME / $Date$
+
+CDSware uses the classical major.minor.patchlevel release version
+numbering scheme that is commonly used in the GNU/Linux world and
+elsewhere.  Each release is labelled by
+
+     major.minor.patchlevel
+
+release version number.  For example, a release version 4.0.1 means:
+
+       4 - 4th major version, i.e. the whole system has been already
+           4th times either fully rewritten or at least in its very
+           essential components.  The upgrade from one major version
+           to another may be rather hard, may require new prerequisite
+           technologies, full data dump, reload and reindexing, as
+           well as other major configuration adapatations, possibly
+           with an important manual intervention.
+
+       0 - 0th minor version, i.e. the first minor release of the 4th
+           major rewrite.  (Increments go 4.1, 4.2, ... 4.9, 4.10,
+           4.11, 4.12, ... until some important rewrite is done,
+           e.g. the database philosophy dramatically changes, leading
+           to a non-trivial upgrade, and we have 5.0.)  The upgrade
+           from one minor version to another may be laborious but is
+           relatively painless, in that some table changes and data
+           manipulations may be necessary but they are somewhat
+           smaller in nature, easier to grasp, and possibly done by an
+           automated script.
+
+       1 - 1st patch level to 4.0, fixing bugs in 4.0.0 but not adding
+           any substantially new functionality.  That is, the only new
+           functionality that is added is that of a `bug fix' nature.
+           The upgrade from one patch level to another is usually
+           straightforward.
+
+           (Packages often seem to break this last rule, e.g. Linux
+           kernel adopting new important functionality (such as
+           ReiserFS) within the stable 2.4.x branch.  It can be easily
+           seen that it is somewhat subjective to judge what is
+           qualitatively more like a minor new functionality and what
+           is more like a patch to the existing behaviour.  We have
+           tried to quantify these notions with respect to whether
+           table structure and/or technology change require small or
+           large upgrade jobs and eventual manual efforts.)
+
+So, if we have a version 4.3, a bug fix would mean to release 4.3.1,
+some minor new functionality and upgrade would mean to release 4.4,
+some important database structure rewrite or an imaginary exchange of
+Python for Common Lisp would mean to release 5.0, etc.
+
+In addition, the two-branch release policy is adopted:
+
+  a) stable branch - releases in the stable branch are numbered with
+     even minor version number, like 0.2, 0.4, etc.  These releases
+     are usually well tested.  The configuration files and features
+     usually don't change often from one release to another.  The
+     release frequency is low.
+
+  b) development branch - releases in the development branch are
+     number with the odd minor version number, like 0.1, 0.3, etc.
+     These releases are more experimental and may be less tested than
+     the stable ones.  The configuration files and features change
+     more rapidly from one release to another.  The release frequency
+     is higher.
+
+It can be seen that the above scheme is somewhat similar to the Linux
+kernel version numbering scheme.
+
+Currently, CDSware 0.0.9 represents the stable branch release and
+0.1.0 the development branch release.  We are going to frequently
+update it to provide 0.1.1, 0.1.2, etc as the currently missing admin
+functionality is being added into the development branch, until later
+on, when some release, say 0.1.8, will achieve a status of
+satisfaction, at which point we release it as the next stable version
+(0.2 or 1.0), and start a new development branch (0.3 or 1.1).
+
+- end of file -
+</pre>
