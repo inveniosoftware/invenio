@@ -76,7 +76,7 @@
   <ru>Придать</ru>
   <sk>Pridaj</sk>
   <cz>Přidej</cz>
-  <no>Last opp</no>
+  <no>Send inn</no>
 </define-tag>
 
 <define-tag MSG_HELP whitespace=delete>
@@ -141,7 +141,7 @@
   <ru>Персоналузовать</ru>
   <sk>Personalizácia</sk>
   <cz>Personalizace</cz>
-  <no>Tilpass brukerinnstillinger</no>
+  <no>Brukerinnstillinger</no>
 </define-tag>
 
 <define-tag MSG_PAGE_BEING_TRANSLATED_HEAD whitespace=delete>
@@ -202,7 +202,7 @@
   </cz>
   <no>
    For øyeblikket er ikke den norske oversettelsen klar. 
-   Vennligst bruk versjonen som er presentert under. Takk for deres forståelse.
+   Vennligst bruk versjonen som er presentert under.
   </no>
 </define-tag>
 
@@ -255,7 +255,7 @@
   <ru>Сузить поиск:</ru>
   <sk>Zúžiť hľadanie na:</sk>
   <cz>Zúžit hledání na:</cz>
-  <no>Smalt søk:</no>
+  <no>Avgrenset søk:</no>
 </define-tag>
 
 <define-tag MSG_FOCUS_ON whitespace=delete>
@@ -268,7 +268,7 @@
   <ru>Устремление для:</ru>
   <sk>Zameranie na:</sk>
   <cz>Zaměření na:</cz>
-  <no>Fokus på:</no>
+  <no>Utvalgte samlinger:</no>
 </define-tag>
 
 <define-tag MSG_SIMPLE_SEARCH whitespace=delete>
@@ -349,7 +349,7 @@
   </cz>
   <no>
     <p>Beklager, samlingen <strong>%s</strong> ser ikke ut til å finnes.
-    <p>Du ønsker kanskje å starte å bla fra <a href="%s">%s</a>.
+    <p>Du ønsker kanskje å starte å søket fra <a href="%s">%s</a>.
   </no>
 </define-tag>
 
@@ -402,7 +402,7 @@
   <ru>сеанс</ru>
   <sk>seansa</sk>
   <cz>seance</cz>
-  <no>sesjon</no>
+  <no>økt</no>
 </define-tag>
 
 <define-tag MSG_LOGIN whitespace=delete>
@@ -454,7 +454,7 @@
   <ru>Просмотрить</ru>
   <sk>Prelistuj</sk>
   <cz>Prolistuj</cz>
-  <no>Bla</no>
+  <no>Bla gjennom</no>
 </define-tag>
 
 <define-tag MSG_SEARCH_RECORDS_FOR whitespace=delete>
@@ -545,7 +545,7 @@
   <ru>абстракт</ru>
   <sk>abstrakt</sk>
   <cz>abstrakt</cz>
-  <no>utdrag</no>
+  <no>sammendrag</no>
 </define-tag>
 
 <define-tag MSG_KEYWORD whitespace=delete>
@@ -610,7 +610,7 @@
   <ru>Любое слова:</ru>
   <sk>Jedno zo slov:</sk>
   <cz>Jedno ze slov:</cz>
-  <no>Hvilke som helst av ordene:</no>
+  <no>Minst ett av ordene:</no>
 </define-tag>
 
 <define-tag MSG_EXACT_PHRASE whitespace=delete>
@@ -701,7 +701,7 @@
   <ru>Результаты Поиска</ru>
   <sk>Výsledky hľadania</sk>
   <cz>Výsledky hledání</cz>
-  <no>Søkeresultat</no>
+  <no>Søkeresultater</no>
 </define-tag>
 
 <define-tag MSG_TRY_YOUR_SEARCH_ON whitespace=delete>
@@ -818,7 +818,7 @@
   <ru>поделит дла коллекции</ru>
   <sk>zhromaždené podľa kolekcií</sk>
   <cz>shromážděné podle kolekcí</cz>
-  <no>del etter samling</no>
+  <no>oppdelt etter samling</no>
 </define-tag>
 
 <define-tag MSG_OUTPUT_FORMAT whitespace=delete>
@@ -870,7 +870,7 @@
   <ru>Подробный запуск</ru>
   <sk>Podrobný záznam</sk>
   <cz>Podrobný záznam</cz>
-  <no>Detaljert post</no>
+  <no>Full post</no>
 </define-tag>
 
 <define-tag MSG_RESULTS_OVERVIEW_FOUND_X_RECORDS_IN_Y_SECONDS whitespace=delete>
@@ -981,7 +981,7 @@
   <ru>любая коллекция</ru>
   <sk>všetky kolekcie</sk>
   <cz>všechny kolekce</cz>
-  <no>hvilken som helst samling</no>
+  <no>alle samlinger</no>
 </define-tag>
 
 <define-tag MSG_ADD_ANOTHER_COLLECTION whitespace=delete>
@@ -1020,7 +1020,7 @@
   <ru>Помощь для приданья</ru>
   <sk>Pomoc pre pridávanie</sk>
   <cz>Nápověda pro přidávání</cz>
-  <no>Opplastningshjelp</no>
+  <no>Innsendingshjelp</no>
 </define-tag>
 
 <define-tag MSG_ADMIN_AREA whitespace=delete>
@@ -1046,7 +1046,7 @@
   <ru>Администрация Придания</ru>
   <sk>Administrácia Pridávania</sk>
   <cz>Administrace Přidávání</cz>
-  <no>Opplastningsadministrasjon</no>
+  <no>Innsendingsadministrasjon</no>
 </define-tag>
 
 <define-tag MSG_GUIDE whitespace=delete>
