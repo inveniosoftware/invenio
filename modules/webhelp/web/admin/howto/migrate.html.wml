@@ -23,8 +23,8 @@
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/>Admin Area</a> &gt; <a class=navtrail href=<WEBURL>/admin/howto/>Admin HOWTOs</a>" \
     navbar_select="howto_migrate"
 
-<p>The CDSware tools come embedded with several independent flexible
-modules that enable you to easily convert your data from any format
+<p>CDSware comes as a suite of several independent flexible modules
+that enable you to easily convert your data from any existing format
 and to upload them into the CDSware system.
 
 <p>This document briefly describes how you proceed.  To learn more on
@@ -38,9 +38,8 @@ $ cd /tmp
 $ cp /my/own/doc/system/datadump.txt .
 $ vi dump.cfg
 $ bibconvert -cdatadump.cfg < datadump.txt > datadump.xml
-$ bibformat < datadump.xml > datadump_with_fmt.xml
-$ bibupload datadump_with_fmt.xml
-$ bibwords add 1-1500
+$ bibupload datadump.xml
+$ bibsched
 </pre>
 </blockquote>
 
@@ -74,27 +73,15 @@ href="marc.html">MARC HOWTO</a>.)</blockquote>
 <dd><blockquote>Convert the data from your own format into XML 
 MARC, using the configuration you just wrote in the previous step.</blockquote>
 
-<dt><code>$ bibformat < datadump.xml > datadump_with_fmt.xml</code>
+<dt><code>$ bibupload datadump.xml</code>
 
-<dd><blockquote>Create default HTML presentation of the data by using
-<a href="<WEBURL>/admin/bibformat/">BibFormat</a> configurations.
-(You may want to create <a
-href="<WEBURL>/admin/bibformat/FORMAT_display.php">new format</a>
-in case your metadata structure is different from what you are used
-to.)  This step enriches the XML MARC file by default HTML formats
-that the search engine will reuse.</blockquote>
-
-<dt><code>$ bibupload datadump_with_fmt.xml</code>
-
-<dd><blockquote>Upload thusly enriched XML file into CDSware
+<dd><blockquote>Upload thusly converted metadata into CDSware
 bibliographic databases.</blockquote>
 
-<dt><code>$ bibwords add 1-1500</code>
+<dt><code>$ bibsched</code>
 
-<dd><blockquote>Run the <a
-href="<WEBURL>/admin/bibwords/">BibWords</a> procedure on records #1
-to #1500 to create word indexes of the newly inputted data.  (Assuming
-there were 1500 records.)</blockquote>
+<dd><blockquote>Watch the progress how the metadata are being
+uploaded, indexed, and formatted.</blockquote>
 
 </dl>
 
