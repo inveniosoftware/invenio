@@ -32,14 +32,16 @@ librarian, an archive manager, and web interface moderators.
 <p>The <a href="howto/">HOWTO guides</a> will give you short recipes
 on some of the most frequently encountered administration tasks.
 
-<h2>System Librarian</h2>
+<h2>System Administrator and Librarian</h2>
 
 <p>The System Librarian will describe the metadata, decide upon MARC tags,
 etc.  He will ensure that there is a homogeneity between various data
 types and collections.  This is because all the bibliographic data is
-stored in the same common space.  
+stored in the same common space.
+<p>The System Administrator configures the system and makes sure everything
+is working as it should.
 
-<p>The system librarian would most probably be interested in the
+<p>The system administrator and librarian would most probably be interested in the
 following administrative modules:
 
 <blockquote>
@@ -49,9 +51,12 @@ following administrative modules:
 
 <dd>Enables you to directly manipulate bibliographic data tables.
 
-    <br><em>Example:</em> edit record, change fields, simple
-    cataloguing, global changes, etc.
+    <br><em>Example:</em> edit record, change fields, simple cataloguing, global changes, etc.
+<dt><a href="bibrank/">BibRank Admin</a>
 
+<dd>Enables you to configure various ranking methods to be used by the search engine.
+
+    <br><em>Example:</em> Update old or create new ranking methods when records are modified. etc.
 <dt><a href="bibwords/">BibWords Admin</a> <small class=note>- not included yet</small>
 
 <dd>Enables you to configure "word files", i.e. to define which
