@@ -323,6 +323,32 @@ a.navtrail:hover {
    color: #000;
    background: transparent;
 }
+.errorbox {
+   color: #000;
+   background: #ffcccc;
+   padding: 1px;
+   margin-top: 5px;
+   margin-bottom: 5px;
+   margin-left: 30px;
+   margin-right: 30px;
+   border-spacing: 0px;
+   border-collapse: collapse;
+   border: 2px solid #990000; 
+}
+.errorboxheader {
+   color: #000;
+   background: #ffcccc;
+   padding: 3px;
+   border-spacing: 0px;
+   font-weight: bold;
+   text-align: left;
+}
+.errorboxbody {
+   color: #000;
+   background: #ffcccc;
+   padding: 3px;
+   font-size: normal;
+}
 .searchbox {
    color: #000;
    background: transparent;
