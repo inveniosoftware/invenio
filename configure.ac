@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cdsware, 0.0.9+.CVS.20031128, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.0.9+.CVS.20031128)
+AC_INIT(cdsware, 0.0.9+.CVS.20031202, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.0.9+.CVS.20031202)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -455,6 +455,8 @@ AC_CONFIG_FILES([Makefile \
 	  modules/bibconvert/doc/admin/Makefile \
 	  modules/bibharvest/Makefile \
 	  modules/bibharvest/bin/Makefile \
+	  modules/bibharvest/lib/Makefile \
+	  modules/bibharvest/web/Makefile \
 	  modules/bibsched/Makefile \
 	  modules/bibsched/bin/Makefile \
 	  modules/bibwords/Makefile \
