@@ -945,14 +945,14 @@ def acc_getActionRoles(id_action):
 
 def acc_getRoleId(name_role):
     """get id of role, name given. """
-    try: return run_sql("""SELECT id FROM accROLE WHERE name = %s""" % (name_role, ))[0][0]
+    try: return run_sql("""SELECT id FROM accROLE WHERE name = %s""", (name_role, ))[0][0]
     except IndexError: return 0
 
 
 def acc_getRoleName(id_role):
     """get name of role, id given. """
     
-    try: return run_sql("""SELECT name FROM accROLE WHERE id = %s""" % (id_role, ))[0][0]
+    try: return run_sql("""SELECT name FROM accROLE WHERE id = %s""", (id_role, ))[0][0]
     except IndexError: return ''
 
 
@@ -960,7 +960,7 @@ def acc_getRoleDetails(id_role=0):
     """get all the fields for an action."""
     
     details = []
-    try: result = run_sql("""SELECT * FROM accROLE WHERE id = %s """ % (id_role, ))[0]
+    try: result = run_sql("""SELECT * FROM accROLE WHERE id = %s """, (id_role, ))[0]
     except IndexError: return details
     
     if result:
@@ -982,7 +982,7 @@ def acc_getRoleActions(id_role):
                       FROM accROLE_accACTION_accARGUMENT raa, accACTION a
                       WHERE raa.id_accROLE = %s and
                             raa.id_accACTION = a.id
-                      ORDER BY a.name """ % (id_role, ))
+                      ORDER BY a.name """, (id_role, ))
 
 
 def acc_getRoleUsers(id_role):
@@ -992,7 +992,7 @@ def acc_getRoleUsers(id_role):
     FROM user_accROLE ur, user u
     WHERE ur.id_accROLE = %s AND
     u.id = ur.id_user
-    ORDER BY u.email""" % (id_role, ))
+    ORDER BY u.email""", (id_role, ))
 
 
 # ARGUMENT RELATED
@@ -1001,7 +1001,7 @@ def acc_getArgumentId(keyword, value):
     """get id of argument, keyword=value pair given.
     value = 'optional value' is replaced for id_accARGUMENT = -1."""
     
-    try: return run_sql("""SELECT DISTINCT id FROM accARGUMENT WHERE keyword = '%s' and value = '%s'""" % (keyword, value))[0][0]
+    try: return run_sql("""SELECT DISTINCT id FROM accARGUMENT WHERE keyword = %s and value = %s""", (keyword, value))[0][0]
     except IndexError:
         if value == 'optional value': return -1
         return 0
@@ -1009,36 +1009,27 @@ def acc_getArgumentId(keyword, value):
 
 # USER RELATED
 
-def acc_listUsers():
-    """list all users"""
-    
-    try: return run_sql("""SELECT id,email FROM user""")
-    except IndexError: return []
-    
-
 def acc_getUserEmail(id_user=0):
     """get email of user, id given."""
     
-    try: return run_sql("""SELECT email FROM user WHERE id = %s """ % (id_user, ))[0][0]
+    try: return run_sql("""SELECT email FROM user WHERE id = %s """, (id_user, ))[0][0]
     except IndexError: return ''
     
 
 def acc_getUserId(email=''):
     """get id of user, email given."""
     
-    try: return run_sql("""SELECT id FROM user WHERE email = '%s' """ % (email, ))[0][0]
+    try: return run_sql("""SELECT id FROM user WHERE email = %s """, (email, ))[0][0]
     except IndexError: return 0
     
 
 def acc_getUserRoles(id_user=0):
     """get all roles a user is connected to."""
     
-    query = """SELECT ur.id_accROLE
+    res = run_sql("""SELECT ur.id_accROLE
     FROM user_accROLE ur
     WHERE ur.id_user = %s
-    ORDER BY ur.id_accROLE""" % (id_user, )
-
-    res = run_sql(query)
+    ORDER BY ur.id_accROLE""", (id_user, ))
 
     return res
 
@@ -1049,7 +1040,7 @@ def acc_findUserInfoIds(id_user=0):
     res1 = run_sql("""SELECT ur.id_user, raa.*
     FROM user_accROLE ur LEFT JOIN accROLE_accACTION_accARGUMENT raa
     ON ur.id_accROLE = raa.id_accROLE
-    WHERE ur.id_user = %s """ % (id_user, ))
+    WHERE ur.id_user = %s """, (id_user, ))
 
     res2 = []
     for res in res1: res2.append(res)
@@ -1191,7 +1182,7 @@ def acc_findPossibleActions(id_role, id_action):
     FROM accROLE_accACTION_accARGUMENT raa, accARGUMENT ar
     WHERE raa.id_accROLE = %s and                
     raa.id_accACTION = %s and
-    raa.id_accARGUMENT = ar.id """ % (id_role, id_action))
+    raa.id_accARGUMENT = ar.id """, (id_role, id_action))
     
     # find needed keywords, create header
     keywords = acc_getActionKeywords(id_action=id_action)
@@ -1199,8 +1190,7 @@ def acc_findPossibleActions(id_role, id_action):
 
     if not keywords:
         # action without arguments
-        if run_sql("""SELECT * FROM accROLE_accACTION_accARGUMENT WHERE id_accROLE = %s AND id_accACTION = %s AND id_accARGUMENT = 0 AND argumentlistid = 0"""
-                   % (id_role, id_action)):
+        if run_sql("""SELECT * FROM accROLE_accACTION_accARGUMENT WHERE id_accROLE = %s AND id_accACTION = %s AND id_accARGUMENT = 0 AND argumentlistid = 0""", (id_role, id_action)):
             return [['#', 'argument keyword'], ['0', 'action without arguments']]
         
 
@@ -1456,7 +1446,7 @@ def acc_find_delegated_roles(id_role_admin=0):
     result = []
 
     for (name_role, ) in rolenames:
-        roledetails = run_sql("""SELECT * FROM accROLE WHERE name = '%s' """ % (name_role, ))
+        roledetails = run_sql("""SELECT * FROM accROLE WHERE name = %s """, (name_role, ))
         if roledetails: result.append(roledetails)
 
     return result
