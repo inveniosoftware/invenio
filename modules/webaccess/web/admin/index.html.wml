@@ -24,11 +24,11 @@
 
 <p>
  This is the gate to the admin area for WebAccess. You need to 
- <a href="http://<WEBURL>/youraccount.py/login">login</a> to enter.
+ <a href="<WEBURL>/youraccount.py/login">login</a> to enter.
 </p>
 
 <p>
- Reduce text size for better view (much info): <br>
+ You might want to reduce text size for better view (much info): <br>
  - Mozilla:           View -> Text Zoom -> Smaller. <br>
  - Internet Explorer: View -> Text Size -> Smaller. <br>
  - Opera:             use + (plus) and - (minus) keys.
