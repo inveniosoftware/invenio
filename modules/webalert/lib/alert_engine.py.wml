@@ -122,7 +122,7 @@ def get_query(alert_id):
 def send_email(fromaddr, toaddr, body):
     global DEBUGLEVEL
     try:
-        server = smtplib.SMTP('smtp.cern.ch')
+        server = smtplib.SMTP('localhost')
         if DEBUGLEVEL > 2:
             server.set_debuglevel(1)
         else:
@@ -187,25 +187,28 @@ def email_notify(alert, records, argstr):
     url = weburl + "/search.py?" + argstr
     pattern = get_pattern(argstr)
     catalogue = get_catalogue(argstr)
+    catword = 'catalogue'
+    if get_catalogue_num(argstr) > 1:
+        catword += 's'
     
-    time = strftime("%c")
+    time = strftime("%d-%m-%Y")
 
-    msg += '\nalert name: \'%s\'' % alert[5]
+    msg += '\nalert name: %s' % alert[5]
     msg += '\npattern: \'%s\'' % pattern
-    msg += '\ncatalogue(s): %s' % catalogue
+    if catalogue:
+        msg += '\n%s: %s' % (catword, catalogue)
     msg += '\nfrequency: %s ' % format_frequency(alert[3])
     msg += '\nrun time: %s ' % time
-    msg += '\nfound: %s record(s)' % len(records)
-    
+    msg += '\nfound: %s record' % len(records)
+    if len(records) > 1:
+        msg += 's'
+    msg += "\nurl: <%s/search.py?%s>\n" % (weburl, argstr)
+
     msg += print_records(records)
 
-    msg += "\n\nThe Search URL is <%s/search.py?%s>\n" % (weburl, argstr)
-    # msg += "The URL for this alert is <%s>\n" % url
+    msg += "\n\n-- \nCERN Document Server Alert Service <%s>\nUnsubscribe at <%s>\nNeed human intervention? Contact <%s>" % (weburl, ALERTURL, supportemail)
 
-    msg += "\nTo modify your alerts: <%s>" % ALERTURL
-    msg += "\n\n-- \nCERN Document Server Alert Service <%s>\nEmail: <%s>" % (weburl, supportemail)
-
-    subject = 'Alert \'%s\' run on %s' % (alert[5], time)
+    subject = 'Alert %s run on %s' % (alert[5], time)
     
     body = forge_email(FROMADDR, email, subject, msg)
 
@@ -273,6 +276,11 @@ def get_pattern(argstr):
 
 def get_catalogue(argstr):
     return get_argument_as_string(argstr, 'c')
+
+def get_catalogue_num(argstr):
+    args = parse_qs(argstr)
+    a = get_argument(args, 'c')
+    return len(a)
 
 def get_date_from(time, freq):
     t = mktime(time)
