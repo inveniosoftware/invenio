@@ -31,6 +31,13 @@
 ## which are ``templates'' for future use: you have to preserve such
 ## elements exactly and only edit the text, so be careful.
 
+## Beware of the whitespace treatment.  1) Elements that have text on
+## more than one line should be define-tag'ed without
+## ``whitespace=delete'' specification.  2) Within the define-tag body
+## definitions, there should be no trailing whitespace after tag
+## translations and before the end of lines.  In Emacs, evaluate
+## (replace-regexp ">\\s +$" ">") to fix the second problem.
+
 ## If you make changes to this file that may be of general interest,
 ## please consider donating them back to the CDSware project.  If you
 ## want to fix existing translation or to introduce a new language,
@@ -59,7 +66,7 @@
   <fr>Recherche</fr>
   <de>Suchen</de>
   <es>Buscar</es>
-  <pt>Buscar</pt>  
+  <pt>Buscar</pt>
   <it>Ricercare</it>
   <ru>Искать</ru>
   <sk>Hľadaj</sk>
@@ -73,7 +80,7 @@
   <fr>Soumission</fr>
   <de>Eintragen</de>
   <es>Enviar</es>
-  <pt>Enviar</pt>  
+  <pt>Enviar</pt>
   <it>Sottomettere</it>
   <ru>Внести</ru>
   <sk>Pridaj</sk>
@@ -170,7 +177,7 @@
   <en>
      At the moment the English version of this page isn't available yet.
      Please use the version presented below.  Thanks for your understanding.
-  </en>  
+  </en>
   <fr>
      Pour le moment, la traduction française de cette page n'est pas
      achevée.  Nous vous prions de bien vouloir consulter la version
@@ -334,50 +341,50 @@
   <se>Samlingen %s finns inte</se>
 </define-tag>
 
-<define-tag MSG_COLLECTION_NOT_FOUND_BODY whitespace=delete>
+<define-tag MSG_COLLECTION_NOT_FOUND_BODY>
   <en>
     <p>Sorry, collection <strong>%s</strong> does not seem to exist.
-    <p>You may want to start browsing from <a href="%s">%s</a>.
-  </en> 
+    <p>You may want to start browsing from <a href=\"%s\">%s</a>.
+  </en>
   <fr>
     <p>Désolé, collection <strong>%s</strong> n'est pas trouvable.
-    <p>Essaiez de naviguer à partir de <a href="%s">%s</a>.
+    <p>Essaiez de naviguer à partir de <a href=\"%s\">%s</a>.
   </fr>
   <de>
     <p>Entschuldigung, Sammlung <strong>%s</strong> scheint nicht zu existieren.
-    <p>Sie können erneut beginnen von <a href="%s">%s</a>.
+    <p>Sie können erneut beginnen von <a href=\"%s\">%s</a>.
   </de>
   <es>
     <p>Lo sentimos, la colección <strong>%s</strong> no existe.
-    <p>Inténtelo empezando desde <a href="%s">%s</a>.
+    <p>Inténtelo empezando desde <a href=\"%s\">%s</a>.
   </es>
   <pt>
     <p>Sinto muito, mas a coleção <strong>%s</strong> parece não existir.
-    <p>Experimente explorar a partir de <a href="%s">%s</a>.
+    <p>Experimente explorar a partir de <a href=\"%s\">%s</a>.
   </pt>
   <it>
     <p>Spiacenti, la collezione <strong>%s</strong> non sembra esistere.
-    <p>Provate a cercare a partire da <a href="%s">%s</a>.
+    <p>Provate a cercare a partire da <a href=\"%s\">%s</a>.
   </it>
   <ru>
     <p>Извините, набор <strong>%s</strong> не существует.
-    <p>Вы можете ещё раз начать с <a href="%s">%s</a>.
+    <p>Вы можете ещё раз начать с <a href=\"%s\">%s</a>.
   </ru>
   <sk>
     <p>Ľutujeme, kolekcia <strong>%s</strong> neexistuje.
-    <p>Skúste začať hľadať od <a href="%s">%s</a>.     
+    <p>Skúste začať hľadať od <a href=\"%s\">%s</a>.     
   </sk>
   <cz>
     <p>Litujeme, kolekce <strong>%s</strong> neexistuje.
-    <p>Zkuste začít hledat od <a href="%s">%s</a>.     
+    <p>Zkuste začít hledat od <a href=\"%s\">%s</a>.     
   </cz>
   <no>
     <p>Beklager, samlingen <strong>%s</strong> ser ikke ut til å finnes.
-    <p>Du ønsker kanskje å starte å søket fra <a href="%s">%s</a>.
+    <p>Du ønsker kanskje å starte å søket fra <a href=\"%s\">%s</a>.
   </no>
   <se>
     <p>Beklager, samlingen <strong>%s</strong> ser ikke ut til å finnes.
-    <p>Du ønsker kanskje å starte å søket fra <a href="%s">%s</a>.
+    <p>Du ønsker kanskje å starte å søket fra <a href=\"%s\">%s</a>.
   </se>
 </define-tag>
 
@@ -730,7 +737,7 @@
   <sk>Regulárny výraz:</sk>
   <cz>Regulární výraz:</cz>
   <no>Regulært uttrykk:</no>
-  <se>Reguljärt uttryck:</se> 
+  <se>Reguljärt uttryck:</se>
 </define-tag>
 
 <define-tag MSG_AND whitespace=delete>
@@ -1123,10 +1130,10 @@
 <define-tag MSG_GUEST whitespace=delete>
   <en>guest</en>
   <fr>visiteur</fr>
-  <de>Gast</de> 
-  <es>visitante</es> 
+  <de>Gast</de>
+  <es>visitante</es>
   <pt>visitante</pt>
-  <it>guest</it> 
+  <it>guest</it>
   <ru>гость</ru>
   <sk>hosť</sk>
   <cz>host</cz>
@@ -1137,10 +1144,10 @@
 <define-tag MSG_SUBMIT_HELP whitespace=delete>
   <en>Submit Help</en>
   <fr>Aide de Soumission</fr>
-  <de>Eintragehilfe</de> 
-  <es>Ayuda para el Envio</es> 
+  <de>Eintragehilfe</de>
+  <es>Ayuda para el Envio</es>
   <pt>Ajuda sobre Envio</pt>
-  <it>Aiuto per la Sottomissione</it> 
+  <it>Aiuto per la Sottomissione</it>
   <ru>Помощь при внесении</ru>
   <sk>Pomoc pre pridávanie</sk>
   <cz>Nápověda pro přidávání</cz>
@@ -1152,10 +1159,10 @@
 <define-tag MSG_ADMINISTRATION whitespace=delete>
   <en>administration</en>
   <fr>administration</fr>
-  <de>Verwaltung</de> 
-  <es>administración</es> 
+  <de>Verwaltung</de>
+  <es>administración</es>
   <pt>administração</pt>
-  <it>amministrazione</it> 
+  <it>amministrazione</it>
   <ru>администрация</ru>
   <sk>administrácia</sk>
   <cz>administrace</cz>
@@ -1166,10 +1173,10 @@
 <define-tag MSG_ADMIN_AREA whitespace=delete>
   <en>Admin Area</en>
   <fr>Coin Administrateur</fr>
-  <de>Verwaltungsraum</de> 
-  <es>Área del Administrador</es> 
+  <de>Verwaltungsraum</de>
+  <es>Área del Administrador</es>
   <pt>Área do Administrador</pt>
-  <it>Area dell&quot;Amministratore</it> 
+  <it>Area dell&quot;Amministratore</it>
   <ru>Область Администратора</ru>
   <sk>Areál Administrátora</sk>
   <cz>Areál Administrátora</cz>
@@ -1180,10 +1187,10 @@
 <define-tag MSG_ADMIN_SUBMIT whitespace=delete>
   <en>WebSubmit Administration</en>
   <fr>Administration de Soumission</fr>
-  <de>WebSubmit Verwaltung</de> 
-  <es>Administración de WebSubmit</es> 
+  <de>WebSubmit Verwaltung</de>
+  <es>Administración de WebSubmit</es>
   <pt>Administração de Envios</pt>
-  <it>Amministrazione Websubmit</it> 
+  <it>Amministrazione Websubmit</it>
   <ru>Администрация Внесения</ru>
   <sk>Administrácia Pridávania</sk>
   <cz>Administrace Přidávání</cz>
@@ -1194,10 +1201,10 @@
 <define-tag MSG_GUIDE whitespace=delete>
   <en>Guide</en>
   <fr>Guide</fr>
-  <de>Führer</de> 
+  <de>Führer</de>
   <es>Guía</es>
   <pt>Guia</pt>
-  <it>Guida</it> 
+  <it>Guida</it>
   <ru>Руководство</ru>
   <sk>Príručka</sk>
   <cz>Příručka</cz>
@@ -1537,7 +1544,8 @@
     público.
   </pt>
   <it>
-    Nessun risultato trovato nelle collezioni selezionate. Seguono risultati trovati in tutta la base dati pubblica.
+    Nessun risultato trovato nelle collezioni selezionate.
+    Seguono risultati trovati in tutta la base dati pubblica.
   </it>
   <ru>
     Не найден точный результат во выбранном наборе.
@@ -1561,7 +1569,7 @@
   </se>
 </define-tag>
 
-<define-tag MSG_NO_PUBLIC_HITS>
+<define-tag MSG_NO_PUBLIC_HITS whitespace=delete>
   <en>
     No public collection matched your query.  If you were looking for
     a non-public document, please choose the desired restricted
@@ -1577,12 +1585,12 @@
     Wenn Sie private Dokumente durchsuchen möchten, 
     wählen Sie bitte zuerst eine private Sammlung aus.
   </de>
-  <es>  
+  <es>
     Ninguna colección pública coincide con su búsqueda.
     Si estaba buscando documentos no públicos, por favor
     escoga primero la opción collección restringida.
   </es>
-  <pt>  
+  <pt>
     Nenhuma coleção pública corresponde à sua busca. Se você está 
     procurando um documento que não é público, por favor escolha 
     a coleção restrita desejada primeiro.
@@ -1595,27 +1603,27 @@
     Ваш запрос не удовлетворён ни одним доступным набором.  Для поиска 
     документа ограниченного доступа, выберете сначала ваш набор.    
   </ru>
-  <sk>  
+  <sk>
     Žiadna verejne prístupná kolekcia nevyhovuje Vašej otázke.  Ak ste
     hľadali dokumenty verejne neprístupné, zvoľte prosím najskôr
     príslušnú neverejnú kolekciu.
   </Sk>
-  <cz>  
+  <cz>
     Žádná veřejně přístupná kolekce nevyhovuje Vašemu dotazu.  Jestliže
     jste hledali dokumenty veřejně nepřístupné, zvolte prosím nejdříve
     příslušnou neveřejnou kolekci.    
   </cz>
-  <no>  
+  <no>
     Ingen offentlige samlinger passet ditt søk. Dersom du så etter et 
     ikke-offentlig dokument, vennligst velg den ønskede adgangsbegrensede
     samlingen først.
   </no>
-  <se>  
+  <se>
     Inga öppna samlingar motsvarar din sökning. Välj de åtkomstbegränsade samlingarna först.
   </se>
 </define-tag>
 
-<define-tag MSG_NO_MATCH_WITHIN_TIME_LIMITS>
+<define-tag MSG_NO_MATCH_WITHIN_TIME_LIMIT>
   <en>
     No match within your time limits, discarding this condition...
   </en>
@@ -1724,7 +1732,7 @@
     Foram encontrados resultados para todos os termos de busca 
     mas a consulta booleana não gerou resultados. Por favor 
     combine seus termos de outra maneira.
-  </pt>  
+  </pt>
   <it>
     Tutti i termini di ricerca sono stati trovati ma la ricerca booleana non ha dato risultati. Vi preghiamo di combinare differentemente i termini.
   </it>
@@ -1791,7 +1799,7 @@
   </se>
 </define-tag>
 
-<define-tag MSG_INTERNAL_ERROR>
+<define-tag MSG_INTERNAL_ERROR whitespace=delete>
   <en>Internal Error</en>
   <fr>Erreur Interne</fr>
   <de>Interner Fehler</de>
@@ -1807,47 +1815,47 @@
 
 <define-tag MSG_PLEASE_CONTACT_AND_QUOTE>
   <en>
-    Please contact <a href="mailto:%s">%s</a> quoting the following
+    Please contact <a href=\"mailto:%s\">%s</a> quoting the following
     information:
   </en>
   <fr>
-    Veuillez contacter <a href="mailto:%s">%s</a> en mentionnant
+    Veuillez contacter <a href=\"mailto:%s\">%s</a> en mentionnant
     l'information suivante:        
   </fr>
   <de>
-    Bitte kontaktieren Sie <a href="mailto:%s">%s</a> und geben folgende Auskunft:
+    Bitte kontaktieren Sie <a href=\"mailto:%s\">%s</a> und geben folgende Auskunft:
   </de>
   <es>
-    Por favor contacte <a href="mailto:%s">%s</a> indicando la siguiente
+    Por favor contacte <a href=\"mailto:%s\">%s</a> indicando la siguiente
     información:
   </es>
   <pt>
-    Por favor entre em contato com <a href="mailto:%s">%s</a>
+    Por favor entre em contato com <a href=\"mailto:%s\">%s</a>
     mencionando a seguinte informação:       
   </pt>
   <it>
-    Vi preghiamo di contattare <a href="mailto:%s">%s</a> citando l'informazione seguente:
+    Vi preghiamo di contattare <a href=\"mailto:%s\">%s</a> citando l'informazione seguente:
   </it>
   <ru>
-    Пожалуйста свяжитесь с <a href="mailto:%s">%s</a> и укажите следующую информацию:
+    Пожалуйста свяжитесь с <a href=\"mailto:%s\">%s</a> и укажите следующую информацию:
   </ru>
   <sk>
-    Prosíme kontaktujte <a href="mailto:%s">%s</a> a uveďte nasledovné
+    Prosíme kontaktujte <a href=\"mailto:%s\">%s</a> a uveďte nasledovné
     informácie:
   </sk>
   <cz>
-    Prosíme kontaktujte <a href="mailto:%s">%s</a> a uveďte následující
+    Prosíme kontaktujte <a href=\"mailto:%s\">%s</a> a uveďte následující
     informace:
   </cz>
   <no>
-    Vennligst kontakt <a href="mailto:%s">%s</a> og ta med følgenede informasjon:
+    Vennligst kontakt <a href=\"mailto:%s\">%s</a> og ta med følgenede informasjon:
   </no>
   <se>
-    Vänligen kontakta <a href="mailto:%s">%s</a> och ta med följande information:
+    Vänligen kontakta <a href=\"mailto:%s\">%s</a> och ta med följande information:
   </se>
 </define-tag>
 
-<define-tag MSG_SEARCH_OPTIONS>
+<define-tag MSG_SEARCH_OPTIONS whitespace=delete>
   <en>Search options:</en>
   <fr>Options de la recherche:</fr>
   <de>Suchoptionen:</de>
@@ -1861,7 +1869,7 @@
   <se>Sökalternativ:</se>
 </define-tag>
 
-<define-tag MSG_LATEST_ADDITIONS>
+<define-tag MSG_LATEST_ADDITIONS whitespace=delete>
   <en>Latest additions:</en>
   <fr>Dernières ajouts:</fr>
   <de>Letzte Einträge:</de>
@@ -1875,7 +1883,7 @@
   <se>Senast inlagda poster:</se>
 </define-tag>
 
-<define-tag MSG_MORE>
+<define-tag MSG_MORE whitespace=delete>
   <en>more</en>
   <fr>davantage</fr>
   <de>mehr</de>
@@ -1889,7 +1897,7 @@
   <se>mer</se>
 </define-tag>
 
-<define-tag MSG_COLLECTION_CONTAINS_NO_RECORDS>
+<define-tag MSG_COLLECTION_CONTAINS_NO_RECORDS whitespace=delete>
   <en>This collection does not contain any document yet.</en>
   <fr>Cette collection ne contient pas encore de document.</fr>
   <de>Diese Sammlung enthält zur Zeit keine Dokumente.</de>
@@ -1903,7 +1911,7 @@
   <se>Denna samling innehåller ännu inga dokument.</se>
 </define-tag>
 
-<define-tag MSG_COLLECTION_RESTRICTED_CONTENT>
+<define-tag MSG_COLLECTION_RESTRICTED_CONTENT whitespace=delete>
   <en>The contents of this collection is restricted.</en>
   <fr>Le contenu de cette collection est restreint.</fr>
   <de>Der Inhalt von dieser Sammlung ist privat.</de>
@@ -1922,7 +1930,7 @@
   <fr>Conversion</fr>
   <de>Konvertieren</de>
   <es>Convertir</es>
-  <pt>Converter</pt>  
+  <pt>Converter</pt>
   <it>Convertire</it>
   <ru>Конвертировать</ru>
   <sk>Konvertovať</sk>
@@ -1936,7 +1944,7 @@
   <fr>Agenda</fr>
   <de>Agenda</de>
   <es>Agenda</es>
-  <pt>Agenda</pt>  
+  <pt>Agenda</pt>
   <it>Agenda</it>
   <ru>Повестка</ru>
   <sk>Agenda</sk>
@@ -1950,7 +1958,7 @@
   <fr>Webcast</fr>
   <de>Webcast</de>
   <es>Webcast</es>
-  <pt>Webcast</pt>  
+  <pt>Webcast</pt>
   <it>Webcast</it>
   <ru>Вэбкаст</ru>
   <sk>Webcast</sk>
@@ -1964,7 +1972,7 @@
   <fr>Bulletin</fr>
   <de>Bulletin</de>
   <es>Boletín</es>
-  <pt>Boletim</pt>  
+  <pt>Boletim</pt>
   <it>Bulletin</it>
   <ru>Бюллетень</ru>
   <sk>Buletín</sk>
@@ -1978,7 +1986,7 @@
   <fr>Bibliothèque</fr>
   <de>Bibliothek</de>
   <es>Biblioteca</es>
-  <pt>Biblioteca</pt>  
+  <pt>Biblioteca</pt>
   <it>Biblioteca</it>
   <ru>Библиотека</ru>
   <sk>Knižnica</sk>
@@ -1999,6 +2007,21 @@
   <cz>Tato stránka je také dostupná v následujících jazycích:</cz>
   <no>Denne siden er også tilgjengelig på følgende språk:</no>
   <se>Denna webbplats finns även tillgänglig på följande språk:</se>
+</define-tag>
+
+# FIXME
+<define-tag MSG_THOUSANDS_SEPARATOR whitespace=delete>
+  <en>,</en>
+  <fr>'</fr>
+  <de>,</de>
+  <es>,</es>
+  <pt>,</pt>
+  <it>,</it>
+  <ru>,</ru>
+  <sk>,</sk>
+  <cz>,</cz>
+  <no>,</no>
+  <se>,</se>
 </define-tag>
 
 ## end of file
