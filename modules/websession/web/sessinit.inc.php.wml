@@ -113,7 +113,7 @@ function acc_authorize_action($uid, $action) {
     global $BINDIR;
 
     $auth = exec($BINDIR."/authaction ". escapeshellarg($uid) . " " . escapeshellarg($action));
-    return split(";",$auth);
+    return split(" , ",$auth);
 }
 
 function authenticate($email,$rule,$doctype="*",$action="*")
