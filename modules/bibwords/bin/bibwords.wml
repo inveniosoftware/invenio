@@ -47,7 +47,7 @@ Examples:
       
  Scheduler options:
  -u,  --user=USER          user name to store task, password needed
- -p,  --sleeptime=SLEEP    time after which to repeat tasks (no)
+ -s,  --sleeptime=SLEEP    time after which to repeat tasks (no)
                            e.g.: 1s, 30m, 24h, 7d
  -t,  --time=DATE          moment for the task to be active (now)
                            e.g.: +15s, 5m, 3h , 2002-10-27 13:57:26
@@ -509,7 +509,7 @@ def usage(code, msg=''):
       
  Scheduler options:
  -u,  --user=USER          user name to store task, password needed
- -p,  --sleeptime=SLEEP    time after which to repeat tasks (no)
+ -s,  --sleeptime=SLEEP    time after which to repeat tasks (no)
                            e.g.: 1s, 30m, 24h, 7d
  -t,  --time=DATE          moment for the task to be active (now)
                            e.g.: +15s, 5m, 3h , 2002-10-27 13:57:26
@@ -1339,7 +1339,7 @@ def command_line():
     long_flags =["add","del","check","repair","id=","modified=","wordsindex=",
                  "maxmem=", "flush=","user=","sleeptime=",
                  "time=","help", "version", "debug", "verbose"]
-    short_flags ="axcri:m:w:M:f:u:p:t:hvdD"
+    short_flags ="axcri:m:w:M:f:u:s:t:hvdD"
     format_string = "%Y-%m-%d %H:%M:%S"
     tables = None
     sleeptime = ""
@@ -1395,7 +1395,7 @@ def command_line():
                 opts_dict["flush"]=int(opt[1])
             elif opt[0] in [ "-u", "--user"]:
                 user = opt[1]
-            elif opt[0] in [ "-p", "--sleeptime" ]:
+            elif opt[0] in [ "-s", "--sleeptime" ]:
                 get_date(opt[1])    # see if it is a valid shift
                 sleeptime= opt[1]
             elif opt[0] in [ "-t", "--time" ]:
