@@ -283,6 +283,8 @@ INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) 
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,40,'pt','rt',90);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,41,'ru','rt',100);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,42,'ru','rt',90);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,43,'se','rt',100);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,44,'se','rt',90);
 
 INSERT INTO example VALUES (1,'author search','Search for <span class=example>Ellis, J</span> within <span class=example>author</span> field.');
 INSERT INTO example VALUES (2,'word search','Search for <span class=example>quantum</span> within <span class=example>any</span> field.');
@@ -378,7 +380,8 @@ INSERT INTO portalbox VALUES (39,'SOBRE ESTE SITE','Bem vindo ao site de demonst
 INSERT INTO portalbox VALUES (40,'VEJA TAMBÉM','<a href=\"http://cdsware.cern.ch/\">CDSware</a><br><a href=\"http://www.cern.ch/\">CERN</a><br><a href=\"http://google.com/\">Google</a>');
 INSERT INTO portalbox VALUES (41,'ОБ ЕТОМ САЙТЕ','Здравствуйте на нашом демонстративном сайте для CDSware, свободной системе для серверов документов, исходимой из ЦЕРНа.  Пересмотрите возможности нашево демонстративново сайта как вам увлекается.');
 INSERT INTO portalbox VALUES (42,'ПОСМОТРИТЬ ТОЖЕ','<a href=\"http://cdsware.cern.ch/\">CDSware</a><br><a href=\"http://www.cern.ch/\">CERN</a><br><a href=\"http://google.com/\">Google</a>');
-
+INSERT INTO portalbox VALUES (43,'OM DENNA WEBBPLATS','Välkommen till demoinstallationen av CDSware, en fri programvara för hantering av dokument, från CERN. Välkommen att undersöka alla funktioner i denna installation.');
+INSERT INTO portalbox VALUES (44,'SE ÄVEN','<a href=\"http://cdsware.cern.ch/\">CDSware</a><br><a href=\"http://www.cern.ch/\">CERN</a><br><a href=\"http://google.com/\">Google</a>');
 
 INSERT INTO sbmCOLLECTION VALUES (36,'Catalogues');
 
