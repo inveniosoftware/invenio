@@ -90,7 +90,7 @@ def update_alert(req, name, freq, notif, idb, bname, idq, old_idb):
 
 def remove_alert(req, name, idu, idq, idb):
     uid = getUid(req) 
-    return page("Display alerts", webalert.perform_remove_alert(name, idu, idq, idb),
+    return page("Display alerts", webalert.perform_remove_alert(name, idu, idq, idb, uid),
                 """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
                 "", "CDS Personalize, Display alerts", "CDS, personalize", create_user_infobox(uid), "")
 

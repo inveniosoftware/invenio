@@ -341,7 +341,7 @@ def perform_list_alerts (uid):
 #         identifier of the query;
 #         identifier of the basket
 # output: confirmation message + the list of alerts Web page
-def perform_remove_alert( alert_name, id_user, id_query, id_basket):
+def perform_remove_alert( alert_name, id_user, id_query, id_basket,uid):
 
     # set variables
     out = ""
