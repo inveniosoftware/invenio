@@ -2116,10 +2116,10 @@ def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
     
     res = run_sql("SHOW TABLE STATUS LIKE 'collection'")
     if res:
-        if str(res[0][11])[len(collection_table_update_time) - 3:] == ".00":
-            collection_table_update_time = str(res[0][11])[0:len(collection_table_update_time) - 3]
+        if str(res[0][11])[-3:] == ".00":
+            collection_table_update_time = str(res[0][11])[:-3]
         else:
-            collection_table_update_time = str(res[0][11])[0:len(collection_table_update_time)]  
+            collection_table_update_time = str(res[0][11]) 
         output += "Collection table last updated: %s<br>" % collection_table_update_time
     try:
         file = open("%s/collections/1/last-updated-ln=en.html" % cachedir)
