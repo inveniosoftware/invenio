@@ -239,7 +239,6 @@ def create_rnkmethod_cache():
             methods[rank_method_code]["min_nr_words_docs"] = int(config.get("find_similar", "min_nr_words_docs"))
             methods[rank_method_code]["max_nr_words_upper"] = int(config.get("find_similar", "max_nr_words_upper"))
             methods[rank_method_code]["max_nr_words_lower"] = int(config.get("find_similar", "max_nr_words_lower"))
-            methods[rank_method_code]["override_default_min_relevance"] = config.get("find_similar", "override_default_min_relevance")
             methods[rank_method_code]["default_min_relevance"] = int(config.get("find_similar", "default_min_relevance"))
             
         if config.has_section("combine_method"):
@@ -316,7 +315,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     except Exception, e:
         result = (None, "", adderrorbox("An error occured when trying to rank the search result", ["Unexpected error: %s<br><b>Traceback:</b>%s" % (e, traceback.format_tb(sys.exc_info()[2]))]), voutput)
 
-    if result[0] and result[1]:
+    if result[0] and result[1]: #split into two lists for search_engine
         results_similar_recIDs = map(lambda x: x[0], result[0])
         results_similar_relevances = map(lambda x: x[1], result[0])
         result = (results_similar_recIDs, results_similar_relevances, result[1], result[2], "%s" % configcreated + result[3])
@@ -329,7 +328,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     return result
 
 def combine_method(rank_method_code, pattern, hitset, rank_limit_relevance,verbose):
-    """combining several methods"""
+    """combining several methods into one based on methods/percentage in config file"""
 
     global voutput
     result = {}
@@ -377,7 +376,7 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
         return (None, "Warning, Could not load ranking data for method.", "", voutput)
 
     lwords_hitset = None
-    for j in range(0, len(lwords)):
+    for j in range(0, len(lwords)): #find which docs to search based on ranges..should be done in search_engine...
         if lwords[j] and lwords[j][:6] == "recid:":
             if not lwords_hitset:
                 lwords_hitset = HitSet()
@@ -404,14 +403,14 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     reclist = []
     reclist_addend = []
 
-    if not lwords_hitset:
+    if not lwords_hitset: #rank all docs, can this be speed up using something else than for loop?
         for recID in lrecIDs:
             if rnkdict.has_key(recID):
                 reclist.append((recID, rnkdict[recID]))
                 del rnkdict[recID]
             else:
                 reclist_addend.append((recID, 0))
-    else:
+    else: #rank docs in hitset, can this be speed up using something else than for loop?
         lwords_lrecIDs = lwords_hitset.items()
         for recID in lwords_lrecIDs:
             if rnkdict.has_key(recID) and hitset.contains(recID):
@@ -446,8 +445,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
 
     if verbose > 0:
         voutput += "<br>Running rank method: %s, using find_similar/word_frequency in bibrank_record_sorter<br>" % rank_method_code
-    if methods[rank_method_code]["override_default_min_relevance"] == "no":
-        rank_limit_relevance = methods[rank_method_code]["default_min_relevance"]
+    rank_limit_relevance = methods[rank_method_code]["default_min_relevance"]
 
     try:
         recID = int(recID)
@@ -470,9 +468,9 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     #Calculate all term frequencies
     for (term, tf) in rec_terms.iteritems():
 	if len(term) >= methods[rank_method_code]["min_word_length"] and terms_recs.has_key(term) and tf[1] != 0:
-            tf_values[term] =  int((1 + math.log(tf[0])) * tf[1])
+            tf_values[term] =  int((1 + math.log(tf[0])) * tf[1]) #calculate term weigth
     tf_values = tf_values.items()
-    tf_values.sort(lambda x, y: cmp(y[1], x[1])) 
+    tf_values.sort(lambda x, y: cmp(y[1], x[1])) #sort based on weigth
 
     lwords = []
     stime = time.time()
@@ -480,15 +478,15 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
 
     for (t, tf) in tf_values: #t=term, tf=term frequency
         term_recs = deserialize_via_marshal(terms_recs[t])
-        if len(tf_values) <= methods[rank_method_code]["max_nr_words_lower"] or (len(term_recs) >= methods[rank_method_code]["min_nr_words_docs"] and (((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) <=  methods[rank_method_code]["max_word_occurence"]) and ((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) >= methods[rank_method_code]["min_word_occurence"]))):
-             lwords.append((t, methods[rank_method_code]["rnkWORD_table"]))
-             (recdict, rec_termcount) = calculate_record_relevance_findsimilar((t, round(tf, 4)) , term_recs, hitset, recdict, rec_termcount, verbose, "true")
+        if len(tf_values) <= methods[rank_method_code]["max_nr_words_lower"] or (len(term_recs) >= methods[rank_method_code]["min_nr_words_docs"] and (((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) <=  methods[rank_method_code]["max_word_occurence"]) and ((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) >= methods[rank_method_code]["min_word_occurence"]))): #too complicated...something must be done
+             lwords.append((t, methods[rank_method_code]["rnkWORD_table"])) #list of terms used
+             (recdict, rec_termcount) = calculate_record_relevance_findsimilar((t, round(tf, 4)) , term_recs, hitset, recdict, rec_termcount, verbose, "true") #true tells the function to not calculate all unimportant terms
         if len(tf_values) > methods[rank_method_code]["max_nr_words_lower"] and (len(lwords) ==  methods[rank_method_code]["max_nr_words_upper"] or tf < 0):
             break
 
     if len(recdict) == 0 or len(lwords) == 0:
         return (None, "Could not find any similar documents, possibly because of error in ranking data.", "", voutput)
-    else:
+    else: #sort if we got something to sort
         (reclist, hitset) = sort_record_relevance_findsimilar(recdict, rec_termcount, hitset, rank_limit_relevance, verbose)
 
     if verbose > 0:
@@ -541,15 +539,14 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
     #calculate then relevance for each term before sorting the list of records
     for (term, table) in lwords:
 	term_recs = run_sql("SELECT term, hitlist FROM %s WHERE term='%s'" % (methods[rank_method_code]["rnkWORD_table"], MySQLdb.escape_string(term)))
-        if term_recs:
+        if term_recs: #if term exists in database, use for ranking
 	    term_recs = deserialize_via_marshal(term_recs[0][1])
-            if check_term(term, methods[rank_method_code]["col_size"], len(term_recs), 1.0, 0.00, 0):
-                (recdict, rec_termcount) = calculate_record_relevance((term, int(term_recs["Gi"][1])) , term_recs, hitset, recdict, rec_termcount, verbose, quick=None)
+            (recdict, rec_termcount) = calculate_record_relevance((term, int(term_recs["Gi"][1])) , term_recs, hitset, recdict, rec_termcount, verbose, quick=None)
             del term_recs
 
     if len(recdict) == 0 or (len(lwords) == 1 and lwords[0] == ""):
         return (None, "Records not ranked. The query is not detailed enough, or not enough records found, for ranking to be possible.", "", voutput)
-    else: 
+    else: #sort if we got something to sort
         (reclist, hitset) = sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, verbose)
 
     #Add any documents not ranked to the end of the list
@@ -580,26 +577,28 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, ver
 
     
     (t, qtf) = term
-    if invidx.has_key("Gi"):
+    if invidx.has_key("Gi"):#Gi = weigth for this term, created by bibrank_word_indexer
         Gi = invidx["Gi"][1]
         del invidx["Gi"]
-    else:
+    else: #if not existing, bibrank should be run with -R
         return (recdict, rec_termcount)
 
     if not quick or (qtf >= 0 or (qtf < 0 and len(recdict) == 0)):
         #Only accept records existing in the hitset received from the search engine
         for (j, tf) in invidx.iteritems():
-            if hitset.contains(j):
-                recdict[j] = recdict.get(j, 0) + int(math.log(tf[0] * Gi * tf[1] * qtf))
-                rec_termcount[j] = rec_termcount.get(j, 0) + 1
-        #Multiply with the number of terms of the total number of terms in the query existing in the records 
+            if hitset.contains(j):#only include docs found by search_engine based on query
+                try: #calculates rank value
+                    recdict[j] = recdict.get(j, 0) + int(math.log(tf[0] * Gi * tf[1] * qtf))
+                except:
+                    return (recdict, rec_termcount)
+                rec_termcount[j] = rec_termcount.get(j, 0) + 1 #number of terms from query in document
     elif quick: #much used term, do not include all records, only use already existing ones
-        for (j, tf) in recdict.iteritems():
+        for (j, tf) in recdict.iteritems(): #i.e: if doc contains important term, also count unimportant
             if invidx.has_key(j):
                 tf = invidx[j]
                 recdict[j] = recdict.get(j, 0) + int(math.log(tf[0] * Gi * tf[1] * qtf))
-                rec_termcount[j] = rec_termcount.get(j, 0) + 1
-
+                rec_termcount[j] = rec_termcount.get(j, 0) + 1 #number of terms from query in document
+    
     return (recdict, rec_termcount)
 
 def calculate_record_relevance_findsimilar(term, invidx, hitset, recdict, rec_termcount, verbose, quick=None):
@@ -614,25 +613,25 @@ def calculate_record_relevance_findsimilar(term, invidx, hitset, recdict, rec_te
 
     
     (t, qtf) = term
-    if invidx.has_key("Gi"):
+    if invidx.has_key("Gi"): #Gi = weigth for this term, created by bibrank_word_indexer
         Gi = invidx["Gi"][1]
         del invidx["Gi"]
-    else:
+    else: #if not existing, bibrank should be run with -R
         return (recdict, rec_termcount)
 
     if not quick or (qtf >= 0 or (qtf < 0 and len(recdict) == 0)):
         #Only accept records existing in the hitset received from the search engine
         for (j, tf) in invidx.iteritems():
-            if hitset.contains(j):
+            if hitset.contains(j): #only include docs found by search_engine based on query
+                #calculate rank value
                 recdict[j] = recdict.get(j, 0) + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
-                rec_termcount[j] = rec_termcount.get(j, 0) + 1
-        #Multiply with the number of terms of the total number of terms in the query existing in the records 
+                rec_termcount[j] = rec_termcount.get(j, 0) + 1 #number of terms from query in document
     elif quick: #much used term, do not include all records, only use already existing ones
-        for (j, tf) in recdict.iteritems():
-            if invidx.has_key(j):
+        for (j, tf) in recdict.iteritems(): #i.e: if doc contains important term, also count unimportant
+            if invidx.has_key(j): 
                 tf = invidx[j]
                 recdict[j] = recdict[j] + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
-                rec_termcount[j] = rec_termcount.get(j, 0) + 1
+                rec_termcount[j] = rec_termcount.get(j, 0) + 1 #number of terms from query in document
 
     return (recdict, rec_termcount)
 
@@ -644,14 +643,19 @@ def sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, 
 
     startCreate = time.time()
     global voutput
-
     reclist = []
+
+    #remove all ranked documents so that unranked can be added to the end
     hitset.removemany(recdict.keys()) 
+
+    #gives each record a score between 0-100
     divideby = max(recdict.values())
     for (j, w) in recdict.iteritems():
         w = int(w * 100 / divideby)
 	if w >= rank_limit_relevance:
             reclist.append((j, w))
+    
+    #sort scores
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
 
     if verbose > 0:
@@ -668,17 +672,23 @@ def sort_record_relevance_findsimilar(recdict, rec_termcount, hitset, rank_limit
     startCreate = time.time()
     global voutput
     reclist = []
+
     #Multiply with the number of terms of the total number of terms in the query existing in the records
     for j in recdict.keys():
-        hitset.remove(j)
-        if recdict[j] > 0:
+        if recdict[j] > 0 and rec_termcount[j] > 1:
             recdict[j] = math.log((recdict[j] * rec_termcount[j]))
- 
+        else:
+            recdict[j] = 0
+
+    hitset.removemany(recdict.keys())
+    #gives each record a score between 0-100
     divideby = max(recdict.values())
     for (j, w) in recdict.iteritems():
         w = int(w * 100 / divideby)
 	if w >= rank_limit_relevance:
             reclist.append((j, w))
+
+    #sort scores
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
 
     if verbose > 0:

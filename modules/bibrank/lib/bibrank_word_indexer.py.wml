@@ -159,7 +159,6 @@ def get_words_from_phrase(phrase, weight, lang="",
                           split=string.split):
     "Returns list of words from phrase 'phrase'."
     words = {} 
-    #print phrase
     phrase = strip_accents(phrase) 
     phrase = lower(phrase) 
     #Getting rid of strange characters
@@ -171,12 +170,13 @@ def get_words_from_phrase(phrase, weight, lang="",
     phrase = re.sub("&raquo;", ' ', phrase)
     phrase = re.sub("&ecirc;", ' ', phrase)
     phrase = re.sub("&amp;", ' ', phrase)
-    
     if string.find(phrase, "</") > -1:
         #Most likely html, remove html code
         phrase = re.sub("(?s)<[^>]*>|&#?\w+;", ' ', phrase)
+    #removes http links
+    phrase = re.sub("(?s)http://[^( )]*", '', phrase)
     phrase = re.sub(chars_punctuation, ' ', phrase)
-    phrase = lower(phrase)
+
     #By doing this like below, characters standing alone, like c a b is not added to the inedx, but when they are together with characters like c++ or c$ they are added.
     for word in split(phrase):    
         if options["remove_stopword"] == "True" and not is_stopword_force(word) and check_term(word, 0):
