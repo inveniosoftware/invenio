@@ -3,27 +3,38 @@ CERN DOCUMENT SERVER SOFTWARE (CDSware) CREDITS
 
 Revision: $Id$
 
-Help with translating CDSware was kindly provided by:
+Several people outside the CDSware Development Team 
+contributed to the project:
 
- - German translation:
-     Guido Pelzer <guido.pelzer@web.de>
+  - Thierry Thomas <thierry@FreeBSD.org>
+    Patches for compiling CDSware on FreeBSD.
+  
+  - Frédéric Gobry <frederic.gobry@epfl.ch>
+    Patches for building CDSware out of its source tree.
+  
+  - Guido Pelzer <guido.pelzer@web.de>
+    Contributions to German translation.
+  
+  - Valerio Gracco <valerio.gracco@cern.ch>
+    Contributions to Italian translation.
+  
+  - Tullio Basaglia <tullio.basaglia@cern.ch>
+    Contributions to Italian translation.
+  
+  - Flavio C. Coelho <fccoelho@fiocruz.br>
+    Contributions to Portuguese translation.
+    
+  - Lyuba Vasilevskaya <lyubov.vassilevskaya@cern.ch>
+    Contributions to Russian translation.
+  
+  - Maria Gomez Marti <maria.gomez.marti@cern.ch>
+    Contributions to Spanish translation.
 
- - Italian translation: 
-     Valerio Gracco <valerio.gracco@cern.ch>
-     Tullio Basaglia <tullio.basaglia@cern.ch>
+  - Magaly Bascones Dominguez <magaly.bascones.dominguez@cern.ch>
+    Contributions to Spanish translation.
 
- - Portuguese translation: 
-     Flavio C. Coelho <fccoelho@fiocruz.br>
-
- - Russian translation:
-     Lyuba Vasilevskaya <lyubov.vassilevskaya@cern.ch>
-
- - Spanish translation: 
-     Maria Gomez Marti <maria.gomez.marti@cern.ch>
-     Magaly Bascones Dominguez <magaly.bascones.dominguez@cern.ch>
-
- - Swedish translation:
-     Urban Andersson <urban.andersson@hb.se>
+  - Urban Andersson <urban.andersson@hb.se>
+    Contributions to Swedish translation.
 
 Their help is greatly appreciated.
 
