@@ -56,7 +56,7 @@ DEVELOPERADDR = ['erik.simon@cern.ch', 'tibor.simko@cern.ch']
 # 2 = messages on the console, but no email sent
 # 3 = many messages on the console, no email sent
 # 4 = many messages on the console, email sent to DEVELOPERADDR
-DEBUGLEVEL = 4
+DEBUGLEVEL = 0
 
 
 def update_date_lastrun(alert):
