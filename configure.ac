@@ -466,6 +466,7 @@ AC_CONFIG_FILES([Makefile \
 	  modules/bibformat/web/admin/Makefile \
 	  modules/webhelp/Makefile \
 	  modules/webhelp/web/Makefile \
+	  modules/webhelp/web/hacking/Makefile \
 	  modules/websearch/Makefile \
 	  modules/websearch/bin/Makefile \
 	  modules/websearch/doc/Makefile \
