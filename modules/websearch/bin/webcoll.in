@@ -65,7 +65,7 @@ try:
     sys.path.append('%s' % pylibdir)
     from cdsware.config import *
     from cdsware.messages import *
-    from cdsware.search_engine import HitSet, search_pattern, get_creation_date, nice_number
+    from cdsware.search_engine import HitSet, search_pattern, get_creation_date, nice_number, get_field_i18nname
     from cdsware.search_engine_config import cfg_author_et_al_threshold, cfg_instant_browse, cfg_max_recID, cfg_narrow_search_show_grandsons
     from cdsware.dbquery import run_sql    
     from cdsware.access_control_engine import acc_authorize_action
@@ -266,13 +266,20 @@ class Collection:
                 print "Error %d: %s" % (e.args[0], e.args[1])
                 sys.exit(1)
 
-    def get_namefull(self, prolog="", epilog="", prolog_suffix=" ", epilog_suffix=""):
-        "Return nicely formatted full collection name (including prefix and suffixes)."
+    def get_name(self, ln=cdslang, name_type="ln", prolog="", epilog="", prolog_suffix=" ", epilog_suffix=""):
+        """Return nicely formatted collection name for language LN.
+        The NAME_TYPE may be 'ln' (=long name), 'sn' (=short name), etc."""        
         out = prolog
-        out += self.name
-        # FIXME: use new collectionname table
-        #if self.namesuffix:
-        #    out += prolog_suffix + self.namesuffix + epilog_suffix
+        i18name = ""
+        res = run_sql("SELECT value FROM collectionname WHERE id_collection=%s AND ln=%s AND type=%s", (self.id, ln, name_type))
+        try:
+            i18name += res[0][0]
+        except IndexError:
+            pass
+        if i18name:
+            out += i18name
+        else:
+            out += self.name
         out += epilog
         return out
 
@@ -403,7 +410,7 @@ class Collection:
                 if out:
                     out += separator
                 out += """<a class="navtrail" href="%s/?c=%s&amp;as=%d&amp;ln=%s">%s</a>""" % \
-                            (weburl, urllib.quote_plus(dad.name), as, ln, dad.name)
+                            (weburl, urllib.quote_plus(dad.name), as, ln, dad.get_name(ln))
         return out
 
     def create_nbrecs_info(self, ln=cdslang, prolog="""&nbsp;<small class="nbdoccoll">(""", epilog=""")</small>"""):
@@ -475,9 +482,9 @@ class Collection:
                     else:
                         narrowsearch += """<input type=checkbox name="c" value="%s" checked>&nbsp;</td>""" % son.name
                 narrowsearch += """<td valign="top"><a href="%s/?c=%s&amp;as=%d&amp;ln=%s">%s%s%s</a>%s """ % \
-                                (weburl, urllib.quote_plus(son.name), as, ln, style_prolog, son.get_namefull(), style_epilog, son.create_nbrecs_info(ln))
+                                (weburl, urllib.quote_plus(son.name), as, ln, style_prolog, son.get_name(ln), style_epilog, son.create_nbrecs_info(ln))
                 if son.restricted_p():
-                    narrowsearch += """ <small class="warning">[restricted]</small>"""
+                    narrowsearch += """ <small class="warning">[%s]</small>""" % msg_restricted[ln]
                 if cfg_narrow_search_show_grandsons:
                     # iterate trough grandsons:
                     grandsons = son.get_sons()
@@ -486,7 +493,7 @@ class Collection:
                         narrowsearch += """<br>"""
                         for i in range(0,nb_grandsons):
                             narrowsearch += """<a href="%s/?c=%s&amp;as=%d&amp;ln=%s">%s</a>%s """ % \
-                                            (weburl, urllib.quote_plus(grandsons[i].name), as, ln, grandsons[i].get_namefull(), \
+                                            (weburl, urllib.quote_plus(grandsons[i].name), as, ln, grandsons[i].get_name(ln), \
                                              grandsons[i].create_nbrecs_info(ln))
                 narrowsearch += """</td></tr>"""
             narrowsearch += "</tbody></table>"            
@@ -710,7 +717,7 @@ class Collection:
         "Produces 'search within' selection box for the current collection."
         out = ""
         out += """<select name="%s">""" % fieldname
-        out += """<option value="">%s""" % msg_any_field[ln]
+        out += """<option value="">%s""" % get_field_i18nname("any field", ln)
         query = """SELECT f.code,f.name FROM field AS f, collection_field_fieldvalue AS cff
                    WHERE cff.type='sew' AND cff.id_collection=%d AND cff.id_field=f.id
                    ORDER BY cff.score DESC, f.name ASC"""  % self.id
@@ -722,19 +729,19 @@ class Collection:
         else:
             # no 'search within' fields are defined for this collection, so propose default ones:
             if cfg_cern_site:
-                out += """<option value="title"%s>%s""" % (is_selected("title", value), msg_title[ln])
-                out += """<option value="author"%s>%s""" % (is_selected("author", value), msg_author[ln])
-                out += """<option value="reportnumber"%s>%s""" % (is_selected("reportnumber", value), msg_report_number[ln])
-                out += """<option value="year"%s>%s""" % (is_selected("year", value), msg_year[ln])
+                out += """<option value="title"%s>%s""" % (is_selected("title", value), get_field_i18nname("title", ln))
+                out += """<option value="author"%s>%s""" % (is_selected("author", value), get_field_i18nname("author", ln))
+                out += """<option value="reportnumber"%s>%s""" % (is_selected("reportnumber", value), get_field_i18nname("report number", ln))
+                out += """<option value="year"%s>%s""" % (is_selected("year", value), get_field_i18nname("year", ln))
             else:
-                out += """<option value="title"%s>- %s""" % (is_selected("title", value), msg_title[ln])
-                out += """<option value="author"%s>- %s""" % (is_selected("author", value), msg_author[ln])
-                out += """<option value="abstract"%s>- %s""" % (is_selected("abstract", value), msg_abstract[ln])
-                out += """<option value="keyword"%s>- %s""" % (is_selected("keyword", value), msg_keyword[ln])
-                out += """<option value="reportnumber"%s>- %s""" % (is_selected("reportnumber", value), msg_report_number[ln])
-                out += """<option value="year"%s>- %s""" % (is_selected("year", value), msg_year[ln])
-                out += """<option value="fulltext"%s>%s""" % (is_selected("fulltext", value), msg_fulltext[ln])
-                out += """<option value="reference"%s>%s""" % (is_selected("reference", value), msg_reference[ln])
+                out += """<option value="title"%s>- %s""" % (is_selected("title", value), get_field_i18nname("title", ln))
+                out += """<option value="author"%s>- %s""" % (is_selected("author", value), get_field_i18nname("author", ln))
+                out += """<option value="abstract"%s>- %s""" % (is_selected("abstract", value), get_field_i18nname("abstract", ln))
+                out += """<option value="keyword"%s>- %s""" % (is_selected("keyword", value), get_field_i18nname("keyword", ln))
+                out += """<option value="reportnumber"%s>- %s""" % (is_selected("reportnumber", value), get_field_i18nname("report number", ln))
+                out += """<option value="year"%s>- %s""" % (is_selected("year", value), get_field_i18nname("year", ln))
+                out += """<option value="fulltext"%s>%s""" % (is_selected("fulltext", value), get_field_i18nname("fulltext", ln))
+                out += """<option value="reference"%s>%s""" % (is_selected("reference", value), get_field_i18nname("reference", ln))
         out += """</select>""" 
         return out
 

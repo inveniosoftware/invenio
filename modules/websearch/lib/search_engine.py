@@ -408,7 +408,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
     if cc == cdsname:
         cc_intl = cdsnameintl[ln]
     else:
-        cc_intl = cc
+        cc_intl = get_coll_i18nname(cc, ln)
     out += """
     <h1 class="headline">%s</h1>
     <form action="%s/search.py" method="get">
@@ -710,24 +710,25 @@ def create_navtrail_links(cc=cdsname,
             if out:
                 out += separator
             out += """<a class="navtrail" href="%s/?c=%s&amp;as=%d&amp;ln=%s">%s</a>""" % \
-                   (weburl, urllib.quote_plus(dad), as, ln, dad)
+                   (weburl, urllib.quote_plus(dad), as, ln, get_coll_i18nname(dad, ln))
     if self_p and cc != cdsname:
         if out:
             out += separator
         out += """<a class="navtrail" href="%s/?c=%s&amp;as=%d&amp;ln=%s">%s</a>""" % \
-               (weburl, urllib.quote_plus(cc), as, ln, cc)        
+               (weburl, urllib.quote_plus(cc), as, ln, get_coll_i18nname(cc, ln))        
     return out
 
 def create_searchwithin_selection_box(fieldname='f', value='', ln='en'):
     "Produces 'search within' selection box for the current collection."
     out = ""
     out += """<select name="%s">""" % fieldname
-    out += """<option value="">%s""" % msg_any_field[ln]
+    out += """<option value="">%s""" % get_field_i18nname("any field", ln)
     query = "SELECT code,name FROM field ORDER BY name ASC"
     res = run_sql(query)
     for field_code, field_name in res:
         if field_code and field_code != "anyfield":
-            out += """<option value="%s"%s>%s""" % (field_code, is_selected(field_code,value), field_name)
+            out += """<option value="%s"%s>%s""" % (field_code, is_selected(field_code,value),
+                                                    get_field_i18nname(field_name, ln))
     if value and str(value[0]).isdigit():
         out += """<option value="%s" selected>%s MARC tag""" % (value, value)
     out += """</select>""" 
@@ -1095,6 +1096,42 @@ def wash_dates(d1y, d1m, d1d, d2y, d2m, d2d):
                       # needed, 31 will always do
     # okay, return constructed YYYY-MM-DD dates
     return (day1, day2)
+
+def get_coll_i18nname(c, ln=cdslang):
+    """Return nicely formatted collection name (of name type 'ln',
+    'long name') for collection C in language LN."""    
+    global collection_i18nname_cache
+    global collection_i18nname_cache_timestamp
+    # firstly, check whether the collectionname table was modified:
+    res = run_sql("SHOW TABLE STATUS LIKE 'collectionname'")
+    if res and res[0][11]>collection_i18nname_cache_timestamp:
+        # yes it was, cache clear-up needed:
+        collection_i18nname_cache = create_collection_i18nname_cache()
+    # secondly, read i18n name from either the cache or return common name:
+    out = c
+    try:
+        out = collection_i18nname_cache[c][ln]
+    except KeyError:
+        pass # translation in LN does not exist
+    return out
+
+def get_field_i18nname(f, ln=cdslang):
+    """Return nicely formatted field name (of type 'ln', 'long name')
+       for field F in language LN."""
+    global field_i18nname_cache
+    global field_i18nname_cache_timestamp
+    # firstly, check whether the fieldname table was modified:
+    res = run_sql("SHOW TABLE STATUS LIKE 'fieldname'")
+    if res and res[0][11]>field_i18nname_cache_timestamp:
+        # yes it was, cache clear-up needed:
+        field_i18nname_cache = create_field_i18nname_cache()
+    # secondly, read i18n name from either the cache or return common name:
+    out = f
+    try:
+        out = field_i18nname_cache[f][ln]
+    except KeyError:
+        pass # translation in LN does not exist
+    return out
     
 def get_coll_ancestors(coll):
     "Returns a list of ancestors for collection 'coll'."
@@ -1225,6 +1262,62 @@ except:
         collection_reclist_cache = create_collection_reclist_cache()
     except:
         collection_reclist_cache = {}
+
+def create_collection_i18nname_cache():
+    """Create cache of I18N collection names of type 'ln' (=long name).
+    Called on startup and used later during the search time."""    
+    global collection_i18nname_cache_timestamp
+    names = {}
+    res = run_sql("SELECT c.name,cn.ln,cn.value FROM collectionname AS cn, collection AS c WHERE cn.id_collection=c.id AND cn.type='ln'") # ln=long name
+    for c,ln,i18nname in res:
+        if i18nname:
+            try:
+                names[c]
+            except KeyError:
+                names[c] = {}
+            names[c][ln] = i18nname
+    # update timestamp
+    try:
+        collection_i18nname_cache_timestamp = time.strftime("%04Y-%02m-%02d %02H:%02M:%02S", time.localtime())
+    except NameError:
+        collection_i18nname_cache_timestamp = 0
+    return names
+
+try:
+    collection_i18nname_cache.has_key(cdsname)
+except:
+    try:
+        collection_i18nname_cache = create_collection_i18nname_cache()
+    except:
+        collection_i18nname_cache = {}
+
+def create_field_i18nname_cache():
+    """Create cache of I18N field names of type 'ln' (=long name).
+    Called on startup and used later during the search time."""    
+    global field_i18nname_cache_timestamp
+    names = {}
+    res = run_sql("SELECT f.name,fn.ln,fn.value FROM fieldname AS fn, field AS f WHERE fn.id_field=f.id AND fn.type='ln'") # ln=long name
+    for f,ln,i18nname in res:
+        if i18nname:
+            try:
+                names[f]
+            except KeyError:
+                names[f] = {}
+            names[f][ln] = i18nname
+    # update timestamp
+    try:
+        field_i18nname_cache_timestamp = time.strftime("%04Y-%02m-%02d %02H:%02M:%02S", time.localtime())
+    except NameError:
+        field_i18nname_cache_timestamp = 0
+    return names
+
+try:
+    field_i18nname_cache.has_key(cdsname)
+except:
+    try:
+        field_i18nname_cache = create_field_i18nname_cache()
+    except:
+        field_i18nname_cache = {}
 
 def browse_pattern(req, colls, p, f, rg, ln=cdslang):
     """Browse either biliographic phrases or words indexes, and display it."""
@@ -1694,11 +1787,11 @@ def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang, intro_text_p
     if t == 'w':
         nearest_terms = get_nearest_terms_in_bibwords(p, f, n, n)
         if not nearest_terms:
-            return "%s%s." % (msg_no_words_index_available[ln], f)         
+            return "%s%s." % (msg_no_words_index_available[ln], get_field_i18nname(f, ln))         
     else:
         nearest_terms = get_nearest_terms_in_bibxxx(p, f, n, n)
         if not nearest_terms:
-            return "%s %s." % (msg_no_phrase_index_available[ln], f) 
+            return "%s %s." % (msg_no_phrase_index_available[ln], get_field_i18nname(f, ln)) 
     # display them:
     out += """<table class="nearesttermsbox" cellpadding="0" cellspacing="0" border="0">"""
     for term in nearest_terms:
@@ -1736,7 +1829,7 @@ def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang, intro_text_p
     if intro_text_p: # add full leading introductory text
         intro = msg_search_term[ln] % p
         if f:
-            intro += " " + msg_inside_index[ln] % f
+            intro += " " + msg_inside_index[ln] % get_field_i18nname(f, ln)
         intro += " " + msg_did_not_match[ln]
     return intro + "<blockquote>" + out + "</blockquote>"
 
@@ -2074,7 +2167,7 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=cdsname, nb_found
               "\n<table class=\"searchresultsbox\"><tr><td class=\"searchresultsboxheader\" align=\"left\">" \
               "<strong><big>" \
               "<a href=\"%s/?c=%s&amp;as=%d&amp;ln=%s\">%s</a></big></strong></td>\n" % \
-              (urllib.quote(collection), weburl, weburl, urllib.quote_plus(collection), as, ln, collection)
+              (urllib.quote(collection), weburl, weburl, urllib.quote_plus(collection), as, ln, get_coll_i18nname(collection, ln))
     else:
         out += """\n<form action="%s/search.py" method="get"><div align="center">\n""" % weburl
 
@@ -2091,7 +2184,7 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=cdsname, nb_found
     else:
         out += "<small>"
         if nb_found > rg:
-            out += collection + " : " + msg_x_records_found[ln] % nice_number(nb_found, ln) + " &nbsp; "
+            out += get_coll_i18nname(collection, ln) + " : " + msg_x_records_found[ln] % nice_number(nb_found, ln) + " &nbsp; "
 
     if nb_found > rg: # navig.arrows are needed, since we have many hits
         url = '%s/search.py?p=%s&amp;cc=%s&amp;f=%s&amp;sf=%s&amp;so=%s&amp;sp=%s&amp;rm=%s&amp;of=%s&amp;ot=%s' % (weburl, urllib.quote(p), urllib.quote(collection), f, sf, so, sp, rm, of, ot)
@@ -2183,7 +2276,8 @@ def print_results_overview(colls, results_final_nb_total, results_final_nb, cpu_
         if results_final_nb.has_key(coll) and results_final_nb[coll] > 0:
             out += "<strong><a href=\"#%s\">%s</a></strong>, " \
                   "<a href=\"#%s\">%s</a><br>" \
-                  % (urllib.quote(coll), coll, urllib.quote(coll), msg_x_records_found[ln] % nice_number(results_final_nb[coll], ln))
+                  % (urllib.quote(coll), get_coll_i18nname(coll, ln), urllib.quote(coll),
+                     msg_x_records_found[ln] % nice_number(results_final_nb[coll], ln))
     out += "</td></tr></tbody></table>\n"
     return out
 
@@ -3184,13 +3278,12 @@ def perform_request_cache(req, action="show"):
     if action == "clear":
         search_cache = {}
         collection_reclist_cache = create_collection_reclist_cache()
-    # show collection cache:
-    out += "<h3>Collection Cache</h3>"
-    out += "- collection cache timestamp: %s" % collection_reclist_cache_timestamp
+    # show collection reclist cache:
+    out += "<h3>Collection reclist cache</h3>"
     res = run_sql("SHOW TABLE STATUS LIKE 'collection'")
-    if res:
-        out += "<br>- collection table last updated: %s" % res[0][11]
-    out += "<br>- collection cache contents:"
+    out += "- collection table last updated: %s" % res[0][11]
+    out += "<br>- reclist cache timestamp: %s" % collection_reclist_cache_timestamp
+    out += "<br>- reclist cache contents:"
     out += "<blockquote>"
     for coll in collection_reclist_cache.keys():
         if collection_reclist_cache[coll]:
@@ -3214,6 +3307,28 @@ def perform_request_cache(req, action="show"):
         out += "<p>Search cache is empty."
     out += "</blockquote>"
     out += """<p><a href="%s/search.py/cache?action=clear">clear cache</a>""" % weburl
+    # show field i18nname cache:
+    out += "<h3>Field I18N names cache</h3>"
+    res = run_sql("SHOW TABLE STATUS LIKE 'fieldname'")
+    out += "- fieldname table last updated: %s" % res[0][11]
+    out += "<br>- i18nname cache timestamp: %s" % field_i18nname_cache_timestamp
+    out += "<br>- i18nname cache contents:"
+    out += "<blockquote>"
+    for field in field_i18nname_cache.keys():
+        for ln in field_i18nname_cache[field].keys():
+            out += "%s, %s = %s<br>" % (field, ln, field_i18nname_cache[field][ln])
+    out += "</blockquote>"
+    # show collection i18nname cache:
+    out += "<h3>Collection I18N names cache</h3>"
+    res = run_sql("SHOW TABLE STATUS LIKE 'collectionname'")
+    out += "- collectionname table last updated: %s" % res[0][11]
+    out += "<br>- i18nname cache timestamp: %s" % collection_i18nname_cache_timestamp
+    out += "<br>- i18nname cache contents:"
+    out += "<blockquote>"
+    for coll in collection_i18nname_cache.keys():
+        for ln in collection_i18nname_cache[coll].keys():
+            out += "%s, %s = %s<br>" % (coll, ln, collection_i18nname_cache[coll][ln])
+    out += "</blockquote>"
     req.write(out)
     return "\n"
 
@@ -3285,6 +3400,7 @@ def profile(p="", f="", c=cdsname):
 #print type(wash_url_argument("-1",'int'))
 #print get_nearest_terms_in_bibxxx("ellis", "author", 5, 5)
 #print call_bibformat(68, "HB_FLY")
+#print create_collection_i18nname_cache()
 
 ## profiling:
 #profile("of the this")

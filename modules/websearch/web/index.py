@@ -40,6 +40,7 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
     from cdsware.webpage import page, create_error_box
     from cdsware.webuser import getUid
     from cdsware.messages import wash_language,msg_internal_error,msg_collection_not_found_head,msg_collection_not_found_body
+    from cdsware.search_engine import get_coll_i18nname
     # wash params:
     try:
         as = int(as)
@@ -66,8 +67,8 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
     req.content_type = "text/html"
     req.send_http_header()
     # deduce collection id:
-    collid = get_collid(c)
-    if type(collid) is not int:
+    colID = get_colID(c)
+    if type(colID) is not int:
          return page(title=msg_collection_not_found_head[ln] % c,
                      body=msg_collection_not_found_body[ln] % (c, weburl, cdsname),
                      description="%s - Not found: %s " % (cdsname, c),
@@ -77,31 +78,31 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
                      urlargs=req.args)
     # display collection interface page:
     try:
-        fp = open("%s/collections/%d/navtrail-as=%d-ln=%s.html" % (cachedir, collid, as, ln), "r")
+        fp = open("%s/collections/%d/navtrail-as=%d-ln=%s.html" % (cachedir, colID, as, ln), "r")
         c_navtrail = fp.read()
         fp.close()
-        fp = open("%s/collections/%d/body-as=%d-ln=%s.html" % (cachedir, collid, as, ln), "r")
+        fp = open("%s/collections/%d/body-as=%d-ln=%s.html" % (cachedir, colID, as, ln), "r")
         c_body = fp.read()
         fp.close()
-        fp = open("%s/collections/%d/portalbox-lt-ln=%s.html" % (cachedir, collid, ln), "r")
+        fp = open("%s/collections/%d/portalbox-lt-ln=%s.html" % (cachedir, colID, ln), "r")
         c_portalbox_lt = fp.read()
         fp.close()
-        fp = open("%s/collections/%d/portalbox-lb-ln=%s.html" % (cachedir, collid, ln), "r")
+        fp = open("%s/collections/%d/portalbox-lb-ln=%s.html" % (cachedir, colID, ln), "r")
         c_portalbox_lb = fp.read()
         fp.close()
-        fp = open("%s/collections/%d/portalbox-rt-ln=%s.html" % (cachedir, collid, ln), "r")
+        fp = open("%s/collections/%d/portalbox-rt-ln=%s.html" % (cachedir, colID, ln), "r")
         c_portalbox_rt = fp.read()
         fp.close()
-        fp = open("%s/collections/%d/portalbox-rb-ln=%s.html" % (cachedir, collid, ln), "r")
+        fp = open("%s/collections/%d/portalbox-rb-ln=%s.html" % (cachedir, colID, ln), "r")
         c_portalbox_rb = fp.read()
         fp.close()
-        fp = open("%s/collections/%d/last-updated-ln=%s.html" % (cachedir, collid, ln), "r")
+        fp = open("%s/collections/%d/last-updated-ln=%s.html" % (cachedir, colID, ln), "r")
         c_last_updated = fp.read()
         fp.close()
-        if c == cdsname: # title of the page depends on collection name and language
+        if c == cdsname:
             title = cdsnameintl[ln]
         else:
-            title = c
+            title = get_coll_i18nname(c, ln)
             
         return page(title=title,
                     body=c_body,
@@ -118,7 +119,7 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
             req.write("<br>c=%s" % c)
             req.write("<br>as=%s" % as)        
             req.write("<br>ln=%s" % ln)        
-            req.write("<br>collid=%s" % collid)
+            req.write("<br>colID=%s" % colID)
             req.write("<br>uid=%s" % uid)
         return page(title=msg_internal_error[ln],
                     body = create_error_box(req, ln=ln),
@@ -130,11 +131,11 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
          
     return "\n"    
 
-def get_collid(c):
+def get_colID(c):
     "Return collection ID for given collection name.  Return None if no match found."
     from cdsware.dbquery import run_sql
-    collid = None
+    colID = None
     res = run_sql("SELECT id FROM collection WHERE name=%s", (c,), 1)
     if res:
-        collid = res[0][0]
-    return collid 
+        colID = res[0][0]
+    return colID 
