@@ -25,19 +25,6 @@ from marshal import loads
 from zlib import decompress
 from dbquery import run_sql
 
-def get_citing_recidrelevance(rank_method_code, citing_recids):
-    """return a tuple of list ([recid,citation_weight],...) for all the record in citing_recids list
-    """
-    result = []
-    query = "select relevance_data from rnkMETHODDATA, rnkMETHOD WHERE rnkMETHOD.id = rnkMETHODDATA.id_rnkMETHOD and rnkMETHOD.name = '%s'" % rank_method_code
-    compressed_citation_weight_dic = run_sql(query)
-    if compressed_citation_weight_dic and compressed_citation_weight_dic[0]:
-        citation_dic = loads(decompress(compressed_citation_weight_dic[0][0]))
-        for id in citing_recids:
-            tmp = [id, citation_dic[id]]
-            result.append(tmp)
-    return result
-
 def init_cited_by_dictionary():
     """return citation list dictionary from rnkCITATIONDATA
     """
@@ -61,16 +48,39 @@ def init_reference_list_dictionary():
 cache_cited_by_dictionary = init_cited_by_dictionary()
 cache_reference_list_dictionary = init_reference_list_dictionary()
 
-def get_cited_by_list(record_id):
-    """return citation list dictionary of record_id
+### INTERFACE
+
+def calculate_cited_by_list(record_id, sort_order="d"):
+    """Return a tuple of ([recid,citation_weight],...) for all the
+       record in citing RECORD_ID.  The resulting recids is sorted by
+       ascending/descending citation weights depending or SORT_ORDER.
     """
     citation_list = []
+    result = []
+    # determine which record cite RECORD_ID:
     if cache_cited_by_dictionary:
         citation_list = cache_cited_by_dictionary.get(record_id, [])
-    return citation_list
+    # get their weights:
+    query = "select relevance_data from rnkMETHODDATA, rnkMETHOD WHERE rnkMETHOD.id=rnkMETHODDATA.id_rnkMETHOD and rnkMETHOD.name='cit'"
+    compressed_citation_weight_dic = run_sql(query)
+    if compressed_citation_weight_dic and compressed_citation_weight_dic[0]:
+        citation_dic = loads(decompress(compressed_citation_weight_dic[0][0]))
+        for id in citation_list:
+            tmp = [id, citation_dic[id]]
+            result.append(tmp)
+    # sort them:
+    if result:
+        if sort_order == "d":
+            result.sort(lambda x, y: cmp(y[1], x[1]))
+        else:
+            result.sort(lambda x, y: cmp(x[1], y[1]))
+    return result
 
-def get_co_cited_with_list(record_id):
-    """return a tuple of list([id,co-cited weitht],[...,....]) for record_id"""
+def calculate_co_cited_with_list(record_id, sort_order="d"):
+    """Return a tuple of ([recid,co-cited weight],...) for records
+       that are co-cited with RECORD_ID.  The resulting recids is sorted by
+       ascending/descending citation weights depending or SORT_ORDER.
+    """
     result = []
     result_intermediate = {}
     citation_list = []
@@ -87,4 +97,9 @@ def get_co_cited_with_list(record_id):
     for key, value in result_intermediate.iteritems():
         if not (key==record_id):
             result.append([key, value])
+    if result:
+        if sort_order == "d":
+            result.sort(lambda x, y: cmp(y[1], x[1]))
+        else:
+            result.sort(lambda x, y: cmp(x[1], y[1]))
     return result
