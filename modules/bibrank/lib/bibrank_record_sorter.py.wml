@@ -535,8 +535,6 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
                     term = stem_by_lang(string.replace(term, ' ', ''), methods[rank_method_code]["stemmer"])
                 if lwords_old[i] != term: #add if stemmed word is different than original word
 	            lwords.append((term, methods[rank_method_code]["rnkWORD_table"]))
-    if verbose > 0 and words_removed:
-        voutput += "The following words are very common and were not included in ranking the documents: %s<br>" % words_removed
 
     (recdict, rec_termcount, lrecIDs_remove) = ({}, {}, {})
     #For each term, if accepted, get a list of the records using the term
@@ -545,6 +543,7 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
 	term_recs = run_sql("SELECT term, hitlist FROM %s WHERE term='%s'" % (methods[rank_method_code]["rnkWORD_table"], MySQLdb.escape_string(term)))
         if term_recs:
 	    term_recs = deserialize_via_marshal(term_recs[0][1])
+            voutput += "%s" % term_recs
             if check_term(term, methods[rank_method_code]["col_size"], len(term_recs), 1.0, 0.00, 0):
                 (recdict, rec_termcount) = calculate_record_relevance((term, int(term_recs["Gi"][1])) , term_recs, hitset, recdict, rec_termcount, verbose, quick=None)
             del term_recs

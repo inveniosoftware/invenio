@@ -317,7 +317,7 @@ def command_line():
         usage(1)
     if args:
         usage(1)
-    bibrank_options = {"quick":"no","cmd":"add","flush":100000,"validset":"", "collection":[], "id":[], "check": "", "stat":"", "modified":"", "last_updated":"last_updated","run":"", "verbose":1}
+    bibrank_options = {"quick":"yes","cmd":"add","flush":100000,"validset":"", "collection":[], "id":[], "check": "", "stat":"", "modified":"", "last_updated":"last_updated","run":"", "verbose":1}
 
     res = run_sql("SELECT name from rnkMETHOD")
     bibrank_options["run"] = []

@@ -1290,13 +1290,20 @@ def update_rnkWORD(table, terms):
                 term_docs = deserialize_via_marshal(hitlist)
                 if term_docs.has_key("Gi"):
                     Gi[t] = term_docs["Gi"][1]
+                elif len(term_docs) == 1:
+                    Gi[t] = 1
                 else:
-                    write_message("Please rebalance these records,(may require deletion before adding again)")
-                    raise Exception("Rebalance")
+                    Fi = 0
+                    Gi[t] = 1
+	            for (j, tf) in term_docs.iteritems():
+                        Fi += tf[0]
+                    for (j, tf) in term_docs.iteritems():
+                        if tf[0] != Fi:
+                            Gi[t] = Gi[t] + ((float(tf[0]) / Fi) * math.log(float(tf[0]) / Fi) / math.log(2)) / math.log(N) 
             write_message("Phase 3: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
             i += 5000
         write_message("Phase 3: Finished getting approximate importance of all affected terms")
-        
+
     write_message("Phase 4: Calculating normalization value for all affected records and updating %sR" % table[:-1])
     records = Nj.keys()
     i = 0
