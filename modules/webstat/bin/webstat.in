@@ -30,11 +30,15 @@
 ## fill config variables:
 LISPIMAGEDIR=<LIBDIR>/lisp/cdsware
 CONFIGDIR=<ETCDIR>/webstat
+CLISP=<CLISP>
+CMUCL=<CMUCL>
+SBCL=<SBCL>
 
 ## do we have enough arguments?
 if [ ! -n "$1" ]; then
     echo "Error: Not enough arguments."
     echo "Usage:" $0 "<httpd-log-file>"
+    echo "Note: Please analyze only moderately-sized logs, e.g. for a day or a week."
     exit 1
 fi
 
@@ -44,17 +48,19 @@ FILELOG=$1
 if [ ! -f $FILECFG ]; then 
     echo "Error: config file ${FILECFG} not found."
     echo "Usage:" $0 "<httpd-log-file>"
+    echo "Note: Please analyze only moderately-sized logs, e.g. for a day or a week."
     exit 1
 fi
 if [ ! -f $FILELOG ]; then 
     echo "Error: httpd log file not found."
     echo "Usage:" $0 "<httpd-log-file>"
+    echo "Note: Please analyze only moderately-sized logs, e.g. for a day or a week."
     exit 1
 fi
 
 ## check which Common Lisp implementation to use?
 if [ "$LISP" == "" ]; then 
-    LISP=lisp
+    LISP=cmucl
     if [ ! -e ${LISPIMAGEDIR}/webstat.$LISP.core ]; then
         LISP=sbcl
         if [ ! -e ${LISPIMAGEDIR}/webstat.$LISP.core ]; then
@@ -68,15 +74,15 @@ if [ "$LISP" == "" ]; then
 fi
 
 ## okay, try to run the process:
-if [ "$LISP" == "lisp" ]; then
-    $LISP -core ${LISPIMAGEDIR}/webstat.$LISP.core -quiet -batch \
-          -eval "(progn (analyze-httpd-log-file \"$FILECFG\" \"$FILELOG\")(quit))"
+if [ "$LISP" == "cmucl" ]; then
+    $CMUCL -core ${LISPIMAGEDIR}/webstat.$LISP.core -quiet -batch \
+           -eval "(progn (analyze-httpd-log-file \"$FILECFG\" \"$FILELOG\")(quit))"
 elif [ "$LISP" == "sbcl" ]; then
-    $LISP --noinform --core ${LISPIMAGEDIR}/webstat.$LISP.core \
+    $SBCL --noinform --core ${LISPIMAGEDIR}/webstat.$LISP.core \
           --eval "(progn (analyze-httpd-log-file \"$FILECFG\" \"$FILELOG\")(quit))"
 elif [ "$LISP" == "clisp" ]; then
-    $LISP -q -M ${LISPIMAGEDIR}/webstat.$LISP.mem \
-          -x "(progn (analyze-httpd-log-file \"$FILECFG\" \"$FILELOG\")(quit))"
+    $CLISP -q -M ${LISPIMAGEDIR}/webstat.$LISP.mem \
+           -x "(progn (analyze-httpd-log-file \"$FILECFG\" \"$FILELOG\")(quit))"
 else
     echo "Error: $LISP not supported.  Please read README."
     exit 1
