@@ -305,7 +305,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     """
 
     hitset = copy.deepcopy(hitset_global) #we are receiving a global hitset
-    verbose = 9
+    #verbose = 9
     try:
         if methods:
             pass
