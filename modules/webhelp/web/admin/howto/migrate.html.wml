@@ -23,12 +23,14 @@
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/>Admin Area</a> &gt; <a class=navtrail href=<WEBURL>/admin/howto/>Admin HOWTOs</a>" \
     navbar_select="howto_migrate"
 
+Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
+<h2>Overview</h2>
+
 <p>CDSware comes as a suite of several independent flexible modules
 that enable you to easily convert your data from any existing format
-and to upload them into the CDSware system.
-
-<p>This document briefly describes how you proceed.  To learn more on
-each of the steps, simply follow embedded links.
+and to upload them into the CDSware system.  This document briefly
+describes how you proceed.  
 
 <h2>Quick instructions for the impatient CDSware admin</h2>
 
@@ -70,8 +72,10 @@ href="marc.html">MARC HOWTO</a>.)</blockquote>
 
 <dt><code>$ bibconvert -cdatadump.cfg < datadump.txt > datadump.xml</code>
 
-<dd><blockquote>Convert the data from your own format into XML 
-MARC, using the configuration you just wrote in the previous step.</blockquote>
+<dd><blockquote>Convert the data from your own format into XML MARC,
+using the configuration you just wrote in the previous step.  FIXME:
+add a note about creating collection indicators (980) and OAI
+IDs.</blockquote>
 
 <dt><code>$ bibupload datadump.xml</code>
 
