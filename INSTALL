@@ -24,17 +24,22 @@ Contents
    Here is the software you need to have around before you
    start installing CDSware:
 
-     a) MySQL server (may be on a remote machine), and MySQL client
+     a) Unix-like operating system.  The main development and
+        production platform for CDSware at CERN is Debian GNU/Linux,
+        but any Unix system supporting the software listed below
+        should do.
+
+     b) MySQL server (may be on a remote machine), and MySQL client
         (must be available locally too).  Version 4.1.0 and above is
         recommended due to its UTF-8 support.
           <http://mysql.com/>
 
-     b) Apache server, with support for loading DSO modules.  
+     c) Apache server, with support for loading DSO modules.  
         Tested mainly with version 2.0.43 and above.  Apache2 is
         recommended due to its superior mod_python support, see below.
           <http://httpd.apache.org/>
 
-     c) Python v2.x, featuring recent MySQLdb module (v0.9.2), and
+     d) Python v2.x, featuring recent MySQLdb module (v0.9.2), and
         Numeric module (v21 and above).  We recommended to use Python
         v2.2 and above.  Also, we recommend to optionally install also
         the Psyco module that increases performance of some Pythonic
@@ -46,17 +51,17 @@ Contents
           <http://sourceforge.net/projects/numpy>
           <http://psyco.sourceforge.net/>
 
-     d) mod_python compiled as Apache module.  Tested mainly with
+     e) mod_python compiled as Apache module.  Tested mainly with
         versions 3.0BETA4 and above.  mod_python 3.x is recommended
         due to better Apache2 and MySQL support, as we saw in our
         experience.
           <http://www.modpython.org/>
 
-     e) PHP compiled as Apache module, including MySQL support.
+     f) PHP compiled as Apache module, including MySQL support.
         Tested mainly with PHP version 4.3.0 and above.  
           <http://www.php.net/>
 
-     f) PHP compiled as a standalone command-line executable (CLI)
+     g) PHP compiled as a standalone command-line executable (CLI)
         (in addition to Apache module) is required, too.  As of PHP
         4.3.0 you'll obtain the CLI executable by default, so you
         don't have to compile it separately.  Note that PHP CLI should
@@ -64,10 +69,10 @@ Contents
           <http://www.php.net/manual/en/install.commandline.php>
           <http://www.php.net/manual/en/ref.pcntl.php>
 
-     g) WML - Website META Language:
+     h) WML - Website META Language:
           <http://www.engelschall.com/sw/wml/>
 
-     h) If you want to be able to search for words in the fulltext files 
+     i) If you want to be able to search for words in the fulltext files 
         (i.e. to have fulltext indexing), then you need as well to install 
         some of the following tools: 
 
