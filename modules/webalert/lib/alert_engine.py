@@ -120,8 +120,13 @@ def get_query(alert_id):
     r = run_sql('select urlargs from query where id=%s', (alert_id,))
     return r[0][0]
 
-def send_email(fromaddr, toaddr, body):
+def send_email(fromaddr, toaddr, body, attempt=0):
     global DEBUGLEVEL
+
+    if attempt > 2:
+        log('error sending email to %s: SMTP error; gave up after 3 attempts' % toaddr)
+        return
+    
     try:
         server = smtplib.SMTP('localhost')
         if DEBUGLEVEL > 2:
@@ -132,9 +137,11 @@ def send_email(fromaddr, toaddr, body):
         server.sendmail(fromaddr, toaddr, body)
         server.quit()
     except:
-        print 'Error connecting to SMTP server, retrying in 10 seconds.'
+        if (DEBUGLEVEL > 1):
+            print 'Error connecting to SMTP server, attempt %s retrying in 10 seconds.' % attempt
         sleep(10)
-        send_email(fromaddr, toaddr, body)
+        send_email(fromaddr, toaddr, body, attempt+1)
+        return
 
 
 def forge_email(fromaddr, toaddr, subject, content):
@@ -182,14 +189,14 @@ def email_notify(alert, records, argstr):
         msg = "*** THIS MESSAGE WAS SENT IN DEBUG MODE, DON'T TAKE IT INTO ACCOUNT ***\n\n"
 
     msg += "Hello\n\n"
-    msg += wrap("Below are the results of the email alert that you set up with the CERN Document Server. This is an automatic message, please don't reply to its address. For any question, use <%s> instead." % supportemail)
+    msg += wrap("Below are the results of the email alert that you set up with the CERN Document Server.  This is an automatic message, please don't reply to its address.  For any question, use <%s> instead." % supportemail)
 
     email = get_email(alert[0])
         
     url = weburl + "/search.py?" + argstr
     pattern = get_pattern(argstr)
     catalogue = get_catalogue(argstr)
-    catword = 'catalogue'
+    catword = 'collection'
     if get_catalogue_num(argstr) > 1:
         catword += 's'
     
@@ -200,7 +207,7 @@ def email_notify(alert, records, argstr):
     if catalogue:
         msg += wrap('%s: %s' % (catword, catalogue))
     msg += wrap('frequency: %s ' % format_frequency(alert[3]))
-    msg += wrap('run time: %s ' % time)
+    msg += wrap('run time: %s ' % strftime("%a %d-%m-%Y %H:%M:%S"))
     recword = 'record'
     if len(records) > 1:
         recword += 's'
@@ -209,7 +216,7 @@ def email_notify(alert, records, argstr):
 
     msg += wrap_records(print_records(records))
 
-    msg += "\n-- \nCERN Document Server Alert Service <%s>\nUnsubscribe at <%s>\nNeed human intervention? Contact <%s>" % (weburl, ALERTURL, supportemail)
+    msg += "\n-- \nCERN Document Server Alert Service <%s>\nUnsubscribe?  See <%s>\nNeed human intervention?  Contact <%s>" % (weburl, ALERTURL, supportemail)
 
     subject = 'Alert %s run on %s' % (alert[5], time)
     
@@ -325,6 +332,8 @@ def run_query(query, frequency):
 
     recs = get_record_ids(query[1], date_from, date_until)
 
+    log('query %08s produced %08s records' % (query[0], len(recs)))
+    
     if DEBUGLEVEL > 2:
         print "[%s] run query: %s with dates: from=%s, until=%s\n  found rec ids: %s" % (strftime("%c"), query, date_from, date_until, recs)
 
@@ -374,10 +383,19 @@ def update_arguments(argstr, date_from, date_until):
         
     return r
 
+def log(msg):
+    try:
+        log = open(logdir + '/alertengine.log', 'a')
+        log.write(strftime('%04Y%02m%02d%02H%02M%02S#'))
+        log.write(msg + '\n')
+        log.close()
+    except:
+        pass
+    
 def process_alerts(alerts):
     # TBD: do not generate the email each time, forge it once and then
     # send it to all appropriate people
-    
+
     for a in alerts['alerts']:
         if alert_use_basket_p(a):
             add_records_to_basket(alerts['records'], a[2])
