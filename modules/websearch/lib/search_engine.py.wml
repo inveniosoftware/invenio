@@ -61,7 +61,7 @@ except ImportError, e:
 
 try:
     from webuser import getUid, create_user_infobox
-    from webpage import pageheaderonly    
+    from webpage import pageheaderonly, pagefooteronly    
 except ImportError, e:
     pass # ignore user personalisation, needed e.g. for command-line
         
@@ -198,8 +198,8 @@ def create_opft_search_units(req, p, f, m=None):
     ## check arguments: if matching type phrase/string/regexp, do we have field defined?    
     if (m=='p' or m=='r' or m=='e') and not f:
         m = 'a'        
-        print_warning(req, "This matching type cannot be used within <em>any field</em>.  I will perform a word search instead." , "")
-        print_warning(req, "If you want to phrase/substring/regexp search in a specific field, e.g. inside title, then please choose <em>within title</em> search option.", "")
+        print_warning(req, "This matching type cannot be used within <em>any field</em>.  I will perform a word search instead." )
+        print_warning(req, "If you want to phrase/substring/regexp search in a specific field, e.g. inside title, then please choose <em>within title</em> search option.")
         
     ## is desired matching type set?
     if m:
@@ -295,13 +295,13 @@ def create_opft_search_units(req, p, f, m=None):
                         # fi is not defined, look at where we are doing exact or subphrase search (single/double quotes):
                         if pi[0]=='"' and pi[-1]=='"':                        
                             opfts.append([oi,pi[1:-1],"anyfield",'a'])
-                            print_warning(req, "Searching for an exact match inside any field may be slow.  You may want to search for words instead, or choose to search within specific field.", "")
+                            print_warning(req, "Searching for an exact match inside any field may be slow.  You may want to search for words instead, or choose to search within specific field.")
                         else:                        
                             # nope, subphrase in global index is not possible => change back to WRD search
                             for pii in get_words_from_phrase(pi):
                                 # since there may be '-' and other chars that we do not index in WRD
                                 opfts.append([oi,pii,fi,'w'])
-                            print_warning(req, "The partial phrase search does not work in any field.  I'll do a boolean AND searching instead.", "")
+                            print_warning(req, "The partial phrase search does not work in any field.  I'll do a boolean AND searching instead.")
                             print_warning(req, "If you want to do a partial phrase search in a specific field, e.g. inside title, then please choose 'within title' search option.", "Tip")
                             print_warning(req, "If you want to do exact phrase matching, then please use double quotes.", "Tip")
                 elif fi and str(fi[0]).isdigit() and str(fi[0]).isdigit():
@@ -394,7 +394,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
         cell_2_moreright = create_andornot_box('op2', op2)
         cell_3_left = create_matchtype_box('m3', m3) + """<input type="text" name="p3" size="%d" value="%s">""" % (cfg_advancedsearch_pattern_box_width, cgi.escape(p3,1))
         cell_3_right = create_searchwithin_selection_box('f3', f3)
-        cell_3_moreright = """<input class="formbutton" type="submit" name="search" value="SEARCH"><input class="formbutton" type="submit" name="search" value="Browse">&nbsp;"""
+        cell_3_moreright = """<input class="formbutton" type="submit" name="action" value="SEARCH"><input class="formbutton" type="submit" name="action" value="Browse">&nbsp;"""
         cell_4 = """<small><a href="%s/help/search/tips.html">search&nbsp;tips</a> ::
                            <a href="%s/search.py?p=%s&amp;f=%s&amp;cc=%s">simple&nbsp;search</a></small>""" % \
                     (weburl, weburl, urllib.quote(p1), urllib.quote(f1), urllib.quote(cc))
@@ -440,7 +440,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
         cell_1_left = """<input type="text" name="p" size="%d" value="%s">""" % \
         (cfg_simplesearch_pattern_box_width, cgi.escape(p, 1))
         cell_1_middle = create_searchwithin_selection_box('f', f)
-        cell_1_right = """<input class="formbutton" type="submit" name="search" value="SEARCH"><input class="formbutton" type="submit" name="search" value="Browse">&nbsp;"""
+        cell_1_right = """<input class="formbutton" type="submit" name="action" value="SEARCH"><input class="formbutton" type="submit" name="action" value="Browse">&nbsp;"""
         cell_2 = """<small><a href="%s/help/search/tips.html">search&nbsp;tips</a> ::
                            <a href="%s/search.py?p1=%s&amp;f1=%s&amp;as=1&amp;cc=%s">advanced&nbsp;search</a></small>""" %\
                           (weburl, weburl, urllib.quote(p), urllib.quote(f), urllib.quote(cc))
@@ -735,10 +735,6 @@ def create_google_box(p, f, p1, p2, p3,
         out += epilog
     return out
 
-def create_footer():    
-    "Creates CDS page footer."
-    return cdspagefooter
-     
 class HitList:
     """Class describing set of records, implemented as bit vectors of recIDs.
     Using Numeric arrays for speed (1 value = 8 bits), can use later "real"
@@ -1116,34 +1112,37 @@ def browse_pattern(req, colls, p, f, rg):
     for coll in colls:
         urlarg_colls += "&c=%s" % urllib.quote(coll)
     ## okay, "real browse" follows:
-    browsed_words = browse_in_bibxxx(p, f, rg)
-    while not browsed_words:
+    browsed_phrases = get_nearest_terms_in_bibxxx(p, f, rg, 1)
+    while not browsed_phrases:
         # try again and again with shorter and shorter pattern:
         try:
             p = p[:-1]
-            browsed_words = browse_in_bibxxx(p, f, rg)
+            browsed_phrases = get_nearest_terms_in_bibxxx(p, f, rg, 1)
         except:
             # probably there are no hits at all:
             req.write("<p>No values found.")
             return
+
     ## try to check hits in these particular collection selection:
-    browsed_words_in_colls = []
-    for word,nbhits in browsed_words:
-        word_hitlist = HitList()
-        word_hitlists = search_pattern("", word, f, colls, 'e')
+    browsed_phrases_in_colls = []
+    for phrase in browsed_phrases:
+        phrase_hitlist = HitList()
+        phrase_hitlists = search_pattern("", phrase, f, colls, 'e')
         for coll in colls:
-            word_hitlist.union(word_hitlists[coll])
-        word_hitlist.calculate_nbhits()
-        if word_hitlist._nbhits > 0:
-            # okay, this word has some hits in colls, so add it:
-            browsed_words_in_colls.append([word, word_hitlist._nbhits])
+            phrase_hitlist.union(phrase_hitlists[coll])
+        phrase_hitlist.calculate_nbhits()
+        if phrase_hitlist._nbhits > 0:
+            # okay, this phrase has some hits in colls, so add it:
+            browsed_phrases_in_colls.append([phrase, phrase_hitlist._nbhits])
 
     ## were there hits in collections?
-    if browsed_words_in_colls == []:
-        if browsed_words != []:
+    if browsed_phrases_in_colls == []:
+        if browsed_phrases != []:
             print_warning(req, """<p>No match close to <em>%s</em> found in given collections.
-            Please try different term.<p>Displaying matches in any collection...""" % p_orig, "")
-            browsed_words_in_colls = browsed_words 
+            Please try different term.<p>Displaying matches in any collection...""" % p_orig)
+            ## try to get nbhits for these phrases in any collection:
+            for phrase in browsed_phrases:
+                browsed_phrases_in_colls.append([phrase, get_nbhits_in_bibxxx(phrase, f)])
 
     ## display results now:
     out = """<table class="searchresultsbox">
@@ -1161,9 +1160,9 @@ def browse_pattern(req, colls, p, f, rg):
                </tr>
               </thead>
               <tbody>""" % f
-    if len(browsed_words_in_colls) == 1:
+    if len(browsed_phrases_in_colls) == 1:
         # one hit only found:
-        word, nbhits = browsed_words_in_colls[0][0], browsed_words_in_colls[0][1]
+        phrase, nbhits = browsed_phrases_in_colls[0][0], browsed_phrases_in_colls[0][1]
         out += """<tr>
                    <td class="searchresultsboxbody" align="right">
                     %s
@@ -1174,10 +1173,10 @@ def browse_pattern(req, colls, p, f, rg):
                    <td class="searchresultsboxbody" align="left">
                     <a href="%s/search.py?p=%%22%s%%22&f=%s%s">%s</a>
                    </td>
-                  </tr>""" % (nbhits, weburl, urllib.quote(word), urllib.quote(f), urlarg_colls, word)        
-    elif len(browsed_words_in_colls) > 1:
+                  </tr>""" % (nbhits, weburl, urllib.quote(phrase), urllib.quote(f), urlarg_colls, phrase)        
+    elif len(browsed_phrases_in_colls) > 1:
         # first display what was found but the last one:
-        for word, nbhits in browsed_words_in_colls[:-1]:
+        for phrase, nbhits in browsed_phrases_in_colls[:-1]:
             out += """<tr>
                        <td class="searchresultsboxbody" align="right">
                         %s
@@ -1188,17 +1187,17 @@ def browse_pattern(req, colls, p, f, rg):
                        <td class="searchresultsboxbody" align="left">
                         <a href="%s/search.py?p=%%22%s%%22&f=%s%s">%s</a>
                        </td>
-                      </tr>""" % (nbhits, weburl, urllib.quote(word), urllib.quote(f), urlarg_colls, word)
+                      </tr>""" % (nbhits, weburl, urllib.quote(phrase), urllib.quote(f), urlarg_colls, phrase)
         # now display last hit as "next term":
-        word, nbhits = browsed_words_in_colls[-1]        
+        phrase, nbhits = browsed_phrases_in_colls[-1]        
         out += """<tr><td colspan="2" class="normal">
                                    &nbsp;
                                  </td>
                                  <td class="normal">
                                    <img src="%s/img/sn.gif" alt="" border="0">
-                                   next %s: <a href="%s/search.py?search=Browse&p=%s&f=%s%s">%s</a>
+                                   <a href="%s/search.py?action=Browse&p=%s&f=%s%s">next</a>
                                  </td>
-                             </tr>""" % (weburl, f, weburl, urllib.quote(word), urllib.quote(f), urlarg_colls, word)        
+                             </tr>""" % (weburl, weburl, urllib.quote(phrase), urllib.quote(f), urlarg_colls)        
     out += """</tbody>
         </table>"""        
     req.write(out)
@@ -1210,202 +1209,9 @@ def browse_in_bibwords(req, p, f):
     if f:
         req.write(" inside <em>%s</em> " % f)
     req.write(" in any collection are:<br>")
-    urlargs = string.replace(req.args, "search=Browse","search=SEARCH")
-    req.write(create_nearest_terms_box(urlargs, p, f))
+    urlargs = string.replace(req.args, "action=Browse","action=SEARCH")
+    req.write(create_nearest_terms_box(urlargs, p, f, 'w'))
     return
-
-def browse_in_bibxxx(p, f, rg):
-    """Browse bibliographic phrases for the given pattern in the given field, regardless of collection.
-       Return list of [word1, nbhits1],[word2, nbhits2],...[word_rg,nbhits_rg]."""
-    ## determine browse field:
-    if string.find(p, ":") > 0: # does 'p' contain ':'?
-        f, p = split(p, ":", 2)
-    ## wash 'p' argument:
-    p = re_quotes.sub("", p)
-    ## construct 'tl' which defines the tag list (MARC tags) to search in:
-    tl = []
-    if str(f[0]).isdigit() and str(f[1]).isdigit():
-        tl.append(f) # 'f' seems to be okay as it starts by two digits
-    else:
-        # deduce desired MARC tags on the basis of chosen 'f'
-        tl = get_field_tags(f)
-    ## start browsing to fetch list of hits:
-    browsed_words_hits = {} # will hold dict of {'word' : nbhits}
-    for t in tl:
-        # deduce into which bibxxx table we will search:
-        digit1, digit2 = int(t[0]), int(t[1])
-        bx = "bib%d%dx" % (digit1, digit2)
-        bibx = "bibrec_bib%d%dx" % (digit1, digit2)
-        # construct query:
-        if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
-            query = "SELECT bx.id, bx.value FROM %s AS bx WHERE bx.value >= '%s' AND bx.tag LIKE '%s%%' ORDER BY bx.value ASC LIMIT %d" \
-                    % (bx, p, t, rg)
-        else:
-            query = "SELECT bx.id, bx.value FROM %s AS bx WHERE bx.value >= '%s' AND bx.tag='%s' ORDER BY bx.value ASC LIMIT %d" \
-                    % (bx, p, t, rg)
-        # launch the query:
-        res = run_sql(query)
-        # display results:
-        for row in res:
-            bx_id, bx_val = row[0], row[1]
-            # deduce number of hits (=different RECIDs) for 'bx_val':
-            query_bis = "SELECT COUNT(DISTINCT(bibx.id_bibrec)) FROM %s AS bibx WHERE bibx.id_bibxxx='%s'" % (bibx, bx_id)
-            query_bis_hits = 0
-            res_bis = run_sql(query_bis, None, 1)
-            if res_bis:
-                query_bis_hits = res_bis[0][0]
-            try:
-                browsed_words_hits[bx_val] += query_bis_hits
-            except:
-                browsed_words_hits[bx_val] = query_bis_hits
-    # select first rg words only (this is needed as we were searching
-    # in many different tables and so aren't sure we have more than rg
-    # words right; this of course won't be needed when we shall have
-    # one ACC table only for given field):
-    wlist = browsed_words_hits.keys()
-    wlist.sort()
-    out = []
-    for word in wlist[:rg]:
-        out.append([word, browsed_words_hits[word]])
-    return out
-
-def browse_in_bibxxx_old(req, colls, p, f, rg):
-    """Browse bibliographic phrases for the given pattern in the given field."""
-    ## determine browse field:
-    if string.find(p, ":") > 0: # does 'p' contain ':'?
-        f, p = split(p, ":", 2)
-    ## prepare collection urlargument for later printing:
-    urlarg_colls = ""
-    for coll in colls:
-        urlarg_colls += "&c=%s" % urllib.quote(coll)
-    ## wash 'p' argument:
-    p = re_quotes.sub("", p)
-    ## construct 'tl' which defines the tag list (MARC tags) to search in:
-    tl = []
-    if str(f[0]).isdigit() and str(f[1]).isdigit():
-        tl.append(f) # 'f' seems to be okay as it starts by two digits
-    else:
-        # deduce desired MARC tags on the basis of chosen 'f'
-        tl = get_field_tags(f)
-    ## start browsing to fetch list of hits:
-    for t in tl:
-        # print header for this tag:
-        out = """<table class="searchresultsbox">
-                  <thead>
-                   <tr>
-                    <th class="searchresultsboxheader" align="left">
-                      <strong>#</strong>
-                    </th>
-                    <th class="searchresultsboxheader" width="15">
-                      &nbsp;
-                    </th>
-                    <th class="searchresultsboxheader" align="left">
-                      <strong>%s</strong> %s
-                    </th>
-                   </tr>
-                  </thead>
-                  <tbody>""" % (f, get_tag_name(t,"[","]"))
-        req.write(out)
-        # deduce into which bibxxx table we will search:
-        digit1, digit2 = int(t[0]), int(t[1])
-        bx = "bib%d%dx" % (digit1, digit2)
-        bibx = "bibrec_bib%d%dx" % (digit1, digit2)
-        p_t = p
-        while 1: # try quering until some hits can be found:
-            # construct query:
-            if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
-                query = "SELECT bx.id, bx.value FROM %s AS bx WHERE bx.value >= '%s' AND bx.tag LIKE '%s%%' ORDER BY bx.value ASC LIMIT %d" \
-                        % (bx, p_t, t, cfg_nb_browse_seen_records+2)
-            else:
-                query = "SELECT bx.id, bx.value FROM %s AS bx WHERE bx.value >= '%s' AND bx.tag='%s' ORDER BY bx.value ASC LIMIT %d" \
-                        % (bx, p_t, t, cfg_nb_browse_seen_records+2)
-            # launch the query:
-            res = run_sql(query)
-            if res:
-                # some hits found, good
-                break 
-            else:
-                # no hits found, so try to shorten the browse string by a letter
-                if len(p_t)>1:
-                    p_t = p_t[:-1]
-                else:
-                    break # cannot shorten more, so exit with no results found
-        # print results:
-        nb_hits = 0
-        word_current_hit = ""
-        word_next_hit = ""
-        for word_id,word in res:
-            # detect how many hits has word in these particular collections:
-            word_hitlist = HitList()
-            word_hitlists = search_pattern("", word, f, colls, 'e')
-            for coll in colls:
-                word_hitlist.union(word_hitlists[coll])
-            word_hitlist.calculate_nbhits()
-            if word_hitlist._nbhits > 0:
-                # okay, it has some hits in colls, so print it:
-                word_current_hit = word
-                nb_hits += 1
-                if nb_hits > rg:
-                    word_next_hit = word
-                    break
-                out = """<tr>
-                           <td class="searchresultsboxbody" align="right">
-                            %s
-                           </td>
-                           <td class="searchresultsboxbody" width="15">
-                            &nbsp;
-                           </td>
-                           <td class="searchresultsboxbody" align="left">
-                            <a href="%s/search.py?p=%%22%s%%22&f=%s%s">%s</a>
-                           </td>
-                          </tr>""" % (word_hitlist._nbhits, weburl, urllib.quote(word), urllib.quote(f), urlarg_colls, word)
-                req.write(out)
-        # propose 'next word' link:
-        if word_next_hit:
-            req.write("""<tr><td colspan="2" class="normal">
-                               &nbsp;
-                             </td>
-                             <td class="normal">
-                               <img src="%s/img/sn.gif" alt="" border="0">
-                               next %s: <a href="%s/search.py?search=Browse&p=%s&f=%s%s">%s</a>
-                             </td>
-                         </tr>"""\
-                      % (weburl, get_tag_name(t), weburl, urllib.quote(word_next_hit), urllib.quote(f), urlarg_colls, word_next_hit))
-        else:
-            # we don't have 'next word hit', so print only 'try out' proposals if they apply
-            if res:
-                word_try = res[len(res)-1][1]
-                if word_try == p_t or word_try == word_current_hit:
-                    req.write("""<tr><td colspan="2" class="normal">
-                                       &nbsp;
-                                     </td>
-                                     <td class="normal">
-                                      <img src="%s/img/sn.gif" alt="" border="0">
-                                       nothing found below %s.
-                                     </td>
-                                 </tr>""" % (weburl, word_try))
-                else:
-                    req.write("""<tr><td colspan="2" class="normal">
-                                       &nbsp;
-                                     </td>
-                                     <td class="normal">
-                                      <img src="%s/img/sn.gif" alt="" border="0">
-                                       <a href="%s/search.py?search=Browse&p=%s&f=%s%s">browse further</a>
-                                     </td>
-                                 </tr>"""\
-                              % (weburl, weburl, urllib.quote(word_try), urllib.quote(f), urlarg_colls))
-            else:
-                req.write("""<tr><td colspan="2" class="normal">
-                                   &nbsp;
-                                 </td>
-                                 <td class="normal">
-                                   nothing found below %s.
-                                 </td>
-                             </tr>""" % p_t)            
-        # print footer for this tag:
-        req.write("""</tbody>
-            </table>""")
-    return 
 
 def search_pattern(req, p=None, f=None, colls=[], m=None, hit_hints=0):
     """Searches for pattern 'p' and field 'f' and returns dict of recIDs HitLists per each collection in 'colls'.
@@ -1452,17 +1258,18 @@ def search_pattern(req, p=None, f=None, colls=[], m=None, hit_hints=0):
             return None
         if hit_hints:
             results_for_opft_item.calculate_nbhits()
-            if results_for_opft_item._nbhits == 0:                
+            if results_for_opft_item._nbhits == 0:
+                # no hits found, propose nearest indexed terms:
                 text = "Search term <em>%s</em>" % pi
                 if fi:
                     text += " inside <em>%s</em> " % fi
                 print_warning(req, "%s did not match any record.  Nearest terms in any collection are: %s" %
-                              (text, create_nearest_terms_box(req.args, pi, fi)), "")
+                              (text, create_nearest_terms_box(req.args, pi, fi, ti)))
                 return results_out # empty
                 
             if dbg:
                 print_warning(req, "Item <strong>%s:%s</strong> gave %d hits." %
-                              (fi, pi, results_for_opft_item._nbhits), "")                
+                              (fi, pi, results_for_opft_item._nbhits))                
         # secondly, apply the set intersect/union/disjunction functions:
         if dbg:
             t1 = os.times()[4]
@@ -1501,9 +1308,9 @@ def search_pattern(req, p=None, f=None, colls=[], m=None, hit_hints=0):
                 url_args_new = re.sub(r'(^|\&)p=.*?(\&|$)', r'\1p='+urllib.quote(pi)+r'\2', url_args)
                 url_args_new = re.sub(r'(^|\&)f=.*?(\&|$)', r'\1f='+urllib.quote(fi)+r'\2', url_args_new)
                 text += """<tr><td class="nearesttermsboxbody" align="right">%s</td><td class="nearesttermsboxbody" width="15">&nbsp;</td><td class="nearesttermsboxbody" align="left"><a class="nearestterms" href="%s/search.py?%s">%s</a></td></tr>""" % \
-                        (get_word_nbhits(pi, fi), weburl, url_args_new, pi)
+                        (get_nbhits_in_bibwords(pi, fi), weburl, url_args_new, pi)
             text += """</table></blockquote>"""
-            print_warning(req, text, "")
+            print_warning(req, text)
         return results_out # still empty
 
     ## intersect with collection universe:
@@ -1538,11 +1345,11 @@ def search_pattern(req, p=None, f=None, colls=[], m=None, hit_hints=0):
                 url_args = re.sub(r'\&+$', '', url_args)
                 print_warning(req, """Match found in other public collections: 
                               <a class="nearestterms" href="%s/search.py?%s">%d hits</a>.""" %
-                              (weburl, url_args, results_in_Home._nbhits), "")
+                              (weburl, url_args, results_in_Home._nbhits))
             else:
                 # no hits found in Home, recommend different search terms:
                 text = """No public collection matched your query.  If you were looking for a non-public document, please choose the desired restricted collection first."""
-                print_warning(req, text, "")
+                print_warning(req, text)
 
     return results_out
 
@@ -1611,7 +1418,7 @@ def search_in_bibxxx(req, p, f, type):
         if len(ps) == 2:
             pattern = "BETWEEN '%s' AND '%s'" % (MySQLdb.escape_string(ps[0]), MySQLdb.escape_string(ps[1]))
         else:
-            if string.find(p, '%') > 0:
+            if string.find(p, '%') > -1:
                 pattern = "LIKE '%s'" % MySQLdb.escape_string(ps[0])
             else:
                 pattern = "='%s'" % MySQLdb.escape_string(ps[0])
@@ -1657,10 +1464,16 @@ def search_in_bibxxx(req, p, f, type):
         print_warning(req, "The pattern '%s' in field '%s' has got '%d' hits." % (p, f, nb_hits), "Info")
     # check whether it is sound to do a new search:
     if nb_hits == 0 and not (p.startswith("%") and p.endswith("%")):
-        # try to launch substring search:
-        p_new = "%" + p + "%"
-        print_warning(req, "No exact match found, looking for substrings...", "")
-        return search_in_bibxxx(req, p_new, f, type)
+        if f == "recid" or f == "sysno":
+            # return no hits found for 'recid' and 'sysno' indexes:
+            print_warning(req, "Requested record does not seem to exist.")
+            set = HitList()
+            return set
+        else:
+            # for other indexes, try to launch substring search:
+            p_new = "%" + p + "%"
+            print_warning(req, "No exact match found, looking for substrings...") # TODO: do we really want this for each index?
+            return search_in_bibxxx(req, p_new, f, type)
     else:
         # okay, return result set:
         set = HitList()
@@ -1683,12 +1496,61 @@ def search_in_bibrec(day1, day2, type='creation_date'):
     set.addlist(Numeric.array(l))
     return set
 
-def create_nearest_terms_box(urlargs, p, f, n=5, prologue="<blockquote>", epilogue="</blockquote>"):
+def create_nearest_terms_box(urlargs, p, f, t='w', n=5, prologue="<blockquote>", epilogue="</blockquote>"):
     """Return text box containing list of 'n' nearest terms above/below 'p'
-       in the words index list for the field 'f'.
+       for the field 'f' for matching type 't' (words/phrases).
        Propose new searches according to `urlargs' with the new words.
     """    
     out = ""
+    nearest_terms = []
+    # look for nearest terms:
+    if t == 'w':
+        nearest_terms = get_nearest_terms_in_bibwords(p, f, n, n)
+        if not nearest_terms:
+            return "%sNo words index available for %s.%s" % (prologue, f, epilogue)            
+    else:
+        nearest_terms = get_nearest_terms_in_bibxxx(p, f, n, n)
+        if not nearest_terms:
+            return "%sNo phrases available for %s.%s" % (prologue, f, epilogue)                        
+    # display them:
+    out += """<table class="nearesttermsbox" cellpadding="0" cellspacing="0" border="0">"""
+    for term in nearest_terms:
+        if t == 'w':
+            term_nbhits = get_nbhits_in_bibwords(term, f)
+        else:
+            term_nbhits = get_nbhits_in_bibxxx(term, f)
+        if term == p: # print search word for orientation:
+            if term_nbhits > 0:
+                out += """<tr>
+                           <td class="nearesttermsboxbodyselected" align="right">%d</td>
+                           <td class="nearesttermsboxbodyselected" width="15">&nbsp;</td>
+                           <td class="nearesttermsboxbodyselected" align="left">
+                             <a class="nearesttermsselected" href="%s/search.py?%s">%s</a>
+                           </td>
+                          </tr>""" % \
+                           (term_nbhits, weburl, urlargs_replace_text_in_arg(urlargs, 'p', p, term), term)
+            else:
+                out += """<tr>
+                           <td class="nearesttermsboxbodyselected" align="right">-</td>
+                           <td class="nearesttermsboxbodyselected" width="15">&nbsp;</td>
+                           <td class="nearesttermsboxbodyselected" align="left">%s</td>
+                          </tr>""" % term
+        else:
+            out += """<tr>
+                       <td class="nearesttermsboxbody" align="right">%s</td>
+                       <td class="nearesttermsboxbody" width="15">&nbsp;</td>
+                       <td class="nearesttermsboxbody" align="left">
+                         <a class="nearestterms" href="%s/search.py?%s">%s</a>
+                       </td>
+                      </tr>""" % \
+                       (term_nbhits, weburl, urlargs_replace_text_in_arg(urlargs, 'p', p, term), term)
+    out += "</table>"
+    # return the text
+    return "%s%s%s" % (prologue, out, epilogue)
+
+def get_nearest_terms_in_bibwords(p, f, n_below, n_above):
+    """Return list of +n -n nearest terms to word `p' in wordsindex for field `f'."""
+    nearest_words = [] # will hold the (sorted) list of nearest words to return
     # deduce into which bibwordsX table we will search:
     bibwordsX = "bibwords%d" % get_wordsindex_id("anyfield")
     if f:
@@ -1696,57 +1558,85 @@ def create_nearest_terms_box(urlargs, p, f, n=5, prologue="<blockquote>", epilog
         if wordsindex_id:
             bibwordsX = "bibwords%d" % wordsindex_id
         else:
-            return "%sNo words index available for %s.%s" % (prologue, f, epilogue)
-    nearest_words = [] # will hold the (sorted) list of nearest words
-    # try to get `n' words above `p':
-    query = "SELECT word FROM %s WHERE word<'%s' ORDER BY word DESC LIMIT %d" % (bibwordsX, escape_string(p), n)
+            return nearest_words
+    # firstly try to get `n' closest words above `p':
+    query = "SELECT word FROM %s WHERE word<'%s' ORDER BY word DESC LIMIT %d" % (bibwordsX, escape_string(p), n_above)
     res = run_sql(query)
-    if res:
-        for row in res:
-            nearest_words.append(row[0])
-        nearest_words.reverse()
-    # insert given word `p':
+    for row in res:
+        nearest_words.append(row[0])
+    nearest_words.reverse()
+    # secondly insert given word `p':
     nearest_words.append(p)
-    # try to get `n' words below `p':
-    query = "SELECT word FROM %s WHERE word>'%s' ORDER BY word ASC LIMIT %d" % (bibwordsX, escape_string(p), n)
+    # finally try to get `n' closest words below `p':
+    query = "SELECT word FROM %s WHERE word>'%s' ORDER BY word ASC LIMIT %d" % (bibwordsX, escape_string(p), n_below)
     res = run_sql(query)
-    if res:
-        for row in res:
-            nearest_words.append(row[0])        
-    # output the words:
-    if nearest_words:
-        out += """<table class="nearesttermsbox" cellpadding="0" cellspacing="0" border="0">"""
-        for word in nearest_words:
-            if word == p: # print search word for orientation:
-                if get_word_nbhits(word, f) > 0:
-                    out += """<tr>
-                               <td class="nearesttermsboxbodyselected" align="right">%d</td>
-                               <td class="nearesttermsboxbodyselected" width="15">&nbsp;</td>
-                               <td class="nearesttermsboxbodyselected" align="left">
-                                 <a class="nearesttermsselected" href="%s/search.py?%s">%s</a>
-                               </td>
-                              </tr>""" % \
-                               (get_word_nbhits(word, f), weburl, urlargs_replace_text_in_arg(urlargs, 'p', p, word), word)
-                else:
-                    out += """<tr>
-                               <td class="nearesttermsboxbodyselected" align="right">-</td>
-                               <td class="nearesttermsboxbodyselected" width="15">&nbsp;</td>
-                               <td class="nearesttermsboxbodyselected" align="left">%s</td>
-                              </tr>""" % word
-            else:
-                out += """<tr>
-                           <td class="nearesttermsboxbody" align="right">%s</td>
-                           <td class="nearesttermsboxbody" width="15">&nbsp;</td>
-                           <td class="nearesttermsboxbody" align="left">
-                             <a class="nearestterms" href="%s/search.py?%s">%s</a>
-                           </td>
-                          </tr>""" % \
-                           (get_word_nbhits(word, f), weburl, urlargs_replace_text_in_arg(urlargs, 'p', p, word), word)
-        out += "</table>"
+    for row in res:
+        nearest_words.append(row[0])        
+    return nearest_words
+
+def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
+    """Browse (-n_above, +n_below) closest bibliographic phrases
+       for the given pattern p in the given field f, regardless
+       of collection.
+       Return list of [phrase1, phrase2, ... , phrase_n]."""
+    ## determine browse field:
+    if string.find(p, ":") > 0: # does 'p' contain ':'?
+        f, p = split(p, ":", 2)
+    ## wash 'p' argument:
+    p = re_quotes.sub("", p)
+    ## construct 'tl' which defines the tag list (MARC tags) to search in:
+    tl = []
+    if str(f[0]).isdigit() and str(f[1]).isdigit():
+        tl.append(f) # 'f' seems to be okay as it starts by two digits
     else:
-        out += "No words index available for this query."
-    # return the text
-    return "%s%s%s" % (prologue, out, epilogue)
+        # deduce desired MARC tags on the basis of chosen 'f'
+        tl = get_field_tags(f)
+    ## start browsing to fetch list of hits:
+    browsed_phrases_above = {} # will hold {phrase1: 1, phrase2: 1, ..., phraseN: 1} dict of browsed phrases above p (to make them unique)
+    browsed_phrases_below = {} # will hold {phrase1: 1, phrase2: 1, ..., phraseN: 1} dict of browsed phrases below p (to make them unique)
+    for t in tl:
+        # deduce into which bibxxx table we will search:
+        digit1, digit2 = int(t[0]), int(t[1])
+        bx = "bib%d%dx" % (digit1, digit2)
+        bibx = "bibrec_bib%d%dx" % (digit1, digit2)
+        # firstly try to get `n' closest phrases above `p':
+        if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
+            query = "SELECT bx.value FROM %s AS bx WHERE bx.value<'%s' AND bx.tag LIKE '%s%%' ORDER BY bx.value DESC LIMIT %d" \
+                    % (bx, escape_string(p), t, n_above)
+        else:
+            query = "SELECT bx.value FROM %s AS bx WHERE bx.value<'%s' AND bx.tag='%s' ORDER BY bx.value DESC LIMIT %d" \
+                    % (bx, escape_string(p), t, n_above)
+        res = run_sql(query)
+        for row in res:
+            browsed_phrases_above[row[0]] = 1
+        # secondly try to get `n' closest phrases below `p':
+        if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
+            query = "SELECT bx.value FROM %s AS bx WHERE bx.value>'%s' AND bx.tag LIKE '%s%%' ORDER BY bx.value ASC LIMIT %d" \
+                    % (bx, escape_string(p), t, n_below)
+        else:
+            query = "SELECT bx.value FROM %s AS bx WHERE bx.value>'%s' AND bx.tag='%s' ORDER BY bx.value ASC LIMIT %d" \
+                    % (bx, escape_string(p), t, n_below)
+        res = run_sql(query)
+        for row in res:
+            browsed_phrases_below[row[0]] = 1
+    # select first n words only: (this is needed as we were searching
+    # in many different tables and so aren't sure we have more than n
+    # words right; this of course won't be needed when we shall have
+    # one ACC table only for given field):
+    l1 = browsed_phrases_above.keys()
+    l1.sort()
+    l1.reverse()
+    l1 = l1[:n_above]
+    l1.reverse()
+    l2 = browsed_phrases_below.keys()
+    l2.sort()
+    out = []
+    for phrase in l1[:n_above]:
+        out.append(phrase)
+    out.append(p) # always append self, even if no hits, to indicate our position
+    for phrase in l2[:n_below]:
+        out.append(phrase)
+    return out
 
 def urlargs_replace_text_in_arg(urlargs, arg, text_old, text_new):
     """Analyze `urlargs' (URL CGI GET query arguments) and for each
@@ -1773,7 +1663,7 @@ def urlargs_replace_text_in_arg(urlargs, arg, text_old, text_new):
         out = out[1:]
     return out
 
-def get_word_nbhits(word, f):
+def get_nbhits_in_bibwords(word, f):
     """Return number of hits for word 'word' inside words index for field 'f'."""
     out = 0
     # deduce into which bibwordsX table we will search:
@@ -1790,6 +1680,40 @@ def get_word_nbhits(word, f):
         for hitlist in res:
             out += Numeric.sum(Numeric.loads(zlib.decompress(hitlist[0])).copy().astype(Numeric.Int))
     return out
+
+def get_nbhits_in_bibxxx(p, f):
+    """Return number of hits for word 'word' inside words index for field 'f'."""
+    ## determine browse field:
+    if string.find(p, ":") > 0: # does 'p' contain ':'?
+        f, p = split(p, ":", 2)
+    ## wash 'p' argument:
+    p = re_quotes.sub("", p)
+    ## construct 'tl' which defines the tag list (MARC tags) to search in:
+    tl = []
+    if str(f[0]).isdigit() and str(f[1]).isdigit():
+        tl.append(f) # 'f' seems to be okay as it starts by two digits
+    else:
+        # deduce desired MARC tags on the basis of chosen 'f'
+        tl = get_field_tags(f)
+    # start searching:
+    recIDs = {} # will hold dict of {recID1: 1, recID2: 1, ..., }  (unique recIDs, therefore)
+    for t in tl:
+        # deduce into which bibxxx table we will search:
+        digit1, digit2 = int(t[0]), int(t[1])
+        bx = "bib%d%dx" % (digit1, digit2)
+        bibx = "bibrec_bib%d%dx" % (digit1, digit2)
+        if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
+            query = """SELECT bibx.id_bibrec FROM %s AS bibx, %s AS bx
+                        WHERE bx.value='%s' AND bx.tag LIKE '%s%%' AND bibx.id_bibxxx=bx.id""" \
+                     % (bibx, bx, escape_string(p), t)
+        else:
+            query = """SELECT bibx.id_bibrec FROM %s AS bibx, %s AS bx
+                        WHERE bx.value='%s' AND bx.tag='%s' AND bibx.id_bibxxx=bx.id""" \
+                     % (bibx, bx, escape_string(p), t)
+        res = run_sql(query)
+        for row in res:
+            recIDs[row[0]] = 1
+    return len(recIDs)         
 
 def get_mysql_recid_from_aleph_sysno(sysno):
     """Returns MySQL's recID for ALEPH sysno passed in the argument (e.g. "002379334CER").
@@ -1928,12 +1852,12 @@ def get_modification_date(recID):
         out = res[0][0]
     return out
 
-def print_warning(req, msg, type='Tip', prologue='', epilogue='<br>'):
+def print_warning(req, msg, type='', prologue='<br>', epilogue='<br>'):
     "Prints warning message and flushes output."
     if req:
-        req.write('%s<span class="quicknote">' % (prologue))
+        req.write('\n%s<span class="quicknote">' % (prologue))
         if type:
-            req.write('<strong>%s:</strong> ' % type)
+            req.write('%s: ' % type)
         req.write('%s</span>%s' % (msg, epilogue))
 
 def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1, jrec=1, rg=10,
@@ -2415,13 +2339,13 @@ def print_record(recID, format='hb', ot='', decompress=zlib.decompress):
     elif format == "hb-fly":
         # HTML brief called on the fly; suitable for testing brief formats
         out += call_bibformat(recID, "BRIEF_HTML")
-        out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?id=%s">Detailed record</a></span>""" \
+        out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">Detailed record</a></span>""" \
                % (weburl, recID)
 
     elif format == "hd-ejournalsite":
         # HTML brief called on the fly; suitable for testing brief formats
         out += call_bibformat(recID, "EJOURNALSITE")
-        out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?id=%s">Detailed record</a></span>""" \
+        out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">Detailed record</a></span>""" \
                % (weburl, recID)
 
     else:
@@ -2472,13 +2396,13 @@ def print_record(recID, format='hb', ot='', decompress=zlib.decompress):
             alephsysnos = get_fieldvalues(recID, "970__a")
             if len(alephsysnos)>0:
                 alephsysno = alephsysnos[0]
-                out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?sysnb=%s">Detailed record</a></span>""" \
+                out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?sysno=%s">Detailed record</a></span>""" \
                        % (weburl, alephsysno)
             else:
-                out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?id=%s">Detailed record</a></span>""" \
+                out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">Detailed record</a></span>""" \
                        % (weburl, recID)
         else:
-            out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?id=%s">Detailed record</a></span>""" \
+            out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">Detailed record</a></span>""" \
                    % (weburl, recID)
         # ...and the "Mark record" functionality:
         #out += """<span class="moreinfo"> - <input name="recid" type="checkbox" value="%s"> Mark record</span>""" % recID
@@ -2580,7 +2504,7 @@ def wash_url_argument(var, new_type):
 
 def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
                            p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
-                           id="-1", idb="-1", sysnb="", search="SEARCH",
+                           recid="-1", recidb="-1", sysno="", id="-1", idb="-1", sysnb="", action="SEARCH",
                            d1y="", d1m="", d1d="", d2y="", d2m="", d2d=""):
     """Perform search, without checking for authentication.  Return list of recIDs found, if of=id.  Otherwise create web page."""    
     # wash all passed arguments:
@@ -2609,10 +2533,13 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
     m3 = wash_url_argument(m3, 'str')
     sc = wash_url_argument(sc, 'int')
     jrec = wash_url_argument(jrec, 'int')
+    recid = wash_url_argument(recid, 'int')
+    recidb = wash_url_argument(recidb, 'int')
+    sysno = wash_url_argument(sysno, 'str')
     id = wash_url_argument(id, 'int')
     idb = wash_url_argument(idb, 'int')
     sysnb = wash_url_argument(sysnb, 'str')
-    search = wash_url_argument(search, 'str')
+    action = wash_url_argument(action, 'str')
     d1y = wash_url_argument(d1y, 'str')
     d1m = wash_url_argument(d1m, 'str')
     d1d = wash_url_argument(d1d, 'str')
@@ -2620,6 +2547,13 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
     d2m = wash_url_argument(d2m, 'str')
     d2d = wash_url_argument(d2d, 'str')
     day1, day2 = wash_dates(d1y, d1m, d1d, d2y, d2m, d2d)
+    # backwards compatibility (if applicable): id, idb, sysnb -> recid, recidb, sysno
+    if sysnb != "" and sysno == "":
+        sysno = sysnb
+    if id > 0 and recid == -1:
+        recid = id
+    if idb > 0 and recidb == -1:
+        recidb = idb
     # deduce user id:
     try:
         uid = getUid(req)
@@ -2649,16 +2583,16 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         # write header:
         req.write(create_header(cc, as, uid))
         req.write("""<div class="pagebody">""")
-    if sysnb or id>0:
+    if sysno or recid>0:
         ## 1 - detailed record display
-        if sysnb: # ALEPH sysnb is passed, so deduce MySQL id for the record:            
-            id = get_mysql_recid_from_aleph_sysno(sysnb)
+        if sysno: # ALEPH SYS number was passed, so deduce MySQL recID for the record:            
+            recid = get_mysql_recid_from_aleph_sysno(sysno)
         if of=="hb":
             of = "hd"
-        if record_exists(id):
-            if idb<=id: # sanity check
-                idb=id+1
-            print_records(req, range(id,idb), -1, -9999, of, ot)
+        if record_exists(recid):
+            if recidb<=recid: # sanity check
+                recidb=recid+1
+            print_records(req, range(recid,recidb), -1, -9999, of, ot)
         else: # record does not exist
             if of.startswith("h"):
                 (cc, colls_to_display, colls_to_search) = wash_colls(cc, c, sc)
@@ -2675,11 +2609,11 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                           </tr>
                          </table>""" % \
                       (create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
-                                         p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d, search),
+                                         p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d, action),
                        create_google_box(p, f, p1, p2, p3))
                 req.write(out)
-                print_warning(req, "Requested record does not seem to exist.", None, "<p>")
-    elif search == "Browse":
+                print_warning(req, "Requested record does not seem to exist.")
+    elif action == "Browse":
         ## 2 - browse needed
         (cc, colls_to_display, colls_to_search) = wash_colls(cc, c, sc)
         p = wash_pattern(p)
@@ -2697,7 +2631,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                       </tr>
                      </table>""" % \
                   (create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
-                                     p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d, search),
+                                     p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d, action),
                    create_google_box(p, f, p1, p2, p3))
             req.write(out)
         if as==1 or (p1 or p2 or p3):
@@ -2725,7 +2659,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                       </tr>
                      </table>""" % \
                   (create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
-                                     p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d, search),
+                                     p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d, action),
                    create_google_box(p, f, p1, p2, p3))
             req.write(out)
         # run search:
@@ -2806,7 +2740,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                     else: # it is WRD query
                         p3n = re.sub(r'(\w)[^a-zA-Z0-9\s\:](\w)', "\\1 \\2", p3)
                     if of.startswith('h'):
-                        print_warning(req, "No exact match found, trying similar queries...", "", "<p>","<p>")
+                        print_warning(req, "No exact match found, trying similar queries...")
                     results_final = search_pattern(req, "", "", colls_to_search)
                     if p1n:
                         results_tmp = search_pattern(req, p1n, f1, colls_to_search, m1)
@@ -2846,7 +2780,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                     else: # it is WRD query
                         pn = re.sub(r'(\w)[^a-zA-Z0-9\s:](\w)', "\\1 \\2", p)
                     if of.startswith('h'):
-                        print_warning(req, "No exact match found, trying <em>%s</em>..." % pn, "", "<p>","<p>")
+                        print_warning(req, "No exact match found, trying <em>%s</em>..." % pn)
                     results_final = search_pattern(req, pn, f, colls_to_search, None)
                     for coll in colls_to_search:
                         results_final_nb[coll] = results_final[coll]._nbhits
@@ -2855,8 +2789,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         if results_final_nb_total == 0:
             # nope, so try similar queries:
             if of.startswith('h'):
-                print_warning(req, "No exact match found, trying similar queries...", "", "<p>","<p>")
-                req.write("<p>")
+                print_warning(req, "No exact match found, trying similar queries...")
                 if as==1 or (p1 or p2 or p3):
                     if p1:
                         search_pattern(req, p1, f1, colls_to_search, m1, 1)
@@ -2899,7 +2832,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
     # 4 -- write footer:
     if of.startswith('h'):
         req.write("""</div>""") # pagebody end
-        req.write(create_footer())
+        req.write(pagefooteronly())
     elif of.startswith('x'):
         req.write("""</collection>\n""")
     # 5 - return value
@@ -2996,7 +2929,6 @@ def perform_request_log(req, date=""):
 #print wash_field("wau")
 #print print_record(20,"tm","001,245")
 #print create_opft_search_units(None, "PHE-87-13","reportnumber")
-#print get_word_nbhits("of","title")
 #print ":"+wash_pattern("* and % doo * %")+":\n"
 #print ":"+wash_pattern("*")+":\n"
 #print ":"+wash_pattern("ellis* ell* e*%")+":\n"
@@ -3010,5 +2942,5 @@ def perform_request_log(req, date=""):
 #print search_in_bibrec('2002-12-01','2002-12-12')
 #print wash_dates('1980', '', '28', '2003','02','')
 #print type(wash_url_argument("-1",'int'))
-#print browse_in_bibxxx("z", "author", 10)
 </protect>
+
