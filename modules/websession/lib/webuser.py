@@ -229,7 +229,10 @@ def create_user_infobox(uid):
     """Create info box on currenly logged user.""" 
     out = ""
     if isGuestUser(uid):
-        out +=  """guest :: <a class="userinfo" href="%s/youraccount.py/login">login</a>""" % weburl
+        out +=  """guest :: <a class="userinfo" href="%s/youraccount.py/info">info</a>::
+		    	    <a class="userinfo" href="%s/youraccount.py/login">login</a>
+		"""%(weburl,weburl)
+	   	
     else:
         out += """%s ::
 	       <a class="userinfo" href="%s/youraccount.py/account">account</a></strong> ::
