@@ -406,6 +406,34 @@ a.navtrail:hover {
    padding: 3px;
    font-size: normal;
 }
+.latestadditionsbox {
+   color: #000;
+   background: transparent;
+   padding: 5px;
+   margin-top: 5px;
+   margin-bottom: 5px;
+   margin-left: 20px;
+   margin-right: 20px;
+   border-spacing: 5px;
+}
+.latestadditionsboxtimebody {
+   color: #000;
+   background: transparent;
+   padding: 3px;
+   white-space: nowrap;
+   text-align: right;
+   vertical-align: top;
+   font-size: xx-small;
+}
+.latestadditionsboxrecordbody {
+   color: #000;
+   background: transparent;
+   padding: 3px;
+   text-align: left;
+   vertical-align: top;
+   text-align: left;
+   font-size: small;
+}
 .portalbox {
    color: #000;
    background: #fff;
