@@ -332,7 +332,7 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
      <dt>BibRank code:</dt>
      <dd>A unique code that identifies a rank method, is used when running the bibrank daemon and used to name the configuration file for the method.
      </br>The template files includes the necessary parameters for the chosen rank method, and only needs to be edited with the correct tags and paths.
-     </br>For more information, please go to the <a href="%s/admin/bibrank/bibrankadminguide.html">BibRank guide</a> and read the section about adding a rank method</dd>
+     </br>For more information, please go to the <a href="%s/admin/bibrank/guide.html">BibRank guide</a> and read the section about adding a rank method</dd>
     </dl>
     """ % weburl
     text = """
@@ -425,7 +425,7 @@ def perform_modifyrank(rnkid='', rnkcode='', ln=cdslang, template='', cfgfile=''
     output  = """
     <dl>
      <dd>When changing the BibRank code of a rank method, you must also change any scheduled tasks using the old value.
-     </br>For more information, please go to the <a href="%s/admin/bibrank/bibrankadminguide.html">BibRank guide</a> and read the section about modifying a rank method's  BibRank code.</dd>
+     </br>For more information, please go to the <a href="%s/admin/bibrank/guide.html">BibRank guide</a> and read the section about modifying a rank method's  BibRank code.</dd>
     </dl>
     """ % weburl
     
@@ -550,7 +550,7 @@ def perform_deleterank(rnkid, ln=cdslang, confirm=0):
      <dt>WARNING:</dt>
      <dd>When deleting a rank method, you also deletes all data related to the rank method, like translations, which collections
      it was attached to and the data necessary to rank the searchresults. Any scheduled tasks using the deleted rank method will also stop working.
-     </br></br>For more information, please go to the <a href="%s/admin/bibrank/bibrankadminguide.html">BibRank guide</a> and read the section regarding deleting a rank method.</dd>
+     </br></br>For more information, please go to the <a href="%s/admin/bibrank/guide.html">BibRank guide</a> and read the section regarding deleting a rank method.</dd>
     </dl>
     </strong>
     </span>
