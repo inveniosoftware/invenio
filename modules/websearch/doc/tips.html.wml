@@ -172,15 +172,15 @@ in one go.  This page lists several tips and tricks that you may find
 useful to this effect.
 </fr>
 <de>
-<p>Unsere Suchmaschine versucht die zu heute typische
-Websuche-erfahrung anzubieten, die auch zum Beispiel von Populären
-Suchmaschinen als <a href="http://google.com/">Google</a> angeboten
-ist. Die Natur der bibliographischen Suche unterscheidet sich jedoch
-von der Websuche. Wir bieten auch mehrere Erweiterungen an, damit man
-eine komplexe und genaue strukturierte Suche durchführen kann,
-inklusiv eine kombinierte Metadatensuche, Volltextsuche und
-Referenzsuche zugleich. Diese Seite stellt einige Tipps und Tricks
-vor, die man zu diesem Effekt nützlich finden kann.
+<p>Unsere Suchmaschine bietet den heutigen Stand der Web-Such
+Technologie, die auch von bekannten Suchmaschinen wie zum Beispiel
+<a href="http://google.com/">Google</a> angeboten werden. Im Detail
+unterscheidet sich jedoch die bibliographische Suche von einer
+Web-Suche. Wir bieten mehrere Erweiterungen an, damit eine komplexe
+und genau strukturierte Suche möglich wird, inklusiv einer
+kombinierten Metadatensuche, Volltextsuche und Referenzsuche. Diese
+Seite stellt Tipps und Tricks vor, die für eine effektive Suche
+nützlich sind.
 </de>
 <es>
 <p>Our search engine tries to offer today's typical web searching
@@ -233,6 +233,7 @@ in one go.  This page lists several tips and tricks that you may find
 useful to this effect.
 </cz>
 
+<en>
 <h3><strong class="headerboxbodylogo">Index</strong></h3>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
@@ -251,8 +252,158 @@ useful to this effect.
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</en>
+<fr>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</fr>
+<de>
+<h3><strong class="headerboxbodylogo">Inhaltsverzeichnis</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Einfache versus erweiterte Suche</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Grundlagen</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Suche nach Wörtern und Wortgruppen</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolsche Suche</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Spezielle Zeichen und Notation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">Internationale Zeichen</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Trunkierung</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Strukturierte Metadatensuche</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Bereichs-Recherche</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Kombinierte Metadaten-/Volltext-/Zitatsuche</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">FAQ</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">Wie wähle ich am geschicktesten meinen Suchbegriff</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">Wie suche ich nach Publikationen eines bestimmten Autors</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">Wie lasse ich Ergebnisse auf eine bestimmte Weise sortieren</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">Wie bekomme ich Dokumente anderer Server (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">Wie kann ich in verknüpften Volltextdateien suchen</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">Wie kann ich nach Zitaten suchen</a>
+</de>
+<es>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</es>
+<it>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</it>
+<ru>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</ru>
+<sk>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</sk>
+<cz>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</cz>
 
-<h3><a name="simpleadvanced">Simple versus advanced search</a></h3>
+<h3><a name="simpleadvanced">
+<en>Simple versus advanced search</en>
+<fr>Simple versus advanced search</fr>
+<de>Einfache versus erweiterte Suche</de>
+<es>Simple versus advanced search</es>
+<it>Simple versus advanced search</it>
+<ru>Simple versus advanced search</ru>
+<sk>Simple versus advanced search</sk>
+<cz>Simple versus advanced search</cz>
+</a></h3>
 
 <p>The default search mode is <strong>simple search</strong> that
 basically provides you with one input box where you can type your
@@ -361,7 +512,16 @@ use of the simple/advanced terms as found in other search engines.
 would use the simple search interface".  Recall that you can always go
 to the Advanced Search for more query assistance.
         
-<h3><a name="guidance">Search guidance</a></h3>
+<h3><a name="guidance">
+<en>Search guidance</en>
+<fr>Search guidance</fr>
+<de>Grundlagen</de>
+<es>Search guidance</es>
+<it>Search guidance</it>
+<ru>Search guidance</ru>
+<sk>Search guidance</sk>
+<cz>Search guidance</cz>
+</a></h3>
 
 <p>After you submit your query, the search engine will analyze it and
 will try to always guide you in case no exact match could be found.
@@ -388,7 +548,16 @@ for and see what the system says in return.  If you aren't satisfied,
 you would then add/remove words from your query until the satisfactory
 reply.
 
-<h3><a name="words-vs-phrases">Searching for words versus phrases</a></h3>
+<h3><a name="words-vs-phrases">
+<en>Searching for words versus phrases</en>
+<fr>Searching for words versus phrases</fr>
+<de>Suche nach Wörtern und Wortgruppen</de>
+<es>Searching for words versus phrases</es>
+<it>Searching for words versus phrases</it>
+<ru>Searching for words versus phrases</ru>
+<sk>Searching for words versus phrases</sk>
+<cz>Searching for words versus phrases</cz>
+</a></h3>
 
 <p>The default search mode is a <strong>search for words</strong>.  This
 means that any whitespace you type is not significant, but is rather
@@ -465,7 +634,16 @@ what ``phrase search'' usually means in the context of web page search
 engines, the former one is usually an order of magnitude faster if you
 know the precise values you are looking for.
 
-<h3><a name="boolean">Boolean queries</a></h3>
+<h3><a name="boolean">
+<en>Boolean queries</en>
+<fr>Boolean queries</fr>
+<de>Boolsche Suche</de>
+<es>Boolean queries</es>
+<it>Boolean queries</it>
+<ru>Boolean queries</ru>
+<sk>Boolean queries</sk>
+<cz>Boolean queries</cz>
+</a></h3>
 
 We have already seen how whitespace adds a silent boolean AND in the
 search for words.  The other boolean operators include:
@@ -578,7 +756,16 @@ for a pseudo-expression "(ellis and muon) or kaon".  A search for
 "ellis and (muon or kaon)" is to be written as <code>muon or kaon
 ellis</code>.
 
-<h3><a name="punctuation">Special characters and punctuation</a></h3>
+<h3><a name="punctuation">
+<en>Special characters and punctuation</en>
+<fr>Special characters and punctuation</fr>
+<de>Spezielle Zeichen und Notation</de>
+<es>Special characters and punctuation</es>
+<it>Special characters and punctuation</it>
+<ru>Special characters and punctuation</ru>
+<sk>Special characters and punctuation</sk>
+<cz>Special characters and punctuation</cz>
+</a></h3>
 
 <p>When indexing words, an attention is paid to index it both with and
    without punctuation, so that you should be able to search for terms
@@ -632,7 +819,16 @@ ellis</code>.
       </blockquote>
       </form>
 
-<h3><a name="unicode">International characters</a></h3>
+<h3><a name="unicode">
+<en>International characters</en>
+<fr>International characters</fr>
+<de>Internationale Zeichen</de>
+<es>International characters</es>
+<it>International characters</it>
+<ru>International characters</ru>
+<sk>International characters</sk>
+<cz>International characters</cz>
+</a></h3>
 
 <p>The search engine works with Unicode UTF-8 so you can type your
    query strings in any language stored in the database.  For
@@ -662,14 +858,14 @@ ellis</code>.
    <thead>
    <tr>
    <th class="errorboxheader">
-   IMPORTANT NOTE FOR THE CERN SITE
+   IMPORTANT NOTE
    </th>
    </tr>
    </thead>
    <tbody>
    <tr>
    <td class="errorboxbody">
-      At the moment, words including accented characters can only be retrieved by entering
+      Currently, words that include accented characters can only be retrieved by entering
       accented characters in the query.
    </td>
    </tr>
@@ -677,7 +873,16 @@ ellis</code>.
    </table>
 ">
 
-<h3><a name="wildcard">Word truncation/stemming</a></h3>
+<h3><a name="wildcard">
+<en>Word truncation/stemming</en>
+<fr>Word truncation/stemming</fr>
+<de>Trunkierung</de>
+<es>Word truncation/stemming</es>
+<it>Word truncation/stemming</it>
+<ru>Word truncation/stemming</ru>
+<sk>Word truncation/stemming</sk>
+<cz>Word truncation/stemming</cz>
+</a></h3>
 
 <p>The word truncation is supported via asterisk (*) wildcard
    character.  The wildcard instructs the search engine to match any
@@ -737,7 +942,16 @@ ellis</code>.
    database has to be looked up to determine whether it matches or
    not.  (There are currently no partial phrase indexes.)
 
-<h3><a name="structured">Structured metadata search</a></h3>
+<h3><a name="structured">
+<en>Structured metadata search</en>
+<fr>Structured metadata search</fr>
+<de>Strukturierte Metadatensuche</de>
+<es>Structured metadata search</es>
+<it>Structured metadata search</it>
+<ru>Structured metadata search</ru>
+<sk>Structured metadata search</sk>
+<cz>Structured metadata search</cz>
+</a></h3>
 
 <p>Searching within various bibliograpic fields (such as title,
    author) is supported via Google's <code>"site:"</code> like syntax.
@@ -772,7 +986,16 @@ ellis</code>.
     <code>keyword</code>, <code>year</code>, <code>fulltext</code>,
     and <code>reference</code>.
 
-<h3><a name="span">Span queries</a></h3>
+<h3><a name="span">
+<en>Span queries</en>
+<fr>Span queries</fr>
+<de>Bereichs-Recherche</de>
+<es>Span queries</es>
+<it>Span queries</it>
+<ru>Span queries</ru>
+<sk>Span queries</sk>
+<cz>Span queries</cz>
+</a></h3>
 
 <p>The span query is provided via a <code>-></code> sign.  For
 example, to search for all documents on <em>muon decay</em> published
@@ -797,7 +1020,16 @@ J</em> to <em>Ellis, Qqq</em>, type:
       </blockquote>
       </form>
 
-<h3><a name="combined">Combined metadata/fulltext/citation search</a></h3>
+<h3><a name="combined">
+<en>Combined metadata/fulltext/citation search</en>
+<fr>Combined metadata/fulltext/citation search</fr>
+<de>Kombinierte Metadaten-/Volltext-/Zitatsuche</de>
+<es>Combined metadata/fulltext/citation search</es>
+<it>Combined metadata/fulltext/citation search</it>
+<ru>Combined metadata/fulltext/citation search</ru>
+<sk>Combined metadata/fulltext/citation search</sk>
+<cz>Combined metadata/fulltext/citation search</cz>
+</a></h3>
 
 <p>All the syntax mentioned above can be combined together in one
    query.  For example, to find documents that have the word
@@ -847,14 +1079,14 @@ J</em> to <em>Ellis, Qqq</em>, type:
    <thead>
    <tr>
    <th class="errorboxheader">
-   IMPORTANT NOTE FOR THE CERN SITE
+   IMPORTANT NOTE
    </th>
    </tr>
    </thead>
    <tbody>
    <tr>
    <td class="errorboxbody">
-      At the moment, fulltext files and references are not fully searchable on the CERN site.
+      Currently, fulltext files and references are not fully searchable on the CERN site.
       Assumed operational time: Q1 2004.
    </td>
    </tr>
@@ -863,9 +1095,27 @@ J</em> to <em>Ellis, Qqq</em>, type:
 ">
 
 
-<h3><a name="howto">Frequently asked questions</a></h3>
+<h3><a name="howto">
+<en>Frequently asked questions</en>
+<fr>Frequently asked questions</fr>
+<de>FAQ</de>
+<es>Frequently asked questions</es>
+<it>Frequently asked questions</it>
+<ru>Frequently asked questions</ru>
+<sk>Frequently asked questions</sk>
+<cz>Frequently asked questions</cz>
+</a></h3>
 
-<h4><a name="howto-choose-terms">How to wisely choose your search terms (speed-wise)</a></h4>
+<h4><a name="howto-choose-terms">
+<en>How to wisely choose your search terms (speed-wise)</en>
+<fr>How to wisely choose your search terms (speed-wise)</fr>
+<de>Wie wähle ich am geschicktesten meinen Suchbegriff</de>
+<es>How to wisely choose your search terms (speed-wise)</es>
+<it>How to wisely choose your search terms (speed-wise)</it>
+<ru>How to wisely choose your search terms (speed-wise)</ru>
+<sk>How to wisely choose your search terms (speed-wise)</sk>
+<cz>How to wisely choose your search terms (speed-wise)</cz>
+</a></h4>
 <p>
 <ul>
 <li>Whenever possible, prefer word searches instead of phrase searches.
@@ -878,7 +1128,16 @@ J</em> to <em>Ellis, Qqq</em>, type:
     <a href="<WEBURL>/?c=Theses">Theses</a> collection first, and start your search from there.
 </ul>
 
-<h4><a name="howto-search-for-author">How to search for publications by a given author</a></h4>
+<h4><a name="howto-search-for-author">
+<en>How to search for publications by a given author</en>
+<fr>How to search for publications by a given author</fr>
+<de>Wie suche ich nach Publikationen eines bestimmten Autors</de>
+<es>How to search for publications by a given author</es>
+<it>How to search for publications by a given author</it>
+<ru>How to search for publications by a given author</ru>
+<sk>How to search for publications by a given author</sk>
+<cz>How to search for publications by a given author</cz>
+</a></h4>
 
 <p>You can search for an author in many ways, each having its own
 advantages and disadvantages.
@@ -1001,7 +1260,16 @@ they could work with you on inputting a consistently spelled and
 properly formatted first name everywhere.  Only the consistent
 database content will ensure a proper author searching behaviour.
 
-<h4><a name="howto-sort-pattern">How to sort according to a certain pattern</a></h4>
+<h4><a name="howto-sort-pattern">
+<en>How to sort according to a certain pattern</en>
+<fr>How to sort according to a certain pattern</fr>
+<de>Wie lasse ich Ergebnisse auf eine bestimmte Weise sortieren</de>
+<es>How to sort according to a certain pattern</es>
+<it>How to sort according to a certain pattern</it>
+<ru>How to sort according to a certain pattern</ru>
+<sk>How to sort according to a certain pattern</sk>
+<cz>How to sort according to a certain pattern</cz>
+</a></h4>
 
 <p>You may select a certain field according to which sort the search
    results, for example to sort the results by main title.  However,
@@ -1038,7 +1306,16 @@ database content will ensure a proper author searching behaviour.
    href="<WEBURL>/search.py?p=reportnumber%3A%22CERN-TH-2001*%22&sf=reportnumber&so=a&sp=CERN-TH">nicely
    sorted list</a> of all CERN-TH 2001 publications.
 
-<h4><a name="howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a></h4>
+<h4><a name="howto-hepdoc">
+<en>How to get documents from other servers (Google, SPIRES, KEK)</en>
+<fr>How to get documents from other servers (Google, SPIRES, KEK)</fr>
+<de>Wie bekomme ich Dokumente anderer Server (Google, SPIRES, KEK)</de>
+<es>How to get documents from other servers (Google, SPIRES, KEK)</es>
+<it>How to get documents from other servers (Google, SPIRES, KEK)</it>
+<ru>How to get documents from other servers (Google, SPIRES, KEK)</ru>
+<sk>How to get documents from other servers (Google, SPIRES, KEK)</sk>
+<cz>How to get documents from other servers (Google, SPIRES, KEK)</cz>
+</a></h4>
 
 <p>On the search results page, links to other servers like <a
 href="http://google.com/">Google</a>, <a
@@ -1072,7 +1349,16 @@ support it.  For example, SPIRES or KEK cannot search for terms within
    you will see that KEK proposes &quot;scanned images&quot; that you can download.
 ">
 
-<h4><a name="howto-fulltext">How to search in fulltext files</a></h4>
+<h4><a name="howto-fulltext">
+<en>How to search in fulltext files</en>
+<fr>How to search in fulltext files</fr>
+<de>Wie kann ich in verknüpften Volltextdateien suchen</de>
+<es>How to search in fulltext files</es>
+<it>How to search in fulltext files</it>
+<ru>How to search in fulltext files</ru>
+<sk>How to search in fulltext files</sk>
+<cz>How to search in fulltext files</cz>
+</a></h4>
 
 <p>If a metadata record contains some associated fulltext files, <CDSNAMEINTL>
 tries to extract the textual information from the files and index it into a separate <code>fulltext</code> index.
@@ -1106,14 +1392,14 @@ metadata or in the fulltext, type:
    <thead>
    <tr>
    <th class="errorboxheader">
-   IMPORTANT NOTE FOR THE CERN SITE
+   IMPORTANT NOTE
    </th>
    </tr>
    </thead>
    <tbody>
    <tr>
    <td class="errorboxbody">
-      At the moment, the fulltext indexes aren't available on the CERN site.  
+      Currently, the fulltext indexes aren't available on the CERN site.  
       Assumed operational time: Q1 2004.
       Please use the
       <a href="http://weblib.cern.ch/fulltext.shtml">old fulltext interface</a>
@@ -1124,7 +1410,16 @@ metadata or in the fulltext, type:
    </table>
 ">
 
-<h4><a name="howto-citations">How to search for citations</a></h4>
+<h4><a name="howto-citations">
+<en>How to search for citations</en>
+<fr>How to search for citations</fr>
+<de>Wie kann ich nach Zitaten suchen</de>
+<es>How to search for citations</es>
+<it>How to search for citations</it>
+<ru>How to search for citations</ru>
+<sk>How to search for citations</sk>
+<cz>How to search for citations</cz>
+</a></h4>
 
 <p>If a metadata record contains an associated fulltext file, <CDSNAMEINTL>
 tries to extract references automatically from that file and index
@@ -1180,14 +1475,14 @@ For example, to find all articles on <em>standard model</em> that aren't written
    <thead>
    <tr>
    <th class="errorboxheader">
-   IMPORTANT NOTE FOR THE CERN SITE
+   IMPORTANT NOTE
    </th>
    </tr>
    </thead>
    <tbody>
    <tr>
    <td class="errorboxbody">
-      At the moment, the reference indexes aren't available on the CERN site.
+      Currently, the reference indexes aren't available on the CERN site.
       The citation search is therefore impossible at the moment.
       Assumed operational time: Q1 2004.
    </td>
