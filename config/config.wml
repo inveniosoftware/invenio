@@ -28,21 +28,23 @@
 
 ## This file ('config.wml') consists of several relatively independent 
 ## configuration parts:
-##   Part 1: CDS internal parameters
+##   Part 1: Important parameters
 ##   Part 2: CDS OAI parameters
 ##   Part 3: CDS page elements
 ##   Part 4: CDS navigation bar
+##   Part 5: WebSearch WML Parameters 
+##   Part 6: WebSubmit WML Parameters 
 ## The configuration is done by editing the content of the "define-tag" 
 ## WML elements below.  Feel free to edit as many as you need.  When done,
 ## return to the main CDSware source directory and type 'make'.  Good luck! :-)
 
-#####################################
-## Part 1: CDS internal parameters ##
-#####################################
+###################################
+## Part 1:  Important parameters ##
+###################################
 
 ## This part defines essential CDSware internal parameters that
-## influence general CDSware behaviour, like the name of the server,
-## the behaviour of alerting engine, etc.
+## everybody should modify, like the name of the server or the email
+## address of the local CDSware administrator.  
 
 ## CDSNAME -- the name of this particular CDSware installation:  
 ##  (example: "CERN Document Server")
@@ -51,15 +53,15 @@ Atlantis Institute of Science
 </define-tag>
 
 ## RUNTIMELOGDIR -- the dir of the CDS and OAI runtime log files:
-##  (example: "/log/cdsweb/cdsdemoruntimelogs")
+##  (example: "/log/cdsware/cdsdemoruntimelogs")
 <define-tag RUNTIMELOGDIR whitespace=delete>
-/log/cdsweb/cdsdemoruntimelogs
+/log/cdsware/cdsdemoruntimelogs
 </define-tag>
 
 ## ALERTENGINEEMAIL -- the email address from which the alert emails will appear to be send:
-##  (example: "cds.alert@cdsweb.cern.ch")
+##  (example: "cds.alert@cdsware.cern.ch")
 <define-tag ALERTENGINEEMAIL whitespace=delete>
-cds.alert@cdsweb.cern.ch
+cds.alert@cdsware.cern.ch
 </define-tag>
 
 ## SUPPORTEMAIL -- the email address of the support team for this installation:
@@ -67,83 +69,13 @@ cds.alert@cdsweb.cern.ch
 cds.support@cern.ch
 </define-tag>
 
-## ALERTMAXNUMDOCS -- the maximum number of document notices that the alert engine sends by email:
-##  (example: "50")
-<define-tag ALERTMAXNUMDOCS whitespace=delete>
-50
+## ADMINEMAIL -- the email address of the 'superuser' for this installation:
+<define-tag ADMINEMAIL whitespace=delete>
+cds.support@cern.ch
 </define-tag>
 
 ################################
-## Part 2: CDS OAI parameters ##
-################################
-
-## This part defines OAI parameters for the current installation of
-## CDSware OAI repository.
-
-## OAIIDSCHEME -- OAI identifier scheme:  
-##  (example: "oai")
-<define-tag OAIIDSCHEME whitespace=delete>
-oai
-</define-tag>
-
-## OAIIDPREFIX -- OAI identifier prefix:  
-##  (example: "cds.cern.ch")
-<define-tag OAIIDPREFIX whitespace=delete>
-cds.cern.ch
-</define-tag>
-
-## OAISAMPLEIDENTIFIER -- OAI sample identifier:  
-##  (example: "oai:cds.cern.ch:CERN-TH-4036")
-<define-tag OAISAMPLEIDENTIFIER whitespace=delete>
-<OAIIDSCHEME>:<OAIIDPREFIX>:CERN-TH-4036
-</define-tag>
-
-## OAIIDENTIFYDESCRIPTION -- description for the OAI Identify verb (optional):
-## (example:"")
-
-<define-tag OAIIDENTIFYDESCRIPTION whitespace=delete>
- <description>
-   <oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier
-                                       http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">
-      <scheme>
-       <OAIIDSCHEME>
-      </scheme>
-      <repositoryIdentifier>
-       <OAIIDPREFIX>
-      </repositoryIdentifier>
-      <delimiter>
-       :
-      </delimiter>
-      <sampleIdentifier>
-       <OAISAMPLEIDENTIFIER>
-      </sampleIdentifier>
-   </oai-identifier>
- </description>
- <description>
-  <eprints xmlns="http://www.openarchives.org/OAI/1.1/eprints"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://www.openarchives.org/OAI/1.1/eprints
-                               http://www.openarchives.org/OAI/1.1/eprints.xsd">
-      <content>
-       <URL>http://foo.com</URL>
-      </content>
-      <metadataPolicy>
-       <text>Free and unlimited use by anybody with obligation to refer to original record</text>
-      </metadataPolicy>
-      <dataPolicy>
-       <text>Full content, i.e. preprints may not be harvested by robots</text>
-      </dataPolicy>
-      <submissionPolicy>
-       <text>Submission restricted. Submitted documents are subject of approval by OAI repository admins.</text>
-      </submissionPolicy>
-  </eprints>
- </description>
-</define-tag>
-
-################################
-## Part 3: CDS page elements ##
+## Part 2: CDS page elements ##
 ################################
 
 ## This part defines CDS portal-like page style and its elements.
@@ -259,17 +191,109 @@ cds.cern.ch
 </define-tag>
 
 ################################
-## Part 4: CDS navigation bar ##
+## Part 3: CDS navigation bar ##
 ################################
 
 ## The navigation bar and sub-bars are defined in a separate
 ## "cdsnavbar.wml" file.  You may want to modify it now, if you
 ## really know what you are doing. :-)
 
-#####################################
-## Part 5: WebSubmit Configuration ##
-#####################################
+######################################
+## Part 4: WebSearch WML Parameters ##
+######################################
 
+## This section contains some WML-based configuration parameters for
+## WebSearch module.  Please note that WebSearch is mostly configured
+## on run-time via its WebSearch Admin web interface.  The parameters
+## below are the ones that you do not probably want to modify during
+## the runtime.
+
+## ALERTMAXNUMDOCS -- the maximum number of document notices that the alert engine sends by email:
+##  (example: "50")
+<define-tag ALERTMAXNUMDOCS whitespace=delete>
+50
+</define-tag>
+
+######################################
+## Part 5: WebSearch OAI parameters ##
+######################################
+
+## This part defines OAI parameters for the current installation of
+## CDSware OAI repository.
+
+## OAIIDSCHEME -- OAI identifier scheme:  
+##  (example: "oai")
+<define-tag OAIIDSCHEME whitespace=delete>
+oai
+</define-tag>
+
+## OAIIDPREFIX -- OAI identifier prefix:  
+##  (example: "cds.cern.ch")
+<define-tag OAIIDPREFIX whitespace=delete>
+cds.cern.ch
+</define-tag>
+
+## OAISAMPLEIDENTIFIER -- OAI sample identifier:  
+##  (example: "oai:cds.cern.ch:CERN-TH-4036")
+<define-tag OAISAMPLEIDENTIFIER whitespace=delete>
+<OAIIDSCHEME>:<OAIIDPREFIX>:CERN-TH-4036
+</define-tag>
+
+## OAIIDENTIFYDESCRIPTION -- description for the OAI Identify verb (optional):
+## (example:"")
+
+<define-tag OAIIDENTIFYDESCRIPTION whitespace=delete>
+ <description>
+   <oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier
+                                       http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">
+      <scheme>
+       <OAIIDSCHEME>
+      </scheme>
+      <repositoryIdentifier>
+       <OAIIDPREFIX>
+      </repositoryIdentifier>
+      <delimiter>
+       :
+      </delimiter>
+      <sampleIdentifier>
+       <OAISAMPLEIDENTIFIER>
+      </sampleIdentifier>
+   </oai-identifier>
+ </description>
+ <description>
+  <eprints xmlns="http://www.openarchives.org/OAI/1.1/eprints"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.openarchives.org/OAI/1.1/eprints
+                               http://www.openarchives.org/OAI/1.1/eprints.xsd">
+      <content>
+       <URL>http://foo.com</URL>
+      </content>
+      <metadataPolicy>
+       <text>Free and unlimited use by anybody with obligation to refer to original record</text>
+      </metadataPolicy>
+      <dataPolicy>
+       <text>Full content, i.e. preprints may not be harvested by robots</text>
+      </dataPolicy>
+      <submissionPolicy>
+       <text>Submission restricted. Submitted documents are subject of approval by OAI repository admins.</text>
+      </submissionPolicy>
+  </eprints>
+ </description>
+</define-tag>
+
+######################################
+## Part 6: WebSubmit WML Parameters ##
+######################################
+
+## This section contains some WML-based configuration parameters for
+## WebSubmit module.  Please note that WebSubmit is mostly configured
+## on run-time via its WebSubmit Admin web interface.  The parameters
+## below are the ones that you do not probably want to modify during
+## the runtime.
+
+## v0.0.9: you probably do not want to change these
 <define-tag AUTHENTICATE whitespace=delete>
 TRUE
 </define-tag>
@@ -298,13 +322,10 @@ TRUE
 <HTDOCSDIR>submit/storage
 </define-tag>
 
-<define-tag ADMINEMAIL whitespace=delete>
-cds.support@cern.ch
-</define-tag>
-
-<define-tag SUBMITSUPPORTEMAIL whitespace=delete>
-</define-tag>
-
+##########################
+##  THAT's ALL, FOLKS!  ##
+##########################
+  
 ## And this is the end of "config.wml" WML configuration phase.  Now
 ## please return to the main CDS source directory and type 'make'.
 ## (Note: if you have bravely edited the "cdsnavbar.wml" file too,
