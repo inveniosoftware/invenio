@@ -191,10 +191,10 @@ via both a high-level and low-level API interface.
                      internal information on the searching process in case
                      something goes wrong.         
 
-               ap - alternative patterns (0=no, 1=yes).  In case no exact
-                    match is found, the search engine can try alternative
-                    patterns e.g. to replace non-alphanumeric characters by
-                    a boolean query.  ap defines if this is wanted.          
+                ap - alternative patterns (0=no, 1=yes).  In case no exact
+                     match is found, the search engine can try alternative
+                     patterns e.g. to replace non-alphanumeric characters by
+                     a boolean query.  ap defines if this is wanted.          
           """
        
    Examples:
