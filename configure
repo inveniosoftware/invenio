@@ -2441,16 +2441,16 @@ echo "$as_me: WARNING:
    <http://www.squarebox.co.uk/download/>." >&2;}
 fi
 
-# Extract the first word of "ppm2gif", so it can be a program name with args.
-set dummy ppm2gif; ac_word=$2
+# Extract the first word of "ppmtogif", so it can be a program name with args.
+set dummy ppmtogif; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_PPM2GIF+set}" = set; then
+if test "${ac_cv_path_PPMTOGIF+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  case $PPM2GIF in
+  case $PPMTOGIF in
   [\\/]* | ?:[\\/]*)
-  ac_cv_path_PPM2GIF="$PPM2GIF" # Let the user override the test with a path.
+  ac_cv_path_PPMTOGIF="$PPMTOGIF" # Let the user override the test with a path.
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
@@ -2460,7 +2460,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_PPM2GIF="$as_dir/$ac_word$ac_exec_ext"
+    ac_cv_path_PPMTOGIF="$as_dir/$ac_word$ac_exec_ext"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -2470,30 +2470,30 @@ done
   ;;
 esac
 fi
-PPM2GIF=$ac_cv_path_PPM2GIF
+PPMTOGIF=$ac_cv_path_PPMTOGIF
 
-if test -n "$PPM2GIF"; then
-  echo "$as_me:$LINENO: result: $PPM2GIF" >&5
-echo "${ECHO_T}$PPM2GIF" >&6
+if test -n "$PPMTOGIF"; then
+  echo "$as_me:$LINENO: result: $PPMTOGIF" >&5
+echo "${ECHO_T}$PPMTOGIF" >&6
 else
   echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
-if test -z "$PPM2GIF"; then
+if test -z "$PPMTOGIF"; then
    { echo "$as_me:$LINENO: WARNING:
-   ppm2gif was not found in your path.  It is used in
+   ppmtogif was not found in your path.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
-   the configure script.  Ppm2gif is available from
+   the configure script.  Ppmtogif is available from
    <http://www.acme.com/software/pbmplus/>." >&5
 echo "$as_me: WARNING:
-   ppm2gif was not found in your path.  It is used in
+   ppmtogif was not found in your path.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
-   the configure script.  Ppm2gif is available from
+   the configure script.  Ppmtogif is available from
    <http://www.acme.com/software/pbmplus/>." >&2;}
 fi
 
@@ -2811,7 +2811,7 @@ ac_config_commands="$ac_config_commands default-19"
 ac_config_commands="$ac_config_commands default-20"
 
 
-ac_config_files="$ac_config_files Makefile config/Makefile config/configbis.wml cgibin/Makefile dbutil/Makefile htdocs/Makefile htdocs/img/Makefile htdocs/errors/Makefile htdocs/submit/Makefile htdocs/submit/docs/Makefile htdocs/submit/docs/english/Makefile htdocs/submit/access/Makefile htdocs/submit/access/protected/Makefile htdocs/submit/MESS/Makefile htdocs/submit/MESS/functions/Makefile htdocs/submit/mycds/Makefile htdocs/submit/bibformat/Makefile htdocs/submit/bibformat/config/Makefile htdocs/submit/publiline/Makefile htdocs/submit/publiline/inotes/Makefile htdocs/personalize/Makefile htdocs/docs/Makefile htdocs/bibformat/Makefile htdocs/bibformat/core/Makefile htdocs/bibformat/common/Makefile htdocs/admin/Makefile htdocs/admin/howto/Makefile htdocs/admin/bibconvert/Makefile htdocs/admin/bibdata/Makefile htdocs/admin/bibformat/Makefile htdocs/admin/bibharvest/Makefile htdocs/admin/bibupload/Makefile htdocs/admin/bibwords/Makefile htdocs/admin/webaccess/Makefile htdocs/admin/websearch/Makefile htdocs/admin/websubmit/Makefile htdocs/admin/websubmit/docs/Makefile htdocs/admin/websubmit/docs/english/Makefile htdocs/admin/webperso/Makefile"
+ac_config_files="$ac_config_files Makefile config/Makefile config/configbis.wml cgibin/Makefile dbutil/Makefile htdocs/Makefile htdocs/img/Makefile htdocs/errors/Makefile htdocs/submit/Makefile htdocs/submit/docs/Makefile htdocs/submit/docs/english/Makefile htdocs/submit/access/Makefile htdocs/submit/access/protected/Makefile htdocs/submit/MESS/Makefile htdocs/submit/MESS/functions/Makefile htdocs/submit/mycds/Makefile htdocs/submit/bibconvert/Makefile htdocs/submit/bibconvert/config/Makefile htdocs/submit/bibconvert/KB/Makefile htdocs/submit/publiline/Makefile htdocs/submit/publiline/inotes/Makefile htdocs/personalize/Makefile htdocs/docs/Makefile htdocs/bibformat/Makefile htdocs/bibformat/core/Makefile htdocs/bibformat/common/Makefile htdocs/admin/Makefile htdocs/admin/howto/Makefile htdocs/admin/bibconvert/Makefile htdocs/admin/bibdata/Makefile htdocs/admin/bibformat/Makefile htdocs/admin/bibharvest/Makefile htdocs/admin/bibupload/Makefile htdocs/admin/bibwords/Makefile htdocs/admin/webaccess/Makefile htdocs/admin/websearch/Makefile htdocs/admin/websubmit/Makefile htdocs/admin/websubmit/docs/Makefile htdocs/admin/websubmit/docs/english/Makefile htdocs/admin/webperso/Makefile"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -3354,8 +3354,9 @@ do
   "htdocs/submit/MESS/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/submit/MESS/Makefile" ;;
   "htdocs/submit/MESS/functions/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/submit/MESS/functions/Makefile" ;;
   "htdocs/submit/mycds/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/submit/mycds/Makefile" ;;
-  "htdocs/submit/bibformat/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/submit/bibformat/Makefile" ;;
-  "htdocs/submit/bibformat/config/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/submit/bibformat/config/Makefile" ;;
+  "htdocs/submit/bibconvert/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/submit/bibconvert/Makefile" ;;
+  "htdocs/submit/bibconvert/config/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/submit/bibconvert/config/Makefile" ;;
+  "htdocs/submit/bibconvert/KB/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/submit/bibconvert/KB/Makefile" ;;
   "htdocs/submit/publiline/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/submit/publiline/Makefile" ;;
   "htdocs/submit/publiline/inotes/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/submit/publiline/inotes/Makefile" ;;
   "htdocs/personalize/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/personalize/Makefile" ;;
@@ -3506,7 +3507,7 @@ s,@GIFTEXT@,$GIFTEXT,;t t
 s,@GIFINTER@,$GIFINTER,;t t
 s,@GIFRSIZE@,$GIFRSIZE,;t t
 s,@JPEGSIZE@,$JPEGSIZE,;t t
-s,@PPM2GIF@,$PPM2GIF,;t t
+s,@PPMTOGIF@,$PPMTOGIF,;t t
 s,@PPMQUANT@,$PPMQUANT,;t t
 s,@PNMSCALE@,$PNMSCALE,;t t
 s,@PERL@,$PERL,;t t

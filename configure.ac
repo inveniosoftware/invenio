@@ -218,14 +218,14 @@ if test -z "$JPEGSIZE"; then
 fi
 
 dnl Check for Ppmtogif:
-AC_PATH_PROG(PPM2GIF, ppm2gif)
-if test -z "$PPM2GIF"; then
+AC_PATH_PROG(PPMTOGIF, ppmtogif)
+if test -z "$PPMTOGIF"; then
    AC_MSG_WARN([
-   ppm2gif was not found in your path.  It is used in 
+   ppmtogif was not found in your path.  It is used in 
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware 
    functionality.  We recommend you to install it first and to rerun 
-   the configure script.  Ppm2gif is available from
+   the configure script.  Ppmtogif is available from
    <http://www.acme.com/software/pbmplus/>.])
 fi
 
@@ -385,6 +385,7 @@ AC_OUTPUT(Makefile \
 	  htdocs/submit/mycds/Makefile \
 	  htdocs/submit/bibconvert/Makefile \
 	  htdocs/submit/bibconvert/config/Makefile \
+	  htdocs/submit/bibconvert/KB/Makefile \
 	  htdocs/submit/publiline/Makefile \
 	  htdocs/submit/publiline/inotes/Makefile \
 	  htdocs/personalize/Makefile \
