@@ -41,14 +41,14 @@ def Send_SRV_Mail(parameters,curdir,form):
     # variables declaration
     FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
     addresses = parameters['addressesSRV']
-    if os.path.exists("%s/%s" % (curdir,parameters['emailFile'])):
+    if parameters['emailFile']!=None and parameters['emailFile']!="" and os.path.exists("%s/%s" % (curdir,parameters['emailFile'])):
         fp = open("%s/%s" % (curdir,parameters['emailFile']), "r")
         SuE = fp.read()
         fp.close()
     else:
         SuE = ""
     SuE = SuE.replace("\n",",")
-    if os.path.exists("%s/%s" % (curdir,parameters['noteFile'])):
+    if parameters['noteFile']!=None and parameters['noteFile']!= "" and os.path.exists("%s/%s" % (curdir,parameters['noteFile'])):
         fp = open("%s/%s" % (curdir,parameters['noteFile']), "r")
         note = fp.read()
         fp.close()
