@@ -27,7 +27,7 @@
 </p>
 
 <dl>
- <dt><a href="websearchadmin.py">Edit Collection Tree</a></dt>
+ <dt><a href="websearchadmin.py">WebSearch Admin Interface</a></dt>
  <dd>Start area for WebSearch administration.</dd>
 </dl>
 <dl>

@@ -1589,7 +1589,7 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
 
     extra = """<dl>
      <dt><b>Help:</b></dt>
-     <dd>For documentation, take a look at the <a href="%s/admin/websearch/websearchadminguide.html">Websearch Admin Guide</a>.</dd>
+     <dd>For documentation, take a look at the <a href="%s/admin/websearch/guide.html">Websearch Admin Guide</a>.</dd>
     </dl>
     """ % weburl
     
