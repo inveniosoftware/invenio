@@ -41,18 +41,12 @@ oaiidentifydescription = """<OAIIDENTIFYDESCRIPTION>"""
 oaiidfield             =   "<OAIIDTAG>"
 oaisetfield            =   "<OAISETTAG>"
 
-try:
-    import sys
-    import urllib
-    sys.path.append('%s' % pylibdir)
-    from cdsware.config import *
-    from cdsware.dbquery import run_sql
-    from cdsware import oai_repository
-except ImportError, e:
-    import sys
-    sys.stderr.write("Error: %s" % e)
-    sys.exit(1)
-
+import sys
+import urllib
+sys.path.append('%s' % pylibdir)
+from cdsware.config import *
+from cdsware.dbquery import run_sql
+from cdsware import oai_repository
 
 def index (req):
     "OAI repository interface"

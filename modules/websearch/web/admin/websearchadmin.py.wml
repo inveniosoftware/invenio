@@ -30,22 +30,17 @@
 ## fill config variables:
 pylibdir = "<LIBDIR>/python"
 
-try:
-    import cgi
-    import os
-    import sys
-    import urllib
-    sys.path.append('%s' % pylibdir)
-    from cdsware.config import *
-    from cdsware import search_engine
-    from cdsware.webpage import page, pageheaderonly, pagefooteronly
-    from cdsware.webuser import getUid
-    from cdsware.dbquery import run_sql
-    from mod_python import apache
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+import cgi
+import os
+import sys
+import urllib
+sys.path.append('%s' % pylibdir)
+from cdsware.config import *
+from cdsware import search_engine
+from cdsware.webpage import page, pageheaderonly, pagefooteronly
+from cdsware.webuser import getUid
+from cdsware.dbquery import run_sql
+from mod_python import apache
 
 __version__ = "$Id$"
 

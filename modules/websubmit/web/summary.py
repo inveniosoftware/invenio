@@ -31,30 +31,20 @@
 pylibdir = "<LIBDIR>/python"
 <protect>
 ## import interesting modules:
-try:
-    import string
-    import os
-    import sys
-    import time
-    import MySQLdb
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+import string
+import os
+import sys
+import time
+import MySQLdb
 
-try:
-    sys.path.append('%s' % pylibdir)
-    from cdsware.config import *
-    from cdsware.dbquery import run_sql
-    from cdsware.access_control_engine import acc_authorize_action
-    from cdsware.websubmit_config import *
-    from cdsware.webpage import page, create_error_box
-    from cdsware.webuser import getUid,get_email
-    from cdsware.messages import *
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+sys.path.append('%s' % pylibdir)
+from cdsware.config import *
+from cdsware.dbquery import run_sql
+from cdsware.access_control_engine import acc_authorize_action
+from cdsware.websubmit_config import *
+from cdsware.webpage import page, create_error_box
+from cdsware.webuser import getUid,get_email
+from cdsware.messages import *
 
 def index(req,doctype="",act="",access="",indir=""):
     t=""    

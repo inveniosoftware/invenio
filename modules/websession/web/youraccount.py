@@ -31,23 +31,17 @@ __lastupdated__ = """<: print `date +"%d %b %Y %H:%M:%S %Z"`; :>"""
 ## fill config variables:
 pylibdir = "<LIBDIR>/python"
 
-try:
-    import sys
-    sys.path.append('%s' % pylibdir)
-    from cdsware import webuser
-    from cdsware.config import *
-    from cdsware.webpage import page
-    from cdsware import webaccount
-    from cdsware import webbasket
-    from cdsware import webalert
-    from cdsware import webuser
-    from mod_python import apache    
-    import smtplib
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
-
+import sys
+sys.path.append('%s' % pylibdir)
+from cdsware import webuser
+from cdsware.config import *
+from cdsware.webpage import page
+from cdsware import webaccount
+from cdsware import webbasket
+from cdsware import webalert
+from cdsware import webuser
+from mod_python import apache    
+import smtplib
 
 def set(req):
     uid = webuser.getUid(req)
