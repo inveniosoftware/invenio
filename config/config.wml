@@ -142,28 +142,57 @@ cds.support@cern.ch
 ## CDSPAGEHEADER -- eventual global HTML page header:
 ##  (example: "")
 <define-tag CDSPAGEHEADER>
-<table class=header border=0 cellspacing=0 cellpadding=0 width="100%">
-  <tr>
-    <td>
-      <table class=header border=0 cellspacing=0 cellpadding=0>
-        <tr>
-          <td class=headerselected align=left>&nbsp;<small><strong><CDSNAME></strong></small>&nbsp;</td>
-          <td align=left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-          <td align=left><small><a href="<WEBURL>">SEARCH</a></small></td>
-          <td align=left><small>&nbsp;&nbsp;::&nbsp;&nbsp;</small></td>
-          <td align=left><small><a href="<WEBURL>/submit/">SUBMIT</a></small></td>
-          <td align=left><small>&nbsp;&nbsp;::&nbsp;&nbsp;</small></td>
-          <td align=left><small><a href="<WEBURL>/youraccount.py/display">PERSONALIZE</a></small></td>
-          <td align=left><small>&nbsp;&nbsp;::&nbsp;&nbsp;</small></td>
-          <td align=left><small><a href="<WEBURL>/yourbaskets.py/display">BASKETS</a></small></td>
-          <td align=left><small>&nbsp;&nbsp;::&nbsp;&nbsp;</small></td>
-          <td align=left><small><a href="<WEBURL>/youralerts.py/list_alerts">ALERTS</a></small></td>
-          <td align=left><small>&nbsp;&nbsp;::&nbsp;&nbsp;</small></td>
-          <td align=left><small><a href="<WEBURL>/help/">HELP</a></small></td>
-        </tr>
-      </table>
-    </td>
-  </tr>
+<table border=0 cellspacing=0 cellpadding=0>
+ <tr>
+  <td style="border-bottom: 2px solid #3366cc;" valign="bottom">
+   <span class=headline><big><strong><CDSNAME></strong></big></span>
+  </td>
+  <td style="border-bottom: 2px solid #3366cc;" valign="bottom">
+   <table border=0 cellspacing=0 cellpadding=0>
+     <tr>
+       <td width=45>
+             &nbsp;
+       </td>
+       <td width=95 class=headerselected align=center valign=bottom>
+             <small><strong><a class=header href="<WEBURL>">SEARCH</a></strong></small>
+       </td>
+       <td width=15>
+             &nbsp;
+       </td>
+       <td width=95 class=headerselected align=center valign=bottom>
+             <small><strong><a class=header href="<WEBURL>/submit/">SUBMIT</a></strong></small>
+       </td>
+       <td width=15>
+             &nbsp;
+       </td>
+       <td width=95 class=headerselected align=center valign=bottom>
+             <small><strong><a class=header href="<WEBURL>/youraccount.py/display">PERSONALIZE</a></strong></small>
+       </td>
+       <td width=15>
+             &nbsp;
+       </td>
+       <td width=95 class=headerselected align=center valign=bottom>
+             <small><strong><a class=header href="<WEBURL>/yourbaskets.py/display">BASKETS</a></strong></small>
+       </td>
+       <td width=15>
+             &nbsp;
+       </td>
+       <td width=95 class=headerselected align=center valign=bottom>
+             <small><strong><a class=header href="<WEBURL>/youralerts.py/list_alerts">ALERTS</a></strong></small>
+       </td>
+       <td width=15>
+             &nbsp;
+       </td>
+       <td width=95 class=headerselected align=center valign=bottom>
+             <small><strong><a class=header href="<WEBURL>/help/">HELP</a></strong></small>
+       </td>
+       <td width=30>
+             &nbsp;
+       </td>
+     </tr>
+   </table>
+  </td>
+ </tr>
 </table>
 </define-tag>
 

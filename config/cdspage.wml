@@ -24,10 +24,10 @@
 
 ## include navigation trail and bar definitions:
 #include "cdsnavtrail.wml" \
-   header="<br><table width=100% border=0 cellpadding=0 cellspacing=0><tr class=navtrail><td width=3%>&nbsp;</td><td><small><small><a class=navtrail href='<WEBURL>'><CDSNAME></a> &gt; " \
+   header="<br><table class=navtrailbox border=0 cellpadding=0 cellspacing=0><tr><td width=15>&nbsp;</td><td class=navtrailboxbody><a class=navtrail href='<WEBURL>'><CDSNAME></a> &gt; " \
    prolog="" \
    epilog="&gt;" \
-   footer="$(title)</small></small></td></tr></table>"
+   footer="$(title)</td></tr></table>"
 #include "cdsnavbar.wml"
 
 ## HTML header:
@@ -103,9 +103,9 @@ $(cdspageheaderadd)
    ### Stripe 2: CDS page body
 <:    
     if ('$(navtrail_position)' =~ /\w/) {
-        print '<table width="100%" class="navtrail" border=0 cellspacing=0 cellpadding=2><tr class="navtrail"><td align=left><small><small>$(navtrail_position) &gt; $(title)</small></small></td></tr></table>';
+        print '<table class="navtrailbox" border=0 cellspacing=0 cellpadding=0><tr><td width="15">&nbsp;</td><td class="navtrailboxbody" align="left">$(navtrail_position) &gt; $(title)</td></tr></table>';
     } elsif ('$(navtrail_body)' =~ /\w/) {
-        print '<table width="100%" class="navtrail" border=0 cellspacing=0 cellpadding=2><tr class="navtrail"><td align=left><small><small>$(navtrail_body)</small></small></td></tr></table>';
+        print '<table class="navtrailbox" border=0 cellspacing=0 cellpadding=0><tr><td width="15">&nbsp;</td><td class="navtrailboxbody" align="left">$(navtrail_body)</td></tr></table>';
     } elsif ('$(navtrail_body:-undef)' eq 'undef'){
         print '<br>';
         &navTrail();
@@ -121,7 +121,7 @@ $(cdspageheaderadd)
   </td>
   <td height=100% width=<CDSPAGESTRIPEWIDTH> align=right class=pagestriperight>
    ### Stripe 3: CDS page right stripe
-   <table height=100% width=100%  cellspacing=0 cellpadding=0 border=0>
+   <table width=100%  cellspacing=0 cellpadding=0 border=0>
     <tr valign=top>
      <td>
       <table cellspacing=0 cellpadding=0 border=0 width=100%>
