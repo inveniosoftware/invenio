@@ -38,6 +38,7 @@ import Numeric
 import os
 import urllib
 import random
+
 from zlib import compress,decompress
 from bibrankadminlib import modify_translations, get_current_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
 from messages import *
@@ -609,6 +610,7 @@ def perform_modifycollectiontree(colID, ln=cdslang, move_up='', move_down='', mo
     <b>Focus on...:</b>
     </td></tr><tr><td valign="top">
     """
+
     tree = get_col_tree(colID, 'r')
     output += create_colltree(tree, col_dict, colID, ln, move_from, move_to, 'r', "yes")
     output += """</td><td valign="top">
@@ -1010,10 +1012,12 @@ def perform_showportalboxes(colID, ln=cdslang, callback='yes', content='', confi
                 res = get_col_pbx(colID, key, pos_key)
                 i = 0
                 for (pbxID, colID_pbx, tln, score, position, title, body) in res:
-                    move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
-                    if i != 0:
+                    move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""        
+		    if i != 0:
                         move += """<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s&amp;rand=%s#5"><img border="0" src="%s/img/smallup.gif" title="Move portalbox up"></a>""" % (weburl, colID, ln, pbxID, res[i - 1][0], tln, random.randint(0, 1000), weburl)
-                    move += "</td></tr><tr><td>"
+	            else:
+		        move += "&nbsp;&nbsp;&nbsp;" 
+                    move += "</td><td>"
                     i += 1
                     if i != len(res):
                         move += """<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s&amp;rand=%s#5"><img border="0" src="%s/img/smalldown.gif" title="Move portalbox down"></a>""" % (weburl, colID, ln, pbxID, res[i][0], tln, random.randint(0, 1000), weburl)
@@ -1305,9 +1309,11 @@ def perform_showsortoptions(colID, ln=cdslang, callback='yes', content='', confi
                     
         for (fldID, fldvID, stype, score, score_fieldvalue) in res:
             move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
-            if i != 0:
+	    if i != 0:
                 move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=soo&amp;rand=%s#8"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, res[i - 1][0], random.randint(0, 1000), weburl)
-            move += "</td></tr><tr><td>"
+	    else:
+		move += "&nbsp;&nbsp;&nbsp;"     
+	    move += "</td><td>"
             i += 1
             if i != len(res):
                 move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=soo&amp;rand=%s#8"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>""" % (weburl, colID, ln, fldID, res[i][0], random.randint(0, 1000), weburl)
@@ -1365,9 +1371,11 @@ def perform_showsearchfields(colID, ln=cdslang, callback='yes', content='', conf
                     
         for (fldID, fldvID, stype, score, score_fieldvalue) in res:
             move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
-            if i != 0:
+	    if i != 0:
                 move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=sew&amp;rand=%s#6"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, res[i - 1][0], random.randint(0, 1000), weburl)
-            move += "</td></tr><tr><td>"
+	    else:
+		move += "&nbsp;&nbsp;&nbsp;"  
+	    move += "</td><td>"
             i += 1
             if i != len(res):
                 move += '<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=sew&amp;rand=%s#6"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>' % (weburl, colID, ln, fldID, res[i][0], random.randint(0, 1000), weburl)
@@ -1425,27 +1433,33 @@ def perform_showsearchoptions(colID, ln=cdslang, callback='yes', content='', con
         for (id) in fld_distinct:
             col_fld = get_col_fld(colID, 'seo', id)
 
-            move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
-            if i != 0:
+            #move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
+	    move = ""
+	    if i != 0:
                 move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=seo&amp;rand=%s#7"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, id[0], fld_distinct[i - 1][0], random.randint(0, 1000), weburl)
-            move += "</td></tr><tr><td>"
+	    else:
+		move += "&nbsp;&nbsp;&nbsp;" 
+            #move += "</td><td>"
             i += 1
             if i != len(fld_distinct):
                 move += '<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=seo&amp;rand=%s#7"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>' % (weburl, colID, ln, id[0], fld_distinct[i][0], random.randint(0, 1000), weburl)
-            move += """</td></tr></table>"""
+            #move += """</td></tr></table>"""
 
             j = 0
             for (fldID, fldvID, stype, score, score_fieldvalue) in col_fld:
                 fieldvalue = get_fld_value(fldvID)
 
-                move2 = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
+                #move2 = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
+  		move2 = ""
                 if j != 0:
                     move2 += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, id[0], fldvID, col_fld[j - 1][1], random.randint(0, 1000), weburl)
-                move2 += "</td></tr><tr><td>"
+	        else:
+		    move2 += "&nbsp;&nbsp;&nbsp;"                
+		#move2 += "</td><td>"
                 j += 1
                 if j != len(col_fld):
-                    move2 += '<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>' % (weburl, colID, ln, id[0], fldvID, col_fld[j][1], random.randint(0, 1000), weburl)    
-                move2 += """</td></tr></table>"""
+                    move2 += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>""" % (weburl, colID, ln, id[0], fldvID, col_fld[j][1], random.randint(0, 1000), weburl)   
+                #move2 += """</td></tr></table>"""
    
                 if fieldvalue[0][1] != fieldvalue[0][2]:
                     actions.append([move, "%s" % (j==1 and fld_dict[int(fldID)] or '&nbsp'), move2, "%s - %s" % (fieldvalue[0][1],fieldvalue[0][2])])
@@ -1500,7 +1514,9 @@ def perform_showoutputformats(colID, ln=cdslang, callback='yes', content='', con
             move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
             if i != 0:
                 move += """<a href="%s/admin/websearch/websearchadmin.py/switchfmtscore?colID=%s&amp;ln=%s&amp;type=format&amp;id_1=%s&amp;id_2=%s&amp;rand=%s#10"><img border="0" src="%s/img/smallup.gif" title="Move format up"></a>""" % (weburl, colID, ln, id_format, col_fmt[i - 1][0], random.randint(0, 1000), weburl)
-            move += "</td></tr><tr><td>"
+	    else:
+		move += "&nbsp;&nbsp;&nbsp;" 
+            move += "</td><td>"
             i += 1
             if i != len(col_fmt):
                 move += '<a href="%s/admin/websearch/websearchadmin.py/switchfmtscore?colID=%s&amp;ln=%s&amp;type=format&amp;id_1=%s&amp;id_2=%s&amp;rand=%s#10"><img border="0" src="%s/img/smalldown.gif" title="Move format down"></a>' % (weburl, colID, ln, id_format, col_fmt[i][0], random.randint(0, 1000), weburl)
@@ -1763,6 +1779,12 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
     rtype - the type of the tree, regular or virtual
     edit - if the method should output the edit buttons."""
     
+    if move_from:
+        move_from_rtype = move_from[0]
+        move_from_id = int(move_from[1:len(move_from)])
+        tree_from = get_col_tree(colID, move_from_rtype)
+        tree_to = get_col_tree(colID, rtype)
+
     tables = 0
     tstack = []
     i = 0
@@ -1795,7 +1817,7 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
         
         if i > 0 and tree[i][1] == 0:
             tables = tables + 1
-            text += """</td><td></td><td></td><td><table border="0" cellspacing="0" cellpadding="0"><tr><td>
+            text += """</td><td></td><td></td><td></td><td><table border="0" cellspacing="0" cellpadding="0"><tr><td>
             """
 
         if i == 0:
@@ -1803,14 +1825,17 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
         else:
             tstack.append((id_son, dad, tables))
         
-        text += """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
         if up == 1 and edit:
-            text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_up=%s&amp;rtype=%s#tree"><img border="0" src="%s/img/smallup.gif" title="Move collection up"></a>""" % (weburl, colID, ln, i, rtype, weburl)
-        text += "</td></tr><tr><td>"
+            text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_up=%s&amp;rtype=%s#%s"><img border="0" src="%s/img/smallup.gif" title="Move collection up"></a>""" % (weburl, colID, ln, i, rtype, tree[i][0], weburl)
+	else:
+	    text += """&nbsp;"""
+        text += "</td><td>"
         
         if down == 1 and edit:
-            text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_down=%s&amp;rtype=%s#tree"><img border="0" src="%s/img/smalldown.gif" title="Move collection down"></a>""" % (weburl, colID, ln, i, rtype, weburl)
-        text += "</td></tr></table></td><td>"
+            text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_down=%s&amp;rtype=%s#%s"><img border="0" src="%s/img/smalldown.gif" title="Move collection down"></a>""" % (weburl, colID, ln, i, rtype, tree[i][0], weburl)
+	else:
+	    text += """&nbsp;"""
+        text += "</td><td>"
 
         if edit:
             if move_from and move_to:
@@ -1819,22 +1844,18 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
             if not (move_from == "" and i == 0) and not (move_from != "" and int(move_from[1:len(move_from)]) == i and rtype == move_from[0]):
                 check = "true"
                 if move_from:
-                    move_from_rtype = move_from[0]
-                    move_from_id = int(move_from[1:len(move_from)])
-                    tree_from = get_col_tree(colID, move_from_rtype)
-                    tree_to = get_col_tree(colID, rtype)
-                    if tree_from[move_from_id][0] == tree_to[i][0] or not check_col(tree_to[i][0], tree_from[move_from_id][0]):
-                        check = ''
-                    elif not check_col(tree_to[i][0], tree_from[move_from_id][0]):
-                        check = ''
-                    if not check and (tree_to[i][0] == 1 and tree_from[move_from_id][3] == tree_to[i][0] and move_from_rtype != rtype):
-                        check = "true"
+                    #if tree_from[move_from_id][0] == tree_to[i][0] or not check_col(tree_to[i][0], tree_from[move_from_id][0]):
+                    #    check = ''
+                    #elif not check_col(tree_to[i][0], tree_from[move_from_id][0]):
+                    #    check = ''
+                    #if not check and (tree_to[i][0] == 1 and tree_from[move_from_id][3] == tree_to[i][0] and move_from_rtype != rtype):
+                    #    check = "true"
                     if check:
                         text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_from=%s&amp;move_to=%s%s&amp;rtype=%s#tree"><img border="0" src="%s/img/move_to.gif" title="Move '%s' to '%s'"></a>
                 """ % (weburl, colID, ln, move_from, rtype, i, rtype, weburl,  col_dict[tree_from[int(move_from[1:len(move_from)])][0]], col_dict[tree_to[i][0]])
                 else:
-                    text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_from=%s%s&amp;rtype=%s#tree"><img border="0" src="%s/img/move_from.gif" title="Move '%s' from this location."></a>
-                """ % (weburl, colID, ln, rtype, i, rtype, weburl, col_dict[tree[i][0]])
+                    text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_from=%s%s&amp;rtype=%s#%s"><img border="0" src="%s/img/move_from.gif" title="Move '%s' from this location."></a>
+                """ % (weburl, colID, ln, rtype, i, rtype, tree[i][0], weburl, col_dict[tree[i][0]])
             else:
                 text += """<img border="0" src="%s/img/white_field.gif">
                 """ % weburl
@@ -1847,8 +1868,8 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
         <td>"""
 
         if edit:
-            text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;delete=%s&amp;rtype=%s#tree"><img border="0" src="%s/img/iconcross.gif" title="Remove colletion from tree"></a>
-        """ % (weburl, colID, ln, i, rtype, weburl)
+            text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;delete=%s&amp;rtype=%s#%s"><img border="0" src="%s/img/iconcross.gif" title="Remove colletion from tree"></a>
+        """ % (weburl, colID, ln, i, rtype, tree[i][0], weburl)
         elif i != 0:
             text += """<img border="0" src="%s/img/white_field.gif">
         """ % weburl
@@ -1859,8 +1880,8 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
         if tmove_from:
             move_from = tmove_from
 
-        text += """<a name="tree"></a>%s<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s" title="Edit collection">%s</a>%s%s%s
-        """ % ((reltype=="v" and '<i>' or ''), weburl, tree[i][0], ln, col_dict[id_son], (move_to=="%s%s" %(rtype,i) and '&nbsp;<img border="0" src="%s/img/move_to.gif">' % weburl or ''), (move_from=="%s%s" % (rtype,i) and '&nbsp;<img border="0" src="%s/img/move_from.gif">' % weburl or ''), (reltype=="v" and '</i>' or ''))
+        text += """<a name="%s"></a>%s<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s" title="Edit collection">%s</a>%s%s%s
+        """ % (tree[i][0], (reltype=="v" and '<i>' or ''), weburl, tree[i][0], ln, col_dict[id_son], (move_to=="%s%s" %(rtype,i) and '&nbsp;<img border="0" src="%s/img/move_to.gif">' % weburl or ''), (move_from=="%s%s" % (rtype,i) and '&nbsp;<img border="0" src="%s/img/move_from.gif">' % weburl or ''), (reltype=="v" and '</i>' or ''))
         
         text += """</td></tr>
         """
@@ -1871,6 +1892,7 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
         tables = tables - 1
     text += """</table>
         """
+
     return text
 
 def perform_deletecollection(colID, ln=cdslang, confirm=-1, callback='yes'):
