@@ -36,8 +36,8 @@ pylibdir = "<LIBDIR>/python"
 oaiidprefix            =   "<OAIIDPREFIX>"
 oaisampleidentifier    =   "<OAISAMPLEIDENTIFIER>"
 oaiidentifydescription = """<OAIIDENTIFYDESCRIPTION>"""
-oaiidfield             =   "909COo"
-oaisetfield            =   "909COp"
+oaiidfield             =   "0248_a"
+oaisetfield            =   "0248_p"
 
 
 try:
@@ -649,7 +649,7 @@ def OAIGetSysno(identifier):
     "Returns the first MySQL BIB ID for the OAI identifier 'identifier', if it exists."
     sysno = None
     if identifier:
-        query = "SELECT DISTINCT(bb.id_bibrec) FROM bib90x AS bx, bibrec_bib90x AS bb WHERE bx.tag='%s' AND bb.id_bibxxx=bx.id AND bx.value='%s'" % (oaiidfield,identifier)
+        query = "SELECT DISTINCT(bb.id_bibrec) FROM bib02x AS bx, bibrec_bib02x AS bb WHERE bx.tag='%s' AND bb.id_bibxxx=bx.id AND bx.value='%s'" % (oaiidfield,identifier)
         res = run_sql(query)
         for row in res:
             sysno = row[0]
@@ -662,9 +662,9 @@ def OAIGetSysnoList(set, fromDate, untilDate):
     out_dict = {} # dict to hold list of out sysnos as its keys
 
     if set:
-        query = "SELECT DISTINCT bibx.id_bibrec FROM bib90x AS bx LEFT JOIN bibrec_bib90x AS bibx ON bx.id=bibx.id_bibxxx LEFT JOIN bibrec AS b ON b.id=bibx.id_bibrec WHERE bx.tag='%s' AND bx.value='%s'" % (oaisetfield,set)
+        query = "SELECT DISTINCT bibx.id_bibrec FROM bib02x AS bx LEFT JOIN bibrec_bib02x AS bibx ON bx.id=bibx.id_bibxxx LEFT JOIN bibrec AS b ON b.id=bibx.id_bibrec WHERE bx.tag='%s' AND bx.value='%s'" % (oaisetfield,set)
     else:
-        query = "SELECT DISTINCT bibx.id_bibrec FROM bib90x AS bx LEFT JOIN bibrec_bib90x AS bibx ON bx.id=bibx.id_bibxxx LEFT JOIN bibrec AS b ON b.id=bibx.id_bibrec WHERE bx.tag='%s'" % (oaiidfield)
+        query = "SELECT DISTINCT bibx.id_bibrec FROM bib02x AS bx LEFT JOIN bibrec_bib02x AS bibx ON bx.id=bibx.id_bibxxx LEFT JOIN bibrec AS b ON b.id=bibx.id_bibrec WHERE bx.tag='%s'" % (oaiidfield)
 
     if untilDate:
         query = query + " AND b.modification_date <= '%s'" % untilDate

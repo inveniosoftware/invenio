@@ -38,8 +38,8 @@ pylibdir = "<LIBDIR>/python"
 oaiidprefix            =   "<OAIIDPREFIX>"
 oaisampleidentifier    =   "<OAISAMPLEIDENTIFIER>"
 oaiidentifydescription = """<OAIIDENTIFYDESCRIPTION>"""
-oaiidfield             =   "909COo"
-oaisetfield            =   "909COp"
+oaiidfield             =   "0248_a"
+oaisetfield            =   "0248_p"
 
 try:
     import sys
