@@ -27,10 +27,10 @@ table = rnkWORD01F
 #using stopword list from /bibindex/bibindex_engine_config
 #False = no stopword removal
 stopword = True
-#relevance_number_output_prologue = (
-#relevance_number_output_epilogue = )
-relevance_number_output_prologue = <!-
-relevance_number_output_epilogue = -->
+relevance_number_output_prologue = (
+relevance_number_output_epilogue = )
+#relevance_number_output_prologue = <!-
+#relevance_number_output_epilogue = -->
 #MARC tag,tag points, tag language
 tag1 = 6531_a, 2, <CDSLANG>
 tag2 = 695__a, 1, <CDSLANG>
