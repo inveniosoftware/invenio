@@ -92,6 +92,11 @@ def modifyaccountstatus(req, userID, email_user_pattern='', limit_to=-1, maxpage
             
     return wal.perform_modifyaccountstatus(req=req, userID=userID, email_user_pattern=email_user_pattern, limit_to=limit_to, maxpage=maxpage, page=page, callback=callback, confirm=confirm)
 
+def modifypreferences(req, userID, login_method='', callback='yes', confirm=0):
+    """modify the preferences of an account"""
+            
+    return wal.perform_modifypreferences(req=req, userID=userID, login_method=login_method, callback=callback, confirm=confirm)
+
 def modifylogindata(req, userID, email='', password='', callback='yes', confirm=0):
     """modify the email/password of an account"""
             

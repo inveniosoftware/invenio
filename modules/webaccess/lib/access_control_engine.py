@@ -28,7 +28,7 @@ __version__ = "$Id$"
 from config import *
 from dbquery import run_sql
 from MySQLdb import ProgrammingError
-from access_control_config import SUPERADMINROLE, cfg_webaccess_warning_msgs, cfg_webaccess_msgs, CFG_ACCESS_CONTROL_LEVEL_GUESTS, CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
+from access_control_config import SUPERADMINROLE, cfg_webaccess_warning_msgs, cfg_webaccess_msgs, CFG_ACCESS_CONTROL_LEVEL_GUESTS, CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS#, CFG_EXTERNAL_ACCESS_CONTROL
 
 called_from = 1 #1=web,0=cli
 try:
@@ -53,6 +53,12 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
                     given action.
     """
 
+    #TASK -1: Checking external source if user is authorized:
+    #if CFG_:
+    #    em_pw = run_sql("SELECT email, password FROM user WHERE id=%s", (id_user,))
+    #    if em_pw:
+    #        if not CFG_EXTERNAL_ACCESS_CONTROL.loginUser(em_pw[0][0], em_pw[0][1]):
+    #            return (10, "%s %s" % (cfg_webaccess_warning_msgs[10], (called_from and cfg_webaccess_msgs[1] or "")))
     # TASK 0: find id and allowedkeywords of action
     if verbose: print 'task 0 - get action info'
     query1 = """select a.id, a.allowedkeywords, a.optional

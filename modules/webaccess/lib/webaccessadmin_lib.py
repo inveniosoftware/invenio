@@ -49,7 +49,7 @@ from webpage import page, pageheaderonly, pagefooteronly
 from webuser import getUid, get_email, page_not_authorized
 from mod_python import apache
 from search_engine import print_record
-from cdsware.webuser import checkemail
+from cdsware.webuser import checkemail, get_user_preferences, set_user_preferences
 
 __version__ = "$Id$"
 
@@ -525,6 +525,8 @@ def perform_accesspolicy(req, callback='yes', confirm=0):
     account_policy[0] = "Users can register new accounts. New accounts automatically activated." 
     account_policy[1] = "Users can register new accounts. Admin users must activate the accounts."
     account_policy[2] = "Only admin can register new accounts. User cannot edit email address."
+    account_policy[3] = "Only admin can register new accounts. User cannot edit email address or password."
+    account_policy[4] = "Only admin can register new accounts. User cannot edit email address,password or login method."
     site_policy = {}
     site_policy[0] = "Normal operation of the site."
     site_policy[1] = "Read-only site, all write operations temporarily closed."
@@ -878,7 +880,7 @@ def perform_modifyalerts(req, userID, callback='yes', confirm=0):
     else:
         return addadminbox(subtitle, body)
 
-def perform_modifypreferences(req, userID, callback='yes', confirm=0):
+def perform_modifypreferences(req, userID, login_method='', callback='yes', confirm=0):
     """modify email and password of an account"""
     
     (auth_code, auth_message) = is_adminuser(req)
@@ -889,7 +891,31 @@ def perform_modifypreferences(req, userID, callback='yes', confirm=0):
     res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
     output = ""
     if res:
-        output += """Not implemented yet."""
+        user_pref = get_user_preferences(userID)
+        if confirm in [1, "1"]:
+            if login_method:
+                user_pref['login_method'] = login_method 
+                set_user_preferences(userID, user_pref)
+
+        output += "Select default login method:<br>"
+        text = ""
+        methods = CFG_EXTERNAL_AUTHENTICATION.keys()
+        methods.sort()
+        for system in methods:
+            text += """<input type="radio" name="login_method" value="%s" %s>%s<br>""" % (system, (user_pref['login_method'] == system and "checked" or ""), system)
+
+
+        output += createhiddenform(action="modifypreferences",
+                                   text=text,
+                                   confirm=1,
+                                   userID=userID,
+                                   button="Select")
+
+        if confirm in [1, "1"]:
+            if login_method:
+                output += """<b><span class="info">The login method has been changed</span></b>"""
+            else:
+                 output += """<b><span class="info">Nothing to update</span></b>"""
     else:
         output += '<b><span class="info">The account id given does not exist.</span></b>'
   

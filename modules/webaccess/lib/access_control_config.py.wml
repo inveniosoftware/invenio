@@ -29,6 +29,7 @@ adminemail = "<ADMINEMAIL>"
 __version__ = "$Id$"
 
 from config import *
+from external_authentication import *
 
 # VALUES TO BE EXPORTED
 # CURRENTLY USED BY THE FILES access_control_engine.py access_control_admin.py webaccessadmin_lib.py
@@ -46,6 +47,12 @@ DELEGATEADDUSERROLE = 'accdelegaterole'
 MAXSELECTUSERS = 25
 # max number of users to display in a page (mainly for user area)
 MAXPAGEUSERS = 25
+# Use external source for access control?
+# Atleast one must be added
+# Adviced not to change the name, since it is used to identify the account
+# Format is:   System name: (System class, Default True/Flase), atleast one must be default
+CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % cdsname: (None, True)}
+#CFG_EXTERNAL_AUTHENTICATION = {"CERN Document Server (internal)": (None, True), "CERN NICE (external)": (external_auth_nice(), False)}
 # defines how open the site is
 #0 = normal operation of the site
 #1 = read-only site, all write operations temporarily closed 
@@ -59,6 +66,8 @@ CFG_ACCESS_CONTROL_LEVEL_GUESTS = 0
 #0 = Users can register, automatically acticate accounts
 #1 = Users can register, but admin must activate the accounts
 #2 = Users cannot register or update email address, only admin can register accounts. 
+#3 = Users cannot register or update email address or password, only admin can register accounts. 
+#4 = Same as 3, but user cannot change login method.
 CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS = 0
 # limit email addresses available to use when register a new account (example: cern.ch):
 CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN = ""
@@ -141,6 +150,12 @@ cfg_webaccess_warning_msgs = {
                                 6: 'Error(6): Guest accounts are not authorized to perform this action.',
                                 7: 'Error(7): Not enough arguments, user ID and action name required.',
                                 8: 'Error(8): Incorrect keyword argument(s) for this action.',
-                                9: """Error(9): Account '%s' is not yet activated."""
+                                9: """Error(9): Account '%s' is not yet activated.""", 
+                               10: """Error(10): You were not authorized by the authentication method '%s'.""",
+                               11: """Error(11): The selected login method '%s' is not the default method for this account, please try another one.""",
+                               12: """Error(12): Selected login method '%s' does not exist.""",
+                               13: """Error(13): Could not register '%s' account.""",
+                               14: """Error(14): Could not login using '%s', because this user is unknown.""", 
+                               15: """Error(15): Could not login using your '%s' account, because you have introduced a wrong password."""
 		} 
 </protect>
