@@ -95,13 +95,24 @@ def login(req,p_email=None,p_pw=None,action='login'):
                         """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,
                         "","CDS Personalize, Main page", "CDS, personalize",webuser.create_user_infobox(uid), "")
        else:
-        
-           return page("Your Account", webaccount.perform_display(req),"&gt;",
-                       "", "CDS Personalize, Main page", "CDS, personalize", webuser.create_user_infobox(uid), "")
+      	   if webuser.userNotExist(p_email,p_pw) or p_email=='':
+               mess ="Your are not logged into the system.User unknown.<BR><BR> if you wish you can login again "
+           else:
+               mess ="Your are not logged into the system.Wrong password.<BR><BR> if you wish you can login again"
+           act = "login"    
+	   return page("Logout", webaccount.perform_back(mess,act),
+                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
+                "","CDS Personalize, Main page", "CDS, personalize",
+                webuser.create_user_infobox(uid), "")
     if action == 'register':
         
         if webuser.registerUser(req,p_email,p_pw):
             webuser.update_Uid(req,p_email,p_pw,uid)
-        
+        else :
+            mess ="Your are not registered into the system please try again"
+            act = "login"
+            return page("Register failure",webaccount.perform_back(mess,act),"""&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
+                "","CDS Personalize, Main page", "CDS, personalize",
+                webuser.create_user_infobox(uid), "")
     return  page("Your Account", webaccount.perform_display(req), "&gt;",
                  "","CDS Personalize, Main page", "CDS, personalize",webuser.create_user_infobox(uid),"")
