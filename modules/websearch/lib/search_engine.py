@@ -54,9 +54,13 @@ import unicodedata
 ## import CDSware stuff:
 from config import *
 from messages import *
-from search_engine_config import *
+from search_engine_config import * 
 from bibrank_record_sorter import get_bibrank_methods,rank_records
+from bibrank_citation_grapher import get_citation_history_html
+from bibrank_downloads_grapher import downloads_statistics
+from bibrank_similarity import get_reading_similarity
 from dbquery import run_sql
+from bibrank_citation_searcher import get_cited_by_list, get_citing_recidrelevance
 try:
     from webuser import getUid
     from webpage import pageheaderonly, pagefooteronly, create_error_box
@@ -2594,6 +2598,41 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         # good, no sort needed
         return recIDs
         
+
+def print_record_list2(req, citing_rec_ids, type, ranking_list):
+    diclist = ranking_list
+    req.write("""<table><tr><td>""") 
+    if (type == "citation"):
+       
+            nb_citation = len(citing_rec_ids)
+            html_list_head = """<table><tr><td class="blocknote">Cited&nbsp;By&nbsp;%s&nbsp;records</td></tr></table>"""% str(nb_citation)       
+    else:
+            html_list_head = """<table><tr><td class="blocknote">People&nbsp;who&nbsp;downloaded&nbsp;this&nbsp;record&nbsp;also&nbsp;downloaded&nbsp;:</td></tr></table>"""
+    req.write(html_list_head)
+    req.write("""<small><ul>""") 
+    for i in citing_rec_ids[0:5]:
+            if not ranking_list:
+                req.write( """<li>%s""" % (print_record(i,format="similarity")))
+            
+            else:
+                req.write( """</U><tr><td valign=top><small><font class="rankscoreinfo"><a>(%s)</a></font></small></td><td valign=top><small>%s</small></td></tr>""" % (diclist,print_record(i,format="similarity")))
+    req.write("""</ul></small>""") 
+                
+    req.write("""</td></tr></table> """) 
+
+def print_record_list(req,title,score_list):
+    req.write("""<table><tr><td>""") 
+    html_list_head = """<table><tr><td class="blocknote">%s</td></tr></table>"""%title      
+    req.write(html_list_head)
+    req.write("""<td><tr><td><table>""")
+    max = min(len(score_list),5)
+    for i in score_list[0:max]:
+        req.write( """<tr><td><font class="rankscoreinfo"><a>(%s)&nbsp;</a></font><small>&nbsp;%s</small></td></tr>""" % (i[1],print_record(i[0],format="similarity")))
+    
+    req.write("""</table></small></td></tr></table> """) 
+                              
+                        
+
 def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress):
     """Prints list of records 'recIDs' formatted accoding to 'format' in groups of 'rg' starting from 'jrec'.
     Assumes that the input list 'recIDs' is sorted in reverse order, so it counts records from tail to head.
@@ -2676,6 +2715,40 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                 for irec in range(irec_max,irec_min,-1):
                     req.write(print_record(recIDs[irec], format, ot, ln))
                     if record_exists(recIDs[irec])==1:
+                        #querry = """recid:%s"""%recIDs[irec]
+                        #citing_rec_ids = perform_request_search(p = querry, rm="cit")
+                        citing_list = get_cited_by_list(recIDs[irec])
+                        req.write("""<table><tr><td>""")
+                        if citing_list:
+                            reclist = get_citing_recidrelevance('cit', citing_list)
+                            reclist.sort(lambda x, y: cmp(x[1], y[1]))
+                       
+                            list_title ="Cited&nbsp;By&nbsp;%s&nbsp;record"% len(citing_list)
+                            req.write("""</td>""")
+                            reclist.reverse()
+                            print_record_list(req, list_title, reclist)                           
+                            req.write("""&nbsp;<a  href="%s/search.py?p=recid:%d&amp;rm=cit&amp;ln=%s">>>more</a><br>\n""" %  (weburl, recIDs[irec], ln) )
+                            req.write("""</td><tr><tr><td>""")
+                            req.write(get_citation_history_html(recIDs[irec]))
+                            req.write("""</td></tr>""")
+                       
+                        download_list = get_reading_similarity(recIDs[irec], "rnkDOWNLOADS")
+                        if download_list:
+                            req.write("""<tr><td>""")
+                            list_title = "People&nbsp;who&nbsp;downloaded&nbsp;this&nbsp;record&nbsp;also&nbsp;downloaded&nbsp;:"
+                            print_record_list(req, list_title, download_list)
+                            req.write("""</td></tr><tr><td>""")
+                        req.write(downloads_statistics(recIDs[irec]))
+                        req.write("""</td></tr>""")
+                        
+                        page_viewed_list = get_reading_similarity(recIDs[irec], "rnkPAGEVIEWS")
+                        if page_viewed_list:
+                            req.write("""<tr><td>""")
+                            list_title = "People&nbsp;who&nbsp;viewed&nbsp;this&nbsp;page&nbsp;also&nbsp;viewed&nbsp;:"
+                            print_record_list(req, list_title, page_viewed_list)
+                            req.write("""</td></tr>""")
+                        req.write("""</table>""")
+                        
                         req.write("""\n<div class="recordlastmodifiedbox">%s</div>""" % \
                                   (msg_record_last_modified[ln] % (get_creation_date(recIDs[irec]),get_modification_date(recIDs[irec]))))
                         req.write("""<p><span class="moreinfo"><a class="moreinfo" href="%s/search.py?p=recid:%d&amp;rm=wrd&amp;ln=%s">%s</a></span>\n""" % \
@@ -2925,6 +2998,31 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
         else:
             out += call_bibformat(recID, format)
 
+    elif format.startswith("similarity"):
+        
+        if record_exist_p == -1:
+            out += msg_record_deleted[ln]
+        else:
+            out += """<a href="http://cdswebdev.cern.ch/search.py?recid=%s&ln=en">""" %recID
+            # firstly, title:
+            titles = get_fieldvalues(recID, "245__a")
+            for title in titles:
+                out += "<strong>%s</strong> " % title
+            # secondly, authors:
+           
+            authors = get_fieldvalues(recID, "100__a") + get_fieldvalues(recID, "700__a")
+            if authors:
+                out += "&nbsp;/"
+                for i in range (0,cfg_author_et_al_threshold):
+                    if i < len(authors):
+                        out +=  authors[i]
+                if len(authors) > cfg_author_et_al_threshold:
+                        out += " <em>et al.</em>"  
+                        
+            rec_year = get_fieldvalues(recID,'773__y')
+            if not rec_year: rec_year = get_fieldvalues(recID, '260__c') 
+            if rec_year:  out += "&nbsp;/%s"%rec_year[0]   
+            out += "</a>"
     else:
         # HTML brief format by default
         if record_exist_p == -1:
@@ -2989,6 +3087,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                            % (weburl, recID, ln, msg_detailed_record[ln])
                     out += """<span class="moreinfo"> - <a class="moreinfo" href="%s/search.py?p=recid:%d&amp;rm=wrd&amp;ln=%s">%s</a></span>\n""" % \
                            (weburl, recID, ln, msg_similar_records[ln])
+                    out += """<span class="moreinfo"> - <a class="moreinfo" href="%s/search.py?p=recid:%d&amp;rm=cit&amp;ln=%s">Cited by</a></span>\n""" %  (weburl, recID, ln) 
 
     # print record closing tags, if needed:
     if format == "marcxml" or format == "oai_dc":
