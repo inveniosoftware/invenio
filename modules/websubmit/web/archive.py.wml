@@ -52,7 +52,16 @@ def index(req,c=cdsname,ln=cdslang,base="",id=""):
         uid_email = get_email(uid)
     except MySQLdb.Error, e:
         return errorMsg(e.value,req)
-    t = "<center><table><tr><td>"
+    t = """
+    <center>
+    <table class="searchbox" summary="">
+        <tr>"""
+    t+="        <th class=\"portalboxheader\">Archive for %s/%s" % (base,id)
+    t+="""
+            </th>
+        </tr>
+        <tr>
+            <td class="portalboxbody">"""
     if base == "":
         return warningMsg("Sorry... Parameter <i>base</i> needed",req)
     elif id == "":
@@ -107,8 +116,10 @@ def index(req,c=cdsname,ln=cdslang,base="",id=""):
     else:
         return warningMsg("no file found...",req)
     t+="</td></tr></table></center>"
-    return page(title="Archive %s %s" % (base,id),
+    p_navtrail = "Archive"
+    return page(title="",
                      body=t,
+                     navtrail = p_navtrail,
                      description="toto",
                      keywords="keywords",
                      uid=uid,

@@ -67,7 +67,7 @@ def index(req,doctype="",act="",access="",indir=""):
             else:
                 value = ""
             #value = strip_tags($value);
-            t=t+ "<tr><td align=right><small><A HREF='' onClick=\"window.opener.document.forms[0].curpage.value='%s';window.opener.document.forms[0].action='Main.py';window.opener.document.forms[0].submit();return false;\"><FONT color=\"%s\">%s</FONT></A></small></td><td><I><small><font color=black>%s</font></small></I></td></tr>\n" % (arr[2],color,arr[0],value);
+            t=t+ "<tr><td align=right><small><A HREF='' onClick=\"window.opener.document.forms[0].curpage.value='%s';window.opener.document.forms[0].action='submit.py';window.opener.document.forms[0].submit();return false;\"><FONT color=\"%s\">%s</FONT></A></small></td><td><I><small><font color=black>%s</font></small></I></td></tr>\n" % (arr[2],color,arr[0],value);
     t=t+"</table>"
     return t
 </protect>

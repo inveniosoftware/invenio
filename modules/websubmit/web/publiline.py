@@ -79,16 +79,22 @@ def index(req,c=cdsname,ln=cdslang,doctype="",categ="",RN="",send=""):
                     
 def selectDoctype():
     t="""
-        <br>
-        <small>
-        <STRONG class=headline>Notice:</STRONG><BR>
+ <table class="searchbox" width="100%" summary="">
+    <tr>
+        <th class="portalboxheader">List of refereed types of documents</th>
+    </tr>
+    <tr>
+        <td class="portalboxbody">
     Select one of the following types of documents to check the documents status:</small>
-    <CENTER><BR>"""
+    <blockquote>"""
     res = run_sql("select DISTINCT doctype from sbmAPPROVAL")
     for row in res:
         res2 = run_sql("select ldocname from sbmDOCTYPE where sdocname=%s", (row[0],))
-        t+="<small><A HREF='publiline.py?doctype=%s'>%s</A></small><BR>" % (row[0],res2[0][0])
-    t+="</CENTER>"
+        t+="<li><A HREF='publiline.py?doctype=%s'>%s</A><BR>" % (row[0],res2[0][0])
+    t+="""</blockquote>
+        </td>
+    </tr>
+</table>"""
     return t
 
 def selectCateg(doctype):
@@ -99,21 +105,24 @@ def selectCateg(doctype):
     if len(sth) == 0:
         categ = "unknown"
         return selectDocument(doctype,categ)
-    t+= """
-        <BR>
-        <SMALL>
-        <STRONG class=headline>Notice:</STRONG><BR>
-            Please choose a category
-        </SMALL>
-        <BR><BR>
+    t+="""
+ <table class="searchbox" width="100%" summary="">
+    <tr>"""
+    t+=   "<th class=\"portalboxheader\">%s: List of refereed categories</th>" % title
+    t+="""
+    </tr>
+    <tr>
+        <td class="portalboxbody">
+        Please choose a category
+    <blockquote>
         <FORM action="publiline.py" method=get>"""
     t+="        <INPUT type=hidden name=doctype value='%s'>\n" % doctype
     t+="        <INPUT type=hidden name=categ value=''>\n"
     t+="        </FORM>\n"
     t+="""
-<TABLE align=center>
+<TABLE>
 <TR>
-    <TD align=center>"""
+    <TD align=left>"""
     for arr in sth:
         waiting = 0
         rejected = 0
@@ -126,35 +135,41 @@ def selectCateg(doctype):
         rejected = sth2[0][0]
         num = waiting + approved + rejected
         if waiting != 0: 
-            classtext = "class=results"
+            classtext = "class=blocknote"
         else:
             classtext = ""
         t+="<A href=\"\" onClick=\"document.forms[0].categ.value='%s';document.forms[0].submit();return false;\"><SMALL %s>%s</SMALL></A><SMALL> (%s document<SMALL>(</SMALL>s<SMALL>)</SMALL>\n" % (arr[1],classtext,arr[2],num)
         if waiting != 0:
-            t+= "| %s <IMG ALT=\"pending\" SRC=\"%s/waiting_or.gif\" border=0>\n" % (waiting,images)
+            t+= "| %s<IMG ALT=\"pending\" SRC=\"%s/waiting_or.gif\" border=0>\n" % (waiting,images)
         if approved != 0:
-            t+= "| %s <IMG ALT=\"approved\" SRC=\"%s/smchk_gr.gif\" border=0>\n" % (approved,images)
+            t+= "| %s<IMG ALT=\"approved\" SRC=\"%s/smchk_gr.gif\" border=0>\n" % (approved,images)
         if rejected != 0:
-            t+= "| %s <IMG ALT=\"rejected\" SRC=\"%s/cross_red.gif\" border=0>\n" % (rejected,images)
+            t+= "| %s<IMG ALT=\"rejected\" SRC=\"%s/cross_red.gif\" border=0>" % (rejected,images)
         t+=")</SMALL><BR>\n"
     t+="""
     </TD>
-    <TD>&nbsp;</TD>
     <TD>
-    <TABLE cellpadding=1 cellspacing=0 border=0><TR class="headerselected"><TD>
-        <TABLE width="100%" bgcolor="white" cellspacing=0 cellpadding=5 border=0><TR><TD>
-        <SMALL>
-        <B class=headline>Key:</B><BR>"""
+         <table class="searchbox" width="100%" summary="">
+            <tr>
+                <th class="portalboxheader">Key:</th>
+            <tr>
+            <tr>
+                <td>"""
     t+="        <IMG ALT=\"pending\" SRC=\"%s/waiting_or.gif\" border=0> waiting for approval<BR>" % images
     t+="        <IMG ALT=\"approved\" SRC=\"%s/smchk_gr.gif\" border=0> already approved<BR>" % images
     t+="        <IMG ALT=\"rejected\" SRC=\"%s/cross_red.gif\" border=0> rejected<BR><BR>\n" % images
-    t+="""<SMALL class=results>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</SMALL> some documents are pending<BR>
-        </SMALL>
-        </TD></TR></TABLE>
-    </TD></TR></TABLE>
+    t+="""
+                <SMALL class=blocknote>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</SMALL> some documents are pending<BR></SMALL>
+                </td>
+            </tr>
+        </table>
     </TD>
 </TR>
-</TABLE>"""
+</TABLE>
+        </blockquote>
+        </td>
+    </tr>
+</table>"""
     return t
 
 def selectDocument(doctype,categ):
@@ -163,19 +178,23 @@ def selectDocument(doctype,categ):
     title = res[0][0]
     if categ == "":
         categ == "unknown"
-    t+= """
-        <SMALL>
-        <STRONG class=headline>Notice:</STRONG><BR>
-            Click on a report number to have more information
-        </SMALL>
-        <BR>
+    t+="""
+ <table class="searchbox" width="100%" summary="">
+    <tr>"""
+    t+=   "<th class=\"portalboxheader\">%s - %s: List of refereed documents</th>" % (title,categ)
+    t+="""
+    </tr>
+    <tr>
+        <td class="portalboxbody">
+        Click on a report number to have more information
+    <blockquote>
         <FORM action="publiline.py" method=get>"""
     t+="        <INPUT type=hidden name=doctype value='%s'>\n" % doctype
     t+="        <INPUT type=hidden name=categ value='%s'>\n" % categ
     t+="        <INPUT type=hidden name=RN value=''>\n" 
     t+="        </FORM>\n"
-    t+="<TABLE border=1>"
-    t+="<TR><TH><SMALL><STRONG class=headline>Report  Number</STRONG></SMALL></TH><TH><SMALL><STRONG class=headline>Waiting for Approval<BR>(Internal Notes)</STRONG></SMALL></TH><TH><SMALL><STRONG class=headline>Approved</STRONG></SMALL></TH><TH><SMALL><STRONG class=headline>Rejected</STRONG></SMALL></TH></TR>";
+    t+="<TABLE class=\"searchbox\">"
+    t+="<TR><TH class=\"portalboxheader\">Report  Number</TH><TH class=\"portalboxheader\">Pending</TH><TH class=\"portalboxheader\">Approved</TH><TH class=\"portalboxheader\">Rejected</TH></TR>"
     sth = run_sql("select rn,status from sbmAPPROVAL where doctype=%s and categ=%s order by status DESC,rn DESC",(doctype,categ))
     for arr in sth:
         RN = arr[0]
@@ -186,7 +205,11 @@ def selectDocument(doctype,categ):
             t+="<TR><TD align=center><A HREF=\"\" onClick=\"document.forms[0].RN.value='%s';document.forms[0].submit();return false;\">%s</A></TD><TD align=center>&nbsp;</TD><TD align=center>&nbsp;</TD><TD align=center><IMG ALT=\"check\" SRC=\"%s/cross_red.gif\"></TD></TR>" % (RN,RN,images)
         elif status == "approved":
             t+="<TR><TD align=center><A HREF=\"\" onClick=\"document.forms[0].RN.value='%s';document.forms[0].submit();return false;\">%s</A></TD><TD align=center>&nbsp;</TD><TD align=center><IMG ALT=\"check\" SRC=\"%s/smchk_gr.gif\"></TD><TD align=center>&nbsp;</TD></TR>" % (RN,RN,images)
-    t+= "</TABLE>"
+    t+= """</TABLE>
+        </blockquote>
+        </td>
+    </tr>
+</table>"""
     return t
 
 def displayDocument(doctype,categ,RN,send):
@@ -195,7 +218,6 @@ def displayDocument(doctype,categ,RN,send):
     docname = res[0][0]
     if categ == "":
         categ = "unknown"
-    t+= "    <BR><BR>"
     sth = run_sql("select rn,status,dFirstReq,dLastReq,dAction,access from sbmAPPROVAL where rn=%s",(RN,))
     if len(sth) > 0:
         arr = sth[0]
@@ -212,8 +234,14 @@ def displayDocument(doctype,categ,RN,send):
             image = "<IMG SRC=\"%s/iconcross.gif\" ALT=\"\" align=right>" % images
         else:
             image = ""
-        t+="<TABLE border=1 align=center><TR><TD><SMALL><STRONG class=headline>%s%s</STRONG></SMALL></TD></TR>" % (image,RN)
-        t+="<TR><TD class=header><BR>"
+        t+="""
+ <table class="searchbox" summary="">
+    <tr>"""
+        t+=   "<th class=\"portalboxheader\">%s%s</th>" % (image,RN)
+        t+="""
+    </tr>
+    <tr>
+        <td class="portalboxbody">"""
     else:
         return warningMsg("This document has never been requested for approval!<BR>&nbsp;")
     (authors,title,sysno,newrn) = getInfo(doctype,categ,RN)
@@ -244,11 +272,11 @@ def displayDocument(doctype,categ,RN,send):
         else:
             t+= "Last approval e-mail was sent on: <strong class=headline>%s</strong><BR>" % dLastReq
         t+="<BR>You can send an approval request e-mail again by clicking the following button:"
-        t+= "<BR><INPUT type=submit name=send value=\"Send Again\" onClick=\"return confirm('WARNING! An e-mail will be send to your referee if you confirm.')\">"
+        t+= "<BR><INPUT class=\"adminbutton\" type=submit name=send value=\"Send Again\" onClick=\"return confirm('WARNING! An e-mail will be send to your referee if you confirm.')\">"
         # We also display a button for the referee
         if acc_authorize_action(uid, "referee",verbose=0,doctype=doctype, categ=categ):
             t+= "<br>As a referee for this document, you may click this button to approve or reject it:"
-            t+= "<BR><INPUT type=submit name=approval value=\"Approve/Reject\" onClick=\"window.location='approve.py?%s';return false;\">" % access
+            t+= "<BR><INPUT class=\"adminbutton\" type=submit name=approval value=\"Approve/Reject\" onClick=\"window.location='approve.py?%s';return false;\">" % access
     if status == "approved":
         t+="This Document has been <strong class=headline>approved</strong>.<BR>Its approved reference is: <strong class=headline>%s</strong><BR><BR>" % newrn
         t+="It has first been sent to approval on: <strong class=headline>%s</strong><BR>" % dFirstReq
@@ -266,7 +294,11 @@ def displayDocument(doctype,categ,RN,send):
             t+="Last approval e-mail was sent on: <strong class=headline>%s</STRONG><BR>" % dLastReq
         t+= "It has been rejected on: <strong class=headline>%s</STRONG><BR>" % dAction
     t+= "</SMALL></FORM>"
-    t+= "<BR></TD></TR></TABLE>"
+    t+= """<BR></TD></TR></TABLE>
+        </blockquote>
+        </td>
+    </tr>
+</table>"""
     return t
 
 # Retrieve info about document
@@ -296,7 +328,7 @@ def getInPending(doctype,categ,RN):
         title=fp.read()
         fp.close()
     if title == "":
-        return false
+        return 0
     else:
         return (authors,title,"","")
 
@@ -304,9 +336,9 @@ def getInPending(doctype,categ,RN):
 def getInAlice(doctype,categ,RN):
     # initialize sysno variable
     sysno = ""
-    searchresults = search_pattern(req=None, p=rn, f="reportnumber").items().tolist()
+    searchresults = search_pattern(req=None, p=RN, f="reportnumber").items().tolist()
     if len(searchresults) == 0:
-        return false
+        return 0
     sysno = searchresults[0]
     if sysno != "":
         title = Get_Field('245__a',sysno)
@@ -316,7 +348,7 @@ def getInAlice(doctype,categ,RN):
         newrn = Get_Field('037__a',sysno)
         return (authors,title,sysno,newrn)
     else:
-        return false
+        return 0
 
 def SendEnglish(doctype,categ,RN,title,authors,access):
     FROMADDR = 'CDSwareSubmission Interface <%s>' % supportemail
@@ -351,7 +383,7 @@ def SendEnglish(doctype,categ,RN,title,authors,access):
         addresses = re.sub(",$","",addresses)
     if addresses=="":
         SendWarning(doctype,categ,RN,title,authors,access)
-        return false
+        return 0
     if authors == "":
         authors = "-"
     res = run_sql("select value from sbmPARAMETERS where name='directory' and doctype=%s", (doctype,))

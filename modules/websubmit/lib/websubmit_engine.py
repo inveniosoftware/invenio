@@ -221,7 +221,6 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
                     setCookie(key,value,uid)
     # create interface
     # top menu
-    t=t+"<br><br>"
     t=t+"<FORM method=\"POST\" action=\"submit.py\" onSubmit=\"return tester();\">"
     t=t+"<center><TABLE cellspacing=0 cellpadding=0 border=0><TR>"
     t=t+"   <TD class=submitHeader><B>%s&nbsp;</B></TD>" % docname
@@ -572,13 +571,13 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     <small>(1) you should take note of this number at the beginning of the submission, it will allow you to get your information back in case your browser crashes before the end of the submission.</small><BR>"""
     # Add the summary window definition if needed
     t=t+"    <small>(2) mandatory fields appear in red in the 'Summary' window.</small><BR>\n"
-
     # start display:
     req.content_type = "text/html"
     req.send_http_header()
-    
-    return page(title="%s of %s" % (actname,docname),
+    p_navtrail = "<a href=\"submit.py\">Submit</a>&nbsp;>&nbsp;<a href=\"submit.py?doctype=%s\">%s</a>&nbsp;>&nbsp;%s" % (doctype,docname,actname)
+    return page(title="" ,
                     body=t,
+                    navtrail = p_navtrail,
                     description="",
                     keywords="",
                     uid=uid,
@@ -767,7 +766,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         t=t+"<TD class=submitEmptyPage align=right>&nbsp;</TD>\n"
     else: 
         for i in range(1,nbpages+1):
-            t=t+"<TD class=submitPage><small>&nbsp;<A HREF='' onClick=\"document.forms[0].curpage.value=%s;document.forms[0].action='submit.py';document.forms[0].submit();return false;\">%s</A>&nbsp;</small></TD>" % (i,i)
+            t=t+"<TD class=submitPage><small>&nbsp;<A HREF='' onClick=\"document.forms[0].curpage.value=%s;document.forms[0].action='submit.py';document.forms[0].step.value=0;document.forms[0].submit();return false;\">%s</A>&nbsp;</small></TD>" % (i,i)
         t=t+"<TD class=submitCurrentPage>end of action</TD><TD class=submitEmptyPage>&nbsp;&nbsp;</TD></TR></TABLE></TD>\n"
         t=t+"<TD class=submitHeader align=right>&nbsp;<A HREF='' onClick=\"window.open('summary.py?doctype=%s&act=%s&access=%s&indir=%s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;\"><font color=white><small>SUMMARY(2)</small></font></A>&nbsp;</TD>\n" % (doctype,act,access,indir)
     t=t+"</TR>\n"
@@ -832,8 +831,10 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     req.content_type = "text/html"
     req.send_http_header()
     
-    return page(title="%s of %s" % (actname,docname),
+    p_navtrail = "<a href=\"submit.py\">Submit</a>&nbsp;>&nbsp;<a href=\"submit.py?doctype=%s\">%s</a>&nbsp;>&nbsp;%s" % (doctype,docname,actname)
+    return page(title="",
                     body=t,
+                    navtrail = p_navtrail,
                     description="",
                     keywords="",
                     uid=uid,
@@ -855,11 +856,14 @@ def home(req,c=cdsname,ln=cdslang):
 <SCRIPT TYPE="text/javascript" LANGUAGE="Javascript1.2">
 var allLoaded = 1;
 </SCRIPT>
+ <table class="searchbox" width="100%" summary="">
+    <tr>
+        <th class="portalboxheader">Catalogues available for submission</th>
+    </tr>
+    <tr>
+        <td class="portalboxbody">
 <BR>
-<SMALL>
-<STRONG class=headline>Notice:</STRONG><BR>
 Please select the type of document you want to submit:
-</SMALL>
 <BR><BR>
 <TABLE width="100%">
 <TR>
@@ -873,9 +877,14 @@ Please select the type of document you want to submit:
     </TD>
 </TR>
 </TABLE>
-</FORM>"""
-    return page(title="Submit",
+</FORM>
+        </td>
+    </tr>
+</table>"""
+    p_navtrail = "Submit"
+    return page(title="",
                      body=finaltext,
+                     navtrail=p_navtrail,
                      description="toto",
                      keywords="keywords",
                      uid=uid,
@@ -1024,11 +1033,17 @@ function selectdoctype(nb)
 <INPUT type="hidden" name="startPg" value=1>""" 
     t = t + "<INPUT type=hidden name=mainmenu value=\"submit.py?doctype=%s\">\n" % doctype
     t = t + """
-<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>"""
+ <table class="searchbox" width="100%" summary="">
+    <tr>"""
+    t+="        <th class=\"portalboxheader\">%s</th>" % docFullDesc
+    t+="""
+    </tr>
+    <tr>
+        <td class="portalboxbody">"""
     if description != "":
-        t = t + "<TR bgcolor=\"#EEEEEE\"><TD><SMALL>%s</SMALL></TD></TR>" % description
+        t = t + "<SMALL>%s</SMALL>" % description
     t = t + """
-<TR><TD><BR>
+<BR>
 <SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
 var nbimg = document.images.length + 1;
 </SCRIPT>
@@ -1050,12 +1065,13 @@ var nbimg = document.images.length + 1;
         <TABLE>"""
     #display list of actions
     for i in range(0,len(actionShortDesc)):
-        t = t + "        <TR>\n"
-        t = t + "            <TD align=\"center\" class=wsactionbutton onMouseOver=\"this.className='wsactionbuttonh';window.status='%s';\" onMouseOut=\"this.className='wsactionbutton';\" onClick=\"if (tester()){document.forms[0].indir.value='%s';document.forms[0].act.value='%s';document.forms[0].submit();}; return false;\">\n" % (statustext[i],indir[i],actionShortDesc[i])
-        t = t + "            <A class=\"textbutton\" HREF=\"\" onClick=\"if (tester()){document.forms[0].indir.value='%s';document.forms[0].act.value='%s';document.forms[0].submit();}; return false;\" onmouseover=\"window.status='%s';\">\n" % (indir[i],actionShortDesc[i],statustext[i])
-        t = t + "            <span class=\"textbutton\">%s</span></A><BR>\n" % statustext[i]
-        t = t + "            </TD>\n"
-        t = t + "        </TR>\n"
+        t+="<input type=\"submit\" class=\"adminbutton\" value=\"%s\" onClick=\"if (tester()){document.forms[0].indir.value='%s';document.forms[0].act.value='%s';document.forms[0].submit();}; return false;\"><br>" % (statustext[i],indir[i],actionShortDesc[i])
+        #t = t + "        <TR>\n"
+        #t = t + "            <TD align=\"center\" class=wsactionbutton onMouseOver=\"this.className='wsactionbuttonh';window.status='%s';\" onMouseOut=\"this.className='wsactionbutton';\" onClick=\"if (tester()){document.forms[0].indir.value='%s';document.forms[0].act.value='%s';document.forms[0].submit();}; return false;\">\n" % (statustext[i],indir[i],actionShortDesc[i])
+        #t = t + "            <A class=\"textbutton\" HREF=\"\" onClick=\"if (tester()){document.forms[0].indir.value='%s';document.forms[0].act.value='%s';document.forms[0].submit();}; return false;\" onmouseover=\"window.status='%s';\">\n" % (indir[i],actionShortDesc[i],statustext[i])
+        #t = t + "            <span class=\"textbutton\">%s</span></A><BR>\n" % statustext[i]
+        #t = t + "            </TD>\n"
+        #t = t + "        </TR>\n"
     t = t + """
         </TABLE>
     </TD>
@@ -1079,10 +1095,13 @@ enter your access number directly in the input box.</small></FONT>
 <TABLE border=0 bgcolor="#CCCCCC" width="100%"><TR>
 <TD width="100%">
 <small>Access Number: <INPUT size=15 name=AN>"""
-    t = t + "<INPUT type=hidden name=doctype value=\"%s\"> <INPUT type=submit value=\" go! \">" % doctype
-    t = t + "</small></TD></TR></TABLE><HR></FORM>"
-    p_navtrail = "<a href=\"submit.py\">Submit</a>"
-    return page(title="%s Submission Page" % docFullDesc,
+    t = t + "<INPUT type=hidden name=doctype value=\"%s\"> <INPUT class=\"adminbutton\" type=submit value=\" go! \">" % doctype
+    t = t + """</small></TD></TR></TABLE><HR></FORM>
+        </td>
+    </tr>
+</table>"""
+    p_navtrail = "<a href=\"submit.py\">Submit</a>&nbsp;>&nbsp;%s" % docFullDesc
+    return page(title="",
                      body=t,
                      navtrail=p_navtrail,
                      description="toto",
