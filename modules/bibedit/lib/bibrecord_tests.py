@@ -191,6 +191,40 @@ class BadInputTreatmentTest(unittest.TestCase):
                     ee = i
         self.assertEqual(bibrecord.warning((99,'(Tagname : datafield)')),ee)
 
+class AccentedUnicodeLettersTest(unittest.TestCase):
+    """ bibrecord - testing accented UTF-8 letters """
+
+    def setUp(self):
+        xml_example_record = """
+        <record>
+        <controlfield tag="001">33</controlfield>
+        <datafield tag="041" ind1="" ind2="">
+        <subfield code="a">eng</subfield>
+        </datafield>
+        <datafield tag="100" ind1="" ind2="">
+        <subfield code="a">Döè1, John</subfield>
+        </datafield>
+        <datafield tag="100" ind1="" ind2="">
+        <subfield code="a">Doe2, John</subfield>
+        <subfield code="b">editor</subfield>
+        </datafield>
+        <datafield tag="245" ind1="" ind2="1">
+        <subfield code="a">Пушкин</subfield>
+        </datafield>
+        <datafield tag="245" ind1="" ind2="2">
+        <subfield code="a">On the foo and bar2</subfield>
+        </datafield>
+        </record>
+        """
+        (self.rec, st, e) = bibrecord.create_record(xml_example_record,1,1)        
+
+    def test_accented_unicode_characters(self):
+        """bibrecord - accented Unicode letters"""
+        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "100", "", ""),
+                         [([('a', 'Döè1, John')], '', '', '', 3), ([('a', 'Doe2, John'), ('b', 'editor')], '', '', '', 4)])
+        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "245", "", "1"),
+                         [([('a', 'Пушкин')], '', '1', '', 5)])
+
 class GettingFieldValuesTest(unittest.TestCase):
     """ bibrecord - testing for getting field/subfield values """
 
@@ -243,7 +277,8 @@ def create_test_suite():
     return unittest.TestSuite((unittest.makeSuite(SanityTest,'test'),
                                unittest.makeSuite(SuccessTest,'test'),
                                unittest.makeSuite(BadInputTreatmentTest,'test'),
-                               unittest.makeSuite(GettingFieldValuesTest,'test')))
+                               unittest.makeSuite(GettingFieldValuesTest,'test'),
+                               unittest.makeSuite(AccentedUnicodeLettersTest,'test')))
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())
   
