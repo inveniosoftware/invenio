@@ -78,26 +78,12 @@ def perform_index(ln=cdslang):
             for (str, function) in col[1:]:
                 actions[-1][-1] += ' / <a href="%s/admin/bibrank/bibrankadmin.py/%s?rnkID=%s&ln=%s">%s</a>' % (weburl, function, rnkID, ln, str)
 
-    output  = """
-    <dl>
-     <dt>Rank method:</dt>
-     <dd>A method responsible for creating the necessary data to rank a result.</dd>
-     <dt>Translations:</dt>
-     <dd>Each rank method may have many names in many languages.</dd>
-     <dt>Collections:</dt>
-     <dd>Which collections the rank method should be visible in.</dd>
-    </dl>
-    """
+    output = """
+    <a href="%s/admin/bibrank/bibrankadmin.py/addrankarea?ln=%s">Add new rank method</a><br><br>
+    """ % (weburl, ln)
     
     output += tupletotable(header=header, tuple=actions)
-
-    extra = """
-    <dl>
-     <dt><a href="%s/admin/bibrank/bibrankadmin.py/addrankarea?ln=%s">Add new rank method</a>
-     <dd>Go here to add a new rank method.
-    </dl>
-    """ % (weburl, ln)
-    return addadminbox("""Explanation of concepts&nbsp;&nbsp&nbsp;<small>[<a href="%s/admin/bibrank/guide.html#mi">?</a>]</small>""" % weburl, datalist=[output, extra])
+    return addadminbox("""Overview of rank methodss&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mi">?</a>]</small>""" % weburl, datalist=[output, ''])
 
 def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0):
     """Modify which collections the rank method is visible to"""
@@ -118,15 +104,9 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
         subtitle = """Step 1 - Select collection to enable/disable rank method '%s' for""" % rnkNAME
         output  = """
         <dl>
-        <dt>Enable for:</dt>
-        <dd>To make the rank method visible in the search interface for a collection,
-        choose the wanted collection and press the "Enable" button.</dd>
-        <dt>Disable for:</dt>
-        <dd>To hide the rank method from the search interface for a collection,
-        choose the wanted collection and press the "Disable" button.</dd>
-        <dt>'%s' is currently enabled for the following collections:</dt>
+        <dt>The rank method is currently enabled for these collections:</dt>
         <dd>
-        """ % rnkNAME
+        """
         col_list = get_rnk_col(rnkID, ln)
         if not col_list:
             output += """No collections"""
@@ -217,7 +197,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
         body = [output, extra]
     except NameError:
         body = [output]
-    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a href="%s/admin/bibrank/guide.html#mc">?</a>]</small>""" % weburl, body)
+    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mc">?</a>]</small>""" % weburl, body)
 
 def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='yes'):
     """Modify the translations of a rank method"""
@@ -311,7 +291,7 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
     except NameError:
         body = [output]
 
-    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a href="%s/admin/bibrank/guide.html#mt">?</a>]</small>""" % weburl, body)
+    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mt">?</a>]</small>""" % weburl, body)
         
 def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
     """form to add a new rank method with these values:
@@ -323,7 +303,7 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
      <dt>BibRank code:</dt>
      <dd>A unique code that identifies a rank method, is used when running the bibrank daemon and used to name the configuration file for the method.
      <br>The template files includes the necessary parameters for the chosen rank method, and only needs to be edited with the correct tags and paths.
-     <br>For more information, please go to the <a href="%s/admin/bibrank/guide.html">BibRank guide</a> and read the section about adding a rank method</dd>
+     <br>For more information, please go to the <a title="See guide" href="%s/admin/bibrank/guide.html">BibRank guide</a> and read the section about adding a rank method</dd>
     </dl>
     """ % weburl
     text = """
@@ -398,7 +378,7 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
     except NameError:
         body = [output]
 
-    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a href="%s/admin/bibrank/guide.html#ar">?</a>]</small>""" % weburl, body)
+    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#ar">?</a>]</small>""" % weburl, body)
       
 def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', confirm=0):
     """form to modify a rank method
@@ -415,7 +395,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
     output  = """
     <dl>
      <dd>When changing the BibRank code of a rank method, you must also change any scheduled tasks using the old value.
-     <br>For more information, please go to the <a href="%s/admin/bibrank/guide.html">BibRank guide</a> and read the section about modifying a rank method's  BibRank code.</dd>
+     <br>For more information, please go to the <a title="See guide" href="%s/admin/bibrank/guide.html">BibRank guide</a> and read the section about modifying a rank method's  BibRank code.</dd>
     </dl>
     """ % weburl
     
@@ -492,7 +472,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
             text = """<b><span class="info"><br>Sorry, could not modify configuration file, please check for rights to do so: '%s/bibrank/%s.cfg'<br>Please modify the file manually.</span></b>""" % (etcdir, get_rnk_code(rnkID)[0][0])
         output += text
 
-    finoutput = addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a href="%s/admin/bibrank/guide.html#mr">?</a>]</small>""" % weburl, [output])
+    finoutput = addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mr">?</a>]</small>""" % weburl, [output])
     output = ""
     
     text = """
@@ -539,7 +519,7 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
      <dt>WARNING:</dt>
      <dd>When deleting a rank method, you also deletes all data related to the rank method, like translations, which collections
      it was attached to and the data necessary to rank the searchresults. Any scheduled tasks using the deleted rank method will also stop working.
-     <br><br>For more information, please go to the <a href="%s/admin/bibrank/guide.html">BibRank guide</a> and read the section regarding deleting a rank method.</dd>
+     <br><br>For more information, please go to the <a title="See guide" href="%s/admin/bibrank/guide.html">BibRank guide</a> and read the section regarding deleting a rank method.</dd>
     </dl>
     </strong>
     </span>
@@ -578,7 +558,7 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
     except NameError:
         body = [output]
 
-    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a href="%s/admin/bibrank/guide.html#dr">?</a>]</small>""" % weburl, body)
+    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#dr">?</a>]</small>""" % weburl, body)
 
 
 def perform_showrankdetails(rnkID, ln=cdslang):
