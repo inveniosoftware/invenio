@@ -20,9 +20,15 @@
 pylibdir=$(libdir)/python/cdsware
 pylib_DATA=__init__.py config.py dbquery.py
 
+phplibdir=$(libdir)/php/cdsware/errors
+phplib_DATA=errorHandling.shtml
+
 EXTRA_DIST = $(wildcard *.wml)
 
-CLEANFILES = $(pylib_DATA) *~ *.tmp *.pyc
+CLEANFILES = $(pylib_DATA) $(phplib_DATA) *~ *.tmp *.pyc
 
 %.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml
+	$(WML) -o $@ $<
+
+%.shtml: %.shtml.wml ../../../config/config.wml ../../../config/configbis.wml
 	$(WML) -o $@ $<
