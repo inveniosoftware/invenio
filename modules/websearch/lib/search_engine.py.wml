@@ -2441,7 +2441,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, de
                         req.write("""\n<div class="recordlastmodifiedbox">%s</div>""" % \
                                   (msg_record_last_modified[ln] % (get_creation_date(recIDs[irec]),get_modification_date(recIDs[irec]))))
                         req.write("""\n<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
-                        req.write("""<input name="recid" type="hidden" value="%s"></td>""" % recIDs[irec])
+                        req.write("""<input name="recid" type="hidden" value="%s">""" % recIDs[irec])
                         req.write("""<br><input class="formbutton" type="submit" name="action" value="%s">"""  % msg_add_to_basket[ln])
                         req.write("""\n</form>""")
                     req.write("<p>&nbsp;")
