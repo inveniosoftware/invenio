@@ -19,7 +19,7 @@
 
 docdir = $(WEBDIR)/admin/bibrank
 
-doc_DATA= index.html bibrankadminguide.html
+doc_DATA= bibrankadminguide.html
 
 sampledir=$(WEBDIR)/admin/bibrank
 sample_DATA=jif.cfg jif.kb

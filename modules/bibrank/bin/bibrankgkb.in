@@ -43,7 +43,6 @@ Usage: bibrankgkb %s [options]
 """
 
 ## fill config variables:
-#pylibdir = "/usr/local/cdsware-DEMO/lib/python"
 pylibdir = "<LIBDIR>/python"
 __version__ = "$Id$"
 
@@ -141,7 +140,6 @@ def bibrankgkb(config):
                 j = j + 1
             temp = get_from_source(cfg[0], (urls, cfg[2]))
         elif cfg[0] == "db":
-            print cfg
             temp = get_from_source(cfg[0], (cfg[1], cfg[2]))
         i = i + 1
         if len(conv) != 0:

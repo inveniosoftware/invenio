@@ -89,6 +89,7 @@ try:
     import types
     import gc
     import ConfigParser
+    import zlib
     
 except ImportError, e:
     print "Error: %s" % e
@@ -100,7 +101,7 @@ try:
     from cdsware.config import *
     from cdsware.search_engine_config import cfg_max_recID
     from cdsware.search_engine import perform_request_search, strip_accents
-    from cdsware.search_engine import HitSet
+    from cdsware.search_engine import HitSet, get_index_id, create_basic_search_units
     from cdsware.dbquery import run_sql
     from cdsware.access_control_engine import acc_authorize_action 
     from bisect import bisect
@@ -717,6 +718,12 @@ def serialize_via_numeric_array(arr):
 def deserialize_via_numeric_array(string):
     """Decompress and deserialize string into a Numeric array."""
     return Numeric.loads(decompress(string))
+def serialize_via_marshal(obj):
+    """Serialize Python object via marshal into a compressed string."""
+    return MySQLdb.escape_string(compress(dumps(obj)))
+def deserialize_via_marshal(string):
+    """Decompress and deserialize string into a Python object via marshal."""
+    return loads(decompress(string))
 
 def _db_login(relogin = 0):
     """Login to the database"""
@@ -999,7 +1006,7 @@ def task_run(row):
     task_proc = row[1]
     opts_dict = loads(row[6])
     task_status = row[7]
-    if task_proc != "bibrank":
+    if task_proc != "runbibrank":
         write_message("-The task #%d does not seem to be a BibRank task." % task_id, sys.stderr)
         return 0
     if task_status != "WAITING":
@@ -1032,6 +1039,7 @@ def task_run(row):
                     
         for key in opts_dict["run"]:
             #file = "/home/trondaks/w/cdsware/modules/bibrank/etc/" + key + ".cfg"
+            cfg_name = getName(key)
             file = etcdir + "/bibrank/" + key + ".cfg"
             if opts_dict["verbose"] >=9:
                 write_message("Getting configuration from file: %s" % file)
@@ -1044,7 +1052,6 @@ def task_run(row):
             cfg_stars = number_of_stars 
             cfg_star = config.getfloat("rank_method", "top_star_percentage")
             cfg_short = key
-            cfg_name = config.get("rank_method", "name")
             cfg_function = config.get("rank_method", "function")
             cfg_importance = config.getfloat("rank_method", "overall_importance")
             sets[key] = StarSet(cfg_name, cfg_short, cfg_function, cfg_importance, cfg_stars, cfg_star)
@@ -1069,6 +1076,18 @@ def task_run(row):
         write_message("Task #%d finished." % task_id)
         showtime((time.time() - startCreate))
     return 1
+
+def getName(rnkname, ln=cdslang, type='ln'):
+    try:
+        rnkid = run_sql("SELECT id FROM rnkMETHOD where name='%s'" % rnkname)
+        rnkid = str(rnkid[0][0])
+        res = run_sql("SELECT value FROM rnkMETHODNAME where type='%s' and ln='%s' and id_rnkMETHOD=%s" % (type, ln, rnkid))
+        if not res:
+            res = run_sql("SELECT value FROM rnkMETHODNAME WHERE ln='%s' and id_rnkMETHOD=%s and type='%s'"  % (cdslang, rnkid, type))
+        return res[0][0]
+    except StandardError, e:
+        write_message("Cannot run rank method, either given code for method is wrong, or it has not been added using the webinterface.")
+        raise StandardError
 
 def command_line():
     global opts_dict
@@ -1125,14 +1144,67 @@ def command_line():
         write_message(e, sys.stderr)
         sys.exit(1)
 
-    #user = authenticate(user)
+    user = authenticate(user)
     if opts_dict["verbose"]>=9:
         write_message("Storing task options %s" % opts_dict)
-    query = """INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status) VALUES ('bibrank','%s',CAST('%s' AS DATE),'%s','%s','WAITING')""" % (MySQLdb.escape_string(user),MySQLdb.escape_string(sched_time), sleeptime, MySQLdb.escape_string(dumps(opts_dict)))
+    query = """INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status) VALUES ('runbibrank','%s',CAST('%s' AS DATE),'%s','%s','WAITING')""" % (MySQLdb.escape_string(user),MySQLdb.escape_string(sched_time), sleeptime, MySQLdb.escape_string(dumps(opts_dict)))
     new_task_id = run_sql(query)
     print "Task #%d was successfully scheduled for execution." % new_task_id
     return
 
+def create_doc_vector():
+    startCreate = time.time()
+    words = {}
+    docs = {}
+    docsnr = run_sql("SELECT count(*) FROM bibrec")[0][0]
+    for nr in range(0, cfg_max_recID + 1):
+        docs[nr] = []
+        
+    write_message("Total possible xnumber of docs: %s" % (cfg_max_recID + 1))
+    write_message("Current number of docs: %s" % (docsnr))
+    res = run_sql("SELECT id,term, hitlist FROM idxWORD01F")
+    write_message("Number of terms: %s" % len(res))
+
+    file1 = open("no.txt", 'w')
+    file2 = open("yes.txt", 'w')
+    nr = 0
+    for id, term, hitlist in res:
+        if not words.has_key(term):
+            hitset = HitSet(Numeric.loads(decompress(hitlist)))
+            hitset.calculate_nbhits()
+            if check_term(term, hitset, docsnr):
+                file2.write(term + "\n")
+                words[term] = nr
+                reclist = hitset.tolist()
+                for recid in reclist:
+                    docs[recid].append(id)
+                nr = nr + 1
+            else:
+                file1.write(term + "\n")
+        else:
+            print "ERROR"
+    file1.close()
+    file2.close()
+    write_message("Done, Number of terms: %s" % nr)
+    return (docs,words)
+    
+def check_term(term, set, docsnr):
+    termlength = 3
+    stopwords = 0.80
+    
+    try:
+        if int(term):
+            return ""
+    except StandardError, e:
+        if len(term) <= termlength:
+            return ""
+        if (float(set._nbhits) / float(docsnr)) >= stopwords:
+            return ""
+        reg = re.compile(r'[{}()\><!#?/$%^*=+;:]')
+        if re.search(reg, term):
+            return ""
+    return "true"
+    
 def main():
     if len(sys.argv) == 2:
         try:
@@ -1154,6 +1226,7 @@ def main():
             write_message("Exiting.")
             task_update_status("ERROR")
     else:
+        sys.exit()
         command_line()
         
 if __name__ == "__main__":

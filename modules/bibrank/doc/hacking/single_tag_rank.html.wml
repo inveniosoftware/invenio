@@ -29,43 +29,77 @@ When running a rank method, the first thing that happen after the configuration 
 into account are found. If the user used options like --collection or --id to specify which records to check, the records in the
 collections/ranges will be added to a variable, so that they later can be used for filtering out unwanted records.
 
-Then the function responsible for creating the rankmethod specified in the configuration file will be
+Then the function responsible for creating the rank method specified in the configuration file will be
 called. In this case the single_tag_rank_method function.
 
-If quick:
-    1. First, the functions checks if we are doing a full update (rebalace) or a quick update (using for example the --modified option)
-    which is the case here.
-    2. Call fromdb() which read the old data from database and create a starset object which contains the data from the database.
-    3. Update starset object set "last updated" variable to current datetime.
-    4. Call function single_tag_rank.
-    5. This method will then load the configuration from the configurationfile sent as argument to the function.
-    6. Then the knowledgebasefile mentioned in the cfg file will be loaded and placed in the 'kb_data' variable
-    7. The tags in the cfg file are loaded.
-    8. The function checks if it is a quick or full update (checks opts_dict["modified"])
-    9. Since it is a quick update, it will first load all records modified after given date, then for each record returned from the
-    database, a sql query will be executed to check that all mandatory tags exists, if not, it will continue to the next record. If the
-    record has all mandatory tags, a sql statement will be executed to read the value for this record in the tag given in the cfg file.
-    10. The function will then go through all records, and if we have the value for the record as a key in kb_data, the value from kb_data
-    will be associated to this record id. If the record id already has a value, this will be replaced if the newest is higher than the old
-    one, and if there is no match in kb_data it will get the value -1.
-    11. The two 'sets' of record id's will then be merged, the new values replaces the old ones.
-    12. Finally the database is updated with the new values.
+Configuration file:
+    [rank_method]
+    function = single_tag_rank_method
+    top_star_percentage = 0.10
+    overall_importance = 1.0
+
+    [single_tag_rank]
+    tag = 909C4p
+    kb_src = /log/cdsware-DEMODEV/etc/bibrank/stm.kb
+    check_mandatory_tags = 909C4c
+    enable_modified = yes
+
+
+If quick/modified:
+   1. First, the functions checks if we are doing a full update (rebalace) or a quick update (using for example the --modified option)
+      which is the case here.
     
-If full:
-    1. First, the functions checks if we are doing a full update (rebalace) or a quick update (using for example the --modified option).
-    2. Update starset object set "last updated" variable to current datetime.
-    4. Call function single_tag_rank.
-    5. This method will then load the configuration from the configurationfile sent as argument to the function.
-    6. Then the knowledgebasefile mentioned in the cfg file will be loaded and placed in the 'kb_data' variable
-    7. The tags in the cfg file are loaded.
-    8. The function checks if is is a quick or full update (checks opts_dict["modified"])
-    9. Since it here is a full update, it will execute a sql statement to load all records wich have the MARC21 tag from the cfg file. If
-    there are mandatory tags, one sql statement will be executed for each, and a intersection done between the returned sets to remove records
-    without the mandatory tags.
-    10. The function will then go through all records, and if we have the value for the record as a key in kb_data, the value from kb_data
-    will be associated to this record id. If the record id already has a value, this will be replaced if the newest is higher than the old one,
-    and if there is no match in kb_data it will get the value -1.
-    11. The returned of type dict is then sorted, using the sorting function described <a href="sort.html">here</a>.
-    12. Finally the database is updated with the sorted values, if the rankmethod's abbreviation exists in rnkMETHOD, if not, an error message is given.
+   2. Call fromdb() which read the old data from database and create a starset object which contains the data from the database.
+   
+   3. Update starset object set "last updated" variable to current datetime.
+   
+   4. Call function single_tag_rank.
+   
+   5. This method will then load the configuration from the configurationfile sent as argument to the function.
+
+   6. Then the knowledgebasefile mentioned in the cfg file will be loaded and placed in the 'kb_data' variable.
+    
+   7. The tags in the cfg file are loaded.
+    
+   8. The function checks if it is a quick or full update (checks opts_dict["modified"]).
+    
+   9. Since it is a quick update, it will first load all records modified after given date, then for each record returned from the
+      database, a sql query will be executed to check that all mandatory tags exists, if not, it will continue to the next record. If the
+      record has all mandatory tags, a sql statement will be executed to read the value for this record in the tag given in the cfg file.
+
+  10. The function will then go through all records, and if we have the value for the record as a key in kb_data, the value from kb_data
+      will be associated to this record id. If the record id already has a value, this will be replaced if the newest is higher than the old
+      one, and if there is no match in kb_data it will get the value -1.
+
+  11. The two 'sets' of record id's will then be merged, the new values replaces the old ones.
+
+  12. Finally the database is updated with the new values.
+    
+If full/rebalancing:
+   1. First, the functions checks if we are doing a full update (rebalace) or a quick update (using for example the --modified option).
+
+   2. Update starset object set "last updated" variable to current datetime.
+
+   3. Call function single_tag_rank.
+
+   4. This method will then load the configuration from the configurationfile sent as argument to the function.
+
+   5. Then the knowledgebasefile mentioned in the cfg file will be loaded and placed in the 'kb_data' variable.
+
+   6. The tags in the cfg file are loaded.
+
+   7. The function checks if is is a quick or full update (checks opts_dict["modified"]).
+
+   8. Since it here is a full update, it will execute a sql statement to load all records wich have the MARC21 tag from the cfg file. If
+      there are mandatory tags, one sql statement will be executed for each, and a intersection done between the returned sets to remove records
+      without the mandatory tags.
+
+   9. The function will then go through all records, and if we have the value for the record as a key in kb_data, the value from kb_data
+      will be associated to this record id. If the record id already has a value, this will be replaced if the newest is higher than the old one,
+      and if there is no match in kb_data it will get the value -1.
+
+  10. The returned of type dict is then sorted, using the sorting function described <a href="sort.html">here</a>.
+
+  11. Finally the database is updated with the sorted values, if the rank method's abbreviation exists in rnkMETHOD, if not, an error message is given.
 </pre>
 </blockquotes>

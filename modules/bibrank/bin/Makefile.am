@@ -21,7 +21,7 @@ bin_SCRIPTS=bibrank bibrankgkb
 
 EXTRA_DIST = $(wildcard *.wml)
 
-CLEANFILES = $(bin_SCRIPTS) *~ *.tmp bibrankc bibrankgkbc
+CLEANFILES = $(bin_SCRIPTS) *~ *.tmp bibrankc bibrankgkbc vectorrankc
 
 %: %.wml ../../../config/config.wml ../../../config/configbis.wml ../../../config/cdswmllib.wml
 	$(WML) -o $@ $<

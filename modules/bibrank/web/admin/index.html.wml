@@ -1,3 +1,5 @@
+## $Id$
+
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002 CERN.
 ##
@@ -16,20 +18,19 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
-    title="Create knowledgebase files (bibrankgkb)" \
-    navbar_name="hacking-bibrank" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a>  &gt; <a class=navtrail href=<WEBURL>/hacking/bibrank/>BibRank Internals</a> " \
-    navbar_select="hacking-bibrank-index" 
+    title="BibRank Admin" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a>" 
 
-<pre>
-<blockquotes>
-   1. Read default configuration file or the one specified by the user
+<p>
+ This is the gate to the admin area for BibRank. You need to 
+ <a href="<WEBURL>/youraccount.py/login?referer=<WEBURL>/admin/bibrank/">login</a> to enter.
+</p>
 
-   2. Read each create_ line from the cfg file, for each line, read the source(s) from either database, file
-      or www by calling get_from_source(). Convert between naming conventions if source for convertion data is given.
-
-   3. Merge into one file, repeat 2. until last source is read.
-
-   4. Save file if requested with --output
-</pre>
-</blockquotes>
+<dl>
+ <dt><a href="bibrankadmin.py">BibRank Admin Interface</a></dt>
+ <dd>Start area for BibRank administration.</dd>
+</dl>
+<dl>
+ <dt><a href="bibrankadminguide.html">BibRank Admin Guide</a></dt>
+ <dd>Everything you want to know about BibRank administration</dd>
+</dl>
