@@ -38,7 +38,7 @@ pylibdir = "<LIBDIR>/python"
 
 ## version number:
 __version__ = "$Id$"
-    
+
 ## import interesting modules:
 
 try:
@@ -47,8 +47,8 @@ try:
     from cdsware.dbquery import run_sql
     from cdsware.config import *
     from cdsware.search_engine import perform_request_search
+    from cdsware.search_engine import print_record
     import getopt
-    import urllib
     import marshal
     import signal
     import string
@@ -62,14 +62,17 @@ except ImportError, e:
     import sys
     sys.exit(1)
 
-sql_queries   = []
-cds_query     = {}                   # holds CDS query parameters (fields, collection, pattern)
-process_hb    = 0                    # flag, process records without created format
-process       = 1                    # flag, process records (unless count only)
-fmt           = "hb"                 # default format to be processed
-sleeptime     = ""                   # default sleeptime
-format_string = "%Y-%m-%d %H:%M:%S"
-sched_time    = time.strftime(format_string)
+sql_queries    = []                           # holds SQL queries to be executed
+cds_query      = {}                           # holds CDS query parameters (fields, collection, pattern)
+process_format = 0                            # flag, process records without created format
+process        = 1                            # flag, process records (unless count only)
+fmt            = "hb"                         # default format to be processed
+sleeptime      = ""                           # default sleeptime
+format_string  = "%Y-%m-%d %H:%M:%S"          # date/time format
+sched_time     = time.strftime(format_string) # scheduled execution time in the date/time format
+
+### sql commands to be executed during the script run
+###
 
 sql = {
 
@@ -81,18 +84,22 @@ sql = {
 }
 
 
-def bibreformat_task(sql_queries, cds_query, process_hb):
+### run the bibreformat task bibsched scheduled
+###
+
+def bibreformat_task(sql_queries, cds_query, process_format):
     
     global process, fmt
 
     t1 = os.times()[4]
 
+
 ### Query the database
 ###
 
-    if process_hb:
+    if process_format:
         print "Querying database for records with missing format ..."
-        without_hb = withouthb()
+        without_format = without_fmt()
 
     recIDs = []
 
@@ -116,9 +123,9 @@ def bibreformat_task(sql_queries, cds_query, process_hb):
 ### list of corresponding record IDs was retrieved
 ### bibformat the records selected
 
-    if process_hb:
-        print "Records to be processed: %d" % (len(recIDs)+len(without_hb))
-        print "Out of it records without created format: %d" % len(without_hb)
+    if process_format:
+        print "Records to be processed: %d" % (len(recIDs)+len(without_format))
+        print "Out of it records without created format: %d" % len(without_format)
     else:
         print "Records to be processed: %d" % (len(recIDs))
 
@@ -135,9 +142,9 @@ def bibreformat_task(sql_queries, cds_query, process_hb):
         iterate_over(recIDs, weburl, fmt)
 
 
-### Iterate over all records prepared in list II (no_hb)
-    if process_hb and process:
-        iterate_over(without_hb, weburl, fmt)
+### Iterate over all records prepared in list II (no_format)
+    if process_format and process:
+        iterate_over(without_format, weburl, fmt)
 
 
 ### Final statistics
@@ -159,16 +166,6 @@ def bibreformat_task(sql_queries, cds_query, process_hb):
 
     message = " bibupload: %2f sec" % tbibupload
     print message
-
-
-### MySQL Search by recID
-###
-
-def read_xml_input(weburl, query):
-    "Read records to preprocess via http"
-    
-    url = "%s/search.py?%s" % (weburl, query)
-    return urllib.urlopen(url).read()
 
 
 ### Result set operations
@@ -199,15 +196,15 @@ def ldiff(l1, l2):
     return ld
 
 
-### Identify recIDs of records with missing hb
+### Identify recIDs of records with missing format
 ###
 
-def withouthb():
-    "List of record IDs to be reformated, not having the hb format yet"
+def without_fmt():
+    "List of record IDs to be reformated, not having the specified format yet"
 
     global fmt
 
-    xm1, xm2, hb1, hb2 = [],[],[],[]
+    xm1, xm2, format1, format2 = [],[],[],[]
     
     q1 = sql['q1'] # "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='xm'"
     q2 = sql['q2'] # "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt
@@ -218,13 +215,13 @@ def withouthb():
     for item in xm1:
         xm2.append(item[0])
 
-    ## get complete recID list of hb formatted records
-    hb1 = run_sql(q2)
+    ## get complete recID list of formatted records
+    format1 = run_sql(q2)
 
-    for item in hb1:
-        hb2.append(item[0])
+    for item in format1:
+        format2.append(item[0])
 
-    return lhdiff(xm2,hb2)
+    return lhdiff(xm2,format2)
 
 
 ### Bibreformat all selected records
@@ -249,7 +246,20 @@ def iterate_over(list, weburl, fmt):
         print message
 
         query = "id=%d&of=xm" % (record)
-        xml_content = xml_content + read_xml_input(weburl, query)
+
+        count = 0
+
+        contents = print_record(record, 'xm') 
+
+        while (contents == "") and (count < 10):
+            contents = print_record(record, 'xm') 
+            count = count + 1
+            time.sleep(10)
+        if count == 10:
+            sys.stderr.write("Failed to download %s from %s after 10 attempts... terminating" % (query, weburl))
+            sys.exit(0)
+
+        xml_content = xml_content + contents
 
         if xml_content:
 
@@ -523,7 +533,7 @@ def task_get_options(id):
     return out
 
 
-def task_run(process_hb):
+def task_run(process_format):
     """Runs the task by fetching arguments from the BibSched task queue.  This is what BibSched will be invoking via daemon call."""
 
     global task_id, process, fmt, sched_time
@@ -539,7 +549,7 @@ def task_run(process_hb):
 #        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt)
         sql_queries.append(sql['all'])
     if options.has_key("without"):
-        process_hb = 1
+        process_format = 1
 
     if options.has_key("noprocess"):
         process = 0
@@ -580,7 +590,7 @@ def task_run(process_hb):
     signal.signal(signal.SIGINT, task_sig_unknown)
     ## run the task:
 
-    bibreformat_task(sql_queries, cds_query, process_hb)
+    bibreformat_task(sql_queries, cds_query, process_format)
 
     ## we are done:
     task_update_state("DONE")
@@ -620,21 +630,18 @@ def main():
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
         ## A - run the task
         task_id = int(sys.argv[1])
-        process_hb = 0
-        task_run(process_hb)
+        process_format = 0
+        task_run(process_format)
     else:
         ## B - submit the task
-        process_hb = 0
+        process_format = 0
         options = {} # will hold command-line options
         try:
             opts, args = getopt.getopt(sys.argv[1:], "hVdu:ac:f:s:p:lo:nt:wl", ["help", "version", "debug","user=","all","collection=","field=","sleeptime=","pattern=","format=","noprocess","time=","without","last"])
         except getopt.GetoptError, err:
             usage(1, err)
 
-        if len(sys.argv) == 1:                       # default
-
-            options["without"]    = 1
-            options["last"]   = 1
+        clp = 0 # default parameters flag
 
         try:
 
@@ -649,19 +656,20 @@ def main():
                 elif opt[0] in ["-d", "--debug"]:
                     options["debug"]  = 1
                 elif opt[0] in ["-a", "--all"]:
-                    options["all"]    = 1
+                    options["all"]        = 1
                     options["without"]    = 1
+                    clp = 1
                 elif opt[0] in ["-c", "--collection"]:
                     options["collection"]=opt[1]
+                    clp = 1
                 elif opt[0] in ["-n", "--noprocess"]:
                     options["noprocess"] = 1
-                    if len(sys.argv) == 2:
-                        options["without"]    = 1
-                        options["last"]   = 1
                 elif opt[0] in ["-f", "--field"]:
                     options["field"]  = opt[1]
+                    clp = 1
                 elif opt[0] in ["-p","--pattern"]:
                     options["pattern"] = opt[1]
+                    clp = 1
                 elif opt[0] in ["-o","--format"]:
                     options["format"] = opt[1]
                 elif opt[0] in ["-s", "--sleeptime" ]:
@@ -670,6 +678,11 @@ def main():
                 elif opt[0] in [ "-t", "--time" ]:
                     sched_time = get_date(opt[1])
 
+            if clp == 0: # default
+
+                options["without"]  = 1
+                options["last"]     = 1
+        
         except StandardError, e:
             usage(e)
         task_submit(options)
