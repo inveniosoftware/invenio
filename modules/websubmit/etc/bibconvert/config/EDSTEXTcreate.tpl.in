@@ -1,7 +1,7 @@
 ## read config variables:
 #include "config.wml"
 #include "configbis.wml"
-<protect>START---<record>
+<protect>START::DEFP()---<record>
 SN::MINLW(31)---<controlfield tag="001"><:SN::SN::IF(,000,ORIG):></controlfield>
 DB---<datafield tag="980" ind1="" ind2=""><subfield code="a"><:comboTEXT::comboTEXT:></subfield></datafield>
 ER---<datafield tag="037" ind1="" ind2=""><subfield code="a"><:RNTEST2::RNTEST2:></subfield></datafield>
@@ -15,7 +15,7 @@ AB---<datafield tag="520" ind1="" ind2=""><subfield code="a"><:AB::AB:></subfiel
 NO---<datafield tag="500" ind1="" ind2=""><subfield code="a"><:NO::NO:></subfield></datafield>
 KW---<datafield tag="650" ind1="" ind2=""><subfield code="a"><:KW*::KW:></subfield></datafield>
 EM---<datafield tag="856" ind1="0" ind2=""><subfield code="f"><:SuE::SuE:></subfield></datafield>
-EXT---<datafield tag="856" ind1="4" ind2=""><subfield code="u"><:linkmanager::linkmanager:>?base=TEST&id=<:RNTEST2::RNTEST2::DOWN:></subfield><subfield code="z">Access to fulltext document</subfield></datafield>
+EXT---<datafield tag="856" ind1="4" ind2=""><subfield code="u"></protect><WEBURL><protect>/archive.py?base=TEST&id=<:RNTEST2::RNTEST2::DOWN:></subfield><subfield code="z">Access to fulltext document</subfield></datafield>
 LN---<datafield tag="041" ind1="" ind2=""><subfield code="a"><:LANG::LANG::IF(,eng,ORIG):></subfield></datafield>
-END---</record>
+END::DEFP()---</record>
 </protect>

@@ -8,13 +8,10 @@ KW---<:KW:>
 AB---<:AB:>
 NO---<:NO:>
 Rep---<:Rep:>
-AN---<:AN:>
 act---<:act:>
 BN---<:BN:>
-DB---<:DB:>
 RNPHO---<:RNPHO:>
 RNPHO2---<:RNPHO2:>
 comboRPICT---<:comboRPICT:>
 SN---<:SN:>
-linkmanager---<:linkmanager:>
 </protect>

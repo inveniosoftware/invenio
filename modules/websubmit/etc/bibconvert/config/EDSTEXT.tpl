@@ -9,13 +9,10 @@ AB---<:AB:>
 NO---<:NO:>
 Rep---<:Rep:>
 AF---<:AF:>
-AN---<:AN:>
 act---<:act:>
 BN---<:BN:>
-DB---<:DB:>
 RNTEST---<:RNTEST:>
 RNTEST2---<:RNTEST2:>
 comboTEXT---<:comboTEXT:>
 SN---<:SN:>
-linkmanager---<:linkmanager:>
 </protect>
