@@ -45,12 +45,7 @@ def index(req, ln=cdslang):
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
-        return page(title=msg_internal_error[ln],
-                    body = create_error_box(req, verbose=verbose, ln=ln),
-                    description="%s - Internal Error" % cdsname, 
-                    keywords="%s, CDSware, Internal Error" % cdsname,
-                    language=ln,
-                    urlargs=req.args)
+        return error_page(req)
 
     if not brc.check_user(uid):
         return page(title="BibRank Admin Interface",
@@ -59,15 +54,9 @@ def index(req, ln=cdslang):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                urlargs=req.args)   
+                urlargs=req.args)
     else:
-        return page(title='Authorization failure',
-                uid=uid,
-                body=brc.adderrorbox('try to login first',
-                                     datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount.py/login?referer=%s/admin/bibrank/">login</a> with another account.""" % (weburl, weburl)]),
-                navtrail= navtrail_previous_links,
-                lastupdated=__lastupdated__)
+        return auth_failed(uid, navtrail_previous_links)
 
 def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -75,12 +64,7 @@ def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
-        return page(title=msg_internal_error[ln],
-                    body = create_error_box(req, verbose=verbose, ln=ln),
-                    description="%s - Internal Error" % cdsname, 
-                    keywords="%s, CDSware, Internal Error" % cdsname,
-                    language=ln,
-                    urlargs=req.args)
+        return error_page(req)
 
     if not brc.check_user(uid):
         return page(title="Add new rank method",
@@ -92,49 +76,32 @@ def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 urlargs=req.args,
-                lastupdated=__lastupdated__)   
-    else:
-        return page(title='Authorization failure',
-                uid=uid,
-                body=brc.adderrorbox('try to login first',
-                                     datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount.py/login?referer=%s/admin/bibrank/">login</a> with another account.""" % (weburl, weburl)]),
-                navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
+    else:
+        return auth_failed(uid, navtrail_previous_links)
 
-def modifytranslation(req, rnkID='', ln=cdslang, sel_lang='', trans = [], confirm=0):
+def modifytranslations(req, rnkID='', ln=cdslang, sel_type='', trans = [], confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
     
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
-        return page(title=msg_internal_error[ln],
-                    body = create_error_box(req, verbose=verbose, ln=ln),
-                    description="%s - Internal Error" % cdsname, 
-                    keywords="%s, CDSware, Internal Error" % cdsname,
-                    language=ln,
-                    urlargs=req.args)
+        return error_page(req)
 
     if not brc.check_user(uid):
         return page(title="Modify translations",
-                body=brc.perform_modifytranslation(rnkID=rnkID,
+                body=brc.perform_modifytranslations(rnkID=rnkID,
                                              ln=ln,
-                                             sel_lang=sel_lang,
+                                             sel_type=sel_type,
                                              trans=trans,
                                              confirm=confirm),
                 uid=uid,
                 language=ln,
                 urlargs=req.args,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
-    else:
-        return page(title='Authorization failure',
-                uid=uid,
-                body=brc.adderrorbox('try to login first',
-                                     datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount.py/login?referer=%s/admin/bibrank/">login</a> with another account.""" % (weburl, weburl)]),
-                navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
+    else:
+        return auth_failed(uid, navtrail_previous_links)
 
 def modifycollection(req, ln=cdslang, rnkID='', func='', colID='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -142,12 +109,7 @@ def modifycollection(req, ln=cdslang, rnkID='', func='', colID='', confirm=0):
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
-        return page(title=msg_internal_error[ln],
-                    body = create_error_box(req, verbose=verbose, ln=ln),
-                    description="%s - Internal Error" % cdsname, 
-                    keywords="%s, CDSware, Internal Error" % cdsname,
-                    language=ln,
-                    urlargs=req.args)
+        return error_page(req)
 
     if not brc.check_user(uid):
         return page(title="Modify visibility toward collections",
@@ -160,15 +122,9 @@ def modifycollection(req, ln=cdslang, rnkID='', func='', colID='', confirm=0):
                 language=ln,
                 urlargs=req.args,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
-    else:
-        return page(title='Authorization failure',
-                uid=uid,
-                body=brc.adderrorbox('try to login first',
-                                     datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount.py/login?referer=%s/admin/bibrank/">login</a> with another account.""" % (weburl, weburl)]),
-                navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
+    else:
+        return auth_failed(uid, navtrail_previous_links)
 
 def deleterank(req, ln=cdslang, rnkID='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -176,12 +132,7 @@ def deleterank(req, ln=cdslang, rnkID='', confirm=0):
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
-        return page(title=msg_internal_error[ln],
-                    body = create_error_box(req, verbose=verbose, ln=ln),
-                    description="%s - Internal Error" % cdsname, 
-                    keywords="%s, CDSware, Internal Error" % cdsname,
-                    language=ln,
-                    urlargs=req.args)
+        return error_page(req)
 
     if not brc.check_user(uid):
         return page(title="Delete rank method",
@@ -192,17 +143,9 @@ def deleterank(req, ln=cdslang, rnkID='', confirm=0):
                 language=ln,
                 urlargs=req.args,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
-    else:
-        return page(title='Authorization failure',
-                uid=uid,
-                body=brc.adderrorbox('try to login first',
-                                     datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount.py/login?referer=%s/admin/bibrank/">login</a> with another account.""" % (weburl, weburl)]),
-                navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
-
-
+    else:
+        return auth_failed(uid, navtrail_previous_links)
 
 def modifyrank(req, ln=cdslang, rnkID='', rnkcode='', template='', cfgfile='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -210,12 +153,7 @@ def modifyrank(req, ln=cdslang, rnkID='', rnkcode='', template='', cfgfile='', c
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
-        return page(title=msg_internal_error[ln],
-                    body = create_error_box(req, verbose=verbose, ln=ln),
-                    description="%s - Internal Error" % cdsname, 
-                    keywords="%s, CDSware, Internal Error" % cdsname,
-                    language=ln,
-                    urlargs=req.args)
+        return error_page(req)
 
     if not brc.check_user(uid):
         return page(title="Modify rank method",
@@ -231,13 +169,7 @@ def modifyrank(req, ln=cdslang, rnkID='', rnkcode='', template='', cfgfile='', c
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
-        return page(title='Authorization failure',
-                uid=uid,
-                body=brc.adderrorbox('try to login first',
-                                     datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount.py/login?referer=%s/admin/bibrank/">login</a> with another account.""" % (weburl, weburl)]),
-                navtrail= navtrail_previous_links,
-                lastupdated=__lastupdated__)
+        return auth_failed(uid, navtrail_previous_links)
 
 def showrankdetails(req, ln=cdslang, rnkID=''):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -245,12 +177,7 @@ def showrankdetails(req, ln=cdslang, rnkID=''):
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
-        return page(title=msg_internal_error[ln],
-                    body = create_error_box(req, verbose=verbose, ln=ln),
-                    description="%s - Internal Error" % cdsname, 
-                    keywords="%s, CDSware, Internal Error" % cdsname,
-                    language=ln,
-                    urlargs=req.args)
+        return error_page(req)
 
     if not brc.check_user(uid):
         return page(title="Rank method details",
@@ -262,13 +189,22 @@ def showrankdetails(req, ln=cdslang, rnkID=''):
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
-        return page(title='Authorization failure',
+        return auth_failed(uid, navtrail_previous_links)
+
+def error_page(req):
+    return page(title=msg_internal_error[ln],
+                body = create_error_box(req, verbose=verbose, ln=ln),
+                description="%s - Internal Error" % cdsname, 
+                keywords="%s, CDSware, Internal Error" % cdsname,
+                language=ln,
+                urlargs=req.args)
+
+def auth_failed(uid, navtrail_previous_links):
+    return page(title='Authorization failure',
                 uid=uid,
-                body=brc.adderrorbox('try to login first',
+                body=wsc.adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount.py/login?referer=%s/admin/bibrank/">login</a> with another account.""" % (weburl, weburl)]),
+                                     <a href="%s/youraccount.py/login?referer=%s/admin/websearch/">login</a> with another account.""" % (weburl, weburl)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
-
     
-
