@@ -59,6 +59,11 @@ except ImportError, e:
     import sys
     sys.exit(1)
 
+try:
+    from webuser import getUid, create_user_infobox
+except ImportError, e:
+    pass # ignore user personalisation, needed e.g. for command-line
+        
 search_cache = {} # will cache results of previous searches
 dbg = 0 # are we debugging?
 
@@ -302,7 +307,7 @@ def create_opft_search_units(req, p, f, m=None):
             print_warning(req, opft, "Debug (create_opft_search_units() - created search unit)")            
     return opfts
 
-def create_header(cc=cdsname):
+def create_header(cc=cdsname, as=0, headeradd=""):
     "Creates CDS header and info on URL and date."
     return """
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -315,14 +320,20 @@ def create_header(cc=cdsname):
 </head>
 <body>
 <div class="pageheader">%s</div>
-""" % (cc, supportemail, weburl, cdspageheader)
+%s
+%s
+""" % (cc, supportemail, weburl,
+       cdspageheader, \
+       create_navtrail(cc, as,
+                       """<table border="0" cellspacing="0" cellpadding="2"><tr class="navtrail"><td><small><small>""",
+                       "","&gt;","", "&gt; Search Results</small></small></td></tr></table>",0), \
+       headeradd)
 
 def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1, p2, f2, m2, op2, p3, f3, m3, sc):
     "Create search box for 'search again in the results page' functionality."
     out = ""
     # print search box prolog:
     out += """
-    <p>
     <form action="%s/search.py" method="get">
     <strong class="headline"><span class="h1">%s</span></strong>
     <input type="hidden" name="cc" value="%s"> 
@@ -333,8 +344,6 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
     if sp:
         out += """<input type="hidden" name="sp" value="%s">""" % sp 
 
-    out += create_navtrail(cc, as, """<br><table border="0" cellspacing="0" cellpadding="0"><tr class="navtrail"><td width="60"></td><td><small><small>""","","&gt;","",
-                          "&gt; Search Results</small></small></td></tr></table><p>",0)
 
 
     # possibly print external search engines links (Google box):
@@ -972,6 +981,69 @@ try:
 except:
     collrecs_cache = create_collrecs_cache()
     collrecs_cache[cdsname] = get_collection_hitlist(cdsname)
+
+def browse(req, colls, p, f, rg):
+    """Browse either biliographic phrases or words indexes."""
+    return
+
+def browse_in_bibwords(p, f):
+    """Browse inside words indexes."""
+    return
+
+def browse_in_bibxxx(req, colls, p, f, rg):
+    """Browse bibliographic phrases for the given pattern in the given field."""
+    print_warning(req, "The browse functionality is about to be expanded and prettyfied.", "Warning")
+    ## determine browse field:
+    if string.find(p, ":") > 0: # does 'p' contain ':'?
+        f, p = split(p, ":", 2)
+    ## check arguments:
+    if not f:
+        print_warning(req, "Sorry, cannot browse within any field.  Please choose a field to browse in (e.g. <em>within title</em>).",
+                      "Error")
+        return 1
+    ## wash 'p' argument:
+    p = re_quotes.sub("", p)
+    ## construct 'tl' which defines the tag list (MARC tags) to search in:
+    tl = []
+    if str(f[0]).isdigit() and str(f[1]).isdigit():
+        tl.append(f) # 'f' seems to be okay as it starts by two digits
+    else:
+        # deduce desired MARC tags on the basis of chosen 'f'
+        tl = get_field_tags(f)
+        if not tl:
+            # by default we are searching in author index:
+            tl = get_field_tags("author")
+            print_warning(req, "The browse does not work in this field.  Choosing author index instead.", "Warning")
+    ## okay, start browse:
+    for t in tl:
+        req.write("<p><strong>Browsing in '%s' field:</strong>" % t)
+        # deduce into which bibxxx table we will search:
+        digit1, digit2 = int(t[0]), int(t[1])
+        bx = "bib%d%dx" % (digit1, digit2)
+        bibx = "bibrec_bib%d%dx" % (digit1, digit2)
+        # construct query:
+        if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
+            query = "SELECT bx.id, bx.value FROM %s AS bx WHERE bx.value >= '%s' AND bx.tag LIKE '%s%%' ORDER BY bx.value ASC LIMIT %d" \
+                    % (bx, p, t, rg)
+        else:
+            query = "SELECT bx.id, bx.value FROM %s AS bx WHERE bx.value >= '%s' AND bx.tag='%s' ORDER BY bx.value ASC LIMIT %d" \
+                    % (bx, p, t, rg)
+        # launch the query:
+        res = run_sql(query)
+        # display results:
+        for row in res:
+            bx_id, bx_val = row[0], row[1]
+            # deduce number of hits (=different RECIDs) for 'bx_val':
+            query_bis = "SELECT COUNT(DISTINCT(bibx.id_bibrec)) FROM %s AS bibx WHERE bibx.id_bibxxx='%s'" % (bibx, bx_id)
+            query_bis_hits = 0
+            res_bis = run_sql(query_bis, None, 1)
+            if res_bis:
+                query_bis_hits = res_bis[0][0]
+            hits = "%d record" % query_bis_hits
+            if query_bis_hits > 1:
+                hits = hits + "s"
+            req.write("""<br>&nbsp;&nbsp;&nbsp;%s ... <a href="%s/search.py?p=%s&f=%s">%s</a>""" % (bx_val, weburl, bx_val, t, hits))
+    return 
 
 def search_pattern(req, p=None, f=None, colls=None, m=None, hit_hints=0):
     """Searches for pattern 'p' and field 'f' and returns dict of recIDs HitLists per each collection in 'colls'.
@@ -2012,8 +2084,12 @@ def perform_request_search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", 
         # we are doing HTML output:
         req.content_type = "text/html"
         req.send_http_header()
-        # write header:
-        req.write(create_header(cc))
+        # detect user:
+        try:
+            uid = getUid(req)
+            req.write(create_header(cc, as, create_user_infobox(uid)))
+        except: # ignore user personalisation, needed e.g. for command-line
+            req.write(create_header(cc, as))
     if sysnb or id>0:
         ## 1 - detailed record display
         if sysnb: # ALEPH sysnb is passed, so deduce MySQL id for the record:            
@@ -2054,7 +2130,8 @@ def perform_request_search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", 
                 req.write(create_nearest_words_links(url, p3, f3))
         else:
             req.write("<p>Words nearest to <strong>%s</strong> inside <strong>%s</strong> are:<br>" % (p, f))
-            req.write(create_nearest_words_links(url, p, f))
+            #req.write(create_nearest_words_links(url, p, f))
+            browse_pattern(req, colls_to_search, p, f, rg)
     else:
         ## 3 - search needed
         # wash passed collection arguments:
