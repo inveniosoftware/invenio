@@ -28,7 +28,7 @@ import string
 from bibindex_engine_config import *
 
 stopwords = {}
-def create_stopwords_dict(filename=cfg_path_to_stopwords_file):
+def create_stopwords(filename=cfg_path_to_stopwords_file):
     """Create stopword dictionary out of FILENAME."""
     try:
         filename = open(filename, 'r')
@@ -41,7 +41,7 @@ def create_stopwords_dict(filename=cfg_path_to_stopwords_file):
        stopdict[string.rstrip(line)] = 1
     return stopdict
 
-stopwords = get_stopwords()
+stopwords = create_stopwords()
 
 def is_stopword(word, force_check=0): 
     """Return true if WORD is found among stopwords, false otherwise.
