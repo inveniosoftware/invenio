@@ -52,56 +52,56 @@ $(cdspageheaderadd)
 ## CDS page content:
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
  <tr valign=top>
-  <td height=100% width=<CDSPAGESTRIPEWIDTH> align=left class=pagestripeleft>
-   ### Stripe 1: CDS page left stripe
-   <table height=100% width=100% cellspacing=0 cellpadding=0 border=0>
-    <tr valign=top>
-     <td>
-      <table width=100% cellspacing=0 cellpadding=0 border=0>
-       <tr class="pageboxlefttop" valign=top>
-        <td width=100%>
-         ## navbar is by default in the the left top box
-         <navbar:render nohints name=$(navbar_name) select=$(navbar_select)> 
-        </td>
-       </tr>
+#  <td height=100% width=<CDSPAGESTRIPEWIDTH> align=left class=pagestripeleft>
+#    ### Stripe 1: CDS page left stripe
+#    <table height=100% width=100% cellspacing=0 cellpadding=0 border=0>
+#     <tr valign=top>
+#      <td>
+#       <table width=100% cellspacing=0 cellpadding=0 border=0>
+#        <tr class="pageboxlefttop" valign=top>
+#         <td width=100%>
+#          ## navbar is by default in the the left top box
+#          <navbar:render nohints name=$(navbar_name) select=$(navbar_select)> 
+#         </td>
+#        </tr>
 
-         ## first common "left top" CDS page box
-         <: if ('<CDSPAGEBOXLEFTTOP>' =~ /\w/) {
-               print '<tr class="pageboxlefttop" valign=top><td width=100%><CDSPAGEBOXLEFTTOP></td></tr>';
-            }
-         :> 
-         ## then optional "left top" page box that each page can define on its own
-         <: if ('$(cdspageboxlefttopadd)' =~ /\w/) {
-               print '<tr class="pageboxlefttopadd"><td width=100%>$(cdspageboxlefttopadd)</td></tr>';
-            }
-         :> 
-      </table>
-     </td>
-    </tr>
-    <tr valign=bottom>
-     <td>
-      <table width=100% cellspacing=0 cellpadding=0 border=0>       
-         ## first optional "left bottom" page box that each page can define on its own
-         <: if ('$(cdspageboxleftbottomadd)' =~ /\w/) {
-               print '<tr valign=bottom><td class="pageboxleftbottomadd" width=100%>$(cdspageboxleftbottomadd)</td></tr>';
-            }
-         :>              
-         ## then common "left bottom" CDS page box
-         <: if ('<CDSPAGEBOXLEFTBOTTOM>' =~ /\w/) {
-               print '<tr><td class="pageboxleftbottom" width=100%><CDSPAGEBOXLEFTBOTTOM></td></tr>';
-            }
-         :>
-      </table>
-     </td>
-    </tr>
-   </table>
-  </td>
+#          ## first common "left top" CDS page box
+#          <: if ('<CDSPAGEBOXLEFTTOP>' =~ /\w/) {
+#                print '<tr class="pageboxlefttop" valign=top><td width=100%><CDSPAGEBOXLEFTTOP></td></tr>';
+#             }
+#          :> 
+#          ## then optional "left top" page box that each page can define on its own
+#          <: if ('$(cdspageboxlefttopadd)' =~ /\w/) {
+#                print '<tr class="pageboxlefttopadd"><td width=100%>$(cdspageboxlefttopadd)</td></tr>';
+#             }
+#          :> 
+#       </table>
+#      </td>
+#     </tr>
+#     <tr valign=bottom>
+#      <td>
+#       <table width=100% cellspacing=0 cellpadding=0 border=0>       
+#          ## first optional "left bottom" page box that each page can define on its own
+#          <: if ('$(cdspageboxleftbottomadd)' =~ /\w/) {
+#                print '<tr valign=bottom><td class="pageboxleftbottomadd" width=100%>$(cdspageboxleftbottomadd)</td></tr>';
+#             }
+#          :>              
+#          ## then common "left bottom" CDS page box
+#          <: if ('<CDSPAGEBOXLEFTBOTTOM>' =~ /\w/) {
+#                print '<tr><td class="pageboxleftbottom" width=100%><CDSPAGEBOXLEFTBOTTOM></td></tr>';
+#             }
+#          :>
+#       </table>
+#      </td>
+#     </tr>
+#    </table>
+#   </td>
   ### Stripe 2 prolog: make some space to separate stripes
   <td class=pagestripemiddle align=left width=5>
   </td>
   <td class=pagestripemiddle align=left>
    ### Stripe 2: CDS page body
-
+   <br>
    <strong class=headline><span class="h1">$(title)</span></strong>
 <:    
     if ('$(navtrail_body)' =~ /\w/) {
@@ -122,6 +122,12 @@ $(cdspageheaderadd)
     <tr valign=top>
      <td>
       <table cellspacing=0 cellpadding=0 border=0 width=100%>
+        <tr class="pageboxlefttop" valign=top>
+         <td width=100%>
+          ## navbar is by default in the the left top box
+          <navbar:render nohints name=$(navbar_name) select=$(navbar_select)> 
+         </td>
+        </tr>
          ## first common "right top" CDS page box
          <: if ('<CDSPAGEBOXRIGHTTOP>' =~ /\w/) {
               print '<tr class="pageboxrighttop" valign=top><td width=100%><CDSPAGEBOXRIGHTTOP></td></tr>';
@@ -130,6 +136,11 @@ $(cdspageheaderadd)
          ## then optional "right top" page box that each page can define on its own
          <: if ('$(cdspageboxrighttopadd)' =~ /\w/) {
              print '<tr class="pageboxrighttopadd"><td width=100%>$(cdspageboxrighttopadd)</td></tr>';
+            }
+         :> 
+         ## then optional "left top" page box that each page can define on its own
+         <: if ('$(cdspageboxlefttopadd)' =~ /\w/) {
+               print '<tr class="pageboxlefttopadd"><td width=100%>$(cdspageboxlefttopadd)</td></tr>';
             }
          :> 
       </table>
@@ -146,6 +157,11 @@ $(cdspageheaderadd)
           ## then common "right bottom" CDS page box
          <: if ('<CDSPAGEBOXRIGHTBOTTOM>' =~ /\w/) {
              print '<tr class="pageboxrightbottom"><td width=100%><CDSPAGEBOXRIGHTBOTTOM></td></tr>';
+            }
+         :>
+         ## then common "left bottom" CDS page box
+         <: if ('<CDSPAGEBOXLEFTBOTTOM>' =~ /\w/) {
+               print '<tr><td class="pageboxleftbottom" width=100%><CDSPAGEBOXLEFTBOTTOM></td></tr>';
             }
          :>
       </table>
