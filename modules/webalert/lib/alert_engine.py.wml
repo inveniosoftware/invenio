@@ -51,7 +51,7 @@ ALERTURL = weburl + '/youralerts.py/list'
 # 1 = messages on the console, email sent
 # 2 = messages on the console, but no email sent
 # 3 = many messages on the console, no email sent
-DEBUGLEVEL = 3
+DEBUGLEVEL = 0
 
 
 def update_date_lastrun(alert):
@@ -271,9 +271,9 @@ def run_query(query, frequency):
 
     time = localtime()
     # Override time here for testing purposes (beware of localtime offset):
-    time = (2002, 12, 21, 2, 0, 0, 2, 120, 1)
+    #time = (2002, 12, 21, 2, 0, 0, 2, 120, 1)
     # Override frequency here for testing
-    frequency = 'week'
+    #frequency = 'week'
     ystr = strftime("%Y", time)
     mstr = strftime("%m", time)
     dstr = strftime("%d", time)
