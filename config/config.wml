@@ -51,7 +51,7 @@ Max Planck Gesellschaft eDocument Server
 </define-tag>
 
 ## RUNTIMELOGDIR -- the dir of the CDS and OAI runtime log files:
-##  (example: "/log/cdsdev/cdsruntimelogs")
+##  (example: "/log/cdsdev/mpgruntimelogs")
 <define-tag RUNTIMELOGDIR whitespace=delete>
 /log/cdsdev/mpgruntimelogs
 </define-tag>
@@ -103,46 +103,7 @@ oai:mpg
 oai:mpg:identifier
 </define-tag>
 
-## OAIURLCONTENT -- OAI URL content:  
-##  (example: "http://foo.com/")
-<define-tag OAIURLCONTENT whitespace=delete>
-http://foo.com/
-</define-tag>
-
-## OAIMETADATAPOLICY -- OAI metadata policy:  
-##  (example: "Free and unlimited use by anybody with obligation to refer to original record")
-<define-tag OAIMETADATAPOLICY whitespace=delete>
-Free and unlimited use by anybody with obligation to refer to original record
-</define-tag>
-
-## OAIMETADATAPOLICYURL -- URL of the OAI metadata policy (optional):  
-##  (example: "http://foo.com/")
-<define-tag OAIMETADATAPOLICYURL whitespace=delete>
-</define-tag>
-
-## OAIDATAPOLICY -- OAI data policy:  
-##  (example: "Full content, i.e. preprints may not be harvested by robots")
-<define-tag OAIDATAPOLICY whitespace=delete>
-Full content, i.e. preprints may not be harvested by robots
-</define-tag>
-
-## OAIDATAPOLICYURL -- URL of the OAI data policy (optional):  
-##  (example: "http://foo.com")
-<define-tag OAIDATAPOLICYURL whitespace=delete>
-</define-tag>
-
-## OAISUBMISSIONPOLICY -- OAI submission policy:
-##  (example: "Submission restricted. Submitted documents are subject of approval by OAI repository admins.")
-<define-tag OAISUBMISSIONPOLICY whitespace=delete>
-Submission restricted. Submitted documents are subject of approval by OAI repository admins.
-</define-tag>
-
-## OAISUBMISSIONPOLICYURL -- URL of the OAI submission policy (optional):  
-##  (example: "http://foo.com/")
-<define-tag OAISUBMISSIONPOLICYURL whitespace=delete>
-</define-tag>
-
-## OAIIDENTIFYDESCRIPTION -- description to Identify (optional)
+## OAIIDENTIFYDESCRIPTION -- description for the OAI Identify verb (optional):
 ## (example:"")
 <define-tag OAIIDENTIFYDESCRIPTION whitespace=delete>
  <description>
@@ -265,7 +226,7 @@ Submission restricted. Submitted documents are subject of approval by OAI reposi
   </tr>
   <tr>
   <td class="address">
-  Powered by the <a class=note href="http://cdsware.cern.ch/">CERN Document Server Software</a>.
+  Powered by <a class=note href="http://cdsware.cern.ch/">CDSware</a> <VERSION>.
   </td>
   <td align=right class="address">
   Revised <: print `date +"%d %b %Y %H:%M:%S %Z"`; :>
