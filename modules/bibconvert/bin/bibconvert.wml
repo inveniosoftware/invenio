@@ -42,6 +42,7 @@ try:
     import re
     import sys
     import time
+    import getopt
     from time import gmtime, strftime, localtime
     import os.path
 except ImportError, e:
@@ -99,23 +100,6 @@ def set_conv():
 
     return conv_setting
 
-def get_options():
-    "Read command line options into list"
-
-    out = []
-    for arg in sys.argv:
-        if (arg[:1] == "-"):
-            out.append(arg)
-    return out
-
-def get_arguments():
-    "Read command line arguments into list"
-    
-    out = []
-    for arg in sys.argv:
-        if (arg[:1] != "-"):
-            out.append(arg)
-    return out
 
 def get_pars(fn):
     "Read function and its parameters into list"
@@ -125,19 +109,6 @@ def get_pars(fn):
     out.append(re.split('\(|\)',fn)[0])
     out.append(re.split(',',re.split('\(|\)',fn)[1]))
 
-    return out
-
-
-def is_opt(seek,opt_list):
-    "Return entire argument if given in the list of options"
-
-    out = ""
-
-    for arg in opt_list:
-        if (seek == arg[:2]):
-            out = arg
-        if (seek == arg[:3]):
-            out = arg
     return out
 
 def append_to_output_file(filename, output):
@@ -757,7 +728,6 @@ def crawl_KB(filename,value,mode):
                 code[0]        = string.lower(code[0])
                 if ((len(string.split(code[0],value_to_cmp)) > 1)or(len(string.split(value_to_cmp,code[0]))>1)or(code[0]=="_DEFAULT_")):
                     value = value.replace(code[0],code[1])
-#                    return value
 
             else:
                 if ((code[0] == value)or(code[0]=="_DEFAULT_")):
@@ -1141,7 +1111,7 @@ def FormatField(value,fn):
         return out
 
     elif (fn == "CUT"):
-        par = set_default_pars(par,",")
+        par = set_par_defaults(par,",")
         left  = value[:len(par[0])]
         right = value[-(len(par[1])):]
 
@@ -1293,7 +1263,7 @@ def create_record(begin_record_header, ending_record_footer, query_string, match
                         field = field[:-1]
                     else:
                         repetitive = 0
-                    if (is_opt("-d",opt_list)[:2]=="-d"):
+                    if dirmode:
                         DATA    = select_line(field,data_parsed)
                     else:
                         DATA    = select_line(field,data_parsed)
@@ -1372,20 +1342,14 @@ def create_record(begin_record_header, ending_record_footer, query_string, match
         if len(recID) == 1 and match_mode == 1:
             ctrlfield = "<controlfield tag=\"001\">%d</controlfield>" % (recID[0])
             out_to_print = ctrlfield + "\n" + out_to_print
-#            out_to_print = out_to_print + "\n" + output
             out_flag = 1
         
         if len(recID) == 0 and match_mode == 0:
-#            out_to_print = out_to_print + "\n" + output
             out_flag = 1
         
         if len(recID) > 1 and match_mode == 2:
-#            out_to_print = out_to_print + "\n" + output
             out_flag = 1
         
-#    else:
-#        
-#        out_to_print = out_to_print + "\n" + output
     
     if out_flag or match_mode == -1:
         if begin_record_header != "":
@@ -1399,157 +1363,140 @@ def create_record(begin_record_header, ending_record_footer, query_string, match
 
 ### MAIN ###
 
-tcounter = 0
+conv_setting         = set_conv()
+sysno                = generate("DATE(%w%H%M%S)")
+separator            = ""
+tcounter             = 0
+source_data          = ""
+query_string         = ""
+match_mode           = -1
+begin_record_header  = ""
+ending_record_footer = ""
+output_rec_sep       = ""
+begin_header         = ""
+ending_footer        = ""
+oai_identifier_from  = 1
+      
+opts, args = getopt.getopt(sys.argv[1:],"c:d:hVl:o:b:e:B:E:s:m:C:",
+             [
+               "config",
+               "directory",
+               "help",
+               "version",
+               "length",
+               "oai",
+               "header",
+               "footer",
+               "record-header",
+               "record-footer",
+               "separator",
+               "match",
+               "config-alt"
+             ])
 
-conv_setting = set_conv()
-sysno = generate("DATE(%w%H%M%S)")
+# get options and arguments
 
+dirmode = 0
 
-if(len(sys.argv) < 2):
-    printInfo()
-    sys.exit(0)
+for opt, opt_value in opts:
+    if opt == "-c":
 
-opt_list = get_options()
-arg_list = get_arguments()
+        extract_tpl = opt_value
+        extract_tpl_parsed  = parse_common_template(extract_tpl,1)
 
-if(len(opt_list) == 0):
-    printInfo()
-    sys.exit(0)
-    
-elif (is_opt("-h",opt_list)[:2] == "-h"):
-    printInfo()
-    sys.exit(0)
+        source_tpl  = opt_value
+        source_tpl_parsed  = parse_common_template(source_tpl,2)
 
-elif (is_opt("-V",opt_list)[:2] == "-V"):
-    print __version__
-    sys.exit(0)
+        target_tpl  = opt_value 
+        target_tpl_parsed  = parse_common_template(target_tpl,3)
 
-else:
-
-    source_data = ""
-    separator   = ""
-
-
-    if (is_opt("-m0",opt_list)[:3] == "-m0"):
-        query_string = is_opt("-m0",opt_list)[3:]
-        match_mode   = 0
-    elif (is_opt("-m1",opt_list)[:3] == "-m1"):
-        query_string = is_opt("-m1",opt_list)[3:]
-        match_mode   = 1
-    elif (is_opt("-m2",opt_list)[:3] == "-m2"):
-        query_string = is_opt("-m2",opt_list)[3:]
-        match_mode   = 2
-    else:
-        query_string = ""
-        match_mode   = -1
-
-    if (is_opt("-B",opt_list)[:2] == "-B"):
-        begin_record_header = is_opt("-B",opt_list)[2:]
-    else:
-        begin_record_header = ""
-        
-    if (is_opt("-E",opt_list)[:2] == "-E"):
-        ending_record_footer = is_opt("-E",opt_list)[2:]
-    else:
-        ending_record_footer = ""
-
- 
-    if (is_opt("-s",opt_list)[:2] == "-s"):
-        separator = is_opt("-s",opt_list)[2:]
-
-    if (is_opt("-d",opt_list)[:2] == "-d"):
-        source_data       = is_opt("-d",opt_list)[2:]
+    elif opt == "-d":
+        source_data       = opt_value
         source_data       = source_data + "/"
         extract_tpl       = "/"
+        dirmode           = 1
 
-    else:
-        if (is_opt("-Cx",opt_list)[:3] == "-Cx"):
-            extract_tpl = is_opt("-Cx",opt_list)[3:]
-            extract_tpl_parsed = parse_template(extract_tpl)
-        elif (is_opt("-c",opt_list)[:2] == "-c"):
-            extract_tpl = is_opt("-c",opt_list)[2:]
-            extract_tpl_parsed  = parse_common_template(extract_tpl,1)
-        else:
-            printInfo()
-            sys.exit(0)
-
-
-    if (is_opt("-Cs",opt_list)[:3] == "-Cs"):
-        source_tpl = is_opt("-Cs",opt_list)[3:]
-        source_tpl_parsed  = parse_template(source_tpl)
-    elif (is_opt("-c",opt_list)[:2] == "-c"):
-        source_tpl = is_opt("-c",opt_list)[2:]
-        source_tpl_parsed  = parse_common_template(source_tpl,2)
-    else:
+    elif opt == "-h":
         printInfo()
         sys.exit(0)
-        
-    if (is_opt("-Ct",opt_list)[:3] == "-Ct"):
-        target_tpl = is_opt("-Ct",opt_list)[3:]
-        target_tpl_parsed  = parse_template(target_tpl)
-    elif (is_opt("-c",opt_list)[:2] == "-c"):
-        target_tpl = is_opt("-c",opt_list)[2:]
-        target_tpl_parsed  = parse_common_template(target_tpl,3)
-    else:
-        printInfo()
+
+    elif opt == "-V":
+        print __version__
         sys.exit(0)
-       
-    if (is_opt("-t",opt_list)[:2] == "-t"):
-        output_rec_sep = is_opt("-t",opt_list)[2:]
-    else:
-        output_rec_sep = ""
 
-    if (is_opt("-b",opt_list)[:2] == "-b"):
-        begin_header = is_opt("-b",opt_list)[2:]
-    else:
-        begin_header = ""
-        
-    if (is_opt("-e",opt_list)[:2] == "-e"):
-        ending_footer = is_opt("-e",opt_list)[2:]
-    else:
-        ending_footer = ""
-
-    if (is_opt("-l",opt_list)[:2] == "-l"):
+    elif opt == "-l":
         try:
-            conv_setting[0] = string.atoi(is_opt("-l",opt_list)[2:])
+            conv_setting[0] = string.atoi(opt_value)
         except ValueError, e:
             conv_setting[0] = 1
-    if (is_opt("-o",opt_list)[:2] == "-o"):
+
+    elif opt == "-o":
         try:
-            oai_identifier_from = string.atoi(is_opt("-o",opt_list)[2:])
+            oai_identifier_from = string.atoi(opt_value)
         except ValueError, e:
             oai_identifier_from = 1
+
+    elif opt == "-b":
+        begin_header         = opt_value
+
+    elif opt == "-e":
+        ending_footer        = opt_value
+
+    elif opt == "-B":
+        begin_record_header  = opt_value
+
+    elif opt == "-E":
+        ending_record_footer = opt_value
+
+    elif opt == "-s":
+        separator            = opt_value
+
+    elif opt == "-t":
+        output_rec_sep       = opt_value
+
+    elif opt == "-m":
+        match_mode           = string.atoi(opt_value[0:1])
+        query_string         = opt_value[1:]
+
+    elif opt == "-C":
+        if opt_value[0:1] == "x":
+            extract_tpl   = opt_value[1:]
+            extract_tpl_parsed = parse_template(extract_tpl)
+        if opt_value[0:1] == "t":
+            target_tpl    = opt_value[1:]
+            target_tpl_parsed  = parse_template(target_tpl)
+        if opt_value[0:1] == "s":
+            source_tpl    = opt_value[1:]
+            source_tpl_parsed  = parse_template(source_tpl)
+    
+if dirmode:
+    if (os.path.isdir(source_data)):
+        data_parsed = parse_input_data_d(source_data,source_tpl)
+
+        record = create_record(begin_record_header, ending_record_footer, query_string, match_mode)
+        if record != "":
+            print record
+            tcounter = tcounter + 1
+            if output_rec_sep != "":
+                print output_rec_sep
     else:
-        oai_identifier_from = 1
-
-    if (is_opt("-d",opt_list)[:2] == "-d"):
-        if (os.path.isdir(source_data)):
-            data_parsed = parse_input_data_d(source_data,source_tpl)
-
-            record = create_record(begin_record_header, ending_record_footer, query_string, match_mode)
-            if record != "":
-                print record
-                tcounter = tcounter + 1
-                if output_rec_sep != "":
-                    print output_rec_sep
+        exit_on_error("Cannot access directory: %s" % source_data)
+      
+else:
+    done = 0
+    print begin_header
+    while (done == 0):
+        data_parsed = parse_input_data_fx(source_tpl)
+        if (data_parsed == -1):
+            done = 1
         else:
-            exit_on_error("Cannot access directory: %s" % source_data)
-          
-    if (is_opt("-d",opt_list)[:2] == ""):
-        done = 0
-        print begin_header
-        while (done == 0):
-            data_parsed = parse_input_data_fx(source_tpl)
-            if (data_parsed == -1):
-                done = 1
-            else:
-                if (data_parsed[0][0]!= ''):
-                    record = create_record(begin_record_header, ending_record_footer, query_string, match_mode)
-                    if record != "":
-                        print record
-                        tcounter = tcounter + 1
-                        if output_rec_sep != "":
-                            print output_rec_sep
-    print ending_footer
+            if (data_parsed[0][0]!= ''):
+                record = create_record(begin_record_header, ending_record_footer, query_string, match_mode)
+                if record != "":
+                    print record
+                    tcounter = tcounter + 1
+                    if output_rec_sep != "":
+                        print output_rec_sep
+print ending_footer
 
 </protect>
