@@ -530,7 +530,7 @@
   <es>Buscar en %s registros por:</es>
   <pt>Buscar %s registros por:</pt>
   <it>Ricerca in %s registrazioni:</it>
-  <ru>Искать %s записи для:</ru>
+  <ru>Искать до %s записей для:</ru>
   <sk>Hľadaj v %s záznamoch:</sk>
   <cz>Hledej v %s záznamech:</cz>
   <no>Søk i %s poster etter:</no>
@@ -642,7 +642,7 @@
   <es>texto completo</es>
   <pt>texto completo</pt>
   <it>testo completo</it>
-  <ru>польный текст</ru>
+  <ru>полный текст</ru>
   <sk>plný text</sk>
   <cz>plný text</cz>
   <no>fulltekst</no>
@@ -1149,8 +1149,8 @@
 </define-tag>
 
 <define-tag MSG_ADMIN_AREA whitespace=delete>
-  <en>Administrator&quot;s Area</en>
-  <fr>Coin d&quot;Administrateur</fr>
+  <en>Admin Area</en>
+  <fr>Coin Administrateur</fr>
   <de>Verwaltungsraum</de> 
   <es>Área del Administrador</es> 
   <pt>Área do Administrador</pt>
