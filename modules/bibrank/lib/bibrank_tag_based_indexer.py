@@ -63,8 +63,9 @@ def single_tag_rank_method_exec(rank_method_code, name, config):
     startCreate = time.time()
     rnkset = {}
     rnkset_old = fromDB(rank_method_code)
-    if options["quick"] == "no":
-        print options["recid_range"]
+    #if options["quick"] == "no":
+    #    [[0, 1000]]
+    #    print options["recid_range"]
         
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     rnkset_new = single_tag_rank(config)
