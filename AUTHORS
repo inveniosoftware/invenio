@@ -9,19 +9,22 @@ The CDS Development Group consists of several people:
    Head of the team.
 
  - Tibor Simko <tibor.simko@cern.ch>
-   Search interface, search engine, user personalization, software packaging, design.
+   Search interface, search engine, user personalization, software
+   packaging, design.  WebSearch, BibWords, BibData, WebPerso.
   
  - Thomas Baron <thomas.baron@cern.ch>
-   Submit interface, most of Admin interfaces, BibUpload.
+   Submit interface, administrative modules.  WebSubmit, most of Web
+   Admins, BibUpload.
 
  - Martin Vesely <martin.vesely@cern.ch>
-   Compliance with Open Archive Initiative, BibConvert, BibHarvest.
+   Compliance with Open Archive Initiative.  BibConvert, BibHarvest.
 
  - Hector Sanchez <hector.sanchez@cern.ch>
-   BibFormat, output formatting and automated link creating tool.
+   BibFormat, output formatting and automated link-generation tool.
 
-Moreover, several students have worked on the project, including
-Marcin Kuta and Eric Simon (user personalization), and others.
+Moreover, several students have worked on the project, among others
+Marcin Kuta and Eric Simon (WebPerso), Eduardo Margallo (BibFormat,
+BibWords), and others.
 
        - CDS Development Group
          <cds.support@cern.ch>
