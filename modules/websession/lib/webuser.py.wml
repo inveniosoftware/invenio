@@ -191,15 +191,17 @@ def update_Uid(req,p_email,p_pw,uid):
 def create_user_infobox(uid):
     """Create info box on currenly logged user.""" 
     out = ""
-    out += """<div align="right" class="userinfobox">
-                <small>
-                  <strong>user:</strong> %s
-                  ::
-                  <a class="userinfobox" href="%s/youraccount.py/login">login</a>
-                  ::
-                  <a class="userinfobox" href="%s/youraccount.py/logout">logout</a>
-                </small>
-              </div>""" % (getDataUid(None, uid)[0], weburl, weburl)
+    out += """<table align="right" class="userinfobox">
+               <tr>
+                <td>
+                 <strong>user:</strong> %s
+                 ::
+                 <a class="userinfobox" href="%s/youraccount.py/login">login</a>
+                 ::
+                 <a class="userinfobox" href="%s/youraccount.py/logout">logout</a>
+                </td>
+               </tr> 
+              </table>""" % (getDataUid(None, uid)[0], weburl, weburl)
     return out
 
 ## --- follow some functions for Apache user/group authentication
