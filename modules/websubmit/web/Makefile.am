@@ -24,7 +24,7 @@ doc_DATA=approve.py direct.py submit.py summary.py
 
 EXTRA_DIST = $(wildcard *.wml)
 
-CLEANFILES = $(doc_DATA) *~ *.tmp *.php
+CLEANFILES = $(doc_DATA) *~ *.tmp *.php *.html
 
 %.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml
 	$(WML) -o $@ $<
