@@ -6,11 +6,11 @@ Revision: $Id$
 The CDS Development Group consists of:
 
  - Jean-Yves Le Meur <jean-yves.le.meur@cern.ch>
-     Head of the team.
+     Head of the team.  Strategic planning and lead.
 
  - Tibor Simko <tibor.simko@cern.ch>
      Search engine, indexing engine, task scheduling system, user
-     interface and personalization, general system architecture and
+     interface and personalization, general system architecture,
      release management.
      Maintains mostly: WebSearch, BibWords, BibSched, WebStyle,
                        WebHelp, WebAlert, WebBasket, MiscUtils.
@@ -37,16 +37,16 @@ Several students and temporary group members contributed to the
 project.  In the decreasing chronological order:
 
  - Mikael Vik <mikael.vik@cern.ch>
-     Role-based access control engine and its admin interface,
-     the WebAccess module.  Guest user sessions garbage collection,
+     Role-based access control engine and its admin interface, 
+     the WebAccess module.  Guest user sessions garbage collector,
      for the WebSession module.
 
  - Erik Simon <erik@mifasol.net>
      Alert engine, for the WebAlert module.
 
  - Roberta Faggian <roberta.faggian@cern.ch>
-     Alert and basket user interfaces, for the WebAlert and the
-     WebBasket modules.
+     Rewrite of the alert and basket user interfaces, for the WebAlert
+     and the WebBasket modules.
 
  - Julio Pernia Aznar <jpernia@altransdb.com>
      Parts of user and session management, for the WebSession module.
@@ -55,7 +55,8 @@ project.  In the decreasing chronological order:
      Parts of web design and graphics, for the WebStyle module.
 
  - Eduardo Margallo 
-     Parts of the indexing engine and the task scheduler, for the
-     BibWords and the BibSched modules.
+     Enhancements to the indexing engine, for the BibWords module.
+     Initial implementation of the task scheduler, for the BibSched
+     module.
 
 - end of file -
