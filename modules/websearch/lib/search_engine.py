@@ -2615,9 +2615,18 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 if re.search(r'\w[^a-zA-Z0-9]\w',p1) or \
                    re.search(r'\w[^a-zA-Z0-9]\w',p2) or \
                    re.search(r'\w[^a-zA-Z0-9]\w',p3):
-                    p1 = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1 \\2", p1)
-                    p2 = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1 \\2", p2)
-                    p3 = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1 \\2", p3)
+                    if p1.startswith('"') and p1.endswith('"'): # is it ACC query?
+                        p1 = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1_\\2", p1)
+                    else: # it is WRD query
+                        p1 = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1 \\2", p1)
+                    if p1.startswith('"') and p1.endswith('"'): # is it ACC query?                        
+                        p2 = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1_\\2", p2)
+                    else: # it is WRD query
+                        p2 = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1 \\2", p2)
+                    if p3.startswith('"') and p3.endswith('"'): # is it ACC query?
+                        p3 = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1_\\2", p3)
+                    else: # it is WRD query
+                        p3 = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1 \\2", p3)
                     if of.startswith('h'):
                         print_warning(req, "No match found.  Trying similar queries...", "", "<p>","<p>")
                     results_final = search_pattern(req, "", "", colls_to_search)
@@ -2653,7 +2662,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                         results_final_nb_total += results_final_nb[coll]
             else:
                 if re.search(r'\w[^a-zA-Z0-9]\w',p):
-                    p = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1 \\2", p)
+                    if p.startswith('"') and p.endswith('"'): # is it ACC query?
+                        p = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1_\\2", p)
+                    else: # it is WRD query
+                        p = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1 \\2", p)
                     if of.startswith('h'):
                         print_warning(req, "No match found.  Trying %s..." % p, "", "<p>","<p>")
                     results_final = search_pattern(req, p, f, colls_to_search, None)
