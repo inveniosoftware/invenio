@@ -436,7 +436,10 @@ def task_run(row):
             #Using the function variable to call the function related to the rank method
             cfg_function = config.get("rank_method", "function")
             func_object = globals().get(cfg_function)
-            func_object(row, key)
+            if func_object:
+                func_object(row, key)
+            else:
+                write_message("Cannot run method '%s', no function to call" % key)  
     except StandardError, e:
         write_message("\nException caught: %s" % e, sys.stderr)
         traceback.print_tb(sys.exc_info()[2])
