@@ -162,7 +162,7 @@ def get_words_from_pattern(pattern):
             words[word] = 1;
     return words.keys()
 
-def create_basic_search_units(req, p, f, m=None):
+def create_basic_search_units(req, p, f, m=None, of='hb'):
     """Splits search pattern and search field into a list of independently searchable units.
        - A search unit consists of '(operator, pattern, field, type, hitset)' tuples where
           'operator' is set union (|), set intersection (+) or set exclusion (-);
@@ -174,15 +174,17 @@ def create_basic_search_units(req, p, f, m=None):
           performs this kind of matching.  If it is not set, then a guess is made.
           'm' can have values: 'a'='all of the words', 'o'='any of the words',
                                'p'='phrase/substring', 'r'='regular expression',
-                               'e'='exact value'."""
+                               'e'='exact value'.
+        - Warnings are printed on req (when not None) in case of HTML output formats."""
 
     opfts = [] # will hold (o,p,f,t,h) units
 
     ## check arguments: if matching type phrase/string/regexp, do we have field defined?
     if (m=='p' or m=='r' or m=='e') and not f:
-        m = 'a'        
-        print_warning(req, "This matching type cannot be used within <em>any field</em>.  I will perform a word search instead." )
-        print_warning(req, "If you want to phrase/substring/regexp search in a specific field, e.g. inside title, then please choose <em>within title</em> search option.")
+        m = 'a'
+        if of.startswith("h"):
+            print_warning(req, "This matching type cannot be used within <em>any field</em>.  I will perform a word search instead." )
+            print_warning(req, "If you want to phrase/substring/regexp search in a specific field, e.g. inside title, then please choose <em>within title</em> search option.")
         
     ## is desired matching type set?
     if m:
@@ -210,7 +212,8 @@ def create_basic_search_units(req, p, f, m=None):
             for word in get_words_from_pattern(p):
                 opfts.append(['|',word,f,'w']) # '|' in all units
         else:
-            print_warning(req, "Matching type '%s' is not implemented yet." % m, "Warning")
+            if of.startswith("h"):
+                print_warning(req, "Matching type '%s' is not implemented yet." % m, "Warning")
             opfts.append(['|',"%"+p+"%",f,'a'])            
     else:        
         ## B - matching type is not known: let us try to determine it by some heuristics
@@ -282,16 +285,18 @@ def create_basic_search_units(req, p, f, m=None):
                         # fi is not defined, look at where we are doing exact or subphrase search (single/double quotes):
                         if pi[0]=='"' and pi[-1]=='"':                        
                             opfts.append([oi,pi[1:-1],"anyfield",'a'])
-                            print_warning(req, "Searching for an exact match inside any field may be slow.  You may want to search for words instead, or choose to search within specific field.")
+                            if of.startswith("h"):
+                                print_warning(req, "Searching for an exact match inside any field may be slow.  You may want to search for words instead, or choose to search within specific field.")
                         else:                        
                             # nope, subphrase in global index is not possible => change back to WRD search
                             pi = strip_accents(pi) # strip accents for 'w' mode, FIXME: delete when not needed
                             for pii in get_words_from_pattern(pi):
                                 # since there may be '-' and other chars that we do not index in WRD
                                 opfts.append([oi,pii,fi,'w'])
-                            print_warning(req, "The partial phrase search does not work in any field.  I'll do a boolean AND searching instead.")
-                            print_warning(req, "If you want to do a partial phrase search in a specific field, e.g. inside title, then please choose 'within title' search option.", "Tip")
-                            print_warning(req, "If you want to do exact phrase matching, then please use double quotes.", "Tip")
+                            if of.startswith("h"):
+                                print_warning(req, "The partial phrase search does not work in any field.  I'll do a boolean AND searching instead.")
+                                print_warning(req, "If you want to do a partial phrase search in a specific field, e.g. inside title, then please choose 'within title' search option.", "Tip")
+                                print_warning(req, "If you want to do exact phrase matching, then please use double quotes.", "Tip")
                 elif fi and str(fi[0]).isdigit() and str(fi[0]).isdigit():
                     # B3b - fi exists and starts by two digits => do ACC search
                     opfts.append([oi,pi,fi,'a'])            
@@ -312,12 +317,14 @@ def create_basic_search_units(req, p, f, m=None):
         try:
             pi = opfts[i][1]
             if pi == '*':
-                print_warning(req, "Ignoring standalone wildcard word.", "Warning")
+                if of.startswith("h"):
+                    print_warning(req, "Ignoring standalone wildcard word.", "Warning")
                 del opfts[i]
             if pi == '' or pi == ' ':
                 fi = opfts[i][2]
                 if fi:
-                    print_warning(req, "Ignoring empty <em>%s</em> search term." % fi, "Warning")
+                    if of.startswith("h"):
+                        print_warning(req, "Ignoring empty <em>%s</em> search term." % fi, "Warning")
                 del opfts[i]
         except:
             pass
@@ -327,6 +334,8 @@ def create_basic_search_units(req, p, f, m=None):
 
 def page_start(req, of, cc, as, ln, uid, title_message=msg_search_results[cdslang]):
     "Start page according to given output format."
+    if not req: 
+        return # we were called from CLI
     if of.startswith('x'):
         # we are doing XML output:
         req.content_type = "text/xml"
@@ -357,6 +366,8 @@ def page_start(req, of, cc, as, ln, uid, title_message=msg_search_results[cdslan
     
 def page_end(req, of="hb", ln=cdslang):
     "End page according to given output format: e.g. close XML tags, add HTML footer, etc."
+    if not req: 
+        return # we were called from CLI
     if of.startswith('h'):
         req.write("""</div>""") # pagebody end
         req.write(pagefooteronly(lastupdated=__lastupdated__, language=ln, urlargs=req.args))
@@ -1604,21 +1615,21 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         # no pattern, so return all universe
         return hitset_full
     # search stage 1: break up arguments into basic search units:
-    if verbose:
+    if verbose and of.startswith("h"):
         t1 = os.times()[4]
-    basic_search_units = create_basic_search_units(req, p, f, m)
-    if verbose:
+    basic_search_units = create_basic_search_units(req, p, f, m, of)
+    if verbose and of.startswith("h"):
         t2 = os.times()[4]
         print_warning(req, "Search stage 1: basic search units are: %s" % basic_search_units)
         print_warning(req, "Search stage 1: execution took %.2f seconds." % (t2 - t1))
     # search stage 2: do search for each search unit and verify hit presence:
-    if verbose:
+    if verbose and of.startswith("h"):
         t1 = os.times()[4]
     basic_search_units_hitsets = []
     for idx_unit in range(0,len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
         basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m)
-        if verbose >= 9:
+        if verbose >= 9 and of.startswith("h"):
             print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (bsu_p, Numeric.nonzero(basic_search_unit_hitset._set)))
         if basic_search_unit_hitset._nbhits>0 or \
            ap==0 or \
@@ -1664,14 +1675,14 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                         else:
                             print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m, ln=ln))
                 return hitset_empty
-    if verbose:
+    if verbose and of.startswith("h"):
         t2 = os.times()[4]
         for idx_unit in range(0,len(basic_search_units)):
             print_warning(req, "Search stage 2: basic search unit %s gave %d hits." %
                           (basic_search_units[idx_unit][1:], basic_search_units_hitsets[idx_unit]._nbhits))
         print_warning(req, "Search stage 2: execution took %.2f seconds." % (t2 - t1))
     # search stage 3: apply boolean query for each search unit:
-    if verbose:
+    if verbose and of.startswith("h"):
         t1 = os.times()[4]
     hitset_in_any_collection = HitSet()
     for idx_unit in range(0,len(basic_search_units)):
@@ -1684,7 +1695,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         elif this_unit_operation == '|':
             hitset_in_any_collection.union(this_unit_hitset)
         else:
-            print_warning(req, "Invalid set operation %s." % this_unit_operation, "Error")
+            if of.startswith("h"):
+                print_warning(req, "Invalid set operation %s." % this_unit_operation, "Error")
     hitset_in_any_collection.calculate_nbhits()
     if hitset_in_any_collection._nbhits == 0:
         # no hits found, propose alternative boolean query:
@@ -1705,7 +1717,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                         (bsu_nbhits, weburl, url_args_new, bsu_p)
             text += """</table></blockquote>"""
             print_warning(req, text)                
-    if verbose:
+    if verbose and of.startswith("h"):
         t2 = os.times()[4]
         print_warning(req, "Search stage 3: boolean query gave %d hits." % hitset_in_any_collection._nbhits)
         print_warning(req, "Search stage 3: execution took %.2f seconds." % (t2 - t1))
@@ -1854,7 +1866,7 @@ def search_unit_in_bibrec(day1, day2, type='creation_date'):
 def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0, ln=cdslang):
     """Return dict of hitsets given by intersection of hitset with the collection universes."""
     # search stage 4: intersect with the collection universe:
-    if verbose:
+    if verbose and of.startswith("h"):
         t1 = os.times()[4]
     results = {}
     results_nbhits = 0
@@ -1884,7 +1896,7 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
             if of.startswith("h"):
                 print_warning(req, msg_no_public_hits[ln])
             results = {}
-    if verbose:
+    if verbose and of.startswith("h"):
         t2 = os.times()[4]
         print_warning(req, "Search stage 4: intersecting with collection universe gave %d hits." % results_nbhits)
         print_warning(req, "Search stage 4: execution took %.2f seconds." % (t2 - t1))                                        
