@@ -153,6 +153,12 @@ cds.support@cern.ch
           <td align=left><small>&nbsp;&nbsp;::&nbsp;&nbsp;</small></td>
           <td align=left><small><a href="<WEBURL>/submit/">SUBMIT</a></small></td>
           <td align=left><small>&nbsp;&nbsp;::&nbsp;&nbsp;</small></td>
+          <td align=left><small><a href="<WEBURL>/youraccount.py/display">PERSONALIZE</a></small></td>
+          <td align=left><small>&nbsp;&nbsp;::&nbsp;&nbsp;</small></td>
+          <td align=left><small><a href="<WEBURL>/yourbaskets.py/display">BASKETS</a></small></td>
+          <td align=left><small>&nbsp;&nbsp;::&nbsp;&nbsp;</small></td>
+          <td align=left><small><a href="<WEBURL>/youralerts.py/list_alerts">ALERTS</a></small></td>
+          <td align=left><small>&nbsp;&nbsp;::&nbsp;&nbsp;</small></td>
           <td align=left><small><a href="<WEBURL>/help/">HELP</a></small></td>
         </tr>
       </table>
@@ -195,7 +201,7 @@ cds.support@cern.ch
   <table cellpadding=0 border=0 cellspacing=0 width="100%"  class="pagefooter">
   <tr>
   <td class="address">
-  <CDSNAME>&nbsp;::&nbsp;<a class=note href="<WEBURL>">Search</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/submit/">Submit</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/help/">Help</a>
+  <CDSNAME>&nbsp;::&nbsp;<a class=note href="<WEBURL>">Search</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/submit/">Submit</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/youraccount.py/display">Personalize</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/yourbaskets.py/display">Baskets</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/youralerts.py/list_alerts">Alerts</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/help/">Help</a>
   </td>
   <td align=right class="address">
   Last updated <: print `date +"%d %b %Y %H:%M:%S %Z"`; :>
