@@ -74,9 +74,11 @@ def display_public(req, id_basket=0, name="", action="", to_basket="", mark=[], 
     title = "Display basket"
     uid = getUid(req)    
 
-    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2: 
         return page_not_authorized(req, "../yourbaskets.py/display_public")
-
+    if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1 and action == "EXECUTE":
+        return page_not_authorized(req, "../yourbaskets.py/display_public")
+        
     return page(title=title,
                 body=webbasket.perform_display_public(uid, id_basket, name, action, to_basket, mark, newname, of),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
