@@ -61,13 +61,13 @@ def perform_display(req):
     <dd>With baskets you can define specific collections of items,
     store interesting records you want to access later or share with others."""
     if isGuestUser(uid):
-        out+= perform_guest_user(type="baskets")
+        out+= warning_guest_user(type="baskets")
     out += """
     <dt><A href="../youralerts.py/list">Your Alerts</A>
     <dd>Subscribe to a search which will be run periodically by our service.  The result can be sent to you
     via Email or stored in one of your baskets."""
     if isGuestUser(uid):
-	 out+= perform_guest_user(type="alerts")
+	 out+= warning_guest_user(type="alerts")
     out += """
     <dt><A href="http://weblib.cern.ch/cgi-bin/checkloan?uid=&version=2">Your Loans</A>
     <dd>Check out book you have on load, submit borrowing requests, etc.  Requires CERN ID."""
@@ -79,9 +79,9 @@ def perform_display(req):
     return out
 
 
-def perform_guest_user(type):
+def warning_guest_user(type):
 
-    msg="""You are logged in as a guest user, so your %s will disappear at the end of the current session. If you wish you can login
+    msg="""You are logged in as a guest user, so your %s will disappear at the end of the current session. If you wish you can<br> login
 	 or register here <A href="../youraccount.py/login">here</A>
 
 	"""%type

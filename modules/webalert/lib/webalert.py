@@ -43,7 +43,7 @@ try:
     from webpage import page
     from dbquery import run_sql
     from webuser import getUid, create_user_infobox,isGuestUser
-    from webaccount import perform_guest_user
+    from webaccount import warning_guest_user
     from webbasket import perform_create_basket
     from mod_python import apache
 except ImportError, e:
@@ -152,7 +152,7 @@ def perform_display(permanent,uid):
             out += """</TR>\n"""
         out += """</TABLE><BR>\n"""
     if isGuestUser(uid):
-	out += perform_guest_user(type="alerts")    
+	out += warning_guest_user(type="alerts")    
     return out
 
 

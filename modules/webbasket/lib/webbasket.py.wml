@@ -31,7 +31,7 @@ try:
     from webpage import page
     from dbquery import run_sql
     from webuser import getUid, getDataUid,isGuestUser
-    from webaccount import perform_guest_user
+    from webaccount import warning_guest_user
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -267,7 +267,7 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
         out += display_basket_content(uid, id_basket, basket_name)
     # if is guest user print message of relogin
     if isGuestUser(uid):
- 	out += perform_guest_user(type="baskets")
+ 	out += warning_guest_user(type="baskets")
     return out
     
 
