@@ -127,6 +127,9 @@ msg_no_boolean_hits = {}
 msg_no_exact_match_for_foo_using_bar_instead = {}
 msg_internal_error = {}
 msg_please_contact_and_quote = {}
+msg_search_options = {}
+msg_latest_additions = {}
+msg_more = {}
 
 ## English:
 <en>
@@ -227,6 +230,9 @@ msg_no_boolean_hits['en'] = """<MSG_NO_BOOLEAN_HITS>"""
 msg_no_exact_match_for_foo_using_bar_instead['en'] = """<MSG_NO_EXACT_MATCH_FOR_FOO_USING_BAR_INSTEAD>"""
 msg_internal_error['en'] = """<MSG_INTERNAL_ERROR>"""
 msg_please_contact_and_quote['en'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
+msg_search_options['en'] = """<MSG_SEARCH_OPTIONS>"""
+msg_latest_additions['en'] = """<MSG_LATEST_ADDITIONS>"""
+msg_more['en'] = """<MSG_MORE>"""
 </en>
 
 ## French:
@@ -328,6 +334,9 @@ msg_no_boolean_hits['fr'] = """<MSG_NO_BOOLEAN_HITS>"""
 msg_no_exact_match_for_foo_using_bar_instead['fr'] = """<MSG_NO_EXACT_MATCH_FOR_FOO_USING_BAR_INSTEAD>"""
 msg_internal_error['fr'] = """<MSG_INTERNAL_ERROR>"""
 msg_please_contact_and_quote['fr'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
+msg_search_options['fr'] = """<MSG_SEARCH_OPTIONS>"""
+msg_latest_additions['fr'] = """<MSG_LATEST_ADDITIONS>"""
+msg_more['fr'] = """<MSG_MORE>"""
 </fr>
 
 ## German:
@@ -429,6 +438,9 @@ msg_no_boolean_hits['de'] = """<MSG_NO_BOOLEAN_HITS>"""
 msg_no_exact_match_for_foo_using_bar_instead['de'] = """<MSG_NO_EXACT_MATCH_FOR_FOO_USING_BAR_INSTEAD>"""
 msg_internal_error['de'] = """<MSG_INTERNAL_ERROR>"""
 msg_please_contact_and_quote['de'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
+msg_search_options['de'] = """<MSG_SEARCH_OPTIONS>"""
+msg_latest_additions['de'] = """<MSG_LATEST_ADDITIONS>"""
+msg_more['de'] = """<MSG_MORE>"""
 </de>
 
 ## Spanish:
@@ -530,6 +542,9 @@ msg_no_boolean_hits['es'] = """<MSG_NO_BOOLEAN_HITS>"""
 msg_no_exact_match_for_foo_using_bar_instead['de'] = """<MSG_NO_EXACT_MATCH_FOR_FOO_USING_BAR_INSTEAD>"""
 msg_internal_error['es'] = """<MSG_INTERNAL_ERROR>"""
 msg_please_contact_and_quote['es'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
+msg_search_options['es'] = """<MSG_SEARCH_OPTIONS>"""
+msg_latest_additions['es'] = """<MSG_LATEST_ADDITIONS>"""
+msg_more['es'] = """<MSG_MORE>"""
 </es>
 
 ## Portuguese:
@@ -631,6 +646,9 @@ msg_no_boolean_hits['pt'] = """<MSG_NO_BOOLEAN_HITS>"""
 msg_no_exact_match_for_foo_using_bar_instead['pt'] = """<MSG_NO_EXACT_MATCH_FOR_FOO_USING_BAR_INSTEAD>"""
 msg_internal_error['pt'] = """<MSG_INTERNAL_ERROR>"""
 msg_please_contact_and_quote['pt'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
+msg_search_options['pt'] = """<MSG_SEARCH_OPTIONS>"""
+msg_latest_additions['pt'] = """<MSG_LATEST_ADDITIONS>"""
+msg_more['pt'] = """<MSG_MORE>"""
 </pt>
 
 ## Italian:
@@ -732,6 +750,9 @@ msg_no_boolean_hits['it'] = """<MSG_NO_BOOLEAN_HITS>"""
 msg_no_exact_match_for_foo_using_bar_instead['it'] = """<MSG_NO_EXACT_MATCH_FOR_FOO_USING_BAR_INSTEAD>"""
 msg_internal_error['it'] = """<MSG_INTERNAL_ERROR>"""
 msg_please_contact_and_quote['it'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
+msg_search_options['it'] = """<MSG_SEARCH_OPTIONS>"""
+msg_latest_additions['it'] = """<MSG_LATEST_ADDITIONS>"""
+msg_more['it'] = """<MSG_MORE>"""
 </it>
 
 ## Russian:
@@ -833,6 +854,9 @@ msg_no_boolean_hits['ru'] = """<MSG_NO_BOOLEAN_HITS>"""
 msg_no_exact_match_for_foo_using_bar_instead['ru'] = """<MSG_NO_EXACT_MATCH_FOR_FOO_USING_BAR_INSTEAD>"""
 msg_internal_error['ru'] = """<MSG_INTERNAL_ERROR>"""
 msg_please_contact_and_quote['ru'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
+msg_search_options['ru'] = """<MSG_SEARCH_OPTIONS>"""
+msg_latest_additions['ru'] = """<MSG_LATEST_ADDITIONS>"""
+msg_more['ru'] = """<MSG_MORE>"""
 </ru>
 
 ## Slovak:
@@ -934,6 +958,9 @@ msg_no_boolean_hits['skk'] = """<MSG_NO_BOOLEAN_HITS>"""
 msg_no_exact_match_for_foo_using_bar_instead['sk'] = """<MSG_NO_EXACT_MATCH_FOR_FOO_USING_BAR_INSTEAD>"""
 msg_internal_error['sk'] = """<MSG_INTERNAL_ERROR>"""
 msg_please_contact_and_quote['sk'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
+msg_search_options['sk'] = """<MSG_SEARCH_OPTIONS>"""
+msg_latest_additions['sk'] = """<MSG_LATEST_ADDITIONS>"""
+msg_more['sk'] = """<MSG_MORE>"""
 </sk>
 
 ## Czech:
@@ -1035,6 +1062,9 @@ msg_no_boolean_hits['cz'] = """<MSG_NO_BOOLEAN_HITS>"""
 msg_no_exact_match_for_foo_using_bar_instead['cz'] = """<MSG_NO_EXACT_MATCH_FOR_FOO_USING_BAR_INSTEAD>"""
 msg_internal_error['cz'] = """<MSG_INTERNAL_ERROR>"""
 msg_please_contact_and_quote['cz'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
+msg_search_options['cz'] = """<MSG_SEARCH_OPTIONS>"""
+msg_latest_additions['cz'] = """<MSG_LATEST_ADDITIONS>"""
+msg_more['cz'] = """<MSG_MORE>"""
 </cz>
 
 ## Norwegian:
@@ -1136,9 +1166,12 @@ msg_no_boolean_hits['no'] = """<MSG_NO_BOOLEAN_HITS>"""
 msg_no_exact_match_for_foo_using_bar_instead['no'] = """<MSG_NO_EXACT_MATCH_FOR_FOO_USING_BAR_INSTEAD>"""
 msg_internal_error['no'] = """<MSG_INTERNAL_ERROR>"""
 msg_please_contact_and_quote['no'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
+msg_search_options['no'] = """<MSG_SEARCH_OPTIONS>"""
+msg_latest_additions['no'] = """<MSG_LATEST_ADDITIONS>"""
+msg_more['no'] = """<MSG_MORE>"""
 </no>
 
-## language oriented functions:
+## I18N messages oriented functions:
 
 def wash_language(ln):
     """Look at LN and check if it is one of allowed languages for the interface.
