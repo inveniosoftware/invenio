@@ -478,12 +478,11 @@ def account_list_alerts(uid, action="", id_alert=0, id_basket=0,newname=""):
     # set variables
     out = ""
     id_user = uid # XXX
-    SQL_query = "SELECT a.alert_name FROM query q, user_query_basket a, basket b "\
+    SQL_query = "SELECT distinct a.alert_name FROM query q, user_query_basket a, basket b "\
                 "WHERE a.id_user='%s' "\
                 "AND a.id_query=q.id "\
-                "AND a.id_basket=b.id "\
                 "ORDER BY a.alert_name ASC " % id_user
- 
+
     query_result = run_sql(SQL_query)    
     out += """<FORM name="displayalert" action="../youralerts.py/list" method="post">"""
         # display the list of baskets
