@@ -65,7 +65,8 @@ try:
 except MySQLdb.Error, e:
     print """
     *************************************************
-    ** Database query error %d: %s.
+    ** DATABASE QUERY ERROR %d: %s.
+    *************************************************
     ** Perhaps you need to create CDSware tables?  **
     ** If yes, then run 'make create-tables' now.  **
     ** If not, then read the above error message   **
