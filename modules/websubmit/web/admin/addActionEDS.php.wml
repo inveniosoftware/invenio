@@ -161,7 +161,7 @@ function checkRequired(sactname, lactname)
       . ereg_replace("'", "&#39;",
                htmlspecialchars(${mysql_field_name($columns, 1)}))
       . "'>\n</TD>\n</TR>\n");
-
+      print("<input type=\"hidden\" name=\"actionbutton\" value=\"\">");
       for($indx = 0; $indx < $numTblFlds; $indx++)
       {
          # Get the name of the current field...
@@ -169,7 +169,7 @@ function checkRequired(sactname, lactname)
 
          # Ensure we dont once again print certain fields
          if(($currentField != "cd") && ($currentField != "md")
-            && ($currentField != "sactname"))
+            && ($currentField != "sactname")&& ($currentField != "actionbutton"))
          {
             # First display the form field label...
             print("<TR>\n<TH BGCOLOR='#87CEFA' ALIGN='right' "

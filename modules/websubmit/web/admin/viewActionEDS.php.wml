@@ -232,6 +232,7 @@ curActionbutton, sugActionbutton, curStatustext, sugStatustext)
             . "Date:&nbsp;</TH>\n<TD WIDTH='80%' ALIGN='left' "
             . "BGCOLOR='#FFFFCC'><INPUT TYPE='readonly' NAME='md' "
             . "VALUE='" . $dataRow["md"] . "'>\n</TD>\n</TR>\n");
+	    print("<input type=\"hidden\" name=\"actionbutton\" value=\"\">");
 
             # Now fill this new table with all of the details...
 
@@ -244,7 +245,7 @@ curActionbutton, sugActionbutton, curStatustext, sugStatustext)
                # fields out...
             
                if(($currentField != "sactname") && ($currentField != "cd")
-                  && ($currentField != "md"))
+                  && ($currentField != "md") && ($currentField != "actionbutton"))
                {
                   # First, display the field name...
                   print("<TR>\n<TH BGCOLOR='#87CEFA' ALIGN='right' "
