@@ -1,55 +1,58 @@
-Hello
+--------------------------------------------------------------------
+CDSware News: CDSware v0.1.0 released
+December 4, 2003
+http://cdsware.cern.ch/news/
+--------------------------------------------------------------------
 
-The CDSware v0.0.9 was released on August 1st, 2002.
+CDSware v0.1.0 was released on December 4th, 2003.
 
 What's new:
-   * first "public" alpha release of CDSware
-   * recently standardized Library of Congress' MARC XML schema adopted
-     in all CDSware modules as the new default internal XML file format
-     (BibConvert, BibFormat, BibUpload, WebSubmit, WebSearch)
-   * support for OAI-PMH v2.0 in addition to OAI-PMH v1.1 (WebSearch)
-   * search interface now honors multiple output formats per collection
-     (BibFormat, WebSearch)
-   * search interface now honors search fields, search options, and
-     sort options from the database config tables (WebSearch,
-     WebSearch Admin)
-   * search interface now honors words indexes from the database config
-     tables (BibWords, WebSearch)
-   * easy reformatting of already uploaded bibliographic records via
-     web admin. tool (BibFormat Admin/Reformat Records)
-   * new submission form field type ("response") allowing
-     greater flexibility (WebSubmit) [thanks to Frank Sudholt]
-   * demo site "Atlantis Institute of Science" updated to demonstrate:
-     Pictures collection of photographs; specific per-collection
-     formats; references inside Articles and Preprints; "cited by"
-     search link; published version linking; subject category
-     searching; search within, search options, sort options in the web
-     collection pages.
+  * development branch release
+  * search engine redesign to yield five times more search performance
+    for larger sites (WebSearch, BibWords)
+  * fulltext indexation of PDF, PostScript, MS Word, MS PowerPoint and
+    MS Excel files (WebSearch)
+  * integrated combined metadata/fulltext/citation search (WebSearch)
+  * multi-stage search guidance in cases of no exact match (WebSearch)
+  * OAI-PMH harvestor (BibHarvest)
+  * bibliographic task scheduler (BibSched)
+  * automatic daemon mode of the indexer, the formatter and the
+    collection cache generator (BibWords, BibFormat, WebSearch)
+  * user management and session handling rewrite (WebSession)
+  * user personalization, document baskets and notification alert
+    system (WebBasket, WebAlert)
+  * role-based access control engine (WebAccess)
+  * internationalization of the interface started (currently with
+    Czech, German, English, Spanish, French, Italian, Portuguese,
+    Russian, and Slovak support)
+  * web page design update (WebStyle)
+  * introduction of programmer-oriented technical documentation corner
+    (WebHelp)
+  * source tree reorganization, mod_python technology adopted for most
+    of the modules
 
 Download:
-   <http://cdsware.cern.ch/download/cdsware-0.0.9.tar.gz>
+   <http://cdsware.cern.ch/download/cdsware-0.1.0.tar.gz>
 
 Notes:
-   As of release v0.0.9 the CDSware uses recently standardized MARC
-   XML schema provided by the Library of Congress. The default
-   configurations of nearly all CDSware modules have been changed
-   accordingly. We recommend you to install from scratch rather than
-   over an existing previous v0.01preX installations. However, in case
-   you want to keep your existing configuration and data, please feel
-   free to contact us for assistance.
+   This is a development branch release.  It is not meant to replace
+   CDSware 0.0.9.  Users of 0.0.9 are advised to wait for the next
+   stable release.  Users of 0.0.9+ are advised to upgrade to 0.1.0.
+
+   As of this release we are adopting the classical stable/development
+   branch version numbering scheme spread in the GNU/Linux world and
+   elsewhere, with even minor versions denoting stable branch releases
+   and odd minor versions denoting development releases.  For more
+   details, see <http://cdsware.cern.ch:8000/hacking/releases.html>.
 
 Known problems:
-   The admin interface is missing some functionality (e.g. there is no
-   BibWords Admin yet).  The interaction between WebSubmit and
-   WebSearch is missing some functionality (e.g. search pages are not
-   updated automatically when new documents are submitted).  We plan
-   to concentrate on these problems now.
+   WebSubmit is not working properly yet.  Several admin-level
+   functionality of 0.0.9 is missing in 0.1.0 yet.  The task scheduler
+   and RBAC authentication engines are functional but not yet called
+   by all the clients.  These issues will be subsequently dealt with
+   in the next releases of the 0.1.x development branch.
 
 What's next:
-   The v0.0.9 release should be the last one in the v0.0.x series. We
-   plan to complete various missing admin interface functionality and
-   to release v0.1 during August 2002.
-
-See also:
-   <http://cdsware.cern.ch/news/index.shtml#20020801>
-
+   Fixing known problems described above.  Stabilizing the 0.1.x tree.
+   Continuing with the internationalization of the interface.
+   Introducing BibIndex for better phrase indexing and browsing.
