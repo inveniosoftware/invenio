@@ -17,6 +17,14 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = bibconvert bibedit bibharvest bibsched bibindex bibrank bibupload bibformat elmsubmit miscutil webstyle websession webhelp webbasket webalert websearch websubmit webaccess webstat
+FILESWML=$(wildcard $(srcdir)/*.wml)
 
-CLEANFILES = *~
+etcdir=$(sysconfdir)/webstat
+etc_DATA=$(FILESWML:$(srcdir)/%.wml=%)
+
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+
+CLEANFILES = $(wildcard *.cfg) *~ *.tmp
+
+%.cfg: %.cfg.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
+	$(WML) -o $@ $<

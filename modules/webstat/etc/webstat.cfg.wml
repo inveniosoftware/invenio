@@ -1,0 +1,21 @@
+;;; -*- Mode: LISP; Syntax: COMMON-LISP; -*-
+;;;
+;;; webstat config file
+
+#include "config.wml"
+
+(defvar *profile* nil)
+(defvar *nb-histogram-items-to-print* 20)
+(defvar *exclude-ip-list* '("137.138.249.162"))
+(defvar *home-collection* "<CDSNAME>")
+(defvar *search-interface-url* "/?")
+(defvar *search-engine-url* "/search.py?")
+(defvar *basket-url* "/yourbaskets.py/")
+(defvar *add-to-basket-url* "/yourbaskets.py/add")
+(defvar *display-basket-url* "/yourbaskets.py/display")
+(defvar *display-public-basket-url* "/yourbaskets.py/display_public")
+(defvar *alert-url* "/youralerts.py/")
+(defvar *display-your-alerts-url* "/youralerts.py/list")
+(defvar *display-your-searches-url* "/youralerts.py/display")
+
+;;; end of file

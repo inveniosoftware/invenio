@@ -1,0 +1,14 @@
+Makefile
+Makefile.in
+z_*
+*.O
+*.shtml
+*.py
+*.pyc
+*.fas 
+*.fasl 
+*.lib 
+*.x86f
+*.mem
+*.core
+*~
