@@ -31,7 +31,7 @@ The CDS Development Group consists of:
      System librarian, MARC21 expertise.
 
  - Chris Montarbaud <christiane.montarbaud@cern.ch>
-     Multimedia and photo treatment.
+     Multimedia and photos.
 
 Several students and temporary group members contributed to the
 project.  In the decreasing chronological order:
@@ -41,7 +41,7 @@ project.  In the decreasing chronological order:
      the WebAccess module.  Guest user sessions garbage collector,
      for the WebSession module.
 
- - Erik Simon <erik@mifasol.net>
+ - Erik Simon <erik.simon@unine.ch>
      Alert engine, for the WebAlert module.
 
  - Roberta Faggian <roberta.faggian@cern.ch>
