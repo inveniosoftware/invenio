@@ -63,10 +63,6 @@ def single_tag_rank_method_exec(rank_method_code, name, config):
     startCreate = time.time()
     rnkset = {}
     rnkset_old = fromDB(rank_method_code)
-    #if options["quick"] == "no":
-    #    [[0, 1000]]
-    #    print options["recid_range"]
-        
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     rnkset_new = single_tag_rank(config)
     rnkset = union_dicts(rnkset_old, rnkset_new)
@@ -413,7 +409,7 @@ def bibrank_engine(row, run):
                 options["recid_range"] = [[min_id, max_id]] 
 
             if options["quick"] == "no" and options["verbose"] >= 9:
-                write_message("Rebalance not yet enabled, parameter ignored.")
+                write_message("Recalculate parameter not used, parameter ignored.")
 
             if options["cmd"] == "del":
                 del_recids(cfg_short, options["recid_range"])

@@ -34,8 +34,8 @@ Usage: %s [options]
      Ranking examples:
        %s -wjif -a --id=0-30000,30001-860000 --verbose=9
        %s -wjif -d --modified='2002-10-27 13:57:26'
-       %s -wjif --rebalance --collection=Articles
-       %s -wsbr -a -i 234-250,293,300-500 -u admin@cdsware
+       %s -wwrd --rebalance --collection=Articles
+       %s -wwrd -a -i 234-250,293,300-500 -u admin@cdsware
  
  Ranking options:
  -w, --run=r1[,r2]         runs each rank method in the order given
@@ -49,7 +49,9 @@ Usage: %s [options]
  -d, --del                 delete words for selected records
  -S, --stat                show statistics for a method
  
- -R, --rebalance           rebalancing rank data: does complete update. if not used: quick update
+ -R, --recalculate         recalculate weigth data, used by word frequency method
+                           should be used if ca 1% of the document has been changed
+                           since last time -R was used
  Repairing options:
  -k,  --check              check consistency for all records in the table(s)
                            check if update of ranking data is necessary
@@ -184,7 +186,9 @@ def usage(code, msg=''):
  -d, --del                 delete words for selected records
  -S, --stat                show statistics for a method
  
- -R, --rebalance           rebalancing rank data: does complete update. if not used: quick update
+ -R, --recalculate         recalculate weigth data, used by word frequency method
+                           should be used if ca 1%% of the document has been changed
+                           since last time -R was used
  Repairing options:
  -k,  --check              check consistency for all records in the table(s)
                            check if update of ranking data is necessary

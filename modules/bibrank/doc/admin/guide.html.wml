@@ -123,7 +123,7 @@ in different ways to create the ranking data necessary at searchtime to fast be 
 Usage bibrank:
        bibrank -wjif -a --id=0-30000,30001-860000 --verbose=9
        bibrank -wjif -d --modified='2002-10-27 13:57:26'
-       bibrank -wjif --rebalance --collection=Articles
+       bibrank -wwrd --recalculate --collection=Articles
        bibrank -wwrd -a -i 234-250,293,300-500 -u admin@cdsware
 
  Ranking options:
@@ -138,7 +138,9 @@ Usage bibrank:
  -d, --del                 delete words for selected records
  -S, --stat                show statistics for a method
 
- -R, --rebalance           rebalancing rank data: does complete update. if not used: quick update
+ -R, --recalculate         recalculate weigth data, used by word frequency method
+                           should be used if ca 1% of the document has been changed
+                           since last time -R was used
  Repairing options:
  -k,  --check              check consistency for all records in the table(s)
                            check if update of ranking data is necessary
@@ -230,7 +232,7 @@ $ bibrank 2505
 </blockquote>
 
 <h4>Step 6 - Fast update of modified records</h4>
-If you just want to update the latest additions or modified records, you may want to do a faster update by running the daemon without the rebalance option. (the rebalance option is default). This may cause lower accurancy when ranking.
+If you just want to update the latest additions or modified records, you may want to do a faster update by running the daemon without the recalculate option. (the recalculate option is off by default). This may cause lower accurancy when ranking.
 
 <a name="brm"></a><h2>5. BibRank Methods</h2>
 Each BibRank method has a configuration file which contains different parameters and sections necessary to do the ranking.
@@ -286,7 +288,7 @@ The left side must match the content of the tag mentioned in the tag variable.
 <a name="wrd"></a><h3>5.2 Word Similarity/Similar Records</h3>
 The Word Similarity/Similar Records method uses the content of the tags selected to determine which records is most relevant to a query, or most similar to a selected record. This method got a lot of parameters to configure, and it may need some tweaking to get the best result. The BibRank code for this method has to be 'wrd' for it to work. For best result, it is adviced to install the stemming module mentioned in INSTALL, and use a stopword list containing stopwords in the languages the records exists in. The stemmer and stopword list is used to get better results and to limit the size of the index, thus making ranking faster and more accurate. For best result with the stemmer, it is important to mark each tag to be used with the most common language the value of the tag may be in. It is adviced to not change the 'function','table' and the parameters under [find_similar]. If the stemmer is not installed, to assure that no problems exists, the 'stem_if_avail' parameter should be set to 'no'. Each tag to be used by the method has to be given a point. The number of points describes how important one word is in this tag.
 
-When running BibRank to update the index for this rank method, it is not necessary to rebalance each time, but when large number of records has been updated/added, it can be wise to recalculate using the rebalance parameter of BibRank.
+When running BibRank to update the index for this rank method, it is not necessary to recalculate each time, but when large number of records has been updated/added, it can be wise to recalculate using the recalculate parameter of BibRank.
 <br><br><b>Example</b>
 <pre>
 <blockquote>
