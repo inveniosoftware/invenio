@@ -173,7 +173,7 @@ def login(req,p_email=None,p_pw=None,action='login'):
        iden = webuser.loginUser(p_email,p_pw)
     
        if len(iden)>0:
-           uid=webuser.update_Uid(req,p_email,p_pw,uid)
+           uid=webuser.update_Uid(req,p_email,p_pw)
            return  page(title="Login",
                         body=webaccount.perform_display(req),
                         navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
@@ -192,21 +192,26 @@ def login(req,p_email=None,p_pw=None,action='login'):
                        description="CDS Personalize, Main page",
                        keywords="CDS, personalize",
                        uid=uid)
-    if action == 'register':
-        
-        if webuser.registerUser(req,p_email,p_pw):
-            webuser.update_Uid(req,p_email,p_pw,uid)
-        else :
+    else:
+        mess=""
+	act=""
+	ruid=webuser.registerUser(req,p_email,p_pw)
+        if ruid==1:
+		uid=webuser.update_Uid(req,p_email,p_pw)
+		return  page(title="Your Account",
+                   	     body=webaccount.perform_display(req), 
+	        	     description="CDS Personalize, Main page",
+	                     keywords="CDS, personalize",
+		             uid=uid)
+        elif  ruid ==-1 :
+		mess ="The user already exists in the database, pleas try again"
+		act = "login"
+	else:
             mess ="Your are not registered into the system please try again"
        	    act = "login"
-            return page(title="Register failure",
-                        body=webaccount.perform_back(mess,act),
-                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
-                        description="CDS Personalize, Main page",
-                        keywords="CDS, personalize",
-                        uid=uid)
-    return  page(title="Your Account",
-                 body=webaccount.perform_display(req), 
-                 description="CDS Personalize, Main page",
-                 keywords="CDS, personalize",
-                 uid=uid)
+	return page(title="Register failure",
+ 	            body=webaccount.perform_back(mess,act),
+                    navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                    description="CDS Personalize, Main page",
+                    keywords="CDS, personalize",
+                    uid=uid)

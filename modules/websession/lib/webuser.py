@@ -99,7 +99,7 @@ def checkRegister(user,passw):
        checkRegister(user,passw) -> boolean
     """
     
-    query_result = run_sql("select email,password from user where email=%s", (user,))
+    query_result = run_sql("select * from user where email=%s and password=%s", (user,passw))
     if len(query_result)> 0 :
         return 0
     return 1
@@ -160,7 +160,7 @@ def registerUser(request,user,passw):
    
        registerUser(request,user,passw) -> int 
     """ 
-    if userOnSystem(user) and user !='':
+    if userOnSystem(user) and  user !='':
 	return -1	
     if checkRegister(user,passw) and checkemail(user):
 	query_result = run_sql("insert into user (email, password) values (%s,%s)", (user,passw))
@@ -200,7 +200,7 @@ def userNotExist(p_email,p_pw):
         return 0
     return 1
 
-def update_Uid(req,p_email,p_pw,uid):
+def update_Uid(req,p_email,p_pw):
     """It updates the userId of the session. It is used when a guest user is logged in succesfully in the system 
     with a given email and password
     """	
