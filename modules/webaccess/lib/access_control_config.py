@@ -120,7 +120,11 @@ def_auths = (
 cfg_webaccess_msgs = {
                                 0: 'Try to <a href="%s/youraccount.py/login?referer=%s/admin/%s/">login</a> with another account.' % (weburl, weburl, "%s"),
                                 1: '<br>If you think this is not correct, please contact: <a href="mailto:%s">%s</a>' % (supportemail, supportemail),
-                                2: '<br>Any questions should be sent to: <a href="mailto:%s">%s</a>' % (supportemail, supportemail)
+                                2: '<br>Any questions should be sent to: <a href="mailto:%s">%s</a>' % (supportemail, supportemail),
+				3: 'Guest users are not allowed, please <a href="%s/youraccount.py/login">login</a>.' % weburl,
+				4: 'The site is temporarily closed for maintenance.  Please come back soon.',
+ 				5: 'Authorization failure',
+                                6: '%s temporarily closed' % cdsname
 
 		} 
 
@@ -135,7 +139,9 @@ cfg_webaccess_warning_msgs = {
                                 6: 'Error(6): Guest accounts are not authorized to perform this action.',
                                 7: 'Error(7): Not enough arguments, user ID and action name required.',
                                 8: 'Error(8): Incorrect keyword argument(s) for this action.',
-                                9: """Error(9): Account '%s' is not yet activated.""",
-                               10: """The site is temporarily closed for maintenance.  Please come back soon."""
+                                9: """Error(9): Account '%s' is not yet activated."""
 		} 
 </protect>
+
+
+"""Guest users are not allowed, please <a href="%s/youraccount.py/login">login</a>.""" % weburl
