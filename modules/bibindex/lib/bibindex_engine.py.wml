@@ -211,6 +211,8 @@ def get_words_from_fulltext(url_indirect,separators="[^\w]",split=string.split):
        Please note the double indirection. url_indirect
        returns a document that has to be parsed to get the actual
        urls."""
+    if cfg_fulltext_index_local_files_only and string.find(url_indirect, weburl) < 0:
+        return []
     if options["verbose"] >= 2:
         write_message("... reading fulltext files from %s started" % url_indirect)
     url_direct = None

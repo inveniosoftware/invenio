@@ -51,5 +51,10 @@ conv_programs_helpers =  {"html": "<HTMLTOTEXT>",
 cfg_check_mysql_threads = 0 # to check or not to check the problem? 
 cfg_max_mysql_threads = 50 # how many threads (connections) we consider as still safe
 cfg_mysql_thread_timeout = 20 # we'll kill threads that were sleeping for more than X seconds
+
+## do we want to fulltext-index local files only, or also remote URLs?
+cfg_fulltext_index_local_files_only = 0
+
 ## FIXME: put these to the global WML config file one day
+
 
