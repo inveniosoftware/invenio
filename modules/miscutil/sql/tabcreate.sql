@@ -1752,7 +1752,7 @@ CREATE TABLE IF NOT EXISTS idxINDEX (
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxINDEXNAME (
-  id_idxINDEX mediumint(9) unsigned NOT NULL auto_increment,
+  id_idxINDEX mediumint(9) unsigned NOT NULL,
   ln char(2) NOT NULL default '',
   type char(3) NOT NULL default 'sn',
   value varchar(255) NOT NULL,
@@ -2079,7 +2079,7 @@ CREATE TABLE IF NOT EXISTS rnkMETHOD (
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS rnkMETHODNAME (
-  id_rnkMETHOD mediumint(9) unsigned NOT NULL auto_increment,
+  id_rnkMETHOD mediumint(9) unsigned NOT NULL,
   ln char(2) NOT NULL default '',
   type char(3) NOT NULL default 'sn',
   value varchar(255) NOT NULL,
@@ -2115,7 +2115,7 @@ CREATE TABLE IF NOT EXISTS collection (
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS collectionname (
-  id_collection mediumint(9) unsigned NOT NULL auto_increment,
+  id_collection mediumint(9) unsigned NOT NULL,
   ln char(2) NOT NULL default '',
   type char(3) NOT NULL default 'sn',
   value varchar(255) NOT NULL,
@@ -2206,7 +2206,7 @@ CREATE TABLE IF NOT EXISTS format (
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS formatname (
-  id_format mediumint(9) unsigned NOT NULL auto_increment,
+  id_format mediumint(9) unsigned NOT NULL,
   ln char(2) NOT NULL default '',
   type char(3) NOT NULL default 'sn',
   value varchar(255) NOT NULL,
@@ -2236,7 +2236,7 @@ CREATE TABLE IF NOT EXISTS field (
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS fieldname (
-  id_field mediumint(9) unsigned NOT NULL auto_increment,
+  id_field mediumint(9) unsigned NOT NULL,
   ln char(2) NOT NULL default '',
   type char(3) NOT NULL default 'sn',
   value varchar(255) NOT NULL,
