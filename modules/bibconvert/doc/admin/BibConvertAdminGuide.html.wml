@@ -150,7 +150,7 @@ have been taken from the field AU2)
 <H4>
 <A NAME="KB"></A>KB(kb_file)&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp; kb_file search</H4>
 
-<BLOCKQUOTE>default: KB(kb_file,1/0)
+<BLOCKQUOTE>default: KB(kb_file,1/0/R)
 <P>The input value is compared to a kb_file and may be replaced
 by another value. In the case that the input value is not recognized, it is by default kept
 without any modification. This default can be overridden by <strong>_DEFAULT_---default value</strong> entry in the kb_file
@@ -160,6 +160,7 @@ of values that correspond to each other:
 <P>KB(file,1) searches the exact value passed.
 <BR>KB(file,0) searches the KB code inside the value passed.
 <BR>KB(file,2) as 0 but not case sensitive
+<BR>KB(file,R) replacements are applied on substrings/characters only.
 <P>Edge spaces are not considered.
 Output value is not further formated.</BLOCKQUOTE>
 
