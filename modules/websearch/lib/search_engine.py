@@ -2044,7 +2044,7 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
               "\n<form action=\"%s/search.py\" method=\"get\">"\
               "\n<table width=\"100%%\" class=\"searchresultsbox\"><tr><td class=\"searchresultsboxheader\" align=\"left\">" \
               "<strong><big>" \
-              "<a href=\"%s/?cc=%s&amp;as=%d&amp;ln=%s\">%s</a></big></strong></td>\n" % \
+              "<a href=\"%s/?c=%s&amp;as=%d&amp;ln=%s\">%s</a></big></strong></td>\n" % \
               (urllib.quote(collection), weburl, weburl, urllib.quote_plus(collection), as, ln, collection)
     else:
         out += """\n<form action="%s/search.py" method="get"><div align="center">\n""" % weburl
