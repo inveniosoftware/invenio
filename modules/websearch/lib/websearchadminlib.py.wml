@@ -524,7 +524,7 @@ def perform_modifycollectiontree(colID, ln=cdslang, move_up='', move_down='', mo
                                            rtype=rtype,
                                            ln=ln,
                                            confirm=1)
-                output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index#tree" % weburl,
+                output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index?mtype=perform_managecoll#tree" % weburl,
                                            text="<b>To cancel</b>",
                                            button="Cancel",
                                            colID=colID,
@@ -547,7 +547,7 @@ def perform_modifycollectiontree(colID, ln=cdslang, move_up='', move_down='', mo
             move_from_id = int(move_from[1:len(move_from)])
             text = """<b>Select collection to place the %s collection '%s' under.</b><br><br>
             """ % ((move_from_rtype=="r" and 'regular' or 'virtual'), col_dict[tree[move_from_id][0]])
-            output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index#tree" % weburl,
+            output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index?mtype=perform_managecoll#tree" % weburl,
                                        text=text,
                                        button="Cancel",
                                        colID=colID,
@@ -579,7 +579,7 @@ def perform_modifycollectiontree(colID, ln=cdslang, move_up='', move_down='', mo
                                                ln=ln,
                                                rtype=rtype,
                                                confirm=1)
-                    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index#tree" % weburl,
+                    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index?mtype=perform_managecoll#tree" % weburl,
                                                text="""<b>To cancel</b>""",
                                                button="Cancel",
                                                colID=colID,
@@ -1724,30 +1724,63 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     colID = int(colID)
     col_dict = dict(get_current_name('', ln, get_col_nametypes()[0][0], "collection"))
 
-    fin_output = ""
     output = ""
+    fin_output = ""
     if not col_dict.has_key(1):
         fin_output += """<b><span class="info">Before collections can be created, a root collection must be given.</span></b><br>"""
         fin_output += perform_addcollection(colID=colID, ln=ln, callback='')
         return fin_output
- 
-    if mtype == "perform_addcollection":
+
+    fin_output += """
+    <table>
+    <tr>
+    <td><b>Menu</b></td>
+    </tr>
+    <tr>
+    <td>0.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s">Show all</a></small></td>
+    <td>1.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_managecoll">Manage collections</a></small></td>
+    <td>2.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_runwebcoll">Manage webcoll</a></small></td>
+    </tr>
+    </table>
+    """ % (weburl, colID, ln, weburl, colID, ln, weburl, colID, ln)
+     
+    if mtype == "perform_addcollection" and content:
         fin_output += content
-    else:
+    elif mtype != "perform_runwebcoll":
         fin_output += perform_addcollection(colID=colID, ln=ln, callback='')
-    fin_output += """
-    <br>
-    """
-
-    if mtype == "perform_addcollectiontotree":
+        fin_output += "<br>"
+        
+    if mtype == "perform_addcollectiontotree" and content:
         fin_output += content
-    else:
+    elif mtype != "perform_runwebcoll":
         fin_output += perform_addcollectiontotree(colID=colID, ln=ln, callback='')
-    fin_output += """
-    <br>
-    """
+        fin_output += "<br>"
 
+    if mtype != "perform_runwebcoll":
+        fin_output += show_coll_not_in_tree(colID, ln, col_dict)
+        fin_output += "<br>"
+        
+    if mtype == "perform_modifycollectiontree" and content:
+        fin_output += content
+    elif mtype != "perform_runwebcoll":
+        fin_output += perform_modifycollectiontree(colID=colID, ln=ln, callback='')
+        fin_output += "<br>"
+
+    if mtype == "perform_runwebcoll" and content:
+        fin_output += content
+    elif mtype == "perform_runwebcoll" or not mtype:
+        fin_output += perform_runwebcoll(colID, ln, callback='')
+
+    try:
+        body = [fin_output, extra]
+    except NameError:
+        body = [fin_output]
+
+    return addadminbox('Overview', body)
+    
+def show_coll_not_in_tree(colID, ln, col_dict):
     output = ""
+    fin_output = ""
     subtitle = "These collections are not in the tree, and should be added"
     tree = get_col_tree(colID)
     in_tree = {}
@@ -1761,18 +1794,8 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
                 output += """<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s" title="Edit collection">%s</a> ,
                 """ % (weburl, id[0], ln, col_dict[id[0]])
         fin_output += addadminbox(subtitle, [output])
-    fin_output += """
-    <br>
-    """
-        
-    if mtype == "perform_modifycollectiontree":
-        fin_output += content
-    else:
-        fin_output += perform_modifycollectiontree(colID=colID, ln=ln, callback='')
-    fin_output += "<br>"
-
     return fin_output
-
+    
 def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='', edit=''):
     """Creates the presentation of the collection tree, with the buttons for modifying it.
     tree - the tree to present, from get_tree()
@@ -2043,8 +2066,92 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
         fin_output += content
     elif mtype == "perform_showoutputformats" or not mtype:
         fin_output += perform_showoutputformats(colID, ln, callback='')
-    
+            
     return addadminbox("Overview of edit options for collection '%s'" % col_dict[colID],  [fin_output])
+
+def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
+    """form to delete an output format not in use.
+    colID - the collection id of the current collection.
+    fmtID - the format id to delete."""
+ 
+    subtitle = """<a name="11"></a>Run webcoll for collection"""
+    output  = ""
+
+    colID = int(colID)
+    col_dict = dict(get_current_name('', ln, get_col_nametypes()[0][0], "collection"))
+
+    if confirm in [0, "0"]:
+        text = """<b>Do you want to run webcoll now for the collection '%s'.</b>
+        """ % col_dict[colID]
+        output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/runwebcoll#11" % weburl,
+                                   text=text,
+                                   button="Execute",
+                                   colID=colID,
+                                   ln=ln,
+                                   confirm=1)
+                    
+    elif confirm in [1, "1"]:
+        name = run_sql("select name from collection where id=%s" % colID)
+        res = os.popen("""%swebcoll -c%s"""  % ("/log/cdsware-DEMODEV/bin/", name[0][0])).readlines()
+        if res:
+            output += """<b><span class="info">Result from webcoll:</span></b><br>
+            """
+            for line in res:
+                output += """%s<br>""" % line
+        else:
+            output += """<b><span class="info">Cannot run webcoll.</span></b>
+            """
+            
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_index(colID, ln, "perform_runwebcoll", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+
+def perform_removeoutputformat(colID, ln=cdslang, fmtID='', callback='yes', confirm=0):
+    """form to remove an output format from a collection.
+    colID - the collection id of the current collection.
+    fmtID - the format id.
+    """
+
+    subtitle = """<a name="10.5"></a>Remove output format"""
+    output  = ""
+
+    col_dict = dict(get_current_name('', ln, get_col_nametypes()[0][0], "collection"))
+    fmt_dict = dict(get_current_name('', ln, get_fmt_nametypes()[0][0], "format"))
+
+    if colID and fmtID:
+        colID = int(colID)
+        fmtID = int(fmtID)
+
+        if confirm in ["0", 0]:
+            text = """Do you want to remove the output format '%s' from the collection '%s'.""" % (fmt_dict[fmtID], col_dict[colID])
+            output += createhiddenform(action="removeoutputformat#10.5",
+                                       text=text,
+                                       button="Confirm",
+                                       colID=colID,
+                                       fmtID=fmtID,
+                                       confirm=1)
+        elif confirm in ["1", 1]:
+            res = remove_fmt(colID, fmtID)
+            if res:
+                output += """<b><span class="info">Removed the output format '%s' from the collection '%s'.</span></b>
+                """ % (fmt_dict[fmtID], col_dict[colID])
+            else:
+                output += """<b><span class="info">Cannot remove the field from the collection '%s'.</span></b>
+                """ % (col_dict[colID])
+
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    output = "<br>" + addadminbox(subtitle, body)
+    return perform_showoutputformats(colID, ln, content=output)
 
 def get_col_tree(colID, rtype=''):
     """Returns a presentation of the tree as a list.
