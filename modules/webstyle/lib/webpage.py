@@ -169,7 +169,7 @@ def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspa
     out = re.sub(r"<!--LANGUAGESELECTIONBOX-->", create_language_selection_box(urlargs, language), out)
     return out
 
-def pagefooteronly(cdspagefooteradd="", lastupdated="", language=cdslang, verbose=1):
+def pagefooteronly(cdspagefooteradd="", lastupdated="", language=cdslang, urlargs="", verbose=1):
     """Return just the ending of page(), with full footer.
        Suitable for the search results page and any long-taking scripts."""
     out = page_template_footer % (cdspagefooteradd, cdspagefooter)
@@ -186,6 +186,7 @@ def pagefooteronly(cdspagefooteradd="", lastupdated="", language=cdslang, verbos
     out = re.sub(r"<!--LN-->", language, out)
     out = re.sub(r"<!--POWEREDBY-->", msg_powered_by[language], out)
     out = re.sub(r"<!--MAINTAINEDBY-->", msg_maintained_by[language], out)
+    out = re.sub(r"<!--LANGUAGESELECTIONBOX-->", create_language_selection_box(urlargs, language), out)
     if lastupdated:
         out = re.sub(r"<!--LASTUPDATED-->", msg_last_updated[language] + " " + lastupdated, out)
     return out
