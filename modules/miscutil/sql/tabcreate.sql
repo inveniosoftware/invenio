@@ -2073,7 +2073,6 @@ CREATE TABLE IF NOT EXISTS rnkMETHOD (
   id mediumint(9) unsigned NOT NULL auto_increment,
   name varchar(20) NOT NULL default '',
   last_updated datetime NOT NULL default '0000-00-00 00:00:00',
-  star_category_ranges longblob,
   PRIMARY KEY (id),
   UNIQUE KEY name (name)
 ) TYPE=MyISAM;
@@ -2086,6 +2085,12 @@ CREATE TABLE IF NOT EXISTS rnkMETHODNAME (
   PRIMARY KEY  (id_rnkMETHOD,ln,type)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS rnkMETHODDATA (
+  id_rnkMETHOD mediumint(9) unsigned NOT NULL,
+  relevance_data longblob,
+  PRIMARY KEY  (id_rnkMETHOD)
+) TYPE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS collection_rnkMETHOD (
   id_collection mediumint(9) unsigned NOT NULL,
   id_rnkMETHOD mediumint(9) unsigned NOT NULL,
@@ -2093,11 +2098,19 @@ CREATE TABLE IF NOT EXISTS collection_rnkMETHOD (
   PRIMARY KEY  (id_collection,id_rnkMETHOD)
 ) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS rnkSET (
-  id_rnkMETHOD mediumint(9) unsigned NOT NULL default '0',
-  star_category tinyint(4) UNSIGNED NOT NULL default '0',
-  hitset longblob NOT NULL,
-  PRIMARY KEY (id_rnkMETHOD,star_category)
+CREATE TABLE IF NOT EXISTS rnkWORD01F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(50) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS rnkWORD01R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY  (id_bibrec,type)
 ) TYPE=MyISAM;
 
 -- tables for collections and collection tree:
