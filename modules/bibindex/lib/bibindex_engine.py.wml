@@ -51,7 +51,8 @@ from search_engine_config import cfg_max_recID
 from search_engine import perform_request_search, strip_accents
 from dbquery import run_sql
 from access_control_engine import acc_authorize_action
-
+from bibindex_engine_stopwords import is_stopword
+from bibindex_engine_stemmer import stem
 
 ## import optional modules:
 try:
@@ -361,28 +362,44 @@ def get_words_from_fulltext(url_indirect,separators="[^\w]",split=string.split):
 # indexing fulltext. The default is get_words_from_phrase
 tagToWordsFunctions = {'8564_u':get_words_from_fulltext}
 
-def get_words_from_phrase(phrase,
-                          chars_punctuation=r"[\.\,\:\;\?\!\"]",
-                          chars_alphanumericseparators=r"[\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]",
-                          split=string.split):
+def get_words_from_phrase(phrase, split=string.split):
     "Returns list of words from phrase 'phrase'."
     words = {}
+    # chars_punctuation and chars_alphanumericseparators from config
+
+    if cfg_remove_html_code and string.find(phrase, "</") > -1:
+        #Most likely html, remove html code
+        phrase = sre.sub("(?s)<[^>]*>|&#?\w+;", ' ', phrase)
+
+    phrase = str.lower(phrase)
     # 1st split phrase into blocks according to whitespace
     for block in split(strip_accents(phrase)):
         # 2nd remove leading/trailing punctuation and add block:
-        block = sre.sub(r"^"+chars_punctuation+"+", "", block)
-        block = sre.sub(chars_punctuation+"+$", "", block)
+        block = sre.sub(r"^"+cfg_chars_punctuation+"+", "", block)
+        block = sre.sub(cfg_chars_punctuation+"+$", "", block)
         if block:
-            words[block] = 1         
+            block = wash_word(block)
+            if block:
+                words[block] = 1    
             # 3rd break each block into subblocks according to punctuation and add subblocks:
-            for subblock in sre.split(chars_punctuation, block):
+            for subblock in sre.split(cfg_chars_punctuation, block):
+                subblock = wash_word(subblock)
                 if subblock:
                     words[subblock] = 1
                     # 4th break each subblock into alphanumeric groups and add groups:                    
-                    for alphanumeric_group in sre.split(chars_alphanumericseparators, subblock):
+                    for alphanumeric_group in sre.split(cfg_chars_alphanumericseparators, subblock):
+                        alphanumeric_group = wash_word(alphanumeric_group)
                         if alphanumeric_group:
                             words[alphanumeric_group] = 1
+ 
     return words.keys()
+
+def wash_word(word): 
+    if not is_stopword(word): 
+        stemmed = stem(word=word)
+        if len(stemmed) >= cfg_min_word_length:
+            return stemmed
+    return ""
 
 def remove_subfields(s):
     "Removes subfields from string, e.g. 'foo $$c bar' becomes 'foo bar'."
@@ -1278,7 +1295,7 @@ def task_run(row):
     Return 1 in case of success and 0 in case of failure.
     """
     
-    global options, task_id, wordTables
+    global options, task_id, wordTables, stemmer, stopwords
 
     # read from SQL row:
     task_id = row[0]
@@ -1555,7 +1572,7 @@ def main():
         except StandardError, err:
             command_line()
             sys.exit()
-        
+
         res = run_sql("SELECT * FROM schTASK WHERE id='%d'" % (id), None, 1)
         if not res:
             write_message("Selected task not found.", sys.stderr)

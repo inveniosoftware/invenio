@@ -19,7 +19,7 @@
 
 pylibdir = $(libdir)/python/cdsware
 pylib_DATA = bibindex_engine.py bibindex_engine_config.py bibindex_engine_tests.py \
-             bibindexadminlib.py 
+             bibindexadminlib.py bibindex_engine_stemmer.py bibindex_engine_stopwords.py
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)

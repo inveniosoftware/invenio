@@ -55,6 +55,20 @@ cfg_mysql_thread_timeout = 20 # we'll kill threads that were sleeping for more t
 ## do we want to fulltext-index local files only, or also remote URLs?
 cfg_fulltext_index_local_files_only = 0
 
+## which language should we use as default?
+##{'fr': 'french', 'en': 'english', 'no':'norwegian', 'se':'swedish', 'de': 'german', 'it':'italian', 'pt':'portuguese'}
+## None = No stemming
+cfg_use_stemmer_lang = 'en'
+
+## path to stopword list, None = no stopword removal
+cfg_path_stopwordlist = "<ETCDIR>/bibrank/stopwords.kb"
+
+##used by get_words_from_phrase
+cfg_chars_alphanumericseparators = r"[\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
+cfg_chars_punctuation = r"[\.\,\:\;\?\!\"]"
+cfg_remove_html_code = True
+cfg_min_word_length = 0
+
 ## access credentials to access restricted URLs:
 ## (this may be interesting if you are fulltext-indexing files located
 ## on a remote server and when files on that server are only available
