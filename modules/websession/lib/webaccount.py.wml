@@ -2,7 +2,7 @@
 ## CDSware User account information implementation.  Useful for youraccount pages.
 
 ## This file is part of the CERN Document Server Software (CDSware).
-## Copyright (C) 2002 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
 ## The CDSware is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as

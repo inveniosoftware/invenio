@@ -3,7 +3,7 @@
 ## Note: If you change this file, please run "autoreconf" to regenerate the "configure" script.
 
 ## This file is part of the CERN Document Server Software (CDSware).
-## Copyright (C) 2002 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
 ## The CDSware is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cdsware, 0.5.0.20041217, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.5.0.20041217)
+AC_INIT(cdsware, 0.5.0.20050106, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.5.0.20050106)
 
 ## Check for install:
 AC_PROG_INSTALL
