@@ -20,7 +20,9 @@
 #include "configbis.wml"
 #include "cdspage.wml" \
     title="WebSubmit Admin FAQ" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a> &gt; <a class=navtrail href=<lang:star: index.*.html>><MSG_GUIDE></a>" 
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a> &gt; <a class=navtrail href=<lang:star: index.*.html>><MSG_GUIDE></a>"  \
+    navbar_name="admin" \
+    navbar_select="websubmit-admin-guide"
 
     &nbsp;<span class="guideheader">Q</span>1. <a href="#Q1">I'd like to be warned each time there is an error, or an important 
     action is made through the manager. Is this possible?
