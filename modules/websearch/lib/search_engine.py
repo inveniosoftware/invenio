@@ -1558,7 +1558,7 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
             # some hits found in Home, so propose this search:
             if ap:
                 if of.startswith("h"):
-                    print_warning(req, """No exact match found, searching in other public collections...""")
+                    print_warning(req, """No exact match found in selected collection(s).  Results from the whole public database follow.""")
                 results = {}
                 results[cdsname] = results_in_Home
             else:
@@ -1885,7 +1885,7 @@ def get_fieldvalues(recID, tag):
         bx = "bib%sx" % digit
         bibx = "bibrec_bib%sx" % digit
         query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND bx.tag LIKE '%s'" \
-                % (bx, bibx, recID, tag)
+                "ORDER BY bibx.field_number, bx.tag ASC" % (bx, bibx, recID, tag)
         res = run_sql(query)
         for row in res:
             out.append(row[0])
