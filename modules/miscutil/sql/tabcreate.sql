@@ -1754,8 +1754,8 @@ CREATE TABLE IF NOT EXISTS idxINDEX (
 CREATE TABLE IF NOT EXISTS idxINDEX_field (
   id_idxINDEX mediumint(9) unsigned NOT NULL,
   id_field mediumint(9) unsigned NOT NULL,
-  regexp_punctuation text NOT NULL default "[\.\,\:\;\?\!\"]",
-  regexp_alphanumeric_separators text NOT NULL default "[\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]",
+  regexp_punctuation varchar(255) NOT NULL default "[\.\,\:\;\?\!\"]",
+  regexp_alphanumeric_separators varchar(255) NOT NULL default "[\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]",
   PRIMARY KEY  (id_idxINDEX,id_field)
 ) TYPE=MyISAM;
 
