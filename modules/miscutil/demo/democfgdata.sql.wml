@@ -378,12 +378,12 @@ INSERT INTO portalbox VALUES (37,'OM DENNE SIDEN','Velkommen til demosiden for C
 INSERT INTO portalbox VALUES (38,'SE OGSÅ','<a href=\"http://cdsware.cern.ch/\">CDSware</a><br><a href=\"http://www.cern.ch/\">CERN</a><br><a href=\"http://google.com/\">Google</a>');
 INSERT INTO portalbox VALUES (39,'SOBRE ESTE SITE','Bem vindo ao site de demonstração do CDSware, um servidor de documentos livre desenvolvido pelo CERN. Sinta-se à vontade para explorar plenamente todos os recursos deste site demonstração.');
 INSERT INTO portalbox VALUES (40,'VEJA TAMBÉM','<a href=\"http://cdsware.cern.ch/\">CDSware</a><br><a href=\"http://www.cern.ch/\">CERN</a><br><a href=\"http://google.com/\">Google</a>');
-INSERT INTO portalbox VALUES (41,'ОБ ЕТОМ САЙТЕ','Здравствуйте на нашом демонстративном сайте для CDSware, свободной системе для серверов документов, исходимой из ЦЕРНа.  Пересмотрите возможности нашево демонстративново сайта как вам увлекается.');
-INSERT INTO portalbox VALUES (42,'ПОСМОТРИТЬ ТОЖЕ','<a href=\"http://cdsware.cern.ch/\">CDSware</a><br><a href=\"http://www.cern.ch/\">CERN</a><br><a href=\"http://google.com/\">Google</a>');
+INSERT INTO portalbox VALUES (41,'ОБ ЭТОМ САЙТЕ','Добро пожаловать на наш демонстрационный сайт CDSware. CDSware -- свободная программа для серверов документов, разработанная в CERNе.  Пожалуйста пользуйтесь свободно этим сайтом.');
+INSERT INTO portalbox VALUES (42,'СМОТРИТЕ ТАКЖЕ','<a href=\"http://cdsware.cern.ch/\">CDSware</a><br><a href=\"http://www.cern.ch/\">CERN</a><br><a href=\"http://google.com/\">Google</a>');
 INSERT INTO portalbox VALUES (43,'OM DENNA WEBBPLATS','Välkommen till demoinstallationen av CDSware, en fri programvara för hantering av dokument, från CERN. Välkommen att undersöka alla funktioner i denna installation.');
 INSERT INTO portalbox VALUES (44,'SE ÄVEN','<a href=\"http://cdsware.cern.ch/\">CDSware</a><br><a href=\"http://www.cern.ch/\">CERN</a><br><a href=\"http://google.com/\">Google</a>');
 
-INSERT INTO sbmCOLLECTION VALUES (36,'Catalogues');
+INSERT INTO sbmCOLLECTION VALUES (36,'Document Types');
 
 INSERT INTO sbmCOLLECTION_sbmCOLLECTION VALUES (0,36,1);
 
@@ -400,21 +400,23 @@ INSERT INTO sbmCATEGORIES VALUES ('PICT','DIAG','Diagrams and Charts');
 INSERT INTO sbmCATEGORIES VALUES ('PICT','HIST','Personalities and History of CERN');
 INSERT INTO sbmCATEGORIES VALUES ('PICT','LIFE','Life at CERN');
 INSERT INTO sbmCATEGORIES VALUES ('PICT','TRACK','Experiments and Tracks');
-INSERT INTO sbmCATEGORIES VALUES ('RTEXT','ARTICLE','Article');
-INSERT INTO sbmCATEGORIES VALUES ('TEXT','PREPRINT','Preprint');
 INSERT INTO sbmCATEGORIES VALUES ('TEXT','ARTICLE','Article');
 INSERT INTO sbmCATEGORIES VALUES ('TEXT','BOOK','Book');
-INSERT INTO sbmCATEGORIES VALUES ('TEXT','THESIS','Thesis');
+INSERT INTO sbmCATEGORIES VALUES ('TEXT','POETRY','Poetry');
+INSERT INTO sbmCATEGORIES VALUES ('TEXT','PREPRINT','Preprint');
 INSERT INTO sbmCATEGORIES VALUES ('TEXT','REPORT','Report');
+INSERT INTO sbmCATEGORIES VALUES ('TEXT','THESIS','Thesis');
+INSERT INTO sbmCATEGORIES VALUES ('RTEXT','ARTICLE','Article');
 INSERT INTO sbmCATEGORIES VALUES ('RTEXT','BOOK','Book');
+INSERT INTO sbmCATEGORIES VALUES ('RTEXT','POETRY','Poetry');
 INSERT INTO sbmCATEGORIES VALUES ('RTEXT','PREPRINT','Preprint');
 INSERT INTO sbmCATEGORIES VALUES ('RTEXT','REPORT','Report');
 INSERT INTO sbmCATEGORIES VALUES ('RTEXT','THESIS','Thesis');
 
-INSERT INTO sbmDOCTYPE VALUES ('text document (with simple refereeing)','RTEXT','2002-05-06','2002-06-20','');
-INSERT INTO sbmDOCTYPE VALUES ('text document','TEXT','2002-05-03','2002-06-21','This is a template for a text type of document with direct integration after submission\r\nUse it as a reference to create your new document types and submissions (clone).');
-INSERT INTO sbmDOCTYPE VALUES ('picture document','PICT','2002-05-03','2002-06-20','This is a template for a picture-like type of document with direct integration after submission\r\nUse it as a reference to create your new document types and submissions (clone).');
-INSERT INTO sbmDOCTYPE VALUES ('picture document (with simple refereeing)','RPICT','2002-05-07','2002-06-20','');
+INSERT INTO sbmDOCTYPE VALUES ('textual document (Article, Preprint, Thesis, etc) with simple refereeing','RTEXT','2002-05-06','2002-06-20','');
+INSERT INTO sbmDOCTYPE VALUES ('textual document (Article, Preprint, Thesis, etc)','TEXT','2002-05-03','2002-06-21','This is a template for a text type of document with direct integration after submission\r\nUse it as a reference to create your new document types and submissions (clone).');
+INSERT INTO sbmDOCTYPE VALUES ('pictorial document (Picture)','PICT','2002-05-03','2002-06-20','This is a template for a picture-like type of document with direct integration after submission\r\nUse it as a reference to create your new document types and submissions (clone).');
+INSERT INTO sbmDOCTYPE VALUES ('pictorial document (Picture) with simple refereeing','RPICT','2002-05-07','2002-06-20','');
 
 INSERT INTO sbmFIELD VALUES ('APPRTEXT',1,3,'COM','<br>Enter here your additional comments:<br>','O','comments','','2002-05-06','2002-05-28','','');
 INSERT INTO sbmFIELD VALUES ('APPRTEXT',1,2,'decision','<br><br>Your decision: ','M','decision','','2002-05-06','2002-05-28','','');
