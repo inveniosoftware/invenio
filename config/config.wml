@@ -28,18 +28,18 @@
 
 ## This file ('config.wml') consists of several relatively independent 
 ## configuration parts:
-##   Part 1: Important parameters
-##   Part 2: CDS OAI parameters
-##   Part 3: CDS page elements
-##   Part 4: CDS navigation bar
-##   Part 5: WebSearch WML Parameters 
-##   Part 6: WebSubmit WML Parameters 
+##   Part 1: Essential parameters
+##   Part 2: CDS page elements
+##   Part 3: CDS navigation bar
+##   Part 5: WebSearch WML parameters 
+##   Part 4: WebSearch OAI parameters
+##   Part 6: WebSubmit WML parameters 
 ## The configuration is done by editing the content of the "define-tag" 
 ## WML elements below.  Feel free to edit as many as you need.  When done,
 ## return to the main CDSware source directory and type 'make'.  Good luck! :-)
 
 ###################################
-## Part 1:  Important parameters ##
+## Part 1:  Essential parameters ##
 ###################################
 
 ## This part defines essential CDSware internal parameters that
