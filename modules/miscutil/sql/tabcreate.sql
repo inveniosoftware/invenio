@@ -1829,6 +1829,14 @@ CREATE TABLE IF NOT EXISTS bibwords9 (
   UNIQUE KEY word (word)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS bibwords10 (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  word varchar(50) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY word (word)
+) TYPE=MyISAM;
+
 --  reverse:
 
 CREATE TABLE IF NOT EXISTS bibwords1r (
@@ -1888,6 +1896,13 @@ CREATE TABLE IF NOT EXISTS bibwords8r (
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibwords9r (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  wordlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS bibwords10r (
   id_bibrec mediumint(9) unsigned NOT NULL,
   wordlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
