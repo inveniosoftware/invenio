@@ -489,7 +489,7 @@
   <cs>schválení</cs>
   <no>godkjente</no>
   <sv>godkända</sv>
-  <el>approvals</el>
+  <el>εγκρίσεις</el>
 </define-tag>
 
 <define-tag MSG_SESSION whitespace=delete>
