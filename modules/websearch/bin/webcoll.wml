@@ -63,7 +63,7 @@ try:
     sys.path.append('%s' % pylibdir)
     from cdsware.config import *
     from cdsware.messages import *
-    from cdsware.search_engine import HitSet, search_pattern, get_modification_date
+    from cdsware.search_engine import HitSet, search_pattern, get_creation_date
     from cdsware.search_engine_config import cfg_author_et_al_threshold, cfg_instant_browse, cfg_max_recID, cfg_narrow_search_show_grandsons
     from cdsware.dbquery import run_sql    
     from cdsware.access_control_engine import acc_authorize_action
@@ -554,7 +554,7 @@ class Collection:
                         box += """<tr>
                                     <td class="latestadditionsboxtimebody">%s</td>
                                     <td class="latestadditionsboxrecordbody">%s</td>
-                                  </tr>""" % (get_modification_date(recIDs[idx],fmt="%Y-%m-%d<br>%T"), print_record(recIDs[idx]))
+                                  </tr>""" % (get_creation_date(recIDs[idx],fmt="%Y-%m-%d<br>%h:%i"), print_record(recIDs[idx]))
                 box += "</table>"
                 if self.nbrecs > rg:
                     box += """<div align="right"><small><a href="%s&amp;ln=%s">[&gt;&gt; %s]</a></small></div>""" % (url, ln, msg_more[ln])
