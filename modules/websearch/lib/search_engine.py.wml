@@ -280,10 +280,10 @@ def create_basic_search_units(req, p, f, m=None):
             if pi == '*':
                 print_warning(req, "Ignoring standalone wildcard word.", "Warning")
                 del opfts[i]
-            if pi == '':
+            if pi == '' or pi == ' ':
                 fi = opfts[i][2]
                 if fi:
-                    print_warning(req, "Ignoring empty <em>%s</em> field term." % fi, "Warning")
+                    print_warning(req, "Ignoring empty <em>%s</em> search term." % fi, "Warning")
                 del opfts[i]
         except:
             pass
