@@ -56,11 +56,8 @@ try:
     from cdsware.config import *
     from cdsware.dbquery import run_sql
     from search_engine_config import *
-
 except ImportError, e:
     import sys
-
-voutput = ""
 
 class HitSet:
     """Class describing set of records, implemented as bit vectors of recIDs.
@@ -183,6 +180,7 @@ def check_term(stopwords, term, col_size, term_rec, max_occ, min_occ, termlength
     max_occ - max frequency of the term allowed
     min_occ - min frequence of the term allowed
     termlength - the minimum length of the terms allowed"""
+
     try:
         if stopwords.has_key(term) or (len(term) <= termlength) or ((float(term_rec) / float(col_size)) >= max_occ) or ((float(term_rec) / float(col_size)) <= min_occ):
 	    return ""
@@ -202,44 +200,16 @@ def get_stopwords(file='stopwords.kb'):
         stopwords[string.rstrip(line)] = 1
     return stopwords
 
-def get_config(rank_method_code): #needs some work
-    """Load common data into memory"""
-    global voutput
-    global stopwords
-    global stemmer
-    global chars_alphanumericseparators
-    global col_size
-    global rnkWORD_table
-    languages = {'fr': 'french', 'en': 'porter', 'no':'norwegian', 'se':'swedish', 'de': 'german', 'it':'italian', 'pt':'portugese'}
-    voutput = ""
-
-    try: 
-        if stemmer and stopwords:     
-            pass
-    except StandardError, e:
-        if methods[rank_method_code].has_key("rnkWORD_table"):
-            rnkWORD_table = methods[rank_method_code]["rnkWORD_table"]
-        try:
-            if methods[rank_method_code].has_key("stem_lang"):
-                stemmer = Stemmer.Stemmer(languages[methods[rank_method_code]["stem_lang"]])
-            else: 
-                stemmer = None         
-        except Exception, e:
-            stemmer = None
-        if methods[rank_method_code].has_key("stopword"):
-            stopwords = get_stopwords("%s" % methods[rank_method_code]["stopword"]) 
-        else:
-            stopwords = {}
-        chars_alphanumericseparators = r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
-        if methods[rank_method_code].has_key("rnkWORD_table"):
-            col_size = run_sql("SELECT count(*) FROM %sR" % rnkWORD_table[:-1])[0][0]
-
 def create_rnkmethod_cache():
     """Create cache with vital information for each rank method."""
 
-    global methods
+    global methods    
+    languages = {'fr': 'french', 'en': 'porter', 'no':'norwegian', 'se':'swedish', 'de': 'german', 'it':'italian', 'pt':'portugese'}
     bibrank_meths = run_sql("SELECT name from rnkMETHOD")
     methods = {}
+    global voutput
+    voutput = ""
+
     for (rank_method_code,) in bibrank_meths:
         try:
             file = etcdir + "/bibrank/" + rank_method_code + ".cfg"
@@ -247,18 +217,29 @@ def create_rnkmethod_cache():
             config.readfp(open(file))
         except StandardError, e:
             pass
+
         cfg_function = config.get("rank_method", "function")
         methods[rank_method_code] = {}
         methods[rank_method_code]["function"] = cfg_function
         methods[rank_method_code]["prefix"] = config.get(cfg_function, "prefix")
         methods[rank_method_code]["postfix"] = config.get(cfg_function, "postfix")
 
+        methods[rank_method_code]["chars_alphanumericseparators"] = r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
+
+        i8n_names = run_sql("SELECT ln,value from rnkMETHODNAME,rnkMETHOD where id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" % (rank_method_code))
+        for (ln, value) in i8n_names:
+            methods[rank_method_code][ln] = value
+
         if config.has_option(cfg_function, "table"):
             methods[rank_method_code]["rnkWORD_table"] = config.get(cfg_function, "table")
-        if  config.has_option(cfg_function, "stem_if_avail") and config.get(cfg_function, "stem_if_avail") == "yes":
-            methods[rank_method_code]["stem_lang"] = config.get(cfg_function, "stem_query_language")
+            methods[rank_method_code]["col_size"] = run_sql("SELECT count(*) FROM %sR" % methods[rank_method_code]["rnkWORD_table"][:-1])[0][0]
+
+        if config.has_option(cfg_function, "stem_if_avail") and config.get(cfg_function, "stem_if_avail") == "yes":
+            methods[rank_method_code]["stemmer"] = Stemmer.Stemmer(languages[config.get(cfg_function, "stem_query_language")])
+
         if config.has_option(cfg_function, "stopword"):
-            methods[rank_method_code]["stopword"] = config.get(cfg_function, "stopword")
+            methods[rank_method_code]["stopwords"] = get_stopwords("%s" % config.get(cfg_function, "stopword"))
+
         if config.has_section("find_similar"):
             methods[rank_method_code]["max_word_occurence"] = float(config.get("find_similar", "max_word_occurence"))
             methods[rank_method_code]["min_word_occurence"] = float(config.get("find_similar", "min_word_occurence"))
@@ -268,10 +249,6 @@ def create_rnkmethod_cache():
             methods[rank_method_code]["max_nr_words_lower"] = int(config.get("find_similar", "max_nr_words_lower"))
             methods[rank_method_code]["override_default_min_relevance"] = config.get("find_similar", "override_default_min_relevance")
             methods[rank_method_code]["default_min_relevance"] = int(config.get("find_similar", "default_min_relevance"))
-
-        i8n_names = run_sql("SELECT ln,value from rnkMETHODNAME,rnkMETHOD where id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" % (rank_method_code))
-        for (ln, value) in i8n_names:
-            methods[rank_method_code][ln] = value
             
 def is_method_valid(colID, rank_method_code):
     """Checks if a method is valid for the collection given"""
@@ -315,20 +292,19 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
        pattern, search engine query or record ID (you check the type)                   
        verbose, verbose level
     """
-
     hitset = copy.deepcopy(hitset_global) #we are receiving a global hitset
 
     try:
-        if methods:
+        if methods:  
             pass
-    except Exception:
+    except Exception, e:
         create_rnkmethod_cache()
 
+    global voutput
+    voutput = ""
     try:
         function = methods[rank_method_code]["function"]
         func_object = globals().get(function)
-        get_config(rank_method_code)
-
         if func_object and pattern and pattern[0][0:6] == "recid:":
             result = find_similar(rank_method_code, pattern[0][6:], hitset, rank_limit_relevance, verbose)
         elif func_object:
@@ -347,6 +323,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
 
     if verbose > 0:
         print string.replace(voutput, "<br>", "\n")
+
     return result
 
 def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
@@ -364,7 +341,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     query_terms = {} 
     recID = int(recID)
 
-    res = run_sql("SELECT termlist FROM %sR WHERE id_bibrec=%s" % (rnkWORD_table[:-1], recID))
+    res = run_sql("SELECT termlist FROM %sR WHERE id_bibrec=%s" % (methods[rank_method_code]["rnkWORD_table"][:-1], recID))
     if not res:
         return (None, "Warning: Requested record does not seem to exist.", "", voutput) 
     rec_terms = deserialize_via_marshal(res[0][0])
@@ -373,7 +350,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     if len(rec_terms) > 0:
         terms = "%s" % dict(rec_terms).keys()
         terms = terms[1:len(terms) - 1]
-        terms_recs = dict(run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (rnkWORD_table,terms)))
+        terms_recs = dict(run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (methods[rank_method_code]["rnkWORD_table"],terms)))
     else:
         return (None, "Warning, An error has occured (3)", "", voutput)
 
@@ -393,7 +370,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     #Use only most important terms
     for (t, tf) in query_terms_old:
         term_recs = deserialize_via_marshal(terms_recs[t])
-        if len(query_terms_old) <= methods[rank_method_code]["max_nr_words_lower"] or (len(term_recs) >= methods[rank_method_code]["min_nr_words_docs"] and (((float(len(term_recs)) / float(col_size)) <=  methods[rank_method_code]["max_word_occurence"]) and ((float(len(term_recs)) / float(col_size)) >= methods[rank_method_code]["min_word_occurence"]))):
+        if len(query_terms_old) <= methods[rank_method_code]["max_nr_words_lower"] or (len(term_recs) >= methods[rank_method_code]["min_nr_words_docs"] and (((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) <=  methods[rank_method_code]["max_word_occurence"]) and ((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) >= methods[rank_method_code]["min_word_occurence"]))):
              query_terms[t] = round(tf, 4) 
              (recdict, rec_termcount, lrecIDs_remove) = calculate_record_relevance((t, query_terms[t]) , term_recs, hitset, recdict, rec_termcount, lrecIDs_remove, verbose, "yes") 
              if verbose > 0:
@@ -406,9 +383,9 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
         return (None, "Warning, An error has occured (4)", "", voutput)
 
     if verbose > 0:
-        voutput += "<br>Number of terms: %s<br>" % run_sql("SELECT count(id) FROM %s" % rnkWORD_table)[0][0]
+        voutput += "<br>Number of terms: %s<br>" % run_sql("SELECT count(id) FROM %s" % methods[rank_method_code]["rnkWORD_table"])[0][0]
         voutput += "Number of terms to use for query: %s<br>" % (len(query_terms))
-        voutput += "Current number of recIDs: %s<br>" % (col_size)
+        voutput += "Current number of recIDs: %s<br>" % (methods[rank_method_code]["col_size"])
         voutput += "Prepare time: %s<br>" % (str(time.time() - startCreate))
 
     recdict = post_calculate_record_relevance(recdict, rec_termcount, lrecIDs_remove, hitset, verbose)
@@ -416,7 +393,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
 
     if verbose > 0:
         voutput += "Total time used: %s<br>" % (str(time.time() - startCreate))
-        rank_method_stat(reclist, query_terms)
+        rank_method_stat(rank_method_code, reclist, query_terms)
 
     return (reclist[:len(reclist)], methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
 
@@ -457,17 +434,16 @@ def word_frequency(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     query_terms = {}
     lwords_old = lwords
     lwords = []
- 
     #Check terms, remove non alphanumeric characters. Use both unstemmed and stemmed version of all terms.
     for i in range(0, len(lwords_old)):
         term = string.lower(lwords_old[i])
         use_term = 0
-        if not stopwords.has_key(term):
+        if not methods[rank_method_code]["stopwords"].has_key(term):
             lwords.append(term)
-            terms = string.split(string.lower(re.sub(chars_alphanumericseparators, ' ', term)))  
+            terms = string.split(string.lower(re.sub(methods[rank_method_code]["chars_alphanumericseparators"], ' ', term)))  
             for term in terms: 
-                if stemmer: # stem word
-                    term = stemmer.stem(string.replace(term, ' ', ''))
+                if methods[rank_method_code].has_key("stemmer"): # stem word
+                    term = methods[rank_method_code]["stemmer"].stem(string.replace(term, ' ', ''))
                 if lwords_old[i] != term: #add if stemmed word is different than original word
 	            lwords.append(term)
 
@@ -475,10 +451,10 @@ def word_frequency(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     #For each term, if accepted, get a list of the records using the term
     #calculate then relevance for each term before sorting the list of records
     for term in lwords:
-	term_recs = run_sql("SELECT term, hitlist FROM %s WHERE term='%s'" % (rnkWORD_table,  MySQLdb.escape_string(term)))
+	term_recs = run_sql("SELECT term, hitlist FROM %s WHERE term='%s'" % (methods[rank_method_code]["rnkWORD_table"],  MySQLdb.escape_string(term)))
         if term_recs:
 	    term_recs = deserialize_via_marshal(term_recs[0][1])
-            if check_term({}, term, col_size, len(term_recs), 1.0, 0.00, 0):
+            if check_term({}, term, methods[rank_method_code]["col_size"], len(term_recs), 1.0, 0.00, 0):
                 query_terms[term] = int(query_terms.get(term, 0) + term_recs["Gi"][1])
                 (recdict, rec_termcount, lrecIDs_remove) = calculate_record_relevance((term, query_terms[term]) , term_recs, hitset, recdict, rec_termcount, lrecIDs_remove, verbose)
             del term_recs
@@ -487,8 +463,8 @@ def word_frequency(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
         return (None, "Records not ranked. The query is not detailed enough for ranking to be possible.", "", voutput)
 
     if verbose > 0:
-        voutput += "<br>Current number of recIDs: %s<br>" % (col_size)
-        voutput += "Number of terms: %s<br>" % run_sql("SELECT count(id) FROM %s" % rnkWORD_table)[0][0]
+        voutput += "<br>Current number of recIDs: %s<br>" % (methods[rank_method_code]["col_size"])
+        voutput += "Number of terms: %s<br>" % run_sql("SELECT count(id) FROM %s" % methods[rank_method_code]["rnkWORD_table"])[0][0]
         voutput += "Terms: %s<br>" % query_terms
         voutput += "Prepare and pre calculate time: %s<br>" % (str(time.time() - startCreate))
 
@@ -504,7 +480,7 @@ def word_frequency(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
 
     if verbose > 0:
         voutput += "Total time used: %s<br>" % (str(time.time() - startCreate))
-        rank_method_stat(reclist, query_terms)
+        rank_method_stat(rank_method_code, reclist, query_terms)
 
     return (reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
 
@@ -566,7 +542,7 @@ def sort_record_relevance(recdict, rank_limit_relevance,recID, verbose):
 
     return reclist
 
-def rank_method_stat(reclist, lwords):
+def rank_method_stat(rank_method_code, reclist, lwords):
     """Shows some statistics about the searchresult."""
     global voutput
     if len(reclist) > 20:
@@ -577,7 +553,7 @@ def rank_method_stat(reclist, lwords):
     voutput += "<br>Rank statistics:<br>"
     for i in range(1, j):
    	voutput += "%s,Recid:%s,Score:%s<br>" % (i,reclist[len(reclist) - i][0],reclist[len(reclist) - i][1])
-	res = run_sql("SELECT termlist FROM %sR WHERE id_bibrec=%s" % (rnkWORD_table[:-1],reclist[len(reclist) - i][0]))
+	res = run_sql("SELECT termlist FROM %sR WHERE id_bibrec=%s" % (methods[rank_method_code]["rnkWORD_table"][:-1],reclist[len(reclist) - i][0]))
 	try:
 	    termlist = deserialize_via_marshal(res[0][0])
             for term in lwords:
@@ -611,5 +587,5 @@ try:
     psyco.bind(deserialize_via_numeric_array)
     psyco.bind(deserialize_via_marshal)
 except StandardError, e:
-    print "Psyco Error",e
+    pass
 
