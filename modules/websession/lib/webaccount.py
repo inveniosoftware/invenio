@@ -233,7 +233,7 @@ def perform_set(email,password):
         current_login_method = prefs['login_method']
 
         text += """<form method="post" action="../youraccount.py/change">"""
-        text += """<big><strong class=headline>Which login method would you like to use as default?</strong></big><br>(Only the selected account can be used to login)<br><br><table><tr><td valign=top><b>Select account:</b></td><td>"""
+        text += """<big><strong class=headline>Edit login method</strong></big><p>Please select which login method you would like to use to authenticate yourself:<table><tr><td valign=top><b>Select method:</b></td><td>"""
         methods = CFG_EXTERNAL_AUTHENTICATION.keys()
         methods.sort()
         for system in methods:
@@ -247,7 +247,7 @@ def create_register_page_box(referer=''):
 
     text = ""
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1:
-        text += """Please enter the values of your preference and choose the <strong class=headline>register</strong> button."""
+        text += """Please enter your email address and desired password:"""
         if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
             text += "The account will not be possible to use before it has been verified and activated."  
     elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
@@ -298,8 +298,7 @@ def create_login_page_box(referer=''):
 
     text = ""
     text += """
-              <p>If you already have an account, please log in by choosing the <strong class=headline>login
-              </strong> button below. <br>"""
+              <p>If you already have an account, please login using the form below. <br>"""
     internal = None
     for system in CFG_EXTERNAL_AUTHENTICATION.keys():
         if not CFG_EXTERNAL_AUTHENTICATION[system][0]:
@@ -326,27 +325,27 @@ def create_login_page_box(referer=''):
     text += """
               <table>
               <tr>
-		 <td align=right>%s
+		 <td align="right">%s
 		 </td>
                  <td>%s</td>
 		 <td></td>
 	       </tr>
               <tr>
-		 <td align=right><input type="hidden" name="referer" value="%s"><strong>Username:</strong>
+		 <td align="right"><input type="hidden" name="referer" value="%s"><strong>Username:</strong>
 		 </td>
                  <td><input type="text" size="25" name="p_email" value=""></td>
 		 <td></td>
 	       </tr>
 	       <tr>
-		 <td align=right><strong>Password:</strong>		
+		 <td align="right"><strong>Password:</strong>		
 		</td>
-		<td align=left><input type="password" size="25" name="p_pw" value="">
+		<td align="left"><input type="password" size="25" name="p_pw" value="">
 		 </td>
                  <td>
 		 </td>
                 </tr>
                 <tr>
-		 <td></td><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>""" % (logmethtitle, logmethdata, cgi.escape(referer))
+		 <td></td><td align="center" colspan="3"><code class="blocknote"><input class="formbutton" type="submit" name="action" value="login"></code>""" % (logmethtitle, logmethdata, cgi.escape(referer))
     if internal:
         text += """&nbsp;&nbsp;&nbsp;(<a href="./lost">Lost your password?</a>)"""
     text += """
