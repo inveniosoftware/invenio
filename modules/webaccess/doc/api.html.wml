@@ -1,0 +1,115 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="Access Control Engine API" \
+    navbar_name="web user" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/>Help Central</a> &gt; <a class=navtrail href=<WEBURL>/help/webaccess/>WebAccess Help</a> &gt; <a class=navtrail href=<WEBURL>/help/webaccess/internals.html>WebAccess Internals</a>" \
+    navbar_select="access-control-engine-api" 
+
+<pre>
+ACCESS CONTROL ENGINE API / $Date$
+
+CDSware Access Control Engine can be called from within your Python programs
+via both a regular API interface and CLI.
+
+1. Regular API
+
+   Description:
+
+      There is not very much information in the database at the moment.
+      More can be added on demand.
+
+      Information on these will be added when time allows it.
+
+   Signature:
+
+      def ace_authorize_action(id_user, name_action, dict={}, **arguments):
+          """ Check if user is allowed to perform action
+	  with given list of arguments.
+	  Return 1 if authentication succeeds, 0 if it fails.
+
+	  The arguments are as follows:
+    
+                  id_user - currently the id of the user to be authorized in the 
+                            cdsdev database
+                            
+              name_action - the name of the action
+
+                arguments - dictionary with keyword=value pairs created automatically
+                            by python on the extra arguments. these depend on the
+                            given action.
+          """
+
+   Examples: 
+
+      >>> # import the functions from module
+      >>> pylibdir = '/log/cdsware-DEMODEV/lib/python/cdsware/'
+      >>> import sys
+      >>> sys.path.append('%s' % pylibdir)
+      >>> from access_control_engine import *
+      >>> # authorize user 109 for action WebSearch_search with collection="LHC"
+      >>> ace_authorize_action(109, 'WebSearch_search', collection="LHC")
+      1
+      >>> # authorize user 109 for action WebSearch_search with collection="fail this"
+      >>> ace_authorize_action(109, 'WebSearch_search', collection="fail this")
+      0
+      >>> # authorize user 109 for action BibFormat_modify with format="htmlbrief"
+      >>> ace_authorize_action(109, 'BibFormat_modify', format="htmlbrief")
+      1
+
+2. Command Line Interface
+
+   Description:
+
+      The Command Line Interface uses the regular API of ace_authorize_action.
+      
+   Signature:
+
+      access_control_engine.py id_user name_action keyword1 value1 keyword2 value2 ...
+          """ See description from function ace_authorize_action.
+                  id_user - id of user to be authorized
+ 
+	      name_action - name of the action
+ 
+	         keyword1 - first keyword like in the keyword=value pairs, 
+                            same rules for the following ones.
+			    always one word.
+ 
+	           value1 - value that belongs in a pair with the corresponding keyword,
+                            same rules for the following ones.
+			    add quotes if it is more that one word.
+ 
+              the keyword=value pairs are collected in a dictionary
+          """
+   
+   Examples:
+
+      These are the same ones as for the regular API:
+      $ access_control_engine.py 109 WebSearch_search collection LHC
+      $ access_control_engine.py 109 WebSearch_search collection 'fail this'
+      $ access_control_engine.py 109 Bibformat_modify format htmlbrief
+
+      
+These are the only entry points for authorization and i doubt that 
+any more will be created. Notes on functions to add new authorizations 
+will be added when time allows it.
+</pre>
+
+
