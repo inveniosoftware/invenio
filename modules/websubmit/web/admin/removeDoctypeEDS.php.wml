@@ -150,6 +150,23 @@
                . "$doc2delete doctype.');\n</SCRIPT>\n");
             } // END if
 
+            # Now delete the entry for the doctype in the "sbmSUBMISSIONS"
+            # table.
+            $q8Res = mysql_query("DELETE FROM sbmSUBMISSIONS WHERE doctype = '"
+             . "$doc2delete'");
+
+            if(!$q8Res)
+            {
+               # Unable to delete.  Alert the user.
+
+               print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR:\\n"
+               . "\\nIt was not possible to delete the details\\nof the "
+               . "$doc2delete document type from the sbmSUBMISSIONS table.\\n"
+               . "\\nThis means that it will be necessary to manually "
+               . "delete any rows in this table relating to the "
+               . "$doc2delete doctype.');\n</SCRIPT>\n");
+            } // END if
+
             # Now delete the entry for the doctype in the actual "sbmDOCTYPE"
             # table.
             $q5Res = mysql_query("DELETE FROM sbmDOCTYPE WHERE sdocname = '"
