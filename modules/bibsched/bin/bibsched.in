@@ -272,7 +272,7 @@ class Manager:
             if process in self.helper_modules:
                 program=os.path.join( bindir, process )
                 if process == "bibupload":
-                    arg2 = "-t"
+                    arg2 = "-t "
                 else:
                     arg2 = ""
                 COMMAND = "%s %s %s >> %s 2>> %s &" % (program, arg2, str(id), fdout, fderr)
@@ -500,7 +500,7 @@ class Manager:
             where = "and state='DONE'"
         else:
             where = "and state!='DONE'"
-        query = "SELECT id,proc,user,date,sleeptime,state,progress FROM schTASKS WHERE state NOT LIKE '%%DELETED%%' %s order by date desc" % where
+        query = "SELECT id,proc,user,date,sleeptime,state,progress FROM schTASKS WHERE state NOT LIKE '%%DELETED%%' %s order by date asc" % where
         self.cursor.execute(query)
         self.rows = self.cursor.fetchall()
         self.repaint()
@@ -514,7 +514,7 @@ class Manager:
                     where = "and state='DONE'"
                 else:
                     where = "and state!='DONE'"
-                query = "SELECT id,proc,user,date,sleeptime,state,progress FROM schTASKS WHERE state NOT LIKE '%%DELETED%%' %s order by date desc" % where
+                query = "SELECT id,proc,user,date,sleeptime,state,progress FROM schTASKS WHERE state NOT LIKE '%%DELETED%%' %s order by date asc" % where
                 self.cursor.execute(query)
                 self.rows = self.cursor.fetchall()
                 ring = 0
@@ -616,7 +616,7 @@ class Bibsched:
             proc = running_process[ 1 ]
             id   = running_process[ 0 ]
             if proc == "bibupload":
-                arg2 = "-t"
+                arg2 = "-t "
             else:
                 arg2 = ""
             if get_my_pid(proc,"%s%s" % (arg2, str(id))):
