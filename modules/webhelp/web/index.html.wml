@@ -104,7 +104,7 @@
     <sk>Pomoc pre hľadanie <CDSNAMEINTL>.</sk>
     <cz>Nápověda pro hledání <CDSNAMEINTL>.</cz>
     <no>Få hjelp til søking i <CDSNAMEINTL>.</no>
-<dt><a href="submit/<lang:star: index.*.php>"><MSG_SUBMIT_HELP></a>
+<dt><a href="submit/<lang:star: index.*.html>"><MSG_SUBMIT_HELP></a>
 <dd><en>Get help with submitting to <CDSNAMEINTL>.</en>
     <fr>Obtenez de l'aide avec la soumission dans <CDSNAMEINTL>.</fr>
     <de>Hier können Sie die Eintragehilfe für den <CDSNAMEINTL> konsultieren.</de>
