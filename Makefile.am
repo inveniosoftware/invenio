@@ -34,6 +34,13 @@ all:
 	@echo "** running 'make install'.                                  **"
 	@echo "**************************************************************"
 
+test:
+	@if [ -e @prefix@/bin/testsuite ]; then \
+	    @prefix@/bin/testsuite ; \
+	else \
+	    echo "Hmm, testsuite does not seem to be installed.  Please do 'make install' first."; \
+	fi
+
 install-data-local:
 	mkdir -p @prefix@/var
 	mkdir -p @prefix@/var/cache
