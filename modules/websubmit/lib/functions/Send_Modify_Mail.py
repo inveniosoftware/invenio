@@ -63,7 +63,9 @@ def Send_Modify_Mail (parameters,curdir,form):
     email_txt += "Please note that the modifications will be taken into account in a couple of minutes.\n\nBest regards,\nThe %s Server support Team" % cdsname
     # send the mail
     body = forge_email(FROMADDR,sub,parameters['addressesMBI'],"%s modified" % rn,email_txt)
-    send_email(FROMADDR,sub,body,0)
+    tostring = "%s,%s" % (sub,parameters['addressesMBI'])
+    tolist = re.split(",",tostring)
+    send_email(FROMADDR,tolist,body,0)
     return ""
    
 

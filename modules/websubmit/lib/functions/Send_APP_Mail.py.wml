@@ -113,6 +113,8 @@ def Send_APP_Mail (parameters,curdir,form):
     #Send mail to referee
     # Actually send the email
     body = forge_email(FROMADDR,addresses,adminemail,mailtitle,mailbody)
-    send_email(FROMADDR,addresses,body,0)
+    tostring = "%s,%s" % (addresses,adminemail)
+    tolist = re.split(",",tostring)
+    send_email(FROMADDR,tolist,body,0)
     return ""
 </protect>

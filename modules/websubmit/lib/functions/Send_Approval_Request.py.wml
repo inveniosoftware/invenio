@@ -104,6 +104,8 @@ def Send_Approval_Request (parameters,curdir,form):
     #Send mail to referee
     # Actually send the email
     body = forge_email(FROMADDR,addresses,adminemail,title_referee,mail_referee)
-    send_email(FROMADDR,addresses,body,0)
+    tostring = "%s,%s" % (addresses,adminemail)
+    tolist = re.split(",",tostring)
+    send_email(FROMADDR,tolist,body,0)
     return ""
 </protect>

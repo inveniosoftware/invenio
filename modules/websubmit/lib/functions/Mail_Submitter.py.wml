@@ -96,7 +96,9 @@ def Mail_Submitter (parameters,curdir,form):
     email_txt = email_txt + "Thank you for using %s Submission Interface.\n" % cdsname
     # send the mail
     body = forge_email(FROMADDR,m_recipient,adminemail,"%s: Document Received" % fullrn,email_txt)
-    send_email(FROMADDR,m_recipient,body,0)
+    tostring = "%s,%s" % (m_recipient,adminemail)
+    tolist = re.split(",",tostring)
+    send_email(FROMADDR,tolist,body,0)
     return ""
    
 </protect>

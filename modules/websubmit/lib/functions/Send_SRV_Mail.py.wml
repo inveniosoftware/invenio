@@ -62,6 +62,8 @@ def Send_SRV_Mail(parameters,curdir,form):
     
     # Actually send the email
     body = forge_email(FROMADDR,SuE,addresses,"%s revised" % rn,message)
-    send_email(FROMADDR,SuE,body,0)
+    tostring = "%s,%s" % (SuE,addresses)
+    tolist = re.split(",",tostring)
+    send_email(FROMADDR,tolist,body,0)
     return ""
 </protect>
