@@ -1466,7 +1466,7 @@ def acc_garbage_collector(verbose=0):
     id_actions = run_sql("""SELECT DISTINCT a.id FROM accACTION a""")
     idactionsstr = ''
     for (id, ) in id_actions:
-        idactionsstre += (idactionsstr and ',' or '') + '%s' id
+        idactionsstr += (idactionsstr and ',' or '') + '%s' % id # FIXME: here was a syntactic bug, so check the code!
     if idactionsstr:
         count += run_sql("""DELETE FROM accROLE_accACTION_accARGUMENT WHERE id_accACTION NOT IN (%s)""" % (idactionsstr, ))
 
