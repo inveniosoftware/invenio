@@ -98,12 +98,20 @@ def checkRegister(user,passw):
        
        checkRegister(user,passw) -> boolean
     """
-
+    
     query_result = run_sql("select email,password from user where email=%s", (user,))
     if len(query_result)> 0 :
         return 0
     return 1
 
+def userOnSystem(user):
+    """It checks if the user is registered already on the system
+    """
+    query_register = run_sql("select * from user where email=%s", (user,))
+    if len(query_register)>0:
+	return 1
+    return 0
+	
 def checkemail(email):
     """It is a first intent for cheking the email,whith this first version it just checks if the email 
        written by the user doesn't contain blanks and that contains '@'
@@ -147,14 +155,17 @@ def getDataUid(request,uid):
 
 def registerUser(request,user,passw):
     """It registers the user, inserting into the user table of MySQL database, the email and the pasword 
-	of the user. It returns true if the insertion is done 
+	of the user. It returns 1 if the insertion is done, 0 if there is any failure with the email 
+	and -1 if the user is already on the data base
    
-       registerUser(request,user,passw) -> boolean
-    """
+       registerUser(request,user,passw) -> int 
+    """ 
+    if userOnSystem(user) and user !='':
+	return -1	
     if checkRegister(user,passw) and checkemail(user):
-        query_result = run_sql("insert into user (email, password) values (%s,%s)", (user,passw))
-        setUid(request,query_result)
-        return 1
+	query_result = run_sql("insert into user (email, password) values (%s,%s)", (user,passw))
+	setUid(request,query_result)
+	return 1
     return 0
 
 def updateDataUser(req,uid,email,password):

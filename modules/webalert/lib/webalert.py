@@ -43,6 +43,7 @@ try:
     from webpage import page
     from dbquery import run_sql
     from webuser import getUid, create_user_infobox,isGuestUser
+    from webaccount import perform_guest_user
     from webbasket import perform_create_basket
     from mod_python import apache
 except ImportError, e:
@@ -150,7 +151,8 @@ def perform_display(permanent,uid):
                     out += """<TD>-unknown-</TD>"""
             out += """</TR>\n"""
         out += """</TABLE><BR>\n"""
-
+    if isGuestUser(uid):
+	out += perform_guest_user(type="alerts")    
     return out
 
 
@@ -352,10 +354,7 @@ def perform_list_alerts (uid):
         out += """</TABLE>\n"""
     out += """<P>You have defined <B>%s</B> alerts.</P>""" % len(query_result)    
     if isGuestUser(uid) :
-	out += """<br><FONT color="red"> You are logged in as a <B>guest</B> user, so your baskets
-	will disappear at the end of the current session. If you wish you can login or register
-	<A href="../youraccount.py/login">here</A>.</FONT>"""	
- 	
+	out += perform_guest_user(type="alerts")
     return out
 
 

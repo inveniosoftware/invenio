@@ -183,7 +183,7 @@ def login(req,p_email=None,p_pw=None,action='login'):
             webuser.update_Uid(req,p_email,p_pw,uid)
         else :
             mess ="Your are not registered into the system please try again"
-            act = "login"
+       	    act = "login"
             return page(title="Register failure",
                         body=webaccount.perform_back(mess,act),
                         navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
