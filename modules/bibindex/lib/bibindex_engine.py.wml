@@ -89,7 +89,13 @@ def write_message(msg, stream=sys.stdout):
     return
 
 ## precompile some often-used regexp for speed reasons:
-re_subfields = sre.compile('\$\$\w');
+sre_subfields = sre.compile('\$\$\w');
+sre_phrase = sre.compile("(?s)<[^>]*>|&#?\w+;")
+sre_block_punctuation_begin = sre.compile(r"^"+cfg_chars_punctuation+"+")
+sre_block_punctuation_end = sre.compile(cfg_chars_punctuation+"+$")
+sre_punctuation = sre.compile(cfg_chars_punctuation)
+sre_separators = sre.compile(cfg_chars_alphanumericseparators)
+sre_datetime_shift = sre.compile("([-\+]{0,1})([\d]+)([dhms])")
 
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
@@ -369,25 +375,25 @@ def get_words_from_phrase(phrase, split=string.split):
 
     if cfg_remove_html_code and string.find(phrase, "</") > -1:
         #Most likely html, remove html code
-        phrase = sre.sub("(?s)<[^>]*>|&#?\w+;", ' ', phrase)
+        phrase = sre_compile.sub(' ', phrase)
 
     phrase = str.lower(phrase)
     # 1st split phrase into blocks according to whitespace
     for block in split(strip_accents(phrase)):
         # 2nd remove leading/trailing punctuation and add block:
-        block = sre.sub(r"^"+cfg_chars_punctuation+"+", "", block)
-        block = sre.sub(cfg_chars_punctuation+"+$", "", block)
+        block = sre_block_punctuation_begin.sub("", block)
+        block = sre_block_punctuation_end.sub("", block)
         if block:
             block = wash_word(block)
             if block:
                 words[block] = 1    
             # 3rd break each block into subblocks according to punctuation and add subblocks:
-            for subblock in sre.split(cfg_chars_punctuation, block):
+            for subblock in sre_punctuation.split(block):
                 subblock = wash_word(subblock)
                 if subblock:
                     words[subblock] = 1
                     # 4th break each subblock into alphanumeric groups and add groups:                    
-                    for alphanumeric_group in sre.split(cfg_chars_alphanumericseparators, subblock):
+                    for alphanumeric_group in sre_separators.split(subblock):
                         alphanumeric_group = wash_word(alphanumeric_group)
                         if alphanumeric_group:
                             words[alphanumeric_group] = 1
@@ -403,7 +409,7 @@ def wash_word(word):
 
 def remove_subfields(s):
     "Removes subfields from string, e.g. 'foo $$c bar' becomes 'foo bar'."
-    return re_subfields.sub(' ', s)
+    return sre_subfields.sub(' ', s)
 
 def get_index_id(indexname):
     """Returns the words/phrase index id for INDEXNAME.
@@ -570,9 +576,8 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
        It can handle normal date strings and shifts with respect
        to now."""
     date = time.time()
-    shift_re=sre.compile("([-\+]{0,1})([\d]+)([dhms])")
     factors = {"d":24*3600, "h":3600, "m":60, "s":1}
-    m = shift_re.match(var)
+    m = sre_datetime_shift.match(var)
     if m:
         sign = m.groups()[0] == "-" and -1 or 1
         factor = factors[m.groups()[2]]
