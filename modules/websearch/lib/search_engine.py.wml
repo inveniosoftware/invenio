@@ -67,6 +67,7 @@ except ImportError, e:
 search_cache = {} # will cache results of previous searches
 dbg = 0 # are we debugging?
 cfg_nb_browse_seen_records = 100 # limit of the number of records to check when browsing certain collection
+cfg_nicely_ordered_collection_list = 0 # do we propose collection list nicely ordered or alphabetical?
 
 ## precompile some often-used regexp for speed reasons:
 re_a = re.compile('[бавд]')
@@ -112,6 +113,24 @@ def build_table_latin1_to_ascii():
 # build conversion table:
 table_latin1_to_ascii = build_table_latin1_to_ascii()
 
+def get_alphabetically_ordered_collection_list(collid=1, level=0):
+    """Returns nicely ordered (score respected) list of collections, more exactly list of tuples
+       (collection name, printable collection name).
+       Suitable for create_search_box()."""
+    out = []
+    query = "SELECT id,name FROM collection ORDER BY name ASC"
+    res = run_sql(query)
+    for c_id, c_name in res:
+        # make a nice printable name (e.g. truncate c_printable for for long collection names):
+        if len(c_name)>30:
+            c_printable = c_name[:30] + "..."
+        else:
+            c_printable = c_name
+        if level:
+            c_printable = " " + level * '-' + " " + c_printable
+        out.append([c_name, c_printable])
+    return out    
+    
 def get_nicely_ordered_collection_list(collid=1, level=0):
     """Returns nicely ordered (score respected) list of collections, more exactly list of tuples
        (collection name, printable collection name).
@@ -308,7 +327,7 @@ def create_opft_search_units(req, p, f, m=None):
             print_warning(req, opft, "Debug (create_opft_search_units() - created search unit)")            
     return opfts
 
-def create_header(cc=cdsname, as=0, headeradd=""):
+def create_header(cc=cdsname, as=0, uid=0, headeradd=""):
     "Creates CDS header and info on URL and date."
     return """
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -324,10 +343,10 @@ def create_header(cc=cdsname, as=0, headeradd=""):
 %s
 %s
 """ % (cc, supportemail, weburl,
-       cdspageheader, \
+       re.sub("<!--USERINFOBOX-->", create_user_infobox(uid), cdspageheader),
        create_navtrail(cc, as,
                        """<table class="navtrailbox"><tr><td width="15">&nbsp;</td><td class="navtrailboxbody">""",
-                       "","&gt;","", "&gt; Search Results</td></tr></table><br>",0), \
+                       "","&gt;","", "&gt; Search Results</td></tr></table><br>",0),
        headeradd)
 
 def create_inputdate_box(name="d1", selected_year="", selected_month="", selected_day=""):
@@ -371,9 +390,6 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
     if sp:
         out += """<input type="hidden" name="sp" value="%s">""" % sp 
 
-    # possibly print external search engines links (Google box):
-    if cfg_google_box:
-        out += create_google_box(p, f, p1, p2, p3)
     # decide upon leading text:
     leadingtext = "Search"
     if action == "Browse":
@@ -477,7 +493,11 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
          <tbody>
           <tr valign="bottom">
            <td valign="top" class="searchboxbody">""" % leadingtext
-    colls_nicely_ordered = get_nicely_ordered_collection_list()    
+    colls_nicely_ordered = []
+    if cfg_nicely_ordered_collection_list:
+        colls_nicely_ordered = get_nicely_ordered_collection_list()
+    else:
+        colls_nicely_ordered = get_alphabetically_ordered_collection_list()    
     if colls and colls[0] != cdsname:
         # some collections are defined, so print these first, and only then print 'add another collection' heading:
         for c in colls:
@@ -598,8 +618,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
              </tbody>
             </table>""" % (cell_1_left, cell_1_middle, cell_1_right)
     ## last but not least, print end of search box:
-    out += """</table></form>
-    """
+    out += """</form>"""
     return out
 
 def nice_number(num):
@@ -692,14 +711,14 @@ def create_matchtype_box(name='m', value=''):
     return out
 
 def create_google_box(p, f, p1, p2, p3,
-                      prolog="""<table align="right" class="googlebox"><tr><th class="googleboxheader">Try your search on:</th></tr><tr><td class="googleboxbody">""",
+                      prolog="""<table class="googlebox"><tr><th class="googleboxheader">Try your search on:</th></tr><tr><td class="googleboxbody">""",
                       separator= """<br>""",
                       epilog="""</td></tr></table>"""):
     "Creates the box that proposes links to other useful search engines like Google.  'p' is the search pattern."
     out = ""
     if not p and (p1 or p2 or p3):
         p = p1 + " " + p2 + " " + p3 
-    if cfg_google_box == 1:
+    if cfg_google_box: # do we want to print it?
         out += prolog
         if cfg_google_box_cern:
             # CERN Intranet:
@@ -1255,10 +1274,10 @@ def browse_in_bibxxx(req, colls, p, f, rg):
                                      </td>
                                      <td class="normal">
                                       <img src="%s/img/sn.gif" alt="" border="0">
-                                       try again below <a href="%s/search.py?search=Browse&p=%s&f=%s%s">%s</a>
+                                       <a href="%s/search.py?search=Browse&p=%s&f=%s%s">browse further</a>
                                      </td>
                                  </tr>"""\
-                              % (weburl, weburl, urllib.quote(word_try), urllib.quote(f), urlarg_colls, word_try))
+                              % (weburl, weburl, urllib.quote(word_try), urllib.quote(f), urlarg_colls))
             else:
                 req.write("""<tr><td colspan="2" class="normal">
                                    &nbsp;
@@ -1272,7 +1291,7 @@ def browse_in_bibxxx(req, colls, p, f, rg):
             </table>""")
     return 
 
-def search_pattern(req, p=None, f=None, colls=None, m=None, hit_hints=0):
+def search_pattern(req, p=None, f=None, colls=[], m=None, hit_hints=0):
     """Searches for pattern 'p' and field 'f' and returns dict of recIDs HitLists per each collection in 'colls'.
     - Optionally, the function accepts the match type argument 'm'.
       If it is set (e.g. from advanced search interface), then it
@@ -1282,15 +1301,15 @@ def search_pattern(req, p=None, f=None, colls=None, m=None, hit_hints=0):
     - If hit_hints is set, than print lots of hints on current search.  Useful for debugging and/or when search gives zero hits.
     - Called by main()."""    
 
-    ## create result set:
-    results = HitList()
-    results_used = 0 # not-yet-used flag, to be able to circumvent set operations
+    ## create empty output results set:
+    results_out = {}
+    for coll in colls:
+        results_out[coll] = HitList()
+        results_out[coll]._nbhits = 0
 
     ## if p is not defined, return all hits in given collections:
     if not p:
-        results_out = {}
         for coll in colls:
-            results_out[coll] = HitList()
             results_out[coll]._set = collrecs_cache[coll]._set
             results_out[coll]._nbhits = collrecs_cache[coll]._nbhits
         return results_out
@@ -1301,9 +1320,9 @@ def search_pattern(req, p=None, f=None, colls=None, m=None, hit_hints=0):
     opft_items = create_opft_search_units(req, p, f, m)
     #req.write("<p>%s" % opft_items)
     
-    hit_hints_displayed = 0 # did we already displayed some search hint?
-    
     ## search regardless of collection:
+    results_in_any_collection = HitList()
+    results_in_any_collection_empty = 1 # to be able to skip first set operation
     for opft_item in opft_items:
         results_for_opft_item = {}
         oi, pi, fi, ti = opft_item[0], opft_item[1], opft_item[2], opft_item[3]
@@ -1314,16 +1333,16 @@ def search_pattern(req, p=None, f=None, colls=None, m=None, hit_hints=0):
             results_for_opft_item = search_in_bibwords(req, pi, fi)
         else: 
             print_warning(req, "The search type '%s' is not defined." % ti, "Error")
-            return(1)
+            return None
         if hit_hints:
             results_for_opft_item.calculate_nbhits()
             if results_for_opft_item._nbhits == 0:                
-                hit_hints_displayed = 1
                 text = "Search term <strong>%s</strong>" % pi
                 if fi:
                     text += " inside <em>%s</em> " % fi
                 print_warning(req, "%s did not match any record.  Nearest terms are: %s" %
-                              (text, create_nearest_words_links(req.args, pi, fi)), "")                
+                              (text, create_nearest_words_links(req.args, pi, fi)), "")
+                return results_out # empty
                 
             if dbg:
                 print_warning(req, "Item <strong>%s:%s</strong> gave %d hits." %
@@ -1331,46 +1350,33 @@ def search_pattern(req, p=None, f=None, colls=None, m=None, hit_hints=0):
         # secondly, apply the set intersect/union/disjunction functions:
         if dbg:
             t1 = os.times()[4]
-        if results_used:
+        if results_in_any_collection_empty:
+            results_in_any_collection = results_for_opft_item
+            results_in_any_collection_empty = 0
+        else:
             if oi == '+':
-                results.intersect(results_for_opft_item)
+                results_in_any_collection.intersect(results_for_opft_item)
             elif oi == '-':
-                results.difference(results_for_opft_item)
+                results_in_any_collection.difference(results_for_opft_item)
             elif oi == '|':
-                results.union(results_for_opft_item)
+                results_in_any_collection.union(results_for_opft_item)
             else:
                 print_warning(req, "Invalid set operation %s." % oi, "Error")
-        else:
-            results = results_for_opft_item
-            results_used = 1
         if dbg:
             t2 = os.times()[4]
             print_warning(req, "Set operation '%s' took %.2f seconds." % (oi, (t2 - t1)), "Profile")
 
+    ## before doing collection intersection, see how many hits we have now:
+    results_in_any_collection.calculate_nbhits()
+    
     ## return all hits if no collection list specified (useful for WebSearch Admin to determine collection
     ## recID universe):
-    if colls == None:        
-        results.calculate_nbhits()
-        return results
+    if colls == []:        
+        return results_in_any_collection
 
-    ## intersect with collection universe:
-    if dbg:
-        t1 = os.times()[4]
-    results_out = {}
-    if colls:
-        for coll in colls:
-            results_out[coll] = HitList()
-            results_out[coll]._set = Numeric.bitwise_and(results._set, collrecs_cache[coll]._set)
-        if dbg:
-            t2 = os.times()[4]
-            print_warning(req, "Intersecting with collection hitlist universe took %.2f seconds." % ((t2 - t1)), "Profile")
-
-    ## count number of hits:
-    for coll in colls:
-        results_out[coll].calculate_nbhits()
-        
-    if hit_hints and not hit_hints_displayed:
-        if results._nbhits == 0: # pattern not found in any public/private collection:
+    ## were there no hits at all before doing collection intersection?
+    if results_in_any_collection._nbhits == 0: # pattern not found in any public/private collection:
+        if hit_hints:
             text = """All search terms matched but boolean query returned no hits.  Please combine your search terms differently."""
             url_args = req.args
             for opft_item in opft_items:
@@ -1379,37 +1385,46 @@ def search_pattern(req, p=None, f=None, colls=None, m=None, hit_hints=0):
                 url_args_new = re.sub(r'(^|\&)f=.*?(\&|$)', r'\1f='+urllib.quote(fi)+r'\2', url_args_new)
                 text += """<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="%s/search.py?%s">%s</a> - about %s hits""" % \
                         (weburl, url_args_new, pi, get_word_nbhits(pi, fi))
-            print_warning(req, text, "") 
-        else: # pattern found but perhaps not in the collections chosen by the user:
-            num = 0
-            for coll in colls:
-                num += results_out[coll]._nbhits
-            if num == 0:
-                # try to search in Home:
-                results_Home = HitList()
-                results_Home._set = Numeric.bitwise_and(results._set, collrecs_cache[cdsname]._set)
-                results_Home.calculate_nbhits()
-                if results_Home._nbhits > 0:
-                    # some hits found in Home, so propose this search:
-                    url_args = req.args
-                    url_args = re.sub(r'(^|\&)cc=.*?(\&|$)', r'\2', url_args)
-                    url_args = re.sub(r'(^|\&)c=.*?(\&[^c]+=|$)', r'\2', url_args)
-                    url_args = re.sub(r'^\&+', '', url_args)
-                    url_args = re.sub(r'\&+$', '', url_args)
-                    print_warning(req, """Matches found in other public collections: 
-                                  <a href="%s/search.py?%s">%d hits</a>.""" %
-                                  (weburl, url_args, results_Home._nbhits), "")
-                else:
-                    # no hits found in Home, recommend different search terms:
-                    text = """All search terms matched but boolean query returned no hits.  Please combine your search terms differently."""
-                    url_args = req.args
-                    for opft_item in opft_items:
-                        oi, pi, fi, ti = opft_item[0], opft_item[1], opft_item[2], opft_item[3]
-                        url_args_new = re.sub(r'(^|\&)p=.*?(\&|$)', r'\1p='+urllib.quote(pi)+r'\2', url_args)
-                        url_args_new = re.sub(r'(^|\&)f=.*?(\&|$)', r'\1f='+urllib.quote(fi)+r'\2', url_args_new)
-                        text += """<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="%s/search.py?%s">%s</a> - about %s hits""" % \
-                                (weburl, url_args_new, pi, get_word_nbhits(pi, fi))
-                    print_warning(req, text, "")
+            print_warning(req, text, "")
+        return results_out # still empty
+
+    ## intersect with collection universe:
+    if dbg:
+        t1 = os.times()[4]
+    if colls:
+        for coll in colls:
+            results_out[coll]._set = Numeric.bitwise_and(results_in_any_collection._set, collrecs_cache[coll]._set)
+        if dbg:
+            t2 = os.times()[4]
+            print_warning(req, "Intersecting with collection hitlist universe took %.2f seconds." % ((t2 - t1)), "Profile")
+
+    ## count number of hits in given collections:
+    results_out_nb_hits_total = 0
+    for coll in colls:
+        results_out[coll].calculate_nbhits()
+        results_out_nb_hits_total += results_out[coll]._nbhits
+        
+    if results_out_nb_hits_total == 0:
+        # pattern had been found but not in the collections chosen by the user:
+        if hit_hints:
+            # try to search in Home:
+            results_in_Home = HitList()
+            results_in_Home._set = Numeric.bitwise_and(results_in_any_collection._set, collrecs_cache[cdsname]._set)
+            results_in_Home.calculate_nbhits()
+            if results_in_Home._nbhits > 0:
+                # some hits found in Home, so propose this search:
+                url_args = req.args
+                url_args = re.sub(r'(^|\&)cc=.*?(\&|$)', r'\2', url_args)
+                url_args = re.sub(r'(^|\&)c=.*?(\&[^c]+=|$)', r'\2', url_args)
+                url_args = re.sub(r'^\&+', '', url_args)
+                url_args = re.sub(r'\&+$', '', url_args)
+                print_warning(req, """Match found in other public collections: 
+                              <a href="%s/search.py?%s">%d hits</a>.""" %
+                              (weburl, url_args, results_in_Home._nbhits), "")
+            else:
+                # no hits found in Home, recommend different search terms:
+                text = """No other public collection matched your query.  If you were looking for a non-public document, please choose the desired restricted collection first."""
+                print_warning(req, text, "")
 
     return results_out
 
@@ -1752,7 +1767,7 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
                       as=0, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
                       d1y="", d1m="", d1d="", d2y="", d2m="", d2d="",
                       cpu_time=-1, middle_only=0):
-    """Prints stripe with the information on 'collection' and 'nb_found' results and CPU time.
+    """Prints stripe with the information on 'collection' and 'nb_found' results oand CPU time.
        Also, prints navigation links (beg/next/prev/end) inside the results set.
        If middle_only is set to 1, it will only print the middle box information (beg/netx/prev/end/etc) links.
        This is suitable for displaying navigation links at the bottom of the search results page."""
@@ -2327,7 +2342,7 @@ def log_query(hostname, query_args, uid=-1):
         if id_query:
             run_sql("INSERT INTO user_query (id_user, id_query, hostname, date) VALUES (%s, %s, %s, %s)",
                     (uid, id_query, hostname,
-                     time.strftime("%04Y-%02m-%02d %02H%:02M:%02S", time.localtime())))
+                     time.strftime("%04Y-%02m-%02d %02H:%02M:%02S", time.localtime())))
     return
 
 def log_query_info(action, p, f, colls, nb_records_found_total=-1):
@@ -2431,6 +2446,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
     d2m = wash_url_argument(d2m, 'str')
     d2d = wash_url_argument(d2d, 'str')
     day1, day2 = wash_dates(d1y, d1m, d1d, d2y, d2m, d2d)
+    # deduce user id:
+    uid = getUid(req)
     # start output
     if of.startswith('x'):
         # we are doing XML output:
@@ -2452,12 +2469,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         # we are doing HTML output:
         req.content_type = "text/html"
         req.send_http_header()
-        # detect user:
-        try:
-            uid = getUid(req)
-            req.write(create_header(cc, as, create_user_infobox(uid)))
-        except: # ignore user personalisation, needed e.g. for command-line
-            req.write(create_header(cc, as))
+        # write header:
+        req.write(create_header(cc, as, uid))
     if sysnb or id>0:
         ## 1 - detailed record display
         if sysnb: # ALEPH sysnb is passed, so deduce MySQL id for the record:            
@@ -2473,8 +2486,20 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 (cc, colls_to_display, colls_to_search) = wash_colls(cc, c, sc)
                 p = wash_pattern(p)
                 f = wash_field(f)
-                req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
-                                            p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d, search))
+                out = """<table width="100%%" cellspacing="0" cellpadding="0" border="0">
+                          <tr valign="top">
+                           <td>
+                             %s
+                           </td>
+                           <td class="pagestriperight">
+                            %s
+                           </td>
+                          </tr>
+                         </table>""" % \
+                      (create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
+                                         p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d, search),
+                       create_google_box(p, f, p1, p2, p3))
+                req.write(out)
                 print_warning(req, "Requested record does not seem to exist.", None, "<p>")
     elif search == "Browse":
         ## 2 - browse needed
@@ -2483,8 +2508,20 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         f = wash_field(f)
         # write search box:
         if of.startswith("h"):
-            req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d, search))
+            out = """<table width="100%%" cellspacing="0" cellpadding="0" border="0">
+                      <tr valign="top">
+                       <td>
+                         %s
+                       </td>
+                       <td class="pagestriperight">
+                        %s
+                       </td>
+                      </tr>
+                     </table>""" % \
+                  (create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
+                                     p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d, search),
+                   create_google_box(p, f, p1, p2, p3))
+            req.write(out)
         if as==1 or (p1 or p2 or p3):
             browse_pattern(req, colls_to_search, p1, f1, rg)
             browse_pattern(req, colls_to_search, p2, f2, rg)
@@ -2499,8 +2536,20 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         f = wash_field(f)
         # write search box:
         if of.startswith("h"):
-            req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d, search))
+            out = """<table width="100%%" cellspacing="0" cellpadding="0" border="0">
+                      <tr valign="top">
+                       <td>
+                         %s
+                       </td>
+                       <td class="pagestriperight">
+                        %s
+                       </td>
+                      </tr>
+                     </table>""" % \
+                  (create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
+                                     p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d, search),
+                   create_google_box(p, f, p1, p2, p3))
+            req.write(out)
         # run search:
         t1 = os.times()[4]
         if as == 1 or (p1 or p2 or p3):
