@@ -152,10 +152,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
                                        confirm=1)
         elif confirm in ["1", 1] and func in ["0", 0] and colID:
             subtitle = "Step 3 - Result"
-            if finresult:
-                output += """<b><span class="info">Rank method '%s' enabled for collection '%s'</span></b>""" % (rnkNAME, colNAME) 
-            else:
-                output += """<b><span class="info">Rank method '%s' could not be enabled for collection '%s'</span></b>""" % (rnkNAME[0], colNAME)
+            output += write_outcome(finresult)
         elif confirm not in ["0", 0] and func in ["0", 0]:
              output += """<b><span class="info">Please select a collection.</span></b>"""
         
@@ -178,23 +175,9 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
                                        func=1,
                                        confirm=1)
              
-        if confirm in ["0", 0] and func in ["1", 1] and colID:
-            subtitle = "Step 2 - Confirm to disable rank method for collection"
-            text = "<b><p>Please confirm to disable rank method '%s' for collection '%s'</p></b>" % (rnkNAME, colNAME)
-            output += createhiddenform(action="modifycollection",
-                                       text=text,
-                                       button="Confirm",
-                                       rnkID=rnkID,
-                                       ln=ln,
-                                       colID=colID,
-                                       func=1,
-                                       confirm=1)
-        elif confirm in ["1", 1] and func in ["1", 1] and colID:
+        if confirm in ["1", 1] and func in ["1", 1] and colID:
             subtitle = "Step 3 - Result"
-            if finresult:
-                output += """<b><span class="info">Rank method '%s' disabled for collection '%s'</span></b>""" % (rnkNAME, colNAME)
-            else:
-                output += """<b><span class="info">Rank method '%s' could not be disabled for collection '%s'</span></b>""" % (rnkNAME, colNAME)
+            output += write_outcome(finresult)
         elif confirm not in ["0", 0] and func in ["1", 1]:
              output += """<b><span class="info">Please select a collection.</span></b>"""
     try:
@@ -273,24 +256,9 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
                                    ln=ln,
                                    confirm=2)
 
-        if sel_type and len(trans):
-            if confirm in ["1", 1]:
-                text = """<b>Please confirm modification of translations for rank method '%s'.</b>""" % (rnk_dict[rnkID])
-                output += createhiddenform(action="modifytranslations",
-                                           text=text,
-                                           button="Confirm",
-                                           rnkID=rnkID,
-                                           sel_type=sel_type,
-                                           trans=trans,
-                                           ln=ln,
-                                           confirm=2)
-
-            elif confirm in ["2", 2]:
-                if finresult:
-                    output += """<b><span class="info">Translations modified for rank method.</span></b>"""
-                else:
-                    output += """<b><span class="info">Sorry, could not modify translations for rank method.</span></b>"""
-                    
+        if sel_type and len(trans) and confirm in ["2", 2]:
+            output += write_outcome(finresult)
+  
     try:
         body = [output, extra]
     except NameError:
@@ -299,8 +267,7 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
     return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mt">?</a>]</small>""" % weburl, body)
         
 def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
-    """form to add a new rank method with these values:
-    """
+    """form to add a new rank method with these values:"""
  
     subtitle = 'Step 1 - Create new rank method'
     output  = """
@@ -351,8 +318,8 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
         elif confirm in ["1", 1]:
             rnkID = add_rnk(rnkcode)
             subtitle = "Step 3 - Result"
-            if rnkID:
-                rnkID = rnkID[0]
+            if rnkID[0] == 1:
+                rnkID = rnkID[1]
                 text = """<b><span class="info">Added new rank method with BibRank code '%s'</span></b>""" % rnkcode
                 try:
                     if template:
@@ -564,16 +531,12 @@ def perform_showrankdetails(rnkID, ln=cdslang):
         text += "Not yet run.<br>"
     output = addadminbox(subtitle, [text])
 
-    subtitle = """Rank method sets"""
+    subtitle = """Rank method statistics"""
     text = ""
     try:
-        threshold = deserialize_via_numeric_array(get_rnk(rnkID)[0][3])
-        res = get_rnk_set(rnkID)
-        for i in range(0, len(res)):
-            set = deserialize_via_numeric_array(res[i][2])
-            text += "Star %s : %s (Threshold: %s)<br>" % (res[i][1], set._nbhits, threshold[res[i][1]])
+        text = "Not yet implemented"
     except StandardError, e:
-        text = "BibRank not yet run, cannot show sets"
+        text = "BibRank not yet run, cannot show statistics for method"
     output += addadminbox(subtitle, [text])
 
     subtitle = """Attached to collections <a href="%s/admin/bibrank/bibrankadmin.py/modifycollection?rnkID=%s&ln=%s">[Modify]</a>""" % (weburl, rnkID, ln)
@@ -643,7 +606,7 @@ def get_rnk(rnkID=''):
         return res
     except StandardError, e:
         return ()
-    
+
 def get_translations(rnkID):
     """Returns the translations in rnkMETHODNAME for a rankmethod
     rnkID - the id of the rankmethod from rnkMETHOD """
@@ -711,10 +674,10 @@ def attach_col_rnk(rnkID, colID):
     
     try:
         res = run_sql("INSERT INTO collection_rnkMETHOD(id_collection, id_rnkMETHOD) values (%s,%s)" % (colID, rnkID))
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
-    
+        return (0, e)
+
 def detach_col_rnk(rnkID, colID):
     """detach rank method from collection
     rnkID - id from rnkMETHOD table
@@ -722,9 +685,9 @@ def detach_col_rnk(rnkID, colID):
     
     try:
         res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_collection=%s AND id_rnkMETHOD=%s" % (colID, rnkID))
+        return (1, "")
     except StandardError, e:
-        return ""
-    return "true"
+        return (0, e)
 
 def delete_rnk(rnkID):
     """Deletes all data for the given rank method
@@ -735,9 +698,9 @@ def delete_rnk(rnkID):
         res = run_sql("DELETE FROM rnkMETHODNAME WHERE id_rnkMETHOD=%s" % rnkID)
         res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_rnkMETHOD=%s" % rnkID)
         res = run_sql("DELETE FROM rnkSET WHERE id_rnkMETHOD=%s" % rnkID)
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def modify_rnk(rnkID, rnkcode):
     """change the code for the rank method given
@@ -746,9 +709,9 @@ def modify_rnk(rnkID, rnkcode):
     
     try:
         res = run_sql("UPDATE rnkMETHOD set name='%s' WHERE id=%s" % (MySQLdb.escape_string(rnkcode), rnkID))
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def add_rnk(rnkcode):
     """Adds a new rank method to rnkMETHOD
@@ -757,9 +720,12 @@ def add_rnk(rnkcode):
     try:
         res = run_sql("INSERT INTO rnkMETHOD(name) VALUES('%s')" % MySQLdb.escape_string(rnkcode))
         res = run_sql("SELECT id FROM rnkMETHOD WHERE name='%s'" % MySQLdb.escape_string(rnkcode))
-        return res
+        if res:
+            return (1, res[0][0])
+        else:
+            raise StandardError
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def addadminbox(header='', datalist=[], cls="admin_wvar"):
     """used to create table around main data on a page, row based.
@@ -972,7 +938,6 @@ def adderrorbox(header='', datalist=[]):
             output += '</td>'
         output += '</tr>'
     output += '</tbody></table>'
-
     return output
 
 def serialize_via_numeric_array_dumps(arr):
@@ -1094,6 +1059,14 @@ def modify_translations(ID, langs, sel_type, trans, table):
             else:
                 if trans[nr]:
                     res = run_sql("INSERT INTO %s%s(id_%s, type, ln, value) VALUES (%s,'%s','%s','%s')" % (table, name, table, ID, sel_type, langs[nr][0], MySQLdb.escape_string(trans[nr])))
-        return "true"
+        return (1, "")
     except StandardError, e:
-	return ""
+	return (0, e)
+
+def write_outcome(res):
+    if res[0] == 1:
+        return """<b><span class="info">Operation successfully completed.</span></b>"""
+    else:
+        return """<b><span class="info">Operation failed. Reason:</span></b><br>%s""" % res[1][1]
+
+

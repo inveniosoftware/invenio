@@ -43,7 +43,7 @@ import datetime
 import time
 
 from zlib import compress,decompress
-from bibrankadminlib import modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
+from bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
 from messages import *
 from dbquery import run_sql
 from config import *
@@ -105,7 +105,6 @@ def perform_modifytranslations(colID, ln=cdslang, sel_type='', trans=[], confirm
                                        ln=ln,
                                        confirm=0)
 
-
         if confirm in [-1, "-1", 0, "0"]:
             trans = []
             for (key, value) in cdslangs:
@@ -129,10 +128,7 @@ def perform_modifytranslations(colID, ln=cdslang, sel_type='', trans=[], confirm
                                    confirm=2)
 
         if sel_type and len(trans) and confirm in ["2", 2]:
-            if finresult:
-                output += """<b><span class="info">Translations modified for collection '%s'.</span></b>""" % (col_dict[colID])
-            else:
-                output += """<b><span class="info">Sorry, could not modify translations for collection '%s'.</span></b>""" % (col_dict[colID])
+            output += write_outcome(finresult)
                     
     try:
         body = [output, extra]
@@ -143,7 +139,7 @@ def perform_modifytranslations(colID, ln=cdslang, sel_type='', trans=[], confirm
         return perform_editcollection(colID, ln, "perform_modifytranslations", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
-
+        
 def perform_modifyrankmethods(colID, ln=cdslang, func='', rnkID='', confirm=0, callback='yes'):
     """Modify which rank methods is visible to the collection
     func - remove or add rank method
@@ -199,10 +195,7 @@ def perform_modifyrankmethods(colID, ln=cdslang, func='', rnkID='', confirm=0, c
                                        confirm=1)
             
         if confirm in ["1", 1] and func in ["0", 0] and int(rnkID) != -1:
-            if finresult:
-                output += """<b><span class="info">Rank method '%s' enabled for collection '%s'</span></b>""" % (rnk_dict[int(rnkID)], col_dict[colID]) 
-            else:
-                output += """<b><span class="info">Rank method '%s' could not be enabled for collection '%s'</span></b>""" % (rnk_dict[int(rnkID)], col_dict[colID])
+            output += write_outcome(finresult)
         elif confirm not in ["0", 0] and func in ["0", 0]:
             output += """<b><span class="info">Please select a rank method.</span></b>"""
 
@@ -226,10 +219,7 @@ def perform_modifyrankmethods(colID, ln=cdslang, func='', rnkID='', confirm=0, c
                                        confirm=1)
              
         if confirm in ["1", 1] and func in ["1", 1] and int(rnkID) != -1:
-            if finresult:
-                output += """<b><span class="info">Rank method '%s' disabled for collection '%s'</span></b>""" % (rnk_dict[int(rnkID)], col_dict[colID])
-            else:
-                output += """<b><span class="info">Rank method '%s' could not be disabled for collection '%s'</span></b>""" % (rnk_dict[int(rnkID)], col_dict[colID])
+            output += write_outcome(finresult)
         elif confirm not in ["0", 0] and func in ["1", 1]:
             output += """<b><span class="info">Please select a rank method.</span></b>"""
                     
@@ -266,12 +256,11 @@ def perform_addcollectiontotree(colID, ln=cdslang, add_dad='', add_son='', rtype
                 output2 += """<b><span class="info">Cannot add a collection as a pointer to itself.</span></b><br><br>
                 """
             elif check_col(add_dad, add_son):
-                if add_col_dad_son(add_dad, add_son, rtype):
-                    output2 += """<b><span class="info">Added the collection '%s' as a %s subcollection of '%s'.<br> It will appear on your website after the next webcoll run.  You can   either run it manually or wait until bibsched does it for you.</span></b><br><br>
-                    """ % (col_dict[add_son], (rtype=="r" and 'regular' or 'virtual'), col_dict[add_dad])
-                else:
-                    output2 += """<b><span class="info">Could not add the collection '%s' as a %s subcollection of '%s'.</span></b><br><br>
-                    """ % (col_dict[add_son], (rtype=="r" and 'regular' or 'virtual'), col_dict[add_dad])
+                res = add_col_dad_son(add_dad, add_son, rtype)
+                output2 += write_outcome(res)
+                if res[0] == 1:
+                    output2 += """<b><span class="info"><br> The collection will appear on your website after the next webcoll run. You can either run it manually or wait until bibsched does it for you.</span></b><br><br>
+                    """
             else:
                 output2 += """<b><span class="info">Cannot add the collection '%s' as a %s subcollection of '%s' since it will either create a loop, or the association already exists.</span></b><br><br>
                 """ % (col_dict[add_son], (rtype=="r" and 'regular' or 'virtual'), col_dict[add_dad])
@@ -283,7 +272,6 @@ def perform_addcollectiontotree(colID, ln=cdslang, add_dad='', add_son='', rtype
     col_list = col_dict.items()
     col_list.sort(compare_on_val)
 
-    
     output = show_coll_not_in_tree(colID, ln, col_dict)
     text = """
     <span class="adminlabel">Attach which</span>
@@ -333,7 +321,6 @@ def perform_addcollectiontotree(colID, ln=cdslang, add_dad='', add_son='', rtype
     else:
         return addadminbox(subtitle, body)
     
-    
 def perform_addcollection(colID, ln=cdslang, colNAME='', dbquery='', rest='', callback="yes", confirm=-1):
     """form to add a new collection.
     colNAME - the name of the new collection
@@ -354,16 +341,11 @@ def perform_addcollection(colID, ln=cdslang, colNAME='', dbquery='', rest='', ca
                               confirm=1)
     if colNAME and confirm in ["1", 1]:
         res = add_col(colNAME, '', '')
-        if res:
-            output += """<b><span class="info">Added new collection with default name '%s'</span></b>
-            """ % colNAME
-            output += perform_addcollectiontotree(colID=colID, ln=ln, add_son=res[0][0], callback='')
-        else:
-            output += """<b><span class="info">Sorry, could not add collection, most likely the collection already exists.</span></b>
-            """
+        output += write_outcome(res)
+        if res[0] == 1:
+            output += perform_addcollectiontotree(colID=colID, ln=ln, add_son=res[1], callback='')
     elif confirm not in ["-1", -1]:
-        output += """<b><span class="info">Please give the collection a name.</span></b>
-        """
+        output += """<b><span class="info">Please give the collection a name.</span></b>"""
         
     try:
         body = [output, extra]
@@ -696,16 +678,13 @@ def perform_addportalbox(colID, ln=cdslang, title='', body='', callback='yes', c
     
     if body and confirm in [1, "1"]:
         res = add_pbx(title, body)
-        if res:
-            output += """<b><span class="info">Added the portalbox '%s'. To add the portalbox to the collection, go <a href="addexistingportalbox?colID=%s&amp;ln=%s&amp;pbxID=%s#5">here</a>.</span></b>""" % (title, colID, ln, res[0][0])
-        else:
-            output += """<b><span class="info">Cannot add the portalbox '%s'.</span></b>
-            """ % title
+        output += write_outcome(res)
+        if res[1] == 1:
+            output += """<b><span class="info">To add the portalbox to the collection, go <a href="addexistingportalbox?colID=%s&amp;ln=%s&amp;pbxID=%s#5">here</a>.</span></b>""" % (colID, ln, res[1])
     elif confirm not in [-1, "-1"]:
         output  += """<b><span class="info">Body field must be filled.</span></b>
         """
         
-                
     try:
         body = [output, extra]
     except NameError:
@@ -776,12 +755,7 @@ def perform_addexistingportalbox(colID, ln=cdslang, pbxID=-1, score=0, position=
     if pbxID > -1 and position and sel_ln and confirm in [1, "1"]:
         pbxID = int(pbxID)
         res = add_col_pbx(colID, pbxID, sel_ln, position, '')
-        if res:
-            output += """<b><span class="info">Added the portalbox '%s' to the collection '%s'.</span></b>
-            """ % (pbx_dict[pbxID], col_dict[colID])
-        else:
-            output += """<b><span class="info">Cannot add the portalbox '%s' to the collection '%s'.</span></b>
-            """ % (pbx_dict[pbxID], col_dict[colID])
+        output += write_outcome(res)
     elif pbxID > -1 and confirm not in [-1, "-1"]:
         output  += """<b><span class="info">All fields must be filled.</span></b>
         """
@@ -806,8 +780,11 @@ def perform_deleteportalbox(colID, ln=cdslang, pbxID=-1, callback='yes', confirm
     if pbxID not in [-1," -1"] and confirm in [1, "1"]:
         ares = get_pbx()
         pbx_dict = dict(map(lambda x: (x[0], x[1]), ares))
-        pname = pbx_dict[int(pbxID)]
-        ares = delete_pbx(int(pbxID))
+        if pbx_dict.has_key(int(pbxID)):
+            pname = pbx_dict[int(pbxID)]
+            ares = delete_pbx(int(pbxID))
+        else:
+            return """<b><span class="info">This portalbox does not exist</span></b>"""
                 
     res = get_pbx()
     col_dict = dict(get_def_name('', "collection"))
@@ -846,14 +823,8 @@ def perform_deleteportalbox(colID, ln=cdslang, pbxID=-1, callback='yes', confirm
                                        pbxID=pbxID,
                                        ln=ln,
                                        confirm=1)
-                    
         elif confirm in [1, "1"]:
-            if ares:
-                output += """<b><span class="info">Deleted the portalbox '%s'.</span></b>
-                """ % pname
-            else:
-                output += """<b><span class="info">Cannot delete the portalbox.</span></b>
-                """
+            output += write_outcome(ares)
     elif confirm not in [-1, "-1"]:
         output  += """<b><span class="info">Choose a portalbox to delete.</span></b>
         """
@@ -923,13 +894,7 @@ def perform_modifyportalbox(colID, ln=cdslang, pbxID=-1, score='', position='', 
             res = modify_pbx(colID, pbxID, sel_ln, score, position, '', '')
             res2 = get_pbx()
             pbx_dict = dict(map(lambda x: (x[0], x[1]), res2))
-            if res:
-                output += """<b><span class="info">Modified the presentation of the portalbox '%s' in this collection.</span></b><br><br>
-                """ % pbx_dict[pbxID]
-            else:
-                output += """<b><span class="info">Cannot modify the portalbox '%s'.</span></b><br><br>
-                """ % pbx_dict[pbxID]
-
+            output += write_outcome(res)
         output += """Portalbox (content) specific values (any changes appears everywhere the portalbox is used.)"""
         text = """
         <span class="adminlabel">Title</span>
@@ -955,17 +920,9 @@ def perform_modifyportalbox(colID, ln=cdslang, pbxID=-1, score='', position='', 
         if pbxID > -1 and confirm in [4, "4"]:
             pbxID = int(pbxID)
             res = modify_pbx(colID, pbxID, sel_ln, '', '', title, body)
-            res2 = get_pbx()
-            pbx_dict = dict(map(lambda x: (x[0], x[1]), res2))
-            if res:
-                output += """<b><span class="info">Modified the content of the portalbox '%s' for all occurences of it.</span></b>
-                """ % pbx_dict[pbxID]
-            else:
-                output += """<b><span class="info">Cannot modify the portalbox '%s'.</span></b>
-                """ % pbx_dict[pbxID]
+            output += write_outcome(res)
     else:
-        output  = """No portalbox to modify.
-        """
+        output  = """No portalbox to modify."""
 
     try:
         body = [output, extra]
@@ -983,12 +940,8 @@ def perform_switchpbxscore(colID, id_1, id_2, sel_ln, ln=cdslang):
 
     res = get_pbx()
     pbx_dict = dict(map(lambda x: (x[0], x[1]), res))
-    if switch_pbx_score(colID, id_1, id_2, sel_ln):
-        output = """<br><b><span class="info">'%s' changed position with '%s'</span></b>
-        """ % (pbx_dict[int(id_1)], pbx_dict[int(id_2)])
-    else:
-        output = """<br><b><span class="info">Could not complete the operation.</span></b>"""
-
+    res = switch_pbx_score(colID, id_1, id_2, sel_ln)
+    output += write_outcome(res)
     return perform_showportalboxes(colID, ln, content=output)
 
 def perform_showportalboxes(colID, ln=cdslang, callback='yes', content='', confirm=-1):
@@ -1001,7 +954,6 @@ def perform_showportalboxes(colID, ln=cdslang, callback='yes', content='', confi
     subtitle = """<a name="5">5. Modify portalboxes for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.5">?</a>]</small>""" % (col_dict[colID], weburl)
     output  = ""
     pos = get_pbx_pos()
-
 
     output = """<dl>
      <dt>Portalbox actions (not related to this collection)
@@ -1085,13 +1037,7 @@ def perform_removeportalbox(colID, ln=cdslang, pbxID='', sel_ln='', callback='ye
                                        confirm=1)
         elif confirm in ["1", 1]:
             res = remove_pbx(colID, pbxID, sel_ln)
-            if res:
-                output += """<b><span class="info">Removed the portalbox '%s' from the collection '%s'.</span></b>
-                """ % (pbx_dict[pbxID], col_dict[colID])
-            else:
-                output += """<b><span class="info">Cannot remove the portalbox from the collection '%s'.</span></b>
-                """ % (pbxID, col_dict[colID])
- 
+            output += write_outcome(res)
     try:
         body = [output, extra]
     except NameError:
@@ -1108,13 +1054,8 @@ def perform_switchfmtscore(colID, type, id_1, id_2, ln=cdslang):
 
     output = ""
     fmt_dict = dict(get_def_name('', "format"))
-    
-    if switch_score(colID, id_1, id_2, type):
-        output = """<br><b><span class="info">'%s' changed position with '%s'</span></b>
-        """ % (fmt_dict[int(id_1)], fmt_dict[int(id_2)])
-    else:
-        output = """<br><b><span class="info">Could not complete the operation.</span></b>"""
-
+    res = switch_score(colID, id_1, id_2, type)
+    output += write_outcome(res)
     return perform_showoutputformats(colID, ln, content=output)
 
 def perform_switchfldscore(colID, id_1, id_2, fmeth, ln=cdslang):
@@ -1123,11 +1064,8 @@ def perform_switchfldscore(colID, id_1, id_2, fmeth, ln=cdslang):
     id_1/id_2 - the id's to change the score for."""
 
     fld_dict = dict(get_def_name('', "field"))
-    if switch_fld_score(colID, id_1, id_2):
-        output = """<br><b><span class="info">'%s' changed position with '%s'</span></b>
-        """ % (fld_dict[int(id_1)], fld_dict[int(id_2)])
-    else:
-        output = """<br><b><span class="info">Could not complete the operation.</span></b>"""
+    res = switch_fld_score(colID, id_1, id_2)
+    output += write_outcome(res)
 
     if fmeth == "soo":
         return perform_showsortoptions(colID, ln, content=output)
@@ -1143,13 +1081,8 @@ def perform_switchfldvaluescore(colID, id_1, id_fldvalue_1, id_fldvalue_2, ln=cd
 
     name_1 = run_sql("SELECT name from fieldvalue where id=%s" % id_fldvalue_1)[0][0]
     name_2 = run_sql("SELECT name from fieldvalue where id=%s" % id_fldvalue_2)[0][0]
-
-    if switch_fld_value_score(colID, id_1, id_fldvalue_1, id_fldvalue_2):
-        output = """<br><b><span class="info">'%s' changed position with '%s'</span></b>
-        """ % (name_1, name_2)
-    else:
-        output = """<br><b><span class="info">Could not complete the operation.</span></b>"""
-
+    res = switch_fld_value_score(colID, id_1, id_fldvalue_1, id_fldvalue_2)
+    output += write_outcome(res)
     return perform_modifyfield(colID, fldID=id_1, ln=ln, content=output)
 
 def perform_addnewfieldvalue(colID, fldID, ln=cdslang, name='', value='', callback="yes", confirm=-1):
@@ -1175,11 +1108,11 @@ def perform_addnewfieldvalue(colID, fldID, ln=cdslang, name='', value='', callba
                               confirm=1)
     if name and value and confirm in ["1", 1]:
         res = add_fldv(name, value)
-        if res:
-            ares = add_col_fld(colID, fldID, 'seo', res)
-            output += """<b><span class="info">Added new value to search option.</span></b>"""
-        else:
-            output += """<b><span class="info">Sorry, could not add value.</span></b>"""
+        output += write_outcome(res)
+        if res[0] == 1:
+            res = add_col_fld(colID, fldID, 'seo', res[1])
+            if res[0] == 0:
+                output += "<br>" + write_outcome(res)
     elif confirm not in ["-1", -1]:
         output += """<b><span class="info">Please fill in name and value.</span></b>
         """
@@ -1233,15 +1166,12 @@ def perform_modifyfieldvalue(colID, fldID, fldvID, ln=cdslang, name='', value=''
     if name and value and confirm in ["1", 1]:
         res = update_fldv(fldvID, name, value)
         if res:
-            output += """<b><span class="info">Modified value.</span></b>"""
+            output += """<b><span class="info">Operation successfully completed.</span></b>"""
         else:
-            output += """<b><span class="info">Sorry, could not modify value.</span></b>"""
+            output += """<b><span class="info">Operation failed.</span></b>"""
     elif confirm in ["2", 2]:
             res = delete_fldv(fldvID)
-            if res:
-                output += """<b><span class="info">Deleted value and all associations.</span></b>"""
-            else:
-                output += """<b><span class="info">Sorry, could not delete value and all associations completely.</span></b>"""
+            output += write_outcome(res)
     elif confirm not in ["-1", -1]:
         output += """<b><span class="info">Please fill in name and value.</span></b>"""
         
@@ -1293,12 +1223,7 @@ def perform_removefield(colID, ln=cdslang, fldID='', fldvID='', fmeth='', callba
                                        confirm=1)
         elif confirm in ["1", 1]:
             res = remove_fld(colID, fldID, fldvID)
-            if res:
-                output += """<b><span class="info">Removed the %s '%s' %s from the collection '%s'.</span></b>
-                """ % (field, fld_dict[fldID], (fldvID not in ["", "None"] and "with value '%s'" % fldv_dict[fldvID] or ''), col_dict[colID])
-            else:
-                output += """<b><span class="info">Cannot remove the %s from the collection '%s'.</span></b>
-                """ % (field, col_dict[colID])
+            output += write_outcome(res)
     try:
         body = [output, extra]
     except NameError:
@@ -1345,12 +1270,7 @@ def perform_removefieldvalue(colID, ln=cdslang, fldID='', fldvID='', fmeth='', c
                                        confirm=1)
         elif confirm in ["1", 1]:
             res = remove_fld(colID, fldID, fldvID)
-            if res:
-                output += """<b><span class="info">Removed the value '%s' from the search option '%s'.</span></b>
-                """ % (fldv_dict[fldvID], fld_dict[fldID])
-            else:
-                output += """<b><span class="info">Cannot remove the value from the search option.</span></b>
-                """
+            output += write_outcome(res)
     try:
         body = [output, extra]
     except NameError:
@@ -1403,13 +1323,7 @@ def perform_addexistingfieldvalue(colID, fldID, fldvID=-1, ln=cdslang, callback=
                                confirm=1)
             
     if fldvID not in [-1, "-1"] and confirm in [1, "1"]:
-        fldvID = int(fldvID)
-        if ares:
-            output += """<b><span class="info">Added the value '%s' to the search option '%s'.</span></b>
-            """ % (fldv_dict[fldvID], fld_dict[fldID])
-        else:
-            output += """<b><span class="info">Cannot add the value to the search option.</span></b>
-            """
+        output += write_outcome(ares)
     elif confirm in [1, "1"]:
         output += """<b><span class="info">Select a value to add and try again.</span></b>"""
     try:
@@ -1465,13 +1379,7 @@ def perform_addexistingfield(colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', c
                                confirm=1)
             
     if fldID not in [-1, "-1"] and confirm in [1, "1"]:
-        fldID = int(fldID)
-        if ares:
-            output += """<b><span class="info">Added the field '%s' %s to the collection '%s'.</span></b>
-            """ % (fld_dict[fldID], (fldvID != -1 and "with fieldvalue '%s'" % fldv_dict[fldvID] or ''), col_dict[colID])
-        else:
-            output += """<b><span class="info">Cannot add the field '%s' %s to the collection '%s'.</span></b>
-            """ % (fld_dict[fldID], (fldvID != -1 and "with fieldvalue '%s'" % fldv_dict[fldvID] or ''), col_dict[colID])
+        output += write_outcome(ares)
     elif fldID in [-1, "-1"] and confirm not in [-1, "-1"]:
         output  += """<b><span class="info">Select a field.</span></b>
         """
@@ -1776,7 +1684,6 @@ def perform_showoutputformats(colID, ln=cdslang, callback='yes', content='', con
                 move += '<a href="%s/admin/websearch/websearchadmin.py/switchfmtscore?colID=%s&amp;ln=%s&amp;type=format&amp;id_1=%s&amp;id_2=%s&amp;rand=%s#10"><img border="0" src="%s/img/smalldown.gif" title="Move format down"></a>' % (weburl, colID, ln, id_format, col_fmt[i][0], random.randint(0, 1000), weburl)
             move += """</td></tr></table>"""
 
-
             actions.append([move, code, fmt_dict[int(id_format)]])
             for col in [(('Remove', 'removeoutputformat'),)]:
                 actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fmtID=%s#10">%s</a>' % (weburl, col[0][1], colID, ln, id_format, col[0][0]))
@@ -1832,20 +1739,12 @@ def perform_addexistingoutputformat(colID, ln=cdslang, fmtID=-1, callback='yes',
                                    ln=ln,
                                    confirm=1)
     else:
-        output  = """No existing output formats to add, please create a new one.
-        """
+        output  = """No existing output formats to add, please create a new one."""
 
     if fmtID not in [-1, "-1"] and confirm in [1, "1"]:
-        fmtID = int(fmtID)
-        if ares:
-            output += """<b><span class="info">Added the output format '%s' to the collection '%s'.</span></b>
-            """ % (fmt_dict[fmtID], col_dict[colID])
-        else:
-            output += """<b><span class="info">Cannot add the output format '%s' to the collection '%s'.</span></b>
-            """ % (fmt_dict[fmtID], col_dict[colID])
+        output += write_outcome(ares)
     elif fmtID in [-1, "-1"] and confirm not in [-1, "-1"]:
-        output  += """<b><span class="info">Please select output format.</span></b>
-        """
+        output  += """<b><span class="info">Please select output format.</span></b>"""
     try:
         body = [output, extra]
     except NameError:
@@ -1911,12 +1810,7 @@ def perform_deleteoutputformat(colID, ln=cdslang, fmtID=-1, callback='yes', conf
                                        confirm=1)
                     
         elif confirm in [1, "1"]:
-            if ares:
-                output += """<b><span class="info">Deleted the output format '%s'.</span></b>
-                """ % old_colNAME
-            else:
-                output += """<b><span class="info">Cannot delete the output format.</span></b>
-                """
+            output += write_outcome(ares)
     elif confirm not in [-1, "-1"]:
         output  += """<b><span class="info">Choose a output format to delete.</span></b>
         """
@@ -1955,13 +1849,7 @@ def perform_removeoutputformat(colID, ln=cdslang, fmtID='', callback='yes', conf
                                        confirm=1)
         elif confirm in ["1", 1]:
             res = remove_fmt(colID, fmtID)
-            if res:
-                output += """<b><span class="info">Removed the output format '%s' from the collection '%s'.</span></b>
-                """ % (fmt_dict[fmtID], col_dict[colID])
-            else:
-                output += """<b><span class="info">Cannot remove the field from the collection '%s'.</span></b>
-                """ % (col_dict[colID])
- 
+            output += write_outcome(res)
     try:
         body = [output, extra]
     except NameError:
@@ -1983,7 +1871,7 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     if not col_dict.has_key(1):
         res = add_col(cdsname, '', '')
         if res:
-	    fin_output += """<b><span class="info">Created root collection '%s'</span></b><br>""" % cdsname
+	    fin_output += """<b><span class="info">Created root collection.</span></b><br>"""
 	else:
             return "Cannot create root collection, please check database."
     if cdsname != run_sql("SELECT name from collection WHERE id=1")[0][0]:
@@ -2239,8 +2127,7 @@ def perform_deletecollection(colID, ln=cdslang, confirm=-1, callback='yes'):
     else:
         subtitle = """4. Delete collection"""
         output = """<b><span class="info">Not possible to delete the root collection</span></b>"""
-        
-            
+                    
     try:
         body = [output, extra]
     except NameError:
@@ -2450,7 +2337,7 @@ def perform_validateconf(colID, ln, confirm=0, callback='yes'):
     header = ['Id', 'Name', 'Query', 'Subcollections', 'Restricted', 'I8N','Status']
     rnk_list = get_def_name('', "rnkMETHOD")
     actions = []
-    
+
     for (id, name, dbquery, restricted) in collections:
         reg_sons = len(get_col_tree(id, 'r'))
         vir_sons = len(get_col_tree(id, 'v'))
@@ -2458,12 +2345,12 @@ def perform_validateconf(colID, ln, confirm=0, callback='yes'):
         langs = run_sql("SELECT ln from collectionname where id_collection=%s" % id)
         i8n = ""
 
+ 
         if len(langs) > 0:
             for lang in langs:
                 i8n += "%s, " % lang
         else:
             i8n = """<b><span class="info">None</span></b>"""
-
         if (reg_sons > 1 and dbquery) or dbquery=="":
             status = """<b><span class="warning">ERROR 1:Query</span></b>"""
         elif dbquery is None and reg_sons == 1:
@@ -2530,13 +2417,7 @@ def perform_removeoutputformat(colID, ln=cdslang, fmtID='', callback='yes', conf
                                        confirm=1)
         elif confirm in ["1", 1]:
             res = remove_fmt(colID, fmtID)
-            if res:
-                output += """<b><span class="info">Removed the output format '%s' from the collection '%s'.</span></b>
-                """ % (fmt_dict[fmtID], col_dict[colID])
-            else:
-                output += """<b><span class="info">Cannot remove the field from the collection '%s'.</span></b>
-                """ % (col_dict[colID])
-
+            output += write_outcome(res)
     try:
         body = [output, extra]
     except NameError:
@@ -2582,48 +2463,6 @@ def get_col_tree(colID, rtype=''):
     except StandardError, e:
         return ()
 
-def remove_col_subcol(id_son, id_dad, type):
-    """Remove a collection as a son of another collection in the tree, if collection isn't used elsewhere in the tree, remove all registered sons of the id_son.
-    id_son - collection id of son to remove
-    id_dad - the id of the dad"""
-
-    try:
-        if id_son != id_dad:
-            tree = get_col_tree(id_son)
-            res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s" % (id_son, id_dad))
-        else:
-            tree = get_col_tree(id_son, type)
-            res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s and type='%s'" % (id_son, id_dad, type))
-            
-        if not run_sql("SELECT * from collection_collection WHERE id_son=%s and type='%s'" % (id_son, type)):
-            for (id, up, down, dad, rtype) in tree:
-                res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s" % (id, dad))
-        return "true"
-    except StandardError, e:
-        return ()
-
-def check_col(add_dad, add_son):
-    """Check if the collection can be placed as a son of the dad without causing loops.
-    add_dad - collection id
-    add_son - collection id"""
-    
-    try:
-        stack = [add_dad]
-        res = run_sql("SELECT id_dad FROM collection_collection WHERE id_dad=%s AND id_son=%s" % (add_dad,add_son))
-        if res:
-            raise StandardError
-        while len(stack) > 0:
-            colID = stack.pop()
-            res = run_sql("SELECT id_dad FROM collection_collection WHERE id_son=%s" % colID)
-            for id in res:
-                if int(id[0]) == int(add_son):
-                    raise StandardError
-                else:
-                    stack.append(id[0])
-        return "true"
-    except StandardError, e:
-        return ""
-
 def add_col_dad_son(add_dad, add_son, rtype):
     """Add a son to a collection (dad)
     add_dad - add to this collection id
@@ -2638,41 +2477,10 @@ def add_col_dad_son(add_dad, add_son, rtype):
                 highscore = int(score[0])
         highscore += 1
         res = run_sql("INSERT INTO collection_collection(id_dad,id_son,score,type) values(%s,%s,%s,'%s')" % (add_dad, add_son, highscore, rtype))
-        return highscore
+        return (1, highscore)
     except StandardError, e:
-        return ()
+        return (0, e)
         
-def switch_col_treescore(col_1, col_2):
-    try:
-        res1 = run_sql("SELECT score FROM collection_collection WHERE id_dad=%s and id_son=%s" % (col_1[3], col_1[0]))
-        res2 = run_sql("SELECT score FROM collection_collection WHERE id_dad=%s and id_son=%s" % (col_2[3], col_2[0]))
-        res = run_sql("UPDATE collection_collection SET score=%s WHERE id_dad=%s and id_son=%s" % (res2[0][0], col_1[3], col_1[0]))
-        res = run_sql("UPDATE collection_collection SET score=%s WHERE id_dad=%s and id_son=%s" % (res1[0][0], col_2[3], col_2[0]))
-        return "true"
-    except StandardError, e:
-        return ()
-
-def move_col_tree(col_from, col_to, move_to_rtype=''):
-    """Move a collection from one point in the tree to another. becomes a son of the endpoint.
-    col_from - move this collection from current point
-    col_to - and set it as a son of this collection.
-    move_to_rtype - either virtual or regular collection"""
-    
-    try:
-        res = run_sql("SELECT score FROM collection_collection WHERE id_dad=%s ORDER BY score asc" % col_to[0])
-        highscore = 0
-        for score in res:
-            if int(score[0]) > highscore:
-                highscore = int(score[0])
-        highscore += 1
-        if not move_to_rtype:
-            move_to_rtype = col_from[4] 
-        res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s" % (col_from[0], col_from[3]))
-        res = run_sql("INSERT INTO collection_collection(id_dad,id_son,score,type) values(%s,%s,%s,'%s')" % (col_to[0], col_from[0], highscore, move_to_rtype))
-        return "true"
-    except StandardError, e:
-        return ()
-
 def compare_on_val(first, second):
     """Compare the two values"""
     
@@ -2823,7 +2631,48 @@ def find_next(tree, start_son):
         start_son += 1
         if tree[start_son][3] == id_dad:
             return start_son
-        
+
+def remove_col_subcol(id_son, id_dad, type):
+    """Remove a collection as a son of another collection in the tree, if collection isn't used elsewhere in the tree, remove all registered sons of the id_son.
+    id_son - collection id of son to remove
+    id_dad - the id of the dad"""
+
+    try:
+        if id_son != id_dad:
+            tree = get_col_tree(id_son)
+            res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s" % (id_son, id_dad))
+        else:
+            tree = get_col_tree(id_son, type)
+            res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s and type='%s'" % (id_son, id_dad, type))  
+        if not run_sql("SELECT * from collection_collection WHERE id_son=%s and type='%s'" % (id_son, type)):
+            for (id, up, down, dad, rtype) in tree:
+                res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s" % (id, dad))
+        return (1, "")
+    except StandardError, e:
+        return (0, e)
+
+def check_col(add_dad, add_son):
+    """Check if the collection can be placed as a son of the dad without causing loops.
+    add_dad - collection id
+    add_son - collection id"""
+    
+    try:
+        stack = [add_dad]
+        res = run_sql("SELECT id_dad FROM collection_collection WHERE id_dad=%s AND id_son=%s" % (add_dad,add_son))
+        if res:
+            raise StandardError
+        while len(stack) > 0:
+            colID = stack.pop()
+            res = run_sql("SELECT id_dad FROM collection_collection WHERE id_son=%s" % colID)
+            for id in res:
+                if int(id[0]) == int(add_son):
+                    raise StandardError
+                else:
+                    stack.append(id[0])
+        return (1, "")
+    except StandardError, e:
+        return (0, e)
+      
 def attach_rnk_col(colID, rnkID):
     """attach rank method to collection
     rnkID - id from rnkMETHOD table
@@ -2831,10 +2680,10 @@ def attach_rnk_col(colID, rnkID):
     
     try:
         res = run_sql("INSERT INTO collection_rnkMETHOD(id_collection, id_rnkMETHOD) values (%s,%s)" % (colID, rnkID))
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
-    
+        return (0, e)
+
 def detach_rnk_col(colID, rnkID):
     """detach rank method from collection
     rnkID - id from rnkMETHOD table
@@ -2842,9 +2691,40 @@ def detach_rnk_col(colID, rnkID):
     
     try:
         res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_collection=%s AND id_rnkMETHOD=%s" % (colID, rnkID))
+        return (1, "")
     except StandardError, e:
-        return ""
-    return "true"
+        return (0, e)
+
+def switch_col_treescore(col_1, col_2):
+    try:
+        res1 = run_sql("SELECT score FROM collection_collection WHERE id_dad=%s and id_son=%s" % (col_1[3], col_1[0]))
+        res2 = run_sql("SELECT score FROM collection_collection WHERE id_dad=%s and id_son=%s" % (col_2[3], col_2[0]))
+        res = run_sql("UPDATE collection_collection SET score=%s WHERE id_dad=%s and id_son=%s" % (res2[0][0], col_1[3], col_1[0]))
+        res = run_sql("UPDATE collection_collection SET score=%s WHERE id_dad=%s and id_son=%s" % (res1[0][0], col_2[3], col_2[0]))
+        return (1, "")
+    except StandardError, e:
+        return (0, e)
+
+def move_col_tree(col_from, col_to, move_to_rtype=''):
+    """Move a collection from one point in the tree to another. becomes a son of the endpoint.
+    col_from - move this collection from current point
+    col_to - and set it as a son of this collection.
+    move_to_rtype - either virtual or regular collection"""
+    
+    try:
+        res = run_sql("SELECT score FROM collection_collection WHERE id_dad=%s ORDER BY score asc" % col_to[0])
+        highscore = 0
+        for score in res:
+            if int(score[0]) > highscore:
+                highscore = int(score[0])
+        highscore += 1
+        if not move_to_rtype:
+            move_to_rtype = col_from[4] 
+        res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s" % (col_from[0], col_from[3]))
+        res = run_sql("INSERT INTO collection_collection(id_dad,id_son,score,type) values(%s,%s,%s,'%s')" % (col_to[0], col_from[0], highscore, move_to_rtype))
+        return (1, "")
+    except StandardError, e:
+        return (0, e)
 
 def remove_pbx(colID, pbxID, ln):
     """Removes a portalbox from the collection given.
@@ -2854,9 +2734,9 @@ def remove_pbx(colID, pbxID, ln):
     
     try:
         res = run_sql("DELETE FROM collection_portalbox WHERE id_collection=%s AND id_portalbox=%s AND ln='%s'" % (colID, pbxID, ln))
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def remove_fmt(colID,fmtID):
     """Removes a format from the collection given.
@@ -2865,9 +2745,9 @@ def remove_fmt(colID,fmtID):
     
     try:
         res = run_sql("DELETE FROM collection_format WHERE id_collection=%s AND id_format=%s" % (colID, fmtID))
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def remove_fld(colID,fldID, fldvID=''):
     """Removes a field from the collection given.
@@ -2882,9 +2762,9 @@ def remove_fld(colID,fldID, fldvID=''):
             else:
                 sql += " AND id_fieldvalue is NULL"
         res = run_sql(sql)
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def delete_fldv(fldvID):
     """Deletes all data for the given fieldvalue
@@ -2893,9 +2773,9 @@ def delete_fldv(fldvID):
     try:
         res = run_sql("DELETE FROM collection_field_fieldvalue WHERE id_fieldvalue=%s" % fldvID)
         res = run_sql("DELETE FROM fieldvalue WHERE id=%s" % fldvID)
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def delete_pbx(pbxID):
     """Deletes all data for the given portalbox
@@ -2904,9 +2784,9 @@ def delete_pbx(pbxID):
     try:
         res = run_sql("DELETE FROM collection_portalbox WHERE id_portalbox=%s" % pbxID)
         res = run_sql("DELETE FROM portalbox WHERE id=%s" % pbxID)
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
     
 def delete_fmt(fmtID):
     """Deletes all data for the given format
@@ -2916,9 +2796,9 @@ def delete_fmt(fmtID):
         res = run_sql("DELETE FROM format WHERE id=%s" % fmtID)
         res = run_sql("DELETE FROM collection_format WHERE id_format=%s" % fmtID)
         res = run_sql("DELETE FROM formatname WHERE id_format=%s" % fmtID)
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
     
 def delete_col(colID):
     """Deletes all data for the given collection
@@ -2933,9 +2813,9 @@ def delete_col(colID):
         res = run_sql("DELETE FROM collection_portalbox WHERE id_collection=%s" % colID)
         res = run_sql("DELETE FROM collection_format WHERE id_collection=%s" % colID)
         res = run_sql("DELETE FROM collection_field_fieldvalue WHERE id_collection=%s" % colID)
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
     
 def add_fmt(code, name, rtype):
     """Add a new output format. Returns the id of the format.
@@ -2947,9 +2827,9 @@ def add_fmt(code, name, rtype):
         res = run_sql("INSERT INTO format (code, name) values ('%s','%s')" % (MySQLdb.escape_string(code), MySQLdb.escape_string(name)))
         fmtID = run_sql("SELECT id FROM format WHERE code='%s'" % MySQLdb.escape_string(code))
         res = run_sql("INSERT INTO formatname(id_format, type, ln, value) VALUES (%s,'%s','%s','%s')" % (fmtID[0][0], rtype, cdslang, MySQLdb.escape_string(name)))
-        return fmtID
+        return (1, fmtID)
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def update_fldv(fldvID, name, value):
     """Modify existing fieldvalue
@@ -2960,10 +2840,10 @@ def update_fldv(fldvID, name, value):
     try:
         res = run_sql("UPDATE fieldvalue set name='%s' where id=%s" % (MySQLdb.escape_string(name), fldvID))
         res = run_sql("UPDATE fieldvalue set value='%s' where id=%s" % (MySQLdb.escape_string(value), fldvID))
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
- 
+        return (0, e)
+
 def add_fldv(name, value):
     """Add a new fieldvalue, returns id of fieldvalue
     value - the value of the fieldvalue
@@ -2974,17 +2854,23 @@ def add_fldv(name, value):
         if not res:
             res = run_sql("INSERT INTO fieldvalue (name, value) values ('%s','%s')" % (MySQLdb.escape_string(name), MySQLdb.escape_string(value)))
             res = run_sql("SELECT id FROM fieldvalue WHERE name='%s' and value='%s'" % (MySQLdb.escape_string(name), MySQLdb.escape_string(value)))
-        return res[0][0]
+        if res:
+            return (1, res[0][0])
+        else:
+            raise StandardError
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def add_pbx(title, body):
     try:
         res = run_sql("INSERT INTO portalbox (title, body) values ('%s','%s')" % (MySQLdb.escape_string(title), MySQLdb.escape_string(body)))
         res = run_sql("SELECT id FROM portalbox WHERE title='%s' AND body='%s'" % (MySQLdb.escape_string(title), MySQLdb.escape_string(body)))
-        return res
+        if res:
+            return (1, res[0][0])
+        else:
+            raise StandardError
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def add_col(colNAME, dbquery, rest):
     """Adds a new collection to collection table
@@ -3011,9 +2897,12 @@ def add_col(colNAME, dbquery, rest):
         res = run_sql(sql)
         colID = run_sql("SELECT id FROM collection WHERE name='%s'" % MySQLdb.escape_string(colNAME))
         res = run_sql("INSERT INTO collectionname(id_collection, type, ln, value) VALUES (%s,'%s','%s','%s')" % (colID[0][0], rtype, cdslang, MySQLdb.escape_string(colNAME)))
-        return colID
+        if colID:
+            return (1, colID[0][0])
+        else:
+            raise StandardError
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def add_col_pbx(colID, pbxID, ln, position, score=''):
     """add a portalbox to the collection.
@@ -3033,9 +2922,9 @@ def add_col_pbx(colID, pbxID, ln, position, score=''):
             else:
                 score = 0
             res = run_sql("INSERT INTO collection_portalbox(id_portalbox, id_collection, ln, score, position) values (%s,%s,'%s',%s,'%s')" % (pbxID, colID, ln, (score + 1), position))
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def add_col_fmt(colID, fmtID, score=''):
     """Add a output format to the collection.
@@ -3053,9 +2942,9 @@ def add_col_fmt(colID, fmtID, score=''):
             else:
                 score = 0
             res = run_sql("INSERT INTO collection_format(id_format, id_collection, score) values (%s,%s,%s)" % (fmtID, colID, (score + 1)))
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def add_col_fld(colID, fldID, type, fldvID=''):
     """Add a sort/search/field to the collection.
@@ -3088,7 +2977,7 @@ def add_col_fld(colID, fldID, type, fldvID=''):
             if not res:
                res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_fieldvalue, id_collection, type, score, score_fieldvalue) values (%s,%s,%s,'%s',%s,%s)" % (fldID, fldvID, colID, type, score, (v_score + 1)))
             else:
-                raise StandardError
+                return (0, (0,"Already exists"))
         else:
             res = run_sql("SELECT * FROM collection_field_fieldvalue WHERE id_collection=%s AND type='%s' and id_field=%s and id_fieldvalue is NULL" % (colID, type, fldID))
             if res:
@@ -3099,9 +2988,9 @@ def add_col_fld(colID, fldID, type, fldvID=''):
             else:
                 score = 0
             res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_collection, type, score,score_fieldvalue) values (%s,%s,'%s',%s, 0)" % (fldID, colID, type, (score + 1)))
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
         
 def modify_restricted(colID, rest):
     """Modify the dwhich apache group is allowed to use the collection.
@@ -3116,9 +3005,9 @@ def modify_restricted(colID, rest):
             sql += "null"
         sql += " WHERE id=%s" % colID
         res = run_sql(sql)
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
         
 def modify_dbquery(colID, dbquery):
     """Modify the dbquery of an collection.
@@ -3133,9 +3022,9 @@ def modify_dbquery(colID, dbquery):
             sql += "null"
         sql += " WHERE id=%s" % colID
         res = run_sql(sql)
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def modify_pbx(colID, pbxID, sel_ln, score='', position='', title='', body=''):
     """Modify a portalbox
@@ -3156,9 +3045,9 @@ def modify_pbx(colID, pbxID, sel_ln, score='', position='', title='', body=''):
             res = run_sql("UPDATE collection_portalbox SET score='%s' WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (score, colID, pbxID, sel_ln))
         if position:
             res = run_sql("UPDATE collection_portalbox SET position='%s' WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (position, colID, pbxID, sel_ln))
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def switch_fld_score(colID, id_1, id_2):
     """Switch the scores of id_1 and id_2 in collection_field_fieldvalue
@@ -3171,9 +3060,9 @@ def switch_fld_score(colID, id_1, id_2):
         res2 = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s" % (colID, id_2))
         res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s" % (res2[0][0], colID, id_1))
         res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s" % (res1[0][0], colID, id_2))    
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ()
+        return (0, e)
 
 def switch_fld_value_score(colID, id_1, fldvID_1, fldvID_2):
     """Switch the scores of two field_value
@@ -3186,9 +3075,9 @@ def switch_fld_value_score(colID, id_1, fldvID_1, fldvID_2):
         res2 = run_sql("SELECT score_fieldvalue FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (colID, id_1, fldvID_2))
         res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (res2[0][0], colID, id_1, fldvID_1))
         res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (res1[0][0], colID, id_1, fldvID_2))    
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ()
+        return (0, e)
     
 def switch_pbx_score(colID, id_1, id_2, sel_ln):
     """Switch the scores of id_1 and id_2 in the table given by the argument.
@@ -3201,9 +3090,9 @@ def switch_pbx_score(colID, id_1, id_2, sel_ln):
         res2 = run_sql("SELECT score FROM collection_portalbox WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (colID, id_2, sel_ln))
         res = run_sql("UPDATE collection_portalbox SET score=%s WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (res2[0][0], colID, id_1, sel_ln))
         res = run_sql("UPDATE collection_portalbox SET score=%s WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (res1[0][0], colID, id_2, sel_ln))
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ()
+        return (0, e)
 
 def switch_score(colID, id_1, id_2, table):
     """Switch the scores of id_1 and id_2 in the table given by the argument.
@@ -3216,6 +3105,6 @@ def switch_score(colID, id_1, id_2, table):
         res2 = run_sql("SELECT score FROM collection_%s WHERE id_collection=%s and id_%s=%s" % (table, colID, table, id_2))
         res = run_sql("UPDATE collection_%s SET score=%s WHERE id_collection=%s and id_%s=%s" % (table, res2[0][0], colID, table, id_1))
         res = run_sql("UPDATE collection_%s SET score=%s WHERE id_collection=%s and id_%s=%s" % (table, res1[0][0], colID, table, id_2))
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ()
+        return (0, e)

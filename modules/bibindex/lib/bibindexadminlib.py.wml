@@ -40,7 +40,7 @@ import urllib
 import time
 import random
 from zlib import compress,decompress
-from bibrankadminlib import modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
+from bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
 from messages import *
 from dbquery import run_sql
 from config import *
@@ -272,10 +272,7 @@ def perform_modifytranslations(fldID, ln=cdslang, sel_type='', trans=[], confirm
                                            confirm=2)
 
             elif confirm in ["2", 2]:
-                if finresult:
-                    output += """<b><span class="info">Translations modified.</span></b>"""
-                else:
-                    output += """<b><span class="info">Sorry, could not modify translations.</span></b>"""
+                output += write_outcome(finresult)
                     
     try:
         body = [output, extra]
@@ -391,12 +388,7 @@ def perform_addfield(ln=cdslang, fldNAME='', code='', callback="yes", confirm=-1
                               confirm=1)
     if fldNAME and code and confirm in ["1", 1]:
         res = add_fld(fldNAME, code)
-        if res:
-            output += """<b><span class="info">Added new logical field.</span></b>
-            """
-        else:
-            output += """<b><span class="info">Sorry, could not add logical field, most likely the field already exists.</span></b>
-            """
+        output += write_outcome(res)
     elif confirm not in ["-1", -1]:
         output += """<b><span class="info">Please give the logical field a name and code.</span></b>
         """
@@ -417,12 +409,14 @@ def perform_deletefield(fldID, ln=cdslang, callback='yes', confirm=0):
     """
 
     fld_dict = dict(get_def_name('', "field"))
+    if not fld_dict.has_key(int(fldID)):
+        return """<b><span class="info">Field does not exist</span></b>"""
+
     subtitle = """<a name="5"></a>4. Delete the logical field '%s'&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (fld_dict[int(fldID)], weburl)
     output  = ""
 
     if fldID:
         fldID = int(fldID)
-
         if confirm in ["0", 0]:
             check = run_sql("SELECT * from idxINDEX_field where id_field=%s" % fldID)
             text = ""
@@ -436,13 +430,11 @@ def perform_deletefield(fldID, ln=cdslang, callback='yes', confirm=0):
                                        confirm=1)
         elif confirm in ["1", 1]:
             res = delete_fld(fldID)
-            if res:
-                return """<b><span class="info">Deleted the logical field '%s'.</span></b>
-                """ % (fld_dict[fldID])
+            if res[0] == 1:
+                return """<br><b><span class="info">Field deleted.</span></b>""" + write_outcome(res)
             else:
-                return """<b><span class="info">Cannot delete the logical field.</span></b>
-                """
- 
+                output += write_outcome(res)
+
     try:
         body = [output, extra]
     except NameError:
@@ -497,22 +489,6 @@ def perform_showdetails(ln=cdslang, callback='', confirm=0):
         if cols.endswith(", "):
             cols = cols[:-2]
         output += """<tr><td>%s</td><td>%s</td><td>%s</td></tr>""" % ("""<a href="%s/admin/bibindex/bibindexadmin.py/showfield?fldID=%s">%s</A>""" % (weburl, field_id, field_name), field_tags, lang)
-
-        
-        #        query = "SELECT wordsindex.name FROM wordsindex, wordsindex_field WHERE wordsindex.id=wordsindex_field.id_wordsindex AND wordsindex_field.id_field=%d" % field_id
-        #        try:
-        #            res = run_sql(query)
-        #        except StandardError, e:
-        #            res = ()
-        #        wordsindexes = ""
-        #for row in res:
-        #   
-            #wordsindexes = wordsindexes + row[0] + ", "
-            #if wordsindexes.endswith(", "):
-            #    wordsindexes = wordsindexes[:-2]
-            #else:
-            #    wordsindexes =  """<font color="#990000">no WRD index</font>"""
-            #    output += """<tr><td align="right">%d</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (field_id, field_name, field_tags, wordsindexes)
     output += "</table>"
 
     try:
@@ -558,12 +534,7 @@ def perform_modifyfield(fldID, ln=cdslang, code='', callback='yes', confirm=-1):
         if fldID > -1 and confirm in [1, "1"]:
             fldID = int(fldID)
             res = modify_fld(fldID, code)
-            if res:
-                output += """<b><span class="info">Modified the code of the logical field.</span></b>
-                """
-            else:
-                output += """<b><span class="info">Cannot modify the code of the logical field.</span></b>
-                """
+            output += write_outcome(res)
     else:
         output  = """No field to modify.
         """
@@ -602,18 +573,15 @@ def perform_showfieldtags(fldID, ln=cdslang, callback='yes', content='', confirm
     if len(res) > 0:
         i = 0
         for (fldID, tagID, tname, tvalue, score) in res:
-            #move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
 	    move = ""
             if i != 0:
                 move += """<a href="%s/admin/bibindex/bibindexadmin.py/switchtagscore?fldID=%s&amp;id_1=%s&amp;id_2=%s&amp;ln=%s&amp=rand=%s#4"><img border="0" src="%s/img/smallup.gif" title="Move tag up"></a>""" % (weburl, fldID, tagID, res[i - 1][1], ln, random.randint(0, 1000), weburl)
 	    else:
 		move += "&nbsp;&nbsp;&nbsp;"
             i += 1
-            #move += "</td></tr><tr><td>"
             if i != len(res):
                 move += '<a href="%s/admin/bibindex/bibindexadmin.py/switchtagscore?fldID=%s&amp;id_1=%s&amp;id_2=%s&amp;ln=%s&amp;rand=%s#4"><img border="0" src="%s/img/smalldown.gif" title="Move tag down"></a>' % (weburl, fldID, tagID, res[i][1], ln, random.randint(0, 1000), weburl)
-            #move += """</td></tr></table>"""
-            
+
             actions.append([move, tvalue, tname])
             for col in [(('Details','showdetailsfieldtag'), ('Modify','modifytag'),('Remove','removefieldtag'),)]:
                 actions[-1].append('<a href="%s/admin/bibindex/bibindexadmin.py/%s?fldID=%s&amp;tagID=%s&amp;ln=%s#4.1">%s</a>' % (weburl, col[0][1], fldID, tagID, ln, col[0][0]))
@@ -675,12 +643,7 @@ def perform_addtag(fldID, ln=cdslang, value=['',-1], name='', callback="yes", co
     if (value[0] and value[1] in [-1, "-1"]) or (not value[0] and value[1] not in [-1, "-1"]):
         if confirm in ["1", 1]:
             res = add_fld_tag(fldID, name, (value[0] !='' and value[0] or value[1]))
-            if res:
-                output += """<b><span class="info">Added new MARC tag with value'%s'</span></b>
-                """ % (value[0] !='' and value[0] or value[1])
-            else:
-                output += """<b><span class="info">Sorry, could not add MARC tag, most likely the tag already exists in the logical field.</span></b>
-            """
+            output += write_outcome(res)
     elif confirm not in ["-1", -1]:
         output += """<b><span class="info">Please choose to add either a new or an existing MARC tag, but not both.</span></b>
         """
@@ -731,12 +694,7 @@ def perform_modifytag(fldID, tagID, ln=cdslang, name='', value='', callback='yes
     
     if name and value and confirm in [1, "1"]:
         res = modify_tag(tagID, name, value)
-        if res:
-            output += """<b><span class="info">Modified the MARC tag.</span></b>
-            """ 
-        else:
-            output += """<b><span class="info">Cannot modify the MARC tag.</span></b>
-            """
+        output += write_outcome(res)
 
     try:
         body = [output, extra]
@@ -773,13 +731,8 @@ def perform_removefieldtag(fldID, tagID, ln=cdslang, callback='yes', confirm=0):
                                        confirm=1)
         elif confirm in ["1", 1]:
             res = remove_fldtag(fldID, tagID)
-            if res:
-                output += """<b><span class="info">Removed the tag from the logical field.</span></b>
-                """
-            else:
-                output += """<b><span class="info">Cannot remove the tag from the logical field.</span></b>
-                """
-
+            output += write_outcome(res)
+ 
     try:
         body = [output, extra]
     except NameError:
@@ -799,12 +752,8 @@ def perform_switchtagscore(fldID, id_1, id_2, ln=cdslang):
     output = ""
     name_1 = run_sql("select name from tag where id=%s" % id_1)[0][0]
     name_2 = run_sql("select name from tag where id=%s" % id_2)[0][0]
-    if switch_score(fldID, id_1, id_2):
-        output = """<br><b><span class="info">'%s' changed position with '%s'</span></b>
-        """ % (name_1, name_2)
-    else:
-        output = """<br><b><span class="info">Could not complete the operation.</span></b>"""
-
+    res = switch_score(fldID, id_1, id_2)
+    output += write_outcome(res)
     return perform_showfieldtags(fldID, ln, content=output)
  
 def perform_deletetag(fldID, ln=cdslang, tagID=-1, callback='yes', confirm=-1):
@@ -865,12 +814,7 @@ def perform_deletetag(fldID, ln=cdslang, tagID=-1, callback='yes', confirm=-1):
                                        confirm=1)
                     
         elif confirm in [1, "1"]:
-            if ares:
-                output += """<b><span class="info">Deleted the MARC tag.</span></b>
-                """
-            else:
-                output += """<b><span class="info">Cannot delete the MARC tag.</span></b>
-                """
+            output += write_outcome(ares)
     elif confirm not in [-1, "-1"]:
         output  += """<b><span class="info">Choose a MARC tag to delete.</span></b>
         """
@@ -995,9 +939,9 @@ def remove_fld(colID,fldID, fldvID=''):
         if fldvID:
             sql += " AND id_fieldvalue=%s" % fldvID
         res = run_sql(sql)
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def remove_fldtag(fldID,tagID):
     """Removes a field from the collection given.
@@ -1007,9 +951,9 @@ def remove_fldtag(fldID,tagID):
     try:
         sql = "DELETE FROM field_tag WHERE id_field=%s AND id_tag=%s" % (fldID, tagID)
         res = run_sql(sql)
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def delete_tag(tagID):
     """Deletes all data for the given field
@@ -1017,9 +961,9 @@ def delete_tag(tagID):
     
     try:
         res = run_sql("DELETE FROM tag where id=%s" % tagID)
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
         
 def delete_fld(fldID):
     """Deletes all data for the given field
@@ -1030,9 +974,9 @@ def delete_fld(fldID):
         res = run_sql("DELETE FROM field_tag WHERE id_field=%s" % fldID)
         res = run_sql("DELETE FROM idxINDEX_field WHERE id_field=%s" % fldID)
         res = run_sql("DELETE FROM field WHERE id=%s" % fldID)
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def add_fld(name, code):
     """Add a new output format. Returns the id of the format.
@@ -1045,9 +989,12 @@ def add_fld(name, code):
         res = run_sql("INSERT INTO field (name, code) values('%s','%s')" % (MySQLdb.escape_string(name), MySQLdb.escape_string(code)))
         fldID = run_sql("SELECT id FROM field WHERE code='%s'" % MySQLdb.escape_string(code))
         res = run_sql("INSERT INTO fieldname (id_field, type, ln, value) VALUES (%s,'%s','%s','%s')" % (fldID[0][0], type, cdslang, MySQLdb.escape_string(name)))
-        return fldID
+        if fldID:
+            return (1, fldID[0][0])
+        else:
+            raise StandardError
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def add_fld_tag(fldID, name, value):
     """Add a sort/search/field to the collection.
@@ -1069,9 +1016,9 @@ def add_fld_tag(fldID, name, value):
             res = run_sql("SELECT id FROM tag WHERE value='%s'" % MySQLdb.escape_string(value))  
             
         res = run_sql("INSERT INTO field_tag(id_field, id_tag, score) values(%s, %s, %s)" % (fldID, res[0][0], score))
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
         
 def modify_fld(fldID, code):
     """Modify the dbquery of an collection.
@@ -1082,9 +1029,9 @@ def modify_fld(fldID, code):
         sql = "UPDATE field SET code='%s'" % code
         sql += " WHERE id=%s" % fldID
         res = run_sql(sql)
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
 
 
 def modify_tag(tagID, name, value):
@@ -1097,9 +1044,9 @@ def modify_tag(tagID, name, value):
         res = run_sql(sql)
         sql = "UPDATE tag SET value='%s' WHERE id=%s" % (value, tagID)
         res = run_sql(sql)
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ""
+        return (0, e)
 
 def switch_score(fldID, id_1, id_2):
     """Switch the scores of id_1 and id_2 in the table given by the argument.
@@ -1111,7 +1058,7 @@ def switch_score(fldID, id_1, id_2):
         res2 = run_sql("SELECT score FROM field_tag WHERE id_field=%s and id_tag=%s" % (fldID, id_2))
         res = run_sql("UPDATE field_tag SET score=%s WHERE id_field=%s and id_tag=%s" % (res2[0][0], fldID, id_1))
         res = run_sql("UPDATE field_tag SET score=%s WHERE id_field=%s and id_tag=%s" % (res1[0][0], fldID, id_2))
-        return "true"
+        return (1, "")
     except StandardError, e:
-        return ()
+        return (0, e)
 
