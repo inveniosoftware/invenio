@@ -405,7 +405,13 @@ def create_google_box(p, f, p1, p2, p3, ln=cdslang,
                 out += separator
                 out += """<a href="http://www-lib.kek.jp/cgi-bin/kiss_prepri?RP=%s">KEK</a>""" % urllib.quote(p)        
             out += separator
+        # Google Scholar:
+        if f == "author":
+            out += """<a href="http://scholar.google.com/scholar?q=author%%3A%s">Google Scholar</a>""" % urllib.quote(p)
+        else:
+            out += """<a href="http://scholar.google.com/scholar?q=%s">Google Scholar</a>""" % urllib.quote(p)
         # Google:
+        out += separator
         out += """<a href="http://google.com/search?q=%s">Google</a>""" % urllib.quote(p)
         # AllTheWeb:
         out += separator
