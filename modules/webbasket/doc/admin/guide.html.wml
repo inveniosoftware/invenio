@@ -11,12 +11,17 @@
 ## The CDSware is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = doc lib web
+#include "cdspage.wml" \
+    title="WebBasket Admin Guide" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/webbasket/>WebBasket Admin</a>" \
+    navbar_name="admin" \
+    navbar_select="webbasket-admin-guide"
 
-CLEANFILES = *~
+Not implemented yet.  If you want to manipulate user baskets, see
+tables <code>user_basket, basket, basket_record</code>. 
