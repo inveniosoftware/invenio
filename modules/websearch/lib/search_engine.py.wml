@@ -270,12 +270,14 @@ def create_basic_search_units(req, p, f, m=None):
                 if sre_quotes.match(pi):
                     # B3a - quotes are found => do ACC search (phrase search)
                     if fi:
-                        if sre_doublequote.match(pi):
-                            pi = string.replace(pi, '"', '') # get rid of quotes
+                        if pi[0] == '"' and pi[-1] == '"':
+                            pi = string.replace(pi, '"', '') # remove quote signs
                             opfts.append([oi,pi,fi,'a'])
-                        else:
-                            pi = string.replace(pi, "'", '') # get rid of quotes
+                        elif pi[0] == "'" and pi[-1] == "'":
+                            pi = string.replace(pi, "'", "") # remove quote signs
                             opfts.append([oi,"%"+pi+"%",fi,'a'])
+                        else: # unbalanced quotes, so do WRD query:
+                            opfts.append([oi,pi,fi,'w'])                            
                     else:
                         # fi is not defined, look at where we are doing exact or subphrase search (single/double quotes):
                         if pi[0]=='"' and pi[-1]=='"':                        
@@ -1630,11 +1632,11 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             basic_search_units_hitsets.append(basic_search_unit_hitset)                    
         else:
             # stage 2-2: no hits found for this search unit, try to replace non-alphanumeric chars inside pattern:
-            if sre.search(r'\w[^a-zA-Z0-9\s\:]+(\w|$)', bsu_p):
+            if sre.search(r'[^a-zA-Z0-9\s\:]', bsu_p):
                 if bsu_p.startswith('"') and bsu_p.endswith('"'): # is it ACC query?
-                    bsu_pn = sre.sub(r'(\w)[^a-zA-Z0-9\s\:]+(\w|$)', "\\1*\\2", bsu_p)
+                    bsu_pn = sre.sub(r'[^a-zA-Z0-9\s\:]+', "*", bsu_p)
                 else: # it is WRD query
-                    bsu_pn = sre.sub(r'(\w)[^a-zA-Z0-9\s\:]+(\w|$)', "\\1 \\2", bsu_p)
+                    bsu_pn = sre.sub(r'[^a-zA-Z0-9\s\:]+', " ", bsu_p)
                 if verbose and of.startswith('h') and req:
                     print_warning(req, "trying (%s,%s,%s)" % (bsu_pn,bsu_f,bsu_m))
                 basic_search_unit_hitset = search_pattern(req=None, p=bsu_pn, f=bsu_f, m=bsu_m, of="id", ln=ln)
