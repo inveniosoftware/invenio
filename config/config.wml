@@ -153,19 +153,19 @@ cds.support@cern.ch
        <td width=45>
              &nbsp;
        </td>
-       <td width=95 class=headerselected align=center valign=bottom>
+       <td width=75 class=headerselected align=center valign=bottom>
              <small><strong><a class=header href="<WEBURL>">SEARCH</a></strong></small>
        </td>
        <td width=15>
              &nbsp;
        </td>
-       <td width=95 class=headerselected align=center valign=bottom>
+       <td width=75 class=headerselected align=center valign=bottom>
              <small><strong><a class=header href="<WEBURL>/submit/">SUBMIT</a></strong></small>
        </td>
        <td width=15>
              &nbsp;
        </td>
-       <td width=95 class=headerselected align=center valign=bottom>
+       <td width=75 class=headerselected align=center valign=bottom>
              <small><strong><a class=header href="<WEBURL>/help/">HELP</a></strong></small>
        </td>
        <td width=30>
@@ -224,7 +224,7 @@ cds.support@cern.ch
   <td>
   Powered by <a class=note href="http://cdsware.cern.ch/">CDSware</a> v<VERSION>
   </td>
-  <td align=right class="address">
+  <td align=right>
   Maintained by <a class=note href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a>
   </td>
   </tr>
