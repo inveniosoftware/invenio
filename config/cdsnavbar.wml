@@ -142,8 +142,8 @@
   <navbar:button id=admin txt="<strong>ADMIN AREA</strong>" url="<WEBURL>/admin/" hint="CDSware Administrators Area">
   <navbar:button id=howto txt="HOWTOs" url="<WEBURL>/admin/howto/" hint="CDSware Admin HOWTO Documents" menu="howto">
   <navbar:button id=foo txt="<strong>SYSTEM&nbsp;LIB</strong>">
-  <navbar:button id=bibdata txt="BibData Admin" url="<WEBURL>/admin/bibdata/" hint="CDSware BibData Admin" menu="bibdata">
-  <navbar:button id=bibwords txt="BibWords Admin" url="<WEBURL>/admin/bibwords/" hint="CDSware BibWords Admin">
+  <navbar:button id=bibedit txt="BibEdit Admin" url="<WEBURL>/admin/bibedit/" hint="CDSware BibEdit Admin" menu="bibedit">
+  <navbar:button id=bibindex txt="BibIndex Admin" url="<WEBURL>/admin/bibindex/" hint="CDSware BibIndex Admin">
   <navbar:button id=foo txt="<strong>ARCHIVE&nbsp;MGMT</strong>">
   <navbar:button id=bibharvest txt="BibHarvest Admin" url="<WEBURL>/admin/bibharvest/" hint="CDSware BibHarvest Admin">
   <navbar:button id=bibconvert txt="BibConvert Admin" url="<WEBURL>/admin/bibconvert/" hint="CDSware BibConvert Admin">
@@ -203,7 +203,7 @@
   <navbar:button id=webaccess_websubmit txt="Authorizations&nbsp;on&nbsp;WebSubmit&nbsp;Admin" url="<WEBURL>/admin/webaccess/submitmanager.php" hint="Authorizations on WebSubmit Admin">
   <navbar:button id=webaccess_websearch txt="Authorizations&nbsp;on&nbsp;WebSearch&nbsp;Admin" url="<WEBURL>/admin/webaccess/searchmanager.php" hint="Authorizations on WebSearch Admin">
   <navbar:button id=webaccess_webaccess txt="Authorizations&nbsp;on&nbsp;WebAccess&nbsp;Admin" url="<WEBURL>/admin/webaccess/accessmanager.php" hint="Authorizations on WebAccess Admin">
-  <navbar:button id=webaccess_bibdata txt="Authorizations&nbsp;on&nbsp;BibData&nbsp;Admin" url="<WEBURL>/admin/webaccess/bibmanager.php" hint="Authorizations on BibData Admin">
+  <navbar:button id=webaccess_bibedit txt="Authorizations&nbsp;on&nbsp;BibEdit&nbsp;Admin" url="<WEBURL>/admin/webaccess/bibmanager.php" hint="Authorizations on BibEdit Admin">
   <navbar:button id=webaccess_bibformat txt="Authorizations&nbsp;on&nbsp;BibFormat&nbsp;Admin" url="<WEBURL>/admin/webaccess/bibformatmanager.php" hint="Authorizations on BibFormat Admin">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
@@ -232,8 +232,8 @@
   </navbar:footer>
 </navbar:define>
 
-## navbar bibdata:
-<navbar:define name=bibdata
+## navbar bibedit:
+<navbar:define name=bibedit
         imgbase="img/" urlbase="$(ROOT)">
   <navbar:header>
     <table cellspacing=0 cellpadding=1 border=0>
@@ -241,8 +241,8 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=bibdata_edit_record txt="Edit Record" url="<WEBURL>/admin/bibdata/displayRec.php" hint="BibData Admin - Edit Record">
-  <navbar:button id=bibdata_global_replace txt="Global Replace" url="<WEBURL>/admin/bibdata/globalReplace.php" hint="BibData Admin - Global Replace">
+  <navbar:button id=bibedit_edit_record txt="Edit Record" url="<WEBURL>/admin/bibedit/displayRec.php" hint="BibEdit Admin - Edit Record">
+  <navbar:button id=bibedit_global_replace txt="Global Replace" url="<WEBURL>/admin/bibedit/globalReplace.php" hint="BibEdit Admin - Global Replace">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
