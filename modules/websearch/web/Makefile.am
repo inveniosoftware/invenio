@@ -21,7 +21,7 @@ SUBDIRS = admin
 
 webappdir = $(WEBDIR)
 
-webapp_DATA=search.py index.py oai2d.py
+webapp_DATA=search.py index.py
 
 EXTRA_DIST = $(wildcard *.wml)
 
