@@ -50,7 +50,7 @@
   <ru>Главная страница</ru>
   <sk>Hlavná stránka</sk>
   <cz>Hlavní stránka</cz>
-  <no>Hjem</no>
+  <no>Hovedside</no>
 </define-tag>
 
 <define-tag MSG_SEARCH whitespace=delete>
@@ -76,7 +76,7 @@
   <ru>Придать</ru>
   <sk>Pridaj</sk>
   <cz>Přidej</cz>
-  <no>Send inn</no>
+  <no>Last opp</no>
 </define-tag>
 
 <define-tag MSG_HELP whitespace=delete>
@@ -141,7 +141,7 @@
   <ru>Персоналузовать</ru>
   <sk>Personalizácia</sk>
   <cz>Personalizace</cz>
-  <no>Personaliser</no>
+  <no>Tilpass brukerinnstillinger</no>
 </define-tag>
 
 <define-tag MSG_PAGE_BEING_TRANSLATED_HEAD whitespace=delete>
@@ -467,7 +467,7 @@
   <ru>Искать %s запускоб для:</ru>
   <sk>Hľadaj v %s záznamoch:</sk>
   <cz>Hledej v %s záznamech:</cz>
-  <no>Søk %s poster etter:</no>
+  <no>Søk i %s poster etter:</no>
 </define-tag>
 
 <define-tag MSG_ANY_FIELD whitespace=delete>
@@ -480,7 +480,7 @@
   <ru>любое поле</ru>
   <sk>všetky polia</sk>
   <cz>všechna pole</cz>
-  <no>hvilket som helst felt</no>
+  <no>alle felt</no>
 </define-tag>
 
 <define-tag MSG_TITLE whitespace=delete>
@@ -623,7 +623,7 @@
   <ru>Тоцная фраза:</ru>
   <sk>Presná veta:</sk>
   <cz>Přesná věta:</cz>
-  <no>Nøyaktig frase:</no>
+  <no>Nøyaktig uttrykk:</no>
 </define-tag>
 
 <define-tag MSG_PARTIAL_PHRASE whitespace=delete>
@@ -636,7 +636,7 @@
   <ru>Парциальная фраза:</ru>
   <sk>Čiastočná veta:</sk>
   <cz>Částečná věta:</cz>
-  <no>Delvis frase:</no>
+  <no>Delvis uttrykk:</no>
 </define-tag>
 
 <define-tag MSG_REGULAR_EXPRESSION whitespace=delete>
@@ -955,7 +955,7 @@
   <ru>ПРИДАТ В КОРЗИНУ</ru>
   <sk>PRIDAŤ DO KOŠÍKA</sk>
   <cz>PŘIDAT DO KOŠÍKU</cz>
-  <no>LEGG TIL KURV</no>
+  <no>LEGG TIL I KURV</no>
 </define-tag>
 
 <define-tag MSG_COLLECTIONS whitespace=delete>
@@ -1020,7 +1020,7 @@
   <ru>Помощь для приданья</ru>
   <sk>Pomoc pre pridávanie</sk>
   <cz>Nápověda pro přidávání</cz>
-  <no>Submit Hjelp</no>
+  <no>Opplastningshjelp</no>
 </define-tag>
 
 <define-tag MSG_ADMIN_AREA whitespace=delete>
@@ -1046,7 +1046,7 @@
   <ru>Администрация Придания</ru>
   <sk>Administrácia Pridávania</sk>
   <cz>Administrace Přidávání</cz>
-  <no>WebSubmit Administrering</no>
+  <no>Opplastningsadministrasjon</no>
 </define-tag>
 
 <define-tag MSG_GUIDE whitespace=delete>
