@@ -854,7 +854,7 @@ def tupletotable(header=[], tuple=[], start='', end='', extracolumn=''):
     if tblstr: tblstr = ' <tr>\n%s\n </tr>\n' % (tblstr, )
     
     tblstr = start + '<table class="admin_wvar_nomargin">\n' + tblstr
-
+    
     # extra column
     try: 
         extra = '<tr>'

@@ -75,7 +75,7 @@ let the http-daemon have write/read access to your cdsware/etc/bibrank directory
 <a name="mi"></a><h3>3.1 Main interface</h3>
 In the main interface screen, you see a list of all rank methods currently added. If you have added the 'long name' translation in the current chosen language for a rank method, you will see this name, if not, and the default cdsware language translation exists, it will be used instead. And if no translation exists, the bibrank code will be used. To find out about the functionality available, check out the topics below.
 
-</br><b>Explanation of concepts</b>
+</br></br><b>Explanation of concepts</b>
 <blockquote>
 <pre>
 Rank method:

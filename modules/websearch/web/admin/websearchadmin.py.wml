@@ -629,7 +629,7 @@ def removeportalbox(req, colID, ln=cdslang, pbxID='', sel_ln='', callback='yes',
 
 def addexistingportalbox(req, colID, ln=cdslang, pbxID=-1, score=0, position='', sel_ln='', callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:

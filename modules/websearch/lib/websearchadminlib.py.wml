@@ -583,8 +583,13 @@ def perform_modifycollectiontree(colID, ln=cdslang, move_up='', move_down='', mo
         elif delete:
             delete = int(delete)
             if confirm in [0, "0"]:
-                text = """<b>Do you want to remove the %s collection '%s' in subdirectory '%s' together with its subcollections.</b>
-                """ % ((tree[delete][4]=="r" and 'regular' or 'virtual'), col_dict[tree[delete][0]], col_dict[tree[delete][3]])
+                if col_dict[tree[delete][0]] != col_dict[tree[delete][3]]:
+                    text = """<b>Do you want to remove the %s collection '%s' and its subcollections in the %s collection '%s'.</b>
+                    """ % ((tree[delete][4]=="r" and 'regular' or 'virtual'), col_dict[tree[delete][0]], (rtype=="r" and 'regular' or 'virtual'), col_dict[tree[delete][3]])
+                else:
+                    text = """<b>Do you want to remove all subcollections of the %s collection '%s'.</b>
+                    """ % ((rtype=="r" and 'regular' or 'virtual'), col_dict[tree[delete][3]])
+                    
                 output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/modifycollectiontree#tree" % weburl,
                                            text=text,
                                            button="Confirm",
@@ -599,12 +604,17 @@ def perform_modifycollectiontree(colID, ln=cdslang, move_up='', move_down='', mo
                                            colID=colID,
                                            ln=ln)
             else:
-                if remove_col_subcol(tree[delete][0], tree[delete][3]):
-                    output += """<b><span class="info">Removed the %s collection '%s' in subdirectory '%s' together with its subcollections.</span></b><br><br>
-                    """ % ((tree[delete][4]=="r" and 'regular' or 'virtual'), col_dict[tree[delete][0]], col_dict[tree[delete][3]])
+                if remove_col_subcol(tree[delete][0], tree[delete][3], rtype):
+                    if col_dict[tree[delete][0]] != col_dict[tree[delete][3]]:
+                        output += """<b><span class="info">Removed the %s collection '%s' and its subcollections in subdirectory '%s'.</span></b><br><br>
+                        """ % ((tree[delete][4]=="r" and 'regular' or 'virtual'), col_dict[tree[delete][0]], col_dict[tree[delete][3]])
+                    else:
+                        output += """<b><span class="info">Removed the subcollections of the %s collection '%s'.</span></b><br><br>
+                        """ % ((rtype=="r" and 'regular' or 'virtual'), col_dict[tree[delete][3]])
+                        
                 else:
-                    output += """<b><span class="info">Could not remove the %s collection '%s' in subdirectory '%s' together with its subcollections.</span></b><br><br>
-                    """ % ((rtype=="r" and 'regular' or 'virtual'), col_dict[tree[delete][0]], col_dict[tree[delete][3]])
+                    output += """<b><span class="info">Could not remove the collection from the tree.</span></b><br><br>
+                    """
                 delete = ''
         elif move_from and not move_to:
             move_from_rtype = move_from[0]
@@ -795,7 +805,8 @@ def perform_addexistingportalbox(colID, ln=cdslang, pbxID=-1, score=0, position=
         listpos = pos.items()
         listpos.sort()
         for (key, name) in listpos:
-            text += """<option value="%s" %s>%s</option>""" % (key, key==position and 'selected="selected"' or '', name)       
+            text += """<option value="%s" %s>%s</option>""" % (key, key==position and 'selected="selected"' or '', name)
+        text += "</select>"
         output += createhiddenform(action="addexistingportalbox#5.2",
                                    text=text,
                                    button="Add",
@@ -1091,7 +1102,7 @@ def perform_showportalboxes(colID, ln=cdslang, callback='yes', content='', confi
     </dl>
     """  % (colID, ln, colID, ln, colID, ln)
   
-    header = ['', 'Position', 'Language', 'Title', 'Actions']
+    header = ['Position', 'Language', '', 'Title', 'Actions']
     actions = []
     cdslang = get_languages()
     lang = dict(cdslang)
@@ -1100,16 +1111,10 @@ def perform_showportalboxes(colID, ln=cdslang, callback='yes', content='', confi
     pos_list.sort()
    
     if len(get_col_pbx(colID)) > 0:
-        span = 0
         for (key, value) in cdslang:
             for (pos_key, pos_value) in pos_list:
                 res = get_col_pbx(colID, key, pos_key)
                 i = 0
-                if len(res) > 0 and span == 0:
-                    span = 1
-                elif len(res) > 0:
-                    span = 0
-                    
                 for (pbxID, colID_pbx, tln, score, position, title, body) in res:
                     if i != 0:
                         move = """<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s#5"><img border="0" src="%s/img/arrow_up.gif" title="Move portalbox up"></a>""" % (weburl, colID, ln, pbxID, res[i - 1][0], tln, weburl)
@@ -1118,7 +1123,7 @@ def perform_showportalboxes(colID, ln=cdslang, callback='yes', content='', confi
                     i += 1
                     if i != len(res):
                         move += '<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s#5"><img border="0" src="%s/img/%s" title="Move portalbox down"></a>' % (weburl, colID, ln, pbxID, res[i][0], tln, weburl, ('arrow_down.gif'))
-                    actions.append([move, "%s%s%s" % ((span==1 and '<span class="info">' or ''), pos[position], (span==1 and '</span>' or '')), "%s%s%s" % ((span==1 and '<span class="info">' or ''), lang[tln], (span==1 and '</span>' or '')), "%s%s%s" % ((span==1 and '<span class="info">' or ''), title, (span==1 and '</span>' or ''))])
+                    actions.append(["%s" % (i==1 and pos[position] or ''), "%s" % (i==1 and lang[tln] or ''), move, "%s" % title])
                     for col in [(('Modify', 'modifyportalbox'), ('Remove', 'removeportalbox'),)]:
                         actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;pbxID=%s&amp;sel_ln=%s#5.4">%s</a>' % (weburl, col[0][1], colID, ln, pbxID, tln, col[0][0]))
                         for (str, function) in col[1:]:
@@ -1691,6 +1696,8 @@ def perform_addexistingoutputformat(colID, ln=cdslang, fmtID=-1, callback='yes',
     subtitle = """<a name="10.2"></a>Add existing output format to collection"""
     output  = ""
 
+    if fmtID not in [-1, "-1"] and confirm in [1, "1"]:
+        ares = add_col_fmt(colID, fmtID)
     colID = int(colID)
     res = get_current_name('', ln, get_fmt_nametypes()[0][0], "format")
     fmt_dict = dict(res)
@@ -1733,8 +1740,7 @@ def perform_addexistingoutputformat(colID, ln=cdslang, fmtID=-1, callback='yes',
                                        ln=ln,
                                        confirm=1)
         elif confirm in [1, "1"]:
-            res = add_col_fmt(colID, fmtID)
-            if res:
+            if ares:
                 output += """<b><span class="info">Added the output format '%s' to the collection '%s'.</span></b>
                 """ % (fmt_dict[fmtID], col_dict[colID])
             else:
@@ -2356,15 +2362,20 @@ def get_col_tree(colID, rtype=''):
     except StandardError, e:
         return ()
 
-def remove_col_subcol(id_son, id_dad):
+def remove_col_subcol(id_son, id_dad, type):
     """Remove a collection as a son of another collection in the tree, if collection isn't used elsewhere in the tree, remove all registered sons of the id_son.
     id_son - collection id of son to remove
     id_dad - the id of the dad"""
 
-    tree = get_col_tree(id_son)
     try:
-        res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s" % (id_son, id_dad))
-        if not run_sql("SELECT * from collection_collection WHERE id_son=%s" % id_son):
+        if id_son != id_dad:
+            tree = get_col_tree(id_son)
+            res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s" % (id_son, id_dad))
+        else:
+            tree = get_col_tree(id_son, type)
+            res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s and type='%s'" % (id_son, id_dad, type))
+            
+        if not run_sql("SELECT * from collection_collection WHERE id_son=%s and type='%s'" % (id_son, type)):
             for (id, up, down, dad, rtype) in tree:
                 res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s" % (id, dad))
         return "true"

@@ -568,7 +568,7 @@ def sort(starset):
         for nr in range(0, starset.getSize() + 1):
             sets[nr] = HitSet()
             threshold[nr] = 0
-        
+
         for key in tempdoc.keys():
             """Deletes keys with negative value"""
             if tempdoc[key][1] <= 0:
