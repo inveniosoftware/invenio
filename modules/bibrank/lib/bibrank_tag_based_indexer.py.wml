@@ -61,7 +61,7 @@ from dbquery import run_sql
 options = {}
 def citation_exec(rank_method_code, name, config):
     """Creating the rank method data for citation"""
-    dict = get_citation_weight(rank_method_code)
+    dict = get_citation_weight(rank_method_code, config)
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     if dict: intoDB(dict, date, rank_method_code)
     else: print "no need to update the indexes for citations"
