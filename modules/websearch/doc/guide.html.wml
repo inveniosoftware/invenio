@@ -1,5 +1,4 @@
 ## -*- mode: html; coding: utf-8; -*-
-##
 ## $Id$
 ##
 ## This file is part of the CERN Document Server Software (CDSware).
@@ -323,12 +322,12 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
@@ -344,12 +343,12 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
@@ -365,12 +364,12 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Einfache versus erweiterte Suche</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Grundlagen</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Suche nach Wörtern und Wortgruppen</a>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolsche Suche</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Spezielle Zeichen und Notation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">Internationale Zeichen</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Trunkierung</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Strukturierte Metadatensuche</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Bereichs-Recherche</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Kombinierte Metadaten-/Volltext-/Zitatsuche</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">FAQ</a>
@@ -386,12 +385,12 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
@@ -407,12 +406,12 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
@@ -428,12 +427,12 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
@@ -449,12 +448,12 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
@@ -470,12 +469,12 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
@@ -491,12 +490,12 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
@@ -512,15 +511,15 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
@@ -533,12 +532,12 @@ useful to this effect.
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Searching for regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Regular expressions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
@@ -608,7 +607,7 @@ way that contain either of the words <em>muon</em> or
     <option value="p">Partial phrase:
     <option value="r">Regular expression:
     </select>
-    <input type="text" name="p1" size="30" value="Ellis, J"></td>
+    <input type="text" name="p1" size="16" value="Ellis, J"></td>
             <td class="searchboxbody"><select name="f1"><option value="">any field<option value="abstract">abstract<option value="author" selected>author<option value="collection">collection<option value="division">division<option value="experiment">experiment<option value="fulltext">fulltext<option value="keyword">keyword<option value="reference">reference<option value="reportnumber">report number<option value="subject">subject<option value="title">title<option value="year">year</select></td>
 
             <td class="searchboxbody">
@@ -629,7 +628,7 @@ way that contain either of the words <em>muon</em> or
     <option value="p">Partial phrase:
     <option value="r">Regular expression:
     </select>
-    <input type="text" name="p2" size="30" value="muon neutrino"></td>
+    <input type="text" name="p2" size="16" value="muon neutrino"></td>
             <td class="searchboxbody"><select name="f2"><option value="">any field<option value="abstract">abstract<option value="author">author<option value="collection">collection<option value="division">division<option value="experiment">experiment<option value="fulltext">fulltext<option value="keyword">keyword<option value="reference">reference<option value="reportnumber">report number<option value="subject">subject<option value="title" selected>title<option value="year">year</select></td>
 
             <td class="searchboxbody">
@@ -650,7 +649,7 @@ way that contain either of the words <em>muon</em> or
     <option value="p">Partial phrase:
     <option value="r">Regular expression:
     </select>
-    <input type="text" name="p3" size="30" value="2001"></td>
+    <input type="text" name="p3" size="16" value="2001"></td>
             <td class="searchboxbody"><select name="f3"><option value="">any field<option value="abstract">abstract<option value="author">author<option value="collection">collection<option value="division">division<option value="experiment">experiment<option value="fulltext">fulltext<option value="keyword">keyword<option value="reference">reference<option value="reportnumber">report number<option value="subject">subject<option value="title">title<option value="year" selected>year</select></td>
 
             <td class="searchboxbody"><input class="formbutton" type="submit" name="action" value="SEARCH"><input class="formbutton" type="submit" name="action" value="Browse">&nbsp;</td>
@@ -793,50 +792,20 @@ There are two phrase searching modes:
 
 </ol>
 
-The difference between exact and partial phrase searching modes may
+<p>The difference between exact and partial phrase searching modes may
 not be obvious upon first look.  While the latter is more similar to
 what ``phrase search'' usually means in the context of web page search
 engines, the former one is usually an order of magnitude faster if you
 know the precise values you are looking for.
 
-<h3><a name="regexp">
-<en>Searching for regular expressions</en>
-<fr>Searching for regular expressions</fr>
-<de>Searching for regular expressions</de>
-<es>Searching for regular expressions</es>
-<pt>Searching for regular expressions</pt>
-<it>Searching for regular expressions</it>
-<ru>Searching for regular expressions</ru>
-<sk>Searching for regular expressions</sk>
-<cz>Searching for regular expressions</cz>
-<no>Searching for regular expressions</no>
-<se>Searching for regular expressions</se>
-</a></h3>
-
 <p>Another interesting searching mode besides the word and phrase
-searches mentioned above is the <strong>regular expression
-search</strong>.  In the Simple Search interface you can trigger it by
-using slashes instead of quotes:
-
-      <form action="<WEBURL>/search.py" method="get">
-      <blockquote>
-      <input size=40 type="text" name="p" value="/^E.*s$/">
-      <select name="f"><option value="">any field<option selected>title<option>author</select>
-      <input class="formbutton" type="submit" name="action" value="SEARCH">
-      </blockquote>
-      </form>
-
-while in the Advanced Search interface you can select the matching
-type explicitely by using the selection box menu, as described above.
-
-<p>The regular expression searching mode is mostly for the power users
-acquainted with the traditional Unix regexp syntax.  The above example
-<code>/^E.*s$/</code> will find all the titles that start by the
-letter <em>E</em>, followed by any number of any characters, and end
-by the letter <em>s</em>.  To learn more about the regular expression
-syntax, please consult for example <a
-href="http://en.wikipedia.org/wiki/Regular_expression">Wikipedia
-regexp article</a> and the references therein.
+searches is the <strong>regular expression search</strong>, introduced
+by slashes instead of quotes.  For example, the above partial phrase
+query <code>'muon decay'</code> is fully equivalent to the regular
+expression query <code>/muon decay/</code>.  The regular expression
+syntax is very powerful and permits you to construct very complex
+queries.  For more information, please consult the <a
+href="#regexp">regular expression</a> section of this guide.
 
 <h3><a name="boolean">
 <en>Boolean queries</en>
@@ -1224,6 +1193,93 @@ satisfied.
     <code>keyword</code>, <code>year</code>, <code>experiment</code>,
     <code>fulltext</code>, and <code>reference</code>.
 
+<h3><a name="regexp">
+<en>Regular expressions</en>
+<fr>Regular expressions</fr>
+<de>Regular expressions</de>
+<es>Regular expressions</es>
+<pt>Regular expressions</pt>
+<it>Regular expressions</it>
+<ru>Regular expressions</ru>
+<sk>Regular expressions</sk>
+<cz>Regular expressions</cz>
+<no>Regular expressions</no>
+<se>Regular expressions</se>
+</a></h3>
+
+<p>The regular expression searching mode is mostly for the power users
+acquainted with the traditional Unix/POSIX regexp syntax.  In the
+Simple Search interface you can trigger it by using slashes instead of
+quotes:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="title:/^E.*s$/">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+while in the Advanced Search interface you can select the matching
+type explicitely by using the selection box menu.  The above example
+will find all the titles that start by the letter <em>E</em>, followed
+by any number of any characters, and end by the letter <em>s</em>.
+
+<p>Another example could be an author search for an author expressed
+in the database as either <em>Ellis, J</em> or <em>Ellis, John</em>:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="author:/^Ellis, (J|John)$/">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+<p>The regular expression search enables you to formulate very
+specific word proximity queries.  For example, let us find all titles
+containing words <em>dense</em> and <em>matter</em> that are separated
+by at most one word that doesn't contain the letter <em>l</em>:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="title:/dense ([^ l]* )?matter/">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+  
+<p>Note that you can also use character intervals such as
+<code>[a-k]</code> and occurrence counts such as <code>{3}</code>.
+For example, let us find all preprints that do not follow the year
+cataloguing policy, that is <em>YYYY</em> to denote year, optionally
+followed by <em>?</em> or by another <em>-YYYY</em>:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="collection:PREPRINT -year:/^[0-9]{4}([\?\-]|\-[0-9]{4})?$/">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+You can use also character classes such <code>[:alnum:]</code>, so
+that the above query is equivalent to:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="collection:PREPRINT -year:/^[[:digit:]]{4}([\?\-]|\-[[:digit:]]{4})?$/">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+<p>To learn more about POSIX regular expressions, please consult the
+<a href="http://en.wikipedia.org/wiki/Regular_expression">Wikipedia
+regexp article</a> and the <a
+href="http://dev.mysql.com/doc/mysql/en/Regexp.html">MySQL regexp
+documentation</a>.
+
 <h3><a name="span">
 <en>Span queries</en>
 <fr>Span queries</fr>
@@ -1244,7 +1300,7 @@ between <em>1983</em> and <em>1992</em>, type:
 
       <form action="<WEBURL>/search.py" method="get">
       <blockquote>
-      <input size=60 type="text" name="p" value="muon decay year:1983->1992">
+      <input size=30 type="text" name="p" value="muon decay year:1983->1992">
       <select name="f"><option value="">any field<option>title<option>author</select>
       <input class="formbutton" type="submit" name="action" value="SEARCH">
       </blockquote>
@@ -1255,7 +1311,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
 
       <form action="<WEBURL>/search.py" method="get">
       <blockquote>
-      <input size=60 type="text" name="p" value="author:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;">
+      <input size=30 type="text" name="p" value="author:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;">
       <select name="f"><option value="">any field<option>title<option>author</select>
       <input class="formbutton" type="submit" name="action" value="SEARCH">
       </blockquote>
@@ -1500,6 +1556,22 @@ false positives.  The search is relatively slow.
 of compound family names such <em>Pepe-Altarelli, M</em> or <em>'t
 Hooft, G</em> where a casual user query for <em>Hooft, G</em> would
 match the wanted author, unlike the methods mentioned above.)
+
+<li>Finally, let us note that you can use the <a href="#regexp">regular
+expression syntax</a> to construct any complex author query.  A simple
+example is to search for an author expressed in the database as either
+<em>Ellis, J</em> or <em>Ellis, John</em>:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="author:/^Ellis, (J|John)$/">
+      <select name="f"><option value="">any field<option>title<option selected>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+Please consult <a href="#regexp">regular expression searching tips</a>
+to know more about regular expression search possibilities.
 
 </ol>
 
