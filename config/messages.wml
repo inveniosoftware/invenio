@@ -39,6 +39,8 @@
   <es>Página principal</es>
   <it>Pagina principale</it>
   <ru>Главная страница</ru>
+  <sk>Hlavná stránka</sk>
+  <cz>Hlavní stránka</cz>
 </define-tag>
 
 <define-tag MSG_SEARCH whitespace=delete>
@@ -48,6 +50,8 @@
   <es>Buscar</es>
   <it>Ricercare</it>
   <ru>Поиск</ru>
+  <sk>Hľadaj</sk>
+  <cz>Hledej</cz>
 </define-tag>
 
 <define-tag MSG_SUBMIT whitespace=delete>
@@ -57,6 +61,8 @@
   <es>Someta</es>
   <it>Invio</it>
   <ru>Придать</ru>
+  <sk>Pridaj</sk>
+  <cz>Přidej</cz>
 </define-tag>
 
 <define-tag MSG_HELP whitespace=delete>
@@ -66,6 +72,8 @@
   <es>Ayuda</es>
   <it>Aiuto</it>
   <ru>Помощь</ru>
+  <sk>Pomoc</sk>
+  <cz>Nápověda</cz>
 </define-tag>
 
 <define-tag MSG_HELP_CENTRAL whitespace=delete>
@@ -74,7 +82,9 @@
   <de>Hilfezentrale</de>
   <es>Central de la Ayuda</es>
   <it>Aiuto</it>
-  <ru>Централа помощи</ru>
+  <ru>Централа Помощи</ru>
+  <sk>Centrála Pomoci</sk>
+  <cz>Centrála Nápovědy</cz>
 </define-tag>
 
 <define-tag MSG_SEARCH_HELP whitespace=delete>
@@ -84,6 +94,8 @@
   <es>Ayuda de Búsqueda</es>
   <it>Aiuto alla Ricerca</it>
   <ru>Помощь для поиска</ru>
+  <sk>Pomoc pri vyhľadávaní</sk>
+  <cz>Pomoc při vyhledávaní</cz>
 </define-tag>
 
 <define-tag MSG_SEARCH_TIPS whitespace=delete>
@@ -93,6 +105,8 @@
   <es>Sugerencias de búsqueda</es>
   <it>Consigli per la Ricerca</it>
   <ru>Указания дла поиска</ru>
+  <sk>Tipy pre vyhľadávanie</sk>
+  <cz>Tipy pro vyhledávaní</cz>
 </define-tag>
 
 <define-tag MSG_PERSONALIZE whitespace=delete>
@@ -102,6 +116,8 @@
   <es>Personalice</es>
   <it>Personalizzazione</it>
   <ru>Персоналузовать</ru>
+  <sk>Personalizácia</sk>
+  <cz>Personalizace</cz>
 </define-tag>
 
 <define-tag MSG_PAGE_BEING_TRANSLATED_HEAD whitespace=delete>
@@ -111,6 +127,8 @@
   <es>VERSIÓN EN ESPAÑOL DISPONIBLE PRÓXIMAMENTE</es>
   <it>TRADUZIONE ITALIANA DISPONIBLE PROSSIMAMENTE</it>
   <ru>ПЕРЕВОД НА РУССКИЙ ЯЗЫК НЕ ГОТОВ</ru>
+  <sk>PREKLAD DO SLOVENČINY SA PRIPRAVUJE</sk>
+  <cz>PŘEKLAD DO ČEŠTINY SE PŘIPRAVUJE</cz>
 </define-tag>
 
 <define-tag MSG_PAGE_BEING_TRANSLATED_BODY>
@@ -141,6 +159,16 @@
   <ru>
      Перевод етой страницы на русский язык не готов. Упрашаем пользоваться английским вариантом. Спосибо дла сознания.
   </ru>
+  <sk>
+     Slovenský preklad tejto stránky nie je ukončený.
+     Prosíme použite anglickú verziu uvedenú nižšie.
+     Ďakujeme za pochopenie.
+  </sk>
+  <cz>
+     Český překlad této stránky není ukončen.
+     Prosíme použijte anglickou verzi uvedenou níže.
+     Děkujeme za pochopení.
+  </cz>
 </define-tag>
 
 <define-tag MSG_POWERED_BY whitespace=delete>
@@ -150,6 +178,8 @@
   <es>Powered by</es>
   <it>Powered by</it>
   <ru>Powered by</ru>
+  <sk>Powered by</sk>
+  <cz>Powered by</cz>
 </define-tag>
 
 <define-tag MSG_MAINTAINED_BY whitespace=delete>
@@ -159,6 +189,8 @@
   <es>Mantenido cerca</es>
   <it>Mantenuto da</it>
   <ru>Содержаиет</ru>
+  <sk>Spravuje</sk>
+  <cz>Spravuje</cz>
 </define-tag>
 
 <define-tag MSG_LAST_UPDATED whitespace=delete>
@@ -168,6 +200,8 @@
   <es>Última modificación</es>
   <it>Ultimo aggiornamento</it>
   <ru>Последнеие изменение</ru>
+  <sk>Posledná aktualizácia</sk>
+  <cz>Poslední aktualizace</cz>
 </define-tag>
 
 <define-tag MSG_NARROW_SEARCH whitespace=delete>
@@ -177,6 +211,8 @@
   <es>Narrow search:</es>
   <it>Ricerca ristretta:</it>
   <ru>Сузить поиск:</ru>
+  <sk>Zúžiť hľadanie na:</sk>
+  <cz>Zúžit hledání na:</cz>
 </define-tag>
 
 <define-tag MSG_FOCUS_ON whitespace=delete>
@@ -186,6 +222,8 @@
   <es>Focus on:</es>
   <it>Focus on:</it>
   <ru>Устремление для:</ru>
+  <sk>Zameranie na:</sk>
+  <cz>Zaměření na:</cz>
 </define-tag>
 
 <define-tag MSG_SIMPLE_SEARCH whitespace=delete>
@@ -194,7 +232,9 @@
   <de>Einfache Suche</de>
   <es>Búsqueda Básica</es>
   <it>Ricerca Semplice</it>
-  <ru>Простой поиск</ru>
+  <ru>Простой Поиск</ru>
+  <sk>Jednoduché Hľadanie</sk>
+  <cz>Jednoduché Hledání</cz>
 </define-tag>
 
 <define-tag MSG_ADVANCED_SEARCH whitespace=delete>
@@ -204,6 +244,8 @@
   <es>Búsqueda Avanzada</es>
   <it>Ricerca Avanzata</it>
   <ru>Расширенный поиск</ru>
+  <sk>Rozšírené Hľadanie</sk>
+  <cz>Rozšířené Hledání</cz>
 </define-tag>
 
 <define-tag MSG_COLLECTION_NOT_FOUND_HEAD whitespace=delete>
@@ -211,8 +253,10 @@
   <fr>Collection %s Introuvable</fr>
   <de>Kollektion %s nicht gefunden</de>
   <es>Collection %s Not Found</es>
-  <it>Raccolta %s Non Trouvata</it>
+  <it>Collezione %s Non Trouvata</it>
   <ru>Коллекция %s не существует</ru>
+  <sk>Kolekcia %s Nenájdená</sk>
+  <cz>Kolekcia %s Nenalezena</cz>
 </define-tag>
 
 <define-tag MSG_COLLECTION_NOT_FOUND_BODY whitespace=delete>
@@ -233,13 +277,21 @@
     <p>You may want to start browsing from <a href="%s">%s</a>.
   </es>
   <it>
-    <p>Spiacenti, la raccolta <strong>%s</strong> non sembra esistere.
+    <p>Spiacenti, collezione <strong>%s</strong> non sembra esistere.
     <p>Provate a tare la ricera a partire da <a href="%s">%s</a>.
   </it>
   <ru>
     <p>Извините, коллекция <strong>%s</strong> неествует.
     <p>Испробуйте начать просмотривать из <a href="%s">%s</a>.
   </ru>
+  <sk>
+    <p>Ľutujeme, kolekcia <strong>%s</strong> neexistuje.
+    <p>Skúste začať hľadať od <a href="%s">%s</a>.     
+  </sk>
+  <cz>
+    <p>Litujeme, kolekce <strong>%s</strong> neexistuje.
+    <p>Zkuste začít hledat od <a href="%s">%s</a>.     
+  </cz>
 </define-tag>
 
 <define-tag MSG_ACCOUNT whitespace=delete>
@@ -249,6 +301,8 @@
   <es>account</es>
   <it>conto</it>
   <ru>счёт</ru>
+  <sk>konto</sk>
+  <cz>konto</cz>
 </define-tag>
 
 <define-tag MSG_ALERTS whitespace=delete>
@@ -258,6 +312,8 @@
   <es>alerts</es>
   <it>allerta</it>
   <ru>авизо</ru>
+  <sk>avíza</sk>
+  <cz>avíza</cz>
 </define-tag>
 
 <define-tag MSG_BASKETS whitespace=delete>
@@ -267,6 +323,8 @@
   <es>baskets</es>
   <it>paniere</it>
   <ru>корзины</ru>
+  <sk>košíky</sk>
+  <cz>košíky</cz>
 </define-tag>
 
 <define-tag MSG_SESSION whitespace=delete>
@@ -276,6 +334,8 @@
   <es>session</es>
   <it>sessione</it>
   <ru>сеанс</ru>
+  <sk>seansa</sk>
+  <cz>seance</cz>
 </define-tag>
 
 <define-tag MSG_LOGIN whitespace=delete>
@@ -285,6 +345,8 @@
   <es>login</es>
   <it>login</it>
   <ru>записатсья</ru>
+  <sk>prihlásiť</sk>
+  <cz>přihlásit</cz>
 </define-tag>
 
 <define-tag MSG_LOGOUT whitespace=delete>
@@ -294,6 +356,8 @@
   <es>logout</es>
   <it>logout</it>
   <ru>выписатсья</ru>
+  <sk>odhlásiť</sk>
+  <cz>odhlásit</cz>
 </define-tag>
 
 <define-tag MSG_LANGUAGE whitespace=delete>
@@ -303,6 +367,8 @@
   <es>lengua:</es>
   <it>lingua:</it>
   <ru>язык</ru>
+  <sk>jazyk:</sk>
+  <cz>jazyk:</cz>
 </define-tag>
 
 <define-tag MSG_BROWSE whitespace=delete>
@@ -312,6 +378,8 @@
   <es>Hojee</es>
   <it>Sfogliare</it>
   <ru>Просмотрить</ru>
+  <sk>Prelistuj</sk>
+  <cz>Prolistuj</cz>
 </define-tag>
 
 <define-tag MSG_SEARCH_RECORDS_FOR whitespace=delete>
@@ -319,8 +387,10 @@
   <fr>Cherchez dans %s notices:</fr>
   <de>Suchen durch %s Datensätze für:</de>
   <es>Buscar %s records for:</es>
-  <it>Ricerca %s for:</it>
+  <it>Ricerca %s registrazioni:</it>
   <ru>Искать %s запускоб для:</ru>
+  <sk>Hľadaj v %s záznamoch:</sk>
+  <cz>Hledej v %s záznamech:</cz>
 </define-tag>
 
 <define-tag MSG_ANY_FIELD whitespace=delete>
@@ -330,6 +400,8 @@
   <es>any field</es>
   <it>tutti i campi</it>
   <ru>любое поле</ru>
+  <sk>všetky polia</sk>
+  <cz>všechna pole</cz>
 </define-tag>
 
 <define-tag MSG_TITLE whitespace=delete>
@@ -339,6 +411,8 @@
   <es>title</es>
   <it>titolo</it>
   <ru>титр</ru>
+  <sk>názov</sk>
+  <cz>název</cz>
 </define-tag>
 
 <define-tag MSG_AUTHOR whitespace=delete>
@@ -348,6 +422,8 @@
   <es>author</es>
   <it>autore</it>
   <ru>автор</ru>
+  <sk>autor</sk>
+  <cz>autor</cz>
 </define-tag>
 
 <define-tag MSG_REPORT_NUMBER whitespace=delete>
@@ -357,6 +433,8 @@
   <es>report number</es>
   <it>numero del rapporto</it>
   <ru>номер рапорта</ru>
+  <sk>číslo správy</sk>
+  <cz>číslo zprávy</cz>
 </define-tag>
 
 <define-tag MSG_YEAR whitespace=delete>
@@ -366,6 +444,8 @@
   <es>year</es>
   <it>anno</it>
   <ru>год</ru>
+  <sk>rok</sk>
+  <cz>rok</cz>
 </define-tag>
 
 <define-tag MSG_ABSTRACT whitespace=delete>
@@ -375,6 +455,8 @@
   <es>abstract</es>
   <it>riasunto</it>
   <ru>абстракт</ru>
+  <sk>abstrakt</sk>
+  <cz>abstrakt</cz>
 </define-tag>
 
 <define-tag MSG_KEYWORD whitespace=delete>
@@ -384,6 +466,8 @@
   <es>keyword</es>
   <it>parola chiave</it>
   <ru>клюцевое слово</ru>
+  <sk>kľúčové slovo</sk>
+  <cz>klíčové slovo</cz>
 </define-tag>
 
 <define-tag MSG_FULLTEXT whitespace=delete>
@@ -393,6 +477,8 @@
   <es>fulltext</es>
   <it>testo completo</it>
   <ru>польный текст</ru>
+  <sk>plný text</sk>
+  <cz>plný text</cz>
 </define-tag>
 
 <define-tag MSG_REFERENCE whitespace=delete>
@@ -402,6 +488,8 @@
   <es>reference</es>
   <it>referenza</it>
   <ru>референция</ru>
+  <sk>referencie</sk>
+  <cz>reference</cz>
 </define-tag>
 
 <define-tag MSG_ALL_OF_THE_WORDS whitespace=delete>
@@ -411,6 +499,8 @@
   <es>All of the words:</es>
   <it>Tutte la parole:</it>
   <ru>Все слова:</ru>
+  <sk>Všetky tieto slová:</sk>
+  <cz>Všechna tato slova:</cz>
 </define-tag>
 
 <define-tag MSG_ANY_OF_THE_WORDS whitespace=delete>
@@ -420,6 +510,8 @@
   <es>Any of the words:</es>
   <it>Almeno una parola:</it>
   <ru>Любое слова:</ru>
+  <sk>Jedno zo slov:</sk>
+  <cz>Jedno ze slov:</cz>
 </define-tag>
 
 <define-tag MSG_EXACT_PHRASE whitespace=delete>
@@ -429,6 +521,8 @@
   <es>Exact phrase:</es>
   <it>Espressione esatta:</it>
   <ru>Тоцная фраза:</ru>
+  <sk>Presná veta:</sk>
+  <cz>Přesná věta:</cz>
 </define-tag>
 
 <define-tag MSG_PARTIAL_PHRASE whitespace=delete>
@@ -438,6 +532,8 @@
   <es>Partial phrase:</es>
   <it>Espressione parziale:</it>
   <ru>Парциальная фраза:</ru>
+  <sk>Čiastočná veta:</sk>
+  <cz>Částečná věta:</cz>
 </define-tag>
 
 <define-tag MSG_REGULAR_EXPRESSION whitespace=delete>
@@ -447,6 +543,8 @@
   <es>Regular expression:</es>
   <it>Espressione regulare:</it>
   <ru>Регулярное выраение:</ru>
+  <sk>Regulárny výraz:</sk>
+  <cz>Regulární výraz:</cz>
 </define-tag>
 
 <define-tag MSG_AND whitespace=delete>
@@ -454,8 +552,10 @@
   <fr>ET</fr>
   <de>UND</de>
   <es>AND</es>
-  <it>AND</it>
+  <it>E</it>
   <ru>И</ru>
+  <sk>A</sk>
+  <cz>A</cz>
 </define-tag>
 
 <define-tag MSG_OR whitespace=delete>
@@ -463,8 +563,10 @@
   <fr>OU</fr>
   <de>ODER</de>
   <es>OU</es>
-  <it>OR</it>
+  <it>OPPURE</it>
   <ru>ИЛИ</ru>
+  <sk>ALEBO</sk>
+  <cz>NEBO</cz>
 </define-tag>
 
 <define-tag MSG_AND_NOT whitespace=delete>
@@ -472,8 +574,10 @@
   <fr>ET NON PAS</fr>
   <de>UND NICHT</de>
   <es>AND NOT</es>
-  <it>AND NOT</it>
+  <it>E NON</it>
   <ru>И НЕТ</ru>
+  <sk>A NIE</sk>
+  <cz>A NE</cz>
 </define-tag>
 
 <define-tag MSG_SEARCH_RESULTS whitespace=delete>
@@ -483,6 +587,8 @@
   <es>Search Results</es>
   <it>Risultato della ricerca</it>
   <ru>Результаты Поиска</ru>
+  <sk>Výsledky hľadania</sk>
+  <cz>Výsledky hledání</cz>
 </define-tag>
 
 <define-tag MSG_TRY_YOUR_SEARCH_ON whitespace=delete>
@@ -492,6 +598,8 @@
   <es>Try your search on:</es>
   <it>Provate la ricerca su</it>
   <ru>Испробуйте искать на:</ru>
+  <sk>Skúste hľadať na:</sk>
+  <cz>Zkuste hledat na:</cz>
 </define-tag>
 
 <define-tag MSG_SORT_BY whitespace=delete>
@@ -501,6 +609,8 @@
   <es>Sort by:</es>
   <it>Selezione per:</it>
   <ru>Сортировать по:</ru>
+  <sk>Utrieďte podľa:</sk>
+  <cz>Setřiďte podle:</cz>
 </define-tag>
 
 <define-tag MSG_LATEST_FIRST whitespace=delete>
@@ -510,6 +620,8 @@
   <es>latest first</es>
   <it>latest first</it>
   <ru>последний запуск сперва</ru>
+  <sk>posledný záznam najskôr</sk>
+  <cz>poslední záznam nejdříve</cz>
 </define-tag>
 
 <define-tag MSG_ASCENDING whitespace=delete>
@@ -519,6 +631,8 @@
   <es>asc.</es>
   <it>asc.</it>
   <ru>восх.</ru>
+  <sk>vzost.</sk>
+  <cz>vzest.</cz>
 </define-tag>
 
 <define-tag MSG_DESCENDING whitespace=delete>
@@ -528,6 +642,8 @@
   <es>desc.</es>
   <it>desc.</it>
   <ru>нисх.</ru>
+  <sk>zost.</sk>
+  <cz>sest.</cz>
 </define-tag>
 
 <define-tag MSG_DISPLAY_RESULTS whitespace=delete>
@@ -537,6 +653,8 @@
   <es>Display results:</es>
   <it>Visualizzare:</it>
   <ru>Изобразить результаты:</ru>
+  <sk>Zobraziť výsledky:</sk>
+  <cz>Zobrazit výsledky:</cz>
 </define-tag>
 
 <define-tag MSG_RESULTS whitespace=delete>
@@ -546,6 +664,8 @@
   <es>results</es>
   <it>risultati</it>
   <ru>результаты</ru>
+  <sk>výsledky</sk>
+  <cz>výsledky</cz>
 </define-tag>
 
 <define-tag MSG_SINGLE_LIST whitespace=delete>
@@ -555,6 +675,8 @@
   <es>single list</es>
   <it>elenco unico</it>
   <ru>один опись</ru>
+  <sk>jediný list</sk>
+  <cz>jediný list</cz>
 </define-tag>
 
 <define-tag MSG_SPLIT_BY_COLLECTION whitespace=delete>
@@ -564,6 +686,8 @@
   <es>split by collection</es>
   <it>raggrupato per collezione</it>
   <ru>поделит дла коллекции</ru>
+  <sk>zhromaždené podľa kolekcií</sk>
+  <cz>shromážděné podle kolekcí</cz>
 </define-tag>
 
 <define-tag MSG_OUTPUT_FORMAT whitespace=delete>
@@ -573,6 +697,8 @@
   <es>Output format:</es>
   <it>Formato d'uscita</it>
   <ru>Выходной формат</ru>
+  <sk>Výstupný formát:</sk>
+  <cz>Výstupní formát:</cz>
 </define-tag>
 
 <define-tag MSG_BRIEF whitespace=delete>
@@ -582,6 +708,8 @@
   <es>brief</es>
   <it>corto</it>
   <ru>краткий</ru>
+  <sk>stručný</sk>
+  <cz>stručný</cz>
 </define-tag>
 
 <define-tag MSG_DETAILED whitespace=delete>
@@ -591,6 +719,8 @@
   <es>detailed</es>
   <it>dettagliato</it>
   <ru>подробный</ru>
+  <sk>podrobný</sk>
+  <cz>podrobný</cz>
 </define-tag>
 
 <define-tag MSG_DETAILED_RECORD whitespace=delete>
@@ -598,8 +728,10 @@
   <fr>Notice détaillée</fr>
   <de>Details vom Eintrag</de>
   <es>Detailed record</es>
-  <it>Detailed record</it>
+  <it>Registrazione dettagliata</it>
   <ru>Подробный запуск</ru>
+  <sk>Podrobný záznam</sk>
+  <cz>Podrobný záznam</cz>
 </define-tag>
 
 <define-tag MSG_RESULTS_OVERVIEW_FOUND_X_RECORDS_IN_Y_SECONDS whitespace=delete>
@@ -616,11 +748,17 @@
     <strong>Results overview:</strong> Found <strong>%s</strong> records in %.2f seconds.
   </es>
   <it>
-    <strong>Results overview:</strong> Found <strong>%s</strong> records in %.2f seconds.
+    <strong>Vista d'insieme dei resultati:</strong> Trovati <strong>%s</strong> registrazioni in %.2f seconds.
   </it>
   <ru>
     <strong>Конспект результата:</strong> Найдено <strong>%s</strong> запускоб за %.2f секунды.
   </ru>
+  <sk>
+    <strong>Prehľad výsledkov:</strong> Nájdených <strong>%s</strong> záznamov za %.2f sekúnd.
+  </sk>
+  <cz>
+    <strong>Přehled výsledků:</strong> Nalezeno <strong>%s</strong> záznamů za %.2f vteřin.
+  </cz>
 </define-tag>
 
 <define-tag MSG_X_RECORDS_FOUND whitespace=delete>
@@ -628,8 +766,10 @@
   <fr><strong>%s</strong> notices trouvées</fr>
   <de><strong>%s</strong> Datensätze gefunden</de>
   <es><strong>%s</strong> records found</es>
-  <it><strong>%s</strong> records found</it>
+  <it><strong>%s</strong> registrazioni found</it>
   <ru><strong>%s</strong> запусков найдено</ru>
+  <sk><strong>%s</strong> záznamov nájdených</sk>
+  <cz><strong>%s</strong> záznamů nalezeno</cz>
 </define-tag>
 
 <define-tag MSG_JUMP_TO_RECORD whitespace=delete>
@@ -637,8 +777,10 @@
   <fr>allez sur la notice:</fr>
   <de>gehen zum Satz:</de>
   <es>jump to record:</es>
-  <it>andare al record:</it>
+  <it>andare alla registrazione:</it>
   <ru>идти к запуску</ru>
+  <sk>skoč na záznam:</sk>
+  <cz>skoč na záznam:</cz>
 </define-tag>
 
 <define-tag MSG_SEARCH_TOOK_X_SECONDS whitespace=delete>
@@ -648,6 +790,8 @@
   <es>Search took %.2f seconds.</es>
   <it>La ricerta ha preso %.2f secondi.</it>
   <ru>Пуск длил %.2f секунд.</ru>
+  <sk>Hľadanie trvalo %.2f sekúnd.</sk>
+  <cz>Hledání trvalo %.2f vteřin.</cz>
 </define-tag>
 
 <define-tag MSG_ADD_TO_BASKET whitespace=delete>
@@ -656,7 +800,9 @@
   <de>IN DEN KORB HINZUFÜGEN</de>
   <es>ADD TO BASKET</es>
   <it>AGGIUNGERE AL PANIERE</it>
-  <ru>придат в корзину</ru>
+  <ru>ПРИДАТ В КОРЗИНУ</ru>
+  <sk>PRIDAŤ DO KOŠÍKA</sk>
+  <cz>PŘIDAT DO KOŠÍKU</cz>
 </define-tag>
 
 <define-tag MSG_COLLECTIONS whitespace=delete>
@@ -664,8 +810,10 @@
   <fr>collections</fr>
   <de>Kollektionen</de>
   <es>collections</es>
-  <it>collections</it>
+  <it>collezioni</it>
   <ru>коллекции</ru>
+  <sk>kolekcie</sk>
+  <cz>kolekce</cz>
 </define-tag>
 
 <define-tag MSG_ANY_COLLECTION whitespace=delete>
@@ -673,8 +821,10 @@
   <fr>toutes les collections</fr>
   <de>alle Kollektionen</de>
   <es>any collection</es>
-  <it>any collection</it>
+  <it>una qualunque collezione</it>
   <ru>любая коллекция</ru>
+  <sk>všetky kolekcie</sk>
+  <cz>všechny kolekce</cz>
 </define-tag>
 
 <define-tag MSG_ADD_ANOTHER_COLLECTION whitespace=delete>
@@ -682,8 +832,10 @@
   <fr>ajouter une nouvelle collection</fr>
   <de>Neue Kollektion hinzufügen</de>
   <es>add another collection</es>
-  <it>add another collection</it>
+  <it>aggiungere un'altra collezione</it>
   <ru>придат коллекцию</ru>
+  <sk>pridať kolekciu</sk>
+  <cz>přidat kolekci</cz>
 </define-tag>
 
 ## end of file
