@@ -35,6 +35,6 @@ kb_2 = SELECT id_bibrec,value FROM bib93x,bibrec_bib93x WHERE tag='938__f' AND i
 kb_3 = SELECT id_bibrec,value FROM bib21x,bibrec_bib21x WHERE tag='210__a' AND id_bibxxx=id
 kb_4 = url_%s
 
-create_0 = file,,%(kb_1_filter)s,,file,,%(kb_1)s
-#create_0 = ,, ,,www,,%(kb_4)s,,%(url_regexp)s
+#create_0 = file,,%(kb_1_filter)s,,file,,%(kb_1)s
+create_0 = ,, ,,www,,%(kb_4)s,,%(url_regexp)s
 #create_0 = ,, ,,db,,%(kb_2)s,,%(kb_3)s

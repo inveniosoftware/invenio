@@ -1205,45 +1205,68 @@ def update_rnkWORD(table, terms):
     Gi = {}
     Nj = {}
     N = run_sql("select count(id_bibrec) from %sR" % table[:-1])[0][0]
- 
-    write_message("Beginning post-processing of %s terms" % len(terms))
-    if len(terms) == 0:
+     
+    if len(terms) == 0 and options["quick"] == "yes":
         write_message("No terms to process, ending...")
         return ""
+    elif options["quick"] == "yes": #not used -R option, fast calculation (not accurate)       
+        write_message("Beginning post-processing of %s terms" % len(terms))
+       
+        #Locating all documents related to the modified/new/deleted terms, if fast update, 
+        #only take into account new/modified occurences
+        write_message("Phase 1: Finding records containing modified terms")      
+        terms = terms.keys()
+        i = 0 
 
-    #Locating all documents related to the modified/new/deleted terms, if fast update, 
-    #only take into account new/modified occurences
-    write_message("Phase 1: Finding records containing modified terms")      
-    terms = terms.keys()
-    i = 0 
-
-    while i < len(terms):
-        terms_docs = get_from_forward_index(terms, i, (i+5000), table)
-        for (t, hitlist) in terms_docs: 
-            term_docs = deserialize_via_marshal(hitlist)
-            if term_docs.has_key("Gi"):
-                del term_docs["Gi"]
-	    for (j, tf) in term_docs.iteritems():
-                if (options["quick"] == "yes" and tf[1] == 0) or options["quick"] == "no":
-                    Nj[j] = 0
-        write_message("Phase 1: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
-        i += 5000
-    write_message("Phase 1: Finished finding records containing modified terms")
+        while i < len(terms):
+            terms_docs = get_from_forward_index(terms, i, (i+5000), table)
+            for (t, hitlist) in terms_docs: 
+                term_docs = deserialize_via_marshal(hitlist)
+                if term_docs.has_key("Gi"):
+                    del term_docs["Gi"]
+	        for (j, tf) in term_docs.iteritems():
+                    if (options["quick"] == "yes" and tf[1] == 0) or options["quick"] == "no":
+                        Nj[j] = 0
+            write_message("Phase 1: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
+            i += 5000
+        write_message("Phase 1: Finished finding records containing modified terms")
     
-    #Find all terms in the records found in last phase
-    write_message("Phase 2: Finding all terms in affected records")
-    records = Nj.keys()   
-    i = 0
-    while i < len(records):
-        docs_terms = get_from_reverse_index(records, i, (i + 5000), table)
-        for (j, termlist) in docs_terms:
-            doc_terms = deserialize_via_marshal(termlist)
-            for (t, tf) in doc_terms.iteritems(): 
-                 Gi[t] = 0
-        write_message("Phase 2: ......processed %s/%s records " % ((i+5000>len(records) and len(records) or (i+5000)), len(records)))
-    	i += 5000
-    write_message("Phase 2: Finished finding all terms in affected records")
+        #Find all terms in the records found in last phase
+        write_message("Phase 2: Finding all terms in affected records")
+        records = Nj.keys()   
+        i = 0
+        while i < len(records):
+            docs_terms = get_from_reverse_index(records, i, (i + 5000), table)
+            for (j, termlist) in docs_terms:
+                doc_terms = deserialize_via_marshal(termlist)
+                for (t, tf) in doc_terms.iteritems(): 
+                    Gi[t] = 0
+            write_message("Phase 2: ......processed %s/%s records " % ((i+5000>len(records) and len(records) or (i+5000)), len(records)))
+    	    i += 5000
+        write_message("Phase 2: Finished finding all terms in affected records")
 
+    else: #recalculate
+        max_id = run_sql("SELECT MAX(id) FROM %s" % table)
+        max_id = max_id[0][0]
+        write_message("Beginning recalculation of %s terms" % max_id)
+        
+        terms = []
+        i = 0
+        while i < max_id:
+            terms_docs = get_from_forward_index_with_id(i, (i+5000), table)
+            for (t, hitlist) in terms_docs:
+                Gi[t] = 0
+                term_docs = deserialize_via_marshal(hitlist)
+                if term_docs.has_key("Gi"):
+                    del term_docs["Gi"]
+                for (j, tf) in term_docs.iteritems():
+                    Nj[j] = 0
+            write_message("Phase 1: ......processed %s/%s terms" % ((i+5000)>max_id and max_id or (i+5000), max_id))
+            i += 5000
+
+        write_message("Phase 1: Finished finding which records contains which terms")
+        write_message("Phase 2: Jumping over..already done in phase 1 because of -R option")
+ 
     terms = Gi.keys()
     Gi = {}
     i = 0
@@ -1344,6 +1367,10 @@ def get_from_forward_index(terms, start, stop, table):
     for j in range(start, (stop < len(terms) and stop or len(terms))):
         current_terms += "'%s'," % terms[j]
     terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (table,current_terms[:-1]))
+    return terms_docs
+
+def get_from_forward_index_with_id(start, stop, table):
+    terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE id between %s and %s" % (table, start, stop)) 
     return terms_docs
 
 def get_from_reverse_index(records, start, stop, table):
