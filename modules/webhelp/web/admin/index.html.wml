@@ -23,162 +23,361 @@
     navtrail_previous_links="" \
     navbar_select="admin"
 
-Welcome to the <CDSNAME> Administrator's Area.  Here is a short
-description of what you can do, from the point of view of a system
-librarian, an archive manager, and web interface moderators.
+Welcome to the Admin Area of the <CDSNAME>.  You'll find here pointers
+to the available runtime admin-level interfaces and admin-level guides
+on how to configure and run the CDSware system.
 
-<h2>HOWTOs</h2>
 
-<p>The <a href="howto/">HOWTO guides</a> will give you short recipes
-on some of the most frequently encountered administration tasks.
+<p>CDSware comes as a suite of several more or less independent
+modules.  You'll find brief descriptions for each admin module below.
+(More background information on each module may be read in the <a
+href="<WEBURL>/hacking/modules.html">modules overview</a> article.)
 
-<h2>System Administrator and Librarian</h2>
+<h3>Admin HOWTO guides</h3>
 
-<p>The System Librarian will describe the metadata, decide upon MARC tags,
-etc.  He will ensure that there is a homogeneity between various data
-types and collections.  This is because all the bibliographic data is
-stored in the same common space.
-<p>The System Administrator configures the system and makes sure everything
-is working as it should.
+<p><a href="howto/">Admin HOWTO Guides</a> give you you both short and
+not-so-short recipes and thoughts on some of the most frequently
+encountered administrative tasks.  They tend to answer various
+admin-level questions of a rather general level.  The specific tasks
+are better addressed by module-specific guides and interfaces
+presented below.
 
-<p>The system administrator and librarian would most probably be interested in the
-following administrative modules:
+<h3>Data acquisition related modules</h3>
 
-<blockquote>
-<dl>
+<p>The metadata input into a running CDSware system can be done in two
+ways: <em>(i) admin-oriented batch mode</em>,
+i.e. <strong>BibHarvest</strong> to get data from OAI repositories,
+<strong>BibConvert</strong> to convert any input data into XML MARC,
+and <strong>BibUpload</strong> to upload XML MARC files into CDSware;
+and <em>(ii) author-oriented interactive mode</em>,
+i.e. <strong>WebSubmit</strong> to submit documents via Web.  Once the
+data are uploaded in CDSware, you may want to modify them via
+<strong>BibEdit</strong> to edit the metadata.
 
-<dt><a href="bibdata/">BibData Admin</a>  <small class=note>- partially included</small>
+<table border="1" cellpadding="2">
 
-<dd>Enables you to directly manipulate bibliographic data tables.
+<tr>
+ <th class="searchboxheader">Admin Module</th>
+ <th class="searchboxheader">Admin Description</th>
+ <th class="searchboxheader">Admin Interface</th>
+ <th class="searchboxheader">Admin Guide</th>
+</tr>
 
-    <br><em>Example:</em> edit record, change fields, simple cataloguing, global changes, etc.
-<dt><a href="bibrank/">BibRank Admin</a>
+<tr>
+<td>
+  <strong>BibHarvest Admin</strong>
+</td>
+<td>
+  Enables you to configure OAI metadata harvestor for eventual periodical
+  batch upload of data.  For example, you can define from where to
+  harvest, with what periodicity, how to transform data before
+  uploading them into CDSware, etc.
+</td>
+<td>
+  <small class=note>not available, but OAI harvestor and provider are included</small>
+</td>
+<td>
+  <a href="bibharvest/guide.html">BibHarvest Admin Guide</a>
+</td>
+</tr>
 
-<dd>Enables you to configure various ranking methods to be used by the search engine.
+<tr>
+<td>
+  <strong>BibConvert Admin</strong>
+</td>
+<td>
+    Explains how to use bibliographic data convertor. Useful for batch
+    upload of data.  For example, when migrating the metadata from
+    your old system, or when integrating metadata acquisitions from
+    non-OAI sources, or just about any line-based
+    not-so-well-structured metadata.    
+</td>
+<td>
+  <small class=note>command-line program</small>
+</td>
+<td>
+  <a href="bibconvert/guide.html">BibConvert Admin Guide</a>
+</td>
+</tr>
 
-    <br><em>Example:</em> Update old or create new ranking methods when records are modified. etc.
-<dt><a href="bibwords/">BibWords Admin</a> <small class=note>- not included yet</small>
-
-<dd>Enables you to configure "word files", i.e. to define which
-bibliographic fields are indexed into which word indexes.  The word
-indexes are then used by the search interface.  This is an essential
-part of the CDSware system if you have some non-standard data
-structure.  Otherwise, CDSware defines itself some commonly used index
-files (author, title, abstract, keywords, etc).
-
-    <br><em>Example:</em> you can tell that the author index is
-    constructed from <code>100 $a</code> and <code>700 $a</code> bibliographic tags.
-
-</dl>
-</blockquote>
-
-<h2>Archive Manager</h2>
-
-<p>The Archive Manager will work closely with the
-System Librarian and will perform various system tasks like setting up the
-data archives, importing other data sources, converting data formats,
-etc.
-
-<p>The Archive Manager would most probably be interested in the
-following administrative modules:
-
-<blockquote>
-<dl>
-
-<dt><a href="bibharvest/">BibHarvest Admin</a> <small class=note>- not included yet</small>
-
-<dd>Enables you to configure OAI data harvestor for eventual
-periodical batch upload of data.
-
-    <br><em>Example:</em> what to harvest, how to transform data, how
-    to store them into CDSware, etc.
-
-<dt><a href="bibconvert/">BibConvert Admin</a>
-
-<dd>Explains on how to use bibliographic data convertor. Useful for batch upload of data.
-
-    <br><em>Example:</em> migration of data from your old system,
-    automatic acquisitions of non-OAI data and not-so-well-structured
-    data, etc.
-
-<dt><a href="bibupload/">BibUpload Admin</a> <small class=note>- not included yet</small>
-
-<dd>Enables you to configure eventual local special operations to be
+<tr>
+<td>
+  <strong>BibUpload Admin</strong>
+</td>
+<td>
+    Enables you to configure eventual local special operations to be
     done on the data being uploaded.
+</td>
+<td>
+  <small class=note>command-line program</small>
+</td>
+<td>
+  <a href="bibupload/guide.html">BibUpload Admin Guide</a>
+</td>
+</tr>
 
-    <br><em>Note:</em> This is usually not needed, as all the data
-    transformation is usually done via <a
-    href="bibharvest/">BibHarvest</a> and <a
-    href="bibconvert/">BibConvert</a>.
-
-</dl>
-</blockquote>
-
-<h2>Web Interface Moderators</h2>
-
-<p>The Web Interface Moderators will work closely with the Archive
-Manager and will determine the way how the data is presented to the
-end user.  They will decide upon output formats, will configure search
-pages for different collections, will decide upon submission and
-approval policies of various data types, etc.
-
-<p>The Web Interface Moderators would most probably be interested
-in the following administrative modules:
-
-<blockquote>
-<dl>
-
-<dt><a href="bibformat/">BibFormat Admin</a>
-
-<dd>Enables you to specify how the bibliographic data is presented to
-    the end user in the search interface.  BibFormat is not only a
-    bibliographic data formatter, but also an external link resolver.
-    e.g. to propose published version links to publishers' sites.
-
-    <br><em>Example:</em> you can decide that titles should be
-    presented in bold font, that for each author an automatic link to
-    author's home page should be created according to some receipt, or
-    that for certain report number a special action should be
-    performed, etc.
-
-<dt><a href="webaccess/">WebAccess Admin</a> <small class=note>- included</small>
-
-<dd>Enables you to define who has got access or admin rights on various CDSware modules.
-
-    <br><em>Example:</em> you can tell that John is the bibliographic
-    data manager, that Jim can modify search interface pages, that
-    Jill is submission approval editor, etc.
-
-<dt><a href="websearch/">WebSearch Admin</a> <small class=note>- partially include</small>
-
-<dd>Enables you to configure the search interface for various data collections.
-
-    <br><em>Example:</em> you can define different page header,
-    footer, and portal boxes (left, right, top, bottom) to describe
-    various data collections.  Also, you can define search options,
-    search fields, and search examples, etc.
-
-    <br><em>Note:</em> This is an essential part of the CDSware system, so
-    you most probably want to configure it.
-
-<dt><a href="websubmit/">WebSubmit Admin</a> <small class=note>- included</small>
-
-<dd>Enables you to configure the submit interface and logic for various data types.
-
-    <br><em>Example:</em> you can define metadata fields for various
-    data types, what to do with the inputted values before uploading,
+<tr>
+<td>
+  <strong>WebSubmit Admin</strong>
+</td>
+<td>
+    Enables you to configure the submit interface and logic for various document types.
+    For example, you can define which metadata fields should be submitted for various
+    doctypes, what to do with the inputted values before uploading,
     possible peer review and approval strategy, etc.
+</td>
+<td>
+  <a href="websubmit/">WebSubmit Admin Interface</a>
+</td>
+<td>
+  <a href="websubmit/guide/">WebSubmit Admin Guide</a>
+</td>
+</tr>
 
-    <br><em>Note:</em> This is an essential part of the CDSware system, so
-    you most probably want to configure it.
+<tr>
+<td>
+  <strong>BibEdit Admin</strong>
+</td>
+<td>
+  Enables you to directly manipulate bibliographic data, edit a single
+  record, do global replacements, and other cataloguing tasks.
+</td>
+<td>
+  <small class=note>not available, but see the guide for the command-line way</small>
+</td>
+<td>
+  <a href="bibedit/guide.html">BibEdit Admin Guide</a>
+</td>
+</tr>
 
-<dt><a href="webperso/">WebPerso Admin</a> <small class=note>- not included yet</small>
+</table>
 
-<dd>Enables you to manage user accounts and various user personalisation features
-    like user-defined baskets and alert queries.
+<h3>Data provision related modules</h3>
 
-    <br><em>Example:</em> you can run and/or stop alerting engine,
-    clean user and session tables, modfify user baskets, etc.
+<p>The metadata output from a running CDSware system to the end-user
+is covered by several modules: <strong>BibIndex</strong> to index the
+metadata, <strong>BibRank</strong> to eventually rank them,
+<strong>BibFormat</strong> to format them for the output,
+<strong>WebSearch</strong> to provide search interfaces and search
+engine.
 
-</dl>
-</blockquote>
+<table border="1">
+
+<tr>
+ <th class="searchboxheader">Admin Module</th>
+ <th class="searchboxheader">Admin Description</th>
+ <th class="searchboxheader">Admin Interface</th>
+ <th class="searchboxheader">Admin Guide</th>
+</tr>
+
+<tr>
+<td>
+  <strong>BibIndex Admin</strong>
+</td>
+<td>
+  Enables you to configure "word files", i.e. to define which
+  bibliographic fields are indexed into which word indexes.  The word
+  indexes are then used by the search interface.  For example, you can
+  define that the logical author index is constructed from physical
+  <code>100 $a</code> and <code>700 $a</code> bibliographic tags, you
+  can force reindexing of the fulltext index, etc.
+</td>
+<td>
+  <small class=note>not available, but see the guide for the command-line way</small>
+</td>
+<td>
+  <a href="bibindex/guide.html">BibIndex Admin Guide</a>
+</td>
+</tr>
+
+<tr>
+<td>
+  <strong>BibRank Admin</strong>
+</td>
+<td>
+  Enables you to configure various ranking methods to be used by the search engine.
+  You can rebalance existing ranking sets, create new ranking methods, etc.
+</td>
+<td>
+  <a href="bibrank/">BibRank Admin Interface</a>
+</td>
+<td>
+  <a href="bibrank/guide.html">BibRank Admin Guide</a>
+</td>
+</tr>
+
+<tr>
+<td>
+  <strong>BibFormat Admin</strong>
+</td>
+<td>
+    Enables you to specify how the bibliographic data is presented to
+    the end user in the search interface.  You can decide that titles should be
+    presented in bold font, that for each author an automatic link to
+    author's home page should be created according to some receipt, etc.
+    
+</td>
+<td>
+  <a href="bibformat/">BibFormat Admin Interface</a>
+</td>
+<td>
+  <a href="bibformat/guide.html">BibFormat Admin Guide</a>
+</td>
+</tr>
+
+<tr>
+<td>
+  <strong>WebSearch Admin</strong>
+</td>
+<td>
+    Enables you to configure the search interface for various metadata
+    collections.  You can define new collections and organize them in
+    the tree, you can define various portalboxes that would appear on
+    the screen, you can define search options and search fields to
+    present, etc.
+</td>
+<td>
+  <a href="websearch/">WebSearch Admin Interface</a>
+</td>
+<td>
+  <a href="websearch/guide.html">WebSearch Admin Guide</a>
+</td>
+</tr>
+
+</table>
+
+<h3>Personalization related modules</h3>
+
+<p>The CDSware interface can be personalized to suit different needs
+of different end-users.  This functionality is covered by several
+modules: <strong>WebSession</strong> to identify users and their
+personal configurations, <strong>WebBasket</strong> to provide
+personal baskets or document carts, and <strong>WebAlert</strong> to
+set up personal email notification alerts.
+
+<table border="1">
+
+<tr>
+ <th class="searchboxheader">Admin Module</th>
+ <th class="searchboxheader">Admin Description</th>
+ <th class="searchboxheader">Admin Interface</th>
+ <th class="searchboxheader">Admin Guide</th>
+</tr>
+
+<tr>
+<td>
+  <strong>WebSession Admin</strong>
+</td>
+<td>
+  Enables you to inspect the status of guest sessions and to expire
+  them; the status and details on registered users, etc.
+</td>
+<td>
+  <small class=note>not available, but see the guide for the command-line way</small>
+</td>
+<td>
+  <a href="websession/guide.html">WebSession Admin Guide</a>
+</td>
+</tr>
+
+<tr>
+<td>
+  <strong>WebBasket Admin</strong>
+</td>
+<td>
+  Enables you to inspect and manipulate user baskets set up on the
+  system, to make them public/private, etc.
+</td>
+<td>
+  <small class=note>not available, but see the guide for the command-line way</small>
+</td>
+<td>
+  <a href="webbasket/guide.html">WebBasket Admin Guide</a>
+</td>
+</tr>
+
+<tr>
+<td>
+  <strong>WebAlert Admin</strong>
+</td>
+<td>
+  Enables you to inspect and manipulate user alerts set up on the
+  system, to run the alert engine, etc.
+</td>
+<td>
+  <small class=note>not available, but see the guide for the command-line way</small>  
+</td>
+<td>
+  <a href="webalert/guide.html">WebAlert Admin Guide</a>
+</td>
+</tr>
+
+</table>
+
+<h3>System glue modules</h3>
+
+<p>Modules that provide the necessary glue for those presented above
+are: <strong>BibSched</strong> to manage and schedule bibliographic
+tasks, <strong>WebAccess</strong> to define role-based access control
+system to all CDSware services, and <strong>WebStyle</strong> to
+define a common look and feel of CDSware web pages.
+
+<table border="1">
+
+<tr>
+ <th class="searchboxheader">Admin Module</th>
+ <th class="searchboxheader">Admin Description</th>
+ <th class="searchboxheader">Admin Interface</th>
+ <th class="searchboxheader">Admin Guide</th>
+</tr>
+
+<tr>
+<td>
+  <strong>BibSched Admin</strong>
+</td>
+<td>
+  Enables you to inspect bibliographic task queue, to postpone or
+  reschedule jobs, to make priorities, to run periodical tasks, etc.
+</td>
+<td>
+  <small class=note>command-line program</small>
+</td>
+<td>
+  <a href="bibsched/guide.html">BibSched Admin Guide</a>
+</td>
+</tr>
+
+<tr>
+<td>
+  <strong>WebAccess Admin</strong>
+</td>
+<td>
+    Enables you to define who has got access or admin rights on various CDSware modules. 
+    For example, you can define that John is the bibliographic
+    data manager, that Jim can modify the search interface pages, that
+    Jill is the submission approval editor, etc.
+</td>
+<td>
+  <a href="webaccess/">WebAccess Admin Interface</a>
+</td>
+<td>
+  <a href="webaccess/guide.html">WebAccess Admin Guide</a>
+</td>
+</tr>
+
+<tr>
+<td>
+  <strong>WebStyle Admin</strong>
+</td>
+<td>
+  Enables you to customize default CDSware page style and the CSS style sheet.
+</td>
+<td>
+  <small class=note>not available, but see the guide for the command-line way</small>
+</td>
+<td>
+  <a href="webstyle/guide.html">WebStyle Admin Guide</a>
+</td>
+</tr>
+
+</table>
