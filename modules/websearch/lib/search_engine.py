@@ -2067,7 +2067,7 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
         url = '%s/search.py?p=%s&amp;cc=%s&amp;f=%s&amp;sf=%s&amp;so=%s&amp;sp=%s&amp;of=%s&amp;ot=%s' % (weburl, urllib.quote(p), urllib.quote(collection), f, sf, so, sp, of, ot)
         url += '&amp;as=%s&amp;ln=%s&amp;p1=%s&amp;p2=%s&amp;p3=%s&amp;f1=%s&amp;f2=%s&amp;f3=%s&amp;m1=%s&amp;m2=%s&amp;m3=%s&amp;op1=%s&amp;op2=%s' \
                % (as, ln, urllib.quote(p1), urllib.quote(p2), urllib.quote(p3), f1, f2, f3, m1, m2, m3, op1, op2)
-        url += '&amp;sc=%d' % sc + pl_in_url
+        url += '&amp;sc=%d' % 0 + pl_in_url # sc=0, since we do not want to split by collection in `next/previous' pages
         url += '&amp;d1y=%d&amp;d1m=%d&amp;d1d=%d&amp;d2y=%d&amp;d2m=%d&amp;d2d=%d' \
                % (d1y, d1m, d1d, d2y, d2m, d2d)
         if jrec-rg > 1:
@@ -2108,7 +2108,7 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
         out += "<input type=\"hidden\" name=\"m3\" value=\"%s\">" % m3
         out += "<input type=\"hidden\" name=\"op1\" value=\"%s\">" % op1
         out += "<input type=\"hidden\" name=\"op2\" value=\"%s\">" % op2
-        out += "<input type=\"hidden\" name=\"sc\" value=\"%s\">" % sc
+        out += "<input type=\"hidden\" name=\"sc\" value=\"0\">" # sc=0, since we do not want to split by collection in `next/previous' pages
         out += "<input type=\"hidden\" name=\"d1y\" value=\"%d\">" % d1y
         out += "<input type=\"hidden\" name=\"d1m\" value=\"%d\">" % d1m
         out += "<input type=\"hidden\" name=\"d1d\" value=\"%d\">" % d1d
