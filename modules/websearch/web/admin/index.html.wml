@@ -11,22 +11,26 @@
 ## The CDSware is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-webappdir = $(WEBDIR)/admin/websearch
+#include "cdspage.wml" \
+    title="WebSearch Admin" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a>" 
+     
+<p>
+ This is the gate to the admin area for WebSearch. You need to 
+ <a href="<WEBURL>/youraccount.py/login?referer=<WEBURL>/admin/websearch/">login</a> to enter.
+</p>
 
-webapp_DATA= index.html websearchadmin.py
-
-EXTRA_DIST = $(wildcard *.wml)
-
-CLEANFILES = $(bin_SCRIPTS) $(webapp_DATA) *~ *.tmp search.pyc
-
-%.py: %.py.wml ../../../../config/config.wml ../../../../config/configbis.wml
-	$(WML) -o $@ $<
-
-%.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
+<dl>
+ <dt><a href="websearchadmin.py">Edit Collection Tree</a></dt>
+ <dd>Start area for WebSearch administration.</dd>
+</dl>
+<dl>
+ <dt><a href="guide.html">WebSearch Admin Guide</a></dt>
+ <dd>Everything you want to know about WebSearch administration</dd>
+</dl>
