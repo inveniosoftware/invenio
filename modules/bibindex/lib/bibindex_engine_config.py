@@ -60,14 +60,17 @@ cfg_fulltext_index_local_files_only = 0
 ## None = No stemming
 cfg_use_stemmer_lang = None
 
-## path to stopword list, None = no stopword removal
-cfg_path_stopwordlist = None
-##"<ETCDIR>/bibrank/stopwords.kb"
+##Remove stopwords? False = no stopword removal
+cfg_remove_stopwords = True
+## path to stopword list, used by bibrank also, should be given even if stopwordremoval is not used
+cfg_path_stopwordlist = "<ETCDIR>/bibrank/stopwords.kb"
 
 ##used by get_words_from_phrase
 cfg_chars_alphanumericseparators = r"[\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
 cfg_chars_punctuation = r"[\.\,\:\;\?\!\"]"
+##Remove HTML tags from text
 cfg_remove_html_code = True
+##Minimum word length allowed to be added to index
 cfg_min_word_length = 0
 
 ## access credentials to access restricted URLs:

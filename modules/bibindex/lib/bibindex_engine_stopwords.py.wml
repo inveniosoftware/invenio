@@ -51,7 +51,7 @@ def is_stopword(word):
     """returns False if not stopword, True if stopword"""
 
     #inputword must be lowercase
-    if cfg_path_stopwordlist and stopwords.has_key(word):
+    if cfg_remove_stopwords and stopwords.has_key(word):
         return True
     return False
 
