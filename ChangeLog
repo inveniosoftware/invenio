@@ -1,3 +1,557 @@
+CDSware v0.3.3 (released 2004-07-16)
+====================================
+
+2004-07-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* .cvsignore: Added .wmlrc.
+
+2004-07-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/webuser.py.wml: Terminology fix: ampersand
+	-> @.
+
+2004-07-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/webuser.py.wml: checkemail() made more
+	efficient.
+
+2004-07-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* Makefile.am: Don't need .wmlrc in the distribution.
+
+2004-07-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* CREDITS: Added Thierry and Frederic.
+
+2004-07-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* INSTALL: Added a note on building CDSware out of its source tree.
+
+2004-07-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* .wmlrc: Removed.  Configure now takes care of creating it.
+
+2004-07-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* Makefile.am, configure.ac: Patch from Frederic be able to build
+	CDSware out of its source tree.
+
+2004-07-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibconvert/bin/Makefile.am,
+	modules/bibconvert/doc/admin/Makefile.am,
+	modules/bibedit/doc/admin/Makefile.am,
+	modules/bibedit/lib/Makefile.am, modules/bibformat/bin/Makefile.am,
+	modules/bibformat/doc/admin/Makefile.am,
+	modules/bibformat/lib/common/Makefile.am,
+	modules/bibformat/lib/core/Makefile.am,
+	modules/bibformat/web/Makefile.am,
+	modules/bibformat/web/admin/Makefile.am,
+	modules/bibharvest/bin/Makefile.am,
+	modules/bibharvest/doc/admin/Makefile.am,
+	modules/bibharvest/lib/Makefile.am,
+	modules/bibharvest/web/Makefile.am,
+	modules/bibindex/bin/Makefile.am,
+	modules/bibindex/doc/admin/Makefile.am,
+	modules/bibindex/lib/Makefile.am,
+	modules/bibindex/web/admin/Makefile.am,
+	modules/bibrank/bin/Makefile.am,
+	modules/bibrank/doc/admin/Makefile.am,
+	modules/bibrank/doc/hacking/Makefile.am,
+	modules/bibrank/etc/Makefile.am, modules/bibrank/lib/Makefile.am,
+	modules/bibrank/web/admin/Makefile.am,
+	modules/bibsched/bin/Makefile.am,
+	modules/bibsched/doc/admin/Makefile.am,
+	modules/bibupload/bin/Makefile.am,
+	modules/bibupload/doc/admin/Makefile.am,
+	modules/miscutil/bin/Makefile.am,
+	modules/miscutil/demo/Makefile.am,
+	modules/miscutil/lib/Makefile.am, modules/miscutil/sql/Makefile.am,
+	modules/webaccess/bin/Makefile.am,
+	modules/webaccess/doc/admin/Makefile.am,
+	modules/webaccess/doc/hacking/Makefile.am,
+	modules/webaccess/lib/Makefile.am,
+	modules/webaccess/web/admin/Makefile.am,
+	modules/webalert/bin/Makefile.am,
+	modules/webalert/doc/admin/Makefile.am,
+	modules/webalert/lib/Makefile.am, modules/webalert/web/Makefile.am,
+	modules/webbasket/doc/admin/Makefile.am,
+	modules/webbasket/lib/Makefile.am,
+	modules/webbasket/web/Makefile.am, modules/webhelp/web/Makefile.am,
+	modules/webhelp/web/admin/Makefile.am,
+	modules/webhelp/web/admin/howto/Makefile.am,
+	modules/webhelp/web/hacking/Makefile.am,
+	modules/websearch/bin/Makefile.am,
+	modules/websearch/doc/Makefile.am,
+	modules/websearch/doc/admin/Makefile.am,
+	modules/websearch/doc/hacking/Makefile.am,
+	modules/websearch/lib/Makefile.am,
+	modules/websearch/web/Makefile.am,
+	modules/websearch/web/admin/Makefile.am,
+	modules/websession/bin/Makefile.am,
+	modules/websession/doc/admin/Makefile.am,
+	modules/websession/lib/Makefile.am,
+	modules/websession/web/Makefile.am,
+	modules/webstyle/css/Makefile.am,
+	modules/webstyle/doc/admin/Makefile.am,
+	modules/webstyle/lib/Makefile.am,
+	modules/websubmit/bin/Makefile.am,
+	modules/websubmit/doc/Makefile.am,
+	modules/websubmit/doc/admin/Makefile.am,
+	modules/websubmit/etc/bibconvert/KB/Makefile.am,
+	modules/websubmit/etc/bibconvert/config/Makefile.am,
+	modules/websubmit/lib/Makefile.am,
+	modules/websubmit/lib/functions/Makefile.am,
+	modules/websubmit/web/Makefile.am,
+	modules/websubmit/web/admin/Makefile.am: Patch from Frederic be
+	able to build CDSware out of its source tree.
+
+2004-07-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql.wml: I18N translations of
+	collection names.  SUBMIT boxes for the search interface to point
+	to submission pages.
+
+2004-07-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/sql/tabfill.sql.wml: I18N field names for
+	DE,PT,IT,NO.
+
+2004-07-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/messages.wml: Added PT,IT,DE and NO translations for new
+	phrases.
+
+2004-07-14  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/sql/tabcreate.sql: Remove unnecessary trailing
+	commas (causing troubles on some systems).
+
+2004-07-14  Martin Vesely <martin.vesely@cern.ch>
+
+	* modules/bibconvert/bin/bibconvert.wml: Regular expressions
+	introduced.
+
+2004-07-14  Martin Vesely <martin.vesely@cern.ch>
+
+	* modules/bibconvert/doc/admin/dcxml-to-marcxml.cfg: Extraction
+	template modified.
+
+2004-07-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/messages.wml, modules/miscutil/lib/messages.py.wml: Added
+	record last modified message.
+
+2004-07-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Fix displaying ADD TO
+	BASKET on HTML detailed page.  Added record last modified info box.
+
+2004-07-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webstyle/css/cds.css.wml: Added recordlastmodifiedbox.
+
+2004-07-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/sql/tabfill.sql.wml: Fix serialized column of
+	the Photo formats due to change in encoding (UTF-8).  Fix links in
+	Photo formats to use recid instead of sysnb.
+
+2004-07-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/sql/tabfill.sql.wml: Added I18N translations for
+	field names and home collection.
+
+2004-07-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql.wml: Added I18N
+	translations for collection names.
+
+2004-07-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/messages.wml, modules/miscutil/lib/messages.py.wml: Added
+	`restricted' message.  Moved I18N field names into SQL tables.
+
+2004-07-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/bin/webcoll.wml,
+	modules/websearch/lib/search_engine.py.wml,
+	modules/websearch/web/index.py.wml: Respect I18N names of
+	collections and fields.
+
+2004-07-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/bin/dbexec.wml: Use = instead of == for strict
+	POSIX compliance.  (Thanks to Thierry Thomas.)
+
+2004-07-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/doc/hacking/stages.html.wml,
+	modules/websearch/lib/search_engine.py.wml: New behaviour of the
+	search engine on stage 4-2-1: when no hits are found in the
+	collection selected by the user, but there are some hits in other
+	public collections, then do not show list these hits anymore to the
+	end user, but rather propose link to them only.  (Often users were
+	confused as to why their collection choice wasn't respected.)
+
+2004-07-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/messages.wml: Rephrase ``No hits in given collection'' to
+	respect new behaviour of the search engine.
+
+2004-07-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/cdswmllib.wml: Use adverb to denote CZ and SK languages.
+
+2004-07-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/messages.wml, modules/miscutil/lib/messages.py.wml: Added
+	I18N message for deleted records.
+
+2004-07-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine_config.py.wml: Added OAI ID
+	tag from the config file.  Suitable for the display of deleted
+	records in order to preserve OAI ID in XML MARC display.
+
+2004-07-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Records marked as
+	DELETED (in the collection identifier tag 980) aren't accessible
+	anymore via XML MARC and other formats.
+
+2004-07-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac, modules/bibedit/Makefile.am,
+	modules/bibedit/lib/.cvsignore, modules/bibedit/lib/Makefile.am:
+	Added BibEdit lib.
+
+2004-07-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* INSTALL: Added note for FreeBSD users on Apache 2 threads
+	configuration.
+
+2004-07-12  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/bibupload/bin/bibupload.wml: get rid of beginning of
+	following record if on the same line
+
+2004-07-09  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/bibedit/lib/bibrecord.py.wml: new xml parsing library
+
+2004-07-07  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/hacking/Makefile.am,
+	modules/webhelp/web/hacking/index.html.wml,
+	modules/webhelp/web/hacking/testsuite.html.wml: Added testsuite
+	hackers' guide.
+
+2004-07-07  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/lib/websubmit_engine.py.wml,
+	modules/websubmit/lib/functions/Get_Info.py.wml,
+	modules/websubmit/lib/functions/Get_Sysno.py.wml,
+	modules/websubmit/lib/functions/Make_Modify_Record.py.wml,
+	modules/websubmit/lib/functions/Make_Record.py.wml,
+	modules/websubmit/lib/functions/Report_Number_Generation.py.wml,
+	modules/websubmit/lib/functions/mail.py.wml: replaced "w+" open
+	mode by "w"
+
+2004-07-07  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/doc/admin/implementwebform.html.wml: added
+	comment about mandatory select box elements
+
+2004-07-07  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/web/admin/addElement2PageEDS.php.wml: check if
+	new mandatory select box begins with "Select:"
+
+2004-07-07  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine.py.wml,
+	modules/bibindex/lib/bibindex_engine_config.py.wml: Added option to
+	fulltext-index local files only, i.e. remote URLs are skipped if
+	the option is on.
+
+2004-07-07  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/bibupload/bin/bibupload.wml: cumulative record count if
+	several files are passed as parameters
+
+2004-07-05  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/web/admin/elementConfigDetsEDS.php.wml: change
+	type of response elements now possible
+
+2004-06-23  Martin Vesely <martin.vesely@cern.ch>
+
+	* modules/bibharvest/lib/oai_repository.py.wml: DC Title extended
+	for 111__a.
+
+2004-06-22  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: [no log message]
+
+2004-06-22  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/web/admin/bibrankadmin.py.wml: Got redirected to
+	/websearch after loging, fixed
+
+2004-06-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* INSTALL: Added note on `make test' to run the test suite.
+
+2004-06-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* Makefile.am: Added `make test' target.
+
+2004-06-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/Makefile.am,
+	modules/websearch/lib/search_engine_tests.py.wml: Added search
+	engine unit tests examples.
+
+2004-06-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/.cvsignore: Added .pyc to the list of
+	extensions to ignore.
+
+2004-06-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/bin/.cvsignore,
+	modules/miscutil/bin/Makefile.am,
+	modules/miscutil/bin/testsuite.wml: Added testsuite bin file.
+
+2004-06-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/bin/bibindex.wml,
+	modules/bibindex/lib/Makefile.am,
+	modules/bibindex/lib/bibindex_engine.py.wml,
+	modules/bibindex/lib/bibindex_engine_config.py.wml,
+	modules/bibindex/lib/bibindex_engine_tests.py.wml: BibIndex
+	monolithic bin file split into a small bin file and large lib
+	engine and engine_config files.  BibIndex unit testing file added.
+
+2004-06-07  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Looks like it was
+	abbreviated monthname and not full which was used... (thanks to
+	may...)
+
+2004-06-07  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/bibrank.wml: Fixed bugs
+
+2004-06-07  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Modified Webcoll
+	status of the webpage, added more checks
+
+2004-06-04  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrankadminlib.py.wml: bug fixed in
+	modify_translations
+
+2004-06-04  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Cleaned up
+	frontpage of interface
+
+2004-06-04  Martin Vesely <martin.vesely@cern.ch>
+
+	* modules/bibconvert/bin/bibconvert.wml: Implementation of regular
+	expressions in destination template configuration.
+
+2004-06-04  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrankadminlib.py.wml: Using name field in
+	rankmethod table instead of i8n names
+
+2004-06-04  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibindex/lib/bibindexadminlib.py.wml: Changed back to
+	using the name field instead of i8n names
+
+2004-06-04  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Added a overview
+	of collections with error checking
+
+2004-06-04  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Committing to get
+	it over to pcdh91...(need to do something with this soon...)
+
+2004-06-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/bin/webcoll.wml: Nice number printing is now
+	taken from the search engine library and is language-dependent.
+
+2004-06-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Nice number printing
+	is now language dependent.
+
+2004-06-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/messages.py.wml: Added thousands separator.
+
+2004-06-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/messages.wml: Fixed whitespace treatment.  Added thousands
+	separator.
+
+2004-05-28  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml,
+	modules/websearch/web/admin/websearchadmin.py.wml: Changed the
+	navigation/work flow in websearch interface
+
+2004-05-27  Martin Vesely <martin.vesely@cern.ch>
+
+	* modules/bibconvert/bin/bibconvert.wml: Data parsing error
+	corrected (bugfix).
+
+2004-05-27  Martin Vesely <martin.vesely@cern.ch>
+
+	* modules/bibconvert/doc/admin/guide.html.wml: Typo corrected.
+
+2004-05-27  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/web/admin/removeDoctypeEDS.php.wml: delete all
+	occurrence of the deleted document type in the sbmSUBMISSIONS table
+
+2004-05-27  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/miscutil/sql/tabcreate.sql: corrected
+	sbmCOLLECTION_sbmDOCTYPE table definition id_son is now a 10
+	characters string to be coherent with the sbmDOCTYPE definition
+
+2004-05-27  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml,
+	modules/websearch/web/admin/websearchadmin.py.wml: Prepared for
+	webcoll interface
+
+2004-05-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Added a check to
+	see if collection with id==1 exists, if not a form to add it is
+	displayed.
+
+2004-05-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Changed
+	terminology of "add collection to tree"
+
+2004-05-25  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibconvert/doc/admin/Makefile.am: Added forgotten
+	dcxml-to-marcxml.cfg to the distribution.
+
+2004-05-24  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: No longer
+	mandatory to have a title for a portalbox
+
+2004-05-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/admin/index.html.wml: International name for
+	Admin Area.
+
+2004-05-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/messages.py.wml: Added `administration'
+	messages.
+
+2004-05-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/messages.wml: Added `administration' message.	Small
+	French fix.
+
+2004-05-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/webaccount.py.wml,
+	modules/websession/web/youraccount.py.wml: Added `Your Admin
+	Activities' page.
+
+2004-05-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/webuser.py.wml: Add link to
+	`administration' in the personal header.
+
+2004-05-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/cdsnavbar.wml: Added link to BibIndex Admin Interface.
+
+2004-05-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/.cvsignore,
+	modules/bibindex/lib/Makefile.am, modules/bibindex/web/.cvsignore,
+	modules/bibindex/web/Makefile.am,
+	modules/bibindex/web/admin/.cvsignore,
+	modules/bibindex/web/admin/Makefile.am: Added appropriate
+	Makefile.am and .cvsignore files.
+
+2004-05-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac: Added BibIndex lib, web, web/admin dirs.
+
+2004-05-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/sql/tabfill.sql.wml: Added cfgbibindex action.
+
+2004-05-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Modified up/down
+	arrows
+
+2004-05-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibindex/.cvsignore, modules/bibindex/lib/Makefile,
+	modules/bibindex/lib/Makefile.am, modules/bibindex/lib/Makefile.in,
+	modules/bibindex/lib/bibindexadminlib.py.wml,
+	modules/bibindex/web/Makefile, modules/bibindex/web/Makefile.am,
+	modules/bibindex/web/Makefile.in,
+	modules/bibindex/web/admin/Makefile,
+	modules/bibindex/web/admin/Makefile.am,
+	modules/bibindex/web/admin/Makefile.in: Removed makefiles
+
+2004-05-14  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibindex/lib/Makefile, modules/bibindex/lib/Makefile.am,
+	modules/bibindex/lib/Makefile.in,
+	modules/bibindex/lib/bibindexadminlib.py.wml,
+	modules/bibindex/web/Makefile, modules/bibindex/web/Makefile.am,
+	modules/bibindex/web/Makefile.in,
+	modules/bibindex/web/admin/Makefile,
+	modules/bibindex/web/admin/Makefile.am,
+	modules/bibindex/web/admin/Makefile.in: Forget Makefiles...
+
+2004-05-14  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrankadminlib.py.wml: Unsure what is
+	change...commiting just to be sure
+
+2004-05-14  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml,
+	modules/websearch/web/admin/websearchadmin.py.wml: Changed images
+	used for arrows in websearchadmin, also added random argument to
+	urls to force reload of page
+
+2004-05-14  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibindex/Makefile.am,
+	modules/bibindex/doc/admin/Makefile.am,
+	modules/bibindex/doc/admin/index.html.wml,
+	modules/bibindex/lib/bibindexadminlib.py.wml,
+	modules/bibindex/web/admin/bibindexadmin.py.wml,
+	modules/bibindex/web/admin/index.html.wml: First version of
+	BibIndex interface
+
 CDSware v0.3.2 (released 2004-05-12)
 ====================================
 

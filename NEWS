@@ -5,6 +5,33 @@ Revision: $Id$
 
 Here is a short summary of most notable changes in CDSware releases:
 
+CDSware v0.3.3 (DEVELOPMENT) -- released 2004-07-16
+
+  * new international phrases, collection and field names; thanks to
+    Guido, Flavio, Tullio
+  * collection international names are now respected by the search
+    engine and interfaces (WebSearch)
+  * field international names are now respected by the search
+    engine and interfaces (WebSearch)
+  * when no hits found in a given collection, do not display all
+    public hits straight away but only link to them (WebSearch)
+  * records marked as DELETED aren't shown anymore in XML MARC and
+    other formats (WebSearch)
+  * detailed record page now features record creation and modification
+    times (WebSearch)
+  * improved XML MARC parsing and cumulative record count in case of
+    uploading of several files in one go (BibUpload)
+  * personal `your admin activities' page introduced (WebSession)
+  * added option to fulltext-index local files only (BibIndex)
+  * initial release of the BibIndex Admin interface (BibIndex)
+  * checking of mandatory selection box definitions (WebSubmit)
+  * WebSearch Admin interface cleanup (WebSearch)
+  * introducing common test suite infrastructure (WebSearch, BibIndex,
+    MiscUtil, WebHelp)
+  * fixed accent and link problems for photo demo records (MiscUtil)
+  * conference title exported via OAI XML DC (BibHarvest)
+  * enabled building out of source directory; thanks to Frederic
+
 CDSware v0.3.2 (DEVELOPMENT) -- released 2004-05-12
 
   * admin area improved: all the modules have now Admin Guides; some
