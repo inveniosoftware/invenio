@@ -273,7 +273,7 @@ cds.cern.ch
            xsi:schemaLocation="http://www.openarchives.org/OAI/1.1/eprints
                                http://www.openarchives.org/OAI/1.1/eprints.xsd">
       <content>
-       <URL>http://foo.com</URL>
+       <URL>http://<OAIIDPREFIX>/</URL>
       </content>
       <metadataPolicy>
        <text>Free and unlimited use by anybody with obligation to refer to original record</text>
