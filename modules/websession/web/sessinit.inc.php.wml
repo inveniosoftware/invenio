@@ -42,6 +42,7 @@ $DBPASS = "<DBPASS>";
 $DBNAME = "<DBNAME>";
 $WEBDIR = "<WEBDIR>";
 $WEBURL = "<WEBURL>";
+$BINDIR = "<BINDIR>";
 $ADMINEMAIL = "<ADMINEMAIL>";
 $IMAGES = "<WEBURL>/img";
 
@@ -55,258 +56,43 @@ $SESS_DBUSER = $DBUSER;      /* database user */
 $SESS_DBPASS = $DBPASS;	/* database password */
 
 $SESS_DBH = "";
-$SESS_LIFE = get_cfg_var("session.gc_maxlifetime");
 
-## sess_open():
-function sess_open($save_path, $session_name) {
-	global $SESS_DBHOST, $SESS_DBNAME, $SESS_DBUSER, $SESS_DBPASS, $SESS_DBH;
-
-	if (! $SESS_DBH = mysql_pconnect($SESS_DBHOST, $SESS_DBUSER, $SESS_DBPASS)) {
-		echo "<li>Can't connect to $SESS_DBHOST as $SESS_DBUSER";
-		echo "<li>MySQL Error: ", mysql_error();
-		die;
-	}
-
-	if (! mysql_select_db($SESS_DBNAME, $SESS_DBH)) {
-		echo "<li>Unable to select database $SESS_DBNAME";
-		die;
-	}
-	
-	return true;
+## open_db_connection():
+function open_db_connection() {
+    ## Open persistent connection to the database.
+    global $SESS_DBHOST, $SESS_DBNAME, $SESS_DBUSER, $SESS_DBPASS, $SESS_DBH;    
+    if (! $SESS_DBH = mysql_pconnect($SESS_DBHOST, $SESS_DBUSER, $SESS_DBPASS)) {
+        echo "<li>Can't connect to $SESS_DBHOST as $SESS_DBUSER";
+        echo "<li>MySQL Error: ", mysql_error();
+        die;
+    }
+    if (! mysql_select_db($SESS_DBNAME, $SESS_DBH)) {
+        echo "<li>Unable to select database $SESS_DBNAME";
+        die;
+    }	
+    return true;
 }
 
-## sess_close():
-function sess_close() {
-	return true;
+## getUid($cookie_string):
+function getUid($cookie_string) {
+    ## Read cookie string, look up the session table, and return userID.
+    ## If this cookie is not found, then return 0.
+    global $SESS_DBH;
+    $uid = 0;
+    $query = "SELECT uid FROM session WHERE session_key='$cookie_string'";
+    $res = mysql_perform_query($query, $SESS_DBH);
+    if ($row = mysql_fetch_row($res)) {
+	if ($row[0]) {
+            $uid = $row[0];
+        }            
+    } 
+    mysql_free_result($res);
+    return($uid);    
 }
-
-## sess_read():
-function sess_read($key) {
-	global $SESS_DBH, $SESS_LIFE;
-
-	$qry = "SELECT session_vars FROM session WHERE session_key = '$key'";
-	$qid = mysql_query($qry, $SESS_DBH);
-
-	if (list($value) = mysql_fetch_row($qid)) {
-		return $value;
-	}
-
-	return '';
-}
-
-## sess_write():
-function sess_write($key, $val) {
-	global $SESS_DBH, $SESS_LIFE;
-
-	$expiry = time() + $SESS_LIFE;
-	$value = addslashes($val);
-
-	$qry = "INSERT INTO session VALUES ('$key', '$value', $expiry)";
-	$qid = mysql_query($qry, $SESS_DBH);
-
-	if (! $qid) {
-		$qry = "UPDATE session SET session_expiry = $expiry, session_vars = '$value' WHERE session_key = '$key'";
-		$qid = mysql_query($qry, $SESS_DBH);
-	}
-
-	return $qid;
-}
-
-## sess_destroy():
-function sess_destroy($key) {
-	global $SESS_DBH;
-	displayMessage("Info",
-                       "sess_destroy called",
-                       "logfile");
-
-	$qry = "DELETE FROM session WHERE session_key = '$key'";
-	$res = mysql_query($qry, $SESS_DBH);
-
-	return $res;
-}
-
-###########################################################################
-# Garbage Collector
-#
-# 1) Delete expired sessions
-# 1b)Delete guest users without session
-# 2) Delete queries not attached to any user
-# 3) Delete baskets not attached to any user
-# 4) Delete records not stored in any basket
-# 5) Delete formats not attached to any user
-#
-function sess_gc($maxlifetime) {
-	global $SESS_DBH;
-	global $uid;
-
-        # when we started (used for profiling information, see below):
-	list($mt_msec,$mt_sec) = split(" ", microtime());  
-	$mt_start = $mt_sec+$mt_msec;  
-	displayMessage("Info", 
-                       "Garbage collector: started.",
-                       "screen,logfile");
-
-
-	# Destroy expired sessions
-	$query = "DELETE FROM session WHERE session_expiry < " . time();
-	$result = mysql_perform_query($query, $SESS_DBH);
-	displayMessage("Info",
-		       "Garbage collector: deleting " . mysql_affected_rows($SESS_DBH) . " expired sessions.",
-		       "screen,logfile");		
-	
-
-	# Delete guest users without session.
-	# The LEFT JOIN method cannot be applied here because there is no simple
-	# way to compare the user id in table user with the one encoded in
-	# session_vars in table session.
-	#
-	# backup of current uid
-	$old_uid = $uid;
-
-	$query = "SELECT session_vars FROM session";
-	$result = mysql_perform_query($query, $SESS_DBH);
-	$nRows = mysql_num_rows($result);
-	if($nRows) {
-	    $cur_svar=mysql_fetch_row($result);
-	    $uidStr = "$uid";
-	    while($cur_svar = mysql_fetch_row($result)) {
-		session_decode($cur_svar[0]);
-		$uidStr .= ",$uid";
-	    }
-	}
-
-	# restoration of the previous uid
-	$uid = $old_uid;
-
- 	if($uidStr != "") {
- 	    $query = "DELETE FROM user WHERE id NOT IN (".$uidStr.") AND email = ''";
- 	    $result = mysql_perform_query($query, $SESS_DBH);
- 	    $nRows = mysql_affected_rows($SESS_DBH);
- 	}
- 	else
- 	    $nRows = 0;
-
-        displayMessage("Info",
-                       "Garbage collector: deleting " . $nRows . " guest users without session",
-                       "screen,logfile");
-
-
-	# Delete queries not attached to any user.
-	# Select user ids appearing in table user_query but not in table user
-	$query = "SELECT DISTINCT uq.id_user
-                  FROM user_query AS uq LEFT JOIN user AS u
-                    ON uq.id_user = u.id
-                WHERE u.id IS NULL";
-	$result = mysql_perform_query($query, $SESS_DBH);
-	$nRows = mysql_num_rows($result);
-	# delete them one by one
-	for($i=0; $i<$nRows; $i++) {
-	    $curRow = mysql_fetch_row($result);
-	    $query = "DELETE FROM user_query WHERE id_user = $curRow[0]";
-	    $result2 = mysql_perform_query($query, $SESS_DBH);
-	}
-
-
-	# Delete queries not attached to any user.
-	# Select queries that must be deleted (the ones that are not in user_query)
-	$query = "SELECT DISTINCT q.id
-                  FROM query AS q LEFT JOIN user_query AS uq ON uq.id_query = q.id
-                WHERE uq.id_query IS NULL 
-                AND q.type<>'p'";
-	$result = mysql_perform_query($query, $SESS_DBH);
-        displayMessage("Info",
-                       "Garbage collector: deleting " . mysql_num_rows($result) . " queries.",
-                       "screen,logfile");
-
-	# delete them one by one
-	for($i=0; $i<mysql_num_rows($result); $i++) {
-	    $curRow = mysql_fetch_row($result);
-	    $query = "DELETE FROM query WHERE id = $curRow[0]";
-	    $result2 = mysql_perform_query($query, $SESS_DBH);
-	}
-
-
-	# Delete baskets not owned by any user
-	# Select basket ids
-	$query = "SELECT us.id_shelf 
-                  FROM user_shelf AS us LEFT JOIN user AS u 
-                    ON u.id = us.id_user 
-                  WHERE u.id IS NULL";
-	$result = mysql_perform_query($query, $SESS_DBH);
-	$nRows = mysql_num_rows($result);
-        displayMessage("Info",
-                       "Garbage collector: deleting " . $nRows . " baskets not owned by any user.",
-                       "screen,logfile");
-	# delete them one by one
-	for($i=0; $i<$nRows; $i++) {
-	    $curRow = mysql_fetch_row($result);
-	    $query = "DELETE FROM user_shelf WHERE id_shelf = $curRow[0]";
-	    $result2 = mysql_perform_query($query, $SESS_DBH);
-	    $query = "DELETE FROM shelf WHERE id = $curRow[0]";
-	    $result2 = mysql_perform_query($query, $SESS_DBH);
-	}
-
-
-	# Delete entries from table shelf_record that don't correspond to any existing record
-	$query = "SELECT sr.id_shelf FROM shelf_record AS sr LEFT JOIN shelf AS s ON s.id = sr.id_shelf
-                WHERE s.id IS NULL";
-	$result = mysql_perform_query($query, $SESS_DBH);
-	$nRows = mysql_num_rows($result);
-	for($i=0; $i<$nRows; $i++) {
-	    $curRow = mysql_fetch_row($result);
-	    $query = "DELETE FROM shelf_record WHERE id_shelf = $curRow[0]";
-	    $result2 = mysql_perform_query($query, $SESS_DBH);
-	}
-
-	# Delete records not in any shelf
-	$query = "SELECT DISTINCT r.id FROM record AS r LEFT JOIN shelf_record AS sr ON r.id = sr.id_record
-                WHERE sr.id_record IS NULL";
-	$result = mysql_perform_query($query, $SESS_DBH);
-	$nRows = mysql_num_rows($result);
-        displayMessage("Info",
-                       "Garbage collector: deleting " . $nRows . " records not in any shelf.",
-                       "screen,logfile");
-	for($i=0; $i<$nRows; $i++) {
-	    $curRow = mysql_fetch_row($result);
-	    $query = "DELETE FROM record WHERE id = $curRow[0]";
-	    $result2 = mysql_perform_query($query, $SESS_DBH);
-	}
-
-	# Delete formats not attached to any user
-	$query = "SELECT DISTINCT f.id FROM format AS f LEFT JOIN user_format AS uf
-                    ON f.id = uf.id_format WHERE uf.id_user IS NULL"; 
-	$result = mysql_perform_query($query, $SESS_DBH);
-	$nRows = mysql_num_rows($result);
-        displayMessage("Info",
-                       "Garbage collector: deleting " . $nRows . " formats not attached to any user.",
-                       "screen,logfile");
-	for($i=0; $i<$nRows; $i++) {
-	    $curRow = mysql_fetch_row($result);
-	    $query = "DELETE FROM format WHERE id = $curRow[0]";
-	    $result2 = mysql_perform_query($query, $SESS_DBH);
-	}
-	
-	# add some profiling info to the runtime logfile
-	list($mt_msec,$mt_sec) = split(" ", microtime());  
-	$mt_end = $mt_sec+$mt_msec; $mt = $mt_end-$mt_start; $mt_start=$mt_end;  
-	displayMessage("Info", 
-                       "Garbage collector took " .sprintf("%.2f",$mt) ." sec to execute.",
-                       "screen,logfile");
-
-	return $nb_sess_deleted;
-}
-
-session_set_save_handler(
-	"sess_open",
-	"sess_close",
-	"sess_read",
-	"sess_write",
-	"sess_destroy",
-	"sess_gc");
 
 ## getEmail():
 function getEmail($uid) {
-    return "guest"; # FIXME: call PHP->Python interface for the new session stuff
+    ## Return user email out of his UID.
     global $SESS_DBH;
     $uid_email = "guest";
     $query = "SELECT email FROM user WHERE id='$uid'";
@@ -320,254 +106,12 @@ function getEmail($uid) {
     return($uid_email);
 }
 
-## getPW():
-function getPW($uid) {
-    global $SESS_DBH;
-    $uid_pw = "";
-    $query = "SELECT password FROM user WHERE id='$uid'";
-    $res = mysql_perform_query($query, $SESS_DBH);
-    if ($row = mysql_fetch_row($res)) {
-        if ($row[0]) {
-            $uid_pw = $row[0];
-        }            
-    } 
-    mysql_free_result($res);
-    return($uid_pw);
-}
-
-## getID():
-function getID($email) {
-    global $SESS_DBH;
-    $uid_id = "";
-    $query = "SELECT id FROM user WHERE email='$email'";
-    $res = mysql_perform_query($query, $SESS_DBH);
-    if ($row = mysql_fetch_row($res)) {
-        if ($row[0]) {
-            $uid_id = $row[0];
-        }            
-    } 
-    mysql_free_result($res);
-    return($uid_id);
-}
-
-## displayLoginInfo():
-function displayLoginInfo($uid) {
-    $uid_email = getEmail($uid);
-#    $out = "<table cellspacing=0 cellpadding=0 border=0><tr><td>&nbsp;&nbsp;&nbsp;</td><td colspan=5 align=left class=loginselected><small><strong class=loginselectedtext>Your ID:</strong>&nbsp;$uid_email</td></tr><tr><td>&nbsp;&nbsp;&nbsp;</td><td align=center class=login><small><a href=\"${WEBDIR}personalize/youraccount.shtml?action=login\">login</a></small>&nbsp;</td><td align=center class=login>&nbsp;<small><a href=\"${WEBDIR}personalize/youraccount.shtml?action=logout\">logout</a></small>&nbsp;</td><td align=center class=login>&nbsp;<small><a href=\"${WEBDIR}personalize/youraccount.shtml\">settings</a></small>&nbsp;</td><td align=center class=login>&nbsp;<small><a href=\"${WEBDIR}yourshelf.shtml\">basket</a></small>&nbsp;</td><td align=center class=login>&nbsp;<small><a href=\"${WEBDIR}yourprofile.shtml\">alert</a></small></td></tr></table>";
-    $out = "<span>[$uid_email]</span>";
-    return $out;
-}
-
-## expandOrCollapseURL():
-function expandOrCollapseURL($base,$req,$mn) {
-    $x = $base . $req;
-    $mn = preg_replace("/\[/","\[",$mn);
-    $mn = preg_replace("/\]/","\]",$mn);
-    $x=preg_replace("/([&\?])SESSIONID=\w+/","\\1",$x);
-    $x=preg_replace("/([&\?])$mn=\w/","\\1",$x);
-    if (strstr($x,'?')) { $x.="&"; } else { $x.="?"; } 
-    $x .= session_name() . "=" . session_id();
-    $x=preg_replace("/&+/","&",$x);    
-    return($x);
-}
-
-## displayYourFormatOptions():
-function displayYourFormatOptions($uid,$p_of) {
-    global $SESS_DBH;
-    $out = "";
-    $query = "SELECT f.id,f.name FROM format f, user_format uf " .
-	     "WHERE uf.id_user='$uid' AND f.id=uf.id_format";
-    $res = mysql_perform_query($query, $SESS_DBH);
-    if (mysql_num_rows($res)) {
-        while ($row = mysql_fetch_row($res)) {
-            $out .= "<option value=\"$row[0]\"";  
-            if ($row[0] == $p_of) {
-                $out .= " selected";
-            }
-            $out .= ">personal - $row[1]\n";
-        }
-    }
-    mysql_free_result($res);
-    return $out;
-}
-
-## getRandomTip():
-function getRandomTip($catalogue) {
-    global $WEBDIR;
-    # connect to mysql database:
-    $problem=0;
-    $dbh = mysql_pconnect($SESS_DBHOST,$SESS_DBUSER,$SESS_DBPASS) or $problem=1;
-    if (!$problem) {
-        mysql_select_db($SESS_DBNAME) or $problem=1;
-        if (!$problem) {
-            # getting all tips for $catalogue:
-            $query = "SELECT type,message FROM tip WHERE base='$catalogue'";
-            $res = mysql_query($query, $dbh) or $problem=1;
-            if (!$problem) {
-                if (mysql_num_rows($res)) {
-                    while ($row = mysql_fetch_row($res)) {
-                        $tip_type[] = $row[0];
-                        $tip_message[] = $row[1];
-                    }
-                } else {
-                    $squery = "SELECT type,message FROM tip WHERE base=''";
-                    $sres = mysql_query($squery, $dbh);
-                    while ($srow = mysql_fetch_row($sres)) {
-                        $tip_type[] = $srow[0];
-                        $tip_message[] = $srow[1];
-                    }
-                    mysql_free_result($sres);                    
-                }
-                mysql_free_result($res);
-                if (count($tip_type)) {
-                    # getting random tip:
-                    srand((double)microtime()*1000000);
-                    if (count($tip_type)>1) {
-                        $rnd=rand(1,count($tip_type))-1;
-                    } else {
-                        $rnd=0;
-                    }
-#                    $rndtip = "<img src=\"".$WEBDIR."/img/r.gif\" alt=\"\">&nbsp;<small>" .
-#                              "<span class=quicknote>$tip_type[$rnd]:</span> " .
-#                              "$tip_message[$rnd]</small>";
-                     $rndtip = "<small><strong>$tip_type[$rnd]:</strong> " .
-                               "$tip_message[$rnd]</small>";
-                }
-            }
-        }
-    }
-    if ($rndtip) {
-        $rndtip .= " <small>(<a href=\"".$WEBDIR."/tips.shtml\">read all tips</a>)</small>";
-    }
-    return $rndtip;
-}
-
-## getLatestCDSNews():
-function getLatestCDSNews() {
-    # connect to mysql database:
-    $problem=0;
-    $cdsdbh = mysql_pconnect($SESS_DBHOST,$SESS_DBUSER,$SESS_DBPASS) or $problem=1;
-    if ($cdsdbh && !$problem) {
-        mysql_select_db("cdsnews") or $problem=1;
-        if (!$problem) {
-            # getting last CDS news:
-            $query = "SELECT MAX(id) FROM news";
-            $res = mysql_query($query, $cdsdbh) or $problem=1;
-            if (!$problem) {
-                if (mysql_num_rows($res)) {
-                    if ($row = mysql_fetch_row($res)) {
-                        $maxid=$row[0];
-                        $squery = "SELECT date,synopsis FROM news WHERE id=$maxid";
-                        $sres = mysql_query($squery, $cdsdbh) or $problem=1;
-                        if (!$problem) {
-                            if (mysql_num_rows($sres)) {
-                                if ($row = mysql_fetch_row($sres)) {
-                                    $out = "<small><strong>$row[0]:</strong> $row[1]</small>";
-                                    $out .= " <small>(<a href=\"http://cds.cern.ch/news.shtml?id=$maxid\">read&nbsp;more</a> | <a href=\"http://cds.cern.ch/news.shtml\">subscribe</a>)</small>";
-                                }
-                                mysql_free_result($sres);
-                            }
-                        }
-                    }
-                    mysql_free_result($res);
-                }
-            }
-        }
-    }    
-    return $out;
-}
-
-## getSearchExample():
-function getSearchExample($id_collection, $all=0) {
-    ## Returns search examples for given collection.  
-    ## If all=0, returns random search example.  If all!=0, returns all examples.
-    global $WEBURL;
-    global $SESS_DBH;
-    $out = "";
-    # getting all examples for $catalogue:
-    $query = "SELECT e.type,e.body FROM example AS e, collection_example AS ce ".
-             "WHERE ce.id_collection='".$id_collection."' AND e.id=ce.id_example";
-    $res = mysql_query($query, $SESS_DBH) or $problem=1;
-    if (!$problem) {
-        if (mysql_num_rows($res)) {
-            while ($row = mysql_fetch_row($res)) {
-                $example_type[] = $row[0];
-                $example_body[] = $row[1];
-            }
-        } 
-        mysql_free_result($res);
-        if (count($example_type)) {
-            if ($all) {
-                # case A - return all examples:
-                for ($i=0; $i<count($example_type); $i++) {
-                    $indxs[] = $i;
-                }
-            } else {
-                ## case B - return random example: [this is the default behaviour]
-                srand((double)microtime()*1000000);
-                if (count($example_type)>1) {
-                    $indxs[] = rand(1,count($example_type))-1;
-                } else {
-                    $indxs[] = 0;
-                }
-            }
-            # return chosen example(s):
-            for ($i=0; $i<count($indxs); $i++) {
-                if ($out) {
-                    $out .= "<br>";
-                }
-                $out .= "<small><em>Example (".$example_type[$indxs[$i]]."):</em> " .
-                        $example_body[$indxs[$i]]."&nbsp;&nbsp;&nbsp;";
-                if ($all) {
-                    $out .= "[<a href=\"".$PHP_SELF."?se=0\">close</a>]</small>";
-                } else {
-                    $out .= "[<a href=\"".$PHP_SELF."?se=1\">more</a>]</small>";
-                }
-            }
-        }        
-    } 
-    return $out;
-}
-
-## createNavigationBar():
-function createNavigationBar() { 
-    global $PHP_SELF, $mn;
-    $n = func_num_args();
-    $a = func_get_args();
-    $out = "\n<table width=\"100%\"><tr><td class=\"about\">";
-    if ($mn == "b") {
-        $out .= "<a class=\"img\" href=\"$PHP_SELF?mn=d\"><img width=\"16\" src=\"".$WEBDIR."/img/iconnext.gif\" border=0 alt=\"o\"></a>";
-    } else {
-        $out .= "<a class=\"img\" href=\"$PHP_SELF?mn=b\"><img width=\"16\" src=\"".$WEBDIR."/img/iconcross.gif\" border=0 alt=\"x\"></a>";
-    }
-    $out .= "<small>";
-    for ($i=0; $i < $n; $i++) {
-        list ($url,$txt) = $a[$i];
-        if ($url) {
-            $out .= "<a href=\"".$WEBDIR."/".$url."\">".$txt."</a> &gt; "; 
-        } else {
-            $out .= $txt . " &gt; "; 
-        }
-    }
-    $out = substr($out, 0, -6);
-    $out .= "</small></td></tr></table>";
-    return $out;
-} 
-
-## createGuestUser():
-function createGuestUser() {
-    global $SESS_DBH;
-    mysql_query("INSERT INTO user (id) VALUES (NULL)", $SESS_DBH) or die("<p>".mysql_error());
-    if (mysql_affected_rows($SESS_DBH)) { # to check whether the above insert failed or not
-        $uid = mysql_insert_id($SESS_DBH);
-        session_register("uid");
-    } else {
-        displayMessage("Error",
-                       "Unable to create new guest user",
-                       "logfile");
-        $uid = 0;
-    }
-    return $uid;
+function acc_authorize_action($uid, $action) {
+    ## Authorize where $uid can perform $action by calling external
+    ## Python CLI API of WebAccess.
+    ## Return 1 when allowed, 0 otherwise.
+    global $BINDIR;
+    return exec($BINDIR."/authaction ". escapeshellarg($uid) . " " . escapeshellarg($action));
 }
 
 function authenticate($email,$rule,$doctype="*",$action="*")
@@ -636,102 +180,11 @@ VALUES	('$rule','')");
 	return $idrule;
 }
 
-function getNumberOfBaskets() {
-    global $SESS_DBH;
-    global $SESS_LIFE;
-    $count = 0;
-
-    $query = "SELECT COUNT(*) FROM shelf";
-    $result = mysql_perform_query($query, $SESS_DBH);
-    if(mysql_num_rows($result)) {
-	$row = mysql_fetch_row($result);
-	$count = $row[0];
-    }
-
-    return $count;
-}
-
-function getNumberOfRegisteredUsers() {
-    global $SESS_DBH;
-    global $SESS_LIFE;
-    $count = 0;
-
-    $query = "SELECT COUNT(*) FROM user WHERE email <> ''";
-    $result = mysql_perform_query($query, $SESS_DBH);
-    if(mysql_num_rows($result)) {
-	$row = mysql_fetch_row($result);
-	$count = $row[0];
-    }
-
-    return $count;
-}
-    
-function getNumberOfAlerts() {
-    global $SESS_DBH;
-    global $SESS_LIFE;
-    $count = 0;
-
-    $query = "SELECT COUNT(*) FROM user_query_shelf";
-    $result = mysql_perform_query($query, $SESS_DBH);
-    if(mysql_num_rows($result)) {
-	$row = mysql_fetch_row($result);
-	$count = $row[0];
-    }
-
-    return $count;
-}
-
-## getNumberOfSessions():
-function getNumberOfSessions($time_diff) { 
-    # returns nb of active sessions that were created not longer than $time_diff seconds ago
-    global $SESS_DBH;
-    global $SESS_LIFE;
-
-    # 0) argument check:
-    if ($time_diff > $SESS_LIFE) {
-        # if desired $time_diff is greater than session lifetime, then garbage collector
-        # might have run and the result would not be meaningful => we need to set 
-        # maximum $time_diff that is available, i.e. $SESS_LIFE
-        $time_diff = $SESS_LIFE;
-    }
-
-    # 1) find out the number of sessions:
-    $num_sessions = "unknown";
-    $since_when = time() + $SESS_LIFE - $time_diff;
-    $query = "SELECT COUNT(*) FROM session WHERE session_expiry > $since_when";
-    $res = mysql_query($query, $SESS_DBH);
-    if (mysql_num_rows($res)) {
-        if ($row = mysql_fetch_row($res)) {
-            $num_sessions = $row[0];
-        }
-        mysql_free_result($res);
-    }
-
-    # 2) find out the number of queries:
-    $num_queries = "unknown";
-    $query = "SELECT COUNT(*) FROM user_query WHERE date > DATE_SUB(NOW(), INTERVAL $time_diff SECOND);";
-    $res = mysql_query($query, $SESS_DBH);
-    if (mysql_num_rows($res)) {
-        if ($row = mysql_fetch_row($res)) {
-            $num_queries = $row[0];
-        }
-        mysql_free_result($res);
-    }
-
-    $out = "<small>There have been <strong>" . $num_sessions . "</strong> active users " .
-           "in the past " . sprintf("%d",$time_diff/60) . " minutes. ".
-           "They have made <strong>" . $num_queries . "</strong> queries.</small>";
-
-    return $out;
-}
-
-###
-# function to call as an alternative to mysql_query
-# the function stops the execution if the query couldn't be executed
-# and prints an error message (HTML formatted) (default behaviour)
-# if behaviour is set to 'continue', then the function just goes on
-#
 function mysql_perform_query($query, $link_identifier, $behaviour="die") {
+    ## Function to call as an alternative to mysql_query.  The function
+    ## stops the execution if the query couldn't be executed and
+    ## prints an error message (HTML formatted) (default behaviour).  If
+    ## behaviour is set to 'continue', then the function just goes on.
     if($behaviour == "continue")
 	$result = mysql_query($query, $link_identifier);	    
     else {
@@ -745,25 +198,6 @@ function mysql_perform_query($query, $link_identifier, $behaviour="die") {
 
     return $result;
 }
-
-## displayMessage():
-function displayMessage($type, $msg, $where = "screen") {
-    global $IMAGES;
-    if (eregi("screen",$where)) { 
-        echo "\n<p><table><tr><td class=\"devel\"><strong><img src=\"".$IMAGES."/r.gif\" alt=\"*\">&nbsp;".
-             "$type:</strong> $msg</td></tr></table>\n";
-    }
-    if (eregi("logfile",$where)) {
-        $logfile = "__RUNTIMELOGFILE__";       
-        $fp = fopen($logfile, "a") or die("unable to open file " .$logfile);
-        if($fp) {
-            $buf = "$type: $msg [" .date("Y-m-d H:i:s") ."]\n";
-            fwrite($fp, $buf);
-            fclose($fp);
-        }        
-    }
-}
-
 
 ## displayLoginMenu()
 function displayLoginMenu($type) { 
@@ -884,11 +318,11 @@ WHERE  sdocname='$doctypes'");
     print '</table>';
 }
 
-#session_start();
-#if (!session_is_registered("uid")) {
-#    $uid = createGuestUser();
-#}
-$uid = 0;
+## okay, helper functions defined, set up user ID variables now...
+
+## do not create new sessions from PHP; only analyze the cookie already set
+open_db_connection();
+$uid = getUid($_COOKIE["CDSSESSION"]);
 $uid_email = getEmail($uid); 
 </protect>
 ?>
