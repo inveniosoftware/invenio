@@ -122,8 +122,11 @@ cds.support@cern.ch
 ## lot of new input records, so that it may grow past the present
 ## CFG_MAX_RECID limit, nothing bad happens: you only have to change
 ## this parameter and reindex the full database content.  Note also
-## that the lower CFG_MAX_RECID, the faster the search engine is, so
-## you have interest not to put it unnecessarily high.
+## that the lower CFG_MAX_RECID, the faster the search engine and the
+## indexation engines are, so you have interest not to put it
+## unnecessarily high.  The relation between the speed and the value
+## of CFG_MAX_RECID is about linear, so that cutting CFG_MAX_RECID by
+## half will speed up the indexation about twice.
 ##  (example: "8000")
 <define-tag CFG_MAX_RECID whitespace=delete>
 8000
