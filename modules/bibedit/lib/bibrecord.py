@@ -198,10 +198,18 @@ def create_record(xmltext,verbose = verbose, correct=correct):
 
 
         
-def record_get_field_instances(rec):
-    """returns the list of fields stored in record 'rec'"""
-    return rec.items()
-
+def record_get_field_instances(rec, tag="", ind1="", ind2=""):
+    """Return the list of field instances of record REC matching TAG and IND1 and IND2.
+       When TAG is an emtpy string, then return all field instances."""
+    out = []
+    if tag:
+        for possible_field_instance in rec[tag]:
+            if possible_field_instance[1] == ind1 and \
+               possible_field_instance[2] == ind2:
+                   out.append(possible_field_instance)
+    else:
+        return rec.items()
+    return out
 
 def record_has_field(rec,tag):
     """checks whether record 'rec' contains tag 'tag'"""
@@ -368,6 +376,14 @@ def records_xml_output(listofrec):
 def field_get_subfield_instances(field):
     """returns the list of subfields associated with field 'field'"""
     return field[0]
+
+def field_get_subfield_values(field_instance, code):
+    """Return subfield CODE values of the field instance FIELD."""
+    out = []
+    for sf_code, sf_value in field_instance[0]:
+        if sf_code == code:
+            out.append(sf_value)
+    return out
         
 def field_add_subfield(field,code,value):
     """adds a subfield to field 'field'"""
