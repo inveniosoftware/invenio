@@ -22,7 +22,7 @@ bin_SCRIPTS=bibrank bibrankgkb
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
-CLEANFILES = $(bin_SCRIPTS) *~ *.tmp bibrankc bibrankgkbc 
+CLEANFILES = $(bin_SCRIPTS) *~ *.tmp bibrankc bibrankgkbc bibranktestc
 %: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdswmllib.wml
 	$(WML) -o $@ $<
 	chmod u+x $@

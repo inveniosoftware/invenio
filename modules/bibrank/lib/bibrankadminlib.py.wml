@@ -36,6 +36,7 @@ import re
 import MySQLdb
 import Numeric
 import os
+import ConfigParser
 from zlib import compress,decompress
 from messages import *
 from dbquery import run_sql
@@ -496,7 +497,14 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
             try:
                 rnkNAME = get_def_name(rnkID, "rnkMETHOD")[0][1]
                 rnkcode = get_rnk_code(rnkID)[0][0]
-                result = delete_rnk(rnkID)
+                table = ""
+                try:
+                    config = ConfigParser.ConfigParser()
+                    config.readfp(open("%s/bibrank/%s.cfg" % (etcdir, rnkcode), 'r'))
+                    table = config.get(config.get('rank_method', "function"), "table")
+                except StandardError, e:
+                    pass
+                result = delete_rnk(rnkID, table)
                 subtitle = "Step 2 - Result"
                 if result:
                     text = """<b><span class="info">Rank method deleted</span></b>"""
@@ -678,7 +686,7 @@ def detach_col_rnk(rnkID, colID):
     except StandardError, e:
         return (0, e)
 
-def delete_rnk(rnkID):
+def delete_rnk(rnkID, table=""):
     """Deletes all data for the given rank method
     rnkID - delete all data in the tables associated with ranking and this id """
     
@@ -687,6 +695,9 @@ def delete_rnk(rnkID):
         res = run_sql("DELETE FROM rnkMETHODNAME WHERE id_rnkMETHOD=%s" % rnkID)
         res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_rnkMETHOD=%s" % rnkID)
         res = run_sql("DELETE FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s" % rnkID)
+        if table:
+            res = run_sql("truncate %s" % table)
+            res = run_sql("truncate %sR" % table[:-1])
         return (1, "")
     except StandardError, e:
         return (0, e)

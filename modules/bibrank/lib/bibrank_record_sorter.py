@@ -47,15 +47,11 @@ except ImportError, e:
     pass
 
 try:
-    import Stemmer
-except ImportError, e:
-    pass
-
-try:
     sys.path.append('%s' % pylibdir)
     from cdsware.config import *
     from cdsware.dbquery import run_sql
-    from search_engine_config import *
+    from cdsware.bibindex_engine_stemmer import stem_by_lang, lang_available
+    from cdsware.bibindex_engine_stopwords import is_stopword_force
 except ImportError, e:
     pass
 
@@ -173,9 +169,8 @@ def adderrorbox(header='', datalist=[]):
     output += '</tbody></table>'
     return output
 
-def check_term(stopwords, term, col_size, term_rec, max_occ, min_occ, termlength):
+def check_term(term, col_size, term_rec, max_occ, min_occ, termlength):
     """Check if the term is valid for use
-    stopwords - a dict of stopwords
     term - the term to check
     col_size - the number of records in database
     term_rec - the number of records which contains this term
@@ -184,7 +179,7 @@ def check_term(stopwords, term, col_size, term_rec, max_occ, min_occ, termlength
     termlength - the minimum length of the terms allowed"""
 
     try:
-        if stopwords.has_key(term) or (len(term) <= termlength) or ((float(term_rec) / float(col_size)) >= max_occ) or ((float(term_rec) / float(col_size)) <= min_occ):
+        if is_stopword_force(term) or (len(term) <= termlength) or ((float(term_rec) / float(col_size)) >= max_occ) or ((float(term_rec) / float(col_size)) <= min_occ):
 	    return ""
         if int(term):
             return ""
@@ -192,21 +187,10 @@ def check_term(stopwords, term, col_size, term_rec, max_occ, min_occ, termlength
 	pass
     return "true"
 
-def get_stopwords(file='stopwords.kb'):
-    """Load the stopwords from the file and returns a dict cotaining the words."""
-    stopwords = open(file, 'r')
-    lines = stopwords.readlines()
-    stopwords.close()
-    stopwords = {}
-    for line in lines:
-        stopwords[string.rstrip(line)] = 1
-    return stopwords
-
 def create_rnkmethod_cache():
     """Create cache with vital information for each rank method."""
 
     global methods    
-    languages = {'fr': 'french', 'en': 'porter', 'no':'norwegian', 'se':'swedish', 'de': 'german', 'it':'italian', 'pt':'portugese'}
     bibrank_meths = run_sql("SELECT name from rnkMETHOD")
     methods = {}
     global voutput
@@ -240,12 +224,12 @@ def create_rnkmethod_cache():
 
         if config.has_option(cfg_function, "stem_if_avail") and config.get(cfg_function, "stem_if_avail") == "yes":
             try:
-                methods[rank_method_code]["stemmer"] = Stemmer.Stemmer(languages[config.get(cfg_function, "stem_query_language")])
+                methods[rank_method_code]["stemmer"] = config.get(cfg_function, "stem_query_language")
             except Exception,e:
                 pass
 
         if config.has_option(cfg_function, "stopword"):
-            methods[rank_method_code]["stopwords"] = get_stopwords("%s" % config.get(cfg_function, "stopword"))
+            methods[rank_method_code]["stopwords"] = config.get(cfg_function, "stopword")
 
         if config.has_section("find_similar"):
             methods[rank_method_code]["max_word_occurence"] = float(config.get("find_similar", "max_word_occurence"))
@@ -484,7 +468,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     #Calculate all term frequencies
     for (term, tf) in rec_terms.iteritems():
 	if len(term) >= methods[rank_method_code]["min_word_length"] and terms_recs.has_key(term) and tf[1] != 0:
-            tf_values[term] =  int((1 + math.log(tf[0])) *  tf[1])
+            tf_values[term] =  int((1 + math.log(tf[0])) * tf[1])
     tf_values = tf_values.items()
     tf_values.sort(lambda x, y: cmp(y[1], x[1])) 
 
@@ -496,10 +480,11 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     testvalue = 20
 
     for (t, tf) in tf_values: #t=term, tf=term frequency
+        #term_recs = run_sql("SELECT term, hitlist FROM %s WHERE term='%s'" % (methods[rank_method_code]["rnkWORD_table"], t))
         term_recs = deserialize_via_marshal(terms_recs[t])
         if len(tf_values) <= methods[rank_method_code]["max_nr_words_lower"] or (len(term_recs) >= methods[rank_method_code]["min_nr_words_docs"] and (((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) <=  methods[rank_method_code]["max_word_occurence"]) and ((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) >= methods[rank_method_code]["min_word_occurence"]))):
              lwords.append((t, methods[rank_method_code]["rnkWORD_table"]))
-             (recdict, rec_termcount) = calculate_record_relevance((t, round(tf, 4)) , term_recs, hitset, recdict, rec_termcount, verbose, "true")
+             (recdict, rec_termcount) = calculate_record_relevance_findsimilar((t, round(tf, 4)) , term_recs, hitset, recdict, rec_termcount, verbose, "true")
         if len(tf_values) > methods[rank_method_code]["max_nr_words_lower"] and (len(lwords) ==  testvalue or tf < 0):
             break
 
@@ -509,7 +494,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     except:
         rec_terms = []
 
-    if rec_terms:
+    if 1==0: #rec_terms:
         rec_terms = deserialize_via_marshal(rec_terms[0][0])
         #Get all documents using terms from the selected documents
         if len(rec_terms) > 0:
@@ -528,13 +513,12 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
             for (t, tf) in tf_values:
                 term_recs = deserialize_via_marshal(terms_recs[t])
                 lwords.append((t, methods[rank_method_code]["rnkWORD_table"]))
-                (recdict, rec_termcount) = calculate_record_relevance((t, round(tf, 4)) , term_recs, hitset, recdict, rec_termcount, verbose, quick="true") 
+                (recdict, rec_termcount) = calculate_record_relevance((t, round(tf, 4)) , term_recs, hitset, recdict, rec_termcount, verbose, "true") 
     methods[rank_method_code]["rnkWORD_table"] = "rnkWORD01F"
-
     if len(recdict) == 0 or len(lwords) == 0:
         return (None, "Could not find any similar documents, possibly because of error in ranking data.", "", voutput)
     else:
-        (reclist, hitset) = sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, verbose)
+        (reclist, hitset) = sort_record_relevance_findsimilar(recdict, rec_termcount, hitset, rank_limit_relevance, verbose)
 
     if verbose > 0:
         voutput += "<br>Number of terms: %s<br>" % run_sql("SELECT count(id) FROM %s" % methods[rank_method_code]["rnkWORD_table"])[0][0]
@@ -569,25 +553,22 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
 
     lwords_old = lwords
     lwords = []
-    #Check terms, remove non alphanumeric characters. Use both unstemmed and stemmed version of all terms.
     words_removed = ""
+    #Check terms, remove non alphanumeric characters. Use both unstemmed and stemmed version of all terms.
     for i in range(0, len(lwords_old)):
         term = string.lower(lwords_old[i])
-        if not methods[rank_method_code]["stopwords"].has_key(term):
+        if not methods[rank_method_code]["stopwords"] or methods[rank_method_code]["stopwords"] and not is_stopword_force(term):
             lwords.append((term, methods[rank_method_code]["rnkWORD_table"]))
             terms = string.split(string.lower(re.sub(methods[rank_method_code]["chars_alphanumericseparators"], ' ', term)))  
             for term in terms: 
                 if methods[rank_method_code].has_key("stemmer"): # stem word
-                    term = methods[rank_method_code]["stemmer"].stem(string.replace(term, ' ', ''))
+                    term = stem_by_lang(string.replace(term, ' ', ''), methods[rank_method_code]["stemmer"])
                 if lwords_old[i] != term: #add if stemmed word is different than original word
 	            lwords.append((term, methods[rank_method_code]["rnkWORD_table"]))
-       # else:  
-       #     words_removed += "%s" % term
-    #if words_removed:
-    #    if len(string.split(words_removed, ",")) > 1:
-    #        voutput += "The following words are very common and were not included in ranking the documents: %s." % words_removed
-        #else:
-        #    voutput += "% is a very common word and was not included in ranking the documents." % words_removed
+        else:  
+            words_removed += "%s " % term
+    if verbose > 0 and words_removed:
+        voutput += "The following words are very common and were not included in ranking the documents: %s<br>" % words_removed
 
     (recdict, rec_termcount, lrecIDs_remove) = ({}, {}, {})
     #For each term, if accepted, get a list of the records using the term
@@ -596,14 +577,14 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
 	term_recs = run_sql("SELECT term, hitlist FROM %s WHERE term='%s'" % (methods[rank_method_code]["rnkWORD_table"], MySQLdb.escape_string(term)))
         if term_recs:
 	    term_recs = deserialize_via_marshal(term_recs[0][1])
-            if check_term({}, term, methods[rank_method_code]["col_size"], len(term_recs), 1.0, 0.00, 0):
-                (recdict, rec_termcount) = calculate_record_relevance((term, int(term_recs["Gi"][1])) , term_recs, hitset, recdict, rec_termcount, verbose, None)
+            if check_term(term, methods[rank_method_code]["col_size"], len(term_recs), 1.0, 0.00, 0):
+                (recdict, rec_termcount) = calculate_record_relevance((term, int(term_recs["Gi"][1])) , term_recs, hitset, recdict, rec_termcount, verbose, quick=None)
             del term_recs
 
     #if len(recdict) == 0:
     #    pass
  
-    if len(lwords) > 1:
+    if len(lwords) < 0:
         bigram_table = "rnkWORD02F"
         bigrams = {}
         lwords_dict = {}
@@ -620,14 +601,17 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
             for bigram in res:
                 bigram = bigram[0]
                 splitted_bigram = string.split(bigram, " ")
-                if lwords_dict.has_key(splitted_bigram[0]) and lwords_dict.has_key(splitted_bigram[1]) and splitted_bigram[0] != splitted_bigram[1] and not bigrams.has_key(bigram) and lwords_dict[splitted_bigram[0]] < lwords_dict[splitted_bigram[1]]:
-                    bigrams[bigram] = 1
+                if lwords_dict.has_key(splitted_bigram[0]) and lwords_dict.has_key(splitted_bigram[1]) and splitted_bigram[0] != splitted_bigram[1] and not bigrams.has_key(bigram):
+                    if lwords_dict[splitted_bigram[0]] < lwords_dict[splitted_bigram[1]]:
+                        bigrams[bigram] = 1
+                    else:
+                        bigrams[bigram] = 0.5
  
-        for bigram in bigrams.keys():
+        for (bigram, w) in bigrams.iteritems():
             lwords.append((bigram, bigram_table))
 	    hitlist = run_sql("SELECT hitlist FROM %s WHERE term='%s'" % (bigram_table, MySQLdb.escape_string(bigram)))
 	    hitlist = deserialize_via_marshal(hitlist[0][0])
-            (recdict, rec_termcount) = calculate_record_relevance((bigram, int(hitlist["Gi"][1])) , hitlist, hitset, recdict, rec_termcount, verbose, "true")
+            (recdict, rec_termcount) = calculate_record_relevance((bigram, int(hitlist["Gi"][1]) * w) , hitlist, hitset, recdict, rec_termcount, verbose, quick="true")
             del hitlist
 
     if len(recdict) == 0 or (len(lwords) == 1 and lwords[0] == ""):
@@ -701,7 +685,44 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, ver
         #Only accept records existing in the hitset received from the search engine
         for (j, tf) in invidx.iteritems():
             if hitset.contains(j):
+                #recdict[j] = recdict.get(j, 0) + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
+                recdict[j] = recdict.get(j, 0) + int(math.log(tf[0] * Gi * tf[1] * qtf))
+                rec_termcount[j] = rec_termcount.get(j, 0) + 1
+        #Multiply with the number of terms of the total number of terms in the query existing in the records 
+    elif quick: #much used term, do not include all records, only use already existing ones
+        for (j, tf) in recdict.iteritems():
+            if invidx.has_key(j):
+                tf = invidx[j]
+                #recdict[j] = recdict[j] + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
+                recdict[j] = recdict.get(j, 0) + int(math.log(tf[0] * Gi * tf[1] * qtf))
+                rec_termcount[j] = rec_termcount.get(j, 0) + 1
+
+    return (recdict, rec_termcount)
+
+def calculate_record_relevance_findsimilar(term, invidx, hitset, recdict, rec_termcount, verbose, quick=None):
+    """Calculating the relevance of the documents based on the input, calculates only one word
+    term - (term, query term factor) the term and its importance in the overall search
+    invidx - {recid: tf, Gi: norm value} The Gi value is used as a idf value
+    hitset - a hitset with records that are allowed to be ranked
+    recdict - contains currently ranked records, is returned with new values
+    rec_termcount - {recid: count} the number of terms in this record that matches the query
+    verbose - verbose value
+    quick - if quick=yes only terms with a positive qtf is used, to limit the number of records to sort"""
+
+    
+    (t, qtf) = term
+    if invidx.has_key("Gi"):
+        Gi = invidx["Gi"][1]
+        del invidx["Gi"]
+    else:
+        return (recdict, rec_termcount)
+
+    if not quick or (qtf >= 0 or (qtf < 0 and len(recdict) == 0)):
+        #Only accept records existing in the hitset received from the search engine
+        for (j, tf) in invidx.iteritems():
+            if hitset.contains(j):
                 recdict[j] = recdict.get(j, 0) + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
+                #recdict[j] = recdict.get(j, 0) + int(math.log(tf[0] * Gi * tf[1] * qtf))
                 rec_termcount[j] = rec_termcount.get(j, 0) + 1
         #Multiply with the number of terms of the total number of terms in the query existing in the records 
     elif quick: #much used term, do not include all records, only use already existing ones
@@ -709,6 +730,7 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, ver
             if invidx.has_key(j):
                 tf = invidx[j]
                 recdict[j] = recdict[j] + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
+                #recdict[j] = recdict.get(j, 0) + int(math.log(tf[0] * Gi * tf[1] * qtf))
                 rec_termcount[j] = rec_termcount.get(j, 0) + 1
 
     return (recdict, rec_termcount)
@@ -722,14 +744,42 @@ def sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, 
     startCreate = time.time()
     global voutput
     reclist = []
-    #Multiply with the number of terms of the total number of terms in the query existing in the records 
+    #Multiply with the number of terms of the total number of terms in the query existing in the records
+    for j in recdict.keys():
+        hitset.remove(j)
+        #if recdict[j] > 0:
+        #    recdict[j] = math.log((recdict[j] * rec_termcount[j]))
+       	#    recdict[j] = recdict[j] * rec_termcount[j]
+ 
+    divideby = max(recdict.values())
+    for (j, w) in recdict.iteritems():
+        w = int(w * 100 / divideby)
+	if w >= rank_limit_relevance:
+            reclist.append((j, w))
+    reclist.sort(lambda x, y: cmp(x[1], y[1]))
+
+    if verbose > 0:
+        voutput += "Number of records sorted: %s<br>" % len(reclist)
+        voutput += "Sort time: %s<br>" % (str(time.time() - startCreate))
+    return (reclist, hitset)
+
+def sort_record_relevance_findsimilar(recdict, rec_termcount, hitset, rank_limit_relevance, verbose):
+    """Sorts the dictionary and returns records with a relevance higher than the given value.
+    recdict - {recid: value} unsorted
+    rank_limit_relevance - a value > 0 usually
+    verbose - verbose value"""
+
+    startCreate = time.time()
+    global voutput
+    reclist = []
+    #Multiply with the number of terms of the total number of terms in the query existing in the records
     for j in recdict.keys():
         hitset.remove(j)
         if recdict[j] > 0:
-            recdict[j] = math.log(recdict[j] * rec_termcount[j])
-
+            recdict[j] = math.log((recdict[j] * rec_termcount[j]))
+       	#    recdict[j] = recdict[j] * rec_termcount[j]
+ 
     divideby = max(recdict.values())
-    
     for (j, w) in recdict.iteritems():
         w = int(w * 100 / divideby)
 	if w >= rank_limit_relevance:
@@ -754,14 +804,14 @@ def rank_method_stat(rank_method_code, reclist, lwords):
 	j = len(reclist)
 
     voutput += "<br>Rank statistics:<br>"
-    for i in range(1, j):
+    for i in range(1, j + 1):
    	voutput += "%s,Recid:%s,Score:%s<br>" % (i,reclist[len(reclist) - i][0],reclist[len(reclist) - i][1])
         for (term, table) in lwords:
 	    term_recs = run_sql("SELECT hitlist FROM %s WHERE term='%s'" % (table, term))
             if term_recs:
                 term_recs = deserialize_via_marshal(term_recs[0][0])
                 if term_recs.has_key(reclist[len(reclist) - i][0]):
-                    voutput += "%s-%s / " % (term, term_recs[reclist[len(reclist) - i][0]][0])
+                    voutput += "%s-%s / " % (term, term_recs[reclist[len(reclist) - i][0]])
         voutput += "<br>"
 
     voutput += "<br>Score variation:<br>"

@@ -24,7 +24,8 @@ function = word_similarity
 stem_if_avail = yes
 stem_query_language = <CDSLANG>
 table = rnkWORD01F
-stopword = <ETCDIR>/bibrank/stopwords.kb
+#using stopwordlist from /bibindex/bibindex_engine_config
+stopword = True
 relevance_number_output_prologue = (
 relevance_number_output_epilogue = )
 

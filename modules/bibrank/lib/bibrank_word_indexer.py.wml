@@ -76,16 +76,13 @@ except ImportError, e:
     import sys
 
 try:
-    import Stemmer
-except ImportError, e:
-    pass
-
-try:
     sys.path.append('%s' % pylibdir)
     from cdsware.config import *
     from cdsware.search_engine_config import cfg_max_recID
     from cdsware.search_engine import perform_request_search, strip_accents, HitSet
     from cdsware.dbquery import run_sql
+    from cdsware.bibindex_engine_stemmer import stem_by_lang, lang_available
+    from cdsware.bibindex_engine_stopwords import is_stopword_force
 except ImportError, e:
     import sys
 
@@ -126,6 +123,11 @@ def dict_union(list1, list2):
             union_dict[e] = count
 	else:
 	    union_dict[e] = (union_dict[e][0] + count[0], count[1])
+
+    #for (e, count) in list2.iteritems():
+    #    list1[e] = (list1.get(e, (0, 0))[0] + count[0], count[1])
+
+    #return list1
     return union_dict
 
 ## safety function for killing slow MySQL threads:
@@ -174,25 +176,26 @@ def get_words_from_phrase(phrase, weight, lang="",
         #Most likely html, remove html code
         phrase = re.sub("(?s)<[^>]*>|&#?\w+;", ' ', phrase)
     phrase = re.sub(chars_punctuation, ' ', phrase)
-
+    phrase = lower(phrase)
     #By doing this like below, characters standing alone, like c a b is not added to the inedx, but when they are together with characters like c++ or c$ they are added.
     for word in split(phrase):    
-        if not stopwords.has_key(word) and check_term(word, 0):
-            if lang and lang !="none" and stemmer.has_key(lang):
-                word = stemmer[lang].stem(word)
+        if not is_stopword_force(word) and check_term(word, 0):
+            if lang and lang !="none" and options["use_stemming"] == "yes":
+                word = stem_by_lang(word, lang)
             if not words.has_key(word):
                 words[word] = (0,0)
             words[word] = (words[word][0] + weight, 0)
-        elif not stopwords.has_key(word):  
+        elif not is_stopword_force(word):  
             phrase = re.sub(chars_alphanumericseparators, ' ', word) 
             for word_ in split(phrase):   
-                if lang and lang !="none" and stemmer.has_key(lang):
-		    word_ = stemmer[lang].stem(word_)
+                if lang and lang !="none" and options["use_stemming"] == "yes":
+                    word_ = stem_by_lang(word_, lang)
                 if word_:
                     if not words.has_key(word_):
                         words[word_] = (0,0)
                     words[word_] = (words[word_][0] + weight, 0)
-    #print words
+ 
+    print words
     return words
 
 def split_ranges(parse_string):
@@ -976,11 +979,8 @@ def word_index(row, run):
         print "Warning: Psyco", e
         pass
 
-    global options, task_id, wordTables, stopwords, stemmer, languages 
-    languages = {'fr': 'french', 'en': 'porter', 'no':'norwegian', 'se':'swedish', 'de': 'german', 'it':'italian', 'pt':'portugese'}
-
-    stemmer = {}
-
+    global options, task_id, wordTables, languages 
+      
     # read from SQL row:
     task_id = row[0]
     task_proc = row[1]
@@ -1010,9 +1010,10 @@ def word_index(row, run):
         options["current_run"] = rank_method_code
         options["modified_words"] = {}
         options["table"] = config.get(config.get("rank_method", "function"), "table")
-        (stopwords, tags) = get_tags(config) #get the tags to include
+        options["use_stemming"] = config.get(config.get("rank_method","function"),"stem_if_avail")
+        tags = get_tags(config) #get the tags to include
         options["validset"] = get_valid_range(rank_method_code) #get the records from the collections the method is enabled for
-
+        function = config.get("rank_method","function")
         wordTable = WordTable(options["table"], tags)
         wordTable.report_on_table_consistency()
         try:
@@ -1071,40 +1072,34 @@ def word_index(row, run):
     return 1
        
 def get_tags(config):
-    """Get the tags that should be used creating the index and each tag's parameter, also get stemmer for language"""
+    """Get the tags that should be used creating the index and each tag's parameter"""
     tags = []
     function = config.get("rank_method","function")
     i = 1
     shown_error = 0
   
-    try:
+    #try:
+    if 1:
         while config.has_option(function,"tag%s"% i):
             tag = config.get(function, "tag%s" % i)
             tag = string.split(tag, ",")
             tag[1] = int(string.strip(tag[1]))
             tag[2] = string.strip(tag[2])
-            #get stopwordlist
-            stopwords = get_stopwords("%s" % config.get(function, "stopword"))
-
-            try:
-                #get stemmer for language if possible
-                if tag[2] and tag[2] != "none" and languages.has_key(tag[2]) and config.get(function,"stem_if_avail") == "yes" and not stemmer.has_key(tag[2]): 
-                    stemmer[tag[2]] = Stemmer.Stemmer(languages[tag[2]])
-                    if options["verbose"] >=9:
-                        write_message("Stemmer for language '%s' initiated" % tag[2])
-                elif tag[2] != "none" and config.get(function,"stem_if_avail") == "yes" and not stemmer.has_key(tag[2]):
-                    write_message("Warning: Language '%s' not available in PyStemmer." % tag[2])
-            except NameError:
+  
+            #check if stemmer for language is available
+            if config.get(function,"stem_if_avail") == "yes" and stem_by_lang("information", "en") != "inform":
                 if shown_error == 0:
                     write_message("Warning: PyStemmer not found. Please read INSTALL.")
                     shown_error = 1
+            elif tag[2] and tag[2] != "none" and config.get(function,"stem_if_avail") == "yes" and not lang_available(tag[2]): 
+                write_message("Warning: Language '%s' not available in PyStemmer." % tag[2])
             tags.append(tag)
             i += 1
-    except Exception:
-        write_message("Could not read data from configuration file, please check for errors")
-        raise StandardError
+    #except Exception:
+    #    write_message("Could not read data from configuration file, please check for errors")
+    #    raise StandardError
 
-    return (stopwords, tags)
+    return tags
 
 def get_valid_range(rank_method_code):
     """Returns which records are valid for this rank method, according to which collections it is enabled for."""
@@ -1133,32 +1128,22 @@ def write_message(msg, stream=sys.stdout):
     else:
         sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
 
-def get_stopwords(file='stopwords.txt'):
-    """Get stopword list"""
-    stopwords = open(file, 'r')
-    lines = stopwords.readlines()
-    stopwords.close()
-    stopwords = {}
-    for line in lines:
-        stopwords[string.rstrip(line)] = 1
-    return stopwords
-
 def check_term(term, termlength):
-    """Check if term is a stopword, or for any other reasons for not using this term."""
+    """Check if term contains not allowed characters, or for any other reasons for not using this term."""
     try:
-        if stopwords.has_key(lower(term)) or (len(term) <= termlength):
-	    return ""
+        if len(term) <= termlength:
+	    return False
         reg = re.compile(r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]")
         if re.search(reg, term):
-            return ""
+            return False
         term = str.replace(term, "-", "")
         term = str.replace(term, ".", "")
         term = str.replace(term, ",", "")
         if int(term):
-            return ""
+            return False
     except StandardError, e:
 	pass
-    return "true"
+    return True
 
 def check_rnkWORD(table):
     """Checks for any problems in rnkWORD tables."""
@@ -1247,11 +1232,9 @@ def update_rnkWORD(table, terms):
     write_message("Phase 1: Finding records containing modified terms")      
     terms = terms.keys()
     i = 0 
+
     while i < len(terms):
-        current_terms = ""
-        for j in range(i, ((i+5000)< len(terms) and (i+5000) or len(terms))):
-            current_terms += "'%s'," % terms[j]
-        terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE term in (%s)" % (table,current_terms[:-1]))
+        terms_docs = get_from_forward_index(terms, i, (i+5000), table)
         for (t, hitlist) in terms_docs: 
             term_docs = deserialize_via_marshal(hitlist)
             if term_docs.has_key("Gi"):
@@ -1268,8 +1251,7 @@ def update_rnkWORD(table, terms):
     records = Nj.keys()   
     i = 0
     while i < len(records):
-        current_recs = "%s" % records[i:i+5000]
-        docs_terms = run_sql("SELECT id_bibrec, termlist FROM %sR WHERE id_bibrec in (%s)" % (table[:-1],current_recs[1:-1]))
+        docs_terms = get_from_reverse_index(records, i, (i + 5000), table)
         for (j, termlist) in docs_terms:
             doc_terms = deserialize_via_marshal(termlist)
             for (t, tf) in doc_terms.iteritems(): 
@@ -1285,10 +1267,7 @@ def update_rnkWORD(table, terms):
         #Calculating Fi and Gi value for each term
         write_message("Phase 3: Calculating importance of all affected terms")
         while i < len(terms):
-            current_terms = ""
-            for j in range(i, ((i+5000)< len(terms) and (i+5000) or len(terms))):
-                current_terms += "'%s'," % terms[j]
-            terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE term in (%s)" % (table,current_terms[:-1]))
+            terms_docs = get_from_forward_index(terms, i, (i+5000), table)
             for (t, hitlist) in terms_docs:
                 term_docs = deserialize_via_marshal(hitlist)
                 if term_docs.has_key("Gi"):
@@ -1307,10 +1286,7 @@ def update_rnkWORD(table, terms):
         #Using existing Gi value instead of calculating a new one. Missing some accurancy.
         write_message("Phase 3: Getting approximate importance of all affected terms")
         while i < len(terms):
-            current_terms = ""
-            for j in range(i, ((i+5000)< len(terms) and (i+5000) or len(terms))):
-                current_terms += "'%s'," % terms[j]
-            terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE term in (%s)" % (table,current_terms[:-1]))
+            terms_docs = get_from_forward_index(terms, i, (i+5000), table)
             for (t, hitlist) in terms_docs:
                 term_docs = deserialize_via_marshal(hitlist)
                 if term_docs.has_key("Gi"):
@@ -1327,9 +1303,7 @@ def update_rnkWORD(table, terms):
     i = 0
     while i < len(records):
         #Calculating the normalization value for each document, and adding the Gi value to each term in each document.
-        current_recs = "%s" % records[i:i+5000]
-        current_recs = current_recs[1:-1]
-        docs_terms = run_sql("SELECT id_bibrec, termlist FROM %sR WHERE id_bibrec IN (%s)" % (table[:-1],current_recs))
+        docs_terms = get_from_reverse_index(records, i, (i + 5000), table)
         for (j, termlist) in docs_terms:
             doc_terms = deserialize_via_marshal(termlist)           
             for (t, tf) in doc_terms.iteritems():
@@ -1354,10 +1328,7 @@ def update_rnkWORD(table, terms):
     terms = Gi.keys()
     while i < len(terms):
         #Adding the Gi value to each term, and adding the normalization value to each term in each document.
-        current_terms = ""
-        for j in range(i, ((i+5000)< len(terms) and (i+5000) or len(terms))):
-            current_terms += "'%s'," % terms[j]
-        terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (table,current_terms[:-1]))
+        terms_docs = get_from_forward_index(terms, i, (i+5000), table)
         for (t, hitlist) in terms_docs: 
             term_docs = deserialize_via_marshal(hitlist)
             if term_docs.has_key("Gi"):
@@ -1376,6 +1347,20 @@ def update_rnkWORD(table, terms):
     write_message("Time used for post-processing: %.1fmin" % ((time.time() - stime) / 60))
     write_message("Finished post-processing") 
     
+
+def get_from_forward_index(terms, start, stop, table):
+    current_terms = ""
+    for j in range(start, (stop < len(terms) and stop or len(terms))):
+        current_terms += "'%s'," % terms[j]
+    terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (table,current_terms[:-1]))
+    return terms_docs
+
+def get_from_reverse_index(records, start, stop, table):
+    current_recs = "%s" % records[start:stop]
+    current_recs = current_recs[1:-1]
+    docs_terms = run_sql("SELECT id_bibrec, termlist FROM %sR WHERE id_bibrec IN (%s)" % (table[:-1],current_recs))
+    return docs_terms
+
 def test_word_separators(phrase="hep-th/0101001"):
     """Tests word separating policy on various input."""
     print "%s:" % phrase
