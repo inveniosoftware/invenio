@@ -28,9 +28,9 @@ EXTRA_DIST = $(wildcard *.wml)
 CLEANFILES = $(pylib_DATA) $(phplib_DATA) *~ *.tmp *.pyc
 
 %.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml \
-      ../../../config/messages.wml
+      ../../../config/messages.wml ../../../config/cdswmllib.wml
 	$(WML) -o $@ $<
 
 %.php: %.php.wml ../../../config/config.wml ../../../config/configbis.wml \
-      ../../../config/messages.wml
+      ../../../config/messages.wml ../../../config/cdswmllib.wml
 	$(WML) -o $@ $<
