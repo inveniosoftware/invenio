@@ -23,36 +23,35 @@
 #include "configbis.wml"
 #include "cdswmllib.wml"
 
-try:
-    import sre
-    import Stemmer
-    stem_avail = True
-except ImportError, e:
-    stem_avail = False
-    pass
-
 from bibindex_engine_config import *
 
-def getStemmer():
+def create_stemmers():
+    """Create stemmers dictionary for all possible languages."""
     languages = {'fr': 'french', 'en': 'english', 'no':'norwegian', 'se':'swedish', 'de': 'german', 'it':'italian', 'pt':'portuguese'}
-    stemmer = {}
-    if stem_avail:
+    stemmers = {}
+    try:
+        import Stemmer
         for (key, value) in languages.iteritems():
-            stemmer[key] = Stemmer.Stemmer(value)
-        return stemmer
+            stemmers[key] = Stemmer.Stemmer(value)
+
+    except ImportError:
+        pass # PyStemmer isn't available
+    return stemmers
+
+stemmers = create_stemmers()
+
+def is_stemmer_available_for_language(lang):
+    """Return true if stemmer for language LANG is available.
+       Return false otherwise.
+    """
+    return stemmers.has_key(lang)
+    
+def stem(word, lang=cfg_stemmer_default_language):
+    """Return WORD stemmed according to language CFG_STEMMER_DEFAULT_LANGUAGE
+       (read from the config file).
+    """
+    if lang and is_stemmer_available_for_language(lang):
+        return stemmers[lang].stem(word)
     else:
-        return {}
+        return word
 
-def stem(word):
-    if cfg_use_stemmer_lang:
-        return stemmer[cfg_use_stemmer_lang].stem(word)
-    return word
-
-def stem_by_lang(word, lang):
-    return stemmer[lang].stem(word)
-
-def lang_available(lang):
-    return stemmer.has_key(lang)
-
-"Creates the stemmers."
-stemmer = getStemmer()
