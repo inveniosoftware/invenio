@@ -47,13 +47,13 @@
 ## CDSNAME -- the name of this particular CDSware installation:  
 ##  (example: "CERN Document Server")
 <define-tag CDSNAME whitespace=delete>
-Max Planck Gesellschaft eDocument Server
+Atlantis Institute of Science
 </define-tag>
 
 ## RUNTIMELOGDIR -- the dir of the CDS and OAI runtime log files:
 ##  (example: "/log/cdsdev/mpgruntimelogs")
 <define-tag RUNTIMELOGDIR whitespace=delete>
-/log/cdsdev/mpgruntimelogs
+/log/cdsdev/cdsdemoruntimelogs
 </define-tag>
 
 ## ALERTENGINEEMAIL -- the email address from which the alert emails will appear to be send:
@@ -92,15 +92,15 @@ cds.support@cern.ch
 ## CDSware OAI repository.
 
 ## OAIIDPREFIX -- OAI identifier prefix:  
-##  (example: "oai:cerncds")
+##  (example: "oai:cdswaredemo")
 <define-tag OAIIDPREFIX whitespace=delete>
-oai:mpg
+oai:cdswaredemo
 </define-tag>
 
 ## OAISAMPLEIDENTIFIER -- OAI sample identifier:  
-##  (example: "oai:mpg:101")
+##  (example: "oai:cdswaredemo:101")
 <define-tag OAISAMPLEIDENTIFIER whitespace=delete>
-oai:mpg:identifier
+oai:cdswaredemo:101
 </define-tag>
 
 ## OAIIDENTIFYDESCRIPTION -- description for the OAI Identify verb (optional):
@@ -171,9 +171,15 @@ oai:mpg:identifier
 ##  (example: "")
 <define-tag CDSPAGEHEADER>
 <center>
- <span class=address><small>The <CDSNAME> website is in active development.  
- Some of its functionalities may not work fully yet.</small></span>
+ <span class=address><small>The <CDSNAME> document server is a fictive demo site of <a class=note href="http://cdsware.cern.ch/">CDSware</a>, a free document server software.</small></span>
 </center>
+<table class=header border=0 cellspacing=0 cellpadding=0 width="100%">
+  <tr class=header>
+    <td align=left>
+    <big><strong><CDSNAME></strong></big>
+    </td>
+  </tr>
+</table>
 </define-tag>
 
 ## CDSPAGESTRIPEWIDTH -- width of CDS page stripe (left, right portal stripes)
