@@ -5,6 +5,31 @@ Revision: $Id$
 
 Here is a short summary of most notable changes in CDSware releases.
 
+CDSware v0.1.0 -- December 4th, 2003
+  * development branch release
+  * search engine redesign to yield five times more search performance 
+    for larger sites (WebSearch, BibWords)
+  * fulltext indexation of PDF, PostScript, MS Word, MS PowerPoint and
+    MS Excel files (WebSearch)
+  * integrated combined metadata/fulltext/citation search (WebSearch)
+  * multi-stage search guidance in cases of no exact match (WebSearch)
+  * OAI-PMH harvestor (BibHarvest)
+  * bibliographic task scheduler (BibSched)
+  * automatic daemon mode of the indexer, the formatter and the
+    collection cache generator (BibWords, BibFormat, WebSearch)
+  * user management and session handling rewrite (WebSession)
+  * user personalization, document baskets and notification alert
+    system (WebBasket, WebAlert)
+  * role-based access control engine (WebAccess)
+  * internationalization of the interface started (currently with
+    Czech, German, English, Spanish, French, Italian, Portuguese,
+    Russian, and Slovak support)
+  * web page design update (WebStyle)
+  * introduction of programmer-oriented technical documentation corner
+    (WebHelp)
+  * source tree reorganization, mod_python technology adopted for most
+    of the modules
+
 CDSware v0.0.9 -- August 1st, 2002
   * first "public" alpha release of CDSware
   * recently standardized Library of Congress' MARC XML schema adopted
