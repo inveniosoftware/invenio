@@ -429,6 +429,8 @@ class BibDocFile:
         else:
             fullname = "%s.%s" % (name,format)
             (self.mime,self.encoding) = mimetypes.guess_type(fullname)
+            if self.mime == None:
+              self.mime = "text/plain"
         
     def display(self):
         if self.format != "":
