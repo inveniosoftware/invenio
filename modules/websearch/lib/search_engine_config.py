@@ -47,4 +47,4 @@ cfg_google_box = <CFG_GOOGLE_BOX>
 cfg_google_box_servers = <CFG_GOOGLE_BOX_SERVERS>
 
 ## do we want experimental features? (0=no, 1=yes)
-cfg_experimental_features = 1
+cfg_experimental_features = 0
