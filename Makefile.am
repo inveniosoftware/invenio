@@ -42,12 +42,10 @@ test:
 	fi
 
 install-data-local:
-	mkdir -p @prefix@/var
-	mkdir -p @prefix@/var/cache
-	mkdir -p @prefix@/var/log
-	mkdir -p @prefix@/var/tmp
-	mkdir -p @prefix@/var/data
-	chmod -R ug=rwx @prefix@/var
+	for d in / /cache /log /tmp /data ; do		\
+		mkdir -p $(localstatedir)$$d &&		\
+		chmod ug=rwx $(localstatedir)$$d ;	\
+	done
 	@echo "**************************************************************"
 	@echo "** CDSware has been successfully installed!                 **"
 	@echo "**                                                          **"
@@ -61,8 +59,6 @@ install-data-local:
 	@echo "** 'apachectl restart'.                                     **"
 	@echo "**************************************************************"
 
-uninstall-local:
-	rm -rf @prefix@/var
 
 create-tables: local-dbexec local-tabfill
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
@@ -77,6 +73,15 @@ update-v0.3.0-tables update-v0.3.1-tables: local-dbexec
 	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runbibrank','run BibRank','','no');" | ./modules/miscutil/bin/dbexec 
 	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgbibrank','configure BibRank','','no');" | ./modules/miscutil/bin/dbexec 
 
+update-v0.3.2-tables: local-dbexec
+	echo "ALTER TABLE sbmCOLLECTION_sbmDOCTYPE CHANGE id_son id_son char(10) NOT NULL default '0';" | ./modules/miscutil/bin/dbexec 
+
+update-v0.3.3-tables: local-dbexec 
+	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
+	echo "ALTER TABLE flxLINKTYPEPARAMS CHANGE pname pname varchar(78) NOT NULL default '';" | ./modules/miscutil/bin/dbexec 
+	echo "ALTER TABLE rnkMETHOD DROP star_category_ranges;" | ./modules/miscutil/bin/dbexec
+	echo "DROP TABLE rnkSET;" | ./modules/miscutil/bin/dbexec
+
 drop-tables: local-dbexec 
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
 
@@ -86,7 +91,7 @@ local-dbexec: $(srcdir)/modules/miscutil/bin/dbexec.wml
 local-tabfill: $(srcdir)/modules/miscutil/sql/tabfill.sql.wml
 	(cd ./modules/miscutil/sql; make)
 
-create-demo-site: install
+create-demo-site: 
 # 	for f in $(sbmdat); do \
 # 	    if [ ! -e $(sbmdir)/$$f.shtml ]; then \
 # 		ln -s $(sbmdir)/go.shtml $(sbmdir)/$$f.shtml ; \
@@ -115,8 +120,7 @@ create-demo-site: install
 	@echo "** To drop the demo site, you can run 'make drop-demo-site'.         **"
 	@echo "***********************************************************************"
 
-load-demo-records: install
-	${prefix}/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabbibclean.sql
+load-demo-records: 
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
 	${prefix}/bin/bibupload -i $(srcdir)/modules/miscutil/demo/demobibdata.xml
 	${prefix}/bin/bibupload 1
@@ -154,7 +158,7 @@ load-demo-records: install
 	@echo "** you can run 'make drop-demo-site'.                                **"
 	@echo "***********************************************************************"
 
-drop-demo-site: install
+drop-demo-site: 
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabcreate.sql
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
@@ -171,7 +175,7 @@ drop-demo-site: install
 	@echo "** The demo site and records have been successfully dropped. **"
 	@echo "***************************************************************"
 
-remove-demo-records: install
+remove-demo-records: 
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabbibclean.sql
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
 	@echo ""
