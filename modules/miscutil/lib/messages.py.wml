@@ -142,6 +142,13 @@ msg_record_deleted = {}
 msg_restricted = {}
 msg_record_last_modified = {}
 msg_similar_records = {}
+msg_cited_by = {}
+msg_cited_by_x_records = {}
+msg_cocited_with_x_records = {}
+msg_citation_history = {}
+msg_downloads_history = {}
+msg_people_who_viewed_this_page = {}
+msg_people_who_downloaded_this_document = {}
 
 ## English:
 <en>
@@ -257,6 +264,13 @@ msg_record_deleted['en'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['en'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['en'] = """<MSG_RECORD_LAST_MODIFIED>"""
 msg_similar_records['en'] = """<MSG_SIMILAR_RECORDS>"""
+msg_cited_by['en'] = """<MSG_CITED_BY>"""
+msg_cited_by_x_records['en'] = """<MSG_CITED_BY_X_RECORDS>"""
+msg_cocited_with_x_records['en'] = """<MSG_COCITED_WITH_X_RECORDS>"""
+msg_citation_history['en'] = """<MSG_CITATION_HISTORY>"""
+msg_downloads_history['en'] = """<MSG_DOWNLOADS_HISTORY>"""
+msg_people_who_viewed_this_page['en'] = """<MSG_PEOPLE_WHO_VIEWED_THIS_PAGE>"""
+msg_people_who_downloaded_this_document['en'] = """<MSG_PEOPLE_WHO_DOWNLOADED_THIS_DOCUMENT>"""
 </en>
 
 ## French:
@@ -373,6 +387,13 @@ msg_record_deleted['fr'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['fr'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['fr'] = """<MSG_RECORD_LAST_MODIFIED>"""
 msg_similar_records['fr'] = """<MSG_SIMILAR_RECORDS>"""
+msg_cited_by['fr'] = """<MSG_CITED_BY>"""
+msg_cited_by_x_records['fr'] = """<MSG_CITED_BY_X_RECORDS>"""
+msg_cocited_with_x_records['fr'] = """<MSG_COCITED_WITH_X_RECORDS>"""
+msg_citation_history['fr'] = """<MSG_CITATION_HISTORY>"""
+msg_downloads_history['fr'] = """<MSG_DOWNLOADS_HISTORY>"""
+msg_people_who_viewed_this_page['fr'] = """<MSG_PEOPLE_WHO_VIEWED_THIS_PAGE>"""
+msg_people_who_downloaded_this_document['fr'] = """<MSG_PEOPLE_WHO_DOWNLOADED_THIS_DOCUMENT>"""
 </fr>
 
 ## German:
@@ -489,6 +510,13 @@ msg_record_deleted['de'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['de'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['de'] = """<MSG_RECORD_LAST_MODIFIED>"""
 msg_similar_records['de'] = """<MSG_SIMILAR_RECORDS>"""
+msg_cited_by['de'] = """<MSG_CITED_BY>"""
+msg_cited_by_x_records['de'] = """<MSG_CITED_BY_X_RECORDS>"""
+msg_cocited_with_x_records['de'] = """<MSG_COCITED_WITH_X_RECORDS>"""
+msg_citation_history['de'] = """<MSG_CITATION_HISTORY>"""
+msg_downloads_history['de'] = """<MSG_DOWNLOADS_HISTORY>"""
+msg_people_who_viewed_this_page['de'] = """<MSG_PEOPLE_WHO_VIEWED_THIS_PAGE>"""
+msg_people_who_downloaded_this_document['de'] = """<MSG_PEOPLE_WHO_DOWNLOADED_THIS_DOCUMENT>"""
 </de>
 
 ## Spanish:
@@ -605,6 +633,13 @@ msg_record_deleted['es'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['es'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['es'] = """<MSG_RECORD_LAST_MODIFIED>"""
 msg_similar_records['es'] = """<MSG_SIMILAR_RECORDS>"""
+msg_cited_by['es'] = """<MSG_CITED_BY>"""
+msg_cited_by_x_records['es'] = """<MSG_CITED_BY_X_RECORDS>"""
+msg_cocited_with_x_records['es'] = """<MSG_COCITED_WITH_X_RECORDS>"""
+msg_citation_history['es'] = """<MSG_CITATION_HISTORY>"""
+msg_downloads_history['es'] = """<MSG_DOWNLOADS_HISTORY>"""
+msg_people_who_viewed_this_page['es'] = """<MSG_PEOPLE_WHO_VIEWED_THIS_PAGE>"""
+msg_people_who_downloaded_this_document['es'] = """<MSG_PEOPLE_WHO_DOWNLOADED_THIS_DOCUMENT>"""
 </es>
 
 ## Portuguese:
@@ -721,6 +756,13 @@ msg_record_deleted['pt'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['pt'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['pt'] = """<MSG_RECORD_LAST_MODIFIED>"""
 msg_similar_records['pt'] = """<MSG_SIMILAR_RECORDS>"""
+msg_cited_by['pt'] = """<MSG_CITED_BY>"""
+msg_cited_by_x_records['pt'] = """<MSG_CITED_BY_X_RECORDS>"""
+msg_cocited_with_x_records['pt'] = """<MSG_COCITED_WITH_X_RECORDS>"""
+msg_citation_history['pt'] = """<MSG_CITATION_HISTORY>"""
+msg_downloads_history['pt'] = """<MSG_DOWNLOADS_HISTORY>"""
+msg_people_who_viewed_this_page['pt'] = """<MSG_PEOPLE_WHO_VIEWED_THIS_PAGE>"""
+msg_people_who_downloaded_this_document['pt'] = """<MSG_PEOPLE_WHO_DOWNLOADED_THIS_DOCUMENT>"""
 </pt>
 
 ## Italian:
@@ -837,6 +879,13 @@ msg_record_deleted['it'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['it'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['it'] = """<MSG_RECORD_LAST_MODIFIED>"""
 msg_similar_records['it'] = """<MSG_SIMILAR_RECORDS>"""
+msg_cited_by['it'] = """<MSG_CITED_BY>"""
+msg_cited_by_x_records['it'] = """<MSG_CITED_BY_X_RECORDS>"""
+msg_cocited_with_x_records['it'] = """<MSG_COCITED_WITH_X_RECORDS>"""
+msg_citation_history['it'] = """<MSG_CITATION_HISTORY>"""
+msg_downloads_history['it'] = """<MSG_DOWNLOADS_HISTORY>"""
+msg_people_who_viewed_this_page['it'] = """<MSG_PEOPLE_WHO_VIEWED_THIS_PAGE>"""
+msg_people_who_downloaded_this_document['it'] = """<MSG_PEOPLE_WHO_DOWNLOADED_THIS_DOCUMENT>"""
 </it>
 
 ## Russian:
@@ -953,6 +1002,13 @@ msg_record_deleted['ru'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['ru'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['ru'] = """<MSG_RECORD_LAST_MODIFIED>"""
 msg_similar_records['ru'] = """<MSG_SIMILAR_RECORDS>"""
+msg_cited_by['ru'] = """<MSG_CITED_BY>"""
+msg_cited_by_x_records['ru'] = """<MSG_CITED_BY_X_RECORDS>"""
+msg_cocited_with_x_records['ru'] = """<MSG_COCITED_WITH_X_RECORDS>"""
+msg_citation_history['ru'] = """<MSG_CITATION_HISTORY>"""
+msg_downloads_history['ru'] = """<MSG_DOWNLOADS_HISTORY>"""
+msg_people_who_viewed_this_page['ru'] = """<MSG_PEOPLE_WHO_VIEWED_THIS_PAGE>"""
+msg_people_who_downloaded_this_document['ru'] = """<MSG_PEOPLE_WHO_DOWNLOADED_THIS_DOCUMENT>"""
 </ru>
 
 ## Slovak:
@@ -1069,6 +1125,13 @@ msg_record_deleted['sk'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['sk'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['sk'] = """<MSG_RECORD_LAST_MODIFIED>"""
 msg_similar_records['sk'] = """<MSG_SIMILAR_RECORDS>"""
+msg_cited_by['sk'] = """<MSG_CITED_BY>"""
+msg_cited_by_x_records['sk'] = """<MSG_CITED_BY_X_RECORDS>"""
+msg_cocited_with_x_records['sk'] = """<MSG_COCITED_WITH_X_RECORDS>"""
+msg_citation_history['sk'] = """<MSG_CITATION_HISTORY>"""
+msg_downloads_history['sk'] = """<MSG_DOWNLOADS_HISTORY>"""
+msg_people_who_viewed_this_page['sk'] = """<MSG_PEOPLE_WHO_VIEWED_THIS_PAGE>"""
+msg_people_who_downloaded_this_document['sk'] = """<MSG_PEOPLE_WHO_DOWNLOADED_THIS_DOCUMENT>"""
 </sk>
 
 ## Czech:
@@ -1185,6 +1248,13 @@ msg_record_deleted['cs'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['cs'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['cs'] = """<MSG_RECORD_LAST_MODIFIED>"""
 msg_similar_records['cs'] = """<MSG_SIMILAR_RECORDS>"""
+msg_cited_by['cs'] = """<MSG_CITED_BY>"""
+msg_cited_by_x_records['cs'] = """<MSG_CITED_BY_X_RECORDS>"""
+msg_cocited_with_x_records['cs'] = """<MSG_COCITED_WITH_X_RECORDS>"""
+msg_citation_history['cs'] = """<MSG_CITATION_HISTORY>"""
+msg_downloads_history['cs'] = """<MSG_DOWNLOADS_HISTORY>"""
+msg_people_who_viewed_this_page['cs'] = """<MSG_PEOPLE_WHO_VIEWED_THIS_PAGE>"""
+msg_people_who_downloaded_this_document['cs'] = """<MSG_PEOPLE_WHO_DOWNLOADED_THIS_DOCUMENT>"""
 </cs>
 
 ## Norwegian:
@@ -1301,6 +1371,13 @@ msg_record_deleted['no'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['no'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['no'] = """<MSG_RECORD_LAST_MODIFIED>"""
 msg_similar_records['no'] = """<MSG_SIMILAR_RECORDS>"""
+msg_cited_by['no'] = """<MSG_CITED_BY>"""
+msg_cited_by_x_records['no'] = """<MSG_CITED_BY_X_RECORDS>"""
+msg_cocited_with_x_records['no'] = """<MSG_COCITED_WITH_X_RECORDS>"""
+msg_citation_history['no'] = """<MSG_CITATION_HISTORY>"""
+msg_downloads_history['no'] = """<MSG_DOWNLOADS_HISTORY>"""
+msg_people_who_viewed_this_page['no'] = """<MSG_PEOPLE_WHO_VIEWED_THIS_PAGE>"""
+msg_people_who_downloaded_this_document['no'] = """<MSG_PEOPLE_WHO_DOWNLOADED_THIS_DOCUMENT>"""
 </no>
 
 ## Swedish:
@@ -1417,6 +1494,13 @@ msg_record_deleted['sv'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['sv'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['sv'] = """<MSG_RECORD_LAST_MODIFIED>"""
 msg_similar_records['sv'] = """<MSG_SIMILAR_RECORDS>"""
+msg_cited_by['sv'] = """<MSG_CITED_BY>"""
+msg_cited_by_x_records['sv'] = """<MSG_CITED_BY_X_RECORDS>"""
+msg_cocited_with_x_records['sv'] = """<MSG_COCITED_WITH_X_RECORDS>"""
+msg_citation_history['sv'] = """<MSG_CITATION_HISTORY>"""
+msg_downloads_history['sv'] = """<MSG_DOWNLOADS_HISTORY>"""
+msg_people_who_viewed_this_page['sv'] = """<MSG_PEOPLE_WHO_VIEWED_THIS_PAGE>"""
+msg_people_who_downloaded_this_document['sv'] = """<MSG_PEOPLE_WHO_DOWNLOADED_THIS_DOCUMENT>"""
 </sv>
 
 ## Greek:
@@ -1533,6 +1617,13 @@ msg_record_deleted['el'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['el'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['el'] = """<MSG_RECORD_LAST_MODIFIED>"""
 msg_similar_records['el'] = """<MSG_SIMILAR_RECORDS>"""
+msg_cited_by['el'] = """<MSG_CITED_BY>"""
+msg_cited_by_x_records['el'] = """<MSG_CITED_BY_X_RECORDS>"""
+msg_cocited_with_x_records['el'] = """<MSG_COCITED_WITH_X_RECORDS>"""
+msg_citation_history['el'] = """<MSG_CITATION_HISTORY>"""
+msg_downloads_history['el'] = """<MSG_DOWNLOADS_HISTORY>"""
+msg_people_who_viewed_this_page['el'] = """<MSG_PEOPLE_WHO_VIEWED_THIS_PAGE>"""
+msg_people_who_downloaded_this_document['el'] = """<MSG_PEOPLE_WHO_DOWNLOADED_THIS_DOCUMENT>"""
 </el>
 
 ## Ukrainian:
@@ -1649,6 +1740,13 @@ msg_record_deleted['uk'] = """<MSG_RECORD_DELETED>"""
 msg_restricted['uk'] = """<MSG_RESTRICTED>"""
 msg_record_last_modified['uk'] = """<MSG_RECORD_LAST_MODIFIED>"""
 msg_similar_records['uk'] = """<MSG_SIMILAR_RECORDS>"""
+msg_cited_by['uk'] = """<MSG_CITED_BY>"""
+msg_cited_by_x_records['uk'] = """<MSG_CITED_BY_X_RECORDS>"""
+msg_cocited_with_x_records['uk'] = """<MSG_COCITED_WITH_X_RECORDS>"""
+msg_citation_history['uk'] = """<MSG_CITATION_HISTORY>"""
+msg_downloads_history['uk'] = """<MSG_DOWNLOADS_HISTORY>"""
+msg_people_who_viewed_this_page['uk'] = """<MSG_PEOPLE_WHO_VIEWED_THIS_PAGE>"""
+msg_people_who_downloaded_this_document['uk'] = """<MSG_PEOPLE_WHO_DOWNLOADED_THIS_DOCUMENT>"""
 </uk>
 
 
