@@ -115,13 +115,13 @@ def get_nicely_ordered_collection_list(collid=1, level=0):
         colls_nicely_ordered  = colls_nicely_ordered + get_nicely_ordered_collection_list(cid, level+1)
     return colls_nicely_ordered
 
-def get_wordsindex_id(field):
-    """Returns first words index id where the field code 'field' is word-indexed.
-       Returns zero in case there is no words table for this index.
+def get_index_id(field):
+    """Returns first index id where the field code FIELD is indexed.
+       Returns zero in case there is no table for this index.
        Example: field='author', output=4."""
     out = 0
-    query = """SELECT w.id FROM wordsindex AS w, wordsindex_field AS wf, field AS f
-                WHERE f.code='%s' AND wf.id_field=f.id AND w.id=wf.id_wordsindex
+    query = """SELECT w.id FROM idxINDEX AS w, idxINDEX_field AS wf, field AS f
+                WHERE f.code='%s' AND wf.id_field=f.id AND w.id=wf.id_idxINDEX
                 LIMIT 1""" % MySQLdb.escape_string(field)
     res = run_sql(query, None, 1)
     if res:
@@ -261,7 +261,7 @@ def create_basic_search_units(req, p, f, m=None):
                 elif fi and str(fi[0]).isdigit() and str(fi[0]).isdigit():
                     # B3b - fi exists and starts by two digits => do ACC search
                     opfts.append([oi,pi,fi,'a'])            
-                elif fi and not get_wordsindex_id(fi):
+                elif fi and not get_index_id(fi):
                     # B3c - fi exists but there is no words table for fi => try ACC search
                     opfts.append([oi,pi,fi,'a'])            
                 else:
@@ -1468,11 +1468,11 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
     set = HitSet() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
     # deduce into which bibwordsX table we will search:
-    bibwordsX = "bibwords%d" % get_wordsindex_id("anyfield")
+    bibwordsX = "idxWORD%02dF" % get_index_id("anyfield")
     if f:
-        wordsindex_id = get_wordsindex_id(f)
-        if wordsindex_id:
-            bibwordsX = "bibwords%d" % wordsindex_id
+        index_id = get_index_id(f)
+        if index_id:
+            bibwordsX = "idxWORD%02dF" % index_id
 
     # wash 'word' argument and construct query:
     word = string.replace(word, '*', '%') # we now use '*' as the truncation character
@@ -1705,14 +1705,14 @@ def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang, intro_text_p
     return intro + "<blockquote>" + out + "</blockquote>"
 
 def get_nearest_terms_in_bibwords(p, f, n_below, n_above):
-    """Return list of +n -n nearest terms to word `p' in wordsindex for field `f'."""
+    """Return list of +n -n nearest terms to word `p' in index for field `f'."""
     nearest_words = [] # will hold the (sorted) list of nearest words to return
     # deduce into which bibwordsX table we will search:
-    bibwordsX = "bibwords%d" % get_wordsindex_id("anyfield")
+    bibwordsX = "idxWORD%02dF" % get_index_id("anyfield")
     if f:
-        wordsindex_id = get_wordsindex_id(f)
-        if wordsindex_id:
-            bibwordsX = "bibwords%d" % wordsindex_id
+        index_id = get_index_id(f)
+        if index_id:
+            bibwordsX = "idxWORD%02dF" % index_id
         else:
             return nearest_words
     # firstly try to get `n' closest words above `p':
@@ -1813,11 +1813,11 @@ def get_nbhits_in_bibwords(word, f):
     """Return number of hits for word 'word' inside words index for field 'f'."""
     out = 0
     # deduce into which bibwordsX table we will search:
-    bibwordsX = "bibwords%d" % get_wordsindex_id("anyfield")
+    bibwordsX = "idxWORD%02dF" % get_index_id("anyfield")
     if f:
-        wordsindex_id = get_wordsindex_id(f)
-        if wordsindex_id:
-            bibwordsX = "bibwords%d" % wordsindex_id
+        index_id = get_index_id(f)
+        if index_id:
+            bibwordsX = "idxWORD%02dF" % index_id
         else:
             return 0
     if word:
@@ -3201,7 +3201,7 @@ def profile(p="", f="", c=cdsname):
 #print ":"+wash_pattern("*")+":\n"
 #print ":"+wash_pattern("ellis* ell* e*%")+":\n"
 #print run_sql("SELECT name,dbquery from collection")
-#print get_wordsindex_id("author")
+#print get_index_id("author")
 #print get_coll_ancestors("Theses")
 #print get_coll_sons("Articles & Preprints")
 #print get_coll_real_descendants("Articles & Preprints")
