@@ -288,8 +288,10 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         elif arr3[3] == 'S':
             text=arr3[9]
         # If the field is an evaluated script
+        # the execed code should set variable text
         elif arr3[3] == 'R':
-            text=eval(arr3[9])
+            co = compile(arr3[9].replace("\r\n","\n"),"<string>","exec")
+            exec(co)
         # If the field type is not recognized
         else:
             text="%s: unknown field type" % arr[1]
@@ -334,27 +336,18 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             # increment the fields counter
             nbFields = nbFields + 1
         else:
-            #case of a user-defined field which contains multiple form fields
-            formfields = text.split(">")
-            for formfield in formfields:
-                match = re.search("name=([^ <>]+)",formfield,re.IGNORECASE)
-                if match != None:
-                    names = match.groups()
-                    for value in names:
-                        if value != "":
-                            value = re.compile("[\"']+").sub("",value)
-                            select.append(0)
-                            radio.append(0)
-                            upload.append(0)
-                            field.append(value)
-                            level.append(arr[5])
-                            txt.append(arr[6])
-                            level.append(arr[5])
-                            fullDesc.append(arr[4])
-                            txt.append(arr[6])
-                            check.append(arr[7])
-                            fieldhtml.append(text)
-                            nbFields = nbFields+1
+            select.append(0)
+            radio.append(0)
+            upload.append(0)
+            field.append(value)
+            level.append(arr[5])
+            txt.append(arr[6])
+            level.append(arr[5])
+            fullDesc.append(arr[4])
+            txt.append(arr[6])
+            check.append(arr[7])
+            fieldhtml.append(text)
+            nbFields = nbFields+1
         # now displays the html form field(s)
         t+="%s\n" % fullDesc[nbFields-1]
         t+=text+"\n"
@@ -824,7 +817,9 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     </TR>
     </TABLE>
     </center>
-    </form>"""
+    </form>
+    <br>
+    <br>"""
     # Add the "back to main menu" button
     if finished == 0:
         t=t+ "    <A HREF=\"%s\" onClick=\"return confirm('Are you sure you want to quit this submission?')\">\n" % mainmenu
