@@ -31,6 +31,7 @@ import re
 import mimetypes
 import shutil
 import md5
+import urllib
 
 from config import *
 from access_control_engine import acc_authorize_action
@@ -280,7 +281,7 @@ class BibDoc:
         if existingIcon != None:
             existingIcon.delete()
         self.BuildRelatedFileList()
-        
+
     def display(self,version=""):
         t=""
         if version == "all":
@@ -291,7 +292,7 @@ class BibDoc:
             docfiles = self.listLatestFiles()
         existingIcon = self.getIcon()
         if existingIcon != None:
-            imagepath = "%s/getfile.py?docid=%s&name=%s&format=gif" % (weburl,existingIcon.getId(),existingIcon.getDocName())
+            imagepath = "%s/getfile.py?docid=%s&name=%s&format=gif" % (weburl,existingIcon.getId(),urllib.quote(existingIcon.getDocName()))
         else:
             imagepath = "%s/smallfiles.gif" % images
         t+="<table border=0 cellspacing=1 class=\"searchbox\"><tr><td align=left colspan=2 class=\"portalboxheader\"><img src='%s' border=0>&nbsp;&nbsp;%s</td></tr>" % (imagepath,self.docname)
@@ -439,7 +440,7 @@ class BibDocFile:
             format = ".%s" % self.format
         else:
             format = ""
-        return "<tr><td valign=top><small><a href=\"%s/getfile.py?docid=%s&name=%s&format=%s&version=%s\">%s%s</a></td><td valign=top><font size=-2 color=green>[%s&nbsp;B]</font></td></tr>\n""" % (weburl,self.bibdocid,re.sub("\&","%26",self.name),self.format,self.version,self.name,format,self.size)
+        return "<tr><td valign=top><small><a href=\"%s/getfile.py?docid=%s&name=%s&format=%s&version=%s\">%s%s</a></td><td valign=top><font size=-2 color=green>[%s&nbsp;B]</font></td></tr>\n""" % (weburl,self.bibdocid,urllib.quote(self.name),urllib.quote(self.format),self.version,self.name,format,self.size)
  
     def getType(self):
         return self.type
