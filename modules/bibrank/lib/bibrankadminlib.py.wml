@@ -567,7 +567,7 @@ def perform_showrankdetails(rnkID, ln=cdslang):
     languages = dict(get_languages())
     if trans:
         for lang, type, name in trans:
-            if lang and type and name:
+            if lang and languages.has_key(lang) and type and name:
                 if prev_lang != lang:
                     prev_lang = lang
                     text += """%s: <br>""" % (languages[lang])
