@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of the CERN Document Server Software (CDSware).
@@ -30,6 +31,7 @@
 <strong>2. <a href="#2">Edit records via Web interface</a></strong><br>
 <strong>3. <a href="#3">Edit records via command line</a></strong><br>
 <strong>4. <a href="#4">Delete records via command line</a></strong><br>
+<strong>5. <a href="#5">Delete all records</a></strong><br>
 
 <a name="1"></a><h2>1. Overview</h2>
 
@@ -176,12 +178,22 @@ baskets.
      CDSware yet; moreover in the future we plan to abolish all the
      bibXXx tables, so that this won't be necessary anymore.
 
-<p>P.S. If you want to wipe out all the existing bibliographic content of
-     your site, for example to start uploading the documents from
-     scratch again, you can launch:
+<a name="5"></a><h2>5. Delete all records</h2>
 
+    <p>If you want to wipe out all the existing bibliographic content of
+       your site, for example to start uploading the documents from
+       scratch again, you can launch:
+                                  
      <pre>
        $ /path/to/your/cdsware/bin/dbexec &lt; /path/to/your/cdsware-source/modules/miscutil/sql/tabbibclean.sql
        $ /path/to/your/cdsware/bin/webcoll
      </pre>
+
+     Note that you may also want to truncate some idxWORD11* tables,
+     in case you have created additional indexes.  Look into
+     <code>tabbibclean.sql</code> to see exactly what it does.
+
+     Note that you may also want to delete the fulltext files and the
+     submission counters in <code>/path/to/your/cdsware/var/data</code>
+     subdirectories, if you use WebSubmit.
 
