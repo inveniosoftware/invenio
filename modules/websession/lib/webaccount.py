@@ -97,6 +97,12 @@ def perform_display_account(req,data,bask,aler,sear):
     out +=template_account("Your Baskets",bask)
     out +=template_account("Your Alert Searches",aler)
     out +=template_account("Your Searches",sear)
+    out +=template_account("Your Submissions",
+                           """You can consult the list of <a href="%s/yoursubmissions.py">your submissions</a>
+                              and inquire about their status.""" % weburl)
+    out +=template_account("Your Approvals",
+                           """You can consult the list of <a href="%s/yourapprovals.py">your approvals</a>
+                              with the documents you approved or refereed.""" % weburl)
     return out
 
 # template_account() : it is a template for print each of the options from the user's account	
