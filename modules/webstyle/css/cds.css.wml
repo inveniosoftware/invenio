@@ -101,20 +101,40 @@ a.note:hover {
    color: #999;
    background: transparent;
 }
+.navtrail {
+   color: #666;
+   background: #f2f2f2;
+}
 a.navtrail:link {
-   color: #006;
+   color: #666;
    background: transparent;
 }
 a.navtrail:visited {
-   color: #006;
+   color: #666;
    background: transparent;
 }
 a.navtrail:active {
-   color: #006;
+   color: #666;
    background: transparent;
 }
 a.navtrail:hover {
-   color: #006;
+   color: #666;
+   background: transparent;
+}
+a.userinfobox:link {
+   color: #060;
+   background: transparent;
+}
+a.userinfobox:visited {
+   color: #060;
+   background: transparent;
+}
+a.userinfobox:active {
+   color: #060;
+   background: transparent;
+}
+a.userinfobox:hover {
+   color: #060;
    background: transparent;
 }
 .pageheader {
@@ -209,6 +229,10 @@ a.navtrail:hover {
    color: #060;
    background: transparent;
 }
+.userinfobox {
+   color: #060;
+   background: transparent;
+}
 .header {
    color: #000;
    background: #9cf;
@@ -261,10 +285,6 @@ a.navtrail:hover {
    font-family: "Helvetica", "Arial", sans-serif;
    font-style: normal;
    font-size: x-small;
-}
-.navtrail {
-   color: #006;
-   background: transparent;
 }
 .note {
    color: #999;
