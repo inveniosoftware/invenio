@@ -1399,7 +1399,7 @@ opts, args = getopt.getopt(sys.argv[1:],"c:d:hVl:o:b:e:B:E:s:m:C:",
 dirmode = 0
 
 for opt, opt_value in opts:
-    if opt == "-c":
+    if opt in ["-c", "--config"]:
 
         extract_tpl = opt_value
         extract_tpl_parsed  = parse_common_template(extract_tpl,1)
@@ -1410,55 +1410,55 @@ for opt, opt_value in opts:
         target_tpl  = opt_value 
         target_tpl_parsed  = parse_common_template(target_tpl,3)
 
-    elif opt == "-d":
+    elif opt in ["-d", "--directory"]:
         source_data       = opt_value
         source_data       = source_data + "/"
         extract_tpl       = "/"
         dirmode           = 1
 
-    elif opt == "-h":
+    elif opt in ["-h", "--help"]:
         printInfo()
         sys.exit(0)
 
-    elif opt == "-V":
+    elif opt in ["-V", "--version"]:
         print __version__
         sys.exit(0)
 
-    elif opt == "-l":
+    elif opt in ["-l", "--length"]:
         try:
             conv_setting[0] = string.atoi(opt_value)
         except ValueError, e:
             conv_setting[0] = 1
 
-    elif opt == "-o":
+    elif opt in ["-o", "--oai"]:
         try:
             oai_identifier_from = string.atoi(opt_value)
         except ValueError, e:
             oai_identifier_from = 1
 
-    elif opt == "-b":
+    elif opt in ["-b", "--header"]:
         begin_header         = opt_value
 
-    elif opt == "-e":
+    elif opt in ["-e", "--footer"]:
         ending_footer        = opt_value
 
-    elif opt == "-B":
+    elif opt in ["-B", "--record-header"]:
         begin_record_header  = opt_value
 
-    elif opt == "-E":
+    elif opt in ["-E", "--record-footer"]:
         ending_record_footer = opt_value
 
-    elif opt == "-s":
+    elif opt in ["-s", "--separator"]:
         separator            = opt_value
 
-    elif opt == "-t":
+    elif opt in ["-t", "--output_separator"]:
         output_rec_sep       = opt_value
 
-    elif opt == "-m":
+    elif opt in ["-m", "--match"]:
         match_mode           = string.atoi(opt_value[0:1])
         query_string         = opt_value[1:]
 
-    elif opt == "-C":
+    elif opt in ["-C", "--config-alt"]:
         if opt_value[0:1] == "x":
             extract_tpl   = opt_value[1:]
             extract_tpl_parsed = parse_template(extract_tpl)
