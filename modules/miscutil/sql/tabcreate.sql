@@ -2208,6 +2208,31 @@ CREATE TABLE IF NOT EXISTS tag (
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
+-- tables for file management
+
+CREATE TABLE IF NOT EXISTS bibdoc (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  type varchar(255),
+  status varchar(50) NOT NULL default '',
+  docname varchar(250) NOT NULL default 'file',
+  creation_date datetime NOT NULL default '0000-00-00',
+  modification_date datetime NOT NULL default '0000-00-00',
+  PRIMARY KEY  (id)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS bibrec_bibdoc (
+  id_bibrec mediumint(9) unsigned NOT NULL default '0',
+  id_bibdoc mediumint(9) unsigned NOT NULL default '0',
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS bibdoc_bibdoc (
+  id_bibdoc1 mediumint(9) unsigned NOT NULL,
+  id_bibdoc2 mediumint(9) unsigned NOT NULL,
+  type varchar(255),
+  KEY  (id_bibdoc1),
+  KEY  (id_bibdoc2)
+) TYPE=MyISAM;
+
 -- tables for publication requests:
 
 CREATE TABLE IF NOT EXISTS publreq (

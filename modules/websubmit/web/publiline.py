@@ -249,7 +249,7 @@ def displayDocument(doctype,categ,RN,send):
         if authors == "unknown" or title == "unknown":
             SendWarning(doctype,categ,RN,title,authors,access)
         else:
-            SendEnglish(doctype,categ,RN,title,authors,access)
+            SendEnglish(doctype,categ,RN,title,authors,access,sysno)
             run_sql("update sbmAPPROVAL set dLastReq=NOW() where rn=%s",(RN,))
             t+= "<I><strong class=headline>Your request has been sent to the referee!</strong></I><BR><BR>"
     t+= "<FORM action=\"publiline.py\">\n"
@@ -323,6 +323,12 @@ def getInPending(doctype,categ,RN):
         fp.close()
     else:
         title = ""
+    if os.path.exists("%s/%s/%s/SN" % (PENDIR,doctype,RN)):
+        fp = open("%s/%s/%s/SN" % (PENDIR,doctype,RN),"r")
+        sysno=fp.read()
+        fp.close()
+    else:
+        sysno = ""
     if title == "" and os.path.exists("%s/%s/%s/TIF" % (PENDIR,doctype,RN)):
         fp = open("%s/%s/%s/TIF" % (PENDIR,doctype,RN),"r")
         title=fp.read()
@@ -330,7 +336,7 @@ def getInPending(doctype,categ,RN):
     if title == "":
         return 0
     else:
-        return (authors,title,"","")
+        return (authors,title,sysno,"")
 
 #seek info in Alice database
 def getInAlice(doctype,categ,RN):
@@ -350,7 +356,7 @@ def getInAlice(doctype,categ,RN):
     else:
         return 0
 
-def SendEnglish(doctype,categ,RN,title,authors,access):
+def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
     FROMADDR = 'CDSwareSubmission Interface <%s>' % supportemail
     # retrieve useful information from webSubmit configuration
     res = run_sql("select value from sbmPARAMETERS where name='categformatDAM' and doctype=%s", (doctype,))
@@ -362,8 +368,11 @@ def SendEnglish(doctype,categ,RN,title,authors,access):
     else:
         categ = "unknown"
     res = run_sql("select value from sbmPARAMETERS where name='addressesDAM' and doctype=%s",(doctype,))
-    otheraddresses = res[0][0]
-    otheraddresses = otheraddresses.replace("<CATEG>",categ)
+    if len(res) > 0:
+        otheraddresses = res[0][0]
+        otheraddresses = otheraddresses.replace("<CATEG>",categ)
+    else:
+        otheraddresses = ""
     # Build referee's email address
     refereeaddress = ""
     # Try to retrieve the referee's email from the referee's database
@@ -397,14 +406,14 @@ def SendEnglish(doctype,categ,RN,title,authors,access):
     Author(s): %s
     
     To access the document(s), select the file(s) from the location:
-    <%s/archive.py?base=%s&id=%s>
+    <%s/getfile.py?recid=%s>
     
     To approve/reject the document, you should go to this URL:
     <%s/approve.py?%s>
     
     ---------------------------------------------
     Best regards.
-    The submission team.""" % (RN,title,authors,urlpath,directory,RN,urlpath,access)
+    The submission team.""" % (RN,title,authors,urlpath,sysno,urlpath,access)
     # send the mail
     body = forge_email(FROMADDR,addresses,adminemail,"Request for Approval of %s" % RN,message)
     send_email(FROMADDR,addresses,body,0)

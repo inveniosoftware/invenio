@@ -98,7 +98,7 @@ def Send_Approval_Request (parameters,curdir,form):
     title_referee = "Request for approval of %s" % rn
     mail_referee = "The document %s has been submitted to the %s Server..\nYour approval is requested on it.\n\n" % (rn,cdsname)
     mail_referee +="Title: %s\n\nAuthor(s): %s\n\n" % (title,author)
-    mail_referee +="To access the document(s), select the file(s) from the location:<%s/archive.py?recid=%s>\n\n" % (htdocsurl,sysno)
+    mail_referee +="To access the document(s), select the file(s) from the location:<%s/getfile.py?recid=%s>\n\n" % (htdocsurl,sysno)
     mail_referee +="To approve/reject the document, you should go to this URL:\n<%s/approve.py?%s>\n" % (urlpath,access)
     mail_referee +="---------------------------------------------\nBest regards.\nThe submission team.\n"
     #Send mail to referee
