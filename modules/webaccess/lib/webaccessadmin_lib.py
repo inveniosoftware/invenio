@@ -529,13 +529,14 @@ def perform_accesspolicy(req, callback='yes', confirm=0):
     subtitle = """<a name="1"></a>1. Access policy.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
     account_policy = {}
-    account_policy[0] = "Users can register new accounts. New accounts automatically activated" 
-    account_policy[1] = "Users can register new accounts. Admin users must activate the accounts"
-    account_policy[2] = "Only admin can register new accounts. "
+    account_policy[0] = "Users can register new accounts. New accounts automatically activated." 
+    account_policy[1] = "Users can register new accounts. Admin users must activate the accounts."
+    account_policy[2] = "Only admin can register new accounts. User cannot edit email address."
 
     output = "<br><b>Current settings:</b><br>"
     output += "Guest accounts allowed: %s<br>" % (CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0 and "Yes" or "No")
     output += "Account policy: %s<br>" % (account_policy[CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS])
+    output += "Allowed email addresses limited: %s<br>" % (CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN and CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN or "Not limited")
     output += "Send email to admin when new account: %s<br>" % (CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS == 1 and "Yes" or "No")
     output += "Use which email address: %s<br>" % (CFG_ACCESS_CONTROL_SEND_TO_EMAIL)
     output += "Send email to user after creating new account: %s<br>" % (CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1 and "Yes" or "No")

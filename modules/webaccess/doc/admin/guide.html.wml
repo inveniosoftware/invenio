@@ -818,7 +818,7 @@ II. Example - connecting role and user</a>
     The three levels for normal accounts, are:
        0 - Allow user to create account, automatically activate new accounts
        1 - Allow user to create account, administrator must activate account
-       2 - Only administrators can create account.
+       2 - Only administrators can create account. User cannot edit the email address.
     You can configure CDSware to send an email:
        1. To an admin email-address when an account is created
        2. To the owner of an account when it is created
@@ -833,8 +833,10 @@ II. Example - connecting role and user</a>
     - Access policy for accounts.
       0 = Users can register, automatically acticate accounts
       1 = Users can register, but admin must activate the accounts
-      2 = Users cannot register, only admin can register accounts.
+      2 = Users cannot register or change email address, only admin can register accounts.
       CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS = 0
+    - Limit email addresses available to use when register a new account (example: cern.ch).
+      CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN = ""
     - Send an email when a new account is created by an user
       CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS = 0
     - Send it to this email-address

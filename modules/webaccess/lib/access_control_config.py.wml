@@ -53,8 +53,10 @@ CFG_ACCESS_CONTROL_LEVEL_GUESTS = 0
 # access policy for accounts. 
 #0 = Users can register, automatically acticate accounts
 #1 = Users can register, but admin must activate the accounts
-#2 = Users cannot register, only admin can register accounts. 
+#2 = Users cannot register or update email address, only admin can register accounts. 
 CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS = 0
+# limit email addresses available to use when register a new account (example: cern.ch):
+CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN = ""
 # send an email when a new account is created by an user
 CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS = 0
 # send it to this email-address
