@@ -328,7 +328,7 @@ def display_basket_content(uid, id_basket, basket_name):
                            """<IMG src="%s/arrow_down.gif" border="0"></A>"""\
                            """</TD>"""\
                            """<TD>%s</TD></TR>"""\
-                           """<TR colspan="2"><TD></TD></TR>""" % (id_basket,row[0],row[1],preid,preord,imagesurl,zlib.decompress(preabstract))                    
+                           """<TR colspan="2"><TD></TD></TR>""" % (id_basket,row[0],row[1],preid,preord,imagesurl,preabstract)
                     # display current item
                     out += """<TR valign="top"><TD width="60">%s<input type="checkbox" name="mark" value="%s">"""\
                            """<A href="display?id_basket=%s&amp;action=ORDER&amp;idup=%s&amp;ordup=%s&amp;iddown=%s&amp;orddown=%s">"""\
@@ -684,11 +684,11 @@ def perform_display_public(uid, id_basket, basket_name, action, to_basket, mark,
                            """<IMG src="%s/arrow_down.gif" border="0"></A>"""\
                            """</TD>"""\
                            """<TD>%s</TD></TR>"""\
-                           """<TR colspan="2"><TD></TD></TR>""" % (id_basket,row[0],row[1],preid,preord,imagesurl,zlib.decompress(preabstract))                    
+                           """<TR colspan="2"><TD></TD></TR>""" % (id_basket,row[0],row[1],preid,preord,imagesurl,preabstract)
                     # display current item
                     out += """<TR valign="top"><TD width="60">%s<input type="checkbox" name="mark" value="%s">"""\
                            """<A href="display?id_basket=%s&action=ORDER&idup=%s&ordup=%s&iddown=%s&orddown=%s">"""\
-                           """<IMG src="%s/arrow_up.gif" border="0"></A>""" % (i,row[0],id_basket,row[0],row[1],preid,preord,imagesurl)              
+                           """<IMG src="%s/arrow_up.gif" border="0"></A>""" % (i,row[0],id_basket,row[0],row[1],preid,preord,imagesurl)
                 preid = row[0]
                 preord = row[1]
                 preabstract = print_record(row[0], "hb")
@@ -697,7 +697,7 @@ def perform_display_public(uid, id_basket, basket_name, action, to_basket, mark,
             out += """<IMG src="%s/arrow_down.gif" border="0"></A>"""\
                    """</TD>"""\
                    """<TD>%s</TD></TR>"""\
-                   """<TR colspan="2"><TD></TD></TR>""" % (imagesurl,zlib.decompress(preabstract))                    
+                   """<TR colspan="2"><TD></TD></TR>""" % (imagesurl,preabstract)
 
             # hidden parameters
             out += """<INPUT type="hidden" name="id_basket" value="%s"></TD></TR>""" % id_basket
