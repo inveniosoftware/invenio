@@ -281,7 +281,7 @@
   <ru>Сократить набор:</ru>
   <sk>Zúžiť podľa kolekciе:</sk>
   <cz>Zúžit podle kolekcе:</cz>
-  <no>Avgrenset søk:</no>
+  <no>Begrens til samling:</no>
   <se>Avgränsad sökning:</se>
 </define-tag>
 
@@ -435,7 +435,7 @@
   <en>submissions</en>
   <fr>soumissions</fr>
   <de>Eintragungen</de>
-  <es>submissions</es>
+  <es>envios</es>
   <pt>submissions</pt>
   <it>submissions</it>
   <ru>записи</ru>
@@ -451,8 +451,8 @@
   <fr>approbations</fr>
   <de>Bestätigungen</de>
   <es>approvals</es>
-  <pt>approvals</pt>
-  <it>approvals</it>
+  <pt>aprovações</pt>
+  <it>approvazioni</it>
   <ru>подтверждения</ru>
   <sk>schválenia</sk>
   <cz>schválení</cz>
@@ -744,14 +744,14 @@
 <define-tag MSG_RANK_BY whitespace=delete>
   <en>Rank by:</en>
   <fr>Ranger par:</fr>
-  <de>Rank by:</de>
+  <de>Ranking:</de>
   <es>Rank by:</es>
-  <pt>Rank by:</pt>
-  <it>Rank by:</it>
+  <pt>Ordenado por:</pt>
+  <it>Ordinare per:</it>
   <ru>Упорядочить по:</ru>
   <sk>Zoradiť podľa:</sk>
   <cz>Seřadit podle:</cz>
-  <no>Rank by:</no>
+  <no>Ranger etter:</no>
   <se>Rangordna efter:</se>
 </define-tag>
 
@@ -1405,8 +1405,8 @@
     Les autres collections publiques ont donné <a class="nearestterms" href="%s/search.py?%s">%d résultats</a>.
   </fr>
   <de>
-    Kein genaues Resultat in den Sammlung %s.
-    Other public collections gave <a class="nearestterms" href="%s/search.py?%s">%d hits</a>.
+    Kein genaues Resultat in der Sammlung %s.
+    Andere offentliche Sammlungen ergaben <a class="nearestterms" href="%s/search.py?%s">%d Ergebnisse</a>.
   </de>
   <es>
     No hay documentos que respondan a la búsqueda en la coleción %s.
@@ -1414,11 +1414,11 @@
   </es>
   <pt>
     Nenhum resultado foi encontrado na coleção %s.
-    Other public collections gave <a class="nearestterms" href="%s/search.py?%s">%d hits</a>.
+    Outras coleções públicas retornaram <a class="nearestterms" href="%s/search.py?%s">%d resultados</a>.
   </pt>
   <it>
     Nessun risultato trovato nelle collezioni %s.
-    Other public collections gave <a class="nearestterms" href="%s/search.py?%s">%d hits</a>.
+    Le altre collezioni pubbliche hanno dato <a class="nearestterms" href="%s/search.py?%s">%d risultati</a>.
   </it>
   <ru>
     Не найден результат в наборе %s.
@@ -1434,7 +1434,7 @@
   </cz>
   <no>
     Ingen nøyaktige treff funnet i samling %s.
-    Other public collections gave <a class="nearestterms" href="%s/search.py?%s">%d hits</a>.
+    Andre offentlige samlinger gav <a class="nearestterms" href="%s/search.py?%s">%d treff</a>.
   </no>
   <se>
     Inga poster hittades i samling %s.
@@ -1886,10 +1886,10 @@
 <define-tag MSG_THOUSANDS_SEPARATOR whitespace=delete>
   <en>,</en>
   <fr>'</fr>
-  <de>,</de>
+  <de>.</de>
   <es>,</es>
-  <pt>,</pt>
-  <it>,</it>
+  <pt>.</pt>
+  <it>.</it>
   <ru>,</ru>
   <sk>,</sk>
   <cz>,</cz>
@@ -1901,14 +1901,14 @@
 <define-tag MSG_RECORD_DELETED whitespace=delete>
   <en>The record has been deleted.</en>
   <fr>La notice a été supprimée.</fr>
-  <de>The record has been deleted.</de>
+  <de>Der Datensatz wurde gelöscht.</de>
   <es>The record has been deleted.</es>
-  <pt>The record has been deleted.</pt>
+  <pt>O registro foi apagado.</pt>
   <it>The record has been deleted.</it>
   <ru>The record has been deleted.</ru>
   <sk>Záznam bol vymazaný.</sk>
   <cz>Záznam byl vymazán.</cz>
-  <no>The record has been deleted.</no>
+  <no>Posten har blitt slettet.</no>
   <se>The record has been deleted.</se>
 </define-tag>
 
@@ -1931,14 +1931,14 @@
 <define-tag MSG_RECORD_LAST_MODIFIED whitespace=delete>
   <en>Record created %s, last modified %s</en>
   <fr>Notice créée %s, modifiée %s</fr>
-  <de>Record created %s, last modified %s</de>
+  <de>Datensatz erzeugt %s, letzte Änderung %s</de>
   <es>Record created %s, last modified %s</es>
-  <pt>Record created %s, last modified %s</pt>
+  <pt>Registro criado %s, modificado pela última vez %s</pt>
   <it>Record created %s, last modified %s</it>
   <ru>Record created %s, last modified %s</ru>
   <sk>Záznam vytvorený %s, modifikovaný %s</sk>
   <cz>Záznam vytvořen %s, modifikován %s</cz>
-  <no>Record created %s, last modified %s</no>
+  <no>Posten vart laget %s, sist endret %s</no>
   <se>Record created %s, last modified %s</se>
 </define-tag>
 
