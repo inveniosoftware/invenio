@@ -40,25 +40,19 @@ oaiidfield             =   "<OAIIDTAG>"
 oaisetfield            =   "<OAISETTAG>"
 oaideleted             =   "<OAIDELETEDPOLICY>"
 
-try:
-    import cPickle
-    import string
-    from string import split
-    import os
-    import re
-    import urllib
-    import sys
-    import time
-    import md5
+import cPickle
+import string
+from string import split
+import os
+import re
+import urllib
+import sys
+import time
+import md5
 
-    sys.path.append('%s' % pylibdir)
-    from config import *
-    from dbquery import run_sql
-
-except ImportError, e:
-    import sys
-    sys.stderr.write("Error: %s" % e)
-    sys.exit(1)
+sys.path.append('%s' % pylibdir)
+from config import *
+from dbquery import run_sql
 
 verbs = {
     "Identify"            : [""],

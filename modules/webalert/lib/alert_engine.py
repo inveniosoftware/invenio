@@ -30,20 +30,15 @@
 
 __version__ = "$Id$"
 
-try:
-    from cgi import parse_qs
-    from sre import search, sub
-    from time import localtime, strftime, mktime, sleep
-    import smtplib
-    from config import *
-    from search_engine import perform_request_search
-    from dbquery import run_sql
-    from htmlparser import *
-    from string import split
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)    
+from cgi import parse_qs
+from sre import search, sub
+from time import localtime, strftime, mktime, sleep
+import smtplib
+from config import *
+from search_engine import perform_request_search
+from dbquery import run_sql
+from htmlparser import *
+from string import split
 
 MAXIDS = 50
 FROMADDR = 'CDS Alert Engine <%s>' % alertengineemail

@@ -30,16 +30,11 @@
 
 __version__ = "$Id$"
 
-try:
-    from config import *
-    from search_engine import print_record
-    from HTMLParser import HTMLParser
-    import textwrap
-    from string import split
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)    
+from config import *
+from search_engine import print_record
+from HTMLParser import HTMLParser
+import textwrap
+from string import split
 
 WRAPWIDTH = 72
 

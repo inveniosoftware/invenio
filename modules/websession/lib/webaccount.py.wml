@@ -25,17 +25,12 @@
 #include "config.wml"
 #include "configbis.wml"
 
-try:
-    import sys
-    import cgi
-    from config import *
-    from webpage import page
-    from dbquery import run_sql	
-    from webuser import getUid,isGuestUser
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+import sys
+import cgi
+from config import *
+from webpage import page
+from dbquery import run_sql	
+from webuser import getUid,isGuestUser
 
 imagesurl = "%s/img" % weburl
 
