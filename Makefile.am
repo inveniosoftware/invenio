@@ -61,6 +61,15 @@ create-tables: local-dbexec local-tabfill
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabcreate.sql
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
 
+update-v0.3.0-tables update-v0.3.1-tables: local-dbexec
+	echo "ALTER TABLE idxINDEXNAME CHANGE id_idxINDEX id_idxINDEX mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec 
+	echo "ALTER TABLE rnkMETHODNAME CHANGE id_rnkMETHOD id_rnkMETHOD mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec 
+	echo "ALTER TABLE collectionname CHANGE id_collection id_collection mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec 
+	echo "ALTER TABLE formatname CHANGE id_format id_format mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec 
+	echo "ALTER TABLE fieldname CHANGE id_field id_field mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec 
+	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runbibrank','run BibRank','','no');" | ./modules/miscutil/bin/dbexec 
+	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgbibrank','configure BibRank','','no');" | ./modules/miscutil/bin/dbexec 
+
 drop-tables: local-dbexec 
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabdrop.sql
 
