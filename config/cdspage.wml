@@ -61,7 +61,7 @@ $(cdspageheaderadd)
        <tr class="pageboxlefttop" valign=top>
         <td width=100%>
          ## navbar is by default in the the left top box
-         <navbar:render name=$(navbar_name) select=$(navbar_select)> 
+         <navbar:render nohints name=$(navbar_name) select=$(navbar_select)> 
         </td>
        </tr>
          ## first common "left top" CDS page box
