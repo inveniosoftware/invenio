@@ -455,19 +455,6 @@ def remove_subfields(s):
     "Removes subfields from string, e.g. 'foo $$c bar' becomes 'foo bar'."
     return re_subfields.sub(' ', s)
 
-def get_field_tags(field):
-    """Returns a list of MARC tags for the field code 'field'.
-       Returns empty list in case of error.
-       Example: field='author', output=['100__%','700__%']."""
-    out = []
-    query = """SELECT t.value FROM tag AS t, field_tag AS ft, field AS f
-                WHERE f.code='%s' AND ft.id_field=f.id AND t.id=ft.id_tag
-                ORDER BY ft.score DESC""" % field
-    res = run_sql(query)
-    for row in res:
-        out.append(row[0])
-    return out
-
 def get_index_id(indexname):
     """Returns the words/phrase index id for INDEXNAME.
        Returns empty string in case there is no words table for this index.
