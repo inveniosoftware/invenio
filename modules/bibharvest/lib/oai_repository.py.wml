@@ -354,6 +354,9 @@ def print_record(sysno, format='marcxml'):
             for f in get_field(sysno, "245__a"):
                 out =  "%s         <title>%s</title>\n" % (out, encode_for_xml(f))
 
+            for f in get_field(sysno, "111__a"):
+	                    out =  "%s         <title>%s</title>\n" % (out, encode_for_xml(f))
+
             for f in get_field(sysno, "65017a"):
                 out =  "%s         <subject>%s</subject>\n" % (out, encode_for_xml(f))
 
