@@ -169,24 +169,7 @@ taskid = -1
 base_process_size = 4500 # process base size
 opts_dict = {} # will hold task options
 
-## build iso-latin-1 to "undotted" ascii translation table
-def build_table_latin1_to_ascii():
-    """Builds translation table from ISO Latin-1 into ASCII.
-    For example, 'fÅÈlin' gets translated into 'felin', etc.
-    Suitable for search string pattern replacement.  Much faster than regexps."""
-    table = range(256)
-    for i in table:
-        x = unicodedata.decomposition(unichr(i))
-        if x and x[0] == "0":
-            table[i] = int(x.split()[0], 16)
-    return string.join(map(chr, table), "")
-
-# build conversion table:
-table_latin1_to_ascii = build_table_latin1_to_ascii()
-
-
 ## Dictionary merging functions
-
 def intersection(dict, dict2):
     "Returns intersection of the two dictionaries."
     int_dict = {}
@@ -227,7 +210,6 @@ def list_union(list1, list2):
     return union_dict.keys()
 
 ## MARC-21 tag/field access functions
-
 def get_fieldvalues(recID, tag):
     """Returns list of values of the MARC-21 'tag' fields for the record
        'recID'."""
@@ -256,20 +238,6 @@ def get_field_tags(field):
     return out
 
 ## Fulltext word extraction functions
-def separator_table(separators):
-    """Returns a translation table to convert the characters according to
-       the separators regex into spaces."""
-    expr = sre.compile(separators)
-    table = range(256)
-    for i in table:
-        x = unichr(i)
-        if expr.match(x):
-            table[i] = ord(' ')
-    return string.join(map(chr, table), "")
-
-# Standard separator table
-word_separator_table = separator_table("[\s]")
-
 def get_fulltext_urls_from_html_page(htmlpagebody):
     """Parses htmlpagebody data looking for url_directs referring to
        probable fulltexts.
@@ -312,7 +280,6 @@ def get_words_from_fulltext(url_indirect,separators="[^\w]",split=string.split):
         fulltext_urls = get_fulltext_urls_from_html_page(htmlpagebody)
 
     words = {}
-    table = separator_table(separators)
 
     # process as many urls as they were found:
     for (ext,url_direct) in fulltext_urls:
@@ -411,8 +378,7 @@ def get_words_from_fulltext(url_indirect,separators="[^\w]",split=string.split):
         if bingo:
             tmp_name_txt_file = open("%s.txt" % tmp_name)
             for phrase in tmp_name_txt_file.xreadlines():
-                phrase = translate(phrase, table)
-                for word in split(phrase):
+                for word in get_words_from_phrase(phrase):
                     if not words.has_key(word):
                         words[word] = 1;
             tmp_name_txt_file.close()
