@@ -18,11 +18,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 bin_SCRIPTS=dbexec
-noinst_SCRIPTS=dbtest
+noinst_SCRIPTS=pytest dbtest
 
 EXTRA_DIST = $(wildcard *.wml)
 
 install-data-local:
+	./pytest
 	./dbtest
 
 CLEANFILES = $(bin_SCRIPTS) $(noinst_SCRIPTS) *~ *.tmp
