@@ -2575,6 +2575,14 @@ CREATE TABLE IF NOT EXISTS sbmSUBMISSIONS (
   md datetime NOT NULL default '0000-00-00 00:00:00'
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS sbmCOOKIES (
+  id int(15) unsigned NOT NULL auto_increment,
+  name varchar(100) NOT NULL,
+  value text,
+  uid int(15) NOT NULL,
+  PRIMARY KEY  (id)
+) TYPE=MyISAM;
+
 -- Scheduler tables
 
 CREATE TABLE IF NOT EXISTS schTASK (
