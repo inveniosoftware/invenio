@@ -2645,7 +2645,7 @@ CREATE TABLE IF NOT EXISTS sbmFIELDDESC (
   fidesc text,
   cd date default NULL,
   md date default NULL,
-  fddfi1 text,
+  modifytext text,
   fddfi2 text,
   cookie int(11) default '0',
   PRIMARY KEY  (name)
@@ -2688,15 +2688,6 @@ CREATE TABLE IF NOT EXISTS sbmIMPLEMENT (
   score int(11) NOT NULL default '0',
   stpage int(11) NOT NULL default '0',
   endtxt varchar(100) NOT NULL default ''
-) TYPE=MyISAM PACK_KEYS=1;
-
-CREATE TABLE IF NOT EXISTS sbmMODIFY (
-  modn varchar(15) default NULL,
-  modd text,
-  cd date default NULL,
-  md date default NULL,
-  modfi1 text,
-  modfi2 text
 ) TYPE=MyISAM PACK_KEYS=1;
 
 CREATE TABLE IF NOT EXISTS sbmPARAMETERS (
