@@ -46,6 +46,7 @@ try:
     from string import split
     import os
     import re
+    import urllib
     import sys
     import time
     import md5
@@ -783,7 +784,7 @@ def parse_args(args=""):
         for item in list_of_arguments:
             keyvalue = item.split('=')
             if len(keyvalue) == 2:
-                out_args[keyvalue[0]] = keyvalue[1]
+                out_args[keyvalue[0]] = urllib.unquote(keyvalue[1])
             else:
                 out_args['verb'] = ""
 
