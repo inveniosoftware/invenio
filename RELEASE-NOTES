@@ -1,38 +1,52 @@
 --------------------------------------------------------------------
-CDSware News: CDSware v0.1.2 released
-December 21, 2003
+CDSware v0.3.0 (DEVELOPMENT) is released 
+March 5, 2004
 http://cdsware.cern.ch/news/
 --------------------------------------------------------------------
 
-CDSware v0.1.2 was released on December 21st, 2003.
+CDSware v0.3.0 (DEVELOPMENT) was released on March 5th, 2003.
 
 What's new:
-  * development branch release
-  * fix BibReformat task launching problem (BibFormat)
-  * fix BibTeX -> XML MARC conversion example (BibConvert)
-  * updated Spanish translation
-  
+  * new development branch release (important SQL table changes)
+  * introducing a new submission engine and the end-user web
+    interface (WebSubmit)
+  * bibupload is now a BibSched task with new options (BibUpload)
+  * BibWords renamed into BibIndex in the view of future phrase
+    indexing changes (BibIndex)
+  * more secure DB server connectivity (BibSched)
+  * record matching functionality (BibConvert)
+  * character encoding conversion tables (BibConvert)
+  * Qualified Dublin Core conversion example (BibConvert)
+  * OAI deleted recods policy can now be specified (BibHarvest)
+  * multi-language collection portalboxes (WebSearch)
+  * HTML pages now respect language selections (WebSearch, WebHelp)
+  * minor layout changes (WebStyle)
+  * updated Russian and other translations
+  * ChangeLog is now generated from CVS log messages
+  * plus the usual set of bugfixes (see ChangeLog)
+
 Download:
-   <http://cdsware.cern.ch/download/cdsware-0.1.2.tar.gz>
+   <http://cdsware.cern.ch/download/cdsware-0.3.0.tar.gz>
 
 Notes: 
-   This development branch release is intended primarily to fix
-   BibReformat's task-launching password-reading problem that slipped
-   into v0.1.1.  Users of v0.1.1 are advised either to patch their
-   running CDSware installation by this one-liner:
+   The minor version number of the development branch was bumped to
+   indicate important SQL table structure changes.  An upgrade from
+   CDSware v0.1.x is relatively easy though.  Please contact us if you
+   want some hints in this direction.  (We do not provide an upgrade
+   script automatically in the tarball because of the development
+   branch nature of the release.)
 
-      $ perl -pi~ -e 's,getpass\(,getpass.getpass(,g' /path/to/your/cdsware/bin/bibreformat
+   CDSware v0.3.0 now includes the first Pythonic DEVELOPMENT version
+   of the WebSubmit module.  We encourage you to test it.  Users of
+   v0.0.9 are however advised to stay with their system until a STABLE
+   release is announced.
 
-   or to upgrade to v0.1.2 which brings, as a bonus, updated Spanish
-   translation.
-
-Known problems: 
-   WebSubmit is not working yet.  Several admin-level functionality of
-   v0.0.9 is missing in v0.1.x.  The task scheduler is functional but
-   not fully tested.  These issues will be subsequently dealt with in
-   the next releases of the v0.1.x development branch.
+Known problems:
+   Several important admin-level functionality of v0.0.9 is still
+   missing in v0.3.0.  These issues will be subsequently dealt with in
+   the next releases of the v0.3.x development branch.
 
 What's next: 
-   Fixing known problems described above.  Stabilizing the v0.1.x
-   tree.  Continuing with the internationalization of the interface.
-   Introducing BibIndex for better phrase indexing and browsing.  
+   Fixing known problems described above.  Developing BibIndex for
+   better phrase indexing and browsing.  Introducing BibRank to
+   provide basic ranking features.
