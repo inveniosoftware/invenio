@@ -367,53 +367,147 @@ def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_
     box += """</select>"""        
     return box
 
-def create_google_box(p, f, p1, p2, p3, ln=cdslang,
-                      prolog_start="""<table class="googlebox" align="right"><tr><th class="googleboxheader">""",
+def create_google_box(cc, p, f, p1, p2, p3, ln=cdslang,
+                      prolog_start="""<table class="googlebox"><tr><th colspan="2" class="googleboxheader">""",
                       prolog_end="""</th></tr><tr><td class="googleboxbody">""",
-                      separator= """<br>""",
+                      column_separator="""</td><td class="googleboxbody">""",
+                      link_separator= """<br>""",
                       epilog="""</td></tr></table>"""):
     "Creates the box that proposes links to other useful search engines like Google.  'p' is the search pattern."
-    out = ""
+    out_links = []
     if not p and (p1 or p2 or p3):
-        p = p1 + " " + p2 + " " + p3 
-    if cfg_google_box: # do we want to print it?
-        out += prolog_start + msg_try_your_search_on[ln] + prolog_end
-        if cfg_cern_site:
-            # CERN Intranet:
-            out += """<a href="http://search.cern.ch/query.html?qt=%s">CERN&nbsp;Intranet</a>""" % urllib.quote(p)
-            # SPIRES
+        p = p1 + " " + p2 + " " + p3
+    # check suitable p's whether we want to print it
+    if cfg_google_box == 0 or \
+           p == "" or \
+           string.find(p, "recid:")>=0 or \
+           string.find(p, "sysno:")>=0 or \
+           string.find(p, "sysnos:")>=0:
+        return ""
+    # remove our logical field index names:
+    p = sre.sub(r'\w+:', '', p)
+    p_quoted = urllib.quote(p)
+    # Amazon
+    if cfg_google_box_servers.get('Amazon', 0):
+        if string.find(cc, "Book") >= 0:
             if f == "author":
-                out += separator
-                out += """<a href="http://www.slac.stanford.edu/spires/find/hep/www?AUTHOR=%s">SPIRES</a>""" % urllib.quote(p)
-            elif f == "title":
-                out += separator
-                out += """<a href="http://www.slac.stanford.edu/spires/find/hep/www?TITLE=%s">SPIRES</a>""" % urllib.quote(p)
-            elif f == "reportnumber":
-                out += separator
-                out += """<a href="http://www.slac.stanford.edu/spires/find/hep/www?REPORT-NUM=%s">SPIRES</a>""" % urllib.quote(p)
-            elif f == "keyword":
-                out += separator
-                out += """<a href="http://www.slac.stanford.edu/spires/find/hep/www?k=%s">SPIRES</a>""" % urllib.quote(p)
-            # KEK
-            if f == "author":
-                out += separator
-                out += """<a href="http://www-lib.kek.jp/cgi-bin/kiss_prepri?AU=%s">KEK</a>""" % urllib.quote(p)        
-            elif f == "title":
-                out += separator
-                out += """<a href="http://www-lib.kek.jp/cgi-bin/kiss_prepri?TI=%s">KEK</a>""" % urllib.quote(p)        
-            elif f == "reportnumber":
-                out += separator
-                out += """<a href="http://www-lib.kek.jp/cgi-bin/kiss_prepri?RP=%s">KEK</a>""" % urllib.quote(p)        
-            out += separator
-        # Google Scholar:
+                out_links.append("""<a class="google" href="http://www.amazon.com/exec/obidos/external-search/?field-author=%s&tag=cern">%s in Amazon</a>""" % (p_quoted, p))                
+            else:
+                out_links.append("""<a class="google" href="http://www.amazon.com/exec/obidos/external-search/?keyword=%s&tag=cern">%s in Amazon</a>""" % (p_quoted, p))
+    # CERN Intranet:
+    if cfg_google_box_servers.get('CERN Intranet', 0):
+        out_links.append("""<a class="google" href="http://search.cern.ch/query.html?qt=%s">%s in CERN&nbsp;Intranet</a>""" % (urllib.quote(string.replace(p, ' ', ' +')), p))
+    # CERN Agenda:
+    if cfg_google_box_servers.get('CERN Agenda', 0):
         if f == "author":
-            out += """<a href="http://scholar.google.com/scholar?q=author%%3A%s">Google Scholar</a>""" % urllib.quote(p)
+            out_links.append("""<a class="google" href="http://agenda.cern.ch/search.php?field=speaker&keywords=%s&search=Search">%s in CERN&nbsp;Agenda</a>""" % (p_quoted, p))
+        elif f == "title":
+            out_links.append("""<a class="google" href="http://agenda.cern.ch/search.php?field=title&keywords=%s&search=Search">%s in CERN&nbsp;Agenda</a>""" % (p_quoted, p))
+    # CiteSeer:
+    if cfg_google_box_servers.get('CiteSeer', 0):
+        out_links.append("""<a class="google" href="http://citeseer.ist.psu.edu/cs?q=%s">%s in CiteSeer</a>""" % (p_quoted, p))        
+    # Google Scholar:
+    if cfg_google_box_servers.get('Google Scholar', 0):
+        if f == "author":
+            out_links.append("""<a class="google" href="http://scholar.google.com/scholar?q=author%%3A%s">%s in Google Scholar</a>""" % (p_quoted, p))
         else:
-            out += """<a href="http://scholar.google.com/scholar?q=%s">Google Scholar</a>""" % urllib.quote(p)
-        # Google Web:
-        out += separator
-        out += """<a href="http://google.com/search?q=%s">Google Web</a>""" % urllib.quote(p)
-        # epilogue:
+            out_links.append("""<a class="google" href="http://scholar.google.com/scholar?q=%s">%s in Google Scholar</a>""" % (p_quoted, p))
+    # Google Web:
+    if cfg_google_box_servers.get('Google Web', 0):
+        if f == "author":
+            p_google = p
+            if string.find(p, ",") >= 0 and (not p.startswith('"')) and (not p.endswith('"')):
+                p_lastname, p_firstnames = string.split(p, ",", 1)
+                p_google = '"%s %s" OR "%s %s"' % (p_lastname, p_firstnames, p_firstnames, p_lastname) 
+            out_links.append("""<a class="google" href="http://google.com/search?q=%s">%s in Google Web</a>""" % (urllib.quote(p_google), p_google))
+        else:
+            out_links.append("""<a class="google" href="http://google.com/search?q=%s">%s in Google Web</a>""" % (p_quoted, p))
+    # IEC
+    if cfg_google_box_servers.get('IEC', 0):
+        if string.find(cc, "Standard") >= 0:
+            out_links.append("""<a class="google" href="http://www.iec.ch/cgi-bin/procgi.pl/www/iecwww.p?wwwlang=E&wwwprog=sea22.p&search=text&searchfor=%s">%s in IEC</a>""" % (p_quoted, p))
+    # IHS
+    if cfg_google_box_servers.get('IHS', 0):
+        if string.find(cc, "Standard") >= 0:
+            out_links.append("""<a class="google" href="http://global.ihs.com/search_res.cfm?&input_doc_title=%s">%s in IHS</a>""" % (p_quoted, p))
+    # INSPEC
+    if cfg_google_box_servers.get('INSPEC', 0):
+        if f == "author":
+            p_inspec = sre.sub(r'(, )| ', '-', p)
+            p_inspec = sre.sub(r'(-\w)\w+$', '\\1', p_inspec)
+            out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.au.">%s in INSPEC</a>""" % (urllib.quote(p_inspec), p_inspec)) 
+        elif f == "title":
+            out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.ti.">%s in INSPEC</a>""" % (p_quoted, p))
+        elif f == "abstract":
+            out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.ab.">%s in INSPEC</a>""" % (p_quoted, p))               
+        elif f == "year":
+            out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.yr.">%s in INSPEC</a>""" % (p_quoted, p))
+    # ISO
+    if cfg_google_box_servers.get('ISO', 0):
+        if string.find(cc, "Standard") >= 0:
+            out_links.append("""<a class="google" href="http://www.iso.org/iso/en/StandardsQueryFormHandler.StandardsQueryFormHandler?languageCode=en&keyword=%s&lastSearch=false&title=true&isoNumber=&isoPartNumber=&isoDocType=ALL&isoDocElem=ALL&ICS=&stageCode=&stagescope=Current&repost=1&stagedatepredefined=&stageDate=&committee=ALL&subcommittee=&scopecatalogue=CATALOGUE&scopeprogramme=PROGRAMME&scopewithdrawn=WITHDRAWN&scopedeleted=DELETED&sortOrder=ISO">%s in ISO</a>""" % (p_quoted, p))
+    # KEK
+    if cfg_google_box_servers.get('KEK', 0):
+        kek_search_title = "KEK KISS Preprints"
+        kek_search_baseurl = "http://www-lib.kek.jp/cgi-bin/kiss_prepri?"
+        if string.find(cc, "Book") >= 0:
+            kek_search_title = "KEK Library Books"
+            kek_search_baseurl = "http://www-lib.kek.jp/cgi-bin/kiss_book?DSP=1&"            
+        elif string.find(cc, "Periodical") >= 0:
+            kek_search_title = "KEK Library Journals"
+            kek_search_baseurl = "http://www-lib.kek.jp/cgi-bin/kiss_book?DSP=2&"
+        if f == "author":
+            out_links.append("""<a class="google" href="%sAU=%s">%s in %s</a>""" % \
+                             (kek_search_baseurl, p_quoted, p, kek_search_title))       
+        elif f == "title":
+            out_links.append("""<a class="google" href="%sTI=%s">%s in %s</a>""" % \
+                             (kek_search_baseurl, p_quoted, p, kek_search_title))        
+        elif f == "reportnumber":
+            out_links.append("""<a class="google" href="%sRP=%s">%s in %s</a>""" % \
+                             (kek_search_baseurl, p_quoted, p, kek_search_title))        
+    # NEBIS
+    if cfg_google_box_servers.get('NEBIS', 0):
+        if string.find(cc, "Book") >= 0:
+            if f == "author":
+                out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WAU">%s in NEBIS</a>""" % (p_quoted, p))                
+            elif f == "title":
+                out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WTI">%s in NEBIS</a>""" % (p_quoted, p))               
+            else:
+                out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WRD">%s in NEBIS</a>""" % (p_quoted, p))
+    # SPIRES
+    if cfg_google_box_servers.get('SPIRES', 0):
+        spires_search_title = "SLAC SPIRES HEP"
+        spires_search_baseurl = "http://www.slac.stanford.edu/spires/find/hep/"
+        if string.find(cc, "Book") >= 0:
+            spires_search_title = "SLAC Library Books"
+            spires_search_baseurl = "http://www.slac.stanford.edu/spires/find/books/"            
+        elif string.find(cc, "Periodical") >= 0:
+            spires_search_title = "SLAC Library Journals"
+            spires_search_baseurl = "http://www.slac.stanford.edu/spires/find/tserials/"            
+        if f == "author":
+            out_links.append("""<a class="google" href="%swww?AUTHOR=%s">%s in %s</a>""" % \
+                   (spires_search_baseurl, p_quoted, p, spires_search_title))
+        elif f == "title":
+            out_links.append("""<a class="google" href="%swww?TITLE=%s">%s in %s</a>""" % \
+                   (spires_search_baseurl, p_quoted, p, spires_search_title))
+        elif f == "reportnumber":
+            out_links.append("""<a class="google" href="%swww?REPORT-NUM=%s">%s in %s</a>""" % \
+                   (spires_search_baseurl, p_quoted, p, spires_search_title))
+        elif f == "keyword":
+            out_links.append("""<a class="google" href="%swww?k=%s">%s in %s</a>""" % \
+                   (spires_search_baseurl, p_quoted, p, spires_search_title))
+        else: # invent a poor man's any field search since SPIRES doesn't support one
+            out_links.append("""<a class="google" href="%swww?rawcmd=find+t+%s+or+a+%s+or+k+%s+or+s+%s+or+r+%s">%s in %s</a>""" % \
+            (spires_search_baseurl, p_quoted, p_quoted, p_quoted, p_quoted, p_quoted, p, spires_search_title))
+    # okay, so print the box now:
+    out = ""
+    if out_links:
+        out += """<a name="googlebox"></a>"""
+        out += prolog_start + msg_not_found_what_you_were_looking_for[ln] + prolog_end
+        nb_out_links_in_one_column = len(out_links)/2 
+        out += string.join(out_links[:nb_out_links_in_one_column], link_separator)
+        out += column_separator
+        out += string.join(out_links[nb_out_links_in_one_column:], link_separator)
         out += epilog
     return out
 
@@ -459,6 +553,8 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
         cell_4 = """<small><a href="%s/help/search/tips.%s.html">%s</a> ::
                            <a href="%s/search.py?p=%s&amp;f=%s&amp;rm=%s&amp;cc=%s&amp;ln=%s">%s</a></small>""" % \
                     (weburl, ln, msg_search_tips[ln], weburl, urllib.quote(p1), urllib.quote(f1), urllib.quote(rm), urllib.quote(cc), ln, msg_simple_search[ln])
+        if cfg_google_box and (p1 or p2 or p3):
+            cell_4 += """<small> :: <a href="#googlebox">%s</a></small>""" % msg_try_your_search_on[ln]
         # print them:
         out += """
         <table class="searchbox">
@@ -505,6 +601,8 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
         cell_2 = """<small><a href="%s/help/search/tips.%s.html">%s</a> ::
                            <a href="%s/search.py?p1=%s&amp;f1=%s&amp;rm=%s&amp;as=1&amp;cc=%s&amp;ln=%s">%s</a></small>""" %\
                           (weburl, ln, msg_search_tips[ln], weburl, urllib.quote(p), urllib.quote(f), urllib.quote(rm), urllib.quote(cc), ln, msg_advanced_search[ln])
+        if cfg_google_box and p:
+            cell_2 += """<small> :: <a href="#googlebox">%s</a></small>""" % msg_try_your_search_on[ln]
         out += """
         <table class="searchbox">
          <thead>
@@ -581,11 +679,11 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
                    <tbody>
                     <tr valign="bottom">
                       <td class="searchboxbody">
-                       <input type="text" name="pl" value="%s">
+                       <input type="text" name="pl" size="%d" value="%s">
                       </td>
                     </tr>
                    </tbody>
-                  </table>""" % cgi.escape(pl, 1)
+                  </table>""" % (cfg_simplesearch_pattern_box_width, cgi.escape(pl, 1))
     ## fourthly, print from/until date boxen, if applicable:
     if action==msg_browse[ln] or (d1y==0 and d1m==0 and d1d==0 and d2y==0 and d2m==0 and d2d==0):
         pass # do not need it
@@ -695,8 +793,8 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
             </table>""" % (msg_sort_by[ln], msg_display_results[ln], msg_output_format[ln], cell_7_a, cell_7_b, cell_7_c)
     ## last but not least, print end of search box:
     out += """</form>"""
-    ## now return the search box nicely framed with the google_box:
-    return """%s%s""" % (create_google_box(p, f, p1, p2, p3, ln), out)
+    ## now return the search box:
+    return out
 
 def create_navtrail_links(cc=cdsname,
                           as=0,
@@ -1796,6 +1894,66 @@ def intersect_results_with_hitset(req, results, hitset, ap=0, aptext="", of="hb"
             print_warning(req, aptext)
         results = results_ap
     return results        
+
+def create_similarly_named_authors_link_box(author_name, ln=cdslang):
+    """Return a box similar to ``Not satisfied...'' one by proposing
+       author searches for similar names.  Namely, take AUTHOR_NAME
+       and the first initial of the firstame (after comma) and look
+       into author index whether authors with e.g. middle names exist.
+       Useful mainly for CERN Library that sometimes contains name
+       forms like Ellis-N, Ellis-Nick, Ellis-Nicolas all denoting the
+       same person.  The box isn't proposed if no similarly named
+       authors are found to exist.
+    """
+    # return nothing if not configured:
+    if cfg_create_similarly_named_authors_link_box == 0:
+        return ""
+    # return empty box if there is no initial: 
+    if sre.match(r'[^ ,]+, [^ ]', author_name) is None:
+        return ""
+    # firstly find name comma initial:
+    author_name_to_search = sre.sub(r'^([^ ,]+, +[^ ,]).*$', '\\1', author_name)
+    print author_name_to_search
+    # secondly search for similar name forms:
+    similar_author_names = {}
+    for tag in get_field_tags("author"):  
+        # deduce into which bibxxx table we will search:
+        digit1, digit2 = int(tag[0]), int(tag[1])
+        bx = "bib%d%dx" % (digit1, digit2)
+        bibx = "bibrec_bib%d%dx" % (digit1, digit2)
+        if len(tag) != 6 or tag[-1:]=='%':
+            # only the beginning of field 't' is defined, so add wildcard character:
+            query = "SELECT bx.value FROM %s AS bx WHERE bx.value LIKE '%s%%' AND bx.tag LIKE '%s%%'" \
+                    % (bx, escape_string(author_name_to_search), tag)        
+        else:
+            query = "SELECT bx.value FROM %s AS bx WHERE bx.value LIKE '%s%%' AND bx.tag='%s'" \
+                    % (bx, escape_string(author_name_to_search), tag)        
+        res = run_sql(query)
+        for row in res:
+            similar_author_names[row[0]] = 1
+    # remove the original name and sort the list:
+    try:
+        del similar_author_names[author_name]
+    except KeyError:
+        pass
+    # thirdly print the box:    
+    out = ""
+    if similar_author_names:
+        out_authors = similar_author_names.keys()
+        out_authors.sort()
+        out += """<a name="googlebox"></a>"""
+        out += """<table class="googlebox"><tr><th colspan="2" class="googleboxheader">"""
+        out += msg_see_also_similar_author_names[ln]
+        out += """</th></tr>"""
+        for out_author in out_authors:
+            out += "<tr>"
+            out += """<td class="googleboxbody">%d</td>""" % get_nbhits_in_bibxxx(out_author, "author")
+            out += """<td class="googleboxbody">"""
+            out += """<a class="google" href="%s/search.py?p=%s&amp;f=author">%s</a>""" % \
+                   (weburl, urllib.quote(out_author), out_author)                   
+            out += """</td></tr>"""
+        out += """</table>"""
+    return out
 
 def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang, intro_text_p=1):
     """Return text box containing list of 'n' nearest terms above/below 'p'
@@ -3194,6 +3352,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             try:
                 results_in_any_collection = search_pattern(req, p1, f1, m1, ap=ap, of=of, verbose=verbose, ln=ln)
                 if results_in_any_collection._nbhits == 0:
+                    if of.startswith("h"):
+                        req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
                     return page_end(req, of, ln)     
                 if p2:
                     results_tmp = search_pattern(req, p2, f2, m2, ap=ap, of=of, verbose=verbose, ln=ln)
@@ -3208,6 +3368,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                             print_warning(req, "Invalid set operation %s." % op1, "Error")
                     results_in_any_collection.calculate_nbhits()
                     if results_in_any_collection._nbhits == 0:
+                        if of.startswith("h"):
+                            req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
                         return page_end(req, of, ln)                
                 if p3:
                     results_tmp = search_pattern(req, p3, f3, m3, ap=ap, of=of, verbose=verbose, ln=ln)
@@ -3224,6 +3386,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
+                    req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
                 return page_end(req, of, ln)                            
         else:
             ## 3B - simple search
@@ -3232,9 +3395,12 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
+                    req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
                 return page_end(req, of, ln)
 
         if results_in_any_collection._nbhits == 0:
+            if of.startswith("h"):
+                req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
             return page_end(req, of, ln)
                 
 #             search_cache_key = p+"@"+f+"@"+string.join(colls_to_search,",")
@@ -3252,9 +3418,12 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         except:
             if of.startswith("h"):
                 req.write(create_error_box(req, verbose=verbose, ln=ln))
+                req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
             return page_end(req, of, ln)
         
         if results_final == {}:
+            if of.startswith("h"):
+                req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
             return page_end(req, of, ln)
         
         # search stage 5: apply search option limits and restrictions:
@@ -3268,8 +3437,11 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
+                    req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
                 return page_end(req, of, ln)                            
             if results_final == {}:
+                if of.startswith("h"):
+                    req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
                 return page_end(req, of, ln)
 
         
@@ -3284,8 +3456,11 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
+                    req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
                 return page_end(req, of, ln)                            
             if results_final == {}:
+                if of.startswith("h"):
+                    req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
                 return page_end(req, of, ln)
 
         t2 = os.times()[4]
@@ -3360,6 +3535,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                                                     jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                     sc, pl_in_url, 
                                                     d1y, d1m, d1d, d2y, d2m, d2d, cpu_time, 1))
+            if f == "author" and of.startswith("h"):
+                req.write(create_similarly_named_authors_link_box(p, ln))
             # log query:
             try:
                 log_query(req.get_remote_host(), req.args, uid)
@@ -3368,6 +3545,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 pass
             log_query_info("ss", p, f, colls_to_search, results_final_nb_total)
     ## 4 - write footer:
+    if of.startswith("h"):
+        req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
     return page_end(req, of, ln)
 
 def perform_request_cache(req, action="show"):
