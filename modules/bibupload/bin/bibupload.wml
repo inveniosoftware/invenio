@@ -1303,6 +1303,7 @@ function getmicrotime()
 
 function formatfield($field)
 {
+   return $field; # FIXME: the real body function below switched off since it apparently breaks UTF-8
    // whatever character encoding in input, we want UTF8 in output
    // to check if the file is Latin-1, we use the fact that there
    // is a loss when you utf8_decode a latin-1 string
