@@ -55,7 +55,7 @@ Atlantis Institute of Science
 ## RUNTIMELOGDIR -- the dir of the CDS and OAI runtime log files:
 ##  (example: "/log/cdsware/cdsdemoruntimelogs")
 <define-tag RUNTIMELOGDIR whitespace=delete>
-/log/cdsware/cdsdemoruntimelogs
+/tmp/atlantis
 </define-tag>
 
 ## ALERTENGINEEMAIL -- the email address from which the alert emails will appear to be send:
@@ -125,10 +125,22 @@ cds.support@cern.ch
 <center>
  <span class=address><small>The <CDSNAME> document server is a fictive demo site of <a class=note href="http://cdsware.cern.ch/">CDSware</a>, a free document server software.</small></span>
 </center>
-<table class=header border=0 cellspacing=0 cellpadding=0 width="100%">
+ <table class=header border=0 cellspacing=0 cellpadding=0 width="100%">
   <tr class=header>
     <td align=left>
-    <big><strong><CDSNAME></strong></big>
+     <table class=header border=0 cellspacing=0 cellpadding=0>
+      <tr class=header>
+        <td class=headerselected>
+        <CDSNAME>
+        </td>
+      </tr>
+     </table>
+    </td>
+    <td align=center>
+       <a href="<HTDOCSURL>">SEARCH</a>
+    </td>
+    <td align=center>
+      <a href="<HTDOCSURL>submit/">SUBMIT</a>
     </td>
   </tr>
 </table>
@@ -179,7 +191,7 @@ cds.support@cern.ch
   <a class=note href="<HTDOCSURL>docs/">Sitemap</a>.
   </td>
   <td align=right class="address">
-  URL: <? echo "http://" . $HTTP_HOST . $PHP_SELF ?>
+  <!--URL-->
   </td>
   </tr>
   <tr>
@@ -235,7 +247,7 @@ oai
 ## OAIIDPREFIX -- OAI identifier prefix:  
 ##  (example: "cds.cern.ch")
 <define-tag OAIIDPREFIX whitespace=delete>
-cds.cern.ch
+atlantis.cern.ch
 </define-tag>
 
 ## OAISAMPLEIDENTIFIER -- OAI sample identifier:  
