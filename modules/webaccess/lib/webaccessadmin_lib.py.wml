@@ -965,7 +965,7 @@ def perform_deleteaction(req, id_action="0", confirm=0):
         if acca.acc_getActionRoles(id_action=id_action):
             output += createhiddenform(action="deleteroleaction",
                                        text="""rather delete only connection between action %s
-                                       and a selected role?""" (name_action, ),
+                                       and a selected role?""" % (name_action, ),
                                        id_action=id_action,
                                        reverse=1,
                                        button='go there')
