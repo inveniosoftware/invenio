@@ -1,0 +1,58 @@
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#include "configbis.wml"
+#include "config.wml"
+[rank_method]
+function = word_frequency
+overall_importance = 1.0
+
+[word_frequency]
+stem_if_avail = yes
+table = rnkWORD01F
+stopword = <ETCDIR>/bibrank/stopwords.kb
+#MARC tag,tag points, tag language
+tag1 = 6531_a, 1, <cdslang>
+tag2 = 695__a, 1, <cdslang>
+tag3 = 6532_a, 1, <cdslang>
+tag4 = 245__%, 5, <cdslang>
+tag5 = 246_% , 1, fr
+tag6 = 250__a, 1, <cdslang>
+tag7 = 711__a, 1, <cdslang>
+tag8 = 210__a, 1, <cdslang>
+tag9 = 222__a, 1, <cdslang>
+tag10 = 520__%, 1, <cdslang>
+tag11 = 590__%, 1, fr
+tag12 = 111__a, 1, <cdslang>
+tag13 = 100__%, 1, none
+tag14 = 700__%, 1, none
+tag15 = 721__a, 1, none
+
+#('6531_a'), keyword
+#('695__a'), keyword
+#('6532_a'), keyword
+#('245__%'), title
+#('246_%',), title
+#('250__a'), title 
+#('711__a'), title
+#('210__a'), abbreviated
+#('222__a'), key title
+#('520__%'), abstract
+#('590__%'), abstract
+#('111__a'), conference 
+#('100__%'), author
+#('700__%'), author
+#('721__a') author
