@@ -610,7 +610,7 @@ def OAIIdentify(args):
     repositoryName        = "  <repositoryName>" + cdsname + "</repositoryName>\n"
     baseURL               = "  <baseURL>%s/oai2d.py/</baseURL>\n" % weburl
     protocolVersion       = "  <protocolVersion>2.0</protocolVersion>\n"
-    adminEmail            = "  <adminEmail>mailto:%s</adminEmail>\n" % supportemail
+    adminEmail            = "  <adminEmail>%s</adminEmail>\n" % supportemail
     earliestDST		  = "  <earliestDatestamp>%s</earliestDatestamp>\n" % get_earliest_datestamp()               
     deletedRecord         = "  <deletedRecord>%s</deletedRecord>\n" % oaideleted
     repositoryIdentifier  = "%s" % oaiidprefix
