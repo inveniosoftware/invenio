@@ -1,5 +1,5 @@
 ## $Id$
-## CDSware Access Control Config in mod_python.
+## CDSware Access Control Config.
 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002 CERN.
@@ -17,19 +17,33 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-#include "config.wml"
-#include "configbis.wml"
-supportemail = "<SUPPORTEMAIL>"
-adminemail = "<ADMINEMAIL>"
 
 """CDSware Access Control Config. """
-
-<protect> ## okay, rest of the Python code goes below #######
 
 __version__ = "$Id$"
 
 from config import *
 from external_authentication import *
+
+## general configuration parameters read from the config.wml file:
+## (look there for details)
+
+#include "config.wml"
+#include "configbis.wml"
+supportemail = "<SUPPORTEMAIL>"
+adminemail = "<ADMINEMAIL>"
+CFG_ACCESS_CONTROL_LEVEL_SITE = <CFG_ACCESS_CONTROL_LEVEL_SITE>
+CFG_ACCESS_CONTROL_LEVEL_GUESTS = <CFG_ACCESS_CONTROL_LEVEL_GUESTS>
+CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS = <CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS>
+CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN = "<CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN>"
+CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS = <CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS>
+CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT = <CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT>
+CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION = <CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION>
+CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION = <CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION>
+
+## local configuration parameters:
+
+<protect> 
 
 # VALUES TO BE EXPORTED
 # CURRENTLY USED BY THE FILES access_control_engine.py access_control_admin.py webaccessadmin_lib.py
@@ -53,34 +67,6 @@ MAXPAGEUSERS = 25
 # Format is:   System name: (System class, Default True/Flase), atleast one must be default
 CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % cdsname: (None, True)}
 #CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % cdsname: (None, True), "CERN NICE (external)": (external_auth_nice(), False)}
-# defines how open the site is
-#0 = normal operation of the site
-#1 = read-only site, all write operations temporarily closed 
-#2 = site fully closed
-CFG_ACCESS_CONTROL_LEVEL_SITE = 0
-# access policy for guests. 
-#0 = Allow guests to search, 
-#1 = Guests cannot search (all users must login)
-CFG_ACCESS_CONTROL_LEVEL_GUESTS = 0
-# access policy for accounts. 
-#0 = Users can register, automatically acticate accounts
-#1 = Users can register, but admin must activate the accounts
-#2 = Users cannot register or update email address, only admin can register accounts. 
-#3 = Users cannot register or update email address or password, only admin can register accounts. 
-#4 = Same as 3, but user cannot change login method.
-CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS = 0
-# limit email addresses available to use when register a new account (example: cern.ch):
-CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN = ""
-# send an email when a new account is created by an user
-CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS = 0
-# send it to this email-address
-CFG_ACCESS_CONTROL_SEND_TO_EMAIL = adminemail
-# send an email to the user notifying when the account is created
-CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT = 0
-# send an email to the user notifying when the account is activated
-CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION = 0
-# send an email to the user notifying when the account is deleted/rejected
-CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION = 0
 
 # default data for the add_default_settings function
 # roles
