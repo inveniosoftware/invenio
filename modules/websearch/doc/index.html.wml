@@ -20,7 +20,7 @@
 #include "cdspage.wml" \
     title="Search Help" \
     navbar_name="search-new" \
-    navtrail_position="<a class=navtrail href=<WEBURL>><CDSNAME></a> &gt; <a href=<WEBURL>/help/>Help Central</a>" \
+    navtrail_position="<a class=navtrail href=<WEBURL>><CDSNAME></a> &gt; <a class=navtrail href=<WEBURL>/help/>Help Central</a>" \
     navbar_select="tips" 
 
 <p>Find out all about searching <CDSNAME>:
