@@ -796,7 +796,7 @@ def account_list_baskets(uid, action="", id_basket=0, newname=""):
                                (uid,))
       
        	out += """<FORM name="displaybasket" action="../yourbaskets.py/display" method="post">"""
-        out += """You own following email alert searches::"""
+        out += """You own the following baskets: """
         out += """<SELECT name="id_basket"><OPTION value="0">- basket name -</OPTION>"""            
  	for row in query_result :
                 if str(id_basket) == str(row[0]):
