@@ -108,8 +108,8 @@ load-demo-records: install
 	@echo "** You will be asked for a username, please enter admin email below. **"
 	@echo "***********************************************************************"
 	@echo ""
-	${prefix}/bin/bibwords
-	${prefix}/bin/bibwords 2
+	${prefix}/bin/bibindex
+	${prefix}/bin/bibindex 2
 	@echo ""
 	@echo "***********************************************************************"
 	@echo "** You will be asked for a username, please enter admin email below. **"
