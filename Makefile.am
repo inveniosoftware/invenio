@@ -72,4 +72,3 @@ drop-tables:
 	./dbutil/dbexec < ./dbutil/tabdrop.sql
 
 CLEANFILES = *~ index.wml
-sbmdir=/soft/httpd/host/cdsweb/htdocs/DEMO/submit/access/protected
