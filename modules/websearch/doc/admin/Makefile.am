@@ -18,7 +18,7 @@
 
 docdir = $(WEBDIR)/admin/websearch
 
-doc_DATA=websearchadminguide.html
+doc_DATA=guide.html
 
 EXTRA_DIST = $(wildcard *.wml)
 
