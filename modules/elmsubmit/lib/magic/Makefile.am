@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir = $(libdir)/python/cdsware/magic
-pylib_DATA =  __init__.py compile_magic.py magic.ext magic.ext.mgc magic.so
+pylib_DATA =  __init__.py compile_magic.py magic.ext magic.ext.mgc
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
