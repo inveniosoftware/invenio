@@ -361,8 +361,6 @@ On Fri, 15 Oct 2004, Frederic Gobry wrote:
 Yes, it would.  A log of slow queries as well.  I'll add them as new
 log files before the next release.
 
-** WebSearch: add p4,f4 for Advanced Search for Anna 
-
 ** WebSearch: safer wildcard treatment
 
 > okay, just began to wonder when CERN* never returned an answer :)
