@@ -107,9 +107,9 @@ def Create_Modify_Interface(parameters,curdir,form):
                         text += "  }\n"
                         text += "  i=i+1;\n"
                         text += "}\n"
-                        text += "if (found == 0) {\n"
-                        text += "  el[el.length] = new Option(\"%s\", \"%s\", 1,1);\n"
-                        text += "}\n"
+                        #text += "if (found == 0) {\n"
+                        #text += "  el[el.length] = new Option(\"%s\", \"%s\", 1,1);\n"
+                        #text += "}\n"
                     text += "</SCRIPT>\n"
             elif type == "D":
                 text=fidesc
