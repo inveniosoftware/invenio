@@ -1,9 +1,10 @@
-
 /* CDSware style sheet */
 /* $Id$ */
 body {
    color: #000;
    background: #fff;
+   margin: 0px;
+   padding: 0px;
    font-family: helvetica, arial, sans-serif;
 }
 p,br,dl,strong,em,h1,h2,h3,h4,h5,h6,td,blockquote,ol,ul {
@@ -15,7 +16,7 @@ pre,code {
 h1 {
    font-size: 173%;
    font-weight: 700;
-   margin-left: 0%;
+   margin-left: 60px;
 }
 .h1 {
    font-size: 173%;
@@ -77,26 +78,6 @@ a.moreinfo:hover {
    color: #060;
    background: transparent;
 }
-a.header:link {
-   color: #fff;
-   background: #36c;
-   text-decoration: none;
-}
-a.header:visited {
-   color: #fff;
-   background: #36c;
-   text-decoration: none;
-}
-a.header:active {
-   color: #fff;
-   background: #36c;
-   text-decoration: none;
-}
-a.header:hover {
-   color: #fff;
-   background: #36c;
-   text-decoration: none;
-}
 a.img:hover {
    color: #00c;
    background: transparent;
@@ -122,12 +103,103 @@ a.note:hover {
    color: #999;
    background: transparent;
 }
+.headerbox {
+   color: #000;
+   width: 100%;
+   margin: 0px;
+   border-collapse: separate;
+   border-spacing: 0px;
+   border-bottom: 2px solid #3366cc;
+}
+.headerboxbody {
+   color: #000;
+   padding: 0px;
+}
+.headerboxbodylogo {
+   color: #36c;
+   font-weight: bold;
+   font-size: large;
+   padding: 0px;
+}
+.headermodulebox {
+   color: #fff;
+   background: transparent;
+   border-collapse: separate;
+   border-spacing: 0px;
+   margin: 0px;
+}
+.headermoduleboxbody {
+   color: #000;
+   background: #36c;
+   font-size: x-small;
+   font-weight: bold;
+   text-align: center;
+   padding: 0px;
+   width: 75px;
+}
+.headermoduleboxbodyblank {
+   width: 15px; 
+   padding: 0px;
+}
+.headermoduleboxbodyselected {
+   color: #000;
+   background: #fff;
+   font-size: x-small;
+   font-weight: bold;
+   text-align: center;
+   border-left: 2px solid #3366cc;
+   border-right: 2px solid #3366cc;
+   border-top: 2px solid #3366cc;
+   padding: 0px;
+   width: 75px;
+}
+a.header:link {
+   color: #fff;
+   background: #36c;
+   text-decoration: none;
+}
+a.header:visited {
+   color: #fff;
+   background: #36c;
+   text-decoration: none;
+}
+a.header:active {
+   color: #fff;
+   background: #36c;
+   text-decoration: none;
+}
+a.header:hover {
+   color: #fff;
+   background: #36c;
+   text-decoration: none;
+}
+a.headerselected:link {
+   color: #36c;
+   background: #fff;
+   text-decoration: none;
+}
+a.headerselected:visited {
+   color: #36c;
+   background: #fff;
+   text-decoration: none;
+}
+a.headerselected:active {
+   color: #36c;
+   background: #fff;
+   text-decoration: none;
+}
+a.headerselected:hover {
+   color: #36c;
+   background: #fff;
+   text-decoration: none;
+}
 .navtrailbox {
    color: #36c;
    background: #fff;
    padding: 0px;
    border-spacing: 0px;
    border-collapse: collapse;
+   margin-top: 7px;
    font-size: x-small;
 }
 .navtrailboxbody {
@@ -135,6 +207,7 @@ a.note:hover {
    padding: 0px;
    border-spacing: 0px;
    background: #fff;
+   padding-left: 10px;
    font-size: x-small;
 }
 a.navtrail:link {
@@ -159,28 +232,36 @@ a.navtrail:hover {
 }
 .pageheader {
    color: #999;
+   font-size: x-small;
    background: transparent;
 }
 .pagebody {
     color: #000;
     background: transparent;
+    margin-left: 10px;
+    margin-top: 10px;
+    margin-right: 10px;
 }
 .pagestriperight {
    color: #000;
    background: #fff;
    width: 150px;
+   padding-left: 10px;
 }
 .pagefooter {
    color: #999;
    background: #fff;
    font-size: x-small;
    margin-top: 20px;
+   padding-bottom: 5px;
 }
 .footerbox {
    color: #999;
    background: #fff;
    font-size: x-small;
-   margin-top: 20px;
+   margin-left: 0px;
+   padding-left: 5px;
+   padding-right: 5px;
    border-top: 1px solid #999;
 }
 .pagestripemiddle {
@@ -231,16 +312,17 @@ a.navtrail:hover {
    padding: 1px;
    margin-top: 5px;
    margin-bottom: 5px;
+   margin-left: 60px;
+   margin-right: 60px;
    border-spacing: 0px;
    border-collapse: collapse;
-   border-top: 1px solid #3366cc; 
 }
 .searchboxheader {
    color: #000;
    background: #f1f1f1;
    padding: 3px;
    border-spacing: 0px;
-   /* border-bottom: 1px solid #999999; */
+   border-top: 1px solid #36c;
    font-size: small;
    text-align: left;
 }
@@ -249,7 +331,34 @@ a.navtrail:hover {
    background: transparent;
    padding: 3px;
    font-size: normal;
-;}
+}
+.narrowsearchbox {
+   color: #000;
+   background: transparent;
+   padding: 1px;
+   margin-top: 20px;
+   margin-bottom: 5px;
+   margin-left: 20px;
+   margin-right: 20px;
+   border-spacing: 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #3366cc; 
+}
+.narrowsearchboxheader {
+   color: #000;
+   background: #f1f1f1;
+   padding: 3px;
+   border-spacing: 0px;
+   /* border-bottom: 1px solid #999999; */
+   font-size: small;
+   text-align: left;
+}
+.narrowsearchboxbody {
+   color: #000;
+   background: transparent;
+   padding: 3px;
+   font-size: normal;
+}
 .portalbox {
    color: #000;
    background: #fff;
@@ -334,10 +443,16 @@ a.navtrail:hover {
 }
 .searchresultsboxbody {
    color: #000;
-   background: transparent;
+   background: #ffe;
    border-top: 1px dotted #fc0; 
    border-bottom: 1px dotted #fc0; 
    padding: 2px;
+}
+.searchresultsboxrecords {
+   color: #000;
+   background: transparent;
+   margin-left: 20px;
+   margin-right: 20px;
 }
 .nearesttermsbox {
    color: #603;
@@ -395,43 +510,27 @@ a.nearestterms:hover {
    border-bottom: 1px solid #060; 
 }
 .userinfoboxbody {
-   color: #36c;
+   color: #060;
    background: #fff;
-   font-size: x-small;
-   font-weight: bold;
-   border-left: 2px solid #36c; 
-   border-right: 2px solid #36c; 
-   border-top: 2px solid #36c;
-   padding-left: 10px;
    padding-right: 10px;
+   font-size: x-small;
+   font-weight: normal;
 }
 a.userinfo:link {
-   color: #36c;
+   color: #060;
    background: transparent;
 }
 a.userinfo:visited {
-   color: #36c;
+   color: #060;
    background: transparent;
 }
 a.userinfo:active {
-   color: #36c;
+   color: #060;
    background: transparent;
 }
 a.userinfo:hover {
-   color: #36c;
+   color: #060;
    background: transparent;
-}
-.header {
-   color: #000;
-   background: #36c;
-}
-.headerselected {
-   color: #fff;
-   background: #36c;
-}
-.headerselectedmodule {
-   color: #000;
-   background: #eee;
 }
 .faq {
    margin-left: 12%;
