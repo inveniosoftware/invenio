@@ -313,7 +313,8 @@ def page_start(req, of, cc, as, ln, uid):
                                  description="%s %s." % (cc, msg_search_results[ln]),
                                  keywords="CDSware, WebSearch, %s" % cc,
                                  uid=uid,
-                                 language=ln))
+                                 language=ln,
+                                 urlargs=req.args))
         req.write("""<div class="pagebody">""")
     
 def page_end(req, of="hb", ln=cdslang):
@@ -327,26 +328,26 @@ def page_end(req, of="hb", ln=cdslang):
         return []
     else: return "\n"    
 
-def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_day=0):
+def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_day=0, ln=cdslang):
     "Produces 'From Date', 'Until Date' kind of selection box.  Suitable for search options."
     box = ""
     # day
     box += """<select name="%sd">""" % name
-    box += """<option value="">any day"""
+    box += """<option value="">%s""" % msg_any_day[ln]
     for day in range(1,32):
         box += """<option value="%02d"%s>%02d""" % (day, is_selected(day, selected_day), day)
     box += """</select>"""
     # month
     box += """<select name="%sm">""" % name
-    box += """<option value="">any month"""
-    for mm, month in [(1,'January'), (2,'February'), (3,'March'), (4,'April'), \
-                      (5,'May'), (6,'June'), (7,'July'), (8,'August'), \
-                      (9,'September'), (10,'October'), (11,'November'), (12,'December')]:
-        box += """<option value="%d"%s>%s""" % (mm, is_selected(mm, selected_month), month)
+    box += """<option value="">%s""" % msg_any_month[ln]
+    for mm, month in [(1,msg_january[ln]), (2,msg_february[ln]), (3,msg_march[ln]), (4,msg_april[ln]), \
+                      (2,msg_may[ln]), (6,msg_june[ln]), (7,msg_july[ln]), (8,msg_august[ln]), \
+                      (9,msg_september[ln]), (10,msg_october[ln]), (11,msg_november[ln]), (12,msg_december[ln])]:
+        box += """<option value="%02d"%s>%s""" % (mm, is_selected(mm, selected_month), month)
     box += """</select>"""
     # year
     box += """<select name="%sy">""" % name
-    box += """<option value="">any year"""
+    box += """<option value="">%s""" % msg_any_year[ln]
     for year in range(1980,2004):
         box += """<option value="%d"%s>%d""" % (year, is_selected(year, selected_year), year)
     box += """</select>"""        
@@ -571,16 +572,16 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, ln, p1, f1, m
     if action==msg_browse[ln] or (d1y==0 and d1m==0 and d1d==0 and d2y==0 and d2m==0 and d2d==0):
         pass # do not need it
     else:
-        cell_6_a = create_inputdate_box("d1", d1y, d1m, d1d)
-        cell_6_b = create_inputdate_box("d2", d2y, d2m, d2d)
+        cell_6_a = create_inputdate_box("d1", d1y, d1m, d1d, ln=ln)
+        cell_6_b = create_inputdate_box("d2", d2y, d2m, d2d, ln=ln)
         out += """<table class="searchbox">
                    <thead> 
                     <tr>
                       <th class="searchboxheader">
-                        Added since:
+                        %s
                       </th>
                       <th class="searchboxheader">
-                        until:
+                        %s
                       </th>                      
                     </tr>
                    </thead>
@@ -591,7 +592,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, ln, p1, f1, m
                     </tr>
                    </tbody>
                   </table>""" % \
-           (cell_6_a, cell_6_b)        
+           (msg_added_since[ln], msg_until[ln], cell_6_a, cell_6_b)        
     ## fifthly, print Display/Sort box:
     if action != msg_browse[ln]:
         cell_1_left = """
@@ -1302,10 +1303,10 @@ def browse_in_bibwords(req, p, f, ln=cdslang):
         req.write(" inside <em>%s</em> " % f)
     req.write(" in any collection are:<br>")
     urlargs = string.replace(req.args, "action=%s","action=%s" % (msg_search[ln], msg_browse[ln]))
-    req.write(create_nearest_terms_box(urlargs, p, f, 'w')) 
+    req.write(create_nearest_terms_box(urlargs, p, f, 'w', ln=ln)) 
     return
 
-def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0):
+def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=cdslang):
     """Search for complex pattern 'p' within field 'f' according to
        matching type 'm'.  Return hitset of recIDs.
 
@@ -1370,24 +1371,24 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0):
                     bsu_pn = sre.sub(r'(\w)[^a-zA-Z0-9\s\:]+(\w|$)', "\\1 \\2", bsu_p)
                 if verbose and of.startswith('h') and req:
                     print_warning(req, "trying %s/%s/%s" % (bsu_pn,bsu_f,bsu_m))
-                basic_search_unit_hitset = search_pattern(req=None, p=bsu_pn, f=bsu_f, m=bsu_m, of="id")
+                basic_search_unit_hitset = search_pattern(req=None, p=bsu_pn, f=bsu_f, m=bsu_m, of="id", ln=ln)
                 if basic_search_unit_hitset._nbhits > 0:
                     # we retain the new unit instead
                     if of.startswith('h'):
-                        print_warning(req, "No exact match found for <em>%s</em>, using <em>%s</em> instead..." % (bsu_p,bsu_pn))
+                        print_warning(req, msg_no_exact_match_for_foo_using_bar_instead[ln] % (bsu_p,bsu_pn))
                     basic_search_units[idx_unit][1] = bsu_pn
                     basic_search_units_hitsets.append(basic_search_unit_hitset)
                 else:
                     # stage 2-3: no hits found either, propose nearest indexed terms:
                     if of.startswith('h'):
                         if req:
-                            print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m))
+                            print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m, ln=ln))
                     return hitset_empty
             else:        
                 # stage 2-3: no hits found either, propose nearest indexed terms:
                 if of.startswith('h'):
                     if req:
-                        print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m))
+                        print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m, ln=ln))
                 return hitset_empty
     if verbose:
         t2 = os.times()[4]
@@ -1414,7 +1415,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0):
     if hitset_in_any_collection._nbhits == 0:
         # no hits found, propose alternative boolean query:
         if of.startswith('h'):
-            text = """All search terms matched but boolean query returned no hits.  Please combine your search terms differently."""
+            text = msg_no_boolean_hits[ln]
             text += """<blockquote><table class="nearesttermsbox" cellpadding="0" cellspacing="0" border="0">"""
             for idx_unit in range(0,len(basic_search_units)):
                 bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
@@ -1576,7 +1577,7 @@ def search_unit_in_bibrec(day1, day2, type='creation_date'):
     set.addlist(Numeric.array(l))
     return set
 
-def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0):
+def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0, ln=cdslang):
     """Return dict of hitsets given by intersection of hitset with the collection universes."""
     # search stage 4: intersect with the collection universe:
     if verbose:
@@ -1597,7 +1598,7 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
             # some hits found in Home, so propose this search:
             if ap:
                 if of.startswith("h"):
-                    print_warning(req, """No exact match found in selected collection(s).  Results from the whole public database follow.""")
+                    print_warning(req, msg_no_hits_in_given_collection[ln])
                 results = {}
                 results[cdsname] = results_in_Home
             else:
@@ -1605,8 +1606,7 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
         else:
             # no hits found in Home, recommend different search terms:
             if of.startswith("h"):            
-                print_warning(req, """No public collection matched your query.  If you were looking for a non-public document,
-                                      please choose the desired restricted collection first.""")
+                print_warning(req, msg_no_public_hits[ln])
             results = {}
     if verbose:
         t2 = os.times()[4]
@@ -1641,9 +1641,10 @@ def intersect_results_with_hitset(req, results, hitset, ap=0, aptext="", of="hb"
         results = results_ap
     return results        
 
-def create_nearest_terms_box(urlargs, p, f, t='w', n=5):
+def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang):
     """Return text box containing list of 'n' nearest terms above/below 'p'
-       for the field 'f' for matching type 't' (words/phrases).
+       for the field 'f' for matching type 't' (words/phrases) in
+       language 'ln'.
        Propose new searches according to `urlargs' with the new words.
     """    
     out = ""
@@ -1654,11 +1655,11 @@ def create_nearest_terms_box(urlargs, p, f, t='w', n=5):
     if t == 'w':
         nearest_terms = get_nearest_terms_in_bibwords(p, f, n, n)
         if not nearest_terms:
-            return "%sNo words index available for %s.%s" % (prologue, f, epilogue)            
+            return "%s%s%s.%s" % (prologue, msg_no_words_index_available[ln], f, epilogue)            
     else:
         nearest_terms = get_nearest_terms_in_bibxxx(p, f, n, n)
         if not nearest_terms:
-            return "%sNo phrases available for %s.%s" % (prologue, f, epilogue)                        
+            return "%s%s %s.%s" % (prologue, msg_no_phrase_index_available[ln], f, epilogue)                        
     # display them:
     out += """<table class="nearesttermsbox" cellpadding="0" cellspacing="0" border="0">"""
     for term in nearest_terms:
@@ -1693,10 +1694,10 @@ def create_nearest_terms_box(urlargs, p, f, t='w', n=5):
                        (term_nbhits, weburl, urlargs_replace_text_in_arg(urlargs, r'^p\d?$', p, term), term)
     out += "</table>"
     # add leading introductory text and return:
-    intro = "Search term <em>%s</em>" % p
+    intro = msg_search_term[ln] % p
     if f:
-        intro += " inside <em>%s</em>" % f
-    intro += " did not match any record.  Nearest terms in any collection are:"
+        intro += " " + msg_inside_index[ln] % f
+    intro += " " + msg_did_not_match[ln]
     return intro + "<blockquote>" + out + "</blockquote>"
 
 def get_nearest_terms_in_bibwords(p, f, n_below, n_above):
@@ -2506,8 +2507,8 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     elif format == "hb-fly":
         # HTML brief called on the fly; suitable for testing brief formats
         out += call_bibformat(recID, "BRIEF_HTML")
-        out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">%s</a></span>""" \
-               % (weburl, recID, msg_detailed_record[ln])
+        out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s&amp;ln=%s">%s</a></span>""" \
+               % (weburl, recID, ln, msg_detailed_record[ln])
 
     elif cfg_cern_site and format == "hp":
         # HTML portfolio format called on the fly
@@ -2516,8 +2517,8 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     elif cfg_cern_site and format == "hd-ejournalsite":
         # HTML brief called on the fly; suitable for testing brief formats
         out += call_bibformat(recID, "EJOURNALSITE")
-        out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">%s</a></span>""" \
-               % (weburl, recID, msg_detailed_record[ln])
+        out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s&amp;ln=%s">%s</a></span>""" \
+               % (weburl, recID, ln, msg_detailed_record[ln])
 
     else:
         # HTML brief format by default
@@ -2568,14 +2569,14 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 alephsysnos = get_fieldvalues(recID, "970__a")
                 if len(alephsysnos)>0:
                     alephsysno = alephsysnos[0]
-                    out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?sysno=%s">%s</a></span>""" \
-                           % (weburl, alephsysno, msg_detailed_record[ln])
+                    out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?sysno=%s&amp;ln=%s">%s</a></span>""" \
+                           % (weburl, alephsysno, ln, msg_detailed_record[ln])
                 else:
-                    out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">%s</a></span>""" \
-                           % (weburl, recID, msg_detailed_record[ln])
+                    out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s&amp;ln=%s">%s</a></span>""" \
+                           % (weburl, recID, ln, msg_detailed_record[ln])
             else:
-                out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">%s</a></span>""" \
-                       % (weburl, recID, msg_detailed_record[ln])
+                out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s&amp;ln=%s">%s</a></span>""" \
+                       % (weburl, recID, ln, msg_detailed_record[ln])
 
     # print record closing tags, if needed:
     if format == "marcxml" or format == "oai_dc":
@@ -2921,7 +2922,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 browse_pattern(req, colls_to_search, p, f, rg)
         except:
             if of.startswith("h"):
-                req.write(create_error_box(req))
+                req.write(create_error_box(req, verbose=verbose, ln=ln))
             return page_end(req, of, ln)            
 
     else:
@@ -2934,11 +2935,11 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         if as == 1 or (p1 or p2 or p3):
             ## 3A - advanced search
             try:
-                results_in_any_collection = search_pattern(req, p1, f1, m1, ap=ap, of=of, verbose=verbose)
+                results_in_any_collection = search_pattern(req, p1, f1, m1, ap=ap, of=of, verbose=verbose, ln=ln)
                 if results_in_any_collection._nbhits == 0:                
                     return page_end(req, of)                
                 if p2:
-                    results_tmp = search_pattern(req, p2, f2, m2, ap=ap, of=of, verbose=verbose)
+                    results_tmp = search_pattern(req, p2, f2, m2, ap=ap, of=of, verbose=verbose, ln=ln)
                     if op1 == "a": # add
                         results_in_any_collection.intersect(results_tmp)
                     elif op1 == "o": # or
@@ -2952,7 +2953,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                     if results_in_any_collection._nbhits == 0:                
                         return page_end(req, of)                
                 if p3:
-                    results_tmp = search_pattern(req, p3, f3, m3, ap=ap, of=of, verbose=verbose)
+                    results_tmp = search_pattern(req, p3, f3, m3, ap=ap, of=of, verbose=verbose, ln=ln)
                     if op2 == "a": # add
                         results_in_any_collection.intersect(results_tmp)
                     elif op2 == "o": # or
@@ -2965,15 +2966,15 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                     results_in_any_collection.calculate_nbhits()
             except:
                 if of.startswith("h"):
-                    req.write(create_error_box(req))
+                    req.write(create_error_box(req, verbose=verbose, ln=ln))
                 return page_end(req, of)                            
         else:
             ## 3B - simple search
             try:
-                results_in_any_collection = search_pattern(req, p, f, ap=ap, of=of, verbose=verbose)
+                results_in_any_collection = search_pattern(req, p, f, ap=ap, of=of, verbose=verbose, ln=ln)
             except:
                 if of.startswith("h"):
-                    req.write(create_error_box(req))
+                    req.write(create_error_box(req, verbose=verbose, ln=ln))
                 return page_end(req, of)
 
         if results_in_any_collection._nbhits == 0:                
@@ -2990,10 +2991,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
 
         # search stage 4: intersection with collection universe:
         try:
-            results_final = intersect_results_with_collrecs(req, results_in_any_collection, colls_to_search, ap, of, verbose)
+            results_final = intersect_results_with_collrecs(req, results_in_any_collection, colls_to_search, ap, of, verbose, ln)
         except:
             if of.startswith("h"):
-                req.write(create_error_box(req))
+                req.write(create_error_box(req, verbose=verbose, ln=ln))
             return page_end(req, of)
         
         if results_final == {}:
@@ -3006,11 +3007,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                                                               results_final,
                                                               search_unit_in_bibrec(day1, day2),
                                                               ap,
-                                                              aptext="No match within your time limits, "\
-                                                                     "discarding this condition...")
+                                                              aptext=msg_no_match_within_time_limits[ln])
             except:
                 if of.startswith("h"):
-                    req.write(create_error_box(req))
+                    req.write(create_error_box(req, verbose=verbose, ln=ln))
                 return page_end(req, of)                            
             if results_final == {}:
                 return page_end(req, of)
@@ -3019,13 +3019,12 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             try:
                 results_final = intersect_results_with_hitset(req,
                                                               results_final,
-                                                              search_pattern(req, pl, ap=0),
+                                                              search_pattern(req, pl, ap=0, ln=ln),
                                                               ap,
-                                                              aptext="No match within your search limits, "\
-                                                                     "discarding this condition...")
+                                                              aptext=msg_no_match_within_search_limits[ln])
             except:
                 if of.startswith("h"):
-                    req.write(create_error_box(req))
+                    req.write(create_error_box(req, verbose=verbose, ln=ln))
                 return page_end(req, of)                            
             if results_final == {}:
                 return page_end(req, of)
