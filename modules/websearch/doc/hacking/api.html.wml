@@ -51,8 +51,8 @@ via both a high-level and low-level API interface.
 
       def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="id", ot="", as="0",
                                  p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
-                                 recid="-1", recidb="-1", sysno="", id="-1", idb="-1", sysnb="", action="SEARCH",
-                                 d1y="", d1m="", d1d="", d2y="", d2m="", d2d="", verbose="0", ap="0"):
+                                 recid="-1", recidb="-1", sysno="", id="-1", idb="-1", sysnb="", action="",
+                                 d1y="", d1m="", d1d="", d2y="", d2m="", d2d="", verbose="0", ap="0", ln=cdslang):
           """Perform search or browse request, without checking for
              authentication.  Return list of recIDs found, if of=id.
              Otherwise create web page.
@@ -167,7 +167,7 @@ via both a high-level and low-level API interface.
                      backwards compatibility.
                      
             action - action to do.  "SEARCH" for searching, "Browse" for
-                     browsing.
+                     browsing.  Default is to search.
             
                d1y - first date year (e.g. "1998").  Useful for search
                      limits on creation date.
@@ -195,6 +195,9 @@ via both a high-level and low-level API interface.
                      match is found, the search engine can try alternative
                      patterns e.g. to replace non-alphanumeric characters by
                      a boolean query.  ap defines if this is wanted.          
+
+               ln - language of the search interface (e.g. "en").  Useful
+                    for internationalization.
           """
        
    Examples:
