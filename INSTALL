@@ -260,7 +260,7 @@ Contents
               AddDefaultCharset UTF-8
               AddType application/x-httpd-php .php .shtml
               AddType application/x-httpd-php-source .phps .shtmls
-              DirectoryIndex index.html index.py index.shtml index.php 
+              DirectoryIndex index.en.html index.html index.py index.en.shtml index.shtml index.en.php index.php 
 
           This is to ensure that the browsers will get UTF-8 as
           the default page encoding, that "*.shtml" files will be
