@@ -330,7 +330,7 @@ class WordTable:
 
     def put_into_db(self, mode="normal", split=string.split):
         """Updates the current words table in the corresponding MySQL's
-           idxFOO table.  Mode 'normal' means normal execution,
+           rnkWORD table.  Mode 'normal' means normal execution,
            mode 'emergency' means words index reverting to old state.
            """
         if options["verbose"]:
@@ -445,8 +445,8 @@ class WordTable:
         """Flush a single word to the database and delete it from memory"""
         set = self.load_old_recIDs(word)
 	#write_message("%s %s" % (word, self.value[word]))
-
         if set: # merge the word recIDs found in memory:
+            options["modified_words"][word] = 1
             if self.merge_with_old_recIDs(word, recIDs, set) == 0:
                 # nothing to update:
                 if options["verbose"] >= 9:
@@ -456,7 +456,6 @@ class WordTable:
                 # yes there were some new words:
                 if options["verbose"] >= 9:
                     write_message("......... updating hitlist for ``%s''" % word)
-                options["modified_words"][word] = 1
 		run_sql("UPDATE %s SET hitlist='%s' WHERE term='%s'" % (self.tablename, serialize_via_marshal(set), MySQLdb.escape_string(word)))
         else: # the word is new, will create new set:
             if options["verbose"] >= 9:
@@ -670,6 +669,7 @@ class WordTable:
         query = query_factory.getvalue()
         query_factory.close()
         run_sql(query)
+
         query_factory = cStringIO.StringIO()
         qwrite = query_factory.write
         qwrite("INSERT INTO %sR (id_bibrec,termlist,type) VALUES" % self.tablename[:-1])
@@ -686,6 +686,7 @@ class WordTable:
             qwrite( "','CURRENT')" )
         query = query_factory.getvalue()
         query_factory.close()
+
         try:
             run_sql(query)
         except MySQLdb.DatabaseError:
@@ -1236,10 +1237,10 @@ def update_rnkWORD(table, terms):
     Nj = {}
     N = run_sql("select count(id_bibrec) from %sR" % table[:-1])[0][0]
  
-    if len(terms) == 0:
-        return ""
-
     write_message("Beginning post-processing of %s terms" % len(terms))
+    if len(terms) == 0:
+        write_message("No terms to process, ending...")
+        return ""
 
     #Locating all documents related to the modified/new/deleted terms, if fast update, 
     #only take into account new/modified occurences

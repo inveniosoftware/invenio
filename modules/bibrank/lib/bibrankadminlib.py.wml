@@ -602,9 +602,9 @@ def get_rnk(rnkID=''):
     
     try:
         if rnkID:
-            res = run_sql("SELECT id,name,last_updated,star_category_ranges from rnkMETHOD WHERE id=%s" % rnkID)
+            res = run_sql("SELECT id,name,last_updated from rnkMETHOD WHERE id=%s" % rnkID)
         else:
-            res = run_sql("SELECT id,name,last_updated,star_category_ranges from rnkMETHOD")
+            res = run_sql("SELECT id,name,last_updated from rnkMETHOD")
         return res
     except StandardError, e:
         return ()
@@ -633,19 +633,6 @@ def get_col_nametypes():
     type = []
     type.append(('ln', 'Long name'))
     return type
-
-def get_rnk_set(rnkID=''):
-    """Return all rank sets, or all for a specified rank method
-    rnkID = if given, return rank sets of specified rank method, if not, return all. """
-    
-    try:
-        if rnkID:
-            res = run_sql("SELECT id_rnkMETHOD,star_category,relevance_data from rnkMETHODDATA WHERE id_rnkMETHOD=%s ORDER BY star_category" % rnkID)
-        else:
-            res = run_sql("SELECT id_rnkMETHOD,star_category,relevance_data from rnkMETHODDATA order by id_rnkMETHOD,starcategory")
-        return res
-    except StandardError, e:
-        return ()
 
 def get_rnk_col(rnkID, ln=cdslang):
     """ Returns a list of the collections the given rank method is attached to
