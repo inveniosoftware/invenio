@@ -36,7 +36,7 @@ import time
 import zlib
 import urllib
 sys.path.append('%s' % pylibdir)
-from cdsware.config import *
+from cdsware.config import weburl,webdir
 from cdsware.webpage import page
 from cdsware import webbasket
 from cdsware.dbquery import run_sql

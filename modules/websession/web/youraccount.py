@@ -34,7 +34,7 @@ pylibdir = "<LIBDIR>/python"
 import sys
 sys.path.append('%s' % pylibdir)
 from cdsware import webuser
-from cdsware.config import *
+from cdsware.config import weburl,cdsname,cdslang
 from cdsware.webpage import page
 from cdsware import webaccount
 from cdsware import webbasket

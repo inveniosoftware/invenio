@@ -37,7 +37,7 @@ import zlib
 import urllib
 import time
 sys.path.append('%s' % pylibdir)
-from cdsware.config import *
+from cdsware.config import weburl
 from cdsware.webpage import page
 from cdsware import webalert
 from cdsware.webuser import getUid
