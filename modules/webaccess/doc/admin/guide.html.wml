@@ -22,10 +22,743 @@
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/>Admin Area</a>  &gt; <a class=navtrail href=<WEBURL>/admin/webaccess/>WebAccess Admin</a> " \
     navbar_select="hacking-webaccess-api" 
 
+
 <pre>
 WEBACCESS WEB ADMIN INTERFACE / $Date$
+
+1. Introduction to the pages
+2. Example pages, illustrating snapshots
+
+
+1. INTRODUCTION
+
+All the WebAccess Administration web pages have certain features/design choices in common
+
+- Divided into steps
+
+  The process of adding new authorizations/information is stepwise. The subtitle
+  contains information about wich step you are on and what you are supposed to do.
+
+- Restart from any wanted step 
+
+  You can always start from an earlier step by simply clicking the wanted button. This
+  is not a way to undo changes! No information about previous database is kept, so all
+  changes are definite.
+
+- Change or new entry must confirmed
+
+  On all the pages you will be asked to confirm the change, with information about
+  what kind of change you are about to perform.
+
+- Links to other relevant admin areas on the right side
+
+  To make it easier to perform your administration tasks, we have added a menu area on 
+  the right hand side of these pages. The menu contain links to other relevant admin pages and 
+  change according to the page you are on and the information you have selected.
+
+2. EXAMPLE PAGES
+
+I. Role area
+II. Example - connecting role and user
+
+
+I. Role area
+
+  Administration tasks starts in one of the administration areas. The role area is the main area
+  from where you can perform all your managing tasks. The other admin areas are just other ways of entering.
+
+</pre>
+
+<div>
+<table border="0" cellspacing="0" cellpadding="0" class="navtrailbox" width="100%" summary="">
+ <tr>
+  <td class="navtrailboxbody">
+   <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt; 
+   <a class="navtrail" href="">Manage WebAccess</a>  &gt; Role Administration
+  </td>
+
+ </tr>
+</table>
+</div>
+
+<div class="pagebody">
+ <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
+  <tr valign="top">
+   <td class="pagestripemiddle" align="left">
+   
+    <h1 class="headline">Role Administration</h1>
+    <table class="admin_wvar" width="100%" summary="">
+     <thead>
+      <tr>
+       <th class="adminheaderleft" colspan="2">administration with roles as access point</th>
+      </tr>
+     </thead>
+     <tbody>
+      <tr>
+       <td style="vertical-align: top; margin-top: 5px; width: 75%;">
+        <dl>
+         <dt>Users:</dt>
+         <dd>add or remove users from the access to a role and its priviliges.</dd>
+         <dt>Authorizations/Actions:</dt>
+         <dd>these terms means almost the same, but an authorization is a <br>
+             connection between a role and an action (possibly) containing arguments.</dd>
+         <dt>Roles:</dt>
+         <dd>see all the information attached to a role and decide if you want to<br>delete it.</dd>
+        </dl>
+
+        <table class="admin_wvar_nomargin" summary="">
+         <tr>
+          <th class="adminheader">id</th>
+          <th class="adminheader">name</th>
+          <th class="adminheader">description</th>
+          <th class="adminheader">users</th>
+          <th class="adminheader">authorizations / actions</th>
+          <th class="adminheader">role</th>
+          <th class="adminheader"></th>
+          <th class="adminheader"></th>
+         </tr>
+    
+         <tr>
+          <td class="admintdright">2</td>
+          <td class="admintdleft">photoadmin</td>
+          <td class="admintdleft">administrator of the photo col...</td>
+          <td class="admintdleft">
+           <a href="">add</a> / 
+           <a href="">remove</a>
+          </td>
+          <td class="admintdleft">
+           <a href="">add</a> / 
+           <a href="">modify</a> / 
+           <a href="">remove</a>
+          </td>
+          
+          <td class="admintdleft"><a href="">delete</a></td>
+          <td class="admintdleft"><a href="">show details</a></td>
+          <td rowspan="4" style="vertical-align: bottom">
+          
+          </td>
+         </tr>
+          <tr>
+          <td class="admintdright">9</td>
+          <td class="admintdleft">submitter</td>
+          <td class="admintdleft"></td>
+          <td class="admintdleft">
+           <a href="">add</a> / 
+           <a href="">remove</a>
+          </td>
+          
+          <td class="admintdleft"><a href="">add</a> / 
+           <a href="">modify</a> / 
+           <a href="">remove</a>
+          </td>
+          
+          <td class="admintdleft"><a href="">delete</a></td>
+          <td class="admintdleft"><a href="">show details</a></td>
+         </tr> 
+         
+         <tr>
+          <td class="admintdright">1</td>
+          <td class="admintdleft">superadmin</td>
+          <td class="admintdleft">all rights</td>
+          <td class="admintdleft"><a href="">add</a> / <a href="">remove</a></td>
+          <td class="admintdleft"><a href="">add</a> / 
+           <a href="">modify</a> / 
+           <a href="">remove</a>
+          </td>
+          <td class="admintdleft"><a href="">delete</a></td>
+          <td class="admintdleft"><a href="">show details</a></td>
+         </tr> 
+         
+         <tr>
+          <td class="admintdright">3</td>
+          <td class="admintdleft">webaccessadmin</td>
+          <td class="admintdleft">access to web administrator in...</td>
+          <td class="admintdleft">
+           <a href="">add</a> / 
+           <a href="">remove</a>
+          </td>
+          <td class="admintdleft"><a href="">add</a> / 
+           <a href="">modify</a> / 
+           <a href="">remove</a>
+          </td>
+          <td class="admintdleft"><a href="">delete</a></td>
+          <td class="admintdleft"><a href="">show details</a></td>
+         </tr> 
+        </table> 
+       </td>
+       <td style="vertical-align: top; margin-top: 5px; width: 25%;">
+        <dl>
+         <dt><a href="">Create new role</a></dt>
+         <dd>go here to add a new role.</dd>
+         <dt><a href="">Create new action</a></dt>
+         <dd>go here to add a new action.</dd>
+        </dl>
+       </td>
+      </tr>
+     </tbody>
+    </table>
+   </td>
+  </tr>
+ </table>
+</div>
+
+
+<pre>
+
+II. Example - connecting role and user
+  
+  One of the important tasks that can be handled via the WebAccess Admin Web Interface
+  is the delegation of access rights to users. This is done by connecting them to the 
+  different roles offered.
+
+  The task is divided into 5 simple and comprehensive steps. Below follows the pages from 
+  the different steps with comments on the ongoing procedure.
+
+- step 1 - select a role
+
+  You must first select the role you want to connect users to. All the available roles are
+  listed alfabetically in a select box. Just find the wanted role and select it. Then click on
+  the button saying &quot;select role&quot;. 
+
+  If you start from the Role Area, this step is already done, and you start directly on step 2.
+
+</pre>
+
+<table border="0" cellspacing="0" cellpadding="0" class="navtrailbox" width="100%" summary="">
+ <tr>
+  <td class="navtrailboxbody">
+   <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt; 
+   <a class="navtrail" href="">Manage WebAccess</a> &gt; <a class="navtrail" href="">Role Administration</a>  &gt; Connect user to role 
+  </td>
+
+ </tr>
+</table>
+
+<div class="pagebody">
+ <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
+  <tr valign="top">
+   <td class="pagestripemiddle" align="left">
+    <h1 class="headline">Connect user to role </h1>
+    <table class="admin_wvar" width="100%" summary="">
+     <thead>
+      <tr>
+       <th class="adminheaderleft" colspan="2">step 1 - select a role</th>
+      </tr>
+     </thead>
+     <tbody>
+      <tr>
+       <td style="vertical-align: top; margin-top: 5px; width: 75%;">
+        <form action="" method="POST">
+         <span class="adminlabel">1. select role</span>
+         <select name="id_role" class="admin_w200">
+          <option value="0">*** select role ***</option>
+          <option value="2">photoadmin</option>
+          <option value="9">submitter</option>
+          <option value="1">superadmin</option>
+          <option value="3">webaccessadmin</option>
+         </select>
+         <input class="adminbutton" type="submit" value="select role">
+        </form>
+       </td>
+       <td style="vertical-align: top; margin-top: 5px; width: 25%;">
+        <dl>
+         <dt><a href="">Create new role</a></dt>
+         <dd>go here to add a new role.</dd>
+        </dl>
+       </td>
+      </tr>
+     </tbody>
+    </table>
+   </td>
+   <td class="pagestriperight" width="120" align="right" valign="top">
+   </td>
+  </tr>
+ </table>
+</div>
+
+
+
+<pre>
+
+- step 2 - search for users
+
+  As you can see, the subtitle of the page has now changed. The subtitle always tells you
+  which step you are on and what your current task is.
+
+  There can be possibly thousands of users using your online library, therefore it is important
+  to make it easier to identify the user you are looking for. Give part of, or the entire search 
+  string and all users with partly matching e-mails will be listed on the next step.
+
+  You can also see that the right hand menu has changed. This area is always updated with links
+  to related admin areas.
 
 </pre>
 
 
+<table border="0" cellspacing="0" cellpadding="0" class="navtrailbox" width="100%" summary="">
+ <tr>
+  <td class="navtrailboxbody">
+   <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt; 
+   <a class="navtrail" href="">Manage WebAccess</a> &gt; <a class="navtrail" href="">Role Administration</a>  &gt; Connect user to role 
+  </td>
 
+ </tr>
+</table>
+
+<div class="pagebody">
+ <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
+  <tr valign="top">
+   <td class="pagestripemiddle" align="left">
+    <h1 class="headline">Connect user to role </h1>
+    <table class="admin_wvar" width="100%" summary="">
+     <thead>
+      <tr>
+       <th class="adminheaderleft" colspan="2">step 2 - search for users</th>
+      </tr>
+     </thead>
+     <tbody>
+      <tr>
+       <td style="vertical-align: top; margin-top: 5px; width: 75%;">
+        <form action="" method="POST">
+         <span class="adminlabel">1. select role</span>
+         <select name="id_role" class="admin_w200">
+          <option value="0">*** select role ***</option>
+          <option value="2">photoadmin</option>
+          <option value="9">submitter</option>
+          <option value="1" selected="selected">superadmin</option>
+          <option value="3">webaccessadmin</option>
+         </select>
+         <input class="adminbutton" type="submit" value="select role">
+        </form>
+        <form action="" method="POST">
+         <table summary="">
+          <tr>
+           <td>
+            <span class="adminlabel">2. search pattern </span>
+            <input class="admin_wvar" type="text" name="email_user_pattern" value="">
+            <input type="hidden" name="id_role" value="1">
+           </td>
+           <td style="vertical-align: bottom"> 
+            <input class="adminbutton" type="submit" value="search for users">
+           </td>
+          </tr>
+         </table>
+        </form>
+       </td>
+       <td style="vertical-align: top; margin-top: 5px; width: 25%;">
+        <dl>
+         <dt><a href="">Create new role</a></dt>
+         <dd>go here to add a new role.</dd>
+        </dl>
+        <dl>
+         <dt><a href="">Remove users</a></dt>
+         <dd>remove users from role superadmin.</dd>
+         <dt><a href="">Connected users</a></dt>
+         <dd>show all users connected to role superadmin.</dd>
+        </dl>
+        <dl>
+         <dt><a href="">Add authorization</a></dt>
+         <dd>start adding new authorizations to role superadmin.</dd>
+        </dl>
+       </td>
+      </tr>
+     </tbody>
+    </table>
+   </td>
+   <td class="pagestriperight" width="120" align="right" valign="top">
+   </td>
+  </tr>
+ </table>
+</div>
+
+
+
+<pre>
+
+- step 3 - select a user.
+
+  The select box contains all users with partly matching e-mail adresses. Select the one
+  you want to connect to the role and continue.
+
+  Notice the navigation trail that tells you were on the Administrator pages you are currently
+  working. 
+
+</pre>
+
+
+<table border="0" cellspacing="0" cellpadding="0" class="navtrailbox" width="100%" summary="">
+ <tr>
+  <td class="navtrailboxbody">
+   <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt; 
+   <a class="navtrail" href="">Manage WebAccess</a> &gt; <a class="navtrail" href="">Role Administration</a>  &gt; Connect user to role 
+  </td>
+
+ </tr>
+</table>
+
+<div class="pagebody">
+ <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
+  <tr valign="top">
+   <td class="pagestripemiddle" align="left">
+    <h1 class="headline">Connect user to role </h1>
+    <table class="admin_wvar" width="100%" summary="">
+     <thead>
+      <tr>
+       <th class="adminheaderleft" colspan="2">step 3 - select a user</th>
+      </tr>
+     </thead>
+     <tbody>
+      <tr>
+       <td style="vertical-align: top; margin-top: 5px; width: 75%;">
+        <form action="" method="POST">
+         <span class="adminlabel">1. select role</span>
+         <select name="id_role" class="admin_w200">
+          <option value="0">*** select role ***</option>
+          <option value="2">photoadmin</option>
+          <option value="9">submitter</option>
+          <option value="1" selected="selected">superadmin</option>
+          <option value="3">webaccessadmin</option>
+         </select>
+         <input class="adminbutton" type="submit" value="select role">
+        </form>
+
+        <form action="" method="POST">
+         <table summary="">
+          <tr>
+           <td> 
+            <span class="adminlabel">2. search pattern </span>
+            <input class="admin_wvar" type="text" name="email_user_pattern" value="k">
+            <input type="hidden" name="id_role" value="1">
+           </td>
+           <td style="vertical-align: bottom"> 
+            <input class="adminbutton" type="submit" value="search for users">
+           </td>
+          </tr>
+         </table>
+        </form>
+
+        <form action="" method="POST">
+         <span class="adminlabel">3. select user</span>
+         <select name="id_user" class="admin_w200">
+          <option value="0">*** select user ***</option>
+          <option value="133">arild.vik@cern.ch</option>
+          <option value="136">franck.black@cern.ch</option>
+          <option value="130">frode.skaar@cern.ch</option>
+          <option value="142">jan.stowisek@cern.ch</option>
+          <option value="140">kien@cern.ch</option>
+          <option value="132">kristine.vik@cern.ch</option>
+          <option value="134">kurt.cobain@cern.ch</option>
+          <option value="141">lasse.isaksen@cern.ch</option>
+          <option value="126">mick.draper@cern.ch</option>
+          <option value="100" selected="selected">mikael.vik@cern.ch</option>
+          <option value="181">sjur.kvammen@cern.ch</option>
+          <option value="-6">tibor.simko@cern.ch (connected)</option>
+         </select>
+         <input type="hidden" name="id_role" value="1">
+         <input type="hidden" name="email_user_pattern" value="k">
+         <input class="adminbutton" type="submit" value="add this user">
+        </form>
+       </td>
+       <td style="vertical-align: top; margin-top: 5px; width: 25%;">
+        <dl>
+         <dt><a href="">Create new role</a></dt>
+         <dd>go here to add a new role.</dd>
+        </dl>
+        <dl>
+         <dt><a href="">Remove users</a></dt>
+         <dd>remove users from role superadmin.</dd>
+         <dt><a href="">Connected users</a></dt>
+         <dd>show all users connected to role superadmin.</dd>
+        </dl>
+        <dl>
+         <dt><a href="">Add authorization</a></dt>
+         <dd>start adding new authorizations to role superadmin.</dd>
+        </dl>
+       </td>
+      </tr>
+     </tbody>
+    </table>
+   </td>
+   <td class="pagestriperight" width="120" align="right" valign="top">
+   </td>
+  </tr>
+ </table>
+</div>
+
+
+
+<pre>
+
+- step 4 - confirm to add user
+
+  All WebAccess Administrator web pages display the action you are about to peform, this
+  means explaining what kind of addition, change or update will be done to your access control
+  data.
+
+  If you are happy with your decision, simply confirm it.
+
+</pre>
+
+
+<table border="0" cellspacing="0" cellpadding="0" class="navtrailbox" width="100%" summary="">
+ <tr>
+  <td class="navtrailboxbody">
+   <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt; 
+   <a class="navtrail" href="">Manage WebAccess</a> &gt; <a class="navtrail" href="">Role Administration</a>  &gt; Connect user to role 
+  </td>
+
+ </tr>
+</table>
+
+<div class="pagebody">
+ <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
+  <tr valign="top">
+   <td class="pagestripemiddle" align="left">
+    <h1 class="headline">Connect user to role </h1>
+    <table class="admin_wvar" width="100%" summary="">
+     <thead>
+      <tr>
+       <th class="adminheaderleft" colspan="2">step 4 - confirm to add user</th>
+      </tr>
+     </thead>
+     <tbody>
+      <tr>
+       <td style="vertical-align: top; margin-top: 5px; width: 75%;">
+        <form action="" method="POST">
+         <span class="adminlabel">1. select role</span>
+         <select name="id_role" class="admin_w200">
+          <option value="0">*** select role ***</option>
+          <option value="2">photoadmin</option>
+          <option value="9">submitter</option>
+          <option value="1" selected="selected">superadmin</option>
+          <option value="3">webaccessadmin</option>
+         </select>
+         <input class="adminbutton" type="submit" value="select role">
+        </form>
+
+        <form action="" method="POST">
+         <table summary="">
+          <tr>
+           <td> 
+            <span class="adminlabel">2. search pattern </span>
+            <input class="admin_wvar" type="text" name="email_user_pattern" value="k">
+            <input type="hidden" name="id_role" value="1">
+           </td>
+           <td style="vertical-align: bottom"> 
+            <input class="adminbutton" type="submit" value="search for users">
+           </td>
+          </tr>
+         </table>
+        </form>
+
+        <form action="" method="POST">
+         <span class="adminlabel">3. select user</span>
+         <select name="id_user" class="admin_w200">
+          <option value="0">*** select user ***</option>
+          <option value="133">arild.vik@cern.ch</option>
+          <option value="136">franck.black@cern.ch</option>
+          <option value="130">frode.skaar@cern.ch</option>
+          <option value="142">jan.stowisek@cern.ch</option>
+          <option value="140">kien@cern.ch</option>
+          <option value="132">kristine.vik@cern.ch</option>
+          <option value="134">kurt.cobain@cern.ch</option>
+          <option value="141">lasse.isaksen@cern.ch</option>
+          <option value="126">mick.draper@cern.ch</option>
+          <option value="100" selected="selected">mikael.vik@cern.ch</option>
+          <option value="181">sjur.kvammen@cern.ch</option>
+          <option value="-6">tibor.simko@cern.ch (connected)</option>
+         </select>
+         <input type="hidden" name="id_role" value="1">
+         <input type="hidden" name="email_user_pattern" value="k">
+         <input class="adminbutton" type="submit" value="add this user">
+        </form>
+
+        <form action="" method="POST">
+         <table summary="">
+          <tr>
+           <td>add user <strong>mikael.vik@cern.ch</strong> to role <strong>superadmin</strong>? 
+            <input type="hidden" name="confirm" value="1">
+            <input type="hidden" name="id_user" value="100">
+            <input type="hidden" name="id_role" value="1">
+            <input type="hidden" name="email_user_pattern" value="k">
+           </td>
+           <td style="vertical-align: bottom"> 
+            <input class="adminbutton" type="submit" value="confirm">
+           </td>
+          </tr>
+         </table>
+        </form>
+       </td>
+       <td style="vertical-align: top; margin-top: 5px; width: 25%;">
+        <dl>
+         <dt><a href="">Create new role</a></dt>
+         <dd>go here to add a new role.</dd>
+        </dl>
+        <dl>
+         <dt><a href="">Remove users</a></dt>
+         <dd>remove users from role superadmin.</dd>
+         <dt><a href="">Connected users</a></dt>
+         <dd>show all users connected to role superadmin.</dd>
+        </dl>
+        <dl>
+         <dt><a href="">Add authorization</a></dt>
+         <dd>start adding new authorizations to role superadmin.</dd>
+        </dl>
+       </td>
+      </tr>
+     </tbody>
+    </table>
+   </td>
+   <td class="pagestriperight" width="120" align="right" valign="top">
+   </td>
+  </tr>
+ </table>
+</div>
+
+
+
+<pre>
+
+- step 5 - confirm user added.
+
+  The user has now been added to this role. You can easily continue adding more users to this 
+  role be restarting from step 2 or 3. You can also go directly to another area and keep working
+  on the same role.
+
+</pre>
+
+
+<table border="0" cellspacing="0" cellpadding="0" class="navtrailbox" width="100%" summary="">
+ <tr>
+  <td class="navtrailboxbody">
+   <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt; 
+   <a class="navtrail" href="">Manage WebAccess</a> &gt; <a class="navtrail" href="">Role Administration</a>  &gt; Connect user to role 
+  </td>
+
+ </tr>
+</table>
+
+<div class="pagebody">
+ <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
+  <tr valign="top">
+   <td class="pagestripemiddle" align="left">
+    <h1 class="headline">Connect user to role </h1>
+    <table class="admin_wvar" width="100%" summary="">
+     <thead>
+      <tr>
+       <th class="adminheaderleft" colspan="2">step 5 - confirm user added</th>
+      </tr>
+     </thead>
+     <tbody>
+      <tr>
+       <td style="vertical-align: top; margin-top: 5px; width: 75%;">
+        <form action="" method="POST">
+         <span class="adminlabel">1. select role</span>
+         <select name="id_role" class="admin_w200">
+          <option value="0">*** select role ***</option>
+          <option value="2">photoadmin</option>
+          <option value="9">submitter</option>
+          <option value="1" selected="selected">superadmin</option>
+          <option value="3">webaccessadmin</option>
+         </select>
+         <input class="adminbutton" type="submit" value="select role">
+        </form>
+
+        <form action="" method="POST">
+         <table summary="">
+          <tr>
+           <td> 
+            <span class="adminlabel">2. search pattern </span>
+            <input class="admin_wvar" type="text" name="email_user_pattern" value="k">
+            <input type="hidden" name="id_role" value="1">
+           </td>
+           <td style="vertical-align: bottom"> 
+            <input class="adminbutton" type="submit" value="search for users">
+           </td>
+          </tr>
+         </table>
+        </form>
+
+        <form action="" method="POST">
+         <span class="adminlabel">3. select user</span>
+         <select name="id_user" class="admin_w200">
+          <option value="0">*** select user ***</option>
+          <option value="133">arild.vik@cern.ch</option>
+          <option value="136">franck.black@cern.ch</option>
+          <option value="130">frode.skaar@cern.ch</option>
+          <option value="142">jan.stowisek@cern.ch</option>
+          <option value="140">kien@cern.ch</option>
+          <option value="132">kristine.vik@cern.ch</option>
+          <option value="134">kurt.cobain@cern.ch</option>
+          <option value="141">lasse.isaksen@cern.ch</option>
+          <option value="126">mick.draper@cern.ch</option>
+          <option value="100" selected="selected">mikael.vik@cern.ch</option>
+          <option value="181">sjur.kvammen@cern.ch</option>
+          <option value="-6">tibor.simko@cern.ch (connected)</option>
+         </select>
+         <input type="hidden" name="id_role" value="1">
+         <input type="hidden" name="email_user_pattern" value="k">
+         <input class="adminbutton" type="submit" value="add this user">
+        </form>
+
+        <form action="" method="POST">
+         <table summary="">
+          <tr>
+           <td>add user <strong>mikael.vik@cern.ch</strong> to role <strong>superadmin</strong>? 
+            <input type="hidden" name="confirm" value="1">
+            <input type="hidden" name="id_user" value="100">
+            <input type="hidden" name="id_role" value="1">
+            <input type="hidden" name="email_user_pattern" value="k">
+           </td>
+           <td style="vertical-align: bottom"> 
+            <input class="adminbutton" type="submit" value="confirm">
+           </td>
+          </tr>
+         </table>
+        </form>
+
+        <p>confirm: user <strong>mikael.vik@cern.ch</strong> added to role <strong>superadmin</strong>.</p>
+
+       </td>
+       <td style="vertical-align: top; margin-top: 5px; width: 25%;">
+        <dl>
+         <dt><a href="">Create new role</a></dt>
+         <dd>go here to add a new role.</dd>
+        </dl>
+        <dl>
+         <dt><a href="">Remove users</a></dt>
+         <dd>remove users from role superadmin.</dd>
+         <dt><a href="">Connected users</a></dt>
+         <dd>show all users connected to role superadmin.</dd>
+        </dl>
+        <dl>
+         <dt><a href="">Add authorization</a></dt>
+         <dd>start adding new authorizations to role superadmin.</dd>
+        </dl>
+       </td>
+      </tr>
+     </tbody>
+    </table>
+   </td>
+   <td class="pagestriperight" width="120" align="right" valign="top">
+   </td>
+  </tr>
+ </table>
+</div>
+ 
+ 
+<pre>
+
+- The end
+
+  This example is very similar to all the other pages where you administrate WebAccess. The pages
+  are and easy gateway to maintaing access control rights, and share a lot of features.
+  - divided into steps
+  - restart from any wanted step (not undo)
+  - changes must be confirmed
+  - link to other relevant areas
+  - prevent unwanted input
+
+  As an administrator with access to these pages you are free to manage the rights any way you want.
+
+</pre>

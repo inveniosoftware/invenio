@@ -217,14 +217,11 @@ def acc_deleteRole(id_role=0, name_role=0):
         # string of rolenames
         roles_str = ''
         for (name, ) in rolenames: roles_str += (roles_str and ',' or '') + '"%s"' % (name, )
-        print 'rolestr:', roles_str
         # arguments with non existing rolenames
         not_valid = run_sql("""SELECT ar.id FROM accARGUMENT ar WHERE keyword = 'role' AND value NOT IN (%s)""" % (roles_str, ))
-        print 'notvalid', not_valid
         if not_valid:
             nv_str = ''
             for (id, ) in not_valid: nv_str += (nv_str and ',' or '') + '%s' % (id, )
-            print 'nvstr:', nv_str
             # delete entries
             count += run_sql("""DELETE FROM accROLE_accACTION_accARGUMENT
             WHERE id_accACTION = %s AND id_accARGUMENT IN (%s) """ % (acc_getActionId(name_action=DELEGATEADDUSERROLE), nv_str))
@@ -358,28 +355,22 @@ def acc_addAuthorization(name_role='', name_action='', optional=0, **keyval):
     **keyval - dictionary of keyword=value pairs, used to find ids. """
     
     inserted = []
-    print 'checking info'
 
     # check that role and action exist
     id_role = run_sql("""SELECT id FROM accROLE where name = '%s'""" % (name_role, ))
     action_details = run_sql("""SELECT * from accACTION where name = '%s' """ % (name_action, ))
     if not id_role or not action_details: return []
 
-    print 'checked info'
-
     # get role id and action id and details
     id_role, id_action = id_role[0][0], action_details[0][0]
     allowedkeywords_str = action_details[0][3]
-    print action_details
+
     allowedkeywords_lst = acc_getActionKeywords(id_action=id_action)
     optional_action = action_details[0][4] == 'yes' and 1 or 0
     optional = int(optional)
 
-    print 'ready for insertion'
-    
     # this action does not take arguments
     if not optional and not keyval:
-        print 'no args'
         # can not add if user is doing a mistake
         if allowedkeywords_str: return []
         # check if entry exists
@@ -394,7 +385,6 @@ def acc_addAuthorization(name_role='', name_action='', optional=0, **keyval):
 
     # try to add authorization without the optional arguments
     elif optional:
-        print 'optional'
         # optional not allowed for this action
         if not optional_action: return []
         # check if authorization already exists
@@ -410,7 +400,6 @@ def acc_addAuthorization(name_role='', name_action='', optional=0, **keyval):
 
 
     else:
-        print 'regular'
         # regular authorization
         
         # get list of ids, if they don't exist, create arguments
@@ -447,7 +436,6 @@ def acc_addAuthorization(name_role='', name_action='', optional=0, **keyval):
                     % (id_role, id_action, id_argument, arglistid))
             inserted.append([id_role, id_action, id_argument, arglistid])
 
-    print 'last one'
     
     return inserted
 
@@ -1367,23 +1355,22 @@ def acc_find_delegated_roles(id_role_admin=0):
     return tuple of all the roles.
 
     id_role_admin - id of the admin role """
-    # 
+
     id_action_delegate = acc_getActionId(name_action=DELEGATEADDUSERROLE)
-    # 
+
     rolenames = run_sql("""SELECT DISTINCT(ar.value)
     FROM accROLE_accACTION_accARGUMENT raa LEFT JOIN accARGUMENT ar
     ON raa.id_accARGUMENT = ar.id
     WHERE raa.id_accROLE = '%s' AND
     raa.id_accACTION = '%s'
     """ % (id_role_admin, id_action_delegate))
-    # 
+
     result = []
-    # 
+
     for (name_role, ) in rolenames:
         roledetails = run_sql("""SELECT * FROM accROLE WHERE name = '%s' """ % (name_role, ))
         if roledetails: result.append(roledetails)
-    # 
-    # print run_sql("""SELECT DISTINCT(ar.value) FROM accROLE_accACTION_accARGUMENT raa LEFT JOIN accARGUMENT ar ON raa.id_accARGUMENT = ar.id WHERE raa.id_accROLE = '%s' AND raa.id_accACTION = '%s' """ % (7,8))
+
     return result
 
 
@@ -1443,7 +1430,42 @@ def acc_cleanupUserRoles():
     return (count, ids2)
 
 
-def acc_cleanDatabase():
+def acc_garbage_collector(verbose=0):
+    """clean the entire database for unused data"""
+
+    # keep all deleted entries
+
+    del_entries = []
+
+    # unused arguments
+
+    ids1 = run_sql("""SELECT DISTINCT ar.id
+    FROM accARGUMENT ar LEFT JOIN accROLE_accACTION_accARGUMENT raa ON ar.id = raa.id_accARGUMENT
+    WHERE raa.id_accARGUMENT IS NULL """)
+
+    del_entries.append([])
+if 1:
+    idstr = ''
+    for (id, ) in ((3, ), (4, ), (5, ), (5, )): # ids1:
+        del_entries[-1].append(id)
+        idstr += (idstr and ',' or '') + '%s' % id
+
+    # delete unreferenced arguments
+    count = run_sql("""DELETE FROM accARGUMENT
+    WHERE id in (%s)""" % (idstr, ))
+    
+    # return count and ids of deleted arguments
+    return (count, ids2)
+
+
+    # user_accROLEs without existing role
+
+    # accROLE_accACTION_accARGUMENT where role is deleted
+
+    # accROLE_accACTION_accARGUMENT where action is deleted
+
+    # delegated roles that does not exist
+    
     return
 
 </protect>

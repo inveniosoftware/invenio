@@ -27,17 +27,12 @@
  <a href="<WEBURL>/youraccount.py/login">login</a> to enter.
 </p>
 
-<p>
- You might want to reduce text size for better view (much info): <br>
- - Mozilla:           View -> Text Zoom -> Smaller. <br>
- - Internet Explorer: View -> Text Size -> Smaller. <br>
- - Opera:             use + (plus) and - (minus) keys.
-</p>
-
 <dl>
  <dt><a href="webaccessadmin.py">Manage WebAccess - Full Functionality</a>.</dt>
  <dd>Start area for WebAccess administration. Here you have <br>
      all possibility to manage, grant and revoke rights to anyone.</dd>
+</dl>
+<dl>
  <dt><a href="webaccessadmin.py/delegate_startarea">Delegate Rights - With Restrictions</a>.</dt>
  <dd>Delegate the rights to a specified number of roles. <br>
      Everything you can do here is also allowed in the Main Admin Area. <br>

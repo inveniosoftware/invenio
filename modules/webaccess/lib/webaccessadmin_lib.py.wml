@@ -97,13 +97,13 @@ def index(req, title='', body='', subtitle='', adminarea=2, authorized=0):
 def mustloginpage(req):
     """show a page asking the user to login."""
     
-    navtrail_previous_links = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/webaccess/">WebAccess Admin</a> &gt; """ % (weburl, weburl)
+    navtrail_previous_links = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/webaccess/">WebAccess Admin</a> """ % (weburl, weburl)
 
     return page(title='Authorization failure',
                 uid=getUid(req),
                 body=adderrorbox('try to login first',
                                  datalist=["""You are not a user authorized to perform admin tasks, try to
-                                 <a href="%s/youraccount.py/login">login</a> with another account.""" % (weburl, )]),
+                                 <a href="%s/youraccount.py/login?referer=%s/admin/webaccess">login</a> with another account.""" % (weburl, weburl)]),
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)                
 
@@ -927,8 +927,8 @@ def perform_addaction(req, name_action='', arguments='', optional='no', descript
             extra = """
             <dl>
              <dt><a href="addauthorization?id_action=%s&amp;reverse=1">Add authorization</a></dt>
-             <dd>start adding new authorizations to this action.</dd>
-            </dl> """ % (acca.acc_getActionId(name_action=name_action, ))
+             <dd>start adding new authorizations to action %s.</dd>
+            </dl> """ % (acca.acc_getActionId(name_action=name_action), name_action)
 
     try: body = [output, extra]
     except NameError: body = [output]
@@ -964,8 +964,8 @@ def perform_deleteaction(req, id_action="0", confirm=0):
 
         if acca.acc_getActionRoles(id_action=id_action):
             output += createhiddenform(action="deleteroleaction",
-                                       text="""rather delete only connection between this action
-                                       and a selected role?""",
+                                       text="""rather delete only connection between action %s
+                                       and a selected role?""" (name_action, ),
                                        id_action=id_action,
                                        reverse=1,
                                        button='go there')
@@ -1124,12 +1124,12 @@ def perform_addrole(req, name_role='', description='put description here.', conf
             extra = """
             <dl>
              <dt><a href="addauthorization?id_role=%s">Add authorization</a></dt>
-             <dd>start adding new authorizations to this role.</dd>
+             <dd>start adding new authorizations to role %s.</dd>
             </dl>
              <dt><a href="adduserrole?id_role=%s">Connect user</a></dt>
-             <dd>connect a user to the role.</dd>
+             <dd>connect a user to role %s.</dd>
             <dl>
-            </dl>""" % (id_role, id_role)
+            </dl>""" % (id_role, name_role, id_role, name_role)
 
     try: body = [output, extra]
     except NameError: body = [output]
@@ -1200,6 +1200,8 @@ def perform_showroledetails(req, id_role):
                               button="select role")
 
     if id_role not in [0, '0']:
+        name_role = acca.acc_getRoleName(id_role=id_role)
+        
         output += roledetails(id_role=id_role)
             
         extra = """
@@ -1211,11 +1213,11 @@ def perform_showroledetails(req, id_role):
         </dl>
         <dl>
          <dt><a href="adduserrole?id_role=%s">Connect user</a></dt>
-         <dd>connect a user to the role.</dd>
+         <dd>connect a user to role %s.</dd>
          <dt><a href="deleteuserrole?id_role=%s">Remove user</a></dt>
-         <dd>remove a user from the role.</dd>
+         <dd>remove a user from role %s.</dd>
         </dl>
-        """ % (id_role, id_role, id_role, id_role)
+        """ % (id_role, id_role, id_role, name_role, id_role, name_role)
         body = [output, extra]
     
     else:
@@ -1384,15 +1386,15 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
         extra += """
     <dl>
      <dt><a href="deleteuserrole?id_role=%s">Remove users</a></dt>
-     <dd>remove users from this role.</dd>
+     <dd>remove users from role %s.</dd>
      <dt><a href="showroleusers?id_role=%s">Connected users</a></dt>
-     <dd>show all connected users.</dd>
+     <dd>show all users connected to role %s.</dd>
     </dl>
     <dl>
      <dt><a href="addauthorization?id_role=%s">Add authorization</a></dt>
-     <dd>start adding new authorizations to this role.</dd>
+     <dd>start adding new authorizations to role %s.</dd>
     </dl>
-    """ % (id_role, id_role, id_role)
+    """ % (id_role, name_role, id_role, name_role, id_role, name_role)
 
     return index(req=req,
                  title=title,
@@ -1477,7 +1479,8 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
                                            id_user=id_user)
 
                 if int(id_role) < 0:
-                    output += '<p>role already connected to the user, try another one...<p>'
+                    name_role = acca.acc_getRoleName(id_role=-int(id_role))
+                    output += '<p>role %s already connected to the user, try another one...<p>' % (name_role, )
                 elif int(id_role):
                     subtitle = 'step 4 - confirm to add role to user'
 
@@ -1509,11 +1512,17 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
     </dl>
     <dl>
      <dt><a href="deleteuserrole?id_user=%s&amp;reverse=1">Remove roles</a></dt>
-     <dd>disconnect roles from this user.</dd>
-    """ % (id_user, ) 
-    extra += """
+     <dd>disconnect roles from user %s.</dd>
     </dl>
-    """
+    """ % (id_user, email_out)
+        if int(id_role):
+            if int(id_role) < 0: id_role = -int(id_role)
+            extra += """
+            <dl>
+             <dt><a href="deleteuserrole?id_role=%s">Remove users</a></dt>
+             <dd>disconnect users from role %s.<dd>
+            </dl>
+            """ % (id_role, name_role)
     
     return index(req=req,
                  title=title,
@@ -1570,7 +1579,7 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
         # user not connected to a role
         else:
             subtitle = 'step 1 - user not connected'
-            output += '<p>no need to remove roles from this user,<br>user <strong>%s</strong> is not connected to any roles.</p>' % (email_user, )
+            output += '<p>no need to remove roles from user <strong>%s</strong>,<br>user is not connected to any roles.</p>' % (email_user, )
             has_roles, id_user = 0, '0' # stop the rest of the output below...
             
         # user connected to roles
@@ -1620,16 +1629,24 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
         extra += """
         <dl>
          <dt><a href="adduserrole?id_role=%s">Connect user</a></dt>
-         <dd>add users to this role.</dd>
-        </dl>
-        """ % (id_role, )
+         <dd>add users to role %s.</dd>
+        """ % (id_role, name_role)
+        if int(reverse):
+            extra += """
+             <dt><a href="deleteuserrole?id_role=%s">Remove user</a></dt>
+             <dd>remove users from role %s.</dd> """ % (id_role, name_role)
+        extra += '</dl>'
     if str(id_user) != "0":
         extra += """
         <dl>
          <dt><a href="addroleuser?email_user_pattern=%s&amp;id_user=%s">Connect role</a></dt>
-         <dd>add roles to this user.</dd>
-        </dl>
-        """ % (email_user, id_user)
+         <dd>add roles to user %s.</dd>
+        """ % (email_user, id_user, email_user)
+        if not int(reverse):
+            extra += """
+             <dt><a href="deleteuserrole?id_user=%s&amp;email_user_pattern=%s&amp;reverse=1">Remove role</a></dt>
+             <dd>remove roles from user %s.</dd> """ % (id_user, email_user, email_user)
+        extra += '</dl>'
 
     if extra: body = [output, extra]
     else: body = [output]
@@ -1653,11 +1670,11 @@ def perform_showuserdetails(req, id_user=0):
         extra = """
         <dl>
          <dt><a href="addroleuser?id_user=%s&amp;email_user_pattern=%s">Connect role</a></dt>
-         <dd>connect a role to the user.</dd>
+         <dd>connect a role to user %s.</dd>
          <dt><a href="deleteuserrole?id_user=%s&amp;reverse=1">Remove role</a></dt>
-         <dd>remove a role from the user.</dd>
+         <dd>remove a role from user %s.</dd>
         </dl>
-        """ % (id_user, email_user, id_user)
+        """ % (id_user, email_user, email_user, id_user, email_user)
 
         body = [output, extra]
     else:
@@ -1708,6 +1725,7 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
     # values that might get used
     name_role = acca.acc_getRoleName(id_role=id_role) or id_role
     name_action = acca.acc_getActionName(id_action=id_action) or id_action
+
     optional = optional == 'on' and 1 or int(optional)
     
     extra = """
@@ -1729,7 +1747,8 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
                                   step=1,
                                   roles=acca.acc_getAllRoles(),
                                   reverse=reverse)
-        if id_role != "0":
+
+        if str(id_role) != "0":
             subtitle = 'step 2 - select action'
             rolacts = acca.acc_getRoleActions(id_role)
             allhelp = acca.acc_getAllActions()
@@ -1743,6 +1762,7 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
                                          extraactions=allacts,
                                          id_role=id_role,
                                          reverse=reverse)
+            
     # action -> role -> arguments
     else:
         adminarea = 4
@@ -1752,7 +1772,7 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
                                     step=1,
                                     actions=acca.acc_getAllActions(),
                                     reverse=reverse)
-        if id_action != "0":
+        if str(id_action) != "0":
             subtitle = 'step 2 - select role'
             actroles = acca.acc_getActionRoles(id_action)
             allhelp = acca.acc_getAllRoles()
@@ -1769,6 +1789,20 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
 
     # ready for step 3 no matter which direction we took to get here
     if id_action != "0" and id_role != "0":
+        # links to adding authorizations in the other direction
+        if str(reverse) == "0":
+            extra += """
+            <dl>
+             <dt><a href="addauthorization?id_action=%s&amp;reverse=1">Add authorization</a></dt>
+             <dd>add authorizations to action %s.</dd>
+            </dl> """ % (id_action, name_action)
+        else:
+            extra += """
+            <dl>
+             <dt><a href="addauthorization?id_role=%s">Add authorization</a></dt>
+             <dd>add authorizations to role %s.</dd>
+            </dl> """ % (id_role, name_role)
+
         subtitle = 'step 3 - enter values for the keywords\n'
 
         output += """
@@ -1785,8 +1819,8 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
         # res used to determine if showing "create connection without arguments"
         res_auths = acca.acc_findPossibleActions(id_role, id_action)
         
-        # action without arguments
         if not res_keys:
+            # action without arguments
             if not res_auths:
                 output += """
                  <input type="hidden" name="confirm" value="1">
@@ -1798,27 +1832,32 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
                 output += '<p><strong>connection without arguments is already created.</strong></p>'
                    
         else:
+            # action with arguments
             optionalargs = acca.acc_getActionIsOptional(id_action=id_action)
 
-            output += '<span class="adminlabel">3. arguments</span><br>'
+            output += '<span class="adminlabel">3. authorized arguments</span><br>'
             if optionalargs:
+                # optional arguments
                 output += """
                 <p>
-                 <input type="checkbox" name="optional" %s />
-                 create connection without the need for arguments
+                 <input type="radio" name="optional" value="1" %s />
+                 connect %s to %s for any arguments <br>
+                 <input type="radio" name="optional" value="0" %s />
+                 connect %s to %s for only these argument cases:
                 </p>
-                """ % (optional and 'checked="checked"' or '', )
-                
+                """ % (optional and 'checked="checked"' or '', name_role, name_action, not optional and 'checked="checked"' or '', name_role, name_action)
+
+            # list the arguments
             allkeys = 1
             for key in res_keys:
-                output += '<span class="adminlabel">%s </span>\n <input class="admin_wvar" type="text" name="%s"' % (key, key)
+                output += '<span class="adminlabel" style="margin-left: 30px;">%s </span>\n <input class="admin_wvar" type="text" name="%s"' % (key, key)
                 try:
                     val = keywords[key] = cleanstring_argumentvalue(keywords[key])
                     if val: output += 'value="%s" ' % (val, )
                     else: allkeys = 0
                 except KeyError: allkeys = 0
                 output += ' /> <br>\n'
-            output = output[:-5] + ' <input class="adminbutton" type="submit" value="create entry -->" />\n'
+            output = output[:-5] + ' <input class="adminbutton" type="submit" value="create authorization -->" />\n'
             output += '</form>\n'
 
             # ask for confirmation
@@ -2851,7 +2890,7 @@ def cleanstring_email(str=''):
       str - string to be cleaned """
 
     # remove not allowed characters
-    str = re.sub(r'[^a-zA-Z0-9_.@]', '', str)
+    str = re.sub(r'[^a-zA-Z0-9_.@-]', '', str)
 
     return str
 
@@ -2862,3 +2901,4 @@ def check_email(str=''):
 
     r = re.compile(r'(.)+\@(.)+\.(.)+')
     return r.match(str) and 1 or 0
+

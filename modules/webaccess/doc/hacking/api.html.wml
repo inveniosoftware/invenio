@@ -52,8 +52,7 @@ Contents:
 
 	  The arguments are as follows:
     
-                  id_user - currently the id of the user to be authorized in the
-                            cdsdev database
+                  id_user - id of the user to be authorized in the database
                             
               name_action - the name of the action
 
@@ -64,6 +63,7 @@ Contents:
    Examples:
 
 >>> # import the functions from module
+>>> # change this to your local settings...
 >>> pylibdir = '/log/cdsware-DEMODEV/lib/python/cdsware/'
 >>> import sys
 >>> sys.path.append('%s' % pylibdir)
