@@ -108,8 +108,8 @@ def send_email(req,p_email=None):
                     keywords="CDS, personalize",
                     uid=uid)
 	
-    fromaddr = "From:cds.alert@cdsware.cern.ch"
-    toaddrs  = "To:" + p_email
+    fromaddr = "From: <ALERTENGINEEMAIL>"
+    toaddrs  = "To: " + p_email
     to = toaddrs + "\n"
     sub = "Subject:Registration for cds.cern.ch\n\n"
     body="""\nHello \n\nThe password for user"%s"\nis "%s" (without quotes).
