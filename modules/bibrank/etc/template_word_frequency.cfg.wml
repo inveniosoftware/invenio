@@ -22,6 +22,7 @@ overall_importance = 1.0
 
 [word_frequency]
 stem_if_avail = yes
+stem_query_language = <CDSLANG>
 table = rnkWORD01F
 stopword = <ETCDIR>/bibrank/stopwords.kb
 #MARC tag,tag points, tag language
