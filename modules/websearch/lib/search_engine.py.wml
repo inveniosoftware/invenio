@@ -2821,10 +2821,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
          d2y - second date year (e.g. "1998").  Useful for search
                limits on creation date.
                     
-         d2m - second date month (e.g. "08").  Useful for search
+         d2m - second date month (e.g. "09").  Useful for search
                limits on creation date.
                
-         d2d - second date day (e.g. "23").  Useful for search limits
+         d2d - second date day (e.g. "02").  Useful for search limits
                on creation date.
                
      verbose - verbose level (0=min, 9=max).  Useful to print some
