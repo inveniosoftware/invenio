@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cdsware, 0.5.0.20050314, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.5.0.20050314)
+AC_INIT(cdsware, 0.5.0.20050329, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.5.0.20050329)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -95,7 +95,7 @@ fi
 
 ## Check for Python:
 AC_MSG_CHECKING(for python)
-AC_ARG_WITH(python, AC_HELP_STRING([--with-python], [path to a specific Python binary [optional]]), PYTHON=${withval})
+AC_ARG_WITH(python, AC_HELP_STRING([--with-python], [path to a specific Python binary (optional)]), PYTHON=${withval})
 if test -n "$PYTHON"; then
    AC_MSG_RESULT($PYTHON)
 else
@@ -137,7 +137,7 @@ if test -z "$ACROREAD"; then
    <http://www.adobe.com/products/acrobat/readstep.html>.])
 fi
 
-## Check for Gzip:
+## Check for gzip:
 AC_PATH_PROG(GZIP, gzip)
 if test -z "$GZIP"; then
    AC_MSG_WARN([
@@ -149,7 +149,7 @@ if test -z "$GZIP"; then
    <http://www.gzip.org/>.])
 fi
 
-## Check for Gunzip:
+## Check for gunzip:
 AC_PATH_PROG(GUNZIP, gunzip)
 if test -z "$GUNZIP"; then
    AC_MSG_WARN([
@@ -306,7 +306,7 @@ if test -z "$GIFTEXT"; then
    <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>.])
 fi
 
-## Check for File:
+## Check for file:
 AC_PATH_PROG(FILE, file)
 if test -z "$FILE"; then
    AC_MSG_WARN([
@@ -318,7 +318,7 @@ if test -z "$FILE"; then
    <ftp://ftp.astron.com/pub/file/>.])
 fi
 
-## Check for Convert:
+## Check for convert:
 AC_PATH_PROG(CONVERT, convert)
 if test -z "$CONVERT"; then
    AC_MSG_WARN([
@@ -331,42 +331,64 @@ if test -z "$CONVERT"; then
 fi
 
 ## Check for CLISP:
-AC_PATH_PROG(CLISP, clisp)
-if test -z "$CLISP"; then
-   AC_MSG_WARN([
-   GNU CLISP was not found in your PATH.  It is used by the WebStat
-   module to produce statistics about CDSware usage.  (Alternatively,
-   SBCL or CMUCL can be used instead of CLISP.)
-   You can continue without it but you will miss this feature.  We 
-   recommend you to install it first (if you don't have neither CMUCL
-   nor SBCL) and to rerun the configure script.  
-   GNU CLISP is available from <http://clisp.cons.org/>.])
+AC_MSG_CHECKING(for clisp)
+AC_ARG_WITH(clisp, AC_HELP_STRING([--with-clisp], [path to a specific CLISP binary (optional)]), CLISP=${withval})
+if test -n "$CLISP"; then
+   AC_MSG_RESULT($CLISP)
+else
+   AC_PATH_PROG(CLISP, clisp)
+   if test -z "$CLISP"; then
+      AC_MSG_WARN([
+      GNU CLISP was not found in your PATH.  It is used by the WebStat
+      module to produce statistics about CDSware usage.  (Alternatively,
+      SBCL or CMUCL can be used instead of CLISP.)
+      You can continue without it but you will miss this feature.  We 
+      recommend you to install it first (if you don't have neither CMUCL
+      nor SBCL) and to rerun the configure script.  
+      GNU CLISP is available from <http://clisp.cons.org/>.])
+   fi
 fi
 
 ## Check for CMUCL:
-AC_PATH_PROG(CMUCL, lisp)
-if test -z "$CMUCL"; then
-   AC_MSG_WARN([
-   CMUCL was not found in your PATH.  It is used by the WebStat
-   module to produce statistics about CDSware usage.  (Alternatively,
-   CLISP or SBCL can be used instead of CMUCL.)
-   You can continue without it but you will miss this feature.  We 
-   recommend you to install it first (if you don't have neither CLISP
-   nor SBCL) and to rerun the configure script.  
-   CMUCL is available from <http://www.cons.org/cmucl/>.])
+AC_MSG_CHECKING(for cmucl)
+AC_ARG_WITH(cmucl, AC_HELP_STRING([--with-cmucl], [path to a specific CMUCL binary (optional)]), CMUCL=${withval})
+if test -n "$CMUCL"; then
+   AC_MSG_RESULT($CMUCL)
+else
+   AC_PATH_PROG(CMUCL, cmucl)
+   if test -z "$CMUCL"; then
+      AC_MSG_CHECKING(for lisp) # CMUCL can also be installed under `lisp' exec name
+      AC_PATH_PROG(CMUCL, lisp) 
+   fi
+   if test -z "$CMUCL"; then   
+      AC_MSG_WARN([
+      CMUCL was not found in your PATH.  It is used by the WebStat
+      module to produce statistics about CDSware usage.  (Alternatively,
+      CLISP or SBCL can be used instead of CMUCL.)
+      You can continue without it but you will miss this feature.  We 
+      recommend you to install it first (if you don't have neither CLISP
+      nor SBCL) and to rerun the configure script.  
+      CMUCL is available from <http://www.cons.org/cmucl/>.])
+   fi    
 fi
 
 ## Check for SBCL:
-AC_PATH_PROG(SBCL, sbcl)
-if test -z "$SBCL"; then
-   AC_MSG_WARN([
-   SBCL was not found in your PATH.  It is used by the WebStat
-   module to produce statistics about CDSware usage.  (Alternatively,
-   CLISP or CMUCL can be used instead of SBCL.)
-   You can continue without it but you will miss this feature.  We 
-   recommend you to install it first (if you don't have neither CLISP
-   nor CMUCL) and to rerun the configure script.  
-   SBCL is available from <http://sbcl.sourceforge.net/>.])
+AC_MSG_CHECKING(for sbcl)
+AC_ARG_WITH(sbcl, AC_HELP_STRING([--with-sbcl], [path to a specific SBCL binary (optional)]), SBCL=${withval})
+if test -n "$SBCL"; then
+   AC_MSG_RESULT($SBCL)
+else
+   AC_PATH_PROG(SBCL, sbcl)
+   if test -z "$SBCL"; then
+      AC_MSG_WARN([
+      SBCL was not found in your PATH.  It is used by the WebStat
+      module to produce statistics about CDSware usage.  (Alternatively,
+      CLISP or CMUCL can be used instead of SBCL.)
+      You can continue without it but you will miss this feature.  We 
+      recommend you to install it first (if you don't have neither CLISP
+      nor CMUCL) and to rerun the configure script.  
+      SBCL is available from <http://sbcl.sourceforge.net/>.])
+   fi    
 fi
 
 ## Check for gnuplot:
@@ -420,6 +442,7 @@ AC_CONFIG_FILES([config.nice \
 	  modules/bibconvert/doc/admin/Makefile \
 	  modules/bibconvert/doc/hacking/Makefile \
 	  modules/bibconvert/etc/Makefile \
+	  modules/bibconvert/lib/Makefile \
 	  modules/bibedit/Makefile \
 	  modules/bibedit/bin/Makefile \
 	  modules/bibedit/doc/Makefile \
@@ -520,6 +543,7 @@ AC_CONFIG_FILES([config.nice \
 	  modules/webalert/lib/Makefile \
 	  modules/webalert/web/Makefile \
 	  modules/websubmit/Makefile \
+	  modules/websubmit/bin/Makefile \
 	  modules/websubmit/etc/Makefile \
 	  modules/websubmit/etc/bibconvert/Makefile \
 	  modules/websubmit/etc/bibconvert/KB/Makefile \
@@ -574,6 +598,9 @@ AC_MSG_RESULT([**   - DB name: $DBNAME])
 AC_MSG_RESULT([**   - DB username: $DBUSER])
 AC_MSG_RESULT([**   - DB password: $DBPASS])
 AC_MSG_RESULT([**   - Python executable: $PYTHON])
+AC_MSG_RESULT([**   - CLISP executable: $CLISP])
+AC_MSG_RESULT([**   - CMUCL executable: $CMUCL])
+AC_MSG_RESULT([**   - SBCL executable: $SBCL])
 AC_MSG_RESULT([** Here are the steps to continue the building process:                   **])
 AC_MSG_RESULT([**   1) Customize self-explanatory config file './config/config.wml'.     **])
 AC_MSG_RESULT([**   2) Type 'make' to build your customized CDSware installation.        **])
