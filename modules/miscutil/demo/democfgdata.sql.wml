@@ -29,7 +29,7 @@ INSERT INTO collectionname VALUES (2,'sk','ln','Preprinty');
 INSERT INTO collectionname VALUES (2,'cs','ln','Preprinty');
 INSERT INTO collectionname VALUES (2,'no','ln','Førtrykk');
 INSERT INTO collectionname VALUES (2,'sv','ln','Preprints');
-INSERT INTO collectionname VALUES (2,'el','ln','Preprints');
+INSERT INTO collectionname VALUES (2,'el','ln','Προδημοσιεύσεις');
 
 INSERT INTO collectionname VALUES (3,'en','ln','Books');
 INSERT INTO collectionname VALUES (3,'fr','ln','Livres');
@@ -185,7 +185,7 @@ INSERT INTO collectionname VALUES (15,'sk','ln','Články a Preprinty');
 INSERT INTO collectionname VALUES (15,'cs','ln','Články a Preprinty');
 INSERT INTO collectionname VALUES (15,'no','ln','Artikler og Førtrykk');
 INSERT INTO collectionname VALUES (15,'sv','ln','');
-INSERT INTO collectionname VALUES (15,'el','ln',"’ρθρα & Preprints");
+INSERT INTO collectionname VALUES (15,'el','ln',"’ρθρα & Προδημοσιεύσεις");
 
 INSERT INTO collectionname VALUES (16,'en','ln','Books & Reports');
 INSERT INTO collectionname VALUES (16,'fr','ln','Livres et Rapports');
