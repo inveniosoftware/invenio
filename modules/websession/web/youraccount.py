@@ -178,8 +178,8 @@ def send_email(req, p_email=None, ln=cdslang):
 	server.sendmail(fromaddr, toaddrs, msg)
 
     except smtplib.SMTPRecipientsRefused,e:
-           eMsg = "The entered e-mail address is incorrect, please check that it is written correctly (e.g. johndoe@example.com)"
-	   return page(title="Your Account",
+           eMsg = "The entered email address is incorrect, please check that it is written correctly (e.g. johndoe@example.com)."
+	   return page(title="Incorrect email address",
                        body=webaccount.perform_emailMessage(eMsg),
                        description="CDS Personalize, Main page",
                        keywords="CDS, personalize",
