@@ -177,7 +177,8 @@
 
   <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=bibindex-admin-interface txt="Interface" url="<WEBURL>/admin/bibindex/bibindexadmin.py">
+  <navbar:button id=bibindex-admin-interface txt="Indexes" url="<WEBURL>/admin/bibindex/bibindexadmin.py/index">
+  <navbar:button id=bibindex-admin-interface txt="Fields" url="<WEBURL>/admin/bibindex/bibindexadmin.py/field">
   <navbar:button id=bibindex-admin-guide txt="Guide" url="<WEBURL>/admin/bibindex/guide.html">
 
   <navbar:epilog> </td><td></td></tr> </navbar:epilog>
