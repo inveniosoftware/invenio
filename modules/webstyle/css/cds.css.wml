@@ -339,6 +339,42 @@ a.navtrail:hover {
    border-bottom: 1px dotted #fc0; 
    padding: 2px;
 }
+.nearesttermsbox {
+   color: #603;
+   background: #ffe;
+   padding: 0px;
+   border-spacing: 0px;
+   border-collapse: collapse;
+}
+.nearesttermsboxheader {
+   color: #603;
+   background: #ffc;
+   padding: 0px;
+   border-spacing: 0px;
+   text-align: left;
+   font-weight: normal;
+}
+.nearesttermsboxbody {
+   color: #603;
+   background: #fff;
+   padding: 0px;
+}
+a.nearestterms:link {
+   color: #603;
+   background: transparent;
+}
+a.nearestterms:visited {
+   color: #603;
+   background: transparent;
+}
+a.nearestterms:active {
+   color: #603;
+   background: transparent;
+}
+a.nearestterms:hover {
+   color: #603;
+   background: transparent;
+}
 .moreinfo {
    color: #060;
    background: transparent;
