@@ -201,13 +201,13 @@ def perform_set(email,password):
 	<form method="post" action="../youraccount.py/change">
 		<p>If you want to change your email address or password, please set new values in the form below.
 		<table>
-			<tr><td align=right><strong>New email address:</strong><br><small class=important>(mandatory)</small></td><td><input type="text" size="25" name="email" value="%s"><br><small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td><td></td></tr>
+			<tr><td align=right><strong>New email address:</strong><br><small class=important>(mandatory)</small></td><td><input type="text" size="25" name="email" %s value="%s"><br><small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td><td></td></tr>
 			<tr><td align=right><strong>New password:</strong><br><small class=quicknote>(optional)</small></td><td align=left><input type="password" size="25" name="password" value="%s"><br><small><span class=quicknote>Note:</span> The password phrase may contain punctuation, spaces, etc.</small></td></tr><tr><td align=right><strong>Retype password:</strong></td><td align=left><input type="password" size="25" name="password2" value="%s"></td><td><input type="hidden" name="action" value="edit"></td></tr>
 				<tr><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" value="Set new values"></code>&nbsp;&nbsp;&nbsp;</td></tr>
 		</table>
         </form>
       </body>	
-      """ % (email, password, "")
+      """ % (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2 and "disabled" or "", email, password, "")
     return text                    				
 
 ##  create_register_page_box(): register a new account

@@ -255,7 +255,10 @@ def updateDataUser(req,uid,email,password):
     """
     if email =='guest':
         return 0
-    query_result = run_sql("update user set email=%s,password=%s where id=%s", (email,password,uid))
+    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
+        query_result = run_sql("update user set password=%s where id=%s", (password,uid))
+    else:
+        query_result = run_sql("update user set email=%s,password=%s where id=%s", (email,password,uid))
     
 def loginUser(p_email,p_pw):
     """It is a first simple version for the authentication of user. It returns the id of the user, 
