@@ -42,7 +42,7 @@ def Send_Approval_Request (parameters,curdir,form):
     global rn,sysno
     # variables declaration
     doctype = re.search(".*/([^/]*)/([^/]*)/[^/]*$",curdir).group(2)
-    FROMADDR = 'CDS webSubmit <%s>' % supportemail
+    FROMADDR = 'CDSwareSubmission Interface <%s>' % supportemail
     otheraddresses = parameters['addressesDAM']
     directory = parameters['directory']
     categformat = parameters['categformatDAM']
