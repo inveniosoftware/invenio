@@ -2372,19 +2372,19 @@
 
 # FIXME
 <define-tag MSG_DOWNLOADS_HISTORY whitespace=delete>
-  <en>Dowloads history:</en>
+  <en>Downloads history:</en>
   <fr>Historique des téléchargements:</fr>
   <de>Historie der Herunterladen:</de>
   <es>Historia de descargas:</es>
-  <pt>Dowloads history:</pt>
+  <pt>Downloads history:</pt>
   <it>Cronaca dei downloads:</it>
-  <ru>Dowloads history:</ru>
+  <ru>Downloads history:</ru>
   <sk>História sťahovania:</sk>
   <cs>Historie stahování:</cs>
-  <no>Dowloads history:</no>
-  <sv>Dowloads history:</sv>
+  <no>Downloads history:</no>
+  <sv>Downloads history:</sv>
   <el>Ιστορικό downloads:</el>
-  <uk>Dowloads history:</uk>
+  <uk>Downloads history:</uk>
 </define-tag>
 
 # FIXME
