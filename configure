@@ -1706,10 +1706,10 @@ fi
 
 if test -z "$PYTHON"; then
    { { echo "$as_me:$LINENO: error:
-   Python was not found in your path.  Please install it first.
+   Python was not found in your PATH.  Please install it first.
    Available from <http://python.org/>." >&5
 echo "$as_me: error:
-   Python was not found in your path.  Please install it first.
+   Python was not found in your PATH.  Please install it first.
    Available from <http://python.org/>." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -1756,14 +1756,14 @@ fi
 
 if test -z "$ACROREAD"; then
    { echo "$as_me:$LINENO: WARNING:
-   Acrobat Reader was not found in your path.  It is used in
+   Acrobat Reader was not found in your PATH.  It is used in
    the WebSubmit module for automatic conversion of submitted documents.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Acrobat Reader is available from
    <http://www.adobe.com/products/acrobat/readstep.html>." >&5
 echo "$as_me: WARNING:
-   Acrobat Reader was not found in your path.  It is used in
+   Acrobat Reader was not found in your PATH.  It is used in
    the WebSubmit module for automatic conversion of submitted documents.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
@@ -1813,7 +1813,7 @@ fi
 
 if test -z "$LYNX"; then
    { echo "$as_me:$LINENO: WARNING:
-   Lynx was not found in your path.  It is used in
+   Lynx was not found in your PATH.  It is used in
    the WebSubmit module to fetch files from URLs given by
    submitters.
    You can continue without it but you will miss some CDSware
@@ -1821,7 +1821,7 @@ if test -z "$LYNX"; then
    the configure script.  Lynx is available from
    <http://lynx.browser.org/>." >&5
 echo "$as_me: WARNING:
-   Lynx was not found in your path.  It is used in
+   Lynx was not found in your PATH.  It is used in
    the WebSubmit module to fetch files from URLs given by
    submitters.
    You can continue without it but you will miss some CDSware
@@ -1872,14 +1872,14 @@ fi
 
 if test -z "$GZIP"; then
    { echo "$as_me:$LINENO: WARNING:
-   Gzip was not found in your path.  It is used in
+   Gzip was not found in your PATH.  It is used in
    the WebSubmit module to compress the data submitted in an archive.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Gzip is available from
    <http://www.gzip.org/>." >&5
 echo "$as_me: WARNING:
-   Gzip was not found in your path.  It is used in
+   Gzip was not found in your PATH.  It is used in
    the WebSubmit module to compress the data submitted in an archive.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
@@ -1929,7 +1929,7 @@ fi
 
 if test -z "$GUNZIP"; then
    { echo "$as_me:$LINENO: WARNING:
-   Gunzip was not found in your path.  It is used in
+   Gunzip was not found in your PATH.  It is used in
    the WebSubmit module to correctly deal with submitted compressed
    files.
    You can continue without it but you will miss some CDSware
@@ -1937,7 +1937,7 @@ if test -z "$GUNZIP"; then
    the configure script.  Gunzip is available from
    <http://www.gzip.org/>." >&5
 echo "$as_me: WARNING:
-   Gunzip was not found in your path.  It is used in
+   Gunzip was not found in your PATH.  It is used in
    the WebSubmit module to correctly deal with submitted compressed
    files.
    You can continue without it but you will miss some CDSware
@@ -1946,7 +1946,7 @@ echo "$as_me: WARNING:
    <http://www.gzip.org/>." >&2;}
 fi
 
-## Check for Tar:
+## Check for tar:
 # Extract the first word of "tar", so it can be a program name with args.
 set dummy tar; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
@@ -1988,14 +1988,14 @@ fi
 
 if test -z "$TAR"; then
    { echo "$as_me:$LINENO: WARNING:
-   Tar was not found in your path.  It is used in
+   Tar was not found in your PATH.  It is used in
    the WebSubmit module to pack the submitted data into an archive.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Tar is available from
    <ftp://prep.ai.mit.edu/pub/gnu/tar/>." >&5
 echo "$as_me: WARNING:
-   Tar was not found in your path.  It is used in
+   Tar was not found in your PATH.  It is used in
    the WebSubmit module to pack the submitted data into an archive.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
@@ -2003,7 +2003,7 @@ echo "$as_me: WARNING:
    <ftp://prep.ai.mit.edu/pub/gnu/tar/>." >&2;}
 fi
 
-## Check for Ps2pdf:
+## Check for ps2pdf:
 # Extract the first word of "ps2pdf", so it can be a program name with args.
 set dummy ps2pdf; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
@@ -2045,19 +2045,589 @@ fi
 
 if test -z "$PS2PDF"; then
    { echo "$as_me:$LINENO: WARNING:
-   Ps2pdf was not found in your path.  It is used in
+   ps2pdf was not found in your PATH.  It is used in
    the WebSubmit module to convert submitted PostScripts into PDF.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
-   the configure script.  Ps2pdf is available from
+   the configure script.  PS2PDF is available from
    <http://www.cs.wisc.edu/~ghost/doc/AFPL/6.50/Ps2pdf.htm>." >&5
 echo "$as_me: WARNING:
-   Ps2pdf was not found in your path.  It is used in
+   ps2pdf was not found in your PATH.  It is used in
    the WebSubmit module to convert submitted PostScripts into PDF.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
-   the configure script.  Ps2pdf is available from
+   the configure script.  PS2PDF is available from
    <http://www.cs.wisc.edu/~ghost/doc/AFPL/6.50/Ps2pdf.htm>." >&2;}
+fi
+
+## Check for pdftotext:
+# Extract the first word of "pdftotext", so it can be a program name with args.
+set dummy pdftotext; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_PDFTOTEXT+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $PDFTOTEXT in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PDFTOTEXT="$PDFTOTEXT" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_PDFTOTEXT="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  ;;
+esac
+fi
+PDFTOTEXT=$ac_cv_path_PDFTOTEXT
+
+if test -n "$PDFTOTEXT"; then
+  echo "$as_me:$LINENO: result: $PDFTOTEXT" >&5
+echo "${ECHO_T}$PDFTOTEXT" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+if test -z "$PDFTOTEXT"; then
+   { echo "$as_me:$LINENO: WARNING:
+   pdftotext was not found in your PATH.  It is used for the fulltext indexation
+   of PDF files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  pdftotext is available from <http://www.foolabs.com/xpdf/home.html>.
+   " >&5
+echo "$as_me: WARNING:
+   pdftotext was not found in your PATH.  It is used for the fulltext indexation
+   of PDF files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  pdftotext is available from <http://www.foolabs.com/xpdf/home.html>.
+   " >&2;}
+fi
+
+## Check for pstotext:
+# Extract the first word of "pstotext", so it can be a program name with args.
+set dummy pstotext; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_PSTOTEXT+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $PSTOTEXT in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PSTOTEXT="$PSTOTEXT" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_PSTOTEXT="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  ;;
+esac
+fi
+PSTOTEXT=$ac_cv_path_PSTOTEXT
+
+if test -n "$PSTOTEXT"; then
+  echo "$as_me:$LINENO: result: $PSTOTEXT" >&5
+echo "${ECHO_T}$PSTOTEXT" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+if test -z "$PSTOTEXT"; then
+   { echo "$as_me:$LINENO: WARNING:
+   pstotext was not found in your PATH.  It is used for the fulltext indexation
+   of PDF and PostScript files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  pstotext is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
+   " >&5
+echo "$as_me: WARNING:
+   pstotext was not found in your PATH.  It is used for the fulltext indexation
+   of PDF and PostScript files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  pstotext is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
+   " >&2;}
+fi
+
+## Check for ps2ascii:
+# Extract the first word of "ps2ascii", so it can be a program name with args.
+set dummy ps2ascii; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_PSTOASCII+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $PSTOASCII in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PSTOASCII="$PSTOASCII" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_PSTOASCII="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  ;;
+esac
+fi
+PSTOASCII=$ac_cv_path_PSTOASCII
+
+if test -n "$PSTOASCII"; then
+  echo "$as_me:$LINENO: result: $PSTOASCII" >&5
+echo "${ECHO_T}$PSTOASCII" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+if test -z "$PSTOASCII"; then
+   { echo "$as_me:$LINENO: WARNING:
+   ps2ascii was not found in your PATH.  It is used for the fulltext indexation
+   of PostScript files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  ps2ascii is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
+   " >&5
+echo "$as_me: WARNING:
+   ps2ascii was not found in your PATH.  It is used for the fulltext indexation
+   of PostScript files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  ps2ascii is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
+   " >&2;}
+fi
+
+## Check for antiword:
+# Extract the first word of "antiword", so it can be a program name with args.
+set dummy antiword; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_ANTIWORD+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $ANTIWORD in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ANTIWORD="$ANTIWORD" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_ANTIWORD="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  ;;
+esac
+fi
+ANTIWORD=$ac_cv_path_ANTIWORD
+
+if test -n "$ANTIWORD"; then
+  echo "$as_me:$LINENO: result: $ANTIWORD" >&5
+echo "${ECHO_T}$ANTIWORD" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+if test -z "$ANTIWORD"; then
+   { echo "$as_me:$LINENO: WARNING:
+   antiword was not found in your PATH.  It is used for the fulltext indexation
+   of Microsoft Word files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  antiword is available from <http://www.winfield.demon.nl/index.html>.
+   " >&5
+echo "$as_me: WARNING:
+   antiword was not found in your PATH.  It is used for the fulltext indexation
+   of Microsoft Word files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  antiword is available from <http://www.winfield.demon.nl/index.html>.
+   " >&2;}
+fi
+
+## Check for catdoc:
+# Extract the first word of "catdoc", so it can be a program name with args.
+set dummy catdoc; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_CATDOC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $CATDOC in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_CATDOC="$CATDOC" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_CATDOC="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  ;;
+esac
+fi
+CATDOC=$ac_cv_path_CATDOC
+
+if test -n "$CATDOC"; then
+  echo "$as_me:$LINENO: result: $CATDOC" >&5
+echo "${ECHO_T}$CATDOC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+if test -z "$CATDOC"; then
+   { echo "$as_me:$LINENO: WARNING:
+   catdoc was not found in your PATH.  It is used for the fulltext indexation
+   of Microsoft Word files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  catdoc is available from <http://www.ice.ru/~vitus/catdoc/index.html>.
+   " >&5
+echo "$as_me: WARNING:
+   catdoc was not found in your PATH.  It is used for the fulltext indexation
+   of Microsoft Word files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  catdoc is available from <http://www.ice.ru/~vitus/catdoc/index.html>.
+   " >&2;}
+fi
+
+## Check for wvText:
+# Extract the first word of "wvText", so it can be a program name with args.
+set dummy wvText; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_WVTEXT+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $WVTEXT in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_WVTEXT="$WVTEXT" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_WVTEXT="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  ;;
+esac
+fi
+WVTEXT=$ac_cv_path_WVTEXT
+
+if test -n "$WVTEXT"; then
+  echo "$as_me:$LINENO: result: $WVTEXT" >&5
+echo "${ECHO_T}$WVTEXT" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+if test -z "$WVTEXT"; then
+   { echo "$as_me:$LINENO: WARNING:
+   wvText was not found in your PATH.  It is used for the fulltext indexation
+   of Microsoft Word files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  wvText is available from <http://sourceforge.net/projects/wvware>.
+   " >&5
+echo "$as_me: WARNING:
+   wvText was not found in your PATH.  It is used for the fulltext indexation
+   of Microsoft Word files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  wvText is available from <http://sourceforge.net/projects/wvware>.
+   " >&2;}
+fi
+
+## Check for ppthtml:
+# Extract the first word of "ppthtml", so it can be a program name with args.
+set dummy ppthtml; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_PPTHTML+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $PPTHTML in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PPTHTML="$PPTHTML" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_PPTHTML="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  ;;
+esac
+fi
+PPTHTML=$ac_cv_path_PPTHTML
+
+if test -n "$PPTHTML"; then
+  echo "$as_me:$LINENO: result: $PPTHTML" >&5
+echo "${ECHO_T}$PPTHTML" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+if test -z "$PPTHTML"; then
+   { echo "$as_me:$LINENO: WARNING:
+   ppthtml was found in your PATH. It is used for the fulltext indexation
+   of Microsoft PowerPoint files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  ppthtml is available from <http://www.xlhtml.org/>.
+   " >&5
+echo "$as_me: WARNING:
+   ppthtml was found in your PATH. It is used for the fulltext indexation
+   of Microsoft PowerPoint files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  ppthtml is available from <http://www.xlhtml.org/>.
+   " >&2;}
+fi
+
+## Check for xlhtml:
+# Extract the first word of "xlhtml", so it can be a program name with args.
+set dummy xlhtml; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_XLHTML+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $XLHTML in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_XLHTML="$XLHTML" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_XLHTML="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  ;;
+esac
+fi
+XLHTML=$ac_cv_path_XLHTML
+
+if test -n "$XLHTML"; then
+  echo "$as_me:$LINENO: result: $XLHTML" >&5
+echo "${ECHO_T}$XLHTML" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+if test -z "$XLHTML"; then
+   { echo "$as_me:$LINENO: WARNING:
+   xlhtml was found in your PATH. It is used for the fulltext indexation
+   of Microsoft Excel files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  xlhtml is available from <http://chicago.sourceforge.net/xlhtml/>.
+   " >&5
+echo "$as_me: WARNING:
+   xlhtml was found in your PATH. It is used for the fulltext indexation
+   of Microsoft Excel files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  xlhtml is available from <http://chicago.sourceforge.net/xlhtml/>.
+   " >&2;}
+fi
+
+## Check for html2text:
+# Extract the first word of "html2text", so it can be a program name with args.
+set dummy html2text; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_HTMLTOTEXT+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $HTMLTOTEXT in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_HTMLTOTEXT="$HTMLTOTEXT" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_HTMLTOTEXT="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  ;;
+esac
+fi
+HTMLTOTEXT=$ac_cv_path_HTMLTOTEXT
+
+if test -n "$HTMLTOTEXT"; then
+  echo "$as_me:$LINENO: result: $HTMLTOTEXT" >&5
+echo "${ECHO_T}$HTMLTOTEXT" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+if test -z "$HTMLTOTEXT"; then
+   { echo "$as_me:$LINENO: WARNING:
+   html2text was found in your PATH. It is used for the fulltext indexation
+   of Microsoft PowerPoint and Excel files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  html2text is available from <http://userpage.fu-berlin.de/~mbayer/tools/html2text.html>.
+   " >&5
+echo "$as_me: WARNING:
+   html2text was found in your PATH. It is used for the fulltext indexation
+   of Microsoft PowerPoint and Excel files.
+   You can continue without it but you may miss fulltext searching capability
+   of CDSware.  We recomend you to install it first and to rerun the configure
+   script.  html2text is available from <http://userpage.fu-berlin.de/~mbayer/tools/html2text.html>.
+   " >&2;}
+fi
+
+## Check for Giftext:
+# Extract the first word of "giftext", so it can be a program name with args.
+set dummy giftext; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_GIFTEXT+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $GIFTEXT in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_GIFTEXT="$GIFTEXT" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_GIFTEXT="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  ;;
+esac
+fi
+GIFTEXT=$ac_cv_path_GIFTEXT
+
+if test -n "$GIFTEXT"; then
+  echo "$as_me:$LINENO: result: $GIFTEXT" >&5
+echo "${ECHO_T}$GIFTEXT" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+if test -z "$GIFTEXT"; then
+   { echo "$as_me:$LINENO: WARNING:
+   Giftext was not found in your PATH.  It is used in
+   the WebSubmit module to create an icon from a submitted picture.
+   You can continue without it but you will miss some CDSware
+   functionality.  We recommend you to install it first and to rerun
+   the configure script.  Giftext is available from
+   <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>." >&5
+echo "$as_me: WARNING:
+   Giftext was not found in your PATH.  It is used in
+   the WebSubmit module to create an icon from a submitted picture.
+   You can continue without it but you will miss some CDSware
+   functionality.  We recommend you to install it first and to rerun
+   the configure script.  Giftext is available from
+   <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>." >&2;}
 fi
 
 ## Check for File:
@@ -2102,14 +2672,14 @@ fi
 
 if test -z "$FILE"; then
    { echo "$as_me:$LINENO: WARNING:
-   File was not found in your path.  It is used in
+   File was not found in your PATH.  It is used in
    the WebSubmit module to check the validity of the submitted files.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
    the configure script.  File is available from
    <ftp://ftp.astron.com/pub/file/>." >&5
 echo "$as_me: WARNING:
-   File was not found in your path.  It is used in
+   File was not found in your PATH.  It is used in
    the WebSubmit module to check the validity of the submitted files.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
@@ -2159,14 +2729,14 @@ fi
 
 if test -z "$DJPEG"; then
    { echo "$as_me:$LINENO: WARNING:
-   Djpeg was not found in your path.  It is used in
+   Djpeg was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Djpeg is available from
    <http://www.ijg.org/files>." >&5
 echo "$as_me: WARNING:
-   Djpeg was not found in your path.  It is used in
+   Djpeg was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
@@ -2216,14 +2786,14 @@ fi
 
 if test -z "$CONVERT"; then
    { echo "$as_me:$LINENO: WARNING:
-   Convert was not found in your path.  It is used in
+   Convert was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Convert is available from
    <http://www.imagemagick.org/>." >&5
 echo "$as_me: WARNING:
-   Convert was not found in your path.  It is used in
+   Convert was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
@@ -2273,14 +2843,14 @@ fi
 
 if test -z "$GIFTEXT"; then
    { echo "$as_me:$LINENO: WARNING:
-   Giftext was not found in your path.  It is used in
+   Giftext was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Giftext is available from
    <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>." >&5
 echo "$as_me: WARNING:
-   Giftext was not found in your path.  It is used in
+   Giftext was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
@@ -2330,14 +2900,14 @@ fi
 
 if test -z "$GIFINTER"; then
    { echo "$as_me:$LINENO: WARNING:
-   Gifinter was not found in your path.  It is used in
+   Gifinter was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Gifinter is available from
    <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>." >&5
 echo "$as_me: WARNING:
-   Gifinter was not found in your path.  It is used in
+   Gifinter was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
@@ -2387,14 +2957,14 @@ fi
 
 if test -z "$GIFRSIZE"; then
    { echo "$as_me:$LINENO: WARNING:
-   Gifrsize was not found in your path.  It is used in
+   Gifrsize was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Gifrsize is available from
    <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>." >&5
 echo "$as_me: WARNING:
-   Gifrsize was not found in your path.  It is used in
+   Gifrsize was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
@@ -2444,14 +3014,14 @@ fi
 
 if test -z "$JPEGSIZE"; then
    { echo "$as_me:$LINENO: WARNING:
-   jpegsize was not found in your path.  It is used in
+   jpegsize was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Jpegsize is available from
    <http://www.squarebox.co.uk/download/>." >&5
 echo "$as_me: WARNING:
-   jpegsize was not found in your path.  It is used in
+   jpegsize was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
@@ -2501,14 +3071,14 @@ fi
 
 if test -z "$PPMTOGIF"; then
    { echo "$as_me:$LINENO: WARNING:
-   ppmtogif was not found in your path.  It is used in
+   ppmtogif was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Ppmtogif is available from
    <http://www.acme.com/software/pbmplus/>." >&5
 echo "$as_me: WARNING:
-   ppmtogif was not found in your path.  It is used in
+   ppmtogif was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
@@ -2558,14 +3128,14 @@ fi
 
 if test -z "$PPMQUANT"; then
    { echo "$as_me:$LINENO: WARNING:
-   ppmquant was not found in your path.  It is used in
+   ppmquant was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Ppmquant is available from
    <http://www.acme.com/software/pbmplus/>." >&5
 echo "$as_me: WARNING:
-   ppmquant was not found in your path.  It is used in
+   ppmquant was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
@@ -2615,14 +3185,14 @@ fi
 
 if test -z "$PNMSCALE"; then
    { echo "$as_me:$LINENO: WARNING:
-   pnmscale was not found in your path.  It is used in
+   pnmscale was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Pnmscale is available from
    <http://www.acme.com/software/pbmplus/>." >&5
 echo "$as_me: WARNING:
-   pnmscale was not found in your path.  It is used in
+   pnmscale was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware
    functionality.  We recommend you to install it first and to rerun
@@ -2784,6 +3354,15 @@ echo "$as_me: error:
 fi
 
 ## Substitute variables:
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3460,10 +4039,19 @@ s,@GZIP@,$GZIP,;t t
 s,@GUNZIP@,$GUNZIP,;t t
 s,@TAR@,$TAR,;t t
 s,@PS2PDF@,$PS2PDF,;t t
+s,@PDFTOTEXT@,$PDFTOTEXT,;t t
+s,@PSTOTEXT@,$PSTOTEXT,;t t
+s,@PSTOASCII@,$PSTOASCII,;t t
+s,@ANTIWORD@,$ANTIWORD,;t t
+s,@CATDOC@,$CATDOC,;t t
+s,@WVTEXT@,$WVTEXT,;t t
+s,@PPTHTML@,$PPTHTML,;t t
+s,@XLHTML@,$XLHTML,;t t
+s,@HTMLTOTEXT@,$HTMLTOTEXT,;t t
+s,@GIFTEXT@,$GIFTEXT,;t t
 s,@FILE@,$FILE,;t t
 s,@DJPEG@,$DJPEG,;t t
 s,@CONVERT@,$CONVERT,;t t
-s,@GIFTEXT@,$GIFTEXT,;t t
 s,@GIFINTER@,$GIFINTER,;t t
 s,@GIFRSIZE@,$GIFRSIZE,;t t
 s,@JPEGSIZE@,$JPEGSIZE,;t t
