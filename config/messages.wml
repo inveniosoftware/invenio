@@ -2371,7 +2371,7 @@
 </define-tag>
 
 # FIXME
-<define-tag MSG_DOWLOADS_HISTORY whitespace=delete>
+<define-tag MSG_DOWNLOADS_HISTORY whitespace=delete>
   <en>Dowloads history:</en>
   <fr>Historique des téléchargements:</fr>
   <de>Historie der Herunterladen:</de>
