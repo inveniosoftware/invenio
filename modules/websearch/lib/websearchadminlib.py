@@ -1756,7 +1756,7 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     <td><b>Menu</b></td>
     </tr>
     <tr>
-    <td>0.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s">Show all</a></small></td>
+    <td>0.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_showall">Show all</a></small></td>
     <td>1.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_addcollection">Create new collection</a></small></td>
     <td>2.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_addcollectiontotree">Attach collection to tree</a></small></td>
     <td>3.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_modifycollectiontree">Modify collection tree</a></small></td>
@@ -1765,33 +1765,36 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     </tr>
     </table>
     """ % (weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln)
-     
+
+    if mtype == "":
+        fin_output += """<br><br><b><span class="info">For managing the collections, select an item from the menu.</span><b><br>"""
+        
     if mtype == "perform_addcollection" and content:
         fin_output += content
-    elif mtype != "perform_runwebcoll" and mtype != "perform_addcollectiontotree" and mtype != "perform_modifycollectiontree" and mtype != "perform_validateconf":
+    elif mtype == "perform_addcollection" or mtype == "perform_showall":
         fin_output += perform_addcollection(colID=colID, ln=ln, callback='')
         fin_output += "<br>"
         
     if mtype == "perform_addcollectiontotree" and content:
         fin_output += content
-    elif mtype != "perform_runwebcoll" and mtype != "perform_addcollection" and mtype != "perform_modifycollectiontree" and mtype != "perform_validateconf":
+    elif mtype == "perform_addcollectiontotree" or mtype == "perform_showall":
         fin_output += perform_addcollectiontotree(colID=colID, ln=ln, callback='')
         fin_output += "<br>"
         
     if mtype == "perform_modifycollectiontree" and content:
         fin_output += content
-    elif mtype != "perform_runwebcoll" and mtype !="perform_addcollection" and mtype!="perform_addcollectiontotree" and mtype!= "perform_validateconf":
+    elif mtype == "perform_modifycollectiontree" or mtype == "perform_showall":
         fin_output += perform_modifycollectiontree(colID=colID, ln=ln, callback='')
         fin_output += "<br>"
 
     if mtype == "perform_runwebcoll" and content:
         fin_output += content
-    elif mtype != "perform_modifycollectiontree" and mtype !="perform_addcollection" and mtype!="perform_addcollectiontotree" and mtype!= "perform_validateconf":
+    elif mtype == "perform_runwebcoll" or mtype == "perform_showall":
         fin_output += perform_runwebcoll(colID, ln, callback='')
 
     if mtype == "perform_validateconf" and content:
         fin_output += content
-    elif mtype == "perform_validateconf":
+    elif mtype == "perform_validateconf" or mtype == "perform_showall":
         fin_output += perform_validateconf(colID, ln, callback='')
 
     try:
