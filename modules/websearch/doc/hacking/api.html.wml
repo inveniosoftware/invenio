@@ -52,7 +52,7 @@ via both a high-level and low-level API interface.
       def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="id", ot="", as="0",
                                  p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
                                  recid="-1", recidb="-1", sysno="", id="-1", idb="-1", sysnb="", action="SEARCH",
-                                 d1y="", d1m="", d1d="", d2y="", d2m="", d2d="", dbg="0", ap="0"):
+                                 d1y="", d1m="", d1d="", d2y="", d2m="", d2d="", verbose="0", ap="0"):
           """Perform search or browse request, without checking for
              authentication.  Return list of recIDs found, if of=id.
              Otherwise create web page.
@@ -187,7 +187,7 @@ via both a high-level and low-level API interface.
                d2d - second date day (e.g. "23").  Useful for search limits
                      on creation date.
                      
-               dbg - debug info level (0=min, 9=max).  Useful to print some
+           verbose - verbose level (0=min, 9=max).  Useful to print some
                      internal information on the searching process in case
                      something goes wrong.         
 
@@ -233,7 +233,7 @@ via both a high-level and low-level API interface.
 
    Signature:
 
-      def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", dbg=0):
+      def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0):
           """Search for complex pattern 'p' within field 'f' according to
              matching type 'm'.  Return hitset of recIDs.
       
@@ -253,7 +253,7 @@ via both a high-level and low-level API interface.
              prints the information in case of HTML formats, otherwise it's
              silent).
       
-             The 'dbg' argument controls the level of debugging information
+             The 'verbose' argument controls the level of debugging information
              to be printed (0=least, 9=most).
       
              All the parameters are assumed to have been previously washed.

@@ -1248,7 +1248,7 @@ def browse_in_bibwords(req, p, f):
     req.write(create_nearest_terms_box(urlargs, p, f, 'w'))
     return
 
-def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", dbg=0):
+def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0):
     """Search for complex pattern 'p' within field 'f' according to
        matching type 'm'.  Return hitset of recIDs.
 
@@ -1268,7 +1268,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", dbg=0):
        prints the information in case of HTML formats, otherwise it's
        silent).
 
-       The 'dbg' argument controls the level of debugging information
+       The 'verbose' argument controls the level of debugging information
        to be printed (0=least, 9=most).
 
        All the parameters are assumed to have been previously washed.
@@ -1285,15 +1285,15 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", dbg=0):
         # no pattern, so return all universe
         return hitset_full
     # search stage 1: break up arguments into basic search units:
-    if dbg:
+    if verbose:
         t1 = os.times()[4]
     basic_search_units = create_basic_search_units(req, p, f, m)
-    if dbg:
+    if verbose:
         t2 = os.times()[4]
         print_warning(req, "Search stage 1: basic search units are: %s" % basic_search_units)
         print_warning(req, "Search stage 1: execution took %.2f seconds." % (t2 - t1))
     # search stage 2: do search for each search unit and verify hit presence:
-    if dbg:
+    if verbose:
         t1 = os.times()[4]
     basic_search_units_hitsets = []
     for idx_unit in range(0,len(basic_search_units)):
@@ -1309,7 +1309,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", dbg=0):
                     bsu_pn = sre.sub(r'(\w)[^a-zA-Z0-9\s\:]+(\w|$)', "\\1*\\2", bsu_p)
                 else: # it is WRD query
                     bsu_pn = sre.sub(r'(\w)[^a-zA-Z0-9\s\:]+(\w|$)', "\\1 \\2", bsu_p)
-                if dbg and of.startswith('h') and req:
+                if verbose and of.startswith('h') and req:
                     print_warning(req, "trying %s/%s/%s" % (bsu_pn,bsu_f,bsu_m))
                 basic_search_unit_hitset = search_pattern(req=None, p=bsu_pn, f=bsu_f, m=bsu_m, of="id")
                 if basic_search_unit_hitset._nbhits > 0:
@@ -1330,14 +1330,14 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", dbg=0):
                     if req:
                         print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m))
                 return hitset_empty
-    if dbg:
+    if verbose:
         t2 = os.times()[4]
         for idx_unit in range(0,len(basic_search_units)):
             print_warning(req, "Search stage 2: basic search unit %s gave %d hits." %
                           (basic_search_units[idx_unit][1:], basic_search_units_hitsets[idx_unit]._nbhits))
         print_warning(req, "Search stage 2: execution took %.2f seconds." % (t2 - t1))
     # search stage 3: apply boolean query for each search unit:
-    if dbg:
+    if verbose:
         t1 = os.times()[4]
     hitset_in_any_collection = HitSet()
     for idx_unit in range(0,len(basic_search_units)):
@@ -1371,7 +1371,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", dbg=0):
                         (bsu_nbhits, weburl, url_args_new, bsu_p)
             text += """</table></blockquote>"""
             print_warning(req, text)                
-    if dbg:
+    if verbose:
         t2 = os.times()[4]
         print_warning(req, "Search stage 3: boolean query gave %d hits." % hitset_in_any_collection._nbhits)
         print_warning(req, "Search stage 3: execution took %.2f seconds." % (t2 - t1))
@@ -1515,10 +1515,10 @@ def search_unit_in_bibrec(day1, day2, type='creation_date'):
     set.addlist(Numeric.array(l))
     return set
 
-def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", dbg=0):
+def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0):
     """Return dict of hitsets given by intersection of hitset with the collection universes."""
     # search stage 4: intersect with the collection universe:
-    if dbg:
+    if verbose:
         t1 = os.times()[4]
     results = {}
     results_nbhits = 0
@@ -1547,7 +1547,7 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
                 print_warning(req, """No public collection matched your query.  If you were looking for a non-public document,
                                       please choose the desired restricted collection first.""")
             results = {}
-    if dbg:
+    if verbose:
         t2 = os.times()[4]
         print_warning(req, "Search stage 4: intersecting with collection universe gave %d hits." % results_nbhits)
         print_warning(req, "Search stage 4: execution took %.2f seconds." % (t2 - t1))                                        
@@ -2603,7 +2603,7 @@ def wash_url_argument(var, new_type):
 def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="id", ot="", as="0",
                            p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
                            recid="-1", recidb="-1", sysno="", id="-1", idb="-1", sysnb="", action="SEARCH",
-                           d1y="0", d1m="0", d1d="0", d2y="0", d2m="0", d2d="0", dbg="0", ap="0"):
+                           d1y="0", d1m="0", d1d="0", d2y="0", d2m="0", d2d="0", verbose="0", ap="0"):
     """Perform search or browse request, without checking for
        authentication.  Return list of recIDs found, if of=id.
        Otherwise create web page.
@@ -2738,7 +2738,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
          d2d - second date day (e.g. "23").  Useful for search limits
                on creation date.
                
-         dbg - debug info level (0=min, 9=max).  Useful to print some
+     verbose - verbose level (0=min, 9=max).  Useful to print some
                internal information on the searching process in case
                something goes wrong.
 
@@ -2789,7 +2789,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
     d2m = wash_url_argument(d2m, 'int')
     d2d = wash_url_argument(d2d, 'int')
     day1, day2 = wash_dates(d1y, d1m, d1d, d2y, d2m, d2d)
-    dbg = wash_url_argument(dbg, 'int')
+    verbose = wash_url_argument(verbose, 'int')
     ap = wash_url_argument(ap, 'int')
     # backwards compatibility: id, idb, sysnb -> recid, recidb, sysno (if applicable)
     if sysnb != "" and sysno == "":
@@ -2850,11 +2850,11 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         results_in_any_collection = HitSet()
         if as == 1 or (p1 or p2 or p3):
             ## 3A - advanced search
-            results_in_any_collection = search_pattern(req, p1, f1, m1, ap=ap, of=of, dbg=dbg)
+            results_in_any_collection = search_pattern(req, p1, f1, m1, ap=ap, of=of, verbose=verbose)
             if results_in_any_collection._nbhits == 0:                
                 return page_end(req, of)                
             if p2:
-                results_tmp = search_pattern(req, p2, f2, m2, ap=ap, of=of, dbg=dbg)
+                results_tmp = search_pattern(req, p2, f2, m2, ap=ap, of=of, verbose=verbose)
                 if op1 == "a": # add
                     results_in_any_collection.intersect(results_tmp)
                 elif op1 == "o": # or
@@ -2868,7 +2868,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 if results_in_any_collection._nbhits == 0:                
                     return page_end(req, of)                
             if p3:
-                results_tmp = search_pattern(req, p3, f3, m3, ap=ap, of=of, dbg=dbg)
+                results_tmp = search_pattern(req, p3, f3, m3, ap=ap, of=of, verbose=verbose)
                 if op2 == "a": # add
                     results_in_any_collection.intersect(results_tmp)
                 elif op2 == "o": # or
@@ -2881,7 +2881,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 results_in_any_collection.calculate_nbhits()
         else:
             ## 3B - simple search
-            results_in_any_collection = search_pattern(req, p, f, ap=ap, of=of, dbg=dbg)
+            results_in_any_collection = search_pattern(req, p, f, ap=ap, of=of, verbose=verbose)
 
         if results_in_any_collection._nbhits == 0:                
             return page_end(req, of)
@@ -2896,7 +2896,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
 #                 search_cache.clear()
 
         # search stage 4: intersection with collection universe:
-        results_final = intersect_results_with_collrecs(req, results_in_any_collection, colls_to_search, ap, of, dbg)
+        results_final = intersect_results_with_collrecs(req, results_in_any_collection, colls_to_search, ap, of, verbose)
         if results_final == {}:
             return page_end(req, of)
         
