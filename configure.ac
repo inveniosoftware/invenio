@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cdsware, 0.3.1.20040402, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.3.1.20040402)
+AC_INIT(cdsware, 0.3.1.20040503, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.3.1.20040503)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -359,13 +359,24 @@ AC_CONFIG_FILES([Makefile \
 	  modules/bibconvert/bin/Makefile \
 	  modules/bibconvert/doc/Makefile \
 	  modules/bibconvert/doc/admin/Makefile \
+	  modules/bibconvert/doc/hacking/Makefile \
 	  modules/bibconvert/etc/Makefile \
+	  modules/bibedit/Makefile \
+	  modules/bibedit/doc/Makefile \
+	  modules/bibedit/doc/admin/Makefile \
+	  modules/bibedit/doc/hacking/Makefile \
 	  modules/bibharvest/Makefile \
 	  modules/bibharvest/bin/Makefile \
+	  modules/bibharvest/doc/Makefile \
+	  modules/bibharvest/doc/admin/Makefile \
+	  modules/bibharvest/doc/hacking/Makefile \
 	  modules/bibharvest/lib/Makefile \
 	  modules/bibharvest/web/Makefile \
 	  modules/bibindex/Makefile \
 	  modules/bibindex/bin/Makefile \
+	  modules/bibindex/doc/Makefile \
+	  modules/bibindex/doc/admin/Makefile \
+	  modules/bibindex/doc/hacking/Makefile \
 	  modules/bibrank/Makefile \
 	  modules/bibrank/bin/Makefile \
 	  modules/bibrank/doc/Makefile \
@@ -377,16 +388,22 @@ AC_CONFIG_FILES([Makefile \
 	  modules/bibrank/web/admin/Makefile \
 	  modules/bibsched/Makefile \
 	  modules/bibsched/bin/Makefile \
+	  modules/bibsched/doc/Makefile \
+	  modules/bibsched/doc/admin/Makefile \
+	  modules/bibsched/doc/hacking/Makefile \
 	  modules/bibupload/Makefile \
 	  modules/bibupload/bin/Makefile \
 	  modules/bibupload/doc/Makefile \
 	  modules/bibupload/doc/admin/Makefile \
+	  modules/bibupload/doc/hacking/Makefile \
 	  modules/bibformat/Makefile \
 	  modules/bibformat/bin/Makefile \
+	  modules/bibformat/doc/Makefile \
+	  modules/bibformat/doc/admin/Makefile \
+	  modules/bibformat/doc/hacking/Makefile \
 	  modules/bibformat/lib/Makefile \
 	  modules/bibformat/lib/core/Makefile \
 	  modules/bibformat/lib/common/Makefile \
-	  modules/bibformat/doc/Makefile \
 	  modules/bibformat/web/Makefile \
 	  modules/bibformat/web/admin/Makefile \
 	  modules/webhelp/Makefile \
@@ -404,19 +421,31 @@ AC_CONFIG_FILES([Makefile \
 	  modules/websearch/web/admin/Makefile \
 	  modules/websession/Makefile \
 	  modules/websession/bin/Makefile \
+	  modules/websession/doc/Makefile \
+	  modules/websession/doc/admin/Makefile \
+	  modules/websession/doc/hacking/Makefile \
 	  modules/websession/lib/Makefile \
 	  modules/websession/web/Makefile \
 	  modules/webstyle/Makefile \
 	  modules/webstyle/css/Makefile \
+	  modules/webstyle/doc/Makefile \
+	  modules/webstyle/doc/admin/Makefile \
+	  modules/webstyle/doc/hacking/Makefile \
 	  modules/webstyle/img/Makefile \
 	  modules/webstyle/lib/Makefile \
 	  modules/webbasket/Makefile \
+	  modules/webbasket/doc/Makefile \
+	  modules/webbasket/doc/admin/Makefile \
+	  modules/webbasket/doc/hacking/Makefile \
 	  modules/webbasket/lib/Makefile \
 	  modules/webbasket/web/Makefile \
 	  modules/webalert/Makefile \
+	  modules/webalert/bin/Makefile \
+	  modules/webalert/doc/Makefile \
+	  modules/webalert/doc/admin/Makefile \
+	  modules/webalert/doc/hacking/Makefile \
 	  modules/webalert/lib/Makefile \
 	  modules/webalert/web/Makefile \
-	  modules/webalert/bin/Makefile \
 	  modules/websubmit/Makefile \
 	  modules/websubmit/etc/Makefile \
 	  modules/websubmit/etc/bibconvert/Makefile \
@@ -424,6 +453,7 @@ AC_CONFIG_FILES([Makefile \
 	  modules/websubmit/etc/bibconvert/config/Makefile \
 	  modules/websubmit/doc/Makefile \
 	  modules/websubmit/doc/admin/Makefile \
+	  modules/websubmit/doc/hacking/Makefile \
 	  modules/websubmit/lib/Makefile \
 	  modules/websubmit/lib/functions/Makefile \
 	  modules/websubmit/web/Makefile \
