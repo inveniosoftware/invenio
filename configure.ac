@@ -491,6 +491,12 @@ AC_CONFIG_FILES([Makefile \
 	  modules/webalert/bin/Makefile \
 	  modules/websubmit/Makefile \
 	  modules/websubmit/web/Makefile \
+	  modules/webaccess/Makefile \
+	  modules/webaccess/bin/Makefile \
+	  modules/webaccess/doc/Makefile \
+	  modules/webaccess/lib/Makefile \
+	  modules/webaccess/web/Makefile \
+	  modules/webaccess/web/admin/Makefile \
 	  modules/miscutil/Makefile \
 	  modules/miscutil/bin/Makefile \
 	  modules/miscutil/lib/Makefile \
