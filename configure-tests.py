@@ -66,8 +66,12 @@ if sys.version < cfg_min_python_version:
     ** problems you may need to upgrade Python and       **
     ** reinstall CDSware from scratch.                   **
     *******************************************************
-    """ % (string.replace(sys.version, "\n", ""), cfg_min_python_version) 
-    getpass.getpass("Press ENTER to continue the installation anyhow...")
+    """ % (string.replace(sys.version, "\n", ""), cfg_min_python_version)
+    try:
+        getpass.getpass("Press ENTER to continue the installation anyhow...")
+    except KeyboardInterrupt:
+        print "\n\nInstallation aborted."
+        sys.exit(1)
 
 ## 2) check for required modules:
 try:
@@ -122,7 +126,11 @@ except ImportError, e:
     ** production.)                                    **
     *****************************************************
     """ % e
-    getpass.getpass("Press ENTER to continue the installation...")
+    try:
+        getpass.getpass("Press ENTER to continue the installation...")
+    except KeyboardInterrupt:
+        print "\n\nInstallation aborted."
+        sys.exit(1)
 
 try:
     import Stemmer
@@ -142,7 +150,11 @@ except ImportError, e:
     ** on real production data.)                       **
     *****************************************************
     """ % e
-    getpass.getpass("Press ENTER to continue the installation...")
+    try:
+        getpass.getpass("Press ENTER to continue the installation...")
+    except KeyboardInterrupt:
+        print "\n\nInstallation aborted."
+        sys.exit(1)
 
 try:
     import pyRXP
@@ -160,7 +172,35 @@ except ImportError, e:
     ** production.)                                    **
     *****************************************************
     """ % e
-    getpass.getpass("Press ENTER to continue the installation...")
+    try:
+        getpass.getpass("Press ENTER to continue the installation...")
+    except KeyboardInterrupt:
+        print "\n\nInstallation aborted."
+        sys.exit(1)
+
+try:
+    import Gnuplot
+except ImportError, e:
+    print """
+    *****************************************************
+    ** WARNING: PYTHON IMPORT WARNING %s
+    *****************************************************
+    ** Note that Gnuplot.py is not really required but **
+    ** we recommend it in order to have nice download  **
+    ** and citation history graphs on Detailed record  **
+    ** pages.                                          **
+    **                                                 **
+    ** You can safely continue installing CDSware now, **
+    ** and add this module anytime later.  (I.e. even  **
+    ** after your CDSware installation is put into     **
+    ** production.)                                    **
+    *****************************************************
+    """ % e
+    try:
+        getpass.getpass("Press ENTER to continue the installation...")
+    except KeyboardInterrupt:
+        print "\n\nInstallation aborted."
+        sys.exit(1)
 
 ## 4) check for versions of some important modules:
 if MySQLdb.__version__ < cfg_min_mysqldb_version:
@@ -173,7 +213,11 @@ if MySQLdb.__version__ < cfg_min_mysqldb_version:
     ** file for more details.                          **
     *****************************************************
     """ % (MySQLdb.__version__, cfg_min_mysqldb_version)
-    getpass.getpass("Press ENTER to continue the installation anyhow...")
+    try:
+        getpass.getpass("Press ENTER to continue the installation anyhow...")
+    except KeyboardInterrupt:
+        print "\n\nInstallation aborted."
+        sys.exit(1)
 
 if MySQLdb.__version__ > cfg_max_mysqldb_version:
     print """
@@ -198,4 +242,8 @@ if Numeric.__version__ < cfg_min_numeric_version:
     ** file for more details.                          **
     *****************************************************
     """ % (Numeric.__version__, cfg_min_numeric_version)
-    getpass.getpass("Press ENTER to continue the installation anyhow...")
+    try:
+        getpass.getpass("Press ENTER to continue the installation anyhow...")
+    except KeyboardInterrupt:
+        print "\n\nInstallation aborted."
+        sys.exit(1)
