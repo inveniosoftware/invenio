@@ -649,7 +649,7 @@ def perform_showrankdetails(rnkID, ln=cdslang):
 
     return output
 
-def compare_on_val(first, second):
+def compare_on_val(second, first):
     return cmp(second[1], first[1])
 
 def get_rnk_code(rnkID):
@@ -1061,6 +1061,7 @@ def get_current_name(ID, ln, rtype, table):
         result = filter(lambda x: not res2.has_key(x[0]), res1)
         res = res + result
         res = list(res)
+	res.sort(compare_on_val) 
         return res
     except StandardError, e:
         raise StandardError
