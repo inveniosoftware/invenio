@@ -41,6 +41,11 @@ and how it will be stored in CDSware.
 <dd>Describes how to migrate a bunch of your old data from any format
 you might have into CDSware.
 
+<dt><a href="run.html">HOWTO Run</a>
+
+<dd>Describes how to run your CDSware installation and how to take
+care of its normal operation day by day.
+
 </dl>
 </blockquote>
 

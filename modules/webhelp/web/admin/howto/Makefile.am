@@ -19,7 +19,7 @@
 
 docdir = $(WEBDIR)/admin/howto
 
-doc_DATA=index.html marc.html migrate.html
+doc_DATA=index.html marc.html migrate.html run.html
 
 EXTRA_DIST = $(wildcard *.wml)
 
