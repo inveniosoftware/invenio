@@ -47,7 +47,7 @@ def index(req, ln=cdslang):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not brc.check_user(uid):
+    if not brc.check_user(uid,'cfgbibrank'):
         return page(title="BibRank Admin Interface",
                 body=brc.perform_index(ln),
                 uid=uid,
@@ -66,7 +66,7 @@ def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not brc.check_user(uid):
+    if not brc.check_user(uid,'cfgbibrank'):
         return page(title="Add new rank method",
                 body=brc.perform_addrankarea(rnkcode=rnkcode,
                                              ln=cdslang,
@@ -88,7 +88,7 @@ def modifytranslations(req, rnkID='', ln=cdslang, sel_type='', trans = [], confi
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not brc.check_user(uid):
+    if not brc.check_user(uid,'cfgbibrank'):
         return page(title="Modify translations",
                 body=brc.perform_modifytranslations(rnkID=rnkID,
                                              ln=ln,
@@ -111,7 +111,7 @@ def modifycollection(req, ln=cdslang, rnkID='', func='', colID='', confirm=0):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not brc.check_user(uid):
+    if not brc.check_user(uid,'cfgbibrank'):
         return page(title="Modify visibility toward collections",
                 body=brc.perform_modifycollection(rnkID=rnkID,
                                                  ln=ln,
@@ -134,7 +134,7 @@ def deleterank(req, ln=cdslang, rnkID='', confirm=0):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not brc.check_user(uid):
+    if not brc.check_user(uid,'cfgbibrank'):
         return page(title="Delete rank method",
                 body=brc.perform_deleterank(rnkID=rnkID,
                                                  ln=ln,
@@ -155,7 +155,7 @@ def modifyrank(req, ln=cdslang, rnkID='', rnkcode='', template='', cfgfile='', c
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not brc.check_user(uid):
+    if not brc.check_user(uid,'cfgbibrank'):
         return page(title="Modify rank method",
                 body=brc.perform_modifyrank(rnkID=rnkID,
                                             ln=ln,
@@ -179,7 +179,7 @@ def showrankdetails(req, ln=cdslang, rnkID=''):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not brc.check_user(uid):
+    if not brc.check_user(uid,'cfgbibrank'):
         return page(title="Rank method details",
                 body=brc.perform_showrankdetails(rnkID=rnkID,
                                                  ln=ln),

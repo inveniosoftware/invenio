@@ -51,11 +51,11 @@ def getnavtrail(previous = ''):
     navtrail = navtrail + previous
     return navtrail
 
-def check_user(uid, adminarea=2, authorized=0):
-    if not authorized and not is_adminuser(uid):
+def check_user(uid, role, adminarea=2, authorized=0):
+    if not authorized and not is_adminuser(uid, role):
         return "false"
     
-def is_adminuser(uid, role = 'cfgbibrank'):
+def is_adminuser(uid, role):
     """check if user is a registered administrator. """
     return acce.acc_authorize_action(uid, role)
 
