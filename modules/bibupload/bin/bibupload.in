@@ -66,6 +66,11 @@ if (!extension_loaded('pcntl')) {
   print "error... pcntl php module needed for running bibupload. Check your php installation";
   exit();
 }
+// then test if mysql is loaded
+if (!extension_loaded('mysql')) {
+  print "error... mysql php module needed for running bibupload. Check your php installation";
+  exit();
+}
 
 // time limit for script execution
 set_time_limit(86340);
