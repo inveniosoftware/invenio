@@ -799,7 +799,7 @@ WHERE  id_bibrec=$recid and
 
 function deletefield($recid,$fulltag,$tablename,$logfp)
 {
-    global $strongtags,$options;
+    global $strongtags,$options,$mysql_server_version;
 
     $t1 = getmicrotime();
     $res = mysql_perform_query("
@@ -816,7 +816,25 @@ WHERE  id_bibxxx = id and
     while ($row = mysql_fetch_row($res)) {
         // delete main value + subfields
         $t1 = getmicrotime();
-        mysql_perform_query("
+        if (strcmp($mysql_server_version, "4.0") < 0) {
+            $res2 = mysql_perform_query("
+SELECT id_bibxxx
+FROM   bibrec_$tablename,
+       $tablename
+WHERE  id_bibrec=$recid and 
+       field_number=$row[0] and
+       id_bibxxx=id and
+       tag NOT IN ".createTextFromArray($strongtags));
+            while ($row2 = mysql_fetch_row($res2)) {
+                mysql_perform_query("
+DELETE 
+FROM    bibrec_$tablename
+WHERE   id_bibrec=$recid and
+        id_bibxxx=$row2[0] and
+        field_number = $row[0]");
+            }
+        } else {
+            mysql_perform_query("
 DELETE 
 FROM   bibrec_$tablename
 USING  bibrec_$tablename,
@@ -825,6 +843,7 @@ WHERE  id_bibrec=$recid and
        field_number=$row[0] and
        id_bibxxx=id and
        tag NOT IN ".createTextFromArray($strongtags));
+        }
         $t2 = getmicrotime();
         if ($options['PRINTDB'])
             print ($t2-$t1)." delete from bibrec_$tablename using  bibrec_$tablename, ".
@@ -1661,6 +1680,9 @@ $sock = @mysql_connect("${mysql_machine}","${mysql_docid}","${mysql_docpw}")
      or die("Sorry, cannot connect to SQL server.\nPlease try later.\n");
 mysql_select_db("${mysql_dbname}") 
      or die("Sorry, cannot choose ".${mysql_dbname}." database.  Please try later.\n");
+
+// detect MySQL server version
+$mysql_server_version = mysql_get_server_info();
 
 // do what is required:
 if ($options['TASKRUN']) {
