@@ -1951,9 +1951,10 @@ CREATE TABLE IF NOT EXISTS oaiset (
 CREATE TABLE IF NOT EXISTS collection_portalbox (
   id_collection mediumint(9) unsigned NOT NULL,
   id_portalbox mediumint(9) unsigned NOT NULL,
+  ln char(2) NOT NULL default '',
   position char(3) NOT NULL default 'top',
   score tinyint(4) unsigned NOT NULL default '0',
-  PRIMARY KEY  (id_collection,id_portalbox)
+  PRIMARY KEY  (id_collection,id_portalbox,ln)
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS portalbox (
