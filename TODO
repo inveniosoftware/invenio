@@ -7,6 +7,12 @@ CDSware TODO list
 Suitable for editing with Emacs ToDoo mode, see
 <http://www.emacswiki.org/cgi-bin/wiki/ToDoo>.
 
+* the Personalization part is not I18N-ized yet, and there are not
+  very many personalization options.  We plan to expand it at some
+  point in the future, like a possibility to select default
+  language, default number of hits per page, default sorting, etc.
+  Received: Mon Mar 15 11:23:34 2004
+
 * bibsched task sleeping sometimes cannot be done directly
   Sometimes when you try to make bibsched task sleeping, you cannot do
   it because MySQL is active for the task elsewhere:
@@ -31,26 +37,12 @@ name the same collection in many different languages in a clean way.
 I'll prepare a demo for v0.3.1.  This possibility will solve the above
 mentioned end-user confusion-prone display in a clean way.
 
-o [tibor] static HTML pages should not get created all languages
-  Static HTML pages should not get created all languages when user
-  selected only some languages in his config.wml.
-  Received Mon Jan 26 19:21:35 2004
-
 o [tibor] in search for ``title: goo'' the space should be ignored
   Received Wed Jan 21 11:09:00 2004
 
-o [tibor] Internal Error exceptions.KeyError 'Articles & Preprints' 
-  ``Fixed'' by restarting Apache.  It appears that you contacted a
-  server process exactly when it was being restarted, as the cache is
-  usually filled upon Apache startup.  I'll have a closer look and fix
-  it properly later.
-  Seems to be connected to the runaway client number problem.
-  Maybe run_sql() should be revised.
-  Received Tue Jan 20 10:56:02 2004
-
 o [tibor] CDSware DEMO formats
    - picture links should use recid not sysnb
-   - use /search.py  not /search in links
+   - use /search.py  not /search in e.g. citation search links
    - print creation/modification dates in HTML Detailed format
   Received Mon Jan 19 10:41:18 2004
 
@@ -63,6 +55,7 @@ o [thomas] BibUpload must use run_sql()
 
 o [tibor] Installation: upgrade instructions
   Received Wed Dec 17 16:20:35 2003 
+  Updated Wed May 12 12:00:38 2004 - update sql targets, plus release announcements
 
 * WebSession account edit bugs 
 - email unique
@@ -88,7 +81,10 @@ forcing option for date/time lookup or something.  I've added a note
 in my TODO file to do more investigations.  In any case, you may run
 `apachectl graceful' each hour in a cron job.
 
-  Updated Mon Mar  8 19:11:43 2004
+  Updated Mon Mar  8 19:11:43 2004 
+
+  Updated Wed May 12 12:01:10 2004 - search cache for collections
+   fixed for v0.3.2, search cache for patterns to be done still
 
 o [tibor] WebSearch: sort pattern test
   Received Wed Dec 17 16:20:35 2003 
@@ -96,9 +92,8 @@ o [tibor] WebSearch: sort pattern test
 * import/adapt old admin interfaces
   Received Wed Dec 17 16:20:35 2003 
 
-o [martin] BibConvert: DC2MARC21 
-  Received Wed Dec 17 16:20:35 2003 
-  Progress: DCQ example done, XML OAI DC pending
+  Updated Wed May 12 12:01:52 2004 - admin area revisited for v0.3.2,
+  some admin interfaces still to be done (ongoing task)
 
 o [martin] BibConvert: MEDLINE, BibTeX examples
   Received: Wed Dec 17 16:20:35 2003 
@@ -116,6 +111,27 @@ o [tibor] BibIndex: make our own ACC indexes
   Related to bibXXx table abolition.
   Progress: table structure prepared for v0.3.0
 
+o [tibor] add restricted mode (guest users not allowed)
+  On Wed, 17 Mar 2004, Filippos N. Kolovos wrote:
+  > 1. Yes, we would like unregistered users not to be able to use AT
+  > ALL the search facilities of the system (including the initial
+  > interface search page) and a message like the one that you provided
+  > to appear to them. Only registered users should be able to use the
+  > system
+  >
+  >>     ``Sorry, system Foo is available only to registered users.  In
+  >>       order to register please send an email to <bar@quux.com> that
+  >>       will let you know your access credentials.  If you have an
+  >>       account already, please login below.''
+  > 
+  > 2. Initially, we would like to have a policy for our users, with
+  > which since a user has been registered by the admin, then he, or she
+  > should have all the priviledges that the system offers concerning
+  > the searching of the system and maybe some personalization issues,
+  > for example to be able to change only his/her password, but not the
+  > username, since we would like to have the control on the usernames
+  > of our users
+  
 
 DONE
 ====
@@ -152,5 +168,32 @@ o [thomas] WebSubmit: adaptation
 o [tibor] Admin: HOWTO Run guide 
   Received Wed Dec 17 16:20:35 2003 
   Done for v0.3.1
+
+o [tibor] Internal Error exceptions.KeyError 'Articles & Preprints' 
+  ``Fixed'' by restarting Apache.  It appears that you contacted a
+  server process exactly when it was being restarted, as the cache is
+  usually filled upon Apache startup.  I'll have a closer look and fix
+  it properly later.
+  Seems to be connected to the runaway client number problem.
+  Maybe run_sql() should be revised.
+  Received Tue Jan 20 10:56:02 2004
+  
+  Possibly done by improving run_sql() for v0.3.0 and by fixing search
+  cache thingie for v0.3.2
+
+o [tibor] static HTML pages should not get created all languages
+  Static HTML pages should not get created all languages when user
+  selected only some languages in his config.wml.
+  Received Mon Jan 26 19:21:35 2004
+
+  They are now shown only in the language of the installation.
+  And I18N creation is now faster, so I'll keep creating them all.
+  Done for v0.3.2
+
+o [martin] BibConvert: DC2MARC21 
+  Received Wed Dec 17 16:20:35 2003 
+  Progress: DCQ example done, XML OAI DC pending
+  Updated Wed May 12 12:02:18 2004 - done for v0.3.2
+
 
 ;; end of file
