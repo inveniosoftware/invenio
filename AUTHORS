@@ -6,25 +6,37 @@ Revision: $Id$
 The CDS Development Group consists of several people:
 
  - Jean-Yves Le Meur <jean-yves.le.meur@cern.ch>
-   Head of the team.
+     Head of the team.
 
  - Tibor Simko <tibor.simko@cern.ch>
-   Search interface, search engine, user personalization, software
-   packaging, design.  WebSearch, BibWords, BibData, WebPerso.
+     Search interface, search and indexing engine, user
+     personalization, system architecture, release management.
+     Maintains mostly: WebSearch, BibWords, BibSched, WebStyle,
+                       WebHelp, WebAlert, WebBasket, WebAccess, 
+                       MiscUtils.
   
  - Thomas Baron <thomas.baron@cern.ch>
-   Submit interface, administrative modules.  WebSubmit, most of Web
-   Admins, BibUpload.
+     Submit interface, batch upload, administrative modules.
+     Maintains mostly: WebSubmit, BibUpload, BibSched.
 
  - Martin Vesely <martin.vesely@cern.ch>
-   Compliance with Open Archive Initiative.  BibConvert, BibHarvest.
+     Open Archive Initiative gateway, metadata conversion.
+     Maintains mostly: BibConvert, BibHarvest.
 
  - Hector Sanchez <hector.sanchez@cern.ch>
-   BibFormat, output formatting and automated link-generation tool.
+     Metadata output formatter and automated link-generator.
+     Maintains mostly: BibFormat, WebSession.
 
-Moreover, several students have worked on the project, among others
-Marcin Kuta and Eric Simon (WebPerso), Eduardo Margallo (BibFormat,
-BibWords), and others.
+ - Maja Gracco <maja.gracco@cern.ch>
+     System librarian, MARC21 expertise.
+
+ - Chris Montarbaud <christiane.montarbaud@cern.ch>
+     Multimedia and photo treatment.
+
+Several students and temporary group members worked on the project:
+Eric Simon (WebAlert), Eduardo Margallo (BibWords, BibSched), Mikael
+Vik (WebAccess), Roberta Faggian (WebBasket, WebAlert), Julio Pernia
+Aznar (WebSession), Franck Grenier (WebStyle).
 
        - CDS Development Group
          <cds.support@cern.ch>
