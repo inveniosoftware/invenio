@@ -236,23 +236,6 @@ def task_sig_wakeup(sig, frame):
     write_message("continuing...")
     task_update_status("CONTINUING")
 
-def task_sig_stop(sig, frame):
-    """Signal handler for the 'stop' signal sent by BibSched."""
-    if options["verbose"]>= 9:
-        write_message("got signal %d" % sig)
-    write_message("stopping...")
-    task_update_status("STOPPING")
-    errcode = 0
-    try:
-        task_sig_stop_commands()
-        write_message("stopped")
-        task_update_status("STOPPED")
-    except StandardError, err:
-        write_message("Error during stopping! %e" % err)
-        task_update_status("STOPPINGFAILED")
-        errcode = 1
-    sys.exit(errcode)
-
 def task_sig_stop_commands():
     """Do all the commands necessary to stop the task before quitting.
     Useful for task_sig_stop() handler.
@@ -413,10 +396,33 @@ def task_run(row):
     queue row, containing if, arguments, etc.
     Return 1 in case of success and 0 in case of failure.
     """
+    global task_id, options
+    task_id = row[0]
+    task_proc = row[1]
+    options = loads(row[6])
+    task_status = row[7]
 
+
+    # install signal handlers
+    signal.signal(signal.SIGUSR1, task_sig_sleep)
+    signal.signal(signal.SIGTERM, task_sig_stop)
+    signal.signal(signal.SIGABRT, task_sig_suicide)
+    signal.signal(signal.SIGCONT, task_sig_wakeup)
+    signal.signal(signal.SIGINT, task_sig_unknown)
+
+    if task_proc != "runbibrank":
+        write_message("-The task #%d does not seem to be a BibRank task." % task_id, sys.stderr)
+        return 0
+    if task_status != "WAITING":
+        write_message("The task #%d is %s. I expected WAITING." % (task_id, task_status), sys.stderr)
+        return 0
+    if options["verbose"]:
+        write_message("Task #%d started." % task_id)
+    task_update_status("RUNNING")
     try:  
         options = marshal.loads(row[6])
         for key in options["run"]:
+            write_message("")
             file = etcdir + "/bibrank/" + key + ".cfg"
             if options["verbose"] >= 9:
                 write_message("Getting configuration from file: %s" % file)
@@ -434,7 +440,12 @@ def task_run(row):
     except StandardError, e:
         write_message("\nException caught: %s" % e, sys.stderr)
         traceback.print_tb(sys.exc_info()[2])
+        task_update_status("ERROR")
         sys.exit(1)
+
+    task_update_status("DONE")
+    if options["verbose"]:
+        write_message("Task #%d finished." % task_id)
     return 1
 
 def main():
