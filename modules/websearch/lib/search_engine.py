@@ -2007,11 +2007,10 @@ def get_creation_date(recID):
         out = res[0][0]
     return out
 
-def get_modification_date(recID):
+def get_modification_date(recID, fmt="%Y-%m-%d"):
     "Returns the date of last modification for the record 'recID'."
     out = ""
-    query = "SELECT DATE_FORMAT(modification_date,'%%Y-%%m-%%d') FROM bibrec WHERE id='%s'" % (recID)
-    res = run_sql(query, None, 1)
+    res = run_sql("SELECT DATE_FORMAT(modification_date,%s) FROM bibrec WHERE id='%s'", (fmt, recID), 1)
     if res:        
         out = res[0][0]
     return out
@@ -2146,7 +2145,7 @@ def print_results_overview(colls, results_final_nb_total, results_final_nb, cpu_
     out += "</td></tr></tbody></table>\n"
     return out
 
-def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern=''):
+def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0):
     """Sort records in 'recIDs' list according sort field 'sort_field' in order 'sort_order'.
        If more than one instance of 'sort_field' is found for a given record, try to choose that that is given by
        'sort pattern', for example "sort by report number that starts by CERN-PS".
@@ -2159,26 +2158,30 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern=''):
         print_warning(req, "Sorry, sorting is allowed on sets of up to %d records only.  Using default sort order (\"latest first\")." % cfg_nb_records_to_sort,"Warning")
         return recIDs
 
+    sort_fields = string.split(sort_field, ",")
     recIDs_dict = {}
     recIDs_out = []
 
     ## first deduce sorting MARC tag out of the 'sort_field' argument:
     tags = []
-    if sort_field and str(sort_field[0:2]).isdigit():
-        # sort_field starts by two digits, so this is probably a MARC tag already
-        tags.append(sort_field)
-    else:
-        # let us check the 'field' table
-        query = """SELECT DISTINCT(t.value) FROM tag AS t, field_tag AS ft, field AS f
-                    WHERE f.code='%s' AND ft.id_field=f.id AND t.id=ft.id_tag
-                    ORDER BY ft.score DESC""" % sort_field
-        res = run_sql(query)
-        if res:
-            for row in res:
-                tags.append(row[0])
+    for sort_field in sort_fields:
+        if sort_field and str(sort_field[0:2]).isdigit():
+            # sort_field starts by two digits, so this is probably a MARC tag already
+            tags.append(sort_field)
         else:
-            print_warning(req, "Sorry, '%s' does not seem to be a valid sort option.  Choosing title sort instead." % sort_field, "Error")
-            tags.append("245__a")
+            # let us check the 'field' table
+            query = """SELECT DISTINCT(t.value) FROM tag AS t, field_tag AS ft, field AS f
+                        WHERE f.code='%s' AND ft.id_field=f.id AND t.id=ft.id_tag
+                        ORDER BY ft.score DESC""" % sort_field
+            res = run_sql(query)
+            if res:
+                for row in res:
+                    tags.append(row[0])
+            else:
+                print_warning(req, "Sorry, '%s' does not seem to be a valid sort option.  Choosing title sort instead." % sort_field, "Error")
+                tags.append("245__a")
+    if verbose >= 3:
+        print_warning(req, "Sorting by tags %s." % tags)        
         
     ## check if we have sorting tag defined:
     if tags:
@@ -3055,7 +3058,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                     results_final_for_all_colls.union(results_final[coll])
                 recIDs = results_final_for_all_colls.items().tolist()
                 if sf: # do we have to sort first?
-                    recIDs = sort_records(req, recIDs, sf, so, sp)
+                    recIDs = sort_records(req, recIDs, sf, so, sp, verbose)
                 return recIDs
             elif of.startswith("h"):
                 req.write(print_results_overview(colls_to_search, results_final_nb_total, results_final_nb, cpu_time, ln))
@@ -3070,7 +3073,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                                                     d1y, d1m, d1d, d2y, d2m, d2d, cpu_time))
                     results_final_sorted = results_final[coll].items()
                     if sf:
-                        results_final_sorted = sort_records(req, results_final_sorted, sf, so, sp)
+                        results_final_sorted = sort_records(req, results_final_sorted, sf, so, sp, verbose)
                     print_records(req, results_final_sorted, jrec, rg, of, ot, ln)
                     if of.startswith("h"):
                         req.write(print_search_info(p, f, sf, so, sp, of, ot, coll, results_final_nb[coll],
