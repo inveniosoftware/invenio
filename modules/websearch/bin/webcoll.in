@@ -76,11 +76,6 @@ except ImportError, e:
 collection_house = {} # will hold collections we treat in this run of the program; a dict of {collname2, collobject1}, ...
 options = {} # will hold task options
 
-## TODO: still leaving live SQL queries here and there in the code; a
-## ``real way'' of doing this would be to grab a snapshot of the
-## database, initiate our own classes, work on memory, and flush the
-## results back.  Refactoring needed, but time is low.
-
 def get_collection(colname):
     """Return collection object from the collection house for given colname.
        If does not exist, then create it."""
@@ -245,7 +240,7 @@ def print_record(recID, format='hb', ln=cdslang):
     return out
 
 class Collection:
-    "Holds the information on collections (id,name,nameshort,dbquery)."
+    "Holds the information on collections (id,name,dbquery)."
 
     def __init__(self, name=""):
         "Creates collection instance by querying the MySQL configuration database about 'name'."
@@ -254,32 +249,26 @@ class Collection:
         self.reclist_with_nonpublic_subcolls = HitSet()
         if not name:
             self.name = cdsname # by default we are working on the home page
-            self.nameshort = cdsname
-            self.namesuffix = None
             self.id = 1
             self.dbquery = None
             self.nbrecs = None
             self.reclist = HitSet()
         else:
             self.name = name
-            query = "SELECT id,name,nameshort,namesuffix,dbquery,nbrecs,reclist FROM collection WHERE name='%s'" % escape_string(name)
+            query = "SELECT id,name,dbquery,nbrecs,reclist FROM collection WHERE name='%s'" % escape_string(name)
             try:
                 res = run_sql(query, None, 1)
                 if res:
                     self.id = res[0][0]
                     self.name = res[0][1]
-                    self.nameshort = res[0][2]
-                    self.namesuffix = res[0][3]
-                    self.dbquery = res[0][4]
-                    self.nbrecs = res[0][5]
+                    self.dbquery = res[0][2]
+                    self.nbrecs = res[0][3]
                     try:
                         self.reclist = HitSet(Numeric.loads(zlib.decompress(res[0][5])))
                     except:
                         self.reclist = HitSet()
                 else: # collection does not exist!
                     self.id = None
-                    self.nameshort = None
-                    self.namesuffix = None
                     self.dbquery = None
                     self.nbrecs = None
                     self.reclist = HitSet()
@@ -291,8 +280,9 @@ class Collection:
         "Return nicely formatted full collection name (including prefix and suffixes)."
         out = prolog
         out += self.name
-        if self.namesuffix:
-            out += prolog_suffix + self.namesuffix + epilog_suffix
+        # FIXME: use new collectionname table
+        #if self.namesuffix:
+        #    out += prolog_suffix + self.namesuffix + epilog_suffix
         out += epilog
         return out
 
@@ -564,9 +554,8 @@ class Collection:
 
     def create_searchoptions(self):
         "Produces 'Search options' portal box."
-        # TODO: distinguish name/nameshort, i.e. naviguable/non-naviguable search options
         box=""
-        query = """SELECT DISTINCT(cff.id_field),f.code,f.nameshort FROM collection_field_fieldvalue AS cff, field AS f
+        query = """SELECT DISTINCT(cff.id_field),f.code,f.name FROM collection_field_fieldvalue AS cff, field AS f
                    WHERE cff.id_collection=%d AND cff.id_fieldvalue IS NOT NULL AND cff.id_field=f.id
                    ORDER BY cff.score DESC""" % self.id
         res = run_sql(query)
@@ -575,9 +564,9 @@ class Collection:
                 field_id = row[0]
                 field_code = row[1]
                 field_name = row[2]                
-                query_bis = """SELECT fv.value,fv.nameshort FROM fieldvalue AS fv, collection_field_fieldvalue AS cff
+                query_bis = """SELECT fv.value,fv.name FROM fieldvalue AS fv, collection_field_fieldvalue AS cff
                                WHERE cff.id_collection=%d AND cff.type='seo' AND cff.id_field=%d AND fv.id=cff.id_fieldvalue
-                               ORDER BY cff.score_fieldvalue DESC, cff.score DESC, fv.nameshort ASC""" % (self.id, field_id)
+                               ORDER BY cff.score_fieldvalue DESC, cff.score DESC, fv.name ASC""" % (self.id, field_id)
                 res_bis = run_sql(query_bis)                
                 if res_bis:
                     box += """<select name="%s">""" % field_code
@@ -655,7 +644,7 @@ class Collection:
     def create_sortoptions(self, ln=cdslang):
         "Produces 'Sort options' portal box."
         box=""
-        query = """SELECT f.code,f.nameshort FROM field AS f, collection_field_fieldvalue AS cff
+        query = """SELECT f.code,f.name FROM field AS f, collection_field_fieldvalue AS cff
                    WHERE id_collection=%d AND cff.type='soo' AND cff.id_field=f.id
                    ORDER BY cff.score DESC, f.name ASC""" % self.id
         box += """<select name="sf">"""
@@ -672,6 +661,16 @@ class Collection:
                     <option value="a">%s
                     <option value="d">%s
                   </select>""" % (msg_ascending[ln], msg_descending[ln])
+        return box 
+
+    def create_rankoptions(self, ln=cdslang):
+        "Produces 'Rank options' portal box."
+        box=""
+        box += """<select name="rm">"""
+        box += """  <option value="">- %s -""" % msg_latest_first[ln]
+        for field, value in (('jif','journal impact factor'),):
+            box += """  <option value="%s">%s""" % (field, value)                
+        box += """</select>"""
         return box 
 
     def create_displayoptions(self, ln=cdslang):
@@ -878,7 +877,7 @@ class Collection:
                        <tbody> 
                       </table>""" % (msg_search_options[ln], self.create_searchoptions())
         if 0:
-            # TODO: create published in, if appropriate:
+            # FIXME: create published in, if appropriate:
             if self.create_publishedin():
                 out += self.create_publishedin()
         # arrival date: from/until:
@@ -903,16 +902,12 @@ class Collection:
                    </tbody>
                   </table>""" % \
            (msg_added_since[ln], msg_until[ln], cell_6_a, cell_6_b)        
-        # format options, etc in the last table:
+        # sort/rank options:
         cell_7_a = self.create_sortoptions(ln)
-        cell_7_b = self.create_displayoptions(ln)
-        cell_7_c = self.create_formatoptions(ln)
+        cell_7_b = self.create_rankoptions(ln)
         out += """<table class="searchbox">
                    <thead>
                     <tr>
-                      <th class="searchboxheader">
-                        %s
-                      </th>
                       <th class="searchboxheader">
                         %s
                       </th>
@@ -925,11 +920,33 @@ class Collection:
                     <tr valign="bottom">
                       <td class="searchboxbody">%s</td>
                       <td class="searchboxbody">%s</td>
+                    </tr>
+                   </tbody>
+                  </table>""" % \
+           (msg_sort_by[ln], "", cell_7_a, "")
+# FIXME:          (msg_sort_by[ln], msg_rank_by[ln], cell_7_a, cell_7_b)
+        # display/format options:        
+        cell_8_a = self.create_displayoptions(ln)
+        cell_8_b = self.create_formatoptions(ln)
+        out += """<table class="searchbox">
+                   <thead>
+                    <tr>
+                      <th class="searchboxheader">
+                        %s
+                      </th>
+                      <th class="searchboxheader">
+                        %s
+                      </th>
+                    </tr>
+                   </thead>
+                   <tbody>
+                    <tr valign="bottom">
+                      <td class="searchboxbody">%s</td>
                       <td class="searchboxbody">%s</td>
                     </tr>
                    </tbody>
                   </table>""" % \
-           (msg_sort_by[ln], msg_display_results[ln], msg_output_format[ln], cell_7_a, cell_7_b, cell_7_c)        
+           (msg_display_results[ln], msg_output_format[ln], cell_8_a, cell_8_b)  
         # print commentary end:
         out += "<!--/create_searchfor_advanced()-->"
         return out
