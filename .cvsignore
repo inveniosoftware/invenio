@@ -4,6 +4,7 @@ configure
 config.cache
 config.log
 config.status
+config.nice
 autom4te.cache
 aclocal.m4
 z_*

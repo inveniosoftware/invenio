@@ -17,9 +17,12 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+confignicedir = $(sysconfdir)/build
+confignice_SCRIPTS=config.nice
+
 SUBDIRS = config modules
 
-EXTRA_DIST = UNINSTALL RELEASE-NOTES configure-tests.py
+EXTRA_DIST = UNINSTALL RELEASE-NOTES configure-tests.py config.nice.in
 
 ## submit stuff for demo data link creation
 sbmdir = $(WEBDIR)/submit/access/protected

@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cdsware, 0.5.0.20050106, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.5.0.20050106)
+AC_INIT(cdsware, 0.5.0.20050214, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.5.0.20050214)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -355,7 +355,8 @@ AC_SUBST(HTMLTOTEXT)
 AC_SUBST(localstatedir, `eval echo "${localstatedir}"`)
 
 ## Define output files:
-AC_CONFIG_FILES([Makefile \
+AC_CONFIG_FILES([config.nice \
+	  Makefile \
 	  config/Makefile \
 	  config/configbis.wml \
 	  modules/Makefile \
