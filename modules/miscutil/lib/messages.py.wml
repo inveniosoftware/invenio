@@ -144,6 +144,7 @@ msg_this_page_in_languages = {}
 msg_admin_area = {}
 msg_administration = {}
 msg_thousands_separator = {}
+msg_record_deleted = {}
 
 ## English:
 <en>
@@ -261,6 +262,7 @@ msg_this_page_in_languages['en'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 msg_admin_area['en'] = """<MSG_ADMIN_AREA>"""
 msg_administration['en'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['en'] = """<MSG_THOUSANDS_SEPARATOR>"""
+msg_record_deleted['en'] = """<MSG_RECORD_DELETED>"""
 </en>
 
 ## French:
@@ -379,6 +381,7 @@ msg_this_page_in_languages['fr'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 msg_admin_area['fr'] = """<MSG_ADMIN_AREA>"""
 msg_administration['fr'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['fr'] = """<MSG_THOUSANDS_SEPARATOR>"""
+msg_record_deleted['fr'] = """<MSG_RECORD_DELETED>"""
 </fr>
 
 ## German:
@@ -497,6 +500,7 @@ msg_this_page_in_languages['de'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 msg_admin_area['de'] = """<MSG_ADMIN_AREA>"""
 msg_administration['de'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['de'] = """<MSG_THOUSANDS_SEPARATOR>"""
+msg_record_deleted['de'] = """<MSG_RECORD_DELETED>"""
 </de>
 
 ## Spanish:
@@ -615,6 +619,7 @@ msg_this_page_in_languages['es'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 msg_admin_area['es'] = """<MSG_ADMIN_AREA>"""
 msg_administration['es'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['es'] = """<MSG_THOUSANDS_SEPARATOR>"""
+msg_record_deleted['es'] = """<MSG_RECORD_DELETED>"""
 </es>
 
 ## Portuguese:
@@ -733,6 +738,7 @@ msg_this_page_in_languages['pt'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 msg_admin_area['pt'] = """<MSG_ADMIN_AREA>"""
 msg_administration['pt'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['pt'] = """<MSG_THOUSANDS_SEPARATOR>"""
+msg_record_deleted['pt'] = """<MSG_RECORD_DELETED>"""
 </pt>
 
 ## Italian:
@@ -851,6 +857,7 @@ msg_this_page_in_languages['it'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 msg_admin_area['it'] = """<MSG_ADMIN_AREA>"""
 msg_administration['it'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['it'] = """<MSG_THOUSANDS_SEPARATOR>"""
+msg_record_deleted['it'] = """<MSG_RECORD_DELETED>"""
 </it>
 
 ## Russian:
@@ -969,6 +976,7 @@ msg_this_page_in_languages['ru'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 msg_admin_area['ru'] = """<MSG_ADMIN_AREA>"""
 msg_administration['ru'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['ru'] = """<MSG_THOUSANDS_SEPARATOR>"""
+msg_record_deleted['ru'] = """<MSG_RECORD_DELETED>"""
 </ru>
 
 ## Slovak:
@@ -1087,6 +1095,7 @@ msg_this_page_in_languages['sk'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 msg_admin_area['sk'] = """<MSG_ADMIN_AREA>"""
 msg_administration['sk'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['sk'] = """<MSG_THOUSANDS_SEPARATOR>"""
+msg_record_deleted['sk'] = """<MSG_RECORD_DELETED>"""
 </sk>
 
 ## Czech:
@@ -1205,6 +1214,7 @@ msg_this_page_in_languages['cz'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 msg_admin_area['cz'] = """<MSG_ADMIN_AREA>"""
 msg_administration['cz'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['cz'] = """<MSG_THOUSANDS_SEPARATOR>"""
+msg_record_deleted['cz'] = """<MSG_RECORD_DELETED>"""
 </cz>
 
 ## Norwegian:
@@ -1323,6 +1333,7 @@ msg_this_page_in_languages['no'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 msg_admin_area['no'] = """<MSG_ADMIN_AREA>"""
 msg_administration['no'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['no'] = """<MSG_THOUSANDS_SEPARATOR>"""
+msg_record_deleted['no'] = """<MSG_RECORD_DELETED>"""
 </no>
 
 ## Swedish:
@@ -1441,6 +1452,7 @@ msg_this_page_in_languages['se'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 msg_admin_area['se'] = """<MSG_ADMIN_AREA>"""
 msg_administration['se'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['se'] = """<MSG_THOUSANDS_SEPARATOR>"""
+msg_record_deleted['se'] = """<MSG_RECORD_DELETED>"""
 </se>
 
 ## I18N messages oriented functions:

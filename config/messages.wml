@@ -2024,4 +2024,19 @@
   <se>,</se>
 </define-tag>
 
+# FIXME
+<define-tag MSG_RECORD_DELETED whitespace=delete>
+  <en>The record has been deleted.</en>
+  <fr>La notice a été supprimée.</fr>
+  <de>The record has been deleted.</de>
+  <es>The record has been deleted.</es>
+  <pt>The record has been deleted.</pt>
+  <it>The record has been deleted.</it>
+  <ru>The record has been deleted.</ru>
+  <sk>Záznam bol vymazaný.</sk>
+  <cz>Záznam byl vymazán.</cz>
+  <no>The record has been deleted.</no>
+  <se>The record has been deleted.</se>
+</define-tag>
+
 ## end of file
