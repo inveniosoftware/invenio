@@ -439,6 +439,17 @@ def create_google_box(cc, p, f, p1, p2, p3, ln=cdslang,
             out_links.append("""<a class="google" href="http://agenda.cern.ch/search.php?field=speaker&keywords=%s&search=Search">%s %s CERN&nbsp;Agenda</a>""" % (p_quoted, p, msg_in[ln]))
         elif f == "title":
             out_links.append("""<a class="google" href="http://agenda.cern.ch/search.php?field=title&keywords=%s&search=Search">%s %s CERN&nbsp;Agenda</a>""" % (p_quoted, p, msg_in[ln]))
+    # CERN EDMS:
+    if cfg_google_box_servers.get('CERN Agenda', 0):
+        # FIXME: reusing CERN Agenda config variable until we can enter CERN EDMS into config.wml
+        if f == "author":
+            out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=ADVANCED&p_author=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, msg_in[ln]))
+        elif f == "title" or f == "abstract" or f == "keyword":
+            out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=ADVANCED&p_title=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, msg_in[ln]))
+        elif f == "reportnumber":
+            out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=ADVANCED&p_document_id=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, msg_in[ln]))
+        else:
+            out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=BASE&p_free_text=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, msg_in[ln]))
     # CiteSeer:
     if cfg_google_box_servers.get('CiteSeer', 0):
         out_links.append("""<a class="google" href="http://citeseer.ist.psu.edu/cs?q=%s">%s %s CiteSeer</a>""" % (p_quoted, p, msg_in[ln]))        
