@@ -472,6 +472,8 @@ AC_CONFIG_FILES([Makefile \
 	  modules/websearch/Makefile \
 	  modules/websearch/bin/Makefile \
 	  modules/websearch/doc/Makefile \
+	  modules/websearch/doc/admin/Makefile \
+	  modules/websearch/doc/hacking/Makefile \
 	  modules/websearch/lib/Makefile \
 	  modules/websearch/web/Makefile \
 	  modules/websearch/web/admin/Makefile \
@@ -494,6 +496,8 @@ AC_CONFIG_FILES([Makefile \
 	  modules/webaccess/Makefile \
 	  modules/webaccess/bin/Makefile \
 	  modules/webaccess/doc/Makefile \
+	  modules/webaccess/doc/admin/Makefile \
+	  modules/webaccess/doc/hacking/Makefile \
 	  modules/webaccess/lib/Makefile \
 	  modules/webaccess/web/Makefile \
 	  modules/webaccess/web/admin/Makefile \

@@ -17,12 +17,11 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-userdocdir = $(WEBDIR)/help/search
-admindocdir = $(WEBDIR)/admin/websearch
-hackerdocdir = $(WEBDIR)/hacking/websearch
+SUBDIRS = admin hacking
 
-userdoc_DATA=tips.html index.html
-hackerdoc_DATA=internals.html stages.html api.html
+docdir = $(WEBDIR)/help/search
+
+doc_DATA=tips.html index.html
 
 EXTRA_DIST = $(wildcard *.wml)
 

@@ -20,8 +20,8 @@
 #include "cdspage.wml" \
     title="Search Engine API" \
     navbar_name="hacking-websearch" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt; <a class=navtrail href=internals.html>WebSearch Internals</a> " \
-    navbar_select="websearch-internals-api" 
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt; <a class=navtrail href=index.html>WebSearch Internals</a> " \
+    navbar_select="hacking-websearch-api" 
 
 <protect>
 <pre>

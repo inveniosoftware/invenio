@@ -19,9 +19,9 @@
 
 #include "cdspage.wml" \
     title="WebAccess Internals" \
-    navbar_name="webaccess-new" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/>Help Central</a> &gt; <a class=navtrail href=<WEBURL>/help/webaccess/>WebAccess Help</a>" \
-    navbar_select="webaccess-internals" 
+    navbar_name="hacking-webaccess" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a>" \
+    navbar_select="hacking-webaccess-index" 
 
 This page summarizes all the information suitable to dig inside
 the WebAccess internals.

@@ -19,9 +19,9 @@
 
 #include "cdspage.wml" \
     title="Access Control Engine API" \
-    navbar_name="web user" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/>Help Central</a> &gt; <a class=navtrail href=<WEBURL>/help/webaccess/>WebAccess Help</a> &gt; <a class=navtrail href=<WEBURL>/help/webaccess/internals.html>WebAccess Internals</a>" \
-    navbar_select="access-control-engine-api" 
+    navbar_name="hacking-webaccess" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt; <a class=navtrail href=index.html>WebAccess Internals</a>" \
+    navbar_select="hacking-webaccess-api" 
 
 <pre>
 ACCESS CONTROL ENGINE API / $Date$

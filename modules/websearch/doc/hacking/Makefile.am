@@ -17,23 +17,13 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-#include "cdspage.wml" \
-    title="WebSearch Internals" \
-    navbar_name="hacking-websearch" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a>" \
-    navbar_select="websearch-internals" 
+docdir = $(WEBDIR)/hacking/websearch
 
-This page summarizes all the information suitable to dig inside
-Search Engine internals.
+doc_DATA=api.html stages.html index.html
 
-<blockquote>
-<dl>
+EXTRA_DIST = $(wildcard *.wml)
 
-<dt><a href="stages.html">Search Processing Stages</a> <dd>Explains what
-happens after user hits the SEARCH button.
+CLEANFILES = $(doc_DATA) *~ *.tmp
 
-<dt><a href="api.html">Search Engine API</a> <dd>Explains how to call
-search engine from your Python programs, should a need arize.
-
-</dl>
-</blockquote>
+%.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml
+	$(WML) -o $@ $<

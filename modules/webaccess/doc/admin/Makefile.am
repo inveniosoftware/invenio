@@ -17,10 +17,13 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-#include "cdspage.wml" \
-    title="WebAccess Help" \
-    navbar_name="web user" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/>Help Central</a>" \
-    navbar_select="tips" 
+docdir = $(WEBDIR)/admin/webaccess
 
+#doc_DATA=index.html
 
+EXTRA_DIST = $(wildcard *.wml)
+
+CLEANFILES = $(doc_DATA) *~ *.tmp
+
+%.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml
+	$(WML) -o $@ $<

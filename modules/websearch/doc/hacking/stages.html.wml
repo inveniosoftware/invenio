@@ -20,8 +20,8 @@
 #include "cdspage.wml" \
     title="Search Processing Stages" \
     navbar_name="hacking-websearch" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt; <a class=navtrail href=internals.html>WebSearch Internals</a> " \
-    navbar_select="websearch-internals-stages" 
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt; <a class=navtrail href=index.html>WebSearch Internals</a> " \
+    navbar_select="hacking-websearch-stages" 
 
 <pre>
 SEARCH PROCESSING STAGES / $Date$
