@@ -40,7 +40,6 @@ try:
     import time
     import urllib
     import zlib
-    import lzo
     import MySQLdb
     import Numeric
     import md5
@@ -981,22 +980,6 @@ def search_pattern(req, p=None, f=None, colls=None, m=None, hit_hints=0):
         else: 
             print_warning(req, "The search type '%s' is not defined." % ti, "Error")
             return(1)
-        if 0: # TODO: test LZO and ZLIB:
-            str = Numeric.dumps(results_for_opft_item._set)
-            t1 = os.times()[4]
-            junk1 = zlib.compress(str)
-            t2 = os.times()[4]
-            junk2 = lzo.compress(str)
-            t3 = os.times()[4]
-            print_warning(req, "Compressing %s/%s took %.2f sec and %d chars via ZLIB and %.2f sec and %d chars via LZO." %
-                          (pi, fi, t2-t1, len(junk1), t3-t2, len(junk2)))
-            t1 = os.times()[4]
-            junk3 = zlib.decompress(junk1)
-            t2 = os.times()[4]
-            junk4 = lzo.decompress(junk2)
-            t3 = os.times()[4]
-            print_warning(req, "Decompressing back took %.2f sec via ZLIB and %.2f sec via LZO." %
-                          (t2-t1, t3-t2))
         if hit_hints:
             results_for_opft_item.calculate_nbhits()
             if results_for_opft_item._nbhits == 0:                

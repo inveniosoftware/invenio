@@ -31,9 +31,10 @@
 pylibdir = "<LIBDIR>/python"
 
 try:
-    import sys
+    import sys    
     sys.path.append('%s' % pylibdir)
     from cdsware.search_engine import *
+    from mod_python import apache
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -42,19 +43,43 @@ except ImportError, e:
 <protect> 
 __version__ = "$Id$"
 
-def search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
-           p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
-           id="-1", idb="-1", sysnb="", search="SEARCH"):
-    """Fallback entry point to WebSearch, for backward compatibility."""
-    index(req, cc, c, p, f, rg, sf, so, sp, of, ot, as,
-              p1, f1, m1, op1, p2, f2, m2, op2, p3, f3, m3, sc, jrec,
-              id, idb, sysnb, search)
+def index(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
+          p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
+          id="-1", idb="-1", sysnb="", search="SEARCH"):
+    """Main entry point to WebSearch."""
+    restricted_collections = {"Theses":1, "Pictures":1}
+    if restricted_collections.has_key(cc):
+        req.err_headers_out.add("Location", "%s/search.py/authenticate?%s" % (weburl, req.args))
+        raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
+    else:
+        do_search(req, cc, c, p, f, rg, sf, so, sp, of, ot, as,
+                  p1, f1, m1, op1, p2, f2, m2, op2, p3, f3, m3, sc, jrec,
+                  id, idb, sysnb, search)
     return "\n"
     
-def index(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
-              p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
-              id="-1", idb="-1", sysnb="", search="SEARCH"):
-    """Main entry point to WebSearch."""
+def authenticate(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
+                 p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
+                 id="-1", idb="-1", sysnb="", search="SEARCH"):
+    """Authenticate the user before launching the search."""
+
+    __auth_realm__ = "restricted collections"
+    
+    def __auth__(req, user, password):
+        if user == 'spam' and password == 'eggs':
+            return 1
+        else:
+            return 0
+
+    do_search(req, cc, c, p, f, rg, sf, so, sp, of, ot, as,
+              p1, f1, m1, op1, p2, f2, m2, op2, p3, f3, m3, sc, jrec,
+              id, idb, sysnb, search)
+
+    return "\n"
+
+def do_search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
+           p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
+           id="-1", idb="-1", sysnb="", search="SEARCH"):
+    """Do search, without checking for authentication."""    
     # wash passed numerical arguments:
     try:
         id = string.atoi(id)
