@@ -24,7 +24,7 @@
 
 <p>
  This is the gate to the admin area for WebAccess. You need to 
- <a href="<WEBURL>/youraccount.py/login">login</a> to enter.
+ <a href="<WEBURL>/youraccount.py/login?referer=<WEBURL>/admin/webaccess/">login</a> to enter.
 </p>
 
 <dl>
