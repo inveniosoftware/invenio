@@ -32,7 +32,7 @@ pylibdir = "<LIBDIR>/python"
 import sys
 sys.path.append('%s' % pylibdir)
 import cdsware.bibrankadminlib as brc
-reload(brc)
+#reload(brc)
 from cdsware.webpage import page, create_error_box
 from cdsware.config import weburl,cdslang
 from cdsware.webuser import getUid
@@ -202,7 +202,7 @@ def error_page(req):
 def auth_failed(uid, navtrail_previous_links):
     return page(title='Authorization failure',
                 uid=uid,
-                body=wsc.adderrorbox('try to login first',
+                body=brc.adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
                                      <a href="%s/youraccount.py/login?referer=%s/admin/websearch/">login</a> with another account.""" % (weburl, weburl)]),
                 navtrail= navtrail_previous_links,
