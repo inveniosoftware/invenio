@@ -37,6 +37,5 @@ cfg_call_bibformat = <CFG_CALL_BIBFORMAT> # if "HTML detailed" format is not fou
 cfg_use_aleph_sysnos = <CFG_USE_OLD_SYSNOS> # do we want to make ALEPH/old sysnos visible rather than MySQL's recID?
 cfg_fields_convert = <CFG_FIELDS_CONVERT>
 cfg_google_box = <CFG_GOOGLE_BOX> # are we are proposing links to other search engines like google by default?
-cfg_google_box_cern = <CFG_GOOGLE_BOX_CERN> # are we are proposing CERN-like links to other search engines by default?
 cfg_simplesearch_pattern_box_width = <CFG_SIMPLESEARCH_PATTERN_BOX_WIDTH> # width of the search pattern window in the simple search interface
 cfg_advancedsearch_pattern_box_width = <CFG_ADVANCEDSEARCH_PATTERN_BOX_WIDTH> # width of the search pattern window in the advanced search interface
