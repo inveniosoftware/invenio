@@ -417,6 +417,6 @@ def process_alert_queries_for_user(uid):
 
     
 if __name__ == '__main__':
-    process_alert_queries_for_user(2530836) # eric
+    process_alert_queries_for_user(2571422) # erik
     process_alert_queries_for_user(109) # tibor
     # process_alert_queries_for_user(11040) # jean-yves
