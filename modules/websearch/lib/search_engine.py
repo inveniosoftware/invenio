@@ -230,7 +230,7 @@ def create_opft_search_units(req, p, f, m=None):
             p = re_operands.sub(r' \1', p)
             if dbg:
                 print_warning(req, "p=%s" % p, "Debug (create_opft_search_units() - B3 started)")
-            for pi in split(p, ' '): # iterate through separated units (or items, as "pi" stands for "p item")
+            for pi in split(p): # iterate through separated units (or items, as "pi" stands for "p item")
                 pi = re.sub("__SPACE__", " ", pi) # replace back '__SPACE__' by ' ' 
                 pi = re.sub("__SPACEBIS__", " ", pi) # replace back '__SPACEBIS__' by ' '
                 # firstly, determine set operand
@@ -333,7 +333,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
     if sp:
         out += """<input type="hidden" name="sp" value="%s">""" % sp 
 
-    out += create_navtrail(cc, """<br><table border="0" cellspacing="0" cellpadding="0"><tr class="navtrail"><td width="60"></td><td><small><small>""","","&gt;","",
+    out += create_navtrail(cc, as, """<br><table border="0" cellspacing="0" cellpadding="0"><tr class="navtrail"><td width="60"></td><td><small><small>""","","&gt;","",
                           "&gt; Search Results</small></small></td></tr></table><p>",0)
 
 
@@ -358,7 +358,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
         cell_3_right = create_searchwithin_selection_box('f3', f3)
         cell_3_moreright = """<input type="submit" name="search" value="SEARCH"><input type="submit" name="search" value="Browse">&nbsp;"""
         cell_3_farright = """<small class="light"><a href="%s/search.py?p=%s&amp;f=%s&amp;cc=%s">Simple&nbsp;Search</a></small>
-                             <br><small><a href="%s/docs/faq.shtml">Search&nbsp;Tips</a></small>""" % \
+                             <br><small><a href="%s/help/search/tips.html">Search&nbsp;Tips</a></small>""" % \
                              (weburl, urllib.quote(p1), urllib.quote(f1), urllib.quote(cc), weburl)
         # print them:
         out += """
@@ -397,7 +397,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
         cell_1_middle = "<small><strong>within:</strong></small><br>%s" % create_searchwithin_selection_box('f', f)
         cell_1_right = """<input type="submit" name="search" value="SEARCH"><input type="submit" name="search" value="Browse">&nbsp;"""
         cell_1_farright = """<small class="light"><a href="%s/search.py?p1=%s&amp;f1=%s&amp;as=1&amp;cc=%s">Advanced&nbsp;Search</a></small>
-                             <br><small><a href="%s/docs/faq.shtml">Search&nbsp;Tips</a></small>""" %\
+                             <br><small><a href="%s/help/search/tips.html">Search&nbsp;Tips</a></small>""" %\
                           (weburl, urllib.quote(p), urllib.quote(f), urllib.quote(cc), weburl)
         out += """
         <tr>
@@ -520,22 +520,29 @@ def is_selected(var, fld):
         return ""
 
 def create_navtrail(cc=cdsname,
+                    as=0,
                     header="""<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr class="pageboxlefttop"><td><small>""", \
                     prolog="", \
                     separator="&gt;", \
                     epilog="", \
                     footer="&gt; Search Results</small></td></tr></table>",
                     exclude_root=0):
-    "Creates navigation trail, i.e. links to ancestors of the 'cc' collection."
+    """Creates navigation trail, i.e. links to ancestors of the 'cc' collection.
+    If as==1, then links to Advanced Search interfaces; otherwise Simple Search.
+    """
     # firstly, display navtrail prologue:
     navtrail = header        
     # first, display list of ancestors:
     for dad in get_coll_ancestors(cc):
-        navtrail += """%s <a class="navtrail" href="%s/goto.shtml?c=%s">%s</a> %s %s """ % \
-                    (prolog, weburl, urllib.quote(dad), dad, epilog, separator)
+        if dad != cdsname:
+            navtrail += """%s <a class="navtrail" href="%s/?c=%s&as=%d">%s</a> %s %s """ % \
+                        (prolog, weburl, urllib.quote_plus(dad), as, dad, epilog, separator)
+        else: # hide cdsname for aesthetical reasons
+            navtrail += """%s <a class="navtrail" href="%s/?as=%d">%s</a> %s %s """ % \
+                        (prolog, weburl, as, dad, epilog, separator)            
     # then print cc:
     if cc != cdsname or not exclude_root:
-        navtrail += """%s <a class="navtrail" href="%s/goto.shtml?c=%s">%s</a> %s""" % (prolog, weburl, urllib.quote(cc), cc, epilog)
+        navtrail += """%s <a class="navtrail" href="%s/?c=%s&as=%d">%s</a> %s""" % (prolog, weburl, urllib.quote_plus(cc), as, cc, epilog)
     # last, print navtrail epilogue:
     navtrail += footer
     return navtrail
@@ -625,9 +632,9 @@ def create_google_box(p, f, p1, p2, p3,
         out += epilog
     return out
 
-def create_footer(url):    
+def create_footer():    
     "Creates CDS page footer."
-    return """%s""" % re.sub("<!--URL-->", "URL: %s" % url, cdspagefooter)
+    return cdspagefooter
      
 class HitList:
     """Class describing set of records, implemented as bit vectors of recIDs.
@@ -771,11 +778,16 @@ def wash_colls(cc, c, split_colls=0):
     if len(colls)==0:
         colls = [cc]
 
-    # then let us check the number of sons of 'cc':
-    query = "SELECT COUNT(cc.id_son) FROM collection_collection AS cc, collection AS c " \
-            "WHERE c.name='%s' AND c.id=cc.id_dad" % cc
-    res = run_sql(query, None, 1)
-    if res and res[0][0] == len(colls):
+    # then let us check the list of non-restricted "real" sons of 'cc' and compare it to 'coll':
+    query = "SELECT c.name FROM collection AS c, collection_collection AS cc, collection AS ccc WHERE c.id=cc.id_son AND cc.id_dad=ccc.id AND ccc.name='%s' AND cc.type='r' AND c.restricted IS NULL" % MySQLdb.escape_string(cc)
+    res = run_sql(query)
+    l_cc_nonrestricted_sons = []
+    l_c = colls
+    for row in res:
+        l_cc_nonrestricted_sons.append(row[0]) 
+    l_c.sort()
+    l_cc_nonrestricted_sons.sort()
+    if l_cc_nonrestricted_sons == l_c:
         colls_out_for_display = [cc] # yep, washing permitted, it is sufficient to display 'cc'
     else:
         colls_out_for_display = colls # nope, we need to display all 'colls' successively
@@ -830,11 +842,13 @@ def wash_pattern(p):
             if pi:
                 p = pi
                 break
-    # get rid of standalone wildcards:
-    p = re.sub("^\s*[\*\%]+(\s|$)", " ", p)
-    p = re.sub("\s[\*\%]+\s*$", " ", p)
-    p = re.sub("\s[\*\%]+\s", " ", p)
-    # get rid of unnecessary whitespace:
+    # add leading/trailing whitespace for the two following wildcard-sanity checking regexps:
+    p = " " + p + " " 
+    # get rid of wildcards at the beginning of words:
+    p = re.sub(r'(\s)[\*\%]+', "\\1", p)
+    # get rid of extremely short words (1-3 letters with wildcards): TODO: put into the search config
+    p = re.sub(r'(\s\w{1,3})[\*\%]+', "\\1", p)
+    # remove unnecessary whitespace:
     p = string.strip(p)
     return p
     
@@ -921,6 +935,28 @@ def get_collection_hitlist(coll):
     # okay, return result set:
     return set
 
+def coll_restricted_p(coll):
+    "Predicate to test if the collection coll is restricted or not."
+    if not coll:
+        return 0
+    query = "SELECT restricted FROM collection WHERE name='%s'" % MySQLdb.escape_string(coll)
+    res = run_sql(query, None, 1)
+    if res and res[0][0] != None:       
+        return 1
+    else:
+        return 0
+
+def coll_restricted_group(coll):
+    "Return Apache group to which the collection is restricted.  Return None if it's public."
+    if not coll:
+        return None
+    query = "SELECT restricted FROM collection WHERE name='%s'" % MySQLdb.escape_string(coll)
+    res = run_sql(query, None, 1)
+    if res:
+        return res[0][0]
+    else:
+        return None
+    
 def create_collrecs_cache():
     """Creates list of records belonging to collections.  Called on startup
     and used later for intersecting search results with collection universe."""
@@ -1397,8 +1433,8 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
               "\n<form action=\"%s/search.py\" method=\"get\">"\
               "\n<table width=\"100%%\" cellpadding=2 cellspacing=0 border=0><tr class=\"results\"><td align=\"left\">" \
               "<strong><big><img align=\"left\" src=\"%s/img/okay.gif\" width=20 height=20 alt=\"*\">"\
-              "<a href=\"%s/goto.shtml?c=%s\">%s</a></big></strong></td>\n" % \
-              (collection, weburl, weburl, weburl, urllib.quote(collection), collection)
+              "<a href=\"%s/?c=%s&as=%d\">%s</a></big></strong></td>\n" % \
+              (collection, weburl, weburl, weburl, urllib.quote_plus(collection), as, collection)
     else:
         out += """\n<form action="%s/search.py" method="get"><div align="center">\n""" % weburl
 
@@ -1915,7 +1951,7 @@ def encode_for_xml(s):
 def call_bibformat(id, otype="HD"):
     """Calls BibFormat for the record 'id'.  Desired BibFormat output type is passed in 'otype' argument.
        This function is mainly used to display full format, if they are not stored in the 'bibfmt' table."""
-    f = urllib.urlopen("%sbibformat/bibformat.shtml?id=%s&otype=%s" % (weburl, id, otype))
+    f = urllib.urlopen("%s/bibformat/bibformat.shtml?id=%s&otype=%s" % (weburl, id, otype))
     out = f.read()
     f.close()
     return out
@@ -1938,6 +1974,267 @@ def log_query_info(action, p, f, colls, nb_records_found_total=-1):
         pass
     return
 
+### CALLABLES
+
+def perform_request_search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
+                           p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
+                           id="-1", idb="-1", sysnb="", search="SEARCH"):
+    """Perform search, without checking for authentication."""    
+    # wash passed numerical arguments:
+    try:
+        id = string.atoi(id)
+        idb = string.atoi(idb)
+    except:
+        id = cfg_max_recID + 1
+        idb = cfg_max_recID + 1
+    sc = string.atoi(sc)
+    jrec = string.atoi(jrec)
+    rg = string.atoi(rg)
+    as = string.atoi(as)
+    if type(of) is list:
+        of = of[0]
+    if type(ot) is list:
+        ot = string.join(ot,",")
+    if of.startswith('x'):
+        # we are doing XML output:
+        req.content_type = "text/xml"
+        req.send_http_header()
+        req.write("""<?xml version="1.0" encoding="UTF-8"?>\n""")
+        if of.startswith("xm"):
+            req.write("""<collection xmlns="http://www.loc.gov/MARC21/slim">\n""")
+        else:
+            req.write("""<collection>\n""")
+    elif of.startswith('t') or str(of[0:3]).isdigit():
+        # we are doing plain text output:
+        req.content_type = "text/plain"
+        req.send_http_header()
+    else:
+        # we are doing HTML output:
+        req.content_type = "text/html"
+        req.send_http_header()
+        # write header:
+        req.write(create_header(cc))
+    if sysnb or id>0:
+        ## 1 - detailed record display
+        if sysnb: # ALEPH sysnb is passed, so deduce MySQL id for the record:            
+            id = get_mysql_recid_from_aleph_sysno(sysnb)
+        if of=="hb":
+            of = "hd"
+        if record_exists(id):
+            if idb<=id: # sanity check
+                idb=id+1
+            print_records(req, range(id,idb), -1, -9999, of, ot)
+        else: # record does not exist
+            if of.startswith("h"):
+                (cc, colls_to_display, colls_to_search) = wash_colls(cc, c, sc)
+                p = wash_pattern(p)
+                f = wash_field(f)
+                req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
+                                            p2, f2, m2, op2, p3, f3, m3, sc))
+                print_warning(req, "Requested record does not seem to exist.", None, "<p>")
+    elif search == "Browse":
+        ## 2 - browse needed
+        (cc, colls_to_display, colls_to_search) = wash_colls(cc, c, sc)
+        p = wash_pattern(p)
+        f = wash_field(f)
+        # write search box:
+        if of.startswith("h"):
+            req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
+                                        p2, f2, m2, op2, p3, f3, m3, sc))
+        url = string.replace(req.args, "search=Browse","search=SEARCH")
+        if as==1 or (p1 or p2 or p3):
+            if p1:
+                req.write("<p>Words nearest to <strong>%s</strong> inside <strong>%s</strong> are:<br>" % (p1, f1))
+                req.write(create_nearest_words_links(url, p1, f1))
+            if p2:
+                req.write("<p>Words nearest to <strong>%s</strong> inside <strong>%s</strong> are:<br>" % (p2, f2))
+                req.write(create_nearest_words_links(url, p2, f2))
+            if p3:
+                req.write("<p>Words nearest to <strong>%s</strong> inside <strong>%s</strong> are:<br>" % (p3, f3))
+                req.write(create_nearest_words_links(url, p3, f3))
+        else:
+            req.write("<p>Words nearest to <strong>%s</strong> inside <strong>%s</strong> are:<br>" % (p, f))
+            req.write(create_nearest_words_links(url, p, f))
+    else:
+        ## 3 - search needed
+        # wash passed collection arguments:
+        (cc, colls_to_display, colls_to_search) = wash_colls(cc, c, sc)
+        p = wash_pattern(p)
+        f = wash_field(f)
+        # write search box:
+        if of.startswith("h"):
+            req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
+                                        p2, f2, m2, op2, p3, f3, m3, sc))
+        # run search:
+        t1 = os.times()[4]
+        if as == 1 or (p1 or p2 or p3):
+            # 3A - advanced search
+            results_final = search_pattern(req, "", "", colls_to_search)
+            if p1:
+                results_tmp = search_pattern(req, p1, f1, colls_to_search, m1)
+                for coll in colls_to_search: # join results for first advanced search boxen
+                    results_final[coll].intersect(results_tmp[coll])
+            if p2:
+                results_tmp = search_pattern(req, p2, f2, colls_to_search, m2)
+                for coll in colls_to_search: # join results for first and second advanced search boxen
+                    if op1 == "a": # add
+                        results_final[coll].intersect(results_tmp[coll])
+                    elif op1 == "o": # or
+                        results_final[coll].union(results_tmp[coll])
+                    elif op1 == "n": # not
+                        results_final[coll].difference(results_tmp[coll])
+                    else:
+                        print_warning(req, "Invalid set operation %s." % op1, "Error")
+            if p3:
+                results_tmp = search_pattern(req, p3, f3, colls_to_search, m3)
+                for coll in colls_to_search: # join results for second and third advanced search boxen
+                    if op2 == "a": # add
+                        results_final[coll].intersect(results_tmp[coll])
+                    elif op2 == "o": # or
+                        results_final[coll].union(results_tmp[coll])
+                    elif op2 == "n": # not
+                        results_final[coll].difference(results_tmp[coll])
+                    else:
+                        print_warning(req, "Invalid set operation %s." % op1, "Error")            
+            for coll in colls_to_search:
+                results_final[coll].calculate_nbhits()
+        else:
+            # 3B - simple search
+            search_cache_key = p+"@"+f+"@"+string.join(colls_to_search,",")
+            if search_cache.has_key(search_cache_key): # is the result in search cache?
+                results_final = search_cache[search_cache_key]        
+            else:       
+                results_final = search_pattern(req, p, f, colls_to_search)
+                search_cache[search_cache_key] = results_final
+            if len(search_cache) > cfg_search_cache_size: # is the cache full? (sanity cleaning)
+                search_cache.clear()
+        t2 = os.times()[4]
+        cpu_time = t2 - t1
+        # find total number of records found in each collection
+        results_final_nb_total = 0
+        results_final_nb = {}
+        for coll in colls_to_search:
+            results_final_nb[coll] = results_final[coll]._nbhits
+            results_final_nb_total += results_final_nb[coll]
+        # was there at least one hit?
+        if results_final_nb_total == 0:
+            if of.startswith('h'):
+                print_warning(req, "No match found.  Trying similar queries...", "", "<p>","<p>")
+                req.write("<p>")
+                if as==1 or (p1 or p2 or p3):
+                    if p1:
+                        search_pattern(req, p1, f1, colls_to_search, m1, 1)
+                    if p2:
+                        search_pattern(req, p2, f2, colls_to_search, m2, 1)
+                    if p3:
+                        search_pattern(req, p3, f3, colls_to_search, m3, 1)
+                else:
+                    search_pattern(req, p, f, colls_to_search, None, 1)
+        else:
+            # yes, some hits found, so print results overview:
+            if of.startswith("h"):
+                req.write(print_results_overview(colls_to_search, results_final_nb_total, results_final_nb, cpu_time))
+            # print records:
+            if len(colls_to_search)>1:
+                cpu_time = -1 # we do not want to have search time printed on each collection
+            for coll in colls_to_search:
+                if results_final[coll]._nbhits:
+                    if of.startswith("h"):
+                        req.write(print_search_info(p, f, sf, so, sp, of, ot, coll, results_final_nb[coll], jrec, rg, as, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2, cpu_time))
+                    results_final_sorted = results_final[coll].items()
+                    if sf:
+                        results_final_sorted = sort_records(req, results_final_sorted, sf, so, sp)
+                    print_records(req, results_final_sorted, jrec, rg, of, ot)
+                    if of.startswith("h"):
+                        req.write(print_search_info(p, f, sf, so, sp, of, ot, coll, results_final_nb[coll], jrec, rg, as, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2, cpu_time, 1))
+            # log query:
+            log_query_info("ss", p, f, colls_to_search, results_final_nb_total)
+    # 4 -- write footer:
+    if of.startswith('h'):
+        req.write(create_footer())
+    elif of.startswith('x'):
+        req.write("""</collection>\n""")
+    return "\n"
+
+def perform_request_cache(req, action="show"):
+    """Manipulates the search engine cache."""
+    global search_cache
+    global collrecs_cache
+    req.content_type = "text/html"
+    req.send_http_header() 
+    out = ""
+    out += "<h1>Search Cache</h1>"
+    # clear cache if requested:
+    if action == "clear":
+        search_cache = {}
+        collrecs_cache = create_collrecs_cache()
+        collrecs_cache[cdsname] = get_collection_hitlist(cdsname)
+    # show collection cache:
+    out += "<h3>Collection Cache</h3>"
+    out += "<blockquote>"
+    for coll in collrecs_cache.keys():
+        if collrecs_cache[coll]:
+            out += "%s<br>" % coll
+    out += "</blockquote>"
+    # show search cache:
+    out += "<h3>Search Cache</h3>"
+    out += "<blockquote>"
+    if len(search_cache):
+        out += """<table border="=">"""
+        out += "<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>" % ("Pattern","Field","Collection","Number of Hits")
+        for search_cache_key in search_cache.keys():
+            p, f, c = string.split(search_cache_key, "@", 2)
+            # find out about length of cached data:
+            l = 0
+            for coll in search_cache[search_cache_key]:
+                l += search_cache[search_cache_key][coll]._nbhits
+            out += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%d</td></tr>" % (p, f, c, l)
+        out += "</table>"
+    else:
+        out += "<p>Search cache is empty."
+    out += "</blockquote>"
+    out += """<p><a href="%s/search.py/cache?action=clear">clear cache</a>""" % weburl
+    req.write(out)
+    return "\n"
+
+def perform_request_log(req, date=""):
+    """Display search log information for given date."""
+    req.content_type = "text/html"
+    req.send_http_header() 
+    req.write("<h1>Search Log</h1>")
+    if date: # case A: display stats for a day
+        yyyymmdd = string.atoi(date)
+        req.write("<p><big><strong>Date: %d</strong></big><p>" % yyyymmdd)
+        req.write("""<table border="1">""")
+        req.write("<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>" % ("No.","Time", "Pattern","Field","Collection","Number of Hits"))
+        # read file:
+        p = os.popen("grep ^%d %s/search.log" % (yyyymmdd,logdir), 'r')
+        lines = p.readlines()
+        p.close()
+        # process lines:
+        i = 0
+        for line in lines:
+            try:
+                datetime, as, p, f, c, nbhits = string.split(line,"#")
+                i += 1
+                req.write("<tr><td align=\"right\">#%d</td><td>%s:%s:%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" \
+                          % (i, datetime[8:10], datetime[10:12], datetime[12:], p, f, c, nbhits))
+            except:
+                pass # ignore eventual wrong log lines
+        req.write("</table>")
+    else: # case B: display summary stats per day
+        yyyymm01 = int(time.strftime("%04Y%02m01", time.localtime()))
+        yyyymmdd = int(time.strftime("%04Y%02m%02d", time.localtime()))
+        req.write("""<table border="1">""")
+        req.write("<tr><td><strong>%s</strong></td><td><strong>%s</strong></tr>" % ("Day", "Number of Queries"))
+        for day in range(yyyymm01,yyyymmdd+1):
+            p = os.popen("grep -c ^%d %s/search.log" % (day,logdir), 'r')
+            for line in p.readlines():
+                req.write("""<tr><td>%s</td><td align="right"><a href="%s/search.py/log?date=%d">%s</a></td></tr>""" % (day, weburl,day,line))
+            p.close()
+        req.write("</table>")
+    return "\n"    
+
 ## test cases:
 #print collrecs_cache
 #collrecs_cache["Preprints"] = get_collection_hitlist("Preprints")
@@ -1950,6 +2247,7 @@ def log_query_info(action, p, f, colls, nb_records_found_total=-1):
 #print get_word_nbhits("of","title")
 #print ":"+wash_pattern("* and % doo * %")+":\n"
 #print ":"+wash_pattern("*")+":\n"
+#print ":"+wash_pattern("ellis* ell* e*%")+":\n"
 #print run_sql("SELECT name,dbquery from collection")
 #print get_wordsindex_id("author")
 #print get_coll_ancestors("Theses")
