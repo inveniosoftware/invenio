@@ -791,7 +791,7 @@
   <en>rank by</en>
   <fr>ranger par</fr>
   <de>ranking</de>
-  <es>rank by</es>
+  <es>ordenar por</es>
   <pt>ordenado por</pt>
   <it>ordinare per</it>
   <ru>упорядочить по</ru>
@@ -1978,7 +1978,7 @@
   <en>Record created %s, last modified %s</en>
   <fr>Notice créée %s, modifiée %s</fr>
   <de>Datensatz erzeugt %s, letzte Änderung %s</de>
-  <es>Record created %s, last modified %s</es>
+  <es>Registro creado %s, modificado %s</es>
   <pt>Registro criado %s, modificado pela última vez %s</pt>
   <it>Record created %s, last modified %s</it>
   <ru>Record created %s, last modified %s</ru>
@@ -1993,7 +1993,7 @@
   <en>Similar records</en>
   <fr>Notices similaires</fr>
   <de>Similar records</de>
-  <es>Similar records</es>
+  <es>Registros similares</es>
   <pt>Similar records</pt>
   <it>Similar records</it>
   <ru>Similar records</ru>
@@ -2008,14 +2008,14 @@
   <en>word similarity</en>
   <fr>similarité de mots</fr>
   <de>word similarity</de>
-  <es>word similarity</es>
+  <es>similitud de palabras</es>
   <pt>word similarity</pt>
   <it>word similarity</it>
   <ru>word similarity</ru>
   <sk>podobnosť slov</sk>
   <cz>podobnost slov</cz>
-  <no></no>
-  <se>word similarity</se>
+  <no>ord-likhet</no>
+  <se>ord-likhet</se>
 </define-tag>
 
 ## end of file
