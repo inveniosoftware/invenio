@@ -465,6 +465,13 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, new_bas
     out += perform_list_alerts(uid)
     return out
 
+def is_selected(var, fld):
+    "Checks if the two are equal, and if yes, returns ' selected'. Useful for select boxes."
+    if var == fld:
+        return " selected"
+    else:
+        return ""
+
 # account_list_alerts: list alert for the account page
 # input:  the user id
 #         id_alert: the identifier of the alert 
@@ -473,13 +480,10 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, new_bas
 #         new basket name for this alert;
 #         identifier of the query to be alerted
 # output: the list of alerts Web page
-def account_list_alerts(uid, action="", id_alert=0, id_basket=0,old_id_basket=0,newname=""):
+def account_list_alerts(uid, action="", id_alert=0,id_basket=0,old_id_basket=0,newname="",value=""):
     i=0
-  # set variables
-    out = ""
-    options = ""
     id_user = uid # XXX
-    list=[]
+    out = ""
     SQL_query = """ SELECT q.id, q.urlargs, a.id_user, a.id_query, 
                             a.id_basket, a.alert_name, a.frequency, 
                             a.notification, 
@@ -489,26 +493,22 @@ def account_list_alerts(uid, action="", id_alert=0, id_basket=0,old_id_basket=0,
                     FROM query q, user_query_basket a
                     WHERE a.id_user='%s' AND a.id_query=q.id
                     ORDER BY a.alert_name ASC """ % id_user
-    query_result = run_sql(SQL_query)    
-
-    if len(query_result) > 0:
-
-        for row in query_result :
-                i+=1   
-		list += ["""<A href="../youralerts.py/modify?idq=%d&name=%s&freq=%s&notif=%s&idb=%d&old_idb=%d">%s</A>
-			 """%(row[0],row[5],row[6],row[7],id_basket,old_id_basket,row[5])]
-		options += """<OPTION value=%d>%s</OPTION>""" % (i,row[5])
+    query_result = run_sql(SQL_query)  
+    out += """<FORM name="displayalert" action="../youralerts.py/list" method="post">"""
     out += """You own following alerts: """
-    for l in range(0,i):
-	out +=""
-	out+=list[l]
-    if isGuestUser(uid) :
-	out += warning_guest_user(type="alerts")
+    out += """<SELECT name="id_alert"><OPTION value="0">- alert name -</OPTION>"""
+    for row in query_result :
+              if len(query_result)>0:
+                              alert_selected = " selected"
+                              alert_name = row[0]
+              else:
+                      alert_selected = ""
+              out += """<OPTION>%s</OPTION>""" % (row[5])
+    out += """</SELECT>\n"""
+    out += """&nbsp;<CODE class="blocknote">"""\
+           """<INPUT class="formbutton" type="submit" name="action" value="SHOW"></CODE>\n"""
+    out += """</FORM>"""
     return out
-
-#   for l in range(0,1):
-
-
 
 # account_list_searches: list the searches of the user
 # input:  the user id
