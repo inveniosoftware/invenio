@@ -99,22 +99,17 @@ class pSession(Session):
         repr = self.__getRepr().replace("'", "\\\'")
         repr = repr.replace('"', '\\\"')
         try:
-            sql = 'insert into %s (session_key, session_object, uid) values ("%s","%s",%s)'\
-                  % (self.__class__.__tableName, self.id, repr, int(self.getUid()))
+            sql = 'INSERT INTO %s (session_key, session_expiry, session_object, uid) values ("%s","%s","%s","%s")' % \
+                  (self.__class__.__tableName, self.id, self.get_access_time()+60*60*24*2, repr, int(self.getUid()))
             res = run_sql(sql)
-        #TODO. WARNING!! it should be "except IntegrityError, e:" but this will 
+        # FIXME. WARNING!! it should be "except IntegrityError, e:" but this will 
         #   create a dependency on package MySQL. I'll leave it like this for
         #   the time being but this can lead to Exception masking
         except Exception, e:
-            sql = 'update %s set uid=%s, session_object="%s" where session_key="%s"'%(self.__class__.__tableName, int(self.getUid()), repr, self.id)
+            sql = 'UPDATE %s SET uid=%s, session_expiry=%s, session_object="%s" WHERE session_key="%s"' % \
+                  (self.__class__.__tableName, int(self.getUid()), self.get_access_time()+60*60*24*2, repr, self.id)
             res = run_sql(sql)
             self.__dirty=0
-
-    def _set_access_time (self, resolution):
-        now = time.time()
-        if now - self._Session__access_time > resolution:
-            self._Session__access_time = now
-            run_sql("UPDATE session SET session_expiry=%d WHERE session_key='%s'" % (now+60*60*24*2, self.id))
 
 class pSessionMapping(UserDict):
     """Only the necessary methods to make it work with the session manager 
