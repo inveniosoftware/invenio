@@ -16,9 +16,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "configbis.wml"
 #include "config.wml"
+
 [rank_method]
 function = word_frequency
-overall_importance = 1.0
 
 [word_frequency]
 stem_if_avail = yes
@@ -76,4 +76,4 @@ max_nr_words_lower = 10
 #override minimum relevance value and use the one from search_engine?
 override_default_min_relevance = no
 #default minimum relevance value to use for find similar
-default_min_relevance = 1
+default_min_relevance = 75

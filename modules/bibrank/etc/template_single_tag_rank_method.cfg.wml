@@ -18,7 +18,6 @@
 
 [rank_method]
 function = single_tag_rank_method
-overall_importance = 1.0
 
 [single_tag_rank_method]
 tag = 909C4p

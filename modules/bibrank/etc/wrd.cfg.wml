@@ -19,7 +19,6 @@
 
 [rank_method]
 function = word_frequency
-overall_importance = 1.0
 
 [word_frequency]
 stem_if_avail = yes
