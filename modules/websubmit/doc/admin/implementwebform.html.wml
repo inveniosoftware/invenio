@@ -140,6 +140,9 @@
              in which webSubmit will save the value entered in this field. This is also the one you will use in your 
              "<a href=bibconvert.<lang:star: *>.html>bibConvert</a>" configuration. Bibconvert is the program which will 
              convert the data gathered in webSubmit in a formatted XML file for insertion in the documents database.
+             <br>
+             &nbsp;<span class="guideheader">T</span>ips:
+             <li>Elements of type "select box" which are used as a mandatory field in a form must start with "&lt;option&gt;Select:&lt;/option&gt;"
             </BLOCKQUOTE>
             
         <a name="addcheck"></a>
