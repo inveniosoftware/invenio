@@ -80,6 +80,7 @@ def change(req,email=None,password=None,password2=None,login_method="",ln=cdslan
     elif login_method and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4:
         return webuser.page_not_authorized(req, "../youraccount.py/change")
     elif email:
+        uid2 = webuser.emailUnique(email)
         if (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2 or (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1 and webuser.checkemail(email))) and uid2 != -1 and (uid2 == uid or uid2 == 0) and password == password2:
             if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
                 change = webuser.updateDataUser(req,uid,email,password)
