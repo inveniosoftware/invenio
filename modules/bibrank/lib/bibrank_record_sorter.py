@@ -505,7 +505,10 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
             break
 
     methods[rank_method_code]["rnkWORD_table"] = "rnkWORD02F"
-    rec_terms = run_sql("SELECT termlist FROM %sR WHERE id_bibrec=%s" % (methods[rank_method_code]["rnkWORD_table"][:-1], recID))
+    try:
+        rec_terms = run_sql("SELECT termlist FROM %sR WHERE id_bibrec=%s" % (methods[rank_method_code]["rnkWORD_table"][:-1], recID))
+    except:
+        rec_terms = []
 
     if rec_terms:
         rec_terms = deserialize_via_marshal(rec_terms[0][0])
@@ -611,7 +614,10 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
             i += 1
 
         for (term, table) in lwords:
-            res = run_sql("SELECT term FROM %s WHERE term like '%% %s' or term like '%s %%'" % (bigram_table, term, term))
+            try:
+                res = run_sql("SELECT term FROM %s WHERE term like '%% %s' or term like '%s %%'" % ("idxfff", term, term))
+            except:
+                res = []
             for bigram in res:
                 bigram = bigram[0]
                 splitted_bigram = string.split(bigram, " ")

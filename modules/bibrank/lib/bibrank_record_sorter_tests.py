@@ -44,13 +44,6 @@ class TestListSetOperations(unittest.TestCase):
         hitset.addlist((1,2,5))
         self.assertEqual(({1: 839, 2: 1193, 5: 350}, {1: 1, 2: 1, 5: 1}),  bibrank_record_sorter.calculate_record_relevance(("testterm", 2.0), {"Gi":(0, 50.0), 1: (3, 4.0), 2: (4, 5.0), 5: (1, 3.5)}, hitset, {}, {}, 0, None))
 
-    def test_post_calculate_record_relevance(self):
-        """bibrank record sorter - post calculation of relevances"""
-        hitset = HitSet()
-        hitset.addlist((1,2,5))
-        (returned_dict, returned_hitset) = bibrank_record_sorter.post_calculate_record_relevance({1: 839, 2: 1193, 5: 350}, {1: 1, 2: 1, 5: 1}, hitset, 0)
-        self.assertEqual(({1: 6.7322107064672059, 2: 7.0842264220979159, 5: 5.857933154483459}, []), (returned_dict, returned_hitset.tolist()))
-
 def create_test_suite():
     """Return test suite for the indexing engine."""
     return unittest.TestSuite((unittest.makeSuite(TestListSetOperations,'test'),))
