@@ -1161,9 +1161,9 @@ def perform_addnewfieldvalue(colID, fldID, ln=cdslang, name='', value='', callba
     output = ""
     subtitle = """<a name="7.4"></a>Add new value"""
     text = """
-    <span class="adminlabel">Name</span>
+    <span class="adminlabel">Display name</span>
     <input class="admin_w200" type="text" name="name" value="%s" /><br>
-    <span class="adminlabel">Value</span>
+    <span class="adminlabel">Search value</span>
     <input class="admin_w200" type="text" name="value" value="%s" /><br>
     """ % (name, value)
     output = createhiddenform(action="%s/admin/websearch/websearchadmin.py/addnewfieldvalue" % weburl,
@@ -1209,9 +1209,9 @@ def perform_modifyfieldvalue(colID, fldID, fldvID, ln=cdslang, name='', value=''
     </dl>"""
 
     text = """
-    <span class="adminlabel">Name</span>
+    <span class="adminlabel">Display name</span>
     <input class="admin_w200" type="text" name="name" value="%s" /><br>
-    <span class="adminlabel">Value</span>
+    <span class="adminlabel">Search value</span>
     <input class="admin_w200" type="text" name="value" value="%s" /><br>
     """ % (name, value)
     output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/modifyfieldvalue" % weburl,
@@ -1259,9 +1259,17 @@ def perform_removefield(colID, ln=cdslang, fldID='', fldvID='', fmeth='', callba
     sel_ln - remove the field with this language
     fldID - remove the field with this id"""
 
-    subtitle = """<a name="6.4"><a name="7.4"><a name="8.4"></a>Remove field"""
-    output  = ""
+    if fmeth == "soo":
+        field = "sort option"
+    elif fmeth == "sew":
+        field = "search field"
+    elif fmeth == "seo":
+        field = "search option"
+    else:
+        field = "field"
 
+    subtitle = """<a name="6.4"><a name="7.4"><a name="8.4"></a>Remove %s""" % field
+    output  = ""
     col_dict = dict(get_def_name('', "collection"))
     fld_dict = dict(get_def_name('', "field"))
     res = get_fld_value()
@@ -1274,7 +1282,7 @@ def perform_removefield(colID, ln=cdslang, fldID='', fldvID='', fmeth='', callba
             fldvID = int(fldvID)
 
         if confirm in ["0", 0]:
-            text = """Do you want to remove the field '%s' %s from the collection '%s'.""" % (fld_dict[fldID], (fldvID not in["", "None"] and "with value '%s'" % fldv_dict[fldvID] or ''), col_dict[colID])
+            text = """Do you want to remove the %s '%s' %s from the collection '%s'.""" % (field, fld_dict[fldID], (fldvID not in["", "None"] and "with value '%s'" % fldv_dict[fldvID] or ''), col_dict[colID])
             output += createhiddenform(action="removefield#6.5",
                                        text=text,
                                        button="Confirm",
@@ -1286,11 +1294,11 @@ def perform_removefield(colID, ln=cdslang, fldID='', fldvID='', fmeth='', callba
         elif confirm in ["1", 1]:
             res = remove_fld(colID, fldID, fldvID)
             if res:
-                output += """<b><span class="info">Removed the field '%s' %s from the collection '%s'.</span></b>
-                """ % (fld_dict[fldID], (fldvID not in ["", "None"] and "with fieldvalue '%s'" % fldv_dict[fldvID] or ''), col_dict[colID])
+                output += """<b><span class="info">Removed the %s '%s' %s from the collection '%s'.</span></b>
+                """ % (field, fld_dict[fldID], (fldvID not in ["", "None"] and "with value '%s'" % fldv_dict[fldvID] or ''), col_dict[colID])
             else:
-                output += """<b><span class="info">Cannot remove the field from the collection '%s'.</span></b>
-                """ % col_dict[colID]
+                output += """<b><span class="info">Cannot remove the %s from the collection '%s'.</span></b>
+                """ % (field, col_dict[colID])
     try:
         body = [output, extra]
     except NameError:
@@ -1311,7 +1319,7 @@ def perform_removefieldvalue(colID, ln=cdslang, fldID='', fldvID='', fmeth='', c
     sel_ln - remove the field with this language
     fldID - remove the field with this id"""
 
-    subtitle = """<a name="7.4"></a>Remove field"""
+    subtitle = """<a name="7.4"></a>Remove value"""
     output  = ""
 
     col_dict = dict(get_def_name('', "collection"))
@@ -1326,7 +1334,7 @@ def perform_removefieldvalue(colID, ln=cdslang, fldID='', fldvID='', fmeth='', c
             fldvID = int(fldvID)
 
         if confirm in ["0", 0]:
-            text = """Do you want to remove the value '%s' from the field '%s'.""" % (fldv_dict[fldvID], fld_dict[fldID])
+            text = """Do you want to remove the value '%s' from the search option '%s'.""" % (fldv_dict[fldvID], fld_dict[fldID])
             output += createhiddenform(action="removefieldvalue#7.4",
                                        text=text,
                                        button="Confirm",
@@ -1338,10 +1346,10 @@ def perform_removefieldvalue(colID, ln=cdslang, fldID='', fldvID='', fmeth='', c
         elif confirm in ["1", 1]:
             res = remove_fld(colID, fldID, fldvID)
             if res:
-                output += """<b><span class="info">Removed the value '%s' from the field '%s'.</span></b>
+                output += """<b><span class="info">Removed the value '%s' from the search option '%s'.</span></b>
                 """ % (fldv_dict[fldvID], fld_dict[fldID])
             else:
-                output += """<b><span class="info">Cannot remove the value from the field.</span></b>
+                output += """<b><span class="info">Cannot remove the value from the search option.</span></b>
                 """
     try:
         body = [output, extra]
