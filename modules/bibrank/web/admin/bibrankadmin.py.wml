@@ -204,7 +204,7 @@ def auth_failed(uid, navtrail_previous_links):
                 uid=uid,
                 body=brc.adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount.py/login?referer=%s/admin/websearch/">login</a> with another account.""" % (weburl, weburl)]),
+                                     <a href="%s/youraccount.py/login?referer=%s/admin/bibrank/">login</a> with another account.""" % (weburl, weburl)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
     
