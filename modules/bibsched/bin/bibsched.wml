@@ -36,7 +36,7 @@ pylibdir = "<LIBDIR>/python"
 #######
 
 ### -- local configuration section starts here ---
-cfg_valid_processes = ["bibwords","bibupload","bibreformat","webcoll","bibtaskex"] # which tasks are reconized as valid?
+cfg_valid_processes = ["bibindex","bibupload","bibreformat","webcoll","bibtaskex"] # which tasks are reconized as valid?
 ### -- local configuration section ends here ---
 
 ## version number:
