@@ -42,6 +42,7 @@ from cdsware.dbquery import run_sql
 from cdsware.webuser import getUid,page_not_authorized
 from cdsware import webbasket
 from mod_python import apache
+from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
 imagesurl = "%s/img" % webdir
 
@@ -56,7 +57,7 @@ def index(req):
 def display(req, action="", title="Your Baskets", delete_alerts="", confirm_action="", id_basket=0, bname="", newname="", newbname="", mark=[], to_basket="", copy_move="", idup="", ordup="", iddown="", orddown="", of="hb"):
 
     uid = getUid(req)
-    if uid == -1: 
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
         return page_not_authorized(req, "../yourbaskets.py/display")
 
     if action=="DELETE":
@@ -73,7 +74,7 @@ def display_public(req, id_basket=0, name="", action="", to_basket="", mark=[], 
     title = "Display basket"
     uid = getUid(req)    
 
-    if uid == -1: 
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
         return page_not_authorized(req, "../yourbaskets.py/display_public")
 
     return page(title=title,
@@ -90,7 +91,7 @@ def add(req, recid=[], bid=[], bname=[]):
     title = "Adding records to baskets"
     uid = getUid(req)
 
-    if uid == -1: 
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
         return page_not_authorized(req, "../yourbaskets.py/add")
 
     return page(title=title,
