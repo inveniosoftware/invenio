@@ -79,7 +79,12 @@ create-demo-site: install
 # 	done
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/demo/democfgdata.sql
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
-	${prefix}/bin/webcoll -ucds.support@cern.ch
+	@echo ""
+	@echo "***********************************************************************"
+	@echo "** You will be asked for a username, please enter admin email below. **"
+	@echo "***********************************************************************"
+	@echo ""
+	${prefix}/bin/webcoll
 	${prefix}/bin/webcoll 1
 	@echo "***********************************************************************"
 	@echo "** The demo site has been successfully created.                      **"
@@ -96,11 +101,26 @@ load-demo-records: install
 	${prefix}/bin/dbexec < ./modules/miscutil/sql/tabbibclean.sql
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
 	${prefix}/bin/bibupload ./modules/miscutil/demo/demobibdata.xml
-	${prefix}/bin/bibwords -ucds.support@cern.ch
+	@echo ""
+	@echo "***********************************************************************"
+	@echo "** You will be asked for a username, please enter admin email below. **"
+	@echo "***********************************************************************"
+	@echo ""
+	${prefix}/bin/bibwords
 	${prefix}/bin/bibwords 1
-	${prefix}/bin/bibreformat -ucds.support@cern.ch -oHB,HD,HP,HC
+	@echo ""
+	@echo "***********************************************************************"
+	@echo "** You will be asked for a username, please enter admin email below. **"
+	@echo "***********************************************************************"
+	@echo ""
+	${prefix}/bin/bibreformat -oHB,HD,HP,HC
 	${prefix}/bin/bibreformat 2
-	${prefix}/bin/webcoll -ucds.support@cern.ch
+	@echo ""
+	@echo "***********************************************************************"
+	@echo "** You will be asked for a username, please enter admin email below. **"
+	@echo "***********************************************************************"
+	@echo ""
+	${prefix}/bin/webcoll
 	${prefix}/bin/webcoll 3
 	@echo "***********************************************************************"
 	@echo "** The demo records have been successfully loaded.                   **"
@@ -119,7 +139,12 @@ drop-demo-site: install
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabcreate.sql
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
-	${prefix}/bin/webcoll -ucds.support@cern.ch
+	@echo ""
+	@echo "***********************************************************************"
+	@echo "** You will be asked for a username, please enter admin email below. **"
+	@echo "***********************************************************************"
+	@echo ""
+	${prefix}/bin/webcoll
 	${prefix}/bin/webcoll 1
 	for f in $(sbmdat); do rm -f $(sbmdir)/$$f.shtml ; done
 	@echo "***************************************************************"
@@ -129,8 +154,13 @@ drop-demo-site: install
 remove-demo-records: install
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabbibclean.sql
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
-	${prefix}/bin/webcoll update-reclist
-	${prefix}/bin/webcoll update-webpage
+	@echo ""
+	@echo "***********************************************************************"
+	@echo "** You will be asked for a username, please enter admin email below. **"
+	@echo "***********************************************************************"
+	@echo ""
+	${prefix}/bin/webcoll 
+	${prefix}/bin/webcoll 1
 	@echo "**********************************************************"
 	@echo "** The demo records have been successfully removed.     **"
 	@echo "** The demo collection and submit configurations        **"
