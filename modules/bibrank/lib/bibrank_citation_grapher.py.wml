@@ -29,7 +29,7 @@ from zlib import decompress
 from config import weburl
 from dbquery import run_sql    
 from bibrank_grapher import create_temporary_image, write_coordinates_in_tmp_file, remove_old_img
-from bibrank_citation_searcher import get_cited_by_list
+from bibrank_citation_searcher import calculate_cited_by_list
 
 cfg_bibrank_print_citation_history = 1 
 color_line_list = ['9', '19', '10', '15', '21', '18']
@@ -53,8 +53,8 @@ def calculate_citation_history_coordinates(recid):
     """Return a list of citation graph coordinates for RECID, sorted by year."""
     result = []
     initial_result= get_initial_result(calculate_citation_graphe_x_coordinates(recid))
-    citlist = get_cited_by_list(recid)
-    for rec_id in citlist:
+    citlist = calculate_cited_by_list(recid)
+    for rec_id, cit_weight in citlist:
         cit_year = get_field_values(rec_id,'773__y')
         if not cit_year: cit_year = get_field_values(rec_id, '260__c')
         #print rec_idh,str(cit_year[0])
@@ -63,7 +63,6 @@ def calculate_citation_history_coordinates(recid):
     for key, value in initial_result.items():
         result.append((key, value))
     result.sort()
-    print result
     return result
 
 def calculate_citation_graphe_x_coordinates(recid):
