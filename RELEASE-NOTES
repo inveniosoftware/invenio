@@ -1,52 +1,42 @@
 --------------------------------------------------------------------
-CDSware v0.3.0 (DEVELOPMENT) is released 
-March 5, 2004
+CDSware v0.3.1 (DEVELOPMENT) is released 
+March 12, 2004
 http://cdsware.cern.ch/news/
 --------------------------------------------------------------------
 
-CDSware v0.3.0 (DEVELOPMENT) was released on March 5th, 2003.
+CDSware v0.3.1 (DEVELOPMENT) was released on March 12th, 2004.
 
 What's new:
-  * new development branch release (important SQL table changes)
-  * introducing a new submission engine and the end-user web
-    interface (WebSubmit)
-  * bibupload is now a BibSched task with new options (BibUpload)
-  * BibWords renamed into BibIndex in the view of future phrase
-    indexing changes (BibIndex)
-  * more secure DB server connectivity (BibSched)
-  * record matching functionality (BibConvert)
-  * character encoding conversion tables (BibConvert)
-  * Qualified Dublin Core conversion example (BibConvert)
-  * OAI deleted recods policy can now be specified (BibHarvest)
-  * multi-language collection portalboxes (WebSearch)
-  * HTML pages now respect language selections (WebSearch, WebHelp)
-  * minor layout changes (WebStyle)
-  * updated Russian and other translations
-  * ChangeLog is now generated from CVS log messages
-  * plus the usual set of bugfixes (see ChangeLog)
+  * security fix preventing exposure of local configuration variables
+    by malicious URL crafting (WebSearch, WebSubmit, WebAlert,
+    WebBasket, WebSession, BibHarvest, MiscUtil)
+  * initial release of the ranking engine (BibRank)
+  * new guide on HOWTO Run Your CDSware Installation (WebHelp)
+  * fixed submit configurations with respect to fulltext links and
+    metadata tags (WebSubmit, MiscUtil)
+  * Your Account personal corner now shows the list and the status
+    of submissions and approvals (WebSession)
+  * uniform help and version number option for CLI executables
+    (WebSearch, BibSched, BibIndex, BibRank, BibHarvest, BibConvert,
+    WebAccess, BibFormat, WebSession, WebAlert)
+  * uniform technique for on-the-fly formatting of search results via
+    `hb_' and `hd_' output format parameters (WebSearch)
+  * check for presence of pcntl and mysql PHP libraries (BibUpload)
 
 Download:
-   <http://cdsware.cern.ch/download/cdsware-0.3.0.tar.gz>
+   <http://cdsware.cern.ch/download/cdsware-0.3.1.tar.gz>
 
 Notes: 
-   The minor version number of the development branch was bumped to
-   indicate important SQL table structure changes.  An upgrade from
-   CDSware v0.1.x is relatively easy though.  Please contact us if you
-   want some hints in this direction.  (We do not provide an upgrade
-   script automatically in the tarball because of the development
-   branch nature of the release.)
-
-   CDSware v0.3.0 now includes the first Pythonic DEVELOPMENT version
-   of the WebSubmit module.  We encourage you to test it.  Users of
-   v0.0.9 are however advised to stay with their system until a STABLE
-   release is announced.
+   This DEVELOPMENT release contains an important security fix.  All
+   CDSware DEVELOPMENT users (v0.1.x and v0.3.x) are asked to upgrade
+   to v0.3.1 as soon as possible.  Users of v0.0.9 are not affected.
 
 Known problems:
-   Several important admin-level functionality of v0.0.9 is still
-   missing in v0.3.0.  These issues will be subsequently dealt with in
-   the next releases of the v0.3.x development branch.
+   Ranking engine is fully functional from the admin-level point of
+   view, but the end-user ranking functionality still has to be
+   plugged into the search interface.  Several important admin-level
+   functionalities of v0.0.9 are still missing in the v0.3.x tree.
 
 What's next: 
    Fixing known problems described above.  Developing BibIndex for
-   better phrase indexing and browsing.  Introducing BibRank to
-   provide basic ranking features.
+   better phrase indexing and browsing. 
