@@ -61,10 +61,10 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> </navbar:prolog>
   <navbar:button id=submit_submit txt="Submit Documents" url="<WEBURL>/submit/" hint="Submit Documents">
-  <navbar:button id=submit_referee txt="Check Documents Status" url="<WEBURL>/submit/publiline/inotes/DAMStat.shtml" hint="Refereeing Process">
-  <navbar:button id=submit_doc txt="Documentation" url="<WEBURL>/submit/docs/english" hint="Documentation">
+  <navbar:button id=submit_referee txt="Check Documents Status" url="<WEBURL>/submit/publiline/inotes/DAMStat.php" hint="Refereeing Process">
+  <navbar:button id=submit_doc txt="Help" url="<WEBURL>/help/submit" hint="Help">
 
-  <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
+  <Navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
   <navbar:footer>
     </table>
@@ -98,10 +98,10 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=youralerts txt="Your Alerts" url="<WEBURL>/personalize/youralerts.shtml" hint="Your Alerts">
-  <navbar:button id=yourbaskets txt="Your Baskets" url="<WEBURL>/personalize/yourbaskets.shtml" hint="Your Baskets">
-  <navbar:button id=yoursearches txt="Your Searches" url="<WEBURL>/personalize/yoursearches.shtml" hint="Your Searches">
-  <navbar:button id=yoursettings txt="Your Settings" url="<WEBURL>/personalize/yoursettings.shtml" hint="Your Settings">
+  <navbar:button id=youralerts txt="Your Alerts" url="<WEBURL>/personalize/youralerts.php" hint="Your Alerts">
+  <navbar:button id=yourbaskets txt="Your Baskets" url="<WEBURL>/personalize/yourbaskets.php" hint="Your Baskets">
+  <navbar:button id=yoursearches txt="Your Searches" url="<WEBURL>/personalize/yoursearches.php" hint="Your Searches">
+  <navbar:button id=yoursettings txt="Your Settings" url="<WEBURL>/personalize/yoursettings.php" hint="Your Settings">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
@@ -119,9 +119,9 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=about txt="About" url="<WEBURL>/docs/about.shtml" hint="About">
-  <navbar:button id=userguide txt="User Guide" url="<WEBURL>/docs/userguide.shtml" hint="User Guide">
-  <navbar:button id=faq txt="FAQ" url="<WEBURL>/docs/faq.shtml" hint="FAQ">
+  <navbar:button id=about txt="About" url="<WEBURL>/docs/about.php" hint="About">
+  <navbar:button id=userguide txt="User Guide" url="<WEBURL>/docs/userguide.php" hint="User Guide">
+  <navbar:button id=faq txt="FAQ" url="<WEBURL>/docs/faq.php" hint="FAQ">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
@@ -172,15 +172,15 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=websubmit_newdoctype txt="New&nbsp;Doctype" url="<WEBURL>/admin/websubmit/newDoctypeEDS.shtml" hint="New Type of Document">
-  <navbar:button id=websubmit_deldoctype txt="Remove&nbsp;Doctype" url="<WEBURL>/admin/websubmit/removeDoctypeEDS.shtml" hint="Remove Type of Document">
-  <navbar:button id=websubmit_listactions txt="Available&nbsp;Actions" url="<WEBURL>/admin/websubmit/allActionsEDS.shtml" hint="List Available Actions">
-  <navbar:button id=websubmit_listchecks txt="Available&nbsp;Javascript&nbsp;Checks" url="<WEBURL>/admin/websubmit/allChecksEDS.shtml" hint="List Available Javascript Checking functions">
-  <navbar:button id=websubmit_listelements txt="Available&nbsp;Element&nbsp;Descriptions" url="<WEBURL>/admin/websubmit/allElementsEDS.shtml" hint="List Available Element Descriptions">
-  <navbar:button id=websubmit_listmodify txt="Available&nbsp;Modification&nbsp;Texts" url="<WEBURL>/admin/websubmit/allModifyEDS.shtml" hint="List Available Modification Texts">
-  <navbar:button id=websubmit_listfunctions txt="Available&nbsp;Functions" url="<WEBURL>/admin/websubmit/listFunctions.shtml" hint="List Available Functions">
-  <navbar:button id=websubmit_organise txt="Organise&nbsp;Main&nbsp;Page" url="<WEBURL>/admin/websubmit/editCatalogues.shtml" hint="Main Page Organisation">
-  <navbar:button id=websubmit_doc txt="Documentation" url="<WEBURL>/admin/websubmit/docs/english" hint="Websubmit Documentation">
+  <navbar:button id=websubmit_newdoctype txt="New&nbsp;Doctype" url="<WEBURL>/admin/websubmit/newDoctypeEDS.php" hint="New Type of Document">
+  <navbar:button id=websubmit_deldoctype txt="Remove&nbsp;Doctype" url="<WEBURL>/admin/websubmit/removeDoctypeEDS.php" hint="Remove Type of Document">
+  <navbar:button id=websubmit_listactions txt="Available&nbsp;Actions" url="<WEBURL>/admin/websubmit/allActionsEDS.php" hint="List Available Actions">
+  <navbar:button id=websubmit_listchecks txt="Available&nbsp;Javascript&nbsp;Checks" url="<WEBURL>/admin/websubmit/allChecksEDS.php" hint="List Available Javascript Checking functions">
+  <navbar:button id=websubmit_listelements txt="Available&nbsp;Element&nbsp;Descriptions" url="<WEBURL>/admin/websubmit/allElementsEDS.php" hint="List Available Element Descriptions">
+  <navbar:button id=websubmit_listmodify txt="Available&nbsp;Modification&nbsp;Texts" url="<WEBURL>/admin/websubmit/allModifyEDS.php" hint="List Available Modification Texts">
+  <navbar:button id=websubmit_listfunctions txt="Available&nbsp;Functions" url="<WEBURL>/admin/websubmit/listFunctions.php" hint="List Available Functions">
+  <navbar:button id=websubmit_organise txt="Organise&nbsp;Main&nbsp;Page" url="<WEBURL>/admin/websubmit/editCatalogues.php" hint="Main Page Organisation">
+  <navbar:button id=websubmit_doc txt="Guide" url="<WEBURL>/admin/websubmit/guide/" hint="Guide">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
@@ -198,13 +198,13 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=webaccess_superusers txt="Superusers" url="<WEBURL>/admin/webaccess/superusers.shtml" hint="Superusers">
-  <navbar:button id=webaccess_submit txt="Authorizations&nbsp;on&nbsp;Submit" url="<WEBURL>/admin/webaccess/submit.shtml" hint="Authorizations on Submit">
-  <navbar:button id=webaccess_websubmit txt="Authorizations&nbsp;on&nbsp;WebSubmit&nbsp;Admin" url="<WEBURL>/admin/webaccess/submitmanager.shtml" hint="Authorizations on WebSubmit Admin">
-  <navbar:button id=webaccess_websearch txt="Authorizations&nbsp;on&nbsp;WebSearch&nbsp;Admin" url="<WEBURL>/admin/webaccess/searchmanager.shtml" hint="Authorizations on WebSearch Admin">
-  <navbar:button id=webaccess_webaccess txt="Authorizations&nbsp;on&nbsp;WebAccess&nbsp;Admin" url="<WEBURL>/admin/webaccess/accessmanager.shtml" hint="Authorizations on WebAccess Admin">
-  <navbar:button id=webaccess_bibdata txt="Authorizations&nbsp;on&nbsp;BibData&nbsp;Admin" url="<WEBURL>/admin/webaccess/bibmanager.shtml" hint="Authorizations on BibData Admin">
-  <navbar:button id=webaccess_bibformat txt="Authorizations&nbsp;on&nbsp;BibFormat&nbsp;Admin" url="<WEBURL>/admin/webaccess/bibformatmanager.shtml" hint="Authorizations on BibFormat Admin">
+  <navbar:button id=webaccess_superusers txt="Superusers" url="<WEBURL>/admin/webaccess/superusers.php" hint="Superusers">
+  <navbar:button id=webaccess_submit txt="Authorizations&nbsp;on&nbsp;Submit" url="<WEBURL>/admin/webaccess/submit.php" hint="Authorizations on Submit">
+  <navbar:button id=webaccess_websubmit txt="Authorizations&nbsp;on&nbsp;WebSubmit&nbsp;Admin" url="<WEBURL>/admin/webaccess/submitmanager.php" hint="Authorizations on WebSubmit Admin">
+  <navbar:button id=webaccess_websearch txt="Authorizations&nbsp;on&nbsp;WebSearch&nbsp;Admin" url="<WEBURL>/admin/webaccess/searchmanager.php" hint="Authorizations on WebSearch Admin">
+  <navbar:button id=webaccess_webaccess txt="Authorizations&nbsp;on&nbsp;WebAccess&nbsp;Admin" url="<WEBURL>/admin/webaccess/accessmanager.php" hint="Authorizations on WebAccess Admin">
+  <navbar:button id=webaccess_bibdata txt="Authorizations&nbsp;on&nbsp;BibData&nbsp;Admin" url="<WEBURL>/admin/webaccess/bibmanager.php" hint="Authorizations on BibData Admin">
+  <navbar:button id=webaccess_bibformat txt="Authorizations&nbsp;on&nbsp;BibFormat&nbsp;Admin" url="<WEBURL>/admin/webaccess/bibformatmanager.php" hint="Authorizations on BibFormat Admin">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
@@ -241,8 +241,8 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=bibdata_edit_record txt="Edit Record" url="<WEBURL>/admin/bibdata/displayRec.shtml" hint="BibData Admin - Edit Record">
-  <navbar:button id=bibdata_global_replace txt="Global Replace" url="<WEBURL>/admin/bibdata/globalReplace.shtml" hint="BibData Admin - Global Replace">
+  <navbar:button id=bibdata_edit_record txt="Edit Record" url="<WEBURL>/admin/bibdata/displayRec.php" hint="BibData Admin - Edit Record">
+  <navbar:button id=bibdata_global_replace txt="Global Replace" url="<WEBURL>/admin/bibdata/globalReplace.php" hint="BibData Admin - Global Replace">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
@@ -260,15 +260,15 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=BEH_display txt="Behaviours" url="<WEBURL>/admin/bibformat/BEH_display.shtml" hint="BibFormat Admin - Behaviours">
-  <navbar:button id=OAIER_display txt="Extraction&nbsp;Rules" url="<WEBURL>/admin/bibformat/OAIER_display.shtml" hint="BibFormat Admin - Extraction Rules">
-  <navbar:button id=LINK_display txt="Link Rules" url="<WEBURL>/admin/bibformat/LINK_display.shtml" hint="BibFormat Admin - Link Rules">
-  <navbar:button id=LINK_FORMAT_display txt="File Formats" url="<WEBURL>/admin/bibformat/LINK_FORMAT_display.shtml" hint="BibFormat Admin - File Formats">
-  <navbar:button id=UDF_display txt="UDFs" url="<WEBURL>/admin/bibformat/UDF_display.shtml" hint="BibFormat Admin - User Defined Functions">
-  <navbar:button id=FORMAT_display txt="Formats" url="<WEBURL>/admin/bibformat/FORMAT_display.shtml" hint="BibFormat Admin - Formats">
-  <navbar:button id=KB_display txt="KBs" url="<WEBURL>/admin/bibformat/KB_display.shtml" hint="BibFormat Admin - Knowledge Bases">
-  <navbar:button id=test txt="Execution Test" url="<WEBURL>/admin/bibformat/test.shtml" hint="BibFormat Admin - Execution Test">
-  <navbar:button id=BIBREFORMAT_display txt="Reformat Records" url="<WEBURL>/admin/bibformat/BIBREFORMAT_display.shtml" hint="BibFormat Admin - Reformat Records">
+  <navbar:button id=BEH_display txt="Behaviours" url="<WEBURL>/admin/bibformat/BEH_display.php" hint="BibFormat Admin - Behaviours">
+  <navbar:button id=OAIER_display txt="Extraction&nbsp;Rules" url="<WEBURL>/admin/bibformat/OAIER_display.php" hint="BibFormat Admin - Extraction Rules">
+  <navbar:button id=LINK_display txt="Link Rules" url="<WEBURL>/admin/bibformat/LINK_display.php" hint="BibFormat Admin - Link Rules">
+  <navbar:button id=LINK_FORMAT_display txt="File Formats" url="<WEBURL>/admin/bibformat/LINK_FORMAT_display.php" hint="BibFormat Admin - File Formats">
+  <navbar:button id=UDF_display txt="UDFs" url="<WEBURL>/admin/bibformat/UDF_display.php" hint="BibFormat Admin - User Defined Functions">
+  <navbar:button id=FORMAT_display txt="Formats" url="<WEBURL>/admin/bibformat/FORMAT_display.php" hint="BibFormat Admin - Formats">
+  <navbar:button id=KB_display txt="KBs" url="<WEBURL>/admin/bibformat/KB_display.php" hint="BibFormat Admin - Knowledge Bases">
+  <navbar:button id=test txt="Execution Test" url="<WEBURL>/admin/bibformat/test.php" hint="BibFormat Admin - Execution Test">
+  <navbar:button id=BIBREFORMAT_display txt="Reformat Records" url="<WEBURL>/admin/bibformat/BIBREFORMAT_display.php" hint="BibFormat Admin - Reformat Records">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
