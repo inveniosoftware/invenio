@@ -26,6 +26,54 @@ AM_INIT_AUTOMAKE(cdsware, 0.0.9+)
 ## Check for install:
 AC_PROG_INSTALL
 
+## Define WEBDIR directory:
+AC_ARG_WITH(webdir, AC_HELP_STRING([--with-webdir], [specify where the web files go (e.g. /var/www/cdsware/)]), WEBDIR=${withval})
+if test -z "$WEBDIR"; then
+   AC_MSG_ERROR([
+   You have not used the "--with-webdir" argument that should define the installation directory for Web programs and documents.  
+   Example: "--with-webdir=/var/www/cdsware/".])
+fi   
+
+## Define WEBURL URL:
+AC_ARG_WITH(weburl, AC_HELP_STRING([--with-weburl], [specify URL where web files will be reached (e.g. http://cdsdev.cern.ch/cdsware/)]), WEBURL=${withval})
+if test -z "$WEBURL"; then
+   AC_MSG_ERROR([
+   You have not used the "--with-weburl" argument that should define the corresponding URL where the site will be reached.  
+   Example: "--with-weburl=http://webserver.domain.com/cdsware/".])
+fi   
+
+## Define DBHOST database host:
+AC_ARG_WITH(dbhost, AC_HELP_STRING([--with-dbhost], [specify DB server (e.g. cdsdb.cern.ch)]), DBHOST=${withval})
+if test -z "$DBHOST"; then
+   AC_MSG_ERROR([
+   You have not used the "--with-dbhost" argument that should define which DB server to use.  
+   Example: "--with-dbhost=sqlserver.domain.com".])
+fi   
+
+## Define DBNAME database name:
+AC_ARG_WITH(dbname, AC_HELP_STRING([--with-dbname], [specify DB name (e.g. cdsware)]), DBNAME=${withval})
+if test -z "$DBNAME"; then
+   AC_MSG_ERROR([
+   You have not used the "--with-dbname" argument that should define DB name.  
+   Example: "--with-dbname=cdsware".])
+fi   
+
+## Define DBUSER user name:
+AC_ARG_WITH(dbuser, AC_HELP_STRING([--with-dbuser], [specify DB user name (e.g. cdsware)]), DBUSER=${withval})
+if test -z "$DBUSER"; then
+   AC_MSG_ERROR([
+   You have not used the "--with-dbuser" argument that should define DB user name.  
+   Example: "--with-dbuser=cdsware".])
+fi   
+
+## Define DBPASS user password:
+AC_ARG_WITH(dbpass, AC_HELP_STRING([--with-dbpass], [specify DB user password (e.g. myp1ss)]), DBPASS=${withval})
+if test -z "$DBPASS"; then
+   AC_MSG_ERROR([
+   You have not used the "--with-dbpass" argument that should define DB user password.  
+   Example: "--with-dbpass=myp1ss".])
+fi   
+
 ## Check for WML:
 AC_PATH_PROG(WML, wml)
 if test -z "$WML"; then
@@ -373,78 +421,6 @@ if test -z "$PNMSCALE"; then
    <http://www.acme.com/software/pbmplus/>.])
 fi
 
-## Define HTDOCSDIR directory:
-AC_ARG_WITH(htdocsdir, AC_HELP_STRING([--with-htdocsdir], [specify where htdocs files go (e.g. /soft/httpd/host/cdsdev/htdocs/MPI/)]), HTDOCSDIR=${withval})
-if test -z "$HTDOCSDIR"; then
-   AC_MSG_ERROR([
-   You have not used the "--with-htdocsdir" argument that should define the installation directory for HTML documents.  
-   Example: "--with-htdocsdir=/soft/httpd/host/cdsdev/htdocs/MPI/".])
-fi   
-
-## Define CGIBIDIR directory:
-AC_ARG_WITH(cgibindir, AC_HELP_STRING([--with-cgibindir], [specify where cgibin files go (e.g. /soft/httpd/host/cdsdev/cgi-bin/MPI/)]), CGIBINDIR=${withval})
-if test -z "$CGIBINDIR"; then
-   AC_MSG_ERROR([
-   You have not used the "--with-cgibindir" argument that should define the installation directory for CGI scripts.  
-   Example: "--with-cgibindir=/soft/httpd/host/cdsdev/cgi-bin/MPI/".])
-fi   
-
-## Define DBUTILDIR directory:
-AC_ARG_WITH(dbutildir, AC_HELP_STRING([--with-dbutildir], [specify where dbutil files go (e.g. /usr/local/bin/MPI/)]), DBUTILDIR=${withval})
-if test -z "$DBUTILDIR"; then
-   AC_MSG_ERROR([
-   You have not used the "--with-dbutil" argument that should define the installation directory for DB utilitites.  
-   Example: "--with-dbutildir=/usr/local/bin/MPI/".])
-fi   
-
-## Define HTDOCSURL URL:
-AC_ARG_WITH(htdocsurl, AC_HELP_STRING([--with-htdocsurl], [specify URL where htdocs files will be reached (e.g. http://cdsdev.cern.ch/MPI/)]), HTDOCSURL=${withval})
-if test -z "$HTDOCSURL"; then
-   AC_MSG_ERROR([
-   You have not used the "--with-htdocsurl" argument that should define the URL where the HTML documents will be reached.  
-   Example: "--with-htdocsurl=http://cdsdev.cern.ch/MPI/".])
-fi   
-
-## Define CGIBINURL URL:
-AC_ARG_WITH(cgibinurl, AC_HELP_STRING([--with-cgibinurl], [specify URL where CGI scripts will be reached (e.g. http://cdsdev.cern.ch/cgi-bin/MPI/)]), CGIBINURL=${withval})
-if test -z "$CGIBINURL"; then
-   AC_MSG_ERROR([
-   You have not used the "--with-cgibinurl" argument that should define the URL where the HTML documents will be reached.  
-   Example: "--with-cgibinurl=http://cdsdev.cern.ch/cgi-bin/MPI/".])
-fi   
-
-## Define DBHOST database host:
-AC_ARG_WITH(dbhost, AC_HELP_STRING([--with-dbhost], [specify DB server (e.g. cdsdb.cern.ch)]), DBHOST=${withval})
-if test -z "$DBHOST"; then
-   AC_MSG_ERROR([
-   You have not used the "--with-dbhost" argument that should define which DB server to use.  
-   Example: "--with-dbhost=cdsdb.cern.ch".])
-fi   
-
-## Define DBNAME database name:
-AC_ARG_WITH(dbname, AC_HELP_STRING([--with-dbname], [specify DB name (e.g. cdsware)]), DBNAME=${withval})
-if test -z "$DBNAME"; then
-   AC_MSG_ERROR([
-   You have not used the "--with-dbname" argument that should define DB name.  
-   Example: "--with-dbname=cdsware".])
-fi   
-
-## Define DBUSER user name:
-AC_ARG_WITH(dbuser, AC_HELP_STRING([--with-dbuser], [specify DB user name (e.g. cdsware)]), DBUSER=${withval})
-if test -z "$DBUSER"; then
-   AC_MSG_ERROR([
-   You have not used the "--with-dbuser" argument that should define DB user name.  
-   Example: "--with-dbuser=cdsware".])
-fi   
-
-## Define DBPASS user password:
-AC_ARG_WITH(dbpass, AC_HELP_STRING([--with-dbpass], [specify DB user password (e.g. myp1ss)]), DBPASS=${withval})
-if test -z "$DBPASS"; then
-   AC_MSG_ERROR([
-   You have not used the "--with-dbpass" argument that should define DB user password.  
-   Example: "--with-dbpass=myp1ss".])
-fi   
-
 ## Substitute variables:
 AC_SUBST(VERSION)
 AC_SUBST(WML)
@@ -452,11 +428,9 @@ AC_SUBST(MYSQL)
 AC_SUBST(PHP)
 AC_SUBST(PERL)
 AC_SUBST(PYTHON)
-AC_SUBST(HTDOCSDIR)
-AC_SUBST(CGIBINDIR)
-AC_SUBST(DBUTILDIR)
-AC_SUBST(HTDOCSURL)
-AC_SUBST(CGIBINURL)
+AC_SUBST(WEBDIR)
+AC_SUBST(CLIDIR)
+AC_SUBST(WEBURL)
 AC_SUBST(DBHOST)
 AC_SUBST(DBNAME)
 AC_SUBST(DBUSER)
@@ -476,31 +450,45 @@ AC_CONFIG_FILES([Makefile \
 	  config/Makefile \
 	  config/configbis.wml \
 	  modules/Makefile \
-	  modules/websearch/Makefile \
-	  modules/websearch/admin/Makefile \
-	  modules/websearch/cli/Makefile \
-	  modules/websearch/web/Makefile \
 	  modules/bibwords/Makefile \
-	  modules/bibwords/admin/Makefile \
-	  modules/bibwords/cli/Makefile \
+	  modules/bibwords/bin/Makefile \
 	  modules/bibupload/Makefile \
-	  modules/bibupload/admin/Makefile \
-	  modules/bibupload/cli/Makefile \
+	  modules/bibupload/bin/Makefile \
+	  modules/bibformat/Makefile \
+	  modules/bibformat/bin/Makefile \
+	  modules/bibformat/lib/Makefile \
+	  modules/bibformat/lib/core/Makefile \
+	  modules/bibformat/lib/common/Makefile \
+	  modules/bibformat/doc/Makefile \
+	  modules/bibformat/web/Makefile \
+	  modules/bibformat/web/admin/Makefile \
+	  modules/websearch/Makefile \
+	  modules/websearch/bin/Makefile \
+	  modules/websearch/lib/Makefile \
+	  modules/websearch/web/Makefile \
+	  modules/websession/Makefile \
+	  modules/websession/web/Makefile \
+	  modules/webstyle/Makefile \
+	  modules/webstyle/css/Makefile \
+	  modules/webstyle/img/Makefile \
+	  modules/webstyle/lib/Makefile \
+	  modules/miscutil/Makefile \
+	  modules/miscutil/bin/Makefile \
+	  modules/miscutil/lib/Makefile \
+	  modules/miscutil/demo/Makefile \
+	  modules/miscutil/sql/Makefile \
 	  ])
 
 ## Finally, write output files:
 AC_OUTPUT
 
 ## Write help:
-
 AC_MSG_RESULT([****************************************************************************])
 AC_MSG_RESULT([** Your CERN Document Server Software (CDSware) installation is now ready **]) 
 AC_MSG_RESULT([** for building.  You have entered the following parameters:              **]) 
-AC_MSG_RESULT([**   - HTML documents install directory: $HTDOCSDIR])
-AC_MSG_RESULT([**   - CGI scripts install directory: $CGIBINDIR])
-AC_MSG_RESULT([**   - DB utilities install directory: $DBUTILDIR])
-AC_MSG_RESULT([**   - HTML documents home URL: $HTDOCSURL])
-AC_MSG_RESULT([**   - CGI scripts home URL: $CGIBINURL])
+AC_MSG_RESULT([**   - CDSware main install directory: ${prefix}])
+AC_MSG_RESULT([**   - Web install directory: $WEBDIR])
+AC_MSG_RESULT([**   - Web home URL: $WEBURL])
 AC_MSG_RESULT([**   - DB server: $DBHOST])
 AC_MSG_RESULT([**   - DB name: $DBNAME])
 AC_MSG_RESULT([**   - DB username: $DBUSER])
@@ -510,6 +498,7 @@ AC_MSG_RESULT([**   1) Customize self-explanatory config file './config/config.w
 AC_MSG_RESULT([**   2) Type 'make' to build your customized CDSware installation.        **])
 AC_MSG_RESULT([**   3) Type 'make create-tables' if you have not created tables before.  **])
 AC_MSG_RESULT([**   4) Type 'make install' to install the system.                        **])
+AC_MSG_RESULT([**   5) Type 'make create-demo-site' to install and test the demo site.   **])
 AC_MSG_RESULT([** Good luck, and thanks for choosing the CERN Document Server Software.  **])
 AC_MSG_RESULT([**              -- CDS Development Group <cds.support@cern.ch>            **])
 AC_MSG_RESULT([****************************************************************************])
