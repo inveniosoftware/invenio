@@ -51,6 +51,11 @@
     $header =~ s/<!--CDSNAMEINTL-->/<CDSNAMEINTL>/g;
     $header =~ s/<!--MSGSEARCH-->/<MSG_SEARCH>/g;
     $header =~ s/<!--MSGSUBMIT-->/<MSG_SUBMIT>/g;
+    $header =~ s/<!--MSGCONVERT-->/<MSG_CONVERT>/g;
+    $header =~ s/<!--MSGAGENDA-->/<MSG_AGENDA>/g;
+    $header =~ s/<!--MSGWEBCAST-->/<MSG_WEBCAST>/g;
+    $header =~ s/<!--MSGBULLETIN-->/<MSG_BULLETIN>/g;
+    $header =~ s/<!--MSGLIBRARY-->/<MSG_LIBRARY>/g;
     $header =~ s/<!--MSGHELP-->/<MSG_HELP>/g;
     $header =~ s/<!--LN-->/<lang:star: *>/g;
     print $header;
