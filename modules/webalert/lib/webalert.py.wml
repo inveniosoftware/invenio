@@ -520,6 +520,6 @@ def account_list_searches(uid):
     except:
         pass
     
-    out +=""" You have made %s queries.A <A href="../youralerts.py/display">detailed list</A> is available with a poosibility to (a) view search results and (b) subscribe for automatic email alerting service for these queries
+    out +=""" You have made %s queries.A <A href="../youralerts.py/display">detailed list</A> is available with a posibility to (a) view search results and (b) subscribe for automatic email alerting service for these queries
 	  """ %nb_queries_total
     return out	
