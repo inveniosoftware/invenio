@@ -21,7 +21,7 @@ pylibdir=$(libdir)/python/cdsware
 pylib_DATA=__init__.py config.py dbquery.py messages.py
 
 phplibdir=$(libdir)/php/cdsware/errors
-phplib_DATA=errorHandling.shtml
+phplib_DATA=errorHandling.php
 
 EXTRA_DIST = $(wildcard *.wml)
 
@@ -31,6 +31,6 @@ CLEANFILES = $(pylib_DATA) $(phplib_DATA) *~ *.tmp *.pyc
       ../../../config/messages.wml
 	$(WML) -o $@ $<
 
-%.shtml: %.shtml.wml ../../../config/config.wml ../../../config/configbis.wml \
+%.php: %.php.wml ../../../config/config.wml ../../../config/configbis.wml \
       ../../../config/messages.wml
 	$(WML) -o $@ $<
