@@ -41,34 +41,13 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> </navbar:prolog>
 
-  <navbar:button id=search txt="Search" url="<HTDOCSURL>" hint="CDSware Search">
+  <navbar:button id=searchbiblinfo txt="Search" url="<HTDOCSURL>" hint="CDSware Search">
   <navbar:button id=submit txt="Submit" url="<HTDOCSURL>/submit/" hint="CDSware Submit">
   <navbar:button id=personalize txt="Personalize" url="<HTDOCSURL>/personalize/" hint="CDSware Personalize" menu="personalize">
   <navbar:button id=documentation txt="Documentation" url="<HTDOCSURL>/docs/" hint="CDSware Documentation" menu="documentation">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
   <navbar:epilog type=S> </small></td><td></td></tr></navbar:epilog>
-
-  <navbar:footer>
-    </table>
-  </navbar:footer>
-</navbar:define>
-
-## navbar search:
-<navbar:define name=search
-        imgbase="img/" urlbase="$(ROOT)">
-  <navbar:header>
-    <table cellspacing=0 cellpadding=1 border=0>
-  </navbar:header>
-
-  <navbar:prolog><tr valign=top><td></td><td align=left><small> </navbar:prolog>
-
-  <navbar:button id=button1 txt="whatever" url="<HTDOCSURL>" hint="CDSware Search">
-  <navbar:button id=button2 txt="one" url="<HTDOCSURL>" hint="CDSware Search">
-  <navbar:button id=button3 txt="can" url="<HTDOCSURL>" hint="CDSware Search">
-  <navbar:button id=button4 txt="imagine" url="<HTDOCSURL>" hint="CDSware Search">
-
-  <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
   <navbar:footer>
     </table>
