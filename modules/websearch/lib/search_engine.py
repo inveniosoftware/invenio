@@ -1939,7 +1939,7 @@ def get_field_tags(field):
     return out
 
 def get_fieldvalues(recID, tag):
-    """Return list of field values for field 'tag' inside record 'recID'."""
+    """Return list of field values for field TAG inside record RECID."""
     out = []
     if tag == "001___":
         # we have asked for recID that is not stored in bibXXx tables
@@ -2015,12 +2015,19 @@ def get_fieldvalues_alephseq_like(recID, tags):
     return out
 
 def record_exists(recID):
-    "Returns 1 if record 'recID' exists.  Returns 0 otherwise."
+    """Return 1 if record RECID exists.
+       Return 0 if it doesn't exist.
+       Return -1 if it exists but is marked as deleted."""
     out = 0
     query = "SELECT id FROM bibrec WHERE id='%s'" % recID
     res = run_sql(query, None, 1)
-    if res:        
-        out = 1
+    if res:
+        # record exists; now check whether it isn't marked as deleted:
+        dbcollids = get_fieldvalues(recID, "980__%")
+        if ("DELETED" in dbcollids) or (cfg_cern_site and "DUMMY" in dbcollids):
+            out = -1 # exists, but marked as deleted
+        else:
+            out = 1 # exists fine
     return out    
 
 def get_creation_date(recID, fmt="%Y-%m-%d"):
@@ -2334,10 +2341,11 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, de
                 req.write("</small></div>\n")
                 for irec in range(irec_max,irec_min,-1):
                     req.write(print_record(recIDs[irec], format, ot, ln))
-                    req.write("""\n<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
-                    req.write("""<input name="recid" type="hidden" value="%s"></td>""" % recIDs[irec])
-                    req.write("""<br><input class="formbutton" type="submit" name="action" value="%s">"""  % msg_add_to_basket[ln])
-                    req.write("""\n</form>""")
+                    if record_exists(irec)==1:
+                        req.write("""\n<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
+                        req.write("""<input name="recid" type="hidden" value="%s"></td>""" % recIDs[irec])
+                        req.write("""<br><input class="formbutton" type="submit" name="action" value="%s">"""  % msg_add_to_basket[ln])
+                        req.write("""\n</form>""")
                     req.write("<p>&nbsp;")
     else:        
         print_warning(req, 'Use different search terms.')        
@@ -2347,7 +2355,8 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     out = ""
 
     # sanity check:
-    if not record_exists(recID):
+    record_exist_p = record_exists(recID)
+    if record_exist_p == 0: # doesn't exist
         return out
 
     # print record opening tags, if needed:
@@ -2364,7 +2373,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
         # look for detailed format existence:
         query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
         res = run_sql(query, None, 1)
-        if res:
+        if res and record_exist_p==1:
             # record 'recID' is formatted in 'format', so print it
             out += "%s" % decompress(res[0][0])
         else:
@@ -2375,44 +2384,53 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
             elif format.startswith("xm"):
                 out += """    <record>\n"""
                 out += "        <controlfield tag=\"001\">%d</controlfield>\n" % int(recID)
-            for digit1 in range(0,10):
-                for digit2 in range(0,10):
-                    bx = "bib%d%dx" % (digit1, digit2)
-                    bibx = "bibrec_bib%d%dx" % (digit1, digit2)
-                    query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
-                            "WHERE bb.id_bibrec='%s' AND b.id=bb.id_bibxxx AND b.tag LIKE '%s%%' "\
-                            "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx, recID, str(digit1)+str(digit2))
-                    res = run_sql(query)
-                    field_number_old = -999
-                    field_old = ""
-                    for row in res:
-                        field, value, field_number = row[0], row[1], row[2]
-                        ind1, ind2 = field[3], field[4]
-                        if ind1 == "_":
-                            ind1 = ""
-                        if ind2 == "_":
-                            ind2 = ""                        
-                        # print field tag
-                        if field_number != field_number_old or field[:-1] != field_old[:-1]:
+            if record_exist_p == -1:
+                # deleted record, so display only OAI ID and 980:
+                oai_ids = get_fieldvalues(recID, cfg_oaiidtag)
+                if oai_ids:
+                    out += "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\"><subfield code=\"%s\">%s</subfield></datafield>\n" % \
+                           (cfg_oaiidtag[0:3], cfg_oaiidtag[3:4], cfg_oaiidtag[4:5], cfg_oaiidtag[5:6], oai_ids[0])
+                out += "<datafield tag=\"980\" ind1=\"\" ind2=\"\"><subfield code=\"a\">DELETED</subfield></datafield>\n"
+            else:
+                for digit1 in range(0,10):
+                    for digit2 in range(0,10):
+                        bx = "bib%d%dx" % (digit1, digit2)
+                        bibx = "bibrec_bib%d%dx" % (digit1, digit2)
+                        query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
+                                "WHERE bb.id_bibrec='%s' AND b.id=bb.id_bibxxx AND b.tag LIKE '%s%%' "\
+                                "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx, recID, str(digit1)+str(digit2))
+                        res = run_sql(query)
+                        field_number_old = -999
+                        field_old = ""
+                        for row in res:
+                            field, value, field_number = row[0], row[1], row[2]
+                            ind1, ind2 = field[3], field[4]
+                            if ind1 == "_":
+                                ind1 = ""
+                            if ind2 == "_":
+                                ind2 = ""                        
+                            # print field tag
+                            if field_number != field_number_old or field[:-1] != field_old[:-1]:
+                                if format.startswith("xm") or format == "marcxml":
+
+                                    fieldid = encode_for_xml(field[0:3])
+
+                                    if field_number_old != -999:
+                                        out += """        </datafield>\n"""
+
+                                    out += """        <datafield tag="%s" ind1="%s" ind2="%s">\n""" % \
+                                           (encode_for_xml(field[0:3]), encode_for_xml(ind1), encode_for_xml(ind2))
+
+                                field_number_old = field_number
+                                field_old = field
+                            # print subfield value
                             if format.startswith("xm") or format == "marcxml":
+                                value = encode_for_xml(value)
+                                out += """            <subfield code="%s">%s</subfield>\n""" % (encode_for_xml(field[-1:]), value)
 
-                                fieldid = encode_for_xml(field[0:3])
-
-                                if field_number_old != -999:
-                                    out += """        </datafield>\n"""
-
-                                out += """        <datafield tag="%s" ind1="%s" ind2="%s">\n""" % (encode_for_xml(field[0:3]), encode_for_xml(ind1), encode_for_xml(ind2))
-
-                            field_number_old = field_number
-                            field_old = field
-                        # print subfield value
-                        if format.startswith("xm") or format == "marcxml":
-                            value = encode_for_xml(value)
-                            out += """            <subfield code="%s">%s</subfield>\n""" % (encode_for_xml(field[-1:]), value)
-
-                    # all fields/subfields printed in this run, so close the tag:
-                    if (format.startswith("xm") or format == "marcxml") and field_number_old != -999:
-                        out += """        </datafield>\n"""
+                        # all fields/subfields printed in this run, so close the tag:
+                        if (format.startswith("xm") or format == "marcxml") and field_number_old != -999:
+                            out += """        </datafield>\n"""
             # we are at the end of printing the record:
             if format.startswith("xm") or format == "marcxml":
                 out += "    </record>\n"
@@ -2423,28 +2441,31 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                          xsi:schemaLocation="http://purl.org/dc/elements/1.1/
                                              http://www.openarchives.org/OAI/1.1/dc.xsd">\n"""
-        for f in get_fieldvalues(recID, "041__a"):
-            out += "        <language>%s</language>\n" % f
+        if record_exist_p == -1:
+            out += ""
+        else:
+            for f in get_fieldvalues(recID, "041__a"):
+                out += "        <language>%s</language>\n" % f
 
-        for f in get_fieldvalues(recID, "100__a"):
-            out += "        <creator>%s</creator>\n" % encode_for_xml(f)
+            for f in get_fieldvalues(recID, "100__a"):
+                out += "        <creator>%s</creator>\n" % encode_for_xml(f)
 
-        for f in get_fieldvalues(recID, "700__a"):
-            out += "        <creator>%s</creator>\n" % encode_for_xml(f)
+            for f in get_fieldvalues(recID, "700__a"):
+                out += "        <creator>%s</creator>\n" % encode_for_xml(f)
 
-        for f in get_fieldvalues(recID, "245__a"):
-            out += "        <title>%s</title>\n" % encode_for_xml(f)
+            for f in get_fieldvalues(recID, "245__a"):
+                out += "        <title>%s</title>\n" % encode_for_xml(f)
 
-        for f in get_fieldvalues(recID, "65017a"):
-            out += "        <subject>%s</subject>\n" % encode_for_xml(f)
+            for f in get_fieldvalues(recID, "65017a"):
+                out += "        <subject>%s</subject>\n" % encode_for_xml(f)
 
-        for f in get_fieldvalues(recID, "8564_u"):
-            out += "        <identifier>%s</identifier>\n" % encode_for_xml(f)
-        
-        for f in get_fieldvalues(recID, "520__a"):
-            out += "        <description>%s</description>\n" % encode_for_xml(f)            
+            for f in get_fieldvalues(recID, "8564_u"):
+                out += "        <identifier>%s</identifier>\n" % encode_for_xml(f)
 
-        out += "        <date>%s</date>\n" % get_creation_date(recID)
+            for f in get_fieldvalues(recID, "520__a"):
+                out += "        <description>%s</description>\n" % encode_for_xml(f)            
+
+            out += "        <date>%s</date>\n" % get_creation_date(recID)
         out += "    </dc>\n"                    
 
     elif format.startswith("x_"):
@@ -2462,151 +2483,169 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
 
     elif format.startswith('t'):
         ## user directly asked for some tags to be displayed only
-        out += get_fieldvalues_alephseq_like(recID, ot)
+        if record_exist_p == -1:
+            out += get_fieldvalues_alephseq_like(recID, "001,%s,980" % cfg_oaiidtag)
+        else:
+            out += get_fieldvalues_alephseq_like(recID, ot)
 
     elif format == "hm":
-        out += "<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ot)) + "</pre>"
+        if record_exist_p == -1:
+            out += "<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, "001,%s,980" % cfg_oaiidtag)) + "</pre>"
+        else:
+            out += "<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ot)) + "</pre>"
 
     elif format.startswith("h") and ot:
         ## user directly asked for some tags to be displayed only
-        out += "<pre>" + get_fieldvalues_alephseq_like(recID, ot) + "</pre>"
+        if record_exist_p == -1:
+            out += "<pre>" + get_fieldvalues_alephseq_like(recID, "001,%s,980" % cfg_oaiidtag) + "</pre>"
+        else:
+            out += "<pre>" + get_fieldvalues_alephseq_like(recID, ot) + "</pre>"
 
     elif format == "hd":
         # HTML detailed format
-        # look for detailed format existence:
-        query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
-        res = run_sql(query, None, 1)
-        if res:
-            # record 'recID' is formatted in 'format', so print it
-            out += "%s" % decompress(res[0][0])
+        if record_exist_p == -1:
+            out += msg_record_deleted[ln]
         else:
-            # record 'recID' is not formatted in 'format', so either call BibFormat on the fly or use default format
-            # second, see if we are calling BibFormat on the fly:
-            if cfg_call_bibformat:
-                out += call_bibformat(recID)
+            # look for detailed format existence:
+            query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
+            res = run_sql(query, None, 1)
+            if res:
+                # record 'recID' is formatted in 'format', so print it
+                out += "%s" % decompress(res[0][0])
             else:
-                # okay, need to construct a simple "Detailed record" format of our own:
-                out += "<p>&nbsp;"
-                # secondly, title:
-                titles = get_fieldvalues(recID, "245__a")
-                for title in titles:
-                    out += "<p><p><center><big><strong>%s</strong></big></center>" % title
-                # thirdly, authors:
-                authors = get_fieldvalues(recID, "100__a") + get_fieldvalues(recID, "700__a")
-                if authors:
-                    out += "<p><p><center>"
-                    for author in authors:
-                        out += """<a href="%s/search.py?p=%s&f=author">%s</a> ;""" % (weburl, urllib.quote(author), author)
-                    out += "</center>"
-                # fourthly, date of creation:
-                dates = get_fieldvalues(recID, "260__c")
-                for date in dates:
-                    out += "<p><center><small>%s</small></center>" % date
-                # fifthly, abstract:
-                abstracts = get_fieldvalues(recID, "520__a")
-                for abstract in abstracts:
-                    out += """<p style="margin-left: 15%%; width: 70%%">
-                             <small><strong>Abstract:</strong> %s</small></p>""" % abstract
-                # fifthly bis, keywords:
-                keywords = get_fieldvalues(recID, "6531_a")
-                if len(keywords):
-                    out += """<p style="margin-left: 15%; width: 70%">
-                             <small><strong>Keyword(s):</strong></small>"""
-                    for keyword in keywords:
-                        out += """<small><a href="%s/search.py?p=%s&f=keyword">%s</a> ;</small> """ % (weburl, urllib.quote(keyword), keyword)
-                # fifthly bis bis, published in:
-                prs_p = get_fieldvalues(recID, "909C4p")
-                prs_v = get_fieldvalues(recID, "909C4v")
-                prs_y = get_fieldvalues(recID, "909C4y")
-                prs_n = get_fieldvalues(recID, "909C4n")
-                prs_c = get_fieldvalues(recID, "909C4c")
-                for idx in range(0,len(prs_p)):
-                    out += """<p style="margin-left: 15%%; width: 70%%">
-                             <small><strong>Publ. in:</strong> %s"""  % prs_p[idx]
-                    if prs_v and prs_v[idx]:
-                        out += """<strong>%s</strong>""" % prs_v[idx]
-                    if prs_y and prs_y[idx]:
-                        out += """(%s)""" % prs_y[idx]
-                    if prs_n and prs_n[idx]:
-                        out += """, no.%s""" % prs_n[idx]
-                    if prs_c and prs_c[idx]:
-                        out += """, p.%s""" % prs_c[idx]
-                    out += """.</small>"""
-                # sixthly, fulltext link:
-                urls_z = get_fieldvalues(recID, "8564_z")
-                urls_u = get_fieldvalues(recID, "8564_u")
-                for idx in range(0,len(urls_u)):
-                    link_text = "URL"
-                    if urls_z[idx]:
-                        link_text = urls_z[idx]
-                    out += """<p style="margin-left: 15%%; width: 70%%">
-                    <small><strong>%s:</strong> <a href="%s">%s</a></small>""" % (link_text, urls_u[idx], urls_u[idx])
-                # print some white space at the end:
-                out += "<p><p>"
+                # record 'recID' is not formatted in 'format', so either call BibFormat on the fly or use default format
+                # second, see if we are calling BibFormat on the fly:
+                if cfg_call_bibformat:
+                    out += call_bibformat(recID)
+                else:
+                    # okay, need to construct a simple "Detailed record" format of our own:
+                    out += "<p>&nbsp;"
+                    # secondly, title:
+                    titles = get_fieldvalues(recID, "245__a")
+                    for title in titles:
+                        out += "<p><p><center><big><strong>%s</strong></big></center>" % title
+                    # thirdly, authors:
+                    authors = get_fieldvalues(recID, "100__a") + get_fieldvalues(recID, "700__a")
+                    if authors:
+                        out += "<p><p><center>"
+                        for author in authors:
+                            out += """<a href="%s/search.py?p=%s&f=author">%s</a> ;""" % (weburl, urllib.quote(author), author)
+                        out += "</center>"
+                    # fourthly, date of creation:
+                    dates = get_fieldvalues(recID, "260__c")
+                    for date in dates:
+                        out += "<p><center><small>%s</small></center>" % date
+                    # fifthly, abstract:
+                    abstracts = get_fieldvalues(recID, "520__a")
+                    for abstract in abstracts:
+                        out += """<p style="margin-left: 15%%; width: 70%%">
+                                 <small><strong>Abstract:</strong> %s</small></p>""" % abstract
+                    # fifthly bis, keywords:
+                    keywords = get_fieldvalues(recID, "6531_a")
+                    if len(keywords):
+                        out += """<p style="margin-left: 15%; width: 70%">
+                                 <small><strong>Keyword(s):</strong></small>"""
+                        for keyword in keywords:
+                            out += """<small><a href="%s/search.py?p=%s&f=keyword">%s</a> ;</small> """ % (weburl, urllib.quote(keyword), keyword)
+                    # fifthly bis bis, published in:
+                    prs_p = get_fieldvalues(recID, "909C4p")
+                    prs_v = get_fieldvalues(recID, "909C4v")
+                    prs_y = get_fieldvalues(recID, "909C4y")
+                    prs_n = get_fieldvalues(recID, "909C4n")
+                    prs_c = get_fieldvalues(recID, "909C4c")
+                    for idx in range(0,len(prs_p)):
+                        out += """<p style="margin-left: 15%%; width: 70%%">
+                                 <small><strong>Publ. in:</strong> %s"""  % prs_p[idx]
+                        if prs_v and prs_v[idx]:
+                            out += """<strong>%s</strong>""" % prs_v[idx]
+                        if prs_y and prs_y[idx]:
+                            out += """(%s)""" % prs_y[idx]
+                        if prs_n and prs_n[idx]:
+                            out += """, no.%s""" % prs_n[idx]
+                        if prs_c and prs_c[idx]:
+                            out += """, p.%s""" % prs_c[idx]
+                        out += """.</small>"""
+                    # sixthly, fulltext link:
+                    urls_z = get_fieldvalues(recID, "8564_z")
+                    urls_u = get_fieldvalues(recID, "8564_u")
+                    for idx in range(0,len(urls_u)):
+                        link_text = "URL"
+                        if urls_z[idx]:
+                            link_text = urls_z[idx]
+                        out += """<p style="margin-left: 15%%; width: 70%%">
+                        <small><strong>%s:</strong> <a href="%s">%s</a></small>""" % (link_text, urls_u[idx], urls_u[idx])
+                    # print some white space at the end:
+                    out += "<p><p>"
 
     elif format.startswith("hb_") or format.startswith("hd_"):
         # underscore means that HTML brief/detailed formats should be called on-the-fly; suitable for testing formats
-        out += call_bibformat(recID, format)
+        if record_exist_p == -1:
+            out += msg_record_deleted[ln]
+        else:
+            out += call_bibformat(recID, format)
 
     else:
         # HTML brief format by default
-        query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
-        res = run_sql(query)
-        if res:
-            # record 'recID' is formatted in 'format', so print it
-            out += "%s" % decompress(res[0][0])
+        if record_exist_p == -1:
+            out += msg_record_deleted[ln]
         else:
-            # record 'recID' does not exist in format 'format', so print some default format:
-            # firstly, title:
-            titles = get_fieldvalues(recID, "245__a")
-            for title in titles:
-                out += "<strong>%s</strong> " % title
-            # secondly, authors:
-            authors = get_fieldvalues(recID, "100__a") + get_fieldvalues(recID, "700__a")
-            if authors:
-                out += " / "
-                for i in range (0,cfg_author_et_al_threshold):
-                    if i < len(authors):
-                        out += """<a href="%s/search.py?p=%s&f=author">%s</a> ;""" % (weburl, urllib.quote(authors[i]), authors[i])
-                if len(authors) > cfg_author_et_al_threshold:
-                    out += " <em>et al.</em>"
-            # thirdly, date of creation:
-            dates = get_fieldvalues(recID, "260__c")
-            for date in dates:
-                out += " %s." % date
-            # thirdly bis, report numbers:
-            rns = get_fieldvalues(recID, "037__a")
-            for rn in rns:
-                out += """ <small class="quicknote">[%s]</small>""" % rn
-            rns = get_fieldvalues(recID, "088__a")
-            for rn in rns:
-                out += """ <small class="quicknote">[%s]</small>""" % rn
-            # fourthly, beginning of abstract:
-            abstracts = get_fieldvalues(recID, "520__a")
-            for abstract in abstracts:
-                out += "<br><small>%s [...]</small>" % abstract[:1+string.find(abstract, '.')]
-            # fifthly, fulltext link:
-            urls_z = get_fieldvalues(recID, "8564_z")
-            urls_u = get_fieldvalues(recID, "8564_u")
-            for idx in range(0,len(urls_u)):
-                out += """<br><small class="note"><a class="note" href="%s">%s</a></small>""" % (urls_u[idx], urls_u[idx])
+            query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
+            res = run_sql(query)
+            if res:
+                # record 'recID' is formatted in 'format', so print it
+                out += "%s" % decompress(res[0][0])
+            else:
+                # record 'recID' does not exist in format 'format', so print some default format:
+                # firstly, title:
+                titles = get_fieldvalues(recID, "245__a")
+                for title in titles:
+                    out += "<strong>%s</strong> " % title
+                # secondly, authors:
+                authors = get_fieldvalues(recID, "100__a") + get_fieldvalues(recID, "700__a")
+                if authors:
+                    out += " / "
+                    for i in range (0,cfg_author_et_al_threshold):
+                        if i < len(authors):
+                            out += """<a href="%s/search.py?p=%s&f=author">%s</a> ;""" % (weburl, urllib.quote(authors[i]), authors[i])
+                    if len(authors) > cfg_author_et_al_threshold:
+                        out += " <em>et al.</em>"
+                # thirdly, date of creation:
+                dates = get_fieldvalues(recID, "260__c")
+                for date in dates:
+                    out += " %s." % date
+                # thirdly bis, report numbers:
+                rns = get_fieldvalues(recID, "037__a")
+                for rn in rns:
+                    out += """ <small class="quicknote">[%s]</small>""" % rn
+                rns = get_fieldvalues(recID, "088__a")
+                for rn in rns:
+                    out += """ <small class="quicknote">[%s]</small>""" % rn
+                # fourthly, beginning of abstract:
+                abstracts = get_fieldvalues(recID, "520__a")
+                for abstract in abstracts:
+                    out += "<br><small>%s [...]</small>" % abstract[:1+string.find(abstract, '.')]
+                # fifthly, fulltext link:
+                urls_z = get_fieldvalues(recID, "8564_z")
+                urls_u = get_fieldvalues(recID, "8564_u")
+                for idx in range(0,len(urls_u)):
+                    out += """<br><small class="note"><a class="note" href="%s">%s</a></small>""" % (urls_u[idx], urls_u[idx])
 
-        # at the end of HTML mode, print the "Detailed record" functionality:
-        if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
-            pass # do nothing for portfolio and on-the-fly formats
-        else:
-            if cfg_use_aleph_sysnos:
-                alephsysnos = get_fieldvalues(recID, "970__a")
-                if len(alephsysnos)>0:
-                    alephsysno = alephsysnos[0]
-                    out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?sysno=%s&amp;ln=%s">%s</a></span>""" \
-                           % (weburl, alephsysno, ln, msg_detailed_record[ln])
+            # at the end of HTML mode, print the "Detailed record" functionality:
+            if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
+                pass # do nothing for portfolio and on-the-fly formats
+            else:
+                if cfg_use_aleph_sysnos:
+                    alephsysnos = get_fieldvalues(recID, "970__a")
+                    if len(alephsysnos)>0:
+                        alephsysno = alephsysnos[0]
+                        out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?sysno=%s&amp;ln=%s">%s</a></span>""" \
+                               % (weburl, alephsysno, ln, msg_detailed_record[ln])
+                    else:
+                        out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s&amp;ln=%s">%s</a></span>""" \
+                               % (weburl, recID, ln, msg_detailed_record[ln])
                 else:
                     out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s&amp;ln=%s">%s</a></span>""" \
                            % (weburl, recID, ln, msg_detailed_record[ln])
-            else:
-                out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s&amp;ln=%s">%s</a></span>""" \
-                       % (weburl, recID, ln, msg_detailed_record[ln])
 
     # print record closing tags, if needed:
     if format == "marcxml" or format == "oai_dc":
