@@ -35,18 +35,18 @@
 //---------------------------------------------------------------------
 
 
-  define(DB, COMMON_DIR."/dbparams.inc.shtml");
-  define(FUNCTION_LIB, COMMON_DIR."/general.inc.shtml");
+  define(DB, COMMON_DIR."/dbparams.inc.php");
+  define(FUNCTION_LIB, COMMON_DIR."/general.inc.php");
   
-  define(MAIN, CORE_DIR."/FlexElink.inc.shtml");
-  define(RECORD_SEP, CORE_DIR."/RecordSeparator.inc.shtml");
-  define(VARIABLE_EXT, CORE_DIR."/OAISpecExtractor.inc.shtml");
-  define(PROCESSOR, CORE_DIR."/Processor.inc.shtml");
-  define(EXECUTOR, CORE_DIR."/AEvalLan.inc.shtml");
-  define(UDF_RETRIEVER, CORE_DIR."/UDFRetriever.inc.shtml");
-  define(FORMAT_RETRIEVER, CORE_DIR."/FormatRetriever.inc.shtml");
-  define(KB_RETRIEVER, CORE_DIR."/KBRetriever.inc.shtml");
-  define(INTVARS, CORE_DIR."/IntVars.inc.shtml");
-  define(LINK_RESOLVER, CORE_DIR."/LinkResolver.inc.shtml");
+  define(MAIN, CORE_DIR."/FlexElink.inc.php");
+  define(RECORD_SEP, CORE_DIR."/RecordSeparator.inc.php");
+  define(VARIABLE_EXT, CORE_DIR."/OAISpecExtractor.inc.php");
+  define(PROCESSOR, CORE_DIR."/Processor.inc.php");
+  define(EXECUTOR, CORE_DIR."/AEvalLan.inc.php");
+  define(UDF_RETRIEVER, CORE_DIR."/UDFRetriever.inc.php");
+  define(FORMAT_RETRIEVER, CORE_DIR."/FormatRetriever.inc.php");
+  define(KB_RETRIEVER, CORE_DIR."/KBRetriever.inc.php");
+  define(INTVARS, CORE_DIR."/IntVars.inc.php");
+  define(LINK_RESOLVER, CORE_DIR."/LinkResolver.inc.php");
 
 ?>

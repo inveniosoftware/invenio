@@ -100,7 +100,7 @@ class FlexElink {
     if($record=="")
       return array(-1, "");
     //More records
-    set_time_limit(1000);
+    set_time_limit(<CFG_BIBFORMAT_TIME_LIMIT>);
     $vars=$this->extractor->getVars("DEFAULT", $record);
     if($vars==null)
       return array(0, $this->extractor->getError());
