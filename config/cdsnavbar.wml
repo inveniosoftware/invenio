@@ -32,158 +32,53 @@
 
 #use wml::des::navbar
 
-## navbar main:
-<navbar:define name=main-old
-        imgbase="img/" urlbase="$(ROOT)">
-  <navbar:header>
-    <table cellspacing=0 cellpadding=1 border=0>
-  </navbar:header>
-
-  <navbar:prolog><tr valign=top><td></td><td align=left><small> </navbar:prolog>
-
-  <navbar:button id=searchbiblinfo txt="Search" url="<WEBURL>" hint="CDSware Search" menu="search">
-  <navbar:button id=submit txt="Submit" url="<WEBURL>/submit/" hint="CDSware Submit" menu="submit">
-
-  <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
-  <navbar:epilog type=S> </small></td><td></td></tr></navbar:epilog>
-
-  <navbar:footer>
-    </table>
-  </navbar:footer>
-</navbar:define>
-
-## navbar submit:
-<navbar:define name=submit
-        imgbase="img/" urlbase="$(ROOT)">
-  <navbar:header>
-    <table cellspacing=0 cellpadding=1 border=0>
-  </navbar:header>
-
-  <navbar:prolog><tr valign=top><td></td><td align=left><small> </navbar:prolog>
-  <navbar:button id=submit_submit txt="Submit Documents" url="<WEBURL>/submit/" hint="Submit Documents">
-  <navbar:button id=submit_referee txt="Check Documents Status" url="<WEBURL>/submit/publiline/inotes/DAMStat.php" hint="Refereeing Process">
-  <navbar:button id=submit_doc txt="Help" url="<WEBURL>/help/submit" hint="Help">
-
-  <Navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
-
-  <navbar:footer>
-    </table>
-  </navbar:footer>
-</navbar:define>
-
-## navbar search:
-<navbar:define name=search
-        imgbase="img/" urlbase="$(ROOT)">
-  <navbar:header>
-    <table cellspacing=0 cellpadding=1 border=0>
-  </navbar:header>
-
-  <navbar:prolog><tr valign=top><td></td><td align=left><small> </navbar:prolog>
-  <navbar:button id=help txt="Search Help" url="<WEBURL>/help/search/" hint="Search Help">
-  <navbar:button id=tips txt="Search Tips" url="<WEBURL>/help/search/tips.html" hint="Search Tips">
-
-  <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
-
-  <navbar:footer>
-    </table>
-  </navbar:footer>
-</navbar:define>
-
-## navbar personalize:
-<navbar:define name=personalize
-        imgbase="img/" urlbase="$(ROOT)">
-  <navbar:header>
-    <table cellspacing=0 cellpadding=1 border=0>
-  </navbar:header>
-
-  <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
-
-  <navbar:button id=youralerts txt="Your Alerts" url="<WEBURL>/personalize/youralerts.php" hint="Your Alerts">
-  <navbar:button id=yourbaskets txt="Your Baskets" url="<WEBURL>/personalize/yourbaskets.php" hint="Your Baskets">
-  <navbar:button id=yoursearches txt="Your Searches" url="<WEBURL>/personalize/yoursearches.php" hint="Your Searches">
-  <navbar:button id=yoursettings txt="Your Settings" url="<WEBURL>/personalize/yoursettings.php" hint="Your Settings">
-
-  <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
-
-  <navbar:footer>
-    </table>
-  </navbar:footer>
-</navbar:define>
-
-## navbar documentation:
-<navbar:define name=documentation
-        imgbase="img/" urlbase="$(ROOT)docs">
-  <navbar:header>
-    <table cellspacing=0 cellpadding=1 border=0>
-  </navbar:header>
-
-  <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
-
-  <navbar:button id=about txt="About" url="<WEBURL>/docs/about.php" hint="About">
-  <navbar:button id=userguide txt="User Guide" url="<WEBURL>/docs/userguide.php" hint="User Guide">
-  <navbar:button id=faq txt="FAQ" url="<WEBURL>/docs/faq.php" hint="FAQ">
-
-  <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
-
-  <navbar:footer>
-    </table>
-  </navbar:footer>
-</navbar:define>
-
 ## navbar admin:
 <navbar:define name=admin
         imgbase="img/" urlbase="$(ROOT)">
   <navbar:header>
-    <table cellspacing=0 cellpadding=1 border=0>
+    <table class=adminbox>
   </navbar:header>
 
-  <navbar:prolog><tr valign=top><td></td><td align=left><small> </navbar:prolog>
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> </navbar:prolog>
 
   <navbar:button id=admin txt="<strong>ADMIN AREA</strong>" url="<WEBURL>/admin/" hint="CDSware Administrators Area">
-  <navbar:button id=howto txt="HOWTOs" url="<WEBURL>/admin/howto/" hint="CDSware Admin HOWTO Documents" menu="howto">
-  <navbar:button id=foo txt="<strong>SYSTEM&nbsp;LIB</strong>">
-  <navbar:button id=bibedit txt="BibEdit Admin" url="<WEBURL>/admin/bibedit/" hint="CDSware BibEdit Admin" menu="bibedit">
-  <navbar:button id=bibrank txt="BibRank Admin" url="<WEBURL>/admin/bibrank/" hint="CDSware BibRank Admin" menu="bibrank">
-  <navbar:button id=bibindex txt="BibIndex Admin" url="<WEBURL>/admin/bibindex/" hint="CDSware BibIndex Admin">
-  <navbar:button id=foo txt="<strong>ARCHIVE&nbsp;MGMT</strong>">
-  <navbar:button id=bibharvest txt="BibHarvest Admin" url="<WEBURL>/admin/bibharvest/" hint="CDSware BibHarvest Admin">
-  <navbar:button id=bibconvert txt="BibConvert Admin" url="<WEBURL>/admin/bibconvert/" hint="CDSware BibConvert Admin">
-  <navbar:button id=bibupload txt="BibUpload Admin" url="<WEBURL>/admin/bibupload/" hint="CDSware BibUpload Admin">
-  <navbar:button id=foo txt="<strong>WEB&nbsp;INTERFACE</strong>">
-  <navbar:button id=bibformat txt="BibFormat Admin" url="<WEBURL>/admin/bibformat/" hint="CDSware BibFormat Admin" menu="bibformat">
-  <navbar:button id=webaccess txt="WebAccess Admin" url="<WEBURL>/admin/webaccess/" hint="CDSware Web Access Rights Admin" menu="webaccess">
-  <navbar:button id=websearch txt="WebSearch Admin" url="<WEBURL>/admin/websearch/" hint="CDSware Web Search Interface Admin">
-  <navbar:button id=websearch txt="WebSubmit Admin" url="<WEBURL>/admin/websubmit/" hint="CDSware Web Submit Interface Admin" menu="websubmit_admin">
-  <navbar:button id=webperso txt="WebPerso Admin" url="<WEBURL>/admin/webperso/" hint="CDSware Web Personal Features Admin">
+  <navbar:button id=howto txt="HOWTOs" url="<WEBURL>/admin/howto/" hint="CDSware Admin HOWTO Documents" menu="admin-howto">
+  <navbar:button id=bibconvert txt="BibConvert Admin" url="<WEBURL>/admin/bibconvert/" hint="CDSware BibConvert Admin" menu="admin-bibconvert">
+  <navbar:button id=bibedit txt="BibEdit Admin" url="<WEBURL>/admin/bibedit/" hint="CDSware BibEdit Admin" menu="admin-bibedit">
+  <navbar:button id=bibformat txt="BibFormat Admin" url="<WEBURL>/admin/bibformat/" hint="CDSware BibFormat Admin" menu="admin-bibformat">
+  <navbar:button id=bibharvest txt="BibHarvest Admin" url="<WEBURL>/admin/bibharvest/" hint="CDSware BibHarvest Admin" menu="admin-bibharvest">
+  <navbar:button id=bibindex txt="BibIndex Admin" url="<WEBURL>/admin/bibindex/" hint="CDSware BibIndex Admin" menu="admin-bibindex">
+  <navbar:button id=bibrank txt="BibRank Admin" url="<WEBURL>/admin/bibrank/" hint="CDSware BibRank Admin" menu="admin-bibrank">
+  <navbar:button id=bibsched txt="BibSched Admin" url="<WEBURL>/admin/bibsched/" hint="CDSware BibSched Admin" menu="admin-bibsched">
+  <navbar:button id=bibupload txt="BibUpload Admin" url="<WEBURL>/admin/bibupload/" hint="CDSware BibUpload Admin" menu="admin-bibupload">
+  <navbar:button id=webaccess txt="WebAccess Admin" url="<WEBURL>/admin/webaccess/" hint="CDSware Web Access Rights Admin" menu="admin-webaccess">
+  <navbar:button id=webalert txt="WebAlert Admin" url="<WEBURL>/admin/webalert/" hint="CDSware WebAlert Admin" menu="admin-webalert">
+  <navbar:button id=webbasket txt="WebBasket Admin" url="<WEBURL>/admin/webbasket/" hint="CDSware WebBasket Admin" menu="admin-webbasket">
+  <navbar:button id=websearch txt="WebSearch Admin" url="<WEBURL>/admin/websearch/" hint="CDSware Web Search Interface Admin" menu="admin-websearch">
+  <navbar:button id=websession txt="WebSession Admin" url="<WEBURL>/admin/websession/" hint="CDSware WebSession Admin" menu="admin-websession">
+  <navbar:button id=webstyle txt="WebStyle Admin" url="<WEBURL>/admin/webstyle/" hint="CDSware WebStyle Admin" menu="admin-webstyle">
+  <navbar:button id=websubmit txt="WebSubmit Admin" url="<WEBURL>/admin/websubmit/" hint="CDSware Web Submit Interface Admin" menu="admin-websubmit">
 
-  <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
-  <navbar:epilog type=S> </small></td><td></td></tr></navbar:epilog>
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+  <navbar:epilog type=S> </td><td></td></tr></navbar:epilog>
 
   <navbar:footer>
     </table>
   </navbar:footer>
 </navbar:define>
 
-## navbar WebSubmit:
-<navbar:define name=websubmit_admin
+## navbar admin-howto:
+<navbar:define name=admin-howto
         imgbase="img/" urlbase="$(ROOT)">
   <navbar:header>
-    <table cellspacing=0 cellpadding=1 border=0 class="portalbox">
-    <tr>
-     <th class="portalboxheader">WebSubmit Admin</th>
-    </tr>
+    <table class=adminbox>
   </navbar:header>
 
-  <navbar:prolog><tr valign=top><td align=left> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=websubmit_newdoctype txt="New&nbsp;Doctype" url="<WEBURL>/admin/websubmit/newDoctypeEDS.php" hint="New Type of Document">
-  <navbar:button id=websubmit_deldoctype txt="Remove&nbsp;Doctype" url="<WEBURL>/admin/websubmit/removeDoctypeEDS.php" hint="Remove Type of Document">
-  <navbar:button id=websubmit_listactions txt="Available&nbsp;Actions" url="<WEBURL>/admin/websubmit/allActionsEDS.php" hint="List Available Actions">
-  <navbar:button id=websubmit_listchecks txt="Available&nbsp;Javascript&nbsp;Checks" url="<WEBURL>/admin/websubmit/allChecksEDS.php" hint="List Available Javascript Checking functions">
-  <navbar:button id=websubmit_listelements txt="Available&nbsp;Element&nbsp;Descriptions" url="<WEBURL>/admin/websubmit/allElementsEDS.php" hint="List Available Element Descriptions">
-  <navbar:button id=websubmit_listfunctions txt="Available&nbsp;Functions" url="<WEBURL>/admin/websubmit/listFunctions.php" hint="List Available Functions">
-  <navbar:button id=websubmit_organise txt="Organise&nbsp;Main&nbsp;Page" url="<WEBURL>/admin/websubmit/editCatalogues.php" hint="Main Page Organisation">
-  <navbar:button id=websubmit_doc txt="Guide" url="<WEBURL>/admin/websubmit/guide/" hint="Guide">
+  <navbar:button id=howto_marc txt="HOWTO MARC" url="<WEBURL>/admin/howto/marc.html" hint="Admin's HOWTO Guides - How to MARC your medatada">
+  <navbar:button id=howto_migrate txt="HOWTO Migrate" url="<WEBURL>/admin/howto/migrate.html" hint="Admin's HOWTO Guides - How to Migrate your old documents into CDSware">
+  <navbar:button id=howto_run txt="HOWTO Run" url="<WEBURL>/admin/howto/run.html" hint="Admin's HOWTO Guides - How to Run your CDSware installation day-by-day">
 
   <navbar:epilog> </td><td></td></tr> </navbar:epilog>
 
@@ -192,77 +87,50 @@
   </navbar:footer>
 </navbar:define>
 
-## navbar WebAccess:
-<navbar:define name=webaccess
-        imgbase="img/" urlbase="$(ROOT)/admin/webaccess">
+## navbar admin-bibconvert:
+<navbar:define name=admin-bibconvert
+        imgbase="img/" urlbase="$(ROOT)">
   <navbar:header>
-    <table cellspacing=0 cellpadding=1 border=0>
+    <table class=adminbox>
   </navbar:header>
 
-  <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=webaccess_superusers txt="Superusers" url="<WEBURL>/admin/webaccess/superusers.php" hint="Superusers">
-  <navbar:button id=webaccess_submit txt="Authorizations&nbsp;on&nbsp;Submit" url="<WEBURL>/admin/webaccess/submit.php" hint="Authorizations on Submit">
-  <navbar:button id=webaccess_websubmit txt="Authorizations&nbsp;on&nbsp;WebSubmit&nbsp;Admin" url="<WEBURL>/admin/webaccess/submitmanager.php" hint="Authorizations on WebSubmit Admin">
-  <navbar:button id=webaccess_websearch txt="Authorizations&nbsp;on&nbsp;WebSearch&nbsp;Admin" url="<WEBURL>/admin/webaccess/searchmanager.php" hint="Authorizations on WebSearch Admin">
-  <navbar:button id=webaccess_webaccess txt="Authorizations&nbsp;on&nbsp;WebAccess&nbsp;Admin" url="<WEBURL>/admin/webaccess/accessmanager.php" hint="Authorizations on WebAccess Admin">
-  <navbar:button id=webaccess_bibedit txt="Authorizations&nbsp;on&nbsp;BibEdit&nbsp;Admin" url="<WEBURL>/admin/webaccess/bibmanager.php" hint="Authorizations on BibEdit Admin">
-  <navbar:button id=webaccess_bibformat txt="Authorizations&nbsp;on&nbsp;BibFormat&nbsp;Admin" url="<WEBURL>/admin/webaccess/bibformatmanager.php" hint="Authorizations on BibFormat Admin">
+  <navbar:button id=bibconvert-admin-guide txt="Guide" url="<WEBURL>/admin/bibconvert/guide.html">
 
-  <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
 
   <navbar:footer>
     </table>
   </navbar:footer>
 </navbar:define>
 
-## navbar howto:
-<navbar:define name=howto
+## navbar admin-bibedit:
+<navbar:define name=admin-bibedit
         imgbase="img/" urlbase="$(ROOT)">
   <navbar:header>
-    <table cellspacing=0 cellpadding=1 border=0>
+    <table class=adminbox>
   </navbar:header>
 
-  <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=howto_marc txt="HOWTO MARC" url="<WEBURL>/admin/howto/marc.html" hint="Admin's HOWTO Guides - How to MARC your medatada">
-  <navbar:button id=howto_migrate txt="HOWTO Migrate" url="<WEBURL>/admin/howto/migrate.html" hint="Admin's HOWTO Guides - How to Migrate your old documents into CDSware">
-  <navbar:button id=howto_run txt="HOWTO Run" url="<WEBURL>/admin/howto/run.html" hint="Admin's HOWTO Guides - How to Run your CDSware installation day-by-day">
+  <navbar:button id=bibedit-admin-guide txt="Guide" url="<WEBURL>/admin/bibedit/guide.html">
 
-  <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
 
   <navbar:footer>
     </table>
   </navbar:footer>
 </navbar:define>
 
-## navbar bibedit:
-<navbar:define name=bibedit
+## navbar admin-bibformat:
+<navbar:define name=admin-bibformat
         imgbase="img/" urlbase="$(ROOT)">
   <navbar:header>
-    <table cellspacing=0 cellpadding=1 border=0>
+    <table class=adminbox>
   </navbar:header>
 
-  <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
-
-  <navbar:button id=bibedit_edit_record txt="Edit Record" url="<WEBURL>/admin/bibedit/displayRec.php" hint="BibEdit Admin - Edit Record">
-  <navbar:button id=bibedit_global_replace txt="Global Replace" url="<WEBURL>/admin/bibedit/globalReplace.php" hint="BibEdit Admin - Global Replace">
-
-  <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
-
-  <navbar:footer>
-    </table>
-  </navbar:footer>
-</navbar:define>
-
-## navbar bibformat:
-<navbar:define name=bibformat
-        imgbase="img/" urlbase="$(ROOT)">
-  <navbar:header>
-    <table cellspacing=0 cellpadding=1 border=0>
-  </navbar:header>
-
-  <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
   <navbar:button id=BEH_display txt="Behaviours" url="<WEBURL>/admin/bibformat/BEH_display.php" hint="BibFormat Admin - Behaviours">
   <navbar:button id=OAIER_display txt="Extraction&nbsp;Rules" url="<WEBURL>/admin/bibformat/OAIER_display.php" hint="BibFormat Admin - Extraction Rules">
@@ -273,8 +141,236 @@
   <navbar:button id=KB_display txt="KBs" url="<WEBURL>/admin/bibformat/KB_display.php" hint="BibFormat Admin - Knowledge Bases">
   <navbar:button id=test txt="Execution Test" url="<WEBURL>/admin/bibformat/test.php" hint="BibFormat Admin - Execution Test">
   <navbar:button id=BIBREFORMAT_display txt="Reformat&nbsp;Records" url="<WEBURL>/admin/bibformat/BIBREFORMAT_display.php" hint="BibFormat Admin - Reformat Records">
+  <navbar:button id=bibformat-guide txt="Guide" url="<WEBURL>/admin/bibformat/guide.html" hint="BibFormat Admin - Guide">
 
-  <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar admin-bibharvest:
+<navbar:define name=admin-bibharvest
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=bibharvest-admin-guide txt="Guide" url="<WEBURL>/admin/bibharvest/guide.html">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar admin-bibindex:
+<navbar:define name=admin-bibindex
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=bibindex-admin-guide txt="Guide" url="<WEBURL>/admin/bibindex/guide.html">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar admin-bibrank:
+<navbar:define name=admin-bibrank
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=bibrank-admin-interface txt="Interface" url="<WEBURL>/admin/bibrank/bibrankadmin.py">
+  <navbar:button id=bibrank-admin-guide txt="Guide" url="<WEBURL>/admin/bibrank/guide.html">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar admin-bibsched:
+<navbar:define name=admin-bibsched
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=bibsched-admin-guide txt="Guide" url="<WEBURL>/admin/bibsched/guide.html">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar admin-bibupload:
+<navbar:define name=admin-bibupload
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=bibupload-admin-guide txt="Guide" url="<WEBURL>/admin/bibupload/guide.html">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar admin-webaccess:
+<navbar:define name=admin-webaccess
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=webaccess-admin-manager txt="Manager" url="<WEBURL>/admin/webaccess/webaccessadmin.py">
+  <navbar:button id=webaccess-admin-delegator txt="Delegator" url="<WEBURL>/admin/webaccess/webaccessadmin.py/delegate_startarea">
+  <navbar:button id=webaccess-admin-guide txt="Guide" url="<WEBURL>/admin/webaccess/guide.html">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar admin-webalert:
+<navbar:define name=admin-webalert
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=webalert-admin-guide txt="Guide" url="<WEBURL>/admin/webalert/guide.html">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar admin-webbasket:
+<navbar:define name=admin-webbasket
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=webbasket-admin-guide txt="Guide" url="<WEBURL>/admin/webbasket/guide.html">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar admin-websearch:
+<navbar:define name=admin-websearch
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=websearch-admin-interface txt="Interface" url="<WEBURL>/admin/websearch/websearchadmin.py">
+  <navbar:button id=websearch-admin-guide txt="Guide" url="<WEBURL>/admin/websearch/guide.html">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar admin-websession:
+<navbar:define name=admin-websession
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=websession-admin-guide txt="Guide" url="<WEBURL>/admin/websession/guide.html">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar admin-webstyle:
+<navbar:define name=admin-webstyle
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=webstyle-admin-guide txt="Guide" url="<WEBURL>/admin/webstyle/guide.html">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar admin-websubmit:
+<navbar:define name=admin-websubmit
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=websubmit_newdoctype txt="New&nbsp;Doctype" url="<WEBURL>/admin/websubmit/newDoctypeEDS.php" hint="New Type of Document">
+  <navbar:button id=websubmit_deldoctype txt="Remove&nbsp;Doctype" url="<WEBURL>/admin/websubmit/removeDoctypeEDS.php" hint="Remove Type of Document">
+  <navbar:button id=websubmit_listactions txt="Available&nbsp;Actions" url="<WEBURL>/admin/websubmit/allActionsEDS.php" hint="List Available Actions">
+  <navbar:button id=websubmit_listchecks txt="Available&nbsp;Javascript&nbsp;Checks" url="<WEBURL>/admin/websubmit/allChecksEDS.php" hint="List Available Javascript Checking functions">
+  <navbar:button id=websubmit_listelements txt="Available&nbsp;Element&nbsp;Descriptions" url="<WEBURL>/admin/websubmit/allElementsEDS.php" hint="List Available Element Descriptions">
+  <navbar:button id=websubmit_listfunctions txt="Available&nbsp;Functions" url="<WEBURL>/admin/websubmit/listFunctions.php" hint="List Available Functions">
+  <navbar:button id=websubmit_organise txt="Organise&nbsp;Main&nbsp;Page" url="<WEBURL>/admin/websubmit/editCatalogues.php" hint="Main Page Organisation">
+  <navbar:button id=websubmit-admin-guide txt="Guide" url="<WEBURL>/admin/websubmit/guide/" hint="Guide">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
 
   <navbar:footer>
     </table>
