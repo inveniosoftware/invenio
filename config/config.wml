@@ -45,24 +45,10 @@
 ## WML elements below.  Feel free to edit as many as you need.  When done,
 ## return to the main CDSware source directory and type 'make'.  Good luck! :-)
 
-## Before starting, let's include messages and define available
-## languages for the international multi-language interface.  (You
-## don't want to change these things here, the real language selection
-## will be chosen further down.)
+## Before starting, let's include messages and helper functions:
+#include "cdswmllib.wml"
 #include "configbis.wml"
 #include "messages.wml"
-#use wml::std::lang
-<lang:new id=de short>
-<lang:new id=en short>
-<lang:new id=es short>
-<lang:new id=pt short>
-<lang:new id=fr short>
-<lang:new id=it short>
-<lang:new id=ru short>
-<lang:new id=sk short>
-<lang:new id=cz short>
-<lang:new id=no short>
-<lang:new id=se short>
 
 ###################################
 ## Part 1:  Essential parameters ##
@@ -91,9 +77,10 @@ Atlantis Institute of Fictive Science
  <it>Atlantis Istituto di Scienza Fittizia</it>
  <ru>Атлантис Институт фиктивных Наук</ru>
  <sk>Atlantis Inštitút Fiktívnych Vied</sk>
- <cz>Atlantis Institut Fiktivních Věd</cz>
+ <cs>Atlantis Institut Fiktivních Věd</cs>
  <no>Atlantis Institutt for Fiktiv Vitenskap</no>
- <se>Atlantis Institut för Fiktiv Vetenskap</se>
+ <sv>Atlantis Institut för Fiktiv Vetenskap</sv>
+ <el>Ινστιτούτο Φανταστικών Επιστημών Ατλαντίδος</el>
 </define-tag>
 
 ## CDSLANG -- the default language of the interface:
@@ -106,13 +93,13 @@ en
 ## available in, separated by commas.  The order specified below will
 ## be respected on the interface pages.  A good default would be to
 ## use the alphabetical order.  Currently supported languages include
-## Czech, German, English, Spanish, French, Italian, Norwegian,
+## Czech, German, Greek, English, Spanish, French, Italian, Norwegian,
 ## Portuguese, Russian, Slovak, and Swedish, so that the current
 ## eventual maximum you can select is
-## "cz,de,en,es,fr,it,no,pt,ru,sk,se".
+## "cs,de,el,en,es,fr,it,no,pt,ru,sk,sv".
 ##  (example: "de,en,fr,it")
 <define-tag CDSLANGS whitespace=delete>
-cz,de,en,es,fr,it,no,pt,ru,sk,se
+cs,de,el,en,es,fr,it,no,pt,ru,sk,sv
 </define-tag>
 
 ## ALERTENGINEEMAIL -- the email address from which the alert emails will appear to be send:
@@ -646,7 +633,7 @@ atlantis.cern.ch
 ## CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE -- when indexing, do you want to use
 ## stemming?  If so, stem according to which language?  Use '' for
 ## no stemming, 'fr' for French, 'en' for English, 'no' for Norwegian,
-## 'se' for Swedish, 'de' for German, 'it' for Italian, 'pt' for
+## 'sv' for Swedish, 'de' for German, 'it' for Italian, 'pt' for
 ## Portuguese'. This feature is still somewhat experimental.  We
 ## recommend to say nothing ("") at this stage of things.
 ##  (example: "")

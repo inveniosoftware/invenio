@@ -18,6 +18,22 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+## language handling:
+
+#use wml::std::lang
+<lang:new id=de short>
+<lang:new id=en short>
+<lang:new id=es short>
+<lang:new id=pt short>
+<lang:new id=fr short>
+<lang:new id=it short>
+<lang:new id=ru short>
+<lang:new id=sk short>
+<lang:new id=cs short>
+<lang:new id=no short>
+<lang:new id=sv short>
+<lang:new id=el short>
+
 ## library of WML functions of general interest:
 
 <:
@@ -34,9 +50,10 @@
                       'it' => 'Italiano',
                       'ru' => 'Русский',
                       'sk' => 'Slovensky',
-                      'cz' => 'Česky',
+                      'cs' => 'Česky',
                       'no' => 'Norsk/Bokmål',
-                      'se' => 'Svenska');
+                      'sv' => 'Svenska',
+                      'el' => 'Ελληνικά');
         return $longnames{$ln};
     }
     
