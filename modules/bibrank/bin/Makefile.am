@@ -17,12 +17,12 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS=bibrank bibrank_gkb
+bin_SCRIPTS=bibrank
 
 EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(bin_SCRIPTS) *~ *.tmp bibrankc bibrank_gkbc
 
-%: %.wml ../../../config/config.wml ../../../config/configbis.wml
+%: %.wml ../../../config/config.wml ../../../config/configbis.wml ../../../config/cdswmllib.wml
 	$(WML) -o $@ $<
 	chmod u+x $@
