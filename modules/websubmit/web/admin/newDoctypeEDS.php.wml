@@ -314,11 +314,6 @@ function checkRequired(ldocname, sdocname, hurl, combon, combot, description,
                   # elements for this submission, and insert them for the
                   # new doctype.
 
-                  # Create the Apache security symbolic link for the new
-                  # doctype
-                  createSecurityLink($sub2Clone["actname"] . "$sdocname",
-                                                               $sdocname);
-
                   # Now conduct a select query to get all of the elements
                   # for this submission.
                   $cloneStr2 = "SELECT * FROM sbmFIELD WHERE subname = '"
@@ -655,7 +650,7 @@ function checkRequired(ldocname, sdocname, hurl, combon, combot, description,
          This function deals with the actions to take after the form to
          enter a new doctype has been submitted.
 
-         Author: Nicholas Robinson (Adapted from it's MESS Manager
+         Author: Nicholas Robinson (Adapted from it's WebSubmit Manager
                                     Counterpart (processCloning()), also
                                     written by Nicholas Robinson).
          Email:  Nicholas.Robinson@cern.ch
@@ -729,7 +724,7 @@ function checkRequired(ldocname, sdocname, hurl, combon, combot, description,
             $msgTxt .= "not cloned from another document type.";
          } // END else
 
-         $msgTxt .= "\n\nMESS Administrator.";
+         $msgTxt .= "\n\nWebSubmit Administrator.";
 
          # Mail the administrator(s) to inform them of the deletion...
          mail(ADMIN_EMAIL, "$sdocname Document Type Created", $msgTxt,

@@ -138,7 +138,7 @@ function checkScoreStpage(score, stpage)
       # Lock the sbmIMPLEMENT table as READ
       if($lockRes = mysql_query("LOCK TABLES sbmIMPLEMENT READ"))
       {
-         # Execute a query on the sbmIMPLEMENT table in the MESS2 DB to
+         # Execute a query on the sbmIMPLEMENT table in the WebSubmit2 DB to
          # find the values of the given action ($actname) for the relevant
 	 # doctype ($doctype)
          $queryResult = mysql_query("SELECT * FROM sbmIMPLEMENT WHERE

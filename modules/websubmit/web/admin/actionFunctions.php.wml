@@ -543,12 +543,12 @@
                      . $dateDets['mday'] . " "
                      . $dateDets['month'] . " " .  $dateDets['year']
                      . ", at " . $dateDets['hours'] . ":"
-                     . $dateDets['minutes'] . ".\n\nMESS Administrator.";
+                     . $dateDets['minutes'] . ".\n\nWebSubmit Administrator.";
              
                      # Send the message...
                      mail(ADMIN_EMAIL, "${action}.${doctype}.$function "
                               . "function Deletion", $msgTxt,
-                                            "From: MESS_Administrator");
+                                            "From: WebSubmit_Administrator");
                   } // END if
                   elseif(mysql_affected_rows() > 1)
                   {

@@ -74,7 +74,7 @@
 	 return;
       } # END if
 
-      # Execute a select query on the MESS2 database, getting the value of
+      # Execute a select query on the WebSubmit2 database, getting the value of
       # the required parameter...
       $queryResult = mysql_query("SELECT value FROM sbmPARAMETERS WHERE
                                                   doctype='$doctype' and name='$param'");
@@ -194,7 +194,7 @@
          $item=htmlspecialchars($item);
 
          /***********************************************************
-            Find the length of the parameter field as defined in the MESS2
+            Find the length of the parameter field as defined in the WebSubmit2
             database.  This field length will be used in the JavaScript
             input validation.
          ***********************************************************/   
@@ -345,14 +345,14 @@
             if($newValue)
             {
                # If this is a call to add a parameter to the system,
-	       # execute an insert query on MESS...
+	       # execute an insert query on WebSubmit...
                $queryResult = mysql_query("INSERT INTO sbmPARAMETERS
                  (doctype, name, value) VALUES('$doctype','$param','$paramValue')");
             } // END if
             else
             {
                # If this is a call to update the parameters value...
-               # Execute the update query on the MESS2 database.
+               # Execute the update query on the WebSubmit2 database.
                $queryResult = mysql_query("UPDATE sbmPARAMETERS SET
                            value='$paramValue'
                            WHERE doctype = '$doctype' and name='$param'");
@@ -419,7 +419,7 @@
                . $dateDets['minutes'] . ".";
 
                mail(ADMIN_EMAIL, "Error: Multiple Values For A Parameter",
-                      $errMailTxt, "From: MESS_Administrator");
+                      $errMailTxt, "From: WebSubmit_Administrator");
             } // END elseif
             else
             {

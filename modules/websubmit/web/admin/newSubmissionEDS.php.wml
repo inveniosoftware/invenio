@@ -82,7 +82,7 @@
       
          Author: Nicholas Robinson
          Email:  Nicholas.Robinson@cern.ch
-         Created:         07/12/2000 (ammended from it's MESS Manager add
+         Created:         07/12/2000 (ammended from it's WebSubmit Manager add
                                       a new action to a doctype
                                       counterpart)
          Last Modified:   15/03/2001
@@ -338,7 +338,7 @@
          Email:  Nicholas.Robinson@cern.ch
                  ca8nro@yahoo.co.uk
          Created:         08/12/2000    (Modified from actInputForm, a
-                                         function in the MESS Manager that
+                                         function in the WebSubmit Manager that
                                          is used for adding a new action
                                          to a doctype without cloning
                                          another).
@@ -481,7 +481,7 @@
                  ca8nro@yahoo.co.uk
          Created:         08/12/2000           (Adapted from it's
                                                 counterpart for adding a
-                                                new action to the MESS
+                                                new action to the WebSubmit
                                                 database)
          Last Modified:   25/01/2001
       *******************************************************************/
@@ -506,8 +506,6 @@
       if($addSubRes)
       {
          # In this case, the query was executed successfully
-
-         createSecurityLink($subname, $docname);
 
          # Update the doctype modification date in the sbmDOCTYPE table
          updateEDSDOCTYPEmd($docname, $md);
@@ -577,7 +575,7 @@
                  ca8nro@yahoo.co.uk
          Created:             11/12/2000             (This functions has
                                                       been adapted from
-                                                      its MESS counterpart
+                                                      its WebSubmit counterpart
                                                       for cloning actions)
          Last Modified:       25/01/2001
       *******************************************************************/
@@ -645,9 +643,6 @@
             {
                # Cool...the query worked, and we can proceed to clone all
                # of the submissions details.
-
-               # Sort out the security...
-               createSecurityLink("${subToAdd}$doctype", $doctype);
 
                # Free the result set of the $submInsRes query, as it is no
                # longer needed.  We can also now begin to clone all of the

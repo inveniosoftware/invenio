@@ -37,15 +37,15 @@
    {
       /*****************************************************************
          This function produces a table, which contains a list of all of
-         the functions in the MESS system database.  The function is
+         the functions in the WebSubmit system database.  The function is
          passed a query result that points to a list of all functions in
-         the MESS database (obtained by querying the sbmALLFUNCDESCR table
+         the WebSubmit database (obtained by querying the sbmALLFUNCDESCR table
          for function).
 
          The table that is produced contains the functions name, a form
          with a graphical input button that when pressed, takes the user
          to a page where they can view the usage of the function
-         throughout MESS, and a form with a graphical input button, which
+         throughout WebSubmit, and a form with a graphical input button, which
          when pressed, takes the user to a page where they can view/edit
          details of that particular function (e.g. adding parameters,
          changing the function description, etc...
@@ -64,7 +64,7 @@
           . "<TH>View<BR>Function Usage</TH>\n<TH>View/Edit<BR>Function "
           . "Details</TH>\n</TR>\n");
 
-      # For each function in the array, (each function in MESS), display
+      # For each function in the array, (each function in WebSubmit), display
       # its name, and make the input forms...
 
       while(list($funName) = mysql_fetch_row($queryResult))
@@ -89,17 +89,17 @@
    /**************************Start of Main Script*********************/
 
    /**********************************************************************
-      This script displays a table of all functions in the MESS database
+      This script displays a table of all functions in the WebSubmit database
       on the browser screen.  Effectively, it makes a table, containing
       the name of each function, and for each function, a link to a page
-      that shows the functions usage in MESS, and a link to a page that
+      that shows the functions usage in WebSubmit, and a link to a page that
       allows the user to view and/or edit the details of that function.
 
       It is worth making a note at this stage about the operation of this
-      script.  I had at first thought that the MESS table sbmFUNDESC
-      contained the details of every function in the MESS database, and
+      script.  I had at first thought that the WebSubmit table sbmFUNDESC
+      contained the details of every function in the WebSubmit database, and
       therefore it would be possible to simply query this table to get the
-      names of all functions in  MESS.  Further observations however,
+      names of all functions in  WebSubmit.  Further observations however,
       revealed that sbmFUNDESC only contains entries for functions that take
       parameters, which meant that functions without parameters would not 
       be listed by querying this table.  This meant that it was necessaray
@@ -109,7 +109,7 @@
       This table was added to mess, and called sbmALLFUNCDESCR.  It was
       decided that it would be made compulsary that all functions have an
       entry in this new table, so that obtaining a list of all functions
-      in MESS would be very easy and efficient.
+      in WebSubmit would be very easy and efficient.
 
    **********************************************************************/
 
@@ -118,7 +118,7 @@
       # Place a READ lock on the sbmALLFUNCDESCR table
       if($lockRes = mysql_query("LOCK TABLES sbmALLFUNCDESCR READ"))
       {
-         # Run a query to retrieve all of the functions in the MESS...
+         # Run a query to retrieve all of the functions in the WebSubmit...
          $funcQuery = mysql_query("SELECT function FROM sbmALLFUNCDESCR ORDER
 							BY function");
 
@@ -145,7 +145,7 @@
             # JavaScript alert...
             print("<SCRIPT TYPE='text/javascript'>alert('ERROR:  Unable"
 	     . " to execute query for all "
-             . "functions in MESS');</SCRIPT>");
+             . "functions in WebSubmit');</SCRIPT>");
          } // END else
       } # END if
       else

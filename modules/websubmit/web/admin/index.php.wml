@@ -65,10 +65,10 @@ function displayDoctypeList()
          row of the query dynaset that is passed to it ($queryResult),  
          outputting each record as a row in the table.
 
-         The function has been adapted to serve both MESS and EDS, so that
+         The function has been adapted to serve both WebSubmit and EDS, so that
          the URL of the page to be linked to is passed as an argument to
          the function, and therefore the relevant page is linked to,
-         depending upon whether it is in the MESS Administrator, or the
+         depending upon whether it is in the WebSubmit Administrator, or the
          WebSubmit Administrator.
          
          Author: Nicholas Robinson

@@ -3,7 +3,7 @@
 #include "configbis.wml"
 <protect>
 START::DEFP()---<record>
-SN---<controlfield tag="001"><:SN::SN::IF(,000,ORIG):></controlfield>
+SN---<controlfield tag="001"><:SN::SN:></controlfield>
 DB::DEFP()---<datafield tag="980" ind1="" ind2=""><subfield code="a">PICTURE</subfield></datafield>
 ER---<datafield tag="037" ind1="" ind2=""><subfield code="a"><:RNPHO2::RNPHO2:></subfield></datafield>
 RN---<datafield tag="088" ind1="" ind2=""><subfield code="a"><:Rep*::Rep:></subfield></datafield>
@@ -16,7 +16,6 @@ AB---<datafield tag="520" ind1="" ind2=""><subfield code="a"><:AB::AB:></subfiel
 NO---<datafield tag="500" ind1="" ind2=""><subfield code="a"><:NO::NO:></subfield></datafield>
 KW---<datafield tag="650" ind1="" ind2=""><subfield code="a"><:KW*::KW:></subfield></datafield>
 EM---<datafield tag="856" ind1="0" ind2=""><subfield code="f"><:SuE::SuE:></subfield></datafield>
-EXT---<datafield tag="856" ind1="4" ind2=""><subfield code="u"></protect><WEBURL><protect>/archive.py?base=pictures&id=<:RNPHO2::RNPHO2::DOWN:></subfield><subfield code="z">Access to fulltext document</subfield></datafield>
 LN---<datafield tag="041" ind1="" ind2=""><subfield code="a"><:LANG::LANG::IF(,eng,ORIG):></subfield></datafield>
 END::DEFP()---</record>
 </protect>

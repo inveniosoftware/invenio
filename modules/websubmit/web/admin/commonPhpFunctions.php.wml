@@ -44,7 +44,7 @@ $IMAGES="<WEBURL>/img";
       This script is not executable in a browser.  It contains the
       definitions of all PHP functions that are common to all of the
       scripts in the WebSubmit Administrator system.  This script has been
-      adapted from its MESS counterpart, and contains some of the
+      adapted from its WebSubmit counterpart, and contains some of the
       functions of that script.
    *********************************************************************/
 
@@ -71,7 +71,7 @@ $IMAGES="<WEBURL>/img";
 	if (AUTHENTICATION)
 	{
 		$uid_email = getEmail($uid);
-		if (!authenticate("$uid_email","submissionmanager",$doctype))
+		if(acc_authorize_action($uid, "cfgwebsubmit") != 1)
 		   return false;
 		else
 		   return true;
@@ -143,12 +143,12 @@ $IMAGES="<WEBURL>/img";
          We don't want to allow the user to call a page by simply
          typing something in the uri bar of his/her browser.  We only want
          a given page to be called from certain other scripts belonging to
-         the MESS2 administrator.  This is a security feature, as we don't
+         the WebSubmit2 administrator.  This is a security feature, as we don't
          want the user to be able to corrupt the database either
          accidentally, or  maliciously by typing URIs of scripts with CGI
          variables being passed to them.  We can ensure this doesn't
          happen by testing the special HTTP variable HTTP_REFERER to
-         ensure that it contains the name of a legal MESS2 administrator
+         ensure that it contains the name of a legal WebSubmit2 administrator
          script.
          This function gets the name of the calling page from the
          variable theRefererPage, which is actually a copy of the
@@ -228,7 +228,7 @@ $IMAGES="<WEBURL>/img";
          function will be called when the user has attempted to load one
          of the administrator pages in an inappropriate way, such as
          typing the URI into the location bar, and pressing enter, instead
-         of following the MESS2 Administrator pages through the hierarchy
+         of following the WebSubmit2 Administrator pages through the hierarchy
          to get to a specific page.
 
          Author: Nicholas Robinson
@@ -516,7 +516,7 @@ $IMAGES="<WEBURL>/img";
       print('<H4>Add A Parameter:</H4>'
           . '<SMALL><EM>Please select the parameter you want to add to this function:<BR></EM></SMALL>');
              
-      # Run a SELECT query to obtain a list of all tables in the MESS
+      # Run a SELECT query to obtain a list of all tables in the WebSubmit
       # database.  This will be used as the table that the parameter is 
       # to be found in when a user adds a parameter to the function.   
          
@@ -554,7 +554,7 @@ $IMAGES="<WEBURL>/img";
                 . ' { alert(\'A table field must be selected in order'
                 . ' to add a parameter!\'); }  else { if(confirm(\'Warning:'
                 . '\\nAdding a parameter to a function will mean that'
-                . ' further manual updating of the MESS database is '
+                . ' further manual updating of the WebSubmit database is '
                 . 'necessary.\\nAre you sure you wish to undertake'
                 . ' this action?\')) { submit(); } }"'
                 . '></CENTER></FORM>');
@@ -740,59 +740,6 @@ $IMAGES="<WEBURL>/img";
    } // END function makePageBody()
 
    //*****************
-
-   function createSecurityLink($subname, $docname)
-   {
-      /*******************************************************************
-         We need to create a symbolic link in the directory
-         of the server responsible for security.  (Constant set up in
-         config.php)
-         This symbolic link will be "{the submission name}.php", and
-         will link to the file "go.php".  (It is used as a security
-         feature for each submission type, enabling us to use apaches
-         security feature to restrict access to certain submission
-         types.
-      
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
-                 ca8nro@yahoo.co.uk
-         Created:        25/01/2001
-         Last Modified:  25/01/2001
-      *******************************************************************/
-            
-      # Make the link...
-	if (!file_exists("<WEBDIR>/submit/access/protected/${subname}.php"))
-      		exec("ln -s <WEBDIR>/submit/access/protected/go.php "
-            	. "<WEBDIR>/submit/access/protected/${subname}.php", $trash, $fail);
-            
-      if($fail)
-      {
-         # Alert the user...
-         print('<SCRIPT TYPE="text/javascript">alert("It was not '
-             . 'possible to create the symbolic link to go.php '
-             . ' script for the new submission in the following access '
-             . 'protections directory: <WEBDIR>/access/protected/'
-             . 'This symbolic link file must be created manually.")'
-             . ';</SCRIPT>');
-         
-         # Alert admin...
-         $msgTxt = "An error ocurred during the addition of the "
-            . "$subname submission type to the $docname document type.  "
-            . "It was not possible to create the ${subname}.php symbolic"
-            . " link, which points to the go.php script in the "
-            . "<WEBDIR>/access/protected/ directory.It is important "
-            . "that this link is created manually, and that the relevant "
-            . "Apache security permissions are also set for the "
-            . "${subname}.php file.WebSubmit Administrator ("
-            . makeDate() . ")";
-         
-         # Now send the mail..
-         mail(ADMIN_EMAIL, "ERROR: ${subname}.php Security Smbolic Link "
-         . "Creation Failure", $msgTxt, "From: WebSubmit_Administrator");
-      } // END if
-   } // END function createSecurityLink()
-
-   // *******************************
 
    function test_key_legal($theKey)
    {

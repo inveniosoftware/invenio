@@ -44,83 +44,50 @@ from cdsware.webuser import getUid, get_email
 from cdsware.messages import *
 from mod_python import apache
 from cdsware.websubmit_config import *
+from cdsware.file import *
 
-def index(req,c=cdsname,ln=cdslang,base="",id=""):
+def index(req,c=cdsname,ln=cdslang,recid="",docid="",version="",name="",format=""):
     # get user ID:
     try:
         uid = getUid(req)
         uid_email = get_email(uid)
     except MySQLdb.Error, e:
         return errorMsg(e.value,req)
-    t = """
-    <center>
-    <table class="searchbox" summary="">
-        <tr>"""
-    t+="        <th class=\"portalboxheader\">Archive for %s/%s" % (base,id)
-    t+="""
-            </th>
-        </tr>
-        <tr>
-            <td class="portalboxbody">"""
-    if base == "":
-        return warningMsg("Sorry... Parameter <i>base</i> needed",req)
-    elif id == "":
-        return warningMsg("Sorry... Parameter <i>id</i> needed",req)
-    elif not os.path.exists("%s/%s" % (archive,base)):
-        return warningMsg("Sorry... Cannot find base %s" % base, req)
-    else:
-        id = id.lower()
-        # initialise variables
-        numfiles = 0
-        nummainfiles = 0
-        numadditionalfiles = 0
-        mainfiletext = "<blockquote><table border=0 cellspacing=2>"
-        additionalfiletext = "<blockquote><table border=0 cellspacing=2>"
-        # first open base directory
-        for root, dirs, files in os.walk("%s/%s" % (archive,base)):
-            if root == "%s/%s" % (archive,base):
-                for file in files:
-                    if re.search("^%s\..*" % id,file):
-                        numfiles += 1
-                        nummainfiles += 1
-                        size = os.path.getsize("%s/%s/%s" % (archive,base,file))
-                        fileurl = "%s/%s/%s" % (archive,base,file)
-                        filename = re.sub("([^\.]*)\..*","\\1",file)
-                        if os.path.exists("%s/%s/icon-%s.gif" % (archive,base,filename)):
-                            imagesrc = "%s/%s/icon-%s.gif" % (archive,base,filename)
-                        else:
-                            imagesrc = "%s/smallfiles.gif" % images
-                        mainfiletext += "<tr><td align=right><img src='%s' border=0></td><td valign=top><small><a href='%s'>%s</a></td><td valign=top><font size=-2 color=green>[%s o]</font></small></td></tr>" % (imagesrc,fileurl,file,size)
-            elif root == "%s/%s/%s" % (archive,base,id):
-                for file in files:
-                    if not re.match("^icon-.*.gif",file):
-                        numfiles+=1
-                        numadditionalfiles+=1
-                        size = os.path.getsize("%s/%s/%s/%s" % (archive,base,id,file))
-                        fileurl = "%s/%s/%s/%s" % (archive,base,id,file)
-                        filename = re.sub("([^\.]*)\..*","\\1",file)
-                        if os.path.exists("%s/%s/%s/icon-%s.gif" % (archive,base,id,filename)):
-                            imagesrc = "%s/%s/%s/icon-%s.gif" % (archive,base,id,filename)
-                        else:
-                            imagesrc = "%s/smallfiles.gif" % images
-                        additionalfiletext += "<tr><td align=right><img src='%s' border=0></td><td valign=top><small><a href='%s'>%s</a></td><td valign=top><font size=-2 color=green>[%s o]</font></small></td></tr>" % (imagesrc,fileurl,file,size)
-    mainfiletext += "</table></blockquote>"
-    additionalfiletext += "</table></blockquote>"
-    if numfiles != 0:
-        if nummainfiles != 0:
-            t+="<small><p>found %s <b>main</b> file(s):</small>" % nummainfiles
-            t+=mainfiletext
-        if numadditionalfiles != 0:
-            t+="<small><p>found <font color=green>%s</font> <b>additional</b> file(s):</small>" % numadditionalfiles
-            t+=additionalfiletext
-    else:
-        return warningMsg("no file found...",req)
-    t+="</td></tr></table></center>"
+    docfiles = []
+    t=""
+    filelist=""
+    # if a precise file is requested, we stream it
+    if name!="":
+        if docid=="":
+            return errorMsg("Parameter docid missing",req)
+        else:
+            docfile = BibDoc(bibdocid=docid).getFile(name,format,version)
+            if docfile == None:
+                return warningMsg("can't find file...",req)
+            else:
+                return docfile.stream(req)
+    # all files attached to a record
+    elif recid!="":
+        bibarchive = BibRecDocs(recid)
+        filelist = bibarchive.display(docid,version)
+    # a precise filename
+    elif docid!="":
+        bibdoc = BibDoc(bibdocid=docid)
+        recid = bibdoc.getRecid()
+        filelist = bibdoc.display(version)
+    title = "record #<a href=\"search.py?recid=%s\">%s</a>" % (recid,recid)
+    if docid != "":
+        title += " document #%s" % docid
+    if version != "":
+        title += " version #%s" % version
+    t = """<center><table class="searchbox" summary="" width="500"><tr><th class="portalboxheader">Archive&nbsp;&nbsp;&nbsp;&nbsp;<font size=-2>[%s]</font></th></tr><tr><td class="portalboxbody">\n""" % title
+    t+=filelist
+    t+="""</td></tr></table></center>\n"""
     p_navtrail = "Archive"
     return page(title="",
                      body=t,
                      navtrail = p_navtrail,
-                     description="toto",
+                     description="",
                      keywords="keywords",
                      uid=uid,
                      language=ln,

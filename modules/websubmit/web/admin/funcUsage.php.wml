@@ -33,10 +33,10 @@
 
    /******************************************************************
       This script has been written so that a user can view the usage of a
-      particular function throughout the MESS system.  The script is
+      particular function throughout the WebSubmit system.  The script is
       passed the variable $function from the calling page (which is
       listFunctions.php).  The script runs a series of queries,
-      retrieving all doctypes in the MESS database, then retrieving all
+      retrieving all doctypes in the WebSubmit database, then retrieving all
       actions for each of these queries, then retrieving all functions
       that match with the function name stored in $function, for each of
       these actions.  This means that a form of hierarchical list can be
@@ -109,7 +109,7 @@
          $headerDrawn = 0;
                         
          # For each document type returned by the query (each doctype in
-         # the MESS database...
+         # the WebSubmit database...
          while(list($doctypeItem, $doctypeName) =
                                           mysql_fetch_row($doctypesQuery))
          {
@@ -202,9 +202,9 @@
                         because field names have been changed in the
                         functions table, or, more likely, because the
                         current action is an action that has been created
-                        whereby a corresponding table in the MESS database
+                        whereby a corresponding table in the WebSubmit database
                         has not been created. (All actions must have a
-                        corresponding functions table in MESS.
+                        corresponding functions table in WebSubmit.
                      **************************************************/
                         
                      # Make a query string to contain the error message to
@@ -216,10 +216,10 @@
                       . " been  changed since this\\napplication was "  
                       . "developed."
                       . "\\n\\nIt is also possible however, that "
-                      . "the MESS action ($actItem) being queried for "
+                      . "the WebSubmit action ($actItem) being queried for "
                       . "functions\\ndoes not have a corresponding "
-                      . "functions table in the MESS database.\\n\\n"
-                      . "All actions in MESS must have corresponding"
+                      . "functions table in the WebSubmit database.\\n\\n"
+                      . "All actions in WebSubmit must have corresponding"
                       . " functions tables.";
                         
                      # Display the error in an alert box...
@@ -260,7 +260,7 @@
                   . "sbmIMPLEMENT table.\\n\\nIt is possible that the " 
                   . "names"
                   . " of the fields in the sbmIMPLEMENT table\\nhave "
-                  . "been changed since the MESS Administrator "
+                  . "been changed since the WebSubmit Administrator "
                   . "application was developed.\\n\\nContact the system"
                   . " administrator about this problem.";
  
@@ -287,7 +287,7 @@
          $docErrorString = "ERROR\\n\\nUnable to query the sbmDOCTYPE "
            . "table.\\n\\n"
            . "It is possible that the names of the fields in the TEST\\n"
-           . "table have been changed since the MESS Administrator "
+           . "table have been changed since the WebSubmit Administrator "
            . "application was developed.\\n\\nContact the system "
            . "administrator about this problem.";
  
@@ -311,7 +311,7 @@ function displayPage()
    if($lockRes = mysql_query("LOCK TABLES sbmDOCTYPE READ"))
    {
       # We must execute a query to return a list of all document types in
-      # the MESS system.  This can be obtained by querying the TEST
+      # the WebSubmit system.  This can be obtained by querying the TEST
       # table...
       $doctypesQuery = mysql_query("SELECT sdocname, ldocname FROM sbmDOCTYPE ORDER
                                                            BY sdocname");

@@ -68,7 +68,7 @@
    {
       /***************************************************************
          This function will display a blank form that will allow the user
-         to enter a new function into the MESS system.  The function will
+         to enter a new function into the WebSubmit system.  The function will
          produce a form with 2 inputs - one for the function name, and
          another for the function description.
 
@@ -84,7 +84,7 @@
       print("<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0 "
           . "ALIGN='center' BGCOLOR='#E0E0E0'>\n<TR><TD "
           . "ALIGN='left'>\n<SMALL><I>Using this facility, it is"
-          . " possible to add new functions to the MESS system.  "
+          . " possible to add new functions to the WebSubmit system.  "
           . "The first stage, is to enter the name and the "
           . "description of the function into the form below, and "
           . "then submit these details...</I>\n</SMALL>\n"
@@ -124,7 +124,7 @@
           . "VALUE='SAVE DETAILS' onClick=\"if(thefunction.value =="
           . " '') { alert('A function name must be entered!'); }"
           . " else if(confirm('Are you sure you wish to commit this"
-          . " function to MESS?')) { submit(); "
+          . " function to WebSubmit?')) { submit(); "
           . "}\">\n</TD>\n</FORM>\n"
           . "<FORM ACTION='listFunctions.php' METHOD='post'>\n<TD>\n"
           . "<INPUT TYPE='button' VALUE='CANCEL' "
@@ -145,7 +145,7 @@
       {
          # If this clause has been reached, it means that the user has
          # entered the name &/or description for the new function, and has
-         # chosen to commit it to the MESS database.
+         # chosen to commit it to the WebSubmit database.
 
 	 ########LOCKS########
 
@@ -160,32 +160,32 @@
             if($commitResult)
             {
                # In this case, the new function has successfully been
-	       # added to the MESS database, so therefore we can display
+	       # added to the WebSubmit database, so therefore we can display
 	       # the details for the function (name, description,
 	       # parameters), and also offer the user the opportunity to
 	       # add parameters to it...
 
-               # Send an email to the MESS administrator, informing them
-	       # that a new function has been added to the MESS system..
+               # Send an email to the WebSubmit administrator, informing them
+	       # that a new function has been added to the WebSubmit system..
 
                # Get the date for the message...
                $dateDets = getDate();
 
                # Create the message text...
                $messageText = "Please be advised that the $thefunction "
-               . "function was added to MESS on " . $dateDets['weekday']
+               . "function was added to WebSubmit on " . $dateDets['weekday']
                . " " . $dateDets['mday'] . " " . $dateDets['month'] . " "
                . $dateDets['year'] . ", at " . $dateDets['hours'] . ":"
-               . $dateDets['minutes'] . ".\n\nMESS Administrator.";
+               . $dateDets['minutes'] . ".\n\nWebSubmit Administrator.";
 
                # Send the message...
                mail(ADMIN_EMAIL, "Warning: $thefunction Function Created",
-                               $messageText, "From: MESS_Administrator");
+                               $messageText, "From: WebSubmit_Administrator");
 
                # Display an alert informing the user that the new function
-               # has been added to the MESS system
+               # has been added to the WebSubmit system
                print("<SCRIPT TYPE='text/javascript'>alert('The "
-                . "$thefunction function has been added to the MESS "
+                . "$thefunction function has been added to the WebSubmit "
                 . "system');</SCRIPT>\n");
 
                # Display a header for the page...
@@ -284,12 +284,12 @@
                . " is to be utilised by these doctypes/actions, rows "
 	       . "should be added for the relevant doctype in the "
 	       . "relevant tables of the various parameters."
-               . "\n\nMESS Administrator.";
+               . "\n\nWebSubmit Administrator.";
 
                # Send the message...
                mail(ADMIN_EMAIL, "Parameter Added To New $function "
 		. "Function",
-                            $messageText, "From: MESS_Administrator");
+                            $messageText, "From: WebSubmit_Administrator");
 	    } # END if
 	    else
 	    {

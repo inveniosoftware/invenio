@@ -194,7 +194,7 @@
                 . $dateDets['minutes'] . ".";
              
                mail(ADMIN_EMAIL, "Error: Multiple Values For A Parameter",
-                      $errMailTxt, "From: MESS_Administrator");
+                      $errMailTxt, "From: WebSubmit_Administrator");
             
                # Inform the user of this error using a javascript alert..
                print("<SCRIPT TYPE='text/javascript'>alert('Error:\\n\\n"

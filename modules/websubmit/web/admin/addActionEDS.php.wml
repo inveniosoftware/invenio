@@ -317,13 +317,13 @@ function checkRequired(sactname, lactname)
                      $msgTxt .= "  This action is the $sactname "
                         . "action.\n\n";
                      
-                     $msgTxt .= "MESS Administrator (";
+                     $msgTxt .= "WebSubmit Administrator (";
                      $msgTxt .= makeDate();
                      $msgTxt .= ")";  
                       
                      # Now send the mail..
                      mail(ADMIN_EMAIL, "$sactname Action Added to "
-                                . "EDS/MESS", $msgTxt,
+                                . "EDS/WebSubmit", $msgTxt,
                                             "From: WebSubmit_Administrator");
 
                      # Redirect the browser...

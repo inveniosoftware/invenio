@@ -387,18 +387,18 @@ function checkScoreStep(score, step)
              . $dateDets['month'] . " " .  $dateDets['year']
              . ", at " . $dateDets['hours'] . ":"
              . $dateDets['minutes'] . "."
-             . "\n\nMESS Administrator.";
+             . "\n\nWebSubmit Administrator.";
 
             # Send the message...
             mail(ADMIN_EMAIL, "$funToAdd Function Added to $action"
-             . ".$doctype Action", $msgTxt, "From: MESS_Administrator");
+             . ".$doctype Action", $msgTxt, "From: WebSubmit_Administrator");
          } // END if
          else
          {
             # If this clause has been reached, it means that the insert of
             # the new function to the relevant functions has failed.  As a
             # result, the user should be informed of this by a javascript
-            # alert, and the browser should redirect to the MESS
+            # alert, and the browser should redirect to the WebSubmit
             # Asdministrator main page.
 
             print("<SCRIPT TYPE='text/javascript'>alert('The $funToAdd "
@@ -424,11 +424,11 @@ function checkScoreStep(score, step)
              . ", at " . $dateDets['hours'] . ":"
              . $dateDets['minutes'] . "."
              . "\n\nYou should investigate this problem as soon as "
-             . "possible.\n\nMESS Administrator.";
+             . "possible.\n\nWebSubmit Administrator.";
 
             # Send the message...
             mail(ADMIN_EMAIL, "ERROR: $funToAdd Function Not Added To "
-            . "${action}.$doctype", $msgTxt, "From: MESS_Administrator");
+            . "${action}.$doctype", $msgTxt, "From: WebSubmit_Administrator");
 
             # Now redirect the browser to the Administrator main page...
             pageFocusHome();
@@ -475,7 +475,7 @@ function checkScoreStep(score, step)
           . " medium; font-weight: bold'>Add a function to the $action "
           . "action of the $doctype document type</SPAN>\n");
 
-         # The first task is to obtain a list of all functions in MESS
+         # The first task is to obtain a list of all functions in WebSubmit
          $funcQuery = mysql_query("SELECT function FROM sbmALLFUNCDESCR ORDER
                                                             BY function");
 
@@ -532,12 +532,12 @@ function checkScoreStep(score, step)
          {
             # If this clause has been reached, the script has been able to
             # query the sbmALLFUNCDESCR table in order to obtain a list of
-            # all of the MESS functions.  In this case, it is simply
+            # all of the WebSubmit functions.  In this case, it is simply
             # appropriate to display a suitable error message, and send
-            # the browser focus to the MESS Administrator home page, as it
+            # the browser focus to the WebSubmit Administrator home page, as it
             # is obviously not possible to add a function in this case...
 
-            print("<H3>ERROR: Unable To Retrieve MESS Functions List"
+            print("<H3>ERROR: Unable To Retrieve WebSubmit Functions List"
                 . "</H3>\n");
 
             # Now redirect the browser...
