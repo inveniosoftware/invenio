@@ -26,7 +26,8 @@ import os
 import sys
 import time
 import tempfile
-from config import weburl
+from config import weburl, cdslang
+from messages import msg_dowloads_history
 from dbquery import run_sql
 from bibrank_downloads_indexer import database_tuples_to_single_list
 from bibrank_grapher import *
@@ -36,7 +37,7 @@ cfg_id_bibdoc_id_bibrec = 5
 cfg_bibrank_print_download_history = 1
 cfg_bibrank_print_download_split_by_id = 0
 
-def create_download_history_graph_and_box(id_bibrec):
+def create_download_history_graph_and_box(id_bibrec, ln=cdslang):
     """Create graph with citation history for record ID_BIBREC (into a
        temporary file) and return HTML box refering to that image.
        Called by Detailed record pages.
@@ -84,10 +85,15 @@ def create_download_history_graph_and_box(id_bibrec):
             if file_to_close_history :
                 if os.path.exists(file_to_close_history):
                     os.unlink(file_to_close_history)
-                
+
+    out = ""
     if html_content != "":
-        html_code = write_html(html_content, users_analysis_text)
-    return html_code
+        out += """<br/><br/><table><tr><td class="blocknote">
+                  %s %s</td></tr><tr><td>
+                  <table border="0" cellspacing="1" cellpadding="1">""" %  (msg_dowloads_history[ln], user_analysis_text)
+        out += html_content
+        out += "</table></td></tr></table>"
+    return out
     
 def draw_downloads_statistics(id_bibrec, id_bibdoc_list):
     """Create a graph about download history using a temporary file to store datas 
@@ -233,16 +239,5 @@ def create_users_analysis_graph(id_bibrec, ips):
     result2 = write_coordinates_in_tmp_file([coordinates_list])
     #plot the graphe
     return create_temporary_image(id_bibrec, 'download_users', result2[0], '', '', (0, 0), result2[1], [], [], [1, 3])
-
-def write_html(content_text, user_analysis_text=""):
-    """Html code which contains 2 images :
-    The left part represents the history of the downloads since the document creation
-    The right part reprsents the repartition (cern's user or not) of the users who have downloaded the document """
-    text = """<br/><br/><table><tr><td class="blocknote">
-    Downloads history: %s</td></tr><tr><td>
-    <table border=0 cellspacing=1 cellpadding=1>""" %  user_analysis_text
-    text += content_text
-    text += "</table></td></tr></table>"
-    return text
 
 </protect>
