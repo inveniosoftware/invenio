@@ -19,7 +19,7 @@
 
 webappdir = $(WEBDIR)
 
-webapp_DATA=sessinit.inc.shtml
+webapp_DATA=sessinit.inc.shtml youraccount.py
 
 EXTRA_DIST = $(wildcard *.wml)
 
