@@ -2817,7 +2817,7 @@ CREATE TABLE IF NOT EXISTS schTASK (
   user varchar(50) NOT NULL,
   runtime datetime NOT NULL,
   sleeptime varchar(20),
-  arguments text,
+  arguments longtext,
   status varchar(20),
   progress varchar(255),
   PRIMARY KEY  (id)
