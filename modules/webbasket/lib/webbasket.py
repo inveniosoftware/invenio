@@ -237,7 +237,7 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
                 if len(alert_query_result) == 0:
                     out += """There isn't any alert related to this basket."""
                 else:
-                    out += """The following <A href="../youralerts.py/list_alerts">alerts</A> are related to this basket:&nbsp;"""
+                    out += """The following <A href="../youralerts.py/list">alerts</A> are related to this basket:&nbsp;"""
                     i = 1
                     for row in alert_query_result:
                         if i == 1:
@@ -374,7 +374,7 @@ def delete_basket(uid, id_basket, basket_name):
         Msg = """There isn't any alert related to this basket."""
         out += """<TR><TD colspan="2" align="left">%s</TD></TR>""" % Msg
     else:
-        Msg = """The following <A href="../youralerts.py/list_alerts">alerts</A> are related to this basket:&nbsp;"""
+        Msg = """The following <A href="../youralerts.py/list">alerts</A> are related to this basket:&nbsp;"""
         i = 1
         for row in query_result:
             if i == 1:
