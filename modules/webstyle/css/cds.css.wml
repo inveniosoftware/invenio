@@ -688,39 +688,42 @@ a.userinfo:hover {
    background: transparent;
 }
 .langinfobox {
-   color: #039;
+   color: #999;
+   background: #fff;
    font-size: x-small;
    width: 150px;
    margin-bottom: 15px;
 }
 .langinfoboxheader {
-   color: #039;
+   color: #999;
+   background: #fff;
    font-size: x-small;
    font-weight: bold;
    border-top: 1px solid #060; 
    border-bottom: 1px solid #060; 
 }
 .langinfoboxbody {
-   color: #039;
+   color: #999;
+   background: #fff;
    padding-right: 5px;
    padding-bottom: 2px;
    font-size: x-small;
    font-weight: normal;
 }
 a.langinfo:link {
-   color: #039;
+   color: #999;
    background: transparent;
 }
 a.langinfo:visited {
-   color: #039;
+   color: #999;
    background: transparent;
 }
 a.langinfo:active {
-   color: #039;
+   color: #999;
    background: transparent;
 }
 a.langinfo:hover {
-   color: #039;
+   color: #999;
    background: transparent;
 }
 .faq {
