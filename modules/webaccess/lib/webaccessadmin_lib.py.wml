@@ -36,6 +36,10 @@ import access_control_admin as acca
 # reload(acca)
 import cgi
 import re
+import random
+import MySQLdb
+import string
+import smtplib
 
 from bibrankadminlib import adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform
 from access_control_config import * 
@@ -44,6 +48,8 @@ from config import *
 from webpage import page, pageheaderonly, pagefooteronly
 from webuser import getUid, get_email
 from mod_python import apache
+from search_engine import print_record
+from cdsware.webuser import checkemail
 
 __version__ = "$Id$"
 
@@ -73,11 +79,12 @@ def index(req, title='', body='', subtitle='', adminarea=2, authorized=0):
     
     if body:
         if adminarea == 1: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/delegate_startarea>Delegate Rights</a> ' % (weburl, )
-        if adminarea >= 2: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py>Manage WebAccess</a> ' % (weburl, )
+        if adminarea >= 2 and adminarea < 7: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py>Manage WebAccess</a> ' % (weburl, )
         if adminarea == 3: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/rolearea>Role Administration</a> ' % (weburl, )
         elif adminarea == 4: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/actionarea>Action Administration</a> ' % (weburl, )
         elif adminarea == 5: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/userarea>User Administration</a> ' % (weburl, )
         elif adminarea == 6: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/resetarea>Reset Authorizations</a> ' % (weburl, )
+        elif adminarea == 7: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/manageaccounts>Manage Accounts</a> ' % (weburl, )
     
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -234,7 +241,7 @@ def perform_userarea(req, email_user_pattern=''):
     # remove letters not allowed in an email
     email_user_pattern = cleanstring_email(email_user_pattern)
         
-    text  = ' <span class="adminlabel">1. search pattern </span>\n'
+    text  = ' <span class="adminlabel">1. search for user</span>\n'
     text += ' <input class="admin_wvar" type="text" name="email_user_pattern" value="%s" />\n' % (email_user_pattern, )
 
     output += createhiddenform(action="userarea",
@@ -453,6 +460,628 @@ def perform_adddefaultsettings(req, superusers=[], confirm=0):
                  body=[output],
                  adminarea=6)
 
+def perform_manageaccounts(req, mtype='', content='', confirm=0):
+    """start area for managing accounts."""
+
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
+
+    subtitle = 'Overview'
+
+    fin_output = ''
+
+    fin_output += """
+    <table>
+    <tr>
+    <td><b>Menu</b></td>
+    </tr>
+    <tr>
+    <td>0.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/manageaccounts?mtype=perform_showall">Show all</a></small></td>
+    <td>1.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/manageaccounts?mtype=perform_accesspolicy#1">Access policy</a></
+small></td>
+    <td>2.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/manageaccounts?mtype=perform_accountoverview#2">Account overview</a></
+small></td>
+    <td>3.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/manageaccounts?mtype=perform_createaccount#3">Create account</a></
+small></td>
+    <td>4.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/manageaccounts?mtype=perform_modifyaccounts#4">Edit accounts</a></small></
+td>
+    </tr>
+    </table>
+    """ % (weburl, weburl, weburl, weburl, weburl)
+
+    if mtype == "perform_accesspolicy" and content:
+        fin_output += content
+    elif mtype == "perform_accesspolicy" or mtype == "perform_showall":
+        fin_output += perform_accesspolicy(req, callback='')
+        fin_output += "<br>"
+
+    if mtype == "perform_accountoverview" and content:
+        fin_output += content
+    elif mtype == "perform_accountoverview" or mtype == "perform_showall":
+        fin_output += perform_accountoverview(req, callback='')
+        fin_output += "<br>"
+
+    if mtype == "perform_createaccount" and content:
+        fin_output += content
+    elif mtype == "perform_createaccount" or mtype == "perform_showall":
+        fin_output += perform_createaccount(req, callback='')
+        fin_output += "<br>"
+
+    if mtype == "perform_modifyaccounts" and content:
+        fin_output += content
+    elif mtype == "perform_modifyaccounts" or mtype == "perform_showall":
+        fin_output += perform_modifyaccounts(req, callback='')
+        fin_output += "<br>"
+
+    return index(req=req,
+                 title='Manage Accounts',
+                 subtitle=subtitle, 
+                 body=[fin_output],
+                 adminarea=0,
+                 authorized=1)
+
+def perform_accesspolicy(req, callback='yes', confirm=0):
+    """Modify default behaviour of a guest user or if new accounts should automatically/manually be modified."""
+
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
+
+    subtitle = """<a name="1"></a>1. Access policy.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html">?</a>]</small>""" % weburl
+
+    output = "<b>Currently, all changes must be done from command line, and the webserver restarted for changes to take effect</b><br>"
+    output += "Options in access_control_config.py to modify:<br><br>"
+    output += """<protect>
+    # Access policy for guests.<br> 
+    # 0 = Allow guests to search,<br> 
+    # 1 = Guests cannot search (all users must login)<br> 
+    CFG_ACCESS_CONTROL_LEVEL_GUESTS = 0<br>  
+    # Access policy for accounts.<br>  
+    # 0 = Users can register, automatically acticate accounts<br> 
+    # 1 = Users can register, but admin must activate the accounts<br> 
+    # 2 = Users cannot register, only admin can register accounts.<br> 
+    CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS = 0<br> 
+    # Send an email when a new account is created by an user<br> 
+    CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS = 0<br>
+    # Send it to this email-address<br> 
+    CFG_ACCESS_CONTROL_SEND_TO_EMAIL = adminemail<br> 
+    # Send an email to the user notifying when the account is created<br> 
+    CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT = 0<br> 
+    # Send an email to the user notifying when the account is activated<br> 
+    CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION = 0<br> 
+    # Send an email to the user notifying when the account is deleted/rejected<br> 
+    CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION = 0</protect>"""
+
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_manageaccounts(req, "perform_accesspolicy", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+
+def perform_accountoverview(req, callback='yes', confirm=0):
+    """Modify default behaviour of a guest user or if new accounts should automatically/manually be modified."""
+
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
+
+    subtitle = """<a name="2"></a>2. Account overview.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html">?</a>]</small>""" % weburl
+    output = ""
+    res = run_sql("SELECT COUNT(*) FROM user WHERE email=''")
+    output += "Guest accounts: %s<br>" % res[0][0]
+    res = run_sql("SELECT COUNT(*) FROM user WHERE email!=''")
+    output += "Registered accounts: %s<br>" % res[0][0]
+    res = run_sql("SELECT COUNT(*) FROM user WHERE email!='' AND note='0' OR note IS NULL")
+    output += "Inactive accounts: %s " % res[0][0]
+    if res[0][0] > 0:
+        output += ' [<a href="modifyaccounts?email_user_pattern=&amp;limit_to=disabled&amp;maxpage=25&amp;page=1">Activate/Reject accounts</a>]'
+    res = run_sql("SELECT COUNT(*) FROM user")
+    output += "<br>Total nr of accounts: %s<br>" % res[0][0]
+
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_manageaccounts(req, "perform_accountoverview", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+
+def perform_createaccount(req, email='', password='', callback='yes', confirm=0):
+    """Modify default behaviour of a guest user or if new accounts should automatically/manually be modified."""
+
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
+
+    subtitle = """<a name="3"></a>3. Create account.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html">?</a>]</small>""" % weburl
+
+    output = ""
+
+    text = ' <span class="adminlabel">Email:</span>\n'
+    text += ' <input class="admin_wvar" type="text" name="email" value="%s" /><br>' % (email, )
+    text += ' <span class="adminlabel">Password:</span>\n'
+    text += ' <input class="admin_wvar" type="text" name="password" value="%s" /><br>' % (password, )
+
+    output += createhiddenform(action="createaccount",
+                               	text=text,
+                                confirm=1,
+                                button="Create")
+
+    if confirm in [1, "1"] and email and checkemail(email):
+        res = run_sql("SELECT * FROM user WHERE email='%s'" % MySQLdb.escape_string(email))
+        if not res:
+            res = run_sql("INSERT INTO user (email,password, note) values('%s','%s', '1')" % (MySQLdb.escape_string(email), MySQLdb.escape_string(password)))
+            if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
+                emailsent = sendNewUserAccountWarning(email, email, password)
+            if password:
+                output += '<b><span class="info">Account created with password and activated.</span></b>'  
+            else: 
+                output += '<b><span class="info">Account created without password and activated.</span></b>' 
+            if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
+                if emailsent:
+                    output += '<br><b><span class="info">An email has been sent to the owner of the account.</span></b>' 
+                else:
+                    output += '<br><b><span class="important">Could not send an email to the owner of the account.</span></b>' 
+            
+        else:
+            output += '<b><span class="info">An account with the same email already exists.</span></b>' 
+       
+    elif confirm in [1, "1"]:
+        output += '<b><span class="info">Please specify an valid email-address.</span></b>'
+        
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_manageaccounts(req, "perform_createaccount", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+
+
+def perform_modifyaccountstatus(req, userID, email_user_pattern, limit_to, maxpage, page, callback='yes', confirm=0):
+    """set a disabled account to enabled and opposite"""
+    
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
+
+    res = run_sql("SELECT id, email, note, password FROM user WHERE id=%s" % userID)
+    output = ""
+    if res:
+        if res[0][2] in [0, "0", None]:
+            res2 = run_sql("UPDATE user SET note=1 WHERE id=%s" % userID)
+            output += """<b><span class="info">The account '%s' has been activated.</span></b>""" % res[0][1]
+            if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION == 1:
+                emailsent = sendAccountActivatedMessage(res[0][1], res[0][1], res[0][3])
+                if emailsent: 
+                    output += """<br><b><span class="info">An email has been sent to the owner of the account.</span></b>"""
+                else:
+                    output += """<br><b><span class="info">Could not send an email to the owner of the account.</span></b>"""
+ 
+        elif res[0][2] in [1, "1"]:
+            res2 = run_sql("UPDATE user SET note=0 WHERE id=%s" % userID)
+            output += """<b><span class="info">The account '%s' has been set inactive.</span></b>""" % res[0][1]
+    else:
+        output += '<b><span class="info">The account id given does not exist.</span></b>'
+  
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_modifyaccounts(req, email_user_pattern, limit_to, maxpage, page, content=output, callback='yes')
+    else:
+        return addadminbox(subtitle, body)
+
+def perform_editaccount(req, userID, mtype='', content='', callback='yes', confirm=-1):
+    """form to modify an account. this method is calling other methods which again is calling this and sending back the output of the method.
+    if callback, the method will call perform_editcollection, if not, it will just return its output.
+    userID - id of the user
+    mtype - the method that called this method.
+    content - the output from that method."""
+
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
+
+    res = run_sql("SELECT id, email FROM user WHERE id=%s" % userID)
+    if not res:
+        if mtype == "perform_deleteaccount":
+            text = """<b><span class="info">The selected account has been deleted, to continue editing, go back to 'Manage Accounts'.</span></b>"""
+            if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION == 1:
+                text += """<br><b><span class="info">An email has been sent to the owner of the account.</span></b>"""
+        else:
+            text = """<b><span class="info">The selected accounts does not exist, please go back and select an account to edit.</span></b>"""
+          
+        return index(req=req, 
+                 title='Edit Account',
+                 subtitle="Edit account", 
+                 body=[text],
+                 adminarea=7,
+                 authorized=1)
+        
+    fin_output = """
+    <table>
+    <tr>
+    <td><b>Menu</b></td>
+    </tr>
+    <tr>
+    <td>0.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s">Show all</a></small></td>
+    <td>1.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_modifylogindata">Modify login-data</a></small></td>
+    <td>2.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_modifybasket">Modify baskets</a></small></td>
+    <td>3.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_modifyalerts">Modify alerts</a></small></td>
+    <td>4.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_modifypreferences">Modify preferences</a></small></td>
+    </tr><tr>
+    <td>5.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_deleteaccount">Delete account</a></small></td>
+    </tr>
+    </table>
+    """ % (weburl, userID, weburl, userID, weburl, userID, weburl, userID, weburl, userID, weburl, userID)
+
+    if mtype == "perform_modifylogindata" and content:
+        fin_output += content
+    elif mtype == "perform_modifylogindata" or not mtype:
+        fin_output += perform_modifylogindata(req, userID, callback='')
+
+    if mtype == "perform_modifybasket" and content:
+        fin_output += content
+    elif mtype == "perform_modifybasket" or not mtype:
+        fin_output += perform_modifybasket(req, userID, callback='')
+
+    if mtype == "perform_modifypreferences" and content:
+        fin_output += content
+    elif mtype == "perform_modifypreferences" or not mtype:
+        fin_output += perform_modifypreferences(req, userID, callback='')
+
+    if mtype == "perform_modifyalerts" and content:
+        fin_output += content
+    elif mtype == "perform_modifyalerts" or not mtype:
+        fin_output += perform_modifyalerts(req, userID, callback='')
+
+    if mtype == "perform_deleteaccount" and content:
+        fin_output += content
+    elif mtype == "perform_deleteaccount" or not mtype:
+        fin_output += perform_deleteaccount(req, userID, callback='')
+        
+    return index(req=req,
+                 title='Edit Account',
+                 subtitle="Edit account '%s'" % res[0][1], 
+                 body=[fin_output],
+                 adminarea=7,
+                 authorized=1)
+
+def perform_modifybasket(req, userID, callback='yes', confirm=0):
+    """modify email and password of an account"""
+    
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
+
+    subtitle = """<a name="2"></a>2. Modify baskets.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html">?</a>]</small>""" % weburl
+
+    res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
+    output = ""
+    if res:
+        text = """To modify the baskets for this account, you have to login as the user."""
+        output += createhiddenform(action="%s/youraccount.py/login?" % weburl,
+                                   text=text,
+                                   p_email=res[0][1],
+                                   p_pw=res[0][2],
+                                   referer="%s/yourbaskets.py/display" % weburl,
+                                   button="Login")
+        output += "Remember that you will be logged out as the current user."
+
+        #baskets = run_sql("SELECT basket.id, basket.name, basket.public FROM basket, user_basket WHERE id_user=%s and user_basket.id_basket=basket.id" % userID)
+        #output += "<table><tr>"
+        #for (id, name, public) in baskets:
+        #    output += "<tr><td>%s<br>Public: %s</td></tr>" % (name, (public=="y" and "Yes" or "No"))
+        #    basket_records = run_sql("SELECT id_record, nb_order FROM basket_record WHERE id_basket=%s" % id)
+        #    for (id_record, nb_order) in basket_records:
+        #        output += "<tr><td></td><td>"
+        #        output += print_record(id_record)
+        #        output += "</td></tr>"
+        #    
+        #output += "</tr></table>"
+    else:
+        output += '<b><span class="info">The account id given does not exist.</span></b>'
+  
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_editaccount(req, userID, mtype='perform_modifybasket', content=addadminbox(subtitle, body), callback='yes')
+    else:
+        return addadminbox(subtitle, body)
+
+def perform_modifylogindata(req, userID, email='', password='', callback='yes', confirm=0):
+    """modify email and password of an account"""
+    
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
+
+    subtitle = """<a name="1"></a>1. Edit login-data.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html">?</a>]</small>""" % weburl
+
+    res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
+    output = ""
+    if res:
+        if not email and not password:
+            email = res[0][1]
+            password = res[0][2]
+        text =  ' <span class="adminlabel">Account id:</span>%s<br>\n' % userID
+        text += ' <span class="adminlabel">Email:</span>\n'
+        text += ' <input class="admin_wvar" type="text" name="email" value="%s" /><br>' % (email, )
+        text += ' <span class="adminlabel">Password:</span>\n'
+        text += ' <input class="admin_wvar" type="text" name="password" value="%s" /><br>' % (password, )
+
+        output += createhiddenform(action="modifylogindata",
+                                   text=text,
+				   userID=userID,
+                                   confirm=1,
+                                   button="Modify")
+        if confirm in [1, "1"] and email and checkemail(email):
+            res = run_sql("UPDATE user SET email='%s' WHERE id=%s" % (MySQLdb.escape_string(email), userID))
+            res = run_sql("UPDATE user SET password='%s' WHERE id=%s" % (MySQLdb.escape_string(password), userID))
+            output += '<b><span class="info">Email and/or password modified.</span></b>'
+        elif confirm in [1, "1"]:
+            output += '<b><span class="info">Please specify an valid email-address.</span></b>'
+    else:
+        output += '<b><span class="info">The account id given does not exist.</span></b>'
+  
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_editaccount(req, userID, mtype='perform_modifylogindata', content=addadminbox(subtitle, body), callback='yes')
+    else:
+        return addadminbox(subtitle, body)
+
+
+def perform_modifyalerts(req, userID, callback='yes', confirm=0):
+    """modify email and password of an account"""
+    
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
+
+    subtitle = """<a name="3"></a>3. Modify alerts.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html">?</a>]</small>""" % weburl
+
+    res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
+    output = ""
+    if res:
+        text = """To modify the alerts for this account, you have to login as the user."""
+        output += createhiddenform(action="%s/youraccount.py/login?" % weburl,
+                                   text=text,
+                                   p_email=res[0][1],
+                                   p_pw=res[0][2],
+                                   referer="%s/youralerts.py/display" % weburl,
+                                   button="Login")
+        output += "Remember that you will be logged out as the current user."
+
+        res= """ SELECT q.id, q.urlargs, a.id_basket, 
+                 a.alert_name, a.frequency, a.notification, 
+                 DATE_FORMAT(a.date_creation,'%%d %%b %%Y'), 
+                 DATE_FORMAT(a.date_lastrun,'%%d %%b %%Y')
+                 FROM query q, user_query_basket a
+                 WHERE a.id_user='%s' AND a.id_query=q.id
+                 ORDER BY a.alert_name ASC """ % userID
+        #res = run_sql(res)
+        #for (qID, qurlargs,  id_basket, alertname, frequency, notification, date_creation, date_lastrun) in res:
+        #    output += "%s - %s - %s - %s - %s - %s - %s<br>" % (qID,  id_basket, alertname, frequency, notification, date_creation, date_lastrun)
+    else:
+        output += '<b><span class="info">The account id given does not exist.</span></b>'
+  
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_editaccount(req, userID, mtype='perform_modifyalerts', content=addadminbox(subtitle, body), callback='yes')
+    else:
+        return addadminbox(subtitle, body)
+
+def perform_modifypreferences(req, userID, callback='yes', confirm=0):
+    """modify email and password of an account"""
+    
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
+
+    subtitle = """<a name="4"></a>4. Modify preferences.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html">?</a>]</small>""" % weburl
+
+    res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
+    output = ""
+    if res:
+        output += """Not implemented yet."""
+    else:
+        output += '<b><span class="info">The account id given does not exist.</span></b>'
+  
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_editaccount(req, userID, mtype='perform_modifypreferences', content=addadminbox(subtitle, body), callback='yes')
+    else:
+        return addadminbox(subtitle, body)
+
+def perform_deleteaccount(req, userID, callback='yes', confirm=0):
+    """delete account"""
+
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
+    
+    subtitle = """<a name="5"></a>5. Delete account.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html">?</a>]</small>""" % weburl
+
+    res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
+    output = ""
+    if res:
+        if confirm in [0, "0"]:
+            text = '<b><span class="important">Are you sure you want to delete the account with email: "%s"?</span></b>' % res[0][1]
+            output += createhiddenform(action="deleteaccount",
+                                       text=text,
+				       userID=userID,
+                                       confirm=1,
+                                       button="Delete")
+        
+        elif confirm in [1, "1"]:
+            res2 = run_sql("DELETE FROM user WHERE id=%s" % userID)
+            output += '<b><span class="info">Account deleted.</span></b>'
+            if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION == 1:
+                emailsent = sendAccountDeletedMessage(res[0][1], res[0][1])
+    else:
+        output += '<b><span class="info">The account id given does not exist.</span></b>'
+  
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_editaccount(req, userID, mtype='perform_deleteaccount', content=addadminbox(subtitle, body), callback='yes')
+    else:
+        return addadminbox(subtitle, body)
+
+def perform_rejectaccount(req, userID, email_user_pattern, limit_to, maxpage, page, callback='yes', confirm=0):
+    """Delete account and send an email to the owner."""
+
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
+    
+    res = run_sql("SELECT id, email, password, note FROM user WHERE id=%s" % userID)
+    output = ""
+    if res:
+        res2 = run_sql("DELETE FROM user WHERE id=%s" % userID)
+        output += '<b><span class="info">Account rejected and deleted.</span></b>'
+        if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION == 1:
+            if not res[0][3] or res[0][3] == "0":
+                emailsent = sendAccountRejectedMessage(res[0][1], res[0][1])
+            elif res[0][3] == "1":
+                emailsent = sendAccountDeletedMessage(res[0][1], res[0][1])
+            if emailsent: 
+                output += """<br><b><span class="info">An email has been sent to the owner of the account.</span></b>"""
+            else:
+                output += """<br><b><span class="info">Could not send an email to the owner of the account.</span></b>"""
+    else:
+        output += '<b><span class="info">The account id given does not exist.</span></b>'
+
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_modifyaccounts(req, email_user_pattern, limit_to, maxpage, page, content=output, callback='yes')
+    else:
+        return addadminbox(subtitle, body)
+        
+def perform_modifyaccounts(req, email_user_pattern='', limit_to=-1, maxpage=MAXPAGEUSERS, page=1, content='', callback='yes', confirm=0):
+    """Modify default behaviour of a guest user or if new accounts should automatically/manually be modified."""
+
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
+
+    subtitle = """<a name="4"></a>4. Edit accounts.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html">?</a>]</small>""" % weburl
+
+    output = ""
+
+    # remove letters not allowed in an email
+    email_user_pattern = cleanstring_email(email_user_pattern)
+    try:
+        maxpage = int(maxpage)
+    except:
+        maxpage = MAXPAGEUSERS
+    try:
+        page = int(page)
+        if page < 1:
+            page = 1
+    except:
+        page = 1
+        
+    text  = ' <span class="adminlabel">Email (part of):</span>\n'
+    text += ' <input class="admin_wvar" type="text" name="email_user_pattern" value="%s" /><br>' % (email_user_pattern, )
+    
+    text += """<span class="adminlabel">Limit to:</span>
+    <select name="limit_to" class="admin_w200">
+    <option value="all" %s>All accounts</option>
+    <option value="enabled" %s>Active accounts</option>
+    <option value="disabled" %s>Inactive accounts</option>
+    </select><br>""" % ((limit_to=="all" and "selected" or ""), (limit_to=="enabled" and "selected" or ""), (limit_to=="disabled" and "selected" or ""))
+
+    text += """<span class="adminlabel">Accounts per page:</span>
+    <select name="maxpage" class="admin_wvar">
+    <option value="25" %s>25</option>
+    <option value="50" %s>50</option>
+    <option value="100" %s>100</option>
+    <option value="250" %s>250</option>
+    <option value="500" %s>500</option>
+    <option value="1000" %s>1000</option>
+    </select><br>""" % ((maxpage==25 and "selected" or ""), (maxpage==50 and "selected" or ""), (maxpage==100 and "selected" or ""), (maxpage==250 and "selected" or ""), (maxpage==500 and "selected" or ""), (maxpage==1000 and "selected" or ""))
+
+    output += createhiddenform(action="modifyaccounts",
+                               text=text,
+                               button="search for accounts")
+
+    if limit_to not in [-1, "-1"] and maxpage:
+        users1 = "SELECT id,email,note FROM user WHERE "
+        if limit_to == "enabled":
+            users1 += " email!='' AND note=1"
+        elif limit_to == "disabled":
+            users1 += " email!='' AND note=0 OR note IS NULL"
+        elif limit_to == "guest":
+            users1 += " email=''"
+        else:
+            users1 += " email!=''"
+        if email_user_pattern:
+            users1 += " AND email RLIKE '%s'" % (email_user_pattern)
+        users1 += " ORDER BY email LIMIT %s" % (maxpage * page + 1)
+        users1 = run_sql(users1)
+        if not users1:
+            output += '<b><span class="info">There are no accounts matching the email given.</span></b>'
+        else: 
+            users = []
+            if maxpage * (page  - 1) > len(users1):
+                page = len(users1) / maxpage + 1  
+            for (id, email, note) in users1[maxpage * (page  - 1):(maxpage * page)]:
+                users.append(['', id, email, (note=="1" and '<strong class="info">Active</strong>' or '<strong class="important">Inactive</strong>')])
+                for col in [(((note=="1" and 'Inactivate' or 'Activate'), 'modifyaccountstatus'), ((note == "0" and 'Reject' or 'Delete'), 'rejectaccount'), ),   
+                            (('Edit account', 'editaccount'), ),]:
+                    users[-1].append('<a href="%s?userID=%s&amp;email_user_pattern=%s&amp;limit_to=%s&amp;maxpage=%s&amp;page=%s&amp;rand=%s">%s</a>' % (col[0][1], id, email_user_pattern, limit_to, maxpage, page, random.randint(0,1000), col[0][0]))
+                    for (str, function) in col[1:]:
+                        users[-1][-1] += ' / <a href="%s?userID=%s&amp;email_user_pattern=%s&amp;limit_to=%s&amp;maxpage=%s&amp;page=%s&amp;rand=%s">%s</a>' % (function, id, email_user_pattern, limit_to, maxpage, page, random.randint(0,1000), str)
+ 
+            last = ""
+            next = ""
+            if len(users1) > maxpage:
+                if page > 1:
+                    last += '<b><span class="info"><a href="modifyaccounts?email_user_pattern=%s&amp;limit_to=%s&amp;maxpage=%s&amp;page=%s">Last Page</a></span></b>' % (email_user_pattern, limit_to, maxpage, (page - 1))
+                if len(users1[maxpage * (page  - 1):(maxpage * page)]) == maxpage:
+                    next += '<b><span class="info"><a href="modifyaccounts?email_user_pattern=%s&amp;limit_to=%s&amp;maxpage=%s&amp;page=%s">Next page</a></span></b>' % (email_user_pattern, limit_to, maxpage, (page + 1))
+                output += '<b><span class="info">Showing accounts %s-%s:</span></b>' % (1 + maxpage * (page - 1), maxpage * page)
+            else:
+                output += '<b><span class="info">%s matching account(s):</span></b>' % len(users1)
+            output += tupletotable(header=[last, 'id', 'email', 'Status', '', '',next], tuple=users)
+
+    else:
+        output += '<b><span class="info">Please select which accounts to find and how many to show per page.</span></b>'
+    
+    if content:
+        output += "<br>%s" % content
+    
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_manageaccounts(req, "perform_modifyaccounts", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
 
 def perform_delegate_startarea(req):
     """start area for lower level delegation of rights."""
@@ -662,7 +1291,7 @@ def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=
             # remove letters not allowed in an email
             email_user_pattern = cleanstring_email(email_user_pattern)
                 
-            text  = ' <span class="adminlabel">2. search pattern </span>\n'
+            text  = ' <span class="adminlabel">2. search for user </span>\n'
             text += ' <input class="admin_wvar" type="text" name="email_user_pattern" value="%s" />\n' % (email_user_pattern, )
     
             output += createhiddenform(action="delegate_adduserrole",
@@ -1316,7 +1945,7 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
         # remove letters not allowed in an email
         email_user_pattern = cleanstring_email(email_user_pattern)
             
-        text  = ' <span class="adminlabel">2. search pattern </span>\n'
+        text  = ' <span class="adminlabel">2. search for user </span>\n'
         text += ' <input class="admin_wvar" type="text" name="email_user_pattern" value="%s" />\n' % (email_user_pattern, )
 
         output += createhiddenform(action="adduserrole",
@@ -1437,7 +2066,7 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
     # clean email search string
     email_user_pattern = cleanstring_email(email_user_pattern)
         
-    text  = ' <span class="adminlabel">1. search pattern </span>\n'
+    text  = ' <span class="adminlabel">1. search for user </span>\n'
     text += ' <input class="admin_wvar" type="text" name="email_user_pattern" value="%s" />\n' % (email_user_pattern, )
 
     output = createhiddenform(action='addroleuser',
@@ -2674,4 +3303,110 @@ def check_email(str=''):
 
     r = re.compile(r'(.)+\@(.)+\.(.)+')
     return r.match(str) and 1 or 0
+
+def sendAccountActivatedMessage(AccountEmail, sendTo, password, ln=cdslang):
+    """Send an email to the address given by sendTo about the new activated account."""
+
+    fromaddr = "From: %s" % supportemail
+    toaddrs  = "To: %s" % sendTo
+    to = toaddrs + "\n"
+    sub = "Subject: Your account on '%s' has been activated\n\n" % cdsname
+    body = "Your account earlier created on '%s' has been activated:\n\n" % cdsname
+    body += "   Username/Email: %s\n" % AccountEmail
+    body += "   Password: %s\n" % ("*" * len(password))
+    body += "\n---------------------------------"
+    body += "\n%s" % cdsname
+    body += "\nContact: %s" % supportemail
+    msg = to + sub + body
+
+    server = smtplib.SMTP('localhost')
+    server.set_debuglevel(1)
+
+    try:
+        server.sendmail(fromaddr, toaddrs, msg)
+    except smtplib.SMTPRecipientsRefused,e:
+        return 0
+
+    server.quit()
+    return 1
+
+def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=cdslang):
+    """Send an email to the address given by sendTo about the new account newAccountEmail."""
+
+    fromaddr = "From: %s" % supportemail
+    toaddrs  = "To: %s" % sendTo
+    to = toaddrs + "\n"
+    sub = "Subject: Account created on '%s'\n\n" % cdsname
+    body = "An account has been created for you on '%s':\n\n" % cdsname
+    body += "   Username/Email: %s\n" % newAccountEmail
+    body += "   Password: %s\n" % ("*" * len(password))
+    body += "\n---------------------------------"
+    body += "\n%s" % cdsname
+    body += "\nContact: %s" % supportemail
+    msg = to + sub + body
+
+    server = smtplib.SMTP('localhost')
+    server.set_debuglevel(1)
+
+    try:
+        server.sendmail(fromaddr, toaddrs, msg)
+    except smtplib.SMTPRecipientsRefused,e:
+        return 0
+
+    server.quit()
+    return 1
+
+def sendAccountRejectedMessage(newAccountEmail, sendTo, ln=cdslang):
+    """Send an email to the address given by sendTo about the new account newAccountEmail."""
+
+    fromaddr = "From: %s" % supportemail
+    toaddrs  = "To: %s" % sendTo
+    to = toaddrs + "\n"
+    sub = "Subject: Account rejected on '%s'\n\n" % cdsname
+    body = "Your request for an account has been rejected on '%s':\n\n" % cdsname
+    body += "   Username/Email: %s\n" % newAccountEmail
+    body += "\n---------------------------------"
+    body += "\n%s" % cdsname
+    body += "\nContact: %s" % supportemail
+    msg = to + sub + body
+
+    server = smtplib.SMTP('localhost')
+    server.set_debuglevel(1)
+
+    try:
+        server.sendmail(fromaddr, toaddrs, msg)
+    except smtplib.SMTPRecipientsRefused,e:
+        return 0
+
+    server.quit()
+    return 1
+
+def sendAccountDeletedMessage(newAccountEmail, sendTo, ln=cdslang):
+    """Send an email to the address given by sendTo about the new account newAccountEmail."""
+
+    fromaddr = "From: %s" % supportemail
+    toaddrs  = "To: %s" % sendTo
+    to = toaddrs + "\n"
+    sub = "Subject: Account deleted on '%s'\n\n" % cdsname
+    body = "Your account on '%s' has been deleted:\n\n" % cdsname
+    body += "   Username/Email: %s\n" % newAccountEmail
+    body += "\n---------------------------------"
+    body += "\n%s" % cdsname
+    body += "\nContact: %s" % supportemail
+    msg = to + sub + body
+
+    server = smtplib.SMTP('localhost')
+    server.set_debuglevel(1)
+
+    try:
+        server.sendmail(fromaddr, toaddrs, msg)
+    except smtplib.SMTPRecipientsRefused,e:
+        return 0
+
+    server.quit()
+    return 1
+
+
+
+
 
