@@ -142,6 +142,3 @@ cfg_webaccess_warning_msgs = {
                                 9: """Error(9): Account '%s' is not yet activated."""
 		} 
 </protect>
-
-
-"""Guest users are not allowed, please <a href="%s/youraccount.py/login">login</a>.""" % weburl
