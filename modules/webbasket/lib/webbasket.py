@@ -723,7 +723,7 @@ def perform_request_add(uid=-1, recid=[], bid=[], bname=[]):
         except BasketException, e:
             out += """The basket %s has not been created: %s""" % (bname, e)
     if bskIDs == []:
-        # A - propose list of baskets to choose from
+        # A - some information missing, so propose list of baskets to choose from
         basket_id_name_list = get_list_of_user_baskets(uid)
         if basket_id_name_list != []:
             # there are some baskets; good
@@ -748,16 +748,19 @@ def perform_request_add(uid=-1, recid=[], bid=[], bname=[]):
             out += """<input type="submit" name="action" value="CREATE NEW BASKET">"""
             out += """</form>"""            
     else:
-        # B - we have baskets IDs; good
+        # B - we have baskets IDs, so we can add records
         out += """<p><span class="info">Adding %s records to basket(s)...</span>""" % len(recIDs)
         for bskID in bskIDs:
-            for recID in recIDs:
-                try:
-                    res = run_sql("INSERT INTO basket_record(id_basket,id_record,nb_order) VALUES (%s,%s,%s)",
-                                  (bskID,recID,'0'))
-                except:
-                    pass # maybe records already existed? (page reload)
-        out += """<span class="info">done.</span>"""
+            if is_basket_owner(uid, bskID):
+                for recID in recIDs:
+                    try:
+                        res = run_sql("INSERT INTO basket_record(id_basket,id_record,nb_order) VALUES (%s,%s,%s)",
+                                      (bskID,recID,'0'))
+                    except:
+                        pass # maybe records were already there? page reload happened?
+                out += """<span class="info">done.</span>"""
+            else:
+                out += """<span class="info">sorry, you are not the owner of the basket.</span>"""
         out += perform_display(uid=uid, id_basket=bskIDs[0])
     return out 
 
