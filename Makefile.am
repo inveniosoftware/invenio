@@ -46,7 +46,7 @@ load-sample-data: install ./dbutil/tabfill.sql
 	(cd ./dbutil; ./bibupload ./samplebibdatafmt.xml)
 	rm -f ./dbutil/samplebibdatafmt.xml
 	./cgibin/create_collection_pages ""+
-	./dbutil/bibwords -ucds.support@cern.ch
+	./dbutil/bibwords 
 	./dbutil/bibwords 1
 	@echo "*******************************************************************************"
 	@echo "** The sample data has been successfully loaded.                             **"
