@@ -876,9 +876,10 @@ II. Example - connecting role and user</a>
 
   - Edit account:
     When editing one account, you can change the email address, password, delete the account, or modify
-    the baskets or alerts belonging to one account. To modify baskets or alerts, you need to login
-    as the user, and modify the desired data as a normal user. Remember to log out as the user when you
-    are finished editing.
+    the baskets or alerts belonging to one account. Which login method should be the default for this
+    account can also be selected. To modify baskets or alerts, you need to login as the user, and 
+    modify the desired data as a normal user. Remember to log out as the user when you are finished 
+    editing.
 
 </pre>
 
@@ -896,6 +897,10 @@ II. Example - connecting role and user</a>
 
    If you want the user to be unable to change login method and account username / password, forcing use
    of certain external systems, set CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS to 4 as mentioned in the last paragraph.
+
+   If a user is changing login method from an external one to the internal, he also need to either change the
+   password before logging out, or ask to get the password sent by email, since the password is randomly 
+   generated for the local account when using an external login method.
 
    If a external login system is used, you may want to protect the users username / password using HTTPS.
 
