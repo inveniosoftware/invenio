@@ -24,31 +24,47 @@ Contents
    Here is the software you need to have around before you
    start installing CDSware:
 
-     a) Apache server, compiled with PHP and MySQL support:
-          <http://httpd.apache.org/>
-          <http://www.php.net/>
-
-     b) PHP compiled as a standalone command-line executable 
-        (in addition to Apache module) is required, too:
-          <http://www.php.net/manual/en/install.commandline.php>
-
-     c) MySQL server (may be on a remote machine), and MySQL client
-        (must be available locally too):
+     a) MySQL server (may be on a remote machine), and MySQL client
+        (must be available locally too).
+        Tested mainly with MySQL version 4.0.11, should work with
+        other releases too.
           <http://mysql.com/>
 
-     d) WML - Website META Language:
-          <http://www.engelschall.com/sw/wml/>
+     b) Apache server, with support for loading DSO modules.  
+        Tested mainly with version 2.0.43 and above.  Apache2 is
+        recommended due to its superior mod_python support, see below.
+          <http://httpd.apache.org/>
 
-     e) Python v2.x, featuring recent MySQLdb v0.9x module
-        (it is recommended to use Python v2.2 that gives ~30% faster
-         search speed than Python v2.1; also, it is recommended to
-         install optional Psyco module that further increases the
-         speed of Set operations by about ~20%):
+     c) Python v2.x, featuring recent MySQLdb v0.9.2 module.
+        We recommended to use Python v2.2 and above.  Also, we
+        recommend to optionally install also the Psyco module that
+        increases performance of some operations.  (Note that CDSware
+        will work without Psyco, though.)
+
           <http://python.org/>
           <http://sourceforge.net/projects/mysql-python>
           <http://psyco.sourceforge.net/>
 
-     f) If you want to be able to search for words in the fulltext files 
+     d) mod_python compiled as Apache module.  Tested mainly with
+        versions 3.0BETA4 and above.  mod_python 3.x is recommended
+        due to better Apache2 and MySQL support, as we saw in our
+        experience.
+          <http://www.modpython.org/>
+
+     e) PHP compiled as Apache module, including MySQL support.
+        Tested mainly with PHP version 4.3.0 and above.
+          <http://www.php.net/>
+
+     f) PHP compiled as a standalone command-line executable (CLI)
+        (in addition to Apache module) is required, too.  As of PHP
+        4.3.0 you'll obtain the CLI executable by default, so you
+        don't have to compile it separately.
+          <http://www.php.net/manual/en/install.commandline.php>
+
+     g) WML - Website META Language:
+          <http://www.engelschall.com/sw/wml/>
+
+     h) If you want to be able to search for words in the fulltext files 
         (i.e. to have fulltext indexing), then you need as well to install 
         some of the following tools: 
 
@@ -76,32 +92,33 @@ Contents
 1. Quick instructions for the impatient CDSware admin
 =====================================================
 
+      $ cd /usr/local/src/
+      $ wget http://cdsware.cern.ch/download/cdsware-0.9.tar.gz
+      $ tar xvfz cdsware-0.9.tar.gz
+      $ cd cdsware-0.9
+      $ ./configure --with-prefix=/usr/local/cdsware-demo \
+                    --with-webdir=/var/www/DEMO \
+                    --with-weburl=http://webserver.domain.com/DEMO \
+                    --with-dbhost=sqlserver.domain.com \
+                    --with-dbname=cdsware \
+                    --with-dbuser=cdsware \
+                    --with-dbpass=myp1ss 
+      $ vi ./config/config.wml   ## optional, but strongly recommended
+      $ make
       $ mysql -h sqlserver.domain.com -u root -p mysql
           mysql> CREATE DATABASE cdsware;
           mysql> GRANT ALL PRIVILEGES ON cdsware.* TO cdsware@webserver.domain.com IDENTIFIED BY 'myp1ss';
       $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
       $ sudo vi /path/to/php/conf/php.ini ## see below in part 2
       $ sudo /path/to/apache/bin/apachectl graceful
-      $ cd /usr/local/src/
-      $ wget http://cdsware.cern.ch/download/cdsware-0.9.tar.gz
-      $ tar xvfz cdsware-0.9.tar.gz
-      $ cd cdsware-0.9
-      $ ./configure --with-htdocsdir=/www/data/CDSware/ \
-                    --with-cgibindir=/www/cgi-bin/CDSware/ \
-                    --with-dbutildir=/usr/local/bin/CDSware/ \
-                    --with-htdocsurl=http://webserver.domain.com/CDSware/ \
-                    --with-cgibinurl=http://webserver.domain.com/cgi-bin/CDSware/ \
-                    --with-dbhost=sqlserver.domain.com \
-                    --with-dbname=cdsware \
-                    --with-dbuser=cdsware \
-                    --with-dbpass=myp1ss 
-      $ vi ./config/config.wml  ## optional, but strongly recommended
-      $ gmake
-      $ gmake create-tables     ## optional
-      $ gmake install
-      $ gmake load-sample-data  ## optional
-      $ gmake clean-sample-data ## optional
-      $ netscape http://webserver.domain.com/CDSware/admin/ ## optional
+      $ make create-tables       ## optional
+      $ make install
+      $ sudo chown -R www-data /usr/local/cdsware-demo/var
+      $ make create-demo-site    ## optional
+      $ make load-demo-records   ## optional
+      $ make remove-demo-records ## optional
+      $ make destroy-demo-site   ## optional
+      $ netscape http://webserver.domain.com/cdsware/admin/ ## optional
 
 2. Detailed instructions for the patient CDSware admin
 ======================================================
@@ -109,6 +126,86 @@ Contents
    The CERN Document Server Software (CDSware) uses standard GNU autoconf
    method to build and install its files.  This means that you proceed
    as follows:
+
+      $ cd /usr/local/src/
+ 
+          Change to a directory where we will configure and build the
+          CDS Software.  (The built files will be installed into
+          different "target" directories later.)
+
+      $ wget http://cdsware.cern.ch/download/cdsware-0.9.tar.gz
+
+          Fetch CDSware package from the CDSware distribution server.
+
+      $ tar xvfz cdsware-0.9.tar.gz
+
+          Untar the distriburion tarball.    
+
+      $ cd cdsware-0.9
+   
+          Go to the source directory.
+
+      $ ./configure --with-prefix=/usr/local/cdsware-demo \
+                    --with-webdir=/var/www/DEMO \
+                    --with-weburl=http://webserver.domain.com/DEMO \
+                    --with-dbhost=sqlserver.domain.com \
+                    --with-dbname=cdsware \
+                    --with-dbuser=cdsware \
+                    --with-dbpass=myp1ss 
+
+          Configure essential CDSware parameters, such as the generic 
+          installation directory (--with-prefix), the home directory
+          for Web scripts and documents (--with-webdir, must be inside
+          Apache htdocs path) and the corresponding URL for the
+          CDSware home web directory (--with-weburl); finally, we
+          configure the database host (--with-dbhost), database name
+          (--with-dbname), and database user credentials
+          (--with-dbuser, --with-dbpass).  Don't use trailing slashes.
+          
+          The general installation directory --prefix may be chosen
+          anywhere on the system; please foresee sufficient space,
+          since CDSware will use it not only its binary and library
+          files, but also runtime log and cache files.
+
+          Let's underline that --with-webdir must be within the
+          Apache's htdocs directory and that --with-weburl must be the
+          URL corresdponding to this directory, and that it'll appear
+          as "home URL" of this CDSware installation to the end users.
+
+          Note that CDSware won't install in any other directories but
+          the two mentioned in the above configure line.
+
+          This configuration step is mandatory, and is referred to as
+          "pre-compile time configuration step a)" in the elucidative
+          explanatory commentary below.  
+
+      $ vi ./config/config.wml  ## optional, but strongly recommended
+
+          Optionally, customize your CDSware installation.  We
+          strongly recommend you to edit at least the top of this file
+          where you can define some very essential CDSware parameters
+          like the name of your CDSware document server or the email
+          address of the local CDSware administrator.  (The latter is
+          needed if you want to use administration modules, and you
+          certainly do!)
+
+          The rest of the "config.wml" file enables you to change the
+          CDSware web page look and feel, and otherwise to influence
+          its behaviour and default parameters.
+
+          This configuration step is optional, but strongly
+          recommended.  It is referred to as "compile time
+          configuration step b)" in the elucidative explanatory
+          commentary below.
+
+      $ make
+
+          Launch the CDSware build.  All the pages will be pre-created
+          based on the config you have edited in the previous step.
+
+          Before proceeding further with the CDSware installation, we
+          have to do some admin-level tasks on the MySQL and Apache
+          servers.
 
       $ mysql -h sqlserver.domain.com -u root -p mysql
           mysql> CREATE DATABASE cdsware;
@@ -139,17 +236,20 @@ Contents
           by the web server as PHP files, and that "index.shtml" will
           be considered as directory index file.
 
+          In addition, you have to ask Apache to interpret .py files
+          in the installation place via mod_python:
+
+              <Directory /var/www/DEMO/>
+                 AddHandler python-program .py
+                 PythonHandler mod_python.publisher
+                 PythonDebug On
+              </Directory>
+            
       $ sudo vi /path/to/php/conf/php.ini ## see below in part 2
 
           Please ask your webserver administrator to put the following
           lines in your "php.ini" configuration file:
           
-              session.save_handler = user
-              session.auto_start = 0
-              session.name = SESSIONID
-              session.gc_probability = 0
-              session.gc_maxlifetime = 60000
-              session.cookie_lifetime = 0
               log_errors = on
               display_errors = off
               expose_php = off
@@ -157,108 +257,69 @@ Contents
 	      register_globals = on
 	      short_open_tag = on
 
-          This is to tell PHP that we will be using our own session
-          handler and our own garbage collector.  Also, it sets up
-          some other relevant PHP variables.
+          This will set up some relevant PHP variables.
            
       $ sudo /path/to/apache/bin/apachectl graceful
 
-          Please ask your webserver admin to restart the Apache server
-          after the above "httpd.conf" and "php.ini" changes.
+          Please ask your webserver administrator to restart the
+          Apache server after the above "httpd.conf" and "php.ini"
+          changes.
 
-      $ cd /usr/local/src/
- 
-          Change to a directory where we will configure and build the
-          CDS Software.  (The built files will be installed later on
-          into Apache htdocs and cgi-bin trees.)
+          After these admin-level tasks to be performed as root, let's
+          now go back to finish the installation of the CDSware package.
 
-      $ wget http://cdsware.cern.ch/download/cdsware-0.9.tar.gz
-
-          Fetch CDSware package from the CDSware distribution server.
-
-      $ tar xvfz cdsware-0.9.tar.gz
-
-          Untar the distriburion tarball.    
-
-      $ cd cdsware-0.9
-   
-          Go to the source directory.
-
-      $ ./configure --with-htdocsdir=/www/data/CDSware/ \
-                    --with-cgibindir=/www/cgi-bin/CDSware/ \
-                    --with-dbutildir=/usr/local/bin/CDSware/ \
-                    --with-htdocsurl=http://webserver.domain.com/CDSware/ \
-                    --with-cgibinurl=http://webserver.domain.com/cgi-bin/CDSware/ \
-                    --with-dbhost=sqlserver.domain.com \
-                    --with-dbname=cdsware \
-                    --with-dbuser=cdsware \
-                    --with-dbpass=myp1ss 
-
-          Configure essential CDSware parameters, as the installation
-          directories for CDSware HTDOCS files, CGI scripts and DB
-          utilities, the corresponding URLs for the CDSware homepage
-          and CGI scripts, and finally the database host, database
-          name, and database user credentials.
-          
-          The first two directories must be within the Apache's htdocs
-          and cgi-bin paths, respectively.  The DB utilities may be
-          installed anywhere on the system.  Note that CDSware won't
-          install in any other directories but the three mentioned in
-          the above configure line.
-
-          This configuration step is mandatory, and is referred to as
-          "pre-compile time configuration step a)" in the elucidative
-          explanatory commentary below.  
-
-      $ vi ./config/config.wml  ## optional, but strongly recommended
-
-          Optionally, customize your CDSware installation.  We
-          strongly recommend you to edit at least the top of this file
-          where you can define some rather essential CDSware
-          parameters like the name of your CDSware document server or
-          the email address of the local CDSware administrator.  (The
-          latter is needed if you want to use admin. modules in
-          general.)
-
-          The rest of the "config.wml" file enables you to change the
-          CDSware web page look and feel, and otherwise to influence
-          its behaviour and default parameters.
-
-          This configuration step is optional, but strongly
-          recommended.  It is referred to as "compile time
-          configuration step b)" in the elucidative explanatory
-          commentary below.
-
-      $ gmake
-
-          Launch the CDSware build.  All the pages will be pre-created
-          based on the config you have edited in the previous step.
-
-      $ gmake create-tables     ## optional
+      $ make create-tables     ## optional
 
           Optionally, create CDSware tables on the MySQL server.  You
-          probably want to do this step only once, i.e. only if you
-          have not created any CDSware databases yet.
+          probably want to do this step only once, i.e. if you have
+          not created any CDSware database and tables yet.
 
-      $ gmake install
+      $ make install
 
-          Install the web pages, cgi scripts and database utilities
-          in the respective directories, as specified earlier by the
-          configure command.
+          Install the web pages, scripts, utilities and everything
+          needed for runtime into the respective directories, as
+          specified earlier by the configure command.
 
           After this step, you should be able to point your browser to
           the chosen URL of your local CDSware installation and see it
           running!
 
-      $ gmake load-sample-data  ## optional
+      $ sudo chown -R www-data /usr/local/cdsware-demo/var
 
-          Optionally, load some sample data to be able to test the
-          CDSware installation.
+          One more superuser step, as we need to enable Apache server
+          to write some log information and to cache interesting
+          entities inside the "var" subdirectory of our CDSware
+          general installation directory.
 
-      $ gmake clean-sample-data ## optional
+          Here we assume that your Apache server processes are run
+          under "www-data" group.  Change this appropriately for your
+          system.
 
-          Optionally, remove the sample data and prepare a blank CDSware
-          installation for production purposes.
+      $ make create-demo-site  ## optional
+
+          This step is recommended to test your local CDSware
+          installation.  It should give you our "Atlantis Institute of
+          Science" demo installation, exactly as you see it at
+          <http://cdsware.cern.ch/DEMO/>.
+
+      $ make load-demo-records  ## optional
+
+          Optionally, load some demo records to be able to test
+          indexing and searching of your local demo CDSware
+          installation.
+
+      $ make remove-demo-records ## optional
+
+          Optionally, remove the demo records loaded in the previous
+          step but otherwise keep the demo collection, submit, format
+          etc configurations that you may reuse and modify for
+          production purposes.
+
+      $ make destroy-demo-site ## optional
+
+          Optionally, destroy also all the demo configuration so that
+          you'll have a blank CDSware system for your production
+          purposes.
 
       $ netscape http://webserver.domain.com/CDSware/admin/ ## optional
 
@@ -290,15 +351,17 @@ Contents
 
           This configures essential CDSware parameters that makes your
           CDSware copy installable and runable.  The essential parameters
-          include: install directories for HTML documents, CGI scripts
-          and DB utilities; the base URL of the HTML documents and CGI
-          scripts; and MySQL user and server credentials.  
+          include: general CDSware installation directory containing
+          (among others) binaries, libraries, and log and cache
+          directories; install directory for Web scripts and pages;
+          and MySQL user and server credentials.
 
           This configuration step uses standard GNU autoconf approach,
           i.e. you will run the standard "configure" script.  Note
           that the only arguments that CDSware takes into consideration
-          are CDSware-specific "--with-foo" arguments, see the end of
-          "configure --help" output.
+          are the general "--prefix" one and CDSware-specific
+          "--with-foo" arguments, see the end of "configure --help"
+          output.
 
           This configuration step is mandatory.  Without knowing
           theses essential parameters there is nothing to install and
@@ -323,25 +386,34 @@ Contents
           pre-generated.  We prefer that this configuration step is
           done during compile-time and not runtime, because of
           multiple reasons: (i) the pre-generated pages impose less
-          load on the web and the database server and so they are
-          served faster to the web client; (ii) we use several
-          different languages (PHP, Perl, Python) so that by using
-          compile-time configuration options we can share the same
-          variables across many heterogeneous applications; (iii) use
-          of WML and page templates enables you to easily change
-          anything in the CDSware system, even in its deepest level.
+          load on the web server and the database server and so they
+          are served faster to the end user; (ii) we use several
+          different languages (Python, PHP) and by using independent
+          compile-time configuration language we can share the same
+          configuration variables across heterogeneous languages;
+          (iii) use of WML and page templates enables you to easily
+          change anything in the CDSware system, even into deep
+          levels.
 
-          Usually, if you are changing parameters and/or look and feel
-          of CDSware pages, you do this step several times:
+          If you are changing parameters and/or look and feel
+          of CDSware pages, you may want to repeat these step several
+          times:
 
               $ vi config/config.wml
-              $ gmake install
-              $ netscape http://webserver.domain.com/CDSware/
-              $ vi config/config.wml
-              $ gmake install
+              $ make drop-tables
+              $ make create-tables
+              $ make create-demo-site
+              $ make load-demo-records
+              $ netscape http://webserver.domain.com/DEMO/
               [...]
 
-          until you are satisfied with the result.
+          to see what it brings, until you are satisfied with the
+          result.
+
+          (Note that you may as well choose to change these parameters
+          inside the CDSware library configuration files later on,
+          during runtime, at least for non-static Python and PHP
+          pages.)
 
       (c) runtime configuration phase 
           [uses MySQL / after "make install", while doing "netscape http://webserver.domain.com/CDSware/admin/"]
@@ -349,25 +421,27 @@ Contents
           Optionally, you will most probably want to define specific
           data collections, to configure submit and search page for those
           collections, to specify search options and word files to
-          search in, etc.  
+          search in, formats how to display data, etc.  
 
           This configuration step uses MySQL configuration tables and
           is done during the runtime, for your convenience.  It means
           that after previous configuration step (b), and after
-          successful "gmake install", if you are happy with its result
+          successful "make install", if you are happy with its result
           you no longer edit WML files within the CDSware source tree but
-          rather configure "working" CDSware installation via its
-          Administration web interface.
+          rather configure "fully running" CDSware installation via
+          its Administration web interface.
          
           Usually, you will do this step many times in the future, to
           tweak the running installation, to add new collections and
           data types, etc.
 
           (Note that if you want to change something "deeper" in a
-           running CDSware installation, such as look and feel of pages,
-           or to add some new pages, then you need to go back to WML
-           source, so you may want to leave your customized copy of
-           the CDSware WML source tree around.)
+          running CDSware installation, such as look and feel of pages,
+          or to add some new pages, then you may want to edit library
+          configuration files for Python and PHP non-static pages, as
+          noted above.  But if you want to do really "deep" changes,
+          you need to go back to WML source, so you may want to leave
+          your customized copy of the CDSware WML source tree around.)
 
    We hope that this explains why we have chosen this three-level
    configuration model, and that you will find it convenient in real
