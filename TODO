@@ -14,8 +14,22 @@ Suitable for editing with Emacs ToDoo mode, see
    sync;You can't run this command now")
   Received Tue Mar  2 10:22:33 2004
 
-o [simko] language-dependent portalboxes 
-  Received Wed Feb 11 12:53:13 2004
+o [simko] language-dependent collection names
+  Received Mon Mar  8 19:22:46 2004
+
+Upon first look I don't see any problem with your setup.  Apart from
+an eventual end-user problem of seeing a collection named ``EPFL
+Library Catalogue'' on the search results page, but when she clicks on
+this collection name the name changes to ``Swiss Federal Institute of
+Technology Lausanne'', which may be confusing.  To avoid this problem,
+we usually call CDSNAME the same way as the collection #1 and the same
+way as the default language of the interface.
+
+Anyhow, this touches clearly a more general problem with translations
+of collection names.  CDSware v0.3.0 now contains a possibility to
+name the same collection in many different languages in a clean way.
+I'll prepare a demo for v0.3.1.  This possibility will solve the above
+mentioned end-user confusion-prone display in a clean way.
 
 o [tibor] static HTML pages should not get created all languages
   Static HTML pages should not get created all languages when user
@@ -47,13 +61,7 @@ o [thomas] BibUpload must use run_sql()
   to avoid connection dropping problems
   Received Fri Jan 16 10:17:11 2004
 
-o [tibor] Admin: HOWTO Run guide 
-  Received Wed Dec 17 16:20:35 2003 
-
 o [tibor] Installation: upgrade instructions
-  Received Wed Dec 17 16:20:35 2003 
-
-o [tibor] WebSession: garbage collection and guest session check
   Received Wed Dec 17 16:20:35 2003 
 
 * WebSession account edit bugs 
@@ -67,23 +75,34 @@ o [tibor] BibSched: enable multiple hosts
 o [tibor] WebSearch: search cache back
   Received Wed Dec 17 16:20:35 2003 
 
+> It seems that restarting Apache solved the problem of internal error
+> mentioned in my last email (thanks). Should I restart Apache
+> everytime that I run webcoll ? The fact that 'Apache cache is not
+> updated for all Apache instances' could explain the error message
+> and the no collection issue that has been solved?
+  
+I think so.  WebSearch caches certain things and it may not update the
+information on which records belong to which collections.  The caching
+issue is being rethought in the current WebSearch, maybe I'll add a
+forcing option for date/time lookup or something.  I've added a note
+in my TODO file to do more investigations.  In any case, you may run
+`apachectl graceful' each hour in a cron job.
+
+  Updated Mon Mar  8 19:11:43 2004
+
 o [tibor] WebSearch: sort pattern test
   Received Wed Dec 17 16:20:35 2003 
 
 * import/adapt old admin interfaces
   Received Wed Dec 17 16:20:35 2003 
 
-o [thomas] BibUpload: adaptation
-  Received Wed Dec 17 16:20:35 2003 
-
-o [thomas] WebSubmit: adaptation 
-  Received Wed Dec 17 16:20:35 2003 
-
 o [martin] BibConvert: DC2MARC21 
   Received Wed Dec 17 16:20:35 2003 
+  Progress: DCQ example done, XML OAI DC pending
 
 o [martin] BibConvert: MEDLINE, BibTeX examples
-  Received Wed Dec 17 16:20:35 2003 
+  Received: Wed Dec 17 16:20:35 2003 
+  Progress: BibTeX example done, MEDLINE pending
 
 o [tibor] WebSearch: add RSS output for recent additions to the collections.
   Received Wed Dec 17 16:20:35 2003 
@@ -95,6 +114,8 @@ o [tibor] BibIndex: make our own ACC indexes
   Received Wed Dec 17 16:20:35 2003 
   Study phrase index generation from XML MARC.
   Related to bibXXx table abolition.
+  Progress: table structure prepared for v0.3.0
+
 
 DONE
 ====
@@ -112,6 +133,24 @@ o [tibor] BibSched: test periodicity
   Used in production at CERN. 
   Done Tue Jan 27 16:17:20 2004
 
+o [simko] language-dependent portalboxes 
+  Received Wed Feb 11 12:53:13 2004
+  Done in CDSware v0.3.0
 
+o [tibor] WebSession: garbage collection and guest session check
+  Received Wed Dec 17 16:20:35 2003 
+  Done for v0.3.0
+
+o [thomas] BibUpload: adaptation
+  Received Wed Dec 17 16:20:35 2003 
+  Done for v0.3.0
+
+o [thomas] WebSubmit: adaptation 
+  Received Wed Dec 17 16:20:35 2003 
+  Done for v0.3.0
+
+o [tibor] Admin: HOWTO Run guide 
+  Received Wed Dec 17 16:20:35 2003 
+  Done for v0.3.1
 
 ;; end of file
