@@ -43,7 +43,6 @@ def Move_Pictures_Archive(parameters,curdir,form):
         raise functionError("Set_Archive_Files should be called before Move_Files_Archive")
     MainDir = "%s/files/MainFiles" % curdir
     IncludeDir = "%s/files/AdditionalFiles" %curdir
-    IconDir = "%s/files/icons" % curdir
     # create archive directories if needed
     if not os.path.exists("%s/%s" % (archivepath,formatfile)):
         os.makedirs("%s/%s" % (archivepath,formatfile))
@@ -55,16 +54,25 @@ def Move_Pictures_Archive(parameters,curdir,form):
     if os.path.exists(IncludeDir):
         for root, dirs, files in os.walk(IncludeDir):
             for file in files:
-                if os.path.exists("%s/%s/%s" % (archivepath,formatfile,file)):
-                    os.rename("%s/%s/%s" % (archivepath,formatfile,file),"%s/obsolete/%s_%s" % (archivepath,file,now))
-                shutil.copy("%s/%s" % (IncludeDir,file),"%s/%s/%s" % (archivepath,formatfile,file))
+                if not re.match("^icon-.*",file):
+                    extension = re.sub("^[^\.]*\.","",file).lower()
+                    filename = re.sub("\.%s" % extension,"",file)
+                    if os.path.exists("%s/%s/%s" % (archivepath,formatfile,file)):
+                        os.rename("%s/%s/%s" % (archivepath,formatfile,file),"%s/obsolete/%s_%s" % (archivepath,file,now))
+                    shutil.copy("%s/%s" % (IncludeDir,file),"%s/%s/%s" % (archivepath,formatfile,file))
+                    if os.path.exists("%s/icon-%s.gif" % (IncludeDir,filename)):
+                        shutil.copy("%s/icon-%s.gif" % (IncludeDir,filename),"%s/%s/icon-%s.gif" % (archivepath,formatfile,filename))
     # main Files
     if os.path.exists(MainDir):
         for root, dirs, files in os.walk(MainDir):
             for file in files:
-                extension = re.sub("^[^\.]*\.","",file).lower()
-                if os.path.exists("%s/%s.%s" % (archivepath,formatfile,extension)):
-                    os.rename("%s/%s.%s" % (archivepath,formatfile,extension),"%s/obsolete/%s.%s_%s" % (archivepath,formatfile,extension,now))
-                shutil.copy("%s/%s" % (MainDir,file),"%s/%s.%s" % (archivepath,formatfile,extension))
+                if not re.match("^icon-.*",file):
+                    extension = re.sub("^[^\.]*\.","",file).lower()
+                    filename = re.sub("\.%s" % extension,"",file)
+                    if os.path.exists("%s/%s.%s" % (archivepath,formatfile,extension)):
+                        os.rename("%s/%s.%s" % (archivepath,formatfile,extension),"%s/obsolete/%s.%s_%s" % (archivepath,formatfile,extension,now))
+                    shutil.copy("%s/%s" % (MainDir,file),"%s/%s.%s" % (archivepath,formatfile,extension))
+                    if os.path.exists("%s/icon-%s.gif" % (MainDir,filename)):
+                        shutil.copy("%s/icon-%s.gif" % (MainDir,filename),"%s/icon-%s.gif" % (archivepath,formatfile))
     return ""
 </protect>

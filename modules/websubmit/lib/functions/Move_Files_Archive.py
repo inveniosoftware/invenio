@@ -51,13 +51,6 @@ def Move_Files_Archive(parameters,curdir,form):
     if not os.path.exists("%s/obsolete" % archivepath):
         os.mkdir("%s/obsolete" % archivepath)
     now=time.strftime("%Y-%m-%d_%H:%M:%S")
-    # icon files
-    if os.path.exists(IconDir):
-        for root, dirs, files in os.walk(IconDir):
-            for file in files:
-                if os.path.exists("%s/%s/%s" % (archivepath,formatfile,file)):
-                    os.rename("%s/%s/%s" % (archivepath,formatfile,file),"%s/obsolete/%s_%s" % (archivepath,file,now))
-                shutil.copy("%s/%s" % (IconDir,file),"%s/%s/%s" % (archivepath,formatfile,file))
     # additional Files
     if os.path.exists(IncludeDir):
         for root, dirs, files in os.walk(IncludeDir):

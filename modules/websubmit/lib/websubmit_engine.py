@@ -1212,7 +1212,7 @@ def print_function_calls (doctype, action, step, form):
 def Propose_Next_Action (doctype,action_score,access,currentlevel,indir):
     global machine,storage,act,rn
     t=""
-    res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE docname=%s and level!='0' and level='%s' and score>%s ORDER BY score", (doctype,currentlevel,action_score,))
+    res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE docname=%s and level!='0' and level=%s and score>%s ORDER BY score", (doctype,currentlevel,action_score,))
     if len(res) > 0:
         t=t+Request_Print("A","<BR><BR>You now have to<ul>")
         first_score = res[0][10]
