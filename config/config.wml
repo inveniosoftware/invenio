@@ -255,10 +255,6 @@ oai:cdswaredemo:101
 ## Part 5: WebSubmit Configuration ##
 #####################################
 
-<define-tag ADMINEMAIL whitespace=delete>
-thomas.baron@cern.ch
-</define-tag>
-
 <define-tag AUTHENTICATE whitespace=delete>
 TRUE
 </define-tag>
@@ -267,20 +263,24 @@ TRUE
 TRUE
 </define-tag>
 
-<define-tag STORAGE whitespace=delete>
-<HTDOCSDIR>submit/storage
-</define-tag>
-
 <define-tag TMPDIR whitespace=delete>
 /tmp
 </define-tag>
 
 <define-tag ARCHIVE whitespace=delete>
-/archive
+<HTDOCSDIR>submit/archive
 </define-tag>
 
 <define-tag COUNTERS whitespace=delete>
 <HTDOCSDIR>submit/counters
+</define-tag>
+
+<define-tag STORAGE whitespace=delete>
+<HTDOCSDIR>submit/storage
+</define-tag>
+
+<define-tag ADMINEMAIL whitespace=delete>
+thomas.baron@cern.ch
 </define-tag>
 
 <define-tag SUBMITSUPPORTEMAIL whitespace=delete>
