@@ -46,15 +46,13 @@ class TestCitationSearcher(unittest.TestCase):
         # FIXME: test postponed
         #self.assert_(bibrank_citation_searcher.init_reference_list_dictionary())
 
-    def test_get_citing_recidrelevance(self):
+    def test_calculate_cited_by_list(self):
         """bibrank citation searcher - get citing relevance"""
         # FIXME: test postponed
-        #self.assert_(bibrank_citation_searcher.get_citing_recidrelevance(self.rank_method_code, self.recids))    
 
-    def test_get_co_cited_with_list(self):
+    def test_calculate_co_cited_with_list(self):
         """bibrank citation searcher - get co-cited-with data"""
         # FIXME: test postponed
-        #self.assert_(bibrank_citation_searcher.get_co_cited_with_list(self.recid))    
             
 def create_test_suite():
     """Return test suite for the citation searcher.""" 
