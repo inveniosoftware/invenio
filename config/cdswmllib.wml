@@ -23,8 +23,7 @@
 <:
     sub generate_language_list_for_python {
         ## Return Python-ready language list out of user-configured WML language list.
-        ## Input string example: en,sk,fr
-        ## Output string: ['en','sk,'fr']
+        ## Output example: ['en','sk,'fr']
         $out = "[";
         foreach $lang (split /\s*,\s*/, '<CDSLANGS>') {
             $out .= "'".$lang."',";
@@ -32,4 +31,16 @@
         $out .= "]";
         return $out;
     }
+
+    sub generate_language_selection_box_for_html {
+        ## Return HTML-ready language selection box links.
+        ## Output example: 
+        ($filenamebase, $filenameextension) = split /\./, '$(WML_SRC_BASENAME)';
+        $out = "<MSG_THIS_PAGE_IN_LANGUAGES>";
+        foreach $lang (split /\s*,\s*/, '<CDSLANGS>') {
+            $out .= ' <a class="langinfo" href="'.$filenamebase.'.'.$lang.'.'.$filenameextension.'">'.uc($lang).'</a> |';
+        }
+        return substr($out, 0, -1);
+    }
+
 :>
