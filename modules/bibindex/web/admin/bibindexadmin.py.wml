@@ -88,7 +88,7 @@ def addtag(req, fldID, ln=cdslang, value=['',-1], name='', callback='yes', confi
     else:
         return auth_failed(uid, navtrail_previous_links, auth[1])
     
-def showfieldtags(req, fldID, ln=cdslang, callback='yes', confirm=-1):
+def modifyfieldtags(req, fldID, ln=cdslang, callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/">BibIndex Interface</a> """ % (weburl)
 
  
@@ -101,7 +101,56 @@ def showfieldtags(req, fldID, ln=cdslang, callback='yes', confirm=-1):
     auth = bic.check_user(uid,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Logical Field",
-                    body=bic.perform_showfieldtags(fldID=fldID,
+                    body=bic.perform_modifyfieldtags(fldID=fldID,
+                                                   ln=ln,
+                                                   callback=callback,
+                                                   confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    urlargs=req.args,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)   
+    else:
+        return auth_failed(uid, navtrail_previous_links, auth[1])
+
+def addindexfield(req, idxID, ln=cdslang, fldID='', callback='yes', confirm=-1):
+    navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/">BibIndex Interface</a> """ % (weburl)
+
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+   
+    auth = bic.check_user(uid,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_addindexfield(idxID=idxID,
+                                            ln=ln,
+                                            fldID=fldID,
+                                            callback=callback,
+                                            confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    urlargs=req.args,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)   
+    else:
+        return auth_failed(uid, navtrail_previous_links, auth[1])
+
+def modifyindexfields(req, idxID, ln=cdslang, callback='yes', confirm=-1):
+    navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/">BibIndex Interface</a> """ % (weburl)
+
+ 
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+
+
+    auth = bic.check_user(uid,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_modifyindexfields(idxID=idxID,
                                                    ln=ln,
                                                    callback=callback,
                                                    confirm=confirm),
@@ -188,6 +237,31 @@ def modifyfield(req, fldID, ln=cdslang, code='', callback='yes', confirm=-1):
     else:
         return auth_failed(uid, navtrail_previous_links, auth[1])
 
+def modifyindex(req, idxID, ln=cdslang, idxNAME='', idxDESC='', callback='yes', confirm=-1):
+    navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/">BibIndex Interface</a> """ % (weburl)
+
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+
+    auth = bic.check_user(uid,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_modifyindex(idxID=idxID,
+                                                 ln=ln,
+                                                 idxNAME=idxNAME,
+                                                 idxDESC=idxDESC,
+                                                 callback=callback,
+                                                 confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    urlargs=req.args,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return auth_failed(uid, navtrail_previous_links, auth[1])
+
 def modifytag(req, fldID, tagID, ln=cdslang, name='', value='', callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/">BibIndex Interface</a> """ % (weburl)
 
@@ -236,7 +310,29 @@ def deletefield(req, fldID, ln=cdslang, confirm=0):
     else:
         return auth_failed(uid, navtrail_previous_links, auth[1])
 
-def showdetails(req, ln=cdslang, callback='yes', confirm=-1):
+def deleteindex(req, idxID, ln=cdslang, confirm=0):
+    navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/">BibIndex Interface</a> """ % (weburl)
+    
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+
+    auth = bic.check_user(uid,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_deleteindex(idxID=idxID,
+                                                 ln=ln,
+                                                 confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    urlargs=req.args,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)   
+    else:
+        return auth_failed(uid, navtrail_previous_links, auth[1])
+
+def showfieldoverview(req, ln=cdslang, callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/">BibIndex Interface</a> """ % (weburl)
 
  
@@ -249,7 +345,7 @@ def showdetails(req, ln=cdslang, callback='yes', confirm=-1):
     auth = bic.check_user(uid,'cfgbibindex')
     if not auth[0]:
         return page(title="BibIndex Interface",
-                    body=bic.perform_showdetails(ln=ln,
+                    body=bic.perform_showfieldoverview(ln=ln,
                                                  callback=callback,
                                                  confirm=confirm),
                     uid=uid,
@@ -260,7 +356,7 @@ def showdetails(req, ln=cdslang, callback='yes', confirm=-1):
     else:
         return auth_failed(uid, navtrail_previous_links, auth[1])
     
-def showfields(req, ln=cdslang, callback='yes', confirm=-1):
+def editfields(req, ln=cdslang, callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/">BibIndex Interface</a> """ % (weburl)
 
  
@@ -273,7 +369,7 @@ def showfields(req, ln=cdslang, callback='yes', confirm=-1):
     auth = bic.check_user(uid,'cfgbibindex')
     if not auth[0]:
         return page(title="BibIndex Interface",
-                    body=bic.perform_showfields(ln=ln,
+                    body=bic.perform_editfields(ln=ln,
                                                 callback=callback,
                                                 confirm=confirm),
                     uid=uid,
@@ -284,7 +380,7 @@ def showfields(req, ln=cdslang, callback='yes', confirm=-1):
     else:
         return auth_failed(uid, navtrail_previous_links, auth[1])
 
-def showfield(req, fldID, ln=cdslang, mtype='', callback='yes', confirm=-1):
+def editfield(req, fldID, ln=cdslang, mtype='', callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/">BibIndex Interface</a> """ % (weburl)
 
  
@@ -297,7 +393,7 @@ def showfield(req, fldID, ln=cdslang, mtype='', callback='yes', confirm=-1):
     auth = bic.check_user(uid,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Logical Field",
-                    body=bic.perform_showfield(fldID=fldID,
+                    body=bic.perform_editfield(fldID=fldID,
                                                ln=ln,
                                                mtype=mtype,
                                                callback=callback,
@@ -310,7 +406,57 @@ def showfield(req, fldID, ln=cdslang, mtype='', callback='yes', confirm=-1):
     else:
         return auth_failed(uid, navtrail_previous_links, auth[1])
 
-def modifytranslations(req, fldID, ln=cdslang, sel_type='', trans = [], confirm=-1):
+def editindex(req, idxID, ln=cdslang, mtype='', callback='yes', confirm=-1):
+    navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/">BibIndex Interface</a> """ % (weburl)
+
+ 
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+
+
+    auth = bic.check_user(uid,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_editindex(idxID=idxID,
+                                               ln=ln,
+                                               mtype=mtype,
+                                               callback=callback,
+                                               confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    urlargs=req.args,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)   
+    else:
+        return auth_failed(uid, navtrail_previous_links, auth[1])
+
+def modifyindextranslations(req, idxID, ln=cdslang, sel_type='', trans = [], confirm=-1):
+    navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/">BibIndex Interface</a> """ % (weburl)
+        
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+
+    auth = bic.check_user(uid,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_modifyindextranslations(idxID=idxID,
+                                                        ln=ln,
+                                                        sel_type=sel_type,
+                                                        trans=trans,
+                                                        confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    urlargs=req.args,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)   
+    else:
+        return auth_failed(uid, navtrail_previous_links, auth[1])
+
+def modifyfieldtranslations(req, fldID, ln=cdslang, sel_type='', trans = [], confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/">BibIndex Interface</a> """ % (weburl)
         
     try:
@@ -321,7 +467,7 @@ def modifytranslations(req, fldID, ln=cdslang, sel_type='', trans = [], confirm=
     auth = bic.check_user(uid,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Logical Field",
-                    body=bic.perform_modifytranslations(fldID=fldID,
+                    body=bic.perform_modifyfieldtranslations(fldID=fldID,
                                                         ln=ln,
                                                         sel_type=sel_type,
                                                         trans=trans,
@@ -358,6 +504,29 @@ def addfield(req, ln=cdslang, fldNAME='', code='', callback="yes", confirm=-1):
     else:
         return auth_failed(uid, navtrail_previous_links, auth[1])
 
+def addindex(req, ln=cdslang, idxNAME='', callback="yes", confirm=-1):
+    navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/">BibIndex Interface</a> """ % (weburl)
+    
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+    
+    auth = bic.check_user(uid,'cfgbibindex')
+    if not auth[0]:
+        return page(title="BibIndex Interface",
+                    body=bic.perform_addindex(ln=cdslang,
+                                              idxNAME=idxNAME,
+                                              callback=callback,
+                                              confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    urlargs=req.args,
+                    lastupdated=__lastupdated__)   
+    else:
+        return auth_failed(uid, navtrail_previous_links, auth[1])
+
 def switchtagscore(req, fldID, id_1, id_2, ln=cdslang):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/">BibIndex Interface</a> """ % (weburl)
     
@@ -377,6 +546,30 @@ def switchtagscore(req, fldID, id_1, id_2, ln=cdslang):
                     language=ln,
                     urlargs=req.args,
                     navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)   
+    else:
+        return auth_failed(uid, navtrail_previous_links, auth[1])
+
+def removeindexfield(req, idxID, fldID, ln=cdslang, callback="yes", confirm=-1):
+    navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/">BibIndex Interface</a> """ % (weburl)
+    
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+    
+    auth = bic.check_user(uid,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_removeindexfield(idxID=idxID,
+                                                    fldID=fldID,
+                                                    ln=cdslang,
+                                                    callback=callback,
+                                                    confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    urlargs=req.args,
                     lastupdated=__lastupdated__)   
     else:
         return auth_failed(uid, navtrail_previous_links, auth[1])

@@ -46,7 +46,8 @@ from config import *
 from webpage import page, pageheaderonly, pagefooteronly
 from webuser import getUid, get_email
 from mod_python import apache
-
+from search_engine import nice_number
+    
 __version__ = "$Id$"
 
 def getnavtrail(previous = ''):
@@ -70,37 +71,232 @@ def perform_index(ln=cdslang, mtype='', content=''):
     </tr>
     <tr>
     <td>0.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s">Show all</a></small></td>
-    <td>1.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_showfields#1">Edit logical field</a></small></td>
-    <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_addfield#2">Add new logical field</a></small></td>
-    <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_showdetails#2">Logical fields overview</a></small></td>
-
+    <td>1.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_showindexoverview#1">Overview of indexes</a></small></td>
+    <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_editindexes#2">Edit index</a></small></td>
+    <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_addindex#3">Add new index</a></small></td>
+    <td>4.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_showfieldoverview#4">Overview of logical fields</a></small></td>
+    <td>5.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_editfields#2">Edit logical field</a></small></td>
+    <td>6.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_addfield#3">Add new logical field</a></small></td>
     </tr>
     </table>
-    """ % (weburl, ln, weburl, ln, weburl, ln, weburl, ln)
+    """ % (weburl, ln, weburl, ln, weburl, ln, weburl, ln, weburl, ln, weburl, ln, weburl, ln)
 
-    if mtype == "perform_showfields" and content:
+    if mtype == "perform_showindexoverview" and content:
         fin_output += content
-    elif mtype == "perform_showfields" or not mtype:
-        fin_output += perform_showfields(ln, callback='')
+    elif mtype == "perform_showindexoverview" or not mtype:
+        fin_output += perform_showindexoverview(ln, callback='')
+
+    if mtype == "perform_editindexes" and content:
+        fin_output += content
+    elif mtype == "perform_editindexes" or not mtype:
+        fin_output += perform_editindexes(ln, callback='')
+
+    if mtype == "perform_addindex" and content:
+        fin_output += content
+    elif mtype == "perform_addindex" or not mtype:
+        fin_output += perform_addindex(ln, callback='')
+
+    if mtype == "perform_editfields" and content:
+        fin_output += content
+    elif mtype == "perform_editfields" or not mtype:
+        fin_output += perform_editfields(ln, callback='')
 
     if mtype == "perform_addfield" and content:
         fin_output += content
     elif mtype == "perform_addfield" or not mtype:
         fin_output += perform_addfield(ln, callback='')
         
-    if mtype == "perform_showdetails" and content:
+    if mtype == "perform_showfieldoverview" and content:
         fin_output += content
-    elif mtype == "perform_showdetails" or not mtype:
-        fin_output += perform_showdetails(ln, callback='')
-   
+    elif mtype == "perform_showfieldoverview" or not mtype:
+        fin_output += perform_showfieldoverview(ln, callback='')
+
     return addadminbox("Overview of BibIndex Interface",  [fin_output])
 
-def perform_showfields(ln=cdslang, callback='yes', content='', confirm=-1):
-    """show the sort fields of this collection.."""
-    
+def perform_editfield(fldID, ln=cdslang, mtype='', content='', callback='yes', confirm=-1):
+    """form to modify a field. this method is calling other methods which again is calling this and sending back the output of the method.
+    if callback, the method will call perform_editcollection, if not, it will just return its output.
+    fldID - id of the field
+    mtype - the method that called this method.
+    content - the output from that method."""
+
     fld_dict = dict(get_def_name('', "field"))
-    fld_type = get_fld_nametypes()
-    subtitle = """<a name="1"></a>1. Edit logical field&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (weburl)
+    if fldID in [-1, "-1"]:
+         return addadminbox("Edit logical field",  ["""<b><span class="info">Please go back and select a logical field</span></b>"""])
+        
+    fin_output = """
+    <table>
+    <tr>
+    <td><b>Menu</b></td>
+    </tr>
+    <tr>
+    <td>0.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s">Show all</a></small></td>
+    <td>1.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_modifyfield">Modify field code</a></small></td>
+    <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_modifyfieldtranslations">Modify translations</a></small></td>
+    <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_modifyfieldtags">Modify MARC tags</a></small></td>
+    </tr><tr>
+    <td>4.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_deletefield">Delete field</a></small></td>
+    <td>5.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_showdetailsfield">Show field usage</a></small></td>
+    </tr>
+    </table>
+    """ % (weburl, fldID, ln, weburl, fldID, ln, weburl, fldID, ln, weburl, fldID, ln, weburl, fldID, ln, weburl, fldID, ln)
+
+    if mtype == "perform_modifyfield" and content:
+        fin_output += content
+    elif mtype == "perform_modifyfield" or not mtype:
+        fin_output += perform_modifyfield(fldID, ln, callback='')
+
+    if mtype == "perform_modifyfieldtranslations" and content:
+        fin_output += content
+    elif mtype == "perform_modifyfieldtranslations" or not mtype:
+        fin_output += perform_modifyfieldtranslations(fldID, ln, callback='')
+
+    if mtype == "perform_modifyfieldtags" and content:
+        fin_output += content
+    elif mtype == "perform_modifyfieldtags" or not mtype:
+        fin_output += perform_modifyfieldtags(fldID, ln, callback='')
+
+    if mtype == "perform_deletefield" and content:
+        fin_output += content
+    elif mtype == "perform_deletefield" or not mtype:
+        fin_output += perform_deletefield(fldID, ln, callback='')
+
+    if mtype == "perform_showdetailsfield" and content:
+        fin_output += content
+    elif mtype == "perform_showdetailsfield" or not mtype:
+        fin_output += perform_showdetailsfield(fldID,ln, callback='')
+        
+    return addadminbox("Edit logical field '%s'" % fld_dict[int(fldID)],  [fin_output])
+      
+def perform_editindex(idxID, ln=cdslang, mtype='', content='', callback='yes', confirm=-1):
+    """form to modify a index. this method is calling other methods which again is calling this and sending back the output of the method.
+    idxID - id of the index
+    mtype - the method that called this method.
+    content - the output from that method."""
+
+    if idxID in [-1, "-1"]:
+         return addadminbox("Edit index",  ["""<b><span class="info">Please go back and select a index</span></b>"""])
+        
+    fin_output = """
+    <table>
+    <tr>
+    <td><b>Menu</b></td>
+    </tr>
+    <tr>
+    <td>0.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">Show all</a></small></td>
+    <td>1.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifyindex">Modify index name / descriptor</a></small></td>
+    <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifyindextranslations">Modify translations</a></small></td>
+    <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifyindexfields">Modify index fields</a></small></td>
+    <td>4.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_deleteindex">Delete index</a></small></td>
+    </tr>
+    </table>
+    """ % (weburl, idxID, ln, weburl, idxID, ln, weburl, idxID, ln, weburl, idxID, ln, weburl, idxID, ln)
+
+    if mtype == "perform_modifyindex" and content:
+        fin_output += content
+    elif mtype == "perform_modifyindex" or not mtype:
+        fin_output += perform_modifyindex(idxID, ln, callback='')
+
+    if mtype == "perform_modifyindextranslations" and content:
+        fin_output += content
+    elif mtype == "perform_modifyindextranslations" or not mtype:
+        fin_output += perform_modifyindextranslations(idxID, ln, callback='')
+
+    if mtype == "perform_modifyindexfields" and content:
+        fin_output += content
+    elif mtype == "perform_modifyindexfields" or not mtype:
+        fin_output += perform_modifyindexfields(idxID, ln, callback='')
+
+    if mtype == "perform_deleteindex" and content:
+        fin_output += content
+    elif mtype == "perform_deleteindex" or not mtype:
+        fin_output += perform_deleteindex(idxID, ln, callback='')
+        
+    return addadminbox("Edit index",  [fin_output])
+
+def perform_showindexoverview(ln=cdslang, callback='', confirm=0):
+    subtitle = """<a name="1"></a>1. Overview of indexes"""
+    output = """<table cellpadding="3" border="1">"""
+    output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>""" % ("ID", "Name", "Fwd.Idx Size", "Rev.Idx Size", "Fwd.Idx Words", "Rev.Idx Records", "Last updated", "Fields", "Translations")
+    idx = get_idx()
+    idx_dict = dict(get_def_name('', "idxINDEX"))
+
+    for idxID, idxNAME, idxDESC,idxUPD in idx:
+        table_status_forward = get_table_status('idxWORD%sF' % (idxID < 10 and '0%s' % idxID or idxID))
+        table_status_reverse = get_table_status('idxWORD%sR' % (idxID < 10 and '0%s' % idxID or idxID))
+        if str(idxUPD)[-3:] == ".00":
+            idxUPD = str(idxUPD)[0:-3]
+        lang = get_lang_list("idxINDEXNAME", "id_idxINDEX", idxID) 
+        idx_fld = get_idx_fld(idxID)
+        fld = ""  
+        for row in idx_fld:
+            fld += row[1] + ", "
+        if fld.endswith(", "):
+            fld = fld[:-2]
+        if len(fld) == 0:
+            fld = """<b><span class="info">None</span></b>"""
+        date = (idxUPD and idxUPD or """<b><span class="info">Not updated</span></b>""")
+
+    
+        if table_status_forward and table_status_reverse:
+            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (idxID, """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s" title="%s">%s</A>""" % (weburl, idxID, ln, idxDESC, idx_dict[idxID]), "%s MB" % nice_number(table_status_forward[0][5] / 1048576), "%s MB" % nice_number(table_status_reverse[0][5] / 1048576), nice_number(table_status_forward[0][3]), nice_number(table_status_reverse[0][3]), date, fld, lang)
+        elif not table_status_forward:
+            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (idxID, """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</A>""" % (weburl, idxID, ln, idx_dict[idxID]), "Error", "%s MB" % nice_number(table_status_reverse[0][5] / 1048576),"Error", nice_number(table_status_reverse[0][3]), date, "", lang)
+        elif not table_status_reverse:
+            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (idxID, """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</A>""" % (weburl, idxID, ln, idx_dict[idxID]), "%s MB" % nice_number(table_status_forward[0][5] / 1048576), "Error", nice_number(table_status_forward[0][3]), "Error", date, "", lang)
+    output += "</table>"
+
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_index(fldID, ln, "perform_showindexoverview", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body) 
+
+def perform_editindexes(ln=cdslang, callback='yes', content='', confirm=-1):
+    """show a list of indexes that can be edited."""
+    
+    subtitle = """<a name="2"></a>2. Edit index&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (weburl)
+
+    fin_output = ''
+    idx = get_idx()
+    output = ""
+    if len(idx) > 0:
+        text = """
+        <span class="adminlabel">Index name</span>
+        <select name="idxID" class="admin_w200">
+        <option value="-1">- Select a index -</option>
+        """
+        for (idxID, idxNAME, idxDESC, idxUPD) in idx:
+            text += """<option value="%s">%s</option>""" % (idxID, idxNAME)
+        text += """</select>"""
+
+        output += createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/editindex" % weburl,
+                                   text=text,
+                                   button="Edit",
+                                   ln=ln,
+                                   confirm=1)
+    
+    else:
+        output += """No indexes exists"""
+
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_index(ln, "perform_editindexes", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+
+def perform_editfields(ln=cdslang, callback='yes', content='', confirm=-1):
+    """show a list of all logical fields that can be edited."""
+    
+    subtitle = """<a name="5"></a>5. Edit logical field&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (weburl)
 
     fin_output = ''
 
@@ -113,10 +309,10 @@ def perform_showfields(ln=cdslang, callback='yes', content='', confirm=-1):
         <option value="-1">- Select a field -</option>
         """
         for (fldID, name, code) in res:
-            text += """<option value="%s">%s</option>""" % (fldID, fld_dict[int(fldID)])
+            text += """<option value="%s">%s</option>""" % (fldID, name)
         text += """</select>"""
 
-        output += createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/showfield" % weburl,
+        output += createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/editfield" % weburl,
                                    text=text,
                                    button="Edit",
                                    ln=ln,
@@ -131,67 +327,125 @@ def perform_showfields(ln=cdslang, callback='yes', content='', confirm=-1):
         body = [output]
 
     if callback:
-        return perform_index(ln, "perform_showfields", addadminbox(subtitle, body))
+        return perform_index(ln, "perform_editfields", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
 
-def perform_showfield(fldID, ln=cdslang, mtype='', content='', callback='yes', confirm=-1):
-    """form to modify a collection. this method is calling other methods which again is calling this and sending back the output of the method.
-    if callback, the method will call perform_editcollection, if not, it will just return its output.
-    colID - id of the collection
-    mtype - the method that called this method.
-    content - the output from that method."""
+def perform_addindex(ln=cdslang, idxNAME='', callback="yes", confirm=-1):
+    """form to add a new index.
+    idxNAME - the name of the new index"""
 
-    fld_dict = dict(get_def_name('', "field"))
-    if fldID in [-1, "-1"]:
-         return addadminbox("Edit logical field",  ["""<b><span class="info">Please go back and select a logical field</span></b>"""])
+    output = ""
+    subtitle = """<a name="3"></a>3. Add new index"""
+    text = """
+    <span class="adminlabel">Index name</span>
+    <input class="admin_w200" type="text" name="idxNAME" value="%s" /><br>
+    """ % idxNAME
+    output = createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/addindex" % weburl,
+                              text=text,
+                              ln=ln,
+                              button="Add index",
+                              confirm=1)
+    if idxNAME and confirm in ["1", 1]:
+        res = add_idx(idxNAME)
+        output += write_outcome(res) + """<br>To configure this index, go <a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&ln=%s">here</a>.""" % (weburl, res[1], ln)
+    elif confirm not in ["-1", -1]:
+        output += """<b><span class="info">Please give the index a name.</span></b>
+        """
         
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_index(ln, "perform_addindex", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+ 
+def perform_modifyindextranslations(idxID, ln=cdslang, sel_type='', trans=[], confirm=-1, callback='yes'):
+    """Modify the translations of a index
+    sel_type - the nametype to modify
+    trans - the translations in the same order as the languages from get_languages()"""
     
-    fin_output = """
-    <table>
-    <tr>
-    <td><b>Menu</b></td>
-    </tr>
-    <tr>
-    <td>0.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/showfield?fldID=%s&amp;ln=%s">Show all</a></small></td>
-    <td>1.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/showfield?fldID=%s&amp;ln=%s&amp;mtype=perform_modifyfield">Modify field code</a></small></td>
-    <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/showfield?fldID=%s&amp;ln=%s&amp;mtype=perform_modifytranslations">Modify translations</a></small></td>
-    <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/showfield?fldID=%s&amp;ln=%s&amp;mtype=perform_showfieldtags">Modify MARC tags</a></small></td>
-    </tr><tr>
-    <td>4.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/showfield?fldID=%s&amp;ln=%s&amp;mtype=perform_deletefield">Delete field</a></small></td>
-    <td>5.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/showfield?fldID=%s&amp;ln=%s&amp;mtype=perform_showdetailsfield">Show field usage</a></small></td>
-    </tr>
-    </table>
-    """ % (weburl, fldID, ln, weburl, fldID, ln, weburl, fldID, ln, weburl, fldID, ln, weburl, fldID, ln, weburl, fldID, ln)
-
-    if mtype == "perform_modifyfield" and content:
-        fin_output += content
-    elif mtype == "perform_modifyfield" or not mtype:
-        fin_output += perform_modifyfield(fldID, ln, callback='')
-
-    if mtype == "perform_modifytranslations" and content:
-        fin_output += content
-    elif mtype == "perform_modifytranslations" or not mtype:
-        fin_output += perform_modifytranslations(fldID, ln, callback='')
-
-    if mtype == "perform_showfieldtags" and content:
-        fin_output += content
-    elif mtype == "perform_showfieldtags" or not mtype:
-        fin_output += perform_showfieldtags(fldID, ln, callback='')
-
-    if mtype == "perform_deletefield" and content:
-        fin_output += content
-    elif mtype == "perform_deletefield" or not mtype:
-        fin_output += perform_deletefield(fldID, ln, callback='')
-
-    if mtype == "perform_showdetailsfield" and content:
-        fin_output += content
-    elif mtype == "perform_showdetailsfield" or not mtype:
-        fin_output += perform_showdetailsfield(fldID,ln, callback='')
+    output = ''
+    subtitle = ''
+    cdslangs = get_languages()
+    if confirm in ["2", 2] and idxID:
+        finresult = modify_translations(idxID, cdslangs, sel_type, trans, "idxINDEX")
+    idx_dict = dict(get_def_name('', "idxINDEX"))
+    if idxID and idx_dict.has_key(int(idxID)):
+        idxID = int(idxID)
+        subtitle = """<a name="2"></a>2. Modify translations for index.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % weburl
         
-    return addadminbox("Edit logical field '%s'" % fld_dict[int(fldID)],  [fin_output])
+        if type(trans) is str:
+            trans = [trans]
+        if sel_type == '':
+            sel_type = get_idx_nametypes()[0][0]
+            
+        header = ['Language', 'Translation']
+        actions = []
+                            
+        types = get_idx_nametypes()
+        if len(types) > 1:
+            text  = """
+            <span class="adminlabel">Name type</span>
+            <select name="sel_type" class="admin_w200">
+            """
+
+            for (key, value) in types:
+                text += """<option value="%s" %s>%s""" % (key, key == sel_type and 'selected="selected"' or '', value)
+                trans_names = get_name(idxID, ln, key, "field")
+                if trans_names and trans_names[0][0]:
+                    text += ": %s" % trans_names[0][0]
+                text += "</option>"
+            text += """</select>"""
         
-def perform_modifytranslations(fldID, ln=cdslang, sel_type='', trans=[], confirm=-1, callback='yes'):
+            output += createhiddenform(action="modifyindextranslations#2",
+                                       text=text,
+                                       button="Select",
+                                       idxID=idxID,
+                                       ln=ln,
+                                       confirm=0)
+
+
+        if confirm in [-1, "-1", 0, "0"]:
+            trans = []
+            for (key, value) in cdslangs:
+                try:
+                    trans_names = get_name(idxID, key, sel_type, "idxINDEX")
+                    trans.append(trans_names[0][0])
+                except StandardError, e:
+                    trans.append('')
+
+        for nr in range(0,len(cdslangs)):
+            actions.append(["%s %s" % (cdslangs[nr][1], (cdslangs[nr][0]==cdslang and '<small>(def)</small>' or ''))])
+            actions[-1].append('<input type="text" name="trans" size="30" value="%s"/>' % trans[nr])
+
+        text = tupletotable(header=header, tuple=actions)
+        output += createhiddenform(action="modifyindextranslations#2",
+                                   text=text,
+                                   button="Modify",
+                                   idxID=idxID,
+                                   sel_type=sel_type,
+                                   ln=ln,
+                                   confirm=2)
+
+        if sel_type and len(trans):
+            if confirm in ["2", 2]:
+                output += write_outcome(finresult)
+                    
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_editindex(idxID, ln, "perform_modifyindextranslations", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+
+def perform_modifyfieldtranslations(fldID, ln=cdslang, sel_type='', trans=[], confirm=-1, callback='yes'):
     """Modify the translations of a field
     sel_type - the nametype to modify
     trans - the translations in the same order as the languages from get_languages()"""
@@ -228,7 +482,7 @@ def perform_modifytranslations(fldID, ln=cdslang, sel_type='', trans=[], confirm
                 text += "</option>"
             text += """</select>"""
         
-            output += createhiddenform(action="modifytranslations#3",
+            output += createhiddenform(action="modifyfieldtranslations#3",
                                        text=text,
                                        button="Select",
                                        fldID=fldID,
@@ -250,7 +504,7 @@ def perform_modifytranslations(fldID, ln=cdslang, sel_type='', trans=[], confirm
             actions[-1].append('<input type="text" name="trans" size="30" value="%s"/>' % trans[nr])
 
         text = tupletotable(header=header, tuple=actions)
-        output += createhiddenform(action="modifytranslations#3",
+        output += createhiddenform(action="modifyfieldtranslations#3",
                                    text=text,
                                    button="Modify",
                                    fldID=fldID,
@@ -259,18 +513,7 @@ def perform_modifytranslations(fldID, ln=cdslang, sel_type='', trans=[], confirm
                                    confirm=2)
 
         if sel_type and len(trans):
-            if confirm in ["1", 1]:
-                text = """<b>Please confirm modification of translations for logical field '%s'.</b>""" % (fld_dict[fldID])
-                output += createhiddenform(action="modifytranslations#3",
-                                           text=text,
-                                           button="Confirm",
-                                           fldID=fldID,
-                                           sel_type=sel_type,
-                                           trans=trans,
-                                           ln=ln,
-                                           confirm=2)
-
-            elif confirm in ["2", 2]:
+            if confirm in ["2", 2]:
                 output += write_outcome(finresult)
                     
     try:
@@ -279,7 +522,7 @@ def perform_modifytranslations(fldID, ln=cdslang, sel_type='', trans=[], confirm
         body = [output]
 
     if callback:
-        return perform_showfield(fldID, ln, "perform_modifytranslations", addadminbox(subtitle, body))
+        return perform_editfield(fldID, ln, "perform_modifytranslations", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
 
@@ -321,7 +564,7 @@ def perform_showdetailsfieldtag(fldID, tagID, ln=cdslang, callback="yes", confir
         body = [output]
 
     if callback:
-        return perform_showfieldtags(fldID, ln, "perform_showdetailsfieldtag", addadminbox(subtitle, body))
+        return perform_modifyfieldtags(fldID, ln, "perform_showdetailsfieldtag", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
 
@@ -361,7 +604,7 @@ def perform_showdetailsfield(fldID, ln=cdslang, callback="yes", confirm=-1):
         body = [fin_output]
 
     if callback:
-        return perform_showfield(ln, "perform_showdetailsfield", addadminbox(subtitle, body))
+        return perform_editfield(ln, "perform_showdetailsfield", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
 
@@ -372,7 +615,7 @@ def perform_addfield(ln=cdslang, fldNAME='', code='', callback="yes", confirm=-1
     code - the field code"""
 
     output = ""
-    subtitle = """<a name="2"></a>2. Add new logical field"""
+    subtitle = """<a name="6"></a>6. Add new logical field"""
     code = str.replace(code,' ', '')
     text = """
     <span class="adminlabel">Field name</span>
@@ -411,7 +654,7 @@ def perform_deletefield(fldID, ln=cdslang, callback='yes', confirm=0):
     if not fld_dict.has_key(int(fldID)):
         return """<b><span class="info">Field does not exist</span></b>"""
 
-    subtitle = """<a name="5"></a>4. Delete the logical field '%s'&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (fld_dict[int(fldID)], weburl)
+    subtitle = """<a name="4"></a>4. Delete the logical field '%s'&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (fld_dict[int(fldID)], weburl)
     output  = ""
 
     if fldID:
@@ -422,7 +665,7 @@ def perform_deletefield(fldID, ln=cdslang, callback='yes', confirm=0):
             if check:
                 text += """<b><span class="info">This field is used in an index, deletion may cause problems.</span></b><br>"""
             text += """Do you want to delete the logical field '%s' and all its relations and definitions.""" % (fld_dict[fldID])
-            output += createhiddenform(action="deletefield#5",
+            output += createhiddenform(action="deletefield#4",
                                        text=text,
                                        button="Confirm",
                                        fldID=fldID,
@@ -440,18 +683,57 @@ def perform_deletefield(fldID, ln=cdslang, callback='yes', confirm=0):
         body = [output]
 
     if callback:
-        return perform_showfield(fldID, ln, "perform_deletefield", addadminbox(subtitle, body))
+        return perform_editfield(fldID, ln, "perform_deletefield", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
 
-def perform_showdetails(ln=cdslang, callback='', confirm=0):
-    
-    subtitle = """<a name="3"></a>3. Logical fields overview"""
+def perform_deleteindex(idxID, ln=cdslang, callback='yes', confirm=0):
+    """form to delete an index.
+    idxID - the index id from table idxINDEX.
+    """
+   
+    if idxID:
+        subtitle = """<a name="4"></a>4. Delete the index.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % weburl
+        output  = ""
+
+        if confirm in ["0", 0]:
+            idx = get_idx(idxID)
+            if idx:
+                text = ""
+                text += """<b><span class="info">By deleting an index, you may also loose any indexed data in the forward and reverse table for this index.</span></b><br>"""
+                text += """Do you want to delete the index '%s' and all its relations and definitions.""" % (idx[0][1])
+                output += createhiddenform(action="deleteindex#5",
+                                       text=text,
+                                       button="Confirm",
+                                       idxID=idxID,
+                                       confirm=1)
+            else:
+                return """<br><b><span class="info">Index specified does not exist.</span></b>"""
+        elif confirm in ["1", 1]:
+            res = delete_idx(idxID)
+            if res[0] == 1:
+                return """<br><b><span class="info">Index deleted.</span></b>""" + write_outcome(res)
+            else:
+                output += write_outcome(res)
+
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_editindex(idxID, ln, "perform_deleteindex", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+
+def perform_showfieldoverview(ln=cdslang, callback='', confirm=0):
+    subtitle = """<a name="4"></a>4. Logical fields overview"""
     output = """<table cellpadding="3" border="1">"""
     output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>""" % ("Field", "MARC Tags", "Translations")
     query = "SELECT id,name FROM field"
     res = run_sql(query)
     col_dict = dict(get_def_name('', "collection"))
+    fld_dict = dict(get_def_name('', "field"))
 
     for field_id,field_name in res:
         query = "SELECT tag.value FROM tag, field_tag WHERE tag.id=field_tag.id_tag AND field_tag.id_field=%d ORDER BY field_tag.score DESC,tag.value ASC" % field_id
@@ -461,33 +743,11 @@ def perform_showdetails(ln=cdslang, callback='', confirm=0):
             field_tags = field_tags + row[0] + ", "
         if field_tags.endswith(", "):
             field_tags = field_tags[:-2]
+        if not field_tags:
+            field_tags = """<b><span class="info">None</span></b>"""
 
-        cdslangs = dict(get_languages())
-        langs = run_sql("select ln from fieldname where id_field=%s" % field_id)
-        exists = {}
-        lang = ''
-        for lng in langs:
-            if not exists.has_key(lng[0]):
-                lang += lng[0] + ", "
-            exists[lng[0]] = 1
-        if lang.endswith(", "):
-            lang = lang [:-2]
-        if len(exists) == 0:
-            lang = """<b><span class="info">None</span></b>"""
-            
-        col_fld = get_col_fld('', '', field_id)
-        cols = ''
-        exists = {}
-        for (id_collection, id_field, id_fieldvalue, ftype, score, score_fieldvalue) in col_fld:
-            if not exists.has_key(id_collection):
-                cols = cols + col_dict[int(id_collection)]+ ", "
-            exists[id_collection] = 1
-        if len(exists) == 0:
-            cols = """<span class="info">None</span>"""
-                
-        if cols.endswith(", "):
-            cols = cols[:-2]
-        output += """<tr><td>%s</td><td>%s</td><td>%s</td></tr>""" % ("""<a href="%s/admin/bibindex/bibindexadmin.py/showfield?fldID=%s">%s</A>""" % (weburl, field_id, field_name), field_tags, lang)
+        lang = get_lang_list("fieldname", "id_field", field_id)            
+        output += """<tr><td>%s</td><td>%s</td><td>%s</td></tr>""" % ("""<a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&ln=%s">%s</A>""" % (weburl, field_id, ln, fld_dict[field_id]), field_tags, lang)
     output += "</table>"
 
     try:
@@ -496,9 +756,56 @@ def perform_showdetails(ln=cdslang, callback='', confirm=0):
         body = [output]
 
     if callback:
-        return perform_index(fldID, ln, "perform_showfields", addadminbox(subtitle, body))
+        return perform_index(fldID, ln, "perform_showfieldoverview", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body) 
+
+def perform_modifyindex(idxID, ln=cdslang, idxNAME='', idxDESC='', callback='yes', confirm=-1):
+    """form to modify an index name.
+    idxID - the index name to change.
+    idxNAME - new name of index
+    idxDESC - description of index content"""
+
+    subtitle  = ""
+    output  = ""
+
+    if idxID not in [-1, "-1"]:
+        subtitle = """<a name="2"></a>1. Modify index name.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % weburl
+        if confirm in [-1, "-1"]:
+            idx = get_idx(idxID)
+            idxNAME = idx[0][1]
+            idxDESC = idx[0][2]
+        text = """
+        <span class="adminlabel">Index name</span>
+        <input class="admin_w200" type="text" name="idxNAME" value="%s" /><br>
+        <span class="adminlabel">Index description</span>
+        <input class="admin_w200" type="text" name="idxDESC" value="%s" /><br>
+        """ % (idxNAME, idxDESC)
+        
+        output += createhiddenform(action="modifyindex#1",
+                                   text=text,
+                                   button="Modify",
+                                   idxID=idxID,
+                                   ln=ln,
+                                   confirm=1)
+
+        if idxID > -1 and idxNAME and confirm in [1, "1"]:
+            res = modify_idx(idxID, idxNAME, idxDESC)
+            output += write_outcome(res)
+        elif confirm in [1, "1"]:
+            output += """<br><b><span class="info">Please give a name for the index.</span></b>"""
+    else:
+        output  = """No index to modify."""
+
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_editindex(idxID, ln, "perform_modifyindex", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
 
 def perform_modifyfield(fldID, ln=cdslang, code='', callback='yes', confirm=-1):
     """form to modify a field.
@@ -544,11 +851,50 @@ def perform_modifyfield(fldID, ln=cdslang, code='', callback='yes', confirm=-1):
         body = [output]
 
     if callback:
-        return perform_showfield(fldID, ln, "perform_modifyfield", addadminbox(subtitle, body))
+        return perform_editfield(fldID, ln, "perform_modifyfield", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
 
-def perform_showfieldtags(fldID, ln=cdslang, callback='yes', content='', confirm=-1):
+def perform_modifyindexfields(idxID, ln=cdslang, callback='yes', content='', confirm=-1):
+    """Modify which logical fields to use in this index.."""
+    
+    output = ''
+    subtitle = """<a name="3"></a>3. Modify index fields.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % weburl
+    
+    output = """<dl>
+     <dt>Menu</dt>
+     <dd><a href="%s/admin/bibindex/bibindexadmin.py/addindexfield?idxID=%s&amp;ln=%s#3.1">Add field to index</a></dd>
+    </dl>
+    """  % (weburl, idxID, ln)
+
+    header = ['Field', '']
+    actions = []
+
+    idx_fld = get_idx_fld(idxID)
+    if len(idx_fld) > 0:
+        for (idxID, idxNAME,fldID, fldNAME, regexp_punct, regexp_alpha_sep) in idx_fld:
+            actions.append([fldNAME])
+            for col in [(('Remove','removeindexfield'),)]:
+                actions[-1].append('<a href="%s/admin/bibindex/bibindexadmin.py/%s?idxID=%s&amp;fldID=%s&amp;ln=%s#3.1">%s</a>' % (weburl, col[0][1], idxID, fldID, ln, col[0][0]))
+                for (str, function) in col[1:]:
+                    actions[-1][-1] += ' / <a href="%s/admin/bibindex/bibindexadmin.py/%s?fldID=%s&amp;flID=%s&amp;ln=%s#4.1">%s</a>' % (weburl, function, idxID, fldID, ln, str)
+        output += tupletotable(header=header, tuple=actions)
+    else:
+        output += """No index fields exists"""
+
+    output += content
+
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_editindex(idxID, ln, "perform_modifyindexfields", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+        
+def perform_modifyfieldtags(fldID, ln=cdslang, callback='yes', content='', confirm=-1):
     """show the sort fields of this collection.."""
     
     output = ''
@@ -598,7 +944,7 @@ def perform_showfieldtags(fldID, ln=cdslang, callback='yes', content='', confirm
         body = [output]
 
     if callback:
-        return perform_showfield(fldID, ln, "perform_showfieldtags", addadminbox(subtitle, body))
+        return perform_editfield(fldID, ln, "perform_modifyfieldtags", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
 
@@ -653,7 +999,7 @@ def perform_addtag(fldID, ln=cdslang, value=['',-1], name='', callback="yes", co
         body = [output]
         
     if callback:
-        return perform_showfieldtags(fldID, ln, "perform_addtag", addadminbox(subtitle, body))
+        return perform_modifyfieldtags(fldID, ln, "perform_addtag", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
 
@@ -673,7 +1019,7 @@ def perform_modifytag(fldID, tagID, ln=cdslang, name='', value='', callback='yes
         name = tag[0][1]
         value = tag[0][2]
 
-    subtitle = """<a name="4.1"></a>Modify MARC tag"""
+    subtitle = """<a name="3.1"></a>Modify MARC tag"""
     
     text = """
     Any modifications will apply to all logical fields using this tag.<br>
@@ -701,15 +1047,14 @@ def perform_modifytag(fldID, tagID, ln=cdslang, name='', value='', callback='yes
         body = [output]
 
     if callback:
-        return perform_showfieldtags(fldID, ln, "perform_modifytag", addadminbox(subtitle, body))
+        return perform_modifyfieldtags(fldID, ln, "perform_modifytag", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
 
 def perform_removefieldtag(fldID, tagID, ln=cdslang, callback='yes', confirm=0):
-    """form to remove a portalbox from a collection.
-    colID - the current collection, remove the portalbox from this collection.
-    sel_ln - remove the portalbox with this language
-    pbxID - remove the portalbox with this id"""
+    """form to remove a tag from a field.
+    fldID - the current field, remove the tag from this field.
+    tagID - remove the tag with this id"""
  
     subtitle = """<a name="4.1"></a>Remove MARC tag from logical field"""
     output  = ""
@@ -738,7 +1083,84 @@ def perform_removefieldtag(fldID, tagID, ln=cdslang, callback='yes', confirm=0):
         body = [output]
         
     if callback:
-        return perform_showfieldtags(fldID, ln, "perform_removefieldtag", addadminbox(subtitle, body))
+        return perform_modifyfieldtags(fldID, ln, "perform_removefieldtag", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+
+def perform_addindexfield(idxID, ln=cdslang, fldID='', callback="yes", confirm=-1):
+    """form to add a new field.
+    fldNAME - the name of the new field
+    code - the field code"""
+
+    output = ""
+    subtitle = """<a name="4.1"></a>Add logical field to index"""
+    text = """
+    <span class="adminlabel">Field name</span>
+    <select name="fldID" class="admin_w200">
+    <option value="-1">- Select a field -</option>
+    """
+
+    fld = get_fld()
+
+    for (fldID2, fldNAME, fldCODE) in fld:
+        text += """<option value="%s" %s>%s</option>""" % (fldID2, (fldID==fldID2 and 'selected="selected"' or ''), fldNAME)
+    text += """</select>"""
+        
+    output = createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/addindexfield" % weburl,
+                              text=text,
+                              idxID=idxID,
+                              ln=ln,
+                              button="Add field",
+                              confirm=1)
+    
+    if fldID and not fldID in [-1, "-1"] and confirm in ["1", 1]:
+            res = add_idx_fld(idxID, fldID)
+            output += write_outcome(res)
+    elif confirm in ["1", 1]:
+        output += """<b><span class="info">Please select a field to add.</span></b>"""
+        
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+        
+    if callback:
+        return perform_modifyindexfields(idxID, ln, "perform_addindexfield", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+
+def perform_removeindexfield(idxID, fldID, ln=cdslang, callback='yes', confirm=0):
+    """form to remove a field from an index.
+    idxID - the current index, remove the field from this index.
+    fldID - remove the field with this id"""
+ 
+    subtitle = """<a name="3.1"></a>Remove field from index"""
+    output  = ""
+
+    if fldID and idxID:
+        fldID = int(fldID)
+        idxID = int(idxID)
+        fld = get_fld(fldID)
+        idx = get_idx(idxID)
+        if fld and idx and confirm not in ["1", 1]:
+            text = """Do you want to remove the field '%s' from the index '%s'.""" % (fld[0][1], idx[0][1])
+            output += createhiddenform(action="removeindexfield#3.1",
+                                       text=text,
+                                       button="Confirm",
+                                       idxID=idxID,
+                                       fldID=fldID,
+                                       confirm=1)
+        elif confirm in ["1", 1]:
+            res = remove_idxfld(idxID, fldID)
+            output += write_outcome(res)
+    
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+        
+    if callback:
+        return perform_modifyindexfields(idxID, ln, "perform_removeindexfield", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
 
@@ -753,7 +1175,7 @@ def perform_switchtagscore(fldID, id_1, id_2, ln=cdslang):
     name_2 = run_sql("select name from tag where id=%s" % id_2)[0][0]
     res = switch_score(fldID, id_1, id_2)
     output += write_outcome(res)
-    return perform_showfieldtags(fldID, ln, content=output)
+    return perform_modifyfieldtags(fldID, ln, content=output)
  
 def perform_deletetag(fldID, ln=cdslang, tagID=-1, callback='yes', confirm=-1):
     """form to delete an MARC tag not in use.
@@ -802,8 +1224,7 @@ def perform_deletetag(fldID, ln=cdslang, tagID=-1, callback='yes', confirm=-1):
         tagID = int(tagID)
         tags = get_tags(tagID)
         if confirm in [0, "0"]:
-            text = """<b>Do you want to delete the MARC tag '%s'.</b>
-            """ % tags[0][2]
+            text = """<b>Do you want to delete the MARC tag '%s'.</b>""" % tags[0][2]
             output += createhiddenform(action="deletetag#4.1",
                                        text=text,
                                        button="Confirm",
@@ -815,8 +1236,7 @@ def perform_deletetag(fldID, ln=cdslang, tagID=-1, callback='yes', confirm=-1):
         elif confirm in [1, "1"]:
             output += write_outcome(ares)
     elif confirm not in [-1, "-1"]:
-        output  += """<b><span class="info">Choose a MARC tag to delete.</span></b>
-        """
+        output  += """<b><span class="info">Choose a MARC tag to delete.</span></b>"""
 
     try:
         body = [output, extra]
@@ -824,12 +1244,20 @@ def perform_deletetag(fldID, ln=cdslang, tagID=-1, callback='yes', confirm=-1):
         body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
-    return perform_showfieldtags(fldID, ln, content=output)
+    return perform_modifyfieldtags(fldID, ln, content=output)
 
 def compare_on_val(first, second):
     """Compare the two values"""
     
     return cmp(first[1], second[1])
+
+def get_table_status(tblname):
+    sql = "SHOW TABLE STATUS LIKE '%s'" % tblname
+    try:
+        res = run_sql(sql)
+        return res
+    except StandardError, e:
+        return ""
 
 def get_col_fld(colID=-1, type = '', id_field=''):
     """Returns either all portalboxes associated with a collection, or based on either colID or language or both.
@@ -847,10 +1275,21 @@ def get_col_fld(colID=-1, type = '', id_field=''):
     except StandardError, e:
         return ""
 
+def get_idx(idxID=''):
+    sql = "SELECT id,name,description,last_updated FROM idxINDEX"
+    try:
+        if idxID:
+            sql += " WHERE id=%s" % idxID
+        sql += " ORDER BY id asc"
+        res = run_sql(sql)
+        return res
+    except StandardError, e:
+        return ""
+    
 def get_fld_tags(fldID='', tagID=''):
-    """Returns either all portalboxes associated with a collection, or based on either colID or language or both.
-    colID - collection id
-    ln - language id"""
+    """Returns tags associated with a field.
+    fldID - field id
+    tagID - tag id"""
 
     sql = "SELECT id_field,id_tag, tag.name, tag.value, score FROM field_tag,tag  WHERE tag.id=field_tag.id_tag"
     
@@ -866,8 +1305,8 @@ def get_fld_tags(fldID='', tagID=''):
         return ""
 
 def get_tags(tagID=''):
-    """Returns either all portalboxes associated with a collection, or based on either colID or language or both.
-    colID - collection id
+    """Returns all or a given tag.
+    tagID - tag id
     ln - language id"""
 
     sql = "SELECT id, name, value FROM tag"
@@ -882,7 +1321,7 @@ def get_tags(tagID=''):
         return ""
     
 def get_fld(fldID=''):
-    """Returns allfields"""
+    """Returns all fields or only the given field"""
     
     try:
         if not fldID:
@@ -905,6 +1344,18 @@ def get_fld_value(fldvID = ''):
     except StandardError, e:
         return ""
 
+def get_idx_fld(idxID=''):
+    """Return a list of fields associated with one or all indexes"""
+    try:
+        sql = "SELECT id_idxINDEX, idxINDEX.name, id_field, field.name, regexp_punctuation, regexp_alphanumeric_separators FROM idxINDEX, field, idxINDEX_field WHERE idxINDEX.id = idxINDEX_field.id_idxINDEX AND field.id = idxINDEX_field.id_field"
+        if idxID:
+            sql += " AND id_idxINDEX=%s" % idxID
+        sql += " ORDER BY id_idxINDEX asc"
+        res = run_sql(sql)
+        return res
+    except StandardError, e:
+        return ""
+
 def get_col_nametypes():
     """Return a list of the various translationnames for the fields"""
     
@@ -914,6 +1365,13 @@ def get_col_nametypes():
 
 def get_fld_nametypes():
     """Return a list of the various translationnames for the fields"""
+    
+    type = []
+    type.append(('ln', 'Long name'))
+    return type
+
+def get_idx_nametypes():
+    """Return a list of the various translationnames for the index"""
     
     type = []
     type.append(('ln', 'Long name'))
@@ -942,10 +1400,22 @@ def remove_fld(colID,fldID, fldvID=''):
     except StandardError, e:
         return (0, e)
 
+def remove_idxfld(idxID, fldID):
+    """Remove a field from a index in table idxINDEX_field
+    idxID - index id from idxINDEX
+    fldID - field id from field table"""
+    
+    try:
+        sql = "DELETE FROM idxINDEX_field WHERE id_field=%s and id_idxINDEX=%s" % (fldID, idxID)
+        res = run_sql(sql)
+        return (1, "")
+    except StandardError, e:
+        return (0, e)
+
 def remove_fldtag(fldID,tagID):
-    """Removes a field from the collection given.
-    colID - the collection the format is connected to
-    fldID - the field which should be removed from the collection."""
+    """Removes a tag from the field given.
+    fldID - the field the tag is connected to
+    tagID - the tag which should be removed from the field."""
     
     try:
         sql = "DELETE FROM field_tag WHERE id_field=%s AND id_tag=%s" % (fldID, tagID)
@@ -964,6 +1434,21 @@ def delete_tag(tagID):
     except StandardError, e:
         return (0, e)
         
+def delete_idx(idxID):
+    """Deletes all data for the given index together with the idxWORDXXR and idxWORDXXF tables"""
+    try:
+        res = run_sql("DELETE FROM idxINDEX WHERE id=%s" % idxID)
+        res = run_sql("DELETE FROM idxINDEXNAME WHERE id_idxINDEX=%s" % idxID)
+        res = run_sql("DELETE FROM idxINDEX_field WHERE id_idxINDEX=%s" % idxID)
+        res = run_sql("DROP TABLE idxWORD%sF" % (idxID < 10 and "0%s" % idxID or idxID))
+        res = run_sql("DROP TABLE idxWORD%sR" % (idxID < 10 and "0%s" % idxID or idxID))
+        res = run_sql("DROP TABLE idxPHRASE%sF" % (idxID < 10 and "0%s" % idxID or idxID))
+        res = run_sql("DROP TABLE idxPHRASE%sR" % (idxID < 10 and "0%s" % idxID or idxID))
+        return (1, "")
+    except StandardError, e:
+        return (0, e)
+   
+
 def delete_fld(fldID):
     """Deletes all data for the given field
     fldID - delete all data in the tables associated with field and this id """
@@ -977,11 +1462,78 @@ def delete_fld(fldID):
     except StandardError, e:
         return (0, e)
 
+def add_idx(idxNAME):
+    """Add a new index. returns the id of the new index.
+    idxID - the id for the index, number
+    idxNAME - the default name for the default language of the format."""
+    
+    try:
+        idxID = 0
+        res = run_sql("SELECT id from idxINDEX WHERE name='%s'" % MySQLdb.escape_string(idxNAME))
+        if res:
+            return (0, (0, "A index with the given name already exists."))  
+  
+        for i in range(1, 100):
+            res = run_sql("SELECT id from idxINDEX WHERE id=%s" % i)
+            res2 = run_sql("SHOW TABLE STATUS LIKE 'idxWORD%s%%'" % (i < 10 and "0%s" % i or i))
+            if not res and not res2: 
+                idxID = i
+                break
+        if idxID == 0:
+            return (0, (0, "Not possible to create new indexes, delete an index and try again."))    
+
+        res = run_sql("INSERT INTO idxINDEX(id, name) values('%s','%s')" % (idxID, MySQLdb.escape_string(idxNAME)))
+        type = get_idx_nametypes()[0][0]
+        res = run_sql("INSERT INTO idxINDEXNAME(id_idxINDEX, ln, type, value) VALUES(%s,'%s','%s', '%s')" % (idxID, cdslang, type, MySQLdb.escape_string(idxNAME)))
+
+        res = run_sql("""CREATE TABLE IF NOT EXISTS idxWORD%sF (
+                         id mediumint(9) unsigned NOT NULL auto_increment,
+                         term varchar(50) default NULL,
+                         hitlist longblob,
+                         PRIMARY KEY  (id),
+                         UNIQUE KEY term (term)
+                         ) TYPE=MyISAM""" % (idxID < 10 and "0%s" % idxID or idxID))
+
+        res = run_sql("""CREATE TABLE IF NOT EXISTS idxWORD%sR (
+                         id_bibrec mediumint(9) unsigned NOT NULL,
+                         termlist longblob,
+                         type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+                         PRIMARY KEY (id_bibrec,type)
+                         ) TYPE=MyISAM""" % (idxID < 10 and "0%s" % idxID or idxID))
+
+        res = run_sql("""CREATE TABLE `idxPHRASE%sF` (
+                         `id` mediumint(9) unsigned NOT NULL auto_increment,
+                         `term` varchar(50) default NULL,
+                         `hitlist` longblob,
+                         PRIMARY KEY  (`id`),
+                         UNIQUE KEY `term` (`term`)
+                         ) TYPE=MyISAM""" % (idxID < 10 and "0%s" % idxID or idxID))
+
+        res = run_sql("""CREATE TABLE `idxPHRASE%sR` (
+                         `id_bibrec` mediumint(9) unsigned NOT NULL default '0',
+                         `termlist` longblob,
+                         `type` enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+                         PRIMARY KEY  (`id_bibrec`,`type`)
+                         ) TYPE=MyISAM""" % (idxID < 10 and "0%s" % idxID or idxID))
+
+        res = run_sql("SELECT id from idxINDEX WHERE id=%s" % idxID)
+        res2 = run_sql("SHOW TABLE STATUS LIKE 'idxWORD%sF'" % (idxID < 10 and "0%s" % idxID or idxID))
+        res3 = run_sql("SHOW TABLE STATUS LIKE 'idxWORD%sR'" % (idxID < 10 and "0%s" % idxID or idxID))
+        if res and res2 and res3:
+            return (1, res[0][0])
+        elif not res:
+            return (0, (0, "Could not add the new index to idxINDEX"))
+        elif not res2:
+            return (0, (0, "Forward table not created for unknown reason."))
+        elif not res3:
+            return (0, (0, "Reverse table not created for unknown reason."))
+    except StandardError, e:
+        return (0, e)
+
 def add_fld(name, code):
-    """Add a new output format. Returns the id of the format.
-    code - the code for the format, max 6 chars.
-    name - the default name for the default language of the format.
-    rtype - the default nametype"""
+    """Add a new logical field. Returns the id of the field.
+    code - the code for the field,
+    name - the default name for the default language of the field."""
     
     try:
         type = get_fld_nametypes()[0][0]
@@ -1018,11 +1570,37 @@ def add_fld_tag(fldID, name, value):
         return (1, "")
     except StandardError, e:
         return (0, e)
-        
+
+def add_idx_fld(idxID, fldID):
+    """Add a field to an index"""
+
+    try:
+        sql = "SELECT * FROM idxINDEX_field WHERE id_idxINDEX=%s and id_field=%s" % (idxID, fldID)
+        res = run_sql(sql)
+        if res:
+            return (0, (0, "The field selected already exists for this index"))
+        sql = "INSERT INTO idxINDEX_field(id_idxINDEX, id_field) values (%s, %s)" % (idxID, fldID)
+        res = run_sql(sql)
+        return (1, "")
+    except StandardError, e:
+        return (0, e)
+
+def modify_idx(idxID, idxNAME, idxDESC):
+    """Modify index name or index description in idxINDEX table"""
+    
+    try:
+        sql = "UPDATE idxINDEX SET name='%s' WHERE id=%s" % (MySQLdb.escape_string(idxNAME), idxID)
+        res = run_sql(sql)
+        sql = "UPDATE idxINDEX SET description='%s' WHERE ID=%s" % (MySQLdb.escape_string(idxDESC), idxID)
+        res = run_sql(sql)
+        return (1, "")
+    except StandardError, e:
+        return (0, e)
+            
 def modify_fld(fldID, code):
-    """Modify the dbquery of an collection.
-    colID - the id of the collection involved
-    dbquery - the new dbquery"""
+    """Modify the code of field
+    fldID - the id of the field to modify
+    code - the new code"""
     
     try:
         sql = "UPDATE field SET code='%s'" % code
@@ -1032,11 +1610,11 @@ def modify_fld(fldID, code):
     except StandardError, e:
         return (0, e)
 
-
 def modify_tag(tagID, name, value):
-    """Modify the dbquery of an collection.
-    colID - the id of the collection involved
-    dbquery - the new dbquery"""
+    """Modify the name and value of a tag.
+    tagID - the id of the tag to modify
+    name - the new name of the tag
+    value - the new value of the tag"""
     
     try:
         sql = "UPDATE tag SET name='%s' WHERE id=%s" % (name, tagID)
@@ -1060,4 +1638,18 @@ def switch_score(fldID, id_1, id_2):
         return (1, "")
     except StandardError, e:
         return (0, e)
+
+def get_lang_list(table, field, id):
+    langs = run_sql("select ln from %s where %s=%s" % (table, field, id))
+    exists = {}
+    lang = ''
+    for lng in langs:
+        if not exists.has_key(lng[0]):
+            lang += lng[0] + ", "
+        exists[lng[0]] = 1
+    if lang.endswith(", "):
+        lang = lang [:-2]
+    if len(exists) == 0:
+        lang = """<b><span class="info">None</span></b>"""
+    return lang
 
