@@ -1,0 +1,185 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="BibEdit Admin Guide" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/bibedit/>BibEdit Admin</a>" \
+    navbar_name="admin" \
+    navbar_select="bibedit-admin-guide"
+
+<h2>Contents</h2>
+<strong>1. <a href="#1">Overview</a></strong><br>
+<strong>2. <a href="#2">Edit records via Web interface</a></strong><br>
+<strong>3. <a href="#3">Edit records via command line</a></strong><br>
+<strong>4. <a href="#4">Delete records via command line</a></strong><br>
+
+<a name="1"></a><h2>1. Overview</h2>
+
+<p>BibEdit enables you to directly manipulate bibliographic data, edit a
+single record, do global replacements, and other cataloguing tasks.
+
+<a name="2"></a><h2>2. Edit records via Web interface</h2>
+
+<p>Bibliographic Metadata Editor on Web is not implemented yet.
+Please use the command-line technique describe below.
+
+<a name="3"></a><h2>3. Edit records via command line</h2>
+
+<p>The idea is to download record in XML MARC format, edit it by using
+any editor, and upload the changes back.  Note that you can edit any
+number of records at the same time: for example, you can download all
+records written by <code>Qllis, J</code>, open the file in your
+favourite text editor, and change globally the author name to the
+proper form <code>Ellis, J</code>.
+
+<p>You therefore continue as follows:
+
+<ol>
+<li> Download the record in XML MARC.  For example, download record ID 1234:
+
+        <pre>
+         $ wget -O z.xml 'http://your.site/search.py?recid=1234&of=xm'
+        </pre>
+
+    or download latest 5,000 public documents written by <code>Qllis, J</code>:
+
+        <pre>
+         $ wget -O z.xml 'http://your.site/search.py?p=Qllis%2C+J&f=author&of=xm&rg=5000'
+        </pre>
+
+<li> Edit the metadata as necessary:
+
+        <pre>
+         $ emacs z.xml
+        </pre>    
+
+<li> Upload changes back:
+
+        <pre>
+         $ bibupload -r z.xml
+        </pre>
+
+<li> See the progress of the treatment of the file via BibSched:
+
+        <pre>
+         $ bibsched
+        </pre>
+
+     If you do not want to wait for the next wake-up time of indexing
+     and formatting daemons, launch them manually now:
+
+         <pre>
+         $ bibindex
+         $ bibreformat
+         $ webcoll
+         </pre>
+
+      and watch the progress via <code>bibsched</code>.
+
+ </ol>
+
+After which the record(s) should be fully modified and formatted and
+all indexes and collections updated, as necessary.
+
+<a name="4"></a><h2>4. Delete records via command line</h2>
+
+<p>Once a record has been uploaded, we prefer not to *destroy* it fully
+anymore (i.e. to wipe it out and to reuse its record ID for another
+record) for a variety of reasons.  For example, some users may have
+put this record already into their baskets in the meantime, or the
+record might have been already announced by alert emails to the
+external world, or the OAI harvestors might have harvested it already,
+etc.  We usually prefer only to *mark* records as deleted, so that our
+record IDs are ensured to stay permanent.
+
+Thus said, the canonical way to delete a record ID 1234 in CDSware
+v0.1.x development branch is to download its XML MARC:
+
+       <pre>
+       $ wget -O z.xml 'http://your.site/search.py?recid=1234&of=xm'
+       </pre>
+
+and to mark it as deleted by adding the indicator ``DELETED'' into the
+MARC 980 $$c tag:
+
+       <pre>
+       $ vi z.xml
+       [...]
+        &lt;datafield tag="980" ind1="" ind2=""&gt;
+          &lt;subfield code="a"&gt;PREPRINT&lt;/subfield&gt;
+          &lt;subfield code="c"&gt;DELETED&lt;/subfield&gt;
+        &lt;/datafield&gt;
+       [...]
+       </pre>
+
+and upload thusly modified record in the `replace' mode:
+
+       <pre>
+       $ bibupload -r z.xml
+       </pre>
+
+and watch the progress via <code>bibsched</code>, as mentioned in the
+<a href="#3">section 3</a>.
+
+<p>This procedure will remove all necessary entries from the words index
+space, the collection cache space, etc, so that the record will not be
+findable anymore from the search interface by usual means.  But, the
+record HTML brief and detailed displays will remain untouched, so that
+the record will still be shown to the end users as it used to be when
+they will access their baskets, or when they access it via direct URL
+distributed by the alert engine (search.py?recid=1234).
+
+<p>In some cases this may not be what is wanted.  For example you may
+want to warn the users that the record has been deleted and hide its
+old contents.  To do this, just modify the contents of the other MARC
+tags as appropriate, for example you can remove everything and leave
+only a title warning:
+
+<pre>
+       $ cat z.xml
+       &lt;record&gt;
+       &lt;controlfield tag="001"&gt;1234&lt;/controlfield&gt;
+       &lt;datafield tag="245" ind1="" ind2=""&gt;
+          &lt;subfield code="a"&gt;The record has been deleted&lt;/subfield&gt;
+       &lt;/datafield&gt;
+       &lt;datafield tag="980" ind1="" ind2=""&gt;
+          &lt;subfield code="c"&gt;DELETED&lt;/subfield&gt;
+       &lt;/datafield&gt;
+       &lt;/record&gt;
+</pre>
+
+so that the end users would see a message ``The record has been
+deleted'' instead of the usual title, authors, and stuff in their
+baskets.
+
+<p>P.S. Note that the ``bibXXx'' tables will keep having entries for the
+     deleted records.  These entries are to be cleaned from time to
+     time by the BibEdit garbage collector.  This GC isn't part of
+     CDSware yet; moreover in the future we plan to abolish all the
+     bibXXx tables, so that this won't be necessary anymore.
+
+<p>P.S. If you want to wipe out all the existing bibliographic content of
+     your site, for example to start uploading the documents from
+     scratch again, you can launch:
+
+     <pre>
+       $ /path/to/your/cdsware/bin/dbexec &lt; /path/to/your/cdsware-source/modules/miscutil/sql/tabbibclean.sql
+       $ /path/to/your/cdsware/bin/webcoll
+     </pre>
+
