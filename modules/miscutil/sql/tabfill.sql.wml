@@ -23,7 +23,7 @@
 #include "configbis.wml"
 
 ## local defaults, i.e. WML config variables are to be used:
-INSERT INTO collection VALUES (1,'<CDSNAME>','<CDSNAME>',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO collection VALUES (1,'<CDSNAME>',NULL,NULL,NULL,NULL);
 INSERT INTO user VALUES (1, '<ADMINEMAIL>', '', NULL, NULL);
 INSERT INTO flxLINKTYPES VALUES ('AUTHOR_SEARCH','N','EXT','','');
 INSERT INTO flxLINKTYPES VALUES ('KEYWORD_SEARCH','N','EXT','','');
@@ -36,19 +36,19 @@ INSERT INTO flxLINKTYPEPARAMS VALUES ('KEYWORD_SEARCH','KEYWORD',0);
 
 # generally suitable defaults:
 <protect>
-INSERT INTO field VALUES (1,'any field','any field','anyfield');
-INSERT INTO field VALUES (2,'title','title','title');
-INSERT INTO field VALUES (3,'author','author','author');
-INSERT INTO field VALUES (4,'abstract','abstract','abstract');
-INSERT INTO field VALUES (5,'keyword','keyword','keyword');
-INSERT INTO field VALUES (6,'report number','report no.','reportnumber');
-INSERT INTO field VALUES (7,'subject','subject','subject');
-INSERT INTO field VALUES (8,'reference','reference','reference');
-INSERT INTO field VALUES (9,'fulltext','fulltext','fulltext');
-INSERT INTO field VALUES (10,'collection','collection','collection');
-INSERT INTO field VALUES (11,'division','division','division');
-INSERT INTO field VALUES (12,'year','year','year');
-INSERT INTO field VALUES (13,'experiment','experiment','experiment');
+INSERT INTO field VALUES (1,'any field','anyfield');
+INSERT INTO field VALUES (2,'title','title');
+INSERT INTO field VALUES (3,'author','author');
+INSERT INTO field VALUES (4,'abstract','abstract');
+INSERT INTO field VALUES (5,'keyword','keyword');
+INSERT INTO field VALUES (6,'report number','reportnumber');
+INSERT INTO field VALUES (7,'subject','subject');
+INSERT INTO field VALUES (8,'reference','reference');
+INSERT INTO field VALUES (9,'fulltext','fulltext');
+INSERT INTO field VALUES (10,'collection','collection');
+INSERT INTO field VALUES (11,'division','division');
+INSERT INTO field VALUES (12,'year','year');
+INSERT INTO field VALUES (13,'experiment','experiment');
 
 INSERT INTO field_tag VALUES (1,100,10);
 INSERT INTO field_tag VALUES (1,101,10);
@@ -1158,16 +1158,6 @@ INSERT INTO flxUDFPARAMS VALUES ('LFILL','char',1);
 INSERT INTO flxUDFPARAMS VALUES ('LFILL','str',0);
 INSERT INTO flxUDFPARAMS VALUES ('COPY','length',2);
 INSERT INTO flxUSERS VALUES (1);
-
-INSERT INTO rules VALUES (1,'superuser','users associated with this role have all rights');
-INSERT INTO rules VALUES (2,'submissionmanager','this role allows people to access the webSubmit admin');
-INSERT INTO rules VALUES (3,'submissionuser','this role is used to specifies who has the right to perform an action over a given document type (webSubmit).\r\nIf noone is associated to this role for a given document type/action, then no protection is set on this action.');
-INSERT INTO rules VALUES (4,'searchmanager','This roles gives access to the webSearch admin');
-INSERT INTO rules VALUES (5,'bibmanager','This role gives access to the bibData admin');
-INSERT INTO rules VALUES (6,'accessmanager','This role allows the user to manage all the access rights (webAccess admin)');
-INSERT INTO rules VALUES (7,'submissionviewer','This role allows a user to view all actions completed in webSubmit for a given document type');
-INSERT INTO rules VALUES (9,'referee','This role is given to the referees in the webSubmit simple refereeing process');
-INSERT INTO rules VALUES (10,'bibformatmanager','This role allows a user to access the bibFormat admin');
 
 INSERT INTO sbmACTION VALUES ('Submit Bibliographic Information','SBI','running','1998-08-17','2001-08-08','submit_button.gif','Submit a Document');
 INSERT INTO sbmACTION VALUES ('Modify Bibliographic Information','MBI','modify','1998-08-17','2001-11-07','modify_button.gif','Modify a Document');

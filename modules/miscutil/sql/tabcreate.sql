@@ -1751,6 +1751,14 @@ CREATE TABLE IF NOT EXISTS idxINDEX (
   UNIQUE KEY name (name)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS idxINDEXNAME (
+  id_idxINDEX mediumint(9) unsigned NOT NULL auto_increment,
+  ln char(2) NOT NULL default '',
+  type char(3) NOT NULL default 'sn',
+  value varchar(255) NOT NULL,
+  PRIMARY KEY  (id_idxINDEX,ln,type),
+) TYPE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS idxINDEX_field (
   id_idxINDEX mediumint(9) unsigned NOT NULL,
   id_field mediumint(9) unsigned NOT NULL,
@@ -2061,20 +2069,35 @@ CREATE TABLE IF NOT EXISTS idxPHRASE10R (
 
 -- tables for ranking:
 
-CREATE TABLE idxRANK (
-  id int(11) NOT NULL auto_increment,
+CREATE TABLE IF NOT EXISTS rnkMETHOD (
+  id mediumint(9) unsigned NOT NULL auto_increment,
   name varchar(20) NOT NULL default '',
   last_updated datetime NOT NULL default '0000-00-00 00:00:00',
-  star_category_ranges longblob NOT NULL,
+  star_category_ranges longblob,
   PRIMARY KEY (id),
   UNIQUE KEY name (name)
 ) TYPE=MyISAM;
 
-CREATE TABLE idxRANKSET (
-  id_idxRANK int(11) NOT NULL default '0',
+CREATE TABLE IF NOT EXISTS rnkMETHODNAME (
+  id_rnkMETHOD mediumint(9) unsigned NOT NULL auto_increment,
+  ln char(2) NOT NULL default '',
+  type char(3) NOT NULL default 'sn',
+  value varchar(255) NOT NULL,
+  PRIMARY KEY  (id_rnkMETHOD,ln,type),
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS collection_rnkMETHOD (
+  id_collection mediumint(9) unsigned NOT NULL,
+  id_rnkMETHOD mediumint(9) unsigned NOT NULL,
+  score tinyint(4) unsigned NOT NULL default '0',
+  PRIMARY KEY  (id_collection,id_rnkMETHOD)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS rnkSET (
+  id_rnkMETHOD mediumint(9) unsigned NOT NULL default '0',
   star_category tinyint(4) UNSIGNED NOT NULL default '0',
   hitset longblob NOT NULL,
-  PRIMARY KEY (id_idxRANK,star_category)
+  PRIMARY KEY (id_rnkMETHOD,star_category)
 ) TYPE=MyISAM;
 
 -- tables for collections and collection tree:
@@ -2082,8 +2105,6 @@ CREATE TABLE idxRANKSET (
 CREATE TABLE IF NOT EXISTS collection (
   id mediumint(9) unsigned NOT NULL auto_increment,
   name varchar(255) NOT NULL,
-  nameshort varchar(255) NOT NULL,
-  namesuffix varchar(255),
   dbquery text,
   nbrecs int(10) unsigned default '0',
   reclist longblob,
@@ -2091,6 +2112,14 @@ CREATE TABLE IF NOT EXISTS collection (
   PRIMARY KEY  (id),
   UNIQUE KEY name (name),
   KEY dbquery (dbquery(50))
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS collectionname (
+  id_collection mediumint(9) unsigned NOT NULL auto_increment,
+  ln char(2) NOT NULL default '',
+  type char(3) NOT NULL default 'sn',
+  value varchar(255) NOT NULL,
+  PRIMARY KEY  (id_collection,ln,type),
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS collection_collection (
@@ -2176,6 +2205,14 @@ CREATE TABLE IF NOT EXISTS format (
   UNIQUE KEY code (code)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS formatname (
+  id_format mediumint(9) unsigned NOT NULL auto_increment,
+  ln char(2) NOT NULL default '',
+  type char(3) NOT NULL default 'sn',
+  value varchar(255) NOT NULL,
+  PRIMARY KEY  (id_format,ln,type),
+) TYPE=MyISAM;
+
 -- tables for search options and MARC tags:
 
 CREATE TABLE IF NOT EXISTS collection_field_fieldvalue (
@@ -2193,16 +2230,22 @@ CREATE TABLE IF NOT EXISTS collection_field_fieldvalue (
 CREATE TABLE IF NOT EXISTS field (
   id mediumint(9) unsigned NOT NULL auto_increment,
   name varchar(255) NOT NULL,
-  nameshort varchar(255) NOT NULL,
   code varchar(255) NOT NULL,
   PRIMARY KEY  (id),
   UNIQUE KEY code (code)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS fieldname (
+  id_field mediumint(9) unsigned NOT NULL auto_increment,
+  ln char(2) NOT NULL default '',
+  type char(3) NOT NULL default 'sn',
+  value varchar(255) NOT NULL,
+  PRIMARY KEY  (id_field,ln,type),
+) TYPE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS fieldvalue (
   id mediumint(9) unsigned NOT NULL auto_increment,
   name varchar(255) NOT NULL,
-  nameshort varchar(255) NOT NULL,
   value text NOT NULL,
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
@@ -2279,22 +2322,6 @@ CREATE TABLE IF NOT EXISTS user (
   settings varchar(255) default NULL,
   UNIQUE KEY id (id),
   KEY email (email)
-) TYPE=MyISAM;
-
-CREATE TABLE IF NOT EXISTS rules (
-  id int(11) NOT NULL auto_increment,
-  name varchar(40) NOT NULL default '',
-  description text NOT NULL,
-  PRIMARY KEY  (id)
-) TYPE=MyISAM;
-
-CREATE TABLE IF NOT EXISTS user_rule (
-  id_user int(11) NOT NULL default '0',
-  id_rule int(11) NOT NULL default '0',
-  id int(11) NOT NULL auto_increment,
-  param1 varchar(10) NOT NULL default '*',
-  param2 varchar(10) NOT NULL default '*',
-  PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
 -- tables for access control engine
