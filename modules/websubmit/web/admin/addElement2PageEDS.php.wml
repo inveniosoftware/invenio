@@ -66,7 +66,7 @@ function checkRequired(param)
    /*********************Function Declarations***************************/
 
    function procInsrtn($subname, $pageNumber, $fieldnb, $fidesc, $fitext, 
-                $level, $sdesc, $checkn, $cd, $md, $doctype, $nPgs)
+                $level, $sdesc, $checkn, $doctype, $nPgs)
    {
       /******************************************************************
          This function has the task of actually processing the insertion
@@ -89,7 +89,7 @@ function checkRequired(param)
       $insStr = "INSERT INTO sbmFIELD (subname, pagenb, fieldnb, fidesc, "
       . "fitext, level, sdesc, checkn, cd, md, fiefi1, fiefi2) VALUES("
       . "'$subname', '$pageNumber', '$fieldnb', '$fidesc', '$fitext', "
-      . "'$level', '$sdesc', '$checkn', '$cd', '$md', NULL, NULL)"; 
+      . "'$level', '$sdesc', '$checkn', NOW(), NOW(), NULL, NULL)"; 
 
       # Now execute the above query string...
 
@@ -686,7 +686,7 @@ function displayPage()
          {
             # $level checks out.
             procInsrtn($subname, $pageNumber, $fieldnb, $fidesc_A,
-                   $fitext, $level, $sdesc, $checkn, $cd, $md, $doctype,
+                   $fitext, $level, $sdesc, $checkn, $doctype,
                                                            $nPgs);
          } // END if
          else
@@ -712,7 +712,7 @@ function displayPage()
          {
             # $level checks out.
             procInsrtn($subname, $pageNumber, $fieldnb, $fidesc_B,
-                   $fitext, $level, $sdesc, $checkn, $cd, $md, $doctype,
+                   $fitext, $level, $sdesc, $checkn, $doctype,
                                                            $nPgs);
          } // END if
          else
@@ -736,7 +736,7 @@ function displayPage()
          {
             # $level checks out.
             procInsrtn($subname, $pageNumber, $fieldnb, $fidesc_C,
-                   $fitext, $level, $sdesc, $checkn, $cd, $md, $doctype,
+                   $fitext, $level, $sdesc, $checkn, $doctype,
                                                            $nPgs);
          } // END if
          else
