@@ -21,12 +21,38 @@
 ## library of WML functions of general interest:
 
 <:
+    sub get_language_name {
+        ## Return long name for a language.
+        ## Input: en
+        ## Output: English
+        ($ln) = @_;
+        %longnames = ('en' => 'English',
+                      'fr' => 'Français',
+                      'de' => 'Deutsch',
+                      'es' => 'Español',
+                      'pt' => 'Português',
+                      'it' => 'Italiano',
+                      'ru' => 'Русский',
+                      'sk' => 'Slovenčina',
+                      'cz' => 'Čeština',
+                      'no' => 'Norsk/Bokmål',
+                      'se' => 'Svenska');
+        return $longnames{$ln};
+    }
+    
     sub generate_language_list_for_python {
         ## Return Python-ready language list out of user-configured WML language list.
-        ## Output example: ['en','sk,'fr']
+        ## May return short or long version, depending on the first argument.
+        ## Output example: ['en','fr']
+        ## Output example: [['en','English'],['fr','French']]
+        ($type) = @_;
         $out = "[";
-        foreach $lang (split /\s*,\s*/, '<CDSLANGS>') {
-            $out .= "'".$lang."',";
+        foreach $ln (split /\s*,\s*/, '<CDSLANGS>') {
+            if ($type) {
+               $out .= "['".$ln."','".get_language_name($ln)."'],";
+            } else {
+               $out .= "'".$ln."',";
+            }
         }
         $out .= "]";
         return $out;
@@ -36,11 +62,11 @@
         ## Return HTML-ready language selection box links.
         ## Output example: 
         ($filenamebase, $filenameextension) = split /\./, '$(WML_SRC_BASENAME)';
-        $out = "<MSG_THIS_PAGE_IN_LANGUAGES>";
-        foreach $lang (split /\s*,\s*/, '<CDSLANGS>') {
-            $out .= ' <a class="langinfo" href="'.$filenamebase.'.'.$lang.'.'.$filenameextension.'">'.uc($lang).'</a> |';
+        $out = "<MSG_THIS_PAGE_IN_LANGUAGES> <br> ";
+        foreach $ln (split /\s*,\s*/, '<CDSLANGS>') {
+            $out .= ' <a class="langinfo" href="'.$filenamebase.'.'.$ln.'.'.$filenameextension.'">'.get_language_name($ln).'</a> &nbsp; ';
         }
-        return substr($out, 0, -1);
+        return substr($out, 0, -2);
     }
 
     sub generate_pretty_version_string {
