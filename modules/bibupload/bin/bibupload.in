@@ -1098,7 +1098,12 @@ function insert ($rec)
             if (DISPLAY)
                 display($rec);
             else if (!FORMAT)
-                integrate($rec,$logfp);
+                if (CORRECT || REPLACE) {
+                    print ("Error: Cannot update record. Record not found");
+                }
+                else {
+                    integrate($rec,$logfp);
+                }
         }
     }
     else {
