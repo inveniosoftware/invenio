@@ -26,21 +26,24 @@ CLEANFILES = $(lispimage_DATA) *~ *.tmp *.pyc *.fas *.fasl *.lib *.x86f *.mem *.
 
 webstat.clisp.mem: $(FILESLISP)
 	if [ -x "${CLISP}" ]; then \
-	    clisp -q -x "(progn (load \"load.lisp\")(saveinitmem \"webstat.clisp.mem\"))"; \
+             (cwd=`pwd`; cd $(srcdir) && \
+             ${CLISP} -q -x "(progn (load \"load.lisp\")(saveinitmem \"$${cwd}/webstat.clisp.mem\"))"); \
         else \
             echo "Warning: cannot find CLISP, hoping you have CMUCL or SBCL instead."; \
         fi
 
 webstat.cmucl.core: $(FILESLISP)
 	if [ -x "${CMUCL}" ]; then \
-	    lisp -quiet -batch -eval "(progn (load \"load.lisp\")(ext:save-lisp \"webstat.cmucl.core\"))"; \
+            (cwd=`pwd`; cd $(srcdir) && \
+             ${CMUCL} -quiet -batch -eval "(progn (load \"load.lisp\")(ext:save-lisp \"$${cwd}/webstat.cmucl.core\"))"); \
         else \
             echo "Warning: cannot find CMUCL, hoping you have CLISP or SBCL instead."; \
         fi
 
 webstat.sbcl.core: $(FILESLISP)
 	if [ -x "${SBCL}" ]; then \
-	    sbcl --noinform --eval "(progn (load \"load.lisp\")(sb-ext:save-lisp-and-die \"webstat.sbcl.core\"))"; \
+           (cwd=`pwd`; cd $(srcdir) && \
+            ${SBCL} --noinform --eval "(progn (load \"load.lisp\")(sb-ext:save-lisp-and-die \"$${cwd}/webstat.sbcl.core\"))"); \
         else \
             echo "Warning: cannot find SBCL, hoping you have CLISP or CMUCL instead."; \
         fi
