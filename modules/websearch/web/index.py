@@ -40,7 +40,7 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
     from cdsware.webpage import page, create_error_box
     from cdsware.webuser import getUid
     from cdsware.messages import wash_language,msg_internal_error,msg_collection_not_found_head,msg_collection_not_found_body
-    from cdsware.search_engine import get_coll_i18nname
+    from cdsware.search_engine import get_colID, get_coll_i18nname
     # wash params:
     try:
         as = int(as)
@@ -130,12 +130,3 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
                     urlargs=req.args)
          
     return "\n"    
-
-def get_colID(c):
-    "Return collection ID for given collection name.  Return None if no match found."
-    from cdsware.dbquery import run_sql
-    colID = None
-    res = run_sql("SELECT id FROM collection WHERE name=%s", (c,), 1)
-    if res:
-        colID = res[0][0]
-    return colID 
