@@ -18,9 +18,15 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
-    title="Submit" \
+    title="<MSG_SUBMIT>" \
     navbar_name="submit" \
     navtrail_previous_links="" \
-    navbar_select="submit" 
+    navbar_select="submit" \
+    cdspageheaderadd="<div align=right><a href=index.en.html>EN</a> | <a href=index.fr.html>FR</a> | <a href=index.de.html>DE</a> | <a href=index.es.html>ES</a> | <a href=index.it.html>IT</a> | <a href=index.ru.html>RU</a></div>"
 
-<p>Coming soon.
+<en>Coming soon.</en>
+<fr>Arrive bientôt.</fr>
+<de>Wird gerade vorbereitet.</de>
+<es>Disponible próximamente.</es>
+<it>Disponible prossimamente.</it>
+<ru>Coming soon.</ru>

@@ -21,11 +21,32 @@ SUBDIRS = admin hacking
 
 docdir = $(WEBDIR)/help
 
-doc_DATA=index.html
+doc_DATA=index.en.html index.fr.html index.de.html index.es.html index.it.html index.ru.html
 
 EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 
-%.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml
-	$(WML) -o $@ $<
+%.en.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
+           ../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
+
+%.fr.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
+           ../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_FR:$@ $<
+
+%.de.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
+           ../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_DE:$@ $<
+
+%.es.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
+           ../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_ES:$@ $<
+
+%.it.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
+           ../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_IT:$@ $<
+
+%.ru.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
+           ../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_RU:$@ $<

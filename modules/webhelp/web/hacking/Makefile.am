@@ -23,7 +23,7 @@ doc_DATA=index.html modules.html style.html concepts.html directory.html cdsware
 
 EXTRA_DIST = $(wildcard *.wml) $(wildcard *.el)
 
-CLEANFILES = $(wildcard *.shtml) *~ *.tmp
+CLEANFILES = $(wildcard *.html) *~ *.tmp
 
 %.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml
 	$(WML) -o $@ $<

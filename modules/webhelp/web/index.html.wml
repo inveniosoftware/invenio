@@ -18,19 +18,87 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
-    title="Help Central" \
+    title="<MSG_HELP_CENTRAL>" \
     navbar_name="help" \
     navtrail_previous_links="" \
-    navbar_select="tips" 
+    navbar_select="tips" \
+    cdspageheaderadd="<div align=right><a href=index.en.html>EN</a> | <a href=index.fr.html>FR</a> | <a href=index.de.html>DE</a> | <a href=index.es.html>ES</a> | <a href=index.it.html>IT</a> | <a href=index.ru.html>RU</a></div>"
 
-<p>Welcome to the <CDSNAME> Help Central.
+<es>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</es>
+<it>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</it>
+<ru>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</ru>
+
+<p>
+<en>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</en>
+<fr>Bienvenu au <MSG_HELP_CENTRAL> de <CDSNAMEINTL>.</fr>
+<de>Willkommen Sie bei der <MSG_HELP_CENTRAL> vom <CDSNAMEINTL>.</de>
+<es>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</es>
+<it>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</it>
+<ru>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</ru>
 
 <blockquote>
 <dl>
 
-<dt><a href="search/">Search Help</a>
+<dt><a href="search/<lang:star: index.*.html>"><MSG_SEARCH_HELP></a>
 
-<dd>Get help with searching <CDSNAME>.
+<dd><en>Get help with searching <CDSNAMEINTL>.</en>
+    <fr>Obtenez de l'aide avec la recherche sur <CDSNAMEINTL>.</fr>
+    <de>Hier können Sie die Suchhilfe für den <CDSNAMEINTL> konsultieren.</de>
+    <es>Get help with searching <CDSNAMEINTL>.</es>
+    <it>Get help with searching <CDSNAMEINTL>.</it>
+    <ru>Get help with searching <CDSNAMEINTL>.</ru>
+    
 
 </dl>
 </blockquote>
