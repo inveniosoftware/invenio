@@ -88,13 +88,14 @@ create-demo-site: install
 	${prefix}/bin/webcoll 1
 	@echo "***********************************************************************"
 	@echo "** The demo site has been successfully created.                      **"
+	@echo "**                                                                   **"
 	@echo "** Please point your browser to @WEBURL@ "
-	@echo "** It should ressemble our 'Atlantis Institute of Science' demo site **"
-	@echo "** that is available at <http://cdsware.cern.ch/DEMO/>,              **"
+	@echo "** It should ressemble our 'Atlantis Institute of Fictive Science'   **"
+	@echo "** demo site that is available at <http://cdsware.cern.ch/demo/>,    **"
 	@echo "** with the exception that no demo records have been loaded yet.     **"
 	@echo "**                                                                   **"
 	@echo "** To load demo records, you can run 'make load-demo-records'.       **"
-	@echo "** To drop the demo site, you can run 'make drop-demo-site'.   **"
+	@echo "** To drop the demo site, you can run 'make drop-demo-site'.         **"
 	@echo "***********************************************************************"
 
 load-demo-records: install
@@ -124,10 +125,10 @@ load-demo-records: install
 	${prefix}/bin/webcoll 3
 	@echo "***********************************************************************"
 	@echo "** The demo records have been successfully loaded.                   **"
+	@echo "**                                                                   **"
 	@echo "** Please point your browser to @WEBURL@ "
-	@echo "** It should ressemble our 'Atlantis Institute of Science' demo site **"
-	@echo "** that is available at <http://cdsware.cern.ch/DEMO/>.              **"
-	@echo "** You should be able to do some searches, etc.                      **"
+	@echo "** It should ressemble our 'Atlantis Institute of Fictive Science'   **"
+	@echo "** demo site that is available at <http://cdsware.cern.ch/demo/>.    **"
 	@echo "**                                                                   **"
 	@echo "** To remove demo records, you can run 'make remove-demo-records'.   **"
 	@echo "** To drop also the demo site collection etc configurations,         **"
