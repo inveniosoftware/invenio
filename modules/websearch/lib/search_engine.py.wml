@@ -1302,8 +1302,8 @@ def browse_in_bibwords(req, p, f, ln=cdslang):
     if f:
         req.write(" inside <em>%s</em> " % f)
     req.write(" in any collection are:<br>")
-    urlargs = string.replace(req.args, "action=%s","action=%s" % (msg_search[ln], msg_browse[ln]))
-    req.write(create_nearest_terms_box(urlargs, p, f, 'w', ln=ln)) 
+    urlargs = string.replace(req.args, "action=%s" % msg_search[ln],"action=%s" % msg_browse[ln])
+    req.write(create_nearest_terms_box(urlargs, p, f, 'w', ln=ln, intro_text_p=0)) 
     return
 
 def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=cdslang):
@@ -1641,11 +1641,13 @@ def intersect_results_with_hitset(req, results, hitset, ap=0, aptext="", of="hb"
         results = results_ap
     return results        
 
-def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang):
+def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang, intro_text_p=1):
     """Return text box containing list of 'n' nearest terms above/below 'p'
        for the field 'f' for matching type 't' (words/phrases) in
        language 'ln'.
        Propose new searches according to `urlargs' with the new words.
+       If `intro_text_p' is true, then display the introductory message,
+       otherwise print only the nearest terms in the box content.
     """    
     out = ""
     nearest_terms = []
@@ -1655,11 +1657,11 @@ def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang):
     if t == 'w':
         nearest_terms = get_nearest_terms_in_bibwords(p, f, n, n)
         if not nearest_terms:
-            return "%s%s%s.%s" % (prologue, msg_no_words_index_available[ln], f, epilogue)            
+            return "%s%s." % (msg_no_words_index_available[ln], f)         
     else:
         nearest_terms = get_nearest_terms_in_bibxxx(p, f, n, n)
         if not nearest_terms:
-            return "%s%s %s.%s" % (prologue, msg_no_phrase_index_available[ln], f, epilogue)                        
+            return "%s %s." % (msg_no_phrase_index_available[ln], f) 
     # display them:
     out += """<table class="nearesttermsbox" cellpadding="0" cellspacing="0" border="0">"""
     for term in nearest_terms:
@@ -1693,11 +1695,12 @@ def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang):
                       </tr>""" % \
                        (term_nbhits, weburl, urlargs_replace_text_in_arg(urlargs, r'^p\d?$', p, term), term)
     out += "</table>"
-    # add leading introductory text and return:
-    intro = msg_search_term[ln] % p
-    if f:
-        intro += " " + msg_inside_index[ln] % f
-    intro += " " + msg_did_not_match[ln]
+    intro = ""
+    if intro_text_p: # add full leading introductory text
+        intro = msg_search_term[ln] % p
+        if f:
+            intro += " " + msg_inside_index[ln] % f
+        intro += " " + msg_did_not_match[ln]
     return intro + "<blockquote>" + out + "</blockquote>"
 
 def get_nearest_terms_in_bibwords(p, f, n_below, n_above):
