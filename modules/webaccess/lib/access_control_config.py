@@ -1,4 +1,5 @@
 ## $Id$
+## CDSware Access Control Config in mod_python.
 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002 CERN.
@@ -11,18 +12,27 @@
 ## The CDSware is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir=$(libdir)/python/cdsware
-pylib_DATA=access_control_engine.py access_control_config.py access_control_admin.py webaccessadmin_lib.py
+"""CDSware Access Control Config. """
 
-EXTRA_DIST = $(wildcard *.wml)
+<protect> ## okay, rest of the Python code goes below #######
 
-CLEANFILES = $(pylib_DATA) *~ *.tmp *.pyc
+__version__ = "$Id$"
 
-%.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml
-	$(WML) -o $@ $<
+# VALUES TO BE EXPORTED
+# CURRENTLY USED BY THE FILES access_control_engine.py access_control_admin.py webaccessadmin_lib.py
+
+# name of the role giving superadmin rights
+SUPERADMINROLE      = 'superadmin'
+# name of the action allowing roles to access the web administrator interface
+WEBACCESSACTION     = 'accesswebadmin'
+# name of the action allowing roles to delegate the rights to other roles
+# ex: libraryadmin to delegate libraryworker
+DELEGATEADDUSERROLE = 'delegate_adduserrole'
+
+</protect>
