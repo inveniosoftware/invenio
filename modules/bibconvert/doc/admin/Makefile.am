@@ -29,4 +29,4 @@ EXTRA_DIST = $(wildcard *.wml) $(sample_DATA)
 CLEANFILES = $(doc_DATA) *~ *.tmp
 
 %.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml
-	$(WML) -o $@ $<
+	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<

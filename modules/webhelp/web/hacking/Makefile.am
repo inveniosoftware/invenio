@@ -26,4 +26,4 @@ EXTRA_DIST = $(wildcard *.wml) $(wildcard *.el)
 CLEANFILES = $(wildcard *.html) *~ *.tmp
 
 %.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml
-	$(WML) -o $@ $<
+	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
