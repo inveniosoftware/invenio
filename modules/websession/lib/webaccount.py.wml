@@ -109,7 +109,7 @@ def perform_display_account(req,data,bask,aler,sear):
 def template_account(title,body):	
     out =""	
     out +="""
-	 	      <table class="searchbox" width="100%%" summary=""	>	
+	 	      <table class="searchbox" width="90%%" summary=""	>	
                        <thead>
                         <tr>
                          <th class="searchboxheader">%s</th>
