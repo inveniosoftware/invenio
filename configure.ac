@@ -471,6 +471,7 @@ AC_CONFIG_FILES([Makefile \
 	  modules/websearch/doc/Makefile \
 	  modules/websearch/lib/Makefile \
 	  modules/websearch/web/Makefile \
+	  modules/websearch/web/admin/Makefile \
 	  modules/websession/Makefile \
 	  modules/websession/web/Makefile \
 	  modules/websession/lib/Makefile \
