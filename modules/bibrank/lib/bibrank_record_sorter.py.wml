@@ -469,22 +469,49 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     if not rnkdict:
         return (None, "Warning, Could not load ranking data for method.", "", voutput)
 
+    lwords_hitset = None
+    for j in range(0, len(lwords)):
+        if lwords[j] and lwords[j][:6] == "recid:":
+            if not lwords_hitset:
+                lwords_hitset = HitSet()
+            lword = lwords[j][6:]
+            if string.find(lword, "->") > -1:
+                lword = string.split(lword, "->")
+                if int(lword[0]) >= cfg_max_recID + 1 or int(lword[1]) >= cfg_max_recID + 1:        
+                    return (None, "Warning, The record range given is out of range.", "", voutput)  
+                for i in range(int(lword[0]), int(lword[1])):
+                    lwords_hitset.add(int(i))
+            elif lword < cfg_max_recID + 1:
+                lwords_hitset.add(int(lword))
+            else:
+                return (None, "Warning, The record range given is out of range.", "", voutput)  
+    
     rnkdict = deserialize_via_marshal(rnkdict[0][0])
     if verbose > 0:
         voutput += "Ranking data loaded, size of structure: %s<br>" % len(rnkdict)
     lrecIDs = hitset.items()
+
     if verbose > 0:
         voutput += "Number of records to rank: %s<br>" % len(lrecIDs)
     reclist = []
     reclist_addend = []
 
-    for recID in lrecIDs:
-        if rnkdict.has_key(recID):
-            reclist.append((recID, rnkdict[recID][1]))
-            del rnkdict[recID]
-        else:
-            reclist_addend.append((recID, 0))
-
+    if not lwords_hitset:
+        for recID in lrecIDs:
+            if rnkdict.has_key(recID):
+                reclist.append((recID, rnkdict[recID][1]))
+                del rnkdict[recID]
+            else:
+                reclist_addend.append((recID, 0))
+    else:
+        lwords_lrecIDs = lwords_hitset.items()
+        for recID in lwords_lrecIDs:
+            if rnkdict.has_key(recID) and hitset.contains(recID):
+                reclist.append((recID, rnkdict[recID][1]))
+                del rnkdict[recID]
+            elif hitset.contains(recID):
+                reclist_addend.append((recID, 0))
+        
     if verbose > 0:
         voutput += "Number of records ranked: %s<br>" % len(reclist)
         voutput += "Number of records not ranked: %s" % len(reclist_addend)
