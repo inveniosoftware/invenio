@@ -61,6 +61,7 @@ except ImportError, e:
 
 try:
     from webuser import getUid, create_user_infobox
+    from webpage import pageheaderonly    
 except ImportError, e:
     pass # ignore user personalisation, needed e.g. for command-line
         
@@ -328,26 +329,12 @@ def create_opft_search_units(req, p, f, m=None):
     return opfts
 
 def create_header(cc=cdsname, as=0, uid=0, headeradd=""):
-    "Creates CDS header and info on URL and date."
-    return """
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <title>%s - Search Results</title>
-  <link rev="made" href="mailto:%s">
-  <link rel="stylesheet" href="%s/img/cds.css">
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-</head>
-<body>
-<div class="pageheader">%s</div>
-%s
-%s
-""" % (cc, supportemail, weburl,
-       re.sub("<!--USERINFOBOX-->", create_user_infobox(uid), cdspageheader),
-       create_navtrail(cc, as,
-                       """<table class="navtrailbox"><tr><td width="15">&nbsp;</td><td class="navtrailboxbody">""",
-                       "","&gt;","", "&gt; Search Results</td></tr></table><br>",0),
-       headeradd)
+    "Creates CDS header and info on URL and date."    
+    return pageheaderonly(title="Search Results",
+                          navtrail=create_navtrail_links(cc, as, 1),
+                          description="%s Search Results." % cc,
+                          keywords="CDSware, WebSearch, %s" % cc,
+                          uid=uid)
 
 def create_inputdate_box(name="d1", selected_year="", selected_month="", selected_day=""):
     "Produces 'From Date', 'Until Date' kind of selection box.  Suitable for search options."
@@ -380,11 +367,11 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
     out = ""    
     # print search box prolog:
     out += """
+    <h1 class="headline">%s</h1>
     <form action="%s/search.py" method="get">
-    <strong class="headline"><span class="h1">%s</span></strong>
     <input type="hidden" name="cc" value="%s"> 
     <input type="hidden" name="as" value="%s">
-    """ % (weburl, cc, cc, as)
+    """ % (cc, weburl, cc, as)
     if ot:
         out += """<input type="hidden" name="ot" value="%s">""" % ot
     if sp:
@@ -642,35 +629,26 @@ def is_selected(var, fld):
     else:
         return ""
 
-def create_navtrail(cc=cdsname,
-                    as=0,
-                    header="""<table class="navtrailbox"><tr><td width="15">&nbsp;</td><td class="navtrailboxbody"><small>""", \
-                    prolog="", \
-                    separator="&gt;", \
-                    epilog="", \
-                    footer="&gt; Search Results</td></tr></table><br>",
-                    exclude_root=0):
-    """Creates navigation trail, i.e. links to ancestors of the 'cc' collection.
-    If as==1, then links to Advanced Search interfaces; otherwise Simple Search.
+def create_navtrail_links(cc=cdsname,
+                          as=0,
+                          self_p=1,
+                          separator=" &gt; "):
+    """Creates navigation trail links, i.e. links to collection ancestors (except Home collection).
+    If as==1, then links to Advanced Search interfaces; otherwise Simple Search.        
     """
-    # firstly, display navtrail prologue:
-    navtrail = header        
-    # first, display list of ancestors:
+    out = ""
     for dad in get_coll_ancestors(cc):
-        if dad != cdsname:
-            navtrail += """%s <a class="navtrail" href="%s/?c=%s&as=%d">%s</a> %s %s """ % \
-                        (prolog, weburl, urllib.quote_plus(dad), as, dad, epilog, separator)
-        else: # hide cdsname for aesthetical reasons
-            navtrail += """%s <a class="navtrail" href="%s/?as=%d">%s</a> %s %s """ % \
-                        (prolog, weburl, as, "Home", epilog, separator)            
-    # then print cc:
-    if cc != cdsname:
-        navtrail += """%s <a class="navtrail" href="%s/?c=%s&as=%d">%s</a> %s""" % (prolog, weburl, urllib.quote_plus(cc), as, cc, epilog)
-    elif not exclude_root:
-        navtrail += """%s <a class="navtrail" href="%s/?c=%s&as=%d">%s</a> %s""" % (prolog, weburl, urllib.quote_plus(cc), as, "Home", epilog)
-    # last, print navtrail epilogue:
-    navtrail += footer
-    return navtrail
+        if dad != cdsname: # exclude Home collection
+            if out:
+                out += separator
+            out += """<a class="navtrail" href="%s/?c=%s&amp;as=%d">%s</a>""" % \
+                   (weburl, urllib.quote_plus(dad), as, dad)
+    if self_p and cc != cdsname:
+        if out:
+            out += separator
+        out += """<a class="navtrail" href="%s/?c=%s&amp;as=%d">%s</a>""" % \
+               (weburl, urllib.quote_plus(cc), as, cc)        
+    return out
 
 def create_searchwithin_selection_box(fieldname='f', value=''):
     "Produces 'search within' selection box for the current collection."
@@ -843,7 +821,7 @@ def escape_string(s):
 
 def asciify_accented_letters(s):
     "Translates ISO-8859-1 accented letters into their ASCII equivalents."
-    s = string.translate(s, table_latin1_to_ascii)
+    #s = string.translate(s, table_latin1_to_ascii)
     return s
 
 def wash_colls(cc, c, split_colls=0):
@@ -920,7 +898,7 @@ def wash_colls(cc, c, split_colls=0):
     colls_out_for_display = map(lambda x, colls_out_for_display=colls_out_for_display:colls_out_for_display[x-1], colls_out_for_display_nondups)
         
     # second, let us decide on collection splitting:
-    if split_colls == 0:
+    if 1 or split_colls == 0:
         # type A - no sons are wanted
         colls_out = colls_out_for_display
 #    elif split_colls == 1:
@@ -1628,7 +1606,10 @@ def search_in_bibxxx(req, p, f, type):
         if len(ps) == 2:
             pattern = "BETWEEN '%s' AND '%s'" % (MySQLdb.escape_string(ps[0]), MySQLdb.escape_string(ps[1]))
         else:
-            pattern = "LIKE '%s'" % MySQLdb.escape_string(ps[0])            
+            if string.find(p, '%') > 0:
+                pattern = "LIKE '%s'" % MySQLdb.escape_string(ps[0])
+            else:
+                pattern = "='%s'" % MySQLdb.escape_string(ps[0])
     # construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
     if str(f[0]).isdigit() and str(f[1]).isdigit():
@@ -2148,10 +2129,10 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', decompress=zli
                 if x:
                     req.write('\n')
         else:
-            # we are doing HTML output:
-            req.write("""<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
+            # we are doing HTML output:            
+            req.write("""\n<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
             if format.startswith("hb"):
-                req.write("\n<table>")            
+                req.write("""\n<table>""")            
                 for irec in range(irec_max,irec_min,-1):
                     req.write("""\n<tr><td valign="top"><input name="recid" type="checkbox" value="%s"></td>""" % recIDs[irec])
                     req.write("""<td valign="top" align="right">%d.</td><td valign="top">""" % (jrec+irec_max-irec))
@@ -2176,7 +2157,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', decompress=zli
                     req.write("<p><p>")
             #req.write("""<div align="right"><input type="submit" name="action" value="ADD TO BASKET"></div>""")
             req.write("""<br><input class="formbutton" type="submit" name="action" value="ADD TO BASKET">""")
-            req.write("""</form>""")
+            req.write("""\n</form>""")
 
     else:        
         print_warning(req, 'Use different search terms.')        
@@ -2463,7 +2444,6 @@ def encode_for_xml(s):
     "Encode special chars in string so that it would be XML-compliant."
     s = string.replace(s, '&', '&amp;')
     s = string.replace(s, '<', '&lt;')
-    s = unicode(s,'latin-1','ignore').encode('utf-8','replace')
     return s
 
 def call_bibformat(id, otype="HD"):
@@ -2591,7 +2571,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
     d2d = wash_url_argument(d2d, 'str')
     day1, day2 = wash_dates(d1y, d1m, d1d, d2y, d2m, d2d)
     # deduce user id:
-    uid = getUid(req)
+    try:
+        uid = getUid(req)
+    except:
+        uid = 0
     # start output
     if of.startswith('x'):
         # we are doing XML output:
@@ -2615,6 +2598,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         req.send_http_header()
         # write header:
         req.write(create_header(cc, as, uid))
+        req.write("""<div class="pagebody">""")
     if sysnb or id>0:
         ## 1 - detailed record display
         if sysnb: # ALEPH sysnb is passed, so deduce MySQL id for the record:            
@@ -2864,6 +2848,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             log_query_info("ss", p, f, colls_to_search, results_final_nb_total)
     # 4 -- write footer:
     if of.startswith('h'):
+        req.write("""</div>""") # pagebody end
         req.write(create_footer())
     elif of.startswith('x'):
         req.write("""</collection>\n""")
