@@ -27,10 +27,10 @@ What's new:
 
  *) OAI gateway validated against OAI Repository Explorer (BibHarvest)
 
- *) fixed modification option for the indexer (BibIndex)
+ *) fixed "records modified since" option for the indexer (BibIndex)
 
- *) collection cache update speeded up (closing #WebSearch-016)
-    (WebSearch)
+ *) collection cache update is done only when the cache is not up to
+    date (WebSearch) [closing #WebSearch-016]
 
  *) cleanup of user login mechanism (WebSession, WebAccess)
 
@@ -39,8 +39,7 @@ What's new:
 
  *) fixed submission in UTF-8 languages (WebSubmit)
 
- *) updated HOWTO Run Your Existing CDSware Installation guide
-    (WebHelp)
+ *) updated HOWTO Run Your Existing CDSware Installation (WebHelp)
 
  *) test suite improvements (WebSearch, BibHarvest, BibRank,
     BibConvert)
