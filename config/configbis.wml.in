@@ -110,6 +110,15 @@
 <define-tag GIFRSIZE whitespace=delete>
 @GIFRSIZE@
 </define-tag>
+<define-tag PDFTOTEXT whitespace=delete>
+@PDFTOTEXT@
+</define-tag>
+<define-tag PSTOTEXT whitespace=delete>
+@PSTOTEXT@
+</define-tag>
+<define-tag WORDTOTEXT whitespace=delete>
+@WORDTOTEXT@
+</define-tag>
 
 
 
