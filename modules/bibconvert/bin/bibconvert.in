@@ -635,6 +635,8 @@ def generate(keyword):
     par = set_par_defaults(par,"")
     
     if (fn == "SYSNO"):
+        out = sysno500
+    if (fn == "SYSNO330"):
         out = sysno
     if (fn == "WEEK"):
         par = set_par_defaults(par,"0")
@@ -649,6 +651,10 @@ def generate(keyword):
         par = set_par_defaults(par,"%w%H%M%S," + "%d" % conv_setting[1])
         out = strftime(par[0],localtime())
         out = out[:string.atoi(par[1])]
+    if (fn == "XDATE"):
+        par = set_par_defaults(par,"%w%H%M%S," + ",%d" % conv_setting[1])
+        out = strftime(par[0],localtime())
+        out = string.atoi(par[1]) + out[:string.atoi(par[2])]
     if (fn == "OAI"):
         oai_prefix = "</protect><OAIIDPREFIX><protect>"
         out = "%s:%d" % (oai_prefix,tcounter + oai_identifier_from)
@@ -1309,11 +1315,14 @@ def exit_on_error(error_message):
     return 0
 
 
-def create_record(begin_record_header, ending_record_footer, query_string, match_mode):
+def create_record(begin_record_header, ending_record_footer, query_string, match_mode, Xcount):
     "Create output record"
     out_to_print         = ""
     out                  = []
     field_data_item_LIST = []
+    ssn5cnt = "%3d" % Xcount
+    sysno                = generate("DATE(%w%H%M%S)")
+    sysno500             = generate("XDATE(%w%H%M%S),%s" % ssn5cnt)
 
     for T_tpl_item_LIST in target_tpl_parsed:
         # the line is printed only if the variables inside are not empty
@@ -1438,6 +1447,7 @@ def create_record(begin_record_header, ending_record_footer, query_string, match
 
 conv_setting         = set_conv()
 sysno                = generate("DATE(%w%H%M%S)")
+sysno500             = generate("DATE(%w%H%M%S)")
 separator            = ""
 tcounter             = 0
 source_data          = ""
@@ -1470,6 +1480,7 @@ opts, args = getopt.getopt(sys.argv[1:],"c:d:hVl:o:b:e:B:E:s:m:C:",
 # get options and arguments
 
 dirmode = 0
+Xcount  = 0
 
 for opt, opt_value in opts:
     if opt in ["-c", "--config"]:
@@ -1546,7 +1557,7 @@ if dirmode:
     if (os.path.isdir(source_data)):
         data_parsed = parse_input_data_d(source_data,source_tpl)
 
-        record = create_record(begin_record_header, ending_record_footer, query_string, match_mode)
+        record = create_record(begin_record_header, ending_record_footer, query_string, match_mode, Xcount)
         if record != "":
             print record
             tcounter = tcounter + 1
@@ -1564,7 +1575,8 @@ else:
             done = 1
         else:
             if (data_parsed[0][0]!= ''):
-                record = create_record(begin_record_header, ending_record_footer, query_string, match_mode)
+                record = create_record(begin_record_header, ending_record_footer, query_string, match_mode, Xcount)
+                Xcount += 1
                 if record != "":
                     print record
                     tcounter = tcounter + 1
