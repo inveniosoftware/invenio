@@ -65,7 +65,7 @@ def perform_display(req):
         will disappear at the end of the current session. If you wish you can login or register
         <A href="./login">here</A>.</FONT>"""
     out += """
-    <dt><A href="../youralerts.py/list_alerts">Your Alerts</A>
+    <dt><A href="../youralerts.py/list">Your Alerts</A>
     <dd>Subscribe to a search which will be run periodically by our service.  The result can be sent to you
     via Email or stored in one of your baskets."""
     if isGuestUser(uid):

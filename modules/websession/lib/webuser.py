@@ -86,12 +86,12 @@ def isGuestUser(uid):
       
        isGuestUser(uid) -> boolean
     """
-    if uid==-1:
-        return 1
-    query_result = run_sql("select email from user where id=%s", (uid,))[0][0]
-    if query_result == '':
-        return 1
-    return 0
+    out = 1
+    res = run_sql("select email from user where id=%s", (uid,))
+    if res:
+        if res[0][0]:
+            out = 0
+    return out
 
 def checkRegister(user,passw):
     """It checks if the user is register with the correct password
@@ -205,27 +205,26 @@ def givePassword(email):
 	return query_pass[0][0]
     return -999
 
+def get_email(uid):
+    """Return email address of the user uid.  Return string 'guest' in case
+    the user is not found."""
+    out = "guest"
+    res = run_sql("SELECT email FROM user WHERE id=%s", (uid,), 1)
+    if res and res[0][0]: 
+        out = res[0][0]
+    return out
+
 def create_user_infobox(uid):
     """Create info box on currenly logged user.""" 
     out = ""
-    out += """<table class="userinfobox" align="right">
-               <thead>
-                <tr>
-                  <td class="userinfoboxheader">
-                    <strong>user:</strong> %s
-                  </td>
-                 </tr> 
-               </thead>
-               <tbody>
-                <tr>
-                 <td class="userinfoboxbody">
-                  <a class="userinfo" href="%s/youraccount.py/login">login</a>
-                  ::
-                  <a class="userinfo" href="%s/youraccount.py/logout">logout</a>
-                 </td>
-                </tr>
-               </tbody> 
-              </table>""" % (getDataUid(None, uid)[0], weburl, weburl)
+    logintext = ""
+    if isGuestUser(uid):
+        logintext = """<a class="userinfo" href="%s/youraccount.py/login">login</a>""" % weburl
+    else:
+        logintext = """<a class="userinfo" href="%s/youraccount.py/logout">logout</a>""" % weburl        
+    out += """<td class="userinfoboxbody" nowrap>
+               %s :: %s
+              </td>""" % (get_email(uid), logintext)
     return out
 
 ## --- follow some functions for Apache user/group authentication
