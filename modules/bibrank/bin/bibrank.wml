@@ -92,11 +92,10 @@ try:
     import copy
     import types
     import ConfigParser
+    import cdsware.search_engine
     
 except ImportError, e:
-    print "Error: %s" % e
     import sys
-    sys.exit(1)
 
 try:
     sys.path.append('%s' % pylibdir)
@@ -104,10 +103,9 @@ try:
     from cdsware.bibrank_tag_based_indexer import *
     from cdsware.bibrank_word_indexer import *
     from cdsware.access_control_engine import acc_authorize_action 
+    from cdsware.search_engine import perform_request_search
 except ImportError, e:
-    print "Error: %s" % e
     import sys
-    sys.exit(1)
 
 task_id = -1 # the task id
 nb_char_in_line = 50  # for verbose pretty printing
@@ -466,3 +464,4 @@ def main():
         
 if __name__ == "__main__":
     main()
+  
