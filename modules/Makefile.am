@@ -17,6 +17,6 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = bibwords bibupload bibformat miscutil websearch webstyle websession webhelp
+SUBDIRS = bibsched bibwords bibupload bibformat miscutil webstyle websession webhelp webbasket webalert websearch websubmit
 
 CLEANFILES = *~
