@@ -716,7 +716,7 @@ class Collection:
             # no 'search within' fields are defined for this collection, so propose default ones:
             if cfg_cern_site:
                 out += """<option value="title"%s>%s""" % (is_selected("title", value), msg_title[ln])
-                out += """<option value="author"%s>%sr""" % (is_selected("author", value), msg_author[ln])
+                out += """<option value="author"%s>%s""" % (is_selected("author", value), msg_author[ln])
                 out += """<option value="reportnumber"%s>%s""" % (is_selected("reportnumber", value), msg_report_number[ln])
                 out += """<option value="year"%s>%s""" % (is_selected("year", value), msg_year[ln])
             else:
@@ -1196,7 +1196,7 @@ def task_run():
             write_message("%s / reclist cache update" % coll.name)
         coll.calculate_reclist()
         coll.update_reclist()
-        task_update_progress("Part 1/2: done %d/%d." % (i,len(colls)))
+        task_update_progress("Part 1/2: done %d/%d" % (i,len(colls)))
     # thirdly, update collection webpage cache:
     i = 0
     for coll in colls:
@@ -1204,7 +1204,7 @@ def task_run():
         if options["verbose"]:
             write_message("%s / web cache update" % coll.name)
         coll.update_webpage_cache()
-        task_update_progress("Part 2/2: done %d/%d." % (i,len(colls)))
+        task_update_progress("Part 2/2: done %d/%d" % (i,len(colls)))
     ## we are done:
     task_update_progress("Done.")
     task_update_status("DONE")
