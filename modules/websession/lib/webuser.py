@@ -231,13 +231,13 @@ def create_user_infobox(uid):
     """Create info box on currenly logged user.""" 
     out = ""
     if isGuestUser(uid):
-        out +=  """guest :: <a class="userinfo" href="%s/youraccount.py/info">info</a>::
+        out +=  """guest :: <a class="userinfo" href="%s/youraccount.py/display">info</a>::
 		    	    <a class="userinfo" href="%s/youraccount.py/login">login</a>
 		"""%(weburl,weburl)
 	   	
     else:
         out += """%s ::
-	       <a class="userinfo" href="%s/youraccount.py/account">account</a></strong> ::
+	       <a class="userinfo" href="%s/youraccount.py/display">account</a></strong> ::
                <a class="userinfo" href="%s/yourbaskets.py/display">baskets</a></strong> ::
                <a class="userinfo" href="%s/youralerts.py/list">alerts</a></strong> ::
                <a class="userinfo" href="%s/youraccount.py/logout">logout</a>""" % \
@@ -253,8 +253,8 @@ def auth_apache_user_p(user, password):
     try:
         apache_password_line_for_user = os.popen("grep %s %s" % (user,cfg_apache_password_file), 'r').read()
         password_apache = string.split(string.strip(apache_password_line_for_user),":")[1]
-    except: # no pw found, so return not-allowed status
-        return 0
+    except: # no pw found, so return not-allowed status	
+        return 0	
     salt = password_apache[:2]
     if crypt.crypt(password, salt) == password_apache:
         return 1

@@ -38,8 +38,8 @@ except ImportError, e:
 
 imagesurl = "%s/img" % weburl
 
-# perform_display(): display the main features of CDS personalize
-def perform_display(req):
+# perform_info(): display the main features of CDS personalize
+def perform_info(req):
     out = ""
     uid = getUid(req)
 
@@ -188,7 +188,7 @@ def perform_ask():
 		 </td>
                 </tr>
               </table>
-              <p><strong>Note:</strong> Your email address will stay strictly confidential and won't be disclosed to any third party. It will be used to indentify you to the CERN Document Server personal services. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.
+              <p><strong>Note:</strong> It is not recommended to use valuable passwords as CERN AFS or NICE accounts with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you in the CERN Document Server personal services. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.
              </form>
            """
     return text
@@ -247,8 +247,7 @@ def perform_emailMessage(eMsg):
     out =""
     out +="""
 	  <body>
-		  <br> %s
-                  <br><A href="../youraccount.py/lost">Try again</A>
+		   %s <A href="../youraccount.py/lost">Try again</A>
 
           </body>
 

@@ -37,19 +37,14 @@ try:
     from cdsware import webaccount
     from cdsware import webbasket
     from cdsware import webalert
+    from cdsware import webuser
     import smtplib
 except ImportError, e:
     print "Error: %s" % e
     import sys
     sys.exit(1)
 
-def info(req):
-    uid = webuser.getUid(req)
-    return page(title="Your Account",
-                body=webaccount.perform_display(req),
-                description="CDS Personalize, Main page",
-                keywords="CDS, personalize",
-                uid=uid)
+
 def set(req):
     uid = webuser.getUid(req)
     data = webuser.getDataUid(req,uid)
@@ -73,22 +68,29 @@ def change(req,email=None,password=None):
 
 def lost(req):
     uid = webuser.getUid(req)
-    return page(title="Your Account",
+    return page(title="Login",
                 body=webaccount.perform_lost(),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid)
 
-def account(req):
+def display(req):
     uid =  webuser.getUid(req)
+    if webuser.isGuestUser(uid):
+		
+	return page(title="Your Account",
+                    body=webaccount.perform_info(req),
+	            description="CDS Personalize, Main page",
+	            keywords="CDS, personalize",
+	            uid=uid)
+
     data = webuser.getDataUid(req,uid)	
     bask = webbasket.account_list_baskets(uid)	  	  
     aler = webalert.account_list_alerts(uid)
     sear = webalert.account_list_searches(uid)	    	
     return page(title="Your Account",
                 body=webaccount.perform_display_account(req,data,bask,aler,sear),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid)
@@ -103,7 +105,6 @@ def send_email(req,p_email=None):
 	eMsg = "The entered e-mail address doesn't exist in the database"
 	return page(title="Your Account",
                     body=webaccount.perform_emailMessage(eMsg),
-                    navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
                     uid=uid)
@@ -126,7 +127,6 @@ def send_email(req,p_email=None):
            eMsg = "The entered e-mail address is incorrect, please check that it is written correctly (e.g. johndoe@example.com)"
 	   return page(title="Your Account",
                        body=webaccount.perform_emailMessage(eMsg),
-        	       navtrail="""<a class="navtrail" href="%s/youraccount.py/account">Your Account</a>""" % weburl,
                        description="CDS Personalize, Main page",
                        keywords="CDS, personalize",
                        uid=uid)
@@ -134,7 +134,6 @@ def send_email(req,p_email=None):
     server.quit()
     return page(title="Your Account",
                 body=webaccount.perform_emailSent(p_email),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/account">Your Account</a>""" % weburl,
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid)
@@ -143,7 +142,7 @@ def delete(req):
     uid = webuser.getUid(req)	
     return page(title="Delete Account",
                 body=webaccount.perform_delete(),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/account">Your Account</a>""" % weburl,
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid)
@@ -153,7 +152,7 @@ def logout(req):
     uid = webuser.logoutUser(req)
     return page(title="Logout",
                 body=webaccount.perform_logout(req),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/account">Your Account</a>""" % weburl,
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid)
@@ -166,7 +165,7 @@ def login(req,p_email=None,p_pw=None,action='login'):
        if p_email==None:
            return  page(title="Login",
                         body=webaccount.perform_ask(),
-                        navtrail="""<a class="navtrail" href="%s/youraccount.py/account">Your Account</a>""" % weburl,
+                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
                         description="CDS Personalize, Main page",
                         keywords="CDS, personalize",
                         uid=uid)
@@ -174,14 +173,14 @@ def login(req,p_email=None,p_pw=None,action='login'):
     
        if len(iden)>0:
            uid=webuser.update_Uid(req,p_email,p_pw)
-           return account(req)	
+           return display(req)	
        else:
       	   if webuser.userNotExist(p_email,p_pw) or p_email=='':
-               mess ="Your are not logged into the system.User unknown.<BR><BR> if you wish you can login again "
+               mess ="Your are not logged into the system. User unknown."
            else:
-               mess ="Your are not logged into the system.Wrong password.<BR><BR> if you wish you can login again"
+               mess ="Your are not logged into the system. Wrong password."
            act = "login"    
-	   return page(title="Wrong login",
+	   return page(title="Login",
                        body=webaccount.perform_back(mess,act),
                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
                        description="CDS Personalize, Main page",
@@ -193,11 +192,7 @@ def login(req,p_email=None,p_pw=None,action='login'):
 	ruid=webuser.registerUser(req,p_email,p_pw)
         if ruid==1:
 		uid=webuser.update_Uid(req,p_email,p_pw)
-		return  page(title="Your Account",
-                   	     body=webaccount.perform_display(req), 
-	        	     description="CDS Personalize, Main page",
-	                     keywords="CDS, personalize",
-		             uid=uid)
+		return display(req)	
         elif  ruid ==-1 :
 		mess ="The user already exists in the database, pleas try again"
 		act = "login"
