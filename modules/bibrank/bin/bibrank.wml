@@ -1187,7 +1187,6 @@ def main():
             write_message("Exiting.")
             task_update_status("ERROR")
     else:
-        sys.exit()
         command_line()
         
 if __name__ == "__main__":
