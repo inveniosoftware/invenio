@@ -1,0 +1,67 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="Interface Description" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a> &gt; <a class=navtrail href=<WEBURL>/help/submit/<lang:star: index.*.html>><MSG_SUBMIT_HELP></a>"
+
+        <h3>Interface:</h3>
+            <BLOCKQUOTE>
+                <span class="guideheader">H</span>ere is the description of the main CDS Submit interface:<BR>
+                <IMG src="<WEBURL>/img/sbm_guide_description.png" class="guideimg" ALT="">
+                <BR>
+                <span class="guideheader">T</span>his example shows the second page of the submission of a text document.
+                 The user will have to fill all the fields ("language", "number of pages", "date of creation" and "keywords"), and 
+                 then click on the "next page" button to go to page 3. You can see here that this particular submission is 
+                 composed of 4 pages.
+            </BLOCKQUOTE>
+            
+        <h3>Cancelling the action:</h3>
+            <BLOCKQUOTE>
+                <span class="guideheader">A</span>t any time, you can click the "main menu" button to cancel and leave the 
+                submission. You will then be able to continue this submission if you want by using the "submissions" link in the
+                personal options panel:<br>
+                <IMG src="<WEBURL>/img/sbm_guide_submissions.png" class="guideimg" ALT="">
+            </BLOCKQUOTE>
+            
+        <h3>Navigating through the pages:</h3>
+            <BLOCKQUOTE>
+                <span class="guideheader">T</span>o go from one page to another, you can use the "previous page"/
+                "next page" buttons, or directly click on the page numbers at the top of the interface. Another solution to 
+                navigate through the pages, is to open the summary window.
+            </BLOCKQUOTE>
+            
+        <h3>Using the summary window:</h3>
+            <BLOCKQUOTE>
+                <span class="guideheader">B</span>y clicking the "SUMMARY" link, you can open the summary window for 
+                the current action:<BR>
+                <IMG src="<WEBURL>/img/sbm_guide_summary.png" class="guideimg" ALT="" align="left">
+                <span class="guideheader">T</span>his window presents you the list of all the fields of the submission, together with 
+                the values you already entered.<br><br>
+                <span class="guideheader">C</span>licking on one of the field names will bring you directly to the submission 
+                page containing this field.<br><br><br><br><br><br><br><br>
+            </BLOCKQUOTE>
+            
+        <h3>See also:</h3>
+            <BLOCKQUOTE>
+                <li><A HREF="subnumber.<lang:star: *>.html">submission numbers</A><BR>
+                <li><A HREF="login.<lang:star: *>.html">login</A><BR>
+            </BLOCKQUOTE>
+

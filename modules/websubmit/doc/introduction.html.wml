@@ -1,0 +1,48 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="Introduction" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a> &gt; <a class=navtrail href=<WEBURL>/help/submit/<lang:star: index.*.html>><MSG_SUBMIT_HELP></a>"
+
+        <h3>Please note:</h3>
+        <BLOCKQUOTE>
+            <span class="guideheader">T</span>his tool can be used on all platforms (Sun, Mac and PC), with all known 
+            web browsers.
+        </BLOCKQUOTE>
+        
+        <h3>Description:</h3>
+        <BLOCKQUOTE>
+            <span class="guideheader">C</span>DS Submit is the main entry point for all documents stored in 
+            <a href="<WEBURL>"><CDSNAME></a>. But it is more than simply a submission tool...<br><br>
+            <span class="guideheader">T</span>his tool offers the opportunity to the users not only to submit a document 
+            (of many possible types), but also allows different manipulations on these documents.<br><br>
+            <span class="guideheader">A</span>mong other possibilities, CDS Submit allows you to modify your documents, 
+            submit revised versions, referee some documents, keep track of all the past submissions you did...
+        </BLOCKQUOTE>
+
+        <h3>See also:</h3>
+            <BLOCKQUOTE>
+                <li><A HREF="<lang:star: description.*.html>">interface description</A><BR>
+                <li><A HREF="<lang:star: actions.*.html>">actions</A><BR>
+                <li><A HREF="<lang:star: documents.*.html>">document types</A><BR>
+            </BLOCKQUOTE>
+
+

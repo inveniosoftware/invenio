@@ -21,65 +21,63 @@ SUBDIRS = admin
 
 docdir = $(WEBDIR)/help/submit
 
-doc_DATA=access.en.php access.fr.php access.de.php access.es.php access.pt.php access.it.php access.ru.php access.sk.php access.cz.php access.no.php \
-         actions.en.php actions.fr.php actions.de.php actions.es.php actions.pt.php actions.it.php actions.ru.php actions.sk.php actions.cz.php actions.no.php \
-         approval.en.php approval.fr.php approval.de.php approval.pt.php approval.es.php approval.it.php approval.ru.php approval.sk.php approval.cz.php approval.no.php \
-         bibliographic_fields.en.php bibliographic_fields.fr.php bibliographic_fields.de.php bibliographic_fields.es.php bibliographic_fields.pt.php bibliographic_fields.it.php bibliographic_fields.ru.php bibliographic_fields.sk.php bibliographic_fields.cz.php bibliographic_fields.no.php \
-         completed.en.php completed.fr.php completed.de.php completed.es.php completed.pt.php completed.it.php completed.ru.php completed.sk.php completed.cz.php completed.no.php \
-         cookies.en.php cookies.fr.php cookies.de.php cookies.es.php cookies.pt.php cookies.it.php cookies.ru.php cookies.sk.php cookies.cz.php cookies.no.php \
-         description.en.php description.fr.php description.de.php description.pt.php description.es.php description.it.php description.ru.php description.sk.php description.cz.php description.no.php \
-         file_transfer.en.php file_transfer.fr.php file_transfer.de.php file_transfer.es.php file_transfer.pt.php file_transfer.it.php file_transfer.ru.php file_transfer.sk.php file_transfer.cz.php file_transfer.no.php \
-         index.en.php index.fr.php index.de.php index.pt.php index.es.php index.it.php index.ru.php index.sk.php index.cz.php index.no.php \
-         introduction.en.php introduction.fr.php introduction.de.php introduction.es.php introduction.pt.php introduction.it.php introduction.ru.php introduction.sk.php introduction.cz.php introduction.no.php \
-         link.en.php link.fr.php link.de.php link.es.php link.pt.php link.it.php link.ru.php link.sk.php link.cz.php link.no.php \
-         login.en.php login.fr.php login.de.php login.pt.php login.es.php login.it.php login.ru.php login.sk.php login.cz.php login.no.php \
-         modification.en.php modification.fr.php modification.de.php modification.es.php modification.pt.php modification.it.php modification.ru.php modification.sk.php modification.cz.php modification.no.php \
-         password.en.php password.fr.php password.de.php password.es.php password.pt.php password.it.php password.ru.php password.sk.php password.cz.php password.no.php \
-         pending.en.php pending.fr.php pending.de.php pending.es.php pending.pt.php pending.it.php pending.ru.php pending.sk.php pending.cz.php pending.no.php \
-         revised_version.en.php revised_version.fr.php revised_version.de.php revised_version.es.php revised_version.pt.php revised_version.it.php revised_version.ru.php revised_version.sk.php revised_version.cz.php revised_version.no.php \
-         submission.en.php submission.fr.php submission.de.php submission.es.php submission.pt.php submission.it.php submission.ru.php submission.sk.php submission.cz.php submission.no.php \
-         subnumber.en.php subnumber.fr.php subnumber.de.php subnumber.es.php subnumber.pt.php subnumber.it.php subnumber.ru.php subnumber.sk.php subnumber.cz.php subnumber.no.php
+doc_DATA=access.en.html access.fr.html access.de.html access.es.html access.pt.html access.it.html access.ru.html access.sk.html access.cz.html access.no.html \
+         actions.en.html actions.fr.html actions.de.html actions.es.html actions.pt.html actions.it.html actions.ru.html actions.sk.html actions.cz.html actions.no.html \
+         approval.en.html approval.fr.html approval.de.html approval.pt.html approval.es.html approval.it.html approval.ru.html approval.sk.html approval.cz.html approval.no.html \
+         bibliographic_fields.en.html bibliographic_fields.fr.html bibliographic_fields.de.html bibliographic_fields.es.html bibliographic_fields.pt.html bibliographic_fields.it.html bibliographic_fields.ru.html bibliographic_fields.sk.html bibliographic_fields.cz.html bibliographic_fields.no.html \
+         description.en.html description.fr.html description.de.html description.pt.html description.es.html description.it.html description.ru.html description.sk.html description.cz.html description.no.html \
+         file_transfer.en.html file_transfer.fr.html file_transfer.de.html file_transfer.es.html file_transfer.pt.html file_transfer.it.html file_transfer.ru.html file_transfer.sk.html file_transfer.cz.html file_transfer.no.html \
+         index.en.html index.fr.html index.de.html index.pt.html index.es.html index.it.html index.ru.html index.sk.html index.cz.html index.no.html \
+         introduction.en.html introduction.fr.html introduction.de.html introduction.es.html introduction.pt.html introduction.it.html introduction.ru.html introduction.sk.html introduction.cz.html introduction.no.html \
+         login.en.html login.fr.html login.de.html login.pt.html login.es.html login.it.html login.ru.html login.sk.html login.cz.html login.no.html \
+         modification.en.html modification.fr.html modification.de.html modification.es.html modification.pt.html modification.it.html modification.ru.html modification.sk.html modification.cz.html modification.no.html \
+         password.en.html password.fr.html password.de.html password.es.html password.pt.html password.it.html password.ru.html password.sk.html password.cz.html password.no.html \
+         pending.en.html pending.fr.html pending.de.html pending.es.html pending.pt.html pending.it.html pending.ru.html pending.sk.html pending.cz.html pending.no.html \
+         approvals.en.html approvals.fr.html approvals.de.html approvals.es.html approvals.pt.html approvals.it.html approvals.ru.html approvals.sk.html approvals.cz.html approvals.no.html \
+         revised_version.en.html revised_version.fr.html revised_version.de.html revised_version.es.html revised_version.pt.html revised_version.it.html revised_version.ru.html revised_version.sk.html revised_version.cz.html revised_version.no.html \
+         submission.en.html submission.fr.html submission.de.html submission.es.html submission.pt.html submission.it.html submission.ru.html submission.sk.html submission.cz.html submission.no.html \
+         subnumber.en.html subnumber.fr.html subnumber.de.html subnumber.es.html subnumber.pt.html subnumber.it.html subnumber.ru.html subnumber.sk.html subnumber.cz.html subnumber.no.html
 
 EXTRA_DIST = $(wildcard *.wml)
 
-CLEANFILES = $(doc_DATA) *~ *.tmp
+CLEANFILES = $(doc_DATA) *~ *.tmp *.php
 
-%.en.php: %.php.wml ../../../config/config.wml ../../../config/configbis.wml \
+%.en.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
            ../../../config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
 
-%.fr.php: %.php.wml ../../../config/config.wml ../../../config/configbis.wml \
+%.fr.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
            ../../../config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_FR:$@ $<
 
-%.de.php: %.php.wml ../../../config/config.wml ../../../config/configbis.wml \
+%.de.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
            ../../../config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_DE:$@ $<
 
-%.es.php: %.php.wml ../../../config/config.wml ../../../config/configbis.wml \
+%.es.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
            ../../../config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_ES:$@ $<
 
-%.pt.php: %.php.wml ../../../config/config.wml ../../../config/configbis.wml \
+%.pt.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
            ../../../config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_PT:$@ $<
 
-%.it.php: %.php.wml ../../../config/config.wml ../../../config/configbis.wml \
+%.it.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
            ../../../config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_IT:$@ $<
 
-%.ru.php: %.php.wml ../../../config/config.wml ../../../config/configbis.wml \
+%.ru.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
            ../../../config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_RU:$@ $<
 
-%.sk.php: %.php.wml ../../../config/config.wml ../../../config/configbis.wml \
+%.sk.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
            ../../../config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_SK:$@ $<
 
-%.cz.php: %.php.wml ../../../config/config.wml ../../../config/configbis.wml \
+%.cz.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
            ../../../config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_CZ:$@ $<
 
-%.no.php: %.php.wml ../../../config/config.wml ../../../config/configbis.wml \
+%.no.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
            ../../../config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_NO:$@ $<

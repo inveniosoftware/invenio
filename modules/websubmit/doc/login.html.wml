@@ -1,0 +1,58 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="Login" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a> &gt; <a class=navtrail href=<WEBURL>/help/submit/<lang:star: index.*.html>><MSG_SUBMIT_HELP></a>" 
+
+        <h3>Description:</h3>
+            <BLOCKQUOTE>
+                <span class="guideheader">Y</span>ou have to login before using the tool. You should use your email address 
+                as your user name. This strictly identifies a unique user, and if you loose or forget your password we will send it 
+                to you at this email address.<br>
+                <IMG src="<WEBURL>/img/sbm_guide_login.png" class="guideimg" ALT=""><br>
+                <span class="guideheader">O</span>nce you are logged in, you will stay logged until you close your browser, 
+                or explicitely request a logout.<br>
+                <IMG src="<WEBURL>/img/sbm_guide_logout.png" class="guideimg" ALT=""><br>
+            </BLOCKQUOTE>
+        
+        <h3>Why a login mechanism?</h3>
+            <BLOCKQUOTE>
+                <span class="guideheader">A</span>s it ensures privacy, this login mechanism also allows us to offer new 
+                personal services to you: <a href="pending.<lang:star: *>.html">access your pending submissions</a>, or the
+                <a href="approvals.<lang:star: *>.html">documents you referee</a> for example.
+            </BLOCKQUOTE>
+            
+        <h3>Important note:</h3>
+            <BLOCKQUOTE>
+                <span class="guideheader">E</span>ven if an empty password is authorized, it would mean anybody could 
+                potentially access your private services, so unless you don't mind this, choose a non empty password!
+        </BLOCKQUOTE>
+        
+        <h3>See also:</h3>
+            <BLOCKQUOTE>
+                <li><A HREF="pending.<lang:star: *>.html">view pending submissions</A><BR>
+                <li><A HREF="completed.<lang:star: *>.html">view completed submissions</A><BR>
+                <li><A HREF="description.<lang:star: *>.html">interface description</A><BR>
+                <li><A HREF="password.<lang:star: *>.html">protection and passwords</A><BR>
+                <li><A HREF="subnumber.<lang:star: *>.html">submission numbers</A><BR>
+            </BLOCKQUOTE>
+
+

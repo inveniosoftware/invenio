@@ -1,0 +1,49 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="Submission Number" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a> &gt; <a class=navtrail href=<WEBURL>/help/submit/<lang:star: index.*.html>><MSG_SUBMIT_HELP></a>"
+
+    <BLOCKQUOTE>
+        <span class="guideheader">T</span>he submission numbers are used to uniquely identify a submission. When 
+        you start a submission, you are given a submission number which appears at the bottom of the interface:<br>
+        <IMG src="<WEBURL>/img/sbm_guide_subnumber.png" class="guideimg" ALT=""><br>
+        <span class="guideheader">Y</span>ou can note this number at the beginning of the submission. If your browser 
+        crashes during the submission (it happens!), you will be able to retrieve the data you had already entered using this 
+        submission number.
+        In order to do so, please go to the access page of the proper type of document, enter the submission number 
+        (also called "access number") at the bottom of the page and click on "go!":<br>
+        <IMG src="<WEBURL>/img/sbm_guide_accessnumber.png" class="guideimg" ALT=""><br>
+        If the system does not find your submission, make sure you are on the correct access page.<BR><BR>
+        <span class="guideheader">O</span>nce an action has been fully completed, you will not be able to use this 
+        feature anymore.
+        <BR><BR>
+        <span class="guideheader">A</span>nother way of continuing a submission which was previously stopped is to use
+        the personal service "submissions" tool:<br>
+        <IMG src="<WEBURL>/img/sbm_guide_submissions.png" class="guideimg" ALT="">
+    </BLOCKQUOTE>
+    
+        <h3>See also:</h3>
+            <BLOCKQUOTE>
+                <li><A HREF="description.<lang:star: *>.html">interface description</A><BR>
+                <li><A HREF="access.<lang:star: *>.html">access pages</A><BR>
+                <li><A HREF="pending.<lang:star: *>.html">pending submissions</A><BR>
+            </BLOCKQUOTE>

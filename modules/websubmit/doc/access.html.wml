@@ -1,0 +1,45 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="Access Pages" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a> &gt; <a class=navtrail href=<WEBURL>/help/submit/<lang:star: index.*.html>><MSG_SUBMIT_HELP></a>" 
+    
+    <BLOCKQUOTE>
+        <span class="guideheader">T</span>here is one <a href="<WEBURL>/submit.py">main access page</a> for 
+        CDSware Submit.<br><br>
+        <span class="guideheader">T</span>here, you should choose the type of document which interests you by clicking 
+        on its name.<br><br>
+        <span class="guideheader">O</span>nce here, you can find the list of all the possible actions for this type of 
+        document (blue buttons), and sometimes a list of categories. If there is a list of categories, you should first choose 
+        one before clicking on an action.<br><br>
+        <span class="guideheader">A</span>t the bottom of the page you will find the input box in which you can enter 
+        your <a href="subnumber.<lang:star: *>.html">submission number</a>.<br><br>
+        <span class="guideheader">A</span>n action can be either open to anybody worldwide or restricted to a given 
+        list of people. In any case you should login before using the tool:<br>
+        <IMG src="<WEBURL>/img/sbm_guide_login.png" class="guideimg" ALT="">
+    </BLOCKQUOTE>
+    
+        <h3>See also:</h3>
+            <BLOCKQUOTE>
+                <li><A HREF="description.<lang:star: *>.html">interface description</A><BR>
+                <li><A HREF="password.<lang:star: *>.html">protection and passwords</A><BR>
+                <li><A HREF="subnumber.<lang:star: *>.html">submission numbers</A><BR>
+            </BLOCKQUOTE>

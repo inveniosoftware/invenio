@@ -1,0 +1,53 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="Notes on Bibliographic Fields" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a> &gt; <a class=navtrail href=<WEBURL>/help/submit/<lang:star: index.*.html>><MSG_SUBMIT_HELP></a>" 
+
+        <h3>Authors:</h3>
+            <BLOCKQUOTE>    
+                <span class="guideheader">I</span>f you have problem with authors, make sure you chose the right format 
+                ("Initial. Name" or "Name, Initial") and that the first part is ALWAYS followed by a white space. Make sure also 
+                that you have entered one author per line. <B>Warning</B>! In all cases, an empty line in the list of authors can 
+                result in an error. Be careful, and do not put an empty line for example at the end of the list.
+            </BLOCKQUOTE>
+
+        <h3>Special characters in Titles/Abstracts:</h3>
+            <BLOCKQUOTE>    
+                <span class="guideheader">I</span>f your document is in TeX/LaTeX, do not forget to use the 
+                "Copy&amp;Paste" option. You may need to use special characters, like accented characters or formula. Using 
+                accented characters from your keyboard should not be a problem as the system is UTF-8 based. Anyway, you
+                should always check the quality and correctness of the information in your record once it has been
+                inserted in the database. If there is a problem, please <a href="mailto:<ADMINEMAIL>">contact us</a>.
+            </BLOCKQUOTE>
+
+        <h3>keywords:</h3>
+            <BLOCKQUOTE>    
+                <span class="guideheader">M</span>ake sure you put one keyword per line in the input box. If you enter 
+                "muon decay" on a single line and try to search for "muon" afterwards, the report will not be found, whereas
+                 if you put "muon" on one line and "decay" on the next, your report will be found.
+            </BLOCKQUOTE>
+        
+        <h3>See also:</h3>
+            <BLOCKQUOTE>
+                <li><A HREF="submission.<lang:star: *>.html">submit new record</A><BR>
+            </BLOCKQUOTE>
+

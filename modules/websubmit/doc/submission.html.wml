@@ -1,0 +1,58 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="Submit New Record" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a> &gt; <a class=navtrail href=<WEBURL>/help/submit/<lang:star: index.*.html>><MSG_SUBMIT_HELP></a>" 
+
+        <h3>Description:</h3>
+        <BLOCKQUOTE>
+            <span class="guideheader">T</span>his action is used to submit a document (of any kind) to our server. 
+            A submission is usually divided into several steps, which are:
+            <UL>
+                <LI><b>Submission of bibliographic information</b><br> in this part of the submission, which usually comes first
+                you are asked to enter bibliographic fields such as title, author, etc. When a special formatting is requested, 
+                it is written in the notice and an automatic checking is applied. You are then asked to modify your entry when 
+                it is mistyped.<BR><BR>
+                <LI><b>File Upload</B><BR>This should be used if your file is accessible from your local machine file system 
+                (either the file is on your local disk, or it is reachable through a remote file system connection). 
+            </UL>
+        </BLOCKQUOTE>
+
+        <h3>Important Notices:</h3>
+        <BLOCKQUOTE>
+            <LI>As documents will be available worldwide, only final versions - including all figures - should be submitted.
+            <LI>Users are encouraged to submit their papers in PDF rather than any other file formats.
+        </BLOCKQUOTE>
+
+        <h3>Delay:</h3>
+        <BLOCKQUOTE>
+            <span class="guideheader">T</span>he maximum delay between the end of a submission and the appearance 
+            of the submitted document on the server is <B>1 day</B>. After this time, if you still do not find the document, 
+            please <A HREF="mailto:<ADMINEMAIL>">contact us</A>
+        </BLOCKQUOTE>
+        
+        <h3>See also:</h3>
+            <BLOCKQUOTE>
+                <li><A HREF="bibliographic_fields.<lang:star: *>.html">notes on the bibliographic fields</A><BR>
+                <li><A HREF="file_transfer.<lang:star: *>.html">notes on file transfers</A><BR>
+            </BLOCKQUOTE>
+
+
