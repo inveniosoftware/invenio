@@ -86,7 +86,7 @@ def Create_Modify_Interface(parameters,curdir,form):
                 text="<INPUT type=hidden name=\"%s\" value=\"%s\">" % (field,val)
                 text=text+"<SCRIPT>document.forms[0].%s.value=\"%s\";</SCRIPT>" % (field,value)
             elif type == "S":
-                values = value.split("[\n\r]+")
+                values = re.split("[\n\r]+",value)
                 text=fidesc
                 if re.search("%s\[\]" % field,fidesc):
                     multipletext = "[]"
@@ -95,15 +95,17 @@ def Create_Modify_Interface(parameters,curdir,form):
                 if len(values) > 0 and not(len(values) == 1 and values[0] == ""):
                     text += "<SCRIPT>\n"
                     text += "var i = 0;\n"
-                    text += "el = document.forms[0].elements['%s%s'];" % (field,multipletext)
-                    text += """
-max = el.length;\n"""
+                    text += "el = document.forms[0].elements['%s%s'];\n" % (field,multipletext)
+                    text += "max = el.length;\n"
                     for val in values:
                         text += "var found = 0;\n"
+                        text += "var i=0;\n"
                         text += "while (i != max) {\n"
                         text += "  if (el.options[i].value == \"%s\" || el.options[i].text == \"%s\") {\n" % (val,val)
                         text += "    el.options[i].selected = true;\n"
                         text += "    found = 1;\n"
+                        text += "  }\n"
+                        text += "  i=i+1;\n"
                         text += "}\n"
                         text += "if (found == 0) {\n"
                         text += "  el[el.length] = new Option(\"%s\", \"%s\", 1,1);\n"
@@ -112,7 +114,7 @@ max = el.length;\n"""
             elif type == "D":
                 text=fidesc
             elif type == "R":
-                text= eval(fidesc)
+                text=eval(fidesc)
             else:
                 text="%s: unknown field type" % field
             t = t+"<small>%s</small>" % text
