@@ -58,6 +58,7 @@
     $header =~ s/<!--MSGBULLETIN-->/<MSG_BULLETIN>/g;
     $header =~ s/<!--MSGLIBRARY-->/<MSG_LIBRARY>/g;
     $header =~ s/<!--MSGHELP-->/<MSG_HELP>/g;
+    $header =~ s/<!--MSGPERSONALIZE-->/<MSG_PERSONALIZE>/g;
     $header =~ s/<!--LN-->/<lang:star: *>/g;
     if ('$(navtrail_previous_links)' =~ /\w/) {
         $navtrailboxbody = '<a class="navtrail" href="<WEBURL>/?ln=<lang:star: *>"><MSG_HOME></a> &gt; $(navtrail_previous_links) &gt; $(title)';
@@ -75,7 +76,7 @@ $(cdspageheaderadd)
 ## CDS page content:
 
 <div class="pagebody">
-  <div class="pagestripeleft">
+  <div class="pagebodystripeleft">
     ## first site-wide CDSPAGEBOXLEFTTOP:
     <: if ('<CDSPAGEBOXLEFTTOP>' =~ /\w/) {
          print '<div class="pageboxlefttop"><CDSPAGEBOXLEFTTOP></div>';
@@ -97,7 +98,7 @@ $(cdspageheaderadd)
        }
     :> 
   </div>
-  <div class="pagestriperight">
+  <div class="pagebodystriperight">
     ## before everything, print the navbar:
     <navbar:render nohints name=$(navbar_name) select=$(navbar_select)>
     ## first site-wide CDSPAGEBOXRIGHTTOP:
@@ -121,7 +122,7 @@ $(cdspageheaderadd)
        }
     :> 
   </div>
-  <div class="pagestripemiddle">
+  <div class="pagebodystripemiddle">
     <h1 class="headline">$(title)</h1>
     <p>
     {#BODY#}
