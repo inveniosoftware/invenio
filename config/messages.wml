@@ -248,7 +248,7 @@
 <define-tag MSG_NARROW_SEARCH whitespace=delete>
   <en>Narrow by collection:</en>
   <fr>Limiter par collection:</fr>
-  <de>Einschränken nach Kollektionen:</de>
+  <de>Einschränken nach Sammlungen:</de>
   <es>Búsqueda limitada:</es>
   <pt>Busca limitada:</pt>
   <it>Ricerca ristretta:</it>
@@ -300,7 +300,7 @@
 <define-tag MSG_COLLECTION_NOT_FOUND_HEAD whitespace=delete>
   <en>Collection %s Not Found</en>
   <fr>Collection %s Introuvable</fr>
-  <de>Kollektion %s nicht gefunden</de>
+  <de>Sammlung %s nicht gefunden</de>
   <es>No se ha encontrado la colección %s</es>
   <pt>A coleção %s não foi encontrada</pt>
   <it>Collezione %s Non Trovata</it>
@@ -320,8 +320,8 @@
     <p>Essaiez de naviguer à partir de <a href="%s">%s</a>.
   </fr>
   <de>
-    <p>Entschuldigung, die Kollektion <strong>%s</strong> scheint nicht zu existieren.
-    <p>Sie können von <a href="%s">%s</a> durchsuchen beginnen.
+    <p>Entschuldigung, Sammlung <strong>%s</strong> scheint nicht zu existieren.
+    <p>Sie können erneut beginnen von <a href="%s">%s</a>.
   </de>
   <es>
     <p>Lo sentimos, la colección <strong>%s</strong> no parece existir.
@@ -668,7 +668,7 @@
 <define-tag MSG_REGULAR_EXPRESSION whitespace=delete>
   <en>Regular expression:</en>
   <fr>Expression régulaire:</fr>
-  <de>Reguläres Ausdruck:</de>
+  <de>Regulärer Ausdruck:</de>
   <es>Expresión regular:</es>
   <pt>Expressão regular:</pt>
   <it>Regular expression:</it>
@@ -850,7 +850,7 @@
 <define-tag MSG_SPLIT_BY_COLLECTION whitespace=delete>
   <en>split by collection</en>
   <fr>regroupés par collection</fr>
-  <de>vertailen in Kollektionen</de>
+  <de>verteilen in Sammlungen</de>
   <es>agrupar por colección</es>
   <pt>agrupar por coleção</pt>
   <it>raggruppati per collezione</it>
@@ -1000,7 +1000,7 @@
 <define-tag MSG_COLLECTIONS whitespace=delete>
   <en>collections</en>
   <fr>collections</fr>
-  <de>Kollektionen</de>
+  <de>Sammlungen</de>
   <es>colecciones</es>
   <pt>coleções</pt>
   <it>collezioni</it>
@@ -1013,7 +1013,7 @@
 <define-tag MSG_ANY_COLLECTION whitespace=delete>
   <en>any collection</en>
   <fr>toutes les collections</fr>
-  <de>alle Kollektionen</de>
+  <de>alle Sammlungen</de>
   <es>alguna colección</es>
   <pt>qualquer coleção</pt>
   <it>tutte le collezioni</it>
@@ -1026,7 +1026,7 @@
 <define-tag MSG_ADD_ANOTHER_COLLECTION whitespace=delete>
   <en>add another collection</en>
   <fr>ajouter une nouvelle collection</fr>
-  <de>Neue Kollektion hinzufügen</de>
+  <de>Neue Sammlung hinzufügen</de>
   <es>añadir otra colección</es>
   <pt>adicionar outra coleção</pt>
   <it>aggiungere un'altra collezione</it>
@@ -1351,7 +1351,7 @@
 <define-tag MSG_DID_NOT_MATCH whitespace=delete>
   <en>did not match any record.  Nearest terms in any collection are:</en>
   <fr>ne se trouve dans aucune notice.  Les termes les plus proches de toutes les collections sont:</fr>
-  <de>hat keine Datensätze gekriegt.  Die nächste Begriffe in allen Kollektionen sind:</de>
+  <de>hat keine Datensätze gefunden.  Die nächsten Begriffe in allen Sammlungen sind:</de>
   <es>no se han encontrado ningún registro.  Los períodos mas aproximados en cualquier colección son:</es>
   <pt>não está presente em nenhum registro.  Os termos mais similares em todas as coleções são:</pt>
   <it>non ha dato risultati. I termini piu` prossimi in tutte le collezioni sono:</it>
@@ -1364,7 +1364,7 @@
 <define-tag MSG_NO_WORDS_INDEX_AVAILABLE whitespace=delete>
   <en>No words index available for</en>
   <fr>Aucun index des mots n'est disponible pour</fr>
-  <de>Kein Wordindex steht zur Verfügung für</de>
+  <de>Kein Wortindex steht zur Verfügung für</de>
   <es>No hay índices disponibles para la palabra</es>
   <pt>Nenhum índice de palavras está disponível para</pt>
   <it>Nessun indice per parola è disponibile per</it>
@@ -1397,8 +1397,8 @@
     sélectionnées.  Les résultats de toutes la base publique suivent.
   </fr>
   <de>
-    Kein genaues Resultat wurde gefunden.
-    Resultate von der ganzen offenen Datenbank folgen:
+    Kein genaues Resultat in den ausgewählten Sammlung gefunden.
+    Resultate aus der ganzen öffentlichen Datenbank folgen:
   </de>
   <es>
     No se han encontrado coincidencias exactas con la(s) coleción(es)
@@ -1443,9 +1443,9 @@
     la collection restreinte.
   </fr>
   <de>
-    Keine offene Kollektion hat Ihre Suche abgefunden. 
-    Wenn Sie die private Dokumente durchsuchen möchten, 
-    wählen Sie bitte zuerst die private Kollektion aus.
+    In keiner allgemein zugänglichen Sammlung wurde Ihre Suche gefunden. 
+    Wenn Sie private Dokumente durchsuchen möchten, 
+    wählen Sie bitte zuerst eine private Sammlung aus.
   </de>
   <es>  
     No se ha encontrado ninguna colección pública que coincida con su
@@ -1491,8 +1491,8 @@
     n'est pas prise en compte...
   </fr>
   <de>
-    Kein Resultat in der eingegebene Zeitbeschränkung wurde erreicht, 
-    diese Bedingung wird ignoriert...
+    Kein Resultat in der eingegebene Zeitbeschränkung, 
+    Bedingung wird ignoriert...
   </de>
   <es>
     No se han encontrado coincidencias dentro de los límites de
@@ -1530,8 +1530,8 @@
     sont pas prise en compte...
   </fr>
   <de>
-    Kein Resultat in der eingegebene Suchebeschränkung wurde erreicht, 
-    diese Bedingung wird ignoriert...
+    Kein Resultat in der eingegebene Suchebeschränkung, 
+    Bedingung wird ignoriert...
   </de>
   <es>
     No se han encontrado coincidencias dentro de los límites,
@@ -1571,8 +1571,8 @@
     n'a rien donnée.  Essayez de combiner ces termes différamment.
   </fr>
   <de>
-    Alle eingegebene Begriffe wurden gefunden, aber die boolsche Suchfrage hat keine Datensätze gekriegt.
-    Kombinieren Sie, bitte, Ihre Suchfrage anders.
+    Alle Suchbegriffe gefunden, aber die boolsche Suchfrage hat keine Datensätze gefunden.
+    Bitte kombinieren Sie Ihre Suchfrage anders.
   </de>
   <es>
     Se han encontrado coincidencias para todos los términos pero la
@@ -1666,7 +1666,7 @@
     l'information suivante:        
   </fr>
   <de>
-    Kontaktieren Sie <a href="mailto:%s">%s</a>, bitte, und geben Sie die folgende Auskunft an:
+    Bitte kontaktieren Sie <a href="mailto:%s">%s</a> und geben folgende Auskunft:
   </de>
   <es>
     Por favor contacte <a href="mailto:%s">%s</a> indicando la siguiente
@@ -1698,7 +1698,7 @@
 <define-tag MSG_SEARCH_OPTIONS>
   <en>Search options:</en>
   <fr>Options de la recherche:</fr>
-  <de>Suche Wahlen:</de>
+  <de>Suchoptionen:</de>
   <es>Opciones de búsqueda:</es>
   <pt>Opções de busca:</pt>
   <it>Opzioni di ricerca:</it>
@@ -1711,7 +1711,7 @@
 <define-tag MSG_LATEST_ADDITIONS>
   <en>Latest additions:</en>
   <fr>Dernières ajouts:</fr>
-  <de>Letzte Eintrage:</de>
+  <de>Letzte Einträge:</de>
   <es>Últimas adquisiciones:</es>
   <pt>Ítens mais recentes:</pt>
   <it>Ultimi arrivi:</it>
@@ -1737,7 +1737,7 @@
 <define-tag MSG_COLLECTION_CONTAINS_NO_RECORDS>
   <en>This collection does not contain any document yet.</en>
   <fr>Cette collection ne contient pas encore de document.</fr>
-  <de>Diese Kollektion enthält zur Zeit keine Dokumente.</de>
+  <de>Diese Sammlung enthält zur Zeit keine Dokumente.</de>
   <es>Esta colección aún no contiene ningún documento.</es>
   <pt>Esta coleção ainda não contém nenhum documento.</pt>
   <it>Questa collezione non contiene ancora alcun documento.</it>
@@ -1750,7 +1750,7 @@
 <define-tag MSG_COLLECTION_RESTRICTED_CONTENT>
   <en>The contents of this collection is restricted.</en>
   <fr>Le contenu de cette collection est restreint.</fr>
-  <de>Der Inhalt von dieser Kollektion ist privat.</de>
+  <de>Der Inhalt von dieser Sammlung ist privat.</de>
   <es>Los contenidos de esta colección están restringidos.</es>
   <pt>O conteúdo desta coleção é restrito.</pt>
   <it>Il contenuto di questa collezione è riservato.</it>
