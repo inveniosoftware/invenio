@@ -1,3 +1,4 @@
+## $Id$
 ## Administrator interface for WebSearch
 
 ## This file is part of the CERN Document Server Software (CDSware).
@@ -1945,9 +1946,9 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     <td>1.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_addcollection">Create new collection</a></small></td>
     <td>2.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_addcollectiontotree">Attach collection to tree</a></small></td>
     <td>3.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_modifycollectiontree">Modify collection tree</a></small></td>
-    <td>4.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_runwebcoll">Webcoll Status</a></small></td>
+    <td>4.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkwebcollstatus">Webcoll Status</a></small></td>
     </tr><tr>
-    <td>5.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_validateconf">Collections Status</a></small></td>
+    <td>5.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkcollectionstatus">Collections Status</a></small></td>
     </tr>
     </table>
     """ % (weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln)
@@ -1973,15 +1974,15 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
         fin_output += perform_modifycollectiontree(colID=colID, ln=ln, callback='')
         fin_output += "<br>"
 
-    if mtype == "perform_runwebcoll" and content:
+    if mtype == "perform_checkwebcollstatus" and content:
         fin_output += content
-    elif mtype == "perform_runwebcoll" or mtype == "perform_showall":
-        fin_output += perform_runwebcoll(colID, ln, callback='')
+    elif mtype == "perform_checkwebcollstatus" or mtype == "perform_showall":
+        fin_output += perform_checkwebcollstatus(colID, ln, callback='')
 
-    if mtype == "perform_validateconf" and content:
+    if mtype == "perform_checkcollectionstatus" and content:
         fin_output += content
-    elif mtype == "perform_validateconf" or mtype == "perform_showall":
-        fin_output += perform_validateconf(colID, ln, callback='')
+    elif mtype == "perform_checkcollectionstatus" or mtype == "perform_showall":
+        fin_output += perform_checkcollectionstatus(colID, ln, callback='')
 
     try:
         body = [fin_output, extra]
@@ -2282,10 +2283,10 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
             
     return addadminbox("Overview of edit options for collection '%s'" % col_dict[colID],  [fin_output])
 
-def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
-    """Status of the collection tables / indexes"""
+def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
+    """Check status of the collection tables with respect to the webcoll cache."""
  
-    subtitle = """<a name="11"></a>Webcoll Status"""
+    subtitle = """<a name="11"></a>Webcoll Status&nbsp;&nbsp&nbsp;[<a href="%s/admin/websearch/guide.html#4">?</a>]""" % weburl
     output  = ""
 
     colID = int(colID)
@@ -2297,27 +2298,25 @@ def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
     
     res = run_sql("SHOW TABLE STATUS LIKE 'collection'")
     if res:
-        if str(res[0][11])[-3:] == ".00":
-            collection_table_update_time = str(res[0][11])[:-3]
-        else:
-            collection_table_update_time = str(res[0][11]) 
+        collection_table_update_time = re.sub(r'\.00$', '', str(res[0][11]))
         output += "Collection table last updated: %s<br>" % collection_table_update_time
     try:
         file = open("%s/collections/1/last-updated-ln=en.html" % cachedir)
-        collection_web_update_time = str(file.readline())
+        collection_web_update_time = string.strip(file.readline())
+        collection_web_update_time = re.sub(r'[A-Z ]+$', '', collection_web_update_time)
         output += "Collection webpage last updated: %s<br>" % collection_web_update_time
         file.close()
     except StandardError, e:
         pass
 
-    tabletime = time.strptime(collection_table_update_time, "%Y-%m-%d %H:%M:%S")
+    # reformat collection_web_update_time to the format suitable for comparisons
     try:
-        webtime = time.strptime(collection_web_update_time, "%d %b %Y %H:%M:%S %Z")
+        collection_web_update_time = time.strftime("%04Y-%02m-%02d %02H:%02M:%02S",
+                           time.strptime(collection_web_update_time, "%d %b %Y %H:%M:%S"))
     except ValueError, e:
-        collection_web_update_time[0:string.rfind(collection_web_update_time, " ")]
-        webtime = time.strptime(collection_web_update_time, "%d %b %Y %H:%M:%S")
-        
-    if tabletime > webtime:
+        pass
+
+    if collection_table_update_time > collection_web_update_time:
         output += """<br><b><span class="info">Warning: The collections has been modified since last time Webcoll was executed, to process the changes, Webcoll must be executed.</span></b><br>"""
 
     header = ['ID', 'Name', 'Time', 'Status', 'Progress']
@@ -2378,21 +2377,21 @@ def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
         body = [output]
 
     if callback:
-        return perform_index(colID, ln, "perform_runwebcoll", addadminbox(subtitle, body))
+        return perform_index(colID, ln, "perform_checkwebcollstatus", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
     
-def perform_validateconf(colID, ln, confirm=0, callback='yes'):
-    """Validation of the configuration of the collections"""
+def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
+    """Check the configuration of the collections."""
  
-    subtitle = """<a name="11"></a>Collections Status"""
+    subtitle = """<a name="11"></a>Collections Status&nbsp;&nbsp&nbsp;[<a href="%s/admin/websearch/guide.html#5">?</a>]""" % weburl
     output  = ""
 
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
     collections = run_sql("SELECT id, name, dbquery, restricted FROM collection ORDER BY id")
 
-    header = ['Id', 'Name', 'Query', 'Subcollections', 'Restricted', 'I8N','Status']
+    header = ['ID', 'Name', 'Query', 'Subcollections', 'Restricted', 'I18N','Status']
     rnk_list = get_def_name('', "rnkMETHOD")
     actions = []
 
@@ -2448,7 +2447,7 @@ def perform_validateconf(colID, ln, confirm=0, callback='yes'):
     return addadminbox(subtitle, body)
 
     if callback:
-        return perform_index(colID, ln, "perform_validateconf", addadminbox(subtitle, body))
+        return perform_index(colID, ln, "perform_checkcollectionstatus", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
 
