@@ -26,8 +26,9 @@
 <protect>   
    1. Read default configuration file or the one specified by the user
 
-   2. Read each create_ line from the cfg file, for each line, read the source(s) from either database, file
-      or www by calling get_from_source(). Convert between naming conventions if source for convertion data is given.
+   2. Read each create_ line from the cfg file, for each line, read the 
+      source(s) from either database, file or www by calling get_from_source(). 
+      Convert between naming conventions if source for convertion data is given.
 
    3. Merge into one file, repeat 2. until last source is read.
 
@@ -37,9 +38,10 @@
 
    How to spesify a source:
        -create_x = filter, source
-   Where x is a number from 0 and up. The source and the filter is read, and each line in the source is 
-   checked against the filter to be converted into the correct naming standard. If no filter is given, 
-   the source is directly translated into a .kb file.
+   Where x is a number from 0 and up. The source and the filter is read, 
+   and each line in the source is checked against the filter to be converted 
+   into the correct naming standard. If no filter is given, the source is 
+   directly translated into a .kb file.
 
    Read filter from:
 
