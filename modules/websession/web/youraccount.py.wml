@@ -150,8 +150,7 @@ def delete(req):
 
 def logout(req):
     
-    uid = webuser.getUid(req)
-    webuser.logoutUser(req,uid)
+    uid = webuser.logoutUser(req)
     return page(title="Logout",
                 body=webaccount.perform_logout(req),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
@@ -174,7 +173,7 @@ def login(req,p_email=None,p_pw=None,action='login'):
        iden = webuser.loginUser(p_email,p_pw)
     
        if len(iden)>0:
-           webuser.update_Uid(req,p_email,p_pw,uid)
+           uid=webuser.update_Uid(req,p_email,p_pw,uid)
            return  page(title="Login",
                         body=webaccount.perform_display(req),
                         navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,

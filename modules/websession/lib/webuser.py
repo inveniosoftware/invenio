@@ -182,7 +182,7 @@ def loginUser(p_email,p_pw):
     query_result = run_sql("SELECT id from user where email=%s and password=%s", (p_email,p_pw))
     return query_result
 
-def logoutUser(req,uid):
+def logoutUser(req):
     """It logout the user of the system, creating a guest user.
     """
     sm = session.MPSessionManager(pSession, pSessionMapping())
@@ -190,6 +190,7 @@ def logoutUser(req,uid):
     id1 = create_GuestUser()
     s.setUid(id1)
     sm.maintain_session(req,s)
+    return id1	
 
 def userNotExist(p_email,p_pw):
     """Check if the user exits or not in the system
@@ -206,7 +207,8 @@ def update_Uid(req,p_email,p_pw,uid):
     query_ID = int(run_sql("select id from user where email=%s and password=%s",
                            (p_email,p_pw))[0][0])
     setUid(req,query_ID)
-
+    return query_ID
+	
 def givePassword(email):
     """ It checks in the database the password for a given email. It is used to send the password to the email of the user.It returns 
 	the password if the user exists, otherwise it returns -999
