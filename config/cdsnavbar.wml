@@ -56,6 +56,7 @@
   <navbar:button id=webbasket txt="WebBasket Admin" url="<WEBURL>/admin/webbasket/" hint="CDSware WebBasket Admin" menu="admin-webbasket">
   <navbar:button id=websearch txt="WebSearch Admin" url="<WEBURL>/admin/websearch/" hint="CDSware Web Search Interface Admin" menu="admin-websearch">
   <navbar:button id=websession txt="WebSession Admin" url="<WEBURL>/admin/websession/" hint="CDSware WebSession Admin" menu="admin-websession">
+  <navbar:button id=webstat txt="WebStat Admin" url="<WEBURL>/admin/webstat/" hint="CDSware WebStat Admin" menu="admin-webstat">
   <navbar:button id=webstyle txt="WebStyle Admin" url="<WEBURL>/admin/webstyle/" hint="CDSware WebStyle Admin" menu="admin-webstyle">
   <navbar:button id=websubmit txt="WebSubmit Admin" url="<WEBURL>/admin/websubmit/" hint="CDSware Web Submit Interface Admin" menu="admin-websubmit">
 
@@ -379,6 +380,25 @@
     </table>
   </navbar:footer>
 </navbar:define>
+
+## navbar admin-webstat:
+<navbar:define name=admin-webstat
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=webstat-admin-guide txt="Guide" url="<WEBURL>/admin/webstat/guide.html">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
 
 ## End of file.  Please return to "config.wml" file, and the main CDSware
 ## source directory, and type "make clean && make".
