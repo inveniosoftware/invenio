@@ -364,7 +364,12 @@ class BibDoc:
                     filepath = "%s/%s" % (self.basedir,fil)
                     fileversion = re.sub(".*;","",fil)
                     fullname = fil.replace(";%s" % fileversion,"")
-                    fullname_last_dot_postition = fullname.rfind(".")
+                    # detect fullname's basename and extension:
+                    if fullname.endswith(".gz"):
+                        # .gz is to be included with the extension (e.g. ".ps.gz")
+                        fullname_last_dot_postition = fullname[:-3].rfind(".")
+                    else:
+                        fullname_last_dot_postition = fullname.rfind(".")
                     if fullname_last_dot_postition == -1:
                         fullname_basename = fullname
                         fullname_extension = ""
