@@ -2437,7 +2437,9 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, de
                 req.write("</small></div>\n")
                 for irec in range(irec_max,irec_min,-1):
                     req.write(print_record(recIDs[irec], format, ot, ln))
-                    if record_exists(irec)==1:
+                    if record_exists(recIDs[irec])==1:
+                        req.write("""\n<div class="recordlastmodifiedbox">%s</div>""" % \
+                                  (msg_record_last_modified[ln] % (get_creation_date(recIDs[irec]),get_modification_date(recIDs[irec]))))
                         req.write("""\n<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
                         req.write("""<input name="recid" type="hidden" value="%s"></td>""" % recIDs[irec])
                         req.write("""<br><input class="formbutton" type="submit" name="action" value="%s">"""  % msg_add_to_basket[ln])
@@ -2726,7 +2728,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 for idx in range(0,len(urls_u)):
                     out += """<br><small class="note"><a class="note" href="%s">%s</a></small>""" % (urls_u[idx], urls_u[idx])
 
-            # at the end of HTML mode, print the "Detailed record" functionality:
+            # at the end of HTML brief mode, print the "Detailed record" functionality:
             if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
                 pass # do nothing for portfolio and on-the-fly formats
             else:
