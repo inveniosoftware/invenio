@@ -2628,7 +2628,7 @@ CREATE TABLE IF NOT EXISTS sbmCOLLECTION_sbmCOLLECTION (
 
 CREATE TABLE IF NOT EXISTS sbmCOLLECTION_sbmDOCTYPE (
   id_father int(11) NOT NULL default '0',
-  id_son char(5) NOT NULL default '0',
+  id_son char(10) NOT NULL default '0',
   catalogue_order int(11) NOT NULL default '0'
 ) TYPE=MyISAM;
 
