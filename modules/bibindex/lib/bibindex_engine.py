@@ -70,7 +70,7 @@ except:
 class MyFancyURLopener(urllib.FancyURLopener):
     def prompt_user_passwd(self, host, realm):
         # supply some dummy credentials by default
-        return (cfg_urlopener_username, cfg_urlopener_password)
+        return (cfg_bibindex_urlopener_username, cfg_bibindex_urlopener_password)
     def http_error_401(self, url, fp, errcode, errmsg, headers):
         # do not bother with protected pages
         raise IOError, (999, 'unauthorized access')  
@@ -91,10 +91,10 @@ def write_message(msg, stream=sys.stdout):
 ## precompile some often-used regexp for speed reasons:
 sre_subfields = sre.compile('\$\$\w');
 sre_html = sre.compile("(?s)<[^>]*>|&#?\w+;")
-sre_block_punctuation_begin = sre.compile(r"^"+cfg_chars_punctuation+"+")
-sre_block_punctuation_end = sre.compile(cfg_chars_punctuation+"+$")
-sre_punctuation = sre.compile(cfg_chars_punctuation)
-sre_separators = sre.compile(cfg_chars_alphanumericseparators)
+sre_block_punctuation_begin = sre.compile(r"^"+cfg_bibindex_chars_punctuation+"+")
+sre_block_punctuation_end = sre.compile(cfg_bibindex_chars_punctuation+"+$")
+sre_punctuation = sre.compile(cfg_bibindex_chars_punctuation)
+sre_separators = sre.compile(cfg_bibindex_chars_alphanumeric_separators)
 sre_datetime_shift = sre.compile("([-\+]{0,1})([\d]+)([dhms])")
 
 nb_char_in_line = 50  # for verbose pretty printing
@@ -218,7 +218,7 @@ def get_words_from_fulltext(url_indirect,separators="[^\w]",split=string.split):
        Please note the double indirection. url_indirect
        returns a document that has to be parsed to get the actual
        urls."""
-    if cfg_fulltext_index_local_files_only and string.find(url_indirect, weburl) < 0:
+    if cfg_bibindex_fulltext_index_local_files_only and string.find(url_indirect, weburl) < 0:
         return []
     if options["verbose"] >= 2:
         write_message("... reading fulltext files from %s started" % url_indirect)
@@ -374,7 +374,7 @@ def get_words_from_phrase(phrase, split=string.split):
        punctuation characters definition present in the config file.
     """
     words = {}
-    if cfg_remove_html_code and string.find(phrase, "</") > -1:
+    if cfg_bibindex_remove_html_markup and string.find(phrase, "</") > -1:
         phrase = sre_html.sub(' ', phrase)
     phrase = str.lower(phrase)
     # 1st split phrase into blocks according to whitespace
@@ -403,13 +403,13 @@ def apply_stemming_and_stopwords_and_length_check(word):
        See the config file in order to influence these.
     """
     # stem word, when configured so:
-    if cfg_stemmer_default_language != None:
-        word = stem(word, cfg_stemmer_default_language)
+    if cfg_bibindex_stemmer_default_language != "":
+        word = stem(word, cfg_bibindex_stemmer_default_language)
     # now check against stopwords: 
     if is_stopword(word): 
         return ""
     # finally check the word length:
-    if len(word) < cfg_min_word_length:
+    if len(word) < cfg_bibindex_min_word_length:
         return ""
     return word
 

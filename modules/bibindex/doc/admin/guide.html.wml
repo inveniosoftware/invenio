@@ -70,70 +70,76 @@
 <a name="2.2"></a><h3>2.2 Configure Logical Fields</h3>
 <a name="3"></a><h2>3. Configure Word/Phrase Indexes</h2>
 <a name="3.1"></a><h3>3.1 Define New Index</h3>
-<pre>
-To define a new index you must first give the index a internal name. An empty
-index is then created by preparing the database tables. 
 
-Before the index can be used for searching, the fields that should be included
-in the index must be selected.
+<p>To define a new index you must first give the index a internal
+name. An empty index is then created by preparing the database tables.
 
-When desired to fill the index based on the fields selected, you can schedule
-the update by running '<b>bibindex -w indexname</b>' together with other
-desired parameters.
-</pre>
+<p>Before the index can be used for searching, the fields that should be
+included in the index must be selected.
+
+<p>When desired to fill the index based on the fields selected, you can
+schedule the update by running <b>bibindex -w indexname</b> together
+with other desired parameters. 
+
 <a name="3.2"></a><h3>3.2 Configure Word-Breaking Procedure</h3>
-<pre>
-Can be configured by changing '<b>cfg_chars_alphanumericseparators</b>' and 
-'<b>cfg_chars_punctuation</b>' in '<b>bibindex_engine_config.py</b>'.
 
-How the words are broken up defines what is added to the index. Should only
-"director-general" be added, or should "director", "general" and "director-general"
-be added? The index can vary between 300 000 and 3 000 000 terms based the policy
-for breaking words.
-</pre>
+<p>Can be configured by changing
+<b>cfg_bibindex_chars_alphanumeric_separators</b> and
+<b>cfg_bibindex_chars_punctuation</b> in the general config file.
+
+<p>How the words are broken up defines what is added to the index. Should
+only "director-general" be added, or should "director", "general" and
+"director-general" be added? The index can vary between 300 000 and 3
+000 000 terms based the policy for breaking words.
+
 <a name="3.3"></a><h3>3.3 Configure Stopwords List</h3>
-<pre>
-Bibindex supports stopword removal by not adding words which exists in a given stopword 
-list to the index. Stopword removal makes the index smaller by removing much used words.
 
-Which stopword list that should be used can be configured in the bibindex_engine_config.py
-file by changing the value of the variable cfg_path_to_stopwords_file. If no stopword list should
-be used, the value should be None.
-</pre>
+<p>BibIndex supports stopword removal by not adding words which exists in
+a given stopword list to the index. Stopword removal makes the index
+smaller by removing much used words.
+
+<p>Which stopword list that should be used can be configured in the
+general config file file by changing the value of the variable
+cfg_bibindex_path_to_stopwords_file. If no stopword list should be
+used, the value should be 0. 
 
 <a name="3.4"></a><h3>3.4 Configure stemming</h3>
-<pre>
-The BibIndex indexer supports stemming, removing the ending of words thus creating a smaller 
-indexer. For example, using english, the word "information" will be stemmed to 
-"inform", "looking", "looks", "looked" will be stemmed to "look", thus giving more hits to 
-each word. 
 
-Currently only one stemmer is supported, so the stemmer to use should be selected based on the most 
-used language. All searches will also be stemmed based on the same language. For documents in other 
+<p>The BibIndex indexer supports stemming, removing the ending of
+words thus creating a smaller indexer. For example, using english, the
+word "information" will be stemmed to "inform", "looking", "looks",
+"looked" will be stemmed to "look", thus giving more hits to each
+word.
+
+<p>Currently only one stemmer is supported, so the stemmer to use
+should be selected based on the most used language. All searches will
+also be stemmed based on the same language. For documents in other
 languages, there will be no difference if stemmer is used or not.
 
-The Stemmer currently supported, supports the following languages:
+<p>The Stemmer currently supported, supports the following languages:
 French, English, Norwegian, Swedish, German, Italian and Portugese.
 
-If another than the default stemmer should be used, the file '<b>bibindex_engine_stemmer.py</b>' 
-must be changed to support the desired stemmers interface.
+<p>If another than the default stemmer should be used, the file
+<b>bibindex_engine_stemmer.py</b> must be changed to support the
+desired stemmers interface.
 
-To change the default language to use for the stemmer, change the variable 
-'<b>cfg_stemmer_default_language</b>' in '<b>bibindex_engine_config.py</b>'. 
-To disable use of stemmer, set the value to None.
-</pre>
+<p>To change the default language to use for the stemmer, change the
+variable <b>cfg_bibindex_stemmer_default_language</b> in the general
+config file.  To disable use of stemmer, set the value to empty
+string.
+
 <a name="3.5"></a><h3>3.5 Configure Word Length</h3>
-<pre>
-By setting the value of '<b>cfg_min_word_length</b>' in '<b>bibindex_engine_config.py</b>' 
-higher than 0, only words with the number of characters higher than this will be added 
-to the index.
-</pre>
+
+<p>By setting the value of <b>cfg_bibindex_min_word_length</b> in the
+general config file higher than 0, only words with the number of
+characters higher than this will be added to the index.
+
 <a name="3.6"></a><h3>3.6 Configure Removal of HTML Code</h3>
-<pre>
-By setting the value of '<b>cfg_remove_html_code</b>' in '<b>bibindex_engine_config.py</b>' 
-to True, the indexer will try to remove all HTML code from documents before indexing, and
-index only the text left. Setting it to False disable it. (HTML code is defined as everything
-between '<' and '>' in a text.)
-</pre>
+
+<p>By setting the value of <b>cfg_bibindex_remove_html_markup</b> in
+the general config file, the indexer may try to remove all HTML code
+from documents before indexing, and index only the text left.  (HTML
+code is defined as everything between '<' and '>' in a text.)
+
 <a name="3.7"></a><h3>3.7 Configure Accent Stripping</h3>
 <a name="4"></a><h2>4. Run BibIndex Daemon</h2>

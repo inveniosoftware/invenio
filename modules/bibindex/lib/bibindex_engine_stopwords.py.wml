@@ -22,7 +22,7 @@ import string
 
 from bibindex_engine_config import *
 
-def create_stopwords(filename=cfg_path_to_stopwords_file):
+def create_stopwords(filename=cfg_bibindex_path_to_stopwords_file):
     """Create stopword dictionary out of FILENAME."""
     try:
         filename = open(filename, 'r')
@@ -46,6 +46,6 @@ def is_stopword(word, force_check=0):
        useful for ranking.
     """    
     # note: input word is assumed to be in lowercase
-    if (cfg_remove_stopwords or force_check) and stopwords.has_key(word):
+    if (cfg_bibindex_remove_stopwords or force_check) and stopwords.has_key(word):
         return True
     return False

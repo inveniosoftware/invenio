@@ -41,7 +41,7 @@ def is_stemmer_available_for_language(lang):
     """
     return stemmers.has_key(lang)
     
-def stem(word, lang=cfg_stemmer_default_language):
+def stem(word, lang=cfg_bibindex_stemmer_default_language):
     """Return WORD stemmed according to language LANG (e.g. 'en')."""
     if lang and is_stemmer_available_for_language(lang):
         return stemmers[lang].stem(word)
