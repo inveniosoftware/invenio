@@ -1,5 +1,5 @@
- # $Id$
-## Bibindex stemmer class
+## $Id$
+## BibIndex stemmer.
 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002 CERN.
@@ -17,11 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-## read config variables:
-#include "config.wml"
-#include "configbis.wml"
-#include "cdswmllib.wml"
 
 from bibindex_engine_config import *
 
@@ -47,9 +42,7 @@ def is_stemmer_available_for_language(lang):
     return stemmers.has_key(lang)
     
 def stem(word, lang=cfg_stemmer_default_language):
-    """Return WORD stemmed according to language CFG_STEMMER_DEFAULT_LANGUAGE
-       (read from the config file).
-    """
+    """Return WORD stemmed according to language LANG (e.g. 'en')."""
     if lang and is_stemmer_available_for_language(lang):
         return stemmers[lang].stem(word)
     else:
