@@ -24,14 +24,15 @@
 
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
+<h2>Contents</h2>
+
+<strong>1. <a href="#1">Introduction, using roles</a></strong><br>
+<strong>2. <a href="#2">WebAccess admin interface</a></strong><br>
+<strong>3. <a href="#3">Example pages, illustrating snapshots</a></strong><br>
+<strong>4. <a href="#4">Managing accounts / Access policy</a></strong><br>
+
+<h2><a name="1">1. INTRODUCTION, USING ROLES</a></h2>
 <pre>
-1. Introduction, using roles
-2. WebAccess admin interface
-3. Example pages, illustrating snapshots
-
-
-1. INTRODUCTION, USING ROLES
-
   WebAccess is a common RBAC, role based access control, for all of
   CDSware. This means that users are connected to roles that cover
   different areas of access. I.e <em>administrator of the photo
@@ -52,10 +53,10 @@
   WebAccess is based on allowing users to perform actions. This means
   that only allowed actions are stored in the access control engine's
   database.
+</pre>
 
-
-2. WEBACCESS ADMIN INTERFACE
-
+<h2><a name="2">2. WEBACCESS ADMIN INTERFACE</a></h2>
+<pre>
 All the WebAccess Administration web pages have certain
 features/design choices in common
 
@@ -82,15 +83,15 @@ features/design choices in common
   added a menu area on the right hand side of these pages. The menu
   contain links to other relevant admin pages and change according to
   the page you are on and the information you have selected.
+</pre>
 
-
-3. EXAMPLE PAGES
-
+<h2><a name="3">3. EXAMPLE PAGES</a></h2>
+<pre>
 I. Role area
 II. Example - connecting role and user
 
 
-I. Role area
+I. Role area</a>
 
   Administration tasks starts in one of the administration areas. The
   role area is the main area from where you can perform all your
@@ -255,7 +256,7 @@ I. Role area
 
 <pre>
 
-II. Example - connecting role and user
+II. Example - connecting role and user</a>
   
   One of the important tasks that can be handled via the WebAccess Admin Web Interface
   is the delegation of access rights to users. This is done by connecting them to the 
@@ -798,6 +799,51 @@ II. Example - connecting role and user
   - prevent unwanted input
 
   As an administrator with access to these pages you are free to manage the rights any way you want.
+</pre>
+
+<h2><a name="4">IV. Managing accounts and access policy</a></h2>
+<pre>
+  Here you can administrate the accounts and the access policy for your CDSware installation.
+
+  - Access policy:
+    To change the access policy, the access_control_config.py file must be edited manually. You can 
+    edit the access policy level for guest accounts, registered accounts and decide when to warn
+    the owner of the account when something happens with it, either when it is created, deleted or
+    approved. The apache server must be restarted after modifying these settings.
+
+    The two levels for guest account, are:
+       0 - Allow guest accounts
+       1 - Do not allow guest accounts
+    The three levels for normal accounts, are:
+       0 - Allow user to create account, automatically activate new accounts
+       1 - Allow user to create account, administrator must activate account
+       2 - Only administrators can create account.
+    You can configure CDSware to send an email:
+       1. To an admin email-address when an account is created
+       2. To the owner of an account when it is created
+       3. To the owner of an account when it is activated
+       4. To the owner of an account when it is deleted
+
+  - Account overview:
+    Here you find a overview of the number of guest accounts, registered accounts and accounts
+    awaiting activation, with a link to the activation page.
+
+  - Create account:
+    For creating new accounts, email must be unique, if configured to do so, an email will be
+    sent to the given address when account is created.
+
+  - Edit accounts:
+    For activating or rejecting accounts in addition to modify them. An activated account can be
+    inactivated for a short period of time, but this will not warn the account owner. To find accounts
+    enter a part of the email address of the account and then search. This may take some time. If there
+    are more than the selected number of accounts per page, you can use the next/prev links to switch
+    pages. The accounts to search in can also be limited to only activated or not activated accounts.
+
+  - Edit account:
+    When editing one account, you can change the email address, password, delete the account, or modify
+    the baskets or alerts belonging to one account. To modify baskets or alerts, you need to login
+    as the user, and modify the desired data as a normal user. Remember to log out as the user when you
+    are finished editing.
 
 - end of file -
 </pre>
