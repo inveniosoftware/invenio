@@ -371,7 +371,7 @@ INSERT INTO portalbox VALUES (37,'OM DENNE SIDEN','Velkommen til demosiden for C
 INSERT INTO portalbox VALUES (38,'SE OGSÅ','<a href=\"http://cdsware.cern.ch/\">CDSware</a><br><a href=\"http://www.cern.ch/\">CERN</a><br><a href=\"http://google.com/\">Google</a>');
 INSERT INTO portalbox VALUES (39,'SOBRE ESTE SITE','Bem vindo ao site de demonstração do CDSware, um servidor de documentos livre desenvolvido pelo CERN. Sinta-se à vontade para explorar plenamente todos os recursos deste site demonstração.');
 INSERT INTO portalbox VALUES (40,'VEJA TAMBÉM','<a href=\"http://cdsware.cern.ch/\">CDSware</a><br><a href=\"http://www.cern.ch/\">CERN</a><br><a href=\"http://google.com/\">Google</a>');
-INSERT INTO portalbox VALUES (41,'ОБ ЕТОМ САЙТЕ','Здравстбуйте на нашом демонстративном сайте CDSware, свободной системе для серверов документов, исходимой из ЦЕРНа.  Пересмотрите возможности нашево демонстративново сайта как вам увлекается.');
+INSERT INTO portalbox VALUES (41,'ОБ ЕТОМ САЙТЕ','Здравствуйте на нашом демонстративном сайте для CDSware, свободной системе для серверов документов, исходимой из ЦЕРНа.  Пересмотрите возможности нашево демонстративново сайта как вам увлекается.');
 INSERT INTO portalbox VALUES (42,'ПОСМОТРИТЬ ТОЖЕ','<a href=\"http://cdsware.cern.ch/\">CDSware</a><br><a href=\"http://www.cern.ch/\">CERN</a><br><a href=\"http://google.com/\">Google</a>');
 
 
