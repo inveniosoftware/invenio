@@ -39,12 +39,7 @@ except ImportError, e:
 def perform_display(req):
     out = ""
     uid = webuser.getUid(req)
-    id_user = uid # XXX
-    if webuser.isGuestUser(uid):
-        id_user=0
-    else:
-        id_user=1
-        
+    id_user = webuser.isGuestUser(uid)
 
     out += """<P>The CDS Search offers you a possibility to personalize the interface, to set up your own personal library
     of documents, or to set up an automatic alert query that would run periodically and would notify you of search
@@ -64,7 +59,7 @@ def perform_display(req):
     <dt><A href="../yourbaskets.py/display">Your Baskets</A>
     <dd>With baskets you can define specific collections of items,
     store interesting records you want to access later or share with others."""
-    if (id_user == 0):
+    if (id_user == 1):
         out += """<br><FONT color="red"> You are logged in as a <B>guest</B> user, so your baskets
         will disappear at the end of the current session. If you wish you can login or register
         <A href="./login">here</A>.</FONT>"""
@@ -72,7 +67,7 @@ def perform_display(req):
     <dt><A href="../youralerts.py/list_alerts">Your Alerts</A>
     <dd>Subscribe to a search which will be run periodically by our service.  The result can be sent to you
     via Email or stored in one of your baskets."""
-    if (id_user == 0):
+    if (id_user == 1):
         out += """<br><FONT color="red"> You are logged in as a <B>guest</B> user, so your alerts
         will disappear at the end of the current session. If you wish you can login or register
         <A href="./login">here</A>.</FONT>"""
