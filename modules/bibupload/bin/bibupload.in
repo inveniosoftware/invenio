@@ -21,6 +21,7 @@
 ## read config variables:
 #include "config.wml"
 #include "configbis.wml"
+#include "cdswmllib.wml"
 
 ## start PHP:
 <protect>#!</protect><PHP> -q
@@ -33,6 +34,8 @@
    $mysql_docid = "<DBUSER>";
    $mysql_docpw = "<DBPASS>";
    $supportemail = "<SUPPORTEMAIL>";
+
+   $__version__ = "<: print generate_pretty_version_string('$Id$'); :>";
 
 ### okay, config read, from now on the script can continue ###
 
@@ -1342,6 +1345,11 @@ function parse_command($argv)
             displayhelp();
             exit;
          }
+         if ($argv[$i] == "-V" || $argv[$i] == "--version")
+         {
+            displayversion();
+            exit;
+         }
          else if ($argv[$i] == "-u" || $argv[$i] == "--user") {
 	    $i++;
             $options['USER'] = $argv[$i];
@@ -1413,6 +1421,12 @@ function parse_command($argv)
    }
 }
 	
+function displayversion()
+{
+  global $__version__;
+  print $__version__;
+}
+
 function displayhelp()
 {
    global $errorfp;
@@ -1427,6 +1441,7 @@ function displayhelp()
   o If the match fails and no insert mode is selected, an error occurs
   Options: 
    -h, --help     print this help
+   -V, --version  print version information
    -u, --user     choose user
    -v, --verbose  verbosity level (0=mute, 1=default info msg,
 		  2=display record analysis, 3=display integration requests, 
