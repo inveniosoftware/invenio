@@ -20,7 +20,7 @@
 #include "cdspage.wml" \
     title="Help Central" \
     navbar_name="help" \
-    navtrail_position="<a class=navtrail href=<WEBURL>><CDSNAME></a>" \
+    navtrail_previous_links="" \
     navbar_select="tips" 
 
 <p>Welcome to the <CDSNAME> Help Central.
