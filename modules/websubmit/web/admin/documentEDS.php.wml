@@ -664,9 +664,9 @@
    # Select the CDS Search database...
    dbSelect(DOCS_DATABASE);
 
-   if (!canUseWebSubmitAdmin($uid,$doctype))
-      outWarning("You are not allowed to access WebSubmit Admin for this "
-	       . "type of documents");
+   $auth = canUseWebSubmitAdmin($uid,$doctype);
+   if (!$auth[0])
+      outWarning($auth[1] . "<br><br>" . "You are not allowed to access WebSubmit Admin for this type of documents");
    else
    {
       if(isset($deleteSub))

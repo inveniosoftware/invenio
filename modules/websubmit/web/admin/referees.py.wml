@@ -53,8 +53,9 @@ def index(req,c=cdsname,ln=cdslang,todo="",id="",doctype="",categ="",addusers=""
         uid_email = get_email(uid)
     except MySQLdb.Error, e:
         return errorMsg(e.value,req)
-    if not acc_authorize_action(uid, "cfgwebsubmit",verbose=0):
-        return errorMsg("You are not authorized to use websubmit admin",req,uid)
+    (auth_code, auth_message) = acc_authorize_action(uid, "cfgwebsubmit",verbose=0)
+    if auth_code != 0:
+        return errorMsg(auth_message, req, uid)
     # request for deleting a user
     if todo == "deleteuser":
         acc_deleteUserRole(id,name_role=role)

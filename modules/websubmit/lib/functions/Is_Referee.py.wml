@@ -31,7 +31,8 @@ def Is_Referee(parameters,curdir,form):
     else:
         categ=""
     # Try to retrieve the referee's email from the referee's database
-    if not acc_authorize_action(uid, "referee",doctype=doctype, categ=categ):
+    (auth_code, auth_message) = acc_authorize_action(uid, "referee",doctype=doctype, categ=categ)
+    if auth_code != 0:
         raise functionStop("""
 <SCRIPT> 
         document.forms[0].action="submit.py";

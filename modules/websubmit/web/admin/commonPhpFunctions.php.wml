@@ -68,10 +68,12 @@ $IMAGES="<WEBURL>/img";
    function canUseWebSubmitAdmin($uid,$doctype='%')
    {
 	$uid_email = getEmail($uid);
-	if(acc_authorize_action($uid, "cfgwebsubmit") != 1)
-	   return false;
+        $auth = acc_authorize_action($uid, "cfgwebsubmit");
+
+	if($auth[0] == 0)
+	   return array(true, $auth[1]);
 	else
-	   return true;
+	   return array(false, $auth[1]);
    }
 
    function makeEDSmdDate()

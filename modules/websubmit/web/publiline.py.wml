@@ -274,7 +274,8 @@ def displayDocument(doctype,categ,RN,send):
         t+="<BR>You can send an approval request e-mail again by clicking the following button:"
         t+= "<BR><INPUT class=\"adminbutton\" type=submit name=send value=\"Send Again\" onClick=\"return confirm('WARNING! An e-mail will be send to your referee if you confirm.')\">"
         # We also display a button for the referee
-        if acc_authorize_action(uid, "referee",verbose=0,doctype=doctype, categ=categ):
+        (auth_code, auth_message) = acc_authorize_action(uid, "referee",verbose=0,doctype=doctype, categ=categ)
+        if auth_code == 0:
             t+= "<br>As a referee for this document, you may click this button to approve or reject it:"
             t+= "<BR><INPUT class=\"adminbutton\" type=submit name=approval value=\"Approve/Reject\" onClick=\"window.location='approve.py?%s';return false;\">" % access
     if status == "approved":

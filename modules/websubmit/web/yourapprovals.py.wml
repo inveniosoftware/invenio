@@ -87,7 +87,8 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
                 urlargs=req.args)
 
 def isReferee(uid,doctype="",categ=""):
-    if  acc_authorize_action(uid, "referee",verbose=0,doctype=doctype, categ=categ):
+    (auth_code, auth_message) = acc_authorize_action(uid, "referee",verbose=0,doctype=doctype, categ=categ)
+    if auth_code == 0:
         return 1
     else:
         return 0

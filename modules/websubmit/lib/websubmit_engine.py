@@ -152,8 +152,9 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         fp.write(uid_email)
         fp.close()
     # is user authorized to perform this action?
-    if acc_isRole("submit",doctype=doctype,act=act) and not acc_authorize_action(uid, "submit",verbose=0,doctype=doctype, act=act):
-        return warningMsg("<center><font color=red>Sorry, user %s does not have the right to perform this action. Try logging with another user.</font></center>" % uid_email,req)
+    (auth_code, auth_message) = acc_authorize_action(uid, "submit",verbose=0,doctype=doctype, act=act)
+    if acc_isRole("submit",doctype=doctype,act=act) and auth_code != 0:
+        return warningMsg("<center><font color=red>%s</font></center>" % auth_message, req)
     # then we update the "journal of submission" 
     res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE  doctype=%s and action=%s and id=%s and email=%s", (doctype,act,access,uid_email,))
     if len(res) == 0:
