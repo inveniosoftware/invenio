@@ -32,6 +32,7 @@ install-data-local:
 	mkdir -p @prefix@/var
 	mkdir -p @prefix@/var/cache
 	mkdir -p @prefix@/var/log
+	mkdir -p @prefix@/var/tmp
 	chmod -R ug=rwx @prefix@/var
 
 uninstall-local:
