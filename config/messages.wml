@@ -448,7 +448,7 @@
   <en>Browse</en>
   <fr>Liste</fr>
   <de>Durchblättern</de>
-  <es>Ojear</es>
+  <es>Explorar</es>
   <pt>Explorar</pt>
   <it>Sfogliare</it>
   <ru>Просмотрить</ru>
@@ -799,7 +799,7 @@
   <en>single list</en>
   <fr>liste unique</fr>
   <de>einzige Liste</de>
-  <es>lista indival</es>
+  <es>lista única</es>
   <pt>lista única</pt>
   <it>lista unica</it>
   <ru>один опись</ru>
@@ -864,7 +864,7 @@
   <en>Detailed record</en>
   <fr>Notice détaillée</fr>
   <de>Details vom Eintrag</de>
-  <es>Registro detallo</es>
+  <es>Registro detallado</es>
   <pt>Registro detalhado</pt>
   <it>Registrazione dettagliata</it>
   <ru>Подробный запуск</ru>
@@ -988,7 +988,7 @@
   <en>add another collection</en>
   <fr>ajouter une nouvelle collection</fr>
   <de>Neue Kollektion hinzufügen</de>
-  <es>añadir otra coleción</es>
+  <es>añadir otra colección</es>
   <pt>adicionar outra coleção</pt>
   <it>aggiungere un'altra collezione</it>
   <ru>придат коллекцию</ru>
@@ -1001,7 +1001,7 @@
   <en>guest</en>
   <fr>visiteur</fr>
   <de>Gast</de> 
-  <es>guest</es> 
+  <es>visitante</es> 
   <pt>visitante</pt>
   <it>guest</it> 
   <ru>гость</ru>
@@ -1014,7 +1014,7 @@
   <en>Submit Help</en>
   <fr>Aide de Soumission</fr>
   <de>Eintragehilfe</de> 
-  <es>Submit Help</es> 
+  <es>Enviar Ayuda</es> 
   <pt>Ajuda sobre Envio</pt>
   <it>Aiuto per la Sottomissione</it> 
   <ru>Помощь для приданья</ru>
@@ -1027,7 +1027,7 @@
   <en>Administrator&quot;s Area</en>
   <fr>Coin d&quot;Administrateur</fr>
   <de>Verwaltungsraum</de> 
-  <es>Administrator&quot;s Area</es> 
+  <es>Área de Administración</es> 
   <pt>Área do Administrador</pt>
   <it>Area dell&quot;Amministratore</it> 
   <ru>Ареал Администратора</ru>
@@ -1040,7 +1040,7 @@
   <en>WebSubmit Administration</en>
   <fr>Administration de Soumission</fr>
   <de>WebSubmit Verwaltung</de> 
-  <es>WebSubmit Administration</es> 
+  <es>Administración de WebSubmit</es> 
   <pt>Administração de Envios</pt>
   <it>Amministrazione Websubmit</it> 
   <ru>Администрация Придания</ru>
@@ -1053,7 +1053,7 @@
   <en>Guide</en>
   <fr>Guide</fr>
   <de>Führer</de> 
-  <es>Guide</es>
+  <es>Guía</es>
   <pt>Guia</pt>
   <it>Guida</it> 
   <ru>Руководитель</ru>
@@ -1066,7 +1066,7 @@
   <en>Added since:</en>
   <fr>Ajouté depuis:</fr>
   <de>Hinzufügt seit:</de>
-  <es>Added since:</es>
+  <es>Añadido a partir de:</es>
   <pt>Adicionada desde:</pt>
   <it>Aggiunto dal:</it>
   <ru>Придано из:</ru>
@@ -1079,7 +1079,7 @@
   <en>until:</en>
   <fr>jusqu'à:</fr>
   <de>nach:</de>
-  <es>until:</es>
+  <es>hasta:</es>
   <pt>até:</pt>
   <it>fino al:</it>
   <ru>в:</ru>
@@ -1092,7 +1092,7 @@
   <en>any day</en>
   <fr>tous les jours</fr>
   <de>beliebiger Tag</de>
-  <es>any day</es>
+  <es>cualquier día</es>
   <pt>qualquer dia</pt>
   <it>qualsiasi giorno</it>
   <ru>любой день</ru>
@@ -1105,7 +1105,7 @@
   <en>any month</en>
   <fr>tous les mois</fr>
   <de>beliebiger Monat</de>
-  <es>any month</es>
+  <es>cualquier mes</es>
   <pt>qualquer mês</pt>
   <it>qualsiasi mese</it>
   <ru>любой месяц</ru>
@@ -1118,7 +1118,7 @@
   <en>any year</en>
   <fr>toutes les années</fr>
   <de>beliebiges Jahr</de>
-  <es>any year</es>
+  <es>cualquier año</es>
   <pt>qualquer ano</pt>
   <it>qualsiasi anno</it>
   <ru>любой год</ru>
@@ -1131,7 +1131,7 @@
   <en>January</en>
   <fr>janvier</fr>
   <de>Januar</de>
-  <es>January</es>
+  <es>Enero</es>
   <pt>Janeiro</pt>
   <it>Gennaio</it>
   <ru>январь</ru>
@@ -1144,7 +1144,7 @@
   <en>February</en>
   <fr>février</fr>
   <de>Februar</de>
-  <es>February</es>
+  <es>Febrero</es>
   <pt>Fevereiro</pt>
   <it>Febbraio</it>
   <ru>февраль</ru>
@@ -1157,7 +1157,7 @@
   <en>March</en>
   <fr>mars</fr>
   <de>März</de>
-  <es>March</es>
+  <es>Marzo</es>
   <pt>Março</pt>
   <it>Marzo</it>
   <ru>март</ru>
@@ -1170,7 +1170,7 @@
   <en>April</en>
   <fr>avril</fr>
   <de>April</de>
-  <es>April</es>
+  <es>Abril</es>
   <pt>Abril</pt>
   <it>Aprile</it>
   <ru>апрель</ru>
@@ -1183,7 +1183,7 @@
   <en>May</en>
   <fr>mai</fr>
   <de>Mai</de>
-  <es>May</es>
+  <es>Mayo</es>
   <pt>Maio</pt>
   <it>Maggio</it>
   <ru>май</ru>
@@ -1196,7 +1196,7 @@
   <en>June</en>
   <fr>juin</fr>
   <de>Juni</de>
-  <es>June</es>
+  <es>Junio</es>
   <pt>Junho</pt>
   <it>Giugno</it>
   <ru>июнь</ru>
@@ -1209,7 +1209,7 @@
   <en>July</en>
   <fr>juillet</fr>
   <de>Juli</de>
-  <es>July</es>
+  <es>Julio</es>
   <pt>Julho</pt>
   <it>Luglio</it>
   <ru>июль</ru>
@@ -1222,7 +1222,7 @@
   <en>August</en>
   <fr>août</fr>
   <de>August</de>
-  <es>August</es>
+  <es>Agosto</es>
   <pt>Agosto</pt>
   <it>Agosto</it>
   <ru>август</ru>
@@ -1235,7 +1235,7 @@
   <en>September</en>
   <fr>septembre</fr>
   <de>September</de>
-  <es>September</es>
+  <es>Septiembre</es>
   <pt>Setembro</pt>
   <it>Settembre</it>
   <ru>сентябрь</ru>
@@ -1248,7 +1248,7 @@
   <en>October</en>
   <fr>octobre</fr>
   <de>October</de>
-  <es>October</es>
+  <es>Octubre</es>
   <pt>Outubro</pt>
   <it>Ottobre</it>
   <ru>октябрь</ru>
@@ -1261,7 +1261,7 @@
   <en>November</en>
   <fr>novembre</fr>
   <de>November</de>
-  <es>November</es>
+  <es>Noviembre</es>
   <pt>Novembro</pt>
   <it>Novembre</it>
   <ru>ноябрь</ru>
@@ -1274,7 +1274,7 @@
   <en>December</en>
   <fr>décembre</fr>
   <de>Dezember</de>
-  <es>December</es>
+  <es>Diciembre</es>
   <pt>Dezembro</pt>
   <it>Dicembre</it>
   <ru>декабрь</ru>
@@ -1287,7 +1287,7 @@
   <en>Search term <em>%s</em></en>
   <fr>Le terme de recherche <em>%s</em></fr>
   <de>Suchbegriff <em>%s</em></de>
-  <es>Search term <em>%s</em></es>
+  <es>La expresión de búsqueda <em>%s</em></es>
   <pt>Termo de busca <em>%s</em></pt>
   <it>Termine di ricerca <em>%s</em></it>
   <ru>Искомое выражение <em>%s</em></ru>
@@ -1300,7 +1300,7 @@
   <en>inside <em>%s</em> index</en>
   <fr>dans l'index <em>%s</em></fr>
   <de>im Index von <em>%s</em></de>
-  <es>inside <em>%s</em> index</es>
+  <es>dentro del índice <em>%s</em></es>
   <pt>no <em>%s</em> índice</pt>
   <it>nell'indice <em>%s</em></it>
   <ru>в индексе <em>%s</em></ru>
@@ -1313,7 +1313,7 @@
   <en>did not match any record.  Nearest terms in any collection are:</en>
   <fr>ne se trouve dans aucune notice.  Les termes les plus proches de toutes les collections sont:</fr>
   <de>hat keine Datensätze gekriegt.  Die nächste Begriffe in allen Kollektionen sind:</de>
-  <es>did not match any record.  Nearest terms in any collection are:</es>
+  <es>no se han encontrado ningún registro.  Los períodos mas aproximados en cualquier colección son:</es>
   <pt>não está presente em nenhum registro.  Os termos mais similares em todas as coleções são:</pt>
   <it>non ha dato risultati. I termini piu` prossimi in tutte le collezioni sono:</it>
   <ru>не найденo. Ближайшие термины:</ru>
@@ -1326,7 +1326,7 @@
   <en>No words index available for</en>
   <fr>Aucun index des mots n'est disponible pour</fr>
   <de>Kein Wordindex steht zur Verfügung für</de>
-  <es>No words index available for</es>
+  <es>No hay índices disponibles para la palabra</es>
   <pt>Nenhum índice de palavras está disponível para</pt>
   <it>Nessun indice per parola è disponibile per</it>
   <ru>Лексическый индекс не найден для</ru>
@@ -1339,7 +1339,7 @@
   <en>No phrase index available for</en>
   <fr>Aucun index des phrases n'est disponible pour</fr>
   <de>Kein Begriffindex steht zur Verfügung für</de>
-  <es>No phrase index available for</es>
+  <es>No hay índice disponible para la expresión</es>
   <pt>Nenhum índice de frases está disponível para</pt>
   <it>Nessun indice per frase è disponibile per</it>
   <ru>Фразный индех не найден для</ru>
@@ -1362,8 +1362,9 @@
     Resultate von der ganzen offenen Datenbank folgen:
   </de>
   <es>
-    No exact match found in selected collection(s).
-    Results from the whole public database follow.
+    No se han encontrado coincidencias exactas con la(s) coleción(es)
+    seleccionadas.  A continuación se muestran los resultados de toda
+    la base de datos pública.
   </es>
   <pt>
     Nenhum resultado exato foi encontrado na(s) coleção(ões)
@@ -1408,9 +1409,9 @@
     wählen Sie bitte zuerst die private Kollektion aus.
   </de>
   <es>  
-    No public collection matched your query.  If you were looking for
-    a non-public document, please choose the desired restricted
-    collection first.
+    No se ha encontrado ninguna colección pública que coincida con su
+    solicitud. Si estaba buscando documentos no públicos, por favor
+    escoga la opción collección restringida primero.
   </es>
   <pt>  
     Nenhuma coleção pública corresponde à sua busca. Se você está 
@@ -1455,7 +1456,8 @@
     diese Bedingung wird ignoriert...
   </de>
   <es>
-    No match within your time limits, discarding this condition...
+    No se han encontrado coincidencias dentro de los límites de
+    tiempo, descartando esta condición...
   </es>
   <pt>
     Nenhum resultado dentro do período de tempo especificado,
@@ -1493,7 +1495,8 @@
     diese Bedingung wird ignoriert...
   </de>
   <es>
-    No match within your time limits, discarding this condition...
+    No se han encontrado coincidencias dentro de los límites,
+    descartando esta condición...    
   </es>
   <pt>
     Nenhum resultado dentro dos limites de busca especificados, 
@@ -1533,8 +1536,9 @@
     Kombinieren Sie, bitte, Ihre Suchfrage anders.
   </de>
   <es>
-    All search terms matched but boolean query returned no hits.
-    Please combine your search terms differently.
+    Se han encontrado coincidencias para todos los términos pero la
+    expresión booleana no ha devuelto resultados.  Por favor combien
+    sus términos de búsqueda de otra manera.
   </es>
   <pt>
     Foram encontrados resultados para todos os termos de busca 
@@ -1574,7 +1578,8 @@
     Kein genaues Resultat für <em>%s</em> wurde gefunden, <em>%s</em> wird verwendet anstatt...
   </de>
   <es>
-    No exact match found for <em>%s</em>, using <em>%s</em> instead...
+    No se han encontrado coincidencias con <em>%s</em>, en cambio
+    usando <em>%s</em> ...
   </es>
   <pt>
     Nenhum resultado exato foi encontrado para <em>%s</em>, usando
@@ -1603,7 +1608,7 @@
   <en>Internal Error</en>
   <fr>Erreur Interne</fr>
   <de>Interner Fehler</de>
-  <es>Internal Error</es>
+  <es>Error Interno</es>
   <pt>Erro Interno</pt>
   <it>Errore Interno</it>
   <ru>Интерная ошибка</ru>
@@ -1625,8 +1630,8 @@
     Kontaktieren Sie <a href="mailto:%s">%s</a>, bitte, und geben Sie die folgende Auskunft an:
   </de>
   <es>
-    Please contact <a href="mailto:%s">%s</a> quoting the following
-    information:
+    Por favor contacte <a href="mailto:%s">%s</a> indicando la siguiente
+    información:
   </es>
   <pt>
     Por favor entre em contato com <a href="mailto:%s">%s</a>
@@ -1655,7 +1660,7 @@
   <en>Search options:</en>
   <fr>Options de la recherche:</fr>
   <de>Suche Wahlen:</de>
-  <es>Search options:</es>
+  <es>Opciones de búsqueda:</es>
   <pt>Opções de busca:</pt>
   <it>Opzioni di ricerca:</it>
   <ru>Выборы поиска:</ru>
@@ -1668,7 +1673,7 @@
   <en>Latest additions:</en>
   <fr>Dernières ajouts:</fr>
   <de>Letzte Eintrage:</de>
-  <es>Latest additions:</es>
+  <es>Últimas adquisiciones:</es>
   <pt>Ítens mais recentes:</pt>
   <it>Ultimi arrivi:</it>
   <ru>Последнее добавления:</ru>
@@ -1681,7 +1686,7 @@
   <en>more</en>
   <fr>davantage</fr>
   <de>mehr</de>
-  <es>more</es>
+  <es>más</es>
   <pt>mais</pt>
   <it>ancora</it>
   <ru>более</ru>
@@ -1694,7 +1699,7 @@
   <en>This collection does not contain any document yet.</en>
   <fr>Cette collection ne contient pas encore de document.</fr>
   <de>Diese Kollektion enthält zur Zeit keine Dokumente.</de>
-  <es>This collection does not contain any document yet.</es>
+  <es>Esta colección aún no contiene ningún documento.</es>
   <pt>Esta coleção ainda não contém nenhum documento.</pt>
   <it>Questa collezione non contiene ancora alcun documento.</it>
   <ru>Ета коллекция не содержит еще запусков.</ru>
@@ -1707,7 +1712,7 @@
   <en>The contents of this collection is restricted.</en>
   <fr>Le contenu de cette collection est restreint.</fr>
   <de>Der Inhalt von dieser Kollektion ist privat.</de>
-  <es>The contents of this collection is restricted.</es>
+  <es>Los contenidos de esta colección están restringidos.</es>
   <pt>O conteúdo desta coleção é restrito.</pt>
   <it>Il contenuto di questa collezione è riservato.</it>
   <ru>Содержание етой коллекции приватно.</ru>
