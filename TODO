@@ -7,6 +7,16 @@ CDSware TODO list
 Suitable for editing with Emacs ToDoo mode, see
 <http://www.emacswiki.org/cgi-bin/wiki/ToDoo>.
 
+o [tibor] BibSched must use run_sql()
+  Received Fri Jan 16 10:17:11 2004
+
+o [thomas] BibUpload must use run_sql() 
+  to avoid connection dropping problems
+  Received Fri Jan 16 10:17:11 2004
+
+o [tibor] Get rid of isolatin stuff (for RH9)
+  Received Thu Jan 15 16:16:49 2004
+
 o [tibor] Admin: HOWTO Run guide 
   Received Wed Dec 17 16:20:35 2003 
 
