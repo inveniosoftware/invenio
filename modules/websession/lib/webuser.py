@@ -213,8 +213,8 @@ def checkemail(email):
 
     if (string.find(email, "@") <= 0) or (string.find(email, " ") > 0):
        return 0
-    elif CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN:
-        if not email.endswith(CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN):
+    elif CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN:
+        if not email.endswith(CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN):
             return 0         
     return 1
 
@@ -266,8 +266,8 @@ def registerUser(req,user,passw):
 
         if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
             sendNewUserAccountWarning(user, user, passw)
-        if CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS and CFG_ACCESS_CONTROL_SEND_TO_EMAIL:
-            sendNewAdminAccountWarning(user, CFG_ACCESS_CONTROL_SEND_TO_EMAIL)
+        if CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS:
+            sendNewAdminAccountWarning(user, adminemail)
 	return 1
     return 0
 
