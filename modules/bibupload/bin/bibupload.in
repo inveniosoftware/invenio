@@ -1289,8 +1289,10 @@ function integrate ($rec)
 	    // a record matching the additional criteria was found
             if ($options['DISPLAY'])
                 display($rec);
-            update($rec,$recid,$logfp);
-            $nbUpdatedRecords++;
+            if ($options['REPLACE'] || $options['CORRECT'] || $options['APPEND']) {
+              update($rec,$recid,$logfp);
+              $nbUpdatedRecords++;
+            }
         }
         else {
             // no matching record was found
@@ -1314,8 +1316,10 @@ function integrate ($rec)
         // this is an update
         if ($options['DISPLAY'])
             display($rec);
-        update($rec,$recid,$logfp);
-        $nbUpdatedRecords++;
+        if ($options['REPLACE'] || $options['CORRECT'] || $options['APPEND']) {
+          update($rec,$recid,$logfp);
+          $nbUpdatedRecords++;
+        }
     }
 }
 
