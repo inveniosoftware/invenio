@@ -1,0 +1,4 @@
+This directory builds a Python C-Extension library "magic.so".
+
+It is a python extension of libmagic (a.k.a the library interface to
+UNIX's file command) written by Brett Funderburg.

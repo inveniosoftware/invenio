@@ -20,7 +20,7 @@
 FILESWML=$(wildcard $(srcdir)/*.wml)
 
 etcdir=$(sysconfdir)/elmsubmit
-etc_DATA=$(FILESWML:$(srcdir)/%.wml=%)
+etc_DATA=elmsubmit.cfg
 
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 

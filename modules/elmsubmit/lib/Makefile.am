@@ -20,12 +20,12 @@
 SUBDIRS = magic
 
 pylibdir = $(libdir)/python/cdsware
-pylib_DATA = elmsubmit_misc.py
+pylib_DATA = elmsubmit.py elmsubmit_misc.py config2pyobj.py elmsubmit_doctype_test.py elmsubmit_enriched2txt.py elmsubmit_EZArchive.py elmsubmit_EZEmail.py elmsubmit_field_validation.py elmsubmit_filename_generator.py elmsubmit_html2txt.py elmsubmit_misc.py elmsubmit_richtext2txt.py elmsubmit_submission_parser.py lex.py lextab.py myhtmlentitydefs.py parsetab.py yacc.py mime.types.edited parser.out
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
-CLEANFILES = $(pylib_DATA) *~ *.tmp *.pyc
+CLEANFILES = *.py *~ *.tmp *.pyc
 
 %.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o $@ $<

@@ -1,0 +1,192 @@
+Here are some examples of how to use EZArchive:
+
+Creation:
+
+1.
+
+Input:          Two byte strings for which we invent filenames something.foo
+                and something.bar.
+Desired Output: Byte string containing tar.gz
+In [6]: elmsubmit_EZArchive.create(input=[('something.foo', 'data...'), ('something.bar', 'data...')])
+Out[6]: "\x1f\x8b\..."
+
+2.
+
+Input:          Two byte strings for which we invent filenames something.foo
+                and something.bar.
+Desired Output: (Attempt at) returning byte string containing bz2 file.
+In [7]: elmsubmit_EZArchive.create(input=[('something.foo', 'data...'), ('something.bar', 'data...')], compression='bz2')
+EZArchiveError: tried to compress more than one file into a single bz2 file
+
+3.
+
+Input:          One byte string for which we invent filename something.foo.
+Desired Output: Byte string containing bz2 file.
+In [16]: elmsubmit_EZArchive.create(input=[('something.foo', 'data...')], compression='bz2')
+Out[16]: 'BZh91AY&SY#\xa9...'
+
+4.
+
+Input:          Same as 3.
+Desired Output: A file we name on our disk.
+In [17]: elmsubmit_EZArchive.create(input=[('something.foo', 'data...')], compression='bz2', compress_to='my_file', my_file='/tmp/something.foo.bz2')
+Out[17]: None
+$ file /tmp/something.foo.bz2
+/tmp/something.foo.bz2: bzip2 compressed data, block size = 900k
+
+5.
+
+Input:          /home/devnull/present and /home/devnull/letter directories.
+Desired Output: tar.bz2 file in a temporary file location.
+In [19]: elmsubmit_EZArchive.create(input=['~/letter', '~/present'], compress_to='my_file', my_file='/home/devnull/info.tar.bz2', input_disposition='file_locations', compression='tar.bz2')
+Out[19]: None
+
+6.
+
+Input:          Same as 5
+Desired Output: Same as 5, but flatten the directory structure
+                (renaming files that collide in SAMENAME, 1.SAMENAME, 2.SAMENAME, etc.
+                format) and force file permissions and don't worry about clobbering
+                existing tar.bz2 file):
+In[40]: elmsubmit_EZArchive.create(input=['~/letter', '~/present'], compress_to='my_file', my_file='/home/devnull/info.tar.bz2', input_disposition='file_locations', compression='tar.bz2', directory_structure='flatten', filename_collision='rename_similar', force_file_permissions=0700, allow_clobber=True)
+Out[40]: None
+
+$ tar tvjf info.tar.bz2
+-rwx------ devnull/devnull 25804 2004-08-24 12:30:40 akletter.cls
+-rwx------ devnull/devnull 25820 2004-08-24 12:30:40 akletter.cls~
+-rwx------ devnull/devnull   278 2004-08-24 12:30:40 email.txt
+-rwx------ devnull/devnull   278 2004-08-24 12:30:40 email.txt~
+
+See no dirs, and file permissions forced.
+Full options: filename_collision='rename_similar', # ['throw_error', 'rename_similar', 'rename_random', 'overwrite', 'skip']
+
+Extraction:
+
+1.
+
+Input: Byte string containing tar.gz; extract is clever enough to
+       guess the file type (you can specify explicity using
+       compression_hint='tar.gz' if you want to save CPU cycles).
+
+Output: List containing data about each file in the archive. Notably s[x]['file'] will get you the data in file number x.
+
+In [6]: s = elmsubmit_EZArchive.extract(input=open('/tmp/eg/example.tar.gz', 'rb').read())
+
+In [9]: s[0]
+Out[9]: {'file_type': 'dir', 'basename': 'mutt-1.4.2', 'tar_dir': ''}
+
+In [10]: s[3]
+Out[10]: 
+{'basename': 'stamp-h.in',
+ 'file': 'timestamp\n',
+ 'file_type': 'regular',
+ 'tar_dir': 'mutt-1.4.2'}
+
+In [11]: s[24]
+Out[11]: 
+{'basename': 'mutt_dotlock.c',
+ 'file': '/*\n * Copyright (C) 1996-2000 Micha...',
+ 'file_type': 'regular',
+ 'tar_dir': 'mutt-1.4.2'}
+
+2.
+
+Input: Same input as 1., but read directly from disk.
+Output: File is written out to disk with correct file permissions.
+
+        This time, the return value is a 2-tuple. The first entry is
+        the location of the temp dir. The second entry is a list of
+        file data like in 1, except the ['file'] key is not present
+        (since we have written the data to disk).
+
+s = elmsubmit_EZArchive.extract(input='/tmp/eg/example.tar.gz', input_disposition='file_location', extract_to='temp_directory')
+
+In [18]: (s[0], s[1][1:5])
+Out[18]: 
+('/home/devnull/tmp/tmpzi4d_z',
+ [{'basename': 'Makefile.in',
+   'dirname': '/home/devnull/tmp/tmpzi4d_z/mutt-1.4.2',
+   'file_type': 'regular',
+   'fullname': '/home/devnull/tmp/tmpzi4d_z/mutt-1.4.2/Makefile.in',
+   'tar_dir': 'mutt-1.4.2'},
+  {'basename': 'README',
+   'dirname': '/home/devnull/tmp/tmpzi4d_z/mutt-1.4.2',
+   'file_type': 'regular',
+   'fullname': '/home/devnull/tmp/tmpzi4d_z/mutt-1.4.2/README',
+   'tar_dir': 'mutt-1.4.2'},
+  {'basename': 'stamp-h.in',
+   'dirname': '/home/devnull/tmp/tmpzi4d_z/mutt-1.4.2',
+   'file_type': 'regular',
+   'fullname': '/home/devnull/tmp/tmpzi4d_z/mutt-1.4.2/stamp-h.in',
+   'tar_dir': 'mutt-1.4.2'},
+  {'basename': 'ABOUT-NLS',
+   'dirname': '/home/devnull/tmp/tmpzi4d_z/mutt-1.4.2',
+   'file_type': 'regular',
+   'fullname': '/home/devnull/tmp/tmpzi4d_z/mutt-1.4.2/ABOUT-NLS',
+   'tar_dir': 'mutt-1.4.2'}])
+
+3. 
+
+Input: Same as 2.
+Output: Same as 2, except this time we force the file and directory
+        permissions written out.
+In [20]: s = elmsubmit_EZArchive.extract(input='/tmp/eg/example.tar.gz', input_disposition='file_location', extract_to='temp_directory', force_file_permissions=0700, force_dir_permissions=0500)
+
+Int[11]: (s[0], s[1][1:5])
+Out[11]: 
+('/home/devnull/tmp/tmprT0mQB',
+ [{'basename': 'Makefile.in',
+   'dirname': '/home/devnull/tmp/tmprT0mQB/mutt-1.4.2',
+   'file_type': 'regular',
+   'fullname': '/home/devnull/tmp/tmprT0mQB/mutt-1.4.2/Makefile.in',
+   'tar_dir': 'mutt-1.4.2'},
+  {'basename': 'README',
+   'dirname': '/home/devnull/tmp/tmprT0mQB/mutt-1.4.2',
+   'file_type': 'regular',
+   'fullname': '/home/devnull/tmp/tmprT0mQB/mutt-1.4.2/README',
+   'tar_dir': 'mutt-1.4.2'},
+  {'basename': 'stamp-h.in',
+   'dirname': '/home/devnull/tmp/tmprT0mQB/mutt-1.4.2',
+   'file_type': 'regular',
+   'fullname': '/home/devnull/tmp/tmprT0mQB/mutt-1.4.2/stamp-h.in',
+   'tar_dir': 'mutt-1.4.2'},
+  {'basename': 'ABOUT-NLS',
+   'dirname': '/home/devnull/tmp/tmprT0mQB/mutt-1.4.2',
+   'file_type': 'regular',
+   'fullname': '/home/devnull/tmp/tmprT0mQB/mutt-1.4.2/ABOUT-NLS',
+   'tar_dir': 'mutt-1.4.2'}])
+
+4.
+
+Input: Same as 3.
+Output: Same as 3, except this time we flatten the directory structure
+        (renaming files that collide in SAMENAME, 1.SAMENAME, 2.SAMENAME,
+        etc. format)
+s = elmsubmit_EZArchive.extract(input='/tmp/eg/example.tar.gz', input_disposition='file_location', extract_to='my_directory', my_directory='/tmp/wizzo', force_file_permissions=0700, force_dir_permissions=0500, directory_structure='flatten', filename_collision='rename_similar', backup_extension='.orig')
+
+In [6]: s[1:5]
+Out[6]: 
+[{'basename': 'README',
+  'dirname': '/tmp/wizzo/',
+  'file_type': 'regular',
+  'fullname': '/tmp/wizzo/README',
+  'tar_dir': ''},
+ {'basename': 'stamp-h.in',
+  'dirname': '/tmp/wizzo/',
+  'file_type': 'regular',
+  'fullname': '/tmp/wizzo/stamp-h.in',
+  'tar_dir': ''},
+ {'basename': 'ABOUT-NLS',
+  'dirname': '/tmp/wizzo/',
+  'file_type': 'regular',
+  'fullname': '/tmp/wizzo/ABOUT-NLS',
+  'tar_dir': ''},
+ {'basename': 'ChangeLog',
+  'dirname': '/tmp/wizzo/',
+  'file_type': 'regular',
+  'fullname': '/tmp/wizzo/ChangeLog',
+  'tar_dir': ''}]
+
+Again, we get the information about each file extracted in s, but this
+time we don't get told the directory extracted to, since we named it
+ourselves.
