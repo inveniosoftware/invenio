@@ -75,9 +75,9 @@ re_word = sre.compile('[\s]')
 re_quotes = sre.compile('[\'\"]')
 re_doublequote = sre.compile('\"')
 re_equal = sre.compile('\=')
-re_logical_and = sre.compile('\sand\s')
-re_logical_or = sre.compile('\sor\s')
-re_logical_not = sre.compile('\snot\s')
+re_logical_and = sre.compile('\sand\s', sre.I)
+re_logical_or = sre.compile('\sor\s', sre.I)
+re_logical_not = sre.compile('\snot\s', sre.I)
 re_operands = sre.compile(r'\s([\+\-\|])\s')
 
 def get_alphabetically_ordered_collection_list(collid=1, level=0):
@@ -141,7 +141,7 @@ def get_words_from_pattern(pattern):
 
 def create_basic_search_units(req, p, f, m=None):
     """Splits search pattern and search field into a list of independently searchable units.
-       - A search unit consists of '(operand, pattern, field, type, hitlist)' tuples where
+       - A search unit consists of '(operand, pattern, field, type, hitset)' tuples where
           'operand' is set union (|), set intersection (+) or set exclusion (-);
           'pattern' is either a word (e.g. muon*) or a phrase (e.g. 'nuclear physics');
           'field' is either a code like 'title' or MARC tag like '100__a';
@@ -155,7 +155,7 @@ def create_basic_search_units(req, p, f, m=None):
 
     opfts = [] # will hold (o,p,f,t,h) units
 
-    ## check arguments: if matching type phrase/string/regexp, do we have field defined?    
+    ## check arguments: if matching type phrase/string/regexp, do we have field defined?
     if (m=='p' or m=='r' or m=='e') and not f:
         m = 'a'        
         print_warning(req, "This matching type cannot be used within <em>any field</em>.  I will perform a word search instead." )
@@ -173,7 +173,7 @@ def create_basic_search_units(req, p, f, m=None):
         elif m == 'r':
             # A3 - regular expression:
             opfts.append(['|',p,f,'r']) # '|' since we have only one unit
-        elif m == 'a':
+        elif m == 'a' or m == 'w':
             # A4 - all of the words:
             for word in get_words_from_pattern(p):
                 if len(opfts)==0:
@@ -773,7 +773,7 @@ def urlargs_replace_text_in_arg(urlargs, regexp_argname, text_old, text_new):
         out = out[1:]
     return out
 
-class HitList:
+class HitSet:
     """Class describing set of records, implemented as bit vectors of recIDs.
     Using Numeric arrays for speed (1 value = 8 bits), can use later "real"
     bit vectors to save space."""
@@ -834,17 +834,21 @@ class HitList:
         return Numeric.nonzero(self._set)[index]
         
     def calculate_nbhits(self):
-        "Calculates the number of records set in the hitlist."
+        "Calculates the number of records set in the hitset."
         self._nbhits = Numeric.sum(self._set.copy().astype(Numeric.Int))
 
     def items(self):
         "Return an array containing all recID."
         return Numeric.nonzero(self._set)
 
-# speed up HitList operations by ~20% if Psyco is installed:
+    def tolist(self):
+        "Return an array containing all recID."
+        return Numeric.nonzero(self._set).tolist()
+
+# speed up HitSet operations by ~20% if Psyco is installed:
 try:
     import psyco
-    psyco.bind(HitList)
+    psyco.bind(HitSet)
 except:
     pass
 
@@ -947,13 +951,23 @@ def wash_colls(cc, c, split_colls=0):
     return (cc, colls_out_for_display, colls_out)
  
 def wash_pattern(p):
-    """Wash pattern passed by URL."""
+    """Wash pattern passed by URL. Check for sanity of the wildcard by
+    removing wildcards if they are appended to extremely short words
+    (1-3 letters).  TODO: instead of this approximative treatment, it
+    will be much better to introduce a temporal limit, e.g. to kill a
+    query if it does not finish in 10 seconds."""
     # add leading/trailing whitespace for the two following wildcard-sanity checking regexps:
     p = " " + p + " " 
     # get rid of wildcards at the beginning of words:
     p = sre.sub(r'(\s)[\*\%]+', "\\1", p)
-    # get rid of extremely short words (1-3 letters with wildcards): TODO: put into the search config
-    p = sre.sub(r'(\s\w{1,3})[\*\%]+', "\\1", p)
+    # replace spaces within quotes by __SPACE__ temporarily:
+    p = sre.sub("'(.*?)'", lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p) 
+    p = sre.sub("\"(.*?)\"", lambda x: "\""+string.replace(x.group(1), ' ', '__SPACEBIS__')+"\"", p) 
+    # get rid of extremely short words (1-3 letters with wildcards): 
+    p = sre.sub(r'([\s\"]\w{1,3})[\*\%]+', "\\1", p)
+    # replace back __SPACE__ by spaces:
+    p = sre.sub("__SPACE__", " ", p)
+    p = sre.sub("__SPACEBIS__", " ", p)
     # remove unnecessary whitespace:
     p = string.strip(p)
     return p
@@ -1065,10 +1079,10 @@ def get_coll_real_descendants(coll):
     return coll_sons
 
 def get_collection_reclist(coll):
-    """Return hitlist of recIDs that belong to the collection 'coll'."""
+    """Return hitset of recIDs that belong to the collection 'coll'."""
     global collection_reclist_cache
     if not collection_reclist_cache[coll]:
-        set = HitList()
+        set = HitSet()
         query = "SELECT nbrecs,reclist FROM collection WHERE name='%s'" % coll
         # launch the query:
         res = run_sql(query, None, 1)
@@ -1143,14 +1157,14 @@ def browse_pattern(req, colls, p, f, rg):
     browsed_phrases_in_colls = []
     if 0:
         for phrase in browsed_phrases:
-            phrase_hitlist = HitList()
-            phrase_hitlists = search_pattern("", phrase, f, colls, 'e')
+            phrase_hitset = HitSet()
+            phrase_hitsets = search_pattern("", phrase, f, 'e')
             for coll in colls:
-                phrase_hitlist.union(phrase_hitlists[coll])
-            phrase_hitlist.calculate_nbhits()
-            if phrase_hitlist._nbhits > 0:
+                phrase_hitset.union(phrase_hitsets[coll])
+            phrase_hitset.calculate_nbhits()
+            if phrase_hitset._nbhits > 0:
                 # okay, this phrase has some hits in colls, so add it:
-                browsed_phrases_in_colls.append([phrase, phrase_hitlist._nbhits])
+                browsed_phrases_in_colls.append([phrase, phrase_hitset._nbhits])
 
     ## were there hits in collections?
     if browsed_phrases_in_colls == []:
@@ -1232,45 +1246,42 @@ def browse_in_bibwords(req, p, f):
     req.write(create_nearest_terms_box(urlargs, p, f, 'w'))
     return
 
-def search_basic_pattern(p, f=None, m=None):
-    """Searches for basic pattern 'p' and field 'f' and
-       return hitlist of recIDs.  Does not break up 'p' into any
-       smaller units: this function is called for already ``basic
-       search units'' that have been broke up before.
-         Optionally, the function accepts the match type argument 'm'.
-       If it is set (e.g. from advanced search interface), then it
-       performs this kind of matching.  If it is not set, then a guess
-       is made.
-         Calls search_in_bibwords() and/or search_in_bibxxx() functions.
-    """    
-    ## create empty output results set:
-    set = HitList()
-    if m == 'a' or m == 'r':
-        # we are doing either direct bibxxx search or phrase search or regexp search
-        set = search_in_bibxxx(p, f, m)
-    else:
-        # we are doing bibwords search by default
-        set = search_in_bibwords(p, f)
-    set.calculate_nbhits()
-    return set
+def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", dbg=0):
+    """Search for complex pattern 'p' within field 'f' according to
+       matching type 'm'.  Return hitset of recIDs.
 
-def search_pattern(req, p=None, f=None, m=None, of='hb', dbg=0):
-    """Search for pattern 'p' and field 'f' and return hitlist of recIDs.
-       Breaks `p' into ``basic search units'', runs the search for them,
-       and aggregates the results together.
-       Optionally, the function accepts the match type argument 'm'.
-       If it is set (e.g. from advanced search interface), then it
-       performs this kind of matching.  If it is not set, then a guess
-       is made according to quotes/spaces/commas etc.
+       The function uses multi-stage searching algorithm in case of no
+       exact match found.  See the Search Internals document for
+       detailed description.
+
+       The 'ap' argument governs whether an alternative patterns are to
+       be used in case there is no direct hit for (p,f,m).  For
+       example, whether to replace non-alphanumeric characters by
+       spaces if it would give some hits.  See the Search Internals
+       document for detailed description.  (ap=0 forbits the
+       alternative pattern usage, ap=1 permits it.)
+
+       The 'of' argument governs whether to print or not some
+       information to the user in case of no match found.  (Usually it
+       prints the information in case of HTML formats, otherwise it's
+       silent).
+
+       The 'dbg' argument controls the level of debugging information
+       to be printed (0=least, 9=most).
+
+       All the parameters are assumed to have been previously washed.
+
+       This function is suitable as a mid-level API.
     """
-    hitlist_empty = HitList()
-    hitlist_empty._nbhits = 0
+    
+    hitset_empty = HitSet()
+    hitset_empty._nbhits = 0
     # sanity check:
     if not p:
-        hitlist_full = HitList(Numeric.ones(cfg_max_recID+1, Numeric.Int0))
-        hitlist_full._nbhits = cfg_max_recID
+        hitset_full = HitSet(Numeric.ones(cfg_max_recID+1, Numeric.Int0))
+        hitset_full._nbhits = cfg_max_recID
         # no pattern, so return all universe
-        return hitlist_full
+        return hitset_full
     # search stage 1: break up arguments into basic search units:
     if dbg:
         t1 = os.times()[4]
@@ -1282,69 +1293,71 @@ def search_pattern(req, p=None, f=None, m=None, of='hb', dbg=0):
     # search stage 2: do search for each search unit and verify hit presence:
     if dbg:
         t1 = os.times()[4]
-    basic_search_units_hitlists = []
+    basic_search_units_hitsets = []
     for idx_unit in range(0,len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
-        basic_search_unit_hitlist = search_basic_pattern(bsu_p, bsu_f, bsu_m)
-        if basic_search_unit_hitlist._nbhits > 0:
+        basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m)
+        if ap==0 or basic_search_unit_hitset._nbhits > 0:
             # stage 2-1: this basic search unit is retained
-            basic_search_units_hitlists.append(basic_search_unit_hitlist)                    
+            basic_search_units_hitsets.append(basic_search_unit_hitset)                    
         else:
             # stage 2-2: no hits found for this search unit, try to replace non-alphanumeric chars inside pattern:
-            if sre.search(r'\w[^a-zA-Z0-9\s\:]\w', bsu_p):
+            if sre.search(r'\w[^a-zA-Z0-9\s\:]+(\w|$)', bsu_p):
                 if bsu_p.startswith('"') and bsu_p.endswith('"'): # is it ACC query?
-                    bsu_pn = sre.sub(r'(\w)[^a-zA-Z0-9\s\:]+(\w)', "\\1*\\2", bsu_p)
+                    bsu_pn = sre.sub(r'(\w)[^a-zA-Z0-9\s\:]+(\w|$)', "\\1*\\2", bsu_p)
                 else: # it is WRD query
-                    bsu_pn = sre.sub(r'(\w)[^a-zA-Z0-9\s:]+(\w)', "\\1 \\2", bsu_p)
-                basic_search_unit_hitlist = search_basic_pattern(bsu_pn, bsu_f, bsu_m)
-                if basic_search_unit_hitlist._nbhits > 0:
+                    bsu_pn = sre.sub(r'(\w)[^a-zA-Z0-9\s\:]+(\w|$)', "\\1 \\2", bsu_p)
+                if dbg and of.startswith('h') and req:
+                    print_warning(req, "trying %s/%s/%s" % (bsu_pn,bsu_f,bsu_m))
+                basic_search_unit_hitset = search_pattern(req=None, p=bsu_pn, f=bsu_f, m=bsu_m, of="id")
+                if basic_search_unit_hitset._nbhits > 0:
                     # we retain the new unit instead
                     if of.startswith('h'):
                         print_warning(req, "No exact match found for <em>%s</em>, using <em>%s</em> instead..." % (bsu_p,bsu_pn))
                     basic_search_units[idx_unit][1] = bsu_pn
-                    basic_search_units_hitlists.append(basic_search_unit_hitlist)
+                    basic_search_units_hitsets.append(basic_search_unit_hitset)
                 else:
                     # stage 2-3: no hits found either, propose nearest indexed terms:
                     if of.startswith('h'):
                         if req:
                             print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m))
-                    return hitlist_empty
+                    return hitset_empty
             else:        
                 # stage 2-3: no hits found either, propose nearest indexed terms:
                 if of.startswith('h'):
                     if req:
                         print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m))
-                return hitlist_empty
+                return hitset_empty
     if dbg:
         t2 = os.times()[4]
         for idx_unit in range(0,len(basic_search_units)):
             print_warning(req, "Search stage 2: basic search unit %s gave %d hits." %
-                          (basic_search_units[idx_unit][1:], basic_search_units_hitlists[idx_unit]._nbhits))
+                          (basic_search_units[idx_unit][1:], basic_search_units_hitsets[idx_unit]._nbhits))
         print_warning(req, "Search stage 2: execution took %.2f seconds." % (t2 - t1))
     # search stage 3: apply boolean query for each search unit:
     if dbg:
         t1 = os.times()[4]
-    hitlist_in_any_collection = HitList()
+    hitset_in_any_collection = HitSet()
     for idx_unit in range(0,len(basic_search_units)):
         this_unit_operation = basic_search_units[idx_unit][0]
-        this_unit_hitlist = basic_search_units_hitlists[idx_unit]
+        this_unit_hitset = basic_search_units_hitsets[idx_unit]
         if this_unit_operation == '+':
-            hitlist_in_any_collection.intersect(this_unit_hitlist)
+            hitset_in_any_collection.intersect(this_unit_hitset)
         elif this_unit_operation == '-':
-            hitlist_in_any_collection.difference(this_unit_hitlist)
+            hitset_in_any_collection.difference(this_unit_hitset)
         elif this_unit_operation == '|':
-            hitlist_in_any_collection.union(this_unit_hitlist)
+            hitset_in_any_collection.union(this_unit_hitset)
         else:
             print_warning(req, "Invalid set operation %s." % this_unit_operation, "Error")
-    hitlist_in_any_collection.calculate_nbhits()
-    if hitlist_in_any_collection._nbhits == 0:
+    hitset_in_any_collection.calculate_nbhits()
+    if hitset_in_any_collection._nbhits == 0:
         # no hits found, propose alternative boolean query:
         if of.startswith('h'):
             text = """All search terms matched but boolean query returned no hits.  Please combine your search terms differently."""
             text += """<blockquote><table class="nearesttermsbox" cellpadding="0" cellspacing="0" border="0">"""
             for idx_unit in range(0,len(basic_search_units)):
                 bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
-                bsu_nbhits = basic_search_units_hitlists[idx_unit]._nbhits
+                bsu_nbhits = basic_search_units_hitsets[idx_unit]._nbhits
                 url_args_new = sre.sub(r'(^|\&)p=.*?(\&|$)', r'\1p='+urllib.quote(bsu_p)+r'\2', req.args)
                 url_args_new = sre.sub(r'(^|\&)f=.*?(\&|$)', r'\1f='+urllib.quote(bsu_f)+r'\2', url_args_new)
                 text += """<tr><td class="nearesttermsboxbody" align="right">%s</td>
@@ -1358,75 +1371,36 @@ def search_pattern(req, p=None, f=None, m=None, of='hb', dbg=0):
             print_warning(req, text)                
     if dbg:
         t2 = os.times()[4]
-        print_warning(req, "Search stage 3: boolean query gave %d hits." % hitlist_in_any_collection._nbhits)
+        print_warning(req, "Search stage 3: boolean query gave %d hits." % hitset_in_any_collection._nbhits)
         print_warning(req, "Search stage 3: execution took %.2f seconds." % (t2 - t1))
-    return hitlist_in_any_collection
+    return hitset_in_any_collection
 
-def search_intersect_with_collrecs(req, hitlist_in_any_collection, colls, of="hb", dbg=0):
-    """Return dict of hitlists given by intersection of hitlist with the collection universes."""
-    # search stage 4: intersect with the collection universe:
-    if dbg:
-        t1 = os.times()[4]
-    results = {}
-    results_nbhits = 0
-    for coll in colls:
-        results[coll] = HitList()
-        results[coll]._set = Numeric.bitwise_and(hitlist_in_any_collection._set, get_collection_reclist(coll)._set)
-        results[coll].calculate_nbhits()
-        results_nbhits += results[coll]._nbhits    
-    if results_nbhits == 0:
-        # no hits found, try to search in Home:
-        results_in_Home = HitList()
-        results_in_Home._set = Numeric.bitwise_and(hitlist_in_any_collection._set, get_collection_reclist(cdsname)._set)
-        results_in_Home.calculate_nbhits()
-        if results_in_Home._nbhits > 0:
-            # some hits found in Home, so propose this search:
-            if of.startswith("h"):
-                print_warning(req, """No exact match found, searching in other public collections...""")
-                results = {}
-                results[cdsname] = results_in_Home
-                results_nbhits = results_in_Home._nbhits
-            else:
-                results = {}
-        else:
-            # no hits found in Home, recommend different search terms:
-            if of.startswith("h"):            
-                print_warning(req, """No public collection matched your query.  If you were looking for a non-public document,
-                                      please choose the desired restricted collection first.""")
-            results = {}
-    if dbg:
-        t2 = os.times()[4]
-        print_warning(req, "Search stage 4: intersecting with collection universe gave %d hits." % results_nbhits)
-        print_warning(req, "Search stage 4: execution took %.2f seconds." % (t2 - t1))                                        
-    return results
+def search_unit(p, f=None, m=None):
+    """Search for basic search unit defined by pattern 'p' and field
+       'f' and matching type 'm'.  Return hitset of recIDs.
+    
+       All the parameters are assumed to have been previously washed.
+       'p' is assumed already being a ``basic search unit'' so that it
+       is search as such and is not broken up in any way.  Only
+       wildcard and span queries are being detected inside 'p'.
 
-def search_results_intersect_with_a_hitlist(req, results, hitlist, fallback=0, fallbacktext="", of="hb"):
-    """Return intersection of search 'results' (a dict of hitlists
-       with collection as key) with the 'hitlist', i.e. apply
-       'hitlist' intersection to each collection within search
-       'results'.
-       If the final 'results' set is to be empty, and 'fallback' is
-       true, and then print the `warningtext' and return the original
-       'results' set unchanged.  If 'fallback' is false, then return
-       empty results set."""
-    if fallback:
-        results_fallback = copy.deepcopy(results)
+       This function is suitable as a low-level API.
+    """
+    
+    ## create empty output results set:
+    set = HitSet()
+    if m == 'a' or m == 'r':
+        # we are doing either direct bibxxx search or phrase search or regexp search
+        set = search_unit_in_bibxxx(p, f, m)
     else:
-        results_fallback = {} # will return empty dict in case of no hits found
-    nb_total = 0
-    for coll in results.keys():
-        results[coll].intersect(hitlist)
-        results[coll].calculate_nbhits()
-        nb_total += results[coll]._nbhits
-    if nb_total == 0:
-        if of.startswith("h"):
-            print_warning(req, fallbacktext)
-        results = results_fallback
-    return results        
+        # we are doing bibwords search by default
+        set = search_unit_in_bibwords(p, f)
+    set.calculate_nbhits()
+    return set
 
-def search_in_bibwords(word, f, decompress=zlib.decompress):
-    """Searches for 'word' inside bibwordsX table for field 'f' and returns hitlist of recIDs."""
-    set = HitList() # will hold output result set
+def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
+    """Searches for 'word' inside bibwordsX table for field 'f' and returns hitset of recIDs."""
+    set = HitSet() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
     # deduce into which bibwordsX table we will search:
     bibwordsX = "bibwords%d" % get_wordsindex_id("anyfield")
@@ -1452,18 +1426,18 @@ def search_in_bibwords(word, f, decompress=zlib.decompress):
     res = run_sql(query)
     # fill the result set:
     for word,hitlist in res:
-        hitlist_bibwrd = HitList(Numeric.loads(decompress(hitlist)))
+        hitset_bibwrd = HitSet(Numeric.loads(decompress(hitlist)))
         # add the results:
         if set_used:
-            set.union(hitlist_bibwrd)
+            set.union(hitset_bibwrd)
         else:            
-            set = hitlist_bibwrd
+            set = hitset_bibwrd
             set_used = 1
     # okay, return result set:
     return set
 
-def search_in_bibxxx(p, f, type):
-    """Searches for pattern 'p' inside bibxxx tables for field 'f' and returns hitlist of recIDs found.
+def search_unit_in_bibxxx(p, f, type):
+    """Searches for pattern 'p' inside bibxxx tables for field 'f' and returns hitset of recIDs found.
     The search type is defined by 'type' (e.g. equals to 'r' for a regexp search)."""
     p_orig = p # saving for eventual future 'no match' reporting
     # wash arguments:
@@ -1519,15 +1493,15 @@ def search_in_bibxxx(p, f, type):
     # check no of hits found:
     nb_hits = len(l)
     # okay, return result set:
-    set = HitList()
+    set = HitSet()
     set.addlist(Numeric.array(l))
     return set
 
-def search_in_bibrec(day1, day2, type='creation_date'):
-    """Return hitlist of recIDs found that were either created or modified (see 'type' arg)
+def search_unit_in_bibrec(day1, day2, type='creation_date'):
+    """Return hitset of recIDs found that were either created or modified (see 'type' arg)
        from day1 until day2, inclusive.  Does not pay attention to pattern, collection, anything.
        Useful to intersect later on with the 'real' query."""
-    set = HitList()
+    set = HitSet()
     if type != "creation_date" and type != "modification_date":
         # type argument is invalid, so search for creation dates by default
         type = "creation_date"
@@ -1538,6 +1512,71 @@ def search_in_bibrec(day1, day2, type='creation_date'):
         l.append(row[0])        
     set.addlist(Numeric.array(l))
     return set
+
+def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", dbg=0):
+    """Return dict of hitsets given by intersection of hitset with the collection universes."""
+    # search stage 4: intersect with the collection universe:
+    if dbg:
+        t1 = os.times()[4]
+    results = {}
+    results_nbhits = 0
+    for coll in colls:
+        results[coll] = HitSet()
+        results[coll]._set = Numeric.bitwise_and(hitset_in_any_collection._set, get_collection_reclist(coll)._set)
+        results[coll].calculate_nbhits()
+        results_nbhits += results[coll]._nbhits    
+    if results_nbhits == 0:
+        # no hits found, try to search in Home:
+        results_in_Home = HitSet()
+        results_in_Home._set = Numeric.bitwise_and(hitset_in_any_collection._set, get_collection_reclist(cdsname)._set)
+        results_in_Home.calculate_nbhits()
+        if results_in_Home._nbhits > 0:
+            # some hits found in Home, so propose this search:
+            if ap:
+                if of.startswith("h"):
+                    print_warning(req, """No exact match found, searching in other public collections...""")
+                results = {}
+                results[cdsname] = results_in_Home
+            else:
+                results = {}
+        else:
+            # no hits found in Home, recommend different search terms:
+            if of.startswith("h"):            
+                print_warning(req, """No public collection matched your query.  If you were looking for a non-public document,
+                                      please choose the desired restricted collection first.""")
+            results = {}
+    if dbg:
+        t2 = os.times()[4]
+        print_warning(req, "Search stage 4: intersecting with collection universe gave %d hits." % results_nbhits)
+        print_warning(req, "Search stage 4: execution took %.2f seconds." % (t2 - t1))                                        
+    return results
+
+def intersect_results_with_hitset(req, results, hitset, ap=0, aptext="", of="hb"):
+    """Return intersection of search 'results' (a dict of hitsets
+       with collection as key) with the 'hitset', i.e. apply
+       'hitset' intersection to each collection within search
+       'results'.
+
+       If the final 'results' set is to be empty, and 'ap'
+       (approximate pattern) is true, and then print the `warningtext'
+       and return the original 'results' set unchanged.  If 'ap' is
+       false, then return empty results set.
+    """
+    
+    if ap:
+        results_ap = copy.deepcopy(results)
+    else:
+        results_ap = {} # will return empty dict in case of no hits found
+    nb_total = 0
+    for coll in results.keys():
+        results[coll].intersect(hitset)
+        results[coll].calculate_nbhits()
+        nb_total += results[coll]._nbhits
+    if nb_total == 0:
+        if of.startswith("h"):
+            print_warning(req, aptext)
+        results = results_ap
+    return results        
 
 def create_nearest_terms_box(urlargs, p, f, t='w', n=5):
     """Return text box containing list of 'n' nearest terms above/below 'p'
@@ -1640,6 +1679,7 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
         tl = get_field_tags(f)
     ## start browsing to fetch list of hits:
     browsed_phrases_above = {} # will hold {phrase1: 1, phrase2: 1, ..., phraseN: 1} dict of browsed phrases above p (to make them unique)
+    browsed_phrases_exact = {} # will hold {phrase1: 1, phrase2: 1, ..., phraseN: 1} dict of browsed phrases exactly equal to p 
     browsed_phrases_below = {} # will hold {phrase1: 1, phrase2: 1, ..., phraseN: 1} dict of browsed phrases below p (to make them unique)
     for t in tl:
         # deduce into which bibxxx table we will search:
@@ -1656,7 +1696,17 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
         res = run_sql(query)
         for row in res:
             browsed_phrases_above[row[0]] = 1
-        # secondly try to get `n' closest phrases below `p':
+        # secondly try to get phrases equal to `p':
+        if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
+            query = "SELECT bx.value FROM %s AS bx WHERE bx.value='%s' AND bx.tag LIKE '%s%%' ORDER BY bx.value ASC" \
+                    % (bx, escape_string(p), t)
+        else:
+            query = "SELECT bx.value FROM %s AS bx WHERE bx.value='%s' AND bx.tag='%s' ORDER BY bx.value ASC" \
+                    % (bx, escape_string(p), t)
+        res = run_sql(query)
+        for row in res:
+            browsed_phrases_exact[row[0]] = 1            
+        # thirdly try to get `n' closest phrases below `p':
         if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
             query = "SELECT bx.value FROM %s AS bx WHERE bx.value>'%s' AND bx.tag LIKE '%s%%' ORDER BY bx.value ASC LIMIT %d" \
                     % (bx, escape_string(p), t, n_below)
@@ -1680,7 +1730,11 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
     out = []
     for phrase in l1[:n_above]:
         out.append(phrase)
-    out.append(p) # always append self, even if no hits, to indicate our position
+    if len(browsed_phrases_exact)>0:
+        for phrase in browsed_phrases_exact.keys():
+            out.append(phrase)
+    else:
+        out.append(p) # always append self, even if no hits, to indicate our position
     for phrase in l2[:n_below]:
         out.append(phrase)
     return out
@@ -2534,7 +2588,7 @@ def wash_url_argument(var, new_type):
             except:
                 out = 0
         elif type(var) is int:
-            pass
+            out = var
         elif type(var) is str:
             try:
                 out = string.atoi(var)
@@ -2546,11 +2600,154 @@ def wash_url_argument(var, new_type):
 
 ### CALLABLES
 
-def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
+def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="id", ot="", as="0",
                            p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
                            recid="-1", recidb="-1", sysno="", id="-1", idb="-1", sysnb="", action="SEARCH",
-                           d1y="", d1m="", d1d="", d2y="", d2m="", d2d="", dbg="0"):
-    """Perform search, without checking for authentication.  Return list of recIDs found, if of=id.  Otherwise create web page."""    
+                           d1y="", d1m="", d1d="", d2y="", d2m="", d2d="", dbg="0", ap="0"):
+    """Perform search or browse request, without checking for
+       authentication.  Return list of recIDs found, if of=id.
+       Otherwise create web page.
+
+       The arguments are as follows:
+
+         req - mod_python Request class instance.
+
+          cc - current collection (e.g. "ATLAS").  The collection the
+               user started to search/browse from.
+
+           c - collectin list (e.g. ["Theses", "Books"]).  The
+               collections user may have selected/deselected when
+               starting to search from 'cc'.
+
+           p - pattern to search for (e.g. "ellis and muon or kaon").
+
+           f - field to search within (e.g. "author").
+
+          rg - records in groups of (e.g. "10").  Defines how many hits
+               per collection in the search results page are
+               displayed.
+
+          sf - sort field (e.g. "title").  
+
+          so - sort order ("a"=ascending, "d"=descending).
+
+          sp - sort pattern (e.g. "CERN-") -- in case there are more
+               values in a sort field, this argument tells which one
+               to prefer
+          
+          of - output format (e.g. "hb").  Usually starting "h" means
+               HTML output (and "hb" for HTML brief, "hd" for HTML
+               detailed), "x" means XML output, "t" means plain text
+               output, "id" means no output at all but to return list
+               of recIDs found.  (Suitable for high-level API.)
+          
+          ot - output only these MARC tags (e.g. "100,700,909C0b").
+               Useful if only some fields are to be shown in the
+               output, e.g. for library to control some fields.
+          
+          as - advanced search ("0" means no, "1" means yes).  Whether
+               search was called from within the advanced search
+               interface.
+          
+          p1 - first pattern to search for in the advanced search
+               interface.  Much like 'p'.
+          
+          f1 - first field to search within in the advanced search
+               interface.  Much like 'f'.
+          
+          m1 - first matching type in the advanced search interface.
+               ("a" all of the words, "o" any of the words, "e" exact
+               phrase, "p" partial phrase, "r" regular expression).
+          
+         op1 - first operator, to join the first and the second unit
+               in the advanced search interface.  ("a" add, "o" or,
+               "n" not).
+
+          p2 - second pattern to search for in the advanced search
+               interface.  Much like 'p'.
+          
+          f2 - second field to search within in the advanced search
+               interface.  Much like 'f'.
+          
+          m2 - second matching type in the advanced search interface.
+               ("a" all of the words, "o" any of the words, "e" exact
+               phrase, "p" partial phrase, "r" regular expression).
+          
+         op2 - second operator, to join the second and the third unit
+               in the advanced search interface.  ("a" add, "o" or,
+               "n" not).
+
+          p3 - third pattern to search for in the advanced search
+               interface.  Much like 'p'.
+          
+          f3 - third field to search within in the advanced search
+               interface.  Much like 'f'.
+          
+          m3 - third matching type in the advanced search interface.
+               ("a" all of the words, "o" any of the words, "e" exact
+               phrase, "p" partial phrase, "r" regular expression).
+          
+          sc - split by collection ("0" no, "1" yes).  Governs whether
+               we want to present the results in a single huge list,
+               or splitted by collection.
+          
+        jrec - jump to record (e.g. "234").  Used for navigation
+               inside the search results.
+          
+       recid - display record ID (e.g. "20000").  Do not
+               search/browse but go straight away to the Detailed
+               record page for the given recID.
+       
+      recidb - display record ID bis (e.g. "20010").  If greater than
+               'recid', then display records from recid to recidb.
+               Useful for example for dumping records from the
+               database for reformatting.
+      
+       sysno - display old system SYS number (e.g. "").  If you
+               migrate to CDSware from another system, and store your
+               old SYS call numbers, you can use them instead of recid
+               if you wish so.
+       
+          id - the same as recid, in case recid is not set.  For
+               backwards compatibility.
+          
+         idb - the same as recid, in case recidb is not set.  For
+               backwards compatibility.
+
+       sysnb - the same as sysno, in case sysno is not set.  For
+               backwards compatibility.
+               
+      action - action to do.  "SEARCH" for searching, "Browse" for
+               browsing.
+      
+         d1y - first date year (e.g. "1998").  Useful for search
+               limits on creation date.
+                    
+         d1m - first date month (e.g. "08").  Useful for search
+               limits on creation date.
+               
+         d1d - first date day (e.g. "23").  Useful for search
+               limits on creation date.
+               
+         d2y - second date year (e.g. "1998").  Useful for search
+               limits on creation date.
+                    
+         d2m - second date month (e.g. "08").  Useful for search
+               limits on creation date.
+               
+         d2d - second date day (e.g. "23").  Useful for search limits
+               on creation date.
+               
+         dbg - debug info level (0=min, 9=max).  Useful to print some
+               internal information on the searching process in case
+               something goes wrong.
+
+          ap - alternative patterns (0=no, 1=yes).  In case no exact
+               match is found, the search engine can try alternative
+               patterns e.g. to replace non-alphanumeric characters by
+               a boolean query.  ap defines if this is wanted. 
+    """
+    
     # wash all passed arguments:
     cc = wash_url_argument(cc, 'str')
     sc = wash_url_argument(sc, 'int')
@@ -2593,6 +2790,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
     d2d = wash_url_argument(d2d, 'str')
     day1, day2 = wash_dates(d1y, d1m, d1d, d2y, d2m, d2d)
     dbg = wash_url_argument(dbg, 'int')
+    ap = wash_url_argument(ap, 'int')
     # backwards compatibility: id, idb, sysnb -> recid, recidb, sysno (if applicable)
     if sysnb != "" and sysno == "":
         sysno = sysnb
@@ -2602,7 +2800,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         recidb = idb
     # TODO deduce passed search limiting criterias (if applicable)
     pl = "" # no limits by default
-    if action != "Browse": # we do not want to add options while browsing
+    if action != "Browse" and req: # we do not want to add options while browsing or while calling via command-line
         fieldargs = cgi.parse_qs(req.args)
         for fieldcode in get_fieldcodes():
             if fieldargs.has_key(fieldcode):
@@ -2649,14 +2847,14 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
         t1 = os.times()[4]
-        results_in_any_collection = HitList()
+        results_in_any_collection = HitSet()
         if as == 1 or (p1 or p2 or p3):
             ## 3A - advanced search
-            results_in_any_collection = search_pattern(req, p1, f1, m1, of=of, dbg=dbg)
+            results_in_any_collection = search_pattern(req, p1, f1, m1, ap=ap, of=of, dbg=dbg)
             if results_in_any_collection._nbhits == 0:                
                 return page_end(req, of)                
             if p2:
-                results_tmp = search_pattern(req, p2, f2, m2, of=of, dbg=dbg)
+                results_tmp = search_pattern(req, p2, f2, m2, ap=ap, of=of, dbg=dbg)
                 if op1 == "a": # add
                     results_in_any_collection.intersect(results_tmp)
                 elif op1 == "o": # or
@@ -2670,7 +2868,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 if results_in_any_collection._nbhits == 0:                
                     return page_end(req, of)                
             if p3:
-                results_tmp = search_pattern(req, p3, f3, m3, of=of, dbg=dbg)
+                results_tmp = search_pattern(req, p3, f3, m3, ap=ap, of=of, dbg=dbg)
                 if op2 == "a": # add
                     results_in_any_collection.intersect(results_tmp)
                 elif op2 == "o": # or
@@ -2683,7 +2881,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 results_in_any_collection.calculate_nbhits()
         else:
             ## 3B - simple search
-            results_in_any_collection = search_pattern(req, p, f, of=of, dbg=dbg)
+            results_in_any_collection = search_pattern(req, p, f, ap=ap, of=of, dbg=dbg)
 
         if results_in_any_collection._nbhits == 0:                
             return page_end(req, of)
@@ -2696,30 +2894,30 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
 #                 search_cache[search_cache_key] = results_final
 #             if len(search_cache) > cfg_search_cache_size: # is the cache full? (sanity cleaning)
 #                 search_cache.clear()
-                
+
         # search stage 4: intersection with collection universe:
-        results_final = search_intersect_with_collrecs(req, results_in_any_collection, colls_to_search, of, dbg)
+        results_final = intersect_results_with_collrecs(req, results_in_any_collection, colls_to_search, ap, of, dbg)
         if results_final == {}:
             return page_end(req, of)
         
         # search stage 5: apply search option limits and restrictions:
         if day1 != "":
-            results_final = search_results_intersect_with_a_hitlist(req,
-                                                                    results_final,
-                                                                    search_in_bibrec(day1, day2),
-                                                                    fallback=1,
-                                                                    fallbacktext="No match within your time limits, "\
-                                                                                 "discarding this condition...")
+            results_final = intersect_results_with_hitset(req,
+                                                          results_final,
+                                                          search_unit_in_bibrec(day1, day2),
+                                                          ap,
+                                                          aptext="No match within your time limits, "\
+                                                                 "discarding this condition...")
             if results_final == {}:
                 return page_end(req, of)
 
         if pl:
-            results_final = search_results_intersect_with_a_hitlist(req,
-                                                                    results_final,
-                                                                    search_pattern(req, pl),
-                                                                    fallback=1,
-                                                                    fallbacktext="No match within your search limits, "\
-                                                                                 "discarding this condition...")
+            results_final = intersect_results_with_hitset(req,
+                                                          results_final,
+                                                          search_pattern(req, pl, ap=0),
+                                                          ap,
+                                                          aptext="No match within your search limits, "\
+                                                                 "discarding this condition...")
             if results_final == {}:
                 return page_end(req, of)
 
@@ -2740,10 +2938,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             # print results overview:
             if of == "id":
                 # we have been asked to return list of recIDs
-                results_final_for_all_colls = HitList()
+                results_final_for_all_colls = HitSet()
                 for coll in results_final.keys():
                     results_final_for_all_colls.union(results_final[coll])
-                return results_final_for_all_colls.items()
+                return results_final_for_all_colls.items().tolist()
             elif of.startswith("h"):
                 req.write(print_results_overview(colls_to_search, results_final_nb_total, results_final_nb, cpu_time))
             # print records:
@@ -2851,8 +3049,16 @@ def perform_request_log(req, date=""):
         req.write("</table>")
     return "\n"    
 
+def profile(p="", f="", c=cdsname):
+    """Profile search time."""
+    import profile
+    import pstats
+    profile.run("perform_request_search(p='%s',f='%s', c='%s')" % (p, f, c), "perform_request_search_profile")
+    p = pstats.Stats("perform_request_search_profile")
+    p.strip_dirs().sort_stats("cumulative").print_stats()        
+    return 0
+
 ## test cases:
-#print perform_search(None, "of","title",["Preprints"])
 #print wash_colls(cdsname,"Library Catalogue", 0)
 #print wash_colls("Periodicals & Progress Reports",["Periodicals","Progress Reports"], 0)
 #print wash_field("wau")
@@ -2868,8 +3074,11 @@ def perform_request_log(req, date=""):
 #print get_coll_real_descendants("Articles & Preprints")
 #print get_collection_reclist("Theses")
 #print log(sys.stdin)
-#print search_in_bibrec('2002-12-01','2002-12-12')
+#print search_unit_in_bibrec('2002-12-01','2002-12-12')
 #print wash_dates('1980', '', '28', '2003','02','')
 #print type(wash_url_argument("-1",'int'))
+
+## profiling:
+#profile("of the this")
 </protect>
 
