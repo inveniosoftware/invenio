@@ -22,8 +22,6 @@
   
    /*********************Authentication*******************************/
 
-  $uid_email = getEmail($uid);  
-
   if ($uid_email == "guest")
   {
     outWarning('You seem to be guest.  Please <a href="'.$WEBURL.'/youraccount.py/login?referer='.$WEBURL.$PHP_SELF.'">login</a> first.');
