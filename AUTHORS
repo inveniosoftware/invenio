@@ -24,7 +24,7 @@ The CDS Development Group currently consists of:
      Maintains mostly: BibConvert, BibHarvest.
 
  - Nicholas Robinson <nicholas.robinson@cern.ch>
-     Automatic reference extraction.  (upcoming)
+     Reference extraction from PDF files, for the BibEdit module.
 
  - Alberto Pepe <alberto.pepe@cern.ch>
      (upcoming)
@@ -39,12 +39,12 @@ Many former group members (CERN fellows, technical and summer
 students) contributed to the project.  In an approximate decreasing
 chronological order:
 
- - Diane Berkovits <diane.berkovits@cern.ch>
-     Download stats and ranking, for the BibRank and WebSubmit
-     modules.  (upcoming)
+ - Diane Berkovits <diane.berkovits@epfl.ch>
+     Ranking by downloads, for the BibRank and WebSubmit
+     modules. 
 
- - Anna Afshar <anna.afshar@cern.ch>
-     Citation ranking, for the BibRank module. (upcoming)
+ - Anna Afshar <anna.afsharghasemlouy@epfl.ch>
+     Ranking by citations, for the BibRank module.
 
  - Trond Aksel Myklebust <tamyk@online.no>
      Ranking engine, the BibRank module.  Stemming and stopwords for
@@ -72,7 +72,7 @@ chronological order:
      the WebAccess module.  Guest user sessions garbage collector,
      for the WebSession module.
 
- - Erik Simon <erik.simon@gmx.net>
+ - Eric Simon <eric.simon@unine.ch>
      Alert engine, for the WebAlert module.
 
  - Roberta Faggian <roberta.faggian@cern.ch>
