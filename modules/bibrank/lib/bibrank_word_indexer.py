@@ -81,8 +81,8 @@ try:
     from cdsware.search_engine_config import cfg_max_recID
     from cdsware.search_engine import perform_request_search, strip_accents, HitSet
     from cdsware.dbquery import run_sql
-    from cdsware.bibindex_engine_stemmer import stem_by_lang, lang_available
-    from cdsware.bibindex_engine_stopwords import is_stopword_force
+    from cdsware.bibindex_engine_stemmer import is_stemmer_available_for_language, stem
+    from cdsware.bibindex_engine_stopwords import is_stopword
 except ImportError, e:
     import sys
 
@@ -179,17 +179,17 @@ def get_words_from_phrase(phrase, weight, lang="",
 
     #By doing this like below, characters standing alone, like c a b is not added to the inedx, but when they are together with characters like c++ or c$ they are added.
     for word in split(phrase):    
-        if options["remove_stopword"] == "True" and not is_stopword_force(word) and check_term(word, 0):
+        if options["remove_stopword"] == "True" and not is_stopword(word, 1) and check_term(word, 0):
             if lang and lang !="none" and options["use_stemming"]:
-                word = stem_by_lang(word, lang)
+                word = stem(word, lang)
             if not words.has_key(word):
                 words[word] = (0,0)
             words[word] = (words[word][0] + weight, 0)
-        elif options["remove_stopword"] == "True" and not is_stopword_force(word):  
+        elif options["remove_stopword"] == "True" and not is_stopword(word, 1):  
             phrase = re.sub(chars_alphanumericseparators, ' ', word) 
             for word_ in split(phrase):   
                 if lang and lang !="none" and options["use_stemming"]:
-                    word_ = stem_by_lang(word_, lang)
+                    word_ = stem(word_, lang)
                 if word_:
                     if not words.has_key(word_):
                         words[word_] = (0,0)
@@ -1086,11 +1086,11 @@ def get_tags(config):
             tag[2] = string.strip(tag[2])
   
             #check if stemmer for language is available
-            if config.get(function,"stemming") and stem_by_lang("information", "en") != "inform":
+            if config.get(function,"stemming") and stem("information", "en") != "inform":
                 if shown_error == 0:
                     write_message("Warning: PyStemmer not found. Please read INSTALL.")
                     shown_error = 1
-            elif tag[2] and tag[2] != "none" and config.get(function,"stemming") and not lang_available(tag[2]): 
+            elif tag[2] and tag[2] != "none" and config.get(function,"stemming") and not is_stemmer_available_for_language(tag[2]): 
                 write_message("Warning: Language '%s' not available in PyStemmer." % tag[2])
             tags.append(tag)
             i += 1

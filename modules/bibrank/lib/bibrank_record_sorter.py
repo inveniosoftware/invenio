@@ -50,8 +50,8 @@ try:
     sys.path.append('%s' % pylibdir)
     from cdsware.config import *
     from cdsware.dbquery import run_sql
-    from cdsware.bibindex_engine_stemmer import stem_by_lang, lang_available
-    from cdsware.bibindex_engine_stopwords import is_stopword_force
+    from cdsware.bibindex_engine_stemmer import stem
+    from cdsware.bibindex_engine_stopwords import is_stopword
     from cdsware.search_engine_config import cfg_max_recID
 except ImportError, e:
     pass
@@ -180,7 +180,7 @@ def check_term(term, col_size, term_rec, max_occ, min_occ, termlength):
     termlength - the minimum length of the terms allowed"""
 
     try:
-        if is_stopword_force(term) or (len(term) <= termlength) or ((float(term_rec) / float(col_size)) >= max_occ) or ((float(term_rec) / float(col_size)) <= min_occ):
+        if is_stopword(term, 1) or (len(term) <= termlength) or ((float(term_rec) / float(col_size)) >= max_occ) or ((float(term_rec) / float(col_size)) <= min_occ):
 	    return ""
         if int(term):
             return ""
@@ -525,12 +525,12 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
     #Check terms, remove non alphanumeric characters. Use both unstemmed and stemmed version of all terms.
     for i in range(0, len(lwords_old)):
         term = string.lower(lwords_old[i])
-        if not methods[rank_method_code]["stopwords"] == "True" or methods[rank_method_code]["stopwords"] and not is_stopword_force(term):
+        if not methods[rank_method_code]["stopwords"] == "True" or methods[rank_method_code]["stopwords"] and not is_stopword(term, 1):
             lwords.append((term, methods[rank_method_code]["rnkWORD_table"]))
             terms = string.split(string.lower(re.sub(methods[rank_method_code]["chars_alphanumericseparators"], ' ', term)))  
             for term in terms: 
                 if methods[rank_method_code].has_key("stemmer"): # stem word
-                    term = stem_by_lang(string.replace(term, ' ', ''), methods[rank_method_code]["stemmer"])
+                    term = stem(string.replace(term, ' ', ''), methods[rank_method_code]["stemmer"])
                 if lwords_old[i] != term: #add if stemmed word is different than original word
 	            lwords.append((term, methods[rank_method_code]["rnkWORD_table"]))
 
