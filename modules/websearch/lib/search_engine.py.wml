@@ -210,6 +210,7 @@ def create_basic_search_units(req, p, f, m=None):
             # so, let us replace temporarily any space within quotes by '__SPACE__'
             p = sre.sub("'(.*?)'", lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p) 
             p = sre.sub("\"(.*?)\"", lambda x: "\""+string.replace(x.group(1), ' ', '__SPACEBIS__')+"\"", p)
+            p = sre.sub("\/(.*?)\/", lambda x: "/"+string.replace(x.group(1), ' ', '__SPACETER__')+"/", p)
             # wash argument:
             p = re_equal.sub(":", p)
             p = re_logical_and.sub(" ", p)
@@ -219,6 +220,7 @@ def create_basic_search_units(req, p, f, m=None):
             for pi in split(p): # iterate through separated units (or items, as "pi" stands for "p item")
                 pi = sre.sub("__SPACE__", " ", pi) # replace back '__SPACE__' by ' ' 
                 pi = sre.sub("__SPACEBIS__", " ", pi) # replace back '__SPACEBIS__' by ' '
+                pi = sre.sub("__SPACETER__", " ", pi) # replace back '__SPACETER__' by ' '
                 # firstly, determine set operator
                 if pi[0] == '+' or pi[0] == '-' or pi[0] == '|':
                     if len(opfts) or pi[0] == '-': # either not first unit, or '-' for the first unit
@@ -1034,11 +1036,13 @@ def wash_pattern(p):
     # replace spaces within quotes by __SPACE__ temporarily:
     p = sre.sub("'(.*?)'", lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p) 
     p = sre.sub("\"(.*?)\"", lambda x: "\""+string.replace(x.group(1), ' ', '__SPACEBIS__')+"\"", p) 
+    p = sre.sub("\/(.*?)\/", lambda x: "/"+string.replace(x.group(1), ' ', '__SPACETER__')+"/", p)
     # get rid of extremely short words (1-3 letters with wildcards): 
     p = sre.sub(r'([\s\"]\w{1,3})[\*\%]+', "\\1", p)
     # replace back __SPACE__ by spaces:
     p = sre.sub("__SPACE__", " ", p)
     p = sre.sub("__SPACEBIS__", " ", p)
+    p = sre.sub("__SPACETER__", " ", p)
     # replace special terms:
     p = sre.sub("\$TODAY\$", time.strftime("%04Y-%02m-%02d", time.localtime()), p)
     # remove unnecessary whitespace:
