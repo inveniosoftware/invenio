@@ -57,8 +57,8 @@ class TestStripAccents(unittest.TestCase):
 
     def test_strip_accents(self):
         """search engine stripping of accented letters"""
-        self.assertEqual("memememe", search_engine.wash_pattern('mémêmëmè'))
-        self.assertEqual("MEMEMEME", search_engine.wash_pattern('MÉMÊMËMÈ'))
+        self.assertEqual("memememe", search_engine.strip_accents('mémêmëmè'))
+        self.assertEqual("MEMEMEME", search_engine.strip_accents('MÉMÊMËMÈ'))
 
 
 def create_test_suite():
