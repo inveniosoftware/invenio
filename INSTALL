@@ -135,6 +135,7 @@ Contents
       $ sudo /path/to/apache/bin/apachectl graceful
       $ make create-tables       ## optional
       $ make install
+      $ make test                ## optional
       $ sudo chown -R www-data /usr/local/cdsware-DEMO/var
       $ make create-demo-site    ## optional
       $ make load-demo-records   ## optional
@@ -358,6 +359,13 @@ Contents
           After this step, you should be able to point your browser to
           the chosen URL of your local CDSware installation and see it
           running!
+
+      $ make test
+
+          Optionally, you can run our test suite to verify the results
+          of known tests on your local CDSware installation.  Note
+          that this command should be run only after you have
+          installed the whole system via `make install'.
 
       $ sudo chown -R www-data /usr/local/cdsware-DEMO/var
 
