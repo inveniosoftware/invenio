@@ -529,7 +529,7 @@ def usage(code, msg=''):
  -r,  --repair             try to repair all records in the table(s)
 
  Specific options:
- -w,  --wordsindex=w1[,w2] words indexes to consider (all)
+ -w,  --windex=w1[,w2]     word/phrase indexes to consider (all)
  -M,  --maxmem=XXX         maximum memory usage in kB (no limit)
  -f,  --flush=NNN          full consistent table flush after NNN records (10000)
       
