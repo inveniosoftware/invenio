@@ -98,7 +98,11 @@ Contents
         downgraded/upgraded Perl for compiling WML on that platform.       
           <http://www.engelschall.com/sw/wml/>
 
-     i) If you want to be able to search for words in the fulltext files 
+     i) If you want to be able to extract references from PDF fulltext
+        files, then you need to install pdftotext version 3 at least.
+          <http://www.foolabs.com/xpdf/home.html> 
+
+     j) If you want to be able to search for words in the fulltext files 
         (i.e. to have fulltext indexing), then you need as well to install 
         some of the following tools: 
           - for PDF files: pdftotext or pstotext
@@ -117,7 +121,7 @@ Contents
               <http://chicago.sourceforge.net/xlhtml/>
               <http://userpage.fu-berlin.de/~mbayer/tools/html2text.html>
 
-     j) If you have chosen to install fast XML MARC Python processors 
+     k) If you have chosen to install fast XML MARC Python processors 
         in the step d) above, then you have to install the parsers
         themselves:
           - (optional) RXP: 
@@ -125,19 +129,20 @@ Contents
           - (optional) 4suite:
              <http://4suite.org/>
 
-     k) (recommended) Gnuplot, the command-line driven interactive
+     l) (recommended) Gnuplot, the command-line driven interactive
         plotting program.  It is used to display download and citation
         history graphs on the Detailed record pages on the web
         interface.  Note that Gnuplot is not required, only
         recommended.
           <http://www.gnuplot.info/>                      
 
-     l) (recommended) A Common Lisp implementation, such as CLISP,
+     m) (recommended) A Common Lisp implementation, such as CLISP,
         SBCL or CMUCL.  It is used for the web server log analysing
         tool and the metadata checking program.  Note that any of the
-        three above implementations will do.  CMUCL produces fastest
-        code, but it does not support UTF-8 yet.  Note that a Common
-        Lisp implementation is not required, only recommended.
+        three implementations CLISP, SBCL, or CMUCL will do.  CMUCL
+        produces fastest machine code, but it does not support UTF-8
+        yet.  Pick up CLISP if you don't know what to do.  Note that a
+        Common Lisp implementation is not required, only recommended.
           <http://clisp.cons.org/>
           <http://www.cons.org/cmucl/>
           <http://sbcl.sourceforge.net/>     
@@ -318,8 +323,14 @@ Contents
 
       $ make
 
-          Launch the CDSware build.  All the pages will be pre-created
-          based on the config you have edited in the previous step.
+          Launch the CDSware build.  Since many messages are printed
+          during the build process, you may want to run it in a
+          fast-scrolling terminal such as rxvt or in a detached screen
+          session.
+
+          During this step all the pages and scripts will be
+          pre-created and customized based on the config you have
+          edited in the previous step.
 
           Before proceeding further with the CDSware installation, we
           have to do some admin-level tasks on the MySQL and Apache
