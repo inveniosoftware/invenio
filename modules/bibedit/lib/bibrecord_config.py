@@ -21,11 +21,12 @@
 
 ### CONFIGURATION OPTIONS FOR BIBRECORD LIBRARY
 
-#0: Parse Warning
-"""Configuration for module bibrecord"""
+"""bibrecord configuration"""
 
+# location of the MARC21 DTD file:
 cfg_marc21_dtd = "<ETCDIR>/bibedit/MARC21slim.dtd"
 
+# internal dictionary of warning messages:
 cfg_bibrecord_warning_msgs = {
     0: '' ,
     1: 'WARNING: tag missing for field(s)\nValue stored with tag \'000\'',
@@ -38,9 +39,13 @@ cfg_bibrecord_warning_msgs = {
     8: 'WARNING: empty datafield',
     98:'WARNING: problems importing cdsware',
     99: 'Document not well formed'
-    } # Dictionary of warning messages
+    } 
 
-cfg_bibrecord_default_verbose_level=0 #Verbose level to be used in the creation of records
-cfg_bibrecord_default_correct=0 #Correct (0/1) to be used in the creation of records
-cfg_bibrecord_parsers_available = [0,1,2] #parsers available
-                                          # 0 - minidom; 1-is4suite; 2-pyRXP
+# verbose level to be used when creating records from XML: (0=least, ..., 9=most)
+cfg_bibrecord_default_verbose_level=0
+
+# correction level to be used when creating records from XML: (0=no, 1=yes)
+cfg_bibrecord_default_correct=0
+
+# XML parsers available: (0=minidom, 1=4suite, 2=PyRXP)
+cfg_bibrecord_parsers_available = [0,1,2]                                           
