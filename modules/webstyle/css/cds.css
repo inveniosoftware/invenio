@@ -272,12 +272,6 @@ a.navtrail:hover {
     margin-top: 10px;
     margin-right: 10px;
 }
-.pagestriperight {
-   color: #000;
-   background: #fff;
-   width: 150px;
-   padding-left: 10px;
-}
 .pagefooter {
    color: #999;
    background: #fff;
@@ -300,7 +294,7 @@ a.navtrail:hover {
 }
 .pagestriperight {
    color: #000;
-   background: #fff;
+   background: transparent;
    font-size: x-small;
    padding-left: 3px;
 }
