@@ -89,7 +89,7 @@ function task_submit()
     // This function submits the task to bibsched task queue
     // This is what users will be invoking via command line.
 
-    global $options;
+    global $options,$errorfp;
 
     // To be sure no task is set
     if ($options['TASKRUN']) {
@@ -100,9 +100,14 @@ function task_submit()
     else
 	$date = "'".$options['DATE']."'";
 
-    foreach ($options['recordfiles'] as $recordfile) {
+    foreach ($options['recordfiles'] as $originalrecordfile) {
+	$recordfile = $originalrecordfile;
         if (!file_exists("$recordfile"))
-            $recordfile = $PWD."/$recordfile";
+            $recordfile = getcwd()."/$recordfile";
+        if (!file_exists("$recordfile")) {
+            fwrite($errorfp,"Error: Cannot find file $originalrecordfile.\n");
+	    exit(1);
+        }
         $totalrecs = trim(`grep -a "<record" $recordfile | wc -l`);
     }
 
@@ -1533,12 +1538,14 @@ function task_run()
     foreach ($options['recordfiles'] as $recordfile) {
         
         if (!file_exists("$recordfile"))
-            $recordfile = $PWD."/$recordfile";
+            $recordfile = getcwd()."/$recordfile";
         
         //open xml file
         $fp = @fopen("$recordfile","r");
         if (!$fp) {
-            fwrite($errorfp, "Error: cannot localize and/or open file '$recordfile' for reading.  Ignored.\n");
+            fwrite($errorfp, "Error: cannot localize and/or open file $recordfile for reading.\n");
+            task_update_state("ERROR");
+            exit(1);
         }
         else {
             $totalrecs += `grep "<record" $recordfile | wc -l`;
