@@ -203,7 +203,7 @@ def record_get_field_instances(rec, tag="", ind1="", ind2=""):
        When TAG is an emtpy string, then return all field instances."""
     out = []
     if tag:
-        if record_had_field(rec, tag):
+        if record_has_field(rec, tag):
             for possible_field_instance in rec[tag]:
                 if possible_field_instance[1] == ind1 and \
                    possible_field_instance[2] == ind2:
