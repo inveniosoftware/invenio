@@ -1,0 +1,7 @@
+Makefile
+Makefile.in
+z_*
+*.O
+*~
+index.wml
+create_collection_pages

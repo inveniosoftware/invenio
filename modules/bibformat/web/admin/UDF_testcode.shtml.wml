@@ -1,0 +1,74 @@
+<?
+/*********************************************************************
+   This file is part of the CERN Document Server Software (CDSware).
+   Copyright (C) 2002 CERN.
+   1211 Geneva 23 - Switzerland
+   <cds.support@cern.ch>
+
+    The CDSware is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    The CDSware is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with CDSware; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+*********************************************************************/
+
+//==========================================================================
+//  File: UDF_testcode.shtml (flexElink WI)
+//  Description: Allows to test a UDF for a given set of parameter values. 
+//	Parameter values have to be specified in the correct order and the 
+//	parameter name is not relevant (only the order and the value). It
+//	shows a web page with the result of executing the UDF with those
+//	parameter values
+//  POST parameters:
+//      fname ---> (required) Name (id) of the UDF to be tested
+//	<param> -> (optional, multiple) Parameter value, they have to come in
+//		the same order as the UDF definition specifies
+//  Requires:  ERROR, UDF_RETRIEVER
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+  include("localconf.inc.shtml");
+
+  include(ERROR);
+
+  include(UDF_RETRIEVER);
+
+  if(!isset($fname) || (trim($fname)==""))
+  {
+    errorpage("Function not set!!");
+  }
+
+  global $HTTP_POST_VARS;
+  $pars=array();
+  foreach($HTTP_POST_VARS as $var=>$value)
+  {
+    if(get_magic_quotes_gpc())
+      $value=stripslashes($value);
+    if($var!="fname")
+      array_push($pars, $value);
+  }
+  print_r($pars);
+
+  $ret=new UDFRetriever();
+  list($ecode, $emsg)=$ret->execute( $fname, $pars, 0, 0);
+  $ret->destroy();
+  if($ecode)
+  {
+    print "Result:<br><h2>$emsg</h2>";
+  }
+  else
+  {
+    print "ERROR!! $emsg";
+  }
+
+  print "<hr>";
+  print "<a href=\"JavaScript:window.history.go(-1)\">[Go back]</a>";
+?>

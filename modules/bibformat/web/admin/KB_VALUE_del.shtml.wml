@@ -1,0 +1,73 @@
+<?
+/*********************************************************************
+   This file is part of the CERN Document Server Software (CDSware).
+   Copyright (C) 2002 CERN.
+   1211 Geneva 23 - Switzerland
+   <cds.support@cern.ch>
+
+    The CDSware is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    The CDSware is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with CDSware; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+*********************************************************************/
+
+//==========================================================================
+//  File: KB_del.shtml (flexElink WI)
+//  Description: Deletes a pair key-value from the DB table of the indicated KB.
+//  POST parameters:
+//      name --> (required) Name (id) of the KB from which the key-value has to
+//		be deleted
+//      key ---> (required) Key value to be deleted (the mapping value is also
+//		deleted)
+//  Notes: If the KB is succesfully added to the DB it redirects the current
+//      browser to the indicated KB display 
+//  Requires:  DB, ERROR
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+  include("localconf.inc.shtml");
+
+  include(DB);
+  include(ERROR);
+  
+  if( (!isset($kb_name)) or (trim($kb_name)=="") )
+  {
+    errorpage("<b>KB name</b> hasn't been specified");
+    exit;
+  }
+
+  if( (!isset($key)) or (trim($key)=="") )
+  {
+    errorpage("<b>KB entry key</b> hasn't been specified");
+    exit;
+  }
+  
+  $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD );
+  mysql_selectdb( $DB_DB );
+
+  $kb_name=strtoupper(trim($kb_name));
+  $qry="select kb_table from flxKBS where kb_name='$kb_name'";
+  $res=mysql_query( $qry, $db );
+  list($kb_table)=mysql_fetch_array( $res );
+  
+  $qry="delete from $kb_table where vkey='$key'";
+  if(!mysql_query( $qry ))
+  {
+    errorpage("Impossible to delete KB entry:<br> ".mysql_error());
+    mysql_close( $db );
+    exit;
+  }
+
+  mysql_close( $db );
+
+  header("location: KB_showone.shtml?name=".urlencode($kb_name));
+?>

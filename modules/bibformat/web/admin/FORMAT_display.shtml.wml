@@ -1,0 +1,139 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+<?
+  include("localconf.inc.shtml");
+?>
+
+#include "cdspage.wml" \
+    title="Formats" \
+    navbar_name="admin" \
+    navbar_select="FORMAT_display"  \
+    cdspageboxlefttopadd="<protect><?displayLoginMenu('admin');?> </protect>"
+
+<?
+  include("security.inc.shtml");
+<protect>## $Id$</protect>
+
+//==========================================================================
+//  File: FORMAT_display.shtml (flexElink WI)
+//  Description: Shows a list of the existing formats in the DB, and allows to
+//      access to their details, add or delete
+//  POST parameters:
+//  Notes: 
+//  Requires:  DB, ERROR
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+  include(DB);
+  include(ERROR);
+  
+  include(HEADER);
+?>
+
+<p>Define the output formats, i.e. how to create the output out of
+internal BibFormat variables that were extracted in a previous step.
+This is the functionality you would want to configure most of the
+time.  It may reuse formats, user defined functions, knowledge bases,
+etc.
+
+<em>Example:</em> You can tell that authors should be printed in
+italic, that if there are more than 10 authors only the first three
+should be printed, etc.
+<p>
+
+<script language="javascript">
+<!---
+  function openwindowlink( addr, name )
+  {
+    window.open( addr, "Window"+name, "height=700,witdh=120,scrollbars,resizable")
+  }
+//-->
+</script>
+
+<?
+
+  $cBorder="#CCCCCC";
+  $cHeaders="#9999FF";
+  $cCells="#CCFFFF";
+  $cImpCells="#FFFFFFF0";
+
+  $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD ) or errormsg("Couldn't conn
+  ect to mySQL");
+  mysql_selectdb( $DB_DB ) or errormsg(sprintf("Couldn't connect into database %
+    s", $DB_DB));
+  $qry_format="select name, doc from flxFORMATS order by name";
+  $res_format=mysql_query( $qry_format );
+
+  print '<table width="100%" cellpadding="4" cellspacing="0">';
+  $color="";
+  while($format=mysql_fetch_array($res_format))
+  {
+    list($name, $doc)=$format;
+
+    if($color==$cCells)
+      $color="#FFFFFF";
+    else
+      $color=$cCells;
+    $doc=str_replace("\n", "<br>", $doc);
+    $doc=str_replace(" ", "&nbsp;", $doc);
+    print "<tr bgcolor=\"$color\">";
+    print "<td><b>$name</b></td>";
+    print "<td width=\"100%\"><font size=\"2\">$doc&nbsp;</font></td>";
+    print "<td><a href=\"JavaScript:openwindowlink( 'FORMAT_showone.shtml?fname=".urlencode($name)."', 'FE' )\"><font size=\"2\">[Code]</font></a></td>";
+    print "<td><a href=\"JavaScript:openwindowlink( 'FORMAT_edit.shtml?fname=".urlencode($name)."', 'FM' )\"><font size=\"2\">[Modify]</font></a></td>";
+    print "<td><a href=\"FORMAT_del.shtml?fname=".urlencode($name)."\"><font size=\"2\">[Delete]</font></a></td>";
+    print "</tr>";
+    print "<tr>";
+    print "<td colspan=\"3\">".str_replace("\n", "<br>", htmlspecialchars($code))."</td>";
+    print "</tr>";
+  }
+  print "</table>";
+
+
+  mysql_close( $db );
+
+?>
+  <hr><br>
+  <form action="FORMAT_add.shtml" method="POST">
+    <table width="70%" align="center">
+      <tr>
+        <td bgcolor="#000000" width="100%" align="center" colspan="2">
+          <font color="#FFFFFF">Add new FORMAT</font>
+        </td>
+      </tr>
+      <tr>
+        <td>Format Name</td>
+        <td><input type="text" name="fname"></td>
+      </tr>
+      <tr>
+        <td>Format documentation</td>
+        <td><textarea name="doc" cols="65" rows="5"></textarea><td>
+      </tr>
+      <tr>
+        <td>EL Code</td>
+        <td><textarea name="code" cols="65" rows="20"></textarea><td>
+      </tr>
+      <tr>
+	<td align="center" colspan="2"><input type="submit" value="Add"></td>
+      </tr>
+    </table>
+  </form>
+<?
+  include(FOOTER);
+?>

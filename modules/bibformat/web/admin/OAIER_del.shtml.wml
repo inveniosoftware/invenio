@@ -1,0 +1,83 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+<?
+<protect>## $Id$</protect>
+
+//==========================================================================
+//  File: OAIER_del.shtml (flexElink WI)
+//  Description: Deletes an existing variable and the corresponding ER from the 
+//      configuration DB.
+//  POST parameters:
+//      type -----> (required) Input type the ER belongs to
+//      varname --> (required) Internal variable name to be deleted
+//  Notes: If the variable-ER is succesfully deleted from the DB the current 
+//    browser is redirected to the OAI extraction rules list
+//  Requires:  DB, ERROR
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+
+  include("localconf.inc.shtml");
+
+  include(DB);
+  include(ERROR);
+
+  if( (!isset($type)) or (trim($type)=="") )
+  {
+    errorpage("<b>Type of the rule</b> hasn't been specified");
+    exit;
+  }
+  if( (!isset($varname)) or (trim($varname)=="") )
+  {
+    errorpage("<b>Variable name</b> hasn't been specified");
+    exit;
+  }
+
+  $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD );
+  mysql_selectdb( $DB_DB );
+  
+  $type=trim(strtoupper($type));
+  $varname=trim(strtoupper($varname));
+
+  $qry="delete from flxXMLMARCEXTRULESUBFIELDS
+        where type='$type' 
+	and varname='$varname'";
+  if(!mysql_query( $qry ))
+  {
+    errorpage("Impossible to delete variable subfields:<br> ".mysql_error());
+    mysql_close( $db );
+    exit;
+  }
+  
+  $qry="delete from flxXMLMARCEXTRULES
+        where type='$type'
+	and varname='$varname'";
+  if(!mysql_query( $qry ))
+  {
+    errorpage("Impossible to delete rule:<br> ".mysql_error());
+    mysql_close( $db );
+    exit;
+  }
+
+  mysql_close( $db );
+
+  header("location: OAIER_display.shtml");
+
+?>

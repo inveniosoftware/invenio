@@ -1,0 +1,84 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+<?
+<protect>## $Id$</protect>
+
+//==========================================================================
+//  File: BEH_OTYPE_add.shtml (flexElink WI)
+//  Description: Adds a new behaviour to the DB from the data passed as 
+//	parameteres
+//  POST parameters:
+//      otype --> (required) Behaviour label the action corresponds to
+//      type ---> (required, possible values: NORMAL, IENRICH) Behaviour type. 
+//      doc ----> (optional) Documentation describing the behaviour
+//  Notes: If the behaviour is succesfully added to the DB it redirects the
+//	browser to the behaviour list display
+//  Requires:  DB, ERROR
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+
+  include("localconf.inc.shtml");
+
+  include(DB);
+  include(ERROR);
+
+  if( (!isset($otype)) or (trim($otype)=="") )
+  {
+    errorpage("<b>Output type name</b> hasn't been specified");
+    exit;
+  }
+  $otype=strtoupper(trim($otype));
+
+  if( (!isset($type)) or (trim($type)=="") )
+    $type="";
+  $type=strtoupper(trim($type));
+  
+  if(!in_array($type, array( "NORMAL", "IENRICH" )))
+  {
+    errorpage("<b>Behavior type</b> incorrect!!");
+    exit;
+  }
+  
+  if( !isset($doc) ) 
+    $doc="";
+  $doc=strtoupper(trim($doc));
+  if(!get_magic_quotes_gpc())
+  {
+    $doc=addslashes($doc);
+  }
+
+  $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD ) or 
+	errormsg("Couldn't connect to mySQL") or exit;
+  mysql_selectdb( $DB_DB );
+  
+  $qry="insert into flxBEHAVIORS(name, type, doc)
+	values ('$otype', '$type', '$doc')";
+  if(!mysql_query( $qry ))
+  {
+    errorpage("Impossible to insert new output type:<br> ".mysql_error());
+    mysql_close( $db );
+    exit;
+  }
+  
+  mysql_close( $db );
+
+  header("location: BEH_display.shtml");
+?>

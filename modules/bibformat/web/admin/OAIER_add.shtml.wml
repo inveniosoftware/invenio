@@ -1,0 +1,94 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+<?
+<protect>## $Id$</protect>
+
+//==========================================================================
+//  File: OAIER_add.shtml (flexElink WI)
+//  Description: Adds a new variable and the corresponding ER to the 
+//	configuration DB.
+//  POST parameters:
+//	type -----> (required) Input type the ER belongs to
+//	varname --> (required) Internal variable name
+//	att_id ---> (optional) varfield element attribute ID value
+//	att_i1 ---> (optional) varfield element attribute I1 value (only 
+//                              relevant if ftype=DATAFIELD)
+//	att_i2 ---> (optional) varfield element attribute I2 value (only
+//                              relevant if ftype=DATAFIELD)
+//      ftype ----> (required) field type (DATAFIELD, CONTROLFIELD), default 
+//                            value DATAFIELD
+//  Notes: If the variable-ER is succesfully added to the DB the current browser
+//	is redirected to the OAI extraction rules list
+//  Requires:  DB, ERROR
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+
+  include("localconf.inc.shtml");
+
+  include(DB);
+  include(ERROR);
+
+  if( (!isset($type)) or (!trim($type)) )
+  {
+    errorpage("Rule <b>type</b> hasn't been specified");
+    exit;
+  }
+
+  if( (!isset($varname)) or (!trim($varname)) )
+  {
+    errorpage("Rule <b>varname</b> hasn't been specified");
+    exit;
+  }
+  
+  if( (!isset($ftype))||(($ftype!="DATAFIELD")&&($ftype!="CONTROLFIELD")) )
+    $ftype="DATAFIELD";
+
+  if(!isset($att_id))
+    $att_id="";
+  
+  if(!isset($att_i1))
+    $att_i1="";
+  
+  if(!isset($att_i2))
+    $att_i2="";
+
+  $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD ) 
+     or errormsg("Couldn't connect to mySQL") or exit;
+  mysql_selectdb( $DB_DB );
+  
+  $type=trim(strtoupper($type));
+  $varname=trim(strtoupper($varname));
+  $att_id=trim($att_id);
+  $att_i1=trim($att_i1);
+  $att_i2=trim($att_i2);
+  $qry="insert into flxXMLMARCEXTRULES(type, varname, att_id, att_i1, att_i2, ftype)
+	values ('$type', '$varname', '$att_id', '$att_i1', '$att_i2', '$ftype')";
+  if(!mysql_query( $qry ))
+  {
+    errorpage("Impossible to insert new rule:<br> ".mysql_error());
+    mysql_close( $db );
+    exit;
+  }
+  
+  mysql_close( $db );
+
+  header("location: OAIER_display.shtml");
+?>

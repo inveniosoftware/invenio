@@ -1,0 +1,233 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+<?
+  include("localconf.inc.shtml");
+?>
+
+#include "cdspage.wml" \
+    title="Behaviours" \
+    navbar_name="admin" \
+    navbar_select="BEH_display" \
+    cdspageboxlefttopadd="<protect><?displayLoginMenu('admin');?> </protect>"
+
+<?
+  include("security.inc.shtml");
+<protect>## $Id$</protect>
+
+//==========================================================================
+//  File: BEH_ACTION_edit.shtml (flexElink WI)
+//  Description: Allows to edit a single behavior action from the DB and apply
+//	changes in the action's data to the DB
+//  POST parameters:
+//      otype --> (required) Behavior label the action corresponds to
+//      eorder -> (required) Evaluation order of the condition the actions
+//              corresponds to
+//      process -> (optional) If defined (value not relevant) the script updates
+//              action's in the DB; if not it displays options for modifiying it
+//      aorder --> (required if process is not defined) Action application order
+//		inside its corresponding condition. When process is set, it 
+//		contains the new order for this action; if it's empty, the
+//		script will look for the last apply order of the actions for
+//		the corresponding condition.
+//      original_aorder --> (required if process is defined) Original action 
+//		application order inside its corresponding condition.
+//      code ----> (optional) Action's EL code 
+//      locator -> (optional) Not relevant
+//  Notes: If the update of the action is succesful it closes the current i
+//	browser and refreshes the caller one
+//  Requires:  DB, ERROR
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+
+  include(DB);
+  include(ERROR);
+
+  if( (!isset($otype)) or (trim($otype)=="") )
+  {
+    print "<b>Output type</b> hasn't been specified";
+    print "<hr>";
+    print "<a align=\"center\" href=\"JavaScript:window.close();\">[Close]</a>";
+    exit;
+  }
+  $otype=trim(strtoupper($otype));
+  if( (!isset($eorder)) or (trim($eorder)=="") )
+  {
+    print "<b>Condition evaluation order</b> hasn't been specified";
+    print "<hr>";
+    print "<a align=\"center\" href=\"JavaScript:window.close();\">[Close]</a>";
+    exit;
+  }
+  $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD );
+  mysql_selectdb( $DB_DB );
+  if(!isset($process))
+  {
+    if( (!isset($aorder)) or (trim($aorder)=="") )
+    {
+      print "<b>Action apply order</b> hasn't been specified";
+      print "<hr>";
+      print "<a align=\"center\" href=\"JavaScript:window.close();\">[Close]</a>";
+      exit;
+    }
+    $qry="select locator, el_code
+	  from flxBEHAVIORCONDITIONSACTIONS
+	  where otype='$otype'
+	  and eval_order=$eorder
+	  and apply_order=$aorder";
+     $qh=mysql_query( $qry );
+     list($locator, $code)=mysql_fetch_array( $qh );
+    
+?>
+<form action="BEH_ACTION_edit.shtml" method="POST">
+  <table>
+    <tr>
+      <td colspan="2" bgcolor="black">
+	<font color="white" align="center">
+	 Modifying action '<? echo $otype." -- ".$eorder." -- ".$aorder;?>'</font>
+      </td>
+    </tr>
+    <tr>
+      <td>Apply order: </td>
+      <td><input type="text" name="aorder" value="<?echo $aorder;?>"></td>
+    </tr>
+    <tr>
+      <td>Locator(only IENRICH types): </td>
+      <td><textarea name="locator" cols="80" rows="2"><?echo $locator?></textarea></td>
+    </tr>
+    <tr>
+      <td>EL Code: </td>
+      <td><textarea name="code" cols="80" rows="9"><?echo $code;?></textarea></td>
+    </tr>
+    <tr>
+      <td colspan="2" align="center">
+        <input type="submit" value="UPDATE" name="btnUpd">
+        <input type="submit" value="UPDATE&CLOSE" name="btnUpdClose">
+      </td>
+    </tr>
+  </table>
+  <input type="hidden" name="process" value="oo">
+  <input type="hidden" name="otype" value="<?echo $otype;?>">
+  <input type="hidden" name="eorder" value="<?echo $eorder;?>">
+  <input type="hidden" name="original_aorder" value="<?echo $aorder;?>">
+</form>
+<?
+  }
+  else
+  {
+    if( (!isset($original_aorder)) or (trim($original_aorder)=="") )
+    {
+      print "<b>Action orginal apply order</b> hasn't been specified";
+      print "<hr>";
+      print "<a align=\"center\" href=\"JavaScript:window.close();\">[Close]</a>";
+      exit;
+    }
+    if( (!isset($code)) )
+      $code="";
+    else
+    {
+      $temp_code=$code;
+      if(get_magic_quotes_gpc())
+        $temp_code=stripslashes($temp_code);
+      include(EXECUTOR);
+      $a=new AELExecutor();
+      list($ok, $msg)=$a->checkCode( $temp_code );
+      if(!$ok)
+      {
+        print "Code incorrect: <b>$msg</b><hr>
+               <a href=\"JavaScript:window.history.go(-1)\">[Go Back]</a>";
+        exit;
+      }
+    }
+    if( (!isset($locator)) )
+      $locator="";
+    if(!get_magic_quotes_gpc())
+    {
+      $code=addslashes($code);
+      $locator=addslashes($locator);
+    }
+    if( (!isset($aorder)) or (trim($aorder)=="") )
+    {
+      $qry="select max(apply_order)+1 
+            from flxBEHAVIORCONDITIONSACTIONS 
+	    where otype='$otype'
+	    and eval_order='$eorder'";
+      $res=mysql_query( $qry );
+      $aorder=mysql_fetch_array( $res );
+      $aorder=$aorder[0];
+      if($aorder==null)
+      {
+        $aorder=0;
+      }
+    }
+
+    if($aorder==$original_aorder)
+    {
+      $qry="update flxBEHAVIORCONDITIONSACTIONS
+	    set locator='$locator',
+		el_code='$code'
+	    where otype='$otype'
+	    and eval_order='$eorder'
+	    and apply_order='$aorder'";
+      if(!mysql_query( $qry ))
+      {
+        print "Impossible to update action: ".mysql_error()."<hr> <a href=\"JavaScript:window.history.go(-1)\">[Go Back]</a>";
+        mysql_close( $db );
+	exit;
+      }
+    }
+    else
+    {
+      $qry="delete from flxBEHAVIORCONDITIONSACTIONS
+	    where otype='$otype'
+	    and eval_order='$eorder'
+	    and apply_order='$original_aorder'";
+      if(!mysql_query( $qry ))
+      {
+        print "Impossible to delete old action: ".mysql_error()."<hr> <a href=\"JavaScript:window.history.go(-1)\">[Go Back]</a>";
+        mysql_close( $db );
+	exit;
+      }
+      $qry="insert into flxBEHAVIORCONDITIONSACTIONS
+	  (otype, eval_order, apply_order, locator, el_code)
+          values ('$otype', '$eorder', '$aorder', '$locator', '$code')";
+    
+      if(!mysql_query( $qry ))
+      {
+         print "Impossible to insert new action: ".mysql_error()."<hr> <a href=\"JavaScript:window.history.go(-1)\">[Go Back]</a>";
+         mysql_close( $db );
+         exit;
+      }
+    }
+
+   
+   mysql_close( $db );
+?>
+<script language="JavaScript">
+  opener.location.reload(false);
+<?
+   if(isset($btnUpd))
+     print "window.location=\"BEH_ACTION_edit.shtml?otype=$otype&eorder=$eorder&aorder=$aorder\";";
+   else
+     print "window.close();";
+?>
+</script>
+<?
+  }
+
+?>

@@ -1,0 +1,54 @@
+<?
+/*********************************************************************
+   This file is part of the CERN Document Server Software (CDSware).
+   Copyright (C) 2002 CERN.
+   1211 Geneva 23 - Switzerland
+   <cds.support@cern.ch>
+
+    The CDSware is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    The CDSware is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with CDSware; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+*********************************************************************/
+  
+   /*********************Authentication*******************************/
+   function canUseBibFormatAdmin($uid,$doctype='%')
+   {
+	if (AUTHENTICATION)
+	{
+		$uid_email = getEmail($uid);
+		if (!authenticate("$uid_email","bibformatmanager",$doctype))
+		   return false;
+		else
+		   return true;
+	}
+	else
+	   return true;
+   }
+
+  $uid_email = getEmail($uid);
+
+  if ($uid_email == "guest")
+  {
+    outWarning("Please log in using the left menu.");
+    print "</td></tr></table>";
+    exit;
+  }
+
+  if(!canUseBibFormatAdmin($uid))
+  {
+    outWarning("Sorry, you are not allowed to use bibFormat Admin. <br> If you think this is not correct, please contact $ADMINEMAIL");
+    print "</td></tr></table>";
+    exit;
+  }
+    
+?>

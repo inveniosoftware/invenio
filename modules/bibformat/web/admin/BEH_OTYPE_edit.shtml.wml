@@ -1,0 +1,186 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+<?
+<protect>## $Id$</protect>
+
+//==========================================================================
+//  File: BEH_OTYPE_edit.shtml (flexElink WI)
+//  Description: Allows to modify a behavior's data and updates it, according
+//	with the made changes, in the DB
+//  POST parameters:
+//      otype --> (required) Behavior label 
+//      otype_orig -> (optional) If defined the script updates the data passed 
+//		parameters in the DB. When defined, it contains the DB label(the
+//		original one as it can be changed) of the behaviour to be 
+//		modified
+//      type ---> (required if otype_orig is set, possible values: NORMAL, 
+//		IENRICH) Behaviour type. 
+//      doc ----> (optional) Documentation describing the behaviour
+//  Notes: If the behaviour data is succesfully updated in the DB it redirects
+//	the current browser to the detailed display of the updated behaviour
+//  Requires:  DB, ERROR, FUNCTION_LIB
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+  include("localconf.inc.shtml");
+
+  include(DB);
+  include(ERROR);
+  include(FUNCTION_LIB);
+
+  if((!isset($otype))||(trim($otype)==""))
+  {
+    print "<b>ERROR</b>: Output type label hasn't been specified!!<hr>";
+    print "<a align=\"center\" href=\"JavaScript:window.history.go(-1)\">[Go Back]</a>";
+    exit;
+  }
+  if(get_magic_quotes_gpc())
+  {
+    $otype=stripslashes($otype);
+  }
+
+  $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD );
+  mysql_selectdb( $DB_DB );
+
+  if(isset($otype_orig))
+  {
+    $otype=trim(strtoupper($otype));
+    $otype_orig=trim(strtoupper($otype_orig));
+    if(!isset($type))
+    {
+      $type="NORMAL";
+    }
+    else
+    {
+      $type=strtoupper(trim($type));
+    }
+    if(($type!="NORMAL")&&($type!="IENRICH"))
+    {
+      print "Incorrect value for <b>type</b>";
+      print "<hr>";
+      print "<a href=\"JavaScript:window.history.go(-1)\">[Back]</a>";
+      exit;
+    }
+    if(!isset($doc))
+    {
+      $doc="";
+    }
+    if(!get_magic_quotes_gpc())
+    {
+      $type=addslashes($type);
+      $doc=addslashes($doc);
+      $otype=addslashes($otype);
+      $otype_orig=addslashes($otype_orig);
+    }
+
+    if($otype!=$otype_orig)
+    {
+      $qry="update flxBEHAVIORCONDITIONSACTIONS
+  	    set otype='$otype'
+	    where otype='$otype_orig'";
+      if(!mysql_query($qry))
+      {
+        print "Impossible to update actions for output type '$otype_orig': ".mysql_error();
+        print "<hr>";
+        print "<a href=\"JavaScript:window.history.go(-1)\">[Back]</a>";
+        mysql_close( $db );
+        exit;
+      }
+      
+      $qry="update flxBEHAVIORCONDITIONS
+  	    set otype='$otype'
+	    where otype='$otype_orig'";
+      if(!mysql_query($qry))
+      {
+        print "Impossible to update conditions for output type '$otype_orig': ".mysql_error();
+        print "<hr>";
+        print "<a href=\"JavaScript:window.history.go(-1)\">[Back]</a>";
+        mysql_close( $db );
+        exit;
+      }
+
+    }
+
+    $qry="update flxBEHAVIORS
+	 set name='$otype',
+	     type='$type',
+	     doc='$doc'
+         where name='$otype_orig'";
+    if(!mysql_query($qry))
+    {
+      print "Impossible to update output type '$otype_orig': ".mysql_error();
+      print "<hr>";
+      print "<a href=\"JavaScript:window.history.go(-1)\">[Back]</a>";
+      mysql_close( $db );
+      exit;
+    }
+
+    if($errors!="")
+    {
+      print $errors;
+      print "<hr>";
+      print "<a href=\"JavaScript:window.history.go(-1)\">[Back]</a>";
+      mysql_close( $db );
+      exit;
+    }
+
+    header("location: BEH_OTYPE_showone.shtml?otype=$otype");
+    exit;
+  }
+//-----------------------------------------------------------------  
+  $qry="select type, doc
+        from flxBEHAVIORS
+	where name='".addslashes($otype)."'";
+  $qh=mysql_query($qry, $db);
+  list($type, $doc)=mysql_fetch_row($qh);
+?>
+  <form action="BEH_OTYPE_edit.shtml" method="POST">
+    <table width="100%" bgcolor="#CCCCCC" border="1">
+      <tr bgcolor="#0000FF" align="center">
+        <td colspan="2"><font size="6" color="white">Modifying output type '<?echo $otype;?>'</font></td>
+      </tr>
+      <tr bgcolor="#FFFFFF">
+        <td bgcolor="#33CCFF" width="15%"><b>Name</b></td>
+        <td><input type="text" name="otype" value="<?echo $otype;?>"</td>
+      </tr>
+      <tr bgcolor="#FFFFFF">
+        <td bgcolor="#33CCFF" width="15%"><b>Type</b></td>
+        <td><select name="type">
+	      <option value="NORMAL"<?if($type=="NORMAL") echo " selected";?>>Normal</option> 
+	      <option value="IENRICH"<?if($type=="IENRICH") echo " selected";?>>Input Enrich</option>
+	    </select> 
+	</td>
+      </tr>
+      <tr bgcolor="#FFFFFF">
+        <td bgcolor="#33CCFF"><b>Documentation</b></td>
+        <td><textarea name="doc" cols="65" rows="5"><?echo $doc;?></textarea></td>
+      </tr>
+      <tr align="center">
+        <td colspan="2">
+	  <input type="button" value="CANCEL" onClick="JavaScript:window.history.go(-1)">
+          <input type="submit" value="UPDATE">
+          <input type="hidden" name="otype_orig" value="<?echo $otype;?>">
+        </td>
+      </tr>
+    </table>
+  </form>
+<?
+  mysql_close( $db );
+?>

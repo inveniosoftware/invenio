@@ -1,0 +1,227 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+<?
+  include("localconf.inc.shtml");
+?>
+#include "cdspage.wml" \
+    title="Extraction Rules" \
+    navbar_name="admin" \
+    navbar_select="OAIER_display"  \
+    cdspageboxlefttopadd="<protect><?displayLoginMenu('admin');?> </protect>"
+
+<?
+  include("security.inc.shtml");
+<protect>## $Id$</protect>
+
+//==========================================================================
+//  File: OAIER_display.shtml (flexElink WI)
+//  Description: Shows a list of defined internal variables and their 
+//	corresponding extraction rules (ER); it also shows fields of each
+//	variable. Besides, it provides access to management operations
+//  POST parameters:
+//  Notes: 
+//  Requires:  DB, ERROR
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+
+  include(DB);
+  include(ERROR);
+  
+  include(HEADER);
+  
+  $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD );
+  mysql_selectdb( $DB_DB );
+
+  $qry_rules="select * 
+              from flxXMLMARCEXTRULES 
+              order by type, varname";
+
+  $res=mysql_query( $qry_rules, $db );
+
+  $old_type="";
+
+?>
+
+<p>Define how the metadata tags from input are mapped into internal
+BibFormat variable names.  The variable names can afterwards be used
+in formatting and linking rules.
+
+<em>Example:</em> You can tell that <code>100 $a</code> field
+should be mapped into <code>$100.a</code> internal variable that you
+could use later.<p>
+
+<script language="javascript">
+<!---
+  function openwindowlink( addr, name )
+  {
+    window.open( addr, "Window"+name, "height=320,witdh=320,scrollbars,resizable")
+  }
+//-->
+</script>
+
+<?
+
+  print '<table width="100%" cellspacing="0" cellpadding="4">';
+
+  $color1="#FFFFFF";
+  $color2="#66CCCC";
+
+  while($row=mysql_fetch_array($res))
+  {
+    list($type, $varname, $att_id, $att_i1, $att_i2, $mvalues, $ftype)=$row;
+    if(($old_type=="") or ($type!=$old_type))
+    {
+      print "\t<tr>\n";
+      print "\t\t<td colspan=\"6\" align=\"center\" bgcolor=\"#000000\"><b><font size=\"5\" color=\"#FFFFFF\">$type</font></b></td>\n";
+      print "\t</tr>\n";
+      print "\t<tr align=\"center\" bgcolor=\"#CCCCCC\">\n";
+      print "\t\t<td><b>Varname</b></td>\n";
+      print "\t\t<td><b>Mapping Tag</b></td>\n";
+      print "\t\t<td><b>Allow multiple values</b></td>\n";
+      print "\t\t<td colspan=\"3\">&nbsp;</td>\n";
+      print "\t</tr>\n";
+
+      $old_type=$type;
+      $color=$color2;
+    }
+    if($color==$color1)
+      $color=$color2;
+    else
+      $color=$color1;
+    print "\t<tr bgcolor=\"$color\" align=\"center\">\n";
+    print "\t\t<td><b>$varname</b></td>\n";
+    if($ftype=="DATAFIELD")
+    {
+      print "\t\t<td>".htmlspecialchars("<datafield tag=\"$att_id\" ind1=\"$att_i1\" ind2=\"$att_i2\">")."</td>\n";
+    }
+    else
+    {
+      print "\t\t<td>".htmlspecialchars("<controlfield tag=\"$att_id\">")."</td>\n";
+    }
+    if($mvalues=="S")
+      print "\t\t<td>Yes</td>\n";
+    else
+      print "\t\t<td><font color=\"red\">No</font></td>\n";
+    print "\t\t<td><a href=\"\"><font size=\"2\">[Modify]</font></a></td>\n";
+    if($ftype=="DATAFIELD")
+    {
+      print "\t\t<td><a href=\"JavaScript:openwindowlink('OAIER_SF_add.shtml?type=$type&varname=$varname', 'OAIERSFADD$type$varname')\"><font size=\"2\">[Add Subfield]</font></a></td>\n";
+    }
+    else
+    {
+      print "\t\t<td>&nbsp;</td>";
+    }
+    print "\t\t<td><a href=\"OAIER_del.shtml?type=".urlencode($type)."&varname=".urlencode($varname)."\"><font size=\"2\">[Delete]</font></a></td>\n";
+    print "\t</tr>\n";
+    if($ftype!="DATAFIELD") continue;
+
+    $qry_sf="select sfname, att_label from flxXMLMARCEXTRULESUBFIELDS where type='$type'
+		and varname='$varname' order by sfname";
+    $res_sf=mysql_query($qry_sf);
+    if(mysql_num_rows($res_sf)>=1)
+    {
+      print "\t<tr align=\"center\" bgcolor=\"$color\">\n";
+      print "\t\t<td colspan=\"6\">\n";
+      print "\t\t\t".'<table width="50%" bgcolor="#CCCCCC" cellspacing="1">'."\n";
+      print "\t\t\t\t<tr>\n";
+      print "\t\t\t\t\t<td colspan=\"4\" align=\"center\">";
+      print "<font size=\"2\"><b>SUBFIELDS</b></font>";
+      print "</td>\n";
+      print "\t\t\t\t</tr>\n";
+      print "\t\t\t\t<tr align=\"center\">\n";
+      print "\t\t\t\t\t<td><font size=\"2\">SF Name</font></td>\n";
+      print "\t\t\t\t\t<td><font size=\"2\">Mapping Tag</font></td>\n";
+      print "\t\t\t\t\t<td colspan=\"2\">&nbsp;</td>\n";
+      print "\t\t\t\t</tr>\n";
+      while($row_sf=mysql_fetch_array($res_sf))
+      {
+        list($sfname, $att_label)=$row_sf;
+	print "\t\t\t\t<tr align=\"center\" bgcolor=\"$color\">\n";
+	print "\t\t\t\t\t<td>$sfname</td>\n";
+	print "\t\t\t\t\t<td>".htmlspecialchars("<subfield code=\"$att_label\">")."</td>\n";
+	print "\t\t\t\t\t<td><a href=\"\"><font size=\"2\">[Modify]</font></a></td>\n";
+	print "\t\t\t\t\t<td><a href=\"OAIER_SF_del.shtml?type=".urlencode($type)."&varname=".urlencode($varname)."&sfname=".urlencode($sfname)."\"><font size=\"2\">[Delete]</font></a></td>\n";
+	print "\t\t\t\t</tr>\n";
+      }
+
+
+
+      print "\t\t\t</table>\n";
+      print "\t\t</td>\n";
+      print "\t</tr>\n";
+    }
+    while($row_sf=mysql_fetch_array($res_sf))
+    {
+      print "<tr bgcolor=\"$color\">";
+      print "<td><font size=\"2\"><strong>$sfname</strong></font></td>";
+      print "<td><font size=\"2\">$att_label</font></td>";
+      print "<td colspan=\"3\"></td>";
+      print "<td><a href=\"\"><font size=\"2\">[Delete]</font></a>";
+      print "</tr>";
+
+    }
+  }
+  print "</table>";
+?>
+  <hr>
+  <form action="OAIER_add.shtml" method="POST">
+  <table align="center" width="80%">
+    <tr>
+      <td colspan="2" align="center" bgcolor="#000000"><font size="5" color="#FFFFFF">Add new Extraction Rule</font></td>
+    </tr>
+    <tr>
+      <td align="right">Type</td>
+      <td><input type="text" name="type"></td> 
+    </tr>
+    <tr>
+      <td align="right">Variable name</td>
+      <td><input type="text" name="varname"></td>
+    </tr>
+    <tr>
+      <td align="right">Field Type</td>
+      <td><select name="ftype">
+            <option value="DATAFIELD">datafield</option>
+            <option value="CONTROLFIELD">controlfield</option>
+          </select>
+      </td>
+   </tr>
+    <tr>
+      <td align="right">Attribute TAG value</td>
+      <td><input type="text" name="att_id"></td>
+    </tr>
+    <tr>
+      <td align="right">Attribute IND1 value<br><font size="1">(only for datafield)</font></td>
+      <td><input type="text" name="att_i1"></td>
+    </tr>
+    <tr>
+      <td align="right">Attribute IND2 value<br><font size="1">(only for datafield)</font></td>
+      <td><input type="text" name="att_i2"></td>
+    </tr>
+    <tr>
+      <td colspan="2" align="center"><input type="submit" value="Add rule"></td>
+    </tr>
+  </table>
+  </form>
+<?
+
+  mysql_close( $db );
+
+  include(FOOTER);
+?>

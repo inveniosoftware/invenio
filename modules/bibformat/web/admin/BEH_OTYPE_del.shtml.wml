@@ -1,0 +1,92 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+<?
+  include("localconf.inc.shtml");
+?>
+
+#include "cdspage.wml" \
+    title="Behaviours" \
+    navbar_name="admin" \
+    navbar_select="BEH_display" \
+    cdspageboxlefttopadd="<protect><?displayLoginMenu('admin');?> </protect>"
+
+<?
+  include("security.inc.shtml");
+<protect>## $Id$</protect>
+
+//==========================================================================
+//  File: BEH_OTYPE_del.shtml (flexElink WI)
+//  Description: Deletes an existing behaviour (and all the items that depend
+//	on them) from the DB 
+//      parameteres
+//  POST parameters:
+//      otype --> (required) Behaviour label the action corresponds to
+//  Notes: If the behaviour is succesfully deleted from the DB it closes the
+//      current browser and refreshes the opener one
+//  Requires:  DB, ERROR
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+
+
+  include(DB);
+  include(ERROR);
+
+  if( (!isset($otype)) or (trim($otype)=="") )
+  {
+    errorpage("<b>Output type name</b> hasn't been specified");
+    exit;
+  }
+  $otype=strtoupper(trim($otype));
+
+  $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD ) or 
+	errormsg("Couldn't connect to mySQL") or exit;
+  mysql_selectdb( $DB_DB );
+
+  $qry="delete from flxBEHAVIORCONDITIONSACTIONS where otype='$otype'";
+  if(!mysql_query( $qry ))
+  {
+    errorpage("Impossible to delete actions related to this output type:<br> ".mysql_error());
+    mysql_close( $db );
+    exit;
+  }
+ 
+  $qry="delete from flxBEHAVIORCONDITIONS where otype='$otype'";
+  if(!mysql_query( $qry ))
+  {
+    errorpage("Impossible to delete conditions related to this output type:<br> ".mysql_error());
+    mysql_close( $db );
+    exit;
+  }
+
+  $qry="delete from flxBEHAVIORS where name='$otype'";
+  if(!mysql_query( $qry ))
+  {
+    errorpage("Impossible to delete output type:<br> ".mysql_error());
+    mysql_close( $db );
+    exit;
+  }
+  
+  mysql_close( $db );
+?>
+<script language="JavaScript">
+  opener.location.reload(false);
+  window.close();
+</script>
+

@@ -1,0 +1,105 @@
+<?
+/*********************************************************************
+   This file is part of the CERN Document Server Software (CDSware).
+   Copyright (C) 2002 CERN.
+   1211 Geneva 23 - Switzerland
+   <cds.support@cern.ch>
+
+    The CDSware is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    The CDSware is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with CDSware; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+*********************************************************************/
+
+//==========================================================================
+//  File: UDF_add.shtml (flexElink WI)
+//  Description: Adds a new UDF definition to the DB. It also stores the
+//	UDF's parameters.
+//  POST parameters:
+//      fname --> (required) Name (id) of the UDF to be added
+//	params -> (required) Contains the UDF param list. UDF parameters are
+//		separated by using ","
+//      doc ----> (optional) Description of the purpose of the UDF
+//      code ---> (optional) UDF's PHP code
+//  Notes: If the UDF is succesfully added to the DB it redirects the current
+//      browser to the UDF display list
+//  Requires:  DB, ERROR
+//  Author: Hector.Sanchez@cern.ch
+//==========================================================================
+
+
+  include("localconf.inc.shtml");
+
+  include(DB);
+  include(ERROR);
+
+  if( (!isset($fname)) or (trim($fname)=="") )
+  {
+    errorpage("<b>Function name</b> hasn't been specified");
+    exit;
+  }
+
+  if(!isset($params))
+  {
+    errorpage("<b>Params</b> hasn't been specified");
+    exit;
+  }
+  
+  if(!isset($code))
+    $code="";
+  
+  if(!isset($doc))
+    $doc="";
+
+  $db=mysql_connect( $DB_HOST, $DB_USER, $DB_PASSWD ) 
+	or errormsg("Couldn't connect to mySQL") or exit;
+  mysql_selectdb( $DB_DB );
+  
+  $fname=trim(strtoupper($fname));
+  $rtype=trim(strtoupper($rtype));
+  if(!get_magic_quotes_gpc())
+  {
+    $code=addslashes($code);
+    $doc=addslashes($doc);
+  }
+  
+  $qry="insert into flxUDFS (fname, rtype, code, doc)
+	values ('$fname', '$rtype', '$code', '$doc')";
+  if(!mysql_query( $qry ))
+  {
+    errorpage("Impossible to insert new UDF:<br> ".mysql_error());
+    mysql_close( $db );
+    exit;
+  }
+
+  $pars=explode(",", trim($params));
+  $counter=0;
+  foreach($pars as $parname)
+  {
+    $parname=trim($parname);
+    if($parname=="")
+      continue;
+    $qry="insert into flxUDFPARAMS(fname, pname, ord)
+		values('$fname', '$parname', '$counter')";
+    if(!mysql_query( $qry ))
+    {
+      errorpage("Impossible to insert UDF parameter '$parname':<br> ".mysql_error());
+      mysql_close( $db );
+      exit;
+    }
+    $counter++;
+  }
+  
+  mysql_close( $db );
+
+  header("location: UDF_display.shtml");
+?>
