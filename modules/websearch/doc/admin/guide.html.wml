@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of the CERN Document Server Software (CDSware).
@@ -65,10 +66,10 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.9. <a href="#3.9">Modify rank options</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.10.<a href="#3.10">Modify output formats</a><br>
 <strong>4. <a href="#4">Webcoll Status</a></strong><br>
-<strong>4. <a href="#5">Collections Status</a></strong><br>
-<strong>5. <a href="#6">Edit Search Engine Parameters</a></strong><br>
-<strong>6. <a href="#7">Search Engine Cache</a></strong><br>
-<strong>7. <a href="#8">Additional Information</a></strong><br>
+<strong>5. <a href="#5">Collections Status</a></strong><br>
+<strong>6. <a href="#6">Edit Search Engine Parameters</a></strong><br>
+<strong>7. <a href="#7">Search Engine Cache</a></strong><br>
+<strong>8. <a href="#8">Additional Information</a></strong><br>
 
 <a name="1"></a><h2>1. Overview</h2>
 
@@ -77,7 +78,7 @@ collections that the end-users see.  The WebSearch Admin functionality
 can be basically separated into several parts: (i) how to organize
 collections into <a href="#2">collection tree</a>; (ii) how to define
 and edit <a href="#3">collection parameters</a>; (iii) how to update
-collection cache via the <a href="#3">webcoll daemon</a>; and (iv) how
+collection cache via the <a href="#4">webcoll daemon</a>; and (iv) how
 to influence the search engine behaviour and set various <a
 href="#5">search engine parameters</a>.  These issues will be
 subsequently described in the rest of this guide.
@@ -124,7 +125,7 @@ after adding a collection:
 
 <p>After you edit these two things, the collection is fully usable for
    the search interface.  It will appear in the search interface after
-   the next run of the <a href="#5">WebColl Daemon</a>.
+   the next run of the <a href="#4">WebColl Daemon</a>.
 
 <p>However, you will probably want to customize further things, like
    define collection name translation in various languages, define
@@ -471,31 +472,63 @@ href="<WEBURL>/admin/bibformat/">BibFormat Admin</a> interface.
 
 <a name="4"></a><h2>4. Webcoll Status</h2>
 
-Shows when the collections were last updated, and when the collections and indexes are
-scheduled to be updated next time. Also warning messages are shown at the end if needed.
+<p>WebColl is the daemon that normally periodically runs via <a
+href="<WEBURL>/admin/bibsched/">BibSched</a> and that updates the
+collection cache with the collection parameters configured in the
+previous section.  Alternatively to running webcoll via BibSched, you
+can also run it any time you want from the command line, either for
+all collections or for selected collection only.  See the --help
+option.
+
+<p>The WebSearch Admin interface has got a WebColl Status menu that
+shows when the collection cache was last updated and when the next
+update is scheduled.  It warns in case something suspicious was
+discovered.
 
 <a name="5"></a><h2>5. Collections Status</h2>
 
-Shows a list of all collections, and if there is anything wrong regarding
-configuration of the collections, together with the languages the collection
-name has been translated into.
-<br><br><b>Query:</b><br>
-The Query should be empty if a collection got subcollections, if not, a query is needed.<br>
-<br><b>Subcollections:</b><br>
-A collection which got a query, should not have any subcollections.<br>
-<br><b>Restricted:</b><br>
-A restricted collection can only be accessed by users belonging to the group mentioned.<br>
-<br><b>i8n:</b><br>
-Show which languages this translation has been translated into.<br>
-<br><b>Status:</b><br>
-If no errors was found, "OK" is displayed for each collection, if not, a number and a errormessage 
-is shown.<br>
-1: Query = Collection got query and got subcollections<br>
-2: Query = Collection got no query and no subcollections
+<p>The Collection Status menu of the WebSearch Admin interface shows
+the list of all collections and checks if there is anything wrong
+regarding configuration of collections, together with the languages
+the collection name has been translated into, etc.  Here is the
+detailed explanation of the functionality:
 
+<blockquote>
+<dl>
 
-Show which languages this translation has been translated into.<br>
+<dt><strong>ID</strong>
+<dd>ID of the collection.
 
+<dt><strong>Name</strong>
+<dd>Name of the collection.
+
+<dt><strong>Query</strong>
+<dd>The collection definition query.  Note that it should be empty if
+a collection got subcollections.  If not, then a query is needed.
+
+<dt><strong>Subcollections</strong>
+<dd>The subcollections that the collection is composed of.  Note that
+a collection which got defined by a query should not have any
+subcollections.
+
+<dt><strong>Restricted</strong>
+<dd>A restricted collection can only be accessed by users belonging to
+the Apache groups mentioned in this column.
+
+<dt><strong>I18N</strong>
+<dd>Show which languages the collection name has been translated into.
+
+<dt><strong>Status</strong>
+<dd>If no errors was found, <em>OK</em> is displayed for each
+collection.  If an error was found, then an error number and short
+message are shown.  The meaning of the error messages is the
+following: <em>1:Query</em> means that the collection was defined via
+a query but also via subcollections too; <em>2:Query</em> means that
+the collection wasn't defined neither via query nor via
+subcollections.
+
+</dl>
+</blockquote>
 
 <a name="6"></a><h2>6. Edit Search Engine Parameters</h2>
 
