@@ -1721,4 +1721,69 @@
   <no>Innholdet i denne samlingen er adgangsbegrenset.</no>
 </define-tag>
 
+<define-tag MSG_CONVERT whitespace=delete>
+  <en>Convert</en>
+  <fr>Conversion</fr>
+  <de>Konvertieren</de>
+  <es>Convert</es>
+  <pt>Convert</pt>  
+  <it>Convert</it>
+  <ru>Обратить</ru>
+  <sk>Konvertovať</sk>
+  <cz>Konvertovat</cz>
+  <no>Convert</no>
+</define-tag>
+
+<define-tag MSG_AGENDA whitespace=delete>
+  <en>Agenda</en>
+  <fr>Agenda</fr>
+  <de>Agenda</de>
+  <es>Agenda</es>
+  <pt>Agenda</pt>  
+  <it>Agenda</it>
+  <ru>Повестки</ru>
+  <sk>Agenda</sk>
+  <cz>Agenda</cz>
+  <no>Agenda</no>
+</define-tag>
+
+<define-tag MSG_WEBCAST whitespace=delete>
+  <en>Webcast</en>
+  <fr>Webcast</fr>
+  <de>Webcast</de>
+  <es>Webcast</es>
+  <pt>Webcast</pt>  
+  <it>Webcast</it>
+  <ru>Вебкаст</ru>
+  <sk>Webcast</sk>
+  <cz>Webcast</cz>
+  <no>Webcast</no>
+</define-tag>
+
+<define-tag MSG_BULLETIN whitespace=delete>
+  <en>Bulletin</en>
+  <fr>Bulletin</fr>
+  <de>Bulletin</de>
+  <es>Bulletin</es>
+  <pt>Bulletin</pt>  
+  <it>Bulletin</it>
+  <ru>Бюллетен</ru>
+  <sk>Buletín</sk>
+  <cz>Buletín</cz>
+  <no>Bulletin</no>
+</define-tag>
+
+<define-tag MSG_LIBRARY whitespace=delete>
+  <en>Library</en>
+  <fr>Bibliothèque</fr>
+  <de>Bibliothek</de>
+  <es>Library</es>
+  <pt>Library</pt>  
+  <it>Library</it>
+  <ru>Библиотека</ru>
+  <sk>Knižnica</sk>
+  <cz>Knihovna</cz>
+  <no>Library</no>
+</define-tag>
+
 ## end of file

@@ -132,6 +132,11 @@ msg_latest_additions = {}
 msg_more = {}
 msg_collection_contains_no_records = {}
 msg_collection_restricted_content = {}
+msg_convert = {}
+msg_agenda = {}
+msg_webcast = {}
+msg_bulletin = {}
+msg_library = {}
 
 ## English:
 <en>
@@ -237,6 +242,11 @@ msg_latest_additions['en'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['en'] = """<MSG_MORE>"""
 msg_collection_contains_no_records['en'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 msg_collection_restricted_content['en'] = """<MSG_COLLECTION_RESTRICTED_CONTENT>"""
+msg_convert['en'] = """<MSG_CONVERT>"""
+msg_agenda['en'] = """<MSG_AGENDA>"""
+msg_webcast['en'] = """<MSG_WEBCAST>"""
+msg_bulletin['en'] = """<MSG_BULLETIN>""" 
+msg_library['en'] = """<MSG_LIBRARY>"""
 </en>
 
 ## French:
@@ -343,6 +353,11 @@ msg_latest_additions['fr'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['fr'] = """<MSG_MORE>"""
 msg_collection_contains_no_records['fr'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 msg_collection_restricted_content['fr'] = """<MSG_COLLECTION_RESTRICTED_CONTENT>"""
+msg_convert['fr'] = """<MSG_CONVERT>"""
+msg_agenda['fr'] = """<MSG_AGENDA>"""
+msg_webcast['fr'] = """<MSG_WEBCAST>"""
+msg_bulletin['fr'] = """<MSG_BULLETIN>""" 
+msg_library['fr'] = """<MSG_LIBRARY>"""
 </fr>
 
 ## German:
@@ -449,6 +464,11 @@ msg_latest_additions['de'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['de'] = """<MSG_MORE>"""
 msg_collection_contains_no_records['de'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 msg_collection_restricted_content['de'] = """<MSG_COLLECTION_RESTRICTED_CONTENT>"""
+msg_convert['de'] = """<MSG_CONVERT>"""
+msg_agenda['de'] = """<MSG_AGENDA>"""
+msg_webcast['de'] = """<MSG_WEBCAST>"""
+msg_bulletin['de'] = """<MSG_BULLETIN>""" 
+msg_library['de'] = """<MSG_LIBRARY>"""
 </de>
 
 ## Spanish:
@@ -555,6 +575,11 @@ msg_latest_additions['es'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['es'] = """<MSG_MORE>"""
 msg_collection_contains_no_records['es'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 msg_collection_restricted_content['es'] = """<MSG_COLLECTION_RESTRICTED_CONTENT>"""
+msg_convert['es'] = """<MSG_CONVERT>"""
+msg_agenda['es'] = """<MSG_AGENDA>"""
+msg_webcast['es'] = """<MSG_WEBCAST>"""
+msg_bulletin['es'] = """<MSG_BULLETIN>""" 
+msg_library['es'] = """<MSG_LIBRARY>"""
 </es>
 
 ## Portuguese:
@@ -661,6 +686,11 @@ msg_latest_additions['pt'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['pt'] = """<MSG_MORE>"""
 msg_collection_contains_no_records['pt'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 msg_collection_restricted_content['pt'] = """<MSG_COLLECTION_RESTRICTED_CONTENT>"""
+msg_convert['pt'] = """<MSG_CONVERT>"""
+msg_agenda['pt'] = """<MSG_AGENDA>"""
+msg_webcast['pt'] = """<MSG_WEBCAST>"""
+msg_bulletin['pt'] = """<MSG_BULLETIN>""" 
+msg_library['pt'] = """<MSG_LIBRARY>"""
 </pt>
 
 ## Italian:
@@ -767,6 +797,11 @@ msg_latest_additions['it'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['it'] = """<MSG_MORE>"""
 msg_collection_contains_no_records['it'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 msg_collection_restricted_content['it'] = """<MSG_COLLECTION_RESTRICTED_CONTENT>"""
+msg_convert['it'] = """<MSG_CONVERT>"""
+msg_agenda['it'] = """<MSG_AGENDA>"""
+msg_webcast['it'] = """<MSG_WEBCAST>"""
+msg_bulletin['it'] = """<MSG_BULLETIN>""" 
+msg_library['it'] = """<MSG_LIBRARY>"""
 </it>
 
 ## Russian:
@@ -873,6 +908,11 @@ msg_latest_additions['ru'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['ru'] = """<MSG_MORE>"""
 msg_collection_contains_no_records['ru'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 msg_collection_restricted_content['ru'] = """<MSG_COLLECTION_RESTRICTED_CONTENT>"""
+msg_convert['ru'] = """<MSG_CONVERT>"""
+msg_agenda['ru'] = """<MSG_AGENDA>"""
+msg_webcast['ru'] = """<MSG_WEBCAST>"""
+msg_bulletin['ru'] = """<MSG_BULLETIN>""" 
+msg_library['ru'] = """<MSG_LIBRARY>"""
 </ru>
 
 ## Slovak:
@@ -979,6 +1019,11 @@ msg_latest_additions['sk'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['sk'] = """<MSG_MORE>"""
 msg_collection_contains_no_records['sk'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 msg_collection_restricted_content['sk'] = """<MSG_COLLECTION_RESTRICTED_CONTENT>"""
+msg_convert['sk'] = """<MSG_CONVERT>"""
+msg_agenda['sk'] = """<MSG_AGENDA>"""
+msg_webcast['sk'] = """<MSG_WEBCAST>"""
+msg_bulletin['sk'] = """<MSG_BULLETIN>""" 
+msg_library['sk'] = """<MSG_LIBRARY>"""
 </sk>
 
 ## Czech:
@@ -1085,6 +1130,11 @@ msg_latest_additions['cz'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['cz'] = """<MSG_MORE>"""
 msg_collection_contains_no_records['cz'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 msg_collection_restricted_content['cz'] = """<MSG_COLLECTION_RESTRICTED_CONTENT>"""
+msg_convert['cz'] = """<MSG_CONVERT>"""
+msg_agenda['cz'] = """<MSG_AGENDA>"""
+msg_webcast['cz'] = """<MSG_WEBCAST>"""
+msg_bulletin['cz'] = """<MSG_BULLETIN>""" 
+msg_library['cz'] = """<MSG_LIBRARY>"""
 </cz>
 
 ## Norwegian:
@@ -1191,6 +1241,11 @@ msg_latest_additions['no'] = """<MSG_LATEST_ADDITIONS>"""
 msg_more['no'] = """<MSG_MORE>"""
 msg_collection_contains_no_records['no'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
 msg_collection_restricted_content['no'] = """<MSG_COLLECTION_RESTRICTED_CONTENT>"""
+msg_convert['no'] = """<MSG_CONVERT>"""
+msg_agenda['no'] = """<MSG_AGENDA>"""
+msg_webcast['no'] = """<MSG_WEBCAST>"""
+msg_bulletin['no'] = """<MSG_BULLETIN>""" 
+msg_library['no'] = """<MSG_LIBRARY>"""
 </no>
 
 ## I18N messages oriented functions:
