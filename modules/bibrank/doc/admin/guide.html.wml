@@ -139,9 +139,20 @@ have the same name as the abbreviation stored in the database.
 
 <h4>Step 2 - Get necessary external data (ex. jif values)</h4>
 Check out bibrankgkb documentation below.
+
+</br></br><b>Example</b>
+<blockquote>
+<a href="jif.kb">jif.kb</a> -- sample data with the name of the journals and jif values.
+</blockquote>
+
 <h4>Step 3 - Create the configuration file</h4>
 The configuration files for the different rank methods has different option, so verify that you are using the correct
 configuration file and rank method.
+
+</br></br><b>Example</b>
+<blockquote>
+<a href="jif.cfg">jif.cfg</a> -- sample configuration file, for creating the ranking stars based on journal impact factor
+</blockquote>
 
 Single_tag_rank_method:
 <protect>
