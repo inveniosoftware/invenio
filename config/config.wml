@@ -58,6 +58,7 @@
 <lang:new id=ru short>
 <lang:new id=sk short>
 <lang:new id=cz short>
+<lang:new id=no short>
 
 ## This part defines essential CDSware internal parameters that
 ## everybody should modify, like the name of the server or the email
