@@ -17,11 +17,10 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = admin access personal publiline
+SUBDIRS = admin personal publiline
 
 docdir = $(WEBDIR)/submit
-doc_DATA=index.en.html index.fr.html index.de.html index.es.html index.pt.html index.it.html index.ru.html index.sk.html index.cz.html index.no.html \
-         Access.php Main.php approve.php direct.php index.php pro.php submit.php
+doc_DATA=Main.py approve.py direct.py pro.py submit.py index.py action.py summary.py
 
 EXTRA_DIST = $(wildcard *.wml)
 
@@ -31,42 +30,5 @@ CLEANFILES = $(doc_DATA) *~ *.tmp
            ../../../config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
 
-%.en.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
-           ../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-
-%.fr.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
-           ../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_FR:$@ $<
-
-%.de.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
-           ../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_DE:$@ $<
-
-%.es.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
-           ../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_ES:$@ $<
-
-%.pt.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
-           ../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_PT:$@ $<
-
-%.it.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
-           ../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_IT:$@ $<
-
-%.ru.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
-           ../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_RU:$@ $<
-
-%.sk.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
-           ../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_SK:$@ $<
-
-%.cz.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
-           ../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_CZ:$@ $<
-
-%.no.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
-           ../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_NO:$@ $<
+%.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml
+	$(WML) -o $@ $<
