@@ -380,6 +380,77 @@ msg_add_another_collection['es'] = """<MSG_ADD_ANOTHER_COLLECTION>"""
 msg_guest['es'] = """<MSG_GUEST>"""
 </es>
 
+## Portuguese:
+<pt>
+msg_home['pt'] = """<MSG_HOME>"""
+msg_search['pt'] = """<MSG_SEARCH>"""
+msg_submit['pt'] = """<MSG_SUBMIT>"""
+msg_help['pt'] = """<MSG_HELP>"""
+msg_help_central['pt'] = """<MSG_HELP_CENTRAL>"""
+msg_search_help['pt'] = """<MSG_SEARCH_HELP>"""
+msg_search_tips['pt'] = """<MSG_SEARCH_TIPS>"""
+msg_personalize['pt'] = """<MSG_PERSONALIZE>"""
+msg_collection_not_found_head['pt'] = """<MSG_COLLECTION_NOT_FOUND_HEAD>"""
+msg_collection_not_found_body['pt'] = """<MSG_COLLECTION_NOT_FOUND_BODY>"""
+msg_home['pt'] = """<MSG_HOME>"""
+msg_powered_by['pt'] = """<MSG_POWERED_BY>"""
+msg_maintained_by['pt'] = """<MSG_MAINTAINED_BY>"""
+msg_last_updated['pt'] = """<MSG_LAST_UPDATED>"""
+msg_narrow_search['pt'] = """<MSG_NARROW_SEARCH>"""
+msg_focus_on['pt'] = """<MSG_FOCUS_ON>"""
+msg_simple_search['pt'] = """<MSG_SIMPLE_SEARCH>"""
+msg_advanced_search['pt'] = """<MSG_ADVANCED_SEARCH>"""
+msg_account['pt'] = """<MSG_ACCOUNT>"""
+msg_alerts['pt'] = """<MSG_ALERTS>"""
+msg_baskets['pt'] = """<MSG_BASKETS>"""
+msg_session['pt'] = """<MSG_SESSION>"""
+msg_login['pt'] = """<MSG_LOGIN>"""
+msg_logout['pt'] = """<MSG_LOGOUT>"""
+msg_language['pt'] = """<MSG_LANGUAGE>"""
+msg_browse['pt'] = """<MSG_BROWSE>"""
+msg_search_records_for['pt'] = """<MSG_SEARCH_RECORDS_FOR>"""
+msg_any_field['pt'] = """<MSG_ANY_FIELD>"""
+msg_title['pt'] = """<MSG_TITLE>"""
+msg_author['pt'] = """<MSG_AUTHOR>"""
+msg_report_number['pt'] = """<MSG_REPORT_NUMBER>"""
+msg_year['pt'] = """<MSG_YEAR>"""
+msg_abstract['pt'] = """<MSG_ABSTRACT>"""
+msg_keyword['pt'] = """<MSG_KEYWORD>"""
+msg_fulltext['pt'] = """<MSG_FULLTEXT>"""
+msg_reference['pt'] = """<MSG_REFERENCE>"""
+msg_all_of_the_words['pt'] = """<MSG_ALL_OF_THE_WORDS>"""
+msg_any_of_the_words['pt'] = """<MSG_ANY_OF_THE_WORDS>"""
+msg_exact_phrase['pt'] = """<MSG_EXACT_PHRASE>"""
+msg_partial_phrase['pt'] = """<MSG_PARTIAL_PHRASE>"""
+msg_regular_expression['pt'] = """<MSG_REGULAR_EXPRESSION>"""
+msg_and['pt'] = """<MSG_AND>"""
+msg_or['pt'] = """<MSG_OR>"""
+msg_and_not['pt'] = """<MSG_AND_NOT>"""
+msg_search_results['pt'] = """<MSG_SEARCH_RESULTS>"""
+msg_try_your_search_on['pt'] = """<MSG_TRY_YOUR_SEARCH_ON>"""
+msg_sort_by['pt'] = """<MSG_SORT_BY>"""
+msg_latest_first['pt'] = """<MSG_LATEST_FIRST>"""
+msg_ascending['pt'] = """<MSG_ASCENDING>"""
+msg_descending['pt'] = """<MSG_DESCENDING>"""
+msg_display_results['pt'] = """<MSG_DISPLAY_RESULTS>"""
+msg_results['pt'] = """<MSG_RESULTS>"""
+msg_single_list['pt'] = """<MSG_SINGLE_LIST>"""
+msg_split_by_collection['pt'] = """<MSG_SPLIT_BY_COLLECTION>"""
+msg_output_format['pt'] = """<MSG_OUTPUT_FORMAT>"""
+msg_brief['pt'] = """<MSG_BRIEF>"""
+msg_detailed['pt'] = """<MSG_DETAILED>"""
+msg_detailed_record['pt'] = """<MSG_DETAILED_RECORD>"""
+msg_results_overview_found_x_records_in_y_seconds['pt'] = """<MSG_RESULTS_OVERVIEW_FOUND_X_RECORDS_IN_Y_SECONDS>"""
+msg_x_records_found['pt'] = """<MSG_X_RECORDS_FOUND>"""
+msg_jump_to_record['pt'] = """<MSG_JUMP_TO_RECORD>"""
+msg_search_took_x_seconds['pt'] = """<MSG_SEARCH_TOOK_X_SECONDS>"""
+msg_add_to_basket['pt'] = """<MSG_ADD_TO_BASKET>"""
+msg_collections['pt'] = """<MSG_COLLECTIONS>"""
+msg_any_collection['pt'] = """<MSG_ANY_COLLECTION>"""
+msg_add_another_collection['pt'] = """<MSG_ADD_ANOTHER_COLLECTION>"""
+msg_guest['pt'] = """<MSG_GUEST>"""
+</pt>
+
 ## Italian:
 <it>
 msg_home['it'] = """<MSG_HOME>"""
@@ -669,7 +740,7 @@ msg_guest['cz'] = """<MSG_GUEST>"""
 def wash_language(ln):
     """Look at LN and check if it is one of allowed languages for the interface.
        Return it in case of success, return 'en' otherwise."""
-    if ln in ['cz', 'de', 'en', 'es', 'fr', 'it', 'ru', 'sk']:
+    if ln in ['cz', 'de', 'en', 'es', 'fr', 'it', 'pt', 'ru', 'sk']:
         return ln
     else:
         return 'en'
@@ -678,7 +749,7 @@ def create_language_selection_box(urlargs="", language="en"):
     """Take URLARGS and LANGUAGE and return textual language
        selection box for the given page."""
     out = ""
-    for lang in ['cz', 'de', 'en', 'es', 'fr', 'it', 'ru', 'sk']:
+    for lang in ['cz', 'de', 'en', 'es', 'fr', 'it', 'pt', 'ru', 'sk']:
         if lang == language:
             out += """<span class="langinfo">%s</span> | """ % string.upper(lang)
         else:

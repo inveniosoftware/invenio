@@ -50,6 +50,7 @@ cdsnameintl = {}
 <de>cdsnameintl['de'] = "<CDSNAMEINTL>"</de>
 <en>cdsnameintl['en'] = "<CDSNAMEINTL>"</en>
 <es>cdsnameintl['es'] = "<CDSNAMEINTL>"</es>
+<pt>cdsnameintl['pt'] = "<CDSNAMEINTL>"</pt>
 <fr>cdsnameintl['fr'] = "<CDSNAMEINTL>"</fr>
 <it>cdsnameintl['it'] = "<CDSNAMEINTL>"</it>
 <ru>cdsnameintl['ru'] = "<CDSNAMEINTL>"</ru>
