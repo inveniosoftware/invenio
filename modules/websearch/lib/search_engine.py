@@ -2074,7 +2074,7 @@ def print_results_overview(colls, results_final_nb_total, results_final_nb, cpu_
     # then print hits per collection:
     out += "<tbody><tr><td class=\"searchresultsboxbody\">"
     for coll in colls:
-        if results_final_nb[coll] > 0:
+        if results_final_nb.has_key(coll) and results_final_nb[coll] > 0:
             out += "<strong><a href=\"#%s\">%s</a></strong>, " \
                   "<a href=\"#%s\">%s records found</a><br>" \
                   % (urllib.quote(coll), coll, urllib.quote(coll), nice_number(results_final_nb[coll]))
@@ -2935,6 +2935,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 print_warning(req, "No match found, please enter different search terms.")
         else:
             # yes, some hits found: good!
+            # collection list may have changed due to not-exact-match-found policy so check it out:
+            for coll in results_final.keys(): 
+                if coll not in colls_to_search:
+                    colls_to_search.append(coll)
             # print results overview:
             if of == "id":
                 # we have been asked to return list of recIDs
@@ -2944,10 +2948,6 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 return results_final_for_all_colls.items().tolist()
             elif of.startswith("h"):
                 req.write(print_results_overview(colls_to_search, results_final_nb_total, results_final_nb, cpu_time))
-            # collection list may have changed due to not-exact-match-found policy so check it out:
-            for coll in results_final.keys(): 
-                if coll not in colls_to_search:
-                    colls_to_search.append(coll)
             # print records:
             if len(colls_to_search)>1:
                 cpu_time = -1 # we do not want to have search time printed on each collection
