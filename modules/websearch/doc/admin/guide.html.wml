@@ -393,7 +393,6 @@ physical MARC tags for a logical field, you have to use the <a
 href="<WEBURL>/admin/bibindex/">BibIndex Admin</a> interface.
 
 <a name="3.7"></a><h3>3.7 Modify search options</h3>
-
 <p>The <em>search option</em> is a search field that contains
 interesting predefined values that the end user will be able to choose
 from.  So, on the contrary to the <a href="">search field</a>, you
@@ -402,11 +401,15 @@ but to choose an option from the given list.  For example, "author" is
 a good example of a search field, while, "subject" is a good example
 of a search option.
 
+<p>By using search options you can narrow down a search to a certain subject, documents from a specific division or similar. The options added to a collection is shown in the 'Advance search' interface in the same order as specified in the admin interface. To add a search option, the type of the option must first be chosen (example: division, subject, experiment) and then the category must be chosen (example: CERN LHC, Mathematic, Physics - Muons).
+
 <p>The search options are shown in the "Advanced Search" interfaces in
 the same order as they appear in the WebSearch Admin interface. To add
 a search option, the field name must first be chosen (for example,
 subject) and then the list field values must be entered (for example,
 Mathematics, Physics, Chemistry, etc).
+
+To edit the fields/categories go to the BibIndex interfaces
 
 <a name="3.8"></a><h3>3.8 Modify sort options</h3>
 
