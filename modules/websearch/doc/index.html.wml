@@ -96,24 +96,6 @@
    </tbody>
    </table>
 </ru>
-<no>
-   <p><table class="errorbox">
-   <thead>
-   <tr>
-   <th class="errorboxheader">
-     <MSG_PAGE_BEING_TRANSLATED_HEAD>
-   </th>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-     <MSG_PAGE_BEING_TRANSLATED_BODY>
-   </td>
-   </tr>
-   </tbody>
-   </table>
-</no>
 
 <p><en>Find out all about searching</en>
    <fr>Trouvez tout sur la recherche de</fr>
@@ -124,7 +106,7 @@
    <ru>Find out all about searching</ru>
    <sk>Tu nájdete všetko čo sa týka hľadania na serveri</sk>
    <cz>Zde naleznete vše co se týče vyhledávání na serveru</cz>
-   <no>Find out all about searching</no>
+   <no>Finn ut alt om søking i</no>
    <CDSNAMEINTL>:
 
 <blockquote>
@@ -170,8 +152,8 @@
       plně využívat možností <CDSNAMEINTL>.
     </cz>  
     <no>
-      This page presents you with useful tips and techniques in order to
-      help you use the <CDSNAMEINTL> site to the full.
+      Denne siden presenter nyttige tips og teknikker slik at du lettere kan få
+      fullt utbytte av <CDSNAMEINTL> sine sider.
     </no>  
 
 </dl>

@@ -96,24 +96,6 @@
    </tbody>
    </table>
 </ru>
-<no>
-   <p><table class="errorbox">
-   <thead>
-   <tr>
-   <th class="errorboxheader">
-     <MSG_PAGE_BEING_TRANSLATED_HEAD>
-   </th>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-     <MSG_PAGE_BEING_TRANSLATED_BODY>
-   </td>
-   </tr>
-   </tbody>
-   </table>
-</no>
 
 <p>
 <en>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</en>
@@ -125,7 +107,7 @@
 <ru>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</ru>
 <sk>Víta Vás <MSG_HELP_CENTRAL> <CDSNAMEINTL>.</sk>
 <cz>Vítá Vás <MSG_HELP_CENTRAL> <CDSNAMEINTL>.</cz>
-<no>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</no>
+<no>Velkommen til <MSG_HELP_CENTRAL> for <CDSNAMEINTL>.</no>
 
 <blockquote>
 <dl>
@@ -140,7 +122,7 @@
     <ru>Get help with searching <CDSNAMEINTL>.</ru>
     <sk>Pomoc pre hľadanie <CDSNAMEINTL>.</sk>
     <cz>Nápověda pro hledání <CDSNAMEINTL>.</cz>
-    <no>Get help with searching <CDSNAMEINTL>.</no>
+    <no>Få hjelp til søking i <CDSNAMEINTL>.</no>
 <dt><a href="submit/<lang:star: index.*.php>"><MSG_SUBMIT_HELP></a>
 <dd><en>Get help with submitting to <CDSNAMEINTL>.</en>
     <fr>Obtenez de l'aide avec la soumission dans <CDSNAMEINTL>.</fr>
@@ -151,6 +133,6 @@
     <ru>Get help with submitting to <CDSNAMEINTL>.</ru>
     <sk>Pomoc pre pridávanie do <CDSNAMEINTL>.</sk>
     <cz>Nápověda pro přidávaní do <CDSNAMEINTL>.</cz>
-    <no>Get help with submitting to <CDSNAMEINTL>.</no>
+    <no>Få hjelp til innsending til <CDSNAMEINTL>.</no>
 </dl>
 </blockquote>
