@@ -294,8 +294,8 @@ via both a high-level and low-level API interface.
              'f' and matching type 'm'.  Return hitset of recIDs.
           
              All the parameters are assumed to have been previously washed.
-             'p' is assumed already being a ``basic search unit'' so that it
-             is search as such and is not broken up in any way.  Only
+             'p' is assumed to be already a ``basic search unit'' so that it
+             is searched as such and is not broken up in any way.  Only
              wildcard and span queries are being detected inside 'p'.
       
              This function is suitable as a low-level API.
