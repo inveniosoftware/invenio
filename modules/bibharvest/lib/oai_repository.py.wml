@@ -56,6 +56,15 @@ verbs = {
     "GetRecord"	          : [""]
 }
 
+params = {
+    "verb" : ["Identify","ListIdentifiers","ListSets","ListMetadataFormats","ListRecords","GetRecord"],
+    "metadataPrefix" : ["","oai_dc","marcxml"],
+    "from" :[""],
+    "until":[""],
+    "set" :[""],
+    "identifier": [""]
+}
+
 <protect>
 
 def encode_for_xml(s):
@@ -809,7 +818,13 @@ def parse_args(args=""):
         for item in list_of_arguments:
             keyvalue = item.split('=')
             if len(keyvalue) == 2:
-                out_args[keyvalue[0]] = urllib.unquote(keyvalue[1])
+                if (out_args.has_key(keyvalue[0])):
+                    if(out_args[keyvalue[0]] != ""):
+                        out_args[keyvalue[0]] = "Error"
+                    else:
+                        out_args[keyvalue[0]] = urllib.unquote(keyvalue[1])
+                else:
+                    out_args[keyvalue[0]] = urllib.unquote(keyvalue[1])
             else:
                 out_args['verb'] = ""
 
@@ -817,6 +832,16 @@ def parse_args(args=""):
 
 def check_args(arguments):
     "Check OAI arguments"
+
+    out_args = {
+        "verb"             : "",
+        "metadataPrefix"   : "",
+        "from"             : "",
+        "until"            : "",
+        "set"              : "",
+        "identifier"       : "",
+        "resumptionToken"  : ""
+    }
 
     out = ""
 
@@ -827,6 +852,22 @@ def check_args(arguments):
         pass
     else:
         out = out + oai_error("badVerb","Illegal OAI verb")
+
+## defined args
+#
+#
+    for param in arguments.keys():
+        if out_args.has_key(param):
+            pass
+        else:
+            out = out + oai_error("badArgument","The request includes illegal arguments")
+
+## unique args
+#
+#
+    for param in arguments.keys():
+        if (arguments[param] == "Error"):
+            out = out + oai_error("badArgument","The request includes illegal arguments")
 
 ## resumptionToken exclusive
 #
@@ -867,7 +908,7 @@ def check_args(arguments):
     if (arguments['verb']=="Identify" and (arguments['metadataPrefix']!="" or arguments['identifier']!="" or arguments['set']!="" or arguments['from']!="" or arguments['until']!="" or arguments['resumptionToken']!="")):
         out = out + oai_error("badArgument","The request includes illegal arguments")
 
-## parameters for GetRecord 
+## parameters for GetRecord
 #
 #
     if arguments['verb']=="GetRecord" and arguments['identifier'] == "":
@@ -883,6 +924,15 @@ def check_args(arguments):
     if (arguments['verb']=="ListRecords" or arguments['verb']=="ListIdentifiers") and (arguments['metadataPrefix'] == "" and arguments['resumptionToken'] == ""):
         out = out + oai_error("badArgument","Missing metadataPrefix")
 
+## Metadata prefix defined
+#
+#
+    if arguments.has_key('metadataPrefix'):
+        if ((arguments['metadataPrefix'] in params['metadataPrefix']) or (params['metadataPrefix'] == "")):
+            pass
+        else:
+            out = out + oai_error("badArgument","Missing metadataPrefix")
+            
     return out
- 
+
 </protect>
