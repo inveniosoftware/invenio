@@ -192,6 +192,11 @@ Contents
           configuration step b)" in the elucidative explanatory
           commentary below.
 
+          An important variable to edit if you want to use the webSubmit and
+          the admin modules in general is ADMINEMAIL. Enter your email address
+          here and login with this address when using these modules. You will 
+          then be automatically recognized as superuser for the system.
+
       $ gmake
 
           Launch the CDSware build.  All the pages will be pre-created
