@@ -74,7 +74,5 @@ min_nr_words_docs = 3
 max_nr_words_upper = 20
 #if a document contains less than 10 terms, use much used terms too, if not ignore them
 max_nr_words_lower = 10
-#override minimum relevance value and use the one from search_engine?
-override_default_min_relevance = no
 #default minimum relevance value to use for find similar
 default_min_relevance = 75
