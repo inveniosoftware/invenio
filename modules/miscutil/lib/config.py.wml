@@ -57,6 +57,7 @@ cdsnameintl = {}
 <ru>cdsnameintl['ru'] = "<CDSNAMEINTL>"</ru>
 <sk>cdsnameintl['sk'] = "<CDSNAMEINTL>"</sk>
 <cz>cdsnameintl['cz'] = "<CDSNAMEINTL>"</cz>
+<no>cdsnameintl['no'] = "<CDSNAMEINTL>"</no>
 
 cfg_apache_password_file = "<CFG_APACHE_PASSWORD_FILE>"
 cfg_apache_group_file = "<CFG_APACHE_GROUP_FILE>"

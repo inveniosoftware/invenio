@@ -86,6 +86,7 @@ Atlantis Institute of Fictive Science
  <ru>Атлантис Институт фиктивных Наук</ru>
  <sk>Atlantis Inštitút Fiktívnych Vied</sk>
  <cz>Atlantis Institut Fiktivních Věd</cz>
+ <no>Atlantis Institutt for Fiktiv Vitenskap</no>
 </define-tag>
 
 ## CDSLANG -- the default language of the interface:
@@ -98,12 +99,12 @@ en
 ## available in, separated by commas.  The order specified below will
 ## be respected on the interface pages.  A good default would be to
 ## use the alphabetical order.  Currently supported languages include
-## Czech, German, English, Spanish, French, Italian, Portuguese,
-## Russian, and Slovak, so the eventual maximum is
-## "cz,de,en,es,fr,it,pt,ru,sk".
-##  (example: "de,en,fr")
+## Czech, German, English, Spanish, French, Italian, Norwegian,
+## Portuguese, Russian, and Slovak, so that the current eventual
+## maximum you can select is "cz,de,en,es,fr,it,no,pt,ru,sk".
+##  (example: "de,en,fr,it")
 <define-tag CDSLANGS whitespace=delete>
-cz,de,en,es,fr,it,pt,ru,sk
+cz,de,en,es,fr,it,no,pt,ru,sk
 </define-tag>
 
 ## ALERTENGINEEMAIL -- the email address from which the alert emails will appear to be send:

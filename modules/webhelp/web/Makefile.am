@@ -21,7 +21,7 @@ SUBDIRS = admin hacking
 
 docdir = $(WEBDIR)/help
 
-doc_DATA=index.en.html index.fr.html index.de.html index.pt.html index.es.html index.it.html index.ru.html index.sk.html index.cz.html
+doc_DATA=index.en.html index.fr.html index.de.html index.pt.html index.es.html index.it.html index.ru.html index.sk.html index.cz.html index.no.html
 
 EXTRA_DIST = $(wildcard *.wml)
 
@@ -62,3 +62,7 @@ CLEANFILES = $(doc_DATA) *~ *.tmp
 %.cz.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
            ../../../config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_CZ:$@ $<
+
+%.no.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
+           ../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_NO:$@ $<
