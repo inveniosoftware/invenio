@@ -48,12 +48,24 @@ except ImportError, e:
     import sys
     sys.exit(1)
 
+http_response_status_code = {
+
+    "000" : "Unknown",
+    "100" : "Continue",
+    "200" : "OK",
+    "302" : "Redirect",
+    "403" : "Forbidden",
+    "404" : "Not Found",
+    "500" : "Error",
+    "503" : "Service Unavailable"
+}
+
 def http_param_resume(http_param_dict,resumptionToken):
     "Change parameter dictionary for harvest resumption"
 
     http_param = {
-     'verb'            : http_param_dict['verb'],
-     'resumptionToken' : resumptionToken
+        'verb'            : http_param_dict['verb'],
+        'resumptionToken' : resumptionToken
     }
     
     return http_param
@@ -76,41 +88,49 @@ def http_request_parameters(http_param_dict, method="POST"):
             if http_param_dict[key]:
                 http_param[key] = http_param_dict[key]
         params = urllib.urlencode(http_param)
-        
+    
     return params
 
 def OAI_Session(server, script, http_param_dict ,method="POST",output="", stylesheet=""):
     "Handle OAi session"
 
+    sys.stderr.write("Starting the harvesting session at %s" %  time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
+    sys.stderr.write("%s - %s\n" % (server, http_request_parameters(http_param_dict)))
+
     a = OAI_Request(server, script, http_request_parameters(http_param_dict, method), method)
+
     rt_obj = re.search('>.*</resumptionToken>',a)
+
     i = 0
 
-    while rt_obj != None:
+    while rt_obj != None and rt_obj !="":
+
         if output:
-            filename       = "%s.%07d" % (output,i)
-            fileoutput     = open(filename,"w")
-            fileoutput.write(a)
-            fileoutput.close()
+            write_file( "%s.%07d" % (output,i), a)
         else:
             sys.stdout.write(a)
 
         i = i + 1
+
         time.sleep(1)
 
         http_param_dict = http_param_resume(http_param_dict,rt_obj.group()[1:-18])
-        
+
         a = OAI_Request(server, script, http_request_parameters(http_param_dict, method), method)
+
         rt_obj = re.search('>.*</resumptionToken>',a)
 
     if output:
-        filename       = "%s.%07d" % (output,i)
-        fileoutput     = open(filename,"w")
-        fileoutput.write(a)
-        fileoutput.close()
-
+        write_file("%s.%07d" % (output,i),a)
     else:
         sys.stdout.write(a)
+
+def write_file(filename="harvest",a=""):
+    "Writes a to filename"
+
+    f = open(filename,"w")
+    f.write(a)
+    f.close()
 
 def help():
     "Print out info"
@@ -131,41 +151,72 @@ def help():
 
 def OAI_Request(server, script, params, method="POST"):
     "Handle OAi request"
+ 
+</protect>
 
-    headers = {"Content-type":"application/x-www-form-urlencoded", "Accept":"text/xml"}
+    headers = {"Content-type":"application/x-www-form-urlencoded", "Accept":"text/xml", "From":"<ADMINEMAIL>", "User-Agent":"CDSware <VERSION>"}
+
+<protect>
 
     i = 0
     while i < 10:
         i = i + 1
         conn = httplib.HTTPConnection(server)
         if method == "GET":
-            conn.request("GET", script + "?" + params)
+
+</protect>
+
+            conn.putrequest(method,script + "?" + params)
+            conn.putheader("Content-type","application/x-www-form-urlencoded")
+            conn.putheader("Accept","text/xml")
+            conn.putheader("From","<ADMINEMAIL>")
+            conn.putheader("User-Agent","<CDSNAME>")
+            conn.endheaders()
+
+<protect>
+
         elif method == "POST":
             conn.request("POST", script, params, headers)
             
         response = conn.getresponse()
+
+        status = "%d" % response.status
+
+        if http_response_status_code.has_key(status):
+            sys.stderr.write("%s(%s) : %s : %s\n" % (status, http_response_status_code[status], response.reason, params))
+        else:
+            sys.stderr.write("%s(%s) : %s : %s\n" % (status, http_response_status_code['000'], response.reason, params))
 
         if response.status == 200:
             i = 10
             data = response.read()
             conn.close()
             return data
+
         elif response.status == 503:
+            sys.stderr.write("Retry in %d seconds...\n" % string.atoi(response.getheader("Retry-After","%d" % (i*i))))
             time.sleep(string.atoi(response.getheader("Retry-After","%d" % (i*i))))
+
         elif response.status == 302:
+            sys.stderr.write("Redirecting...\n")
             server    = response.getheader("Location").split("/")[2]
             script    = "/" + string.join(response.getheader("Location").split("/")[3:],"/")
+
         else:
-            time.sleep(1)
+            sys.stderr.write("Retry in 10 seconds...\n")
+            time.sleep(10)
 
-    sys.stderr.write("Harvesting interrupted (after 10 attempts): %s" % params)
+
+    sys.stderr.write("Harvesting interrupted (after 10 attempts) at %s: %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime())),params)
+
     sys.exit(1)
-
 
 def main():
     "Main"
 
-    opts, args = getopt.getopt(sys.argv[1:],"hVno:v:m:p:i:s:f:u:r:x:",
+
+    try:
+        opts, args = getopt.getopt(sys.argv[1:],"hVo:v:m:p:i:s:f:u:r:x:",
                  [ 
                    "help",
                    "version",
@@ -179,8 +230,11 @@ def main():
                    "until",
                    "resumptionToken"
                  ]
-    )
-
+        )
+    except getopt.error:
+        help()
+        sys.exit(1)
+		
     http_param_dict        = {}
     method                 = "POST"
     output                 = ""
@@ -220,6 +274,7 @@ def main():
         server    = args[0].split("/")[2]
         script    = "/" + string.join(args[0].split("/")[3:],"/")
         OAI_Session(server, script, http_param_dict, method, output, stylesheet)
+        sys.stderr.write("Harvesting successfully completed at: %s\n\n" % time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
 
     else:
         help()
