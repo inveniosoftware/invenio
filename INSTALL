@@ -27,7 +27,11 @@ Contents
      a) Unix-like operating system.  The main development and
         production platform for CDSware at CERN is Debian GNU/Linux,
         but any Unix system supporting the software listed below
-        should do.
+        should do.  Note that localhost should have an MTA running
+        so that CDSware can email notification alerts or registration
+        information to the end users, contact moderators and
+        reviewers of submitted documents, inform administrators about
+        various runtime system information, etc.
 
      b) MySQL server (may be on a remote machine), and MySQL client
         (must be available locally too).  Version 4.1.0 and above is
