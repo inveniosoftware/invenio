@@ -1,0 +1,125 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="Word Similarity/Similar Records Methods" \
+    navbar_name="hacking-bibrank" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a>  &gt; <a class=navtrail href=<WEBURL>/hacking/bibrank/>BibRank Internals</a> " \
+    navbar_select="hacking-bibrank-index" 
+
+<pre>
+<blockquotes>
+When running a rank method, the first thing that happen after the configuration file is loaded, is that 
+the records that should be taken into account are found. This can be done either by specifying a modification 
+date, any records modified between two date will then be added, a record id range, a collection or the last update 
+time of the method.
+Then the function responsible for creating the rank method specified in the configuration file will be called. 
+In this case the word_similarity function.
+
+Because of tight connection with the search_engine and database, there can only be one method using the 
+"word_similarity" template, and the code for this method as designated in the BibRank admin interface has to be 'wrd'.
+
+The 'Word similarity' method works by generating an index over terms in the tags specified in the configuration 
+file for the given records. The data is stored in two tables, on forward and one reverse. The forward index has 
+a list of terms, where each term as a dictionary containing records using this term. The reverse index contains 
+the opposite, a list of records, where each record contains a dictionary of the terms it contains (for the selected tags).
+This means that the forward/reverse index is to some degree similar to the tables created by BibIndex.
+
+The main difference is that the rank method stores more information in the table, based on how important the 
+terms are, based on how many times they have been used, and how important one term is in one record. To minimize 
+the number of terms to process, some techniques are used. Among these are stemming and stopword removal. Stemming 
+removes the end of a term, so that only the stem is left, this means that 'looking' becomes 'look' and minimizes 
+the size of the database. Stopword removal removes very common words without meaning, like 'the', 'one', 'me' 
+in english.
+
+Since automatic language recognisition is not supported, each tag must therefore be given a language for stemming
+to work. This means that in the perfect world one tag should contain text in one language or mostly in one 
+language. If stemming is not wanted, the module can be turned off, though lower rank quality may be expected.
+
+Stopword removal works by checking if a term exists in a file, which can contain any language necessary. Together 
+with the default cdsware installation, the file contains stopwords in french and english.
+
+How the term importance is computed:
+The method used is a variation of the well-known weighting scheme, the vector model [1], in document retrieval. 
+The method is described in [2] and called 'Log-entropy' weigthing scheme. For more detailed explanation of the 
+scheme, the paper should be consulted.
+Since the calculations necessary to calculate the number needed by the method is too demanding, most of the numbers 
+are calculated after the index over term is created and stored in the database for later use. 
+
+Word Similarity: How the ranking is done for the query 'higgs boson':
+1. For each term, check if it can be used (like check agains stopword list), use stemming on the term if possible.
+2. For each term, get dictionary from forward index, calculate values for each term.
+3. Add any records not ranked to end of list.
+4. Sort records.
+5. Return sorted records
+
+Similar records: How the ranking is done for a random choosen record: 
+1. Get terms from reverse index which exists in record.
+2. Sort terms and use only the most important ones for finding similar records.
+3. For selected terms, rank the associated records
+4. Sort records
+5. Return sorted records
+
+Configuration file:
+
+[rank_method]
+function = word_similarity
+
+[word_similarity]
+stem_if_avail = yes
+stem_query_language = <CDSLANG>
+table = rnkWORD01F
+stopword = <ETCDIR>/bibrank/stopwords.kb
+relevance_number_output_prologue = (
+relevance_number_output_epilogue = )
+
+#MARC tag,tag points, tag language
+tag1 = 6531_a, 1, <cdslang> #keyword
+tag2 = 695__a, 1, <cdslang> #keyword
+tag3 = 6532_a, 1, <cdslang> #keyword
+tag4 = 245__%, 10, <cdslang>#title
+tag5 = 246_% , 1, fr #french title
+tag6 = 250__a, 1, <cdslang> #title
+tag7 = 711__a, 1, <cdslang> #title
+tag8 = 210__a, 1, <cdslang> #abbreviated
+tag9 = 222__a, 1, <cdslang> #key title
+
+[find_similar]
+#term should exist in maximum X/100% of documents
+max_word_occurence = 0.05
+#term should exist in minimum X/100% of documents
+min_word_occurence = 0.00
+#term should be atleast 3 characters long
+min_word_length = 3
+#term should be in atleast 3 documents or more
+min_nr_words_docs = 3
+#do not use more than 20 terms for "find similar"
+max_nr_words_upper = 20
+#if a document contains less than 10 terms, use much used terms too, if not ignore them
+max_nr_words_lower = 10
+#override minimum relevance value and use the one from search_engine?
+override_default_min_relevance = no
+#default minimum relevance value to use for find similar
+default_min_relevance = 75
+
+[1] Modern Information Retrieval. Baeza-Yates/Ribeiro-Neto
+[2] New term weighting formulas for the vector space method in information retrieval. ORNL/TM-13756.E.Chisholm/T.G.Kolda
+
+</pre>
+</blockquotes>
