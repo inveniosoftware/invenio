@@ -21,48 +21,22 @@ SUBDIRS = howto
 
 docdir = $(WEBDIR)/admin
 
-doc_DATA=index.en.html index.fr.html index.de.html index.es.html index.pt.html index.it.html index.ru.html index.sk.html index.cz.html index.no.html
+doc_DATA=index.en.html index.fr.html index.de.html index.es.html index.pt.html index.it.html index.ru.html index.sk.html index.cz.html index.no.html index.se.html
 
 EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 
-%.en.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
+%.en.html %.fr.html %.de.html %.es.html %.pt.html %.it.html %.ru.html %.sk.html %.cz.html %.no.html %.se.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
            ../../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-
-%.fr.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
-           ../../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_FR:$@ $<
-
-%.de.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
-           ../../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_DE:$@ $<
-
-%.es.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
-           ../../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_ES:$@ $<
-
-%.pt.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
-           ../../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_PT:$@ $<
-
-%.it.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
-           ../../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_IT:$@ $<
-
-%.ru.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
-           ../../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_RU:$@ $<
-
-%.sk.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
-           ../../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_SK:$@ $<
-
-%.cz.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
-           ../../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_CZ:$@ $<
-
-%.no.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
-           ../../../../config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_NO:$@ $<
+	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$*.en.html \
+	       -o\(ALL-LANG_*\)+LANG_FR:$*.fr.html \
+	       -o\(ALL-LANG_*\)+LANG_DE:$*.de.html \
+	       -o\(ALL-LANG_*\)+LANG_ES:$*.es.html \
+	       -o\(ALL-LANG_*\)+LANG_PT:$*.pt.html \
+	       -o\(ALL-LANG_*\)+LANG_IT:$*.it.html \
+	       -o\(ALL-LANG_*\)+LANG_RU:$*.ru.html \
+	       -o\(ALL-LANG_*\)+LANG_SK:$*.sk.html \
+	       -o\(ALL-LANG_*\)+LANG_CZ:$*.cz.html \
+	       -o\(ALL-LANG_*\)+LANG_NO:$*.no.html \
+	       -o\(ALL-LANG_*\)+LANG_SE:$*.se.html $<
