@@ -155,6 +155,7 @@ Contents
               expose_php = off
               max_execution_time = 160
 	      register_globals = on
+	      short_open_tag = on
 
           This is to tell PHP that we will be using our own session
           handler and our own garbage collector.  Also, it sets up
