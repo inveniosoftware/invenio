@@ -55,6 +55,7 @@ import unicodedata
 from config import *
 from messages import *
 from search_engine_config import *
+from bibrank_record_sorter import get_bibrank_methods,rank_records
 from dbquery import run_sql
 try:
     from webuser import getUid
@@ -75,7 +76,7 @@ re_equal = sre.compile('\=')
 re_logical_and = sre.compile('\sand\s', sre.I)
 re_logical_or = sre.compile('\sor\s', sre.I)
 re_logical_not = sre.compile('\snot\s', sre.I)
-re_operands = sre.compile(r'\s([\+\-\|])\s')
+re_operators = sre.compile(r'\s([\+\-\|])\s')
 
 def get_alphabetically_ordered_collection_list(collid=1, level=0):
     """Returns nicely ordered (score respected) list of collections, more exactly list of tuples
@@ -138,8 +139,8 @@ def get_words_from_pattern(pattern):
 
 def create_basic_search_units(req, p, f, m=None):
     """Splits search pattern and search field into a list of independently searchable units.
-       - A search unit consists of '(operand, pattern, field, type, hitset)' tuples where
-          'operand' is set union (|), set intersection (+) or set exclusion (-);
+       - A search unit consists of '(operator, pattern, field, type, hitset)' tuples where
+          'operator' is set union (|), set intersection (+) or set exclusion (-);
           'pattern' is either a word (e.g. muon*) or a phrase (e.g. 'nuclear physics');
           'field' is either a code like 'title' or MARC tag like '100__a';
           'type' is the search type ('w' for word file search, 'a' for access file search).
@@ -211,20 +212,20 @@ def create_basic_search_units(req, p, f, m=None):
             p = re_logical_and.sub(" ", p)
             p = re_logical_or.sub(" |", p)
             p = re_logical_not.sub(" -", p)
-            p = re_operands.sub(r' \1', p)
+            p = re_operators.sub(r' \1', p)
             for pi in split(p): # iterate through separated units (or items, as "pi" stands for "p item")
                 pi = sre.sub("__SPACE__", " ", pi) # replace back '__SPACE__' by ' ' 
                 pi = sre.sub("__SPACEBIS__", " ", pi) # replace back '__SPACEBIS__' by ' '
-                # firstly, determine set operand
+                # firstly, determine set operator
                 if pi[0] == '+' or pi[0] == '-' or pi[0] == '|':
                     if len(opfts) or pi[0] == '-': # either not first unit, or '-' for the first unit
                         oi = pi[0]
                     else:
-                        oi = "|" # we are in the first unit and operand is not '-', so let us do 
+                        oi = "|" # we are in the first unit and operator is not '-', so let us do 
                                  # set union (with still null result set) 
                     pi = pi[1:]
                 else:
-                    # okay, there is no operand, so let us decide what to do by default
+                    # okay, there is no operator, so let us decide what to do by default
                     if len(opfts):
                         oi = '+' # by default we are doing set intersection...
                     else:
@@ -444,8 +445,8 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
         cell_3_right = create_searchwithin_selection_box('f3', f3, ln=ln)
         cell_3_moreright = """<input class="formbutton" type="submit" name="action" value="%s"><input class="formbutton" type="submit" name="action" value="%s">&nbsp;""" % (msg_search[ln], msg_browse[ln])
         cell_4 = """<small><a href="%s/help/search/tips.%s.html">%s</a> ::
-                           <a href="%s/search.py?p=%s&amp;f=%s&amp;cc=%s&amp;ln=%s">%s</a></small>""" % \
-                    (weburl, ln, msg_search_tips[ln], weburl, urllib.quote(p1), urllib.quote(f1), urllib.quote(cc), ln, msg_simple_search[ln])
+                           <a href="%s/search.py?p=%s&amp;f=%s&amp;rm=%s&amp;cc=%s&amp;ln=%s">%s</a></small>""" % \
+                    (weburl, ln, msg_search_tips[ln], weburl, urllib.quote(p1), urllib.quote(f1), urllib.quote(rm), urllib.quote(cc), ln, msg_simple_search[ln])
         # print them:
         out += """
         <table class="searchbox">
@@ -490,8 +491,8 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
         cell_1_middle = create_searchwithin_selection_box('f', f, ln=ln)
         cell_1_right = """<input class="formbutton" type="submit" name="action" value="%s"><input class="formbutton" type="submit" name="action" value="%s">&nbsp;""" % (msg_search[ln], msg_browse[ln])
         cell_2 = """<small><a href="%s/help/search/tips.%s.html">%s</a> ::
-                           <a href="%s/search.py?p1=%s&amp;f1=%s&amp;as=1&amp;cc=%s&amp;ln=%s">%s</a></small>""" %\
-                          (weburl, ln, msg_search_tips[ln], weburl, urllib.quote(p), urllib.quote(f), urllib.quote(cc), ln, msg_advanced_search[ln])
+                           <a href="%s/search.py?p1=%s&amp;f1=%s&amp;rm=%s&amp;as=1&amp;cc=%s&amp;ln=%s">%s</a></small>""" %\
+                          (weburl, ln, msg_search_tips[ln], weburl, urllib.quote(p), urllib.quote(f), urllib.quote(rm), urllib.quote(cc), ln, msg_advanced_search[ln])
         out += """
         <table class="searchbox">
          <thead>
@@ -598,70 +599,51 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
                    </tbody>
                   </table>""" % \
            (msg_added_since[ln], msg_until[ln], cell_6_a, cell_6_b)        
-    ## fifthly, print Sort/Rank box:
+    ## fifthly, print Display results box, including sort/rank, formats, etc:
     if action != msg_browse[ln]:
-        cell_1_left = """
-        <select name="sf">
-        <option value="">- %s -""" % msg_latest_first[ln]
+        # sort by:
+        cell_7_a = """
+        <select name="sf" class="address">
+        <option value="">- %s -""" % (msg_latest_first[ln])
         query = """SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
                     WHERE cff.type='soo' AND cff.id_field=f.id
                     ORDER BY cff.score DESC, f.name ASC""" 
         res = run_sql(query)
         for code, name in res:
             # propose found sort options:
-            cell_1_left += """<option value="%s"%s>%s""" % (code, is_selected(sf,code), name)
-        cell_1_left += """</select>"""
-        cell_1_left += """<select name="so">
+            cell_7_a += """<option value="%s"%s>%s""" % (code, is_selected(sf,code), name)
+        cell_7_a += """</select>"""
+        cell_7_a += """<select name="so" class="address">
                           <option value="a"%s>%s
                           <option value="d"%s>%s
                           </select>""" % (is_selected(so,"a"), msg_ascending[ln], is_selected(so,"d"), msg_descending[ln])
-        cell_1_right = """
-        <select name="rm">
-        <option value="">- %s -""" % msg_latest_first[ln]
-        for code, name in (('jif', 'journal impact factor'),):
+        # rank by:
+        cell_7_a += """
+        <select name="rm" class="address">
+        <option value="">- %s %s -""" % (string.lower(msg_or[ln]), msg_rank_by[ln])
+        for (code,name) in get_bibrank_methods(ln):
             # propose found rank methods:
-            cell_1_right += """<option value="%s"%s>%s""" % (code, is_selected(rm,code), name)
-        cell_1_right += """</select>"""
-        out += """
-            <table class="searchbox">
-             <thead>
-              <tr>
-               <th class="searchboxheader">
-                %s
-               </th>
-               <th class="searchboxheader">
-                %s
-               </th>
-              </tr> 
-             </thead>
-             <tbody>
-              <tr valign="bottom">
-               <td valign="top" class="searchboxbody">%s</td>
-               <td valign="top" class="searchboxbody">%s</td>
-              </tr>
-             </tbody>
-            </table>""" % (msg_sort_by[ln], "", cell_1_left, "")
-                  # FIXME (msg_sort_by[ln], msg_rank_by[ln], cell_1_left, cell_1_right)
-    ## sixthly, print Display/Format box:
-    if action != msg_browse[ln]:
-        cell_1_right = """
-        <select name="of">"""
+            cell_7_a += """<option value="%s"%s>%s""" % (code, is_selected(rm,code), name)
+        cell_7_a += """</select>"""
+        # display formats:
+        cell_7_c = """
+        <select name="of" class="address">"""
         query = """SELECT code,name FROM format ORDER BY name ASC""" 
         res = run_sql(query)
         if res:
             # propose found formats:
             for code, name in res:
-                cell_1_right += """<option value="%s"%s>%s""" % (code, is_selected(of,code), name)
+                cell_7_c += """<option value="%s"%s>%s""" % (code, is_selected(of,code), name)
         else:
             # no formats are found, so propose the default HTML one:
-            cell_1_right += """<option value="hb"%s>HTML %s""" % (is_selected(of,"hb"), msg_brief[ln])
+            cell_7_c += """<option value="hb"%s>HTML %s""" % (is_selected(of,"hb"), msg_brief[ln])
         # is format made of numbers only? if yes, then propose it too:
         if of and str(of[0:3]).isdigit():
-            cell_1_right += """<option value="%s" selected>%s MARC tag""" % (of, of)
-        cell_1_right += """</select>"""
-        ## okay, formats ended
-        cell_1_middle = """
-        <select name="rg">
+            cell_7_c += """<option value="%s" selected>%s MARC tag""" % (of, of)
+        cell_7_c += """</select>"""
+        # records in groups of: 
+        cell_7_b = """
+        <select name="rg" class="address">
         <option value="10"%s>10 %s
         <option value="25"%s>25 %s
         <option value="50"%s>50 %s
@@ -669,10 +651,10 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
         <option value="250"%s>250 %s
         <option value="500"%s>500 %s
         </select>
-        <select name="sc">
+        <select name="sc" class="address">
         <option value="0"%s>%s
         <option value="1"%s>%s
-        </select>
+        </select> 
         """ % (is_selected(rg,"10"), msg_results[ln], is_selected(rg,"25"), msg_results[ln], is_selected(rg,"50"), msg_results[ln], \
                is_selected(rg,"100"), msg_results[ln], is_selected(rg,"250"), msg_results[ln], is_selected(rg,"500"), msg_results[ln], \
                is_selected(sc,"0"), msg_single_list[ln], is_selected(sc,"1"), msg_split_by_collection[ln])
@@ -686,15 +668,19 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
                <th class="searchboxheader">
                 %s
                </th>
+               <th class="searchboxheader">
+                %s
+               </th>
               </tr> 
              </thead>
              <tbody>
               <tr valign="bottom">
                <td valign="top" class="searchboxbody">%s</td>
                <td valign="top" class="searchboxbody">%s</td>
+               <td valign="top" class="searchboxbody">%s</td>
               </tr>
              </tbody>
-            </table>""" % (msg_display_results[ln], msg_output_format[ln], cell_1_middle, cell_1_right)
+            </table>""" % (msg_sort_by[ln], msg_display_results[ln], msg_output_format[ln], cell_7_a, cell_7_b, cell_7_c)
     ## last but not least, print end of search box:
     out += """</form>"""
     ## now return the search box nicely framed with the google_box:
@@ -1491,8 +1477,15 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m)
         if verbose >= 9:
             print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (bsu_p, Numeric.nonzero(basic_search_unit_hitset._set)))
-        if ap==0 or basic_search_unit_hitset._nbhits > 0:
-            # stage 2-1: this basic search unit is retained
+        if basic_search_unit_hitset._nbhits>0 or \
+           ap==0 or \
+           (idx_unit>0 and bsu_o=="|") or \
+           (idx_unit<len(basic_search_units) and basic_search_units[idx_unit+1][0]=="|"):
+            # stage 2-1: this basic search unit is retained, since
+            # either the hitset is non-empty, or the approximate
+            # pattern treatment is switched off, or the search unit
+            # was joined by an OR operator to preceding/following
+            # units so we do not require that it exists        
             basic_search_units_hitsets.append(basic_search_unit_hitset)                    
         else:
             # stage 2-2: no hits found for this search unit, try to replace non-alphanumeric chars inside pattern:
@@ -1514,13 +1507,19 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                     # stage 2-3: no hits found either, propose nearest indexed terms:
                     if of.startswith('h'):
                         if req:
-                            print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m, ln=ln))
+                            if bsu_f == "recid":
+                                print_warning(req, "Requested record does not seem to exist.")
+                            else:
+                                print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m, ln=ln))
                     return hitset_empty
             else:        
                 # stage 2-3: no hits found either, propose nearest indexed terms:
                 if of.startswith('h'):
                     if req:
-                        print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m, ln=ln))
+                        if bsu_f == "recid":
+                            print_warning(req, "Requested record does not seem to exist.")
+                        else:
+                            print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m, ln=ln))
                 return hitset_empty
     if verbose:
         t2 = os.times()[4]
@@ -2147,7 +2146,7 @@ def get_modification_date(recID, fmt="%Y-%m-%d"):
 
 def print_warning(req, msg, type='', prologue='<br>', epilogue='<br>'):
     "Prints warning message and flushes output."
-    if req:
+    if req and msg:
         req.write('\n%s<span class="quicknote">' % (prologue))
         if type:
             req.write('%s: ' % type)
@@ -2158,7 +2157,7 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=cdsname, nb_found
                       sc=1, pl_in_url="",
                       d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0,
                       cpu_time=-1, middle_only=0):
-    """Prints stripe with the information on 'collection' and 'nb_found' results oand CPU time.
+    """Prints stripe with the information on 'collection' and 'nb_found' results and CPU time.
        Also, prints navigation links (beg/next/prev/end) inside the results set.
        If middle_only is set to 1, it will only print the middle box information (beg/netx/prev/end/etc) links.
        This is suitable for displaying navigation links at the bottom of the search results page."""
@@ -2365,10 +2364,11 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         # good, no sort needed
         return recIDs
         
-def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, decompress=zlib.decompress):
+def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress):
     """Prints list of records 'recIDs' formatted accoding to 'format' in groups of 'rg' starting from 'jrec'.
     Assumes that the input list 'recIDs' is sorted in reverse order, so it counts records from tail to head.
     A value of 'rg=-9999' means to print all records: to be used with care.
+    Print also list of RELEVANCES for each record (if defined), in between RELEVANCE_PROLOGUE and RELEVANCE_EPILOGUE.
     """
 
     # sanity checking:
@@ -2420,8 +2420,12 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, de
                 req.write("""\n<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
                 req.write("""\n<table>""")            
                 for irec in range(irec_max,irec_min,-1):
-                    req.write("""\n<tr><td valign="top"><input name="recid" type="checkbox" value="%s"></td>""" % recIDs[irec])
-                    req.write("""<td valign="top" align="right">%d.</td><td valign="top">""" % (jrec+irec_max-irec))
+                    req.write("""\n<tr><td valign="top" nowrap><input name="recid" type="checkbox" value="%s">""" % recIDs[irec])
+                    req.write("""%d.""" % (jrec+irec_max-irec))
+                    if relevances and relevances[irec]:
+                        req.write("""<br><small class="info">%s%s%s</small>""" % \
+                                  (relevances_prologue, relevances[irec], relevances_epilogue))
+                    req.write("""</td><td valign="top">""")
                     req.write(print_record(recIDs[irec], format, ot, ln))
                     req.write("</td></tr>")
                 req.write("\n</table>")
@@ -2444,6 +2448,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, de
                     if record_exists(recIDs[irec])==1:
                         req.write("""\n<div class="recordlastmodifiedbox">%s</div>""" % \
                                   (msg_record_last_modified[ln] % (get_creation_date(recIDs[irec]),get_modification_date(recIDs[irec]))))
+                        req.write("""<p><span class="moreinfo"><a class="moreinfo" href="%s/search.py?p=recid:%d&amp;rm=wrd&amp;ln=%s">%s</a></span>\n""" % \
+                                  (weburl, recIDs[irec], ln, msg_similar_records[ln]))
                         req.write("""\n<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
                         req.write("""<input name="recid" type="hidden" value="%s">""" % recIDs[irec])
                         req.write("""<br><input class="formbutton" type="submit" name="action" value="%s">"""  % msg_add_to_basket[ln])
@@ -2748,6 +2754,8 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 else:
                     out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s&amp;ln=%s">%s</a></span>""" \
                            % (weburl, recID, ln, msg_detailed_record[ln])
+                    out += """<span class="moreinfo"> - <a class="moreinfo" href="%s/search.py?p=recid:%d&amp;rm=wrd&amp;ln=%s">%s</a></span>\n""" % \
+                           (weburl, recID, ln, msg_similar_records[ln])
 
     # print record closing tags, if needed:
     if format == "marcxml" or format == "oai_dc":
@@ -3105,8 +3113,46 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 req.write(create_error_box(req, verbose=verbose, ln=ln))
             return page_end(req, of, ln)            
 
+    elif rm and p.startswith("recid:"):
+        ## 3-ter - similarity search needed
+        page_start(req, of, cc, as, ln, uid, msg_search_results[ln]) 
+        if of.startswith("h"):
+            req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
+                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
+        if record_exists(p[6:]) != 1:
+            # record does not exist
+            if of.startswith("h"):
+                print_warning(req, "Requested record does not seem to exist.")
+            if of == "id":
+                return []
+        else:
+            # record well exists, so find similar ones to it
+            t1 = os.times()[4]
+            results_similar_recIDs, results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, results_similar_comments = \
+                                    rank_records(rm, 0, get_collection_reclist(cdsname), string.split(p))
+            if results_similar_recIDs:
+                t2 = os.times()[4]
+                cpu_time = t2 - t1
+                if of.startswith("h"):
+                    req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, cdsname, len(results_similar_recIDs),
+                                                jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
+                                                sc, pl_in_url,
+                                                d1y, d1m, d1d, d2y, d2m, d2d, cpu_time))
+                    print_warning(req, results_similar_comments)
+                    print_records(req, results_similar_recIDs, jrec, rg, of, ot, ln,
+                                  results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue)
+                elif of=="id":
+                    return results_similar_recIDs
+            else:
+                # rank_records failed and returned some error message to display:
+                if of.startswith("h"):
+                    print_warning(req, results_similar_relevances_prologue)
+                    print_warning(req, results_similar_relevances_epilogue)
+                    print_warning(req, results_similar_comments)
+                if of == "id":
+                    return []
     else:
-        ## 3 - search needed
+        ## 3 - common search needed
         page_start(req, of, cc, as, ln, uid, msg_search_results[ln])
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
@@ -3117,8 +3163,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             ## 3A - advanced search
             try:
                 results_in_any_collection = search_pattern(req, p1, f1, m1, ap=ap, of=of, verbose=verbose, ln=ln)
-                if results_in_any_collection._nbhits == 0:                
-                    return page_end(req, of, ln)                
+                if results_in_any_collection._nbhits == 0:
+                    return page_end(req, of, ln)     
                 if p2:
                     results_tmp = search_pattern(req, p2, f2, m2, ap=ap, of=of, verbose=verbose, ln=ln)
                     if op1 == "a": # add
@@ -3131,7 +3177,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                         if of.startswith("h"):
                             print_warning(req, "Invalid set operation %s." % op1, "Error")
                     results_in_any_collection.calculate_nbhits()
-                    if results_in_any_collection._nbhits == 0:                
+                    if results_in_any_collection._nbhits == 0:
                         return page_end(req, of, ln)                
                 if p3:
                     results_tmp = search_pattern(req, p3, f3, m3, ap=ap, of=of, verbose=verbose, ln=ln)
@@ -3158,7 +3204,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
                 return page_end(req, of, ln)
 
-        if results_in_any_collection._nbhits == 0:                
+        if results_in_any_collection._nbhits == 0:
             return page_end(req, of, ln)
                 
 #             search_cache_key = p+"@"+f+"@"+string.join(colls_to_search,",")
@@ -3196,6 +3242,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             if results_final == {}:
                 return page_end(req, of, ln)
 
+        
+
         if pl:
             try:
                 results_final = intersect_results_with_hitset(req,
@@ -3228,9 +3276,6 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             for coll in results_final.keys(): 
                 if coll not in colls_to_search:
                     colls_to_search.append(coll)
-            # FIXME: rank
-            if rm:
-                print_warning(req, "Ranking according to %s is not yet implemented." % rm)
             # print results overview:
             if of == "id":
                 # we have been asked to return list of recIDs
@@ -3238,8 +3283,14 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 for coll in results_final.keys():
                     results_final_for_all_colls.union(results_final[coll])
                 recIDs = results_final_for_all_colls.items().tolist()
-                if sf: # do we have to sort first?
+                if sf: # do we have to sort?
                     recIDs = sort_records(req, recIDs, sf, so, sp, verbose)
+                elif rm: # do we have to rank?
+                    results_final_for_all_colls_rank_records_output = rank_records(rm, 0, results_final_for_all_colls,
+                                                                                   string.split(p) + string.split(p1) +
+                                                                                   string.split(p2) + string.split(p3))
+                    if results_final_for_all_colls_rank_records_output[0]:                        
+                        recIDs = results_final_for_all_colls_rank_records_output[0]
                 return recIDs
             elif of.startswith("h"):
                 req.write(print_results_overview(colls_to_search, results_final_nb_total, results_final_nb, cpu_time, ln))
@@ -3253,10 +3304,27 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                                                     jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                     sc, pl_in_url,
                                                     d1y, d1m, d1d, d2y, d2m, d2d, cpu_time))
-                    results_final_sorted = results_final[coll].items()
-                    if sf:
-                        results_final_sorted = sort_records(req, results_final_sorted, sf, so, sp, verbose)
-                    print_records(req, results_final_sorted, jrec, rg, of, ot, ln)
+                    results_final_recIDs = results_final[coll].items()
+                    results_final_relevances = []
+                    results_final_relevances_prologue = ""
+                    results_final_relevances_epilogue = ""
+                    if sf: # do we have to sort?
+                        results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose)
+                    elif rm: # do we have to rank?
+                        results_final_recIDs_ranked, results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue, results_final_comments = \
+                                                     rank_records(rm, 0, results_final[coll],
+                                                                  string.split(p) + string.split(p1) +
+                                                                  string.split(p2) + string.split(p3))
+                        if of.startswith("h"):
+                            print_warning(req, results_final_comments)
+                        if results_final_recIDs_ranked:
+                            results_final_recIDs = results_final_recIDs_ranked
+                        else:
+                            # rank_records failed and returned some error message to display:
+                            print_warning(req, results_final_relevances_prologue)
+                            print_warning(req, results_final_relevances_epilogue)                                
+                    print_records(req, results_final_recIDs, jrec, rg, of, ot, ln,
+                                  results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue)
                     if of.startswith("h"):
                         req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
                                                     jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
