@@ -278,10 +278,14 @@ WHERE  name='$key'");
       // If the SUMMARYON variable is set, this means the summary dockable
       // window is allowed and we have to include the file containing the
       // dynamic html functions which deal with this window.
-      include("Navigation_Functions.php");
+      </protect>
+      include("<LIBDIR>/php/cdsware/websubmit/Navigation_Functions.php");
+      <protect>
    else
       // Else, we include the same functions, but empty.
-      include("Fake_Navigation_Functions.php");
+      <protect>
+      include("<LIBDIR>/php/cdsware/websubmit/Fake_Navigation_Functions.php");
+      </protect>
 ?>
 <SCRIPT LANGUAGE="JavaScript1.1" TYPE="text/javascript">
 	document.onMouseUp = "enddrag(event)";
@@ -913,7 +917,9 @@ WHERE  name='".$arr[3]."'");
    {
       print "	<small>(2) mandatory fields appear in red in the 'Summary'".
          " window.</small><BR>\n";
-      include("Print_Summary.php");
+      </protect>
+      include("<LIBDIR>/php/cdsware/websubmit/Print_Summary.php");
+      <protect>
    }
 
    // This function is used to display a login form if the user has not logged
