@@ -65,11 +65,16 @@ cds.alert@cdsware.cern.ch
 </define-tag>
 
 ## SUPPORTEMAIL -- the email address of the support team for this installation:
+##  (example: "cds.support@cern.ch")
 <define-tag SUPPORTEMAIL whitespace=delete>
 cds.support@cern.ch
 </define-tag>
 
-## ADMINEMAIL -- the email address of the 'superuser' for this installation:
+## ADMINEMAIL -- the email address of the 'superuser' for this
+## installation.  Enter your email address below and login with this
+## address when using CDSware administration modules.  You will then
+## be automatically recognized as superuser of the system.
+##  (example: "cds.support@cern.ch")
 <define-tag ADMINEMAIL whitespace=delete>
 cds.support@cern.ch
 </define-tag>
