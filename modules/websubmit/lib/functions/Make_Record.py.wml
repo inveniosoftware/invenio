@@ -64,7 +64,7 @@ def  Make_Record(parameters,curdir,form):
     rectext = rectext.replace("&lt;subfield","<subfield")
     rectext = rectext.replace("&lt;/subfield","</subfield")
     # Save the record back
-    fp = open("%s/recmysql" % curdir,"w+")
+    fp = open("%s/recmysql" % curdir,"w")
     fp.write(rectext)
     fp.close()
     return ""

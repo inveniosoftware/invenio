@@ -51,7 +51,7 @@ def Get_Sysno(parameters,curdir,form):
         else:
             sysno = searchresults[0]
         # save resultin a file
-        fp = open("%s/SN" % curdir,"w+")
+        fp = open("%s/SN" % curdir,"w")
         fp.write(str(sysno))
         fp.close()
     return ""

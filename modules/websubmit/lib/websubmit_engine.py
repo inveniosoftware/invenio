@@ -134,7 +134,7 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             return errorMsg("can't create submission directory",req)
     # retrieve the original main menu url ans save it in the "mainmenu" file
     if mainmenu != "":
-        fp = open("%s/mainmenu" % curdir,"w+")
+        fp = open("%s/mainmenu" % curdir,"w")
         fp.write(mainmenu)
         fp.close()
     # and if the file containing the URL to the main menu exists
@@ -148,7 +148,7 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     # various authentication related tasks...
     if uid_email != "guest" and uid_email != "":
         #First save the username (email address) in the SuE file. This way bibconvert will be able to use it if needed
-        fp = open("%s/SuE" % curdir,"w+")
+        fp = open("%s/SuE" % curdir,"w")
         fp.write(uid_email)
         fp.close()
     # is user authorized to perform this action?
@@ -173,7 +173,7 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             filename = key
         # the field is an array
         if isinstance(formfields,types.ListType):
-            fp = open("%s/%s" % (curdir,filename),"w+")
+            fp = open("%s/%s" % (curdir,filename),"w")
             for formfield in formfields:
                 #stripslashes(value)
                 value = specialchars(formfield)
@@ -182,7 +182,7 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         # the field is a normal string
         elif isinstance(formfields,types.StringTypes) and formfields != "":
             value = formfields
-            fp = open("%s/%s" % (curdir,filename),"w+")
+            fp = open("%s/%s" % (curdir,filename),"w")
             fp.write(specialchars(value))
             fp.close()
         # the field is a file
@@ -199,10 +199,10 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
                 fp = open("%s/files/%s/%s" % (curdir,key,filename),"w")
                 fp.write(data)
                 fp.close()
-                fp = open("%s/lastuploadedfile" % curdir,"w+")
+                fp = open("%s/lastuploadedfile" % curdir,"w")
                 fp.write(filename)
                 fp.close()
-                fp = open("%s/%s" % (curdir,key),"w+")
+                fp = open("%s/%s" % (curdir,key),"w")
                 fp.write(filename)
                 fp.close()
         # if the found field is the reference of the document
@@ -622,7 +622,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             return errorMsg("can't create submission directory",req,cdsname,ln)
     # retrieve the original main menu url ans save it in the "mainmenu" file
     if mainmenu != "":
-        fp = open("%s/mainmenu" % curdir,"w+")
+        fp = open("%s/mainmenu" % curdir,"w")
         fp.write(mainmenu)
         fp.close()
     # and if the file containing the URL to the main menu exists
@@ -666,7 +666,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             filename = key
         # the field is an array
         if isinstance(formfields,types.ListType):
-            fp = open("%s/%s" % (curdir,filename),"w+")
+            fp = open("%s/%s" % (curdir,filename),"w")
             for formfield in formfields:
                 #stripslashes(value)
                 value = specialchars(formfield)
@@ -675,7 +675,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         # the field is a normal string
         elif isinstance(formfields,types.StringTypes) and formfields != "":
             value = formfields
-            fp = open("%s/%s" % (curdir,filename),"w+")
+            fp = open("%s/%s" % (curdir,filename),"w")
             fp.write(specialchars(value))
             fp.close()
         # the field is a file
@@ -692,10 +692,10 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
                 fp = open("%s/files/%s/%s" % (curdir,key,filename),"w")
                 fp.write(data)
                 fp.close()
-                fp = open("%s/lastuploadedfile" % curdir,"w+")
+                fp = open("%s/lastuploadedfile" % curdir,"w")
                 fp.write(filename)
                 fp.close()
-                fp = open("%s/%s" % (curdir,key),"w+")
+                fp = open("%s/%s" % (curdir,key),"w")
                 fp.write(filename)
                 fp.close()
         # if the found field is the reference of the document

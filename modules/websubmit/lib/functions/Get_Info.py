@@ -85,7 +85,7 @@ def Get_Info_In_DB(rn,parameters,curdir):
         authorvalue = Get_Field('100__a',sysno)
         authorvalue += "\n%s" % Get_Field('700__a',sysno)
         # save result
-        fp = open("%s/SN" % curdir,"w+")
+        fp = open("%s/SN" % curdir,"w")
         fp.write(sysno)
         fp.close()
         return 1

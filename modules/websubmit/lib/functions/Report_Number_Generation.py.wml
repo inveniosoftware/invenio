@@ -90,7 +90,7 @@ def Report_Number_Generation(parameters,curdir,form):
         rn = rn.replace("\013","")
         rn = rn.replace("\012","")
         # The file edsrn is created in the submission directory, and it stores the report number
-        fp = open("%s/%s" % (curdir,parameters['edsrn']),"w+")
+        fp = open("%s/%s" % (curdir,parameters['edsrn']),"w")
         fp.write(rn)
         fp.close()
     # The report number is just read from a specified file
@@ -104,7 +104,7 @@ def Report_Number_Generation(parameters,curdir,form):
     elif parameters['autorngen'] == "A":
         rn = parameters['rnformat'].replace ("<PA>access</PA>",access)
     # The file accessno/edsrn is created, and it stores the report number
-    fp = open("%s/%s" % (curdir,parameters['edsrn']),"w+")
+    fp = open("%s/%s" % (curdir,parameters['edsrn']),"w")
     fp.write(rn)
     fp.close()
     return ""
@@ -118,7 +118,7 @@ def Create_Reference(counter_path,ref_format):
             raise functionError("File System: Cannot create counters directory %s" % counters)
     if not os.path.exists("%s/%s" % (counters,counter_path)):
         try:
-            fp = open("%s/%s" % (counters,counter_path),"w+")
+            fp = open("%s/%s" % (counters,counter_path),"w")
         except:
             raise functionError("File System: no permission to write in counters directory %s" % counters)
         fp.write ("0")
