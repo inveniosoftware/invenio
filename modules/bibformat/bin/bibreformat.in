@@ -234,7 +234,7 @@ def iterate_over(list, weburl, fmt):
     "Iterate odver list of IDs"
 
     n_rec       = 0
-    n_max       = 1000
+    n_max       = 10000
     total_rec   = 0		# Total number of records
     xml_content = ''		# hold the contents
     tbibformat  = 0		# time taken up by external call
