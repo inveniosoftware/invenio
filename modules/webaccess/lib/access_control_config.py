@@ -53,22 +53,28 @@ def_users = []
 #            name                  desc     allowedkeywords   optional
 def_actions = (('cfgwebsearch',         'configure WebSearch',       '',              'no'),
                ('cfgbibformat',         'configure BibFormat',       '',              'no'),
+               ('cfgwebsubmit',         'configure webSubmit',       '',              'no'),
                ('runbibwords',          'run BibWords',       '',              'no'),
                ('runbibupload',         'run BibUpload',       '',              'no'),
                ('runwebcoll',           'run webcoll',       'collection',    'yes'),
                ('runbibformat',         'run BibFormat',       'format',        'yes'),
                (WEBACCESSACTION,        'configure WebAccess',       '',              'no'),
                (DELEGATEADDUSERROLE,    'delegate subroles inside WebAccess',       'role',          'no'),
-               ('runbibtaskex',         'run BibTaskEx example',       '',              'no'))
+               ('runbibtaskex',         'run BibTaskEx example',       '',              'no'),
+               ('referee',                  'referee document type doctype/category categ', 'doctype,categ',    'yes'),
+               ('submit',                   'use webSubmit',    'doctype,act',  'yes'))
 # authorizations
 #          role              action          arglistid  optional   arguments
 def_auths = ((SUPERADMINROLE,    'cfgwebsearch',         -1,      0,       {}),
              (SUPERADMINROLE,    'cfgbibformat',         -1,      0,       {}),
+             (SUPERADMINROLE,    'cfgwebsubmit',         -1,      0,       {}),
              (SUPERADMINROLE,    'runbibwords',          -1,      0,       {}),
              (SUPERADMINROLE,    'runbibupload',         -1,      0,       {}),
              (SUPERADMINROLE,    'runbibformat',         -1,      1,       {}),
              (SUPERADMINROLE,    WEBACCESSACTION,        -1,      0,       {}), 
              ('photoadmin',      'runwebcoll',           -1,      0,       {'collection': 'Pictures'}),
              (WEBACCESSADMINROLE,WEBACCESSACTION,        -1,      0,       {}),
-             (SUPERADMINROLE,    'runtaskex',            -1,      0,       {}))
+             (SUPERADMINROLE,    'runtaskex',            -1,      0,       {}),
+             (SUPERADMINROLE,    'referee',         -1,      1,       {}),
+             (SUPERADMINROLE,    'submit',         -1,      1,       {}))
 </protect>
