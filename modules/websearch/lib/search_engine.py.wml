@@ -400,7 +400,7 @@ def create_google_box(p, f, p1, p2, p3, ln=cdslang,
         out += epilog
     return out
 
-def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, ln, p1, f1, m1, op1, p2, f2, m2, op2, p3, f3, m3, sc, pl,
+def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1, p2, f2, m2, op2, p3, f3, m3, sc, pl,
                       d1y, d1m, d1d, d2y, d2m, d2d, action=""):
     "Create search box for 'search again in the results page' functionality."
     out = ""    
@@ -594,7 +594,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, ln, p1, f1, m
                    </tbody>
                   </table>""" % \
            (msg_added_since[ln], msg_until[ln], cell_6_a, cell_6_b)        
-    ## fifthly, print Display/Sort box:
+    ## fifthly, print Sort/Rank box:
     if action != msg_browse[ln]:
         cell_1_left = """
         <select name="sf">
@@ -611,6 +611,35 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, ln, p1, f1, m
                           <option value="a"%s>%s
                           <option value="d"%s>%s
                           </select>""" % (is_selected(so,"a"), msg_ascending[ln], is_selected(so,"d"), msg_descending[ln])
+        cell_1_right = """
+        <select name="rm">
+        <option value="">- %s -""" % msg_latest_first[ln]
+        for code, name in (('jif', 'journal impact factor'),):
+            # propose found rank methods:
+            cell_1_right += """<option value="%s"%s>%s""" % (code, is_selected(rm,code), name)
+        cell_1_right += """</select>"""
+        out += """
+            <table class="searchbox">
+             <thead>
+              <tr>
+               <th class="searchboxheader">
+                %s
+               </th>
+               <th class="searchboxheader">
+                %s
+               </th>
+              </tr> 
+             </thead>
+             <tbody>
+              <tr valign="bottom">
+               <td valign="top" class="searchboxbody">%s</td>
+               <td valign="top" class="searchboxbody">%s</td>
+              </tr>
+             </tbody>
+            </table>""" % (msg_sort_by[ln], "", cell_1_left, "")
+                  # FIXME (msg_sort_by[ln], msg_rank_by[ln], cell_1_left, cell_1_right)
+    ## sixthly, print Display/Format box:
+    if action != msg_browse[ln]:
         cell_1_right = """
         <select name="of">"""
         query = """SELECT code,name FROM format ORDER BY name ASC""" 
@@ -653,19 +682,15 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, ln, p1, f1, m
                <th class="searchboxheader">
                 %s
                </th>
-               <th class="searchboxheader">
-                %s
-               </th>
               </tr> 
              </thead>
              <tbody>
               <tr valign="bottom">
                <td valign="top" class="searchboxbody">%s</td>
                <td valign="top" class="searchboxbody">%s</td>
-               <td valign="top" class="searchboxbody">%s</td>
               </tr>
              </tbody>
-            </table>""" % (msg_sort_by[ln], msg_display_results[ln], msg_output_format[ln], cell_1_left, cell_1_middle, cell_1_right)
+            </table>""" % (msg_display_results[ln], msg_output_format[ln], cell_1_middle, cell_1_right)
     ## last but not least, print end of search box:
     out += """</form>"""
     ## now return the search box nicely framed with the google_box:
@@ -2026,7 +2051,7 @@ def print_warning(req, msg, type='', prologue='<br>', epilogue='<br>'):
             req.write('%s: ' % type)
         req.write('%s</span>%s' % (msg, epilogue))
 
-def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1, jrec=1, rg=10,
+def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=cdsname, nb_found=-1, jrec=1, rg=10,
                       as=0, ln=cdslang, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
                       sc=1, pl_in_url="",
                       d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0,
@@ -2064,7 +2089,7 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
             out += collection + " : " + msg_x_records_found[ln] % nice_number(nb_found) + " &nbsp; "
 
     if nb_found > rg: # navig.arrows are needed, since we have many hits
-        url = '%s/search.py?p=%s&amp;cc=%s&amp;f=%s&amp;sf=%s&amp;so=%s&amp;sp=%s&amp;of=%s&amp;ot=%s' % (weburl, urllib.quote(p), urllib.quote(collection), f, sf, so, sp, of, ot)
+        url = '%s/search.py?p=%s&amp;cc=%s&amp;f=%s&amp;sf=%s&amp;so=%s&amp;sp=%s&amp;rm=%s&amp;of=%s&amp;ot=%s' % (weburl, urllib.quote(p), urllib.quote(collection), f, sf, so, sp, rm, of, ot)
         url += '&amp;as=%s&amp;ln=%s&amp;p1=%s&amp;p2=%s&amp;p3=%s&amp;f1=%s&amp;f2=%s&amp;f3=%s&amp;m1=%s&amp;m2=%s&amp;m3=%s&amp;op1=%s&amp;op2=%s' \
                % (as, ln, urllib.quote(p1), urllib.quote(p2), urllib.quote(p3), f1, f2, f3, m1, m2, m3, op1, op2)
         url += '&amp;sc=%d' % 0 + pl_in_url # sc=0, since we do not want to split by collection in `next/previous' pages
@@ -2688,7 +2713,7 @@ def wash_url_argument(var, new_type):
 
 ### CALLABLES
 
-def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="id", ot="", as="0",
+def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", rm="", of="id", ot="", as="0",
                            p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
                            recid="-1", recidb="-1", sysno="", id="-1", idb="-1", sysnb="", action="",
                            d1y="0", d1m="0", d1d="0", d2y="0", d2m="0", d2d="0", verbose="0", ap="0", ln=cdslang):
@@ -2722,7 +2747,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
           sp - sort pattern (e.g. "CERN-") -- in case there are more
                values in a sort field, this argument tells which one
                to prefer
-          
+
+          rm - ranking method (e.g. "jif").  Defines whether results
+               should be ranked by some known ranking method.
+
           of - output format (e.g. "hb").  Usually starting "h" means
                HTML output (and "hb" for HTML brief, "hd" for HTML
                detailed), "x" means XML output, "t" means plain text
@@ -2849,7 +2877,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
     rg = wash_url_argument(rg, 'int')
     sf = wash_url_argument(sf, 'str')
     so = wash_url_argument(so, 'str')
-    sp = wash_url_argument(sp, 'string')
+    sp = wash_url_argument(sp, 'str')
+    rm = wash_url_argument(rm, 'str')
     of = wash_url_argument(of, 'str')
     if type(ot) is list:
         ot = string.join(ot,",")
@@ -2927,7 +2956,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
     elif action == msg_browse[ln]:
         ## 2 - browse needed
         if of.startswith("h"):
-            req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, ln, p1, f1, m1, op1,
+            req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
         try:
             if as==1 or (p1 or p2 or p3):
@@ -2944,7 +2973,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
     else:
         ## 3 - search needed
         if of.startswith("h"):
-            req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, ln, p1, f1, m1, op1,
+            req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
         t1 = os.times()[4]
         results_in_any_collection = HitSet()
@@ -3063,6 +3092,9 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             for coll in results_final.keys(): 
                 if coll not in colls_to_search:
                     colls_to_search.append(coll)
+            # FIXME: rank
+            if rm:
+                print_warning(req, "Ranking according to %s is not yet implemented." % rm)
             # print results overview:
             if of == "id":
                 # we have been asked to return list of recIDs
@@ -3081,7 +3113,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             for coll in colls_to_search:                
                 if results_final.has_key(coll) and results_final[coll]._nbhits:
                     if of.startswith("h"):
-                        req.write(print_search_info(p, f, sf, so, sp, of, ot, coll, results_final_nb[coll],
+                        req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
                                                     jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                     sc, pl_in_url,
                                                     d1y, d1m, d1d, d2y, d2m, d2d, cpu_time))
@@ -3090,7 +3122,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                         results_final_sorted = sort_records(req, results_final_sorted, sf, so, sp, verbose)
                     print_records(req, results_final_sorted, jrec, rg, of, ot, ln)
                     if of.startswith("h"):
-                        req.write(print_search_info(p, f, sf, so, sp, of, ot, coll, results_final_nb[coll],
+                        req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
                                                     jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                     sc, pl_in_url, 
                                                     d1y, d1m, d1d, d2y, d2m, d2d, cpu_time, 1))
