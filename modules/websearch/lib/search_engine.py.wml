@@ -62,6 +62,7 @@ from bibrank_downloads_similarity import get_reading_similarity
 from dbquery import run_sql
 from bibrank_citation_searcher import get_cited_by_list, get_citing_recidrelevance, get_co_cited_with_list
 try:
+    from mod_python import apache
     from webuser import getUid
     from webpage import pageheaderonly, pagefooteronly, create_error_box
 except ImportError, e:
@@ -2699,25 +2700,25 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                             reclist = get_citing_recidrelevance('cit', citing_list)
                             reclist.sort(lambda x, y: cmp(x[1], y[1]))
                        
-                            list_title ="Cited&nbsp;By&nbsp;%s&nbsp;record"% len(citing_list)
+                            list_title ="Cited&nbsp;By&nbsp;%s&nbsp;records"% len(citing_list)
                             #req.write("""</td>""")
                             reclist.reverse()
                             print_record_list(req, list_title, reclist)                           
                             req.write("""&nbsp;<a  href="%s/search.py?p=recid:%d&amp;rm=cit&amp;ln=%s">more</a><br><br>\n""" %  (weburl, recIDs[irec], ln) )
                             reclist = get_co_cited_with_list(recIDs[irec])
                             reclist.sort(lambda x, y: cmp(x[1], y[1]))
-                            list_title ="Co-Cited&nbsp;With&nbsp;%s&nbsp;record"% len(reclist)
+                            list_title ="Co-Cited&nbsp;With&nbsp;%s&nbsp;records"% len(reclist)
                             #req.write("""</td>""")
                             reclist.reverse()
                             print_record_list(req, list_title, reclist)                           
-                            req.write("""&nbsp;<a  href="%s/search.py?p=cociting:%d&amp;ln=%s">more</a><br>\n""" %  (weburl, recIDs[irec], ln) )
+                            req.write("""&nbsp;<a href="%s/search.py?p=cociting:%d&amp;ln=%s">more</a><br>\n""" %  (weburl, recIDs[irec], ln) )
                             req.write("""</td></tr><tr><td>""")
                             req.write(get_citation_history_html(recIDs[irec]))
                             req.write("""</td></tr>""")
                         download_list = get_reading_similarity(recIDs[irec], "rnkDOWNLOADS")
                         if download_list:
                             req.write("""<tr><td><br>""")
-                            list_title = "People&nbsp;who&nbsp;downloaded&nbsp;this&nbsp;record&nbsp;also&nbsp;downloaded&nbsp;:"
+                            list_title = "People&nbsp;who&nbsp;downloaded&nbsp;this&nbsp;record&nbsp;also&nbsp;downloaded:"
                             print_record_list(req, list_title, download_list)
                             req.write("""</td></tr><tr><td>""")
                         req.write(downloads_statistics(recIDs[irec]))
@@ -2725,7 +2726,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                         page_viewed_list = get_reading_similarity(recIDs[irec], "rnkPAGEVIEWS")
                         if page_viewed_list:
                             req.write("""<tr><td>""")
-                            list_title = "People&nbsp;who&nbsp;viewed&nbsp;this&nbsp;page&nbsp;also&nbsp;viewed&nbsp;:"
+                            list_title = "People&nbsp;who&nbsp;viewed&nbsp;this&nbsp;page&nbsp;also&nbsp;viewed:"
                             print_record_list(req, list_title, page_viewed_list)
                             req.write("""</td></tr>""")
                         req.write("""</table>""")   
@@ -2983,7 +2984,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
         if record_exist_p == -1:
             out += msg_record_deleted[ln]
         else:
-            out += """<a href="http://cdswebdev.cern.ch/search.py?recid=%s&ln=en">""" %recID
+            out += """<a href="%s/search.py?recid=%s&ln=en">""" % (weburl, recID)
             # firstly, title:
             titles = get_fieldvalues(recID, "245__a")
             for title in titles:
@@ -3403,7 +3404,11 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         if record_exists(recid):
             if recidb<=recid: # sanity check
                 recidb=recid+1
-            print_records(req, range(recid,recidb), -1, -9999, of, ot, ln)
+            print_records(req, range(recid,recidb), -1, -9999, of, ot, ln)            
+            if req and of.startswith("h"): # record detailed page view event
+                client_ip_address = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+                run_sql("INSERT INTO rnkPAGEVIEWS (id_bibrec,id_user,client_host,view_time) VALUES (%s,%s,INET_ATON(%s),NOW())",
+                        (recid, uid, client_ip_address))
         else: # record does not exist
             if of.startswith("h"):
                 print_warning(req, "Requested record does not seem to exist.")
