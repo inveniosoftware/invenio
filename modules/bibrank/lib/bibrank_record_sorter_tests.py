@@ -1,5 +1,4 @@
 ## $Id$
-## CDSware Search Engine in mod_python.
 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002 CERN.
@@ -30,7 +29,7 @@ __version__ = "$Id$"
 
 import bibrank_record_sorter
 import unittest
-from cdsware.search_engine import HitSet
+from search_engine import HitSet
 
 class TestListSetOperations(unittest.TestCase):
     """Test list set operations."""
