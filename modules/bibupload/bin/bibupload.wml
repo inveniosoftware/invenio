@@ -910,7 +910,8 @@ LIMIT 1";
                 $subfieldcode = $subfield->subfieldcode;
                 $fulltag = "$tag$i1$i2$subfieldcode";
                 if ($tag != "FMT") {
-                    deletefield($recid,$fulltag,$tablename,$logfp);
+		    if (!$options['REF'] || $tag == "999")
+                      deletefield($recid,$fulltag,$tablename,$logfp);
                 }
             }
         }
@@ -1001,6 +1002,7 @@ WHERE  id_bibrec=$recid and
             }
 
             else if (!$options['FORMAT']) {
+	      if (!$options['REF'] || $tag=="999") {
                 // main value
                 if ($field->value != "") {
                     $fieldnumber = getNextFieldNumber($tablename,$recid);
@@ -1023,6 +1025,7 @@ WHERE  id_bibrec=$recid and
                                     $fieldnumber,$logfp);
                     }
                 }
+              }
             }
         }
     }
@@ -1238,6 +1241,18 @@ function integrate ($rec)
         $oldsysnoExists = Test_In_DB($oldsysno,"970__a","bib97x");
         if ($oldsysnoExists)
             $recid = $oldsysnoExists;
+	// if still not found and options['REF'] is found, we check against
+	// the 037 tag
+	if ($recid == "000" && $options['REF']) {
+	  $myfield = $rec->get_subfield("037","_","_","a");
+          $myfieldExists = Test_In_DB($myfield,"037__a","bib03x");
+	  if (!$myfieldExists)
+	    $myfieldExists = Test_In_DB($myfield,"088__a","bib08x");
+	  if (!$myfieldExists)
+	    $myfieldExists = Test_In_DB($myfield,"088__9","bib08x");
+	  if ($myfieldExists)
+	    $recid = $myfieldExists;
+	}
         if ($recid != "000") {
 	    // a record matching the additional criteria was found
             if ($options['DISPLAY'])
@@ -1268,6 +1283,7 @@ function integrate ($rec)
         if ($options['DISPLAY'])
             display($rec);
         update($rec,$recid,$logfp);
+        $nbUpdatedRecords++;
     }
 }
 
@@ -1333,6 +1349,7 @@ function parse_command($argv)
    $options['APPEND']   = FALSE;
    $options['CORRECT']  = FALSE;
    $options['FORMAT']   = FALSE;
+   $options['REF']      = FALSE;
    $options['NOTIMECHANGE']   = FALSE;
    $options['HBFMTUPDATE']   = FALSE;
    $options['USER'] = "";
@@ -1391,6 +1408,10 @@ function parse_command($argv)
 	    $options['HBFMTUPDATE'] = TRUE;
 	 else if ($argv[$i] == "-i" || $argv[$i] == "--insertrecord")
 	    $options['INSERT'] = TRUE;
+	 else if ($argv[$i] == "-z" || $argv[$i] == "--ref") {
+	    $options['CORRECT'] = TRUE;
+	    $options['REF'] = TRUE;
+         }
          else
          {
             fwrite($errorfp, "Unrecognized option " . $argv[$i] . "!\n");
@@ -1477,6 +1498,8 @@ function displayhelp()
                        record
    -f, --format        takes only the FMT fields into account. Does not update 
                        the modification stamp either.
+   -z, --ref           update references (update only 999 fields and check 037 field
+                       against both 037 and 088.)
   Example:
        ./bibupload -t '2004-10-24 05:00' -i toto.xml\n");
 }
