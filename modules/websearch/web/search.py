@@ -35,6 +35,7 @@ sys.path.append('%s' % pylibdir)
 from cdsware.config import weburl,cdsname
 from cdsware import search_engine
 from mod_python import apache    
+from cdsware.webuser import getUid, page_not_authorized
 
 __version__ = "$Id$"
 
@@ -47,6 +48,9 @@ def index(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", rm
        explanation of arguments.
     """
     
+    uid = getUid(req)
+    if uid == -1: 
+        return page_not_authorized(req, "../search.py")
     need_authentication = 0
     # check c
     if type(c) is list:

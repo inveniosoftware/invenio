@@ -20,6 +20,7 @@
 #include "config.wml"
 #include "configbis.wml"
 supportemail = "<SUPPORTEMAIL>"
+adminemail = "<ADMINEMAIL>"
 
 """CDSware Access Control Config. """
 
@@ -45,6 +46,26 @@ DELEGATEADDUSERROLE = 'accdelegaterole'
 MAXSELECTUSERS = 25
 # max number of users to display in a page (mainly for user area)
 MAXPAGEUSERS = 25
+# access policy for guests. 
+#0 = Allow guests to search, 
+#1 = Guests cannot search (all users must login)
+CFG_ACCESS_CONTROL_LEVEL_GUESTS = 0
+# access policy for accounts. 
+#0 = Users can register, automatically acticate accounts
+#1 = Users can register, but admin must activate the accounts
+#2 = Users cannot register, only admin can register accounts. 
+CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS = 0
+# send an email when a new account is created by an user
+CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS = 0
+# send it to this email-address
+CFG_ACCESS_CONTROL_SEND_TO_EMAIL = adminemail
+# send an email to the user notifying when the account is created
+CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT = 0
+# send an email to the user notifying when the account is activated
+CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION = 0
+# send an email to the user notifying when the account is deleted/rejected
+CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION = 0
+
 # default data for the add_default_settings function
 # roles
 #           name          description
@@ -91,7 +112,7 @@ def_auths = (
              (SUPERADMINROLE,    'cfgbibrank',           -1,      0,       {}),
             )
 cfg_webaccess_msgs = {
-                                0: 'Try to <a href="%s/youraccount.py/login?referer=%s/admin/%s/">login</a> as another user.' % (weburl, weburl, "%s"),
+                                0: 'Try to <a href="%s/youraccount.py/login?referer=%s/admin/%s/">login</a> with another account.' % (weburl, weburl, "%s"),
                                 1: '<br>If you think this is not correct, please contact: <a href="mailto:%s">%s</a>' % (supportemail, supportemail)
 
 		} 
@@ -104,9 +125,9 @@ cfg_webaccess_warning_msgs = {
            			3: 'Error(3): The action %s does not exist.',
                                 4: 'Error(4): Unexpected error occurred.',
                                 5: 'Error(5): Missing mandatory keyword argument(s) for this action.',
-                                6: 'Error(6): Wrong user ID.',
+                                6: 'Error(6): Guest accounts are not authorized to perform this action.',
                                 7: 'Error(7): Not enough arguments, user ID and action name required.',
-                                8: 'Error(8): Incorrect keyword argument(s) for this action.'
-
+                                8: 'Error(8): Incorrect keyword argument(s) for this action.',
+                                9: """Error(9): Account '%s' is not yet activated."""
 		} 
 </protect>

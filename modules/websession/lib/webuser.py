@@ -36,19 +36,43 @@ import crypt
 import string
 import session
 import websession
+import smtplib
 from websession import pSession, pSessionMapping
 from session import SessionError
 from config import *
 from messages import *
 from cdsware.access_control_engine import acc_authorize_action
 from access_control_admin import acc_findUserRoleActions
+from access_control_config import *
 
 def createGuestUser():
     """Create a guest user , insert into user null values in all fields 
 
        createGuestUser() -> GuestUserID
-    """    
-    return run_sql("insert into user (email) values ('')")
+    """
+    if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0:
+        return run_sql("insert into user (email, note) values ('', '1')")
+    elif CFG_ACCESS_CONTROL_LEVEL_GUESTS >= 1:
+        return run_sql("insert into user (email, note) values ('', '0')")
+
+def page_not_authorized(req, referer='', uid=''):
+    """Show error message when account is not activated"""
+    import cdsware.bibrankadminlib as brl
+    from cdsware.webpage import page
+   
+    if not uid:
+        uid = getUid(req)
+    res = run_sql("SELECT email FROM user WHERE id=%s" % uid)
+    if res and res[0][0]:
+        return page(title='Authorization failure',
+                    uid=getUid(req),
+                    body=brl.adderrorbox('Reason:',
+                    datalist=["%s %s" % (cfg_webaccess_warning_msgs[9] % res[0][0], ("%s %s" % (cfg_webaccess_msgs[0] % referer, cfg_webaccess_msgs[1])))]))
+    else:
+        return page(title='Authorization failure',
+                    uid=getUid(req),
+                    body="""Guest users are not allowed, please <a href="%s/youraccount.py/login">login</a>.""" % weburl)
+        
 
 def getUid (req):
     """It gives the userId taking it from the cookie of the request,also has the control mechanism for the guest users,
@@ -56,6 +80,7 @@ def getUid (req):
 
        getUid(req) -> userId	 
     """
+    guest = 0
     sm = session.MPSessionManager(pSession, pSessionMapping())
     try:
 	s = sm.get_session(req)
@@ -65,8 +90,25 @@ def getUid (req):
     userId = s.getUid()
     if userId == -1: # first time, so create a guest user
         s.setUid(createGuestUser())
+        guest = 1
     sm.maintain_session(req,s)
-    return userId
+    
+    if guest == 0:
+        guest = isGuestUser(userId)
+
+    if guest:
+        if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0:
+            return userId
+        elif CFG_ACCESS_CONTROL_LEVEL_GUESTS >= 1:
+            return -1
+    else:
+        res = run_sql("SELECT note FROM user WHERE id=%s" % userId)
+        if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 0:
+            return userId
+        elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1 and res and res[0][0] in [1, "1"]:
+            return userId
+        else:
+            return -1
 
 def setUid(req,uid):
     """It sets the userId into the session, and raise the cookie to the client.
@@ -153,7 +195,8 @@ def checkemail(email):
        
        checkemail(email) -> boolean
     """
-    if (string.find(email, "@") <= 0) or (string.find(email, " ") > 0):
+
+    if (string.find(email, "@") <= 0) or (string.find(email, " ") > 0) or not (email[-3:-2] == "." or email[-4:-3] == "."):
        return 0
     return 1
 
@@ -191,8 +234,19 @@ def registerUser(req,user,passw):
     if userOnSystem(user) and  user !='':
 	return -1	
     if checkRegister(user,passw) and checkemail(user):
-	setUid(req, run_sql("INSERT INTO user (email, password) VALUES (%s,%s)",
-                                (user,passw)))
+        if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 0:
+            activated = 1
+        elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
+            activated = 0
+        elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
+            return 0
+	setUid(req, run_sql("INSERT INTO user (email, password, note) VALUES (%s,%s,%s)",
+                                (user,passw, activated)))
+
+        if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
+            sendNewUserAccountWarning(user, user, passw)
+        if CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS and CFG_ACCESS_CONTROL_SEND_TO_EMAIL:
+            sendNewAdminAccountWarning(user, CFG_ACCESS_CONTROL_SEND_TO_EMAIL)
 	return 1
     return 0
 
@@ -249,6 +303,67 @@ def givePassword(email):
     if len(query_pass)>0:
 	return query_pass[0][0]
     return -999
+
+def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=cdslang):
+    """Send an email to the address given by sendTo about the new account newAccountEmail."""
+	
+    fromaddr = "From: %s" % supportemail
+    toaddrs  = "To: %s" % sendTo
+    to = toaddrs + "\n"
+    sub = "Subject: New account on '%s'" % cdsname
+    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
+        sub += " - PLEASE ACTIVATE"
+    sub += "\n\n"
+    body = "A new account has been created on '%s'" % cdsname
+    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
+        body += " and is awaiting activation"
+    body += ":\n\n"
+    body += "   Username/Email: %s\n\n" % newAccountEmail
+    body += "You can approve or reject this account request at: %s/admin/webaccess/webaccessadmin.py/manageaccounts\n" % weburl
+    body += "\n---------------------------------"
+    body += "\n%s" % cdsname
+    body += "\nContact: %s" % supportemail
+    msg = to + sub + body	
+
+    server = smtplib.SMTP('localhost')
+    server.set_debuglevel(1)
+   
+    try: 
+        server.sendmail(fromaddr, toaddrs, msg)
+    except smtplib.SMTPRecipientsRefused,e:
+        return 0
+  
+    server.quit()
+    return 1
+
+def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=cdslang):
+    """Send an email to the address given by sendTo about the new account newAccountEmail."""
+	
+    fromaddr = "From: %s" % supportemail
+    toaddrs  = "To: %s" % sendTo
+    to = toaddrs + "\n"
+    sub = "Subject: Your account created on '%s'\n\n" % cdsname
+    body = "You have created a new account on '%s':\n\n" % cdsname
+    body += "   Username/Email: %s\n" % newAccountEmail
+    body += "   Password: %s\n\n" % ("*" * len(password))
+    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
+        body += "This account is awaiting approval by the site administrators and therefore cannot be used as of yet.\nYou will receive an email notification as soon as your account request has been processed.\n"
+    body += "\n---------------------------------"
+    body += "\n%s" % cdsname
+    body += "\nContact: %s" % supportemail
+    msg = to + sub + body
+
+    server = smtplib.SMTP('localhost')
+    server.set_debuglevel(1)
+   
+    try: 
+        server.sendmail(fromaddr, toaddrs, msg)
+    except smtplib.SMTPRecipientsRefused,e:
+        return 0
+  
+    server.quit()
+    return 1
+
 
 def get_email(uid):
     """Return email address of the user uid.  Return string 'guest' in case

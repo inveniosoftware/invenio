@@ -38,7 +38,7 @@ from cdsware.config import weburl,cdsname,cdslang,cachedir,cdsnameintl
 def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
     "Display search interface page for collection c by looking in the collection cache."
     from cdsware.webpage import page, create_error_box
-    from cdsware.webuser import getUid
+    from cdsware.webuser import getUid, page_not_authorized
     from cdsware.messages import wash_language,msg_internal_error,msg_collection_not_found_head,msg_collection_not_found_body
     from cdsware.search_engine import get_colID, get_coll_i18nname
     # wash params:
@@ -56,6 +56,8 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
     # get user ID:
     try:
         uid = getUid(req)
+        if uid == -1:
+            return page_not_authorized(req, "../")
     except MySQLdb.Error, e:
         return page(title=msg_internal_error[ln],
                     body = create_error_box(req, verbose=verbose, ln=ln),

@@ -75,6 +75,7 @@ def perform_index(ln=cdslang, mtype='', content=''):
     <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_editindexes#2">Edit index</a></small></td>
     <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_addindex#3">Add new index</a></small></td>
     <td>4.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_showfieldoverview#4">Overview of logical fields</a></small></td>
+    </tr><tr>
     <td>5.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_editfields#2">Edit logical field</a></small></td>
     <td>6.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py?ln=%s&amp;mtype=perform_addfield#3">Add new logical field</a></small></td>
     </tr>
@@ -134,8 +135,8 @@ def perform_editfield(fldID, ln=cdslang, mtype='', content='', callback='yes', c
     <td>1.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_modifyfield">Modify field code</a></small></td>
     <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_modifyfieldtranslations">Modify translations</a></small></td>
     <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_modifyfieldtags">Modify MARC tags</a></small></td>
-    </tr><tr>
     <td>4.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_deletefield">Delete field</a></small></td>
+    </tr><tr>
     <td>5.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_showdetailsfield">Show field usage</a></small></td>
     </tr>
     </table>
@@ -160,11 +161,6 @@ def perform_editfield(fldID, ln=cdslang, mtype='', content='', callback='yes', c
         fin_output += content
     elif mtype == "perform_deletefield" or not mtype:
         fin_output += perform_deletefield(fldID, ln, callback='')
-
-    if mtype == "perform_showdetailsfield" and content:
-        fin_output += content
-    elif mtype == "perform_showdetailsfield" or not mtype:
-        fin_output += perform_showdetailsfield(fldID,ln, callback='')
         
     return addadminbox("Edit logical field '%s'" % fld_dict[int(fldID)],  [fin_output])
       

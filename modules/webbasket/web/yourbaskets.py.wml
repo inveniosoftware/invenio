@@ -38,9 +38,9 @@ import urllib
 sys.path.append('%s' % pylibdir)
 from cdsware.config import weburl,webdir
 from cdsware.webpage import page
-from cdsware import webbasket
 from cdsware.dbquery import run_sql
-from cdsware.webuser import getUid
+from cdsware.webuser import getUid,page_not_authorized
+from cdsware import webbasket
 from mod_python import apache
 
 imagesurl = "%s/img" % webdir
@@ -54,7 +54,11 @@ def index(req):
     raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
 
 def display(req, action="", title="Your Baskets", delete_alerts="", confirm_action="", id_basket=0, bname="", newname="", newbname="", mark=[], to_basket="", copy_move="", idup="", ordup="", iddown="", orddown="", of="hb"):
+
     uid = getUid(req)
+    if uid == -1: 
+        return page_not_authorized(req, "../yourbaskets.py/display")
+
     if action=="DELETE":
         title="Delete basket"
     return page(title=title,
@@ -68,6 +72,10 @@ def display(req, action="", title="Your Baskets", delete_alerts="", confirm_acti
 def display_public(req, id_basket=0, name="", action="", to_basket="", mark=[], newname="", of="hb"):
     title = "Display basket"
     uid = getUid(req)    
+
+    if uid == -1: 
+        return page_not_authorized(req, "../yourbaskets.py/display_public")
+
     return page(title=title,
                 body=webbasket.perform_display_public(uid, id_basket, name, action, to_basket, mark, newname, of),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
@@ -81,6 +89,10 @@ def add(req, recid=[], bid=[], bname=[]):
     If bname is set, it'll create new basket with this name, and add records there rather than to bid."""
     title = "Adding records to baskets"
     uid = getUid(req)
+
+    if uid == -1: 
+        return page_not_authorized(req, "../yourbaskets.py/add")
+
     return page(title=title,
                 body=webbasket.perform_request_add(uid, recid, bid, bname),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt; <a class="navtrail" href="%s/yourbaskets.py/display">Your Baskets</a>""" % (weburl, weburl),

@@ -40,7 +40,7 @@ sys.path.append('%s' % pylibdir)
 from cdsware.config import weburl
 from cdsware.webpage import page
 from cdsware import webalert
-from cdsware.webuser import getUid
+from cdsware.webuser import getUid, page_not_authorized
 from mod_python import apache
     
 def relative_redirect( req, relative_url, **args ):
@@ -55,6 +55,10 @@ def relative_redirect( req, relative_url, **args ):
 
 def display(req, p="n"):
     uid = getUid(req)	
+
+    if uid == -1: 
+        return page_not_authorized(req, "../youralerts.py/display")
+
     return page(title="Display searches",
                 body=webalert.perform_display(p,uid),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
@@ -65,6 +69,10 @@ def display(req, p="n"):
 
 def input(req, idq, name="", freq="week", notif="y", idb=0, error_msg=""):
     uid = getUid(req)
+
+    if uid == -1: 
+        return page_not_authorized(req, "../youralerts.py/input")
+
     html = webalert.perform_input_alert("add", idq, name, freq, notif, idb,uid)
     if error_msg != "":
         html ="""<div class="quicknote">%s</div><br>%s"""%(error_msg, html)
@@ -78,6 +86,10 @@ def input(req, idq, name="", freq="week", notif="y", idb=0, error_msg=""):
 
 def modify(req, idq, old_idb, name="", freq="week", notif="y", idb=0, error_msg=""):
     uid = getUid(req)
+
+    if uid == -1: 
+        return page_not_authorized(req, "../youralerts.py/modify")
+
     html = webalert.perform_input_alert("update", idq, name, freq, notif, idb,uid, old_idb)
     if error_msg != "":
         html ="""<div class="quicknote">%s</div><br>%s"""%(error_msg, html)
@@ -91,6 +103,10 @@ def modify(req, idq, old_idb, name="", freq="week", notif="y", idb=0, error_msg=
 
 def list(req):
     uid = getUid(req)
+
+    if uid == -1: 
+        return page_not_authorized(req, "../youralerts.py/list")
+
     return page(title="Display alerts",
                 body=webalert.perform_list_alerts(uid),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
@@ -101,6 +117,10 @@ def list(req):
 
 def add(req, name, freq, notif, idb, bname, idq):
     uid = getUid(req)
+
+    if uid == -1: 
+        return page_not_authorized(req, "../youralerts.py/add")
+
     try:
         html=webalert.perform_add_alert(name, freq, notif, idb, bname, idq,uid)
     except webalert.AlertError, e:
@@ -115,6 +135,10 @@ def add(req, name, freq, notif, idb, bname, idq):
 
 def update(req, name, freq, notif, idb, bname, idq, old_idb):
     uid = getUid(req)
+
+    if uid == -1: 
+        return page_not_authorized(req, "../youralerts.py/update")
+
     try:
         html=webalert.perform_update_alert(name, freq, notif, idb, bname, idq, old_idb,uid)
     except webalert.AlertError, e:
@@ -129,6 +153,10 @@ def update(req, name, freq, notif, idb, bname, idq, old_idb):
 
 def remove(req, name, idu, idq, idb):
     uid = getUid(req) 
+
+    if uid == -1: 
+        return page_not_authorized(req, "../youralerts.py/remove")
+
     return page(title="Display alerts",
                 body=webalert.perform_remove_alert(name, idu, idq, idb, uid),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,

@@ -40,11 +40,16 @@ from cdsware import webaccount
 from cdsware import webbasket
 from cdsware import webalert
 from cdsware import webuser
+from cdsware.access_control_config import *
 from mod_python import apache    
 import smtplib
 
 def set(req, ln=cdslang):
     uid = webuser.getUid(req)
+
+    if uid == -1:
+        return webuser.page_not_authorized(req, "../youraccount.py/set")
+
     data = webuser.getDataUid(req,uid)
     email = data[0]
     passw = data[1]
@@ -59,6 +64,10 @@ def set(req, ln=cdslang):
 
 def change(req,email=None,password=None,ln=cdslang):
     uid = webuser.getUid(req)
+
+    if uid == -1:
+        return webuser.page_not_authorized(req, "../youraccount.py/change")
+
     if webuser.checkemail(email):
         
         change = webuser.updateDataUser(req,uid,email,password)
@@ -68,6 +77,10 @@ def change(req,email=None,password=None,ln=cdslang):
 
 def lost(req, ln=cdslang):
     uid = webuser.getUid(req)
+
+    if uid == -1:
+        return webuser.page_not_authorized(req, "../youraccount.py/lost")
+
     return page(title="Login",
                 body=webaccount.perform_lost(),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
@@ -79,6 +92,10 @@ def lost(req, ln=cdslang):
 
 def display(req, ln=cdslang):
     uid =  webuser.getUid(req)
+
+    if uid == -1:
+        return webuser.page_not_authorized(req, "../youraccount.py/display")
+
     if webuser.isGuestUser(uid):
 		
 	return page(title="Your Account",
@@ -105,6 +122,9 @@ def display(req, ln=cdslang):
 def send_email(req, p_email=None, ln=cdslang):
     
     uid = webuser.getUid(req)
+
+    if uid == -1:
+        return webuser.page_not_authorized(req, "../youraccount.py/send_email")
 
     passw = webuser.givePassword(p_email) 
     if passw == -999:
@@ -153,6 +173,10 @@ def send_email(req, p_email=None, ln=cdslang):
 
 def youradminactivities(req, ln=cdslang):
     uid = webuser.getUid(req)	
+
+    if uid == -1:
+        return webuser.page_not_authorized(req, "../youraccount.py/youradminactivities")
+
     return page(title="Your Administrative Activities",
                 body=webaccount.perform_youradminactivities(uid),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
@@ -163,7 +187,11 @@ def youradminactivities(req, ln=cdslang):
                 lastupdated=__lastupdated__)
 
 def delete(req, ln=cdslang):
-    uid = webuser.getUid(req)	
+    uid = webuser.getUid(req)
+
+    if uid == -1:
+        return webuser.page_not_authorized(req, "../youraccount.py/delete")
+	
     return page(title="Delete Account",
                 body=webaccount.perform_delete(),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
@@ -176,6 +204,10 @@ def delete(req, ln=cdslang):
 def logout(req, ln=cdslang):
     
     uid = webuser.logoutUser(req)
+
+    if uid == -1:
+        return webuser.page_not_authorized(req, "../youraccount.py/logout")
+
     return page(title="Logout",
                 body=webaccount.perform_logout(req),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
@@ -202,7 +234,12 @@ def login(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
        iden = webuser.loginUser(p_email,p_pw)
     
        if len(iden)>0:
-           uid=webuser.update_Uid(req,p_email,p_pw)
+           uid = webuser.update_Uid(req,p_email,p_pw)
+           uid2 = webuser.getUid(req)
+           if uid2 == -1:
+               webuser.logoutUser(req)
+               return webuser.page_not_authorized(req, "../youraccount.py/login?ln=%s" % ln, uid=uid)
+
            # login successful!
            if referer:
                req.err_headers_out.add("Location", referer)
@@ -229,9 +266,15 @@ def login(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
 	ruid=webuser.registerUser(req,p_email,p_pw)
         if ruid==1:
 		uid=webuser.update_Uid(req,p_email,p_pw)
-		return display(req, ln)	
+                mess = "Your account has been successfully created."
+                if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
+                    mess += " An email has been sent to the given address with the account information."
+                if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
+                    mess += " A second email will be sent when the account has been activated and can be used."
+                else:
+                    mess += """ To continue to your account, press <a href="%s/youraccount.py/display?ln=%s">here</a>""" % (weburl, ln)
         elif  ruid ==-1 :
-		mess ="The user already exists in the database, pleas try again"
+		mess ="The user already exists in the database, please try again"
 		act = "login"
 	else:
             mess ="Your are not registered into the system please try again"

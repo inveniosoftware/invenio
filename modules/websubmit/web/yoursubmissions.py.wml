@@ -44,7 +44,7 @@ from cdsware.dbquery import run_sql
 from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import *
 from cdsware.webpage import page, create_error_box
-from cdsware.webuser import getUid, get_email, list_registered_users
+from cdsware.webuser import getUid, get_email, list_registered_users, page_not_authorized
 from cdsware.messages import *
 from cdsware.websubmit_config import *
 from cdsware.search_engine import search_pattern
@@ -56,6 +56,8 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
     # get user ID:
     try:
         uid = getUid(req)
+        if uid == -1: 
+            return page_not_authorized(req, "../yoursubmissions.py/index")
         u_email = get_email(uid)
     except MySQLdb.Error, e:
         return errorMsg(e.value,req)

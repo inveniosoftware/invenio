@@ -1957,6 +1957,7 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     <td>2.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_addcollectiontotree">Attach collection to tree</a></small></td>
     <td>3.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_modifycollectiontree">Modify collection tree</a></small></td>
     <td>4.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_runwebcoll">Webcoll Status</a></small></td>
+    </tr><tr>
     <td>5.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_validateconf">Collections Status</a></small></td>
     </tr>
     </table>
@@ -2227,16 +2228,14 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
     <td>1.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_modifydbquery">Modify collection query</a></small></td>
     <td>2.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_modifyrestricted">Modify access restrictions</a></small></td>
     <td>3.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_modifytranslations">Modify translations</a></small></td>
-    </tr>
-    <tr>
     <td>4.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_deletecollection">Delete collection</a></small></td>
+    </tr><tr>
     <td>5.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showportalboxes">Modify portalboxes</a></small></td>
     <td>6.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showsearchfields#6">Modify search fields</a></small></td>
     <td>7.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showsearchoptions#7">Modify search options</a></small></td>
-    </tr>
-    <tr>
     <td>8.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showsortoptions#8">Modify sort options</a></small></td>
     <td>9.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_modifyrankmethods#9">Modify rank options</a></small></td>
+    </tr><tr>
     <td>10.<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showoutputformats#10">Modify output formats</a></small></td>
     </tr>
     </table>

@@ -33,6 +33,7 @@ from webpage import page
 from dbquery import run_sql	
 from webuser import getUid,isGuestUser
 from access_control_admin import acc_findUserRoleActions
+from access_control_config import CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
 
 imagesurl = "%s/img" % weburl
 
@@ -117,7 +118,7 @@ def perform_youradminactivities(uid):
             if action == "cfgbibindex":
                 out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibindex/bibindexadmin.py">Configure BibIndex</a>""" % weburl
             if action == "cfgwebaccess":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/webaccessadmin.py">Configure WebAccess</a>""" % weburl
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/">Configure WebAccess</a>""" % weburl
             if action == "cfgwebsearch":
                 out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py">Configure WebSearch</a>""" % weburl
             if action == "cfgwebsubmit":
@@ -213,8 +214,14 @@ def perform_set(email,password):
 def perform_ask(referer=''):
     text = """
               <p>If you already have an account, please log in by choosing the <strong class=headline>login
-              </strong> button below. <br>If you don't own an account yet, please enter the values of your preference and choose the <strong class=headline>register</strong> button.
-
+              </strong> button below. <br>"""
+    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1:
+        text += """If you don't own an account yet, please enter the values of your preference and choose the <strong class=headline>register</strong> button."""
+        if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
+            text += "The account will not be possible to use before it has been verified and activated."  
+    elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
+        text += """It is not possible to create an account yourself. Contact <a href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a> if you want an account."""
+    text += """ 
               <form method="post" action="../youraccount.py/login">
               <input type="hidden" name="referer" value="%s">
 
@@ -239,13 +246,16 @@ def perform_ask(referer=''):
 		 </td>
                 </tr>
                 <tr>
-		 <td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>&nbsp;&nbsp;&nbsp;<code class=blocknote><input class="formbutton" type="submit" name="action" value="register"></code>&nbsp;&nbsp;&nbsp;(<a href="./lost">Lost your password?</a>)
+		 <td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>&nbsp;&nbsp;&nbsp;""" % (cgi.escape(referer))
+    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1:
+        text += """<code class=blocknote><input class="formbutton" type="submit" name="action" value="register"></code>"""
+    text += """&nbsp;&nbsp;&nbsp;(<a href="./lost">Lost your password?</a>)
 		 </td>
                 </tr>
               </table>
               <p><strong>Note:</strong> Please do not use valuable passwords such as your Unix, AFS or NICE passwords with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you for personal services of %s. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.
              </form>
-           """ % (cgi.escape(referer), cdsname)
+           """ % (cdsname)
     return text
 
 

@@ -82,8 +82,45 @@ def adddefaultsettings(req, superusers=[], confirm=0):
                                           confirm=confirm)
 
 
+def manageaccounts(req, mtype='', content='', confirm=0):
+    """enable, disable and edit accounts"""
+            
+    return wal.perform_manageaccounts(req=req, mtype=mtype, content=content, confirm=confirm)
 
+def modifyaccountstatus(req, userID, email_user_pattern='', limit_to=-1, maxpage=25, page=1, callback='yes', confirm=0):
+    """enable or disable account"""
+            
+    return wal.perform_modifyaccountstatus(req=req, userID=userID, email_user_pattern=email_user_pattern, limit_to=limit_to, maxpage=maxpage, page=page, callback=callback, confirm=confirm)
 
+def modifylogindata(req, userID, email='', password='', callback='yes', confirm=0):
+    """modify the email/password of an account"""
+            
+    return wal.perform_modifylogindata(req=req, userID=userID, email=email, password=password, callback=callback, confirm=confirm)
+
+def rejectaccount(req, userID, email_user_pattern='', limit_to=-1, maxpage=25, page=1, callback='yes', confirm=0):
+    """Set account inactive, delete it and send email to the owner."""
+            
+    return wal.perform_rejectaccount(req=req, userID=userID, email_user_pattern=email_user_pattern, limit_to=limit_to, maxpage=maxpage, page=page, callback=callback, confirm=confirm)
+
+def deleteaccount(req, userID, callback='yes', confirm=0):
+    """delete account"""
+            
+    return wal.perform_deleteaccount(req=req, userID=userID, callback=callback, confirm=confirm)
+
+def createaccount(req, email='', password='', callback='yes', confirm=0):
+    """create account"""
+            
+    return wal.perform_createaccount(req=req, email=email, password=password, callback=callback, confirm=confirm)
+
+def editaccount(req, userID, mtype='', content='', callback='yes', confirm=0):
+    """edit account. """
+
+    return wal.perform_editaccount(req=req, userID=userID, mtype=mtype, content=content, callback=callback, confirm=confirm)
+
+def modifyaccounts(req, email_user_pattern='', limit_to=-1, maxpage=25, page=1, callback='yes', confirm=0):
+    """Modify accounts. """
+
+    return wal.perform_modifyaccounts(req=req, email_user_pattern=email_user_pattern, limit_to=limit_to, maxpage=maxpage, page=page, callback=callback,confirm=confirm)
 
 def delegate_startarea(req):
     """add info here"""

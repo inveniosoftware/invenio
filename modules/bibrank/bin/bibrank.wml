@@ -111,7 +111,7 @@ task_id = -1 # the task id
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
 base_process_size = 4500 # process base size
-options = {} # will hold task options
+bibrank_options = {} # will hold task options
 
 def serialize_via_numeric_array_dumps(arr):
     return Numeric.dumps(arr)
@@ -224,7 +224,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
 
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
-    if options["verbose"]>= 9:
+    if bibrank_options["verbose"]>= 9:
         write_message("got signal %d" % sig)
     write_message("sleeping...")
     task_update_status("SLEEPING")
@@ -232,7 +232,7 @@ def task_sig_sleep(sig, frame):
 
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
-    if options["verbose"]>= 9:
+    if bibrank_options["verbose"]>= 9:
         write_message("got signal %d" % sig)
     write_message("continuing...")
     task_update_status("CONTINUING")
@@ -246,7 +246,7 @@ def task_sig_stop_commands():
 
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
-    if options["verbose"]>= 9:
+    if bibrank_options["verbose"]>= 9:
         write_message("got signal %d" % sig)
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
@@ -256,14 +256,14 @@ def task_sig_suicide(sig, frame):
 
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
-    if options["verbose"]>= 9:
+    if bibrank_options["verbose"]>= 9:
         write_message("got signal %d" % sig)
     write_message("unknown signal %d ignored" % sig) # do nothing for other signals
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
     query = "UPDATE schTASK SET progress='%s' where id=%d" % (MySQLdb.escape_string(msg), task_id)
-    if options["verbose"]>= 9:
+    if bibrank_options["verbose"]>= 9:
         write_message(query)
     run_sql(query)
     return
@@ -271,7 +271,7 @@ def task_update_progress(msg):
 def task_update_status(val):
     """Updates state information in the BibSched task table."""
     query = "UPDATE schTASK SET status='%s' where id=%d" % (MySQLdb.escape_string(val), task_id)
-    if options["verbose"]>= 9:
+    if bibrank_options["verbose"]>= 9:
         write_message(query)
     run_sql(query)
     return
@@ -305,7 +305,7 @@ def get_date_range(var):
 
 def command_line():
     """Storing the task together with the parameters given."""
-    global options
+    global bibrank_options
     long_flags = ["lastupdate","add","del","repair","maxmem", "flush","stat", "rebalance", "id=", "collection=", "check", "modified=", "update", "run=", "user=", "sleeptime=", "time=", "help", "version", "verbose="]
     short_flags = "ladSi:m:c:kUrRM:f:w:u:s:t:hVv:"
     format_string = "%Y-%m-%d %H:%M:%S"
@@ -317,12 +317,12 @@ def command_line():
         usage(1)
     if args:
         usage(1)
-    options = {"quick":"no","cmd":"add","flush":100000,"validset":"", "collection":[], "id":[], "check": "", "stat":"", "modified":"", "last_updated":"last_updated","run":"", "verbose":1}
+    bibrank_options = {"quick":"no","cmd":"add","flush":100000,"validset":"", "collection":[], "id":[], "check": "", "stat":"", "modified":"", "last_updated":"last_updated","run":"", "verbose":1}
 
     res = run_sql("SELECT name from rnkMETHOD")
-    options["run"] = []
+    bibrank_options["run"] = []
     for (name,) in res:
-        options["run"].append(name)
+        bibrank_options["run"].append(name)
 
     sched_time = time.strftime(format_string)
     user = ""
@@ -334,44 +334,44 @@ def command_line():
                 print __version__
                 sys.exit(1)
             elif opt[0] in ["--verbose", "-v"]:
-                options["verbose"] = int(opt[1])
+                bibrank_options["verbose"] = int(opt[1])
             elif opt == ("-a","") or opt == ("--add",""):
-                options["cmd"] = "add"
+                bibrank_options["cmd"] = "add"
                 if ("-x","") in opts or ("--del","") in opts:
                     usage(1)
             elif opt[0] in ["--run", "-w"]:
-                options["run"] = []
+                bibrank_options["run"] = []
                 run = split(opt[1],",")
                 for key in range(0,len(run)):
-                    options["run"].append(run[key])
+                    bibrank_options["run"].append(run[key])
             elif opt == ("-r","") or opt == ("--repair",""):
-                options["cmd"] = "repair"
+                bibrank_options["cmd"] = "repair"
             elif opt == ("-d","") or opt == ("--del",""):            
-                options["cmd"]="del"
+                bibrank_options["cmd"]="del"
             elif opt[0] in [ "-u", "--user"]:
                 user = opt[1]
             elif opt[0] in [ "-k", "--check"]:
-                options["cmd"]= "check" 
+                bibrank_options["cmd"]= "check" 
             elif opt[0] in [ "-S", "--stat"]:
-                options["cmd"] = "stat"
+                bibrank_options["cmd"] = "stat"
             elif opt[0] in [ "-i", "--id" ]:
-                options["id"] = options["id"] + split_ranges(opt[1])
-                options["last_updated"] = ""
+                bibrank_options["id"] = bibrank_options["id"] + split_ranges(opt[1])
+                bibrank_options["last_updated"] = ""
             elif opt[0] in [ "-c", "--collection" ]:
-                options["collection"] = opt[1]
+                bibrank_options["collection"] = opt[1]
             elif opt[0] in [ "-R", "--rebalance"]: 
-                 options["quick"] = "no"   
+                 bibrank_options["quick"] = "no"   
             elif opt[0] in [ "-f", "--flush"]:     
-                options["flush"]=int(opt[1])
+                bibrank_options["flush"]=int(opt[1])
             elif opt[0] in [ "-M", "--maxmem"]:
-                options["maxmem"]=int(opt[1])
-                if options["maxmem"] < base_process_size + 1000:
+                bibrank_options["maxmem"]=int(opt[1])
+                if bibrank_options["maxmem"] < base_process_size + 1000:
                     raise StandardError, "Memory usage should be higher than %d kB" % (base_process_size + 1000)
             elif opt[0] in [ "-m", "--modified" ]:
-                options["modified"] = get_date_range(opt[1]) #2002-10-27 13:57:26
-                options["last_updated"] = ""
+                bibrank_options["modified"] = get_date_range(opt[1]) #2002-10-27 13:57:26
+                bibrank_options["last_updated"] = ""
             elif opt[0] in [ "-l", "--lastupdate" ]:
-                options["last_updated"] = "last_updated"
+                bibrank_options["last_updated"] = "last_updated"
             elif opt[0] in [ "-s", "--sleeptime" ]:
                 get_datetime(opt[1]) # see if it is a valid shift
                 sleeptime=opt[1]
@@ -384,10 +384,10 @@ def command_line():
         sys.exit(1)
              
     user = authenticate(user)
-    if options["verbose"]>=9:
-        write_message("Storing task options %s" % options)
+    if bibrank_options["verbose"]>=9:
+        write_message("Storing task options %s" % bibrank_options)
 
-    new_task_id = run_sql("""INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status) VALUES ('bibrank',%s,%s,%s,%s,'WAITING')""", (user, sched_time, sleeptime, dumps(options)))
+    new_task_id = run_sql("""INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status) VALUES ('bibrank',%s,%s,%s,%s,'WAITING')""", (user, sched_time, sleeptime, dumps(bibrank_options)))
 
     print "Task #%d was successfully scheduled for execution." % new_task_id
     return
@@ -397,10 +397,10 @@ def task_run(row):
     queue row, containing if, arguments, etc.
     Return 1 in case of success and 0 in case of failure.
     """
-    global task_id, options
+    global task_id, bibrank_options
     task_id = row[0]
     task_proc = row[1]
-    options = loads(row[6])
+    bibrank_options = loads(row[6])
     task_status = row[7]
 
 
@@ -417,15 +417,15 @@ def task_run(row):
     if task_status != "WAITING":
         write_message("The task #%d is %s. I expected WAITING." % (task_id, task_status), sys.stderr)
         return 0
-    if options["verbose"]:
+    if bibrank_options["verbose"]:
         write_message("Task #%d started." % task_id)
     task_update_status("RUNNING")
     try:  
-        options = marshal.loads(row[6])
-        for key in options["run"]:
+        bibrank_options = marshal.loads(row[6])
+        for key in bibrank_options["run"]:
             write_message("")
             file = etcdir + "/bibrank/" + key + ".cfg"
-            if options["verbose"] >= 9:
+            if bibrank_options["verbose"] >= 9:
                 write_message("Getting configuration from file: %s" % file)
             config = ConfigParser.ConfigParser()
             try:
@@ -448,7 +448,7 @@ def task_run(row):
         sys.exit(1)
 
     task_update_status("DONE")
-    if options["verbose"]:
+    if bibrank_options["verbose"]:
         write_message("Task #%d finished." % task_id)
     return 1
 

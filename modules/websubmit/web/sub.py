@@ -40,19 +40,26 @@ from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import acc_isRole
 from cdsware.websubmit_config import *
 from cdsware.webpage import page, create_error_box
-from cdsware.webuser import getUid, get_email
+from cdsware.webuser import getUid, get_email, page_not_authorized
 from cdsware.messages import *
 from mod_python import apache
 
 def index(req,c=cdsname,ln=cdslang):
+    uid = getUid(req)
+    if uid == -1: 
+        return page_not_authorized(req, "../sub.py/index")
+
     myQuery = req.args
-    if re.search("@",myQuery):
-        param = re.sub("@.*","",myQuery)
-        IN = re.sub(".*@","",myQuery)
+    if myQuery:
+        if re.search("@",myQuery):
+            param = re.sub("@.*","",myQuery)
+            IN = re.sub(".*@","",myQuery)
+        else:
+            IN = myQuery
+        url = "%s/direct.py?sub=%s&%s" % (urlpath,IN,param)
+        req.err_headers_out.add("Location", url)
+        raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
+        return ""
     else:
-        IN = myQuery
-    url = "%s/direct.py?sub=%s&%s" % (urlpath,IN,param)
-    req.err_headers_out.add("Location", url)
-    raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
-    return ""
+        return "<html>Illegal page access</html>"
 </protect>

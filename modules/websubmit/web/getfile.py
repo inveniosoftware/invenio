@@ -40,7 +40,7 @@ from cdsware.config import cdsname,cdslang
 from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import acc_isRole
 from cdsware.webpage import page, create_error_box
-from cdsware.webuser import getUid, get_email
+from cdsware.webuser import getUid, get_email, page_not_authorized
 from cdsware.messages import *
 from mod_python import apache
 from cdsware.websubmit_config import *
@@ -50,6 +50,8 @@ def index(req,c=cdsname,ln=cdslang,recid="",docid="",version="",name="",format="
     # get user ID:
     try:
         uid = getUid(req)
+        if uid == -1: 
+            return page_not_authorized(req, "../getfile.py/index")
         uid_email = get_email(uid)
     except MySQLdb.Error, e:
         return errorMsg(e.value,req)

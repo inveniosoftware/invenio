@@ -40,11 +40,16 @@ from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import acc_isRole
 from cdsware.websubmit_config import *
 from cdsware.webpage import page, create_error_box
-from cdsware.webuser import getUid, get_email
+from cdsware.webuser import getUid, get_email, page_not_authorized
 from cdsware.messages import *
 from mod_python import apache
 
 def index(req,c=cdsname,ln=cdslang,sub=""):
+
+    uid = getUid(req)
+    if uid == -1: 
+        return page_not_authorized(req, "../direct.py/index")
+
     myQuery = req.args
     if sub == "":
         return errorMsg("Sorry parameter missing...",req)

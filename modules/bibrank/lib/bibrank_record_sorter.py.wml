@@ -493,8 +493,8 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     stime = time.time()
     (recdict, rec_termcount) = ({}, {})
 
-    testvalue = methods[rank_method_code]["max_nr_words_upper"]
-    #testvalue = 20
+    #testvalue = methods[rank_method_code]["max_nr_words_upper"]
+    testvalue = 20
 
     for (t, tf) in tf_values: #t=term, tf=term frequency
         term_recs = deserialize_via_marshal(terms_recs[t])
@@ -532,8 +532,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     #if len(recdict) == 0 or len(lwords) == 0:
     #    return (None, "Could not find any similar documents.", "", voutput)
     #else:
-    (recdict, hitset) = post_calculate_record_relevance(recdict, rec_termcount, hitset, verbose)
-    reclist = sort_record_relevance(recdict, rank_limit_relevance, verbose)
+    (reclist, hitset) = sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, verbose)
 
     if verbose > 0:
         voutput += "<br>Number of terms: %s<br>" % run_sql("SELECT count(id) FROM %s" % methods[rank_method_code]["rnkWORD_table"])[0][0]
@@ -580,8 +579,8 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
                     term = methods[rank_method_code]["stemmer"].stem(string.replace(term, ' ', ''))
                 if lwords_old[i] != term: #add if stemmed word is different than original word
 	            lwords.append((term, methods[rank_method_code]["rnkWORD_table"]))
-        else:  
-            words_removed += "%s" % term
+       # else:  
+       #     words_removed += "%s" % term
     #if words_removed:
     #    if len(string.split(words_removed, ",")) > 1:
     #        voutput += "The following words are very common and were not included in ranking the documents: %s." % words_removed
@@ -627,10 +626,9 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
             del hitlist
 
     if len(recdict) == 0 or (len(lwords) == 1 and lwords[0] == ""):
-        return (None, "Records not ranked. The query is not detailed enough for ranking to be possible.", "", voutput)
-    else:
-        (recdict, hitset) = post_calculate_record_relevance(recdict, rec_termcount, hitset, verbose)
-        reclist = sort_record_relevance(recdict, rank_limit_relevance, verbose)
+        return (None, "Records not ranked. The query is not detailed enough, or not enough records found, for ranking to be possible.", "", voutput)
+    else: 
+        (reclist, hitset) = sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, verbose)
 
     #Add any documents not ranked to the end of the list
     if hitset:
@@ -647,6 +645,34 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
         rank_method_stat(rank_method_code, reclist, lwords)
 
     return (reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
+
+def test():
+    import random
+    queries = 5
+    query_recs = 120000
+    hitset = HitSet()
+    q_invidx = []
+    rank_limit_relevance = 0
+    for i in range(0, queries):
+        invidx = {}
+        invidx["Gi"] = (0, random.randint(1, 100))
+        for j in range(0, query_recs):
+            invidx[j] = (random.randint(1, 10), random.randint(1, 100))
+            hitset.add(j)
+        q_invidx.append(invidx)
+    recdict = {}
+    rec_termcount = {}
+    verbose = 0
+    quick = None
+    stimetotal = time.time()
+    for i in range(0, queries):
+        stime = time.time()
+        (recdict, rec_termcount) = calculate_record_relevance(("term", random.randint(1, 5)), q_invidx[i], hitset, recdict, rec_termcount, verbose, quick=None)
+        print "Query: %s" % (time.time() - stime)
+    stime = time.time()
+    (reclist, hitset) = sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, verbose)
+    print len(reclist), (time.time() - stime)
+    print (time.time() - stimetotal)
 
 def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, verbose, quick=None):
     """Calculating the relevance of the documents based on the input, calculates only one word
@@ -682,28 +708,7 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, ver
 
     return (recdict, rec_termcount)
 
-def post_calculate_record_relevance(recdict, rec_termcount, hitset, verbose):
-    """Multiplies each record's rankvalue with the number of words that matched for the document, 
-    also returns a hitset of records that were not ranked.
-    recdict - {recid: value}
-    rec_termcount - {recid: count}
-    hitset - records not ranked, used to know which records to add to the end of the ranked records
-    verbose - verbose nr"""
-
-    startCreate = time.time()
-    global voutput
-
-    #Multiply with the number of terms of the total number of terms in the query existing in the records 
-    for j in recdict.keys():
-        #if recdict[j] > 0:
-        hitset.remove(j)
-        recdict[j] = math.log(recdict[j] * rec_termcount[j])
-
-    if verbose > 0:
-        voutput += "Post Calculation time: %s<br>" % (str(time.time() - startCreate)) 
-    return (recdict, hitset)
-
-def sort_record_relevance(recdict, rank_limit_relevance, verbose):
+def sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, verbose):
     """Sorts the dictionary and returns records with a relevance higher than the given value.
     recdict - {recid: value} unsorted
     rank_limit_relevance - a value > 0 usually
@@ -712,19 +717,23 @@ def sort_record_relevance(recdict, rank_limit_relevance, verbose):
     startCreate = time.time()
     global voutput
     reclist = []
-    divideby = max(recdict.values())
+    #Multiply with the number of terms of the total number of terms in the query existing in the records 
+    for j in recdict.keys():
+        hitset.remove(j)
+        recdict[j] = math.log(recdict[j] * rec_termcount[j])
 
-    for (recid, w) in recdict.iteritems():
-	w = int(w * 100 / divideby)
+    divideby = max(recdict.values())
+    
+    for (j, w) in recdict.iteritems():
+        w = int(w * 100 / divideby)
 	if w >= rank_limit_relevance:
-            reclist.append((recid, w))
+            reclist.append((j, w))
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
 
     if verbose > 0:
         voutput += "Number of records sorted: %s<br>" % len(reclist)
         voutput += "Sort time: %s<br>" % (str(time.time() - startCreate))
-
-    return reclist
+    return (reclist, hitset)
 
 def rank_method_stat(rank_method_code, reclist, lwords):
     """Shows some statistics about the searchresult.

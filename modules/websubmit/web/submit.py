@@ -39,13 +39,18 @@ from cdsware.config import cdsname,cdslang
 from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import acc_isRole
 from cdsware.webpage import page, create_error_box
-from cdsware.webuser import getUid, get_email
+from cdsware.webuser import getUid, get_email, page_not_authorized
 from cdsware.messages import *
 from mod_python import apache
 from cdsware.websubmit_config import *
 from cdsware.websubmit_engine import *
 
 def index(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="", access="",mainmenu="",fromdir="",file="",nextPg="",nbPg="",curpage=1,step=0,mode="U"):
+
+    uid = getUid(req)
+    if uid == -1: 
+        return page_not_authorized(req, "../submit.py/index")
+
     if doctype=="":
         return home(req,c,ln)
     elif act=="":

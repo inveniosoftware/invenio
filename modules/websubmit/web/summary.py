@@ -42,10 +42,14 @@ from cdsware.dbquery import run_sql
 from cdsware.access_control_engine import acc_authorize_action
 from cdsware.websubmit_config import *
 from cdsware.webpage import page, create_error_box
-from cdsware.webuser import getUid,get_email
+from cdsware.webuser import getUid,get_email, page_not_authorized
 from cdsware.messages import *
 
 def index(req,doctype="",act="",access="",indir=""):
+    uid = getUid(req)
+    if uid == -1: 
+        return page_not_authorized(req, "../summary.py/index")
+
     t=""    
     curdir = "%s/%s/%s/%s" % (storage,indir,doctype,access)
     subname = "%s%s" % (act,doctype)

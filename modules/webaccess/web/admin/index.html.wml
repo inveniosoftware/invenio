@@ -38,6 +38,13 @@
  <dd>Delegate the rights to a specified number of roles. <br>
      Everything you can do here is also allowed in the Main Admin Area. <br>
      Contact Main Administrator for delegation rights.</dd>
+</dl>
+<dl>
+ <dt><a href="webaccessadmin.py/manageaccounts">Manage Accounts</a>.</dt>
+ <dd>Start area for WebAccess Account Administration. Here you can <br>
+     enable, disable and modify accounts.</dd>
+</dl>
+<dl>
  <dt><a href="<WEBURL>/admin/webaccess/guide.html">Guide</a>.</dt>
  <dd>How to administrate WebAccess.</dd>
 </dl>
