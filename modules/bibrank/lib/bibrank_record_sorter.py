@@ -31,10 +31,10 @@
 pylibdir = "<LIBDIR>/python"
 
 try:
+    import sys
     import zlib
     import marshal
     import string
-    import sys
     import time
     import math
     import MySQLdb
@@ -44,7 +44,7 @@ try:
     import traceback
     import copy
 except ImportError, e:
-    import sys
+    pass
 
 try:
     import Stemmer
@@ -57,7 +57,7 @@ try:
     from cdsware.dbquery import run_sql
     from search_engine_config import *
 except ImportError, e:
-    import sys
+    pass
 
 class HitSet:
     """Class describing set of records, implemented as bit vectors of recIDs.
@@ -155,8 +155,10 @@ def deserialize_via_marshal(string):
 def adderrorbox(header='', datalist=[]):
     """used to create table around main data on a page, row based"""
 
-    try: perc= str(100 // len(datalist)) + '%'
-    except ZeroDivisionError: perc= 1
+    try: 
+        perc = str(100 // len(datalist)) + '%'
+    except ZeroDivisionError: 
+        perc = 1
 
     output  = '<table class="errorbox">'
     output += '<thead><tr><th class="errorboxheader" colspan="%s">%s</th></tr></thead>' % (len(datalist), header)
@@ -295,7 +297,7 @@ def get_bibrank_methods(collection, ln=cdslang):
             else:
                 avail_methods.append((rank_method_code, rank_method_code))              
     return avail_methods
-    
+
 def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=[], verbose=0):
     """rank_method_code, e.g. `jif' or `sbr' (word frequency vector model)                    
        rank_limit_relevance, e.g. `23' for `nbc' (number of citations) or `0.10' for `vec'                   
@@ -310,7 +312,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
        verbose_output"""
 
     hitset = copy.deepcopy(hitset_global) #we are receiving a global hitset
-    
+
     try:
         if methods:  
             pass
@@ -364,7 +366,7 @@ def merge_methods(rank_method_code, pattern, hitset, rank_limit_relevance,verbos
     result = result.items()
     result.sort(lambda x, y: cmp(x[1], y[1]))
     return (result, "(", ")", voutput)
-        
+
 def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     """Finding terms to use for calculating similarity. Terms are taken from the recid given, returns a list of recids's and relevance,
     input:
@@ -384,13 +386,13 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
 
     if methods[rank_method_code]["override_default_min_relevance"] == "no":
         rank_limit_relevance = methods[rank_method_code]["default_min_relevance"]
-   
+
     query_terms = {} 
     try:
         recID = int(recID)
     except Exception,e :
         return (None, "Warning: Error in record number, please check that a number is given.", "", voutput) 
-        
+
     res = run_sql("SELECT termlist FROM %sR WHERE id_bibrec=%s" % (methods[rank_method_code]["rnkWORD_table"][:-1], recID))
     if not res:
         return (None, "Warning: Requested record does not seem to exist.", "", voutput) 
@@ -400,7 +402,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     if len(rec_terms) > 0:
         terms = "%s" % dict(rec_terms).keys()
         terms = terms[1:len(terms) - 1]
-        terms_recs = dict(run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (methods[rank_method_code]["rnkWORD_table"],terms)))
+        terms_recs = dict(run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (methods[rank_method_code]["rnkWORD_table"], terms)))
     else:
         return (None, "Warning: Record spesified has no content indexed for use with this method.", "", voutput)
 
@@ -409,7 +411,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     for (term, tf) in rec_terms.iteritems():
 	if len(term) >= methods[rank_method_code]["min_word_length"] and terms_recs.has_key(term):
             query_terms[term] =  int((1 + math.log(tf[0])) *  tf[1])
-  
+
     query_terms_old = query_terms.items()
     query_terms_old.sort(lambda x, y: cmp(y[1], x[1])) 
     query_terms = {}
@@ -526,7 +528,7 @@ def word_frequency(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     #For each term, if accepted, get a list of the records using the term
     #calculate then relevance for each term before sorting the list of records
     for term in lwords:
-	term_recs = run_sql("SELECT term, hitlist FROM %s WHERE term='%s'" % (methods[rank_method_code]["rnkWORD_table"],  MySQLdb.escape_string(term)))
+	term_recs = run_sql("SELECT term, hitlist FROM %s WHERE term='%s'" % (methods[rank_method_code]["rnkWORD_table"], MySQLdb.escape_string(term)))
         if term_recs:
 	    term_recs = deserialize_via_marshal(term_recs[0][1])
             if check_term({}, term, methods[rank_method_code]["col_size"], len(term_recs), 1.0, 0.00, 0):
@@ -575,15 +577,15 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, ver
         #Only accept records existing in the hitset received from the search engine
         for (j, tf) in invidx.iteritems():
             if hitset.contains(j):
-                recdict[j] = recdict.get(j,0) + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
-                rec_termcount[j] = rec_termcount.get(j,0) + 1
+                recdict[j] = recdict.get(j, 0) + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
+                rec_termcount[j] = rec_termcount.get(j, 0) + 1
         #Multiply with the number of terms of the total number of terms in the query existing in the records 
     elif quick: #much used term, do not include all records, only use already existing ones
         for (j, tf) in recdict.iteritems():
             if invidx.has_key(j):
                 tf = invidx[j]
                 recdict[j] = recdict[j] + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
-                rec_termcount[j] = rec_termcount.get(j,0) + 1
+                rec_termcount[j] = rec_termcount.get(j, 0) + 1
         
     return (recdict, rec_termcount)
 
@@ -645,15 +647,12 @@ def rank_method_stat(rank_method_code, reclist, lwords):
     voutput += "<br>Rank statistics:<br>"
     for i in range(1, j):
    	voutput += "%s,Recid:%s,Score:%s<br>" % (i,reclist[len(reclist) - i][0],reclist[len(reclist) - i][1])
-	res = run_sql("SELECT termlist FROM %sR WHERE id_bibrec=%s" % (methods[rank_method_code]["rnkWORD_table"][:-1],reclist[len(reclist) - i][0]))
-	try:
-	    termlist = deserialize_via_marshal(res[0][0])
-            for term in lwords:
-                if termlist.has_key(term):
-                    voutput += "%s-%s / " % (term, termlist[term][0])
-            voutput += "<br>"
-	except StandardError, e:
-	    pass
+	res = run_sql("SELECT termlist FROM %sR WHERE id_bibrec=%s" % (methods[rank_method_code]["rnkWORD_table"][:-1], reclist[len(reclist) - i][0]))
+	termlist = deserialize_via_marshal(res[0][0])
+        for term in lwords:
+            if termlist.has_key(term):
+                voutput += "%s-%s / " % (term, termlist[term][0])
+        voutput += "<br>"
 
     voutput += "<br>Score variation:<br>"
     count = {}
@@ -662,7 +661,7 @@ def rank_method_stat(rank_method_code, reclist, lwords):
     i = 100
     while i >= 0:
         if count.has_key(i):
-            voutput += "%s-%s<br>" % (i,count[i])
+            voutput += "%s-%s<br>" % (i, count[i])
         i -= 1
 
 try:
