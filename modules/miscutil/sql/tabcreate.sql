@@ -2093,7 +2093,7 @@ CREATE TABLE IF NOT EXISTS user_rule (
 -- tables for access control engine
 
 CREATE TABLE IF NOT EXISTS aceROLE (
-  id int(15) unsigned NOT NULL, 
+  id int(15) unsigned NOT NULL auto_increment, 
   name varchar(32), 
   description varchar(255), 
   PRIMARY KEY (id)
@@ -2106,7 +2106,7 @@ CREATE TABLE IF NOT EXISTS user_aceROLE (
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS aceACTION (
-  id int(15) unsigned NOT NULL,
+  id int(15) unsigned NOT NULL auto_increment,
   name varchar(32),
   description varchar(255),
   allowedkeywords varchar(255),
@@ -2115,10 +2115,11 @@ CREATE TABLE IF NOT EXISTS aceACTION (
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS aceARGUMENT (
-  id int(15) unsigned NOT NULL,
+  id int(15) unsigned NOT NULL auto_increment,
   keyword varchar (15),
   value varchar(15),
   PRIMARY KEY (id)
+  KEY KEYVAL (keyword, value)
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS aceROLE_aceACTION_aceARGUMENT (
