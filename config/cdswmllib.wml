@@ -1,4 +1,5 @@
 ## $Id$
+## Library of WML functions of general interest.
 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002 CERN.
@@ -17,12 +18,18 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-noinst_SCRIPTS=configbis.wml
-wmlincludedir = $(libdir)/wml/cdsware
-wmlinclude_DATA = cdsnavbar.wml cdsnavtrail.wml cdspage.wml config.wml configbis.wml \
-                  messages.wml cdswmllib.wml
+## library of WML functions of general interest:
 
-EXTRA_DIST = cdsnavbar.wml cdsnavtrail.wml cdspage.wml config.wml configbis.wml.in \
-             messages.wml cdswmllib.wml
-
-CLEANFILES = *~ $(noinst_SCRIPTS)
+<:
+    sub generate_language_list_for_python {
+        ## Return Python-ready language list out of user-configured WML language list.
+        ## Input string example: en,sk,fr
+        ## Output string: ['en','sk,'fr']
+        $out = "[";
+        foreach $lang (split /\s*,\s*/, '<CDSLANGS>') {
+            $out .= "'".$lang."',";
+        }
+        $out .= "]";
+        return $out;
+    }
+:>
