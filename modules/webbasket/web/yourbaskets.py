@@ -53,23 +53,23 @@ def index(req):
     req.err_headers_out.add("Location", "%s/yourbaskets.py/display?%s" % (weburl, req.args))
     raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
 
-def display(req, action="", title="Your Baskets", delete_alerts="", confirm_action="", id_basket=0, bname="", newname="", newbname="", mark=[], to_basket="", copy_move="", idup="", ordup="", iddown="", orddown=""):
+def display(req, action="", title="Your Baskets", delete_alerts="", confirm_action="", id_basket=0, bname="", newname="", newbname="", mark=[], to_basket="", copy_move="", idup="", ordup="", iddown="", orddown="", of="hb"):
     uid = getUid(req)
     if action=="DELETE":
         title="Delete basket"
     return page(title=title,
-                body=webbasket.perform_display(uid, action, delete_alerts, confirm_action, id_basket, bname, newname, newbname, mark, to_basket, copy_move, idup, ordup, iddown, orddown),
+                body=webbasket.perform_display(uid, action, delete_alerts, confirm_action, id_basket, bname, newname, newbname, mark, to_basket, copy_move, idup, ordup, iddown, orddown, of),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
                 description="CDS Personalize, Display baskets",
                 keywords="CDS, personalize",
                 uid=uid,
                 lastupdated=__lastupdated__)
 
-def display_public(req, id_basket=0, name="", action="", to_basket="", mark=[], newname=""):
+def display_public(req, id_basket=0, name="", action="", to_basket="", mark=[], newname="", of="hb"):
     title = "Display basket"
     uid = getUid(req)    
     return page(title=title,
-                body=webbasket.perform_display_public(uid, id_basket, name, action, to_basket, mark, newname),
+                body=webbasket.perform_display_public(uid, id_basket, name, action, to_basket, mark, newname, of),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
                 description="CDS Personalize, Display baskets",
                 keywords="CDS, personalize",

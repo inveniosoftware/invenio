@@ -57,8 +57,9 @@ imagesurl = "%s/img" % weburl
 #         copy_move="1" if copy items is requested,"2" if move items is requested
 #         idup, ordup are the identifier and the order of the item to be moved up
 #         iddown, orddown are the identifier and the order of the item to be moved down
+#         of is the output format code
 # output: list of baskets in formatted html+content of the selected basket
-def perform_display(uid, action="", delete_alerts="", confirm_action="", id_basket=0, bname="", newname="", newbname="", mark=[], to_basket="", copy_move="", idup="", ordup="", iddown="", orddown=""):
+def perform_display(uid, action="", delete_alerts="", confirm_action="", id_basket=0, bname="", newname="", newbname="", mark=[], to_basket="", copy_move="", idup="", ordup="", iddown="", orddown="", of="hb"):
 
     # set variables
     out = ""
@@ -260,7 +261,7 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
                 if (newbname != ""):
                     basket_name = newbname                
         
-        out += display_basket_content(uid, id_basket, basket_name)
+        out += display_basket_content(uid, id_basket, basket_name, of)
     # if is guest user print message of relogin
     if isGuestUser(uid):
  	out += warning_guest_user(type="baskets")
@@ -271,7 +272,7 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
 # input:  the identifier of the basket
 #         the name of the basket     
 # output: the basket's content
-def display_basket_content(uid, id_basket, basket_name):
+def display_basket_content(uid, id_basket, basket_name, of):
 
     out = ""
     out_tmp=""
@@ -330,7 +331,7 @@ def display_basket_content(uid, id_basket, basket_name):
                            """<IMG src="%s/arrow_up.gif" border="0"></A>""" % (i,row[0],id_basket,row[0],row[1],preid,preord,imagesurl)
                 preid = row[0]
                 preord = row[1]
-                preabstract = print_record(row[0], "hb")
+                preabstract = print_record(row[0], of)
                 i += 1
             # complete display last item
             out += """<IMG src="%s/arrow_down.gif" border="0"></A>"""\
@@ -606,8 +607,9 @@ def order_items(uid, id_basket,idup,ordup,iddown,orddown):
 # perform_display_public: display the content of the selected basket, if public
 # input:  the identifier of the basket
 #         the name of the basket     
+#         of is the output format code
 # output: the basket's content
-def perform_display_public(uid, id_basket, basket_name, action, to_basket, mark, newname):
+def perform_display_public(uid, id_basket, basket_name, action, to_basket, mark, newname, of):
     out = ""
     if action=="EXECUTE":
         # perform actions
@@ -686,7 +688,7 @@ def perform_display_public(uid, id_basket, basket_name, action, to_basket, mark,
                            """<IMG src="%s/arrow_up.gif" border="0"></A>""" % (i,row[0],id_basket,row[0],row[1],preid,preord,imagesurl)
                 preid = row[0]
                 preord = row[1]
-                preabstract = print_record(row[0], "hb")
+                preabstract = print_record(row[0], of)
                 i += 1
             # complete display last item
             out += """<IMG src="%s/arrow_down.gif" border="0"></A>"""\
