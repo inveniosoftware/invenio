@@ -141,6 +141,8 @@ msg_webcast = {}
 msg_bulletin = {}
 msg_library = {}
 msg_this_page_in_languages = {}
+msg_admin_area = {}
+msg_administration = {}
 
 ## English:
 <en>
@@ -255,6 +257,8 @@ msg_webcast['en'] = """<MSG_WEBCAST>"""
 msg_bulletin['en'] = """<MSG_BULLETIN>""" 
 msg_library['en'] = """<MSG_LIBRARY>"""
 msg_this_page_in_languages['en'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
+msg_admin_area['en'] = """<MSG_ADMIN_AREA>"""
+msg_administration['en'] = """<MSG_ADMINISTRATION>"""
 </en>
 
 ## French:
@@ -370,6 +374,8 @@ msg_webcast['fr'] = """<MSG_WEBCAST>"""
 msg_bulletin['fr'] = """<MSG_BULLETIN>""" 
 msg_library['fr'] = """<MSG_LIBRARY>"""
 msg_this_page_in_languages['fr'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
+msg_admin_area['fr'] = """<MSG_ADMIN_AREA>"""
+msg_administration['fr'] = """<MSG_ADMINISTRATION>"""
 </fr>
 
 ## German:
@@ -485,6 +491,8 @@ msg_webcast['de'] = """<MSG_WEBCAST>"""
 msg_bulletin['de'] = """<MSG_BULLETIN>""" 
 msg_library['de'] = """<MSG_LIBRARY>"""
 msg_this_page_in_languages['de'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
+msg_admin_area['de'] = """<MSG_ADMIN_AREA>"""
+msg_administration['de'] = """<MSG_ADMINISTRATION>"""
 </de>
 
 ## Spanish:
@@ -600,6 +608,8 @@ msg_webcast['es'] = """<MSG_WEBCAST>"""
 msg_bulletin['es'] = """<MSG_BULLETIN>""" 
 msg_library['es'] = """<MSG_LIBRARY>"""
 msg_this_page_in_languages['es'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
+msg_admin_area['es'] = """<MSG_ADMIN_AREA>"""
+msg_administration['es'] = """<MSG_ADMINISTRATION>"""
 </es>
 
 ## Portuguese:
@@ -715,6 +725,8 @@ msg_webcast['pt'] = """<MSG_WEBCAST>"""
 msg_bulletin['pt'] = """<MSG_BULLETIN>""" 
 msg_library['pt'] = """<MSG_LIBRARY>"""
 msg_this_page_in_languages['pt'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
+msg_admin_area['pt'] = """<MSG_ADMIN_AREA>"""
+msg_administration['pt'] = """<MSG_ADMINISTRATION>"""
 </pt>
 
 ## Italian:
@@ -830,6 +842,8 @@ msg_webcast['it'] = """<MSG_WEBCAST>"""
 msg_bulletin['it'] = """<MSG_BULLETIN>""" 
 msg_library['it'] = """<MSG_LIBRARY>"""
 msg_this_page_in_languages['it'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
+msg_admin_area['it'] = """<MSG_ADMIN_AREA>"""
+msg_administration['it'] = """<MSG_ADMINISTRATION>"""
 </it>
 
 ## Russian:
@@ -945,6 +959,8 @@ msg_webcast['ru'] = """<MSG_WEBCAST>"""
 msg_bulletin['ru'] = """<MSG_BULLETIN>""" 
 msg_library['ru'] = """<MSG_LIBRARY>"""
 msg_this_page_in_languages['ru'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
+msg_admin_area['ru'] = """<MSG_ADMIN_AREA>"""
+msg_administration['ru'] = """<MSG_ADMINISTRATION>"""
 </ru>
 
 ## Slovak:
@@ -1060,6 +1076,8 @@ msg_webcast['sk'] = """<MSG_WEBCAST>"""
 msg_bulletin['sk'] = """<MSG_BULLETIN>""" 
 msg_library['sk'] = """<MSG_LIBRARY>"""
 msg_this_page_in_languages['sk'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
+msg_admin_area['sk'] = """<MSG_ADMIN_AREA>"""
+msg_administration['sk'] = """<MSG_ADMINISTRATION>"""
 </sk>
 
 ## Czech:
@@ -1175,6 +1193,8 @@ msg_webcast['cz'] = """<MSG_WEBCAST>"""
 msg_bulletin['cz'] = """<MSG_BULLETIN>""" 
 msg_library['cz'] = """<MSG_LIBRARY>"""
 msg_this_page_in_languages['cz'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
+msg_admin_area['cz'] = """<MSG_ADMIN_AREA>"""
+msg_administration['cz'] = """<MSG_ADMINISTRATION>"""
 </cz>
 
 ## Norwegian:
@@ -1290,6 +1310,8 @@ msg_webcast['no'] = """<MSG_WEBCAST>"""
 msg_bulletin['no'] = """<MSG_BULLETIN>""" 
 msg_library['no'] = """<MSG_LIBRARY>"""
 msg_this_page_in_languages['no'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
+msg_admin_area['no'] = """<MSG_ADMIN_AREA>"""
+msg_administration['no'] = """<MSG_ADMINISTRATION>"""
 </no>
 
 ## Swedish:
@@ -1405,6 +1427,8 @@ msg_webcast['se'] = """<MSG_WEBCAST>"""
 msg_bulletin['se'] = """<MSG_BULLETIN>""" 
 msg_library['se'] = """<MSG_LIBRARY>"""
 msg_this_page_in_languages['se'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
+msg_admin_area['se'] = """<MSG_ADMIN_AREA>"""
+msg_administration['se'] = """<MSG_ADMINISTRATION>"""
 </se>
 
 ## I18N messages oriented functions:
