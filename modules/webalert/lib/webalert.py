@@ -43,6 +43,7 @@ try:
     from webpage import page
     from dbquery import run_sql
     from webuser import getUid, create_user_infobox
+    from webbasket import perform_create_basket
     from mod_python import apache
 except ImportError, e:
     print "Error: %s" % e
@@ -248,7 +249,7 @@ def perform_add_alert(alert_name, frequency, notification, id_basket, new_basket
     # set the basket identifier
     if new_basket_name != "":
         # create a new basket
-        id_basket =  yourbaskets.perform_create_basket(new_basket_name)
+        id_basket =  perform_create_basket(uid, new_basket_name)
         out += """The <I>private</I> basket <B>%s</B> has been created.<BR>\n""" % new_basket_name
              
     # add a row to the alerts table: user_query_basket 
@@ -373,7 +374,7 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, new_bas
     # set the basket identifier
     if new_basket_name != "":
         # create a new basket
-        id_basket =  yourbaskets.perform_create_basket(new_basket_name)
+        id_basket =  perform_create_basket(uid, new_basket_name)
         out += """The <I>private</I> basket <B>%s</B> has been created.<BR>\n""" % new_basket_name             
 
     # update a row into the alerts table: user_query_basket 
