@@ -1752,10 +1752,15 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
        of collection.
        Return list of [phrase1, phrase2, ... , phrase_n]."""
     ## determine browse field:
-    if string.find(p, ":") > 0: # does 'p' contain ':'?
+    if not f and string.find(p, ":") > 0: # does 'p' contain ':'?
         f, p = split(p, ":", 1)
     ## wash 'p' argument:
     p = re_quotes.sub("", p)
+    ## We are going to take max(n_below, n_above) as the number of
+    ## values to ferch from bibXXx.  This is needed to work around
+    ## MySQL UTF-8 sorting troubles in 4.0.x.  Proper solution is to
+    ## use MySQL 4.1.x or our own idxPHRASE in the future.
+    n_fetch = 2*max(n_below,n_above)
     ## construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
     if str(f[0]).isdigit() and str(f[1]).isdigit():
@@ -1764,9 +1769,9 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
         # deduce desired MARC tags on the basis of chosen 'f'
         tl = get_field_tags(f)
     ## start browsing to fetch list of hits:
-    browsed_phrases_above = {} # will hold {phrase1: 1, phrase2: 1, ..., phraseN: 1} dict of browsed phrases above p (to make them unique)
-    browsed_phrases_exact = {} # will hold {phrase1: 1, phrase2: 1, ..., phraseN: 1} dict of browsed phrases exactly equal to p 
-    browsed_phrases_below = {} # will hold {phrase1: 1, phrase2: 1, ..., phraseN: 1} dict of browsed phrases below p (to make them unique)
+    browsed_phrases = {} # will hold {phrase1: 1, phrase2: 1, ..., phraseN: 1} dict of browsed phrases (to make them unique)
+    # always add self to the results set:
+    browsed_phrases[p] = 1
     for t in tl:
         # deduce into which bibxxx table we will search:
         digit1, digit2 = int(t[0]), int(t[1])
@@ -1775,55 +1780,37 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
         # firstly try to get `n' closest phrases above `p':
         if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
             query = "SELECT bx.value FROM %s AS bx WHERE bx.value<'%s' AND bx.tag LIKE '%s%%' ORDER BY bx.value DESC LIMIT %d" \
-                    % (bx, escape_string(p), t, n_above)
+                    % (bx, escape_string(p), t, n_fetch)
         else:
             query = "SELECT bx.value FROM %s AS bx WHERE bx.value<'%s' AND bx.tag='%s' ORDER BY bx.value DESC LIMIT %d" \
-                    % (bx, escape_string(p), t, n_above)
+                    % (bx, escape_string(p), t, n_fetch)
         res = run_sql(query)
         for row in res:
-            browsed_phrases_above[row[0]] = 1
-        # secondly try to get phrases equal to `p':
+            browsed_phrases[row[0]] = 1
+        # secondly try to get `n' closest phrases equal to or below `p':
         if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
-            query = "SELECT bx.value FROM %s AS bx WHERE bx.value='%s' AND bx.tag LIKE '%s%%' ORDER BY bx.value ASC" \
-                    % (bx, escape_string(p), t)
+            query = "SELECT bx.value FROM %s AS bx WHERE bx.value>='%s' AND bx.tag LIKE '%s%%' ORDER BY bx.value ASC LIMIT %d" \
+                    % (bx, escape_string(p), t, n_fetch)
         else:
-            query = "SELECT bx.value FROM %s AS bx WHERE bx.value='%s' AND bx.tag='%s' ORDER BY bx.value ASC" \
-                    % (bx, escape_string(p), t)
+            query = "SELECT bx.value FROM %s AS bx WHERE bx.value>='%s' AND bx.tag='%s' ORDER BY bx.value ASC LIMIT %d" \
+                    % (bx, escape_string(p), t, n_fetch)
         res = run_sql(query)
         for row in res:
-            browsed_phrases_exact[row[0]] = 1            
-        # thirdly try to get `n' closest phrases below `p':
-        if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
-            query = "SELECT bx.value FROM %s AS bx WHERE bx.value>'%s' AND bx.tag LIKE '%s%%' ORDER BY bx.value ASC LIMIT %d" \
-                    % (bx, escape_string(p), t, n_below)
-        else:
-            query = "SELECT bx.value FROM %s AS bx WHERE bx.value>'%s' AND bx.tag='%s' ORDER BY bx.value ASC LIMIT %d" \
-                    % (bx, escape_string(p), t, n_below)
-        res = run_sql(query)
-        for row in res:
-            browsed_phrases_below[row[0]] = 1
+            browsed_phrases[row[0]] = 1
     # select first n words only: (this is needed as we were searching
     # in many different tables and so aren't sure we have more than n
     # words right; this of course won't be needed when we shall have
     # one ACC table only for given field):
-    l1 = browsed_phrases_above.keys()
-    l1.sort()
-    l1.reverse()
-    l1 = l1[:n_above]
-    l1.reverse()
-    l2 = browsed_phrases_below.keys()
-    l2.sort()
-    out = []
-    for phrase in l1[:n_above]:
-        out.append(phrase)
-    if len(browsed_phrases_exact)>0:
-        for phrase in browsed_phrases_exact.keys():
-            out.append(phrase)
-    else:
-        out.append(p) # always append self, even if no hits, to indicate our position
-    for phrase in l2[:n_below]:
-        out.append(phrase)
-    return out
+    phrases_out = browsed_phrases.keys()
+    phrases_out.sort(lambda x, y: cmp(string.lower(strip_accents(x)),
+                                      string.lower(strip_accents(y))))
+    # find position of self:
+    try:
+        idx_p = phrases_out.index(p)
+    except:
+        idx_p = len(phrases_out)/2
+    # return n_above and n_below:
+    return phrases_out[max(0,idx_p-n_above):idx_p+n_below]
 
 def get_nbhits_in_bibwords(word, f):
     """Return number of hits for word 'word' inside words index for field 'f'."""
@@ -1846,7 +1833,7 @@ def get_nbhits_in_bibwords(word, f):
 def get_nbhits_in_bibxxx(p, f):
     """Return number of hits for word 'word' inside words index for field 'f'."""
     ## determine browse field:
-    if string.find(p, ":") > 0: # does 'p' contain ':'?
+    if not f and string.find(p, ":") > 0: # does 'p' contain ':'?
         f, p = split(p, ":", 1)
     ## wash 'p' argument:
     p = re_quotes.sub("", p)
@@ -3229,6 +3216,7 @@ def profile(p="", f="", c=cdsname):
 #print search_unit_in_bibrec('2002-12-01','2002-12-12')
 #print wash_dates('1980', '', '28', '2003','02','')
 #print type(wash_url_argument("-1",'int'))
+#print get_nearest_terms_in_bibxxx("ellis", "author", 5, 5)
 
 ## profiling:
 #profile("of the this")
