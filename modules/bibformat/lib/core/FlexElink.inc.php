@@ -95,7 +95,7 @@ class FlexElink {
 
   function getRecordResult($otypes, $debug=0)
   {
-    $record=$this->separator->getRecord();
+    $record=$this->clean($this->separator->getRecord());
     //No more records
     if($record=="")
       return array(-1, "");
@@ -122,6 +122,32 @@ class FlexElink {
 
   function getResult( $otype, $itype, $ifile="" )
   {
+  }
+  function clean($text)
+  {
+    $text = str_replace("\016","",$text);
+    $text = str_replace("\017","",$text);
+    $text = str_replace("\018","",$text);
+    $text = str_replace("\019","",$text);
+    $text = str_replace("\020","",$text);
+    $text = str_replace("\021","",$text);
+    $text = str_replace("\022","",$text);
+    $text = str_replace("\023","",$text);
+    $text = str_replace("\024","",$text);
+    $text = str_replace("\025","",$text);
+    $text = str_replace("\026","",$text);
+    $text = str_replace("\027","",$text);
+    $text = str_replace("\028","",$text);
+    $text = str_replace("\029","",$text);
+    $text = str_replace("\030","",$text);
+    $text = str_replace("\031","",$text);
+    $text = str_replace("\032","",$text);
+    $text = str_replace("\033","",$text);
+    $text = str_replace("\034","",$text);
+    $text = str_replace("\035","",$text);
+    $text = str_replace("\036","",$text);
+    $text = str_replace("\037","",$text);
+    return $text;
   }
 }
 
