@@ -154,7 +154,7 @@ def addcollectiontotree(req, colID, ln=cdslang, add_dad='', add_son='', rtype=''
     else:
         return auth_failed(uid, navtrail_previous_links)
 
-def addcollection(req, colID, ln=cdslang, collname='', dbquery='', rest='', callback="yes", confirm=-1):
+def addcollection(req, colID, ln=cdslang, colNAME='', dbquery='', rest='', callback="yes", confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
     
     try:
@@ -166,7 +166,7 @@ def addcollection(req, colID, ln=cdslang, collname='', dbquery='', rest='', call
         return page(title="Edit Collection Tree",
                 body=wsc.perform_addcollection(colID=colID,
                                                ln=cdslang,
-                                               collname=collname,
+                                               colNAME=colNAME,
                                                dbquery=dbquery,
                                                rest=rest,
                                                callback=callback,
@@ -291,7 +291,7 @@ def showoutputformats(req, colID, ln=cdslang, callback='yes', confirm=0):
     else:
         return auth_failed(uid, navtrail_previous_links)
 
-def addexistingoutputformat(req, colID, ln=cdslang, frmID=-1, callback='yes', confirm=-1):
+def addexistingoutputformat(req, colID, ln=cdslang, fmtID=-1, callback='yes', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
  
     try:
@@ -303,7 +303,7 @@ def addexistingoutputformat(req, colID, ln=cdslang, frmID=-1, callback='yes', co
         return page(title="Edit Collection",
                 body=wsc.perform_addexistingoutputformat(colID=colID,
                                                          ln=ln,
-                                                         frmID=frmID,
+                                                         fmtID=fmtID,
                                                          callback=callback,
                                                          confirm=confirm),
                 uid=uid,
@@ -314,7 +314,7 @@ def addexistingoutputformat(req, colID, ln=cdslang, frmID=-1, callback='yes', co
     else:
         return auth_failed(uid, navtrail_previous_links)
 
-def deleteoutputformat(req, colID, ln=cdslang, frmID=-1, callback='yes', confirm=-1):
+def deleteoutputformat(req, colID, ln=cdslang, fmtID=-1, callback='yes', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
  
     try:
@@ -326,7 +326,7 @@ def deleteoutputformat(req, colID, ln=cdslang, frmID=-1, callback='yes', confirm
         return page(title="Edit Collection",
                 body=wsc.perform_deleteoutputformat(colID=colID,
                                                  ln=ln,
-                                                 frmID=frmID,
+                                                 fmtID=fmtID,
                                                  callback=callback,
                                                  confirm=confirm),
                 uid=uid,
@@ -337,7 +337,7 @@ def deleteoutputformat(req, colID, ln=cdslang, frmID=-1, callback='yes', confirm
     else:
         return auth_failed(uid, navtrail_previous_links)
 
-def removeoutputformat(req, colID, ln=cdslang, frmID='', callback='yes', confirm=0):
+def removeoutputformat(req, colID, ln=cdslang, fmtID='', callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
  
     try:
@@ -349,7 +349,7 @@ def removeoutputformat(req, colID, ln=cdslang, frmID='', callback='yes', confirm
         return page(title="Edit Collection",
                 body=wsc.perform_removeoutputformat(colID=colID,
                                                     ln=ln,
-                                                    frmID=frmID,
+                                                    fmtID=fmtID,
                                                     callback=callback,
                                                     confirm=confirm),
                 uid=uid,
@@ -360,7 +360,7 @@ def removeoutputformat(req, colID, ln=cdslang, frmID='', callback='yes', confirm
     else:
         return auth_failed(uid, navtrail_previous_links)
 
-def modifyoutputformat(req, colID, ln=cdslang, frmID=-1, sel_type='', trans=[], confirm=-1):
+def modifyoutputformat(req, colID, ln=cdslang, fmtID=-1, sel_type='', trans=[], confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
     
     try:
@@ -372,7 +372,7 @@ def modifyoutputformat(req, colID, ln=cdslang, frmID=-1, sel_type='', trans=[], 
         return page(title="Edit Collection",
                 body=wsc.perform_modifyoutputformat(colID=colID,
                                                     ln=ln,
-                                                    frmID=frmID,
+                                                    fmtID=fmtID,
                                                     sel_type=sel_type,
                                                     trans=trans,
                                                     confirm=confirm),
