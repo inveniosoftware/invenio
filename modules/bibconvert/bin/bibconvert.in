@@ -405,7 +405,7 @@ def parse_input_data_fx(source_tpl):
 
     extraction_template_entry   - 
 
-    input data file		- specified by extract_tpl
+    input data file        - specified by extract_tpl
     """
 
     count   = 0
@@ -421,7 +421,7 @@ def parse_input_data_fx(source_tpl):
         if (re.sub("\s","",line) == separator):
             count = count + 1
         else:
-	    record = record + line
+            record = record + line
 
     for field_defined in extract_tpl_parsed:
         try:
@@ -451,7 +451,7 @@ def parse_input_data_fx(source_tpl):
         outvalue     = ""
         field_data_2 = ""
         field_data   = ""
-	
+    
         try:
             if ((field_defined[1][1])=="EOL"):
                 spliton = ['\n']
@@ -462,7 +462,7 @@ def parse_input_data_fx(source_tpl):
                     try:
                         spliton.append(item[1][0])
                     except IndexError, e:
-		        spliton = spliton
+                        spliton = spliton
 
                 
             else:
@@ -1107,18 +1107,18 @@ def printInfo():
     Usage: bibconvert [options] -ctemplate.cfg < input.dat
 
     Options:
-       -c'config'         		configuration templates file
-       -d'directory'      		source_data fields are located in separated files in 'directory'one record)
-       -h                 		help
-       -l'length'         		minimum line length (default = 1)
-       -o'value'          		OAI identifier starts with specified value (default = 1)
-       -b'file header'    		insert file header
-       -e'file footer'    		insert file footer
-       -s'record separator'		record separator, default empty line (EOLEOL)
+       -c'config'                 configuration templates file
+       -d'directory'              source_data fields are located in separated files in 'directory'one record)
+       -h                         help
+       -l'length'                 minimum line length (default = 1)
+       -o'value'                  OAI identifier starts with specified value (default = 1)
+       -b'file header'            insert file header
+       -e'file footer'            insert file footer
+       -s'record separator'        record separator, default empty line (EOLEOL)
        
-       -Cx'field extraction template' 	alternative to -c when configuration is split to several files
-       -Cs'source data template'	alternative to -c when configuration is split to several files
-       -Ct'target data template'	alternative to -c when configuration is split to several files
+       -Cx'field extraction template'     alternative to -c when configuration is split to several files
+       -Cs'source data template'    alternative to -c when configuration is split to several files
+       -Ct'target data template'    alternative to -c when configuration is split to several files
     """
 
 def printHelp():
@@ -1129,18 +1129,18 @@ def printHelp():
     Usage: bibconvert [options] -ctemplate.cfg < input.dat
 
     Options:
-       -c'config'         		configuration templates file
-       -d'directory'      		source_data fields are located in separated files in 'directory'one record)
-       -h                 		help
-       -l'length'         		minimum line length (default = 1)
-       -o'value'          		OAI identifier starts with specified value (default = 1)
-       -b'file header'    		insert file header
-       -e'file footer'    		insert file footer
-       -s'record separator'		record separator, default empty line (EOLEOL)
+       -c'config'                 configuration templates file
+       -d'directory'              source_data fields are located in separated files in 'directory'one record)
+       -h                         help
+       -l'length'                 minimum line length (default = 1)
+       -o'value'                  OAI identifier starts with specified value (default = 1)
+       -b'file header'            insert file header
+       -e'file footer'            insert file footer
+       -s'record separator'        record separator, default empty line (EOLEOL)
        
-       -Cx'field extraction template' 	alternative to -c when configuration is split to several files
-       -Cs'source data template'	alternative to -c when configuration is split to several files
-       -Ct'target data template'	alternative to -c when configuration is split to several files
+       -Cx'field extraction template'     alternative to -c when configuration is split to several files
+       -Cs'source data template'    alternative to -c when configuration is split to several files
+       -Ct'target data template'    alternative to -c when configuration is split to several files
 
     Example:
     --------
@@ -1164,22 +1164,18 @@ def exit_on_error(error_message):
 
 def create_record():
     "Create output record"
-    
     out                  = []
     field_data_item_LIST = []
 
     for T_tpl_item_LIST in target_tpl_parsed:
-
+        # the line is printed only if the variables inside are not empty
+        print_line = 0
         to_output = []
         rows      = 1  
-
         for field_tpl_item_STRING in T_tpl_item_LIST[1]:
-
             DATA = []
-
             if (field_tpl_item_STRING[:2]=="<:"):
                 field_tpl_item_STRING = field_tpl_item_STRING[2:-2]
-
                 field = field_tpl_item_STRING.split("::")[0]
                 if (len(field_tpl_item_STRING.split("::")) == 1):
                     value = generate(field)
@@ -1191,94 +1187,71 @@ def create_record():
                         field = field[:-1]
                     else:
                         repetitive = 0
-
                     if (is_opt("-d",opt_list)[:2]=="-d"):
                         DATA    = select_line(field,data_parsed)
                     else:
                         DATA    = select_line(field,data_parsed)
-                    
                     if (repetitive == 0):
                         DATA = [string.join(DATA," ")]
-
                     SRC_TPL = select_line(field,source_tpl_parsed)
                     try:
                         if (DATA[0] != ""):
                             DATA = get_subfields(DATA,subfield,SRC_TPL)
-
                             FF = field_tpl_item_STRING.split("::")
                             if (len(FF) > 2):
                                 FF = FF[2:]
                                 for fn in FF:
-
-
 #                                    DATAFORMATTED = []
-
                                     if (len(DATA) != 0 and DATA[0] != ""):
                                         DATA = get_subfields(DATA,subfield,SRC_TPL)
-
                                         FF = field_tpl_item_STRING.split("::")
                                         if (len(FF) > 2):
                                             FF = FF[2:]
                                             for fn2 in FF:
-
                                                 DATAFORMATTED = []
-
-                            
                                     for item in DATA:
                                         item = FormatField(item,fn)
                                         DATAFORMATTED.append(item)
-  
                                 DATA = DATAFORMATTED
-
                             if (len(DATA) > rows):
-
                                 rows = len(DATA)
+                            if DATA != "":
+                                print_line = 1
                             to_output.append(DATA)
                     except IndexError, e:
-                        pass        
-
+                        pass
             else:
                 to_output.append([field_tpl_item_STRING])
-
         current = 0
+        default_print = 0
         while (current < rows):
             line_to_print = []
             for item in to_output:
-
                 if (item==[]):
                     item =['']
-
                 if (len(item) <= current):
                     printout = item[0]
                 else:
                     printout = item[current]
-                
                 line_to_print.append(printout)
-
-
             output = exp_n(string.join(line_to_print,""))
-
             global_formatting_functions = T_tpl_item_LIST[0].split("::")[1:]
-
             for GFF in global_formatting_functions:
                 if (GFF[:5] == "RANGE"):
-                    
                     parR       = get_pars(GFF)[1]
                     parR       = set_par_defaults(parR,"MIN,MAX")
-
                     if (parR[0]!="MIN"):
                         if (string.atoi(parR[0]) > (current+1)):
                             output = ""
-                            
                     if (parR[1]!="MAX"):
                         if (string.atoi(parR[1]) < (current+1)):
                             output = ""
-                    
+                elif (GFF[:4] == "DEFP"):
+                    default_print = 1
                 else:
                     output = FormatField(output,GFF)
 
-            if (len(output) > conv_setting[0]):
-
+            if ((len(output) > conv_setting[0] and print_line == 1) or default_print):
                 print output
 
             current = current + 1
@@ -1386,7 +1359,7 @@ else:
 
     if (is_opt("-l",opt_list)[:2] == "-l"):
         try:
-	    conv_setting[0] = string.atoi(is_opt("-l",opt_list)[2:])
+            conv_setting[0] = string.atoi(is_opt("-l",opt_list)[2:])
         except ValueError, e:
             conv_setting[0] = 1
     if (is_opt("-o",opt_list)[:2] == "-o"):
@@ -1406,22 +1379,17 @@ else:
             exit_on_error("Cannot access directory: %s" % source_data)
           
     if (is_opt("-d",opt_list)[:2] == ""):
-
         done = 0
         print begin_header
         while (done == 0):
-
             data_parsed = parse_input_data_fx(source_tpl)
-
             if (data_parsed == -1):
                 done = 1
             else:
                 if (data_parsed[0][0]!= ''):
-                        
                     create_record()                            
                     tcounter = tcounter + 1
                     print output_rec_sep
-                                        
     print ending_footer
 
 </protect>
