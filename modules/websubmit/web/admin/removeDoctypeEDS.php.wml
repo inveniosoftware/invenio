@@ -167,6 +167,23 @@
                . "$doc2delete doctype.');\n</SCRIPT>\n");
             } // END if
 
+            # Now delete the entry for the doctype in the "sbmCOLLECTION_sbmDOCTYPE"
+            # table.
+            $q9Res = mysql_query("DELETE FROM sbmCOLLECTION_sbmDOCTYPE WHERE id_son = '"
+             . "$doc2delete'");
+
+            if(!$q9Res)
+            {
+               # Unable to delete.  Alert the user.
+
+               print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR:\\n"
+               . "\\nIt was not possible to delete the details\\nof the "
+               . "$doc2delete document type from the sbmCOLLECTION_sbmDOCTYPE table.\\n"
+               . "\\nThis means that it will be necessary to manually "
+               . "delete any rows in this table relating to the "
+               . "$doc2delete doctype.');\n</SCRIPT>\n");
+            } // END if
+
             # Now delete the entry for the doctype in the actual "sbmDOCTYPE"
             # table.
             $q5Res = mysql_query("DELETE FROM sbmDOCTYPE WHERE sdocname = '"
