@@ -453,6 +453,18 @@ oai
 909COp
 </define-tag>
 
+## OAIDELETEDTAG -- OAI tag for deleted records mark. OAI record is considered deleted if the value of this field is set to "DELETED" and the OAI deleted records policy is set either to ``transient'' or ``persistent''.
+##  (example: "980__c")
+<define-tag OAIDELETEDTAG whitespace=delete>
+980__c
+</define-tag>
+
+## OAIDELETEDPOLICY -- OAI deletedrecordspolicy
+##  (example: no/transient/persistent)
+<define-tag OAIDELETEDPOLICY whitespace=delete>
+no
+</define-tag>
+
 ## OAIIDPREFIX -- OAI identifier prefix:  
 ##  (example: "cds.cern.ch")
 <define-tag OAIIDPREFIX whitespace=delete>
@@ -520,6 +532,7 @@ atlantis.cern.ch
 <define-tag OAIEXPIRE whitespace=delete>
 90000
 </define-tag>
+
 
 ######################################
 ## Part 6: WebSubmit WML Parameters ##
