@@ -210,7 +210,7 @@ def print_record(recID, format='hb'):
             out += """<br><small class="note"><a class="note" href="%s">%s</a></small>""" % (urls_u[idx], urls_u[idx])
 
     # at the end of HTML mode, print "Detailed record" and "Mark record" functions:
-    out +=  """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?id=%s">Detailed record</a>""" \
+    out +=  """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s">Detailed record</a>""" \
            % (weburl, recID)
     #out += """<- <input name="mark[]" type="checkbox" value="%s"> Mark record""" % recID
     out += "</span>"
@@ -701,7 +701,7 @@ class Collection:
         header = """Search %s for:""" % self.create_nbrecs_info(""," records")
         cell_1_left = """<input type="text" name="p" size="40" value="">"""
         cell_1_middle = "%s" % self.create_searchwithin_selection_box()
-        cell_1_right = """<input class="formbutton" type="submit" name="search" value="SEARCH"><input class="formbutton" type="submit" name="search" value="Browse">"""
+        cell_1_right = """<input class="formbutton" type="submit" name="action" value="SEARCH"><input class="formbutton" type="submit" name="action" value="Browse">"""
         cell_2 = """<small><a href="%s/help/search/tips.html">search tips</a> :: <a href="%s">advanced search</a></small>""" \
         % (weburl, asearchurl)
         # merge them:
