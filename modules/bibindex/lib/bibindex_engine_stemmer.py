@@ -22,7 +22,7 @@ from bibindex_engine_config import *
 
 def create_stemmers():
     """Create stemmers dictionary for all possible languages."""
-    languages = {'fr': 'french', 'en': 'english', 'no':'norwegian', 'se':'swedish', 'de': 'german', 'it':'italian', 'pt':'portuguese'}
+    languages = {'fr': 'french', 'en': 'english', 'no':'norwegian', 'sv':'swedish', 'de': 'german', 'it':'italian', 'pt':'portuguese'}
     stemmers = {}
     try:
         import Stemmer
