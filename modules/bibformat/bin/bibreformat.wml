@@ -109,7 +109,7 @@ def bibreformat_task(sql_queries, cds_query, process_format):
 
         print "Querying database for records with old format (CDS query)..."
 
-        res = perform_request_search(req=None, of='id', c=cds_query['collection'], p=cds_query['pattern'], f=cds_query['field']).tolist()
+        res = perform_request_search(req=None, of='id', c=cds_query['collection'], p=cds_query['pattern'], f=cds_query['field'])#.tolist()
 
         for item in res:
             recIDs.append(item)
