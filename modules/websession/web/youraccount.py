@@ -35,6 +35,7 @@ try:
     from cdsware.config import *
     from cdsware.webpage import page
     from cdsware import webaccount
+    import smtplib
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -63,7 +64,54 @@ def change(req,email=None,password=None):
     else :
         return display(req)
 
+def lost(req):	#Metodo para mostrar el mensaje de perdida! perform_lostmandarle el email al usuario user el cliente smtp de python
+    uid = webuser.getUid(req)
+    return page("Your Account", webaccount.perform_lost(),
+                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
+                "","CDS Personalize, Main page", "CDS, personalize",
+                webuser.create_user_infobox(uid), "")	
+
+def send_email(req,p_email=None):
+    
+    uid = webuser.getUid(req)
+
+    passw = webuser.givePassword(p_email) 
+    if passw == -999:
+	eMsg = "The entered e-mail address doesn't exist in the database"
+	return page("Your Account", webaccount.perform_emailMessage(eMsg),
+        	        """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
+                	"","CDS Personalize, Main page", "CDS, personalize",
+		        webuser.create_user_infobox(uid), "") 
+	
+    fromaddr = "From:cds.support@cern.ch"
+    toaddrs  = "To:" + p_email
+    to = toaddrs + "\n"
+    sub = "Subject:Registration for cds.cern.ch\n\n"
+    body="""\nHello \n\nThe password for user"%s"\nis "%s" (without quotes).
+            """ %(p_email,passw)
+    msg = to + sub + body	
+
+    server = smtplib.SMTP('localhost')
+    server.set_debuglevel(1)
+    
+    try: 
+	server.sendmail(fromaddr, toaddrs, msg)
+
+    except smtplib.SMTPRecipientsRefused,e:
+           eMsg = "The entered e-mail address is incorrect, please check that it is written correctly (e.g. johndoe@example.com)"
+	   return page("Your Account", webaccount.perform_emailMessage(eMsg),
+        	        """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
+                	"","CDS Personalize, Main page", "CDS, personalize",
+		        webuser.create_user_infobox(uid), "") 
+
+    server.quit()
+    return page("Your Account", webaccount.perform_emailSent(p_email),
+                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
+                "","CDS Personalize, Main page", "CDS, personalize",
+                webuser.create_user_infobox(uid), "") 
+
 def delete(req):
+    uid = webuser.getUid(req)	
     return page("Delete Account", webaccount.perform_delete(),
                 """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
                 "","CDS Personalize, Main page", "CDS, personalize",
