@@ -73,17 +73,6 @@ cds.support@cern.ch
 50
 </define-tag>
 
-## LINKTOABSTRACT -- URL location to retrieve document abstracts by reportnumber (optional)
-##  (example: "")
-<define-tag LINKTOABSTRACT whitespace=delete>
-</define-tag>
-
-## FIELDCODES -- (optional)
-## (example: "['037__a','088__a']")
-<define-tag FIELDCODES whitespace=delete>
-[]
-</define-tag>
-
 ################################
 ## Part 2: CDS OAI parameters ##
 ################################
