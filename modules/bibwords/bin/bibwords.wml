@@ -731,6 +731,7 @@ class WordTable:
             write_message("%s %s wordtable flush started" % (self.tablename,mode))
             write_message('...updating %d words into %s started' % \
                 (len(self.value), self.tablename))
+        task_update_progress("%s flushed %d/%d words" % (self.tablename, 0, len(self.value)))
             
         self.recIDs_in_mem = beautify_range_list(self.recIDs_in_mem)
 
@@ -752,6 +753,7 @@ class WordTable:
             if nb_words_report!=0 and ((nb_words_done % nb_words_report) == 0):
                 if opts_dict["verbose"]:
                     write_message('......processed %d/%d words' % (nb_words_done, nb_words_total))
+                task_update_progress("%s flushed %d/%d words" % (self.tablename, nb_words_done, nb_words_total))
         if opts_dict["verbose"] >= 9:
             write_message('...updating %d words into %s ended' % \
                 (nb_words_total, self.tablename))
@@ -797,6 +799,7 @@ class WordTable:
         self.recIDs_in_mem = []
         if opts_dict["verbose"]:
             write_message("%s %s wordtable flush ended" % (self.tablename, mode))
+        task_update_progress("%s flush ended" % (self.tablename))
 
     def load_old_recIDs(self,word):
         """Load existing hitlist for the word from the database index files."""
@@ -927,6 +930,7 @@ class WordTable:
                 if opts_dict["verbose"]:
                     write_message("%s adding records #%d-#%d started" % \
                         (self.tablename, i_low, i_high))
+                task_update_progress("%s adding recs %d-%d" % (self.tablename, i_low, i_high))
                 self.del_recID_range(i_low, i_high)
                 just_processed = self.add_recID_range(i_low, i_high)
                 flush_count = flush_count + i_high - i_low + 1
@@ -1113,8 +1117,8 @@ class WordTable:
     def del_recID_range(self, low, high):
         """Deletes records with 'recID' system number between low
            and high from memory words index table."""
-        if opts_dict["verbose"]:
-            write_message("%s deleting records #%d-#%d started" % \
+        if opts_dict["verbose"] > 2:
+            write_message("%s fetching existing words for records #%d-#%d started" % \
                 (self.tablename, low, high))
         self.recIDs_in_mem.append([low,high])
         query = """SELECT id_bibrec,wordlist FROM %sr as bb WHERE bb.id_bibrec
@@ -1125,8 +1129,8 @@ class WordTable:
             wlist = deserialize_via_marshal(recID_row[1])
             for word in wlist:
                 self.put(recID, word, -1)
-        if opts_dict["verbose"]:
-            write_message("%s deleting records #%d-#%d ended" % \
+        if opts_dict["verbose"] > 2:
+            write_message("%s fetching existing words for records #%d-#%d ended" % \
                 (self.tablename, low, high))
 
     def report_on_table_consistency(self):
