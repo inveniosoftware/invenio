@@ -58,7 +58,10 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1 <a href="#3.1">Define New Index</a></br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2 <a href="#3.2">Configure Word-Breaking Procedure</a></br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3 <a href="#3.3">Configure Stopwords List</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4 <a href="#3.4">Configure Accent Stripping</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4 <a href="#3.4">Configure Stemming</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5 <a href="#3.5">Configure Word Length</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.6 <a href="#3.6">Configure Removal of HTML Code</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.7 <a href="#3.7">Configure Accent Stripping</a></br>
 <strong>4. <a href="#4">Run BibIndex Daemon</a></strong></br>
 
 <a name="1"></a><h2>1. Overview</h2>
@@ -67,7 +70,70 @@
 <a name="2.2"></a><h3>2.2 Configure Logical Fields</h3>
 <a name="3"></a><h2>3. Configure Word/Phrase Indexes</h2>
 <a name="3.1"></a><h3>3.1 Define New Index</h3>
+<pre>
+To define a new index you must first give the index a internal name. An empty
+index is then created by preparing the database tables. 
+
+Before the index can be used for searching, the fields that should be included
+in the index must be selected.
+
+When desired to fill the index based on the fields selected, you can schedule
+the update by running '<b>bibindex -w indexname</b>' together with other
+desired parameters.
+</pre>
 <a name="3.2"></a><h3>3.2 Configure Word-Breaking Procedure</h3>
+<pre>
+Can be configured by changing '<b>cfg_chars_alphanumericseparators</b>' and 
+'<b>cfg_chars_punctuation</b>' in '<b>bibindex_engine_config.py</b>'.
+
+How the words are broken up defines what is added to the index. Should only
+"director-general" be added, or should "director", "general" and "director-general"
+be added? The index can vary between 300 000 and 3 000 000 terms based the policy
+for breaking words.
+</pre>
 <a name="3.3"></a><h3>3.3 Configure Stopwords List</h3>
-<a name="3.4"></a><h3>3.4 Configure Accent Stripping</h3>
+<pre>
+Bibindex supports stopword removal by not adding words which exists in a given stopword 
+list to the index. Stopword removal makes the index smaller by removing much used words.
+
+Which stopword list that should be used can be configured in the bibindex_engine_config.py
+file by changing the value of the variable cfg_path_stopwordlist. If no stopword list should
+be used, the value should be None.
+</pre>
+
+<a name="3.4"></a><h3>3.4 Configure stemming</h3>
+<pre>
+The BibIndex indexer supports stemming, removing the ending of words thus creating a smaller 
+indexer. For example, using english, the word "information" will be stemmed to 
+"inform", "looking", "looks", "looked" will be stemmed to "look", thus giving more hits to 
+each word. 
+
+Currently only one stemmer is supported, so the stemmer to use should be selected based on the most 
+used language. All searches will also be stemmed based on the same language. For documents in other 
+languages, there will be no difference if stemmer is used or not.
+
+The Stemmer currently supported, supports the following languages:
+French, English, Norwegian, Swedish, German, Italian and Portugese.
+
+If another than the default stemmer should be used, the file '<b>bibindex_engine_stemmer.py</b>' 
+must be changed to support the desired stemmers interface.
+
+To change the default language to use for the stemmer, change the variable 
+'<b>cfg_use_stemmer_lang</b>' in '<b>bibindex_engine_config.py</b>'. 
+To disable use of stemmer, set the value to None.
+</pre>
+<a name="3.5"></a><h3>3.5 Configure Word Length</h3>
+<pre>
+By setting the value of '<b>cfg_min_word_length</b>' in '<b>bibindex_engine_config.py</b>' 
+higher than 0, only words with the number of characters higher than this will be added 
+to the index.
+</pre>
+<a name="3.6"></a><h3>3.6 Configure Removal of HTML Code</h3>
+<pre>
+By setting the value of '<b>cfg_remove_html_code</b>' in '<b>bibindex_engine_config.py</b>' 
+to True, the indexer will try to remove all HTML code from documents before indexing, and
+index only the text left. Setting it to False disable it. (HTML code is defined as everything
+between '<' and '>' in a text.)
+</pre>
+<a name="3.7"></a><h3>3.7 Configure Accent Stripping</h3>
 <a name="4"></a><h2>4. Run BibIndex Daemon</h2>
