@@ -271,7 +271,7 @@ def perform_add_alert(alert_name, frequency, notification, id_basket, new_basket
         # create a new basket
         id_basket =  perform_create_basket(uid, new_basket_name)
         out += """The <I>private</I> basket <B>%s</B> has been created.<BR>\n""" % new_basket_name
-             
+
     # add a row to the alerts table: user_query_basket 
     SQL_query = "INSERT INTO user_query_basket (id_user, id_query, id_basket, frequency, date_creation, date_lastrun, alert_name, notification) "\
                 "VALUES ('%s','%s','%s','%s','%s','','%s','%s') " \
@@ -292,15 +292,24 @@ def perform_list_alerts (uid):
     out += """<P>Set a new alert from <A href="display">your searches</A>, """\
            """the <A href="display?p='y'">most popular searches</A> or the input form.</P>"""
     # query the database
-    SQL_query = "SELECT q.id, q.urlargs, a.id_user, a.id_query, a.id_basket, "\
-                "a.alert_name, a.frequency, a.notification, "\
-                "DATE_FORMAT(a.date_creation,'%%d %%b %%Y'), DATE_FORMAT(a.date_lastrun,'%%d %%b %%Y'), "\
-                "b.id, b.name "\
-                "FROM query q, user_query_basket a, basket b "\
-                "WHERE a.id_user='%s' "\
-                "AND a.id_query=q.id "\
-                "AND a.id_basket=b.id "\
-                "ORDER BY a.alert_name ASC " % id_user
+    #SQL_query = "SELECT q.id, q.urlargs, a.id_user, a.id_query, a.id_basket, "\
+    #            "a.alert_name, a.frequency, a.notification, "\
+    #            "DATE_FORMAT(a.date_creation,'%%d %%b %%Y'), DATE_FORMAT(a.date_lastrun,'%%d %%b %%Y'), "\
+    #            "b.id, b.name "\
+    #            "FROM query q, user_query_basket a, basket b "\
+    #            "WHERE a.id_user='%s' "\
+    #            "AND a.id_query=q.id "\
+    #            "AND a.id_basket=b.id "\
+    #            "ORDER BY a.alert_name ASC " % id_user
+    SQL_query = """ SELECT q.id, q.urlargs, a.id_user, a.id_query, 
+                            a.id_basket, a.alert_name, a.frequency, 
+                            a.notification, 
+                            DATE_FORMAT(a.date_creation,'%%d %%b %%Y'), 
+                            DATE_FORMAT(a.date_lastrun,'%%d %%b %%Y'), 
+                            a.id_basket
+                    FROM query q, user_query_basket a
+                    WHERE a.id_user='%s' AND a.id_query=q.id
+                    ORDER BY a.alert_name ASC """ % id_user
     query_result = run_sql(SQL_query)    
 
     if len(query_result) > 0:
@@ -321,21 +330,21 @@ def perform_list_alerts (uid):
                 if row[6]=="week":
                     alert_frequency = "weekly"
                 else:
-                    # row[6]="month"
                     alert_frequency = "monthly"
                     
             # set notification by email field: yes or no
             if row[7] == "y":
                 email_notification = "yes"
             else:
-                # row[7] == "n"
                 email_notification = "no"            
                         
             # set basket name
-            if row[11] =="":
+            if int(row[10])==0: #no basket associated
                 basket_name="""<CENTER>--</CENTER>"""
             else:
-                basket_name=row[11]
+                sql = "select name from basket where id=%s"%row[10]
+                query_result = run_sql(sql)    
+                basket_name=query_result[0][0]
 
             # id, alert name, frequency, e-mail alert, last run, creation, pattern, catalogue, actions
             out += """<TR><TD><I>#%d</I></TD>"""\ 
