@@ -948,4 +948,10 @@ input,select {
    margin-left: 10px;
    background: transparent;
 }
+.recordlastmodifiedbox {
+   text-align: left;
+   font-size: small;
+   color: #603;
+   background: #ffffff;
+}
 /* end of cds.css */
