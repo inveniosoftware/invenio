@@ -1,5 +1,5 @@
- # $Id$
-## Bibindex stopword class
+## $Id$
+## BibIndex stopwords facility.
 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002 CERN.
@@ -18,16 +18,10 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-## read config variables:
-#include "config.wml"
-#include "configbis.wml"
-#include "cdswmllib.wml"
-
 import string
 
 from bibindex_engine_config import *
 
-stopwords = {}
 def create_stopwords(filename=cfg_path_to_stopwords_file):
     """Create stopword dictionary out of FILENAME."""
     try:
