@@ -63,8 +63,13 @@ except ImportError, e:
 sql_queries   = []
 mysql_queries = []
 process_hb    = 0
+process       = 1
+fmt           = "hb"  # default processing format
+ 
 
 def bibreformat_task(sql_queries, mysql_queries, process_hb):
+    
+    global process
 
     t1 = os.times()[4]
 
@@ -108,11 +113,13 @@ def bibreformat_task(sql_queries, mysql_queries, process_hb):
     tbibupload  = 0		# time taken up by external call
     weburl      = "<WEBURL>"
 
+
 ### Iterate over all records prepared in lists I (option)
-    iterate_over(recIDs, weburl)
+    if process:
+        iterate_over(recIDs, weburl)
 
 ### Iterate over all records prepared in list II (no_hb)
-    if process_hb:
+    if process_hb and process:
         iterate_over(without_hb, weburl)
 
 ### Final statistics
@@ -134,23 +141,6 @@ def bibreformat_task(sql_queries, mysql_queries, process_hb):
 
     message = " bibupload: %2f sec" % tbibupload
     print message
-
-### SQL query for recIDs detection, XXX for command line parameter
-###
-
-sql_query_for_recIDs = {
-
-   'a' : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='hb'",
-   'b1': "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='xm'",
-   'b2': "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='hb'",
-   'c1': "select a.id_bibrec from bibrec_bib98x as a left join bib98x as b on a.id_bibxxx=b.id where b.tag='980__a' and b.value='XXX'",
-   'c2': "select a.id_bibrec from bibrec_bib98x as a left join bib98x as b on a.id_bibxxx=b.id where b.tag='980__b' and b.value='XXX'",
-   'l' : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='hb' and bf.last_updated < br.modification_date",
-   'e' : "select br.id from bibrec as br left join bibrec_bib03x as br3 on br.id = br3.id_bibrec left join bib03x as b3 on br3.id_bibxxx = b3.id where b3.value='XXX'",
-   'r' : "select id from bibrec where id='XXX'",
-   's' : "select a.id_bibrec from bib90x as b left join bibrec_bib90x as a on a.id_bibxxx=b.id where b.value='XXX'"
-
-}
 
 ### MySQL Search by recID
 ###
@@ -196,7 +186,7 @@ def withouthb():
     xm1, xm2, hb1, hb2 = [],[],[],[]
     
     q1 = "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='xm'"
-    q2 = "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='hb'"
+    q2 = "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt
 
     ## get complete recID list of xm formatted records
     xm1 = run_sql(q1)
@@ -255,7 +245,7 @@ def iterate_over(list, weburl):
                 message = "START bibformat external call"
                 print message
 
-                command = "%s/bibformat otype='HB' < %s/bibreformat.xml > %s/rec_fmt.xml 2> %s/bibreformat.err" % (bindir,tmpdir,tmpdir,tmpdir)
+                command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s/rec_fmt.xml 2> %s/bibreformat.err" % (bindir,string.upper(fmt),tmpdir,tmpdir,tmpdir)
                 os.system(command)
 
                 t22 = os.times()[4]
@@ -303,7 +293,7 @@ def iterate_over(list, weburl):
         message = "START bibformat external call"
         print message
 
-        command = "%s/bibformat otype='HB' < %s/bibreformat.xml > %s/rec_fmt.xml 2> %s/bibreformat.err" % (bindir,tmpdir,tmpdir,tmpdir)
+        command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s/rec_fmt.xml 2> %s/bibreformat.err" % (bindir,string.upper(fmt),tmpdir,tmpdir,tmpdir)
         os.system(command)
 
         t22 = os.times()[4]
@@ -469,10 +459,10 @@ def task_get_options(id):
         sys.exit(1)
     return out
 
-def task_run(process_hb):
+def task_run(process_hb, fmt):
     """Runs the task by fetching arguments from the BibSched task queue.  This is what BibSched will be invoking via daemon call."""
 
-    global task_id
+    global task_id, process
     options = task_get_options(task_id) # get options from BibSched task table
     ## check task id:
     if not options.has_key("task"):
@@ -481,24 +471,35 @@ def task_run(process_hb):
 
     ## initialize parameters
 
-    if options.has_key("all"): 
-        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='hb'")
+    if options.has_key("all"):
+        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt)
+
     if options.has_key("new"):
         process_hb = 1
+
+    if options.has_key("noprocess"):
+        process = 0
+
+    if options.has_key("last"):
+        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='%s' and bf.last_updated < br.modification_date" % fmt)
+
     if options.has_key("collection"):
         mysql_queries.append(options["collection"])
     else:
         mysql_queries.append("")
+
     if options.has_key("field"):
         mysql_queries.append(options["field"])
     else:
         mysql_queries.append("")
-    if options.has_key("last"):
-        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='hb' and bf.last_updated < br.modification_date")
+
     if options.has_key("phrase"):
         mysql_queries.append(options["phrase"])
     else:
         mysql_queries.append("")
+
+    if options.has_key("format"):
+        fmt = options["format"]        
 
     ## check task state:
     task_state = task_read_state(task_id)
@@ -526,15 +527,15 @@ def usage(exitcode=1, msg=""):
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
     sys.stderr.write("Usage: %s [options]\n" % sys.argv[0])
-    sys.stderr.write("  -u, --user=USER \t\t User name to submit the task as, password needed.\n")
-    sys.stderr.write("  -h, --help      \t\t Print this help.\n")
-    sys.stderr.write("  -V, --version   \t\t Print version information.\n")
-    sys.stderr.write("  -d, --debug     \t\t Print debugging information.\n")
-    sys.stderr.write("  -a, --all       \t\t All records with existing 'hb' format\n")
+    sys.stderr.write("  -u,  --user=USER \t\t User name to submit the task as, password needed.\n")
+    sys.stderr.write("  -h,  --help      \t\t Print this help.\n")
+    sys.stderr.write("  -V,  --version   \t\t Print version information.\n")
+    sys.stderr.write("  -d,  --debug     \t\t Print debugging information.\n")
+    sys.stderr.write("  -a,  --all       \t\t All records\n")
     sys.stderr.write("  -c,  --collection\t\t Select records by collection\n")
     sys.stderr.write("  -f,  --field     \t\t Select records by field.\n")
     sys.stderr.write("  -p,  --phrase    \t\t Select records by phrase.\n")
-    sys.stderr.write("  -l,  --last      \t\t Records modified since last bibreformat only.")
+    sys.stderr.write("  -o,  --format    \t\t Specify output format to be (re-)created. (default HB)\n")
     sys.stderr.write("\n")
     sys.stderr.write(" Example: bibreformat -l -b  Standard synchronization bibreformat run.")
 
@@ -549,19 +550,20 @@ def main():
         ## A - run the task
         task_id = int(sys.argv[1])
         process_hb = 0
-        task_run(process_hb)
+        fmt = "hb"
+        task_run(process_hb, fmt)
     else:
         ## B - submit the task
         process_hb = 0
         options = {} # will hold command-line options
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "hVdu:ac:f:p:l", ["help", "version", "debug","user=","all","collection=","field=","phrase=","last"])
+            opts, args = getopt.getopt(sys.argv[1:], "hVdu:ac:f:p:lo:n", ["help", "version", "debug","user=","all","collection=","field=","phrase=","format=","noprocess"])
         except getopt.GetoptError, err:
             usage(1, err)
 
         if len(sys.argv) == 1:
-            options["new"]  = 1
-            options["last"]  = 1
+            options["new"]    = 1
+            options["last"]   = 1
         try:
             for opt in opts:
                 if opt[0] in ["-h", "--help"]:
@@ -570,20 +572,24 @@ def main():
                     print __version__
                     sys.exit(0)
                 elif opt[0] in [ "-u", "--user"]:
-                    options["user"]  = opt[1]
+                    options["user"]   = opt[1]
                 elif opt[0] in ["-d", "--debug"]:
-                    options["debug"] = 1
+                    options["debug"]  = 1
                 elif opt[0] in ["-a", "--all"]:
-                    options["all"]   = 1
-                    options["new"]   = 1
+                    options["all"]    = 1
+                    options["new"]    = 1
                 elif opt[0] in ["-c", "--collection"]:
                     options["collection"]=opt[1]
+                elif opt[0] in ["-n", "--noprocess"]:
+                    options["noprocess"] = 1
                 elif opt[0] in ["-f", "--field"]:
-                    options["field"]=opt[1]
+                    options["field"]  = opt[1]
                 elif opt[0] in ["-p","--phrase"]:
-                    options["phrase"] =opt[1]
-                elif opt[0] in ["-l","--last"]:
-                    options["last"]  = 1
+                    options["phrase"] = opt[1]
+                elif opt[0] in ["-o","--format"]:
+                    options["format"] = opt[1]
+                elif opt[0] in ["-n","--noprocess"]:
+                    options["noproces"] = 1
         except StandardError, e:
             usage(e)
         task_submit(options)
