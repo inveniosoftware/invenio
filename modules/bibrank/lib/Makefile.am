@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir=$(libdir)/python/cdsware
-pylib_DATA=bibrank_config.py
+pylib_DATA=bibrankadminlib.py
 
 EXTRA_DIST = $(wildcard *.wml)
 
