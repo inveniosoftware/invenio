@@ -448,6 +448,16 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       [CF $$o -> 111 $9]
 
 
+145   MAIN TITLE STATEMENT (NR) [CERN]
+
+      Indicators - Both undefined
+      Subfield Code(s)
+         $a   Remainder of title (NR) - [CER]
+         $b   Remainder of subtitle (NR) - [CER]
+
+      [Not in use in AL300]
+
+
 210   ABBREVIATED TITLE  (NR)
 
       Indicators - Both undefined
@@ -721,7 +731,9 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Indicators - Both undefined
 
       Subfield Code(s)
-         $a   Dissertation note  (NR) - [CER base=14]
+         $a   Diploma  (NR) - [CER base=14]
+         $b   University (NR) - [CER base=14]
+         $c   Date of year of defense - [CER base=14]
 
       [Additional field(s)/tag(s): NO1]
       [NO1 * -> 502 $a]
@@ -1669,6 +1681,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $s   Status of record (NR) - [ARC,CER,IEX,MAN,MMD,WAI/UDC]
          $w   Status week (NR) - [ARC,CER,IEX,MAN,MMD,WAI/UDC]
          $y   Year for Annual list (NR) - [CER]
+         $z   CERN paper or CERN work (candidates for Ann. Report)(NR) - [CER]
 
       [Additional field(s)/tag(s): DISP,SW,909CS,909CT]
       [SW $$a -> 909CS $a -> 916 $a {NOT bas=3n}]
