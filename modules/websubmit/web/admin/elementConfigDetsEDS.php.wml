@@ -1069,7 +1069,7 @@
 
    function displayPage()
    {
-      global $doctype,$update,$rows,$cols,$cookie,$alephcode,$marccode,$type,$size,$maxlength,$fidesc,$name,$subname,$pageNumber,$nPgs,$caller,$modifytext;
+      global $doctype,$update,$changeType,$val,$rows,$cols,$cookie,$alephcode,$marccode,$type,$size,$maxlength,$fidesc,$name,$subname,$pageNumber,$nPgs,$caller,$modifytext;
 
       # Conduct a test to see if this is the first call to this page, or a
       # recursive call whereby the user is attempting to update the
