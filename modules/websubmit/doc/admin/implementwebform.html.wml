@@ -62,10 +62,10 @@
             form elements is roughly made of an html template and a text displayed before the form field.<br><br>
             &nbsp;<span class="guideheader">I</span>n the first part of the page, you have a preview of what the form 
             will look like to the user:<br>
-            <IMG src="<WEBURL>/img/guide_preview.jpg"><br><br>
+            <IMG src="<WEBURL>/img/guide_preview.jpg" class="guideimg"><br><br>
             &nbsp;<span class="guideheader">T</span>hen the second table shows you the list of the form elements 
             present on the page:<br>
-            <IMG src="<WEBURL>/img/guide_elements.jpg"><br><br>
+            <IMG src="<WEBURL>/img/guide_elements.jpg" class="guideimg"><br><br>
             &nbsp;<span class="guideheader">Y</span>ou can then:
             <ul>
                 <li>Move one element from one place to another using the drop-down menus in the first 
