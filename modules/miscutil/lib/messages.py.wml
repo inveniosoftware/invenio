@@ -1292,6 +1292,121 @@ msg_library['no'] = """<MSG_LIBRARY>"""
 msg_this_page_in_languages['no'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
 </no>
 
+## Swedish:
+<se>
+msg_home['se'] = """<MSG_HOME>"""
+msg_search['se'] = """<MSG_SEARCH>"""
+msg_submit['se'] = """<MSG_SUBMIT>"""
+msg_help['se'] = """<MSG_HELP>"""
+msg_help_central['se'] = """<MSG_HELP_CENTRAL>"""
+msg_search_help['se'] = """<MSG_SEARCH_HELP>"""
+msg_search_tips['se'] = """<MSG_SEARCH_TIPS>"""
+msg_personalize['se'] = """<MSG_PERSONALIZE>"""
+msg_collection_not_found_head['se'] = """<MSG_COLLECTION_NOT_FOUND_HEAD>"""
+msg_collection_not_found_body['se'] = """<MSG_COLLECTION_NOT_FOUND_BODY>"""
+msg_home['se'] = """<MSG_HOME>"""
+msg_powered_by['se'] = """<MSG_POWERED_BY>"""
+msg_maintained_by['se'] = """<MSG_MAINTAINED_BY>"""
+msg_last_updated['se'] = """<MSG_LAST_UPDATED>"""
+msg_narrow_search['se'] = """<MSG_NARROW_SEARCH>"""
+msg_focus_on['se'] = """<MSG_FOCUS_ON>"""
+msg_simple_search['se'] = """<MSG_SIMPLE_SEARCH>"""
+msg_advanced_search['se'] = """<MSG_ADVANCED_SEARCH>"""
+msg_account['se'] = """<MSG_ACCOUNT>"""
+msg_alerts['se'] = """<MSG_ALERTS>"""
+msg_baskets['se'] = """<MSG_BASKETS>"""
+msg_submissions['se'] = """<MSG_SUBMISSIONS>"""
+msg_approvals['se'] = """<MSG_APPROVALS>"""
+msg_session['se'] = """<MSG_SESSION>"""
+msg_login['se'] = """<MSG_LOGIN>"""
+msg_logout['se'] = """<MSG_LOGOUT>"""
+msg_language['se'] = """<MSG_LANGUAGE>"""
+msg_browse['se'] = """<MSG_BROWSE>"""
+msg_search_records_for['se'] = """<MSG_SEARCH_RECORDS_FOR>"""
+msg_any_field['se'] = """<MSG_ANY_FIELD>"""
+msg_title['se'] = """<MSG_TITLE>"""
+msg_author['se'] = """<MSG_AUTHOR>"""
+msg_report_number['se'] = """<MSG_REPORT_NUMBER>"""
+msg_year['se'] = """<MSG_YEAR>"""
+msg_abstract['se'] = """<MSG_ABSTRACT>"""
+msg_keyword['se'] = """<MSG_KEYWORD>"""
+msg_fulltext['se'] = """<MSG_FULLTEXT>"""
+msg_reference['se'] = """<MSG_REFERENCE>"""
+msg_all_of_the_words['se'] = """<MSG_ALL_OF_THE_WORDS>"""
+msg_any_of_the_words['se'] = """<MSG_ANY_OF_THE_WORDS>"""
+msg_exact_phrase['se'] = """<MSG_EXACT_PHRASE>"""
+msg_partial_phrase['se'] = """<MSG_PARTIAL_PHRASE>"""
+msg_regular_expression['se'] = """<MSG_REGULAR_EXPRESSION>"""
+msg_and['se'] = """<MSG_AND>"""
+msg_or['se'] = """<MSG_OR>"""
+msg_and_not['se'] = """<MSG_AND_NOT>"""
+msg_search_results['se'] = """<MSG_SEARCH_RESULTS>"""
+msg_try_your_search_on['se'] = """<MSG_TRY_YOUR_SEARCH_ON>"""
+msg_sort_by['se'] = """<MSG_SORT_BY>"""
+msg_latest_first['se'] = """<MSG_LATEST_FIRST>"""
+msg_ascending['se'] = """<MSG_ASCENDING>"""
+msg_descending['se'] = """<MSG_DESCENDING>"""
+msg_rank_by['se'] = """<MSG_RANK_BY>"""
+msg_display_results['se'] = """<MSG_DISPLAY_RESULTS>"""
+msg_results['se'] = """<MSG_RESULTS>"""
+msg_single_list['se'] = """<MSG_SINGLE_LIST>"""
+msg_split_by_collection['se'] = """<MSG_SPLIT_BY_COLLECTION>"""
+msg_output_format['se'] = """<MSG_OUTPUT_FORMAT>"""
+msg_brief['se'] = """<MSG_BRIEF>"""
+msg_detailed['se'] = """<MSG_DETAILED>"""
+msg_detailed_record['se'] = """<MSG_DETAILED_RECORD>"""
+msg_results_overview_found_x_records_in_y_seconds['se'] = """<MSG_RESULTS_OVERVIEW_FOUND_X_RECORDS_IN_Y_SECONDS>"""
+msg_x_records_found['se'] = """<MSG_X_RECORDS_FOUND>"""
+msg_jump_to_record['se'] = """<MSG_JUMP_TO_RECORD>"""
+msg_search_took_x_seconds['se'] = """<MSG_SEARCH_TOOK_X_SECONDS>"""
+msg_add_to_basket['se'] = """<MSG_ADD_TO_BASKET>"""
+msg_collections['se'] = """<MSG_COLLECTIONS>"""
+msg_any_collection['se'] = """<MSG_ANY_COLLECTION>"""
+msg_add_another_collection['se'] = """<MSG_ADD_ANOTHER_COLLECTION>"""
+msg_guest['se'] = """<MSG_GUEST>"""
+msg_added_since['se'] = """<MSG_ADDED_SINCE>"""
+msg_until['se'] = """<MSG_UNTIL>"""
+msg_any_day['se'] = """<MSG_ANY_DAY>"""
+msg_any_month['se'] = """<MSG_ANY_MONTH>""" 
+msg_any_year['se'] = """<MSG_ANY_YEAR>"""
+msg_january['se'] = """<MSG_JANUARY>"""
+msg_february['se'] = """<MSG_FEBRUARY>"""
+msg_march['se'] = """<MSG_MARCH>"""
+msg_april['se'] = """<MSG_APRIL>"""
+msg_may['se'] = """<MSG_MAY>"""
+msg_june['se'] = """<MSG_JUNE>"""
+msg_july['se'] = """<MSG_JULY>"""
+msg_august['se'] = """<MSG_AUGUST>"""
+msg_september['se'] = """<MSG_SEPTEMBER>"""
+msg_october['se'] = """<MSG_OCTOBER>"""
+msg_november['se'] = """<MSG_NOVEMBER>"""
+msg_december['se'] = """<MSG_DECEMBER>"""
+msg_search_term['se'] = """<MSG_SEARCH_TERM>"""
+msg_inside_index['se'] = """<MSG_INSIDE_INDEX>"""
+msg_did_not_match['se'] = """<MSG_DID_NOT_MATCH>"""
+msg_no_words_index_available['se'] = """<MSG_NO_WORDS_INDEX_AVAILABLE>"""
+msg_no_phrase_index_available['se'] = """<MSG_NO_PHRASE_INDEX_AVAILABLE>"""
+msg_no_hits_in_given_collection['se'] = """<MSG_NO_HITS_IN_GIVEN_COLLECTION>"""
+msg_no_public_hits['se'] = """<MSG_NO_PUBLIC_HITS>"""
+msg_no_match_within_time_limits['se'] = """<MSG_NO_MATCH_WITHIN_TIME_LIMITS>"""
+msg_no_match_within_search_limits['se'] = """<MSG_NO_MATCH_WITHIN_SEARCH_LIMITS>"""
+msg_no_boolean_hits['se'] = """<MSG_NO_BOOLEAN_HITS>"""
+msg_no_exact_match_for_foo_using_bar_instead['se'] = """<MSG_NO_EXACT_MATCH_FOR_FOO_USING_BAR_INSTEAD>"""
+msg_internal_error['se'] = """<MSG_INTERNAL_ERROR>"""
+msg_please_contact_and_quote['se'] =  """<MSG_PLEASE_CONTACT_AND_QUOTE>"""
+msg_search_options['se'] = """<MSG_SEARCH_OPTIONS>"""
+msg_latest_additions['se'] = """<MSG_LATEST_ADDITIONS>"""
+msg_more['se'] = """<MSG_MORE>"""
+msg_collection_contains_no_records['se'] = """<MSG_COLLECTION_CONTAINS_NO_RECORDS>"""
+msg_collection_restricted_content['se'] = """<MSG_COLLECTION_RESTRICTED_CONTENT>"""
+msg_convert['se'] = """<MSG_CONVERT>"""
+msg_agenda['se'] = """<MSG_AGENDA>"""
+msg_webcast['se'] = """<MSG_WEBCAST>"""
+msg_bulletin['se'] = """<MSG_BULLETIN>""" 
+msg_library['se'] = """<MSG_LIBRARY>"""
+msg_this_page_in_languages['se'] = """<MSG_THIS_PAGE_IN_LANGUAGES>"""
+</se>
+
 ## I18N messages oriented functions:
 
 def wash_language(ln):
@@ -1306,9 +1421,9 @@ def create_language_selection_box(urlargs="", language="en"):
     """Take URLARGS and LANGUAGE and return textual language
        selection box for the given page."""
     out = ""
-    for lang in <: print generate_language_list_for_python(); :>:
+    for (lang, lang_namelong) in <: print generate_language_list_for_python("long"); :>:
         if lang == language:
-            out += """<span class="langinfo">%s</span> | """ % string.upper(lang)
+            out += """ <span class="langinfo">%s</span> &nbsp; """ % lang_namelong
         else:
             if urlargs:
                 urlargs = sre.sub(r'ln=.*?(&|$)', '', urlargs)
@@ -1319,6 +1434,5 @@ def create_language_selection_box(urlargs="", language="en"):
                     urlargs += "&ln=%s" % lang
             else:
                 urlargs = "ln=%s" % lang
-            out += """<a class="langinfo" href="?%s">%s</a> | """ % (urlargs, string.upper(lang))
-    return msg_this_page_in_languages[language] + " " + out[:-2]
-
+            out += """ <a class="langinfo" href="?%s">%s</a> &nbsp; """ % (urlargs, lang_namelong)
+    return msg_this_page_in_languages[language] + "<br>" + out
