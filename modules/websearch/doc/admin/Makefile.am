@@ -1,4 +1,5 @@
 ## $Id$
+
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002 CERN.
 ##
@@ -18,9 +19,9 @@
 
 docdir = $(WEBDIR)/admin/websearch
 
-doc_DATA=guide.html
+doc_DATA = guide.html
 
-EXTRA_DIST = $(wildcard *.wml)
+EXTRA_DIST = $(wildcard *.wml) 
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 

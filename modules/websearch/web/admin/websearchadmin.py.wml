@@ -39,7 +39,7 @@ from cdsware.webuser import getUid
 
 __version__ = "$Id$"
 
-def switchscore(req, colID, type, id_1, id_2, ln=cdslang):
+def switchfmtscore(req, colID, type, id_1, id_2, ln=cdslang):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
     
     try:
@@ -49,11 +49,80 @@ def switchscore(req, colID, type, id_1, id_2, ln=cdslang):
 
     if not wsc.check_user(uid):
         return page(title="Edit Collection",
-                body=wsc.perform_switchscore(colID=colID,
-                                            ln=ln,
-                                            type=type,
-                                            id_1=id_1,
-                                            id_2=id_2),
+                body=wsc.perform_switchfmtscore(colID=colID,
+                                                ln=ln,
+                                                type=type,
+                                                id_1=id_1,
+                                                id_2=id_2),
+                uid=uid,
+                language=ln,
+                urlargs=req.args,
+                navtrail = navtrail_previous_links,
+                lastupdated=__lastupdated__)   
+    else:
+        return auth_failed(uid, navtrail_previous_links)
+
+def switchfldscore(req, colID, id_1, id_2, fmeth, ln=cdslang):
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
+    
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+
+    if not wsc.check_user(uid):
+        return page(title="Edit Collection",
+                body=wsc.perform_switchfldscore(colID=colID,
+                                                ln=ln,
+                                                id_1=id_1,
+                                                id_2=id_2,
+                                                fmeth=fmeth),
+                uid=uid,
+                language=ln,
+                urlargs=req.args,
+                navtrail = navtrail_previous_links,
+                lastupdated=__lastupdated__)   
+    else:
+        return auth_failed(uid, navtrail_previous_links)
+
+def switchfldvaluescore(req, colID, id_1, id_fldvalue_1, id_fldvalue_2, ln=cdslang):
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
+    
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+
+    if not wsc.check_user(uid):
+        return page(title="Edit Collection",
+                body=wsc.perform_switchfldvaluescore(colID=colID,
+                                                ln=ln,
+                                                id_1=id_1,
+                                                id_fldvalue_1=id_fldvalue_1,
+                                                id_fldvalue_2=id_fldvalue_2),
+                uid=uid,
+                language=ln,
+                urlargs=req.args,
+                navtrail = navtrail_previous_links,
+                lastupdated=__lastupdated__)   
+    else:
+        return auth_failed(uid, navtrail_previous_links)
+    
+def switchpbxscore(req, colID, id_1, id_2, sel_ln,ln=cdslang):
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
+    
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+
+    if not wsc.check_user(uid):
+        return page(title="Edit Collection",
+                body=wsc.perform_switchpbxscore(colID=colID,
+                                                ln=ln,
+                                                id_1=id_1,
+                                                id_2=id_2,
+                                                sel_ln=sel_ln),
                 uid=uid,
                 language=ln,
                 urlargs=req.args,
@@ -268,7 +337,7 @@ def addoutputformat(req, colID, ln=cdslang, code='', name='', callback='yes', co
                 lastupdated=__lastupdated__)   
     else:
         return auth_failed(uid, navtrail_previous_links)
- 
+
 def showoutputformats(req, colID, ln=cdslang, callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
  
@@ -360,6 +429,31 @@ def removeoutputformat(req, colID, ln=cdslang, fmtID='', callback='yes', confirm
     else:
         return auth_failed(uid, navtrail_previous_links)
 
+def removefield(req, colID, ln=cdslang, fldID='', fldvID='', fmeth='', callback='yes', confirm=0):
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
+ 
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+
+    if not wsc.check_user(uid):
+        return page(title="Edit Collection",
+                body=wsc.perform_removefield(colID=colID,
+                                             ln=ln,
+                                             fldID=fldID,
+                                             fldvID=fldvID,
+                                             fmeth=fmeth,
+                                             callback=callback,
+                                             confirm=confirm),
+                uid=uid,
+                language=ln,
+                urlargs=req.args,
+                navtrail = navtrail_previous_links,
+                lastupdated=__lastupdated__)   
+    else:
+        return auth_failed(uid, navtrail_previous_links)
+    
 def modifyoutputformat(req, colID, ln=cdslang, fmtID=-1, sel_type='', trans=[], confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
     
@@ -376,6 +470,103 @@ def modifyoutputformat(req, colID, ln=cdslang, fmtID=-1, sel_type='', trans=[], 
                                                     sel_type=sel_type,
                                                     trans=trans,
                                                     confirm=confirm),
+                uid=uid,
+                language=ln,
+                urlargs=req.args,
+                navtrail = navtrail_previous_links,
+                lastupdated=__lastupdated__)   
+    else:
+        return auth_failed(uid, navtrail_previous_links)
+
+def showsearchoptions(req, colID, ln=cdslang, callback='yes', confirm=0):
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
+ 
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+
+    if not wsc.check_user(uid):
+        return page(title="Edit Collection",
+                body=wsc.perform_showsearchoptions(colID=colID,
+                                                   ln=ln,
+                                                   callback=callback,
+                                                   confirm=confirm),
+                uid=uid,
+                language=ln,
+                urlargs=req.args,
+                navtrail = navtrail_previous_links,
+                lastupdated=__lastupdated__)   
+    else:
+        return auth_failed(uid, navtrail_previous_links)
+
+def addexistingfield(req, colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', callback='yes', confirm=-1):
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
+ 
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+
+    if not wsc.check_user(uid):
+        return page(title="Edit Collection",
+                body=wsc.perform_addexistingfield(colID=colID,
+                                                  ln=ln,
+                                                  fldID=fldID,
+                                                  fldvID=fldvID,
+                                                  fmeth=fmeth,
+                                                  callback=callback,
+                                                  confirm=confirm),
+                uid=uid,
+                language=ln,
+                urlargs=req.args,
+                navtrail = navtrail_previous_links,
+                lastupdated=__lastupdated__)   
+    else:
+        return page(title='Authorization failure',
+                uid=uid,
+                body=wsc.adderrorbox('try to login first',
+                                     datalist=["""You are not a user authorized to perform admin tasks, try to
+                                     <a href="%s/youraccount.py/login?referer=%s/admin/websearch/">login</a> with another account.""" % (weburl, weburl)]),
+                navtrail= navtrail_previous_links,
+                lastupdated=__lastupdated__)
+    
+def showsearchfields(req, colID, ln=cdslang, callback='yes', confirm=0):
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
+ 
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+
+    if not wsc.check_user(uid):
+        return page(title="Edit Collection",
+                body=wsc.perform_showsearchfields(colID=colID,
+                                                  ln=ln,
+                                                  callback=callback,
+                                                  confirm=confirm),
+                uid=uid,
+                language=ln,
+                urlargs=req.args,
+                navtrail = navtrail_previous_links,
+                lastupdated=__lastupdated__)   
+    else:
+        return auth_failed(uid, navtrail_previous_links)
+
+def showsortoptions(req, colID, ln=cdslang, callback='yes', confirm=0):
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
+ 
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+
+    if not wsc.check_user(uid):
+        return page(title="Edit Collection",
+                body=wsc.perform_showsortoptions(colID=colID,
+                                                 ln=ln,
+                                                 callback=callback,
+                                                 confirm=confirm),
                 uid=uid,
                 language=ln,
                 urlargs=req.args,
