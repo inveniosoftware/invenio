@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of the CERN Document Server Software (CDSware).
@@ -358,7 +359,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       [SW $$c -> 044 $a]
 
 
-080   UNIVERSAL DECIMAL CLASSIFICATION NUMBER (NR)
+080   UNIVERSAL DECIMAL CLASSIFICATION NUMBER (R)
 
       Indicators - Both undefined
 
@@ -677,6 +678,8 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Material base and configuration (NR) - [ARC,CER,MAN,MMD]
+         $c   Materials applied to surface (NR) - [ARC]
+         $d   Information recording technique (NR) - [ARC]
          $9   CD-ROM [code concatinated]
 
       [Additional field(s)/tag(s): ME,CDR,909CZ]
@@ -730,6 +733,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Terms governing access (NR) - [ARC,MAN,MMD]
+         $9   Local information (NR) - [ARC]
 
       [Additional field(s)/tag(s): AV, CX]
       [AV * -> 506 $a {ARC,MAN,MMD}] 
@@ -1109,9 +1113,9 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Indicators - Both undefined
 
       Subfield Code(s)
-         $a   Personal name (NR) - [ARC,CER]
-         $e   Relator term  (NR) - [ARC,CER]
-         $u   Affiliation  (NR) - [CER,IEX]
+         $a   Personal name (NR) - [ARC,CER,MMD]
+         $e   Relator term  (NR) - [ARC,CER,MMD]
+         $u   Affiliation  (NR) - [CER,IEX,MMD]
          $v   Affiliation  (NR) - [CER]
 
       [Additional field(s)/tag(s): AU,AU2,AU3]
@@ -1527,7 +1531,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       [SPK $$d -> 909CG $q -> 905 $q]
 
 
-906   RESPONSIBLE PERSON (R) [CERN] 
+906   RESPONSIBLE PERSON / REFEREE (R) [CERN]
 
       Indicators - Both undefined
 
@@ -1538,7 +1542,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $m   E-mail (NR) - [CER]
          $p   Personal name (NR) - [CER]
          $q   Private address (NR) - [CER]
-
 
       [Additional field(s)/tag(s): RESP,909CH]
       [RESP $$a -> 909CH $a -> 905 $a]
@@ -2079,6 +2082,16 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          Generated and used in MySQL; accepted in AL500
 
 
+981   SYSTEM NUMBER OF DELETED DOUBLE RECORDS (R) [CERN]
+
+      Indicators - Both undefined
+
+      Subfield Code(s)
+         $a   System number (NR) - [ARC,CER,IEX,MAN,MMD,WAI]
+
+      {Not in use in AL300; to be added for users of MySQL}
+
+
 999   REFERENCES (R) [CERN] [CDSware/MySQL]
 
       Indicators
@@ -2088,10 +2101,16 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          5    References
 
       Subfield Code(s)
-         $o   Order number [contains [ ] line number] (NR) - [MySQL]
-         $m   Miscellaneous [contains 1st part of reference] (R) - [MySQL]
-         NOT YET IMPLEMENTED
-      
+         $o   Order number [contains [ ] line number] (NR) 
+         $m   Miscellaneous [contains 1st part of reference] (R) 
+         $t   Journal Title abbreviation (NR) 
+         $p   Page (NR) 
+         $v   Volume (NR)
+         $y   Year (NR)
+         $n   Issue Number (NR) 
+         $u   Uniform Resource Identifier (NR)
+         $r   Report Number (NR)
+         NOT YET IMPLEMENTED      
 
 BAS   BASE
 
