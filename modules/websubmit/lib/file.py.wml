@@ -46,6 +46,10 @@ from websubmit_config import *
 archivepath = filedir
 archivesize = filedirsize
 
+# sort compressed file extensions list to get lengthy ones first:
+cfg_compressed_file_extensions_sorted = cfg_compressed_file_extensions
+cfg_compressed_file_extensions_sorted.sort()
+
 class BibRecDocs:
     """this class represents all the files attached to one record"""
     def __init__(self,recid):
@@ -365,17 +369,24 @@ class BibDoc:
                     fileversion = re.sub(".*;","",fil)
                     fullname = fil.replace(";%s" % fileversion,"")
                     # detect fullname's basename and extension:
-                    if fullname.endswith(".gz"):
-                        # .gz is to be included with the extension (e.g. ".ps.gz")
-                        fullname_last_dot_postition = fullname[:-3].rfind(".")
-                    else:
-                        fullname_last_dot_postition = fullname.rfind(".")
-                    if fullname_last_dot_postition == -1:
+                    fullname_lowercase = fullname.lower()
+                    fullname_extension_postition = -1
+                    # first try to detect compressed file extensions:
+                    for compressed_file_extension in cfg_compressed_file_extensions_sorted:
+                        if fullname_lowercase.endswith("." + compressed_file_extension):
+                            fullname_extension_postition = fullname[:-len(compressed_file_extension)-1].rfind(".")
+                            break
+                    if fullname_extension_postition == -1:
+                        # okay, no compressed extension found, so try to find last dot:
+                        fullname_extension_postition = fullname.rfind(".")
+                    # okay, fullname_extension_postition should now indicate where extension starts (incl. compressed ones)
+                    if fullname_extension_postition == -1:
                         fullname_basename = fullname
                         fullname_extension = ""
                     else:
-                        fullname_basename = fullname[:fullname_last_dot_postition]
-                        fullname_extension = fullname[fullname_last_dot_postition+1:]
+                        fullname_basename = fullname[:fullname_extension_postition]
+                        fullname_extension = fullname[fullname_extension_postition+1:]
+                    # we can append file:
                     self.docfiles.append(BibDocFile(filepath,self.type,fileversion,fullname_basename,fullname_extension,self.id))
     
     def BuildRelatedFileList(self):
