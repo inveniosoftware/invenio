@@ -17,14 +17,15 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS=create_collection_pages
+bin_SCRIPTS=webcoll
 
 EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(bin_SCRIPTS) *~ *.tmp index.wml
 
 install-data-local:
-	./create_collection_pages
+	./webcoll update-reclist
+	./webcoll update-webpage
 	rm -f index.wml
 
 %.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml
