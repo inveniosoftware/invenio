@@ -89,13 +89,24 @@ def perform_display(permanent,uid):
     out = ""
     id_user = uid # XXX
 
-    # query the database
-    if permanent=="n":
-        SQL_query = "SELECT q.id,q.urlargs, DATE_FORMAT(uq.date,'%%d %%b %%Y<BR>%%H:%%i') "\
+    # first detect number of queries:
+    nb_queries_total = 0
+    nb_queries_distinct = 0
+    id_queries_distinct = []    
+    res = run_sql("SELECT COUNT(*),COUNT(DISTINCT(id_query)) FROM user_query WHERE id_user=%s", (uid,), 1)
+    try:
+        nb_queries_total = res[0][0]
+        nb_queries_distinct = res[0][1]
+    except:
+        pass
+
+    # query for queries:
+    if permanent=="n":        
+        SQL_query = "SELECT DISTINCT(q.id),q.urlargs "\
                     "FROM query q, user_query uq "\
                     "WHERE uq.id_user='%s' "\
                     "AND uq.id_query=q.id "\
-                    "ORDER BY uq.date DESC" % id_user
+                    "ORDER BY q.id DESC" % id_user
     else:
         # permanent="y"
         SQL_query = "SELECT q.id,q.urlargs "\
@@ -105,7 +116,8 @@ def perform_display(permanent,uid):
 
     # display message: number of items in the list
     if permanent=="n":
-        out += """<P>You have performed <B>%s</B> searches during the last 30 days.</P>""" % len(query_result)
+        out += """<P>You have performed <B>%d</B> searches (<strong>%d</strong> different questions) during the last 30 days or so.</P>"""\
+               % (nb_queries_total, nb_queries_distinct)
     else:
         # permanent="y"
         out += """<P>Here are listed the <B>%s</B> most popular searches.</P>""" % len(query_result)
@@ -115,10 +127,10 @@ def perform_display(permanent,uid):
         # display the list of searches
         out += """<TABLE border="1" cellspacing="0" cellpadding="3" width="100%">\n"""
         # no, pattern, catalogue, action, date
-        out += """<TR class="pageboxlefttop"><TD><B>No</B></TD><TD><B>Query</B></TD>"""\
+        out += """<TR class="pageboxlefttop"><TD><B>No</B></TD><TD><B>Question</B></TD>"""\
                """<TD><B>Action</B></TD>"""
         if permanent=="n":
-            out += """<TD><B>Date</B></TD>"""
+            out += """<TD><B>Last Run</B></TD>"""
         out += """</TR>\n"""
         i = 0
         for row in query_result :
@@ -129,7 +141,13 @@ def perform_display(permanent,uid):
                    """<TD><A href="%s/search.py?%s">Execute&nbsp;search</A><BR><A href="./input_alert?idq=%d">Set&nbsp;new&nbsp;alert</A></TD>"""\
                    % (i, get_textual_query_info_from_urlargs(row[1]), weburl, row[1], row[0])
             if permanent=="n":
-                out += """<TD>%s</TD>""" % row[2]
+                # find out the date of last run for this query:
+                res = run_sql("SELECT DATE_FORMAT(MAX(date),'%%Y-%%m-%%d %%T') FROM user_query WHERE id_user=%s and id_query=%s",
+                              (id_user, row[0]))
+                try:
+                    out += """<TD>%s</TD>""" % res[0][0]
+                except:
+                    out += """<TD>-unknown-</TD>"""
             out += """</TR>\n"""
         out += """</TABLE><BR>\n"""
 
