@@ -1039,19 +1039,21 @@ def get_current_name(ID, ln, rtype, table):
     """Returns a list of the names, either with the name in the current language, the default language, or just the name from the given table
     ln - a language supported by cdsware
     type - the type of value wanted, like 'ln', 'sn'"""
-    
-    #try:
-    if 1==1:
+
+    name = "name"
+    if table == "rnkMETHOD":
+        name = "NAME"
+    try:
         res = ""
         if ID:
-            res = run_sql("SELECT id_%s,value FROM %sname where type='%s' and ln='%s' and id_%s=%s" % (table, table, rtype,ln, table, ID))
+            res = run_sql("SELECT id_%s,value FROM %s%s where type='%s' and ln='%s' and id_%s=%s" % (table, table, name, rtype,ln, table, ID))
         else:
-            res = run_sql("SELECT id_%s,value FROM %sname where type='%s' and ln='%s'" % (table, table, rtype,ln))
+            res = run_sql("SELECT id_%s,value FROM %s%s where type='%s' and ln='%s'" % (table, table, name,  rtype,ln))
         if ln != cdslang:
             if ID:
-                res1 = run_sql("SELECT id_%s,value FROM %sname WHERE ln='%s' and type='%s' and id_%s=%s"  % (table, table, cdslang, rtype, table, ID))
+                res1 = run_sql("SELECT id_%s,value FROM %s%s WHERE ln='%s' and type='%s' and id_%s=%s"  % (table, table, name, cdslang, rtype, table, ID))
             else:
-                res1 = run_sql("SELECT id_%s,value FROM %sname WHERE ln='%s' and type='%s'"  % (table, table, cdslang, rtype))
+                res1 = run_sql("SELECT id_%s,value FROM %s%s WHERE ln='%s' and type='%s'"  % (table, table, name, cdslang, rtype))
             res2 = dict(res)
             result = filter(lambda x: not res2.has_key(x[0]), res1)
             res = res + result
@@ -1064,8 +1066,8 @@ def get_current_name(ID, ln, rtype, table):
         res = res + result
         res = list(res)
         return res
-#    except StandardError, e:
-#        raise StandardError
+    except StandardError, e:
+        raise StandardError
     
 def get_name(ID, ln, rtype, table):
     """Returns the value from the table name based on arguments
@@ -1073,9 +1075,13 @@ def get_name(ID, ln, rtype, table):
     ln - a language supported by cdsware
     type - the type of value wanted, like 'ln', 'sn'
     table - tablename"""
-    
+
+    name = "name"
+    if table == "rnkMETHOD":
+        name = "NAME"
+        
     try:
-        res = run_sql("SELECT value FROM %sname where type='%s' and ln='%s' and id_%s=%s" % (table, rtype, ln, table, ID))
+        res = run_sql("SELECT value FROM %s%s WHERE type='%s' and ln='%s' and id_%s=%s" % (table, name, rtype, ln, table, ID))
         return res
     except StandardError, e:
         return ()
