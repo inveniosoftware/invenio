@@ -38,7 +38,7 @@ oaisampleidentifier    =   "<OAISAMPLEIDENTIFIER>"
 oaiidentifydescription = """<OAIIDENTIFYDESCRIPTION>"""
 oaiidfield             =   "<OAIIDTAG>"
 oaisetfield            =   "<OAISETTAG>"
-
+oaideleted             =   "<OAIDELETEDPOLICY>"
 
 try:
     import cPickle
@@ -74,14 +74,18 @@ verbs = {
 def encode_for_xml(s):
     "Encode special chars in string for XML-compliancy."
 
-    s = string.replace(s, '&', '&amp;')
-    s = string.replace(s, '<', '&lt;')
-    return s
+    if s == None:
+        return s
+    else:
+        s = string.replace(s, '&', '&amp;')
+        s = string.replace(s, '<', '&lt;')
+        return s
 
 def escape_space(s):
     "Encode special chars in string for URL-compliancy."
 
     s = string.replace(s, ' ', '%20')
+    return s
 
 def encode_for_url(s):
     "Encode special chars in string for URL-compliancy."
@@ -282,98 +286,108 @@ def print_record(sysno, format='marcxml'):
     # print record opening tags:
     
     out = out + "  <record>\n"
-    out = out + "   <header>\n"
+
+    if is_deleted(sysno) and oaideleted != "no":
+        out = out + "    <header status=\"deleted\">\n"
+    else:
+        out = out + "   <header>\n"
+
     for id in get_field(sysno,oaiidfield):
-        out = "%s    <identifier>%s</identifier>\n" % (out, encode_for_url(id))
+        out = "%s    <identifier>%s</identifier>\n" % (out, escape_space(id))
     out = "%s    <datestamp>%s</datestamp>\n" % (out, get_modification_date(sysno))
     for set in get_field(sysno,oaisetfield):
         out = "%s    <setSpec>%s</setSpec>\n" % (out, set)
     out = out + "   </header>\n"
-    out = out + "   <metadata>\n"
 
-    if format == "marcxml":
-        out = out + "    <record xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\" type=\"Bibliographic\">"
-        out = out + "     <leader>00000coc  2200000uu 4500</leader>"
-       ## MARC21 and XML formats, possibley OAI -- they are not in "bibfmt" table; so fetch all the data from "bibXXx" tables:
+    if is_deleted(sysno) and oaideleted != "no":
+        pass
+    else:
+        out = out + "   <metadata>\n"
 
         if format == "marcxml":
+            out = out + "    <record xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\" type=\"Bibliographic\">"
+            out = out + "     <leader>00000coc  2200000uu 4500</leader>"
+            ## MARC21 and XML formats, possibley OAI -- they are not in "bibfmt" table; so fetch all the data from "bibXXx" tables:
 
-            out = "%s     <controlfield tag=\"001\">%d</controlfield>\n" % (out, int(sysno))
+            if format == "marcxml":
 
-        for digit1 in range(0,10):
-            for digit2 in range(0,10):
-                bx = "bib%d%dx" % (digit1, digit2)
-                bibx = "bibrec_bib%d%dx" % (digit1, digit2)
-                query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
-                        "WHERE bb.id_bibrec='%s' AND b.id=bb.id_bibxxx AND b.tag LIKE '%s%%' "\
-                        "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx, sysno, str(digit1)+str(digit2))
-                res = run_sql(query)
-                field_number_old = -999
-                field_old = ""
-                for row in res:
-                    field, value, field_number = row[0], row[1], row[2]
-                    ind1, ind2 = field[3], field[4]
-                    if ind1 == "_":
-                        ind1 = " "
-                    if ind2 == "_":
-                        ind2 = " "                        
-                    # print field tag
-                    if field_number != field_number_old or field[:-1] != field_old[:-1]:
+                out = "%s     <controlfield tag=\"001\">%d</controlfield>\n" % (out, int(sysno))
+
+            for digit1 in range(0,10):
+                for digit2 in range(0,10):
+                    bx = "bib%d%dx" % (digit1, digit2)
+                    bibx = "bibrec_bib%d%dx" % (digit1, digit2)
+                    query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
+                            "WHERE bb.id_bibrec='%s' AND b.id=bb.id_bibxxx AND b.tag LIKE '%s%%' "\
+                            "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx, sysno, str(digit1)+str(digit2))
+                    res = run_sql(query)
+                    field_number_old = -999
+                    field_old = ""
+                    for row in res:
+                        field, value, field_number = row[0], row[1], row[2]
+                        ind1, ind2 = field[3], field[4]
+                        if ind1 == "_":
+                            ind1 = " "
+                        if ind2 == "_":
+                            ind2 = " "                        
+                        # print field tag
+                        if field_number != field_number_old or field[:-1] != field_old[:-1]:
+                            if format == "marcxml":
+
+                                fieldid = encode_for_xml(field[0:3])
+
+                                if field_number_old != -999:
+                                    out = out + "     </datafield>\n"
+
+                                out = "%s     <datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">\n" % (out, encode_for_xml(field[0:3]), encode_for_xml(ind1).lower(), encode_for_xml(ind2).lower())
+
+                            field_number_old = field_number
+                            field_old = field
+                        # print subfield value
                         if format == "marcxml":
-
-                            fieldid = encode_for_xml(field[0:3])
-
-                            if field_number_old != -999:
-                                out = out + "     </datafield>\n"
-
-                            out = "%s     <datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">\n" % (out, encode_for_xml(field[0:3]), encode_for_xml(ind1).lower(), encode_for_xml(ind2).lower())
-
-                        field_number_old = field_number
-                        field_old = field
-                    # print subfield value
-                    if format == "marcxml":
-                        value = encode_for_xml(value)
-                        out = "%s      <subfield code=\"%s\">%s</subfield>\n" % (out, encode_for_xml(field[-1:]), value)
+                            value = encode_for_xml(value)
+                            out = "%s      <subfield code=\"%s\">%s</subfield>\n" % (out, encode_for_xml(field[-1:]), value)
    
-                    # fetch next subfield
-                # all fields/subfields printed in this run, so close the tag:
-                if (format == "marcxml") and field_number_old != -999:
-                    out = out + "     </datafield>\n"
-        out = out + "    </record>\n"
+                        # fetch next subfield
+                    # all fields/subfields printed in this run, so close the tag:
+                    if (format == "marcxml") and field_number_old != -999:
+                        out = out + "     </datafield>\n"
+            out = out + "    </record>\n"
 
-    elif format == "xd":
+        elif format == "xd":
         # XML Dublin Core format, possibly OAI -- select only some bibXXx fields:
-        out = out + "       <oaidc:dc xmlns=\"http://purl.org/dc/elements/1.1/\" xmlns:oaidc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">\n"
+            out = out + "       <oaidc:dc xmlns=\"http://purl.org/dc/elements/1.1/\" xmlns:oaidc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">\n"
 
-        for f in get_field(sysno, "041__a"):
-            out =  "%s         <language>%s</language>\n" % (out, f)
+            for f in get_field(sysno, "041__a"):
+                out =  "%s         <language>%s</language>\n" % (out, f)
 
-        for f in get_field(sysno, "100__a"):
-            out =  "%s         <creator>%s</creator>\n" % (out, encode_for_xml(f))
+            for f in get_field(sysno, "100__a"):
+                out =  "%s         <creator>%s</creator>\n" % (out, encode_for_xml(f))
+ 
+            for f in get_field(sysno, "700__a"):
+                out =  "%s         <creator>%s</creator>\n" % (out, encode_for_xml(f))
 
-        for f in get_field(sysno, "700__a"):
-            out =  "%s         <creator>%s</creator>\n" % (out, encode_for_xml(f))
+            for f in get_field(sysno, "245__a"):
+                out =  "%s         <title>%s</title>\n" % (out, encode_for_xml(f))
 
-        for f in get_field(sysno, "245__a"):
-            out =  "%s         <title>%s</title>\n" % (out, encode_for_xml(f))
+            for f in get_field(sysno, "65017a"):
+                out =  "%s         <subject>%s</subject>\n" % (out, encode_for_xml(f))
 
-        for f in get_field(sysno, "65017a"):
-            out =  "%s         <subject>%s</subject>\n" % (out, encode_for_xml(f))
-
-        for f in get_field(sysno, "8564_u"):
-            out =  "%s         <identifier>%s</identifier>\n" % (out, encode_for_xml(escape_space(f)))
+            for f in get_field(sysno, "8564_u"):
+                out =  "%s         <identifier>%s</identifier>\n" % (out, encode_for_xml(escape_space(f)))
         
-        for f in get_field(sysno, "520__a"):
-            out = "%s         <description>%s</description>\n" % (out, encode_for_xml(f))
+            for f in get_field(sysno, "520__a"):
+                out = "%s         <description>%s</description>\n" % (out, encode_for_xml(f))
 
-        date = get_creation_date(sysno)
-
-        out = "%s         <date>%s</date>\n" % (out, date)
-        out = out + "    </oaidc:dc>\n"
+            date = get_creation_date(sysno)
+ 
+            out = "%s         <date>%s</date>\n" % (out, date)
+            out = out + "    </oaidc:dc>\n"
 
     # print record closing tags:
     
-    out = out + "   </metadata>\n"
+        out = out + "   </metadata>\n"
+
     out = out + "  </record>\n"
 
     return out
@@ -587,9 +601,12 @@ def OAIListIdentifiers(args):
                 done = 0
                 for f in get_field(s, "245__a"):
                     if done == 0:
-                        for id in get_field(s,oaiidfield):
-                            out = out + "    <header>\n"
-                            out = "%s      <identifier>%s</identifier>\n" % (out, encode_for_url(id))
+                        for id in get_field(s,oaiidfield): 
+                            if is_deleted(s) and oaideleted != "no":
+                                out = out + "    <header status=\"deleted\">\n"
+                            else:
+                                out = out + "    <header>\n"
+                            out = "%s      <identifier>%s</identifier>\n" % (out, escape_space(id))
                             out = "%s      <datestamp>%s</datestamp>\n" % (out, get_modification_date(OAIGetSysno(id)))
                             for set in get_field(s,oaisetfield):
                                 out = "%s      <setSpec>%s</setSpec>\n" % (out, arg['set'])
@@ -615,6 +632,7 @@ def OAIIdentify(args):
     protocolVersion       = "  <protocolVersion>2.0</protocolVersion>\n"
     adminEmail            = "  <adminEmail>mailto:%s</adminEmail>\n" % supportemail
     earliestDST		  = "  <earliestDatestamp>%s</earliestDatestamp>\n" % get_earliest_datestamp()               
+    deletedRecord         = "  <deletedRecord>%s</deletedRecord>\n" % oaideleted
     repositoryIdentifier  = "%s" % oaiidprefix
     sampleIdentifier      = oaisampleidentifier
     identifyDescription   = oaiidentifydescription + "\n"
@@ -624,7 +642,7 @@ def OAIIdentify(args):
     out = out + protocolVersion
     out = out + adminEmail
     out = out + earliestDST
-    out = out + "  <deletedRecord>no</deletedRecord>\n"
+    out = out + deletedRecord
     out = out + "  <granularity>YYYY-MM-DDThh:mm:ssZ</granularity>\n"
     #    print "  <compression></compression>\n"
     out = out + oaiidentifydescription
@@ -688,7 +706,19 @@ def OAIGetSysnoList(set, fromDate, untilDate):
          
     return out_dict.keys()
 
+def is_deleted(recId):
+    "Check if record with recId has been deleted. Return 1 if deleted."
 
+    query = "select a.id from bibrec as a left join bibrec_bib98x as b on a.id=b.id_bibrec left join bib98x as c on b.id_bibxxx=c.id where c.value='DELETED' and a.id=%s" % recId
+
+    res = run_sql(query)
+
+    for item in res:
+        if item == None:
+            return 0
+        else:
+            return 1
+    
 def OAIGenResumptionToken():
     "Generates unique ID for resumption token management."
 
@@ -763,7 +793,7 @@ def get_sets():
     row = ['','']
 
     query = "SELECT setSpec,setName,setDescription FROM oaiset"
-    res = run_sql (query)
+    res = run_sql(query)
     for row in res:
         row_bis = [row[0],row[1],row[2]]
         out.append(row_bis)
