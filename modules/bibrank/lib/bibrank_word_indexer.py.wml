@@ -1116,7 +1116,7 @@ def get_tags(config):
                 elif tag[2] != "none" and config.get(function,"stem_if_avail") == "yes" and not stemmer.has_key(tag[2]):
                     write_message("Warning: Language '%s' not available in PyStemmer." % tag[2])
             except NameError:
-                if shown_error = 0:
+                if shown_error == 0:
                     write_message("Warning: PyStemmer not found. Please read INSTALL.")
                     shown_error = 1
             tags.append(tag)
