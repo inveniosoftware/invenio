@@ -252,7 +252,7 @@ class GettingFieldValuesTest(unittest.TestCase):
         </datafield>
         </record>
         """
-        (self.rec, st, e) = bibrecord.create_record(xml_example_record,1,1)        
+        (self.rec, st, e) = bibrecord.create_record(xml_example_record,1,1)
 
     def test_get_field_instances(self):
         """bibrecord - getting field instances"""

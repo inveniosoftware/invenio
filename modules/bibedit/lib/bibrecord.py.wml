@@ -62,6 +62,7 @@ if parsers == []:
     sys.exit(2)
 else:
     j,i=1,1
+
     if 2 in parsers:
         try:
             import pyRXP
@@ -127,7 +128,7 @@ def create_records(xmltext,verbose=verbose,correct=correct):
 	creates a list of records 
 	"""
         global import_error
-        err=[]
+        err = []
         if import_error == 1:
             err.append((6,imperr))
         else:
@@ -167,10 +168,9 @@ def create_record(xmltext,verbose = verbose, correct=correct):
     global parser
 
     (i,errors) = testImports(parser)
-
     if i==0:
         return (None,0,errors)
-    
+
     try:
         if parser==2:
             ## the following is because of DTD validation
@@ -185,9 +185,9 @@ def create_record(xmltext,verbose = verbose, correct=correct):
             (rec,er) = create_record_4suite(xmltext,verbose,correct)
         else:
             (rec,er) = create_record_minidom(xmltext,verbose,correct)
-        
         errs = warnings(er)
-    except:
+    except Exception, e:
+        print e
         errs = warnings(concat(err))
         return (None,0,errs)
     
@@ -352,10 +352,10 @@ def record_xml_output(rec):
     xmltext = "<record>\n"
     #add the tag 'tag' to each field in rec[tag]
     fields=[]
+
     for tag in rec.keys():
         for field in rec[tag]:
             fields.append((tag,field))
-            
     record_order_fields(fields)
     
     for field in fields:
@@ -545,21 +545,21 @@ def create_record_minidom(xmltext, verbose=verbose, correct=correct):
     record = {}
     ord=1
     global err
-    
+
     if correct:
         xmlt = xmltext
         (rec,e) = wash(xmlt,0)
-        err.append(e)
+        err.extend(e)
         return (rec,err)
         
     dom = parseString(xmltext)
     root = dom.childNodes[0]
-    
+
     for controlfield in get_childs_by_tag_name(root,"controlfield"):
         s = controlfield.getAttribute("tag")
 
         text_nodes = controlfield.childNodes
-        v = u''.join([ n.data for n in text_nodes ])
+        v = u''.join([ n.data for n in text_nodes ]).encode("utf-8")
 
         name = type(v).__name__
         if (name in ["int","long"]) :
@@ -571,7 +571,7 @@ def create_record_minidom(xmltext, verbose=verbose, correct=correct):
                 err.append((7,'Type found: ' + name))
   
             field = ([],"","","",ord)# the type of value is not correct. (user insert something like a list...)
-        
+
         if record.has_key(s):
             record[s].append(field)
         else:
@@ -583,27 +583,26 @@ def create_record_minidom(xmltext, verbose=verbose, correct=correct):
         
         for subfield in get_childs_by_tag_name(datafield,"subfield"):
             text_nodes = subfield.childNodes
-            v = u''.join([ n.data for n in text_nodes ])
-            code = subfield.getAttributeNS(None,'code')
+            v = u''.join([ n.data for n in text_nodes ]).encode("utf-8")
+            code = subfield.getAttributeNS(None,'code').encode("utf-8")
             if code != '':
                 subfields.append((code,v))
             else:
                 subfields.append(('!',v))
 
-        s = datafield.getAttribute("tag")
+        s = datafield.getAttribute("tag").encode("utf-8")
         if s == '':
             s = '!'
             
-        ind1 = datafield.getAttribute("ind1")
+        ind1 = datafield.getAttribute("ind1").encode("utf-8")
         
-        ind2 = datafield.getAttribute("ind2")            
-        
+        ind2 = datafield.getAttribute("ind2").encode("utf-8")         
         
         if record.has_key(s):
             record[s].append((subfields,ind1,ind2,"",ord))
         else:
             record[s]=[(subfields,ind1,ind2,"",ord)]
-        ord=ord+1
+        ord = ord+1
 
     return (record,err)
 
@@ -613,13 +612,14 @@ def create_record_4suite(xmltext,verbose=verbose,correct=correct):
     creates a record object and returns it
     uses 4Suite domlette
     """
+
     record = {}
     global err
-    
+
     if correct:
         xmlt = xmltext
         (rec,e) = wash(xmlt,1)
-        err.append(e)
+        err.extend(e)
         return (rec,e)
         
     dom = NonvalidatingReader.parseString(xmltext,"urn:dummy")
@@ -627,7 +627,6 @@ def create_record_4suite(xmltext,verbose=verbose,correct=correct):
     root = dom.childNodes[0]
     
     ord=1
-    
     for controlfield in get_childs_by_tag_name(root,"controlfield"):
         s = controlfield.getAttributeNS(None,"tag")
 
