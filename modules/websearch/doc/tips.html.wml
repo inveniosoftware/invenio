@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of the CERN Document Server Software (CDSware).
@@ -298,6 +299,6 @@ to match all first names beginning with J.
 
 <h5>More information:</h5>
 
-Special characters, fulltext searching, citation searching, and other
-capabilities are fully explained in the complete <a href="<lang:star:
-guide.*.html>">Search Guide</a>.
+Special characters, regular expressions, fulltext searching, citation
+searching, and other capabilities are fully explained in the complete
+<a href="<lang:star: guide.*.html>">Search Guide</a>.
