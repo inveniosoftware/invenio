@@ -369,14 +369,13 @@ def get_words_from_fulltext(url_indirect,separators="[^\w]",split=string.split):
 tagToWordsFunctions = {'8564_u':get_words_from_fulltext}
 
 def get_words_from_phrase(phrase, split=string.split):
-    "Returns list of words from phrase 'phrase'."
+    """Return list of words found in PHRASE.  Note that the phrase is
+       split into groups depending on the alphanumeric characters and
+       punctuation characters definition present in the config file.
+    """
     words = {}
-    # chars_punctuation and chars_alphanumericseparators from config
-
     if cfg_remove_html_code and string.find(phrase, "</") > -1:
-        #Most likely html, remove html code
         phrase = sre_html.sub(' ', phrase)
-
     phrase = str.lower(phrase)
     # 1st split phrase into blocks according to whitespace
     for block in split(strip_accents(phrase)):
@@ -384,28 +383,35 @@ def get_words_from_phrase(phrase, split=string.split):
         block = sre_block_punctuation_begin.sub("", block)
         block = sre_block_punctuation_end.sub("", block)
         if block:
-            block = wash_word(block)
+            block = apply_stemming_and_stopwords_and_length_check(block)
             if block:
                 words[block] = 1    
             # 3rd break each block into subblocks according to punctuation and add subblocks:
             for subblock in sre_punctuation.split(block):
-                subblock = wash_word(subblock)
+                subblock = apply_stemming_and_stopwords_and_length_check(subblock)
                 if subblock:
                     words[subblock] = 1
                     # 4th break each subblock into alphanumeric groups and add groups:                    
                     for alphanumeric_group in sre_separators.split(subblock):
-                        alphanumeric_group = wash_word(alphanumeric_group)
+                        alphanumeric_group = apply_stemming_and_stopwords_and_length_check(alphanumeric_group)
                         if alphanumeric_group:
-                            words[alphanumeric_group] = 1
- 
+                            words[alphanumeric_group] = 1 
     return words.keys()
 
-def wash_word(word): 
-    if not is_stopword(word): 
-        stemmed = stem(word=word)
-        if len(stemmed) >= cfg_min_word_length:
-            return stemmed
-    return ""
+def apply_stemming_and_stopwords_and_length_check(word):
+    """Return WORD after applying stemming and stopword and length checks.
+       See the config file in order to influence these.
+    """
+    # stem word, when configured so:
+    if cfg_stemmer_default_language != None:
+        word = stem(word, cfg_stemmer_default_language)
+    # now check against stopwords: 
+    if is_stopword(word): 
+        return ""
+    # finally check the word length:
+    if len(word) < cfg_min_word_length:
+        return ""
+    return word
 
 def remove_subfields(s):
     "Removes subfields from string, e.g. 'foo $$c bar' becomes 'foo bar'."
