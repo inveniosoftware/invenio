@@ -45,6 +45,8 @@
    </tbody>
    </table>
 
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
 <h2>Contents</h2>
 <strong>1. <a href="#1">Overview</a></strong><br>
 <strong>2. <a href="#2">Edit Collection Tree</a></strong><br>
@@ -69,7 +71,7 @@
 
 <a name="1"></a><h2>1. Overview</h2>
 
-WebSearch Admin interface will help you to configure the search
+<p>WebSearch Admin interface will help you to configure the search
 collections that the end-users see.  The WebSearch Admin functionality
 can be basically separated into several parts: (i) how to organize
 collections into <a href="#2">collection tree</a>; (ii) how to define
@@ -240,30 +242,216 @@ follows:
 </table>
 
 <a name="3"></a><h2>3. Edit Collection Parameters</h2>
+
+<p>To finalize setting up of a collection, you could and should edit
+many parameters, such as define list of records belonging to a
+collection, define search fields, define search interface page
+portalboxes, etc.  In this section we will subsequently describe all
+the various possibilities as they are presented in the <a
+href="<WEBURL>/admin/websearch/websearchadmin.py/editcollection?colID=1">Edit
+Collection</a> pages of the WebSearch Admin Interface.
+
 <a name="3.1"></a><h3>3.1 Modify collection query</h3>
-A collection query defines which documents to show for a collection when traversing the tree. If a collection got no query, it will only show the subcollections it got. Avoid giving a collection a query if it has subcollections, since this may cause problems in the form of a loop. In the same way, if a collection without subcollections doesn't have a query, the result will be that no documents are shown on screen for this collection.<br>
-If you want to remove the query, erase the content of the textbox and update.
+
+<p>The <em>collection query</em> defines which documents belong to the
+given collection.  It is equal to the search term that retrieves all
+documents belonging to the given collection, exactly as you would have
+typed it into the search interface.  For example, to define a
+collection of all papers written by Ellis, you could set up your
+collection query to be <code>author:Ellis</code>.
+
+<p>Usually, the collection query is chosen on the basis of the
+collection identifier that we store in MARC tag 980.  This tag is
+indexed in a logical field called <code>collection</code> so that a
+collection of Theses could be defined via
+<code>collection:THESIS</code>, supposing that every thesis metadata
+record has got the text <code>THESIS</code> in MARC tag 980.
+(Nitpick: we use the term `collection' in two contexts here: once as a
+collection of metadata documents, but also and as a logical field
+name.  We should have probably called the latter
+<code>collectionidentifier</code> or somesuch instead, but we hope the
+difference is clear from... the context.)
+
+<p>If a collection does not have any collection query defined, then
+its content is defined by means of the content of its descendants
+(subcollections).  This is the case for composed collections.  For
+example, the composed collection <em>Articles & Preprints</em> (no
+query defined) will be defined as a father of <em>Articles</em>
+(query: <code>collection:ARTICLE</code>) and <em>Preprints</em>
+(query: <code>collection:PREPRINT</code>).  In this case the
+collection query for <em>Articles & Preprints</em> can stay empty.
+
+<p>Note that you should avoid defining non-empty collection query in
+cases the collection has descendants, since it will prevail and the
+descendants may not be taken into account.  In the same way, if a
+collection doesn't have any query nor any descendants defined, then
+its contents will be empty.
+
+<p>To remove the collection query, set the parameter empty.
+
 <a name="3.2"></a><h3>3.2 Modify access restrictions</h3>
-If there is a need to restrict access to certain collections, this can be done in cdsware by configuring which apache group should have access to the collection. A user then needs to be logged in and be a part of the right usergroup to be able to access the specific collection. To remove any restrictions, set the parameter empty.
+
+<p>If there is a need to restrict access to certain collections, you
+can configure which Apache group the access should be granted to.
+Users will then be prompted to enter Apache user and password.  The
+search engine will check whether user has entered appropriate
+credentials and whether the user belongs to the Apache group that can
+access this restricted collection.
+
+<p>So, from the admin point of view, you should set up corresponding
+Apache user and group files, and you should have specified their
+location in the appropriate section of CDSware <code>config.wml</code>
+file during CDSware compilation.
+
+<p>(Note that in the future we may use CDSware user identities in
+order to avoid the Apache way of authentication.)
+
+<p>To remove any access restrictions, set the parameter empty.
+
 <a name="3.3"></a><h3>3.3 Modify translations</h3>
-To enable internalization support for the collections, the translations for the wanted languages must be added. If there are several name types in use, you will be asked to select which name for the collection you want to change. If a translation does not exist, the translation for the default cdsware language for this installation will be used. The languages available, depends on which languages cdsware is installed  with.
+
+<p>You may define translations of collection names into the languages
+of your CDSware installation.  Moreover, a collection name may be
+different in different contexts (e.g. long name, short name, etc), so
+that prior to modifying translations you will be asked to select which
+name type you want to change.
+
+<p>The translations aren't mandatory to define.  If a translation does
+not exist in a language chosen by the end user, the end user will be
+shown the collection name in the default language of this
+installation.
+
+<p>Note also that the list of available languages depends on the
+compile-time configuration (see the general <code>config.wml</code>
+file).
+
 <a name="3.4"></a><h3>3.4 Delete collection</h3>
-To be able to delete a collection, it must first be removed from the collection tree. Any data associated with the collection will be lost. As an example, if a collection uses several portalboxes, you will loose the association information, but not the portalboxes itself. Similarily, this will also happen regarding output formats, translations, search options, sort options, search fields, ranking, collection query and access restriction.
+
+<p>The collection to be deleted must be first removed from the
+collection tree.  Any metametadata associated with the collection
+(such as association to portalboxes, association to records belonging
+to this collection, etc) will be lost, but the metadata itself will be
+preserved (such as portalboxes themselves, records themselves, etc).
+In total, association to records, output formats, translations, search
+options, sort options, search fields, ranking method, and access
+restriction will be lost.  Use with care!
+
+<p>It may be a good idea only to remove the collection from the end
+users interface, but to keep it "hidden" in a corner they don't see
+and that they can't search when they search from Home.  To achieve
+this, do not delete the collection but simply remove it from the
+collection tree so that it won't be attached to any father collection.
+In this case the search interface page for this collection will stay
+updated, but won't be neither shown in the tree nor searchable from
+Home page.  It will only be accessible via bookmarked URL, for
+example.
+
 <a name="3.5"></a><h3>3.5 Modify portalboxes</h3>
-Portalboxes are used to show various kind of information to the user when a collection is selected by the users. It can be anything from a textbox to a picture. To create a new portalbox, a title and a body must be given, where the body can contain HTML if necessary.
-To add a portalbox to the collection, you must choose an existing portalbox, which language it should be valid for and the position on the screen. Since a portalbox is not bound to one language, one portalbox can be used for several languages.
+
+<p>The search interface HTML page for a given collection may be
+customized by what we call <em>portalboxes</em>.  Portalboxes are used
+to show various kinds of information to the end user, such as a text
+box with some inline help information about the given collection, an
+illustrative picture, etc.
+
+<p>To create a new portalbox, a title and a body must be given, where
+the body can contain HTML if necessary.
+
+<p>To add a portalbox to the collection, you must choose an existing
+portalbox, the language for which the portalbox should be shown, the
+position of the portalbox on the screen, and the ordering score of
+portalboxes.
+
+<ul>
+
+<li>The <em>language</em> could be chosen depending on the language
+used in the portalbox body.  Since a portalbox is not necessarily
+bound to one particular language, one portalbox may be reused for
+several languages, which is particularly suitable for portalboxes
+containing language-independent content such as images.
+
+<li>The <em>position</em> of the portalbox on the screen is chosen
+from several predefined positions, such as right-top, before-title,
+after-title, before-narrow-by-collection-box, etc.  You may present
+several portalboxes on the same position in the same language, in
+which case they will be shown by the order of decreasing score.
+
+<li>The <em>score</em> defines the order of portalboxes that are to be
+presented in the same position and in the same language context.
+
+</ul>
+
 <a name="3.6"></a><h3>3.6 Modify search fields</h3>
-If you want to enable only searching in certain fields for a collection, you need to specify this by adding the wanted fields, including selecting the order of which they may appear in the 'Advanced Search' interface. Management of the fields are done from the BibIndex interface.
+
+<p>The <em>search field</em> is a logical field (such as author,
+title, etc) that is to be proposed for the end users to choose from in
+the search interface page.  If you don't select anything, a default
+list (author, title, year, etc) will be shown.
+
+<p>Note that if you want to add new logical field or modify the
+physical MARC tags for a logical field, you have to use the <a
+href="<WEBURL>/admin/bibindex/">BibIndex Admin</a> interface.
+
 <a name="3.7"></a><h3>3.7 Modify search options</h3>
-By using search options you can narrow down a search to a certain subject, documents from a specific division or similar. The options added to a collection is shown in the 'Advance search' interface in the same order as specified in the admin interface. To add a search option, the type of the option must first be chosen (example: division, subject, experiment) and then the category must be chosen (example: CERN LHC, Mathematic, Physics - Muons). 
+
+<p>The <em>search option</em> is a search field that contains
+interesting predefined values that the end user will be able to choose
+from.  So, on the contrary to the <a href="">search field</a>, you
+don't expect the end users to type free text to search within a field,
+but to choose an option from the given list.  For example, "author" is
+a good example of a search field, while, "subject" is a good example
+of a search option.
+
+<p>The search options are shown in the "Advanced Search" interfaces in
+the same order as they appear in the WebSearch Admin interface. To add
+a search option, the field name must first be chosen (for example,
+subject) and then the list field values must be entered (for example,
+Mathematics, Physics, Chemistry, etc).
+
 <a name="3.8"></a><h3>3.8 Modify sort options</h3>
-If you want to enable only sorting on certain fields for a collection, you need to specify this by adding the wanted fields, including selecting the order of which they may appear in the 'Advanced Search' interface. Management of the fields are done from the BibIndex interface.
+
+<p>You may define a list of logical fields that the end users will be
+able to choose for the sorting purposes.  For example, "first author"
+or "year".  If you don't select anything, a default list (author,
+title, year, etc) will be shown.
+
+<p>Note that if you want to add new logical field or modify the
+physical MARC tags for a logical field, you have to use the <a
+href="<WEBURL>/admin/bibindex/">BibIndex Admin</a> interface.
+
 <a name="3.9"></a><h3>3.9 Modify rank options</h3>
-To enable a certain rank method for a collection, select the method from the 'enable rank method' box and add it. The documents in this collection will then be included in the ranking the next time the BibRank daemon is running the added rank method. To disable a method the process is the same, but select the method from the 'disable rank method' box. For configuration of the rank method, see the BibRank interface.
+
+<p>To enable a certain rank method for a collection, select the method
+from the "enable rank method" box and add it. The documents in this
+collection will then be included in the ranking sets the next time the
+BibRank daemon will run. To disable a method the process is the same,
+but select the method from the 'disable rank method' box.
+
+<p>Note that if you want to add new ranking method or modify existing
+ranking method, you have to use the <a
+href="<WEBURL>/admin/bibrank/">BibRank Admin</a> interface.
+
 <a name="3.10"></a><h3>3.10 Modify output formats</h3>
-For each collection you can specify various output formats, which defines how the search result is presented for various collection types. The order of which the formats appear can also be changed using the 'move' arrows.
+
+<p>Each collection may have several output formats defined.  The end
+users will be able to choose a format they want to see their search
+results list in.  Most formats like HTML brief or XML Dublin Core are
+interesting for each collection, but some formats like HTML portfolio
+are only interesting for Photographs collection, not for Articles
+collection.  The interface will permit you to choose the formats
+appropriate for a given collection.  The order of formats can be
+changed using the 'move' arrows.
+
+<p>Note that if you want to add new output format ('behaviour') or
+modify existing output format, you have to use the <a
+href="<WEBURL>/admin/bibformat/">BibFormat Admin</a> interface.
+
 <a name="4"></a><h2>4. Run WebColl Daemon</h2>
+
 <a name="5"></a><h2>5. Edit Search Engine Parameters</h2>
+
 <a name="6"></a><h2>6. Search Engine Cache</h2>
+
 <a name="7"></a><h2>7. Additional Information</h2>
+
 <a href="<WEBURL>/hacking/websearch/">WebSearch Internals</a>
