@@ -81,10 +81,9 @@ The search engine proceeds as follows.
    (word or phrase) index.
 
    2-1. If p_i was found in the f_i index, we retain the (p_i, f_i)
-        search unit.  We also retain it in the case p_i wasn't found
-        in the f_i index but when (p_i, f_i) was joined to previous
-        units by a boolean OR operator, as in this case it is not
-        mandatory that p_i exists.
+        search unit.  We also retain it in the case when p_i wasn't
+        found in the f_i index but when (p_i, f_i) is joined to the
+        previous unit or to the next unit by boolean operator OR.
 
    2-2. If p_i wasn't found inside f_i, we then look whether p_i
         contains some non-alphanumeric characters, such as a dash or a
