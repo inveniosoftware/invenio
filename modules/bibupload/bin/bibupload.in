@@ -765,7 +765,7 @@ WHERE  id_bibrec=$recid and
 		
    // word file addition
    if ($WORDFILEJOB && $options['BIBWORDS'])
-      system("$WORDFILEJOB add $recid > /dev/null 2>&1");
+      system("$WORDFILEJOB -a -i $recid > /dev/null 2>&1");
 
    // insert xml full format
    insertFMTfield($recid,$rec);
@@ -1016,8 +1016,8 @@ WHERE  id_bibrec=$recid and
 
     // word file update
     if ($WORDFILEJOB && $options['BIBWORDS']) {
-        system("$WORDFILEJOB del $recid > /dev/null 2>&1");
-        system("$WORDFILEJOB add $recid > /dev/null 2>&1");
+        system("$WORDFILEJOB -d -i $recid > /dev/null 2>&1");
+        system("$WORDFILEJOB -a -i $recid > /dev/null 2>&1");
     }
 
     
@@ -1367,9 +1367,9 @@ function parse_command($argv)
             $verbosity = $argv[$i];
 	    if ($verbosity == 0) 
             	$options['MUTE']    = TRUE;
-	    if ($verbosity > 0) 
+	    if ($verbosity > 1) 
 		$options['DISPLAY'] = TRUE;
-	    if ($verbosity > 1)
+	    if ($verbosity > 2)
 		$options['PRINTDB'] = TRUE;
          else if ($argv[$i] == "-w" || $argv[$i] == "--bibwords")
             $options['BIBWORDS'] = TRUE;
@@ -1423,7 +1423,6 @@ function parse_command($argv)
       displayhelp();
       exit;
    }
-
 }
 	
 function displayhelp()
@@ -1441,7 +1440,9 @@ function displayhelp()
   Options: 
    -h, --help     print this help
    -u, --user     choose user
-   -v, --verbose  verbosity level (0=mute, 1=display record analysis, 2=display integration requests, 9=max information)
+   -v, --verbose  verbosity level (0=mute, 1=default info msg,
+		  2=display record analysis, 3=display integration requests, 
+		  9=max information)
    -w, --bibwords call bibwords on integration or modification	of a record.
    -n, --notimechange 
                   do not change record last modification date when updating
@@ -1449,14 +1450,15 @@ function displayhelp()
                   force brief format recreation at next reformatting
                   (sets bibfmt hb last_update to 1970)
    -t, --time     sets date/time of execution (format 'yyyy-mm-dd hh:mm:ss')
+  INSERT Mode
+   -i, --insert  unmatched records are added as new. 
+		 this can be mixed with -r. 
   UPDATE Modes:
-   -r, --record_update The existing record is entirely replaced by the new one 
-   -a, --field_insert  New fields are appended to the existing record
-   -c, --field_update  New fields are replaced by the new ones in the existing record
-   -f, --format        Takes only the FMT fields into account. Does not update the 
-                       modification stamp either.
-  INSERT Modes
-   -i, --record_insert Unmatched records are added as new. This can be mixed with -r. 
+   -r, --replace the existing record is entirely replaced by the new one 
+   -a, --append  new fields are appended to the existing record
+   -c, --correct fields are replaced by the new ones in the existing record
+   -f, --format  takes only the FMT fields into account. Does not update the 
+                 modification stamp either.
   Example:
        ./bibupload -t '2004-10-24 05:00' -i toto.xml\n");
 }
