@@ -36,7 +36,7 @@
 execfile("%s/cdsware/websubmit_functions/mail.py" % pylibdir)
 
 def Send_Modify_Mail (parameters,curdir,form):
-    FROMADDR = 'CDSwareSubmission Interface <%s>' % supportemail
+    FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
     global sysno,rn
     if os.path.exists("%s/%s" % (curdir,parameters['emailFile'])):
         fp = open("%s/%s" % (curdir,parameters['emailFile']),"r")

@@ -39,7 +39,7 @@ execfile("%s/cdsware/websubmit_functions/Retrieve_Data.py" % pylibdir)
 def Send_SRV_Mail(parameters,curdir,form):
     global rn,doctype,sysno
     # variables declaration
-    FROMADDR = 'CDSwareSubmission Interface <%s>' % supportemail
+    FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
     addresses = parameters['addressesSRV']
     if os.path.exists("%s/%s" % (curdir,parameters['emailFile'])):
         fp = open("%s/%s" % (curdir,parameters['emailFile']), "r")

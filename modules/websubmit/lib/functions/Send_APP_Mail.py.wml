@@ -41,7 +41,7 @@ execfile("%s/cdsware/websubmit_functions/mail.py" % pylibdir)
 
 def Send_APP_Mail (parameters,curdir,form):
     global emailvalue,titlevalue,authorvalue,sysno,rn
-    FROMADDR = 'CDSwareSubmission Interface <%s>' % supportemail
+    FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
     doctype = form['doctype']
     emailvalue = emailvalue.replace("\n","")
     titlevalue = titlevalue.replace("\n","")
