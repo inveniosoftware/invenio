@@ -55,7 +55,7 @@ fi
 AC_PATH_PROG(PYTHON, python)
 if test -z "$PYTHON"; then
    AC_MSG_ERROR([
-   Python was not found in your path.  Please install it first.
+   Python was not found in your PATH.  Please install it first.
    Available from <http://python.org/>.])
 fi
 
@@ -63,7 +63,7 @@ fi
 AC_PATH_PROG(ACROREAD, acroread)
 if test -z "$ACROREAD"; then
    AC_MSG_WARN([
-   Acrobat Reader was not found in your path.  It is used in 
+   Acrobat Reader was not found in your PATH.  It is used in 
    the WebSubmit module for automatic conversion of submitted documents.  
    You can continue without it but you will miss some CDSware 
    functionality.  We recommend you to install it first and to rerun 
@@ -75,7 +75,7 @@ fi
 AC_PATH_PROG(LYNX, lynx)
 if test -z "$LYNX"; then
    AC_MSG_WARN([
-   Lynx was not found in your path.  It is used in 
+   Lynx was not found in your PATH.  It is used in 
    the WebSubmit module to fetch files from URLs given by
    submitters.
    You can continue without it but you will miss some CDSware 
@@ -88,7 +88,7 @@ fi
 AC_PATH_PROG(GZIP, gzip)
 if test -z "$GZIP"; then
    AC_MSG_WARN([
-   Gzip was not found in your path.  It is used in 
+   Gzip was not found in your PATH.  It is used in 
    the WebSubmit module to compress the data submitted in an archive.
    You can continue without it but you will miss some CDSware 
    functionality.  We recommend you to install it first and to rerun 
@@ -100,7 +100,7 @@ fi
 AC_PATH_PROG(GUNZIP, gunzip)
 if test -z "$GUNZIP"; then
    AC_MSG_WARN([
-   Gunzip was not found in your path.  It is used in 
+   Gunzip was not found in your PATH.  It is used in 
    the WebSubmit module to correctly deal with submitted compressed
    files.
    You can continue without it but you will miss some CDSware 
@@ -109,11 +109,11 @@ if test -z "$GUNZIP"; then
    <http://www.gzip.org/>.])
 fi
 
-## Check for Tar:
+## Check for tar:
 AC_PATH_PROG(TAR, tar)
 if test -z "$TAR"; then
    AC_MSG_WARN([
-   Tar was not found in your path.  It is used in 
+   Tar was not found in your PATH.  It is used in 
    the WebSubmit module to pack the submitted data into an archive.
    You can continue without it but you will miss some CDSware 
    functionality.  We recommend you to install it first and to rerun 
@@ -121,59 +121,123 @@ if test -z "$TAR"; then
    <ftp://prep.ai.mit.edu/pub/gnu/tar/>.])
 fi
 
-## Check for Ps2pdf:
+## Check for ps2pdf:
 AC_PATH_PROG(PS2PDF, ps2pdf)
 if test -z "$PS2PDF"; then
    AC_MSG_WARN([
-   Ps2pdf was not found in your path.  It is used in 
+   ps2pdf was not found in your PATH.  It is used in 
    the WebSubmit module to convert submitted PostScripts into PDF.
    You can continue without it but you will miss some CDSware 
    functionality.  We recommend you to install it first and to rerun 
-   the configure script.  Ps2pdf is available from
+   the configure script.  PS2PDF is available from
    <http://www.cs.wisc.edu/~ghost/doc/AFPL/6.50/Ps2pdf.htm>.])
 fi
 
-## Check for Pdftotext programs:
-AC_CHECK_PROGS(PDFTOTEXT,[pdftotext pstotext])
+## Check for pdftotext:
+AC_PATH_PROG(PDFTOTEXT, pdftotext)
 if test -z "$PDFTOTEXT"; then
    AC_MSG_WARN([
-   Neither Pstotext nor Pdftotext were found in your path. Either
-   of them can be used to index fulltext PDF files and make them
-   searchable.
-   You can continue without it but you will miss some CDSware
-   functionality. We recomend you to install one of them first
-   (Pdftotext preferred) and to rerun the configure script. Pdftotext 
-   is available from <http://www.foolabs.com/xpdf/home.html>. Pstotext
-   is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
+   pdftotext was not found in your PATH.  It is used for the fulltext indexation 
+   of PDF files.
+   You can continue without it but you may miss fulltext searching capability 
+   of CDSware.  We recomend you to install it first and to rerun the configure 
+   script.  pdftotext is available from <http://www.foolabs.com/xpdf/home.html>. 
    ])
 fi
 
-AC_CHECK_PROGS(PSTOTEXT,[pstotext pstoascii])
+## Check for pstotext:
+AC_PATH_PROG(PSTOTEXT, pstotext)
 if test -z "$PSTOTEXT"; then
    AC_MSG_WARN([
-   Neither Pstotext nor Pstoascii were found in your path. Either
-   of them can be used to index fulltext PS files and make them
-   searchable.
-   You can continue without it but you will miss some CDSware
-   functionality. We recomend you to install one of them first
-   and to rerun the configure script. Both are available as part
-   of Aladdin PS from <http://www.cs.wisc.edu/~ghost/doc/AFPL>.
+   pstotext was not found in your PATH.  It is used for the fulltext indexation 
+   of PDF and PostScript files.
+   You can continue without it but you may miss fulltext searching capability 
+   of CDSware.  We recomend you to install it first and to rerun the configure 
+   script.  pstotext is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
    ])
 fi
 
-
-AC_CHECK_PROGS(WORDTOTEXT,[wvText antiword catdoc])
-if test -z "$WORDTOTEXT"; then
+## Check for ps2ascii:
+AC_PATH_PROG(PSTOASCII, ps2ascii)
+if test -z "$PSTOASCII"; then
    AC_MSG_WARN([
-   None of WvText, Antiword or Catdoc was found in your path. One
-   of them is needed to index fulltext Word files and make them
-   searchable.
-   You can continue without it but you will miss some CDSware
-   functionality. We recomend you to install one of them first
-   and to rerun the configure script. WvText is available from
-   <http://sourceforge.net/projects/wvware>. Antiword is available
-   from <http://www.winfield.demon.nl/index.html>. Catdoc is 
-   available from <http://www.ice.ru/~vitus/catdoc/index.html>
+   ps2ascii was not found in your PATH.  It is used for the fulltext indexation 
+   of PostScript files.
+   You can continue without it but you may miss fulltext searching capability 
+   of CDSware.  We recomend you to install it first and to rerun the configure 
+   script.  ps2ascii is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
+   ])
+fi
+
+## Check for antiword:
+AC_PATH_PROG(ANTIWORD, antiword)
+if test -z "$ANTIWORD"; then
+   AC_MSG_WARN([
+   antiword was not found in your PATH.  It is used for the fulltext indexation 
+   of Microsoft Word files.
+   You can continue without it but you may miss fulltext searching capability 
+   of CDSware.  We recomend you to install it first and to rerun the configure 
+   script.  antiword is available from <http://www.winfield.demon.nl/index.html>. 
+   ])
+fi
+
+## Check for catdoc:
+AC_PATH_PROG(CATDOC, catdoc)
+if test -z "$CATDOC"; then
+   AC_MSG_WARN([
+   catdoc was not found in your PATH.  It is used for the fulltext indexation 
+   of Microsoft Word files.
+   You can continue without it but you may miss fulltext searching capability 
+   of CDSware.  We recomend you to install it first and to rerun the configure 
+   script.  catdoc is available from <http://www.ice.ru/~vitus/catdoc/index.html>.
+   ])
+fi
+
+## Check for wvText:
+AC_PATH_PROG(WVTEXT, wvText)
+if test -z "$WVTEXT"; then
+   AC_MSG_WARN([
+   wvText was not found in your PATH.  It is used for the fulltext indexation 
+   of Microsoft Word files.
+   You can continue without it but you may miss fulltext searching capability 
+   of CDSware.  We recomend you to install it first and to rerun the configure 
+   script.  wvText is available from <http://sourceforge.net/projects/wvware>.
+   ])
+fi     
+
+## Check for ppthtml:
+AC_PATH_PROG(PPTHTML, ppthtml)
+if test -z "$PPTHTML"; then
+   AC_MSG_WARN([
+   ppthtml was found in your PATH. It is used for the fulltext indexation 
+   of Microsoft PowerPoint files.
+   You can continue without it but you may miss fulltext searching capability 
+   of CDSware.  We recomend you to install it first and to rerun the configure 
+   script.  ppthtml is available from <http://www.xlhtml.org/>.
+   ])
+fi
+
+## Check for xlhtml:
+AC_PATH_PROG(XLHTML, xlhtml)
+if test -z "$XLHTML"; then
+   AC_MSG_WARN([
+   xlhtml was found in your PATH. It is used for the fulltext indexation 
+   of Microsoft Excel files.
+   You can continue without it but you may miss fulltext searching capability 
+   of CDSware.  We recomend you to install it first and to rerun the configure 
+   script.  xlhtml is available from <http://chicago.sourceforge.net/xlhtml/>.
+   ])
+fi
+
+## Check for html2text:
+AC_PATH_PROG(HTMLTOTEXT, html2text)
+if test -z "$HTMLTOTEXT"; then
+   AC_MSG_WARN([
+   html2text was found in your PATH. It is used for the fulltext indexation 
+   of Microsoft PowerPoint and Excel files.
+   You can continue without it but you may miss fulltext searching capability 
+   of CDSware.  We recomend you to install it first and to rerun the configure 
+   script.  html2text is available from <http://userpage.fu-berlin.de/~mbayer/tools/html2text.html>.
    ])
 fi
 
@@ -181,7 +245,7 @@ fi
 AC_PATH_PROG(GIFTEXT, giftext)
 if test -z "$GIFTEXT"; then
    AC_MSG_WARN([
-   Giftext was not found in your path.  It is used in 
+   Giftext was not found in your PATH.  It is used in 
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware 
    functionality.  We recommend you to install it first and to rerun 
@@ -193,7 +257,7 @@ fi
 AC_PATH_PROG(FILE, file)
 if test -z "$FILE"; then
    AC_MSG_WARN([
-   File was not found in your path.  It is used in 
+   File was not found in your PATH.  It is used in 
    the WebSubmit module to check the validity of the submitted files.
    You can continue without it but you will miss some CDSware 
    functionality.  We recommend you to install it first and to rerun 
@@ -205,7 +269,7 @@ fi
 AC_PATH_PROG(DJPEG, djpeg)
 if test -z "$DJPEG"; then
    AC_MSG_WARN([
-   Djpeg was not found in your path.  It is used in 
+   Djpeg was not found in your PATH.  It is used in 
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware 
    functionality.  We recommend you to install it first and to rerun 
@@ -217,7 +281,7 @@ fi
 AC_PATH_PROG(CONVERT, convert)
 if test -z "$CONVERT"; then
    AC_MSG_WARN([
-   Convert was not found in your path.  It is used in 
+   Convert was not found in your PATH.  It is used in 
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware 
    functionality.  We recommend you to install it first and to rerun 
@@ -229,7 +293,7 @@ fi
 AC_PATH_PROG(GIFTEXT, giftext)
 if test -z "$GIFTEXT"; then
    AC_MSG_WARN([
-   Giftext was not found in your path.  It is used in 
+   Giftext was not found in your PATH.  It is used in 
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware 
    functionality.  We recommend you to install it first and to rerun 
@@ -241,7 +305,7 @@ fi
 AC_PATH_PROG(GIFINTER, gifinter)
 if test -z "$GIFINTER"; then
    AC_MSG_WARN([
-   Gifinter was not found in your path.  It is used in 
+   Gifinter was not found in your PATH.  It is used in 
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware 
    functionality.  We recommend you to install it first and to rerun 
@@ -253,7 +317,7 @@ fi
 AC_PATH_PROG(GIFRSIZE, gifrsize)
 if test -z "$GIFRSIZE"; then
    AC_MSG_WARN([
-   Gifrsize was not found in your path.  It is used in 
+   Gifrsize was not found in your PATH.  It is used in 
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware 
    functionality.  We recommend you to install it first and to rerun 
@@ -265,7 +329,7 @@ fi
 AC_PATH_PROG(JPEGSIZE, jpegsize)
 if test -z "$JPEGSIZE"; then
    AC_MSG_WARN([
-   jpegsize was not found in your path.  It is used in 
+   jpegsize was not found in your PATH.  It is used in 
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware 
    functionality.  We recommend you to install it first and to rerun 
@@ -277,7 +341,7 @@ fi
 AC_PATH_PROG(PPMTOGIF, ppmtogif)
 if test -z "$PPMTOGIF"; then
    AC_MSG_WARN([
-   ppmtogif was not found in your path.  It is used in 
+   ppmtogif was not found in your PATH.  It is used in 
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware 
    functionality.  We recommend you to install it first and to rerun 
@@ -289,7 +353,7 @@ fi
 AC_PATH_PROG(PPMQUANT, ppmquant)
 if test -z "$PPMQUANT"; then
    AC_MSG_WARN([
-   ppmquant was not found in your path.  It is used in 
+   ppmquant was not found in your PATH.  It is used in 
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware 
    functionality.  We recommend you to install it first and to rerun 
@@ -301,7 +365,7 @@ fi
 AC_PATH_PROG(PNMSCALE, pnmscale)
 if test -z "$PNMSCALE"; then
    AC_MSG_WARN([
-   pnmscale was not found in your path.  It is used in 
+   pnmscale was not found in your PATH.  It is used in 
    the WebSubmit module to create an icon from a submitted picture.
    You can continue without it but you will miss some CDSware 
    functionality.  We recommend you to install it first and to rerun 
@@ -399,7 +463,13 @@ AC_SUBST(DBUSER)
 AC_SUBST(DBPASS)
 AC_SUBST(PDFTOTEXT)
 AC_SUBST(PSTOTEXT)
-AC_SUBST(WORDTOTEXT)
+AC_SUBST(PSTOASCII)
+AC_SUBST(ANTIWORD)
+AC_SUBST(CATDOC)
+AC_SUBST(WVTEXT)
+AC_SUBST(PPTHTML)
+AC_SUBST(XLHTML)
+AC_SUBST(HTMLTOTEXT)
 
 ## Write help:
 AC_CONFIG_COMMANDS([default], [echo "****************************************************************************";\

@@ -28,7 +28,8 @@ Contents
           <http://httpd.apache.org/>
           <http://www.php.net/>
 
-     b) PHP compiled as standalone command-line executable is required too:
+     b) PHP compiled as a standalone command-line executable 
+        (in addition to Apache module) is required, too:
           <http://www.php.net/manual/en/install.commandline.php>
 
      c) MySQL server (may be on a remote machine), and MySQL client
@@ -40,11 +41,33 @@ Contents
 
      e) Python, featuring MySQLdb module:
           <http://python.org/>
+          <http://sourceforge.net/projects/mysql-python>
 
-   (Note that the configure script checks whether you have all
+     f) If you want to be able to search for words in the fulltext files 
+        (i.e. to have fulltext indexing), then you need as well to install 
+        some of the following tools: 
+
+            * for PDF files: pdftotext or pstotext
+                <http://www.foolabs.com/xpdf/home.html> 
+                <http://www.cs.wisc.edu/~ghost/doc/AFPL/>
+            * for PostScript files: pstotext or ps2ascii
+                <http://www.cs.wisc.edu/~ghost/doc/AFPL/>
+            * for MS Word files: antiword, catdoc, or wvText
+                <http://www.winfield.demon.nl/index.html>
+                <http://www.ice.ru/~vitus/catdoc/index.html>
+                <http://sourceforge.net/projects/wvware>           
+            * for MS PowerPoint files: pptHtml and html2text
+                <http://www.xlhtml.org/>
+                <http://userpage.fu-berlin.de/~mbayer/tools/html2text.html>
+            * for MS Excel files: xlhtml and html2text
+                <http://chicago.sourceforge.net/xlhtml/>
+                <http://userpage.fu-berlin.de/~mbayer/tools/html2text.html>
+
+   Note that the configure script checks whether you have all
    the prerequisite software installed and that it won't let
-   you to continue unless everything is in order.)
-
+   you to continue unless everything is in order.  It also warns you 
+   if it cannot find some optional, but recommended software.
+ 
 1. Quick instructions for the impatient CDSware admin
 =====================================================
 

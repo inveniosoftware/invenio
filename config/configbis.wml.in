@@ -116,8 +116,26 @@
 <define-tag PSTOTEXT whitespace=delete>
 @PSTOTEXT@
 </define-tag>
-<define-tag WORDTOTEXT whitespace=delete>
-@WORDTOTEXT@
+<define-tag PSTOASCII whitespace=delete>
+@PSTOASCII@
+</define-tag>
+<define-tag ANTIWORD whitespace=delete>
+@ANTIWORD@
+</define-tag>
+<define-tag CATDOC whitespace=delete>
+@CATDOC@
+</define-tag>
+<define-tag WVTEXT whitespace=delete>
+@WVTEXT@
+</define-tag>
+<define-tag PPTHTML whitespace=delete>
+@PPTHTML@
+</define-tag>
+<define-tag XLHTML whitespace=delete>
+@XLHTML@
+</define-tag>
+<define-tag HTMLTOTEXT whitespace=delete>
+@HTMLTOTEXT@
 </define-tag>
 
 
