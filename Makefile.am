@@ -19,7 +19,7 @@
 
 SUBDIRS = config modules
 
-EXTRA_DIST = UNINSTALL configure-tests.py
+EXTRA_DIST = UNINSTALL RELEASE-NOTES configure-tests.py
 
 ## submit stuff for demo data link creation
 sbmdir = $(WEBDIR)/submit/access/protected
