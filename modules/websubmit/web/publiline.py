@@ -357,7 +357,7 @@ def getInAlice(doctype,categ,RN):
         return 0
 
 def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
-    FROMADDR = 'CDSwareSubmission Interface <%s>' % supportemail
+    FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
     # retrieve useful information from webSubmit configuration
     res = run_sql("select value from sbmPARAMETERS where name='categformatDAM' and doctype=%s", (doctype,))
     categformat = res[0][0]
@@ -420,7 +420,7 @@ def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
     return ""
 
 def SendWarning(doctype,categ,RN,title,authors,access):
-    FROMADDR = 'CDSwareSubmission Interface <%s>' % supportemail
+    FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
     message = "Failed sending approval email request for %s" % RN
     # send the mail
     body = forge_email(FROMADDR,adminemail,"","Failed sending approval email request",message)
