@@ -2028,6 +2028,7 @@ def print_warning(req, msg, type='', prologue='<br>', epilogue='<br>'):
 
 def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1, jrec=1, rg=10,
                       as=0, ln=cdslang, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
+                      sc=1, pl_in_url="",
                       d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0,
                       cpu_time=-1, middle_only=0):
     """Prints stripe with the information on 'collection' and 'nb_found' results oand CPU time.
@@ -2042,7 +2043,7 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
               "\n<form action=\"%s/search.py\" method=\"get\">"\
               "\n<table width=\"100%%\" class=\"searchresultsbox\"><tr><td class=\"searchresultsboxheader\" align=\"left\">" \
               "<strong><big>" \
-              "<a href=\"%s/?c=%s&amp;as=%d&amp;ln=%s\">%s</a></big></strong></td>\n" % \
+              "<a href=\"%s/?cc=%s&amp;as=%d&amp;ln=%s\">%s</a></big></strong></td>\n" % \
               (urllib.quote(collection), weburl, weburl, urllib.quote_plus(collection), as, ln, collection)
     else:
         out += """\n<form action="%s/search.py" method="get"><div align="center">\n""" % weburl
@@ -2063,9 +2064,10 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
             out += collection + " : " + msg_x_records_found[ln] % nice_number(nb_found) + " &nbsp; "
 
     if nb_found > rg: # navig.arrows are needed, since we have many hits
-        url = '%s/search.py?p=%s&amp;c=%s&amp;f=%s&amp;sf=%s&amp;so=%s&amp;sp=%s&amp;of=%s&amp;ot=%s' % (weburl, urllib.quote(p), urllib.quote(collection), f, sf, so, sp, of, ot)
+        url = '%s/search.py?p=%s&amp;cc=%s&amp;f=%s&amp;sf=%s&amp;so=%s&amp;sp=%s&amp;of=%s&amp;ot=%s' % (weburl, urllib.quote(p), urllib.quote(collection), f, sf, so, sp, of, ot)
         url += '&amp;as=%s&amp;ln=%s&amp;p1=%s&amp;p2=%s&amp;p3=%s&amp;f1=%s&amp;f2=%s&amp;f3=%s&amp;m1=%s&amp;m2=%s&amp;m3=%s&amp;op1=%s&amp;op2=%s' \
                % (as, ln, urllib.quote(p1), urllib.quote(p2), urllib.quote(p3), f1, f2, f3, m1, m2, m3, op1, op2)
+        url += '&amp;sc=%d' % sc + pl_in_url
         url += '&amp;d1y=%d&amp;d1m=%d&amp;d1d=%d&amp;d2y=%d&amp;d2m=%d&amp;d2d=%d' \
                % (d1y, d1m, d1d, d2y, d2m, d2d)
         if jrec-rg > 1:
@@ -2083,7 +2085,7 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
             out += "<a class=\"img\" href=\"%s&amp;jrec=%d&amp;rg=%d\"><img src=\"%s/img/se.gif\" alt=\"end\" border=0></a>" % \
                   (url, nb_found-rg+1, rg, weburl)
         out += "<input type=\"hidden\" name=\"p\" value=\"%s\">" % p
-        out += "<input type=\"hidden\" name=\"c\" value=\"%s\">" % collection
+        out += "<input type=\"hidden\" name=\"cc\" value=\"%s\">" % collection
         out += "<input type=\"hidden\" name=\"f\" value=\"%s\">" % f 
         out += "<input type=\"hidden\" name=\"sf\" value=\"%s\">" % sf
         out += "<input type=\"hidden\" name=\"so\" value=\"%s\">" % so
@@ -2106,12 +2108,19 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
         out += "<input type=\"hidden\" name=\"m3\" value=\"%s\">" % m3
         out += "<input type=\"hidden\" name=\"op1\" value=\"%s\">" % op1
         out += "<input type=\"hidden\" name=\"op2\" value=\"%s\">" % op2
+        out += "<input type=\"hidden\" name=\"sc\" value=\"%s\">" % sc
         out += "<input type=\"hidden\" name=\"d1y\" value=\"%d\">" % d1y
         out += "<input type=\"hidden\" name=\"d1m\" value=\"%d\">" % d1m
         out += "<input type=\"hidden\" name=\"d1d\" value=\"%d\">" % d1d
         out += "<input type=\"hidden\" name=\"d2y\" value=\"%d\">" % d2y
         out += "<input type=\"hidden\" name=\"d2m\" value=\"%d\">" % d2m
         out += "<input type=\"hidden\" name=\"d2d\" value=\"%d\">" % d2d
+        if pl_in_url:
+            fieldargs = cgi.parse_qs(pl_in_url)
+            for fieldcode in get_fieldcodes():
+                if fieldargs.has_key(fieldcode):
+                    for val in fieldargs[fieldcode]:
+                        out += "<input type=\"hidden\" name=\"%s\" value=\"%s\">" % (cgi.escape(fieldcode), cgi.escape(val))
         out += "&nbsp; %s <input type=\"text\" name=\"jrec\" size=\"4\" value=\"%d\">" % (msg_jump_to_record[ln], jrec)
     if not middle_only:
         out += "</td>"
@@ -2883,13 +2892,14 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
     if idb > 0 and recidb == -1:
         recidb = idb
     # TODO deduce passed search limiting criterias (if applicable)
-    pl = "" # no limits by default
+    pl, pl_in_url = "", "" # no limits by default
     if action != msg_browse[ln] and req and req.args: # we do not want to add options while browsing or while calling via command-line
         fieldargs = cgi.parse_qs(req.args)
         for fieldcode in get_fieldcodes():
             if fieldargs.has_key(fieldcode):
                 for val in fieldargs[fieldcode]:
                     pl += "+%s:\"%s\" " % (fieldcode, val)
+                    pl_in_url += "&amp;%s=%s" % (urllib.quote(fieldcode), urllib.quote(val))
     # deduce recid from sysno argument (if applicable):
     if sysno: # ALEPH SYS number was passed, so deduce MySQL recID for the record:            
         recid = get_mysql_recid_from_aleph_sysno(sysno)
@@ -3073,6 +3083,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                     if of.startswith("h"):
                         req.write(print_search_info(p, f, sf, so, sp, of, ot, coll, results_final_nb[coll],
                                                     jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
+                                                    sc, pl_in_url,
                                                     d1y, d1m, d1d, d2y, d2m, d2d, cpu_time))
                     results_final_sorted = results_final[coll].items()
                     if sf:
@@ -3081,6 +3092,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                     if of.startswith("h"):
                         req.write(print_search_info(p, f, sf, so, sp, of, ot, coll, results_final_nb[coll],
                                                     jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
+                                                    sc, pl_in_url, 
                                                     d1y, d1m, d1d, d2y, d2m, d2d, cpu_time, 1))
             # log query:
             try:
