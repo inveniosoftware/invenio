@@ -100,7 +100,7 @@ def login(req,p_email=None,p_pw=None,action='login'):
            else:
                mess ="Your are not logged into the system.Wrong password.<BR><BR> if you wish you can login again"
            act = "login"    
-	   return page("Logout", webaccount.perform_back(mess,act),
+	   return page("Wrong login", webaccount.perform_back(mess,act),
                 """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,                
                 "","CDS Personalize, Main page", "CDS, personalize",
                 webuser.create_user_infobox(uid), "")
