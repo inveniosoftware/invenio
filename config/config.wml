@@ -142,12 +142,12 @@ cds.support@cern.ch
 ## CDSPAGEHEADER -- eventual global HTML page header:
 ##  (example: "")
 <define-tag CDSPAGEHEADER>
-<table border=0 cellspacing=0 cellpadding=0>
- <tr>
-  <td style="border-bottom: 2px solid #3366cc;" valign="bottom">
+<table border=0 cellspacing=0 cellpadding=0 style="border-bottom: 2px solid #3366cc;">
+ <tr valign="bottom">
+  <td>
    <span class=headline><big><strong><CDSNAME></strong></big></span>
   </td>
-  <td style="border-bottom: 2px solid #3366cc;" valign="bottom">
+  <td>
    <table border=0 cellspacing=0 cellpadding=0>
      <tr>
        <td width=45>
@@ -178,7 +178,7 @@ cds.support@cern.ch
              &nbsp;
        </td>
        <td width=95 class=headerselected align=center valign=bottom>
-             <small><strong><a class=header href="<WEBURL>/youralerts.py/list_alerts">ALERTS</a></strong></small>
+             <small><strong><a class=header href="<WEBURL>/youralerts.py/list">ALERTS</a></strong></small>
        </td>
        <td width=15>
              &nbsp;
@@ -192,6 +192,7 @@ cds.support@cern.ch
      </tr>
    </table>
   </td>
+  <!--USERINFOBOX-->
  </tr>
 </table>
 </define-tag>
@@ -225,19 +226,17 @@ cds.support@cern.ch
 ## CDSPAGEFOOTER -- eventual global HTML page footer:
 ##  (example: "")
 <define-tag CDSPAGEFOOTER>
-  <address>
-  <hr>
-  <table cellpadding=0 border=0 cellspacing=0 width="100%"  class="pagefooter">
+  <table cellpadding=0 border=0 cellspacing=0 width="100%" class="footerbox">
   <tr>
-  <td class="address">
-  <CDSNAME>&nbsp;::&nbsp;<a class=note href="<WEBURL>">Search</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/submit/">Submit</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/youraccount.py/display">Personalize</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/yourbaskets.py/display">Baskets</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/youralerts.py/list_alerts">Alerts</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/help/">Help</a>
+  <td>
+  <CDSNAME>&nbsp;::&nbsp;<a class=note href="<WEBURL>">Search</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/submit/">Submit</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/youraccount.py/display">Personalize</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/yourbaskets.py/display">Baskets</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/youralerts.py/list">Alerts</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/help/">Help</a>
   </td>
-  <td align=right class="address">
-  Last updated <: print `date +"%d %b %Y %H:%M:%S %Z"`; :>
+  <td align=right>
+  <!--LAST-UPDATED-->Last updated <: print `date +"%d %b %Y %H:%M:%S %Z"`; :>
   </td>
   </tr>
   <tr>
-  <td class="address">
+  <td>
   Powered by <a class=note href="http://cdsware.cern.ch/">CDSware</a> v<VERSION>
   </td>
   <td align=right class="address">
@@ -245,7 +244,6 @@ cds.support@cern.ch
   </td>
   </tr>
   </table>
-  </address>
 </define-tag>
 
 ################################
