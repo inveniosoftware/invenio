@@ -845,4 +845,23 @@ input,select {
    color: #fff; 
    background: #006; 
 }
+.submitCurrentPage {
+   color: #000;
+   background: #9cf;
+   border-top: 1px solid #039;
+   border-left: 1px solid #039;
+   border-right: 1px solid #039;
+}
+.submitEmptyPage {
+   color: #fff;
+   background: #fff;
+   border-bottom: 1px solid #039;
+}
+.submitPage {
+   color: #000;
+   background: #fff;
+   border-top: 1px solid #039;
+   border-left: 1px solid #039;
+   border-right: 1px solid #039;
+}
 /* end of cds.css */
