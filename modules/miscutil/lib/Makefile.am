@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir=$(libdir)/python/cdsware
-pylib_DATA=__init__.py config.py dbquery.py
+pylib_DATA=__init__.py config.py dbquery.py messages.py
 
 phplibdir=$(libdir)/php/cdsware/errors
 phplib_DATA=errorHandling.shtml
@@ -27,8 +27,10 @@ EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(pylib_DATA) $(phplib_DATA) *~ *.tmp *.pyc
 
-%.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml
+%.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml \
+      ../../../config/messages.wml
 	$(WML) -o $@ $<
 
-%.shtml: %.shtml.wml ../../../config/config.wml ../../../config/configbis.wml
+%.shtml: %.shtml.wml ../../../config/config.wml ../../../config/configbis.wml \
+      ../../../config/messages.wml
 	$(WML) -o $@ $<

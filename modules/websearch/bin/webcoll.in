@@ -60,6 +60,7 @@ except ImportError, e:
 try:
     sys.path.append('%s' % pylibdir)
     from cdsware.config import *
+    from cdsware.messages import *
     from cdsware.search_engine import HitSet, search_pattern
     from cdsware.search_engine_config import cfg_author_et_al_threshold, cfg_instant_browse, cfg_max_recID
     from cdsware.dbquery import run_sql    
@@ -139,29 +140,36 @@ def write_message(msg, stream=sys.stdout):
         sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
     return
 
-def create_andornot_box(name='op', value=''):
+def create_andornot_box(name='op', value='', ln='en'):
     "Returns HTML code for the AND/OR/NOT selection box."
     out = """
     <select name="%s">
-    <option value="a"%s>AND
-    <option value="o"%s>OR
-    <option value="n"%s>AND NOT
+    <option value="a"%s>%s
+    <option value="o"%s>%s
+    <option value="n"%s>%s
     </select>
-    """ % (name, is_selected('a', value), is_selected('o', value), is_selected('n', value))
+    """ % (name,
+           is_selected('a', value), msg_and[ln],
+           is_selected('o', value), msg_or[ln],
+           is_selected('n', value), msg_and_not[ln])
     return out
 
-def create_matchtype_box(name='m', value=''):
+def create_matchtype_box(name='m', value='', ln='en'):
     "Returns HTML code for the 'match type' selection box."
     out = """
     <select name="%s">
-    <option value="a"%s>All of the words:
-    <option value="o"%s>Any of the words:
-    <option value="e"%s>Exact phrase:
-    <option value="p"%s>Partial phrase:
-    <option value="r"%s>Regular expression:
+    <option value="a"%s>%s
+    <option value="o"%s>%s
+    <option value="e"%s>%s
+    <option value="p"%s>%s
+    <option value="r"%s>%s
     </select>
-    """ % (name, is_selected('a', value), is_selected('o', value), is_selected('p', value), 
-                 is_selected('r', value), is_selected('e', value))
+    """ % (name,
+           is_selected('a', value), msg_all_of_the_words[ln],
+           is_selected('o', value), msg_any_of_the_words[ln],
+           is_selected('e', value), msg_exact_phrase[ln],
+           is_selected('p', value), msg_partial_phrase[ln],
+           is_selected('r', value), msg_regular_expression[ln])
     return out
 
 def get_field(recID, tag):
@@ -351,36 +359,40 @@ class Collection:
     def update_webpage_cache(self):
         """Create collection page header, navtrail, body (including left and right stripes) and footer, and 
            call write_cache_file() afterwards to update the collection webpage cache."""
-        ## first, update navtrail:
-        for as in range(0,2):
-            self.write_cache_file("navtrail-as=%s" % as, self.create_navtrail_links(as))
-        ## second, update page body:
-        for as in range(0,2): # do both simple search and advanced search pages:
-            body = ""
-            body += """<form action="%s/search.py" method="get">""" % weburl
-            body += self.create_portalbox('te')
-            body += "" + self.create_searchfor(as)
-            body += self.create_portalbox('np')
-            body += """<table cellspacing="0" cellpadding="0" border="0">"""
-            body += """<tr>"""
-            body += """<td valign="top">""" + self.create_narrowsearch(as) + "</td>"
-            body_focuson = self.create_narrowsearch(as, "Focus on:","v")
-            if body_focuson:
-                body += """<td valign="top">""" + body_focuson + """</td>"""
-            body += "</tr></table>"
-            body += self.create_portalbox('ne')
-            body += "</form>"
-            self.write_cache_file("body-as=%s" % as, body)
-        ## third, write portalboxes:
-        self.write_cache_file("portalbox-lt", self.create_portalbox("lt"))
-        self.write_cache_file("portalbox-lb", self.create_portalbox("lb"))
-        self.write_cache_file("portalbox-rt", self.create_portalbox("rt"))
-        self.write_cache_file("portalbox-rb", self.create_portalbox("rb"))
-        ## fourth, write 'last updated' information:
-        self.write_cache_file("last-updated", time.strftime("%02d %b %04Y %02H:%02M:%02S %Z", time.localtime()))
+        ## do this for each language:
+        for lang in ['de', 'en', 'es', 'fr', 'it', 'ru']:
+            ## first, update navtrail:
+            for as in range(0,2):
+                self.write_cache_file("navtrail-as=%s-ln=%s" % (as, lang), self.create_navtrail_links(as, lang))
+            ## second, update page body:
+            for as in range(0,2): # do both simple search and advanced search pages:
+                body = ""
+                body += """<form action="%s/search.py" method="get">""" % weburl
+                body += self.create_portalbox('te')
+                body += "" + self.create_searchfor(as, lang)
+                body += self.create_portalbox('np')
+                body += """<table cellspacing="0" cellpadding="0" border="0">"""
+                body += """<tr>"""
+                body += """<td valign="top">""" + self.create_narrowsearch(as, lang, msg_narrow_search[lang]) + "</td>"
+                body_focuson = self.create_narrowsearch(as, lang, msg_focus_on[lang], "v")
+                if body_focuson:
+                    body += """<td valign="top">""" + body_focuson + """</td>"""
+                body += "</tr></table>"
+                body += self.create_portalbox('ne')
+                body += "</form>"
+                self.write_cache_file("body-as=%s-ln=%s" % (as, lang), body)
+            ## third, write portalboxes:
+            self.write_cache_file("portalbox-lt-ln=%s" % lang, self.create_portalbox("lt"))
+            self.write_cache_file("portalbox-lb-ln=%s" % lang, self.create_portalbox("lb"))
+            self.write_cache_file("portalbox-rt-ln=%s" % lang, self.create_portalbox("rt"))
+            self.write_cache_file("portalbox-rb-ln=%s" % lang, self.create_portalbox("rb"))
+            ## fourth, write 'last updated' information:
+            self.write_cache_file("last-updated-ln=%s" % lang, time.strftime("%02d %b %04Y %02H:%02M:%02S %Z", time.localtime()))
+        return
 
     def create_navtrail_links(self, \
                               as=0,
+                              ln=cdslang,
                               separator=" &gt; "):
         """Creates navigation trail links, i.e. links to collection ancestors (except Home collection).
         If as==1, then links to Advanced Search interfaces; otherwise Simple Search.        
@@ -390,8 +402,8 @@ class Collection:
             if dad.name != cdsname: # exclude Home collection
                 if out:
                     out += separator
-                out += """<a class="navtrail" href="%s/?c=%s&amp;as=%d">%s</a>""" % \
-                            (weburl, urllib.quote_plus(dad.name), as, dad.name)
+                out += """<a class="navtrail" href="%s/?c=%s&amp;as=%d&amp;ln=%s">%s</a>""" % \
+                            (weburl, urllib.quote_plus(dad.name), as, ln, dad.name)
         return out
 
     def create_nbrecs_info(self, prolog="""&nbsp;<small class="nbdoccoll">(""", epilog=""")</small>"""):
@@ -430,7 +442,7 @@ class Collection:
                 out += body
         return out
 
-    def create_narrowsearch(self, as=0, title="Narrow search:", type="r"):
+    def create_narrowsearch(self, as=0, ln=cdslang, title="Narrow search", type="r"):
         """Creates list of collection descendants of type 'type' under title 'title'.
         If as==1, then links to Advanced Search interfaces; otherwise Simple Search.        
         Suitable for 'Narrow search' and 'Focus on' boxes."""        
@@ -470,8 +482,8 @@ class Collection:
                         narrowsearch += """<input type=checkbox name="c" value="%s">&nbsp;</td>""" % son.name
                     else:
                         narrowsearch += """<input type=checkbox name="c" value="%s" checked>&nbsp;</td>""" % son.name
-                narrowsearch += """<td valign="top"><a href="%s/?c=%s&amp;as=%d">%s%s%s</a>%s """ % \
-                                (weburl, urllib.quote_plus(son.name), as, style_prolog, son.name, style_epilog, son.create_nbrecs_info())
+                narrowsearch += """<td valign="top"><a href="%s/?c=%s&amp;as=%d&amp;ln=%s">%s%s%s</a>%s """ % \
+                                (weburl, urllib.quote_plus(son.name), as, ln, style_prolog, son.name, style_epilog, son.create_nbrecs_info())
                 if son.restricted_p():
                     narrowsearch += """ <small class="warning">[restricted]</small>"""
                 grandsons = son.get_sons()
@@ -480,8 +492,8 @@ class Collection:
                     # print all grandsons:
                     narrowsearch += """<br>"""
                     for i in range(0,nb_grandsons):
-                        narrowsearch += """<a href="%s/?c=%s&amp;as=%d">%s</a>%s """ % \
-                                        (weburl, urllib.quote_plus(grandsons[i].name), as, grandsons[i].name, \
+                        narrowsearch += """<a href="%s/?c=%s&amp;as=%d&amp;ln=%s">%s</a>%s """ % \
+                                        (weburl, urllib.quote_plus(grandsons[i].name), as, ln, grandsons[i].name, \
                                          grandsons[i].create_nbrecs_info())
                 narrowsearch += """</td></tr>"""
             narrowsearch += "</tbody></table>"            
@@ -615,14 +627,14 @@ class Collection:
               (cell_1a, cell_1b, cell_1c, cell_1d)
         return out
 
-    def create_sortoptions(self):
+    def create_sortoptions(self, ln=cdslang):
         "Produces 'Sort options' portal box."
         box=""
         query = """SELECT f.code,f.nameshort FROM field AS f, collection_field_fieldvalue AS cff
                    WHERE id_collection=%d AND cff.type='soo' AND cff.id_field=f.id
                    ORDER BY cff.score DESC, f.name ASC""" % self.id
         box += """<select name="sf">"""
-        box += """  <option value="">- latest first -"""
+        box += """  <option value="">- %s -""" % msg_latest_first[ln]
         res = run_sql(query)
         if res:
             for row in res:
@@ -632,10 +644,10 @@ class Collection:
                 box += """  <option value="%s">%s""" % (field, field)                
         box += """</select>"""
         box += """<select name="so">
-                    <option value="a">asc.
-                    <option value="d">desc.
-                  </select>"""
-        return box
+                    <option value="a">%s
+                    <option value="d">%s
+                  </select>""" % (msg_ascending[ln], msg_descending[ln])
+        return box 
 
     def create_displayoptions(self):
         "Produces 'Display options' portal box."
@@ -675,11 +687,11 @@ class Collection:
         box += """</select>"""        
         return box
 
-    def create_searchwithin_selection_box(self, fieldname='f', value=''):
+    def create_searchwithin_selection_box(self, fieldname='f', value='', ln='en'):
         "Produces 'search within' selection box for the current collection."
         out = ""
         out += """<select name="%s">""" % fieldname
-        out += """<option value="">any field"""
+        out += """<option value="">%s""" % msg_any_field[ln]
         query = """SELECT f.code,f.name FROM field AS f, collection_field_fieldvalue AS cff
                    WHERE cff.type='sew' AND cff.id_collection=%d AND cff.id_field=f.id
                    ORDER BY cff.score DESC, f.name ASC"""  % self.id
@@ -691,19 +703,19 @@ class Collection:
         else:
             # no 'search within' fields are defined for this collection, so propose default ones:
             if cfg_cern_site:
-                out += """<option value="title"%s>title""" % is_selected("title", value)
-                out += """<option value="author"%s>author""" % is_selected("author", value)
-                out += """<option value="reportnumber"%s>report number""" % is_selected("reportnumber", value)
-                out += """<option value="year"%s>year""" % is_selected("year", value)
+                out += """<option value="title"%s>%s""" % (is_selected("title", value), msg_title[ln])
+                out += """<option value="author"%s>%sr""" % (is_selected("author", value), msg_author[ln])
+                out += """<option value="reportnumber"%s>%s""" % (is_selected("reportnumber", value), msg_report_number[ln])
+                out += """<option value="year"%s>%s""" % (is_selected("year", value), msg_year[ln])
             else:
-                out += """<option value="title"%s>- title""" % is_selected("title", value)
-                out += """<option value="author"%s>- author""" % is_selected("author", value)
-                out += """<option value="abstract"%s>- abstract""" % is_selected("abstract", value)
-                out += """<option value="keyword"%s>- keyword""" % is_selected("keyword", value)                
-                out += """<option value="reportnumber"%s>- report number""" % is_selected("reportnumber", value)
-                out += """<option value="year"%s>- year""" % is_selected("year", value)
-                out += """<option value="fulltext"%s>fulltext""" % is_selected("fulltext", value)
-                out += """<option value="reference"%s>reference""" % is_selected("reference", value)                
+                out += """<option value="title"%s>- %s""" % (is_selected("title", value), msg_title[ln])
+                out += """<option value="author"%s>- %s""" % (is_selected("author", value), msg_author[ln])
+                out += """<option value="abstract"%s>- %s""" % (is_selected("abstract", value), msg_abstract[ln])
+                out += """<option value="keyword"%s>- %s""" % (is_selected("keyword", value), msg_keyword[ln])
+                out += """<option value="reportnumber"%s>- %s""" % (is_selected("reportnumber", value), msg_report_number[ln])
+                out += """<option value="year"%s>- %s""" % (is_selected("year", value), msg_year[ln])
+                out += """<option value="fulltext"%s>%s""" % (is_selected("fulltext", value), msg_fulltext[ln])
+                out += """<option value="reference"%s>%s""" % (is_selected("reference", value), msg_reference[ln])
         out += """</select>""" 
         return out
 
@@ -712,32 +724,33 @@ class Collection:
         out = "$collSearchExamples = getSearchExample(%d, $se);" % self.id
         return out
 
-    def create_searchfor(self, as=0):
+    def create_searchfor(self, as=0, ln=cdslang):
         "Produces either Simple or Advanced 'Search for' box for the current collection."
         if as == 1:
-            return self.create_searchfor_advanced()
+            return self.create_searchfor_advanced(ln)
         else:
-            return self.create_searchfor_simple()            
+            return self.create_searchfor_simple(ln)            
 
-    def create_searchfor_simple(self):
+    def create_searchfor_simple(self, ln=cdslang):
         "Produces simple 'Search for' box for the current collection."
         # print commentary start:
         out = "<!--create_searchfor_simple()-->"
         out += """<input type="hidden" name="sc" value="1">"""
+        out += """<input type="hidden" name="ln" value="%s">""" % ln
         # define URL add-ons for simple and advanced search boxen:
         if self.name != cdsname:
-            ssearchurl = "?c=%s&amp;as=0" % urllib.quote_plus(self.name)
-            asearchurl = "?c=%s&amp;as=1" % urllib.quote_plus(self.name)
+            ssearchurl = "?c=%s&amp;as=0&amp;ln=%s" % (urllib.quote_plus(self.name), ln)
+            asearchurl = "?c=%s&amp;as=1&amp;ln=%s" % (urllib.quote_plus(self.name), ln)
         else: # hide cdsname for aesthetical reasons
-            ssearchurl = "?as=0"
-            asearchurl = "?as=1"
+            ssearchurl = "?as=0&amp;ln=%s" % ln
+            asearchurl = "?as=1&amp;ln=%s" % ln
         # define search box elements:
-        header = """Search %s for:""" % self.create_nbrecs_info(""," records")
+        header = msg_search_records_for[ln] % self.create_nbrecs_info("","")
         cell_1_left = """<input type="text" name="p" size="40" value="">"""
-        cell_1_middle = "%s" % self.create_searchwithin_selection_box()
-        cell_1_right = """<input class="formbutton" type="submit" name="action" value="SEARCH"><input class="formbutton" type="submit" name="action" value="Browse">"""
-        cell_2 = """<small><a href="%s/help/search/tips.html">search tips</a> :: <a href="%s">advanced search</a></small>""" \
-        % (weburl, asearchurl)
+        cell_1_middle = "%s" % self.create_searchwithin_selection_box(ln=ln)
+        cell_1_right = """<input class="formbutton" type="submit" name="action" value="%s"><input class="formbutton" type="submit" name="action" value="%s">""" % (msg_search[ln], msg_browse[ln])
+        cell_2 = """<small><a href="%s/help/search/tips.%s.html">%s</a> :: <a href="%s">%s</a></small>""" \
+        % (weburl, ln, msg_search_tips[ln], asearchurl, msg_advanced_search[ln])
         # merge them:
         out += """<table class="searchbox">
                    <thead>
@@ -763,31 +776,32 @@ class Collection:
         out += "<!--/create_searchfor_simple()-->"
         return out
 
-    def create_searchfor_advanced(self):
+    def create_searchfor_advanced(self, ln=cdslang):
         "Produces simple 'Search for' box for the current collection."
         # print commentary start:
         out = "<!--create_searchfor_advanced()-->"
         out += """<input type="hidden" name="as" value="1">"""
+        out += """<input type="hidden" name="ln" value="%s">""" % ln
         # define URL add-ons for simple and advanced search boxen:
         if self.name != cdsname:
-            ssearchurl = "?c=%s&amp;as=0" % urllib.quote_plus(self.name)
-            asearchurl = "?c=%s&amp;as=1" % urllib.quote_plus(self.name)
+            ssearchurl = "?c=%s&amp;as=0&amp;ln=%s" % (urllib.quote_plus(self.name), ln)
+            asearchurl = "?c=%s&amp;as=1&amp;ln=%s" % (urllib.quote_plus(self.name), ln)
         else: # hide cdsname for aesthetical reasons
-            ssearchurl = "?as=0"
-            asearchurl = "?as=1"
+            ssearchurl = "?as=0&amp;ln=%s" % ln
+            asearchurl = "?as=1&amp;ln=%s" % ln
         # define search box elements:
-        header = """Search %s for:""" % self.create_nbrecs_info("", " records") 
-        cell_1_left = create_matchtype_box('m1') + """<input type="text" name="p1" size="40" value="">""" 
-        cell_1_middle = self.create_searchwithin_selection_box('f1')
-        cell_1_right = create_andornot_box('op1')
-        cell_2_left = create_matchtype_box('m2') + """<input type="text" name="p2" size="40" value="">"""
-        cell_2_middle = self.create_searchwithin_selection_box('f2')
-        cell_2_right = create_andornot_box('op2')
-        cell_3_left = create_matchtype_box('m3') + """<input type="text" name="p3" size="40" value="">"""
-        cell_3_middle = self.create_searchwithin_selection_box('f3')
-        cell_3_right = """<input class="formbutton" type="submit" name="search" value="SEARCH"><input class="formbutton" type="submit" name="search" value="Browse">&nbsp;"""
-        cell_4 = """<small><a href="%s/help/search/tips.html">search tips</a> :: <a href="%s">simple search</a></small>""" \
-                 % (weburl, ssearchurl)
+        header = msg_search_records_for[ln] % self.create_nbrecs_info("", "") 
+        cell_1_left = create_matchtype_box('m1', ln=ln) + """<input type="text" name="p1" size="40" value="">""" 
+        cell_1_middle = self.create_searchwithin_selection_box('f1', ln=ln)
+        cell_1_right = create_andornot_box('op1', ln=ln)
+        cell_2_left = create_matchtype_box('m2', ln=ln) + """<input type="text" name="p2" size="40" value="">"""
+        cell_2_middle = self.create_searchwithin_selection_box('f2', ln=ln)
+        cell_2_right = create_andornot_box('op2', ln=ln)
+        cell_3_left = create_matchtype_box('m3', ln=ln) + """<input type="text" name="p3" size="40" value="">"""
+        cell_3_middle = self.create_searchwithin_selection_box('f3', ln=ln)
+        cell_3_right = """<input class="formbutton" type="submit" name="search" value="%s"><input class="formbutton" type="submit" name="search" value="%s">&nbsp;""" % (msg_search[ln], msg_browse[ln])
+        cell_4 = """<small><a href="%s/help/search/tips.%s.html">%s</a> :: <a href="%s">%s</a></small>""" \
+                 % (weburl, ln, msg_search_tips[ln], ssearchurl, msg_simple_search[ln])
         # merge them:
         out += """<table class="searchbox">
                    <thead>
@@ -864,20 +878,20 @@ class Collection:
                   </table>""" % \
            (cell_6_a, cell_6_b)        
         # format options, etc in the last table:
-        cell_7_a = self.create_sortoptions()
+        cell_7_a = self.create_sortoptions(ln)
         cell_7_b = self.create_displayoptions()
         cell_7_c = self.create_formatoptions()
         out += """<table class="searchbox">
                    <thead>
                     <tr>
                       <th class="searchboxheader">
-                        Sort results by:
+                        %s
                       </th>
                       <th class="searchboxheader">
-                        Display results:
+                        %s
                       </th>
                       <th class="searchboxheader">
-                        Output format:
+                        %s
                       </th>
                     </tr>
                    </thead>
@@ -889,7 +903,7 @@ class Collection:
                     </tr>
                    </tbody>
                   </table>""" % \
-           (cell_7_a, cell_7_b, cell_7_c)        
+           (msg_sort_by[ln], msg_display_results[ln], msg_output_format[ln], cell_7_a, cell_7_b, cell_7_c)        
         # print commentary end:
         out += "<!--/create_searchfor_advanced()-->"
         return out

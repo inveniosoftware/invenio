@@ -23,6 +23,7 @@
 #include "configbis.wml"
 
 from config import *
+from messages import *
 from webuser import create_user_infobox
 import re
 import string
@@ -41,7 +42,7 @@ page_template_header = """
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
- <title><CDSNAME>: %s</title>
+ <title><!--CDSNAMEINTL-->: %s</title>
  <link rev="made" href="mailto:<SUPPORTEMAIL>">
  <link rel="stylesheet" href="<WEBURL>/img/cds.css">
  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -86,15 +87,16 @@ def create_navtrail(title,
                     previous_links,
                     prolog="", 
                     separator=""" &gt; """,
-                    epilog=""):
+                    epilog="",
+                    language=cdslang):
     """create_navtrail(): create navigation trail table box
        input: title = page title;
               previous_links = the trail content from site title until current page (both ends exlusive).
        output: text containing the navtrail
     """
     out = ""
-    if title != cdsname:
-        out += """<a class="navtrail" href="%s">%s</a>""" % (weburl, "Home")
+    if title != cdsnameintl[language]:
+        out += """<a class="navtrail" href="%s?ln=%s">%s</a>""" % (weburl, language, msg_home[language])
     if previous_links:
         if out:
             out += separator
@@ -102,13 +104,13 @@ def create_navtrail(title,
     if title:
         if out:
             out += separator
-        if title==cdsname:
-            out += "Home"
+        if title == cdsnameintl[language]: # hide site name, print Home instead
+            out += msg_home[language]
         else:
             out += title
     return prolog + out + epilog
 
-def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagerightstripeadd="", cdspageheaderadd="", cdspagebodyadd="", cdspagefooteradd="", lastupdated=""):
+def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagerightstripeadd="", cdspageheaderadd="", cdspagebodyadd="", cdspagefooteradd="", lastupdated="", language=cdslang, urlargs=""):
     """page(): display the cds page
         input: title of the page;
                body of the page in html format;
@@ -117,31 +119,60 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspageri
                cdspageheaderadd is a message to be displayed just under the page header
                cdspagefooteradd is a message to be displayed on the top of the page footer
                lastupdated is a text containing the info on last update (optional)
+               language is the language version of the page
+               urlargs are the URL arguments of the page to display (useful to affect languages)
        output: the final cds page with header, footer, etc.
     """
-    out = page_template_header % (title, description, keywords, cdspageheader, cdspageheaderadd)
-    out = re.sub("<!--NAVTRAILBOX-->", create_navtrail(title, navtrail), out)
-    out = re.sub("<!--USERINFOBOX-->", create_user_infobox(uid), out)
+    if title == cdsnameintl[language]:
+        headerstitle = msg_home[language]
+    else:
+        headerstitle = title
+    out = page_template_header % (headerstitle, description, keywords, cdspageheader, cdspageheaderadd)
     out += page_template_body % (cdspagebodyadd, title, body, cdspagerightstripeadd)
     out += page_template_footer % (cdspagefooteradd, cdspagefooter)
+    out = re.sub(r"<!--CDSNAMEINTL-->", cdsnameintl[language], out)
+    out = re.sub(r"<!--MSGSEARCH-->", msg_search[language], out)
+    out = re.sub(r"<!--MSGSUBMIT-->", msg_submit[language], out)
+    out = re.sub(r"<!--MSGHELP-->", msg_help[language], out)
+    out = re.sub(r"<!--MSGPERSONALIZE-->", msg_personalize[language], out)
+    out = re.sub(r"<!--LN-->", language, out)
+    out = re.sub(r"<!--NAVTRAILBOX-->", create_navtrail(title, navtrail, language=language), out)
+    out = re.sub(r"<!--USERINFOBOX-->", create_user_infobox(uid, language), out)
+    out = re.sub(r"<!--LANGUAGESELECTIONBOX-->", create_language_selection_box(urlargs, language), out)
+    out = re.sub(r"<!--POWEREDBY-->", msg_powered_by[language], out)
+    out = re.sub(r"<!--MAINTAINEDBY-->", msg_maintained_by[language], out)
     if lastupdated:
-        out = re.sub("<!--LASTUPDATED-->", "Last updated " + lastupdated, out)
+        out = re.sub(r"<!--LASTUPDATED-->", msg_last_updated[language] + " " + lastupdated, out)
     return out
 
-def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspageheaderadd=""):
+def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspageheaderadd="", language=cdslang, urlargs=""):
     """Return just the beginning of page(), with full headers.
        Suitable for the search results page and any long-taking scripts."""
     out = page_template_header % (title, description, keywords, cdspageheader, cdspageheaderadd)
-    out = re.sub("<!--NAVTRAILBOX-->", create_navtrail(title, navtrail), out)
-    out = re.sub("<!--USERINFOBOX-->", create_user_infobox(uid), out)
+    out = re.sub(r"<!--CDSNAMEINTL-->", cdsnameintl[language], out)
+    out = re.sub(r"<!--MSGSEARCH-->", msg_search[language], out)
+    out = re.sub(r"<!--MSGSUBMIT-->", msg_submit[language], out)
+    out = re.sub(r"<!--MSGHELP-->", msg_help[language], out)
+    out = re.sub(r"<!--LN-->", language, out)
+    out = re.sub(r"<!--NAVTRAILBOX-->", create_navtrail(title, navtrail, language=language), out)
+    out = re.sub(r"<!--USERINFOBOX-->", create_user_infobox(uid, language), out)
+    out = re.sub(r"<!--LANGUAGESELECTIONBOX-->", create_language_selection_box(urlargs, language), out)
     return out
 
-def pagefooteronly(cdspagefooteradd="", lastupdated=""):
+def pagefooteronly(cdspagefooteradd="", lastupdated="", language=cdslang):
     """Return just the ending of page(), with full footer.
        Suitable for the search results page and any long-taking scripts."""
     out = page_template_footer % (cdspagefooteradd, cdspagefooter)
+    out = re.sub(r"<!--CDSNAMEINTL-->", cdsnameintl[language], out)
+    out = re.sub(r"<!--MSGSEARCH-->", msg_search[language], out)
+    out = re.sub(r"<!--MSGSUBMIT-->", msg_submit[language], out)
+    out = re.sub(r"<!--MSGHELP-->", msg_help[language], out)
+    out = re.sub(r"<!--MSGPERSONALIZE-->", msg_personalize[language], out)
+    out = re.sub(r"<!--LN-->", language, out)
+    out = re.sub(r"<!--POWEREDBY-->", msg_powered_by[language], out)
+    out = re.sub(r"<!--MAINTAINEDBY-->", msg_maintained_by[language], out)
     if lastupdated:
-        out = re.sub("<!--LASTUPDATED-->", "Last updated " + lastupdated, out)
+        out = re.sub(r"<!--LASTUPDATED-->", msg_last_updated[language] + " " + lastupdated, out)
     return out
 
 def create_error_box(req, title="<strong>Internal Error:</strong>"):

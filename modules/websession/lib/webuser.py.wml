@@ -39,6 +39,7 @@ import websession
 from websession import pSession, pSessionMapping
 from session import SessionError
 from config import *
+from messages import *
 
 def create_GuestUser():
     """Create a guest user , insert into user null values in all fields 
@@ -227,22 +228,23 @@ def get_email(uid):
         out = res[0][0]
     return out
 
-def create_user_infobox(uid):
+def create_user_infobox(uid, language="en"):
     """Create info box on currenly logged user.""" 
     out = ""
     if isGuestUser(uid):
-        out +=  """guest :: <a class="userinfo" href="%s/youraccount.py/display">session</a> |
-		    	    <a class="userinfo" href="%s/youraccount.py/login">login</a>
-		"""%(weburl,weburl)
+        out +=  """guest :: <a class="userinfo" href="%s/youraccount.py/display">%s</a> |
+		    	    <a class="userinfo" href="%s/youraccount.py/login">%s</a>
+		"""%(weburl, msg_session[language], weburl, msg_login[language])
 	   	
     else:
         out += """%s ::
-	       <a class="userinfo" href="%s/youraccount.py/display">account</a> |
-               <a class="userinfo" href="%s/youralerts.py/list">alerts</a> |
-               <a class="userinfo" href="%s/yourbaskets.py/display">baskets</a> |
-               <a class="userinfo" href="%s/youraccount.py/logout">logout</a>""" % \
-               (get_email(uid), weburl, weburl, weburl, weburl)
-    return """<img src="%s/img/head.gif" border="0"> %s""" % (weburl, out)
+	       <a class="userinfo" href="%s/youraccount.py/display">%s</a> |
+               <a class="userinfo" href="%s/youralerts.py/list">%s</a> |
+               <a class="userinfo" href="%s/yourbaskets.py/display">%s</a> |
+               <a class="userinfo" href="%s/youraccount.py/logout">%s</a>""" % \
+               (get_email(uid), weburl, msg_account[language], weburl, msg_alerts[language],
+                weburl, msg_baskets[language], weburl, msg_logout[language])
+    return """<img src="%s/img/head.gif" border="0"> %s""" % (weburl, out) 
 
 ## --- follow some functions for Apache user/group authentication
 

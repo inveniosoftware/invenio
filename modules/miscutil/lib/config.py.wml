@@ -33,6 +33,7 @@ dbname = "<DBNAME>"
 dbuser = "<DBUSER>"
 dbpass = "<DBPASS>"
 cdsname = "<CDSNAME>"
+cdslang = "<CDSLANG>"
 supportemail = "<SUPPORTEMAIL>"
 alertengineemail = "<ALERTENGINEEMAIL>"
 webdir = "<WEBDIR>"
@@ -44,8 +45,18 @@ logdir = "<LOGDIR>"
 tmpdir = "<TMPDIR>"
 version = "<VERSION>"
 
+## intl versions of CDSNAME of this installation:
+cdsnameintl = {}
+<de>cdsnameintl['de'] = "<CDSNAMEINTL>"</de>
+<en>cdsnameintl['en'] = "<CDSNAMEINTL>"</en>
+<es>cdsnameintl['es'] = "<CDSNAMEINTL>"</es>
+<fr>cdsnameintl['fr'] = "<CDSNAMEINTL>"</fr>
+<it>cdsnameintl['it'] = "<CDSNAMEINTL>"</it>
+<ru>cdsnameintl['ru'] = "<CDSNAMEINTL>"</ru>
+
 cfg_apache_password_file = "<CFG_APACHE_PASSWORD_FILE>"
 cfg_apache_group_file = "<CFG_APACHE_GROUP_FILE>"
+
 cfg_cern_site = <CFG_CERN_SITE>
 
 cdspageheader = """<CDSPAGEHEADER>"""

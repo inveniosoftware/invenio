@@ -30,21 +30,15 @@
 pylibdir = "<LIBDIR>/python"
 
 import sys
+import sre
 sys.path.append('%s' % pylibdir)
 from cdsware.config import *
+from cdsware.messages import *
 from cdsware.dbquery import run_sql
 from cdsware.webpage import page, create_error_box
 from cdsware.webuser import getUid
 
-def get_collid(c):
-    "Return collection ID for given collection name.  Return None if no match found."
-    collid = None
-    res = run_sql("SELECT id FROM collection WHERE name=%s", (c,), 1)
-    if res:
-        collid = res[0][0]
-    return collid 
-
-def index(req, c=cdsname, as="0", verbose="1"):
+def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
     "Display search interface page for collection c by looking in the collection cache."
     uid = getUid(req)
     try:
@@ -57,60 +51,80 @@ def index(req, c=cdsname, as="0", verbose="1"):
         verbose = 1
     if type(c) is list:
         c = c[0]
+    ln = wash_language(ln)
     req.content_type = "text/html"
     req.send_http_header()
     # deduce collection id:
     collid = get_collid(c)
     if type(collid) is not int:
-         return page(title="Not found: %s" % c,
-                     body="""<p>Sorry, collection <strong>%s</strong> does not seem to exist.
-                             <p>You may want to start browsing from <a href="%s">%s</a>.""" % (c, weburl, cdsname),
-                     description="CERN Document Server - Not found: %s " % c,
-                     keywords="CDS, CDSware",
-                     uid=uid)
+         return page(title=msg_collection_not_found_head[ln] % c,
+                     body=msg_collection_not_found_body[ln] % (c, weburl, cdsname),
+                     description="%s - Not found: %s " % (cdsname, c),
+                     keywords="%s, CDSware" % cdsname,
+                     uid=uid,
+                     language=ln,
+                     urlargs=req.args)
     # display collection interface page:
     try:
-        fp = open("%s/collections/%d/navtrail-as=%d.html" % (cachedir, collid, as), "r")
+        fp = open("%s/collections/%d/navtrail-as=%d-ln=%s.html" % (cachedir, collid, as, ln), "r")
         c_navtrail = fp.read()
         fp.close()
-        fp = open("%s/collections/%d/body-as=%d.html" % (cachedir, collid, as), "r")
+        fp = open("%s/collections/%d/body-as=%d-ln=%s.html" % (cachedir, collid, as, ln), "r")
         c_body = fp.read()
         fp.close()
-        fp = open("%s/collections/%d/portalbox-lt.html" % (cachedir, collid), "r")
+        fp = open("%s/collections/%d/portalbox-lt-ln=%s.html" % (cachedir, collid, ln), "r")
         c_portalbox_lt = fp.read()
         fp.close()
-        fp = open("%s/collections/%d/portalbox-lb.html" % (cachedir, collid), "r")
+        fp = open("%s/collections/%d/portalbox-lb-ln=%s.html" % (cachedir, collid, ln), "r")
         c_portalbox_lb = fp.read()
         fp.close()
-        fp = open("%s/collections/%d/portalbox-rt.html" % (cachedir, collid), "r")
+        fp = open("%s/collections/%d/portalbox-rt-ln=%s.html" % (cachedir, collid, ln), "r")
         c_portalbox_rt = fp.read()
         fp.close()
-        fp = open("%s/collections/%d/portalbox-rb.html" % (cachedir, collid), "r")
+        fp = open("%s/collections/%d/portalbox-rb-ln=%s.html" % (cachedir, collid, ln), "r")
         c_portalbox_rb = fp.read()
         fp.close()
-        fp = open("%s/collections/%d/last-updated.html" % (cachedir, collid), "r")
+        fp = open("%s/collections/%d/last-updated-ln=%s.html" % (cachedir, collid, ln), "r")
         c_last_updated = fp.read()
         fp.close()
-        return page(title=c,
+        if c == cdsname: # title of the page depends on collection name and language
+            title = cdsnameintl[ln]
+        else:
+            title = c
+            
+        return page(title=title,
                     body=c_body,
                     navtrail=c_navtrail,
-                    description="CERN Document Server - %s" % c,
-                    keywords="CDS, CDSware, %s" % c,
+                    description="%s - %s" % (cdsname, c),
+                    keywords="%s, CDSware, %s" % (cdsname, c),
                     uid=uid,
+                    language=ln,
+                    urlargs=req.args,
                     cdspagerightstripeadd=c_portalbox_rt,
-                    lastupdated=c_last_updated)
+                    lastupdated=c_last_updated)                    
     except:        
         if verbose >= 9:
             req.write("<br>c=%s" % c)
             req.write("<br>as=%s" % as)        
+            req.write("<br>ln=%s" % ln)        
             req.write("<br>collid=%s" % collid)
             req.write("<br>uid=%s" % uid)
         return page(title="Internal Error",
                     body = create_error_box(req) + 
                            """<p>You may want to start browsing from <a href="%s">%s</a>.""" % \
                            (weburl, cdsname),
-                    description="CERN Document Server - Internal Error", 
-                    keywords="CDS, CDSware, Internal Error",
-                    uid=uid)
+                    description="%s - Internal Error" % cdsname, 
+                    keywords="%s, CDSware, Internal Error" % cdsname,
+                    uid=uid,
+                    language=ln,
+                    urlargs=req.args)
          
     return "\n"    
+
+def get_collid(c):
+    "Return collection ID for given collection name.  Return None if no match found."
+    collid = None
+    res = run_sql("SELECT id FROM collection WHERE name=%s", (c,), 1)
+    if res:
+        collid = res[0][0]
+    return collid 

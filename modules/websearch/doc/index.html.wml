@@ -1,0 +1,122 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="<MSG_SEARCH_HELP>" \
+    navbar_name="search-new" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a>" \
+    navbar_select="tips" \
+    cdspageheaderadd="<div align=right><a href=index.en.html>EN</a> | <a href=index.fr.html>FR</a> | <a href=index.de.html>DE</a> | <a href=index.es.html>ES</a> | <a href=index.it.html>IT</a> | <a href=index.ru.html>RU</a></div>"
+
+<es>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</es>
+<it>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</it>
+<ru>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</ru>
+
+<p><en>Find out all about searching</en>
+   <fr>Trouvez tout sur la recherche de</fr>
+   <de>Lernen Sie alles über den Suchemöglichkeiten beim</de>
+   <es>Find out all about searching</es>
+   <it>Find out all about searching</it>
+   <ru>Find out all about searching</ru>
+   <CDSNAMEINTL>:
+
+<blockquote>
+<dl>
+
+<dt><a href="<lang:star: tips.*.html>"><MSG_SEARCH_TIPS></a>
+
+<dd>
+    <en>
+      This page presents you with useful tips and techniques in order to
+      help you use the <CDSNAMEINTL> site to the full.
+    </en>  
+    <fr>
+      Cette page vous présente des suggestions et des techniques qui puissent vous être utiles
+      afin d'utiliser le site de <CDSNAMEINTL> à plein.
+    </fr>  
+    <de>
+      Diese Seite zeigt Ihnen alle nützliche Tipps und Techniken die
+      beim <CDSNAMEINTL> zur Verfügung stehen.
+    </de>  
+    <es>
+      This page presents you with useful tips and techniques in order to
+      help you use the <CDSNAMEINTL> site to the full.
+    </es>  
+    <it>
+      This page presents you with useful tips and techniques in order to
+      help you use the <CDSNAMEINTL> site to the full.
+    </it>  
+    <ru>
+      This page presents you with useful tips and techniques in order to
+      help you use the <CDSNAMEINTL> site to the full.
+    </ru>  
+
+</dl>
+</blockquote>

@@ -1,4 +1,5 @@
 ## $Id$
+
 ## This file enables you to configure the parameters of your local CDS
 ## installation.  It should be self-explanatory.  Just go ahead and
 ## change the values within "define-tag" elements according to your
@@ -42,6 +43,20 @@
 ## Part 1:  Essential parameters ##
 ###################################
 
+## First off, let's include messages and define various languages for
+## the international multi-language interface:
+## (You probably do not want to change this.)
+
+#include "messages.wml"
+#use wml::std::lang
+#use wml::fmt::isolatin
+<lang:new id=de short>
+<lang:new id=en short>
+<lang:new id=es short>
+<lang:new id=fr short>
+<lang:new id=it short>
+<lang:new id=ru short>
+
 ## This part defines essential CDSware internal parameters that
 ## everybody should modify, like the name of the server or the email
 ## address of the local CDSware administrator.  
@@ -49,13 +64,30 @@
 ## CDSNAME -- the name of this particular CDSware installation:  
 ##  (example: "CERN Document Server")
 <define-tag CDSNAME whitespace=delete>
-Atlantis Institute of Science
+Atlantis Institute of Fictive Science
+</define-tag>
+
+## CDSNAMEINTL -- the international versions of CDSNAME:
+##  (example: "CERN Document Server")
+<define-tag CDSNAMEINTL whitespace=delete>
+ <en>Atlantis Institute of Fictive Science</en>
+ <fr>Atlantis Institut des Sciences Fictives</fr>
+ <de>Atlantis Institut der fiktiven Wissenschaft</de>
+ <es>Atlantis Instituto de la Ciencia Fictive</es>
+ <it>Atlantis Istituto di Scienza Fictive</it>
+ <ru>Атлантис Институт фиктивных Наук</ru>
+</define-tag>
+
+## CDSLANG -- the default interface language:
+##  (example: "en")
+<define-tag CDSLANG whitespace=delete>
+de
 </define-tag>
 
 ## ALERTENGINEEMAIL -- the email address from which the alert emails will appear to be send:
 ##  (example: "cds.alert@cdsware.cern.ch")
 <define-tag ALERTENGINEEMAIL whitespace=delete>
-cds.alert@cdsware.cern.ch
+cds.alert@cdsdev.cern.ch
 </define-tag>
 
 ## SUPPORTEMAIL -- the email address of the support team for this installation:
@@ -153,9 +185,9 @@ cds.support@cern.ch
 <table border="0" cellpadding="0" cellspacing="0" class="headerbox">
  <tr>
   <td rowspan="2" class="headerboxbodylogo">
-   <CDSNAME>
+   <!--CDSNAMEINTL-->
   </td>
-  <td align="right" class="userinfoboxbody">
+  <td colspan="2" align="right" class="userinfoboxbody">
    <!--USERINFOBOX-->
   </td>
  </tr>
@@ -170,25 +202,28 @@ cds.support@cern.ch
              &nbsp;
        </td>
        <td class="headermoduleboxbody">
-             <a class=header href="<WEBURL>">search</a>
+             <a class=header href="<WEBURL>/?ln=<!--LN-->"><!--MSGSEARCH--></a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
        <td class="headermoduleboxbody">
-             <a class=header href="<WEBURL>/submit/">submit</a>
+             <a class=header href="<WEBURL>/submit/index.<!--LN-->.html"><!--MSGSUBMIT--></a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
        <td class="headermoduleboxbody">
-             <a class=header href="<WEBURL>/help/">help</a>
+             <a class=header href="<WEBURL>/help/index.<!--LN-->.html"><!--MSGHELP--></a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
      </tr>
    </table>
+  </td>
+  <td align="right" class="langinfoboxbody">
+   <!--LANGUAGESELECTIONBOX-->
   </td>
  </tr>
 </table>
@@ -234,7 +269,7 @@ cds.support@cern.ch
   <table cellpadding=0 border=0 cellspacing=0 width="100%" class="footerbox">
   <tr>
   <td>
-  <CDSNAME>&nbsp;::&nbsp;<a class=note href="<WEBURL>">Search</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/submit/">Submit</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/help/">Help</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/youraccount.py/display">Personalize</a>
+  <!--CDSNAMEINTL-->&nbsp;::&nbsp;<a class=note href="<WEBURL>/?ln=<!--LN-->"><!--MSGSEARCH--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/submit/index.<!--LN-->.html"><!--MSGSUBMIT--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/help/index.<!--LN-->.html"><!--MSGHELP--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/youraccount.py/display?ln=<!--LN-->"><!--MSGPERSONALIZE--></a>
   </td>
   <td align=right>
   <!--LASTUPDATED-->
@@ -242,10 +277,10 @@ cds.support@cern.ch
   </tr>
   <tr>
   <td>
-  Powered by <a class=note href="http://cdsware.cern.ch/">CDSware</a> v<VERSION>
+  <!--POWEREDBY--> <a class=note href="http://cdsware.cern.ch/">CDSware</a> v<VERSION>
   </td>
   <td align=right>
-  Maintained by <a class=note href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a>
+  <!--MAINTAINEDBY--> <a class=note href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a>
   </td>
   </tr>
   </table>

@@ -46,7 +46,15 @@
 
 ## CDS page header (first common, then local):
 <div class="pageheader">
-<CDSPAGEHEADER>  
+<:
+    $header = '<CDSPAGEHEADER>';
+    $header =~ s/<!--CDSNAMEINTL-->/<CDSNAMEINTL>/g;
+    $header =~ s/<!--MSGSEARCH-->/<MSG_SEARCH>/g;
+    $header =~ s/<!--MSGSUBMIT-->/<MSG_SUBMIT>/g;
+    $header =~ s/<!--MSGHELP-->/<MSG_HELP>/g;
+    $header =~ s/<!--LN-->/<lang:star: *>/g;
+    print $header;
+:>
 $(cdspageheaderadd)
 </div>
 
@@ -58,9 +66,9 @@ $(cdspageheaderadd)
 <td class="pagestripemiddle" align="left">
 <:    
     if ('$(navtrail_previous_links)' =~ /\w/) {
-        print '<table class="navtrailbox" border=0 cellspacing=0 cellpadding=0><tr><td width="15">&nbsp;</td><td class="navtrailboxbody" align="left"><a class="navtrail" href="<WEBURL>">Home</a> &gt; $(navtrail_previous_links) &gt; $(title)</td></tr></table>';
+        print '<table class="navtrailbox" border=0 cellspacing=0 cellpadding=0><tr><td width="15">&nbsp;</td><td class="navtrailboxbody" align="left"><a class="navtrail" href="<WEBURL>/?ln=<lang:star: *>"><MSG_HOME></a> &gt; $(navtrail_previous_links) &gt; $(title)</td></tr></table>';
     } elsif ('$(navtrail_body)' eq '') {
-        print '<table class="navtrailbox" border=0 cellspacing=0 cellpadding=0><tr><td width="15">&nbsp;</td><td class="navtrailboxbody" align="left"><a class="navtrail" href="<WEBURL>">Home</a> &gt; $(title)</td></tr></table>';
+        print '<table class="navtrailbox" border=0 cellspacing=0 cellpadding=0><tr><td width="15">&nbsp;</td><td class="navtrailboxbody" align="left"><a class="navtrail" href="<WEBURL>/?ln=<lang:star: *>"><MSG_HOME></a> &gt; $(title)</td></tr></table>';
     } elsif ('$(navtrail_body)' =~ /\w/) {
         print '<table class="navtrailbox" border=0 cellspacing=0 cellpadding=0><tr><td width="15">&nbsp;</td><td class="navtrailboxbody" align="left">$(navtrail_body)</td></tr></table>';
     } elsif ('$(navtrail_body:-undef)' eq 'undef'){
@@ -99,7 +107,15 @@ $(cdspagefooteradd)
 <:
     $footer = '<CDSPAGEFOOTER>';
     $lastupdated = `date +"%d %b %Y %H:%M:%S %Z"`;
-    $footer =~ s/<!--LASTUPDATED-->/Last updated $lastupdated/g;
+    $footer =~ s/<!--CDSNAMEINTL-->/<CDSNAMEINTL>/g;
+    $footer =~ s/<!--MSGSEARCH-->/<MSG_SEARCH>/g;
+    $footer =~ s/<!--MSGSUBMIT-->/<MSG_SUBMIT>/g;
+    $footer =~ s/<!--MSGHELP-->/<MSG_HELP>/g;
+    $footer =~ s/<!--MSGPERSONALIZE-->/<MSG_PERSONALIZE>/g;
+    $footer =~ s/<!--LN-->/<lang:star: *>/g;
+    $footer =~ s/<!--LASTUPDATED-->/<MSG_LAST_UPDATED> $lastupdated/g;
+    $footer =~ s/<!--MAINTAINEDBY-->/<MSG_MAINTAINED_BY>/g;
+    $footer =~ s/<!--POWEREDBY-->/<MSG_POWERED_BY>/g;
     print $footer;
 :>
 </div>

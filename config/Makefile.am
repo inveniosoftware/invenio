@@ -19,8 +19,10 @@
 
 noinst_SCRIPTS=configbis.wml
 wmlincludedir = $(libdir)/wml/cdsware
-wmlinclude_DATA = cdsnavbar.wml cdsnavtrail.wml cdspage.wml config.wml configbis.wml
+wmlinclude_DATA = cdsnavbar.wml cdsnavtrail.wml cdspage.wml config.wml configbis.wml \
+                  messages.wml
 
-EXTRA_DIST = cdsnavbar.wml cdsnavtrail.wml cdspage.wml config.wml configbis.wml.in
+EXTRA_DIST = cdsnavbar.wml cdsnavtrail.wml cdspage.wml config.wml configbis.wml.in \
+             messages.wml
 
 CLEANFILES = *~ $(noinst_SCRIPTS)
