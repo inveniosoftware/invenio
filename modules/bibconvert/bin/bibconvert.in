@@ -1,5 +1,5 @@
 ## $Id$
-
+ 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002 CERN.
 ##
@@ -1306,7 +1306,7 @@ def create_record(begin_record_header, ending_record_footer, query_string, match
                                     for item in DATA:
                                         item = FormatField(item,fn)
                                         DATAFORMATTED.append(item)
-                                DATA = DATAFORMATTED
+                                    DATA = DATAFORMATTED
                             if (len(DATA) > rows):
                                 rows = len(DATA)
                             if DATA != "":
