@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cdsware, 0.5.0.20050214, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.5.0.20050214)
+AC_INIT(cdsware, 0.5.0.20050314, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.5.0.20050314)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -330,6 +330,56 @@ if test -z "$CONVERT"; then
    <http://www.imagemagick.org/>.])
 fi
 
+## Check for CLISP:
+AC_PATH_PROG(CLISP, clisp)
+if test -z "$CLISP"; then
+   AC_MSG_WARN([
+   GNU CLISP was not found in your PATH.  It is used by the WebStat
+   module to produce statistics about CDSware usage.  (Alternatively,
+   SBCL or CMUCL can be used instead of CLISP.)
+   You can continue without it but you will miss this feature.  We 
+   recommend you to install it first (if you don't have neither CMUCL
+   nor SBCL) and to rerun the configure script.  
+   GNU CLISP is available from <http://clisp.cons.org/>.])
+fi
+
+## Check for CMUCL:
+AC_PATH_PROG(CMUCL, lisp)
+if test -z "$CMUCL"; then
+   AC_MSG_WARN([
+   CMUCL was not found in your PATH.  It is used by the WebStat
+   module to produce statistics about CDSware usage.  (Alternatively,
+   CLISP or SBCL can be used instead of CMUCL.)
+   You can continue without it but you will miss this feature.  We 
+   recommend you to install it first (if you don't have neither CLISP
+   nor SBCL) and to rerun the configure script.  
+   CMUCL is available from <http://www.cons.org/cmucl/>.])
+fi
+
+## Check for SBCL:
+AC_PATH_PROG(SBCL, sbcl)
+if test -z "$SBCL"; then
+   AC_MSG_WARN([
+   SBCL was not found in your PATH.  It is used by the WebStat
+   module to produce statistics about CDSware usage.  (Alternatively,
+   CLISP or CMUCL can be used instead of SBCL.)
+   You can continue without it but you will miss this feature.  We 
+   recommend you to install it first (if you don't have neither CLISP
+   nor CMUCL) and to rerun the configure script.  
+   SBCL is available from <http://sbcl.sourceforge.net/>.])
+fi
+
+## Check for gnuplot:
+AC_PATH_PROG(GNUPLOT, gnuplot)
+if test -z "$GNUPLOT"; then
+   AC_MSG_WARN([
+   Gnuplot was not found in your PATH.  It is used by the BibRank
+   module to produce graphs about download and citation history.
+   You can continue without it but you will miss these graphs.  We 
+   recommend you to install it first and to rerun the configure script.  
+   Gnuplot is available from <http://www.gnuplot.info/>.])
+fi
+
 ## Substitute variables:
 AC_SUBST(VERSION)
 AC_SUBST(WML)
@@ -353,6 +403,10 @@ AC_SUBST(PPTHTML)
 AC_SUBST(XLHTML)
 AC_SUBST(HTMLTOTEXT)
 AC_SUBST(localstatedir, `eval echo "${localstatedir}"`)
+AC_SUBST(CLISP)
+AC_SUBST(CMUCL)
+AC_SUBST(SBCL)
+AC_SUBST(GNUPLOT)
 
 ## Define output files:
 AC_CONFIG_FILES([config.nice \
@@ -490,6 +544,13 @@ AC_CONFIG_FILES([config.nice \
 	  modules/miscutil/lib/Makefile \
 	  modules/miscutil/demo/Makefile \
 	  modules/miscutil/sql/Makefile \
+	  modules/webstat/Makefile \
+	  modules/webstat/bin/Makefile \
+	  modules/webstat/doc/Makefile \
+	  modules/webstat/doc/admin/Makefile \
+	  modules/webstat/doc/hacking/Makefile \
+	  modules/webstat/etc/Makefile \
+	  modules/webstat/lib/Makefile \
 	  ])
 
 AC_CONFIG_COMMANDS(.wmlrc, [
