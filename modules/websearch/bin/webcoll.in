@@ -336,15 +336,15 @@ class Collection:
             descendants += col_desc.get_descendants()
         return descendants
 
-    def run_wml_and_write_page(self, name='', body=''):
-        "Calls WML engine and writes resulting HTML page in the collection hierarchy."
+    def write_cache_file(self, filename='', filebody=''):
+        "Write a file inside collection cache."
         # open file:
         dirname = "%s/collections/%d" % (cachedir, self.id) 
         mymkdir(dirname)
-        filename = dirname + "/%s.html" % name
+        fullfilename = dirname + "/%s.html" % filename
         try:
 	    os.umask(022)
-            f = open("index.wml", "w")
+            f = open(fullfilename, "w")
         except IOError, v:
             try:
                 (code, message) = v
@@ -354,25 +354,23 @@ class Collection:
             print "I/O Error: " + str(message) + " (" + str(code) + ")"
             sys.exit(1)
         # print user info:
-        Log("...... creating %s" % filename)
+        Log("...... creating %s" % fullfilename)
         sys.stdout.flush()
         # print page body:
-        f.write(body)
+        f.write(filebody)
         # close file:
         f.close()
-        # at the end, call WML:        
-        os.system("%s -o %s index.wml" % (wmlexec, filename))
-        # and purge the wml file:
-        os.system("rm -f index.wml")
-
+        
     def update_webpage_cache(self):
         """Create collection page header, navtrail, body (including left and right stripes) and footer, and 
-           call write_page() afterwards to update the collection webpage cache."""
-
+           call write_cache_file() afterwards to update the collection webpage cache."""
         Log("%s" % self.name)
+        ## first, update navtrail:
         for as in range(0,2):
-            # do both simple search and advanced search pages:
-            body = "<!--pagebody-simplesearch-->"
+            self.write_cache_file("navtrail-as=%s" % as, self.create_navtrail(as, "","", "", "", ""))
+        ## second, update page body:
+        for as in range(0,2): # do both simple search and advanced search pages:
+            body = ""
             body += """<form action="%s/search.py" method="get">""" % weburl
             body += "" + self.create_searchfor(as)
             body += """<table cellspacing="0" cellpadding="0" border="0">"""
@@ -380,21 +378,19 @@ class Collection:
             body += """<td valign="top">""" + self.create_narrowsearch(as) + "</td>"
             body_focuson = self.create_narrowsearch(as, "Focus on:","v")
             if body_focuson:
-                body += """<td valign="top" width="15" style="border-right: 1px dotted #999999;">&nbsp;</td>"""
-                body += """<td valign="top" width="15">&nbsp;</td>"""
+                #body += """<td valign="top" width="15" style="border-right: 1px dotted #999999;">&nbsp;</td>"""
+                body += """<td valign="top" width="30">&nbsp;</td>"""
                 body += """<td valign="top">""" + body_focuson + """</td>"""
             body += "</tr></table>"
-            body += """</form>"""
-            body += "<!--/pagebody-simplesearch-->"
-            self.run_wml_and_write_page("as=%d" % as,
-                                        create_html_header(self.name,
-                                                           self.create_navtrail(as, "","","&gt;","","",0),
-                                                           self.create_portalbox("lt"),
-                                                           self.create_portalbox("lb"),
-                                                           self.create_portalbox("rt"),
-                                                           self.create_portalbox("rb")                                           
-                                                           ) +
-                                        body)
+            body += "</form>"
+            self.write_cache_file("body-as=%s" % as, body)
+        ## third, write portalboxes:
+        self.write_cache_file("portalbox-lt", self.create_portalbox("lt"))
+        self.write_cache_file("portalbox-lb", self.create_portalbox("lb"))
+        self.write_cache_file("portalbox-rt", self.create_portalbox("rt"))
+        self.write_cache_file("portalbox-rb", self.create_portalbox("rb"))
+        ## fourth, write 'last updated' information:
+        self.write_cache_file("last-updated", time.strftime("%02d %b %04Y %02H:%02M:%02S %Z", time.localtime()))
 
     def create_navtrail(self, \
                         as=0,
@@ -403,7 +399,8 @@ class Collection:
                         separator="&gt;", \
                         epilog="", \
                         footer="</td></tr></table>",
-                        exclude_root=0):
+                        exclude_root=1,
+                        exclude_self=1):
         """Creates navigation trail, i.e. links to collection ancestors.
         If as==1, then links to Advanced Search interfaces; otherwise Simple Search.        
         """
@@ -415,10 +412,11 @@ class Collection:
                 navtrail += """%s <a class="navtrail" href="%s/?c=%s&amp;as=%d">%s</a> %s %s """ % \
                             (prolog, weburl, urllib.quote_plus(dad.name), as, dad.name, epilog, separator)
             else: # hide cdsname for aesthetical reasons
-                navtrail += """%s <a class="navtrail" href="%s/?as=%d">%s</a> %s %s """ % \
-                            (prolog, weburl, as, dad.name, epilog, separator)
+                if not exclude_root:
+                    navtrail += """%s <a class="navtrail" href="%s/?as=%d">%s</a> %s %s """ % \
+                                (prolog, weburl, as, dad.name, epilog, separator)
         # then print self:
-        if self.id > 1 or (self.id==1 and not exclude_root):
+        if not exclude_self and (self.id > 1 or (self.id==1 and not exclude_root)):
             navtrail += """%s %s %s""" % (prolog, self.name, epilog)
         # last, print navtrail epilogue:
         navtrail += footer
