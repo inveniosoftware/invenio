@@ -40,6 +40,7 @@ bindir = "<BINDIR>"
 pylibdir = "<LIBDIR>/python"
 cachedir = "<CACHEDIR>"
 logdir = "<LOGDIR>"
+tmpdir = "<TMPDIR>"
 version = "<VERSION>"
 
 cfg_apache_password_file = "<CFG_APACHE_PASSWORD_FILE>"
