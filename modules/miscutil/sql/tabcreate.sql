@@ -2118,7 +2118,7 @@ CREATE TABLE IF NOT EXISTS aceARGUMENT (
   id int(15) unsigned NOT NULL auto_increment,
   keyword varchar (15),
   value varchar(15),
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
   KEY KEYVAL (keyword, value)
 ) TYPE=MyISAM;
 
