@@ -384,32 +384,51 @@ presented in the same position and in the same language context.
 <a name="3.6"></a><h3>3.6 Modify search fields</h3>
 
 <p>The <em>search field</em> is a logical field (such as author,
-title, etc) that is to be proposed for the end users to choose from in
-the search interface page.  If you don't select anything, a default
-list (author, title, year, etc) will be shown.
+title, etc) that will be proposed to the end users in Simple and
+Advanced Search interface pages.  If you do not set any search fields
+for a collection, then a default list (author, title, year, etc) will
+be shown.
 
-<p>Note that if you want to add new logical field or modify the
+<p>Note that if you want to add a new logical field or modify existing
 physical MARC tags for a logical field, you have to use the <a
 href="<WEBURL>/admin/bibindex/">BibIndex Admin</a> interface.
 
 <a name="3.7"></a><h3>3.7 Modify search options</h3>
-<p>The <em>search option</em> is a search field that contains
-interesting predefined values that the end user will be able to choose
-from.  So, on the contrary to the <a href="">search field</a>, you
-don't expect the end users to type free text to search within a field,
-but to choose an option from the given list.  For example, "author" is
-a good example of a search field, while, "subject" is a good example
-of a search option.
 
-<p>By using search options you can narrow down a search to a certain subject, documents from a specific division or similar. The options added to a collection is shown in the 'Advance search' interface in the same order as specified in the admin interface. To add a search option, the type of the option must first be chosen (example: division, subject, experiment) and then the category must be chosen (example: CERN LHC, Mathematic, Physics - Muons).
+<p>The <em>search option</em> is like <a href="#3.6">search field</a>
+in a way that it permits the end user to narrow down his search to
+some logical field such as "subject", but unlike with the search field
+the user is not required to type his query in a free text form;
+rather, the search interface proposes to the end user several
+interesting predefined values prepared by the administrators that the
+end user may choose from.  For example, an "author search" concept is
+a good example of search field usage, since there is plenty of author
+names to be matched, so that the end users would usually type the name
+they wish to find in free text form; while a "subject search" concept
+is a good example for search option usage, since usually there is a
+limited number of subjects in the system given by local subject
+classification scheme, that the end users do not necessarily know
+about and that they are free to choose from a list.  As a rule of
+thumb, the search field concept denotes the case of unlimited number
+possibilites of distinct values to be matched in a given field
+(e.g. author, title, keyword); while the search option concept denotes
+the case of only a handful or so distinct values to be matched in a
+given field (e.g. subject, division, year).
 
-<p>The search options are shown in the "Advanced Search" interfaces in
-the same order as they appear in the WebSearch Admin interface. To add
-a search option, the field name must first be chosen (for example,
-subject) and then the list field values must be entered (for example,
-Mathematics, Physics, Chemistry, etc).
+<p>Search options are shown in the "Advanced Search" interfaces only,
+while search fields are shown both in "Simple Search" and "Advanced
+Search" interface.  (Although if you want to add a search option to
+the "Simple Search" interface, you can achieve it by creating
+appropriate HTML code in a <a href="#3.5">portalbox</a>.)  The search
+options order, as well as the order of search option values, may be
+defined by means of 'move' arrows in the WebSearch Admin interface.
 
-To edit the fields/categories go to the BibIndex interfaces
+<p>To add a new search option, a field name must first be chosen (for
+example "subject") and then a list of possible field values must be
+entered (for example "Mathematics", "Physics", "Chemistry", "Biology",
+etc).  Note that if you want to add a new logical field or modify
+existing physical MARC tags for a logical field, you have to use the
+<a href="<WEBURL>/admin/bibindex/">BibIndex Admin</a> interface.
 
 <a name="3.8"></a><h3>3.8 Modify sort options</h3>
 
@@ -418,7 +437,7 @@ able to choose for the sorting purposes.  For example, "first author"
 or "year".  If you don't select anything, a default list (author,
 title, year, etc) will be shown.
 
-<p>Note that if you want to add new logical field or modify the
+<p>Note that if you want to add a new logical field or modify existing
 physical MARC tags for a logical field, you have to use the <a
 href="<WEBURL>/admin/bibindex/">BibIndex Admin</a> interface.
 
