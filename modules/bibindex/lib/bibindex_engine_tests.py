@@ -1,4 +1,5 @@
 ## $Id$
+## CDSware Search Engine in mod_python.
 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002 CERN.
@@ -17,13 +18,29 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/cdsware
-pylib_DATA = bibindex_engine.py bibindex_engine_config.py bibindex_engine_tests.py \
-             bibindexadminlib.py 
+<protect># -*- coding: utf-8 -*-</protect>
 
-EXTRA_DIST = $(wildcard *.wml)
+"""Unit tests for the indexing engine."""
 
-CLEANFILES = $(pylib_DATA) *~ *.tmp *.pyc
+__lastupdated__ = """<: print `date +"%d %b %Y %H:%M:%S %Z"`; :>"""
 
-%.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml
-	$(WML) -o $@ $<
+<protect> ## okay, rest of the Python code goes below #######
+
+__version__ = "$Id$"
+
+import bibindex_engine 
+import unittest
+
+class TestListSetOperations(unittest.TestCase):
+    """Test list set operations."""
+
+    def test_list_union(self):
+        """bibindex engine list union"""
+        self.assertEqual([1,2,3,4], bibindex_engine.list_union([1,2,3],[1,3,4]))
+
+def create_test_suite():
+    """Return test suite for the indexing engine."""
+    return unittest.TestSuite((unittest.makeSuite(TestListSetOperations,'test'),))
+
+if __name__ == "__main__":
+    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
