@@ -17,7 +17,7 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = config dbutil cgibin htdocs
+SUBDIRS = modules
 
 EXTRA_DIST = UNINSTALL .wmlrc
 
@@ -46,8 +46,9 @@ load-sample-data: install ./dbutil/tabfill.sql
 	(cd ./dbutil; ./bibupload ./samplebibdatafmt.xml)
 	rm -f ./dbutil/samplebibdatafmt.xml
 	./cgibin/create_collection_pages ""+
-	./dbutil/bibwords 
+	./dbutil/bibwords -ucds.support@cern.ch
 	./dbutil/bibwords 1
+	./cgibin/create_collection_pages ""+
 	@echo "*******************************************************************************"
 	@echo "** The sample data has been successfully loaded.                             **"
 	@echo "** Please point your browser to @HTDOCSURL@ "
@@ -55,7 +56,7 @@ load-sample-data: install ./dbutil/tabfill.sql
 	@echo "** Note that you can do 'gmake clean-sample-data' to remove the sample data. **"
 	@echo "*******************************************************************************"
 
-clean-sample-data: ./dbutil/tabfill.sql
+clean-sample-data: install ./dbutil/tabfill.sql
 	./dbutil/dbexec < ./dbutil/tabdrop.sql
 	./dbutil/dbexec < ./dbutil/tabcreate.sql
 	./dbutil/dbexec < ./dbutil/tabfill.sql
