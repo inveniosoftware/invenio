@@ -1072,7 +1072,7 @@
   <ru>Added since:</ru>
   <sk>Pridané od:</sk>
   <cz>Přidané od:</cz>
-  <no>Added since:</no>
+  <no>Lagt til fra:</no>
 </define-tag>
 
 <define-tag MSG_UNTIL whitespace=delete>
@@ -1085,7 +1085,7 @@
   <ru>until:</ru>
   <sk>do:</sk>
   <cz>do:</cz>
-  <no>until:</no>
+  <no>til:</no>
 </define-tag>
 
 <define-tag MSG_ANY_DAY whitespace=delete>
@@ -1098,7 +1098,7 @@
   <ru>any day</ru>
   <sk>hocaký deň</sk>
   <cz>jakýkoli den</cz>
-  <no>any day</no>
+  <no>alle dager</no>
 </define-tag>
 
 <define-tag MSG_ANY_MONTH whitespace=delete>
@@ -1111,7 +1111,7 @@
   <ru>any month</ru>
   <sk>hocaký mesiac</sk>
   <cz>jakýkoli měsíc</cz>
-  <no>any month</no>
+  <no>alle måneder</no>
 </define-tag>
 
 <define-tag MSG_ANY_YEAR whitespace=delete>
@@ -1124,7 +1124,7 @@
   <ru>any year</ru>
   <sk>hocaký rok</sk>
   <cz>jakýkoli rok</cz>
-  <no>any year</no>
+  <no>alle år</no>
 </define-tag>
 
 <define-tag MSG_JANUARY whitespace=delete>
@@ -1137,7 +1137,7 @@
   <ru>January</ru>
   <sk>január</sk>
   <cz>leden</cz>
-  <no>January</no>
+  <no>januar</no>
 </define-tag>
 
 <define-tag MSG_FEBRUARY whitespace=delete>
@@ -1150,7 +1150,7 @@
   <ru>February</ru>
   <sk>február</sk>
   <cz>únor</cz>
-  <no>February</no>
+  <no>februar</no>
 </define-tag>
 
 <define-tag MSG_MARCH whitespace=delete>
@@ -1163,7 +1163,7 @@
   <ru>March</ru>
   <sk>marec</sk>
   <cz>březen</cz>
-  <no>March</no>
+  <no>mars</no>
 </define-tag>
 
 <define-tag MSG_APRIL whitespace=delete>
@@ -1176,7 +1176,7 @@
   <ru>April</ru>
   <sk>apríl</sk>
   <cz>duben</cz>
-  <no>April</no>
+  <no>april</no>
 </define-tag>
 
 <define-tag MSG_MAY whitespace=delete>
@@ -1189,7 +1189,7 @@
   <ru>May</ru>
   <sk>máj</sk>
   <cz>květen</cz>
-  <no>May</no>
+  <no>mai</no>
 </define-tag>
 
 <define-tag MSG_JUNE whitespace=delete>
@@ -1202,7 +1202,7 @@
   <ru>June</ru>
   <sk>jún</sk>
   <cz>červen</cz>
-  <no>June</no>
+  <no>juni</no>
 </define-tag>
 
 <define-tag MSG_JULY whitespace=delete>
@@ -1215,7 +1215,7 @@
   <ru>July</ru>
   <sk>júl</sk>
   <cz>červenec</cz>
-  <no>July</no>
+  <no>juli</no>
 </define-tag>
 
 <define-tag MSG_AUGUST whitespace=delete>
@@ -1228,7 +1228,7 @@
   <ru>August</ru>
   <sk>august</sk>
   <cz>srpen</cz>
-  <no>August</no>
+  <no>august</no>
 </define-tag>
 
 <define-tag MSG_SEPTEMBER whitespace=delete>
@@ -1241,7 +1241,7 @@
   <ru>September</ru>
   <sk>september</sk>
   <cz>září</cz>
-  <no>September</no>
+  <no>september</no>
 </define-tag>
 
 <define-tag MSG_OCTOBER whitespace=delete>
@@ -1254,7 +1254,7 @@
   <ru>October</ru>
   <sk>október</sk>
   <cz>říjen</cz>
-  <no>October</no>
+  <no>oktober</no>
 </define-tag>
 
 <define-tag MSG_NOVEMBER whitespace=delete>
@@ -1267,7 +1267,7 @@
   <ru>November</ru>
   <sk>november</sk>
   <cz>listopad</cz>
-  <no>November</no>
+  <no>november</no>
 </define-tag>
 
 <define-tag MSG_DECEMBER whitespace=delete>
@@ -1280,7 +1280,7 @@
   <ru>December</ru>
   <sk>december</sk>
   <cz>prosinec</cz>
-  <no>December</no>
+  <no>desember</no>
 </define-tag>
 
 <define-tag MSG_SEARCH_TERM whitespace=delete>
@@ -1293,7 +1293,7 @@
   <ru>Search term <em>%s</em></ru>
   <sk>Hľadaný výraz <em>%s</em></sk>
   <cz>Hledaný výraz <em>%s</em></cz>
-  <no>Search term <em>%s</em></no>
+  <no>Søketerm <em>%s</em></no>
 </define-tag>
 
 <define-tag MSG_INSIDE_INDEX whitespace=delete>
@@ -1306,7 +1306,7 @@
   <ru>inside <em>%s</em> index</ru>
   <sk>v indexe <em>%s</em></sk>
   <cz>v indexu em>%s</em></cz>
-  <no>inside <em>%s</em> index</no>
+  <no>innen <em>%s</em>indeks</no>
 </define-tag>
 
 <define-tag MSG_DID_NOT_MATCH whitespace=delete>
@@ -1319,7 +1319,7 @@
   <ru>did not match any record.  Nearest terms in any collection are:</ru>
   <sk>neodpovedá žiadnemu záznamu.  Najbližšie termíny nezávisle na kolekcii sú:</sk>
   <cz>neodpovídá žádnému záznamu.  Nejbližší termíny nezávisle na kolekci jsou:</cz>
-  <no>did not match any record.  Nearest terms in any collection are:</no>
+  <no>passet ingen poster.  næreste term i hvilken som helst samling er:</no>
 </define-tag>
 
 <define-tag MSG_NO_WORDS_INDEX_AVAILABLE whitespace=delete>
@@ -1332,7 +1332,7 @@
   <ru>No words index available for</ru>
   <sk>Index slov nie je dostupný pre</sk>
   <cz>Index slov není k dispozici pro</cz>
-  <no>No words index available for</no>
+  <no>Ingen ordindeks tilgjengelig for</no>
 </define-tag>
 
 <define-tag MSG_NO_PHRASE_INDEX_AVAILABLE whitespace=delete>
@@ -1345,7 +1345,7 @@
   <ru>No phrase index available for</ru>
   <sk>Index viet nie je dostupný pre</sk>
   <cz>Index vět není k dispozici pro</cz>
-  <no>No phrase index available for</no>
+  <no>Ingen uttrykksindeks tilgjengelig for</no>
 </define-tag>
 
 <define-tag MSG_NO_HITS_IN_GIVEN_COLLECTION>
@@ -1386,8 +1386,8 @@
     Výsledky z celé veřejně přístupné databáze následují.
   </cz>
   <no>
-    No exact match found in selected collection(s).
-    Results from the whole public database follow.
+    Ingen nøyaktige treff funnet i valgt(e) samling(er).
+    Resultater fra hele den offentlige databasen følger.
   </no>
 </define-tag>
 
@@ -1403,9 +1403,6 @@
     la collection restreinte.
   </fr>
   <de>
-    No public collection matched your query.  If you were looking for
-    a non-public document, please choose the desired restricted
-    collection first.    
   </de>
   <es>  
     No public collection matched your query.  If you were looking for
@@ -1438,9 +1435,9 @@
     příslušnou neveřejnou kolekci.    
   </cz>
   <no>  
-    No public collection matched your query.  If you were looking for
-    a non-public document, please choose the desired restricted
-    collection first.
+    Ingen offentlige samlinger passet ditt søk. Dersom du så etter et 
+    ikke-offentlig dokument, vennligst velg den ønskede adgangsbegrensede
+    samlingen først.
   </no>
 </define-tag>
 
@@ -1476,7 +1473,7 @@
     není vzata do úvahy...
   </cz>
   <no>
-    No match within your time limits, discarding this condition...
+    Ingen treff innen angitt tidsbegrensning, forkaster dette kriteriet...
   </no>
 </define-tag>
 
@@ -1511,7 +1508,7 @@
     Žádný výsledek nevyhovuje Vašim limitným kritériím, podmínky
     nejsou vzaty do úvahy...
   </cz>
-  <no>No match within your time limits, discarding this condition...</no>
+  <no>Ingen treff innen dine søkebegrensninger, forkaster dette kriteriet...</no>
 </define-tag>
 
 <define-tag MSG_NO_BOOLEAN_HITS>
@@ -1550,8 +1547,8 @@
     jiným spůsobem.
   </cz>
   <no>
-    All search terms matched but boolean query returned no hits.
-    Please combine your search terms differently.
+    Alle søketermer traff men ditt bolske søk returnerte ingen treff.
+    Vennligst kombiner søketermenene dine annerledes.
   </no>
 </define-tag>
 
@@ -1587,7 +1584,7 @@
     použít <em>%s</em> místo něj...
   </cz>
   <no>
-    No exact match found for <em>%s</em>, using <em>%s</em> instead...
+    Ingen nøyaktige treff funnet for <em>%s</em>, bruker <em>%s</em> i stedet...
   </no>
 </define-tag>
 
@@ -1601,7 +1598,7 @@
   <ru>Internal Error</ru>
   <sk>Interná Chyba</sk>
   <cz>Interní Chyba</cz>
-  <no>Internal Error</no>
+  <no>Intern feil</no>
 </define-tag>
 
 <define-tag MSG_PLEASE_CONTACT_AND_QUOTE>
@@ -1642,8 +1639,7 @@
     informace:
   </cz>
   <no>
-    Please contact <a href="mailto:%s">%s</a> quoting the following
-    information:
+    Vennligst kontakt <a href="mailto:%s">%s</a> og ta med følgenede informasjon:
   </no>
 </define-tag>
 
