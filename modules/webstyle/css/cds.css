@@ -752,6 +752,11 @@ a.nearesttermsselected:hover {
    font-size: small;
    background: transparent;
 }
+.rankscoreinfo {
+   color: #666;
+   font-size: x-small;
+   background: transparent;
+}
 .userinfobox {
    color: #039;
    font-size: x-small;
