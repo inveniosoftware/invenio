@@ -44,25 +44,31 @@ def get_collid(c):
         collid = res[0][0]
     return collid 
 
-def index(req, c=cdsname, as="0"):
+def index(req, c=cdsname, as="0", verbose="1"):
     "Display search interface page for collection c by looking in the collection cache."
     uid = getUid(req)
     try:
         as = int(as)
     except:
         as = 0
+    try:
+        verbose = int(verbose)
+    except:
+        verbose = 1
     if type(c) is list:
         c = c[0]
     req.content_type = "text/html"
     req.send_http_header()
+    # deduce collection id:
     collid = get_collid(c)
-    if collid is None:
+    if type(collid) is not int:
          return page(title="Not found: %s" % c,
                      body="""<p>Sorry, collection <strong>%s</strong> does not seem to exist.
                              <p>You may want to start browsing from <a href="%s">%s</a>.""" % (c, weburl, cdsname),
                      description="CERN Document Server - Not found: %s " % c,
                      keywords="CDS, CDSware",
                      uid=uid)
+    # display collection interface page:
     try:
         fp = open("%s/collections/%d/navtrail-as=%d.html" % (cachedir, collid, as), "r")
         c_navtrail = fp.read()
@@ -90,6 +96,11 @@ def index(req, c=cdsname, as="0"):
                     uid=uid,
                     cdspagerightstripeadd=c_portalbox_rt)
     except:        
+        if verbose >= 9:
+            req.write("<br>c=%s" % c)
+            req.write("<br>as=%s" % as)        
+            req.write("<br>collid=%s" % collid)
+            req.write("<br>uid=%s" % uid)
         return page(title="Internal Error",
                     body = create_error_box(req) + 
                            """<p>You may want to start browsing from <a href="%s">%s</a>.""" % \
