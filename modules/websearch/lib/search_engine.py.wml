@@ -275,10 +275,18 @@ def create_basic_search_units(req, p, f, m=None):
 
     ## sanity check:
     for i in range(0,len(opfts)):
-        pi = opfts[i][1]
-        if pi == '*':
-            print_warning(req, "Ignoring standalone wildcard word.", "Warning")
-            del opfts[i]
+        try:
+            pi = opfts[i][1]
+            if pi == '*':
+                print_warning(req, "Ignoring standalone wildcard word.", "Warning")
+                del opfts[i]
+            if pi == '':
+                fi = opfts[i][2]
+                if fi:
+                    print_warning(req, "Ignoring empty <em>%s</em> field term." % fi, "Warning")
+                del opfts[i]
+        except:
+            pass
 
     ## return search units:
     return opfts
@@ -1394,6 +1402,8 @@ def search_unit(p, f=None, m=None):
     
     ## create empty output results set:
     set = HitSet()
+    if not p: # sanity checking
+        return set 
     if m == 'a' or m == 'r':
         # we are doing either direct bibxxx search or phrase search or regexp search
         set = search_unit_in_bibxxx(p, f, m)
@@ -1590,6 +1600,8 @@ def create_nearest_terms_box(urlargs, p, f, t='w', n=5):
     """    
     out = ""
     nearest_terms = []
+    if not p: # sanity check
+        p = "."
     # look for nearest terms:
     if t == 'w':
         nearest_terms = get_nearest_terms_in_bibwords(p, f, n, n)
