@@ -1629,7 +1629,7 @@ ac_config_commands="$ac_config_commands default-19"
 
 ac_config_commands="$ac_config_commands default-20"
 
-ac_config_files="$ac_config_files Makefile config/Makefile config/configbis.wml cgibin/Makefile dbutil/Makefile htdocs/Makefile htdocs/img/Makefile htdocs/submit/Makefile htdocs/personalize/Makefile htdocs/docs/Makefile htdocs/bibformat/Makefile htdocs/bibformat/core/Makefile htdocs/bibformat/common/Makefile htdocs/admin/Makefile htdocs/admin/bibconvert/Makefile htdocs/admin/bibdata/Makefile htdocs/admin/bibformat/Makefile htdocs/admin/bibharvest/Makefile htdocs/admin/bibupload/Makefile htdocs/admin/bibwords/Makefile htdocs/admin/webaccess/Makefile htdocs/admin/websearch/Makefile htdocs/admin/websubmit/Makefile htdocs/admin/webperso/Makefile"
+ac_config_files="$ac_config_files Makefile config/Makefile config/configbis.wml cgibin/Makefile dbutil/Makefile htdocs/Makefile htdocs/img/Makefile htdocs/submit/Makefile htdocs/personalize/Makefile htdocs/docs/Makefile htdocs/bibformat/Makefile htdocs/bibformat/core/Makefile htdocs/bibformat/common/Makefile htdocs/admin/Makefile htdocs/admin/howto/Makefile htdocs/admin/bibconvert/Makefile htdocs/admin/bibdata/Makefile htdocs/admin/bibformat/Makefile htdocs/admin/bibharvest/Makefile htdocs/admin/bibupload/Makefile htdocs/admin/bibwords/Makefile htdocs/admin/webaccess/Makefile htdocs/admin/websearch/Makefile htdocs/admin/websubmit/Makefile htdocs/admin/webperso/Makefile"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -1995,6 +1995,7 @@ do
   "htdocs/bibformat/core/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/bibformat/core/Makefile" ;;
   "htdocs/bibformat/common/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/bibformat/common/Makefile" ;;
   "htdocs/admin/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/admin/Makefile" ;;
+  "htdocs/admin/howto/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/admin/howto/Makefile" ;;
   "htdocs/admin/bibconvert/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/admin/bibconvert/Makefile" ;;
   "htdocs/admin/bibdata/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/admin/bibdata/Makefile" ;;
   "htdocs/admin/bibformat/Makefile" ) CONFIG_FILES="$CONFIG_FILES htdocs/admin/bibformat/Makefile" ;;
@@ -2025,7 +2026,7 @@ do
   "default-18" ) CONFIG_COMMANDS="$CONFIG_COMMANDS default-18" ;;
   "default-19" ) CONFIG_COMMANDS="$CONFIG_COMMANDS default-19" ;;
   "default-20" ) CONFIG_COMMANDS="$CONFIG_COMMANDS default-20" ;;
-  *) { { echo "$as_me:2028: error: invalid argument: $ac_config_target" >&5
+  *) { { echo "$as_me:2029: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;
   esac
@@ -2245,7 +2246,7 @@ done; }
   esac
 
   if test x"$ac_file" != x-; then
-    { echo "$as_me:2248: creating $ac_file" >&5
+    { echo "$as_me:2249: creating $ac_file" >&5
 echo "$as_me: creating $ac_file" >&6;}
     rm -f "$ac_file"
   fi
@@ -2263,7 +2264,7 @@ echo "$as_me: creating $ac_file" >&6;}
       -) echo $tmp/stdin ;;
       [\\/$]*)
          # Absolute (can't be DOS-style, as IFS=:)
-         test -f "$f" || { { echo "$as_me:2266: error: cannot find input file: $f" >&5
+         test -f "$f" || { { echo "$as_me:2267: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          echo $f;;
@@ -2276,7 +2277,7 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
            echo $srcdir/$f
          else
            # /dev/null tree
-           { { echo "$as_me:2279: error: cannot find input file: $f" >&5
+           { { echo "$as_me:2280: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          fi;;
