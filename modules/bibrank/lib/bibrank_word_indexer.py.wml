@@ -1475,6 +1475,6 @@ def getName(methname, ln=cdslang, type='ln'):
         write_message("Cannot run rank method, either given code for method is wrong, or it has not been added using the webinterface.")
         raise Exception
 
-def word_frequency(row, run):
+def word_similarity(row, run):
     """Call correct method"""
     return word_index(row, run)

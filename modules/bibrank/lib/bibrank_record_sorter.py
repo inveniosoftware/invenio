@@ -324,7 +324,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     try:
         function = methods[rank_method_code]["function"]
         func_object = globals().get(function)
-        if func_object and pattern and pattern[0][0:6] == "recid:" and function == "word_frequency":
+        if func_object and pattern and pattern[0][0:6] == "recid:" and function == "word_similarity":
             result = find_similar(rank_method_code, pattern[0][6:], hitset, rank_limit_relevance, verbose)
         elif func_object:
             result = func_object(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
@@ -492,7 +492,7 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
     return (reclist_addend + reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
 
-def word_frequency(rank_method_code, lwords, hitset, rank_limit_relevance,verbose):
+def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbose):
     """Ranking a records containing specified words and returns a sorted list.
     input:
     rank_method_code - the code of the method, from the name field in rnkMETHOD
@@ -670,7 +670,7 @@ try:
     psyco.bind(rank_by_method)
     psyco.bind(calculate_record_relevance)
     psyco.bind(post_calculate_record_relevance)
-    psyco.bind(word_frequency)
+    psyco.bind(word_similarity)
     psyco.bind(sort_record_relevance)
     psyco.bind(serialize_via_numeric_array)
     psyco.bind(serialize_via_marshal)
