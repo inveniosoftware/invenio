@@ -43,4 +43,15 @@
         return substr($out, 0, -1);
     }
 
+    sub generate_pretty_version_string {
+        ## Input: CVS $Id$ string
+        ## Output: nicely formatted version number suitable for `bibtaskex --version'
+        ## Example: ``$Id$''
+        ##          will generate ``webcoll 1.36 (CDSware 0.3.0)''
+        ($out) = @_;
+        ($junk, $filename, $revision, $junk) = split / /, $out;
+        $filename =~ s/\.wml,v//g;
+        return $filename . "/" . $revision . " (CDSware/<VERSION>)";
+    }
+
 :>
