@@ -469,7 +469,8 @@ def remove_subfields(s):
 
 def asciify_accented_letters(s):
     "Translates ISO-8859-1 accented letters into their ASCII equivalents."
-    return translate(s, table_latin1_to_ascii)
+    return s
+    #return translate(s, table_latin1_to_ascii)
 
 def get_field_tags(field):
     """Returns a list of MARC tags for the field code 'field'.
