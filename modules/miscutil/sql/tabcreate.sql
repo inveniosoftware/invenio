@@ -2108,6 +2108,7 @@ CREATE TABLE IF NOT EXISTS oaiset (
   setName varchar(255) NOT NULL default '',
   setSpec varchar(255) NOT NULL default '',
   setDescription text,
+  setDefinition text NOT NULL default '',
   PRIMARY KEY  (id),
   UNIQUE KEY setSpec (setSpec)
 ) TYPE=MyISAM;
