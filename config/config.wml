@@ -29,13 +29,18 @@
 
 ## This file ('config.wml') consists of several relatively independent 
 ## configuration parts:
-##   Part 1: Essential parameters
-##   Part 2: CDS page elements
-##   Part 3: CDS navigation bar
-##   Part 5: WebSearch WML parameters 
-##   Part 4: WebSearch OAI parameters
-##   Part 6: WebSubmit WML parameters
-##   Part 7: BibFormat WML parameters
+##
+##   Part  1: Essential parameters
+##   Part  2: CDS page elements
+##   Part  3: CDS navigation bar
+##   Part  5: WebSearch parameters 
+##   Part  4: BibHarvest OAI parameters
+##   Part  6: WebSubmit parameters
+##   Part  7: Fulltext Archive parameters
+##   Part  8: BibFormat parameters
+##   Part  9: BibIndex parameters
+##   Part 10: Access Control parameters
+##
 ## The configuration is done by editing the content of the "define-tag" 
 ## WML elements below.  Feel free to edit as many as you need.  When done,
 ## return to the main CDSware source directory and type 'make'.  Good luck! :-)
@@ -44,6 +49,7 @@
 ## languages for the international multi-language interface.  (You
 ## don't want to change these things here, the real language selection
 ## will be chosen further down.)
+#include "configbis.wml"
 #include "messages.wml"
 #use wml::std::lang
 <lang:new id=de short>
@@ -313,9 +319,9 @@ cds.support@cern.ch
 ## "cdsnavbar.wml" file.  You may want to modify it now, if you
 ## really know what you are doing. :-)
 
-######################################
-## Part 4: WebSearch WML Parameters ##
-######################################
+##################################
+## Part 4: WebSearch parameters ##
+##################################
 
 ## This section contains some WML-based configuration parameters for
 ## WebSearch module.  Please note that WebSearch is mostly configured
@@ -351,6 +357,26 @@ cds.support@cern.ch
 ##  (example: "1")
 <define-tag CFG_GOOGLE_BOX whitespace=delete>
 1
+</define-tag>
+
+
+## CFG_GOOGLE_BOX_SERVERS -- what servers should be proposed in the
+## above Google box?  See the list of available servers below and put
+## "1" for "yes" and "0" for "no" for each server.
+<define-tag CFG_GOOGLE_BOX_SERVERS whitespace=delete>
+{'Amazon' : 1,
+ 'CERN Intranet' : 1,
+ 'CERN Agenda' : 1,
+ 'CiteSeer' : 1,
+ 'Google Scholar' : 1,
+ 'Google Web' : 1,
+ 'IEC' : 1,
+ 'IHC' : 1,
+ 'INSPEC' : 1,
+ 'ISO' : 1,
+ 'KEK' : 1,
+ 'NEBIS' : 1,
+ 'SPIRES' : 1}
 </define-tag>
 
 ## CFG_SIMPLESEARCH_PATTERN_BOX_WIDTH -- width of the search pattern
@@ -421,13 +447,24 @@ cds.support@cern.ch
 1
 </define-tag>
 
+## CFG_CREATE_SIMILARLY_NAMED_AUTHORS_LINK_BOX -- shall we create help
+## links for Ellis, Nick or Ellis, Nicholas and friends when Ellis, N
+## was searched for?  Useful if you have one author stored in the
+## database under several name formats, namely surname comma firstname
+## and surname comma initial cataloging policy.  Use 0 for no and 1
+## for yes.
+##  (example: "1")
+<define-tag CFG_CREATE_SIMILARLY_NAMED_AUTHORS_LINK_BOX whitespace=delete>
+1
+</define-tag>
 
-######################################
-## Part 5: WebSearch OAI parameters ##
-######################################
 
-## This part defines OAI parameters for the current installation of
-## CDSware OAI repository.
+######################@################
+## Part 5: BibHarvest OAI parameters ##
+#####################@#################
+
+## This part defines parameters for the CDSware OAI gateway.
+## Useful if you are running CDSware as OAI data provider.
 
 ## OAIIDSCHEME -- OAI identifier scheme:  
 ##  (example: "oai")
@@ -516,21 +553,20 @@ atlantis.cern.ch
 </define-tag>
 
 ## OAILOAD -- OAI number of records in a response:
-##  (example: 1000)
+##  (example: "1000")
 <define-tag OAILOAD whitespace=delete>
 1000
 </define-tag>
 
 ## OAIEXPIRE -- OAI resumptionToken expiration time:
-##  (example: 1000)
+##  (example: "1000")
 <define-tag OAIEXPIRE whitespace=delete>
 90000
 </define-tag>
 
-
-######################################
-## Part 6: WebSubmit WML Parameters ##
-######################################
+##################################
+## Part 6: WebSubmit parameters ##
+##################################
 
 ## This section contains some WML-based configuration parameters for
 ## WebSubmit module.  Please note that WebSubmit is mostly configured
@@ -550,9 +586,9 @@ atlantis.cern.ch
 <DATADIR>/submit/storage
 </define-tag>
 
-#############################################
-## Part 7: Fulltext Archive WML Parameters ##
-#############################################
+#########################################
+## Part 7: Fulltext Archive parameters ##
+#########################################
 
 ## This section contains some WML-based configuration parameters for
 ## fulltext archive.
@@ -563,7 +599,7 @@ atlantis.cern.ch
 <DATADIR>/files
 </define-tag>
 
-## CFG__FILE_DIR_SIZE -- all attached fulltext files are stored
+## CFG_FILE_DIR_SIZE -- all attached fulltext files are stored
 ## under the CFG_FILE_DIR directory, inside subdirectories called gX
 ## this variable indicates the maximum number of files stored in each
 ## subdirectories
@@ -571,9 +607,9 @@ atlantis.cern.ch
 5000
 </define-tag>
 
-######################################
-## Part 8: BibFormat WML Parameters ##
-######################################
+##################################
+## Part 8: BibFormat parameters ##
+##################################
 
 ## This section contains some WML-based configuration parameters for
 ## BibFormat module.  Please note that BibFormat is mostly configured
@@ -588,6 +624,180 @@ atlantis.cern.ch
 <define-tag CFG_BIBFORMAT_TIME_LIMIT whitespace=delete>
 1000
 </define-tag>
+
+#################################
+## Part 9: BibIndex parameters ##
+#################################
+
+## This section contains some WML-based configuration parameters for
+## BibIndex module.  Please note that BibIndex is mostly configured
+## on run-time via its BibIndex Admin web interface.  The parameters
+## below are the ones that you do not probably want to modify very
+## often during the runtime.
+
+## CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY -- when fulltext indexing, do
+## you want to index locally stored files only, or also external URLs?
+## Use "0" to say "no" and "1" to say "yes".
+##  (example: "0")
+<define-tag CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY whitespace=delete>
+0
+</define-tag>
+
+## CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE -- when indexing, do you want to use
+## stemming?  If so, stem according to which language?  Use '' for
+## no stemming, 'fr' for French, 'en' for English, 'no' for Norwegian,
+## 'se' for Swedish, 'de' for German, 'it' for Italian, 'pt' for
+## Portuguese'. This feature is still somewhat experimental.  We
+## recommend to say nothing ("") at this stage of things.
+##  (example: "")
+<define-tag CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE whitespace=delete>
+</define-tag>
+
+## CFG_BIBINDEX_REMOVE_STOPWORDS -- when indexing, do we want to remove
+## stopwords?  Use "0" to say "no" and "1" to say "yes".
+##  (example: "0")
+<define-tag CFG_BIBINDEX_REMOVE_STOPWORDS whitespace=delete>
+0
+</define-tag>
+
+## CFG_BIBINDEX_PATH_TO_STOPWORDS_FILE -- path to the stopwords file.  You
+## probably don't want to change this path, although you may want to
+## change the content of that file.  Note that the file is used by the
+## rank engine internally, so it should be given even if stopword
+## removal in the indexes is not used.
+<define-tag CFG_BIBINDEX_PATH_TO_STOPWORDS_FILE whitespace=delete>
+<ETCDIR>/bibrank/stopwords.kb
+</define-tag>
+
+## CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS -- characters considered as
+## alphanumeric separators of word-blocks inside words.  You probably
+## don't want to change this.
+##  (example: "\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~")
+<define-tag CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS whitespace=delete>
+\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~
+</define-tag>
+
+## CFG_BIBINDEX_CHARS_PUNCTUATION -- characters considered as punctuation
+## between word-blocks inside words.  You probably don't want to
+## change this.
+##  (example: "\.\,\:\;\?\!\"")
+<define-tag CFG_BIBINDEX_CHARS_PUNCTUATION whitespace=delete>
+\.\,\:\;\?\!\"
+</define-tag>
+
+## CFG_BIBINDEX_REMOVE_HTML_MARKUP -- should we attempt to remove HTML markup
+## before indexing?  Use 1 if you have HTML markup inside metadata
+## (e.g. in abstracts), use 0 otherwise.
+##  (example: "0")
+<define-tag CFG_BIBINDEX_REMOVE_HTML_MARKUP whitespace=delete>
+0
+</define-tag>
+
+## CFG_BIBINDEX_MIN_WORD_LENGTH -- minimum word length allowed to be added to
+## index.  The terms smaller then this amount will be discarded.
+## Useful to keep the database clean, however you can safely leave
+## this value on 0 for up to 1,000,000 documents.
+##  (example: "0")
+<define-tag CFG_BIBINDEX_MIN_WORD_LENGTH whitespace=delete>
+0
+</define-tag>
+
+## CFG_BIBINDEX_URLOPENER_USERNAME and CFG_BIBINDEX_URLOPENER_PASSWORD --
+## access credentials to access restricted URLs, interesting only if
+## you are fulltext-indexing files located on a remote server that is
+## only available via username/password.  But it's probably better to
+## handle this case via IP or some convention; the current scheme is
+## mostly there for demo only.
+##  (example: "mysuperuser")
+<define-tag CFG_BIBINDEX_URLOPENER_USERNAME whitespace=delete>
+mysuperuser
+</define-tag>
+<define-tag CFG_BIBINDEX_URLOPENER_PASSWORD whitespace=delete>
+mysuperpass
+</define-tag>
+
+
+########################################
+## Part 10: Access control parameters ##
+########################################
+
+## This section contains some WML-based configuration parameters for
+## the access control system.  Please note that WebAccess is mostly
+## configured on run-time via its WebAccess Admin web interface.  The
+## parameters below are the ones that you do not probably want to
+## modify very often during the runtime.  (If you do want to modify
+## them during runtime, for example te deny access temporarily because
+## of backups, you can edit access_control_config.py directly, no need
+## to get back here and no need to redo the make process.)
+
+## CFG_ACCESS_CONTROL_LEVEL_SITE -- defines how open this site is.
+## Use 0 for normal operation of the site, 1 for read-only site (all
+## write operations temporarily closed), 2 for site fully closed.
+## Useful for site maintenance.
+##  (example: "0")
+<define-tag CFG_ACCESS_CONTROL_LEVEL_SITE whitespace=delete>
+0
+</define-tag>
+
+## CFG_ACCESS_CONTROL_LEVEL_GUESTS -- guest users access policy.  Use
+## 0 to allow guest users, 1 not to allow them (all users must login).
+##  (example: "0")
+<define-tag CFG_ACCESS_CONTROL_LEVEL_GUESTS whitespace=delete>
+0
+</define-tag>
+
+## CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS -- account registration and
+## activation policy.  When 0, users can register and accounts are
+## automatically activated.  When 1, users can register but admin must
+## activate the accounts.  When 2, users cannot register nor update
+## their email address, only admin can register accounts.  When 3,
+## users cannot register nor update email address nor password, only
+## admin can register accounts.  When 4, the same as 3 applies, nor
+## user cannot change his login method.
+##  (example: "0")
+<define-tag CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS whitespace=delete>
+0
+</define-tag>
+
+## CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN -- limit account
+## registration to certain email addresses?  If wanted, give domain
+## name below.  If not wanted, leave it empty.
+##  (example: "cern.ch"):
+<define-tag CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN whitespace=delete>
+</define-tag>
+
+## CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS -- send a
+## notification email to the administrator when a new account is
+## created?  Use 0 for no, 1 for yes.
+##  (example: "0")
+<define-tag CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS whitespace=delete>
+0
+</define-tag>
+
+## CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT -- send a
+## notification email to the user when a new account is created?  Use
+## 0 for no, 1 for yes.
+##  (example: "0")
+<define-tag CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT whitespace=delete>
+0
+</define-tag>
+
+## CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION -- send a
+## notification email to the user when a new account is activated?
+## Use 0 for no, 1 for yes.
+##  (example: "0")
+<define-tag CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION whitespace=delete>
+0
+</define-tag>
+
+## CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION -- send a
+## notification email to the user when a new account is deleted or
+## account demand rejected?  Use 0 for no, 1 for yes.
+##  (example: "0")
+<define-tag CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION whitespace=delete>
+0
+</define-tag>
+
 
 ##########################
 ##  THAT's ALL, FOLKS!  ##
