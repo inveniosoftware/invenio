@@ -765,14 +765,14 @@ def create_matchtype_box(name='m', value='', ln='en'):
            is_selected('r', value), msg_regular_expression[ln])
     return out
 
-def nice_number(num):
-    "Returns nice number when using comma as thousands separator."
+def nice_number(num, ln=cdslang):
+    "Returns nicely printed number NUM in language LN using thousands separator char defined in the I18N messages file."
     chars_in = list(str(num))
     num = len(chars_in)
     chars_out = []
     for i in range(0,num):
         if i % 3 == 0 and i != 0:
-            chars_out.append(',')
+            chars_out.append(msg_thousands_separator[ln])
         chars_out.append(chars_in[num-i-1])
     chars_out.reverse()
     return ''.join(chars_out)
@@ -2078,11 +2078,11 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=cdsname, nb_found
     # middle table cell: print beg/next/prev/end arrows:
     if not middle_only:
         out += "<td class=\"searchresultsboxheader\" align=\"center\">\n"
-        out += msg_x_records_found[ln] % nice_number(nb_found) + " &nbsp; "
+        out += msg_x_records_found[ln] % nice_number(nb_found, ln) + " &nbsp; "
     else:
         out += "<small>"
         if nb_found > rg:
-            out += collection + " : " + msg_x_records_found[ln] % nice_number(nb_found) + " &nbsp; "
+            out += collection + " : " + msg_x_records_found[ln] % nice_number(nb_found, ln) + " &nbsp; "
 
     if nb_found > rg: # navig.arrows are needed, since we have many hits
         url = '%s/search.py?p=%s&amp;cc=%s&amp;f=%s&amp;sf=%s&amp;so=%s&amp;sp=%s&amp;rm=%s&amp;of=%s&amp;ot=%s' % (weburl, urllib.quote(p), urllib.quote(collection), f, sf, so, sp, rm, of, ot)
@@ -2167,14 +2167,14 @@ def print_results_overview(colls, results_final_nb_total, results_final_nb, cpu_
     # first find total number of hits:
     out += "<p><table class=\"searchresultsbox\">" \
            "<thead><tr><th class=\"searchresultsboxheader\">%s</th></tr></thead>" % \
-             (msg_results_overview_found_x_records_in_y_seconds[ln] % (nice_number(results_final_nb_total), cpu_time))
+             (msg_results_overview_found_x_records_in_y_seconds[ln] % (nice_number(results_final_nb_total, ln), cpu_time))
     # then print hits per collection:
     out += "<tbody><tr><td class=\"searchresultsboxbody\">"
     for coll in colls:
         if results_final_nb.has_key(coll) and results_final_nb[coll] > 0:
             out += "<strong><a href=\"#%s\">%s</a></strong>, " \
                   "<a href=\"#%s\">%s</a><br>" \
-                  % (urllib.quote(coll), coll, urllib.quote(coll), msg_x_records_found[ln] % nice_number(results_final_nb[coll]))
+                  % (urllib.quote(coll), coll, urllib.quote(coll), msg_x_records_found[ln] % nice_number(results_final_nb[coll], ln))
     out += "</td></tr></tbody></table>\n"
     return out
 
