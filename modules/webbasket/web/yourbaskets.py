@@ -40,7 +40,7 @@ try:
     from cdsware import webbasket
     webbasket = reload( webbasket )
     from cdsware.dbquery import run_sql
-    from cdsware.webuser import getUid, create_user_infobox
+    from cdsware.webuser import getUid
     from mod_python import apache
 except ImportError, e:
     print "Error: %s" % e
@@ -61,22 +61,31 @@ def display(req, action="", title="Your Baskets", delete_alerts="", confirm_acti
     uid = getUid(req)
     if action=="DELETE":
         title="Delete basket"
-    return page(title, webbasket.perform_display(uid, action, delete_alerts, confirm_action, id_basket, bname, newname, newbname, mark, to_basket, copy_move, idup, ordup, iddown, orddown),
-                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,
-                "", "CDS Personalize, Display baskets", "CDS, personalize", create_user_infobox(uid), "")
+    return page(title=title,
+                body=webbasket.perform_display(uid, action, delete_alerts, confirm_action, id_basket, bname, newname, newbname, mark, to_basket, copy_move, idup, ordup, iddown, orddown),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                description="CDS Personalize, Display baskets",
+                keywords="CDS, personalize",
+                uid=uid)
 
 def display_public(req, id_basket=0, name="", action="", to_basket="", mark=[], newname=""):
     title = "Display basket"
     uid = getUid(req)    
-    return page(title, webbasket.perform_display_public(uid, id_basket, name, action, to_basket, mark, newname),
-                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt;""" % weburl,
-                "", "CDS Personalize, Display baskets", "CDS, personalize", create_user_infobox(uid), "")
+    return page(title=title,
+                body=webbasket.perform_display_public(uid, id_basket, name, action, to_basket, mark, newname),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                description="CDS Personalize, Display baskets",
+                keywords="CDS, personalize",
+                uid=uid)
 
 def add(req, recid=[], bid=[], bname=[]):
     """Add records to basket.  If bid isn't set, it'll ask user into which baskets to add them.
     If bname is set, it'll create new basket with this name, and add records there rather than to bid."""
     title = "Adding records to baskets"
     uid = getUid(req)
-    return page(title, webbasket.perform_request_add(uid, recid, bid, bname),
-                """&gt; <a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt; <a class="navtrail" href="%s/yourbaskets.py/display">Your Baskets</a> &gt;""" % (weburl, weburl),
-                "", "CDS Personalize, Add records to basket", "CDS, personalize", create_user_infobox(uid), "")
+    return page(title=title,
+                body=webbasket.perform_request_add(uid, recid, bid, bname),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt; <a class="navtrail" href="%s/yourbaskets.py/display">Your Baskets</a>""" % (weburl, weburl),
+                description="CDS Personalize, Add records to basket",
+                keywords="CDS, personalize",
+                uid=uid)
