@@ -425,8 +425,8 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
             reclist_addend.append((recID, 0))
 
     if verbose > 0:
-        voutput += "Number of records ranked: %S" % len(reclist)
-        voutput += "Number of records not ranked: %S" % len(reclist_addend)
+        voutput += "Number of records ranked: %s" % len(reclist)
+        voutput += "Number of records not ranked: %s" % len(reclist_addend)
 
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
     return (reclist_addend + reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], "")
