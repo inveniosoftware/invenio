@@ -39,6 +39,8 @@ import os
 import urllib
 import random
 import marshal
+import datetime
+import time
 
 from zlib import compress,decompress
 from bibrankadminlib import modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
@@ -2100,9 +2102,7 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
     return addadminbox("Overview of edit options for collection '%s'" % col_dict[colID],  [fin_output])
 
 def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
-    """form to delete an output format not in use.
-    colID - the collection id of the current collection.
-    fmtID - the format id to delete."""
+    """Status of the collection tables / indexes"""
  
     subtitle = """<a name="11"></a>Webcoll Status"""
     output  = ""
@@ -2119,7 +2119,6 @@ def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
         collection_table_update_time = str(res[0][11])[0:len(collection_table_update_time) - 3]
         output += "Collection table last updated: %s<br>" % collection_table_update_time
     try:
-        
         file = open("%s/collections/1/last-updated-ln=en.html" % cachedir)
         collection_web_update_time = str(file.readline())
         output += "Collection webpage last updated: %s<br>" % collection_web_update_time
@@ -2127,9 +2126,10 @@ def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
     except StandardError, e:
         pass
 
-    import datetime
-    import time
-    tabletime = time.strptime(collection_table_update_time, "%Y-%m-%d %H:%M:%S")
+    try:
+        tabletime = time.strptime(collection_table_update_time, "%Y-%m-%d %H:%M:%S")
+    except StandardError, e:
+        tabletime = time.strptime(collection_table_update_time, "%Y-%m-%d %H:%M")
     webtime = time.strptime(collection_web_update_time, "%d %b %Y %H:%M:%S %Z")
     
     if tabletime > webtime:
@@ -2143,19 +2143,19 @@ def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
     if len(res) > 0:
         (id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[len(res) - 1]
         webcoll__update_time = runtime
-        actions.append([id, proc, runtime, status, progress])
+        actions.append([id, proc, runtime, (status !="" and status or ''), (progress !="" and progress or '')])
     else:
         actions.append(['', 'webcoll', '', '', 'Not executed yet'])
 
     res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='bibindex' and runtime< now() ORDER by runtime")
+
     if len(res) > 0:
         (id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[len(res) - 1]
-        actions.append([id, proc, runtime, status, progress])
+        actions.append([id, proc, runtime, (status !="" and status or ''), (progress !="" and progress or '')])
     else:
         actions.append(['', 'bibindex', '', '', 'Not executed yet'])
         
-    output += tupletotable(header=header, tuple=actions)
-        
+    output += tupletotable(header=header, tuple=actions) 
     output += """<br><b>Next scheduled BibSched run:</b><br>"""
     actions = []
     
@@ -2165,7 +2165,7 @@ def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
     if len(res) > 0:
         (id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[0]
         webcoll__update_time = runtime
-        actions.append([id, proc, runtime, status, progress])
+        actions.append([id, proc, runtime, (status !="" and status or ''), (progress !="" and progress or '')])
         webcoll_future = "yes"
     else:
         actions.append(['', 'webcoll', '', '', 'Not scheduled'])
@@ -2175,7 +2175,7 @@ def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
     bibindex_future = ""
     if len(res) > 0:
         (id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[0]
-        actions.append([id, proc, runtime, status, progress])
+        actions.append([id, proc, runtime, (status !="" and status or ''), (progress !="" and progress or '')])
         bibindex_future = "yes"
     else:
         actions.append(['', 'bibindex', '', '', 'Not scheduled'])
@@ -2198,9 +2198,7 @@ def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
         return addadminbox(subtitle, body)
     
 def perform_validateconf(colID, ln, confirm=0, callback='yes'):
-    """form to delete an output format not in use.
-    colID - the collection id of the current collection.
-    fmtID - the format id to delete."""
+    """Validation of the configuration of the collections"""
  
     subtitle = """<a name="11"></a>Collections Status"""
     output  = ""
