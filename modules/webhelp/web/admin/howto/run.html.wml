@@ -1,0 +1,131 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="HOWTO Run Your CDSware Installation" \
+    navbar_name="howto" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/>Admin Area</a> &gt; <a class=navtrail href=<WEBURL>/admin/howto/>Admin HOWTOs</a>" \
+    navbar_select="howto_run"
+
+<p>This HOWTO guide intends to give you ideas on how to run your
+CDSware installation and how to take care of its normal operation day
+by day.
+
+<h3>BibSched Periodical Tasks</h3>
+
+<p>Many tasks that manipulate the bibliographic record database can be
+set to run in a periodical mode.  For example, we want to have the
+indexing engine to scan periodically for newly arrived documents to
+index them as soon as they enter into the system.  It is the role of
+the BibSched system to take care of the task scheduling and the task
+execution.
+
+<p>Periodical tasks (such as regular metadata indexing) as well as
+one-time tasks (such as a batch upload of acquired metadata file)
+are not executed straight away but are stored in the BibSched task
+queue.  BibSched daemon looks periodically in the queue and launches
+the tasks according to their order or the date of programmed runtime.
+You can consider BibSched to be a kind of cron daemon for
+bibliographic tasks.
+
+<p>This means that after CDSware installation you want to have
+BibSched daemon running permanently.  To launch BibSched daemon, do:
+
+   <blockquote>
+   <pre>
+    $ bibsched -d
+   </pre>
+   </blockquote>
+     
+To setup indexing, reformatting, and collection updating daemons to
+run periodically with a sleeping period of, say, 1 hour:
+ 
+   <blockquote>
+   <pre>
+   $ bibindex -s1h
+   $ bibreformat -oHB,HD -s1h
+   $ webcoll -s1h
+   </pre>
+   </blockquote>
+
+<strong>HINT:</strong> It is good to have these three tasks
+permanently in your BibSched queue so that your newly submitted
+documents will be further processed automatically.
+
+<p> Note that the BibSched daemon automatic mode stops as soon as some
+of the tasks ends with an error.  It it therefore a good idea to
+inspect BibSched queue from time to time.  This can be done by running
+the BibSched command-line admin interface:
+
+   <blockquote>
+   <pre>
+   $ bibsched
+   </pre>
+   </blockquote>
+
+that will permit you to stop/start the daemon mode, to delete the
+tasks already submitted, to run some of the tasks manually, etc.  Note
+also that BibSched daemon writes log and error files on its operation
+and on the operation of its tasks.  The log and error files can be
+found on your system at <LOGDIR>.
+
+<p><strong>HINT:</strong> You may want to launch the
+<code>bibsched</code> command from time to time (say a couple of times
+per day) to inspect the BibSched queue and to verify the status of the
+BibSched system.
+
+<h3>Guest Users Cleanup</h3>
+
+<p>Guest users create a log of entries in <CDSNAME> tables that are
+related to their web sessions, their search history, personal baskets,
+etc.  This data has to be garbage-collected periodically.  At the
+moment this is done via a command line program:
+
+   <blockquote>
+   <pre>
+   $ sessiongc
+   </pre>
+   </blockquote>
+
+<strong>HINT:</strong> You may want to launch this command every day.
+
+<p>FIXME. In the future the garbage collection may be done via BibSched task
+queue.
+
+<h3>Alert Engine</h3>
+
+<p><CDSNAME> users may set up an automatic notification email alerts
+that would send them documents corresponding to the user profile by
+email either daily, weekly, or monthly.  It is the job of the alert
+engine to do this.  The alert engine has to be run every day:
+
+   <blockquote>
+   <pre>
+   $ alertengine
+   </pre>
+   </blockquote>
+
+<strong>HINT:</strong> You may want to set up an external cron job
+to call <code>alertengine</code> each day.
+
+<h3>Cleaning Up the Filesystem</h3>
+
+<p>FIXME.  BibReformat temorary XML files. 
+
+<p>FIXME.  WebSubmit archives, what to keep, what not.
