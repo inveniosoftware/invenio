@@ -1,0 +1,300 @@
+CERN DOCUMENT SERVER SOFTWARE (CDSware) INSTALLATION
+====================================================
+
+Revision: $Id$
+
+About
+=====
+
+This document specifies how to build, customize, and install the CERN
+Document Server Software (CDSware).  (See 'UNINSTALL' file if you look 
+for information on how to uninstall the system!)
+
+Contents
+========
+
+0. Prerequisites
+1. Quick instructions for the impatient CDSware admin
+2. Detailed instructions for the patient CDSware admin
+3. Configuration philosophy explained and elucidated
+
+0. Prerequisites
+================
+
+   Here is the software you need to have around before you
+   start installing CDSware:
+
+     a) Apache server, compiled with PHP and MySQL support:
+          <http://httpd.apache.org/>
+          <http://www.php.net/>
+
+     b) MySQL server (may be on a remote machine), and MySQL client
+        (must be available locally too):
+          <http://mysql.com/>
+
+     c) WML - Website META Language:
+          <http://www.engelschall.com/sw/wml/>
+
+     d) Perl, featuring DBI::mysql module:
+          <http://cpan.org/>
+
+     e) Python, featuring MySQLdb module:
+          <http://python.org/>
+
+   (Note that the configure script checks whether you have all
+   the prerequisite software installed and that it won't let
+   you to continue unless everything is in order.)
+
+1. Quick instructions for the impatient CDSware admin
+==================================================
+
+      $ mysql -h sqlserver.domain.com -u root -p mysql
+          mysql> CREATE DATABASE cdsware;
+          mysql> GRANT ALL PRIVILEGES ON cdsware.* TO cdsware@webserver.domain.com IDENTIFIED BY 'myp1ss';
+      $ cd /usr/local/src/
+      $ wget http://cds.cern.ch/download/cdsware-0.9.tar.gz
+      $ tar xvfz cdsware-0.9.tar.gz
+      $ cd cdsware-0.9
+      $ ./configure --with-htdocsdir=/www/data/ \
+                    --with-cgibindir=/www/cgi-bin/ \
+                    --with-dbutildir=/usr/local/bin/ \
+                    --with-htdocsurl=http://webserver.domain.com/CDSware/ \
+                    --with-cgibinurl=http://webserver.domain.com/cgi-bin/CDSware/ \
+                    --with-dbhost=sqlserver.domain.com \
+                    --with-dbname=cdsware \
+                    --with-dbuser=cdsware \
+                    --with-dbpass=myp1ss 
+      $ vi ./config/config.wml  ## optional, but strongly recommended
+      $ gmake
+      $ gmake create-tables     ## optional
+      $ gmake install
+      $ gmake load-sample-data  ## optional
+      $ gmake clean-sample-data ## optional
+      $ netscape http://webserver.domain.com/CDSware/admin/ ## optional
+
+2. Detailed instructions for the patient CDSware admin
+===================================================
+
+   The CERN Document Server Software (CDSware) uses standard GNU autoconf
+   method to build and install its files.  This means that you proceed
+   as follows:
+
+      $ mysql -h sqlserver.domain.com -u root -p mysql
+          mysql> CREATE DATABASE cdsware;
+          mysql> GRANT ALL PRIVILEGES ON cdsware.* TO cdsware@webserver.domain.com IDENTIFIED BY 'myp1ss';
+        
+          You need to create a dedicated database on your MySQL server
+          that CDSware can use for its purposes.  Please contact your
+          MySQL administrator and ask him to execute the above
+          commands that will create a database called "cdsware", a user
+          called "cdsware" with password "myp1ss", and that will grant
+          all rights on the "cdsware" database to the "cdsware" user.
+
+          (Of course, you are free to choose your own user credentials
+           and database names; the above values were just an example.)
+
+      $ cd /usr/local/src/
+ 
+          Change to a directory where we will configure and build the
+          CDS Software.  (The built files will be installed later on
+          into Apache htdocs and cgi-bin trees.)
+
+      $ wget http://cds.cern.ch/download/cdsware-0.9.tar.gz
+
+          Fetch CDSware package from the CDSware distribution server.
+
+      $ tar xvfz cdsware-0.9.tar.gz
+
+          Untar the distriburion tarball.    
+
+      $ cd cdsware-0.9
+   
+          Go to the source directory.
+
+      $ ./configure --with-htdocsdir=/www/data/ \
+                    --with-cgibindir=/www/cgi-bin/ \
+                    --with-dbutildir=/usr/local/bin/ \
+                    --with-htdocsurl=http://webserver.domain.com/CDSware/ \
+                    --with-cgibinurl=http://webserver.domain.com/cgi-bin/CDSware/ \
+                    --with-dbhost=sqlserver.domain.com \
+                    --with-dbname=cdsware \
+                    --with-dbuser=cdsware \
+                    --with-dbpass=myp1ss 
+
+          Configure essential CDSware parameters, as the installation
+          directories for HTDOCS files, CGI scripts and DB utilities,
+          the URL of the homepage and CGI scripts, and DB user
+          credentials.
+          
+          The first two directories must be within the Apache's htdocs
+          and cgi-bin paths.  The DB utilities may be installed
+          anywhere on the system.  Note that CDSware won't install in any
+          other directories but the three mentioned in the above
+          configure line.
+
+          This configuration step is mandatory, and is referred to as
+          "pre-compile time configuration step a)" in the elucidative
+          explanatory commentary below.  
+
+      $ vi ./config/config.wml  ## optional, but strongly recommended
+
+          Optionally, customize your CDSware installation.  Unlike the
+          installation direcories and other essential parameters that
+          were defined in the previous step, the "config.wml" file
+          enables you to change the CDSware web page look and feel, and
+          otherwise to influence its behaviour and default parameters.
+
+          This configuration step is optional, but stringly
+          recommended.  It is referred to as "compile time
+          configuration step b)" in the elucidative explanatory
+          commentary below.
+
+      $ gmake
+
+          Launch the CDSware build.  All the pages will be pre-created
+          based on the config you have edited in the previous step.
+
+      $ gmake create-tables     ## optional
+
+          Optionally, create CDSware tables on the MySQL server.  You
+          probably want to do this step only once, i.e. only if you
+          have not created any CDSware databases yet.
+
+      $ gmake install
+
+          Install the web pages, cgi scripts and database utilities
+          in the respective directories, as specified earlier by the
+          configure command.
+
+          After this step, you should be able to point your browser to
+          the chosen URL of your local CDSware installation and see it
+          running!
+
+      $ gmake load-sample-data  ## optional
+
+          Optionally, load some sample data to be able to test the
+          CDSware installation.
+
+      $ gmake clean-sample-data ## optional
+
+          Optionally, removes the sample data and prepares the CDSware
+          installation for production purposes.
+
+      $ netscape http://webserver.domain.com/CDSware/admin/ ## optional
+
+          Optionally, do further runtime configuration of the CDSware,
+          like definition of data collections, document types,
+          document formats, word file tables, etc.
+
+          This configuration step is optional, and is referred to as
+          "runtime configuration step c)" in the elucidative
+          explanatory commentary below.  
+   
+3. Configuration philosophy explained and elucidated
+====================================================
+
+   As you could see from the above, the condiguration of the CDSware is
+   threefold: 
+
+      (a) pre-compile time configuration phase 
+          [uses command line options / while doing "configure"]
+      (b) compile time configuration phase 
+          [uses WML / after "configure", while doing "&& make install"]
+      (c) runtime configuration phase 
+          [uses MySQL / after "make install", while doing "netscape http://webserver.domain.com/CDSware/admin/"]
+
+   What is the difference, and why?
+
+      (a) pre-compile time configuration phase 
+          [uses command line options / while doing "configure"]
+
+          This configures essential CDSware parameters that makes your
+          CDSware copy installable and runable.  The essential parameters
+          include: install directories for HTML documents, CGI scripts
+          and DB utilities; the base URL of the HTML documents and CGI
+          scripts; and MySQL user and server credentials.  
+
+          This configuration step uses standard GNU autoconf approach,
+          i.e. you will run the standard "configure" script.  Note
+          that the only arguments that CDSware takes into consideration
+          are CDSware-specific "--with-foo" arguments, see the end of
+          "configure --help" output.
+
+          This configuration step is mandatory.  Without knowing
+          theses essential parameters there is nothing to install and
+          nothing to run.  
+
+          Usually, you do this step only once.
+
+      (b) compile time configuration phase 
+          [uses WML / after "configure", while doing "make && make install"]
+
+          Optionally, you may choose to influence CDSware behaviour, to
+          set up CDSware system name, to choose its default parameters,
+          to change its look and feel, to add your local web pages, etc.  
+
+          This configuration step uses WML, the Website META Language.
+          The most important configuration file is "config/config.wml"
+          that you can edit at your will.  Optionally, if you are an
+          advanced user, you may edit other WML files in the
+          distribution tree.
+
+          After that, when you type "make", the CDSware pages will be
+          pre-generated.  We prefer that this configuration step is
+          done during compile-time and not runtime, because of
+          multiple reasons: (i) the pre-generated pages impose less
+          load on the web and the database server and so they are
+          served faster to the web client; (ii) we use several
+          different languages (PHP, Perl, Python) so that by using
+          compile-time configuration options we can share the same
+          variables across many heterogeneous applications; (iii) use
+          of WML and page templates enables you to easily change
+          anything in the CDSware system, even in its deepest level.
+
+          Usually, if you are changing parameters and/or look and feel
+          of CDSware pages, you do this step several times:
+
+              $ vi config/config.wml
+              $ gmake install
+              $ netscape http://webserver.domain.com/CDSware/
+              $ vi config/config.wml
+              $ gmake install
+              [...]
+
+          until you are satisfied with the result.
+
+      (c) runtime configuration phase 
+          [uses MySQL / after "make install", while doing "netscape http://webserver.domain.com/CDSware/admin/"]
+
+          Optionally, you will most probably want to define specific
+          data collections, to configure submit and search page for those
+          collections, to specify search options and word files to
+          search in, etc.  
+
+          This configuration step uses MySQL configuration tables and
+          is done during the runtime, for your convenience.  It means
+          that after previous configuration step (b), and after
+          successful "gmake install", if you are happy with its result
+          you no longer edit WML files within the CDSware source tree but
+          rather configure "working" CDSware installation via its
+          Administration web interface.
+         
+          Usually, you will do this step many times in the future, to
+          tweak the running installation, to add new collections and
+          data types, etc.
+
+          (Note that if you want to change something "deeper" in a
+           running CDSware installation, such as look and feel of pages,
+           or to add some new pages, then you need to go back to WML
+           source, so you may want to leave your customized copy of
+           the CDSware WML source tree around.)
+
+   We hope that this explains why we have chosen this three-level
+   configuration model, and that you will find it convenient in real
+   life.
+
+Good luck, and thanks for choosing the CERN Document Server Software.  
+  
+       - CDS Development Group
+         <cds.support@cern.ch>
+         <http://cds.cern.ch/>

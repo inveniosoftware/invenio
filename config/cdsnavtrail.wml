@@ -1,0 +1,112 @@
+## $Id$
+## CERN Document Server navigation trail generation.
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+<:
+
+  sub navTrail{  
+
+  # prints out default layout of makeTrial
+
+    $PATH     = $ENV{'PWD'};			# current path
+    $menuitem = "title";	  		# TEXT taken from *.wml file
+
+    @TITLE = &makeTrail($PATH,$ROOT);
+
+    if ($WML_SRC_FILENAME eq "index.wml") {
+        pop @TITLE;
+    }
+
+:>
+$(header)
+<:
+    foreach $title(@TITLE){
+      
+      $filename = $title . "/index.wml";
+      $out = &readWMLTitle($filename,$menuitem);
+      if ($out) {
+:>
+$(prolog)
+<:
+          print " <a href=\"" . $title . "\">$out</a>";
+:>
+$(epilog)
+<:
+      }
+    }
+:>
+$(footer)
+<:
+ }
+
+#<=
+ 
+  sub makeTrail{
+
+  # returns list of relative directories in the trail
+      
+    my ($PATH,$rot) = @_;
+
+    @DIR  = split(/\//,$PATH); 			# PATH values of current directory to be considered
+    @PATH = split(/\//,$rot);			# directory relative to ROOT
+    
+    if ($rot ne '.'){				#
+
+      while (@PATH){				# at each level
+        $trail = pop(@DIR);			# ..get its value
+        $path  = pop(@PATH);			#        
+        push(@TRAIL,$trail);			# ..and build an array of dirnames
+      }
+      @TRAIL = reverse(@TRAIL);
+    }
+    
+    $out = $rot;   
+    push(@OUT,$out);
+
+    foreach $ITEM(@TRAIL){
+      $out = $out . "/" . $ITEM;
+      push(@OUT,$out);
+    }
+    
+    return @OUT ;
+  }
+
+#<=
+
+  sub readWMLTitle($file,$key){
+
+  # read text from file to display in navtrail
+
+    ($file,$key) = @_;
+    if(open(IN,$file)){
+      $done = 0;
+      while($line = <IN>){
+          if((!$done) && (($out) = $line=~/$key="(.*?)"/)){
+          $done = 1;
+        }
+      }
+      close(IN);
+    }
+    else{
+      $out = "";
+    }
+    return($out);
+  }
+
+:>

@@ -1,0 +1,168 @@
+## $Id$
+## CERN Document Server general web page template.
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+## include local config and customization of this CDS installation:
+#include "config.wml"
+#include "configbis.wml"
+
+## include navigation trail and bar definitions:
+#include "cdsnavtrail.wml" \
+   header="<table width=100% class=navtrail><tr><td><small><a href='<HTDOCSURL>'><CDSNAME></a> &gt; " \
+   prolog="" \
+   epilog="&gt;" \
+   footer="$(title)</small></td></tr></table>"
+#include "cdsnavbar.wml"
+
+## HTML header:
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+ <title><CDSNAME>: $(title)</title>
+ <link rev="made" href="mailto:<SUPPORTEMAIL>">
+ <link rel="stylesheet" href="<HTDOCSURL>img/cds.css">
+ <meta name="description" content="$(description)">
+ <meta name="keywords" content="$(keywords)">
+</head>
+<body>
+
+## CDS page header (first common, then local):
+<div class="pageheader">
+<CDSPAGEHEADER>  
+$(cdspageheaderadd)
+</div>
+
+## CDS navigation trail:
+<:    
+    if ('$(navtrail_body)' =~ /\w/) {
+        print '<table width=100% class=navtrail><tr><td>$(navtrail_body)</td></tr></table>';
+    } else {
+        &navTrail();
+    }
+:>
+
+## CDS page content:
+<table border=0 cellspacing=0 cellpadding=0 width=100%>
+ <tr valign=top>
+  <td height=100% width=<CDSPAGESTRIPEWIDTH> align=left class=pagestripeleft>
+   ### Stripe 1: CDS page left stripe
+   <table height=100% width=100% cellspacing=0 cellpadding=0 border=0>
+    <tr valign=top>
+     <td>
+      <table width=100% cellspacing=0 cellpadding=0 border=0>
+       <tr class="pageboxlefttop" valign=top>
+        <td width=100%>
+         ## navbar is by default in the the left top box
+         <navbar:render name=$(navbar_name) select=$(navbar_select)> 
+        </td>
+       <tr>
+         ## first common "left top" CDS page box
+         <: if ('<CDSPAGEBOXLEFTTOP>' =~ /\w/) {
+               print '<tr class="pageboxlefttop" valign=top><td width=100%><CDSPAGEBOXLEFTTOP></td></tr>';
+            }
+         :> 
+         ## then optional "left top" page box that each page can define on its own
+         <: if ('$(cdspageboxlefttopadd)' =~ /\w/) {
+               print '<tr class="pageboxlefttopadd"><td width=100%>$(cdspageboxlefttopadd)</td></tr>';
+            }
+         :> 
+      </table>
+     </td>
+    </tr>
+    <tr valign=bottom>
+     <td>
+      <table width=100% cellspacing=0 cellpadding=0 border=0>       
+         ## first optional "left bottom" page box that each page can define on its own
+         <: if ('$(cdspageboxleftbottomadd)' =~ /\w/) {
+               print '<tr valign=bottom><td class="pageboxleftbottomadd" width=100%>$(cdspageboxleftbottomadd)</td></tr>';
+            }
+         :>              
+         ## then common "left bottom" CDS page box
+         <: if ('<CDSPAGEBOXLEFTBOTTOM>' =~ /\w/) {
+               print '<tr><td class="pageboxleftbottom" width=100%><CDSPAGEBOXLEFTBOTTOM></td></tr>';
+            }
+         :>
+      </table>
+     </td>
+    </tr>
+   </table>
+  </td>
+  ### Stripe 2 prolog: make some space to separate stripes
+  <td class=pagestripemiddle align=left width=5>
+  </td>
+  <td class=pagestripemiddle align=left>
+   ### Stripe 2: CDS page right stripe
+   <h1 class=headline>$(title)</h1>
+   {#BODY#}
+  </td>
+  ### Stripe 2 epilog: make some space to separate stripes
+  <td class=pagestripemiddle align=left width=5>
+  </td>
+  <td height=100% width=<CDSPAGESTRIPEWIDTH> align=right class=pagestriperight>
+   ### Stripe 3: CDS page right stripe
+   <table height=100% width=100%  cellspacing=0 cellpadding=0 border=0>
+    <tr valign=top>
+     <td>
+      <table cellspacing=0 cellpadding=0 border=0 width=100%>
+         ## first common "right top" CDS page box
+         <: if ('<CDSPAGEBOXRIGHTTOP>' =~ /\w/) {
+              print '<tr class="pageboxrighttop" valign=top><td width=100%><CDSPAGEBOXRIGHTTOP></td></tr>';
+            }
+         :> 
+         ## then optional "right top" page box that each page can define on its own
+         <: if ('$(cdspageboxrighttopadd)' =~ /\w/) {
+             print '<tr class="pageboxrighttopadd"><td width=100%>$(cdspageboxrighttopadd)</td></tr>';
+            }
+         :> 
+      </table>
+     </td>
+    </tr>
+    <tr valign = bottom>
+     <td>
+      <table cellspacing=0 cellpadding=0 border=0 width=100%>
+          ## first optional "right bottom" page box that each page can define on its own
+         <: if ('$(cdspageboxrightbottomadd)' =~ /\w/) {
+             print '<tr class="pageboxrightbottomadd" valign=bottom><td width=100%>$(cdspageboxrightbottomadd)</td></tr>';
+            }
+         :>              
+          ## then common "right bottom" CDS page box
+         <: if ('<CDSPAGEBOXRIGHTBOTTOM>' =~ /\w/) {
+             print '<tr class="pageboxrightbottom"><td width=100%><CDSPAGEBOXRIGHTBOTTOM></td></tr>';
+            }
+         :>
+      </table>
+     </td>
+    </tr>
+   </table>
+  </td>
+ </tr>
+</table>
+
+## CDS page footer (first local, then common):
+<div class="pagefooter">
+$(cdspagefooteradd)
+<CDSPAGEFOOTER>
+</div>
+
+## CDS page ends:
+</body>
+</html>
+
+## by default we are in the body:
+{#BODY#:

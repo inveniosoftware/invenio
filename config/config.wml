@@ -1,0 +1,247 @@
+## $Id$
+## This file enables you to configure the parameters of your local CDS
+## installation.  It should be self-explanatory.  Just go ahead and
+## change the values within "define-tag" elements according to your
+## needs.  When done, return to the main CDSware source directory and
+## type 'make'.
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+## #####################
+## About "config.wml" ##
+## #####################
+
+## This file ('config.wml') consists of several relatively independent 
+## configuration parts:
+##   Part 1: CDS internal parameters
+##   Part 2: CDS OAI parameters
+##   Part 3: CDS page elements
+##   Part 4: CDS navigation bar
+## The configuration is done by editing the content of the "define-tag" 
+## WML elements below.  Feel free to edit as many as you need.  When done,
+## return to the main CDSware source directory and type 'make'.  Good luck! :-)
+
+#####################################
+## Part 1: CDS internal parameters ##
+#####################################
+
+## This part defines essential CDSware internal parameters that
+## influence general CDSware behaviour, like the name of the server,
+## the behaviour of alerting engine, etc.
+
+## CDSNAME -- the name of this particular CDSware installation:  
+##  (example: "CERN Document Server")
+<define-tag CDSNAME whitespace=delete>
+Max Planck Gesellschaft eDocument Server
+</define-tag>
+
+## RUNTIMELOGDIR -- the dir of the CDS and OAI runtime log files:
+##  (example: "/log/cdsdev/cdsruntimelogs")
+<define-tag RUNTIMELOGDIR whitespace=delete>
+/log/cdsdev/mpgruntimelogs
+</define-tag>
+
+## ALERTENGINEEMAIL -- the email address from which the alert emails will appear to be send:
+##  (example: "cds.alert@cdsdev.cern.ch")
+<define-tag ALERTENGINEEMAIL whitespace=delete>
+cds.alert@cdsdev.cern.ch
+</define-tag>
+
+## SUPPORTEMAIL -- the email address of the support team for this installation:
+<define-tag SUPPORTEMAIL whitespace=delete>
+cds.support@cern.ch
+</define-tag>
+
+## ALERTMAXNUMDOCS -- the maximum number of document notices that the alert engine sends by email:
+##  (example: "50")
+<define-tag ALERTMAXNUMDOCS whitespace=delete>
+50
+</define-tag>
+
+################################
+## Part 2: CDS OAI parameters ##
+################################
+
+## This part defines OAI parameters for the current installation of
+## CDSware OAI repository.
+
+## OAIIDPREFIX -- OAI identifier prefix:  
+##  (example: "oai:cerncds")
+<define-tag OAIIDPREFIX whitespace=delete>
+oai:mpg
+</define-tag>
+
+## OAISAMPLEIDENTIFIER -- OAI sample identifier:  
+##  (example: "oai:mpg:101")
+<define-tag OAISAMPLEIDENTIFIER whitespace=delete>
+oai:mpg:1001
+</define-tag>
+
+## OAIURLCONTENT -- OAI URL content:  
+##  (example: "http://foo.com/")
+<define-tag OAIURLCONTENT whitespace=delete>
+http://foo.com/
+</define-tag>
+
+## OAIMETADATAPOLICY -- OAI metadata policy:  
+##  (example: "Free and unlimited use by anybody with obligation to refer to original record")
+<define-tag OAIMETADATAPOLICY whitespace=delete>
+Free and unlimited use by anybody with obligation to refer to original record
+</define-tag>
+
+## OAIMETADATAPOLICYURL -- URL of the OAI metadata policy:  
+##  (example: "http://foo.com/")
+<define-tag OAIMETADATAPOLICYURL whitespace=delete>
+http://foo.com/
+</define-tag>
+
+## OAIDATAPOLICY -- OAI data policy:  
+##  (example: "Full content, i.e. preprints may not be harvested by robots")
+<define-tag OAIDATAPOLICY whitespace=delete>
+Full content, i.e. preprints may not be harvested by robots
+</define-tag>
+
+## OAISUBMISSIONPOLICYURL -- OAI data policy:  
+##  (example: "http://foo.com/")
+<define-tag OAISUBMISSIONPOLICYURL whitespace=delete>
+http://foo.com/
+</define-tag>
+
+################################
+## Part 3: CDS page elements ##
+################################
+
+## This part defines CDS portal-like page style and its elements.
+## Here is a schematic overview of all the WML-configurable parts:
+##
+## +-----------------------------------------------------------------------------------------+
+## |                                    CDSPAGEHEADER                                        |
+## |                                  (cdspageheaderadd)                                     |
+## +-------------------------+------------------------------------+--------------------------+
+## |   CDSPAGEBOXLEFTTOP     |                                    |  CDSPAGEBOXRIGHTTOP      |
+## | (cdspageboxlefttopadd)  |                                    | (cdspageboxrighttopadd)  |
+## |                         |                                    |                          |
+## |                         |                                    |                          |
+## |                         |                                    |                          |
+## |                         |                                    |                          |
+## |                         |           main page body           |                          |
+## |                         |                                    |                          |
+## |                         |                                    |                          |
+## |                         |                                    |                          |
+## |                         |                                    |                          |
+## |                         |                                    |                          |
+## |                         |                                    |                          |
+## |(cdspageboxleftbottomadd)|                                    |(cdspageboxrightbottomadd)|
+## |   CDSPAGEBOXLEFTBOTTOM  |                                    |  CDSPAGEBOXRIGHTBOTTOM   |
+## +-------------------------+------------------------------------+--------------------------+
+## |                                  (cdspagefooteradd)                                     |
+## |                                     CDSPAGEFOOTER                                       |
+## +-----------------------------------------------------------------------------------------+
+##
+## Here, (i) the upper case elements like CDSPAGEHEADER are globally
+## defined in this 'config.wml' file, see below.  (ii) the lower case
+## elements in parentheses like "(cdspageheaderadd)" are optional
+## local add-ons that each WML page can define locally and pass to the
+## global WML template as parameters.  (iii) Note also that the style
+## and colours of all these elements is defined in the cascading style
+## sheet in the file 'htdocs/img/cds.css' that you can change at your
+## will too.
+
+## CDSPAGEHEADER -- eventual global HTML page header:
+##  (example: "")
+<define-tag CDSPAGEHEADER>
+<center>
+ <span class=address>The <CDSNAME> website is in active development.  
+ Some of its functionalities may not work fully yet.</span>
+</center>
+</define-tag>
+
+## CDSPAGESTRIPEWIDTH -- width of CDS page stripe (left, right portal stripes)
+##  (example: "120")
+<define-tag CDSPAGESTRIPEWIDTH whitespace=delete>
+120
+</define-tag>
+
+## CDSPAGEBOXLEFTTOP -- eventual global HTML left top box:
+##  (example: "")
+<define-tag CDSPAGEBOXLEFTTOP>
+</define-tag>
+
+## CDSPAGEBOXLEFTBOTTOM -- eventual global HTML left bottom box:
+##  (example: "")
+<define-tag CDSPAGEBOXLEFTBOTTOM>
+</define-tag>
+
+## CDSPAGEBOXRIGHTTOP -- eventual global HTML right top box:
+##  (example: "")
+<define-tag CDSPAGEBOXRIGHTTOP>
+</define-tag>
+
+## CDSPAGEBOXRIGHTBOTTOM -- eventual global HTML right bottom box:
+##  (example: "")
+<define-tag CDSPAGEBOXRIGHTBOTTOM>
+</define-tag>
+
+## CDSPAGEFOOTER -- eventual global HTML page footer:
+##  (example: "")
+<define-tag CDSPAGEFOOTER>
+  <address>
+  <hr>
+  <table cellpadding=0 border=0 cellspacing=0 width="100%"  class="pagefooter">
+  <tr>
+  <td class="address">
+  <CDSNAME>
+   -
+  <a class=note href="<HTDOCSURL>">Search</a>
+   -
+  <a class=note href="<HTDOCSURL>submit/">Submit</a>
+   -
+  <a class=note href="<HTDOCSURL>docs/">Help</a>
+   -
+  <a class=note href="<HTDOCSURL>docs/">Sitemap</a>.
+  </td>
+  <td align=right class="address">
+  URL: <? echo "&lt;http://" . $HTTP_HOST . $PHP_SELF . "&gt;."?>
+  </td>
+  </tr>
+  <tr>
+  <td class="address">
+  Powered by the <a class=note href="http://cdsware.cern.ch/">CERN Document Server Software</a>.
+  </td>
+  <td align=right class="address">
+  Revised <: print `date +"%d %b %Y %H:%M:%S %Z"`; :>
+  by &lt;<a class=note href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a>&gt;.
+  </td>
+  </tr>
+  </table>
+  </address>
+</define-tag>
+
+################################
+## Part 4: CDS navigation bar ##
+################################
+
+## The navigation bar and sub-bars are defined in a separate
+## "cdsnavbar.wml" file.  You may want to modify it now, if you
+## really know what you are doing. :-)
+
+## And this is the end of "config.wml" WML configuration phase.  Now
+## please return to the main CDS source directory and type 'make'.
+## (Note: if you have bravely edited the "cdsnavbar.wml" file too,
+## then please do "make clean" before doing "make".)
+
