@@ -196,7 +196,7 @@ def email_notify(alert, records, argstr):
     time = strftime("%d-%m-%Y")
 
     msg += '\n' + wrap('alert name: %s' % alert[5])
-    msg += wrap('pattern: \'%s\'' % pattern)
+    msg += wrap('pattern: %s' % pattern)
     if catalogue:
         msg += wrap('%s: %s' % (catword, catalogue))
     msg += wrap('frequency: %s ' % format_frequency(alert[3]))
