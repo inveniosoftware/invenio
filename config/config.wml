@@ -212,7 +212,7 @@ cds.support@cern.ch
   <td rowspan="2" class="headerboxbodylogo">
    <!--CDSNAMEINTL-->
   </td>
-  <td colspan="2" align="right" class="userinfoboxbody">
+  <td align="right" class="userinfoboxbody">
    <!--USERINFOBOX-->
   </td>
  </tr>
@@ -246,9 +246,6 @@ cds.support@cern.ch
        </td>
      </tr>
    </table>
-  </td>
-  <td align="right" class="langinfoboxbody">
-   <!--LANGUAGESELECTIONBOX-->
   </td>
  </tr>
 </table>
@@ -290,21 +287,19 @@ cds.support@cern.ch
 
 ## CDSPAGEFOOTER -- eventual global HTML page footer:
 ##  (example: "")
-<define-tag CDSPAGEFOOTER>
+<define-tag CDSPAGEFOOTER>  
   <table cellpadding=0 border=0 cellspacing=0 width="100%" class="footerbox">
-  <tr>
-  <td>
+  <tr valign="top">
+  <td valign="top">
+  <!--LANGUAGESELECTIONBOX-->
+  <br>
   <!--CDSNAMEINTL-->&nbsp;::&nbsp;<a class=note href="<WEBURL>/?ln=<!--LN-->"><!--MSGSEARCH--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/submit.py?ln=<!--LN-->"><!--MSGSUBMIT--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/help/index.<!--LN-->.html"><!--MSGHELP--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/youraccount.py/display?ln=<!--LN-->"><!--MSGPERSONALIZE--></a>
-  </td>
-  <td align=right>
-  <!--LASTUPDATED-->
-  </td>
-  </tr>
-  <tr>
-  <td>
+  <br>
   <!--POWEREDBY--> <a class=note href="http://cdsware.cern.ch/">CDSware</a> v<VERSION>
   </td>
-  <td align=right>
+  <td align="right" valign="top">
+  <!--LASTUPDATED-->
+  <br>
   <!--MAINTAINEDBY--> <a class=note href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a>
   </td>
   </tr>
