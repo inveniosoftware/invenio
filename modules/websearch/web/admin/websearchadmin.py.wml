@@ -55,11 +55,11 @@ def index(req):
     """Main entry point to WebSearch Admin."""
 
     __auth_realm__ = "restricted area"
-
-    def __auth__(req, user, password):
+    def __auth__(req, user, password): # FIXME: use Mikael's stuff here instead
         """Is user authorized to proceed with the request?"""
         import sys 
         sys.path.append("<LIBDIR>/python")
+        from cdsware.config import supportemail
         from cdsware.webuser import auth_apache_user_p
         if user != supportemail:
             return 0
