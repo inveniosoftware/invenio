@@ -19,7 +19,7 @@
 
 docdir = $(WEBDIR)/help/search
 
-doc_DATA=tips.html index.html
+doc_DATA=tips.html index.html internals.html
 
 EXTRA_DIST = $(wildcard *.wml)
 
