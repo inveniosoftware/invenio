@@ -1,3 +1,4 @@
+
 /* CDSware style sheet */
 /* $Id$ */
 body {
@@ -122,7 +123,7 @@ a.note:hover {
    background: transparent;
 }
 .navtrailbox {
-   color: #666;
+   color: #36c;
    background: transparent;
    padding: 0px;
    border-spacing: 0px;
@@ -130,42 +131,26 @@ a.note:hover {
    font-size: x-small;
 }
 .navtrailboxbody {
-   color: #666;
+   color: #36c;
    padding: 0px;
    border-spacing: 0px;
-   background: #f1f1f1;
+   background: transparent;
    font-size: x-small;
 }
 a.navtrail:link {
-   color: #666;
+   color: #36c;
    background: transparent;
 }
 a.navtrail:visited {
-   color: #666;
+   color: #36c;
    background: transparent;
 }
 a.navtrail:active {
-   color: #666;
+   color: #36c;
    background: transparent;
 }
 a.navtrail:hover {
-   color: #666;
-   background: transparent;
-}
-a.userinfobox:link {
-   color: #060;
-   background: transparent;
-}
-a.userinfobox:visited {
-   color: #060;
-   background: transparent;
-}
-a.userinfobox:active {
-   color: #060;
-   background: transparent;
-}
-a.userinfobox:hover {
-   color: #060;
+   color: #36c;
    background: transparent;
 }
 .info {
@@ -176,13 +161,27 @@ a.userinfobox:hover {
    color: #999;
    background: transparent;
 }
+.pagebody {
+    color: #000;
+    background: transparent;
+}
+.pagestriperight {
+   color: #000;
+   background: #fff;
+   width: 150px;
+}
 .pagefooter {
    color: #999;
    background: transparent;
+   font-size: x-small;
+   margin-top: 20px;
 }
-.pagestripeleft {
-   color: #000;
-   background: #fff;
+.footerbox {
+   color: #999;
+   background: transparent;
+   font-size: x-small;
+   margin-top: 20px;
+   border-top: 1px solid #999;
 }
 .pagestripemiddle {
    color: #000;
@@ -191,6 +190,8 @@ a.userinfobox:hover {
 .pagestriperight {
    color: #000;
    background: #fff;
+   font-size: x-small;
+   padding-left: 3px;
 }
 .pageboxlefttop {
    color: #000;
@@ -210,28 +211,25 @@ a.userinfobox:hover {
 }
 .pageboxrighttop {
    color: #000;
-   background: #dee;
-   border-left: 1px dotted #999999;
+   background: transparent;
 }
 .pageboxrighttopadd {
    color: #000;
-   background: #dee;
-   border-left: 1px dotted #999999;
+   background: transparent;
 }
 .pageboxrightbottom {
    color: #000;
-   background: #dee;
-   border-left: 1px dotted #999999;
+   background: transparent;
 }
 .pageboxrightbottomadd {
    color: #000;
-   background: #dee;
-   border-left: 1px dotted #999999;
+   background: transparent;
 }
 .searchbox {
    color: #000;
    background: transparent;
    padding: 1px;
+   margin-top: 5px;
    margin-bottom: 5px;
    border-spacing: 0px;
    border-collapse: collapse;
@@ -250,16 +248,15 @@ a.userinfobox:hover {
    color: #000;
    background: transparent;
    padding: 3px;
-   font-size: small;
+   font-size: normal;
 ;}
 .portalbox {
    color: #000;
    background: transparent;
-   padding: 0px;
    margin-bottom: 15px;
-   border-spacing: 0px;
+   border-spacing: 10px;
    border-collapse: collapse;
-   border-top: 1px solid #aabbbb; 
+   border-top: 1px solid #aabbbb;
    font-size: x-small;
 }
 .portalboxheader {
@@ -277,18 +274,17 @@ a.userinfobox:hover {
 }
 .googlebox {
    color: #000;
-   background: #ddeeee;
-   padding: 1px;
+   background: transparent;
+   margin-top: 5px;
    margin-bottom: 5px;
    border-spacing: 0px;
    border-collapse: collapse;
-   border-top: 1px solid #999999; 
+   border-top: 1px solid #999999;
+   width: 150px;
 }
 .googleboxheader {
    color: #000;
    background: #f1f1f1;
-   padding: 3px;
-   border-spacing: 0px;
    border-bottom: 1px solid #999999;
    font-size: x-small;
    text-align: left;
@@ -296,7 +292,6 @@ a.userinfobox:hover {
 .googleboxbody {
    color: #000;
    background: transparent;
-   padding: 3px;
    font-size: x-small;
 ;}
 .formbutton {
@@ -324,7 +319,7 @@ a.userinfobox:hover {
    color: #000;
    background: #ffe;
    padding: 0px;
-   margin-bottom: 15px;
+   margin-top: 15px;
    border-spacing: 0px;
    border-collapse: collapse;
    border-top: 1px solid #fc0; 
@@ -350,8 +345,39 @@ a.userinfobox:hover {
 }
 .userinfobox {
    color: #060;
+   background: transparent;
+   font-size: x-small;
+   width: 150px;
+   margin-bottom: 15px;
+}
+.userinfoboxheader {
+   color: #060;
    background: #dee;
    font-size: x-small;
+   font-weight: bold;
+   border-top: 1px solid #060; 
+   border-bottom: 1px solid #060; 
+}
+.userinfoboxbody {
+   color: #060;
+   background: transparent;
+   font-size: x-small;
+}
+a.userinfo:link {
+   color: #060;
+   background: transparent;
+}
+a.userinfo:visited {
+   color: #060;
+   background: transparent;
+}
+a.userinfo:active {
+   color: #060;
+   background: transparent;
+}
+a.userinfo:hover {
+   color: #060;
+   background: transparent;
 }
 .header {
    color: #000;
