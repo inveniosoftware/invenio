@@ -6,7 +6,7 @@ INSERT INTO collection VALUES (3,'Books','Books',NULL,'collection:BOOK',NULL,NUL
 INSERT INTO collection VALUES (4,'Theses','Theses',NULL,'collection:THESIS',NULL,NULL,'theses');
 INSERT INTO collection VALUES (5,'Reports','Reports',NULL,'collection:REPORT',NULL,NULL,NULL);
 INSERT INTO collection VALUES (6,'Articles','Article',NULL,'collection:ARTICLE',NULL,NULL,NULL);
-INSERT INTO collection VALUES (8,'Pictures','Pictures',NULL,'collection:PICTURE',NULL,NULL,'pictures');
+INSERT INTO collection VALUES (8,'Pictures','Pictures',NULL,'collection:PICTURE',NULL,NULL,NULL);
 INSERT INTO collection VALUES (9,'CERN Divisions','CERN Divisions',NULL,NULL,NULL,NULL,NULL);
 INSERT INTO collection VALUES (10,'CERN Experiments','CERN Experiments',NULL,NULL,NULL,NULL,NULL);
 INSERT INTO collection VALUES (11,'Theoretical Physics (TH)','Theoretical Physics (TH)',NULL,'division:TH',NULL,NULL,NULL);
