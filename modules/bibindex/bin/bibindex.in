@@ -275,7 +275,6 @@ def get_fulltext_urls_from_html_page(htmlpagebody):
         if match:
             out.append([ext,match.group()])
         else: # FIXME: workaround for getfile, should use bibdoc tables
-            print ext
             expr_getfile = sre.compile(r"\"(http://.*getfile\.py\?.*format=" + ext + r"&version=.*)\"")
             match =  expr_getfile.search(htmlpagebody)
             if match:
