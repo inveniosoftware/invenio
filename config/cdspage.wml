@@ -38,6 +38,7 @@
  <title><CDSNAME>: $(title)</title>
  <link rev="made" href="mailto:<SUPPORTEMAIL>">
  <link rel="stylesheet" href="<WEBURL>/img/cds.css">
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
  <meta name="description" content="$(description)">
  <meta name="keywords" content="$(keywords)">
 </head>
@@ -67,8 +68,7 @@ $(cdspageheaderadd)
         &navTrail();
     }
 :>
-   <br>
-   <strong class=headline><span class="h1">$(title)</span></strong>
+   <h1 class="headline">$(title)</h1>
    <p>
    {#BODY#}
 </td>

@@ -142,41 +142,50 @@ cds.support@cern.ch
 ## CDSPAGEHEADER -- eventual global HTML page header:
 ##  (example: "")
 <define-tag CDSPAGEHEADER>
-<table border=0 cellspacing=0 cellpadding=0 style="border-bottom: 2px solid #3366cc;">
- <tr valign="bottom">
-  <td>
-   <span class=headline><big><strong><CDSNAME></strong></big></span>
+<table border="0" cellpadding="0" cellspacing="0" class="headerbox">
+ <tr>
+  <td class="headerboxbodylogo">
+   <CDSNAME>
   </td>
-  <td>
-   <table border=0 cellspacing=0 cellpadding=0>
+  <td class="headerboxbody" valign="bottom">
+   <table border="0" cellpadding="0" cellspacing="0" class="headermodulebox">
      <tr>
-       <td width=45>
+       <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
-       <td width=75 class=headerselected align=center valign=bottom>
-             <small><strong><a class=header href="<WEBURL>">SEARCH</a></strong></small>
-       </td>
-       <td width=15>
+       <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
-       <td width=75 class=headerselected align=center valign=bottom>
-             <small><strong><a class=header href="<WEBURL>/submit/">SUBMIT</a></strong></small>
+       <td class="headermoduleboxbodyselected">
+             <a class=headerselected href="<WEBURL>">SEARCH</a>
        </td>
-       <td width=15>
+       <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
-       <td width=75 class=headerselected align=center valign=bottom>
-             <small><strong><a class=header href="<WEBURL>/help/">HELP</a></strong></small>
+       <td class="headermoduleboxbody">
+             <a class=header href="<WEBURL>/submit/">SUBMIT</a>
        </td>
-       <td width=30>
+       <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
-       <!--USERINFOBOX-->
-       <td width=30>
+       <td class="headermoduleboxbody">
+             <a class=header href="<WEBURL>/help/">HELP</a>
+       </td>
+       <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
-       </tr>
+     </tr>
    </table>
+  </td>
+ </tr>
+</table>
+<table border=0 cellspacing=0 cellpadding=0 class="navtrailbox" width="100%">
+ <tr valign="top">
+  <td align="left" class="navtrailboxbody">
+   <!--NAVTRAILBOX-->
+  </td>
+  <td align="right" class="userinfoboxbody">
+   <!--USERINFOBOX-->
   </td>
  </tr>
 </table>
