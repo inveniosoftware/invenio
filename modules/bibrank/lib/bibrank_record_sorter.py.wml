@@ -329,10 +329,10 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     if result[0]:
         results_similar_recIDs = map(lambda x: x[0], result[0])
         results_similar_relevances = map(lambda x: x[1], result[0])
-        result[0] = (results_similar_recIDs, results_similar_relevances)
+        result = ((results_similar_recIDs, results_similar_relevances),result[1],result[2], result[3])
     else:
-        result[0] = (None, None)
-
+        result = ((None, None),result[1],result[2], result[3])
+   
     if verbose > 0:
         print string.replace(voutput, "<br>", "\n")
     return result
