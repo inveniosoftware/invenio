@@ -291,16 +291,10 @@ cds.support@cern.ch
   <table cellpadding=0 border=0 cellspacing=0 width="100%" class="footerbox">
   <tr valign="top">
   <td valign="top">
-  <!--LANGUAGESELECTIONBOX-->
-  <br>
-  <!--CDSNAMEINTL-->&nbsp;::&nbsp;<a class=note href="<WEBURL>/?ln=<!--LN-->"><!--MSGSEARCH--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/submit.py?ln=<!--LN-->"><!--MSGSUBMIT--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/help/index.<!--LN-->.html"><!--MSGHELP--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/youraccount.py/display?ln=<!--LN-->"><!--MSGPERSONALIZE--></a>
-  <br>
-  <!--POWEREDBY--> <a class=note href="http://cdsware.cern.ch/">CDSware</a> v<VERSION>
+  <!--LANGUAGESELECTIONBOX--><br><!--CDSNAMEINTL-->&nbsp;::&nbsp;<a class=note href="<WEBURL>/?ln=<!--LN-->"><!--MSGSEARCH--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/submit.py?ln=<!--LN-->"><!--MSGSUBMIT--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/help/index.<!--LN-->.html"><!--MSGHELP--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/youraccount.py/display?ln=<!--LN-->"><!--MSGPERSONALIZE--></a><br><!--POWEREDBY--> <a class=note href="http://cdsware.cern.ch/">CDSware</a> v<VERSION>
   </td>
   <td align="right" valign="top">
-  <!--LASTUPDATED-->
-  <br>
-  <!--MAINTAINEDBY--> <a class=note href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a>
+  <!--LASTUPDATED--><br><!--MAINTAINEDBY--> <a class=note href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a>
   </td>
   </tr>
   </table>
