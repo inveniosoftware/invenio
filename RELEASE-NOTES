@@ -1,104 +1,193 @@
 --------------------------------------------------------------------
-CDSware v0.3.3 (DEVELOPMENT) is released
-July 16, 2004
+CDSware v0.5.0 is released
+December 17, 2004
 http://cdsware.cern.ch/news/
 --------------------------------------------------------------------
 
-CDSware v0.3.3 (DEVELOPMENT) was released on July 16th, 2004.
+CDSware v0.5.0 was released on December 17th, 2004.
+
+This release is recommended to all users of prior DEVELOPMENT versions
+(v0.1.x and v0.3.x), as well as old STABLE v0.0.9 version that becomes
+officially deprecated as of this release.
+
 
 What's new:
 -----------
 
- *) new international phrases, collection and field names; thanks to
-    Guido, Flavio, Tullio
+ *) new rank engine, featuring word similarity rank method and the
+    journal impact factor rank demo (BibRank)
 
- *) collection international names are now respected by the search
-    engine and interfaces (WebSearch)
+ *) search engine includes ranking option (WebSearch) 
 
- *) field international names are now respected by the search
-    engine and interfaces (WebSearch)
+ *) record similarity search based on word frequency (WebSearch,
+    BibRank)
 
- *) when no hits found in a given collection, do not display all
-    public hits straight away but only link to them (WebSearch)
+ *) stopwords possibility when ranking and indexing (BibRank, BibIndex)
 
- *) records marked as DELETED aren't shown anymore in XML MARC and
-    other formats (WebSearch)
+ *) stemming possibility when ranking and indexing (BibRank, BibIndex)
 
- *) detailed record page now features record creation and modification
-    times (WebSearch)
+ *) search engine boolean query processing stages improved (WebSearch)
 
- *) improved XML MARC parsing and cumulative record count in case of
-    uploading of several files in one go (BibUpload)
+ *) search engine accent matching in phrase searches (WebSearch)
 
- *) personal `your admin activities' page introduced (WebSession)
+ *) regular expression searching mode introduced into the Simple
+    Search interface too (WebSearch)
 
- *) added option to fulltext-index local files only (BibIndex)
+ *) Search Tips split into a brief Search Tips page and detailed
+    Search Guide page (WebSearch)
 
- *) initial release of the BibIndex Admin interface (BibIndex)
+ *) improvements to the ``Try your search on'' hints (WebSearch)
 
- *) checking of mandatory selection box definitions (WebSubmit)
+ *) author search hints introduced (WebSearch)
 
- *) WebSearch Admin interface cleanup (WebSearch)
+ *) search interface respects title prologue/epilogue portalboxes
+    (WebSearch)
 
- *) introducing common test suite infrastructure (WebSearch, BibIndex,
-    MiscUtil, WebHelp)
+ *) improvements to admin interfaces (WebSearch, BibIndex, BibRank,
+    WebAccess)
 
- *) fixed accent and link problems for photo demo records (MiscUtil)
+ *) basket item ordering problem fixed (WebBasket)
 
- *) conference title exported via OAI XML DC (BibHarvest)
+ *) access error messages introduced (WebAccess and its clients)
 
- *) enabled building out of source directory; thanks to Frederic
+ *) new account management to enable/disable guest users and
+    automatic vs to-be-approved account registration (WebAccess)
+
+ *) possibility for temporary read-only access to, and closure of, the
+    site; useful for backups (WebAccess and its clients)
+
+ *) possibility for external authentication login methods (WebAccess)
+
+ *) new XML MARC handling library (BibEdit)
+
+ *) when uploading, bad XML records are marked as errors (BibUpload)
+
+ *) improvements to the submission engine and its admin interface,
+    thanks to Tiberiu Dondera (WebSubmit)
+
+ *) preparations for electronic mail submission feature, not yet
+    functional (ElmSubmit)
+
+ *) added example on MARC usage at CERN (WebHelp)
+
+ *) legacy compatibility with MySQL 3.23.x assured (BibUpload)
+
+ *) legacy compatibility with Python 2.2 assured (WebSubmit)
+
+ *) test suite additions and corrections (BibRank, BibIndex,
+    WebSearch, BibEdit)
+
+ *) French translation fixes, thanks to Eric Grand
+
+ *) minor Czech and Slovak translation cleanup
+
 
 Download:
 ---------
 
-  <http://cdsware.cern.ch/download/cdsware-0.3.3.tar.gz>
-  <http://cdsware.cern.ch/download/cdsware-0.3.3.tar.gz.md5>
-  <http://cdsware.cern.ch/download/cdsware-0.3.3.tar.gz.sig>
+  <http://cdsware.cern.ch/download/cdsware-0.5.0.tar.gz>
+  <http://cdsware.cern.ch/download/cdsware-0.5.0.tar.gz.md5>
+  <http://cdsware.cern.ch/download/cdsware-0.5.0.tar.gz.sig>
 
-Notes:
-------
 
- *) This DEVELOPMENT release is recommended to all users of prior
-    v0.1.x and v0.3.x versions.  Users of the STABLE v0.0.9 release
-    are invited to test it and let us know their comments.
+Upgrade notes:
+--------------
 
- *) Due to popular demand, search engine behaviour has changed on
-    stage 4-2-1 in the following way: when no hits are found in the
-    collection selected by the user, but there are some hits in other
-    public collections, then do not show these hits anymore to the end
-    user, but rather propose link to them only.  (Often users were
-    confused as to why their collection choice wasn't respected.)
+To upgrade from CDSware v0.3.3, please follow about these steps:
 
- *) This release contains new international names for fields such as
-    author, title.  If you haven't configured previously your fields
-    and their international field names manually, then you may want to
-    insert them now via commands like:
+   - Stop bibsched daemon and all submission procedures and write
+     operations.  For example, you may want to disable the site
+     completely.  Then backup your current database and CDSware files
+     in the installation directory.
 
-        $ echo "SELECT count(*) FROM fieldname;" | dbexec ## check if output is 0
-        $ grep "INTO fieldname V" ./modules/miscutil/sql/tabfill.sql | dbexec
+   - Untar new sources and rerun configure --prefix=... with old
+     parameters.
 
-    See the content of the concerned file for details.  You may also
-    configure them manually via BibIndex Web Admin interface.
+   - Merge your old config.wml with the new one.  There are new
+     options in the new config.wml, so it is not sufficient just to
+     copy over your old config file.  However, the new config file
+     only adds new options, so merging of your old file should be very
+     straightforward.
+
+   - Run make. 
+
+   - Update your table structure with new definitions:
+
+       $ make update-v0.3.3-tables
+
+     If you are upgrading from previous releases, you have to run
+     previous update-v0.3.0-tables and friends respectively first.
+     (See Makefile.am for what these commands do.)
+
+   - Update your table content with new definitions:
+
+       . To activate ranking by word similarity, you have to run SQL
+         statements related to rnkMETHOD tables, e.g. like this:
+       
+             $ echo "TRUNCATE rnkMETHOD; TRUNCATE rnkMETHODDATA;" | \
+               ./modules/miscutil/bin/dbexec
+             $ echo "TRUNCATE rnkMETHODNAME; TRUNCATE collection_rnkMETHOD;" | \
+               ./modules/miscutil/bin/dbexec
+             $ grep rnkMETHOD modules/miscutil/sql/tabfill.sql | \
+               ./modules/miscutil/bin/dbexec
+
+         or you can configure ranking methods via BibRank Admin
+         interface.
+
+       . The EXTRACT_EMAIL BibFormat UDF function has been fixed
+         (thanks to Guido Pelzer) and you are advised to delete the
+         old definition and enter the new one, e.g. like this:
+
+             $ echo "DELETE FROM flxUDFS WHERE fname='EXTRACT_EMAIL';" | \
+               ./modules/miscutil/bin/dbexec
+             $ grep "EXTRACT_EMAIL.*if" modules/miscutil/sql/tabfill.sql | \
+               ./modules/miscutil/bin/dbexec
+
+     By doing this your table definitions should be fully up to date.
+
+   - Run make install and restart your Apache server.  Restart
+     bibsched in the auto mode.  If you activated some ranking
+     methods, you have to tell bibsched to execute bibrank daemon
+     periodically, for example:
+
+        $ bibrank -s1h
+
+     (See also ``HOWTO Run..'' documentation in the Admin Area.)
+
+   - You are done. Check that everything is running fine.
+
 
 Known problems:
 ---------------
+
+ *) Several modules of the this release (e.g. the mail submission
+    system) are experimental and not yet activated.  You may have a
+    peek at what is planned, but please do not rely on them.
 
  *) The admin-level functionality for several modules is not fully
     developed yet.
 
  *) Fulltext file storage management is not yet linked with the
     metadata management.
+ 
+ *) ElmSubmit module not yet activated.
+
 
 What's next:
 ------------
 
  *) Fixing the problems mentioned above.
 
- *) Introducing `find similar' and `sort by relevance' functionalities
-    into the search engine.
-
  *) Developing BibIndex for better phrase indexing and browsing.
 
  *) Developing clearer relations and dependencies between metadata
     records and fulltext files.
+
+ *) Automatic reference extraction program. 
+
+ *) Citation search and ranking.
+
+ *) Download statistics and ranking.
+
+
+- end of file -
