@@ -2113,6 +2113,15 @@ CREATE TABLE IF NOT EXISTS rnkWORD01R (
   PRIMARY KEY  (id_bibrec,type)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS rnkPAGEVIEWS (
+  id_bibrec mediumint(8) unsigned default NULL,
+  id_user int(15) unsigned default '0',
+  client_host int(10) unsigned default NULL,
+  view_time datetime default '0000-00-00 00:00:00',
+  KEY view_time (view_time),
+  KEY id_bibrec (id_bibrec)
+) TYPE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS rnkDOWNLOADS (
   id_bibrec mediumint(8) unsigned default NULL,
   download_time datetime default '0000-00-00 00:00:00',
