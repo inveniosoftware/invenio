@@ -2800,7 +2800,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         recidb = idb
     # TODO deduce passed search limiting criterias (if applicable)
     pl = "" # no limits by default
-    if action != "Browse" and req: # we do not want to add options while browsing or while calling via command-line
+    if action != "Browse" and req and req.args: # we do not want to add options while browsing or while calling via command-line
         fieldargs = cgi.parse_qs(req.args)
         for fieldcode in get_fieldcodes():
             if fieldargs.has_key(fieldcode):
