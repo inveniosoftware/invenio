@@ -78,15 +78,24 @@ def encode_for_xml(s):
     s = string.replace(s, '<', '&lt;')
     return s
 
+def escape_space(s):
+    "Encode special chars in string for URL-compliancy."
+
+    s = string.replace(s, ' ', '%20')
+
 def encode_for_url(s):
     "Encode special chars in string for URL-compliancy."
 
+    s = string.replace(s, '%', '%25')
     s = string.replace(s, ' ', '%20')
     s = string.replace(s, '?', '%3F')
     s = string.replace(s, '#', '%23')
     s = string.replace(s, '=', '%3D')
     s = string.replace(s, '&', '%26')
-    s = string.replace(s, '%', '%25')
+    s = string.replace(s, '/', '%2F')
+    s = string.replace(s, ':', '%3A')
+    s = string.replace(s, ';', '%3B')
+    s = string.replace(s, '+', '%2B')
 
     return s
 
@@ -352,7 +361,7 @@ def print_record(sysno, format='marcxml'):
             out =  "%s         <subject>%s</subject>\n" % (out, encode_for_xml(f))
 
         for f in get_field(sysno, "8564_u"):
-            out =  "%s         <identifier>%s</identifier>\n" % (out, encode_for_xml(encode_for_url(f)))
+            out =  "%s         <identifier>%s</identifier>\n" % (out, encode_for_xml(escape_space(f)))
         
         for f in get_field(sysno, "520__a"):
             out = "%s         <description>%s</description>\n" % (out, encode_for_xml(f))
@@ -397,7 +406,7 @@ def OAIListMetadataFormats(args):
 
         else:
 
-            out = out + oai_error("badArgument","invalid record Identifier")
+            out = out + oai_error("idDoesNotExist","invalid record Identifier")
             out = oai_error_header(args, "ListMetadataFormats") + out + oai_error_footer("ListMetadataFormats")
             return out
 
@@ -421,7 +430,7 @@ def OAIListRecords(args):
     "Generates response to OAIListRecords verb."
 
 </protect>
-    oai_rt_expire        = <OAIEXPIRE> 
+    oai_rt_expire        = <OAIEXPIRE>
     nb_records_in_resume = <OAILOAD>
 <protect>
 
@@ -516,11 +525,11 @@ def OAIGetRecord(args):
     out = ""
     sysno = OAIGetSysno(arg['identifier'])
 
-    if record_exists(sysno): 
+    if record_exists(sysno):
         datestamp = get_modification_date(sysno)
         out = out + print_record(sysno, arg['metadataPrefix'])
     else:
-        out = out + oai_error("badArgument","invalid record Identifier")
+        out = out + oai_error("idDoesNotExist","invalid record Identifier")
         out = oai_error_header(args, "GetRecord") + out + oai_error_footer("GetRecord")
         return out
 
@@ -555,7 +564,7 @@ def OAIListIdentifiers(args):
         sysnos = OAICacheOut(arg['resumptionToken'])
     else:
         sysnos = OAIGetSysnoList(arg['set'], arg['from'], arg['until'])
- 
+
     if len(sysnos) == 0: # noRecordsMatch error
         out = out + oai_error("noRecordsMatch","no records correspond to the request")
         out = oai_error_header(args, "ListIdentifiers") + out + oai_error_footer("ListIdentifiers")
@@ -815,7 +824,7 @@ def check_args(arguments):
 #
     if arguments['from']!="" and arguments['from']!="":
         from_length = len(arguments['from'])
-        if check_date(arguments['from'],"T00:00:00Z") == "": 
+        if check_date(arguments['from'],"T00:00:00Z") == "":
             out = out + oai_error("badArgument","Bad datestamp format in from")
     else:
         from_length = 0
