@@ -117,12 +117,13 @@ def send_email(req,p_email=None):
                     uid=uid,
                     lastupdated=__lastupdated__)
 	
-    fromaddr = "From: <ALERTENGINEEMAIL>"
+    fromaddr = "From: %s" % supportemail
     toaddrs  = "To: " + p_email
     to = toaddrs + "\n"
-    sub = "Subject:Registration for cds.cern.ch\n\n"
-    body="""\nHello \n\nThe password for user"%s"\nis "%s" (without quotes).
-            """ %(p_email,passw)
+    sub = "Subject: Credentials for %s\n\n" % cdsname
+    body = "Here are your user credentials for %s:\n\n" % cdsname
+    body += "   username: %s\n   password: %s\n\n" % (p_email, passw)
+    body += "You can login at %s/youraccount.py/login" % weburl
     msg = to + sub + body	
 
     server = smtplib.SMTP('localhost')
