@@ -1067,10 +1067,10 @@ complex.</span></p>
  <o:lock v:ext="edit" aspectratio="t"/>
 </v:shapetype><v:shape id="_x0000_i1025" type="#_x0000_t75" style='width:397.5pt;
  height:156pt'>
- <v:imagedata src="./BibFormatAdminGuide001.gif"
+ <v:imagedata src="./guide001.gif"
   o:title="Image2"/>
 </v:shape><![endif]--><![if !vml]><img border=0 width=530 height=208
-src="./BibFormatAdminGuide001.gif" v:shapes="_x0000_i1025"><![endif]></span></p>
+src="./guide001.gif" v:shapes="_x0000_i1025"><![endif]></span></p>
 
 <p class=figuremarker><span style='mso-bookmark:aboutFlexelink'>[Fig. 0]</span></p>
 
@@ -1207,10 +1207,10 @@ describes all this explanation. </span></p>
 
 <p class=Texto style='text-indent:0cm'><span style='mso-bookmark:howItWorks'><!--[if gte vml 1]><v:shape
  id="_x0000_i1026" type="#_x0000_t75" style='width:477pt;height:237.75pt'>
- <v:imagedata src="BibFormatAdminGuide002.png"
+ <v:imagedata src="guide002.png"
   o:title="Image3"/>
 </v:shape><![endif]--><![if !vml]><img border=0 width=636 height=317
-src="./BibFormatAdminGuide003.jpg" v:shapes="_x0000_i1026"><![endif]></span></p>
+src="./guide003.jpg" v:shapes="_x0000_i1026"><![endif]></span></p>
 
 <p class=figuremarker><span style='mso-bookmark:howItWorks'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
 
@@ -1389,10 +1389,10 @@ behavior with any input that can be mapped to <i>internal variables</i>.</p>
 
 <p class=Texto><!--[if gte vml 1]><v:shape id="_x0000_i1027" type="#_x0000_t75"
  style='width:455.25pt;height:153.75pt'>
- <v:imagedata src="./BibFormatAdminGuide004.gif"
+ <v:imagedata src="./guide004.gif"
   o:title="Image4"/>
 </v:shape><![endif]--><![if !vml]><img border=0 width=607 height=205
-src="./BibFormatAdminGuide004.gif" v:shapes="_x0000_i1027"><![endif]></p>
+src="./guide004.gif" v:shapes="_x0000_i1027"><![endif]></p>
 
 <p class=figuremarker>[Fig. 4]</p>
 
