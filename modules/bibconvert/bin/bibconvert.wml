@@ -441,8 +441,8 @@ def parse_input_data_fx(source_tpl):
         line = sys.stdin.readline()
         if (line == ""):
             count = count + 1
-        if (record == ""):
-                return (-1)
+        if (record == "" and count):
+            return (-1)
         if (re.sub("\s","",line) == separator):
             count = count + 10
         else:
