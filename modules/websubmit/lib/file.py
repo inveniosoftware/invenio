@@ -365,17 +365,16 @@ class BibDoc:
         """lists all files attached to the bibdoc"""
         self.docfiles = []
         if os.path.exists(self.basedir):
-            for root, dirs, fils in os.walk(self.basedir):
-                for fil in fils:
-                    if fil != ".recid" and fil != ".docid":
-                        filepath = "%s/%s" % (self.basedir,fil)
-                        fileversion = re.sub(".*;","",fil)
-                        fullname = fil.replace(";%s" % fileversion,"")
-                        format = re.sub("^[^\.]*\.","",fullname)
-                        if format == fullname:
-                            format = ""
-                        filename = re.sub("\.%s" % format,"",fullname)
-                        self.docfiles.append(BibDocFile(filepath,self.type,fileversion,filename,format,self.id))
+            for fil in os.listdir(self.basedir):
+                if fil != ".recid" and fil != ".docid" and fil != "." and fil != "..":
+                    filepath = "%s/%s" % (self.basedir,fil)
+                    fileversion = re.sub(".*;","",fil)
+                    fullname = fil.replace(";%s" % fileversion,"")
+                    format = re.sub("^[^\.]*\.","",fullname)
+                    if format == fullname:
+                        format = ""
+                    filename = re.sub("\.%s" % format,"",fullname)
+                    self.docfiles.append(BibDocFile(filepath,self.type,fileversion,filename,format,self.id))
     
     def BuildRelatedFileList(self):
         res = run_sql("select ln.id_bibdoc2,ln.type from bibdoc_bibdoc as ln,bibdoc where id=ln.id_bibdoc2 and ln.id_bibdoc1=%s and status!='deleted'",(self.id,))

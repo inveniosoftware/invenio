@@ -35,12 +35,9 @@ def Move_From_Pending(parameters,curdir,form):
     srcdir = "%s/pending/%s/%s" % (storage,doctype,rn)
     if os.path.exists(srcdir):
         if rn != "":
-            for root, dirs, files in os.walk(srcdir):
-                if root == srcdir:
-                    for file in files:
-                        os.rename("%s/%s" % (srcdir,file), "%s/%s" % (curdir,file))
-                    for dir in dirs:
-                        os.rename("%s/%s" % (srcdir,dir), "%s/%s" % (curdir,dir))
+            files = os.listdir(srcdir)
+            for file in files:
+                os.rename("%s/%s" % (srcdir,file), "%s/%s" % (curdir,file))
             os.rmdir(srcdir)
     else:
         raise functionError("Move_From_Pending: Cannot retrieve reference information %s" % srcdir)

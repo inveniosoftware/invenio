@@ -35,16 +35,16 @@ def Move_Files_Archive(parameters,curdir,form):
         dir = watcheddirs[type]
         if os.path.exists(dir):
             formats = {}
-            for root, dirs, files in os.walk(dir):
-                files.sort()
-                for file in files:
-                    extension = re.sub("^[^\.]*\.","",file)
-                    if extension == file:
-                        extension = ""
-                    filename = re.sub("\..*","",file)
-                    if not formats.has_key(filename):
-                        formats[filename] = []
-                    formats[filename].append(extension)
+            files = os.listdir(dir):
+            files.sort()
+            for file in files:
+                extension = re.sub("^[^\.]*\.","",file)
+                if extension == file:
+                    extension = ""
+                filename = re.sub("\..*","",file)
+                if not formats.has_key(filename):
+                    formats[filename] = []
+                formats[filename].append(extension)
             # first delete all missing files
             bibarchive = BibRecDocs(sysno)
             existingBibdocs = bibarchive.listBibDocs(type)
