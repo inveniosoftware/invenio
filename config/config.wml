@@ -466,6 +466,18 @@ atlantis.cern.ch
  </description>
 </define-tag>
 
+## OAILOAD -- OAI number of records in a response:
+##  (example: 1000)
+<define-tag OAILOAD whitespace=delete>
+1000
+</define-tag>
+
+## OAIEXPIRE -- OAI resumptionToken expiration time:
+##  (example: 1000)
+<define-tag OAIEXPIRE whitespace=delete>
+90000
+</define-tag>
+
 ######################################
 ## Part 6: WebSubmit WML Parameters ##
 ######################################
