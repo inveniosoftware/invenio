@@ -146,7 +146,7 @@ def userOnSystem(user):
 	
 def checkemail(email):
     """Check whether the EMAIL address supplied by the user is valid.
-       At the moment we just check whether it contains ampersand and
+       At the moment we just check whether it contains '@' and
        whether it doesn't contain blanks.
        
        checkemail(email) -> boolean
