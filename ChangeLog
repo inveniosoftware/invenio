@@ -3,6 +3,11 @@ CDSware v0.3.2 (released 2004-05-12)
 
 2004-05-12  Tibor Simko <tibor.simko@cern.ch>
 
+        * modules/websubmit/lib/websubmit_engine.py.wml: Typo fixed
+        (llevel).
+
+2004-05-12  Tibor Simko <tibor.simko@cern.ch>
+
 	* NEWS: Release of v0.3.2.
 
 2004-05-12  Tibor Simko <tibor.simko@cern.ch>
