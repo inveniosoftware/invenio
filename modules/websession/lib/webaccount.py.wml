@@ -195,10 +195,14 @@ def perform_delete():
 ## perform_set(email,password): edit your account parameters, email and password.
 def perform_set(email,password):
 
-    
-    uid = run_sql("SELECT id FROM user where email=%s", (email,))
-    prefs = get_user_preferences(uid[0][0])
+    try:
+        uid = run_sql("SELECT id FROM user where email=%s", (email,))
+        uid = uid[0][0]
+    except:
+        uid = 0
+
     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL = CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
+    prefs = get_user_preferences(uid)
     if CFG_EXTERNAL_AUTHENTICATION.has_key(prefs['login_method']) and  CFG_EXTERNAL_AUTHENTICATION[prefs['login_method']][1] != True:
         CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL = 3
 
@@ -217,8 +221,12 @@ def perform_set(email,password):
       """ % (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL >= 2 and "disabled" or "", email, CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL >= 3 and "disabled" or "",password, CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL >= 3 and "disabled" or "", "")
 
     if len(CFG_EXTERNAL_AUTHENTICATION) >= 1:
-        uid = run_sql("SELECT id FROM user where email=%s", (email,))
-        prefs = get_user_preferences(uid[0][0])
+        try:
+            uid = run_sql("SELECT id FROM user where email=%s", (email,))
+            uid = uid[0][0]
+        except:
+            uid = 0
+        prefs = get_user_preferences(uid)
         current_login_method = prefs['login_method']
 
         text += """<form method="post" action="../youraccount.py/change">"""
@@ -313,7 +321,7 @@ def create_login_page_box(referer=''):
     text += """
               <table>
               <tr>
-		 <td align=right><input type="hidden" name="referer" value="%s"><strong>Username:</strong>
+		 <td align=right><input type="hidden" name="login_method" value="%s"><input type="hidden" name="referer" value="%s"><strong>Username:</strong>
 		 </td>
                  <td><input type="text" size="25" name="p_email" value=""></td>
 		 <td></td>
@@ -327,7 +335,7 @@ def create_login_page_box(referer=''):
 		 </td>
                 </tr>
                 <tr>
-		 <td></td><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>""" % (cgi.escape(referer))
+		 <td></td><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>""" % (system, cgi.escape(referer))
     if internal:
         text += """&nbsp;&nbsp;&nbsp;(<a href="./lost">Lost your password?</a>)"""
     text += """

@@ -535,6 +535,9 @@ def get_user_preferences(uid):
             return deserialize_via_marshal(pref[0][1])
         except:
             return get_default_user_preferences()
+    else: 
+        return get_default_user_preferences()
+
     return None
 
 def set_user_preferences(uid, pref):
