@@ -1,38 +1,38 @@
-# ## $Id$
-# ## Purpose: initializes CDS session management
-# ##
-# ## Note: based on the "PHP4 MySQL Session Handler" code from Ying
-# ##       Zhang <ying@zippydesign.com>.  His code was modified to
-# ##       suit our needs.
-# ##
-# ## Note: for good session management operation, you need to set up in
-# ##       the 'php.ini' file the variables `session.gc_maxlifetime'
-# ##       (e.g. 86400 to mean 1 day) and `session.cookie_lifetime' to
-# ##       zero (session holds until user closes his browser).  In
-# ##       adddition, the garbage collector should be called explicitely
-# ##       via `admin/gc.shtml' if you choose `session.gc_probability'
-# ##       to be zero in the `php.ini' file.
+## $Id$
+## Purpose: initializes CDS session management
+##
+## Note: based on the "PHP4 MySQL Session Handler" code from Ying
+##       Zhang <ying@zippydesign.com>.  His code was modified to
+##       suit our needs.
+##
+## Note: for good session management operation, you need to set up in
+##       the 'php.ini' file the variables `session.gc_maxlifetime'
+##       (e.g. 86400 to mean 1 day) and `session.cookie_lifetime' to
+##       zero (session holds until user closes his browser).  In
+##       adddition, the garbage collector should be called explicitely
+##       via `admin/gc.shtml' if you choose `session.gc_probability'
+##       to be zero in the `php.ini' file.
 
-# ## This file is part of the CERN Document Server Software (CDSware).
-# ## Copyright (C) 2002 CERN.
-# ##
-# ## The CDSware is free software; you can redistribute it and/or
-# ## modify it under the terms of the GNU General Public License as
-# ## published by the Free Software Foundation; either version 2 of the
-# ## License, or (at your option) any later version.
-# ##
-# ## The CDSware is distributed in the hope that it will be useful, but
-# ## WITHOUT ANY WARRANTY; without even the implied warranty of
-# ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# ## General Public License for more details.  
-# ##
-# ## You should have received a copy of the GNU General Public License
-# ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
-# ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# ## read config variables:
-# #include "config.wml"
-# #include "configbis.wml"
+## read config variables:
+#include "config.wml"
+#include "configbis.wml"
 
 <?
 
@@ -47,844 +47,848 @@ $IMAGES = "<WEBURL>/img";
 
 ### okay, config read, from now on the script can continue ###
 
-# $SESS_DBHOST = $DBHOST;	/* database server hostname */
-# $SESS_DBNAME = $DBNAME;	/* database name */
-# $SESS_DBUSER = $DBUSER;      /* database user */
-# $SESS_DBPASS = $DBPASS;	/* database password */
+<protect>
 
-# $SESS_DBH = "";
-# $SESS_LIFE = get_cfg_var("session.gc_maxlifetime");
+$SESS_DBHOST = $DBHOST;	/* database server hostname */
+$SESS_DBNAME = $DBNAME;	/* database name */
+$SESS_DBUSER = $DBUSER;      /* database user */
+$SESS_DBPASS = $DBPASS;	/* database password */
 
-# ## sess_open():
-# function sess_open($save_path, $session_name) {
-# 	global $SESS_DBHOST, $SESS_DBNAME, $SESS_DBUSER, $SESS_DBPASS, $SESS_DBH;
+$SESS_DBH = "";
+$SESS_LIFE = get_cfg_var("session.gc_maxlifetime");
 
-# 	if (! $SESS_DBH = mysql_pconnect($SESS_DBHOST, $SESS_DBUSER, $SESS_DBPASS)) {
-# 		echo "<li>Can't connect to $SESS_DBHOST as $SESS_DBUSER";
-# 		echo "<li>MySQL Error: ", mysql_error();
-# 		die;
-# 	}
+## sess_open():
+function sess_open($save_path, $session_name) {
+	global $SESS_DBHOST, $SESS_DBNAME, $SESS_DBUSER, $SESS_DBPASS, $SESS_DBH;
 
-# 	if (! mysql_select_db($SESS_DBNAME, $SESS_DBH)) {
-# 		echo "<li>Unable to select database $SESS_DBNAME";
-# 		die;
-# 	}
+	if (! $SESS_DBH = mysql_pconnect($SESS_DBHOST, $SESS_DBUSER, $SESS_DBPASS)) {
+		echo "<li>Can't connect to $SESS_DBHOST as $SESS_DBUSER";
+		echo "<li>MySQL Error: ", mysql_error();
+		die;
+	}
+
+	if (! mysql_select_db($SESS_DBNAME, $SESS_DBH)) {
+		echo "<li>Unable to select database $SESS_DBNAME";
+		die;
+	}
 	
-# 	return true;
-# }
+	return true;
+}
 
-# ## sess_close():
-# function sess_close() {
-# 	return true;
-# }
+## sess_close():
+function sess_close() {
+	return true;
+}
 
-# ## sess_read():
-# function sess_read($key) {
-# 	global $SESS_DBH, $SESS_LIFE;
+## sess_read():
+function sess_read($key) {
+	global $SESS_DBH, $SESS_LIFE;
 
-# 	$qry = "SELECT session_vars FROM session WHERE session_key = '$key'";
-# 	$qid = mysql_query($qry, $SESS_DBH);
+	$qry = "SELECT session_vars FROM session WHERE session_key = '$key'";
+	$qid = mysql_query($qry, $SESS_DBH);
 
-# 	if (list($value) = mysql_fetch_row($qid)) {
-# 		return $value;
-# 	}
+	if (list($value) = mysql_fetch_row($qid)) {
+		return $value;
+	}
 
-# 	return '';
-# }
+	return '';
+}
 
-# ## sess_write():
-# function sess_write($key, $val) {
-# 	global $SESS_DBH, $SESS_LIFE;
+## sess_write():
+function sess_write($key, $val) {
+	global $SESS_DBH, $SESS_LIFE;
 
-# 	$expiry = time() + $SESS_LIFE;
-# 	$value = addslashes($val);
+	$expiry = time() + $SESS_LIFE;
+	$value = addslashes($val);
 
-# 	$qry = "INSERT INTO session VALUES ('$key', '$value', $expiry)";
-# 	$qid = mysql_query($qry, $SESS_DBH);
+	$qry = "INSERT INTO session VALUES ('$key', '$value', $expiry)";
+	$qid = mysql_query($qry, $SESS_DBH);
 
-# 	if (! $qid) {
-# 		$qry = "UPDATE session SET session_expiry = $expiry, session_vars = '$value' WHERE session_key = '$key'";
-# 		$qid = mysql_query($qry, $SESS_DBH);
-# 	}
+	if (! $qid) {
+		$qry = "UPDATE session SET session_expiry = $expiry, session_vars = '$value' WHERE session_key = '$key'";
+		$qid = mysql_query($qry, $SESS_DBH);
+	}
 
-# 	return $qid;
-# }
+	return $qid;
+}
 
-# ## sess_destroy():
-# function sess_destroy($key) {
-# 	global $SESS_DBH;
-# 	displayMessage("Info",
-#                        "sess_destroy called",
-#                        "logfile");
+## sess_destroy():
+function sess_destroy($key) {
+	global $SESS_DBH;
+	displayMessage("Info",
+                       "sess_destroy called",
+                       "logfile");
 
-# 	$qry = "DELETE FROM session WHERE session_key = '$key'";
-# 	$res = mysql_query($qry, $SESS_DBH);
+	$qry = "DELETE FROM session WHERE session_key = '$key'";
+	$res = mysql_query($qry, $SESS_DBH);
 
-# 	return $res;
-# }
+	return $res;
+}
 
-# ###########################################################################
-# # Garbage Collector
-# #
-# # 1) Delete expired sessions
-# # 1b)Delete guest users without session
-# # 2) Delete queries not attached to any user
-# # 3) Delete baskets not attached to any user
-# # 4) Delete records not stored in any basket
-# # 5) Delete formats not attached to any user
-# #
-# function sess_gc($maxlifetime) {
-# 	global $SESS_DBH;
-# 	global $uid;
+###########################################################################
+# Garbage Collector
+#
+# 1) Delete expired sessions
+# 1b)Delete guest users without session
+# 2) Delete queries not attached to any user
+# 3) Delete baskets not attached to any user
+# 4) Delete records not stored in any basket
+# 5) Delete formats not attached to any user
+#
+function sess_gc($maxlifetime) {
+	global $SESS_DBH;
+	global $uid;
 
-#         # when we started (used for profiling information, see below):
-# 	list($mt_msec,$mt_sec) = split(" ", microtime());  
-# 	$mt_start = $mt_sec+$mt_msec;  
-# 	displayMessage("Info", 
-#                        "Garbage collector: started.",
-#                        "screen,logfile");
+        # when we started (used for profiling information, see below):
+	list($mt_msec,$mt_sec) = split(" ", microtime());  
+	$mt_start = $mt_sec+$mt_msec;  
+	displayMessage("Info", 
+                       "Garbage collector: started.",
+                       "screen,logfile");
 
 
-# 	# Destroy expired sessions
-# 	$query = "DELETE FROM session WHERE session_expiry < " . time();
-# 	$result = mysql_perform_query($query, $SESS_DBH);
-# 	displayMessage("Info",
-# 		       "Garbage collector: deleting " . mysql_affected_rows($SESS_DBH) . " expired sessions.",
-# 		       "screen,logfile");		
+	# Destroy expired sessions
+	$query = "DELETE FROM session WHERE session_expiry < " . time();
+	$result = mysql_perform_query($query, $SESS_DBH);
+	displayMessage("Info",
+		       "Garbage collector: deleting " . mysql_affected_rows($SESS_DBH) . " expired sessions.",
+		       "screen,logfile");		
 	
 
-# 	# Delete guest users without session.
-# 	# The LEFT JOIN method cannot be applied here because there is no simple
-# 	# way to compare the user id in table user with the one encoded in
-# 	# session_vars in table session.
-# 	#
-# 	# backup of current uid
-# 	$old_uid = $uid;
+	# Delete guest users without session.
+	# The LEFT JOIN method cannot be applied here because there is no simple
+	# way to compare the user id in table user with the one encoded in
+	# session_vars in table session.
+	#
+	# backup of current uid
+	$old_uid = $uid;
 
-# 	$query = "SELECT session_vars FROM session";
-# 	$result = mysql_perform_query($query, $SESS_DBH);
-# 	$nRows = mysql_num_rows($result);
-# 	if($nRows) {
-# 	    $cur_svar=mysql_fetch_row($result);
-# 	    $uidStr = "$uid";
-# 	    while($cur_svar = mysql_fetch_row($result)) {
-# 		session_decode($cur_svar[0]);
-# 		$uidStr .= ",$uid";
-# 	    }
-# 	}
+	$query = "SELECT session_vars FROM session";
+	$result = mysql_perform_query($query, $SESS_DBH);
+	$nRows = mysql_num_rows($result);
+	if($nRows) {
+	    $cur_svar=mysql_fetch_row($result);
+	    $uidStr = "$uid";
+	    while($cur_svar = mysql_fetch_row($result)) {
+		session_decode($cur_svar[0]);
+		$uidStr .= ",$uid";
+	    }
+	}
 
-# 	# restoration of the previous uid
-# 	$uid = $old_uid;
+	# restoration of the previous uid
+	$uid = $old_uid;
 
-#  	if($uidStr != "") {
-#  	    $query = "DELETE FROM user WHERE id NOT IN (".$uidStr.") AND email = ''";
-#  	    $result = mysql_perform_query($query, $SESS_DBH);
-#  	    $nRows = mysql_affected_rows($SESS_DBH);
-#  	}
-#  	else
-#  	    $nRows = 0;
+ 	if($uidStr != "") {
+ 	    $query = "DELETE FROM user WHERE id NOT IN (".$uidStr.") AND email = ''";
+ 	    $result = mysql_perform_query($query, $SESS_DBH);
+ 	    $nRows = mysql_affected_rows($SESS_DBH);
+ 	}
+ 	else
+ 	    $nRows = 0;
 
-#         displayMessage("Info",
-#                        "Garbage collector: deleting " . $nRows . " guest users without session",
-#                        "screen,logfile");
-
-
-# 	# Delete queries not attached to any user.
-# 	# Select user ids appearing in table user_query but not in table user
-# 	$query = "SELECT DISTINCT uq.id_user
-#                   FROM user_query AS uq LEFT JOIN user AS u
-#                     ON uq.id_user = u.id
-#                 WHERE u.id IS NULL";
-# 	$result = mysql_perform_query($query, $SESS_DBH);
-# 	$nRows = mysql_num_rows($result);
-# 	# delete them one by one
-# 	for($i=0; $i<$nRows; $i++) {
-# 	    $curRow = mysql_fetch_row($result);
-# 	    $query = "DELETE FROM user_query WHERE id_user = $curRow[0]";
-# 	    $result2 = mysql_perform_query($query, $SESS_DBH);
-# 	}
+        displayMessage("Info",
+                       "Garbage collector: deleting " . $nRows . " guest users without session",
+                       "screen,logfile");
 
 
-# 	# Delete queries not attached to any user.
-# 	# Select queries that must be deleted (the ones that are not in user_query)
-# 	$query = "SELECT DISTINCT q.id
-#                   FROM query AS q LEFT JOIN user_query AS uq ON uq.id_query = q.id
-#                 WHERE uq.id_query IS NULL 
-#                 AND q.type<>'p'";
-# 	$result = mysql_perform_query($query, $SESS_DBH);
-#         displayMessage("Info",
-#                        "Garbage collector: deleting " . mysql_num_rows($result) . " queries.",
-#                        "screen,logfile");
-
-# 	# delete them one by one
-# 	for($i=0; $i<mysql_num_rows($result); $i++) {
-# 	    $curRow = mysql_fetch_row($result);
-# 	    $query = "DELETE FROM query WHERE id = $curRow[0]";
-# 	    $result2 = mysql_perform_query($query, $SESS_DBH);
-# 	}
+	# Delete queries not attached to any user.
+	# Select user ids appearing in table user_query but not in table user
+	$query = "SELECT DISTINCT uq.id_user
+                  FROM user_query AS uq LEFT JOIN user AS u
+                    ON uq.id_user = u.id
+                WHERE u.id IS NULL";
+	$result = mysql_perform_query($query, $SESS_DBH);
+	$nRows = mysql_num_rows($result);
+	# delete them one by one
+	for($i=0; $i<$nRows; $i++) {
+	    $curRow = mysql_fetch_row($result);
+	    $query = "DELETE FROM user_query WHERE id_user = $curRow[0]";
+	    $result2 = mysql_perform_query($query, $SESS_DBH);
+	}
 
 
-# 	# Delete baskets not owned by any user
-# 	# Select basket ids
-# 	$query = "SELECT us.id_shelf 
-#                   FROM user_shelf AS us LEFT JOIN user AS u 
-#                     ON u.id = us.id_user 
-#                   WHERE u.id IS NULL";
-# 	$result = mysql_perform_query($query, $SESS_DBH);
-# 	$nRows = mysql_num_rows($result);
-#         displayMessage("Info",
-#                        "Garbage collector: deleting " . $nRows . " baskets not owned by any user.",
-#                        "screen,logfile");
-# 	# delete them one by one
-# 	for($i=0; $i<$nRows; $i++) {
-# 	    $curRow = mysql_fetch_row($result);
-# 	    $query = "DELETE FROM user_shelf WHERE id_shelf = $curRow[0]";
-# 	    $result2 = mysql_perform_query($query, $SESS_DBH);
-# 	    $query = "DELETE FROM shelf WHERE id = $curRow[0]";
-# 	    $result2 = mysql_perform_query($query, $SESS_DBH);
-# 	}
+	# Delete queries not attached to any user.
+	# Select queries that must be deleted (the ones that are not in user_query)
+	$query = "SELECT DISTINCT q.id
+                  FROM query AS q LEFT JOIN user_query AS uq ON uq.id_query = q.id
+                WHERE uq.id_query IS NULL 
+                AND q.type<>'p'";
+	$result = mysql_perform_query($query, $SESS_DBH);
+        displayMessage("Info",
+                       "Garbage collector: deleting " . mysql_num_rows($result) . " queries.",
+                       "screen,logfile");
+
+	# delete them one by one
+	for($i=0; $i<mysql_num_rows($result); $i++) {
+	    $curRow = mysql_fetch_row($result);
+	    $query = "DELETE FROM query WHERE id = $curRow[0]";
+	    $result2 = mysql_perform_query($query, $SESS_DBH);
+	}
 
 
-# 	# Delete entries from table shelf_record that don't correspond to any existing record
-# 	$query = "SELECT sr.id_shelf FROM shelf_record AS sr LEFT JOIN shelf AS s ON s.id = sr.id_shelf
-#                 WHERE s.id IS NULL";
-# 	$result = mysql_perform_query($query, $SESS_DBH);
-# 	$nRows = mysql_num_rows($result);
-# 	for($i=0; $i<$nRows; $i++) {
-# 	    $curRow = mysql_fetch_row($result);
-# 	    $query = "DELETE FROM shelf_record WHERE id_shelf = $curRow[0]";
-# 	    $result2 = mysql_perform_query($query, $SESS_DBH);
-# 	}
+	# Delete baskets not owned by any user
+	# Select basket ids
+	$query = "SELECT us.id_shelf 
+                  FROM user_shelf AS us LEFT JOIN user AS u 
+                    ON u.id = us.id_user 
+                  WHERE u.id IS NULL";
+	$result = mysql_perform_query($query, $SESS_DBH);
+	$nRows = mysql_num_rows($result);
+        displayMessage("Info",
+                       "Garbage collector: deleting " . $nRows . " baskets not owned by any user.",
+                       "screen,logfile");
+	# delete them one by one
+	for($i=0; $i<$nRows; $i++) {
+	    $curRow = mysql_fetch_row($result);
+	    $query = "DELETE FROM user_shelf WHERE id_shelf = $curRow[0]";
+	    $result2 = mysql_perform_query($query, $SESS_DBH);
+	    $query = "DELETE FROM shelf WHERE id = $curRow[0]";
+	    $result2 = mysql_perform_query($query, $SESS_DBH);
+	}
 
-# 	# Delete records not in any shelf
-# 	$query = "SELECT DISTINCT r.id FROM record AS r LEFT JOIN shelf_record AS sr ON r.id = sr.id_record
-#                 WHERE sr.id_record IS NULL";
-# 	$result = mysql_perform_query($query, $SESS_DBH);
-# 	$nRows = mysql_num_rows($result);
-#         displayMessage("Info",
-#                        "Garbage collector: deleting " . $nRows . " records not in any shelf.",
-#                        "screen,logfile");
-# 	for($i=0; $i<$nRows; $i++) {
-# 	    $curRow = mysql_fetch_row($result);
-# 	    $query = "DELETE FROM record WHERE id = $curRow[0]";
-# 	    $result2 = mysql_perform_query($query, $SESS_DBH);
-# 	}
 
-# 	# Delete formats not attached to any user
-# 	$query = "SELECT DISTINCT f.id FROM format AS f LEFT JOIN user_format AS uf
-#                     ON f.id = uf.id_format WHERE uf.id_user IS NULL"; 
-# 	$result = mysql_perform_query($query, $SESS_DBH);
-# 	$nRows = mysql_num_rows($result);
-#         displayMessage("Info",
-#                        "Garbage collector: deleting " . $nRows . " formats not attached to any user.",
-#                        "screen,logfile");
-# 	for($i=0; $i<$nRows; $i++) {
-# 	    $curRow = mysql_fetch_row($result);
-# 	    $query = "DELETE FROM format WHERE id = $curRow[0]";
-# 	    $result2 = mysql_perform_query($query, $SESS_DBH);
-# 	}
+	# Delete entries from table shelf_record that don't correspond to any existing record
+	$query = "SELECT sr.id_shelf FROM shelf_record AS sr LEFT JOIN shelf AS s ON s.id = sr.id_shelf
+                WHERE s.id IS NULL";
+	$result = mysql_perform_query($query, $SESS_DBH);
+	$nRows = mysql_num_rows($result);
+	for($i=0; $i<$nRows; $i++) {
+	    $curRow = mysql_fetch_row($result);
+	    $query = "DELETE FROM shelf_record WHERE id_shelf = $curRow[0]";
+	    $result2 = mysql_perform_query($query, $SESS_DBH);
+	}
+
+	# Delete records not in any shelf
+	$query = "SELECT DISTINCT r.id FROM record AS r LEFT JOIN shelf_record AS sr ON r.id = sr.id_record
+                WHERE sr.id_record IS NULL";
+	$result = mysql_perform_query($query, $SESS_DBH);
+	$nRows = mysql_num_rows($result);
+        displayMessage("Info",
+                       "Garbage collector: deleting " . $nRows . " records not in any shelf.",
+                       "screen,logfile");
+	for($i=0; $i<$nRows; $i++) {
+	    $curRow = mysql_fetch_row($result);
+	    $query = "DELETE FROM record WHERE id = $curRow[0]";
+	    $result2 = mysql_perform_query($query, $SESS_DBH);
+	}
+
+	# Delete formats not attached to any user
+	$query = "SELECT DISTINCT f.id FROM format AS f LEFT JOIN user_format AS uf
+                    ON f.id = uf.id_format WHERE uf.id_user IS NULL"; 
+	$result = mysql_perform_query($query, $SESS_DBH);
+	$nRows = mysql_num_rows($result);
+        displayMessage("Info",
+                       "Garbage collector: deleting " . $nRows . " formats not attached to any user.",
+                       "screen,logfile");
+	for($i=0; $i<$nRows; $i++) {
+	    $curRow = mysql_fetch_row($result);
+	    $query = "DELETE FROM format WHERE id = $curRow[0]";
+	    $result2 = mysql_perform_query($query, $SESS_DBH);
+	}
 	
-# 	# add some profiling info to the runtime logfile
-# 	list($mt_msec,$mt_sec) = split(" ", microtime());  
-# 	$mt_end = $mt_sec+$mt_msec; $mt = $mt_end-$mt_start; $mt_start=$mt_end;  
-# 	displayMessage("Info", 
-#                        "Garbage collector took " .sprintf("%.2f",$mt) ." sec to execute.",
-#                        "screen,logfile");
+	# add some profiling info to the runtime logfile
+	list($mt_msec,$mt_sec) = split(" ", microtime());  
+	$mt_end = $mt_sec+$mt_msec; $mt = $mt_end-$mt_start; $mt_start=$mt_end;  
+	displayMessage("Info", 
+                       "Garbage collector took " .sprintf("%.2f",$mt) ." sec to execute.",
+                       "screen,logfile");
 
-# 	return $nb_sess_deleted;
-# }
+	return $nb_sess_deleted;
+}
 
-# session_set_save_handler(
-# 	"sess_open",
-# 	"sess_close",
-# 	"sess_read",
-# 	"sess_write",
-# 	"sess_destroy",
-# 	"sess_gc");
+session_set_save_handler(
+	"sess_open",
+	"sess_close",
+	"sess_read",
+	"sess_write",
+	"sess_destroy",
+	"sess_gc");
 
-# ## getEmail():
-# function getEmail($uid) {
-#     global $SESS_DBH;
-#     $uid_email = "guest";
-#     $query = "SELECT email FROM user WHERE id='$uid'";
-#     $res = mysql_perform_query($query, $SESS_DBH);
-#     if ($row = mysql_fetch_row($res)) {
-# 	if ($row[0]) {
-#             $uid_email = $row[0];
-#         }            
-#     } 
-#     mysql_free_result($res);
-#     return($uid_email);
-# }
+## getEmail():
+function getEmail($uid) {
+    return "guest"; # FIXME: call PHP->Python interface for the new session stuff
+    global $SESS_DBH;
+    $uid_email = "guest";
+    $query = "SELECT email FROM user WHERE id='$uid'";
+    $res = mysql_perform_query($query, $SESS_DBH);
+    if ($row = mysql_fetch_row($res)) {
+	if ($row[0]) {
+            $uid_email = $row[0];
+        }            
+    } 
+    mysql_free_result($res);
+    return($uid_email);
+}
 
-# ## getPW():
-# function getPW($uid) {
-#     global $SESS_DBH;
-#     $uid_pw = "";
-#     $query = "SELECT password FROM user WHERE id='$uid'";
-#     $res = mysql_perform_query($query, $SESS_DBH);
-#     if ($row = mysql_fetch_row($res)) {
-#         if ($row[0]) {
-#             $uid_pw = $row[0];
-#         }            
-#     } 
-#     mysql_free_result($res);
-#     return($uid_pw);
-# }
+## getPW():
+function getPW($uid) {
+    global $SESS_DBH;
+    $uid_pw = "";
+    $query = "SELECT password FROM user WHERE id='$uid'";
+    $res = mysql_perform_query($query, $SESS_DBH);
+    if ($row = mysql_fetch_row($res)) {
+        if ($row[0]) {
+            $uid_pw = $row[0];
+        }            
+    } 
+    mysql_free_result($res);
+    return($uid_pw);
+}
 
-# ## getID():
-# function getID($email) {
-#     global $SESS_DBH;
-#     $uid_id = "";
-#     $query = "SELECT id FROM user WHERE email='$email'";
-#     $res = mysql_perform_query($query, $SESS_DBH);
-#     if ($row = mysql_fetch_row($res)) {
-#         if ($row[0]) {
-#             $uid_id = $row[0];
-#         }            
-#     } 
-#     mysql_free_result($res);
-#     return($uid_id);
-# }
+## getID():
+function getID($email) {
+    global $SESS_DBH;
+    $uid_id = "";
+    $query = "SELECT id FROM user WHERE email='$email'";
+    $res = mysql_perform_query($query, $SESS_DBH);
+    if ($row = mysql_fetch_row($res)) {
+        if ($row[0]) {
+            $uid_id = $row[0];
+        }            
+    } 
+    mysql_free_result($res);
+    return($uid_id);
+}
 
-# ## displayLoginInfo():
-# function displayLoginInfo($uid) {
-#     $uid_email = getEmail($uid);
-# #    $out = "<table cellspacing=0 cellpadding=0 border=0><tr><td>&nbsp;&nbsp;&nbsp;</td><td colspan=5 align=left class=loginselected><small><strong class=loginselectedtext>Your ID:</strong>&nbsp;$uid_email</td></tr><tr><td>&nbsp;&nbsp;&nbsp;</td><td align=center class=login><small><a href=\"${WEBDIR}personalize/youraccount.shtml?action=login\">login</a></small>&nbsp;</td><td align=center class=login>&nbsp;<small><a href=\"${WEBDIR}personalize/youraccount.shtml?action=logout\">logout</a></small>&nbsp;</td><td align=center class=login>&nbsp;<small><a href=\"${WEBDIR}personalize/youraccount.shtml\">settings</a></small>&nbsp;</td><td align=center class=login>&nbsp;<small><a href=\"${WEBDIR}yourshelf.shtml\">basket</a></small>&nbsp;</td><td align=center class=login>&nbsp;<small><a href=\"${WEBDIR}yourprofile.shtml\">alert</a></small></td></tr></table>";
-#     $out = "<span>[$uid_email]</span>";
-#     return $out;
-# }
+## displayLoginInfo():
+function displayLoginInfo($uid) {
+    $uid_email = getEmail($uid);
+#    $out = "<table cellspacing=0 cellpadding=0 border=0><tr><td>&nbsp;&nbsp;&nbsp;</td><td colspan=5 align=left class=loginselected><small><strong class=loginselectedtext>Your ID:</strong>&nbsp;$uid_email</td></tr><tr><td>&nbsp;&nbsp;&nbsp;</td><td align=center class=login><small><a href=\"${WEBDIR}personalize/youraccount.shtml?action=login\">login</a></small>&nbsp;</td><td align=center class=login>&nbsp;<small><a href=\"${WEBDIR}personalize/youraccount.shtml?action=logout\">logout</a></small>&nbsp;</td><td align=center class=login>&nbsp;<small><a href=\"${WEBDIR}personalize/youraccount.shtml\">settings</a></small>&nbsp;</td><td align=center class=login>&nbsp;<small><a href=\"${WEBDIR}yourshelf.shtml\">basket</a></small>&nbsp;</td><td align=center class=login>&nbsp;<small><a href=\"${WEBDIR}yourprofile.shtml\">alert</a></small></td></tr></table>";
+    $out = "<span>[$uid_email]</span>";
+    return $out;
+}
 
-# ## expandOrCollapseURL():
-# function expandOrCollapseURL($base,$req,$mn) {
-#     $x = $base . $req;
-#     $mn = preg_replace("/\[/","\[",$mn);
-#     $mn = preg_replace("/\]/","\]",$mn);
-#     $x=preg_replace("/([&\?])SESSIONID=\w+/","\\1",$x);
-#     $x=preg_replace("/([&\?])$mn=\w/","\\1",$x);
-#     if (strstr($x,'?')) { $x.="&"; } else { $x.="?"; } 
-#     $x .= session_name() . "=" . session_id();
-#     $x=preg_replace("/&+/","&",$x);    
-#     return($x);
-# }
+## expandOrCollapseURL():
+function expandOrCollapseURL($base,$req,$mn) {
+    $x = $base . $req;
+    $mn = preg_replace("/\[/","\[",$mn);
+    $mn = preg_replace("/\]/","\]",$mn);
+    $x=preg_replace("/([&\?])SESSIONID=\w+/","\\1",$x);
+    $x=preg_replace("/([&\?])$mn=\w/","\\1",$x);
+    if (strstr($x,'?')) { $x.="&"; } else { $x.="?"; } 
+    $x .= session_name() . "=" . session_id();
+    $x=preg_replace("/&+/","&",$x);    
+    return($x);
+}
 
-# ## displayYourFormatOptions():
-# function displayYourFormatOptions($uid,$p_of) {
-#     global $SESS_DBH;
-#     $out = "";
-#     $query = "SELECT f.id,f.name FROM format f, user_format uf " .
-# 	     "WHERE uf.id_user='$uid' AND f.id=uf.id_format";
-#     $res = mysql_perform_query($query, $SESS_DBH);
-#     if (mysql_num_rows($res)) {
-#         while ($row = mysql_fetch_row($res)) {
-#             $out .= "<option value=\"$row[0]\"";  
-#             if ($row[0] == $p_of) {
-#                 $out .= " selected";
-#             }
-#             $out .= ">personal - $row[1]\n";
-#         }
-#     }
-#     mysql_free_result($res);
-#     return $out;
-# }
+## displayYourFormatOptions():
+function displayYourFormatOptions($uid,$p_of) {
+    global $SESS_DBH;
+    $out = "";
+    $query = "SELECT f.id,f.name FROM format f, user_format uf " .
+	     "WHERE uf.id_user='$uid' AND f.id=uf.id_format";
+    $res = mysql_perform_query($query, $SESS_DBH);
+    if (mysql_num_rows($res)) {
+        while ($row = mysql_fetch_row($res)) {
+            $out .= "<option value=\"$row[0]\"";  
+            if ($row[0] == $p_of) {
+                $out .= " selected";
+            }
+            $out .= ">personal - $row[1]\n";
+        }
+    }
+    mysql_free_result($res);
+    return $out;
+}
 
-# ## getRandomTip():
-# function getRandomTip($catalogue) {
-#     global $WEBDIR;
-#     # connect to mysql database:
-#     $problem=0;
-#     $dbh = mysql_pconnect($SESS_DBHOST,$SESS_DBUSER,$SESS_DBPASS) or $problem=1;
-#     if (!$problem) {
-#         mysql_select_db($SESS_DBNAME) or $problem=1;
-#         if (!$problem) {
-#             # getting all tips for $catalogue:
-#             $query = "SELECT type,message FROM tip WHERE base='$catalogue'";
-#             $res = mysql_query($query, $dbh) or $problem=1;
-#             if (!$problem) {
-#                 if (mysql_num_rows($res)) {
-#                     while ($row = mysql_fetch_row($res)) {
-#                         $tip_type[] = $row[0];
-#                         $tip_message[] = $row[1];
-#                     }
-#                 } else {
-#                     $squery = "SELECT type,message FROM tip WHERE base=''";
-#                     $sres = mysql_query($squery, $dbh);
-#                     while ($srow = mysql_fetch_row($sres)) {
-#                         $tip_type[] = $srow[0];
-#                         $tip_message[] = $srow[1];
-#                     }
-#                     mysql_free_result($sres);                    
-#                 }
-#                 mysql_free_result($res);
-#                 if (count($tip_type)) {
-#                     # getting random tip:
-#                     srand((double)microtime()*1000000);
-#                     if (count($tip_type)>1) {
-#                         $rnd=rand(1,count($tip_type))-1;
-#                     } else {
-#                         $rnd=0;
-#                     }
-# #                    $rndtip = "<img src=\"".$WEBDIR."/img/r.gif\" alt=\"\">&nbsp;<small>" .
-# #                              "<span class=quicknote>$tip_type[$rnd]:</span> " .
-# #                              "$tip_message[$rnd]</small>";
-#                      $rndtip = "<small><strong>$tip_type[$rnd]:</strong> " .
-#                                "$tip_message[$rnd]</small>";
-#                 }
-#             }
-#         }
-#     }
-#     if ($rndtip) {
-#         $rndtip .= " <small>(<a href=\"".$WEBDIR."/tips.shtml\">read all tips</a>)</small>";
-#     }
-#     return $rndtip;
-# }
+## getRandomTip():
+function getRandomTip($catalogue) {
+    global $WEBDIR;
+    # connect to mysql database:
+    $problem=0;
+    $dbh = mysql_pconnect($SESS_DBHOST,$SESS_DBUSER,$SESS_DBPASS) or $problem=1;
+    if (!$problem) {
+        mysql_select_db($SESS_DBNAME) or $problem=1;
+        if (!$problem) {
+            # getting all tips for $catalogue:
+            $query = "SELECT type,message FROM tip WHERE base='$catalogue'";
+            $res = mysql_query($query, $dbh) or $problem=1;
+            if (!$problem) {
+                if (mysql_num_rows($res)) {
+                    while ($row = mysql_fetch_row($res)) {
+                        $tip_type[] = $row[0];
+                        $tip_message[] = $row[1];
+                    }
+                } else {
+                    $squery = "SELECT type,message FROM tip WHERE base=''";
+                    $sres = mysql_query($squery, $dbh);
+                    while ($srow = mysql_fetch_row($sres)) {
+                        $tip_type[] = $srow[0];
+                        $tip_message[] = $srow[1];
+                    }
+                    mysql_free_result($sres);                    
+                }
+                mysql_free_result($res);
+                if (count($tip_type)) {
+                    # getting random tip:
+                    srand((double)microtime()*1000000);
+                    if (count($tip_type)>1) {
+                        $rnd=rand(1,count($tip_type))-1;
+                    } else {
+                        $rnd=0;
+                    }
+#                    $rndtip = "<img src=\"".$WEBDIR."/img/r.gif\" alt=\"\">&nbsp;<small>" .
+#                              "<span class=quicknote>$tip_type[$rnd]:</span> " .
+#                              "$tip_message[$rnd]</small>";
+                     $rndtip = "<small><strong>$tip_type[$rnd]:</strong> " .
+                               "$tip_message[$rnd]</small>";
+                }
+            }
+        }
+    }
+    if ($rndtip) {
+        $rndtip .= " <small>(<a href=\"".$WEBDIR."/tips.shtml\">read all tips</a>)</small>";
+    }
+    return $rndtip;
+}
 
-# ## getLatestCDSNews():
-# function getLatestCDSNews() {
-#     # connect to mysql database:
-#     $problem=0;
-#     $cdsdbh = mysql_pconnect($SESS_DBHOST,$SESS_DBUSER,$SESS_DBPASS) or $problem=1;
-#     if ($cdsdbh && !$problem) {
-#         mysql_select_db("cdsnews") or $problem=1;
-#         if (!$problem) {
-#             # getting last CDS news:
-#             $query = "SELECT MAX(id) FROM news";
-#             $res = mysql_query($query, $cdsdbh) or $problem=1;
-#             if (!$problem) {
-#                 if (mysql_num_rows($res)) {
-#                     if ($row = mysql_fetch_row($res)) {
-#                         $maxid=$row[0];
-#                         $squery = "SELECT date,synopsis FROM news WHERE id=$maxid";
-#                         $sres = mysql_query($squery, $cdsdbh) or $problem=1;
-#                         if (!$problem) {
-#                             if (mysql_num_rows($sres)) {
-#                                 if ($row = mysql_fetch_row($sres)) {
-#                                     $out = "<small><strong>$row[0]:</strong> $row[1]</small>";
-#                                     $out .= " <small>(<a href=\"http://cds.cern.ch/news.shtml?id=$maxid\">read&nbsp;more</a> | <a href=\"http://cds.cern.ch/news.shtml\">subscribe</a>)</small>";
-#                                 }
-#                                 mysql_free_result($sres);
-#                             }
-#                         }
-#                     }
-#                     mysql_free_result($res);
-#                 }
-#             }
-#         }
-#     }    
-#     return $out;
-# }
+## getLatestCDSNews():
+function getLatestCDSNews() {
+    # connect to mysql database:
+    $problem=0;
+    $cdsdbh = mysql_pconnect($SESS_DBHOST,$SESS_DBUSER,$SESS_DBPASS) or $problem=1;
+    if ($cdsdbh && !$problem) {
+        mysql_select_db("cdsnews") or $problem=1;
+        if (!$problem) {
+            # getting last CDS news:
+            $query = "SELECT MAX(id) FROM news";
+            $res = mysql_query($query, $cdsdbh) or $problem=1;
+            if (!$problem) {
+                if (mysql_num_rows($res)) {
+                    if ($row = mysql_fetch_row($res)) {
+                        $maxid=$row[0];
+                        $squery = "SELECT date,synopsis FROM news WHERE id=$maxid";
+                        $sres = mysql_query($squery, $cdsdbh) or $problem=1;
+                        if (!$problem) {
+                            if (mysql_num_rows($sres)) {
+                                if ($row = mysql_fetch_row($sres)) {
+                                    $out = "<small><strong>$row[0]:</strong> $row[1]</small>";
+                                    $out .= " <small>(<a href=\"http://cds.cern.ch/news.shtml?id=$maxid\">read&nbsp;more</a> | <a href=\"http://cds.cern.ch/news.shtml\">subscribe</a>)</small>";
+                                }
+                                mysql_free_result($sres);
+                            }
+                        }
+                    }
+                    mysql_free_result($res);
+                }
+            }
+        }
+    }    
+    return $out;
+}
 
-# ## getSearchExample():
-# function getSearchExample($id_collection, $all=0) {
-#     ## Returns search examples for given collection.  
-#     ## If all=0, returns random search example.  If all!=0, returns all examples.
-#     global $WEBURL;
-#     global $SESS_DBH;
-#     $out = "";
-#     # getting all examples for $catalogue:
-#     $query = "SELECT e.type,e.body FROM example AS e, collection_example AS ce ".
-#              "WHERE ce.id_collection='".$id_collection."' AND e.id=ce.id_example";
-#     $res = mysql_query($query, $SESS_DBH) or $problem=1;
-#     if (!$problem) {
-#         if (mysql_num_rows($res)) {
-#             while ($row = mysql_fetch_row($res)) {
-#                 $example_type[] = $row[0];
-#                 $example_body[] = $row[1];
-#             }
-#         } 
-#         mysql_free_result($res);
-#         if (count($example_type)) {
-#             if ($all) {
-#                 # case A - return all examples:
-#                 for ($i=0; $i<count($example_type); $i++) {
-#                     $indxs[] = $i;
-#                 }
-#             } else {
-#                 ## case B - return random example: [this is the default behaviour]
-#                 srand((double)microtime()*1000000);
-#                 if (count($example_type)>1) {
-#                     $indxs[] = rand(1,count($example_type))-1;
-#                 } else {
-#                     $indxs[] = 0;
-#                 }
-#             }
-#             # return chosen example(s):
-#             for ($i=0; $i<count($indxs); $i++) {
-#                 if ($out) {
-#                     $out .= "<br>";
-#                 }
-#                 $out .= "<small><em>Example (".$example_type[$indxs[$i]]."):</em> " .
-#                         $example_body[$indxs[$i]]."&nbsp;&nbsp;&nbsp;";
-#                 if ($all) {
-#                     $out .= "[<a href=\"".$PHP_SELF."?se=0\">close</a>]</small>";
-#                 } else {
-#                     $out .= "[<a href=\"".$PHP_SELF."?se=1\">more</a>]</small>";
-#                 }
-#             }
-#         }        
-#     } 
-#     return $out;
-# }
+## getSearchExample():
+function getSearchExample($id_collection, $all=0) {
+    ## Returns search examples for given collection.  
+    ## If all=0, returns random search example.  If all!=0, returns all examples.
+    global $WEBURL;
+    global $SESS_DBH;
+    $out = "";
+    # getting all examples for $catalogue:
+    $query = "SELECT e.type,e.body FROM example AS e, collection_example AS ce ".
+             "WHERE ce.id_collection='".$id_collection."' AND e.id=ce.id_example";
+    $res = mysql_query($query, $SESS_DBH) or $problem=1;
+    if (!$problem) {
+        if (mysql_num_rows($res)) {
+            while ($row = mysql_fetch_row($res)) {
+                $example_type[] = $row[0];
+                $example_body[] = $row[1];
+            }
+        } 
+        mysql_free_result($res);
+        if (count($example_type)) {
+            if ($all) {
+                # case A - return all examples:
+                for ($i=0; $i<count($example_type); $i++) {
+                    $indxs[] = $i;
+                }
+            } else {
+                ## case B - return random example: [this is the default behaviour]
+                srand((double)microtime()*1000000);
+                if (count($example_type)>1) {
+                    $indxs[] = rand(1,count($example_type))-1;
+                } else {
+                    $indxs[] = 0;
+                }
+            }
+            # return chosen example(s):
+            for ($i=0; $i<count($indxs); $i++) {
+                if ($out) {
+                    $out .= "<br>";
+                }
+                $out .= "<small><em>Example (".$example_type[$indxs[$i]]."):</em> " .
+                        $example_body[$indxs[$i]]."&nbsp;&nbsp;&nbsp;";
+                if ($all) {
+                    $out .= "[<a href=\"".$PHP_SELF."?se=0\">close</a>]</small>";
+                } else {
+                    $out .= "[<a href=\"".$PHP_SELF."?se=1\">more</a>]</small>";
+                }
+            }
+        }        
+    } 
+    return $out;
+}
 
-# ## createNavigationBar():
-# function createNavigationBar() { 
-#     global $PHP_SELF, $mn;
-#     $n = func_num_args();
-#     $a = func_get_args();
-#     $out = "\n<table width=\"100%\"><tr><td class=\"about\">";
-#     if ($mn == "b") {
-#         $out .= "<a class=\"img\" href=\"$PHP_SELF?mn=d\"><img width=\"16\" src=\"".$WEBDIR."/img/iconnext.gif\" border=0 alt=\"o\"></a>";
-#     } else {
-#         $out .= "<a class=\"img\" href=\"$PHP_SELF?mn=b\"><img width=\"16\" src=\"".$WEBDIR."/img/iconcross.gif\" border=0 alt=\"x\"></a>";
-#     }
-#     $out .= "<small>";
-#     for ($i=0; $i < $n; $i++) {
-#         list ($url,$txt) = $a[$i];
-#         if ($url) {
-#             $out .= "<a href=\"".$WEBDIR."/".$url."\">".$txt."</a> &gt; "; 
-#         } else {
-#             $out .= $txt . " &gt; "; 
-#         }
-#     }
-#     $out = substr($out, 0, -6);
-#     $out .= "</small></td></tr></table>";
-#     return $out;
-# } 
+## createNavigationBar():
+function createNavigationBar() { 
+    global $PHP_SELF, $mn;
+    $n = func_num_args();
+    $a = func_get_args();
+    $out = "\n<table width=\"100%\"><tr><td class=\"about\">";
+    if ($mn == "b") {
+        $out .= "<a class=\"img\" href=\"$PHP_SELF?mn=d\"><img width=\"16\" src=\"".$WEBDIR."/img/iconnext.gif\" border=0 alt=\"o\"></a>";
+    } else {
+        $out .= "<a class=\"img\" href=\"$PHP_SELF?mn=b\"><img width=\"16\" src=\"".$WEBDIR."/img/iconcross.gif\" border=0 alt=\"x\"></a>";
+    }
+    $out .= "<small>";
+    for ($i=0; $i < $n; $i++) {
+        list ($url,$txt) = $a[$i];
+        if ($url) {
+            $out .= "<a href=\"".$WEBDIR."/".$url."\">".$txt."</a> &gt; "; 
+        } else {
+            $out .= $txt . " &gt; "; 
+        }
+    }
+    $out = substr($out, 0, -6);
+    $out .= "</small></td></tr></table>";
+    return $out;
+} 
 
-# ## createGuestUser():
-# function createGuestUser() {
-#     global $SESS_DBH;
-#     mysql_query("INSERT INTO user (id) VALUES (NULL)", $SESS_DBH) or die("<p>".mysql_error());
-#     if (mysql_affected_rows($SESS_DBH)) { # to check whether the above insert failed or not
-#         $uid = mysql_insert_id($SESS_DBH);
-#         session_register("uid");
-#     } else {
-#         displayMessage("Error",
-#                        "Unable to create new guest user",
-#                        "logfile");
-#         $uid = 0;
-#     }
-#     return $uid;
-# }
+## createGuestUser():
+function createGuestUser() {
+    global $SESS_DBH;
+    mysql_query("INSERT INTO user (id) VALUES (NULL)", $SESS_DBH) or die("<p>".mysql_error());
+    if (mysql_affected_rows($SESS_DBH)) { # to check whether the above insert failed or not
+        $uid = mysql_insert_id($SESS_DBH);
+        session_register("uid");
+    } else {
+        displayMessage("Error",
+                       "Unable to create new guest user",
+                       "logfile");
+        $uid = 0;
+    }
+    return $uid;
+}
 
-# function authenticate($email,$rule,$doctype="*",$action="*")
-# {
-#     global $ADMINEMAIL;
+function authenticate($email,$rule,$doctype="*",$action="*")
+{
+    global $ADMINEMAIL;
 
-#     if (eregi($ADMINEMAIL,"$email"))
-#         return true;
+    if (eregi($ADMINEMAIL,"$email"))
+        return true;
 
-#     $res = mysql_query("select id from rules where name='superuser'");
-#     $row = mysql_fetch_row($res);
-#     $id_superuser = $row[0];
+    $res = mysql_query("select id from rules where name='superuser'");
+    $row = mysql_fetch_row($res);
+    $id_superuser = $row[0];
 
-#     $res = mysql_query("select id_user from user_rule where id_rule='${id_superuser}' and (param1='$doctype' or param1='*') and (param2 LIKE '$action' or param2='*')");
-#     while ($row = mysql_fetch_row($res))
-#     {
-#         $iduser = $row[0];
-#         $emailuser = getEmail($iduser);
-#         if (eregi("$email","$emailuser"))
-#         return true;
-#     }
+    $res = mysql_query("select id_user from user_rule where id_rule='${id_superuser}' and (param1='$doctype' or param1='*') and (param2 LIKE '$action' or param2='*')");
+    while ($row = mysql_fetch_row($res))
+    {
+        $iduser = $row[0];
+        $emailuser = getEmail($iduser);
+        if (eregi("$email","$emailuser"))
+        return true;
+    }
 
-#     $res = mysql_query("select id from rules where name='$rule'");
-#     if (mysql_num_rows($res) == 0)
-#         return false;
-#     else
-#     {
-#         $row = mysql_fetch_row($res);
-#         $idrule = $row[0];
-#         $res = mysql_query("select id_user from user_rule where id_rule='$idrule' and (param1 LIKE '$doctype' or param1='*') and (param2 LIKE '$action' or param2='*')");
-#         while ($row = mysql_fetch_row($res))
-#         {
-#               $iduser = $row[0];
-#               $emailuser = getEmail($iduser);
-#               if (eregi("$email","$emailuser"))
-#                    return true;
-#         }
-#         return false;
-#     }
-# }
+    $res = mysql_query("select id from rules where name='$rule'");
+    if (mysql_num_rows($res) == 0)
+        return false;
+    else
+    {
+        $row = mysql_fetch_row($res);
+        $idrule = $row[0];
+        $res = mysql_query("select id_user from user_rule where id_rule='$idrule' and (param1 LIKE '$doctype' or param1='*') and (param2 LIKE '$action' or param2='*')");
+        while ($row = mysql_fetch_row($res))
+        {
+              $iduser = $row[0];
+              $emailuser = getEmail($iduser);
+              if (eregi("$email","$emailuser"))
+                   return true;
+        }
+        return false;
+    }
+}
 
-# function getRuleID($rule)
-# {
-# 	////////////////////////////
-# 	// get the id of the rule //
-# 	////////////////////////////
-# 	$res = mysql_query("
-# SELECT	id
-# FROM	rules
-# WHERE	name='$rule'");
-# 	if (mysql_num_rows($res) == 0)
-# 	{
-# 		// if it does not exist, attempt to create it
-# 		$res = mysql_query("
-# INSERT
-# INTO	rules (name,description)
-# VALUES	('$rule','')");
-# 		$idrule = mysql_insert_id();
-# 	}
-# 	else
-# 	{
-# 		$row = mysql_fetch_row($res);
-# 		$idrule = $row[0];
-# 	}
+function getRuleID($rule)
+{
+	////////////////////////////
+	// get the id of the rule //
+	////////////////////////////
+	$res = mysql_query("
+SELECT	id
+FROM	rules
+WHERE	name='$rule'");
+	if (mysql_num_rows($res) == 0)
+	{
+		// if it does not exist, attempt to create it
+		$res = mysql_query("
+INSERT
+INTO	rules (name,description)
+VALUES	('$rule','')");
+		$idrule = mysql_insert_id();
+	}
+	else
+	{
+		$row = mysql_fetch_row($res);
+		$idrule = $row[0];
+	}
 
-# 	return $idrule;
-# }
+	return $idrule;
+}
 
-# function getNumberOfBaskets() {
-#     global $SESS_DBH;
-#     global $SESS_LIFE;
-#     $count = 0;
+function getNumberOfBaskets() {
+    global $SESS_DBH;
+    global $SESS_LIFE;
+    $count = 0;
 
-#     $query = "SELECT COUNT(*) FROM shelf";
-#     $result = mysql_perform_query($query, $SESS_DBH);
-#     if(mysql_num_rows($result)) {
-# 	$row = mysql_fetch_row($result);
-# 	$count = $row[0];
-#     }
+    $query = "SELECT COUNT(*) FROM shelf";
+    $result = mysql_perform_query($query, $SESS_DBH);
+    if(mysql_num_rows($result)) {
+	$row = mysql_fetch_row($result);
+	$count = $row[0];
+    }
 
-#     return $count;
-# }
+    return $count;
+}
 
-# function getNumberOfRegisteredUsers() {
-#     global $SESS_DBH;
-#     global $SESS_LIFE;
-#     $count = 0;
+function getNumberOfRegisteredUsers() {
+    global $SESS_DBH;
+    global $SESS_LIFE;
+    $count = 0;
 
-#     $query = "SELECT COUNT(*) FROM user WHERE email <> ''";
-#     $result = mysql_perform_query($query, $SESS_DBH);
-#     if(mysql_num_rows($result)) {
-# 	$row = mysql_fetch_row($result);
-# 	$count = $row[0];
-#     }
+    $query = "SELECT COUNT(*) FROM user WHERE email <> ''";
+    $result = mysql_perform_query($query, $SESS_DBH);
+    if(mysql_num_rows($result)) {
+	$row = mysql_fetch_row($result);
+	$count = $row[0];
+    }
 
-#     return $count;
-# }
+    return $count;
+}
     
-# function getNumberOfAlerts() {
-#     global $SESS_DBH;
-#     global $SESS_LIFE;
-#     $count = 0;
+function getNumberOfAlerts() {
+    global $SESS_DBH;
+    global $SESS_LIFE;
+    $count = 0;
 
-#     $query = "SELECT COUNT(*) FROM user_query_shelf";
-#     $result = mysql_perform_query($query, $SESS_DBH);
-#     if(mysql_num_rows($result)) {
-# 	$row = mysql_fetch_row($result);
-# 	$count = $row[0];
-#     }
+    $query = "SELECT COUNT(*) FROM user_query_shelf";
+    $result = mysql_perform_query($query, $SESS_DBH);
+    if(mysql_num_rows($result)) {
+	$row = mysql_fetch_row($result);
+	$count = $row[0];
+    }
 
-#     return $count;
-# }
+    return $count;
+}
 
-# ## getNumberOfSessions():
-# function getNumberOfSessions($time_diff) { 
-#     # returns nb of active sessions that were created not longer than $time_diff seconds ago
-#     global $SESS_DBH;
-#     global $SESS_LIFE;
+## getNumberOfSessions():
+function getNumberOfSessions($time_diff) { 
+    # returns nb of active sessions that were created not longer than $time_diff seconds ago
+    global $SESS_DBH;
+    global $SESS_LIFE;
 
-#     # 0) argument check:
-#     if ($time_diff > $SESS_LIFE) {
-#         # if desired $time_diff is greater than session lifetime, then garbage collector
-#         # might have run and the result would not be meaningful => we need to set 
-#         # maximum $time_diff that is available, i.e. $SESS_LIFE
-#         $time_diff = $SESS_LIFE;
-#     }
+    # 0) argument check:
+    if ($time_diff > $SESS_LIFE) {
+        # if desired $time_diff is greater than session lifetime, then garbage collector
+        # might have run and the result would not be meaningful => we need to set 
+        # maximum $time_diff that is available, i.e. $SESS_LIFE
+        $time_diff = $SESS_LIFE;
+    }
 
-#     # 1) find out the number of sessions:
-#     $num_sessions = "unknown";
-#     $since_when = time() + $SESS_LIFE - $time_diff;
-#     $query = "SELECT COUNT(*) FROM session WHERE session_expiry > $since_when";
-#     $res = mysql_query($query, $SESS_DBH);
-#     if (mysql_num_rows($res)) {
-#         if ($row = mysql_fetch_row($res)) {
-#             $num_sessions = $row[0];
-#         }
-#         mysql_free_result($res);
-#     }
+    # 1) find out the number of sessions:
+    $num_sessions = "unknown";
+    $since_when = time() + $SESS_LIFE - $time_diff;
+    $query = "SELECT COUNT(*) FROM session WHERE session_expiry > $since_when";
+    $res = mysql_query($query, $SESS_DBH);
+    if (mysql_num_rows($res)) {
+        if ($row = mysql_fetch_row($res)) {
+            $num_sessions = $row[0];
+        }
+        mysql_free_result($res);
+    }
 
-#     # 2) find out the number of queries:
-#     $num_queries = "unknown";
-#     $query = "SELECT COUNT(*) FROM user_query WHERE date > DATE_SUB(NOW(), INTERVAL $time_diff SECOND);";
-#     $res = mysql_query($query, $SESS_DBH);
-#     if (mysql_num_rows($res)) {
-#         if ($row = mysql_fetch_row($res)) {
-#             $num_queries = $row[0];
-#         }
-#         mysql_free_result($res);
-#     }
+    # 2) find out the number of queries:
+    $num_queries = "unknown";
+    $query = "SELECT COUNT(*) FROM user_query WHERE date > DATE_SUB(NOW(), INTERVAL $time_diff SECOND);";
+    $res = mysql_query($query, $SESS_DBH);
+    if (mysql_num_rows($res)) {
+        if ($row = mysql_fetch_row($res)) {
+            $num_queries = $row[0];
+        }
+        mysql_free_result($res);
+    }
 
-#     $out = "<small>There have been <strong>" . $num_sessions . "</strong> active users " .
-#            "in the past " . sprintf("%d",$time_diff/60) . " minutes. ".
-#            "They have made <strong>" . $num_queries . "</strong> queries.</small>";
+    $out = "<small>There have been <strong>" . $num_sessions . "</strong> active users " .
+           "in the past " . sprintf("%d",$time_diff/60) . " minutes. ".
+           "They have made <strong>" . $num_queries . "</strong> queries.</small>";
 
-#     return $out;
-# }
+    return $out;
+}
 
-# ###
-# # function to call as an alternative to mysql_query
-# # the function stops the execution if the query couldn't be executed
-# # and prints an error message (HTML formatted) (default behaviour)
-# # if behaviour is set to 'continue', then the function just goes on
-# #
-# function mysql_perform_query($query, $link_identifier, $behaviour="die") {
-#     if($behaviour == "continue")
-# 	$result = mysql_query($query, $link_identifier);	    
-#     else {
-# 	$result = mysql_query($query, $link_identifier)
-# 	    or die ("<p>MySQL: could not execute your query<br>$query" .
-# 		    "<br>Contact the <a href=\"mailto:search.support@cds.cern.ch\">" .
-# 		    "CDS Support Team</a>.<br>" .
-# 		    "Error " . mysql_errno($link_identifier) . 
-# 		    ": " . mysql_error($link_identifier) . ".</p>");
-#     }
+###
+# function to call as an alternative to mysql_query
+# the function stops the execution if the query couldn't be executed
+# and prints an error message (HTML formatted) (default behaviour)
+# if behaviour is set to 'continue', then the function just goes on
+#
+function mysql_perform_query($query, $link_identifier, $behaviour="die") {
+    if($behaviour == "continue")
+	$result = mysql_query($query, $link_identifier);	    
+    else {
+	$result = mysql_query($query, $link_identifier)
+	    or die ("<p>MySQL: could not execute your query<br>$query" .
+		    "<br>Contact the <a href=\"mailto:search.support@cds.cern.ch\">" .
+		    "CDS Support Team</a>.<br>" .
+		    "Error " . mysql_errno($link_identifier) . 
+		    ": " . mysql_error($link_identifier) . ".</p>");
+    }
 
-#     return $result;
-# }
+    return $result;
+}
 
-# ## displayMessage():
-# function displayMessage($type, $msg, $where = "screen") {
-#     global $IMAGES;
-#     if (eregi("screen",$where)) { 
-#         echo "\n<p><table><tr><td class=\"devel\"><strong><img src=\"".$IMAGES."/r.gif\" alt=\"*\">&nbsp;".
-#              "$type:</strong> $msg</td></tr></table>\n";
-#     }
-#     if (eregi("logfile",$where)) {
-#         $logfile = "__RUNTIMELOGFILE__";       
-#         $fp = fopen($logfile, "a") or die("unable to open file " .$logfile);
-#         if($fp) {
-#             $buf = "$type: $msg [" .date("Y-m-d H:i:s") ."]\n";
-#             fwrite($fp, $buf);
-#             fclose($fp);
-#         }        
-#     }
-# }
+## displayMessage():
+function displayMessage($type, $msg, $where = "screen") {
+    global $IMAGES;
+    if (eregi("screen",$where)) { 
+        echo "\n<p><table><tr><td class=\"devel\"><strong><img src=\"".$IMAGES."/r.gif\" alt=\"*\">&nbsp;".
+             "$type:</strong> $msg</td></tr></table>\n";
+    }
+    if (eregi("logfile",$where)) {
+        $logfile = "__RUNTIMELOGFILE__";       
+        $fp = fopen($logfile, "a") or die("unable to open file " .$logfile);
+        if($fp) {
+            $buf = "$type: $msg [" .date("Y-m-d H:i:s") ."]\n";
+            fwrite($fp, $buf);
+            fclose($fp);
+        }        
+    }
+}
 
 
-# ## displayLoginMenu()
-# function displayLoginMenu($type) { 
-#     global $WEBDIR,$WEBURL,$uid_email,$doctypes;  
+## displayLoginMenu()
+function displayLoginMenu($type) { 
+    global $WEBDIR,$WEBURL,$uid_email,$doctypes;  
 
-#     print '<table width=100% cellpadding=0 cellspacing=0 border=0>'; 
-#     print '<tr><td>&nbsp;<small><b>PERSONALIZE</b></small></td></tr>';
-#       if ($uid_email != "" && $uid_email != "guest")
-#       {
-#          print '<tr><td>'
-#              . '<form action="'.$WEBURL.'/personalize/youraccount.shtml?action='
-#              . 'logout" method="post"><small>&nbsp;&nbsp;&nbsp;<strong>logged in as:</strong>'
-#              . '<br><font color="green">&nbsp;&nbsp;&nbsp;&nbsp;'.$uid_email.'</font>'
-#              . '</td></tr>';
+    print '<table width=100% cellpadding=0 cellspacing=0 border=0>'; 
+    print '<tr><td>&nbsp;<small><b>PERSONALIZE</b></small></td></tr>';
+      if ($uid_email != "" && $uid_email != "guest")
+      {
+         print '<tr><td>'
+             . '<form action="'.$WEBURL.'/personalize/youraccount.shtml?action='
+             . 'logout" method="post"><small>&nbsp;&nbsp;&nbsp;<strong>logged in as:</strong>'
+             . '<br><font color="green">&nbsp;&nbsp;&nbsp;&nbsp;'.$uid_email.'</font>'
+             . '</td></tr>';
 
-#          if (authenticate($uid_email,'superuser'))
-#          {
-#                print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;<strong>superuser:&nbsp;</strong>'
-#                 . '</font></td></tr>';
-#             print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
-#                    . '<A href="'.$WEBURL.'/admin">'
-# 		   . 'administrative&nbsp;area</A></font></td></tr>';
-#          }
+         if (authenticate($uid_email,'superuser'))
+         {
+               print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;<strong>superuser:&nbsp;</strong>'
+                . '</font></td></tr>';
+            print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
+                   . '<A href="'.$WEBURL.'/admin">'
+		   . 'administrative&nbsp;area</A></font></td></tr>';
+         }
 
-#          if ($type == "search")
-#          {
-#                print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
-#                    . '<A href="'.$WEBURL.'/personalize/youralerts.shtml">'
-# 		   . 'Your&nbsp;Alerts</A></font></td></tr>';
-#                print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
-#                    . '<A href="'.$WEBURL.'/personalize/yourbaskets.shtml">'
-# 		   . 'Your&nbsp;Baskets</A></font></td></tr>';
-#                print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
-#                    . '<A href="'.$WEBURL.'/personalize/yoursearches.shtml">'
-# 		   . 'Your&nbsp;Searches</A></font></td></tr>';
-#                print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
-#                    . '<A href="'.$WEBURL.'/personalize/yoursettings.shtml">'
-# 		   . 'Your&nbsp;Settings</A></font></td></tr>';
-#          }
+         if ($type == "search")
+         {
+               print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
+                   . '<A href="'.$WEBURL.'/personalize/youralerts.shtml">'
+		   . 'Your&nbsp;Alerts</A></font></td></tr>';
+               print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
+                   . '<A href="'.$WEBURL.'/personalize/yourbaskets.shtml">'
+		   . 'Your&nbsp;Baskets</A></font></td></tr>';
+               print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
+                   . '<A href="'.$WEBURL.'/personalize/yoursearches.shtml">'
+		   . 'Your&nbsp;Searches</A></font></td></tr>';
+               print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
+                   . '<A href="'.$WEBURL.'/personalize/yoursettings.shtml">'
+		   . 'Your&nbsp;Settings</A></font></td></tr>';
+         }
 
-# 	 if ($type == "submit")
-#    	 {
-#             $res = mysql_query("
-# SELECT * 
-# FROM   sbmSUBMISSIONS 
-# WHERE  email='$uid_email' and 
-#        status='pending'");
+	 if ($type == "submit")
+   	 {
+            $res = mysql_query("
+SELECT * 
+FROM   sbmSUBMISSIONS 
+WHERE  email='$uid_email' and 
+       status='pending'");
 
-#             $numpending = mysql_num_rows($res);
-#             $res = mysql_query("
-# SELECT * 
-# FROM   sbmSUBMISSIONS 
-# WHERE  email='$uid_email' and 
-#        status='finished'");
+            $numpending = mysql_num_rows($res);
+            $res = mysql_query("
+SELECT * 
+FROM   sbmSUBMISSIONS 
+WHERE  email='$uid_email' and 
+       status='finished'");
 
-#             $numfinished = mysql_num_rows($res);
+            $numfinished = mysql_num_rows($res);
 		
-#             if ($doctypes != "account" || $numpending != 0 || $numfinished != 0)
-#                print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;<strong>view:&nbsp;</strong>'
-#                 . '</font></td></tr>';
+            if ($doctypes != "account" || $numpending != 0 || $numfinished != 0)
+               print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;<strong>view:&nbsp;</strong>'
+                . '</font></td></tr>';
 
-#             if ($doctypes != "account")
-#                print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
-#                    . '<A href="'.$WEBURL.'/personalize/youraccount.shtml">your&nbsp;account'
-#                    . '</A></font></td></tr>';
+            if ($doctypes != "account")
+               print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
+                   . '<A href="'.$WEBURL.'/personalize/youraccount.shtml">your&nbsp;account'
+                   . '</A></font></td></tr>';
 
-#             if ($numpending != 0)
-#                print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
-#                    . '<A href="'.$WEBURL.'/submit/mycds/pending.shtml">your&nbsp;pending'
-# 		   . '&nbsp;submissions</A></font></td></tr>';
+            if ($numpending != 0)
+               print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
+                   . '<A href="'.$WEBURL.'/submit/mycds/pending.shtml">your&nbsp;pending'
+		   . '&nbsp;submissions</A></font></td></tr>';
 
-#             if ($numfinished != 0)
-#                print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
-#                    . '<A href="'.$WEBURL.'/submit/mycds/finished.shtml">your&nbsp;completed'
-#                    . '&nbsp;submissions</A></font></td></tr>';
+            if ($numfinished != 0)
+               print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
+                   . '<A href="'.$WEBURL.'/submit/mycds/finished.shtml">your&nbsp;completed'
+                   . '&nbsp;submissions</A></font></td></tr>';
 	
-#             $res = mysql_query("
-# SELECT * 
-# FROM   sbmDOCTYPE 
-# WHERE  sdocname='$doctypes'");
-#             if ($doctypes != "Main" 
-#              && mysql_num_rows($res) != 0 
-#              && authenticate("$uid_email","canView","$doctypes"))
-#                print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
-#                  . '<A href="'.$WEBURL.'/submit/mycds/submitlist.shtml?doctype='.$doctypes.'">'
-#                  . 'all&nbsp;completed&nbsp;submissions</A></font></td></tr>';
+            $res = mysql_query("
+SELECT * 
+FROM   sbmDOCTYPE 
+WHERE  sdocname='$doctypes'");
+            if ($doctypes != "Main" 
+             && mysql_num_rows($res) != 0 
+             && authenticate("$uid_email","canView","$doctypes"))
+               print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
+                 . '<A href="'.$WEBURL.'/submit/mycds/submitlist.shtml?doctype='.$doctypes.'">'
+                 . 'all&nbsp;completed&nbsp;submissions</A></font></td></tr>';
 
-# 	    // Simple approval process
-# 	    if (authenticate("$uid_email","referee","%","%"))
-# 	       print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
-# 	         . '<A href="'.$WEBURL.'/submit/mycds/simpleapproval.shtml?doctype='
-# 	      . $doctypes.'">the documents I referee</A></font></td></tr>';
+	    // Simple approval process
+	    if (authenticate("$uid_email","referee","%","%"))
+	       print '<tr><td><font size="-1">&nbsp;&nbsp;&nbsp;&nbsp;'
+	         . '<A href="'.$WEBURL.'/submit/mycds/simpleapproval.shtml?doctype='
+	      . $doctypes.'">the documents I referee</A></font></td></tr>';
 
-# 	 }
+	 }
 
-#          print '<tr><td><small><input type="submit" name="action" '
-#                 . 'value="logout"></small></form></td></tr>';
-#       }
-#       else
-#       {
-#          if (isset($SuE))
-#             $initialEmail = $SuE;
-#          else
-#             $initialEmail = "$uid_email";
-#          print '<tr><td><form action="'.$WEBURL
-#              . '/personalize/youraccount.shtml?action=login" method="post"><small>'
-#              . '<strong>Email:</strong>';
-#          print '<br><input type="text" size="13" name="p_email" value="'
-#              . $initialEmail.'">';
-#          print '<br><strong>Password:</strong>';
-#          print '<br><input type="password" size="13" name="p_pw" '
-#              . 'value="">';
-#          print '<br><input type="submit" name="action" value="login">';
-#          print ' (<a href="'.$WEBURL.'/personalize/youraccount.shtml?'
-#              . 'action=register">new user?</a>)';
-#          print '</small></form></td></tr>';
-#       }
-#     print '</table>';
-# }
+         print '<tr><td><small><input type="submit" name="action" '
+                . 'value="logout"></small></form></td></tr>';
+      }
+      else
+      {
+         if (isset($SuE))
+            $initialEmail = $SuE;
+         else
+            $initialEmail = "$uid_email";
+         print '<tr><td><form action="'.$WEBURL
+             . '/personalize/youraccount.shtml?action=login" method="post"><small>'
+             . '<strong>Email:</strong>';
+         print '<br><input type="text" size="13" name="p_email" value="'
+             . $initialEmail.'">';
+         print '<br><strong>Password:</strong>';
+         print '<br><input type="password" size="13" name="p_pw" '
+             . 'value="">';
+         print '<br><input type="submit" name="action" value="login">';
+         print ' (<a href="'.$WEBURL.'/personalize/youraccount.shtml?'
+             . 'action=register">new user?</a>)';
+         print '</small></form></td></tr>';
+      }
+    print '</table>';
+}
 
-# session_start();
-# if (!session_is_registered("uid")) {
-#     $uid = createGuestUser();
-# }
-# $uid_email = getEmail($uid);
-
+#session_start();
+#if (!session_is_registered("uid")) {
+#    $uid = createGuestUser();
+#}
+$uid = 0;
+$uid_email = getEmail($uid);
 ?>
+</protect>
