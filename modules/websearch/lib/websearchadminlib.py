@@ -1064,7 +1064,7 @@ def perform_switchfldscore(colID, id_1, id_2, fmeth, ln=cdslang):
 
     fld_dict = dict(get_def_name('', "field"))
     res = switch_fld_score(colID, id_1, id_2)
-    
+
     output = write_outcome(res)
 
     if fmeth == "soo":
@@ -1366,7 +1366,7 @@ def perform_addexistingfield(colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', c
     for (id, var) in res:
         if fmeth == 'seo' or (fmeth != 'seo' and not col_fld.has_key(id)):
             text += """<option value="%s" %s>%s</option>
-            """ % (id, id  == int(fldID) and 'selected="selected"' or '', fld_dict[id])
+            """ % (id, '', fld_dict[id])
                 
     text += """</select><br>"""
 
@@ -1429,13 +1429,13 @@ def perform_showsortoptions(colID, ln=cdslang, callback='yes', content='', confi
         for (fldID, fldvID, stype, score, score_fieldvalue) in res:
             move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
 	    if i != 0:
-                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=soo&amp;rand=%s#8"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, res[i - 1][0], random.randint(0, 1000), weburl)
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=soo&amp;rand=%s#8"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, res[i - 1][0], random.randint(0, 1000), weburl)
 	    else:
 		move += "&nbsp;&nbsp;&nbsp;&nbsp;"     
 	    move += "</td><td>"
             i += 1
             if i != len(res):
-                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=soo&amp;rand=%s#8"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>""" % (weburl, colID, ln, fldID, res[i][0], random.randint(0, 1000), weburl)
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=soo&amp;rand=%s#8"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>""" % (weburl, colID, ln, fldID, res[i][0], random.randint(0, 1000), weburl)
             move += """</td></tr></table>"""
             
             actions.append([move, fld_dict[int(fldID)]])
@@ -2961,33 +2961,26 @@ def add_col_fld(colID, fldID, type, fldvID=''):
             if res:
                 score = int(res[0][0])
                 res = run_sql("SELECT score_fieldvalue FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s and type='%s' ORDER BY score_fieldvalue desc" % (colID, fldID, type))
-                if res:
-                    v_score = int(res[0][0])
-                else:
-                    v_score = 0
             else:
                 res = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s and type='%s' ORDER BY score desc" % (colID, type))
                 if res:
                     score = int(res[0][0]) + 1
                 else:
                     score = 1
-                v_score = 0
 
             res = run_sql("SELECT * FROM collection_field_fieldvalue where id_field=%s and id_collection=%s and type='%s' and id_fieldvalue=%s" % (fldID, colID, type, fldvID))
             if not res:
-               res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_fieldvalue, id_collection, type, score, score_fieldvalue) values (%s,%s,%s,'%s',%s,%s)" % (fldID, fldvID, colID, type, score, (v_score + 1)))
+               run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=score_fieldvalue+1 WHERE id_field=%s AND id_collection=%s and type='%s'" % (fldID, colID, type))   
+               res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_fieldvalue, id_collection, type, score, score_fieldvalue) values (%s,%s,%s,'%s',%s,%s)" % (fldID, fldvID, colID, type, score, 1))
             else:
-                return (0, (0,"Already exists"))
+                return (0, (1, "Already exists"))
         else:
             res = run_sql("SELECT * FROM collection_field_fieldvalue WHERE id_collection=%s AND type='%s' and id_field=%s and id_fieldvalue is NULL" % (colID, type, fldID))
             if res:
-                raise StandardError
-            res = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s AND type='%s' ORDER BY score desc" % (colID, type))
-            if res:
-                score = int(res[0][0])
+                return (0, (1, "Already exists"))
             else:
-                score = 0
-            res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_collection, type, score,score_fieldvalue) values (%s,%s,'%s',%s, 0)" % (fldID, colID, type, (score + 1)))
+                run_sql("UPDATE collection_field_fieldvalue SET score=score+1")         
+                res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_collection, type, score,score_fieldvalue) values (%s,%s,'%s',%s, 0)" % (fldID, colID, type, 1))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -3046,7 +3039,7 @@ def modify_pbx(colID, pbxID, sel_ln, score='', position='', title='', body=''):
         if position:
             res = run_sql("UPDATE collection_portalbox SET position='%s' WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (position, colID, pbxID, sel_ln))
         return (1, "")
-    except StandardError, e:
+    except Exception, e:
         return (0, e)
 
 def switch_fld_score(colID, id_1, id_2):
@@ -3058,8 +3051,11 @@ def switch_fld_score(colID, id_1, id_2):
     try:
         res1 = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s" % (colID, id_1))
         res2 = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s" % (colID, id_2))
-        res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s" % (res2[0][0], colID, id_1))
-        res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s" % (res1[0][0], colID, id_2))    
+        if res1[0][0] == res2[0][0]:
+            return (0, (1, "Both fields got the same score"))
+        else:
+            res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s" % (res2[0][0], colID, id_1))
+            res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s" % (res1[0][0], colID, id_2))    
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -3073,10 +3069,13 @@ def switch_fld_value_score(colID, id_1, fldvID_1, fldvID_2):
     try:
         res1 = run_sql("SELECT score_fieldvalue FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (colID, id_1, fldvID_1))
         res2 = run_sql("SELECT score_fieldvalue FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (colID, id_1, fldvID_2))
-        res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (res2[0][0], colID, id_1, fldvID_1))
-        res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (res1[0][0], colID, id_1, fldvID_2))    
+        if res1[0][0] == res2[0][0]:
+            return (0, (1, "Both fields got the same score"))
+        else:
+            res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (res2[0][0], colID, id_1, fldvID_1))
+            res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (res1[0][0], colID, id_1, fldvID_2))    
         return (1, "")
-    except StandardError, e:
+    except Exception, e:
         return (0, e)
     
 def switch_pbx_score(colID, id_1, id_2, sel_ln):
@@ -3091,7 +3090,7 @@ def switch_pbx_score(colID, id_1, id_2, sel_ln):
         res = run_sql("UPDATE collection_portalbox SET score=%s WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (res2[0][0], colID, id_1, sel_ln))
         res = run_sql("UPDATE collection_portalbox SET score=%s WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (res1[0][0], colID, id_2, sel_ln))
         return (1, "")
-    except StandardError, e:
+    except Exception, e:
         return (0, e)
 
 def switch_score(colID, id_1, id_2, table):
@@ -3106,5 +3105,5 @@ def switch_score(colID, id_1, id_2, table):
         res = run_sql("UPDATE collection_%s SET score=%s WHERE id_collection=%s and id_%s=%s" % (table, res2[0][0], colID, table, id_1))
         res = run_sql("UPDATE collection_%s SET score=%s WHERE id_collection=%s and id_%s=%s" % (table, res1[0][0], colID, table, id_2))
         return (1, "")
-    except StandardError, e:
+    except Exception, e:
         return (0, e)
