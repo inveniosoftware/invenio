@@ -19,7 +19,7 @@
 
 docdir = $(WEBDIR)/hacking/bibrank
 
-doc_DATA=
+doc_DATA= index.html single_tag_rank.html bibrankgkb.html sort.html
 
 EXTRA_DIST = $(wildcard *.wml)
 

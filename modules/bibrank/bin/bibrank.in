@@ -40,7 +40,8 @@ Usage: %s [options]
  -c, --collection=c1,c2    Collections to include in this set
  -i, --id=idr1,idr2        Record ranges to include in this set
  -m, --modified=[from]     Update records modified after date
- -k, --check               Check if set needs rebalancing
+ -k, --check=value         Check if set needs rebalancing, (if the top
+                           star is higher than given percentage 0-1.0)
  -S, --stat                Show statistics
  -w, --run=rm1,rm2         Runs each rank method in the order given
  -r, --rebalance           Rebalance, do full update
@@ -110,7 +111,7 @@ except ImportError, e:
 try:
     import psyco
     psyco.bind(sort())
-    psyco.bind(single_tag_kb())
+    psyco.bind(single_tag_rank())
     psyco.bind(serialize_via_numeric_array)
     psyco.bind(Authorimpact())
     psyco.bind(Merge())
@@ -164,24 +165,24 @@ def citationimpact(methname, starsets, config):
     #intoDB(starset)
     showtime((time.time() - startCreate))    
     
-def single_tag_kb(starset, config):
+def single_tag_rank(starset, config):
     """Connect the given tag with the data from the kb file given"""
     if opts_dict["verbose"] >= 9:
         write_message("Loading knowledgebase file")
-    journals = {}
+    kb_data = {}
     records = []
 
-    input = open(config.get("single_tag_kb", "kb_src"), 'r')
+    input = open(config.get("single_tag_rank", "kb_src"), 'r')
     data = input.readlines()
         
     for line in data:
-        if not line[0:2] == "//":
-            journals[string.strip((string.split(string.strip(line),"---"))[0])] = (string.split(string.strip(line), "---"))[1]
+        if not line[0:2] == "#":
+            kb_data[string.strip((string.split(string.strip(line),"---"))[0])] = (string.split(string.strip(line), "---"))[1]
 
-    tag = config.get("single_tag_kb","tag")
-    tags = split(config.get("single_tag_kb", "check_mandatory_tags"),",")
+    tag = config.get("single_tag_rank","tag")
+    tags = split(config.get("single_tag_rank", "check_mandatory_tags"),",")
 
-    if not opts_dict["modified"] or config.get("single_tag_kb", "enable_modified") == "no":
+    if not opts_dict["modified"] or config.get("single_tag_rank", "enable_modified") == "no":
         records = run_sql("SELECT id_bibrec,value FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id" % (tag[0:2], tag[0:2], tag))
         valid = HitSet(Numeric.ones(cfg_max_recID + 1))
         for key in tags:
@@ -205,12 +206,12 @@ def single_tag_kb(starset, config):
 
     documents = {}
     for key,value in records:
-        if journals.has_key(value):
+        if kb_data.has_key(value):
             if not documents.has_key(key):
-                documents[key] = (value, float(journals[value]))
+                documents[key] = (value, float(kb_data[value]))
             else:
-                if journals.has_key(documents[key]) and float(journals[value]) > float((documents[key])[1]):
-                    documents[key] = (value, float(journals[value]))
+                if journals.has_key(documents[key]) and float(kb_data[value]) > float((documents[key])[1]):
+                    documents[key] = (value, float(kb_data[value]))
         else:
             documents[key] = (value, - 1.0)
     return documents
@@ -307,7 +308,7 @@ def accessimpact(methname, starsets, config):
     intoDB(starset)
     showtime((time.time() - startCreate))
 
-def single_tag_kb_method(methname, starsets, config):
+def single_tag_rank_method(methname, starsets, config):
     """Creating rankset"""
     startCreate = time.time()
     starset = starsets[methname]
@@ -320,11 +321,11 @@ def single_tag_kb_method(methname, starsets, config):
         if opts_dict["verbose"] >= 9:
             write_message("Updating records modified after: %s" % opts_dict["modified"])    
         starset.setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-        tempdoc = single_tag_kb(starset, config)
+        tempdoc = single_tag_rank(starset, config)
         merge_two_sets(tempdoc, starset)
     else:
         starset.setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-        tempdoc = single_tag_kb(starset, config)
+        tempdoc = single_tag_rank(starset, config)
         starset.setUnsorted(tempdoc)
         sort(starset)
     intoDB(starset)
@@ -357,7 +358,7 @@ def authorimpact(methname, starsets, config):
     starset = starsets[methname]
     if opts_dict["verbose"] >= 1:
         write_message("Running: %s" % starset.getName())
-    tempdoc = single_tag_kb(starset, config)
+    tempdoc = single_tag_rank(starset, config)
  
     Auth1 = {}
     documents2 = {}
@@ -525,13 +526,14 @@ def stats(starset):
     """Print statistics"""
     try:
         total = 0
-        write_message("Statistics: %s , Star 1 size: %s%% , Overall Importance: %s%%" % (starset.getName(), round(float(starset.getTopStar()) * 100,2), round(float(starset.getWeigth())*100, 2)))
+        write_message("Statistics: %s , Top Star size: %s%% , Overall Importance: %s%%" % (starset.getName(), round(float(starset.getTopStar()) * 100,2), round(float(starset.getWeigth())*100, 2)))
         for nr in range(0, starset.getSize() + 1):
             write_message("%s star(s): Range >= \t%s\t%s" % (nr, round(starset.getThreshold()[nr],3), (starset.getStar(nr))._nbhits))
             total = total + (starset.getStar(nr))._nbhits
         write_message("Total: %s" % total)
     except StandardError, e:
-        write_message("Error showing statistics: %s" % starset.getName())
+        write_message("Error showing statistics: %s" % starset.getName(), sys.stderr())
+        raise StandardError
 
 def check(starset):
     """Check if rebalancing is necessary"""
@@ -540,11 +542,12 @@ def check(starset):
         if opts_dict["verbose"] >= 9:
             for nr in range(1, starset.getSize() + 1):
                 write_message("%s---%f" % (nr, float(starset.getStar(nr)._nbhits) / float(size)))
-        if (float(starset.getStar(starset.getSize())._nbhits) / float(size)) > starset.getTopStar() * 1.25:
+        if (float(starset.getStar(starset.getSize())._nbhits) / float(size)) >= float(opts_dict["check"]):
             write_message("Rebalance: %s" % starset.getName())
     except StandardError, e:
-        write_message("Error checking: %s" % starset.getName())
-        
+        write_message("Error checking: %s" % starset.getName(), sys.stderr)
+        raise StandardError
+    
 def sort(starset):
     """Sort starset into stars"""
     tempdoc = starset.getUnsorted()
@@ -600,6 +603,7 @@ def sort(starset):
                     slice = filter(lambda x: x[1]>=mbound,set)
                     sets[i].addlist(map(lambda x: x[0], slice))
                     set = set[len(slice): len(set)]                                                             
+
         if len(set) != 0:
             sets[1].addlist(set)
         threshold[1] = -1.0
@@ -759,10 +763,8 @@ def intoDB(starset):
     try:
         id = run_sql("SELECT id from rnkMETHOD where name='%s'" % (starset.getShortName()))
         if len(id) == 0:
-            if opts_dict["verbose"] >= 9:
-                write_message("INSERT into rnkMETHOD(name,last_updated) values('%s','')" % starset.getShortName())
-            data = run_sql("INSERT into rnkMETHOD(name,last_updated) values(%s,%s)", (starset.getShortName(),starset.getLastUpdated()))
-            id = run_sql("SELECT id FROM rnkMETHOD WHERE name=%s", (starset.getShortName(),))
+            write_message("Could not find method in database")
+            raise StandardError
         if opts_dict["verbose"] >= 9:
             write_message("DELETE FROM rnkSET WHERE id_rnkMETHOD=%s" % id[0][0])
             write_message("UPDATE rnkMETHOD SET star_category_ranges WHERE id=%s" % id[0][0])
@@ -775,7 +777,7 @@ def intoDB(starset):
                 write_message("INSERT INTO rnkSET(id_rnkMETHOD,star_category) VALUES(%s,%s)" % (id[0][0], key2))
             data = run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE id=%s",(starset.getLastUpdated(),id[0][0]))
     except StandardError, e:
-        write_message("Could not insert rankdata into database")
+        write_message("Could not insert rankdata into database, please check that this rank method has been added to the database.", sys.stderr)
         task_update_status("ERROR")
         task_sig_stop_commands()
         sys.exit(1)
@@ -803,7 +805,7 @@ def fromDB(starset):
         starset.setLastUpdated(date)
         starset.setThreshold(threshold)
     except StandardError, e:
-        write_message("Rebalance: %s" % starset.getName())
+        write_message("Rebalance: %s" % starset.getName(), sys.stderr)
         task_update_status("ERROR")
         task_sig_stop_commands()
         sys.exit(1)
@@ -817,30 +819,6 @@ def write_message(msg, stream = sys.stdout):
     else:
         sys.stderr.write("Unknown stream %s. [must be sys.stdout or sys.stderr]\n" % stream)
     return
-
-def main():
-    if len(sys.argv) == 2:
-        try:
-            id = int(sys.argv[1])
-        except StandardError, err:
-            command_line()
-            sys.exit()
-        res = run_sql("SELECT * FROM schTASK WHERE id='%d'" % (id), None, 1)
-        if not res:
-            write_message("Selected task not found.", sys.stderr)
-            sys.exit(1)
-        try:
-            if not task_run(res[0]):
-                write_message("Error occurred. Exiting.", sys.stderr)
-        except StandardError, e:
-            write_message("Unexpected error occurred: %s." % e, sys.stderr)
-            write_message("Traceback is:")
-            traceback.print_tb(sys.exc_info()[2])
-            write_message("Exiting.")
-            task_update_status("ERROR")
-    else:
-        command_line()
-
 
 def authenticate(user, header="BibRank Task Submission", action="runbibrank"):
     print header
@@ -884,7 +862,8 @@ def usage(code, msg=''):
  -c, --collection=c1,c2    Collections to include in this set
  -i, --id=idr1,idr2        Record ranges to include in this set
  -m, --modified=[from]     Update records modified after date
- -k, --check               Check if set needs rebalancing
+ -k, --check=value         Check if set needs rebalancing, (if the top
+                           star is higher than given percentage 0-1.0)
  -S, --stat                Show statistics
  -w, --run=rm1,rm2         Runs each rank method in the order given
  -r, --rebalance           Rebalance
@@ -1052,12 +1031,16 @@ def task_run(row):
                     opts_dict["validset"].add(j)
                     
         for key in opts_dict["run"]:
+            #file = "/home/trondaks/w/cdsware/modules/bibrank/etc/" + key + ".cfg"
             file = etcdir + "/bibrank/" + key + ".cfg"
-            print file
             if opts_dict["verbose"] >=9:
                 write_message("Getting configuration from file: %s" % file)
             config = ConfigParser.ConfigParser()
-            config.readfp(open(file))
+            try:
+                config.readfp(open(file))
+            except StandardError, e:
+                write_message("Cannot find configurationfile: %s" % file, sys.stderr)
+                raise StandardError
             cfg_stars = number_of_stars 
             cfg_star = config.getfloat("rank_method", "top_star_percentage")
             cfg_short = key
@@ -1068,7 +1051,6 @@ def task_run(row):
             
             if opts_dict["verbose"] >= 9:
                 print ""
-            print cfg_function
             func_object = globals().get(cfg_function)
             func_object(key,sets,config)
             if opts_dict["stat"]:
@@ -1090,8 +1072,8 @@ def task_run(row):
 
 def command_line():
     global opts_dict
-    long_flags = ["stat", "rebalance", "id=", "collection=", "check", "modified=", "update", "run=", "user=", "sleeptime=", "time=", "help", "version", "verbose="]
-    short_flags = "Si:c:kUrm:w:u:s:t:hVv:"
+    long_flags = ["stat", "rebalance", "id=", "collection=", "check=", "modified=", "update", "run=", "user=", "sleeptime=", "time=", "help", "version", "verbose="]
+    short_flags = "Si:c:k:Urm:w:u:s:t:hVv:"
     format_string = "%Y-%m-%d %H:%M:%S"
     sleeptime = ""
     try:
@@ -1121,7 +1103,7 @@ def command_line():
             elif opt[0] in [ "-u", "--user"]:
                 user = opt[1]
             elif opt[0] in [ "-k", "--check"]:
-                opts_dict["check"]= "true"
+                opts_dict["check"]= opt[1]
             elif opt[0] in [ "-S", "--stat"]:
                 opts_dict["stat"] = "true"
             elif opt[0] in [ "-i", "--id" ]:
@@ -1151,5 +1133,28 @@ def command_line():
     print "Task #%d was successfully scheduled for execution." % new_task_id
     return
 
+def main():
+    if len(sys.argv) == 2:
+        try:
+            id = int(sys.argv[1])
+        except StandardError, err:
+            command_line()
+            sys.exit()
+        res = run_sql("SELECT * FROM schTASK WHERE id='%d'" % (id), None, 1)
+        if not res:
+            write_message("Selected task not found.", sys.stderr)
+            sys.exit(1)
+        try:
+            if not task_run(res[0]):
+                write_message("Error occurred. Exiting.", sys.stderr)
+        except StandardError, e:
+            write_message("Unexpected error occurred: %s." % e, sys.stderr)
+            write_message("Traceback is:")
+            traceback.print_tb(sys.exc_info()[2])
+            write_message("Exiting.")
+            task_update_status("ERROR")
+    else:
+        command_line()
+        
 if __name__ == "__main__":
     main()
