@@ -236,7 +236,7 @@ useful to this effect.
 <h3><strong class="headerboxbodylogo">Index</strong></h3>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
@@ -246,7 +246,7 @@ useful to this effect.
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-produce-list-of-publications">How to produce list of your publications</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
@@ -259,8 +259,8 @@ basically provides you with one input box where you can type your
 query, followed by a possibility to choose one of the common indexes
 to search within.  You would usually simply type the keywords you are
 interested in and hit return.  For example, if you are interested in
-documents on <em>standard model</em> from <em>Ellis</em>, you would
-type:
+documents on <em>standard model</em> that are written by (or mention)
+<em>Ellis</em>, you would type:
 
     <form action="<WEBURL>/search.py" method="get">
     <blockquote>
@@ -270,8 +270,9 @@ type:
     </blockquote>
     </form>
 
-and on the search results page you would further add/remove keywords
-to get at what you were looking for.
+and on the search results page you could further add/remove keywords
+to get more precisely at what you are looking for, as is mentioned <a
+href="#boolean">below</a>.
 
 <p>The <strong>advanced search</strong> interface provides you with
 explicit tools to play with: you can change the matching type from
@@ -386,7 +387,7 @@ for and see what the system says in return.  If you aren't satisfied,
 you would then add/remove words from your query until the satisfactory
 reply.
 
-<h3><a name="words">Searching for words versus phrases</a></h3>
+<h3><a name="words-vs-phrases">Searching for words versus phrases</a></h3>
 
 <p>The default search mode is a <strong>search for words</strong>.  This
 means that any whitespace you type is not significant, but is rather
@@ -411,8 +412,8 @@ There are two phrase searching modes:
 <li>The double quotes instruct the search engine to <strong>search for
     exact phrase</strong>.  This phrase search mode will match if and
     only if the given metadata field is exactly equal to the input
-    pattern.  For example, to find all the documents by <em>Ellis,
-    J</em>, type:
+    pattern.  For example, to find all documents written by <em>Ellis,
+    J</em> spelled exactly that way, type:
 
       <form action="<WEBURL>/search.py" method="get">
       <blockquote>
@@ -423,13 +424,13 @@ There are two phrase searching modes:
       </form>
 
 <li>The single quotes instruct the search engine to <strong>search for
-    partial phrase</strong>.  Unlike exact phrase search, this mode
-    will find "subphrases" that match given pattern, thus allowing
-    for some words before/after given text.  This is the mode Google
-    and other fulltext engines call a "phrase search".  For example,
-    to find all the titles containing the expression <em>muon
-    decay</em> regardless of the position of the expression in the
-    title, type:
+    partial phrase</strong>.  Unlike the exact phrase search, this
+    mode allows for an extra text appearing before/after given
+    pattern.  This is somewhat similar to the "phrase search mode"
+    common on Google and other fulltext engines that search for phrase
+    expressions inside Web pages.  For example, to find all the titles
+    containing the expression <em>muon decay</em> regardless of the
+    position of the expression in the title, type:
 
       <form action="<WEBURL>/search.py" method="get">
       <blockquote>
@@ -439,12 +440,29 @@ There are two phrase searching modes:
       </blockquote>
       </form>
 
+    Now you see how to search for an author spelled sometimes as
+    <em>Ellis, J</em> and sometimes as <em>Ellis, Jonathan
+    Richard</em> (and other authors, such as <em>De Lellis, Jim</em>)
+    at the same time:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="'Ellis, J'">
+      <select name="f"><option value="">any field<option>title<option selected>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+    (See also our specific <a href="#howto-search-for-author">author
+    searching tips</a>.)
+
 </ol>
 
-The difference between exact and partial phrase searches may not be
-obvious.  It's good to remember that the search engines usually offer
-the latter.  We offer the two at the moment, since the first one is
-usually an order of magnitude faster.
+The difference between exact and partial phrase searching modes may
+not be obvious upon first look.  While the latter is more similar to
+what ``phrase search'' usually means in the context of web page search
+engines, the former one is usually an order of magnitude faster if you
+know the precise values you are looking for.
 
 <h3><a name="boolean">Boolean queries</a></h3>
 
@@ -859,22 +877,76 @@ J</em> to <em>Ellis, Qqq</em>, type:
     <a href="<WEBURL>/?c=Theses">Theses</a> collection first, and start your search from there.
 </ul>
 
-<h4><a name="howto-list-of-publications">How to produce list of your publications</a></h4>
-<p>
-The author names are usually stored in a form with initials only such as <em>Ellis, J</em>.
-To get the list of publications in this case, type:
+<h4><a name="howto-search-for-author">How to search for publications by a given author</a></h4>
+
+<p>You can search for an author in many ways, each having its own
+advantages and disadvantages.
+
+<ol>
+
+<li>First of all, note that searching for words isn't usually what you
+would want here.  If you choose to search for the words <code>Ellis
+J</code> within the author index, it means that two queries (for the
+words <code>Ellis</code> and <code>J</code>) are effected first and a
+boolean AND is performed next:
 
       <form action="<WEBURL>/search.py" method="get">
       <blockquote>
-      <input size=40 type="text" name="p" value="author:&quot;Ellis, J&quot;">
+      <input size=40 type="text" name="p" value="Ellis J">
       <select name="f"><option value="">any field<option>title<option selected>author</select>
       <input class="formbutton" type="submit" name="action" value="SEARCH">
       </blockquote>
       </form>
 
-Sometimes the first name may be spelled in full, such as <em>Ellis, John</em>.
-To get the list of publications for both forms at the same time, you could use a
-wildcard query:
+<p>Such a query would match also a document whose first author is
+<em>Ellis, R</em> and the second author <em>Finch, A J</em>, which is
+probably not what you wanted.  While the search is very fast and you
+would have found the results for the author you were looking for, such
+a technique could have returned you many false positives, as the one
+cited above.  Instead of searching for words, a more suitable
+technique to apply in this case is to search for phrases which will
+permit you to achieve higher search precisions.
+
+<li>The author names are usually stored in a form containing initials
+only, such as <em>Ellis, J</em>.  To get the list of publications of
+an author whose name is spelled exactly that way, type:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=40 type="text" name="p" value="author:&quot;Ellis, J&quot;">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+<p>This way of searching gives you the highest precision and no false
+positives.  (Assuming there are no other authors whose names are
+spelled <em>Ellis, J</em>, an assumption that is often false<a
+href="#author-full-names"><sup>*</sup></a>.)  The search is very fast.
+
+<li> Sometimes an author's first name may be spelled abbreviated on
+some documents (such as <em>Ellis, J</em>) and sometimes full on
+others (such as <em>Ellis, John</em>; eventually also with the middle
+name: <em>Ellis, John Rolfe</em>).  To get the list of publications
+for all these forms at the same time, you could use a boolean OR
+query:
+
+      <form action="<WEBURL>/search.py" method="get">
+      <blockquote>
+      <input size=60 type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;">
+      <select name="f"><option value="">any field<option>title<option>author</select>
+      <input class="formbutton" type="submit" name="action" value="SEARCH">
+      </blockquote>
+      </form>
+
+<p>This way of searching still keeps the highest precision and no
+false positives.  (Assuming there are no other authors whose names are
+spelled <em>Ellis, J</em> or <em>Ellis, John</em>, an assumption that
+is often false<a href="#author-full-names"><sup>*</sup></a>.)  The search is
+fast.
+
+<li>To match all of the above forms in a single search term, you can
+try to use a wildcard query:
 
       <form action="<WEBURL>/search.py" method="get">
       <blockquote>
@@ -884,7 +956,18 @@ wildcard query:
       </blockquote>
       </form>
 
-or a partial phrase matching:
+<p>It would match all author names that start by the text
+<code>Ellis, J</code>, i.e. not only the wanted forms <em>Ellis,
+J</em> and <em>Ellis, John</em>, but also <em>Ellis, Jim</em>, or
+<em>Ellis, John Rolfe</em>, or <em>Ellis, Jonathan Richard</em>.
+
+<p>This way of searching returns you more results, which may be
+suitable in case you don't know how the names are spelled in the
+database.  But you also risk the eventuality of getting false
+positives.  The search is relatively fast.
+
+<li>Yet another, the most general alternative is to use a partial
+phrase matching:
     
       <form action="<WEBURL>/search.py" method="get">
       <blockquote>
@@ -894,45 +977,28 @@ or a partial phrase matching:
       </blockquote>
       </form>
 
-The difference is the following.  The former technique (double quotes with a wildcard) matches any author whose
-name <strong>starts by the string</strong> <code>Ellis, J</code>, so that it can match names like
-<em>Ellis, J</em>, <em>Ellis, John</em>, <em>Ellis, Jonathan Richard</em>, etc.
-The latter technique (single quotes) matches any author whose name <strong>contains the string</strong>
-<code>Ellis, J</code> so that in addition to previous matches you have also obtained a match for <em>De Lellis, G</em>.
+<p>It would find not only all the authors mentioned above, but also
+the ones whose names contain the expression <code>Ellis, J</code>
+anywhere inside the name, such as <em>De Lellis, Jim</em>.  It thus
+gives you the largest possible number of hits at the largest risk of
+false positives.  The search is relatively slow.
 
-<p>Note that the latter kind of searching may be useful especially
-in case of compound family names.  For example, imagine that
-<em>Pepe-Altarelli, M</em> is spelled on some documets as <em>Altarelli, M</em>.
-If you then type:
+<p>(Note though that this way of searching may be very handy in case
+of compound family names such <em>Pepe-Altarelli, M</em> or <em>'t
+Hooft, G</em> where a casual user query for <em>Hooft, G</em> would
+match the wanted author, unlike the methods mentioned above.)
 
-      <form action="<WEBURL>/search.py" method="get">
-      <blockquote>
-      <input size=40 type="text" name="p" value="author:'Altarelli, M'">
-      <select name="f"><option value="">any field<option>title<option>author</select>
-      <input class="formbutton" type="submit" name="action" value="SEARCH">
-      </blockquote>
-      </form>
+</ol>
 
-you will obtain hits for the both forms (and possibly more, as already discussed above).
-
-<p>It the two cases mentioned above we have seen how important it is to pay attention to false positives.
-To include only the author name versions you are interested in, you can use a boolean OR query:
-
-      <form action="<WEBURL>/search.py" method="get">
-      <blockquote>
-      <input size=40 type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John Rolfe&quot;">
-      <select name="f"><option value="">any field<option>title<option>author</select>
-      <input class="formbutton" type="submit" name="action" value="SEARCH">
-      </blockquote>
-      </form>
-
-<p>Note that this may still lead to false positives, in case the abbreviated form
-<em>Ellis, J</em> represents in addition a distinct person such as <em>Ellis, Jim</em>.
-There is no way to distinguish them automatically.  You may want to contact the
-<a href="mailto:<ADMINEMAIL>">administrators</a> of <CDSNAMEINTL>
-who will take care of revising the author names with you so that the database would
-contain a consistently spelled and properly formatted full name instead of just the
-initials.
+<p><a name="author-full-names"><strong><sup>*</sup>NOTE:</strong></a>
+If you produce your own list of publications and you notice that
+sometimes your first name is spelled abbreviated and sometimes in
+full, or if you want to idenfify your publications among several
+authors with the same abbreviation, please contact the <a
+href="mailto:<ADMINEMAIL>">administrators</a> of <CDSNAMEINTL> so that
+they could work with you on inputting a consistently spelled and
+properly formatted first name everywhere.  Only the consistent
+database content will ensure a proper author searching behaviour.
 
 <h4><a name="howto-sort-pattern">How to sort according to a certain pattern</a></h4>
 
