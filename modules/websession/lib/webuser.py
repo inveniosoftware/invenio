@@ -42,14 +42,12 @@ from config import *
 from messages import *
 from cdsware.access_control_engine import acc_authorize_action
 
-def create_GuestUser():
+def createGuestUser():
     """Create a guest user , insert into user null values in all fields 
 
-       create_GuestUser() -> GuestUserID
-    """
-    
-    query_result = run_sql("insert into user (email) values ('')")
-    return query_result
+       createGuestUser() -> GuestUserID
+    """    
+    return run_sql("insert into user (email) values ('')")
 
 def getUid ( request ):
     """It gives the userId taking it from the cookie of the request,also has the control mechanism for the guest users,
@@ -58,30 +56,29 @@ def getUid ( request ):
        getUid(request) -> userId	 
     """
     sm = session.MPSessionManager(pSession, pSessionMapping())
-    try :
+    try:
 	s = sm.get_session(request)
     except SessionError,e:
-        s = sm.create_session(request)
 	sm.revoke_session_cookie (request)
-	idg = create_GuestUser()
-        s.setUid(idg)
-        return idg
-
+	s = sm.get_session(request)
     userId = s.getUid()
-    if userId == -1:# first time,create a guest_user
-        id1 = create_GuestUser()
-        s.setUid(id1)
-        sm.maintain_session(request,s)
-        return userId
+    if userId == -1: # first time, so create a guest user
+        s.setUid(createGuestUser())
+    sm.maintain_session(request,s)
     return userId
 
 def setUid(request,uid):
     """It sets the userId into the session, and raise the cookie to the client.
     """
     sm = session.MPSessionManager(pSession, pSessionMapping())
-    s = sm.get_session(request)
+    try:
+	s = sm.get_session(request)
+    except SessionError,e:
+	sm.revoke_session_cookie (request)
+	s = sm.get_session(request)
     s.setUid(uid)
     sm.maintain_session(request,s)
+    return uid
     
 def isGuestUser(uid):
     """It Checks if the userId corresponds to a guestUser or not
@@ -190,8 +187,7 @@ def registerUser(request,user,passw):
     if userOnSystem(user) and  user !='':
 	return -1	
     if checkRegister(user,passw) and checkemail(user):
-	query_result = run_sql("insert into user (email, password) values (%s,%s)", (user,passw))
-	setUid(request,query_result)
+	setUid(request, run_sql("INSERT INTO user (email, password) VALUES (%s,%s)", (user,passw))
 	return 1
     return 0
 
@@ -213,8 +209,12 @@ def logoutUser(req):
     """It logout the user of the system, creating a guest user.
     """
     sm = session.MPSessionManager(pSession, pSessionMapping())
-    s = sm.get_session(req)
-    id1 = create_GuestUser()
+    try:
+	s = sm.get_session(request)
+    except SessionError,e:
+	sm.revoke_session_cookie (request)
+	s = sm.get_session(request)
+    id1 = createGuestUser()
     s.setUid(id1)
     sm.maintain_session(req,s)
     return id1	
@@ -282,6 +282,10 @@ def create_userinfobox_body(uid, language="en"):
                (weburl, language, msg_logout[language])
     return """<img src="%s/img/head.gif" border="0"> %s""" % (weburl, out) 
 
+def list_registered_users():
+    """List all registered users."""    
+    return run_sql("SELECT id,email FROM user where email!=''")
+
 ## --- follow some functions for Apache user/group authentication
 
 def auth_apache_user_p(user, password):
@@ -325,10 +329,4 @@ def auth_apache_user_collection_p(user, password, coll):
         return 1
     else:
         return 0
-
-def list_registered_users():
-    """list all users"""
-    
-    try: return run_sql("""SELECT id,email FROM user where email!=''""")
-    except IndexError: return []
     
