@@ -25,6 +25,7 @@
 from config import *
 from webuser import create_user_infobox
 import re
+import string
 import sys
 import time
 import traceback
@@ -149,7 +150,7 @@ def create_error_box(req, title="<strong>Internal Error:</strong>"):
         boxbody += """Browser: %s\n""" % req.headers_in['User-Agent']
     boxbody += """Client: %s\n""" % req.connection.remote_ip
     boxbody += """Error: %s %s\n""" % (sys.exc_info()[0], sys.exc_info()[1])
-    boxbody += """Traceback: %s\n""" % traceback.print_tb(sys.exc_info()[2])
+    boxbody += "Traceback: \n%s" % string.join(traceback.format_tb(sys.exc_info()[2]),"\n")
     boxbody += """</pre></blockquote>"""
     out = """
         <table class="errorbox">
