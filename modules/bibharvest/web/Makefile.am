@@ -17,6 +17,17 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = bin lib web
+webappdir = $(WEBDIR)
 
-CLEANFILES = *~
+webapp_DATA=oai2d.py
+
+EXTRA_DIST = $(wildcard *.wml)
+
+CLEANFILES = $(bin_SCRIPTS) $(webapp_DATA) *~ *.tmp search.pyc
+
+%.py: %.py.wml ../../../config/config.wml ../../../config/configbis.wml
+	$(WML) -o $@ $<
+
+%: %.wml ../../../config/config.wml ../../../config/configbis.wml
+	$(WML) -o $@ $<
+	chmod u+x $@
