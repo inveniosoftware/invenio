@@ -1,0 +1,261 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="WebSearch Admin Guide" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websearch/>WebSearch Admin</a>" \
+    navbar_select="websearch"
+
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     WARNING: WEBSEARCH ADMIN GUIDE IS NOT FULLY COMPLETED
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+
+     WebSearch Admin Guide is not yet completed.  Moreover, some
+     admin-level functionality for WebSearch exists only in
+     commandline mode.  We are in the process of developing both the
+     guide as well as the web admin interface.  If you are interested
+     in seeing some specific things implemented with high priority,
+     please contact us at <SUPPORTEMAIL>.  Thanks for your interest!
+     
+   </td>
+   </tr>
+   </tbody>
+   </table>
+
+
+<h3>Index</h3>
+<strong>1.<a href="#1">Overview</a></strong></br>
+<strong>2. <a href="#2">Edit Collection Tree</a></strong></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.1 <a href="#2.1">Add new collection</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.2 <a href="#2.2">Add collection to tree</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.3 <a href="#2.3">Modify existing tree</a></br>
+<strong>3. <a href="#3">Edit Collection Parameters</a></strong></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1. <a href="#3.1">Modify collection query</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2. <a href="#3.2">Modify access restrictions</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3. <a href="#3.3">Modify translations</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4. <a href="#3.4">Delete collection</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5. <a href="#3.5">Modify portalboxes</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.6. <a href="#3.6">Modify search fields</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.7. <a href="#3.7">Modify search options</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.8. <a href="#3.8">Modify sort options</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.9. <a href="#3.9">Modify rank options</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.10.<a href="#3.10">Modify output formats</a></br>
+<strong>4. <a href="#4">Run WebColl Daemon</a></strong></br>
+<strong>5. <a href="#5">Edit Search Engine Parameters</a></strong></br>
+<strong>6. <a href="#6">Search Engine Cache</a></strong></br>
+<strong>7. <a href="#7">Additional Information</a></strong></br>
+
+<a name="1"></a><h2>1. Overview</h2>
+
+WebSearch Admin interface will help you to configure the search
+collections that the end-users see.  The WebSearch Admin functionality
+can be basically separated into several parts: (i) how to organize
+collections into <a href="#2">collection tree</a>; (ii) how to define
+and edit <a href="#3">collection parameters</a>; (iii) how to update
+collection cache via the <a href="#3">webcoll daemon</a>; and (iv) how
+to influence the search engine behaviour and set various <a
+href="#5">search engine parameters</a>.  These issues will be
+subsequently described in the rest of this guide.
+
+<a name="2"></a><h2>2. Edit Collection Tree</h2>
+
+<p>Metadata corpus in CDSware is organized into collections.  The
+collections are organized in a tree.  The collection tree is what the
+end-users see when they start to navigate at <a
+href="<WEBURL>"><CDSNAME></a>.  The collection tree is similar to what
+other sites call Web Directories that organize Web into topical
+categories, such as <a href="http://www.google.com/dirhp">Google
+Directory</a>.
+
+<p>Note that CDSware permits every collection in the tree to have
+either "regular" or "virtual" sons.  In other words, every node in the
+collection tree may see either regular or virtual branches growing out
+of it.  This permits to create a tree with very complex, multi-level,
+nested structures of regular and virtual branches, if needed, with the
+aim to ease navigation to end-users from one branch to another.  The
+difference between a regular and a virtual branch will be explained in
+detail further below in the <a href="#2.2">section 2.2</a>.
+
+<a name="2.1"></a><h3>2.1 Add new collection</h3>
+
+<p>To add a new collection, enter its default name in the default
+language of the installation (<CDSLANG>) and click on the ADD button
+to add it.  There are two important actions that you have to perform
+after adding a collection:
+
+    <ul>
+
+    <li>You have to define the set of records that belong to this
+        collection.  This is done by defining a search engine query
+        that would return all records belonging to this collection.
+        See hints on <a href="#3.1">modify collection query</a> below.
+    
+    <li>In order for the collection to appear in the collection
+        navigation tree, you will have to attach it to some existing
+        collection in the tree.  See hints on <a href="#2.2">add
+        collection to tree</a> below.
+        
+    </ul>
+
+<p>After you edit these two things, the collection is fully usable for
+   the search interface.  It will appear in the search interface after
+   the next run of the <a href="#5">WebColl Daemon</a>.
+
+<p>However, you will probably want to customize further things, like
+   define collection name translation in various languages, define
+   collection web page portalboxes, define search options, etc, as
+   explained in this guide under the section <a href="#3">Edit
+   Collection Parameters</a>.
+
+<a name="2.2"></a><h3>2.2 Add collection to tree</h3>
+
+<p>To attach a collection to the tree, choose first which collection
+do you want to attach, then choose the father collection to attach to,
+and then choose the fathership relation type between them (regular,
+virtual).
+
+<p>The difference between the regular and the virtual relationship
+goes as follows:
+
+    <ul>
+
+    <li><strong>regular relationship</strong>: If collection A is
+        composed of B and C, in a way that every document belonging to
+        A is either B or C, then this schema corresponds to the
+        regular type of relationship.  For example, let A equals to
+        "Multimedia" and B and C to "Photos" and "Videos",
+        respectively.  The latter collections would then be declared
+        as regular sons of "Multimedia" and they would appear in the
+        left-hand-side regular navigation tree entitled "Narrow by
+        Collection" in the collection tree.
+
+    <li><strong>virtual relationship</strong>: In addition to the
+        regular decomposition of "Multimedia" into "Photos" and
+        "Videos", it may be advantageous to present a different,
+        orthogonal point of view on "Multimedia", based not on the
+        document type as seen above, but rather on the document
+        creator information.  Let us consider that some (large) part
+        of the multimedia material was created by the "University
+        Multimedia Service" and some (small) part by an external TV
+        company such as BBC.  It may be advantageous to advertize this
+        point of view to the end users too, so they they would be able
+        to easily navigate down to the kind of multimedia material
+        they are looking for.  We can create two more collections
+        named "University Multimedia Service" and "BBC Pictures and
+        Videos" and declare them as virtual sons of the "Multimedia"
+        collection.  These collections would then appear in the
+        right-hand-side virtual navigation tree entitled "Focus on" in
+        the collection tree.
+
+    </ul>
+
+The example presented above would then give us the following picture:
+
+<blockquote>
+<pre>
+        M u l t i m e d i a
+
+        Narrow by Collection:        Focus on:
+        --------------------         ---------
+        [ ] Photos                   University Multimedia Service
+        [ ] Videos                   BBC Pictures and Videos
+</pre>
+</blockquote>
+
+<p>It is important to note that if a collection A is composed of B and
+C as its regular sons, and offers X and Y as its virtual sons, then
+every document belonging to A must also belong to either B or C.  This
+requirement does not apply for X and Y, because X and Y offer only a
+"focus-on" orthogonal view on a (possibly small) part of the document
+corpus of A.  If end-users search the collection A, then they are
+actually searching inside B and C, not X and Y.  If they want to
+search inside X or Y, they have to click upon X or Y first.  One can
+consider virtual branches as a sort of non-essential searching aid to
+the end-user that is activated only when users are interested in a
+particular "focus-on" relationship, provided that this "virtual" point
+of view on A interests her.
+
+<a name="2.3"></a><h3>2.3 Modify existing tree</h3>
+
+<p>To modify existing tree by WebSearch Admin Interface, click on
+icons displayed next to collections.  The meaning of icons is as
+follows:
+
+<table border="1">
+<tr>
+ <td>
+  <img border="0" src="<weburl>/img/iconcross.gif">
+ </td>
+ <td>
+  Remove chosen collection with its subcollections from the collection tree,
+  but do not delete the collection itself.
+  (For full deletion of a collection, see <a href="#3.4">section 3.4</a>.)
+ </td>
+</tr>
+<tr>
+ <td>
+  <img border="0" src="<weburl>/img/arrow_up.gif"> &nbsp;
+  <img border="0" src="<weburl>/img/arrow_down.gif">
+ </td>
+ <td>
+  Move chosen collection up or down among its brothers and sisters, i.e.
+  change the order of collections inside the same level of the tree.
+ </td>
+</tr>
+<tr>
+ <td>
+  <img border="0" src="<weburl>/img/move_from.gif">
+  <img border="0" src="<weburl>/img/move_to.gif">
+ </td>
+ <td>
+  Move chosen collection among branches of the tree.
+  Press the first icon (<img border="0" src="<weburl>/img/move_from.gif">)
+  to choose a collection to move, and the second icon
+  (<img border="0" src="<weburl>/img/move_from.gif">)
+  to select a new father collection that the chosen collection should be attached to.
+ </td>
+</tr>
+</table>
+
+<a name="3"></a><h2>3. Edit Collection Parameters</h2>
+<a name="3.1"></a><h3>3.1 Modify collection query</h3>
+<a name="3.2"></a><h3>3.2 Modify access restrictions</h3>
+<a name="3.3"></a><h3>3.3 Modify translations</h3>
+<a name="3.4"></a><h3>3.4 Delete collection</h3>
+<a name="3.5"></a><h3>3.5 Modify portalboxes</h3>
+<a name="3.6"></a><h3>3.6 Modify search fields</h3>
+<a name="3.7"></a><h3>3.7 Modify search options</h3>
+<a name="3.8"></a><h3>3.8 Modify sort options</h3>
+<a name="3.9"></a><h3>3.9 Modify rank options</h3>
+<a name="3.10"></a><h3>3.10 Modify output formats</h3>
+<a name="4"></a><h2>4. Run WebColl Daemon</h2>
+<a name="5"></a><h2>5. Edit Search Engine Parameters</h2>
+<a name="6"></a><h2>6. Search Engine Cache</h2>
+
+<a name="7"></a><h2>7. Additional Information</h2>
+
+<a href="<WEBURL>/hacking/websearch/">WebSearch Internals</a>
