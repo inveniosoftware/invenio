@@ -257,6 +257,35 @@
          . "<TD ALIGN='left'>\n<INPUT TYPE='button' VALUE='RESET CHANGES'"
          . " onClick=\"reset();\">\n</TD>\n</TR>\n</TABLE>\n</FORM>\n");
       } // END elseif
+      elseif($elementType == "R")
+      {
+         print("<SCRIPT TYPE='text/javascript'>\n\n<!-" . "- hide\n\n"
+               . "function verifyChanges(curFidesc, sugFidesc, curCode, sugCode, curMarc, sugMarc, curMod, sugMod)"
+               . "\n{\n   if(curFidesc == sugFidesc"
+               . " && sugCode == curCode && sugMarc == curMarc && sugMod == curMod)\n   "
+               . "{\n   alert('No Change In The Data Has Been Made!  Can" 
+               . "not Submit.');\n      return false;\n   }\n   else\n"
+               . "   {\n      return true;\n   }\n}\n\n// -->"
+               . "</SCRIPT>\n");  
+         
+         print("<TABLE ALIGN='center' BORDER=0 CELLSPACING=0 "
+         . "CELLPADDING=0>\n<TR>\n<TD ALIGN='right'>\n<INPUT TYPE='"
+         . "button' VALUE='SAVE CHANGES' onClick=\" "
+         . "if(verifyChanges(escape('" . ereg_replace("\r", "",
+             ereg_replace("\n", "\\n",
+             ereg_replace("'","\\'",
+                htmlspecialchars($dataRow["fidesc"]))))
+         . "'), escape(fidesc.value), escape('" . ereg_replace("'","\\'",
+                htmlspecialchars($dataRow["alephcode"]))
+         . "'), escape(alephcode.value), escape('" . ereg_replace("'","\\'",
+                htmlspecialchars($dataRow["marccode"]))
+         . "'), escape(marccode.value), escape('");
+         
+      
+         print("'), escape('" . ereg_replace("'","\\'",htmlspecialchars($dataRow["modifytext"])) . "'), escape(modifytext.value))) { submit(); }\">\n</TD>\n"
+         . "<TD ALIGN='left'>\n<INPUT TYPE='button' VALUE='RESET CHANGES'"
+         . " onClick=\"reset();\">\n</TD>\n</TR>\n</TABLE>\n</FORM>\n");
+      } // END elseif
       elseif($elementType == "S")
       {
          print("<SCRIPT TYPE='text/javascript'>\n\n<!-" . "- hide\n\n"
@@ -754,8 +783,8 @@
                print("$tblHead");
                print("<TR>\n<TH BGCOLOR='#87CEFA' ALIGN='right' WIDTH='"  
                . "20%'>\nItem Description:&nbsp;</TH>\n<TD ALIGN='left' "
-               . "BGCOLOR='#FFFFCC' WIDTH='80%'><TEXTAREA COLS=50 ROWS=20"
-               . " NAME='fidesc'>" . ereg_replace("'", "&#39;",
+               . "BGCOLOR='#FFFFCC' WIDTH='80%'><TEXTAREA COLS=100 ROWS=50"
+               . " NAME='fidesc' wrap='nowrap'>" . ereg_replace("'", "&#39;",
                                    htmlspecialchars($dataRow["fidesc"]))
                . "</TEXTAREA>\n</TD>\n</TR>\n<TH BGCOLOR='#87CEFA' "
                . "ALIGN='right' WIDTH='20%'>\nCookie:&nbsp;</TH>\n<TD "
@@ -774,8 +803,8 @@
                print("$tblHead");
                print("<TR>\n<TH BGCOLOR='#87CEFA' ALIGN='right' WIDTH='"  
                . "20%'>\nItem Description:&nbsp;</TH>\n<TD ALIGN='left' "
-               . "BGCOLOR='#FFFFCC' WIDTH='80%'><TEXTAREA COLS=50 ROWS=20"
-               . " NAME='fidesc'>" . ereg_replace("'", "&#39;",
+               . "BGCOLOR='#FFFFCC' WIDTH='80%'><TEXTAREA COLS=100 ROWS=50"
+               . " NAME='fidesc' wrap='nowrap'>" . ereg_replace("'", "&#39;",
                                    htmlspecialchars($dataRow["fidesc"]))
                . "</TEXTAREA>\n</TD>\n</TR>\n");
             } // END elseif
@@ -786,8 +815,8 @@
                print("$tblHead");
                print("<TR>\n<TH BGCOLOR='#87CEFA' ALIGN='right' WIDTH='"  
                . "20%'>\nItem Description:&nbsp;</TH>\n<TD ALIGN='left' "
-               . "BGCOLOR='#FFFFCC' WIDTH='80%'><TEXTAREA COLS=50 ROWS=20"
-               . " NAME='fidesc'>" . ereg_replace("'", "&#39;",
+               . "BGCOLOR='#FFFFCC' WIDTH='80%'><TEXTAREA COLS=100 ROWS=50"
+               . " NAME='fidesc' wrap='nowrap'>" . ereg_replace("'", "&#39;",
                                    htmlspecialchars($dataRow["fidesc"]))
                . "</TEXTAREA>\n</TD>\n</TR>\n<TH BGCOLOR='#87CEFA' "
                . "ALIGN='right' WIDTH='20%'>\nCookie:&nbsp;</TH>\n<TD "
@@ -1085,6 +1114,11 @@
          {
             # Our item is a user defined input type.
             $updtStr .= "fidesc = '$fidesc', cookie = '$cookie', alephcode = '$alephcode', marccode = '$marccode', modifytext = '$modifytext'";
+         } // END elseif
+         elseif($type == "R")
+         {
+            # Our item is a response input type.
+            $updtStr .= "fidesc = '$fidesc', alephcode = '$alephcode', marccode = '$marccode', modifytext = '$modifytext'";
          } // END elseif
          elseif($type == "S")
          {
