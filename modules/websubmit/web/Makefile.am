@@ -17,10 +17,10 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = admin personal publiline
+SUBDIRS = admin personal
 
 docdir = $(WEBDIR)
-doc_DATA=approve.py direct.py submit.py summary.py sub.py
+doc_DATA=approve.py direct.py submit.py summary.py sub.py archive.py publiline.py
 
 EXTRA_DIST = $(wildcard *.wml)
 

@@ -83,12 +83,21 @@ def index(req,c=cdsname,ln=cdslang,todo="",id="",doctype="",categ="",addusers=""
                 return errorMsg("Cannot link role with action",req)
         roleId = acc_getRoleId(role)
         # For each id in the array
-        for adduser in addusers:
+        if isinstance(addusers,types.ListType):
+            for adduser in addusers:
+                # First check  whether this id is not already associated with this rule
+                myRoles = acc_getUserRoles(adduser)
+                if not roleId in myRoles:
+                    # Actually add the role to the user
+                    acc_addUserRole(adduser,roleId)
+                else:
+                    warningText = "<font color=red>Sorry... This user is already a referee for this category.</font>"
+        else:
             # First check  whether this id is not already associated with this rule
-            myRoles = acc_getUserRoles(adduser)
+            myRoles = acc_getUserRoles(addusers)
             if not roleId in myRoles:
                 # Actually add the role to the user
-                acc_addUserRole(adduser,roleId)
+                acc_addUserRole(addusers,roleId)
             else:
                 warningText = "<font color=red>Sorry... This user is already a referee for this category.</font>"
     return page(title="websubmit admin - referee selection",
