@@ -59,7 +59,7 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail=''):
     """Show error message when account is not activated"""
     from cdsware.webpage import page
 
-    if not CFG_ACCESS_CONTROL_SITE_TEMPORARILY_CLOSED:
+    if not CFG_ACCESS_CONTROL_LEVEL_SITE:
         title = cfg_webaccess_msgs[5]
         if not uid: uid = getUid(req)
         res = run_sql("SELECT email FROM user WHERE id=%s" % uid)
@@ -69,7 +69,10 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail=''):
         else:
             if text: body = text
             else: body = cfg_webaccess_msgs[3]
-    else:
+    elif CFG_ACCESS_CONTROL_LEVEL_SITE == 1:
+        title = cfg_webaccess_msgs[8]
+        body = "%s %s" % (cfg_webaccess_msgs[7], cfg_webaccess_msgs[2])
+    elif CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
         title = cfg_webaccess_msgs[6]
         body = "%s %s" % (cfg_webaccess_msgs[4], cfg_webaccess_msgs[2])
 
@@ -84,7 +87,8 @@ def getUid (req):
        getUid(req) -> userId	 
     """
 
-    if CFG_ACCESS_CONTROL_SITE_TEMPORARILY_CLOSED: return -1
+    if CFG_ACCESS_CONTROL_LEVEL_SITE == 1: return 0
+    if CFG_ACCESS_CONTROL_LEVEL_SITE == 2: return -1
 
     guest = 0
     sm = session.MPSessionManager(pSession, pSessionMapping())

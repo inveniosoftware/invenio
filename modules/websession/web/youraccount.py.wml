@@ -41,13 +41,14 @@ from cdsware import webbasket
 from cdsware import webalert
 from cdsware import webuser
 from cdsware.access_control_config import *
-from mod_python import apache    
+from mod_python import apache  
+from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 import smtplib
 
 def edit(req, ln=cdslang):
     uid = webuser.getUid(req)
 
-    if uid == -1:
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/set")
 
     data = webuser.getDataUid(req,uid)
@@ -65,7 +66,7 @@ def edit(req, ln=cdslang):
 def change(req,email=None,password=None,password2=None,ln=cdslang):
     uid = webuser.getUid(req)
 
-    if uid == -1:
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/change")
 
     uid2 = webuser.emailUnique(email)
@@ -104,12 +105,9 @@ def change(req,email=None,password=None,password2=None,ln=cdslang):
                 lastupdated=__lastupdated__)
 
 def lost(req, ln=cdslang):
-    if CFG_ACCESS_CONTROL_SITE_TEMPORARILY_CLOSED:
-        return webuser.page_not_authorized(req, "../youraccount.py/lost")
-
     uid = webuser.getUid(req)
 
-    if uid == -1:
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/lost")
 
     return page(title="Lost your password?",
@@ -118,13 +116,13 @@ def lost(req, ln=cdslang):
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
-                language=ln,
+                anguage=ln,
                 lastupdated=__lastupdated__)
 
 def display(req, ln=cdslang):
     uid =  webuser.getUid(req)
 
-    if uid == -1:
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/display")
 
     if webuser.isGuestUser(uid):
@@ -154,7 +152,7 @@ def send_email(req, p_email=None, ln=cdslang):
     
     uid = webuser.getUid(req)
 
-    if uid == -1:
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/send_email")
 
     passw = webuser.givePassword(p_email) 
@@ -205,7 +203,7 @@ def send_email(req, p_email=None, ln=cdslang):
 def youradminactivities(req, ln=cdslang):
     uid = webuser.getUid(req)	
 
-    if uid == -1:
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/youradminactivities")
 
     return page(title="Your Administrative Activities",
@@ -220,7 +218,7 @@ def youradminactivities(req, ln=cdslang):
 def delete(req, ln=cdslang):
     uid = webuser.getUid(req)
 
-    if uid == -1:
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/delete")
 	
     return page(title="Delete Account",
@@ -236,7 +234,7 @@ def logout(req, ln=cdslang):
     
     uid = webuser.logoutUser(req)
 
-    if uid == -1:
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/logout")
 
     return page(title="Logout",
@@ -250,7 +248,7 @@ def logout(req, ln=cdslang):
     
 def login(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
 
-    if CFG_ACCESS_CONTROL_SITE_TEMPORARILY_CLOSED:
+    if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
         return webuser.page_not_authorized(req, "../youraccount.py/login")
         
     uid = webuser.getUid(req)
@@ -297,7 +295,7 @@ def login(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
 
 def register(req, p_email=None, p_pw=None, p_pw2=None, action='login', referer='', ln=cdslang):
 
-    if CFG_ACCESS_CONTROL_SITE_TEMPORARILY_CLOSED:
+    if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
         return webuser.page_not_authorized(req, "../youraccount.py/register")
 
     uid = webuser.getUid(req)
