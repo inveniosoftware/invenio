@@ -857,4 +857,7 @@ input,select {
    border-left: 1px solid #039;
    border-right: 1px solid #039;
 }
+.mycdscell {
+    border-right: 1px solid #fff;
+}
 /* end of cds.css */
