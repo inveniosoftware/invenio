@@ -72,7 +72,7 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
 <input type=hidden name=deletedAction>
  <table class="searchbox" width="100%" summary="">
     <tr>
-        <th class="portalboxheader">Your Submissions&nbsp;"""
+        <th class="portalboxheader">For&nbsp;"""
     t+="<select name=doctype onchange=\"document.forms[0].submit();\"><option value=\"\">all types of document"
     res = run_sql("select ldocname,sdocname from sbmDOCTYPE order by ldocname")
     for row in res:
@@ -175,33 +175,7 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
         num+=1
     t+="</table></td></tr></table></form>"
     
-    t+="""
- <table class="searchbox" width="100%" summary="">
-    <tr>
-        <th class="portalboxheader">Refereed Documents</th>
-    </tr>
-    <tr>
-    <td class=\"portalboxbody\">"""
-    res = run_sql("select sdocname,ldocname from sbmDOCTYPE")
-    for row in res:
-        doctype = row[0]
-        docname = row[1]
-        reftext = ""
-        if isReferee(uid,doctype,"*"):
-            reftext+= "<LI><A HREF=\"publiline.py?doctype=%s\">You are general referee</a><br>" % doctype
-            res2 = run_sql("select sname,lname from sbmCATEGORIES where doctype=%s",(doctype,))
-            for row2 in res2:
-                category = row2[0]
-                categname = row2[1]
-                if isReferee(uid,doctype,category):
-                    reftext+= "<LI><A HREF=\"publiline.py?doctype=%s&categ=%s\">You are referee for category: %s (%s)</a><br>" % (doctype,category,categname,category)
-        if reftext != "":
-            t+= "<UL><LI><b>%s</b><UL><small>" % docname
-            t+=reftext
-            t+="</small></UL></UL>"
-    t+="</td></tr></table>"
-    
-    return page(title="personal page",
+    return page(title="Your Submissions",
                     body=t,
                     description="",
                     keywords="",
@@ -209,12 +183,6 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
                     language=ln,
                     urlargs=req.args)
  
-def isReferee(uid,doctype,categ=""):
-    if  acc_authorize_action(uid, "referee",verbose=0,doctype=doctype, categ=categ):
-        return 1
-    else:
-        return 0
-
 def deleteSubmission(id, action, doctype, u_email):
     global storage
     run_sql("delete from sbmSUBMISSIONS WHERE doctype=%s and action=%s and email=%s and status='pending' and id=%s",(doctype,action,u_email,id,))

@@ -19,8 +19,9 @@
 
 SUBDIRS = admin
 
+FILESWML=$(wildcard *.wml)
 docdir = $(WEBDIR)
-doc_DATA=approve.py direct.py submit.py summary.py sub.py archive.py publiline.py personal.py
+doc_DATA=$(FILESWML:.wml=)
 
 EXTRA_DIST = $(wildcard *.wml)
 
