@@ -41,6 +41,7 @@ from session import SessionError
 from config import *
 from messages import *
 from cdsware.access_control_engine import acc_authorize_action
+from access_control_admin import acc_findUserRoleActions
 
 def createGuestUser():
     """Create a guest user , insert into user null values in all fields 
@@ -102,7 +103,7 @@ def isUserSubmitter(uid):
         return 1
     else:
         return 0
-    
+
 def isUserReferee(uid):
     res = run_sql("select sdocname from sbmDOCTYPE")
     for row in res:
@@ -116,6 +117,13 @@ def isUserReferee(uid):
             if acc_authorize_action(uid, "referee",doctype=doctype, categ=categ):
                 return 1
     return 0
+
+def isUserAdmin(uid):
+    "Return 1 if the user UID has some admin rights; 0 otherwise."
+    out = 0
+    if acc_findUserRoleActions(uid):
+        out = 1
+    return out    
 
 def checkRegister(user,passw):
     """It checks if the user is register with the correct password
@@ -278,7 +286,10 @@ def create_userinfobox_body(uid, language="en"):
                    (weburl, language, msg_submissions[language])            
         if isUserReferee(uid):
             out += """<a class="userinfo" href="%s/yourapprovals.py?ln=%s">%s</a> :: """ % \
-                   (weburl, language, msg_approvals[language])                        
+                   (weburl, language, msg_approvals[language])
+        if isUserAdmin(uid):
+            out += """<a class="userinfo" href="%s/youraccount.py/youradminactivities?ln=%s">%s</a> :: """ % \
+                   (weburl, language, msg_administration[language])
         out += """<a class="userinfo" href="%s/youraccount.py/logout?ln=%s">%s</a>""" % \
                (weburl, language, msg_logout[language])
     return """<img src="%s/img/head.gif" border="0"> %s""" % (weburl, out) 
