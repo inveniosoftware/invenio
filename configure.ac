@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cdsware, 0.3.3.20040717, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.3.3.20040717)
+AC_INIT(cdsware, 0.3.3.20040826, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.3.3.20040826)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -352,6 +352,7 @@ AC_SUBST(WVTEXT)
 AC_SUBST(PPTHTML)
 AC_SUBST(XLHTML)
 AC_SUBST(HTMLTOTEXT)
+AC_SUBST(localstatedir, `eval echo "${localstatedir}"`)
 
 ## Define output files:
 AC_CONFIG_FILES([Makefile \

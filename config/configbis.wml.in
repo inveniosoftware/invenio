@@ -44,19 +44,19 @@
 @prefix@/lib
 </define-tag>
 <define-tag LOGDIR whitespace=delete>
-@prefix@/var/log
+@localstatedir@/log
 </define-tag>
 <define-tag ETCDIR whitespace=delete>
 @prefix@/etc
 </define-tag>
 <define-tag TMPDIR whitespace=delete>
-@prefix@/var/tmp
+@localstatedir@/tmp
 </define-tag>
 <define-tag CACHEDIR whitespace=delete>
-@prefix@/var/cache
+@localstatedir@/cache
 </define-tag>
 <define-tag DATADIR whitespace=delete>
-@prefix@/var/data
+@localstatedir@/data
 </define-tag>
 <define-tag WEBDIR whitespace=delete>
 @WEBDIR@
