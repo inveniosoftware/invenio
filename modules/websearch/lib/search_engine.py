@@ -2431,10 +2431,10 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                 req.write("""\n<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
                 req.write("""\n<table>""")            
                 for irec in range(irec_max,irec_min,-1):
-                    req.write("""\n<tr><td valign="top" nowrap><input name="recid" type="checkbox" value="%s">""" % recIDs[irec])
+                    req.write("""\n<tr><td valign="top" align="right" nowrap><input name="recid" type="checkbox" value="%s">""" % recIDs[irec])
                     req.write("""%d.""" % (jrec+irec_max-irec))
                     if relevances and relevances[irec]:
-                        req.write("""<br><small class="info">%s%s%s</small>""" % \
+                        req.write("""<br><div class="rankscoreinfo"><a title="rank score">%s%s%s</a></div>""" % \
                                   (relevances_prologue, relevances[irec], relevances_epilogue))
                     req.write("""</td><td valign="top">""")
                     req.write(print_record(recIDs[irec], format, ot, ln))
