@@ -22,7 +22,7 @@ docdir=$(WEBDIR)/admin/bibconvert
 doc_DATA=index.html guide.html
 
 sampledir=$(WEBDIR)/admin/bibconvert
-sample_DATA=sample.cfg sample.dat sample.kb bibtex.cfg dcq.cfg dcq.dat
+sample_DATA=sample.cfg sample.dat sample.kb bibtex.cfg dcq.cfg dcq.dat dcxml-to-marcxml.cfg
 
 EXTRA_DIST = $(wildcard *.wml) $(sample_DATA)
 
