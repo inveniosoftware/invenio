@@ -89,8 +89,9 @@ A brief description of things we strive at, more or less unsuccessfully.
    a number should be put into accompanying file_config.py with 
    symbol name beginning by cfg_modulename_*.
 
-   Separate interfaces from implementation.  Clearly document your
-   interfaces. 
+   Clearly separate interfaces from implementation.  Document your
+   interfaces.  Do not expose to other modules anything that does not
+   have to be exposed.  Apply principle of least information.
 
    Create as few new library files as possible.  Do not create many
    nested files in nested modules; rather put all the lib files in one
@@ -131,7 +132,8 @@ A brief description of things we strive at, more or less unsuccessfully.
    Speed-critical parts should be profiled with pyprof.  Do not forget
    to use tricks like psycho.
 
-   For more hints and toughts, see Tibor's Vademecum and Essays.
+   For more hints, thoughts, and other ruminations, see <a
+   href="http://simko.info/vademecum/">Vademecum and Essays</a>.
 
 5. PHP 
 
