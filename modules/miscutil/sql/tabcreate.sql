@@ -2634,8 +2634,8 @@ CREATE TABLE IF NOT EXISTS sbmFIELD (
 
 CREATE TABLE IF NOT EXISTS sbmFIELDDESC (
   name varchar(15) NOT NULL default '',
-  alephcode varchar(10) default NULL,
-  marccode varchar(10) NOT NULL default '',
+  alephcode varchar(50) default NULL,
+  marccode varchar(50) NOT NULL default '',
   type char(1) default NULL,
   size int(11) default NULL,
   rows int(11) default NULL,
