@@ -3736,9 +3736,9 @@ ac_abs_top_srcdir=`cd "$ac_dir" && cd $ac_top_srcdir && pwd`
   { echo "$as_me:$LINENO: executing $ac_dest commands" >&5
 echo "$as_me: executing $ac_dest commands" >&6;}
   case $ac_dest in
-    default ) echo "****************************************************************************************";\
-                               echo "** Good, the CERN Document Server Software (CDSware) is now ready for installation!   **";\
-                               echo "** You have entered the following parameters:                                         **";\
+    default ) echo "****************************************************************************";\
+                               echo "** Your CERN Document Server Software (CDSware) installation is now ready **";\
+                               echo "** for building.  You have entered the following parameters:              **";\
                                echo "**   - HTML documents install directory: $HTDOCSDIR";\
                                echo "**   - CGI scripts install directory: $CGIBINDIR";\
                                echo "**   - DB utilities install directory: $DBUTILDIR";\
@@ -3748,14 +3748,14 @@ echo "$as_me: executing $ac_dest commands" >&6;}
                                echo "**   - DB name: $DBNAME";\
                                echo "**   - DB username: $DBUSER";\
                                echo "**   - DB password: $DBPASS";\
-                               echo "** Here are the steps to continue the building process:                               **";\
-                               echo "**   - Firstly, customize the self-explanatory config file './config/config.wml'.     **";\
-                               echo "**   - Secondly, type 'make' to build your customized CDSware installation.           **";\
-                               echo "**   - Thirdly, type 'make create-tables' if you have not created CDSware tables yet. **";\
-                               echo "**   - Finally, type 'make install' to install the system.                            **";\
-                               echo "** Good luck, and thanks for choosing the CERN Document Server Software.              **";\
-                               echo "**              -- CDS Development Group <cds.support@cern.ch>                        **";\
-                               echo "****************************************************************************************" ;;
+                               echo "** Here are the steps to continue the building process:                   **";\
+                               echo "**   1) Customize self-explanatory config file './config/config.wml'.     **";\
+                               echo "**   2) Type 'make' to build your customized CDSware installation.        **";\
+                               echo "**   3) Type 'make create-tables' if you have not created tables before.  **";\
+                               echo "**   4) Type 'make install' to install the system.                        **";\
+                               echo "** Good luck, and thanks for choosing the CERN Document Server Software.  **";\
+                               echo "**              -- CDS Development Group <cds.support@cern.ch>            **";\
+                               echo "****************************************************************************" ;;
   esac
 done
 _ACEOF
