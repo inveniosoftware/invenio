@@ -51,7 +51,7 @@ ALERTURL = weburl + '/youralerts.py/list'
 # 1 = messages on the console, email sent
 # 2 = messages on the console, but no email sent
 # 3 = many messages on the console, no email sent
-DEBUGLEVEL = 0
+DEBUGLEVEL = 3
 
 
 def update_date_lastrun(alert):
@@ -364,4 +364,4 @@ def run_alerts(uid):
     process_alert_queries_for_user(uid)
     
 if __name__ == '__main__':
-    run_alerts_queries_for_user(60)
+    process_alert_queries_for_user(60)
