@@ -36,7 +36,7 @@ words in the whole collection and in a single record. Explains how the ranking d
 <dt><a href="api.html">Bibrank Record Sorter API</a><dd>How to call the Bibrank Record Sorter library from your python programs if necessary.</dd></dt>
 
 
-#<dt><a href="merge_rank_methods.html">Merg rank methods</a> <dd>Explains what this
+#<dt><a href="merge_rank_methods.html">Combine method</a> <dd>Explains what this
 #ranking method does.
 #<dt><a href="sort.html">Sort method</a> <dd>Ex. of use: Sorting of the records based on their rank value into star categor#ies. Explains how the records are
 #sorted into the different star categories.

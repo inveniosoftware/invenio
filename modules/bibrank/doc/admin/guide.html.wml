@@ -39,14 +39,13 @@
 <strong>4.<a href="#bd">BibRank Daemon</a></strong><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1.<a href="#cli1">Command Line Interface</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.2.<a href="#ubd">Using BibRank</a><br>
-<strong>5.<a href="#bt">bibrankgkb Tool</a></strong><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.1.<a href="#cli2">Command Line Interface</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.2.<a href="#ubt">Using bibrankgkb</a><br>
-<strong>6.<a href="#brm">BibRank Methods</a></strong><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.1.<a href="#str">Single tag rank method</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.2.<a href="#wrd">Word Similarity/Similar Records</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.3.<a href="#merge">Merge methods</a><br>
-
+<strong>5.<a href="#brm">BibRank Methods</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.1.<a href="#str">Single tag rank method</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.2.<a href="#wrd">Word Similarity/Similar Records</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.3.<a href="#cmb">Combined method</a><br>
+<strong>6.<a href="#bt">bibrankgkb Tool</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.1.<a href="#cli2">Command Line Interface</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.2.<a href="#ubt">Using bibrankgkb</a><br>
 <strong>7.<a href="#ainf">Additional Information</a></strong><br>
 
 <a name="o"></a><h2>1. Overview</h2>
@@ -56,7 +55,7 @@
 <pre>
 Journal Impact Factor
 Word Similarity/Similar Records
-Merge methods
+Combined Method
 ##Number of downloads
 ##Author Impact
 ##Citation Impact
@@ -191,6 +190,7 @@ When the configuration is okay, you can add the bibrank daemon to the task sched
 $ bibrank -wjif -r
 Task #53 was successfully scheduled for execution.
 </pre>
+</blockquote>
 It is adviced to run the BibRank daemon using no parameters, since the default settings then will be used.
 <br><br><b>Example</b>
 <blockquote>
@@ -232,12 +232,194 @@ $ bibrank 2505
 <h4>Step 6 - Fast update of modified records</h4>
 If you just want to update the latest additions or modified records, you may want to do a faster update by running the daemon without the rebalance option. (the rebalance option is default). This may cause lower accurancy when ranking.
 
-<a name="bt"></a><h2>5. bibrankgkb Tool</h2>
-Before the bibrank daemon can be used, a knowledge base file (kb) with the needed data in the correct format
-needs to be created. This file can be created using the bibrankgkb tool which can read the data either from
+<a name="brm"></a><h2>5. BibRank Methods</h2>
+Each BibRank method has a configuration file which contains different parameters and sections necessary to do the ranking.
+<a name="str"></a><h3>5.1 Single tag rank method</h3>
+This method uses one MARC tag together with a file containing possible values for this MARC tag together with a ranking value. This data is used to create a structure containing the record id associated with the ranking value based on the content of the tag. The method can be used for various ways of ranking like ranking by Journal Impact Factor, or use it to let certain authors always appear top of a search.
+The parameters needed to be configured for this method is the 'tag','kb_src' and 'check_mandatory_tags'.
+<br><br><b>Example</b>
+<blockquote>
+<pre>
+<protect>
+[rank_method]
+function = single_tag_rank_method
+
+[single_tag_rank]
+tag = 909C4p
+kb_src = /usr/local/cdsware-DEMO/etc/bibrank/jif.kb
+check_mandatory_tags = 909C4c,909C4v,909C4y
+</protect>
+</pre>
+</blockquote>
+
+<b>Explanation:</b>
+<pre>
+<blockquote>
+<protect>
+[rank_method]
+##The function which is responsible for doing the work. Should not be changed
+function = single_tag_rank_method
+
+##This section must be available if the single_tag_rank_method is going to be used
+[single_tag_kb]
+
+##The tag which got the value to be searched for on the left side in the kb file (like the journal name)
+tag = 909C4p
+
+##The path to the kb file which got the content of the tag above on left side, and value on the left side
+kb_src = /log/cdsware-DEMODEV/etc/bibrank/jif.kb
+
+##Tags that must be included for a record to be added to the ranking data, to disable remove tags
+check_mandatory_tags = 909C4c,909C4v,909C4y
+</protect>
+</blockquote>
+</pre>
+<a name="wrd"></a><h3>5.2 Word Similarity/Similar Records</h3>
+The Word Similarity/Similar Records method uses the content of the tags selected to determine which records is most relevant to a query, or most similar to a selected record. This method got a lot of parameters to configure, and it may need some tweaking to get the best result. The BibRank code for this method has to be 'wrd' for it to work. For best result, it is adviced to install the stemming module mentioned in INSTALL, and use a stopword list containing stopwords in the languages the records exists in. The stemmer and stopword list is used to get better results and to limit the size of the index, thus making ranking faster and more accurate. For best result with the stemmer, it is important to mark each tag to be used with the most common language the value of the tag may be in. It is adviced to not change the 'function','table' and the parameters under [find_similar]. If the stemmer is not installed, to assure that no problems exists, the 'stem_if_avail' parameter should be set to 'no'. Each tag to be used by the method has to be given a point. The number of points describes how important one word is in this tag.
+
+When running BibRank to update the index for this rank method, it is not necessary to rebalance each time, but when large number of records has been updated/added, it can be wise to recalculate using the rebalance parameter of BibRank.
+<br><br><b>Example</b>
+<pre>
+<blockquote>
+<protect>
+[rank_method]
+function = word_similarity
+
+[word_similarity]
+stem_if_avail = yes
+stem_query_language = en
+table = rnkWORD01F
+stopword = /soft/cdsware-CDSCERNWIENERDEV/etc/bibrank/stopwords.kb
+relevance_number_output_prologue = (
+relevance_number_output_epilogue = )
+tag1 = 6531_a, 1, en
+tag2 = 695__a, 1, en
+tag3 = 6532_a, 1, en
+tag4 = 245__%, 10, en
+tag5 = 246_% , 1, fr
+tag6 = 250__a, 1, en
+tag7 = 711__a, 1, en
+tag8 = 210__a, 1, en
+tag9 = 222__a, 1, en
+tag10 = 520__%, 1, en
+tag11 = 590__%, 1, fr
+tag12 = 111__a, 1, en
+tag13 = 100__%, 1, none
+tag14 = 700__%, 1, none
+tag15 = 721__a, 1, none
+
+[find_similar]
+max_word_occurence = 0.05
+min_word_occurence = 0.00
+min_word_length = 3
+min_nr_words_docs = 3
+max_nr_words_upper = 20
+max_nr_words_lower = 10
+override_default_min_relevance = no
+default_min_relevance = 75
+</protect>
+</blockquote>
+</pre>
+
+<b>Explanation:</b>
+<pre>
+<blockquote>
+<protect>
+[rank_method]
+#internal name for the bibrank program, do not modify
+function = word_similarity
+
+[word_similarity]
+#if stemmer is available, use it. Adviced to turn off if not installed
+stem_if_avail = yes
+#the default language to stem the search query in
+stem_query_language = en
+#the internal table to load the index tables from.
+table = rnkWORD01F
+#the path to the stopword list. One word per line, words in the file will not be indexed.
+stopword = <ETCDIR>/bibrank/stopwords.kb
+#text to show before the rank value when the search result is presented. <-- to hide result
+relevance_number_output_prologue = (
+#text to show after the rank value when the search result is presented. --> to hide result
+relevance_number_output_epilogue = )
+
+#MARC tag,tag points, tag language
+#a list of the tags to be used, together with a number describing the importance of the tag, and the most common language for the content. Not all languages are supported. Among the supported ones are: fr/french, en/english, no/norwegian, se/swedish, de/german, it/italian, pt/portugese
+
+#keyword
+tag1 = 6531_a, 1, en #keyword
+tag2 = 695__a, 1, en #keyword
+tag3 = 6532_a, 1, en #keyword
+tag4 = 245__%, 10, en #title, the words in the title is usually describing a record very good.
+tag5 = 246_% , 1, fr #french title
+tag6 = 250__a, 1, en #title
+tag7 = 711__a, 1, en #title
+tag8 = 210__a, 1, en #abbreviated
+tag9 = 222__a, 1, en #key title
+
+[find_similar]
+#term should exist in maximum X/100% of documents
+max_word_occurence = 0.05
+#term should exist in minimum X/100% of documents
+min_word_occurence = 0.00
+#term should be atleast 3 characters long
+min_word_length = 3
+#term should be in atleast 3 documents or more
+min_nr_words_docs = 3
+#do not use more than 20 terms for "find similar"
+max_nr_words_upper = 20
+#if a document contains less than 10 terms, use much used terms too, if not ignore them
+max_nr_words_lower = 10
+#override minimum relevance value and use the one from search_engine?
+override_default_min_relevance = no
+#default minimum relevance value to use for find similar
+default_min_relevance = 75
+</protect>
+</blockquote>
+</pre>
+
+<a name="cmb"></a><h3>5.3 Combine method</h3>
+The 'Combine method' is running each method mentioned in the config file and adding the score together.
+<br><br><b>Example</b>
+<pre>
+<blockquote>
+<protect>
+[rank_method]
+function = combine_method
+[combine_method]
+method1 = cern_jif,33
+method2 = cern_acc,33
+method3 = wrd,33
+relevance_number_output_prologue = (
+relevance_number_output_epilogue = )
+</protect>
+</blockquote>
+</pre>
+
+<b>Explanation:</b>
+<pre>
+<blockquote>
+<protect>
+[rank_method]
+#tells which method to use, do not change
+function = combine_method
+[combine_method]
+#each line tells which method to use, the code is the same as in the BibRank interface, the number describes how much of the total score the method should count.
+method1 = jif,50
+method2 = wrd,50
+#text to be shown before the rank value on the search result screen.
+relevance_number_output_prologue = (
+#text to be shown after the rank value on the search result screen.
+relevance_number_output_epilogue = )
+</protect>
+</blockquote>
+</pre>
+
+<a name="bt"></a><h2>6. bibrankgkb Tool</h2>
+For some ranking methods, like the single_tag_rank method, a knowledge base file (kb) with the needed data in the correct format is necessary. This file can be created using the bibrankgkb tool which can read the data either from
 the cdsware database, from several web pages using regular expressions, or from another file. In case one source
 has another naming convention, bibrank can convert between them using a convert file.
-<a name="cli2"></a><h3>5.1 Command Line Interface</h3>
+<a name="cli2"></a><h3>6.1 Command Line Interface</h3>
 
 <blockquote>
 <pre>
@@ -257,7 +439,7 @@ Usage: bibrankgkb %s [options]
 </blockquote>
 </pre>
 
-<a name="ubt"></a><h3>5.2 Using bibrankgkb</h3>
+<a name="ubt"></a><h3>6.2 Using bibrankgkb</h3>
 
 <h4>Step 1 - Find sources</h4>
 Since some of the data used for ranking purposes is not freely available, it cannot be bundled with CDSware. To get hold of the necessary data,
@@ -364,189 +546,6 @@ $ ./bibrankgkb -v9
 2004-03-11 17:30:17 --> Time used: 0 second(s).
 </blockquote>
 </pre>
-<a name="brm"></a><h2>6. BibRank Methods</h2>
-Each BibRank method has a configuration file which contains different parameters and sections necessary to do the ranking.
-<a name="str"></a><h3>6.1 Single tag rank method</h3>
-This method uses one MARC tag together with a file containing possible values for this MARC tag together with a ranking value. This data is used to create a structure containing the record id associated with the ranking value based on the content of the tag. The method can be used for various ways of ranking like ranking by Journal Impact Factor, or use it to let certain authors always appear top of a search.
-The parameters needed to be configured for this method is the 'tag','kb_src' and 'check_mandatory_tags'.
-<br><br><b>Example</b>
-<blockquote>
-<pre>
-<protect>
-[rank_method]
-function = single_tag_rank_method
-
-[single_tag_rank]
-tag = 909C4p
-kb_src = /usr/local/cdsware-DEMO/etc/bibrank/jif.kb
-check_mandatory_tags = 909C4c,909C4v,909C4y
-</protect>
-</pre>
-</blockquote>
-
-<b>Explanation:</b>
-<pre>
-<blockquote>
-<protect>
-[rank_method]
-##The function which is responsible for doing the work. Should not be changed
-function = single_tag_rank_method
-
-##This section must be available if the single_tag_rank_method is going to be used
-[single_tag_kb]
-
-##The tag which got the value to be searched for on the left side in the kb file (like the journal name)
-tag = 909C4p
-
-##The path to the kb file which got the content of the tag above on left side, and value on the left side
-kb_src = /log/cdsware-DEMODEV/etc/bibrank/jif.kb
-
-##Tags that must be included for a record to be added to the ranking data, to disable remove tags
-check_mandatory_tags = 909C4c,909C4v,909C4y
-</protect>
-</blockquote>
-</pre>
-<a name="wrd"></a><h3>6.2 Word Similarity/Similar Records</h3>
-The Word Similarity/Similar Records method uses the content of the tags selected to determine which records is most relevant to a query, or most similar to a selected record. This method got a lot of parameters to configure, and it may need some tweaking to get the best result. The BibRank code for this method has to be 'wrd' for it to work. For best result, it is adviced to install the stemming module mentioned in INSTALL, and use a stopword list containing stopwords in the languages the records exists in. The stemmer and stopword list is used to get better results and to limit the size of the index, thus making ranking faster and more accurate. For best result with the stemmer, it is important to mark each tag to be used with the most common language the value of the tag may be in. It is adviced to not change the 'function','table' and the parameters under [find_similar]. If the stemmer is not installed, to assure that no problems exists, the 'stem_if_avail' parameter should be set to 'no'. Each tag to be used by the method has to be given a point. The number of points describes how important one word is in this tag.
-
-When running BibRank to update the index for this rank method, it is not necessary to rebalance each time, but when large number of records has been updated/added, it can be wise to recalculate using the rebalance parameter of BibRank.
-<br><br><b>Example</b>
-<pre>
-<blockquote>
-<protect>
-[rank_method]
-function = word_similarity
-
-[word_similarity]
-stem_if_avail = yes
-stem_query_language = en
-table = rnkWORD01F
-stopword = /soft/cdsware-CDSCERNWIENERDEV/etc/bibrank/stopwords.kb
-relevance_number_output_prologue = (
-relevance_number_output_epilogue = )
-tag1 = 6531_a, 1, en
-tag2 = 695__a, 1, en
-tag3 = 6532_a, 1, en
-tag4 = 245__%, 10, en
-tag5 = 246_% , 1, fr
-tag6 = 250__a, 1, en
-tag7 = 711__a, 1, en
-tag8 = 210__a, 1, en
-tag9 = 222__a, 1, en
-tag10 = 520__%, 1, en
-tag11 = 590__%, 1, fr
-tag12 = 111__a, 1, en
-tag13 = 100__%, 1, none
-tag14 = 700__%, 1, none
-tag15 = 721__a, 1, none
-
-[find_similar]
-max_word_occurence = 0.05
-min_word_occurence = 0.00
-min_word_length = 3
-min_nr_words_docs = 3
-max_nr_words_upper = 20
-max_nr_words_lower = 10
-override_default_min_relevance = no
-default_min_relevance = 75
-</protect>
-</blockquote>
-</pre>
-
-<b>Explanation:</b>
-<pre>
-<blockquote>
-<protect>
-[rank_method]
-#internal name for the bibrank program, do not modify
-function = word_similarity
-
-[word_similarity]
-#if stemmer is available, use it. Adviced to turn off if not installed
-stem_if_avail = yes
-#the default language to stem the search query in
-stem_query_language = en
-#the internal table to load the index tables from.
-table = rnkWORD01F
-#the path to the stopword list. One word per line, words in the file will not be indexed.
-stopword = <ETCDIR>/bibrank/stopwords.kb
-#text to show before the rank value when the search result is presented. <-- to hide result
-relevance_number_output_prologue = (
-#text to show after the rank value when the search result is presented. --> to hide result
-relevance_number_output_epilogue = )
-
-#MARC tag,tag points, tag language
-#a list of the tags to be used, together with a number describing the importance of the tag, and the most common language for the content. Not all languages are supported. Among the supported ones are: fr/french, en/english, no/norwegian, se/swedish, de/german, it/italian, pt/portugese
-
-#keyword
-tag1 = 6531_a, 1, en #keyword
-tag2 = 695__a, 1, en #keyword
-tag3 = 6532_a, 1, en #keyword
-tag4 = 245__%, 10, en #title, the words in the title is usually describing a record very good.
-tag5 = 246_% , 1, fr #french title
-tag6 = 250__a, 1, en #title
-tag7 = 711__a, 1, en #title
-tag8 = 210__a, 1, en #abbreviated
-tag9 = 222__a, 1, en #key title
-
-[find_similar]
-#term should exist in maximum X/100% of documents
-max_word_occurence = 0.05
-#term should exist in minimum X/100% of documents
-min_word_occurence = 0.00
-#term should be atleast 3 characters long
-min_word_length = 3
-#term should be in atleast 3 documents or more
-min_nr_words_docs = 3
-#do not use more than 20 terms for "find similar"
-max_nr_words_upper = 20
-#if a document contains less than 10 terms, use much used terms too, if not ignore them
-max_nr_words_lower = 10
-#override minimum relevance value and use the one from search_engine?
-override_default_min_relevance = no
-#default minimum relevance value to use for find similar
-default_min_relevance = 75
-</protect>
-</blockquote>
-</pre>
-
-<a name="merge"></a><h3>6.3 Merge rank methods</h3>
-The 'merge methods' is running each method mentioned in the config file and adding the score together.
-<br><br><b>Example</b>
-<pre>
-<blockquote>
-<protect>
-[rank_method]
-function = merge_methods
-[merge_methods]
-method1 = cern_jif,33
-method2 = cern_acc,33
-method3 = wrd,33
-relevance_number_output_prologue = (
-relevance_number_output_epilogue = )
-</protect>
-</blockquote>
-</pre>
-
-<b>Explanation:</b>
-<pre>
-<blockquote>
-<protect>
-[rank_method]
-#tells which method to use, do not change
-function = merge_methods
-[merge_methods]
-#each line tells which method to use, the code is the same as in the BibRank interface, the number describes how much of the total score the method should count.
-method1 = jif,50
-method2 = wrd,50
-#text to be shown before the rank value on the search result screen.
-relevance_number_output_prologue = (
-#text to be shown after the rank value on the search result screen.
-relevance_number_output_epilogue = )
-</protect>
-</blockquote>
-</pre>
-
 
 <a name="ainf"></a><h2>7. Additional Information</h2>
 <a href="<WEBURL>/hacking/bibrank/">BibRank Internals</a>

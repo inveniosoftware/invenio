@@ -25,20 +25,20 @@
 
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
-<protect>
-<pre>
-CDSware Bibrank Record Sorter can be called from within your Python programs
-via a high-level API and a mid-mid level API.
+<protect> 
+<pre> 
+CDSware Bibrank Record Sorter can be called from within your Python 
+programs via a high-level API and a mid-mid level API.
 
 1. High-level API
 
    Description:
 
-      The high-level access to the BibRank Record Sorter is provided by
-      exactly the same function as called from the web interface when
-      users submit their queries, if a rank method has been selected.  
-      This should guarantee exactly the same behaviour if the same parameters
-      are given.  
+      The high-level access to the BibRank Record Sorter is provided
+      by exactly the same function as called from the web interface 
+      when users submit their queries, if a rank method has been
+      selected. This should guarantee exactly the same behaviour if 
+      the same parameters are given.  
 
       There are three thing to note: (i) When a search is done, the
       search engine is sending a HitSet containing all the records that
@@ -50,19 +50,27 @@ via a high-level API and a mid-mid level API.
 
    Signature:
 
-      def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern, verbose=0):
+      def rank_records(rank_method_code, rank_limit_relevance,
+                       hitset_global, pattern, verbose=0):
        """
        rank_method_code - 'jif', 'wrd' or other methods
-       rank_limit_relevance - a number defining the threshold of which to rank records, may be ignored by rank method.
-       hitset_global, search engine hits, if all records should be ranked, fill the HitSet with ones.
-       pattern, search engine query or record ID, must be a list. ['CERN', 'fermilab'] or ['recid:12345']
-       verbose, verbose level - 0-9 defines how much debug information should be shown
+       rank_limit_relevance - a number defining the threshold of which
+       to rank records, may be ignored by rank method.
+       hitset_global, search engine hits, if all records should be
+       ranked, fill the HitSet with ones.
+       pattern, search engine query or record ID, must be a
+       list. ['CERN', 'fermilab'] or ['recid:12345']
+       verbose, verbose level - 0-9 defines how much debug information
+       should be shown
        
        output if successfull:
        list of records - [123, 321, 12451, 123, 12, 4]
-       list of rank values - ascending, same length as the list of records [0, 10, 20, 30, 40, 100]
-       prefix - text to show before the rank value, '<--' hides rank value, defined in config file. 
-       postfix - text to show after the rank value, '-!>' hides rank value, defined in config file. 
+       list of rank values - ascending, same length as the list of
+       records [0, 10, 20, 30, 40, 100]
+       prefix - text to show before the rank value, '<--' hides rank
+       value, defined in config file.
+       postfix - text to show after the rank value, '-!>' hides rank
+       value, defined in config file.
        verbose_output - the debug text depending on the verbose level.
 
        output if error:
@@ -96,10 +104,10 @@ via a high-level API and a mid-mid level API.
       is used.
 
    Signatures:
-      def merge_methods(rank_method_code, pattern, hitset, rank_limit_relevance,verbose):
+      def combine_method(rank_method_code, pattern, hitset, rank_limit_relevance,verbose):
       -This method calls each method mentioned in the config file and add the results together
 
-      def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
+      def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,
       -This method finds similar records based on the one given in the recID field. The recID field
        must be a integer value. hitset is ignored. rank_method_code has to be 'wrd'.
 
@@ -128,6 +136,6 @@ via a high-level API and a mid-mid level API.
       >>> # rank records containing ['higgs', 'boson'] using word similarity ('wrd')
       >>> word_similarity('wrd',['higgs', 'boson'], hitset, 0, 0) 
       >>> # rank records using various methods, which methods to use is read from the config file.
-      >>> merge_methods('merge', ['higgs','boson'], hitset, 0, 0)     
+      >>> combine_method('cmb', ['higgs','boson'], hitset, 0, 0)     
 </pre>
 </protect>
