@@ -172,6 +172,7 @@ def create_basic_search_units(req, p, f, m=None):
             opfts.append(['|',p,f,'r']) # '|' since we have only one unit
         elif m == 'a' or m == 'w':
             # A4 - all of the words:
+            p = strip_accents(p) # strip accents for 'w' mode, FIXME: delete when not needed
             for word in get_words_from_pattern(p):
                 if len(opfts)==0:
                     opfts.append(['|',word,f,'w']) # '|' in the first unit
@@ -179,6 +180,7 @@ def create_basic_search_units(req, p, f, m=None):
                     opfts.append(['+',word,f,'w']) # '+' in further units
         elif m == 'o':
             # A5 - any of the words:
+            p = strip_accents(p) # strip accents for 'w' mode, FIXME: delete when not needed
             for word in get_words_from_pattern(p):
                 opfts.append(['|',word,f,'w']) # '|' in all units
         else:
@@ -252,6 +254,7 @@ def create_basic_search_units(req, p, f, m=None):
                             print_warning(req, "Searching for an exact match inside any field may be slow.  You may want to search for words instead, or choose to search within specific field.")
                         else:                        
                             # nope, subphrase in global index is not possible => change back to WRD search
+                            pi = strip_accents(pi) # strip accents for 'w' mode, FIXME: delete when not needed
                             for pii in get_words_from_pattern(pi):
                                 # since there may be '-' and other chars that we do not index in WRD
                                 opfts.append([oi,pii,fi,'w'])
@@ -266,6 +269,7 @@ def create_basic_search_units(req, p, f, m=None):
                     opfts.append([oi,pi,fi,'a'])            
                 else:
                     # B3d - general case => do WRD search                    
+                    pi = strip_accents(pi) # strip accents for 'w' mode, FIXME: delete when not needed
                     for pii in get_words_from_pattern(pi): 
                         opfts.append([oi,pii,fi,'w'])
 
@@ -1030,7 +1034,7 @@ def wash_pattern(p):
     will be much better to introduce a temporal limit, e.g. to kill a
     query if it does not finish in 10 seconds."""
     # strip accents:
-    p = strip_accents(p)
+    # p = strip_accents(p) # FIXME: when available, strip accents all the time
     # add leading/trailing whitespace for the two following wildcard-sanity checking regexps:
     p = " " + p + " " 
     # get rid of wildcards at the beginning of words:
