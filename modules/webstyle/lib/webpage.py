@@ -39,13 +39,12 @@ page_template_header = """
  <title><CDSNAME>: %s</title>
  <link rev="made" href="mailto:<SUPPORTEMAIL>">
  <link rel="stylesheet" href="<WEBURL>/img/cds.css">
- <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
  <meta name="description" content="%s">
  <meta name="keywords" content="%s">
 </head>
 <body>
 <div class="pageheader">
-%s
 %s
 %s
 </div>
@@ -60,14 +59,13 @@ page_template_footer = """
 </html>
 """
 
-page_template_portal = """
+page_template_body = """
+<div class="pagebody">
 <table border="0" cellspacing="0" cellpadding="0" width="100%%">
  <tr valign="top">
   <td class="pagestripemiddle" align="left">
    %s
-   <br>
-   <strong class="headline"><span class="h1">%s</span></strong>
-   <p>
+   <h1 class="headline">%s</h1>
    %s
   </td>
   <td class="pagestriperight" width="<CDSPAGESTRIPEWIDTH>" align="right" valign="top">
@@ -76,13 +74,14 @@ page_template_portal = """
   </td>
  </tr>
 </table>
+</div>
 """
 
 def create_navtrail(title,
                     previous_links,
-                    prolog="""<table class="navtrailbox"><tr><td width="15">&nbsp;</td><td class="navtrailboxbody">""", 
+                    prolog="", 
                     separator=""" &gt; """,
-                    epilog="""</td></tr></table>"""):
+                    epilog=""):
     """create_navtrail(): create navigation trail table box
        input: title = page title;
               previous_links = the trail content from site title until current page (both ends exlusive).
@@ -114,8 +113,21 @@ def page(title, body, navtrail="", url="", description="", keywords="", uid=0, c
                cdspagefooteradd is a message to be dusplayed on the top of the page footer
        output: the final cds page with header, footer, etc.
     """
-    out = page_template_header % (title, description, keywords, cdspageheader, cdspageheaderadd, create_navtrail(title, navtrail))
+    out = page_template_header % (title, description, keywords, cdspageheader, cdspageheaderadd)
+    out = re.sub("<!--NAVTRAILBOX-->", create_navtrail(title, navtrail), out)
     out = re.sub("<!--USERINFOBOX-->", create_user_infobox(uid), out)
-    out += page_template_portal % (cdspagebodyadd, title, body, cdspagerightstripeadd)
+    out += page_template_body % (cdspagebodyadd, title, body, cdspagerightstripeadd)
     out += page_template_footer % (cdspagefooteradd, re.sub("<!--URL-->", url, cdspagefooter))
+    return out
+
+def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspageheaderadd=""):
+    """Return just the beginning of page()."""
+    out = page_template_header % (title, description, keywords, cdspageheader, cdspageheaderadd)
+    out = re.sub("<!--NAVTRAILBOX-->", create_navtrail(title, navtrail), out)
+    out = re.sub("<!--USERINFOBOX-->", create_user_infobox(uid), out)
+    return out
+
+def pagefooteronly(url="", cdspagefooteradd=""):
+    """Return just the beginning of page()."""
+    out = page_template_footer % (cdspagefooteradd, re.sub("<!--URL-->", url, cdspagefooter))
     return out
