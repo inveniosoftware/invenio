@@ -17,11 +17,11 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-FILESWML=$(wildcard *.wml)
+FILESWML=$(wildcard $(srcdir)/*.wml)
 phplibdir=$(libdir)/php/cdsware/bibformat/core
-phplib_DATA=$(FILESWML:.wml=)
+phplib_DATA=$(FILESWML:$(srcdir)/%.wml=%)
 
-EXTRA_DIST = $(wildcard *.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(wildcard *.php) *~ *.tmp
 

@@ -18,7 +18,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 gifsdir=$(WEBDIR)/img
-gifs_DATA = $(wildcard *.gif *.jpg *.png)
+
+GIFS = $(wildcard $(srcdir)/*.gif $(srcdir)/*.jpg $(srcdir)/*.png)
+
+gifs_DATA = $(GIFS:$(srcdir)/%=%)
 
 EXTRA_DIST = $(gifs_DATA)
 

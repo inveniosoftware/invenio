@@ -21,7 +21,8 @@ webappdir = $(WEBDIR)/admin/webaccess
 
 webapp_DATA=webaccessadmin.py index.html
 
-EXTRA_DIST = $(wildcard *.wml)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(webapp_DATA) *~ *.tmp
 

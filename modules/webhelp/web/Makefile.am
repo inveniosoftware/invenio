@@ -23,7 +23,8 @@ docdir = $(WEBDIR)/help
 
 doc_DATA=index.en.html index.fr.html index.de.html index.pt.html index.es.html index.it.html index.ru.html index.sk.html index.cz.html index.no.html index.se.html
 
-EXTRA_DIST = $(wildcard *.wml)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 

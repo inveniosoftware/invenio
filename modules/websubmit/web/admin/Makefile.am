@@ -19,10 +19,10 @@
 
 webappdir = $(WEBDIR)/admin/websubmit
 
-FILESWML=$(wildcard *.wml)
-webapp_DATA=$(FILESWML:.wml=)
+FILESWML=$(wildcard $(srcdir)/*.wml)
+webapp_DATA=$(FILESWML:$(srcdir)/%.wml=%)
 
-EXTRA_DIST = $(wildcard *.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(webapp_DATA) *~ *.tmp
 

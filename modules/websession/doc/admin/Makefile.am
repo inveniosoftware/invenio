@@ -20,7 +20,8 @@ docdir = $(WEBDIR)/admin/websession
 
 doc_DATA=index.html guide.html
 
-EXTRA_DIST = $(wildcard *.wml)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 

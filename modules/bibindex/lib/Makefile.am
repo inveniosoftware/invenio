@@ -21,7 +21,8 @@ pylibdir = $(libdir)/python/cdsware
 pylib_DATA = bibindex_engine.py bibindex_engine_config.py bibindex_engine_tests.py \
              bibindexadminlib.py 
 
-EXTRA_DIST = $(wildcard *.wml)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(pylib_DATA) *~ *.tmp *.pyc
 

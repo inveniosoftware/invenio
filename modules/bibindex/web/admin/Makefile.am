@@ -21,7 +21,8 @@ webappdir = $(WEBDIR)/admin/bibindex
 
 webapp_DATA= index.html bibindexadmin.py
 
-EXTRA_DIST = $(wildcard *.wml)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(bin_SCRIPTS) $(webapp_DATA) *~ *.tmp search.pyc
 

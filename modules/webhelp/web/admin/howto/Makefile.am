@@ -21,7 +21,8 @@ docdir = $(WEBDIR)/admin/howto
 
 doc_DATA=index.html marc.html migrate.html run.html
 
-EXTRA_DIST = $(wildcard *.wml)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 

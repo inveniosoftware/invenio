@@ -19,7 +19,8 @@
 
 noinst_DATA=democfgdata.sql
 
-EXTRA_DIST = $(wildcard *.wml) demobibdata.xml
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) demobibdata.xml
 
 CLEANFILES = $(noinst_DATA) *~ *.tmp democfgdata.sql 
 

@@ -19,7 +19,8 @@
 
 noinst_DATA=tabfill.sql
 
-EXTRA_DIST = $(wildcard *.wml) tabcreate.sql tabdrop.sql tabbibclean.sql
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) tabcreate.sql tabdrop.sql tabbibclean.sql
 
 CLEANFILES = $(noinst_DATA) *~ *.tmp tabfill.sql
 

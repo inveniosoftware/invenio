@@ -19,7 +19,8 @@
 
 bin_SCRIPTS=bibupload
 
-EXTRA_DIST = $(wildcard *.wml)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(bin_SCRIPTS) *~ *.tmp 
 

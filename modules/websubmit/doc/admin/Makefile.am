@@ -43,7 +43,8 @@ doc_DATA=actionimplement.en.html actionimplement.fr.html actionimplement.de.html
         bibconvert.en.html bibconvert.fr.html bibconvert.de.html bibconvert.es.html bibconvert.pt.html bibconvert.it.html bibconvert.ru.html bibconvert.sk.html bibconvert.cz.html bibconvert.no.html bibconvert.se.html   \
         introduction.en.html introduction.fr.html introduction.de.html introduction.es.html introduction.pt.html introduction.it.html introduction.ru.html introduction.sk.html introduction.cz.html introduction.no.html introduction.se.html
 
-EXTRA_DIST = $(wildcard *.wml)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp *.php
 

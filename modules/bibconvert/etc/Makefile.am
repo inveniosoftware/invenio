@@ -18,8 +18,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 etcdir=$(sysconfdir)/bibconvert/KB
-etc_DATA=$(wildcard *.kb)
 
-EXTRA_DIST = $(wildcard *.kb)
+KBS = $(wildcard $(srcdir)/*.kb)
+
+etc_DATA = $(KBS:$(srcdir)/%=%)
+
+EXTRA_DIST = $(etc_DATA)
 
 CLEANFILES = *~ *.tmp

@@ -20,7 +20,8 @@
 pylibdir=$(libdir)/python/cdsware
 pylib_DATA=access_control_engine.py access_control_config.py access_control_admin.py webaccessadmin_lib.py
 
-EXTRA_DIST = $(wildcard *.wml)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(pylib_DATA) *~ *.tmp *.pyc
 

@@ -22,9 +22,11 @@ imgdir = $(WEBDIR)/img
 
 doc_DATA=index.html modules.html style.html concepts.html directory.html cdsware.el \
          releases.html testsuite.html
+
 img_DATA=modules.jpeg
 
-EXTRA_DIST = $(wildcard *.wml) $(wildcard *.el) $(wildcard *.jpeg)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) modules.jpeg cdsware.el
 
 CLEANFILES = $(wildcard *.html) *~ *.tmp
 

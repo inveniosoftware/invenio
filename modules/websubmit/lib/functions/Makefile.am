@@ -17,11 +17,12 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-FILESWML=$(wildcard *.wml)
-pylibdir=$(libdir)/python/cdsware/websubmit_functions
-pylib_DATA=$(FILESWML:.wml=)
+FILESWML=$(wildcard $(srcdir)/*.wml)
 
-EXTRA_DIST = $(wildcard *.wml)
+pylibdir=$(libdir)/python/cdsware/websubmit_functions
+pylib_DATA=$(FILESWML:$(srcdir)/%.wml=%)
+
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(wildcard *.php) $(wildcard *.py) *~ *.tmp
 

@@ -19,10 +19,14 @@
 docdir = $(WEBDIR)/admin/bibformat
 gifsdir=$(WEBDIR)/admin/bibformat
 
-doc_DATA=guide.html 
-gifs_DATA = $(wildcard *.gif *.jpg *.png)
+doc_DATA = guide.html
 
-EXTRA_DIST = $(wildcard *.wml)
+IMGS = $(wildcard $(srcdir)/*.gif $(srcdir)/*.jpg $(srcdir)/*.png)
+
+gifs_DATA = $(IMGS:$(srcdir)/%=%)
+
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 

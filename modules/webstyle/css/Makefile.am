@@ -20,7 +20,8 @@
 webdir=$(WEBDIR)/img
 web_DATA=cds.css
 
-EXTRA_DIST = $(wildcard *.wml)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(web_DATA) *~ *.tmp
 

@@ -20,7 +20,8 @@
 pylibdir=$(libdir)/python/cdsware
 pylib_DATA=websession.py session.py webuser.py webaccount.py
 
-EXTRA_DIST = $(wildcard *.wml)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(pylib_DATA) *~ *.tmp *.pyc
 

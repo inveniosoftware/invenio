@@ -19,11 +19,12 @@
 
 SUBDIRS = admin
 
-FILESWML=$(wildcard *.wml)
+FILESWML=$(wildcard $(srcdir)/*.wml)
 docdir = $(WEBDIR)
-doc_DATA=$(FILESWML:.wml=)
 
-EXTRA_DIST = $(wildcard *.wml)
+doc_DATA=$(FILESWML:$(srcdir)/%.wml=%)
+
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp *.php *.html
 

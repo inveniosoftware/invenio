@@ -20,7 +20,8 @@
 pylibdir=$(libdir)/python/cdsware
 pylib_DATA=webbasket.py
 
-EXTRA_DIST = $(wildcard *.wml)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(pylib_DATA) *~ *.tmp *.pyc
 

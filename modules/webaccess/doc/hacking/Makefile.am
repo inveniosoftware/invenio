@@ -21,7 +21,8 @@ docdir = $(WEBDIR)/hacking/webaccess
 
 doc_DATA=index.html api.html admin-internals.html table-structure.html
 
-EXTRA_DIST = $(wildcard *.wml)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 

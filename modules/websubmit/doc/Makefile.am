@@ -38,7 +38,8 @@ doc_DATA=access.en.html access.fr.html access.de.html access.es.html access.pt.h
          submission.en.html submission.fr.html submission.de.html submission.es.html submission.pt.html submission.it.html submission.ru.html submission.sk.html submission.cz.html submission.no.html submission.se.html \
          subnumber.en.html subnumber.fr.html subnumber.de.html subnumber.es.html subnumber.pt.html subnumber.it.html subnumber.ru.html subnumber.sk.html subnumber.cz.html subnumber.no.html subnumber.se.html
 
-EXTRA_DIST = $(wildcard *.wml)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp *.php
 

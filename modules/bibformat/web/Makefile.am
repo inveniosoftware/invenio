@@ -21,10 +21,10 @@ SUBDIRS = admin
 
 webdir=$(WEBDIR)/bibformat
 
-FILESWML=$(wildcard *.wml)
-web_DATA=$(FILESWML:.wml=)
+FILESWML=$(wildcard $(srcdir)/*.wml)
+web_DATA=$(FILESWML:$(srcdir)/%.wml=%)
 
-EXTRA_DIST = $(wildcard *.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(wildcard *.php) *~ *.tmp
 

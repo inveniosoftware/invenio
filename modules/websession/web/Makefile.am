@@ -21,7 +21,8 @@ webappdir = $(WEBDIR)
 
 webapp_DATA=sessinit.inc.php youraccount.py
 
-EXTRA_DIST = $(wildcard *.wml)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(webapp_DATA) *~ *.tmp
 

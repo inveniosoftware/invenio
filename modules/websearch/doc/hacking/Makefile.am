@@ -21,7 +21,8 @@ docdir = $(WEBDIR)/hacking/websearch
 
 doc_DATA=api.html stages.html index.html
 
-EXTRA_DIST = $(wildcard *.wml)
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 
