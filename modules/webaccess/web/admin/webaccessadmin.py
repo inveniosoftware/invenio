@@ -33,8 +33,8 @@ pylibdir = "<LIBDIR>/python"
 import sys
 sys.path.append('%s' % pylibdir)
 import cdsware.webaccessadmin_lib as wal
-reload(wal)
-from cdsware.webaccessadmin_lib import index
+# reload(wal)
+# from cdsware.webaccessadmin_lib import index
 
 __version__ = "$Id$"
 
@@ -89,6 +89,15 @@ def delegate_startarea(req):
     """add info here"""
             
     return wal.perform_delegate_startarea(req=req)
+
+
+def delegate_adminsetup(req, id_role_admin=0, id_role_delegate=0, confirm=0):
+    """add info here"""
+            
+    return wal.perform_delegate_adminsetup(req=req,
+                                           id_role_admin=id_role_admin,
+                                           id_role_delegate=id_role_delegate,
+                                           confirm=confirm)
 
 
 def delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=0, confirm=0):
