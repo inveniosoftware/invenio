@@ -889,6 +889,6 @@ WHERE  sdocname='$doctypes'");
 #    $uid = createGuestUser();
 #}
 $uid = 0;
-$uid_email = getEmail($uid);
-?>
+$uid_email = getEmail($uid); 
 </protect>
+?>
