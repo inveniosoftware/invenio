@@ -1992,7 +1992,7 @@
 <define-tag MSG_SIMILAR_RECORDS whitespace=delete>
   <en>Similar records</en>
   <fr>Notices similaires</fr>
-  <de>Similar records</de>
+  <de>Ähnliche Datensätze</de>
   <es>Registros similares</es>
   <pt>Similar records</pt>
   <it>Similar records</it>
@@ -2007,7 +2007,7 @@
 <define-tag MSG_WORD_SIMILARITY whitespace=delete>
   <en>word similarity</en>
   <fr>similarité de mots</fr>
-  <de>word similarity</de>
+  <de>Wortähnlichkeit</de>
   <es>similitud de palabras</es>
   <pt>word similarity</pt>
   <it>word similarity</it>
