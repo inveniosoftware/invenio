@@ -31,7 +31,8 @@ Contents
 
      b) MySQL server (may be on a remote machine), and MySQL client
         (must be available locally too).  Version 4.1.0 and above is
-        recommended due to its UTF-8 support.
+        recommended due to its UTF-8 support.  Please set the variable
+        max_allowed_packet to at least 4M in your my.cnf.
           <http://mysql.com/>
 
      c) Apache server, with support for loading DSO modules.  
