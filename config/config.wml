@@ -89,6 +89,16 @@ cds.support@cern.ch
 8000
 </define-tag>
 
+## CFG_APACHE_PASSWORD_FILE -- where Apache user credentials are stored
+<define-tag CFG_APACHE_PASSWORD_FILE whitespace=delete>
+/soft/httpd/conf/httpd.password
+</define-tag>
+
+## CFG_APACHE_GROUP_FILE -- where Apache user groups are stored
+<define-tag CFG_APACHE_GROUP_FILE whitespace=delete>
+/soft/httpd/conf/httpd.group
+</define-tag>
+
 ################################
 ## Part 2: CDS page elements ##
 ################################
@@ -137,21 +147,13 @@ cds.support@cern.ch
     <td>
       <table class=header border=0 cellspacing=0 cellpadding=0>
         <tr>
-          <td class=headerselected align=left>
-            &nbsp;<small><strong><CDSNAME></strong></small>&nbsp;
-          </td>
-          <td align=left>
-             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          </td>
-          <td align=left>
-             &nbsp;&nbsp;&nbsp;<small><a href="<WEBURL>">SEARCH</a></small>&nbsp;&nbsp;&nbsp;
-          </td>
-          <td align=left>
-            &nbsp;&nbsp;&nbsp;<small><a href="<WEBURL>/submit/">SUBMIT</a></small>&nbsp;&nbsp;&nbsp;
-          </td>
-          <td align=center>
-            &nbsp;
-          </td>
+          <td class=headerselected align=left>&nbsp;<small><strong><CDSNAME></strong></small>&nbsp;</td>
+          <td align=left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+          <td align=left><small><a href="<WEBURL>">SEARCH</a></small></td>
+          <td align=left><small>&nbsp;&nbsp;::&nbsp;&nbsp;</small></td>
+          <td align=left><small><a href="<WEBURL>/submit/">SUBMIT</a></small></td>
+          <td align=left><small>&nbsp;&nbsp;::&nbsp;&nbsp;</small></td>
+          <td align=left><small><a href="<WEBURL>/help/">HELP</a></small></td>
         </tr>
       </table>
     </td>
@@ -193,27 +195,18 @@ cds.support@cern.ch
   <table cellpadding=0 border=0 cellspacing=0 width="100%"  class="pagefooter">
   <tr>
   <td class="address">
-  <CDSNAME>
-   -
-  <a class=note href="<WEBURL>">Search</a>
-   -
-  <a class=note href="<WEBURL>/submit/">Submit</a>
-   -
-  <a class=note href="<WEBURL>/docs/">Help</a>
-   -
-  <a class=note href="<WEBURL>/docs/">Sitemap</a>.
+  <CDSNAME>&nbsp;::&nbsp;<a class=note href="<WEBURL>">Search</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/submit/">Submit</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/help/">Help</a>
   </td>
   <td align=right class="address">
-  <!--URL-->
+  Last updated <: print `date +"%d %b %Y %H:%M:%S %Z"`; :>
   </td>
   </tr>
   <tr>
   <td class="address">
-  Powered by <a class=note href="http://cdsware.cern.ch/">CDSware</a> v<VERSION>.
+  Powered by <a class=note href="http://cdsware.cern.ch/">CDSware</a> v<VERSION>
   </td>
   <td align=right class="address">
-  Revised <: print `date +"%d %b %Y %H:%M:%S %Z"`; :>
-  by <a class=note href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a>
+  Maintained by <a class=note href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a>
   </td>
   </tr>
   </table>
