@@ -78,8 +78,9 @@ create-demo-site: install
 # 	    fi \
 # 	done
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/demo/democfgdata.sql
-	${prefix}/bin/webcoll update-reclist
-	${prefix}/bin/webcoll update-webpage
+	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
+	${prefix}/bin/webcoll -ucds.support@cern.ch
+	${prefix}/bin/webcoll 1
 	@echo "***********************************************************************"
 	@echo "** The demo site has been successfully created.                      **"
 	@echo "** Please point your browser to @WEBURL@ "
@@ -88,7 +89,7 @@ create-demo-site: install
 	@echo "** with the exception that no demo records have been loaded yet.     **"
 	@echo "**                                                                   **"
 	@echo "** To load demo records, you can run 'make load-demo-records'.       **"
-	@echo "** To destroy the demo site, you can run 'make destroy-demo-site'.   **"
+	@echo "** To drop the demo site, you can run 'make drop-demo-site'.   **"
 	@echo "***********************************************************************"
 
 load-demo-records: install
@@ -109,32 +110,34 @@ load-demo-records: install
 	@echo "** You should be able to do some searches, etc.                      **"
 	@echo "**                                                                   **"
 	@echo "** To remove demo records, you can run 'make remove-demo-records'.   **"
-	@echo "** To remove also the demo site collection etc configurations,       **"
-	@echo "** you can run 'make destroy-demo-site'.                             **"
+	@echo "** To drop also the demo site collection etc configurations,         **"
+	@echo "** you can run 'make drop-demo-site'.                                **"
 	@echo "***********************************************************************"
 
-destroy-demo-site: install
+drop-demo-site: install
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabdrop.sql
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabcreate.sql
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
-	${prefix}/bin/webcoll update-reclist
-	${prefix}/bin/webcoll update-webpage
+	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
+	${prefix}/bin/webcoll -ucds.support@cern.ch
+	${prefix}/bin/webcoll 1
 	for f in $(sbmdat); do rm -f $(sbmdir)/$$f.shtml ; done
-	@echo "*****************************************************************"
-	@echo "** The demo site and records have been successfully destroyed. **"
-	@echo "*****************************************************************"
+	@echo "***************************************************************"
+	@echo "** The demo site and records have been successfully dropped. **"
+	@echo "***************************************************************"
 
 remove-demo-records: install
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabbibclean.sql
+	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
 	${prefix}/bin/webcoll update-reclist
 	${prefix}/bin/webcoll update-webpage
-	@echo "**************************************************************"
-	@echo "** The demo records have been successfully removed.         **"
-	@echo "** The demo collection and submit configurations            **"
-	@echo "** have been preserved.                                     **"
-	@echo "**                                                          **"
-	@echo "** Note that you can run 'make destroy-demo-site' to remove **"
-	@echo "** the demo site fully.                                     **"
-	@echo "**************************************************************"
+	@echo "**********************************************************"
+	@echo "** The demo records have been successfully removed.     **"
+	@echo "** The demo collection and submit configurations        **"
+	@echo "** have been preserved.                                 **"
+	@echo "**                                                      **"
+	@echo "** Note that you can run 'make drop-demo-site' to drop  **"
+	@echo "** the demo site fully.                                 **"
+	@echo "**********************************************************"
 
 CLEANFILES = *~
