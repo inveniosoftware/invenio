@@ -289,8 +289,7 @@ def create_login_page_box(referer=''):
 		 </td>
                 </tr>
               </table>
-              <p><strong>Note:</strong> Please do not use valuable passwords such as your Unix, AFS or NICE passwords with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you for personal services of %s. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.
-           """ % (cdsname)
+           """
     return text
 
 
