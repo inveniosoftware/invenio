@@ -28,16 +28,59 @@
 
 """CDSware Search Engine config parameters, read from WML configuration file."""
 
-cfg_max_recID = <CFG_MAX_RECID> # rec universe: shoud be >= than maximum recID from the bibrec database
-cfg_instant_browse = <CFG_NB_LATEST_ADDITIONS> # the number of docs to display under 'Latest Additions'
-cfg_author_et_al_threshold = <CFG_AUTHOR_ET_AL_THRESHOLD> # print up to 3 author names, then add "et al" in the brief format
-cfg_search_cache_size = <CFG_SEARCH_CACHE_SIZE> # how many search hits we want to cache in memory?
-cfg_nb_records_to_sort = <CFG_NB_RECORDS_TO_SORT> # limit for sorting
-cfg_call_bibformat = <CFG_CALL_BIBFORMAT> # if "HTML detailed" format is not found, do we want to call BibFormat on the fly?
-cfg_use_aleph_sysnos = <CFG_USE_OLD_SYSNOS> # do we want to make ALEPH/old sysnos visible rather than MySQL's recID?
+# rec universe: shoud be >= than maximum recID from the bibrec database
+cfg_max_recID = <CFG_MAX_RECID> 
+
+# the number of docs to display under 'Latest Additions'
+cfg_instant_browse = <CFG_NB_LATEST_ADDITIONS>
+
+# print up to 3 author names, then add "et al" in the brief format
+cfg_author_et_al_threshold = <CFG_AUTHOR_ET_AL_THRESHOLD> 
+
+# how many search hits we want to cache in memory?
+cfg_search_cache_size = <CFG_SEARCH_CACHE_SIZE> 
+
+# limit for sorting
+cfg_nb_records_to_sort = <CFG_NB_RECORDS_TO_SORT> 
+
+# if "HTML detailed" format is not found, do we want to call BibFormat on the fly?
+cfg_call_bibformat = <CFG_CALL_BIBFORMAT>
+
+# do we want to make ALEPH/old sysnos visible rather than MySQL's recID?
+cfg_use_aleph_sysnos = <CFG_USE_OLD_SYSNOS> 
+
+# field names to convert from a previous search system?
 cfg_fields_convert = <CFG_FIELDS_CONVERT>
-cfg_google_box = <CFG_GOOGLE_BOX> # are we are proposing links to other search engines like google by default?
-cfg_simplesearch_pattern_box_width = <CFG_SIMPLESEARCH_PATTERN_BOX_WIDTH> # width of the search pattern window in the simple search interface
-cfg_advancedsearch_pattern_box_width = <CFG_ADVANCEDSEARCH_PATTERN_BOX_WIDTH> # width of the search pattern window in the advanced search interface
-cfg_narrow_search_show_grandsons = <CFG_NARROW_SEARCH_SHOW_GRANDSONS> # show or not grandsons in Narrow Search boxes?
-cfg_oaiidtag = "<OAIIDTAG>" # OAI ID tag, to be shown for DELETED records
+
+# width of the search pattern window in the simple search interface
+cfg_simplesearch_pattern_box_width = <CFG_SIMPLESEARCH_PATTERN_BOX_WIDTH> 
+
+# width of the search pattern window in the advanced search interface
+cfg_advancedsearch_pattern_box_width = <CFG_ADVANCEDSEARCH_PATTERN_BOX_WIDTH> 
+
+# show or not grandsons in Narrow Search boxes?
+cfg_narrow_search_show_grandsons = <CFG_NARROW_SEARCH_SHOW_GRANDSONS> 
+
+# OAI ID tag, to be shown for DELETED records
+cfg_oaiidtag = "<OAIIDTAG>" 
+
+# create links for Ellis, N and friends when Ellis, N was searched for?
+cfg_create_similarly_named_authors_link_box = 1
+
+# are we are proposing links to other search engines like google?
+cfg_google_box = <CFG_GOOGLE_BOX>
+
+# what other search engines to point to in the `'Haven't found...'' google box?
+cfg_google_box_servers = {'Amazon' : 1,
+                          'CERN Intranet' : 1,
+                          'CERN Agenda' : 1,
+                          'CiteSeer' : 1,
+                          'Google Scholar' : 1,
+                          'Google Web' : 1,
+                          'IEC' : 1,
+                          'IHC' : 1,
+                          'INSPEC' : 1,
+                          'ISO' : 1,
+                          'KEK' : 1,
+                          'NEBIS' : 1,
+                          'SPIRES' : 1}
