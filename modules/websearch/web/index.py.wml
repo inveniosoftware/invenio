@@ -57,8 +57,8 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
-        return page(title="Internal Error",
-                    body = create_error_box(req, verbose=verbose),
+        return page(title=msg_internal_error[ln],
+                    body = create_error_box(req, verbose=verbose, ln=ln),
                     description="%s - Internal Error" % cdsname, 
                     keywords="%s, CDSware, Internal Error" % cdsname,
                     language=ln,
@@ -121,10 +121,8 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
             req.write("<br>ln=%s" % ln)        
             req.write("<br>collid=%s" % collid)
             req.write("<br>uid=%s" % uid)
-        return page(title="Internal Error",
-                    body = create_error_box(req) + 
-                           """<p>You may want to start browsing from <a href="%s">%s</a>.""" % \
-                           (weburl, cdsname),
+        return page(title=msg_internal_error[ln],
+                    body = create_error_box(req, ln=ln),
                     description="%s - Internal Error" % cdsname, 
                     keywords="%s, CDSware, Internal Error" % cdsname,
                     uid=uid,
