@@ -25,6 +25,10 @@
 from config import *
 from webuser import create_user_infobox
 import re
+import sys
+import time
+import traceback
+import urllib
 
 ## start Python:
 <protect>## $Id$</protect>
@@ -85,6 +89,7 @@ def create_navtrail(title,
     """create_navtrail(): create navigation trail table box
        input: title = page title;
               previous_links = the trail content from site title until current page (both ends exlusive).
+       output: text containing the navtrail
     """
     out = ""
     if title != cdsname:
@@ -130,3 +135,36 @@ def pagefooteronly(cdspagefooteradd=""):
     """Return just the beginning of page()."""
     out = page_template_footer % (cdspagefooteradd, cdspagefooter)
     return out
+
+def create_error_box(req, title="<strong>Internal Error:</strong>"):
+    """Analyse the req object and the sys traceback and return a text
+       message box with internal information that would be suitful to
+       display when something bad has happened."""
+    boxhead = """<p>%s %s %s""" % (title, sys.exc_info()[0], sys.exc_info()[1])
+    boxbody = """<p>Please contact <a href="mailto:%s">%s</a> 
+                   quoting the following information:<blockquote><pre>""" % (urllib.quote(supportemail), supportemail)
+    boxbody += """URI: http://%s%s\n""" % (req.hostname, req.unparsed_uri)
+    boxbody += """Time: %s\n""" % time.strftime("%02d/%b/%Y:%H:%M:%S %z")
+    if req.headers_in.has_key('User-Agent'):
+        boxbody += """Browser: %s\n""" % req.headers_in['User-Agent']
+    boxbody += """Client: %s\n""" % req.connection.remote_ip
+    boxbody += """Error: %s %s\n""" % (sys.exc_info()[0], sys.exc_info()[1])
+    boxbody += """Traceback: %s\n""" % traceback.print_tb(sys.exc_info()[2])
+    boxbody += """</pre></blockquote>"""
+    out = """
+        <table class="errorbox">
+         <thead>
+          <tr>
+           <th class="errorboxheader">
+             %s
+           </th>
+          </tr> 
+         </thead>
+         <tbody>
+          <tr>
+            <td class="errorboxbody">%s</td>
+          </tr>
+         </tbody>
+        </table>""" % (boxhead, boxbody)
+    return out
+
