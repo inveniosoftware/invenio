@@ -283,6 +283,8 @@ def get_bibrank_methods(collection, ln=cdslang):
         if options.has_key("function") and is_method_valid(collection, rank_method_code):
             if options.has_key(ln):
                 avail_methods.append((rank_method_code, options[ln]))
+            elif options.has_key(cdslang):
+                avail_methods.append((rank_method_code, options[cdslang]))
             else:
                 avail_methods.append((rank_method_code, rank_method_code))              
     return avail_methods
@@ -410,10 +412,13 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
 
     if not rnkdict:
         return (None, "Warning, Could not load ranking data for method.", "", voutput)
-    if verbose > 0:
-        voutput += "Ranking data loaded, size of structure: %s" % len(rnkdict)
+
     rnkdict = deserialize_via_marshal(rnkdict[0][0])
+    if verbose > 0:
+        voutput += "Ranking data loaded, size of structure: %s<br>" % len(rnkdict)
     lrecIDs = hitset.items()
+    if verbose > 0:
+        voutput += "Number of records to rank: %s<br>" % len(lrecIDs)
     reclist = []
     reclist_addend = []
 
