@@ -19,14 +19,14 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-dnl Initialize autoconf and automake:
-AC_INIT(cdsware, 0.01-pre7, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.01-pre7)
+## Initialize autoconf and automake:
+AC_INIT(cdsware, 0.0.9, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.0.9)
 
-dnl Check for install:
+## Check for install:
 AC_PROG_INSTALL
 
-dnl Check for WML:
+## Check for WML:
 AC_PATH_PROG(WML, wml)
 if test -z "$WML"; then
    AC_MSG_ERROR([
@@ -34,7 +34,7 @@ if test -z "$WML"; then
    Available from <http://www.engelschall.com/sw/wml/>.])
 fi
 
-dnl Check for MySQL client:
+## Check for MySQL client:
 AC_PATH_PROG(MYSQL, mysql)
 if test -z "$MYSQL"; then
    AC_MSG_ERROR([
@@ -42,7 +42,7 @@ if test -z "$MYSQL"; then
    Available from <http://mysql.com/>.])
 fi
 
-dnl Check for PHP:
+## Check for PHP:
 AC_PATH_PROG(PHP, php)
 if test -z "$PHP"; then
    AC_MSG_ERROR([
@@ -51,7 +51,7 @@ if test -z "$PHP"; then
    Available from <http://www.php.net/manual/en/install.commandline.php>.])
 fi
 
-dnl Check for Python:
+## Check for Python:
 AC_PATH_PROG(PYTHON, python)
 if test -z "$PYTHON"; then
    AC_MSG_ERROR([
@@ -59,7 +59,7 @@ if test -z "$PYTHON"; then
    Available from <http://python.org/>.])
 fi
 
-dnl Check for Acrobat Reader:
+## Check for Acrobat Reader:
 AC_PATH_PROG(ACROREAD, acroread)
 if test -z "$ACROREAD"; then
    AC_MSG_WARN([
@@ -71,7 +71,7 @@ if test -z "$ACROREAD"; then
    <http://www.adobe.com/products/acrobat/readstep.html>.])
 fi
 
-dnl Check for Lynx:
+## Check for Lynx:
 AC_PATH_PROG(LYNX, lynx)
 if test -z "$LYNX"; then
    AC_MSG_WARN([
@@ -84,7 +84,7 @@ if test -z "$LYNX"; then
    <http://lynx.browser.org/>.])
 fi
 
-dnl Check for Gzip:
+## Check for Gzip:
 AC_PATH_PROG(GZIP, gzip)
 if test -z "$GZIP"; then
    AC_MSG_WARN([
@@ -96,7 +96,7 @@ if test -z "$GZIP"; then
    <http://www.gzip.org/>.])
 fi
 
-dnl Check for Gunzip:
+## Check for Gunzip:
 AC_PATH_PROG(GUNZIP, gunzip)
 if test -z "$GUNZIP"; then
    AC_MSG_WARN([
@@ -109,7 +109,7 @@ if test -z "$GUNZIP"; then
    <http://www.gzip.org/>.])
 fi
 
-dnl Check for Tar:
+## Check for Tar:
 AC_PATH_PROG(TAR, tar)
 if test -z "$TAR"; then
    AC_MSG_WARN([
@@ -121,7 +121,7 @@ if test -z "$TAR"; then
    <ftp://prep.ai.mit.edu/pub/gnu/tar/>.])
 fi
 
-dnl Check for Ps2pdf:
+## Check for Ps2pdf:
 AC_PATH_PROG(PS2PDF, ps2pdf)
 if test -z "$PS2PDF"; then
    AC_MSG_WARN([
@@ -133,7 +133,7 @@ if test -z "$PS2PDF"; then
    <http://www.cs.wisc.edu/~ghost/doc/AFPL/6.50/Ps2pdf.htm>.])
 fi
 
-dnl Check for File:
+## Check for File:
 AC_PATH_PROG(FILE, file)
 if test -z "$FILE"; then
    AC_MSG_WARN([
@@ -145,7 +145,7 @@ if test -z "$FILE"; then
    <ftp://ftp.astron.com/pub/file/>.])
 fi
 
-dnl Check for Djpeg:
+## Check for Djpeg:
 AC_PATH_PROG(DJPEG, djpeg)
 if test -z "$DJPEG"; then
    AC_MSG_WARN([
@@ -157,7 +157,7 @@ if test -z "$DJPEG"; then
    <http://www.ijg.org/files>.])
 fi
 
-dnl Check for Convert:
+## Check for Convert:
 AC_PATH_PROG(CONVERT, convert)
 if test -z "$CONVERT"; then
    AC_MSG_WARN([
@@ -169,7 +169,7 @@ if test -z "$CONVERT"; then
    <http://www.imagemagick.org/>.])
 fi
 
-dnl Check for Giftext:
+## Check for Giftext:
 AC_PATH_PROG(GIFTEXT, giftext)
 if test -z "$GIFTEXT"; then
    AC_MSG_WARN([
@@ -181,7 +181,7 @@ if test -z "$GIFTEXT"; then
    <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>.])
 fi
 
-dnl Check for Gifinter:
+## Check for Gifinter:
 AC_PATH_PROG(GIFINTER, gifinter)
 if test -z "$GIFINTER"; then
    AC_MSG_WARN([
@@ -193,7 +193,7 @@ if test -z "$GIFINTER"; then
    <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>.])
 fi
 
-dnl Check for Gifrsize:
+## Check for Gifrsize:
 AC_PATH_PROG(GIFRSIZE, gifrsize)
 if test -z "$GIFRSIZE"; then
    AC_MSG_WARN([
@@ -205,7 +205,7 @@ if test -z "$GIFRSIZE"; then
    <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>.])
 fi
 
-dnl Check for jpegsize:
+## Check for jpegsize:
 AC_PATH_PROG(JPEGSIZE, jpegsize)
 if test -z "$JPEGSIZE"; then
    AC_MSG_WARN([
@@ -217,7 +217,7 @@ if test -z "$JPEGSIZE"; then
    <http://www.squarebox.co.uk/download/>.])
 fi
 
-dnl Check for Ppmtogif:
+## Check for Ppmtogif:
 AC_PATH_PROG(PPMTOGIF, ppmtogif)
 if test -z "$PPMTOGIF"; then
    AC_MSG_WARN([
@@ -229,7 +229,7 @@ if test -z "$PPMTOGIF"; then
    <http://www.acme.com/software/pbmplus/>.])
 fi
 
-dnl Check for Ppmquant:
+## Check for Ppmquant:
 AC_PATH_PROG(PPMQUANT, ppmquant)
 if test -z "$PPMQUANT"; then
    AC_MSG_WARN([
@@ -241,7 +241,7 @@ if test -z "$PPMQUANT"; then
    <http://www.acme.com/software/pbmplus/>.])
 fi
 
-dnl Check for Pnmscale:
+## Check for Pnmscale:
 AC_PATH_PROG(PNMSCALE, pnmscale)
 if test -z "$PNMSCALE"; then
    AC_MSG_WARN([
@@ -253,7 +253,7 @@ if test -z "$PNMSCALE"; then
    <http://www.acme.com/software/pbmplus/>.])
 fi
 
-dnl Define HTDOCSDIR directory:
+## Define HTDOCSDIR directory:
 AC_ARG_WITH(htdocsdir, AC_HELP_STRING([--with-htdocsdir], [specify where htdocs files go (e.g. /soft/httpd/host/cdsdev/htdocs/MPI/)]), HTDOCSDIR=${withval})
 if test -z "$HTDOCSDIR"; then
    AC_MSG_ERROR([
@@ -261,7 +261,7 @@ if test -z "$HTDOCSDIR"; then
    Example: "--with-htdocsdir=/soft/httpd/host/cdsdev/htdocs/MPI/".])
 fi   
 
-dnl Define CGIBIDIR directory:
+## Define CGIBIDIR directory:
 AC_ARG_WITH(cgibindir, AC_HELP_STRING([--with-cgibindir], [specify where cgibin files go (e.g. /soft/httpd/host/cdsdev/cgi-bin/MPI/)]), CGIBINDIR=${withval})
 if test -z "$CGIBINDIR"; then
    AC_MSG_ERROR([
@@ -269,7 +269,7 @@ if test -z "$CGIBINDIR"; then
    Example: "--with-cgibindir=/soft/httpd/host/cdsdev/cgi-bin/MPI/".])
 fi   
 
-dnl Define DBUTILDIR directory:
+## Define DBUTILDIR directory:
 AC_ARG_WITH(dbutildir, AC_HELP_STRING([--with-dbutildir], [specify where dbutil files go (e.g. /usr/local/bin/MPI/)]), DBUTILDIR=${withval})
 if test -z "$DBUTILDIR"; then
    AC_MSG_ERROR([
@@ -277,7 +277,7 @@ if test -z "$DBUTILDIR"; then
    Example: "--with-dbutildir=/usr/local/bin/MPI/".])
 fi   
 
-dnl Define HTDOCSURL URL:
+## Define HTDOCSURL URL:
 AC_ARG_WITH(htdocsurl, AC_HELP_STRING([--with-htdocsurl], [specify URL where htdocs files will be reached (e.g. http://cdsdev.cern.ch/MPI/)]), HTDOCSURL=${withval})
 if test -z "$HTDOCSURL"; then
    AC_MSG_ERROR([
@@ -285,7 +285,7 @@ if test -z "$HTDOCSURL"; then
    Example: "--with-htdocsurl=http://cdsdev.cern.ch/MPI/".])
 fi   
 
-dnl Define CGIBINURL URL:
+## Define CGIBINURL URL:
 AC_ARG_WITH(cgibinurl, AC_HELP_STRING([--with-cgibinurl], [specify URL where CGI scripts will be reached (e.g. http://cdsdev.cern.ch/cgi-bin/MPI/)]), CGIBINURL=${withval})
 if test -z "$CGIBINURL"; then
    AC_MSG_ERROR([
@@ -293,7 +293,7 @@ if test -z "$CGIBINURL"; then
    Example: "--with-cgibinurl=http://cdsdev.cern.ch/cgi-bin/MPI/".])
 fi   
 
-dnl Define DBHOST database host:
+## Define DBHOST database host:
 AC_ARG_WITH(dbhost, AC_HELP_STRING([--with-dbhost], [specify DB server (e.g. cdsdb.cern.ch)]), DBHOST=${withval})
 if test -z "$DBHOST"; then
    AC_MSG_ERROR([
@@ -301,7 +301,7 @@ if test -z "$DBHOST"; then
    Example: "--with-dbhost=cdsdb.cern.ch".])
 fi   
 
-dnl Define DBNAME database name:
+## Define DBNAME database name:
 AC_ARG_WITH(dbname, AC_HELP_STRING([--with-dbname], [specify DB name (e.g. cdsware)]), DBNAME=${withval})
 if test -z "$DBNAME"; then
    AC_MSG_ERROR([
@@ -309,7 +309,7 @@ if test -z "$DBNAME"; then
    Example: "--with-dbname=cdsware".])
 fi   
 
-dnl Define DBUSER user name:
+## Define DBUSER user name:
 AC_ARG_WITH(dbuser, AC_HELP_STRING([--with-dbuser], [specify DB user name (e.g. cdsware)]), DBUSER=${withval})
 if test -z "$DBUSER"; then
    AC_MSG_ERROR([
@@ -317,7 +317,7 @@ if test -z "$DBUSER"; then
    Example: "--with-dbuser=cdsware".])
 fi   
 
-dnl Define DBPASS user password:
+## Define DBPASS user password:
 AC_ARG_WITH(dbpass, AC_HELP_STRING([--with-dbpass], [specify DB user password (e.g. myp1ss)]), DBPASS=${withval})
 if test -z "$DBPASS"; then
    AC_MSG_ERROR([
@@ -325,9 +325,7 @@ if test -z "$DBPASS"; then
    Example: "--with-dbpass=myp1ss".])
 fi   
 
-dnl Test supplied DB user credentials:
-
-dnl Substitute variables:
+## Substitute variables:
 AC_SUBST(VERSION)
 AC_SUBST(WML)
 AC_SUBST(MYSQL)
@@ -344,30 +342,32 @@ AC_SUBST(DBNAME)
 AC_SUBST(DBUSER)
 AC_SUBST(DBPASS)
 
-dnl Write help:
-AC_OUTPUT_COMMANDS([echo "****************************************************************************************"])
-AC_OUTPUT_COMMANDS([echo "** Good, the CERN Document Server Software (CDSware) is now ready for installation!   **"])
-AC_OUTPUT_COMMANDS([echo "** You have entered the following parameters:                                         **"])
-AC_OUTPUT_COMMANDS([echo "**   - HTML documents install directory: $X1"],X1=$HTDOCSDIR)
-AC_OUTPUT_COMMANDS([echo "**   - CGI scripts install directory: $X2"],X2=$CGIBINDIR)
-AC_OUTPUT_COMMANDS([echo "**   - DB utilities install directory: $X3"],X3=$DBUTILDIR)
-AC_OUTPUT_COMMANDS([echo "**   - HTML documents home URL: $X4"],X4=$HTDOCSURL)
-AC_OUTPUT_COMMANDS([echo "**   - CGI scripts home URL: $X5"],X5=$CGIBINURL)
-AC_OUTPUT_COMMANDS([echo "**   - DB server: $X6"],X6=$DBHOST)
-AC_OUTPUT_COMMANDS([echo "**   - DB name: $X7"],X7=$DBNAME)
-AC_OUTPUT_COMMANDS([echo "**   - DB username: $X8"],X8=$DBUSER)
-AC_OUTPUT_COMMANDS([echo "**   - DB password: $X9"],X9=$DBPASS)
-AC_OUTPUT_COMMANDS([echo "** Here are the steps to continue the building process:                               **"])
-AC_OUTPUT_COMMANDS([echo "**   - Firstly, customize the self-explanatory config file './config/config.wml'.     **"])
-AC_OUTPUT_COMMANDS([echo "**   - Secondly, type 'make' to build your customized CDSware installation.           **"])
-AC_OUTPUT_COMMANDS([echo "**   - Thirdly, type 'make create-tables' if you have not created CDSware tables yet. **"])
-AC_OUTPUT_COMMANDS([echo "**   - Finally, type 'make install' to install the system.                            **"])
-AC_OUTPUT_COMMANDS([echo "** Good luck, and thanks for choosing the CERN Document Server Software.              **"])
-AC_OUTPUT_COMMANDS([echo "**              -- CDS Development Group <cds.support@cern.ch>                        **"])
-AC_OUTPUT_COMMANDS([echo "****************************************************************************************"])
+## Write help:
+AC_CONFIG_COMMANDS([default], [echo "****************************************************************************************";\
+                               echo "** Good, the CERN Document Server Software (CDSware) is now ready for installation!   **";\ 
+                               echo "** You have entered the following parameters:                                         **";\ 
+                               echo "**   - HTML documents install directory: $HTDOCSDIR";\
+                               echo "**   - CGI scripts install directory: $CGIBINDIR";\
+                               echo "**   - DB utilities install directory: $DBUTILDIR";\
+                               echo "**   - HTML documents home URL: $HTDOCSURL";\
+                               echo "**   - CGI scripts home URL: $CGIBINURL";\
+                               echo "**   - DB server: $DBHOST";\
+                               echo "**   - DB name: $DBNAME";\
+                               echo "**   - DB username: $DBUSER";\
+                               echo "**   - DB password: $DBPASS";\
+                               echo "** Here are the steps to continue the building process:                               **";\
+                               echo "**   - Firstly, customize the self-explanatory config file './config/config.wml'.     **";\
+                               echo "**   - Secondly, type 'make' to build your customized CDSware installation.           **";\
+                               echo "**   - Thirdly, type 'make create-tables' if you have not created CDSware tables yet. **";\
+                               echo "**   - Finally, type 'make install' to install the system.                            **";\
+                               echo "** Good luck, and thanks for choosing the CERN Document Server Software.              **";\
+                               echo "**              -- CDS Development Group <cds.support@cern.ch>                        **";\
+                               echo "****************************************************************************************"], 
+                               [HTDOCSDIR=$HTDOCSDIR; CGIBINDIR=$CGIBINDIR; DBUTILDIR=$DBUTILDIR; HTDOCSURL=$HTDOCSURL; \
+                                CGIBINURL=$CGIBINURL; DBHOST=$DBHOST; DBNAME=$DBNAME; DBUSER=$DBUSER; DBPASS=$DBPASS])
 
-dnl Write output files:
-AC_OUTPUT(Makefile \
+## Define output files:
+AC_CONFIG_FILES([Makefile \
 	  config/Makefile \
 	  config/configbis.wml \
 	  cgibin/Makefile \
@@ -406,6 +406,9 @@ AC_OUTPUT(Makefile \
 	  htdocs/admin/websubmit/Makefile \
 	  htdocs/admin/websubmit/docs/Makefile \
 	  htdocs/admin/websubmit/docs/english/Makefile \
-	  htdocs/admin/webperso/Makefile)
+	  htdocs/admin/webperso/Makefile])
+
+## Finally, write output files:
+AC_OUTPUT
 
 ## end of file
