@@ -126,7 +126,7 @@ Contents:
      query the database for connection between user and role superadmin.
      -> authorize if yes
    
-   III. find all of the users roles and create string with the ids
+   III. check if the user exists and find all of the users roles and create string with the ids
      query the database and build string of ids
      -> don't authorize if no roles
    

@@ -83,11 +83,16 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
     # ------------------------------------------
     
     
-    # TASK 2: find all the user's roles and create or-string
-    if verbose: print 'task 2 - find userroles'
+    # TASK 2: check if user exists and find all the user's roles and create or-string
+    if verbose: print 'task 2 - find user and userroles'
     
-    query2 = """SELECT ur.id_accROLE FROM user_accROLE ur WHERE ur.id_user=%s ORDER BY ur.id_accROLE """ % id_user
-    try: res2 = run_sql(query2)
+    try: 
+        query2 = """SELECT * from user where id=%s""" % id_user
+        res2 = run_sql(query2)
+        if not res2:
+            raise Exception
+        query2 = """SELECT ur.id_accROLE FROM user_accROLE ur WHERE ur.id_user=%s ORDER BY ur.id_accROLE """ % id_user
+        res2 = run_sql(query2)
     except Exception: return (6, "%s %s" % (cfg_webaccess_warning_msgs[6], (called_from and "%s %s" % (cfg_webaccess_msgs[0] % name_action[3:], cfg_webaccess_msgs[1]) or "")))
     
     if not res2: return (2, "%s %s" % (cfg_webaccess_warning_msgs[2], (called_from and "%s %s" % (cfg_webaccess_msgs[0] % name_action[3:], cfg_webaccess_msgs[1]) or ""))) #user has no roles
