@@ -1354,7 +1354,7 @@ def update_rnkWORD(table, terms):
             for (t, tf) in doc_terms.iteritems():
                 if Gi.has_key(t):
                     Nj[j] = Nj.get(j, 0) + math.pow(Gi[t] * (1 + math.log(tf[0])),2)
-                    Git = math.floor(Gi[t]*100)
+                    Git = int(math.floor(Gi[t]*100))
                     if Git >= 0:
                         Git += 1
                     doc_terms[t] = (tf[0], Git)
@@ -1384,7 +1384,7 @@ def update_rnkWORD(table, terms):
 	    for (j, tf) in term_docs.iteritems():
                 if Nj.has_key(j):
                     term_docs[j] = (tf[0], Nj[j])
-            Git = int(Gi[t]*100)
+            Git = int(math.floor(Gi[t]*100))
             if Git >= 0:
                 Git += 1
             term_docs["Gi"] = (0, Git)

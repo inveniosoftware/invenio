@@ -72,7 +72,7 @@ except ImportError, e:
 
 options = {}
 
-def single_tag_rank_method_exec(rnkMETHOD, name, config):
+def single_tag_rank_method_exec(rank_method_code, name, config):
     """Creating the rank method data"""
     startCreate = time.time()
     rnkset = {}
@@ -80,11 +80,11 @@ def single_tag_rank_method_exec(rnkMETHOD, name, config):
     if options["verbose"] >= 1:
         write_message("Running: %s." % name)
 
-    rnkset_old = fromDB(rnkMETHOD)
+    rnkset_old = fromDB(rank_method_code)
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     rnkset_new = single_tag_rank(config)
     rnkset = union_dicts(rnkset_old, rnkset_new)
-    intoDB(rnkset, date, rnkMETHOD)
+    intoDB(rnkset, date, rank_method_code)
     showtime((time.time() - startCreate))
 
 def single_tag_rank(config):
@@ -131,38 +131,38 @@ def single_tag_rank(config):
             rnkset[key] = (value, - 1.0)
     return rnkset
 
-def get_lastupdated(rnkMETHOD):
+def get_lastupdated(rank_method_code):
     """Get the last time the rank method was updated"""
-    res = run_sql("SELECT rnkMETHOD.last_updated FROM rnkMETHOD WHERE name='%s'" % rnkMETHOD)
+    res = run_sql("SELECT rnkMETHOD.last_updated FROM rnkMETHOD WHERE name='%s'" % rank_method_code)
     if res:
         return res[0][0]
     else:
         raise Exception("Is this the first run? Please do a complete update.")
 
-def intoDB(dict, date, rnkMETHOD):
+def intoDB(dict, date, rank_method_code):
     """Insert the rank method data into the database"""
-    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rnkMETHOD)
-    del_rnkMETHODDATA(rnkMETHOD)
+    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rank_method_code)
+    del_rank_method_codeDATA(rank_method_code)
     run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES ('%s','%s')" % (id[0][0], serialize_via_marshal(dict)))
-    run_sql("UPDATE rnkMETHOD SET last_updated='%s' WHERE name='%s'" % (date, rnkMETHOD))
+    run_sql("UPDATE rnkMETHOD SET last_updated='%s' WHERE name='%s'" % (date, rank_method_code))
 
-def fromDB(rnkMETHOD):
+def fromDB(rank_method_code):
     """Get the data for a rank method"""
-    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rnkMETHOD)
+    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rank_method_code)
     res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s" % id[0][0])
     if res:
         return deserialize_via_marshal(res[0][0])
     else:
         return {}
 
-def del_rnkMETHODDATA(rnkMETHOD):
+def del_rank_method_codeDATA(rank_method_code):
     """Delete the data for a rank method"""
-    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rnkMETHOD)
+    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rank_method_code)
     res = run_sql("DELETE FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s" % id[0][0])
 
-def del_recids(rnkMETHOD, range):
+def del_recids(rank_method_code, range):
     """Delete some records from the rank method"""
-    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rnkMETHOD)
+    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rank_method_code)
     res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s" % id[0][0])
     if res:
         rec_dict = deserialize_via_marshal(res[0][0])
@@ -173,7 +173,7 @@ def del_recids(rnkMETHOD, range):
                     del rec_dict[i]  
         write_messag("New size: %s" % len(rec_dict))
         date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        intoDB(rec_dict, date, rnkMETHOD)
+        intoDB(rec_dict, date, rank_method_code)
     else:
         print "Create before deleting!"
     
@@ -186,10 +186,10 @@ def union_dicts(dict1, dict2):
         union_dict[key] = value
     return union_dict
 
-def rnkMETHOD_statistics(rnkMETHOD):
+def rank_method_code_statistics(rank_method_code):
     """Print statistics"""
     
-    method = fromDB(rnkMETHOD) 
+    method = fromDB(rank_method_code) 
     max = ('',-999999)
     maxcount = 0
     min = ('',999999)
@@ -208,9 +208,9 @@ def rnkMETHOD_statistics(rnkMETHOD):
             maxcount += 1
 
     write_message("Showing statistic for selected method")
-    write_message("Method name: %s" % getName(rnkMETHOD))
-    write_message("Short name: %s" % rnkMETHOD)
-    write_message("Last run: %s" % get_lastupdated(rnkMETHOD))
+    write_message("Method name: %s" % getName(rank_method_code))
+    write_message("Short name: %s" % rank_method_code)
+    write_message("Last run: %s" % get_lastupdated(rank_method_code))
     write_message("Number of records: %s" % len(method))
     write_message("Lowest value: %s (%s) - Number of records: %s" % (min[0], min[1], mincount))
     write_message("Highest value: %s (%s) - Number of records: %s" % (max[0], max[1], maxcount))
@@ -226,12 +226,12 @@ def rnkMETHOD_statistics(rnkMETHOD):
                  distinct_values[value[1]] = 1
          write_message("Set %s (%s-%s) %s Distinct values: %s" % (i, lower, upper, len(distinct_values), setcount)) 
 
-def check_method(rnkMETHOD):
+def check_method(rank_method_code):
     write_message("Checking rank method...")
-    if len(fromDB(rnkMETHOD)) == 0:
+    if len(fromDB(rank_method_code)) == 0:
         write_message("Rank method not yet executed, please run it to create the necessary data.")
     else:
-        if len(add_date(rnkMETHOD)) > 0:
+        if len(add_date(rank_method_code)) > 0:
             write_message("Records modified, update recommended")
         else:
             write_message("No records modified, update not necessary")
@@ -367,7 +367,7 @@ def bibrank_engine(row, run):
         #psyco.bind(authorimpact_exec)
         #psyco.bind(merge_exec)
         #psyco.bind(citationimpact_exec)
-        #psyco.bind(accessimpact_exec)
+        psyco.bind(accessimpact_exec)
     except StandardError, e: 
         print "Psyco ERROR",e 
 
@@ -398,10 +398,10 @@ def bibrank_engine(row, run):
     try:
         options["run"] = []
         options["run"].append(run)
-        for rnkMETHOD in options["run"]:
-            cfg_name = getName(rnkMETHOD)
+        for rank_method_code in options["run"]:
+            cfg_name = getName(rank_method_code)
                 
-            file = etcdir + "/bibrank/" + rnkMETHOD + ".cfg"
+            file = etcdir + "/bibrank/" + rank_method_code + ".cfg"
             if options["verbose"] >= 9:
                 write_message("Getting configuration from file: %s" % file)
             config = ConfigParser.ConfigParser()
@@ -411,11 +411,11 @@ def bibrank_engine(row, run):
                 write_message("Cannot find configurationfile: %s" % file, sys.stderr)
                 raise StandardError
 
-            cfg_short = rnkMETHOD
+            cfg_short = rank_method_code
             cfg_function = config.get("rank_method", "function") + "_exec"
             cfg_importance = config.getfloat("rank_method", "overall_importance")
             cfg_name = getName(cfg_short)
-            options["validset"] = get_valid_range(rnkMETHOD)
+            options["validset"] = get_valid_range(rank_method_code)
 
             if options["collection"]:
                 l_of_colls = string.split(options["collection"], ",")
@@ -427,9 +427,9 @@ def bibrank_engine(row, run):
             elif options["id"]:
                 options["recid_range"] = options["id"]
             elif options["modified"]:
-                options["recid_range"] = add_date(rnkMETHOD, options["modified"])
+                options["recid_range"] = add_date(rank_method_code, options["modified"])
             elif options["last_updated"]:
-                options["recid_range"] = add_date(rnkMETHOD)
+                options["recid_range"] = add_date(rank_method_code)
             else:
                 if options["verbose"] > 1:
                     write_message("No records specified, updating all")
@@ -445,13 +445,13 @@ def bibrank_engine(row, run):
                     del_recids(cfg_short, options["recid_range"])
                 elif options["cmd"] == "add":
                     func_object = globals().get(cfg_function)
-                    func_object(rnkMETHOD, cfg_name, config)
+                    func_object(rank_method_code, cfg_name, config)
                 elif options["cmd"] == "stat":
-                    rnkMETHOD_statistics(rnkMETHOD)
+                    rank_method_code_statistics(rank_method_code)
                 elif options["cmd"] == "check":
-                    check_method(rnkMETHOD)
+                    check_method(rank_method_code)
                 else:
-                    write_message("Invalid command found processing %s" % rnkMETHOD, sys.stderr)
+                    write_message("Invalid command found processing %s" % rank_method_code, sys.stderr)
                     raise StandardError
     except StandardError, e:
         write_message("\nException caught: %s" % e, sys.stderr)
@@ -466,12 +466,12 @@ def bibrank_engine(row, run):
         showtime((time.time() - startCreate))
     return 1
 
-def get_valid_range(rnkMETHOD):
+def get_valid_range(rank_method_code):
     """Return a range of records"""
     if options["verbose"] >=9:
         write_message("Getting records from collections enabled for rank method.")
 
-    res = run_sql("SELECT collection.name FROM collection,collection_rnkMETHOD,rnkMETHOD WHERE collection.id=id_collection and id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" %  rnkMETHOD)
+    res = run_sql("SELECT collection.name FROM collection,collection_rnkMETHOD,rnkMETHOD WHERE collection.id=id_collection and id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" %  rank_method_code)
     l_of_colls = []
     for coll in res:
         l_of_colls.append(coll[0])
@@ -483,12 +483,12 @@ def get_valid_range(rnkMETHOD):
     valid.addlist(recIDs)
     return valid
    
-def add_date(rnkMETHOD, date=""):
+def add_date(rank_method_code, date=""):
     """If date is not set, then retrieve it from the database.
        Reindex all formats newer than the modification date"""
     if not date:
         try:
-            date = (get_lastupdated(rnkMETHOD),'')
+            date = (get_lastupdated(rank_method_code),'')
         except Exception, e:
             date = "0000-00-00 00:00:00"
     query = """SELECT b.id FROM bibrec AS b WHERE b.modification_date >=
@@ -500,21 +500,21 @@ def add_date(rnkMETHOD, date=""):
     list = create_range_list(res)
     if not list:
         if options["verbose"]:
-            write_message( "No new records added. '%s' is up to date" % getName(rnkMETHOD))
+            write_message( "No new records added. '%s' is up to date" % getName(rank_method_code))
     return list
 
-def getName(rnkMETHOD, ln=cdslang, type='ln'):
+def getName(rank_method_code, ln=cdslang, type='ln'):
     """Returns the name of the method if it exists"""
 
     try:
-        rnkid = run_sql("SELECT id FROM rnkMETHOD where name='%s'" % rnkMETHOD)
+        rnkid = run_sql("SELECT id FROM rnkMETHOD where name='%s'" % rank_method_code)
         if rnkid:
             rnkid = str(rnkid[0][0])
             res = run_sql("SELECT value FROM rnkMETHODNAME where type='%s' and ln='%s' and id_rnkMETHOD=%s" % (type, ln, rnkid))
             if not res:
                 res = run_sql("SELECT value FROM rnkMETHODNAME WHERE ln='%s' and id_rnkMETHOD=%s and type='%s'"  % (cdslang, rnkid, type))
             if not res: 
-                return rnkMETHOD
+                return rank_method_code
             return res[0][0]
         else:
             raise Exception
@@ -562,62 +562,17 @@ def deserialize_via_marshal(string):
     """Decompress and deserialize string into a Python object via marshal."""
     return loads(decompress(string))
 
-#------------------------------------------------------------
-#---------------BELOW IS OLD CODE, NOT WORKING ATM-----------
-#------------------------------------------------------------
-
-def citationimpact_exec(rnkMETHOD, name, config):
-    """Calculates rankset based on number of citations each document has"""
-    startCreate = time.time()
-    tempdoc = {}
-
-    if options["verbose"] >= 1:
-        write_message("Running: %s." % name)
-    citation_tag = config.get("citationimpact", "citation_tag")
-    curr_repnr_tag = config.get("citationimpact", "curr_tag")
-    old_repnr_tag = config.get("citationimpact", "old_tag")
-    
-    if not options["modified"]:
-        if options["verbose"] >= 9:
-            write_message("Rebalancing")
-        starset.setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-        citations = run_sql("SELECT id_bibrec,value FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id" %  (citation_tag[0:2], citation_tag[0:2], citation_tag))
-    else:
-        fromDB(starset)
-        if options["modified"] == "last_updated":
-            options["modified"] = starset.getLastUpdated()
-        if options["verbose"] >= 9:
-            write_message("Updating records modified after: %s" % options["modified"])  
-        starset.setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-        mod_data = run_sql("SELECT id FROM bibrec WHERE modification_date >=%s", (options["modified"]),)
-        for id in mod_data:
-            citation = run_sql("SELECT id_bibrec,value FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id and id_bibrec=%s" %  (citation_tag[0:2], citation_tag[0:2], citation_tag, id))
-            for id,value in citation:
-                citations.append((id,value))
-
-    for key,value in citations:
-        data = run_sql("SELECT id_bibrec FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id AND value='%s'" % (curr_repnr_tag[0:2], curr_repnr_tag[0:2], curr_repnr_tag, value))
-        data = run_sql("SELECT id_bibrec FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id AND value='%s'"  % (old_repnr_tag[0:2], old_repnr_tag[0:2], old_repnr_tag, value))
-        
-    if not options["modified"]:
-        starset.setUnsorted(tempdoc)
-        sort(starset)
-    else:
-        merge_two_sets(tempdoc, starset)
-    #intoDB(starset)
-    showtime((time.time() - startCreate))    
-    
-def accessimpact_exec(rnkMETHOD, starsets, config):
+def accessimpact_exec(rank_method_code, name, config):
     """Generating rankset based on number of downloads per document"""
     startCreate = time.time()
-    starset = starsets[rnkMETHOD]
+
     options["dbhost"] = config.get("accessimpact", "dbhost")
     options["dbname"] = config.get("accessimpact", "dbname")
     options["dbuser"] = config.get("accessimpact", "dbuser")
     options["dbpass"] = config.get("accessimpact", "dbpass")
     if options["verbose"] >= 1:
-        write_message("Running: %s." % starset.getName())
-    starset.setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+        write_message("Running: %s." % name)
+    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
     sysno_tag = config.get("accessimpact", "sysnr_tag")
     curr_repnr_tag = config.get("accessimpact", "curr_tag")
@@ -629,12 +584,8 @@ def accessimpact_exec(rnkMETHOD, starsets, config):
         impacc = dict(run_sql2("SELECT imprecno,SUM(nbaccess) FROM impacc group BY imprecno"))
         cdssysno = run_sql("SELECT value,id_bibrec FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id" % (sysno_tag[0:2], sysno_tag[0:2], sysno_tag))
     else:
-        fromDB(starset)
         impacc = {}
-        if options["modified"] == "last_updated":
-            options["modified"] = starset.getLastUpdated()
-        if options["verbose"] >= 9:
-            write_message("Updating records modified after: %s" % options["modified"])  
+ 
         pre_impacc = dict(run_sql2("SELECT distinct imprecno,'' FROM impacc WHERE sdate >=%s", (options["modified"],)))
         imprec = []
         cdssysno = []
@@ -690,21 +641,59 @@ def accessimpact_exec(rnkMETHOD, starsets, config):
             write_message("Percentage match: %s%%,(%s/%s)" % (round((float(count) / float(count+notcount)) * 100, 3), notcount, count))
         except:
             print count, notcount
-            
+
+    intoDB(tempdoc, date, rank_method_code)
+    showtime((time.time() - startCreate))
+
+#------------------------------------------------------------
+#---------------BELOW IS OLD CODE, NOT WORKING ATM-----------
+#------------------------------------------------------------
+
+def citationimpact_exec(rank_method_code, name, config):
+    """Calculates rankset based on number of citations each document has"""
+    startCreate = time.time()
+    tempdoc = {}
+
+    if options["verbose"] >= 1:
+        write_message("Running: %s." % name)
+    citation_tag = config.get("citationimpact", "citation_tag")
+    curr_repnr_tag = config.get("citationimpact", "curr_tag")
+    old_repnr_tag = config.get("citationimpact", "old_tag")
+    
+    if not options["modified"]:
+        if options["verbose"] >= 9:
+            write_message("Rebalancing")
+        starset.setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+        citations = run_sql("SELECT id_bibrec,value FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id" %  (citation_tag[0:2], citation_tag[0:2], citation_tag))
+    else:
+        fromDB(starset)
+        if options["modified"] == "last_updated":
+            options["modified"] = starset.getLastUpdated()
+        if options["verbose"] >= 9:
+            write_message("Updating records modified after: %s" % options["modified"])  
+        starset.setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+        mod_data = run_sql("SELECT id FROM bibrec WHERE modification_date >=%s", (options["modified"]),)
+        for id in mod_data:
+            citation = run_sql("SELECT id_bibrec,value FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id and id_bibrec=%s" %  (citation_tag[0:2], citation_tag[0:2], citation_tag, id))
+            for id,value in citation:
+                citations.append((id,value))
+
+    for key,value in citations:
+        data = run_sql("SELECT id_bibrec FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id AND value='%s'" % (curr_repnr_tag[0:2], curr_repnr_tag[0:2], curr_repnr_tag, value))
+        data = run_sql("SELECT id_bibrec FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id AND value='%s'"  % (old_repnr_tag[0:2], old_repnr_tag[0:2], old_repnr_tag, value))
+        
     if not options["modified"]:
         starset.setUnsorted(tempdoc)
         sort(starset)
     else:
-        merge_two_sets(tempdoc,starset)
-
-    test(starset)
-    intoDB(starset)
-    showtime((time.time() - startCreate))
-
-def authorimpact_exec(rnkMETHOD, starsets, config):
+        merge_two_sets(tempdoc, starset)
+    #intoDB(starset)
+    showtime((time.time() - startCreate))    
+    
+def authorimpact_exec(rank_method_code, starsets, config):
     """Calculating the rankvalue a document has based on its authors"""
     startCreate = time.time()
-    starset = starsets[rnkMETHOD]
+    starset = starsets[rank_method_code]
     if options["verbose"] >= 1:
         write_message("Running: %s" % starset.getName())
     tempdoc = single_tag_rank(starset, config)
@@ -815,25 +804,25 @@ def authorimpact_modified(data, Auth):
             if not found == 1:
                 Auth[value].append(key)
 
-def merge_exec(rnkMETHOD, starsets, config):
+def merge_exec(rank_method_code, starsets, config):
     """Merge several methods into one starset"""
     startCreate = time.time()
     if options["verbose"] >= 1:
-        write_message("Running: %s" % starsets[rnkMETHOD].getName())
-    starsets[rnkMETHOD].setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+        write_message("Running: %s" % starsets[rank_method_code].getName())
+    starsets[rank_method_code].setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     threshold = {}
     finalset = {}
     permut = ''
-    for nr in range(0, starsets[rnkMETHOD].getSize() + 1):
+    for nr in range(0, starsets[rank_method_code].getSize() + 1):
         finalset[nr] = HitSet()
         permut = permut + "%s" % nr
-    starsets[rnkMETHOD].setWeigth(1.0)
+    starsets[rank_method_code].setWeigth(1.0)
     sum = 0.0
     nr = 0
     convert = {}
     size=-1
     for key in starsets:
-        if key != rnkMETHOD:
+        if key != rank_method_code:
             sum = sum + starsets[key].getWeigth()
             convert[nr] = key
             nr=nr + 1
@@ -844,7 +833,7 @@ def merge_exec(rnkMETHOD, starsets, config):
                 size = len(starsets[key].getStars()) -1
     sum = 1.0 / sum
     for key in starsets:
-        if key != rnkMETHOD:
+        if key != rank_method_code:
             starsets[key].setWeigth(starsets[key].getWeigth() * sum)
 
     p = Permutation(permut, len(starsets)-1)
@@ -857,13 +846,13 @@ def merge_exec(rnkMETHOD, starsets, config):
             place = place+float(perm[i]) * float(starsets[convert[i]].getWeigth())
         finalset[int(round(place))].union(tempset)
 
-    for i in range(0, starsets[rnkMETHOD].getSize() + 1):
+    for i in range(0, starsets[rank_method_code].getSize() + 1):
         finalset[i].calculate_nbhits()
         threshold[i] = 0
 
-    starsets[rnkMETHOD].setStars(finalset)
-    starsets[rnkMETHOD].setThreshold(threshold)
-    intoDB(starsets[rnkMETHOD])
+    starsets[rank_method_code].setStars(finalset)
+    starsets[rank_method_code].setThreshold(threshold)
+    intoDB(starsets[rank_method_code])
     showtime((time.time() - startCreate))
 
 def showtime(timeused):
@@ -963,8 +952,8 @@ def run_sql2(sql, param=None, n=0, with_desc=0):
 
 #def citationimpact(row):
 #    return bibrank_engine(row)
-#def accessimpact(row):
-#    return bibrank_engine(row)
+def accessimpact(row, run):
+    return bibrank_engine(row, run)
 #def authorimpact(row):
 #    return bibrank_engine(row)
 #def merge(row):
