@@ -932,7 +932,7 @@ def displayCatalogueBranch(id_father,level,catalogues):
     # display the son catalogues
     for row in res2:
         catalogues.append(row[0])
-        text = text + displayCatalogueBranch(row[0],llevel+1,catalogues)
+        text = text + displayCatalogueBranch(row[0],level+1,catalogues)
     if len(res1) != 0 or len(res2) != 0:
         text = text + "</UL>\n"
     return text
