@@ -52,12 +52,6 @@
 Atlantis Institute of Science
 </define-tag>
 
-## RUNTIMELOGDIR -- the dir of the CDS and OAI runtime log files:
-##  (example: "/log/cdsware/cdsdemoruntimelogs")
-<define-tag RUNTIMELOGDIR whitespace=delete>
-/tmp/atlantis
-</define-tag>
-
 ## ALERTENGINEEMAIL -- the email address from which the alert emails will appear to be send:
 ##  (example: "cds.alert@cdsware.cern.ch")
 <define-tag ALERTENGINEEMAIL whitespace=delete>
@@ -77,6 +71,22 @@ cds.support@cern.ch
 ##  (example: "cds.support@cern.ch")
 <define-tag ADMINEMAIL whitespace=delete>
 cds.support@cern.ch
+</define-tag>
+
+## CFG_MAX_RECID -- maximum record ID number possible, i.e. the upper
+## estimate of the total number of documents in the database.  A
+## reasonable estimate is: if you have 500,000 records in the database
+## now, and the size is growing by 10,000 records per month, then a
+## value of 700,000 sounds reasonable, as it should suffice for two
+## years.  Note that if in 6 months you'll suddenly have to upload a
+## lot of new input records, so that it may grow past the present
+## CFG_MAX_RECID limit, nothing bad happens: you only have to change
+## this parameter and reindex the full database content.  Note also
+## that the lower CFG_MAX_RECID, the faster the search engine is, so
+## you have interest not to put it unnecessarily high.
+##  (example: "8000")
+<define-tag CFG_MAX_RECID whitespace=delete>
+8000
 </define-tag>
 
 ################################
@@ -122,25 +132,28 @@ cds.support@cern.ch
 ## CDSPAGEHEADER -- eventual global HTML page header:
 ##  (example: "")
 <define-tag CDSPAGEHEADER>
-<center>
- <span class=address><small>The <CDSNAME> document server is a fictive demo site of <a class=note href="http://cdsware.cern.ch/">CDSware</a>, a free document server software.</small></span>
-</center>
- <table class=header border=0 cellspacing=0 cellpadding=0 width="100%">
-  <tr class=header>
-    <td align=left>
-     <table class=header border=0 cellspacing=0 cellpadding=0>
-      <tr class=header>
-        <td class=headerselected>
-        <CDSNAME>
-        </td>
-      </tr>
-     </table>
-    </td>
-    <td align=center>
-       <a href="<HTDOCSURL>">SEARCH</a>
-    </td>
-    <td align=center>
-      <a href="<HTDOCSURL>submit/">SUBMIT</a>
+<table class=header border=0 cellspacing=0 cellpadding=0 width="100%">
+  <tr>
+    <td>
+      <table class=header border=0 cellspacing=0 cellpadding=0>
+        <tr>
+          <td class=headerselected align=left>
+            &nbsp;<small><strong><CDSNAME></strong></small>&nbsp;
+          </td>
+          <td align=left>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </td>
+          <td align=left>
+             &nbsp;&nbsp;&nbsp;<small><a href="<WEBURL>">SEARCH</a></small>&nbsp;&nbsp;&nbsp;
+          </td>
+          <td align=left>
+            &nbsp;&nbsp;&nbsp;<small><a href="<WEBURL>/submit/">SUBMIT</a></small>&nbsp;&nbsp;&nbsp;
+          </td>
+          <td align=center>
+            &nbsp;
+          </td>
+        </tr>
+      </table>
     </td>
   </tr>
 </table>
@@ -182,13 +195,13 @@ cds.support@cern.ch
   <td class="address">
   <CDSNAME>
    -
-  <a class=note href="<HTDOCSURL>">Search</a>
+  <a class=note href="<WEBURL>">Search</a>
    -
-  <a class=note href="<HTDOCSURL>submit/">Submit</a>
+  <a class=note href="<WEBURL>/submit/">Submit</a>
    -
-  <a class=note href="<HTDOCSURL>docs/">Help</a>
+  <a class=note href="<WEBURL>/docs/">Help</a>
    -
-  <a class=note href="<HTDOCSURL>docs/">Sitemap</a>.
+  <a class=note href="<WEBURL>/docs/">Sitemap</a>.
   </td>
   <td align=right class="address">
   <!--URL-->
@@ -222,13 +235,103 @@ cds.support@cern.ch
 ## This section contains some WML-based configuration parameters for
 ## WebSearch module.  Please note that WebSearch is mostly configured
 ## on run-time via its WebSearch Admin web interface.  The parameters
-## below are the ones that you do not probably want to modify during
-## the runtime.
+## below are the ones that you do not probably want to modify very
+## often during the runtime.  (Note that you may modify them
+## afterwards too, though.)
 
-## ALERTMAXNUMDOCS -- the maximum number of document notices that the alert engine sends by email:
+## CFG_SEARCH_CACHE_SIZE -- how many queries we want to cache in
+## memory per one Apache httpd process?  This cache is used mainly for
+## "next/previous page" functionality, but it caches also "popular"
+## user queries if more than one user happen to search for the same
+## thing.  Note that large numbers may lead to great memory
+## consumption.  We recommend a value not greater than 100.
+##  (example: "100")
+<define-tag CFG_SEARCH_CACHE_SIZE whitespace=delete>
+100
+</define-tag>
+
+## CFG_FIELDS_CONVERT -- if you migrate from an older system, you may
+## want to map field codes of your old system (such as 'ti') to
+## CDSware/MySQL ("title").  Use Python dictionary syntax for the
+## translation table, see the example below.  Usually you don't want
+## to do that, and would use empty dict {}.
+##  (example: "{'wau':'author', 'wti':'title'}")
+<define-tag CFG_FIELDS_CONVERT whitespace=delete>
+{}
+</define-tag>
+
+## CFG_GOOGLE_BOX -- on the search results page, do we want propose
+## links to other search engines like Google?  Put "1" for "yes" and
+## "0" for "no".
+##  (example: "1")
+<define-tag CFG_GOOGLE_BOX whitespace=delete>
+1
+</define-tag>
+
+## CFG_GOOGLE_BOX_CERN -- do we want propose links to some famous HEP
+## sites such as Spires and KEK?  Put "1" for "yes" and "0" for "no".
+##  (example: "0")
+<define-tag CFG_GOOGLE_BOX_CERN whitespace=delete>
+0
+</define-tag>
+
+## CFG_SIMPLESEARCH_PATTERN_BOX_WIDTH -- width of the search pattern
+## window in the simple search interface, in characters.
 ##  (example: "50")
-<define-tag ALERTMAXNUMDOCS whitespace=delete>
-50
+<define-tag CFG_SIMPLESEARCH_PATTERN_BOX_WIDTH whitespace=delete>
+40
+</define-tag>
+
+## CFG_ADVANCEDSEARCH_PATTERN_BOX_WIDTH -- width of the search pattern
+## window in the advanced search interface, in characters.
+##  (example: "50")
+<define-tag CFG_ADVANCEDSEARCH_PATTERN_BOX_WIDTH whitespace=delete>
+30
+</define-tag>
+
+## CFG_NB_RECORDS_TO_SORT -- how many records do we still want to
+## sort?  For higher numbers we print only a warning and won't perform
+## any sorting other than default 'latest records first', as sorting
+## would be very time consuming then.  We recommend a value of not
+## more than a couple of thousands.
+##  (example: "1000")
+<define-tag CFG_NB_RECORDS_TO_SORT whitespace=delete>
+1000
+</define-tag>
+
+## CFG_CALL_BIBFORMAT -- if "HTML detailed" format is not found, do we
+## want to call BibFormat on the fly?  Put "1" for "yes" and "0" for
+## "no".  Usually we want to have "0' here.
+##  (example: "0")
+<define-tag CFG_CALL_BIBFORMAT whitespace=delete>
+0
+</define-tag>
+
+## CFG_USE_OLD_SYSNOS -- do we want to make old SYSNOs visible rather
+## than MySQL's record IDs?  You may use this if you migrate from a
+## different e-doc system, and you store your old system numbers into
+## 909C0o.  Put "1" for "yes" and "0" for "no". Usually you don't want
+## to do that, though.
+##  (example: "0")
+<define-tag CFG_USE_OLD_SYSNOS whitespace=delete>
+0
+</define-tag>
+
+## CFG_NB_LATEST_ADDITIONS -- the number of records to display under
+## 'Latest Additions' in the web collection pages
+##  (example: "10")
+<define-tag CFG_NB_LATEST_ADDITIONS whitespace=delete>
+10
+</define-tag>
+
+## CFG_AUTHOR_ET_AL_THRESHOLD -- up to how many author names to print
+## explicitely; for more print "et al".  Note that this is used in
+## default formatting that is seldomly used, as usually BibFormat
+## defines all the format.  The value below is only used when
+## BibFormat fails, for example.
+##  (example: "3")
+<define-tag CFG_AUTHOR_ET_AL_THRESHOLD whitespace=delete>
+3
 </define-tag>
 
 ######################################
@@ -324,19 +427,19 @@ TRUE
 </define-tag>
 
 <define-tag ARCHIVE whitespace=delete>
-<HTDOCSDIR>submit/archive
+<WEBDIR>/submit/archive
 </define-tag>
 
 <define-tag ARCHIVEURL whitespace=delete>
-<HTDOCSURL>submit/archive
+<WEBURL>/submit/archive
 </define-tag>
 
 <define-tag COUNTERS whitespace=delete>
-<HTDOCSDIR>submit/counters
+<WEBDIR>/submit/counters
 </define-tag>
 
 <define-tag STORAGE whitespace=delete>
-<HTDOCSDIR>submit/storage
+<WEBDIR>/submit/storage
 </define-tag>
 
 ##########################
