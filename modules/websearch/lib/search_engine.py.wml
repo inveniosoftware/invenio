@@ -2331,7 +2331,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
                 print_warning(req, "Sorry, '%s' does not seem to be a valid sort option.  Choosing title sort instead." % sort_field, "Error")
                 tags.append("245__a")
     if verbose >= 3:
-        print_warning(req, "Sorting by tags %s." % tags)        
+        print_warning(req, "Sorting by tags %s." % tags)
         
     ## check if we have sorting tag defined:
     if tags:
@@ -2349,8 +2349,8 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
                         bingo = 1
                         val = v
                         break
-                if not bingo: # not found, so joint them all together
-                    val = string.join(vals)                    
+                if not bingo: # sort_pattern not present, so add other vals after spaces
+                    val = sort_pattern + "          " + string.join(vals)  
             else:
                 # no sort pattern defined, so join them all together
                 val = string.join(vals)
