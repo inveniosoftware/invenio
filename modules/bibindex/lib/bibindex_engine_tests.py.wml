@@ -28,14 +28,14 @@ __lastupdated__ = """<: print `date +"%d %b %Y %H:%M:%S %Z"`; :>"""
 
 __version__ = "$Id$"
 
-import bibindex_engine 
+import bibindex_engine
 import unittest
 
 class TestListSetOperations(unittest.TestCase):
     """Test list set operations."""
 
     def test_list_union(self):
-        """bibindex engine list union"""
+        """bibindex engine - list union"""
         self.assertEqual([1,2,3,4], bibindex_engine.list_union([1,2,3],[1,3,4]))
 
 def create_test_suite():
