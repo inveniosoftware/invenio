@@ -499,7 +499,7 @@ class Manager:
             
 class Bibsched:
     def __init__(self):
-        self.helper_modules = ["bibwords","bibupload"]
+        self.helper_modules = ["bibwords","bibupload","bibreformat"]
         self.db = MySQLdb.connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
         self.cursor = self.db.cursor()
         self.cursor_bis = self.db.cursor()
@@ -568,6 +568,7 @@ class Bibsched:
                 fdout = name + ".out"
             update_query="""UPDATE schTASKS set output='%s', error='%s' WHERE id='%d'""" % (fdout, fderr, id )
             self.cursor.execute(update_query)
+            self.set_state(id,"RUNNING")
             if proc in self.helper_modules:
                 program=os.path.join( os.getcwd(), proc )
                 if proc == "bibupload":
@@ -593,7 +594,10 @@ class Bibsched:
                 arg2 = "-t"
             else:
                 arg2 = ""
-            self.running[id] = get_my_pid(proc,"%s%s" % (arg2, str(id)))
+            if get_my_pid(proc,"%s%s" % (arg2, str(id))):
+            	self.running[id] = get_my_pid(proc,"%s%s" % (arg2, str(id)))
+            else:
+		        self.set_state(id,"ERROR")
         query="""SELECT id,proc,user,UNIX_TIMESTAMP(date),sleeptime,
         arguments,state,score,output,error FROM schTASKS"""
         self.cursor.execute(query)
@@ -604,7 +608,22 @@ class Bibsched:
             time.sleep( 1 )
             self.cursor.execute(query)
             rows=self.cursor.fetchall()
-            
+            running_process = self.get_running_processes()
+	        if running_process:
+            	proc = running_process[ 1 ]
+            	id   = running_process[ 0 ]
+            	if proc == "bibupload":
+                	arg2 = "-t"
+            	else:
+                	arg2 = ""
+	    	    if get_my_pid(proc,"%s%s" % (arg2, str(id))):
+            		self.running[id] = get_my_pid(proc,"%s%s" % (arg2, str(id)))
+	    	    else:
+			        self.set_state(id,"ERROR")
+			        if id in self.running.keys():
+			            del self.running[id]
+		
+
 def Log(message):
     if not dbg: return
     log=open( runtimelogdir + "/bibsched.log","a")
