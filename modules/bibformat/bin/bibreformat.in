@@ -453,7 +453,7 @@ def authenticate(user, header="BibReformat Task Submission", action="runbibforma
     else:
         (uid_db, password_db) = res[0]
         if password_db:
-            password_entered = getpass()
+            password_entered = getpass.getpass()
             if password_db == password_entered:
                 pass
             else:
