@@ -27,7 +27,6 @@
 
 try:
     import sys
-    sys.path.append('%s' % pylibdir)
     from config import *
     from webpage import page
     import user
