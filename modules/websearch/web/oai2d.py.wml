@@ -77,7 +77,6 @@ except ImportError, e:
     sys.stderr.write("Error: %s" % e)
     sys.exit(1)
 
-
 def encode_for_xml(s):
     "Encode special chars in string so that it would be XML-compliant."
 
@@ -104,7 +103,9 @@ def encode_for_url(s):
 def print_oai_header(verb):
     "Print OAI header"
 
-    out_stream = "Content-type: text/xml\n\n"
+    out_stream = ""
+
+###    out_stream = "Content-Type: text/xml\n\n"
     out_stream = out_stream + "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n"
     out_stream = out_stream + "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">\n"
 
@@ -183,7 +184,6 @@ def localtime_to_UTC(date):
 
     return timetoconvert
 
-
 def get_creation_date(sysno):
     "Returns the creation date of the record 'sysno'."
 
@@ -208,13 +208,16 @@ def get_modification_date(sysno):
         out = row[0]
     return localtime_to_UTC(out)
 
-def check_date(date, time):
+def check_date(date, time="T00:00:00Z"):
     "Check if the date has a correct format"
 
     if(re.sub("[0123456789\-:TZ]","",date) == ""):
         if len(date) == 10:
             date = date + time
-        date = UTC_to_localtime(date)
+        if len(date) == 20:
+            date = UTC_to_localtime(date)
+        else:
+            date = ""
     else:
         date = ""
     
@@ -256,7 +259,6 @@ def print_record(sysno, format='marcxml'):
         out_stream = "%s    <setSpec>%s</setSpec>\n" % (out_stream, set)
     out_stream = out_stream + "   </header>\n"
     out_stream = out_stream + "   <metadata>\n"
-
 
     if format == "marcxml":
         out_stream = out_stream + "    <record xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\" type=\"Bibliographic\">"
@@ -331,7 +333,7 @@ def print_record(sysno, format='marcxml'):
             out_stream =  "%s         <identifier>%s</identifier>\n" % (out_stream, encode_for_xml(encode_for_url(f)))
         
         for f in get_field(sysno, "520__a"):
-            out_stream = "%s         <description>%s</description>\n" % (out_stream, encode_for_xml(f))            
+            out_stream = "%s         <description>%s</description>\n" % (out_stream, encode_for_xml(f))
 
         date = get_creation_date(sysno)
 
@@ -405,6 +407,8 @@ def OAIListRecords(metadataPrefix, fromDate, untilDate, set, resumptionToken):
 
     out_stream = ""
 
+    out_stream = out_stream + print_oai_header("ListRecords")
+
     sysnos = []
     sysno  = []
 
@@ -413,6 +417,7 @@ def OAIListRecords(metadataPrefix, fromDate, untilDate, set, resumptionToken):
         filename = "%s/RTdata/%s" % (runtimelogdir, resumptionToken)
         if os.path.exists(filename) == 0:
              out_stream = oai_error("badResumptionToken","ResumptionToken expired")
+             out_stream = out_stream + print_oai_footer("ListRecords")
              return out_stream
 
     if resumptionToken:
@@ -424,15 +429,14 @@ def OAIListRecords(metadataPrefix, fromDate, untilDate, set, resumptionToken):
     if len(sysnos) == 0: # noRecordsMatch error
         
         out_stream = out_stream + oai_error("noRecordsMatch","no records correspond to the request")
+        out_stream = out_stream + print_oai_footer("ListRecords")
         return out_stream
-
-    out_stream = out_stream + print_oai_header("ListRecords")
 
     i = 0
     for s in sysnos:
         if s:
             i = i + 1
-            if i > nb_records_in_resume:           # cache or write?
+            if i > nb_records_in_resume:          # cache or write?
                 if i == nb_records_in_resume + 1: # resumptionToken?
                     resumptionToken = OAIGenResumptionToken()
                     extdate = OAIGetResponseDate(oai_rt_expire)
@@ -491,17 +495,17 @@ def OAIGetRecord(identifier, metadataPrefix):
     """Returns record 'identifier' according to 'metadataPrefix' format for OAI metadata harvesting."""
     
     out_stream = ""
+    out_stream = out_stream + print_oai_header("GetRecord")
 
     sysno = OAIGetSysno(identifier)
 
     if record_exists(sysno):       
         datestamp = get_modification_date(sysno)
+        out_stream = out_stream + print_record(sysno, metadataPrefix)
+        out_stream = out_stream + print_oai_footer("GetRecord")
     else:
         out_stream = out_stream + oai_error("badArgument","invalid record Identifier")
-
-    out_stream = out_stream + print_oai_header("GetRecord")
-    out_stream = out_stream + print_record(sysno, metadataPrefix)
-    out_stream = out_stream + print_oai_footer("GetRecord")
+        out_stream = out_stream + print_oai_footer("GetRecord")
 
     return out_stream
 
@@ -514,6 +518,7 @@ def OAIListIdentifiers(metadataPrefix, fromDate,untilDate,set,resumptionToken):
 <protect>
 
     out_stream = ""
+    out_stream = out_stream + print_oai_header("ListIdentifiers")
 
     sysno  = []
     sysnos = []
@@ -522,6 +527,7 @@ def OAIListIdentifiers(metadataPrefix, fromDate,untilDate,set,resumptionToken):
         filename = "%s/RTdata/%s" % (runtimelogdir, resumptionToken)
         if os.path.exists(filename) == 0:
              out_stream = out_stream + oai_error("badResumptionToken","ResumptionToken expired")
+             out_stream = out_stream + print_oai_footer("ListIdentifiers")
              return out_stream
 
     if resumptionToken:
@@ -531,8 +537,8 @@ def OAIListIdentifiers(metadataPrefix, fromDate,untilDate,set,resumptionToken):
 
     if len(sysnos) == 0: # noRecordsMatch error
         out_stream = out_stream + oai_error("noRecordsMatch","no records correspond to the request")
-
-    out_stream = out_stream + print_oai_header("ListIdentifiers")
+        out_stream = out_stream + print_oai_footer("ListIdentifiers")
+        return out_stream
 
     i = 0
     for s in sysnos:
@@ -572,8 +578,8 @@ def OAIListIdentifiers(metadataPrefix, fromDate,untilDate,set,resumptionToken):
 def OAIIdentify():
     "Generates response to OAIIdentify verb."
         
-    responseDate          = OAIGetResponseDate()
-    requestURL            = OAIGetRequestURL()
+#    responseDate          = OAIGetResponseDate()
+#    requestURL            = OAIGetRequestURL()
     repositoryName        = "  <repositoryName>" + cdsname + "</repositoryName>\n"
     baseURL               = "  <baseURL>%soai2d.py/</baseURL>\n" % cgibinurl
     protocolVersion       = "  <protocolVersion>2.0</protocolVersion>\n"
@@ -616,7 +622,7 @@ def OAIGetRequestURL():
     if os.environ.has_key('SCRIPT_NAME'):
         script_name = os.environ['SCRIPT_NAME']
     else:
-        script_name = ""
+        script_name = "oai2d.py/"
 
     requestURL = "http://" + server_name + script_name 
     if query_string:
@@ -633,10 +639,7 @@ def OAIGetResponseDate(delay=0):
 def oai_error(code, msg):
     "OAI error occured"
 
-    out_stream = print_oai_header("")
-    out_stream = "%s <error code=\"%s\">%s</error>\n" % (out_stream, code, msg)
-    out_stream = out_stream + print_oai_footer("")
-    return out_stream
+    return "%s <error code=\"%s\">%s</error>\n" % (out_stream, code, msg)
 
 
 def OAIGetSysno(identifier):
@@ -770,48 +773,62 @@ def get_sets():
 def parse_args(args=""):
     "Parse input args"
 
-    out_args = {}
+    out_args = {
+        "verb"             : "",
+        "metadataPrefix"   : "",
+        "from"             : "",
+        "until"            : "",
+        "set"              : "",
+        "identifier"       : "",
+        "resumptionToken"  : ""
+    }
 
-    list_of_arguments = args.split('&')
+    if args == "" or args == None:
+        pass
+    else:
 
-    for item in list_of_arguments:
-        key, value = item.split('=')
-        out_args[key] = value
+        list_of_arguments = args.split('&')
+
+        for item in list_of_arguments:
+            key, value = item.split('=')
+            out_args[key] = value
 
     return out_args
 
 def check_args(arguments):
-    "Check OAI arguments, OK=''"
+    "Check OAI arguments"
 
     out_stream = ""
 
-
 ## principal argument required
 #
-    if arguments.has_key('verb'):
+#
+    if arguments['verb'] != "":
         pass
     else:
         out_stream = out_stream + oai_error("badArgument","Missing OAI verb.")
 
 ## resumptionToken exclusive
+#
 #    
-    if ((arguments.has_key('from') or arguments.has_key('until') or arguments.has_key('metadataPrefix') or arguments.has_key('identifier') or arguments.has_key('set')) and arguments.has_key('resumptionToken')):
+    if ((arguments['from']!="" or arguments['until']!="" or arguments['metadataPrefix']!="" or arguments['identifier']!="" or arguments['set']!="") and arguments['resumptionToken']!=""):
 
         out_stream = out_stream + oai_error("badArgument","The request includes illegal arguments")
 
 ## datestamp formats
 #
-    if arguments.has_key('from'):
+#
+    if arguments['from']!="" and arguments['from']!="":
         from_length = len(arguments['from'])
-        if check_date(arguments['from'],"T23:59:59Z") == "": 
-            out_stream = out_stream + oai_error("badArgument","Bad datestamp format")
+        if check_date(arguments['from'],"T00:00:00Z") == "": 
+            out_stream = out_stream + oai_error("badArgument","Bad datestamp format in from")
     else:
         from_length = 0
 
-    if arguments.has_key('until'):
+    if arguments['until']!="" and arguments['until']!="":
         until_length = len(arguments['until'])
         if check_date(arguments['until'],"T23:59:59Z") == "":
-            out_stream = out_stream + oai_error("badArgument","Bad datestamp format")
+            out_stream = out_stream + oai_error("badArgument","Bad datestamp format in until")
     else:
         until_length = 0 
 
@@ -819,79 +836,73 @@ def check_args(arguments):
         if until_length <> 0:
             if from_length <> until_length:
                 out_stream = out_stream + oai_error("badArgument","Bad datestamp format")
+                
 
 ## Identify exclusive
 #
-    if (arguments['verb']=="Identify" and (arguments.has_key('metadataPrefix') or arguments.has_key('identifier') or arguments.has_key('set') or arguments.has_key('from') or arguments.has_key('until') or arguments.has_key('resumptionToken'))):
+#
+    if (arguments['verb']=="Identify" and (arguments['metadataPrefix']!="" or arguments['identifier']!="" or arguments['set']!="" or arguments['from']!="" or arguments['until']!="" or arguments['resumptionToken']!="")):
         out_stream = out_stream + oai_error("badArgument","The request includes illegal arguments")
 
-## identifier for GetRecords 
+## parameters for GetRecord 
 #
-    if arguments['verb']=="GetRecords" and arguments['identifier'] == "":
+#
+    if arguments['verb']=="GetRecord" and arguments['identifier'] == "":
         out_stream = out_stream + oai_error("badArgument","Record identifier missing")
+
+    if arguments['verb']=="GetRecord" and arguments['metadataPrefix'] == "":
+        out_stream = out_stream + oai_error("badArgument","Missing metadataPrefix")
+
+
+## parameters for ListRecords and ListIdentifiers
+#
+#
+    if (arguments['verb']=="ListRecords" or arguments['verb']=="ListIdentifiers") and arguments['metadataPrefix'] == "":
+        out_stream = out_stream + oai_error("badArgument","Missing metadataPrefix")
 
     return out_stream
 
-def index (req, verb="", metadataPrefix="", set="", identifier="", restmptionToken=""):
+def index (req):
     "OAI repository interface"
 
-    arguments = parse_args(req.args)
- 
-    if arguments.has_key('from'):
-        fromDate = arguments['from']
-    else:
-        fromDate = ""
-    if arguments.has_key('until'):
-        untilDate = arguments['until']
-    else:
-        untilDate = ""
-    if arguments.has_key('resumptionToken'):
-        resumptionToken = arguments['resumptionToken']
-    else:
-        resumptionToken = ""
-    if arguments.has_key('identifier'):
-        identifier = arguments['identifier']
-    else:
-        identifier = ""
-    if arguments.has_key('metadataPrefix'): 
-        metadataPrefix = arguments['metadataPrefix']
-    else:
-        metadataPrefix = ""
-    if arguments.has_key('set'):
-        set = arguments['set']
-    else:
-        set = ""
+    arg = parse_args(req.args)
 
-    oai_check = check_args(arguments)
+    oai_check = check_args(arg)
 
     if oai_check == "":
  
-        if verb   == "Identify":
+        if arg['verb']   == "Identify":
             req.write(OAIIdentify())
-        elif verb == "ListSets":
-            req.write(OAIListSets(resumptionToken))
-        elif verb == "ListIdentifiers":
-            if metadataPrefix == "":
-                req.write(oai_error("badArgument","metadataPrefix missing."))
-            elif fromDate > untilDate:
-                req.write(oai_error("badArgument","Wrong date"))
+        elif arg['verb'] == "ListSets":
+            req.write(OAIListSets(arg['resumptionToken']))
+        elif arg['verb'] == "ListIdentifiers":
+            if arg['from'] > arg['until']:
+                req.write(print_oai_header)
+                req.write(oai_error("badArgument", "Wrong date"))
+                req.write(print_oai_footer)
             else:
-                req.write(OAIListIdentifiers(metadataPrefix, fromDate, untilDate, set, resumptionToken))
-        elif verb == "ListRecords":
-            if metadataPrefix == "":
-                req.write(oai_error("badArgument","metadataPrefix missing."))
-            elif fromDate > untilDate:
-                req.write(oai_error("badArgument","Wrong date"))
-            req.write(OAIListRecords(metadataPrefix, fromDate, untilDate, set, resumptionToken))
-        elif verb == "GetRecord":
-            req.write(OAIGetRecord(identifier, metadataPrefix))
-        elif verb == "ListMetadataFormats":
-            req.write(OAIListMetadataFormats(identifier, resumptionToken))
+                req.write(OAIListIdentifiers(arg['metadataPrefix'], arg['from'], arg['until'], arg['set'], arg['resumptionToken']))
+        elif arg['verb'] == "ListRecords":
+            if arg['from'] > arg['until']:
+                req.write(print_oai_header)
+                req.write(oai_error("badArgument", "Wrong date"))
+                req.write(print_oai_footer)
+            req.write(OAIListRecords(arg['metadataPrefix'], arg['from'], arg['until'], arg['set'], arg['resumptionToken']))
+        elif arg['verb'] == "GetRecord":
+            req.write(OAIGetRecord(arg['identifier'], arg['metadataPrefix']))
+        elif arg['verb'] == "ListMetadataFormats":
+            req.write(OAIListMetadataFormats(arg['identifier'], arg['resumptionToken']))
         else:
+            req.write(print_oai_header)
             req.write(oai_error("badVerb","Illegal OAI verb"))
+            req.write(print_oai_footer)
+
+
     else:
+        req.write(print_oai_header(""))
         req.write(oai_check)
-                
+        req.write(print_oai_footer(""))
+
     return "\n"
 
 </protect>
