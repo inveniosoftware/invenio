@@ -58,9 +58,12 @@ def Report_Number_Generation(parameters,curdir,form):
             fp.close()
             yy = re.sub("^......","",mydate)
         # Evaluate category - Category is read from the file named 'rnin
-        fp = open("%s/%s" % (curdir,parameters['rnin']),"r")
-        category = fp.read()
-        category =  category.replace("\n","")
+        if os.path.exists("%s/%s" % (curdir,parameters['rnin'])):
+            fp = open("%s/%s" % (curdir,parameters['rnin']),"r")
+            category = fp.read()
+            category =  category.replace("\n","")
+        else:
+            category = ""
         # The counter and report number formats are evaluated.
         # All data is considered as a string literal except that enclosed
         # in the <PA></PA> brackets. The category replaces <PA>categ</PA>

@@ -47,31 +47,30 @@ def Get_Info(parameters,curdir,form):
     titlefile = parameters["titleFile"]
     emailfile = parameters["emailFile"]
     authorfile = parameters["authorFile"]
-    if not Get_Info_In_Pending(rn,titlefile,emailfile,authorfile,doctype):
+    if not Get_Info_In_Curdir(rn,titlefile,emailfile,authorfile,doctype):
         if not Get_Info_In_DB(rn,parameters,curdir):
             DocumentNotFound(rn)
     return ""
 
-def Get_Info_In_Pending(repno,titlefile,emailfile,authorfile,doctype):
+def Get_Info_In_Curdir(repno,titlefile,emailfile,authorfile,doctype):
     global titlevalue,emailvalue,authorvalue
-    PENDIR = "%s/pending/%s" % (storage,doctype)
-    if not os.path.exists("%s/%s" % (PENDIR,repno)):
+    if not os.path.exists("%s/%s" % (curdir,titlefile)):
         return 0
     else:
-        if os.path.exists("%s/%s/%s" % (PENDIR,repno,titlefile)):
-            fp = open("%s/%s/%s" % (PENDIR,repno,titlefile),"r")
+        if os.path.exists("%s/%s" % (curdir,titlefile)):
+            fp = open("%s/%s" % (curdir,titlefile),"r")
             titlevalue = fp.read()
             fp.close()
         else :
             titlevalue = "-"
-        if os.path.exists("%s/%s/%s" % (PENDIR,repno,emailfile)):
-            fp = open("%s/%s/%s" % (PENDIR,repno,emailfile),"r")
+        if os.path.exists("%s/%s" % (curdir,emailfile)):
+            fp = open("%s/%s" % (curdir,emailfile),"r")
             emailvalue = fp.read()
             fp.close()
         else :
             emailvalue = "-"
-        if os.path.exists("%s/%s/%s" % (PENDIR,repno,authorfile)):
-            fp = open("%s/%s/%s" % (PENDIR,repno,authorfile),"r")
+        if os.path.exists("%s/%s" % (curdir,authorfile)):
+            fp = open("%s/%s" % (curdir,authorfile),"r")
             authorvalue = fp.read()
             fp.close()
         else :
@@ -87,7 +86,7 @@ def Get_Info_In_DB(rn,parameters,curdir):
         authorvalue += "\n%s" % Get_Field('700__a',sysno)
         # save result
         fp = open("%s/SN" % curdir,"w+")
-        fp.write(fp,sysno)
+        fp.write(sysno)
         fp.close()
         return 1
     else:

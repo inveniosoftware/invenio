@@ -38,16 +38,21 @@ def Get_Sysno(parameters,curdir,form):
     global rn,sysno
     # initialize sysno variable
     sysno = ""
-    searchresults = search_pattern(req=None, p=rn, f="reportnumber").items().tolist()
-    if len(searchresults) == 0:
-        raise functionStop("<SCRIPT>document.forms[0].action=\"Main.py\";document.forms[0].curpage.value = 1;document.forms[0].submit();alert('The report %s cannot be found in our database.\\nPerhaps it has not been integrated yet?\\nAnyway, you can choose another report number if you wish.\\n Or retry this action in a few minutes.');</SCRIPT>" % rn)
-    elif len(searchresults) > 1:
-        raise functionStop("<SCRIPT>document.forms[0].action=\"Main.py\";document.forms[0].curpage.value = 1;document.forms[0].submit();alert('Multiple documents have been found with report number %s\\nYou can try with another report number if you wish.\\n Or retry this action in a few minutes.');</SCRIPT>" % rn)
+    if os.path.exists("%s/SN" % curdir):
+        fp = open("%s/SN" % curdir,"r")
+        sysno = fp.read()
+        fp.close()
     else:
-        sysno = searchresults[0]
-    # save resultin a file
-    fp = open("%s/SN" % curdir,"w+")
-    fp.write(str(sysno))
-    fp.close()
+        searchresults = search_pattern(req=None, p=rn, f="reportnumber").items().tolist()
+        if len(searchresults) == 0:
+            raise functionStop("<SCRIPT>document.forms[0].action=\"Main.py\";document.forms[0].curpage.value = 1;document.forms[0].submit();alert('The report %s cannot be found in our database.\\nPerhaps it has not been integrated yet?\\nAnyway, you can choose another report number if you wish.\\n Or retry this action in a few minutes.');</SCRIPT>" % rn)
+        elif len(searchresults) > 1:
+            raise functionStop("<SCRIPT>document.forms[0].action=\"Main.py\";document.forms[0].curpage.value = 1;document.forms[0].submit();alert('Multiple documents have been found with report number %s\\nYou can try with another report number if you wish.\\n Or retry this action in a few minutes.');</SCRIPT>" % rn)
+        else:
+            sysno = searchresults[0]
+        # save resultin a file
+        fp = open("%s/SN" % curdir,"w+")
+        fp.write(str(sysno))
+        fp.close()
     return ""
 </protect>

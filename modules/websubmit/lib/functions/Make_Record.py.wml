@@ -40,7 +40,7 @@ def  Make_Record(parameters,curdir,form):
     source = parameters['sourceTemplate'].replace(" ","")
     create = parameters['createTemplate'].replace(" ","")
     # We use bibconvert to create the xml record
-    call_uploader_txt = "%s -l80 -d'%s'  -Cs'%s/%s' -Ct'%s/%s' > %s/recmysql" % (bibconvert,curdir,bibconvertconf,source,bibconvertconf,create,curdir)
+    call_uploader_txt = "%s -l1 -d'%s'  -Cs'%s/%s' -Ct'%s/%s' > %s/recmysql" % (bibconvert,curdir,bibconvertconf,source,bibconvertconf,create,curdir)
     os.system(call_uploader_txt)
     # Then we have to format this record (turn & into &amp; and < into &lt;
     # After all we know nothing about the text entered by the users at submission time

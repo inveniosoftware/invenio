@@ -100,6 +100,7 @@ def Send_APP_Mail (parameters,curdir,form):
     if decision == "approve":
         mailtitle = "%s has been approved" % rn
         mailbody = "The %s %s has been approved." % (docname,rn)
+        mailbody += "\nIt will soon be accessible here:\n<%s/search.py?recid=%s>" % (htdocsurl,sysno)
     else:
         mailtitle = "%s has been rejected" % rn
         mailbody = "The %s %s has been rejected." % (docname,rn)

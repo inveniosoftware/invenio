@@ -31,6 +31,6 @@
 def Print_Success_SRV(parameters,curdir,form): 
     global rn
     t=""
-    t+="<br><br><B>Submission successful! The files will be added as soon as possible</B><br><BR>for document %s</b>" % rn
+    t+="<br><br><b>Document %s was successfully revised.</b>" % rn
     return t
 </protect>
