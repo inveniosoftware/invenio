@@ -94,23 +94,43 @@ cds.support@cern.ch
 ## OAIIDPREFIX -- OAI identifier prefix:  
 ##  (example: "oai:cdswaredemo")
 <define-tag OAIIDPREFIX whitespace=delete>
-oai:cdswaredemo
+oai:cdsdev.cern.ch
 </define-tag>
 
 ## OAISAMPLEIDENTIFIER -- OAI sample identifier:  
 ##  (example: "oai:cdswaredemo:101")
 <define-tag OAISAMPLEIDENTIFIER whitespace=delete>
-oai:cdswaredemo:101
+oai:cdsdev.cern.ch:101
 </define-tag>
 
 ## OAIIDENTIFYDESCRIPTION -- description for the OAI Identify verb (optional):
 ## (example:"")
+
 <define-tag OAIIDENTIFYDESCRIPTION whitespace=delete>
  <description>
-  <eprints xmlns="http://www.openarchives.org/OAI/eprints"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://www.openarchives.org/OAI/1.1/eprints
-                              http://www.openarchives.org/OAI/1.1/eprints.xsd">
+   <oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier
+                                       http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">
+      <scheme>
+       oai
+      </scheme>
+      <repositoryIdentifier>
+       cdsdev.cern.ch
+      </repositoryIdentifier>
+      <delimiter>
+       :
+      </delimiter>
+      <sampleIdentifier>
+       <OAISAMPLEIDENTIFIER>
+      </sampleIdentifier>
+   </oai-identifier>
+ </description>
+ <description>
+  <eprints xmlns="http://www.openarchives.org/OAI/1.1/eprints"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.openarchives.org/OAI/1.1/eprints
+                               http://www.openarchives.org/OAI/1.1/eprints.xsd">
       <content>
        <URL>http://foo.com</URL>
       </content>
