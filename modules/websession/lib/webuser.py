@@ -279,12 +279,22 @@ def logoutUser(req):
     return id1	
 
 def userNotExist(p_email,p_pw):
-    """Check if the user exits or not in the system
+    """Check if the user exists or not in the system
     """
     query_result = run_sql("select email from user where email=%s", (p_email,))
     if len(query_result)>0 and query_result[0]!='':
         return 0
     return 1
+
+def emailUnique(p_email):
+    """Check if the email address only exists once. If yes, return userid, if not, -1
+    """
+    query_result = run_sql("select id, email from user where email=%s", (p_email,))
+    if len(query_result) == 1:
+        return query_result[0][0]
+    elif len(query_result) == 0:
+        return 0
+    return -1
 
 def update_Uid(req,p_email,p_pw):
     """It updates the userId of the session. It is used when a guest user is logged in succesfully in the system 

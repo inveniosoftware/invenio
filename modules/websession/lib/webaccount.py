@@ -50,7 +50,7 @@ def perform_info(req):
     <dl>
 
     <dt>
-    <A href="./set">Your Settings</A>
+    <A href="./edit">Your Settings</A>
     <dd>Set or change your account Email address or password.
     Specify your preferences about the way the interface looks like.
     
@@ -138,7 +138,7 @@ def perform_display_account(req,data,bask,aler,sear):
 	sear="No queries found"
     else:
  	user = data[0]
-        accBody ="""You are logged in as %s. You may want to a) <A href="../youraccount.py/logout">logout</A>; b) edit your <A href="../youraccount.py/set">email address or password</a>.<BR><BR>
+        accBody ="""You are logged in as %s. You may want to a) <A href="../youraccount.py/logout">logout</A>; b) edit your <A href="../youraccount.py/edit">email address or password</a>.<BR><BR>
 		 """%user			
     out =""
     out +=template_account("Your Account",accBody)
@@ -202,12 +202,12 @@ def perform_set(email,password):
 		<p>If you want to change your email address or password, please set new values in the form below.
 		<table>
 			<tr><td align=right><strong>New email address:</strong><br><small class=important>(mandatory)</small></td><td><input type="text" size="25" name="email" value="%s"><br><small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td><td></td></tr>
-			<tr><td align=right><strong>New password:</strong></td><td align=left><input type="password" size="25" name="password" value="%s"><br><small><span class=quicknote>Note:</span> The password phrase may contain punctuation, spaces, etc.</small></td><td><input type="hidden" name="action" value="edit"></td></tr>
+			<tr><td align=right><strong>New password:</strong><br><small class=quicknote>(optional)</small></td><td align=left><input type="password" size="25" name="password" value="%s"><br><small><span class=quicknote>Note:</span> The password phrase may contain punctuation, spaces, etc.</small></td></tr><tr><td align=right><strong>Retype password:</strong></td><td align=left><input type="password" size="25" name="password2" value="%s"></td><td><input type="hidden" name="action" value="edit"></td></tr>
 				<tr><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" value="Set new values"></code>&nbsp;&nbsp;&nbsp;</td></tr>
 		</table>
         </form>
       </body>	
-      """%(email,password)
+      """ % (email, password, "")
     return text                    				
 
 ##  create_register_page_box(): register a new account
@@ -244,9 +244,17 @@ def create_register_page_box(referer=''):
                  <td>
 		 </td>
                 </tr>
+	       <tr>
+		 <td align=right><strong>Retype Password:</strong>	
+		</td>
+		<td align=left><input type="password" size="25" name="p_pw2" value="">
+		 </td>
+                 <td>
+		 </td>
+                </tr>
                 <tr>""" % (cgi.escape(referer))
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1:
-        text += """<td align=left colspan=3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code class=blocknote><input class="formbutton" type="submit" name="action" value="register"></code></td>"""
+        text += """<td></td><td align=left colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="register"></code></td>"""
     text += """</tr>
               </table>
               <p><strong>Note:</strong> Please do not use valuable passwords such as your Unix, AFS or NICE passwords with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you for personal services of %s. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.
@@ -282,7 +290,7 @@ def create_login_page_box(referer=''):
 		 </td>
                 </tr>
                 <tr>
-		 <td align=center colspan=3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>""" % (cgi.escape(referer))
+		 <td></td><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>""" % (cgi.escape(referer))
     text += """&nbsp;&nbsp;&nbsp;(<a href="./lost">Lost your password?</a>)
 		 </td>
                 </tr>
@@ -345,7 +353,9 @@ def perform_emailMessage(eMsg):
     return out 
 
 # perform_back(): template for return to a previous page, used for login,register and setting 
-def perform_back(mess,act): 
+def perform_back(mess,act,linkname=''): 
+    if not linkname:
+        linkname = act
     out =""
     out+="""
           <body>
@@ -356,6 +366,6 @@ def perform_back(mess,act):
                 </tr>
              </table>
             </body>
-         """%(mess,act,act)
+         """%(mess,act,linkname)
     
     return out

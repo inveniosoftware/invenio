@@ -44,7 +44,7 @@ from cdsware.access_control_config import *
 from mod_python import apache    
 import smtplib
 
-def set(req, ln=cdslang):
+def edit(req, ln=cdslang):
     uid = webuser.getUid(req)
 
     if uid == -1:
@@ -62,18 +62,43 @@ def set(req, ln=cdslang):
                 language=ln,
                 lastupdated=__lastupdated__)
 
-def change(req,email=None,password=None,ln=cdslang):
+def change(req,email=None,password=None,password2=None,ln=cdslang):
     uid = webuser.getUid(req)
 
     if uid == -1:
         return webuser.page_not_authorized(req, "../youraccount.py/change")
 
-    if webuser.checkemail(email):
-        
+    uid2 = webuser.emailUnique(email)
+    if webuser.checkemail(email) and uid2 != -1 and (uid2 == uid or uid2 == 0) and password == password2:
         change = webuser.updateDataUser(req,uid,email,password)
-        return display(req, ln)
-    else :
-        return display(req, ln)
+        mess = "Settings successfully edited."
+       	act = "display"
+        linkname = "Show account"
+        title = "Settings edited"
+    elif uid2 == -1 or uid2 != uid and not uid2 == 0:
+        mess = "The email address is already in use, please try again."
+       	act = "edit"
+        linkname = "Edit settings"
+        title = "Editing settings failed"
+    elif not webuser.checkemail(email):
+        mess = "The email address is not valid, please try again."
+       	act = "edit"
+        linkname = "Edit settings"
+        title = "Editing settings failed"
+    elif password != password2:
+        mess = "The passwords do not match, please try again."
+       	act = "edit"
+        linkname = "Edit settings"
+        title = "Editing settings failed"
+    
+    return page(title=title,
+ 	        body=webaccount.perform_back(mess,act, linkname),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
+                description="CDS Personalize, Main page",
+                keywords="CDS, personalize",
+                uid=uid,
+                language=ln,
+                lastupdated=__lastupdated__)
 
 def lost(req, ln=cdslang):
     uid = webuser.getUid(req)
@@ -261,7 +286,7 @@ def login(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
                        language=ln,
                        lastupdated=__lastupdated__)
 
-def register(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
+def register(req, p_email=None, p_pw=None, p_pw2=None, action='login', referer='', ln=cdslang):
     uid = webuser.getUid(req)
 
     if p_email==None:
@@ -276,9 +301,12 @@ def register(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslan
     
     mess=""
     act=""
-    ruid=webuser.registerUser(req,p_email,p_pw)
-    if ruid==1:
-        uid=webuser.update_Uid(req,p_email,p_pw)
+    if p_pw == p_pw2:
+        ruid = webuser.registerUser(req,p_email,p_pw)
+    else:
+        ruid = -2
+    if ruid == 1:
+        uid = webuser.update_Uid(req,p_email,p_pw)
         mess = "Your account has been successfully created."
         title = "Account created"
         if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
@@ -287,12 +315,16 @@ def register(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslan
             mess += " A second email will be sent when the account has been activated and can be used."
         else:
             mess += """ To continue to your account, press <a href="%s/youraccount.py/display?ln=%s">here</a>""" % (weburl, ln)
-    elif  ruid ==-1 :
-        mess ="The user already exists in the database, please try again"
+    elif ruid == -1:
+        mess = "The user already exists in the database, please try again."
+	act = "register"
+        title = "Register failure"
+    elif ruid == -2:
+        mess = "Both passwords must match, please try again."
 	act = "register"
         title = "Register failure"
     else:
-        mess ="Your are not registered into the system please try again"
+        mess = "Your are not registered into the system, please try again."
        	act = "register"
         title = "Register failure"
 
