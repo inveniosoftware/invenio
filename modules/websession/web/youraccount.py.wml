@@ -116,7 +116,7 @@ def lost(req, ln=cdslang):
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
-                anguage=ln,
+                language=ln,
                 lastupdated=__lastupdated__)
 
 def display(req, ln=cdslang):
