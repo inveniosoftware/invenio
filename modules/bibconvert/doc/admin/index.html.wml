@@ -119,6 +119,10 @@ href="../bibupload/">BibUpload</a>.
 <p>Other useful BibConvert configuration examples:
 
 <blockquote>
-<a href="bibtex.cfg">bibtex.cfg</a> -- BibTeX to XML MARC example
+<a href="dcq.cfg">dcq.cfg</a> -- Qualified Dublin Core in SGML to XML MARC example
+<br><a href="dcq.dat">dcq.dat</a> -- corresponding data file, featuring collection identifiers demo
 </blockquote>
 
+<blockquote>
+<a href="bibtex.cfg">bibtex.cfg</a> -- BibTeX to XML MARC example
+</blockquote>
