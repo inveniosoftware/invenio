@@ -325,14 +325,13 @@ def create_header(cc=cdsname, as=0, headeradd=""):
 """ % (cc, supportemail, weburl,
        cdspageheader, \
        create_navtrail(cc, as,
-                       """<table border="0" cellspacing="0" cellpadding="2"><tr class="navtrail"><td><small><small>""",
-                       "","&gt;","", "&gt; Search Results</small></small></td></tr></table>",0), \
+                       """<table class="navtrailbox"><tr><td width="15">&nbsp;</td><td class="navtrailboxbody">""",
+                       "","&gt;","", "&gt; Search Results</td></tr></table><br>",0), \
        headeradd)
 
-def create_inputdate_box(title="From date", name="d1", selected_year="", selected_month="", selected_day=""):
+def create_inputdate_box(name="d1", selected_year="", selected_month="", selected_day=""):
     "Produces 'From Date', 'Until Date' kind of selection box.  Suitable for search options."
     box = ""
-    box += "<small><strong>%s:</strong></small><br>" % title
     # day
     box += """<select name="%sd">""" % name
     box += """<option value="">any day"""
@@ -373,85 +372,104 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
 
     # possibly print external search engines links (Google box):
     if cfg_google_box:
-        out += """<table align="right"><tr><td>%s</td></tr></table>""" % create_google_box(p, f, p1, p2, p3)
-    out += "<table>"
+        out += create_google_box(p, f, p1, p2, p3)
     # firstly, print Query box:
     if as==1:
         # print Advanced Search form:
         # define search box elements:
-        cell_1_left = "<small><strong>Search for:</strong></small><br>" + create_matchtype_box('m1', m1) + \
+        cell_1_left = create_matchtype_box('m1', m1) + \
                       """<input type="text" name="p1" size="%d" value="%s">""" % (cfg_advancedsearch_pattern_box_width, cgi.escape(p1,1))
-        cell_1_right = "<small><strong>within:</strong></small><br>%s" % create_searchwithin_selection_box('f1', f1)
+        cell_1_right = create_searchwithin_selection_box('f1', f1)
         cell_1_moreright = create_andornot_box('op1', op1)
-        cell_1_farright = ""
         cell_2_left = create_matchtype_box('m2', m2) + """<input type="text" name="p2" size="%d" value="%s">""" % (cfg_advancedsearch_pattern_box_width, cgi.escape(p2,1))
         cell_2_right = create_searchwithin_selection_box('f2', f2)
         cell_2_moreright = create_andornot_box('op2', op2)
-        cell_2_farright = ""
         cell_3_left = create_matchtype_box('m3', m3) + """<input type="text" name="p3" size="%d" value="%s">""" % (cfg_advancedsearch_pattern_box_width, cgi.escape(p3,1))
         cell_3_right = create_searchwithin_selection_box('f3', f3)
-        cell_3_moreright = """<input type="submit" name="search" value="SEARCH"><input type="submit" name="search" value="Browse">&nbsp;"""
-        cell_3_farright = """<small class="light"><a href="%s/search.py?p=%s&amp;f=%s&amp;cc=%s">Simple&nbsp;Search</a></small>
-                             <br><small><a href="%s/help/search/tips.html">Search&nbsp;Tips</a></small>""" % \
-                             (weburl, urllib.quote(p1), urllib.quote(f1), urllib.quote(cc), weburl)
+        cell_3_moreright = """<input class="formbutton" type="submit" name="search" value="SEARCH"><input class="formbutton" type="submit" name="search" value="Browse">&nbsp;"""
+        cell_4 = """<small><a href="%s/help/search/tips.html">search&nbsp;tips</a> ::
+                           <a href="%s/search.py?p=%s&amp;f=%s&amp;cc=%s">simple&nbsp;search</a></small>""" % \
+                    (weburl, weburl, urllib.quote(p1), urllib.quote(f1), urllib.quote(cc))
         # print them:
         out += """
-        <tr>
-        <td valign="top" nowrap>
-         <table>
-         <tr valign="bottom">
-           <td>%s</td>
-           <td>%s</td>
-           <td>%s</td>
-           <td>%s</td>
-         </tr>
-         <tr valign="bottom">
-           <td>%s</td>
-           <td>%s</td>
-           <td>%s</td>
-           <td>%s</td>
-         </tr>
-         <tr valign="bottom">
-           <td>%s</td>
-           <td>%s</td>
-           <td>%s</td>
-           <td>%s</td>
-         </tr>
-         </table>
-        </td>
-        </tr>""" % \
-         (cell_1_left, cell_1_right, cell_1_moreright, cell_1_farright, \
-          cell_2_left, cell_2_right, cell_2_moreright, cell_2_farright, \
-          cell_3_left, cell_3_right, cell_3_moreright, cell_3_farright)         
+        <table class="searchbox">
+         <thead>
+          <tr>
+           <th colspan="3" class="searchboxheader">
+            Search for:
+           </th>
+          </tr> 
+         </thead>
+         <tbody>
+          <tr valign="bottom">
+            <td class="searchboxbody">%s</td>
+            <td class="searchboxbody">%s</td>
+            <td class="searchboxbody">%s</td>
+          </tr>
+          <tr valign="bottom">
+            <td class="searchboxbody">%s</td>
+            <td class="searchboxbody">%s</td>
+            <td class="searchboxbody">%s</td>
+          </tr>
+          <tr valign="bottom">
+            <td class="searchboxbody">%s</td>
+            <td class="searchboxbody">%s</td>
+            <td class="searchboxbody">%s</td>
+          </tr>
+          <tr valign="bottom">
+            <td colspan="3" align="right" class="searchboxbody">%s</td>
+          </tr>
+         </tbody>
+        </table>
+        """ % \
+         (cell_1_left, cell_1_right, cell_1_moreright, \
+          cell_2_left, cell_2_right, cell_2_moreright, \
+          cell_3_left, cell_3_right, cell_3_moreright,
+          cell_4)         
     else:
         # print Simple Search form:
-        cell_1_left = """<small><strong>Search for:</strong></small>
-                         <br><input type="text" name="p" size="%d" value="%s">""" % \
+        cell_1_left = """<input type="text" name="p" size="%d" value="%s">""" % \
         (cfg_simplesearch_pattern_box_width, cgi.escape(p, 1))
-        cell_1_middle = "<small><strong>within:</strong></small><br>%s" % create_searchwithin_selection_box('f', f)
-        cell_1_right = """<input type="submit" name="search" value="SEARCH"><input type="submit" name="search" value="Browse">&nbsp;"""
-        cell_1_farright = """<small class="light"><a href="%s/search.py?p1=%s&amp;f1=%s&amp;as=1&amp;cc=%s">Advanced&nbsp;Search</a></small>
-                             <br><small><a href="%s/help/search/tips.html">Search&nbsp;Tips</a></small>""" %\
-                          (weburl, urllib.quote(p), urllib.quote(f), urllib.quote(cc), weburl)
+        cell_1_middle = create_searchwithin_selection_box('f', f)
+        cell_1_right = """<input class="formbutton" type="submit" name="search" value="SEARCH"><input class="formbutton" type="submit" name="search" value="Browse">&nbsp;"""
+        cell_2 = """<small><a href="%s/help/search/tips.html">search&nbsp;tips</a> ::
+                           <a href="%s/search.py?p1=%s&amp;f1=%s&amp;as=1&amp;cc=%s">advanced&nbsp;search</a></small>""" %\
+                          (weburl, weburl, urllib.quote(p), urllib.quote(f), urllib.quote(cc))
         out += """
-        <tr>
-        <td valign="top" nowrap>
-         <table>
-         <tr valign="bottom">
-           <td>%s</td>
-           <td>%s</td>
-           <td>%s</td>
-           <td>%s</td>
-         </tr>
-         </table>
-        </td>
-        </tr>
-        """ % (cell_1_left, cell_1_middle, cell_1_right, cell_1_farright)
+        <table class="searchbox">
+         <thead>
+          <tr>
+           <th colspan="3" class="searchboxheader">
+            Search for:
+           </th>
+          </tr> 
+         </thead>
+         <tbody>
+          <tr valign="bottom">
+            <td class="searchboxbody">%s</td>
+            <td class="searchboxbody">%s</td>
+            <td class="searchboxbody">%s</td>
+          </tr>
+          <tr valign="bottom">
+            <td colspan="3" align="right" class="searchboxbody">%s</td>
+          </tr>
+         </tbody>
+        </table> 
+        """ % (cell_1_left, cell_1_middle, cell_1_right,
+               cell_2)
     # secondly, print Collection(s) box:
     out += """
-    <tr>
-    <td valign="top">
-    <small><strong>Search collections:</strong></small><br>"""
+        <table class="searchbox">
+         <thead>
+          <tr>
+           <th colspan="3" class="searchboxheader">
+            Search collections:
+           </th>
+          </tr> 
+         </thead>
+         <tbody>
+          <tr valign="bottom">
+           <td valign="top" class="searchboxbody">"""
     colls_nicely_ordered = get_nicely_ordered_collection_list()    
     if colls and colls[0] != cdsname:
         # some collections are defined, so print these first, and only then print 'add another collection' heading:
@@ -472,26 +490,36 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
     out += """
     </select>
     </td>
-    </tr>"""
+    </tr>
+    </tbody>
+    </table>"""
     # thirdly, print from/until date boxen, if applicable:
     if d1y=="" and d1m=="" and d1d=="" and d2y=="" and d2m=="" and d2d=="":
         pass # do not need it
     else:
-        cell_6_a = create_inputdate_box("Added since", "d1", d1y, d1m, d1d)
-        cell_6_b = create_inputdate_box("until", "d2", d2y, d2m, d2d)
-        out += """<table cellpadding="3" cellspacing="0">
+        cell_6_a = create_inputdate_box("d1", d1y, d1m, d1d)
+        cell_6_b = create_inputdate_box("d2", d2y, d2m, d2d)
+        out += """<table class="searchbox">
+                   <thead> 
                     <tr>
-                      <td colspan="3" height="3">
-                      </td>
+                      <th class="searchboxheader">
+                        Added since:
+                      </th>
+                      <th class="searchboxheader">
+                        until:
+                      </th>                      
                     </tr>
+                   </thead>
+                   <tbody>
                     <tr valign="bottom">
-                      <td>%s</td>
-                      <td>%s</td>
+                      <td class="searchboxbody">%s</td>
+                      <td class="searchboxbody">%s</td>
                     </tr>
-                   </table>""" % \
+                   </tbody>
+                  </table>""" % \
            (cell_6_a, cell_6_b)        
     # fourthly, print Display/Sort box:
-    cell_1_left = """<small><strong>Sort by:</strong></small><br>
+    cell_1_left = """
     <select name="sf">
     <option value="">- latest first -"""
     query = """SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
@@ -506,7 +534,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
                       <option value="a"%s>asc.
                       <option value="d"%s>desc.
                       </select>""" % (is_selected(so,"a"),is_selected(so,"d"))
-    cell_1_right = """<small><strong>Output format:</strong></small><br>
+    cell_1_right = """
     <select name="of">"""
     query = """SELECT code,name FROM format ORDER BY name ASC""" 
     res = run_sql(query)
@@ -522,7 +550,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
         cell_1_right += """<option value="%s" selected>%s MARC tag""" % (of, of)
     cell_1_right += """</select>"""
     ## okay, formats ended
-    cell_1_middle = """<small><strong>Display results:</strong></small><br>
+    cell_1_middle = """
     <select name="rg">
     <option value="10"%s>10 results
     <option value="25"%s>25 results
@@ -539,11 +567,28 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
            is_selected(rg,"100"), is_selected(rg,"250"), is_selected(rg,"500"),\
            is_selected(sc,"0"), is_selected(sc,"1"))
     out += """
-    <tr>
-    <td valign="top">
-    <table><tr valign="top"><td>%s</td><td>%s</td><td>%s</td></tr></table>
-    </td>
-    </tr>""" % (cell_1_left, cell_1_middle, cell_1_right)
+        <table class="searchbox">
+         <thead>
+          <tr>
+           <th class="searchboxheader">
+            Sort by:
+           </th>
+           <th class="searchboxheader">
+            Display results:
+           </th>
+           <th class="searchboxheader">
+            Output format:
+           </th>
+          </tr> 
+         </thead>
+         <tbody>
+          <tr valign="bottom">
+           <td valign="top" class="searchboxbody">%s</td>
+           <td valign="top" class="searchboxbody">%s</td>
+           <td valign="top" class="searchboxbody">%s</td>
+          </tr>
+         </tbody>
+        </table>""" % (cell_1_left, cell_1_middle, cell_1_right)
     # print end of search box:
     out += """</table></form>
     """
@@ -572,11 +617,11 @@ def is_selected(var, fld):
 
 def create_navtrail(cc=cdsname,
                     as=0,
-                    header="""<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr class="pageboxlefttop"><td><small>""", \
+                    header="""<table class="navtrailbox"><tr><td width="15">&nbsp;</td><td class="navtrailboxbody"><small>""", \
                     prolog="", \
                     separator="&gt;", \
                     epilog="", \
-                    footer="&gt; Search Results</small></td></tr></table>",
+                    footer="&gt; Search Results</td></tr></table><br>",
                     exclude_root=0):
     """Creates navigation trail, i.e. links to ancestors of the 'cc' collection.
     If as==1, then links to Advanced Search interfaces; otherwise Simple Search.
@@ -639,9 +684,9 @@ def create_matchtype_box(name='m', value=''):
     return out
 
 def create_google_box(p, f, p1, p2, p3,
-                      prolog="""<table border=0 cellpadding=0 cellspacing=0><tr><td width="30"></td><td class="pageboxrighttopadd"><small><strong>Try your search on:</strong><br> """,
+                      prolog="""<table align="right" class="googlebox"><tr><th class="googleboxheader">Try your search on:</th></tr><tr><td class="googleboxbody">""",
                       separator= """<br>""",
-                      epilog="""</small></td></tr></table>"""):
+                      epilog="""</td></tr></table>"""):
     "Creates the box that proposes links to other useful search engines like Google.  'p' is the search pattern."
     out = ""
     if not p and (p1 or p2 or p3):
@@ -1063,25 +1108,72 @@ except:
     collrecs_cache = create_collrecs_cache()
     collrecs_cache[cdsname] = get_collection_hitlist(cdsname)
 
-def browse(req, colls, p, f, rg):
-    """Browse either biliographic phrases or words indexes."""
-    return
+def browse_pattern(req, colls, p, f, rg):
+    """Browse either biliographic phrases or words indexes, and display it."""
+    ## do we search in words indexes?
+    if not f:
+        return browse_in_bibwords(req, p, f)
+    ## okay, "real browse" follows:
+    browsed_words_hits = browse_in_bibxxx(colls, p, f, rg)
+    while not browsed_words_hits:
+        # try again and again with shorter and shorter pattern:
+        try:
+            p = p[:-1]
+            browsed_words_hits = browse_in_bibxxx(colls, p, f, rg)
+        except:
+            # probably there are no hits at all:
+            req.write("<p>No values found.")
+            return         
+    ## display results now:
+    out = """<table class="searchresultsbox">
+              <thead>
+               <tr>
+                <th class="searchresultsboxheader" align="left">
+                  hits
+                </th>
+                <th class="searchresultsboxheader" width="15">
+                  &nbsp;
+                </th>
+                <th class="searchresultsboxheader" align="left">
+                  %s
+                </th>
+               </tr>
+              </thead>
+              <tbody>""" % f
+    wlist = browsed_words_hits.keys()
+    wlist.sort()
+    for word in wlist:
+        out += """<tr>
+                   <td class="searchresultsboxbody" align="right">
+                    %s
+                   </td>
+                   <td class="searchresultsboxbody" width="15">
+                    &nbsp;
+                   </td>
+                   <td class="searchresultsboxbody" align="left">
+                    <a href="%s/search.py?p=%s&f=%s">%s</a>
+                   </td>
+                  </tr>""" % (browsed_words_hits[word], weburl, urllib.quote(word), urllib.quote(f), word)
+    out += """</tbody>
+        </table>"""        
+    req.write(out)
+    return 
 
-def browse_in_bibwords(p, f):
+def browse_in_bibwords(req, p, f):
     """Browse inside words indexes."""
+    req.write("<p>Words nearest to <strong>%s</strong> " % p)
+    if f:
+        req.write(" inside <strong>%s</strong> " % f)
+    req.write(" are:<br>")
+    url = string.replace(req.args, "search=Browse","search=SEARCH")
+    req.write(create_nearest_words_links(url, p, f))
     return
 
-def browse_in_bibxxx(req, colls, p, f, rg):
+def browse_in_bibxxx(colls, p, f, rg):
     """Browse bibliographic phrases for the given pattern in the given field."""
-    print_warning(req, "The browse functionality is about to be expanded and prettyfied.", "Warning")
     ## determine browse field:
     if string.find(p, ":") > 0: # does 'p' contain ':'?
         f, p = split(p, ":", 2)
-    ## check arguments:
-    if not f:
-        print_warning(req, "Sorry, cannot browse within any field.  Please choose a field to browse in (e.g. <em>within title</em>).",
-                      "Error")
-        return 1
     ## wash 'p' argument:
     p = re_quotes.sub("", p)
     ## construct 'tl' which defines the tag list (MARC tags) to search in:
@@ -1091,13 +1183,9 @@ def browse_in_bibxxx(req, colls, p, f, rg):
     else:
         # deduce desired MARC tags on the basis of chosen 'f'
         tl = get_field_tags(f)
-        if not tl:
-            # by default we are searching in author index:
-            tl = get_field_tags("author")
-            print_warning(req, "The browse does not work in this field.  Choosing author index instead.", "Warning")
-    ## okay, start browse:
+    ## start browsing to fetch list of hits:
+    browsed_words_hits = {} # will hold dict of {'word' : nbhits}
     for t in tl:
-        req.write("<p><strong>Browsing in '%s' field:</strong>" % t)
         # deduce into which bibxxx table we will search:
         digit1, digit2 = int(t[0]), int(t[1])
         bx = "bib%d%dx" % (digit1, digit2)
@@ -1120,11 +1208,11 @@ def browse_in_bibxxx(req, colls, p, f, rg):
             res_bis = run_sql(query_bis, None, 1)
             if res_bis:
                 query_bis_hits = res_bis[0][0]
-            hits = "%d record" % query_bis_hits
-            if query_bis_hits > 1:
-                hits = hits + "s"
-            req.write("""<br>&nbsp;&nbsp;&nbsp;%s ... <a href="%s/search.py?p=%s&f=%s">%s</a>""" % (bx_val, weburl, bx_val, t, hits))
-    return 
+            try:
+                browsed_words_hits[bx_val] += query_bis_hits
+            except:
+                browsed_words_hits[bx_val] = query_bis_hits
+    return browsed_words_hits
 
 def search_pattern(req, p=None, f=None, colls=None, m=None, hit_hints=0):
     """Searches for pattern 'p' and field 'f' and returns dict of recIDs HitLists per each collection in 'colls'.
@@ -1606,10 +1694,10 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
     if not middle_only:
         out += "\n<a name=\"%s\"></a>" \
               "\n<form action=\"%s/search.py\" method=\"get\">"\
-              "\n<table width=\"100%%\" cellpadding=2 cellspacing=0 border=0><tr class=\"results\"><td align=\"left\">" \
-              "<strong><big><img align=\"left\" src=\"%s/img/okay.gif\" width=20 height=20 alt=\"*\">"\
+              "\n<table width=\"100%%\" class=\"searchresultsbox\"><tr><td class=\"searchresultsboxheader\" align=\"left\">" \
+              "<strong><big>" \
               "<a href=\"%s/?c=%s&as=%d\">%s</a></big></strong></td>\n" % \
-              (collection, weburl, weburl, weburl, urllib.quote_plus(collection), as, collection)
+              (collection, weburl, weburl, urllib.quote_plus(collection), as, collection)
     else:
         out += """\n<form action="%s/search.py" method="get"><div align="center">\n""" % weburl
 
@@ -1621,7 +1709,7 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
 
     # middle table cell: print beg/next/prev/end arrows:
     if not middle_only:
-        out += "<td align=\"center\">\n"
+        out += "<td class=\"searchresultsboxheader\" align=\"center\">\n"
         out += "<strong>%s</strong> records found: &nbsp; \n" % nice_number(nb_found)
     else:
         out += "<small>"
@@ -1686,7 +1774,7 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
     # right table cell: cpu time info
     if not middle_only:
         if cpu_time > -1:
-            out +="<td align=\"right\"><small>Search took %.2f sec.</small>&nbsp;</td>" % cpu_time
+            out +="<td class=\"searchresultsboxheader\" align=\"right\"><small>Search took %.2f sec.</small>&nbsp;</td>" % cpu_time
         out += "</tr></table>"
     else:
         out += "</div>"
@@ -1700,17 +1788,17 @@ def print_results_overview(colls, results_final_nb_total, results_final_nb, cpu_
         # if one collection only, print nothing:
         return out
     # first find total number of hits:
-    out += "<p><table width=\"100%%\" border=0 cellspacing=0 cellpadding=2>" \
-           "<tr><td class=\"results\"><strong>Results overview:</strong> Found <strong>%s</strong> records in %.2f seconds.</td></tr>" % \
+    out += "<p><table class=\"searchresultsbox\" width=\"100%%\">" \
+           "<thead><tr><th class=\"searchresultsboxheader\"><strong>Results overview:</strong> Found <strong>%s</strong> records in %.2f seconds.</th></tr></thead>" % \
            (nice_number(results_final_nb_total), cpu_time)
     # then print hits per collection:
-    out += "<tr><td class=\"resultsbis\">"
+    out += "<tbody><tr><td class=\"searchresultsboxbody\">"
     for coll in colls:
         if results_final_nb[coll] > 0:
-            out += "In <strong><a href=\"#%s\">%s</a></strong>, " \
+            out += "<strong><a href=\"#%s\">%s</a></strong>, " \
                   "<a href=\"#%s\">%s records found</a><br>" \
                   % (urllib.quote(coll), coll, urllib.quote(coll), nice_number(results_final_nb[coll]))
-    out += "</td></tr></table>\n"
+    out += "</td></tr></tbody></table>\n"
     return out
 
 def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern=''):
@@ -1860,7 +1948,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', decompress=zli
                     req.write("</td></tr>")
                 req.write("\n</table>")
             #req.write("""<div align="right"><input type="submit" name="action" value="ADD TO BASKET"></div>""")
-            req.write("""<br><input type="submit" name="action" value="ADD TO BASKET">""")
+            req.write("""<br><input class="formbutton" type="submit" name="action" value="ADD TO BASKET">""")
             req.write("""</form>""")
 
     else:        
@@ -2317,20 +2405,11 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d))
-        url = string.replace(req.args, "search=Browse","search=SEARCH")
         if as==1 or (p1 or p2 or p3):
-            if p1:
-                req.write("<p>Words nearest to <strong>%s</strong> inside <strong>%s</strong> are:<br>" % (p1, f1))
-                req.write(create_nearest_words_links(url, p1, f1))
-            if p2:
-                req.write("<p>Words nearest to <strong>%s</strong> inside <strong>%s</strong> are:<br>" % (p2, f2))
-                req.write(create_nearest_words_links(url, p2, f2))
-            if p3:
-                req.write("<p>Words nearest to <strong>%s</strong> inside <strong>%s</strong> are:<br>" % (p3, f3))
-                req.write(create_nearest_words_links(url, p3, f3))
+            browse_pattern(req, colls_to_search, p1, f1, rg)
+            browse_pattern(req, colls_to_search, p2, f2, rg)
+            browse_pattern(req, colls_to_search, p3, f3, rg)
         else:
-            req.write("<p>Words nearest to <strong>%s</strong> inside <strong>%s</strong> are:<br>" % (p, f))
-            #req.write(create_nearest_words_links(url, p, f))
             browse_pattern(req, colls_to_search, p, f, rg)
     else:
         ## 3 - search needed
