@@ -80,7 +80,9 @@ page_template_body = """
     <div class="pageboxrightbottom"><CDSPAGEBOXRIGHTBOTTOM></div>
   </div>
   <div class="pagebodystripemiddle">
+    %s
     <h1 class="headline">%s</h1>
+    %s
     %s
   </div>
 </div>
@@ -113,7 +115,7 @@ def create_navtrailbox_body(title,
             out += title
     return prolog + out + epilog
 
-def page(title, body, navtrail="", description="", keywords="", uid=0, cdspageheaderadd="", cdspageboxlefttopadd="", cdspageboxleftbottomadd="", cdspageboxrighttopadd="", cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="", language=cdslang, urlargs="", verbose=1):
+def page(title, body, navtrail="", description="", keywords="", uid=0, cdspageheaderadd="", cdspageboxlefttopadd="", cdspageboxleftbottomadd="", cdspageboxrighttopadd="", cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="", language=cdslang, urlargs="", verbose=1, titleprologue="", titleepilogue=""):
     """page(): display CDS web page
         input: title of the page
                body of the page in html format
@@ -129,6 +131,8 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagehe
                language is the language version of the page
                urlargs are the URL arguments of the page to display (useful to affect languages)
                verbose is verbosity of the page (useful for debugging)
+               titleprologue is to be printed right before page title
+               titleepilogue is to be printed right after page title
        output: the final cds page with header, footer, etc.
     """
     if title == cdsnameintl[language]:
@@ -136,7 +140,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagehe
     else:
         headerstitle = title
     out = page_template_header % (headerstitle, description, keywords, cdspageheader, cdspageheaderadd)
-    out += page_template_body % (cdspageboxlefttopadd, cdspageboxleftbottomadd, cdspageboxrighttopadd, cdspageboxrightbottomadd, title, body)
+    out += page_template_body % (cdspageboxlefttopadd, cdspageboxleftbottomadd, cdspageboxrighttopadd, cdspageboxrightbottomadd, titleprologue, title, titleepilogue, body)
     out += page_template_footer % (cdspagefooteradd, cdspagefooter)
     out = re.sub(r"<!--CDSNAMEINTL-->", cdsnameintl[language], out)
     out = re.sub(r"<!--MSGSEARCH-->", msg_search[language], out)
