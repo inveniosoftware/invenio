@@ -92,15 +92,15 @@ create-demo-site: install
 	@echo "***********************************************************************"
 
 load-demo-records: install
+	${prefix}/bin/dbexec < ./modules/miscutil/sql/tabbibclean.sql
+	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
 	${prefix}/bin/bibupload ./modules/miscutil/demo/demobibdata.xml
 	${prefix}/bin/bibwords -ucds.support@cern.ch
 	${prefix}/bin/bibwords 1
-	@LYNX@ -source '@WEBURL@/search.py?rg=100&of=xm' > z.xml
-	${prefix}/bin/bibformat otype=HB,HD,HP,HC < ./z.xml > ./zf.xml
-	${prefix}/bin/bibupload -f ./zf.xml
-	rm -f z.xml zf.xml
-	${prefix}/bin/webcoll update-reclist
-	${prefix}/bin/webcoll update-webpage
+	${prefix}/bin/bibreformat -ucds.support@cern.ch -oHB,HD,HP,HC
+	${prefix}/bin/bibreformat 2
+	${prefix}/bin/webcoll -ucds.support@cern.ch
+	${prefix}/bin/webcoll 3
 	@echo "***********************************************************************"
 	@echo "** The demo records have been successfully loaded.                   **"
 	@echo "** Please point your browser to @WEBURL@ "
