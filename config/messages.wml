@@ -908,4 +908,16 @@
   <no></no>
 </define-tag>
 
+<define-tag MSG_GUEST whitespace=delete>
+  <en>guest</en>
+  <fr>visiteur</fr>
+  <de>Gast</de> 
+  <es>guest</es> 
+  <it>guest</it> 
+  <ru>guest</ru>
+  <sk>hosť</sk>
+  <cz>host</cz>
+  <no></no>
+</define-tag>
+
 ## end of file

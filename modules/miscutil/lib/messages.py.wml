@@ -94,6 +94,7 @@ msg_add_to_basket = {}
 msg_collections = {}
 msg_any_collection = {}
 msg_add_another_collection = {}
+msg_guest = {}
 
 ## English:
 <en>
@@ -163,6 +164,7 @@ msg_add_to_basket['en'] = """<MSG_ADD_TO_BASKET>"""
 msg_collections['en'] = """<MSG_COLLECTIONS>"""
 msg_any_collection['en'] = """<MSG_ANY_COLLECTION>"""
 msg_add_another_collection['en'] = """<MSG_ADD_ANOTHER_COLLECTION>"""
+msg_guest['en'] = """<MSG_GUEST>"""
 </en>
 
 ## French:
@@ -233,6 +235,7 @@ msg_add_to_basket['fr'] = """<MSG_ADD_TO_BASKET>"""
 msg_collections['fr'] = """<MSG_COLLECTIONS>"""
 msg_any_collection['fr'] = """<MSG_ANY_COLLECTION>"""
 msg_add_another_collection['fr'] = """<MSG_ADD_ANOTHER_COLLECTION>"""
+msg_guest['fr'] = """<MSG_GUEST>"""
 </fr>
 
 ## German:
@@ -303,6 +306,7 @@ msg_add_to_basket['de'] = """<MSG_ADD_TO_BASKET>"""
 msg_collections['de'] = """<MSG_COLLECTIONS>"""
 msg_any_collection['de'] = """<MSG_ANY_COLLECTION>"""
 msg_add_another_collection['de'] = """<MSG_ADD_ANOTHER_COLLECTION>"""
+msg_guest['de'] = """<MSG_GUEST>"""
 </de>
 
 ## Spanish:
@@ -373,6 +377,7 @@ msg_add_to_basket['es'] = """<MSG_ADD_TO_BASKET>"""
 msg_collections['es'] = """<MSG_COLLECTIONS>"""
 msg_any_collection['es'] = """<MSG_ANY_COLLECTION>"""
 msg_add_another_collection['es'] = """<MSG_ADD_ANOTHER_COLLECTION>"""
+msg_guest['es'] = """<MSG_GUEST>"""
 </es>
 
 ## Italian:
@@ -443,6 +448,7 @@ msg_add_to_basket['it'] = """<MSG_ADD_TO_BASKET>"""
 msg_collections['it'] = """<MSG_COLLECTIONS>"""
 msg_any_collection['it'] = """<MSG_ANY_COLLECTION>"""
 msg_add_another_collection['it'] = """<MSG_ADD_ANOTHER_COLLECTION>"""
+msg_guest['it'] = """<MSG_GUEST>"""
 </it>
 
 ## Russian:
@@ -513,6 +519,7 @@ msg_add_to_basket['ru'] = """<MSG_ADD_TO_BASKET>"""
 msg_collections['ru'] = """<MSG_COLLECTIONS>"""
 msg_any_collection['ru'] = """<MSG_ANY_COLLECTION>"""
 msg_add_another_collection['ru'] = """<MSG_ADD_ANOTHER_COLLECTION>"""
+msg_guest['ru'] = """<MSG_GUEST>"""
 </ru>
 
 ## Slovak:
@@ -583,6 +590,7 @@ msg_add_to_basket['sk'] = """<MSG_ADD_TO_BASKET>"""
 msg_collections['sk'] = """<MSG_COLLECTIONS>"""
 msg_any_collection['sk'] = """<MSG_ANY_COLLECTION>"""
 msg_add_another_collection['sk'] = """<MSG_ADD_ANOTHER_COLLECTION>"""
+msg_guest['sk'] = """<MSG_GUEST>"""
 </sk>
 
 ## Czech:
@@ -653,6 +661,7 @@ msg_add_to_basket['cz'] = """<MSG_ADD_TO_BASKET>"""
 msg_collections['cz'] = """<MSG_COLLECTIONS>"""
 msg_any_collection['cz'] = """<MSG_ANY_COLLECTION>"""
 msg_add_another_collection['cz'] = """<MSG_ADD_ANOTHER_COLLECTION>"""
+msg_guest['cz'] = """<MSG_GUEST>"""
 </cz>
 
 ## language oriented functions:
