@@ -37,6 +37,7 @@ import MySQLdb
 import Numeric
 import os
 import urllib
+import random
 from zlib import compress,decompress
 from bibrankadminlib import modify_translations, get_current_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
 from messages import *
@@ -121,25 +122,13 @@ def perform_modifytranslations(colID, ln=cdslang, sel_type='', trans=[], confirm
                                    colID=colID,
                                    sel_type=sel_type,
                                    ln=ln,
-                                   confirm=1)
+                                   confirm=2)
 
-        if sel_type and len(trans):
-            if confirm in ["1", 1]:
-                text = """<b>Please confirm modification of translations for collection '%s'.</b>""" % (col_dict[colID])
-                output += createhiddenform(action="modifytranslations#3",
-                                           text=text,
-                                           button="Confirm",
-                                           colID=colID,
-                                           sel_type=sel_type,
-                                           trans=trans,
-                                           ln=ln,
-                                           confirm=2)
-
-            elif confirm in ["2", 2]:
-                if finresult:
-                    output += """<b><span class="info">Translations modified for collection '%s'.</span></b>""" % (col_dict[colID])
-                else:
-                    output += """<b><span class="info">Sorry, could not modify translations for collection '%s'.</span></b>""" % (col_dict[colID])
+        if sel_type and len(trans) and confirm in ["2", 2]:
+            if finresult:
+                output += """<b><span class="info">Translations modified for collection '%s'.</span></b>""" % (col_dict[colID])
+            else:
+                output += """<b><span class="info">Sorry, could not modify translations for collection '%s'.</span></b>""" % (col_dict[colID])
                     
     try:
         body = [output, extra]
@@ -203,25 +192,16 @@ def perform_modifyrankmethods(colID, ln=cdslang, func='', rnkID='', confirm=0, c
                                        colID=colID,
                                        ln=ln,
                                        func=0,
-                                       confirm=0)
-
-        if confirm in ["0", 0] and func in ["0", 0] and int(rnkID) != -1:
-            text = "<b>Please confirm to enable rank method '%s' for the collection '%s'</b>" % (dict(rnk_list)[int(rnkID)], col_dict[colID])
-            output += createhiddenform(action="modifyrankmethods#9",
-                                       text=text,
-                                       button="Confirm",
-                                       colID=colID,
-                                       ln=ln,
-                                       rnkID=rnkID,
-                                       func=0,
                                        confirm=1)
-
-        elif confirm in ["1", 1] and func in ["0", 0] and len(rnkID) > 0:
+            
+        if confirm in ["1", 1] and func in ["0", 0] and int(rnkID) != -1:
             if finresult:
                 output += """<b><span class="info">Rank method '%s' enabled for collection '%s'</span></b>""" % (rnk_dict[int(rnkID)], col_dict[colID]) 
             else:
                 output += """<b><span class="info">Rank method '%s' could not be enabled for collection '%s'</span></b>""" % (rnk_dict[int(rnkID)], col_dict[colID])
-    
+        elif confirm not in ["0", 0] and func in ["0", 0]:
+            output += """<b><span class="info">Please select a rank method.</span></b>"""
+
         coll_list = get_col_rnk(colID, ln)
         if coll_list:
             text  = """
@@ -239,23 +219,15 @@ def perform_modifyrankmethods(colID, ln=cdslang, func='', rnkID='', confirm=0, c
                                        colID=colID,
                                        ln=ln,
                                        func=1,
-                                       confirm=0)
-             
-        if confirm in ["0", 0] and func in ["1", 1] and int(rnkID) != -1:
-            text = "<b>Please confirm to disable rank method '%s' for collection '%s'</b>" % (rnk_dict[int(rnkID)], col_dict[colID])
-            output += createhiddenform(action="modifyrankmethods#9",
-                                       text=text,
-                                       button="Confirm",
-                                       colID=colID,
-                                       ln=ln,
-                                       rnkID=rnkID,
-                                       func=1,
                                        confirm=1)
-        elif confirm in ["1", 1] and func in ["1", 1]:
+             
+        if confirm in ["1", 1] and func in ["1", 1] and int(rnkID) != -1:
             if finresult:
                 output += """<b><span class="info">Rank method '%s' disabled for collection '%s'</span></b>""" % (rnk_dict[int(rnkID)], col_dict[colID])
             else:
                 output += """<b><span class="info">Rank method '%s' could not be disabled for collection '%s'</span></b>""" % (rnk_dict[int(rnkID)], col_dict[colID])
+        elif confirm not in ["0", 0] and func in ["1", 1]:
+            output += """<b><span class="info">Please select a rank method.</span></b>"""
                     
     try:
         body = [output, extra]
@@ -279,37 +251,25 @@ def perform_addcollectiontotree(colID, ln=cdslang, add_dad='', add_son='', rtype
     subtitle = """Attach collection to tree&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#2.2">?</a>]</small>""" % (weburl)
 
     col_dict = dict(get_current_name('', ln, get_col_nametypes()[0][0], "collection"))
-    if confirm in [0, "0"] and not (add_son and add_dad and rtype):
+    if confirm not in [-1, "-1"] and not (add_son and add_dad and rtype):
         output2 += """<b><span class="info">All fields must be filled.</span></b><br><br>
         """
     elif add_son and add_dad and rtype:
         add_son = int(add_son)
         add_dad = int(add_dad)
-        if confirm in [0, "0"]:
+        if confirm not in [-1, "-1"]:
             if add_son == add_dad:
                 output2 += """<b><span class="info">Cannot add a collection as a pointer to itself.</span></b><br><br>
                 """
             elif check_col(add_dad, add_son):
-                text = """<b>Do you want to add the collection '%s' as a %s subcollection of '%s'.</b>
-                """ % (col_dict[add_son], (rtype=="r" and 'regular' or 'virtual'), col_dict[add_dad])
-                output2 += createhiddenform(action="%s/admin/websearch/websearchadmin.py/addcollectiontotree" % weburl,
-                                           text=text,
-                                           button="Confirm",
-                                           colID=colID,
-                                           add_son=add_son,
-                                           add_dad=add_dad,
-                                           ln=ln,
-                                           rtype=rtype,
-                                           confirm=1)
+                if add_col_dad_son(add_dad, add_son, rtype):
+                    output2 += """<b><span class="info">Added the collection '%s' as a %s subcollection of '%s'.</span></b><br><br>
+                    """ % (col_dict[add_son], (rtype=="r" and 'regular' or 'virtual'), col_dict[add_dad])
+                else:
+                    output2 += """<b><span class="info">Could not add the collection '%s' as a %s subcollection of '%s'.</span></b><br><br>
+                    """ % (col_dict[add_son], (rtype=="r" and 'regular' or 'virtual'), col_dict[add_dad])
             else:
                 output2 += """<b><span class="info">Cannot add the collection '%s' as a %s subcollection of '%s' since it will either create a loop, or the association already exists.</span></b><br><br>
-                """ % (col_dict[add_son], (rtype=="r" and 'regular' or 'virtual'), col_dict[add_dad])
-        else:
-            if add_col_dad_son(add_dad, add_son, rtype):
-                output2 += """<b><span class="info">Added the collection '%s' as a %s subcollection of '%s'.</span></b><br><br>
-                """ % (col_dict[add_son], (rtype=="r" and 'regular' or 'virtual'), col_dict[add_dad])
-            else:
-                output2 += """<b><span class="info">Could not add the collection '%s' as a %s subcollection of '%s'.</span></b><br><br>
                 """ % (col_dict[add_son], (rtype=="r" and 'regular' or 'virtual'), col_dict[add_dad])
         add_son = ''
         add_dad = ''
@@ -353,7 +313,7 @@ def perform_addcollectiontotree(colID, ln=cdslang, add_dad='', add_son='', rtype
                                button="Add",
                                colID=colID,
                                ln=ln,
-                               confirm=0)
+                               confirm=1)
     output += output2
     try:
         body = [output, extra]
@@ -383,28 +343,16 @@ def perform_addcollection(colID, ln=cdslang, colNAME='', dbquery='', rest='', ca
                               colID=colID,
                               ln=ln,
                               button="Add collection",
-                              confirm=0)
-    if colNAME:
-        if confirm in ["0", 0]:
-            text = """<b>Add collection with default name: '%s'.</b>
-            """ % (colNAME)
-            output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/addcollection" % weburl,
-                                       text=text,
-                                       colID=colID,
-                                       colNAME=colNAME,
-                                       dbquery=dbquery,
-                                       rest=rest,
-                                       button="Confirm",
-                                       confirm=1)
-        elif confirm in ["1", 1]:
-            res = add_col(colNAME, '', '')
-            if res:
-                output += """<b><span class="info">Added new collection with default name '%s'</span></b>
-                """ % colNAME
-            else:
-                output += """<b><span class="info">Sorry, could not add collection, most likely the collection already exists.</span></b>
-                """
-    elif confirm in ["0", 0]:
+                              confirm=1)
+    if colNAME and confirm in ["1", 1]:
+        res = add_col(colNAME, '', '')
+        if res:
+            output += """<b><span class="info">Added new collection with default name '%s'</span></b>
+            """ % colNAME
+        else:
+            output += """<b><span class="info">Sorry, could not add collection, most likely the collection already exists.</span></b>
+            """
+    elif confirm not in ["-1", -1]:
         output += """<b><span class="info">Please give the collection a name.</span></b>
         """
         
@@ -454,20 +402,9 @@ def perform_modifydbquery(colID, ln=cdslang, dbquery='', callback='yes', confirm
                                    button="Modify",
                                    colID=colID,
                                    ln=ln,
-                                   confirm=0)
+                                   confirm=1)
 
-        if confirm in ["0", 0]:
-            if dbquery:
-                text = """<b>Change query for this collection to: '%s'.</b>""" % dbquery
-            else:
-                text = """<b>Remove query for this collection.</b>""" 
-            output += createhiddenform(action="modifydbquery",
-                                       text=text,
-                                       colID=colID,
-                                       dbquery=dbquery,                                    
-                                       button="Confirm",
-                                       confirm=1)
-        elif confirm in ["1", 1]:
+        if confirm in ["1", 1]:
             res = modify_dbquery(colID, dbquery)
             if res:
                 text = """<b><span class="info">Changed query.</span></b>""" 
@@ -511,21 +448,9 @@ def perform_modifyrestricted(colID, ln=cdslang, rest='', callback='yes', confirm
                                    button="Modify",
                                    colID=colID,
                                    ln=ln,
-                                   confirm=0)
+                                   confirm=1)
 
-        if confirm in ["0", 0]:
-            if rest:
-                text = """<b>Change access restrictions for this collection to: '%s'.</b>""" % rest
-            else:
-                text = """<b>Remove any access restrictions for this collection.</b>"""
-                
-            output += createhiddenform(action="modifyrestricted",
-                                       colID=colID,
-                                       text=text,
-                                       rest=rest,                                    
-                                       button="Confirm",
-                                       confirm=1)
-        elif confirm in ["1", 1]:
+        if confirm in ["1", 1]:
             res = modify_restricted(colID, rest)
             if res:
                 text = """<b><span class="info">Changed the access restrictions.</span></b>""" 
@@ -557,7 +482,7 @@ def perform_modifycollectiontree(colID, ln=cdslang, move_up='', move_down='', mo
     tree = get_col_tree(colID, rtype)
     col_dict = dict(get_current_name('', ln, get_col_nametypes()[0][0], "collection"))
 
-    subtitle = """Modify collection tree: %s&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#2.3">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """Modify collection tree: %s&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#2.3">?</a>]&nbsp;&nbsp;&nbsp;<a href="%s/admin/websearch/websearchadmin.py/showtree?colID=%s&amp;ln=%s">Printer friendly version</a></small>""" % (col_dict[colID], weburl, weburl, colID, ln)
     fin_output = ""
     output = ""
     
@@ -676,7 +601,7 @@ def perform_modifycollectiontree(colID, ln=cdslang, move_up='', move_down='', mo
     except StandardError, e:
         return """<b><span class="info">An error occured.</span></b>
         """
- 
+
     output += """<table border ="0" width="100%">
     <tr><td width="50%">
     <b>Narrow by collection:</b>
@@ -705,6 +630,33 @@ def perform_modifycollectiontree(colID, ln=cdslang, move_up='', move_down='', mo
     else:
         return addadminbox(subtitle, body)
 
+def perform_showtree(colID, ln=cdslang):
+    col_dict = dict(get_current_name('', ln, get_col_nametypes()[0][0], "collection"))
+    subtitle = "Collection tree: %s" % col_dict[int(colID)]
+    output = """<table border ="0" width="100%">
+    <tr><td width="50%">
+    <b>Narrow by collection:</b>
+    </td><td width="50%">
+    <b>Focus on...:</b>
+    </td></tr><tr><td valign="top">
+    """
+    tree = get_col_tree(colID, 'r')
+    output += create_colltree(tree, col_dict, colID, ln, '', '', 'r', '')
+    output += """</td><td valign="top">
+    """
+    tree = get_col_tree(colID, 'v')
+    output += create_colltree(tree, col_dict, colID, ln, '', '', 'v', '')
+    output += """</td>
+    </tr>
+    </table>
+    """
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    return addadminbox(subtitle, body)
+    
 def perform_addportalbox(colID, ln=cdslang, title='', body='', callback='yes', confirm=-1):
     """form to add a new portalbox
     title - the title of the portalbox
@@ -724,28 +676,16 @@ def perform_addportalbox(colID, ln=cdslang, title='', body='', callback='yes', c
                               button="Add",
                               colID=colID,
                               ln=ln,
-                              confirm=0)
+                              confirm=1)
     
-    if title and body:
-        if confirm in [0, "0"]:
-            text ="""<b>Do you want to add the portalbox '%s'.</b>
+    if title and body and confirm in [1, "1"]:
+        res = add_pbx(title, body)
+        if res:
+            output += """<b><span class="info">Added the portalbox '%s'. To add the portalbox to the collection, go <a href="addexistingportalbox?colID=%s&amp;ln=%s&amp;pbxID=%s#5">here</a>.</span></b>""" % (title, colID, ln, res[0][0])
+        else:
+            output += """<b><span class="info">Cannot add the portalbox '%s'.</span></b>
             """ % title
-            output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/addportalbox#5.1" % weburl,
-                                       text=text,
-                                       button="Confirm",
-                                       colID=colID,
-                                       title=title,
-                                       body=body,                                     
-                                       ln=ln,
-                                       confirm=1)
-        elif confirm in [1, "1"]:
-            res = add_pbx(title, body)
-            if res:
-                output += """<b><span class="info">Added the portalbox '%s'. To add the portalbox to the collection, go <a href="addexistingportalbox?colID=%s&amp;ln=%s&amp;pbxID=%s#5">here</a>.</span></b>""" % (title, colID, ln, res[0][0])
-            else:
-                output += """<b><span class="info">Cannot add the portalbox '%s'.</span></b>
-                """ % title
-    elif confirm in [0, "0"]:
+    elif confirm not in [-1, "-1"]:
         output  += """<b><span class="info">All fields must be filled.</span></b>
         """
         
@@ -812,35 +752,21 @@ def perform_addexistingportalbox(colID, ln=cdslang, pbxID=-1, score=0, position=
                                    button="Add",
                                    colID=colID,
                                    ln=ln,
-                                   confirm=0)
+                                   confirm=1)
     else:
         output  = """No existing portalboxes to add, please create a new one.
         """
         
-    if pbxID > -1 and position and sel_ln:
+    if pbxID > -1 and position and sel_ln and confirm in [1, "1"]:
         pbxID = int(pbxID)
-        if confirm in [0, "0"]:
-            text = """<b>Do you want to add the portalbox '%s' to the collection '%s'.</b>
+        res = add_col_pbx(colID, pbxID, sel_ln, position, '')
+        if res:
+            output += """<b><span class="info">Added the portalbox '%s' to the collection '%s'.</span></b>
             """ % (pbx_dict[pbxID], col_dict[colID])
-            output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/addexistingportalbox#5.2" % weburl,
-                                       text=text,
-                                       button="Confirm",
-                                       colID=colID,
-                                       pbxID=pbxID,
-                                       sel_ln=sel_ln,                                     
-                                       score=score,
-                                       position=position,
-                                       ln=ln,
-                                       confirm=1)
-        elif confirm in [1, "1"]:
-            res = add_col_pbx(colID, pbxID, sel_ln, position, '')
-            if res:
-                output += """<b><span class="info">Added the portalbox '%s' to the collection '%s'.</span></b>
-                """ % (pbx_dict[pbxID], col_dict[colID])
-            else:
-                output += """<b><span class="info">Cannot add the portalbox '%s' to the collection '%s'.</span></b>
-                """ % (pbx_dict[pbxID], col_dict[colID])
-    elif pbxID > -1:
+        else:
+            output += """<b><span class="info">Cannot add the portalbox '%s' to the collection '%s'.</span></b>
+            """ % (pbx_dict[pbxID], col_dict[colID])
+    elif pbxID > -1 and confirm not in [-1, "-1"]:
         output  += """<b><span class="info">All fields must be filled.</span></b>
         """
 
@@ -895,7 +821,7 @@ def perform_deleteportalbox(colID, ln=cdslang, pbxID=-1, callback='yes', confirm
     if pbxID not in [-1,"-1"]:
         pbxID = int(pbxID)
         if confirm in [0, "0"]:
-            text = """<b>Do you want to delete the portalbox '%s'.</b>
+            text = """<b>Are you sure you want to delete the portalbox '%s'.</b>
             """ % pbx_dict[pbxID]
             output += createhiddenform(action="deleteportalbox#5.3",
                                        text=text,
@@ -912,7 +838,7 @@ def perform_deleteportalbox(colID, ln=cdslang, pbxID=-1, callback='yes', confirm
             else:
                 output += """<b><span class="info">Cannot delete the portalbox.</span></b>
                 """
-    elif confirm in [0, "0"]:
+    elif confirm not in [-1, "-1"]:
         output  += """<b><span class="info">Choose a portalbox to delete.</span></b>
         """
 
@@ -974,35 +900,19 @@ def perform_modifyportalbox(colID, ln=cdslang, pbxID=-1, score='', position='', 
                                    body=cgi.escape(body, 1),
                                    sel_ln=sel_ln,
                                    ln=ln,
-                                   confirm=1)
+                                   confirm=3)
 
-        if pbxID > -1 and score and position:
+        if pbxID > -1 and score and position and confirm in [3, "3"]:
             pbxID = int(pbxID)
-            if confirm in [1, "1"]:
-                text = """<b>Do you want to modify the portalbox '%s' in this collection.</b>
+            res = modify_pbx(colID, pbxID, sel_ln, score, position, '', '')
+            res2 = get_pbx()
+            pbx_dict = dict(map(lambda x: (x[0], x[1]), res2))
+            if res:
+                output += """<b><span class="info">Modified the presentation of the portalbox '%s' in this collection.</span></b><br><br>
                 """ % pbx_dict[pbxID]
-                output += createhiddenform(action="modifyportalbox#5.4",
-                                           text=text,
-                                           button="Confirm",
-                                           colID=colID,
-                                           pbxID=pbxID,
-                                           sel_ln=sel_ln,                                     
-                                           score=score,
-                                           position=position,
-                                           title=title,
-                                           body=cgi.escape(body, 1),
-                                           ln=ln,
-                                           confirm=3)
-            elif confirm in [3, "3"]:
-                res = modify_pbx(colID, pbxID, sel_ln, score, position, '', '')
-                res2 = get_pbx()
-                pbx_dict = dict(map(lambda x: (x[0], x[1]), res2))
-                if res:
-                    output += """<b><span class="info">Modified the presentation of the portalbox '%s' in this collection.</span></b><br><br>
-                    """ % pbx_dict[pbxID]
-                else:
-                    output += """<b><span class="info">Cannot modify the portalbox '%s'.</span></b><br><br>
-                    """ % pbx_dict[pbxID]
+            else:
+                output += """<b><span class="info">Cannot modify the portalbox '%s'.</span></b><br><br>
+                """ % pbx_dict[pbxID]
 
         output += """Portalbox (content) specific values (any changes appears everywhere the portalbox is used.)"""
         text = """
@@ -1024,35 +934,19 @@ def perform_modifyportalbox(colID, ln=cdslang, pbxID=-1, score='', position='', 
                                    score=score,
                                    position=position,
                                    ln=ln,
-                                   confirm=2)
+                                   confirm=4)
 
-        if pbxID > -1 and title:
+        if pbxID > -1 and title and confirm in [4, "4"]:
             pbxID = int(pbxID)
-            if confirm in [2, "2"]:
-                text = """<b>Do you want to modify the portalbox '%s' for all collections using it.</b>
+            res = modify_pbx(colID, pbxID, sel_ln, '', '', title, body)
+            res2 = get_pbx()
+            pbx_dict = dict(map(lambda x: (x[0], x[1]), res2))
+            if res:
+                output += """<b><span class="info">Modified the content of the portalbox '%s' for all occurences of it.</span></b>
                 """ % pbx_dict[pbxID]
-                output += createhiddenform(action="modifyportalbox#5.4",
-                                           text=text,
-                                           button="Confirm",
-                                           colID=colID,
-                                           pbxID=pbxID,
-                                           sel_ln=sel_ln,                                     
-                                           score=score,
-                                           position=position,
-                                           title=title,
-                                           body=cgi.escape(body, 1),
-                                           ln=ln,
-                                           confirm=4)
-            elif confirm in [4, "4"]:
-                res = modify_pbx(colID, pbxID, sel_ln, '', '', title, body)
-                res2 = get_pbx()
-                pbx_dict = dict(map(lambda x: (x[0], x[1]), res2))
-                if res:
-                    output += """<b><span class="info">Modified the content of the portalbox '%s' for all occurences of it.</span></b>
-                    """ % pbx_dict[pbxID]
-                else:
-                    output += """<b><span class="info">Cannot modify the portalbox '%s'.</span></b>
-                    """ % pbx_dict[pbxID]
+            else:
+                output += """<b><span class="info">Cannot modify the portalbox '%s'.</span></b>
+                """ % pbx_dict[pbxID]
     else:
         output  = """No portalbox to modify.
         """
@@ -1116,14 +1010,16 @@ def perform_showportalboxes(colID, ln=cdslang, callback='yes', content='', confi
                 res = get_col_pbx(colID, key, pos_key)
                 i = 0
                 for (pbxID, colID_pbx, tln, score, position, title, body) in res:
+                    move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
                     if i != 0:
-                        move = """<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s#5"><img border="0" src="%s/img/arrow_up.gif" title="Move portalbox up"></a>""" % (weburl, colID, ln, pbxID, res[i - 1][0], tln, weburl)
-                    else:
-                        move = "&nbsp;&nbsp;&nbsp;"
+                        move += """<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s&amp;rand=%s#5"><img border="0" src="%s/img/smallup.gif" title="Move portalbox up"></a>""" % (weburl, colID, ln, pbxID, res[i - 1][0], tln, random.randint(0, 1000), weburl)
+                    move += "</td></tr><tr><td>"
                     i += 1
                     if i != len(res):
-                        move += '<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s#5"><img border="0" src="%s/img/%s" title="Move portalbox down"></a>' % (weburl, colID, ln, pbxID, res[i][0], tln, weburl, ('arrow_down.gif'))
+                        move += """<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s&amp;rand=%s#5"><img border="0" src="%s/img/smalldown.gif" title="Move portalbox down"></a>""" % (weburl, colID, ln, pbxID, res[i][0], tln, random.randint(0, 1000), weburl)
+                    move += """</td></tr></table>"""
                     actions.append(["%s" % (i==1 and pos[position] or ''), "%s" % (i==1 and lang[tln] or ''), move, "%s" % title])
+                    
                     for col in [(('Modify', 'modifyportalbox'), ('Remove', 'removeportalbox'),)]:
                         actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;pbxID=%s&amp;sel_ln=%s#5.4">%s</a>' % (weburl, col[0][1], colID, ln, pbxID, tln, col[0][0]))
                         for (str, function) in col[1:]:
@@ -1350,30 +1246,17 @@ def perform_addexistingfield(colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', c
                                colID=colID,
                                fmeth=fmeth,
                                ln=ln,
-                               confirm=0)
+                               confirm=1)
             
-    if fldID not in [-1, "-1"]:
+    if fldID not in [-1, "-1"] and confirm in [1, "1"]:
         fldID = int(fldID)
-        if confirm in [0, "0"]:
-            text = """<b>Do you want to add the field '%s' %s to the collection '%s'.</b>
+        if ares:
+            output += """<b><span class="info">Added the field '%s' %s to the collection '%s'.</span></b>
             """ % (fld_dict[fldID], (fldvID != -1 and "with fieldvalue '%s'" % fldv_dict[fldvID] or ''), col_dict[colID])
-            output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/addexistingfield#6.2" % weburl,
-                                       text=text,
-                                       button="Confirm",
-                                       colID=colID,
-                                       fldID=fldID,
-                                       fldvID=fldvID,
-                                       fmeth=fmeth,
-                                       ln=ln,
-                                       confirm=1)
-        elif confirm in [1, "1"]:
-            if ares:
-                output += """<b><span class="info">Added the field '%s' %s to the collection '%s'.</span></b>
-                """ % (fld_dict[fldID], (fldvID != -1 and "with fieldvalue '%s'" % fldv_dict[fldvID] or ''), col_dict[colID])
-            else:
-                output += """<b><span class="info">Cannot add the field '%s' %s to the collection '%s'.</span></b>
-                """ % (fld_dict[fldID], (fldvID != -1 and "with fieldvalue '%s'" % fldv_dict[fldvID] or ''), col_dict[colID])
-    elif fldID in [-1, "-1"] and confirm in [0, "0"]:
+        else:
+            output += """<b><span class="info">Cannot add the field '%s' %s to the collection '%s'.</span></b>
+            """ % (fld_dict[fldID], (fldvID != -1 and "with fieldvalue '%s'" % fldv_dict[fldvID] or ''), col_dict[colID])
+    elif fldID in [-1, "-1"] and confirm not in [-1, "-1"]:
         output  += """<b><span class="info">Select a field.</span></b>
         """
 
@@ -1421,14 +1304,15 @@ def perform_showsortoptions(colID, ln=cdslang, callback='yes', content='', confi
         i = 0
                     
         for (fldID, fldvID, stype, score, score_fieldvalue) in res:
+            move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
             if i != 0:
-                move = """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=soo#8"><img border="0" src="%s/img/arrow_up.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, res[i - 1][0],weburl)
-            else:
-                move = "&nbsp;&nbsp;&nbsp;"
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=soo&amp;rand=%s#8"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, res[i - 1][0], random.randint(0, 1000), weburl)
+            move += "</td></tr><tr><td>"
             i += 1
             if i != len(res):
-                move += '<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s#8"><img border="0" src="%s/img/%s" title="Move down"></a>' % (weburl, colID, ln, fldID, res[i][0], weburl, ('arrow_down.gif'))
-
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=soo&amp;rand=%s#8"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>""" % (weburl, colID, ln, fldID, res[i][0], random.randint(0, 1000), weburl)
+            move += """</td></tr></table>"""
+            
             actions.append([move, fld_dict[int(fldID)]])
                     
             for col in [(('Remove', 'removefield'),)]:
@@ -1480,13 +1364,14 @@ def perform_showsearchfields(colID, ln=cdslang, callback='yes', content='', conf
         i = 0
                     
         for (fldID, fldvID, stype, score, score_fieldvalue) in res:
+            move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
             if i != 0:
-                move = """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=sew#6"><img border="0" src="%s/img/arrow_up.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, res[i - 1][0],weburl)
-            else:
-                move = "&nbsp;&nbsp;&nbsp;"
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=sew&amp;rand=%s#6"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, res[i - 1][0], random.randint(0, 1000), weburl)
+            move += "</td></tr><tr><td>"
             i += 1
             if i != len(res):
-                move += '<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=sew#6"><img border="0" src="%s/img/%s" title="Move down"></a>' % (weburl, colID, ln, fldID, res[i][0], weburl, ('arrow_down.gif'))
+                move += '<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=sew&amp;rand=%s#6"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>' % (weburl, colID, ln, fldID, res[i][0], random.randint(0, 1000), weburl)
+            move += """</td></tr></table>"""
 
             actions.append([move, fld_dict[int(fldID)]])
                     
@@ -1539,23 +1424,29 @@ def perform_showsearchoptions(colID, ln=cdslang, callback='yes', content='', con
         i = 0
         for (id) in fld_distinct:
             col_fld = get_col_fld(colID, 'seo', id)
+
+            move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
             if i != 0:
-                move = """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=seo#7"><img border="0" src="%s/img/arrow_up.gif" title="Move up"></a>""" % (weburl, colID, ln, id[0], fld_distinct[i - 1][0],weburl)
-            else:
-                move = "&nbsp;&nbsp;&nbsp;"
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=seo&amp;rand=%s#7"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, id[0], fld_distinct[i - 1][0], random.randint(0, 1000), weburl)
+            move += "</td></tr><tr><td>"
             i += 1
             if i != len(fld_distinct):
-                move += '<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=seo#7"><img border="0" src="%s/img/%s" title="Move down"></a>' % (weburl, colID, ln, id[0], fld_distinct[i][0], weburl, ('arrow_down.gif'))
+                move += '<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=seo&amp;rand=%s#7"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>' % (weburl, colID, ln, id[0], fld_distinct[i][0], random.randint(0, 1000), weburl)
+            move += """</td></tr></table>"""
+
             j = 0
             for (fldID, fldvID, stype, score, score_fieldvalue) in col_fld:
                 fieldvalue = get_fld_value(fldvID)
+
+                move2 = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
                 if j != 0:
-                    move2 = """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s#7"><img border="0" src="%s/img/arrow_up.gif" title="Move up"></a>""" % (weburl, colID, ln, id[0], fldvID, col_fld[j - 1][1], weburl)
-                else:
-                    move2 = "&nbsp;&nbsp;&nbsp;"
+                    move2 += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, id[0], fldvID, col_fld[j - 1][1], random.randint(0, 1000), weburl)
+                move2 += "</td></tr><tr><td>"
                 j += 1
                 if j != len(col_fld):
-                    move2 += '<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s#7"><img border="0" src="%s/img/%s" title="Move down"></a>' % (weburl, colID, ln, id[0], fldvID, col_fld[j][1], weburl, ('arrow_down.gif'))
+                    move2 += '<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>' % (weburl, colID, ln, id[0], fldvID, col_fld[j][1], random.randint(0, 1000), weburl)    
+                move2 += """</td></tr></table>"""
+   
                 if fieldvalue[0][1] != fieldvalue[0][2]:
                     actions.append([move, "%s" % (j==1 and fld_dict[int(fldID)] or '&nbsp'), move2, "%s - %s" % (fieldvalue[0][1],fieldvalue[0][2])])
                 else:
@@ -1596,10 +1487,7 @@ def perform_showoutputformats(colID, ln=cdslang, callback='yes', content='', con
      <dd><a href="addexistingoutputformat?colID=%s&amp;ln=%s#10.2">Add existing output format to collection</a></dd>
     </dl>
     """  % (colID, ln)
-    #<dd><a href="addoutputformat?colID=%s&amp;ln=%s#10.1">Create new output format</a></dd>
-     #<dd><a href="deleteoutputformat?colID=%s&amp;ln=%s#10.3">Delete an unused output format</a></dd>
-     #<dd><a href="modifyoutputformat?colID=%s&amp;ln=%s#10.4">Modify the translations of an output format</a></dd>
-    
+
     header = ['', 'Code', 'Output format', 'Actions']
     actions = []
     
@@ -1609,13 +1497,16 @@ def perform_showoutputformats(colID, ln=cdslang, callback='yes', content='', con
     i = 0
     if len(col_fmt) > 0:
         for (id_format, colID_fld, code, score) in col_fmt:
+            move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
             if i != 0:
-                move = """<a href="%s/admin/websearch/websearchadmin.py/switchfmtscore?colID=%s&amp;ln=%s&amp;type=format&amp;id_1=%s&amp;id_2=%s#10"><img border="0" src="%s/img/arrow_up.gif" title="Move format up"></a>""" % (weburl, colID, ln, id_format, col_fmt[i - 1][0], weburl)
-            else:
-                move = "&nbsp;&nbsp;&nbsp;"
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfmtscore?colID=%s&amp;ln=%s&amp;type=format&amp;id_1=%s&amp;id_2=%s&amp;rand=%s#10"><img border="0" src="%s/img/smallup.gif" title="Move format up"></a>""" % (weburl, colID, ln, id_format, col_fmt[i - 1][0], random.randint(0, 1000), weburl)
+            move += "</td></tr><tr><td>"
             i += 1
             if i != len(col_fmt):
-                move += '<a href="%s/admin/websearch/websearchadmin.py/switchfmtscore?colID=%s&amp;ln=%s&amp;type=format&amp;id_1=%s&amp;id_2=%s#10"><img border="0" src="%s/img/%s" title="Move format down"></a>' % (weburl, colID, ln, id_format, col_fmt[i][0], weburl, ('arrow_down.gif'))
+                move += '<a href="%s/admin/websearch/websearchadmin.py/switchfmtscore?colID=%s&amp;ln=%s&amp;type=format&amp;id_1=%s&amp;id_2=%s&amp;rand=%s#10"><img border="0" src="%s/img/smalldown.gif" title="Move format down"></a>' % (weburl, colID, ln, id_format, col_fmt[i][0], random.randint(0, 1000), weburl)
+            move += """</td></tr></table>"""
+
+
             actions.append([move, code, fmt_dict[int(id_format)]])
             for col in [(('Remove', 'removeoutputformat'),)]:
                 actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fmtID=%s#10">%s</a>' % (weburl, col[0][1], colID, ln, id_format, col[0][0]))
@@ -1634,59 +1525,6 @@ def perform_showoutputformats(colID, ln=cdslang, callback='yes', content='', con
         return perform_editcollection(colID, ln, "perform_showoutputformats", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
-
-def perform_addoutputformat(colID, ln=cdslang, code='', name='', callback='yes', confirm=-1):
-    """form to add a new outputformat
-    colID - the collection the format should be added to
-    code - short code for the format, like xml, html
-    name - the default name in the default cdsware language."""
-
-    colID = int(colID)
-    subtitle = """<a name="10.1"></a>Create new output format"""
-    text = """
-    <span class="adminlabel">Code</span>
-    <input class="admin_wvar" type="text" name="code" maxlength="6" value="%s" /><br>
-    <span class="adminlabel">Name</span>
-    <input class="admin_wvar" type="text" name="name" value="%s" /><br>
-    """ % (code, name)
-    output = createhiddenform(action="addoutputformat#10.1",
-                              text=text,
-                              button="Add",
-                              colID=colID,
-                              ln=ln,
-                              confirm=0)
-
-    if code and name:
-        if confirm in [0, "0"]:
-            text ="""<b>Do you want to add the output format '%s'.</b>
-            """ % name
-            output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/addoutputformat#10.1" % weburl,
-                                       text=text,
-                                       button="Confirm",
-                                       colID=colID,
-                                       code=code,
-                                       name=name,                                     
-                                       ln=ln,
-                                       confirm=1)
-        elif confirm in [1, "1"]:
-            res = add_fmt(code, name, get_fmt_nametypes()[0][0])
-            if res:
-                output += """<b><span class="info">Added the output format '%s'. To add the output format to the collection, go <a href="addexistingoutputformat?colID=%s&amp;ln=%s&amp;fmtID=%s#10">here</a>.</span></b>
-                """ % (name, colID, ln, res[0][0])
-            else:
-                output += """<b><span class="info">Cannot add the output format '%s'.</span></b>
-                """ % name
-    elif confirm in [0, "0"]:
-        output  += """<b><span class="info">All fields must be filled.</span></b>
-        """
-        
-                
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
-
-    return perform_showoutputformats(colID, ln, content=addadminbox(subtitle, body))
 
 def perform_addexistingoutputformat(colID, ln=cdslang, fmtID=-1, callback='yes', confirm=-1):
     """form to add an existing output format to a collection.
@@ -1722,31 +1560,20 @@ def perform_addexistingoutputformat(colID, ln=cdslang, fmtID=-1, callback='yes',
                                    button="Add",
                                    colID=colID,
                                    ln=ln,
-                                   confirm=0)
+                                   confirm=1)
     else:
         output  = """No existing output formats to add, please create a new one.
         """
 
-    if fmtID not in [-1, "-1"]:
+    if fmtID not in [-1, "-1"] and confirm in [1, "1"]:
         fmtID = int(fmtID)
-        if confirm in [0, "0"]:
-            text = """<b>Do you want to add the output format '%s' to the collection '%s'.</b>
+        if ares:
+            output += """<b><span class="info">Added the output format '%s' to the collection '%s'.</span></b>
             """ % (fmt_dict[fmtID], col_dict[colID])
-            output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/addexistingoutputformat#10.2" % weburl,
-                                       text=text,
-                                       button="Confirm",
-                                       colID=colID,
-                                       fmtID=fmtID,
-                                       ln=ln,
-                                       confirm=1)
-        elif confirm in [1, "1"]:
-            if ares:
-                output += """<b><span class="info">Added the output format '%s' to the collection '%s'.</span></b>
-                """ % (fmt_dict[fmtID], col_dict[colID])
-            else:
-                output += """<b><span class="info">Cannot add the output format '%s' to the collection '%s'.</span></b>
-                """ % (fmt_dict[fmtID], col_dict[colID])
-    elif fmtID in [-1, "-1"] and confirm in [0, "0"]:
+        else:
+            output += """<b><span class="info">Cannot add the output format '%s' to the collection '%s'.</span></b>
+            """ % (fmt_dict[fmtID], col_dict[colID])
+    elif fmtID in [-1, "-1"] and confirm not in [-1, "-1"]:
         output  += """<b><span class="info">Please select output format.</span></b>
         """
     try:
@@ -1820,7 +1647,7 @@ def perform_deleteoutputformat(colID, ln=cdslang, fmtID=-1, callback='yes', conf
             else:
                 output += """<b><span class="info">Cannot delete the output format.</span></b>
                 """
-    elif confirm in [0, "0"]:
+    elif confirm not in [-1, "-1"]:
         output  += """<b><span class="info">Choose a output format to delete.</span></b>
         """
 
@@ -1872,129 +1699,7 @@ def perform_removeoutputformat(colID, ln=cdslang, fmtID='', callback='yes', conf
 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_showoutputformats(colID, ln, content=output)
-
-def perform_modifyoutputformat(colID, ln=cdslang, fmtID=-1, sel_type='', trans=[], confirm=-1):
-    """Modify the translations of am output format
-    fmtID - format id
-    sel_type - nametype to change
-    trans - a list of the names in the same order as the languages."""
-    
-    output = ''
-    subtitle = 'Modify translations for output format'
-    cdslangs = get_languages()
-        
-    if confirm in ["2", 2] and fmtID:
-        finresult = modify_translations(fmtID, cdslangs, sel_type, trans, "format")
-            
-    res = get_current_name('', ln, get_fmt_nametypes()[0][0], "format")
-    fmt_dict = dict(res)
-
-    text  = """
-    <span class="adminlabel">Output formats</span>
-    <select name="fmtID" class="admin_w200">
-    <option value ="-1">- select output format -</output>
-    """
-    for (key, value) in res:
-        text += """<option value="%s" %s>%s""" % (key, key == int(fmtID) and 'selected="selected"' or '', value)
-        text += "</option>"
-    text += """</select>"""
-
-    output = createhiddenform(action="modifyoutputformat#10.4",
-                              text=text,
-                              button="Select",
-                              colID=colID,
-                              ln=ln,
-                              confirm=0)
-
-    
-    if fmtID not in [-1, "-1"] and fmt_dict.has_key(int(fmtID)):
-        fmtID = int(fmtID)
-        subtitle = """<a name="10.4">Modify translations for output format '%s'</a><br>""" % fmt_dict[fmtID]
-        
-        if type(trans) is str:
-            trans = [trans]
-        if sel_type == '':
-            sel_type = get_fmt_nametypes()[0][0]
-            
-        header = ['Language', 'Translation']
-        actions = []
-                        
-        text  = """
-        <span class="adminlabel">Name type</span>
-        <select name="sel_type" class="admin_w200">
-        """
-        
-        types = get_fmt_nametypes()
-        if len(types) > 1:
-            for (key, value) in types:
-                text += """<option value="%s" %s>%s""" % (key, key == sel_type and 'selected="selected"' or '', value)
-                trans_names = get_name(fmtID, ln, key, "format")
-                if trans_names and trans_names[0][0]:
-                    text += ": %s" % trans_names[0][0]
-                text += "</option>"
-            text += """</select>"""
-        
-            output += createhiddenform(action="modifyoutputformat#10.4",
-                                       text=text,
-                                       button="Select",
-                                       colID=colID,
-                                       fmtID=fmtID,
-                                       ln=ln,
-                                       confirm=0)
-
-        if confirm in [0, "0"]:
-            trans = []
-            for key, value in cdslangs:
-                try:
-                    trans_names = get_name(fmtID, key, sel_type, "format")
-                    trans.append(trans_names[0][0])
-                except StandardError, e:
-                    trans.append('')
-
-        for nr in range(0,len(cdslangs)):
-            actions.append(["%s %s" % (cdslangs[nr][1], (cdslangs[nr][0]==cdslang and '<small>(def)</small>' or ''))])
-            actions[-1].append('<input type="text" name="trans" size="30" value="%s"/>' % trans[nr])
-        
-        text = tupletotable(header=header, tuple=actions)
-        output += createhiddenform(action="modifyoutputformat#10.4",
-                                   text=text,
-                                   button="Modify",
-                                   colID=colID,
-                                   fmtID=fmtID,
-                                   sel_type=sel_type,
-                                   ln=ln,
-                                   confirm=1)
-
-        if sel_type and len(trans):
-            if confirm in ["1", 1]:
-                text = """<b>Please confirm modification of translations for collection '%s'.</b>""" % (fmt_dict[fmtID])
-                output += createhiddenform(action="modifyoutputformat#10.4",
-                                           text=text,
-                                           button="Confirm",
-                                           colID=colID,
-                                           fmtID=fmtID,
-                                           sel_type=sel_type,
-                                           trans=trans,
-                                           ln=ln,
-                                           
-                                           confirm=2)
-
-            elif confirm in ["2", 2]:
-                if finresult:
-                    output += """<b><span class="info">Translations modified for output format '%s'.</span></b>""" % (fmt_dict[fmtID])
-                else:
-                    output += """<b><span class="info">Sorry, could not modify translations for output format '%s'.</span></b>""" % (fmt_dict[fmtID])
-    elif fmtID in [-1, "-1"] and confirm in ["0", 0]:
-        output += """<b><span class="info">Please chose a output format.</span></b>""" 
-        
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
-        
-    output = "<br>" + addadminbox(subtitle, body)
-    return perform_showoutputformats(colID, ln, content=output)
-        
+ 
 def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     """The index method, calling methods to show the collection tree, create new collections and add collections to tree.
     """
@@ -2044,9 +1749,7 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
         fin_output += content
     else:
         fin_output += perform_modifycollectiontree(colID=colID, ln=ln, callback='')
-    fin_output += """
-    <br>
-    """
+    fin_output += "<br>"
 
     return fin_output
 
@@ -2092,30 +1795,22 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
         
         if i > 0 and tree[i][1] == 0:
             tables = tables + 1
-            text += """</td><td></td><td></td><td></td><td><table border="0" cellspacing="0" cellpadding="0"><tr><td>
+            text += """</td><td></td><td></td><td><table border="0" cellspacing="0" cellpadding="0"><tr><td>
             """
 
         if i == 0:
             tstack.append((id_son, dad, 1))
         else:
             tstack.append((id_son, dad, tables))
-       
+        
+        text += """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
         if up == 1 and edit:
-            text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_up=%s&amp;rtype=%s#tree"><img border="0" src="%s/img/arrow_up.gif" title="Move collection up"></a>""" % (weburl, colID, ln, i, rtype, weburl)
-        elif i != 0:
-            text += """<img border="0" src="%s/img/white_field.gif">
-            """ % weburl
-
-        text += """</td><td>
-        """
-
+            text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_up=%s&amp;rtype=%s#tree"><img border="0" src="%s/img/smallup.gif" title="Move collection up"></a>""" % (weburl, colID, ln, i, rtype, weburl)
+        text += "</td></tr><tr><td>"
+        
         if down == 1 and edit:
-            text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_down=%s&amp;rtype=%s#tree"><img border="0" src="%s/img/arrow_down.gif" title="Move collection down"></a>""" % (weburl, colID, ln, i, rtype, weburl)
-        elif i != 0:
-            text += """<img border="0" src="%s/img/white_field.gif">
-            """ % weburl 
-        text += """</td><td>
-        """
+            text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_down=%s&amp;rtype=%s#tree"><img border="0" src="%s/img/smalldown.gif" title="Move collection down"></a>""" % (weburl, colID, ln, i, rtype, weburl)
+        text += "</td></tr></table></td><td>"
 
         if edit:
             if move_from and move_to:
@@ -2178,6 +1873,63 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
         """
     return text
 
+def perform_deletecollection(colID, ln=cdslang, confirm=-1, callback='yes'):
+    """form to delete a collection
+    colID - id of collection
+    """
+    
+    subtitle =''
+    output  = """
+    <span class="warning">
+    <strong>
+    <dl>
+     <dt>WARNING:</dt>
+     <dd>When deleting a collection, you also deletes all data related to the collection like translations, relations to other collections and information about which rank methods to use.
+     <br>For more information, please go to the <a title="See guide" href="%s/admin/websearch/guide.html">WebSearch guide</a> and read the section regarding deleting a collection.</dd>
+    </dl>
+    </strong>
+    </span>
+    """ % weburl
+
+    col_dict = dict(get_current_name('', ln, get_col_nametypes()[0][0], "collection"))
+    if colID and col_dict.has_key(int(colID)):
+        colID = int(colID)
+        subtitle = """<a name="4">4. Delete collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.4">?</a>]</small>""" % (col_dict[colID], weburl)
+        res = run_sql("SELECT * from collection_collection WHERE id_dad=%s" % colID)
+        res2 = run_sql("SELECT * from collection_collection WHERE id_son=%s" % colID)
+                
+        if not res and not res2:
+            if confirm in ["-1", -1]:
+                text = """Do you want to delete this collection."""
+                output += createhiddenform(action="deletecollection#4",
+                                           text=text,
+                                           colID=colID,
+                                           button="Delete",
+                                           confirm=0)
+            elif confirm in ["0", 0]:
+                text = """Are you sure you want to delete this collection."""
+                output += createhiddenform(action="deletecollection#4",
+                                           text=text,
+                                           colID=colID,
+                                           button="Confirm",
+                                           confirm=1)
+            elif confirm in ["1", 1]:
+                result = delete_col(colID)
+                if not result:
+                    raise StandardException
+        else:
+            output = """<b><span class="info">Can not delete a collection that is a part of the collection tree, remove collection from the tree and try again.</span></b>"""
+            
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
+
+    if callback:
+        return perform_editcollection(colID, ln, "perform_deletecollection", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+    
 def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
     """form to modify a collection. this method is calling other methods which again is calling this and sending back the output of the method.
     if callback, the method will call perform_editcollection, if not, it will just return its output.
@@ -2268,63 +2020,6 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
     
     return addadminbox("Overview of edit options for collection '%s'" % col_dict[colID],  [fin_output])
 
-def perform_deletecollection(colID, ln=cdslang, confirm=-1, callback='yes'):
-    """form to delete a collection
-    colID - id of collection
-    """
-    
-    subtitle =''
-    output  = """
-    <span class="warning">
-    <strong>
-    <dl>
-     <dt>WARNING:</dt>
-     <dd>When deleting a collection, you also deletes all data related to the collection like translations, relations to other collections and information about which rank methods to use.
-     <br>For more information, please go to the <a title="See guide" href="%s/admin/websearch/guide.html">WebSearch guide</a> and read the section regarding deleting a collection.</dd>
-    </dl>
-    </strong>
-    </span>
-    """ % weburl
-
-    col_dict = dict(get_current_name('', ln, get_col_nametypes()[0][0], "collection"))
-    if colID and col_dict.has_key(int(colID)):
-        colID = int(colID)
-        subtitle = """<a name="4">4. Delete collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.4">?</a>]</small>""" % (col_dict[colID], weburl)
-        res = run_sql("SELECT * from collection_collection WHERE id_dad=%s" % colID)
-        res2 = run_sql("SELECT * from collection_collection WHERE id_son=%s" % colID)
-                
-        if not res and not res2:
-            if confirm in ["-1", -1]:
-                text = """Do you want to delete this collection."""
-                output += createhiddenform(action="deletecollection#4",
-                                           text=text,
-                                           colID=colID,
-                                           button="Confirm",
-                                           confirm=0)
-            elif confirm in ["0", 0]:
-                text = """Are you sure you want to delete this collection."""
-                output += createhiddenform(action="deletecollection#4",
-                                           text=text,
-                                           colID=colID,
-                                           button="Confirm",
-                                           confirm=1)
-            elif confirm in ["1", 1]:
-                result = delete_col(colID)
-                if not result:
-                    raise StandardException
-        else:
-            output = """<b><span class="info">Can not delete a collection that is a part of the collection tree, remove collection from the tree and try again.</span></b>"""
-            
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
-
-    if callback:
-        return perform_editcollection(colID, ln, "perform_deletecollection", addadminbox(subtitle, body))
-    else:
-        return addadminbox(subtitle, body)
-        
 def get_col_tree(colID, rtype=''):
     """Returns a presentation of the tree as a list.
     colID - startpoint for the tree

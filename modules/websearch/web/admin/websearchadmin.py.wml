@@ -153,6 +153,26 @@ def modifydbquery(req, colID, ln=cdslang, dbquery='', confirm=-1):
     else:
         return auth_failed(uid, navtrail_previous_links)
 
+def showtree(req, colID, ln=cdslang):
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
+    
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+
+    if not wsc.check_user(uid, 'cfgwebsearch'):
+        return page(title="Edit Collection",
+                    body=wsc.perform_showtree(colID=colID,
+                                              ln=ln),
+                    uid=uid,
+                    language=ln,
+                    urlargs=req.args,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)   
+    else:
+        return auth_failed(uid, navtrail_previous_links)
+    
 def modifyrestricted(req, colID, ln=cdslang, rest='', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Edit Collection Tree</a> """ % (weburl)
     
