@@ -18,6 +18,8 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+<protect># -*- coding: utf-8 -*-</protect>
+
 """CDSware Search Engine in mod_python."""
 
 __lastupdated__ = """<: print `date +"%d %b %Y %H:%M:%S %Z"`; :>"""
@@ -969,6 +971,24 @@ def wash_colls(cc, c, split_colls=0):
     colls_out = map(lambda x, colls_out=colls_out:colls_out[x-1], colls_out_nondups)
 
     return (cc, colls_out_for_display, colls_out)
+
+def strip_accents(x):
+    """Strip accents in the input phrase X by replacing UTF-8 accented characters 
+    by their unaccented cousins.  For exmple, replace é by e."""
+    y = unicode(x, "utf-8")
+    # asciify lowercase:
+    y = sre.sub(unicode(r"(?u)[áàäâã]", "utf-8"), "a", y)
+    y = sre.sub(unicode(r"(?u)[éèëê]", "utf-8"), "e", y)
+    y = sre.sub(unicode(r"(?u)[íìïî]", "utf-8"), "i", y)
+    y = sre.sub(unicode(r"(?u)[óòöôõ]", "utf-8"), "o", y)
+    y = sre.sub(unicode(r"(?u)[úùüû]", "utf-8"), "u", y)
+    # asciify uppercase:
+    y = sre.sub(unicode(r"(?u)[ÁÀÄÂÃ]", "utf-8"), "A", y)
+    y = sre.sub(unicode(r"(?u)[ÉÈËÊ]", "utf-8"), "E", y)
+    y = sre.sub(unicode(r"(?u)[ÍÌÏÎ]", "utf-8"), "I", y)
+    y = sre.sub(unicode(r"(?u)[ÓÒÖÔÕ]", "utf-8"), "O", y)
+    y = sre.sub(unicode(r"(?u)[ÚÙÜÛ]", "utf-8"), "U", y)
+    return y.encode("utf-8")
  
 def wash_pattern(p):
     """Wash pattern passed by URL. Check for sanity of the wildcard by
@@ -976,6 +996,8 @@ def wash_pattern(p):
     (1-3 letters).  TODO: instead of this approximative treatment, it
     will be much better to introduce a temporal limit, e.g. to kill a
     query if it does not finish in 10 seconds."""
+    # strip accents:
+    p = strip_accents(p)
     # add leading/trailing whitespace for the two following wildcard-sanity checking regexps:
     p = " " + p + " " 
     # get rid of wildcards at the beginning of words:
