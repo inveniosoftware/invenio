@@ -22,9 +22,9 @@
 
 #include "cdspage.wml" \
     title="Behaviours" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/bibformat/>BibFormat Admin</a>" \ 
     navbar_name="admin" \
-    navbar_select="BEH_display" \
-    cdspageboxlefttopadd="<protect><?displayLoginMenu('admin');?> </protect>"
+    navbar_select="BEH_display"
 
 <?
   include("security.inc.php");
@@ -79,7 +79,7 @@
   list($type, $doc)=mysql_fetch_row($qh);
 
 ?>  
-  <table width="100%" bgcolor="#CCCCCC" border="1">
+  <table bgcolor="#CCCCCC" border="1">
     <tr bgcolor="#0000FF" align="center">
       <td colspan="2"><font size="6" color="white">Details of output type '<?echo $otype;?>'</font></td>
     </tr>
@@ -93,7 +93,7 @@
     </tr>
   </table>
   
-  <table width="100%" cellspacing="0" bgcolor="#CCCCCC" cellpadding="4" border="0">
+  <table cellspacing="0" bgcolor="#CCCCCC" cellpadding="4" border="0">
     <tr align="center">
       <td><a href="JavaScript:openwindowlink('BEH_COND_add.php?otype=<? print urlencode($otype);?>', 'BEHRADDC<? echo $linktype;?>')">[Add condition]</a></td>
       <td><a href="BEH_OTYPE_edit.php?otype=<?print urlencode($otype);?>">[Modify]</a></td>
@@ -111,7 +111,7 @@
   if(mysql_num_rows($qh)>=1)
   {
 ?>
-  <table width="100%" bgcolor="#CCCCCC" border="1">
+  <table bgcolor="#CCCCCC" border="1">
     <tr bgcolor="#0000FF" align="center">
       <td colspan="4"><font color="white"><b>CONDITIONS</b></font></td>
     </tr>
@@ -137,7 +137,7 @@
 ?>
     <tr bgcolor="#FFFFFF">
       <td bgcolor="#33CCFF"><font size="2"><b>Action (<?echo $aorder;?>)</b></font></td>
-      <td width="100%"><?echo text2HTML($action);?></td>
+      <td><?echo text2HTML($action);?></td>
       <td><font size="2"><a href="JavaScript:openwindowlink('BEH_ACTION_edit.php?otype=<?echo urlencode($otype);?>&eorder=<?echo $eorder;?>&aorder=<?echo $aorder;?>', 'BEHCAE<? echo "$otype$eorder$aorder";?>')">[Modify]</a></td>
       <td><font size="2"><a href="BEH_ACTION_del.php?otype=<?echo urlencode($otype);?>&eorder=<?echo $eorder;?>&aorder=<?echo $aorder;?>">[Delete]</a></td>
     </tr>

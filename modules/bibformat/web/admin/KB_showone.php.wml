@@ -77,7 +77,7 @@
   print "<td bgcolor=\"$cImpCells\" colspan=\"3\" align=\"center\">ADD <b>VALUE</b>: 
 	      <i>Key</i> <input type=\"text\" name=\"key\">
 	      <i>Value</i> <input type=\"text\" name=\"value\">
-	      <input type=\"submit\" value=\"Add value\">
+	      <input class=\"formbutton\" type=\"submit\" value=\"Add value\">
 	  </td>";
   print "</tr>";
   while($row=mysql_fetch_array($res))

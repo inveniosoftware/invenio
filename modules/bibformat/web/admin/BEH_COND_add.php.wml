@@ -23,8 +23,7 @@
 #include "cdspage.wml" \
     title="Behaviours" \
     navbar_name="admin" \
-    navbar_select="BEH_display" \
-    cdspageboxlefttopadd="<protect><?displayLoginMenu('admin');?> </protect>"
+    navbar_select="BEH_display"
 
 <?
   include("security.inc.php");
@@ -84,7 +83,7 @@
       <td><textarea name="code" cols="80" rows="9"></textarea></td>
     </tr>
     <tr>
-      <td colspan="2" align="center"><input type="submit"></td>
+      <td colspan="2" align="center"><input class="formbutton" type="submit"></td>
     </tr>
   </table>
   <input type="hidden" name="process" value="oo">

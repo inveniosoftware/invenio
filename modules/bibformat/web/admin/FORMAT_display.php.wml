@@ -22,9 +22,9 @@
 
 #include "cdspage.wml" \
     title="Formats" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/bibformat/>BibFormat Admin</a>" \ 
     navbar_name="admin" \
-    navbar_select="FORMAT_display"  \
-    cdspageboxlefttopadd="<protect><?displayLoginMenu('admin');?> </protect>"
+    navbar_select="FORMAT_display"
 
 <?
   include("security.inc.php");
@@ -80,7 +80,7 @@ should be printed, etc.
   $qry_format="select name, doc from flxFORMATS order by name";
   $res_format=mysql_query( $qry_format );
 
-  print '<table width="100%" cellpadding="4" cellspacing="0">';
+  print '<table cellpadding="4" cellspacing="0">';
   $color="";
   while($format=mysql_fetch_array($res_format))
   {
@@ -91,10 +91,10 @@ should be printed, etc.
     else
       $color=$cCells;
     $doc=str_replace("\n", "<br>", $doc);
-    $doc=str_replace(" ", "&nbsp;", $doc);
+    #$doc=str_replace(" ", "&nbsp;", $doc);
     print "<tr bgcolor=\"$color\">";
     print "<td><b>$name</b></td>";
-    print "<td width=\"100%\"><font size=\"2\">$doc&nbsp;</font></td>";
+    print "<td><font size=\"2\">$doc&nbsp;</font></td>";
     print "<td><a href=\"JavaScript:openwindowlink( 'FORMAT_showone.php?fname=".urlencode($name)."', 'FE' )\"><font size=\"2\">[Code]</font></a></td>";
     print "<td><a href=\"JavaScript:openwindowlink( 'FORMAT_edit.php?fname=".urlencode($name)."', 'FM' )\"><font size=\"2\">[Modify]</font></a></td>";
     print "<td><a href=\"FORMAT_del.php?fname=".urlencode($name)."\"><font size=\"2\">[Delete]</font></a></td>";
@@ -111,9 +111,9 @@ should be printed, etc.
 ?>
   <hr><br>
   <form action="FORMAT_add.php" method="POST">
-    <table width="70%" align="center">
+    <table>
       <tr>
-        <td bgcolor="#000000" width="100%" align="center" colspan="2">
+        <td bgcolor="#000000" colspan="2">
           <font color="#FFFFFF">Add new FORMAT</font>
         </td>
       </tr>
@@ -130,7 +130,7 @@ should be printed, etc.
         <td><textarea name="code" cols="65" rows="20"></textarea><td>
       </tr>
       <tr>
-	<td align="center" colspan="2"><input type="submit" value="Add"></td>
+	<td align="center" colspan="2"><input class="formbutton" type="submit" value="Add"></td>
       </tr>
     </table>
   </form>

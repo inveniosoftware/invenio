@@ -22,9 +22,9 @@
 
 #include "cdspage.wml" \
     title="Knowledge Bases (KBs)" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/bibformat/>BibFormat Admin</a>" \ 
     navbar_name="admin" \
-    navbar_select="KB_display"  \
-    cdspageboxlefttopadd="<protect><?displayLoginMenu('admin');?> </protect>"
+    navbar_select="KB_display"
 
 <?
   include("security.inc.php");
@@ -75,7 +75,7 @@ function openwindowlink( addr, name )
 
   $qry="select kb_name, kb_table, doc from flxKBS order by kb_name";
   $res=mysql_query( $qry, $db );
-  print '<table bgcolor="'.$cBorder.'" border="1" width="100%">';
+  print '<table bgcolor="'.$cBorder.'" border="1">';
   print "<tr bgcolor=\"$cHeaders\">";
   print "<td align=\"center\"><b>KB name</b></td>";
   print "<td align=\"center\"><b>Table name</b></td>";
@@ -86,13 +86,13 @@ function openwindowlink( addr, name )
   {
     list($kb_name, $kb_table, $doc)=$row;
     $doc=str_replace("\n", "<br>", $doc);
-    $doc=str_replace(" ", "&nbsp;", $doc);
+    #$doc=str_replace(" ", "&nbsp;", $doc);
     print "<tr bgcolor=\"$cCells\">";
     print "<td bgcolor=\"$cImpCells\">
 	      <strong>$kb_name</strong>
 	   </td>";
     print "<td>$kb_table</td>";
-    print "<td width=\"100%\"><font size=\"2\">$doc&nbsp;</font></td>";
+    print "<td><font size=\"2\">$doc&nbsp;</font></td>";
     print "<td><font size=\"2\">
 	      <a href=\"JavaScript:openwindowlink( 'KB_showone.php?name=".urlencode($kb_name)."', 'KBSv$kb_name' )\">[Values]</a></font></td>";
     print "<td><font size=\"2\">
@@ -110,9 +110,9 @@ function openwindowlink( addr, name )
 ?>
   <br>
   <form action="KB_add.php" method="POST">
-    <table width="70%" align="center">
+    <table>
       <tr>
-        <td bgcolor="#000000" width="100%" align="center" colspan="2">
+        <td bgcolor="#000000" colspan="2">
           <font color="#FFFFFF">Add new KNOWLEDGE BASE</font>
         </td>
       </tr>
@@ -129,7 +129,7 @@ function openwindowlink( addr, name )
 	<td><textarea name="doc" cols="50" rows="5"></textarea><td>
       </tr>
       <tr>
-	<td colspan="2" align="center"><input type="submit" value="Add"></td>
+	<td colspan="2" align="center"><input class="formbutton" type="submit" value="Add"></td>
       </tr>
     </table>
   </form>

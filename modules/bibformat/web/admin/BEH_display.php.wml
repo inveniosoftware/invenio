@@ -21,9 +21,9 @@
 ?>
 #include "cdspage.wml" \
     title="Behaviours" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/bibformat/>BibFormat Admin</a>" \ 
     navbar_name="admin" \
-    navbar_select="BEH_display" \
-    cdspageboxlefttopadd="<protect><?displayLoginMenu('admin');?> </protect>"
+    navbar_select="BEH_display"
 
 <?
   include("security.inc.php");
@@ -72,11 +72,11 @@ print the format out.
   $qry_otypes="select name, type, doc from flxBEHAVIORS order by name";
   $qh_otypes=mysql_query( $qry_otypes );
 ?>
-  <table width="100%" border="1">
+  <table border="1">
     <tr bgcolor="#0000FF" align="center">
       <td><font color="white"><b>Name</b></font></td>
       <td><font color="white"><b>Type</b></font></td>
-      <td width="100%"><font color="white"><b>Documentation</b></font></td>
+      <td><font color="white"><b>Documentation</b></font></td>
       <td colspan="2"></td>
     </tr>
 <?
@@ -95,9 +95,9 @@ print the format out.
   print "</table>";
 ?>
   <form action="BEH_OTYPE_add.php" method="POST">
-    <table width="70%" align="center">
+    <table>
       <tr>
-	<td align="center" bgcolor="#0000FF" colspan="2">
+	<td bgcolor="#0000FF" colspan="2">
 	  <font color="#FFFFFF"><strong>Add new OUPUT TYPE</strong></font>
 	</td>
       </tr>
@@ -125,7 +125,7 @@ print the format out.
 	<td><textarea name="doc" cols="65" rows="5"></textarea></td>
       </tr>
       <tr>
-	<td colspan="2" align="center"><input type="submit" value="Add output type"></td>
+	<td colspan="2" align="center"><input class="formbutton" type="submit" value="Add output type"></td>
       </tr>
     </table>
   </form>

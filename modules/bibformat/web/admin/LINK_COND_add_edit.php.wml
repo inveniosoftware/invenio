@@ -165,7 +165,7 @@
       <td><input type="text" name="formats" size="107" value="<?echo $formats;?>"></td>
     </tr>
     <tr>
-      <td colspan="2" align="center"><input type="submit"></td>
+      <td colspan="2" align="center"><input class="formbutton" type="submit"></td>
     </tr>
   </table>
   <input type="hidden" name="linktype" value="<?echo $linktype;?>">

@@ -21,9 +21,9 @@
 ?>
 #include "cdspage.wml" \
     title="Extraction Rules" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/bibformat/>BibFormat Admin</a>" \ 
     navbar_name="admin" \
-    navbar_select="OAIER_display"  \
-    cdspageboxlefttopadd="<protect><?displayLoginMenu('admin');?> </protect>"
+    navbar_select="OAIER_display"
 
 <?
   include("security.inc.php");
@@ -78,7 +78,7 @@ could use later.<p>
 
 <?
 
-  print '<table width="100%" cellspacing="0" cellpadding="4">';
+  print '<table cellspacing="0" cellpadding="4">';
 
   $color1="#FFFFFF";
   $color2="#66CCCC";
@@ -182,9 +182,9 @@ could use later.<p>
 ?>
   <hr>
   <form action="OAIER_add.php" method="POST">
-  <table align="center" width="80%">
+  <table>
     <tr>
-      <td colspan="2" align="center" bgcolor="#000000"><font size="5" color="#FFFFFF">Add new Extraction Rule</font></td>
+      <td colspan="2" bgcolor="#000000"><font size="5" color="#FFFFFF">Add new Extraction Rule</font></td>
     </tr>
     <tr>
       <td align="right">Type</td>
@@ -215,7 +215,7 @@ could use later.<p>
       <td><input type="text" name="att_i2"></td>
     </tr>
     <tr>
-      <td colspan="2" align="center"><input type="submit" value="Add rule"></td>
+      <td colspan="2" align="center"><input class="formbutton" type="submit" value="Add rule"></td>
     </tr>
   </table>
   </form>

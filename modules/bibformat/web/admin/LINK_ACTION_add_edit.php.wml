@@ -126,7 +126,7 @@
       <td><textarea name="el_code" cols="80" rows="15"><?echo $el_code;?></textarea></td>
     </tr>
     <tr>
-      <td colspan="2" align="center"><input type="submit"></td>
+      <td colspan="2" align="center"><input class="formbutton" type="submit"></td>
     </tr>
   </table>
   <input type="hidden" name="linktype" value="<?echo $linktype;?>">

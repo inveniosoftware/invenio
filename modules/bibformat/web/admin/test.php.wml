@@ -22,9 +22,9 @@
 
 #include "cdspage.wml" \
     title="Execution Test" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/bibformat/>BibFormat Admin</a>" \ 
     navbar_name="admin" \
-    navbar_select="test"  \
-    cdspageboxlefttopadd="<protect><?displayLoginMenu('admin');?> </protect>"
+    navbar_select="test"
 
 <?
   include("security.inc.php");
@@ -107,7 +107,7 @@ when debugging newly created formats.
     <tr>
       <td align="center" colspan="2">
 	<input type="hidden" name="process" value="oo">
-	<input type="submit" value="LAUNCH!!">
+	<input class="formbutton" type="submit" value="LAUNCH!!">
       </td>
     </tr>
   </table>
