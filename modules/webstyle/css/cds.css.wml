@@ -359,24 +359,30 @@ a.navtrail:hover {
    border-bottom: 1px solid #060; 
 }
 .userinfoboxbody {
-   color: #060;
+   color: #36c;
    background: transparent;
    font-size: x-small;
+   font-weight: bold;
+   border-left: 2px solid #36c; 
+   border-right: 2px solid #36c; 
+   border-top: 2px solid #36c;
+   padding-left: 10px;
+   padding-right: 10px;
 }
 a.userinfo:link {
-   color: #060;
+   color: #36c;
    background: transparent;
 }
 a.userinfo:visited {
-   color: #060;
+   color: #36c;
    background: transparent;
 }
 a.userinfo:active {
-   color: #060;
+   color: #36c;
    background: transparent;
 }
 a.userinfo:hover {
-   color: #060;
+   color: #36c;
    background: transparent;
 }
 .header {

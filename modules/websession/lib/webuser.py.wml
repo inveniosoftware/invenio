@@ -217,15 +217,16 @@ def get_email(uid):
 def create_user_infobox(uid):
     """Create info box on currenly logged user.""" 
     out = ""
-    logintext = ""
     if isGuestUser(uid):
-        logintext = """<a class="userinfo" href="%s/youraccount.py/login">login</a>""" % weburl
+        out +=  """guest :: <a class="userinfo" href="%s/youraccount.py/login">login</a>""" % weburl
     else:
-        logintext = """<a class="userinfo" href="%s/youraccount.py/logout">logout</a>""" % weburl        
-    out += """<td class="userinfoboxbody" nowrap>
-               %s :: %s
-              </td>""" % (get_email(uid), logintext)
-    return out
+        out += """%s ::
+               <a class="userinfo" href="%s/youraccount.py/display">account</a></strong> ::
+               <a class="userinfo" href="%s/yourbaskets.py/display">baskets</a></strong> ::
+               <a class="userinfo" href="%s/youralerts.py/list">alerts</a></strong> ::
+               <a class="userinfo" href="%s/youraccount.py/logout">logout</a>""" % \
+               (get_email(uid), weburl, weburl, weburl, weburl)
+    return """<td class="userinfoboxbody">%s</td>""" % out
 
 ## --- follow some functions for Apache user/group authentication
 
