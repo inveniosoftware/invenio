@@ -358,7 +358,7 @@ a.navtrail:hover {
 }
 .searchbox {
    color: #000;
-   background: transparent;
+   background: #fff;
    padding: 1px;
    margin-top: 5px;
    margin-bottom: 5px;
@@ -378,12 +378,12 @@ a.navtrail:hover {
 }
 .searchboxbody {
    color: #000;
-   background: transparent;
+   background: #fff;
    padding: 3px;
 }
 .narrowsearchbox {
    color: #000;
-   background: transparent;
+   background: #fff;
    padding: 1px;
    margin-top: 20px;
    margin-bottom: 5px;
@@ -403,7 +403,7 @@ a.navtrail:hover {
 }
 .narrowsearchboxbody {
    color: #000;
-   background: transparent;
+   background: #fff;
    padding: 3px;
 }
 .latestadditionsbox {
