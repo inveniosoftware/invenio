@@ -388,10 +388,6 @@ def command_line():
 
     new_task_id = run_sql("""INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status) VALUES ('bibrank',%s,%s,%s,%s,'WAITING')""", (user, sched_time, sleeptime, dumps(options)))
 
-
-    #query = """INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status) VALUES ('bibrank','%s',CAST('%s' AS DATE),'%s','%s','WAITING')""" % (MySQLdb.escape_string(user),MySQLdb.escape_string(sched_time), sleeptime, MySQLdb.escape_string(dumps(options)))
-
-    #new_task_id = run_sql(query)
     print "Task #%d was successfully scheduled for execution." % new_task_id
     return
 

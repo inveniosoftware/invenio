@@ -1298,7 +1298,7 @@ def update_rnkWORD(table, terms):
                     Fi += tf[0]
                 for (j, tf) in term_docs.iteritems():
                     if tf[0] != Fi:
-                        Gi[t] = Gi[t] + ((float(tf[0]) / Fi) * math.log(float(tf[0]) / Fi, 2)) / math.log(N) 
+                        Gi[t] = Gi[t] + ((float(tf[0]) / Fi) * math.log(float(tf[0]) / Fi) / math.log(2)) / math.log(N) 
             write_message("Phase 3: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
             i += 5000
         write_message("Phase 3: Finished calculating importance of all affected terms")
@@ -1333,13 +1333,13 @@ def update_rnkWORD(table, terms):
             doc_terms = deserialize_via_marshal(termlist)           
             for (t, tf) in doc_terms.iteritems():
                 if Gi.has_key(t):
-                    Nj[j] = Nj.get(j, 0) + math.pow(Gi[t] * (1 + math.log(tf[0])),2)
+                    Nj[j] = Nj.get(j, 0) + math.pow(Gi[t] * (1 + math.log(tf[0])), 2)
                     Git = int(math.floor(Gi[t]*100))
                     if Git >= 0:
                         Git += 1
                     doc_terms[t] = (tf[0], Git)
                 else:  
-                    Nj[j] = Nj.get(j, 0) + math.pow(tf[1] * (1 + math.log(tf[0])),2)
+                    Nj[j] = Nj.get(j, 0) + math.pow(tf[1] * (1 + math.log(tf[0])), 2)
             Nj[j] = 1.0 / math.sqrt(Nj[j])
             Nj[j] = int(Nj[j] * 100)
             if Nj[j] >= 0:

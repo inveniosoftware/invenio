@@ -383,7 +383,9 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
 
     startCreate = time.time()
     global voutput
-
+ 
+    if verbose > 0:
+        voutput += "<br>Running rank method: %s, using find_similar/word_frequency in bibrank_record_sorter<br>" % rank_method_code
     if methods[rank_method_code]["override_default_min_relevance"] == "no":
         rank_limit_relevance = methods[rank_method_code]["default_min_relevance"]
 
@@ -405,7 +407,6 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
         terms_recs = dict(run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (methods[rank_method_code]["rnkWORD_table"], terms)))
     else:
         return (None, "Warning: Record spesified has no content indexed for use with this method.", "", voutput)
-
 
     #Calculate all terms
     for (term, tf) in rec_terms.iteritems():
@@ -488,6 +489,7 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     
     rnkdict = deserialize_via_marshal(rnkdict[0][0])
     if verbose > 0:
+        voutput += "<br>Running rank method: %s, using rank_by_method function in bibrank_record_sorter<br>" % rank_method_code
         voutput += "Ranking data loaded, size of structure: %s<br>" % len(rnkdict)
     lrecIDs = hitset.items()
 
@@ -514,7 +516,7 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
         
     if verbose > 0:
         voutput += "Number of records ranked: %s<br>" % len(reclist)
-        voutput += "Number of records not ranked: %s" % len(reclist_addend)
+        voutput += "Number of records not ranked: %s<br>" % len(reclist_addend)
 
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
     return (reclist_addend + reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
@@ -535,6 +537,9 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
 
     global voutput
     startCreate = time.time()
+
+    if verbose > 0:
+        voutput += "<br>Running rank method: %s, using word_frequency function in bibrank_record_sorter<br>" % rank_method_code
     query_terms = {}
     lwords_old = lwords
     lwords = []
@@ -598,8 +603,12 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, ver
     quick - if quick=yes only terms with a positive qtf is used, to limit the number of records to sort"""
 
     (t, qtf) = term
-    Gi = invidx["Gi"][1]
-    del invidx["Gi"]
+    if invidx.has_key("Gi"):
+        Gi = invidx["Gi"][1]
+        del invidx["Gi"]
+    else:
+        return (recdict, rec_termcount)
+
     if not quick or (qtf >= 0 or (qtf < 0 and len(recdict) == 0)):
         #Only accept records existing in the hitset received from the search engine
         for (j, tf) in invidx.iteritems():
