@@ -24,10 +24,10 @@
 
 ## include navigation trail and bar definitions:
 #include "cdsnavtrail.wml" \
-   header="<table width=100% class=navtrail><tr><td><small><a href='<HTDOCSURL>'><CDSNAME></a> &gt; " \
+   header="<br><table width=100% border=0 cellpadding=0 cellspacing=0><tr class=navtrail><td width=3%>&nbsp;</td><td><small><small><a class=navtrail href='<HTDOCSURL>'><CDSNAME></a> &gt; " \
    prolog="" \
    epilog="&gt;" \
-   footer="$(title)</small></td></tr></table>"
+   footer="$(title)</small></small></td></tr></table>"
 #include "cdsnavbar.wml"
 
 ## HTML header:
@@ -49,15 +49,6 @@
 $(cdspageheaderadd)
 </div>
 
-## CDS navigation trail:
-<:    
-    if ('$(navtrail_body)' =~ /\w/) {
-        print '<table width=100% class=navtrail><tr><td>$(navtrail_body)</td></tr></table>';
-    } else {
-        &navTrail();
-    }
-:>
-
 ## CDS page content:
 <table border=0 cellspacing=0 cellpadding=0 width=100%>
  <tr valign=top>
@@ -72,7 +63,7 @@ $(cdspageheaderadd)
          ## navbar is by default in the the left top box
          <navbar:render name=$(navbar_name) select=$(navbar_select)> 
         </td>
-       <tr>
+       </tr>
          ## first common "left top" CDS page box
          <: if ('<CDSPAGEBOXLEFTTOP>' =~ /\w/) {
                print '<tr class="pageboxlefttop" valign=top><td width=100%><CDSPAGEBOXLEFTTOP></td></tr>';
@@ -108,8 +99,17 @@ $(cdspageheaderadd)
   <td class=pagestripemiddle align=left width=5>
   </td>
   <td class=pagestripemiddle align=left>
-   ### Stripe 2: CDS page right stripe
-   <h1 class=headline>$(title)</h1>
+   ### Stripe 2: CDS page body
+
+   <strong class=headline><span class="h1">$(title)</span></strong>
+<:    
+    if ('$(navtrail_body)' =~ /\w/) {
+        print '<br><table width="100%" class="navtrail" border=0 cellspacing=0 cellpadding=0><tr class="navtrail"><td width="3%">&nbsp;</td><td align=left><small>$(navtrail_body)</small></td></tr></table>';
+    } elsif ('$(navtrail_body:-undef)' eq 'undef'){
+         &navTrail();
+    }
+:>
+   <p>
    {#BODY#}
   </td>
   ### Stripe 2 epilog: make some space to separate stripes
