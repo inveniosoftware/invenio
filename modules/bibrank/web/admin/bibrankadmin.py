@@ -47,7 +47,8 @@ def index(req, ln=cdslang):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not brc.check_user(uid,'cfgbibrank'):
+    auth = brc.check_user(uid,'cfgbibrank')
+    if not auth[0]:
         return page(title="BibRank Admin Interface",
                 body=brc.perform_index(ln),
                 uid=uid,
@@ -56,7 +57,7 @@ def index(req, ln=cdslang):
                 lastupdated=__lastupdated__,
                 urlargs=req.args)
     else:
-        return auth_failed(uid, navtrail_previous_links)
+        return auth_failed(uid, navtrail_previous_links, auth[1])
 
 def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -66,7 +67,8 @@ def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not brc.check_user(uid,'cfgbibrank'):
+    auth = brc.check_user(uid,'cfgbibrank')
+    if not auth[0]:
         return page(title="Add new rank method",
                 body=brc.perform_addrankarea(rnkcode=rnkcode,
                                              ln=cdslang,
@@ -78,7 +80,7 @@ def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
                 urlargs=req.args,
                 lastupdated=__lastupdated__)
     else:
-        return auth_failed(uid, navtrail_previous_links)
+        return auth_failed(uid, navtrail_previous_links, auth[1])
 
 def modifytranslations(req, rnkID='', ln=cdslang, sel_type='', trans = [], confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -88,7 +90,8 @@ def modifytranslations(req, rnkID='', ln=cdslang, sel_type='', trans = [], confi
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not brc.check_user(uid,'cfgbibrank'):
+    auth = brc.check_user(uid,'cfgbibrank')
+    if not auth[0]:
         return page(title="Modify translations",
                 body=brc.perform_modifytranslations(rnkID=rnkID,
                                              ln=ln,
@@ -101,7 +104,7 @@ def modifytranslations(req, rnkID='', ln=cdslang, sel_type='', trans = [], confi
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)
     else:
-        return auth_failed(uid, navtrail_previous_links)
+        return auth_failed(uid, navtrail_previous_links, auth[1])
 
 def modifycollection(req, ln=cdslang, rnkID='', func='', colID='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -111,7 +114,8 @@ def modifycollection(req, ln=cdslang, rnkID='', func='', colID='', confirm=0):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not brc.check_user(uid,'cfgbibrank'):
+    auth = brc.check_user(uid,'cfgbibrank')
+    if not auth[0]:
         return page(title="Modify visibility toward collections",
                 body=brc.perform_modifycollection(rnkID=rnkID,
                                                  ln=ln,
@@ -124,7 +128,7 @@ def modifycollection(req, ln=cdslang, rnkID='', func='', colID='', confirm=0):
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)
     else:
-        return auth_failed(uid, navtrail_previous_links)
+        return auth_failed(uid, navtrail_previous_links, auth[1])
 
 def deleterank(req, ln=cdslang, rnkID='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -134,7 +138,8 @@ def deleterank(req, ln=cdslang, rnkID='', confirm=0):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not brc.check_user(uid,'cfgbibrank'):
+    auth = brc.check_user(uid,'cfgbibrank')
+    if not auth[0]:
         return page(title="Delete rank method",
                 body=brc.perform_deleterank(rnkID=rnkID,
                                                  ln=ln,
@@ -145,7 +150,7 @@ def deleterank(req, ln=cdslang, rnkID='', confirm=0):
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)
     else:
-        return auth_failed(uid, navtrail_previous_links)
+        return auth_failed(uid, navtrail_previous_links, auth[1])
 
 def modifyrank(req, ln=cdslang, rnkID='', rnkcode='', template='', cfgfile='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -155,7 +160,8 @@ def modifyrank(req, ln=cdslang, rnkID='', rnkcode='', template='', cfgfile='', c
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not brc.check_user(uid,'cfgbibrank'):
+    auth = brc.check_user(uid,'cfgbibrank')
+    if not auth[0]:
         return page(title="Modify rank method",
                 body=brc.perform_modifyrank(rnkID=rnkID,
                                             ln=ln,
@@ -169,7 +175,7 @@ def modifyrank(req, ln=cdslang, rnkID='', rnkcode='', template='', cfgfile='', c
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
-        return auth_failed(uid, navtrail_previous_links)
+        return auth_failed(uid, navtrail_previous_links, auth[1])
 
 def showrankdetails(req, ln=cdslang, rnkID=''):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -179,7 +185,8 @@ def showrankdetails(req, ln=cdslang, rnkID=''):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    if not brc.check_user(uid,'cfgbibrank'):
+    auth = brc.check_user(uid,'cfgbibrank')
+    if not auth[0]:
         return page(title="Rank method details",
                 body=brc.perform_showrankdetails(rnkID=rnkID,
                                                  ln=ln),
@@ -189,7 +196,7 @@ def showrankdetails(req, ln=cdslang, rnkID=''):
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
-        return auth_failed(uid, navtrail_previous_links)
+        return auth_failed(uid, navtrail_previous_links, auth[1])
 
 def error_page(req):
     return page(title=msg_internal_error[ln],
@@ -199,12 +206,10 @@ def error_page(req):
                 language=ln,
                 urlargs=req.args)
 
-def auth_failed(uid, navtrail_previous_links):
+def auth_failed(uid, navtrail_previous_links, message=""):
     return page(title='Authorization failure',
                 uid=uid,
-                body=brc.adderrorbox('try to login first',
-                                     datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount.py/login?referer=%s/admin/bibrank/">login</a> with another account.""" % (weburl, weburl)]),
+                body=brc.adderrorbox('Not logged in',
+                                     datalist=[message]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
-    
