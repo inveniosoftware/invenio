@@ -2130,7 +2130,7 @@ def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
     import datetime
     import time
     tabletime = time.strptime(collection_table_update_time, "%Y-%m-%d %H:%M:%S")
-    webtime = time.strptime(collection_web_update_time, "%d %B %Y %H:%M:%S %Z")
+    webtime = time.strptime(collection_web_update_time, "%d %b %Y %H:%M:%S %Z")
     
     if tabletime > webtime:
         output += """<br><b><span class="info">Warning: The collections has been modified since last time Webcoll was executed, to process the changes, Webcoll must be executed.</span></b><br>"""
