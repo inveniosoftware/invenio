@@ -52,6 +52,7 @@ try:
     from cdsware import bibrank_downloads_indexer_tests
     from cdsware import bibrank_record_sorter_tests
     from cdsware import bibrank_tag_based_indexer_tests
+    from cdsware import oai_repository_tests 
 
 except ImportError, e:
     print "Error: %s" % e
@@ -68,7 +69,8 @@ def create_all_test_suites():
                                bibrank_citation_searcher_tests.create_test_suite(),
                                bibrank_downloads_indexer_tests.create_test_suite(),
                                bibrank_record_sorter_tests.create_test_suite(),
-                               bibrank_tag_based_indexer_tests.create_test_suite()))
+                               bibrank_tag_based_indexer_tests.create_test_suite(),
+                               oai_repository_tests.create_test_suite()))
 
 def print_info_line():
     """Prints info line about tests to be executed."""
