@@ -89,7 +89,7 @@ def create_navtrail(title,
     """
     out = ""
     if title != cdsname:
-        out += """<a class="navtrail" href="%s">%s</a>""" % (weburl, cdsname)
+        out += """<a class="navtrail" href="%s">%s</a>""" % (weburl, "Home")
     if previous_links:
         if out:
             out += separator
@@ -97,7 +97,10 @@ def create_navtrail(title,
     if title:
         if out:
             out += separator
-        out += title
+        if title==cdsname:
+            out += "Home"
+        else:
+            out += title
     return prolog + out + epilog
 
 def page(title, body, navtrail="", url="", description="", keywords="", uid=0, cdspagerightstripeadd="", cdspageheaderadd="", cdspagebodyadd="", cdspagefooteradd=""):

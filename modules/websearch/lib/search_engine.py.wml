@@ -662,7 +662,7 @@ def create_navtrail(cc=cdsname,
                         (prolog, weburl, urllib.quote_plus(dad), as, dad, epilog, separator)
         else: # hide cdsname for aesthetical reasons
             navtrail += """%s <a class="navtrail" href="%s/?as=%d">%s</a> %s %s """ % \
-                        (prolog, weburl, as, dad, epilog, separator)            
+                        (prolog, weburl, as, "Home", epilog, separator)            
     # then print cc:
     if cc != cdsname or not exclude_root:
         navtrail += """%s <a class="navtrail" href="%s/?c=%s&as=%d">%s</a> %s""" % (prolog, weburl, urllib.quote_plus(cc), as, cc, epilog)

@@ -414,7 +414,7 @@ class Collection:
             else: # hide cdsname for aesthetical reasons
                 if not exclude_root:
                     navtrail += """%s <a class="navtrail" href="%s/?as=%d">%s</a> %s %s """ % \
-                                (prolog, weburl, as, dad.name, epilog, separator)
+                                (prolog, weburl, as, "Home", epilog, separator)
         # then print self:
         if not exclude_self and (self.id > 1 or (self.id==1 and not exclude_root)):
             navtrail += """%s %s %s""" % (prolog, self.name, epilog)
@@ -544,7 +544,7 @@ class Collection:
                 recIDs = Numeric.nonzero(self.reclist)
                 for idx in range(self.nbrecs-1, self.nbrecs-rg-1, -1):
                     if idx>=0:
-                        box += """<li style="font-size: small;"><p><small>""" + print_record(recIDs[idx]) + "</small></p>"
+                        box += """<li><p><small>""" + print_record(recIDs[idx]) + "</small></p>"
                 box += "</ol>"
                 if self.nbrecs > rg:
                     box += """<div align="right"><small><a href="%s">[&gt;&gt; more]</a></small></div>""" % url
