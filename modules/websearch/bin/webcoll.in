@@ -69,6 +69,7 @@ try:
     from cdsware.search_engine_config import cfg_author_et_al_threshold, cfg_instant_browse, cfg_max_recID, cfg_narrow_search_show_grandsons
     from cdsware.dbquery import run_sql    
     from cdsware.access_control_engine import acc_authorize_action
+    from cdsware.bibrank_record_sorter import get_bibrank_methods
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -225,6 +226,8 @@ def print_record(recID, format='hb', ln=cdslang):
     # at the end of HTML mode, print "Detailed record" and "Mark record" functions:
     out +=  """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s&amp;ln=%s">%s</a>""" \
            % (weburl, recID, ln, msg_detailed_record[ln])
+    out += """<span class="moreinfo"> - <a class="moreinfo" href="%s/search.py?p=recid:%d&amp;rm=wrd&amp;ln=%s">%s</a></span>\n""" % \
+           (weburl, recID, ln, msg_similar_records[ln])
     #out += """<- <input name="mark[]" type="checkbox" value="%s"> Mark record""" % recID
     out += "</span>"
     return out
@@ -636,7 +639,7 @@ class Collection:
         query = """SELECT f.code,f.name FROM field AS f, collection_field_fieldvalue AS cff
                    WHERE id_collection=%d AND cff.type='soo' AND cff.id_field=f.id
                    ORDER BY cff.score DESC, f.name ASC""" % self.id
-        box += """<select name="sf">"""
+        box += """<select name="sf" class="address">"""
         box += """  <option value="">- %s -""" % msg_latest_first[ln]
         res = run_sql(query)
         if res:
@@ -646,7 +649,7 @@ class Collection:
             for field in ('title','author','report number','year'):
                 box += """  <option value="%s">%s""" % (field, field)                
         box += """</select>"""
-        box += """<select name="so">
+        box += """<select name="so" class="address">
                     <option value="a">%s
                     <option value="d">%s
                   </select>""" % (msg_ascending[ln], msg_descending[ln])
@@ -655,30 +658,18 @@ class Collection:
     def create_rankoptions(self, ln=cdslang):
         "Produces 'Rank options' portal box."
         box=""
-        if 1: return "not implemented yet" # FIXME
-        box += """<select name="rm">"""
-        box += """  <option value="">- %s -""" % "no ranking filter"
-        for field, value in (('jif','journal impact factor'),
-                             ('nci','citation frequency'),
-                             ('ndl','download frequency'),
-                             ('crf','combined relevance factor')):
-            box += """  <option value="%s">%s""" % (field, value)                
+        box += """<select name="rm" class="address">"""
+        box += """  <option value="">- %s %s -""" % (string.lower(msg_or[ln]), msg_rank_by[ln])
+        for (code,name) in get_bibrank_methods(ln):
+            box += """  <option value="%s">%s""" % (code, name)                
         box += """</select>"""
-        box += """<select name="rs">
-                    <option value="0" selected>- any star category -
-                    <option value="5">*****
-                    <option value="4">****
-                    <option value="3">***
-                    <option value="2">**
-                    <option value="1">*
-                  </select>"""
         return box 
 
     def create_displayoptions(self, ln=cdslang):
         "Produces 'Display options' portal box."
         box=""
         # firstly, display hits per collection selection box:
-        box += """<select name="rg">
+        box += """<select name="rg" class="address">
            <option value="10">10 %s
            <option value="25">25 %s
            <option value="50">50 %s
@@ -689,7 +680,7 @@ class Collection:
                            msg_results[ln], msg_results[ln], msg_results[ln])
         # secondly, display split by collection selection box:
         if self.get_sons():
-            box += """<select name="sc">
+            box += """<select name="sc" class="address">
             <option value="1">%s
             <option value="0">%s
             </select>""" % (msg_split_by_collection[ln], msg_single_list[ln])
@@ -698,7 +689,7 @@ class Collection:
     def create_formatoptions(self, ln=cdslang):
         "Produces 'Output format options' portal box."
         box = ""
-        box += """<select name="of">
+        box += """<select name="of" class="address">
            """
         query = """SELECT f.code,f.name FROM format AS f, collection_format AS cf
                    WHERE cf.id_collection=%d AND cf.id_format=f.id ORDER BY cf.score DESC, f.name ASC"""  % self.id
@@ -903,12 +894,16 @@ class Collection:
                    </tbody>
                   </table>""" % \
            (msg_added_since[ln], msg_until[ln], cell_6_a, cell_6_b)        
-        # sort/rank options:
-        cell_7_a = self.create_sortoptions(ln)
-        cell_7_b = self.create_rankoptions(ln)
+        # sort/rank and display/format options:        
+        cell_7_a = self.create_sortoptions(ln) + self.create_rankoptions(ln)
+        cell_7_b = self.create_displayoptions(ln)
+        cell_7_c = self.create_formatoptions(ln)
         out += """<table class="searchbox">
                    <thead>
                     <tr>
+                      <th class="searchboxheader">
+                        %s
+                      </th>
                       <th class="searchboxheader">
                         %s
                       </th>
@@ -921,32 +916,12 @@ class Collection:
                     <tr valign="bottom">
                       <td class="searchboxbody">%s</td>
                       <td class="searchboxbody">%s</td>
-                    </tr>
-                   </tbody>
-                  </table>""" % \
-                      (msg_sort_by[ln], "Ranking filter:", cell_7_a, cell_7_b)
-        # display/format options:        
-        cell_8_a = self.create_displayoptions(ln)
-        cell_8_b = self.create_formatoptions(ln)
-        out += """<table class="searchbox">
-                   <thead>
-                    <tr>
-                      <th class="searchboxheader">
-                        %s
-                      </th>
-                      <th class="searchboxheader">
-                        %s
-                      </th>
-                    </tr>
-                   </thead>
-                   <tbody>
-                    <tr valign="bottom">
-                      <td class="searchboxbody">%s</td>
                       <td class="searchboxbody">%s</td>
                     </tr>
                    </tbody>
                   </table>""" % \
-           (msg_display_results[ln], msg_output_format[ln], cell_8_a, cell_8_b)  
+                      (msg_sort_by[ln], msg_display_results[ln], msg_output_format[ln],                       
+                       cell_7_a, cell_7_b, cell_7_c)
         # print commentary end:
         out += "<!--/create_searchfor_advanced()-->"
         return out
