@@ -60,8 +60,9 @@
   </navbar:header>
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> </navbar:prolog>
-  <navbar:button id=button1 txt="Refereeing Process" url="<HTDOCSURL>submit/publiline/inotes/DAMStat.shtml" hint="Refereeing Process">
-  <navbar:button id=button1 txt="Documentation" url="<HTDOCSURL>docs/submit/english" hint="Documentation">
+  <navbar:button id=submit_submit txt="Submit Documents" url="<HTDOCSURL>submit/" hint="Submit Documents">
+  <navbar:button id=submit_referee txt="Check Documents Status" url="<HTDOCSURL>submit/publiline/inotes/DAMStat.shtml" hint="Refereeing Process">
+  <navbar:button id=submit_doc txt="Documentation" url="<HTDOCSURL>/submit/docs/english" hint="Documentation">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
@@ -148,7 +149,7 @@
   <navbar:button id=bibupload txt="BibUpload Admin" url="<HTDOCSURL>/admin/bibupload/" hint="CDSware BibUpload Admin">
   <navbar:button id=foo txt="<strong>WEB&nbsp;INTERFACE</strong>">
   <navbar:button id=bibformat txt="BibFormat Admin" url="<HTDOCSURL>/admin/bibformat/" hint="CDSware BibFormat Admin" menu="bibformat">
-  <navbar:button id=webaccess txt="WebAccess Admin" url="<HTDOCSURL>/admin/webaccess/" hint="CDSware Web Access Rights Admin">
+  <navbar:button id=webaccess txt="WebAccess Admin" url="<HTDOCSURL>/admin/webaccess/" hint="CDSware Web Access Rights Admin" menu="webaccess">
   <navbar:button id=websearch txt="WebSearch Admin" url="<HTDOCSURL>/admin/websearch/" hint="CDSware Web Search Interface Admin">
   <navbar:button id=websubmit txt="WebSubmit Admin" url="<HTDOCSURL>/admin/websubmit/" hint="CDSware Web Submit Interface Admin" menu="websubmit">
   <navbar:button id=webperso txt="WebPerso Admin" url="<HTDOCSURL>/admin/webperso/" hint="CDSware Web Personal Features Admin">
@@ -170,14 +171,39 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=newdoctype txt="New&nbsp;Doctype" url="<HTDOCSURL>admin/websubmit/newDoctypeEDS.shtml" hint="New Type of Document">
-  <navbar:button id=deldoctype txt="Remove&nbsp;Doctype" url="<HTDOCSURL>admin/websubmit/removeDoctypeEDS.shtml" hint="Remove Type of Document">
-  <navbar:button id=listactions txt="Available&nbsp;Actions" url="<HTDOCSURL>admin/websubmit/allActionsEDS.shtml" hint="List Available Actions">
-  <navbar:button id=listchecks txt="Available&nbsp;Javascript&nbsp;Checks" url="<HTDOCSURL>admin/websubmit/allChecksEDS.shtml" hint="List Available Javascript Checking functions">
-  <navbar:button id=listelements txt="Available&nbsp;Element&nbsp;Descriptions" url="<HTDOCSURL>admin/websubmit/allElementsEDS.shtml" hint="List Available Element Descriptions">
-  <navbar:button id=listmodify txt="Available&nbsp;Modification&nbsp;Texts" url="<HTDOCSURL>admin/websubmit/allModifyEDS.shtml" hint="List Available Modification Texts">
-  <navbar:button id=listfunctions txt="Available&nbsp;Functions" url="<HTDOCSURL>admin/websubmit/listFunctions.shtml" hint="List Available Functions">
-  <navbar:button id=organise txt="Organise&nbsp;Main&nbsp;Page" url="<HTDOCSURL>admin/websubmit/editCatalogues.shtml" hint="Main Page Organisation">
+  <navbar:button id=websubmit_newdoctype txt="New&nbsp;Doctype" url="<HTDOCSURL>admin/websubmit/newDoctypeEDS.shtml" hint="New Type of Document">
+  <navbar:button id=websubmit_deldoctype txt="Remove&nbsp;Doctype" url="<HTDOCSURL>admin/websubmit/removeDoctypeEDS.shtml" hint="Remove Type of Document">
+  <navbar:button id=websubmit_listactions txt="Available&nbsp;Actions" url="<HTDOCSURL>admin/websubmit/allActionsEDS.shtml" hint="List Available Actions">
+  <navbar:button id=websubmit_listchecks txt="Available&nbsp;Javascript&nbsp;Checks" url="<HTDOCSURL>admin/websubmit/allChecksEDS.shtml" hint="List Available Javascript Checking functions">
+  <navbar:button id=websubmit_listelements txt="Available&nbsp;Element&nbsp;Descriptions" url="<HTDOCSURL>admin/websubmit/allElementsEDS.shtml" hint="List Available Element Descriptions">
+  <navbar:button id=websubmit_listmodify txt="Available&nbsp;Modification&nbsp;Texts" url="<HTDOCSURL>admin/websubmit/allModifyEDS.shtml" hint="List Available Modification Texts">
+  <navbar:button id=websubmit_listfunctions txt="Available&nbsp;Functions" url="<HTDOCSURL>admin/websubmit/listFunctions.shtml" hint="List Available Functions">
+  <navbar:button id=websubmit_organise txt="Organise&nbsp;Main&nbsp;Page" url="<HTDOCSURL>admin/websubmit/editCatalogues.shtml" hint="Main Page Organisation">
+  <navbar:button id=websubmit_doc txt="Documentation" url="<HTDOCSURL>admin/websubmit/docs/english" hint="Websubmit Documentation">
+
+  <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar WebAccess:
+<navbar:define name=webaccess
+        imgbase="img/" urlbase="$(ROOT)/admin/webaccess">
+  <navbar:header>
+    <table cellspacing=0 cellpadding=1 border=0>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=webaccess_superusers txt="Superusers" url="<HTDOCSURL>admin/webaccess/superusers.shtml" hint="Superusers">
+  <navbar:button id=webaccess_submit txt="Authorizations&nbsp;on&nbsp;Submit" url="<HTDOCSURL>admin/webaccess/submit.shtml" hint="Authorizations on Submit">
+  <navbar:button id=webaccess_websubmit txt="Authorizations&nbsp;on&nbsp;WebSubmit&nbsp;Admin" url="<HTDOCSURL>admin/webaccess/submitmanager.shtml" hint="Authorizations on WebSubmit Admin">
+  <navbar:button id=webaccess_websearch txt="Authorizations&nbsp;on&nbsp;WebSearch&nbsp;Admin" url="<HTDOCSURL>admin/webaccess/searchmanager.shtml" hint="Authorizations on WebSearch Admin">
+  <navbar:button id=webaccess_webaccess txt="Authorizations&nbsp;on&nbsp;WebAccess&nbsp;Admin" url="<HTDOCSURL>admin/webaccess/accessmanager.shtml" hint="Authorizations on WebAccess Admin">
+  <navbar:button id=webaccess_bibdata txt="Authorizations&nbsp;on&nbsp;BibData&nbsp;Admin" url="<HTDOCSURL>admin/webaccess/bibmanager.shtml" hint="Authorizations on BibData Admin">
+  <navbar:button id=webaccess_bibformat txt="Authorizations&nbsp;on&nbsp;BibFormat&nbsp;Admin" url="<HTDOCSURL>admin/webaccess/bibformatmanager.shtml" hint="Authorizations on BibFormat Admin">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
@@ -215,7 +241,7 @@
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
   <navbar:button id=bibdata_edit_record txt="Edit Record" url="<HTDOCSURL>admin/bibdata/displayRec.shtml" hint="BibData Admin - Edit Record">
-  <navbar:button id=bibdata_global_replace txt="Global Replace" url="<HTDOCSURL>admin/bibformat/globalReplace.shtml" hint="BibData Admin - Global Replace">
+  <navbar:button id=bibdata_global_replace txt="Global Replace" url="<HTDOCSURL>admin/bibdata/globalReplace.shtml" hint="BibData Admin - Global Replace">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 

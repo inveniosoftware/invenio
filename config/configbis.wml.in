@@ -62,5 +62,58 @@
 <define-tag DBPASS whitespace=delete>
 @DBPASS@
 </define-tag>
+<define-tag LYNX whitespace=delete>
+@LYNX@
+</define-tag>
+<define-tag ACROREAD whitespace=delete>
+@ACROREAD@
+</define-tag>
+<define-tag GZIP whitespace=delete>
+@GZIP@
+</define-tag>
+<define-tag GUNZIP whitespace=delete>
+@GUNZIP@
+</define-tag>
+<define-tag TAR whitespace=delete>
+@TAR@
+</define-tag>
+<define-tag DISTILLER whitespace=delete>
+@PS2PDF@
+</define-tag>
+<define-tag GFILE whitespace=delete>
+@FILE@
+</define-tag>
+<define-tag DJPEG whitespace=delete>
+@DJPEG@
+</define-tag>
+<define-tag CONVERT whitespace=delete>
+@CONVERT@
+</define-tag>
+<define-tag GIFTEXT whitespace=delete>
+@GIFTEXT@
+</define-tag>
+<define-tag JPEGSIZE whitespace=delete>
+@JPEGSIZE@
+</define-tag>
+<define-tag PNMSCALE whitespace=delete>
+@PNMSCALE@
+</define-tag>
+<define-tag PPMQUANT whitespace=delete>
+@PPMQUANT@
+</define-tag>
+<define-tag PPMTOGIF whitespace=delete>
+@PPMTOGIF@
+</define-tag>
+<define-tag GIFINTER whitespace=delete>
+@GIFINTER@
+</define-tag>
+<define-tag GIFRSIZE whitespace=delete>
+@GIFRSIZE@
+</define-tag>
+
+
+
+
+
 
 

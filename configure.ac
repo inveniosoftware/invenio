@@ -59,6 +59,200 @@ if test -z "$PYTHON"; then
    Available from <http://python.org/>.])
 fi
 
+dnl Check for Acrobat Reader:
+AC_PATH_PROG(ACROREAD, acroread)
+if test -z "$ACROREAD"; then
+   AC_MSG_WARN([
+   Acrobat Reader was not found in your path.  It is used in 
+   the WebSubmit module for automatic conversion of submitted documents.  
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  Acrobat Reader is available from
+   <http://www.adobe.com/products/acrobat/readstep.html>.])
+fi
+
+dnl Check for Lynx:
+AC_PATH_PROG(LYNX, lynx)
+if test -z "$LYNX"; then
+   AC_MSG_WARN([
+   Lynx was not found in your path.  It is used in 
+   the WebSubmit module to fetch files from URLs given by
+   submitters.
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  Lynx is available from
+   <http://lynx.browser.org/>.])
+fi
+
+dnl Check for Gzip:
+AC_PATH_PROG(GZIP, gzip)
+if test -z "$GZIP"; then
+   AC_MSG_WARN([
+   Gzip was not found in your path.  It is used in 
+   the WebSubmit module to compress the data submitted in an archive.
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  Gzip is available from
+   <http://www.gzip.org/>.])
+fi
+
+dnl Check for Gunzip:
+AC_PATH_PROG(GUNZIP, gunzip)
+if test -z "$GUNZIP"; then
+   AC_MSG_WARN([
+   Gunzip was not found in your path.  It is used in 
+   the WebSubmit module to correctly deal with submitted compressed
+   files.
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  Gunzip is available from
+   <http://www.gzip.org/>.])
+fi
+
+dnl Check for Tar:
+AC_PATH_PROG(TAR, tar)
+if test -z "$TAR"; then
+   AC_MSG_WARN([
+   Tar was not found in your path.  It is used in 
+   the WebSubmit module to pack the submitted data into an archive.
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  Tar is available from
+   <ftp://prep.ai.mit.edu/pub/gnu/tar/>.])
+fi
+
+dnl Check for Ps2pdf:
+AC_PATH_PROG(PS2PDF, ps2pdf)
+if test -z "$PS2PDF"; then
+   AC_MSG_WARN([
+   Ps2pdf was not found in your path.  It is used in 
+   the WebSubmit module to convert submitted PostScripts into PDF.
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  Ps2pdf is available from
+   <http://www.cs.wisc.edu/~ghost/doc/AFPL/6.50/Ps2pdf.htm>.])
+fi
+
+dnl Check for File:
+AC_PATH_PROG(FILE, file)
+if test -z "$FILE"; then
+   AC_MSG_WARN([
+   File was not found in your path.  It is used in 
+   the WebSubmit module to check the validity of the submitted files.
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  File is available from
+   <ftp://ftp.astron.com/pub/file/>.])
+fi
+
+dnl Check for Djpeg:
+AC_PATH_PROG(DJPEG, djpeg)
+if test -z "$DJPEG"; then
+   AC_MSG_WARN([
+   Djpeg was not found in your path.  It is used in 
+   the WebSubmit module to create an icon from a submitted picture.
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  Djpeg is available from
+   <http://www.ijg.org/files>.])
+fi
+
+dnl Check for Convert:
+AC_PATH_PROG(CONVERT, convert)
+if test -z "$CONVERT"; then
+   AC_MSG_WARN([
+   Convert was not found in your path.  It is used in 
+   the WebSubmit module to create an icon from a submitted picture.
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  Convert is available from
+   <http://www.imagemagick.org/>.])
+fi
+
+dnl Check for Giftext:
+AC_PATH_PROG(GIFTEXT, giftext)
+if test -z "$GIFTEXT"; then
+   AC_MSG_WARN([
+   Giftext was not found in your path.  It is used in 
+   the WebSubmit module to create an icon from a submitted picture.
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  Giftext is available from
+   <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>.])
+fi
+
+dnl Check for Gifinter:
+AC_PATH_PROG(GIFINTER, gifinter)
+if test -z "$GIFINTER"; then
+   AC_MSG_WARN([
+   Gifinter was not found in your path.  It is used in 
+   the WebSubmit module to create an icon from a submitted picture.
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  Gifinter is available from
+   <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>.])
+fi
+
+dnl Check for Gifrsize:
+AC_PATH_PROG(GIFRSIZE, gifrsize)
+if test -z "$GIFRSIZE"; then
+   AC_MSG_WARN([
+   Gifrsize was not found in your path.  It is used in 
+   the WebSubmit module to create an icon from a submitted picture.
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  Gifrsize is available from
+   <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>.])
+fi
+
+dnl Check for jpegsize:
+AC_PATH_PROG(JPEGSIZE, jpegsize)
+if test -z "$JPEGSIZE"; then
+   AC_MSG_WARN([
+   jpegsize was not found in your path.  It is used in 
+   the WebSubmit module to create an icon from a submitted picture.
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  Jpegsize is available from
+   <http://www.squarebox.co.uk/download/>.])
+fi
+
+dnl Check for Ppmtogif:
+AC_PATH_PROG(PPM2GIF, ppm2gif)
+if test -z "$PPM2GIF"; then
+   AC_MSG_WARN([
+   ppm2gif was not found in your path.  It is used in 
+   the WebSubmit module to create an icon from a submitted picture.
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  Ppm2gif is available from
+   <http://www.acme.com/software/pbmplus/>.])
+fi
+
+dnl Check for Ppmquant:
+AC_PATH_PROG(PPMQUANT, ppmquant)
+if test -z "$PPMQUANT"; then
+   AC_MSG_WARN([
+   ppmquant was not found in your path.  It is used in 
+   the WebSubmit module to create an icon from a submitted picture.
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  Ppmquant is available from
+   <http://www.acme.com/software/pbmplus/>.])
+fi
+
+dnl Check for Pnmscale:
+AC_PATH_PROG(PNMSCALE, pnmscale)
+if test -z "$PNMSCALE"; then
+   AC_MSG_WARN([
+   pnmscale was not found in your path.  It is used in 
+   the WebSubmit module to create an icon from a submitted picture.
+   You can continue without it but you will miss some CDSware 
+   functionality.  We recommend you to install it first and to rerun 
+   the configure script.  Pnmscale is available from
+   <http://www.acme.com/software/pbmplus/>.])
+fi
+
 dnl Define HTDOCSDIR directory:
 AC_ARG_WITH(htdocsdir, AC_HELP_STRING([--with-htdocsdir], [specify where htdocs files go (e.g. /soft/httpd/host/cdsdev/htdocs/MPI/)]), HTDOCSDIR=${withval})
 if test -z "$HTDOCSDIR"; then
@@ -180,8 +374,19 @@ AC_OUTPUT(Makefile \
 	  dbutil/Makefile \
 	  htdocs/Makefile \
 	  htdocs/img/Makefile \
+	  htdocs/errors/Makefile \
 	  htdocs/submit/Makefile \
-	  htdocs/submit/errors/Makefile \
+	  htdocs/submit/docs/Makefile \
+	  htdocs/submit/docs/english/Makefile \
+	  htdocs/submit/access/Makefile \
+	  htdocs/submit/access/protected/Makefile \
+	  htdocs/submit/MESS/Makefile \
+	  htdocs/submit/MESS/functions/Makefile \
+	  htdocs/submit/mycds/Makefile \
+	  htdocs/submit/bibformat/Makefile \
+	  htdocs/submit/bibformat/config/Makefile \
+	  htdocs/submit/publiline/Makefile \
+	  htdocs/submit/publiline/inotes/Makefile \
 	  htdocs/personalize/Makefile \
 	  htdocs/docs/Makefile \
 	  htdocs/bibformat/Makefile \
@@ -198,6 +403,8 @@ AC_OUTPUT(Makefile \
 	  htdocs/admin/webaccess/Makefile \
 	  htdocs/admin/websearch/Makefile \
 	  htdocs/admin/websubmit/Makefile \
+	  htdocs/admin/websubmit/docs/Makefile \
+	  htdocs/admin/websubmit/docs/english/Makefile \
 	  htdocs/admin/webperso/Makefile)
 
 ## end of file
