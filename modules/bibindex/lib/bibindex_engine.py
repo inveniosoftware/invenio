@@ -90,7 +90,7 @@ def write_message(msg, stream=sys.stdout):
 
 ## precompile some often-used regexp for speed reasons:
 sre_subfields = sre.compile('\$\$\w');
-sre_phrase = sre.compile("(?s)<[^>]*>|&#?\w+;")
+sre_html = sre.compile("(?s)<[^>]*>|&#?\w+;")
 sre_block_punctuation_begin = sre.compile(r"^"+cfg_chars_punctuation+"+")
 sre_block_punctuation_end = sre.compile(cfg_chars_punctuation+"+$")
 sre_punctuation = sre.compile(cfg_chars_punctuation)
@@ -375,7 +375,7 @@ def get_words_from_phrase(phrase, split=string.split):
 
     if cfg_remove_html_code and string.find(phrase, "</") > -1:
         #Most likely html, remove html code
-        phrase = sre_compile.sub(' ', phrase)
+        phrase = sre_html.sub(' ', phrase)
 
     phrase = str.lower(phrase)
     # 1st split phrase into blocks according to whitespace
