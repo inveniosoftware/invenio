@@ -29,7 +29,7 @@ sampledir=$(WEBDIR)/admin/bibformat
 
 EXTRA_DIST = $(wildcard *.wml) $(gifs_DATA)
 
-CLEANFILES = $(wildcard *.shtml) *~ *.tmp
+CLEANFILES = $(wildcard *.php) *~ *.tmp
 
-%.shtml: %.shtml.wml ../../../config/config.wml ../../../config/configbis.wml ../../../config/cdspage.wml ../../../config/cdsnavbar.wml
+%.php: %.php.wml ../../../config/config.wml ../../../config/configbis.wml ../../../config/cdspage.wml ../../../config/cdsnavbar.wml
 	$(WML) -o $@ $<
