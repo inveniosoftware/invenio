@@ -471,30 +471,6 @@ AC_SUBST(PPTHTML)
 AC_SUBST(XLHTML)
 AC_SUBST(HTMLTOTEXT)
 
-## Write help:
-AC_CONFIG_COMMANDS([default], [echo "****************************************************************************";\
-                               echo "** Your CERN Document Server Software (CDSware) installation is now ready **";\ 
-                               echo "** for building.  You have entered the following parameters:              **";\ 
-                               echo "**   - HTML documents install directory: $HTDOCSDIR";\
-                               echo "**   - CGI scripts install directory: $CGIBINDIR";\
-                               echo "**   - DB utilities install directory: $DBUTILDIR";\
-                               echo "**   - HTML documents home URL: $HTDOCSURL";\
-                               echo "**   - CGI scripts home URL: $CGIBINURL";\
-                               echo "**   - DB server: $DBHOST";\
-                               echo "**   - DB name: $DBNAME";\
-                               echo "**   - DB username: $DBUSER";\
-                               echo "**   - DB password: $DBPASS";\
-                               echo "** Here are the steps to continue the building process:                   **";\
-                               echo "**   1) Customize self-explanatory config file './config/config.wml'.     **";\
-                               echo "**   2) Type 'make' to build your customized CDSware installation.        **";\
-                               echo "**   3) Type 'make create-tables' if you have not created tables before.  **";\
-                               echo "**   4) Type 'make install' to install the system.                        **";\
-                               echo "** Good luck, and thanks for choosing the CERN Document Server Software.  **";\
-                               echo "**              -- CDS Development Group <cds.support@cern.ch>            **";\
-                               echo "****************************************************************************"], 
-                               [HTDOCSDIR=$HTDOCSDIR; CGIBINDIR=$CGIBINDIR; DBUTILDIR=$DBUTILDIR; HTDOCSURL=$HTDOCSURL; \
-                                CGIBINURL=$CGIBINURL; DBHOST=$DBHOST; DBNAME=$DBNAME; DBUSER=$DBUSER; DBPASS=$DBPASS])
-
 ## Define output files:
 AC_CONFIG_FILES([Makefile \
 	  config/Makefile \
@@ -539,5 +515,28 @@ AC_CONFIG_FILES([Makefile \
 
 ## Finally, write output files:
 AC_OUTPUT
+
+## Write help:
+
+AC_MSG_RESULT([****************************************************************************])
+AC_MSG_RESULT([** Your CERN Document Server Software (CDSware) installation is now ready **]) 
+AC_MSG_RESULT([** for building.  You have entered the following parameters:              **]) 
+AC_MSG_RESULT([**   - HTML documents install directory: $HTDOCSDIR])
+AC_MSG_RESULT([**   - CGI scripts install directory: $CGIBINDIR])
+AC_MSG_RESULT([**   - DB utilities install directory: $DBUTILDIR])
+AC_MSG_RESULT([**   - HTML documents home URL: $HTDOCSURL])
+AC_MSG_RESULT([**   - CGI scripts home URL: $CGIBINURL])
+AC_MSG_RESULT([**   - DB server: $DBHOST])
+AC_MSG_RESULT([**   - DB name: $DBNAME])
+AC_MSG_RESULT([**   - DB username: $DBUSER])
+AC_MSG_RESULT([**   - DB password: $DBPASS])
+AC_MSG_RESULT([** Here are the steps to continue the building process:                   **])
+AC_MSG_RESULT([**   1) Customize self-explanatory config file './config/config.wml'.     **])
+AC_MSG_RESULT([**   2) Type 'make' to build your customized CDSware installation.        **])
+AC_MSG_RESULT([**   3) Type 'make create-tables' if you have not created tables before.  **])
+AC_MSG_RESULT([**   4) Type 'make install' to install the system.                        **])
+AC_MSG_RESULT([** Good luck, and thanks for choosing the CERN Document Server Software.  **])
+AC_MSG_RESULT([**              -- CDS Development Group <cds.support@cern.ch>            **])
+AC_MSG_RESULT([****************************************************************************])
 
 ## end of file
