@@ -444,13 +444,13 @@ oai
 
 ## OAIIDTAG -- OAI identifier tag:  
 ##  (example: "0248_a")
-<define-tag OAIIDSCHEME whitespace=delete>
+<define-tag OAIIDTAG whitespace=delete>
 0248_a
 </define-tag>
 
 ## OAISETTAG -- OAI set tag:  
 ##  (example: "0248_p")
-<define-tag OAIIDSCHEME whitespace=delete>
+<define-tag OAISETTAG whitespace=delete>
 0248_p
 </define-tag>
 
