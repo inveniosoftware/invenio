@@ -462,12 +462,16 @@ AC_CONFIG_FILES([Makefile \
 	  modules/bibformat/doc/Makefile \
 	  modules/bibformat/web/Makefile \
 	  modules/bibformat/web/admin/Makefile \
+	  modules/webhelp/Makefile \
+	  modules/webhelp/web/Makefile \
 	  modules/websearch/Makefile \
 	  modules/websearch/bin/Makefile \
+	  modules/websearch/doc/Makefile \
 	  modules/websearch/lib/Makefile \
 	  modules/websearch/web/Makefile \
 	  modules/websession/Makefile \
 	  modules/websession/web/Makefile \
+	  modules/websession/lib/Makefile \
 	  modules/webstyle/Makefile \
 	  modules/webstyle/css/Makefile \
 	  modules/webstyle/img/Makefile \
