@@ -112,12 +112,12 @@ def template_account(title,body):
 	 	      <table class="searchbox" width="100%%" summary=""	>	
                        <thead>
                         <tr>
-                         <th class="portalboxheader">%s</th>
+                         <th class="searchboxheader">%s</th>
                         </tr>		
                        </thead>
                        <tbody>
                         <tr>
-                         <td class="portalboxbody">%s</td>
+                         <td class="searchboxbody">%s</td>
                         </tr>
                        </tbody>
                       </table>""" % (title, body)
@@ -129,7 +129,7 @@ def warning_guest_user(type):
     msg="""You are logged in as a guest user, so your %s will disappear at the end of the current session. If you wish you can
            <a href="../youraccount.py/login">login or register here</a>.
 	"""%type
-    return """<table class="errorbox" width="100%%" summary="">
+    return """<table class="errorbox" summary="">
                        <thead>
                         <tr>
                          <th class="errorboxheader">%s</th>
