@@ -1538,8 +1538,7 @@ def search_in_bibxxx(req, p, f, type):
     if nb_hits == 0 and not (p.startswith("%") and p.endswith("%")):
         # try to launch substring search:
         p_new = "%" + p + "%"
-        print_warning(req, "Your original search for <strong>%s</strong> within <strong>%s</strong> field did not return any result.  Looking for subphrase/substring match..." % \
-                      (p_orig, f), "Info")
+        print_warning(req, "No match found, looking for substrings...", "")
         return search_in_bibxxx(req, p_new, f, type)
     else:
         # okay, return result set:
@@ -2628,7 +2627,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                     else: # it is WRD query
                         p3 = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1 \\2", p3)
                     if of.startswith('h'):
-                        print_warning(req, "No match found.  Trying similar queries...", "", "<p>","<p>")
+                        print_warning(req, "No match found, trying similar queries...", "", "<p>","<p>")
                     results_final = search_pattern(req, "", "", colls_to_search)
                     if p1:
                         results_tmp = search_pattern(req, p1, f1, colls_to_search, m1)
@@ -2667,7 +2666,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                     else: # it is WRD query
                         p = re.sub(r'(\w)[^a-zA-Z0-9](\w)', "\\1 \\2", p)
                     if of.startswith('h'):
-                        print_warning(req, "No match found.  Trying %s..." % p, "", "<p>","<p>")
+                        print_warning(req, "No match found, trying %s..." % p, "", "<p>","<p>")
                     results_final = search_pattern(req, p, f, colls_to_search, None)
                     for coll in colls_to_search:
                         results_final_nb[coll] = results_final[coll]._nbhits
@@ -2676,7 +2675,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         if results_final_nb_total == 0:
             # nope, so try similar queries:
             if of.startswith('h'):
-                print_warning(req, "No match found.  Trying similar queries...", "", "<p>","<p>")
+                print_warning(req, "No match found, trying similar queries...", "", "<p>","<p>")
                 req.write("<p>")
                 if as==1 or (p1 or p2 or p3):
                     if p1:
