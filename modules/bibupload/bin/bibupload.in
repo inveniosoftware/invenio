@@ -1528,6 +1528,7 @@ function task_run()
     $starttime = getmicrotime();
     $vals = array();
     $nbRecords = 0;
+    $totalrecs = 0;
 
     foreach ($options['recordfiles'] as $recordfile) {
         
@@ -1540,7 +1541,7 @@ function task_run()
             fwrite($errorfp, "Error: cannot localize and/or open file '$recordfile' for reading.  Ignored.\n");
         }
         else {
-            $totalrecs = `grep "<record" $recordfile | wc -l`;
+            $totalrecs += `grep "<record" $recordfile | wc -l`;
 
             if (!$options['MUTE'])
                 print "\nInput file: $recordfile\n";
