@@ -1,0 +1,45 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="Actions" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a> &gt; <a class=navtrail href=<lang:star: index.*.html>><MSG_GUIDE></a>" 
+
+        <BLOCKQUOTE>
+            &nbsp;<span class="guideheader">I</span>n webSubmit you can create several actions (for example 
+            "Submit New Record", "Submit a New File", "Send to a Distribution List", etc. in fact any action you can imagine 
+            to perform on a document stored in your database). The creation of an action is very simple and consists in 
+            filling in a name, description and associating a directory to this action. The directory parameter indicates where 
+            the collected data will be stored when the action is carried on.<br><br>
+            &nbsp;<span class="guideheader">O</span>nce an action is created, you have to implement it over a document 
+            type. Implementing an action means defining the web form which will be displayed to a user, and defining the 
+            treatment (set of functions) applied to the data which have been gathered. The implementation of the same action 
+            over two document types can be very different. The fields in the web form can be different as well as the functions 
+            applied at the end of this action.
+        </BLOCKQUOTE>
+
+        <h3>See also:</h3>
+            <BLOCKQUOTE>
+                <li><A HREF="actionnew.<lang:star: *>.html">create a new action</A><BR>
+                <li><A HREF="actionremove.<lang:star: *>.html">remove an action</A><BR>
+                <li><A HREF="actionmodify.<lang:star: *>.html">modify an action</A><BR>
+                <li><A HREF="actionimplement.<lang:star: *>.html">implement an action over a type of document</A><BR>
+            </BLOCKQUOTE>
+

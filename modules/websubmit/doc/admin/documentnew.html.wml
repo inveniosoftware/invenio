@@ -1,0 +1,54 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="Add a new type of document" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a> &gt; <a class=navtrail href=<lang:star: index.*.html>><MSG_GUIDE></a>" 
+
+    <h3>How to get there?</h3>
+            <BLOCKQUOTE>
+                &nbsp;<span class="guideheader">C</span>lick on the "New Doctype" link in the webSubmit right menu.
+            </BLOCKQUOTE>
+    <h3>How to do this?</h3>
+            <BLOCKQUOTE>
+                &nbsp;<span class="guideheader">A</span> new document type is defined by 6 fields:<br>
+                <UL>
+                    <li><b>Creation Date</b> and <b>Modification Dates</b> are generated and modified automatically.<br>
+                    <li><b>Document Type ID</b>: This is the acronym for your new document type. We usually use a 3 letters 
+                    acronym.
+                    <li><b>Document Type Name</b>: This is the full name of your new document. This is the text which will 
+                    appear on the list of available documents and catalogues on webSubmit main page.
+                    <li><b>Document Type Description</b>: This is the text which will appear on the document type submission 
+                    page. This can be pure text or html.
+                    <li><b>Doctype to clone</b>: Here you can choose to create your document type as a clone of another 
+                    existing document type. If so, the new document type will implement all actions implemented by the chosen 
+                    one. The web forms will be the same, and the functions also, as well as the values of the parameters for 
+                    these functions. Of course once cloned, you will be able to modify the implemented actions.
+                </UL>
+            </BLOCKQUOTE>
+
+
+        <h3>See also:</h3>
+            <BLOCKQUOTE>
+                <li><A HREF="documentremove.<lang:star: *>.html">remove a type of document</A><BR>
+                <li><A HREF="documentmodify.<lang:star: *>.html">modify a type of document</A><BR>
+                <li><A HREF="actionimplement.<lang:star: *>.html">implement an action over a type of document</A><BR>
+            </BLOCKQUOTE>
+

@@ -1,0 +1,59 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ 
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="Document Types" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a> &gt; <a class=navtrail href=<lang:star: index.*.html>><MSG_GUIDE></a>" 
+ 
+
+    <fr><MSG_PAGE_BEING_TRANSLATED_BODY></fr>
+    <de><MSG_PAGE_BEING_TRANSLATED_BODY></de>
+    <es><MSG_PAGE_BEING_TRANSLATED_BODY></es>
+    <pt><MSG_PAGE_BEING_TRANSLATED_BODY></pt>
+    <it><MSG_PAGE_BEING_TRANSLATED_BODY></it>
+    <ru><MSG_PAGE_BEING_TRANSLATED_BODY></ru>
+    <sk><MSG_PAGE_BEING_TRANSLATED_BODY></sk>
+    <cz><MSG_PAGE_BEING_TRANSLATED_BODY></cz>
+    <no><MSG_PAGE_BEING_TRANSLATED_BODY></no>
+
+        <BLOCKQUOTE>
+            <UL>
+                &nbsp;<span class="guideheader">W</span>ebSubmit can propose several actions on different document 
+                types. Each of these document type may or may not implement all possible actions. The main difference 
+                between each document type is the metadata which define each of them, and may also be the kind of fulltext 
+                files attached to one record. <br><br>
+                &nbsp;<span class="guideheader">A</span> document type can be one of "Thesis", "Photos", "Videotapes"... 
+                or whatever type of document you may invent. A document type is always defined by its metadata. It may or
+                may not have a fulltext file attached to it.<br><br>
+                &nbsp;<span class="guideheader">T</span>his tool leaves you free to create the web forms adapted to whatever type of document you want to 
+                create (see "<a href=actionform.<lang:star: *>.html>Create and Maintain the Web Form</a>") as well as free 
+                to determine what treatment you wish to apply to the collected data (see 
+                 "<a href=actiontreatment.<lang:star: *>.html>Create and Maintain the Data Treatment</a>").
+            </UL>
+        </BLOCKQUOTE>
+
+        <h3>See also:</h3>
+            <BLOCKQUOTE>
+                <A HREF="documentnew.<lang:star: *>.html">add a new type of document</A><BR>
+                <A HREF="documentremove.<lang:star: *>.html">remove a type of document</A><BR>
+                <A HREF="documentmodify.<lang:star: *>.html">modify a type of document</A><BR>
+                <A HREF="actionimplement.<lang:star: *>.html">implement an action over a type of document</A><BR>
+            </BLOCKQUOTE>
+

@@ -1,0 +1,54 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="Modify an existing type of document" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a> &gt; <a class=navtrail href=<lang:star: index.*.html>><MSG_GUIDE></a>" 
+
+        <h3>What is it?</h3>
+        <BLOCKQUOTE>
+            &nbsp;<span class="guideheader">M</span>odifying a document type in webSubmit - this will modify its 
+            general data description, not the implementations of 
+            the actions on this document type. For the later, please see <A HREF="actionimplement.<lang:star: *>.html">
+            implement an action over a type of document</A>.
+        </BLOCKQUOTE>
+        <h3>How to get there?</h3>
+        <BLOCKQUOTE>
+            &nbsp;<span class="guideheader">F</span>rom the main page of the manager, click on the title of the 
+            document type you want to modify, then click on the "Edit Document Type Details".
+        </BLOCKQUOTE>
+        <h3>How to do this?</h3>
+        <BLOCKQUOTE>
+            &nbsp;<span class="guideheader">O</span>nce here, you can modify 2 fields:<br>
+            <li><b>Document Type Name</b>: This is the full name of your new document. This is the text which will appear 
+            on the list of available documents and catalogues on webSubmit main page.
+            <li><b>Document Type Description</b>: This is the text which will appear on the right of the screen when the user 
+            moves the mouse over the document type title and on the document type submission page. This can be pure 
+            text or html.
+        </BLOCKQUOTE>
+
+
+        <h3>See also:</h3>
+            <BLOCKQUOTE>
+                <li><A HREF="documentremove.<lang:star: *>.html">remove a type of document</A><BR>
+                <li><A HREF="documentnew.<lang:star: *>.html">create a type of document</A><BR>
+                <li><A HREF="actionimplement.<lang:star: *>.html">implement an action over a type of document</A><BR>
+            </BLOCKQUOTE>
+

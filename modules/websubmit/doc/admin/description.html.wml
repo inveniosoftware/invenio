@@ -1,0 +1,66 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="Interface Description" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a> &gt; <a class=navtrail href=<lang:star: index.*.html>><MSG_GUIDE></a>" 
+ 
+
+    <fr><MSG_PAGE_BEING_TRANSLATED_BODY></fr>
+    <de><MSG_PAGE_BEING_TRANSLATED_BODY></de>
+    <es><MSG_PAGE_BEING_TRANSLATED_BODY></es>
+    <pt><MSG_PAGE_BEING_TRANSLATED_BODY></pt>
+    <it><MSG_PAGE_BEING_TRANSLATED_BODY></it>
+    <ru><MSG_PAGE_BEING_TRANSLATED_BODY></ru>
+    <sk><MSG_PAGE_BEING_TRANSLATED_BODY></sk>
+    <cz><MSG_PAGE_BEING_TRANSLATED_BODY></cz>
+    <no><MSG_PAGE_BEING_TRANSLATED_BODY></no>
+
+        <h3>Welcome to webSubmit Management tool:</h3>
+        <BLOCKQUOTE>
+            <UL>
+                &nbsp;<span class="guideheader">o</span>n the websubmit admin <a href="<WEBURL>/admin/websubmit/">main page</a> you will find:<br><br>
+                <IMG src="<WEBURL>/img/guide_adm_main_page.png" class="guideimg"><br><br>
+                <UL>
+                    <LI>The list of all existing document type in the middle of the page. Click on one line in the list to have
+                     access to the main document modification panel</SMALL>
+                    <LI>The right menu panel with the following links inside:
+                        <UL>
+                            <LI>"<b>webSubmit Admin</b>": This links leads you back to the main page of the manager.
+                            <LI>"<b>New Doctype</b>": Click here if you wish to create a new document type.
+                            <LI>"<b>Remove Doctype</b>": Click here if you want to remove an existing document type.
+                            <LI>"<b>Available Actions</b>": Lists all existing actions
+                            <LI>"<b>Available Javascript Checks</b>": Lists all existing Javascript checking functions.
+                            <LI>"<b>Available Element Description</b>": Lists all existing html form element descriptions.
+                            <LI>"<b>Available Functions</b>": Lists all existing functions in CDS Submit.
+                            <LI>"<b>Organise Main Page</b>": Allows you to manage the appearance and order of the list of document
+                             types on CDS Submit User main page.
+                        </UL>
+                </UL>
+        </BLOCKQUOTE>
+
+
+        <h3>See also:</h3>
+            <BLOCKQUOTE>
+                <A HREF="description.<lang:star: *>.html">interface description</A><BR>
+                <A HREF="actions.<lang:star: *>.html">actions</A><BR>
+                <A HREF="documents.<lang:star: *>.html">document types</A><BR>
+            </BLOCKQUOTE>
+

@@ -1,0 +1,43 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="Remove a type of document" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a> &gt; <a class=navtrail href=<lang:star: index.*.html>><MSG_GUIDE></a>" 
+
+        <h3>How to get there?</h3>
+        <BLOCKQUOTE>
+            &nbsp;<span class="guideheader">C</span>lick on the "Remove Doctype" link in the 
+            webSubmit admin right menu
+        </BLOCKQUOTE>
+        <h3>How to do this?</h3>
+        <BLOCKQUOTE>
+            &nbsp;<span class="guideheader">S</span>elect the document type to delete then click on the "Remove Doctype" button. Remember by doing this, you 
+            will delete this document type as well as all the implementation of actions for this document type!
+        </BLOCKQUOTE>
+
+
+        <h3>See also:</h3>
+            <BLOCKQUOTE>
+                <li><A HREF="documentnew.<lang:star: *>.php">create a type of document</A><BR>
+                <li><A HREF="documentmodify.<lang:star: *>.php">modify a type of document</A><BR>
+                <li><A HREF="actionimplement.<lang:star: *>.php">implement an action over a type of document</A><BR>
+            </BLOCKQUOTE>
+

@@ -1,0 +1,64 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="General overview of the manager tool" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a> &gt; <a class=navtrail href=<lang:star: index.*.html>><MSG_GUIDE></a>" 
+
+    <fr><MSG_PAGE_BEING_TRANSLATED_BODY></fr>
+    <de><MSG_PAGE_BEING_TRANSLATED_BODY></de>
+    <es><MSG_PAGE_BEING_TRANSLATED_BODY></es>
+    <pt><MSG_PAGE_BEING_TRANSLATED_BODY></pt>
+    <it><MSG_PAGE_BEING_TRANSLATED_BODY></it>
+    <ru><MSG_PAGE_BEING_TRANSLATED_BODY></ru>
+    <sk><MSG_PAGE_BEING_TRANSLATED_BODY></sk>
+    <cz><MSG_PAGE_BEING_TRANSLATED_BODY></cz>
+    <no><MSG_PAGE_BEING_TRANSLATED_BODY></no>
+
+        <h3>Things to know before using the Manager:</h3>
+        <BLOCKQUOTE>
+            <UL>
+                &nbsp;<span class="guideheader">T</span>his manager tool allows you to administrate all the WebSubmit 
+                interface. With it, you will be able to create new actions, new types of documents and edit the existing ones.
+                <br><br>
+                &nbsp;<span class="guideheader">T</span>he main objects in webSubmit are the "action" (such as 
+                "Submit New Record", "Submit New File", "Modify Record"...) and the "type of document" (such as "preprint", 
+                "photo"...).<br><br>
+                &nbsp;<span class="guideheader">T</span>o one given type of document can be attached several actions.
+                An action is the addition of two processes: 
+                <UL>
+                    <LI>The first one is the <a href="implementwebform.<lang:star: *>.html">data gathering</a>. The manager 
+                    will allow you to create new web forms corresponding to the fields the user will have to fill in when using 
+                    webSubmit.
+                    <LI>The second one is the <a href="implementfunctions.<lang:star: *>.html">data treatement</a>.
+                     Basically, what the program will do with the data gathered during the first phase. The treatment appears 
+                     in this tool as a sequence of functions. This manager will allow you to add functions to an action, edit the 
+                     existing functions, and reorder the functions.
+                </UL>
+            </UL>
+        </BLOCKQUOTE>
+
+        <h3>See also:</h3>
+            <BLOCKQUOTE>
+                <li><A HREF="example.<lang:star: *>.html">using the manager through an example</A><BR>
+                <li><A HREF="description.<lang:star: *>.html">interface description</A><BR>
+                <li><A HREF="actions.<lang:star: *>.html">actions</A><BR>
+                <li><A HREF="documents.<lang:star: *>.html">document types</A><BR>
+            </BLOCKQUOTE>

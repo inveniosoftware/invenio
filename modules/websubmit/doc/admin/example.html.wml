@@ -1,0 +1,96 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="Using the manager through an example" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a> &gt; <a class=navtrail href=<lang:star: index.*.html>><MSG_GUIDE></a>" 
+ 
+
+    <fr><MSG_PAGE_BEING_TRANSLATED_BODY></fr>
+    <de><MSG_PAGE_BEING_TRANSLATED_BODY></de>
+    <es><MSG_PAGE_BEING_TRANSLATED_BODY></es>
+    <pt><MSG_PAGE_BEING_TRANSLATED_BODY></pt>
+    <it><MSG_PAGE_BEING_TRANSLATED_BODY></it>
+    <ru><MSG_PAGE_BEING_TRANSLATED_BODY></ru>
+    <sk><MSG_PAGE_BEING_TRANSLATED_BODY></sk>
+    <cz><MSG_PAGE_BEING_TRANSLATED_BODY></cz>
+    <no><MSG_PAGE_BEING_TRANSLATED_BODY></no>
+
+        <h3>what is this?</h3>
+        <BLOCKQUOTE>
+            <UL>
+            This page presents you the typical situations a user could meet using WebSubmit, and for each situation how to use the manager to configure it.
+            </UL>
+        </BLOCKQUOTE>
+
+    <h3>The user reaches WebSubmit main page.</h3>
+    <IMG src="<WEBURL>/img/guide_mainmenu.png" alt="Main Page" class="guideimg" align="left">
+    &nbsp;<span class="guideheader">T</span>o add a document type to WebSubmit, you should go to the <a target=top href="<WEBURL>/admin/websubmit/index.php">main page</a>
+     and click on "New Doctype" in the left blue panel.<br><br>
+    &nbsp;<span class="guideheader">E</span>ven once created, a document type will not appear automatically on this page. To configure the list of catalogues and document
+     types displayed on this page, the administrator shall go to the <a target=top href="<WEBURL>/admin/websubmit/editCatalogues.php">edit catalogues</a>
+      page. (see the <a href=catalogues.<lang:star: *>.html>guide section</a>)<br>
+
+    <h3>The user can then click on the document type he is interested in.</h3>
+    <IMG src="<WEBURL>/img/guide_menudoc.png" alt="Document type Page" class="guideimg" align="left">
+    &nbsp;<span class="guideheader">T</span>he text appearing under the header containing the name of the document
+     can be configured by going to the <a target=top href="<WEBURL>/admin/websubmit/">main page</a>, click on 
+     the title of the document type then on the "Edit Document Types Details" button.<br><br>
+    &nbsp;<span class="guideheader">Y</span>ou can associate several categories to a document type which can be defined by going to the
+     <a target=top href="<WEBURL>/admin/websubmit/">main page</a>, click on the title of the document type 
+     then on the "View Categories" button. The selected category will be saved in a file named "comboXXX" 
+     (where XXX is the short name of the document type) in the submission directory.<br><br>
+    &nbsp;<span class="guideheader">T</span>o add an action button to this page, first implement this action by going to the 
+    <a target=top href="<WEBURL>/admin/websubmit/">main page</a>, click on the title of the document type then 
+    on the "Add a new submission" button. If the action is already implemented and the button still does not appear 
+    on the submision page, then you should edit the details of this implementation: go to the 
+    <a target=top href="<WEBURL>/admin/websubmit">main page</a>, click on the title of the document type then 
+    on the icon in the "Edit Submission" column and in the line of the desired action. There you should set the 
+    "Displayed" form field to "YES".<br><br>
+    &nbsp;<span class="guideheader">Y</span>ou can also change the order of the buttons, by going to the <a target=top href="<WEBURL>/admin/websubmit/">
+    main page</a>, click on the title of the document type then on the icon in the "Edit Submission" column and in the 
+    line of the desired action. There you can set the "buttonorder" form field.<br><br>
+
+    <h3>The user now may choose a category, then click on the action button he wishes.<br>The submission starts, the first page of the web form appears.</h3>
+    <IMG src="<WEBURL>/img/guide_form.png" alt="Document type Page" class="guideimg" align="left">
+    &nbsp;<span class="guideheader">T</span>his web form is composed of several pages, on each of these 
+    pages form fields can be found. To modify the number of pages, add or withdraw form fields and modify 
+    the texts before each form field, you shall go to the <a target=top href="<WEBURL>/admin/websubmit">main page</a>, 
+    click on the title of the document type then on the icon in the "Edit Submission Pages" column and in the line of the 
+    desired action. (see the <a href=actionimplement.<lang:star: *>.html>guide section</a>)<br>
+
+    <h3>On the last page of the submission, there should be a button like in the following image which will 
+    trigger the end script</h3>
+    <IMG src="<WEBURL>/img/guide_endaction.png" alt="Document type End Page" class="guideimg" align="left">
+    &nbsp;<span class="guideheader">T</span>his button is defined like any other form field. Its definition should include
+     a <i> onclick="finish();"</i> javascript attribute.<br><br>
+    &nbsp;<span class="guideheader">A</span>fter clicking this button, WebSubmit will apply the end script functions 
+    to the gathered data. To modify the end script, you shall go to the <a target=top href="<WEBURL>/admin/websubmit/">
+    main page</a>, click on the title of the document type then on the icon in the "Edit Functions" column and in the line 
+    of the desired action. (see the <a href="implementfunctions.<lang:star: *>.html">guide section</a>)<br>
+
+
+        <h3>See also:</h3>
+            <BLOCKQUOTE>
+        <A HREF="description.<lang:star: *>.html">interface description</A><BR>
+        <A HREF="actions.<lang:star: *>.html">actions</A><BR>
+        <A HREF="documents.<lang:star: *>.html">document types</A><BR>
+            </BLOCKQUOTE>
+

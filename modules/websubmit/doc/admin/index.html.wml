@@ -1,0 +1,81 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "configbis.wml"
+#include "cdspage.wml" \
+    title="<MSG_GUIDE>" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a>" 
+
+
+    <fr><MSG_PAGE_BEING_TRANSLATED_BODY></fr>
+    <de><MSG_PAGE_BEING_TRANSLATED_BODY></de>
+    <es><MSG_PAGE_BEING_TRANSLATED_BODY></es>
+    <pt><MSG_PAGE_BEING_TRANSLATED_BODY></pt>
+    <it><MSG_PAGE_BEING_TRANSLATED_BODY></it>
+    <ru><MSG_PAGE_BEING_TRANSLATED_BODY></ru>
+    <sk><MSG_PAGE_BEING_TRANSLATED_BODY></sk>
+    <cz><MSG_PAGE_BEING_TRANSLATED_BODY></cz>
+    <no><MSG_PAGE_BEING_TRANSLATED_BODY></no>
+
+        <h3>Table of Contents</STRONG></h3>
+
+        <UL>
+          <LI><B>Introduction</B>
+        <UL>
+          <LI><A HREF="introduction.<lang:star: *>.html">General Overview of the Manager Tool</A>
+          <LI><A HREF="example.<lang:star: *>.html">Using the manager through an example</A>
+        </UL>
+        <LI><B>The Interface</B>
+        <UL>
+          <LI><A HREF="description.<lang:star: *>.html">Description</A>
+        </UL>
+          <LI><B><A HREF="documents.<lang:star: *>.html">Types of Document</A></B>
+          <UL>
+            <LI><A HREF="documentnew.<lang:star: *>.html">Add a New Type of Document</A>
+              <LI><A HREF="documentremove.<lang:star: *>.html">Remove a type of document</A>
+            <LI><A HREF="documentmodify.<lang:star: *>.html">Modify an Existing Type of Document</A>
+          </UL>
+        <LI><B><A HREF="actions.<lang:star: *>.html">Actions</A></B>
+        <UL>
+          <LI><A HREF="actionnew.<lang:star: *>.html">Add a New Action</A>
+          <LI><A HREF="actionremove.<lang:star: *>.html">Remove an Action</A>
+          <LI><A HREF="actionmodify.<lang:star: *>.html">Modify an Existing Action</A>
+          <LI><A HREF="actionimplement.<lang:star: *>.html">Implement an Action over a Document Type</A>
+             <UL>
+            <LI><A HREF="implementwebform.<lang:star: *>.html">Create and Maintain the Web Form</A>
+            <LI><A HREF="implementfunctions.<lang:star: *>.html">Create and Maintain the Data Treatment</A>
+             </UL>
+        </UL>
+        <LI><B><A HREF="functions.<lang:star: *>.html">Functions</A></B>
+        <UL>
+          <LI><A HREF="functionnew.<lang:star: *>.html">Create a New Function</A>
+          <LI><A HREF="functiondelete.<lang:star: *>.html">Remove a Function</A>
+          <LI><A HREF="functionedit.<lang:star: *>.html">Edit a Function</A>
+          <LI><A HREF="functiondescription.<lang:star: *>.html">All Functions Explained</A>
+        </UL>
+        <LI><B><A HREF="protection.<lang:star: *>.html">Protection</A></B>
+        <LI><B><A HREF="catalogues.<lang:star: *>.html">Catalogues Organisation</A></B>
+        <LI><B><A HREF="bibconvert.<lang:star: *>.html">bibConvert</A></B>
+          <LI><B>Notes</B>
+        <UL>
+        </UL>
+        <LI><B><A HREF="faq.<lang:star: *>.html">FAQ</a></B>
+        </UL>
+         
+
