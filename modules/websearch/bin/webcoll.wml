@@ -59,7 +59,7 @@ except ImportError, e:
 try:
     sys.path.append('%s' % pylibdir)
     from cdsware.config import *
-    from cdsware.search_engine import HitList, search_pattern
+    from cdsware.search_engine import HitSet, search_pattern
     from cdsware.search_engine_config import cfg_author_et_al_threshold, cfg_instant_browse, cfg_max_recID
     from cdsware.dbquery import run_sql    
 except ImportError, e:
@@ -241,13 +241,13 @@ class Collection:
         "Creates collection instance by querying the MySQL configuration database about 'name'."
         self.calculate_reclist_run_already = 0 # to speed things up wihtout much refactoring
         self.update_reclist_run_already = 0 # to speed things up wihtout much refactoring
-        self.reclist_with_nonpublic_subcolls = HitList()
+        self.reclist_with_nonpublic_subcolls = HitSet()
         if not name:
             self.name = cdsname # by default we are working on the home page
             self.id = 1
             self.dbquery = None
             self.nbrecs = None
-            self.reclist = HitList()
+            self.reclist = HitSet()
         else:
             self.name = name
             query = "SELECT id,name,nameshort,dbquery,nbrecs,reclist FROM collection WHERE name='%s'" % escape_string(name)
@@ -260,15 +260,15 @@ class Collection:
                     self.dbquery = res[0][3]
                     self.nbrecs = res[0][4]
                     try:
-                        self.reclist = HitList(Numeric.loads(zlib.decompress(res[0][5])))
+                        self.reclist = HitSet(Numeric.loads(zlib.decompress(res[0][5])))
                     except:
-                        self.reclist = HitList()
+                        self.reclist = HitSet()
                 else: # collection does not exist!
                     self.id = None
                     self.nameshort = None
                     self.dbquery = None
                     self.nbrecs = None
-                    self.reclist = HitList()
+                    self.reclist = HitSet()
             except MySQLdb.Error, e:
                 print "Error %d: %s" % (e.args[0], e.args[1])
                 sys.exit(1)
@@ -900,8 +900,8 @@ class Collection:
             # do we have to recalculate?
             return (self.reclist, self.reclist_with_nonpublic_subcolls)
         Log("... calculating reclist of %s" % self.name)
-        reclist = HitList() # will hold results for public sons only; good for storing into DB
-        reclist_with_nonpublic_subcolls = HitList() # will hold results for both public and nonpublic sons; good for deducing total
+        reclist = HitSet() # will hold results for public sons only; good for storing into DB
+        reclist_with_nonpublic_subcolls = HitSet() # will hold results for both public and nonpublic sons; good for deducing total
                                                   # number of documents
         if not self.dbquery:
             # A - collection does not have dbquery, so query recursively all its non-restricted sons:
