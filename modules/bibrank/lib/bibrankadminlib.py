@@ -63,7 +63,7 @@ def perform_index(ln=cdslang):
     """create the bibrank main area menu page."""
     
     header = ['Name', 'Translations', 'Collections', 'Rank method']
-    rnk_list = get_current_name('', ln, get_rnk_mainnametype(), "rnkMETHOD")
+    rnk_list = get_current_name('', ln, get_rnk_nametypes()[0][0], "rnkMETHOD")
     actions = []
     
     for (rnkID, name) in rnk_list:
@@ -106,7 +106,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
     subtitle = ""
 
     if rnkID:
-        rnkNAME = get_current_name(rnkID, ln, get_rnk_mainnametype(), "rnkMETHOD")[0][1]
+        rnkNAME = get_current_name(rnkID, ln, get_rnk_nametypes()[0][0], "rnkMETHOD")[0][1]
 
         if func in ["0", 0] and confirm in ["1", 1]:
                 finresult = attach_col_rnk(rnkID, colID)
@@ -114,7 +114,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
                 finresult = detach_col_rnk(rnkID, colID)
 
         if colID:
-            colNAME = get_current_name(colID, ln, get_col_mainnametype(), "collection")[0][1]
+            colNAME = get_current_name(colID, ln, get_col_nametypes()[0][0], "collection")[0][1]
         subtitle = """Step 1 - Select collection to enable/disable rank method '%s' for""" % rnkNAME
         output  = """
         <dl>
@@ -137,7 +137,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
         </dl>
         """
                         
-        col_list = get_current_name('', ln, get_col_mainnametype(), "collection")
+        col_list = get_current_name('', ln, get_col_nametypes()[0][0], "collection")
         col_rnk = dict(get_rnk_col(rnkID))
         col_list = filter(lambda x: not col_rnk.has_key(x[0]), col_list)
 
@@ -145,10 +145,11 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
             text  = """
             <span class="adminlabel">Enable for:</span>
             <select name="colID" class="admin_w200">
+            <option value="">- select collection -</option>
             """
             
             for (id, name) in col_list:
-                text += """<option value="%s" %s>%s</option>""" % (id, (func in ["0", 0] and confirm in ["0", 0] and int(colID) == int(id)) and 'selected="selected"' or '' , name)
+                text += """<option value="%s" %s>%s</option>""" % (id, (func in ["0", 0] and confirm in ["0", 0] and colID and int(colID) == int(id)) and 'selected="selected"' or '' , name)
             text += """</select>"""
             output += createhiddenform(action="modifycollection",
                                        text=text,
@@ -158,7 +159,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
                                        func=0,
                                        confirm=0)
 
-        if confirm in ["0", 0] and func in ["0", 0]:
+        if confirm in ["0", 0] and func in ["0", 0] and colID:
             subtitle = "Step 2 - Confirm to enable rank method for the chosen collection"
             text = "<b><p>Please confirm to enable rank method '%s' for the collection '%s'</p></b>" % (rnkNAME, colNAME)
             output += createhiddenform(action="modifycollection",
@@ -169,7 +170,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
                                        colID=colID,
                                        func=0,
                                        confirm=1)
-        elif confirm in ["1", 1] and func in ["0", 0]:
+        elif confirm in ["1", 1] and func in ["0", 0] and colID:
             subtitle = "Step 3 - Result"
             if finresult:
                 output += """<b><span class="info">Rank method '%s' enabled for collection '%s'</span></b>""" % (rnkNAME, colNAME) 
@@ -181,10 +182,11 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
             text  = """
             <span class="adminlabel">Disable for:</span>
             <select name="colID" class="admin_w200">
+            <option value="">- select collection -</option>
             """
         
             for (id, name) in col_list:
-                text += """<option value="%s" %s>%s</option>""" % (id, (func in ["1", 1] and confirm in ["0", 0] and int(colID) == int(id)) and 'selected="selected"' or '' , name)
+                text += """<option value="%s" %s>%s</option>""" % (id, (func in ["1", 1] and confirm in ["0", 0] and colID and int(colID) == int(id)) and 'selected="selected"' or '' , name)
             text += """</select>"""
             output += createhiddenform(action="modifycollection",
                                        text=text,
@@ -194,7 +196,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
                                        func=1,
                                        confirm=0)
              
-        if confirm in ["0", 0] and func in ["1", 1]:
+        if confirm in ["0", 0] and func in ["1", 1] and colID:
             subtitle = "Step 2 - Confirm to disable rank method for collection"
             text = "<b><p>Please confirm to disable rank method '%s' for collection '%s'</p></b>" % (rnkNAME, colNAME)
             output += createhiddenform(action="modifycollection",
@@ -205,7 +207,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
                                        colID=colID,
                                        func=1,
                                        confirm=1)
-        elif confirm in ["1", 1] and func in ["1", 1]:
+        elif confirm in ["1", 1] and func in ["1", 1] and colID:
             subtitle = "Step 3 - Result"
             if finresult:
                 output += """<b><span class="info">Rank method '%s' disabled for collection '%s'</span></b>""" % (rnkNAME, colNAME)
@@ -228,7 +230,7 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
     if confirm in ["2", 2] and rnkID:
         finresult = modify_translations(rnkID, cdslangs, sel_type, trans, "rnkMETHOD")
         
-    rnk_dict = dict(get_current_name('', ln, get_rnk_mainnametype(), "rnkMETHOD"))
+    rnk_dict = dict(get_current_name('', ln, get_rnk_nametypes()[0][0], "rnkMETHOD"))
     if rnkID and rnk_dict.has_key(int(rnkID)):
         rnkID = int(rnkID)
         subtitle = """<a name="3">3. Modify translations for rank method '%s'</a></br>""" % rnk_dict[rnkID]
@@ -236,7 +238,7 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
         if type(trans) is str:
             trans = [trans]
         if sel_type == '':
-            sel_type = get_rnk_mainnametype()
+            sel_type = get_rnk_nametypes()[0][0]
             
         header = ['Language', 'Translation']
 
@@ -249,9 +251,7 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
     
         types = get_rnk_nametypes()
         if len(types) > 1:
-            for col in types:
-                key = col[0][0]
-                value = col[0][1]
+            for (key, value) in types:
                 text += """<option value="%s" %s>%s""" % (key, key == sel_type and 'selected="selected"' or '', value)
                 trans_names = get_name(rnkID, ln, key, "rnkMETHOD")
                 if trans_names and trans_names[0][0]:
@@ -265,7 +265,6 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
                                        rnkID=rnkID,
                                        ln=ln,
                                        confirm=0)
-
 
         if confirm in [-1, "-1", 0, "0"]:
             trans = []
@@ -448,7 +447,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
     text = ""
     if rnkcode and confirm in ["0", 0] and get_rnk_code(rnkID)[0][0] != rnkcode:
             subtitle = 'Step 2 - Confirm modification of configuration'
-            text += "<b>Modify rank method '%s' with old code '%s' and set new code '%s'.</b>" % (get_current_name(rnkID, ln, get_rnk_mainnametype(), "rnkMETHOD")[0][0], get_rnk_code(rnkID)[0][0], rnkcode)         
+            text += "<b>Modify rank method '%s' with old code '%s' and set new code '%s'.</b>" % (get_current_name(rnkID, ln, get_rnk_nametypes()[0][0], "rnkMETHOD")[0][0], get_rnk_code(rnkID)[0][0], rnkcode)         
     if cfgfile and confirm in ["0", 0]:
             subtitle = 'Step 2 - Confirm modification of configuration'
             text += "</br><b>Modify configuration file</b>"
@@ -467,7 +466,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
         result = modify_rnk(rnkID, rnkcode)
         subtitle = "Step 3 - Result"
         if result:
-            text = """<b><span class="info">Rank method '%s' modified, new code is '%s'.</span></b>""" % (get_current_name(rnkID, ln, get_rnk_mainnametype(), "rnkMETHOD")[0][0], rnkcode)
+            text = """<b><span class="info">Rank method '%s' modified, new code is '%s'.</span></b>""" % (get_current_name(rnkID, ln, get_rnk_nametypes()[0][0], "rnkMETHOD")[0][0], rnkcode)
             try:
                 file =  open("%s/bibrank/%s.cfg" % (etcdir, oldcode), 'r')
                 file2 =  open("%s/bibrank/%s.cfg" % (etcdir, rnkcode), 'w')
@@ -499,6 +498,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
     text = """
     <span class="adminlabel">Select</span>
     <select name="template" class="admin_w200">
+    <option value="">- select template -</option>
     """
     templates = get_templates()
     for templ in templates:
@@ -547,7 +547,7 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
     
     if rnkID:
         if confirm in ["0", 0]:
-            rnkNAME = get_current_name(rnkID, ln, get_rnk_mainnametype(), "rnkMETHOD")[0][1]
+            rnkNAME = get_current_name(rnkID, ln, get_rnk_nametypes()[0][0], "rnkMETHOD")[0][1]
             subtitle = 'Step 1 - Confirm deletion'
             text = """Delete rank method '%s'.""" % (rnkNAME)
             output += createhiddenform(action="deleterank",
@@ -556,7 +556,7 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
                                       confirm=1)
         elif confirm in ["1", 1]:
             try:
-                rnkNAME = get_current_name(rnkID, ln, get_rnk_mainnametype(), "rnkMETHOD")[0][1]
+                rnkNAME = get_current_name(rnkID, ln, get_rnk_nametypes()[0][0], "rnkMETHOD")[0][1]
                 rnkcode = get_rnk_code(rnkID)[0][0]
                 result = delete_rnk(rnkID)
                 subtitle = "Step 2 - Result"
@@ -620,7 +620,7 @@ def perform_showrankdetails(rnkID, ln=cdslang):
     prev_lang = ''
     trans = get_translations(rnkID)
     types = get_rnk_nametypes()
-    types = dict(map(lambda x: (x[0][0], x[0][1]), types))
+    types = dict(map(lambda x: (x[0], x[1]), types))
     text = ""
     languages = dict(get_languages())
     if trans:
@@ -688,21 +688,17 @@ def get_translations(rnkID):
 def get_rnk_nametypes():
     """Return a list of the various translationnames for the rank methods"""
     
-    return [(('ln', 'Long name'),),(('sn', 'Short name'),)]
-
-def get_rnk_mainnametype():
-    """Return the main/default translationname"""
-    
-    return get_rnk_nametypes()[0][0][0]
+    type = []
+    type.append(('ln', 'Long name'))
+    type.append(('sn', 'Short name'))
+    return type
 
 def get_col_nametypes():
     """Return a list of the various translationnames for the rank methods"""
-    return [(('ln', 'Long name'),)]
-
-def get_col_mainnametype():
-    """Return the main/default translationname"""
-    return get_col_nametypes()[0][0][0]
-
+    
+    type = []
+    type.append(('ln', 'Long name'))
+    return type
 
 def get_rnk_set(rnkID=''):
     """Return all rank sets, or all for a specified rank method
@@ -723,11 +719,11 @@ def get_rnk_col(rnkID, ln=cdslang):
     
     try:
         res1 = dict(run_sql("SELECT id_collection, '' FROM collection_rnkMETHOD WHERE id_rnkMETHOD=%s" % rnkID))
-        res2 = get_current_name('',ln, get_col_mainnametype(), "rnkMETHOD")
+        res2 = get_current_name('',ln, get_col_nametypes()[0][0], "collection")
         result = filter(lambda x: res1.has_key(x[0]), res2)
         return result
     except StandardError, e:
-        raise ()
+        return ()
 
 def get_templates():
     """Read etcdir/bibrank and returns a list of all files with 'template' """
