@@ -1380,8 +1380,8 @@ def search_unit(p, f=None, m=None):
        'f' and matching type 'm'.  Return hitset of recIDs.
     
        All the parameters are assumed to have been previously washed.
-       'p' is assumed already being a ``basic search unit'' so that it
-       is search as such and is not broken up in any way.  Only
+       'p' is assumed to be already a ``basic search unit'' so that it
+       is searched as such and is not broken up in any way.  Only
        wildcard and span queries are being detected inside 'p'.
 
        This function is suitable as a low-level API.
@@ -2947,8 +2947,9 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             # print records:
             if len(colls_to_search)>1:
                 cpu_time = -1 # we do not want to have search time printed on each collection
-            for coll in results_final.keys():
-                if results_final[coll]._nbhits:
+            colls_to_search.extend(results_final.keys())
+            for coll in colls_to_search:                
+                if results_final.has_key(coll) and results_final[coll]._nbhits:
                     if of.startswith("h"):
                         req.write(print_search_info(p, f, sf, so, sp, of, ot, coll, results_final_nb[coll],
                                                     jrec, rg, as, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
