@@ -87,14 +87,16 @@ Contents
           mysql> GRANT ALL PRIVILEGES ON cdsware.* TO cdsware@webserver.domain.com IDENTIFIED BY 'myp1ss';
         
           You need to create a dedicated database on your MySQL server
-          that CDSware can use for its purposes.  Please contact your
-          MySQL administrator and ask him to execute the above
-          commands that will create a database called "cdsware", a user
-          called "cdsware" with password "myp1ss", and that will grant
-          all rights on the "cdsware" database to the "cdsware" user.
+          that the CDSware can use for its purposes.  Please
+          contact your MySQL administrator and ask him to execute the
+          above commands that will create the "cdsware" database, a
+          user called "cdsware" with password "myp1ss", and that will
+          grant all rights on the "cdsware" database to the "cdsware"
+          user.
 
           (Of course, you are free to choose your own user credentials
-           and database names; the above values were just an example.)
+           and the database name; the above values were just an
+           example.  See also the configure line below.)
 
       $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
 
@@ -164,8 +166,8 @@ Contents
 
           Configure essential CDSware parameters, as the installation
           directories for HTDOCS files, CGI scripts and DB utilities,
-          the URL of the homepage and CGI scripts, and DB user
-          credentials.
+          the URL of the homepage and CGI scripts, and database host,
+          database name, and database user credentials.
           
           The first two directories must be within the Apache's htdocs
           and cgi-bin paths.  The DB utilities may be installed
