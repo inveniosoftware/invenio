@@ -36,7 +36,7 @@ DBPASS=<DBPASS>
 ###### okay, config file read, the script can continue ######
 
 # is help called?
-if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo "Usage: $0"
     echo "General options:"
     echo " -h, --help            Print this help."
@@ -45,7 +45,7 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
 fi 
 
 # is version called?
-if [ "$1" == "-V" ] || [ "$1" == "--version" ]; then
+if [ "$1" = "-V" ] || [ "$1" = "--version" ]; then
     echo "<: print generate_pretty_version_string('$Id$'); :>"
     exit 0
 fi 
