@@ -42,7 +42,7 @@ from cdsware import webalert
 from cdsware import webuser
 from cdsware.access_control_config import *
 from mod_python import apache  
-from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
+from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE, cfg_webaccess_warning_msgs, CFG_EXTERNAL_AUTHENTICATION
 import smtplib
 
 def edit(req, ln=cdslang):
@@ -63,38 +63,56 @@ def edit(req, ln=cdslang):
                 language=ln,
                 lastupdated=__lastupdated__)
 
-def change(req,email=None,password=None,password2=None,ln=cdslang):
+def change(req,email=None,password=None,password2=None,login_method="",ln=cdslang):
     uid = webuser.getUid(req)
 
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/change")
 
-    uid2 = webuser.emailUnique(email)
-    if (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2 or (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1 and webuser.checkemail(email))) and uid2 != -1 and (uid2 == uid or uid2 == 0) and password == password2:
-        change = webuser.updateDataUser(req,uid,email,password)
-        if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
-            mess = "Password successfully edited."
-        else:
-            mess = "Settings successfully edited."
-       	act = "display"
-        linkname = "Show account"
+    if login_method and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 4:
         title = "Settings edited"
-    elif uid2 == -1 or uid2 != uid and not uid2 == 0:
-        mess = "The email address is already in use, please try again."
+        act = "display"
+        linkname = "Show account"
+        prefs = webuser.get_user_preferences(uid)
+        prefs['login_method'] = login_method
+        webuser.set_user_preferences(uid, prefs)
+        mess = "Login method successfully selected."
+    elif login_method and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4:
+        return webuser.page_not_authorized(req, "../youraccount.py/change")
+    elif email:
+        if (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2 or (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1 and webuser.checkemail(email))) and uid2 != -1 and (uid2 == uid or uid2 == 0) and password == password2:
+            if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
+                change = webuser.updateDataUser(req,uid,email,password)
+            else:
+                return webuser.page_not_authorized(req, "../youraccount.py/change")
+            if change and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
+                mess = "Password successfully edited."
+            elif change:
+                mess = "Settings successfully edited."
+       	    act = "display"
+            linkname = "Show account"
+            title = "Settings edited"
+        elif uid2 == -1 or uid2 != uid and not uid2 == 0:
+            mess = "The email address is already in use, please try again."
+       	    act = "edit"
+            linkname = "Edit settings"
+            title = "Editing settings failed"
+        elif not webuser.checkemail(email):
+            mess = "The email address is not valid, please try again."
+       	    act = "edit"
+            linkname = "Edit settings"
+            title = "Editing settings failed"
+        elif password != password2:
+            mess = "The passwords do not match, please try again."
+       	    act = "edit"
+            linkname = "Edit settings"
+            title = "Editing settings failed"
+    else:
+        mess = "Could not update settings."
        	act = "edit"
         linkname = "Edit settings"
         title = "Editing settings failed"
-    elif not webuser.checkemail(email):
-        mess = "The email address is not valid, please try again."
-       	act = "edit"
-        linkname = "Edit settings"
-        title = "Editing settings failed"
-    elif password != password2:
-        mess = "The passwords do not match, please try again."
-       	act = "edit"
-        linkname = "Edit settings"
-        title = "Editing settings failed"
-    
+            
     return page(title=title,
  	        body=webaccount.perform_back(mess,act, linkname),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
@@ -147,13 +165,31 @@ def display(req, ln=cdslang):
                 language=ln,
                 lastupdated=__lastupdated__)
     	
-	
 def send_email(req, p_email=None, ln=cdslang):
     
     uid = webuser.getUid(req)
 
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/send_email")
+
+    user_prefs = webuser.get_user_preferences(webuser.emailUnique(p_email))
+    if user_prefs:
+        if CFG_EXTERNAL_AUTHENTICATION.has_key(user_prefs['login_method']) or CFG_EXTERNAL_AUTHENTICATION.has_key(user_prefs['login_method']) and CFG_EXTERNAL_AUTHENTICATION[user_prefs['login_method']][0] != None:
+	    Msg = """If you have lost password for your CERN Document Server internal
+               account, then please enter your email address below and the lost
+               password will be emailed to you.<br>
+               Note that if you have been using an external login system (such
+               as CERN NICE), then we cannot do anything and you have to ask
+               there.  Alternatively, you can ask <a href="mailto:<SUPPORTEMAIL>">
+               <SUPPORTEMAIL></a> to change your login system from external to internal.<br><br>"""
+
+	    return page(title="Your Account",
+                        body=Msg,
+                        description="CDS Personalize, Main page",
+                        keywords="CDS, personalize",
+                        uid=uid,
+                        language=ln,
+                        lastupdated=__lastupdated__)
 
     passw = webuser.givePassword(p_email) 
     if passw == -999:
@@ -246,7 +282,7 @@ def logout(req, ln=cdslang):
                 language=ln,
                 lastupdated=__lastupdated__)
     
-def login(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
+def login(req, p_email=None, p_pw=None, login_method=None, action='login', referer='', ln=cdslang):
 
     if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
         return webuser.page_not_authorized(req, "../youraccount.py/login")
@@ -254,7 +290,7 @@ def login(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
     uid = webuser.getUid(req)
 
     if action =='login':
-       if p_email==None:
+       if p_email==None or not login_method:
            return  page(title="Login",
                         body=webaccount.create_login_page_box(referer),
                         navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
@@ -263,9 +299,9 @@ def login(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
                         uid=uid,
                         language=ln,
                         lastupdated=__lastupdated__)
-       iden = webuser.loginUser(p_email,p_pw)
-    
+       (iden, p_email, p_pw, msgcode) = webuser.loginUser(req,p_email,p_pw, login_method)
        if len(iden)>0:
+           
            uid = webuser.update_Uid(req,p_email,p_pw)
            uid2 = webuser.getUid(req)
            if uid2 == -1:
@@ -279,10 +315,10 @@ def login(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
            else:
                return display(req)
        else:
-      	   if webuser.userNotExist(p_email,p_pw) or p_email=='' or p_email==' ':
-               mess ="Your are not logged into the system, because this user is unknown."
-           else:
-               mess ="Your are not logged into the system, because you have introduced a wrong password."
+           mess = cfg_webaccess_warning_msgs[msgcode] % login_method
+           if msgcode == 14:
+      	       if not webuser.userNotExist(p_email,p_pw) or p_email=='' or p_email==' ':
+                   mess = cfg_webaccess_warning_msgs[15] % login_method
            act = "login"    
 	   return page(title="Login",
                        body=webaccount.perform_back(mess,act),

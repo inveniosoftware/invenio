@@ -28,6 +28,8 @@ At the same time this presents all the stuff it could need with sessions managem
 It also contains Apache-related user authentication stuff.
 """
 
+from marshal import loads,dumps
+from zlib import compress,decompress
 from dbquery import run_sql
 import sys
 import time
@@ -37,6 +39,7 @@ import string
 import session
 import websession
 import smtplib
+import MySQLdb
 from websession import pSession, pSessionMapping
 from session import SessionError
 from config import *
@@ -207,6 +210,7 @@ def checkemail(email):
        
        checkemail(email) -> boolean
     """
+
     if (string.find(email, "@") <= 0) or (string.find(email, " ") > 0):
        return 0
     elif CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN:
@@ -254,8 +258,11 @@ def registerUser(req,user,passw):
             activated = 0
         elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
             return 0
-	setUid(req, run_sql("INSERT INTO user (email, password, note) VALUES (%s,%s,%s)",
-                                (user,passw, activated)))
+
+        user_preference = get_default_user_preferences()
+
+	setUid(req, run_sql("INSERT INTO user (email, password, note, settings) VALUES (%s,%s,%s,%s)",
+                                (user,passw,activated,serialize_via_marshal(user_preference),)))
 
         if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
             sendNewUserAccountWarning(user, user, passw)
@@ -269,21 +276,60 @@ def updateDataUser(req,uid,email,password):
     """
     if email =='guest':
         return 0
+
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
         query_result = run_sql("update user set password=%s where id=%s", (password,uid))
     else:
         query_result = run_sql("update user set email=%s,password=%s where id=%s", (email,password,uid))
+    return 1
     
-def loginUser(p_email,p_pw):
+def loginUser(req, p_email,p_pw, login_method):
     """It is a first simple version for the authentication of user. It returns the id of the user, 
        for checking afterwards if the login is correct
     """
-    query_result = run_sql("SELECT id from user where email=%s and password=%s", (p_email,p_pw))
-    return query_result
+
+    user_prefs = get_user_preferences(emailUnique(p_email))
+    if user_prefs and login_method != user_prefs["login_method"]:
+        if CFG_EXTERNAL_AUTHENTICATION.has_key(user_prefs["login_method"]):
+            return ([], p_email, p_pw, 11)
+
+    if not CFG_EXTERNAL_AUTHENTICATION.has_key(login_method):
+        return ([], p_email, p_pw, 12)
+
+    if CFG_EXTERNAL_AUTHENTICATION[login_method][0]:
+        p_email = CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_email, p_pw)
+        if p_email:
+            p_pw = givePassword(p_email)
+            if not p_pw or p_pw < 0:
+                import random
+                p_pw = int(random.random() * 1000000)
+                if not registerUser(req,p_email,p_pw):
+                    return ([], p_email, p_pw, 13)
+                else:
+                    query_result = run_sql("SELECT id from user where email=%s and password=%s", (p_email,p_pw,))
+                    user_prefs = get_user_preferences(query_result[0][0])
+                    user_prefs["login_method"] = login_method
+                    set_user_preferences(query_result[0][0], user_prefs)      
+        else:
+            return ([], p_email, p_pw, 10)
+
+    query_result = run_sql("SELECT id from user where email=%s and password=%s", (p_email,p_pw,))
+    if query_result:
+        prefered_login_method = get_user_preferences(query_result[0][0])['login_method']
+    else:
+        return ([], p_email, p_pw, 14)
+
+    if login_method != prefered_login_method:
+        if CFG_EXTERNAL_AUTHENTICATION.has_key(prefered_login_method):
+            return ([], p_email, p_pw, 11)
+
+    return (query_result, p_email, p_pw, 0)
 
 def logoutUser(req):
     """It logout the user of the system, creating a guest user.
     """
+    uid = getUid(req)
+
     sm = session.MPSessionManager(pSession, pSessionMapping())
     try:
 	s = sm.get_session(req)
@@ -298,6 +344,7 @@ def logoutUser(req):
 def userNotExist(p_email,p_pw):
     """Check if the user exists or not in the system
     """
+
     query_result = run_sql("select email from user where email=%s", (p_email,))
     if len(query_result)>0 and query_result[0]!='':
         return 0
@@ -306,6 +353,7 @@ def userNotExist(p_email,p_pw):
 def emailUnique(p_email):
     """Check if the email address only exists once. If yes, return userid, if not, -1
     """
+    
     query_result = run_sql("select id, email from user where email=%s", (p_email,))
     if len(query_result) == 1:
         return query_result[0][0]
@@ -326,9 +374,10 @@ def givePassword(email):
     """ It checks in the database the password for a given email. It is used to send the password to the email of the user.It returns 
 	the password if the user exists, otherwise it returns -999
     """
+
     query_pass = run_sql("select password from user where email =%s",(email,))
     if len(query_pass)>0:
-	return query_pass[0][0]
+        return query_pass[0][0]
     return -999
 
 def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=cdslang):
@@ -390,7 +439,6 @@ def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=cdslang):
   
     server.quit()
     return 1
-
 
 def get_email(uid):
     """Return email address of the user uid.  Return string 'guest' in case
@@ -480,3 +528,31 @@ def auth_apache_user_collection_p(user, password, coll):
     else:
         return 0
     
+def get_user_preferences(uid):
+    pref = run_sql("SELECT id, settings FROM user WHERE id=%s", (uid,))
+    if pref:
+        try:
+            return deserialize_via_marshal(pref[0][1])
+        except:
+            return get_default_user_preferences()
+    return None
+
+def set_user_preferences(uid, pref):
+    res = run_sql("UPDATE user SET settings='%s' WHERE id=%s" % (serialize_via_marshal(pref),uid))
+   
+def get_default_user_preferences():
+    user_preference = {
+        'login_method': ''}
+
+    for system in CFG_EXTERNAL_AUTHENTICATION.keys():
+        if CFG_EXTERNAL_AUTHENTICATION[system][1]:
+            user_preference['login_method'] = system
+            break 
+    return user_preference
+    
+def serialize_via_marshal(obj):
+    """Serialize Python object via marshal into a compressed string."""
+    return MySQLdb.escape_string(compress(dumps(obj)))
+def deserialize_via_marshal(string):
+    """Decompress and deserialize string into a Python object via marshal."""
+    return loads(decompress(string))

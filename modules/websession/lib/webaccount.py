@@ -31,9 +31,9 @@ import cgi
 from config import *
 from webpage import page
 from dbquery import run_sql	
-from webuser import getUid,isGuestUser
+from webuser import getUid,isGuestUser, get_user_preferences, set_user_preferences
 from access_control_admin import acc_findUserRoleActions
-from access_control_config import CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
+from access_control_config import CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, CFG_EXTERNAL_AUTHENTICATION
 
 imagesurl = "%s/img" % weburl
 
@@ -138,7 +138,7 @@ def perform_display_account(req,data,bask,aler,sear):
 	sear="No queries found"
     else:
  	user = data[0]
-        accBody ="""You are logged in as %s. You may want to a) <A href="../youraccount.py/logout">logout</A>; b) edit your <A href="../youraccount.py/edit">email address or password</a>.<BR><BR>
+        accBody ="""You are logged in as %s. You may want to a) <A href="../youraccount.py/logout">logout</A>; b) edit your <A href="../youraccount.py/edit">account settings</a>.<BR><BR>
 		 """%user			
     out =""
     out +=template_account("Your Account",accBody)
@@ -195,19 +195,40 @@ def perform_delete():
 ## perform_set(email,password): edit your account parameters, email and password.
 def perform_set(email,password):
 
+    
+    uid = run_sql("SELECT id FROM user where email=%s", (email,))
+    prefs = get_user_preferences(uid[0][0])
+    CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL = CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
+    if CFG_EXTERNAL_AUTHENTICATION.has_key(prefs['login_method']) and  CFG_EXTERNAL_AUTHENTICATION[prefs['login_method']][1] != True:
+        CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL = 3
+
     text = """
         <body>
-        <p><big><strong class=headline>Edit account parameters</strong></big>
+        <p><big><strong class=headline>Edit parameters</strong></big>
 	<form method="post" action="../youraccount.py/change">
 		<p>If you want to change your email address or password, please set new values in the form below.
 		<table>
 			<tr><td align=right><strong>New email address:</strong><br><small class=important>(mandatory)</small></td><td><input type="text" size="25" name="email" %s value="%s"><br><small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td><td></td></tr>
-			<tr><td align=right><strong>New password:</strong><br><small class=quicknote>(optional)</small></td><td align=left><input type="password" size="25" name="password" value="%s"><br><small><span class=quicknote>Note:</span> The password phrase may contain punctuation, spaces, etc.</small></td></tr><tr><td align=right><strong>Retype password:</strong></td><td align=left><input type="password" size="25" name="password2" value="%s"></td><td><input type="hidden" name="action" value="edit"></td></tr>
+			<tr><td align=right><strong>New password:</strong><br><small class=quicknote>(optional)</small></td><td align=left><input type="password" size="25" name="password" %s value="%s"><br><small><span class=quicknote>Note:</span> The password phrase may contain punctuation, spaces, etc.</small></td></tr><tr><td align=right><strong>Retype password:</strong></td><td align=left><input type="password" size="25" name="password2" %s value="%s"></td><td><input type="hidden" name="action" value="edit"></td></tr>
 				<tr><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" value="Set new values"></code>&nbsp;&nbsp;&nbsp;</td></tr>
 		</table>
         </form>
       </body>	
-      """ % (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2 and "disabled" or "", email, password, "")
+      """ % (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL >= 2 and "disabled" or "", email, CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL >= 3 and "disabled" or "",password, CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL >= 3 and "disabled" or "", "")
+
+    if len(CFG_EXTERNAL_AUTHENTICATION) >= 1:
+        uid = run_sql("SELECT id FROM user where email=%s", (email,))
+        prefs = get_user_preferences(uid[0][0])
+        current_login_method = prefs['login_method']
+
+        text += """<form method="post" action="../youraccount.py/change">"""
+        text += """<big><strong class=headline>Which login method would you like to use as default?</strong></big><table><tr><td valign=top><b>Select account:</b></td><td>"""
+        methods = CFG_EXTERNAL_AUTHENTICATION.keys()
+        methods.sort()
+        for system in methods:
+            text += """<input type="radio" name="login_method" value="%s" %s %s>%s<br>""" % (system, (current_login_method == system and "checked" or ""), CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4 and "disabled" or "", system)
+        text += """</td><td></td></tr><tr><td></td><td><input class="formbutton" type="submit" value="Select method"></td></tr></table></form>"""
+
     return text                    				
 
 ##  create_register_page_box(): register a new account
@@ -263,20 +284,42 @@ def create_register_page_box(referer=''):
 	
 ##  create_login_page_box(): ask for the user's email and password, for login into the system
 def create_login_page_box(referer=''):
-    text = """
+
+    text = ""
+    text += """
               <p>If you already have an account, please log in by choosing the <strong class=headline>login
               </strong> button below. <br>"""
-    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1:
-        text += """If you don't own an account yet, please <a href="./register">register</a>."""
-    elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
+    internal = None
+    for system in CFG_EXTERNAL_AUTHENTICATION.keys():
+        if not CFG_EXTERNAL_AUTHENTICATION[system][0]:
+            internal = system
+            break
+    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1 and internal:
+        text += """If you don't own an account yet, please <a href="./register">register</a> an internal account."""
+    else:
         text += """It is not possible to create an account yourself. Contact <a href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a> if you want an account."""
-    text += """ 
-              <form method="post" action="../youraccount.py/login">
-              <input type="hidden" name="referer" value="%s">
 
+    text += """<form method="post" action="../youraccount.py/login">"""
+    if len(CFG_EXTERNAL_AUTHENTICATION) > 1: 
+        logmethtext = """<select name="login_method">"""
+        methods = CFG_EXTERNAL_AUTHENTICATION.keys()
+        methods.sort()
+        for system in methods:
+            logmethtext += """<option value="%s" %s>%s</option>""" % (system, (CFG_EXTERNAL_AUTHENTICATION[system][1]== True and "selected" or ""), system)
+        logmethtext += "</select>"
+    else:
+        for system in CFG_EXTERNAL_AUTHENTICATION.keys():
+            logmethtext = """%s<input type="hidden" name="login_method" value="%s">""" % (system, system)
+    text += """
               <table>
-                <tr>
-		 <td align=right><strong>Email address:</strong>
+	       <tr>
+		 <td align=right><strong>Login via:</strong>		
+		</td>
+		<td align=left>%s
+		 </td>
+               </tr>
+              <tr>
+		 <td align=right><input type="hidden" name="referer" value="%s"><strong>Username:</strong>
 		 </td>
                  <td><input type="text" size="25" name="p_email" value=""></td>
 		 <td></td>
@@ -290,12 +333,15 @@ def create_login_page_box(referer=''):
 		 </td>
                 </tr>
                 <tr>
-		 <td></td><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>""" % (cgi.escape(referer))
-    text += """&nbsp;&nbsp;&nbsp;(<a href="./lost">Lost your password?</a>)
-		 </td>
+		 <td></td><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" name="action" value="login"></code>""" % (logmethtext, cgi.escape(referer))
+    if internal:
+        text += """&nbsp;&nbsp;&nbsp;(<a href="./lost">Lost your password?</a>)"""
+    text += """
+		</td>
+		<td>
                 </tr>
-              </table>
-           """
+              </table>"""
+    text += "</form>"
     return text
 
 
@@ -313,8 +359,13 @@ def perform_lost():
     out +="""
 	  <body>
 		<form  method="post" action="../youraccount.py/send_email">
-		 If you have lost your password string, please enter the email address of your cds.cern.ch account. 
-		 The lost password will be emailed to the owner of that account.
+      If you have lost password for your CERN Document Server internal
+      account, then please enter your email address below and the lost
+      password will be emailed to you.<br>
+      Note that if you have been using an external login system (such
+      as CERN NICE), then we cannot do anything and you have to ask
+      there.  Alternatively, you can ask <a href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a> to change
+      your login system from external to internal.<br><br>
 		<table>		
 	    		<tr>
 				<td align=right><strong>Email address:</strong></td>
@@ -322,7 +373,7 @@ def perform_lost():
 				<td><input type="hidden" name="action" value="lost"></td>
 			</tr>
 			<tr><td></td>
-				<td><code class=blocknote><input class="formbutton" type="submit" value="Fetch password"></code></td>
+				<td><code class=blocknote><input class="formbutton" type="submit" value="Send lost password"></code></td>
 			</tr>
 		</table>
 			
