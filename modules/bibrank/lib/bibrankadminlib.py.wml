@@ -52,9 +52,11 @@ def getnavtrail(previous = ''):
     return navtrail
 
 def check_user(uid, role, adminarea=2, authorized=0):
-    if not authorized and not is_adminuser(uid, role):
-        return "false"
-    
+    (auth_code, auth_message) = is_adminuser(uid, role)
+    if not authorized and auth_code != 0:
+        return ("false", auth_message)
+    return ("", auth_message)
+        
 def is_adminuser(uid, role):
     """check if user is a registered administrator. """
     return acce.acc_authorize_action(uid, role)

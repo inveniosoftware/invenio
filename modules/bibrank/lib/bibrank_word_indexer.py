@@ -86,7 +86,6 @@ try:
     from cdsware.search_engine_config import cfg_max_recID
     from cdsware.search_engine import perform_request_search, strip_accents, HitSet
     from cdsware.dbquery import run_sql
-    from cdsware.access_control_engine import acc_authorize_action
 except ImportError, e:
     import sys
 

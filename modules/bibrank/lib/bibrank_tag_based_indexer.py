@@ -65,8 +65,6 @@ try:
     from cdsware.search_engine import perform_request_search, strip_accents
     from cdsware.search_engine import HitSet, get_index_id, create_basic_search_units
     from cdsware.dbquery import run_sql
-    from cdsware.access_control_engine import acc_authorize_action 
-    from bisect import bisect
 except ImportError, e:
     import sys
 
