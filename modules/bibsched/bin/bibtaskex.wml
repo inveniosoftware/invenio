@@ -42,6 +42,7 @@ try:
     import getopt
     import marshal
     import signal
+    import sre
     import string
     import sys
     import time
@@ -51,6 +52,25 @@ except ImportError, e:
     sys.exit(1)
 
 cfg_n_default = 30 # how many Fibonacci numbers to calculate if none submitted?
+
+def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
+    """Returns a date string according to the format string.
+       It can handle normal date strings and shifts with respect
+       to now."""
+    date = time.time()
+    shift_re=sre.compile("([-\+]{0,1})([\d]+)([dhms])")
+    factors = {"d":24*3600, "h":3600, "m":60, "s":1}
+    m = shift_re.match(var)
+    if m:
+        sign = m.groups()[0] == "-" and -1 or 1
+        factor = factors[m.groups()[2]]
+        value = float(m.groups()[1])
+        date = time.localtime(date + sign * factor * value)
+        date = time.strftime(format_string, date)
+    else:
+        date = time.strptime(var, format_string)
+        date = time.strftime(format_string, date)        
+    return date
 
 def write_message(msg, stream=sys.stdout):
     """Prints message and flush output stream (may be sys.stdout or sys.stderr).  Useful for debugging stuff."""
@@ -64,32 +84,32 @@ def write_message(msg, stream=sys.stdout):
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
     write_message("sleeping...")
-    task_update_state("SLEEPING")
+    task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
 
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
     write_message("continuing...")
-    task_update_state("CONTINUING")
+    task_update_status("CONTINUING")
 
 def task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
     write_message("stopping...")
-    task_update_state("STOPPING")
+    task_update_status("STOPPING")
     write_message("flushing cache or whatever...")
     time.sleep(3)
     write_message("closing tables or whatever...")
     time.sleep(1)
     write_message("stopped")
-    task_update_state("STOPPED")
+    task_update_status("STOPPED")
     sys.exit(0)
     
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
     write_message("suiciding myself now...")
-    task_update_state("SUICIDING")
+    task_update_status("SUICIDING")
     write_message("suicided")
-    task_update_state("SUICIDED")
+    task_update_status("SUICIDED")
     sys.exit(0)
 
 def task_sig_unknown(sig, frame):
@@ -129,7 +149,6 @@ def authenticate(user):
         user = string.strip(string.lower(sys.stdin.readline()))
     else:
         print >> sys.stdout, "\rUsername:", user        
-
     res = run_sql("select password from user where email=%s", (user,), 1)
     if res:
         row = res[0]
@@ -157,27 +176,28 @@ def task_submit(options):
     ## authenticate user:
     user = authenticate(options.get("user", ""))
     ## submit task:
-    task_id = run_sql("""INSERT INTO schTASKS (id,proc,user,state,date,arguments) VALUES (NULL,'bibtaskex',%s,'WAITING',NOW(),%s)""",
-                      (user, marshal.dumps(options)))
-    ## update task number:
+    task_id = run_sql("""INSERT INTO schTASK (id,proc,user,runtime,sleeptime,status,arguments)
+                         VALUES (NULL,'bibtaskex',%s,%s,%s,'WAITING',%s)""",
+                      (user, options["runtime"], options["sleeptime"], marshal.dumps(options)))
+    ## update task number: 
     options["task"] = task_id
-    run_sql("""UPDATE schTASKS SET arguments=%s WHERE id=%s""", (marshal.dumps(options),task_id))
+    run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""", (marshal.dumps(options),task_id))
     write_message("Task #%d submitted." % task_id)    
     return task_id
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
     global task_id
-    return run_sql("UPDATE schTASKS SET progress=%s where id=%s", (msg, task_id))
+    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, task_id))
 
-def task_update_state(val):
-    """Updates state information in the BibSched task table."""
+def task_update_status(val):
+    """Updates status information in the BibSched task table."""
     global task_id
-    return run_sql("UPDATE schTASKS SET state=%s where id=%s", (val, task_id))    
+    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, task_id))    
 
-def task_read_state(task_id):
-    """Read state information in the BibSched task table."""
-    res = run_sql("SELECT state FROM schTASKS where id=%s", (task_id,), 1)
+def task_read_status(task_id):
+    """Read status information in the BibSched task table."""
+    res = run_sql("SELECT status FROM schTASK where id=%s", (task_id,), 1)
     try:
         out = res[0][0]
     except:
@@ -187,7 +207,7 @@ def task_read_state(task_id):
 def task_get_options(id):
     """Returns options for the task 'id' read from the BibSched task queue table."""
     out = {}
-    res = run_sql("SELECT arguments FROM schTASKS WHERE id=%s AND proc='bibtaskex'", (id,))
+    res = run_sql("SELECT arguments FROM schTASK WHERE id=%s AND proc='bibtaskex'", (id,))
     try:
         out = marshal.loads(res[0][0])
     except:
@@ -204,13 +224,13 @@ def task_run():
     if not options.has_key("task"):
         write_message("Error: The task #%d does not seem to be a BibTaskEx task." % task_id)
         return
-    ## check task state:
-    task_state = task_read_state(task_id)
-    if task_state != "WAITING":
-        write_message("Error: The task #%d is %s.  I expected WAITING." % (task_id, task_state))
+    ## check task status:
+    task_status = task_read_status(task_id)
+    if task_status != "WAITING":
+        write_message("Error: The task #%d is %s.  I expected WAITING." % (task_id, task_status))
         return
-    ## update task state:
-    task_update_state("RUNNING")
+    ## update task status:
+    task_update_status("RUNNING")
     ## initialize signal handler:
     signal.signal(signal.SIGUSR1, task_sig_sleep)
     signal.signal(signal.SIGTERM, task_sig_stop)
@@ -234,7 +254,7 @@ def task_run():
         time.sleep(1)
     ## we are done:
     task_update_progress("Done %d out of %d." % (n,n))
-    task_update_state("DONE")
+    task_update_status("DONE")
     return
 
 def usage(exitcode=1, msg=""):
@@ -242,8 +262,13 @@ def usage(exitcode=1, msg=""):
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
     sys.stderr.write("Usage: %s [options]\n" % sys.argv[0])
+    sys.stderr.write("Command options:\n")
     sys.stderr.write("  -n, --number=NUM\t Print Fibonacci numbers for up to NUM.  [default=%d]\n" % cfg_n_default)
-    sys.stderr.write("  -u, --user=USER \t\t User name to submit the task as, password needed.\n")
+    sys.stderr.write("Scheduling options:\n")
+    sys.stderr.write("  -u, --user=USER \t User name to submit the task as, password needed.\n")
+    sys.stderr.write("  -t, --runtime=TIME \t Time to execute the task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26\n")
+    sys.stderr.write("  -s, --sleeptime=SLEEP \t Sleeping frequency after which to repeat task (no), e.g.: 30m, 2h, 1d\n")
+    sys.stderr.write("General options:\n")
     sys.stderr.write("  -h, --help      \t\t Print this help.\n")
     sys.stderr.write("  -V, --version   \t\t Print version information.\n")
     sys.stderr.write("  -d, --debug     \t\t Print debugging information.\n")
@@ -261,10 +286,12 @@ def main():
     else:
         ## B - submit the task
         options = {} # will hold command-line options
+        options["runtime"] = time.strftime("%Y-%m-%d %H:%M:%S") 
+        options["sleeptime"] = "0"
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "hVdn:u:", ["help", "version", "debug","number=","user="])
+            opts, args = getopt.getopt(sys.argv[1:], "hVdn:u:s:t:", ["help", "version", "debug","number=","user=","sleep=","time="])
         except getopt.GetoptError, err:
-            usage(1, err)            
+            usage(1, err)
         try:
             for opt in opts:
                 if opt[0] in ["-h", "--help"]:
@@ -278,6 +305,13 @@ def main():
                     options["debug"]=1
                 elif opt[0] in ["-n", "--number"]:
                     options["number"]=int(opt[1])
+                elif opt[0] in [ "-s", "--sleeptime" ]:
+                    get_datetime(opt[1]) # see if it is a valid shift
+                    options["sleeptime"] = opt[1]
+                elif opt[0] in [ "-t", "--runtime" ]:
+                    options["runtime"] = get_datetime(opt[1])
+                else:
+                    usage(1)
         except StandardError, e:
             usage(e)        
         task_submit(options)
