@@ -35,20 +35,23 @@
 <define-tag PYTHON whitespace=delete>
 @PYTHON@
 </define-tag>
-<define-tag HTDOCSDIR whitespace=delete>
-@HTDOCSDIR@
+<define-tag BINDIR whitespace=delete>
+@prefix@/bin
 </define-tag>
-<define-tag CGIBINDIR whitespace=delete>
-@CGIBINDIR@
+<define-tag LIBDIR whitespace=delete>
+@prefix@/lib
 </define-tag>
-<define-tag DBUTILDIR whitespace=delete>
-@DBUTILDIR@
+<define-tag LOGDIR whitespace=delete>
+@prefix@/var/log
 </define-tag>
-<define-tag HTDOCSURL whitespace=delete>
-@HTDOCSURL@
+<define-tag CACHEDIR whitespace=delete>
+@prefix@/var/cache
 </define-tag>
-<define-tag CGIBINURL whitespace=delete>
-@CGIBINURL@
+<define-tag WEBDIR whitespace=delete>
+@WEBDIR@
+</define-tag>
+<define-tag WEBURL whitespace=delete>
+@WEBURL@
 </define-tag>
 <define-tag DBHOST whitespace=delete>
 @DBHOST@
