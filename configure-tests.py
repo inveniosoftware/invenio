@@ -113,12 +113,51 @@ except ImportError, e:
     *****************************************************
     ** WARNING: PYTHON IMPORT WARNING %s
     *****************************************************
-    ** Note that this module is not required but we    **
-    ** recommend it for faster CDSware operation.      **
+    ** Note that Psyco is not really required but      **
+    ** we recommend it for faster CDSware operation.   **
+    **                                                 **
     ** You can safely continue installing CDSware now, **
-    ** and add the recommended Python module anytime   **
-    ** later. (for example, even after your CDSware    **
-    ** installation is put into full production)       **
+    ** and add this module anytime later.  (I.e. even  **
+    ** after your CDSware installation is put into     **
+    ** production.)                                    **
+    *****************************************************
+    """ % e
+    getpass.getpass("Press ENTER to continue the installation...")
+
+try:
+    import Stemmer
+except ImportError, e:
+    print """
+    *****************************************************
+    ** WARNING: PYTHON IMPORT WARNING %s
+    *****************************************************
+    ** Note that PyStemmer is not really required but  **
+    ** we recommend it to enable the stemming feature  **
+    ** in the indexing engine and to bump up the speed **
+    ** and accuracy of word-frequency based rankings.  **
+    **                                                 **
+    ** You can safely continue installing CDSware now, **
+    ** and add this module anytime later. (But better  **
+    ** before you firstly run the indexation/ranking   **
+    ** on real production data.)                       **
+    *****************************************************
+    """ % e
+    getpass.getpass("Press ENTER to continue the installation...")
+
+try:
+    import pyRXP
+except ImportError, e:
+    print """
+    *****************************************************
+    ** WARNING: PYTHON IMPORT WARNING %s
+    *****************************************************
+    ** Note that PyRXP is not really required but      **
+    ** we recommend it for fast XML MARC parsing.      **
+    **                                                 **
+    ** You can safely continue installing CDSware now, **
+    ** and add this module anytime later.  (I.e. even  **
+    ** after your CDSware installation is put into     **
+    ** production.)                                    **
     *****************************************************
     """ % e
     getpass.getpass("Press ENTER to continue the installation...")
