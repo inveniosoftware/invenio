@@ -873,6 +873,7 @@ hr {
     border-width: 0;    
 }
 input,select {
+    color: #000;
     background: #fff;
 }
 .wsactionbutton {
