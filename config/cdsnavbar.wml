@@ -253,7 +253,7 @@
 
   <navbar:button id=webaccess-admin-manager txt="Manager" url="<WEBURL>/admin/webaccess/webaccessadmin.py">
   <navbar:button id=webaccess-admin-delegator txt="Delegator" url="<WEBURL>/admin/webaccess/webaccessadmin.py/delegate_startarea">
-  <navbar:button id=webaccess-admin-accounts txt="Accounts" url="<WEBURL>/admin/webaccess/webaccessadmin.py/manage_accounts">
+  <navbar:button id=webaccess-admin-accounts txt="Accounts" url="<WEBURL>/admin/webaccess/webaccessadmin.py/manageaccounts">
   <navbar:button id=webaccess-admin-guide txt="Guide" url="<WEBURL>/admin/webaccess/guide.html">
 
   <navbar:epilog> </td><td></td></tr> </navbar:epilog>
