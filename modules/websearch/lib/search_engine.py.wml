@@ -3138,7 +3138,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             # record well exists, so find similar ones to it
             t1 = os.times()[4]
             results_similar_recIDs, results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, results_similar_comments = \
-                                    rank_records(rm, 0, get_collection_reclist(cdsname), string.split(p))
+                                    rank_records(rm, 0, get_collection_reclist(cdsname), string.split(p), verbose)
             if results_similar_recIDs:
                 t2 = os.times()[4]
                 cpu_time = t2 - t1
@@ -3297,7 +3297,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 elif rm: # do we have to rank?
                     results_final_for_all_colls_rank_records_output = rank_records(rm, 0, results_final_for_all_colls,
                                                                                    string.split(p) + string.split(p1) +
-                                                                                   string.split(p2) + string.split(p3))
+                                                                                   string.split(p2) + string.split(p3), verbose)
                     if results_final_for_all_colls_rank_records_output[0]:                        
                         recIDs = results_final_for_all_colls_rank_records_output[0]
                 return recIDs
@@ -3323,7 +3323,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                         results_final_recIDs_ranked, results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue, results_final_comments = \
                                                      rank_records(rm, 0, results_final[coll],
                                                                   string.split(p) + string.split(p1) +
-                                                                  string.split(p2) + string.split(p3))
+                                                                  string.split(p2) + string.split(p3), verbose)
                         if of.startswith("h"):
                             print_warning(req, results_final_comments)
                         if results_final_recIDs_ranked:
