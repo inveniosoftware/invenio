@@ -1070,7 +1070,7 @@ def word_index(row, run):
     return 1
        
 def get_tags(config):
-    """Get the tags that should be used creating the index and each tag's parameter."""
+    """Get the tags that should be used creating the index and each tag's parameter, also get stemmer for language"""
     tags = []
     function = config.get("rank_method","function")
     i = 1
@@ -1476,4 +1476,5 @@ def getName(methname, ln=cdslang, type='ln'):
         raise Exception
 
 def word_frequency(row, run):
+    """Call correct method"""
     return word_index(row, run)

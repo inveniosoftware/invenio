@@ -252,6 +252,13 @@ def create_rnkmethod_cache():
             methods[rank_method_code]["override_default_min_relevance"] = config.get("find_similar", "override_default_min_relevance")
             methods[rank_method_code]["default_min_relevance"] = int(config.get("find_similar", "default_min_relevance"))
             
+        if config.has_section("merge_methods"):
+            i = 1
+            methods[rank_method_code]["merge_methods"] = []
+            while config.has_option("merge_methods", "method%s" % i):
+                methods[rank_method_code]["merge_methods"].append(string.split(config.get("merge_methods", "method%s" % i), ","))
+                i += 1
+
 def is_method_valid(colID, rank_method_code):
     """Checks if a method is valid for the collection given"""
     
@@ -290,12 +297,18 @@ def get_bibrank_methods(collection, ln=cdslang):
     return avail_methods
     
 def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=[], verbose=0):
-    """rank_method, e.g. `jif' or `sbr' (word frequency vector model)                    
+    """rank_method_code, e.g. `jif' or `sbr' (word frequency vector model)                    
        rank_limit_relevance, e.g. `23' for `nbc' (number of citations) or `0.10' for `vec'                   
-       hitset, search engine hits; optional                   
+       hitset, search engine hits;                   
        pattern, search engine query or record ID (you check the type)                   
        verbose, verbose level
-    """
+       output:
+       list of records
+       list of rank values
+       prefix
+       postfix
+       verbose_output"""
+
     hitset = copy.deepcopy(hitset_global) #we are receiving a global hitset
     
     try:
@@ -309,14 +322,14 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     try:
         function = methods[rank_method_code]["function"]
         func_object = globals().get(function)
-        if func_object and pattern and pattern[0][0:6] == "recid:":
+        if func_object and pattern and pattern[0][0:6] == "recid:" and function == "word_frequency":
             result = find_similar(rank_method_code, pattern[0][6:], hitset, rank_limit_relevance, verbose)
         elif func_object:
             result = func_object(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
         else:
             result = rank_by_method(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
     except Exception, e:
-        result = (None, "", adderrorbox("An error occured when trying to rank the search result", ["Unexpected error: %s<br><b>Traceback:</b>%s" % (e, format_output(traceback.format_tb(sys.exc_info()[2])))]), voutput)
+        result = (None, "", adderrorbox("An error occured when trying to rank the search result", ["Unexpected error: %s<br><b>Traceback:</b>%s" % (e, traceback.format_tb(sys.exc_info()[2]))]), voutput)
 
     if result[0]:
         results_similar_recIDs = map(lambda x: x[0], result[0])
@@ -330,11 +343,41 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
 
     return result
 
+def merge_methods(rank_method_code, pattern, hitset, rank_limit_relevance,verbose):
+    """Merging several methods"""
+
+    #global voutput
+    result = {}
+    for (method, percent) in methods[rank_method_code]["merge_methods"]:
+        function = methods[method]["function"]
+        func_object = globals().get(function)
+        percent = int(percent)
+        if func_object:
+            this_result = dict(func_object(method, pattern, hitset, rank_limit_relevance, verbose)[0])
+        else:
+            this_result = dict(rank_by_method(method, pattern, hitset, rank_limit_relevance, verbose)[0])
+        divideby = float(max(this_result.values()))
+        for (recID, value) in this_result.iteritems():
+            if value > 0:
+                result[recID] = result.get(recID, 0) + int(((value / divideby) * 100) / 100.0 * percent)
+
+    result = result.items()
+    result.sort(lambda x, y: cmp(x[1], y[1]))
+    return (result, "(", ")", voutput)
+        
 def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
-    """Finding terms to use for calculating similarity. Terms are taken from the recid given, returns a list of recids's and relevance, [[23,34], [344,24], [1,01]]
-    recID - record to use for find similar
-    rank_limit_relevance - find all similar document above given percentage (0-100)
-    verbose - how much debug information to show, 0-9"""
+    """Finding terms to use for calculating similarity. Terms are taken from the recid given, returns a list of recids's and relevance,
+    input:
+    rank_method_code - the code of the method, from the name field in rnkMETHOD
+    recID - records to use for find similar
+    hitset - a list of hits for the query found by search_engine
+    rank_limit_relevance - show only records with a rank value above this
+    verbose - verbose value
+    output:
+    reclist - a list of sorted records: [[23,34], [344,24], [1,01]] 
+    prefix - what to show before the rank value 
+    postfix - what to show after the rank value
+    voutput - contains extra information, content dependent on verbose value"""
 
     startCreate = time.time()
     global voutput
@@ -343,8 +386,11 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
         rank_limit_relevance = methods[rank_method_code]["default_min_relevance"]
    
     query_terms = {} 
-    recID = int(recID)
-
+    try:
+        recID = int(recID)
+    except Exception,e :
+        return (None, "Warning: Error in record number, please check that a number is given.", "", voutput) 
+        
     res = run_sql("SELECT termlist FROM %sR WHERE id_bibrec=%s" % (methods[rank_method_code]["rnkWORD_table"][:-1], recID))
     if not res:
         return (None, "Warning: Requested record does not seem to exist.", "", voutput) 
@@ -356,7 +402,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
         terms = terms[1:len(terms) - 1]
         terms_recs = dict(run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (methods[rank_method_code]["rnkWORD_table"],terms)))
     else:
-        return (None, "Warning, An error has occured (3)", "", voutput)
+        return (None, "Warning: Record spesified has no content indexed for use with this method.", "", voutput)
 
 
     #Calculate all terms
@@ -369,14 +415,14 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     query_terms = {}
 
     stime = time.time()
-    (recdict, rec_termcount, lrecIDs_remove) = ({}, {}, {})
+    (recdict, rec_termcount) = ({}, {})
 
     #Use only most important terms
     for (t, tf) in query_terms_old:
         term_recs = deserialize_via_marshal(terms_recs[t])
         if len(query_terms_old) <= methods[rank_method_code]["max_nr_words_lower"] or (len(term_recs) >= methods[rank_method_code]["min_nr_words_docs"] and (((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) <=  methods[rank_method_code]["max_word_occurence"]) and ((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) >= methods[rank_method_code]["min_word_occurence"]))):
              query_terms[t] = round(tf, 4) 
-             (recdict, rec_termcount, lrecIDs_remove) = calculate_record_relevance((t, query_terms[t]) , term_recs, hitset, recdict, rec_termcount, lrecIDs_remove, verbose, "yes") 
+             (recdict, rec_termcount) = calculate_record_relevance((t, query_terms[t]) , term_recs, hitset, recdict, rec_termcount, verbose, "yes") 
              if verbose > 0:
                  voutput += "Term: %s,Number of records: %s, %s<br>" % (t, len(recdict), tf)
 
@@ -384,16 +430,15 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
             break
 
     if len(query_terms) == 0: #not enough terms to get a good result
-        return (None, "Warning, An error has occured (4)", "", voutput)
-
+        return (None, "Warning, Selected record does not contain enough information to find similar records.", "", voutput)
     if verbose > 0:
         voutput += "<br>Number of terms: %s<br>" % run_sql("SELECT count(id) FROM %s" % methods[rank_method_code]["rnkWORD_table"])[0][0]
         voutput += "Number of terms to use for query: %s<br>" % (len(query_terms))
         voutput += "Current number of recIDs: %s<br>" % (methods[rank_method_code]["col_size"])
         voutput += "Prepare time: %s<br>" % (str(time.time() - startCreate))
 
-    recdict = post_calculate_record_relevance(recdict, rec_termcount, lrecIDs_remove, hitset, verbose)
-    reclist = sort_record_relevance(recdict, rank_limit_relevance,recID, verbose)
+    (recdict, hitset) = post_calculate_record_relevance(recdict, rec_termcount, hitset, verbose)
+    reclist = sort_record_relevance(recdict, rank_limit_relevance, verbose)
 
     if verbose > 0:
         voutput += "Total time used: %s<br>" % (str(time.time() - startCreate))
@@ -402,10 +447,19 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     return (reclist[:len(reclist)], methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
 
 def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbose):
-    """input: list of words, ['ellis', 'muon']          
-    optional list of recIDs
-    output: sorted list of recIDs based on rank method given, e.g. [[23,34], [344,24], [1,01]]           
-    if not possible, then return empty list""" 
+    """Ranking of records based on predetermined values.
+    input:
+    rank_method_code - the code of the method, from the name field in rnkMETHOD, used to get predetermined values from 
+    rnkMETHODDATA
+    lwords - a list of words from the query
+    hitset - a list of hits for the query found by search_engine
+    rank_limit_relevance - show only records with a rank value above this
+    verbose - verbose value
+    output:
+    reclist - a list of sorted records, with unsorted added to the end: [[23,34], [344,24], [1,01]] 
+    prefix - what to show before the rank value 
+    postfix - what to show after the rank value
+    voutput - contains extra information, content dependent on verbose value"""
 
     global voutput
     rnkdict = run_sql("SELECT relevance_data FROM rnkMETHODDATA,rnkMETHOD where rnkMETHOD.id=id_rnkMETHOD and rnkMETHOD.name='%s'" % rank_method_code)
@@ -437,10 +491,18 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     return (reclist_addend + reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
 
 def word_frequency(rank_method_code, lwords, hitset, rank_limit_relevance,verbose):
-    """input: list of words, ['ellis', 'muon']          
-    optional list of recIDs
-    output: sorted list of recIDs by summary word frequencies, e.g. [[23,34], [344,24], [1,01]]           
-    if not possible (e.g. all stopwords), then return empty list""" 
+    """Ranking a records containing specified words and returns a sorted list.
+    input:
+    rank_method_code - the code of the method, from the name field in rnkMETHOD
+    lwords - a list of words from the query
+    hitset - a list of hits for the query found by search_engine
+    rank_limit_relevance - show only records with a rank value above this
+    verbose - verbose value
+    output:
+    reclist - a list of sorted records: [[23,34], [344,24], [1,01]] 
+    prefix - what to show before the rank value 
+    postfix - what to show after the rank value
+    voutput - contains extra information, content dependent on verbose value"""
 
     global voutput
     startCreate = time.time()
@@ -469,7 +531,7 @@ def word_frequency(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
 	    term_recs = deserialize_via_marshal(term_recs[0][1])
             if check_term({}, term, methods[rank_method_code]["col_size"], len(term_recs), 1.0, 0.00, 0):
                 query_terms[term] = int(query_terms.get(term, 0) + term_recs["Gi"][1])
-                (recdict, rec_termcount, lrecIDs_remove) = calculate_record_relevance((term, query_terms[term]) , term_recs, hitset, recdict, rec_termcount, lrecIDs_remove, verbose)
+                (recdict, rec_termcount) = calculate_record_relevance((term, query_terms[term]) , term_recs, hitset, recdict, rec_termcount, verbose)
             del term_recs
 
     if len(recdict) == 0 or (len(lwords) == 1 and lwords[0] == ""):
@@ -481,13 +543,12 @@ def word_frequency(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
         voutput += "Terms: %s<br>" % query_terms
         voutput += "Prepare and pre calculate time: %s<br>" % (str(time.time() - startCreate))
 
-    recdict = post_calculate_record_relevance(recdict, rec_termcount, lrecIDs_remove, hitset, verbose)
-    reclist = sort_record_relevance(recdict, rank_limit_relevance, 0, verbose)
+    (recdict, hitset) = post_calculate_record_relevance(recdict, rec_termcount, hitset, verbose)
+    reclist = sort_record_relevance(recdict, rank_limit_relevance, verbose)
 
     #Add any documents not ranked to the end of the list
     if hitset:
         hitset.calculate_nbhits()
-    if hitset and len(reclist) < hitset._nbhits: #add records found but not in list
         lrecIDs = hitset.tolist()                                #using 2-3mb 
         reclist = zip(lrecIDs, [0] * len(lrecIDs)) + reclist      #using 6mb
 
@@ -497,8 +558,15 @@ def word_frequency(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
 
     return (reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
 
-def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, lrecIDs_remove, verbose, quick=None):
-    """Calculating the relevance of the documents based on the input"""
+def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, verbose, quick=None):
+    """Calculating the relevance of the documents based on the input, calculates only one word
+    term - (term, query term factor) the term and its importance in the overall search
+    invidx - {recid: tf, Gi: norm value} The Gi value is used as a idf value
+    hitset - a hitset with records that are allowed to be ranked
+    recdict - contains currently ranked records, is returned with new values
+    rec_termcount - {recid: count} the number of terms in this record that matches the query
+    verbose - verbose value
+    quick - if quick=yes only terms with a positive qtf is used, to limit the number of records to sort"""
 
     (t, qtf) = term
     Gi = invidx["Gi"][1]
@@ -508,7 +576,6 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, lre
         for (j, tf) in invidx.iteritems():
             if hitset.contains(j):
                 recdict[j] = recdict.get(j,0) + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
-                lrecIDs_remove[j] = 1 
                 rec_termcount[j] = rec_termcount.get(j,0) + 1
         #Multiply with the number of terms of the total number of terms in the query existing in the records 
     elif quick: #much used term, do not include all records, only use already existing ones
@@ -518,25 +585,33 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, lre
                 recdict[j] = recdict[j] + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
                 rec_termcount[j] = rec_termcount.get(j,0) + 1
         
-    return (recdict, rec_termcount, lrecIDs_remove)
+    return (recdict, rec_termcount)
 
-def post_calculate_record_relevance(recdict, rec_termcount, lrecIDs_remove, hitset, verbose):
-    """Calculating the relevance of the documents based on the input"""
+def post_calculate_record_relevance(recdict, rec_termcount, hitset, verbose):
+    """Multiplies each record's rankvalue with the number of words that matched for the document, 
+    also returns a hitset of records that were not ranked.
+    recdict - {recid: value}
+    rec_termcount - {recid: count}
+    hitset - records not ranked, used to know which records to add to the end of the ranked records
+    verbose - verbose nr"""
 
     startCreate = time.time()
     global voutput
 
     #Multiply with the number of terms of the total number of terms in the query existing in the records 
-    for j in lrecIDs_remove.keys():
+    for j in recdict.keys():
         hitset.remove(j)
         recdict[j] = math.log(recdict[j] * rec_termcount[j])
 
     if verbose > 0:
         voutput += "Post Calculation time: %s<br>" % (str(time.time() - startCreate)) 
-    return recdict
+    return (recdict, hitset)
 
-def sort_record_relevance(recdict, rank_limit_relevance,recID, verbose):
-    """Sorts the dictionary and returns records with a relevance higher than the given value."""
+def sort_record_relevance(recdict, rank_limit_relevance, verbose):
+    """Sorts the dictionary and returns records with a relevance higher than the given value.
+    recdict - {recid: value} unsorted
+    rank_limit_relevance - a value > 0 usually
+    verbose - verbose value"""
 
     startCreate = time.time()
     global voutput
@@ -556,7 +631,11 @@ def sort_record_relevance(recdict, rank_limit_relevance,recID, verbose):
     return reclist
 
 def rank_method_stat(rank_method_code, reclist, lwords):
-    """Shows some statistics about the searchresult."""
+    """Shows some statistics about the searchresult.
+    rank_method_code - name field from rnkMETHOD
+    reclist - a list of sorted and ranked records
+    lwords - the words in the query"""
+
     global voutput
     if len(reclist) > 20:
 	j = 20
@@ -585,7 +664,6 @@ def rank_method_stat(rank_method_code, reclist, lwords):
         if count.has_key(i):
             voutput += "%s-%s<br>" % (i,count[i])
         i -= 1
-
 
 try:
     import psyco

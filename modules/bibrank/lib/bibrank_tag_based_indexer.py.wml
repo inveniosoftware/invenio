@@ -403,7 +403,6 @@ def bibrank_engine(row, run):
 
             cfg_short = rank_method_code
             cfg_function = config.get("rank_method", "function") + "_exec"
-            cfg_importance = config.getfloat("rank_method", "overall_importance")
             cfg_name = getName(cfg_short)
             options["validset"] = get_valid_range(rank_method_code)
 
