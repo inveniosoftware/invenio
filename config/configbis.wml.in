@@ -46,6 +46,9 @@
 <define-tag LOGDIR whitespace=delete>
 @prefix@/var/log
 </define-tag>
+<define-tag ETCDIR whitespace=delete>
+@prefix@/etc
+</define-tag>
 <define-tag TMPDIR whitespace=delete>
 @prefix@/var/tmp
 </define-tag>
