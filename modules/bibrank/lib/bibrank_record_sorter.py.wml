@@ -474,7 +474,6 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     rec_terms = deserialize_via_marshal(rec_terms[0][0])
 
     #Get all documents using terms from the selected documents
-
     if len(rec_terms) == 0:
         return (None, "Warning: Record spesified has no content indexed for use with this method.", "", voutput)
     else:
@@ -532,10 +531,10 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
                 (recdict, rec_termcount) = calculate_record_relevance((t, round(tf, 4)) , term_recs, hitset, recdict, rec_termcount, verbose, quick="true") 
     methods[rank_method_code]["rnkWORD_table"] = "rnkWORD01F"
 
-    #if len(recdict) == 0 or len(lwords) == 0:
-    #    return (None, "Could not find any similar documents.", "", voutput)
-    #else:
-    (reclist, hitset) = sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, verbose)
+    if len(recdict) == 0 or len(lwords) == 0:
+        return (None, "Could not find any similar documents, possibly because of error in ranking data.", "", voutput)
+    else:
+        (reclist, hitset) = sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, verbose)
 
     if verbose > 0:
         voutput += "<br>Number of terms: %s<br>" % run_sql("SELECT count(id) FROM %s" % methods[rank_method_code]["rnkWORD_table"])[0][0]
@@ -726,7 +725,8 @@ def sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, 
     #Multiply with the number of terms of the total number of terms in the query existing in the records 
     for j in recdict.keys():
         hitset.remove(j)
-        recdict[j] = math.log(recdict[j] * rec_termcount[j])
+        if recdict[j] > 0:
+            recdict[j] = math.log(recdict[j] * rec_termcount[j])
 
     divideby = max(recdict.values())
     
