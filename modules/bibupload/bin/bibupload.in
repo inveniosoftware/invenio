@@ -1424,7 +1424,7 @@ function parse_command($argv)
 function displayversion()
 {
   global $__version__;
-  print $__version__;
+  print $__version__."\n";
 }
 
 function displayhelp()
