@@ -1569,8 +1569,10 @@ function task_run()
 	                if ($validrec) {
         	            integrate($rec);
                 	}
-                	else
+                	else {
+                            $nbErrorRecords++;
                 	    fwrite($errorfp,$xml."\n");
+                        }
                 }
 
                 unset($rec);
