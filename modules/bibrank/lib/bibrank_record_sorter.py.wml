@@ -273,12 +273,24 @@ def create_rnkmethod_cache():
         for (ln, value) in i8n_names:
             methods[rank_method_code][ln] = value
             
-def is_method_valid(collection, rank_method_code):
+def is_method_valid(colID, rank_method_code):
     """Checks if a method is valid for the collection given"""
+    
+    enabled_colls = dict(run_sql("SELECT id_collection, score from collection_rnkMETHOD,rnkMETHOD WHERE id_rnkMETHOD=rnkMETHOD.id AND name='%s'" % rank_method_code))
 
-    return 1
+    colID = int(colID)
+    if enabled_colls.has_key(colID):
+        return 1
+    else:
+        while colID:
+            colID = run_sql("SELECT id_dad FROM collection_collection WHERE id_son=%s" % colID)
+            if colID and enabled_colls.has_key(colID[0][0]):
+                return 1
+            elif colID:
+                colID = colID[0][0]
+    return 0
 
-def get_bibrank_methods(collection='',ln=cdslang):
+def get_bibrank_methods(collection,ln=cdslang):
     """Returns a list of rank methods and the name om them in the language defined by the ln parameter, if collection is given, only methods enabled for that collection is returned."""
 
     try:
@@ -305,7 +317,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     """
 
     hitset = copy.deepcopy(hitset_global) #we are receiving a global hitset
-    #verbose = 9
+
     try:
         if methods:
             pass
