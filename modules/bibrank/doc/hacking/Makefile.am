@@ -19,7 +19,7 @@
 
 docdir = $(WEBDIR)/hacking/bibrank
 
-doc_DATA= index.html single_tag_rank.html bibrankgkb.html sort.html merge_rank_methods.html
+doc_DATA= index.html single_tag_rank.html bibrankgkb.html word_similarity.html api.html
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)

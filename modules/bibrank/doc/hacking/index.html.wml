@@ -30,11 +30,16 @@ BibRank and it's different ranking methods.
 <dl>
 
 <dt><a href="single_tag_rank.html">Single tag rank method</a> <dd>Ex. of use: Journal Impact Factor. Explains what this
-ranking method does to create the star categories for use when ranking based on Journal Impact Factor or similar methods.
-<dt><a href="merge_rank_methods.html">Merg rank methods</a> <dd>Explains what this
-ranking method does.
-<dt><a href="sort.html">Sort method</a> <dd>Ex. of use: Sorting of the records based on their rank value into star categories. Explains how the records are
-sorted into the different star categories.
+ranking method does to create the ranking data for use when ranking based on Journal Impact Factor or similar methods.</dd></dt>
+<dt><a href="word_similarity.html">Word Similarity/Similar Records methods</a> <dd>Ex. of use: Ranking based on the importance of
+words in the whole collection and in a single record. Explains how the ranking data is calculated.</dd></dt>
+<dt><a href="api.html">Bibrank Record Sorter API</a><dd>How to call the Bibrank Record Sorter library from your python programs if necessary.</dd></dt>
+
+
+#<dt><a href="merge_rank_methods.html">Merg rank methods</a> <dd>Explains what this
+#ranking method does.
+#<dt><a href="sort.html">Sort method</a> <dd>Ex. of use: Sorting of the records based on their rank value into star categor#ies. Explains how the records are
+#sorted into the different star categories.
 ##<dt><a href="citation_mehod.html">Citation method</a> <dd>Explains what this
 ##ranking method does.
 ##<dt><a href="author_method.html">Author method</a> <dd>Explains what this
@@ -42,6 +47,6 @@ sorted into the different star categories.
 ##<dt><a href="access_method.html">Access method</a> <dd>Explains what this
 ##ranking method does.
 
-<dt><a href="bibrankgkb.html">Create knowledgebase files (bibrankgkb)</a> <dd>Explains how to create knowledgebase files using the bibrankgkb tool
+<dt><a href="bibrankgkb.html">Create knowledgebase files (bibrankgkb)</a> <dd>Explains how to create knowledgebase files using the bibrankgkb tool</dd></dt>
 </dl>
 </blockquote>
