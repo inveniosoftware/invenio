@@ -37,7 +37,7 @@ import access_control_admin as acca
 import cgi
 import re
 
-from bibrank_config import adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform
+from bibrankadminlib import adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform
 from access_control_config import * 
 from dbquery import run_sql
 from config import *
