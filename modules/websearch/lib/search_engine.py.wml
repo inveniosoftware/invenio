@@ -198,8 +198,8 @@ def create_opft_search_units(req, p, f, m=None):
     ## check arguments: if matching type phrase/string/regexp, do we have field defined?    
     if (m=='p' or m=='r' or m=='e') and not f:
         m = 'a'        
-        print_warning(req, "This matching type cannot be used within <em>any field</em>.  I will perform a word search instead." , "Warning")
-        print_warning(req, "If you want to phrase/substring/regexp search in a specific field, e.g. inside title, then please choose <em>within title</em> search option.", "Tip")
+        print_warning(req, "This matching type cannot be used within <em>any field</em>.  I will perform a word search instead." , "")
+        print_warning(req, "If you want to phrase/substring/regexp search in a specific field, e.g. inside title, then please choose <em>within title</em> search option.", "")
         
     ## is desired matching type set?
     if m:
@@ -295,14 +295,14 @@ def create_opft_search_units(req, p, f, m=None):
                         # fi is not defined, look at where we are doing exact or subphrase search (single/double quotes):
                         if pi[0]=='"' and pi[-1]=='"':                        
                             opfts.append([oi,pi[1:-1],"anyfield",'a'])
-                            print_warning(req, "Searching for an exact match inside any field may be slow.  You may want to try to search for words instead, or choose a search within specific field.", "Warning")
+                            print_warning(req, "Searching for an exact match inside any field may be slow.  You may want to search for words instead, or choose to search within specific field.", "")
                         else:                        
                             # nope, subphrase in global index is not possible => change back to WRD search
                             for pii in get_words_from_phrase(pi):
                                 # since there may be '-' and other chars that we do not index in WRD
                                 opfts.append([oi,pii,fi,'w'])
-                            print_warning(req, "The sub-phrase search does not work in any field.  I'll do a 'logical AND' style of search instead.", "Warning")
-                            print_warning(req, "If you want to do a sub-phrase search in a specific field, e.g. inside title, then please choose 'within title' search option.", "Tip")
+                            print_warning(req, "The partial phrase search does not work in any field.  I'll do a boolean AND searching instead.", "")
+                            print_warning(req, "If you want to do a partial phrase search in a specific field, e.g. inside title, then please choose 'within title' search option.", "Tip")
                             print_warning(req, "If you want to do exact phrase matching, then please use double quotes.", "Tip")
                 elif fi and str(fi[0]).isdigit() and str(fi[0]).isdigit():
                     # B3b - fi exists and starts by two digits => do ACC search
@@ -682,9 +682,9 @@ def create_matchtype_box(name='m', value=''):
     <select name="%s">
     <option value="a"%s>All of the words:
     <option value="o"%s>Any of the words:
-    <option value="p"%s>Phrase/substring:
+    <option value="e"%s>Exact phrase:
+    <option value="p"%s>Partial phrase:
     <option value="r"%s>Regular expression:
-    <option value="e"%s>Exact value:
     </select>
     """ % (name, is_selected('a', value), is_selected('o', value), is_selected('p', value), 
                  is_selected('r', value), is_selected('e', value))
@@ -700,7 +700,7 @@ def create_google_box(p, f, p1, p2, p3,
         p = p1 + " " + p2 + " " + p3 
     if cfg_google_box: # do we want to print it?
         out += prolog
-        if cfg_google_box_cern:
+        if cfg_cern_site:
             # CERN Intranet:
             out += """<a href="http://search.cern.ch/query.html?qt=%s">CERN&nbsp;Intranet</a>""" % urllib.quote(p)
             # SPIRES
@@ -1678,21 +1678,12 @@ def search_in_bibrec(day1, day2, type='creation_date'):
     set.addlist(Numeric.array(l))
     return set
 
-def create_nearest_terms_box(urlargs, p, f, n=10, p_replace_only="", prologue="<blockquote>", epilogue="</blockquote>"):
-    """Return list of 'n' nearest terms to 'p' in the words index list for the field 'f'.
-
-    p_replace_only is internally used by create_nearest_terms_box()
-    when it recursively calls itself several times so that we know
-    what word inside 'p' is to be replaced by nearest terms in the
-    newly proposed links.  If p_replace_only is empty string, then
-    replace the whole 'p' argument.
-    """
-    
+def create_nearest_terms_box(urlargs, p, f, n=5, prologue="<blockquote>", epilogue="</blockquote>"):
+    """Return text box containing list of 'n' nearest terms above/below 'p'
+       in the words index list for the field 'f'.
+       Propose new searches according to `urlargs' with the new words.
+    """    
     out = ""
-    # what word to replace inside p?
-    if not p_replace_only:
-        p_replace_only = p
-    p_replace_only_quoted = urllib.quote_plus(p_replace_only)
     # deduce into which bibwordsX table we will search:
     bibwordsX = "bibwords%d" % get_wordsindex_id("anyfield")
     if f:
@@ -1701,27 +1692,81 @@ def create_nearest_terms_box(urlargs, p, f, n=10, p_replace_only="", prologue="<
             bibwordsX = "bibwords%d" % wordsindex_id
         else:
             return "%sNo words index available for %s.%s" % (prologue, f, epilogue)
-    # try to get nearest n words:
-    query = "SELECT word FROM %s WHERE word LIKE '%s%%' LIMIT %d" % (bibwordsX, escape_string(p), n)
+    nearest_words = [] # will hold the (sorted) list of nearest words
+    # try to get `n' words above `p':
+    query = "SELECT word FROM %s WHERE word<'%s' ORDER BY word DESC LIMIT %d" % (bibwordsX, escape_string(p), n)
     res = run_sql(query)
     if res:
         for row in res:
-            p_new = row[0]
-            p_new_quoted = urllib.quote_plus(p_new,'')
-            urlargs_new = urlargs
-            if p_replace_only_quoted:
-                urlargs_new = string.replace(urlargs, p_replace_only_quoted, p_new_quoted)
+            nearest_words.append(row[0])
+        nearest_words.reverse()
+    # insert given word `p':
+    nearest_words.append(p)
+    # try to get `n' words below `p':
+    query = "SELECT word FROM %s WHERE word>'%s' ORDER BY word ASC LIMIT %d" % (bibwordsX, escape_string(p), n)
+    res = run_sql(query)
+    if res:
+        for row in res:
+            nearest_words.append(row[0])        
+    # output the words:
+    if nearest_words:
+        out += """<table class="nearesttermsbox" cellpadding="0" cellspacing="0" border="0">"""
+        for word in nearest_words:
+            if word == p: # print search word for orientation:
+                if get_word_nbhits(word, f) > 0:
+                    out += """<tr>
+                               <td class="nearesttermsboxbodyselected" align="right">%d</td>
+                               <td class="nearesttermsboxbodyselected" width="15">&nbsp;</td>
+                               <td class="nearesttermsboxbodyselected" align="left">
+                                 <a class="nearesttermsselected" href="%s/search.py?%s">%s</a>
+                               </td>
+                              </tr>""" % \
+                               (get_word_nbhits(word, f), weburl, urlargs_replace_text_in_arg(urlargs, 'p', p, word), word)
+                else:
+                    out += """<tr>
+                               <td class="nearesttermsboxbodyselected" align="right">-</td>
+                               <td class="nearesttermsboxbodyselected" width="15">&nbsp;</td>
+                               <td class="nearesttermsboxbodyselected" align="left">%s</td>
+                              </tr>""" % word
             else:
-                urlargs_new = urlargs + "&p=%s" % p_new_quoted
-            out += """<tr><td class="nearesttermsboxbody" align="right">%s</td><td class="nearesttermsboxbody" width="15">&nbsp;</td><td class="nearesttermsboxbody" align="left"><a class="nearestterms" href="%s/search.py?%s">%s</a></td></tr>""" % \
-                   (get_word_nbhits(p_new, f), weburl, urlargs_new, p_new)
-        return """%s<table class="nearesttermsbox" cellpadding="0" cellspacing="0" border="0">%s</table>%s""" % (prologue, out, epilogue)
+                out += """<tr>
+                           <td class="nearesttermsboxbody" align="right">%s</td>
+                           <td class="nearesttermsboxbody" width="15">&nbsp;</td>
+                           <td class="nearesttermsboxbody" align="left">
+                             <a class="nearestterms" href="%s/search.py?%s">%s</a>
+                           </td>
+                          </tr>""" % \
+                           (get_word_nbhits(word, f), weburl, urlargs_replace_text_in_arg(urlargs, 'p', p, word), word)
+        out += "</table>"
     else:
-        # try search pattern of lesser length:
-        if p:
-            return create_nearest_terms_box(urlargs, p[:-1], f, n, p_replace_only)
-        else:
-            return "%sNo words index available for this query.%s" % (prologue, epilogue)
+        out += "No words index available for this query."
+    # return the text
+    return "%s%s%s" % (prologue, out, epilogue)
+
+def urlargs_replace_text_in_arg(urlargs, arg, text_old, text_new):
+    """Analyze `urlargs' (URL CGI GET query arguments) and for each
+       occurrence of argument `arg' replace every substring `text_old'
+       by `text_new'.  Return the resulting URL.
+       Useful for create_nearest_terms_box."""
+    out = ""
+    # parse URL arguments into a dictionary:
+    urlargsdict = cgi.parse_qs(urlargs)
+    ## construct new URL arguments:
+    urlargsdictnew = {}
+    for key in urlargsdict.keys():
+        if key == arg: # replace `arg' by new values
+            urlargsdictnew[key] = []
+            for parg in urlargsdict[key]:
+                urlargsdictnew[key].append(string.replace(parg, text_old, text_new))
+        else: # keep old values
+            urlargsdictnew[key] = urlargsdict[key]
+    # build new URL for this word:
+    for key in urlargsdictnew.keys():
+        for val in urlargsdictnew[key]:
+            out += "&" + key + "=" + urllib.quote_plus(val, '')
+    if out.startswith("&"):
+        out = out[1:]
+    return out
 
 def get_word_nbhits(word, f):
     """Return number of hits for word 'word' inside words index for field 'f'."""
@@ -1734,19 +1779,18 @@ def get_word_nbhits(word, f):
             bibwordsX = "bibwords%d" % wordsindex_id
         else:
             return 0
-    # try to get nearest n words:
     if word:
-        query = "SELECT hitlist FROM %s WHERE word LIKE '%s'" % (bibwordsX, escape_string(word))
+        query = "SELECT hitlist FROM %s WHERE word='%s'" % (bibwordsX, escape_string(word))
         res = run_sql(query)
         for hitlist in res:
             out += Numeric.sum(Numeric.loads(zlib.decompress(hitlist[0])).copy().astype(Numeric.Int))
-    return nice_number(out)
+    return out
 
 def get_mysql_recid_from_aleph_sysno(sysno):
     """Returns MySQL's recID for ALEPH sysno passed in the argument (e.g. "2209836CERCER").
        Returns None in case of failure."""
     out = None
-    query = "SELECT bb.id_bibrec FROM bibrec_bib90x AS bb, bib90x AS b WHERE b.value='%s' AND b.tag='909C0o' AND bb.id_bibxxx=b.id" %\
+    query = "SELECT bb.id_bibrec FROM bibrec_bib90x AS bb, bib97x AS b WHERE b.value='%s' AND b.tag='970__a' AND bb.id_bibxxx=b.id" %\
             (escape_string(sysno))
     res = run_sql(query, None, 1)
     if res:        
@@ -2130,8 +2174,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', decompress=zli
                     req.write('\n')
         else:
             # we are doing HTML output:            
-            req.write("""\n<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
             if format.startswith("hb"):
+                req.write("""\n<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
                 req.write("""\n<table>""")            
                 for irec in range(irec_max,irec_min,-1):
                     req.write("""\n<tr><td valign="top"><input name="recid" type="checkbox" value="%s"></td>""" % recIDs[irec])
@@ -2139,6 +2183,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', decompress=zli
                     req.write(print_record(recIDs[irec], format, ot))
                     req.write("</td></tr>")
                 req.write("\n</table>")
+                req.write("""<br><input class="formbutton" type="submit" name="action" value="ADD TO BASKET">""")
+                req.write("""\n</form>""")
             else:
                 # deduce url without 'of' argument:
                 url_args = re.sub(r'(^|\&)of=.*?(\&|$)',r'\1',req.args)
@@ -2153,12 +2199,11 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', decompress=zli
                 req.write("</small></div>\n")
                 for irec in range(irec_max,irec_min,-1):
                     req.write(print_record(recIDs[irec], format, ot))
-                    req.write("""<input name="recid" type="hidden" value="%s"></td>""" % irec)
-                    req.write("<p><p>")
-            #req.write("""<div align="right"><input type="submit" name="action" value="ADD TO BASKET"></div>""")
-            req.write("""<br><input class="formbutton" type="submit" name="action" value="ADD TO BASKET">""")
-            req.write("""\n</form>""")
-
+                    req.write("""\n<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
+                    req.write("""<input name="recid" type="hidden" value="%s"></td>""" % recIDs[irec])
+                    req.write("""<br><input class="formbutton" type="submit" name="action" value="ADD TO BASKET">""")
+                    req.write("""\n</form>""")
+                    req.write("<p>&nbsp;")
     else:        
         print_warning(req, 'Use different search terms.')        
 
