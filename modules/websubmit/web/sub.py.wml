@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-   
+
 ## read config variables:
 #include "config.wml"
 #include "configbis.wml"
@@ -57,30 +57,14 @@ except ImportError, e:
     sys.exit(1)
 
 def index(req,c=cdsname,ln=cdslang):
-    ln = wash_language(ln)
-    form = req.form
-    access = form.keys()[0]
-    if access == "":
-        return errorMsg("approve.py: cannot determine document reference",req)
-    res = run_sql("select doctype,rn from sbmAPPROVAL where access='%s'" % access)
-    if len(res) == 0:
-        return errorMsg("approve.py: cannot find document in database",req)
+    myQuery = req.args
+    if re.search("@",myQuery):
+        param = re.sub("@.*","",myQuery)
+        IN = re.sub(".*@","",myQuery)
     else:
-        doctype = res[0][0]
-        rn = res[0][1]
-    res = run_sql("select value from sbmPARAMETERS where name='edsrn' and doctype='%s'" % doctype)
-    edsrn = res[0][0]
-    url = "%s/sub.py?%s=%s&password=%s@APP%s" % (urlpath,edsrn,rn,access,doctype)
+        IN = myQuery
+    url = "%s/direct.py?sub=%s&%s" % (urlpath,IN,param)
     req.err_headers_out.add("Location", url)
     raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
     return ""
-
-def errorMsg(title,req,c=cdsname,ln=cdslang):
-    return page(title="error",
-                    body = create_error_box(req, title=title,verbose=0, ln=ln),
-                    description="%s - Internal Error" % c, 
-                    keywords="%s, CDSware, Internal Error" % c,
-                    language=ln,
-                    urlargs=req.args)
-
 </protect>

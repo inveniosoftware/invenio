@@ -47,7 +47,6 @@ try:
     from cdsware.access_control_engine import acc_authorize_action
     from cdsware.access_control_admin import acc_isRole
     from cdsware.websubmit_config import *
-    from cdsware.specialchars import *
     from cdsware.webpage import page, create_error_box
     from cdsware.webuser import getUid, get_email
     from cdsware.messages import *
