@@ -79,22 +79,22 @@ a.moreinfo:hover {
 }
 a.header:link {
    color: #fff;
-   background: transparent;
+   background: #36c;
    text-decoration: none;
 }
 a.header:visited {
    color: #fff;
-   background: transparent;
+   background: #36c;
    text-decoration: none;
 }
 a.header:active {
    color: #fff;
-   background: transparent;
+   background: #36c;
    text-decoration: none;
 }
 a.header:hover {
    color: #fff;
-   background: transparent;
+   background: #36c;
    text-decoration: none;
 }
 a.img:hover {
@@ -124,7 +124,7 @@ a.note:hover {
 }
 .navtrailbox {
    color: #36c;
-   background: transparent;
+   background: #fff;
    padding: 0px;
    border-spacing: 0px;
    border-collapse: collapse;
@@ -134,7 +134,7 @@ a.note:hover {
    color: #36c;
    padding: 0px;
    border-spacing: 0px;
-   background: transparent;
+   background: #fff;
    font-size: x-small;
 }
 a.navtrail:link {
@@ -172,13 +172,13 @@ a.navtrail:hover {
 }
 .pagefooter {
    color: #999;
-   background: transparent;
+   background: #fff;
    font-size: x-small;
    margin-top: 20px;
 }
 .footerbox {
    color: #999;
-   background: transparent;
+   background: #fff;
    font-size: x-small;
    margin-top: 20px;
    border-top: 1px solid #999;
@@ -252,7 +252,7 @@ a.navtrail:hover {
 ;}
 .portalbox {
    color: #000;
-   background: transparent;
+   background: #fff;
    margin-bottom: 15px;
    border-spacing: 10px;
    border-collapse: collapse;
@@ -269,12 +269,12 @@ a.navtrail:hover {
 }
 .portalboxbody {
    color: #000;
-   background: transparent;
+   background: #fff;
    padding: 2px;
 }
 .googlebox {
    color: #000;
-   background: transparent;
+   background: #fff;
    margin-top: 5px;
    margin-bottom: 5px;
    border-spacing: 0px;
@@ -291,7 +291,7 @@ a.navtrail:hover {
 }
 .googleboxbody {
    color: #000;
-   background: transparent;
+   background: #fff;
    font-size: x-small;
 ;}
 .formbutton {
@@ -345,7 +345,7 @@ a.navtrail:hover {
 }
 .userinfobox {
    color: #060;
-   background: transparent;
+   background: #fff;
    font-size: x-small;
    width: 150px;
    margin-bottom: 15px;
@@ -360,7 +360,7 @@ a.navtrail:hover {
 }
 .userinfoboxbody {
    color: #36c;
-   background: transparent;
+   background: #fff;
    font-size: x-small;
    font-weight: bold;
    border-left: 2px solid #36c; 
