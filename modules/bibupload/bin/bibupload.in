@@ -275,11 +275,12 @@ class subfield {
    	eval("\$this->constructor" . $i . "(" . $args . ");");
    }
 
-   function constructor2($number,&$record)
+   function constructor1($number)
    {
       global $currentfield;
       global $errorfp;
-		
+      global $validrec;
+
       $this->position = $number;
       $this->subfieldcode = $currentfield[attributes][CODE];
 		
@@ -301,7 +302,7 @@ class subfield {
          if ($currentfield[tag]!="SUBFIELD" || $currentfield[type] != "close")
          {
             fwrite($errorfp,"subfield: ERROR! Bad XML file!\n");
-            $record->valid = false;
+            $validrec = false;
          }
          getnexttag();
       }
@@ -345,7 +346,7 @@ class field {
    	eval("\$this->constructor" . $i . "(" . $args . ");");
    }
 
-   function constructor2($nbfield,&$record)
+   function constructor1($nbfield)
    {
       global $currentfield;
 
@@ -380,7 +381,7 @@ class field {
             else
             {
                $this->subfields[$this->nbsubfields] = new subfield(
-                    $this->nbsubfields,$record);
+                    $this->nbsubfields);
                $this->nbsubfields ++;
             }
             getnexttag();
@@ -419,7 +420,6 @@ class record {
    var $fields; 	// contains all fields
    var $recid; 		// system number: 000 if new
    var $nbfields; 	// number of fields
-   var $valid;
 
 
    // Constructor
@@ -427,8 +427,8 @@ class record {
    {
       global $currentfield;
       global $errorfp;
+      global $validrec;
 		
-      $this->valid = true;
       $this->nbfields = 0;
 
       getnexttag();
@@ -451,7 +451,7 @@ class record {
          }
          else if ($currentfield[type] != "close")
          {
-            $this->fields[$this->nbfields] = new field($this->nbfields,$this);
+            $this->fields[$this->nbfields] = new field($this->nbfields);
             $this->nbfields ++;
          }
          else if ($currentfield[type] == "close")
@@ -459,7 +459,7 @@ class record {
          else
          {
             fwrite($errorfp,"field: ERROR! Bad XML file!\n");
-            $this->valid = false;
+            $validrec = false;
          }
       }
 		
@@ -1480,7 +1480,7 @@ function displayhelp()
 
 function task_run()
 {
-    global $maxfieldno,$index,$options,$xml,$nbTags,$nbUpdatedRecords,$nbInsertedRecords,$nbErrorRecords, $nbRecords,$currentfield,$i,$stopstate,$sleepstate,$errorfp;
+    global $maxfieldno,$index,$options,$xml,$nbTags,$nbUpdatedRecords,$nbInsertedRecords,$nbErrorRecords, $nbRecords,$currentfield,$i,$stopstate,$sleepstate,$errorfp,$validrec;
 
     // read task options:
     $task_id = $options["TASKRUN"]; 		// remember task id
@@ -1521,6 +1521,7 @@ function task_run()
             
             while ($xml != "") {
                 $i = 0;
+		$validrec = true;
                 
                 $xml = formatfield($xml);
                 // create XML structure
@@ -1535,7 +1536,7 @@ function task_run()
 
 		// start insertion where the program last stopped
 		if ($nbRecords >= $progress) {
-	                if ($rec->valid) {
+	                if ($validrec) {
         	            integrate($rec);
                 	}
                 	else
