@@ -43,6 +43,7 @@ def Create_Modify_Interface(parameters,curdir,form):
         fp.close()
     else:
         raise functionError("cannot find fields to modify")
+    fieldstext = re.sub("\+","\n",fieldstext)
     fields = fieldstext.split("\n")
     #output some text    
     t=t+"<CENTER bgcolor=white>The document <B>%s</B> has been found in the database.</CENTER><BR>Please modify the following fields:<BR>Then press the 'END' button at the bottom of the page<BR>\n" % rn
