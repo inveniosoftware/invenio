@@ -678,8 +678,8 @@ class Collection:
         # secondly, display split by collection selection box:
         if self.get_sons():
             box += """<select name="sc">
-            <option value="0">all together
             <option value="1">split by collection
+            <option value="0">single list
             </select>"""        
         return box
 
@@ -740,6 +740,7 @@ class Collection:
         "Produces simple 'Search for' box for the current collection."
         # print commentary start:
         out = "<!--create_searchfor_simple()-->"
+        out += """<input type="hidden" name="sc" value="1">"""
         # define URL add-ons for simple and advanced search boxen:
         if self.name != cdsname:
             ssearchurl = "?c=%s&amp;as=0" % urllib.quote_plus(self.name)
