@@ -820,11 +820,11 @@ input,select {
     height: 25px;
     COLOR: #039;
     margin: 0px;
-    background-color: #fff;
-    border-top: 3px solid #039;
-    border-bottom: 3px solid #039;
-    border-left: 3px solid #039;
-    border-right: 3px solid #039;
+    background-color: #9cf;
+    border-top: 2px solid #039;
+    border-bottom: 2px solid #039;
+    border-left: 2px solid #039;
+    border-right: 2px solid #039;
     vertical-align: middle;
     horizontal-align: center;
     font-size: small;
@@ -844,6 +844,5 @@ input,select {
 .submitHeader {
    color: #fff; 
    background: #006; 
-} 
-
+}
 /* end of cds.css */
