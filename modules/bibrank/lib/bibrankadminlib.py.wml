@@ -1040,7 +1040,8 @@ def get_current_name(ID, ln, rtype, table):
     ln - a language supported by cdsware
     type - the type of value wanted, like 'ln', 'sn'"""
     
-    try:
+    #try:
+    if 1==1:
         res = ""
         if ID:
             res = run_sql("SELECT id_%s,value FROM %sname where type='%s' and ln='%s' and id_%s=%s" % (table, table, rtype,ln, table, ID))
@@ -1063,8 +1064,8 @@ def get_current_name(ID, ln, rtype, table):
         res = res + result
         res = list(res)
         return res
-    except StandardError, e:
-        raise StandardError
+#    except StandardError, e:
+#        raise StandardError
     
 def get_name(ID, ln, rtype, table):
     """Returns the value from the table name based on arguments
