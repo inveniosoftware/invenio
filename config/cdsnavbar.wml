@@ -177,7 +177,6 @@
   <navbar:button id=websubmit_listactions txt="Available&nbsp;Actions" url="<WEBURL>/admin/websubmit/allActionsEDS.php" hint="List Available Actions">
   <navbar:button id=websubmit_listchecks txt="Available&nbsp;Javascript&nbsp;Checks" url="<WEBURL>/admin/websubmit/allChecksEDS.php" hint="List Available Javascript Checking functions">
   <navbar:button id=websubmit_listelements txt="Available&nbsp;Element&nbsp;Descriptions" url="<WEBURL>/admin/websubmit/allElementsEDS.php" hint="List Available Element Descriptions">
-  <navbar:button id=websubmit_listmodify txt="Available&nbsp;Modification&nbsp;Texts" url="<WEBURL>/admin/websubmit/allModifyEDS.php" hint="List Available Modification Texts">
   <navbar:button id=websubmit_listfunctions txt="Available&nbsp;Functions" url="<WEBURL>/admin/websubmit/listFunctions.php" hint="List Available Functions">
   <navbar:button id=websubmit_organise txt="Organise&nbsp;Main&nbsp;Page" url="<WEBURL>/admin/websubmit/editCatalogues.php" hint="Main Page Organisation">
   <navbar:button id=websubmit_doc txt="Guide" url="<WEBURL>/admin/websubmit/guide/" hint="Guide">
