@@ -7,7 +7,7 @@ AU::MINLW(105)---<datafield tag="100" ind1="" ind2=""><subfield code="a"><:AU*::
 NUM::MINLW(74)---<datafield tag="300" ind1="" ind2=""><subfield code="a"><:Num::Num:><:Num::Num::IF(,,p):></subfield></datafield>
 AB::MINLW(74)---<datafield tag="520" ind1="" ind2=""><subfield code="a"><:AB::AB:></subfield></datafield>
 NO::MINLW(74)---<datafield tag="500" ind1="" ind2=""><subfield code="a"><:NO::NO:></subfield></datafield>
-KW::MINLW(74)---<datafield tag="650" ind1="" ind2=""><subfield code="a"><:KW*::KW:></subfield></datafield>
+KW::MINLW(74)---<datafield tag="653" ind1="1" ind2=""><subfield code="a"><:KW*::KW:></subfield></datafield>
 LN::MINLW(74)---<datafield tag="041" ind1="" ind2=""><subfield code="a"><:LANG::LANG::IF(,eng,ORIG):></subfield></datafield>
 FMT---<datafield tag="FMT" ind1="" ind2=""><subfield code="f">hd</subfield><subfield code="g"></subfield></datafield>
 FMT---<datafield tag="FMT" ind1="" ind2=""><subfield code="f">hb</subfield><subfield code="g"></subfield></datafield>

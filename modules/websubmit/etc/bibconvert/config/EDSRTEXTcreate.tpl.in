@@ -13,9 +13,9 @@ Dat---<datafield tag="260" ind1="" ind2=""><subfield code="c"><:Dat::yy:>-<:Dat:
 SU---<datafield tag="072" ind1="" ind2="7"><subfield code="2">WebSubmit</subfield></datafield>
 AB---<datafield tag="520" ind1="" ind2=""><subfield code="a"><:AB::AB:></subfield></datafield>
 NO---<datafield tag="500" ind1="" ind2=""><subfield code="a"><:NO::NO:></subfield></datafield>
-KW---<datafield tag="650" ind1="" ind2=""><subfield code="a"><:KW*::KW:></subfield></datafield>
+KW---<datafield tag="653" ind1="1" ind2=""><subfield code="a"><:KW*::KW:></subfield></datafield>
 EM---<datafield tag="856" ind1="0" ind2=""><subfield code="f"><:SuE::SuE:></subfield></datafield>
-URL---<datafield tag="856" ind1="4" ind2=""><subfield code="u"></protect><WEBURL><protect>/getfile.py?recid=<:SN::SN:></subfield><subfield code="z">access to fulltext</subfield></datafield>
+URL---<datafield tag="856" ind1="4" ind2=""><subfield code="u"></protect><WEBURL><protect>/getfile.py?recid=<:SN::SN:></subfield><subfield code="z">Access to Fulltext</subfield></datafield>
 LN---<datafield tag="041" ind1="" ind2=""><subfield code="a"><:LANG::LANG::IF(,eng,ORIG):></subfield></datafield>
 END::DEFP()---</record>
 </protect>
