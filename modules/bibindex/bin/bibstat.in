@@ -21,6 +21,7 @@
 ## read config variables:
 #include "config.wml"
 #include "configbis.wml"
+#include "cdswmllib.wml"
 
 ## start Python:
 <protect>#!</protect><PYTHON>
@@ -31,20 +32,19 @@
 BibStat reports some interesting numbers on CDSware bibliographic record set.
 """
 
+__version__ = "<: print generate_pretty_version_string('$Id$'); :>"
+
 ## fill config variables:
-dbhost = "<DBHOST>"
-dbname = "<DBNAME>"
-dbuser = "<DBUSER>"
-dbpass = "<DBPASS>"
+pylibdir = "<LIBDIR>/python"
 
 ## okay, rest of the Python code goes below
 #######
 
-## version number:
-__version__ = "$Id$"
-
 ## import interesting modules:
 try:
+    import sys
+    sys.path.append('%s' % pylibdir)
+    from cdsware.dbquery import run_sql
     from marshal import loads,dumps
     from zlib import compress,decompress
     from string import split,translate,lower,upper
@@ -52,9 +52,7 @@ try:
     import string
     import os
     import re
-    import sys
     import time
-    import MySQLdb
     import urllib
     import signal
     import threading 
@@ -66,26 +64,16 @@ except ImportError, e:
     import sys
     sys.exit(1)
 
-## cursor to MySQL database:
-try:
-    db = MySQLdb.connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
-    cursor  = db.cursor()
-except StandardError, err:
-    Log(str(err),"Error")
-    sys.exit(1)
-
 def report_table_status(tablename):
     """Report stats for the table TABLENAME."""
     out = ""
-    cursor.execute("SHOW TABLE STATUS LIKE %s", (tablename,))
-    row = cursor.fetchone()
-    while row:
+    res = run_sql("SHOW TABLE STATUS LIKE %s", (tablename,))
+    for row in res:
         out += "%14s %17d %17d %17d" % (row[0], row[3], row[5], row[7]) # Name, Rows, Data_length, Max_data_length
-        row = cursor.fetchone()
     return out    
 
-def main():
-    """Report stats on the CDSware bibliographic tables."""
+def report_on_all_bibliographic_tables():
+    """Report stats for all the interesting bibliographic tables."""
     print "%14s %17s %17s %17s" % ("TABLE", "ROWS", "DATA SIZE", "INDEX SIZE")
     print "============== ================= ================= ================="
     for i in range(0,10):
@@ -98,7 +86,35 @@ def main():
     for i in range(0,11):
         print report_table_status("idxPHRASE%02dF" % i)
         print report_table_status("idxPHRASE%02dR" % i)
-            
+    return     
+
+def usage(exitcode=1, msg=""):
+    """Prints usage info."""
+    if msg:
+        sys.stderr.write("Error: %s.\n" % msg)
+    sys.stderr.write("Usage: %s [options]\n" % sys.argv[0])
+    sys.stderr.write("General options:\n")
+    sys.stderr.write("  -h, --help      \t\t Print this help.\n")
+    sys.stderr.write("  -V, --version   \t\t Print version information.\n")
+    sys.exit(exitcode)
+
+def main():
+    """Report stats on the CDSware bibliographic tables."""
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hV", ["help", "version"])
+    except getopt.GetoptError, err:
+        usage(1, err)
+    if opts:
+        for opt in opts:
+            if opt[0] in ["-h", "--help"]:
+                usage(0)
+            elif opt[0] in ["-V", "--version"]:
+                print __version__
+                sys.exit(0)
+            else:
+                usage(1)
+    else:
+        report_on_all_bibliographic_tables()        
 
 if __name__ == "__main__":
     main()
