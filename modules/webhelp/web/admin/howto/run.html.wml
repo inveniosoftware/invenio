@@ -65,6 +65,7 @@ run periodically with a sleeping period of, say, 1 hour:
    $ bibindex -s1h
    $ bibreformat -oHB,HD -s1h
    $ webcoll -s1h -v0
+   $ bibrank -s1h
    </pre>
    </blockquote>
 
