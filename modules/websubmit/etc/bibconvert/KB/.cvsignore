@@ -1,0 +1,10 @@
+Makefile
+Makefile.in
+config.cache
+config.log
+config.status
+z_*
+*.O
+*.tpl
+*~
+*.shtml
