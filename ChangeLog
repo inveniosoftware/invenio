@@ -1,3 +1,2247 @@
+CDSware v0.5.0 (released 2004-12-17)
+====================================
+
+2004-12-17  Tibor Simko <tibor.simko@cern.ch>
+
+	* RELEASE-NOTES: Release of v0.5.0.
+
+2004-12-17  Tibor Simko <tibor.simko@cern.ch>
+
+	* NEWS: Release of CDSware v0.5.0.  Reformatting for aesthetics, so
+	that news can be easily merged from RELEASE-NOTES.
+
+2004-12-17  Tibor Simko <tibor.simko@cern.ch>
+
+	* Makefile.am: More ALTER TABLE statements for
+	update-v0.3.3-tables.
+
+2004-12-17  Tibor Simko <tibor.simko@cern.ch>
+
+	* INSTALL, UNINSTALL: Added pointer to the RELEASE-NOTES file.
+
+2004-12-17  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/sql/Makefile.am: Added dependency on I18N
+	messages.
+
+2004-12-17  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/messages.wml: Small modifications of ES/NO/SW
+	ranking-related translations.
+
+2004-12-17  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websubmit/doc/admin/index.html.wml,
+	modules/websubmit/doc/admin/philosophy.html.wml: The submission
+	philosophy page refined.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* RELEASE-NOTES: CDSware v0.3.3 release notes.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* RELEASE-NOTES: CDSware v0.3.2 release notes.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* RELEASE-NOTES: CDSware v0.3.1 release notes.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* RELEASE-NOTES: CDSware v0.3.0 release notes.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* RELEASE-NOTES: CDSware v0.1.2 release notes.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* RELEASE-NOTES: CDSware v0.1.1 release notes.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* RELEASE-NOTES: CDSware v0.1.0 release notes.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* RELEASE-NOTES: CDSware v0.0.9 release notes.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql.wml: Add journal impact
+	factor rank method name.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* INSTALL: Added notes on PyRXP and PyStemmer.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* CREDITS: Fred updated, Tiberiu added.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* AUTHORS: Added Nick, Richard, Alberto, Arturo, Diane, and Anna.
+	Updated Trond and Hector.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac: Version number bumped to 0.5.0 in view of the
+	forthcoming release.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/webuser.py.wml: Respect moving of access
+	control variables into the general config file.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webaccess/doc/admin/guide.html.wml,
+	modules/webaccess/lib/webaccessadmin_lib.py.wml: Reflect moving of
+	the local access control config variables into the general config
+	file.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webaccess/lib/access_control_config.py.wml: Some general
+	access control params moved into general config file.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/config.wml: Configuration possibilities enriched by the
+	indexation params, the access control params, and some new search
+	engine params.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/webaccount.py.wml: Cleaned login/register
+	screen messages.
+
+2004-12-16  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webaccount.py.wml,
+	modules/websession/lib/webuser.py.wml,
+	modules/websession/web/youraccount.py.wml: Problems regarding guest
+	user and settings fixed, earlier fixed caused problems when logging
+	in using another method
+
+2004-12-16  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webaccount.py.wml,
+	modules/websession/lib/webuser.py.wml: Fixed problem where error
+	occured when guest user tried to change his non-existing
+	email/password
+
+2004-12-16  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webaccount.py.wml: Changed: Not showing
+	which login method is used when only one exists
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine_config.py.wml: Two local
+	config params moved to the general config file.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/doc/admin/guide.html.wml,
+	modules/bibindex/lib/bibindex_engine.py.wml,
+	modules/bibindex/lib/bibindex_engine_config.py.wml,
+	modules/bibindex/lib/bibindex_engine_stemmer.py.wml,
+	modules/bibindex/lib/bibindex_engine_stopwords.py.wml: Changes due
+	to the move of cfg_* variables into the general config file.
+
+2004-12-16  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_tag_based_indexer.py.wml: Fixed an
+	error when doing an --repair...
+
+2004-12-16  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/bibrank.wml,
+	modules/bibrank/doc/admin/guide.html.wml,
+	modules/bibrank/lib/bibrank_tag_based_indexer.py.wml: Changed
+	"rebalance" to "recalculate"
+
+2004-12-16  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/web/admin/removeDoctypeEDS.php.wml: delete
+	sbmCOLLECTION_sbmDOCTYPE when doctype is deleted
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/admin/howto/run.html.wml: Added note on
+	periodical cleanup of the BibSched schTASK table.
+
+2004-12-16  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_tag_based_indexer.py.wml: [no log
+	message]
+
+2004-12-16  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_tag_based_indexer.py.wml,
+	modules/bibrank/lib/bibrankadminlib.py.wml: Cleaned up, fixed
+	try/except block in bibrankadmin
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/bibrecord_config.py.wml: Put more comments.
+
+2004-12-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/admin/howto/marc.html.wml: CERN MARC changes
+	for 145, 502, 916 tags.
+
+2004-12-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine_stopwords.py.wml: Small
+	cleanup.
+
+2004-12-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine_stemmer.py.wml: Docstring
+	improvements and WML cleanup.
+
+2004-12-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine.py.wml: Changed logic when
+	applying stemming (first) and stopword check (second).
+
+2004-12-15  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Added some
+	missing function commentsx
+
+2004-12-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine.py.wml: Fixed regexp for
+	HTML removal.
+
+2004-12-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: The last commit
+	didn't respect lowercase/uppercase when stripping accents.  Fixed
+	now.
+
+2004-12-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: More I18N of the
+	Google box.  Compile regexps important for the indexation, to speed
+	it up.
+
+2004-12-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/messages.py.wml: New phrase for the Google
+	box.
+
+2004-12-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/messages.wml: Updated transations for the Google box.
+
+2004-12-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine.py.wml: Precompile all major
+	regexps to speed up the execution.  (About 10% faster global word
+	index generation for the demo site.)
+
+2004-12-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webalert/lib/webalert.py.wml,
+	modules/bibharvest/lib/oai_repository.py.wml: Removed unnecessary
+	pylibdir handling.
+
+2004-12-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websubmit/lib/websubmit_engine.py.wml: Cleaned up the
+	import statements.
+
+2004-12-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webaccess/lib/webaccessadmin_lib.py.wml,
+	modules/websubmit/lib/file.py.wml: Cleaned up the import
+	statements.
+
+2004-12-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/webuser.py.wml: Cleaned up the import
+	statements.
+
+2004-12-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibrank/lib/bibrank_tag_based_indexer.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml: Cleaned up the
+	import statements.
+
+2004-12-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibrank/lib/bibrank_tag_based_indexer_tests.py.wml:
+	Removed wrong comment.
+
+2004-12-15  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_record_sorter_tests.py.wml: Cleaned up
+	the import statements.
+
+2004-12-14  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/web/admin/websearchadmin.py.wml: Use proper
+	function names (perform_checkwebcollstatus instead of
+	perform_runwebcoll).
+
+2004-12-14  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Fixed collection
+	table and webcoll cache update times for old Pythons.  Use proper
+	function names (perform_checkwebcollstatus instead of
+	perform_runwebcoll).  Added link to Admin Guide on the WebColl
+	Status and the Collections Status pages.
+
+2004-12-14  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/doc/admin/guide.html.wml: Completed and
+	prettified recent guide additions.
+
+2004-12-14  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/web/index.py.wml: Reflect new treatment of
+	left-top, title-prologue and title-epilogue portalboxes.
+
+2004-12-14  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/bin/webcoll.wml: Properly treat left top, title
+	prologue and title epilogue portalboxes.
+
+2004-12-14  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webstyle/lib/webpage.py.wml: Added title prologue and
+	title epilogue arguments to the page creation function.
+
+2004-12-14  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/admin/howto/marc.html.wml: Minor updates to
+	CERN MARC tags 080, 340, 506, 906, 981, 999.
+
+2004-12-14  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure-tests.py: Added tests for PyStemmer and PyRXP.
+
+2004-12-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine_stopwords.py.wml: One
+	forgotten place fixed.
+
+2004-12-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/bin/testsuite.wml: Added BibIndex stemming
+	tests.
+
+2004-12-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml: Reflect minor
+	BibIndex stopwords/stemmer API change.
+
+2004-12-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/doc/admin/guide.html.wml: Reflect recent
+	stopwords/stemmer refactoring.
+
+2004-12-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine_config.py.wml: Renamed
+	stopword/stemmer options, added more explicit help.
+
+2004-12-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine_stopwords.py.wml: Refactored
+	redundant functions.  Added docstrings.
+
+2004-12-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine_stemmer.py.wml: Fixed case
+	when no available stemmer is found.  Refactored redundant
+	functions.
+
+2004-12-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine_tests.py.wml: Cosmetics.
+
+2004-12-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/Makefile.am,
+	modules/bibindex/lib/bibindex_engine_stemmer_tests.py.wml: Added a
+	basic unit test file for the stemmer.
+
+2004-12-10  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter_tests.py.wml: [no log
+	message]
+
+2004-12-10  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter_tests.py.wml: fixed
+	testcases, disabled one until I can fix the problem
+
+2004-12-10  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibindex/lib/bibindexadminlib.py.wml: Added "Manage
+	fields" link in "add fields to index"
+
+2004-12-10  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/lib/access_control_config.py.wml: disabled cern
+	nice
+
+2004-12-09  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/doc/admin/guide.html.wml: Updated documentation
+
+2004-12-08  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/template_word_similarity.cfg.wml,
+	modules/bibrank/etc/wrd.cfg.wml: removed and changed a few options
+
+2004-12-08  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml: Added comments,
+	added removal of http links when indexing
+
+2004-12-08  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine_config.py.wml,
+	modules/bibindex/lib/bibindex_engine_stopwords.py.wml: Changed so
+	that bibrank can use stopword removal while bibindex not
+
+2004-12-06  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine_config.py.wml: Turned off
+	stemming/stopword removal as default
+
+2004-12-03  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibindex/doc/admin/guide.html.wml: Updated guide with new
+	sections
+
+2004-12-03  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/doc/admin/guide.html.wml: Added
+	webcoll/collection status help
+
+2004-12-03  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/doc/admin/guide.html.wml,
+	modules/webaccess/doc/hacking/api.html.wml: Updated documentation
+
+2004-12-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/messages.wml, modules/miscutil/lib/messages.py.wml,
+	modules/webstyle/css/cds.css.wml: Changes related to the ``Haven't
+	found...'' google box and newly introduced ``See also: similar
+	author names'' box.
+
+2004-12-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine_config.py.wml: Added
+	possibility to enable/disable servers for the `'Haven't found...''
+	Google box.
+
+2004-12-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: - ``Try your search
+	on...'' box expanded and moved to the end of page.
+
+	- Introduced a similar author names search box to handle multiple
+	author name case (initials-only versus full-firstname).
+
+2004-11-30  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/doc/guide.html.wml: More regular search
+	examples.
+
+2004-11-30  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/doc/tips.html.wml: Added reference to regular
+	expressions.
+
+2004-11-29  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* config/cdsnavbar.wml: Changed the bibindex options from
+	"interface" to "Indexes" and "Fields"
+
+2004-11-29  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/doc/admin/guide.html.wml,
+	modules/webaccess/doc/hacking/api.html.wml: Added a few lines about
+	managing login systems
+
+2004-11-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: [no log
+	message]
+
+2004-11-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/bibrank.wml,
+	modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml: Fixed some code
+	when not doing an full update
+
+2004-11-25  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/lib/websubmit_engine.py.wml: code cleaning by
+	Tibi Dondera (EPFL)
+
+2004-11-25  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/web/admin/addFunctions.php.wml: bug correction
+	by Tibi Dondera EPFL (IE compatibility)
+
+2004-11-25  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/web/admin/viewActionEDS.php.wml: bug
+	corrections by Tibi Dondera EPFL
+
+2004-11-24  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: *Code cleanup
+
+2004-11-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webaccount.py.wml: Just added a
+	information message when changing default login method
+
+2004-11-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml: Fixed a problem
+	with mod_python crashing
+
+2004-11-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/lib/access_control_config.py.wml,
+	modules/webaccess/lib/webaccessadmin_lib.py.wml: Addded list of
+	'login via' method to admin interface
+
+2004-11-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/template_word_similarity.cfg.wml,
+	modules/bibrank/etc/wrd.cfg.wml,
+	modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml: Changed variables
+	in preference
+
+2004-11-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Use the term Google
+	Web instead of Google for better distinction with Google Scholar.
+	Remove AllTheWeb.
+
+2004-11-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webaccount.py.wml,
+	modules/websession/lib/webuser.py.wml,
+	modules/websession/web/youraccount.py.wml: *Possible to
+	authenticate user against external loginserver/function before
+	logging user into cdsware.  If local account doesnt exist, but user
+	is verified against external system, the account will be created.
+
+2004-11-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/lib/Makefile.am,
+	modules/webaccess/lib/access_control_config.py.wml,
+	modules/webaccess/lib/access_control_engine.py.wml,
+	modules/webaccess/lib/external_authentication.py.wml,
+	modules/webaccess/lib/webaccessadmin_lib.py.wml,
+	modules/webaccess/web/admin/webaccessadmin.py.wml: *Added
+	possibility to authenticate against an external loginfunction
+	before allowing user to login to cdsware.
+
+2004-11-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine_stemmer.py.wml,
+	modules/bibindex/lib/bibindex_engine_stopwords.py.wml: forgot to
+	add files...
+
+2004-11-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/Makefile.am: [no log message]
+
+2004-11-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/Makefile.am,
+	modules/bibrank/etc/template_word_similarity.cfg.wml,
+	modules/bibrank/etc/wrd.cfg.wml,
+	modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml,
+	modules/bibrank/lib/bibrankadminlib.py.wml: *Using
+	stopword/stemming from /bibindex/lib and stemming/stopword
+	functions
+
+2004-11-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibindex/lib/Makefile.am,
+	modules/bibindex/lib/bibindex_engine.py.wml,
+	modules/bibindex/lib/bibindex_engine_config.py.wml: Added
+	stemming/stopword functionality.  Check
+	/lib/bibindex_engine_config.py for options
+
+2004-11-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Added dynamic link to
+	Google Scholar into the ``Try your search on:'' box.
+
+2004-11-17  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Properly treat
+	whitespace inside Simple Search regexp queries.
+
+2004-11-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibupload/bin/bibupload.wml: BibUpload is now compatible
+	with old MySQL 3.xx servers.  (Notably by changing the
+	deletefield() DELETE SQL logic for this server version.)
+
+2004-11-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/doc/guide.html.wml: Added help on the regexp
+	search syntax.
+
+2004-11-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Introduced regular
+	expression syntax into Simple Search. (field:/regexp/)
+
+2004-11-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/web/youraccount.py.wml: Fixed typo in page()
+	argument for Lost your password box.  (`anguage')
+
+2004-11-02  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webuser.py.wml: Looks like the navtrail
+	had vanished
+
+2004-11-02  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/hacking/cdsware.el: Remove outline mode
+	tweaks since they interfered with the classical outline mode for
+	text files, causing Emacs to be unusably slow when opening them.
+
+2004-11-02  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webbasket/web/yourbaskets.py.wml: *Public baskets are now
+	available even when site is in read only mode
+
+2004-11-02  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websubmit/web/approve.py.wml,
+	modules/websubmit/web/direct.py.wml,
+	modules/websubmit/web/getfile.py.wml,
+	modules/websubmit/web/publiline.py.wml,
+	modules/websubmit/web/sub.py.wml,
+	modules/websubmit/web/submit.py.wml,
+	modules/websubmit/web/summary.py.wml,
+	modules/websubmit/web/yourapprovals.py.wml,
+	modules/websubmit/web/yoursubmissions.py.wml: Update related to
+	site open/close functionality added in webaccess
+
+2004-11-02  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webalert/web/youralerts.py.wml: related to site
+	open/close update in webaccess
+
+2004-11-02  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webbasket/web/yourbaskets.py.wml: related to site
+	open/close
+
+2004-11-02  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webuser.py.wml,
+	modules/websession/web/youraccount.py.wml: Updated related to site
+	open/close/readonly
+
+2004-11-02  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/doc/admin/guide.html.wml,
+	modules/webaccess/lib/access_control_config.py.wml,
+	modules/webaccess/lib/webaccessadmin_lib.py.wml: Added new config
+	variable in access_control_config: 0 - site normal operation 1 -
+	site closed except for searching 2 - site fully closed
+
+2004-11-02  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Print information on
+	sorting by pattern when verbosity level is set high.
+
+2004-11-02  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Fixed sorting when
+	sort_by_pattern was activated and the sorting pattern wasn't
+	present in some of the records.
+
+2004-11-02  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/lib/access_control_config.py.wml: *Removed some
+	misplaced text
+
+2004-11-01  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webuser.py.wml: Modified
+	page_not_authorized
+
+2004-11-01  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/lib/access_control_config.py.wml: Added a few
+	messages
+
+2004-11-01  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/doc/admin/guide.html.wml,
+	modules/webaccess/lib/access_control_config.py.wml,
+	modules/webaccess/lib/webaccessadmin_lib.py.wml,
+	modules/bibindex/web/admin/bibindexadmin.py.wml,
+	modules/websearch/web/admin/websearchadmin.py.wml,
+	modules/websession/lib/webuser.py.wml,
+	modules/websession/web/youraccount.py.wml,
+	modules/bibrank/web/admin/bibrankadmin.py.wml: Using
+	page_not_authorized in webuser
+
+2004-11-01  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webaccess/lib/access_control_config.py.wml: Made the
+	`currently closed' message softer.
+
+2004-11-01  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/webuser.py.wml: Changed `is closed' to
+	`temporarily closed'.
+
+2004-11-01  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/elmsubmit/bin/.cvsignore: Do not pay CVS attention to
+	elmsubmit executable.
+
+2004-11-01  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webstyle/css/cds.css.wml: Put the color property
+	explicitely for the input and select elements because some browsers
+	did not properly inherited it.
+
+2004-11-01  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webuser.py.wml,
+	modules/websession/web/youraccount.py.wml: *Added possibility to
+	close the site for all access
+
+2004-11-01  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Fixed problem
+	when creating/modifying portalboxes causing title to dissapear when
+	containing one or more "
+
+2004-11-01  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibindex/lib/bibindexadminlib.py.wml,
+	modules/bibindex/web/admin/bibindexadmin.py.wml,
+	modules/bibindex/web/admin/index.html.wml: Splitted managing
+	indexes and fields into two interfaces. Fixed interfacebug when
+	modifying: BibIndex Admin -> Edit Logical Field -> Modify MARC tags
+	-> Modify MARC tag
+
+2004-11-01  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/doc/admin/guide.html.wml,
+	modules/webaccess/lib/access_control_config.py.wml,
+	modules/webaccess/lib/webaccessadmin_lib.py.wml: *Added
+	CFG_SITE_OPEN in access_control_config, allows closing of the site
+	for all access
+
+2004-10-28  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/sql/tabfill.sql.wml: BibFormat's UDF
+	EXTRACT_EMAIL changed to ignore blanks after `@'.  (Thanks to
+	Guido.)
+
+2004-10-28  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/bibformat/web/admin/FORMAT_edit.php.wml: corrected bug
+	with &nbsp;
+
+2004-10-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webuser.py.wml: *Fixed (hopefully): When a
+	new user opened a page, he would get a message saying "guest user
+	not allowed", even if guest users are allowed.
+
+2004-10-25  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/webuser.py.wml: Remove wrong TLDN's
+	dot-test from checkemail().
+
+2004-10-25  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webuser.py.wml: Added email check to
+	verify that it is from a valid domain.	The email address box on
+	the "Change email/password" screen is disabled if the security
+	level (2) doesnt allow email to be changed
+
+2004-10-25  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/doc/admin/guide.html.wml,
+	modules/webaccess/lib/access_control_config.py.wml,
+	modules/webaccess/lib/webaccessadmin_lib.py.wml: -Added config
+	option in access_control_config to limit the possible email
+	addresses to use to a defined domain (like "cern.ch")
+
+2004-10-25  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webaccount.py.wml,
+	modules/websession/lib/webuser.py.wml,
+	modules/websession/web/youraccount.py.wml: *Not possible any longer
+	for a user to change the email address if the securitylevel is high
+	enough (2)
+
+2004-10-25  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/elmsubmit/lib/magic/Makefile.am: Temporarily removing
+	magic.so target.
+
+2004-10-22  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/template_word_similarity.cfg.wml,
+	modules/bibrank/etc/wrd.cfg.wml,
+	modules/bibrank/lib/bibrank_record_sorter.py.wml: Fixed a problem
+	in the config files
+
+2004-10-22  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/doc/admin/guide.html.wml: [no log message]
+
+2004-10-22  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/doc/admin/guide.html.wml,
+	modules/webaccess/lib/webaccessadmin_lib.py.wml: Added a overview
+	of the current configuration in the admin interface
+
+2004-10-21  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/doc/admin/guide.html.wml,
+	modules/webaccess/lib/webaccessadmin_lib.py.wml: [no log message]
+
+2004-10-21  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* config/cdsnavbar.wml: manage_accounts changed to manageaccounts
+
+2004-10-21  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibedit/lib/bibrecord.py.wml: *If a parser not existing
+	was chosen, the 4suite parser would be used if available.
+
+2004-10-20  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/web/youraccount.py.wml: Changed some text on
+	the lost password page
+
+2004-10-20  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml,
+	modules/bibindex/lib/bibindexadminlib.py.wml,
+	modules/bibrank/lib/bibrank_record_sorter.py.wml: [no log message]
+
+2004-10-20  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_record_sorter_tests.py.wml: *Fixed a
+	problem with the test case
+
+2004-10-20  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibedit/lib/bibrecord.py.wml: *Hopefully fixed error when
+	no parser installed
+
+2004-10-20  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibedit/lib/bibrecord.py.wml: *Fixed 4suite parser
+
+2004-10-20  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibedit/lib/bibrecord.py.wml: -Hopefully fixed 4suite
+
+2004-10-20  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibedit/lib/bibrecord.py.wml,
+	modules/bibedit/lib/bibrecord_tests.py.wml: *Fixed minidom parser
+
+2004-10-20  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/bibrecord_tests.py.wml: Use proper etcdir
+	when testing for sanity.
+
+2004-10-20  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/miscutil/demo/demobibdata.xml: Fixed file...strange
+	characters in beginning of file causing problems
+
+2004-10-20  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibedit/lib/bibrecord_tests.py.wml: Fixed sanity test
+
+2004-10-20  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/demo/demobibdata.xml: Using > instead of &gt; in
+	an abstract now.
+
+2004-10-20  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/bibrecord.py.wml: Typo fixed.
+
+2004-10-20  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/bibrecord.py.wml:
+	record_get_field_instances() fixed for non-existing tags.
+	encode_for_xml() does not encode > sign anymore.
+
+2004-10-20  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/bibrecord_tests.py.wml: Added test for
+	accented UTF-8 letters.
+
+2004-10-20  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webaccount.py.wml,
+	modules/websession/web/youraccount.py.wml: ...modified some text
+
+2004-10-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/bibrecord.py.wml: String type checks now also
+	check unicode string types.  (As per Alexandra.)
+
+2004-10-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webaccount.py.wml,
+	modules/websession/lib/webuser.py.wml,
+	modules/websession/web/youraccount.py.wml: +Checking that email
+	entered when editing account settings are unique +Password must be
+	entered twice when registering and when editing account settings
+
+2004-10-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/bibrecord_tests.py.wml: Added tests for
+	getting field/subfield values/instances.
+
+2004-10-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/bibrecord.py.wml:
+	record_get_field_instances() now takes optional TAG, IND1 and IND2
+	arguments.  Added field_get_subfield_values() function.
+
+2004-10-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webaccount.py.wml,
+	modules/websession/web/youraccount.py.wml: [no log message]
+
+2004-10-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webaccount.py.wml: [no log message]
+
+2004-10-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webaccount.py.wml,
+	modules/websession/web/youraccount.py.wml: *Splitted login/register
+	page into two pages
+
+2004-10-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/lib/access_control_config.py.wml: Removed some
+	testing code
+
+2004-10-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibindex/lib/bibindexadminlib.py.wml,
+	modules/bibrank/bin/bibrank.wml,
+	modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/webaccess/lib/access_control_config.py.wml,
+	modules/webaccess/lib/access_control_engine.py.wml,
+	modules/webaccess/web/admin/index.html.wml,
+	modules/webaccess/web/admin/webaccessadmin.py.wml,
+	modules/webalert/web/youralerts.py.wml,
+	modules/webbasket/web/yourbaskets.py.wml,
+	modules/websearch/lib/websearchadminlib.py.wml,
+	modules/websearch/web/index.py.wml,
+	modules/websearch/web/search.py.wml,
+	modules/websession/lib/webaccount.py.wml,
+	modules/websession/lib/webuser.py.wml,
+	modules/websession/web/youraccount.py.wml,
+	modules/websubmit/web/approve.py.wml,
+	modules/websubmit/web/direct.py.wml,
+	modules/websubmit/web/getfile.py.wml,
+	modules/websubmit/web/publiline.py.wml,
+	modules/websubmit/web/sub.py.wml,
+	modules/websubmit/web/submit.py.wml,
+	modules/websubmit/web/summary.py.wml,
+	modules/websubmit/web/yourapprovals.py.wml,
+	modules/websubmit/web/yoursubmissions.py.wml: *Added "Access
+	Policy" options.  *Possible to send an email to admin/user when a
+	new account is created/deleted/awaiting approval *Guests can be
+	denied access *New accounts can be automatically activated, or
+	manually.  *Can decide if the user is allowed to create an account.
+
+	For changing access policy, look in access_control_config.py and
+	"Manage accounts" in WebAccess Admin Interface
+
+2004-10-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/lib/webaccessadmin_lib.py.wml: Added a new
+	section, "Manage Accounts" for editing accounts
+
+2004-10-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* config/cdsnavbar.wml: Added a new section for Webaccess in the
+	menu
+
+2004-10-14  Richard Owen <ro@tes.la>
+
+	* modules/elmsubmit/bin/Makefile.am,
+	modules/elmsubmit/bin/elmsubmit.wml,
+	modules/elmsubmit/etc/Makefile.am,
+	modules/elmsubmit/etc/elmsubmit.cfg.wml,
+	modules/elmsubmit/lib/Makefile.am,
+	modules/elmsubmit/lib/config2pyobj.py.wml,
+	modules/elmsubmit/lib/elmsubmit.py.wml,
+	modules/elmsubmit/lib/elmsubmit_EZArchive.py.wml,
+	modules/elmsubmit/lib/elmsubmit_EZArchive_examples.txt,
+	modules/elmsubmit/lib/elmsubmit_EZEmail.py.wml,
+	modules/elmsubmit/lib/elmsubmit_doctype_test.py.wml,
+	modules/elmsubmit/lib/elmsubmit_enriched2txt.py.wml,
+	modules/elmsubmit/lib/elmsubmit_field_validation.py.wml,
+	modules/elmsubmit/lib/elmsubmit_filename_generator.py.wml,
+	modules/elmsubmit/lib/elmsubmit_html2txt.py.wml,
+	modules/elmsubmit/lib/elmsubmit_misc.py.wml,
+	modules/elmsubmit/lib/elmsubmit_richtext2txt.py.wml,
+	modules/elmsubmit/lib/elmsubmit_submission_parser.py.wml,
+	modules/elmsubmit/lib/encdet.py.wml,
+	modules/elmsubmit/lib/encdet_utf8.py.wml,
+	modules/elmsubmit/lib/lex.py.wml,
+	modules/elmsubmit/lib/lextab.py.wml,
+	modules/elmsubmit/lib/mime.types.edited,
+	modules/elmsubmit/lib/myhtmlentitydefs.py.wml,
+	modules/elmsubmit/lib/parser.out,
+	modules/elmsubmit/lib/parsetab.py.wml,
+	modules/elmsubmit/lib/yacc.py.wml,
+	modules/elmsubmit/lib/magic/Makefile.am,
+	modules/elmsubmit/lib/magic/Makefile.magic,
+	modules/elmsubmit/lib/magic/README,
+	modules/elmsubmit/lib/magic/__init__.py.wml,
+	modules/elmsubmit/lib/magic/compile_magic.py.wml,
+	modules/elmsubmit/lib/magic/magic.ext,
+	modules/elmsubmit/lib/magic/magic.ext.mgc,
+	modules/elmsubmit/lib/magic/py_magic.c,
+	modules/elmsubmit/lib/magic/py_magic.h: Initial full checkin of
+	elmsubmit code.
+
+2004-10-12  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml,
+	modules/bibrank/lib/bibrankadminlib.py.wml: Fixed problem in word
+	indexer: If a document already in the table was reindexed, and
+	there was no modified words, the reverse table was still updated
+	and "term frequency" numbers lost. Fixed it by adding the words in
+	the document to the list of words to recalculate the values for.
+
+2004-10-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Do not require the
+	URL link name to be present when making default output format.
+
+2004-10-06  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibindex/lib/bibindexadminlib.py.wml: Changed textbox to
+	a textarea for the Index description
+
+2004-10-06  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrankadminlib.py.wml: Modified some
+	function used by websearch,bibindex,webaccess and bibrank
+
+2004-10-06  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibindex/lib/bibindexadminlib.py.wml,
+	modules/bibindex/web/admin/bibindexadmin.py.wml: +Added admin
+	functionality for modifying indexes in addition to fields
+
+2004-10-06  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webbasket/lib/webbasket.py.wml: Fixed problem with item
+	ordering in case there were holes in nb_order range.  (Which should
+	have happened all the time as soon as there was more than one
+	basket defined on site due to autoincremented nb_order.)
+
+2004-10-04  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml: Changed structure
+	of dictionary used by singletagrankmethod,citations and number of
+	downloads.
+
+2004-10-04  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/stopwords.kb.wml: Added a few stopwords
+
+2004-09-29  Richard Owen <ro@tes.la>
+
+	* modules/elmsubmit/lib/Makefile.am,
+	modules/elmsubmit/lib/elmsubmit_misc.py.wml: Initial checkin of
+	this file.
+
+2004-09-29  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac: Added support for ElmSubmit.
+
+2004-09-29  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/Makefile.am: Added ElmSubmit module.
+
+2004-09-29  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/elmsubmit/.cvsignore, modules/elmsubmit/Makefile.am,
+	modules/elmsubmit/bin/.cvsignore,
+	modules/elmsubmit/bin/Makefile.am,
+	modules/elmsubmit/doc/.cvsignore,
+	modules/elmsubmit/doc/Makefile.am,
+	modules/elmsubmit/doc/admin/.cvsignore,
+	modules/elmsubmit/doc/admin/Makefile.am,
+	modules/elmsubmit/doc/admin/guide.html.wml,
+	modules/elmsubmit/doc/admin/index.html.wml,
+	modules/elmsubmit/doc/hacking/.cvsignore,
+	modules/elmsubmit/doc/hacking/Makefile.am,
+	modules/elmsubmit/etc/.cvsignore,
+	modules/elmsubmit/etc/Makefile.am,
+	modules/elmsubmit/lib/.cvsignore,
+	modules/elmsubmit/lib/Makefile.am,
+	modules/elmsubmit/lib/magic/.cvsignore,
+	modules/elmsubmit/lib/magic/Makefile.am: Added skeleton for
+	ElmSubmit module.
+
+2004-09-29  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/doc/Makefile.am,
+	modules/websearch/doc/guide.html.wml,
+	modules/websearch/doc/index.html.wml,
+	modules/websearch/doc/tips.html.wml: Start splitting of Search Tips
+	into a small tips page and a larger guide page.
+
+2004-09-27  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine.py.wml,
+	modules/bibindex/lib/bibindex_engine_config.py.wml: Activate our
+	fancy non-interactive URL opener for fail-safe fulltext-indexing of
+	remote files.  Access credentials are read from the config file,
+	but are not really all that useful at this stage.  More work
+	needed.
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/doc/hacking/api.html.wml,
+	modules/webaccess/lib/access_control_engine.py.wml: -Added:
+	Checking if userid submitted actually exists in the user table
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/bin/authaction.wml,
+	modules/webaccess/doc/hacking/api.html.wml,
+	modules/webaccess/lib/access_control_config.py.wml,
+	modules/websession/web/sessinit.inc.php.wml: [no log message]
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/web/admin/bibrankadmin.py.wml,
+	modules/webaccess/lib/webaccessadmin_lib.py.wml,
+	modules/websearch/web/admin/websearchadmin.py.wml,
+	modules/bibindex/web/admin/bibindexadmin.py.wml: [no log message]
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/lib/access_control_config.py.wml: Changed
+	messages
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/web/sessinit.inc.php.wml: Fixed problem
+	causing string to split up if it contained " , "
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/web/sessinit.inc.php.wml: String is not
+	splitted using " , "
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/bin/authaction.wml,
+	modules/webaccess/doc/hacking/api.html.wml,
+	modules/webaccess/lib/access_control_config.py.wml,
+	modules/webaccess/lib/access_control_engine.py.wml: Changed message
+	when authorized, and output from authaction
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/doc/hacking/api.html.wml: Modified api to
+	reflect changes in output from functions in the webaccess module
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/web/admin/websearchadmin.py.wml: Modified so
+	that error messages when not authorized is received from webaccess
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/web/admin/bibrankadmin.py.wml: Modified error
+	messages, showing message received from webaccess
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Modified error
+	messages from webaccess
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/bin/webcoll.wml: Modified error message when
+	not authorized by webaccess
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/webaccess/bin/authaction.wml,
+	modules/webaccess/doc/hacking/api.html.wml,
+	modules/webaccess/lib/access_control_config.py.wml,
+	modules/webaccess/lib/access_control_engine.py.wml,
+	modules/webaccess/lib/webaccessadmin_lib.py.wml: Modified error
+	messages when not authorized. Different messages based on reason
+	for not getting authorized. Messages placed in access_contr_config
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_tag_based_indexer.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml,
+	modules/bibrank/lib/bibrankadminlib.py.wml: -Modified error
+	messages from webaccess -and something else...
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websubmit/lib/websubmit_engine.py.wml,
+	modules/websubmit/lib/functions/Is_Original_Submitter.py.wml,
+	modules/websubmit/lib/functions/Is_Referee.py.wml,
+	modules/websubmit/web/publiline.py.wml,
+	modules/websubmit/web/yourapprovals.py.wml,
+	modules/websubmit/web/admin/actionFunctions.php.wml,
+	modules/websubmit/web/admin/addActionEDS.php.wml,
+	modules/websubmit/web/admin/addCheckEDS.php.wml,
+	modules/websubmit/web/admin/addElement2PageEDS.php.wml,
+	modules/websubmit/web/admin/addElementDescrEDS.php.wml,
+	modules/websubmit/web/admin/addFunctions.php.wml,
+	modules/websubmit/web/admin/allActionsEDS.php.wml,
+	modules/websubmit/web/admin/allChecksEDS.php.wml,
+	modules/websubmit/web/admin/allElementsEDS.php.wml,
+	modules/websubmit/web/admin/commonPhpFunctions.php.wml,
+	modules/websubmit/web/admin/doctypeCategoriesEDS.php.wml,
+	modules/websubmit/web/admin/documentEDS.php.wml,
+	modules/websubmit/web/admin/editActionDets.php.wml,
+	modules/websubmit/web/admin/editCatalogues.php.wml,
+	modules/websubmit/web/admin/editDoctypeEDS.php.wml,
+	modules/websubmit/web/admin/editPageElementEDS.php.wml,
+	modules/websubmit/web/admin/editRecordFile.php.wml,
+	modules/websubmit/web/admin/elementConfigDetsEDS.php.wml,
+	modules/websubmit/web/admin/func.php.wml,
+	modules/websubmit/web/admin/funcUsage.php.wml,
+	modules/websubmit/web/admin/index.php.wml,
+	modules/websubmit/web/admin/listFunctions.php.wml,
+	modules/websubmit/web/admin/newDoctypeEDS.php.wml,
+	modules/websubmit/web/admin/newFunc.php.wml,
+	modules/websubmit/web/admin/newSubmissionEDS.php.wml,
+	modules/websubmit/web/admin/pageDetsEDS.php.wml,
+	modules/websubmit/web/admin/parameterUpdate.php.wml,
+	modules/websubmit/web/admin/referees.py.wml,
+	modules/websubmit/web/admin/removeDoctypeEDS.php.wml,
+	modules/websubmit/web/admin/veditFunDets.php.wml,
+	modules/websubmit/web/admin/viewActionEDS.php.wml,
+	modules/websubmit/web/admin/viewChecksEDS.php.wml,
+	modules/websubmit/web/admin/viewEditSubmissionEDS.php.wml: Modified
+	error messages from webaccess when calling authaction without
+	getting authorized
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websession/lib/webuser.py.wml,
+	modules/websession/web/sessinit.inc.php.wml: Modified error
+	messages from webaccess when not authorized (when calling
+	authaction)
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibsched/bin/bibtaskex.wml,
+	modules/bibrank/bin/bibrank.wml,
+	modules/bibrank/bin/bibrankgkb.wml: Modified error messages from
+	webaccess when not authorized
+
+2004-09-23  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibformat/bin/bibreformat.wml,
+	modules/bibformat/web/admin/security.inc.php.wml,
+	modules/bibindex/lib/bibindex_engine.py.wml,
+	modules/bibindex/lib/bibindexadminlib.py.wml,
+	modules/bibindex/web/admin/bibindexadmin.py.wml: Modified error
+	messages when not authorized
+
+2004-09-21  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_word_indexer.py.wml: Changed error
+	message when Psyco is not installed from "ERROR:" to "Warning:"
+
+2004-09-21  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_tag_based_indexer.py.wml: Modified
+	structure of hash table used by single_tag_rank_method Added
+	exception handling when problem with config file in
+	bibrank_record_sorter
+
+2004-09-20  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: -import datetime
+	statement. Module not in use and not supported by Python 2.2
+
+2004-09-16  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/lib/websubmit_engine.py.wml: simpleendaction:
+	exceptions are not caught anymore
+
+2004-09-15  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter_tests.py.wml,
+	modules/bibrank/lib/bibrank_tag_based_indexer_tests.py.wml: [no log
+	message]
+
+2004-09-15  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter_tests.py.wml,
+	modules/bibrank/lib/bibrank_tag_based_indexer_tests.py.wml: Changed
+	some text
+
+2004-09-15  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/miscutil/bin/testsuite.wml: Added bibrank test cases
+
+2004-09-15  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/Makefile.am,
+	modules/bibrank/lib/bibrank_record_sorter_tests.py.wml,
+	modules/bibrank/lib/bibrank_tag_based_indexer_tests.py.wml,
+	modules/bibrank/lib/bibrank_tests.py.wml: Split into one test file
+	per library
+
+2004-09-15  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/bibsched/bin/bibsched.wml: new job status: "DONE WITH
+	ERRORS"
+
+2004-09-15  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/miscutil/sql/tabcreate.sql: change "status" column of
+	schTASK table.
+
+2004-09-15  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/bibupload/bin/bibupload.wml: corrected total number of
+	records.  always store absolute path to files
+
+2004-09-15  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/Makefile.am,
+	modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_tests.py.wml: Added a few testcases
+
+2004-09-15  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/bibupload/bin/bibupload.wml: bibupload stops with an
+	error when a file cannot be found
+
+2004-09-15  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/doc/admin/Makefile.am,
+	modules/websubmit/doc/admin/index.html.wml,
+	modules/websubmit/doc/admin/philosophy.html.wml: added doc page
+	explaining the relation between a search catalogue and a submission
+
+2004-09-15  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/lib/functions/Add_Files.py.wml: added function
+	to insert files which were stored in a "files" directory of the
+	submission directory
+
+2004-09-15  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/lib/websubmit_engine.py.wml: added function
+	simplendaction to deal with non-web submissions
+
+2004-09-14  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/lib/file.py.wml: os.path.getctime does not
+	exist in python 2.3
+
+2004-09-14  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/Makefile.am, modules/bibrank/bin/bibrank.wml,
+	modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml: [no log message]
+
+2004-09-14  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/bibrank.wml: Changed how a new task is
+	submitted because of a bug creating an exception at submit time
+
+2004-09-14  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: [no log message]
+
+2004-09-14  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Changed text from
+	"rearrange by name" to "order alphabetically"
+
+2004-09-14  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Added
+	functionality for rearranging sort options/search fields by name
+	(alphabethically)
+
+2004-09-14  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/web/admin/websearchadmin.py.wml: Added two new
+	functions, rearrangefield/rearrangefieldvalue
+
+2004-09-13  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: Added support
+	for recid:x type of queries for methods using
+	single_tag_rank_method
+
+2004-09-13  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Fixed a few
+	issues regarding sort fields/search options Still a issue when
+	several fields got the same score
+
+2004-09-13  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrankadminlib.py.wml: Modified
+	write_outcome (again)
+
+2004-09-13  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrankadminlib.py.wml: Modified
+	write_outcome
+
+2004-09-13  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrankadminlib.py.wml: Fixed write_outcome
+	when parameter res is empty
+
+2004-09-13  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Fixed some bugs
+	with changing the "score" of fields/fieldvalues
+
+2004-09-13  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/websubmit/lib/file.py.wml,
+	modules/websubmit/lib/functions/Move_Files_Archive.py.wml,
+	modules/websubmit/lib/functions/Move_From_Pending.py.wml: got rid
+	of os.walk which does not exist in python 2.2 replaced with
+	os.listdir:
+
+2004-09-10  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/doc/hacking/bibrankgkb.html.wml,
+	modules/bibrank/doc/hacking/index.html.wml,
+	modules/bibrank/doc/hacking/merge_rank_methods.html.wml,
+	modules/bibrank/doc/hacking/single_tag_rank.html.wml,
+	modules/bibrank/doc/hacking/word_similarity.html.wml: Modified
+	document width
+
+2004-09-08  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: Changed name of
+	a function from merge_methods to combine_method
+
+2004-09-08  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/template_combine_method.cfg.wml,
+	modules/bibrank/etc/template_merge_methods.cfg.wml: Changed name of
+	rank method
+
+2004-09-08  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/doc/admin/guide.html.wml,
+	modules/bibrank/doc/hacking/api.html.wml,
+	modules/bibrank/doc/hacking/index.html.wml: updated config
+
+2004-09-08  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/template_merge_methods.cfg.wml: Added
+	template for merge method
+
+2004-09-08  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/template_word_frequency.cfg.wml: File changed
+	name to template_word_similarity.cfg.wml
+
+2004-09-08  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/doc/admin/guide.html.wml,
+	modules/bibrank/doc/hacking/single_tag_rank.html.wml,
+	modules/bibrank/doc/hacking/word_similarity.html.wml: Documentation
+	updated
+
+2004-09-08  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine.py.wml: Eliminated excessive
+	write_message() function.  Reduced serialize/deserialize function
+	numbers.  Calling get_datetime(), not getdate().
+
+2004-09-08  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/admin/howto/run.html.wml: Added bibrank
+	process to the list of usually expected daemons.
+
+2004-09-08  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/bibrecord_tests.py.wml: Added a FIXME comment
+	on the not-yet-working UTF-8 parsing.
+
+2004-09-08  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: User rankscoreinfo
+	class for outputting relevance scores.
+
+2004-09-08  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webstyle/css/cds.css.wml: Added `rankscoreinfo' for the
+	ranked search engine output.
+
+2004-09-08  Tibor Simko <tibor.simko@cern.ch>
+
+	* Makefile.am: Added final bibrank call after demo records have
+	been loaded.
+
+2004-09-08  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql.wml: Added demo of `journal
+	impact factor' ranking method.
+
+2004-09-08  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/sql/tabfill.sql.wml: Introduced `word
+	similarity' to be a default ranking method.
+
+2004-09-08  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/sql/tabbibclean.sql,
+	modules/miscutil/sql/tabdrop.sql: Added support for new BibRank
+	tables.
+
+2004-09-08  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/sql/tabcreate.sql: New BibRank tables.
+
+2004-09-08  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/admin/howto/marc.html.wml: Added section on
+	MARC schema in use at CERN.
+
+2004-09-07  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml: Changed a function
+	name from word_frequency to word_similarity
+
+2004-09-07  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/template_word_similarity.cfg.wml,
+	modules/bibrank/etc/wrd.cfg.wml: Changed name from word_frequency
+	to word_similarity
+
+2004-09-07  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/doc/hacking/api.html.wml,
+	modules/bibrank/doc/hacking/word_similarity.html.wml: Hacking
+	documentation for the Bibrank module
+
+2004-09-07  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: Not much, some
+	naming issues
+
+2004-09-07  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/doc/admin/guide.html.wml,
+	modules/bibrank/doc/hacking/Makefile.am,
+	modules/bibrank/doc/hacking/bibrankgkb.html.wml,
+	modules/bibrank/doc/hacking/index.html.wml,
+	modules/bibrank/doc/hacking/single_tag_rank.html.wml: Documentation
+	for the BibRank module updated, especially the hacking section
+
+2004-09-06  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibrank/bin/bibrank.wml: Changed bibrank process name to
+	the one expected by bibsched.
+
+2004-09-06  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/demo_jif.cfg.wml,
+	modules/bibrank/etc/template_single_tag_rank_method.cfg.wml,
+	modules/bibrank/etc/template_word_frequency.cfg.wml,
+	modules/bibrank/etc/wrd.cfg.wml: -Removed no longer used parameter
+	from config files. (overall_importance)
+
+2004-09-06  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/bibrank.wml: [no log message]
+
+2004-09-06  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_tag_based_indexer.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml: -Added method for
+	merging the result of various rank methods into one.  -Removed a no
+	longer used parameter from config file (overall_importance)
+
+2004-09-03  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: Fixed: If
+	translation of a rank method didnt exist in a language, the code
+	was sent back instead of the translation in the default language.
+
+2004-09-03  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: Verbose output
+	was not returned for some methods
+
+2004-09-03  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/bibrank.wml: Modified output text
+
+2004-09-03  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: Changed two %S
+	into %s
+
+2004-09-03  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_tag_based_indexer.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml: Modified debug
+	information
+
+2004-09-03  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/demo_jif.cfg.wml,
+	modules/bibrank/etc/template_single_tag_rank_method.cfg.wml,
+	modules/bibrank/etc/template_word_frequency.cfg.wml,
+	modules/bibrank/etc/wrd.cfg.wml: Modified parameter names
+
+2004-09-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Keep selected rank
+	method when doing `jump to record X'.
+
+2004-09-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibrank/etc/demo_jif.cfg.wml: Demo site uses 909C4 to
+	store publication information.
+
+2004-09-03  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: -Fixed crash if
+	Stemmer is not available
+
+2004-09-03  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_tag_based_indexer.py.wml: Tiny bug
+	fixed...not much..
+
+2004-09-03  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/bibrank.wml,
+	modules/bibrank/etc/demo_jif.cfg.wml,
+	modules/bibrank/lib/bibrank_tag_based_indexer.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml:
+	-Bibrank_word_indexer: fixed bug when verbose > 0 -bibrank: fixed
+	default options -config files: fixed some naming issues
+
+2004-09-02  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: -Fixed up how
+	the configuration options are handled inside the methods. Only one
+	global variable for the configdata now.
+
+2004-09-02  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: -Sending verbose
+	value to rank_records
+
+2004-09-02  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: -Fixed
+	get_bibrank_methods. Returning only methods available for the
+	current collection
+
+2004-09-02  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/bin/webcoll.wml,
+	modules/websearch/lib/search_engine.py.wml: get_bibrank_methods()
+	now accepts colID, not collection name.
+
+2004-09-02  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/web/index.py.wml: get_colID() is now read from
+	search engine's library.
+
+2004-09-02  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/bin/webcoll.wml,
+	modules/websearch/lib/search_engine.py.wml: Added collection
+	argument to get_bibrank_method calls.
+
+2004-09-01  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Fixed off-by-one
+	search unit counting in stage 2-1.
+
+2004-09-01  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/messages.wml: Boolean query warning message changed.
+	Added similarity messages.  Rank by message output changed.  Minor
+	CZ and SK cleanup.
+
+2004-09-01  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/messages.py.wml: Similar records message
+	added.
+
+2004-09-01  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: Deleted extra
+	<b> markup.
+
+2004-09-01  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibrank/bin/Makefile.am: Remove bibranktest from the list
+	of common targets.
+
+2004-09-01  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webstyle/css/cds.css.wml: More information (Detailed
+	record, Similar records) is made smaller.
+
+2004-09-01  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/bin/webcoll.wml: Support for the ranking and
+	similarity search.
+
+2004-09-01  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: - Added support for
+	record ranking and similarity search.
+
+	- Stage 2-1 behaviour changed so that no warning is emitted for
+	nonexisting search terms if they are preceded or followed by
+	boolean   OR operator.
+
+	- Nearest hits aren't shown for recid type of queries.
+
+2004-09-01  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/Makefile.am,
+	modules/bibrank/lib/bibrank_record_sorter.py.wml: -Turned verbose
+	off
+
+2004-09-01  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: - rank_records
+	returns (a,b,c,d,e)
+
+2004-09-01  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: -Fixed error in
+	rank_records
+
+2004-09-01  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: If error, first
+	parameter returned by rank_records, ([0]) is (None,None)
+
+2004-09-01  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/demo_jif.cfg.wml,
+	modules/bibrank/etc/template_single_tag_rank_method.cfg.wml,
+	modules/bibrank/etc/template_word_frequency.cfg.wml,
+	modules/bibrank/etc/wrd.cfg.wml: Modified configuration files.
+	Added prefix/postfix
+
+2004-09-01  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_tag_based_indexer.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml: -Modified
+	interfaces mostly
+
+2004-09-01  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/doc/hacking/stages.html.wml: Stage 2-1 checks
+	now for boolean OR operator in the next unit too.
+
+2004-09-01  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/doc/hacking/stages.html.wml: Stage 2-1 altered
+	as to retain also zero-hit (p_i, f_i) search unit in case it is
+	preceded by boolean OR operator.
+
+2004-09-01  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webalert/bin/alertengine.wml: Print run time information
+	with two decimal places only.
+
+2004-08-30  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: -Fixed warning
+	messages
+
+2004-08-30  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: -Added error
+	messages -changed api's.
+
+	-going to add return of verbose messages
+
+2004-08-30  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/demo_jif.cfg.wml,
+	modules/bibrank/etc/template_single_tag_rank_method.cfg.wml,
+	modules/bibrank/etc/template_word_frequency.cfg.wml,
+	modules/bibrank/etc/wrd.cfg.wml: Updated configuration files
+
+2004-08-27  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml:
+	-get_bibrank_methods now accepts the collectionnames as parameter,
+	but does not yet do anything with it.  -find_similar accepts a list
+	of several record ids.
+
+2004-08-27  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: *Fixed: Last
+	document after finding similar documents was never shown.
+
+2004-08-27  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/template_word_frequency.cfg.wml,
+	modules/bibrank/etc/wrd.cfg.wml,
+	modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml: *Changed output
+	from rank_records in bibrank_record_sorter, now returning
+	(list,string,string)
+
+2004-08-27  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/wrd.cfg.wml,
+	modules/bibrank/lib/bibrank_record_sorter.py.wml: Added options for
+	configuring finding similar pages using the word frequency.  -A
+	word need to have a minimum length to be used -Maximum number of
+	words to use -A word must exist in minimum nr of documents -A
+	document must exist in maximum nr of documents
+
+	and other options
+
+2004-08-27  Tibor Simko <tibor.simko@cern.ch>
+
+	* AUTHORS: Changed Erik's email address.
+
+2004-08-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: *Fixed: An
+	error caused the stemmer not to stem the query
+
+2004-08-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/template_word_frequency.cfg.wml,
+	modules/bibrank/etc/wrd.cfg.wml: Added parameter in configuration
+	files to use for stemming of search query
+
+2004-08-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml: Added
+	possibility to select language to stem the query in
+
+2004-08-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_word_indexer.py.wml: Modified update
+	of last_update field in rnkMETHOD
+
+2004-08-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_word_indexer.py.wml: *Fixed bug
+	causing nothing to happen if executed before searching worked
+
+2004-08-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_word_indexer.py.wml: Missed an = in a
+	if bla == bla line
+
+2004-08-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/bibrank.wml: enabled authentication check
+
+2004-08-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_word_indexer.py.wml: Modified error
+	message when PyStemmer is not installed, or language is not
+	supported by PyStemmer
+
+2004-08-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/stopwords.kb.wml: changed to utf-8
+
+2004-08-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/bibrankgkb.wml: Fixed bug causing .kb files
+	with only one # in front of comments to fail.
+
+2004-08-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/bibrank.wml: Removed some printed text and
+	sys.exit command appearing when problems importing files.
+
+2004-08-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_tag_based_indexer.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml: Modified ranking
+	files, mostly small changes in naming of methods.
+
+2004-08-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/stopwords.kb.wml,
+	modules/bibrank/etc/template_word_frequency.cfg.wml,
+	modules/bibrank/etc/wrd.cfg.wml: Configuration files and
+	stopwordlist (english and french) for use together with ranking
+	based on word frequency
+
+2004-08-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/demo_jif.cfg.wml,
+	modules/bibrank/etc/demo_jif.kb.wml: Configuration files and
+	datafiles for use with the demoinstallation of cdsware to enable
+	Journal Impact Factor ranking
+
+2004-08-26  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/bibrankgkb.cfg.wml,
+	modules/bibrank/etc/bibrankgkb_jif_conv.kb.wml,
+	modules/bibrank/etc/bibrankgkb_jif_example.kb.wml: Configuration
+	files and datafiles to use as examples when running bibrankgkb
+
+2004-08-26  Tibor Simko <tibor.simko@cern.ch>
+
+	* Makefile.am: Added support for localstatedir configuration
+	option.  (Thanks to Fred.)  Removed unnecessary `install'
+	subtargets for various demo targets.  Prepared table updating in
+	view of the next release. (Not fully finished yet.)
+
+2004-08-26  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac, config/configbis.wml.in: Added support for
+	localstatedir configuration option.  (Thanks to Fred.)
+
+2004-08-25  Tibor Simko <tibor.simko@cern.ch>
+
+	* CREDITS: Added Eric Grand.  Fixed some grammar.
+
+2004-08-25  Tibor Simko <tibor.simko@cern.ch>
+
+	* AUTHORS: Added Alexandra.  Updated Trond and Tibor.
+
+2004-08-25  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/messages.wml: French translation corrections, thanks to
+	Eric Grand.
+
+2004-08-25  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac: New directories in the BibEdit module.
+
+2004-08-25  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/Makefile.am, modules/bibedit/bin/.cvsignore,
+	modules/bibedit/bin/Makefile.am,
+	modules/bibedit/bin/xmlmarclint.wml,
+	modules/bibedit/etc/.cvsignore, modules/bibedit/etc/MARC21slim.dtd,
+	modules/bibedit/etc/Makefile.am, modules/bibedit/lib/Makefile.am,
+	modules/bibedit/lib/bibrecord.py.wml,
+	modules/bibedit/lib/bibrecord_config.py.wml,
+	modules/bibedit/lib/bibrecord_tests.py.wml: Initial release of new
+	Alexandra's bibrecord library.
+
+2004-08-25  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/bin/testsuite.wml: Add bibrecord test suite.
+
+2004-08-25  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/demo/Makefile.am: Install demobibdata.xml into
+	tmp directory, for test suite purposed.
+
+2004-08-25  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine_tests.py.wml:
+	test_strip_accents() now calls strip_accents() directly, instead of
+	via wash_pattern().
+
+2004-08-25  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibrank/lib/.cvsignore: Added .pyc extension.
+
+2004-08-25  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/bin/Makefile.am, modules/bibrank/bin/bibrank.wml,
+	modules/bibrank/bin/bibrankgkb.wml: Added support for "word
+	frequency" ranking. Moved functions from bibrank file to
+	/lib/bibrank_... files
+
+2004-08-25  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/Makefile.am,
+	modules/bibrank/lib/bibrank_record_sorter.py.wml,
+	modules/bibrank/lib/bibrank_tag_based_indexer.py.wml,
+	modules/bibrank/lib/bibrank_word_indexer.py.wml,
+	modules/bibrank/lib/bibrankadminlib.py.wml: Methods for
+	ranking/sorting records based on various methods like word
+	frequency (using variation of the IDF/TF vector model)
+
+2004-08-25  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/doc/tips.html.wml: Typos fixed.
+
+2004-08-25  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibconvert/bin/Makefile.am,
+	modules/bibconvert/doc/admin/Makefile.am,
+	modules/bibconvert/etc/Makefile.am,
+	modules/bibedit/doc/admin/Makefile.am,
+	modules/bibedit/lib/Makefile.am, modules/bibformat/bin/Makefile.am,
+	modules/bibformat/doc/admin/Makefile.am,
+	modules/bibformat/lib/common/Makefile.am,
+	modules/bibformat/lib/core/Makefile.am,
+	modules/bibformat/web/Makefile.am,
+	modules/bibformat/web/admin/Makefile.am,
+	modules/bibharvest/bin/Makefile.am,
+	modules/bibharvest/doc/admin/Makefile.am,
+	modules/bibharvest/lib/Makefile.am,
+	modules/bibharvest/web/Makefile.am,
+	modules/bibindex/bin/Makefile.am,
+	modules/bibindex/doc/admin/Makefile.am,
+	modules/bibindex/lib/Makefile.am,
+	modules/bibindex/web/admin/Makefile.am,
+	modules/bibrank/bin/Makefile.am,
+	modules/bibrank/doc/admin/Makefile.am,
+	modules/bibrank/doc/hacking/Makefile.am,
+	modules/bibrank/etc/Makefile.am, modules/bibrank/lib/Makefile.am,
+	modules/bibrank/web/admin/Makefile.am,
+	modules/bibsched/bin/Makefile.am,
+	modules/bibsched/doc/admin/Makefile.am,
+	modules/bibupload/bin/Makefile.am,
+	modules/bibupload/doc/admin/Makefile.am,
+	modules/miscutil/bin/Makefile.am,
+	modules/miscutil/demo/Makefile.am,
+	modules/miscutil/lib/Makefile.am, modules/miscutil/sql/Makefile.am,
+	modules/webaccess/bin/Makefile.am,
+	modules/webaccess/doc/admin/Makefile.am,
+	modules/webaccess/doc/hacking/Makefile.am,
+	modules/webaccess/lib/Makefile.am,
+	modules/webaccess/web/admin/Makefile.am,
+	modules/webalert/bin/Makefile.am,
+	modules/webalert/doc/admin/Makefile.am,
+	modules/webalert/lib/Makefile.am, modules/webalert/web/Makefile.am,
+	modules/webbasket/doc/admin/Makefile.am,
+	modules/webbasket/lib/Makefile.am,
+	modules/webbasket/web/Makefile.am, modules/webhelp/web/Makefile.am,
+	modules/webhelp/web/admin/Makefile.am,
+	modules/webhelp/web/admin/howto/Makefile.am,
+	modules/webhelp/web/hacking/Makefile.am,
+	modules/websearch/bin/Makefile.am,
+	modules/websearch/doc/Makefile.am,
+	modules/websearch/doc/admin/Makefile.am,
+	modules/websearch/doc/hacking/Makefile.am,
+	modules/websearch/lib/Makefile.am,
+	modules/websearch/web/Makefile.am,
+	modules/websearch/web/admin/Makefile.am,
+	modules/websession/bin/Makefile.am,
+	modules/websession/doc/admin/Makefile.am,
+	modules/websession/lib/Makefile.am,
+	modules/websession/web/Makefile.am,
+	modules/webstyle/css/Makefile.am,
+	modules/webstyle/doc/admin/Makefile.am,
+	modules/webstyle/img/Makefile.am, modules/webstyle/lib/Makefile.am,
+	modules/websubmit/bin/Makefile.am,
+	modules/websubmit/doc/Makefile.am,
+	modules/websubmit/doc/admin/Makefile.am,
+	modules/websubmit/etc/bibconvert/KB/Makefile.am,
+	modules/websubmit/etc/bibconvert/config/Makefile.am,
+	modules/websubmit/lib/Makefile.am,
+	modules/websubmit/lib/functions/Makefile.am,
+	modules/websubmit/web/Makefile.am,
+	modules/websubmit/web/admin/Makefile.am: Wildcard expansion now
+	refers to the source directory in order to correctly detect the
+	list of available source files.  (Thanks to Frederic.)
+
+2004-08-24  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/template_merge_rank_methods.cfg.wml:
+	Removed..
+
+2004-08-24  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/etc/bibrankgkb.cfg.wml,
+	modules/bibrank/etc/jif.cfg.wml, modules/bibrank/etc/jif.kb.wml,
+	modules/bibrank/etc/jif2.kb.wml,
+	modules/bibrank/etc/jt_conv.kb.wml: Removed some files from the
+	next release, going to be added again later in another form
+
+2004-08-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Strip accents only
+	when searching for words.
+
+2004-08-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure-tests.py: Added test on maximum MySQLdb version.
+
+2004-08-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* INSTALL: Added notes on recommended MySQL 4.0.x and MySQLdb 0.9.2
+	versions.
+
+2004-08-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/sql/tabcreate.sql: Revert previous
+	TEXT-into-BLOB changes, since they didn't work with MySQL 4.1.3
+	anyway, only with MySQL 4.1.0.	(FWIW, this shows once more that
+	conceptually wrong quick-fixes are better to be avoided!)
+
+2004-08-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* INSTALL: Added note on MySQL's default-character-set=utf8.
+
+2004-08-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/sql/tabcreate.sql: Changed BLOB to TEXT for the
+	sake of MySQLdb 1.0.0 compliancy.  Changed flxLINKTYPEPARAMS/pname
+	varchar width, so that the primary key size for this table will
+	fall within the internal MySQL limit of 1000 bytes per key, when
+	the default charset is UTF-8 (i.e. when there are three bytes per
+	char).
+
+2004-08-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Put explicit str()
+	conversion around datetime.datetime objects coming from MySQLdb,
+	since some Python installations (e.g. reported on SUSE) required
+	explicit conversion before comparing to strings.
+
+2004-08-16  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/bibrank/lib/bibrankadminlib.py.wml,
+	modules/websearch/lib/websearchadminlib.py.wml,
+	modules/bibindex/lib/bibindexadminlib.py.wml: Modified feedback
+	messages
+
+2004-08-16  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Modified some
+	textfields
+
+2004-08-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Removed excessive
+	</td> element, thanks to Frederic.
+
+2004-08-13  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Fixed
+	presentation bug when deleting the last value associated with a
+	field
+
+2004-08-13  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: fixed a bug in
+	"modify search options" which happened when you added a new search
+	options without selecting a fieldvalue at the same time.
+
+2004-08-13  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/web/admin/websearchadmin.py.wml: Fixed
+	"Modified search options" part of the modify collection page
+
+2004-07-28  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/miscutil/sql/tabcreate.sql: turned schTASK/arguments
+	column into longtext
+
+2004-07-27  Thomas Baron <thomas.baron@cern.ch>
+
+	* modules/bibupload/bin/bibupload.wml: bad xml records are counted
+	as errors
+
+2004-07-22  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/Makefile.am: Committed too much, Makefile
+	fixed
+
+2004-07-22  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/Makefile.am,
+	modules/websearch/lib/websearchadminlib.py.wml: fixed lazy
+	coding...see last update of file.....
+
+2004-07-20  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Fixed the date
+	problem. Somehow the mysql server returns  2004-07-19 14:52:48.00
+	as the date, and for others it returns 2004-07-19 14:52:48
+
+	Unsure why, but fixed now I hope.
+
+2004-07-19  Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Fixed two bugs,
+	one where the mysql server returned another dateformat than the
+	expected one, only partially fixed atm though. Need to find out how
+	to get the dateformat which mysql will return. The other was where
+	the Progress field of a bibtask was empty.
+
+2004-07-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/admin/index.html.wml: Add link to BibIndex
+	Admin Interface.
+
+2004-07-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac: Version number bump after the release of v0.3.3.
+
+
 CDSware v0.3.3 (released 2004-07-16)
 ====================================
 
