@@ -25,31 +25,30 @@ import unittest
 from string import expandtabs, replace
 
 class SanityTest(unittest.TestCase):
-
-### check for sanity -- xml -> create_record -> xml
+    """ bibrecord - sanity test (xml -> create records -> xml)"""
     def test_for_sanity(self):
-        """ bibrecord - checking for sanity """
-
+        """ bibrecord - demo file sanity test (xml -> create records -> xml)"""
         f=open(tmpdir + '/demobibdata.xml','r')
         xmltext = f.read()
         f.close()
-        rs = bibrecord.create_records(xmltext)
-        recs = map((lambda x:x[0]),rs)
-        xmlT = bibrecord.records_xml_output(recs)
-        x = xmlT.replace('\n','')
-        y = xmltext.replace('\n','')
-        xx=expandtabs(x)
-        yy=expandtabs(y)
-        xxx = xx.replace(' ','')
-        yyy = yy.replace(' ','')
-        xxx = xxx.replace('<!DOCTYPEcollectionSYSTEM"file://%s/bibedit/MARC21slim.dtd"><collection>' % etcdir,
-                          '<collectionxmlns="http://www.loc.gov/MARC21/slim">')
-        self.assertEqual(xxx,yyy)
+        # let's try to reproduce the demo XML MARC file by parsing it and printing it back:
+        recs = map((lambda x:x[0]), bibrecord.create_records(xmltext))
+        xmltext_reproduced = bibrecord.records_xml_output(recs)
+        x = xmltext_reproduced
+        y = xmltext
+        # 'normalize' the two XML MARC files for the purpose of comparing
+        x = expandtabs(x)
+        y = expandtabs(y)
+        x = x.replace(' ','')
+        y = y.replace(' ','')
+        x = x.replace('<!DOCTYPEcollectionSYSTEM"file://%s/bibedit/MARC21slim.dtd">\n<collection>' % etcdir,
+                      '<collectionxmlns="http://www.loc.gov/MARC21/slim">')
+        x = x.replace('</record><record>', "</record>\n<record>")
+        x = x.replace('</record></collection>', "</record>\n</collection>\n")
+        self.assertEqual(x,y)
 
-### testing for success
-        
 class SuccessTest(unittest.TestCase):
-    """ bibrecord - testing for success """
+    """ bibrecord - demo file parsing test """
     def setUp(self):
         f=open(tmpdir + '/demobibdata.xml','r')
         xmltext = f.read()
@@ -57,13 +56,12 @@ class SuccessTest(unittest.TestCase):
         self.recs = map((lambda x:x[0]),bibrecord.create_records(xmltext))
     
     def test_records_created(self):
-        """ bibrecord - number of records created """
-        ## check if it creates every records (the file demobibdata.xml has 75 records)
-        self.assertEqual(75,len(self.recs))
+        """ bibrecord - demo file how many records are created """
+        self.assertEqual(76,len(self.recs))
         
     def test_tags_created(self):
-        """ bibrecord - tags created """
-    ## check if the tags are correct
+        """ bibrecord - demo file which tags are created """
+        ## check if the tags are correct
         tags= ['020', '037', '041', '080', '088', '100', '245', '246', '250', '260', '270', '300', '340', '490', '500', '502', '520', '590', '595', '650', '653', '690', '700', '710', '856','909','980','999']
         t=[]
         for rec in self.recs:
@@ -77,10 +75,10 @@ class SuccessTest(unittest.TestCase):
         self.assertEqual(tags,tt)
 
     def test_fields_created(self):
-        """bibrecord - fields created"""
-    ## check if the number of fields for each record is correct
+        """bibrecord - demo file how many fields are created"""
+        ## check if the number of fields for each record is correct
 
-        fields=[13,13, 8, 11, 10,12, 10, 14, 10, 17, 13, 15, 10, 9, 14, 10, 11, 11, 11, 9, 10, 10, 10, 8, 8, 8, 9, 9, 9, 10, 8, 8, 8,8, 14, 13, 14, 14, 15, 12,12, 12,14, 13, 11, 15, 15, 14, 14, 13, 15, 14, 14, 14, 15, 14, 15, 14, 14, 15, 14, 13, 13, 14, 11, 13, 11, 14, 8, 10, 13, 12, 11, 12,6]
+        fields=[13,13, 8, 11, 10,12, 10, 14, 10, 17, 13, 15, 10, 9, 14, 10, 11, 11, 11, 9, 10, 10, 10, 8, 8, 8, 9, 9, 9, 10, 8, 8, 8,8, 14, 13, 14, 14, 15, 12,12, 12,14, 13, 11, 15, 15, 14, 14, 13, 15, 14, 14, 14, 15, 14, 15, 14, 14, 15, 14, 13, 13, 14, 11, 13, 11, 14, 8, 10, 13, 12, 11, 12, 6, 6]
 
         cr=[]
         ret=[]
@@ -91,11 +89,8 @@ class SuccessTest(unittest.TestCase):
   
 class BadInputTreatmentTest(unittest.TestCase):
     """ bibrecord - testing for bad input treatment """
-    
-    
-### check bad input treatment ###
     def test_wrong_attribute(self):
-        """bibrecord - bad input : Has \'cde\' instead \'code\' in a subfield attribute"""
+        """bibrecord - bad input subfield \'cde\' instead of \'code\'"""
         ws = bibrecord.cfg_bibrecord_warning_msgs
         xml_error1 = """
         <record>
@@ -120,7 +115,7 @@ class BadInputTreatmentTest(unittest.TestCase):
         self.assertEqual(bibrecord.warning((3,'(field number: 4)')),ee)
 
     def test_missing_attribute(self):
-        """ bibrecord - bad input : Missing attribute \"tag\" """
+        """ bibrecord - bad input missing \"tag\" """
         ws = bibrecord.cfg_bibrecord_warning_msgs
         xml_error2 = """
         <record>
@@ -145,7 +140,7 @@ class BadInputTreatmentTest(unittest.TestCase):
         self.assertEqual(bibrecord.warning((1,'(field number(s): [2])')),ee)
 
     def test_empty_datafield(self):
-        """ bibrecord - bad input : Datafield without any subfield """
+        """ bibrecord - bad input no subfield """
         ws = bibrecord.cfg_bibrecord_warning_msgs
         xml_error3 = """
         <record>
@@ -170,7 +165,7 @@ class BadInputTreatmentTest(unittest.TestCase):
 
 
     def test_missing_tag(self):
-        """bibrecord - bad input : Missing end \"tag\""""
+        """bibrecord - bad input missing end \"tag\""""
         ws = bibrecord.cfg_bibrecord_warning_msgs
         xml_error4 = """
         <record>
