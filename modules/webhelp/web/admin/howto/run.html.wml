@@ -95,6 +95,17 @@ found on your system at <LOGDIR>.
 per day) to inspect the BibSched queue and to verify the status of the
 BibSched system.
 
+<p><strong>HINT:</strong> You may want to clean up the old BibSched
+tasks with the DONE status, let us say once per month, to make the
+task table slim and the bibsched daemon both faster and less memory
+hungry:
+
+   <blockquote>
+   <pre>
+   $ echo "DELETE FROM schTASK WHERE status='DONE' AND runtime&lt;DATE_SUB(NOW(), INTERVAL 1 MONTH);" | dbexec
+   </pre>
+   </blockquote>
+
 <h2>Guest Users Cleanup</h2>
 
 <p>Guest users create a lot of entries in <CDSNAME> tables that are
