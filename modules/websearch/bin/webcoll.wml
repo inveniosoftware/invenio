@@ -655,27 +655,28 @@ class Collection:
                   </select>""" % (msg_ascending[ln], msg_descending[ln])
         return box 
 
-    def create_displayoptions(self):
+    def create_displayoptions(self, ln=cdslang):
         "Produces 'Display options' portal box."
         box=""
         # firstly, display hits per collection selection box:
         box += """<select name="rg">
-           <option value=10>10 results
-           <option value=25>25 results
-           <option value=50>50 results
-           <option value=10>100 results
-           <option value=25>250 results
-           <option value=50>500 results
-           </select>"""
+           <option value="10">10 %s
+           <option value="25">25 %s
+           <option value="50">50 %s
+           <option value="10">100 %s
+           <option value="250">250 %s
+           <option value="500">500 %s
+           </select>""" % (msg_results[ln], msg_results[ln], msg_results[ln],
+                           msg_results[ln], msg_results[ln], msg_results[ln])
         # secondly, display split by collection selection box:
         if self.get_sons():
             box += """<select name="sc">
-            <option value="1">split by collection
-            <option value="0">single list
-            </select>"""        
+            <option value="1">%s
+            <option value="0">%s
+            </select>""" % (msg_split_by_collection[ln], msg_single_list[ln])
         return box
 
-    def create_formatoptions(self):
+    def create_formatoptions(self, ln=cdslang):
         "Produces 'Output format options' portal box."
         box = ""
         box += """<select name="of">
@@ -689,7 +690,7 @@ class Collection:
                 box += """<option value="%s">%s""" % (row[0],row[1])
         else:
             # no formats are defined for this collection, so propose the default HTML one:
-            box += """<option value="hb">HTML brief"""
+            box += """<option value="hb">HTML %s""" % msg_brief[ln]
         box += """</select>"""        
         return box
 
@@ -885,8 +886,8 @@ class Collection:
            (cell_6_a, cell_6_b)        
         # format options, etc in the last table:
         cell_7_a = self.create_sortoptions(ln)
-        cell_7_b = self.create_displayoptions()
-        cell_7_c = self.create_formatoptions()
+        cell_7_b = self.create_displayoptions(ln)
+        cell_7_c = self.create_formatoptions(ln)
         out += """<table class="searchbox">
                    <thead>
                     <tr>
