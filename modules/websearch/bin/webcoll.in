@@ -801,23 +801,23 @@ class Collection:
                         </tr>
                       </table>""" % self.create_searchoptions()
         if 0:
-            # create published in, if appropriate:
+            # TODO: create published in, if appropriate:
             if self.create_publishedin():
                 out += self.create_publishedin()
-            # arrival date: from/until:
-            cell_6_a = self.create_inputdate("Added since", "d1")
-            cell_6_b = self.create_inputdate("until", "d2")
-            out += """<table cellpadding="3" cellspacing="0">
-                        <tr>
-                          <td colspan="3" height="3">
-                          </td>
-                        </tr>
-                        <tr valign="bottom" class="searchbox">
-                          <td>%s</td>
-                          <td>%s</td>
-                        </tr>
-                       </table>""" % \
-               (cell_6_a, cell_6_b)        
+        # arrival date: from/until:
+        cell_6_a = self.create_inputdate("Added since", "d1")
+        cell_6_b = self.create_inputdate("until", "d2")
+        out += """<table cellpadding="3" cellspacing="0">
+                    <tr>
+                      <td colspan="3" height="3">
+                      </td>
+                    </tr>
+                    <tr valign="bottom" class="searchbox">
+                      <td>%s</td>
+                      <td>%s</td>
+                    </tr>
+                   </table>""" % \
+           (cell_6_a, cell_6_b)        
         # format options, etc in the last table:
         cell_7_a = self.create_formatoptions()
         cell_7_b = self.create_displayoptions()

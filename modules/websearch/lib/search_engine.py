@@ -114,7 +114,7 @@ table_latin1_to_ascii = build_table_latin1_to_ascii()
 def get_nicely_ordered_collection_list(collid=1, level=0):
     """Returns nicely ordered (score respected) list of collections, more exactly list of tuples
        (collection name, printable collection name).
-       Suitable for print_search_box()."""
+       Suitable for create_search_box()."""
     colls_nicely_ordered = []
     query = "SELECT c.name,cc.id_son FROM collection_collection AS cc, collection AS c "\
             " WHERE c.id=cc.id_son AND cc.id_dad='%s' ORDER BY score DESC" % collid
@@ -329,7 +329,34 @@ def create_header(cc=cdsname, as=0, headeradd=""):
                        "","&gt;","", "&gt; Search Results</small></small></td></tr></table>",0), \
        headeradd)
 
-def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1, p2, f2, m2, op2, p3, f3, m3, sc):
+def create_inputdate_box(title="From date", name="d1", selected_year="", selected_month="", selected_day=""):
+    "Produces 'From Date', 'Until Date' kind of selection box.  Suitable for search options."
+    box = ""
+    box += "<small><strong>%s:</strong></small><br>" % title
+    # day
+    box += """<select name="%sd">""" % name
+    box += """<option value="">any day"""
+    for day in range(1,32):
+        box += """<option value="%02d"%s>%02d""" % (day, is_selected(day, selected_day), day)
+    box += """</select>"""
+    # month
+    box += """<select name="%sm">""" % name
+    box += """<option value="">any month"""
+    for mm, month in [('01','January'), ('02','February'), ('03','March'), ('04','April'), \
+                      ('05','May'), ('06','June'), ('07','July'), ('08','August'), \
+                      ('09','September'), ('10','October'), ('11','November'), ('12','December')]:
+        box += """<option value="%s"%s>%s""" % (mm, is_selected(mm, selected_month), month)
+    box += """</select>"""
+    # year
+    box += """<select name="%sy">""" % name
+    box += """<option value="">any year"""
+    for year in range(1980,2004):
+        box += """<option value="%d"%s>%d""" % (year, is_selected(year, selected_year), year)
+    box += """</select>"""        
+    return box
+
+def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1, p2, f2, m2, op2, p3, f3, m3, sc,
+                      d1y, d1m, d1d, d2y, d2m, d2d):
     "Create search box for 'search again in the results page' functionality."
     out = ""
     # print search box prolog:
@@ -343,8 +370,6 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
         out += """<input type="hidden" name="ot" value="%s">""" % ot
     if sp:
         out += """<input type="hidden" name="sp" value="%s">""" % sp 
-
-
 
     # possibly print external search engines links (Google box):
     if cfg_google_box:
@@ -448,7 +473,24 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, o
     </select>
     </td>
     </tr>"""
-    # thirdly, print Display/Sort box:
+    # thirdly, print from/until date boxen, if applicable:
+    if d1y=="" and d1m=="" and d1d=="" and d2y=="" and d2m=="" and d2d=="":
+        pass # do not need it
+    else:
+        cell_6_a = create_inputdate_box("Added since", "d1", d1y, d1m, d1d)
+        cell_6_b = create_inputdate_box("until", "d2", d2y, d2m, d2d)
+        out += """<table cellpadding="3" cellspacing="0">
+                    <tr>
+                      <td colspan="3" height="3">
+                      </td>
+                    </tr>
+                    <tr valign="bottom">
+                      <td>%s</td>
+                      <td>%s</td>
+                    </tr>
+                   </table>""" % \
+           (cell_6_a, cell_6_b)        
+    # fourthly, print Display/Sort box:
     cell_1_left = """<small><strong>Sort by:</strong></small><br>
     <select name="sf">
     <option value="">- latest first -"""
@@ -875,6 +917,45 @@ def wash_field(f):
     if cfg_fields_convert.has_key(string.lower(f)):
         f = cfg_fields_convert[f]
     return f
+
+def wash_dates(d1y, d1m, d1d, d2y, d2m, d2d):
+    """Take user-submitted dates (day, month, year) of the web form and return (day1, day2) in YYYY-MM-DD format
+    suitable for time restricted searching.  I.e. pay attention when months are not there to put 01 or 12
+    according to if it's the starting or the ending date, etc."""    
+    day1, day2 =  "", ""
+    # sanity checking:
+    if d1y=="" and d1m=="" and d1d=="" and d2y=="" and d2m=="" and d2d=="":
+        return ("", "") # nothing selected, so return empty values
+    # construct day1 (from):
+    if d1y:
+        day1 += "%04d" % int(d1y)
+    else:
+        day1 += "0000"
+    if d1m:
+        day1 += "-%02d" % int(d1m)
+    else:
+        day1 += "-01"
+    if d1d:
+        day1 += "-%02d" % int(d1d)
+    else:
+        day1 += "-01"
+    # construct day2 (until):
+    if d2y:
+        day2 += "%04d" % int(d2y)
+    else:
+        day2 += "9999"
+    if d2m:
+        day2 += "-%02d" % int(d2m)
+    else:
+        day2 += "-12"
+    if d2d:
+        day2 += "-%02d" % int(d2d)
+    else:
+        day2 += "-31" # NOTE: perhaps we should add max(datenumber) in
+                      # given month, but for our quering it's not
+                      # needed, 31 will always do
+    # okay, return constructed YYYY-MM-DD dates
+    return (day1, day2)
     
 def get_coll_ancestors(coll):
     "Returns a list of ancestors for collection 'coll'."
@@ -1305,6 +1386,22 @@ def search_in_bibxxx(req, p, f, type):
         set.addlist(Numeric.array(l))
         return set
 
+def search_in_bibrec(day1, day2, type='creation_date'):
+    """Return hitlist of recIDs found that were either created or modified (see 'type' arg)
+       from day1 until day2, inclusive.  Does not pay attention to pattern, collection, anything.
+       Useful to intersect later on with the 'real' query."""
+    set = HitList()
+    if type != "creation_date" and type != "modification_date":
+        # type argument is invalid, so search for creation dates by default
+        type = "creation_date"
+    res = run_sql("SELECT id FROM bibrec WHERE %s>=%s AND %s<=%s" % (type, "%s", type, "%s"),
+                  (day1, day2))
+    l = []
+    for row in res:
+        l.append(row[0])        
+    set.addlist(Numeric.array(l))
+    return set
+
 def create_nearest_words_links(url, p, f, n=10, prologue="<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", epilogue=""):
     """Return list of 'n' nearest words to 'p' in the words index list for the field 'f'."""
     out = ""
@@ -1387,14 +1484,19 @@ def get_field_tags(field):
 def get_fieldvalues(recID, tag):
     """Return list of field values for field 'tag' inside record 'recID'."""
     out = []
-    digit = tag[0:2]
-    bx = "bib%sx" % digit
-    bibx = "bibrec_bib%sx" % digit
-    query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND bx.tag LIKE '%s'" \
-            % (bx, bibx, recID, tag)
-    res = run_sql(query)
-    for row in res:
-        out.append(row[0])
+    if tag == "001___":
+        # we have asked for recID that is not stored in bibXXx tables
+        out.append(str(recID))
+    else:
+        # we are going to look inside bibXXx tables
+        digit = tag[0:2]
+        bx = "bib%sx" % digit
+        bibx = "bibrec_bib%sx" % digit
+        query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND bx.tag LIKE '%s'" \
+                % (bx, bibx, recID, tag)
+        res = run_sql(query)
+        for row in res:
+            out.append(row[0])
     return out
 
 def get_fieldvalues_alephseq_like(recID, tags):
@@ -1492,6 +1594,7 @@ def print_warning(req, msg, type='Tip', prologue='', epilogue='<br>'):
 
 def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1, jrec=1, rg=10,
                       as=0, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
+                      d1y="", d1m="", d1d="", d2y="", d2m="", d2d="",
                       cpu_time=-1, middle_only=0):
     """Prints stripe with the information on 'collection' and 'nb_found' results and CPU time.
        Also, prints navigation links (beg/next/prev/end) inside the results set.
@@ -1525,10 +1628,12 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
         if nb_found > rg:
             out += "%s: <strong>%s</strong> records found: &nbsp; " % (collection, nice_number(nb_found))
 
-    if nb_found > rg: # navig.arrows are not needed for small number of hits
+    if nb_found > rg: # navig.arrows are needed, since we have many hits
         url = '%s/search.py?p=%s&amp;c=%s&amp;f=%s&amp;sf=%s&amp;so=%s&amp;sp=%s&amp;of=%s&amp;ot=%s' % (weburl, urllib.quote(p), urllib.quote(collection), f, sf, so, sp, of, ot)
         url += '&amp;as=%s&amp;p1=%s&amp;p2=%s&amp;p3=%s&amp;f1=%s&amp;f2=%s&amp;f3=%s&amp;m1=%s&amp;m2=%s&amp;m3=%s&amp;op1=%s&amp;op2=%s' \
                % (as, urllib.quote(p1), urllib.quote(p2), urllib.quote(p3), f1, f2, f3, m1, m2, m3, op1, op2)
+        url += '&amp;d1y=%s&amp;d1m=%s&amp;d1d=%s&amp;d2y=%s&amp;d2m=%s&amp;d2d=%s' \
+               % (d1y, d1m, d1d, d2y, d2m, d2d)
         if jrec-rg > 1:
             out += "<a class=\"img\" href=\"%s&amp;jrec=1&amp;rg=%d\"><img src=\"%s/img/sb.gif\" alt=\"begin\" border=0></a>" % (url, rg, weburl)
         if jrec > 1:
@@ -1566,6 +1671,12 @@ def print_search_info(p, f, sf, so, sp, of, ot, collection=cdsname, nb_found=-1,
         out += "<input type=\"hidden\" name=\"m3\" value=\"%s\">" % m3
         out += "<input type=\"hidden\" name=\"op1\" value=\"%s\">" % op1
         out += "<input type=\"hidden\" name=\"op2\" value=\"%s\">" % op2
+        out += "<input type=\"hidden\" name=\"d1y\" value=\"%s\">" % d1y
+        out += "<input type=\"hidden\" name=\"d1m\" value=\"%s\">" % d1m
+        out += "<input type=\"hidden\" name=\"d1d\" value=\"%s\">" % d1d
+        out += "<input type=\"hidden\" name=\"d2y\" value=\"%s\">" % d2y
+        out += "<input type=\"hidden\" name=\"d2m\" value=\"%s\">" % d2m
+        out += "<input type=\"hidden\" name=\"d2d\" value=\"%s\">" % d2d
         out += "&nbsp; or jump to record: <input type=\"text\" name=\"jrec\" size=\"4\" value=\"%d\">" % jrec
     if not middle_only:
         out += "</td>"
@@ -1683,6 +1794,10 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', decompress=zli
     Assumes that the input list 'recIDs' is sorted in reverse order, so it counts records from tail to head.
     A value of 'rg=-9999' means to print all records: to be used with care.
     """
+
+    # sanity checking:
+    if req == None:
+        return
 
     if len(recIDs):
         nb_found = len(recIDs)
@@ -2063,10 +2178,11 @@ def log_query_info(action, p, f, colls, nb_records_found_total=-1):
 
 ### CALLABLES
 
-def perform_request_search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
+def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
                            p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
-                           id="-1", idb="-1", sysnb="", search="SEARCH"):
-    """Perform search, without checking for authentication."""    
+                           id="-1", idb="-1", sysnb="", search="SEARCH",
+                           d1y="", d1m="", d1d="", d2y="", d2m="", d2d=""):
+    """Perform search, without checking for authentication.  Return list of recIDs found, if of=id.  Otherwise create web page."""    
     # wash passed numerical arguments:
     try:
         id = string.atoi(id)
@@ -2078,6 +2194,8 @@ def perform_request_search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", 
     jrec = string.atoi(jrec)
     rg = string.atoi(rg)
     as = string.atoi(as)
+    # wash dates:
+    day1, day2 = wash_dates(d1y, d1m, d1d, d2y, d2m, d2d)    
     if type(of) is list:
         of = of[0]
     if type(ot) is list:
@@ -2095,6 +2213,9 @@ def perform_request_search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", 
         # we are doing plain text output:
         req.content_type = "text/plain"
         req.send_http_header()
+    elif of == "id":
+        # we are passing list of recIDs
+        pass
     else:
         # we are doing HTML output:
         req.content_type = "text/html"
@@ -2121,7 +2242,7 @@ def perform_request_search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", 
                 p = wash_pattern(p)
                 f = wash_field(f)
                 req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
-                                            p2, f2, m2, op2, p3, f3, m3, sc))
+                                            p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d))
                 print_warning(req, "Requested record does not seem to exist.", None, "<p>")
     elif search == "Browse":
         ## 2 - browse needed
@@ -2131,7 +2252,7 @@ def perform_request_search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", 
         # write search box:
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d))
         url = string.replace(req.args, "search=Browse","search=SEARCH")
         if as==1 or (p1 or p2 or p3):
             if p1:
@@ -2156,7 +2277,7 @@ def perform_request_search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", 
         # write search box:
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, of, ot, as, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, d1y, d1m, d1d, d2y, d2m, d2d))
         # run search:
         t1 = os.times()[4]
         if as == 1 or (p1 or p2 or p3):
@@ -2200,6 +2321,12 @@ def perform_request_search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", 
                 search_cache[search_cache_key] = results_final
             if len(search_cache) > cfg_search_cache_size: # is the cache full? (sanity cleaning)
                 search_cache.clear()
+        # search done; was there a time restriction?  if yes, apply it now:
+        if day1 != "":
+            results_of_time_restriction = search_in_bibrec(day1, day2)
+            for coll in colls_to_search:
+                results_final[coll].intersect(results_of_time_restriction)
+                results_final[coll].calculate_nbhits()
         t2 = os.times()[4]
         cpu_time = t2 - t1
         # find total number of records found in each collection
@@ -2210,6 +2337,7 @@ def perform_request_search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", 
             results_final_nb_total += results_final_nb[coll]
         # was there at least one hit?
         if results_final_nb_total == 0:
+            # nope, so try similar queries:
             if of.startswith('h'):
                 print_warning(req, "No match found.  Trying similar queries...", "", "<p>","<p>")
                 req.write("<p>")
@@ -2224,7 +2352,13 @@ def perform_request_search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", 
                     search_pattern(req, p, f, colls_to_search, None, 1)
         else:
             # yes, some hits found, so print results overview:
-            if of.startswith("h"):
+            if of == "id":
+                # we have been asked to return list of recIDs
+                results_final_for_all_colls = HitList()
+                for coll in colls_to_search:
+                    results_final_for_all_colls.union(results_final[coll])
+                return results_final_for_all_colls.items()
+            elif of.startswith("h"):
                 req.write(print_results_overview(colls_to_search, results_final_nb_total, results_final_nb, cpu_time))
             # print records:
             if len(colls_to_search)>1:
@@ -2232,13 +2366,13 @@ def perform_request_search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", 
             for coll in colls_to_search:
                 if results_final[coll]._nbhits:
                     if of.startswith("h"):
-                        req.write(print_search_info(p, f, sf, so, sp, of, ot, coll, results_final_nb[coll], jrec, rg, as, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2, cpu_time))
+                        req.write(print_search_info(p, f, sf, so, sp, of, ot, coll, results_final_nb[coll], jrec, rg, as, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2, d1y, d1m, d1d, d2y, d2m, d2d, cpu_time))
                     results_final_sorted = results_final[coll].items()
                     if sf:
                         results_final_sorted = sort_records(req, results_final_sorted, sf, so, sp)
                     print_records(req, results_final_sorted, jrec, rg, of, ot)
                     if of.startswith("h"):
-                        req.write(print_search_info(p, f, sf, so, sp, of, ot, coll, results_final_nb[coll], jrec, rg, as, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2, cpu_time, 1))
+                        req.write(print_search_info(p, f, sf, so, sp, of, ot, coll, results_final_nb[coll], jrec, rg, as, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2, d1y, d1m, d1d, d2y, d2m, d2d, cpu_time, 1))
             # log query:
             try:
                 log_query(req.get_remote_host(), req.args, uid)
@@ -2251,7 +2385,11 @@ def perform_request_search(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", 
         req.write(create_footer())
     elif of.startswith('x'):
         req.write("""</collection>\n""")
-    return "\n"
+    # 5 - return value
+    if of == "id":
+        return []
+    else:
+        return "\n"
 
 def perform_request_cache(req, action="show"):
     """Manipulates the search engine cache."""
@@ -2352,4 +2490,6 @@ def perform_request_log(req, date=""):
 #print get_coll_real_descendants("Articles & Preprints")
 #print get_collection_hitlist("Theses")
 #print log(sys.stdin)
+#print search_in_bibrec('2002-12-01','2002-12-12')
+#print wash_dates('1980', '', '28', '2003','02','')
 </protect>

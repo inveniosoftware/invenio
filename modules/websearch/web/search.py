@@ -45,7 +45,8 @@ __version__ = "$Id$"
 
 def index(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
           p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
-          id="-1", idb="-1", sysnb="", search="SEARCH"):
+          id="-1", idb="-1", sysnb="", search="SEARCH",
+          d1y="", d1m="", d1d="", d2y="", d2m="", d2d=""):
     """Main entry point to WebSearch."""
     need_authentication = 0
     # check c
@@ -73,12 +74,14 @@ def index(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of
     else:
         return search_engine.perform_request_search(req, cc, c, p, f, rg, sf, so, sp, of, ot, as,
                                                     p1, f1, m1, op1, p2, f2, m2, op2, p3, f3, m3, sc, jrec,
-                                                    id, idb, sysnb, search)
+                                                    id, idb, sysnb, search,
+                                                    d1y, d1m, d1d, d2y, d2m, d2d) 
 
 
 def authenticate(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", of="hb", ot="", as="0",
                  p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
-                 id="-1", idb="-1", sysnb="", search="SEARCH"):
+                 id="-1", idb="-1", sysnb="", search="SEARCH",
+                 d1y="", d1m="", d1d="", d2y="", d2m="", d2d=""):
     """Authenticate the user before launching the search."""
 
     __auth_realm__ = "restricted collection"
@@ -102,7 +105,8 @@ def authenticate(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp
 
     return search_engine.perform_request_search(req, cc, c, p, f, rg, sf, so, sp, of, ot, as,
                                                 p1, f1, m1, op1, p2, f2, m2, op2, p3, f3, m3, sc, jrec,
-                                                id, idb, sysnb, search)
+                                                id, idb, sysnb, search,
+                                                d1y, d1m, d1d, d2y, d2m, d2d)
 
 def cache(req, action="show"):
     """Manipulates the search engine cache."""
