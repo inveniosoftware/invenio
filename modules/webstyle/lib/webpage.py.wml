@@ -23,6 +23,7 @@
 #include "configbis.wml"
 
 from config import *
+from webuser import create_user_infobox
 import re
 
 ## start Python:
@@ -45,18 +46,7 @@ page_template_header = """
 <body>
 <div class="pageheader">
 %s
-   <table class="navtrailbox" border="0" cellspacing="0" cellpadding="0">
-     <tr>
-      <td width="15">&nbsp;</td>
-      <td class="navtrailboxbody">
-        <small><small>
-          <a class="navtrail" href="%s">%s</a>
-          %s
-          %s
-        </small></small>
-      </td>
-     </tr>
-   </table>
+%s
 %s
 </div>
 """ 
@@ -72,43 +62,45 @@ page_template_footer = """
 
 page_template_portal = """
 <table border="0" cellspacing="0" cellpadding="0" width="100%%">
- <tr>
-  <td class="pagestripemiddle" align="left" valign="top" rowspan="2">
+ <tr valign="top">
+  <td class="pagestripemiddle" align="left">
+   %s
+   <br>
    <strong class="headline"><span class="h1">%s</span></strong>
    <p>
    %s
   </td>
-  <td class="pagestripemiddle" width="5" align="left" valign="top" rowspan="2">
-  </td>
-
   <td class="pagestriperight" width="<CDSPAGESTRIPEWIDTH>" align="right" valign="top">
-    <table width="<CDSPAGESTRIPEWIDTH>" cellspacing="0" cellpadding="0" border="0">
-          <tr>
-           <td class="pageboxrighttop" width="<CDSPAGESTRIPEWIDTH>">
-            <CDSPAGEBOXRIGHTTOP>
-            <!--righttopadd-->
-           </td>
-          </tr>
-    </table>
+    <CDSPAGEBOXRIGHTTOP>
+    %s
   </td>
  </tr>
-
- <tr>
-  <td class="pagestriperight" width="<CDSPAGESTRIPEWIDTH>" align="right" valign="bottom">
-     <table width="<CDSPAGESTRIPEWIDTH>" cellspacing="0" cellpadding="0" border="0">
-       <tr valign="bottom">
-        <td class="pageboxrightbottom" width="<CDSPAGESTRIPEWIDTH>">
-         <!--rightbottomadd-->
-         <CDSPAGEBOXRIGHTBOTTOM>
-        </td>
-       </tr>
-     </table>
-  </td>
- </tr> 
 </table>
 """
 
-def page(title, body, navtrail="&gt;", url="", description="", keywords="", cdspageheaderadd="", cdspagefooteradd=""):
+def create_navtrail(title,
+                    previous_links,
+                    prolog="""<table class="navtrailbox"><tr><td width="15">&nbsp;</td><td class="navtrailboxbody">""", 
+                    separator=""" &gt; """,
+                    epilog="""</td></tr></table>"""):
+    """create_navtrail(): create navigation trail table box
+       input: title = page title;
+              previous_links = the trail content from site title until current page (both ends exlusive).
+    """
+    out = ""
+    if title != cdsname:
+        out += """<a class="navtrail" href="%s">%s</a>""" % (weburl, cdsname)
+    if previous_links:
+        if out:
+            out += separator
+        out += previous_links
+    if title:
+        if out:
+            out += separator
+        out += title
+    return prolog + out + epilog
+
+def page(title, body, navtrail="", url="", description="", keywords="", uid=0, cdspagerightstripeadd="", cdspageheaderadd="", cdspagebodyadd="", cdspagefooteradd=""):
     """page(): display the cds page
         input: title of the page;
                body of the page in html format;
@@ -119,8 +111,8 @@ def page(title, body, navtrail="&gt;", url="", description="", keywords="", cdsp
                cdspagefooteradd is a message to be dusplayed on the top of the page footer
        output: the final cds page with header, footer, etc.
     """
-    out = ""
-    out += page_template_header % (title, description, keywords, cdspageheader, weburl, cdsname, navtrail, title, cdspageheaderadd)
-    out += page_template_portal % (title, body)
+    out = page_template_header % (title, description, keywords, cdspageheader, cdspageheaderadd, create_navtrail(title, navtrail))
+    out = re.sub("<!--USERINFOBOX-->", create_user_infobox(uid), out)
+    out += page_template_portal % (cdspagebodyadd, title, body, cdspagerightstripeadd)
     out += page_template_footer % (cdspagefooteradd, re.sub("<!--URL-->", url, cdspagefooter))
     return out
