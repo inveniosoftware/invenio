@@ -76,15 +76,15 @@ def index(req, title='', body='', subtitle='', adminarea=2, authorized=0):
 
     authorized - if 1, don't check if the user is allowed to be webadmin """
     
-    navtrail_previous_links = """<a class=navtrail href="<WEBURL>/admin/">Admin Area</a> &gt; <a class=navtrail href="<WEBURL>/admin/webaccess/">WebAccess Admin</a> """
+    navtrail_previous_links = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/webaccess/">WebAccess Admin</a> """ % (weburl, weburl)
     
     if body:
-        if adminarea == 1: navtrail_previous_links += '&gt; <a class=navtrail href=<WEBURL>/admin/webaccess/webaccessadmin.py/delegate_startarea>Delegate Rights</a> '
-        if adminarea >= 2: navtrail_previous_links += '&gt; <a class=navtrail href=<WEBURL>/admin/webaccess/webaccessadmin.py>Manage WebAccess</a> '
-        if adminarea == 3: navtrail_previous_links += '&gt; <a class=navtrail href=<WEBURL>/admin/webaccess/webaccessadmin.py/rolearea>Role Administration</a> '
-        elif adminarea == 4: navtrail_previous_links += '&gt; <a class=navtrail href=<WEBURL>/admin/webaccess/webaccessadmin.py/actionarea>Action Administration</a> '
-        elif adminarea == 5: navtrail_previous_links += '&gt; <a class=navtrail href=<WEBURL>/admin/webaccess/webaccessadmin.py/userarea>User Administration</a> ' 
-        elif adminarea == 6: navtrail_previous_links += '&gt; <a class=navtrail href=<WEBURL>/admin/webaccess/webaccessadmin.py/resetarea>Reset Authorizations</a> '
+        if adminarea == 1: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/delegate_startarea>Delegate Rights</a> ' % (weburl, )
+        if adminarea >= 2: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py>Manage WebAccess</a> ' % (weburl, )
+        if adminarea == 3: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/rolearea>Role Administration</a> ' % (weburl, )
+        elif adminarea == 4: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/actionarea>Action Administration</a> ' % (weburl, )
+        elif adminarea == 5: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/userarea>User Administration</a> ' % (weburl, )
+        elif adminarea == 6: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/resetarea>Reset Authorizations</a> ' % (weburl, )
     
     id_user = getUid(req)
 
@@ -105,13 +105,13 @@ def index(req, title='', body='', subtitle='', adminarea=2, authorized=0):
 def mustloginpage(req):
     """show a page asking the user to login."""
     
-    navtrail_previous_links = """<a class=navtrail href="<WEBURL>/admin/">Admin Area</a> &gt; <a class=navtrail href="<WEBURL>/admin/webaccess/">WebAccess Admin</a> &gt; """
+    navtrail_previous_links = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/webaccess/">WebAccess Admin</a> &gt; """ % (weburl, weburl)
 
     return page(title='Authorization failure',
                 uid=getUid(req),
                 body=adderrorbox('try to login first',
                                  datalist=["""You are not a user authorized to perform admin tasks, try to
-                                 <a href="<WEBURL>/youraccount.py/login">login</a>."""]),
+                                 <a href="%s/youraccount.py/login">login</a>.""" % (weburl, )]),
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)                
 
@@ -474,7 +474,7 @@ def perform_delegate_startarea(req):
 
     output += """
     <dl>
-     <dt><a href="delegate_adduserrole">Add users to roles</a>
+     <dt><a href="delegate_adduserrole">Connect users to roles</a>
      <dd>add users to the roles you have delegation rights to.
      <dt><a href="delegate_deleteuserrole">Remove users from roles</a>
      <dd>remove users from the roles you have delegation rights to.
@@ -563,9 +563,9 @@ def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=
                 # no users that match the pattern
                 if not (users1 or users2):
                     output += '<p>no qualified users, try new search.</p>'
-                # to many matching users
+                # too many matching users
                 elif len(users1) > MAXSELECTUSERS:
-                    output += '<p><strong>%s hits</strong>, to many qualified users, specify more narrow search.</p>' % (len(users1), )
+                    output += '<p><strong>%s hits</strong>, too many qualified users, specify more narrow search.</p>' % (len(users1), )
 
                 # show matching users
                 else:
@@ -623,7 +623,7 @@ def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=
         """ % (id_role, )
 
     return index(req=req,
-                 title='Add users to roles',
+                 title='Connect users to roles',
                  subtitle=subtitle, 
                  body=[output, extra],
                  adminarea=1,
@@ -713,7 +713,7 @@ def perform_delegate_deleteuserrole(req, id_role=0, id_user=0, confirm=0):
 
         extra = """
         <dl>
-         <dt><a href="delegate_adduserrole?id_role=%s">Add users to role</a></dt>
+         <dt><a href="delegate_adduserrole?id_role=%s">Connect users to role</a></dt>
          <dd>add users to the roles you have delegating rights to.</dd>
         </dl>
         """ % (id_role, )
@@ -930,7 +930,7 @@ def actiondetails(id_action=0):
                 roles.append([id, name,
                               '<a href="simpleauthorization?id_role=%s&amp;id_action=%s">show authorization details</a>'
                               % (id, id_action),
-                              '<a href="simpleroleusers?id_role=%s">show connected users</a>' % (id, )])
+                              '<a href="showroleusers?id_role=%s">show connected users</a>' % (id, )])
             roletable = tupletotable(header=['id', 'name', '', ''], tuple=roles)
             
             output += '<p>roles connected to %s:</p>\n' % (headerstrong(action=name_action, query=0), )
@@ -1001,11 +1001,16 @@ def perform_addrole(req, name_role='', description='put description here.', conf
                 subtitle = 'step 3 - role could not be added'
                 output += '<p>sorry, could not add role, <br>role with the same name probably exists.</p>'
 
+            id_role = acca.acc_getRoleId(name_role=name_role)
             extra = """
             <dl>
              <dt><a href="addauthorization?id_role=%s">Add authorization</a></dt>
              <dd>start adding new authorizations to this role.</dd>
-            </dl> """ % (acca.acc_getRoleId(name_role=name_role), )
+            </dl>
+             <dt><a href="adduserrole?id_role=%s">Connect user</a></dt>
+             <dd>connect a user to the role.</dd>
+            <dl>
+            </dl>""" % (id_role, id_role)
 
     try: body = [output, extra]
     except NameError: body = [output]
@@ -1080,14 +1085,14 @@ def perform_showroledetails(req, id_role):
             
         extra = """
         <dl>
-         <dt><a href="adduserrole?id_role=%s">Connect user</a></dt>
-         <dd>connect a user to the role.</dd>
-        </dl>
-        <dl>
          <dt><a href="addauthorization?id_role=%s">Add new authorization</a></dt>
          <dd>add an authorization.</dd>
          <dt><a href="modifyauthorizations?id_role=%s">Modify authorizations</a></dt>
          <dd>modify existing authorizations.</dd>
+        </dl>
+        <dl>
+         <dt><a href="adduserrole?id_role=%s">Connect user</a></dt>
+         <dd>connect a user to the role.</dd>
         </dl>
         """ % (id_role, id_role, id_role)
         body = [output, extra]
@@ -1159,7 +1164,7 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
     email_out = acca.acc_getUserEmail(id_user=id_user)
     name_role = acca.acc_getRoleName(id_role=id_role)
     
-    title = 'Add user to role '
+    title = 'Connect user to role '
     subtitle = 'step 1 - select a role'
 
     output = createroleselect(id_role=id_role,
@@ -1198,7 +1203,7 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
             if not (users1 or users2):
                 output += '<p>no qualified users, try new search.</p>'
             elif len(users1) > MAXSELECTUSERS:
-                output += '<p><strong>%s hits</strong>, to many qualified users, specify more narrow search.</p>' % (len(users1), )
+                output += '<p><strong>%s hits</strong>, too many qualified users, specify more narrow search.</p>' % (len(users1), )
                 
             # show matching users
             else:
@@ -1252,13 +1257,17 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
     <dl>
      <dt><a href="addrole">Add new role</a></dt>
      <dd>go here to add a new role.</dd>
+    </dl>
     """
     if str(id_role) != "0":
         extra += """
+    <dl>
      <dt><a href="deleteuserrole?id_role=%s">Delete users</a></dt>
      <dd>delete users from this role.</dd>
-    """ % (id_role, )
-    extra += "    </dl>"
+     <dt><a href="showroleusers?id_role=%s">Connected users</a></dt>
+     <dd>show all connected users.</dd>
+    </dl>
+    """ % (id_role, id_role)
 
     return index(req=req,
                  title=title,
@@ -1278,6 +1287,9 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
 
     email_out = acca.acc_getUserEmail(id_user=id_user)
     name_role = acca.acc_getRoleName(id_role=id_role)
+    # used to sort roles, and also to determine right side links
+    con_roles = []
+    not_roles = []
 
     title = 'Connect user to roles'
     subtitle = 'step 1 - search for users'
@@ -1303,9 +1315,9 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
         # no users 
         if not users:
             output += '<p>no qualified users, try new search.</p>'
-        # to many users
+        # too many users
         elif len(users) > MAXSELECTUSERS:
-            output += '<p><strong>%s hits</strong>, to many qualified users, specify more narrow search.</p>' % (len(users), )
+            output += '<p><strong>%s hits</strong>, too many qualified users, specify more narrow search.</p>' % (len(users), )
         # ok number of users
         else:
             output += createuserselect(id_user=id_user,
@@ -1324,8 +1336,6 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
                 all_roles = acca.acc_getAllRoles()
 
                 # sort the roles in connected and not connected roles
-                con_roles = []
-                not_roles = []
                 for (id, name, description) in all_roles:
                     if (id, ) in role_ids: con_roles.append([-id, name, description])
                     else: not_roles.append([id, name, description])
@@ -1368,7 +1378,7 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
      <dt><a href="addrole">Add new role</a></dt>
      <dd>go here to add a new role.</dd>
     """
-    if int(id_user):
+    if int(id_user) and con_roles:
         extra += """
      <dt><a href="deleteuserrole?id_user=%s&amp;reverse=1">Remove roles</a></dt>
      <dd>disconnect roles from this user.</dd>
@@ -1481,14 +1491,14 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
     if str(id_role) != "0":
         extra += """
         <dl>
-         <dt><a href="adduserrole?id_role=%s">Add users</a></dt>
+         <dt><a href="adduserrole?id_role=%s">Connect user</a></dt>
          <dd>add users to this role.</dd>
         </dl>
         """ % (id_role, )
     if str(id_user) != "0":
         extra += """
         <dl>
-         <dt><a href="addroleuser?email_user_pattern=%s&amp;id_user=%s">Add roles</a></dt>
+         <dt><a href="addroleuser?email_user_pattern=%s&amp;id_user=%s">Connect role</a></dt>
          <dd>add roles to this user.</dd>
         </dl>
         """ % (email_user, id_user)
@@ -1510,13 +1520,14 @@ def perform_showuserdetails(req, id_user=0):
 
     if id_user not in [0, '0']:
         output = userdetails(id_user=id_user)
+        email_user = acca.acc_getUserEmail(id_user=id_user)
 
         extra = """
         <dl>
-         <dt><a href="addroleuser?id_user=%s">Connect role</a></dt>
+         <dt><a href="addroleuser?id_user=%s&amp;email_user_pattern=%s">Connect role</a></dt>
          <dd>connect a role to the user.</dd>
         </dl>
-        """ % (id_user, )
+        """ % (id_user, email_user)
 
         body = [output, extra]
     else:
@@ -1636,17 +1647,25 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
          <input type="hidden" name="id_action" value="%s">
          <input type="hidden" name="reverse" value="%s">
         """  % (id_role, id_action, reverse)
-         
+
+        # the actions argument keywords
         res_keys = acca.acc_getActionKeywords(id_action=id_action)
-
+        
+        # res used to display existing authorizations
+        # res used to determine if showing "create connection without arguments"
+        res_auths = acca.acc_findPossibleActions(id_role, id_action)
+        
+        # action without arguments
         if not res_keys:
-            output += """
-             <input type="hidden" name="confirm" value="1">
-              create connection between %s?
-             <input class="adminbutton" type="submit" value="confirm">
-            </form>
-            """ % (headerstrong(role=name_role, action=name_action, query=0), )
-
+            if not res_auths:
+                output += """
+                 <input type="hidden" name="confirm" value="1">
+                  create connection between %s?
+                 <input class="adminbutton" type="submit" value="confirm">
+                </form>
+                """ % (headerstrong(role=name_role, action=name_action, query=0), )
+            else:
+                output += '<p><strong>connection without arguments is already created.</strong></p>'
                    
         else:
             optionalargs = acca.acc_getActionIsOptional(id_action=id_action)
@@ -1673,7 +1692,7 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
             output += '</form>\n'
 
             # ask for confirmation
-            if allkeys not in ["0", 0] or optional:
+            if str(allkeys) != "0" or optional:
                 keys = keywords.keys()
                 keys.reverse()
                 subtitle = 'step 4 - confirm add of authorization\n'
@@ -1699,11 +1718,11 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
                                            optional=optional,
                                            **keywords)
 
-        # show existing authorizations
-        res = acca.acc_findPossibleActions(id_role, id_action)
+        # show existing authorizations, found authorizations further up in the code...
+        # res_auths = acca.acc_findPossibleActions(id_role, id_action)
         output += '<p>existing authorizations:</p>'
-        if res:
-            output += tupletotable(header=res[0], tuple=res[1:])
+        if res_auths:
+            output += tupletotable(header=res_auths[0], tuple=res_auths[1:])
             # shortcut to modifying authorizations
             extra += """
             <dl>
@@ -1722,8 +1741,7 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
                                                      arglistid=-1,
                                                      optional=optional,
                                                      **keywords)
-        # newentries = ''
-    
+
         if res1:
             res2 = acca.acc_findPossibleActions(id_role, id_action)
             arg = res1[0][3] # the arglistid
@@ -2505,12 +2523,14 @@ def perform_simpleauthorization(req, id_role=0, id_action=0):
                  adminarea=3)
 
 
-def perform_simpleroleusers(req, id_role=0):
+def perform_showroleusers(req, id_role=0):
     """show a page with simple overview of a role and connected users. """
 
     if not is_adminuser(req): return mustloginpage(req)
 
     res = acca.acc_getRoleUsers(id_role=id_role)
+    name_role = acca.acc_getRoleName(id_role=id_role)
+    
     if res:
         users = []
         for (id, name, dontcare) in res: users.append([id, name, '<a href="showuserdetails?id_user=%s">show user details</a>'
@@ -2518,12 +2538,19 @@ def perform_simpleroleusers(req, id_role=0):
         output  = '<p>users connected to %s:</p>' % (headerstrong(role=id_role), )
         output += tupletotable(header=['id', 'name', ''], tuple=users)
     else:
-        output = 'no users connected'
+        output = 'no users connected to role <strong>%s</strong>' % (name_role, )
+
+    extra = """
+    <dl>
+     <dt><a href="adduserrole?id_role=%s">Connect user</a></dt>
+     <dd>connect users to the role.</dd>
+    </dl>
+    """ % (id_role, )
 
     return index(req=req,
-                 title='Simple user details',
-                 subtitle='simple user details', 
-                 body=[output],
+                 title='Users connected to role %s' % (name_role, ),
+                 subtitle='simple details', 
+                 body=[output, extra],
                  adminarea=3)
                
 

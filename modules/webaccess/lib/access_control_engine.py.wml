@@ -50,7 +50,7 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
 
     The arguments are as follows:
     
-          id_user - currently the id of the user in the cdsdev database
+          id_user - id of the user in the database
       
       name_action - the name of the action
       

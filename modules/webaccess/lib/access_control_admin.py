@@ -743,7 +743,7 @@ def acc_getActionDetails(id_action=0):
 
 def acc_getAllActions():
     """returns all entries in accACTION."""
-    return run_sql("""SELECT a.id, a.name, a.description FROM accACTION a ORDER BY a.id""")
+    return run_sql("""SELECT a.id, a.name, a.description FROM accACTION a ORDER BY a.name""")
 
 
 def acc_getActionRoles(id_action):
@@ -751,7 +751,7 @@ def acc_getActionRoles(id_action):
     FROM accROLE_accACTION_accARGUMENT raa LEFT JOIN accROLE r
     ON raa.id_accROLE = r.id
     WHERE raa.id_accACTION = %s
-    ORDER BY r.id """ % (id_action, ))
+    ORDER BY r.name """ % (id_action, ))
 
 
 # ROLE RELATED
@@ -785,7 +785,7 @@ def acc_getRoleDetails(id_role=0):
 def acc_getAllRoles():
     """get all entries in accROLE."""
     
-    return run_sql("""SELECT r.id, r.name, r.description FROM accROLE r ORDER BY r.id""")
+    return run_sql("""SELECT r.id, r.name, r.description FROM accROLE r ORDER BY r.name""")
 
 
 def acc_getRoleActions(id_role):
@@ -795,7 +795,7 @@ def acc_getRoleActions(id_role):
                       FROM accROLE_accACTION_accARGUMENT raa, accACTION a
                       WHERE raa.id_accROLE = %s and
                             raa.id_accACTION = a.id
-                      ORDER BY a.id """ % (id_role, ))
+                      ORDER BY a.name """ % (id_role, ))
 
 
 def acc_getRoleUsers(id_role):
@@ -805,7 +805,7 @@ def acc_getRoleUsers(id_role):
     FROM user_accROLE ur, user u
     WHERE ur.id_accROLE = %s AND
     u.id = ur.id_user
-    ORDER BY u.id""" % (id_role, ))
+    ORDER BY u.email""" % (id_role, ))
 
 
 # ARGUMENT RELATED
@@ -1004,9 +1004,10 @@ def acc_findPossibleActions(id_role, id_action):
     keywords.sort()
 
     if not keywords:
+        # action without arguments
         if run_sql("""SELECT * FROM accROLE_accACTION_accARGUMENT WHERE id_accROLE = %s AND id_accACTION = %s AND id_accARGUMENT = 0 AND argumentlistid = 0"""
                    % (id_role, id_action)):
-            return [['#', 'no arguments needed'], ['0', 'this action has no arguments']]
+            return [['#', 'argument keyword'], ['0', 'action without arguments']]
         
 
     # tuples into lists
@@ -1312,158 +1313,6 @@ def acc_cleanupUserRoles():
     return (count, ids2)
 
 
-# EXTRA FUNCTIONS, NOT REALLY ADMIN STUFF
-
-def insertgooddata(output=0):
-    # insert data in to the testdatabase
-    
-    run_sql("""TRUNCATE TABLE accROLE""")
-    run_sql("""TRUNCATE TABLE user_accROLE""")
-    run_sql("""TRUNCATE TABLE accACTION""")
-    run_sql("""TRUNCATE TABLE accARGUMENT""")
-    run_sql("""TRUNCATE TABLE accROLE_accACTION_accARGUMENT""")
-
-    # def acc_addRole(name_role, description):
-
-    roles = [(SUPERADMINROLE,     'can do anything'),
-             ('ordinaryuser',     'restricted default access for all users'),
-             ('library admin',    'all library rights'),
-             ('bib format admin', 'formatting of the format'),
-             ('bib formatter',    'can use bibformat'),
-             ('webbasket admin',  'administrator of the web baskets'),
-             ('web submitter',    'submit data'),
-             ('bib harvester',    'administer and run harvesting')]
-
-    for role in roles: apply(acc_addRole, role)
-
-    actions = [('WebSearch_search',       'search collection',                         'no', 'collection'), 
-               ('WebSearch_accessInterfaceManager', 'access to the interface manager', 'no', 'collection'), 
-               ('WebBasket_addrecord',    'add record to basket',                      'no', 'basket'), 
-               ('WebBasket_deleterecord', 'delete record from basket',                 'no', 'basket'), 
-               ('WebBasket_seerecord',    'see record in basket',                      'no', 'basket'), 
-               ('BibFormat_create',       'create a format',                           'no', 'format'), 
-               ('BibFormat_delete',       'delete a format',                           'no', 'format'), 
-               ('BibFormat_modify',       'modify a format',                           'no', 'format'), 
-               ('BibFormat_reformat',     'reformat the contents of collection',       'no', 'collection'), 
-               ('WebSubmit_referee',      'refer to doctype in category',              'no', 'doctype,category'),
-               (WEBACCESSACTION,          'do something as webadmin',                  'no', 'what')]
-    
-    for action in actions: apply(acc_addAction, action)
-
-    # def acc_addUserRole(id_user, id_role=0, name_role=0):
-
-    id_roles = []
-    for name, desc in roles:
-        id_roles.append(run_sql(""" SELECT id FROM accROLE WHERE name = '%s' ORDER BY id """ % (name, ))[0][0])
-
-    user_accROLEs = [(109, id_roles[0]), (109, id_roles[1]), (109, id_roles[4]), (109, id_roles[6]),
-                     (321, id_roles[1]), (321, id_roles[2]), (321, id_roles[3]), (100, id_roles[0]),
-                     (100, id_roles[2]), (100, id_roles[4]), (100, id_roles[6]), (15711, id_roles[2]),
-                     (222, id_roles[3]), (222, id_roles[4]), (222, id_roles[7]), (15711, id_roles[7]),
-                     (109, id_roles[7]), (100, id_roles[7]), (321, id_roles[6])]
-
-    for user_accROLE in user_accROLEs: apply(acc_addUserRole, user_accROLE)
-
-    # def acc_addRoleActionArguments_names(name_role, name_action, arglistid=1, **keyval):
-
-    formats = ['hb', 'hd', 'x', 't', 'id']
-    for name, d, k in actions[5:8]:
-        for format in formats:
-            acc_addRoleActionArguments_names(name_role='bib format admin',
-                                             name_action='%s' % (name, ),
-                                             arglistid=-1,
-                                             format='%s' % (format, ))
-            
-    name, d, k = actions[8]
-    collections = ['LHC', 'ATLAS', 'PREPRINTS', 'Theses']
-    for col in collections:
-        acc_addRoleActionArguments_names(name_role='bib formatter',
-                                         name_action='%s' % (name, ),
-                                         arglistid=-1,
-                                         collection='%s' % (col, ))
-                                        
-
-    return 1
-
-
-if __name__ == '__main__':
-    # main(0) # 0: no output, 1: result is printed
-
-    print '\ndoing what i want\n'
-
-    rol, act, [arg1, arg2, arg3, arg4] = 9, 11, [10, 11, 12, 13]
-
-    a, b, c, d = (1, 1, 1, 1)
-    
-    if a: # insert data
-        print '\na'
-        insertgooddata(1)
-
-        rol = acc_addRole('deletesoon', 'hallay')[0]
-        act = acc_addAction('deteteit', 'nothing', 'no', 'key1', 'key2')[0]
-        acc_addUserRole(222, rol)
-    
-        arg1 = acc_addArgument('key1', 'hello')
-        arg2 = acc_addArgument('key1', 'goodbye')
-        arg3 = acc_addArgument('key2', 'mikael')
-        arg4 = acc_addArgument('key2', 'tibor')
-        arg5 = acc_addArgument('key2', 'nick')
-    
-    if b: # a lot of different test
-        print '\nb'
-        print acc_addRoleActionArguments(id_role=rol, id_action=act, arglistid=1, id_arguments=[arg1, arg2, arg3, arg4, arg5]), '\n'
-        print acc_addRoleActionArguments(id_role=rol, id_action=6, arglistid=1, id_arguments=[1, 2, 3, 4, 5]), '\n'
-        print acc_splitArgumentGroup(rol, act, 1), '\n'
-        print acc_splitArgumentGroup(rol, 6, 1), '\n'
-        print acc_splitArgumentGroup(4, 6, 2), '\n'
-        print acc_mergeArgumentGroups(rol, act, [2, 5])
-        for r in acc_findPossibleActions(4, 6): print r
-        for r in acc_findPossibleActions(9, 11): print r
-        for r in acc_findPossibleActionsUser(222, 6): print r
-        for r in acc_findPossibleActionsUser(222, 11): print r
-
-    if c: # find actions for role
-        print '\nc'
-        for r in acc_findPossibleActionsAll(4): print r
-        for r in acc_findPossibleActionsAll(9): print r
-                
-    if d: # print data
-        print '\nh'
-        res = run_sql('SELECT * FROM accROLE_accACTION_accARGUMENT')
-        print 'length:', len(res)
-        print 'role, action, argument, listid'
-        for r in res: print r
 
 </protect>
-
-
-
-# # nice little functions
-# pylibdir = "/log/cdsware-DEMODEV/lib/python"
-# try:
-#     import sys
-#     sys.path.append('%s' % pylibdir)
-#     import cdsware.access_control_engine as acce
-#     import cdsware.access_control_admin as acca
-#     reload(acce)
-#     reload(acca)
-#     from cdsware.dbquery import run_sql
-# except: pass
-# 
-# def ids():
-#  for r in run_sql('select * from accROLE_accACTION_accARGUMENT where id_accROLE = 6 and id_accACTION = 12'): print r
-# def pas():
-#  for r in acca.acc_findPossibleActions(6,12): print r
-# def reset():
-#  run_sql('delete from accROLE_accACTION_accARGUMENT where id_accROLE = 6 and id_accACTION = 12')
-#  acca.acc_addRoleActionArguments(6,12,1,[10,11,12,13,14])
-
-# pylibdir = "/log/cdsware-DEMODEV/lib/python"
-# import sys
-# sys.path.append('%s' % pylibdir)
-# import cdsware.access_control_engine as acce
-# import cdsware.access_control_admin as acca
-# reload(acce)
-# reload(acca)
-# from cdsware.dbquery import run_sql
 
