@@ -46,9 +46,13 @@ try:
     from cdsware import search_engine_tests 
     from cdsware import bibindex_engine_tests 
     from cdsware import bibindex_engine_stemmer_tests 
+    from cdsware import bibrecord_tests 
+    from cdsware import bibrank_citation_indexer_tests
+    from cdsware import bibrank_citation_searcher_tests
+    from cdsware import bibrank_downloads_indexer_tests
     from cdsware import bibrank_record_sorter_tests
     from cdsware import bibrank_tag_based_indexer_tests
-    from cdsware import bibrecord_tests 
+
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -60,6 +64,9 @@ def create_all_test_suites():
                                bibindex_engine_tests.create_test_suite(),
                                bibindex_engine_stemmer_tests.create_test_suite(),
                                bibrecord_tests.create_test_suite(),
+                               bibrank_citation_indexer_tests.create_test_suite(),
+                               bibrank_citation_searcher_tests.create_test_suite(),
+                               bibrank_downloads_indexer_tests.create_test_suite(),
                                bibrank_record_sorter_tests.create_test_suite(),
                                bibrank_tag_based_indexer_tests.create_test_suite()))
 
