@@ -481,6 +481,7 @@ a.navtrail:hover {
    font-size: small;
    padding: 0px 10px;
    text-align: center;
+   vertical-align: top;
 }
 .admintdleft {
    text-align: left;
