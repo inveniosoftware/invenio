@@ -898,7 +898,7 @@ def wash_colls(cc, c, split_colls=0):
     colls_out_for_display = map(lambda x, colls_out_for_display=colls_out_for_display:colls_out_for_display[x-1], colls_out_for_display_nondups)
         
     # second, let us decide on collection splitting:
-    if 1 or split_colls == 0:
+    if split_colls == 0:
         # type A - no sons are wanted
         colls_out = colls_out_for_display
 #    elif split_colls == 1:
@@ -1015,14 +1015,19 @@ def get_coll_ancestors(coll):
     coll_ancestors.reverse()
     return coll_ancestors
 
-def get_coll_sons(coll, type='r'):
-    "Returns a list of sons (first-level descendants) of type 'type' for collection 'coll'."
+def get_coll_sons(coll, type='r', public_only=1):
+    """Return a list of sons (first-level descendants) of type 'type' for collection 'coll'.
+       If public_only, then return only non-restricted son collections.
+    """
     coll_sons = [] 
     query = "SELECT c.name FROM collection AS c "\
             "LEFT JOIN collection_collection AS cc ON c.id=cc.id_son "\
             "LEFT JOIN collection AS ccc ON ccc.id=cc.id_dad "\
-            "WHERE cc.type='%s' AND ccc.name='%s' ORDER BY cc.score DESC" \
+            "WHERE cc.type='%s' AND ccc.name='%s'" \
             % (escape_string(type), escape_string(coll))
+    if public_only:
+        query += " AND c.restricted IS NULL "
+    query += " ORDER BY cc.score DESC" 
     res = run_sql(query)
     for name in res:
         coll_sons.append(name[0])
