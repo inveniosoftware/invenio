@@ -19,7 +19,7 @@
 
 <protect># -*- coding: utf-8 -*-</protect>
 
-from config import tmpdir
+from config import tmpdir, etcdir
 import bibrecord
 import unittest
 from string import expandtabs, replace
@@ -42,8 +42,9 @@ class SanityTest(unittest.TestCase):
         yy=expandtabs(y)
         xxx = xx.replace(' ','')
         yyy = yy.replace(' ','')
-        xxx = xxx.replace('<!DOCTYPEcollectionSYSTEM"file:///soft/cdsware-CDSCERNWIENERDEV/etc/bibedit/MARC21slim.dtd"><collection>', '<collectionxmlns="http://www.loc.gov/MARC21/slim">')
-        self.assertEqual(xxx,yyy) # FIXME: UTF-8 parsing is not working
+        xxx = xxx.replace('<!DOCTYPEcollectionSYSTEM"file://%s/bibedit/MARC21slim.dtd"><collection>' % etcdir,
+                          '<collectionxmlns="http://www.loc.gov/MARC21/slim">')
+        self.assertEqual(xxx,yyy)
 
 ### testing for success
         
@@ -206,7 +207,7 @@ class AccentedUnicodeLettersTest(unittest.TestCase):
         <subfield code="a">Döè1, John</subfield>
         </datafield>
         <datafield tag="100" ind1="" ind2="">
-        <subfield code="a">Doe2, John</subfield>
+        <subfield code="a">Doe2, J>ohn</subfield>
         <subfield code="b">editor</subfield>
         </datafield>
         <datafield tag="245" ind1="" ind2="1">
@@ -217,12 +218,12 @@ class AccentedUnicodeLettersTest(unittest.TestCase):
         </datafield>
         </record>
         """
-        (self.rec, st, e) = bibrecord.create_record(xml_example_record,1,1)        
+        (self.rec, st, e) = bibrecord.create_record(xml_example_record,1,1)
 
     def test_accented_unicode_characters(self):
         """bibrecord - accented Unicode letters"""
         self.assertEqual(bibrecord.record_get_field_instances(self.rec, "100", "", ""),
-                         [([('a', 'Döè1, John')], '', '', '', 3), ([('a', 'Doe2, John'), ('b', 'editor')], '', '', '', 4)])
+                         [([('a', 'Döè1, John')], '', '', '', 3), ([('a', 'Doe2, J>ohn'), ('b', 'editor')], '', '', '', 4)])
         self.assertEqual(bibrecord.record_get_field_instances(self.rec, "245", "", "1"),
                          [([('a', 'Пушкин')], '', '1', '', 5)])
 
