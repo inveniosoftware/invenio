@@ -31,6 +31,7 @@ try:
     from webpage import page
     from dbquery import run_sql
     from webuser import getUid, getDataUid,isGuestUser
+    from search_engine import print_record
     from webaccount import warning_guest_user
 except ImportError, e:
     print "Error: %s" % e
@@ -282,9 +283,9 @@ def display_basket_content(uid, id_basket, basket_name):
     
     # search for basket's items    
     if (id_basket != '0') and (id_basket != 0):
-        query_result = run_sql("SELECT br.id_record,br.nb_order, fmt.value "\
-                               "FROM basket_record br, bibfmt fmt "\
-                               "WHERE br.id_basket=%s AND br.id_record=fmt.id_bibrec AND fmt.format='hb'"\
+        query_result = run_sql("SELECT br.id_record,br.nb_order "\
+                               "FROM basket_record br "\
+                               "WHERE br.id_basket=%s "\
                                "ORDER BY br.nb_order DESC ",
                                (id_basket,))
         if len(query_result) > 0:
@@ -331,17 +332,16 @@ def display_basket_content(uid, id_basket, basket_name):
                     # display current item
                     out += """<TR valign="top"><TD width="60">%s<input type="checkbox" name="mark" value="%s">"""\
                            """<A href="display?id_basket=%s&amp;action=ORDER&amp;idup=%s&amp;ordup=%s&amp;iddown=%s&amp;orddown=%s">"""\
-                           """<IMG src="%s/arrow_up.gif" border="0"></A>""" % (i,row[0],id_basket,row[0],row[1],preid,preord,imagesurl)              
+                           """<IMG src="%s/arrow_up.gif" border="0"></A>""" % (i,row[0],id_basket,row[0],row[1],preid,preord,imagesurl)
                 preid = row[0]
                 preord = row[1]
-                preabstract = row[2]
+                preabstract = print_record(row[0], "hb")
                 i += 1
             # complete display last item
             out += """<IMG src="%s/arrow_down.gif" border="0"></A>"""\
                    """</TD>"""\
                    """<TD>%s</TD></TR>"""\
-                   """<TR colspan="2"><TD></TD></TR>""" % (imagesurl,zlib.decompress(preabstract))                    
-
+                   """<TR colspan="2"><TD></TD></TR>""" % (imagesurl,preabstract)
             # hidden parameters
             out += """<INPUT type="hidden" name="id_basket" value="%s"></TD></TR>""" % id_basket                  
             out += """</TABLE></TD></TR></TABLE></FORM>"""
@@ -636,9 +636,9 @@ def perform_display_public(uid, id_basket, basket_name, action, to_basket, mark,
         if str(res[0][0]).strip() != 'y':
             out += """The basket is private"""
             return out
-        query_result = run_sql("SELECT br.id_record,br.nb_order, fmt.value "\
-                               "FROM basket_record br, bibfmt fmt "\
-                               "WHERE br.id_basket=%s AND br.id_record=fmt.id_bibrec AND fmt.format='hb'"\
+        query_result = run_sql("SELECT br.id_record,br.nb_order "\
+                               "FROM basket_record br "\
+                               "WHERE br.id_basket=%s "\
                                "ORDER BY br.nb_order DESC ",
                                (id_basket,))
         if len(query_result) > 0:
@@ -691,7 +691,7 @@ def perform_display_public(uid, id_basket, basket_name, action, to_basket, mark,
                            """<IMG src="%s/arrow_up.gif" border="0"></A>""" % (i,row[0],id_basket,row[0],row[1],preid,preord,imagesurl)              
                 preid = row[0]
                 preord = row[1]
-                preabstract = row[2]
+                preabstract = print_record(row[0], "hb")
                 i += 1
             # complete display last item
             out += """<IMG src="%s/arrow_down.gif" border="0"></A>"""\
