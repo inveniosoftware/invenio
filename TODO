@@ -7,20 +7,34 @@ CDSware TODO list
 Suitable for editing with Emacs ToDoo mode, see
 <http://www.emacswiki.org/cgi-bin/wiki/ToDoo>.
 
+o [tibor] static HTML pages should not get created all languages
+  Static HTML pages should not get created all languages when user
+  selected only some languages in his config.wml.
+  Received Mon Jan 26 19:21:35 2004
+
+o [tibor] in search for ``title: goo'' the space should be ignored
+  Received Wed Jan 21 11:09:00 2004
+
+o [tibor] Internal Error exceptions.KeyError 'Articles & Preprints' 
+  ``Fixed'' by restarting Apache.  It appears that you contacted a
+  server process exactly when it was being restarted, as the cache is
+  usually filled upon Apache startup.  I'll have a closer look and fix
+  it properly later.
+  Seems to be connected to the runaway client number problem.
+  Maybe run_sql() should be revised.
+  Received Tue Jan 20 10:56:02 2004
+
 o [tibor] CDSware DEMO formats
    - picture links should use recid not sysnb
    - use /search.py  not /search in links
   Received Mon Jan 19 10:41:18 2004
 
-o [tibor] BibSched must use run_sql()
-  Received Fri Jan 16 10:17:11 2004
+o [tibor] RTdata dir should be created during `make install` ?
+  Received Mon Jan 19 10:41:18 2004
 
 o [thomas] BibUpload must use run_sql() 
   to avoid connection dropping problems
   Received Fri Jan 16 10:17:11 2004
-
-o [tibor] Get rid of isolatin stuff (for RH9)
-  Received Thu Jan 15 16:16:49 2004
 
 o [tibor] Admin: HOWTO Run guide 
   Received Wed Dec 17 16:20:35 2003 
@@ -34,9 +48,6 @@ o [tibor] WebSession: garbage collection and guest session check
 * WebSession account edit bugs 
 - email unique
 - pw edit: retype functionality
-  Received Wed Dec 17 16:20:35 2003 
-
-o [tibor] BibSched: test periodicity
   Received Wed Dec 17 16:20:35 2003 
 
 o [tibor] BibSched: enable multiple hosts
@@ -73,5 +84,23 @@ o [tibor] BibIndex: make our own ACC indexes
   Received Wed Dec 17 16:20:35 2003 
   Study phrase index generation from XML MARC.
   Related to bibXXx table abolition.
+
+DONE
+====
+
+o [tibor] BibSched must use run_sql()
+  Received Fri Jan 16 10:17:11 2004
+  Done Tue Jan 27 16:15:17 2004
+
+o [tibor] Get rid of isolatin stuff (for RH9)
+  Received Thu Jan 15 16:16:49 2004
+  Done Tue Jan 27 16:16:45 2004
+
+o [tibor] BibSched: test periodicity
+  Received Wed Dec 17 16:20:35 2003 
+  Used in production at CERN. 
+  Done Tue Jan 27 16:17:20 2004
+
+
 
 ;; end of file
