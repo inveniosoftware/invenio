@@ -32,9 +32,6 @@ Author:   eduardo.margallo@cern.ch
 Modifyer: thomas.baron@cern.ch
 
 """
-runtimelogdir = """<RUNTIMELOGDIR>"""
-cgibindir = "<CGIBINDIR>"
-dbutildir = "<DBUTILDIR>"
 tmpdir = "<TMPDIR>"
 runtimelogdir = tmpdir
 dbhost = "<DBHOST>"
@@ -49,7 +46,7 @@ dbpass = "<DBPASS>"
 __version__ = "$Id$"
 
 
-
+<protect>
 import os
 import imp
 import string
@@ -97,14 +94,18 @@ class Manager:
         self.cursor = self.db.cursor()
         self.cursor_bis = self.db.cursor()
         self.running = 1
-        self.footer_select = "[A Auto mode] [W Wake Up] [R Run] [S Sleep] [T Stop] [K Kill] [I Initialise] [D Delete]   [Q Quit]"
-        self.footer_move = "[KeyUp/KeyDown Move Selected Process] [M Select mode] [Q Quit]"
-        self.footer_auto = "[A Manual mode] [Q Quit]"
-        self.footer2 = "[KeyUp/KeyDown/PageUp/PageDown Change Selection] [L View Log] [1/2/3 Display Type] [M Move mode]"
+        self.footer_move_mode = "[KeyUp/KeyDown Move] [M Select mode] [Q Quit]"
+        self.footer_auto_mode = "[A Manual mode] [Q Quit]"
+        self.footer_select_mode = "[KeyUp/KeyDown/PgUp/PgDown Select] [L View Log] [1/2/3 Display Type] [M Move mode] [A Auto mode] [Q Quit]"
+        self.footer_waiting_item = "[R Run] [D Delete]"
+        self.footer_running_item = "[S Sleep] [T Stop] [K Kill]"
+        self.footer_stopped_item = "[I Initialise] [D Delete]"
+        self.footer_sleeping_item   = "[W Wake Up]"
+        self.item_state = ""
         self.selected_line = 2
         self.rows = []
         self.panel = None
-        self.display = 1
+        self.display = 3
         self.first_visible_line = 0
         self.move_mode = 0
         self.auto_mode = 0
@@ -380,6 +381,7 @@ class Manager:
                 attr = curses.color_pair(7) + curses.A_STANDOUT + curses.A_BOLD
             else:
                 attr = curses.color_pair(8) + curses.A_STANDOUT + curses.A_BOLD
+            self.item_state = row[5]
             self.currentrow = row
         elif self.y == 0:
             if self.auto_mode:
@@ -435,16 +437,25 @@ class Manager:
         if self.selected_line < self.first_visible_line + 2:
             self.first_visible_line = self.selected_line - 2
         for row in self.rows[self.first_visible_line:self.first_visible_line+maxy-2]:
-                id,proc,user,date,sleeptime,state,progress = row
-                self.put_line( row )
+            id,proc,user,date,sleeptime,state,progress = row
+            self.put_line( row )
         self.y = self.stdscr.getmaxyx()[0] - 1
         if self.auto_mode:
-            self.put_footer(self.footer_auto)
+            self.put_footer(self.footer_auto_mode)
         elif self.move_mode:
-            self.put_footer(self.footer_move)
+            self.put_footer(self.footer_move_mode)
         else:
-            self.put_footer(self.footer_select)
-            self.put_footer(self.footer2,1)
+            self.put_footer(self.footer_select_mode)
+            footer2 = ""
+            if self.item_state == "DONE" or self.item_state == "ERROR" or self.item_state == "STOPPED":
+                 footer2 += self.footer_stopped_item
+            elif self.item_state == "RUNNING" or self.item_state == "CONTINUING":
+                 footer2 += self.footer_running_item
+            elif self.item_state == "SLEEPING":
+                 footer2 += self.footer_sleeping_item
+            elif self.item_state == "WAITING":
+                 footer2 += self.footer_waiting_item
+            self.put_footer(footer2,1)
         self.stdscr.refresh()
         
     def start(self, stdscr):
@@ -474,7 +485,7 @@ class Manager:
             where = "and state='DONE'"
         else:
             where = "and state!='DONE'"
-        query = "SELECT id,proc,user,date,sleeptime,state,progress FROM schTASKS WHERE state NOT LIKE '%%DELETED%%' %s order by id desc" % where
+        query = "SELECT id,proc,user,date,sleeptime,state,progress FROM schTASKS WHERE state NOT LIKE '%%DELETED%%' %s order by date desc" % where
         self.cursor.execute(query)
         self.rows = self.cursor.fetchall()
         self.repaint()
@@ -488,7 +499,7 @@ class Manager:
                     where = "and state='DONE'"
                 else:
                     where = "and state!='DONE'"
-                query = "SELECT id,proc,user,date,sleeptime,state,progress FROM schTASKS WHERE state NOT LIKE '%%DELETED%%' %s order by id desc" % where
+                query = "SELECT id,proc,user,date,sleeptime,state,progress FROM schTASKS WHERE state NOT LIKE '%%DELETED%%' %s order by date desc" % where
                 self.cursor.execute(query)
                 self.rows = self.cursor.fetchall()
                 ring = 0
@@ -607,21 +618,6 @@ class Bibsched:
             time.sleep( 1 )
             self.cursor.execute(query)
             rows=self.cursor.fetchall()
-            running_process = self.get_running_processes()
-            if running_process:
-            	proc = running_process[ 1 ]
-            	id   = running_process[ 0 ]
-            	if proc == "bibupload":
-                    arg2 = "-t"
-            	else:
-                    arg2 = ""
-	    	    if get_my_pid(proc,"%s%s" % (arg2, str(id))):
-            		self.running[id] = get_my_pid(proc,"%s%s" % (arg2, str(id)))
-	    	    else:
-                        self.set_state(id,"ERROR")
-                        if id in self.running.keys():
-                            del self.running[id]
-		
 
 def Log(message):
     if not dbg: return
@@ -659,3 +655,4 @@ def main():
     
 if __name__ == '__main__':
     main()
+</protect>
