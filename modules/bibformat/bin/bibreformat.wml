@@ -187,7 +187,8 @@ def iterate_over(list):
             
             if n_rec >= n_max:
 
-                filehandle = open("bibreformat.xml" ,"w")
+                filename = "%s/bibreformat.xml" % tmpdir
+                filehandle = open(filename ,"w")
                 filehandle.write(xml_content)
                 filehandle.close()
 
@@ -199,7 +200,7 @@ def iterate_over(list):
                 message = "START bibformat external call"
                 print message
 
-                command = "%s/bibformat otype='HB' < bibreformat.xml > rec_fmt.xml" % bindir
+                command = "%s/bibformat otype='HB' < %s/bibreformat.xml > %s/rec_fmt.xml 2>> %s/bibreformat.err" % (bindir,tmpdir,tmpdir,tmpdir)
                 os.system(command)
 
                 t22 = os.times()[4]
@@ -216,7 +217,7 @@ def iterate_over(list):
                 message = "START bibupload external call"
                 print message
 
-                command = "%s/bibupload -f rec_fmt.xml" % bindir
+                command = "%s/bibupload -f %s/rec_fmt.xml" % (bindir,tmpdir)
                 os.system(command)
 		
                 t22 = os.times()[4]
@@ -235,7 +236,8 @@ def iterate_over(list):
 
         print "Processing last record set (%d)" % n_rec
 
-        filehandle = open("bibreformat.xml" ,"w")
+        filename = "%s/bibreformat.xml" % tmpdir
+        filehandle = open(filename ,"w")
         filehandle.write(xml_content)
         filehandle.close()
 
@@ -246,7 +248,7 @@ def iterate_over(list):
         message = "START bibformat external call"
         print message
 
-        command = "%s/bibformat otype='HB' < bibreformat.xml > rec_fmt.xml 2> bibreformat.err" % bindir
+        command = "%s/bibformat otype='HB' < %s/bibreformat.xml > %s/rec_fmt.xml 2>> %s/bibreformat.err" % (bindir,tmpdir,tmpdir,tmpdir)
         os.system(command)
 
         t22 = os.times()[4]
@@ -262,7 +264,7 @@ def iterate_over(list):
         message = "START bibupload external call"
         print message
 
-        command = "%s/bibupload -f rec_fmt.xml" % bindir
+        command = "%s/bibupload -f %s/rec_fmt.xml" % (bindir,tmpdir)
         os.system(command)
 
         t22 = os.times()[4]
