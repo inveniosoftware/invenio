@@ -285,7 +285,6 @@ def perform_list_alerts (uid):
     # set variables
     out = ""
     id_user = uid # XXX
-    id_guest = isGuestUser(uid)
 
     # link to the "add new alert" form
     out += """<P>Set a new alert from <A href="display">your searches</A>, """\
@@ -352,7 +351,7 @@ def perform_list_alerts (uid):
                       get_textual_query_info_from_urlargs(row[1]),row[5],row[2],row[3],row[4],row[3],row[5],row[6],row[7],row[4],weburl,row[1])
         out += """</TABLE>\n"""
     out += """<P>You have defined <B>%s</B> alerts.</P>""" % len(query_result)    
-    if (id_guest == 1):
+    if isGuestUser(uid) :
 	out += """<br><FONT color="red"> You are logged in as a <B>guest</B> user, so your baskets
 	will disappear at the end of the current session. If you wish you can login or register
 	<A href="../youraccount.py/login">here</A>.</FONT>"""	
