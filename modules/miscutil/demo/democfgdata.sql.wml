@@ -1,19 +1,37 @@
 #include "config.wml"
 #include "configbis.wml"
 
-INSERT INTO collection VALUES (2,'Preprints','Preprints',NULL,'collection:PREPRINT',NULL,NULL);
-INSERT INTO collection VALUES (3,'Books','Books',NULL,'collection:BOOK',NULL,NULL);
-INSERT INTO collection VALUES (4,'Theses','Theses',NULL,'collection:THESIS',NULL,NULL);
-INSERT INTO collection VALUES (5,'Reports','Reports',NULL,'collection:REPORT',NULL,NULL);
-INSERT INTO collection VALUES (6,'Articles','Article',NULL,'collection:ARTICLE',NULL,NULL);
-INSERT INTO collection VALUES (8,'Pictures','Pictures',NULL,'collection:PICTURE',NULL,NULL);
+INSERT INTO collection VALUES (2,'Preprints','Preprints',NULL,'collection:PREPRINT',NULL,NULL,NULL);
+INSERT INTO collection VALUES (3,'Books','Books',NULL,'collection:BOOK',NULL,NULL,NULL);
+INSERT INTO collection VALUES (4,'Theses','Theses',NULL,'collection:THESIS',NULL,NULL,'theses');
+INSERT INTO collection VALUES (5,'Reports','Reports',NULL,'collection:REPORT',NULL,NULL,NULL);
+INSERT INTO collection VALUES (6,'Articles','Article',NULL,'collection:ARTICLE',NULL,NULL,NULL);
+INSERT INTO collection VALUES (8,'Pictures','Pictures',NULL,'collection:PICTURE',NULL,NULL,'pictures');
+INSERT INTO collection VALUES (9,'CERN Divisions','CERN Divisions',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO collection VALUES (10,'CERN Experiments','CERN Experiments',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO collection VALUES (11,'Theoretical Physics (TH)','Theoretical Physics (TH)',NULL,'division:TH',NULL,NULL,NULL);
+INSERT INTO collection VALUES (12,'Experimental Physics (EP)','Experimental Physics (EP)',NULL,'division:EP',NULL,NULL,NULL);
+INSERT INTO collection VALUES (13,'ISOLDE','ISOLDE',NULL,'experiment:ISOLDE',NULL,NULL,NULL);
+INSERT INTO collection VALUES (14,'ALEPH','ALEPH',NULL,'experiment:ALEPH',NULL,NULL,NULL);
+INSERT INTO collection VALUES (15,'Articles & Preprints','Articles & Preprints',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO collection VALUES (16,'Books & Reports','Books & Reports',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO collection VALUES (17,'Multimedia','Multimedia',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO collection_collection VALUES (1,15,'r',60);
+INSERT INTO collection_collection VALUES (1,16,'r',40);
+INSERT INTO collection_collection VALUES (1,17,'r',30);
+INSERT INTO collection_collection VALUES (15,6,'r',20);
+INSERT INTO collection_collection VALUES (15,2,'r',10);
+INSERT INTO collection_collection VALUES (16,3,'r',30);
+INSERT INTO collection_collection VALUES (16,4,'r',20);
+INSERT INTO collection_collection VALUES (16,5,'r',10);
+INSERT INTO collection_collection VALUES (17,8,'r',10);
 
-INSERT INTO collection_collection VALUES (1,6,60);
-INSERT INTO collection_collection VALUES (1,2,40);
-INSERT INTO collection_collection VALUES (1,3,30);
-INSERT INTO collection_collection VALUES (1,4,20);
-INSERT INTO collection_collection VALUES (1,5,10);
-INSERT INTO collection_collection VALUES (1,8,5);
+INSERT INTO collection_collection VALUES (1,9,'v',20);
+INSERT INTO collection_collection VALUES (1,10,'v',10);
+INSERT INTO collection_collection VALUES (9,11,'r',10);
+INSERT INTO collection_collection VALUES (9,12,'r',20);
+INSERT INTO collection_collection VALUES (10,13,'r',10);
+INSERT INTO collection_collection VALUES (10,14,'r',20);
 
 INSERT INTO collection_example VALUES (1,1,1);
 INSERT INTO collection_example VALUES (1,5,2);
@@ -22,15 +40,8 @@ INSERT INTO collection_example VALUES (1,7,5);
 INSERT INTO collection_example VALUES (1,6,4);
 INSERT INTO collection_example VALUES (1,4,6);
 INSERT INTO collection_example VALUES (1,3,7);
+INSERT INTO collection_example VALUES (1,13,50);
 INSERT INTO collection_example VALUES (1,2,8);
-INSERT INTO collection_example VALUES (6,1,10);
-INSERT INTO collection_example VALUES (6,5,20);
-INSERT INTO collection_example VALUES (6,8,30);
-INSERT INTO collection_example VALUES (6,0,27);
-INSERT INTO collection_example VALUES (3,6,30);
-INSERT INTO collection_example VALUES (6,4,40);
-INSERT INTO collection_example VALUES (6,3,60);
-INSERT INTO collection_example VALUES (6,2,80);
 INSERT INTO collection_example VALUES (2,1,1);
 INSERT INTO collection_example VALUES (2,5,2);
 INSERT INTO collection_example VALUES (2,8,3);
@@ -39,6 +50,7 @@ INSERT INTO collection_example VALUES (2,6,4);
 INSERT INTO collection_example VALUES (2,4,6);
 INSERT INTO collection_example VALUES (2,3,7);
 INSERT INTO collection_example VALUES (2,2,8);
+INSERT INTO collection_example VALUES (3,6,30);
 INSERT INTO collection_example VALUES (3,17,10);
 INSERT INTO collection_example VALUES (3,18,20);
 INSERT INTO collection_example VALUES (4,1,1);
@@ -57,10 +69,36 @@ INSERT INTO collection_example VALUES (5,6,4);
 INSERT INTO collection_example VALUES (5,4,6);
 INSERT INTO collection_example VALUES (5,3,7);
 INSERT INTO collection_example VALUES (5,2,8);
-INSERT INTO collection_example VALUES (1,13,50);
+INSERT INTO collection_example VALUES (6,1,10);
+INSERT INTO collection_example VALUES (6,5,20);
+INSERT INTO collection_example VALUES (6,8,30);
+INSERT INTO collection_example VALUES (6,0,27);
+INSERT INTO collection_example VALUES (6,4,40);
+INSERT INTO collection_example VALUES (6,3,60);
+INSERT INTO collection_example VALUES (6,2,80);
 INSERT INTO collection_example VALUES (8,14,10);
 INSERT INTO collection_example VALUES (8,15,20);
 INSERT INTO collection_example VALUES (8,16,30);
+INSERT INTO collection_example VALUES (15,0,27);
+INSERT INTO collection_example VALUES (15,1,1);
+INSERT INTO collection_example VALUES (15,2,8);
+INSERT INTO collection_example VALUES (15,3,60);
+INSERT INTO collection_example VALUES (15,4,40);
+INSERT INTO collection_example VALUES (15,5,2);
+INSERT INTO collection_example VALUES (15,6,4);
+INSERT INTO collection_example VALUES (15,7,5);
+INSERT INTO collection_example VALUES (15,8,3);
+INSERT INTO collection_example VALUES (16,1,1);
+INSERT INTO collection_example VALUES (16,2,8);
+INSERT INTO collection_example VALUES (16,3,7);
+INSERT INTO collection_example VALUES (16,4,6);
+INSERT INTO collection_example VALUES (16,5,2);
+INSERT INTO collection_example VALUES (16,6,4);
+INSERT INTO collection_example VALUES (16,7,5);
+INSERT INTO collection_example VALUES (16,8,3);
+INSERT INTO collection_example VALUES (17,14,10);
+INSERT INTO collection_example VALUES (17,15,20);
+INSERT INTO collection_example VALUES (17,16,30);
 
 INSERT INTO collection_field_fieldvalue VALUES (2,7,7,'seo',10,18);
 INSERT INTO collection_field_fieldvalue VALUES (2,7,6,'seo',10,19);
@@ -209,6 +247,16 @@ INSERT INTO collection_portalbox VALUES (4,9,'rt',100);
 INSERT INTO collection_portalbox VALUES (4,10,'rt',90);
 INSERT INTO collection_portalbox VALUES (5,11,'rt',100);
 INSERT INTO collection_portalbox VALUES (8,14,'rt',10);
+INSERT INTO collection_portalbox VALUES (9,15,'rt',100);
+INSERT INTO collection_portalbox VALUES (10,16,'rt',100);
+INSERT INTO collection_portalbox VALUES (11,17,'rt',100);
+INSERT INTO collection_portalbox VALUES (12,18,'rt',100);
+INSERT INTO collection_portalbox VALUES (13,19,'rt',100);
+INSERT INTO collection_portalbox VALUES (14,20,'rt',100);
+INSERT INTO collection_portalbox VALUES (15,21,'rt',100);
+INSERT INTO collection_portalbox VALUES (16,22,'rt',100);
+INSERT INTO collection_portalbox VALUES (17,23,'rt',100);
+
 
 INSERT INTO example VALUES (1,'author search','Search for <span class=example>Ellis, J</span> within <span class=example>author</span> field.');
 INSERT INTO example VALUES (2,'word search','Search for <span class=example>quantum</span> within <span class=example>any</span> field.');
@@ -275,9 +323,15 @@ INSERT INTO portalbox VALUES (11,'<small>ABOUT REPORTS</small>','<small>The Repo
 INSERT INTO portalbox VALUES (12,'TEST portal box','this is a test portal box');
 INSERT INTO portalbox VALUES (13,'test','this is a test portal box');
 INSERT INTO portalbox VALUES (14,'<small>ABOUT PICTURES</small>','<small>The Pictures collection contains selected photographs and illustrations.  Please note that photographs are copyrighted.  The collection includes historical archive that starts from 1950.</small>');
-
-
-
+INSERT INTO portalbox VALUES (15,'<small>ABOUT CERN DIVISIONS</small>','<small>These virtual collections present a specific point of view on the database content from CERN Divisions persective.</small>');
+INSERT INTO portalbox VALUES (16,'<small>ABOUT CERN EXPERIMENTS</small>','<small>These virtual collections present a specific point of view on the database content from CERN Experiments persective.</small>');
+INSERT INTO portalbox VALUES (17,'<small>ABOUT TH</small>','<small>This virtual collection groups together all the documents written by authors from CERN TH Division.</small>');
+INSERT INTO portalbox VALUES (18,'<small>ABOUT EP</small>','<small>This virtual collection groups together all the documents written by authors from CERN EP Division.</small>');
+INSERT INTO portalbox VALUES (19,'<small>ABOUT ISOLDE</small>','<small>This virtual collection groups together all the documents about ISOLDE CERN experiment.</small>');
+INSERT INTO portalbox VALUES (20,'<small>ABOUT ALEPH</small>','<small>This virtual collection groups together all the documents about ALEPH CERN experiment.</small>');
+INSERT INTO portalbox VALUES (21,'<small>ABOUT ARTICLES AND PREPRINTS</small>','<small>This collection groups together all published and non-published articles, many of which in electronic fulltext form.</small>');
+INSERT INTO portalbox VALUES (22,'<small>ABOUT BOOKS AND REPORTS</small>','<small>This collection groups together all monograph-like publications, be they books, theses, reports, book chapters, proceedings, and so on.</small>');
+INSERT INTO portalbox VALUES (23,'<small>ABOUT MULTIMEDIA</small>','<small>This collection groups together all multimedia- and outreach- oriented material.</small>');
 
 INSERT INTO sbmCOLLECTION VALUES (36,'Catalogues');
 
