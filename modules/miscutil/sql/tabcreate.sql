@@ -2831,7 +2831,7 @@ CREATE TABLE IF NOT EXISTS schTASK (
   runtime datetime NOT NULL,
   sleeptime varchar(20),
   arguments longtext,
-  status varchar(20),
+  status varchar(50),
   progress varchar(255),
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
