@@ -34,7 +34,7 @@ try:
     from cdsware import user
     from cdsware.config import *
     from cdsware.webpage import page
-    from cdsware.webaccount import *
+    from cdsware import webaccount
 except ImportError, e:
     print "Error: %s" % e
     import sys
