@@ -1299,6 +1299,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0):
     for idx_unit in range(0,len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
         basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m)
+        if verbose >= 9:
+            print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (bsu_p, Numeric.nonzero(basic_search_unit_hitset._set)))
         if ap==0 or basic_search_unit_hitset._nbhits > 0:
             # stage 2-1: this basic search unit is retained
             basic_search_units_hitsets.append(basic_search_unit_hitset)                    
