@@ -2113,7 +2113,7 @@ CREATE TABLE IF NOT EXISTS rnkWORD01R (
   PRIMARY KEY  (id_bibrec,type)
 ) TYPE=MyISAM;
 
-CREATE TABLE rnkDOWNLOADS (
+CREATE TABLE IF NOT EXISTS rnkDOWNLOADS (
   id_bibrec mediumint(8) unsigned default NULL,
   download_time datetime default '0000-00-00 00:00:00',
   client_host int(10) unsigned default NULL,
@@ -2125,7 +2125,7 @@ CREATE TABLE rnkDOWNLOADS (
   KEY id_bibrec (id_bibrec)
 ) TYPE=MyISAM;
 
-CREATE TABLE rnkCITATIONDATA (
+CREATE TABLE IF NOT EXISTS rnkCITATIONDATA (
   citation_data longblob,
   citation_data_reversed longblob
 ) TYPE=MyISAM;
