@@ -2944,10 +2944,13 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 return results_final_for_all_colls.items().tolist()
             elif of.startswith("h"):
                 req.write(print_results_overview(colls_to_search, results_final_nb_total, results_final_nb, cpu_time))
+            # collection list may have changed due to not-exact-match-found policy so check it out:
+            for coll in results_final.keys(): 
+                if coll not in colls_to_search:
+                    colls_to_search.append(coll)
             # print records:
             if len(colls_to_search)>1:
                 cpu_time = -1 # we do not want to have search time printed on each collection
-            colls_to_search.extend(results_final.keys())
             for coll in colls_to_search:                
                 if results_final.has_key(coll) and results_final[coll]._nbhits:
                     if of.startswith("h"):
