@@ -359,6 +359,7 @@ AC_CONFIG_FILES([Makefile \
 	  modules/bibconvert/bin/Makefile \
 	  modules/bibconvert/doc/Makefile \
 	  modules/bibconvert/doc/admin/Makefile \
+	  modules/bibconvert/etc/Makefile \
 	  modules/bibharvest/Makefile \
 	  modules/bibharvest/bin/Makefile \
 	  modules/bibharvest/lib/Makefile \
