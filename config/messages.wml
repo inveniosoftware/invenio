@@ -1520,52 +1520,51 @@
   <se>Inget index tillgängligt för</se>
 </define-tag>
 
+# FIXME
 <define-tag MSG_NO_HITS_IN_GIVEN_COLLECTION>
   <en>
-    No exact match found in selected collection(s).
-    Results from the whole public database follow.
+    No match found in collection %s.
+    Other public collections gave <a class="nearestterms" href="%s/search.py?%s">%d hits</a>.
   </en>
   <fr>
-    Aucun résultat exact n'a été trouvé dans les collections
-    sélectionnées.  Les résultats de toutes la base publique suivent.
+    Aucun résultat n'a été trouvé dans la collection %s.
+    Les autres collections publiques ont donné <a class="nearestterms" href="%s/search.py?%s">%d résultats</a>.
   </fr>
   <de>
-    Kein genaues Resultat in den ausgewählten Sammlung gefunden.
-    Resultate aus der ganzen öffentlichen Datenbank folgen:
+    Kein genaues Resultat in den Sammlung %s.
+    Other public collections gave <a class="nearestterms" href="%s/search.py?%s">%d hits</a>.
   </de>
   <es>
-    No hay documentos que respondan a la búsqueda en la(s) coleción(es)
-    seleccionadas.  A continuación se muestran los resultados de toda
-    la base de datos pública.
+    No hay documentos que respondan a la búsqueda en la coleción %s.
+    Other public collections gave <a class="nearestterms" href="%s/search.py?%s">%d hits</a>.
   </es>
   <pt>
-    Nenhum resultado exato foi encontrado na(s) coleção(ões)
-    selecionada(s).  Seguem resultados para todo o banco de dados
-    público.
+    Nenhum resultado foi encontrado na coleção %s.
+    Other public collections gave <a class="nearestterms" href="%s/search.py?%s">%d hits</a>.
   </pt>
   <it>
-    Nessun risultato trovato nelle collezioni selezionate.
-    Seguono risultati trovati in tutta la base dati pubblica.
+    Nessun risultato trovato nelle collezioni %s.
+    Other public collections gave <a class="nearestterms" href="%s/search.py?%s">%d hits</a>.
   </it>
   <ru>
-    Не найден точный результат во выбранном наборе.
-    Результаты из всех доступных наборов следуют.
+    Не найден результат в наборе %s.
+    Other public collections gave <a class="nearestterms" href="%s/search.py?%s">%d hits</a>.
   </ru>
   <sk>
-    Žiaden presný výsledok nebol vo zvolených kolekciách nájdený.
-    Výsledky z celej verejne prístupnej databázy nasledujú.
+    Žiaden záznam nebol nájdený v kolekcii %s.
+    Ostatné verejne dostupné kolekcie dali <a class="nearestterms" href="%s/search.py?%s">%d záznamov</a>.
   </sk>
   <cz>
-    Žádný přesný výsledek nebyl nalezen ve zvolených kolekcích.
-    Výsledky z celé veřejně přístupné databáze následují.
+    Žádný záznam nebyl nalezen v kolekci %s.
+    Ostatní veřejně dostupné kolekce dali <a class="nearestterms" href="%s/search.py?%s">%d záznamů</a>.
   </cz>
   <no>
-    Ingen nøyaktige treff funnet i valgt(e) samling(er).
-    Resultater fra hele den offentlige databasen følger.
+    Ingen nøyaktige treff funnet i samling %s.
+    Other public collections gave <a class="nearestterms" href="%s/search.py?%s">%d hits</a>.
   </no>
   <se>
-    Inga poster hittades i vald(a) samling(ar).
-    Sökresultat för hela databasen visas.
+    Inga poster hittades i samling %s.
+    Other public collections gave <a class="nearestterms" href="%s/search.py?%s">%d hits</a>.
   </se>
 </define-tag>
 
