@@ -8,7 +8,7 @@ uninstall-local:
 load-sample-data: install
 	./dbutil/dbexec < ./dbutil/samplecfgdata.sql
 	./cgibin/create_collection_pages ""+
-	(cd ./dbutil; ./cvxtm ./samplebibdata.xml)
+	(cd ./dbutil; ./bibupload ./samplebibdata.xml)
 	./dbutil/bibwords add 1-37
 	@echo "*******************************************************************************"
 	@echo "** The sample data has been successfully loaded.                             **"
@@ -18,17 +18,17 @@ load-sample-data: install
 	@echo "*******************************************************************************"
 
 clean-sample-data:
-	./dbutil/dbexec < ./dbutil/drop_tables.sql
-	./dbutil/dbexec < ./dbutil/create_tables.sql
+	./dbutil/dbexec < ./dbutil/tabdrop.sql
+	./dbutil/dbexec < ./dbutil/tabcreate.sql
 	./cgibin/create_collection_pages ""+
 	@echo "****************************************************"
 	@echo "** The sample data has been successfully cleaned. **"
 	@echo "****************************************************"
 
 create-tables:
-	./dbutil/dbexec < ./dbutil/create_tables.sql
+	./dbutil/dbexec < ./dbutil/tabcreate.sql
 
 drop-tables:
-	./dbutil/dbexec < ./dbutil/drop_tables.sql
+	./dbutil/dbexec < ./dbutil/tabdrop.sql
 
 CLEANFILES = *~
