@@ -319,13 +319,13 @@ a.navtrail:hover {
    margin-right: 60px;
    border-spacing: 0px;
    border-collapse: collapse;
+   border-top: 1px solid #36c;
 }
 .searchboxheader {
    color: #000;
    background: #f1f1f1;
    padding: 3px;
    border-spacing: 0px;
-   border-top: 1px solid #36c;
    font-size: small;
    text-align: left;
 }
@@ -352,7 +352,6 @@ a.navtrail:hover {
    background: #f1f1f1;
    padding: 3px;
    border-spacing: 0px;
-   /* border-bottom: 1px solid #999999; */
    font-size: small;
    text-align: left;
 }
