@@ -115,7 +115,7 @@ cds.alert@cdsdev.cern.ch
 ## SUPPORTEMAIL -- the email address of the support team for this installation:
 ##  (example: "cds.support@cern.ch")
 <define-tag SUPPORTEMAIL whitespace=delete>
-thomas.baron@cern.ch
+cds.support@cern.ch
 </define-tag>
 
 ## ADMINEMAIL -- the email address of the 'superuser' for this
@@ -124,7 +124,7 @@ thomas.baron@cern.ch
 ## be automatically recognized as superuser of the system.
 ##  (example: "cds.support@cern.ch")
 <define-tag ADMINEMAIL whitespace=delete>
-thomas.baron@cern.ch
+cds.support@cern.ch
 </define-tag>
 
 ## CFG_MAX_RECID -- maximum record ID number possible, i.e. the upper
@@ -233,7 +233,7 @@ thomas.baron@cern.ch
              &nbsp;
        </td>
        <td class="headermoduleboxbody">
-             <a class=header href="<WEBURL>/submit/?ln=<!--LN-->"><!--MSGSUBMIT--></a>
+             <a class=header href="<WEBURL>/submit.py?ln=<!--LN-->"><!--MSGSUBMIT--></a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
@@ -294,7 +294,7 @@ thomas.baron@cern.ch
   <table cellpadding=0 border=0 cellspacing=0 width="100%" class="footerbox">
   <tr>
   <td>
-  <!--CDSNAMEINTL-->&nbsp;::&nbsp;<a class=note href="<WEBURL>/?ln=<!--LN-->"><!--MSGSEARCH--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/submit/index.<!--LN-->.html"><!--MSGSUBMIT--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/help/index.<!--LN-->.html"><!--MSGHELP--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/youraccount.py/display?ln=<!--LN-->"><!--MSGPERSONALIZE--></a>
+  <!--CDSNAMEINTL-->&nbsp;::&nbsp;<a class=note href="<WEBURL>/?ln=<!--LN-->"><!--MSGSEARCH--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/submit.py?ln=<!--LN-->"><!--MSGSUBMIT--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/help/index.<!--LN-->.html"><!--MSGHELP--></a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/youraccount.py/display?ln=<!--LN-->"><!--MSGPERSONALIZE--></a>
   </td>
   <td align=right>
   <!--LASTUPDATED-->
