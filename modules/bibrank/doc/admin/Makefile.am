@@ -24,7 +24,7 @@ doc_DATA= index.html bibrankadminguide.html
 sampledir=$(WEBDIR)/admin/bibrank
 sample_DATA=jif.cfg jif.kb
 
-EXTRA_DIST = $(wildcard *.wml)
+EXTRA_DIST = $(wildcard *.wml) $(sample_DATA)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 
