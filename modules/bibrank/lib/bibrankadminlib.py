@@ -1078,18 +1078,22 @@ def modify_translations(ID, langs, sel_type, trans, table):
     langs - the languages
     trans - the translations, in same order as in langs
     table - the table"""
+
+    name = "name"
+    if table == "rnkMETHOD":
+        name = "NAME"
     
     try:
         for nr in range(0,len(langs)):
-            res = run_sql("SELECT value FROM %sname WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, table, ID, sel_type, langs[nr][0]))
+            res = run_sql("SELECT value FROM %s%s WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, name, table, ID, sel_type, langs[nr][0]))
             if res:
                 if trans[nr]:
-                    res = run_sql("UPDATE %sname SET value='%s' WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, MySQLdb.escape_string(trans[nr]), table, ID, sel_type, langs[nr][0]))
+                    res = run_sql("UPDATE %s%s SET value='%s' WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, name, MySQLdb.escape_string(trans[nr]), table, ID, sel_type, langs[nr][0]))
                 else:
-                    res = run_sql("DELETE FROM %sname WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, table, ID, sel_type, langs[nr][0]))    
+                    res = run_sql("DELETE FROM %s%s WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, name, table, ID, sel_type, langs[nr][0]))    
             else:
                 if trans[nr]:
-                    res = run_sql("INSERT INTO %sname(id_%s, type, ln, value) VALUES (%s,'%s','%s','%s')" % (table, table, ID, sel_type, langs[nr][0], MySQLdb.escape_string(trans[nr])))
+                    res = run_sql("INSERT INTO %s%s(id_%s, type, ln, value) VALUES (%s,'%s','%s','%s')" % (table, name, table, ID, sel_type, langs[nr][0], MySQLdb.escape_string(trans[nr])))
         return "true"
     except StandardError, e:
-        return ""
+	return ""
