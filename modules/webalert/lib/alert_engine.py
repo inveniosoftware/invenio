@@ -67,18 +67,32 @@ def get_alerts(query, frequency):
     return {'alerts': r, 'records': query['records'], 'argstr': query['argstr']}
 
     
-def add_record_to_basket(record_id, basket_id):
-    try:
-        return run_sql('insert into basket_record (id_basket, id_record) values(%s, %s);', (basket_id, record_id,))
-    except:
-        return 0
+# def add_record_to_basket(record_id, basket_id):
+#     try:
+#         return run_sql('insert into basket_record (id_basket, id_record) values(%s, %s);', (basket_id, record_id,))
+#     except:
+#         return 0
 
     
 def add_records_to_basket(record_ids, basket_id):
-    # TBD: generate the list and all all records in one step
-    for i in record_ids:
-        add_record_to_basket(i, basket_id)
+    global DEBUGLEVEL
+    
+    nrec = len(record_ids)
+    if nrec > 0:
+        vals = '(%s,%s)' % (basket_id, record_ids[0])
+        if nrec > 1:
+            for i in record_ids[1:]:
+                vals += ',(%s, %s)' % (basket_id, i)
 
+        if DEBUGLEVEL > 0:
+            print "-> adding %s records into basket %s: %s" % (nrec, basket_id, vals)
+        try:
+            return run_sql('insert into basket_record (id_basket, id_record) values %s;', (vals,))
+        except:
+            return 0
+    else:
+        return 0
+    
 
 def get_email(uid):
     r = run_sql('select email from user where id=%s', (uid,))
@@ -89,8 +103,12 @@ def get_query(alert_id):
     return r[0][0]
 
 def send_email(fromaddr, toaddr, body):
+    global DEBUGLEVEL
     server = smtplib.SMTP('smtp.cern.ch')
-    server.set_debuglevel(0)
+    if DEBUGLEVEL > 2:
+        server.set_debuglevel(1)
+    else:
+        server.set_debuglevel(0)
     server.sendmail(fromaddr, toaddr, body)
     server.quit()
 
@@ -131,20 +149,26 @@ def email_notify(alert, records, argstr):
 
     if len(records) == 0:
         return
+
+    msg = ""
     
-    msg = "\nHello\n\nBelow are the results of the email alert that you set up with the CERN Document Server:\n"
+    if DEBUGLEVEL > 0:
+        msg = "*** THIS MESSAGE WAS SENT IN DEBUG MODE, DON'T TAKE IT INTO ACCOUNT ***\n\n"
+        
+    msg += "Hello\n\nBelow are the results of the email alert that you set up with the CERN Document Server:\n"
 
     email = get_email(alert[0])
     url = weburl + "/search.py?" + argstr
     pattern = get_pattern(argstr)
     catalogue = get_catalogue(argstr)
     
-    msg += '\nalert name   : \'%s\'' % alert[5]
-    msg += '\npattern      : \'%s\'' % pattern
-    msg += '\ncatalogue(s) : %s' % catalogue
-    msg += '\nfrequency    : %s ' % format_frequency(alert[3])
-    msg += '\nrun time     : %s ' % strftime("%c")
-
+    msg += '\nalert name: \'%s\'' % alert[5]
+    msg += '\npattern: \'%s\'' % pattern
+    msg += '\ncatalogue(s): %s' % catalogue
+    msg += '\nfrequency: %s ' % format_frequency(alert[3])
+    msg += '\nrun time: %s ' % strftime("%c")
+    msg += '\nfound: %s record(s)' % len(records)
+    
     msg += print_records(records)
 
     msg += "\n\nThe search URL for this alert is <%s>\n\n" % url
@@ -201,7 +225,6 @@ def get_record_ids(argstr, date_from, date_until):
     d2y, d2m, d2d = date_until
 
     return perform_request_search(of='id', p=p, c=c, cc=cc, f=f, so=so, sp=sp, ot=ot, as=as, p1=p1, f1=f1, m1=m1, op1=op1, p2=p2, f2=f2, m2=m2, op2=op2, p3=p3, f3=f3, m3=m3, sc=sc, search=search, d1y=d1y, d1m=d1m, d1d=d1d, d2y=d2y, d2m=d2m, d2d=d2d)
-    # return [7, 9, 13, 15, 20]
 
 
 def get_argument_as_string(argstr, argname):
@@ -248,9 +271,9 @@ def run_query(query, frequency):
 
     time = localtime()
     # Override time here for testing purposes (beware of localtime offset):
-    #time = (2003, 1, 10, 2, 0, 0, 2, 120, 1) # ('2003', '01', '10')
+    time = (2002, 12, 21, 2, 0, 0, 2, 120, 1)
     # Override frequency here for testing
-    #frequency = 'week'
+    frequency = 'week'
     ystr = strftime("%Y", time)
     mstr = strftime("%m", time)
     dstr = strftime("%d", time)
