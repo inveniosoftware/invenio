@@ -284,11 +284,9 @@ TRUE
 </define-tag>
 
 <define-tag ADMINEMAIL whitespace=delete>
-thomas.baron@cern.ch
 </define-tag>
 
 <define-tag SUBMITSUPPORTEMAIL whitespace=delete>
-thomas.baron@cern.ch
 </define-tag>
 
 ## And this is the end of "config.wml" WML configuration phase.  Now
