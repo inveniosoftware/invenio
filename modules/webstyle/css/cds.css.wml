@@ -328,7 +328,6 @@ a.userinfobox:hover {
    border-spacing: 0px;
    border-collapse: collapse;
    border-top: 1px solid #fc0; 
-   border-bottom: 1px solid #fc0; 
 }
 .searchresultsboxheader {
    color: #000;
@@ -341,7 +340,8 @@ a.userinfobox:hover {
 .searchresultsboxbody {
    color: #000;
    background: transparent;
-   border-top: 1px solid #fc0; 
+   border-top: 1px dotted #fc0; 
+   border-bottom: 1px dotted #fc0; 
    padding: 2px;
 }
 .moreinfo {
