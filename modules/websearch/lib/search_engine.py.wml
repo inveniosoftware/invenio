@@ -2689,8 +2689,11 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                     urls_u = get_fieldvalues(recID, "8564_u")
                     for idx in range(0,len(urls_u)):
                         link_text = "URL"
-                        if urls_z[idx]:
-                            link_text = urls_z[idx]
+                        try:
+                            if urls_z[idx]:
+                                link_text = urls_z[idx]
+                        except IndexError:
+                            pass
                         out += """<p style="margin-left: 15%%; width: 70%%">
                         <small><strong>%s:</strong> <a href="%s">%s</a></small>""" % (link_text, urls_u[idx], urls_u[idx])
                     # print some white space at the end:
