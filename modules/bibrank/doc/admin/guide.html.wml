@@ -21,26 +21,26 @@
     title="BibRank Admin Guide" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/bibrank/>BibRank Admin</a>" \ 
     navbar_name="admin" \
-    navbar_select="bibrank"
+    navbar_select="bibrank-admin-guide"
 
-<h3>Index</h3>
-<strong>1.<a href="#o">Overview</a></strong></br>
-<strong>2.<a href="#c">Configuration Conventions</a></strong></br>
-<strong>3.<a href="#bai">BibRank Admin Interface</a></strong></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1.<a href="#mi">Main interface</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2.<a href="#ar">Add rank method</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3.<a href="#sd">Show details of rank method</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4.<a href="#mr">Modify rank method</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5.<a href="#dr">Delete rank method</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.6.<a href="#mt">Modify translations</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.7.<a href="#mc">Modify visibility toward collections</a></br>
-<strong>4.<a href="#bd">BibRank Daemon</a></strong></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1.<a href="#cli1">Command Line Interface</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.2.<a href="#ubd">Using BibRank</a></br>
-<strong>5.<a href="#bt">bibrankgkb Tool</a></strong></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.1.<a href="#cli2">Command Line Interface</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.2.<a href="#ubt">Using bibrankgkb</a></br>
-<strong>6.<a href="#ainf">Additional Information</a></strong></br>
+<h2>Contents</h2>
+<strong>1.<a href="#o">Overview</a></strong><br>
+<strong>2.<a href="#c">Configuration Conventions</a></strong><br>
+<strong>3.<a href="#bai">BibRank Admin Interface</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1.<a href="#mi">Main interface</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2.<a href="#ar">Add rank method</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3.<a href="#sd">Show details of rank method</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4.<a href="#mr">Modify rank method</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5.<a href="#dr">Delete rank method</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.6.<a href="#mt">Modify translations</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.7.<a href="#mc">Modify visibility toward collections</a><br>
+<strong>4.<a href="#bd">BibRank Daemon</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1.<a href="#cli1">Command Line Interface</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.2.<a href="#ubd">Using BibRank</a><br>
+<strong>5.<a href="#bt">bibrankgkb Tool</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.1.<a href="#cli2">Command Line Interface</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.2.<a href="#ubt">Using bibrankgkb</a><br>
+<strong>6.<a href="#ainf">Additional Information</a></strong><br>
 
 <a name="o"></a><h2>1. Overview</h2>
 <p>The bibrank module consist currently of two tools:
