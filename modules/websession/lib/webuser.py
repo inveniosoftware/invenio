@@ -57,36 +57,25 @@ def createGuestUser():
 
 def page_not_authorized(req, referer='', uid='', text='', navtrail=''):
     """Show error message when account is not activated"""
-    import cdsware.bibrankadminlib as brl
     from cdsware.webpage import page
-   
+
     if not CFG_ACCESS_CONTROL_SITE_TEMPORARILY_CLOSED:
-        if not uid:
-            uid = getUid(req)
+        title = cfg_webaccess_msgs[5]
+        if not uid: uid = getUid(req)
         res = run_sql("SELECT email FROM user WHERE id=%s" % uid)
         if res and res[0][0]:
-            if text:
-                datalist = [text]
-            else:
-                datalist = ["%s %s" % (cfg_webaccess_warning_msgs[9] % res[0][0], ("%s %s" % (cfg_webaccess_msgs[0] % referer, cfg_webaccess_msgs[1])))]
-                
-            return page(title='Authorization failure',
-                        uid=getUid(req),
-                        body=brl.adderrorbox('',datalist=datalist),
-                        navtrail=navtrail)
+            if text: body = text
+            else: body = "%s %s" % (cfg_webaccess_warning_msgs[9] % res[0][0], ("%s %s" % (cfg_webaccess_msgs[0] % referer, cfg_webaccess_msgs[1])))
         else:
-            if text:
-                body = text
-            else:
-                body = """Guest users are not allowed, please <a href="%s/youraccount.py/login">login</a>.""" % weburl
-            return page(title='Authorization failure',
-                uid=getUid(req),
-                body=body,
-                navtrail=navtrail)
+            if text: body = text
+            else: body = cfg_webaccess_msgs[3]
     else:
-        return page(title='%s temporarily closed' % cdsname,
-                    uid=getUid(req),
-                    body=brl.adderrorbox('',datalist=["%s %s" % (cfg_webaccess_warning_msgs[10], cfg_webaccess_msgs[2])]))
+        title = cfg_webaccess_msgs[6]
+        body = "%s %s" % (cfg_webaccess_msgs[4], cfg_webaccess_msgs[2])
+
+    return page(title=title,
+                uid=getUid(req),
+                body=body)
         
 def getUid (req):
     """It gives the userId taking it from the cookie of the request,also has the control mechanism for the guest users,
@@ -95,8 +84,7 @@ def getUid (req):
        getUid(req) -> userId	 
     """
 
-    if CFG_ACCESS_CONTROL_SITE_TEMPORARILY_CLOSED:
-        return -1
+    if CFG_ACCESS_CONTROL_SITE_TEMPORARILY_CLOSED: return -1
 
     guest = 0
     sm = session.MPSessionManager(pSession, pSessionMapping())
