@@ -68,10 +68,6 @@ Contents
                     --with-dbuser=cdsware \
                     --with-dbpass=myp1ss 
       $ vi ./config/config.wml  ## optional, but strongly recommended
-				## fill in the ADMINEMAIL variable with 
-				## the email address of the main responsible
-				## person. He/she will then be considered by
-				## the system as a superuser.
       $ gmake
       $ gmake create-tables     ## optional
       $ gmake install
@@ -185,21 +181,22 @@ Contents
 
       $ vi ./config/config.wml  ## optional, but strongly recommended
 
-          Optionally, customize your CDSware installation.  Unlike the
-          installation directories and other essential parameters that
-          were defined in the previous step, the "config.wml" file
-          enables you to change the CDSware web page look and feel, and
-          otherwise to influence its behaviour and default parameters.
+          Optionally, customize your CDSware installation.  We
+          strongly recommend you to edit at least the top of this file
+          where you can define some rather essential CDSware
+          parameters like the name of your CDSware document server or
+          the email address of the local CDSware administrator.  (The
+          latter is needed if you want to use admin. modules in
+          general.)
+
+          The rest of the "config.wml" file enables you to change the
+          CDSware web page look and feel, and otherwise to influence
+          its behaviour and default parameters.
 
           This configuration step is optional, but strongly
           recommended.  It is referred to as "compile time
           configuration step b)" in the elucidative explanatory
           commentary below.
-
-          An important variable to edit if you want to use the webSubmit and
-          the admin modules in general is ADMINEMAIL. Enter your email address
-          here and login with this address when using these modules. You will 
-          then be automatically recognized as superuser for the system.
 
       $ gmake
 
