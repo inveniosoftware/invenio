@@ -2092,44 +2092,46 @@ CREATE TABLE IF NOT EXISTS user_rule (
 
 -- tables for access control engine
 
-CREATE TABLE IF NOT EXISTS aceROLE (
+CREATE TABLE IF NOT EXISTS accROLE (
   id int(15) unsigned NOT NULL auto_increment, 
   name varchar(32), 
   description varchar(255), 
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE KEY name (name)
 ) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS user_aceROLE (
+CREATE TABLE IF NOT EXISTS user_accROLE (
   id_user int(15) unsigned NOT NULL,
-  id_aceROLE int(15) unsigned NOT NULL,
-  PRIMARY KEY (id_user, id_aceROLE)
+  id_accROLE int(15) unsigned NOT NULL,
+  PRIMARY KEY (id_user, id_accROLE)
 ) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS aceACTION (
+CREATE TABLE IF NOT EXISTS accACTION (
   id int(15) unsigned NOT NULL auto_increment,
   name varchar(32),
   description varchar(255),
   allowedkeywords varchar(255),
+  optional ENUM ('yes', 'no') NOT NULL default 'no',
   PRIMARY KEY (id), 
   UNIQUE KEY name (name)
 ) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS aceARGUMENT (
+CREATE TABLE IF NOT EXISTS accARGUMENT (
   id int(15) unsigned NOT NULL auto_increment,
-  keyword varchar (15),
-  value varchar(15),
+  keyword varchar (32),
+  value varchar(64),
   PRIMARY KEY (id),
   KEY KEYVAL (keyword, value)
 ) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS aceROLE_aceACTION_aceARGUMENT (
-  id_aceROLE int(15),
-  id_aceACTION int(15),
-  id_aceARGUMENT int(15),
+CREATE TABLE IF NOT EXISTS accROLE_accACTION_accARGUMENT (
+  id_accROLE int(15),
+  id_accACTION int(15),
+  id_accARGUMENT int(15),
   argumentlistid mediumint(8),
-  KEY id_aceROLE     (id_aceROLE),
-  KEY id_aceACTION   (id_aceACTION),
-  KEY id_aceARGUMENT (id_aceARGUMENT)
+  KEY id_accROLE     (id_accROLE),
+  KEY id_accACTION   (id_accACTION),
+  KEY id_accARGUMENT (id_accARGUMENT)
 ) TYPE=MyISAM;
 
 -- tables for personal features (baskets, alerts, searches):
