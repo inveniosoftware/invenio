@@ -80,10 +80,10 @@ def index(req,c=cdsname,ln=cdslang,recid="",docid="",version="",name="",format="
         title += " document #%s" % docid
     if version != "":
         title += " version #%s" % version
-    t = """<center><table class="searchbox" summary="" width="500"><tr><th class="portalboxheader">Archive&nbsp;&nbsp;&nbsp;&nbsp;<font size=-2>[%s]</font></th></tr><tr><td class="portalboxbody">\n""" % title
+    t = """<center><table class="searchbox" summary="" width="500"><tr><th class="portalboxheader">Access&nbsp;to&nbsp;Fulltext&nbsp;&nbsp;&nbsp;&nbsp;<font size=-2>[%s]</font></th></tr><tr><td class="portalboxbody">\n""" % title
     t+=filelist
     t+="""</td></tr></table></center>\n"""
-    p_navtrail = "Archive"
+    p_navtrail = "Access to Fulltext"
     return page(title="",
                      body=t,
                      navtrail = p_navtrail,
