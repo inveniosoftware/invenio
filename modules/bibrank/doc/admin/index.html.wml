@@ -42,7 +42,7 @@ sources.</p>
 may be necessary to obtain. This data may for example be the 'Journal Impact Factors' from the 'Science Citation Index'.
 If you are using different naming convention between various sources, you can provide a convertion file so that the data can be converted to
 a common naming convention. For an example of a file with the necessary data for the journal impact factor method to work together with the demo installation, check out the example file 'jif.kb' below.
-To create the proper files from various sources, please check out the <a href="bibrankadminguide.html">BibRank Admin Guide</a> and the bibrankgkb tool.</p>
+To create the proper files from various sources, please check out the <a href="guide.html">BibRank Admin Guide</a> and the bibrankgkb tool.</p>
 
 To be able to run a rank method, you must first add the ranking option to the correct
 collections, so that it appears as an option for ranking results, and add the abbreviation for the ranking method to the database. In this case
@@ -137,5 +137,5 @@ the creation of an up to date rankmethod without doing a full update,  use '-m d
 <p>It should now be possible to rank the results after a search based on the journal impact factor.</p>
 
 <h3>Additional Information</h3>
-<a href="bibrankadminguide.html">BibRank Admin Guide</a></br>
+<a href="guide.html">BibRank Admin Guide</a></br>
 <a href="http://cdsdev.cern.ch:8000/DEMODEV/hacking/bibrank/">BibRank Internals</a>
