@@ -437,7 +437,8 @@ def OAIListRecords(args):
 
     # check if the resumptionToken did not expire
     if arg['resumptionToken']:
-        filename = "%s/RTdata/%s" % (logdir, arg['resumptionToken'])
+#        filename = "%s/RTdata/%s" % (logdir, arg['resumptionToken'])
+        filename = "%s/%s" % (logdir, arg['resumptionToken'])
         if os.path.exists(filename) == 0:
              out = oai_error("badResumptionToken","ResumptionToken expired")
              out = oai_error_header(args, "ListRecords") + out + oai_error_footer("ListRecords")
@@ -451,7 +452,7 @@ def OAIListRecords(args):
 
     if len(sysnos) == 0: # noRecordsMatch error
         
-        out = out + oai_error("noRecordsMatch","no records correspond to the request")
+        out = out + oai_error("noRecordsMatch","no_ records correspond to the request")
         out = oai_error_header(args, "ListRecords") + out + oai_error_footer("ListRecords")
         return out
 
@@ -548,7 +549,8 @@ def OAIListIdentifiers(args):
     sysnos = []
 
     if arg['resumptionToken']:
-        filename = "%s/RTdata/%s" % (logdir, arg['resumptionToken'])
+#        filename = "%s/RTdata/%s" % (logdir, arg['resumptionToken'])
+        filename = "%s/%s" % (logdir, arg['resumptionToken'])
         if os.path.exists(filename) == 0:
              out = out + oai_error("badResumptionToken","ResumptionToken expired")
              out = oai_error_header(args, "ListIdentifiers") + out + oai_error_footer("ListIdentifiers")
@@ -589,7 +591,7 @@ def OAIListIdentifiers(args):
                             out = "%s      <identifier>%s</identifier>\n" % (out, escape_space(id))
                             out = "%s      <datestamp>%s</datestamp>\n" % (out, get_modification_date(OAIGetSysno(id)))
                             for set in get_field(s,oaisetfield):
-                                out = "%s      <setSpec>%s</setSpec>\n" % (out, arg['set'])
+                                out = "%s      <setSpec>%s</setSpec>\n" % (out, set)
                             out = out + "    </header>\n"
                         done = 1
 
@@ -708,7 +710,8 @@ def OAIGenResumptionToken():
 def OAICacheIn(resumptionToken, sysnos):
     "Stores or adds sysnos in cache.  Input is a string of sysnos separated by commas."
 
-    filename = "%s/RTdata/%s" % (logdir, resumptionToken)
+#    filename = "%s/RTdata/%s" % (logdir, resumptionToken)
+    filename = "%s/%s" % (logdir, resumptionToken)
 
     fil = open(filename,"w")
     cPickle.dump(sysnos,fil)
@@ -721,7 +724,8 @@ def OAICacheOut(resumptionToken):
     
     sysnos = []
 
-    filename = "%s/RTdata/%s" % (logdir, resumptionToken)
+#    filename = "%s/RTdata/%s" % (logdir, resumptionToken)
+    filename = "%s/%s" % (logdir, resumptionToken)
 
     if OAICacheStatus(resumptionToken):
         fil = open(filename,"r")
@@ -739,7 +743,8 @@ def OAICacheClean():
     oai_rt_expire = <OAIEXPIRE>
 <protect>
 
-    directory = "%s/RTdata" % logdir
+#    directory = "%s/RTdata" % logdir
+    directory = "%s" % logdir
 
     files = os.listdir(directory)
 
@@ -755,7 +760,8 @@ def OAICacheClean():
 def OAICacheStatus(resumptionToken):
     "Checks cache status.  Returns 0 for empty, 1 for full."
     
-    filename = "%s/RTdata/%s" % (logdir, resumptionToken)
+#    filename = "%s/RTdata/%s" % (logdir, resumptionToken)
+    filename = "%s/%s" % (logdir, resumptionToken)
     
     if os.path.exists(filename):
         if os.path.getsize(filename) > 0:
