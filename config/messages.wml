@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file enables you to configure the messages that CDSware emits
@@ -671,17 +672,47 @@
 </define-tag>
 
 <define-tag MSG_TRY_YOUR_SEARCH_ON whitespace=delete>
-  <en>Try your search on:</en>
-  <fr>Essayer votre requête sur:</fr>
-  <de>Versuchen Sie Ihre Suche mit:</de>
-  <es>Intentar la búsqueda en:</es>
-  <pt>Tentar sua busca em:</pt>
-  <it>Provate la ricerca su:</it>
-  <ru>Попробуйте искать с:</ru>
-  <sk>Skúste hľadať na:</sk>
-  <cz>Zkuste hledat na:</cz>
-  <no>Prøv søket på:</no>
-  <se>Pröva att söka efter:</se>
+  <en>Try your search on...</en>
+  <fr>Essayer votre requête sur...</fr>
+  <de>Versuchen Sie Ihre Suche mit...</de>
+  <es>Intentar la búsqueda en...</es>
+  <pt>Tentar sua busca em...</pt>
+  <it>Provate la ricerca su...</it>
+  <ru>Попробуйте искать с...</ru>
+  <sk>Skúste hľadať na...</sk>
+  <cz>Zkuste hledat na...</cz>
+  <no>Prøv søket på...</no>
+  <se>Pröva att söka efter...</se>
+</define-tag>
+
+# FIXME
+<define-tag MSG_NOT_FOUND_WHAT_YOU_WERE_LOOKING_FOR whitespace=delete>
+  <en>Haven't found what you were looking for?  Try your search on other servers:</en>
+  <fr>Vous n'avez pas trouvé ce que vous avez cherché?  Essayez votre requête sur d'autres serveurs:</fr>
+  <de>Haven't found what you were looking for?  Versuchen Sie Ihre Suche mit:</de>
+  <es>Haven't found what you were looking for?  Intentar la búsqueda en:</es>
+  <pt>Haven't found what you were looking for?  Tentar sua busca em:</pt>
+  <it>Haven't found what you were looking for?  Provate la ricerca su:</it>
+  <ru>Haven't found what you were looking for?  Попробуйте искать с:</ru>
+  <sk>Nenašli ste čo ste hľadali?  Skúste Vašu otázku na iných serveroch:</sk>
+  <cz>Nenalezli jste co jste hledali?  Zkuste Váš dotaz na jiných servrech:</cz>
+  <no>Haven't found what you were looking for?  Prøv søket på:</no>
+  <se>Haven't found what you were looking for?  Pröva att söka efter:</se>
+</define-tag>
+
+# FIXME
+<define-tag MSG_SEE_ALSO_SIMILAR_AUTHOR_NAMES whitespace=delete>
+  <en>See also: similar author names</en>
+  <fr>Voir aussi: noms d'auteurs similaires</fr>
+  <de>Sehen Sie auch: similar author names</de>
+  <es>Vea también: similar author names</es>
+  <pt>Veja também: similar author names</pt>
+  <it>Vedi anche: similar author names</it>
+  <ru>Смотрите также: similar author names</ru>
+  <sk>Viď tiež: podobné mená autorov</sk>
+  <cz>Viz též: podobná jména autorů</cz>
+  <no>Se også: similar author names</no>
+  <se>Se även: similar author names</se>
 </define-tag>
 
 <define-tag MSG_SORT_BY whitespace=delete>

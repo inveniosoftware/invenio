@@ -1,4 +1,4 @@
-
+## -*- mode: text; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of the CERN Document Server Software (CDSware).
@@ -597,28 +597,50 @@ a.footer:hover {
 .admintdright {
    text-align: right;
 }
+a.google:link {
+   color: #333;
+   background: transparent;
+}
+a.google:visited {
+   color: #333;
+   background: transparent;
+}
+a.google:active {
+   color: #333;
+   background: transparent;
+}
+a.google:hover {
+   color: #333;
+   background: transparent;
+}
 .googlebox {
-   color: #000;
+   color: #333;
    background: #fff;
-   margin-top: 5px;
-   margin-bottom: 5px;
-   padding: 0px;
+   text-align: left;
+   margin-left: auto;
+   margin-right: auto;
+   margin-top: 50px;
+   padding: 10px;
+   font-size: small;
    border-spacing: 0px;
    border-collapse: collapse;
-   border-top: 1px solid #999999;
-   width: 120px;
+   border-top: 1px solid #fc0;
 }
 .googleboxheader {
-   color: #000;
-   background: #f1f1f1;
-   border-bottom: 1px solid #999999;
-   font-size: x-small;
-   text-align: left;
+   color: #333;
+   background: #ffc;
+   font-weight: normal;
+   font-size: small;
+   vertical-align: top;
 }
 .googleboxbody {
-   color: #000;
+   color: #333;
    background: #fff;
-   font-size: x-small;
+   padding-left: 5px;
+   padding-right: 5px;
+   font-size: small;
+   text-align: left;
+   vertical-align: top;
 }
 .adminbox {
    color: #000;
