@@ -70,6 +70,7 @@
     }
     $row=mysql_fetch_array($qh);
     list($code, $doc)=$row;
+    $code = str_replace("&nbsp;","&amp;nbsp;",$code);
 ?>
 <form action="FORMAT_edit.php" method="POST">
   <table witdth="100%" bgcolor="#CCCCCC" cellpadding="4" cellspacing="4">
