@@ -7,6 +7,9 @@ CDSware TODO list
 Suitable for editing with Emacs ToDoo mode, see
 <http://www.emacswiki.org/cgi-bin/wiki/ToDoo>.
 
+o [simko] language-dependent portalboxes 
+  Received Wed Feb 11 12:53:13 2004
+
 o [tibor] static HTML pages should not get created all languages
   Static HTML pages should not get created all languages when user
   selected only some languages in his config.wml.
@@ -27,6 +30,7 @@ o [tibor] Internal Error exceptions.KeyError 'Articles & Preprints'
 o [tibor] CDSware DEMO formats
    - picture links should use recid not sysnb
    - use /search.py  not /search in links
+   - print creation/modification dates in HTML Detailed format
   Received Mon Jan 19 10:41:18 2004
 
 o [tibor] RTdata dir should be created during `make install` ?
