@@ -48,7 +48,7 @@ except ImportError, e:
 MAXIDS = 50
 FROMADDR = 'CDS Alert Engine <%s>' % alertengineemail
 ALERTURL = weburl + '/youralerts.py/list'
-DEVELOPERADDR = ['erik.simon@cern.ch', 'tibor.simko@cern.ch']
+DEVELOPERADDR = [supportemail]
 
 # Debug levels:
 # 0 = production, nothing on the console, email sent
