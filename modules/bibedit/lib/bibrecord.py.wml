@@ -665,7 +665,7 @@ def create_record_4suite(xmltext,verbose=verbose,correct=correct):
              else:
                 subfields.append(('!',v))
 
-        s = datafield.getAttributeNS(None,"tag")
+        s = datafield.getAttributeNS(None,"tag").encode("utf-8")
         if s == '':
             s = '!'
             
@@ -682,9 +682,6 @@ def create_record_4suite(xmltext,verbose=verbose,correct=correct):
 
     return (record,err)
 
-
-
-
 def record_order_fields(rec,fun="order_by_ord"):
     """orders field inside record 'rec' according to a function"""
     rec.sort(eval(fun))
@@ -697,8 +694,6 @@ def record_order_subfields(rec,fun="order_by_code"):
             field[0].sort(eval(fun))
     return
     
-
-
 def concat(list):
     """concats a list of lists"""
     newl = []
@@ -706,9 +701,6 @@ def concat(list):
         newl.extend(l)
     return newl
 
-
-
-   
 def create_field(value,ind1="",ind2="",subfields=[],ord=-1):
     """ creates a field object and returns it"""
     
