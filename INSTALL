@@ -7,8 +7,8 @@ About
 =====
 
 This document specifies how to build, customize, and install the CERN
-Document Server Software (CDSware).  (See 'UNINSTALL' file if you look 
-for information on how to uninstall the system!)
+Document Server Software (CDSware) for the first time.  See
+RELEASE-NOTES if you are upgrading from a previous CDSware release.
 
 Contents
 ========

@@ -6,9 +6,10 @@ Revision: $Id$
 About
 =====
 
-This document specifies how to uninstall the CERN Document 
-Server Software (CDSware).  (See 'INSTALL' file if you look  
-for information on how to install the system!)
+This document specifies how to uninstall the CERN Document Server
+Software (CDSware).  See INSTALL if you look for information on how to
+install the system.  See RELEASE-NOTES if you are upgrading from a
+previous CDSware release.
 
 Contents
 ========
