@@ -19,110 +19,11 @@
 
 #include "cdspage.wml" \
     title="BibConvert Admin" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a>"  \
     navbar_name="admin" \
     navbar_select="bibconvert"
-	    
-<p>BibConvert utility enables you to convert metadata records from
-various metadata formats into another metadata format supported by
-local database. It is designed to process metadata records harvested
-in XML converting them into MARC21 before they are finally uploaded
-into database. However, BibConvert is flexible enough to deal also
-with other structured metadata according to your needs and offers a
-way, how you actually can insert what you want into the database.
 
-<p>It is suitable for tasks such as conversion of records received
-from multiple data sources or conversion of records from another
-system that may support a different metadata format.
-
-<h2>Configuring BibConvert</h2>
-
-<p>OAI DublinCore into MARC21 and OAI MARC into MARC21
-configurations will be provided as default configuration, ensuring the
-standard uploading sequence (incl. <a href="../bibharvest/">BibHarvest</a> and <a
-href="../bibupload/">BibUpload</a> utilities). Other configurations can be
-created according to your needs. The configuration file that has to be
-created for each data source is a text file with following structure:
-
-<protect>
-<blockquote>
-<pre>
-### the configuration starts here
-### Configuration of bibconvert templates
-### source data : <source_data_name>
-
-=== data extraction configuration template ===
-### here comes the data extraction configuration template
-#   entry example:
-
-AU---%A---MAX---;---
-
-#   extracts maximum available data by field from metadata record
-#   the values are found between specified tags
-#   in this case between the '%A' tag and other tags defined
-#   repetitive values are recognized by a semicolon separator
-#   resp. by multiple presence of '%A' tag
-
-===   data source configuration template   ===
-### here comes the data source configuration template
-#   entry example:
-
-AU---<:FIRSTNAME:>-<:SURNAME:>
-
-#   describes the contents of extracted source data fields
-#   in this case, the field AU is described as having two distinct subfields
-
-===   data target configuration template   ===
-### here comes the data target configuration template
-#   entry example:
-
-AU::CONF(AU,,0)---&lt;datafield id="700" ind1="" ind2="">&lt;subfield code="a">&lt;:AU*::SURNAME::CAP():>, &lt;AU*::FIRSTNAME::ABR():>&lt;/subfield>&lt;/datafield>
-
-#   This section concerns rather the desired output, while previous two were focused on the data source structures.
-#   Each line equals to one output line, composed of given literals and values from extracted source data fields.
-#   In this example, the XML Marc21 output line is defined, 
-#   containing re-formatted values of source fields SURNAME and FIRSTNAME
-
-### the configuration ends here
-</pre>
-</blockquote>
-</protect>
-
-<p>Having prepared a configuration, the BibConvert will convert the
-source data file according to it in a batch mode. The BibConvert is
-fully compatible with the Uploader1.x configuration language. For more
-information, have a look at the <a href="guide.html">BibConvert Admin Guide</a>.
-<br><small class="example">BEWARE: At present, BibConvert Admin
-Guide is a snapshot of an internal document.  You may have a look at
-it but please do not distribute it further.  We'll upgrade it
-soon.</small>
-
-<h2>Running BibConvert</h2>
-
-<p>For a fully functional demo, consider the following sample input data:
-
-<blockquote>
-<a href="sample.dat">sample.dat</a> -- sample bibliographic data to be converted and inputted into CDSware
-<br><a href="sample.cfg">sample.cfg</a> -- sample configuration file, featuring knowledge base demo
-</blockquote>
-
-<p>To convert the above data into XML MARC, use the following command:
-
-<blockquote>
-<pre>
-$ bibconvert -b'&lt;collection>' -csample.cfg -e'&lt;/collection>' < sample.dat > /tmp/sample.xml
-<pre>
-</blockquote>
-
-and see the XML MARC output file.  You would then continue the upload procedure by calling <a
-href="../bibupload/">BibUpload</a>.
-
-<p>Other useful BibConvert configuration examples:
-
-<blockquote>
-<a href="dcq.cfg">dcq.cfg</a> -- Qualified Dublin Core in SGML to XML MARC example
-<br><a href="dcq.dat">dcq.dat</a> -- corresponding data file, featuring collection identifiers demo
-</blockquote>
-
-<blockquote>
-<a href="bibtex.cfg">bibtex.cfg</a> -- BibTeX to XML MARC example
-</blockquote>
+<dl>
+ <dt><a href="guide.html">BibConvert Admin Guide</a></dt>
+ <dd>Everything you want to know about configuring and running BibConvert.</dd>
+</dl>

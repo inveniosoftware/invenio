@@ -20,30 +20,136 @@
 #include "cdspage.wml" \
     title="BibConvert Admin Guide" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/bibconvert/>BibConvert Admin</a>" \
-    navbar_select="bibconvert"
+    navbar_name="admin" \
+    navbar_select="bibconvert-admin-guide"
 
-<p/>
-<A HREF="#1">Guide to BibConvert Configuration</a>
-<BR>&nbsp;<A HREF="#G">Conventions</A>
-<BR>&nbsp;<A HREF="#1">Step 1 Definition of Source Record</A>
-<BR>&nbsp;<A HREF="#2">Step 2 Definition of Source Fields</A>
-<BR>&nbsp;<A HREF="#3">Step 3 Definition of Target Record</A>
-<BR>&nbsp;<A HREF="#4">Step 4 Main Configuration</A>
-<BR>&nbsp;<A HREF="#5">Step 5 Other Configuration Files</A>
-<p/>
-<br><A HREF="#5">Formatting in BibConvert</a>
-<BR>&nbsp;<A HREF="#51">Definition of Formatting Functions</A>
-<BR>&nbsp;<A HREF="#52">Generated Values</A>
-<p/>
+<h2>Contents</h2>
+<strong>1. <a href="#1">Overview</a></strong><br>
+<strong>2. <a href="#2">Configuration Example</a></strong><br>
+<strong>3. <a href="#3">Running BibConvert</a></strong><br>
+<strong>4. <a href="#4">BibConvert Configuration Guide</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#G">Conventions</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1. <a href="#4.1">Step 1 Definition of Source Record</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.2. <a href="#4.2">Step 2 Definition of Source Fields</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.3. <a href="#4.3">Step 3 Definition of Target Record</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.4. <a href="#4.4">Formatting in BibConvert</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.4.1 <a href="#4.4.1">Definition of Formatting Functions</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.4.2 <a href="#4.4.2">Generated Values</a><br>
 
-<h2><A NAME="G"></A>Conventions</h2>
+<a name="1"></a><h2>1. Overview</h2>
+
+<p>BibConvert utility enables you to convert metadata records from
+various metadata formats into another metadata format supported by
+local database. It is designed to process metadata records harvested
+in XML converting them into MARC21 before they are finally uploaded
+into database. However, BibConvert is flexible enough to deal also
+with other structured metadata according to your needs and offers a
+way, how you actually can insert what you want into the database.
+
+<p>It is suitable for tasks such as conversion of records received
+from multiple data sources or conversion of records from another
+system that may support a different metadata format.
+
+<a name="2"></a><h2>2. Configuration Example</h2>
+
+<p>OAI DublinCore into MARC21 and OAI MARC into MARC21
+configurations will be provided as default configuration, ensuring the
+standard uploading sequence (incl. <a href="../bibharvest/">BibHarvest</a> and <a
+href="../bibupload/">BibUpload</a> utilities). Other configurations can be
+created according to your needs. The configuration file that has to be
+created for each data source is a text file with following structure:
+
+<protect>
+<blockquote>
+<pre>
+### the configuration starts here
+### Configuration of bibconvert templates
+### source data : <source_data_name>
+
+=== data extraction configuration template ===
+### here comes the data extraction configuration template
+#   entry example:
+
+AU---%A---MAX---;---
+
+#   extracts maximum available data by field from metadata record
+#   the values are found between specified tags
+#   in this case between the '%A' tag and other tags defined
+#   repetitive values are recognized by a semicolon separator
+#   resp. by multiple presence of '%A' tag
+
+===   data source configuration template   ===
+### here comes the data source configuration template
+#   entry example:
+
+AU---<:FIRSTNAME:>-<:SURNAME:>
+
+#   describes the contents of extracted source data fields
+#   in this case, the field AU is described as having two distinct subfields
+
+===   data target configuration template   ===
+### here comes the data target configuration template
+#   entry example:
+
+AU::CONF(AU,,0)---&lt;datafield id="700" ind1="" ind2="">&lt;subfield code="a">&lt;:AU*::SURNAME::CAP():>, &lt;AU*::FIRSTNAME::ABR():>&lt;/subfield>&lt;/datafield>
+
+#   This section concerns rather the desired output, while previous two were focused on the data source structures.
+#   Each line equals to one output line, composed of given literals and values from extracted source data fields.
+#   In this example, the XML Marc21 output line is defined, 
+#   containing re-formatted values of source fields SURNAME and FIRSTNAME
+
+### the configuration ends here
+</pre>
+</blockquote>
+</protect>
+
+<p>Having prepared a configuration, the BibConvert will convert the
+source data file according to it in a batch mode. The BibConvert is
+fully compatible with the Uploader1.x configuration language. For more
+information, have a look at the <a href="#4">BibConvert Configuration
+Guide</a> section below.  
+
+<a name="3"></a><h2>3. Running BibConvert</h2>
+
+<p>For a fully functional demo, consider the following sample input data:
+
+<blockquote>
+<a href="sample.dat">sample.dat</a> -- sample bibliographic data to be converted and inputted into CDSware
+<br><a href="sample.cfg">sample.cfg</a> -- sample configuration file, featuring knowledge base demo
+</blockquote>
+
+<p>To convert the above data into XML MARC, use the following command:
+
+<blockquote>
+<pre>
+$ bibconvert -b'&lt;collection>' -csample.cfg -e'&lt;/collection>' < sample.dat > /tmp/sample.xml
+<pre>
+</blockquote>
+
+and see the XML MARC output file.  You would then continue the upload procedure by calling <a
+href="../bibupload/">BibUpload</a>.
+
+<p>Other useful BibConvert configuration examples:
+
+<blockquote>
+<a href="dcq.cfg">dcq.cfg</a> -- Qualified Dublin Core in SGML to XML MARC example
+<br><a href="dcq.dat">dcq.dat</a> -- corresponding data file, featuring collection identifiers demo
+</blockquote>
+
+<blockquote>
+<a href="bibtex.cfg">bibtex.cfg</a> -- BibTeX to XML MARC example
+</blockquote>
+
+<a name="4"></a><h2>4. BibConvert Configuration Guide</h2>
+
+<h3><A NAME="G"></A>Conventions</h3>
 
 <br/>- comment line starts with '#' sign in the first column
 <br/>- each section is declared by a line starting with '===' (further characters on the line are ignored)
 <br/>- values are separated by '---'
 
-<h2>
-<A NAME="1"></A>Step 1 Definition of Source record</h2>
+<h3>
+<A NAME="4.1"></A>4.1. Step 1 Definition of Source record</h3>
 <P>- Create/edit "data extraction configuration template" section of the configuration file.
 <BR>- Each line of this section stands for a definition of one source field:
 <P><strong>name---keyword---terminating string---separator---</strong>
@@ -65,8 +171,8 @@ fields:
 <BR>TI---TI_---EOL------
 </pre>
 
-<H2>
-<A NAME="2"></A>Step 2 Definition of Source fields</H2>
+<H3>
+<A NAME="4.2"></A>4.2. Step 2 Definition of Source fields</H3>
 <I>Each field extracted from the source according to the definition done
 in the first step can have an internal structure, which is described in
 this section.</I>
@@ -87,8 +193,8 @@ TI---&lt:TI:>
 AU---&lt:FIRSTNAME:>-&lt;:SURNAME:>
 </pre>
 
-<H2>
-<A NAME="3"></A>Step 3 Definition of target record</H2>
+<H3>
+<A NAME="4.3"></A>4.3. Step 3 Definition of target record</H3>
 <I>This definition describes the layout of the target record that is created by the conversion,
 together with the corresponcence to the source fields defined in step 2.</I>
 
@@ -100,7 +206,7 @@ together with the corresponcence to the source fields defined in step 2.</I>
 <BR>- "<strong>::</strong>"is a mandatory separator between the name and the subfield
 definition
 <BR>- optionally, you can apply the appropriate <A HREF="#51">formatting function(s)</A>
-and <A HREF="#52">generated values</A>
+and <A HREF="#4.4.2">generated values</A>
 <BR>- "<strong>::</strong>"is a mandatory separator between the subfield definition and the function(s)
 <BR>- "<strong>---</strong>"is a mandatory separator between the tag and the output code definition
 <BR>- mark repetitive source fields with an asterisk (*)
@@ -113,9 +219,9 @@ and <A HREF="#52">generated values</A>
 </pre>
 </protect>
 
-<h2><A NAME="5"></a>Formatting in BibConvert</H2>
+<h3><A NAME="4.4"></a>4.4 Formatting in BibConvert</H3>
 
-<H2>&nbsp;<A NAME="51"></A>Definition of formatting functions</H2>
+<H3>&nbsp;<A NAME="4.4.1"></A>4.4.1 Definition of formatting functions</H3>
 
 <BLOCKQUOTE>Every field can be processed with a variety of functions that
 partially or entirely change the original value.
@@ -738,8 +844,8 @@ the AU field
 <H4><A NAME="DEFP"></A>DEFP() - default print</H4>
 <BLOCKQUOTE>The value is printed by default even if it does not contain any variable input from the source file.</BLOCKQUOTE>
 
-<H2>
-<A NAME="52"></A>Generated values</H2>
+<H3>
+<A NAME="4.4.2"></A>4.4.2 Generated values</H3>
 
 <BLOCKQUOTE>In the template configurations, values can be either taken from the source
 or generated in the process itself. This is mainly useful for evaluating constant values.
