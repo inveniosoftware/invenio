@@ -1659,7 +1659,7 @@
 <define-tag MSG_SEARCH_OPTIONS>
   <en>Search options:</en>
   <fr>Options de la recherche:</fr>
-  <de>Search options:</de>
+  <de>Suche Wahlen:</de>
   <es>Search options:</es>
   <pt>Opções de busca:</pt>
   <it>Search options:</it>
@@ -1672,7 +1672,7 @@
 <define-tag MSG_LATEST_ADDITIONS>
   <en>Latest additions:</en>
   <fr>Dernières ajouts:</fr>
-  <de>Latest additions:</de>
+  <de>Letzte Eintrage:</de>
   <es>Latest additions:</es>
   <pt>Ítens mais recentes:</pt>
   <it>Latest additions:</it>
@@ -1698,7 +1698,7 @@
 <define-tag MSG_COLLECTION_CONTAINS_NO_RECORDS>
   <en>This collection does not contain any document yet.</en>
   <fr>Cette collection ne contient pas encore de document.</fr>
-  <de>This collection does not contain any document yet.</de>
+  <de>Diese Kollektion enthält zur Zeit keine Dokumente.</de>
   <es>This collection does not contain any document yet.</es>
   <pt>Esta coleção ainda não contém nenhum documento.</pt>
   <it>This collection does not contain any document yet.</it>
@@ -1711,7 +1711,7 @@
 <define-tag MSG_COLLECTION_RESTRICTED_CONTENT>
   <en>The contents of this collection is restricted.</en>
   <fr>Le contenu de cette collection est restreint.</fr>
-  <de>The contents of this collection is restricted.</de>
+  <de>Der Inhalt von dieser Kollektion ist privat.</de>
   <es>The contents of this collection is restricted.</es>
   <pt>O conteúdo desta coleção é restrito.</pt>
   <it>The contents of this collection is restricted.</it>
