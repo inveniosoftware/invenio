@@ -158,7 +158,7 @@ def perform_modifyrankmethods(colID, ln=cdslang, func='', rnkID='', confirm=0, c
     subtitle = ""
 
     col_dict = dict(get_current_name('', ln, get_col_mainnametype(), "collection"))
-    rnk_dict = dict(get_current_name('',ln, get_rnkmainnametype(), "rnkMETHOD"))
+    rnk_dict = dict(get_current_name('',ln, get_rnk_mainnametype(), "rnkMETHOD"))
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
         if func in ["0", 0] and confirm in ["1", 1]:
@@ -190,7 +190,7 @@ def perform_modifyrankmethods(colID, ln=cdslang, func='', rnkID='', confirm=0, c
         </dl>
         """
      
-        rnkmethods = get_current_name('',ln, get_rnkmainnametype(), "rnkMETHOD")
+        rnkmethods = get_current_name('',ln, get_rnk_mainnametype(), "rnkMETHOD")
         rnkmethods2 = dict(get_col_rnk(colID, ln))
         rnkmethods = filter(lambda x: not rnkmethods2.has_key(x[0]), rnkmethods)
         if rnkmethods:
@@ -2015,7 +2015,7 @@ def get_col_rnk(colID, ln=cdslang):
     
     try:
         res1 = dict(run_sql("SELECT id_rnkMETHOD, '' FROM collection_rnkMETHOD WHERE id_collection=%s" % colID))
-        res2 = get_current_name('', ln, get_rnkmainnametype(), "rnkMETHOD")
+        res2 = get_current_name('', ln, get_rnk_mainnametype(), "rnkMETHOD")
         result = filter(lambda x: res1.has_key(x[0]), res2)
         return result
     except StandardError, e:
