@@ -71,7 +71,11 @@ def index(req,c=cdsname,ln=cdslang,sub=""):
     # retrieve 'dir' value
     res = run_sql ("select dir from sbmACTION where sactname=%s",(action,))
     dir = res[0][0]
-    url = "submit.py?doctype=%s&dir=%s&access=%s&act=%s&startPg=1%s" % (doctype,dir,access,action,params)
+    try:
+        mainmenu = req.headers_in['Referer']
+    except:
+        mainmenu = ""
+    url = "submit.py?doctype=%s&dir=%s&access=%s&act=%s&startPg=1%s&mainmenu=%s" % (doctype,dir,access,action,params,mainmenu)
     req.err_headers_out.add("Location", url)
     raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
     return ""
