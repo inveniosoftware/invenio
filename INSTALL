@@ -105,7 +105,7 @@ Contents
       $ wget http://cdsware.cern.ch/download/cdsware-0.9.tar.gz
       $ tar xvfz cdsware-0.9.tar.gz
       $ cd cdsware-0.9
-      $ ./configure --prefix=/usr/local/cdsware-demo \
+      $ ./configure --prefix=/usr/local/cdsware-DEMO \
                     --with-webdir=/var/www/DEMO \
                     --with-weburl=http://webserver.domain.com/DEMO \
                     --with-dbhost=sqlserver.domain.com \
@@ -122,7 +122,7 @@ Contents
       $ sudo /path/to/apache/bin/apachectl graceful
       $ make create-tables       ## optional
       $ make install
-      $ sudo chown -R www-data /usr/local/cdsware-demo/var
+      $ sudo chown -R www-data /usr/local/cdsware-DEMO/var
       $ make create-demo-site    ## optional
       $ make load-demo-records   ## optional
       $ make remove-demo-records ## optional
@@ -154,7 +154,7 @@ Contents
    
           Go to the source directory.
 
-      $ ./configure --prefix=/usr/local/cdsware-demo \
+      $ ./configure --prefix=/usr/local/cdsware-DEMO \
                     --with-webdir=/var/www/DEMO \
                     --with-weburl=http://webserver.domain.com/DEMO \
                     --with-dbhost=sqlserver.domain.com \
@@ -162,27 +162,47 @@ Contents
                     --with-dbuser=cdsware \
                     --with-dbpass=myp1ss 
 
-          Configure essential CDSware parameters, such as the generic 
-          installation directory (--prefix), the home directory
-          for Web scripts and documents (--with-webdir, must be inside
-          Apache htdocs path) and the corresponding URL for the
-          CDSware home web directory (--with-weburl); finally, we
-          configure the database host (--with-dbhost), database name
-          (--with-dbname), and database user credentials
-          (--with-dbuser, --with-dbpass).  Don't use trailing slashes.
-          
-          The general installation directory --prefix may be chosen
-          anywhere on the system; please foresee sufficient space,
-          since CDSware will use it not only its binary and library
-          files, but also runtime log and cache files.
+          Configure essential CDSware parameters, with the following
+          signification:
 
-          Let's underline that --with-webdir must be within the
-          Apache's htdocs directory and that --with-weburl must be the
-          URL corresdponding to this directory, and that it'll appear
-          as "home URL" of this CDSware installation to the end users.
+             --prefix=/usr/local/cdsware-DEMO 
 
-          Note that CDSware won't install in any other directories but
-          the two mentioned in the above configure line.
+                 The CDSware general installation directory, used to
+                 hold command-line binaries and program libraries
+                 containing the core CDSware functionality, but also
+                 to store runtime log and cache information.  Several
+                 subdirs like `bin', `lib', and `var' will be created
+                 inside the --prefix directory to this effect.  Note
+                 that the --prefix directory should be chosen outside
+                 of the Apache htdocs tree, since no file from this
+                 directory is to be accessible on the Web.
+
+             --with-webdir=/var/www/DEMO
+
+                 The directory holding the web interface to CDSware,
+                 i.e. containing all the callable scripts and web
+                 pages visible to the end user.  Must be located
+                 inside Apache htdocs tree.  The scripts within this
+                 directory will generally call core CDSware libraries
+                 and binaries installed in the --prefix directory.
+
+             --with-weburl=http://webserver.domain.com/DEMO
+
+                 The URL corresponding to the --with-webdir directory.
+                 It will denote the home URL of your CDSware
+                 installation.
+
+             --with-dbhost=sqlserver.domain.com
+             --with-dbname=cdsware
+             --with-dbuser=cdsware
+             --with-dbpass=myp1ss 
+
+                 The database server host, the database name, and the
+                 database user credentials.
+
+          CDSware won't install to any other directory but to the two
+          mentioned in this configuration line.  Do not use trailing
+          slashes when specifying any of the above values.
 
           This configuration step is mandatory, and is referred to as
           "pre-compile time configuration step a)" in the elucidative
@@ -296,7 +316,7 @@ Contents
           the chosen URL of your local CDSware installation and see it
           running!
 
-      $ sudo chown -R www-data /usr/local/cdsware-demo/var
+      $ sudo chown -R www-data /usr/local/cdsware-DEMO/var
 
           One more superuser step, as we need to enable Apache server
           to write some log information and to cache interesting
@@ -333,7 +353,7 @@ Contents
           you'll have a blank CDSware system for your production
           purposes.
 
-      $ netscape http://webserver.domain.com/CDSware/admin/ ## optional
+      $ netscape http://webserver.domain.com/DEMO/admin/ ## optional
 
           Optionally, do further runtime configuration of the CDSware,
           like definition of data collections, document types,
@@ -354,7 +374,7 @@ Contents
       (b) compile time configuration phase 
           [uses WML / after "configure", while doing "make && make install"]
       (c) runtime configuration phase 
-          [uses MySQL / after "make install", while doing "netscape http://webserver.domain.com/CDSware/admin/"]
+          [uses MySQL / after "make install", while doing "netscape http://webserver.domain.com/DEMO/admin/"]
 
    What is the difference, and why?
 
@@ -428,7 +448,7 @@ Contents
           pages.)
 
       (c) runtime configuration phase 
-          [uses MySQL / after "make install", while doing "netscape http://webserver.domain.com/CDSware/admin/"]
+          [uses MySQL / after "make install", while doing "netscape http://webserver.domain.com/DEMO/admin/"]
 
           Optionally, you will most probably want to define specific
           data collections, to configure submit and search page for those
