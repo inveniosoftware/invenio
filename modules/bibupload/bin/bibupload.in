@@ -455,12 +455,7 @@ values('$cd','$md')");
             if ($field->subfields[1]->value != "")
             {
                $format = $field->subfields[0]->value;
-               if ($format{0} == "x") {
-                   $value = mysql_escape_string(gzcompress(utf8_encode($field->subfields[1]->value)));
-               }
-               else {   
-                   $value = mysql_escape_string(gzcompress($field->subfields[1]->value));
-               }
+               $value = mysql_escape_string(gzcompress($field->subfields[1]->value));
                $t1 = getmicrotime();
                $res = mysql_perform_query("
 SELECT id 
@@ -793,7 +788,7 @@ function insertFMTfield($recid)
     }
 
     $format = "xm";
-    $value = mysql_escape_string(gzcompress(utf8_encode($xml)));
+    $value = mysql_escape_string(gzcompress($xml));
     $t1 = getmicrotime();
     $res = mysql_perform_query("
 SELECT id 
@@ -1189,8 +1184,6 @@ function formatfield($field)
 #    $field = str_replace("\035","",$field);
 #    $field = str_replace("\036","",$field);
 #    $field = str_replace("\037","",$field);
-   // UTF8 decode
-   $field = utf8_decode($field);
 
    return $field;
 }
