@@ -143,6 +143,7 @@
   <navbar:button id=howto txt="HOWTOs" url="<WEBURL>/admin/howto/" hint="CDSware Admin HOWTO Documents" menu="howto">
   <navbar:button id=foo txt="<strong>SYSTEM&nbsp;LIB</strong>">
   <navbar:button id=bibedit txt="BibEdit Admin" url="<WEBURL>/admin/bibedit/" hint="CDSware BibEdit Admin" menu="bibedit">
+  <navbar:button id=bibrank txt="BibRank Admin" url="<WEBURL>/admin/bibrank/" hint="CDSware BibRank Admin" menu="bibrank">
   <navbar:button id=bibindex txt="BibIndex Admin" url="<WEBURL>/admin/bibindex/" hint="CDSware BibIndex Admin">
   <navbar:button id=foo txt="<strong>ARCHIVE&nbsp;MGMT</strong>">
   <navbar:button id=bibharvest txt="BibHarvest Admin" url="<WEBURL>/admin/bibharvest/" hint="CDSware BibHarvest Admin">
