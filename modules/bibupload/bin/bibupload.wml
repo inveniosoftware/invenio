@@ -1311,7 +1311,7 @@ function get_next_record($fp)
    while (!stristr($line,"</record>") && !feof($fp))
    {
       $line = fgets($fp, 4096);
-      $xmlrecord .= $line;
+      $xmlrecord .= ereg_replace("<record.*","",$line); // get rid of the beginning of the next record, if any
    }
 
    return $xmlrecord;
