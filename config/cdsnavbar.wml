@@ -139,8 +139,8 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> </navbar:prolog>
 
-  <navbar:button id=admin txt="<strong>ADMINS' AREA</strong>" url="<WEBURL>/admin/" hint="CDSware Administrators Area">
-  <navbar:button id=howto txt="HOWTOs" url="<WEBURL>/admin/howto/" hint="CDSware Admins HOWTO Documents" menu="howto">
+  <navbar:button id=admin txt="<strong>ADMIN AREA</strong>" url="<WEBURL>/admin/" hint="CDSware Administrators Area">
+  <navbar:button id=howto txt="HOWTOs" url="<WEBURL>/admin/howto/" hint="CDSware Admin HOWTO Documents" menu="howto">
   <navbar:button id=foo txt="<strong>SYSTEM&nbsp;LIB</strong>">
   <navbar:button id=bibdata txt="BibData Admin" url="<WEBURL>/admin/bibdata/" hint="CDSware BibData Admin" menu="bibdata">
   <navbar:button id=bibwords txt="BibWords Admin" url="<WEBURL>/admin/bibwords/" hint="CDSware BibWords Admin">
@@ -222,8 +222,8 @@
 
   <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=howto_marc txt="HOWTO MARC" url="<WEBURL>/admin/howto/marc.shtml" hint="Admin's HOWTO Guides - How to MARC your medatada">
-  <navbar:button id=howto_migrate txt="HOWTO Migrate" url="<WEBURL>/admin/howto/migrate.shtml" hint="Admin's HOWTO Guides - How to Migrate your old documents into CDSware">
+  <navbar:button id=howto_marc txt="HOWTO MARC" url="<WEBURL>/admin/howto/marc.html" hint="Admin's HOWTO Guides - How to MARC your medatada">
+  <navbar:button id=howto_migrate txt="HOWTO Migrate" url="<WEBURL>/admin/howto/migrate.html" hint="Admin's HOWTO Guides - How to Migrate your old documents into CDSware">
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
