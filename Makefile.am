@@ -146,6 +146,13 @@ load-demo-records:
 	@echo ""
 	${prefix}/bin/webcoll
 	${prefix}/bin/webcoll 5
+	@echo ""
+	@echo "***********************************************************************"
+	@echo "** You will be asked for a username, please enter admin email below. **"
+	@echo "***********************************************************************"
+	@echo ""
+	${prefix}/bin/bibrank
+	${prefix}/bin/bibrank 6
 	@echo "***********************************************************************"
 	@echo "** The demo records have been successfully loaded.                   **"
 	@echo "**                                                                   **"
