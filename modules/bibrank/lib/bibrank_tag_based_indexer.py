@@ -55,11 +55,8 @@ try:
     import copy
     import types
     import ConfigParser
-    
 except ImportError, e:
-    print "Error: %s" % e
     import sys
-    sys.exit(1)
 
 try:
     sys.path.append('%s' % pylibdir)
@@ -71,13 +68,11 @@ try:
     from cdsware.access_control_engine import acc_authorize_action 
     from bisect import bisect
 except ImportError, e:
-    print "Error: %s" % e
     import sys
-    sys.exit(1)
 
 options = {}
 
-def single_tag_rank_method_exec(methname, name, config):
+def single_tag_rank_method_exec(rnkMETHOD, name, config):
     """Creating the rank method data"""
     startCreate = time.time()
     rnkset = {}
@@ -85,11 +80,11 @@ def single_tag_rank_method_exec(methname, name, config):
     if options["verbose"] >= 1:
         write_message("Running: %s." % name)
 
-    rnkset_old = fromDB(methname)
+    rnkset_old = fromDB(rnkMETHOD)
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     rnkset_new = single_tag_rank(config)
     rnkset = union_dicts(rnkset_old, rnkset_new)
-    intoDB(rnkset, date, methname)
+    intoDB(rnkset, date, rnkMETHOD)
     showtime((time.time() - startCreate))
 
 def single_tag_rank(config):
@@ -103,7 +98,7 @@ def single_tag_rank(config):
     data = input.readlines()
         
     for line in data:
-        if not line[0:2] == "#":
+        if not line[0:1] == "#":
             kb_data[string.strip((string.split(string.strip(line),"---"))[0])] = (string.split(string.strip(line), "---"))[1]
     tag = config.get("single_tag_rank","tag")
     tags = split(config.get("single_tag_rank", "check_mandatory_tags"),",")
@@ -136,38 +131,38 @@ def single_tag_rank(config):
             rnkset[key] = (value, - 1.0)
     return rnkset
 
-def get_lastupdated(methname):
+def get_lastupdated(rnkMETHOD):
     """Get the last time the rank method was updated"""
-    res = run_sql("SELECT rnkMETHOD.last_updated FROM rnkMETHOD WHERE name='%s'" % methname)
+    res = run_sql("SELECT rnkMETHOD.last_updated FROM rnkMETHOD WHERE name='%s'" % rnkMETHOD)
     if res:
         return res[0][0]
     else:
-        raise Exception("Is this the first run?")
+        raise Exception("Is this the first run? Please do a complete update.")
 
-def intoDB(dict, date, methname):
+def intoDB(dict, date, rnkMETHOD):
     """Insert the rank method data into the database"""
-    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % methname)
-    del_rnkMETHODDATA(methname)
+    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rnkMETHOD)
+    del_rnkMETHODDATA(rnkMETHOD)
     run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES ('%s','%s')" % (id[0][0], serialize_via_marshal(dict)))
-    run_sql("UPDATE rnkMETHOD SET last_updated='%s' WHERE name='%s'" % (date, methname))
+    run_sql("UPDATE rnkMETHOD SET last_updated='%s' WHERE name='%s'" % (date, rnkMETHOD))
 
-def fromDB(methname):
+def fromDB(rnkMETHOD):
     """Get the data for a rank method"""
-    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % methname)
+    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rnkMETHOD)
     res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s" % id[0][0])
     if res:
         return deserialize_via_marshal(res[0][0])
     else:
         return {}
 
-def del_rnkMETHODDATA(methname):
+def del_rnkMETHODDATA(rnkMETHOD):
     """Delete the data for a rank method"""
-    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % methname)
+    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rnkMETHOD)
     res = run_sql("DELETE FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s" % id[0][0])
 
-def del_recids(methname, range):
+def del_recids(rnkMETHOD, range):
     """Delete some records from the rank method"""
-    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % methname)
+    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rnkMETHOD)
     res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s" % id[0][0])
     if res:
         rec_dict = deserialize_via_marshal(res[0][0])
@@ -178,7 +173,7 @@ def del_recids(methname, range):
                     del rec_dict[i]  
         write_messag("New size: %s" % len(rec_dict))
         date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        intoDB(rec_dict, date, methname)
+        intoDB(rec_dict, date, rnkMETHOD)
     else:
         print "Create before deleting!"
     
@@ -191,10 +186,10 @@ def union_dicts(dict1, dict2):
         union_dict[key] = value
     return union_dict
 
-def statistic(methname):
+def rnkMETHOD_statistics(rnkMETHOD):
     """Print statistics"""
     
-    method = fromDB(methname) 
+    method = fromDB(rnkMETHOD) 
     max = ('',-999999)
     maxcount = 0
     min = ('',999999)
@@ -213,9 +208,9 @@ def statistic(methname):
             maxcount += 1
 
     write_message("Showing statistic for selected method")
-    write_message("Method name: %s" % getName(methname))
-    write_message("Short name: %s" % methname)
-    write_message("Last run: %s" % get_lastupdated(methname))
+    write_message("Method name: %s" % getName(rnkMETHOD))
+    write_message("Short name: %s" % rnkMETHOD)
+    write_message("Last run: %s" % get_lastupdated(rnkMETHOD))
     write_message("Number of records: %s" % len(method))
     write_message("Lowest value: %s (%s) - Number of records: %s" % (min[0], min[1], mincount))
     write_message("Highest value: %s (%s) - Number of records: %s" % (max[0], max[1], maxcount))
@@ -231,12 +226,12 @@ def statistic(methname):
                  distinct_values[value[1]] = 1
          write_message("Set %s (%s-%s) %s Distinct values: %s" % (i, lower, upper, len(distinct_values), setcount)) 
 
-def check_method(methname):
+def check_method(rnkMETHOD):
     write_message("Checking rank method...")
-    if len(fromDB(methname)) == 0:
+    if len(fromDB(rnkMETHOD)) == 0:
         write_message("Rank method not yet executed, please run it to create the necessary data.")
     else:
-        if len(add_date(methname)) > 0:
+        if len(add_date(rnkMETHOD)) > 0:
             write_message("Records modified, update recommended")
         else:
             write_message("No records modified, update not necessary")
@@ -403,10 +398,10 @@ def bibrank_engine(row, run):
     try:
         options["run"] = []
         options["run"].append(run)
-        for methname in options["run"]:
-            cfg_name = getName(methname)
+        for rnkMETHOD in options["run"]:
+            cfg_name = getName(rnkMETHOD)
                 
-            file = etcdir + "/bibrank/" + methname + ".cfg"
+            file = etcdir + "/bibrank/" + rnkMETHOD + ".cfg"
             if options["verbose"] >= 9:
                 write_message("Getting configuration from file: %s" % file)
             config = ConfigParser.ConfigParser()
@@ -416,11 +411,11 @@ def bibrank_engine(row, run):
                 write_message("Cannot find configurationfile: %s" % file, sys.stderr)
                 raise StandardError
 
-            cfg_short = methname
+            cfg_short = rnkMETHOD
             cfg_function = config.get("rank_method", "function") + "_exec"
             cfg_importance = config.getfloat("rank_method", "overall_importance")
             cfg_name = getName(cfg_short)
-            options["validset"] = get_valid_range(methname)
+            options["validset"] = get_valid_range(rnkMETHOD)
 
             if options["collection"]:
                 l_of_colls = string.split(options["collection"], ",")
@@ -432,9 +427,9 @@ def bibrank_engine(row, run):
             elif options["id"]:
                 options["recid_range"] = options["id"]
             elif options["modified"]:
-                options["recid_range"] = add_date(methname, options["modified"])
+                options["recid_range"] = add_date(rnkMETHOD, options["modified"])
             elif options["last_updated"]:
-                options["recid_range"] = add_date(methname)
+                options["recid_range"] = add_date(rnkMETHOD)
             else:
                 if options["verbose"] > 1:
                     write_message("No records specified, updating all")
@@ -442,26 +437,22 @@ def bibrank_engine(row, run):
                 max_id = run_sql("SELECT max(id) from bibrec")[0][0]
                 options["recid_range"] = [[min_id, max_id]] 
 
-            if len(options["recid_range"]) == 0:
-                write_message("No records to update, exiting")
-                raise StandardError
-
-            if options["quick"] == "no":
+            if options["quick"] == "no" and options["verbose"] >= 9:
                 write_message("Rebalance not yet enabled, parameter ignored.")
 
-            if options["cmd"] == "del":
-                del_recids(cfg_short, options["recid_range"])
-            elif options["cmd"] == "add":
-                func_object = globals().get(cfg_function)
-                func_object(methname, cfg_name, config)
-            elif options["cmd"] == "stat":
-                statistic(methname)
-            elif options["cmd"] == "check":
-                check_method(methname)
-            else:
-                write_message("Invalid command found processing %s" % \
-                     methname, sys.stderr)
-                raise StandardError
+            if options["recid_range"]:
+                if options["cmd"] == "del":
+                    del_recids(cfg_short, options["recid_range"])
+                elif options["cmd"] == "add":
+                    func_object = globals().get(cfg_function)
+                    func_object(rnkMETHOD, cfg_name, config)
+                elif options["cmd"] == "stat":
+                    rnkMETHOD_statistics(rnkMETHOD)
+                elif options["cmd"] == "check":
+                    check_method(rnkMETHOD)
+                else:
+                    write_message("Invalid command found processing %s" % rnkMETHOD, sys.stderr)
+                    raise StandardError
     except StandardError, e:
         write_message("\nException caught: %s" % e, sys.stderr)
         traceback.print_tb(sys.exc_info()[2])
@@ -475,12 +466,12 @@ def bibrank_engine(row, run):
         showtime((time.time() - startCreate))
     return 1
 
-def get_valid_range(methname):
+def get_valid_range(rnkMETHOD):
     """Return a range of records"""
     if options["verbose"] >=9:
         write_message("Getting records from collections enabled for rank method.")
 
-    res = run_sql("SELECT collection.name FROM collection,collection_rnkMETHOD,rnkMETHOD WHERE collection.id=id_collection and id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" %  methname)
+    res = run_sql("SELECT collection.name FROM collection,collection_rnkMETHOD,rnkMETHOD WHERE collection.id=id_collection and id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" %  rnkMETHOD)
     l_of_colls = []
     for coll in res:
         l_of_colls.append(coll[0])
@@ -492,12 +483,12 @@ def get_valid_range(methname):
     valid.addlist(recIDs)
     return valid
    
-def add_date(methname, date=""):
+def add_date(rnkMETHOD, date=""):
     """If date is not set, then retrieve it from the database.
        Reindex all formats newer than the modification date"""
     if not date:
         try:
-            date = (get_lastupdated(methname),'')
+            date = (get_lastupdated(rnkMETHOD),'')
         except Exception, e:
             date = "0000-00-00 00:00:00"
     query = """SELECT b.id FROM bibrec AS b WHERE b.modification_date >=
@@ -509,21 +500,21 @@ def add_date(methname, date=""):
     list = create_range_list(res)
     if not list:
         if options["verbose"]:
-            write_message( "No new records added. %s is up to date" % methname)
+            write_message( "No new records added. '%s' is up to date" % getName(rnkMETHOD))
     return list
 
-def getName(rnkname, ln=cdslang, type='ln'):
+def getName(rnkMETHOD, ln=cdslang, type='ln'):
     """Returns the name of the method if it exists"""
 
     try:
-        rnkid = run_sql("SELECT id FROM rnkMETHOD where name='%s'" % rnkname)
+        rnkid = run_sql("SELECT id FROM rnkMETHOD where name='%s'" % rnkMETHOD)
         if rnkid:
             rnkid = str(rnkid[0][0])
             res = run_sql("SELECT value FROM rnkMETHODNAME where type='%s' and ln='%s' and id_rnkMETHOD=%s" % (type, ln, rnkid))
             if not res:
                 res = run_sql("SELECT value FROM rnkMETHODNAME WHERE ln='%s' and id_rnkMETHOD=%s and type='%s'"  % (cdslang, rnkid, type))
             if not res: 
-                return rnkname
+                return rnkMETHOD
             return res[0][0]
         else:
             raise Exception
@@ -575,7 +566,7 @@ def deserialize_via_marshal(string):
 #---------------BELOW IS OLD CODE, NOT WORKING ATM-----------
 #------------------------------------------------------------
 
-def citationimpact_exec(methname, name, config):
+def citationimpact_exec(rnkMETHOD, name, config):
     """Calculates rankset based on number of citations each document has"""
     startCreate = time.time()
     tempdoc = {}
@@ -616,10 +607,10 @@ def citationimpact_exec(methname, name, config):
     #intoDB(starset)
     showtime((time.time() - startCreate))    
     
-def accessimpact_exec(methname, starsets, config):
+def accessimpact_exec(rnkMETHOD, starsets, config):
     """Generating rankset based on number of downloads per document"""
     startCreate = time.time()
-    starset = starsets[methname]
+    starset = starsets[rnkMETHOD]
     options["dbhost"] = config.get("accessimpact", "dbhost")
     options["dbname"] = config.get("accessimpact", "dbname")
     options["dbuser"] = config.get("accessimpact", "dbuser")
@@ -710,10 +701,10 @@ def accessimpact_exec(methname, starsets, config):
     intoDB(starset)
     showtime((time.time() - startCreate))
 
-def authorimpact_exec(methname, starsets, config):
+def authorimpact_exec(rnkMETHOD, starsets, config):
     """Calculating the rankvalue a document has based on its authors"""
     startCreate = time.time()
-    starset = starsets[methname]
+    starset = starsets[rnkMETHOD]
     if options["verbose"] >= 1:
         write_message("Running: %s" % starset.getName())
     tempdoc = single_tag_rank(starset, config)
@@ -824,25 +815,25 @@ def authorimpact_modified(data, Auth):
             if not found == 1:
                 Auth[value].append(key)
 
-def merge_exec(methname, starsets, config):
+def merge_exec(rnkMETHOD, starsets, config):
     """Merge several methods into one starset"""
     startCreate = time.time()
     if options["verbose"] >= 1:
-        write_message("Running: %s" % starsets[methname].getName())
-    starsets[methname].setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+        write_message("Running: %s" % starsets[rnkMETHOD].getName())
+    starsets[rnkMETHOD].setLastUpdated(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     threshold = {}
     finalset = {}
     permut = ''
-    for nr in range(0, starsets[methname].getSize() + 1):
+    for nr in range(0, starsets[rnkMETHOD].getSize() + 1):
         finalset[nr] = HitSet()
         permut = permut + "%s" % nr
-    starsets[methname].setWeigth(1.0)
+    starsets[rnkMETHOD].setWeigth(1.0)
     sum = 0.0
     nr = 0
     convert = {}
     size=-1
     for key in starsets:
-        if key != methname:
+        if key != rnkMETHOD:
             sum = sum + starsets[key].getWeigth()
             convert[nr] = key
             nr=nr + 1
@@ -853,7 +844,7 @@ def merge_exec(methname, starsets, config):
                 size = len(starsets[key].getStars()) -1
     sum = 1.0 / sum
     for key in starsets:
-        if key != methname:
+        if key != rnkMETHOD:
             starsets[key].setWeigth(starsets[key].getWeigth() * sum)
 
     p = Permutation(permut, len(starsets)-1)
@@ -866,13 +857,13 @@ def merge_exec(methname, starsets, config):
             place = place+float(perm[i]) * float(starsets[convert[i]].getWeigth())
         finalset[int(round(place))].union(tempset)
 
-    for i in range(0, starsets[methname].getSize() + 1):
+    for i in range(0, starsets[rnkMETHOD].getSize() + 1):
         finalset[i].calculate_nbhits()
         threshold[i] = 0
 
-    starsets[methname].setStars(finalset)
-    starsets[methname].setThreshold(threshold)
-    intoDB(starsets[methname])
+    starsets[rnkMETHOD].setStars(finalset)
+    starsets[rnkMETHOD].setThreshold(threshold)
+    intoDB(starsets[rnkMETHOD])
     showtime((time.time() - startCreate))
 
 def showtime(timeused):

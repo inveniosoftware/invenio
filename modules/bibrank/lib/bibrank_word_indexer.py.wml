@@ -1,5 +1,5 @@
  # $Id$
-## BibIndex bibliographic data, reference and fulltext indexing utility.
+## BibRank word frequency indexer utility.
 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002 CERN.
@@ -73,14 +73,12 @@ try:
     import re
     import ConfigParser
 except ImportError, e:
-    print "Error: %s" % e
     import sys
-    sys.exit(1)
 
 try:
     import Stemmer
 except ImportError, e:
-    print "Stemmer not available"
+    pass
 
 try:
     sys.path.append('%s' % pylibdir)
@@ -90,9 +88,7 @@ try:
     from cdsware.dbquery import run_sql
     from cdsware.access_control_engine import acc_authorize_action
 except ImportError, e:
-    print "Error: %s" % e
     import sys
-    sys.exit(1)
 
 ## safety parameters concerning MySQL thread-multiplication problem:
 cfg_check_mysql_threads = 0 # to check or not to check the problem? 
@@ -156,16 +152,15 @@ def kill_sleepy_mysql_threads(max_threads=cfg_max_mysql_threads, thread_timeout=
 # indexing fulltext. The default is get_words_from_phrase
 tagToWordsFunctions = {}
 
-def get_words_from_phrase(phrase, stemm, weight, lang,
+def get_words_from_phrase(phrase, weight, lang="",
                           chars_punctuation=r"[\.\,\:\;\?\!\"]",
                           chars_alphanumericseparators=r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]",
                           split=string.split):
     "Returns list of words from phrase 'phrase'."
     words = {} 
-
+    #print phrase
     phrase = strip_accents(phrase) 
     phrase = lower(phrase) 
-
     #Getting rid of strange characters
     phrase = re.sub("&eacute;", 'e', phrase) 
     phrase = re.sub("&egrave;", 'e', phrase) 
@@ -182,10 +177,9 @@ def get_words_from_phrase(phrase, stemm, weight, lang,
     phrase = re.sub(chars_punctuation, ' ', phrase)
 
     #By doing this like below, characters standing alone, like c a b is not added to the inedx, but when they are together with characters like c++ or c$ they are added.
- 
-    for word in split(phrase):     
-        if not stopwords.has_key(word) and check_term(word, 0): 
-            if stemm == "yes" and stemmer.has_key(lang):
+    for word in split(phrase):    
+        if not stopwords.has_key(word) and check_term(word, 0):
+            if lang and lang !="none" and stemmer.has_key(lang):
                 word = stemmer[lang].stem(word)
             if not words.has_key(word):
                 words[word] = (0,0)
@@ -193,12 +187,13 @@ def get_words_from_phrase(phrase, stemm, weight, lang,
         elif not stopwords.has_key(word):  
             phrase = re.sub(chars_alphanumericseparators, ' ', word) 
             for word_ in split(phrase):   
-                if stemm == "yes" and stemmer.has_key(lang):
+                if lang and lang !="none" and stemmer.has_key(lang):
 		    word_ = stemmer[lang].stem(word_)
                 if word_:
                     if not words.has_key(word_):
                         words[word_] = (0,0)
                     words[word_] = (words[word_][0] + weight, 0)
+    #print words
     return words
 
 def split_ranges(parse_string):
@@ -541,7 +536,7 @@ class WordTable:
             records_to_go = records_to_go + range[1] - range[0] + 1
             
         time_started = time.time() # will measure profile time
-        for range in recIDs:	
+        for range in recIDs:
             i_low = range[0]
             chunksize_count = 0
             while i_low <= range[1]:
@@ -591,11 +586,12 @@ class WordTable:
         # If date is not set, then retrieve it from the database.
         # Reindex all formats newer than the modification date
         if not date:
-            write_message("Using the last update time for the global index")
+            write_message("Using the last update time for the rank method")
             id = self.tablename[len("bibindex"):]
             query = """SELECT last_updated FROM rnkMETHOD WHERE name='%s'
             """ % options["current_run"]
             res = run_sql(query)
+
             if not res:
                 return
             if not res[0][0]:
@@ -609,6 +605,7 @@ class WordTable:
             query += "and b.modification_date <= '%s'" % date[1]
         query += "ORDER BY b.id ASC"""
         res = run_sql(query)        
+
         list = create_range_list(res)
         if not list:
             if options["verbose"]:
@@ -625,7 +622,7 @@ class WordTable:
 
         self.recIDs_in_mem.append([recID1,recID2])
         # secondly fetch all needed tags:
-        for (tag, stemm, weight, lang) in self.fields_to_index:
+        for (tag, weight, lang) in self.fields_to_index:
 	    if tag in tagToWordsFunctions.keys():
                 get_words_function = tagToWordsFunctions[ tag ]
 	    else: get_words_function = get_words_from_phrase
@@ -641,7 +638,7 @@ class WordTable:
 		recID, phrase = row 
                 if options["validset"].contains(recID):
                     if not wlist.has_key(recID): wlist[recID] = {}
-                    new_words = get_words_function(phrase, stemm, weight, lang) # ,self.separators
+                    new_words = get_words_function(phrase, weight, lang) # ,self.separators
                     wlist[recID] = dict_union(new_words,wlist[recID])
 
         # were there some words for these recIDs found?
@@ -957,7 +954,7 @@ class WordTable:
                 recommended.""" % (self.tablename, self.tablename[:-1]))
             raise StandardError
                        
-def wfq_index(row, run):
+def word_index(row, run):
     """Run the indexing task.  The row argument is the BibSched task
     queue row, containing if, arguments, etc.
     Return 1 in case of success and 0 in case of failure.
@@ -972,13 +969,15 @@ def wfq_index(row, run):
         psyco.bind(serialize_via_marshal)
         psyco.bind(deserialize_via_numeric_array)
         psyco.bind(deserialize_via_marshal)
-        psyco.bind(update_rnkWFQ)
-        psyco.bind(check_rnkWFQ)
+        psyco.bind(update_rnkWORD)
+        psyco.bind(check_rnkWORD)
     except StandardError,e:
         print "ERROR PSYCO", e
         pass
 
-    global options, task_id, wordTables, stopwords, stemmer
+    global options, task_id, wordTables, stopwords, stemmer, languages 
+    languages = {'fr': 'french', 'en': 'porter', 'no':'norwegian', 'se':'swedish', 'de': 'german', 'it':'italian', 'pt':'portugese'}
+
     stemmer = {}
 
     # read from SQL row:
@@ -1066,17 +1065,17 @@ def wfq_index(row, run):
                 
             elif options["cmd"] == "repair":
                 wordTable.repair()
-                check_rnkWFQ(options["table"])
+                check_rnkWORD(options["table"])
             elif options["cmd"] == "check":
-                check_rnkWFQ(options["table"])
+                check_rnkWORD(options["table"])
                 options["modified_words"] = {}
             elif options["cmd"] == "stat":
-                statistics(options["table"])
+                rnkMETHOD_statistics(options["table"])
             else:
                 write_message("Invalid command found processing %s" % \
                      wordTable.tablename, sys.stderr)
                 raise StandardError
-            update_rnkWFQ(options["table"], options["modified_words"])
+            update_rnkWORD(options["table"], options["modified_words"])
             run_sql("UPDATE rnkMETHOD SET last_updated='%s' WHERE name='%s'" % (method_starting_time, key))
         except StandardError, e:
             write_message("Exception caught: %s" % e, sys.stderr)
@@ -1101,20 +1100,20 @@ def get_tags(config):
         while config.has_option(function,"tag%s"% i):
             tag = config.get(function, "tag%s" % i)
             tag = string.split(tag, ",")
-            tag[1] = string.strip(tag[1])
-            tag[2] = int(tag[2])
-            tag[3] = string.strip(tag[3])
+            tag[1] = int(string.strip(tag[1]))
+            tag[2] = string.strip(tag[2])
             #get stopwordlist
             stopwords = get_stopwords("%s" % config.get(function, "stopword"))
 
             try:
                 #get stemmer for language if possible
-                if config.get(function,"stem_if_avail") == "yes" and not stemmer.has_key(tag[3]) and tag[1] == "yes":
-                    stemmer[tag[3]] = Stemmer.Stemmer(tag[3])
+                if tag[2] and tag[2] != "none" and languages.has_key(tag[2]) and config.get(function,"stem_if_avail") == "yes" and not stemmer.has_key(tag[2]): 
+                    stemmer[tag[2]] = Stemmer.Stemmer(languages[tag[2]])
                     if options["verbose"] >=9:
-                        write_message("Stemmer for language %s initiated" % tag[3])
+                        write_message("Stemmer for language %s initiated" % tag[2])
             except Exception:
-                write_message("Stemmer not available, will not be used")
+                write_message("PyStemmer not found. May cause lower rank precision.")
+                write_message("Continuing anyway. To enable stemming, check INSTALL.")
             tags.append(tag)
             i += 1
     except Exception:
@@ -1132,11 +1131,10 @@ def get_valid_range(key):
     l_of_colls = []
     for coll in res:
         l_of_colls.append(coll[0])
-    if len(l_of_colls) > 0:
-        recIDs = perform_request_search()
-    else:
-        recIDs = []
-
+    #if len(l_of_colls) > 0:
+    recIDs = perform_request_search(c="")
+    #else:
+    #    recIDs = []
     valid = HitSet() 
     valid.addlist(recIDs)
     return valid
@@ -1177,8 +1175,8 @@ def check_term(term, termlength):
 	pass
     return "true"
 
-def check_rnkWFQ(table):
-    """Checks for any problems in rnkWFQ tables."""
+def check_rnkWORD(table):
+    """Checks for any problems in rnkWORD tables."""
     i = 0 
     errors = {}
     termslist = run_sql("SELECT term FROM %s" % table)
@@ -1217,7 +1215,7 @@ def check_rnkWFQ(table):
         write_message("%s errors found during integrity check, repair and rebalancing recommended." % len(errors))
     options["modified_words"] = errors
 
-def statistics(table):
+def rnkMETHOD_statistics(table):
     """Shows some statistics about this rank method."""
 
     maxID = run_sql("select max(id) from %s" % table)
@@ -1244,8 +1242,8 @@ def statistics(table):
     for i in range(0, 20):
         write_message("%s/%s---%s---%s" % (terms[i][0],terms[i][1], Gi[i][0],Gi[len(Gi) - i - 1][0]))
 
-def update_rnkWFQ(table, terms):
-    """Updates rnkWFQF and rnkWFQR with Gi and Nj values. For each term in rnkWFQF, a Gi value for the term is added. And for each term in each document, the Nj value for that document is added. In rnkWFQR, the Gi value for each term in each document is added. For description on how things are computed, look in the hacking docs.
+def update_rnkWORD(table, terms):
+    """Updates rnkWORDF and rnkWORDR with Gi and Nj values. For each term in rnkWORDF, a Gi value for the term is added. And for each term in each document, the Nj value for that document is added. In rnkWORDR, the Gi value for each term in each document is added. For description on how things are computed, look in the hacking docs.
     table - name of forward index to update 
     terms - modified terms"""
 
@@ -1493,5 +1491,5 @@ def getName(methname, ln=cdslang, type='ln'):
         write_message("Cannot run rank method, either given code for method is wrong, or it has not been added using the webinterface.")
         raise Exception
 
-def wordfrequency(row, run):
-    return wfq_index(row, run)
+def word_frequency(row, run):
+    return word_index(row, run)
