@@ -45,8 +45,7 @@ def create_GuestUser():
        create_GuestUser() -> GuestUserID
     """
     
-    SQL_queryguest = "insert into user (email) values ('')"
-    query_result = run_sql(SQL_queryguest)
+    query_result = run_sql("insert into user (email) values ('')")
     return query_result
 
 def getUid ( request ):
@@ -80,8 +79,7 @@ def isGuestUser(uid):
     """
     if uid==-1:
         return 1
-    SQL_queryguest = "select email from user where id='%s' "%(uid)
-    query_result = run_sql(SQL_queryguest)[0][0]
+    query_result = run_sql("select email from user where id=%s", (uid,))[0][0]
     if query_result == '':
         return 1
     return 0
@@ -92,8 +90,7 @@ def checkRegister(user,passw):
        checkRegister(user,passw) -> boolean
     """
 
-    SQL_queryRe = "select email,password from user where email='%s'"%user
-    query_result = run_sql(SQL_queryRe)
+    query_result = run_sql("select email,password from user where email=%s", (user,))
     if len(query_result)> 0 :
         return 0
     return 1
@@ -126,8 +123,7 @@ def getDataUid(request,uid):
     email = 'guest'
     password = 'none'
 
-    SQL_Data = "select email, password from user where id=%s"%uid
-    query_result = run_sql(SQL_Data)
+    query_result = run_sql("select email, password from user where id=%s", (uid,))
     
     if len(query_result)>0:
         
@@ -147,8 +143,7 @@ def registerUser(request,user,passw):
        registerUser(request,user,passw) -> boolean
     """
     if checkRegister(user,passw) and checkemail(user):
-        SQL_queryregister = "insert into user (email, password) values ('%s','%s') "%(user,passw)
-        query_result = run_sql(SQL_queryregister)
+        query_result = run_sql("insert into user (email, password) values (%s,%s)", (user,passw))
         setUid(request,query_result)
         return 1
     return 0
@@ -158,15 +153,13 @@ def updateDataUser(req,uid,email,password):
     """
     if email =='guest':
         return 0
-    SQL_update ="update user set email ='%s',password='%s' where id = %s  "%(email,password,uid)
-    query_result = run_sql(SQL_update)
+    query_result = run_sql("update user set email=%s,password=%s where id=%s", (email,password,uid))
     
 def loginUser(p_email,p_pw):
     """It is a first simple version for the authentication of user. It returns the id of the user, 
        for checking afterwards if the login is correct
     """
-    SQL_query = "SELECT id from user where email ='%s' and password='%s'" %(p_email,p_pw)
-    query_result = run_sql(SQL_query)
+    query_result = run_sql("SELECT id from user where email=%s and password=%s", (p_email,p_pw))
     return query_result
 
 def logoutUser(req,uid):
@@ -181,8 +174,7 @@ def logoutUser(req,uid):
 def userNotExist(p_email,p_pw):
     """Check if the user exits or not in the system
     """
-    SQL_query= "select email from user where email ='%s'"%p_email
-    query_result = yourgoodies.run_sql(SQL_query)
+    query_result = run_sql("select email from user where email=%s", (p_email,))
     if len(query_result)>0 and query_result[0]!='':
         return 0
     return 1
@@ -192,8 +184,8 @@ def update_Uid(req,p_email,p_pw,uid):
     with a given email and password
     """	
     ## clean the guest user line which id = uid, previously inserted as guest user
-    SQL_select = "select id from user where email = '%s' and password='%s'"%(p_email,p_pw)
-    query_ID = int(run_sql(SQL_select)[0][0])
+    query_ID = int(run_sql("select id from user where email=%s and password=%s",
+                           (p_email,p_pw))[0][0])
     setUid(req,query_ID)
 
 def create_user_infobox(uid):
