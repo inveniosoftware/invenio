@@ -62,10 +62,23 @@ class TestErrorCodes(unittest.TestCase):
         self.assertNotEqual(None, re.search("badArgument", oai_repository.check_args(oai_repository.parse_args("verb=ListRecords&metadataPrefix=oai_dc&set=really_wrong_set&from=some_random_date&until=some_random_date"))))
         self.assertNotEqual(None, re.search("badArgument", oai_repository.check_args(oai_repository.parse_args("verb=ListRecords"))))
 
+class TestEncodings(unittest.TestCase):
+    """Test for OAI response encodings."""
+
+    def test_encoding(self):
+        """bibharvest oai repository - testing encodings"""
+
+        self.assertEqual("&lt;&amp;>", oai_repository.encode_for_xml("<&>"))
+        self.assertEqual("%20", oai_repository.escape_space(" "))
+        self.assertEqual("%25%20%3F%23%3D%26%2F%3A%3B%2B", oai_repository.encode_for_url("% ?#=&/:;+"))
+
 def create_test_suite():
     """Return test suite for the oai repository."""
+
+
     return unittest.TestSuite((unittest.makeSuite(TestVerbs, 'test'),
-                               unittest.makeSuite(TestErrorCodes, 'test')))
+                               unittest.makeSuite(TestErrorCodes, 'test'),
+                               unittest.makeSuite(TestEncodings, 'test')))
 
 if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())
