@@ -282,7 +282,7 @@ class record {
          }
          $j++;
       }
-      if ($j == $this->nbfields)
+      if ($j == $this->nbfields + 1)
          return 0;
       else
          return $found;
@@ -1063,8 +1063,8 @@ function insert ($rec)
             $recid = $oldsysnoExists;
         else {
             // test on A500 system number
-            $oldsysno = $rec->get_subfield("970","","","a");
-            $oldsysnoExists = Test_In_DB($oldsysno,"970__a","bib90x");
+            $oldsysno = $rec->get_subfield("970","_","_","a");
+            $oldsysnoExists = Test_In_DB($oldsysno,"970__a","bib97x");
             if ($oldsysnoExists)
                 $recid = $oldsysnoExists;
             else {
