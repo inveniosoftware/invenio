@@ -147,6 +147,7 @@
   <navbar:prolog><tr valign=top><td></td><td align=left><small> </navbar:prolog>
 
   <navbar:button id=admin txt="<strong>ADMINS' AREA</strong>" url="<HTDOCSURL>/admin/" hint="CDSware Administrators' Area">
+  <navbar:button id=howto txt="HOWTOs" url="<HTDOCSURL>/admin/howto/" hint="CDSware Admin's HOWTO Documents" menu="howto">
   <navbar:button id=foo txt="<strong>SYSTEM&nbsp;LIB</strong>">
   <navbar:button id=bibdata txt="BibData Admin" url="<HTDOCSURL>/admin/bibdata/" hint="CDSware BibData Admin">
   <navbar:button id=bibwords txt="BibWords Admin" url="<HTDOCSURL>/admin/bibwords/" hint="CDSware BibWords Admin">
@@ -163,6 +164,24 @@
 
   <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
   <navbar:epilog type=S> </small></td><td></td></tr></navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar howto:
+<navbar:define name=howto
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table cellspacing=0 cellpadding=1 border=0>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td align=left><small> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=howto_migrate txt="HOWTO Migrate" url="<HTDOCSURL>admin/howto/migrate.shtml" hint="Admin's HOWTO Docs - How to Migrate your old documents into CDSware">
+
+  <navbar:epilog> </small></td><td></td></tr> </navbar:epilog>
 
   <navbar:footer>
     </table>
