@@ -25,21 +25,21 @@ EXTRA_DIST = $(FILESLISP:$(srcdir)/%=%)
 CLEANFILES = $(lispimage_DATA) *~ *.tmp *.pyc *.fas *.fasl *.lib *.x86f *.mem *.core
 
 webstat.clisp.mem: $(FILESLISP)
-	if [ -x ${CLISP} ]; then \
+	if [ -x "${CLISP}" ]; then \
 	    clisp -q -x "(progn (load \"load.lisp\")(saveinitmem \"webstat.clisp.mem\"))"; \
         else \
             echo "Warning: cannot find CLISP, hoping you have CMUCL or SBCL instead."; \
         fi
 
 webstat.cmucl.core: $(FILESLISP)
-	if [ -x ${CMUCL} ]; then \
+	if [ -x "${CMUCL}" ]; then \
 	    lisp -quiet -batch -eval "(progn (load \"load.lisp\")(ext:save-lisp \"webstat.cmucl.core\"))"; \
         else \
             echo "Warning: cannot find CMUCL, hoping you have CLISP or SBCL instead."; \
         fi
 
 webstat.sbcl.core: $(FILESLISP)
-	if [ -x ${SBCL} ]; then \
+	if [ -x "${SBCL}" ]; then \
 	    sbcl --noinform --disable-debugger --eval "(progn (load \"load.lisp\")(sb-ext:save-lisp-and-die \"webstat.sbcl.core\"))"; \
         else \
             echo "Warning: cannot find SBCL, hoping you have CLISP or CMUCL instead."; \
