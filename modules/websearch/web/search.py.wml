@@ -32,7 +32,7 @@ pylibdir = "<LIBDIR>/python"
 
 import sys    
 sys.path.append('%s' % pylibdir)
-from cdsware.config import cdsname
+from cdsware.config import weburl,cdsname
 from cdsware import search_engine
 from mod_python import apache    
 
