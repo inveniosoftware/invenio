@@ -167,8 +167,7 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
                                "WHERE ub.id_user=%s AND b.id=ub.id_basket "\
                                "ORDER BY b.name ASC ",
                                (uid,))
-
-        out += """<FORM name="displaybasket" action="display" method="post">"""
+ 	out += """<FORM name="displaybasket" action="display" method="post">"""
 
         if len(query_result) == 0:
             # create new basket form
@@ -179,8 +178,9 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
         else:
             # display the list of baskets
             out += """You own <B>%s</B> baskets.<BR>""" % len(query_result)            
-            out += """Select&nbsp;an&nbsp;existing&nbsp;basket:&nbsp;"""\
-                   """<SELECT name="id_basket"><OPTION value="0">- basket name -</OPTION>"""            
+            out +=  """Select&nbsp;an&nbsp;existing&nbsp;basket:&nbsp;"""\
+                    """<SELECT name="id_basket"><OPTION value="0">- basket name -</OPTION>"""            
+
             for row in query_result :
                 if str(id_basket) == str(row[0]):
                     basket_selected = " selected"
@@ -785,3 +785,34 @@ def get_list_of_user_baskets(uid):
         out.append([row[0], row[1]])
     return out
 
+def account_list_baskets(uid, action="", id_basket=0, newname=""):
+
+	out = ""
+	# query the database for the list of baskets
+        query_result = run_sql("SELECT b.id, b.name, b.public, ub.date_modification "\
+                               "FROM basket b, user_basket ub "\
+                               "WHERE ub.id_user=%s AND b.id=ub.id_basket "\
+                               "ORDER BY b.name ASC ",
+                               (uid,))
+      
+       	out += """<FORM name="displaybasket" action="../yourbaskets.py/display" method="post">"""
+        out += """You own following email alert searches::"""
+        out += """<SELECT name="id_basket"><OPTION value="0">- basket name -</OPTION>"""            
+ 	for row in query_result :
+                if str(id_basket) == str(row[0]):
+                    basket_selected = " selected"
+                    basket_name = row[1]
+                else:
+                    basket_selected = ""
+                out += """<OPTION value="%s"%s>%s</OPTION>""" % (row[0], basket_selected, row[1])
+        out += """</SELECT>\n"""	
+
+            # buttons for basket's selection or creation
+        out += """&nbsp;<CODE class="blocknote">"""\
+                   """<INPUT class="formbutton" type="submit" name="action" value="SELECT"></CODE>\n"""
+        out += """&nbsp;&nbsp;or&nbsp;"""\
+               """<INPUT type="text" name="newname" size="10" maxlength="50">&nbsp;"""\
+               """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="CREATE NEW"></CODE><BR><BR>"""
+
+        out += """</FORM>"""  
+	return out

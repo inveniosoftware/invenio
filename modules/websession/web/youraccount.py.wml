@@ -35,13 +35,15 @@ try:
     from cdsware.config import *
     from cdsware.webpage import page
     from cdsware import webaccount
+    from cdsware import webbasket
+    from cdsware import webalert
     import smtplib
 except ImportError, e:
     print "Error: %s" % e
     import sys
     sys.exit(1)
 
-def display(req):
+def info(req):
     uid = webuser.getUid(req)
     return page(title="Your Account",
                 body=webaccount.perform_display(req),
@@ -78,6 +80,20 @@ def lost(req):
                 keywords="CDS, personalize",
                 uid=uid)
 
+def account(req):
+    uid =  webuser.getUid(req)
+    data = webuser.getDataUid(req,uid)	
+    bask = webbasket.account_list_baskets(uid)	  	  
+    aler = webalert.account_list_alerts(uid)
+    sear = webalert.account_list_searches(uid)	    	
+    return page(title="Your Account",
+                body=webaccount.perform_display_account(req,data,bask,aler,sear),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                description="CDS Personalize, Main page",
+                keywords="CDS, personalize",
+                uid=uid)
+    	
+	
 def send_email(req,p_email=None):
     
     uid = webuser.getUid(req)

@@ -29,6 +29,7 @@ try:
     import sys
     from config import *
     from webpage import page
+    from dbquery import run_sql	
     from webuser import getUid,isGuestUser
 except ImportError, e:
     print "Error: %s" % e
@@ -78,13 +79,52 @@ def perform_display(req):
 
     return out
 
+def perform_display_account(req,data,bask,aler,sear):
+    uid = getUid(req)
+    #your account 	
+    if isGuestUser(uid):
+ 	user ="guest"	
+	accBody = """You are logged in as guest. You may want to <A href="../youraccount.py/login">login</A> as a regular user <BR><BR>
+		    You may want to <A href="../"> start a new search</A>
+		  """	
+	bask=aler="""The <strong class=headline>guest</strong> users need to <A href="../youraccount.py/login">register</A>&nbspfirst"""
+	sear="No queries found"
+    else:
+ 	user = data[0]
+        accBody ="""You are logged in as %s. You may want to <A href="../youraccount.py/logout">logout</A><BR><BR>
+	  	    You may want to <A href="../"> start a new search</A>
+		"""%user			
+    out =""
+    out +=template_account("Your Account",accBody)
+    #your baskets
+    out +=template_account("Your Baskets",bask)
+    out +=template_account("Your Alert Searches",aler)
+    out +=template_account("Your Searches",sear)
+    return out
+	
+def template_account(title,body):	
+    out =""	
+    out +="""
+	 	      <table class="searchbox" width="100%%" summary=""	>	
+                       <thead>
+                        <tr>
+                         <th class="portalboxheader">%s</th>
+                        </tr>
+                       </thead>
+                       <tbody>
+                        <tr>
+                         <td class="portalboxbody">%s</td>
+                        </tr>
+                       </tbody>
+                      </table>""" % (title, body)
+    return out 
 
 def warning_guest_user(type):
 
     msg="""You are logged in as a guest user, so your %s will disappear at the end of the current session. If you wish you can<br> login
 	 or register here <A href="../youraccount.py/login">here</A>
 
-	"""%type
+	"""%type	
     out = ""
     out += """<table class="portalbox" width="100%%" summary="">
                        <thead>
@@ -93,7 +133,7 @@ def warning_guest_user(type):
                         </tr>
                        </thead>
                       </table>""" % (msg)
-    return out
+    return out	
  
 ## perform_delete():delete  the account of the user, not implement yet
 def perform_delete():
@@ -114,11 +154,11 @@ def perform_set(email,password):
 			<tr><td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" value="Set new values"></code>&nbsp;&nbsp;&nbsp;</td></tr>
 		</table>
         </form>
-      </body>
+      </body>	
       """%(email,password)
-    return text                    
-
-##  perform_ask(): ask for the user's email and password, for login in the system
+    return text                    				
+		
+##  perform_ask(): ask for the user's email and password, for logi in the system
 def perform_ask():
     text = """
               <p>If you already have an account, please log in by choosing the <strong class=headline>login
@@ -173,7 +213,7 @@ def perform_lost():
 		<p>If you have lost your password string, please enter the email address of your cds.cern.ch account. 
 		 The lost password will be emailed to the owner of that account.
 
-		<table>
+		<table>			
 			<tr>
 				<td align=right><strong>Email address:</strong></td>
 				<td><input type="text" size="25" name="p_email" value=""><br><IMG src="%s/r.gif" alt="">&nbsp<small><span class=quicknote>Example:</span> <span class=example>johndoe@example.com</span></small></td>
@@ -183,7 +223,7 @@ def perform_lost():
 				<td align=center colspan=3><code class=blocknote><input class="formbutton" type="submit" value="Fetch password"></code></td>
 			</tr>
 		</table>
-
+			
 		</form>
 	  </body>
 	  """%imagesurl
@@ -212,11 +252,11 @@ def perform_emailMessage(eMsg):
 
           </body>
 
-   	  """%eMsg
-    return out
+   	  """%eMsg 
+    return out 
 
-# perform_back(): template for return to a previous page, used for login,register and setting
-def perform_back(mess,act):
+# perform_back(): template for return to a previous page, used for login,register and setting 
+def perform_back(mess,act): 
     out =""
     out+="""
           <body>

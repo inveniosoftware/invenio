@@ -391,7 +391,7 @@ def perform_list_alerts (uid):
         out += """</TABLE>\n"""
     out += """<P>You have defined <B>%s</B> alerts.</P>""" % len(query_result)    
     if isGuestUser(uid) :
-	out += perform_guest_user(type="alerts")
+	out += warning_guest_user(type="alerts")
     return out
 
 
@@ -462,6 +462,64 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, new_bas
     query_result = run_sql(SQL_query)
 
     out += """The alert <B>%s</B> has been successfully updated.<BR><BR>\n""" % alert_name
-    out += perform_list_alerts(uid)
+    out += warning_list_alerts(uid)
     return out
 
+# account_list_alerts: list alert for the account page
+# input:  the user id
+#         id_alert: the identifier of the alert 
+#         id_basket: the identifier of the basket, to access to the alert
+#         new basket identifier: 'no' for no basket;
+#         new basket name for this alert;
+#         identifier of the query to be alerted
+# output: the list of alerts Web page
+def account_list_alerts(uid, action="", id_alert=0, id_basket=0,newname=""):
+
+    # set variables
+    out = ""
+    id_user = uid # XXX
+    SQL_query = "SELECT a.alert_name FROM query q, user_query_basket a, basket b "\
+                "WHERE a.id_user='%s' "\
+                "AND a.id_query=q.id "\
+                "AND a.id_basket=b.id "\
+                "ORDER BY a.alert_name ASC " % id_user
+ 
+    query_result = run_sql(SQL_query)    
+    out += """<FORM name="displayalert" action="../youralerts.py/list" method="post">"""
+        # display the list of baskets
+    out += """You own following shelves:"""
+    out += """<SELECT name="id_alert"><OPTION value="0">- alert name -</OPTION>"""            
+    for row in query_result :
+		if len(query_result)>0:
+				alert_selected = " selected"
+		              	alert_name = row[0]
+                else:
+			alert_selected = ""
+                out += """<OPTION>%s</OPTION>""" % (row[0])
+    out += """</SELECT>\n"""	
+    out += """&nbsp;<CODE class="blocknote">"""\
+	"""<INPUT class="formbutton" type="submit" name="action" value="SHOW"></CODE>\n"""
+    out += """</FORM>"""	
+    if isGuestUser(uid) :
+	out += warning_guest_user(type="alerts")
+    return out
+
+# account_list_searches: list the searches of the user
+# input:  the user id
+# output: resume of the searches 
+def account_list_searches(uid):
+    out =""		
+  # first detect number of queries:
+    nb_queries_total = 0
+    nb_queries_distinct = 0
+    id_queries_distinct = []    
+    res = run_sql("SELECT COUNT(*),COUNT(DISTINCT(id_query)) FROM user_query WHERE id_user=%s", (uid,), 1)
+    try:
+        nb_queries_total = res[0][0]
+        nb_queries_distinct = res[0][1]
+    except:
+        pass
+    
+    out +=""" You have made %s queries.A <A href="../youralerts.py/display">detailed list</A> is available with a poosibility to (a) view search results and (b) subscribe for automatic email alerting service for these queries
+	  """ %nb_queries_total
+    return out	
