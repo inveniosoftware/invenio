@@ -30,7 +30,7 @@ __version__ = "$Id$"
 import unittest
 from bibrank_citation_indexer import last_updated_result
 
-class TestListSetOperations(unittest.TestCase):
+class TestCitationIndexer(unittest.TestCase):
 
     def setUp(self):
         self.rank_method_code = 'cit'
@@ -42,7 +42,7 @@ class TestListSetOperations(unittest.TestCase):
 
 def create_test_suite():
     """Return test suite for the bibrank citation indexer."""
-    return unittest.TestSuite((unittest.makeSuite(TestListSetOperations, 'test'),))
+    return unittest.TestSuite((unittest.makeSuite(TestCitationIndexer, 'test'),))
 
 if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())
