@@ -1346,7 +1346,7 @@ def create_record(begin_record_header, ending_record_footer, query_string, match
                     output = FormatField(output,GFF)
 
             if ((len(output) > conv_setting[0] and print_line == 1) or default_print):
-                out_to_print = out_to_print + output
+                out_to_print = out_to_print + output + "\n"
 
             current = current + 1
 
@@ -1359,29 +1359,30 @@ def create_record(begin_record_header, ending_record_footer, query_string, match
                     
         if len(recID) == 1 and match_mode == 1:
             ctrlfield = "<controlfield tag=\"001\">%d</controlfield>" % (recID[0])
-            out_to_print = ctrlfield + out_to_print
-            out_to_print = out_to_print + "\n" + output
+            out_to_print = ctrlfield + "\n" + out_to_print
+#            out_to_print = out_to_print + "\n" + output
             out_flag = 1
         
         if len(recID) == 0 and match_mode == 0:
-            out_to_print = out_to_print + "\n" + output
+#            out_to_print = out_to_print + "\n" + output
             out_flag = 1
         
         if len(recID) > 1 and match_mode == 2:
-            out_to_print = out_to_print + "\n" + output
+#            out_to_print = out_to_print + "\n" + output
             out_flag = 1
         
-    else:
-        
-        out_to_print = out_to_print + "\n" + output
-        
+#    else:
+#        
+#        out_to_print = out_to_print + "\n" + output
+    
     if out_flag or match_mode == -1:
-        out_to_print = begin_record_header + "\n" + out_to_print + "\n" + ending_record_footer
+        if begin_record_header != "":
+            out_to_print = begin_record_header + "\n" + out_to_print
+        if ending_record_footer != "":
+            out_to_print = out_to_print + "\n" + ending_record_footer
     else:
         out_to_print = ""
     
-
-
     return out_to_print
 
 ### MAIN ###
@@ -1513,7 +1514,8 @@ else:
             if record != "":
                 print record
                 tcounter = tcounter + 1
-                print output_rec_sep
+                if output_rec_sep != "":
+                    print output_rec_sep
         else:
             exit_on_error("Cannot access directory: %s" % source_data)
           
@@ -1530,7 +1532,8 @@ else:
                     if record != "":
                         print record
                         tcounter = tcounter + 1
-                        print output_rec_sep
+                        if output_rec_sep != "":
+                            print output_rec_sep
     print ending_footer
 
 </protect>
