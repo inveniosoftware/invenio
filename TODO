@@ -449,6 +449,20 @@ WebColl can relax if no record was modified/added since the last run
 and if no collection definifion/options/portalboxes/etc were updated
 since the last run.
 
+** WebSearch-017: clearer output messages
+Mon Jan 10 19:28:30 2005
+
+In phrases like ``Search term dark mass inside title index did not
+match any record'' we should better distinguish for the end user
+word-searches from phrase-searches.
+
+** WebSearch-018: investigate doing partial phrase match when exact failed
+Mon Jan 10 19:28:30 2005
+
+investigate doing partial phrase match when exact phrase match failed,
+exactly as we were doing some years ago.
+
+
 * WebSession
 
 ** WebSession-001: detect cookies and inform user if not available upon login
