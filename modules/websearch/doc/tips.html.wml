@@ -1,0 +1,176 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="Search Tips" \
+    navbar_name="search-new" \
+    navtrail_position="<a class=navtrail href=<WEBURL>><CDSNAME></a> &gt; <a href=<WEBURL>/help/>Help Central</a> &gt; <a href=<WEBURL>/help/search/>Search Help</a>" \
+    navbar_select="tips" 
+
+<pre>
+                       - to be updated -
+
+SEARCH ENGINE SYNTAX AND TIPS                   Draft, December 2001
+
+We believe that the search engine behaviour should reflect today's
+typical user web experience, i.e. it should ressemble Google rather
+than classical librarian search screens.  
+
+Here are extensions to Google's syntax that we implemented to enable
+complex structured search.  
+
+1. The typical Google behaviour is preserved, as described at
+   [http://www.google.com/help/refinesearch.html].  Which means that,
+   for example:
+
+   "ellis muon" ... matches all records that contain both the word
+                    'ellis' and the word 'muon' anywhere 
+
+    This means that by default a 'logical AND' kind of search is done,
+    not the phrase search as ALEPH does.
+
+   "ellis and muon" ... ditto, syntactic sugar
+
+   "+ellis +muon" ... ditto, syntactic sugar
+
+   "ellis not muon" ... matches all records that contain the word
+                        'ellis' but that do not contain the word
+                        'muon'
+
+   "ellis -muon" ... ditto, syntactic sugar
+
+   "ellis or muon" ... matches all records that contain at least one
+                       of the words
+
+   "ellis |muon" ... ditto, syntactic sugar
+
+
+2. Logical operations are automatically chained from left to right:
+   (no parenthesis support at the moment)
+
+   "ellis muon or kaon" ... means "(ellis and muon) or kaon".  [Hmm,
+                            Google seems to have preference for the
+                            "OR" branch, so we may want to change this
+                            eventually.]
+
+   "muon or kaon ellis" ... means "(muon or kaon) and ellis"
+
+3. Truncation is done via '*' character (truncates for any word
+   beginning or ending) and via '?' character (truncates for any
+   phrase beginning or ending, i.e. including whitespace, commas etc).
+
+   "muon*" ... matches records that contain words 'muon', 'muons',
+               'muonic', etc.
+
+   "muon?" ... matches records that start by letters 'muon', e.g.
+               'Muon (g-2) in model...', 'Muon and Muon Neutrino
+               Fluxes...', 'Muon Anomalous Magnetic Moment...', etc.
+               (This is good for ACC style of searches.)
+
+   The difference is important: e.g. (1) if you search for "muon
+   anomalous*" within title, you will do a WRD style of search for the
+   word 'muon', and the word that start by letters 'anomalous', and
+   then you do a logical and operation. (2) if you search for "muon
+   anomalous?" within title, you will ACC style of search, so that
+   only records that start by letters 'muon anomalous' are retrieved.
+
+   The wildcards work both in the prefix and the postfix mode:
+
+   "*ism" ... matches records that contain words that end by letters
+              '-ism' 
+
+   "*o*" ... matches records that contain words that contain the
+             letter 'o' anywhere in the word (kinda slow!)
+
+4. Search for various fields is supported via Google "site:" like
+   syntax.  For example:
+
+   "author:ellis" ... matches records containing the word 'ellis'
+                      anywhere within author fields (100 $a, 700 $a)
+
+   "author:ellis, j?" ... matches records that start by 'ellis, j'
+                          inside author fields (100 $a, 700 $a)
+
+   "title:muon*" ... matches records with the words like 'muon',
+                     'muonic', 'muons', etc anywhere within the title
+
+   The old syntax is also accepted, e.g. "wab=trigger" is silently
+   changed into "abstract:trigger".
+
+   The power users may use MARC-21 fields directly:
+
+   "100__a:ellis?" ... matches records that have '100 $a' subfield
+                       starting by letters 'ellis'
+
+   Note that all MARC-21 fields are searchable in this manner, for
+   example:
+
+   "909C0e:WA9?" ... matches records that have '909 C0 $e' subfield
+                     starting by letters 'WA9'
+
+   You can search several 'near' MARC-21 fields in one go:
+
+   "24*:the cms?" ... matches records that have '24x xx $x' subfields
+                     (where 'x' stands for anything) starting by
+                     letters 'the cms'
+
+   "24:the cms?" ... ditto, syntactic sugar
+
+   "24:?the cms?" ... ditto, but letters 'the cms' can be found
+                      anywhere within these fields (not only at its
+                      beginning)
+
+5. Phrase search syntax done when single or double quotes are used.
+   The search is done by searching directly MARC-21 tags.  The phrase
+   search is in fact a substring search, so that:
+
+   "author:'ellis, j'" ... matches authors like 'Ellis, John' or
+                           'Ellis, J' but also 'Nellis, Jim' etc.
+
+   So that the difference beween "author:ellis, j?" and
+   "author:'ellis, j'" is that in the former case the start of the
+   field is fixed by the letter 'e', while in the latter case any text
+   may precede.
+
+   "title:'high precision'" ... matches titles "The high precision
+                                measurements...', or '...rendered with
+                                high precisions, etc.
+
+   "abstract:'f'" ... matches records that contain the letter 'f'
+                      inside the abstract (extremely slow!).  This is
+                      because the phrase search is implemented as a
+                      substring search, i.e. word boundaries are not
+                      required nor checked.
+
+6. All the syntax mentioned above can be combined together, e.g.
+   "author:ellis -muon* +abstract:'additional data' +909C0:199*" which
+   would match records that have the word 'ellis' inside author
+   fields, that do not contain words like 'muon', 'muonic' etc in any
+   field, that contain the phrase (or the substring, to be more
+   precise) 'additional data' inside abstract fields, and that have
+   '909 C0 $x' field (where 'x' stands for anything) starting by
+   digits '199'.
+
+   (Of course, our typical users would just type something like:
+   "ellis -muon* +199* 'additional data'" instead, which will give
+   them approximately the same number of hits and about ~10 times
+   faster.)
+
+Please comment on this RFC as soon as possible.
+</pre>
