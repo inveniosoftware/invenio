@@ -22,7 +22,7 @@ SUBDIRS = config modules
 EXTRA_DIST = UNINSTALL .wmlrc configure-tests.py
 
 ## submit stuff for demo data link creation
-sbmdir = $(WEBDIR)submit/access/protected
+sbmdir = $(WEBDIR)/submit/access/protected
 sbmdat = SBITEXT MBITEXT FTTTEXT SRVTEXT TFUTEXT \
 	 SBIRTEXT MBIRTEXT FTTRTEXT SRVRTEXT TFURTEXT APPRTEXT \
 	 SBIPICT MBIPICT FTTPICT \
@@ -149,7 +149,7 @@ drop-demo-site: install
 	@echo ""
 	${prefix}/bin/webcoll
 	${prefix}/bin/webcoll 1
-	for f in $(sbmdat); do rm -f $(sbmdir)/$$f.shtml ; done
+#	for f in $(sbmdat); do rm -f $(sbmdir)/$$f.shtml ; done
 	@echo "***************************************************************"
 	@echo "** The demo site and records have been successfully dropped. **"
 	@echo "***************************************************************"
