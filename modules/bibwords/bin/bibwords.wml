@@ -136,6 +136,11 @@ try:
 except:
     pass
 
+## safety parameters concerning MySQL thread-multiplication problem:
+cfg_check_mysql_threads = 1 # to check or not to check the problem? 
+cfg_max_mysql_threads = 60 # how many threads (connections) we consider as still safe
+cfg_mysql_thread_timeout = 50 # we'll kill threads that were sleeping for more than X seconds
+
 ## override urllib's default password-asking behaviour:
 class MyFancyURLopener(urllib.FancyURLopener):
     def prompt_user_passwd(self, host, realm):
@@ -207,6 +212,25 @@ def list_union(list1, list2):
     for e in list2:
         union_dict[e] = 1
     return union_dict.keys()
+
+## safety function for killing slow MySQL threads:
+def kill_sleepy_mysql_threads(max_threads=cfg_max_mysql_threads, thread_timeout=cfg_mysql_thread_timeout):
+    """Check the number of MySQL threads and if there are more than
+       MAX_THREADS of them, lill all threads that are in a sleeping
+       state for more than THREAD_TIMEOUT seconds.  (This is useful
+       for working around the the max_connection problem that appears
+       during indexation in some not-yet-understood cases.)  If some
+       threads are to be killed, write info into the log file.      
+    """
+    res = run_sql("SHOW FULL PROCESSLIST")
+    if len(res) > max_threads:
+        for row in res:
+            r_id,r_user,r_host,r_db,r_command,r_time,r_state,r_info = row
+            if r_command == "Sleep" and int(r_time) > thread_timeout:
+                run_sql("KILL %s", (r_id,))
+                if opts_dict["verbose"] >= 1:                
+                    write_message("WARNING: too many MySQL threads, killing thread %s" % r_id)
+    return
 
 ## MARC-21 tag/field access functions
 def get_fieldvalues(recID, tag):
@@ -929,6 +953,8 @@ class WordTable:
                 if opts_dict["verbose"]:
                     write_message("%s adding records #%d-#%d started" % \
                         (self.tablename, i_low, i_high))
+                if cfg_check_mysql_threads:
+                    kill_sleepy_mysql_threads()
                 task_update_progress("%s adding recs %d-%d" % (self.tablename, i_low, i_high))
                 self.del_recID_range(i_low, i_high)
                 just_processed = self.add_recID_range(i_low, i_high)
