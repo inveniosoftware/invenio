@@ -18,9 +18,9 @@
 
 #include "cdspage.wml" \
     title="WebAccess Admin Guide" \
-    navbar_name="hacking-webaccess" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/>Admin Area</a>  &gt; <a class=navtrail href=<WEBURL>/admin/webaccess/>WebAccess Admin</a> " \
-    navbar_select="hacking-webaccess-api" 
+    navbar_name="admin" \
+    navbar_select="webaccess-admin-guide" 
 
 
 <pre>
@@ -33,47 +33,56 @@ WEBACCESS ADMIN GUIDE / $Date$
 
 1. INTRODUCTION, USING ROLES
 
-  WebAccess is a common RBAC, role based access control, for all of CDSware. This means that users
-  are connected to roles that cover different areas of access. I.e <em>administrator of the photo collection</em>
-  or <em>system librarian</em>. Users can be active in different areas and of course connected to as many 
-  roles as needed.
+  WebAccess is a common RBAC, role based access control, for all of
+  CDSware. This means that users are connected to roles that cover
+  different areas of access. I.e <em>administrator of the photo
+  collection</em> or <em>system librarian</em>. Users can be active in
+  different areas and of course connected to as many roles as needed.
   
-  The roles are connected to actions. An action identifies a task you can perform in CDSware. It can be defined
-  to take any number of arguments in order to more clearly describe what you are allowing connected users to do.
+  The roles are connected to actions. An action identifies a task you
+  can perform in CDSware. It can be defined to take any number of
+  arguments in order to more clearly describe what you are allowing
+  connected users to do.
   
-  For example the system librarian can be allowed to run bibwords on the different indexes. To allow system 
-  librarians to run the bibwords indexing on the field author we connect role <em>system librarian</em> with
-  action <em>runbibwords</em> using the argument <em>index='author'</em>.
+  For example the system librarian can be allowed to run bibwords on
+  the different indexes. To allow system librarians to run the
+  bibwords indexing on the field author we connect role <em>system
+  librarian</em> with action <em>runbibwords</em> using the argument
+  <em>index='author'</em>.
   
-  WebAccess is based on allowing users to perform actions. This means that only allowed actions 
-  are stored in the access control engine's database. 
+  WebAccess is based on allowing users to perform actions. This means
+  that only allowed actions are stored in the access control engine's
+  database.
 
 
 2. WEBACCESS ADMIN INTERFACE
 
-All the WebAccess Administration web pages have certain features/design choices in common
+All the WebAccess Administration web pages have certain
+features/design choices in common
 
 - Divided into steps
 
-  The process of adding new authorizations/information is stepwise. The subtitle
-  contains information about wich step you are on and what you are supposed to do.
+  The process of adding new authorizations/information is
+  stepwise. The subtitle contains information about wich step you are
+  on and what you are supposed to do.
 
 - Restart from any wanted step 
 
-  You can always start from an earlier step by simply clicking the wanted button. This
-  is not a way to undo changes! No information about previous database is kept, so all
-  changes are definite.
+  You can always start from an earlier step by simply clicking the
+  wanted button. This is not a way to undo changes! No information
+  about previous database is kept, so all changes are definite.
 
 - Change or new entry must confirmed
 
-  On all the pages you will be asked to confirm the change, with information about
-  what kind of change you are about to perform.
+  On all the pages you will be asked to confirm the change, with
+  information about what kind of change you are about to perform.
 
 - Links to other relevant admin areas on the right side
 
-  To make it easier to perform your administration tasks, we have added a menu area on 
-  the right hand side of these pages. The menu contain links to other relevant admin pages and 
-  change according to the page you are on and the information you have selected.
+  To make it easier to perform your administration tasks, we have
+  added a menu area on the right hand side of these pages. The menu
+  contain links to other relevant admin pages and change according to
+  the page you are on and the information you have selected.
 
 
 3. EXAMPLE PAGES
@@ -84,8 +93,10 @@ II. Example - connecting role and user
 
 I. Role area
 
-  Administration tasks starts in one of the administration areas. The role area is the main area
-  from where you can perform all your managing tasks. The other admin areas are just other ways of entering.
+  Administration tasks starts in one of the administration areas. The
+  role area is the main area from where you can perform all your
+  managing tasks. The other admin areas are just other ways of
+  entering.
 
 </pre>
 
