@@ -237,7 +237,7 @@ cds.support@cern.ch
   <CDSNAME>&nbsp;::&nbsp;<a class=note href="<WEBURL>">Search</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/submit/">Submit</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/help/">Help</a>&nbsp;::&nbsp;<a class=note href="<WEBURL>/youraccount.py/display">Personalize</a>
   </td>
   <td align=right>
-  <!--LAST-UPDATED-->Last updated <: print `date +"%d %b %Y %H:%M:%S %Z"`; :>
+  <!--LASTUPDATED-->
   </td>
   </tr>
   <tr>

@@ -96,7 +96,12 @@ $(cdspageheaderadd)
 ## CDS page footer (first local, then common):
 <div class="pagefooter">
 $(cdspagefooteradd)
-<CDSPAGEFOOTER>
+<:
+    $footer = '<CDSPAGEFOOTER>';
+    $lastupdated = `date +"%d %b %Y %H:%M:%S %Z"`;
+    $footer =~ s/<!--LASTUPDATED-->/Last updated $lastupdated/g;
+    print $footer;
+:>
 </div>
 
 ## CDS page ends:
