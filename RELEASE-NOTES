@@ -1,42 +1,135 @@
 --------------------------------------------------------------------
-CDSware v0.3.1 (DEVELOPMENT) is released 
-March 12, 2004
+CDSware v0.3.2 (DEVELOPMENT) is released 
+May 12, 2004
 http://cdsware.cern.ch/news/
 --------------------------------------------------------------------
 
-CDSware v0.3.1 (DEVELOPMENT) was released on March 12th, 2004.
+CDSware v0.3.2 (DEVELOPMENT) was released on May 12th, 2004.
 
 What's new:
-  * security fix preventing exposure of local configuration variables
-    by malicious URL crafting (WebSearch, WebSubmit, WebAlert,
-    WebBasket, WebSession, BibHarvest, MiscUtil)
-  * initial release of the ranking engine (BibRank)
-  * new guide on HOWTO Run Your CDSware Installation (WebHelp)
-  * fixed submit configurations with respect to fulltext links and
-    metadata tags (WebSubmit, MiscUtil)
-  * Your Account personal corner now shows the list and the status
-    of submissions and approvals (WebSession)
-  * uniform help and version number option for CLI executables
-    (WebSearch, BibSched, BibIndex, BibRank, BibHarvest, BibConvert,
-    WebAccess, BibFormat, WebSession, WebAlert)
-  * uniform technique for on-the-fly formatting of search results via
-    `hb_' and `hd_' output format parameters (WebSearch)
-  * check for presence of pcntl and mysql PHP libraries (BibUpload)
+-----------
+
+ *) admin area improved: all the modules have now Admin Guides; some
+    guides were updated, some are still to be updated (WebHelp,
+    BibConvert, BibFormat, BibIndex, BibSched, WebAlert, WebSession,
+    WebSubmit, BibEdit, BibHarvest, BibRank, BibUpload, WebAccess,
+    WebBasket, WebSearch, WebStyle)
+
+ *) initial release of the WebSearch Admin interface (WebSearch)
+
+ *) initial release of the BibRank Admin interface (BibRank)
+
+ *) search cache expiry after insertion of new records (WebSearch)
+
+ *) search engine now does on-the-fly formatting via BibFormat CLI
+    call to handle restricted site situations (WebSearch)
+
+ *) webcoll default verbosity decreased for efficiency (WebSearch)
+
+ *) added BibConvert configuration example for converting XML Dublin
+    Core to XML MARC (BibConvert)
+
+ *) BibConvert knowledge base mode extended by various case-sensitive
+    matching possibilities (BibConvert)
+
+ *) fixed various problems with fulltext file names and the submission
+    from MS Windows platform (WebSubmit)
+
+ *) fixed problem with bibupload append mode not updating XML MARC
+    properly (BibUpload)
+
+ *) fixed small problems with the submission interface such as
+    multiple fields selection (WebSubmit)
+
+ *) session revoking and session expiry strengthened (WebSession)
+
+ *) page design and style sheet updated to better fit large variety of
+    browsers (WebStyle)
+
+ *) added output format argument for basket display (WebBasket)
+
+ *) new Swedish translation and updated German, Russian, and Spanish
+    translations; thanks to Urban, Guido, Lyuba, and Magaly
+
+ *) faster creation of I18N static HTML and PHP files during make   
 
 Download:
-   <http://cdsware.cern.ch/download/cdsware-0.3.1.tar.gz>
+---------
+
+  <http://cdsware.cern.ch/download/cdsware-0.3.2.tar.gz>
+  <http://cdsware.cern.ch/download/cdsware-0.3.2.tar.gz.md5>
+  <http://cdsware.cern.ch/download/cdsware-0.3.2.tar.gz.sig>
 
 Notes: 
-   This DEVELOPMENT release contains an important security fix.  All
-   CDSware DEVELOPMENT users (v0.1.x and v0.3.x) are asked to upgrade
-   to v0.3.1 as soon as possible.  Users of v0.0.9 are not affected.
+------
+
+ *) This DEVELOPMENT release is recommended to all users of prior
+    v0.1.x and v0.3.x versions.  Users of the STABLE v0.0.9 release
+    are invited to test it and let us know their comments.
+
+ *) This release contains some minor SQL table updates.  If you are
+    upgrading from v0.3.0 or v0.3.1, then after you build CDSware:
+
+      $ ./configure --prefix=[...]
+      $ vi config/config.wml
+      $ make
+
+    you have to run:
+
+      $ make update-v0.3.1-tables
+
+    and then continue as usual:
+
+      $ make install
+      $ sudo apachectl restart
+
+ *) This release contains important fix for BibUpload append mode.
+    Note that BibUpload append mode is normally not used by WebSubmit
+    or any other tools, so most probably you do not have to pay
+    attention to this problem.  You might be affected only if you have
+    expressly used BibUpload append mode (``bibupload -a'') in the
+    command line.  If this is indeed the case, then you have to
+    recreate XML MARC and other formats of your metadata.  The steps
+    to take to recreate formats for your records (say 123) would go
+    like this:
+
+      $ echo "TRUNCATE TABLE bibfmt;" | ./modules/miscutil/bin/dbexec
+      $ wget -O z.xml 'http://your.site/search.py?id=1&idb=123&of=xm&rg=500'
+      $ bibupload -r z.xml
+      $ bibreformat -oHB,HD,HP,HC
+      $ bibsched
+
+    Please contact our mailing list if you want to know more.  
+
+ *) This release contains an initial version of the WebSearch Admin
+    Interface.  It is fully functional but has not been fully tested
+    under CERN production conditions yet.
+
+ *) As of this release, all CDSware releases will be cryptographically
+    signed.  See the INSTALL file for more details.
 
 Known problems:
-   Ranking engine is fully functional from the admin-level point of
-   view, but the end-user ranking functionality still has to be
-   plugged into the search interface.  Several important admin-level
-   functionalities of v0.0.9 are still missing in the v0.3.x tree.
+---------------
+
+ *) Ranking engine is fully functional from the admin-level point of
+    view, but the end-user ranking functionality still has to be
+    plugged into the search interface.
+
+ *) The admin-level functionality for several modules is not fully
+    developed yet.
+
+ *) Fulltext file storage management is not yet linked with the
+    metadata management.
 
 What's next: 
-   Fixing known problems described above.  Developing BibIndex for
-   better phrase indexing and browsing. 
+------------
+
+ *) Fixing the problems mentioned above.  
+
+ *) Introducing ranking methods and international collection names
+    into the search engine.  
+
+ *) Developing BibIndex for better phrase indexing and browsing.
+
+ *) Developing clearer relations and dependencies between metadata
+    records and fulltext files.
