@@ -1,0 +1,60 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="BibUpload Admin" \
+    navbar_name="admin" \
+    navbar_select="bibupload"
+	    
+BibUpload enables you to upload bibliographic data in XML MARC
+format into CDSware bibliographic database.
+
+<h2>Configuring BibUpload</h2>
+
+<p>There is nothing to be configured at the moment.  All the data
+upload configuration is usually done when transforming the data via <a
+href="../bibconvert/">BibConvert</a>.
+
+<p><strong>NOTE</strong>: Please note that BibUpload currently assumes
+<code>037 $a</code> tag to be a "primary report number" that is unique
+throughout the system.  Therefore, if you upload two records with the
+same <code>037 $a</code> tag value, it will override the exising
+record with the new one.  See the beginning of the BibUpload file to
+know more.
+
+<p>More advanced BibUpload configuration functionality will be
+included later.
+
+<h2>Running BibUpload</h2>
+
+<p>Consider that you have an XML MARC file that is to be uploaded into
+the CDSware.  (For example, it might have been produced by <a
+href="../bibconvert/">BibConvert</a>.)  To finish the upload, you
+would call the BibUpload script as follows:
+
+<blockquote>
+<pre>
+$ bibupload -i file.xml
+<pre>
+</blockquote>
+
+<p>After which that data should have been uploaded in the CDSware
+bibliographic databases, and will be subsequently indexed by <a
+href="../bibindex/">BibIndex</a> daemon and reformatted by <a
+href="../bibformat/">BibFormat</a> daemon processes.
