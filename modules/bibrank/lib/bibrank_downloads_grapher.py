@@ -27,7 +27,7 @@ import sys
 import time
 import tempfile
 from config import weburl, cdslang
-from messages import msg_dowloads_history
+from messages import msg_downloads_history
 from dbquery import run_sql
 from bibrank_downloads_indexer import database_tuples_to_single_list
 from bibrank_grapher import *
