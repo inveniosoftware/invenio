@@ -1,0 +1,14 @@
+Book---BOOK
+web-site---SOFT
+Computer---SOFT
+Film---VIDE
+Broadcast---VIDE
+Electronic Source---VIDE
+Audio---VIDE
+Article---PREP
+Report---PREP
+Journal---PREP
+Conference---CONF
+Communication---CONF
+Thesis---THES
+_DEFAULT_---XXX

@@ -1,0 +1,797 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.08 [en] (X11; I; AIX 4.3) [Netscape]">
+</HEAD>
+<BODY>
+
+<H2>BibConvert Admin Guide</H2>
+
+<p/>
+<A HREF="#1">Guide to BibConvert Configuration</a>
+<BR>&nbsp;<A HREF="#G">Conventions</A>
+<BR>&nbsp;<A HREF="#1">Step 1 Definition of Source Record</A>
+<BR>&nbsp;<A HREF="#2">Step 2 Definition of Source Fields</A>
+<BR>&nbsp;<A HREF="#3">Step 3 Definition of Target Record</A>
+<BR>&nbsp;<A HREF="#4">Step 4 Main Configuration</A>
+<BR>&nbsp;<A HREF="#5">Step 5 Other Configuration Files</A>
+<p/>
+<br><A HREF="#5">Formatting in BibConvert</a>
+<BR>&nbsp;<A HREF="#51">Definition of Formatting Functions</A>
+<BR>&nbsp;<A HREF="#52">Generated Values</A>
+<p/>
+
+<h2><A NAME="G"></A>Conventions</h2>
+
+<br/>- comment line starts with '#' sign in the first column
+<br/>- each section is declared by a line starting with '===' (further characters on the line are ignored)
+<br/>- values are separated by '---'
+
+<h2>
+<A NAME="1"></A>Step 1 Definition of Source record</h2>
+<P>- Create/edit "data extraction configuration template" section of the configuration file.
+<BR>- Each line of this section stands for a definition of one source field:
+<P><strong>name---keyword---terminating string---separator---</strong>
+<P>- Choose a (valid) name allowed by the system
+<BR>- Enter <strong>keyword</strong> and <strong>terminating string</strong>, which are boundary tags for
+the wanted value extraction
+<BR>- In case the field is repetitive, enter the value <strong>separator</strong>
+<BR>- "<strong>---</strong>"is mandatory separator between all values, even zero-length
+<BR>- <strong>MAX</strong>/<strong>MIN</strong> keywords can be used instead of terminating string
+<BR>&nbsp;
+<P>Example of a definition of author(repetitive) and title (non-repetitive)
+fields:
+<br>
+<pre>
+=== data extraction configuration template ===
+### here comes the data extraction configuration template
+<br>
+<P>AU---AU_---MAX---;---
+<BR>TI---TI_---EOL------
+</pre>
+
+<H2>
+<A NAME="2"></A>Step 2 Definition of Source fields</H2>
+<I>Each field extracted from the source according to the definition done
+in the first step can have an internal structure, which is described in
+this section.</I>
+<P>- Create/edit "data source configuration template" section of the configuration file.
+<BR>- Each line of this section stands for a definition of one source field
+<BR>- <name> corresponds to the name defined in the step 1
+<P>name---{CONST&lt;:SUBFIELD:>[CONST]}}
+<P>- Enter only constants that appear systematically.
+<BR>- Between two discrete subfields has to be defined a constant of a non zero
+length
+<BR>- "---"is a mandatory separator between the name and the source
+field definition
+<P>Example of a definition of author(repetitive) and title (non-repetitive)
+fields:
+<pre>
+===   data source configuration template   ===
+TI---&lt:TI:>
+AU---&lt:FIRSTNAME:>-&lt;:SURNAME:>
+</pre>
+
+<H2>
+<A NAME="3"></A>Step 3 Definition of target record</H2>
+<I>This definition describes the layout of the target record that is created by the conversion,
+together with the corresponcence to the source fields defined in step 2.</I>
+
+<P>- Create/edit "data target configuration template" section of the configuration file.
+<BR>- Each line of this section stands for an output line created by the conversion.
+<BR>- &lt;name> corresponds to the name defined in the steps 1 and 2
+<P>CODE---CONST&lt;:name::SUBFIELD::FUNCT():>CONST&lt;:GENERATED_VALUE:>
+<P>- <strong>CODE</strong> stands for a tag for readability (optional)
+<BR>- "<strong>::</strong>"is a mandatory separator between the name and the subfield
+definition
+<BR>- optionally, you can apply the appropriate <A HREF="#51">formatting function(s)</A>
+and <A HREF="#52">generated values</A>
+<BR>- "<strong>::</strong>"is a mandatory separator between the subfield definition and the function(s)
+<BR>- "<strong>---</strong>"is a mandatory separator between the tag and the output code definition
+<BR>- mark repetitive source fields with an asterisk (*)
+<P>Example of a definition of author (repetitive) and title (non-repetitive) codes:
+
+<protect>
+<pre>
+<br/>AU::CONF(AU,,0)---&lt;datafield id="700" ind1="" ind2="">&lt;subfield code="a">&lt;:AU*::AU:>&lt;/subfield>&lt;/datafield>
+<br/>TI::CONF(TI,,0)---&lt;datafield id="245" ind1="" ind2="">&lt;subfield code="a">&lt;:TI::TI::SUP(SPACE, ):>&lt;/subfield>&lt;/datafield>
+</pre>
+</protect>
+
+<h2><A NAME="5"></a>Formatting in BibConvert</H2>
+
+<H2>&nbsp;<A NAME="51"></A>Definition of formatting functions</H2>
+
+<BLOCKQUOTE>Every field can be processed with a variety of functions that
+partially or entirely change the original value.
+<BR>There are three types of functions available that take as element either
+single characters, words or the entire value of processed field.
+<BR>&nbsp;
+<P>Every function requires a certain number of parameters to be entered
+in brackets. If an&nbsp; insufficient number of parameters is present,
+the function uses default values. Default values are constructed with attempt to keep the original value.
+<P>The configuration of templates is case sensitive.
+<P>The following functions are available:
+<P><A HREF="#ADD">ADD(prefix,suffix) - add prefix/suffix</A>
+<BR><A HREF="#KB">KB(kb_file,[0-9]) -lookup in kb_file and replace value</A>
+<BR><A HREF="#ABR">ABR(x,suffix)/ABRW(x,suffix) - abbreviation with suffix addition</A>
+<BR><A HREF="#ABRX">ABRX() - abbreviate exclusively words longer</A>
+<BR><A HREF="#CUT">CUT(prefix,postfix) - remove substring from side</A>
+<BR><A HREF="#REP">REP(x,y) - replacement of characters</A>
+<BR><A HREF="#SUP">SUP(type) - suppression of characters of specified type</A>
+<BR><A HREF="#LIM">LIM(n,L/R)/LIMW(str,L/R) - restriction to n letters</A>
+<BR><A HREF="#WORDS">WORDS(n,side) - restriction to n words from L/R</A>
+<BR><A HREF="#MINL">MINL(n)/MAXL(n) - replacement of words shorter/greater
+than n</A>
+<BR><A HREF="#MINLW">MINLW(n) - replacement of short values</A>
+<BR><A HREF="#EXPW">EXP(str,1|0)/EXPW(type) - replacement of words from
+value if containing spec. type/string</A>
+<BR><A HREF="#IF">IF(value,valueT,valueF) - replace T/F value</A>
+<BR><A HREF="#UP">UP/DOWN/CAP/SHAPE/NUM - lower case and upper case, shape</A>
+<BR><A HREF="#SPLIT">SPLIT(n,h,str,from)/SPLITW(sep,h,str,from) - split
+into more lines</A>
+<BR><A HREF="#CONF">CONF(field,value,1/0)/CONFL(value,1/0) - confirm validity
+of a field</A>
+<BR><A HREF="#RANGE">RANGE(from,to) - confirm only entries in the specified
+range</A>
+<BR>&nbsp;</BLOCKQUOTE>
+
+<H4>
+<A NAME="ADD"></A>ADD(prefix,postfix)</H4>
+
+<BLOCKQUOTE>default: ADD(,)&nbsp;&nbsp;&nbsp; no addition
+<P>Adds prefix/postfix to the value, we can use this function to add the proper
+field name as a prefix of the value itself:
+<P>ADD(WAU=,)&nbsp;&nbsp;&nbsp; prefix for the first author (which may
+have been taken from the field AU2)
+<BR>&nbsp;</BLOCKQUOTE>
+
+<H4>
+<A NAME="KB"></A>KB(kb_file)&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp; kb_file search</H4>
+
+<BLOCKQUOTE>default: KB(kb_file,1/0)
+<P>The input value is compared to a kb_file and may be replaced
+by another value. In the case that the input value is not recognized, it is by default kept
+without any modification. This default can be overridden by <strong>_DEFAULT_---default value</strong> entry in the kb_file
+<P>The file specified in the parameter is a text file representing a table
+of values that correspond to each other:
+<P>{<strong>input_value---output_value</strong>}
+<P>KB(file,1) searches the exact value passed.
+<BR>KB(file,0) searches the KB code inside the value passed.
+<BR>KB(file,2) as 0 but not case sensitive
+<P>Edge spaces are not considered.
+Output value is not further formated.</BLOCKQUOTE>
+
+<H4>
+<A NAME="ABR"></A>ABR(x,trm),ABRW(x,trm)&nbsp; - abbreviate term to x places
+with(out) postfix</H4>
+
+<BLOCKQUOTE>default: ABR(1,.)
+<BR>default: ABRW(1,.)
+<P>The words in the input value are shortened according to the parameters
+specified. By default, only the initial character is kept and the output
+value is terminated by a dot.
+<BR>ABRW takes entire value as one word.
+<BLOCKQUOTE>&nbsp;
+<TABLE BORDER COLS=3 WIDTH="50%" NOSAVE >
+<TR>
+<TD>example</TD>
+
+<TD>input</TD>
+
+<TD>output</TD>
+</TR>
+
+<TR>
+<TD>ABR()</TD>
+
+<TD>firstname_surname</TD>
+
+<TD>f._s.</TD>
+</TR>
+
+<TR>
+<TD>ABR(1,)</TD>
+
+<TD>firstname_surname</TD>
+
+<TD>f_s</TD>
+</TR>
+
+<TR>
+<TD>ABR(10,COMMA)</TD>
+
+<TD>firstname_surname</TD>
+
+<TD>firstname,_surname,</TD>
+</TR>
+</TABLE>
+</BLOCKQUOTE>
+</BLOCKQUOTE>
+
+
+<h4>
+<A NAME="ABRX"></A>ABRX() - abbreviate exclusively words longer than given limit</h4>
+<BLOCKQUOTE>default: ABRX(1,.)
+<P>Exclusively words that reach the specified length limit in the input value are abbreviated.
+No suffix is appended to the words shorter than specified limit.
+</blockquote>
+
+<h4>
+<A NAME="CUT"></A>CUT(prefix,postfix) - remove substring from side</h4>
+
+<BLOCKQUOTE>default: CUT(,)
+<P>Remove string from the value (reverse function to the "ADD")
+
+</BLOCKQUOTE>
+
+<H4>
+<A NAME="REP"></A>REP(x,y)&nbsp;&nbsp; - replace x with y</H4>
+
+<BLOCKQUOTE>default: REP(,)&nbsp;&nbsp;&nbsp; no replacement
+<P>The input value is searched for the string specified in the first parameter.
+All such strings are replaced with the string specified in the second parameter.
+
+</BLOCKQUOTE>
+
+<H4>
+<A NAME="SUP"></A>SUP(type,string)&nbsp;&nbsp; - suppress chars of certain
+type</H4>
+
+<BLOCKQUOTE>default: SUP(,)&nbsp;&nbsp;&nbsp; type not recognized
+<P>All groups of characters belonging to the type specified in the first
+parameter are suppressed or replaced with a string specified in the second
+parameter.
+<P>Recognized types:
+<P>SPACE .. invisible chars incl. NEWLINE
+<BR>ALPHA .. alphabetic
+<BR>NALPHA .. not alphabetic
+<BR>NUM .. numeric
+<BR>NNUM&nbsp;&nbsp;&nbsp; .. not numeric
+<BR>ALNUM&nbsp; .. alphanumeric
+<BR>NALNUM&nbsp; .. non alphanumeric
+<BR>LOWER&nbsp; .. lower case
+<BR>UPPER&nbsp; .. upper case
+<BR>PUNCT&nbsp; .. punctuation
+<BR>NPUNCT&nbsp; .. not punctuation
+<BR>&nbsp;
+<BLOCKQUOTE>&nbsp;
+<TABLE BORDER COLS=3 WIDTH="50%" NOSAVE >
+<TR>
+<TD>example</TD>
+
+<TD>input</TD>
+
+<TD>output</TD>
+</TR>
+
+<TR>
+<TD>SUP(SPACE,-)</TD>
+
+<TD>sep_1999</TD>
+
+<TD>sep-1999</TD>
+</TR>
+
+<TR>
+<TD>SUP(NNUM)</TD>
+
+<TD>sep_1999</TD>
+
+<TD>1999</TD>
+</TR>
+
+<TR>
+<TD>SUP(NUM)</TD>
+
+<TD>sep_1999</TD>
+
+<TD>sep_</TD>
+</TR>
+</TABLE>
+</BLOCKQUOTE>
+</BLOCKQUOTE>
+
+<H4>
+<A NAME="LIM"></A>LIM(n,side)/LIMW(str,side)&nbsp;&nbsp; - limit to n letters
+from L/R</H4>
+
+<BLOCKQUOTE>default: LIM(0,)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+no change
+<BR>default: LIMW(,R)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no change
+<P>Limits the value in order to get the required number of characters by
+cutting excess characters from either side.
+<BR>LIMW removes the Left/Right side to the (str) string.
+<BLOCKQUOTE>&nbsp;
+<TABLE BORDER COLS=3 WIDTH="50%" NOSAVE >
+<TR>
+<TD>example</TD>
+
+<TD>input</TD>
+
+<TD>output</TD>
+</TR>
+
+<TR>
+<TD>LIM(4,L)</TD>
+
+<TD>sep_1999</TD>
+
+<TD>1999</TD>
+</TR>
+
+<TR>
+<TD>LIM(4,R)</TD>
+
+<TD>sep_1999</TD>
+
+<TD>sep_</TD>
+</TR>
+
+<TR>
+<TD>LIMW(_,R)</TD>
+
+<TD>sep_1999</TD>
+
+<TD>sep_</TD>
+</TR>
+</TABLE>
+</BLOCKQUOTE>
+</BLOCKQUOTE>
+
+<H4>
+<A NAME="WORDS"></A>WORDS(n,side)&nbsp; - limit to n words from L/R</H4>
+
+<BLOCKQUOTE>default: WORDS(0,R)
+<P>Keeps the number of words specified in the first parameter from either
+side.
+<BR>&nbsp;
+<BR>&nbsp;
+<BLOCKQUOTE>&nbsp;
+<TABLE BORDER COLS=3 WIDTH="50%" NOSAVE >
+<TR>
+<TD>example</TD>
+
+<TD>input</TD>
+
+<TD>output</TD>
+</TR>
+
+<TR>
+<TD>WORDS(1)</TD>
+
+<TD>sep_1999</TD>
+
+<TD>1999</TD>
+</TR>
+
+<TR>
+<TD>WORDS(1,L)</TD>
+
+<TD>sep_1999</TD>
+
+<TD>sep_</TD>
+</TR>
+</TABLE>
+</BLOCKQUOTE>
+</BLOCKQUOTE>
+
+<H4>
+<A NAME="MINL"></A>MINL(n)&nbsp;&nbsp; - exp. words shorter than n</H4>
+
+<BLOCKQUOTE>default: MINL(1)
+<P>All words shorter than the limit specified in the parameter are replaced
+fro mthe sentence.
+<BR>The words with length exactly n are kept.
+<BR>&nbsp;
+<BR>&nbsp;
+<BLOCKQUOTE>&nbsp;
+<TABLE BORDER COLS=3 WIDTH="50%" NOSAVE >
+<TR>
+<TD>example</TD>
+
+<TD>input</TD>
+
+<TD>output</TD>
+</TR>
+
+<TR>
+<TD>MINL(2)</TD>
+
+<TD>History of Physics</TD>
+
+<TD>History of Physics</TD>
+</TR>
+
+<TR>
+<TD>MINL(3)</TD>
+
+<TD>History of Physics</TD>
+
+<TD>History Physics</TD>
+</TR>
+</TABLE>
+</BLOCKQUOTE>
+</BLOCKQUOTE>
+
+<H4>
+MAXL(n)&nbsp;&nbsp; - exp. words longer than n</H4>
+
+<BLOCKQUOTE>default: MAXL(0)
+<P>All words greater in number of characters than the limit specified in
+the parameter are replaced. Words with length exactly n are kept.
+<BR>&nbsp;
+<BR>&nbsp;
+<BLOCKQUOTE>&nbsp;
+<TABLE BORDER COLS=3 WIDTH="50%" NOSAVE >
+<TR>
+<TD>example</TD>
+
+<TD>input</TD>
+
+<TD>output</TD>
+</TR>
+
+<TR>
+<TD>MAXL(2)</TD>
+
+<TD>History of Physics</TD>
+
+<TD>of</TD>
+</TR>
+
+<TR>
+<TD>MAXL(3)</TD>
+
+<TD>History of Physics</TD>
+
+<TD>of</TD>
+</TR>
+</TABLE>
+</BLOCKQUOTE>
+</BLOCKQUOTE>
+
+<H4>
+<A NAME="MINLW"></A>MINLW(n) - replacement of short values</H4>
+
+<BLOCKQUOTE>default: MINLW(1) (no change)
+<P>The entire value is deleted if shorter than the specified limit.
+<BR>This is used for the validation of created records, where we have 20
+characters in the header.
+<BR>The default validation is MINLW(21), i.e. the record entry will not
+be consided as valid, unless it contains at least 21 characters including
+the header. This default setting can be overriden by the -l command line option.
+<P>In order to increase the necessary length of the output line in the configuration 
+itself, apply the function on the total value:
+<P>AU::MINLW(25)---CER &lt;:SYSNO:> AU&nbsp;&nbsp;&nbsp; L &lt;:SURNAME:>,
+&lt;:NAME:>
+<BR>&nbsp;
+<BR>&nbsp;</BLOCKQUOTE>
+
+<H4>
+<A NAME="EXPW"></A>EXP(str,1|0) - exp./aprove word containing specified
+string</H4>
+
+<BLOCKQUOTE>default: EXP&nbsp;&nbsp; (,0)&nbsp;&nbsp;&nbsp;&nbsp; leave
+all value
+<P>The record is shortened by replacing words containing the specified
+string.
+<BR>The second parameter states whether the string approves the word (0)
+or disables it (1).
+<P>for example, to get the email address from the value, use the following
+<BR>&nbsp;
+<BR>&nbsp;
+<BLOCKQUOTE>&nbsp;
+<TABLE BORDER COLS=3 WIDTH="50%" NOSAVE >
+<TR>
+<TD>example</TD>
+
+<TD>input</TD>
+
+<TD>output</TD>
+</TR>
+
+<TR>
+<TD>EXP(@,0)</TD>
+
+<TD>mail to: libdesk@cern.ch</TD>
+
+<TD>libdesk@cern.ch</TD>
+</TR>
+
+<TR>
+<TD>EXP(:,1)</TD>
+
+<TD>mail to: libdesk@cern.ch</TD>
+
+<TD>mail libdesk@cern.ch</TD>
+</TR>
+
+<TR>
+<TD>EXP(@)</TD>
+
+<TD>mail to: libdesk@cern.ch</TD>
+
+<TD>libdesk@cern.ch</TD>
+</TR>
+</TABLE>
+</BLOCKQUOTE>
+</BLOCKQUOTE>
+
+<H4>
+EXPW(type)&nbsp;&nbsp; - exp. word from value if containing spec. type</H4>
+
+<BLOCKQUOTE>default: EXPW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type
+not recognized
+<BR>&nbsp;
+<P>The sentence is shortened by replacing words containing specified type
+of character.
+<P>Types supported in EXPW function:
+<P>ALPHA .. alphabetic
+<BR>NALPHA .. not alphabetic
+<BR>NUM .. numeric
+<BR>NNUM&nbsp;&nbsp;&nbsp; .. not numeric
+<BR>ALNUM&nbsp; .. alphanumeric
+<BR>NALNUM&nbsp; .. non alphanumeric
+<BR>LOWER&nbsp; .. lower case
+<BR>UPPER&nbsp; .. upper case
+<BR>PUNCT&nbsp; .. punctuation
+<BR>NPUNCT&nbsp; .. non punctuation
+<P>Note: SPACE is not handled as a keyword, since all space characters
+are considered as word separators.
+<BR>&nbsp;
+<BR>&nbsp;
+<BLOCKQUOTE>&nbsp;
+<TABLE BORDER COLS=3 WIDTH="50%" NOSAVE >
+<TR>
+<TD>example</TD>
+
+<TD>input</TD>
+
+<TD>output</TD>
+</TR>
+
+<TR>
+<TD>EXPW(NNUM)</TD>
+
+<TD>sep_1999</TD>
+
+<TD>1999</TD>
+</TR>
+
+<TR>
+<TD>EXPW(NUM)</TD>
+
+<TD>sep_1999</TD>
+
+<TD>sep</TD>
+</TR>
+</TABLE>
+</BLOCKQUOTE>
+</BLOCKQUOTE>
+
+<H4>
+<A NAME="IF"></A>IF(value,valueT,valueF) - replace T/F value</H4>
+
+<BLOCKQUOTE>default: IF(,,)
+<P>Compares the value with the first parameter. In case the result is TRUE,
+the input value is replaced with the second parameter, otherwise the input
+value is replaced with the third parameter.
+<BR>In case the input value has to be kept, whatever it is, the keyword
+ORIG can be used (usually in the place of the third parameter)
+<BR>&nbsp;
+<BR>&nbsp;
+<BLOCKQUOTE>&nbsp;
+<TABLE BORDER COLS=3 WIDTH="50%" NOSAVE >
+<TR>
+<TD>example</TD>
+
+<TD>input</TD>
+
+<TD>output</TD>
+</TR>
+
+<TR>
+<TD>IF(sep_1999,sep)</TD>
+
+<TD>sep_1999</TD>
+
+<TD>sep</TD>
+</TR>
+
+<TR>
+<TD>IF(oct_1999,oct)</TD>
+
+<TD>sep_1999</TD>
+
+<TD></TD>
+</TR>
+
+<TR>
+<TD>IF(oct_1999,oct,ORIG)</TD>
+
+<TD>sep_1999</TD>
+
+<TD>oct_1999</TD>
+</TR>
+</TABLE>
+</BLOCKQUOTE>
+</BLOCKQUOTE>
+
+<H4>
+<A NAME="UP"></A>UP&nbsp;&nbsp;&nbsp; - upper case</H4>
+
+<BLOCKQUOTE>Convert all characters to upper case</BLOCKQUOTE>
+
+<H4>
+DOWN&nbsp;&nbsp; - lower case</H4>
+
+<BLOCKQUOTE>Convert all characters to lower case</BLOCKQUOTE>
+
+<H4>
+CAP&nbsp;&nbsp;&nbsp; - make capitals</H4>
+
+<BLOCKQUOTE>Convert the initial character of each word to upper case
+and the rest of characters to lower case</BLOCKQUOTE>
+
+<H4>
+SHAPE&nbsp;&nbsp;&nbsp; - format string</H4>
+
+<BLOCKQUOTE>Supresses all invalid spaces</BLOCKQUOTE>
+
+<H4>
+<B>NUM&nbsp;&nbsp;&nbsp; - number</B></H4>
+
+<BLOCKQUOTE>If it contains at least one digit, convert it into a
+number by suppressing other characters. Leading zeroes are deleted.</BLOCKQUOTE>
+
+<H4>
+<A NAME="SPLIT"></A>SPLIT(n,h,str,from)</H4>
+
+<BLOCKQUOTE>Splits the input value into more lines, where each line contains
+at most (n+h+length of str) characters, (n) being the number of characters
+following the number of characters in the header, specified in (h). The
+header repeats at the beginning of each line. An additional string can
+be inserted as a separator between the header and the following value.
+This string is specified by the third parameter (str). It is possible to
+restrict the application of (str) so it does not appear on the first line
+by entering "2" for (from)</BLOCKQUOTE>
+
+<H4>
+SPLITW(sep,h,str,from)</H4>
+
+<BLOCKQUOTE>Splits the input value into more lines by replacing the line
+separator stated in (sep) with CR/LFs. Also, as in the case of the SPLIT
+function, the first (h) characters are taken as a header and repeat at
+the beginning of each line.&nbsp; An additional string can be inserted
+as a separator between the header and the following value. This string
+is specified by the third parameter (str). It is possible to restrict the
+application of (str) so it does not appear on the first line by entering
+"2" for (from)</BLOCKQUOTE>
+
+<H4>
+<A NAME="CONF"></A>CONF(field,value,1/0)&nbsp; - confirm validity of a
+field</H4>
+
+<BLOCKQUOTE>The input value is taken as it is, or refused depending on
+the value of some other field. In case the other (field) contains&nbsp;
+the string specified in (value), then the input value is confirmed (1)
+or refused (0).</BLOCKQUOTE>
+
+<H4>
+CONFL(str,1|0) - confirm validity of a field</H4>
+
+<BLOCKQUOTE>The input value is confirmed if it contains (<B>1</B>)/misses(<B>0</B>)
+the specified string (<B>str</B>)</BLOCKQUOTE>
+
+<H4>
+<A NAME="RANGE"></A>RANGE(from,to) - confirm only entries in the specified
+range</H4>
+
+<BLOCKQUOTE>Left side function of target template configuration section to select the desired
+entries from the repetitive field.
+<BR>The range can only be continuous.
+<P>The entry is confirmed in case its input falls into the range from-to
+specified in the parameter, border values included. As an upper limit it
+is possibe to use the keyword MAX.
+<P>This is useful in case of AU code, where the first entry has a different
+definition from other entries:
+<P>AU::RANGE(1,1)---CER &lt;:SYSNO:> AU2&nbsp;&nbsp;&nbsp; L &lt;:AU::SURNAME:>,
+&lt;:AU::NAME:>&nbsp;&nbsp;&nbsp; ... takes the first name from the defined
+AU field
+<BR>AU::RANGE(2,MAX)---CER &lt;:SYSNO:> AU&nbsp;&nbsp;&nbsp;&nbsp; L &lt;:AU::SURNAME:>
+, &lt;:AU::NAME:>&nbsp;&nbsp;&nbsp; ... takes the the rest of namesfrom
+the AU field
+<BR>&nbsp;</BLOCKQUOTE>
+
+<H2>
+<A NAME="52"></A>Generated values</H2>
+
+<BLOCKQUOTE>In the template configurations, values can be either taken from the source
+or generated in the process itself. This is mainly useful for evaluating constant values.
+
+<P>Currently, the following date values are generated:
+<BR>&nbsp;</BLOCKQUOTE>
+
+<H4>
+DATE(format,n)</H4>
+
+<BLOCKQUOTE>default: DATE(,10)
+<P>where n is the number of digits required.
+<P>Generates the current date in the form given as a parameter. The format
+has to be given according to the ANSI C notation, i.e. the string is composed
+out of following components:
+<P><A NAME="date"></A>&nbsp; %a&nbsp;&nbsp;&nbsp; abbreviated weekday name
+<BR>&nbsp; %A&nbsp;&nbsp;&nbsp; full weekday name
+<BR>&nbsp; %b&nbsp;&nbsp;&nbsp; abbreviated month name
+<BR>&nbsp; %B&nbsp;&nbsp;&nbsp; full month name
+<BR>&nbsp; %c&nbsp;&nbsp;&nbsp; date and time representation
+<BR>&nbsp; %d&nbsp;&nbsp;&nbsp; decimal day of month number (01-31)
+<BR>&nbsp; %H&nbsp;&nbsp;&nbsp; hour (00-23)(12 hour format)
+<BR>&nbsp; %I&nbsp;&nbsp;&nbsp; hour (01-12)(12 hour format)
+<BR>&nbsp; %j&nbsp;&nbsp;&nbsp; day of year(001-366)
+<BR>&nbsp; %m&nbsp;&nbsp;&nbsp; month (01-12)
+<BR>&nbsp; %M&nbsp;&nbsp;&nbsp; minute (00-59)
+<BR>&nbsp; %p&nbsp;&nbsp;&nbsp; local equivalent of a.m. or p.m.
+<BR>&nbsp; %S&nbsp;&nbsp;&nbsp; second (00-59)
+<BR>&nbsp; %U&nbsp;&nbsp;&nbsp; week number in year (00-53)(starting with
+Sunday)
+<BR>&nbsp; %V&nbsp;&nbsp;&nbsp; week number in year
+<BR>&nbsp; %w&nbsp;&nbsp;&nbsp; weekday (0-6)(starting with Sunday)
+<BR>&nbsp; %W&nbsp;&nbsp;&nbsp; week number in year (00-53)(starting with
+Monday)
+<BR>&nbsp; %x&nbsp;&nbsp;&nbsp; local date representation
+<BR>&nbsp; %X&nbsp;&nbsp;&nbsp; local time representation
+<BR>&nbsp; %y&nbsp;&nbsp;&nbsp; year (no century prefix)
+<BR>&nbsp; %Y&nbsp;&nbsp;&nbsp; year (with century prefix)
+<BR>&nbsp; %Z&nbsp;&nbsp;&nbsp; time zone name
+<BR>&nbsp; %%&nbsp;&nbsp;&nbsp; %
+<BR>&nbsp;</BLOCKQUOTE>
+
+<H4>
+WEEK(diff)</H4>
+
+<BLOCKQUOTE>Enters the two-digit number of the current week (%V) increased
+by specified difference.
+<BR>If the resulting number is negative, the returned value is zero (00).
+<BR>Values are kept up to 99, three digit values are shortened from the
+left.
+<P>WEEK(-4)&nbsp;&nbsp;&nbsp; returns 48, if current week is 52
+<BR>WEEK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; current
+week
+<BR>&nbsp;</BLOCKQUOTE>
+
+<H4>
+SYSNO</H4>
+
+<BLOCKQUOTE>&nbsp;
+<BR>Works the same as DATE, however the format of the resulting value is
+fixed so it complies with the requirements of further record handling.
+The format is 'whhmmss', where:
+<P>w&nbsp;&nbsp;&nbsp;&nbsp; current weekday
+<BR>hh&nbsp;&nbsp;&nbsp; current hour
+<BR>mm&nbsp;&nbsp;&nbsp; current minute
+<BR>ss&nbsp;&nbsp;&nbsp; current second
+<P>The system number, if generated like this, contains a variable value
+changing every second. For the system number is an identifier of the record,
+it is needed to ensure it will be unique for the entire record processed.
+Unlike the function DATE, which simply generates the value of format given,
+SYSNO keeps the value persistent throughout the entire record and excludes collision 
+with other records that are generated in period of one week with one second granularity.
+<P>It is not possible to use the DATE function for generating a system number instead. 
+<P>The system number is unique in range of one week only, according to
+the current definition.
+<BR>&nbsp;
+
+<BR>&nbsp;</BLOCKQUOTE><H4>
+OAI</H4>
+
+<BLOCKQUOTE>
+
+<p/>Inserts  OAI identifier incremented by one for earch record
+Starting value that is used in the first record in the batch job can be specified on the command line using the -o&lt;starting_value> option.
+</BLOCKQUOTE>
+
+</BODY>
+</HTML>
