@@ -65,6 +65,21 @@ function checkRequired(param)
 
    /*********************Function Declarations***************************/
 
+   function TestFormField( $fidesc, $level ) 
+   {
+      $res = mysql_query("select type,fidesc from sbmFIELDDESC where name='$fidesc'");
+      $row = mysql_fetch_row($res);
+      $type = $row[0];
+      $body = $row[1];
+      
+      if ($level == "M" && $type == "S" && !ereg(".*<option>[^<]*Select:.*",$body)) {
+         print "<SCRIPT TYPE='text/javascript'>alert('The mandatory $fidesc select box must begin with \"<option>Select:</option>\"');</SCRIPT>";
+	 return 0;
+      }
+
+      return 1;
+   }
+
    function procInsrtn($subname, $pageNumber, $fieldnb, $fidesc, $fitext, 
                 $level, $sdesc, $checkn, $doctype, $nPgs)
    {
@@ -84,6 +99,10 @@ function checkRequired(param)
          Created:          14/12/2000
          Last Modified:    25/01/2001
       ******************************************************************/
+     
+      if (!TestFormField($fidesc,$level)){
+        return 0;
+      }
 
       # Now we can begin building the query string...
       $insStr = "INSERT INTO sbmFIELD (subname, pagenb, fieldnb, fidesc, "
@@ -685,9 +704,10 @@ function displayPage()
          if($level == "M" || $level == "O")
          {
             # $level checks out.
-            procInsrtn($subname, $pageNumber, $fieldnb, $fidesc_A,
-                   $fitext, $level, $sdesc, $checkn, $doctype,
-                                                           $nPgs);
+            if (!procInsrtn($subname, $pageNumber, $fieldnb, $fidesc_A, $fitext, $level, $sdesc, $checkn, $doctype, $nPgs)) {
+               # Redisplay input form
+               makeEleForm($subname, $pageNumber, $nPgs, $doctype,$fieldnb - 1, $fitext, "", $sdesc, $checkn, "fidesc_A", $fidesc_A);
+            }
          } // END if
          else
          {
@@ -711,9 +731,10 @@ function displayPage()
          if($level == "M" || $level == "O")
          {
             # $level checks out.
-            procInsrtn($subname, $pageNumber, $fieldnb, $fidesc_B,
-                   $fitext, $level, $sdesc, $checkn, $doctype,
-                                                           $nPgs);
+            if (!procInsrtn($subname, $pageNumber, $fieldnb, $fidesc_B,$fitext, $level, $sdesc, $checkn, $doctype,$nPgs)) {
+               # Redisplay input form
+               makeEleForm($subname, $pageNumber, $nPgs, $doctype,$fieldnb - 1, $fitext, "", $sdesc, $checkn, "fidesc_B", $fidesc_B);
+            }
          } // END if
          else
          {
@@ -735,9 +756,10 @@ function displayPage()
          if($level == "M" || $level == "O")
          {
             # $level checks out.
-            procInsrtn($subname, $pageNumber, $fieldnb, $fidesc_C,
-                   $fitext, $level, $sdesc, $checkn, $doctype,
-                                                           $nPgs);
+            if (!procInsrtn($subname, $pageNumber, $fieldnb, $fidesc_C,$fitext, $level, $sdesc, $checkn, $doctype,$nPgs)) {
+               # Redisplay input form
+               makeEleForm($subname, $pageNumber, $nPgs, $doctype,$fieldnb - 1, $fitext, "", $sdesc, $checkn, "fidesc_C", $fidesc_C);
+            }
          } // END if
          else
          {
