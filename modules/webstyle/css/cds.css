@@ -264,6 +264,14 @@ a.navtrail:hover {
     margin-top: 10px;
     margin-right: 10px;
 }
+.snapshot {
+    color: #000;
+    background: transparent;
+    border: 2px solid #999999; 
+    margin-left: 40px;
+    margin-top: 10px;
+    margin-right: 10px;
+}
 .pagestriperight {
    color: #000;
    background: #fff;
