@@ -663,10 +663,10 @@ def perform_addportalbox(colID, ln, title='', body='', callback='yes', confirm=-
     subtitle = """<a name="5.1"></a>Create new portalbox"""
     text = """
     <span class="adminlabel">Title</span>
-    <input class="admin_w200" type="text" name="title" value="%s" /><br>
+    <textarea cols="50" rows="1" class="admin_wvar" type="text" name="title">%s</textarea><br>
     <span class="adminlabel">Body</span>
     <textarea cols="50" rows="10" class="admin_wvar" type="text" name="body">%s</textarea><br>
-    """ % (title, body)
+    """ % (cgi.escape(title), cgi.escape(body))
     output = createhiddenform(action="addportalbox#5.1",
                               text=text,
                               button="Add",
@@ -675,6 +675,8 @@ def perform_addportalbox(colID, ln, title='', body='', callback='yes', confirm=-
                               confirm=1)
     
     if body and confirm in [1, "1"]:
+        title = cgi.escape(title)
+        body = cgi.escape(body)
         res = add_pbx(title, body)
         output += write_outcome(res)
         if res[1] == 1:
@@ -807,21 +809,11 @@ def perform_deleteportalbox(colID, ln, pbxID=-1, callback='yes', confirm=-1):
                                    button="Delete",
                                    colID=colID,
                                    ln=ln,
-                                   confirm=0)
+                                   confirm=1)
         
     if pbxID not in [-1,"-1"]:
         pbxID = int(pbxID)
-        if confirm in [0, "0"]:
-            text = """<b>Are you sure you want to delete the portalbox '%s'.</b>
-            """ % pbx_dict[pbxID]
-            output += createhiddenform(action="deleteportalbox#5.3",
-                                       text=text,
-                                       button="Confirm",
-                                       colID=colID,
-                                       pbxID=pbxID,
-                                       ln=ln,
-                                       confirm=1)
-        elif confirm in [1, "1"]:
+        if confirm in [1, "1"]:
             output += write_outcome(ares)
     elif confirm not in [-1, "-1"]:
         output  += """<b><span class="info">Choose a portalbox to delete.</span></b>
@@ -893,16 +885,16 @@ def perform_modifyportalbox(colID, ln, pbxID=-1, score='', position='', sel_ln='
             res2 = get_pbx()
             pbx_dict = dict(map(lambda x: (x[0], x[1]), res2))
             output += write_outcome(res)
-        output += """Portalbox (content) specific values (any changes appears everywhere the portalbox is used.)"""
+        output += """<br>Portalbox (content) specific values (any changes appears everywhere the portalbox is used.)"""
         text = """
         <span class="adminlabel">Title</span>
-        <input class="admin_w200" type="text" name="title" value="%s" /><br>
-        """ % title
+        <textarea cols="50" rows="1" class="admin_wvar" type="text" name="title">%s</textarea><br>
+        """ % cgi.escape(title)
         
         text += """
         <span class="adminlabel">Body</span>
         <textarea cols="50" rows="10" class="admin_wvar" type="text" name="body">%s</textarea><br>
-        """ % body
+        """ % cgi.escape(body)
         
         output += createhiddenform(action="modifyportalbox#5.4",
                                    text=text,
@@ -1949,9 +1941,6 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     fin_output += """
     <table>
     <tr>
-    <td><b>Menu</b></td>
-    </tr>
-    <tr>
     <td>0.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_showall">Show all</a></small></td>
     <td>1.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_addcollection">Create new collection</a></small></td>
     <td>2.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_addcollectiontotree">Attach collection to tree</a></small></td>
@@ -1999,7 +1988,7 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     except NameError:
         body = [fin_output]
 
-    return addadminbox('Overview', body)
+    return addadminbox('<b>Menu</b>', body)
     
 def show_coll_not_in_tree(colID, ln, col_dict):
     tree = get_col_tree(colID)
@@ -2322,8 +2311,12 @@ def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
         pass
 
     tabletime = time.strptime(collection_table_update_time, "%Y-%m-%d %H:%M:%S")
-    webtime = time.strptime(collection_web_update_time, "%d %b %Y %H:%M:%S %Z")
-    
+    try:
+        webtime = time.strptime(collection_web_update_time, "%d %b %Y %H:%M:%S %Z")
+    except ValueError, e:
+        collection_web_update_time[0:string.rfind(collection_web_update_time, " ")]
+        webtime = time.strptime(collection_web_update_time, "%d %b %Y %H:%M:%S")
+        
     if tabletime > webtime:
         output += """<br><b><span class="info">Warning: The collections has been modified since last time Webcoll was executed, to process the changes, Webcoll must be executed.</span></b><br>"""
 
@@ -2994,6 +2987,8 @@ def add_col_pbx(colID, pbxID, ln, position, score=''):
         return (1, "")
     except StandardError, e:
         return (0, e)
+
+
 
 def add_col_fmt(colID, fmtID, score=''):
     """Add a output format to the collection.
