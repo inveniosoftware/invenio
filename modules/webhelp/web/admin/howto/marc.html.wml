@@ -1072,6 +1072,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Accelerator (NR) - [CER,IEX,MMD]
          $e   Experiment (NR) - [CER,IEX,MAN,MMD]
+         $f   Facility 
 
       [Additional field(s)/tag(s): AC,ACCL,AE,EX]
       [AC * -> 693 $a {CER,IEX base=50,MMD}]
