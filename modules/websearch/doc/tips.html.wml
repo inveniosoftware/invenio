@@ -22,7 +22,7 @@
     navbar_name="search-new" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a> &gt; <a class=navtrail href=<WEBURL>/help/search/<lang:star: index.*.html>><MSG_SEARCH_HELP></a>" \
     navbar_select="tips" \
-    cdspageheaderadd="<div align=right><a href=tips.en.html>EN</a> | <a href=tips.fr.html>FR</a> | <a href=tips.de.html>DE</a> | <a href=tips.es.html>ES</a>| <a href=tips.it.html>IT</a> | <a href=tips.ru.html>RU</a></div>"
+    cdspageheaderadd="<div align=right><a href=tips.en.html>EN</a> | <a href=tips.fr.html>FR</a> | <a href=tips.de.html>DE</a> | <a href=tips.es.html>ES</a>| <a href=tips.it.html>IT</a> | <a href=tips.ru.html>RU</a> | <a href=tips.sk.html>SK</a> | <a href=tips.cz.html>CZ</a></div>"
 
 <fr>
    <p><table class="errorbox">
@@ -114,6 +114,42 @@
    </tbody>
    </table>
 </ru>
+<sk>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</sk>
+<cz>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     <MSG_PAGE_BEING_TRANSLATED_BODY>
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</cz>
 
 <en>
 <p>Our search engine tries to offer today's typical web searching
@@ -176,6 +212,26 @@ search, including an combined metadata, fulltext and reference search
 in one go.  This page lists several tips and tricks that you may find
 useful to this effect.
 </ru>
+<sk>
+<p>Our search engine tries to offer today's typical web searching
+experience, as gained with popular search engines such as <a
+href="http://google.com/">Google</a>.  The nature of bibliographic
+searching differs from that of a web page searching, though.  We
+provide many extensions to enable a complex and precise structured
+search, including an combined metadata, fulltext and reference search
+in one go.  This page lists several tips and tricks that you may find
+useful to this effect.
+</sk>
+<cz>
+<p>Our search engine tries to offer today's typical web searching
+experience, as gained with popular search engines such as <a
+href="http://google.com/">Google</a>.  The nature of bibliographic
+searching differs from that of a web page searching, though.  We
+provide many extensions to enable a complex and precise structured
+search, including an combined metadata, fulltext and reference search
+in one go.  This page lists several tips and tricks that you may find
+useful to this effect.
+</cz>
 
 <h3><strong class="headerboxbodylogo">Index</strong></h3>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>

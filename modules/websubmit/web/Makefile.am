@@ -19,7 +19,7 @@
 
 docdir = $(WEBDIR)/submit
 
-doc_DATA=index.en.html index.fr.html index.de.html index.es.html index.it.html index.ru.html
+doc_DATA=index.en.html index.fr.html index.de.html index.es.html index.it.html index.ru.html index.sk.html index.cz.html
 
 EXTRA_DIST = $(wildcard *.wml)
 
@@ -48,3 +48,11 @@ CLEANFILES = $(doc_DATA) *~ *.tmp
 %.ru.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
            ../../../config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_RU:$@ $<
+
+%.sk.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
+           ../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_SK:$@ $<
+
+%.cz.html: %.html.wml ../../../config/config.wml ../../../config/configbis.wml \
+           ../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_CZ:$@ $<

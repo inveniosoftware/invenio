@@ -56,6 +56,8 @@
 <lang:new id=fr short>
 <lang:new id=it short>
 <lang:new id=ru short>
+<lang:new id=sk short>
+<lang:new id=cz short>
 
 ## This part defines essential CDSware internal parameters that
 ## everybody should modify, like the name of the server or the email
@@ -76,6 +78,8 @@ Atlantis Institute of Fictive Science
  <es>Atlantis Instituto de la Ciencia Fictive</es>
  <it>Atlantis Istituto di Scienza Fictive</it>
  <ru>Атлантис Институт фиктивных Наук</ru>
+ <sk>Atlantis Inštitút Fiktívnych Vied</sk>
+ <cz>Atlantis Institut Fiktivních Věd</cz>
 </define-tag>
 
 ## CDSLANG -- the default interface language:

@@ -22,7 +22,7 @@
     navbar_name="help" \
     navtrail_previous_links="" \
     navbar_select="tips" \
-    cdspageheaderadd="<div align=right><a href=index.en.html>EN</a> | <a href=index.fr.html>FR</a> | <a href=index.de.html>DE</a> | <a href=index.es.html>ES</a> | <a href=index.it.html>IT</a> | <a href=index.ru.html>RU</a></div>"
+    cdspageheaderadd="<div align=right><a href=index.en.html>EN</a> | <a href=index.fr.html>FR</a> | <a href=index.de.html>DE</a> | <a href=index.es.html>ES</a> | <a href=index.it.html>IT</a> | <a href=index.ru.html>RU</a> | <a href=index.cz.html>CZ</a> | <a href=index.sk.html>SK</a></div>"
 
 <es>
    <p><table class="errorbox">
@@ -86,6 +86,8 @@
 <es>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</es>
 <it>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</it>
 <ru>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</ru>
+<sk>Víta Vás <MSG_HELP_CENTRAL> <CDSNAMEINTL>.</sk>
+<cz>Vítá Vás <MSG_HELP_CENTRAL> <CDSNAMEINTL>.</cz>
 
 <blockquote>
 <dl>
@@ -98,7 +100,8 @@
     <es>Get help with searching <CDSNAMEINTL>.</es>
     <it>Get help with searching <CDSNAMEINTL>.</it>
     <ru>Get help with searching <CDSNAMEINTL>.</ru>
-    
+    <sk>Pomoc pri hľadaní <CDSNAMEINTL>.</sk>
+    <cz>Pomoc při hledání <CDSNAMEINTL>.</cz>
 
 </dl>
 </blockquote>

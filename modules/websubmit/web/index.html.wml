@@ -22,7 +22,7 @@
     navbar_name="submit" \
     navtrail_previous_links="" \
     navbar_select="submit" \
-    cdspageheaderadd="<div align=right><a href=index.en.html>EN</a> | <a href=index.fr.html>FR</a> | <a href=index.de.html>DE</a> | <a href=index.es.html>ES</a> | <a href=index.it.html>IT</a> | <a href=index.ru.html>RU</a></div>"
+    cdspageheaderadd="<div align=right><a href=index.en.html>EN</a> | <a href=index.fr.html>FR</a> | <a href=index.de.html>DE</a> | <a href=index.es.html>ES</a> | <a href=index.it.html>IT</a> | <a href=index.ru.html>RU</a> | <a href=index.sk.html>SK</a> | <a href=index.cz.html>CZ</a></div>"
 
 <en>Coming soon.</en>
 <fr>Arrive bientôt.</fr>
@@ -30,3 +30,5 @@
 <es>Disponible próximamente.</es>
 <it>Disponible prossimamente.</it>
 <ru>Coming soon.</ru>
+<sk>Coming soon.</sk>
+<cz>Coming soon.</cz>

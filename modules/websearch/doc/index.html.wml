@@ -22,7 +22,7 @@
     navbar_name="search-new" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a>" \
     navbar_select="tips" \
-    cdspageheaderadd="<div align=right><a href=index.en.html>EN</a> | <a href=index.fr.html>FR</a> | <a href=index.de.html>DE</a> | <a href=index.es.html>ES</a> | <a href=index.it.html>IT</a> | <a href=index.ru.html>RU</a></div>"
+    cdspageheaderadd="<div align=right><a href=index.en.html>EN</a> | <a href=index.fr.html>FR</a> | <a href=index.de.html>DE</a> | <a href=index.es.html>ES</a> | <a href=index.it.html>IT</a> | <a href=index.ru.html>RU</a> | <a href=index.sk.html>SK</a> | <a href=index.cz.html>CZ</a></div>"
 
 <es>
    <p><table class="errorbox">
@@ -85,6 +85,8 @@
    <es>Find out all about searching</es>
    <it>Find out all about searching</it>
    <ru>Find out all about searching</ru>
+   <sk>Tu nájdete všetko čo sa týka hľadania na serveri</sk>
+   <cz>Zde naleznete vše co se týče vyhledávání na serveru</cz>
    <CDSNAMEINTL>:
 
 <blockquote>
@@ -117,6 +119,14 @@
       This page presents you with useful tips and techniques in order to
       help you use the <CDSNAMEINTL> site to the full.
     </ru>  
+    <sk>
+      Táto stránka Vám ponúka užitočné tipy a triky ktoré Vám umožnia
+      plne využívať možností <CDSNAMEINTL>.
+    </sk>  
+    <cz>
+      Tato stránka Vám nabízí užitečné tipy a triky které Vám umožní
+      plně využívat možností <CDSNAMEINTL>.
+    </cz>  
 
 </dl>
 </blockquote>
