@@ -1,13 +1,183 @@
-;;; -*- Mode: TODOO; -*-
+;;; -*- mode: outline; coding: utf-8; outline-regexp: "[*\f]+"; -*-
+;;;
+;;; CDSware TODO and WISH list
+;;; ==========================
 ;;; $Id$
+;;;
+;;;
+;;; This TODO and WISH list of the CDSware project is formatted in a
+;;; way suitable for editing with Emacs outline mode; e.g. use C-c C-t
+;;; to see only headings and hide the text, C-c C-a to make everything
+;;; visible again, C-c C-d to hide one item, C-c C-s to show one item,
+;;; etc.  See Emacs help for more.
 
-CDSware TODO list
-=================
+* BibConvert
 
-Suitable for editing with Emacs ToDoo mode, see
-<http://www.emacswiki.org/cgi-bin/wiki/ToDoo>.
+** BibConvert: MEDLINE, BibTeX examples
+  Received: Wed Dec 17 16:20:35 2003 
+  Progress: BibTeX example done, MEDLINE pending
 
-* FreeBSD ps patch
+* BibEdit
+
+** BibEdit: text or GUI tool
+Wed Nov  3 11:40:16 2004
+
+* BibFormat
+
+** BibFormat(?): foresee electronic issue publication
+Wed Nov  3 11:42:46 2004
+
+Introduce a possibility to easily publish issues of electronic
+journals, like Weekly Bulletin.  Access control needed.
+
+** BibFormat: hb_fly for CDSware distro
+Wed Nov  3 11:39:01 2004
+
+** BibFormat: make hd and other detailed formats on the fly for CDSware too
+Wed Nov  3 11:39:32 2004
+
+Just as we do it for CERN.
+
+** BibFormat: forall()
+On Mon, 18 Oct 2004, pelzer@hbz-nrw.de wrote:
+> why is it impossible to nest forall constructions in your format
+> definitions like:
+> 
+> forall ($6531.a)
+> {
+>   forall($710.a)
+>   {
+>      ....
+>   }
+>   ....
+> }
+
+Because of BibFormat's internal implementation of the forall()
+function.  The BibFormat Admin guide mentions this limitation.
+In the future the BibFormat module will probably get rewritten in
+Python some day, and we'll try to lever this limitation.  (It's
+nothing imminent though.)
+
+** BibFormat: language-dependent behaviour
+> - le premier concerne la fonction link() dans la definition des
+> formats (BibFormat Admin).  Le parametre de langue "ln" n'est pas
+> transmis dans l'URL. Ce qui signifie que lorsque tu cliques par
+> exemple sur un auteur pour faire une recherche par auteur, l'URL ne
+> contient pas le parametre "ln".
+
+Oui, BibFormat a le probleme de multilinguisme, car il a ete developpe
+avant... il faudra que l'on y ajoute la langue comme parametre dans
+plusieurs endroits.
+
+** BibFormat: forsee script for downloading cfg, editing in Emacs, uploading cfg 
+Wed Nov  3 11:58:30 2004
+
+To ease the editing of BibFormat formats and friends, a little script
+is needed that would download cfg into a file that would be
+Emacs-editable and that one could upload back into DB. 
+
+On Wed, 24 Mar 2004, Tibor Simko wrote:
+> When you play with BibFormat formats outside of BibFormat Web Admin,
+> there is an annoyance with the ``serialized'' column of the
+> ``flxFORMATS'' table.  For example, to fill the demo site
+> automatically upon installation I have to resort to fancy SQL
+> statements like the one appended below[1].
+> 
+> Would it be easily possible if:
+> 
+>    1. BibFormat core ``FormatRetriever.inc.php'' would not require
+>       ``serialized'' but would check for its existence, and if this
+>       column is NULL, then it would recreate it upon first load.  IOW,
+>       ``getSerializedFormat()'' should not fail but should call
+>       something like ``setSerializedFormat($plaintextformat)''.  (You
+>       probably have such a function somewhere in the Web Admin; I have
+>       not looked.)
+> 
+>    2. We could even think of writing a more complex external CLI tool
+>       that would provide bibformatcfgdump/bibformatcfgimport
+>       functionality.  People could then edit formats or link rules or
+>       extraction rules or whatever outside of the BibFormat Web Admin,
+>       in a text editor.  It would enable for example an easy way to do
+>       global changes like replacing ``100.a'' with ``110.a'' etc.
+> 
+> What do you think?  Would you have time for option 1, either to advise
+> me or to do it yourself? 
+
+* BibIndex
+
+** BibIndex: introduce optional stemming
+Wed Nov  3 11:40:39 2004
+
+** BibIndex: introduce optional stopwords
+Wed Nov  3 11:40:53 2004
+
+** BibIndex: make our own ACC indexes
+  Wed Dec 17 16:20:35 2003 
+  Study phrase index generation from XML MARC.
+  Related to bibXXx table abolition.
+  Progress: table structure prepared for v0.3.0
+
+** BibIndex: --reindex
+> I suspect my fix of course. Is there a safe way to start the indexes
+> afresh ?  dropping the content of all the idx tables ?
+
+Yes, exactly.  Your fix wasn't sufficient, it would have been
+necessary to do similar things in more places... at the expense of
+speed of the searching and indexing engine.  Which is why it's better
+to reindex all records from scratch.  You can use the following
+technique:
+
+  $ echo "TRUNCATE idxWORD01F;" | /path/to/cdsware/bin/dbexec
+  $ echo "TRUNCATE idxWORD01R;" | /path/to/cdsware/bin/dbexec
+  $ echo "TRUNCATE idxWORD02F;" | /path/to/cdsware/bin/dbexec
+  $ echo "TRUNCATE idxWORD02R;" | /path/to/cdsware/bin/dbexec
+  [...]
+  $ echo "TRUNCATE idxWORD10F;" | /path/to/cdsware/bin/dbexec
+  $ echo "TRUNCATE idxWORD10R;" | /path/to/cdsware/bin/dbexec
+  $ echo "UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00';" | /path/to/cdsware/bin/dbexec
+  $ /path/to/cdsware/bin/bibindex
+
+We should invent a nice option to ``bibindex'' that would take care of
+all these steps.
+
+** BibIndex: index into tmp table
+   When reindexing everything from scratch, don't wipe out existing
+   index but rather create new index into a temporary table and then
+   copy it over the current index at the end of the process .  Useful
+   for end users to keep seeing existing index while the new is beeing
+   built from scratch.
+
+* BibRank
+
+** BibRank: rebalancing should read old records
+Wed Nov  3 11:48:32 2004
+
+When bibrank -R option is used, the attention should not be paid to
+the dates of last modification of neither records not rnkMETHODDATA
+and friends; rather the ranking indexation should go into empty
+tables.
+
+* BibSched
+
+** BibSched enable multiple hosts
+  Wed Dec 17 16:20:35 2003 
+
+** BibSched task sleeping sometimes cannot be done directly
+  Sometimes when you try to make BibSched task sleeping, you cannot do
+  it because MySQL is active for the task elsewhere:
+   _mysql_exceptions.ProgrammingError: (2014, "Commands out of
+   sync;You can't run this command now")
+  Tue Mar  2 10:22:33 2004
+
+** BibSched task numbering
+
+> 2) can you prefix the task number with 0, e.g. _task_0088.err
+
+We cannot foretell how many zeros to put there... depends on the total
+number of jobs.  (Maybe we can put some sufficiently large number of
+leading zeros.)
+
+** BibSched start/stop
 
 > Another patch is for modules/bibsched/bin/bibsched.wml: "ps -C %s o
 > '%%p%%a'" does not exist on FreeBSD, and I have replaced it by "ps
@@ -17,34 +187,158 @@ We'll rewrite the offending part.  We've actually been thinking about
 replacing the bibsched daemon behaviour via a more traditional
 ``apachectl start/stop'' kind of approach.
 
-* language-dependent BibFormat behaviour
+** BibSched ERROR task queue policy
+>   Note that the BibSched daemon automatic mode stops as soon as some
+>   of the tasks ends with an error. It it therefore a good idea to
+>   inspect BibSched queue from time to time. This can be done by
+>   running the BibSched command-line admin interface
+> 
+> Wouldn't it be better that it continued in auto mode and issued a
+> warning (by e-mail) to the admin? that way it would not be necessary
+> to check on it from time to time.
 
-> - le premier concerne la fonction link() dans la définition des
-> formats (BibFormat Admin).  Le paramètre de langue "ln" n'est pas
-> transmis dans l'URL. Ce qui signifie que lorsque tu cliques par
-> exemple sur un auteur pour faire une recherche par auteur, l'URL ne
-> contient pas le paramètre "ln".
+Indeed.  The original workflow assumed a chain of actions that we
+wanted to stop and manually fix as soon as a problem appeared.  
+I think we can safely change this policy now.
 
-Oui, BibFormat a le problème de multilinguisme, car il a été développé
-avant... il faudra que l'on y ajoute la langue comme paramètre dans
-plusieurs endroits.
+* BibUpload
 
-* collection cache
+** BibUpload: table bibxEP was wanted at some point
+Wed Nov  3 11:55:27 2004
+
+During recent demo, at some point in time when a new submission type
+was made the system wanted to look for bibxEP table.  Check tag
+creation rules.
+
+** BibUpload: must use run_sql() 
+  to avoid connection dropping problems
+  Fri Jan 16 10:17:11 2004
+
+* Miscellaneous
+
+** Miscellaneous: investigate usage of SQLRelay
+  <http://sqlrelay.sourceforge.net/>
+
+** Miscellaneous: INSTALL file
+Add comments on PHP and Python linking to the same MySQL library.
+(e.g. people should not use PHP internal MySQL library).
+
+** Miscellaneous: INSTALL file upgrade instructions
+  Wed Dec 17 16:20:35 2003 
+  Updated Wed May 12 12:00:38 2004 - update sql targets, plus release announcements
+
+** Miscellaneous: test suite
+Make version testing there too.
+
+** Miscellaneous: backup script
+
+shutdown DB, put warning message, hotbackup tables, start DB, remove
+warning message
+
+** Miscellaneous: MySQLdb 1.0.0
+API has changed for BLOBs/arrays.  Should adapt our interface.
+
+** Miscellaneous: Personalization part is not I18N-ized yet
+   Received: Mon Mar 15 11:23:34 2004
+
+The Personalization part is not I18N-ized yet and there are not very
+many personalization options.  We plan to expand it at some point in
+the future, like a possibility to select default language, default
+number of hits per page, default sorting, etc.  
+
+* OAI
+
+** OAI: RTdata dir should be created during `make install` ?
+  Mon Jan 19 10:41:18 2004
+
+** OAI: periodical harvesting
+
+On Mon, 4 Oct 2004, pelzer@hbz-nrw.de wrote:
+> reply of martin. my new question: are you ready with OAI data
+> harvestor?  do you have any experiences with periodical harvesting?
+> what do you do with doublets?
+
+For the time being we only provide command-line `bibharvest' tool
+without any periodical harvesting admin facility.  We haven't had time
+to develop BibHarvest Admin yet.  
+
+** OAI: provenance information
+On Tue, 28 Sep 2004, pelzer@hbz-nrw.de wrote:
+> have a question about your oai_repository.py:
+> 
+> do you plan for OAI the output of provenance information in the
+> "about" part of a record? e.g.
+> http://www.openarchives.org/OAI/2.0/guidelines-provenance.htm
+
+* WebAccess
+
+** WebAccess: restriction by IP
+Wed Nov  3 11:39:58 2004
+
+* WebAlert
+
+** WebAlert: manage alerts for a mailing list
+Wed Nov  3 11:46:24 2004
+
+Instead of having to create an account with the email address of
+mailing list (in order to be able to send alerts to mailing list),
+introduce a possibility to define alert mailing list management by
+an individual user.
+
+* WebBasket
+
+** WebBasket: output formats in XML etc
+Wed Nov  3 11:45:37 2004
+
+Properly support many output formats for a basket, quite like the
+search engine does.
+
+* WebSearch
+
+** WebSearch: introduce possibility to search for basketid:333
+Wed Nov  3 11:45:05 2004
+
+** WebSearch: introduce recommended terms lookup
+Wed Nov  3 11:41:12 2004
+
+** WebSearch: introduce `advertized records' like Google
+Wed Nov  3 11:41:35 2004
+
+** WebSearch: introduce NEAR operator
+Wed Nov  3 11:41:54 2004
+
+For example, we could approximate NEAR by doing a regexp search for
+two words less than 20 characters apart.
+
+** WebSearch: put search cache back
+   Wed Dec 17 16:20:35 2003 
+
+** WebSearch: add RSS output for recent additions to the collections.
+  Wed Dec 17 16:20:35 2003 
+
+** WebSearch: when searching for ``title: goo'' the space should be ignored
+  Wed Jan 21 11:09:00 2004
+
+** WebSearch: cross-searching of various CDSware installations
+  Wed Dec 17 16:20:35 2003 
+
+** WebSearch/BibIndex: indicate when cfg_max_recID is going to be exhausted
+  Wed Nov  3 11:38:40 2004
+
+** WebSearch: collection cache
 
 > URI:
 > http://cdsweb.cern.ch/search.py?sc=1&ln=en&p=slow+ejection&f=title&action=Search+&cc=Articles+%26+Preprints&c=Published+Articles&c=Preprints&c=Theses&c=Reports&c=CERN+Internal+Notes
 > Time: 24/Jun/2004:18:16:53 +0200 Browser: Mozilla/4.0 (compatible;
 > MSIE 6.0; Windows NT 5.0) Client: 137.138.169.154
-> 
-> Please fix, thanks, K.Hübner
 
 The problem is connected to temporary cache.  If it happens again,
 please just try to reload the page after a while.  We'll fix the
 problem to prevent it from happening.
 
-* of=nn for the search engine
-
+** WebSearch: of=nn for the search engine
 On Tue, 22 Jun 2004, pelzer@hbz-nrw.de wrote:
+
 >> If this is not feasible (e.g. huuuge result sets), then we may
 >> invent another output behaviour, e.g. ``of=nn'' that would return
 >> you only the number of hits, that is ``12'' for the example above.
@@ -56,122 +350,142 @@ don't see in xml - "mode", how many records are found. i think, it's helpful
 to write the hit number at the beginning of the first xml data record.
 what do you think about this?
 
-* the Personalization part is not I18N-ized yet, and there are not
-  very many personalization options.  We plan to expand it at some
-  point in the future, like a possibility to select default
-  language, default number of hits per page, default sorting, etc.
-  Received: Mon Mar 15 11:23:34 2004
+** WebSearch: multiple search logs
 
-* bibsched task sleeping sometimes cannot be done directly
-  Sometimes when you try to make bibsched task sleeping, you cannot do
-  it because MySQL is active for the task elsewhere:
-   _mysql_exceptions.ProgrammingError: (2014, "Commands out of
-   sync;You can't run this command now")
-  Received Tue Mar  2 10:22:33 2004
+On Fri, 15 Oct 2004, Frederic Gobry wrote:
 
-o [tibor] in search for ``title: goo'' the space should be ignored
-  Received Wed Jan 21 11:09:00 2004
+> For the file log, wouldn't it be useful to keep a track of queries
+> with no matches? (to discover systematic errors or problems) The
+> current implementation seems to discard these queries.
 
-o [tibor] RTdata dir should be created during `make install` ?
-  Received Mon Jan 19 10:41:18 2004
+Yes, it would.  A log of slow queries as well.  I'll add them as new
+log files before the next release.
 
-o [thomas] BibUpload must use run_sql() 
-  to avoid connection dropping problems
-  Received Fri Jan 16 10:17:11 2004
+** WebSearch: add p4,f4 for Advanced Search for Anna 
 
-o [tibor] Installation: upgrade instructions
-  Received Wed Dec 17 16:20:35 2003 
-  Updated Wed May 12 12:00:38 2004 - update sql targets, plus release announcements
+** WebSearch: safer wildcard treatment
 
-* WebSession account edit bugs 
-- email unique
-- pw edit: retype functionality
-  Received Wed Dec 17 16:20:35 2003 
+> okay, just began to wonder when CERN* never returned an answer :)
 
-o [tibor] BibSched: enable multiple hosts
-  Received Wed Dec 17 16:20:35 2003 
+Yup.  I wanted to plug-in a generic timeouter to the whole search
+engine to make sure that queries finish within 10 seconds or so.  But
+this is not done yet.  
 
-o [tibor] WebSearch: search cache back
-  Received Wed Dec 17 16:20:35 2003 
+At the moment, the wildcards are simply refused for words with less
+that three letters, and accepted for longer words.  But this does not
+work well for words like `CERN'.  While waiting for that generic
+timeouter, I should rather check how many indexed terms are returned
+by a wildcard word, and refused to take wildcard into account in case
+of e.g. more than 20 terms or so...
 
-> It seems that restarting Apache solved the problem of internal error
-> mentioned in my last email (thanks). Should I restart Apache
-> everytime that I run webcoll ? The fact that 'Apache cache is not
-> updated for all Apache instances' could explain the error message
-> and the no collection issue that has been solved?
-  
-I think so.  WebSearch caches certain things and it may not update the
-information on which records belong to which collections.  The caching
-issue is being rethought in the current WebSearch, maybe I'll add a
-forcing option for date/time lookup or something.  I've added a note
-in my TODO file to do more investigations.  In any case, you may run
-`apachectl graceful' each hour in a cron job.
+> Looks like you are sending me 'terror*', and not each word that
+> includes in 'terror*'
 
-  Updated Mon Mar  8 19:11:43 2004 
+Currently `cern*' could lead to hundreds of thousands of words, so
+it's hard to .  I'll rewrite the wildcard handling part in order to
+retain cases with <200 words, say, and then I'll pass you the full
+list.
 
-  Updated Wed May 12 12:01:10 2004 - search cache for collections
-   fixed for v0.3.2, search cache for patterns to be done still
+* WebSession
 
-o [tibor] WebSearch: sort pattern test
-  Received Wed Dec 17 16:20:35 2003 
+** WebSession: detect cookies and inform user if not available upon login
 
-o [martin] BibConvert: MEDLINE, BibTeX examples
-  Received: Wed Dec 17 16:20:35 2003 
-  Progress: BibTeX example done, MEDLINE pending
+We should detect whether cookies are disabled, and print a message on
+the login page.  Otherwise user types good access credentials but
+stays guest, not knowing what went wrong.  See e.g.:
 
-o [tibor] WebSearch: add RSS output for recent additions to the collections.
-  Received Wed Dec 17 16:20:35 2003 
+On Tue, 2 Nov 2004, RAMSTEIN Beatrice wrote:
+> I was working with Konqueror (KDE navigator). I tried now with
+> netscape, which is in fact my usual navigator and it works. It still
+> doesn't work with Konqueror, but it doesn't matter, since I usually
+> use Netscape anyway.
 
-o [tibor] WebSearch: cross-searching of various CDSware installations
-  Received Wed Dec 17 16:20:35 2003 
+Good.  Note that Konqueror works perfectly fine for me.  I guess that
+you have probably configured it not to accept cookies, which is why
+our session ID is rejected on your end so that user authentication
+cannot work.  Please try to enable cookies for our domain and
+Konqueror should start to work just fine.
 
-o [tibor] BibIndex: make our own ACC indexes
-  Received Wed Dec 17 16:20:35 2003 
-  Study phrase index generation from XML MARC.
-  Related to bibXXx table abolition.
-  Progress: table structure prepared for v0.3.0
+* WebSubmit
 
-* add restricted mode (guest users not allowed)
-  On Wed, 17 Mar 2004, Filippos N. Kolovos wrote:
-  > 1. Yes, we would like unregistered users not to be able to use AT
-  > ALL the search facilities of the system (including the initial
-  > interface search page) and a message like the one that you provided
-  > to appear to them. Only registered users should be able to use the
-  > system
-  >
-  >>     ``Sorry, system Foo is available only to registered users.  In
-  >>       order to register please send an email to <bar@quux.com> that
-  >>       will let you know your access credentials.  If you have an
-  >>       account already, please login below.''
-  > 
-  > 2. Initially, we would like to have a policy for our users, with
-  > which since a user has been registered by the admin, then he, or she
-  > should have all the priviledges that the system offers concerning
-  > the searching of the system and maybe some personalization issues,
-  > for example to be able to change only his/her password, but not the
-  > username, since we would like to have the control on the usernames
-  > of our users
+** WebSubmit: MBI login link uses bad `referer' argument 
+Received: Wed Nov  3 12:02:44 2004
 
-> I would like new users receive a confirmation mail before they can
-> login (and submit documents), as seen in all internet forum systems.
->
-> I would like to limit registration only to people that has a valid
-> @mydomain.it email address.  
->
-> It seems to me that there is no way to do this in cdsware 0.3.2, do
-> you have any suggestion?
+** WebSubmit: call elements `title' not `TI'
+Wed Nov  3 11:57:31 2004
 
-There is no predefined functionality in CDSware to do these things
-yet.  However, we have had a similar feature request from another
-installation, with an even stronger requirement not to permit guest
-users at all, for example.  It is in our TODO list to introduce a
-flexible user registration system in order to be able to handle
-various open-close usage scenarios.
+** WebSubmit: traceback when `brique' element was edited
+Wed Nov  3 11:56:33 2004
 
-Note that if you are mostly interested in not letting untrusted people
-submit documents, then you may take advantage of an already existing
-access control mechanism and restrict submission to trusted users
-only, as explained briefly in the WebSubmit Admin Guide at
-<http://cdsware.cern.ch:8000/admin/websubmit/guide/protection.en.html>.
-  
-;; end of file
+When `brique' element was edited during a recent demo, a Python
+traceback was obtained.
+
+** WebSubmit: admin interface should use [?] links
+Wed Nov  3 11:50:01 2004
+
+WebSubmit Admin should use [?] links to point to help pages, e.g. to
+the list of available functions etc.
+
+** WebSubmit: Slovak language abbreviation is not `slo', that is Slovene
+Wed Nov  3 11:50:47 2004
+
+** WebSubmit: MBI for hep-th/00000 looked for hep-th_00000
+Wed Nov  3 11:54:10 2004
+
+** WebSubmit: publiline report number link gave traceback
+Wed Nov  3 11:54:10 2004
+
+publiline report number link gave Python traceback during recent
+demo.
+
+** WebSubmit: `your approvals' link not needed everywhere
+Wed Nov  3 11:47:40 2004
+
+On the pesonal account page, Your Approvals link should not be
+displayed if I'm not referee for some document.  Verify!
+
+** WebSubmit: integrate submit new record / submit new file
+Wed Nov  3 11:43:36 2004
+
+Do not separate out submitting new record bibliographic information
+and new fulltext file, but rather merge the latter into the former as
+page N.  See also ``End submission'' and ``Finish submission''
+problems.  MBI and SRV button names should be user-friendly.
+
+** WebSubmit: after adding PCV action, php mysql bad result
+Wed Nov  3 12:05:51 2004
+
+After PCV action was added, php mysql bad result was obtained for some
+page.
+
+** WebSubmit: create icons for submitted videos
+Wed Nov  3 11:44:39 2004
+
+
+** WebSubmit: delete unwanted fields
+> Une petite question e propos de l'interface de soumission: Lorsqu'on
+> efface le contenu d'un champ (de type text input par exemple) qui a
+> ete prealablement saisi lors de la soumission d'un document, les
+> donnees de ce champ ne sont pas effacees.  Elles sont toujours
+> visibles sur le serveur.  Est-ce un bug?  Merci de ta reponse.
+
+Oui, il paraet que c'est un probleme.  On ne peut pas effacer un champ
+en faisant e correct e sur un champ vide (disons sans sous-champs),
+car BibUpload ignorera les champs vides.  On va regarder cela et
+envisager un protocol souhaitable e ce propos.
+
+Sinon ce que tu peux faire en attendant c'est de faire le e replace e
+complet de la notice entiere, comme suit:
+
+  # telecharger la notice recID=123:
+  $ wget -O z_z.xml 'http://pcdh23.cern.ch/search.py?recid=123&of=xm'
+  # editer la notice et enlever le champ en trop:
+  $ vi z_z.xml
+  # soumettre la notice en mode replace:
+  $ bibupload -r z_z.xml
+
+ce qui fera l'affaire.
+
+* End of file
+
+;;; End of file.
