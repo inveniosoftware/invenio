@@ -568,7 +568,6 @@ class Bibsched:
                 fdout = name + ".out"
             update_query="""UPDATE schTASKS set output='%s', error='%s' WHERE id='%d'""" % (fdout, fderr, id )
             self.cursor.execute(update_query)
-            self.set_state(id,"RUNNING")
             if proc in self.helper_modules:
                 program=os.path.join( os.getcwd(), proc )
                 if proc == "bibupload":
