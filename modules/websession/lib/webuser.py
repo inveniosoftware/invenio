@@ -235,18 +235,21 @@ def create_user_infobox(uid, language="en"):
     """Create info box on currenly logged user.""" 
     out = ""
     if isGuestUser(uid):
-        out +=  """%s :: <a class="userinfo" href="%s/youraccount.py/display">%s</a> |
-		    	    <a class="userinfo" href="%s/youraccount.py/login">%s</a>
-		"""%(msg_guest[language], weburl, msg_session[language], weburl, msg_login[language])
-	   	 
+        out += """%s ::
+	       <a class="userinfo" href="%s/youraccount.py/display?ln=%s">%s</a> |
+               <a class="userinfo" href="%s/youralerts.py/list?ln=%s">%s</a> |
+               <a class="userinfo" href="%s/yourbaskets.py/display?ln=%s">%s</a> |
+               <a class="userinfo" href="%s/youraccount.py/login?ln=%s">%s</a>""" % \
+               (msg_guest[language], weburl, language, msg_session[language], weburl, language, msg_alerts[language],
+                weburl, language, msg_baskets[language], weburl, language, msg_login[language])
     else:
         out += """%s ::
-	       <a class="userinfo" href="%s/youraccount.py/display">%s</a> |
-               <a class="userinfo" href="%s/youralerts.py/list">%s</a> |
-               <a class="userinfo" href="%s/yourbaskets.py/display">%s</a> |
-               <a class="userinfo" href="%s/youraccount.py/logout">%s</a>""" % \
-               (get_email(uid), weburl, msg_account[language], weburl, msg_alerts[language],
-                weburl, msg_baskets[language], weburl, msg_logout[language])
+	       <a class="userinfo" href="%s/youraccount.py/display?ln=%s">%s</a> |
+               <a class="userinfo" href="%s/youralerts.py/list?ln=%s">%s</a> |
+               <a class="userinfo" href="%s/yourbaskets.py/display?ln=%s">%s</a> |
+               <a class="userinfo" href="%s/youraccount.py/logout?ln=%s">%s</a>""" % \
+               (get_email(uid), weburl, language, msg_account[language], weburl, language, msg_alerts[language],
+                weburl, language, msg_baskets[language], weburl, language, msg_logout[language])
     return """<img src="%s/img/head.gif" border="0"> %s""" % (weburl, out) 
 
 ## --- follow some functions for Apache user/group authentication

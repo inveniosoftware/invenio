@@ -43,39 +43,41 @@ from cdsware import webuser
 from mod_python import apache    
 import smtplib
 
-def set(req):
+def set(req, ln=cdslang):
     uid = webuser.getUid(req)
     data = webuser.getDataUid(req,uid)
     email = data[0]
     passw = data[1]
     return page(title="Your Settings",
                 body=webaccount.perform_set(email,passw),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
                 description="CDS Personalize, Your Settings",
                 keywords="CDS, personalize",
                 uid=uid,
+                language=ln,
                 lastupdated=__lastupdated__)
 
-def change(req,email=None,password=None):
+def change(req,email=None,password=None,ln=cdslang):
     uid = webuser.getUid(req)
     if webuser.checkemail(email):
         
         change = webuser.updateDataUser(req,uid,email,password)
-        return display(req)
+        return display(req, ln)
     else :
-        return display(req)
+        return display(req, ln)
 
-def lost(req):
+def lost(req, ln=cdslang):
     uid = webuser.getUid(req)
     return page(title="Login",
                 body=webaccount.perform_lost(),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
+                language=ln,
                 lastupdated=__lastupdated__)
 
-def display(req):
+def display(req, ln=cdslang):
     uid =  webuser.getUid(req)
     if webuser.isGuestUser(uid):
 		
@@ -84,6 +86,7 @@ def display(req):
 	            description="CDS Personalize, Main page",
 	            keywords="CDS, personalize",
 	            uid=uid,
+                    language=ln,
                     lastupdated=__lastupdated__)
 
     data = webuser.getDataUid(req,uid)	
@@ -95,10 +98,11 @@ def display(req):
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
+                language=ln,
                 lastupdated=__lastupdated__)
     	
 	
-def send_email(req,p_email=None):
+def send_email(req, p_email=None, ln=cdslang):
     
     uid = webuser.getUid(req)
 
@@ -110,6 +114,7 @@ def send_email(req,p_email=None):
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
                     uid=uid,
+                    language=ln,
                     lastupdated=__lastupdated__)
 	
     fromaddr = "From: %s" % supportemail
@@ -134,6 +139,7 @@ def send_email(req,p_email=None):
                        description="CDS Personalize, Main page",
                        keywords="CDS, personalize",
                        uid=uid,
+                       language=ln,
                        lastupdated=__lastupdated__)
 
     server.quit()
@@ -142,30 +148,33 @@ def send_email(req,p_email=None):
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
+                language=ln,
                 lastupdated=__lastupdated__)
 
-def delete(req):
+def delete(req, ln=cdslang):
     uid = webuser.getUid(req)	
     return page(title="Delete Account",
                 body=webaccount.perform_delete(),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
+                language=ln,
                 lastupdated=__lastupdated__)
 
-def logout(req):
+def logout(req, ln=cdslang):
     
     uid = webuser.logoutUser(req)
     return page(title="Logout",
                 body=webaccount.perform_logout(req),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
+                language=ln,
                 lastupdated=__lastupdated__)
     
-def login(req, p_email=None, p_pw=None, action='login', referer=''):
+def login(req, p_email=None, p_pw=None, action='login', referer='', ln=cdslang):
 
     uid = webuser.getUid(req)
     if action =='login':
@@ -173,10 +182,11 @@ def login(req, p_email=None, p_pw=None, action='login', referer=''):
        if p_email==None:
            return  page(title="Login",
                         body=webaccount.perform_ask(referer),
-                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
                         description="CDS Personalize, Main page",
                         keywords="CDS, personalize",
                         uid=uid,
+                        language=ln,
                         lastupdated=__lastupdated__)
        iden = webuser.loginUser(p_email,p_pw)
     
@@ -196,10 +206,11 @@ def login(req, p_email=None, p_pw=None, action='login', referer=''):
            act = "login"    
 	   return page(title="Login",
                        body=webaccount.perform_back(mess,act),
-                       navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                       navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln), 
                        description="CDS Personalize, Main page",
                        keywords="CDS, personalize",
                        uid=uid,
+                       language=ln,
                        lastupdated=__lastupdated__)
     else:
         mess=""
@@ -207,7 +218,7 @@ def login(req, p_email=None, p_pw=None, action='login', referer=''):
 	ruid=webuser.registerUser(req,p_email,p_pw)
         if ruid==1:
 		uid=webuser.update_Uid(req,p_email,p_pw)
-		return display(req)	
+		return display(req, ln)	
         elif  ruid ==-1 :
 		mess ="The user already exists in the database, pleas try again"
 		act = "login"
@@ -216,8 +227,9 @@ def login(req, p_email=None, p_pw=None, action='login', referer=''):
        	    act = "login"
 	return page(title="Register failure",
  	            body=webaccount.perform_back(mess,act),
-                    navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                    navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
                     uid=uid,
+                    language=ln,
                     lastupdated=__lastupdated__)

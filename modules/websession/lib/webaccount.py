@@ -65,9 +65,11 @@ def perform_info(req):
     via Email or stored in one of your baskets."""
     if isGuestUser(uid):
 	 out+= warning_guest_user(type="alerts")
-    out += """
-    <dt><A href="http://weblib.cern.ch/cgi-bin/checkloan?uid=&version=2">Your Loans</A>
-    <dd>Check out book you have on load, submit borrowing requests, etc.  Requires CERN ID."""
+         
+    if cfg_cern_site:
+        out += """
+        <dt><A href="http://weblib.cern.ch/cgi-bin/checkloan?uid=&version=2">Your Loans</A>
+        <dd>Check out book you have on load, submit borrowing requests, etc.  Requires CERN ID."""
 
     out += """
     </dl>
@@ -118,19 +120,16 @@ def template_account(title,body):
 # warning_guest_user(): It returns an alert message,showing that the user is a guest user and should log into the system
 def warning_guest_user(type):
 
-    msg="""You are logged in as a guest user, so your %s will disappear at the end of the current session. If you wish you can<br> login
-	 or register here <A href="../youraccount.py/login">here</A>
-
-	"""%type	
-    out = ""
-    out += """<table class="portalbox" width="100%%" summary="">
+    msg="""You are logged in as a guest user, so your %s will disappear at the end of the current session. If you wish you can
+           <a href="../youraccount.py/login">login or register here</a>.
+	"""%type
+    return """<table class="errorbox" width="100%%" summary="">
                        <thead>
                         <tr>
-                         <th class="portalboxheader">%s</th>
+                         <th class="errorboxheader">%s</th>
                         </tr>
                        </thead>
-                      </table>""" % (msg)
-    return out	
+                      </table>""" % msg
  
 ## perform_delete():delete  the account of the user, not implement yet
 def perform_delete():
