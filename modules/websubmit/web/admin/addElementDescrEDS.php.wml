@@ -564,7 +564,7 @@
                            $insStr .= "NULL, ";
                         } // END else
 
-                        $insStr .= "NULL, NULL, NULL, '$cd', '$md', ".(isset($modifytext)?"'$modifytext', ":"NULL, ") . " NULL, '$cookie')";
+                        $insStr .= "NULL, NULL, NULL, NOW(), NOW(), ".(isset($modifytext)?"'$modifytext', ":"NULL, ") . " NULL, '$cookie')";
 
                         # Execute the insertion
                         $insRes = mysql_query($insStr);
@@ -682,7 +682,7 @@
                            $insStr .= "NULL, ";
                         } // END else
 
-                        $insStr .= "NULL, '$cd', '$md', ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
+                        $insStr .= "NULL, NOW(), NOW(), ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
                          . "'$cookie')";
 
                         # Execute the insertion
@@ -727,7 +727,7 @@
                         $insStr .= "NULL, ";
                      } // END else
 
-                     $insStr .= "NULL, '$cd', '$md', ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
+                     $insStr .= "NULL, NOW(), NOW(), ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
                       . "'$cookie')";
 
                      # Execute the insertion
@@ -832,7 +832,7 @@
                            $insStr .= "NULL, ";
                         } // END else
 
-                        $insStr .= "NULL, NULL, '$cd', '$md', ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL,"
+                        $insStr .= "NULL, NULL, NOW(), NOW(), ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL,"
                          . " '$cookie')";
 
                         # Execute the insertion
@@ -865,7 +865,7 @@
                       . "$elename', '$alephcode', '$marccode', '$type', NULL, NULL, " 
                       . "NULL, NULL, NULL, ";
 
-                     $insStr .= "'$fidesc', '$cd', '$md', ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
+                     $insStr .= "'$fidesc', NOW(), NOW(), ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
                       . "'$cookie')";
 
                      # Execute the insertion
@@ -897,7 +897,7 @@
                       . "$elename', '$alephcode', '$marccode', '$type', NULL, NULL, " 
                       . "NULL, NULL, NULL, ";
 
-                     $insStr .= "'$fidesc', '$cd', '$md', ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
+                     $insStr .= "'$fidesc', NOW(), NOW(), ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
                       . "'$cookie')";
 
                      # Execute the insertion
@@ -929,7 +929,7 @@
                       . "$elename', '$alephcode', '$marccode', '$type', NULL, NULL, " 
                       . "NULL, NULL, NULL, ";
 
-                     $insStr .= "'$fidesc', '$cd', '$md', ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
+                     $insStr .= "'$fidesc', NOW(), NOW(), ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
                       . "'$cookie')";
 
                      # Execute the insertion
