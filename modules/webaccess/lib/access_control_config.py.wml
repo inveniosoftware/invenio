@@ -114,7 +114,7 @@ def_auths = (
              (SUPERADMINROLE,    'cfgbibrank',           -1,      0,       {}),
             )
 cfg_webaccess_msgs = {
-                                0: 'Try to <a href="%s/youraccount.py/login?referer=%s/admin/%s/">login</a> with another account.' % (weburl, weburl, "%s"),
+                                0: 'Try to <a href="%s/youraccount.py/login?referer=%s/admin/%s">login</a> with another account.' % (weburl, weburl, "%s"),
                                 1: '<br>If you think this is not correct, please contact: <a href="mailto:%s">%s</a>' % (supportemail, supportemail),
                                 2: '<br>If you have any questions, please write to <a href="mailto:%s">%s</a>' % (supportemail, supportemail),
 				3: 'Guest users are not allowed, please <a href="%s/youraccount.py/login">login</a>.' % weburl,
