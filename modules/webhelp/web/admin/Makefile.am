@@ -21,11 +21,44 @@ SUBDIRS = howto
 
 docdir = $(WEBDIR)/admin
 
-doc_DATA=index.html
+doc_DATA=index.en.html index.fr.html index.de.html index.es.html index.pt.html index.it.html index.ru.html index.sk.html index.cz.html
 
 EXTRA_DIST = $(wildcard *.wml)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 
-%.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml
+%.en.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
+           ../../../../config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
+
+%.fr.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
+           ../../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_FR:$@ $<
+
+%.de.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
+           ../../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_DE:$@ $<
+
+%.es.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
+           ../../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_ES:$@ $<
+
+%.pt.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
+           ../../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_PT:$@ $<
+
+%.it.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
+           ../../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_IT:$@ $<
+
+%.ru.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
+           ../../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_RU:$@ $<
+
+%.sk.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
+           ../../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_SK:$@ $<
+
+%.cz.html: %.html.wml ../../../../config/config.wml ../../../../config/configbis.wml \
+           ../../../../config/messages.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_CZ:$@ $<
