@@ -22,9 +22,9 @@
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt;  <a class=navtrail href=<WEBURL>/hacking/webaccess/index.html>WebAccess Internals</a> " \
     navbar_select="hacking-webaccess-admin-internals" 
 
-<pre>
-ACCESS CONTROL ADMIN INTERNALS / $Date$
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
+<pre>
 These are the functions called by the WebAccess Web Admin Interface to administrate
 the wanted authorizations. This listing is of the most important functions. 
 

@@ -22,9 +22,9 @@
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt;  <a class=navtrail href=<WEBURL>/hacking/webaccess/index.html>WebAccess Internals</a> " \
     navbar_select="hacking-webaccess-engine-api" 
 
-<pre>
-ACCESS CONTROL ENGINE API & FLOW/ $Date$
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
+<pre>
 CDSware Access Control Engine can be called from within your Python programs
 via both a regular Python API and CLI.
 In addition the you get an explanation of the program flow.

@@ -23,9 +23,9 @@
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt; <a class=navtrail href=index.html>WebSearch Internals</a> " \
     navbar_select="hacking-websearch-stages" 
 
-<pre>
-SEARCH PROCESSING STAGES / $Date$
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
+<pre>
 What the search engine does after it receives a user query?  Let us
 explain the steps it takes for a fictive complex query example in
 which a user typed

@@ -23,10 +23,10 @@
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt; <a class=navtrail href=index.html>WebSearch Internals</a> " \
     navbar_select="hacking-websearch-api" 
 
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
 <protect>
 <pre>
-SEARCH ENGINE API / $Date$
-
 CDSware Search Engine can be called from within your Python programs
 via both a high-level and low-level API interface.
 
