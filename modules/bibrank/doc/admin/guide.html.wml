@@ -18,8 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
-    title="bibrank Admin Guide" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/bibrank/>bibrank Admin</a>" \ 
+    title="BibRank Admin Guide" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/bibrank/>BibRank Admin</a>" \ 
     navbar_name="admin" \
     navbar_select="bibrank"
 
@@ -361,4 +361,4 @@ $ ./bibrankgkb -v9
 </pre>
 
 <a name="ainf"></a><h3>Additional Information</h3>
-<a href="http://cdsdev.cern.ch:8000/DEMODEV/hacking/bibrank/">BibRank Internals</a>
+<a href="<weburl>/hacking/bibrank/">BibRank Internals</a>
