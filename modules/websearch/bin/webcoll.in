@@ -39,6 +39,7 @@ pylibdir = "<LIBDIR>/python"
 
 ## import modules:
 try:
+    import calendar
     import copy
     import getopt
     import getpass
@@ -78,6 +79,18 @@ except ImportError, e:
 ## global vars
 collection_house = {} # will hold collections we treat in this run of the program; a dict of {collname2, collobject1}, ...
 options = {} # will hold task options
+
+# cfg_cache_last_updated_timestamp_tolerance -- cache timestamp
+# tolerance (in seconds), to account for the fact that an admin might
+# accidentally happen to edit the collection definitions at exactly
+# the same second when some webcoll process was about to be started.
+# In order to be safe, let's put an exaggerated timestamp tolerance
+# value such as 20 seconds:
+cfg_cache_last_updated_timestamp_tolerance = 20
+
+# cfg_cache_last_updated_timestamp_file -- location of the cache
+# timestamp file:
+cfg_cache_last_updated_timestamp_file = "%s/collections/last_updated" % cachedir
 
 def get_collection(colname):
     """Return collection object from the collection house for given colname.
@@ -358,7 +371,7 @@ class Collection:
             print "I/O Error: " + str(message) + " (" + str(code) + ")"
             sys.exit(1)
         # print user info:
-        if options["verbose"] >= 3:
+        if options["verbose"] >= 6:
             write_message("... creating %s" % fullfilename)
         sys.stdout.flush()
         # print page body:
@@ -929,7 +942,7 @@ class Collection:
         if self.calculate_reclist_run_already:
             # do we have to recalculate?
             return (self.reclist, self.reclist_with_nonpublic_subcolls)
-        if options["verbose"] >= 3:
+        if options["verbose"] >= 6:
             write_message("... calculating reclist of %s" % self.name)
         reclist = HitSet() # will hold results for public sons only; good for storing into DB
         reclist_with_nonpublic_subcolls = HitSet() # will hold results for both public and nonpublic sons; good for deducing total
@@ -965,7 +978,7 @@ class Collection:
         if self.update_reclist_run_already:
             # do we have to reupdate?
             return 0
-        if options["verbose"] >= 3:
+        if options["verbose"] >= 6:
             write_message("... updating reclist of %s (%s recs)" % (self.name, self.nbrecs))
         sys.stdout.flush()
         try:
@@ -1019,6 +1032,67 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
         date = time.strptime(var, format_string)
         date = time.strftime(format_string, date)        
     return date
+
+def get_current_time_timestamp():
+    """Return timestamp corresponding to the current time."""
+    return time.strftime("%04Y-%02m-%02d %02H:%02M:%02S", time.localtime())
+    
+def compare_timestamps_with_tolerance(timestamp1,
+                                      timestamp2,
+                                      tolerance=0):
+    """Compare two timestamps TIMESTAMP1 and TIMESTAMP2, of the form
+       '2005-03-31 17:37:26'. Optionally receives a TOLERANCE argument
+       (in seconds).  Return -1 if TIMESTAMP1 is less than TIMESTAMP2
+       minus TOLERANCE, 0 if they are equal within TOLERANCE limit,
+       and 1 if TIMESTAMP1 is greater than TIMESTAMP2 plus TOLERANCE.
+    """
+    # remove any trailing .00 in timestamps:
+    timestamp1 = sre.sub(r'\.[0-9]+$', '', timestamp1)
+    timestamp2 = sre.sub(r'\.[0-9]+$', '', timestamp2)
+    # first convert timestamps to Unix epoch seconds:
+    timestamp1_seconds = calendar.timegm(time.strptime(timestamp1, "%Y-%m-%d %H:%M:%S"))
+    timestamp2_seconds = calendar.timegm(time.strptime(timestamp2, "%Y-%m-%d %H:%M:%S"))
+    # now compare them:
+    if timestamp1_seconds < timestamp2_seconds - tolerance:
+        return -1
+    elif timestamp1_seconds > timestamp2_seconds + tolerance:
+        return 1
+    else:
+        return 0
+
+def get_database_last_updated_timestamp():
+    """Return last updated timestamp for collection-related and
+       record-related database tables.
+    """
+    database_tables_timestamps = []
+    database_tables_timestamps.extend(map(lambda x: str(x[11]), run_sql("SHOW TABLE STATUS LIKE 'bibrec'")))
+    database_tables_timestamps.extend(map(lambda x: str(x[11]), run_sql("SHOW TABLE STATUS LIKE 'idxWORD%%'")))
+    database_tables_timestamps.extend(map(lambda x: str(x[11]), run_sql("SHOW TABLE STATUS LIKE 'collection%%'")))
+    database_tables_timestamps.extend(map(lambda x: str(x[11]), run_sql("SHOW TABLE STATUS LIKE 'portalbox'")))
+    database_tables_timestamps.extend(map(lambda x: str(x[11]), run_sql("SHOW TABLE STATUS LIKE 'field%%'")))
+    database_tables_timestamps.extend(map(lambda x: str(x[11]), run_sql("SHOW TABLE STATUS LIKE 'format%%'")))
+    database_tables_timestamps.extend(map(lambda x: str(x[11]), run_sql("SHOW TABLE STATUS LIKE 'rnkMETHODNAME'")))
+    return max(database_tables_timestamps)
+
+def get_cache_last_updated_timestamp():
+    """Return last updated cache timestamp."""
+    try:
+        f = open(cfg_cache_last_updated_timestamp_file, "r")
+    except:
+        return "1970-01-01 00:00:00"
+    timestamp = f.read()
+    f.close()
+    return timestamp
+
+def set_cache_last_updated_timestamp(timestamp):
+    """Set last updated cache timestamp to TIMESTAMP."""
+    try:
+        f = open(cfg_cache_last_updated_timestamp_file, "w")
+    except:
+        pass
+    f.write(timestamp)
+    f.close()
+    return timestamp
 
 def write_message(msg, stream=sys.stdout):
     """Prints message and flush output stream (may be sys.stdout or sys.stderr)."""
@@ -1161,6 +1235,7 @@ def task_run():
        Arguments described in usage() function.
        Return 1 in case of success and 0 in case of failure."""
     global task_id, options
+    task_run_start_timestamp = get_current_time_timestamp()
     options = task_get_options(task_id) # get options from BibSched task table
     ## check task id:
     if not options.has_key("task"):
@@ -1182,34 +1257,55 @@ def task_run():
     signal.signal(signal.SIGCONT, task_sig_wakeup)
     signal.signal(signal.SIGINT, task_sig_unknown)
     colls = []
-    # firstly, decide which collections to do:
-    if options.has_key("collection"):
-        coll = get_collection(options["collection"])
-        if coll.id == None:
-            usage(1, 'Collection %s does not exist' % coll.name)
-        colls.append(coll)
+    # decide whether we need to run or not, by comparing last updated timestamps:
+    if options["verbose"] >= 3:
+        write_message("Database timestamp is %s." % get_database_last_updated_timestamp())
+        write_message("Collection cache timestamp is %s." % get_cache_last_updated_timestamp())
+    if options.has_key("force") or \
+       compare_timestamps_with_tolerance(get_database_last_updated_timestamp(),
+                                         get_cache_last_updated_timestamp(),
+                                         cfg_cache_last_updated_timestamp_tolerance) >= 0:
+        ## either forced update was requested or cache is not up to date, so recreate it:
+        # firstly, decide which collections to do:
+        if options.has_key("collection"):
+            coll = get_collection(options["collection"])
+            if coll.id == None:
+                usage(1, 'Collection %s does not exist' % coll.name)
+            colls.append(coll)
+        else:
+            res = run_sql("SELECT name FROM collection ORDER BY id")
+            for row in res:
+                colls.append(get_collection(row[0]))            
+        # secondly, update collection reclist cache:
+        i = 0
+        for coll in colls:
+            i += 1
+            if options["verbose"]:
+                write_message("%s / reclist cache update" % coll.name)
+            coll.calculate_reclist()
+            coll.update_reclist()
+            task_update_progress("Part 1/2: done %d/%d" % (i,len(colls)))
+        # thirdly, update collection webpage cache:
+        i = 0
+        for coll in colls:
+            i += 1
+            if options["verbose"]:
+                write_message("%s / web cache update" % coll.name)
+            coll.update_webpage_cache()
+            task_update_progress("Part 2/2: done %d/%d" % (i,len(colls)))
+
+        # finally update the cache last updated timestamp:
+        # (but only when all collections were updated, not when only
+        # some of them were forced-updated as per admin's demand)
+        if not options.has_key("collection"):
+            set_cache_last_updated_timestamp(task_run_start_timestamp)
+            if options["verbose"] >= 3:
+                write_message("Collection cache timestamp is set to %s." % get_cache_last_updated_timestamp())
     else:
-        res = run_sql("SELECT name FROM collection ORDER BY id")
-        for row in res:
-            colls.append(get_collection(row[0]))
-            
-    # secondly, update collection reclist cache:
-    i = 0
-    for coll in colls:
-        i += 1
+        ## cache up to date, we don't have to run
         if options["verbose"]:
-            write_message("%s / reclist cache update" % coll.name)
-        coll.calculate_reclist()
-        coll.update_reclist()
-        task_update_progress("Part 1/2: done %d/%d" % (i,len(colls)))
-    # thirdly, update collection webpage cache:
-    i = 0
-    for coll in colls:
-        i += 1
-        if options["verbose"]:
-            write_message("%s / web cache update" % coll.name)
-        coll.update_webpage_cache()
-        task_update_progress("Part 2/2: done %d/%d" % (i,len(colls)))
+            write_message("Collection cache is up to date, no need to run.")        
+        pass 
     ## we are done:
     task_update_progress("Done.")
     task_update_status("DONE")
@@ -1223,7 +1319,8 @@ def usage(exitcode=1, msg=""):
         sys.stderr.write("Error: %s.\n" % msg)
     sys.stderr.write("Usage: %s [options]\n" % sys.argv[0])
     sys.stderr.write("Command options:\n")
-    sys.stderr.write("  -c, --collection\t Update only given collection. [all]\n")
+    sys.stderr.write("  -c, --collection\t Update cache for the given collection only. [all]\n")
+    sys.stderr.write("  -f, --force\t Force update even if cache is up to date. [no]\n")
     sys.stderr.write("Scheduling options:\n")
     sys.stderr.write("  -u, --user=USER \t User name to submit the task as, password needed.\n")
     sys.stderr.write("  -t, --runtime=TIME \t Time to execute the task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26\n")
@@ -1266,8 +1363,8 @@ def main():
         options["sleeptime"] = ""
         # set user-defined options:
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "hVv:u:s:t:c:",
-                                       ["help", "version", "verbose=","user=","sleep=","time=","collection="])
+            opts, args = getopt.getopt(sys.argv[1:], "hVv:u:s:t:c:f",
+                                       ["help", "version", "verbose=","user=","sleep=","time=","collection=","force"])
         except getopt.GetoptError, err:
             usage(1, err)
         try:
@@ -1288,6 +1385,8 @@ def main():
                     options["runtime"] = get_datetime(opt[1])
                 elif opt[0] in [ "-c", "--collection"]:
                     options["collection"] = opt[1]
+                elif opt[0] in [ "-f", "--force"]:
+                    options["force"] = 1
                 else:
                     usage(1)
         except StandardError, e:
