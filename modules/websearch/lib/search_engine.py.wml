@@ -2308,8 +2308,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, de
                     req.write('\n')
         else:
             # we are doing HTML output:
-            if format.startswith("hp"):
-                # portfolio format:
+            if format.startswith("hb_") or format.startswith("hd_"):
+                # on-the-fly formats:
                 for irec in range(irec_max,irec_min,-1):
                     req.write(print_record(recIDs[irec], format, ot, ln))                
             elif format.startswith("hb"):
@@ -2544,21 +2544,9 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 # print some white space at the end:
                 out += "<p><p>"
 
-    elif format == "hb-fly":
-        # HTML brief called on the fly; suitable for testing brief formats
-        out += call_bibformat(recID, "BRIEF_HTML")
-        out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s&amp;ln=%s">%s</a></span>""" \
-               % (weburl, recID, ln, msg_detailed_record[ln])
-
-    elif cfg_cern_site and format == "hp":
-        # HTML portfolio format called on the fly
-        out += call_bibformat(recID, "HB_P")
-
-    elif cfg_cern_site and format == "hd-ejournalsite":
-        # HTML brief called on the fly; suitable for testing brief formats
-        out += call_bibformat(recID, "EJOURNALSITE")
-        out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s&amp;ln=%s">%s</a></span>""" \
-               % (weburl, recID, ln, msg_detailed_record[ln])
+    elif format.startswith("hb_") or format.startswith("hd_"):
+        # underscore means that HTML brief/detailed formats should be called on-the-fly; suitable for testing formats
+        out += call_bibformat(recID, format)
 
     else:
         # HTML brief format by default
@@ -2604,7 +2592,9 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 out += """<br><small class="note"><a class="note" href="%s">%s</a></small>""" % (urls_u[idx], urls_u[idx])
 
         # at the end of HTML mode, print the "Detailed record" functionality:
-        if format != "hp":
+        if format.startswith("hb_") or format.startswith("hd_"):
+            pass # do nothing for on-the-fly formats
+        else:
             if cfg_use_aleph_sysnos:
                 alephsysnos = get_fieldvalues(recID, "970__a")
                 if len(alephsysnos)>0:
