@@ -58,10 +58,11 @@ cfg_fulltext_index_local_files_only = 0
 ## which language should we use as default?
 ##{'fr': 'french', 'en': 'english', 'no':'norwegian', 'se':'swedish', 'de': 'german', 'it':'italian', 'pt':'portuguese'}
 ## None = No stemming
-cfg_use_stemmer_lang = 'en'
+cfg_use_stemmer_lang = None
 
 ## path to stopword list, None = no stopword removal
-cfg_path_stopwordlist = "<ETCDIR>/bibrank/stopwords.kb"
+cfg_path_stopwordlist = None
+##"<ETCDIR>/bibrank/stopwords.kb"
 
 ##used by get_words_from_phrase
 cfg_chars_alphanumericseparators = r"[\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
