@@ -38,6 +38,7 @@ import Numeric
 import os
 import urllib
 import random
+import marshal
 
 from zlib import compress,decompress
 from bibrankadminlib import modify_translations, get_current_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
@@ -279,18 +280,20 @@ def perform_addcollectiontotree(colID, ln=cdslang, add_dad='', add_son='', rtype
     tree = get_col_tree(colID)
     col_list = col_dict.items()
     col_list.sort(compare_on_val)
+
     
+    output = show_coll_not_in_tree(colID, ln, col_dict)
     text = """
-    <span class="adminlabel">Add which</span>
+    <span class="adminlabel">Attach which</span>
     <select name="add_son" class="admin_w200">
     <option value="">- select collection -</option>
     """
     for (id, name) in col_list:
         if id != colID:
-            text += """<option value="%s" %s>%s</option>""" % (id, str(id)==add_son and 'selected="selected"' or '', name)
+            text += """<option value="%s" %s>%s</option>""" % (id, str(id)==str(add_son) and 'selected="selected"' or '', name)
     text += """
     </select><br>
-    <span class="adminlabel">Add to</span>
+    <span class="adminlabel">Attach to</span>
     <select name="add_dad" class="admin_w200">
     <option value="">- select parent collection -</option>
     """
@@ -309,13 +312,15 @@ def perform_addcollectiontotree(colID, ln=cdslang, add_dad='', add_son='', rtype
     <option value="v" %s>Virtual (Focus on...)</option>
     </select>
     """ % ((rtype=="r" and 'selected="selected"' or ''), (rtype=="v" and 'selected="selected"' or ''))
-    output = createhiddenform(action="%s/admin/websearch/websearchadmin.py/addcollectiontotree" % weburl,
+    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/addcollectiontotree" % weburl,
                                text=text,
                                button="Add",
                                colID=colID,
                                ln=ln,
                                confirm=1)
     output += output2
+
+    output += perform_showtree(colID, ln)
     try:
         body = [output, extra]
     except NameError:
@@ -350,6 +355,7 @@ def perform_addcollection(colID, ln=cdslang, colNAME='', dbquery='', rest='', ca
         if res:
             output += """<b><span class="info">Added new collection with default name '%s'</span></b>
             """ % colNAME
+            output += perform_addcollectiontotree(colID=colID, ln=ln, add_son=res[0][0], callback='')
         else:
             output += """<b><span class="info">Sorry, could not add collection, most likely the collection already exists.</span></b>
             """
@@ -524,7 +530,7 @@ def perform_modifycollectiontree(colID, ln=cdslang, move_up='', move_down='', mo
                                            rtype=rtype,
                                            ln=ln,
                                            confirm=1)
-                output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index?mtype=perform_managecoll#tree" % weburl,
+                output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index?mtype=perform_modifycollectiontree#tree" % weburl,
                                            text="<b>To cancel</b>",
                                            button="Cancel",
                                            colID=colID,
@@ -547,7 +553,7 @@ def perform_modifycollectiontree(colID, ln=cdslang, move_up='', move_down='', mo
             move_from_id = int(move_from[1:len(move_from)])
             text = """<b>Select collection to place the %s collection '%s' under.</b><br><br>
             """ % ((move_from_rtype=="r" and 'regular' or 'virtual'), col_dict[tree[move_from_id][0]])
-            output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index?mtype=perform_managecoll#tree" % weburl,
+            output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index?mtype=perform_modifycollectiontree#tree" % weburl,
                                        text=text,
                                        button="Cancel",
                                        colID=colID,
@@ -579,7 +585,7 @@ def perform_modifycollectiontree(colID, ln=cdslang, move_up='', move_down='', mo
                                                ln=ln,
                                                rtype=rtype,
                                                confirm=1)
-                    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index?mtype=perform_managecoll#tree" % weburl,
+                    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index?mtype=perform_modifycollectiontree#tree" % weburl,
                                                text="""<b>To cancel</b>""",
                                                button="Cancel",
                                                colID=colID,
@@ -597,7 +603,7 @@ def perform_modifycollectiontree(colID, ln=cdslang, move_up='', move_down='', mo
             move_from = ''
             move_to = ''
         else:
-            output += """<br><br>
+            output += """
             """
     except StandardError, e:
         return """<b><span class="info">An error occured.</span></b>
@@ -1727,9 +1733,9 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     output = ""
     fin_output = ""
     if not col_dict.has_key(1):
-        fin_output += """<b><span class="info">Before collections can be created, a root collection must be given.</span></b><br>"""
-        fin_output += perform_addcollection(colID=colID, ln=ln, callback='')
-        return fin_output
+        res = add_col(cdsname, '', '')
+        if not res:
+            return "Cannot create root collection, please check database."
 
     fin_output += """
     <table>
@@ -1738,31 +1744,29 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     </tr>
     <tr>
     <td>0.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s">Show all</a></small></td>
-    <td>1.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_managecoll">Manage collections</a></small></td>
-    <td>2.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_runwebcoll">Manage webcoll</a></small></td>
+    <td>1.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_addcollection">Create new collection</a></small></td>
+    <td>2.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_addcollectiontotree">Attach collection to tree</a></small></td>
+    <td>3.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_modifycollectiontree">Modify collection tree</a></small></td>
+    <td>4.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_runwebcoll">Webcoll overview</a></small></td>
     </tr>
     </table>
-    """ % (weburl, colID, ln, weburl, colID, ln, weburl, colID, ln)
+    """ % (weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln)
      
     if mtype == "perform_addcollection" and content:
         fin_output += content
-    elif mtype != "perform_runwebcoll":
+    elif mtype != "perform_runwebcoll" and mtype != "perform_addcollectiontotree" and mtype != "perform_modifycollectiontree":
         fin_output += perform_addcollection(colID=colID, ln=ln, callback='')
         fin_output += "<br>"
         
     if mtype == "perform_addcollectiontotree" and content:
         fin_output += content
-    elif mtype != "perform_runwebcoll":
+    elif mtype != "perform_runwebcoll" and mtype != "perform_addcollection" and mtype != "perform_modifycollectiontree":
         fin_output += perform_addcollectiontotree(colID=colID, ln=ln, callback='')
-        fin_output += "<br>"
-
-    if mtype != "perform_runwebcoll":
-        fin_output += show_coll_not_in_tree(colID, ln, col_dict)
         fin_output += "<br>"
         
     if mtype == "perform_modifycollectiontree" and content:
         fin_output += content
-    elif mtype != "perform_runwebcoll":
+    elif mtype != "perform_runwebcoll" and mtype !="perform_addcollection" and mtype!="perform_addcollectiontotree":
         fin_output += perform_modifycollectiontree(colID=colID, ln=ln, callback='')
         fin_output += "<br>"
 
@@ -1779,11 +1783,9 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     return addadminbox('Overview', body)
     
 def show_coll_not_in_tree(colID, ln, col_dict):
-    output = ""
-    fin_output = ""
-    subtitle = "These collections are not in the tree, and should be added"
     tree = get_col_tree(colID)
     in_tree = {}
+    output = "These collections are not in the tree, and should be added:<br>"
     for (id, up, down, dad, reltype) in tree:
         in_tree[id] = 1
         in_tree[dad] = 1
@@ -1793,8 +1795,10 @@ def show_coll_not_in_tree(colID, ln, col_dict):
             if not in_tree.has_key(id[0]):
                 output += """<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s" title="Edit collection">%s</a> ,
                 """ % (weburl, id[0], ln, col_dict[id[0]])
-        fin_output += addadminbox(subtitle, [output])
-    return fin_output
+        output += "<br><br>"
+    else:
+        output = ""
+    return output
     
 def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='', edit=''):
     """Creates the presentation of the collection tree, with the buttons for modifying it.
@@ -2074,34 +2078,46 @@ def perform_runwebcoll(colID, ln, confirm=0, callback='yes'):
     colID - the collection id of the current collection.
     fmtID - the format id to delete."""
  
-    subtitle = """<a name="11"></a>Run webcoll for collection"""
+    subtitle = """<a name="11"></a>Webcoll overview"""
     output  = ""
 
     colID = int(colID)
     col_dict = dict(get_current_name('', ln, get_col_nametypes()[0][0], "collection"))
 
-    if confirm in [0, "0"]:
-        text = """<b>Do you want to run webcoll now for the collection '%s'.</b>
-        """ % col_dict[colID]
-        output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/runwebcoll#11" % weburl,
-                                   text=text,
-                                   button="Execute",
-                                   colID=colID,
-                                   ln=ln,
-                                   confirm=1)
-                    
-    elif confirm in [1, "1"]:
-        name = run_sql("select name from collection where id=%s" % colID)
-        res = os.popen("""%swebcoll -c%s"""  % ("/log/cdsware-DEMODEV/bin/", name[0][0])).readlines()
-        if res:
-            output += """<b><span class="info">Result from webcoll:</span></b><br>
-            """
-            for line in res:
-                output += """%s<br>""" % line
-        else:
-            output += """<b><span class="info">Cannot run webcoll.</span></b>
-            """
-            
+    res = run_sql("select proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='webcoll' and runtime< now() ORDER by runtime")
+    output += """<b>Last run:</b><br>"""
+    if len(res) > 0:
+        (proc, host, user, runtime, sleeptime, arguments, status, progress) = res[len(res) - 1]
+        output += "Task: %s<br>" % proc
+        output += "User: %s<br>" % user
+        output += "Runtime: %s<br>" % runtime
+        output += "Sleeptime: %s<br>" % sleeptime
+        output += "Status: %s<br>" % status
+        output += "Progress: %s<br>" % progress
+        output += "<b>Options:</b><br>"
+        options = marshal.loads(arguments)
+        for (key, value) in options.iteritems():
+            output += "&nbsp;%s: %s <br>" % (key,value)
+    else:
+        output += """<span class="info">Not yet run.</span><br>"""
+
+    res = run_sql("select proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='webcoll' and runtime> now() ORDER by runtime")
+    output += """<br><b>Next scheduled run:</b> (when changes to the collections will be prosessed.)<br>"""
+    if len(res) > 0:
+        (proc, host, user, runtime, sleeptime, arguments, status, progress) = res[0]
+        output += "Task: %s<br>" % proc
+        output += "User: %s<br>" % user
+        output += "Runtime: %s<br>" % runtime
+        output += "Sleeptime: %s<br>" % sleeptime
+        output += "Status: %s<br>" % status
+        output += "Progress: %s<br>" % progress
+        output += "<b>Options:</b><br>"
+        options = marshal.loads(arguments)
+        for (key, value) in options.iteritems():
+            output += "&nbsp;%s: %s <br>" % (key,value)
+    else:
+        output += """<span class="info">No webcoll tasks scheduled in the future. If changes has been made to the collections they will not be visible until webcoll has been executed for the changed collections.</soan><br>"""
+    
     try:
         body = [output, extra]
     except NameError:

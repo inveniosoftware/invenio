@@ -183,7 +183,7 @@ def showtree(req, colID, ln=cdslang):
         return error_page(req)
 
     if not wsc.check_user(uid, 'cfgwebsearch'):
-        return page(title="Edit Collection",
+        return page(title="Collection tree",
                     body=wsc.perform_showtree(colID=colID,
                                               ln=ln),
                     uid=uid,
