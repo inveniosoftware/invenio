@@ -407,7 +407,9 @@ class Manager:
         self.stdscr.addnstr(self.y, 0, myline, maxx, attr)
         self.y = self.y+1
 
-    def display_in_footer(self, footer, i = 0):
+    def display_in_footer(self, footer, i = 0, print_time_p=0):
+        if print_time_p:
+            footer = "%s %s" % (footer, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         maxx = self.stdscr.getmaxyx()[1]
         footer = footer.ljust(maxx)
         if self.auto_mode:
@@ -435,11 +437,11 @@ class Manager:
             self.put_line( row )
         self.y = self.stdscr.getmaxyx()[0] - 1
         if self.auto_mode:
-            self.display_in_footer(self.footer_auto_mode)
+            self.display_in_footer(self.footer_auto_mode, print_time_p=1)
         elif self.move_mode:
-            self.display_in_footer(self.footer_move_mode)
+            self.display_in_footer(self.footer_move_mode, print_time_p=1)
         else:
-            self.display_in_footer(self.footer_select_mode)
+            self.display_in_footer(self.footer_select_mode, print_time_p=1)
             footer2 = ""
             if self.item_status == "DONE" or self.item_status == "ERROR" or self.item_status == "STOPPED":
                  footer2 += self.footer_stopped_item
@@ -485,7 +487,7 @@ class Manager:
         while self.running:
             time.sleep( 0.1 )
             self.handle_keys()
-            if ring == 10:
+            if ring == 20:
                 if self.display == 1:
                     where = "and status='DONE'"
                     order = "DESC"
@@ -588,7 +590,7 @@ class BibSched:
         while 1:
             for row in rows:
                 self.handle_row( row )
-            time.sleep( 1 )
+            time.sleep(1)
             rows = run_sql("SELECT id,proc,user,UNIX_TIMESTAMP(runtime),sleeptime,arguments,status FROM schTASK ORDER BY runtime ASC")
 
 def Log(message):
