@@ -260,6 +260,10 @@ Contents
           "pre-compile time configuration step a)" in the elucidative
           explanatory commentary below.  
 
+          (Note that if you prefer to build CDSware out of its source
+           tree, you may run the above configure command like this: 
+           $ mkdir build && cd build && ../configure --prefix=...)
+
       $ vi ./config/config.wml  ## optional, but strongly recommended
 
           Optionally, customize your CDSware installation.  We
