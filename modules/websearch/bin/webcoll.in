@@ -437,7 +437,7 @@ class Collection:
         for row in res:
             title, body = row[0], row[1]
             if title:
-                out += """<table class="portalbox" width="100%%">        
+                out += """<table class="portalbox">        
                            <thead>
                             <tr>
                              <th class="portalboxheader">%s</th>
@@ -668,11 +668,23 @@ class Collection:
     def create_rankoptions(self, ln=cdslang):
         "Produces 'Rank options' portal box."
         box=""
+        if 1: return "not implemented yet" # FIXME
         box += """<select name="rm">"""
-        box += """  <option value="">- %s -""" % msg_latest_first[ln]
-        for field, value in (('jif','journal impact factor'),):
+        box += """  <option value="">- %s -""" % "no ranking filter"
+        for field, value in (('jif','journal impact factor'),
+                             ('nci','citation frequency'),
+                             ('ndl','download frequency'),
+                             ('crf','combined relevance factor')):
             box += """  <option value="%s">%s""" % (field, value)                
         box += """</select>"""
+        box += """<select name="rs">
+                    <option value="0" selected>- any star category -
+                    <option value="5">*****
+                    <option value="4">****
+                    <option value="3">***
+                    <option value="2">**
+                    <option value="1">*
+                  </select>"""
         return box 
 
     def create_displayoptions(self, ln=cdslang):
@@ -925,8 +937,7 @@ class Collection:
                     </tr>
                    </tbody>
                   </table>""" % \
-           (msg_sort_by[ln], "", cell_7_a, "")
-# FIXME:          (msg_sort_by[ln], msg_rank_by[ln], cell_7_a, cell_7_b)
+                      (msg_sort_by[ln], "Ranking filter:", cell_7_a, cell_7_b)
         # display/format options:        
         cell_8_a = self.create_displayoptions(ln)
         cell_8_b = self.create_formatoptions(ln)
