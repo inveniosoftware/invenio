@@ -242,26 +242,25 @@ follows:
 <a name="3"></a><h2>3. Edit Collection Parameters</h2>
 <a name="3.1"></a><h3>3.1 Modify collection query</h3>
 <a name="3.2"></a><h3>3.2 Modify access restrictions</h3>
+If there is a need to restrict access to certain collections, this can be done in cdsware by configuring which apache group should have access to the collection. A user then needs to be logged in and be a part of the right usergroup to be able to access the specific collection.
 <a name="3.3"></a><h3>3.3 Modify translations</h3>
-To enable internalization support for the collections, the translations must be added here. If a translation does not exist, the default cdsware language for this installation will be used.
+To enable internalization support for the collections, the translations for the wanted languages must be added. If a translation does not exist, the translation for the default cdsware language for this installation will be used. The languages available, depends on which languages cdsware is installed  with.
 <a name="3.4"></a><h3>3.4 Delete collection</h3>
 To be able to delete a collection, it must first be removed from the collection tree. Any data associated with the collection will be lost. As an example, if a collection uses several portalboxes, you will loose the association information, but not the portalboxes itself. Similarily, this will also happen regarding output formats, translations, search options, sort options, search fields, ranking, collection query and access restriction.
 <a name="3.5"></a><h3>3.5 Modify portalboxes</h3>
-Portalboxes are used to show various kind of information to the user when a collection is selected. It can be anything from a textbox to a picture. To create a new portalbox, a title and a body must be given. The body can contain html if necessary.
-To add a portalbox to the collection, you must choose an existing portalbox, which language it should be valid for and the position on the screen. Since a portalbox is not bound to one language, one portalbox can be used for all languages.
+Portalboxes are used to show various kind of information to the user when a collection is selected. It can be anything from a textbox to a picture. To create a new portalbox, a title and a body must be given, where the body can contain html if necessary.
+To add a portalbox to the collection, you must choose an existing portalbox, which language it should be valid for and the position on the screen. Since a portalbox is not bound to one language, one portalbox can be used for several languages.
 <a name="3.6"></a><h3>3.6 Modify search fields</h3>
-If you want to enable only searching in certain fields for a collection, this can be done here, including selecting the order of which they may appear. Management of the fields are done from the BibIndex interface.
+If you want to enable only searching in certain fields for a collection, you need to specify this by adding the wanted fields, including selecting the order of which they may appear in the 'Advanced Search' interface. Management of the fields are done from the BibIndex interface.
 <a name="3.7"></a><h3>3.7 Modify search options</h3>
 <a name="3.8"></a><h3>3.8 Modify sort options</h3>
-If you want to enable only sorting on certain fields for a collection, this can be done here, including selecting the order of which they may appear in the 'Advanced Search' interface. Management of the fields are done from the BibIndex interface.
+If you want to enable only sorting on certain fields for a collection, you need to specify this by adding the wanted fields, including selecting the order of which they may appear in the 'Advanced Search' interface. Management of the fields are done from the BibIndex interface.
 <a name="3.9"></a><h3>3.9 Modify rank options</h3>
-To enable a certain rank method for a collection, select the method and add it. The documents in this collection will then be included in the ranking the next time the BibRank is running the added rank method. For configuration of the rank method, see the BibRank interface.
+To enable a certain rank method for a collection, select the method and add it. The documents in this collection will then be included in the ranking the next time the BibRank daemon is running the added rank method. For configuration of the rank method, see the BibRank interface.
 <a name="3.10"></a><h3>3.10 Modify output formats</h3>
-Here you can add the output formats that should be available for the chosen collection. This enables various kind of output of a document or a search.
+For each collection you can specify various output formats, which defines how the search result is presented for various collection types. The order of which the formats appear can also be changed using the 'move' arrows.
 <a name="4"></a><h2>4. Run WebColl Daemon</h2>
 <a name="5"></a><h2>5. Edit Search Engine Parameters</h2>
 <a name="6"></a><h2>6. Search Engine Cache</h2>
-
 <a name="7"></a><h2>7. Additional Information</h2>
-
 <a href="<WEBURL>/hacking/websearch/">WebSearch Internals</a>
