@@ -17,11 +17,11 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS=bibwords bibstat
+bin_SCRIPTS=bibindex bibstat
 
 EXTRA_DIST = $(wildcard *.wml)
 
-CLEANFILES = $(bin_SCRIPTS) *~ *.tmp bibwordsc
+CLEANFILES = $(bin_SCRIPTS) *~ *.tmp bibindexc
 
 %: %.wml ../../../config/config.wml ../../../config/configbis.wml
 	$(WML) -o $@ $<

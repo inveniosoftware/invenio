@@ -74,26 +74,10 @@ except StandardError, err:
     Log(str(err),"Error")
     sys.exit(1)
 
-def escape_string(s):
-    "Escapes special chars in string.  For MySQL queries."
-    return  MySQLdb.escape_string(s)
-
-def report_bibXXx_table_status(tablename):
-    """Report stats for the table bibXXx 'tablename'."""
+def report_table_status(tablename):
+    """Report stats for the table TABLENAME."""
     out = ""
-    query = "SHOW TABLE STATUS LIKE '%s'" % escape_string(tablename)
-    cursor.execute(query)
-    row = cursor.fetchone()
-    while row:
-        out += "%14s %17d %17d %17d" % (row[0], row[3], row[5], row[7]) # Name, Rows, Data_length, Max_data_length
-        row = cursor.fetchone()
-    return out    
-
-def report_bibwords_table_status(tablename):
-    """Report stats for the table bibwordsX 'tablename'."""
-    out = ""
-    query = "SHOW TABLE STATUS LIKE '%s'" % escape_string(tablename)
-    cursor.execute(query)
+    cursor.execute("SHOW TABLE STATUS LIKE %s", (tablename,))
     row = cursor.fetchone()
     while row:
         out += "%14s %17d %17d %17d" % (row[0], row[3], row[5], row[7]) # Name, Rows, Data_length, Max_data_length
@@ -106,11 +90,14 @@ def main():
     print "============== ================= ================= ================="
     for i in range(0,10):
         for j in range(0,10):
-            print report_bibXXx_table_status("bib%1d%1dx" % (i, j))
-            print report_bibXXx_table_status("bibrec_bib%1d%1dx" % (i, j))
-    for i in range(0,10):
-        print report_bibwords_table_status("bibwords%1d" % i)
-        print report_bibwords_table_status("bibwords%1dr" % i)
+            print report_table_status("bib%1d%1dx" % (i, j))
+            print report_table_status("bibrec_bib%1d%1dx" % (i, j))
+    for i in range(0,11):
+        print report_table_status("idxWORD%02dF" % i)
+        print report_table_status("idxWORD%02dR" % i)
+    for i in range(0,11):
+        print report_table_status("idxPHRASE%02dF" % i)
+        print report_table_status("idxPHRASE%02dR" % i)
             
 
 if __name__ == "__main__":
