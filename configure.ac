@@ -134,19 +134,6 @@ if test -z "$ACROREAD"; then
    <http://www.adobe.com/products/acrobat/readstep.html>.])
 fi
 
-## Check for Lynx:
-AC_PATH_PROG(LYNX, lynx)
-if test -z "$LYNX"; then
-   AC_MSG_WARN([
-   Lynx was not found in your PATH.  It is used in 
-   the WebSubmit module to fetch files from URLs given by
-   submitters.
-   You can continue without it but you will miss some CDSware 
-   functionality.  We recommend you to install it first and to rerun 
-   the configure script.  Lynx is available from
-   <http://lynx.browser.org/>.])
-fi
-
 ## Check for Gzip:
 AC_PATH_PROG(GZIP, gzip)
 if test -z "$GZIP"; then
@@ -328,18 +315,6 @@ if test -z "$FILE"; then
    <ftp://ftp.astron.com/pub/file/>.])
 fi
 
-## Check for Djpeg:
-AC_PATH_PROG(DJPEG, djpeg)
-if test -z "$DJPEG"; then
-   AC_MSG_WARN([
-   Djpeg was not found in your PATH.  It is used in 
-   the WebSubmit module to create an icon from a submitted picture.
-   You can continue without it but you will miss some CDSware 
-   functionality.  We recommend you to install it first and to rerun 
-   the configure script.  Djpeg is available from
-   <http://www.ijg.org/files>.])
-fi
-
 ## Check for Convert:
 AC_PATH_PROG(CONVERT, convert)
 if test -z "$CONVERT"; then
@@ -350,90 +325,6 @@ if test -z "$CONVERT"; then
    functionality.  We recommend you to install it first and to rerun 
    the configure script.  Convert is available from
    <http://www.imagemagick.org/>.])
-fi
-
-## Check for Giftext:
-AC_PATH_PROG(GIFTEXT, giftext)
-if test -z "$GIFTEXT"; then
-   AC_MSG_WARN([
-   Giftext was not found in your PATH.  It is used in 
-   the WebSubmit module to create an icon from a submitted picture.
-   You can continue without it but you will miss some CDSware 
-   functionality.  We recommend you to install it first and to rerun 
-   the configure script.  Giftext is available from
-   <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>.])
-fi
-
-## Check for Gifinter:
-AC_PATH_PROG(GIFINTER, gifinter)
-if test -z "$GIFINTER"; then
-   AC_MSG_WARN([
-   Gifinter was not found in your PATH.  It is used in 
-   the WebSubmit module to create an icon from a submitted picture.
-   You can continue without it but you will miss some CDSware 
-   functionality.  We recommend you to install it first and to rerun 
-   the configure script.  Gifinter is available from
-   <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>.])
-fi
-
-## Check for Gifrsize:
-AC_PATH_PROG(GIFRSIZE, gifrsize)
-if test -z "$GIFRSIZE"; then
-   AC_MSG_WARN([
-   Gifrsize was not found in your PATH.  It is used in 
-   the WebSubmit module to create an icon from a submitted picture.
-   You can continue without it but you will miss some CDSware 
-   functionality.  We recommend you to install it first and to rerun 
-   the configure script.  Gifrsize is available from
-   <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>.])
-fi
-
-## Check for jpegsize:
-AC_PATH_PROG(JPEGSIZE, jpegsize)
-if test -z "$JPEGSIZE"; then
-   AC_MSG_WARN([
-   jpegsize was not found in your PATH.  It is used in 
-   the WebSubmit module to create an icon from a submitted picture.
-   You can continue without it but you will miss some CDSware 
-   functionality.  We recommend you to install it first and to rerun 
-   the configure script.  Jpegsize is available from
-   <http://www.squarebox.co.uk/download/>.])
-fi
-
-## Check for Ppmtogif:
-AC_PATH_PROG(PPMTOGIF, ppmtogif)
-if test -z "$PPMTOGIF"; then
-   AC_MSG_WARN([
-   ppmtogif was not found in your PATH.  It is used in 
-   the WebSubmit module to create an icon from a submitted picture.
-   You can continue without it but you will miss some CDSware 
-   functionality.  We recommend you to install it first and to rerun 
-   the configure script.  Ppmtogif is available from
-   <http://www.acme.com/software/pbmplus/>.])
-fi
-
-## Check for Ppmquant:
-AC_PATH_PROG(PPMQUANT, ppmquant)
-if test -z "$PPMQUANT"; then
-   AC_MSG_WARN([
-   ppmquant was not found in your PATH.  It is used in 
-   the WebSubmit module to create an icon from a submitted picture.
-   You can continue without it but you will miss some CDSware 
-   functionality.  We recommend you to install it first and to rerun 
-   the configure script.  Ppmquant is available from
-   <http://www.acme.com/software/pbmplus/>.])
-fi
-
-## Check for Pnmscale:
-AC_PATH_PROG(PNMSCALE, pnmscale)
-if test -z "$PNMSCALE"; then
-   AC_MSG_WARN([
-   pnmscale was not found in your PATH.  It is used in 
-   the WebSubmit module to create an icon from a submitted picture.
-   You can continue without it but you will miss some CDSware 
-   functionality.  We recommend you to install it first and to rerun 
-   the configure script.  Pnmscale is available from
-   <http://www.acme.com/software/pbmplus/>.])
 fi
 
 ## Substitute variables:
