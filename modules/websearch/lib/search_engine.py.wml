@@ -341,7 +341,7 @@ def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_
     box += """<select name="%sm">""" % name
     box += """<option value="">%s""" % msg_any_month[ln]
     for mm, month in [(1,msg_january[ln]), (2,msg_february[ln]), (3,msg_march[ln]), (4,msg_april[ln]), \
-                      (2,msg_may[ln]), (6,msg_june[ln]), (7,msg_july[ln]), (8,msg_august[ln]), \
+                      (5,msg_may[ln]), (6,msg_june[ln]), (7,msg_july[ln]), (8,msg_august[ln]), \
                       (9,msg_september[ln]), (10,msg_october[ln]), (11,msg_november[ln]), (12,msg_december[ln])]:
         box += """<option value="%02d"%s>%s""" % (mm, is_selected(mm, selected_month), month)
     box += """</select>"""
