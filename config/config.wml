@@ -284,6 +284,7 @@ TRUE
 </define-tag>
 
 <define-tag ADMINEMAIL whitespace=delete>
+eduardo.margallo@cern.ch
 </define-tag>
 
 <define-tag SUBMITSUPPORTEMAIL whitespace=delete>
