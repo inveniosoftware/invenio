@@ -592,7 +592,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
         date = time.strftime(format_string, date)
     else:
         date = time.strptime(var, format_string)
-        date = time.strftime(format_string, date)        
+        date = time.strftime(format_string, date)
     return date
 
 def create_range_list(res):
@@ -924,10 +924,12 @@ class WordTable:
             self.put_into_db()
             self.log_progress(time_started,records_done,records_to_go)
 
-    def add_date(self, date):
-        # If date is not set, then retrieve it from the database.
-        # Reindex all formats newer than the modification date
-        if not date:
+    def add_recIDs_by_date(self, dates):
+        """Add records that were modified between DATES[0] and DATES[1].
+           If DATES is not set, then add records that were modified since
+           the last update of the index.
+        """
+        if not dates:
             id = self.tablename[-3:-1]
             query = """SELECT last_updated FROM idxINDEX WHERE id='%s'
             """ % id
@@ -935,12 +937,22 @@ class WordTable:
             if not res:
                 return
             if not res[0][0]:
-                date = "0000-00-00"
+                dates = ("0000-00-00", None)
             else:
-                date = res[0][0]
-        query = """SELECT b.id FROM bibrec AS b WHERE b.modification_date >=
-        '%s' ORDER BY b.id ASC""" % date
-        res = run_sql(query)        
+                dates = (res[0][0], None)
+        if dates[1] is None:
+            res = run_sql("""SELECT b.id FROM bibrec AS b
+                              WHERE b.modification_date >= %s ORDER BY b.id ASC""",
+                          (dates[0],))
+        elif dates[0] is None:
+            res = run_sql("""SELECT b.id FROM bibrec AS b
+                              WHERE b.modification_date <= %s ORDER BY b.id ASC""",
+                          (dates[1],))
+        else:
+            res = run_sql("""SELECT b.id FROM bibrec AS b
+                              WHERE b.modification_date >= %s AND 
+                                    b.modification_date <= %s ORDER BY b.id ASC""",
+                          (dates[0], dates[1]))
         list = create_range_list(res)
         if not list:
             if options["verbose"]:
@@ -1365,7 +1377,7 @@ def task_run(row):
                         recIDs_range.append([recID,recID])
                     wordTable.add_recIDs(recIDs_range)
                 else:
-                    wordTable.add_date(options["modified"])
+                    wordTable.add_recIDs_by_date(options["modified"])
                     # only update last_updated if run via automatic mode:
                     wordTable.update_last_updated(task_starting_time)
                 
