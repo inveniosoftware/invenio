@@ -235,7 +235,10 @@ def create_rnkmethod_cache():
             methods[rank_method_code]["col_size"] = run_sql("SELECT count(*) FROM %sR" % methods[rank_method_code]["rnkWORD_table"][:-1])[0][0]
 
         if config.has_option(cfg_function, "stem_if_avail") and config.get(cfg_function, "stem_if_avail") == "yes":
-            methods[rank_method_code]["stemmer"] = Stemmer.Stemmer(languages[config.get(cfg_function, "stem_query_language")])
+            try:
+                methods[rank_method_code]["stemmer"] = Stemmer.Stemmer(languages[config.get(cfg_function, "stem_query_language")])
+            except Exception,e:
+                pass
 
         if config.has_option(cfg_function, "stopword"):
             methods[rank_method_code]["stopwords"] = get_stopwords("%s" % config.get(cfg_function, "stopword"))
