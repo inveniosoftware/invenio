@@ -2600,7 +2600,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         # good, no sort needed
         return recIDs
         
-def print_record_list_for_similarity_boxen(req, title, score_list):
+def print_record_list_for_similarity_boxen(req, title, score_list, ln=cdslang):
     """Print list of records in the "hs" (HTML Similarity) format for similarity boxes.
        FIXME: bad symbol names again, e.g. SCORE_LIST is *not* a list of scores.  Humph.
     """
@@ -2610,7 +2610,7 @@ def print_record_list_for_similarity_boxen(req, title, score_list):
     req.write("""<td><tr><td><table>""")
     max = min(len(score_list),5)
     for i in score_list[0:max]:
-        req.write( """<tr><td><font class="rankscoreinfo"><a>(%s)&nbsp;</a></font><small>&nbsp;%s</small></td></tr>""" % (i[1],print_record(i[0],format="hs")))    
+        req.write( """<tr><td><font class="rankscoreinfo"><a>(%s)&nbsp;</a></font><small>&nbsp;%s</small></td></tr>""" % (i[1],print_record(i[0],format="hs", ln=ln)))    
     req.write("""</table></small></td></tr></table> """)
     return
                               
@@ -2717,7 +2717,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                                 req.write("""<tr><td>""")
                                 print_record_list_for_similarity_boxen(req,
                                                                        msg_cited_by_x_records[ln] % len(citing_list),
-                                                                       citing_list)                           
+                                                                       citing_list,
+                                                                       ln)                           
                                 req.write("""&nbsp;<a  href="%s/search.py?p=recid:%d&amp;rm=cit&amp;ln=%s">%s</a><br><br>\n""" % \
                                           (weburl, recIDs[irec], ln, msg_more[ln]))
                                 req.write("""</td><tr>""")
@@ -2727,7 +2728,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                                 req.write("""<tr><td>""")
                                 print_record_list_for_similarity_boxen(req,
                                                                        msg_cocited_with_x_records[ln] % len(co_cited_list),
-                                                                       co_cited_list)                           
+                                                                       co_cited_list,
+                                                                       ln)                           
                                 req.write("""&nbsp;<a href="%s/search.py?p=cocitedwith:%d&amp;ln=%s">%s</a><br>\n""" % \
                                           (weburl, recIDs[irec], ln, msg_more[ln]))
                                 req.write("""</td></tr>""")
@@ -2745,7 +2747,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                                 req.write("""<tr><td>""")
                                 print_record_list_for_similarity_boxen(req,
                                                                        msg_people_who_downloaded_this_document[ln],
-                                                                       download_similarity_list)
+                                                                       download_similarity_list,
+                                                                       ln)
                                 req.write("""</td></tr>""")
                             req.write("""</table>""")   
                         # print page view similarity box:
@@ -2754,7 +2757,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                             req.write("<p>&nbsp;")
                             print_record_list_for_similarity_boxen(req,
                                                                    msg_people_who_viewed_this_page[ln],
-                                                                   page_view_similarity_list)
+                                                                   page_view_similarity_list,
+                                                                   ln)
                     req.write("<p>&nbsp;")
     else:        
         print_warning(req, 'Use different search terms.')        
@@ -3001,7 +3005,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
         if record_exist_p == -1:
             out += msg_record_deleted[ln]
         else:
-            out += """<a href="%s/search.py?recid=%s&ln=en">""" % (weburl, recID)
+            out += """<a href="%s/search.py?recid=%s&ln=%s">""" % (weburl, recID, ln)
             # firstly, title:
             titles = get_fieldvalues(recID, "245__a")
             if titles:
