@@ -36,8 +36,8 @@
 
         <h3>See also:</h3>
             <BLOCKQUOTE>
-                <li><A HREF="documentnew.<lang:star: *>.php">create a type of document</A><BR>
-                <li><A HREF="documentmodify.<lang:star: *>.php">modify a type of document</A><BR>
-                <li><A HREF="actionimplement.<lang:star: *>.php">implement an action over a type of document</A><BR>
+                <li><A HREF="documentnew.<lang:star: *>.html">create a type of document</A><BR>
+                <li><A HREF="documentmodify.<lang:star: *>.html">modify a type of document</A><BR>
+                <li><A HREF="actionimplement.<lang:star: *>.html">implement an action over a type of document</A><BR>
             </BLOCKQUOTE>
 
