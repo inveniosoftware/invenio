@@ -19,8 +19,10 @@
 
 #include "cdspage.wml" \
     title="BibRank Admin" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a>" 
-     
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a>"  \
+    navbar_name="admin" \
+    navbar_select="bibrank"
+
 <p>
  This is the gate to the admin area for BibRank. You need to 
  <a href="<WEBURL>/youraccount.py/login?referer=<WEBURL>/admin/bibrank/">login</a> to enter.
