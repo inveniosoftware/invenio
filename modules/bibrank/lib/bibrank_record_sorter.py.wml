@@ -472,7 +472,7 @@ def word_frequency(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
             del term_recs
 
     if len(recdict) == 0 or (len(lwords) == 1 and lwords[0] == ""):
-        return (None, "<b>Records not ranked. The query is not detailed enough for ranking to be possible.", "", voutput)
+        return (None, "Records not ranked. The query is not detailed enough for ranking to be possible.", "", voutput)
 
     if verbose > 0:
         voutput += "<br>Current number of recIDs: %s<br>" % (col_size)
