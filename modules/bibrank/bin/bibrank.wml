@@ -333,7 +333,13 @@ def command_line():
         usage(1)
     if args:
         usage(1)
-    options = {"quick":"yes","cmd":"","flush":10000,"validset":"", "collection":[], "id":[], "check": "", "stat":"", "modified":"", "last_updated":"","run":"", "verbose":1}
+    options = {"quick":"no","cmd":"add","flush":100000,"validset":"", "collection":[], "id":[], "check": "", "stat":"", "modified":"", "last_updated":"last_updated","run":"", "verbose":1}
+
+    res = run_sql("SELECT name from rnkMETHOD")
+    options["run"] = []
+    for (name,) in res:
+        options["run"].append(name)
+
     sched_time = time.strftime(format_string)
     user = ""
     try:
@@ -366,6 +372,7 @@ def command_line():
                 options["cmd"] = "stat"
             elif opt[0] in [ "-i", "--id" ]:
                 options["id"] = options["id"] + split_ranges(opt[1])
+                options["last_updated"] = ""
             elif opt[0] in [ "-c", "--collection" ]:
                 options["collection"] = opt[1]
             elif opt[0] in [ "-R", "--rebalance"]: 
@@ -378,6 +385,7 @@ def command_line():
                     raise StandardError, "Memory usage should be higher than %d kB" % (base_process_size + 1000)
             elif opt[0] in [ "-m", "--modified" ]:
                 options["modified"] = get_date_range(opt[1]) #2002-10-27 13:57:26
+                options["last_updated"] = ""
             elif opt[0] in [ "-l", "--lastupdate" ]:
                 options["last_updated"] = "last_updated"
             elif opt[0] in [ "-s", "--sleeptime" ]:
@@ -390,17 +398,7 @@ def command_line():
     except StandardError, e:
         write_message(e, sys.stderr)
         sys.exit(1)
-  
-    if len(opts) == 0:
-        options["last_updated"] = "last_updated"
-        options["cmd"] = "add"
-        options["quick"] = "no"   
-        options["flush"]= 100000
-        res = run_sql("SELECT name from rnkMETHOD")
-        options["run"] = []
-        for (name,) in res:
-            options["run"].append(name)
-           
+             
     user = authenticate(user)
     if options["verbose"]>=9:
         write_message("Storing task options %s" % options)

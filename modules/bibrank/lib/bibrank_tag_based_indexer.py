@@ -93,15 +93,14 @@ def single_tag_rank(config):
         write_message("Loading knowledgebase file")
     kb_data = {}
     records = []
-
-    input = open(config.get("single_tag_rank", "kb_src"), 'r')
+    input = open(config.get(config.get("rank_method", "function"), "kb_src"), 'r')
     data = input.readlines()
         
     for line in data:
         if not line[0:1] == "#":
             kb_data[string.strip((string.split(string.strip(line),"---"))[0])] = (string.split(string.strip(line), "---"))[1]
-    tag = config.get("single_tag_rank","tag")
-    tags = split(config.get("single_tag_rank", "check_mandatory_tags"),",")
+    tag = config.get(config.get("rank_method", "function"),"tag")
+    tags = split(config.get(config.get("rank_method", "function"), "check_mandatory_tags"),",")
     if tags == ['']:
 	tags = ""
    

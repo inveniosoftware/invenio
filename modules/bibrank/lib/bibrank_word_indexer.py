@@ -1013,9 +1013,9 @@ def word_index(row, run):
         method_starting_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         write_message("Running rank method: %s" % getName(rank_method_code))
         try:
+            file = etcdir + "/bibrank/" + rank_method_code + ".cfg"
             if options["verbose"] >= 9:
                 write_message("Getting configuration from file: %s" % file)
-            file = etcdir + "/bibrank/" + rank_method_code + ".cfg"
             config = ConfigParser.ConfigParser()
             config.readfp(open(file))
         except StandardError, e:
