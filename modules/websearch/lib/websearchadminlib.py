@@ -680,7 +680,7 @@ def perform_addportalbox(colID, ln=cdslang, title='', body='', callback='yes', c
                               ln=ln,
                               confirm=1)
     
-    if title and body and confirm in [1, "1"]:
+    if body and confirm in [1, "1"]:
         res = add_pbx(title, body)
         if res:
             output += """<b><span class="info">Added the portalbox '%s'. To add the portalbox to the collection, go <a href="addexistingportalbox?colID=%s&amp;ln=%s&amp;pbxID=%s#5">here</a>.</span></b>""" % (title, colID, ln, res[0][0])
@@ -688,7 +688,7 @@ def perform_addportalbox(colID, ln=cdslang, title='', body='', callback='yes', c
             output += """<b><span class="info">Cannot add the portalbox '%s'.</span></b>
             """ % title
     elif confirm not in [-1, "-1"]:
-        output  += """<b><span class="info">All fields must be filled.</span></b>
+        output  += """<b><span class="info">Body field must be filled.</span></b>
         """
         
                 
@@ -938,7 +938,7 @@ def perform_modifyportalbox(colID, ln=cdslang, pbxID=-1, score='', position='', 
                                    ln=ln,
                                    confirm=4)
 
-        if pbxID > -1 and title and confirm in [4, "4"]:
+        if pbxID > -1 and confirm in [4, "4"]:
             pbxID = int(pbxID)
             res = modify_pbx(colID, pbxID, sel_ln, '', '', title, body)
             res2 = get_pbx()
