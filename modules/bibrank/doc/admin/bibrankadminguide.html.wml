@@ -1,0 +1,293 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="BibRank Admin Guide" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/bibrank/>Bibrank Admin</a>" \ 
+    navbar_name="admin" \
+    navbar_select="bibrank"
+
+<h3>Index</h3>
+<a href="#o">Overview</a></br>
+<a href="#c">Configuration Conventions</a></br>
+<a href="#bd">bibrank Daemon</a></br>
+<a href="#cli1">Command Line Interface</a></br>
+<a href="#ubd">Using bibrank</a></br>
+<a href="#bt">bibrankgkb Tool</a></br>
+<a href="#cli2">Command Line Interface</a></br>
+<a href="#ubt">Using bibrankgkb</a></br>
+<a href="#ainf">Additional Information</a></br>
+
+<a name="o"></a><h3>Overview</h3>
+<p>The BibRank module consist currently of two tools:
+</br></br>bibrank - Generates star categories for ranking searchresults based on methods like:
+<blockquote>
+<pre>
+Journal Impact Factor
+##Number of downloads
+##Author Impact
+##Citation Impact
+</blockquote>
+</pre>
+bibrankgkb - For generating knowledgebase files for use with bibrank
+</br></br>
+The bibrankgkb may not be necessary to use, it depends on which ranking methods you are planning
+to use, and what data you already got. This guide will take you through the necessary steps in detail in order to create different kinds of ranking methods for the search engine to use.
+
+<a name="c"></a><h3>Configuration Conventions</h3>
+<blockquote>
+<pre>
+- comment line starts with '#' sign in the first column
+- each section in a configuration file is declared inside '[' ']' signs 
+- values in knowledgebasefiles are separated by '---' 
+</blockquote>
+</pre>
+
+<a name="bd"></a><h2>bibrank Daemon</h2>
+The bibrank daemon read the necessary metadata from the cdsware database and combines the read metadata
+in different ways to output the records ranked into the number of categories (stars) given.
+<a name="cli1"></a><h3>Command Line Interface</h3>
+<blockquote>
+<pre>
+Usage: %s [options]
+     Examples:
+       %s --id=0-30000,30001-860000 --run=jif --verbose=9
+       %s --modified='2002-10-27 13:57:26' --run=jif
+       %s --rebalance --collection=Articles --run=jif
+
+ Ranking options:
+ -c, --collection=c1,c2    Collections to include in this rankmethod
+ -i, --id=idr1,idr2        Record ranges to include in this rankmethod
+ -m, --modified=[from]     Update records modified after date
+ -k, --check=value         Check if the rankmethod  needs rebalancing, (if the top
+                           star is higher than given percentage 0-1.0)
+ -S, --stat                Show statistics
+ -w, --run=rm1,rm2         Runs each rank method in the order given
+ -r, --rebalance           Rebalance, do full update
+
+ Scheduling options:
+ -u, --user=USER           user name to store task, password needed
+ -s, --sleeptime=SLEEP     time after which to repeat tasks (no)
+                            e.g.: 1s, 30m, 24h, 7d
+ -t, --time=TIME           moment for the task to be active (now)
+                            e.g.: +15s, 5m, 3h , 2002-10-27 13:57:26
+
+ General options:
+ -h, --help                print this help and exit
+ -V, --version             print version and exit
+ -v, --verbose=LEVEL       verbose level (from 0 to 9, default 1
+</pre>
+</blockquote>
+
+<a name="ubd"></a><h3>Using bibrank</h3>
+
+<h4>Step 1 - Adding the rank option to the search interface</h4>
+To be able to add the needed ranking data to the database, you first have to add the rankmethod to the database, and
+add the wished abbreviation you want to use together with it. The name of the configuration file in the next section, needs to
+have the same name as the abbreviation stored in the database.
+
+<h4>Step 2 - Get necessary external data (ex. jif values)</h4>
+Check out bibrankgkb documentation below.
+<h4>Step 3 - Create the configuration file</h4>
+The configuration files for the different rankmethods has different option, so verify that you are using the correct
+configuration file and rankmethod.
+
+Single_tag_rank_method:
+<protect>
+<pre>
+<blockquote>
+[rank_method]
+##The name of the method, can be anything, but should give an idea to what the rank method does
+name = Journal Impact Factor
+
+##The function which is responsible for doing the work, must be one of the listed ones above.
+function = single_tag_rank_method
+
+##How big the top star category should be of all available records. Remember that if a lot of records
+##have the same rank value, the size may go above this limit
+top_star_percentage = 0.10
+
+##The importance of this rank method if several methods are merged into one rankmethod.
+overall_importance = 1.0
+
+##This section must be available if the single_tag_rank_method is going to be used
+[single_tag_kb]
+
+##The tag which got the value to be searched for on the left side in the kb file (like the journal name)
+tag = 909C4p
+
+##The path to the kb file which got the content of the tag above on left side, and value on the left side
+kb_src = /log/cdsware-DEMODEV/etc/bibrank/jif.kb
+
+##Tags that must be included for a record to be added to a star category, to disable remove tags
+check_mandatory_tags = 909C4c,909C4v,909C4y
+
+##For single_tag_rank_method, this needs to be 'yes', depends on the rankmethod, what it needs of data
+enable_modified = yes
+
+</pre>
+</blockquote>
+</protect>
+For other functions than the single_tag_rank_method, you may need different configuration files, which will be added here when
+supported by CDSware.
+<h4>Step 4 - Full update, rebalancing</h4>
+For the first run of a new ranking method, a full update is needed (not default) to establish the ranges to be used for the categories.
+A full update/rebalance can be run by using the --rebalance/-r option. Sometimes you may want to run the program with the rebalance option,
+to balance the categories. To check if it is necessary, run the bibrank daemon using the --check/-k option together with the max size allowed for the top star , a message will then be given on screen if a rebalance is needed.
+<h4>Step 5 - Fast update of modified records</h4>
+If you just want to update the latest additions or modified records, you may want to do a faster update by running the daemon without the rebalance option.
+If you don't mention anything, the daemon will try to update the records modified after the last run. If you want to update records modified after a certain
+time, you can do this with the '--modified=date' option.
+<h4>Step 6 - Add the ranking method as a scheduled task</h4>
+When the configuration is okay, you can add the bibrank daemon to the task scheduler using the scheduling options. The daemon can then do a update of the rankmethod once each day or similar automatically.
+<a name="bt"></a><h2> bibrankgkb Tool</h2>
+Before the bibrank daemon can be used, a knowledgebase file (kb) with the needed data in the correct format
+needs to be created. This file can be created using the bibrankgkb tool which can read the data either from
+the cdsware database, from several webpages using regular expressions, or from another file. In case one source
+has another naming convention, bibrank can convert between them using a convert file.
+<a name="cli2"></a><h3>Command Line Interface</h3>
+
+<blockquote>
+<pre>
+Usage: bibrankgkb %s [options]
+     Examples:
+       bibrankgkb --input=bibrankgkb.cfg --output=test.kb
+       bibrankgkb -otest.cfg -v9
+       bibrankgkb 
+
+ Generate options:
+ -i,  --input=file          input file, default from /etc/bibrank/bibrankgkb.cfg
+ -o,  --output=file         output file, will be placed in current folder
+ General options:
+ -h,  --help                print this help and exit
+ -V,  --version             print version and exit
+ -v,  --verbose=LEVEL       verbose level (from 0 to 9, default 1)
+</blockquote>
+</pre>
+
+<a name="ubt"></a><h3>Using bibrankgkb</h3>
+
+<h4>Step 1 - Find sources</h4>
+Since some of the data used for ranking purposes is not freely available, it cannot be bundled with CDSware. To get hold of the necessary data,
+you may find it useful to ask your library if they have a copy of the data that can be used (like the Journal Impact Factors from the Science Citation Index), or use google to search the web for any public source.
+<h4>Step 2 - Create configuration file</h4>
+The default configuration file is shown below.
+<protect>
+<pre>
+<blockquote>
+
+##The main section
+[bibrankgkb]
+##The url to a webpage with the data to be read, does not need to have the same name as this one, but if there
+are several links, the url should end with _0-> 
+url_0 = http://www.taelinke.land.ru/impact_A.html
+url_1 = http://www.taelinke.land.ru/impact_B.html
+url_2 = http://www.taelinke.land.ru/impact_C.html
+url_3 = http://www.taelinke.land.ru/impact_DE.html
+url_4 = http://www.taelinke.land.ru/impact_FH.html
+url_5 = http://www.taelinke.land.ru/impact_I.html
+url_6 = http://www.taelinke.land.ru/impact_J.html
+url_7 = http://www.taelinke.land.ru/impact_KN.html
+url_8 = http://www.taelinke.land.ru/impact_QQ.html
+url_9 = http://www.taelinke.land.ru/impact_RZ.html
+##The regular expression for the url mentioned should be given here
+url_regexp = 
+
+##The various sources that can be read in, can either be a file, webpage or from the database
+kb_1 = /home/trondaks/w/cdsware/modules/bibrank/etc/cern_jif.kb
+kb_2 = /home/trondaks/w/cdsware/modules/bibrank/etc/cdsware_jif.kb
+kb_2_filter = /home/trondaks/w/cdsware/modules/bibrank/etc/convert.kb
+kb_3 = SELECT id_bibrec,value FROM bib93x,bibrec_bib93x WHERE tag='938__f' AND id_bibxxx=id
+kb_4 = SELECT id_bibrec,value FROM bib21x,bibrec_bib21x WHERE tag='210__a' AND id_bibxxx=id
+##This points to the url above (the common part of the url is 'url_' followed by a number
+kb_5 = url_%s
+
+##This is the part that will be read by the bibrankgkb tool to determine what to read.
+##The first two part (separated by ,,) gives where to look for the convertion file (which convert
+##the names between to formats), and the second part is the datasource. A convertion file is not
+##needed, as shown in create_0. If the source is from a file, url or the database, it must be
+##given with file,www or db. If several create lines exists, each will be read in turn, and added
+##to a common kb file.
+##So this means that:
+##create_0: Load from file in variable kb_1 without convertion
+##create_1: Load from file in variable kb_2 using convertion from file kb_2_filter
+##create_3: Load from www using url in variable kb_5 and regular expression in url_regexp
+##create_4: Load from database using sql statements in kb_4 and kb_5
+create_0 = ,, ,,file,,%(kb_1)s
+create_1 = file,,%(kb_2_filter)s,,file,,%(kb_2)s
+#create_2 = ,, ,,www,,%(kb_5)s,,%(url_regexp)s
+#create_3 = ,, ,,db,,%(kb_4)s,,%(kb_4)s
+</pre>
+</blockquote>
+</protect>
+When you have found a source for the data, created the configuration file, it may be necessary to
+create an convertion file, but this depends on the coversions used in the available data versus
+the convertion used in your cdsware installation.
+</br>
+The available data may look like this:
+<pre>
+<blockquote>
+COLLOID SURFACE A---1.98
+</pre>
+</blockquote>
+But in cdsware you are using:
+<pre>
+<blockquote>
+Colloids Surf., A---1.98
+</pre>
+</blockquote>
+By using a convertion file like:
+<pre>
+<blockquote>
+COLLOID SURFACE A---Colloids Surf., A
+</pre>
+</blockquote>
+You can convert the source to the correct naming convention.
+<pre>
+<blockquote>
+Colloids Surf., A---1.98
+</pre>
+</blockquote>
+<h4>Step 3 - Run tool</h4>
+When ready to run the tool, you may either use the default file (/etc/bibrank/bibrankgkb.cfg), or use another one by giving it using the input variable '--input'.
+If you want to test the configuration, you can use '--verbose=9' to output on screen, or if you want to save it to a file, use
+'--output=filename', but remember that the file will be saved in the programdirectory.
+The output may look like this:
+<pre>
+<blockquote>
+$ ./bibrankgkb -v9
+2004-03-11 17:30:17 --> Running: Generate Knowledgebase.
+2004-03-11 17:30:17 --> Reading data from file: /log/cdsware-DEMODEV/etc/bibrank/jif.kb
+2004-03-11 17:30:17 --> Reading data from file: /log/cdsware-DEMODEV/etc/bibrank/conv.kb
+2004-03-11 17:30:17 --> Using last resource for converting values.
+2004-03-11 17:30:17 --> Reading data from file: /log/cdsware-DEMODEV/etc/bibrank/jif2.kb
+2004-03-11 17:30:17 --> Converting between naming conventions given.
+2004-03-11 17:30:17 --> Colloids Surf., A---1.98
+2004-03-11 17:30:17 --> Phys. Rev. Lett.---6.462
+2004-03-11 17:30:17 --> J. High Energy Phys.---8.664
+2004-03-11 17:30:17 --> Nucl. Instrum. Methods Phys. Res., A---0.964
+2004-03-11 17:30:17 --> Phys. Lett., B---4.213
+2004-03-11 17:30:17 --> Phys. Rev., D---3.838
+2004-03-11 17:30:17 --> Total nr of lines: 6
+2004-03-11 17:30:17 --> Time used: 0 second(s).
+</blockquote>
+</pre>
+
+<a name="ainf"></a><h3>Additional Information</h3>
+<a href="http://cdsdev.cern.ch:8000/DEMODEV/hacking/bibrank/">BibRank Internals</a>

@@ -1,0 +1,141 @@
+## $Id$
+
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="BibRank Admin" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a>" \ 
+    navbar_name="admin" \
+    navbar_select="bibrank"
+
+<p>The BibRank daemon enables you to add various types of ranking based upon different
+ranking methods to the search engine. The ranking methods, after given the parameters necessary to find
+the metadata in the database, rank the documents into star categories and put them into the database.
+The search engine can then rank the documents it finds after receiving a query from the user,
+according to the choosen method(s), and show the result to the user, hopefully with more relevant
+documents first.</p>
+
+<h2>Configuring BibRank</h2>
+
+<p>The default configurations given, are based on how the Atlantis Demo site is configured.
+This means that the same configuration may not apply to a normal site since it may use different tags. As an example, the 'Journal Impact Factor' method
+will be used. This ranking method uses the journal a document has been published in, and
+rank the document based on the journal's impact factor which can be accessed from various
+sources.</p>
+
+<p>For a few of the rank methods, some external data which is not included with CDSware
+may be necessary to obtain. This data may for example be the 'Journal Impact Factors' from the 'Science Citation Index'.
+If you are using different naming convention between various sources, you can provide a convertion file so that the data can be converted to
+a common naming convention. For an example of a file with the necessary data for the journal impact factor method to work together with the demo installation, check out the example file 'jif.kb' below.
+To create the proper files from various sources, please check out the <a href="bibrankadminguide.html">BibRank Admin Guide</a> and the bibrankgkb tool.</p>
+
+To be able to run a rank method, you must first add the ranking option to the correct
+collections, so that it appears as an option for ranking results, and add the abbreviation for the ranking method to the database. In this case
+we will use the abbreviation 'jif'.
+After adding the rank method to the database, you need to create a configuration file as shown
+below. (Also available below as 'jif.cfg')</p>
+
+<protect>
+<blockquote>
+<pre>
+##First you have to add an [rank_method] category, which is mandatory for any configuration file used by bibrank
+[rank_method]
+
+##Then the name of the rank method must be mentioned, only used for giving feedback when the
+##program is run, it has nothing to do with the naming in the search_engine
+name = Journal Impact Factor
+
+##Then the name of the ranking function needs to be given, take a look at the Bibrank Admin Guide or
+##Hacking Area for ideas about the possibilities.
+function = single_tag_rank_method
+
+##The size of the top star, between 0.0-1.0, the rest of the stars will split even between the range of values left. 
+top_star_percentage = 0.10
+
+##In case several methods are merged into one, how important this is going to be compared to the others
+overall_importance = 1.0
+
+##Everything below depends of the function choosed above.
+
+##For the single_tag_rank_method and authorimpact method, this category is needed
+[single_tag_rank]
+
+##The name of the tag containing the needed metadata, in this case, the journal name
+tag = 909C4p
+
+##The file containing, in this case, the journal name and its jif value in the form: journalname---jifvalue
+kb_src = /log/cdsware-DEMODEV/etc/bibrank/jif.kb
+
+##If there is any tags that must exist for the document to be accepted by the rank method, add them here
+check_mandatory_tags = 909C4c,909C4v,909C4y
+
+##If it is possible to read only modified records for the rank method. It is possible for the jif method, so yes
+enable_modified = yes
+</pre>
+</blockquote>
+</protect>
+
+<p>When the configuration file is ready and placed in the correct folder (usually etc/bibrank/), the BibRank daemon can be
+added to the task scheduler, or ran manually.</p>
+
+<h2>Running BibRank</h2>
+
+<p>For the demosite, consider the following sample input data:</p>
+
+<blockquote>
+<a href="jif.kb">jif.kb</a> -- sample data with the name of the journals and jif values.
+<br><a href="jif.cfg">jif.cfg</a> -- sample configuration file, for creating the ranking stars based on journal impact factor
+</blockquote>
+
+<p>To create the ranking stars based on the Journal Impact Factor and add them to the database, run:
+
+<blockquote>
+<pre>
+$ bibrank -wjif -r
+Task #53 was successfully scheduled for execution.
+</pre>
+</blockquote>
+
+And you will be given a task number which can be used to run the method ($ bibrank 53), or you can use the various scheduling options to run it
+automatically. If the above configuration was used on the demosite,
+the statistic (if asked for in the input with -S) will look something like:
+
+<blockquote>
+<pre>
+$ bibrank 53      
+2004-03-09 14:28:47 --> Task #53 started.
+2004-03-09 14:28:47 --> Running: Journal Impact Factor.
+2004-03-09 14:28:47 --> Statistics: Journal Impact Factor , Top Star size: 10.0% , Overall Importance: 100.0%,
+2004-03-09 14:28:47 --> 0 star(s): Range>=      -9.9    7990
+2004-03-09 14:28:47 --> 1 star(s): Range>=      -1.0    1
+2004-03-09 14:28:47 --> 2 star(s): Range>=      0.964   2
+2004-03-09 14:28:47 --> 3 star(s): Range>=      2.047   0
+2004-03-09 14:28:47 --> 4 star(s): Range>=      3.13    2
+2004-03-09 14:28:47 --> 5 star(s): Range>=      4.213   6
+2004-03-09 14:28:47 --> Total: 8001
+</pre>
+</blockquote>
+
+Since this was the first run, the -r option was used, at later times, this can be avoided to speed up the execution time needed. For
+the creation of an up to date rankmethod without doing a full update,  use '-m date', or no parameter to update records modified since last run.
+
+<p>It should now be possible to rank the results after a search based on the journal impact factor.</p>
+
+<h3>Additional Information</h3>
+<a href="bibrankadminguide.html">BibRank Admin Guide</a></br>
+<a href="http://cdsdev.cern.ch:8000/DEMODEV/hacking/bibrank/">BibRank Internals</a>
