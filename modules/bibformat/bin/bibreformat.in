@@ -64,12 +64,11 @@ sql_queries   = []
 mysql_queries = []
 process_hb    = 0
 process       = 1
-fmt           = "hb"  # default processing format
- 
+fmt           = "hb"
 
 def bibreformat_task(sql_queries, mysql_queries, process_hb):
     
-    global process
+    global process, fmt
 
     t1 = os.times()[4]
 
@@ -102,7 +101,7 @@ def bibreformat_task(sql_queries, mysql_queries, process_hb):
     
     if process_hb:
         print "Records to be processed: %d" % (len(recIDs)+len(without_hb))
-        print "Out of it records without HB format: %d" % len(without_hb)
+        print "Out of it records without created format: %d" % len(without_hb)
     else:
         print "Records to be processed: %d" % (len(recIDs))
 
@@ -112,15 +111,15 @@ def bibreformat_task(sql_queries, mysql_queries, process_hb):
     xml_content = ''		# hold the contents
     tbibformat  = 0		# time taken up by external call
     tbibupload  = 0		# time taken up by external call
-    weburl      = "<WEBURL>"
+#    weburl      = "<WEBURL>"
 
 ### Iterate over all records prepared in lists I (option)
     if process:
-        iterate_over(recIDs, weburl)
+        iterate_over(recIDs, weburl, fmt)
 
 ### Iterate over all records prepared in list II (no_hb)
     if process_hb and process:
-        iterate_over(without_hb, weburl)
+        iterate_over(without_hb, weburl, fmt)
 
 ### Final statistics
 
@@ -183,10 +182,12 @@ def ldiff(l1, l2):
 def withouthb():
     "List of record IDs to be reformated, not having the hb format yet"
 
+    global fmt
+
     xm1, xm2, hb1, hb2 = [],[],[],[]
     
     q1 = "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='xm'"
-    q2 = "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='hb'"
+    q2 = "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt
 
     ## get complete recID list of xm formatted records
     xm1 = run_sql(q1)
@@ -205,7 +206,7 @@ def withouthb():
 ### Bibreformat all selected records
 ###
 
-def iterate_over(list, weburl):
+def iterate_over(list, weburl, fmt):
     "Iterate odver list of IDs"
 
     n_rec       = 0
@@ -214,8 +215,8 @@ def iterate_over(list, weburl):
     xml_content = ''		# hold the contents
     tbibformat  = 0		# time taken up by external call
     tbibupload  = 0		# time taken up by external call
-    tmpdir      = "<TMPDIR>"
-    bindir      = "<BINDIR>"
+#    tmpdir      = "<TMPDIR>"
+#    bindir      = "<BINDIR>"
 
     for record in list:
 
@@ -292,7 +293,7 @@ def iterate_over(list, weburl):
         message = "START bibformat external call"
         print message
 
-        command = "%s/bibformat otype='HB' < %s/bibreformat.xml > %s/rec_fmt.xml 2> %s/bibreformat.err" % (bindir,tmpdir,tmpdir,tmpdir)
+        command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s/rec_fmt.xml 2> %s/bibreformat.err" % (bindir,string.upper(fmt),tmpdir,tmpdir,tmpdir)
         os.system(command)
 
         t22 = os.times()[4]
@@ -461,7 +462,7 @@ def task_get_options(id):
 def task_run(process_hb):
     """Runs the task by fetching arguments from the BibSched task queue.  This is what BibSched will be invoking via daemon call."""
 
-    global task_id, process
+    global task_id, process, fmt
     options = task_get_options(task_id) # get options from BibSched task table
     ## check task id:
     if not options.has_key("task"):
@@ -471,7 +472,7 @@ def task_run(process_hb):
     ## initialize parameters
 
     if options.has_key("all"):
-        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='hb'")
+        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt)
 
     if options.has_key("new"):
         process_hb = 1
@@ -480,7 +481,7 @@ def task_run(process_hb):
         process = 0
 
     if options.has_key("last"):
-        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='hb' and bf.last_updated < br.modification_date")
+        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='%s' and bf.last_updated < br.modification_date" % fmt)
 
     if options.has_key("collection"):
         mysql_queries.append(options["collection"])
