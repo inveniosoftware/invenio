@@ -96,7 +96,7 @@
   <en>Help Central</en>
   <fr>Centre d&rsquo;Aide</fr>
   <de>Hilfezentrale</de>
-  <es>Ayuda General</es>
+  <es>Ayuda</es>
   <pt>Central de Ajuda</pt>
   <it>Aiuto</it>
   <ru>Централа Помощи</ru>
@@ -109,7 +109,7 @@
   <en>Search Help</en>
   <fr>Aide de Recherche</fr>
   <de>Suchhilfe</de>
-  <es>Ayuda de Búsqueda</es>
+  <es>Ayuda a la Búsqueda</es>
   <pt>Ajuda de Busca</pt>
   <it>Aiuto alla Ricerca</it>
   <ru>Помощь для поиска</ru>
@@ -122,7 +122,7 @@
   <en>Search Tips</en>
   <fr>Conseils de Recherche</fr>
   <de>Suchtipps</de>
-  <es>Sugerencias de búsqueda</es>
+  <es>Consejos para la Búsqueda</es>
   <pt>Sugestões de busca</pt>
   <it>Consigli per la Ricerca</it>
   <ru>Указания дла поиска</ru>
@@ -148,7 +148,7 @@
   <en>ENGLISH TRANSLATION UNDER WAY</en>
   <fr>TRADUCTION FRANÇAISE EN COURS</fr>
   <de>ÜBERSETZUNG AUF DEUTSCH WIRD GERADE VORBEREITET</de>
-  <es>VERSIÓN EN ESPAÑOL DISPONIBLE PRÓXIMAMENTE</es>
+  <es>VERSIÓN EN ESPAÑOL ESTARÁ DISPONIBLE PRÓXIMAMENTE</es>
   <pt>VERSÃO EM PORTUGUÊS ESTARÁ DISPONÍVEL EM BREVE</pt>
   <it>TRADUZIONE ITALIANA DISPONIBILE PROSSIMAMENTE</it>
   <ru>ПЕРЕВОД НА РУССКИЙ ЯЗЫК НЕ ГОТОВ</ru>
@@ -173,9 +173,9 @@
      Wir danken Ihnen für Ihr Verständnis.   
   </de>
   <es>
-     De momento la versión en español de esta página no está
-     disponible. Le rogamos utilice la versión en inglés mostrada a
-     continuación. Gracias por su consideración.
+     Por el momento, la versión en español de esta página no está
+     disponible. Le rogamos consultar la versión en inglés mostrada a
+     continuación. Gracias por su compresión.
   </es>
   <pt>
      No momento a versão em português desta página não encontra-se
@@ -236,7 +236,7 @@
   <en>Last updated</en>
   <fr>Dernière mise à jour</fr>
   <de>Letzte Aktualisierung</de>
-  <es>Última modificación</es>
+  <es>Última actualización</es>
   <pt>Última atualização</pt>
   <it>Ultimo aggiornamento</it>
   <ru>Последнее изменение</ru>
@@ -244,12 +244,12 @@
   <cz>Poslední aktualizace</cz>
   <no>Sist oppdatert</no>
 </define-tag>
-
-<define-tag MSG_NARROW_SEARCH whitespace=delete>
+# FIXME
+<define-tag MSG_NARROW_SEARCH whitespace=delete> 
   <en>Narrow by collection:</en>
   <fr>Limiter par collection:</fr>
   <de>Einschränken nach Sammlungen:</de>
-  <es>Búsqueda limitada:</es>
+  <es>Búsqueda por colección:</es>
   <pt>Busca limitada:</pt>
   <it>Ricerca ristretta:</it>
   <ru>Сузить по коллекции:</ru>
@@ -275,7 +275,7 @@
   <en>Simple Search</en>
   <fr>Recherche Simple</fr>
   <de>Einfache Suche</de>
-  <es>Búsqueda Básica</es>
+  <es>Búsqueda Simple</es>
   <pt>Busca Básica</pt>
   <it>Ricerca Semplice</it>
   <ru>Простой Поиск</ru>
@@ -301,7 +301,7 @@
   <en>Collection %s Not Found</en>
   <fr>Collection %s Introuvable</fr>
   <de>Sammlung %s nicht gefunden</de>
-  <es>No se ha encontrado la colección %s</es>
+  <es>Colección %s no encontrada</es>
   <pt>A coleção %s não foi encontrada</pt>
   <it>Collezione %s Non Trovata</it>
   <ru>Коллекция %s не существует</ru>
@@ -324,7 +324,7 @@
     <p>Sie können erneut beginnen von <a href="%s">%s</a>.
   </de>
   <es>
-    <p>Lo sentimos, la colección <strong>%s</strong> no parece existir.
+    <p>Lo sentimos, la colección <strong>%s</strong> no existe.
     <p>Inténtelo empezando desde <a href="%s">%s</a>.
   </es>
   <pt>
@@ -391,7 +391,7 @@
   <cz>košíky</cz>
   <no>kurver</no>
 </define-tag>
-
+ # FIXME
 <define-tag MSG_SUBMISSIONS whitespace=delete>
   <en>submissions</en>
   <fr>soumissions</fr>
@@ -404,8 +404,8 @@
   <cz>přidání</cz>
   <no>innsendte</no>
 </define-tag>
-
-<define-tag MSG_APPROVALS whitespace=delete>
+# FIXME
+<define-tag MSG_APPROVALS whitespace=delete> 
   <en>approvals</en>
   <fr>approbations</fr>
   <de>Bestätigungen</de>
@@ -487,7 +487,7 @@
   <en>Search %s records for:</en>
   <fr>Chercher dans %s notices:</fr>
   <de>Suchen durch %s Datensätze nach:</de>
-  <es>Buscar %s registros por:</es>
+  <es>Buscar en %s registros por:</es>
   <pt>Buscar %s registros por:</pt>
   <it>Ricerca in %s registrazioni:</it>
   <ru>Искать %s запусков для:</ru>
@@ -539,7 +539,7 @@
   <en>report number</en>
   <fr>numéro de rapport</fr>
   <de>Reportnummer</de>
-  <es>número de registro</es>
+  <es>número de reporte</es>
   <pt>número de registro</pt>
   <it>numero del rapporto</it>
   <ru>номер рапорта</ru>
@@ -565,7 +565,7 @@
   <en>abstract</en>
   <fr>abstract</fr>
   <de>Abstrakt</de>
-  <es>sumario</es>
+  <es>resumen</es>
   <pt>resumo</pt>
   <it>riassunto</it>
   <ru>абстракт</ru>
@@ -630,7 +630,7 @@
   <en>Any of the words:</en>
   <fr>Au moins un des mots:</fr>
   <de>Mindestens die Worte:</de>
-  <es>Alguna palabra:</es>
+  <es>Al menos una de las palabras:</es>
   <pt>Qualquer das palavras:</pt>
   <it>Almeno una parola:</it>
   <ru>Любое из слов:</ru>
@@ -643,7 +643,7 @@
   <en>Exact phrase:</en>
   <fr>Phrase exacte:</fr>
   <de>Genaue Phrase:</de>
-  <es>Expresión exacta:</es>
+  <es>Frase exacta:</es>
   <pt>Expressão exata:</pt>
   <it>Frase esatta:</it>
   <ru>Тоцная фраза:</ru>
@@ -656,7 +656,7 @@
   <en>Partial phrase:</en>
   <fr>Phrase partielle:</fr>
   <de>Partielle Phrase:</de>
-  <es>Expresión aproximada:</es>
+  <es>Parte de la frase:</es>
   <pt>Expressão aproximada:</pt>
   <it>Parte di frase:</it>
   <ru>Парциальная фраза:</ru>
@@ -721,7 +721,7 @@
   <en>Search Results</en>
   <fr>Résultats de recherche</fr>
   <de>Suchergebnisse</de>
-  <es>Resultados de búsqueda</es>
+  <es>Resultados de la búsqueda</es>
   <pt>Resultados da busca</pt>
   <it>Risultato della ricerca</it>
   <ru>Результаты Поиска</ru>
@@ -734,7 +734,7 @@
   <en>Try your search on:</en>
   <fr>Essayer votre requête sur:</fr>
   <de>Versuchen Sie Ihre Suche mit:</de>
-  <es>Intentar su búsqueda en:</es>
+  <es>Intentar la búsqueda en:</es>
   <pt>Tentar sua busca em:</pt>
   <it>Provate la ricerca su:</it>
   <ru>Испробуйте искать на:</ru>
@@ -794,7 +794,7 @@
   <cz>sest.</cz>
   <no>synkende</no>
 </define-tag>
-
+# FIXME
 <define-tag MSG_RANK_BY whitespace=delete>
   <en>Rank by:</en>
   <fr>Ranger par:</fr>
@@ -851,7 +851,7 @@
   <en>split by collection</en>
   <fr>regroupés par collection</fr>
   <de>verteilen in Sammlungen</de>
-  <es>agrupar por colección</es>
+  <es>reagrupar por colección</es>
   <pt>agrupar por coleção</pt>
   <it>raggruppati per collezione</it>
   <ru>поделить по коллекциям</ru>
@@ -864,7 +864,7 @@
   <en>Output format:</en>
   <fr>Format de sortie:</fr>
   <de>Darstellungsformat:</de>
-  <es>Formato de salida:</es>
+  <es>Formato de visualización:</es>
   <pt>Formato de saída:</pt>
   <it>Formato di visualizzazione:</it>
   <ru>Выходный формат:</ru>
@@ -903,7 +903,7 @@
   <en>Detailed record</en>
   <fr>Notice détaillée</fr>
   <de>Details vom Eintrag</de>
-  <es>Registro detallado</es>
+  <es>Registro completo</es>
   <pt>Registro detalhado</pt>
   <it>Registrazione dettagliata</it>
   <ru>Подробный запуск</ru>
@@ -923,7 +923,7 @@
     <strong>Übersicht von Ergebnissen:</strong> <strong>%s</strong> Datensätze wurden in %.2f Sekunden gefunden.
   </de>
   <es>
-    <strong>Resultados globales:</strong> Encontrados <strong>%s</strong> registros en %.2f segundos.
+    <strong>Todos los resultados:</strong> Encontrados <strong>%s</strong> registros en %.2f segundos.
   </es>
   <pt>
     <strong>Resultados globais:</strong> Encontrados <strong>%s</strong> registros em %.2f segundos.
@@ -1014,7 +1014,7 @@
   <en>any collection</en>
   <fr>toutes les collections</fr>
   <de>alle Sammlungen</de>
-  <es>alguna colección</es>
+  <es>todas las colecciones</es>
   <pt>qualquer coleção</pt>
   <it>tutte le collezioni</it>
   <ru>любая коллекция</ru>
@@ -1053,7 +1053,7 @@
   <en>Submit Help</en>
   <fr>Aide de Soumission</fr>
   <de>Eintragehilfe</de> 
-  <es>Enviar Ayuda</es> 
+  <es>Ayuda para el Envio</es> 
   <pt>Ajuda sobre Envio</pt>
   <it>Aiuto per la Sottomissione</it> 
   <ru>Помощь для приданья</ru>
@@ -1066,7 +1066,7 @@
   <en>Administrator&quot;s Area</en>
   <fr>Coin d&quot;Administrateur</fr>
   <de>Verwaltungsraum</de> 
-  <es>Área de Administración</es> 
+  <es>Área del Administrador</es> 
   <pt>Área do Administrador</pt>
   <it>Area dell&quot;Amministratore</it> 
   <ru>Ареал Администратора</ru>
@@ -1326,7 +1326,7 @@
   <en>Search term <em>%s</em></en>
   <fr>Le terme de recherche <em>%s</em></fr>
   <de>Suchbegriff <em>%s</em></de>
-  <es>La expresión de búsqueda <em>%s</em></es>
+  <es>Término de búsqueda <em>%s</em></es>
   <pt>Termo de busca <em>%s</em></pt>
   <it>Termine di ricerca <em>%s</em></it>
   <ru>Искомое выражение <em>%s</em></ru>
@@ -1339,7 +1339,7 @@
   <en>inside <em>%s</em> index</en>
   <fr>dans l'index <em>%s</em></fr>
   <de>im Index von <em>%s</em></de>
-  <es>dentro del índice <em>%s</em></es>
+  <es>en el índice <em>%s</em></es>
   <pt>no <em>%s</em> índice</pt>
   <it>nell'indice <em>%s</em></it>
   <ru>в индексе <em>%s</em></ru>
@@ -1352,7 +1352,7 @@
   <en>did not match any record.  Nearest terms in any collection are:</en>
   <fr>ne se trouve dans aucune notice.  Les termes les plus proches de toutes les collections sont:</fr>
   <de>hat keine Datensätze gefunden.  Die nächsten Begriffe in allen Sammlungen sind:</de>
-  <es>no se han encontrado ningún registro.  Los períodos mas aproximados en cualquier colección son:</es>
+  <es>no se han encontrado ningún registro.  Los términos aproximados en todas las colección son:</es>
   <pt>não está presente em nenhum registro.  Os termos mais similares em todas as coleções são:</pt>
   <it>non ha dato risultati. I termini piu` prossimi in tutte le collezioni sono:</it>
   <ru>не найденo. Ближайшие термины:</ru>
@@ -1365,7 +1365,7 @@
   <en>No words index available for</en>
   <fr>Aucun index des mots n'est disponible pour</fr>
   <de>Kein Wortindex steht zur Verfügung für</de>
-  <es>No hay índices disponibles para la palabra</es>
+  <es>No hay ningún índice de palabras disponible</es>
   <pt>Nenhum índice de palavras está disponível para</pt>
   <it>Nessun indice per parola è disponibile per</it>
   <ru>Лексическый индекс не найден для</ru>
@@ -1378,7 +1378,7 @@
   <en>No phrase index available for</en>
   <fr>Aucun index des phrases n'est disponible pour</fr>
   <de>Kein Begriffindex steht zur Verfügung für</de>
-  <es>No hay índice disponible para la expresión</es>
+  <es>No hay ningún índice de frases disponible</es>
   <pt>Nenhum índice de frases está disponível para</pt>
   <it>Nessun indice per frase è disponibile per</it>
   <ru>Фразный индех не найден для</ru>
@@ -1401,7 +1401,7 @@
     Resultate aus der ganzen öffentlichen Datenbank folgen:
   </de>
   <es>
-    No se han encontrado coincidencias exactas con la(s) coleción(es)
+    No hay documentos que respondan a la búsqueda en la(s) coleción(es)
     seleccionadas.  A continuación se muestran los resultados de toda
     la base de datos pública.
   </es>
@@ -1448,9 +1448,9 @@
     wählen Sie bitte zuerst eine private Sammlung aus.
   </de>
   <es>  
-    No se ha encontrado ninguna colección pública que coincida con su
-    solicitud. Si estaba buscando documentos no públicos, por favor
-    escoga la opción collección restringida primero.
+    Ninguna colección pública coincide con su búsqueda.
+    Si estaba buscando documentos no públicos, por favor
+    escoga primero la opción collección restringida.
   </es>
   <pt>  
     Nenhuma coleção pública corresponde à sua busca. Se você está 
@@ -1495,8 +1495,8 @@
     Bedingung wird ignoriert...
   </de>
   <es>
-    No se han encontrado coincidencias dentro de los límites de
-    tiempo, descartando esta condición...
+    No se han encontrado resultados dentro de los límites de
+    tiempo especificados, descartando esta condición...
   </es>
   <pt>
     Nenhum resultado dentro do período de tempo especificado,
@@ -1534,7 +1534,7 @@
     Bedingung wird ignoriert...
   </de>
   <es>
-    No se han encontrado coincidencias dentro de los límites,
+    No se han encontrado resultados dentro de los límites especificados,
     descartando esta condición...    
   </es>
   <pt>
@@ -1575,9 +1575,9 @@
     Bitte kombinieren Sie Ihre Suchfrage anders.
   </de>
   <es>
-    Se han encontrado coincidencias para todos los términos pero la
-    expresión booleana no ha devuelto resultados.  Por favor combien
-    sus términos de búsqueda de otra manera.
+    Todos los términos de la búsqueda han sido encontrados pero la combinación
+    booleana no ha dado resultados.  Por favor combien
+    los términos de búsqueda de otra manera.
   </es>
   <pt>
     Foram encontrados resultados para todos os termos de busca 
@@ -1738,7 +1738,7 @@
   <en>This collection does not contain any document yet.</en>
   <fr>Cette collection ne contient pas encore de document.</fr>
   <de>Diese Sammlung enthält zur Zeit keine Dokumente.</de>
-  <es>Esta colección aún no contiene ningún documento.</es>
+  <es>Esta colección no contiene aún ningún documento.</es>
   <pt>Esta coleção ainda não contém nenhum documento.</pt>
   <it>Questa collezione non contiene ancora alcun documento.</it>
   <ru>Ета коллекция не содержит еще запусков.</ru>
@@ -1751,7 +1751,7 @@
   <en>The contents of this collection is restricted.</en>
   <fr>Le contenu de cette collection est restreint.</fr>
   <de>Der Inhalt von dieser Sammlung ist privat.</de>
-  <es>Los contenidos de esta colección están restringidos.</es>
+  <es>El contenido de esta colección es reservado.</es>
   <pt>O conteúdo desta coleção é restrito.</pt>
   <it>Il contenuto di questa collezione è riservato.</it>
   <ru>Содержание етой коллекции приватно.</ru>
