@@ -42,24 +42,6 @@
    </tbody>
    </table>
 </es>
-<it>
-   <p><table class="errorbox">
-   <thead>
-   <tr>
-   <th class="errorboxheader">
-     <MSG_PAGE_BEING_TRANSLATED_HEAD>
-   </th>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-     <MSG_PAGE_BEING_TRANSLATED_BODY>
-   </td>
-   </tr>
-   </tbody>
-   </table>
-</it>
 <pt>
    <p><table class="errorbox">
    <thead>
@@ -103,7 +85,7 @@
 <de>Willkommen Sie bei der <MSG_HELP_CENTRAL> vom <CDSNAMEINTL>.</de>
 <es>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</es>
 <pt>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</pt>
-<it>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</it>
+<it>Benvenuti nell'<MSG_HELP_CENTRAL> di <CDSNAMEINTL>.</it>
 <ru>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</ru>
 <sk>Víta Vás <MSG_HELP_CENTRAL> <CDSNAMEINTL>.</sk>
 <cz>Vítá Vás <MSG_HELP_CENTRAL> <CDSNAMEINTL>.</cz>
@@ -118,7 +100,7 @@
     <de>Hier können Sie die Suchhilfe für den <CDSNAMEINTL> konsultieren.</de>
     <es>Get help with searching <CDSNAMEINTL>.</es>
     <pt>Get help with searching <CDSNAMEINTL>.</pt>
-    <it>Get help with searching <CDSNAMEINTL>.</it>
+    <it>Aiuto alla ricerca in <CDSNAMEINTL>.</it>
     <ru>Get help with searching <CDSNAMEINTL>.</ru>
     <sk>Pomoc pre hľadanie <CDSNAMEINTL>.</sk>
     <cz>Nápověda pro hledání <CDSNAMEINTL>.</cz>
@@ -129,7 +111,7 @@
     <de>Hier können Sie die Eintragehilfe für den <CDSNAMEINTL> konsultieren.</de>
     <es>Get help with submitting to <CDSNAMEINTL>.</es>
     <pt>Get help with submitting to <CDSNAMEINTL>.</pt>
-    <it>Get help with submitting to <CDSNAMEINTL>.</it>
+    <it>Aiuto per la sottomissione di documenti ad <CDSNAMEINTL>.</it>
     <ru>Get help with submitting to <CDSNAMEINTL>.</ru>
     <sk>Pomoc pre pridávanie do <CDSNAMEINTL>.</sk>
     <cz>Nápověda pro přidávaní do <CDSNAMEINTL>.</cz>

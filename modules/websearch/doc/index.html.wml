@@ -42,24 +42,6 @@
    </tbody>
    </table>
 </es>
-<it>
-   <p><table class="errorbox">
-   <thead>
-   <tr>
-   <th class="errorboxheader">
-     <MSG_PAGE_BEING_TRANSLATED_HEAD>
-   </th>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-     <MSG_PAGE_BEING_TRANSLATED_BODY>
-   </td>
-   </tr>
-   </tbody>
-   </table>
-</it>
 <pt>
    <p><table class="errorbox">
    <thead>
@@ -102,7 +84,7 @@
    <de>Lernen Sie alles über den Suchemöglichkeiten beim</de>
    <es>Find out all about searching</es>
    <pt>Find out all about searching</pt>
-   <it>Find out all about searching</it>
+   <it>Tutto quanto vi serve per poter ricercare in</it>
    <ru>Find out all about searching</ru>
    <sk>Tu nájdete všetko čo sa týka hľadania na serveri</sk>
    <cz>Zde naleznete vše co se týče vyhledávání na serveru</cz>
@@ -136,8 +118,8 @@
       help you use the <CDSNAMEINTL> site to the full.
     </pt>  
     <it>
-      This page presents you with useful tips and techniques in order to
-      help you use the <CDSNAMEINTL> site to the full.
+      Questa pagina vi fornisce utili consigli per servirvi al meglio 
+      <CDSNAMEINTL>.
     </it>  
     <ru>
       This page presents you with useful tips and techniques in order to
