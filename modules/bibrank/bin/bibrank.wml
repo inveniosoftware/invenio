@@ -401,7 +401,7 @@ def command_line():
         for (name,) in res:
             options["run"].append(name)
            
-    #user = authenticate(user)
+    user = authenticate(user)
     if options["verbose"]>=9:
         write_message("Storing task options %s" % options)
     query = """INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status) VALUES ('runbibrank','%s',CAST('%s' AS DATE),'%s','%s','WAITING')""" % (MySQLdb.escape_string(user),MySQLdb.escape_string(sched_time), sleeptime, MySQLdb.escape_string(dumps(options)))
