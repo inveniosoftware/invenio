@@ -40,7 +40,7 @@ from dbquery import run_sql
 from bibindex_engine_stemmer import stem
 from bibindex_engine_stopwords import is_stopword
 from search_engine_config import cfg_max_recID
-
+from bibrank_citation_searcher import get_cited_by_list, get_citing_recidrelevance
 class HitSet:
     """Class describing set of records, implemented as bit vectors of recIDs.
     Using Numeric arrays for speed (1 value = 8 bits), can use later "real"
@@ -293,6 +293,9 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
         func_object = globals().get(function)
         if func_object and pattern and pattern[0][0:6] == "recid:" and function == "word_similarity":
             result = find_similar(rank_method_code, pattern[0][6:], hitset, rank_limit_relevance, verbose)
+        elif rank_method_code == "cit" and pattern and pattern[0][0:6] == "recid:":
+            # FIXME: func_object and pattern and pattern[0][0:6] == "recid:" and function == "citation":
+            result = find_citations(rank_method_code, pattern[0][6:], hitset, verbose)
         elif func_object:
             result = func_object(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
         else:
@@ -410,6 +413,20 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
 
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
     return (reclist_addend + reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
+    
+def find_citations(rank_method_code, recID, hitset, verbose):
+    reclist = []
+    citing_list = get_cited_by_list(int(recID))
+    if citing_list:
+        reclist = get_citing_recidrelevance(rank_method_code, citing_list)
+        reclist.sort(lambda x, y: cmp(x[1], y[1]))
+
+        return (reclist,"(", ")", "Warning: citation search functionality is experimental!")
+    else:
+        return (reclist,"", "", "Warning: citation search functionality is experimental!")
+ 
+
+    #return ([[733229,2], [733209,22], [733208,2131]], "(", ")", "Warning: citation search functionality is experimental!")
 
 def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     """Finding terms to use for calculating similarity. Terms are taken from the recid given, returns a list of recids's and relevance,
