@@ -204,37 +204,27 @@ def localtime_to_UTC(date):
 
 def get_creation_date(sysno):
     "Returns the creation date of the record 'sysno'."
-
     out   = ""
-
-    query = "SELECT DATE_FORMAT(creation_date,'%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id='%s'" % (sysno)
-
-    res = run_sql(query)
-    for row in res:
-        out = row[0]
-    return localtime_to_UTC(out)
+    res = run_sql("SELECT DATE_FORMAT(creation_date,'%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id=%s", (sysno,), 1)
+    if res[0][0]:
+        out = localtime_to_UTC(res[0][0])
+    return out
 
 def get_modification_date(sysno):
     "Returns the date of last modification for the record 'sysno'."
-
     out = ""
-
-    query = "SELECT DATE_FORMAT(modification_date,'%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id='%s'" % (sysno)
-
-    res = run_sql(query)
-    for row in res:
-        out = row[0]
-    return localtime_to_UTC(out)
+    res = run_sql("SELECT DATE_FORMAT(modification_date,'%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id=%s",  (sysno,), 1)
+    if res[0][0]:
+        out = localtime_to_UTC(res[0][0])
+    return out
 
 def get_earliest_datestamp():
     "Get earliest datestamp in the database"
-
     out = ""
-
-    query = "SELECT MIN(DATE_FORMAT(creation_date,'%Y-%m-%d %H:%i:%s')) FROM bibrec"
-
-    res = run_sql(query)
-    return localtime_to_UTC(res[0][0])
+    res = run_sql("SELECT MIN(DATE_FORMAT(creation_date,'%%Y-%%m-%%d %%H:%%i:%%s')) FROM bibrec", (), 1)
+    if res[0][0]:
+        out = localtime_to_UTC(res[0][0])
+    return out
 
 def check_date(date, time="T00:00:00Z"):
     "Check if the date has a correct format"
