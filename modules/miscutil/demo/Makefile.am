@@ -19,6 +19,9 @@
 
 noinst_DATA=democfgdata.sql
 
+tmpdir = $(prefix)/var/tmp
+tmp_DATA = demobibdata.xml
+
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) demobibdata.xml
 
