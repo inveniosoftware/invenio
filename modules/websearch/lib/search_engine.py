@@ -190,11 +190,14 @@ def create_basic_search_units(req, p, f, m=None):
     else:        
         ## B - matching type is not known: let us try to determine it by some heuristics
         if f and p[0]=='"' and p[-1]=='"':
-            ## B0 - does 'p' start and end by double quote, and is 'f' defined? => doing ACC search            
+            ## B0 - does 'p' start and end by double quote, and is 'f' defined? => doing ACC search     
             opfts.append(['|',p[1:-1],f,'a'])
         elif f and p[0]=="'" and p[-1]=="'":
-            ## B0bis - does 'p' start and end by single quote, and is 'f' defined? => doing ACC search            
+            ## B0bis - does 'p' start and end by single quote, and is 'f' defined? => doing ACC search 
             opfts.append(['|','%'+p[1:-1]+'%',f,'a'])
+        elif f and p[0]=="/" and p[-1]=="/":
+            ## B0ter - does 'p' start and end by a slash, and is 'f' defined? => doing regexp search 
+            opfts.append(['|',p[1:-1],f,'r'])
         elif f and string.find(p, ',') >= 0:
             ## B1 - does 'p' contain comma, and is 'f' defined? => doing ACC search
             opfts.append(['|',p,f,'a'])
@@ -206,7 +209,7 @@ def create_basic_search_units(req, p, f, m=None):
             # search units are separated by spaces unless the space is within single or double quotes
             # so, let us replace temporarily any space within quotes by '__SPACE__'
             p = sre.sub("'(.*?)'", lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p) 
-            p = sre.sub("\"(.*?)\"", lambda x: "\""+string.replace(x.group(1), ' ', '__SPACEBIS__')+"\"", p) 
+            p = sre.sub("\"(.*?)\"", lambda x: "\""+string.replace(x.group(1), ' ', '__SPACEBIS__')+"\"", p)
             # wash argument:
             p = re_equal.sub(":", p)
             p = re_logical_and.sub(" ", p)
@@ -268,8 +271,11 @@ def create_basic_search_units(req, p, f, m=None):
                 elif fi and not get_index_id(fi):
                     # B3c - fi exists but there is no words table for fi => try ACC search
                     opfts.append([oi,pi,fi,'a'])            
+                elif fi and pi.startswith('/') and pi.endswith('/'): 
+                    # B3d - fi exists and slashes found => try regexp search
+                    opfts.append([oi,pi[1:-1],fi,'r'])            
                 else:
-                    # B3d - general case => do WRD search                    
+                    # B3e - general case => do WRD search                    
                     pi = strip_accents(pi) # strip accents for 'w' mode, FIXME: delete when not needed
                     for pii in get_words_from_pattern(pi): 
                         opfts.append([oi,pii,fi,'w'])
@@ -1504,7 +1510,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 else: # it is WRD query
                     bsu_pn = sre.sub(r'(\w)[^a-zA-Z0-9\s\:]+(\w|$)', "\\1 \\2", bsu_p)
                 if verbose and of.startswith('h') and req:
-                    print_warning(req, "trying %s/%s/%s" % (bsu_pn,bsu_f,bsu_m))
+                    print_warning(req, "trying (%s,%s,%s)" % (bsu_pn,bsu_f,bsu_m))
                 basic_search_unit_hitset = search_pattern(req=None, p=bsu_pn, f=bsu_f, m=bsu_m, of="id", ln=ln)
                 if basic_search_unit_hitset._nbhits > 0:
                     # we retain the new unit instead
