@@ -544,132 +544,6 @@
   <se>Sök i %s poster efter:</se>
 </define-tag>
 
-<define-tag MSG_ANY_FIELD whitespace=delete>
-  <en>any field</en>
-  <fr>tous les champs</fr>
-  <de>alle Felder</de>
-  <es>cualquier campo</es>
-  <pt>qualquer campo</pt>
-  <it>tutti i campi</it>
-  <ru>любое поле</ru>
-  <sk>všetky polia</sk>
-  <cz>všechna pole</cz>
-  <no>alle felt</no>
-  <se>samtliga fält</se>
-</define-tag>
-
-<define-tag MSG_TITLE whitespace=delete>
-  <en>title</en>
-  <fr>titre</fr>
-  <de>Titel</de>
-  <es>título</es>
-  <pt>título</pt>
-  <it>titolo</it>
-  <ru>название</ru>
-  <sk>názov</sk>
-  <cz>název</cz>
-  <no>tittel</no>
-  <se>titel</se>
-</define-tag>
-
-<define-tag MSG_AUTHOR whitespace=delete>
-  <en>author</en>
-  <fr>auteur</fr>
-  <de>Autor</de>
-  <es>autor</es>
-  <pt>autor</pt>
-  <it>autore</it>
-  <ru>автор</ru>
-  <sk>autor</sk>
-  <cz>autor</cz>
-  <no>forfatter</no>
-  <se>författare</se>
-</define-tag>
-
-<define-tag MSG_REPORT_NUMBER whitespace=delete>
-  <en>report number</en>
-  <fr>numéro de rapport</fr>
-  <de>Reportnummer</de>
-  <es>número de reporte</es>
-  <pt>número de registro</pt>
-  <it>numero del rapporto</it>
-  <ru>номер документа</ru>
-  <sk>číslo správy</sk>
-  <cz>číslo zprávy</cz>
-  <no>rapportnummer</no>
-  <se>rapportnummer</se>
-</define-tag>
-
-<define-tag MSG_YEAR whitespace=delete>
-  <en>year</en>
-  <fr>année</fr>
-  <de>Jahr</de>
-  <es>año</es>
-  <pt>ano</pt>
-  <it>anno</it>
-  <ru>год</ru>
-  <sk>rok</sk>
-  <cz>rok</cz>
-  <no>år</no>
-  <se>år</se>
-</define-tag>
-
-<define-tag MSG_ABSTRACT whitespace=delete>
-  <en>abstract</en>
-  <fr>abstract</fr>
-  <de>Abstrakt</de>
-  <es>resumen</es>
-  <pt>resumo</pt>
-  <it>riassunto</it>
-  <ru>абстракт</ru>
-  <sk>abstrakt</sk>
-  <cz>abstrakt</cz>
-  <no>sammendrag</no>
-  <se>sammanfattning</se>
-</define-tag>
-
-<define-tag MSG_KEYWORD whitespace=delete>
-  <en>keyword</en>
-  <fr>mot clé</fr>
-  <de>Kennwort</de>
-  <es>palabra clave</es>
-  <pt>palavra chave</pt>
-  <it>parola chiave</it>
-  <ru>ключевое слово</ru>
-  <sk>kľúčové slovo</sk>
-  <cz>klíčové slovo</cz>
-  <no>nøkkelord</no>
-  <se>nyckelord</se>
-</define-tag>
-
-<define-tag MSG_FULLTEXT whitespace=delete>
-  <en>fulltext</en>
-  <fr>fulltext</fr>
-  <de>Volltext</de>
-  <es>texto completo</es>
-  <pt>texto completo</pt>
-  <it>testo completo</it>
-  <ru>полный текст</ru>
-  <sk>plný text</sk>
-  <cz>plný text</cz>
-  <no>fulltekst</no>
-  <se>fulltext</se>
-</define-tag>
-
-<define-tag MSG_REFERENCE whitespace=delete>
-  <en>reference</en>
-  <fr>référence</fr>
-  <de>Referenz</de>
-  <es>referencia</es>
-  <pt>referência</pt>
-  <it>referenza</it>
-  <ru>ссылка</ru>
-  <sk>referencie</sk>
-  <cz>reference</cz>
-  <no>referanse</no>
-  <se>referens</se>
-</define-tag>
-
 <define-tag MSG_ALL_OF_THE_WORDS whitespace=delete>
   <en>All of the words:</en>
   <fr>Tous les mots:</fr>
@@ -2036,6 +1910,21 @@
   <cz>Záznam byl vymazán.</cz>
   <no>The record has been deleted.</no>
   <se>The record has been deleted.</se>
+</define-tag>
+
+# FIXME
+<define-tag MSG_RESTRICTED whitespace=delete>
+  <en>restricted</en>
+  <fr>restreint</fr>
+  <de>privat</de>
+  <es>reservado</es>
+  <pt>restrito</pt>
+  <it>riservato</it>
+  <ru>ограничено</ru>
+  <sk>chránené</sk>
+  <cz>chráněno</cz>
+  <no>adgangsbegrenset</no>
+  <se>begränsad</se>
 </define-tag>
 
 ## end of file

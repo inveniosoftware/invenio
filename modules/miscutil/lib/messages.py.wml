@@ -59,15 +59,6 @@ msg_logout = {}
 msg_language = {}
 msg_browse = {}
 msg_search_records_for = {}
-msg_any_field = {}
-msg_title = {}
-msg_author = {}
-msg_report_number = {}
-msg_year = {}
-msg_abstract = {}
-msg_keyword = {}
-msg_fulltext = {}
-msg_reference = {}
 msg_all_of_the_words = {}
 msg_any_of_the_words = {}
 msg_exact_phrase = {}
@@ -145,6 +136,7 @@ msg_admin_area = {}
 msg_administration = {}
 msg_thousands_separator = {}
 msg_record_deleted = {}
+msg_restricted = {}
 
 ## English:
 <en>
@@ -177,15 +169,6 @@ msg_logout['en'] = """<MSG_LOGOUT>"""
 msg_language['en'] = """<MSG_LANGUAGE>"""
 msg_browse['en'] = """<MSG_BROWSE>"""
 msg_search_records_for['en'] = """<MSG_SEARCH_RECORDS_FOR>"""
-msg_any_field['en'] = """<MSG_ANY_FIELD>"""
-msg_title['en'] = """<MSG_TITLE>"""
-msg_author['en'] = """<MSG_AUTHOR>"""
-msg_report_number['en'] = """<MSG_REPORT_NUMBER>"""
-msg_year['en'] = """<MSG_YEAR>"""
-msg_abstract['en'] = """<MSG_ABSTRACT>"""
-msg_keyword['en'] = """<MSG_KEYWORD>"""
-msg_fulltext['en'] = """<MSG_FULLTEXT>"""
-msg_reference['en'] = """<MSG_REFERENCE>"""
 msg_all_of_the_words['en'] = """<MSG_ALL_OF_THE_WORDS>"""
 msg_any_of_the_words['en'] = """<MSG_ANY_OF_THE_WORDS>"""
 msg_exact_phrase['en'] = """<MSG_EXACT_PHRASE>"""
@@ -263,6 +246,7 @@ msg_admin_area['en'] = """<MSG_ADMIN_AREA>"""
 msg_administration['en'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['en'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['en'] = """<MSG_RECORD_DELETED>"""
+msg_restricted['en'] = """<MSG_RESTRICTED>"""
 </en>
 
 ## French:
@@ -296,15 +280,6 @@ msg_logout['fr'] = """<MSG_LOGOUT>"""
 msg_language['fr'] = """<MSG_LANGUAGE>"""
 msg_browse['fr'] = """<MSG_BROWSE>"""
 msg_search_records_for['fr'] = """<MSG_SEARCH_RECORDS_FOR>"""
-msg_any_field['fr'] = """<MSG_ANY_FIELD>"""
-msg_title['fr'] = """<MSG_TITLE>"""
-msg_author['fr'] = """<MSG_AUTHOR>"""
-msg_report_number['fr'] = """<MSG_REPORT_NUMBER>"""
-msg_year['fr'] = """<MSG_YEAR>"""
-msg_abstract['fr'] = """<MSG_ABSTRACT>"""
-msg_keyword['fr'] = """<MSG_KEYWORD>"""
-msg_fulltext['fr'] = """<MSG_FULLTEXT>"""
-msg_reference['fr'] = """<MSG_REFERENCE>"""
 msg_all_of_the_words['fr'] = """<MSG_ALL_OF_THE_WORDS>"""
 msg_any_of_the_words['fr'] = """<MSG_ANY_OF_THE_WORDS>"""
 msg_exact_phrase['fr'] = """<MSG_EXACT_PHRASE>"""
@@ -382,6 +357,7 @@ msg_admin_area['fr'] = """<MSG_ADMIN_AREA>"""
 msg_administration['fr'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['fr'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['fr'] = """<MSG_RECORD_DELETED>"""
+msg_restricted['fr'] = """<MSG_RESTRICTED>"""
 </fr>
 
 ## German:
@@ -415,15 +391,6 @@ msg_logout['de'] = """<MSG_LOGOUT>"""
 msg_language['de'] = """<MSG_LANGUAGE>"""
 msg_browse['de'] = """<MSG_BROWSE>"""
 msg_search_records_for['de'] = """<MSG_SEARCH_RECORDS_FOR>"""
-msg_any_field['de'] = """<MSG_ANY_FIELD>"""
-msg_title['de'] = """<MSG_TITLE>"""
-msg_author['de'] = """<MSG_AUTHOR>"""
-msg_report_number['de'] = """<MSG_REPORT_NUMBER>"""
-msg_year['de'] = """<MSG_YEAR>"""
-msg_abstract['de'] = """<MSG_ABSTRACT>"""
-msg_keyword['de'] = """<MSG_KEYWORD>"""
-msg_fulltext['de'] = """<MSG_FULLTEXT>"""
-msg_reference['de'] = """<MSG_REFERENCE>"""
 msg_all_of_the_words['de'] = """<MSG_ALL_OF_THE_WORDS>"""
 msg_any_of_the_words['de'] = """<MSG_ANY_OF_THE_WORDS>"""
 msg_exact_phrase['de'] = """<MSG_EXACT_PHRASE>"""
@@ -501,6 +468,7 @@ msg_admin_area['de'] = """<MSG_ADMIN_AREA>"""
 msg_administration['de'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['de'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['de'] = """<MSG_RECORD_DELETED>"""
+msg_restricted['de'] = """<MSG_RESTRICTED>"""
 </de>
 
 ## Spanish:
@@ -534,15 +502,6 @@ msg_logout['es'] = """<MSG_LOGOUT>"""
 msg_language['es'] = """<MSG_LANGUAGE>"""
 msg_browse['es'] = """<MSG_BROWSE>"""
 msg_search_records_for['es'] = """<MSG_SEARCH_RECORDS_FOR>"""
-msg_any_field['es'] = """<MSG_ANY_FIELD>"""
-msg_title['es'] = """<MSG_TITLE>"""
-msg_author['es'] = """<MSG_AUTHOR>"""
-msg_report_number['es'] = """<MSG_REPORT_NUMBER>"""
-msg_year['es'] = """<MSG_YEAR>"""
-msg_abstract['es'] = """<MSG_ABSTRACT>"""
-msg_keyword['es'] = """<MSG_KEYWORD>"""
-msg_fulltext['es'] = """<MSG_FULLTEXT>"""
-msg_reference['es'] = """<MSG_REFERENCE>"""
 msg_all_of_the_words['es'] = """<MSG_ALL_OF_THE_WORDS>"""
 msg_any_of_the_words['es'] = """<MSG_ANY_OF_THE_WORDS>"""
 msg_exact_phrase['es'] = """<MSG_EXACT_PHRASE>"""
@@ -620,6 +579,7 @@ msg_admin_area['es'] = """<MSG_ADMIN_AREA>"""
 msg_administration['es'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['es'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['es'] = """<MSG_RECORD_DELETED>"""
+msg_restricted['es'] = """<MSG_RESTRICTED>"""
 </es>
 
 ## Portuguese:
@@ -653,15 +613,6 @@ msg_logout['pt'] = """<MSG_LOGOUT>"""
 msg_language['pt'] = """<MSG_LANGUAGE>"""
 msg_browse['pt'] = """<MSG_BROWSE>"""
 msg_search_records_for['pt'] = """<MSG_SEARCH_RECORDS_FOR>"""
-msg_any_field['pt'] = """<MSG_ANY_FIELD>"""
-msg_title['pt'] = """<MSG_TITLE>"""
-msg_author['pt'] = """<MSG_AUTHOR>"""
-msg_report_number['pt'] = """<MSG_REPORT_NUMBER>"""
-msg_year['pt'] = """<MSG_YEAR>"""
-msg_abstract['pt'] = """<MSG_ABSTRACT>"""
-msg_keyword['pt'] = """<MSG_KEYWORD>"""
-msg_fulltext['pt'] = """<MSG_FULLTEXT>"""
-msg_reference['pt'] = """<MSG_REFERENCE>"""
 msg_all_of_the_words['pt'] = """<MSG_ALL_OF_THE_WORDS>"""
 msg_any_of_the_words['pt'] = """<MSG_ANY_OF_THE_WORDS>"""
 msg_exact_phrase['pt'] = """<MSG_EXACT_PHRASE>"""
@@ -739,6 +690,7 @@ msg_admin_area['pt'] = """<MSG_ADMIN_AREA>"""
 msg_administration['pt'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['pt'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['pt'] = """<MSG_RECORD_DELETED>"""
+msg_restricted['pt'] = """<MSG_RESTRICTED>"""
 </pt>
 
 ## Italian:
@@ -772,15 +724,6 @@ msg_logout['it'] = """<MSG_LOGOUT>"""
 msg_language['it'] = """<MSG_LANGUAGE>"""
 msg_browse['it'] = """<MSG_BROWSE>"""
 msg_search_records_for['it'] = """<MSG_SEARCH_RECORDS_FOR>"""
-msg_any_field['it'] = """<MSG_ANY_FIELD>"""
-msg_title['it'] = """<MSG_TITLE>"""
-msg_author['it'] = """<MSG_AUTHOR>"""
-msg_report_number['it'] = """<MSG_REPORT_NUMBER>"""
-msg_year['it'] = """<MSG_YEAR>"""
-msg_abstract['it'] = """<MSG_ABSTRACT>"""
-msg_keyword['it'] = """<MSG_KEYWORD>"""
-msg_fulltext['it'] = """<MSG_FULLTEXT>"""
-msg_reference['it'] = """<MSG_REFERENCE>"""
 msg_all_of_the_words['it'] = """<MSG_ALL_OF_THE_WORDS>"""
 msg_any_of_the_words['it'] = """<MSG_ANY_OF_THE_WORDS>"""
 msg_exact_phrase['it'] = """<MSG_EXACT_PHRASE>"""
@@ -858,6 +801,7 @@ msg_admin_area['it'] = """<MSG_ADMIN_AREA>"""
 msg_administration['it'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['it'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['it'] = """<MSG_RECORD_DELETED>"""
+msg_restricted['it'] = """<MSG_RESTRICTED>"""
 </it>
 
 ## Russian:
@@ -891,15 +835,6 @@ msg_logout['ru'] = """<MSG_LOGOUT>"""
 msg_language['ru'] = """<MSG_LANGUAGE>"""
 msg_browse['ru'] = """<MSG_BROWSE>"""
 msg_search_records_for['ru'] = """<MSG_SEARCH_RECORDS_FOR>"""
-msg_any_field['ru'] = """<MSG_ANY_FIELD>"""
-msg_title['ru'] = """<MSG_TITLE>"""
-msg_author['ru'] = """<MSG_AUTHOR>"""
-msg_report_number['ru'] = """<MSG_REPORT_NUMBER>"""
-msg_year['ru'] = """<MSG_YEAR>"""
-msg_abstract['ru'] = """<MSG_ABSTRACT>"""
-msg_keyword['ru'] = """<MSG_KEYWORD>"""
-msg_fulltext['ru'] = """<MSG_FULLTEXT>"""
-msg_reference['ru'] = """<MSG_REFERENCE>"""
 msg_all_of_the_words['ru'] = """<MSG_ALL_OF_THE_WORDS>"""
 msg_any_of_the_words['ru'] = """<MSG_ANY_OF_THE_WORDS>"""
 msg_exact_phrase['ru'] = """<MSG_EXACT_PHRASE>"""
@@ -977,6 +912,7 @@ msg_admin_area['ru'] = """<MSG_ADMIN_AREA>"""
 msg_administration['ru'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['ru'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['ru'] = """<MSG_RECORD_DELETED>"""
+msg_restricted['ru'] = """<MSG_RESTRICTED>"""
 </ru>
 
 ## Slovak:
@@ -1010,15 +946,6 @@ msg_logout['sk'] = """<MSG_LOGOUT>"""
 msg_language['sk'] = """<MSG_LANGUAGE>"""
 msg_browse['sk'] = """<MSG_BROWSE>"""
 msg_search_records_for['sk'] = """<MSG_SEARCH_RECORDS_FOR>"""
-msg_any_field['sk'] = """<MSG_ANY_FIELD>"""
-msg_title['sk'] = """<MSG_TITLE>"""
-msg_author['sk'] = """<MSG_AUTHOR>"""
-msg_report_number['sk'] = """<MSG_REPORT_NUMBER>"""
-msg_year['sk'] = """<MSG_YEAR>"""
-msg_abstract['sk'] = """<MSG_ABSTRACT>"""
-msg_keyword['sk'] = """<MSG_KEYWORD>"""
-msg_fulltext['sk'] = """<MSG_FULLTEXT>"""
-msg_reference['sk'] = """<MSG_REFERENCE>"""
 msg_all_of_the_words['sk'] = """<MSG_ALL_OF_THE_WORDS>"""
 msg_any_of_the_words['sk'] = """<MSG_ANY_OF_THE_WORDS>"""
 msg_exact_phrase['sk'] = """<MSG_EXACT_PHRASE>"""
@@ -1096,6 +1023,7 @@ msg_admin_area['sk'] = """<MSG_ADMIN_AREA>"""
 msg_administration['sk'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['sk'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['sk'] = """<MSG_RECORD_DELETED>"""
+msg_restricted['sk'] = """<MSG_RESTRICTED>"""
 </sk>
 
 ## Czech:
@@ -1129,15 +1057,6 @@ msg_logout['cz'] = """<MSG_LOGOUT>"""
 msg_language['cz'] = """<MSG_LANGUAGE>"""
 msg_browse['cz'] = """<MSG_BROWSE>"""
 msg_search_records_for['cz'] = """<MSG_SEARCH_RECORDS_FOR>"""
-msg_any_field['cz'] = """<MSG_ANY_FIELD>"""
-msg_title['cz'] = """<MSG_TITLE>"""
-msg_author['cz'] = """<MSG_AUTHOR>"""
-msg_report_number['cz'] = """<MSG_REPORT_NUMBER>"""
-msg_year['cz'] = """<MSG_YEAR>"""
-msg_abstract['cz'] = """<MSG_ABSTRACT>"""
-msg_keyword['cz'] = """<MSG_KEYWORD>"""
-msg_fulltext['cz'] = """<MSG_FULLTEXT>"""
-msg_reference['cz'] = """<MSG_REFERENCE>"""
 msg_all_of_the_words['cz'] = """<MSG_ALL_OF_THE_WORDS>"""
 msg_any_of_the_words['cz'] = """<MSG_ANY_OF_THE_WORDS>"""
 msg_exact_phrase['cz'] = """<MSG_EXACT_PHRASE>"""
@@ -1215,6 +1134,7 @@ msg_admin_area['cz'] = """<MSG_ADMIN_AREA>"""
 msg_administration['cz'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['cz'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['cz'] = """<MSG_RECORD_DELETED>"""
+msg_restricted['cz'] = """<MSG_RESTRICTED>"""
 </cz>
 
 ## Norwegian:
@@ -1248,15 +1168,6 @@ msg_logout['no'] = """<MSG_LOGOUT>"""
 msg_language['no'] = """<MSG_LANGUAGE>"""
 msg_browse['no'] = """<MSG_BROWSE>"""
 msg_search_records_for['no'] = """<MSG_SEARCH_RECORDS_FOR>"""
-msg_any_field['no'] = """<MSG_ANY_FIELD>"""
-msg_title['no'] = """<MSG_TITLE>"""
-msg_author['no'] = """<MSG_AUTHOR>"""
-msg_report_number['no'] = """<MSG_REPORT_NUMBER>"""
-msg_year['no'] = """<MSG_YEAR>"""
-msg_abstract['no'] = """<MSG_ABSTRACT>"""
-msg_keyword['no'] = """<MSG_KEYWORD>"""
-msg_fulltext['no'] = """<MSG_FULLTEXT>"""
-msg_reference['no'] = """<MSG_REFERENCE>"""
 msg_all_of_the_words['no'] = """<MSG_ALL_OF_THE_WORDS>"""
 msg_any_of_the_words['no'] = """<MSG_ANY_OF_THE_WORDS>"""
 msg_exact_phrase['no'] = """<MSG_EXACT_PHRASE>"""
@@ -1334,6 +1245,7 @@ msg_admin_area['no'] = """<MSG_ADMIN_AREA>"""
 msg_administration['no'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['no'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['no'] = """<MSG_RECORD_DELETED>"""
+msg_restricted['no'] = """<MSG_RESTRICTED>"""
 </no>
 
 ## Swedish:
@@ -1367,15 +1279,6 @@ msg_logout['se'] = """<MSG_LOGOUT>"""
 msg_language['se'] = """<MSG_LANGUAGE>"""
 msg_browse['se'] = """<MSG_BROWSE>"""
 msg_search_records_for['se'] = """<MSG_SEARCH_RECORDS_FOR>"""
-msg_any_field['se'] = """<MSG_ANY_FIELD>"""
-msg_title['se'] = """<MSG_TITLE>"""
-msg_author['se'] = """<MSG_AUTHOR>"""
-msg_report_number['se'] = """<MSG_REPORT_NUMBER>"""
-msg_year['se'] = """<MSG_YEAR>"""
-msg_abstract['se'] = """<MSG_ABSTRACT>"""
-msg_keyword['se'] = """<MSG_KEYWORD>"""
-msg_fulltext['se'] = """<MSG_FULLTEXT>"""
-msg_reference['se'] = """<MSG_REFERENCE>"""
 msg_all_of_the_words['se'] = """<MSG_ALL_OF_THE_WORDS>"""
 msg_any_of_the_words['se'] = """<MSG_ANY_OF_THE_WORDS>"""
 msg_exact_phrase['se'] = """<MSG_EXACT_PHRASE>"""
@@ -1453,6 +1356,7 @@ msg_admin_area['se'] = """<MSG_ADMIN_AREA>"""
 msg_administration['se'] = """<MSG_ADMINISTRATION>"""
 msg_thousands_separator['se'] = """<MSG_THOUSANDS_SEPARATOR>"""
 msg_record_deleted['se'] = """<MSG_RECORD_DELETED>"""
+msg_restricted['se'] = """<MSG_RESTRICTED>"""
 </se>
 
 ## I18N messages oriented functions:
