@@ -47,9 +47,9 @@ MAXSELECTUSERS = 25
 # max number of users to display in a page (mainly for user area)
 MAXPAGEUSERS = 25
 # site open or closed for all access 
-#0 = closed
-#1 = open
-CFG_SITE_OPEN = 1
+#0 = open
+#1 = closed
+CFG_ACCESS_CONTROL_SITE_TEMPORARILY_CLOSED = 0
 # access policy for guests. 
 #0 = Allow guests to search, 
 #1 = Guests cannot search (all users must login)

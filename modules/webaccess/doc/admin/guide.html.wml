@@ -827,9 +827,9 @@ II. Example - connecting role and user</a>
 
   - The variables in access_control_config.py:
     - Site open or closed for all access
-      0 = closed
-      1 = open
-      CFG_SITE_OPEN = 1
+      0 = open
+      1 = closed
+      CFG_ACCESS_CONTROL_SITE_TEMPORARILY_CLOSED = 0
     - Access policy for guests.
       0 = Allow guests to search,
       1 = Guests cannot search (all users must login)

@@ -35,7 +35,7 @@ import cdsware.bibrankadminlib as brc
 #reload(brc)
 from cdsware.webpage import page, create_error_box
 from cdsware.config import weburl,cdslang
-from cdsware.webuser import getUid
+from cdsware.webuser import getUid, page_not_authorized
 
 __version__ = "$Id$"
     
@@ -57,7 +57,7 @@ def index(req, ln=cdslang):
                 lastupdated=__lastupdated__,
                 urlargs=req.args)
     else:
-        return auth_failed(uid, navtrail_previous_links, auth[1])
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -80,7 +80,7 @@ def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
                 urlargs=req.args,
                 lastupdated=__lastupdated__)
     else:
-        return auth_failed(uid, navtrail_previous_links, auth[1])
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifytranslations(req, rnkID='', ln=cdslang, sel_type='', trans = [], confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -104,7 +104,7 @@ def modifytranslations(req, rnkID='', ln=cdslang, sel_type='', trans = [], confi
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)
     else:
-        return auth_failed(uid, navtrail_previous_links, auth[1])
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifycollection(req, ln=cdslang, rnkID='', func='', colID='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -128,7 +128,7 @@ def modifycollection(req, ln=cdslang, rnkID='', func='', colID='', confirm=0):
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)
     else:
-        return auth_failed(uid, navtrail_previous_links, auth[1])
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def deleterank(req, ln=cdslang, rnkID='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -150,7 +150,7 @@ def deleterank(req, ln=cdslang, rnkID='', confirm=0):
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)
     else:
-        return auth_failed(uid, navtrail_previous_links, auth[1])
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifyrank(req, ln=cdslang, rnkID='', rnkcode='', template='', cfgfile='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -175,7 +175,7 @@ def modifyrank(req, ln=cdslang, rnkID='', rnkcode='', template='', cfgfile='', c
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
-        return auth_failed(uid, navtrail_previous_links, auth[1])
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def showrankdetails(req, ln=cdslang, rnkID=''):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
@@ -196,7 +196,7 @@ def showrankdetails(req, ln=cdslang, rnkID=''):
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
-        return auth_failed(uid, navtrail_previous_links, auth[1])
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def error_page(req):
     return page(title=msg_internal_error[ln],
@@ -205,11 +205,3 @@ def error_page(req):
                 keywords="%s, CDSware, Internal Error" % cdsname,
                 language=ln,
                 urlargs=req.args)
-
-def auth_failed(uid, navtrail_previous_links, message=""):
-    return page(title='Authorization failure',
-                uid=uid,
-                body=brc.adderrorbox('Reason:',
-                                     datalist=[message]),
-                navtrail= navtrail_previous_links,
-                lastupdated=__lastupdated__)

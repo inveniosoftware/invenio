@@ -46,7 +46,7 @@ from access_control_config import *
 from dbquery import run_sql
 from config import *
 from webpage import page, pageheaderonly, pagefooteronly
-from webuser import getUid, get_email
+from webuser import getUid, get_email, page_not_authorized
 from mod_python import apache
 from search_engine import print_record
 from cdsware.webuser import checkemail
@@ -101,20 +101,13 @@ def index(req, title='', body='', subtitle='', adminarea=2, authorized=0):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)                
 
-
 def mustloginpage(req, message):
     """show a page asking the user to login."""
     
     navtrail_previous_links = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/webaccess/">WebAccess Admin</a> """ % (weburl, weburl)
 
-    return page(title='Authorization failure',
-                uid=getUid(req),
-                body=adderrorbox('Reason:',
-                                 datalist=[message]),
-                navtrail=navtrail_previous_links,
-                lastupdated=__lastupdated__)                
-
-    
+    return page_not_authorized(req=req, text=message, navtrail=navtrail_previous_links)
+                
 def is_adminuser(req):
     """check if user is a registered administrator. """
 
@@ -534,7 +527,7 @@ def perform_accesspolicy(req, callback='yes', confirm=0):
     account_policy[2] = "Only admin can register new accounts. User cannot edit email address."
 
     output = "<br><b>Current settings:</b><br>"
-    output += "Site open: %s<br>" % (CFG_SITE_OPEN == 1 and "Yes" or "No")
+    output += "Site open: %s<br>" % (CFG_ACCESS_CONTROL_SITE_TEMPORARILY_CLOSED == 0 and "Yes" or "No")
     output += "Guest accounts allowed: %s<br>" % (CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0 and "Yes" or "No")
     output += "Account policy: %s<br>" % (account_policy[CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS])
     output += "Allowed email addresses limited: %s<br>" % (CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN and CFG_ACCESS_CONTROL_LIMIT_TO_DOMAIN or "Not limited")
