@@ -20,7 +20,8 @@
     title="WebAccess Admin" \
     navbar_name="hacking-webaccess" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/>Admin Area</a> " \
-    navbar_select="hacking-webaccess-api" 
+    navbar_name="admin" \
+    navbar_select="webaccess"
 
 <p>
  This is the gate to the admin area for WebAccess. You need to 
