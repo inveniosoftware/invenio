@@ -42,24 +42,6 @@
    </tbody>
    </table>
 </es>
-<pt>
-   <p><table class="errorbox">
-   <thead>
-   <tr>
-   <th class="errorboxheader">
-     <MSG_PAGE_BEING_TRANSLATED_HEAD>
-   </th>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-     <MSG_PAGE_BEING_TRANSLATED_BODY>
-   </td>
-   </tr>
-   </tbody>
-   </table>
-</pt>
 <ru>
    <p><table class="errorbox">
    <thead>
@@ -119,7 +101,7 @@
    <fr>Trouvez tout sur la recherche de</fr>
    <de>Lernen Sie alles über den Suchemöglichkeiten beim</de>
    <es>Find out all about searching</es>
-   <pt>Find out all about searching</pt>
+   <pt>Descubra tudo sobre buscas no</pt>
    <it>Tutto quanto vi serve per poter ricercare in</it>
    <ru>Find out all about searching</ru>
    <sk>Tu nájdete všetko čo sa týka hľadania na serveri</sk>
@@ -153,8 +135,8 @@
       help you use the <CDSNAMEINTL> site to the full.
     </es>  
     <pt>
-      This page presents you with useful tips and techniques in order to
-      help you use the <CDSNAMEINTL> site to the full.
+      Esta página oferece dicas  úteis e técnicas para ajuda-lo a usar o sítio do 
+      <CDSNAMEINTL> em toda sua potencialidade.
     </pt>  
     <it>
       Questa pagina vi fornisce utili consigli per servirvi al meglio 
@@ -189,9 +171,36 @@
       help you use the <CDSNAMEINTL> site to the full.
     </uk>  
 
-<dt><a href="<lang:star: guide.*.html>">Search Guide</a>
+<dt><a href="<lang:star: guide.*.html>">
+     <en>Search Guide</en>
+     <fr>Guide de Recherche</fr>
+     <de>Search Guide</de>
+     <es>Search Guide</es>
+     <pt>Guia de buscas</pt>
+     <it>Search Guide</it>
+     <ru>Search Guide</ru>
+     <sk>Search Guide</sk>
+     <cs>Search Guide</cs>
+     <no>Search Guide</no>
+     <sv>Search Guide</sv>
+     <el>Search Guide</el>
+     <uk>Search Guide</uk>
+    </a>
 
-<dd>Full guide on how to search <CDSNAME>.
+<dd><en>Full guide on how to search</en>
+    <fr>Le guide complet sur comment rechercher sur</fr>
+    <de>Full guide on how to search</de>
+    <es>Full guide on how to search</es>
+    <pt>Guia completo de como realizar buscas no</pt>
+    <it>Full guide on how to search</it>
+    <ru>Full guide on how to search</ru>
+    <sk>Full guide on how to search</sk>
+    <cs>Full guide on how to search</cs>
+    <no>Full guide on how to search</no>
+    <sv>Full guide on how to search</sv>
+    <el>Full guide on how to search</el>
+    <uk>Full guide on how to search</uk>
+    <CDSNAMEINTL>.
 
 </dl>
 </blockquote>
