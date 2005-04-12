@@ -62,5 +62,5 @@ CLEANFILES = $(doc_DATA) *~ *.tmp *.php
 	       -o\(ALL-LANG_*\)+LANG_CS:$*.cs.html \
 	       -o\(ALL-LANG_*\)+LANG_NO:$*.no.html \
 	       -o\(ALL-LANG_*\)+LANG_SV:$*.sv.html \
-	       -o\(ALL-LANG_*\)+LANG_SV:$*.el.html \
+	       -o\(ALL-LANG_*\)+LANG_EL:$*.el.html \
 	       -o\(ALL-LANG_*\)+LANG_UK:$*.uk.html $<
