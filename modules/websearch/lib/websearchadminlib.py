@@ -2098,8 +2098,10 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
                         text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_from=%s&amp;move_to=%s%s&amp;rtype=%s#tree"><img border="0" src="%s/img/move_to.gif" title="Move '%s' to '%s'"></a>
                 """ % (weburl, colID, ln, move_from, rtype, i, rtype, weburl,  col_dict[tree_from[int(move_from[1:len(move_from)])][0]], col_dict[tree_to[i][0]])
                 else:
-                    text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_from=%s%s&amp;rtype=%s#%s"><img border="0" src="%s/img/move_from.gif" title="Move '%s' from this location."></a>
-                """ % (weburl, colID, ln, rtype, i, rtype, tree[i][0], weburl, col_dict[tree[i][0]])
+                    try:
+                        text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_from=%s%s&amp;rtype=%s#%s"><img border="0" src="%s/img/move_from.gif" title="Move '%s' from this location."></a>""" % (weburl, colID, ln, rtype, i, rtype, tree[i][0], weburl, col_dict[tree[i][0]])
+                    except KeyError:
+                        pass
             else:
                 text += """<img border="0" src="%s/img/white_field.gif">
                 """ % weburl
@@ -2112,8 +2114,10 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
         <td>"""
 
         if edit:
-            text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;delete=%s&amp;rtype=%s#%s"><img border="0" src="%s/img/iconcross.gif" title="Remove colletion from tree"></a>
-        """ % (weburl, colID, ln, i, rtype, tree[i][0], weburl)
+            try:
+                text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;delete=%s&amp;rtype=%s#%s"><img border="0" src="%s/img/iconcross.gif" title="Remove colletion from tree"></a>""" % (weburl, colID, ln, i, rtype, tree[i][0], weburl)
+            except KeyError:
+                pass
         elif i != 0:
             text += """<img border="0" src="%s/img/white_field.gif">
         """ % weburl
@@ -2124,8 +2128,10 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
         if tmove_from:
             move_from = tmove_from
 
-        text += """<a name="%s"></a>%s<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s" title="Edit collection">%s</a>%s%s%s
-        """ % (tree[i][0], (reltype=="v" and '<i>' or ''), weburl, tree[i][0], ln, col_dict[id_son], (move_to=="%s%s" %(rtype,i) and '&nbsp;<img border="0" src="%s/img/move_to.gif">' % weburl or ''), (move_from=="%s%s" % (rtype,i) and '&nbsp;<img border="0" src="%s/img/move_from.gif">' % weburl or ''), (reltype=="v" and '</i>' or ''))
+        try:
+            text += """<a name="%s"></a>%s<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s" title="Edit collection">%s</a>%s%s%s""" % (tree[i][0], (reltype=="v" and '<i>' or ''), weburl, tree[i][0], ln, col_dict[id_son], (move_to=="%s%s" %(rtype,i) and '&nbsp;<img border="0" src="%s/img/move_to.gif">' % weburl or ''), (move_from=="%s%s" % (rtype,i) and '&nbsp;<img border="0" src="%s/img/move_from.gif">' % weburl or ''), (reltype=="v" and '</i>' or ''))
+        except KeyError:
+            pass
         
         text += """</td></tr>
         """
