@@ -80,7 +80,12 @@ Contents
           <http://www.modpython.org/>
 
      f) PHP compiled as Apache module, including MySQL support.
-        Tested mainly with PHP version 4.3.0 and above.  
+        Tested mainly with PHP version 4.3.0 and above.  (Note that if
+        you are compiling mod_php from source, it is good to compile
+        it against the same MySQL client library as mod_python, so
+        that the two Apache modules are using the same MySQL client
+        library.  We saw Apache/PHP/Python problems in the past when
+        they weren't.)  
           <http://www.php.net/>
 
      g) PHP compiled as a standalone command-line executable (CLI)
