@@ -26,7 +26,7 @@ IMGS = $(wildcard $(srcdir)/*.gif $(srcdir)/*.jpg $(srcdir)/*.png)
 gifs_DATA = $(IMGS:$(srcdir)/%=%)
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) $(gifs_DATA)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 
