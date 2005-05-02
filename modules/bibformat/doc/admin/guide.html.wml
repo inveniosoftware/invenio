@@ -32,6 +32,20 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1 <a href="#2.1">From Web interface</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2 <a href="#2.2">From the command-line interface</a><br>
 <strong>4. <a href="#4">Detailed Configuration Manual</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1 <a href="#4.1">About BibFormat</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.2 <a href="#4.2">How it works?</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.3 <a href="#4.3">A first look at the web configuration interface</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.4 <a href="#4.4">Mapping the input (OAI Extraction Rules)</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.5 <a href="#4.5">Defining output types: Behaviors</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.6 <a href="#4.6">Formats</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.7 <a href="#4.7">Knowledge bases (KBs)</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.8 <a href="#4.8">User Defined Functions (UDFs)</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.9 <a href="#4.9">Defining links</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.9.1 <a href="#4.9.1">EXTERNAL link conditions</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.9.2 <a href="#4.9.2">INTERNAL link conditions</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.9.3 <a href="#4.9.3">Example</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.10 <a href="#4.10">User management</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.11 <a href="#4.11">Evaluation Language Reference</a></br>
 
 <a name="1"></a><h2>1. Overview</h2>
 
@@ -135,7 +149,7 @@ when debugging newly created formats.
 </blockquote>
 
 <p>To learn more on BibFormat configuration, you can consult the <a
-href="guide.html">BibFormat Admin Guide</a>.</small>
+href="guide.html">BibFormat Admin Guide</a>.
 
 <a name="3"></a><h2>3. Running BibFormat</h2>
 
@@ -151,7 +165,7 @@ When these are ready, you can choose to rebuild formats for selected
 collections or you can manually enter a search query and the web interface
 will accomplish all necessary formatting steps.
 <br>
-<i>Example:</i> You can request Photo collections to have their HTML 
+<em>Example:</em> You can request Photo collections to have their HTML 
 brief formats rebuilt, or you can reformat all the records written by Ellis.
 
 <a name="3.2"></a><h3>3.2. From the command-line interface</h3>
@@ -165,7 +179,7 @@ would then run this file throught BibFormat as follows:
 <blockquote>
 <pre>
 $ bibformat < /tmp/sample.xml > /tmp/sample_with_fmt.xml
-<pre>
+</pre>
 </blockquote>
 
 that would create default HTML formats and would "enrich" the input
@@ -193,7 +207,7 @@ follows:
 <blockquote>
 <pre>
 $ bibformat otype=HP,HC < /tmp/sample.xml > /tmp/sample_fmts_only.xml
-<pre>
+</pre>
 </blockquote>
 
 that should give you an XML file containing only 001 and FMT tags.
@@ -202,7 +216,7 @@ Finally, you would upload the formats:
 <blockquote>
 <pre>
 $ bibupload < /tmp/sample_fmts_only.xml
-<pre>
+</pre>
 </blockquote>
 
 and that's it. The new formats should now appear in <a
@@ -210,187 +224,66 @@ href="<WEBURL>">WebSearch</a>.
 
 <a name="4"></a><h2>4. Detailed Configuration Manual</h2>
 
-<p><small class="note">What follows is a transcription of an old
+<p><small>What follows is a transcription of an old
 FlexElink Configuration Manual v0.3 (2002-07-31).  The text suffers
-from low HTML quality and missing screen snapshots.  The terminology may not be fully up-to-date
+from missing screen snapshots, and the terminology may not be fully up-to-date
 at places.<!--FIXME-->
 </small>
 
-<p><!--[if supportFields]><span><span> </span>TOC \h \z \t &quot;Apartado nivel
-1,1,Apartado nivel 2,2&quot; <span style='mso-element:field-separator'></span></span><![endif]--><span><span class=MsoHyperlink><a href="#_Toc3803663"><span>1. - About BibFormat</span><span><span> </span></span><!--[if supportFields]><span> PAGEREF _Toc3803663 \h </span><![endif]--><span>2</span><span><!--[if gte mso 9]><xml>
- <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000C0000005F0054006F00630033003800300033003600360033000000</w:data>
-</xml><![endif]--></span><!--[if supportFields]><![endif]--></a></span></span></p>
+<a name="4.1"></a><h3>4.1. About BibFormat</h3>
 
-<p><span><span><a href="#_Toc3803664"><span>2. - How it works?</span><span><span>. </span></span><!--[if supportFields]><span> PAGEREF _Toc3803664 \h </span><![endif]--><span>3</span><span><!--[if gte mso 9]><xml>
- <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000C0000005F0054006F00630033003800300033003600360034000000</w:data>
-</xml><![endif]--></span><!--[if supportFields]><![endif]--></a></span></span></p>
+<p>BibFormat is a piece
+of software that is part of the CERN Document Server software (CDS, <a
+href="http://cdsweb.cern.ch/">http://cdsweb.cern.ch</a>).
+</p>
 
-<p><span><span><a href="#_Toc3803665"><span>3. - A first look at the web configuration
-interface</span><span style='color:windowtext;display:none;mso-hide:screen;
-text-decoration:none;text-underline:none'><span>. </span></span><!--[if supportFields]><span> PAGEREF _Toc3803665 \h </span><![endif]--><span>5</span><span><!--[if gte mso 9]><xml>
- <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000C0000005F0054006F00630033003800300033003600360035000000</w:data>
-</xml><![endif]--></span><!--[if supportFields]><![endif]--></a></span></span></p>
-
-<p><span><span><a href="#_Toc3803666"><span>4. - Mapping the input (OAI Extraction Rules)</span><span><span> </span></span><!--[if supportFields]><span> PAGEREF _Toc3803666 \h </span><![endif]--><span>7</span><span><!--[if gte mso 9]><xml>
- <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000C0000005F0054006F00630033003800300033003600360036000000</w:data>
-</xml><![endif]--></span><!--[if supportFields]><![endif]--></a></span></span></p>
-
-<p><span><span><a href="#_Toc3803667"><span>5. - Defining output types: Behaviors</span><span><span> </span></span><!--[if supportFields]><span> PAGEREF _Toc3803667 \h </span><![endif]--><span>10</span><span><!--[if gte mso 9]><xml>
- <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000C0000005F0054006F00630033003800300033003600360037000000</w:data>
-</xml><![endif]--></span><!--[if supportFields]><![endif]--></a></span></span></p>
-
-<p><span><span><a href="#_Toc3803668"><span>6. - Formats</span><span><span
-style='mso-tab-count:1 dotted'> </span></span><!--[if supportFields]><span> PAGEREF _Toc3803668 \h </span><![endif]--><span>12</span><span><!--[if gte mso 9]><xml>
- <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000C0000005F0054006F00630033003800300033003600360038000000</w:data>
-</xml><![endif]--></span><!--[if supportFields]><![endif]--></a></span></span></p>
-
-<p><span><span><a href="#_Toc3803669"><span>7. - Knowledge bases (KBs)</span><span><span> </span></span><!--[if supportFields]><span> PAGEREF _Toc3803669 \h </span><![endif]--><span>13</span><span><!--[if gte mso 9]><xml>
- <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000C0000005F0054006F00630033003800300033003600360039000000</w:data>
-</xml><![endif]--></span><!--[if supportFields]><![endif]--></a></span></span></p>
-
-<p><span><span><a href="#_Toc3803670"><span>8. - User Defined Functions (UDFs)</span><span><span> </span></span><!--[if supportFields]><span> PAGEREF _Toc3803670 \h </span><![endif]--><span>14</span><span><!--[if gte mso 9]><xml>
- <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000C0000005F0054006F00630033003800300033003600370030000000</w:data>
-</xml><![endif]--></span><!--[if supportFields]><![endif]--></a></span></span></p>
-
-<p><span><span><a href="#_Toc3803671"><span>9. - Defining links</span><span><span> </span></span><!--[if supportFields]><span> PAGEREF _Toc3803671 \h </span><![endif]--><span>16</span><span><!--[if gte mso 9]><xml>
- <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000C0000005F0054006F00630033003800300033003600370031000000</w:data>
-</xml><![endif]--></span><!--[if supportFields]><![endif]--></a></span></span></p>
-
-<p><span><span><a href="#_Toc3803672">9.1.
-- EXTERNAL link conditions<span><span
-style='mso-tab-count:1 dotted'> </span></span><!--[if supportFields]><span> PAGEREF _Toc3803672 \h </span><![endif]--><span>17</span><span><!--[if gte mso 9]><xml>
- <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000C0000005F0054006F00630033003800300033003600370032000000</w:data>
-</xml><![endif]--></span><!--[if supportFields]><![endif]--></a></span></span></p>
-
-<p><span><span><a href="#_Toc3803673">9.2.
-- INTERNAL link conditions<span><span
-style='mso-tab-count:1 dotted'> </span></span><!--[if supportFields]><span> PAGEREF _Toc3803673 \h </span><![endif]--><span>17</span><span><!--[if gte mso 9]><xml>
- <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000C0000005F0054006F00630033003800300033003600370033000000</w:data>
-</xml><![endif]--></span><!--[if supportFields]><![endif]--></a></span></span></p>
-
-<p><span><span><a href="#_Toc3803674">9.3.
-- Example<span><span>. </span></span><!--[if supportFields]><span> PAGEREF _Toc3803674 \h </span><![endif]--><span>18</span><span><!--[if gte mso 9]><xml>
- <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000C0000005F0054006F00630033003800300033003600370034000000</w:data>
-</xml><![endif]--></span><!--[if supportFields]><![endif]--></a></span></span></p>
-
-<p><span><span><a href="#_Toc3803675"><span>10. - User management</span><span><span> </span></span><!--[if supportFields]><span> PAGEREF _Toc3803675 \h </span><![endif]--><span>20</span><span><!--[if gte mso 9]><xml>
- <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000C0000005F0054006F00630033003800300033003600370035000000</w:data>
-</xml><![endif]--></span><!--[if supportFields]><![endif]--></a></span></span></p>
-
-<p><span><span><a href="#_Toc3803676"><span>11. - Evaluation Language Reference</span><span><span>. </span></span><!--[if supportFields]><span> PAGEREF _Toc3803676 \h </span><![endif]--><span>21</span><span><!--[if gte mso 9]><xml>
- <w:data>08D0C9EA79F9BACE118C8200AA004BA90B02000000080000000C0000005F0054006F00630033003800300033003600370036000000</w:data>
-</xml><![endif]--></span><!--[if supportFields]><![endif]--></a></span></span></p>
-
-<p><!--[if supportFields]><![endif]--><span>&nbsp;</span></p>
-
-<br clear=all>
-
-<p style='tab-stops:36.0pt'>&nbsp;</p>
-
-<p><a name=aboutFlexelink></a><a name="_Toc240507"></a><a
-name="_Toc241005"></a><a name="_Toc3803663"><span style='mso-bookmark:_Toc241005'><span
-style='mso-bookmark:_Toc240507'><span>1. -
-About BibFormat</span></span></span></a></p>
-
-<p><span>&nbsp;</span></p>
-
-<p><span>BibFormat is a piece
-of software that is part of the CERN Document Server (CDS, </span><a
-href="http://www.cds.ch/"><span>http://www.cds.ch</span><span
-style='mso-bookmark:aboutFlexelink'></span></a><span>)
-and more concretely of the CDS Search module (</span><a
-href="http://weblib.cern.ch/"><span>http://weblib.cern.ch</span><span
-style='mso-bookmark:aboutFlexelink'></span></a><span>).
-</span></p>
-
-<p><span>Its mission, in few
+<p>Its mission, in few
 words, is to provide a flexible mechanism to format the bibliographic records
 that are shown as a result of CDS Search user queries allowing the
 administrators or users customize the view of them. Besides, it offers the
 possibility of using a linking system that can generate automatically all the
 links included in the displayed records (fulltext access, electronic journals
-reference, etc) reducing considerably maintenance.</span></p>
+reference, etc) reducing considerably maintenance.</p>
 
-<p><span>To clarify this too
+<p>To clarify this too
 formal definition, we'll try to illustrate the role of BibFormat inside the CDS
 Search module by showing the following figure. Please, note that this drawing
 is trying to show the main role that BibFormat plays in the CDS structure and
 it's quite simplified, but of course the underlying logic is a bit more
-complex.</span></p>
+complex.</p>
 
-<p><span><!--[if gte vml 1]><v:shapetype
- id="_x0000_t75" coordsize="21600,21600" o:spt="75" o:preferrelative="t"
- path="m@4@5l@4@11@9@11@9@5xe" filled="f" stroked="f">
- <v:stroke joinstyle="miter"/>
- <v:formulas>
-  <v:f eqn="if lineDrawn pixelLineWidth 0"/>
-  <v:f eqn="sum @0 1 0"/>
-  <v:f eqn="sum 0 0 @1"/>
-  <v:f eqn="prod @2 1 2"/>
-  <v:f eqn="prod @3 21600 pixelWidth"/>
-  <v:f eqn="prod @3 21600 pixelHeight"/>
-  <v:f eqn="sum @0 0 1"/>
-  <v:f eqn="prod @6 1 2"/>
-  <v:f eqn="prod @7 21600 pixelWidth"/>
-  <v:f eqn="sum @8 21600 0"/>
-  <v:f eqn="prod @7 21600 pixelHeight"/>
-  <v:f eqn="sum @10 21600 0"/>
- </v:formulas>
- <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
- <o:lock v:ext="edit" aspectratio="t"/>
-</v:shapetype><v:shape id="_x0000_i1025" type="#_x0000_t75" style='width:397.5pt;
- height:156pt'>
- <v:imagedata src="./guide001.gif"
-  o:title="Image2"/>
-</v:shape><![endif]--><![if !vml]><img border=0 width=530 height=208
-src="./guide001.gif" v:shapes="_x0000_i1025"><![endif]></span></p>
+<p><img src="./guide001.gif"></p>
 
-<p class=figuremarker><span>[Fig. 0]</span></p>
+<p>[Fig. 0]</p>
 
-<p align=center style='text-align:center'><span style='mso-bookmark:
-aboutFlexelink'><span style='font-size:10.0pt;mso-bidi-font-size:12.0pt;
-font-family:Courier'>&nbsp;</span></span></p>
-
-<p><span>As you can see, when a
+<p>As you can see, when a
 user query is received, Weblib determines which records from the database match
 it; then it ask BibFormat to format the obtained records. BibFormat looks at
 its rule repository and for each record determines which format has to be
 taken, applies the format specification and solves the possible links; gives
 all this (in a formatted way) back to Weblib and it makes a nice HTML page
-including the formatted results given by BibFormat among other info.</span></p>
+including the formatted results given by BibFormat among other info.</p>
 
-<p><span>The good point in all
+<p>The good point in all
 this is that anyone that has access to BibFormat rule repository is able to
 modify the final appearance of a query result in the CDS Search module without
-altering the logic of the search engine.</span></p>
+altering the logic of the search engine.</p>
 
-<p><span>In order to be able to
+<p>In order to be able to
 modify this BibFormat rule repository, a web configuration interface is
 provided. Trough this paper, we'll try to explain (in a friendly way and form
 the user point of view) how to access this interface, how it's structured and
-how to configure BibFormat trough it to achieve desired results.</span></p>
+how to configure BibFormat trough it to achieve desired results.</p>
 
-<span style='font-size:12.0pt;font-family:Tahoma;mso-fareast-font-family:"Times New Roman";
-mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:AR-SA'><br
-clear=all style='mso-special-character:line-break;page-break-before:always'>
-</span>
+<a name="4.2"></a><h3>4.2. How it works?</h3>
 
-<p>&nbsp;</p>
-
-<p><a name=howItWorks></a><a name="_Toc240508"></a><a
-name="_Toc241006"></a><a name="_Toc3803664"><span style='mso-bookmark:_Toc241006'><span
-style='mso-bookmark:_Toc240508'><span>2. - How
-it works?</span></span></span></a></p>
-
-<p><span>&nbsp;</span></p>
-
-<p><span>We've outlined which is
+<p>We've outlined which is
 the role of BibFormat inside the CDS, so it's time now to have an overview of
 how it works and how it's organized. We'll try not to be very technical,
 however a few explanation about the BibFormat repository and architecture is
-needed to understand how it works.</span></p>
+needed to understand how it works.</p>
 
-<p><span>BibFormat, basically,
+<p>BibFormat, basically,
 takes some bibliographic records as input and produces a formatted &amp; linked
 version of them as output. By "formatted" we mean that BibFormat can produce an
 output containing a transformed version of the input data (normally an HTML
@@ -398,57 +291,43 @@ view); the good part is that you can entirely specify the transformation to
 apply. At the same time, by "linked" we mean that you can ask BibFormat to
 include (if necessary) inside this formatted version references to some
 Internet resources that are related to the data from some pre-configured rules.
-</span></p>
+</p>
 
-<p><span>As an example, we could
+<p>As an example, we could
 imagine that you'd want to see the resulting records from CDS Search queries to
 show their title in bold followed by their authors separated by comas. For
 achieving this you'll have to go to the BibFormat configuration interface and
 define a behavior for BibFormat in which you describe how to format incoming
-records: </span></p>
+records:</p>
 
-<p><span>&nbsp;</span></p>
+<p>
 
-<div style='border:solid windowtext .5pt;padding:1.0pt 4.0pt 1.0pt 3.0pt'>
+<table border cellspacing="0" width="100%">
+<tr>
+<td>
+<pre>
 
-<p style='margin-top:0cm;margin-right:117.0pt;margin-bottom:0cm;
-margin-left:117.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 3.0pt'><span
-style='mso-bookmark:howItWorks'><span style='font-family:"Courier New"'>"&lt;b&gt;"
-$title "&lt;/b&gt;" </span></span></p>
+  "&lt;b&gt;" $title "&lt;/b&gt;"
+  forall($author){
+      $author separator(", ")
+  }
 
-<p style='margin-top:0cm;margin-right:117.0pt;margin-bottom:0cm;
-margin-left:117.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 3.0pt'><span
-style='mso-bookmark:howItWorks'><span style='font-family:"Courier New"'>forall($author){
-</span></span></p>
+</pre>
+</td>
+</tr>
+</table>
 
-<p style='margin-top:0cm;margin-right:117.0pt;margin-bottom:0cm;
-margin-left:117.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 3.0pt'><span
-style='mso-bookmark:howItWorks'><span style='font-family:"Courier New"'><span>  </span>$author separator(", ")</span></span></p>
+<p align="center">Figure 1.-
+A very first <em>Evaluation Language</em> example</p>
 
-<p style='margin-top:0cm;margin-right:117.0pt;margin-bottom:0cm;
-margin-left:117.0pt;margin-bottom:.0001pt;text-indent:0cm;page-break-after:
-avoid;border:none;mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:
-1.0pt 4.0pt 1.0pt 3.0pt'><span><span
-style='font-family:"Courier New"'>}</span></span></p>
-
-</div>
-
-<p class=MsoCaption align=center style='text-align:center'><span
-style='mso-bookmark:howItWorks'><a name="_Toc261502"></a><a name="_Toc261578"><span
-style='mso-bookmark:_Toc261502'>Figure <span style='mso-field-code:"SEQ Figure \\* ARABIC"'>1</span>.-
-A very first <i>Evaluation Language</i> </span></a>example</span></p>
-
-<p><span>Don't be scared!! It's a
+<p>Don't be scared!! It's a
 first approach to the way BibFormat allows you to describe formats. As you can
 see, BibFormat uses a special language that you'll have to learn if you want to
 be able to specify formats or links; it seems difficult (as much as a
 programming language) but you'll see that it's quite more easy than it seems at
-first sight.</span></p>
+first sight.</p>
 
-<p><span>In the next figure, is
+<p>In the next figure, is
 shown how BibFormat works internally. When BibFormat is called, it receives a
 set of bibliographic records to format. It separates each record and translates
 it into a set of what we call "internal variables"; these "internal variables"
@@ -459,184 +338,111 @@ the behavior repository for that one (let's say format) you've asked BibFormat
 to apply (when BibFormat is called, you can indicate which of the
 pre-configured behaviors to apply; this allows it to have more than one
 behavior); inside this behavior you can specify which data you want to appear,
-how it has to appear, some links if they exist…in other words, the format
+how it has to appear, some links if they exist... in other words, the format
 (actually, it's something more than a format, it describes how BibFormat has to
-behave for a given input; that's why we refer to it as behavior). <span> </span>As we've already said, you can include links
+behave for a given input; that's why we refer to it as behavior). As we've already said, you can include links
 in a behavior specification; links are a special BibFormat feature that helps
 you to reduce the maintenance of your formats: you can include a link in
-several formats or behaviors. </span></p>
+several formats or behaviors.</p>
 
-<span style='font-size:12.0pt;font-family:Tahoma;mso-fareast-font-family:"Times New Roman";
-mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:AR-SA'><br
-clear=all>
-</span>
+<p>The picture below,
+describes all this explanation.</p>
 
-<p><span>The picture below,
-describes all this explanation. </span></p>
+<p><img src="./guide003.jpg">
 
-<p><span>&nbsp;</span></p>
+<p>[Fig. 2]</p>
 
-<p style='text-indent:0cm'><span><!--[if gte vml 1]><v:shape
- id="_x0000_i1026" type="#_x0000_t75" style='width:477pt;height:237.75pt'>
- <v:imagedata src="guide002.png"
-  o:title="Image3"/>
-</v:shape><![endif]--><![if !vml]><img border=0 width=636 height=317
-src="./guide003.jpg" v:shapes="_x0000_i1026"><![endif]></span></p>
-
-<p class=figuremarker><span>&nbsp;</span></p>
-
-<p class=figuremarker><span>[Fig. 2]</span></p>
-
-<p><span>&nbsp;</span></p>
-
-<p><span>Summarizing, BibFormat can
+<p>Summarizing, BibFormat can
 transform an input made up of bibliographic records in an HTML output (not only
 HTML but any text-based output) according to certain pre-configured
 specifications (behaviors) that you can entirely define using a certain
-language.</span></p>
+language.</p>
 
-<p><span>Just to mention, currently
+<p>Just to mention, currently
 BibFormat is working taking OAI MARC XML as format for input records, but it
 can be adapted to other ways of inputs (reading a database, function call, etc)
-with a little of development.</span></p>
+with a little of development.</p>
 
-<u><span><br
-clear=all>
-</span></u>
+<a name="4.3"></a><h3>4.3. A first look at the web configuration interface</h3>
 
-<p><a name=firstLookAtWebIF></a><a name="_Toc240509"></a><a
-name="_Toc241007"></a><a name="_Toc3803665"><span style='mso-bookmark:_Toc241007'><span
-style='mso-bookmark:_Toc240509'><span style='mso-bookmark:firstLookAtWebIF'>3.
-- A first look at the web configuration interface</span></span></span></a><span
-style='mso-bookmark:firstLookAtWebIF'></span></p>
-
-<p><span style='mso-bookmark:firstLookAtWebIF'>&nbsp;</span></p>
-
-<p><span style='mso-bookmark:firstLookAtWebIF'>BibFormat can be
+<p>BibFormat can be
 configured through its configuration interface that is accessible via web. It's
 made up of a bunch of web pages that present you the main configuration aspects
 of BibFormat allowing you to change them. In this section we are going to have
 a first look at this web interface, how it's structured and its correspondence
-with BibFormat features.</span></p>
+with BibFormat features.</p>
 
-<p><span style='mso-bookmark:firstLookAtWebIF'>Before entering
+<p>Before entering
 these web pages you'll be asked for your accessing username &amp; password.
 Only certain users are allowed to access BibFormat WI; first you need a CDS
 account that you can create easily by using the standard CDS account manager;
 then you have to ask BibFormat administrator to give privileges to access the
-WI.</span></p>
+WI.</p>
 
-<p><span style='mso-bookmark:firstLookAtWebIF'><span> </span>Once your password is accepted you'll access
+<p>. Once your password is accepted you'll access
 the configuration interface. You'll see that is quite simple: It's structured
 in different sections; each of them corresponds to a BibFormat feature and you
 can navigate through them by using a navigation bar that is always present on
-the left.</span></p>
+the left.</p>
 
-<p><span style='mso-bookmark:firstLookAtWebIF'>&nbsp;</span></p>
+<p>[Fig. 3]</p>
 
-<p class=figuremarker><span style='mso-bookmark:firstLookAtWebIF'>[Fig. 3]</span></p>
-
-<p style='text-indent:0cm'><span style='mso-bookmark:firstLookAtWebIF'>&nbsp;</span></p>
-
-<p><span style='mso-bookmark:firstLookAtWebIF'>Here you are a list
+<p>Here you are a list
 of the different sections the interface offers you and their correspondence
-with BibFormat features:</span></p>
+with BibFormat features:</p>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l6 level1 lfo8;
-tab-stops:list 63.0pt'><span style='mso-bookmark:firstLookAtWebIF'><![if !supportLists]><span
-style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]><b>Behaviors</b>: This is the main section, the one you
+<ul>
+<li><strong>Behaviors:</strong> This is the main section, the one you
 enter by default when you access the web interface. It contains definitions for
 the different pre-configured output types or behaviors that allow you to define
 how you want BibFormat to behave when each output type is selected. More information
-in chapter <i>Defining output types: Behaviors</i> of this manual.</span></p>
+in chapter <em>Defining output types: Behaviors</em> of this manual.</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l6 level1 lfo8;
-tab-stops:list 63.0pt'><span style='mso-bookmark:firstLookAtWebIF'><![if !supportLists]><span
-style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]><b>OAI Extraction Rules</b>: The input types and
+<li><strong>OAI Extraction Rules:</strong> The input types and
 mapping rules for OAI MARC XML inputs are defined here. You'll find here the
 information about all the internal variables and their correspondence with the
-input XML tags. See chapter <i>Mapping the input</i> of this manual for more
-information.</span></p>
+input XML tags. See chapter <em>Mapping the input</em> of this manual for more
+information.</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l6 level1 lfo8;
-tab-stops:list 63.0pt'><span style='mso-bookmark:firstLookAtWebIF'><![if !supportLists]><span
-style='font-family:Symbol;mso-bidi-font-weight:bold'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]><b>Link Rules: </b>Allows you to access the link rules
-repository for defining the way links are generated. See chapter <i>Defining
-Links</i> for a more detailed description about the BibFormat linking system.<b></b></span></p>
+<li><strong>Link Rules:</strong> Allows you to access the link rules
+repository for defining the way links are generated. See chapter <em>Defining
+Links</em> for a more detailed description about the BibFormat linking system.</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l6 level1 lfo8;
-tab-stops:list 63.0pt'><span style='mso-bookmark:firstLookAtWebIF'><![if !supportLists]><span
-style='font-family:Symbol;mso-bidi-font-weight:bold'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]><b>UDFs: </b>Presents you a list of all the User
-Defined Functions (UDFs) that you can use inside <i>Evaluation Language </i>(<i>EL</i>)<i>
-</i>statements that are used for specifying different configuration aspects.
+<li><strong>UDFs:</strong> Presents you a list of all the User
+Defined Functions (UDFs) that you can use inside <em>Evaluation Language</em> (<em>EL</em>)
+statements that are used for specifying different configuration aspects.
 You'll also be able to modify or extend this list within this section.
-Everything about using UDFs and defining new ones in chapter <i>User Defined
-Functions (UDFs)</i>.<b></b></span></p>
+Everything about using UDFs and defining new ones in chapter <em>User Defined
+Functions (UDFs)</em>.</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l6 level1 lfo8;
-tab-stops:list 63.0pt'><span style='mso-bookmark:firstLookAtWebIF'><![if !supportLists]><span
-style='font-family:Symbol;mso-bidi-font-weight:bold'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]><b>Formats: </b>Another <i>EL</i> feature: You can
-define a certain piece of <i>EL</i> code under a name for re-using it whenever
-you want. See chapter <i>Formats</i>.<b></b></span></p>
+<li><strong>Formats:</strong> Another <em>EL</em> feature: You can
+define a certain piece of <em>EL</em> code under a name for re-using it whenever
+you want. See chapter <em>Formats</em>.</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l6 level1 lfo8;
-tab-stops:list 63.0pt'><span style='mso-bookmark:firstLookAtWebIF'><![if !supportLists]><span
-style='font-family:Symbol;mso-bidi-font-weight:bold'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]><b>KBs: </b>A complete management interface for <i>Knowledge
-Bases </i>(<i>KBs</i>); those <i>KBs</i> will also be available inside <i>EL</i>
-statements. See chapter <i>Knowledge Bases(Kbs)</i> for more specific
-information. <b></b></span></p>
+<li><strong>KBs:</strong> A complete management interface for <em>Knowledge
+Bases</em> (<em>KBs</em>); those <em>KBs</em> will also be available inside <em>EL</em>
+statements. See chapter <em>Knowledge Bases(Kbs)</em> for more specific
+information.</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l6 level1 lfo8;
-tab-stops:list 63.0pt'><span style='mso-bookmark:firstLookAtWebIF'><![if !supportLists]><span
-style='font-family:Symbol;mso-bidi-font-weight:bold'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]><b>Execution Test: </b>You'll be able to execute
+<li><strong>Execution Test:</strong> You'll be able to execute
 BibFormat from this section and view the results and some debug info in a web
-page. You have to specify an input data file (through a URL). <b></b></span></p>
+page. You have to specify an input data file (through a URL).</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l6 level1 lfo8;
-tab-stops:list 63.0pt'><span style='mso-bookmark:firstLookAtWebIF'><![if !supportLists]><span
-style='font-family:Symbol;mso-bidi-font-weight:bold'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]><b>User management: </b>Allows you to define which CDS
-users can access or not the BibFormat web interface.<b></b></span></p>
+<li><strong>User management:</strong> Allows you to define which CDS
+users can access or not the BibFormat web interface.</li>
 
-<p style='margin-left:45.0pt;text-indent:0cm'><span
-style='mso-bookmark:firstLookAtWebIF'><b>&nbsp;</b></span></p>
+</ul>
 
-<p><span style='mso-bookmark:firstLookAtWebIF'>Each section has
+<p>Each section has
 different particularities but the way of dealing with them follows a common
 line through the interface. However, each section with their common things and
 particular characteristics are treated in the following chapters of this
-manual.</span></p>
+manual.</p>
 
-<p><span style='mso-bookmark:firstLookAtWebIF'>&nbsp;</span></p>
+<a name="4.4"></a><h3>4.4. Mapping the input (OAI Extraction Rules)</h3>
 
-<p><span style='mso-bookmark:firstLookAtWebIF'>&nbsp;</span></p>
-
-<p><span style='mso-bookmark:firstLookAtWebIF'>&nbsp;</span></p>
-
-<p><span style='mso-bookmark:firstLookAtWebIF'>&nbsp;</span></p>
-
-<span style='mso-bookmark:firstLookAtWebIF'></span>
-
-<p>&nbsp;</p>
-
-<u><span><br clear=all>
-</span></u>
-
-<p><a name="_Toc240510"></a><a name="_Toc241008"></a><a
-name="_Toc3803666"><span style='mso-bookmark:_Toc241008'><span
-style='mso-bookmark:_Toc240510'>4. - Mapping the input (OAI Extraction Rules)</span></span></a></p>
-
-<p>&nbsp;</p>
-
-<p>We have already spoken a bit about BibFormat <i>internal
-variables</i>. These are a key point to understand the BibFormat way of
+<p>We have already spoken a bit about BibFormat <em>internal
+variables</em>. These are a key point to understand the BibFormat way of
 working. As you know, BibFormat takes some bibliographic records as input and,
 according to some pre-configured behavior, formats them into HTML, for example.
 The problem is that this input records can come in several formats: different
@@ -644,520 +450,201 @@ XML conventions, database records, etc. For now, at CDS we only consider that
 the input comes in OAI MARC XML but for the near future we'll may be have to
 extend it to accept other input formats.</p>
 
-<p>That's the reason why <i>internal variables</i> appear; they
+<p>That's the reason why <em>internal variables</em> appear; they
 provide a common way to refer to input data without relaying in any concrete
 format. In other words, we will define BibFormat links and behaviors referring
-to these <i>internal variables</i> and we'll have some rules that define how to
+to these <em>internal variables</em> and we'll have some rules that define how to
 map an input format to them, so we would be able to use any BibFormat defined
-behavior with any input that can be mapped to <i>internal variables</i>.</p>
+behavior with any input that can be mapped to <em>internal variables</em>.</p>
 
-<p>&nbsp;</p>
+<p><img src="./guide004.gif"></p>
 
-<p><!--[if gte vml 1]><v:shape id="_x0000_i1027" type="#_x0000_t75"
- style='width:455.25pt;height:153.75pt'>
- <v:imagedata src="./guide004.gif"
-  o:title="Image4"/>
-</v:shape><![endif]--><![if !vml]><img border=0 width=607 height=205
-src="./guide004.gif" v:shapes="_x0000_i1027"><![endif]></p>
-
-<p class=figuremarker>[Fig. 4]</p>
-
-<p>&nbsp;</p>
+<p>[Fig. 4]</p>
 
 <p>You shouldn't worry about this because is more in the
-development/administration side, but it's important to know where <i>internal
-variables </i>come from and what they refer to. Besides, for CDS we only
+development/administration side, but it's important to know where <em>internal
+variables</em> come from and what they refer to. Besides, for CDS we only
 consider the incoming data in OAI MARC XML format, so we'll talk only about
 this case.</p>
 
-<p><i>Internal variables</i> are quite a simple concept: It's just
+<p><em>Internal variables</em> are quite a simple concept: It's just
 a label that represents some values from the input. Besides, a variable can
-have <i>fields</i> that are also labels that represent values from the input
+have <em>fields</em> that are also labels that represent values from the input
 but that are related to other under the variable (e.g. You can have a variable
 that maps authors and another that maps authors home institutes independently;
 but if you want to have represent an author and his home institute you need to
 relate these two variables in some way). Variables and their fields also
-support multiple values. </p>
+support multiple values.</p>
 
 <p>Focusing on OAI MARC XML, the concept of variable and field is
 already in the input structure.:</p>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l13 level1 lfo9;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>Each occurrence of OAI MARC XML <i>varfield</i> element
-will correspond to a different variable value.</p>
-
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l13 level1 lfo9;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>Each occurrence of OAI MARC XML <i>subfield</i> inside
-a certain <i>varfield </i>element will correspond to a different field value of
-the variable that maps the <i>varfield</i>.</p>
+<ul>
+<li>Each occurrence of OAI MARC XML <em>varfield</em> element
+will correspond to a different variable value.</li>
+<li>Each occurrence of OAI MARC XML <em>subfield</em> inside
+a certain <em>varfield</em> element will correspond to a different field value of
+the variable that maps the <em>varfield</em>.</li>
+</ul>
 
 <p>So what we will have in BibFormat is a set of rules that tells a
-variable name to which <i>varfield </i>element corresponds and each variable
-field name which <i>subfield</i> element maps. Trough the web interface you'll
+variable name to which <em>varfield</em> element corresponds and each variable
+field name which <em>subfield</em> element maps. Trough the web interface you'll
 be able to add or delete new fields to variables or variables themselves,
 you'll be able even to modify the mapping tags of variables (this way you can
-keep your formats independent of changes in the meaning of MARC tags). </p>
+keep your formats independent of changes in the meaning of MARC tags).</p>
 
-<p>In the web interface, all this is located in <i>OAI Ext. Rules</i>
+<p>In the web interface, all this is located in <em>OAI Ext. Rules</em>
 section as you can see in the following figure:</p>
 
-<p>&nbsp;</p>
-
-<p class=figuremarker>[Fig. 5]</p>
+<p>[Fig. 5]</p>
 
 <p>Let's illustrate how BibFormat maps a certain input to variables
 and fields with an example:</p>
 
 <p>We have this variable &amp; field definition on BibFormat:</p>
 
-<p>&nbsp;</p>
+<p>
 
-<table border=1 cellspacing=0 cellpadding=0 width=624 style='width:468.0pt;
- margin-left:-3.6pt;border-collapse:collapse;border:none;mso-border-alt:solid windowtext .5pt;
- mso-padding-alt:0cm 5.4pt 0cm 5.4pt'>
- <tr>
-  <td width=41 valign=top style='width:30.9pt;border:solid windowtext .5pt;
-  background:#E0E0E0;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><b><span
-  style='font-size:10.0pt;mso-bidi-font-size:12.0pt'>Var. label</span></b></p>
-  </td>
-  <td width=205 valign=top style='width:153.8pt;border:solid windowtext .5pt;
-  border-left:none;mso-border-left-alt:solid windowtext .5pt;background:#E0E0E0;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><b><span
-  style='font-size:10.0pt;mso-bidi-font-size:12.0pt'>Mapping tag</span></b></p>
-  </td>
-  <td width=67 valign=top style='width:50.35pt;border:solid windowtext .5pt;
-  border-left:none;mso-border-left-alt:solid windowtext .5pt;background:#E0E0E0;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><b><span
-  style='font-size:10.0pt;mso-bidi-font-size:12.0pt'>Mult. V.</span></b></p>
-  </td>
-  <td width=311 valign=top style='width:232.95pt;border:solid windowtext .5pt;
-  border-left:none;mso-border-left-alt:solid windowtext .5pt;background:#E0E0E0;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><b><span
-  style='font-size:10.0pt;mso-bidi-font-size:12.0pt'>Fields</span></b></p>
-  </td>
- </tr>
- <tr>
-  <td width=41 valign=top style='width:30.9pt;border:solid windowtext .5pt;
-  border-top:none;mso-border-top-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'><span style='font-size:9.0pt;
-  mso-bidi-font-size:12.0pt'>100</span></p>
-  </td>
-  <td width=205 valign=top style='width:153.8pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><span
-  style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>&lt;varfield
-  id=&quot;100&quot; i1=&quot;&quot; i2=&quot;&quot;&gt;</span></p>
-  </td>
-  <td width=67 valign=top style='width:50.35pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><span
-  style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>Yes</span></p>
-  </td>
-  <td width=311 valign=top style='width:232.95pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><span
-  style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>&nbsp;</span></p>
-  <table border=1 cellspacing=0 cellpadding=0 style='border-collapse:collapse;
-   border:none;mso-border-alt:solid windowtext .5pt;mso-padding-alt:0cm 5.4pt 0cm 5.4pt'>
-   <tr>
-    <td width=74 valign=top style='width:55.65pt;border:solid windowtext .5pt;
-    background:#D9D9D9;padding:0cm 5.4pt 0cm 5.4pt'>
-    <p align=center style='text-align:center;text-indent:0cm'><span
-    style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>Field label</span></p>
-    </td>
-    <td width=172 valign=top style='width:128.7pt;border:solid windowtext .5pt;
-    border-left:none;mso-border-left-alt:solid windowtext .5pt;background:#D9D9D9;
-    padding:0cm 5.4pt 0cm 5.4pt'>
-    <p align=center style='text-align:center;text-indent:0cm'><span
-    style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>Mapping tag</span></p>
-    </td>
-   </tr>
-   <tr>
-    <td width=74 valign=top style='width:55.65pt;border:solid windowtext .5pt;
-    border-top:none;mso-border-top-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt'>
-    <p align=center style='text-align:center;text-indent:0cm'><span
-    style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>a</span></p>
-    </td>
-    <td width=172 valign=top style='width:128.7pt;border-top:none;border-left:
-    none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-    mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-    padding:0cm 5.4pt 0cm 5.4pt'>
-    <p align=center style='text-align:center;text-indent:0cm'><span
-    style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>&lt;subfield
-    label=&quot;a&quot;&gt;</span></p>
-    </td>
-   </tr>
-   <tr>
-    <td width=74 valign=top style='width:55.65pt;border:solid windowtext .5pt;
-    border-top:none;mso-border-top-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt'>
-    <p align=center style='text-align:center;text-indent:0cm'><span
-    style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>e</span></p>
-    </td>
-    <td width=172 valign=top style='width:128.7pt;border-top:none;border-left:
-    none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-    mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-    padding:0cm 5.4pt 0cm 5.4pt'>
-    <p align=center style='text-align:center;text-indent:0cm'><span
-    style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>&lt;subfield
-    label=&quot;e&quot;&gt;</span></p>
-    </td>
-   </tr>
+<table border cellspacing='0' cellpadding='5'>
+<tr bgcolor='#e0e0e0'>
+<th align='center'>Var.<br>label</th>
+<th align='center'>Mapping tag</th>
+<th align='center'>Mult. V.</th>
+<th align='center'>Fields</th>
+</tr>
+<tr>
+<td align='center'>100</td>
+<td align='center'>&lt;varfield id="100" i1="" i2=""&gt;</td>
+<td align='center'>Yes</td>
+<td align='center'>
+
+  <table border cellspacing='0'>
+  <tr bgcolor='#e0e0e0'>
+  <td align='center'>Field label</td>
+  <td align='center'>Mapping tag</td>
+  </tr>
+  <tr>
+  <td align='center'>a</td>
+  <td align='center'>&lt;subfield label="a"&gt;</td>
+  </tr>
+  <tr>
+  <td align='center'>e</td>
+  <td align='center'>&lt;subfield label="e"&gt;</td>
+  </tr>
   </table>
-  <p align=center style='text-align:center;text-indent:0cm'><span
-  style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>&nbsp;</span></p>
-  <p align=center style='text-align:center;text-indent:0cm'>&nbsp;<span
-  style='font-size:9.0pt;mso-bidi-font-size:12.0pt'></span></p>
-  </td>
- </tr>
- <tr>
-  <td width=41 valign=top style='width:30.9pt;border:solid windowtext .5pt;
-  border-top:none;mso-border-top-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'><span style='font-size:9.0pt;
-  mso-bidi-font-size:12.0pt'>909C0</span></p>
-  </td>
-  <td width=205 valign=top style='width:153.8pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><span
-  style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>&lt;varfield
-  id=&quot;909&quot; i1=&quot;C&quot; i2=&quot;0&quot;&gt;</span></p>
-  </td>
-  <td width=67 valign=top style='width:50.35pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><span
-  style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>No</span></p>
-  </td>
-  <td width=311 valign=top style='width:232.95pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><span
-  style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>&nbsp;</span></p>
-  <p align=center style='text-align:center;text-indent:0cm'><span
-  style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>&nbsp;</span></p>
-  <table border=1 cellspacing=0 cellpadding=0 style='border-collapse:collapse;
-   border:none;mso-border-alt:solid windowtext .5pt;mso-padding-alt:0cm 5.4pt 0cm 5.4pt'>
-   <tr>
-    <td width=74 valign=top style='width:55.65pt;border:solid windowtext .5pt;
-    background:#D9D9D9;padding:0cm 5.4pt 0cm 5.4pt'>
-    <p align=center style='text-align:center;text-indent:0cm'><span
-    style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>Field label</span></p>
-    </td>
-    <td width=172 valign=top style='width:128.7pt;border:solid windowtext .5pt;
-    border-left:none;mso-border-left-alt:solid windowtext .5pt;background:#D9D9D9;
-    padding:0cm 5.4pt 0cm 5.4pt'>
-    <p align=center style='text-align:center;text-indent:0cm'><span
-    style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>Mapping tag</span></p>
-    </td>
-   </tr>
-   <tr>
-    <td width=74 valign=top style='width:55.65pt;border:solid windowtext .5pt;
-    border-top:none;mso-border-top-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt'>
-    <p align=center style='text-align:center;text-indent:0cm'><span
-    style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>b</span></p>
-    </td>
-    <td width=172 valign=top style='width:128.7pt;border-top:none;border-left:
-    none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-    mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-    padding:0cm 5.4pt 0cm 5.4pt'>
-    <p align=center style='text-align:center;text-indent:0cm'><span
-    style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>&lt;subfield
-    label=&quot;b&quot;&gt;</span></p>
-    </td>
-   </tr>
+
+</td>
+</tr>
+<tr>
+<td align='center'>909C0</td>
+<td align='center'>&lt;varfield id="909" i1="C" i2="0"&gt;</td>
+<td align='center'>No</td>
+<td>
+
+  <table border cellspacing='0'>
+  <tr bgcolor='#e0e0e0'>
+  <td align='center'>Field label</td>
+  <td align='center'>Mapping tag</td>
+  </tr>
+  <tr>
+  <td align='center'>b</td>
+  <td align='center'>&lt;subfield label="b"&gt;</td>
+  </tr>
   </table>
-  <p align=center style='text-align:center;text-indent:0cm'><span
-  style='font-size:9.0pt;mso-bidi-font-size:12.0pt'>&nbsp;</span></p>
-  <p align=center style='text-align:center;text-indent:0cm'>&nbsp;<span
-  style='font-size:9.0pt;mso-bidi-font-size:12.0pt'></span></p>
-  </td>
- </tr>
+
+</td>
+</tr>
 </table>
 
-<p>&nbsp;</p>
+<p>
 
 <p>And then a record like the following arrives as input:</p>
 
-<p>&nbsp;</p>
+<p>
 
-<div style='border:solid windowtext .5pt;padding:1.0pt 4.0pt 1.0pt 4.0pt'>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'>&lt;oai_marc&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'><span>   </span>&lt;varfield id=&quot;037&quot;
-i1=&quot;&quot; i2=&quot;&quot;&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'><span>      </span>&lt;subfield
-label=&quot;a&quot;&gt;SCAN-0009119&lt;/subfield&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'><span>   </span>&lt;/varfield&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'><span>   </span>&lt;varfield id=&quot;100&quot;
-i1=&quot;&quot; i2=&quot;&quot;&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'><span>      </span>&lt;subfield
-label=&quot;a&quot;&gt;Racah, Giulio&lt;/subfield&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'><span>   </span>&lt;/varfield&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'><span>  </span>&lt;varfield id=&quot;100&quot;
-i1=&quot;&quot; i2=&quot;&quot;&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'><span>      </span>&lt;subfield
-label=&quot;a&quot;&gt;Guignard, G&lt;/subfield&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'><span>      </span>&lt;subfield
-label=&quot;e&quot;&gt;editor&lt;/subfield&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'><span>   </span>&lt;/varfield&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'><span>   </span>&lt;varfield id=&quot;909&quot;
-i1=&quot;C&quot; i2=&quot;0&quot;&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'><span>      </span>&lt;subfield
-label=&quot;b&quot;&gt;11&lt;/subfield&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'><span>   </span>&lt;/varfield&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'><span>   </span>&lt;varfield id=&quot;909&quot;
-i1=&quot;C&quot; i2=&quot;0&quot;&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'><span>      </span>&lt;subfield
-label=&quot;b&quot;&gt;12&lt;/subfield&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'><span>   </span>&lt;/varfield&gt;</span></p>
-
-<p style='margin-top:0cm;margin-right:72.0pt;margin-bottom:0cm;
-margin-left:63.0pt;margin-bottom:.0001pt;text-indent:0cm;border:none;
-mso-border-alt:solid windowtext .5pt;padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><span
-style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'>&lt;/oai_marc&gt;</span></p>
-
-</div>
-
-<span style='font-size:12.0pt;font-family:Tahoma;mso-fareast-font-family:"Times New Roman";
-mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:AR-SA'><br
-clear=all style='mso-special-character:line-break;page-break-before:always'>
-</span>
-
-<p>&nbsp;</p>
+<table border cellspacing="0" width="100%">
+<tr>
+<td>
+<pre>
+  &lt;oai_marc&gt;
+   &lt;varfield id="037" i1="" i2=""&gt;
+    &lt;subfield label="a"&gt;SCAN-0009119&lt;/subfield&gt;
+   &lt;/varfield&gt;
+   &lt;varfield id="100" i1="" i2=""&gt;
+    &lt;subfield label="a"&gt;Racah, Giulio&lt;/subfield&gt;
+   &lt;/varfield&gt;
+   &lt;varfield id="100" i1="" i2=""&gt;
+    &lt;subfield label="a"&gt;Guignard, G&lt;/subfield&gt;
+    &lt;subfield label="e"&gt;editor&lt;/subfield&gt;
+   &lt;/varfield&gt;
+   &lt;varfield id="909" i1="C" i2="0"&gt;
+    &lt;subfield label="b"&gt;11&lt;/subfield&gt;
+   &lt;/varfield&gt;
+   &lt;varfield id="909" i1="C" i2="0"&gt;
+    &lt;subfield label="b"&gt;12&lt;/subfield&gt;
+   &lt;/varfield&gt;
+  &lt;/oai_marc&gt;
+</pre>
+</td>
+</tr>
+</table>
 
 <p>The result of the mapping would be like this:</p>
 
-<p>&nbsp;</p>
+<p>
 
-<p>&nbsp;</p>
-
-<table border=1 cellspacing=0 cellpadding=0 style='border-collapse:collapse;
- border:none;mso-border-alt:solid windowtext .5pt;mso-padding-alt:0cm 5.4pt 0cm 5.4pt'>
- <tr>
-  <td width=590 colspan=4 valign=top style='width:442.8pt;border:solid windowtext .5pt;
-  background:#E0E0E0;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><b>Variable
-  "100"</b></p>
-  </td>
- </tr>
- <tr>
-  <td width=118 valign=top style='width:88.55pt;border:solid windowtext .5pt;
-  border-top:none;mso-border-top-alt:solid windowtext .5pt;background:#E0E0E0;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'>Value#
-  0</p>
-  </td>
-  <td width=118 valign=top style='width:88.55pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'>&nbsp;</p>
-  </td>
-  <td width=177 valign=top style='width:132.85pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  background:#E0E0E0;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'>Field "a" value</p>
-  </td>
-  <td width=177 style='width:132.85pt;border-top:none;border-left:none;
-  border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><span
-  style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'>Racah,
-  Giulio</span></p>
-  </td>
- </tr>
- <tr>
-  <td width=118 rowspan=2 style='width:88.55pt;border:solid windowtext .5pt;
-  border-top:none;mso-border-top-alt:solid windowtext .5pt;background:#E0E0E0;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'>Value#
-  1</p>
-  </td>
-  <td width=118 rowspan=2 style='width:88.55pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'>&nbsp;</p>
-  </td>
-  <td width=177 valign=top style='width:132.85pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  background:#E0E0E0;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'>Field "a" value</p>
-  </td>
-  <td width=177 style='width:132.85pt;border-top:none;border-left:none;
-  border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><span
-  style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'>Guignard,
-  G</span></p>
-  </td>
- </tr>
- <tr>
-  <td width=177 valign=top style='width:132.85pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  background:#E0E0E0;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'>Field "e" value</p>
-  </td>
-  <td width=177 style='width:132.85pt;border-top:none;border-left:none;
-  border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><span
-  style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'>editor</span></p>
-  </td>
- </tr>
+<table border cellspacing='0' cellpadding='5' width="60%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<tr bgcolor='#e0e0e0'>
+<th align='center' colspan='4'>Variable "100"</th>
+</tr>
+<tr>
+<td align='center' bgcolor='#e0e0e0'>Value# 0</td>
+<td>&nbsp;</td>
+<td align='center' bgcolor='#e0e0e0'>Field "a" value</td>
+<td align='center'><samp>Racah, Giulio</samp></td>
+</tr>
+<tr>
+<td align='center' rowspan='2' bgcolor='#e0e0e0'>Value# 1</td>
+<td align='center' rowspan='2'>&nbsp;</td>
+<td align='center' bgcolor='#e0e0e0'>Field "a" value</td>
+<td align='center'><samp>Guignard, G</samp></td>
+</tr>
+<tr>
+<td align='center' bgcolor='#e0e0e0'>Field "e" value</td>
+<td align='center'><samp>editor</samp></td>
+</tr>
 </table>
 
-<p>&nbsp;</p>
+<p>
 
-<p>&nbsp;</p>
-
-<table border=1 cellspacing=0 cellpadding=0 style='border-collapse:collapse;
- border:none;mso-border-alt:solid windowtext .5pt;mso-padding-alt:0cm 5.4pt 0cm 5.4pt'>
- <tr>
-  <td width=590 colspan=4 valign=top style='width:442.8pt;border:solid windowtext .5pt;
-  background:#E0E0E0;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><b>Variable
-  "909C0"</b></p>
-  </td>
- </tr>
- <tr>
-  <td width=118 valign=top style='width:88.55pt;border:solid windowtext .5pt;
-  border-top:none;mso-border-top-alt:solid windowtext .5pt;background:#E0E0E0;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'>Value#
-  0</p>
-  </td>
-  <td width=118 valign=top style='width:88.55pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'>&nbsp;</p>
-  </td>
-  <td width=177 valign=top style='width:132.85pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  background:#E0E0E0;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'>Field "b" value</p>
-  </td>
-  <td width=177 style='width:132.85pt;border-top:none;border-left:none;
-  border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><span
-  style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:Courier'>12</span></p>
-  </td>
- </tr>
+<table border cellspacing='0' cellpadding='5' width="60%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<tr bgcolor='#e0e0e0'>
+<th align='center' colspan='4'>Variable "909C0"</th>
+</tr>
+<tr>
+<td align='center'>Value# 0</td>
+<td align='center'>&nbsp;</td>
+<td align='center'>Field "b" value</td>
+<td align='center'><samp>12</samp></td>
+</tr>
 </table>
 
-<p>&nbsp;</p>
-
-<p>Notice how <i>varfield 037</i> is not considered because there
+<p>Notice how <em>varfield 037</em> is not considered because there
 isn't an entry in the BibFormat configuration. Also notice how the values are
-created: if "allow multiple values" is set to "Yes" each occurrence of a <i>varfield</i>
+created: if "allow multiple values" is set to "Yes" each occurrence of a <em>varfield</em>
 element determines a new value (variable "100"); in other case, the last value
 is taken as single value for the variable (variable "909C0").</p>
 
-<p>&nbsp;</p>
-
-<u><span><br clear=all>
-</span></u>
-
-<p><a name="_Toc240511"></a><a name="_Toc241009"></a><a
-name="_Toc3803667"><span style='mso-bookmark:_Toc241009'><span
-style='mso-bookmark:_Toc240511'>5. - Defining output types: Behaviors</span></span></a>
-</p>
-
-<p>&nbsp;</p>
+<a name="4.5"></a><h3>4.5. Defining output types: Behaviors</h3>
 
 <p>Now that we already know how internal variables are structured
 and what they represent in the input, it's time to have a look at how to
@@ -1165,40 +652,32 @@ configure BibFormat to transform that input data mapped into variables into
 HTML results (although any text-based output could be generated).</p>
 
 <p>When BibFormat is asked to format a bunch of bibliographic
-records, it is also necessary to specify which <i>output type</i> it has to
+records, it is also necessary to specify which <em>output type</em> it has to
 use. This output type is a string that identifies a pre-configured set of
 conditions and actions that tells BibFormat how to behave with the given input
-data (that's why the terms <i>output type</i> and <i>behavior</i> are used
+data (that's why the terms <em>output type</em> and <em>behavior</em> are used
 indifferently along this document).</p>
 
 <p>BibFormat can have several pre-configured behaviors each one
 identified by a different label. There are two different types of behaviors
 (you can choose the behavior type when you define it):</p>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l2 level1 lfo10;
-tab-stops:list 63.0pt'><![if !supportLists]>1.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span><![endif]>Normal <span style='font-family:Wingdings;mso-ascii-font-family:
-Tahoma;mso-hansi-font-family:Tahoma;mso-char-type:symbol;mso-symbol-font-family:
-Wingdings'><span style='mso-char-type:symbol;mso-symbol-font-family:Wingdings'>à</span></span>
-Consists in a behavior that outputs exactly the result of its evaluation.</p>
-
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l2 level1 lfo10;
-tab-stops:list 63.0pt'><![if !supportLists]>2.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span><![endif]>Input Erich (only for XML inputs)<span style='font-family:
-Wingdings;mso-ascii-font-family:Tahoma;mso-hansi-font-family:Tahoma;mso-char-type:
-symbol;mso-symbol-font-family:Wingdings'><span style='mso-char-type:symbol;
-mso-symbol-font-family:Wingdings'>à</span></span> It echoes each xml record
+<ol>
+<li>Normal: 
+Consists in a behavior that outputs exactly the result of its evaluation.</li>
+<li>Input Erich (only for XML inputs): It echoes each xml record
 from the input inserting the behavior result just before the xml closing
-element of the record.</p>
+element of the record.</li>
+</ol>
 
 <p>Each behavior contains an ordered list of conditions; a
 condition can contain zero or more associated actions (actions are ordered
-inside a condition). A condition is a behavior item described by an <i>Evaluation
-Language</i> expression that gives as result "TRUE" or "FALSE". An action is an
-<i>Evaluation Language</i> (<i>EL</i>) statement that produces any output. </p>
+inside a condition). A condition is a behavior item described by an <em>Evaluation
+Language</em> expression that gives as result "TRUE" or "FALSE". An action is an
+<em>Evaluation Language</em> (<em>EL</em>) statement that produces any output.</p>
 
 <p>When BibFormat is called to format a set of input records with a
-given behavior label, it looks for the behavior conditions. It evaluates their <i>EL</i>
+given behavior label, it looks for the behavior conditions. It evaluates their <em>EL</em>
 in order and when one of them produces "TRUE" as result, it looks for their
 associated actions. Then BibFormat evaluates the actions in the specified order
 and concatenates their result.</p>
@@ -1206,10 +685,10 @@ and concatenates their result.</p>
 <p>By using different conditions you can specify alternative
 formats inside a behavior (imagine that you want to format a record differently
 depending on its base number); it's true that you could also reach this
-solution by using <i>EL IF</i> statements, but it's more clear, efficient and
+solution by using <em>EL IF</em> statements, but it's more clear, efficient and
 re-usable (you can change one condition without touching the rest or you can
 give it more priority than others, that means give it the chance to be
-evaluated before others, by changing its apply order). </p>
+evaluated before others, by changing its apply order).</p>
 
 <p>Actions are used for specifying the format itself or the actions
 you want to carry on with in case the condition is accomplished.</p>
@@ -1218,11 +697,7 @@ you want to carry on with in case the condition is accomplished.</p>
 modify the ones that already exist. The use is quite easy: you just have to
 select the link in the desired item with the operation you want to do over it.</p>
 
-<p>&nbsp;</p>
-
-<p class=figuremarker>[Fig. 6]</p>
-
-<p>&nbsp;</p>
+<p>[Fig. 6]</p>
 
 <p>Let's have a look at a simple example to illustrate how to
 define behavior that fit our needs:</p>
@@ -1232,225 +707,150 @@ records but depending on their base number you want to apply different formats.
 Whenever a record from base 27 (standards) arrives we want only to show its
 title and the standard numbers, in other case a default format will be applied
 in which the title and authors are shown. We'll assume CDS variable notation
-and that the input rules are defined properly. </p>
+and that the input rules are defined properly.</p>
 
 <p>We are going to define a new NORMAL behavior for this new
-situation, let's call it <i>SIMPLE</i>. In it we'll need two conditions to be
+situation, let's call it <em>SIMPLE</em>. In it we'll need two conditions to be
 defined: one for applying the default format and another one for the 27-base
 special one. The base number comes in variable 909C0.b, so the conditions would
 be based on this variable content.</p>
 
 <p>The result behavior should be defined like this:</p>
 
-<p>&nbsp;</p>
+<p>
 
-<table border=1 cellspacing=0 cellpadding=0 style='border-collapse:collapse;
- border:none;mso-border-alt:solid windowtext .5pt;mso-padding-alt:0cm 5.4pt 0cm 5.4pt'>
- <tr>
-  <td width=650 colspan=2 valign=top style='width:487.8pt;border:solid windowtext .5pt;
-  background:#0C0C0C;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><b>SIMPLE
-  </b><b><span style='font-size:8.0pt;mso-bidi-font-size:12.0pt'>(NORMAL)</span></b></p>
-  </td>
- </tr>
- <tr>
-  <td width=55 valign=top style='width:41.4pt;border:solid windowtext .5pt;
-  border-top:none;mso-border-top-alt:solid windowtext .5pt;background:#E6E6E6;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'>10</p>
-  </td>
-  <td width=595 valign=top style='width:446.4pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  background:#E6E6E6;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'>$909C0.b="27"</p>
-  </td>
- </tr>
- <tr>
-  <td width=650 colspan=2 valign=top style='width:487.8pt;border:solid windowtext .5pt;
-  border-top:none;mso-border-top-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'>&nbsp;</p>
-  <p style='text-indent:0cm'>"&lt;b&gt;"$245.a"&lt;/b&gt;"</p>
-  <p style='text-indent:0cm'>forall($0248.a){</p>
-  <p style='text-indent:0cm'><span> 
-  </span>rep_prefix(" - ")<span> 
-  </span>$0248.a&nbsp;separator(&quot;; &quot;)&nbsp;</p>
-  <p style='text-indent:0cm'>}</p>
-  <p style='text-indent:0cm'>&nbsp;</p>
-  </td>
- </tr>
- <tr>
-  <td width=55 valign=top style='width:41.4pt;border:solid windowtext .5pt;
-  border-top:none;mso-border-top-alt:solid windowtext .5pt;background:#E6E6E6;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'>50</p>
-  </td>
-  <td width=595 valign=top style='width:446.4pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  background:#E6E6E6;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'>""=""</p>
-  </td>
- </tr>
- <tr>
-  <td width=650 colspan=2 valign=top style='width:487.8pt;border:solid windowtext .5pt;
-  border-top:none;mso-border-top-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'>&nbsp;</p>
-  <p style='text-indent:0cm'>"&lt;b&gt;"$245.a"&lt;/b&gt;"</p>
-  <p style='text-indent:0cm'>forall($100.a){</p>
-  <p style='text-indent:0cm'><span style="mso-spacerun: yes"> 
-  </span>rep_prefix(" -<span style="mso-spacerun: yes">  </span>Authors:
-  ")<span style="mso-spacerun: yes">  </span>$100.a&nbsp;separator(&quot;;
-  &quot;)&nbsp;</p>
-  <p style='text-indent:0cm'>}</p>
-  <p style='text-indent:0cm'>&nbsp;</p>
-  </td>
- </tr>
+<table border cellspacing='0' width="60%">
+<tr>
+<th align='center' colspan='2' bgcolor='#a0a0a0'>SIMPLE<small>(NORMAL)</small></th>
+</tr>
+<tr>
+<td bgcolor='#e6e6e6'>10</td>
+<td bgcolor='#e6e6e6'>$909C0.b="27"</td>
+</tr>
+<tr>
+<td colspan='2'>
+<pre>
+
+"&lt;b&gt;"$245.a"&lt;/b&gt;"
+forall($0248.a){
+&nbsp;rep_prefix(" - ") $0248.a separator("; ")
+}
+
+</pre>
+</td>
+</tr>
+<tr>
+<td bgcolor='#e6e6e6'>50</td>
+<td bgcolor='#e6e6e6'>""=""</td>
+</tr>
+<tr>
+<td colspan='2'>
+<pre>
+
+"&lt;b"$245.a"&lt;/b&gt;"
+forall($100.a){
+&nbsp;rep_prefix(" - Authors:") $100.a separator("; ")
+}
+
+</pre>
+</td>
+</tr>
 </table>
 
-<p>&nbsp;</p>
+<p>
 
 <p>Some explanations on this example are needed:</p>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l1 level1 lfo12;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>As you can see we have defined two conditions: one for
+<ul>
+<li>As you can see we have defined two conditions: one for
 the 27-format and another for the default format. The point that is important
 is the order in which we put the conditions: For each record in the input the
 special one is evaluated first (because it has a lower evaluation number, 10)
 and if the condition is true the format will be applied; in case the base is
-not 27 the default condition is evaluated and because its condition <i>EL </i>code
-is always true the default will be used to format the record.</p>
+not 27 the default condition is evaluated and because its condition <em>EL</em> code
+is always true the default will be used to format the record.</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l1 level1 lfo12;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>Don't worry too much about the action code because it's
-quite trivial. There are some "strange" things like the use of functions <i>rep_prefix</i>
-and <i>separator</i>. These are special <i>UDFs</i> that have a special
-behavior inside a FORALL statement:</p>
+<li>Don't worry too much about the action code because it's
+quite trivial. There are some "strange" things like the use of functions <em>rep_prefix</em>
+and <em>separator</em>. These are special <em>UDFs</em> that have a special
+behavior inside a FORALL statement:
 
-<p style='margin-left:99.0pt;text-indent:-18.0pt;mso-list:l1 level2 lfo12;
-tab-stops:list 99.0pt'><![if !supportLists]><span style='font-family:"Courier New";
-mso-bidi-font-family:Tahoma'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]><i>rep_prefix</i> <span style='font-family:Wingdings;
-mso-ascii-font-family:Tahoma;mso-hansi-font-family:Tahoma;mso-char-type:symbol;
-mso-symbol-font-family:Wingdings'><span style='mso-char-type:symbol;mso-symbol-font-family:
-Wingdings'>à</span></span> Prints the string argument only when we are in the
-first iteration of a <i>FORALL</i>. In order words, put the prefix of the
-string which is to be generated by the <i>FORALL </i>statement.</p>
+<ul>
+<li><em>rep_prefix</em>: Prints the string argument only when we are in the
+first iteration of a <em>FORALL</em>. In order words, put the prefix of the
+string which is to be generated by the <em>FORALL</em> statement.</li>
 
-<p style='margin-left:99.0pt;text-indent:-18.0pt;mso-list:l1 level2 lfo12;
-tab-stops:list 99.0pt'><![if !supportLists]><span style='font-family:"Courier New";
-mso-bidi-font-family:Tahoma'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]><i>Separator </i><span style='font-family:Wingdings;
-mso-ascii-font-family:Tahoma;mso-hansi-font-family:Tahoma;mso-char-type:symbol;
-mso-symbol-font-family:Wingdings'><span style='mso-char-type:symbol;mso-symbol-font-family:
-Wingdings'>à</span></span> Prints the string argument in every <i>FORALL</i>
-iteration but not in the last one.</p>
+<li><em>Separator</em>: Prints the string argument in every <em>FORALL</em>
+iteration but not in the last one.</li>
+</ul>
+</li>
+</ul>
 
-<u><span><br clear=all>
-</span></u>
+<a name="4.6"></a><h3>4.6. Formats</h3>
 
-<p><a name="_Toc240518"></a><a name="_Toc241010"></a><a
-name="_Toc3803668"><span style='mso-bookmark:_Toc241010'><span
-style='mso-bookmark:_Toc240518'>6. - Formats</span></span></a></p>
-
-<p>&nbsp;</p>
-
-<p><i>Formats</i> are a special construction that BibFormat <i>Evaluation
-Language </i>(<i>EL</i>) offers. It allows you to group under an identifier
-some <i>EL</i> code and after you can call it from every <i>EL </i>statement. </p>
+<p><em>Formats</em> are a special construction that BibFormat <em>Evaluation
+Language</em> (<em>EL</em>) offers. It allows you to group under an identifier
+some <em>EL</em> code and after you can call it from every <em>EL</em> statement.</p>
 
 <p>You can manage these formats using the web interface. It is
-quite easy to do so: When you access the <i>Formats</i> section it will present
+quite easy to do so: When you access the <em>Formats</em> section it will present
 you a list with all the format identifiers that are already defined and a small
-documentation about what's the format for. From there you can see the whole <i>EL
-</i>code by using the link <i>[Code]</i>. You can add a new format by using the
+documentation about what's the format for. From there you can see the whole <em>EL
+</em>code by using the link <em>[Code]</em>. You can add a new format by using the
 set of input boxes that you'll find at the end of the page. Also delete and
 modify operations are possible for already defined formats.</p>
 
-<p>&nbsp;</p>
+<p>[Fig. 7]</p>
 
-<p class=figuremarker>[Fig. 7]</p>
-
-<p style='text-indent:0cm'><b><u>Note:</u> </b>When defining formats,
+<p><strong><u>Note:</u></strong> When defining formats,
 one has to pay attention not to use "recursive" format calls (either direct or
 indirect); this can lead to execution problems. For example, imagine that we
 have a format called "ex 1" that has a call for itself:</p>
 
-<p style='text-indent:0cm'>&nbsp;</p>
-
-<table border=1 cellspacing=0 cellpadding=0 width=432 style='width:324.05pt;
- margin-left:4.0cm;border-collapse:collapse;border:none;mso-border-alt:solid windowtext .5pt;
- mso-padding-alt:0cm 5.4pt 0cm 5.4pt'>
- <tr>
-  <td width=432 valign=top style='width:324.05pt;border:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='margin-top:0cm;margin-right:126.0pt;
-  margin-bottom:0cm;margin-left:108.0pt;margin-bottom:.0001pt;text-align:center;
-  text-indent:0cm'>Format "ex_1"</p>
-  </td>
- </tr>
- <tr>
-  <td width=432 valign=top style='width:324.05pt;border:solid windowtext .5pt;
-  border-top:none;mso-border-top-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='margin-top:0cm;margin-right:126.0pt;
-  margin-bottom:0cm;margin-left:108.0pt;margin-bottom:.0001pt;text-align:center;
-  text-indent:0cm'>"hello world"</p>
-  <p align=center style='margin-top:0cm;margin-right:126.0pt;
-  margin-bottom:0cm;margin-left:108.0pt;margin-bottom:.0001pt;text-align:center;
-  text-indent:0cm'>format("ex_1")</p>
-  </td>
- </tr>
+<blockquote>
+<table border cellspacing='0' width="60%">
+<tr>
+<td align='center'>Format "ex_1"</td>
+</tr>
+<tr>
+<td align='center'>
+<pre>
+"hello world" 
+format("ex_1")
+</pre>
+</td>
+</tr>
 </table>
+</blockquote>
 
-<p style='text-indent:0cm'>&nbsp;</p>
-
-<p style='text-indent:0cm'>…this is a "direct" recursive call; you
+<p>this is a "direct" recursive call; you
 should never have these kind of calls as the web interface should warn you if
 it finds these kind of troubles. However, "indirect" calls are not detected by
 the web interface, so you have to care about them. One example of "indirect"
 recursion:</p>
 
-<table border=1 cellspacing=0 cellpadding=0 width=432 style='width:324.05pt;
- margin-left:4.0cm;border-collapse:collapse;border:none;mso-border-alt:solid windowtext .5pt;
- mso-padding-alt:0cm 5.4pt 0cm 5.4pt'>
- <tr>
-  <td width=432 valign=top style='width:324.05pt;border:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='margin-top:0cm;margin-right:126.0pt;
-  margin-bottom:0cm;margin-left:108.0pt;margin-bottom:.0001pt;text-align:center;
-  text-indent:0cm'>Format "ex_1"</p>
-  </td>
- </tr>
- <tr>
-  <td width=432 valign=top style='width:324.05pt;border:solid windowtext .5pt;
-  border-top:none;mso-border-top-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='margin-top:0cm;margin-right:126.0pt;
-  margin-bottom:0cm;margin-left:108.0pt;margin-bottom:.0001pt;text-align:center;
-  text-indent:0cm'>"hello world"</p>
-  <p align=center style='margin-top:0cm;margin-right:126.0pt;
-  margin-bottom:0cm;margin-left:108.0pt;margin-bottom:.0001pt;text-align:center;
-  text-indent:0cm'>format("ex_2")</p>
-  </td>
- </tr>
+<p>
+
+<blockquote>
+<table border cellspacing='0' width="60%">
+<tr>
+<td align='center'>Format "ex_1"</td>
+</tr>
+<tr>
+<td align='center'>
+<pre>
+"hello world" 
+format("ex_2")
+</pre>
+</td>
+</tr>
 </table>
+</blockquote>
 
-<p style='text-indent:0cm'>&nbsp;</p>
+<a name="4.7"></a><h3>4.7. Knowledge bases (KBs)</h3>
 
-<u><span><br clear=all>
-</span></u>
-
-<p><a name="_Toc240521"></a><a name="_Toc241011"></a><a
-name="_Toc3803669"><span style='mso-bookmark:_Toc241011'><span
-style='mso-bookmark:_Toc240521'>7. - Knowledge bases (KBs)</span></span></a></p>
-
-<p>&nbsp;</p>
-
-<p>This is yet another special feature provided by BibFormat <i>Evaluation
-Language</i>. In a few words, this allows you to map one string value to
+<p>This is yet another special feature provided by BibFormat <em>Evaluation
+Language</em>. In a few words, this allows you to map one string value to
 another according to a pre-stored set of key values that map to other values
 (the knowledge bases). All the knowledge bases are identified by a label that
 has to be unique (among other KBs identifiers); remember that identifiers are
@@ -1459,167 +859,107 @@ not case-sensitive.</p>
 <p>These sets of values, normally lived in a file, but with this
 new development there was the need to have an easy KB management that was
 integrated in BibFormat. For this reason, you can manage KBs from the BibFormat
-configuration interface: section <i>KBs</i>.</p>
+configuration interface: section <em>KBs</em>.</p>
 
-<p>When accessing to <i>KBs</i> section, the list of all the KBs
+<p>When accessing to <em>KBs</em> section, the list of all the KBs
 identifiers defined will be displayed. Below it you'll find a set of controls
 to add new KBs; the use of these controls is as usual along the interface but
 there's something a bit special: Normally, you shouldn't fill in the input box
-that asks you for the <i>Knowledge base table name</i>; all the knowledge base
+that asks you for the <em>Knowledge base table name</em>; all the knowledge base
 data is handled by a database in which each KB corresponds to a DB table; this
 input box gets the internal table name for that KB; normally the KB manager
 will generate it for you so you shouldn't need to use it.</p>
 
-<p>&nbsp;</p>
-
-<p class=figuremarker>[Fig. 8]</p>
-
-<p>&nbsp;</p>
+<p>[Fig. 8]</p>
 
 <p>Each KB has a link for accessing the list of values that it
 contains. If you click on it, a new window will show you the list of current
 values (key and mapped ones) and a very easy interface to add new values or to
 delete existing ones (KB values are case sensitive).</p>
 
-<p>&nbsp;</p>
+<p>[Fig. 9]</p>
 
-<p class=figuremarker>[Fig. 9]</p>
+<a name="4.8"></a><h3>4.8. User Defined Functions (UDFs)</h3>
 
-<p>&nbsp;</p>
-
-<u><span><br clear=all>
-</span></u>
-
-<p><a name="_Toc240524"></a><a name="_Toc241012"></a><a
-name="_Toc3803670"><span style='mso-bookmark:_Toc241012'><span
-style='mso-bookmark:_Toc240524'>8. - User Defined Functions (UDFs)</span></span></a></p>
-
-<p>&nbsp;</p>
-
-<p>The use of <i>User Defined Functions </i>(<i>UDFs</i>) is one of
-the more powerful features of BibFormat <i>Evaluation Language</i> (<i>EL</i>).
-The idea is that inside <i>EL</i> you can use operations or functions over
+<p>The use of <em>User Defined Functions</em> (<em>UDFs</em>) is one of
+the more powerful features of BibFormat <em>Evaluation Language</em> (<em>EL</em>).
+The idea is that inside <em>EL</em> you can use operations or functions over
 strings; normally a large number of different string transformations are needed
 when talking about formatting but we cannot pretend implement all this
-operations inside <i>EL</i> because it's in constant growing and new needs
+operations inside <em>EL</em> because it's in constant growing and new needs
 appear all the time. For dealing with this problem, BibFormat defines a
-mechanism that allows you to use define as much functions (<i>UDFs</i>) as you
-want and use them inside any <i>EL </i>statement.</p>
+mechanism that allows you to use define as much functions (<em>UDFs</em>) as you
+want and use them inside any <em>EL</em> statement.</p>
 
 <p>These functions are identified by a unique name and they receive
 data (over which they do operations) by parameters. These functions are defined
 in a programming language (PHP) and therefore good knowledge of this language
 is needed.</p>
 
-<p>BibFormat offers a complete UDF management through the <i>UDFs</i>
-web interface section. There you'll see a complete list of all defined <i>UDFs</i>
+<p>BibFormat offers a complete UDF management through the <em>UDFs</em>
+web interface section. There you'll see a complete list of all defined <em>UDFs</em>
 with their identifier, parameters and a small documentation about what the UDF
-does. You can also add, delete or modify <i>UDFs</i> or even have a look at the
+does. You can also add, delete or modify <em>UDFs</em> or even have a look at the
 PHP code of an already defined function (there you'll be able to launch small
 tests over the defined functions).</p>
 
-<p>&nbsp;</p>
-
-<p class=figuremarker>[Fig. 10]</p>
-
-<p>&nbsp;</p>
+<p>[Fig. 10]</p>
 
 <p>The definition of these functions should be reserved to
 administrators and some particularities have to be taken into account when
-defining <i>UDFs</i>:</p>
+defining <em>UDFs</em>:</p>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l0 level1 lfo11;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>When you want to add or modify a <i>UDF</i> you are
+<ul>
+<li>When you want to add or modify a <em>UDF</em> you are
 asked for the parameter list; you have to enter the parameter names separated
 by comas. Ex: You want to define a new function for prefixing a given string
 with another, so you need two parameters (one for the string which is going to
-be prefixed, let's name it <i>str</i>, and another one for the prefix itself,
-let's name it <i>prefix</i>); you should enter them in the parameter input box
-like this: <i>prefix, str</i></p>
+be prefixed, let's name it <em>str</em>, and another one for the prefix itself,
+let's name it <em>prefix</em>); you should enter them in the parameter input box
+like this: <em>prefix, str</em></li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l0 level1 lfo11;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>The order in which you specify the parameters when
-defining a function is the order in which they have to be passed to the <i>UDF</i>
-from an <i>EL</i> statement.</p>
+<li>The order in which you specify the parameters when
+defining a function is the order in which they have to be passed to the <em>UDF</em>
+from an <em>EL</em> statement.</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l0 level1 lfo11;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>When defining the PHP code of a function, there are
-some important things to consider:</p>
+<li>When defining the PHP code of a function, there are
+some important things to consider:
 
-<p style='margin-left:99.0pt;text-indent:-18.0pt;mso-list:l0 level2 lfo11;
-tab-stops:list 99.0pt'><![if !supportLists]><span style='font-family:"Courier New";
-mso-bidi-font-family:Tahoma'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>The result of a function has to be a string.</p>
+<ul>
+<li>The result of a function has to be a string.</li>
 
-<p style='margin-left:99.0pt;text-indent:-18.0pt;mso-list:l0 level2 lfo11;
-tab-stops:list 99.0pt'><![if !supportLists]><span style='font-family:"Courier New";
-mso-bidi-font-family:Tahoma'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>The parameters are available inside the PHP code as
-variables with the parameter name.</p>
+<li>The parameters are available inside the PHP code as
+variables with the parameter name.</li>
 
-<p style='margin-left:99.0pt;text-indent:-18.0pt;mso-list:l0 level2 lfo11;
-tab-stops:list 99.0pt'><![if !supportLists]><span style='font-family:"Courier New";
-mso-bidi-font-family:Tahoma'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>The result of the function has to be defined by a PHP
-result clause giving the resulting string.</p>
+<li>The result of the function has to be defined by a PHP
+result clause giving the resulting string.</li>
 
-<p style='margin-left:99.0pt;text-indent:-18.0pt;mso-list:l0 level2 lfo11;
-tab-stops:list 99.0pt'><![if !supportLists]><span style='font-family:"Courier New";
-mso-bidi-font-family:Tahoma'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>Make sure the PHP code is correct (there's no way to
-know if the code is correct from BibFormat and it won't tell you if it is).</p>
+<li>Make sure the PHP code is correct (there's no way to
+know if the code is correct from BibFormat and it won't tell you if it is).</li>
 
-<p style='margin-left:99.0pt;text-indent:-18.0pt;mso-list:l0 level2 lfo11;
-tab-stops:list 99.0pt'><![if !supportLists]><span style='font-family:"Courier New";
-mso-bidi-font-family:Tahoma'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>There are some special variables available inside the
-PHP definition:</p>
+<li>There are some special variables available inside the
+PHP definition:
 
-<p style='margin-left:135.0pt;text-indent:-18.0pt;mso-list:l0 level3 lfo11;
-tab-stops:list 135.0pt'><![if !supportLists]><span style='font-family:Wingdings'>§<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>$FIRST_ITERATION <span style='font-family:Wingdings;
-mso-ascii-font-family:Tahoma;mso-hansi-font-family:Tahoma;mso-char-type:symbol;
-mso-symbol-font-family:Wingdings'><span style='mso-char-type:symbol;mso-symbol-font-family:
-Wingdings'>à</span></span> Is equal to "1" when we are in the first iteration
-of an <i>EL FORALL</i> statement. "0" in other case. If the call is made outside
-a <i>FORALL </i>is set to "1".</p>
+<ul>
+<li>$FIRST_ITERATION:  Is equal to "1" when we are in the first iteration
+of an <em>EL FORALL</em> statement. "0" in other case. If the call is made outside
+a <em>FORALL</em> is set to "1".</li>
 
-<p style='margin-left:135.0pt;text-indent:-18.0pt;mso-list:l0 level3 lfo11;
-tab-stops:list 135.0pt'><![if !supportLists]><span style='font-family:Wingdings'>§<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>$LAST_ITERATION <span style='font-family:Wingdings;
-mso-ascii-font-family:Tahoma;mso-hansi-font-family:Tahoma;mso-char-type:symbol;
-mso-symbol-font-family:Wingdings'><span style='mso-char-type:symbol;mso-symbol-font-family:
-Wingdings'>à</span></span> Just the opposite case.</p>
+<li>$LAST_ITERATION: Just the opposite case.</li>
+</ul>
 
-<p style='margin-left:99.0pt;text-indent:0cm'>With these two
-variables you can define <i>FORALL</i> special functions like a function to
+<p>With these two
+variables you can define <em>FORALL</em> special functions like a function to
 print a separator.</p>
+</li>
+</ul>
+</li>
+</ul>
 
-<p>&nbsp;</p>
-
-<p>&nbsp;</p>
-
-<p>&nbsp;</p>
-
-<u><span><br clear=all>
-</span></u>
-
-<p><a name="_Toc240525"></a><a name="_Toc241013"></a><a
-name="_Toc3803671"><span style='mso-bookmark:_Toc241013'><span
-style='mso-bookmark:_Toc240525'>9. - Defining links</span></span></a></p>
-
-<p>&nbsp;</p>
+<a name="4.9"></a><h3>4.9. Defining links</h3>
 
 <p>As we've already said, BibFormat is not only a formatter but it
-also provides a link manager but, what do we mean by ‘link manager'? The idea
+also provides a link manager but, what do we mean by 'link manager'? The idea
 is to have a set of rules that describe how to generate a link using certain
 data; if the link can be generated from those rules, then the link manager can
 check different things (i.e. see if the link is valid, if it's a link to a file
@@ -1631,67 +971,57 @@ bibliographic record, you just use the link manager to generate them
 dynamically; like this, you only have to maintain a small set of rules and not
 thousands of static links in records.</p>
 
-<p>BibFormat allows you to configure different <i>link definitions</i>
-each of them identified by a unique name; each of these <i>link definitions</i>
-have some associated <i>parameters</i> which are the information passed to the
+<p>BibFormat allows you to configure different <em>link definitions</em>
+each of them identified by a unique name; each of these <em>link definitions</em>
+have some associated <em>parameters</em> which are the information passed to the
 rules defined for it. Then, when you call the link manager to solve a link
-(from an <i>EL</i> statement, for example) you'll have to specify the
-identifier of the <i>link definition</i> you want to be used and the value for
-each of the parameters used by that <i>link definition</i> (always string
-values). The link manager will retrieve the rules associated to the <i>link
-definition</i> specified and will interpret those rules using the given
+(from an <em>EL</em> statement, for example) you'll have to specify the
+identifier of the <em>link definition</em> you want to be used and the value for
+each of the parameters used by that <em>link definition</em> (always string
+values). The link manager will retrieve the rules associated to the <em>link
+definition</em> specified and will interpret those rules using the given
 parameter values, informing you if the link was generated correctly and result
-(the solved link). </p>
+(the solved link).</p>
 
 <p>BibFormat provides this mechanism and through the web interface
 you can access to the rule repository for having a look at what are the
-available <i>link definitions</i>, define new link rules or maintain already
-defined ones. When adding or modifying a <i>link definition </i>you'll have to
+available <em>link definitions</em>, define new link rules or maintain already
+defined ones. When adding or modifying a <em>link definition</em> you'll have to
 specify the parameters, please remember to separate them by using comas.</p>
 
-<p>&nbsp;</p>
+<p>[Fig. 10]</p>
 
-<p class=figuremarker>[Fig. 10]</p>
-
-<p>&nbsp;</p>
-
-<p><i>Link definitions</i> are structurally quite similar to
+<p><em>Link definitions</em> are structurally quite similar to
 behaviors: Although there can be different types of them (as we'll see later),
-a <i>link definition</i> is made up of one or more conditions and each of these
+a <em>link definition</em> is made up of one or more conditions and each of these
 conditions can have one or more actions that tell how the link has to be built
 in case its condition is accomplished. In general, link rules (this includes
-conditions and actions) have a particular structure and they are described in <i>Evaluation
-Language</i> (<i>EL</i>) with one restriction: <i>EL</i> <i>LINK </i>statement
+conditions and actions) have a particular structure and they are described in <em>Evaluation
+Language</em> (<em>EL</em>) with one restriction: <em>EL LINK</em> statement
 cannot be used. Each group of conditions-actions of a link definition can be of
-a different <i>solving type</i> (actually, when you create a new link
-definition, its <i>solving type</i> its asked; this is just because all
+a different <em>solving type</em> (actually, when you create a new link
+definition, its <em>solving type</em> its asked; this is just because all
 conditions that will be created for that link definition will have the selected
-<i>solving type</i> as default; but you can change it afterwards having a
-"mixed" <i>link definition</i>). Their structure and way the link manager interprets
-them will depend in their <i>solving type</i>. Currently, there you can define
-link conditions of two different <i>solving types</i>: EXTERNAL or INTERNAL. A
+<em>solving type</em> as default; but you can change it afterwards having a
+"mixed" <em>link definition</em>). Their structure and way the link manager interprets
+them will depend in their <em>solving type</em>. Currently, there you can define
+link conditions of two different <em>solving types</em>: EXTERNAL or INTERNAL. A
 more detailed explanation about each type is given later.</p>
 
 <p>As we've said a link definition is made up of various link
-conditions. When a solving for a concrete <i>link definition </i>is asked, the
+conditions. When a solving for a concrete <em>link definition</em> is asked, the
 link manager retrieves all link conditions associated to it. Then it takes the
-first of them (following the <i>evaluation order</i> - the lower is the
+first of them (following the <em>evaluation order</em> - the lower is the
 evaluation order number, the first the condition is considered), it evaluates
-its <i>EL </i>code with the parameter values passed and if the result is "TRUE"
+its <em>EL</em> code with the parameter values passed and if the result is "TRUE"
 associated actions are executed, the link is returned and the solving process
 finishes. In case a condition fails, it looks for the next one. If all the
 conditions fail then the link manager returns that the link couldn't be solved.
 This is the general behavior of the link manager, but the way of determining if
-a link has been solved or not and the link building depends on the condition <i>solving
-type</i>.</p>
+a link has been solved or not and the link building depends on the condition <em>solving
+type</em>.</p>
 
-<p>&nbsp;</p>
-
-<p>&nbsp;</p>
-
-<p class=Apartadonivel2><a name="_Toc3803672">9.1. - EXTERNAL link conditions</a></p>
-
-<p>&nbsp;</p>
+<a name="4.9.1"></a><h4>4.9.1. EXTERNAL link conditions</h4>
 
 <p>This is the simplest way of solving links. It's intended to be
 used when you want to generate a link that points to an external resource
@@ -1700,165 +1030,92 @@ action that will be evaluated if the associated condition is "TRUE". When a
 condition of this type is evaluated "TRUE" and the action is executed, the
 result of the action is given as the solved link and the link manager finishes.</p>
 
-<p>&nbsp;</p>
+<p>[Fig. 11]</p>
 
-<p class=figuremarker>[Fig. 11]</p>
-
-<p>&nbsp;</p>
-
-<p class=Apartadonivel2><a name="_Toc3803673">9.2. - INTERNAL link conditions</a></p>
-
-<p>&nbsp;</p>
+<a name="4.9.2"></a><h4>4.9.2. INTERNAL link conditions</h4>
 
 <p>This condition solving type is intended to be used when you want
 to link to a document which is a file (inside or outside your file system) and
-that can be in different file formats. </p>
+that can be in different file formats.</p>
 
 <p>This case is a bit more complex than the previous one, so we'll
 go step-by-step explaining differences and special features:</p>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l11 level1 lfo14;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>An INTERNAL condition has a <i>base file path</i> and a
-<i>base URL </i>associated. The <i>base file path</i> is the string that will
+<ul>
+<li>An INTERNAL condition has a <em>base file path</em> and a
+<em>base URL</em> associated. The <em>base file path</em> is the string that will
 be used as prefix when looking for a file generated by the actions associated
-to that condition. On the other hand, the <i>base URL</i> will be a string to
-which the link string (resulting from the actions) will be added (i.e. if the <i>base
-file path</i> of a condition is <span style='font-family:Courier'>/tmp/docs</span>
-and the <i>base URL</i> is <span style='font-family:Courier'>http://doc.cern.ch/</span>,
-if the condition is true and the result of the actions is <span
-style='font-family:Courier'>test.pdf</span>, the file path the link manager
-will have to check will be <span style='font-family:Courier'>/tmp/docs/test.pdf</span>
-and, if the file exists, the generated link will be <span style='font-family:
-Courier'>http:/doc.cern.ch/test.pdf</span>)</p>
+to that condition. On the other hand, the <em>base URL</em> will be a string to
+which the link string (resulting from the actions) will be added (i.e. if the <em>base
+file path</em> of a condition is <code>/tmp/docs</code>
+and the <em>base URL</em> is <code>http://doc.cern.ch/</code>,
+if the condition is true and the result of the actions is <code>test.pdf</code>, the file path the link manager
+will have to check will be <code>/tmp/docs/test.pdf</code>
+and, if the file exists, the generated link will be <code>http:/doc.cern.ch/test.pdf</code>)</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l11 level1 lfo14;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>Any condition of this type can several associated <i>file
-formats</i>. This is a new concept that is only used for INTERNAL condition
-solving. A <i>file format</i> is simply a set of file extensions that are
-grouped under an identifier. Then, you can associate a <i>file format</i>
+<li>Any condition of this type can several associated <em>file
+formats</em>. This is a new concept that is only used for INTERNAL condition
+solving. A <em>file format</em> is simply a set of file extensions that are
+grouped under an identifier. Then, you can associate a <em>file format</em>
 identifier with a link condition. When the condition is true the link manager
 will combine each result from the condition actions with the associated file
 formats to check the existence of a file of any format; this means that when an
 action is evaluated, the link manager takes the file extensions of each
-associated file format identifier and checks if the <i>file base path </i>+
-resulting action string + file extension exists in the file system.</p>
+associated file format identifier and checks if the <em>file base path</em> +
+resulting action string + file extension exists in the file system.</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l11 level1 lfo14;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>One condition of this type can have more than one
+<li>One condition of this type can have more than one
 associated action. Each of its actions describes an alternative way of building
 the file path. When a condition of this type is evaluated to "TRUE", the link
-manager retrieves its actions (following actions <i>apply order</i>) and
+manager retrieves its actions (following actions <em>apply order</em>) and
 evaluates the first one; with the action result it builds the file path in this
-way: <i>file base path </i>+ resulting action string, and then combines this
-string with each of the <i>file extensions</i>. If any of the combination
+way: <em>file base path</em> + resulting action string, and then combines this
+string with each of the <em>file extensions</em>. If any of the combination
 exists in the file system, the link is generated (if there are more than one
 file format combination that exist, the link variable will have multiple values
 containing the different links); if not, it starts the same process with the
 next action. If any of the actions drive to a existing file, the link is not
-generated.</p>
+generated.</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l11 level1 lfo14;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>When calling the link manager from a <i>EL</i>
-statement (see chapter <i>Evaluation Language Reference</i>), if the link is
+<li>When calling the link manager from a <em>EL</em>
+statement (see chapter <em>Evaluation Language Reference</em>), if the link is
 solved we'll be able to access to a special internal variable that contains as
 value the resulting link. In the INTERNAL condition links, we have said that
 this variable can contain multiple values in case the link manager finds
 different file formats. In this case, there's another extension that consists
 in having some special variable fields containing special values for each value
-in the <i>LINK </i>variable and to which you can access when the link is solved;
+in the <em>LINK</em> variable and to which you can access when the link is solved;
 here's a table detailing the different variable LINK fields which are defined
-when a INTERNAL condition link is solved:</p>
+when a INTERNAL condition link is solved:</li>
+</ul>
 
-<p style='margin-left:45.0pt;text-indent:0cm'>&nbsp;</p>
-
-<table border=1 cellspacing=0 cellpadding=0 style='margin-left:45.0pt;
- border-collapse:collapse;border:none;mso-border-alt:solid windowtext .5pt;
- mso-padding-alt:0cm 5.4pt 0cm 5.4pt'>
+<blockquote>
+<table border cellspacing='0'>
  <tr>
-  <td width=151 valign=top style='width:4.0cm;border:solid windowtext .5pt;
-  background:#A6A6A6;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><b>Field
-  name</b></p>
-  </td>
-  <td width=439 valign=top style='width:329.4pt;border:solid windowtext .5pt;
-  border-left:none;mso-border-left-alt:solid windowtext .5pt;background:#A6A6A6;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=center style='text-align:center;text-indent:0cm'><b>Value
-  that contains</b></p>
-  </td>
+  <th bgcolor='#a0a0a0'>Field  name</th>
+  <th bgcolor='#a0a0a0'>Value that contains</th>
  </tr>
  <tr>
-  <td width=151 style='width:4.0cm;border:solid windowtext .5pt;border-top:
-  none;mso-border-top-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=left style='text-align:left;text-indent:0cm'><b>url</b></p>
-  </td>
-  <td width=439 valign=top style='width:329.4pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'><span style='font-size:10.0pt;
-  mso-bidi-font-size:12.0pt'>The same value as the LINK variable: The solved
-  URL.</span></p>
-  </td>
+  <th align='left'>url</th>
+  <td>The same value as the LINK variable: The solved URL.</td>
  </tr>
  <tr>
-  <td width=151 style='width:4.0cm;border:solid windowtext .5pt;border-top:
-  none;mso-border-top-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=left style='text-align:left;text-indent:0cm'><b>file</b></p>
-  </td>
-  <td width=439 valign=top style='width:329.4pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'><span style='font-size:10.0pt;
-  mso-bidi-font-size:12.0pt'>Contains the local full path to the file the
-  solved URL points to.</span></p>
-  </td>
+  <th align='left'>file</th>
+  <td>Contains the local full path to the file the solved URL points to.</td>
  </tr>
  <tr>
-  <td width=151 style='width:4.0cm;border:solid windowtext .5pt;border-top:
-  none;mso-border-top-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=left style='text-align:left;text-indent:0cm'><b>format_id</b></p>
-  </td>
-  <td width=439 valign=top style='width:329.4pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'><span style='font-size:10.0pt;
-  mso-bidi-font-size:12.0pt'>Contains the file format id string </span></p>
-  </td>
+  <th align='left'>format_id</th>
+  <td>Contains the file format id string</td>
  </tr>
  <tr>
-  <td width=151 style='width:4.0cm;border:solid windowtext .5pt;border-top:
-  none;mso-border-top-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt'>
-  <p align=left style='text-align:left;text-indent:0cm'><b>format_desc</b></p>
-  </td>
-  <td width=439 valign=top style='width:329.4pt;border-top:none;border-left:
-  none;border-bottom:solid windowtext .5pt;border-right:solid windowtext .5pt;
-  mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
-  <p style='text-indent:0cm'><span style='font-size:10.0pt;
-  mso-bidi-font-size:12.0pt'>Contains the file format description string (this
-  is defined for each file format)</span></p>
-  </td>
+  <th align='left'>format_desc</th>
+  <td>Contains the file format description string (this
+  is defined for each file format)</td>
  </tr>
 </table>
+</blockquote>
 
-<p style='margin-left:45.0pt;text-indent:0cm'>&nbsp;</p>
-
-<p>&nbsp;</p>
-
-<p class=Apartadonivel2><a name="_Toc3803674">9.3. - Example</a></p>
-
-<p>&nbsp;</p>
+<a name="4.9.3"></a><h4>4.9.2 Example</h4>
 
 <p>As the link generation is quite a complex topic (specially when
 talking about INTERNAL linking) we'll try to illustrate it with a simple
@@ -1869,28 +1126,24 @@ generating full-text access to the documents that are archived on a document
 server (a file system which contains document's electronic versions). These
 documents are organized systematically depending in three characteristics that
 are included in the bibliographic records: BASE, CATEGORY and ID. When the base
-corresponds to "CERNREP" then the files are archived below directory <i>/pub/www/home/cernrep/</i>
+corresponds to "CERNREP" then the files are archived below directory <code>/pub/www/home/cernrep/</code>
 and can be stored following two different criteria that depend on the CATEGORY
 and ID values; the documents are all HTML. However, if the base is "PREPRINT"
 and the CATEGORY is either "HEP-TH" or "HEP-PH" they are stored under directory
-<i>/archive/electronic|/pub/www/home/</i> following a certain criteria; in this
-case the documents can be in several file formats: PDF, Postscript, MS Word. </p>
+<code>/archive/electronic|/pub/www/home/</code> following a certain criteria; in this
+case the documents can be in several file formats: PDF, Postscript, MS Word.</p>
 
 <p>Of course, we want only the link to be created if the files
 corresponding to the bibliographic records exist.</p>
 
-<p>So we start creating a new link definition that we'll call <i>FULLTEXT</i>.
+<p>So we start creating a new link definition that we'll call <em>FULLTEXT</em>.
 It will receive three parameters that are the information we need for
 generating this kind of links: BASE, CATEGORY and ID. We select INTERNAL as
 solving type as default and then we fill it the base file path and url with
 some default values (these values are not important, they will be copied by
 default to the conditions we are going to create afterwards).</p>
 
-<p>&nbsp;</p>
-
-<p class=figuremarker>[Fig. 12]</p>
-
-<p>&nbsp;</p>
+<p>[Fig. 12]</p>
 
 <p>Then we create a condition for the first possibility: when BASE
 is "CERNREP". We select INTERNAL as link condition because we want to link to a
@@ -1898,58 +1151,44 @@ file and we want to check its existence and we fill in the base file path and
 URL with the corresponding values. Then we assign the file format types and we
 enter the file archiving criteria as different actions.</p>
 
-<p>&nbsp;</p>
-
-<p class=figuremarker>[Fig. 13]</p>
-
-<p>&nbsp;</p>
+<p>[Fig. 13]</p>
 
 <p>For the other possibility we proceed in the same way by adapting
 the definition to the requirements; we'll have something like this as result:</p>
 
-<p>&nbsp;</p>
-
-<p class=figuremarker>[Fig. 14]</p>
-
-<p>&nbsp;</p>
+<p>[Fig. 14]</p>
 
 <p>Once we have finished the link definition, we can insert links
 of this type from a BibFormat behavior, for example. Let's imagine we have
-included a piece of <i>EL</i> code like this in a behavior because we want to
+included a piece of <em>EL</em> code like this in a behavior because we want to
 insert a link to the full-text documents of any record:</p>
 
-<p>&nbsp;</p>
+<p>
 
-<p><span style='font-family:Courier;mso-bidi-font-family:"Courier New"'>link("FULLTEXT",
-$base, $category, $id)</span></p>
+<table border cellspacing="0" width="100%">
+<tr>
+<td>
+<pre>
 
-<p><span style='font-family:Courier;mso-bidi-font-family:"Courier New"'>{</span></p>
+link("FULLTEXT",$base, $category, $id)
+{
+  "Fulltext: "
+  forall($link){
+    "&lt;a href=\"" $link.url "\"&gt;" $link.format_desc "&lt;/a&gt;"
+    separator " - "
+  }
+}
 
-<p><span style='font-family:Courier;mso-bidi-font-family:"Courier New"'><span>  </span>"Fulltext: "</span></p>
+</pre>
+</td>
+</tr>
+</table>
 
-<p><span style='font-family:Courier;mso-bidi-font-family:"Courier New"'><span>  </span>forall($link){</span></p>
-
-<p><span style='font-family:Courier;mso-bidi-font-family:"Courier New"'><span>    </span>"&lt;a href=\"" $link.url "\"&gt;"
-$link.format_desc "&lt;/a&gt;" </span></p>
-
-<p><span style='font-family:Courier;mso-bidi-font-family:"Courier New"'><span>     </span>separator " - " </span></p>
-
-<p><span style='font-family:Courier;mso-bidi-font-family:"Courier New"'><span>  </span>}</span></p>
-
-<p><span style='font-family:Courier;mso-bidi-font-family:"Courier New"'>}</span></p>
-
-<p>&nbsp;</p>
-
-<p>This <i>EL </i>statement will include the string "Fulltext: "
+<p>This <em>EL</em> statement will include the string "Fulltext: "
 followed by a link to all the documents found for the values of internal
 variables $base, $category, $id separated by " - ".</p>
 
-<u><span><br clear=all>
-</span></u>
-
-<p><a name="_Toc3803675">10. - User management</a></p>
-
-<p>&nbsp;</p>
+<p><a name="4.10"></a><h3>4.10. User management</h3>
 
 <p>The BibFormat web interface (WI) comes with a security mechanism
 which allows you to define which users can access the WI. BibFormat doesn't
@@ -1957,7 +1196,7 @@ have a user management incorporated; instead it uses CDS user schema (as is a
 part of CDS). So if you are not registered as CDS user and you want to have
 access to BibFormat WI, first thing to do is to register in CDS through the
 standard procedure (for example via the CDS Search interface you can access the
-CDs account management system). </p>
+CDs account management system).</p>
 
 <p>BibFormat WI access policy is rather simple: it keeps a list of
 CDS users that can access the WI. Then if someone tries to access any part of
@@ -1971,11 +1210,7 @@ users to the access list by specifying either their CDS user id or their CDS
 login; then you can delete a CDS uses from the access list by simply selecting
 the link "delete" for the corresponding user.</p>
 
-<p>&nbsp;</p>
-
-<p class=figuremarker>[Fig. 15]</p>
-
-<p>&nbsp;</p>
+<p>[Fig. 15]</p>
 
 <p>When you install BibFormat for the first time and you access to
 the WI you'll see that no login or password is asked. The security mechanism
@@ -1983,111 +1218,65 @@ doesn't get activate until at least one user is added to the BibFormat's access
 list. So if you don't want to limit the access to BibFormat WI keep the access
 list without any user in.</p>
 
-<span style='font-size:12.0pt;font-family:Tahoma;mso-fareast-font-family:"Times New Roman";
-mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:AR-SA'><br
-clear=all style='mso-special-character:line-break;page-break-before:always'>
-</span>
-
-<p>&nbsp;</p>
-
-<p><a name="_Toc240526"></a><a name="_Toc241014"></a><a
-name="_Toc3803676"><span style='mso-bookmark:_Toc241014'><span
-style='mso-bookmark:_Toc240526'>11. - Evaluation Language Reference</span></span></a>
-</p>
-
-<p>&nbsp;</p>
+<a name="4.11"></a><h4>4.11. Evaluation Language Reference</h4>
 
 <p>In this section we'll present a more or less formal definition
-of the <i>Evaluation Language </i>(EL); although we are using some formal
+of the <em>Evaluation Language</em> (EL); although we are using some formal
 methods to describe it we'll also make a quick explanation about the elements
 that made up the language and how to combine them to arrive to desired results.
 </p>
 
 <p>Just below you can find the EL definition, expressed in terms of
-EBNF (<i>Extended Backus-Naur Form</i>) notation. We have used capital letters
+EBNF (<em>Extended Backus-Naur Form</em>) notation. We have used capital letters
 to express non-terminal elements and non-capital/bold characters for the
-terminal ones. There's one remark to make: Whenever you find the mark <span
-style='font-size:8.0pt;mso-bidi-font-size:12.0pt;color:maroon'>[REX] </span>after
+terminal ones. There's one remark to make: Whenever you find the mark
+<small><code>[REX]</code></small> after
 any definition, it means that we have used a regular expression just before in
 order to express a set of non-terminals.</p>
 
-<p style='text-indent:0cm'><span style='font-size:10.0pt;
-mso-bidi-font-size:12.0pt;font-family:Courier;mso-bidi-font-family:"Courier New"'>&nbsp;</span></p>
+<p>
 
-<div style='border:solid windowtext .5pt;padding:1.0pt 4.0pt 1.0pt 4.0pt'>
+<table border cellspacing="0" width="100%">
+<tr>
+<td>
+<pre>
 
-<p class=EBNF style='border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'>SENTENCE ::= TERM {<b>&amp;&amp;</b>
-TERM | <b>||</b> TERM}</p>
+ SENTENCE ::= TERM {<strong>&amp;&amp;</strong> TERM | <strong>||</strong> TERM}
 
-<p class=EBNF style='border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'>TERM ::= FACTOR {<b>= </b>FACTOR
-| <b>!=</b> FACTOR | FACTOR}</p>
+ TERM ::= FACTOR {<strong>=</strong> FACTOR | <strong>!=</strong> FACTOR | FACTOR}
 
-<p class=EBNF style='border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'>FACTOR ::= [<b>!</b>]
-BASIC</p>
+ FACTOR ::= [<strong>!</strong>] BASIC
 
-<p class=EBNF style='border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'>BASIC ::= VARIABLE |
-LITERAL | FUNCTION |<b> ( </b>SENTENCE <b>)</b> | FORALL |</p>
+ BASIC ::= VARIABLE | LITERAL | FUNCTION | <strong>(</strong> SENTENCE <strong>)</strong> | FORALL |
+           IF | FORMAT | LINK | COUNT | KB
 
-<p class=EBNF style='text-indent:36.0pt;border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'>IF | FORMAT | LINK | COUNT
-| KB</p>
+ VARIABLE ::= <strong>$</strong> STRING [<strong>.</strong> STRING]
 
-<p class=EBNF style='border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'>VARIABLE ::= <b>$</b>
-STRING [<b>.</b> STRING]</p>
+ LITERAL ::= <strong>"([^"] | \")*"</strong> <small>[REX]</small>
 
-<p class=EBNF style='border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'>LITERAL ::= <b><span
-style='color:maroon'>"([^"] | \")*"</span></b><span style="mso-spacerun: yes"> 
-</span><span style='font-size:8.0pt;mso-bidi-font-size:12.0pt;color:maroon'>[REX]</span></p>
+ FUNCTION ::= STRING <strong>(</strong> [ SENTENCE {<strong>,</strong> SENTENCE} ] <strong>)</strong>
 
-<p class=EBNF style='border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'>FUNCTION ::= STRING <b>(</b>
-[ SENTENCE {<b>,</b> SENTENCE} ] <b>)</b><span style='font-size:8.0pt;
-mso-bidi-font-size:12.0pt;color:maroon'></span></p>
+ FORALL ::= <strong>forall (</strong> VARIABLE [<strong>,</strong> LITERAL] <strong>) {</strong> SENTENCE <strong>}</strong>
 
-<p class=EBNF style='border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'>FORALL ::=<b> forall ( </b>VARIABLE
-[<b>,</b> LITERAL] <b>)</b> <b>{</b> SENTENCE <b>}</b> </p>
+ IF ::= <strong>if(</strong> SENTENCE <strong>) {</strong> SENTENCE <strong>}</strong> [<strong>else {</strong> SENTENCE <strong>}</strong>]
 
-<p class=EBNF style='border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'>IF ::= <b>if( </b>SENTENCE
-<b>) { </b>SENTENCE <b>} </b>[<b>else {</b> SENTENCE <b>}</b>] </p>
+ FORMAT ::= <strong>format(</strong> SENTENCE <strong>)</strong>
 
-<p class=EBNF style='border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'>FORMAT ::= <b>format( </b>SENTENCE
-<b>)</b></p>
+ LINK ::= <strong>link(</strong> SENTENCE <strong>,</strong> [SENTENCE {<strong>,</strong> SENTENCE}] <strong>) {</strong> SENTENCE <strong>}</strong>
+          [<strong>else {</strong> SENTENCE <strong>}</strong>]
 
-<p class=EBNF style='border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'>LINK ::= <b>link( </b>SENTENCE
-<b>,</b> [SENTENCE {<b>, </b>SENTENCE}] <b>) { </b>SENTENCE <b>} </b></p>
+ COUNT ::= <strong>count(</strong> VARIABLE <strong>)</strong>
 
-<p class=EBNF style='border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'><b><span>        </span></b>[<b>else { </b>SENTENCE <b>}</b>]</p>
+ KB ::= <strong>kb(</strong> SENTENCE <strong>)</strong>
 
-<p class=EBNF style='border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'>&nbsp;</p>
+ STRING ::= <strong>[a-zA-Z0-9_]</strong> <small>[REX]</small>
 
-<p class=EBNF style='border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'>COUNT ::= <b>count( </b>VARIABLE
-<b>)</b></p>
+</pre>
+</td>
+</tr>
+</table>
 
-<p class=EBNF style='border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'>KB ::= <b>kb(</b> SENTENCE
-<b>)</b> </p>
-
-<p class=EBNF style='border:none;mso-border-alt:solid windowtext .5pt;
-padding:0cm;mso-padding-alt:1.0pt 4.0pt 1.0pt 4.0pt'>STRING ::= <b><span
-style='color:maroon'>[a-zA-Z0-9_] </span></b><span style='font-size:8.0pt;
-mso-bidi-font-size:12.0pt;color:maroon'>[REX]</span><b></b></p>
-
-</div>
-
-<p><b>&nbsp;</b></p>
+<p>
 
 <p>This is just a formal way of describing the language, but don't
 worry if you don't understand it very well because just below these lines we'll
@@ -2100,45 +1289,37 @@ that in EL blank spaces, tabulators or carriage returns have no more meaning
 than separator for elements of the language; that means that between two basic
 elements you can have as many spaces or carriage returns as you want.</p>
 
-<p>One of the basic elements of the language is what we call <i>LITERALS</i>.
+<p>One of the basic elements of the language is what we call <em>LITERALS</em>.
 These things represent constant string values; they are delimited by a pair of
 double quote (") symbols surrounding the string you want to express. Everything
 you put inside the double quotes will be considered as it is, so inside a
 literal several spaces or carriage have meaning (it's the only case). If you
-want to express a double quote symbol inside a literal you have to <i>escape</i>
+want to express a double quote symbol inside a literal you have to <em>escape</em>
 it using \.</p>
 
 <p>Some examples of literals:</p>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l5 level1 lfo1;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>If you want to represent the string <i>hello</i>,
-inside the EL you'll have to use <span style='font-family:"Courier New"'>"hello"</span>.</p>
+<ul>
+<li>If you want to represent the string <em>hello</em>,
+inside the EL you'll have to use <code>"hello"</code>.</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l5 level1 lfo1;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>For the string <i>hello "big"<span>      </span>man</i>, the representation in EL is <span style='font-family:
-Courier'>"hello \"big\"<span style="mso-spacerun: yes">      </span>man"</span>
-(notice the escape characters and that spaces have meaning).</p>
+<li>For the string <em>hello "big"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; man</em>, the representation in EL is <code>"hello \"big\"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; man"</code>
+(notice the escape characters and that spaces have meaning).</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l5 level1 lfo1;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]><i>Let's see \""</i> string has to be expressed in this
-way <span style='font-family:"Courier New"'>"Let's see \\\"\""</span>.</p>
+<li><em>Let's see \""</em> string has to be expressed in this
+way <code>"Let's see \\\"\""</code>.</li>
+</ul>
 
-<p>Another important basic element of the language is <i>VARIABLES</i>.
+<p>Another important basic element of the language is <em>VARIABLES</em>.
 These elements represent string data from the input to which you can refer
 inside of the language (and is considered also as a string). Variables are defined
 in advance by the administrator (or even users) so you have to know which of
-them you have access to. Additionally, variables can contain <i>FIELDS</i> that
+them you have access to. Additionally, variables can contain <em>FIELDS</em> that
 are simply other input values that are grouped under a variable because they
 have some kind of relationship between them (for example, you could have a
 variable for the information about the author and fields like name, born place,
 etc for it). If you want to know more about variables and their correspondence
-with the input you can look at the <i>Mapping the Input</i> section. The way of
+with the input you can look at the <em>Mapping the Input</em> section. The way of
 expressing a variable in EL is by a dollar symbol followed by any letter,
 number or underscore; variables are case-insensitive. To refer to any field of
 a variable, you simply put a dot followed by the field name (which is also made
@@ -2146,29 +1327,22 @@ up of any character, number or underscore).</p>
 
 <p>Some examples about variables and fields:</p>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l8 level1 lfo2;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>Imagine you have a variable which contains the author
-information and which is called <i>author</i>, to represent in EL you would
-have to write <span style='font-family:Courier'>$author</span>. In every place
+<ul>
+<li>Imagine you have a variable which contains the author
+information and which is called <em>author</em>, to represent in EL you would
+have to write <code>"Author: " $100.a</code>. In every place
 that $author appears BibFormat will consider the value defined for it from the
-current input record.</p>
+current input record.</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l8 level1 lfo2;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>Then you know that the field <i>name</i> of variable <i>author</i>
+<li>Then you know that the field <em>name</em> of variable <em>author</em>
 contains the author full name and you want to refer to it inside an EL
-statement, so you'd write <span style='font-family:Courier'>$author.name</span>.</p>
+statement, so you'd write <code>$author.name</code>.</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l8 level1 lfo2;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>If we speak about CDS configuration, variable and field
+<li>If we speak about CDS configuration, variable and field
 names correspond to MARC 21 tag &amp; indicator names; so to refer to the main
-title of a bibliographic record we should use variable <i>245</i> field <i>b</i>,
-in EL terms: <span style='font-family:Courier;mso-bidi-font-family:"Courier New"'>$245.b</span>.</p>
+title of a bibliographic record we should use variable <em>245</em> field <em>b</em>,
+in EL terms: <code>$245.b</code>.</li>
+</ul>
 
 <p>Now that we know basic elements of the language we can start
 thinking about how to combine them. The most important (and unique) string
@@ -2178,56 +1352,46 @@ result will be the result of the basic elements one after another.</p>
 
 <p>Some samples:</p>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l10 level1 lfo3;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol;
-mso-bidi-font-style:italic'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>To represent the constant string <i>Author:</i>
-followed by the name of the author of the input record you should write <span
-style='font-family:Courier'>"Author: " $100.a</span> (it's supposed CDS
+<ul>
+<li>To represent the constant string <em>Author:</em>
+followed by the name of the author of the input record you should write <code>"Author: " $100.a</code> (it's supposed CDS
 configuration in which MARC 21 notation is used; authors correspond to variable
-100 field a).<i></i></p>
+100 field a).</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l10 level1 lfo3;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol;
-mso-bidi-font-style:italic'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>You want to output the title in bold (always HTML
+<li>You want to output the title in bold (always HTML
 speaking) followed by the author in normal chars separated of the title by char
-/: <span style='font-family:Courier'>"&lt;b&gt;" $245.b "&lt;/b&gt;/" $100.a</span><i></i></p>
+/: <code>"&lt;b&gt;" $245.b "&lt;/b&gt;/" $100.a</code></li>
+</ul>
 
 <p>These two, literals and variables, are only basic elements of
 the EL. You can combine them using concatenation to get new strings. But, of
-course, there are some more operations you can apply over strings: UDFs (<i>User
-Defined Functions</i>). We'll also name these elements as functions, because
+course, there are some more operations you can apply over strings: UDFs (<em>User
+Defined Functions</em>). We'll also name these elements as functions, because
 they are that: functions or operations to be applied over strings; when talking
 about strings we include basic elements or resulting string from applying any
 operations. A UDF has a name that identifies it uniquely and needs to get some information
-that we call <i>parameters</i>. A UDF gives another string as result depending
+that we call <em>parameters</em>. A UDF gives another string as result depending
 on the parameter values (always strings). So to represent a function in EL you
 need its name followed by an open parenthesis, the parameter values separated
 by comas and a closing parenthesis. There's a list of UDF you can look at
-through the interface but this list can be extended to fit your needs (look at <i>UDFs</i>
+through the interface but this list can be extended to fit your needs (look at <em>UDFs</em>
 section of this manual).</p>
 
 <p>Some examples:</p>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l12 level1 lfo4;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>You want to ensure that the title of a bibliographic
+<ul>
+<li>You want to ensure that the title of a bibliographic
 record is always going to be in capital letters; good, there's a function
-called <i>upper</i> that takes one parameter and gives as result the parameter
-transformed in capital letters. You have to write the call like this: <span
-style='font-family:Courier'>upper($245.b).</span></p>
+called <em>upper</em> that takes one parameter and gives as result the parameter
+transformed in capital letters. You have to write the call like this: <code>upper($245.b)</code>.</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l12 level1 lfo4;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>You want only the 3 first chars of an author name to
+<li>You want only the 3 first chars of an author name to
 appear in capital letters. We've seen there's a function for uppercasing a
-string but there's another one, called <i>copy</i> that gets a sub string from
+string but there's another one, called <em>copy</em> that gets a sub string from
 a string passed as first parameter from the char position indicated by the 2<sup>nd</sup>
-parameter and with the length given by the 3<sup>rd</sup> one: copy(
-upper($100.a), "0", "3").</p>
+parameter and with the length given by the 3<sup>rd</sup> one: <code>copy(
+upper($100.a), "0", "3")</code>.</li>
+</ul>
 
 <p>As you can see, these UDFs are very powerful because you can
 concatenate their result with another element (literal, variable or even
@@ -2235,41 +1399,39 @@ function) and the parameters can be basic elements or expressions. We can
 extend this ensuring that any element or expression of the EL that gives as
 result a string value can be combined with other EL expressions or elements.</p>
 
-<p>Another very useful feature of EL is the possibility to use <i>KWONLEDGE
-BASES </i>(KBs). A KB is just a set of key values that map (one-to-one) another
+<p>Another very useful feature of EL is the possibility to use <em>KWONLEDGE
+BASES</em> (KBs). A KB is just a set of key values that map (one-to-one) another
 set of values; may be knowledge bases isn't a very appropriate name because
 they are more like translation tables. BibFormat offers tools to create and
-maintain KBs that can be used in the EL afterwards (see chapter <i>KBs
-management </i>in this manual). You can see KB invocation as a special function
-(the syntax for calling it is the same) with name <i>kb</i> and that takes two
+maintain KBs that can be used in the EL afterwards (see chapter <em>KBs
+management</em> in this manual). You can see KB invocation as a special function
+(the syntax for calling it is the same) with name <em>kb</em> and that takes two
 parameters: one for indicating the KB name (BibFormat can handle several KBs)
 and another one for the key value to translate. The result is the mapped KB
 value or an empty string if it doesn't exist as a key value in the specified
 KB. A typical example is when you have months with numbers and you want to
 translate them into month names; you could have a KB that maps all the month
-numbers to month names and then call it like this <span style='font-family:
-Courier'>kb("MONTH", $m)</span>.</p>
+numbers to month names and then call it like this <code>kb("MONTH", $m)</code>.</p>
 
-<p>Now let's move to <i>FORMATS</i>. Formats are some <i>EL</i>
+<p>Now let's move to <em>FORMATS</em>. Formats are some <em>EL</em>
 code which is grouped under a label (a name) and that can be used in any other
 EL statement. BibFormat allows the user to define as many formats as he wants
 and identify each of them with a simple name. In few words, formats allow you
 to reuse EL code; within a format you can put any EL code (even other format
-calls) and all the variable values are completely available.<span>  </span>Again, a format call in EL follows the same
-convention as functions: the word <i>format</i> followed by the format name (a
+calls) and all the variable values are completely available.  Again, a format call in EL follows the same
+convention as functions: the word <em>format</em> followed by the format name (a
 string) between parenthesis. When you call a format is like if the EL code
 define inside that format was pasted, as it is in the place you make the call.</p>
 
 <p>Example: Imagine you have to write the title of a bibliographic
 records with a certain format, let's say in bold and red; but this formatted
 title you are going to use it in several places. So can take advantages of EL
-formats and define a format called <i>TITLE</i> that contains the code <span
-style='font-family:Courier'>"&lt;font color=\"red\"&gt;&lt;b&gt;" $245.b
-"&lt;/b&gt;&lt;/font&gt;"</span>. Once this is done, you could use it to format
-records by printing their title in that way and their author after it: <span
-style='font-family:Courier'>format("TITLE") "/" $100.a</span>. The good thing
+formats and define a format called <em>TITLE</em> that contains the code <code>"&lt;font color=\"red\"&gt;&lt;b&gt;" $245.b
+"&lt;/b&gt;&lt;/font&gt;"</code>. Once this is done, you could use it to format
+records by printing their title in that way and their author after it:
+<code>format("TITLE") "/" $100.a</code>. The good thing
 is that if some day you decide to change the title formatting you'd only need
-to modify the <i>TITLE</i> format definition and not all the places where you
+to modify the <em>TITLE</em> format definition and not all the places where you
 show the title.</p>
 
 <p>At this point, you have seen basic elements and operations with
@@ -2286,48 +1448,39 @@ any functionality needed can be achieved by defining new UDFs; EL gives basic
 operations to provide this possibility). Let's go step by step: First let's
 talk about the set of operators that can be used in a comparison:</p>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l4 level1 lfo5;
-tab-stops:list 63.0pt'><![if !supportLists]>1.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span><![endif]>Comparison operators: Equal and non-equal (=, !=). They take
+<ol>
+<li>Comparison operators: Equal and non-equal (=, !=). They take
 two operators that have to be strings and produce a logic (true or false)
-value.</p>
+value.</li>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l4 level1 lfo5;
-tab-stops:list 63.0pt'><![if !supportLists]>2.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span><![endif]>Logical operators: AND, OR and NOT (&amp;&amp;, ||, !). All of
+<li>Logical operators: AND, OR and NOT (&amp;&amp;, ||, !). All of
 them have to be used over logical values, taking two operators AND and OR, and
-one operator NOT.</p>
+one operator NOT.</li>
+</ol>
 
 <p>All of them are right associative (except NOT which is unary
 left-associative) and their precedence goes like this (more to less): NOT,
 (EQUAL, NON-EQUAL), (AND, OR). These operators cannot be used anywhere, only
 inside statements that expect a logic value as result, in other words, inside
-condition statements. </p>
+condition statements.</p>
 
 <p>The IF structure is quite easy to learn: First we indicate the
-word <i>IF</i> followed by a condition statement surrounded by parenthesis;
+word <em>IF</em> followed by a condition statement surrounded by parenthesis;
 then a EL statement into braces can be specified, this statement will be
-executed only if the condition was true; optionally, we can add an <i>ELSE</i>
+executed only if the condition was true; optionally, we can add an <em>ELSE</em>
 word followed by another EL statement into braces, that will only be triggered
-if the IF condition was not true. </p>
+if the IF condition was not true.</p>
 
 <p>Let's have a look at some examples:</p>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l9 level1 lfo7;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>I want the title of a record to appear followed by the
-constant <i>Author: </i>and its author afterwards. But it could be nice if the
-constant string appeared only if the record has author: </p>
-
-<p style='margin-left:36.0pt;text-indent:9.0pt'><span
-style='font-family:Courier'>&nbsp;</span></p>
-
-<p style='margin-left:36.0pt;text-indent:9.0pt'><span
-style='font-family:Courier'>format("TITLE") if($100.a!="") { "Author: " $100.a
-}</span></p>
-
-<p style='margin-left:36.0pt;text-indent:9.0pt'>&nbsp;</p>
+<ul>
+<li>I want the title of a record to appear followed by the
+constant <em>Author:</em> and its author afterwards. But it could be nice if the
+constant string appeared only if the record has author:
+<pre>
+format("TITLE") if($100.a!="") { "Author: " $100.a }
+</pre>
+</ul>
 
 <p>BibFormat is not only an EL processor. Among others, it contains
 a link solver that contains it's own rule repository in order to be able to
@@ -2338,7 +1491,7 @@ to maintain (you modify the rules independently from where the link is being
 used) and as re-usable as formats or UDFs. Links are identified by a label and
 need some information to be passed as parameters; then an EL statement has to
 be specified which will be effective only if the link is solved and inside
-which, you'll have access to an special variable, named <i>LINK</i>, which
+which, you'll have access to an special variable, named <em>LINK</em>, which
 contains the solved link among other information (see chapter Link solver for
 more information about which values are accessible); additionally, an else
 statement can be added (following the same syntax as in the IF construction)
@@ -2346,97 +1499,78 @@ that will be effective only if the link can't be solved by the Link solver.</p>
 
 <p>Example:</p>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l9 level1 lfo7;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>We are with our typical example of the simple format
+<ul>
+<li>We are with our typical example of the simple format
 that contains the title and the author, but now we want the author to be linked
 to the search. Supposing that a this kind of link is already defined under the
-label "AUTHOR_SEARCH" we should proceed like this:</p>
-
-<p style='margin-left:45.0pt;text-indent:0cm'>&nbsp;</p>
-
-<p><span style='font-family:Courier'>format("TITLE") "/" </span></p>
-
-<p><span style='font-family:Courier'>link("AUTHOR_SEARCH", $100.a) </span></p>
-
-<p><span style='font-family:Courier'><span>     </span>{ "&lt;a href=\""$link "\"&gt;"$100.a"&lt;/a&gt;"}</span></p>
-
-<p>&nbsp;</p>
+label "AUTHOR_SEARCH" we should proceed like this:
+<pre>
+format("TITLE") "/"
+link("AUTHOR_SEARCH", $100.a)
+    { "&lt;a href=\""$link "\"&gt;"$100.a"&lt;/a&gt;"}
+</pre>
+</li>
+</ul>
 
 <p>The next step when talking about EL components is to deal with
 multiple values. Life is no so easy and, of course, and a bibliographic record
 can have more than one author or can have a related document which is in more
 than one format and that has to be linked. In other words, BibFormat supports
-having variables and fields with multiple values (see chapter <i>Mapping input</i>),
+having variables and fields with multiple values (see chapter <em>Mapping input</em>),
 consequently a way of applying an EL statement over all the values of a
-variable or a field would be quite useful. <i>FORALL</i> is our construction!!
+variable or a field would be quite useful. <em>FORALL</em> is our construction!!
 It allows you to specify a variable or a field followed by a EL statement
 (between braces) that will be applied for every value of the variable or the
-field; any reference to the iteration variable inside the <i>FORALL</i> EL
+field; any reference to the iteration variable inside the <em>FORALL</em> EL
 statement will be related to the current iteration variable value (if you refer
-to a variable that has multiple values outside a <i>FORALL</i> the first value
-is considered). One limitation is that you shouldn't nest <i>FORALL</i>
-statements, in other words, never put a <i>FORALL</i> inside another one. This
+to a variable that has multiple values outside a <em>FORALL</em> the first value
+is considered). One limitation is that you shouldn't nest <em>FORALL</em>
+statements, in other words, never put a <em>FORALL</em> inside another one. This
 construction let's you also limit the number of times you want to iterate over
 a variable or field by adding a literal with the number of iterations.</p>
 
 <p>Some examples:</p>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l9 level1 lfo7;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>Let's continue refining our simple format; now we have
+<ul>
+<li>Let's continue refining our simple format; now we have
 to consider that there can be more than one author for one bibliographic
-record, so we want to show all of them with the link included, of course.</p>
+record, so we want to show all of them with the link included, of course.
+<pre>
 
-<p><span style='font-family:Courier'>&nbsp;</span></p>
+format("TITLE") "/"
+forall($100.a)
+{
+  link("AUTHOR_SEARCH", $100.a)
+    { "&lt;a href=\""$link "\"&gt;"$100.a"&lt;/a&gt;"}
+}
+</pre>
+</li>
 
-<p><span style='font-family:Courier'>format("TITLE") "/" </span></p>
-
-<p><span style='font-family:Courier'>forall($100.a)</span></p>
-
-<p><span style='font-family:Courier'>{</span></p>
-
-<p><span style='font-family:Courier'><span>  </span>link("AUTHOR_SEARCH", $100.a) </span></p>
-
-<p><span style='font-family:Courier'><span>     </span>{ "&lt;a href=\""$link "\"&gt;"$100.a"&lt;/a&gt;"}</span></p>
-
-<p><span style='font-family:Courier'>}</span></p>
-
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l9 level1 lfo7;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>Although this <i>FORALL</i> construction could seem not
+<li>Although this <em>FORALL</em> construction could seem not
 very useful, it's used a lot when defining formats or behaviors. Quite often
 you will have the case where you want only some EL piece of code to be
-effective if a certain variable or field exist; <i>FORALL</i> can also be used
+effective if a certain variable or field exist; <em>FORALL</em> can also be used
 in that situation and it has to be said that is the most comfortable way of
 doing it. Imagine the case you want the title, the constant string "Author: "
 followed by the authors of a bibliographic record; but you don't want the
-constant <i>"</i>Author: " to appear if there's no author at all. You could use
-something like this:<span style='font-family:Courier'></span></p>
+constant <em>"</em>Author: " to appear if there's no author at all. You could use
+something like this:
+<pre>
 
-<p><span style='font-family:Courier'>&nbsp;</span></p>
+format("TITLE") " - "
+forall($100.a)
+{
+  rep_prefix("Author: ") $100.a " "
+}
+</pre>
 
-<p><span style='font-family:Courier'>format("TITLE") " - " </span></p>
+As you can see we are
+using a new function: <em>rep_prefix</em>. In fact this is an UDF which prints
+the string passed as parameter only once at the beginning inside a <em>FORALL</em>
+statement. But the interesting thing here is the <em>FORALL</em> application.</li>
+</ul>
 
-<p><span style='font-family:Courier'>forall($100.a)</span></p>
-
-<p><span style='font-family:Courier'>{</span></p>
-
-<p><span style='font-family:Courier'><span>  </span>rep_prefix("Author: ") $100.a " "</span></p>
-
-<p><span style='font-family:Courier'>}</span></p>
-
-<p style='margin-left:63.0pt;text-indent:0cm'>As you can see we are
-using a new function: <i>rep_prefix</i>. In fact this is an UDF which prints
-the string passed as parameter only once at the beginning inside a <i>FORALL</i>
-statement. But the interesting thing here is the <i>FORALL</i> application.</p>
-
-<p><span style='font-family:Courier'>&nbsp;</span></p>
-
-<p>Finally, there's still one EL special function: <i>COUNT</i>.
+<p>Finally, there's still one EL special function: <em>COUNT</em>.
 Due to certain special situations or strange input data in the variables,
 sometimes is useful to know how many values contain a variable or a field. So
 this function, simply takes a variable or field as argument and returns a
@@ -2446,45 +1580,26 @@ exist or there weren't any values mapped from the input.</p>
 
 <p>Examples:</p>
 
-<p style='margin-left:63.0pt;text-indent:-18.0pt;mso-list:l9 level1 lfo7;
-tab-stops:list 63.0pt'><![if !supportLists]><span style='font-family:Symbol'>·<span
-style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><![endif]>As this is the last example, let's do it a bit more
+<ul>
+<li>As this is the last example, let's do it a bit more
 complicated: Continuing with our very well known simple format, we want all the
 authors of the record appear if there are less than 10, in any other case we
 want only the first one to appear followed by the string "et al.". We'll also
-use a function called <i>GT</i> which returns a non-empty string if the first
-parameter is greater than the second one.</p>
+use a function called <em>GT</em> which returns a non-empty string if the first
+parameter is greater than the second one.
+<pre>
 
-<p><span style='font-family:Courier'>&nbsp;</span></p>
-
-<p><span style='font-family:Courier'>format("TITLE") "/" </span></p>
-
-<p><span style='font-family:Courier'>if(gt(count($100.a),
-"10")!="")</span></p>
-
-<p><span style='font-family:Courier'>{ $100.a "et al." }</span></p>
-
-<p><span style='font-family:Courier'>else</span></p>
-
-<p><span style='font-family:Courier'>{</span></p>
-
-<p><span style='font-family:Courier'><span>  </span>forall($100.a)</span></p>
-
-<p><span style='font-family:Courier'><span>  </span>{</span></p>
-
-<p><span style='font-family:Courier'><span>    </span>link("AUTHOR_SEARCH", $100.a) </span></p>
-
-<p><span style='font-family:Courier'><span>     </span>{ "&lt;a href=\""$link "\"&gt;"$100.a"&lt;/a&gt;"}</span></p>
-
-<p><span style='font-family:Courier'><span>  </span>}</span></p>
-
-<p><span style='font-family:Courier'>}</span></p>
-
-<p style='text-indent:0cm'><span style="mso-spacerun: yes"> </span></p>
-
-<span style='font-size:12.0pt;font-family:Tahoma;mso-fareast-font-family:"Times New Roman";
-mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:AR-SA'><br
-clear=all style='mso-special-character:line-break;page-break-before:always'>
-</span>
-
+format("TITLE") "/" 
+if(gt(count($100.a), "10")!="")
+{ $100.a "et al." }
+else
+{
+  forall($100.a)
+  {
+    link("AUTHOR_SEARCH", $100.a) 
+     { "&lt;a href=\""$link "\"&gt;"$100.a"&lt;/a&gt;"}
+  }
+}
+</pre>
+</li>
+</ul>
