@@ -53,6 +53,7 @@
   <fr>Accueil</fr>
   <de>Hauptseite</de>
   <es>Página principal</es>
+  <ca>Pàgina inicial</ca>
   <pt>Página principal</pt>
   <it>Pagina principale</it>
   <ru>Главная страница</ru>
@@ -69,6 +70,7 @@
   <fr>Recherche</fr>
   <de>Suchen</de>
   <es>Buscar</es>
+  <ca>Cercar</ca>
   <pt>Buscar</pt>
   <it>Ricercare</it>
   <ru>Искать</ru>
@@ -85,6 +87,7 @@
   <fr>Soumission</fr>
   <de>Eintragen</de>
   <es>Enviar</es>
+  <ca>Trametre</ca>
   <pt>Enviar</pt>
   <it>Sottomettere</it>
   <ru>Внести</ru>
@@ -101,6 +104,7 @@
   <fr>Aide</fr>
   <de>Hilfe</de>
   <es>Ayuda</es>
+  <ca>Ajuda</ca>
   <pt>Ajuda</pt>
   <it>Aiuto</it>
   <ru>Помощь</ru>
@@ -117,6 +121,7 @@
   <fr>Centre d&rsquo;aide</fr>
   <de>Hilfezentrale</de>
   <es>Ayuda</es>
+  <ca>Centre d&quot;ajuda</ca>
   <pt>Central de Ajuda</pt>
   <it>Aiuto</it>
   <ru>Центральная Помощь</ru>
@@ -133,6 +138,7 @@
   <fr>Aide de recherche</fr>
   <de>Suchhilfe</de>
   <es>Ayuda a la Búsqueda</es>
+  <ca>Ajuda a la cerca</ca>
   <pt>Ajuda de Busca</pt>
   <it>Aiuto alla Ricerca</it>
   <ru>Помощь для поиска</ru>
@@ -147,6 +153,7 @@
 <define-tag MSG_SEARCH_TIPS whitespace=delete>
   <en>Search Tips</en>
   <fr>Conseils de recherche</fr>
+  <ca>Consells de cerca</ca>
   <de>Suchtipps</de>
   <es>Consejos para la Búsqueda</es>
   <pt>Sugestões de busca</pt>
@@ -165,6 +172,7 @@
   <fr>Personnaliser</fr>
   <de>Personalisieren</de>
   <es>Personalizar</es>
+  <ca>Personalitzar</ca>
   <pt>Personalizar</pt>
   <it>Personalizzazione</it>
   <ru>Персонализовать</ru>
@@ -181,6 +189,7 @@
   <fr>TRADUCTION FRANÇAISE EN COURS</fr>
   <de>ÜBERSETZUNG AUF DEUTSCH WIRD GERADE VORBEREITET</de>
   <es>VERSIÓN EN ESPAÑOL ESTARÁ DISPONIBLE PRÓXIMAMENTE</es>
+  <ca>TRADUCCIÓ CATALANA EN CURS</ca>
   <pt>VERSÃO EM PORTUGUÊS ESTARÁ DISPONÍVEL EM BREVE</pt>
   <it>TRADUZIONE ITALIANA DISPONIBILE PROSSIMAMENTE</it>
   <ru>ПЕРЕВОД НА РУССКИЙ ЯЗЫК ГОТОВИТСЯ</ru>
@@ -212,6 +221,11 @@
      disponible. Le rogamos consultar la versión en inglés mostrada a
      continuación. Gracias por su compresión.
   </es>
+  <ca>
+     De moment, la versión en català d'aquesta pàgina no està
+     disponible. Us preguem que consulteu la versió en anglès que
+     veureu a continuació. Gràcies por la vostra compresió.
+  </ca>
   <pt>
      No momento a versão em português desta página não encontra-se
      disponível. Favor utilizar a versão em inglês apresentada
@@ -261,6 +275,7 @@
   <fr>Powered by</fr>
   <de>Powered by</de>
   <es>Powered by</es>
+  <ca>Powered by</ca>
   <pt>Powered by</pt>
   <it>Powered by</it>
   <ru>Powered by</ru>
@@ -275,6 +290,7 @@
 <define-tag MSG_MAINTAINED_BY whitespace=delete>
   <en>Maintained by</en>
   <fr>Maintenu par</fr>
+  <ca>Mantingut per</ca>
   <de>Verwaltet von</de>
   <es>Mantenido por</es>
   <pt>Mantido por</pt>
@@ -293,6 +309,7 @@
   <fr>Dernière mise à jour</fr>
   <de>Letzte Aktualisierung</de>
   <es>Última actualización</es>
+  <ca>Darrera actualització</ca>
   <pt>Última atualização</pt>
   <it>Ultimo aggiornamento</it>
   <ru>Последнее изменение</ru>
@@ -310,6 +327,7 @@
   <fr>Limiter par collection:</fr>
   <de>Einschränken nach Sammlungen:</de>
   <es>Búsqueda por colección:</es>
+  <ca>Limitar per col·lecció:</ca>
   <pt>Filtrar por coleção:</pt>
   <it>Ricerca ristretta:</it>
   <ru>Сократить набор:</ru>
@@ -326,6 +344,7 @@
   <fr>Focaliser sur:</fr>
   <de>Hinweis auf:</de>
   <es>Enfocado a:</es>
+  <ca>Enfocat a:</ca>
   <pt>Ênfase em:</pt>
   <it>Focus on:</it>
   <ru>Указание на:</ru>
@@ -342,6 +361,7 @@
   <fr>Recherche simple</fr>
   <de>Einfache Suche</de>
   <es>Búsqueda Simple</es>
+  <ca>Cerca simple</ca>
   <pt>Busca Básica</pt>
   <it>Ricerca Semplice</it>
   <ru>Простой Поиск</ru>
@@ -358,6 +378,7 @@
   <fr>Recherche avancée</fr>
   <de>Erweiterte Suche</de>
   <es>Búsqueda Avanzada</es>
+  <ca>Cerca avançada</ca>
   <pt>Busca Avançada</pt>
   <it>Ricerca Avanzata</it>
   <ru>Расширенный Поиск</ru>
@@ -374,6 +395,7 @@
   <fr>Collection %s introuvable</fr>
   <de>Sammlung %s nicht gefunden</de>
   <es>Colección %s no encontrada</es>
+  <ca>No s'ha trobat la col·lecció %s</ca>
   <pt>A coleção %s não foi encontrada</pt>
   <it>Collezione %s Non Trovata</it>
   <ru>Набор %s не существует</ru>
@@ -402,6 +424,10 @@
     <p>Lo sentimos, la colección <strong>%s</strong> no existe.
     <p>Inténtelo empezando desde <a href=\"%s\">%s</a>.
   </es>
+  <ca>
+    <p>Ho sentim, la col·lecció <strong>%s</strong> no existeix.
+    <p>Proveu-ho començant des de <a href=\"%s\">%s</a>.
+  </ca>
   <pt>
     <p>Sinto muito, mas a coleção <strong>%s</strong> parece não existir.
     <p>Experimente explorar a partir de <a href=\"%s\">%s</a>.
@@ -445,6 +471,7 @@
   <fr>compte</fr>
   <de>Konto</de>
   <es>cuenta</es>
+  <ca>compte</ca>
   <pt>conta</pt>
   <it>conto</it>
   <ru>счёт</ru>
@@ -461,6 +488,7 @@
   <fr>alertes</fr>
   <de>Anzeigen</de>
   <es>avisos</es>
+  <ca>alertes</ca>
   <pt>avisos</pt>
   <it>allerta</it>
   <ru>сообщения</ru>
@@ -477,6 +505,7 @@
   <fr>paniers</fr>
   <de>Körbe</de>
   <es>cestas</es>
+  <ca>cistells</ca>
   <pt>cestas</pt>
   <it>paniere</it>
   <ru>корзины</ru>
@@ -495,6 +524,7 @@
   <fr>soumissions</fr>
   <de>Eintragungen</de>
   <es>envios</es>
+  <ca>trameses</ca>
   <pt>envios</pt>
   <it>submissions</it>
   <ru>записи</ru>
@@ -512,6 +542,7 @@
   <fr>approbations</fr>
   <de>Bestätigungen</de>
   <es>approvals</es>
+  <ca>aprovacions</ca>
   <pt>aprovações</pt>
   <it>approvazioni</it>
   <ru>подтверждения</ru>
@@ -528,6 +559,7 @@
   <fr>session</fr>
   <de>Session</de>
   <es>sesión</es>
+  <ca>sessió</ca>
   <pt>sessão</pt>
   <it>sessione</it>
   <ru>сеанс</ru>
@@ -544,6 +576,7 @@
   <fr>login</fr>
   <de>Anmelden</de>
   <es>identificación</es>
+  <ca>identificació</ca>
   <pt>identificação</pt>
   <it>login</it>
   <ru>записаться</ru>
@@ -560,6 +593,7 @@
   <fr>logout</fr>
   <de>Abmelden</de>
   <es>salir</es>
+  <ca>sortir</ca>
   <pt>sair</pt>
   <it>logout</it>
   <ru>выход</ru>
@@ -576,6 +610,7 @@
   <fr>langue</fr>
   <de>sprache</de>
   <es>idioma</es>
+  <ca>idioma</ca>
   <pt>idioma</pt>
   <it>lingua</it>
   <ru>язык</ru>
@@ -592,6 +627,7 @@
   <fr>Liste</fr>
   <de>Durchblättern</de>
   <es>Explorar</es>
+  <ca>Llista</ca>
   <pt>Explorar</pt>
   <it>Sfogliare</it>
   <ru>Просмотреть</ru>
@@ -608,6 +644,7 @@
   <fr>Chercher dans %s notices:</fr>
   <de>Suchen durch %s Datensätze nach:</de>
   <es>Buscar en %s registros por:</es>
+  <ca>Cercar en %s registres per</ca>
   <pt>Buscar %s registros por:</pt>
   <it>Ricerca in %s registrazioni:</it>
   <ru>Искать до %s записей для:</ru>
@@ -624,6 +661,7 @@
   <fr>Tous les mots:</fr>
   <de>Alle Worte:</de>
   <es>Todas las palabras:</es>
+  <ca>Totes les paraules:</ca>
   <pt>Todas as palavras:</pt>
   <it>Tutte le parole:</it>
   <ru>Все слова:</ru>
@@ -640,6 +678,7 @@
   <fr>Au moins un des mots:</fr>
   <de>Mindestens die Worte:</de>
   <es>Al menos una de las palabras:</es>
+  <ca>Qualsevol de les paraules:</ca>
   <pt>Qualquer das palavras:</pt>
   <it>Almeno una parola:</it>
   <ru>Любое из слов:</ru>
@@ -656,6 +695,7 @@
   <fr>Phrase exacte:</fr>
   <de>Genaue Phrase:</de>
   <es>Frase exacta:</es>
+  <ca>Frase exacta:</ca>
   <pt>Expressão exata:</pt>
   <it>Frase esatta:</it>
   <ru>Точная фраза:</ru>
@@ -672,6 +712,7 @@
   <fr>Phrase partielle:</fr>
   <de>Partielle Phrase:</de>
   <es>Parte de la frase:</es>
+  <ca>Part de la frase:</ca>
   <pt>Expressão aproximada:</pt>
   <it>Parte di frase:</it>
   <ru>Часть фразы:</ru>
@@ -688,6 +729,7 @@
   <fr>Expression régulière:</fr>
   <de>Regulärer Ausdruck:</de>
   <es>Expresión regular:</es>
+  <ca>Expressió regular:</ca>
   <pt>Expressão regular:</pt>
   <it>Regular expression:</it>
   <ru>Регулярное выражение:</ru>
@@ -704,6 +746,7 @@
   <fr>ET</fr>
   <de>UND</de>
   <es>Y</es>
+  <ca>I</ca>
   <pt>E</pt>
   <it>E</it>
   <ru>И</ru>
@@ -720,6 +763,7 @@
   <fr>OU</fr>
   <de>ODER</de>
   <es>O</es>
+  <ca>O</ca>
   <pt>OU</pt>
   <it>OPPURE</it>
   <ru>ИЛИ</ru>
@@ -736,6 +780,7 @@
   <fr>ET NON PAS</fr>
   <de>UND NICHT</de>
   <es>Y NO</es>
+  <ca>I NO</ca>
   <pt>E NÃO</pt>
   <it>E NON</it>
   <ru>И НЕТ</ru>
@@ -752,6 +797,7 @@
   <fr>Résultats de recherche</fr>
   <de>Suchergebnisse</de>
   <es>Resultados de la búsqueda</es>
+  <ca>Resultats de la cerca</ca>
   <pt>Resultados da busca</pt>
   <it>Risultato della ricerca</it>
   <ru>Результаты поиска</ru>
@@ -768,6 +814,7 @@
   <fr>Essayer votre requête sur...</fr>
   <de>Versuchen Sie Ihre Suche mit...</de>
   <es>Intentar la búsqueda en...</es>
+  <ca>Proveu la vostra cerca a...</ca>
   <pt>Tentar sua busca em...</pt>
   <it>Provate la ricerca su...</it>
   <ru>Попробуйте искать с...</ru>
@@ -785,6 +832,7 @@
   <fr>Vous n'avez pas trouvé ce que vous avez cherché?  Essayez votre requête sur d'autres serveurs:</fr>
   <de>Haben Sie nicht gefunden was Sie suchten?  Versuchen Sie Ihre Suche mit:</de>
   <es>¿No ha encontrado lo que estaba buscando?  Intente su búsqueda en otros servidores:</es>
+  <ca>No heu trobat el que estaveu cercant?  Proveu la vostra cerca a:</ca>
   <pt>Não encotrou o que estava procurando?  Tentar sua busca em:</pt>
   <it>Non avete trovato quello che cercavate? Provate la ricerca su:</it>
   <ru>Haven't found what you were looking for?  Попробуйте искать с:</ru>
@@ -802,6 +850,7 @@
   <fr>Voir aussi: noms d'auteurs similaires</fr>
   <de>Sehen Sie auch: ähnliche Autornamen</de>
   <es>Vea también: autores con nombres similares</es>
+  <ca>Vegeu també: autors amb noms similars</ca>
   <pt>Veja também: nomes de autores similares</pt>
   <it>Vedi anche: autori con nomi simili</it>
   <ru>Смотрите также: similar author names</ru>
@@ -818,6 +867,7 @@
   <fr>dans</fr>
   <de>in</de>
   <es>en</es>
+  <ca>dins</ca>
   <pt>em</pt>
   <it>on</it>
   <ru>в</ru>
@@ -834,6 +884,7 @@
   <fr>Trier par:</fr>
   <de>Sortieren nach:</de>
   <es>Ordenar por:</es>
+  <ca>Ordenar per:</ca>
   <pt>Ordenar por:</pt>
   <it>Ordinamento per:</it>
   <ru>Классифицировать по:</ru>
@@ -850,6 +901,7 @@
   <fr>derniers en premier</fr>
   <de>das Letzte zuerst</de>
   <es>el último primero</es>
+  <ca>el darrer primer</ca>
   <pt>Último primeiro</pt>
   <it>Le ultime all'inizio</it>
   <ru>сначала последний запрос</ru>
@@ -866,6 +918,7 @@
   <fr>asc.</fr>
   <de>aufw.</de>
   <es>asc.</es>
+  <ca>asc.</ca>
   <pt>asc.</pt>
   <it>asc.</it>
   <ru>восх.</ru>
@@ -882,6 +935,7 @@
   <fr>desc.</fr>
   <de>abw.</de>
   <es>desc.</es>
+  <ca>desc.</ca>
   <pt>desc.</pt>
   <it>disc.</it>
   <ru>нисх.</ru>
@@ -898,6 +952,7 @@
   <fr>ranger par</fr>
   <de>ranking</de>
   <es>ordenar por</es>
+  <ca>prioritzar per</ca>
   <pt>ordenado por</pt>
   <it>ordinare per</it>
   <ru>упорядочить по</ru>
@@ -914,6 +969,7 @@
   <fr>Afficher:</fr>
   <de>Ergebnisse darstellen:</de>
   <es>Mostrar resultados:</es>
+  <ca>Visualitzar els resultats:</ca>
   <pt>Mostrar resultados:</pt>
   <it>Visualizzare:</it>
   <ru>Представить результаты:</ru>
@@ -930,6 +986,7 @@
   <fr>résultats</fr>
   <de>Ergebnisse</de>
   <es>resultados</es>
+  <ca>resultats</ca>
   <pt>resultados</pt>
   <it>risultati</it>
   <ru>результаты</ru>
@@ -946,6 +1003,7 @@
   <fr>liste unique</fr>
   <de>einzige Liste</de>
   <es>lista única</es>
+  <ca>llista única</ca>
   <pt>lista única</pt>
   <it>lista unica</it>
   <ru>один лист</ru>
@@ -962,6 +1020,7 @@
   <fr>regroupés par collection</fr>
   <de>verteilen in Sammlungen</de>
   <es>reagrupar por colección</es>
+  <ca>dividit per col·lecció</ca>
   <pt>agrupar por coleção</pt>
   <it>raggruppati per collezione</it>
   <ru>разделить по наборам</ru>
@@ -978,6 +1037,7 @@
   <fr>Format de sortie:</fr>
   <de>Darstellungsformat:</de>
   <es>Formato de visualización:</es>
+  <ca>Format de visualizació:</ca>
   <pt>Formato de saída:</pt>
   <it>Formato di visualizzazione:</it>
   <ru>Формат представления:</ru>
@@ -994,6 +1054,7 @@
   <fr>bref</fr>
   <de>kurz</de>
   <es>breve</es>
+  <ca>breu</ca>
   <pt>breve</pt>
   <it>breve</it>
   <ru>краткий</ru>
@@ -1009,6 +1070,7 @@
   <en>detailed</en>
   <fr>détaillé</fr>
   <de>detailliert</de>
+  <ca>complet</ca>
   <es>detallado</es>
   <pt>detalhado</pt>
   <it>dettagliato</it>
@@ -1026,6 +1088,7 @@
   <fr>Notice détaillée</fr>
   <de>Details vom Eintrag</de>
   <es>Registro completo</es>
+  <ca>Registre complet</ca>
   <pt>Registro detalhado</pt>
   <it>Registrazione dettagliata</it>
   <ru>Подробная запись</ru>
@@ -1050,6 +1113,9 @@
   <es>
     <strong>Todos los resultados:</strong> Encontrados <strong>%s</strong> registros en %.2f segundos.
   </es>
+  <ca>
+    <strong>Resultats globals:</strong> Trobats <strong>%s</strong> registres em %.2f segonss.
+  </ca>
   <pt>
     <strong>Resultados globais:</strong> Encontrados <strong>%s</strong> registros em %.2f segundos.
   </pt>
@@ -1084,6 +1150,7 @@
   <fr><strong>%s</strong> notices trouvées</fr>
   <de><strong>%s</strong> Datensätze gefunden</de>
   <es><strong>%s</strong> registros encontrados</es>
+  <ca><strong>%s</strong> registres trobats</ca>
   <pt><strong>%s</strong> registros encontrados</pt>
   <it><strong>%s</strong> registrazioni trovate</it>
   <ru><strong>%s</strong> найденных записей</ru>
@@ -1100,6 +1167,7 @@
   <fr>aller sur la notice:</fr>
   <de>gehen zum Satz:</de>
   <es>ir al registro:</es>
+  <ca>saltar al registre:</ca>
   <pt>ir para o registro:</pt>
   <it>andare alla registrazione:</it>
   <ru>идти к записи:</ru>
@@ -1116,6 +1184,7 @@
   <fr>La recherche a duré %.2f secondes.</fr>
   <de>Die Suche hat %.2f Sekunden gedauert.</de>
   <es>La búsqueda tardó %.2f segundos.</es>
+  <ca>La cerca s'ha fet en %.2f segons.</ca>
   <pt>A busca levou %.2f segundos.</pt>
   <it>La ricerca ha preso %.2f secondi.</it>
   <ru>Поиск длился %.2f секунд.</ru>
@@ -1132,6 +1201,7 @@
   <fr>AJOUTER DANS PANIER</fr>
   <de>IN DEN KORB HINZUFÜGEN</de>
   <es>AÑADIR A LA CESTA</es>
+  <ca>AFEGIR AL CISTELL</ca>
   <pt>ADICIONAR À CESTA</pt>
   <it>AGGIUNGERE AL PANIERE</it>
   <ru>ДОБАВИТь В КОРЗИНУ</ru>
@@ -1148,6 +1218,7 @@
   <fr>collections</fr>
   <de>Sammlungen</de>
   <es>colecciones</es>
+  <ca>col·leccions</ca>
   <pt>coleções</pt>
   <it>collezioni</it>
   <ru>наборы</ru>
@@ -1164,6 +1235,7 @@
   <fr>toutes les collections</fr>
   <de>alle Sammlungen</de>
   <es>todas las colecciones</es>
+  <ca>totes les col·leccions</ca>
   <pt>qualquer coleção</pt>
   <it>tutte le collezioni</it>
   <ru>любой набор</ru>
@@ -1180,6 +1252,7 @@
   <fr>ajouter une nouvelle collection</fr>
   <de>Neue Sammlung hinzufügen</de>
   <es>añadir otra colección</es>
+  <ca>afegir una altra col·lecció</ca>
   <pt>adicionar outra coleção</pt>
   <it>aggiungere un'altra collezione</it>
   <ru>добавить другой набор</ru>
@@ -1196,6 +1269,7 @@
   <fr>visiteur</fr>
   <de>Gast</de>
   <es>visitante</es>
+  <ca>visitant</ca>
   <pt>visitante</pt>
   <it>guest</it>
   <ru>гость</ru>
@@ -1212,6 +1286,7 @@
   <fr>Aide pour soumission</fr>
   <de>Eintragehilfe</de>
   <es>Ayuda para el Envio</es>
+  <ca>Ajuda per la tramesa</ca>
   <pt>Ajuda sobre Envio</pt>
   <it>Aiuto per la Sottomissione</it>
   <ru>Помощь при внесении</ru>
@@ -1228,6 +1303,7 @@
   <fr>administration</fr>
   <de>Verwaltung</de>
   <es>administración</es>
+  <ca>administració</ca>
   <pt>administração</pt>
   <it>amministrazione</it>
   <ru>администрация</ru>
@@ -1244,6 +1320,7 @@
   <fr>Coin administrateur</fr>
   <de>Verwaltungsraum</de>
   <es>Área del Administrador</es>
+  <ca>Àrea de l&quot;admistrador</ca>
   <pt>Área do Administrador</pt>
   <it>Area dell&quot;Amministratore</it>
   <ru>Область Администратора</ru>
@@ -1260,6 +1337,7 @@
   <fr>Administration des soumissions</fr>
   <de>WebSubmit Verwaltung</de>
   <es>Administración de WebSubmit</es>
+  <ca>Administració de trameses</ca>
   <pt>Administração de Envios</pt>
   <it>Amministrazione Websubmit</it>
   <ru>Администрация Внесения</ru>
@@ -1276,6 +1354,7 @@
   <fr>Guide</fr>
   <de>Führer</de>
   <es>Guía</es>
+  <ca>Guia</ca>
   <pt>Guia</pt>
   <it>Guida</it>
   <ru>Руководство</ru>
@@ -1292,6 +1371,7 @@
   <fr>Ajouté depuis:</fr>
   <de>Hinzufügt seit:</de>
   <es>Añadido a partir de:</es>
+  <ca>Afegit des de:</ca>
   <pt>Adicionada desde:</pt>
   <it>Aggiunto dal:</it>
   <ru>Добавлено с:</ru>
@@ -1308,6 +1388,7 @@
   <fr>jusqu'à:</fr>
   <de>nach:</de>
   <es>hasta:</es>
+  <ca>fins:</ca>
   <pt>até:</pt>
   <it>fino al:</it>
   <ru>до:</ru>
@@ -1324,6 +1405,7 @@
   <fr>tous les jours</fr>
   <de>beliebiger Tag</de>
   <es>cualquier día</es>
+  <ca>qualsevol dia</ca>
   <pt>qualquer dia</pt>
   <it>qualsiasi giorno</it>
   <ru>любой день</ru>
@@ -1340,6 +1422,7 @@
   <fr>tous les mois</fr>
   <de>beliebiger Monat</de>
   <es>cualquier mes</es>
+  <ca>qualsevol mes</ca>
   <pt>qualquer mês</pt>
   <it>qualsiasi mese</it>
   <ru>любой месяц</ru>
@@ -1356,6 +1439,7 @@
   <fr>toutes les années</fr>
   <de>beliebiges Jahr</de>
   <es>cualquier año</es>
+  <ca>qualsevol any</ca>
   <pt>qualquer ano</pt>
   <it>qualsiasi anno</it>
   <ru>любой год</ru>
@@ -1372,6 +1456,7 @@
   <fr>janvier</fr>
   <de>Januar</de>
   <es>Enero</es>
+  <ca>gener</ca>
   <pt>Janeiro</pt>
   <it>Gennaio</it>
   <ru>январь</ru>
@@ -1388,6 +1473,7 @@
   <fr>février</fr>
   <de>Februar</de>
   <es>Febrero</es>
+  <ca>febrer</ca>
   <pt>Fevereiro</pt>
   <it>Febbraio</it>
   <ru>февраль</ru>
@@ -1404,6 +1490,7 @@
   <fr>mars</fr>
   <de>März</de>
   <es>Marzo</es>
+  <ca>març</ca>
   <pt>Março</pt>
   <it>Marzo</it>
   <ru>март</ru>
@@ -1420,6 +1507,7 @@
   <fr>avril</fr>
   <de>April</de>
   <es>Abril</es>
+  <ca>abril</ca>
   <pt>Abril</pt>
   <it>Aprile</it>
   <ru>апрель</ru>
@@ -1436,6 +1524,7 @@
   <fr>mai</fr>
   <de>Mai</de>
   <es>Mayo</es>
+  <ca>maig</ca>
   <pt>Maio</pt>
   <it>Maggio</it>
   <ru>май</ru>
@@ -1452,6 +1541,7 @@
   <fr>juin</fr>
   <de>Juni</de>
   <es>Junio</es>
+  <ca>juny</ca>
   <pt>Junho</pt>
   <it>Giugno</it>
   <ru>июнь</ru>
@@ -1468,6 +1558,7 @@
   <fr>juillet</fr>
   <de>Juli</de>
   <es>Julio</es>
+  <ca>juliol</ca>
   <pt>Julho</pt>
   <it>Luglio</it>
   <ru>июль</ru>
@@ -1484,6 +1575,7 @@
   <fr>août</fr>
   <de>August</de>
   <es>Agosto</es>
+  <ca>agost</ca>
   <pt>Agosto</pt>
   <it>Agosto</it>
   <ru>август</ru>
@@ -1500,6 +1592,7 @@
   <fr>septembre</fr>
   <de>September</de>
   <es>Septiembre</es>
+  <ca>setembre</ca>
   <pt>Setembro</pt>
   <it>Settembre</it>
   <ru>сентябрь</ru>
@@ -1516,6 +1609,7 @@
   <fr>octobre</fr>
   <de>October</de>
   <es>Octubre</es>
+  <ca>octubre</ca>
   <pt>Outubro</pt>
   <it>Ottobre</it>
   <ru>октябрь</ru>
@@ -1532,6 +1626,7 @@
   <fr>novembre</fr>
   <de>November</de>
   <es>Noviembre</es>
+  <ca>novembre</ca>
   <pt>Novembro</pt>
   <it>Novembre</it>
   <ru>ноябрь</ru>
@@ -1548,6 +1643,7 @@
   <fr>décembre</fr>
   <de>Dezember</de>
   <es>Diciembre</es>
+  <ca>desembre</ca>
   <pt>Dezembro</pt>
   <it>Dicembre</it>
   <ru>декабрь</ru>
@@ -1564,6 +1660,7 @@
   <fr>Le terme de recherche <em>%s</em></fr>
   <de>Suchbegriff <em>%s</em></de>
   <es>Término de búsqueda <em>%s</em></es>
+  <ca>El terme de cerca <em>%s</em></ca>
   <pt>Termo de busca <em>%s</em></pt>
   <it>Termine di ricerca <em>%s</em></it>
   <ru>Искомый термин <em>%s</em></ru>
@@ -1580,6 +1677,7 @@
   <fr>dans l'index <em>%s</em></fr>
   <de>im Index von <em>%s</em></de>
   <es>en el índice <em>%s</em></es>
+  <ca>dins l'índex <em>%s</em></ca>
   <pt>no <em>%s</em> índice</pt>
   <it>nell'indice <em>%s</em></it>
   <ru>в индексе <em>%s</em></ru>
@@ -1596,6 +1694,7 @@
   <fr>ne se trouve dans aucune notice.  Les termes les plus proches de toutes les collections sont:</fr>
   <de>hat keine Datensätze gefunden.  Die nächsten Begriffe in allen Sammlungen sind:</de>
   <es>no se han encontrado ningún registro.  Los términos aproximados en todas las colección son:</es>
+  <ca>no s'ha trobat en cap registre.  Els termes aproximats en totes les col·leccions són:</ca>
   <pt>não está presente em nenhum registro.  Os termos mais similares em todas as coleções são:</pt>
   <it>non ha dato risultati. I termini piu` prossimi in tutte le collezioni sono:</it>
   <ru>не найден. Возможные термины:</ru>
@@ -1612,6 +1711,7 @@
   <fr>Aucun index de mots n'est disponible pour</fr>
   <de>Kein Wortindex steht zur Verfügung für</de>
   <es>No hay ningún índice de palabras disponible</es>
+  <ca>No hi ha cap índex de paraules disponible per a</ca>
   <pt>Nenhum índice de palavras está disponível para</pt>
   <it>Nessun indice per parola è disponibile per</it>
   <ru>Не найден лексический индекс для</ru>
@@ -1628,6 +1728,7 @@
   <fr>Aucun index de phrases n'est disponible pour</fr>
   <de>Kein Begriffindex steht zur Verfügung für</de>
   <es>No hay ningún índice de frases disponible</es>
+  <ca>No hi ha cap índex de frases disponible per a</ca>
   <pt>Nenhum índice de frases está disponível para</pt>
   <it>Nessun indice per frase è disponibile per</it>
   <ru>Не найден фразовый индех для</ru>
@@ -1659,6 +1760,10 @@
     No hay documentos que respondan a la búsqueda en la coleción %s.
     Other public collections gave <a class="nearestterms" href="%s/search.py?%s">%d hits</a>.
   </es>
+  <ca>
+    No s'ha trobat cap coincidència dins la col·lecció %s.
+    Altres col·leccions públiques han donat <a class="nearestterms" href="%s/search.py?%s">%d resultats</a>.
+  </ca>
   <pt>
     Nenhum resultado foi encontrado na coleção %s.
     Outras coleções públicas retornaram <a class="nearestterms" href="%s/search.py?%s">%d resultados</a>.
@@ -1718,6 +1823,11 @@
     Si estaba buscando documentos no públicos, por favor
     escoga primero la opción collección restringida.
   </es>
+  <ca>
+    No s'ha trobat cap coincidència en col·leccions públiques.  Si
+    esteu cercant documents no públics, escolliu primer la col·lecció
+    restringida.
+  </ca>
   <pt>
     Nenhuma coleção pública corresponde à sua busca. Se você está 
     procurando um documento que não é público, por favor escolha 
@@ -1735,7 +1845,7 @@
     Žiadna verejne prístupná kolekcia nevyhovuje Vašej otázke.  Ak ste
     hľadali dokumenty verejne neprístupné, zvoľte prosím najskôr
     príslušnú neverejnú kolekciu.
-  </Sk>
+  </sk>
   <cs>
     Žádná veřejně přístupná kolekce nevyhovuje Vašemu dotazu.  Jestliže
     jste hledali dokumenty veřejně nepřístupné, zvolte prosím nejdříve
@@ -1776,6 +1886,10 @@
     No se han encontrado resultados dentro de los límites de
     tiempo especificados, descartando esta condición...
   </es>
+  <ca>
+    No s'ha trobat cap coincidència en l'intèrval de temps
+    especificat.  Descartant aquesta condició...
+  </ca>
   <pt>
     Nenhum resultado dentro do período de tempo especificado,
     desconsiderando esta condição...
@@ -1823,6 +1937,10 @@
     No se han encontrado resultados dentro de los límites especificados,
     descartando esta condición...    
   </es>
+  <ca>
+    No s'ha trobat cap coincidència en les limitacions que heu
+    especificat.  Descartant aquesta condició...
+  </ca>
   <pt>
     Nenhum resultado dentro dos limites de busca especificados, 
     descartando esta condição...
@@ -1872,6 +1990,10 @@
     La combinación booleana no ha dado resultados.
     Por favor combien los términos de búsqueda de otra manera.
   </es>
+  <ca>
+    La cerca booleana no ha donat cap resultat.
+    Proveu de combinar els vostres termes de cerca d'una altra manera.
+  </ca>
   <pt>
     A consulta booleana não gerou resultados.
     Por favor combine seus termos de outra maneira.
@@ -1924,6 +2046,10 @@
     No se han encontrado coincidencias con <em>%s</em>, en cambio
     usando <em>%s</em> ...
   </es>
+  <ca>
+    No s'ha trobat cap coincidència exacta per <em>%s</em>, però en
+    canvi usant <em>%s</em> ...
+  </ca>
   <pt>
     Nenhum resultado exato foi encontrado para <em>%s</em>, usando
     <em>%s</em> em substituição...
@@ -1963,6 +2089,7 @@
   <fr>Erreur interne</fr>
   <de>Interner Fehler</de>
   <es>Error Interno</es>
+  <ca>Error intern</ca>
   <pt>Erro Interno</pt>
   <it>Errore Interno</it>
   <ru>Внутренная Ошибка</ru>
@@ -1990,6 +2117,10 @@
     Por favor contacte <a href=\"mailto:%s\">%s</a> indicando la siguiente
     información:
   </es>
+  <ca>
+    Si us plau contacteu amb <a href=\"mailto:%s\">%s</a> citant la
+    següent informació:
+  </ca>
   <pt>
     Por favor entre em contato com <a href=\"mailto:%s\">%s</a>
     mencionando a seguinte informação:       
@@ -2028,6 +2159,7 @@
   <fr>Options de recherche:</fr>
   <de>Suchoptionen:</de>
   <es>Opciones de búsqueda:</es>
+  <ca>Opcions de cerca:</ca>
   <pt>Opções de busca:</pt>
   <it>Opzioni di ricerca:</it>
   <ru>Опции поиска:</ru>
@@ -2044,6 +2176,7 @@
   <fr>Derniers ajouts:</fr>
   <de>Letzte Einträge:</de>
   <es>Últimas adquisiciones:</es>
+  <ca>Darreres entrades:</ca>
   <pt>Ítens mais recentes:</pt>
   <it>Ultimi arrivi:</it>
   <ru>Последние добавления:</ru>
@@ -2060,6 +2193,7 @@
   <fr>davantage</fr>
   <de>mehr</de>
   <es>más</es>
+  <ca>més</ca>
   <pt>mais</pt>
   <it>ancora</it>
   <ru>ещё</ru>
@@ -2076,6 +2210,7 @@
   <fr>Cette collection ne contient pas encore de document.</fr>
   <de>Diese Sammlung enthält zur Zeit keine Dokumente.</de>
   <es>Esta colección no contiene aún ningún documento.</es>
+  <ca>Aquesta col·lecció encara no conté cap document.</ca>
   <pt>Esta coleção ainda não contém nenhum documento.</pt>
   <it>Questa collezione non contiene ancora alcun documento.</it>
   <ru>Этот набор не содержит пока ни одной записи.</ru>
@@ -2092,6 +2227,7 @@
   <fr>Le contenu de cette collection est restreint.</fr>
   <de>Der Inhalt von dieser Sammlung ist privat.</de>
   <es>El contenido de esta colección es reservado.</es>
+  <ca>Els continguts d'aquesta col·lecció són restringits.</ca>
   <pt>O conteúdo desta coleção é restrito.</pt>
   <it>Il contenuto di questa collezione è riservato.</it>
   <ru>Содержание етого набора ограничено.</ru>
@@ -2108,6 +2244,7 @@
   <fr>Conversion</fr>
   <de>Konvertieren</de>
   <es>Convertir</es>
+  <ca>Convertir</ca>
   <pt>Converter</pt>
   <it>Convertire</it>
   <ru>Конвертировать</ru>
@@ -2124,6 +2261,7 @@
   <fr>Agenda</fr>
   <de>Agenda</de>
   <es>Agenda</es>
+  <ca>Agenda</ca>
   <pt>Agenda</pt>
   <it>Agenda</it>
   <ru>Повестка</ru>
@@ -2140,6 +2278,7 @@
   <fr>Webcast</fr>
   <de>Webcast</de>
   <es>Webcast</es>
+  <ca>Webcast</ca>
   <pt>Webcast</pt>
   <it>Webcast</it>
   <ru>Вэбкаст</ru>
@@ -2156,6 +2295,7 @@
   <fr>Bulletin</fr>
   <de>Bulletin</de>
   <es>Boletín</es>
+  <ca>Butlletí</ca>
   <pt>Boletim</pt>
   <it>Bulletin</it>
   <ru>Бюллетень</ru>
@@ -2172,6 +2312,7 @@
   <fr>Bibliothèque</fr>
   <de>Bibliothek</de>
   <es>Biblioteca</es>
+  <ca>Biblioteca</ca>
   <pt>Biblioteca</pt>
   <it>Biblioteca</it>
   <ru>Библиотека</ru>
@@ -2188,6 +2329,7 @@
   <fr>Ce site est aussi disponible dans les langues suivantes:</fr>
   <de>Diese Seite gibt es auch in den folgenden Sprachen:</de>
   <es>Este sitio también está disponible en los siguientes idiomas: </es>
+  <ca>Aquest lloc està també disponible en els següents idiomes:</ca>
   <pt>Esta sita também está disponível nos seguintes idiomas: </pt>
   <it>Questo sito è disponibile anche nelle lingue seguenti: </it>
   <ru>Этот сайт также доступен на следующих языках:</ru>
@@ -2204,6 +2346,7 @@
   <fr>'</fr>
   <de>.</de>
   <es>,</es>
+  <ca>.</ca>
   <pt>.</pt>
   <it>.</it>
   <ru>,</ru>
@@ -2224,6 +2367,7 @@
   <fr>La notice a été supprimée.</fr>
   <de>Der Datensatz wurde gelöscht.</de>
   <es>The record has been deleted.</es>
+  <ca>El registre ha estat esborrat.</ca>
   <pt>O registro foi apagado.</pt>
   <it>The record has been deleted.</it>
   <ru>The record has been deleted.</ru>
@@ -2240,6 +2384,7 @@
   <fr>restreint</fr>
   <de>privat</de>
   <es>reservado</es>
+  <ca>restringit</ca>
   <pt>restrito</pt>
   <it>riservato</it>
   <ru>ограничено</ru>
@@ -2259,6 +2404,7 @@
   <fr>Notice créée %s, modifiée %s</fr>
   <de>Datensatz erzeugt %s, letzte Änderung %s</de>
   <es>Registro creado %s, modificado %s</es>
+  <ca>Registre creat el %s, modificat el %s</ca>
   <pt>Registro criado %s, modificado pela última vez %s</pt>
   <it>Record created %s, last modified %s</it>
   <ru>Record created %s, last modified %s</ru>
@@ -2278,6 +2424,7 @@
   <fr>Notices similaires</fr>
   <de>Ähnliche Datensätze</de>
   <es>Registros similares</es>
+  <ca>Registres semblants</ca>
   <pt>Registros similares</pt>
   <it>Similar records</it>
   <ru>Similar records</ru>
@@ -2296,6 +2443,7 @@
   <fr>similarité de mots</fr>
   <de>Wortähnlichkeit</de>
   <es>similitud de palabras</es>
+  <ca>semblança de paraules</ca>
   <pt>similaridade por palavra</pt>
   <it>word similarity</it>
   <ru>word similarity</ru>
@@ -2316,6 +2464,7 @@
   <fr>Cité par</fr>
   <de>Zitiert von</de>
   <es>Citado por</es>
+  <ca>Citat per</ca>
   <pt>Citado por</pt>
   <it>Citato da</it>
   <ru>Cited by</ru>
@@ -2336,6 +2485,7 @@
   <fr>Cité par: %s notices</fr>
   <de>Zitiert von: %s Datensätzen</de>
   <es>Citado por: %s registros</es>
+  <ca>Citat por: %s registres</ca>
   <pt>Citado por: %s registros</pt>
   <it>Citato da: %s articoli</it>
   <ru>Cited by: %s records</ru>
@@ -2356,6 +2506,7 @@
   <fr>Co-cité avec: %s notices</fr>
   <de>Co-zitiert mit: %s Datensätzen</de>
   <es>Co-citado con: %s registros</es>
+  <ca>Co-citat amb: %s registres</ca>
   <pt>Co-citado com: %s registros</pt>
   <it>Citato con: %s articoli</it>
   <ru>Co-cited with: %s records</ru>
@@ -2376,6 +2527,7 @@
   <fr>Historique des citations:</fr>
   <de>Historie der Zitationen:</de>
   <es>Historia de citas:</es>
+  <ca>Històric de cites:</ca>
   <pt>Histórico de citações:</pt>
   <it>Cronaca delle citazioni:</it>
   <ru>Citation history:</ru>
@@ -2396,6 +2548,7 @@
   <fr>Historique des téléchargements:</fr>
   <de>Historie der Herunterladen:</de>
   <es>Historia de descargas:</es>
+  <ca>Històric de baixades:</ca>
   <pt>Históricos de downloads:</pt>
   <it>Cronaca dei downloads:</it>
   <ru>Downloads history:</ru>
@@ -2416,6 +2569,7 @@
   <fr>Les utilisateurs qui ont vu cette page ont aussi vu:</fr>
   <de>Benutzer, die diese Seite sahen, haben auch dargestellt:</de>
   <es>La gente que vió esta página también vió:</es>
+  <ca>Els usuaris que han vist aquesta pàgina també han vist:</ca>
   <pt>Pessoas que visitaram esta página também visitaram:</pt>
   <it>Gli utenti che hanno visitato questa pagina hanno anche visitato:</it>
   <ru>People who viewed this page also viewed:</ru>
@@ -2437,6 +2591,7 @@
   <fr>Les utilisateurs qui ont téléchargé ce document ont aussi téléchargé:</fr>
   <de>Benutzer, die diesen Dokument herunterladeten, haben auch herunterladet:</de>
   <es>La gente que descargó este documento también descargó:</es>
+  <ca>Els usuaris que han baixat aquest document també han baixat:</ca>
   <pt>Pessoas que baixaram este documento também baixaram:</pt>
   <it>Gli utenti che hanno scaricato questo documento hanno anche scaricato:</it>
   <ru>People who downloaded this document also downloaded:</ru>

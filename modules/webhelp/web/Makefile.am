@@ -21,19 +21,20 @@ SUBDIRS = admin hacking
 
 docdir = $(WEBDIR)/help
 
-doc_DATA=index.en.html index.fr.html index.de.html index.pt.html index.es.html index.it.html index.ru.html index.sk.html index.cs.html index.no.html index.sv.html index.el.html index.uk.html
+doc_DATA=index.en.html index.fr.html index.de.html index.pt.html index.es.html index.ca.html index.it.html index.ru.html index.sk.html index.cs.html index.no.html index.sv.html index.el.html index.uk.html
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 
-%.en.html %.fr.html %.de.html %.es.html %.pt.html %.it.html %.ru.html %.sk.html %.cs.html %.no.html %.sv.html %.el.html %.uk.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
+%.en.html %.fr.html %.de.html %.es.html %.ca.html %.pt.html %.it.html %.ru.html %.sk.html %.cs.html %.no.html %.sv.html %.el.html %.uk.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
            $(top_srcdir)/config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$*.en.html \
 	       -o\(ALL-LANG_*\)+LANG_FR:$*.fr.html \
 	       -o\(ALL-LANG_*\)+LANG_DE:$*.de.html \
 	       -o\(ALL-LANG_*\)+LANG_ES:$*.es.html \
+	       -o\(ALL-LANG_*\)+LANG_CA:$*.ca.html \
 	       -o\(ALL-LANG_*\)+LANG_PT:$*.pt.html \
 	       -o\(ALL-LANG_*\)+LANG_IT:$*.it.html \
 	       -o\(ALL-LANG_*\)+LANG_RU:$*.ru.html \

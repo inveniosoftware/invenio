@@ -102,6 +102,7 @@
 <fr>Bienvenu au <MSG_HELP_CENTRAL> de <CDSNAMEINTL>.</fr>
 <de>Herzlich Willkommen in der <MSG_HELP_CENTRAL> von <CDSNAMEINTL>.</de>
 <es>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</es>
+<ca>Benvinguts al <MSG_HELP_CENTRAL> de <CDSNAMEINTL>.</ca>
 <pt>Bem vindo à <MSG_HELP_CENTRAL> do <CDSNAMEINTL>.</pt>
 <it>Benvenuti nell'<MSG_HELP_CENTRAL> di <CDSNAMEINTL>.</it>
 <ru>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</ru>
@@ -120,6 +121,7 @@
     <fr>Obtenez de l'aide avec la recherche sur <CDSNAMEINTL>.</fr>
     <de>Hier können Sie die Suchhilfe für den <CDSNAMEINTL> konsultieren.</de>
     <es>Get help with searching <CDSNAMEINTL>.</es>
+    <ca>Ajuda en la cerca de <CDSNAMEINTL>.</ca>
     <pt>Obtenha ajuda em buscas no <CDSNAMEINTL>.</pt>
     <it>Aiuto alla ricerca in <CDSNAMEINTL>.</it>
     <ru>Get help with searching <CDSNAMEINTL>.</ru>
@@ -134,6 +136,7 @@
     <fr>Obtenez de l'aide avec la soumission dans <CDSNAMEINTL>.</fr>
     <de>Hier können Sie die Eintragehilfe für den <CDSNAMEINTL> konsultieren.</de>
     <es>Get help with submitting to <CDSNAMEINTL>.</es>
+    <ca>Ajuda per la tramesa de documents a <CDSNAMEINTL>.</ca>
     <pt>Obtenha ajuda em submissões ao <CDSNAMEINTL>.</pt>
     <it>Aiuto per la sottomissione di documenti ad <CDSNAMEINTL>.</it>
     <ru>Get help with submitting to <CDSNAMEINTL>.</ru>
