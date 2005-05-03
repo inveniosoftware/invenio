@@ -49,6 +49,9 @@
 <define-tag ETCDIR whitespace=delete>
 @prefix@/etc
 </define-tag>
+<define-tag LOCALEDIR whitespace=delete>
+@prefix@/share/locale
+</define-tag>
 <define-tag TMPDIR whitespace=delete>
 @localstatedir@/tmp
 </define-tag>
