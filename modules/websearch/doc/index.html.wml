@@ -101,6 +101,7 @@
    <fr>Trouvez tout sur la recherche de</fr>
    <de>Lernen Sie alles über den Suchemöglichkeiten beim</de>
    <es>Find out all about searching</es>
+   <ca>Trobeu tota l'ajuda sobre la cerca</ca>
    <pt>Descubra tudo sobre buscas no</pt>
    <it>Tutto quanto vi serve per poter ricercare in</it>
    <ru>Find out all about searching</ru>
@@ -134,6 +135,10 @@
       This page presents you with useful tips and techniques in order to
       help you use the <CDSNAMEINTL> site to the full.
     </es>  
+    <ca>
+      Aquesta pàgina us presenta suggeriments i tècniques que us poden
+      resultar útils per usar <CDSNAMEINTL> en totes les seves possibilitats.
+    </ca>  
     <pt>
       Esta página oferece dicas  úteis e técnicas para ajuda-lo a usar o sítio do 
       <CDSNAMEINTL> em toda sua potencialidade.
@@ -176,6 +181,7 @@
      <fr>Guide de Recherche</fr>
      <de>Search Guide</de>
      <es>Search Guide</es>
+     <ca>Search Guide</ca>
      <pt>Guia de buscas</pt>
      <it>Search Guide</it>
      <ru>Search Guide</ru>
@@ -191,6 +197,7 @@
     <fr>Le guide complet sur comment rechercher sur</fr>
     <de>Full guide on how to search</de>
     <es>Full guide on how to search</es>
+    <ca>Full guide on how to search</ca>
     <pt>Guia completo de como realizar buscas no</pt>
     <it>Full guide on how to search</it>
     <ru>Full guide on how to search</ru>
