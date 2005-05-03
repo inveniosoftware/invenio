@@ -21,6 +21,7 @@
 ## language handling:
 
 #use wml::std::lang
+<lang:new id=ca short>
 <lang:new id=de short>
 <lang:new id=en short>
 <lang:new id=es short>
@@ -47,6 +48,7 @@
                       'fr' => 'Français',
                       'de' => 'Deutsch',
                       'es' => 'Español',
+                      'ca' => 'Català',
                       'pt' => 'Português',
                       'it' => 'Italiano',
                       'ru' => 'Русский',
