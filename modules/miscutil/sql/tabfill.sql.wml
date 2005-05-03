@@ -30,6 +30,7 @@ INSERT INTO collection VALUES (1,'<CDSNAME>',NULL,NULL,NULL,NULL);
 <fr>INSERT INTO collectionname VALUES (1,'fr','ln','<CDSNAMEINTL>');</fr>
 <de>INSERT INTO collectionname VALUES (1,'de','ln','<CDSNAMEINTL>');</de>
 <es>INSERT INTO collectionname VALUES (1,'es','ln','<CDSNAMEINTL>');</es>
+<ca>INSERT INTO collectionname VALUES (1,'ca','ln','<CDSNAMEINTL>');</ca>
 <pt>INSERT INTO collectionname VALUES (1,'pt','ln','<CDSNAMEINTL>');</pt>
 <it>INSERT INTO collectionname VALUES (1,'it','ln','<CDSNAMEINTL>');</it>
 <ru>INSERT INTO collectionname VALUES (1,'ru','ln','<CDSNAMEINTL>');</ru>
@@ -57,6 +58,7 @@ INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,1,
 <fr>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'fr','ln','<MSG_WORD_SIMILARITY>');</fr>
 <de>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'de','ln','<MSG_WORD_SIMILARITY>');</de>
 <es>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'es','ln','<MSG_WORD_SIMILARITY>');</es>
+<ca>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'ca','ln','<MSG_WORD_SIMILARITY>');</ca>
 <pt>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'pt','ln','<MSG_WORD_SIMILARITY>');</pt>
 <it>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'it','ln','<MSG_WORD_SIMILARITY>');</it>
 <ru>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'ru','ln','<MSG_WORD_SIMILARITY>');</ru>
@@ -87,6 +89,7 @@ INSERT INTO fieldname VALUES (1,'en','ln','any field');
 INSERT INTO fieldname VALUES (1,'fr','ln','tous les champs');
 INSERT INTO fieldname VALUES (1,'de','ln','alle Felder');
 INSERT INTO fieldname VALUES (1,'es','ln','cualquier campo');
+INSERT INTO fieldname VALUES (1,'ca','ln','qualsevol camp');
 INSERT INTO fieldname VALUES (1,'pt','ln','qualquer campo');
 INSERT INTO fieldname VALUES (1,'it','ln','tutti i campi');
 INSERT INTO fieldname VALUES (1,'ru','ln','любое поле');
@@ -101,6 +104,7 @@ INSERT INTO fieldname VALUES (2,'en','ln','title');
 INSERT INTO fieldname VALUES (2,'fr','ln','titre');
 INSERT INTO fieldname VALUES (2,'de','ln','Titel');
 INSERT INTO fieldname VALUES (2,'es','ln','título');
+INSERT INTO fieldname VALUES (2,'ca','ln','títol');
 INSERT INTO fieldname VALUES (2,'pt','ln','título');
 INSERT INTO fieldname VALUES (2,'it','ln','titolo');
 INSERT INTO fieldname VALUES (2,'ru','ln','название');
@@ -115,6 +119,7 @@ INSERT INTO fieldname VALUES (3,'en','ln','author');
 INSERT INTO fieldname VALUES (3,'fr','ln','auteur');
 INSERT INTO fieldname VALUES (3,'de','ln','Autor');
 INSERT INTO fieldname VALUES (3,'es','ln','autor');
+INSERT INTO fieldname VALUES (3,'ca','ln','autor');
 INSERT INTO fieldname VALUES (3,'pt','ln','autor');
 INSERT INTO fieldname VALUES (3,'it','ln','autore');
 INSERT INTO fieldname VALUES (3,'ru','ln','автор');
@@ -129,6 +134,7 @@ INSERT INTO fieldname VALUES (4,'en','ln','abstract');
 INSERT INTO fieldname VALUES (4,'fr','ln','abstract');
 INSERT INTO fieldname VALUES (4,'de','ln','Abstrakt');
 INSERT INTO fieldname VALUES (4,'es','ln','resumen');
+INSERT INTO fieldname VALUES (4,'ca','ln','resum');
 INSERT INTO fieldname VALUES (4,'pt','ln','resumo');
 INSERT INTO fieldname VALUES (4,'it','ln','riassunto');
 INSERT INTO fieldname VALUES (4,'ru','ln','абстракт');
@@ -143,6 +149,7 @@ INSERT INTO fieldname VALUES (5,'en','ln','keyword');
 INSERT INTO fieldname VALUES (5,'fr','ln','mot clé');
 INSERT INTO fieldname VALUES (5,'de','ln','Kennwort');
 INSERT INTO fieldname VALUES (5,'es','ln','palabra clave');
+INSERT INTO fieldname VALUES (5,'ca','ln','paraula clau');
 INSERT INTO fieldname VALUES (5,'pt','ln','palavra chave');
 INSERT INTO fieldname VALUES (5,'it','ln','parola chiave');
 INSERT INTO fieldname VALUES (5,'ru','ln','ключевое слово');
@@ -157,6 +164,7 @@ INSERT INTO fieldname VALUES (6,'en','ln','report number');
 INSERT INTO fieldname VALUES (6,'fr','ln','numéro de rapport');
 INSERT INTO fieldname VALUES (6,'de','ln','Reportnummer');
 INSERT INTO fieldname VALUES (6,'es','ln','número de reporte');
+INSERT INTO fieldname VALUES (6,'ca','ln','número d\'informe');
 INSERT INTO fieldname VALUES (6,'pt','ln','número de registro');
 INSERT INTO fieldname VALUES (6,'it','ln','numero del rapporto');
 INSERT INTO fieldname VALUES (6,'ru','ln','номер документа');
@@ -170,7 +178,8 @@ INSERT INTO fieldname VALUES (6,'uk','ln','номер документа');
 INSERT INTO fieldname VALUES (7,'en','ln','subject');
 INSERT INTO fieldname VALUES (7,'fr','ln','sujet');
 INSERT INTO fieldname VALUES (7,'de','ln','Thema');
-INSERT INTO fieldname VALUES (7,'es','ln','');
+INSERT INTO fieldname VALUES (7,'es','ln','materia');
+INSERT INTO fieldname VALUES (7,'ca','ln','matèria');
 INSERT INTO fieldname VALUES (7,'pt','ln','assunto');
 INSERT INTO fieldname VALUES (7,'it','ln','soggetto');
 INSERT INTO fieldname VALUES (7,'ru','ln','');
@@ -185,6 +194,7 @@ INSERT INTO fieldname VALUES (8,'en','ln','reference');
 INSERT INTO fieldname VALUES (8,'fr','ln','référence');
 INSERT INTO fieldname VALUES (8,'de','ln','Referenz');
 INSERT INTO fieldname VALUES (8,'es','ln','referencia');
+INSERT INTO fieldname VALUES (8,'ca','ln','referència');
 INSERT INTO fieldname VALUES (8,'pt','ln','referência');
 INSERT INTO fieldname VALUES (8,'it','ln','referenza');
 INSERT INTO fieldname VALUES (8,'ru','ln','ссылка');
@@ -199,6 +209,7 @@ INSERT INTO fieldname VALUES (9,'en','ln','fulltext');
 INSERT INTO fieldname VALUES (9,'fr','ln','fulltext');
 INSERT INTO fieldname VALUES (9,'de','ln','Volltext');
 INSERT INTO fieldname VALUES (9,'es','ln','texto completo');
+INSERT INTO fieldname VALUES (9,'ca','ln','text complert');
 INSERT INTO fieldname VALUES (9,'pt','ln','texto completo');
 INSERT INTO fieldname VALUES (9,'it','ln','testo completo');
 INSERT INTO fieldname VALUES (9,'ru','ln','полный текст');
@@ -213,6 +224,7 @@ INSERT INTO fieldname VALUES (10,'en','ln','collection');
 INSERT INTO fieldname VALUES (10,'fr','ln','collection');
 INSERT INTO fieldname VALUES (10,'de','ln','Sammlung');
 INSERT INTO fieldname VALUES (10,'es','ln','colección');
+INSERT INTO fieldname VALUES (10,'ca','ln','col·lecció');
 INSERT INTO fieldname VALUES (10,'pt','ln','coleção');
 INSERT INTO fieldname VALUES (10,'it','ln','collezione');
 INSERT INTO fieldname VALUES (10,'ru','ln','набор');
@@ -226,7 +238,8 @@ INSERT INTO fieldname VALUES (10,'uk','ln','розділ');
 INSERT INTO fieldname VALUES (11,'en','ln','division');
 INSERT INTO fieldname VALUES (11,'fr','ln','division');
 INSERT INTO fieldname VALUES (11,'de','ln','Abteilung');
-INSERT INTO fieldname VALUES (11,'es','ln','');
+INSERT INTO fieldname VALUES (11,'es','ln','división');
+INSERT INTO fieldname VALUES (11,'ca','ln','divisió');
 INSERT INTO fieldname VALUES (11,'pt','ln','divisão');
 INSERT INTO fieldname VALUES (11,'it','ln','divisione');
 INSERT INTO fieldname VALUES (11,'ru','ln','');
@@ -241,6 +254,7 @@ INSERT INTO fieldname VALUES (12,'en','ln','year');
 INSERT INTO fieldname VALUES (12,'fr','ln','année');
 INSERT INTO fieldname VALUES (12,'de','ln','Jahr');
 INSERT INTO fieldname VALUES (12,'es','ln','año');
+INSERT INTO fieldname VALUES (12,'ca','ln','any');
 INSERT INTO fieldname VALUES (12,'pt','ln','ano');
 INSERT INTO fieldname VALUES (12,'it','ln','anno');
 INSERT INTO fieldname VALUES (12,'ru','ln','год');
@@ -254,7 +268,8 @@ INSERT INTO fieldname VALUES (12,'uk','ln','рік');
 INSERT INTO fieldname VALUES (13,'en','ln','experiment');
 INSERT INTO fieldname VALUES (13,'fr','ln','expérience');
 INSERT INTO fieldname VALUES (13,'de','ln','Experiment');
-INSERT INTO fieldname VALUES (13,'es','ln','');
+INSERT INTO fieldname VALUES (13,'es','ln','experimento');
+INSERT INTO fieldname VALUES (13,'ca','ln','experiment');
 INSERT INTO fieldname VALUES (13,'pt','ln','experimento');
 INSERT INTO fieldname VALUES (13,'it','ln','esperimento');
 INSERT INTO fieldname VALUES (13,'ru','ln','');
@@ -268,7 +283,8 @@ INSERT INTO fieldname VALUES (13,'uk','ln','експеримент');
 INSERT INTO fieldname VALUES (14,'en','ln','record ID');
 INSERT INTO fieldname VALUES (14,'fr','ln','notice ID');
 INSERT INTO fieldname VALUES (14,'de','ln','Datensatz-ID');
-INSERT INTO fieldname VALUES (14,'es','ln','');
+INSERT INTO fieldname VALUES (14,'es','ln','registro núm.');
+INSERT INTO fieldname VALUES (14,'ca','ln','registre núm.');
 INSERT INTO fieldname VALUES (14,'pt','ln','ID do registro');
 INSERT INTO fieldname VALUES (14,'it','ln','ID della notizia');
 INSERT INTO fieldname VALUES (14,'ru','ln','');
