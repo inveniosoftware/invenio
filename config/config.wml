@@ -73,6 +73,7 @@ Atlantis Institute of Fictive Science
  <fr>Atlantis Institut des Sciences Fictives</fr>
  <de>Atlantis Institut der fiktiven Wissenschaft</de>
  <es>Atlantis Instituto de la Ciencia Fictive</es>
+ <ca>Institut Atlantis de Ciència Fictícia</ca>
  <pt>Instituto Atlantis de Ciência Fictícia</pt>
  <it>Atlantis Istituto di Scienza Fittizia</it>
  <ru>Атлантис Институт фиктивных Наук</ru>
@@ -94,13 +95,13 @@ en
 ## available in, separated by commas.  The order specified below will
 ## be respected on the interface pages.  A good default would be to
 ## use the alphabetical order.  Currently supported languages include
-## Czech, German, Greek, English, Spanish, French, Italian, Norwegian,
-## Portuguese, Russian, Slovak, Swedish, and Ukrainian, so that the current
-## eventual maximum you can select is
-## "cs,de,el,en,es,fr,it,no,pt,ru,sk,sv,uk".
+## Catalan, Czech, German, Greek, English, Spanish, French, Italian,
+## Norwegian, Portuguese, Russian, Slovak, Swedish, and Ukrainian, so
+## that the current eventual maximum you can select is
+## "ca,cs,de,el,en,es,fr,it,no,pt,ru,sk,sv,uk".
 ##  (example: "de,en,fr,it")
 <define-tag CDSLANGS whitespace=delete>
-cs,de,el,en,es,fr,it,no,pt,ru,sk,sv,uk
+ca,cs,de,el,en,es,fr,it,no,pt,ru,sk,sv,uk
 </define-tag>
 
 ## ALERTENGINEEMAIL -- the email address from which the alert emails will appear to be send:
@@ -163,6 +164,12 @@ cds.support@cern.ch
 ################################
 ## Part 2: CDS page elements ##
 ################################
+
+## CFG_TEMPLATE_SKIN -- what template skin do you want to use? 
+##  (example: "default")
+<define-tag CFG_TEMPLATE_SKIN whitespace=delete>
+default
+</define-tag>
 
 ## This part defines CDS portal-like page style and its elements.
 ## Here is a schematic overview of all the WML-configurable parts:
