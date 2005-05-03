@@ -42,12 +42,15 @@ logdir = "<LOGDIR>"
 tmpdir = "<TMPDIR>"
 etcdir = "<ETCDIR>"
 version = "<VERSION>"
+cfg_template_skin = "<CFG_TEMPLATE_SKIN>"
+localedir = "<LOCALEDIR>"
 
 ## intl versions of CDSNAME of this installation:
 cdsnameintl = {}
 <de>cdsnameintl['de'] = "<CDSNAMEINTL>"</de>
 <en>cdsnameintl['en'] = "<CDSNAMEINTL>"</en>
 <es>cdsnameintl['es'] = "<CDSNAMEINTL>"</es>
+<ca>cdsnameintl['ca'] = "<CDSNAMEINTL>"</ca>
 <pt>cdsnameintl['pt'] = "<CDSNAMEINTL>"</pt>
 <fr>cdsnameintl['fr'] = "<CDSNAMEINTL>"</fr>
 <it>cdsnameintl['it'] = "<CDSNAMEINTL>"</it>
