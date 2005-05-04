@@ -372,6 +372,8 @@ def page_start(req, of, cc, as, ln, uid, title_message=msg_search_results[cdslan
     
 def page_end(req, of="hb", ln=cdslang):
     "End page according to given output format: e.g. close XML tags, add HTML footer, etc."
+    if of == "id":
+        return [] # empty recID list 
     if not req: 
         return # we were called from CLI
     if of.startswith('h'):
@@ -379,9 +381,7 @@ def page_end(req, of="hb", ln=cdslang):
         req.write(pagefooteronly(lastupdated=__lastupdated__, language=ln, urlargs=req.args))
     elif of.startswith('x'):
         req.write("""</collection>\n""")
-    if of == "id":
-        return []
-    else: return "\n"    
+    return "\n"    
 
 def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_day=0, ln=cdslang):
     "Produces 'From Date', 'Until Date' kind of selection box.  Suitable for search options."
