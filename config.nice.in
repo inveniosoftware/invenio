@@ -7,4 +7,7 @@
             --with-dbname=@DBNAME@ \
             --with-dbuser=@DBUSER@ \
             --with-dbpass=@DBPASS@ \
-            --with-python=@PYTHON@
+            --with-python=@PYTHON@ \
+            --with-clisp=@CLISP@ \
+            --with-cmucl=@CMUCL@ \
+            --with-sbcl=@SBCL@ 
