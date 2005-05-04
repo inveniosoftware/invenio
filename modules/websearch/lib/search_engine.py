@@ -459,17 +459,17 @@ def create_google_box(cc, p, f, p1, p2, p3, ln=cdslang,
     # CiteSeer:
     if cfg_google_box_servers.get('CiteSeer', 0):
         out_links.append("""<a class="google" href="http://citeseer.ist.psu.edu/cs?q=%s">%s %s CiteSeer</a>""" % (p_quoted, p, msg_in[ln]))        
+    # Google Print:
+    if cfg_google_box_servers.get('Google Scholar', 0):
+        # FIXME: reusing Google Scholar config variable until we can enter Google Print into config.wml
+        if string.find(cc, "Book") >= 0:
+            out_links.append("""<a class="google" href="http://print.google.com/print?q=%s">%s %s Google Print</a>""" % (p_quoted, p, msg_in[ln]))
     # Google Scholar:
     if cfg_google_box_servers.get('Google Scholar', 0):
         if f == "author":
             out_links.append("""<a class="google" href="http://scholar.google.com/scholar?q=author%%3A%s">%s %s Google Scholar</a>""" % (p_quoted, p, msg_in[ln]))
         else:
             out_links.append("""<a class="google" href="http://scholar.google.com/scholar?q=%s">%s %s Google Scholar</a>""" % (p_quoted, p, msg_in[ln]))        
-    # Google Print:
-    if cfg_google_box_servers.get('Google Scholar', 0):
-        # FIXME: reusing Google Scholar config variable until we can enter Google Print into config.wml
-        if string.find(cc, "Book") >= 0:
-            out_links.append("""<a class="google" href="http://print.google.com/print?q=%s">%s %s Google Print</a>""" % (p_quoted, p, msg_in[ln]))
     # Google Web:
     if cfg_google_box_servers.get('Google Web', 0):
         if f == "author":
