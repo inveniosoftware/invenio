@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file enables you to configure the parameters of your local CDS
@@ -164,12 +165,6 @@ cds.support@cern.ch
 ################################
 ## Part 2: CDS page elements ##
 ################################
-
-## CFG_TEMPLATE_SKIN -- what template skin do you want to use? 
-##  (example: "default")
-<define-tag CFG_TEMPLATE_SKIN whitespace=delete>
-default
-</define-tag>
 
 ## This part defines CDS portal-like page style and its elements.
 ## Here is a schematic overview of all the WML-configurable parts:
