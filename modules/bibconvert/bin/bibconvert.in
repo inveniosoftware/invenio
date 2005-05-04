@@ -117,6 +117,7 @@ for opt, opt_value in opts:
         source_data       = opt_value
         source_data       = source_data + "/"
         extract_tpl       = "/"
+        extract_tpl_parsed = None # FIXME: option -d shouldn't require -Cx
         dirmode           = 1
 
     elif opt in ["-h", "--help"]:
