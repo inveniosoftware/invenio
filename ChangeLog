@@ -1,5 +1,183 @@
+CDSware v0.7.1 (released 2005-05-04)
+====================================
+
+2005-05-04  Tibor Simko <tibor.simko@cern.ch>
+
+	* RELEASE-NOTES, NEWS: Release of v0.7.1.
+
+2005-05-04  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibconvert/bin/bibconvert.wml: Quick-fixed the case of
+	the `-d' command line option, as used by WebSubmit.  (It wasn't
+	working as of v0.7.0 included!)
+
+2005-05-04  Tibor Simko <tibor.simko@cern.ch>
+
+	* config.nice.in: Added --with-clisp, --with-cmucl and --with-sbcl
+	arguments.
+
+2005-05-04  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac: Release of v0.7.1.
+
+2005-05-04  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/config.wml: Removed CFG_TEMPLATE_SKIN as per the
+	forthcoming v0.7.1 release.  Added explicit HTML mode and UTF-8
+	coding for Emacs.
+
+2005-05-04  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Invert the order of
+	Google Print vs. Google Scholar in the ``Haven't found...'' box.
+
+2005-05-04  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: Create a link to
+	Google Print in the ``Haven't found...''  box if the user started
+	her search from the Books collection.
+
+2005-05-04  Tibor Simko <tibor.simko@cern.ch>
+
+	* AUTHORS: Updated Anna's address.
+
+2005-05-04  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py.wml: page_end() now always
+	returns empty list for the `id' output format, regardless of the
+	`req' settings.  This is useful for the search engine clients such
+	as the alert engine, because the page_end() was sometimes invoked
+	to terminate a zero-hit search branch.
+
+2005-05-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/doc/index.html.wml: Updated Catalan
+	translation, thanks to Ferran.
+
+2005-05-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/config.wml: Added Catalan and CFG_TEMPLATE_SKIN for the
+	templating.
+
+2005-05-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/configbis.wml.in: Added LOCALEDIR, from the EPFL tree.
+
+2005-05-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/cdswmllib.wml: Added Catalan.
+
+2005-05-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/messages.wml: Introducing Catalan translation, thanks to
+	Ferran.
+
+2005-05-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/Makefile.am,
+	modules/webhelp/web/index.html.wml,
+	modules/webhelp/web/admin/Makefile.am: Introducing Catalan
+	translation, thanks to Ferran.
+
+2005-05-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/messages.py.wml: Added Catalan.	Added
+	gettext language functions from the EPFL tree.
+
+2005-05-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/config.py.wml: Introduced Catalan
+	translation.  Added WML variables related to templating.
+
+2005-05-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/sql/tabfill.sql.wml: Introduced Catalan
+	translation, thanks to Ferran.	Updated Spanish translation.
+
+2005-05-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql.wml: Introducing Catalan
+	translations, thanks to Ferran.  Updating Spanish translations.
+
+2005-05-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websubmit/doc/Makefile.am,
+	modules/websubmit/doc/admin/Makefile.am: Introducing Catalan
+	translation.
+
+2005-05-03  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/doc/Makefile.am,
+	modules/websearch/doc/guide.html.wml,
+	modules/websearch/doc/index.html.wml,
+	modules/websearch/doc/tips.html.wml: Introducing Catalan
+	translation, thanks to Ferran.
+
+2005-05-02  Tibor Simko <tibor.simko@cern.ch>
+
+	* CREDITS: Added Ferran Jorba.
+
+2005-05-02  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibformat/doc/admin/guide.html.wml: Cleanup of the bad
+	markup of the old FlexElink manual, thanks to Ferran Jorba.
+
+2005-05-02  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibformat/doc/admin/Makefile.am: Added missing BibFormat
+	Admin Guide images to the distribution tarball. (EXTRA_DIST)
+
+2005-04-20  Tibor Simko <tibor.simko@cern.ch>
+
+	* INSTALL: Added a recommendation to compile mod_php and mod_python
+	against the same MySQL client library, so that the two Apache
+	modules would use the same MySQL client library.  (We saw
+	Apache/PHP/Python problems in the past when they weren't.)
+
+2005-04-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/websearchadminlib.py.wml: Added some
+	try/except statements to catch the case of a
+	not-existing-but-still-being-referenced-to collection.
+
+2005-04-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql.wml: Fixed Greek
+	translation of Articles, thanks to Theodoros.
+
+2005-04-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websubmit/doc/admin/Makefile.am: Fixed LANG_EL typo for
+	the EL translation, thanks to Theodoros.
+
+2005-04-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/index.html.wml,
+	modules/websearch/doc/index.html.wml: Updated Portuguese
+	translation, thanks to Flavio.
+
+2005-04-08  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/messages.wml: Updated Portuguese translations, thanks to
+	Flavio.  Introduced language-specific FIXME tags (e.g. FIXME_no) so
+	that we can track more easily which language needs updating.
+
+2005-04-06  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac: Version bump after the release.
+
+	
 CDSware v0.7.0 (released 2005-04-06)
 ====================================
+
+2005-04-06  Tibor Simko <tibor.simko@cern.ch>
+
+	* NEWS, RELEASE-NOTES: Clarified wording in the v0.7.0 release
+	news.
+
+2005-04-06  Tibor Simko <tibor.simko@cern.ch>
+
+	* RELEASE-NOTES, ChangeLog, NEWS: Release of v0.7.0.
 
 2005-04-06  Tibor Simko <tibor.simko@cern.ch>
 

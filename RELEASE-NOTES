@@ -1,153 +1,114 @@
 --------------------------------------------------------------------
-CDSware v0.7.0 is released
-April 6, 2005
+CDSware v0.7.1 is released
+May 4, 2005
 http://cdsware.cern.ch/news/
 --------------------------------------------------------------------
 
-CDSware v0.7.0 was released on April 6th, 2005.
-
-This release is recommended to all users of v0.5.0 version.
-
+CDSware v0.7.1 was released on May 4, 2005.  
 
 What's new:
 -----------
 
- *) experimental release of the refextract program for automatic
-    reference extraction from PDF fulltext files (BibEdit)
+ *) important bugfix for bibconvert's ``source data in a directory''
+    mode, as invoked by the web submission system (BibConvert)
 
- *) experimental release of the citation and download ranking tools
-    (BibRank)
+ *) minor bugfix in the search engine, thanks to Frédéric Gobry
+    (WebSearch)
 
- *) new module for gathering usage statistics out of Apache log files
-    (WebStat)
+ *) minor bugfix in the WebSearch Admin interface (WebSearch)
 
- *) new similar-records-navigation tool exploring end-user viewing
-    habits: "people who viewed this page also viewed" (WebSearch,
-    BibRank)
+ *) automatic linking to Google Print in the ``Haven't found what you
+    were looking for...'' page box (WebSearch)
 
- *) OAI gateway validated against OAI Repository Explorer (BibHarvest)
+ *) BibFormat Admin Guide cleaned, thanks to Ferran Jorba   
 
- *) fixed "records modified since" option for the indexer (BibIndex)
+ *) new Catalan translation, thanks to Ferran Jorba
 
- *) collection cache update is done only when the cache is not up to
-    date (WebSearch) [closing #WebSearch-016]
+ *) updated Greek and Portuguese translations, thanks to Theodoros
+    Theodoropoulos and Flávio C. Coelho
 
- *) cleanup of user login mechanism (WebSession, WebAccess)
-
- *) fixed uploading of already-existing records in the insertion mode
-    (BibUpload)
-
- *) fixed submission in UTF-8 languages (WebSubmit)
-
- *) updated HOWTO Run Your Existing CDSware Installation (WebHelp)
-
- *) test suite improvements (WebSearch, BibHarvest, BibRank,
-    BibConvert)
-
- *) German translation updated and new German stopwords list added,
-    thanks to Guido Pelzer
-
- *) new Greek and Ukrainian translations, thanks to Theodoros
-    Theodoropoulos and Vasyl Ostrovskyi
-
- *) all language codes now comply to RFC 1766 and ISO 639
-
- *) numerous other small fixes and improvements, with many
-    contributions by the EPFL team headed by Frederic Gobry
-    (BibConvert, BibUpload, WebSearch, WebSubmit, WebSession)
-
+ *) updated Spanish translation 
 
 Download:
 ---------
 
-  <http://cdsware.cern.ch/download/cdsware-0.7.0.tar.gz>
-  <http://cdsware.cern.ch/download/cdsware-0.7.0.tar.gz.md5>
-  <http://cdsware.cern.ch/download/cdsware-0.7.0.tar.gz.sig>
-
+  <http://cdsware.cern.ch/download/cdsware-0.7.1.tar.gz>
+  <http://cdsware.cern.ch/download/cdsware-0.7.1.tar.gz.md5>
+  <http://cdsware.cern.ch/download/cdsware-0.7.1.tar.gz.sig>
 
 Installation notes:
 -------------------
 
 Please follow the INSTALL file bundled in the distribution tarball.
 
-
 Upgrade notes:
 --------------
 
-If you are upgrading from CDSware v0.5.0, then please follow these
-steps:
+If you are upgrading from CDSware v0.7.0, then please follow the
+following steps:
 
-   - New pre-requisite (optional): if you want to experiment with the
-     automatic reference extraction from PDF fulltext files, then you
-     have to check whether your pdftotext program is of version 3 or
-     later.  (See the INSTALL file, item i.)  Note that you are fully
-     free to skip this step now.
+   - Launch the bibsched monitor and wait until all active bibsched
+     tasks are finished.  Then put bibsched daemon into sleeping
+     (manual) mode.
 
-   - New pre-requisite (optional): if you want to experiment with the
-     download and citation ranking alpha codebase, then we recommend
-     you to firstly install Gnuplot, the command-line driven
-     interactive plotting program.  (See the INSTALL file, item l.)
-     Note that you are fully free to skip this step now.
-
-   - New pre-requisite (optional): if you want to experiment with the
-     new WebStat program for gathering usage statistics out of Apache
-     log files, then you should firstly install a Common Lisp
-     implementation.  (See the INSTALL file, item m.)  Note that you
-     are fully free to skip this step now.
-
-   - After optionally updating your prerequisites, launch the bibsched
-     monitor and wait until all active bibsched tasks are finished.
-     Then put bibsched daemon into manual mode.  Stop all submission
-     procedures and other write operations: for example, you may want
-     to switch your site read-only (set CFG_ACCESS_CONTROL_LEVEL_SITE
-     to 1 in access_control_config.py and restart Apache) or you may
-     want to stop Apache completely.
+   - Stop all submission procedures and other write operations: for
+     example, you may want to switch your site to read-only mode (set
+     CFG_ACCESS_CONTROL_LEVEL_SITE to 1 in access_control_config.py
+     and restart Apache) or you may want to stop Apache completely.
 
    - Optionally you may want to backup your current MySQL database and
      your CDSware installation directory.  (This step is not really
-     mandatory for the 0.5.0 -> 0.7.0 transition, since the changes
+     mandatory for the 0.7.0 -> 0.7.1 transition, since the changes
      are of minor nature only.)
 
-   - Untar new sources and rerun configure with old arguments.  
+   - Untar new sources and rerun configure with old arguments (see
+     /path/to/cdsware/lib/wml/cdsware/etc/build/config.nice).
 
-   - Merge your old config.wml with the new one.  (The old config.wml
+   - Merge your old config.wml with the new one. (Your old config.wml
      can be found in /path/to/cdsware/lib/wml/cdsware/config.wml.)
-     There are some new options in the new config.wml, so it is not
-     sufficient just to copy over your old config file.  However, the
-     new config file only changes two-three language-related things in
-     the beginning of the file, so merging of your old config.wml
-     should be very straightforward.
+     The only novelty in the new config.wml file is the introduction
+     of the Catalan translation in the CDSNAMEINTL and CDSLANGS
+     options, so that merging should be straightforward.  Note that
+     you may directly reuse your old config.wml file in case you do
+     not plan to provide your user interface in Catalan.
 
    - Run make.
 
-   - If you have edited your /path/to/cdsware/etc/ files during or
-     since the last installation (for example to edit the stopwords
-     list or configure language stemmers), then back it up now.
+   - If you have customized your /path/to/cdsware/etc/ files since the
+     last installation (for example to edit the stopwords list or
+     configure language stemmers), then back them up now.
 
    - Run make install.
 
    - If you have backed up your old /path/to/cdsware/etc/ directory as
-     mentioned above, then copy the backup over the freshly installed
-     etc directory now.  The old etc directory should be usable `as
-     is', unless you have configured bibrank to use the Swedish
-     stemmer, in which case you should change the language code from
-     `se' to `sv' in /path/to/cdsware/etc/bibrank/wrd.cfg.
+     mentioned before, then restore your old etc files now.
 
-   - Update your table structure with new definitions:
+   - Optionally update your tables with the new Catalan and Spanish
+     field names:
 
-        $ make update-v0.5.0-tables
+        $ grep "'ca'" modules/miscutil/sql/tabfill.sql | \
+               ./modules/miscutil/bin/dbexec  
+        $ echo "UPDATE fieldname SET value='materia' \
+                 WHERE value='' AND id_field=7 AND ln='es';" | \
+               ./modules/miscutil/bin/dbexec  
+        $ echo "UPDATE fieldname SET value='división' \
+                WHERE value='' AND id_field=11 AND ln='es';" | \
+               ./modules/miscutil/bin/dbexec  
+        $ echo "UPDATE fieldname SET value='experimento' \
+                WHERE value='' AND id_field=13 AND ln='es';" | \
+               ./modules/miscutil/bin/dbexec  
+        $ echo "UPDATE fieldname SET value='registro núm.' \
+                WHERE value='' AND id_field=14 AND ln='es';" | \
+               ./modules/miscutil/bin/dbexec  
 
-     If you are upgrading from previous releases, you have to run
-     previous update-xxx-tables commands first, respectively.  (See
-     Makefile.am for what these commands do, and check out old
-     RELEASE-NOTES for previous releases.)
+   - Optionally run webcoll to regenerate Catalan and Spanish search
+     interface pages.
 
-   - Run webcoll.  The update is done now.
+   - Re-enable write access if you have disabled it before and restart
+     your Apache server.
 
-   - The final stages are: re-enable write-access if you have disabled
-     it in the previous steps; restart your Apache server; put
-     bibsched back into the auto mode.  You are done.
-
+   - Put the bibsched daemon back into the automatic mode.  You are
+     done.
 
 Known problems:
 ---------------
@@ -163,7 +124,6 @@ Known problems:
  *) Fulltext file storage management is not yet linked with the
     metadata management.
  
-
 What's next:
 ------------
 
@@ -177,6 +137,5 @@ What's next:
 
  *) Introducing a new tool for matching external XML MARC records
     against the database content.
-
 
 - end of file -

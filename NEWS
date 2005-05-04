@@ -7,6 +7,29 @@ Here is a short summary of the most notable changes in CDSware
 releases.  For more info about the current release, please consult
 RELEASE-NOTES.  For more info about changes, please consult ChangeLog.
 
+CDSware v0.7.1 -- released 2005-05-04
+-------------------------------------
+
+ *) important bugfix for bibconvert's ``source data in a directory''
+    mode, as invoked by the web submission system (BibConvert)
+
+ *) minor bugfix in the search engine, thanks to Frédéric Gobry
+    (WebSearch)
+
+ *) minor bugfix in the WebSearch Admin interface (WebSearch)
+
+ *) automatic linking to Google Print in the ``Haven't found what you
+    were looking for...'' page box (WebSearch)
+
+ *) BibFormat Admin Guide cleaned, thanks to Ferran Jorba   
+
+ *) new Catalan translation, thanks to Ferran Jorba
+
+ *) updated Greek and Portuguese translations, thanks to Theodoros
+    Theodoropoulos and Flávio C. Coelho
+
+ *) updated Spanish translation 
+ 
 CDSware v0.7.0 -- released 2005-04-06
 -------------------------------------
 
@@ -53,7 +76,6 @@ CDSware v0.7.0 -- released 2005-04-06
  *) numerous other small fixes and improvements, with many
     contributions by the EPFL team headed by Frederic Gobry
     (BibConvert, BibUpload, WebSearch, WebSubmit, WebSession)
-
 
 CDSware v0.5.0 -- released 2004-12-17
 -------------------------------------
@@ -125,7 +147,6 @@ CDSware v0.5.0 -- released 2004-12-17
 
  *) minor Czech and Slovak translation cleanup
 
-
 CDSware v0.3.3 (DEVELOPMENT) -- released 2004-07-16
 ---------------------------------------------------
 
@@ -168,7 +189,6 @@ CDSware v0.3.3 (DEVELOPMENT) -- released 2004-07-16
  *) conference title exported via OAI XML DC (BibHarvest)
 
  *) enabled building out of source directory; thanks to Frederic
-
 
 CDSware v0.3.2 (DEVELOPMENT) -- released 2004-05-12
 ---------------------------------------------------
@@ -217,7 +237,6 @@ CDSware v0.3.2 (DEVELOPMENT) -- released 2004-05-12
 
  *) faster creation of I18N static HTML and PHP files during make
 
-
 CDSware v0.3.1 (DEVELOPMENT) -- released 2004-03-12
 ---------------------------------------------------
 
@@ -243,7 +262,6 @@ CDSware v0.3.1 (DEVELOPMENT) -- released 2004-03-12
     `hb_' and `hd_' output format parameters (WebSearch)
 
  *) check for presence of pcntl and mysql PHP libraries (BibUpload)
-
 
 CDSware v0.3.0 (DEVELOPMENT) -- released 2004-03-05
 ---------------------------------------------------
@@ -280,7 +298,6 @@ CDSware v0.3.0 (DEVELOPMENT) -- released 2004-03-05
 
  *) plus the usual set of bugfixes (see ChangeLog)
 
-
 CDSware v0.1.2 (DEVELOPMENT) -- released 2003-12-21
 ---------------------------------------------------
 
@@ -291,7 +308,6 @@ CDSware v0.1.2 (DEVELOPMENT) -- released 2003-12-21
  *) fix BibTeX -> XML MARC conversion example (BibConvert)
 
  *) updated Spanish translation
-
 
 CDSware v0.1.1 (DEVELOPMENT) -- released 2003-12-19
 ---------------------------------------------------
@@ -316,7 +332,6 @@ CDSware v0.1.1 (DEVELOPMENT) -- released 2003-12-19
  *) Python module detection during configure 
 
  *) bugfixes: os.tempnam() warning, login page referer, and others
-
 
 CDSware v0.1.0 (DEVELOPMENT) -- released 2003-12-04
 ---------------------------------------------------
@@ -358,7 +373,6 @@ CDSware v0.1.0 (DEVELOPMENT) -- released 2003-12-04
 
  *) source tree reorganization, mod_python technology adopted for most
     of the modules
-
 
 CDSware v0.0.9 (STABLE) -- released 2002-08-01
 ----------------------------------------------
