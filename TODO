@@ -504,6 +504,22 @@ As you noticed, currently the search engine only blindly replaces
 ``='' with ``:'' everywhere, which is no good.  I'll make it look
 properly for ``wau='', ``wti='', etc places only.
 
+** WebSearch-20050415: search engine sort options should be collection-dependent
+> I just wondered: the admin UI websearch treats the sort options as
+> collection-dependent. However, in the search_engine, it seems that
+> they are not.
+> 
+> Do I need to take another coffee break? (say yes, please :-))
+
+No, you don't.  On the search interface pages (and hence in the
+WebSearch Admin interface too) the search fields, sort options, output
+formats, etc are rightly collection-dependent.  On the search results
+pages the current collection choice (cc, the one from which the search
+was initiated) should be respected too and the search engine should
+display only those search fields, sort options, output formats, etc
+that are associated with it.  This is indeed not implemented yet.
+
+Put into TODO as WebSearch-20050415.
 
 * WebSession
 
