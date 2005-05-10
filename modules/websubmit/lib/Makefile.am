@@ -19,13 +19,13 @@
 
 SUBDIRS = functions
 
-FILESWML=$(wildcard $(srcdir)/*.wml)
 pylibdir=$(libdir)/python/cdsware
+
 pylib_DATA=websubmit_config.py websubmit_engine.py file.py
 
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = websubmit_config.py.wml websubmit_engine.py file.py
 
-CLEANFILES = $(wildcard *.php) *~ *.tmp *.php *.py
+CLEANFILES = websubmit_config.py *~ *.tmp
 
-%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
+websubmit_config.py: websubmit_config.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o $@ $<
