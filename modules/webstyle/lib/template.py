@@ -24,7 +24,6 @@ __version__ = "$Id$"
 from config import cfg_template_skin
 
 def load(module=''):
-
     """ Load and returns a template class, given a module name (like
         'websearch', 'webbasket',...).  The module corresponding to
         the currently selected template model (see config.wml,
@@ -33,11 +32,15 @@ def load(module=''):
     """
     local = {}
     # load the right template based on the cfg_template_skin and the specified module
-    try:
-        mymodule = __import__("cdsware.%s_templates_%s" % (module, cfg_template_skin), local, local,
-                              ["cdsware.templates.%s_%s" % (module, cfg_template_skin)])
-    except ImportError:
-        mymodule = __import__("cdsware.%s_templates_default" % (module), local, local,
-                              ["cdsware.templates.%s_default" % (module)])
+    if cfg_template_skin == "default":
+        mymodule = __import__("cdsware.%s_templates" % (module), local, local,
+                              ["cdsware.templates.%s" % (module)])
+    else:    
+        try:
+            mymodule = __import__("cdsware.%s_templates_%s" % (module, cfg_template_skin), local, local,
+                                  ["cdsware.templates.%s_%s" % (module, cfg_template_skin)])
+        except ImportError:
+            mymodule = __import__("cdsware.%s_templates" % (module), local, local,
+                                  ["cdsware.templates.%s" % (module)])
     return mymodule.Template()
     
