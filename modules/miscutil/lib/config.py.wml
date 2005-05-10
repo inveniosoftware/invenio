@@ -68,4 +68,8 @@ cfg_apache_group_file = "<CFG_APACHE_GROUP_FILE>"
 cfg_cern_site = <CFG_CERN_SITE>
 
 cdspageheader = """<CDSPAGEHEADER>"""
+cdspageboxlefttop = """<CDSPAGEBOXLEFTTOP>"""
+cdspageboxleftbottom = """<CDSPAGEBOXLEFTBOTTOM>"""
+cdspageboxrighttop = """<CDSPAGEBOXRIGHTTOP>"""
+cdspageboxrightbottom = """<CDSPAGEBOXRIGHTBOTTOM>"""
 cdspagefooter = """<CDSPAGEFOOTER>"""
