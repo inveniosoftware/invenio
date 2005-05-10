@@ -5,6 +5,9 @@ config.log
 config.status
 z_*
 *.O
-*.tpl
 *~
 *.shtml
+EDSPICTcreate.tpl
+EDSRPICTcreate.tpl
+EDSRTEXTcreate.tpl
+EDSTEXTcreate.tpl

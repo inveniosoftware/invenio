@@ -1,4 +1,4 @@
-<protect>TI---<:TI:>
+TI---<:TI:>
 AU---<:AU:>
 LANG---<:LANG:>
 Num---<:Num:>
@@ -15,4 +15,3 @@ RNTEST---<:RNTEST:>
 RNTEST2---<:RNTEST2:>
 comboTEXT---<:comboTEXT:>
 SN---<:SN:>
-</protect>

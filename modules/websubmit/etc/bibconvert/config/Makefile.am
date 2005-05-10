@@ -20,11 +20,24 @@
 FILESWML=$(wildcard $(srcdir)/*.wml)
 
 etcdir=$(sysconfdir)/bibconvert/config
-etc_DATA=$(FILESWML:$(srcdir)/%.wml=%)
+etc_DATA=EDSPICT.tpl EDSPICTmodify.tpl EDSRPICT.tpl EDSRPICTmodify.tpl \
+         EDSRTEXT.tpl EDSRTEXTmodify.tpl EDSTEXT.tpl EDSTEXTmodify.tpl \
+         EDSPICTcreate.tpl EDSRPICTcreate.tpl EDSRTEXTcreate.tpl EDSTEXTcreate.tpl
 
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = EDSPICT.tpl EDSPICTmodify.tpl EDSRPICT.tpl EDSRPICTmodify.tpl \
+         EDSRTEXT.tpl EDSRTEXTmodify.tpl EDSTEXT.tpl EDSTEXTmodify.tpl \
+         EDSPICTcreate.tpl.wml EDSRPICTcreate.tpl.wml EDSRTEXTcreate.tpl.wml EDSTEXTcreate.tpl.wml
 
-CLEANFILES = $(wildcard *.tpl) *~ *.tmp
+CLEANFILES = EDSPICTcreate.tpl EDSRPICTcreate.tpl EDSRTEXTcreate.tpl  EDSTEXTcreate.tpl *~ *.tmp
 
-%.tpl: %.tpl.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
+EDSPICTcreate.tpl: EDSPICTcreate.tpl.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
+	$(WML) -o $@ $<
+
+EDSRPICTcreate.tpl: EDSRPICTcreate.tpl.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
+	$(WML) -o $@ $<
+
+EDSRTEXTcreate.tpl: EDSRTEXTcreate.tpl.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
+	$(WML) -o $@ $<
+
+EDSTEXTcreate.tpl: EDSTEXTcreate.tpl.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
 	$(WML) -o $@ $<

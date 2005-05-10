@@ -1,4 +1,3 @@
-<protect>
 START::DEFP()---<record>
 SN---<controlfield tag="001"><:SN::SN:></controlfield>
 RN::MINLW(74)---<datafield tag="088" ind1="" ind2=""><subfield code="a"><:Rep*::Rep:></subfield></datafield>
@@ -10,4 +9,3 @@ NO::MINLW(74)---<datafield tag="500" ind1="" ind2=""><subfield code="a"><:NO::NO
 KW::MINLW(74)---<datafield tag="653" ind1="1" ind2=""><subfield code="a"><:KW*::KW:></subfield></datafield>
 LN::MINLW(74)---<datafield tag="041" ind1="" ind2=""><subfield code="a"><:LANG::LANG::IF(,eng,ORIG):></subfield></datafield>
 END::DEFP()---</record>
-</protect>

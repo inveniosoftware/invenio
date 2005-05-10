@@ -1,4 +1,3 @@
-<protect>
 START::DEFP()---<record>
 SN---<datafield tag="001"><:SN::SN:></datafield>
 RN::MINLW(74)---<datafield tag="088" ind1="" ind2=""><subfield code="a"><:Rep*::Rep:></subfield></datafield>
@@ -12,4 +11,3 @@ LN::MINLW(74)---<datafield tag="041" ind1="" ind2=""><subfield code="a"><:LANG::
 FMT---<datafield tag="FMT" ind1="" ind2=""><subfield code="f">hd</subfield><subfield code="g"></subfield></datafield>
 FMT---<datafield tag="FMT" ind1="" ind2=""><subfield code="f">hb</subfield><subfield code="g"></subfield></datafield>
 END::DEFP()---</record>
-</protect>

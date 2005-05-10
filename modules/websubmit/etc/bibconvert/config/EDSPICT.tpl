@@ -1,4 +1,4 @@
-<protect>TI---<:TI:>
+TI---<:TI:>
 AU---<:AU:>
 LANG---<:LANG:>
 Num---<:Num:>
@@ -13,4 +13,3 @@ BN---<:BN:>
 RNPHO2---<:RNPHO2:>
 comboPICT---<:comboPICT:>
 SN---<:SN:>
-</protect>
