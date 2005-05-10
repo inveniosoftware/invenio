@@ -17,14 +17,9 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-FILESWML=$(wildcard $(srcdir)/*.wml)
-
 etcdir=$(sysconfdir)/bibconvert/KB
-etc_DATA=$(FILESWML:$(srcdir)/%.wml=%)
+etc_DATA=Month.KB
 
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = $(etc_DATA)
 
-CLEANFILES = $(wildcard *.KB) *~ *.tmp
-
-%.KB: %.KB.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
-	$(WML) -o $@ $<
+CLEANFILES = *~ *.tmp
