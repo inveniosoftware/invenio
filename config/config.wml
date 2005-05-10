@@ -202,6 +202,12 @@ cds.support@cern.ch
 ## sheet in the file 'htdocs/img/cds.css' that you can change at your
 ## will too.
 
+## CFG_TEMPLATE_SKIN -- what template skin do you want to use? 
+##  (example: "default")
+<define-tag CFG_TEMPLATE_SKIN whitespace=delete>
+default
+</define-tag>
+
 ## CDSPAGEHEADER -- eventual global HTML page header:
 ##  (example: "")
 <define-tag CDSPAGEHEADER>
