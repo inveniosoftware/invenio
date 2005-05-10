@@ -17,14 +17,44 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-FILESWML=$(wildcard $(srcdir)/*.wml)
-
 pylibdir=$(libdir)/python/cdsware/websubmit_functions
-pylib_DATA=$(FILESWML:$(srcdir)/%.wml=%)
 
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+pylib_DATA = Add_Files.py \
+             CaseEDS.py \
+             Create_Modify_Interface.py \
+             Create_Recid.py \
+             Finish_Submission.py \
+             Format_Record.py \
+             Get_Info.py \
+             Get_Report_Number.py \
+             Get_Sysno.py \
+             Insert_Modify_Record.py \
+             Insert_Record.py \
+             Is_Original_Submitter.py \
+             Is_Referee.py \
+             Mail_Submitter.py \
+             Make_Modify_Record.py \
+             Make_Record.py \
+             Move_Files_Archive.py \
+             Move_From_Pending.py \
+             Move_to_Done.py \
+             Move_to_Pending.py \
+             Print_Success.py \
+             Print_Success_APP.py \
+             Print_Success_DEL.py \
+             Print_Success_MBI.py \
+             Print_Success_SRV.py \
+             Report_Number_Generation.py \
+             Retrieve_Data.py \
+             Send_APP_Mail.py \
+             Send_Approval_Request.py \
+             Send_Modify_Mail.py \
+             Send_SRV_Mail.py \
+             Test_Status.py \
+             Update_Approval_DB.py \
+             Upload_Files.py \
+             mail.py
 
-CLEANFILES = $(wildcard *.php) $(wildcard *.py) *~ *.tmp
+EXTRA_DIST = $(pylib_DATA)
 
-%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
-	$(WML) -o $@ $<
+CLEANFILES = *~ *.tmp
