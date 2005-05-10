@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir=$(libdir)/python/cdsware
-pylib_DATA=webpage.py template.py webstyle_templates.py 
+pylib_DATA=webpage.py template.py webstyle_templates_default.py 
 
 EXTRA_DIST = $(pylib_DATA)
 

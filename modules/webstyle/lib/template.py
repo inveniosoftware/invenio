@@ -32,12 +32,12 @@ def load(module=''):
         not exist, it returns the default template for that module.
     """
     local = {}
-    # load the right template, based on the template, and the specified module
+    # load the right template based on the cfg_template_skin and the specified module
     try:
         mymodule = __import__("cdsware.%s_templates_%s" % (module, cfg_template_skin), local, local,
                               ["cdsware.templates.%s_%s" % (module, cfg_template_skin)])
     except ImportError:
-        mymodule = __import__("cdsware.%s_templates" % (module), local, local,
-                              ["cdsware.templates.%s" % (module)])
+        mymodule = __import__("cdsware.%s_templates_default" % (module), local, local,
+                              ["cdsware.templates.%s_default" % (module)])
     return mymodule.Template()
     
