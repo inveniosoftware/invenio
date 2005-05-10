@@ -20,10 +20,6 @@
 webdir=$(WEBDIR)/img
 web_DATA=cds.css
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = $(web_DATA) 
 
-CLEANFILES = $(web_DATA) *~ *.tmp
-
-%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
-	$(WML) -o $@ $<
+CLEANFILES = *~ *.tmp
