@@ -17,14 +17,14 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-#include "configbis.wml"
-
 ### CONFIGURATION OPTIONS FOR BIBRECORD LIBRARY
 
 """bibrecord configuration"""
 
+from config import etcdir
+
 # location of the MARC21 DTD file:
-cfg_marc21_dtd = "<ETCDIR>/bibedit/MARC21slim.dtd"
+cfg_marc21_dtd = "%s/bibedit/MARC21slim.dtd" % etcdir
 
 # internal dictionary of warning messages:
 cfg_bibrecord_warning_msgs = {

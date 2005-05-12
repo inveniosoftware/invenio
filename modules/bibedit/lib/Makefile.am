@@ -18,13 +18,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir = $(libdir)/python/cdsware
+
 pylib_DATA = bibrecord.py bibrecord_config.py bibrecord_tests.py \
              refextract.py refextract_config.py
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = $(pylib_DATA)
 
-CLEANFILES = $(pylib_DATA) *~ *.tmp *.pyc
-
-%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
+CLEANFILES = *~ *.tmp *.pyc

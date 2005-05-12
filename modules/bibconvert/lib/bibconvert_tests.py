@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 ## $Id$
 ## CDSware bibconvert unit tests.
 
@@ -18,13 +20,7 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-<protect># -*- coding: utf-8 -*-</protect>
-
 """Unit tests for the bibconvert."""
-
-__lastupdated__ = """<: print `date +"%d %b %Y %H:%M:%S %Z"`; :>"""
-
-## okay, rest of the Python code goes below #######
 
 __version__ = "$Id$"
 

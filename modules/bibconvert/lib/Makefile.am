@@ -17,13 +17,10 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir=$(libdir)/python/cdsware
-pylib_DATA=bibconvert.py bibconvert_tests.py
+pylibdir = $(libdir)/python/cdsware
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+pylib_DATA = bibconvert.py bibconvert_tests.py
 
-CLEANFILES = $(pylib_DATA) *~ *.tmp *.pyc
+EXTRA_DIST = $(pylib_DATA)
 
-%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
+CLEANFILES = *~ *.tmp *.pyc

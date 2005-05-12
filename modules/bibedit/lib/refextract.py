@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## $Id$
-
+##
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -17,8 +19,6 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-<protect>
-# -*- coding: utf-8 -*-
 try:
     import sys, re, string, time
     import os, getopt, cgi
@@ -3000,4 +3000,3 @@ def main():
     if done_coltags:
         sys.stdout.write("%s\n" % (closecollectiontag.encode("utf-8"),))
 
-</protect>

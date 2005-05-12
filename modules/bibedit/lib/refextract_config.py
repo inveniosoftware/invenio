@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## $Id$
-
+##
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -17,20 +19,18 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-#include "configbis.wml"
-
-<protect># -*- coding: utf-8 -*-</protect>
+from config import version, etcdir, pdftotext
 
 # version number:
-cfg_refextract_version = "CDSware/<VERSION> refextract/<VERSION>"
+cfg_refextract_version = "CDSware/%s refextract/%s" % (version, version)
 
 # periodicals knowledge base:
-cfg_refextract_kb_journal_titles = "<ETCDIR>/bibedit/refextract-journal-titles.kb"
+cfg_refextract_kb_journal_titles = "%s/bibedit/refextract-journal-titles.kb" % etcdir
 # report numbers knowledge base:
-cfg_refextract_kb_report_numbers = "<ETCDIR>/bibedit/refextract-report-numbers.kb"
+cfg_refextract_kb_report_numbers = "%s/bibedit/refextract-report-numbers.kb" % etcdir
 
 # path to pdftotext executable:
-cfg_refextract_pdftotext = "<PDFTOTEXT>"
+cfg_refextract_pdftotext = pdftotext
 
 ### FIXME.  The following are not used in this early release. Do not change them.
 
