@@ -17,12 +17,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """CDSware Access Control Engine in mod_python."""
 
-<protect> ## okay, rest of the Python code goes below #######
-
 __version__ = "$Id$"
-
 
 ## import interesting modules:
 from config import *
@@ -233,4 +231,4 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
     # authentication failed
     return (4, "%s %s" % (cfg_webaccess_warning_msgs[4], (called_from and "%s %s" % (cfg_webaccess_msgs[0] % name_action[3:], cfg_webaccess_msgs[1]) or "")))
 
-</protect>
+

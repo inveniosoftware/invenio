@@ -20,8 +20,6 @@
 
 """CDSware Access Control Admin."""
 
-<protect> ## okay, rest of the Python code goes below #######
-
 __version__ = "$Id$"
 
 
@@ -1587,5 +1585,4 @@ def acc_garbage_collector(verbose=0):
     # return statistics
     return del_entries
 
-</protect>
 

@@ -18,12 +18,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir=$(libdir)/python/cdsware
-pylib_DATA=access_control_engine.py access_control_config.py access_control_admin.py webaccessadmin_lib.py external_authentication.py
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+pylib_DATA = access_control_engine.py access_control_config.py access_control_admin.py webaccessadmin_lib.py external_authentication.py
 
-CLEANFILES = $(pylib_DATA) *~ *.tmp *.pyc
+EXTRA_DIST = access_control_engine.py access_control_config.py.wml access_control_admin.py webaccessadmin_lib.py external_authentication.py
 
-%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
+CLEANFILES = *~ *.tmp *.pyc
+
+access_control_config.py: access_control_config.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o $@ $<

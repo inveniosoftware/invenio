@@ -27,9 +27,9 @@ from external_authentication import *
 
 ## general configuration parameters read from the config.wml file:
 ## (look there for details)
-
 #include "config.wml"
 #include "configbis.wml"
+
 supportemail = "<SUPPORTEMAIL>"
 adminemail = "<ADMINEMAIL>"
 CFG_ACCESS_CONTROL_LEVEL_SITE = <CFG_ACCESS_CONTROL_LEVEL_SITE>
