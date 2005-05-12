@@ -17,21 +17,18 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir=$(libdir)/python/cdsware
-pylib_DATA=bibrankadminlib.py \
-           bibrank_tag_based_indexer.py bibrank_tag_based_indexer_tests.py \
-	   bibrank_word_indexer.py \
-           bibrank_record_sorter.py bibrank_record_sorter_tests.py \
-           bibrank_downloads_indexer.py bibrank_downloads_indexer_tests.py \
-	   bibrank_downloads_similarity.py \
-	   bibrank_grapher.py bibrank_downloads_grapher.py bibrank_citation_grapher.py \
-	   bibrank_citation_indexer.py bibrank_citation_indexer_tests.py \
-	   bibrank_citation_searcher.py bibrank_citation_searcher_tests.py
+pylibdir = $(libdir)/python/cdsware
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+pylib_DATA = bibrankadminlib.py \
+             bibrank_tag_based_indexer.py bibrank_tag_based_indexer_tests.py \
+	     bibrank_word_indexer.py \
+             bibrank_record_sorter.py bibrank_record_sorter_tests.py \
+             bibrank_downloads_indexer.py bibrank_downloads_indexer_tests.py \
+	     bibrank_downloads_similarity.py \
+	     bibrank_grapher.py bibrank_downloads_grapher.py bibrank_citation_grapher.py \
+	     bibrank_citation_indexer.py bibrank_citation_indexer_tests.py \
+	     bibrank_citation_searcher.py bibrank_citation_searcher_tests.py
 
-CLEANFILES = $(pylib_DATA) *~ *.tmp *.pyc
+EXTRA_DIST = $(pylib_DATA)
 
-%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
+CLEANFILES = *~ *.tmp *.pyc
