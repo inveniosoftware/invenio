@@ -17,13 +17,21 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-FILESWML=$(wildcard $(srcdir)/*.wml)
-phplibdir=$(libdir)/php/cdsware/bibformat/core
-phplib_DATA=$(FILESWML:$(srcdir)/%.wml=%)
+phplibdir = $(libdir)/php/cdsware/bibformat/core
 
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+phplib_DATA = AEvalLan.inc.php \
+              FlexElink.inc.php \
+              FormatRetriever.inc.php \
+              IntVars.inc.php \
+              KBRetriever.inc.php \
+              LinkResolver.inc.php \
+              OAISpecExtractor.inc.php \
+              Processor.inc.php \
+              RecordSeparator.inc.php \
+              Timing.inc.php \
+              TreeNode.inc.php \
+              UDFRetriever.inc.php
 
-CLEANFILES = $(wildcard *.php) *~ *.tmp
+EXTRA_DIST = $(phplib_DATA)
 
-%.php: %.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
-	$(WML) -o $@ $<
+CLEANFILES = *~ *.tmp

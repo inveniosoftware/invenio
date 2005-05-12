@@ -34,7 +34,6 @@
   define(CDSLOGIN_DIR, "<WEBDIR>");
 //---------------------------------------------------------------------
 
-
   define(DB, COMMON_DIR."/dbparams.inc.php");
   define(FUNCTION_LIB, COMMON_DIR."/general.inc.php");
   
@@ -48,5 +47,7 @@
   define(KB_RETRIEVER, CORE_DIR."/KBRetriever.inc.php");
   define(INTVARS, CORE_DIR."/IntVars.inc.php");
   define(LINK_RESOLVER, CORE_DIR."/LinkResolver.inc.php");
+
+  define(TIMELIMIT, <CFG_BIBFORMAT_TIME_LIMIT>);
 
 ?>

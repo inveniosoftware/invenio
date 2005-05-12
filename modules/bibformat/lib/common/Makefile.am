@@ -17,13 +17,16 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-FILESWML=$(wildcard $(srcdir)/*.wml)
-phplibdir=$(libdir)/php/cdsware/bibformat/common
-phplib_DATA=$(FILESWML:$(srcdir)/%.wml=%)
+phplibdir = $(libdir)/php/cdsware/bibformat/common
 
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+phplib_DATA = general.inc.php global.inc.php dbparams.inc.php 
 
-CLEANFILES = $(wildcard *.php) *~ *.tmp
+EXTRA_DIST = general.inc.php global.inc.php.wml dbparams.inc.php.wml
 
-%.php: %.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
+CLEANFILES = global.inc.php dbparams.inc.php *~ *.tmp
+
+global.inc.php: global.inc.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
+	$(WML) -o $@ $<
+
+dbparams.inc.php: dbparams.inc.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
 	$(WML) -o $@ $<

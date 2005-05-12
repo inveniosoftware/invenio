@@ -3,6 +3,3 @@ Makefile.in
 z_*
 *.O
 *~
-*.shtml
-*.php
-*.py
