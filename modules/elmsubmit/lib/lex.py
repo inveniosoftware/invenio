@@ -1,4 +1,4 @@
-<protect>#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 # ply: lex.py
 #
 # Author: David M. Beazley (beazley@cs.uchicago.edu)
@@ -696,7 +696,4 @@ def runmain(lexer=None,data=None):
         if not tok: break
         print "(%s,'%s',%d)" % (tok.type, tok.value, tok.lineno)
         
-    
 
-
-</protect>

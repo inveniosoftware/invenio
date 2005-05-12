@@ -1,4 +1,4 @@
-<protect>#!/usr/bin/env python
+#!/usr/bin/env python
 # -*- encoding: japanese.ms932 -*-
 
 # encdet.py - An encoding detector
@@ -339,4 +339,4 @@ test_suite(); sys.exit(0)
 if __name__ == "__main__":
   import fileinput
   for s in fileinput.input():
-    print guess(s)</protect>
+    print guess(s)

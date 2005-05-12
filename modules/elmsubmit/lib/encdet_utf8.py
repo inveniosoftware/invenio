@@ -1,4 +1,4 @@
-<protect>#!/usr/bin/env python
+#!/usr/bin/env python
 # -*- encoding: utf8 -*-
 
 # Converted from the original japanese.ms932 encoding to utf8.
@@ -341,4 +341,4 @@ test_suite(); sys.exit(0)
 if __name__ == "__main__":
   import fileinput
   for s in fileinput.input():
-    print guess(s)</protect>
+    print guess(s)

@@ -1,4 +1,4 @@
-<protect>"""HTML character entity references."""
+"""HTML character entity references."""
 
 # maps the HTML entity name to the Unicode codepoint
 name2codepoint = {
@@ -271,4 +271,4 @@ for (name, codepoint) in name2codepoint.iteritems():
         entitydefs[name] = '&#%d;' % codepoint
 
 del name, codepoint
-</protect>
+

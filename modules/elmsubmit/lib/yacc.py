@@ -1,4 +1,4 @@
-<protect>#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 # ply: yacc.py
 #
 # Author(s): David M. Beazley (beazley@cs.uchicago.edu)
@@ -2415,4 +2415,4 @@ def yacc_cleanup():
 def parse(*args,**kwargs):
     raise YaccError, "yacc: No parser built with yacc()"
 
-</protect>
+

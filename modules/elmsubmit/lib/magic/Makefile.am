@@ -18,12 +18,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir = $(libdir)/python/cdsware/magic
-pylib_DATA =  __init__.py compile_magic.py magic.ext magic.ext.mgc
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) magic.ext magic.ext.mgc
+pylib_DATA = __init__.py compile_magic.py magic.ext magic.ext.mgc
 
-CLEANFILES = *.py *~ *.tmp *.pyc
+EXTRA_DIST = $(pylib_DATA)
 
-%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
+CLEANFILES = *~ *.tmp *.pyc
