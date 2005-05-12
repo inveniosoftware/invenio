@@ -954,7 +954,7 @@ def deserialize_via_marshal(string):
     return loads(decompress(string))
 def get_languages():
     languages = []
-    for (lang, lang_namelong) in <: print generate_language_list_for_python("long"); :>:
+    for (lang, lang_namelong) in language_list_long():
         languages.append((lang, lang_namelong))
     languages.sort()
     return languages
