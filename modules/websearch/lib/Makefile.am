@@ -18,13 +18,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir = $(libdir)/python/cdsware
+
 pylib_DATA = websearchadminlib.py search_engine.py search_engine_tests.py search_engine_config.py
 
+EXTRA_DIST = websearchadminlib.py search_engine.py search_engine_tests.py search_engine_config.py.wml
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+CLEANFILES = search_engine_config.py *~ *.tmp *.pyc
 
-CLEANFILES = $(pylib_DATA) *~ *.tmp *.pyc
-
-%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
+search_engine_config.py: search_engine_config.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o $@ $<

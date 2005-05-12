@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ## $Id$
 ## CDSware Search Engine in mod_python.
 
@@ -18,13 +19,9 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-<protect># -*- coding: utf-8 -*-</protect>
-
 """CDSware Search Engine in mod_python."""
 
-__lastupdated__ = """<: print `date +"%d %b %Y %H:%M:%S %Z"`; :>"""
-
-<protect> ## okay, rest of the Python code goes below #######
+__lastupdated__ = """FIXME: last updated"""
 
 __version__ = "$Id$"
 
@@ -3897,5 +3894,4 @@ def profile(p="", f="", c=cdsname):
 
 ## profiling:
 #profile("of the this")
-</protect>
 
