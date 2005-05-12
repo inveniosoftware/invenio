@@ -167,6 +167,26 @@ the dates of last modification of neither records not rnkMETHODDATA
 and friends; rather the ranking indexation should go into empty
 tables.
 
+** BibRank-20050504: similar records in the demo installation give traceback
+
+<http://cdsware.cern.ch:8000/search.py?p=recid:72&rm=wrd&ln=en> gives:
+
+[' File
+"/log/cdsware-DEMOPLUS/lib/python/cdsware/bibrank_record_sorter.py",
+line 230, in rank_records\n result = find_similar(rank_method_code,
+pattern[0][6:], hitset, rank_limit_relevance, verbose)\n', ' File
+"/log/cdsware-DEMOPLUS/lib/python/cdsware/bibrank_record_sorter.py",
+line 381, in find_similar\n if len(tf_values) <=
+methods[rank_method_code]["max_nr_words_lower"] or (len(term_recs)>=
+methods[rank_method_code]["min_nr_words_docs"] and
+(((float(len(term_recs)) /
+float(methods[rank_method_code]["col_size"])) <=
+methods[rank_method_code]["max_word_occurence"]) and
+((float(len(term_recs)) /
+float(methods[rank_method_code]["col_size"]))>=
+methods[rank_method_code]["min_word_occurence"]))): #too
+complicated...something must be done\n']
+
 * BibSched
 
 ** BibSched-001: enable multiple hosts
@@ -229,6 +249,10 @@ creation rules.
 ** BibUpload-002: must use run_sql() 
   to avoid connection dropping problems
   Fri Jan 16 10:17:11 2004
+
+** BibUpload-20050512: XML MARC not stored when bibupload -c is used
+
+XML MARC not stored in bibfmt when bibupload -c is used.
 
 * Miscellaneous
 
