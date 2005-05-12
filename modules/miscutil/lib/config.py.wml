@@ -73,3 +73,5 @@ cdspageboxleftbottom = """<CDSPAGEBOXLEFTBOTTOM>"""
 cdspageboxrighttop = """<CDSPAGEBOXRIGHTTOP>"""
 cdspageboxrightbottom = """<CDSPAGEBOXRIGHTBOTTOM>"""
 cdspagefooter = """<CDSPAGEFOOTER>"""
+
+pdftotext = """<PDFTOTEXT>"""
