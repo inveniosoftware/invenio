@@ -17,13 +17,8 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS=bibconvert
+bin_SCRIPTS = bibconvert
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = bibconvert.in
 
-CLEANFILES = $(bin_SCRIPTS) *~ *.tmp bibconvertc
-
-%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdswmllib.wml
-	$(WML) -o $@ $<
-	chmod u+x $@
+CLEANFILES = *~ *.tmp bibconvertc
