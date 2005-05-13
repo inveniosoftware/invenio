@@ -18,11 +18,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir = $(libdir)/python/cdsware
+
 pylib_DATA = oai_repository.py oai_repository_config.py oai_repository_tests.py  
 
-EXTRA_DIST = oai_repository.py oai_repository_config.py.wml oai_repository_tests.py  
+EXTRA_DIST = $(pylib_DATA)
 
-CLEANFILES = oai_repository_config.py *~ *.tmp *.pyc
-
-oai_repository_config.py: oai_repository_config.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
+CLEANFILES = *~ *.tmp *.pyc
