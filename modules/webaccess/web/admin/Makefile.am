@@ -19,15 +19,11 @@
 
 webappdir = $(WEBDIR)/admin/webaccess
 
-webapp_DATA=webaccessadmin.py index.html
+webapp_DATA = webaccessadmin.py index.html
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = webaccessadmin.py index.html.wml
 
-CLEANFILES = $(webapp_DATA) *~ *.tmp
-
-%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
+CLEANFILES = index.html *~ *.tmp
 
 %.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<

@@ -3,8 +3,5 @@ Makefile.in
 z_*
 *.O
 *~
-oai1d
-oai2d
-*.py
 *.shtml
 *.html

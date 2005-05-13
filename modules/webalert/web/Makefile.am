@@ -19,12 +19,8 @@
 
 webappdir = $(WEBDIR)
 
-webapp_DATA=youralerts.py
+webapp_DATA = youralerts.py
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = $(webapp_DATA)
 
-CLEANFILES = $(webapp_DATA) *~ *.tmp
-
-%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
+CLEANFILES = *~ *.tmp

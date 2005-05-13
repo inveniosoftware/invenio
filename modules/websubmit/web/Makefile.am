@@ -19,14 +19,18 @@
 
 SUBDIRS = admin
 
-FILESWML=$(wildcard $(srcdir)/*.wml)
 docdir = $(WEBDIR)
 
-doc_DATA=$(FILESWML:$(srcdir)/%.wml=%)
+doc_DATA = approve.py \
+           direct.py \
+           getfile.py \
+           publiline.py \
+           sub.py \
+           submit.py \
+           summary.py \
+           yourapprovals.py \
+           yoursubmissions.py
 
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = $(doc_DATA)
 
-CLEANFILES = $(doc_DATA) *~ *.tmp *.php *.html
-
-%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
+CLEANFILES = *~ *.tmp *.php *.html

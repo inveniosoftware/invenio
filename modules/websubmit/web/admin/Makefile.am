@@ -19,16 +19,14 @@
 
 webappdir = $(WEBDIR)/admin/websubmit
 
-FILESWML=$(wildcard $(srcdir)/*.wml)
-webapp_DATA=$(FILESWML:$(srcdir)/%.wml=%)
+FILESWML = $(wildcard $(srcdir)/*.wml)
 
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+webapp_DATA = $(FILESWML:$(srcdir)/%.wml=%) referees.py
 
-CLEANFILES = $(webapp_DATA) *~ *.tmp
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) referees.py
+
+CLEANFILES = $(FILESWML:$(srcdir)/%.wml=%) *~ *.tmp
 
 %.php: %.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-           $(top_srcdir)/config/messages.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
            $(top_srcdir)/config/messages.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
