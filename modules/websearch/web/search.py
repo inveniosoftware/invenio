@@ -82,7 +82,6 @@ def authenticate(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp
     def __auth__(req, user, password):
         """Is user authorized to proceed with the request?"""
         import sys 
-        sys.path.append("<LIBDIR>/python")
         from cdsware.config import cdsname
         from cdsware.webuser import auth_apache_user_collection_p
         from cgi import parse_qs
