@@ -374,11 +374,14 @@ Contents
           index file.
 
           In addition, you have to ask Apache to interpret .py files
-          in the installation place via mod_python:
+          in the installation place via mod_python and to indicate
+          path to CDSware's Python library directory (composed from
+          your --prefix choice followed by `/lib/python'):
 
               <Directory /var/www/DEMO/>
                  AddHandler python-program .py
                  PythonHandler mod_python.publisher
+                 PythonPath "['/usr/local/cdsware-DEMO/lib/python']+sys.path" 
                  PythonDebug On
               </Directory>
             
