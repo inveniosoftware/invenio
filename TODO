@@ -13,32 +13,16 @@
 
 * BibConvert
 
-** BibConvert-001: MEDLINE, BibTeX examples
-  Received: Wed Dec 17 16:20:35 2003 
+** BibConvert-20031217: MEDLINE, BibTeX examples
   Progress: BibTeX example done, MEDLINE pending
 
 * BibEdit
 
-** BibEdit-001: text or GUI tool
-Wed Nov  3 11:40:16 2004
+** BibEdit-20041103: text or GUI tool
 
 * BibFormat
 
-** BibFormat-001: foresee electronic issue publication
-Wed Nov  3 11:42:46 2004
-
-Introduce a possibility to easily publish issues of electronic
-journals, like Weekly Bulletin.  Access control needed.
-
-** BibFormat-002: hb_fly for CDSware distro
-Wed Nov  3 11:39:01 2004
-
-** BibFormat-003: make hd and other detailed formats on the fly for CDSware too
-Wed Nov  3 11:39:32 2004
-
-Just as we do it for CERN.
-
-** BibFormat-004: forall()
+** BibFormat-20041018: forall()
 On Mon, 18 Oct 2004, pelzer@hbz-nrw.de wrote:
 > why is it impossible to nest forall constructions in your format
 > definitions like:
@@ -58,7 +42,7 @@ In the future the BibFormat module will probably get rewritten in
 Python some day, and we'll try to lever this limitation.  (It's
 nothing imminent though.)
 
-** BibFormat-005: language-dependent behaviour
+** BibFormat-20041019: language-dependent behaviour
 > - le premier concerne la fonction link() dans la definition des
 > formats (BibFormat Admin).  Le parametre de langue "ln" n'est pas
 > transmis dans l'URL. Ce qui signifie que lorsque tu cliques par
@@ -69,8 +53,18 @@ Oui, BibFormat a le probleme de multilinguisme, car il a ete developpe
 avant... il faudra que l'on y ajoute la langue comme parametre dans
 plusieurs endroits.
 
-** BibFormat-006: forsee script for downloading cfg, editing in Emacs, uploading cfg 
-Wed Nov  3 11:58:30 2004
+** BibFormat-20041103: foresee electronic issue publication
+
+Introduce a possibility to easily publish issues of electronic
+journals, like Weekly Bulletin.  Access control needed.
+
+** BibFormat-20041104: hb_fly for CDSware distro
+
+** BibFormat-20041105: make hd and other detailed formats on the fly for CDSware too
+
+Just as we do it for CERN.
+
+** BibFormat-20041106: forsee script for downloading cfg, editing in Emacs, uploading cfg 
 
 To ease the editing of BibFormat formats and friends, a little script
 is needed that would download cfg into a file that would be
@@ -103,8 +97,7 @@ On Wed, 24 Mar 2004, Tibor Simko wrote:
 > What do you think?  Would you have time for option 1, either to advise
 > me or to do it yourself? 
 
-** BibFormat-007: bibreformat format type lookup is wrong
-Tue Dec 14 12:38:19 2004
+** BibFormat-20041214: bibreformat format type lookup is wrong
 
 When I launch bibreformat -oHD, and in the bibfmt table there was
 format already for HB, then the record is not processed.  BibReformat
@@ -113,21 +106,19 @@ records or not.
 
 * BibIndex
 
-** BibIndex-001: index conference title with individual contribution records
-Fri Nov 12 14:30:31 2004
+** BibIndex-20031217: make our own ACC indexes
+  Study phrase index generation from XML MARC.
+  Related to bibXXx table abolition.
+  Progress: table structure prepared for v0.3.0
+
+** BibIndex-20041112: index conference title with individual contribution records
 
   When LKR is defined for an article, lookup the conference title and
   index it together with the article metadata, for the title and the
   global indexes.  (Beware of phrase indexes, modification times of
   the conference record WRT contribution records, etc.)
 
-** BibIndex-002: make our own ACC indexes
-  Wed Dec 17 16:20:35 2003 
-  Study phrase index generation from XML MARC.
-  Related to bibXXx table abolition.
-  Progress: table structure prepared for v0.3.0
-
-** BibIndex-003: --reindex
+** BibIndex-20041113: --reindex
 > I suspect my fix of course. Is there a safe way to start the indexes
 > afresh ?  dropping the content of all the idx tables ?
 
@@ -150,7 +141,7 @@ technique:
 We should invent a nice option to ``bibindex'' that would take care of
 all these steps.
 
-** BibIndex-004: index into tmp table
+** BibIndex-20041114: index into tmp table
    When reindexing everything from scratch, don't wipe out existing
    index but rather create new index into a temporary table and then
    copy it over the current index at the end of the process .  Useful
@@ -159,8 +150,7 @@ all these steps.
 
 * BibRank
 
-** BibRank-001: rebalancing should read old records
-Wed Nov  3 11:48:32 2004
+** BibRank20041103: rebalancing should read old records
 
 When bibrank -R option is used, the attention should not be paid to
 the dates of last modification of neither records not rnkMETHODDATA
@@ -189,17 +179,15 @@ complicated...something must be done\n']
 
 * BibSched
 
-** BibSched-001: enable multiple hosts
-  Wed Dec 17 16:20:35 2003 
+** BibSched-20031217: enable multiple hosts
 
-** BibSched-002: task sleeping sometimes cannot be done directly
+** BibSched-20040302: task sleeping sometimes cannot be done directly
   Sometimes when you try to make BibSched task sleeping, you cannot do
   it because MySQL is active for the task elsewhere:
    _mysql_exceptions.ProgrammingError: (2014, "Commands out of
    sync;You can't run this command now")
-  Tue Mar  2 10:22:33 2004
 
-** BibSched-003: task numbering
+** BibSched-20040303: task numbering
 
 > 2) can you prefix the task number with 0, e.g. _task_0088.err
 
@@ -207,7 +195,7 @@ We cannot foretell how many zeros to put there... depends on the total
 number of jobs.  (Maybe we can put some sufficiently large number of
 leading zeros.)
 
-** BibSched-004: start/stop
+** BibSched-20040304: start/stop
 
 > Another patch is for modules/bibsched/bin/bibsched.wml: "ps -C %s o
 > '%%p%%a'" does not exist on FreeBSD, and I have replaced it by "ps
@@ -217,7 +205,7 @@ We'll rewrite the offending part.  We've actually been thinking about
 replacing the bibsched daemon behaviour via a more traditional
 ``apachectl start/stop'' kind of approach.
 
-** BibSched-005: ERROR task queue policy
+** BibSched-20040305: ERROR task queue policy
 >   Note that the BibSched daemon automatic mode stops as soon as some
 >   of the tasks ends with an error. It it therefore a good idea to
 >   inspect BibSched queue from time to time. This can be done by
@@ -231,24 +219,21 @@ Indeed.  The original workflow assumed a chain of actions that we
 wanted to stop and manually fix as soon as a problem appeared.  
 I think we can safely change this policy now.
 
-** BibSched-007: memory efficiency of the daemon for big schTASK tables
-Thu Dec 16 15:24:34 2004
+** BibSched-20041216: memory efficiency of the daemon for big schTASK tables
 
 When there is a lot of DONE tasks in the schTASK table, ``bibsched
 -d'' eats up a lot of memory during the execution.  It shouldn't.
 
 * BibUpload
 
-** BibUpload-001: table bibxEP was wanted at some point
-Wed Nov  3 11:55:27 2004
+** BibUpload-20040116: must use run_sql() 
+  to avoid connection dropping problems
+
+** BibUpload-20041103: table bibxEP was wanted at some point
 
 During recent demo, at some point in time when a new submission type
 was made the system wanted to look for bibxEP table.  Check tag
 creation rules.
-
-** BibUpload-002: must use run_sql() 
-  to avoid connection dropping problems
-  Fri Jan 16 10:17:11 2004
 
 ** BibUpload-20050512: XML MARC not stored when bibupload -c is used
 
@@ -256,45 +241,27 @@ XML MARC not stored in bibfmt when bibupload -c is used.
 
 * Miscellaneous
 
-** Miscellaneous-001: introduce several record modification times (bib/ref/pdf)
-Mon Nov 29 10:05:33 2004
-
-Need to distinguish between several modification times: metadata
-modif, reference modif, fulltext modif.  Touches
-BibUpload/BibReference/BibIndex and friends.
-
-** Miscellaneous-002: investigate usage of SQLRelay
-<http://sqlrelay.sourceforge.net/>
-
-** Miscellaneous-003: INSTALL file
-Add comments on PHP and Python linking to the same MySQL library.
-(e.g. people should not use PHP internal MySQL library).
-
-** Miscellaneous-004: INSTALL file upgrade instructions
-Wed Dec 17 16:20:35 2003 
-Updated Wed May 12 12:00:38 2004 - update sql targets, plus release announcements
-
-** Miscellaneous-005: test suite
-Make version testing there too.
-
-** Miscellaneous-006: backup script
-
-shutdown DB, put warning message, hotbackup tables, start DB, remove
-warning message
-
-** Miscellaneous-007: MySQLdb 1.0.0
-API has changed for BLOBs/arrays.  Should adapt our interfaces.
-
-** Miscellaneous-008: Personalization part is not I18N-ized yet
-Mon Mar 15 11:23:34 2004
+** Miscellaneous-20040315: Personalization part is not I18N-ized yet
 
 The Personalization part is not I18N-ized yet and there are not very
 many personalization options.  We plan to expand it at some point in
 the future, like a possibility to select default language, default
 number of hits per page, default sorting, etc.  
 
-** Miscellaneous-009: version numbering CDSware/0.3.3.20040929 bibindex/1.12
-Mon Dec 13 17:53:24 2004
+** Miscellaneous-20041129: introduce several record modification times (bib/ref/pdf)
+
+Need to distinguish between several modification times: metadata
+modif, reference modif, fulltext modif.  Touches
+BibUpload/BibReference/BibIndex and friends.
+
+** Miscellaneous-20041130: investigate usage of SQLRelay
+<http://sqlrelay.sourceforge.net/>
+
+** Miscellaneous-20041201: INSTALL file
+Add comments on PHP and Python linking to the same MySQL library.
+(e.g. people should not use PHP internal MySQL library).
+
+** Miscellaneous-20041213: version numbering CDSware/0.3.3.20040929 bibindex/1.12
 
 Each module should have its own version numbering, to easily track
 what changed.  For example:
@@ -316,7 +283,21 @@ After a new release:
 indicating that bibformat didn't change while bibindex did a lot in
 between the two releases.
 
-** Miscellaneous-010: INSTALL file and root/non-root
+** Miscellaneous-20041217: INSTALL file upgrade instructions
+Updated Wed May 12 12:00:38 2004 - update sql targets, plus release announcements
+
+** Miscellaneous-20041218: test suite
+Make version testing there too.
+
+** Miscellaneous-20041219: backup script
+
+shutdown DB, put warning message, hotbackup tables, start DB, remove
+warning message
+
+** Miscellaneous-20041220: MySQLdb 1.0.0
+API has changed for BLOBs/arrays.  Should adapt our interfaces.
+
+** Miscellaneous-20041221: INSTALL file and root/non-root
 
 >   (o) You forgot to mention that many steps are to be done as
 > root. Some are obvious, others are not. But for clean install file
@@ -334,12 +315,26 @@ groups, etc.  The INSTALL file is silent on this now, each site has
 their own preferences.  I've added a task to our TODO file to improve
 this.
 
+** Miscellaneous-20050413: prettify config.py
+
+The config variables in config.py are dirty, as they are badly named
+and use different naming styles.  Harmonize them to a schema like
+cfg_general_for, cfg_webaccess_bar, etc.
+
 * OAI
 
-** OAI-001: RTdata dir should be created during `make install` ?
+** OAI-20040119: RTdata dir should be created during `make install` ?
   Mon Jan 19 10:41:18 2004
 
-** OAI-002: periodical harvesting
+** OAI-20040928: provenance information
+On Tue, 28 Sep 2004, pelzer@hbz-nrw.de wrote:
+> have a question about your oai_repository.py:
+> 
+> do you plan for OAI the output of provenance information in the
+> "about" part of a record? e.g.
+> http://www.openarchives.org/OAI/2.0/guidelines-provenance.htm
+
+** OAI-20041004: periodical harvesting
 
 On Mon, 4 Oct 2004, pelzer@hbz-nrw.de wrote:
 > reply of martin. my new question: are you ready with OAI data
@@ -350,21 +345,11 @@ For the time being we only provide command-line `bibharvest' tool
 without any periodical harvesting admin facility.  We haven't had time
 to develop BibHarvest Admin yet.  
 
-** OAI-003: provenance information
-On Tue, 28 Sep 2004, pelzer@hbz-nrw.de wrote:
-> have a question about your oai_repository.py:
-> 
-> do you plan for OAI the output of provenance information in the
-> "about" part of a record? e.g.
-> http://www.openarchives.org/OAI/2.0/guidelines-provenance.htm
-
 * WebAccess
 
-** WebAccess-001: restriction by IP
-Wed Nov  3 11:39:58 2004
+** WebAccess-20041103: restriction by IP
 
-** WebAccess-002: passage de CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS inactive les comptes
-Tue Feb 22 18:24:52 2005
+** WebAccess-20050222: passage de CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS inactive les comptes
 
 Le passage de CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS de 0 a 3 inactive les
 comptes.  Comment fixer le probleme:
@@ -378,14 +363,13 @@ allons fixer cela.
 
 * WebAlert
 
-** WebAlert-001: nice and simple interface to set up an alert
-Wed Nov 24 13:18:02 2004
+** WebAlert-20041124: nice and simple interface to set up an alert
 
 The form we used to have to easily create alerts has gone.  The only
 way now is via search history.  Put it back.  See also
 <http://www.google.com/alerts>.
 
-** WebAlert-002: manage alerts for a mailing list
+** WebAlert-20041103: manage alerts for a mailing list
 Wed Nov  3 11:46:24 2004
 
 Instead of having to create an account with the email address of
@@ -395,62 +379,18 @@ an individual user.
 
 * WebBasket
 
-** WebBasket-001: output formats in XML etc
-Wed Nov  3 11:45:37 2004
+** WebBasket-20041103: output formats in XML etc
 
 Properly support many output formats for a basket, quite like the
 search engine does.
 
 * WebSearch
 
-** WebSearch-001: treat stemming properly
-Mon Dec 13 16:46:45 2004
+** WebSearch-20031217: cross-searching of various CDSware installations
 
-** WebSearch-002: treat stopword search properly
-Mon Dec 13 16:46:43 2004
+** WebSearch-20040121: when searching for ``title: goo'' the space should be ignored
 
-** WebSearch-003: introduce possibility to search for basketid:333
-Wed Nov  3 11:45:05 2004
-
-** WebSearch-004: introduce recommended terms lookup
-Wed Nov  3 11:41:12 2004
-
-** WebSearch-005: introduce `advertized records' like Google
-Wed Nov  3 11:41:35 2004
-
-** WebSearch-006: introduce NEAR operator
-Wed Nov  3 11:41:54 2004
-
-For example, we could approximate NEAR by doing a regexp search for
-two words less than 20 characters apart.
-
-** WebSearch-007: put search cache back
-   Wed Dec 17 16:20:35 2003 
-
-** WebSearch-008: add RSS output for recent additions to the collections.
-  Wed Dec 17 16:20:35 2003 
-
-** WebSearch-009: when searching for ``title: goo'' the space should be ignored
-  Wed Jan 21 11:09:00 2004
-
-** WebSearch-010: cross-searching of various CDSware installations
-  Wed Dec 17 16:20:35 2003 
-
-** WebSearch-011: indicate when cfg_max_recID is going to be exhausted
-  Wed Nov  3 11:38:40 2004
-
-** WebSearch-012: collection cache
-
-> URI:
-> http://cdsweb.cern.ch/search.py?sc=1&ln=en&p=slow+ejection&f=title&action=Search+&cc=Articles+%26+Preprints&c=Published+Articles&c=Preprints&c=Theses&c=Reports&c=CERN+Internal+Notes
-> Time: 24/Jun/2004:18:16:53 +0200 Browser: Mozilla/4.0 (compatible;
-> MSIE 6.0; Windows NT 5.0) Client: 137.138.169.154
-
-The problem is connected to temporary cache.  If it happens again,
-please just try to reload the page after a while.  We'll fix the
-problem to prevent it from happening.
-
-** WebSearch-013: of=nn for the search engine
+** WebSearch-20040622: of=nn for the search engine
 On Tue, 22 Jun 2004, pelzer@hbz-nrw.de wrote:
 
 >> If this is not feasible (e.g. huuuge result sets), then we may
@@ -464,7 +404,7 @@ don't see in xml - "mode", how many records are found. i think, it's helpful
 to write the hit number at the beginning of the first xml data record.
 what do you think about this?
 
-** WebSearch-014: multiple search logs
+** WebSearch-20041015: multiple search logs
 
 On Fri, 15 Oct 2004, Frederic Gobry wrote:
 
@@ -475,7 +415,39 @@ On Fri, 15 Oct 2004, Frederic Gobry wrote:
 Yes, it would.  A log of slow queries as well.  I'll add them as new
 log files before the next release.
 
-** WebSearch-015: safer wildcard treatment
+** WebSearch-20041103: indicate when cfg_max_recID is going to be exhausted
+
+** WebSearch-20041213: treat stemming properly
+
+** WebSearch-20041214: treat stopword search properly
+
+** WebSearch-20041215: introduce possibility to search for basketid:333
+
+** WebSearch-20041216: introduce recommended terms lookup
+
+** WebSearch-20041217: introduce `advertized records' like Google
+
+** WebSearch-20041218: introduce NEAR operator
+
+For example, we could approximate NEAR by doing a regexp search for
+two words less than 20 characters apart.
+
+** WebSearch-20041219: put search cache back
+
+** WebSearch-20041220: add RSS output for recent additions to the collections.
+
+** WebSearch-20041221: collection cache
+
+> URI:
+> http://cdsweb.cern.ch/search.py?sc=1&ln=en&p=slow+ejection&f=title&action=Search+&cc=Articles+%26+Preprints&c=Published+Articles&c=Preprints&c=Theses&c=Reports&c=CERN+Internal+Notes
+> Time: 24/Jun/2004:18:16:53 +0200 Browser: Mozilla/4.0 (compatible;
+> MSIE 6.0; Windows NT 5.0) Client: 137.138.169.154
+
+The problem is connected to temporary cache.  If it happens again,
+please just try to reload the page after a while.  We'll fix the
+problem to prevent it from happening.
+
+** WebSearch-20041222: safer wildcard treatment
 
 > okay, just began to wonder when CERN* never returned an answer :)
 
@@ -498,29 +470,25 @@ it's hard to .  I'll rewrite the wildcard handling part in order to
 retain cases with <200 words, say, and then I'll pass you the full
 list.
 
-** WebSearch-017: clearer output messages
-Mon Jan 10 19:28:30 2005
+** WebSearch-20050110: clearer output messages
 
 In phrases like ``Search term dark mass inside title index did not
 match any record'' we should better distinguish for the end user
 word-searches from phrase-searches.
 
-** WebSearch-018: investigate doing partial phrase match when exact failed
-Mon Jan 10 19:28:30 2005
+** WebSearch-20050111: investigate doing partial phrase match when exact failed
 
 investigate doing partial phrase match when exact phrase match failed,
 exactly as we were doing some years ago.
 
-** WebSearch-019: better no match messages for phrase queries
-Mon Feb  7 16:22:23 2005
+** WebSearch-20050207: better no match messages for phrase queries
 
 Whenever a search using '...' gives zero, your diagnostic messages all
 have % in place of the '. This is extremely confusing. Surely it would
 be a simple matter to display the diagnostic in the form the query was
 typed in?
 
-** WebSearch-020: wau=ellis -> author:ellis
-Mon Feb  7 16:35:11 2005
+** WebSearch-20050208: wau=ellis -> author:ellis
 
 Yes, the equal sign has a special meaning in order to translate our
 old syntax such as ``wau=ellis'' into the new one ``author:ellis''.
@@ -547,7 +515,7 @@ Put into TODO as WebSearch-20050415.
 
 * WebSession
 
-** WebSession-001: detect cookies and inform user if not available upon login
+** WebSession-20041102: detect cookies and inform user if not available upon login
 
 We should detect whether cookies are disabled, and print a message on
 the login page.  Otherwise user types good access credentials but
@@ -567,61 +535,49 @@ Konqueror should start to work just fine.
 
 * WebSubmit
 
-** WebSubmit-001: MBI login link uses bad `referer' argument 
-Received: Wed Nov  3 12:02:44 2004
+** WebSubmit-20041103: MBI login link uses bad `referer' argument 
 
-** WebSubmit-002: call elements `title' not `TI'
-Wed Nov  3 11:57:31 2004
+** WebSubmit-20041104: call elements `title' not `TI'
 
-** WebSubmit-003: traceback when `brique' element was edited
-Wed Nov  3 11:56:33 2004
+** WebSubmit-20041105: traceback when `brique' element was edited
 
 When `brique' element was edited during a recent demo, a Python
 traceback was obtained.
 
-** WebSubmit-004: admin interface should use [?] links
-Wed Nov  3 11:50:01 2004
+** WebSubmit-20041106: admin interface should use [?] links
 
 WebSubmit Admin should use [?] links to point to help pages, e.g. to
 the list of available functions etc.
 
-** WebSubmit-005: Slovak language abbreviation is not `slo', that is Slovene
-Wed Nov  3 11:50:47 2004
+** WebSubmit-20041107: Slovak language abbreviation is not `slo', that is Slovene
 
-** WebSubmit-006: MBI for hep-th/00000 looked for hep-th_00000
-Wed Nov  3 11:54:10 2004
+** WebSubmit-20041108: MBI for hep-th/00000 looked for hep-th_00000
 
-** WebSubmit-007: publiline report number link gave traceback
-Wed Nov  3 11:54:10 2004
+** WebSubmit-20041109: publiline report number link gave traceback
 
 publiline report number link gave Python traceback during recent
 demo.
 
-** WebSubmit-008: `your approvals' link not needed everywhere
-Wed Nov  3 11:47:40 2004
+** WebSubmit-20041110: `your approvals' link not needed everywhere
 
 On the pesonal account page, Your Approvals link should not be
 displayed if I'm not referee for some document.  Verify!
 
-** WebSubmit-009: integrate submit new record / submit new file
-Wed Nov  3 11:43:36 2004
+** WebSubmit-20041111: integrate submit new record / submit new file
 
 Do not separate out submitting new record bibliographic information
 and new fulltext file, but rather merge the latter into the former as
 page N.  See also ``End submission'' and ``Finish submission''
 problems.  MBI and SRV button names should be user-friendly.
 
-** WebSubmit-010: after adding PCV action, php mysql bad result
-Wed Nov  3 12:05:51 2004
+** WebSubmit-20041112: after adding PCV action, php mysql bad result
 
 After PCV action was added, php mysql bad result was obtained for some
 page.
 
-** WebSubmit-011: create icons for submitted videos
-Wed Nov  3 11:44:39 2004
+** WebSubmit-20041113: create icons for submitted videos
 
-
-** WebSubmit-012: delete unwanted fields
+** WebSubmit-20041114: delete unwanted fields
 > Une petite question e propos de l'interface de soumission: Lorsqu'on
 > efface le contenu d'un champ (de type text input par exemple) qui a
 > ete prealablement saisi lors de la soumission d'un document, les
