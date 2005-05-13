@@ -63,11 +63,14 @@ cdsnameintl = {}
 <el>cdsnameintl['el'] = "<CDSNAMEINTL>"</el>
 <uk>cdsnameintl['uk'] = "<CDSNAMEINTL>"</uk>
 
+## Apache password/group files:
 cfg_apache_password_file = "<CFG_APACHE_PASSWORD_FILE>"
 cfg_apache_group_file = "<CFG_APACHE_GROUP_FILE>"
 
+## are we running CERN specifics?
 cfg_cern_site = <CFG_CERN_SITE>
 
+## page elements:
 cdspageheader = """<CDSPAGEHEADER>"""
 cdspageboxlefttop = """<CDSPAGEBOXLEFTTOP>"""
 cdspageboxleftbottom = """<CDSPAGEBOXLEFTBOTTOM>"""
@@ -75,7 +78,23 @@ cdspageboxrighttop = """<CDSPAGEBOXRIGHTTOP>"""
 cdspageboxrightbottom = """<CDSPAGEBOXRIGHTBOTTOM>"""
 cdspagefooter = """<CDSPAGEFOOTER>"""
 
-pdftotext = """<PDFTOTEXT>"""
+## helper programs:
+pdftotext = "<PDFTOTEXT>"
+pstotext = "<PSTOTEXT>"
+pstoascii = "<PSTOASCII>"
+antiword = "<ANTIWORD>"
+catdoc = "<CATDOC>"
+wvtext = "<WVTEXT>"
+ppthtml = "<PPTHTML>"
+xlhtml = "<XLHTML>"
+htmltotext = "<HTMLTOTEXT>"
+gfile = "<GFILE>"
+gzip = "<GZIP>"
+tar = "<TAR>"
+gunzip = "<GUNZIP>"
+acroread = "<ACROREAD>"
+distiller = "<DISTILLER>"
+convert = "<CONVERT>"
 
 ## for search_engine_config:
 cfg_max_recID = <CFG_MAX_RECID> 
@@ -102,13 +121,6 @@ counters = "<CFG_SUBMIT_COUNTER>"
 storage = "<CFG_SUBMIT_DIR>"
 filedir	 = "<CFG_FILE_DIR>"
 filedirsize = <CFG_FILE_DIR_SIZE>
-gfile = "<GFILE>"
-gzip = "<GZIP>"
-tar = "<TAR>"
-gunzip = "<GUNZIP>"
-acroread = "<ACROREAD>"
-distiller = "<DISTILLER>"
-convert = "<CONVERT>"
 bibupload = "<BINDIR>/bibupload"
 bibformat = "<BINDIR>/bibformat"
 bibwords = "<BINDIR>/bibwords"
@@ -135,3 +147,15 @@ oaisetfield = "<OAISETTAG>"
 oaideleted = "<OAIDELETEDPOLICY>"
 oai_rt_expire = <OAIEXPIRE>
 nb_records_in_resume = <OAILOAD>
+
+## for bibindex_engine_config:
+cfg_bibindex_fulltext_index_local_files_only = <CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY>
+cfg_bibindex_stemmer_default_language = "<CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE>"
+cfg_bibindex_remove_stopwords = <CFG_BIBINDEX_REMOVE_STOPWORDS>
+cfg_bibindex_path_to_stopwords_file = "<CFG_BIBINDEX_PATH_TO_STOPWORDS_FILE>"
+cfg_bibindex_chars_alphanumeric_separators = r"[<CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS>]"
+cfg_bibindex_chars_punctuation = r"[<CFG_BIBINDEX_CHARS_PUNCTUATION>]"
+cfg_bibindex_remove_html_markup = <CFG_BIBINDEX_REMOVE_HTML_MARKUP>
+cfg_bibindex_min_word_length = <CFG_BIBINDEX_MIN_WORD_LENGTH>
+cfg_bibindex_urlopener_username = "<CFG_BIBINDEX_URLOPENER_USERNAME>"
+cfg_bibindex_urlopener_password = "<CFG_BIBINDEX_URLOPENER_PASSWORD>"
