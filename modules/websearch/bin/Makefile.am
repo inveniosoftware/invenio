@@ -17,16 +17,8 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS=webcoll
+bin_SCRIPTS = webcoll
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = webcoll.in
 
-CLEANFILES = $(bin_SCRIPTS) *~ *.tmp index.wml
-
-%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
-
-%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdswmllib.wml
-	$(WML) -o $@ $<
-	chmod u+x $@
+CLEANFILES = *~ *.tmp
