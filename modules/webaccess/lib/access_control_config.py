@@ -1,6 +1,5 @@
 ## $Id$
-## CDSware Access Control Config.
-
+##
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -22,28 +21,12 @@
 
 __version__ = "$Id$"
 
+## global configuration parameters:
 from config import *
-from external_authentication import *
-
-## general configuration parameters read from the config.wml file:
-## (look there for details)
-#include "config.wml"
-#include "configbis.wml"
-
-supportemail = "<SUPPORTEMAIL>"
-adminemail = "<ADMINEMAIL>"
-CFG_ACCESS_CONTROL_LEVEL_SITE = <CFG_ACCESS_CONTROL_LEVEL_SITE>
-CFG_ACCESS_CONTROL_LEVEL_GUESTS = <CFG_ACCESS_CONTROL_LEVEL_GUESTS>
-CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS = <CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS>
-CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN = "<CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN>"
-CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS = <CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS>
-CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT = <CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT>
-CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION = <CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION>
-CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION = <CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION>
 
 ## local configuration parameters:
 
-<protect> 
+from external_authentication import *
 
 # VALUES TO BE EXPORTED
 # CURRENTLY USED BY THE FILES access_control_engine.py access_control_admin.py webaccessadmin_lib.py
@@ -144,4 +127,4 @@ cfg_webaccess_warning_msgs = {
                                14: """Error(14): Could not login using '%s', because this user is unknown.""", 
                                15: """Error(15): Could not login using your '%s' account, because you have introduced a wrong password."""
 		} 
-</protect>
+
