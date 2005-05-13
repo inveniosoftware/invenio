@@ -21,9 +21,6 @@ pylibdir = $(libdir)/python/cdsware
 
 pylib_DATA = websearchadminlib.py search_engine.py search_engine_tests.py search_engine_config.py
 
-EXTRA_DIST = websearchadminlib.py search_engine.py search_engine_tests.py search_engine_config.py.wml
+EXTRA_DIST = $(pylib_DATA)
 
-CLEANFILES = search_engine_config.py *~ *.tmp *.pyc
-
-search_engine_config.py: search_engine_config.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
+CLEANFILES = *~ *.tmp *.pyc
