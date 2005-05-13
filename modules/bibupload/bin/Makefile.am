@@ -17,13 +17,8 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS=bibupload
+bin_SCRIPTS = bibupload
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = bibupload.in
 
-CLEANFILES = $(bin_SCRIPTS) *~ *.tmp 
-
-%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
-	chmod u+x $@
+CLEANFILES = *~ *.tmp 
