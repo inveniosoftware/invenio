@@ -22,11 +22,6 @@ pylib_DATA = bibindex_engine.py bibindex_engine_config.py bibindex_engine_tests.
              bibindexadminlib.py bibindex_engine_stemmer.py bibindex_engine_stopwords.py \
              bibindex_engine_stemmer_tests.py 
 
-EXTRA_DIST = bibindex_engine.py bibindex_engine_config.py.wml bibindex_engine_tests.py \
-             bibindexadminlib.py bibindex_engine_stemmer.py bibindex_engine_stopwords.py \
-             bibindex_engine_stemmer_tests.py 
+EXTRA_DIST = $(pylib_DATA)
 
-CLEANFILES = bibindex_engine_config.py *~ *.tmp *.pyc
-
-bibindex_engine_config.py: bibindex_engine_config.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
+CLEANFILES = *~ *.tmp *.pyc
