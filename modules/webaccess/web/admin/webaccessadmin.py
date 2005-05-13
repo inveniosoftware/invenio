@@ -19,7 +19,7 @@
 
 """CDSware WebAccess Administrator Interface."""
 
-__lastupdated__ = """<: print `date +"%d %b %Y %H:%M:%S %Z"`; :>"""
+__lastupdated__ = """$Date$"""
 
 import sys
 import cdsware.webaccessadmin_lib as wal

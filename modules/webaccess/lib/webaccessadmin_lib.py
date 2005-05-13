@@ -20,7 +20,7 @@
 
 """CDSware WebAccess Administrator Interface."""
 
-__lastupdated__ = """<: print `date +"%d %b %Y %H:%M:%S %Z"`; :>"""
+__lastupdated__ = """$Date$"""
 
 ## fill config variables:
 
