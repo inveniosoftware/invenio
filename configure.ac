@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cdsware, 0.7.1.20050504, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.7.1.20050504)
+AC_INIT(cdsware, 0.7.1.20050513, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.7.1.20050513)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -429,6 +429,15 @@ AC_SUBST(CLISP)
 AC_SUBST(CMUCL)
 AC_SUBST(SBCL)
 AC_SUBST(GNUPLOT)
+AC_SUBST(DJPEG)
+AC_SUBST(CONVERT)
+AC_SUBST(GIFTEXT)
+AC_SUBST(JPEGSIZE)
+AC_SUBST(PNMSCALE)
+AC_SUBST(PPMQUANT)
+AC_SUBST(PPMTOGIF)
+AC_SUBST(GIFINTER)
+AC_SUBST(GIFRSIZE)
 
 ## Define output files:
 AC_CONFIG_FILES([config.nice \
@@ -438,6 +447,7 @@ AC_CONFIG_FILES([config.nice \
 	  modules/Makefile \
 	  modules/bibconvert/Makefile \
 	  modules/bibconvert/bin/Makefile \
+	  modules/bibconvert/bin/bibconvert \
 	  modules/bibconvert/doc/Makefile \
 	  modules/bibconvert/doc/admin/Makefile \
 	  modules/bibconvert/doc/hacking/Makefile \
@@ -445,13 +455,28 @@ AC_CONFIG_FILES([config.nice \
 	  modules/bibconvert/lib/Makefile \
 	  modules/bibedit/Makefile \
 	  modules/bibedit/bin/Makefile \
+	  modules/bibedit/bin/refextract \
+	  modules/bibedit/bin/xmlmarclint \
 	  modules/bibedit/doc/Makefile \
 	  modules/bibedit/doc/admin/Makefile \
 	  modules/bibedit/doc/hacking/Makefile \
 	  modules/bibedit/etc/Makefile \
 	  modules/bibedit/lib/Makefile \
+	  modules/bibformat/Makefile \
+	  modules/bibformat/bin/Makefile \
+	  modules/bibformat/bin/bibformat \
+	  modules/bibformat/bin/bibreformat \
+	  modules/bibformat/doc/Makefile \
+	  modules/bibformat/doc/admin/Makefile \
+	  modules/bibformat/doc/hacking/Makefile \
+	  modules/bibformat/lib/Makefile \
+	  modules/bibformat/lib/core/Makefile \
+	  modules/bibformat/lib/common/Makefile \
+	  modules/bibformat/web/Makefile \
+	  modules/bibformat/web/admin/Makefile \
 	  modules/bibharvest/Makefile \
 	  modules/bibharvest/bin/Makefile \
+	  modules/bibharvest/bin/bibharvest \
 	  modules/bibharvest/doc/Makefile \
 	  modules/bibharvest/doc/admin/Makefile \
 	  modules/bibharvest/doc/hacking/Makefile \
@@ -459,6 +484,8 @@ AC_CONFIG_FILES([config.nice \
 	  modules/bibharvest/web/Makefile \
 	  modules/bibindex/Makefile \
 	  modules/bibindex/bin/Makefile \
+	  modules/bibindex/bin/bibindex \
+	  modules/bibindex/bin/bibstat \
 	  modules/bibindex/doc/Makefile \
 	  modules/bibindex/doc/admin/Makefile \
 	  modules/bibindex/doc/hacking/Makefile \
@@ -467,6 +494,8 @@ AC_CONFIG_FILES([config.nice \
 	  modules/bibindex/web/admin/Makefile \
 	  modules/bibrank/Makefile \
 	  modules/bibrank/bin/Makefile \
+	  modules/bibrank/bin/bibrank \
+	  modules/bibrank/bin/bibrankgkb \
 	  modules/bibrank/doc/Makefile \
 	  modules/bibrank/doc/admin/Makefile \
 	  modules/bibrank/doc/hacking/Makefile \
@@ -476,32 +505,52 @@ AC_CONFIG_FILES([config.nice \
 	  modules/bibrank/web/admin/Makefile \
 	  modules/bibsched/Makefile \
 	  modules/bibsched/bin/Makefile \
+	  modules/bibsched/bin/bibsched \
+	  modules/bibsched/bin/bibtaskex \
 	  modules/bibsched/doc/Makefile \
 	  modules/bibsched/doc/admin/Makefile \
 	  modules/bibsched/doc/hacking/Makefile \
 	  modules/bibupload/Makefile \
 	  modules/bibupload/bin/Makefile \
+	  modules/bibupload/bin/bibupload \
 	  modules/bibupload/doc/Makefile \
 	  modules/bibupload/doc/admin/Makefile \
 	  modules/bibupload/doc/hacking/Makefile \
-	  modules/bibformat/Makefile \
-	  modules/bibformat/bin/Makefile \
-	  modules/bibformat/doc/Makefile \
-	  modules/bibformat/doc/admin/Makefile \
-	  modules/bibformat/doc/hacking/Makefile \
-	  modules/bibformat/lib/Makefile \
-	  modules/bibformat/lib/core/Makefile \
-	  modules/bibformat/lib/common/Makefile \
-	  modules/bibformat/web/Makefile \
-	  modules/bibformat/web/admin/Makefile \
 	  modules/elmsubmit/Makefile \
 	  modules/elmsubmit/bin/Makefile \
+	  modules/elmsubmit/bin/elmsubmit \
 	  modules/elmsubmit/doc/Makefile \
 	  modules/elmsubmit/doc/admin/Makefile \
 	  modules/elmsubmit/doc/hacking/Makefile \
 	  modules/elmsubmit/etc/Makefile \
 	  modules/elmsubmit/lib/Makefile \
 	  modules/elmsubmit/lib/magic/Makefile \
+	  modules/miscutil/Makefile \
+	  modules/miscutil/bin/Makefile \
+	  modules/miscutil/bin/dbexec \
+	  modules/miscutil/bin/dbtest \
+	  modules/miscutil/bin/testsuite \
+	  modules/miscutil/lib/Makefile \
+	  modules/miscutil/demo/Makefile \
+	  modules/miscutil/sql/Makefile \
+	  modules/webaccess/Makefile \
+	  modules/webaccess/bin/Makefile \
+	  modules/webaccess/bin/authaction \
+	  modules/webaccess/bin/webaccessadmin \
+	  modules/webaccess/doc/Makefile \
+	  modules/webaccess/doc/admin/Makefile \
+	  modules/webaccess/doc/hacking/Makefile \
+	  modules/webaccess/lib/Makefile \
+	  modules/webaccess/web/Makefile \
+	  modules/webaccess/web/admin/Makefile \
+	  modules/webalert/Makefile \
+	  modules/webalert/bin/Makefile \
+	  modules/webalert/bin/alertengine \
+	  modules/webalert/doc/Makefile \
+	  modules/webalert/doc/admin/Makefile \
+	  modules/webalert/doc/hacking/Makefile \
+	  modules/webalert/lib/Makefile \
+	  modules/webalert/web/Makefile \
 	  modules/webhelp/Makefile \
 	  modules/webhelp/web/Makefile \
 	  modules/webhelp/web/hacking/Makefile \
@@ -509,6 +558,7 @@ AC_CONFIG_FILES([config.nice \
 	  modules/webhelp/web/admin/howto/Makefile \
 	  modules/websearch/Makefile \
 	  modules/websearch/bin/Makefile \
+	  modules/websearch/bin/webcoll \
 	  modules/websearch/doc/Makefile \
 	  modules/websearch/doc/admin/Makefile \
 	  modules/websearch/doc/hacking/Makefile \
@@ -522,6 +572,14 @@ AC_CONFIG_FILES([config.nice \
 	  modules/websession/doc/hacking/Makefile \
 	  modules/websession/lib/Makefile \
 	  modules/websession/web/Makefile \
+	  modules/webstat/Makefile \
+	  modules/webstat/bin/Makefile \
+	  modules/webstat/bin/webstat \
+	  modules/webstat/doc/Makefile \
+	  modules/webstat/doc/admin/Makefile \
+	  modules/webstat/doc/hacking/Makefile \
+	  modules/webstat/etc/Makefile \
+	  modules/webstat/lib/Makefile \
 	  modules/webstyle/Makefile \
 	  modules/webstyle/css/Makefile \
 	  modules/webstyle/doc/Makefile \
@@ -535,15 +593,9 @@ AC_CONFIG_FILES([config.nice \
 	  modules/webbasket/doc/hacking/Makefile \
 	  modules/webbasket/lib/Makefile \
 	  modules/webbasket/web/Makefile \
-	  modules/webalert/Makefile \
-	  modules/webalert/bin/Makefile \
-	  modules/webalert/doc/Makefile \
-	  modules/webalert/doc/admin/Makefile \
-	  modules/webalert/doc/hacking/Makefile \
-	  modules/webalert/lib/Makefile \
-	  modules/webalert/web/Makefile \
 	  modules/websubmit/Makefile \
 	  modules/websubmit/bin/Makefile \
+	  modules/websubmit/bin/thumbmaker \
 	  modules/websubmit/etc/Makefile \
 	  modules/websubmit/etc/bibconvert/Makefile \
 	  modules/websubmit/etc/bibconvert/KB/Makefile \
@@ -555,26 +607,6 @@ AC_CONFIG_FILES([config.nice \
 	  modules/websubmit/lib/functions/Makefile \
 	  modules/websubmit/web/Makefile \
 	  modules/websubmit/web/admin/Makefile \
-	  modules/webaccess/Makefile \
-	  modules/webaccess/bin/Makefile \
-	  modules/webaccess/doc/Makefile \
-	  modules/webaccess/doc/admin/Makefile \
-	  modules/webaccess/doc/hacking/Makefile \
-	  modules/webaccess/lib/Makefile \
-	  modules/webaccess/web/Makefile \
-	  modules/webaccess/web/admin/Makefile \
-	  modules/miscutil/Makefile \
-	  modules/miscutil/bin/Makefile \
-	  modules/miscutil/lib/Makefile \
-	  modules/miscutil/demo/Makefile \
-	  modules/miscutil/sql/Makefile \
-	  modules/webstat/Makefile \
-	  modules/webstat/bin/Makefile \
-	  modules/webstat/doc/Makefile \
-	  modules/webstat/doc/admin/Makefile \
-	  modules/webstat/doc/hacking/Makefile \
-	  modules/webstat/etc/Makefile \
-	  modules/webstat/lib/Makefile \
 	  ])
 
 AC_CONFIG_COMMANDS(.wmlrc, [
