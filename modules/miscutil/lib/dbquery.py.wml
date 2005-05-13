@@ -28,6 +28,11 @@
 import MySQLdb
 import string
 
+## FIXME: these are read here and not in config.py in order to prevent
+## them to show up in case some mod_python web script uses ``from
+## config import *''.  If we waterproof all mod_python web scripts,
+## then it may possibly be moved there.  But it's safer to read them
+## only here.
 dbhost = "<DBHOST>"
 dbname = "<DBNAME>"
 dbuser = "<DBUSER>"
