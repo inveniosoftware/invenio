@@ -76,6 +76,7 @@ cdspagefooter = """<CDSPAGEFOOTER>"""
 
 pdftotext = """<PDFTOTEXT>"""
 
+## for search_engine_config:
 cfg_max_recID = <CFG_MAX_RECID> 
 cfg_instant_browse = <CFG_NB_LATEST_ADDITIONS>
 cfg_author_et_al_threshold = <CFG_AUTHOR_ET_AL_THRESHOLD> 
@@ -91,3 +92,26 @@ cfg_oaiidtag = "<OAIIDTAG>"
 cfg_create_similarly_named_authors_link_box = <CFG_CREATE_SIMILARLY_NAMED_AUTHORS_LINK_BOX>
 cfg_google_box = <CFG_GOOGLE_BOX>
 cfg_google_box_servers = <CFG_GOOGLE_BOX_SERVERS>
+
+## for websubmit_config:
+adminemail     = "<ADMINEMAIL>"
+images         = "<WEBURL>/img"
+urlpath        = "<WEBURL>"
+accessurl      = "<WEBURL>/search.py"
+counters       = "<CFG_SUBMIT_COUNTER>"
+storage        = "<CFG_SUBMIT_DIR>"
+filedir	       = "<CFG_FILE_DIR>"
+filedirsize    = <CFG_FILE_DIR_SIZE>
+gfile          = "<GFILE>"
+gzip           = "<GZIP>"
+tar            = "<TAR>"
+gunzip         = "<GUNZIP>"
+acroread       = "<ACROREAD>"
+distiller      = "<DISTILLER>"
+convert        = "<CONVERT>"
+bibupload      = "<BINDIR>/bibupload"
+bibformat      = "<BINDIR>/bibformat"
+bibwords       = "<BINDIR>/bibwords"
+bibconvert     = "<BINDIR>/bibconvert"
+bibconvertconf = "<ETCDIR>/bibconvert/config"
+htdocsurl      = "<WEBURL>"
