@@ -19,12 +19,11 @@
 
 webappdir = $(WEBDIR)
 
-webapp_DATA=sessinit.inc.php youraccount.py
+webapp_DATA = sessinit.inc.php youraccount.py
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = sessinit.inc.php.wml youraccount.py
 
-CLEANFILES = $(webapp_DATA) *~ *.tmp
+CLEANFILES = sessinit.inc.php *~ *.tmp
 
-%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
+sessinit.inc.php: sessinit.inc.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o $@ $<

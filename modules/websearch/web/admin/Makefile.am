@@ -19,15 +19,11 @@
 
 webappdir = $(WEBDIR)/admin/websearch
 
-webapp_DATA= index.html websearchadmin.py
+webapp_DATA = index.html websearchadmin.py
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = index.html.wml websearchadmin.py
 
-CLEANFILES = $(bin_SCRIPTS) $(webapp_DATA) *~ *.tmp search.pyc
-
-%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
+CLEANFILES = index.html *~ *.tmp 
 
 %.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<

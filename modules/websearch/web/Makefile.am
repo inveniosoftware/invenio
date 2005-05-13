@@ -21,16 +21,8 @@ SUBDIRS = admin
 
 webappdir = $(WEBDIR)
 
-webapp_DATA=search.py index.py
+webapp_DATA = search.py index.py
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = $(webapp_DATA)
 
-CLEANFILES = $(bin_SCRIPTS) $(webapp_DATA) *~ *.tmp search.pyc
-
-%.py: %.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
-
-%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
-	chmod u+x $@
+CLEANFILES = *~ *.tmp search.pyc
