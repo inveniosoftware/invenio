@@ -22,7 +22,7 @@
 
 ## fill config variables:
 LISPIMAGEDIR=@prefix@/lib/lisp/cdsware
-CONFIGDIR=@etcdir@/webstat
+CONFIGDIR=@prefix@/etc/webstat
 CLISP=@CLISP@
 CMUCL=@CMUCL@
 SBCL=@SBCL@
