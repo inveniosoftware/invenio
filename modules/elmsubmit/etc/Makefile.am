@@ -17,14 +17,10 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-FILESWML=$(wildcard $(srcdir)/*.wml)
+etcdir = $(sysconfdir)/elmsubmit
 
-etcdir=$(sysconfdir)/elmsubmit
-etc_DATA=elmsubmit.cfg
+etc_DATA = elmsubmit.cfg
 
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = elmsubmit.cfg.in
 
-CLEANFILES = $(wildcard *.cfg) *~ *.tmp
-
-%.cfg: %.cfg.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
-	$(WML) -o $@ $<
+CLEANFILES = *~ *.tmp
