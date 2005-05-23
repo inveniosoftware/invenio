@@ -1,7 +1,4 @@
-## read config variables:
-#include "config.wml"
-#include "configbis.wml"
-<protect>START::DEFP()---<record>
+START::DEFP()---<record>
 SN---<controlfield tag="001"><:SN::SN:></controlfield>
 DB---<datafield tag="980" ind1="" ind2=""><subfield code="a"><:comboRTEXT::comboRTEXT:></subfield></datafield>
 ER---<datafield tag="037" ind1="" ind2=""><subfield code="a"><:RNTEST2::RNTEST2:></subfield></datafield>
@@ -15,7 +12,6 @@ AB---<datafield tag="520" ind1="" ind2=""><subfield code="a"><:AB::AB:></subfiel
 NO---<datafield tag="500" ind1="" ind2=""><subfield code="a"><:NO::NO:></subfield></datafield>
 KW---<datafield tag="653" ind1="1" ind2=""><subfield code="a"><:KW*::KW:></subfield></datafield>
 EM---<datafield tag="856" ind1="0" ind2=""><subfield code="f"><:SuE::SuE:></subfield></datafield>
-URL---<datafield tag="856" ind1="4" ind2=""><subfield code="u"></protect><WEBURL><protect>/getfile.py?recid=<:SN::SN:></subfield><subfield code="z">Access to Fulltext</subfield></datafield>
+URL---<datafield tag="856" ind1="4" ind2=""><subfield code="u">@WEBURL@/getfile.py?recid=<:SN::SN:></subfield><subfield code="z">Access to Fulltext</subfield></datafield>
 LN---<datafield tag="041" ind1="" ind2=""><subfield code="a"><:LANG::LANG::IF(,eng,ORIG):></subfield></datafield>
 END::DEFP()---</record>
-</protect>
