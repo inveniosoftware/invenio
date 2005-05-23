@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cdsware, 0.7.1.20050513, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.7.1.20050513)
+AC_INIT(cdsware, 0.7.1.20050523, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.7.1.20050523)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -500,6 +500,9 @@ AC_CONFIG_FILES([config.nice \
 	  modules/bibrank/doc/admin/Makefile \
 	  modules/bibrank/doc/hacking/Makefile \
 	  modules/bibrank/etc/Makefile \
+	  modules/bibrank/etc/bibrankgkb.cfg \
+	  modules/bibrank/etc/demo_jif.cfg \
+	  modules/bibrank/etc/template_single_tag_rank_method.cfg \
 	  modules/bibrank/lib/Makefile \
 	  modules/bibrank/web/Makefile \
 	  modules/bibrank/web/admin/Makefile \
@@ -523,6 +526,7 @@ AC_CONFIG_FILES([config.nice \
 	  modules/elmsubmit/doc/admin/Makefile \
 	  modules/elmsubmit/doc/hacking/Makefile \
 	  modules/elmsubmit/etc/Makefile \
+	  modules/elmsubmit/etc/elmsubmit.cfg \
 	  modules/elmsubmit/lib/Makefile \
 	  modules/elmsubmit/lib/magic/Makefile \
 	  modules/miscutil/Makefile \
@@ -600,6 +604,10 @@ AC_CONFIG_FILES([config.nice \
 	  modules/websubmit/etc/bibconvert/Makefile \
 	  modules/websubmit/etc/bibconvert/KB/Makefile \
 	  modules/websubmit/etc/bibconvert/config/Makefile \
+	  modules/websubmit/etc/bibconvert/config/EDSPICTcreate.tpl \
+	  modules/websubmit/etc/bibconvert/config/EDSRPICTcreate.tpl \
+	  modules/websubmit/etc/bibconvert/config/EDSTEXTcreate.tpl \
+	  modules/websubmit/etc/bibconvert/config/EDSRTEXTcreate.tpl \
 	  modules/websubmit/doc/Makefile \
 	  modules/websubmit/doc/admin/Makefile \
 	  modules/websubmit/doc/hacking/Makefile \
