@@ -3,8 +3,3 @@ Makefile.in
 z_*
 *.O
 *~
-*.py
-*.shtml
-*.html
-*.kb
-*.cfg

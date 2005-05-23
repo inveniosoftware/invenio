@@ -14,14 +14,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-#include "configbis.wml"
 
 [rank_method]
 function = single_tag_rank_method
 
 [single_tag_rank_method]
 tag = 909C4p
-kb_src = <ETCDIR>/bibrank/jif.kb
+kb_src = @prefix@/etc/bibrank/jif.kb
 check_mandatory_tags = 909C4c,909C4v,909C4y
 relevance_number_output_prologue = (
 relevance_number_output_epilogue = )
