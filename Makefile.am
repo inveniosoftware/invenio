@@ -106,7 +106,7 @@ update-v0.5.0-tables: local-dbexec
 drop-tables: local-dbexec 
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
 
-local-dbexec: $(srcdir)/modules/miscutil/bin/dbexec.wml
+local-dbexec: 
 	(cd ./modules/miscutil/bin; make)
 
 local-tabfill: $(srcdir)/modules/miscutil/sql/tabfill.sql.wml
