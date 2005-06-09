@@ -23,6 +23,7 @@ noinst_SCRIPTS = dbtest
 EXTRA_DIST = dbexec.in testsuite.in dbtest.in
 
 install-data-local:
+	chmod u+x ./dbtest
 	./dbtest
 
 CLEANFILES = *~ *.tmp
