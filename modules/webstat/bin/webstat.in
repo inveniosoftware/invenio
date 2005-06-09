@@ -54,11 +54,11 @@ fi
 ## check which Common Lisp implementation to use?
 if [ "$LISP" == "" ]; then 
     LISP=cmucl
-    if [ ! -e ${LISPIMAGEDIR}/webstat.$LISP.core ]; then
+    if [ ! -s ${LISPIMAGEDIR}/webstat.$LISP.core ]; then
         LISP=sbcl
-        if [ ! -e ${LISPIMAGEDIR}/webstat.$LISP.core ]; then
+        if [ ! -s ${LISPIMAGEDIR}/webstat.$LISP.core ]; then
             LISP=clisp
-            if [ ! -e ${LISPIMAGEDIR}/webstat.$LISP.mem ]; then
+            if [ ! -s ${LISPIMAGEDIR}/webstat.$LISP.mem ]; then
                 echo "Error: no suitable Lisp images found in ${LISPIMAGEDIR}."
                 exit 1
             fi
