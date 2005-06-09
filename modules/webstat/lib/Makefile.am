@@ -30,6 +30,7 @@ webstat.clisp.mem: $(FILESLISP)
              ${CLISP} -q -x "(progn (load \"load.lisp\")(saveinitmem \"$${cwd}/webstat.clisp.mem\"))"); \
         else \
             echo "Warning: cannot find CLISP, hoping you have CMUCL or SBCL instead."; \
+            touch webstat.clisp.mem; \
         fi
 
 webstat.cmucl.core: $(FILESLISP)
@@ -38,6 +39,7 @@ webstat.cmucl.core: $(FILESLISP)
              ${CMUCL} -quiet -batch -eval "(progn (load \"load.lisp\")(ext:save-lisp \"$${cwd}/webstat.cmucl.core\"))"); \
         else \
             echo "Warning: cannot find CMUCL, hoping you have CLISP or SBCL instead."; \
+            touch webstat.cmucl.core; \
         fi
 
 webstat.sbcl.core: $(FILESLISP)
@@ -46,6 +48,7 @@ webstat.sbcl.core: $(FILESLISP)
             ${SBCL} --noinform --eval "(progn (load \"load.lisp\")(sb-ext:save-lisp-and-die \"$${cwd}/webstat.sbcl.core\"))"); \
         else \
             echo "Warning: cannot find SBCL, hoping you have CLISP or CMUCL instead."; \
+            touch webstat.sbcl.core; \
         fi
 
 
