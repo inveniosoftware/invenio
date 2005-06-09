@@ -18,12 +18,15 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 bin_SCRIPTS = dbexec testsuite
+
 noinst_SCRIPTS = dbtest
 
 EXTRA_DIST = dbexec.in testsuite.in dbtest.in
 
+all:
+	chmod u+x ./dbtest ./dbexec
+
 install-data-local:
-	chmod u+x ./dbtest
 	./dbtest
 
 CLEANFILES = *~ *.tmp
