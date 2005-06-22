@@ -529,6 +529,17 @@ def create_google_box(cc, p, f, p1, p2, p3, ln=cdslang,
                 out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WTI">%s %s NEBIS</a>""" % (p_quoted, p, msg_in[ln]))               
             else:
                 out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WRD">%s %s NEBIS</a>""" % (p_quoted, p, msg_in[ln]))
+    # Scirus:
+    if cfg_google_box_servers.get('Google Scholar', 0):
+        # FIXME: reusing Google Scholar config variable until we can enter Scirus into config.wml
+        if f == "author":
+            out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=author%%3A%s">%s %s Scirus</a>""" % (p_quoted, p, msg_in[ln]))
+        elif f == "title":
+            out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=title%%3A%s">%s %s Scirus</a>""" % (p_quoted, p, msg_in[ln]))
+        elif f == "keyword":
+            out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=keywords%%3A%s">%s %s Scirus</a>""" % (p_quoted, p, msg_in[ln]))
+        else:
+            out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=%s">%s %s Scirus</a>""" % (p_quoted, p, msg_in[ln]))
     # SPIRES
     if cfg_google_box_servers.get('SPIRES', 0):
         spires_search_title = "SLAC SPIRES HEP"
