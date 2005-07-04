@@ -455,9 +455,9 @@ default
 </define-tag>
 
 
-######################@################
+#######################################
 ## Part 5: BibHarvest OAI parameters ##
-#####################@#################
+#######################################
 
 ## This part defines parameters for the CDSware OAI gateway.
 ## Useful if you are running CDSware as OAI data provider.
@@ -471,13 +471,13 @@ oai
 ## OAIIDTAG -- OAI identifier tag:  
 ##  (example: "0248_a")
 <define-tag OAIIDTAG whitespace=delete>
-909COo
+0248_a
 </define-tag>
 
 ## OAISETTAG -- OAI set tag:  
 ##  (example: "0248_p")
 <define-tag OAISETTAG whitespace=delete>
-909COp
+0248_p
 </define-tag>
 
 ## OAIDELETEDTAG -- OAI tag for deleted records mark. OAI record is considered deleted if the value of this field is set to "DELETED" and the OAI deleted records policy is set either to ``transient'' or ``persistent''.
