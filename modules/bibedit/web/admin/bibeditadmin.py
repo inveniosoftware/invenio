@@ -1,5 +1,5 @@
 ## $Id$
-
+##
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -17,6 +17,23 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = bin doc etc lib web
+"""CDSware BibEdit Administrator Interface."""
 
-CLEANFILES = *~
+__lastupdated__ = """$Date$"""
+
+from cdsware.config import cdslang
+from cdsware.webpage import page
+from cdsware.webuser import getUid
+
+__version__ = "$Id$"
+    
+def index(req, ln=cdslang):
+    "BibEdit Admin interface."
+    uid = getUid(req)
+    return page(title="BibEdit Admin Interface",
+                body="TODO",
+                uid=uid,
+                language=ln,
+                navtrail = "FIXME",
+                lastupdated=__lastupdated__,
+                urlargs=req.args)

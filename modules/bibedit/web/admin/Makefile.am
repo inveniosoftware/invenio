@@ -17,6 +17,13 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = bin doc etc lib web
+webappdir = $(WEBDIR)/admin/bibedit
 
-CLEANFILES = *~
+webapp_DATA = bibeditadmin.py index.html
+
+EXTRA_DIST = bibeditadmin.py index.html.wml
+
+CLEANFILES = index.html *~ *.tmp
+
+%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<

@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cdsware, 0.7.1.20050523, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.7.1.20050523)
+AC_INIT(cdsware, 0.7.1.20050704, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.7.1.20050704)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -462,6 +462,8 @@ AC_CONFIG_FILES([config.nice \
 	  modules/bibedit/doc/hacking/Makefile \
 	  modules/bibedit/etc/Makefile \
 	  modules/bibedit/lib/Makefile \
+	  modules/bibedit/web/Makefile \
+	  modules/bibedit/web/admin/Makefile \
 	  modules/bibformat/Makefile \
 	  modules/bibformat/bin/Makefile \
 	  modules/bibformat/bin/bibformat \

@@ -20,7 +20,8 @@
 pylibdir = $(libdir)/python/cdsware
 
 pylib_DATA = bibrecord.py bibrecord_config.py bibrecord_tests.py \
-             refextract.py refextract_config.py
+             refextract.py refextract_config.py \
+             bibeditadminlib.py bibedit_templates.py
 
 EXTRA_DIST = $(pylib_DATA)
 
