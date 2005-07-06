@@ -74,7 +74,7 @@ data are uploaded in CDSware, you may want to modify them via
   uploading them into CDSware, etc.
 </td>
 <td>
-  <small class=note>not available, but OAI harvestor and provider are included</small>
+  <a href="bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a>
 </td>
 <td>
   <a href="bibharvest/guide.html">BibHarvest Admin Guide</a>
@@ -143,7 +143,7 @@ data are uploaded in CDSware, you may want to modify them via
   record, do global replacements, and other cataloguing tasks.
 </td>
 <td>
-  <small class=note>not available, but see the guide for the command-line way</small>
+  <a href="bibedit/bibeditadmin.py">BibEdit Admin Interface</a>
 </td>
 <td>
   <a href="bibedit/guide.html">BibEdit Admin Guide</a>
