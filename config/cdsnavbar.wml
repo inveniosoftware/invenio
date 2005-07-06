@@ -161,6 +161,7 @@
 
   <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
+  <navbar:button id=bibharvest-admin-interface txt="Interface" url="<WEBURL>/admin/bibharvest/bibharvestadmin.py">
   <navbar:button id=bibharvest-admin-guide txt="Guide" url="<WEBURL>/admin/bibharvest/guide.html">
 
   <navbar:epilog> </td><td></td></tr> </navbar:epilog>
