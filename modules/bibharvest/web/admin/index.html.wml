@@ -11,17 +11,29 @@
 ## The CDSware is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/cdsware
+#include "cdspage.wml" \
+    title="BibHarvest Admin" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a>" \
+    navbar_name="admin" \
+    navbar_select="bibharvest" 
+     
 
-pylib_DATA = oai_repository.py oai_repository_config.py oai_repository_tests.py \
-             bibharvestadminlib.py
+<p>
+ This is the gate to the admin area for BibHarvest. You need to
+ <a href="<WEBURL>/youraccount.py/login?referer=<WEBURL>/admin/bibindex/">login</a> to enter.
+</p>
 
-EXTRA_DIST = $(pylib_DATA)
-
-CLEANFILES = *~ *.tmp *.pyc
+<dl>
+ <dt><a href="bibharvestadmin.py">BibHarvest Admin Interface</a></dt>
+ <dd>Configure your OAI sources and harvesting periodicity.</dd>
+</dl>
+<dl>
+ <dt><a href="guide.html">BibIndex Admin Guide</a></dt>
+ <dd>Everything you want to know about BibIndex administration</dd>
+</dl>

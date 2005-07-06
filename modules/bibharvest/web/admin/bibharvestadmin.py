@@ -1,5 +1,5 @@
 ## $Id$
-
+##
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -17,11 +17,18 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/cdsware
+"""CDSware BibHarvest Administrator Interface."""
 
-pylib_DATA = oai_repository.py oai_repository_config.py oai_repository_tests.py \
-             bibharvestadminlib.py
+__lastupdated__ = """$Date$"""
 
-EXTRA_DIST = $(pylib_DATA)
+import sys
+import cdsware.bibharvestadminlib as bhc
+reload(bhc)
+from cdsware.webpage import page, create_error_box
+from cdsware.config import weburl,cdslang
+from cdsware.webuser import getUid, page_not_authorized
 
-CLEANFILES = *~ *.tmp *.pyc
+__version__ = "$Id$"
+
+def index(req):
+    return "Work under progress."

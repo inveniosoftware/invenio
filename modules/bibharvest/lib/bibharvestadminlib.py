@@ -1,4 +1,5 @@
 ## $Id$
+## Administrator interface for BibIndex
 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
@@ -17,11 +18,5 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/cdsware
+"""CDSware Bibharvest Administrator Interface."""
 
-pylib_DATA = oai_repository.py oai_repository_config.py oai_repository_tests.py \
-             bibharvestadminlib.py
-
-EXTRA_DIST = $(pylib_DATA)
-
-CLEANFILES = *~ *.tmp *.pyc

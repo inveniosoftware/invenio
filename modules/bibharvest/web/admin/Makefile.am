@@ -17,11 +17,13 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/cdsware
+webappdir = $(WEBDIR)/admin/bibharvest
 
-pylib_DATA = oai_repository.py oai_repository_config.py oai_repository_tests.py \
-             bibharvestadminlib.py
+webapp_DATA = bibharvestadmin.py index.html
 
-EXTRA_DIST = $(pylib_DATA)
+EXTRA_DIST = bibharvestadmin.py index.html.wml
 
-CLEANFILES = *~ *.tmp *.pyc
+CLEANFILES = index.html *~ *.tmp
+
+%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
+	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
