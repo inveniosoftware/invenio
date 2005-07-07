@@ -846,7 +846,7 @@ def check_args(arguments):
             if from_length != until_length:
                 out = out + oai_error("badArgument", "Bad datestamp format")
 
-    if arguments['from'] > arguments['until']:
+    if arguments['from'] != "" and arguments['until'] != "" and arguments['from'] > arguments['until']:
         out = out + oai_error("badArgument", "Wrong date")
 
 ## Identify exclusive
