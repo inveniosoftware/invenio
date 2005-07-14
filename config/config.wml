@@ -471,13 +471,13 @@ oai
 ## OAIIDTAG -- OAI identifier tag:  
 ##  (example: "0248_a")
 <define-tag OAIIDTAG whitespace=delete>
-0248_a
+909COo
 </define-tag>
 
 ## OAISETTAG -- OAI set tag:  
 ##  (example: "0248_p")
 <define-tag OAISETTAG whitespace=delete>
-0248_p
+909COp
 </define-tag>
 
 ## OAIDELETEDTAG -- OAI tag for deleted records mark. OAI record is considered deleted if the value of this field is set to "DELETED" and the OAI deleted records policy is set either to ``transient'' or ``persistent''.
