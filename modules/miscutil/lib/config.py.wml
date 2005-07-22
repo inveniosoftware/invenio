@@ -147,6 +147,7 @@ oaisetfield = "<OAISETTAG>"
 oaideleted = "<OAIDELETEDPOLICY>"
 oai_rt_expire = <OAIEXPIRE>
 nb_records_in_resume = <OAILOAD>
+nb_identifiers_in_resume = <OAILOAD>
 
 ## for bibindex_engine_config:
 cfg_bibindex_fulltext_index_local_files_only = <CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY>
