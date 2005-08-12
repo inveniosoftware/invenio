@@ -104,6 +104,23 @@ format already for HB, then the record is not processed.  BibReformat
 should look for HD, not HB, when it is deciding whether to process
 records or not.
 
+** BibFormat-20050527: better display of photo galleries
+
+> When you look at photos in CDS it would be useful to be able to
+> navigate simply (forward and back) when you are looking at the full
+> size (or even half-size) versions. Take the case of the relay race;
+> there are 16 photos for this 'event'
+> (http://cdsweb.cern.ch/search.py?of=hd&f=970__a&p=000035128MMD
+> <http://doc.cern.ch//archive/electronic/cern/others/PHO/photo-hi/0504024
+> _06.jpg> ). It would be nice just to browse the 144 dpi versions
+> one-by-one rather than having to go back every time to the page of
+> thumbnails.
+
+Yes, it would indeed be interesting.  For the time being we only point
+to JPEGs sitting on another server, so we cannot easily add
+next/previous links there.  But for the future we can rework the
+formats in order to allow it... I've put it into our TODO list.
+
 * BibIndex
 
 ** BibIndex-20031217: make our own ACC indexes
@@ -377,6 +394,12 @@ mailing list (in order to be able to send alerts to mailing list),
 introduce a possibility to define alert mailing list management by
 an individual user.
 
+** WebAlert-20050812: Similar records should not be in the email body 
+Fri Aug 12 15:46:59 2005
+
+When sending email with records found, the body contains also link to
+find Similar records.  It is not necessary there and should be hidden.
+
 * WebBasket
 
 ** WebBasket-20041103: output formats in XML etc
@@ -513,6 +536,58 @@ that are associated with it.  This is indeed not implemented yet.
 
 Put into TODO as WebSearch-20050415.
 
+** WebSearch-20050617: sorting limit behaviour
+
+> b) Currently an attempt to sort a set of more than 1500 records
+> gives a warning message and reverts to the default order "latest
+> first". I think it would be much better to cut off the set at 1500
+> records by system number (take highest 1500 system numbers) and to
+> sort these 1500 records as requested. This could be much more useful
+> than just refusing the sort.
+
+Yes, it could be interesting to offer this option too.  Thanks for the
+suggestion, I've added it to our TODO list.
+
+** WebSearch-20050624: search in nonexisting access index
+
+On Fri, 17 Jun 2005, David Dallman wrote:
+> What is being searched for in the "not773" case?
+
+You can append ``verbose=1'' argument to the URL to get some internal
+information.  For example:
+
+1. <http://cdsweb.cern.ch/search.py?p=916__y%3Aa2004+not+773__p%3Aa--%3Ezz&verbose=1>
+
+   gives [['|', 'a2004', '916__y', 'a'], ['-', 'a-->zz', '773__p', 'a']]
+
+and
+
+2. <http://cdsweb.cern.ch/search.py?p=916__y%3Aa2004+not773__p%3Aa--%3Ezz&verbose=1>
+
+   gives [['|', 'a2004', '916__y', 'a'], ['+', 'a-->zz', 'not773__p', 'a']]
+
+The tuples should be interpreted as follows:
+
+   [boolean_operator, pattern, tag, search_type]
+
+where search_type a=access file, w=word file, etc.
+
+This means that the search is done in ``not773__p'' field that
+obviously doesn't exist.  So the search engine ignores it and searches
+by default in the ``author'' field.  (I cannot recall why the
+``author'' index was chosen for this.  We have better choices, like
+return an error for example.)
+
+Note also that a->zz should be written with one dash only.  So you
+were searching for authors with names between a- to zz.  Note:
+
+  a-->zz ... 646,515 hits
+  a->zz .... 646,530 hits
+  0->zzzz .. 646,548 hits
+
+I think I'll just return an empty result in case the `chosen' tag
+(not773__p) does not exist.  It's good that you catched this!
+
 * WebSession
 
 ** WebSession-20041102: detect cookies and inform user if not available upon login
@@ -600,6 +675,27 @@ complet de la notice entiere, comme suit:
   $ bibupload -r z_z.xml
 
 ce qui fera l'affaire.
+
+** WebSubmit-20050628: sending emails not UTF-8 clean
+
+> it tries to use outgoing address "Kovárna VIVA Zlín, spol. s.
+> r. o. <vaclav.stodulka@vivazlin.cz>" with all unicode
+> characters. This string is passed to MTA, which rejects it, because
+> headers must be in 7-bit ascii.
+
+Indeed, we should use quoted printables or something.  Added to our
+TODO list.
+
+** WebSubmit-20050713: bad To: header in approval emails
+
+    From: Atlantis Institute of Fictive Science Submission Engine <cds.support@cern.ch>
+    Subject: Request for approval of TEST-PREPRINT-2005-001
+    To: 
+    Date: Wed, 13 Jul 2005 10:52:12 +0200 (CEST)
+
+Note the empty To: header field.  It looks like the approval emails do
+not properly check stuff.  Can you please have a look at it when you
+have time?
 
 * End of file
 
