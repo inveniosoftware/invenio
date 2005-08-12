@@ -170,7 +170,7 @@ def template_account(title,body):
     return out 
 
 # warning_guest_user(): It returns an alert message,showing that the user is a guest user and should log into the system
-def warning_guest_user(type):
+def warning_guest_user(type, ln=cdslang):
 
     msg="""You are logged in as a guest user, so your %s will disappear at the end of the current session. If you wish you can
            <a href="../youraccount.py/login">login or register here</a>.
