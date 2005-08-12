@@ -1,8 +1,7 @@
 ## $Id$
-## Personal features - your baskets.
 
 ## This file is part of the CERN Document Server Software (CDSware).
-## Copyright (C) 2002, 2003, 2004, 2005 CERN.
+## Copyright (C) 2002 CERN.
 ##
 ## The CDSware is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -12,7 +11,7 @@
 ## The CDSware is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
@@ -33,6 +32,12 @@ from webaccount import warning_guest_user
 
 imagesurl = "%s/img" % weburl
 
+from messages import gettext_set_language
+
+import template
+webbasket_templates = template.load('webbasket')
+
+
 ### IMPLEMENTATION
 
 # perform_display(): display the baskets defined by the current user
@@ -40,7 +45,7 @@ imagesurl = "%s/img" % weburl
 #         action="DELETE" delete the selected basket;
 #         action="RENAME" modify the basket name;
 #         action="CREATE NEW" create a new basket;
-#         action="SET PUBLIC" set access permission to public; 
+#         action="SET PUBLIC" set access permission to public;
 #         action="SET PRIVATE" set access permission to private;
 #         action="REMOVE" remove selected items from basket;
 #         action="EXECUTE" copy/move selected items to another basket;
@@ -57,7 +62,7 @@ imagesurl = "%s/img" % weburl
 #         iddown, orddown are the identifier and the order of the item to be moved down
 #         of is the output format code
 # output: list of baskets in formatted html+content of the selected basket
-def perform_display(uid, action="", delete_alerts="", confirm_action="", id_basket=0, bname="", newname="", newbname="", mark=[], to_basket="", copy_move="", idup="", ordup="", iddown="", orddown="", of="hb"):
+def perform_display(uid, action="", delete_alerts="", confirm_action="", id_basket=0, bname="", newname="", newbname="", mark=[], to_basket="", copy_move="", idup="", ordup="", iddown="", orddown="", of="hb", ln="en"):
 
     # set variables
     out = ""
@@ -66,189 +71,142 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
     permission = []
     bname = get_basket_name( id_basket )
 
-    # execute the requested action
-    if (action == "DELETE") and (id_basket != '0') and (id_basket != 0):
+    messages = []
 
-        if (confirm_action == "CANCEL") or (confirm_action == "CONFIRM"):
+    # load the right message language
+    _ = gettext_set_language(ln)
+
+    # execute the requested action
+    if (action == _("DELETE")) and (id_basket != '0') and (id_basket != 0):
+
+        if (confirm_action == _("CANCEL")) or (confirm_action == _("CONFIRM")):
             try:
-                msg = perform_delete(uid, delete_alerts, confirm_action, id_basket)
-                out += "%s<BR>" % msg
+                msg = perform_delete(uid, delete_alerts, confirm_action, id_basket, ln)
+                # out += "%s<BR>" % msg
+                messages.append(msg)
             except BasketException, e:
-                out += "The basket has not been deleted: %s" % e
+                msg = _("The basket has not been deleted: %s") % e
+                messages.append(msg)
             show_actions = 1
         else:
             # goes to the form which deletes the selected basket
-            out += delete_basket(uid, id_basket, bname)
+            out += delete_basket(uid, id_basket, bname, ln)
             basket_name = bname
             show_actions = 0
-            
+
         id_basket = '0'
     else:
         show_actions = 1
-        if action == "CREATE NEW":
+        if action == _("CREATE NEW"):
             # create a new basket
             if newname != "":
                 # create a new basket newname
                 try:
-                    id_basket = perform_create_basket(uid, newname)
-                    out += """The <I>private</I> basket <B>%s</B> has been created.<BR>\n""" % newname
+                    id_basket = perform_create_basket(uid, newname, ln)
+                    messages.append(_("""The <I>private</I> basket <B>%s</B> has been created.""") % newname)
+                    bname = newname
                 except BasketException, e:
-                    out += """The basket %s has not been created: %s""" % (newname, e)
+                    messages.append(_("""The basket %s has not been created: %s""") % (newname, e))
             else:
-                out += """The basket has not been created: specify a basket name."""
+                messages.append(_("""The basket has not been created: specify a basket name."""))
         else:
-            if (id_basket != '0') and (id_basket != 0):           
-                if action == "RENAME":
+            if (id_basket != '0') and (id_basket != 0):
+                if action == _("RENAME"):
                     # rename the selected basket
                     if newbname != "":
                         # rename basket to newname
                         try:
-                            id_basket = perform_rename_basket(uid, id_basket,newbname)
-                            out += """The basket <B>%s</B> has been renamed to <B>%s</B>.<BR>\n""" % (bname, newbname)
+                            id_basket = perform_rename_basket(uid, id_basket,newbname, ln)
+                            messages.append(_("""The basket <B>%s</B> has been renamed to <B>%s</B>.\n""") % (bname, newbname))
+                            bname = newbname
                         except BasketException, e:
-                            out += """The basket has not been renamed: %s"""%e
+                            messages.append(_("""The basket has not been renamed: %s""") % e)
                     else:
-                        out += """The basket has not been renamed: specify a basket name."""                
-                else:                
-                    if action == "SET PUBLIC":
+                        messages.append(_("""The basket has not been renamed: specify a basket name."""))
+                else:
+                    if action == _("SET PUBLIC"):
                         try:
                             # set public permission
-                            set_permission(uid, id_basket, "y")
+                            set_permission(uid, id_basket, "y", ln)
                             url_public_basket = """%s/yourbaskets.py/display_public?id_basket=%s""" \
                                                 % (weburl, id_basket)
-                            out += """The selected basket is now publicly accessible at the following URL:<BR>"""\
-                                   """<A href="%s">%s</A><BR><BR>""" % (url_public_basket, url_public_basket)
+                            messages.append(_("""The selected basket is now publicly accessible at the following URL:""") +
+                                              """<A href="%s">%s</A><BR><BR>""" % (url_public_basket, url_public_basket))
                         except BasketException, e:
-                            out += "The basket has not been made public: %s"%e
+                            messages.append(_("The basket has not been made public: %s") % e)
                     else:
-                        if action == "SET PRIVATE":
+                        if action == _("SET PRIVATE"):
                             # set private permission
                             try:
-                                set_permission(uid, id_basket, "n")
-                                out += """The selected basket is no more publically accessible.<BR>"""
+                                set_permission(uid, id_basket, "n", ln)
+                                messages.append(_("""The selected basket is no more publically accessible."""))
                             except BasketException, e:
-                                 out += "The basket has not been made private: %s"%e
+                                 messages.append(_("The basket has not been made private: %s") % e)
                         else:
-                            if action == "REMOVE":
+                            if action == _("REMOVE"):
                                 # remove the selected items from the basket
                                 try:
-                                    remove_items(uid, id_basket, mark)
-                                    out += """The selected items have been removed.<BR>"""
+                                    remove_items(uid, id_basket, mark, ln)
+                                    messages.append(_("""The selected items have been removed."""))
                                 except BasketException, e:
-                                    out += """The items have not been removed: %s"""%e
+                                    messages.append(_("""The items have not been removed: %s""")%e)
                             else:
-                                if action == "EXECUTE":
+                                if action == _("EXECUTE"):
                                     # copy/move the selected items to another basket
                                     if to_basket == '0':
-                                        out += """Select a destination basket to copy/move items.<BR>"""
-                                    else:    
-                                        move_items(uid, id_basket, mark, to_basket, copy_move)
-                                        out += """The selected items have been copied/moved.<BR>"""
+                                        messages.append(_("""Select a destination basket to copy/move items."""))
+                                    else:
+                                        move_items(uid, id_basket, mark, to_basket, copy_move, ln)
+                                        messages.append(_("""The selected items have been copied/moved."""))
                                 else:
                                     if action == "ORDER":
                                         # change the order of the items in the basket
                                         try:
-                                            order_items(uid, id_basket,idup,ordup,iddown,orddown)
+                                            order_items(uid, id_basket,idup,ordup,iddown,orddown, ln)
                                         except BasketException, e:
-                                            out += """The items have not been re-ordered: %s"""%e
+                                            messages.append(_("""The items have not been re-ordered: %s""") % e)
 
 
     # display the basket's action form
     if (show_actions):
 
+        baskets = []
+        basket_permission = ''
         # query the database for the list of baskets
         query_result = run_sql("SELECT b.id, b.name, b.public, ub.date_modification "\
                                "FROM basket b, user_basket ub "\
                                "WHERE ub.id_user=%s AND b.id=ub.id_basket "\
                                "ORDER BY b.name ASC ",
                                (uid,))
- 	out += """<FORM name="displaybasket" action="display" method="post">"""
-
-        if len(query_result) == 0:
-            # create new basket form
-            out += """No baskets have been defined.<BR>"""
-            out += """New basket name:&nbsp;"""\
-                   """<INPUT type="text" name="newname" size="20" maxlength="50">&nbsp;"""\
-                   """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="CREATE NEW"></CODE>"""
-        else:
-            # display the list of baskets
-            out += """You own <B>%s</B> baskets.<BR>""" % len(query_result)            
-            out +=  """Select&nbsp;an&nbsp;existing&nbsp;basket:&nbsp;"""\
-                    """<SELECT name="id_basket"><OPTION value="0">- basket name -</OPTION>"""            
-
+        if len(query_result) :
             for row in query_result :
                 if str(id_basket) == str(row[0]):
-                    basket_selected = " selected"
-                    basket_name = row[1]
-                else:
-                    basket_selected = ""
-                out += """<OPTION value="%s"%s>%s</OPTION>""" % (row[0], basket_selected, row[1])
-                permission += [(row[0],row[2])]
-            out += """</SELECT>\n"""
-                        
-            # buttons for basket's selection or creation
-            out += """&nbsp;<CODE class="blocknote">"""\
-                   """<INPUT class="formbutton" type="submit" name="action" value="SELECT"></CODE>\n"""
-            out += """&nbsp;&nbsp;or&nbsp;"""\
-                   """<INPUT type="text" name="newname" size="10" maxlength="50">&nbsp;"""\
-                   """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="CREATE NEW"></CODE><BR><BR>"""
+                    basket_permission = row[2]
+                baskets.append({
+                                'id'   : row[0],
+                                'name' : row[1],
+                                'permission' : row[2],
+                              })
 
-            if id_basket:
-                out += """<TABLE style="background-color:F1F1F1; border:thin groove grey" """\
-                       """cellspacing="0" cellpadding="4">\n<TR><TD>"""
+        alerts = []
+        if ((id_basket != '0') and (id_basket != 0)):
+            # is basket related to some alerts?
+            alert_query_result = run_sql("SELECT alert_name FROM user_query_basket WHERE id_user=%s AND id_basket=%s",
+                                         (uid, id_basket))
+            if len(alert_query_result):
+                for row in alert_query_result:
+                    alerts.append(row[0])
 
-                # buttons for actions: display basket content, delete, rename, create a new basket
-                # basket delete
-                out += """<TR><TD colspan="2">The&nbsp;selected&nbsp;basket&nbsp;is&nbsp;<B>%s</B>.</TD>"""\
-                       """<TD><CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="DELETE"></CODE>&nbsp;""" % basket_name
-                # basket rename
-                out += """<br><CODE class="blocknote"><input type="text" name="newbname"><INPUT class="formbutton" type="submit" name="action" value="RENAME"></CODE></TD></TR>"""
-
-                
-                # basket permission private/public
-                i = 0
-                while (i < len(permission)) :
-                    if (str(permission[i][0]) == id_basket):
-                        break
-                    i += 1
-                if (i < len(permission)):
-                    if (permission[i][1] == "n"):
-                        public_basket="no"
-                        out += """<TR><TD colspan="2">Basket access is set to <I>private</I>, convert to <I>public</I>?</TD><TD>"""\
-                               """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="SET PUBLIC"></CODE></TD></TR>\n"""
-                    else :
-                        public_basket="yes"
-                        out += """<TR><TD colspan="2">Basket access is set to <I>public</I>, convert to <I>private</I>?<BR></TD><TD>"""\
-                               """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="SET PRIVATE"></CODE></TD></TR>\n"""
-                    if (public_basket=="yes"):
-                        url_public_basket = """%s/yourbaskets.py/display_public?id_basket=%s""" \
-                                            % (weburl, id_basket)
-                        out += """<TR><TD colspan="3">Public URL: <FONT size="-1"><NOBR><A href="%s">%s</A></NOBR></FONT></TD></TR>""" \
-                               % (url_public_basket, url_public_basket)
-
-                # is basket related to some alerts?
-                alert_query_result = run_sql("SELECT alert_name FROM user_query_basket WHERE id_user=%s AND id_basket=%s",
-                                             (uid, id_basket))
-                out += """<TR><TD colspan="3">"""
-                if len(alert_query_result) == 0:
-                    out += """There isn't any alert related to this basket."""
-                else:
-                    out += """The following <A href="../youralerts.py/list">alerts</A> are related to this basket:&nbsp;"""
-                    i = 1
-                    for row in alert_query_result:
-                        if i == 1:
-                            out += """<B>%s</B>""" % row[0]
-                            i+=1
-                        else:
-                            out += """, <B>%s</B>""" % row[0]
-                            i+=1
-                    out += """<BR>"""
-                out += """</TD></TR></TABLE>"""
-
-            # hidden parameters
-            out += """<INPUT type="hidden" name="bname" value="%s">""" % basket_name   
-
-        out += """</FORM>"""            
+        out += webbasket_templates.tmpl_display_basket_actions(
+                 ln          = ln,
+                 weburl      = weburl,
+                 messages    = messages,
+                 baskets     = baskets,
+                 id_basket   = id_basket,
+                 basket_name = bname,
+                 basket_permission = basket_permission,
+                 alerts      = alerts,
+               )
 
     # display the content of the selected basket
     if ((id_basket != '0') and (id_basket != 0)):
@@ -257,92 +215,59 @@ def perform_display(uid, action="", delete_alerts="", confirm_action="", id_bask
                 basket_name = newname
             else:
                 if (newbname != ""):
-                    basket_name = newbname                
-        
-        out += display_basket_content(uid, id_basket, basket_name, of)
+                    basket_name = newbname
+
+        out += display_basket_content(uid, id_basket, basket_name, of, ln)
     # if is guest user print message of relogin
     if isGuestUser(uid):
- 	out += warning_guest_user(type="baskets")
+        out += warning_guest_user(type="baskets", ln = ln) # modified it for gettext also
     return out
-    
+
 
 # display_basket_content: display the content of the selected basket
 # input:  the identifier of the basket
-#         the name of the basket     
+#         the name of the basket
 # output: the basket's content
-def display_basket_content(uid, id_basket, basket_name, of):
+def display_basket_content(uid, id_basket, basket_name, of, ln):
 
     out = ""
     out_tmp=""
-    
-    # search for basket's items    
+
+    # search for basket's items
     if (id_basket != '0') and (id_basket != 0):
         query_result = run_sql("SELECT br.id_record,br.nb_order "\
                                "FROM basket_record br "\
                                "WHERE br.id_basket=%s "\
                                "ORDER BY br.nb_order DESC ",
                                (id_basket,))
+        items = []
         if len(query_result) > 0:
-            out += out_tmp
-            
-            # display the list of items
-            out += """<FORM name="basketform" action="display" method="post">"""
-            out += """<TABLE cellspacing="0" cellpadding="0">\n<TR><TD>"""
-            out += """<TABLE border="0" cellpadding="0" cellspacing ="3" width="650">"""
-
-            # display operations on the selected items: delete, copy or move
-            out += """<TR><TD colspan="2">Selected items:&nbsp;"""\
-                   """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="REMOVE"></CODE>\n"""
-            out += """&nbsp;&nbsp;or&nbsp;&nbsp;<SELECT name="copy_move"><OPTION value="1">Copy</OPTION>"""\
-                   """<OPTION value="2">Move</OPTION></SELECT>to"""
-            # query the database for the list of baskets
-            query_result1 = run_sql("SELECT b.id, b.name "\
-                                    "FROM basket b, user_basket ub "\
-                                    "WHERE ub.id_user=%s AND b.id=ub.id_basket AND b.id<>%s "\
-                                    "ORDER BY b.name ASC ",
-                                    (uid,id_basket))
-            # display the list of baskets
-            if len(query_result1) > 0:
-                out +="""<SELECT name="to_basket"><OPTION value="0">- select basket -</OPTION>"""
-                for row1 in query_result1 :
-                    out += """<OPTION value="%s">%s</OPTION>""" % (row1[0], row1[1])
-                out += """</SELECT>\n"""
-            out +="""<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="EXECUTE"></CODE><BR><BR></TD></TR>\n"""
-            # display the list of items
-            i = 1
-            preid = 0
-            preord = 0
-            for row in query_result :
-                if i==1:
-                    out += """<TR valign="top"><TD width="60">%s<input type="checkbox" name="mark" value="%s">"""\
-                           """<IMG src="%s/arrow_up.gif" border="0">""" % (i,row[0],imagesurl)
-                else:
-                    # complete display previous item
-                    out += """<A href="display?id_basket=%s&amp;action=ORDER&amp;idup=%s&amp;ordup=%s&amp;iddown=%s&amp;orddown=%s">"""\
-                           """<IMG src="%s/arrow_down.gif" border="0"></A>"""\
-                           """</TD>"""\
-                           """<TD>%s</TD></TR>"""\
-                           """<TR colspan="2"><TD></TD></TR>""" % (id_basket,row[0],row[1],preid,preord,imagesurl,preabstract)
-                    # display current item
-                    out += """<TR valign="top"><TD width="60">%s<input type="checkbox" name="mark" value="%s">"""\
-                           """<A href="display?id_basket=%s&amp;action=ORDER&amp;idup=%s&amp;ordup=%s&amp;iddown=%s&amp;orddown=%s">"""\
-                           """<IMG src="%s/arrow_up.gif" border="0"></A>""" % (i,row[0],id_basket,row[0],row[1],preid,preord,imagesurl)
-                preid = row[0]
-                preord = row[1]
-                preabstract = print_record(row[0], of)
-                i += 1
-            # complete display last item
-            out += """<IMG src="%s/arrow_down.gif" border="0"></A>"""\
-                   """</TD>"""\
-                   """<TD>%s</TD></TR>"""\
-                   """<TR colspan="2"><TD></TD></TR>""" % (imagesurl,preabstract)
-            # hidden parameters
-            out += """<INPUT type="hidden" name="id_basket" value="%s"></TD></TR>""" % id_basket                  
-            out += """</TABLE></TD></TR></TABLE></FORM>"""
-        else:
-            out += """<p>The basket <B>%s</B> is empty.""" % basket_name
-            out += out_tmp
-             
+            for row in query_result:
+                items.append({
+                              'id' : row[0],
+                              'order' : row[1],
+                              'abstract' : print_record(row[0], of),
+                             })
+        query_result = run_sql("SELECT b.id, b.name "\
+                               "FROM basket b, user_basket ub "\
+                               "WHERE ub.id_user=%s AND b.id=ub.id_basket AND b.id<>%s "\
+                               "ORDER BY b.name ASC ",
+                               (uid,id_basket))
+        baskets = []
+        if len(query_result) > 0:
+            for row in query_result:
+                baskets.append({
+                                'id'   : row[0],
+                                'name' : row[1],
+                              })
+        out = webbasket_templates.tmpl_display_basket_content(
+                ln          = ln,
+                items       = items,
+                baskets     = baskets,
+                id_basket   = id_basket,
+                basket_name = basket_name,
+                imagesurl   = imagesurl,
+              )
     return out
 
 
@@ -350,70 +275,50 @@ def display_basket_content(uid, id_basket, basket_name, of):
 # input:  the identifier of the selected basket
 #         the name of the selected basket
 # output: the information about the selected basket and the form for the confirmation of the delete action
-def delete_basket(uid, id_basket, basket_name):
+def delete_basket(uid, id_basket, basket_name, ln):
 
     # set variables
     out = ""
 
-    # search for related alerts
-    out += """<FORM name="deletebasket" action="display" method="post">"""
-    out += """<TABLE style="background-color:F1F1F1; border:thin groove grey" cellspacing="0" """\
-           """cellpadding="0" width="650">\n<TR><TD>"""
-    out += """<TABLE border="0" cellpadding="0" cellspacing ="10">"""
+    alerts = []
     query_result = run_sql("SELECT alert_name FROM user_query_basket WHERE id_user=%s AND id_basket=%s",
                            (uid, id_basket))
-    if len(query_result) == 0:
-        Msg = """There isn't any alert related to this basket."""
-        out += """<TR><TD colspan="2" align="left">%s</TD></TR>""" % Msg
-    else:
-        Msg = """The following <A href="../youralerts.py/list">alerts</A> are related to this basket:&nbsp;"""
-        i = 1
+    if len(query_result):
         for row in query_result:
-            if i == 1:
-                Msg += """<B>%s</B>""" % row[0]
-                i+=1
-            else:
-                Msg += """, <B>%s</B>""" % row[0]
-                i+=1
-        out += """<TR><TD colspan="2" align="left">%s</TD></TR>""" % Msg
-        out += """<TR><TD align="right">Do you want to remove the related alerts too?</TD>"""\
-               """<TD>&nbsp;<SELECT name="delete_alerts"><OPTION value="n" selected>No</OPTION>"""\
-               """<OPTION value="y">Yes</OPTION></TD></TR>"""
+            alerts.append(row[0])
 
-    # confirm delete action? yes or no
-    out += """<TR><TD align="right" width="400">Delete the basket <NOBR><B>%s</B></NOBR> ?</TD>""" % basket_name
-    out += """<TD>&nbsp;<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="confirm_action" value="CONFIRM"></CODE>"""\
-           """&nbsp;<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="confirm_action" value="CANCEL"></CODE>"""
-    # hidden parameters
-    out += """<INPUT type="hidden" name="id_basket" value="%s"></TD></TR>""" % id_basket
-    out += """<INPUT type="hidden" name="action" value="DELETE"></TD></TR>"""
-    out += """</TABLE></TD></TR></TABLE></FORM>"""                
-
-    return out
-
+    return webbasket_templates.tmpl_delete_basket_form(
+             ln = ln,
+             alerts = alerts,
+             id_basket = id_basket,
+             basket_name = basket_name,
+           )
 
 # perform_delete: present a form for the confirmation of the delete action
 # input:  delete_alerts='n' if releted alerts shouldn't be deleted; 'y' if yes
 #         action='YES' if delete action has been confirmed; 'NO' otherwise
 #         id_basket contains the identifier of the selected basket
 # output: go back to the display baskets form with confirmation message
-def perform_delete(uid, delete_alerts, confirm_action, id_basket,):
+def perform_delete(uid, delete_alerts, confirm_action, id_basket, ln):
 
     # set variables
     out = ""
 
-    if (confirm_action=='CONFIRM'):
+    # load the right message language
+    _ = gettext_set_language(ln)
+
+    if (confirm_action == _('CONFIRM')):
         #check that the user which is changing the basket name is the owner of it
         if not is_basket_owner( uid, id_basket ):
-            raise NotBasketOwner("You are not the owner of this basket")
+            raise NotBasketOwner(_("You are not the owner of this basket"))
         # perform the cancellation
-        msg = "The selected basket has been deleted."
+        msg = _("The selected basket has been deleted.")
 
         if (delete_alerts=='y'):
-            # delete the related alerts, remove from the alerts table: user_query_basket 
+            # delete the related alerts, remove from the alerts table: user_query_basket
             query_result = run_sql("DELETE FROM user_query_basket WHERE id_user=%s AND id_basket=%s",
                                    (uid, id_basket))
-            msg += " The related alerts have been removed."
+            msg += " " + _("The related alerts have been removed.")
         else:
             # replace the basket identifier with 0
             # select the records to update
@@ -425,7 +330,7 @@ def perform_delete(uid, delete_alerts, confirm_action, id_basket,):
                 query_result_temp = run_sql("UPDATE user_query_basket "\
                                             "SET alert_name=%s,frequency=%s,notification=%s,"\
                                             "date_creation=%s,date_lastrun=%s,id_basket='0' "\
-                                            "WHERE id_user=%s AND id_query=%s AND id_basket=%s",                                    
+                                            "WHERE id_user=%s AND id_query=%s AND id_basket=%s",
                                             (row[1],row[2],row[3],row[4],row[5],uid,row[0],id_basket))
 
         # delete the relation with the user table
@@ -433,9 +338,9 @@ def perform_delete(uid, delete_alerts, confirm_action, id_basket,):
         # delete the basket information
         query_result = run_sql("DELETE FROM basket WHERE id=%s", (id_basket,))
         # delete the basket content
-        query_result = run_sql("DELETE FROM basket_record WHERE id_basket=%s", (id_basket,))        
-        
-    else:        
+        query_result = run_sql("DELETE FROM basket_record WHERE id_basket=%s", (id_basket,))
+
+    else:
         msg=""
 
     return msg
@@ -443,14 +348,17 @@ def perform_delete(uid, delete_alerts, confirm_action, id_basket,):
 # perform_rename_basket: rename an existing basket
 # input:  basket identifier, basket new name
 # output: basket identifier
-def perform_rename_basket(uid, id_basket, newname):
+def perform_rename_basket(uid, id_basket, newname, ln):
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     # check that there's no basket owned by this user with the same name
     if has_user_basket( uid, newname):
-        raise BasketNameAlreadyExists("You already have a basket which name is '%s'"%newname)
+        raise BasketNameAlreadyExists(_("You already have a basket which name is '%s'") % newname)
     #check that the user which is changing the basket name is the owner of it
     if not is_basket_owner( uid, id_basket ):
-        raise NotBasketOwner("You are not the owner of this basket")
-    # update a row to the basket table   
+        raise NotBasketOwner(_("You are not the owner of this basket"))
+    # update a row to the basket table
     tmp = run_sql("UPDATE basket SET name=%s WHERE id=%s", (newname, id_basket))
 
     return id_basket
@@ -482,7 +390,7 @@ def is_basket_owner(uid, bid):
     """
     return run_sql("select id_basket from user_basket where id_user=%s and id_basket=%s",
                    (uid, bid))
-    
+
 
 def get_basket_name(bid):
     """returns the name of the basket corresponding to the given id
@@ -496,14 +404,18 @@ def get_basket_name(bid):
 # perform_create_basket: create a new basket and the relation with the user table
 # input:  basket name
 # output: basket identifier
-def perform_create_basket(uid, basket_name):
+def perform_create_basket(uid, basket_name, ln):
+
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     # check that there's no basket owned by this user with the same name
     if has_user_basket(uid, basket_name):
-        raise BasketNameAlreadyExists("You already have a basket which name is '%s'"%basket_name)
-    # add a row to the basket table   
+        raise BasketNameAlreadyExists(_("You already have a basket which name is '%s'") % basket_name)
+    # add a row to the basket table
     id_basket = run_sql("INSERT INTO basket(id,name,public) VALUES ('0',%s,'n')", (basket_name,))
-    
-    # create the relation between the user and the basket: user_basket                 
+
+    # create the relation between the user and the basket: user_basket
     query_result = run_sql("INSERT INTO user_basket(id_user,id_basket,date_modification) VALUES (%s,%s,%s)",
                            (uid, id_basket, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
     return id_basket
@@ -523,11 +435,15 @@ def basket_exists (basket_name, uid):
 # set_permission: set access permission on a basket
 # input:  basket identifier, basket public permission
 # output: basket identifier
-def set_permission(uid, id_basket, permission):
+def set_permission(uid, id_basket, permission, ln):
+
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     #check that the user which is changing the basket name is the owner of it
     if not is_basket_owner( uid, id_basket ):
-        raise NotBasketOwner("You are not the owner of this basket")
-    # update a row to the basket table   
+        raise NotBasketOwner(_("You are not the owner of this basket"))
+    # update a row to the basket table
     id_basket = run_sql("UPDATE basket SET public=%s WHERE id=%s", (permission, id_basket))
 
     return id_basket
@@ -535,10 +451,14 @@ def set_permission(uid, id_basket, permission):
 # remove_items: remove the selected items from the basket
 # input:  basket identifier, list of selected items
 # output: basket identifier
-def remove_items(uid, id_basket, mark):
+def remove_items(uid, id_basket, mark, ln):
+
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     #check that the user which is changing the basket name is the owner of it
     if not is_basket_owner( uid, id_basket ):
-        raise NotBasketOwner("You are not the owner of this basket")
+        raise NotBasketOwner(_("You are not the owner of this basket"))
     if type(mark)==list:
         selected_items=mark
     else:
@@ -547,7 +467,7 @@ def remove_items(uid, id_basket, mark):
         # delete the basket content
         query_result = run_sql("DELETE FROM basket_record WHERE id_basket=%s AND id_record=%s",
                                (id_basket, i))
-        
+
     return id_basket
 
 # check_copy: check if the record exists already in the basket
@@ -565,30 +485,34 @@ def check_copy(idbask,i):
 # input: original basket identifier, list of selected items,
 #        destination basket identifier, copy or move option: "1"=copy, "2"=move
 #output: basket identifier
-def move_items(uid, id_basket, mark, to_basket, copy_move="1"):
+def move_items(uid, id_basket, mark, to_basket, copy_move="1", ln="en"):
     if type(mark)==list:
         selected_items=mark
     else:
         selected_items=[mark]
-    for i in selected_items:    
+    for i in selected_items:
 	if check_copy(to_basket,i):
             query_result = run_sql("INSERT INTO basket_record(id_basket,id_record,nb_order) VALUES (%s,%s,'0')",
                                    (to_basket, i))
-    
+
     if copy_move=="2":
         #delete from previous basket
-        remove_items(uid, id_basket, mark)
-        
+        remove_items(uid, id_basket, mark, ln)
+
     return id_basket
 
 # change the order of the items in the basket
 # input: basket identifier
 #        identifiers and positions of the items to be moved
 #output: basket identifier
-def order_items(uid, id_basket,idup,ordup,iddown,orddown):
+def order_items(uid, id_basket,idup,ordup,iddown,orddown, ln):
+
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     #check that the user which is changing the basket name is the owner of it
     if not is_basket_owner( uid, id_basket ):
-        raise NotBasketOwner("You are not the owner of this basket")
+        raise NotBasketOwner(_("You are not the owner of this basket"))
     # move up the item idup (by switching its order number with the other item):
     query_result = run_sql("UPDATE basket_record SET nb_order=%s WHERE id_basket=%s AND id_record=%s",
                            (orddown,id_basket,idup))
@@ -596,117 +520,119 @@ def order_items(uid, id_basket,idup,ordup,iddown,orddown):
     # move down the item iddown (by switching its order number with the other item):
     query_result = run_sql("UPDATE basket_record SET nb_order=%s WHERE id_basket=%s AND id_record=%s",
                            (ordup,id_basket,iddown))
-    
+
     return id_basket
 
 
 # perform_display_public: display the content of the selected basket, if public
 # input:  the identifier of the basket
-#         the name of the basket     
+#         the name of the basket
 #         of is the output format code
 # output: the basket's content
-def perform_display_public(uid, id_basket, basket_name, action, to_basket, mark, newname, of):
+def perform_display_public(uid, id_basket, basket_name, action, to_basket, mark, newname, of, ln = "en"):
     out = ""
-    if action=="EXECUTE":
+    messages = []
+
+    # load the right message language
+    _ = gettext_set_language(ln)
+
+    if action == _("EXECUTE"):
         # perform actions
         if newname != "":
             # create a new basket
-            to_basket = perform_create_basket(uid, newname)
-        out += """The <I>private</I> basket <B>%s</B> has been created.<BR>\n""" % newname
+            try:
+                to_basket = perform_create_basket(uid, newname, ln)
+                messages.append(_("""The <I>private</I> basket <B>%s</B> has been created.""") % newname)
+            except BasketException, e:
+                messages.append(_("""The basket %s has not been created: %s""") % (newname, e))
         # copy the selected items
         if to_basket == '0':
-            out += """Select a destination basket to copy the selected items.<BR>"""
+            messages.append(_("""Select a destination basket to copy the selected items."""))
         else:
-            move_items(uid, id_basket, mark, to_basket, '1')
-            out += """The selected items have been copied.<BR>"""
+            move_items(uid, id_basket, mark, to_basket, '1', ln)
+            messages.append(_("""The selected items have been copied."""))
 
-    # search for basket's items    
+    # search for basket's items
     if (id_basket != '0') and (id_basket != 0):
         res = run_sql("select public from basket where id=%s", (id_basket,))
         if len(res) == 0:
-            out += """Non existing basket"""
+            messages.append(_("""Non existing basket"""))
+
+            out += '<collection>'
+            out += webbasket_templates.tmpl_display_messages (of = of, ln = ln, messages = messages)
+            out += '</collection>'
             return out
+
         if str(res[0][0]).strip() != 'y':
-            out += """The basket is private"""
+            messages.append(_("""The basket is private"""))
+
+            out += '<collection>'
+            out += webbasket_templates.tmpl_display_messages (of = of, ln = ln, messages = messages)
+            out += '</collection>'
             return out
+
         query_result = run_sql("SELECT br.id_record,br.nb_order "\
                                "FROM basket_record br "\
                                "WHERE br.id_basket=%s "\
                                "ORDER BY br.nb_order DESC ",
                                (id_basket,))
-        if len(query_result) > 0:
-            out += """Content of the public basket <B>%s</B> :<BR>""" % basket_name                     
+
+        # Shortcut the output in the case of XML format
+        if of == 'xm':
+            out = '<collection xmlns="http://www.loc.gov/MARC21/slim">\n'
+            for r in query_result:
+                out += print_record (r [0], of)
+            out += '\n</collection>\n'
+
+            return out
+        
             
-            # display the list of items
-            out += """<FORM name="basketform" action="display_public" method="post">"""
-            out += """<TABLE cellspacing="0" cellpadding="0">\n<TR><TD>"""
-            out += """<TABLE border="0" cellpadding="0" cellspacing ="3" width="650">"""
+        items = []
+        if len(query_result) > 0:
+            for row in query_result:
+                items.append({
+                              'id' : row[0],
+                              'order' : row[1],
+                              'abstract' : print_record(row[0], of),
+                             })
 
+        # copy selected items to basket
+        query_result = run_sql("SELECT b.id, b.name "\
+                               "FROM basket b, user_basket ub "\
+                               "WHERE ub.id_user=%s AND b.id=ub.id_basket "\
+                               "ORDER BY b.name ASC ",
+                               (uid,))
+        baskets = []
+        if len(query_result) > 0:
+            for row in query_result:
+                baskets.append({
+                                'id'   : row[0],
+                                'name' : row[1],
+                              })
 
-            # copy selected items to basket
-            query_result1 = run_sql("SELECT b.id, b.name "\
-                                    "FROM basket b, user_basket ub "\
-                                    "WHERE ub.id_user=%s AND b.id=ub.id_basket "\
-                                    "ORDER BY b.name ASC ",
-                                    (uid,))
-            if len(query_result1) > 0:
-                out += """Copy the selected items to """
-                out += """<SELECT name="to_basket"><OPTION value="0">- select basket -</OPTION>"""
-                for row1 in query_result1 :
-                    out += """<OPTION value="%s">%s</OPTION>""" % (row1[0], row1[1])
-                out += """</SELECT>\n"""
-                out += """&nbsp;or new&nbsp;"""
+        out += webbasket_templates.tmpl_display_messages (of = of, ln = ln, messages = messages)
 
-            else:
-                out += """Copy the selected items to new basket&nbsp;"""
-                
-            out += """<INPUT type="text" name="newname" size="10" maxlength="50">&nbsp;&nbsp;"""
-            out += """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="EXECUTE"></CODE><BR><BR></TD></TR>\n"""
-
-            # display the list of items
-            i = 1
-            preid = 0
-            preord = 0
-            for row in query_result :
-                if i==1:
-                    out += """<TR valign="top"><TD width="60">%s<input type="checkbox" name="mark" value="%s">"""\
-                           """<IMG src="%s/arrow_up.gif" border="0">""" % (i,row[0],imagesurl)
-                else:
-                    # complete display previous item
-                    out += """<A href="display?id_basket=%s&action=ORDER&idup=%s&ordup=%s&iddown=%s&orddown=%s">"""\
-                           """<IMG src="%s/arrow_down.gif" border="0"></A>"""\
-                           """</TD>"""\
-                           """<TD>%s</TD></TR>"""\
-                           """<TR colspan="2"><TD></TD></TR>""" % (id_basket,row[0],row[1],preid,preord,imagesurl,preabstract)
-                    # display current item
-                    out += """<TR valign="top"><TD width="60">%s<input type="checkbox" name="mark" value="%s">"""\
-                           """<A href="display?id_basket=%s&action=ORDER&idup=%s&ordup=%s&iddown=%s&orddown=%s">"""\
-                           """<IMG src="%s/arrow_up.gif" border="0"></A>""" % (i,row[0],id_basket,row[0],row[1],preid,preord,imagesurl)
-                preid = row[0]
-                preord = row[1]
-                preabstract = print_record(row[0], of)
-                i += 1
-            # complete display last item
-            out += """<IMG src="%s/arrow_down.gif" border="0"></A>"""\
-                   """</TD>"""\
-                   """<TD>%s</TD></TR>"""\
-                   """<TR colspan="2"><TD></TD></TR>""" % (imagesurl,preabstract)
-
-            # hidden parameters
-            out += """<INPUT type="hidden" name="id_basket" value="%s"></TD></TR>""" % id_basket
-            out += """<INPUT type="hidden" name="name" value="%s"></TD></TR>""" % basket_name       
-            out += """</TABLE></TD></TR></TABLE></FORM>"""
-        else:
-            out += """The basket <B>%s</B> is empty.""" % basket_name
-             
+        out += _("""Content of the public basket <B>%s</B> :""") % get_basket_name(id_basket) + "<BR>"
+        out += webbasket_templates.tmpl_display_public_basket_content(
+                ln          = ln,
+                items       = items,
+                baskets     = baskets,
+                id_basket   = id_basket,
+                basket_name = basket_name,
+                imagesurl   = imagesurl,
+              )
     return out
 
 ## --- new stuff starts here ---
 
-def perform_request_add(uid=-1, recid=[], bid=[], bname=[]):
+def perform_request_add(uid=-1, recid=[], bid=[], bname=[], ln="en"):
     """Add records recid to baskets bid for user uid. If bid isn't set, it'll ask user into which baskets to add them.
     If bname is set, it'll create new basket with this name, and add records there rather than to bid."""
     out = ""
+
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     # wash arguments:
     recIDs = recid
     bskIDs = bid
@@ -716,42 +642,38 @@ def perform_request_add(uid=-1, recid=[], bid=[], bname=[]):
         bskIDs = [bid]
     # sanity checking:
     if recIDs == []:
-        return "<p>No records to add."
+        return _("No records to add.")
     # do we have to create some baskets?
     if bname:
         try:
-            new_basket_ID = perform_create_basket(uid, bname)
+            new_basket_ID = perform_create_basket(uid, bname, ln)
             bskIDs = [new_basket_ID]
         except BasketException, e:
-            out += """The basket %s has not been created: %s""" % (bname, e)
+            out += _("""The basket %s has not been created: %s""") % (bname, e)
+    basket_id_name_list = get_list_of_user_baskets(uid)
+    if len(basket_id_name_list) == 1:
+        bskIDs = [basket_id_name_list[0][0]]
     if bskIDs == []:
         # A - some information missing, so propose list of baskets to choose from
-        basket_id_name_list = get_list_of_user_baskets(uid)
         if basket_id_name_list != []:
             # there are some baskets; good
-            out += "<p>Please choose the basket you want to add %d records to:" % len(recIDs)
-            out += """<form action="%s/yourbaskets.py/add" method="post">""" % weburl
-            for recID in recIDs:
-                out += """<input type="hidden" name="recid" value="%s">""" % recID
-            out += """<select name="bid">"""
-            for basket_id, basket_name in get_list_of_user_baskets(uid):
-                out += """<option value="%s">%s""" % (basket_id, basket_name)
-            out += """</select>"""
-            out += """<input class="formbutton" type="submit" name="action" value="ADD TO BASKET">"""
-            out += """</form>"""
+            out += webbasket_templates.tmpl_add_choose_basket(
+                     ln = ln,
+                     baskets = basket_id_name_list,
+                     recids = recIDs,
+                   )
         else:
-            # user have to create a basket first
-            out += """<p>You don't own baskets defined yet."""
-            out += """<form action="%s/yourbaskets.py/add" method="post">""" % weburl
-            for recID in recIDs:
-                out += """<input type="hidden" name="recid" value="%s">""" % recID
-            out += """New basket name: """
-            out += """<input type="text" size="30" name="bname" value="">"""
-            out += """<input class="formbutton" type="submit" name="action" value="CREATE NEW BASKET">"""
-            out += """</form>"""            
+            out += webbasket_templates.tmpl_add_create_basket(
+                     ln = ln,
+                     recids = recIDs,
+                   )
+            
+        if isGuestUser(uid):
+            out += warning_guest_user (type = _("baskets"), ln = ln)
     else:
         # B - we have baskets IDs, so we can add records
-        out += """<p><span class="info">Adding %s records to basket(s)...</span>""" % len(recIDs)
+        messages = []
+        messages.append(_("Adding %s records to basket(s)...") % len(recIDs))
         for bskID in bskIDs:
             if is_basket_owner(uid, bskID):
                 for recID in recIDs:
@@ -760,11 +682,15 @@ def perform_request_add(uid=-1, recid=[], bid=[], bname=[]):
                                       (bskID,recID,'0'))
                     except:
                         pass # maybe records were already there? page reload happened?
-                out += """<span class="info">done.</span>"""
+                messages.append(_("...done."))
             else:
-                out += """<span class="info">sorry, you are not the owner of this basket.</span>"""
-        out += perform_display(uid=uid, id_basket=bskIDs[0])
-    return out 
+                messages.append(_("sorry, you are not the owner of this basket."))
+        out += webbasket_templates.tmpl_add_messages(
+                 ln = ln,
+                 messages = messages,
+               )
+        out += perform_display(uid=uid, id_basket=bskIDs[0], ln=ln)
+    return out
 
 def get_list_of_user_baskets(uid):
     """Return list of lists [[basket_id, basket_name],[basket_id, basket_name],...] for the given user."""
@@ -778,34 +704,29 @@ def get_list_of_user_baskets(uid):
         out.append([row[0], row[1]])
     return out
 
-def account_list_baskets(uid, action="", id_basket=0, newname=""):
+def account_list_baskets(uid, action="", id_basket=0, newname="", ln="en"):
 
-	out = ""
-	# query the database for the list of baskets
-        query_result = run_sql("SELECT b.id, b.name, b.public, ub.date_modification "\
-                               "FROM basket b, user_basket ub "\
-                               "WHERE ub.id_user=%s AND b.id=ub.id_basket "\
-                               "ORDER BY b.name ASC ",
-                               (uid,))
-      
-       	out += """<FORM name="displaybasket" action="../yourbaskets.py/display" method="post">"""
-        out += """You own the following baskets: """
-        out += """<SELECT name="id_basket"><OPTION value="0">- basket name -</OPTION>"""            
- 	for row in query_result :
-                if str(id_basket) == str(row[0]):
-                    basket_selected = " selected"
-                    basket_name = row[1]
-                else:
-                    basket_selected = ""
-                out += """<OPTION value="%s"%s>%s</OPTION>""" % (row[0], basket_selected, row[1])
-        out += """</SELECT>\n"""	
+    out = ""
+    # query the database for the list of baskets
+    query_result = run_sql("SELECT b.id, b.name, b.public, ub.date_modification "\
+                           "FROM basket b, user_basket ub "\
+                           "WHERE ub.id_user=%s AND b.id=ub.id_basket "\
+                           "ORDER BY b.name ASC ",
+                           (uid,))
 
-            # buttons for basket's selection or creation
-        out += """&nbsp;<CODE class="blocknote">"""\
-                   """<INPUT class="formbutton" type="submit" name="action" value="SELECT"></CODE>\n"""
-        out += """&nbsp;&nbsp;or&nbsp;"""\
-               """<INPUT type="text" name="newname" size="10" maxlength="50">&nbsp;"""\
-               """<CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="CREATE NEW"></CODE><BR><BR>"""
+    baskets = []
+    if len(query_result) :
+        for row in query_result :
+            if str(id_basket) == str(row[0]):
+                basket_permission = row[2]
+            baskets.append({
+                            'id'   : row[0],
+                            'name' : row[1],
+                            'permission' : row[2],
+                            'selected' : (str(id_basket) == str(row[0])) and "selected" or "",
+                          })
 
-        out += """</FORM>"""  
-	return out
+    return webbasket_templates.tmpl_account_list_baskets(
+             ln = ln,
+             baskets = baskets,
+           )

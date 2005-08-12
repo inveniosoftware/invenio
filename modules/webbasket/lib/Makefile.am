@@ -17,9 +17,9 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir=$(libdir)/python/cdsware
+pylibdir = $(libdir)/python/cdsware
 
-pylib_DATA=webbasket.py
+pylib_DATA = webbasket.py webbasket_templates.py
 
 EXTRA_DIST = $(pylib_DATA)
 
