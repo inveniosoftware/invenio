@@ -1,5 +1,5 @@
 ## $Id$
-##
+
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -11,7 +11,7 @@
 ## The CDSware is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
@@ -30,12 +30,20 @@ from cdsware import webbasket
 from cdsware import webalert
 from cdsware import webuser
 from cdsware.access_control_config import *
-from mod_python import apache  
+from mod_python import apache
 from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE, cfg_webaccess_warning_msgs, CFG_EXTERNAL_AUTHENTICATION
 import smtplib
 
+from cdsware.messages import gettext_set_language
+
+import cdsware.template
+websession_templates = cdsware.template.load('websession')
+
 def edit(req, ln=cdslang):
     uid = webuser.getUid(req)
+
+    # load the right message language
+    _ = gettext_set_language(ln)
 
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/set")
@@ -43,9 +51,9 @@ def edit(req, ln=cdslang):
     data = webuser.getDataUid(req,uid)
     email = data[0]
     passw = data[1]
-    return page(title="Your Settings",
-                body=webaccount.perform_set(email,passw),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
+    return page(title= _("Your Settings"),
+                body=webaccount.perform_set(email,passw, ln),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
                 description="CDS Personalize, Your Settings",
                 keywords="CDS, personalize",
                 uid=uid,
@@ -55,17 +63,20 @@ def edit(req, ln=cdslang):
 def change(req,email=None,password=None,password2=None,login_method="",ln=cdslang):
     uid = webuser.getUid(req)
 
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/change")
 
     if login_method and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 4:
-        title = "Settings edited"
+        title = _("Settings edited")
         act = "display"
-        linkname = "Show account"
+        linkname = _("Show account")
         prefs = webuser.get_user_preferences(uid)
         prefs['login_method'] = login_method
         webuser.set_user_preferences(uid, prefs)
-        mess = "Login method successfully selected."
+        mess = _("Login method successfully selected.")
     elif login_method and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4:
         return webuser.page_not_authorized(req, "../youraccount.py/change")
     elif email:
@@ -76,36 +87,36 @@ def change(req,email=None,password=None,password2=None,login_method="",ln=cdslan
             else:
                 return webuser.page_not_authorized(req, "../youraccount.py/change")
             if change and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
-                mess = "Password successfully edited."
+                mess = _("Password successfully edited.")
             elif change:
-                mess = "Settings successfully edited."
+                mess = _("Settings successfully edited.")
        	    act = "display"
-            linkname = "Show account"
-            title = "Settings edited"
+            linkname = _("Show account")
+            title = _("Settings edited")
         elif uid2 == -1 or uid2 != uid and not uid2 == 0:
-            mess = "The email address is already in use, please try again."
+            mess = _("The email address is already in use, please try again.")
        	    act = "edit"
-            linkname = "Edit settings"
-            title = "Editing settings failed"
+            linkname = _("Edit settings")
+            title = _("Editing settings failed")
         elif not webuser.checkemail(email):
-            mess = "The email address is not valid, please try again."
+            mess = _("The email address is not valid, please try again.")
        	    act = "edit"
-            linkname = "Edit settings"
-            title = "Editing settings failed"
+            linkname = _("Edit settings")
+            title = _("Editing settings failed")
         elif password != password2:
-            mess = "The passwords do not match, please try again."
+            mess = _("The passwords do not match, please try again.")
        	    act = "edit"
-            linkname = "Edit settings"
-            title = "Editing settings failed"
+            linkname = _("Edit settings")
+            title = _("Editing settings failed")
     else:
-        mess = "Could not update settings."
+        mess = _("Could not update settings.")
        	act = "edit"
-        linkname = "Edit settings"
-        title = "Editing settings failed"
-            
+        linkname = _("Edit settings")
+        title = _("Editing settings failed")
+
     return page(title=title,
- 	        body=webaccount.perform_back(mess,act, linkname),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
+ 	        body=webaccount.perform_back(mess,act, linkname, ln),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
@@ -115,12 +126,15 @@ def change(req,email=None,password=None,password2=None,login_method="",ln=cdslan
 def lost(req, ln=cdslang):
     uid = webuser.getUid(req)
 
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/lost")
 
-    return page(title="Lost your password?",
-                body=webaccount.perform_lost(),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
+    return page(title=_("Lost your password?"),
+                body=webaccount.perform_lost(ln),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
@@ -130,33 +144,39 @@ def lost(req, ln=cdslang):
 def display(req, ln=cdslang):
     uid =  webuser.getUid(req)
 
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/display")
 
-    if webuser.isGuestUser(uid):		
-	return page(title="Your Account",
-                    body=webaccount.perform_info(req),
-	            description="CDS Personalize, Main page",
-	            keywords="CDS, personalize",
-	            uid=uid,
+    if webuser.isGuestUser(uid):
+        return page(title=_("Your Account"),
+                    body=webaccount.perform_info(req, ln),
+                    description="CDS Personalize, Main page",
+                    keywords="CDS, personalize",
+                    uid=uid,
                     language=ln,
                     lastupdated=__lastupdated__)
 
-    data = webuser.getDataUid(req,uid)	
-    bask = webbasket.account_list_baskets(uid)	  	  
-    aler = webalert.account_list_alerts(uid)
-    sear = webalert.account_list_searches(uid)	    	
-    return page(title="Your Account",
-                body=webaccount.perform_display_account(req,data,bask,aler,sear),
+    data = webuser.getDataUid(req,uid)
+    bask = webbasket.account_list_baskets(uid, ln = ln)
+    aler = webalert.account_list_alerts(uid, ln = ln)
+    sear = webalert.account_list_searches(uid, ln = ln)
+    return page(title=_("Your Account"),
+                body=webaccount.perform_display_account(req,data,bask,aler,sear,ln),
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
                 language=ln,
                 lastupdated=__lastupdated__)
-    	
+
 def send_email(req, p_email=None, ln=cdslang):
-    
+
     uid = webuser.getUid(req)
+
+    # load the right message language
+    _ = gettext_set_language(ln)
 
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/send_email")
@@ -164,15 +184,9 @@ def send_email(req, p_email=None, ln=cdslang):
     user_prefs = webuser.get_user_preferences(webuser.emailUnique(p_email))
     if user_prefs:
         if CFG_EXTERNAL_AUTHENTICATION.has_key(user_prefs['login_method']) or CFG_EXTERNAL_AUTHENTICATION.has_key(user_prefs['login_method']) and CFG_EXTERNAL_AUTHENTICATION[user_prefs['login_method']][0] != None:
-	    Msg = """If you have lost password for your CERN Document Server internal
-               account, then please enter your email address below and the lost
-               password will be emailed to you.<br>
-               Note that if you have been using an external login system (such
-               as CERN NICE), then we cannot do anything and you have to ask
-               there.  Alternatively, you can ask <a href="mailto:<%s>">
-               <%s></a> to change your login system from external to internal.<br><br>""" % (supportemail, supportemail)
+            Msg = websession_templates.tmpl_lost_password_message(ln = ln, supportemail = supportemail)
 
-	    return page(title="Your Account",
+            return page(title=_("Your Account"),
                         body=Msg,
                         description="CDS Personalize, Main page",
                         keywords="CDS, personalize",
@@ -180,45 +194,45 @@ def send_email(req, p_email=None, ln=cdslang):
                         language=ln,
                         lastupdated=__lastupdated__)
 
-    passw = webuser.givePassword(p_email) 
+    passw = webuser.givePassword(p_email)
     if passw == -999:
-	eMsg = "The entered e-mail address doesn't exist in the database"
-	return page(title="Your Account",
-                    body=webaccount.perform_emailMessage(eMsg),
+        eMsg = _("The entered e-mail address doesn't exist in the database")
+        return page(title=_("Your Account"),
+                    body=webaccount.perform_emailMessage(eMsg, ln),
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
                     uid=uid,
                     language=ln,
                     lastupdated=__lastupdated__)
-	
+
     fromaddr = "From: %s" % supportemail
     toaddrs  = "To: " + p_email
     to = toaddrs + "\n"
-    sub = "Subject: Credentials for %s\n\n" % cdsname
-    body = "Here are your user credentials for %s:\n\n" % cdsname
-    body += "   username: %s\n   password: %s\n\n" % (p_email, passw)
-    body += "You can login at %s/youraccount.py/login" % weburl
-    msg = to + sub + body	
+    sub = "Subject: %s %s\n\n" % (_("Credentials for"), cdsname)
+    body = "%s %s:\n\n" % (_("Here are your user credentials for"), cdsname)
+    body += "   %s: %s\n   %s: %s\n\n" % (_("username"), p_email, _("password"), passw)
+    body += "%s %s/youraccount.py/login?ln=%s" % (_("You can login at"), weburl, ln)
+    msg = to + sub + body
 
     server = smtplib.SMTP('localhost')
     server.set_debuglevel(1)
-    
-    try: 
-	server.sendmail(fromaddr, toaddrs, msg)
+
+    try:
+        server.sendmail(fromaddr, toaddrs, msg)
 
     except smtplib.SMTPRecipientsRefused,e:
-           eMsg = "The entered email address is incorrect, please check that it is written correctly (e.g. johndoe@example.com)."
-	   return page(title="Incorrect email address",
-                       body=webaccount.perform_emailMessage(eMsg),
-                       description="CDS Personalize, Main page",
-                       keywords="CDS, personalize",
-                       uid=uid,
-                       language=ln,
-                       lastupdated=__lastupdated__)
+        eMsg = _("The entered email address is incorrect, please check that it is written correctly (e.g. johndoe@example.com).")
+        return page(title=_("Incorrect email address"),
+                    body=webaccount.perform_emailMessage(eMsg, ln),
+                    description="CDS Personalize, Main page",
+                    keywords="CDS, personalize",
+                    uid=uid,
+                    language=ln,
+                    lastupdated=__lastupdated__)
 
     server.quit()
-    return page(title="Lost password sent",
-                body=webaccount.perform_emailSent(p_email),
+    return page(title=_("Lost password sent"),
+                body=webaccount.perform_emailSent(p_email, ln),
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
@@ -226,14 +240,17 @@ def send_email(req, p_email=None, ln=cdslang):
                 lastupdated=__lastupdated__)
 
 def youradminactivities(req, ln=cdslang):
-    uid = webuser.getUid(req)	
+    uid = webuser.getUid(req)
+
+    # load the right message language
+    _ = gettext_set_language(ln)
 
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/youradminactivities")
 
-    return page(title="Your Administrative Activities",
-                body=webaccount.perform_youradminactivities(uid),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
+    return page(title=_("Your Administrative Activities"),
+                body=webaccount.perform_youradminactivities(uid, ln),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
@@ -243,12 +260,15 @@ def youradminactivities(req, ln=cdslang):
 def delete(req, ln=cdslang):
     uid = webuser.getUid(req)
 
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/delete")
-	
-    return page(title="Delete Account",
-                body=webaccount.perform_delete(),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
+
+    return page(title=_("Delete Account"),
+                body=webaccount.perform_delete(ln),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
@@ -256,33 +276,39 @@ def delete(req, ln=cdslang):
                 lastupdated=__lastupdated__)
 
 def logout(req, ln=cdslang):
-    
+
     uid = webuser.logoutUser(req)
+
+    # load the right message language
+    _ = gettext_set_language(ln)
 
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return webuser.page_not_authorized(req, "../youraccount.py/logout")
 
-    return page(title="Logout",
-                body=webaccount.perform_logout(req),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
+    return page(title=_("Logout"),
+                body=webaccount.perform_logout(req, ln),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
                 language=ln,
                 lastupdated=__lastupdated__)
-    
+
 def login(req, p_email=None, p_pw=None, login_method=None, action='login', referer='', ln=cdslang):
 
     if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
         return webuser.page_not_authorized(req, "../youraccount.py/login")
-        
+
     uid = webuser.getUid(req)
 
-    if action =='login':
+    # load the right message language
+    _ = gettext_set_language(ln)
+
+    if action == _('login'):
        if p_email==None or not login_method:
-           return  page(title="Login",
-                        body=webaccount.create_login_page_box(referer),
-                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
+           return  page(title=_("Login"),
+                        body=webaccount.create_login_page_box(referer, ln),
+                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
                         description="CDS Personalize, Main page",
                         keywords="CDS, personalize",
                         uid=uid,
@@ -290,7 +316,7 @@ def login(req, p_email=None, p_pw=None, login_method=None, action='login', refer
                         lastupdated=__lastupdated__)
        (iden, p_email, p_pw, msgcode) = webuser.loginUser(req,p_email,p_pw, login_method)
        if len(iden)>0:
-           
+
            uid = webuser.update_Uid(req,p_email,p_pw)
            uid2 = webuser.getUid(req)
            if uid2 == -1:
@@ -300,7 +326,7 @@ def login(req, p_email=None, p_pw=None, login_method=None, action='login', refer
            # login successful!
            if referer:
                req.err_headers_out.add("Location", referer)
-               raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY               
+               raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
            else:
                return display(req)
        else:
@@ -308,10 +334,10 @@ def login(req, p_email=None, p_pw=None, login_method=None, action='login', refer
            if msgcode == 14:
       	       if not webuser.userNotExist(p_email,p_pw) or p_email=='' or p_email==' ':
                    mess = cfg_webaccess_warning_msgs[15] % login_method
-           act = "login"    
-	   return page(title="Login",
-                       body=webaccount.perform_back(mess,act),
-                       navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln), 
+           act = "login"
+	   return page(title=_("Login"),
+                       body=webaccount.perform_back(mess,act, _("Login"), ln),
+                       navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
                        description="CDS Personalize, Main page",
                        keywords="CDS, personalize",
                        uid=uid,
@@ -325,16 +351,19 @@ def register(req, p_email=None, p_pw=None, p_pw2=None, action='login', referer='
 
     uid = webuser.getUid(req)
 
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     if p_email==None:
-        return  page(title="Register",
-                     body=webaccount.create_register_page_box(referer),
-                     navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
+        return  page(title=_("Register"),
+                     body=webaccount.create_register_page_box(referer, ln),
+                     navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
                      description="CDS Personalize, Main page",
                      keywords="CDS, personalize",
                      uid=uid,
                      language=ln,
                      lastupdated=__lastupdated__)
-    
+
     mess=""
     act=""
     if p_pw == p_pw2:
@@ -343,30 +372,31 @@ def register(req, p_email=None, p_pw=None, p_pw2=None, action='login', referer='
         ruid = -2
     if ruid == 1:
         uid = webuser.update_Uid(req,p_email,p_pw)
-        mess = "Your account has been successfully created."
-        title = "Account created"
+        mess = _("Your account has been successfully created.")
+        title = _("Account created")
         if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
-            mess += " An email has been sent to the given address with the account information."
+            mess += _(" An email has been sent to the given address with the account information.")
         if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
-            mess += " A second email will be sent when the account has been activated and can be used."
+            mess += _(" A second email will be sent when the account has been activated and can be used.")
         else:
-            mess += """ You can now access your <a href="%s/youraccount.py/display?ln=%s">account</a>.""" % (weburl, ln)
+            mess += _(""" You can now access your <a href="%s">account</a>.""") % (
+                      "%s/youraccount.py/display?ln=%s" % (weburl, ln))
     elif ruid == -1:
-        mess = "The user already exists in the database, please try again."
-	act = "register"
-        title = "Register failure"
+        mess = _("The user already exists in the database, please try again.")
+        act = "register"
+        title = _("Register failure")
     elif ruid == -2:
-        mess = "Both passwords must match, please try again."
-	act = "register"
-        title = "Register failure"
+        mess = _("Both passwords must match, please try again.")
+        act = "register"
+        title = _("Register failure")
     else:
-        mess = "The email address given is not valid, please try again."
+        mess = _("The email address given is not valid, please try again.")
        	act = "register"
-        title = "Register failure"
+        title = _("Register failure")
 
     return page(title=title,
- 	        body=webaccount.perform_back(mess,act),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">Your Account</a>""" % (weburl, ln),
+                body=webaccount.perform_back(mess,act, (act == 'register' and _("register") or ""), ln),
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,

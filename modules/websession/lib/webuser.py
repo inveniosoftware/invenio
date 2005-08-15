@@ -12,7 +12,7 @@
 ## The CDSware is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
@@ -48,8 +48,15 @@ from access_control_engine import acc_authorize_action
 from access_control_admin import acc_findUserRoleActions
 from access_control_config import *
 
+import cdsware.template
+# language for gettext
+from cdsware.messages import gettext_set_language
+
+## templating engine
+tmpl = cdsware.template.load('websession')
+
 def createGuestUser():
-    """Create a guest user , insert into user null values in all fields 
+    """Create a guest user , insert into user null values in all fields
 
        createGuestUser() -> GuestUserID
     """
@@ -83,12 +90,12 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail=''):
                 uid=getUid(req),
                 body=body,
                 navtrail=navtrail)
-        
+
 def getUid (req):
     """It gives the userId taking it from the cookie of the request,also has the control mechanism for the guest users,
        inserting in the MySql table when need it, and raise the cookie to the client.
 
-       getUid(req) -> userId	 
+       getUid(req) -> userId
     """
 
     if CFG_ACCESS_CONTROL_LEVEL_SITE == 1: return 0
@@ -107,7 +114,7 @@ def getUid (req):
         userId = s.getUid()
         guest = 1
     sm.maintain_session(req,s)
-    
+
     if guest == 0:
         guest = isGuestUser(userId)
 
@@ -137,10 +144,10 @@ def setUid(req,uid):
     s.setUid(uid)
     sm.maintain_session(req,s)
     return uid
-    
+
 def isGuestUser(uid):
     """It Checks if the userId corresponds to a guestUser or not
-      
+
        isGuestUser(uid) -> boolean
     """
     out = 1
@@ -182,14 +189,14 @@ def isUserAdmin(uid):
     out = 0
     if acc_findUserRoleActions(uid):
         out = 1
-    return out    
+    return out
 
 def checkRegister(user,passw):
     """It checks if the user is register with the correct password
-       
+
        checkRegister(user,passw) -> boolean
     """
-    
+
     query_result = run_sql("select * from user where email=%s and password=%s", (user,passw))
     if len(query_result)> 0 :
         return 0
@@ -202,12 +209,12 @@ def userOnSystem(user):
     if len(query_register)>0:
 	return 1
     return 0
-	
+
 def checkemail(email):
     """Check whether the EMAIL address supplied by the user is valid.
        At the moment we just check whether it contains '@' and
        whether it doesn't contain blanks.
-       
+
        checkemail(email) -> boolean
     """
 
@@ -215,27 +222,27 @@ def checkemail(email):
        return 0
     elif CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN:
         if not email.endswith(CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN):
-            return 0         
+            return 0
     return 1
 
 def getDataUid(req,uid):
     """It takes the email and password from a given userId, from the MySQL database, if don't exist it just returns
-       guest values for email and password	
-	
+       guest values for email and password
+
        getDataUid(req,uid) -> [email,password]
 
-    """	
+    """
 
     email = 'guest'
     password = 'none'
 
     query_result = run_sql("select email, password from user where id=%s", (uid,))
-    
+
     if len(query_result)>0:
-        
+
         email = query_result[0][0]
         password = query_result[0][1]
-        
+
     if password == None or  email =='':
         email = 'guest'
     list = [email] +[password]
@@ -243,14 +250,14 @@ def getDataUid(req,uid):
 
 
 def registerUser(req,user,passw):
-    """It registers the user, inserting into the user table of MySQL database, the email and the pasword 
-	of the user. It returns 1 if the insertion is done, 0 if there is any failure with the email 
+    """It registers the user, inserting into the user table of MySQL database, the email and the pasword
+	of the user. It returns 1 if the insertion is done, 0 if there is any failure with the email
 	and -1 if the user is already on the data base
-   
-       registerUser(req,user,passw) -> int 
-    """ 
+
+       registerUser(req,user,passw) -> int
+    """
     if userOnSystem(user) and  user !='':
-	return -1	
+	return -1
     if checkRegister(user,passw) and checkemail(user):
         if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 0:
             activated = 1
@@ -282,9 +289,9 @@ def updateDataUser(req,uid,email,password):
     else:
         query_result = run_sql("update user set email=%s,password=%s where id=%s", (email,password,uid))
     return 1
-    
+
 def loginUser(req, p_email,p_pw, login_method):
-    """It is a first simple version for the authentication of user. It returns the id of the user, 
+    """It is a first simple version for the authentication of user. It returns the id of the user,
        for checking afterwards if the login is correct
     """
 
@@ -309,7 +316,7 @@ def loginUser(req, p_email,p_pw, login_method):
                     query_result = run_sql("SELECT id from user where email=%s and password=%s", (p_email,p_pw,))
                     user_prefs = get_user_preferences(query_result[0][0])
                     user_prefs["login_method"] = login_method
-                    set_user_preferences(query_result[0][0], user_prefs)      
+                    set_user_preferences(query_result[0][0], user_prefs)
         else:
             return ([], p_email, p_pw, 10)
 
@@ -339,7 +346,7 @@ def logoutUser(req):
     id1 = createGuestUser()
     s.setUid(id1)
     sm.maintain_session(req,s)
-    return id1	
+    return id1
 
 def userNotExist(p_email,p_pw):
     """Check if the user exists or not in the system
@@ -353,7 +360,7 @@ def userNotExist(p_email,p_pw):
 def emailUnique(p_email):
     """Check if the email address only exists once. If yes, return userid, if not, -1
     """
-    
+
     query_result = run_sql("select id, email from user where email=%s", (p_email,))
     if len(query_result) == 1:
         return query_result[0][0]
@@ -362,16 +369,16 @@ def emailUnique(p_email):
     return -1
 
 def update_Uid(req,p_email,p_pw):
-    """It updates the userId of the session. It is used when a guest user is logged in succesfully in the system 
+    """It updates the userId of the session. It is used when a guest user is logged in succesfully in the system
     with a given email and password
-    """	
+    """
     query_ID = int(run_sql("select id from user where email=%s and password=%s",
                            (p_email,p_pw))[0][0])
     setUid(req,query_ID)
     return query_ID
-	
+
 def givePassword(email):
-    """ It checks in the database the password for a given email. It is used to send the password to the email of the user.It returns 
+    """ It checks in the database the password for a given email. It is used to send the password to the email of the user.It returns
 	the password if the user exists, otherwise it returns -999
     """
 
@@ -382,7 +389,7 @@ def givePassword(email):
 
 def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=cdslang):
     """Send an email to the address given by sendTo about the new account newAccountEmail."""
-	
+
     fromaddr = "From: %s" % supportemail
     toaddrs  = "To: %s" % sendTo
     to = toaddrs + "\n"
@@ -399,22 +406,22 @@ def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=cdslang):
     body += "\n---------------------------------"
     body += "\n%s" % cdsname
     body += "\nContact: %s" % supportemail
-    msg = to + sub + body	
+    msg = to + sub + body
 
     server = smtplib.SMTP('localhost')
     server.set_debuglevel(1)
-   
-    try: 
+
+    try:
         server.sendmail(fromaddr, toaddrs, msg)
     except smtplib.SMTPRecipientsRefused,e:
         return 0
-  
+
     server.quit()
     return 1
 
 def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=cdslang):
     """Send an email to the address given by sendTo about the new account newAccountEmail."""
-	
+
     fromaddr = "From: %s" % supportemail
     toaddrs  = "To: %s" % sendTo
     to = toaddrs + "\n"
@@ -431,12 +438,12 @@ def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=cdslang):
 
     server = smtplib.SMTP('localhost')
     server.set_debuglevel(1)
-   
-    try: 
+
+    try:
         server.sendmail(fromaddr, toaddrs, msg)
     except smtplib.SMTPRecipientsRefused,e:
         return 0
-  
+
     server.quit()
     return 1
 
@@ -445,43 +452,26 @@ def get_email(uid):
     the user is not found."""
     out = "guest"
     res = run_sql("SELECT email FROM user WHERE id=%s", (uid,), 1)
-    if res and res[0][0]: 
+    if res and res[0][0]:
         out = res[0][0]
     return out
 
 def create_userinfobox_body(uid, language="en"):
-    """Create user info box body for user UID in language LANGUAGE.""" 
+    """Create user info box body for user UID in language LANGUAGE."""
     out = ""
-    if isGuestUser(uid):
-        out += """%s ::
-	       <a class="userinfo" href="%s/youraccount.py/display?ln=%s">%s</a> ::
-               <a class="userinfo" href="%s/youralerts.py/list?ln=%s">%s</a> ::
-               <a class="userinfo" href="%s/yourbaskets.py/display?ln=%s">%s</a> ::
-               <a class="userinfo" href="%s/youraccount.py/login?ln=%s">%s</a>""" % \
-               (msg_guest[language], weburl, language, msg_session[language], weburl, language, msg_alerts[language],
-                weburl, language, msg_baskets[language], weburl, language, msg_login[language])
-    else:
-        out += """%s ::
-	       <a class="userinfo" href="%s/youraccount.py/display?ln=%s">%s</a> ::
-               <a class="userinfo" href="%s/youralerts.py/list?ln=%s">%s</a> ::
-               <a class="userinfo" href="%s/yourbaskets.py/display?ln=%s">%s</a> :: """ % \
-               (get_email(uid), weburl, language, msg_account[language], weburl, language, msg_alerts[language],
-                weburl, language, msg_baskets[language])
-        if isUserSubmitter(uid):
-            out += """<a class="userinfo" href="%s/yoursubmissions.py?ln=%s">%s</a> :: """ % \
-                   (weburl, language, msg_submissions[language])            
-        if isUserReferee(uid):
-            out += """<a class="userinfo" href="%s/yourapprovals.py?ln=%s">%s</a> :: """ % \
-                   (weburl, language, msg_approvals[language])
-        if isUserAdmin(uid):
-            out += """<a class="userinfo" href="%s/youraccount.py/youradminactivities?ln=%s">%s</a> :: """ % \
-                   (weburl, language, msg_administration[language])
-        out += """<a class="userinfo" href="%s/youraccount.py/logout?ln=%s">%s</a>""" % \
-               (weburl, language, msg_logout[language])
-    return """<img src="%s/img/head.gif" border="0"> %s""" % (weburl, out) 
+
+    return tmpl.tmpl_create_userinfobox(
+             ln = language,
+             weburl = weburl,
+             guest = isGuestUser(uid),
+             email = get_email(uid),
+             submitter = isUserSubmitter(uid),
+             referee = isUserReferee(uid),
+             admin = isUserAdmin(uid),
+           )
 
 def list_registered_users():
-    """List all registered users."""    
+    """List all registered users."""
     return run_sql("SELECT id,email FROM user where email!=''")
 
 ## --- follow some functions for Apache user/group authentication
@@ -489,13 +479,13 @@ def list_registered_users():
 def auth_apache_user_p(user, password):
     """Check whether user-supplied credentials correspond to valid
     Apache password data file.  Return 0 in case of failure, 1 in case
-    of success."""    
+    of success."""
     try:
         pipe_input, pipe_output = os.popen2(["/bin/grep", "^" + user + ":", cfg_apache_password_file], 'r')
         line =  pipe_output.readlines()[0]
         password_apache = string.split(string.strip(line),":")[1]
-    except: # no pw found, so return not-allowed status	
-        return 0	
+    except: # no pw found, so return not-allowed status
+        return 0
     salt = password_apache[:2]
     if crypt.crypt(password, salt) == password_apache:
         return 1
@@ -505,7 +495,7 @@ def auth_apache_user_p(user, password):
 def auth_apache_user_in_groups(user):
     """Return list of Apache groups to which Apache user belong."""
     out = []
-    try:        
+    try:
         pipe_input,pipe_output = os.popen2(["/bin/grep", user, cfg_apache_group_file], 'r')
         for line in pipe_output.readlines():
             out.append(string.split(string.strip(line),":")[0])
@@ -517,7 +507,7 @@ def auth_apache_user_collection_p(user, password, coll):
     """Check whether user-supplied credentials correspond to valid
     Apache password data file, and whether this user is authorized to
     see the given collections.  Return 0 in case of failure, 1 in case
-    of success."""    
+    of success."""
     from search_engine import coll_restricted_p, coll_restricted_group
     if not auth_apache_user_p(user, password):
         return 0
@@ -527,7 +517,7 @@ def auth_apache_user_collection_p(user, password, coll):
         return 1
     else:
         return 0
-    
+
 def get_user_preferences(uid):
     pref = run_sql("SELECT id, settings FROM user WHERE id=%s", (uid,))
     if pref:
@@ -540,7 +530,7 @@ def get_user_preferences(uid):
 
 def set_user_preferences(uid, pref):
     res = run_sql("UPDATE user SET settings='%s' WHERE id=%s" % (serialize_via_marshal(pref),uid))
-   
+
 def get_default_user_preferences():
     user_preference = {
         'login_method': ''}
@@ -548,9 +538,9 @@ def get_default_user_preferences():
     for system in CFG_EXTERNAL_AUTHENTICATION.keys():
         if CFG_EXTERNAL_AUTHENTICATION[system][1]:
             user_preference['login_method'] = system
-            break 
+            break
     return user_preference
-    
+
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
     return MySQLdb.escape_string(compress(dumps(obj)))
