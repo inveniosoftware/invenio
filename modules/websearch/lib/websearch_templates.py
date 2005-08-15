@@ -1829,19 +1829,18 @@ class Template:
             for var in ['ot', 'sp', 'rm']:
                 if vars()[var]:
                     out += self.tmpl_input_hidden(name = var, value = vars()[var])
+            if pl_in_url:
+                fieldargs = cgi.parse_qs(pl_in_url)
+                for fieldcode in all_fieldcodes:
+                    # get_fieldcodes():
+                    if fieldargs.has_key(fieldcode):
+                        for val in fieldargs[fieldcode]:
+                            out += self.tmpl_input_hidden(name = cgi.escape(fieldcode), value = cgi.escape(val))
+            out += """&nbsp; %(jump)s <input type="text" name="jrec" size="4" value="%(jrec)d">""" % {
+                     'jump' : _("jump to record"),
+                     'jrec' : jrec,
+                   }
 
-        if pl_in_url:
-            fieldargs = cgi.parse_qs(pl_in_url)
-            for fieldcode in all_fieldcodes:
-                # get_fieldcodes():
-                if fieldargs.has_key(fieldcode):
-                    for val in fieldargs[fieldcode]:
-                        out += self.tmpl_input_hidden(name = cgi.escape(fieldcode), value = cgi.escape(val))
-
-        out += """&nbsp; %(jump)s <input type="text" name="jrec" size="4" value="%(jrec)d">""" % {
-                 'jump' : _("jump to record"),
-                 'jrec' : jrec,
-               }
         if not middle_only:
             out += "</td>"
         else:
