@@ -19,7 +19,8 @@
 
 pylibdir = $(libdir)/python/cdsware
 
-pylib_DATA = websearchadminlib.py search_engine.py search_engine_tests.py search_engine_config.py
+pylib_DATA = websearchadminlib.py websearch_templates.py			\
+             search_engine.py search_engine_config.py search_engine_tests.py  
 
 EXTRA_DIST = $(pylib_DATA)
 

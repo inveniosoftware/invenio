@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## CDSware Search Engine in mod_python.
 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
@@ -13,7 +12,7 @@
 ## The CDSware is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
@@ -21,7 +20,7 @@
 
 """CDSware Search Engine in mod_python."""
 
-__lastupdated__ = """FIXME: last updated"""
+__lastupdated__ = """$Date$"""
 
 __version__ = "$Id$"
 
@@ -51,20 +50,26 @@ import unicodedata
 ## import CDSware stuff:
 from config import *
 from messages import *
-from search_engine_config import * 
-from dbquery import run_sql
+from search_engine_config import *
 from bibrank_record_sorter import get_bibrank_methods,rank_records
 from bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 if cfg_experimental_features:
     from bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
     from bibrank_citation_grapher import create_citation_history_graph_and_box
     from bibrank_downloads_grapher import create_download_history_graph_and_box
+from dbquery import run_sql
 try:
     from mod_python import apache
     from webuser import getUid
     from webpage import pageheaderonly, pagefooteronly, create_error_box
+
 except ImportError, e:
     pass # ignore user personalisation, needed e.g. for command-line
+
+from messages import gettext_set_language
+
+import template
+websearch_templates = template.load('websearch')
 
 ## global vars:
 search_cache = {} # will cache results of previous searches
@@ -122,8 +127,8 @@ def get_alphabetically_ordered_collection_list(collid=1, level=0):
         if level:
             c_printable = " " + level * '-' + " " + c_printable
         out.append([c_name, c_printable])
-    return out    
-    
+    return out
+
 def get_nicely_ordered_collection_list(collid=1, level=0):
     """Returns nicely ordered (score respected) list of collections, more exactly list of tuples
        (collection name, printable collection name).
@@ -188,7 +193,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
         if of.startswith("h"):
             print_warning(req, "This matching type cannot be used within <em>any field</em>.  I will perform a word search instead." )
             print_warning(req, "If you want to phrase/substring/regexp search in a specific field, e.g. inside title, then please choose <em>within title</em> search option.")
-        
+
     ## is desired matching type set?
     if m:
         ## A - matching type is known; good!
@@ -217,24 +222,24 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
         else:
             if of.startswith("h"):
                 print_warning(req, "Matching type '%s' is not implemented yet." % m, "Warning")
-            opfts.append(['|',"%"+p+"%",f,'a'])            
-    else:        
+            opfts.append(['|',"%"+p+"%",f,'a'])
+    else:
         ## B - matching type is not known: let us try to determine it by some heuristics
         if f and p[0]=='"' and p[-1]=='"':
-            ## B0 - does 'p' start and end by double quote, and is 'f' defined? => doing ACC search     
+            ## B0 - does 'p' start and end by double quote, and is 'f' defined? => doing ACC search
             opfts.append(['|',p[1:-1],f,'a'])
         elif f and p[0]=="'" and p[-1]=="'":
-            ## B0bis - does 'p' start and end by single quote, and is 'f' defined? => doing ACC search 
+            ## B0bis - does 'p' start and end by single quote, and is 'f' defined? => doing ACC search
             opfts.append(['|','%'+p[1:-1]+'%',f,'a'])
         elif f and p[0]=="/" and p[-1]=="/":
-            ## B0ter - does 'p' start and end by a slash, and is 'f' defined? => doing regexp search 
+            ## B0ter - does 'p' start and end by a slash, and is 'f' defined? => doing regexp search
             opfts.append(['|',p[1:-1],f,'r'])
         elif f and string.find(p, ',') >= 0:
             ## B1 - does 'p' contain comma, and is 'f' defined? => doing ACC search
             opfts.append(['|',p,f,'a'])
         elif f and str(f[0:2]).isdigit():
             ## B2 - does 'f' exist and starts by two digits?  => doing ACC search
-            opfts.append(['|',p,f,'a'])            
+            opfts.append(['|',p,f,'a'])
         else:
             ## B3 - doing WRD search, but maybe ACC too
             # search units are separated by spaces unless the space is within single or double quotes
@@ -255,8 +260,8 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                     if len(opfts) or pi[0] == '-': # either not first unit, or '-' for the first unit
                         oi = pi[0]
                     else:
-                        oi = "|" # we are in the first unit and operator is not '-', so let us do 
-                                 # set union (with still null result set) 
+                        oi = "|" # we are in the first unit and operator is not '-', so let us do
+                                 # set union (with still null result set)
                     pi = pi[1:]
                 else:
                     # okay, there is no operator, so let us decide what to do by default
@@ -286,11 +291,11 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                             opfts.append([oi,pi,fi,'w'])                            
                     else:
                         # fi is not defined, look at where we are doing exact or subphrase search (single/double quotes):
-                        if pi[0]=='"' and pi[-1]=='"':                        
+                        if pi[0]=='"' and pi[-1]=='"':
                             opfts.append([oi,pi[1:-1],"anyfield",'a'])
                             if of.startswith("h"):
                                 print_warning(req, "Searching for an exact match inside any field may be slow.  You may want to search for words instead, or choose to search within specific field.")
-                        else:                        
+                        else:
                             # nope, subphrase in global index is not possible => change back to WRD search
                             pi = strip_accents(pi) # strip accents for 'w' mode, FIXME: delete when not needed
                             for pii in get_words_from_pattern(pi):
@@ -302,17 +307,17 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                                 print_warning(req, "If you want to do exact phrase matching, then please use double quotes.", "Tip")
                 elif fi and str(fi[0]).isdigit() and str(fi[0]).isdigit():
                     # B3b - fi exists and starts by two digits => do ACC search
-                    opfts.append([oi,pi,fi,'a'])            
+                    opfts.append([oi,pi,fi,'a'])
                 elif fi and not get_index_id(fi):
                     # B3c - fi exists but there is no words table for fi => try ACC search
-                    opfts.append([oi,pi,fi,'a'])            
-                elif fi and pi.startswith('/') and pi.endswith('/'): 
+                    opfts.append([oi,pi,fi,'a'])
+                elif fi and pi.startswith('/') and pi.endswith('/'):
                     # B3d - fi exists and slashes found => try regexp search
-                    opfts.append([oi,pi[1:-1],fi,'r'])            
+                    opfts.append([oi,pi[1:-1],fi,'r'])
                 else:
-                    # B3e - general case => do WRD search                    
+                    # B3e - general case => do WRD search
                     pi = strip_accents(pi) # strip accents for 'w' mode, FIXME: delete when not needed
-                    for pii in get_words_from_pattern(pi): 
+                    for pii in get_words_from_pattern(pi):
                         opfts.append([oi,pii,fi,'w'])
 
     ## sanity check:
@@ -353,7 +358,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=msg_search_results[cdslan
         req.content_type = "text/plain"
         req.send_http_header()
     elif of == "id":
-        pass # nothing to do, we shall only return list of recIDs 
+        pass # nothing to do, we shall only return list of recIDs
     else:
         # we are doing HTML output:
         req.content_type = "text/html"
@@ -365,8 +370,8 @@ def page_start(req, of, cc, as, ln, uid, title_message=msg_search_results[cdslan
                                  uid=uid,
                                  language=ln,
                                  urlargs=req.args))
-        req.write("""<div class="pagebody">""")
-    
+        req.write(websearch_templates.tmpl_search_pagestart(ln = ln))
+
 def page_end(req, of="hb", ln=cdslang):
     "End page according to given output format: e.g. close XML tags, add HTML footer, etc."
     if of == "id":
@@ -374,11 +379,11 @@ def page_end(req, of="hb", ln=cdslang):
     if not req: 
         return # we were called from CLI
     if of.startswith('h'):
-        req.write("""</div>""") # pagebody end
+        req.write(websearch_templates.tmpl_search_pageend(ln = ln)) # pagebody end
         req.write(pagefooteronly(lastupdated=__lastupdated__, language=ln, urlargs=req.args))
     elif of.startswith('x'):
         req.write("""</collection>\n""")
-    return "\n"    
+    return "\n"
 
 def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_day=0, ln=cdslang):
     "Produces 'From Date', 'Until Date' kind of selection box.  Suitable for search options."
@@ -403,7 +408,7 @@ def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_
     this_year = int(time.strftime("%Y", time.localtime()))
     for year in range(this_year-20, this_year+1):
         box += """<option value="%d"%s>%d""" % (year, is_selected(year, selected_year), year)
-    box += """</select>"""        
+    box += """</select>"""
     return box
 
 def create_google_box(cc, p, f, p1, p2, p3, ln=cdslang,
@@ -413,7 +418,6 @@ def create_google_box(cc, p, f, p1, p2, p3, ln=cdslang,
                       link_separator= """<br>""",
                       epilog="""</td></tr></table>"""):
     "Creates the box that proposes links to other useful search engines like Google.  'p' is the search pattern."
-    out_links = []
     if not p and (p1 or p2 or p3):
         p = p1 + " " + p2 + " " + p3
     # check suitable p's whether we want to print it
@@ -425,442 +429,145 @@ def create_google_box(cc, p, f, p1, p2, p3, ln=cdslang,
         return ""
     # remove our logical field index names:
     p = sre.sub(r'\w+:', '', p)
-    p_quoted = urllib.quote(p)
-    # Amazon
-    if cfg_google_box_servers.get('Amazon', 0):
-        if string.find(cc, "Book") >= 0:
-            if f == "author":
-                out_links.append("""<a class="google" href="http://www.amazon.com/exec/obidos/external-search/?field-author=%s&tag=cern">%s %s Amazon</a>""" % (p_quoted, p, msg_in[ln]))                
-            else:
-                out_links.append("""<a class="google" href="http://www.amazon.com/exec/obidos/external-search/?keyword=%s&tag=cern">%s %s Amazon</a>""" % (p_quoted, p, msg_in[ln]))
-    # CERN Intranet:
-    if cfg_google_box_servers.get('CERN Intranet', 0):
-        out_links.append("""<a class="google" href="http://search.cern.ch/query.html?qt=%s">%s %s CERN&nbsp;Intranet</a>""" % (urllib.quote(string.replace(p, ' ', ' +')), p, msg_in[ln]))
-    # CERN Agenda:
-    if cfg_google_box_servers.get('CERN Agenda', 0):
-        if f == "author":
-            out_links.append("""<a class="google" href="http://agenda.cern.ch/search.php?field=speaker&keywords=%s&search=Search">%s %s CERN&nbsp;Agenda</a>""" % (p_quoted, p, msg_in[ln]))
-        elif f == "title":
-            out_links.append("""<a class="google" href="http://agenda.cern.ch/search.php?field=title&keywords=%s&search=Search">%s %s CERN&nbsp;Agenda</a>""" % (p_quoted, p, msg_in[ln]))
-    # CERN EDMS:
-    if cfg_google_box_servers.get('CERN Agenda', 0):
-        # FIXME: reusing CERN Agenda config variable until we can enter CERN EDMS into config.wml
-        if f == "author":
-            out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=ADVANCED&p_author=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, msg_in[ln]))
-        elif f == "title" or f == "abstract" or f == "keyword":
-            out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=ADVANCED&p_title=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, msg_in[ln]))
-        elif f == "reportnumber":
-            out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=ADVANCED&p_document_id=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, msg_in[ln]))
-        else:
-            out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=BASE&p_free_text=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, msg_in[ln]))
-    # CiteSeer:
-    if cfg_google_box_servers.get('CiteSeer', 0):
-        out_links.append("""<a class="google" href="http://citeseer.ist.psu.edu/cs?q=%s">%s %s CiteSeer</a>""" % (p_quoted, p, msg_in[ln]))        
-    # Google Print:
-    if cfg_google_box_servers.get('Google Scholar', 0):
-        # FIXME: reusing Google Scholar config variable until we can enter Google Print into config.wml
-        if string.find(cc, "Book") >= 0:
-            out_links.append("""<a class="google" href="http://print.google.com/print?q=%s">%s %s Google Print</a>""" % (p_quoted, p, msg_in[ln]))
-    # Google Scholar:
-    if cfg_google_box_servers.get('Google Scholar', 0):
-        if f == "author":
-            out_links.append("""<a class="google" href="http://scholar.google.com/scholar?q=author%%3A%s">%s %s Google Scholar</a>""" % (p_quoted, p, msg_in[ln]))
-        else:
-            out_links.append("""<a class="google" href="http://scholar.google.com/scholar?q=%s">%s %s Google Scholar</a>""" % (p_quoted, p, msg_in[ln]))        
-    # Google Web:
-    if cfg_google_box_servers.get('Google Web', 0):
-        if f == "author":
-            p_google = p
-            if string.find(p, ",") >= 0 and (not p.startswith('"')) and (not p.endswith('"')):
-                p_lastname, p_firstnames = string.split(p, ",", 1)
-                p_google = '"%s %s" OR "%s %s"' % (p_lastname, p_firstnames, p_firstnames, p_lastname) 
-            out_links.append("""<a class="google" href="http://google.com/search?q=%s">%s %s Google Web</a>""" % (urllib.quote(p_google), p_google, msg_in[ln]))
-        else:
-            out_links.append("""<a class="google" href="http://google.com/search?q=%s">%s %s Google Web</a>""" % (p_quoted, p, msg_in[ln]))
-    # IEC
-    if cfg_google_box_servers.get('IEC', 0):
-        if string.find(cc, "Standard") >= 0:
-            out_links.append("""<a class="google" href="http://www.iec.ch/cgi-bin/procgi.pl/www/iecwww.p?wwwlang=E&wwwprog=sea22.p&search=text&searchfor=%s">%s %s IEC</a>""" % (p_quoted, p, msg_in[ln]))
-    # IHS
-    if cfg_google_box_servers.get('IHS', 0):
-        if string.find(cc, "Standard") >= 0:
-            out_links.append("""<a class="google" href="http://global.ihs.com/search_res.cfm?&input_doc_title=%s">%s %s IHS</a>""" % (p_quoted, p, msg_in[ln]))
-    # INSPEC
-    if cfg_google_box_servers.get('INSPEC', 0):
-        if f == "author":
-            p_inspec = sre.sub(r'(, )| ', '-', p)
-            p_inspec = sre.sub(r'(-\w)\w+$', '\\1', p_inspec)
-            out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.au.">%s %s INSPEC</a>""" % (urllib.quote(p_inspec), p_inspec, msg_in[ln])) 
-        elif f == "title":
-            out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.ti.">%s %s INSPEC</a>""" % (p_quoted, p, msg_in[ln]))
-        elif f == "abstract":
-            out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.ab.">%s %s INSPEC</a>""" % (p_quoted, p, msg_in[ln]))               
-        elif f == "year":
-            out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.yr.">%s %s INSPEC</a>""" % (p_quoted, p, msg_in[ln]))
-    # ISO
-    if cfg_google_box_servers.get('ISO', 0):
-        if string.find(cc, "Standard") >= 0:
-            out_links.append("""<a class="google" href="http://www.iso.org/iso/en/StandardsQueryFormHandler.StandardsQueryFormHandler?languageCode=en&keyword=%s&lastSearch=false&title=true&isoNumber=&isoPartNumber=&isoDocType=ALL&isoDocElem=ALL&ICS=&stageCode=&stagescope=Current&repost=1&stagedatepredefined=&stageDate=&committee=ALL&subcommittee=&scopecatalogue=CATALOGUE&scopeprogramme=PROGRAMME&scopewithdrawn=WITHDRAWN&scopedeleted=DELETED&sortOrder=ISO">%s %s ISO</a>""" % (p_quoted, p, msg_in[ln]))
-    # KEK
-    if cfg_google_box_servers.get('KEK', 0):
-        kek_search_title = "KEK KISS Preprints"
-        kek_search_baseurl = "http://www-lib.kek.jp/cgi-bin/kiss_prepri?"
-        if string.find(cc, "Book") >= 0:
-            kek_search_title = "KEK Library Books"
-            kek_search_baseurl = "http://www-lib.kek.jp/cgi-bin/kiss_book?DSP=1&"            
-        elif string.find(cc, "Periodical") >= 0:
-            kek_search_title = "KEK Library Journals"
-            kek_search_baseurl = "http://www-lib.kek.jp/cgi-bin/kiss_book?DSP=2&"
-        if f == "author":
-            out_links.append("""<a class="google" href="%sAU=%s">%s %s %s</a>""" % \
-                             (kek_search_baseurl, p_quoted, p, msg_in[ln], kek_search_title))       
-        elif f == "title":
-            out_links.append("""<a class="google" href="%sTI=%s">%s %s %s</a>""" % \
-                             (kek_search_baseurl, p_quoted, p, msg_in[ln], kek_search_title))        
-        elif f == "reportnumber":
-            out_links.append("""<a class="google" href="%sRP=%s">%s %s %s</a>""" % \
-                             (kek_search_baseurl, p_quoted, p, msg_in[ln], kek_search_title))        
-    # NEBIS
-    if cfg_google_box_servers.get('NEBIS', 0):
-        if string.find(cc, "Book") >= 0:
-            if f == "author":
-                out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WAU">%s %s NEBIS</a>""" % (p_quoted, p, msg_in[ln]))                
-            elif f == "title":
-                out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WTI">%s %s NEBIS</a>""" % (p_quoted, p, msg_in[ln]))               
-            else:
-                out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WRD">%s %s NEBIS</a>""" % (p_quoted, p, msg_in[ln]))
-    # Scirus:
-    if cfg_google_box_servers.get('Google Scholar', 0):
-        # FIXME: reusing Google Scholar config variable until we can enter Scirus into config.wml
-        if f == "author":
-            out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=author%%3A%s">%s %s Scirus</a>""" % (p_quoted, p, msg_in[ln]))
-        elif f == "title":
-            out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=title%%3A%s">%s %s Scirus</a>""" % (p_quoted, p, msg_in[ln]))
-        elif f == "keyword":
-            out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=keywords%%3A%s">%s %s Scirus</a>""" % (p_quoted, p, msg_in[ln]))
-        else:
-            out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=%s">%s %s Scirus</a>""" % (p_quoted, p, msg_in[ln]))
-    # SPIRES
-    if cfg_google_box_servers.get('SPIRES', 0):
-        spires_search_title = "SLAC SPIRES HEP"
-        spires_search_baseurl = "http://www.slac.stanford.edu/spires/find/hep/"
-        if string.find(cc, "Book") >= 0:
-            spires_search_title = "SLAC Library Books"
-            spires_search_baseurl = "http://www.slac.stanford.edu/spires/find/books/"            
-        elif string.find(cc, "Periodical") >= 0:
-            spires_search_title = "SLAC Library Journals"
-            spires_search_baseurl = "http://www.slac.stanford.edu/spires/find/tserials/"            
-        if f == "author":
-            out_links.append("""<a class="google" href="%swww?AUTHOR=%s">%s %s %s</a>""" % \
-                   (spires_search_baseurl, p_quoted, p, msg_in[ln], spires_search_title))
-        elif f == "title":
-            out_links.append("""<a class="google" href="%swww?TITLE=%s">%s %s %s</a>""" % \
-                   (spires_search_baseurl, p_quoted, p, msg_in[ln], spires_search_title))
-        elif f == "reportnumber":
-            out_links.append("""<a class="google" href="%swww?REPORT-NUM=%s">%s %s %s</a>""" % \
-                   (spires_search_baseurl, p_quoted, p, msg_in[ln], spires_search_title))
-        elif f == "keyword":
-            out_links.append("""<a class="google" href="%swww?k=%s">%s %s %s</a>""" % \
-                   (spires_search_baseurl, p_quoted, p, msg_in[ln], spires_search_title))
-        else: # invent a poor man's any field search since SPIRES doesn't support one
-            out_links.append("""<a class="google" href="%swww?rawcmd=find+t+%s+or+a+%s+or+k+%s+or+s+%s+or+r+%s">%s %s %s</a>""" % \
-            (spires_search_baseurl, p_quoted, p_quoted, p_quoted, p_quoted, p_quoted, p, msg_in[ln], spires_search_title))
-    # okay, so print the box now:
-    out = ""
-    if out_links:
-        out += """<a name="googlebox"></a>"""
-        out += prolog_start + msg_not_found_what_you_were_looking_for[ln] + prolog_end
-        nb_out_links_in_one_column = len(out_links)/2 
-        out += string.join(out_links[:nb_out_links_in_one_column], link_separator)
-        out += column_separator
-        out += string.join(out_links[nb_out_links_in_one_column:], link_separator)
-        out += epilog
-    return out
+
+    return websearch_templates.tmpl_google_box(
+             ln = ln,
+             cc = cc,
+             p = p,
+             f = f,
+             prolog_start = prolog_start,
+             prolog_end = prolog_end,
+             column_separator = column_separator,
+             link_separator = link_separator,
+             epilog = epilog,
+           )
 
 def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1, p2, f2, m2, op2, p3, f3, m3, sc, pl,
                       d1y, d1m, d1d, d2y, d2m, d2d, action=""):
     "Create search box for 'search again in the results page' functionality."
-    out = ""    
-    # print search box prolog:
+
+    # load the right message language
+    _ = gettext_set_language(ln)
+
+    # some computations
     if cc == cdsname:
         cc_intl = cdsnameintl[ln]
     else:
         cc_intl = get_coll_i18nname(cc, ln)
-    out += """
-    <h1 class="headline">%s</h1>
-    <form action="%s/search.py" method="get">
-    <input type="hidden" name="cc" value="%s"> 
-    <input type="hidden" name="as" value="%s">
-    <input type="hidden" name="ln" value="%s">
-    """ % (cc_intl, weburl, cc, as, ln)
-    if ot:
-        out += """<input type="hidden" name="ot" value="%s">""" % ot
-    if sp:
-        out += """<input type="hidden" name="sp" value="%s">""" % sp 
 
-    # decide upon leading text:
-    leadingtext = msg_search[ln]
-    if action == msg_browse[ln]:
-        leadingtext = msg_browse[ln]
-    ## firstly, print Query box:
-    if as==1:
-        # print Advanced Search form:
-        # define search box elements:
-        cell_1_left = create_matchtype_box('m1', m1, ln=ln) + \
-                      """<input type="text" name="p1" size="%d" value="%s">""" % (cfg_advancedsearch_pattern_box_width, cgi.escape(p1,1))
-        cell_1_right = create_searchwithin_selection_box('f1', f1, ln=ln)
-        cell_1_moreright = create_andornot_box('op1', op1, ln=ln)
-        cell_2_left = create_matchtype_box('m2', m2, ln=ln) + """<input type="text" name="p2" size="%d" value="%s">""" % (cfg_advancedsearch_pattern_box_width, cgi.escape(p2,1))
-        cell_2_right = create_searchwithin_selection_box('f2', f2, ln=ln)
-        cell_2_moreright = create_andornot_box('op2', op2, ln=ln)
-        cell_3_left = create_matchtype_box('m3', m3, ln=ln) + """<input type="text" name="p3" size="%d" value="%s">""" % (cfg_advancedsearch_pattern_box_width, cgi.escape(p3,1))
-        cell_3_right = create_searchwithin_selection_box('f3', f3, ln=ln)
-        cell_3_moreright = """<input class="formbutton" type="submit" name="action" value="%s"><input class="formbutton" type="submit" name="action" value="%s">&nbsp;""" % (msg_search[ln], msg_browse[ln])
-        cell_4 = """<small><a href="%s/help/search/tips.%s.html">%s</a> ::
-                           <a href="%s/search.py?p=%s&amp;f=%s&amp;rm=%s&amp;cc=%s&amp;ln=%s">%s</a></small>""" % \
-                    (weburl, ln, msg_search_tips[ln], weburl, urllib.quote(p1), urllib.quote(f1), urllib.quote(rm), urllib.quote(cc), ln, msg_simple_search[ln])
-        if cfg_google_box and (p1 or p2 or p3):
-            cell_4 += """<small> :: <a href="#googlebox">%s</a></small>""" % msg_try_your_search_on[ln]
-        # print them:
-        out += """
-        <table class="searchbox">
-         <thead>
-          <tr>
-           <th colspan="3" class="searchboxheader">
-            %s:
-           </th>
-          </tr> 
-         </thead>
-         <tbody>
-          <tr valign="top">
-            <td class="searchboxbody">%s</td>
-            <td class="searchboxbody">%s</td>
-            <td class="searchboxbody">%s</td>
-          </tr>
-          <tr valign="bottom">
-            <td class="searchboxbody">%s</td>
-            <td class="searchboxbody">%s</td>
-            <td class="searchboxbody">%s</td>
-          </tr>
-          <tr valign="bottom">
-            <td class="searchboxbody">%s</td>
-            <td class="searchboxbody">%s</td>
-            <td class="searchboxbody">%s</td>
-          </tr>
-          <tr valign="bottom">
-            <td colspan="3" align="right" class="searchboxbody">%s</td>
-          </tr>
-         </tbody>
-        </table>
-        """ % \
-         (leadingtext,
-          cell_1_left, cell_1_right, cell_1_moreright, \
-          cell_2_left, cell_2_right, cell_2_moreright, \
-          cell_3_left, cell_3_right, cell_3_moreright,
-          cell_4)         
-    else:
-        # print Simple Search form:
-        cell_1_left = """<input type="text" name="p" size="%d" value="%s">""" % \
-        (cfg_simplesearch_pattern_box_width, cgi.escape(p, 1))
-        cell_1_middle = create_searchwithin_selection_box('f', f, ln=ln)
-        cell_1_right = """<input class="formbutton" type="submit" name="action" value="%s"><input class="formbutton" type="submit" name="action" value="%s">&nbsp;""" % (msg_search[ln], msg_browse[ln])
-        cell_2 = """<small><a href="%s/help/search/tips.%s.html">%s</a> ::
-                           <a href="%s/search.py?p1=%s&amp;f1=%s&amp;rm=%s&amp;as=1&amp;cc=%s&amp;ln=%s">%s</a></small>""" %\
-                          (weburl, ln, msg_search_tips[ln], weburl, urllib.quote(p), urllib.quote(f), urllib.quote(rm), urllib.quote(cc), ln, msg_advanced_search[ln])
-        if cfg_google_box and p:
-            cell_2 += """<small> :: <a href="#googlebox">%s</a></small>""" % msg_try_your_search_on[ln]
-        out += """
-        <table class="searchbox">
-         <thead>
-          <tr>
-           <th colspan="3" class="searchboxheader">
-            %s:
-           </th>
-          </tr> 
-         </thead>
-         <tbody>
-          <tr valign="top">
-            <td class="searchboxbody">%s</td>
-            <td class="searchboxbody">%s</td>
-            <td class="searchboxbody">%s</td>
-          </tr>
-          <tr valign="bottom">
-            <td colspan="3" align="right" class="searchboxbody">%s</td>
-          </tr>
-         </tbody>
-        </table> 
-        """ % (leadingtext,
-               cell_1_left, cell_1_middle, cell_1_right,
-               cell_2)
-    ## secondly, print Collection(s) box:
-    out += """
-        <table class="searchbox">
-         <thead>
-          <tr>
-           <th colspan="3" class="searchboxheader">
-            %s %s:
-           </th>
-          </tr> 
-         </thead>
-         <tbody>
-          <tr valign="bottom">
-           <td valign="top" class="searchboxbody">""" % (leadingtext, msg_collections[ln])
     colls_nicely_ordered = []
     if cfg_nicely_ordered_collection_list:
         colls_nicely_ordered = get_nicely_ordered_collection_list()
     else:
-        colls_nicely_ordered = get_alphabetically_ordered_collection_list()    
+        colls_nicely_ordered = get_alphabetically_ordered_collection_list()
+
+    colls_nice = []
+    for (cx, cx_printable) in colls_nicely_ordered:
+        if not cx.startswith("Unnamed collection"):
+            colls_nice.append({ 'value' : cx,
+                                'text' : cx_printable
+                              })
+
+    coll_selects = []
     if colls and colls[0] != cdsname:
         # some collections are defined, so print these first, and only then print 'add another collection' heading:
         for c in colls:
             if c:
-                out += """<select name="c"><option value="">*** %s ***""" % msg_any_collection[ln]
-                for (cx, cx_printable) in colls_nicely_ordered:
+                temp = []
+                temp.append({ 'value' : '',
+                              'text' : '*** %s ***' % _("any collection")
+                            })
+                for val in colls_nice:
                     # print collection:
-                    if not cx.startswith("Unnamed collection"):                    
-                        out+= """<option value="%s"%s>%s""" % (cx, is_selected(c, sre.sub("^[\s\-]*","",cx)), cx_printable)
-                out += """</select>"""
-        out += """<select name="c"><option value="">*** %s ***""" % msg_add_another_collection[ln]
+                    if not cx.startswith("Unnamed collection"):
+                        temp.append({ 'value' : val['value'],
+                                      'text' : val['text'],
+                                      'selected' : (c == sre.sub("^[\s\-]*","", val['value']))
+                                    })
+                coll_selects.append(temp)
+        coll_selects.append([{ 'value' : '',
+                               'text' : '*** %s ***' % _("add another collection")
+                             }] + colls_nice)
     else: # we searched in CDSNAME, so print 'any collection' heading
-        out += """<select name="c"><option value="">*** %s ***""" % msg_any_collection[ln]
-    for (cx, cx_printable) in colls_nicely_ordered:
-        if not cx.startswith("Unnamed collection"):
-            out += """<option value="%s">%s""" % (cx, cx_printable)
-    out += """
-    </select>
-    </td>
-    </tr>
-    </tbody>
-    </table>"""
-    ## thirdly, print search limits, if applicable:
-    if action != msg_browse[ln] and pl:
-        out += """<table class="searchbox">
-                   <thead> 
-                    <tr>
-                      <th class="searchboxheader">
-                        Limit to:
-                      </th>
-                    </tr>
-                   </thead>
-                   <tbody>
-                    <tr valign="bottom">
-                      <td class="searchboxbody">
-                       <input type="text" name="pl" size="%d" value="%s">
-                      </td>
-                    </tr>
-                   </tbody>
-                  </table>""" % (cfg_simplesearch_pattern_box_width, cgi.escape(pl, 1))
-    ## fourthly, print from/until date boxen, if applicable:
-    if action==msg_browse[ln] or (d1y==0 and d1m==0 and d1d==0 and d2y==0 and d2m==0 and d2d==0):
-        pass # do not need it
-    else:
-        cell_6_a = create_inputdate_box("d1", d1y, d1m, d1d, ln=ln)
-        cell_6_b = create_inputdate_box("d2", d2y, d2m, d2d, ln=ln)
-        out += """<table class="searchbox">
-                   <thead> 
-                    <tr>
-                      <th class="searchboxheader">
-                        %s
-                      </th>
-                      <th class="searchboxheader">
-                        %s
-                      </th>                      
-                    </tr>
-                   </thead>
-                   <tbody>
-                    <tr valign="bottom">
-                      <td class="searchboxbody">%s</td>
-                      <td class="searchboxbody">%s</td>
-                    </tr>
-                   </tbody>
-                  </table>""" % \
-           (msg_added_since[ln], msg_until[ln], cell_6_a, cell_6_b)        
-    ## fifthly, print Display results box, including sort/rank, formats, etc:
-    if action != msg_browse[ln]:
-        # sort by:
-        cell_7_a = """
-        <select name="sf" class="address">
-        <option value="">- %s -""" % (msg_latest_first[ln])
-        query = """SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
-                    WHERE cff.type='soo' AND cff.id_field=f.id
-                    ORDER BY cff.score DESC, f.name ASC""" 
-        res = run_sql(query)
+        coll_selects.append([{ 'value' : '',
+                               'text' : '*** %s ***' % _("any collection")
+                             }] + colls_nice)
+
+    sort_formats = [{
+                      'value' : '',
+                      'text' : _("latest first")
+                    }]
+    query = """SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
+                WHERE cff.type='soo' AND cff.id_field=f.id
+                ORDER BY cff.score DESC, f.name ASC"""
+    res = run_sql(query)
+    for code, name in res:
+        sort_formats.append({
+                              'value' : code,
+                              'text' : name,
+                            })
+
+    ## ranking methods
+    ranks = [{
+               'value' : '',
+               'text' : "- %s %s -" % (_("or"), _("rank by")),
+             }]
+    for (code,name) in get_bibrank_methods(get_colID(cc), ln):
+        # propose found rank methods:
+        ranks.append({
+                       'value' : code,
+                       'text' : name,
+                     })
+
+    formats = []
+    query = """SELECT code,name FROM format ORDER BY name ASC"""
+    res = run_sql(query)
+    if res:
+        # propose found formats:
         for code, name in res:
-            # propose found sort options:
-            cell_7_a += """<option value="%s"%s>%s""" % (code, is_selected(sf,code), name)
-        cell_7_a += """</select>"""
-        cell_7_a += """<select name="so" class="address">
-                          <option value="a"%s>%s
-                          <option value="d"%s>%s
-                          </select>""" % (is_selected(so,"a"), msg_ascending[ln], is_selected(so,"d"), msg_descending[ln])
-        # rank by:
-        cell_7_a += """
-        <select name="rm" class="address">
-        <option value="">- %s %s -""" % (string.lower(msg_or[ln]), msg_rank_by[ln])
-        for (code,name) in get_bibrank_methods(get_colID(cc), ln):
-            # propose found rank methods:
-            cell_7_a += """<option value="%s"%s>%s""" % (code, is_selected(rm,code), name)
-        cell_7_a += """</select>"""
-        # display formats:
-        cell_7_c = """
-        <select name="of" class="address">"""
-        query = """SELECT code,name FROM format ORDER BY name ASC""" 
-        res = run_sql(query)
-        if res:
-            # propose found formats:
-            for code, name in res:
-                cell_7_c += """<option value="%s"%s>%s""" % (code, is_selected(of,code), name)
-        else:
-            # no formats are found, so propose the default HTML one:
-            cell_7_c += """<option value="hb"%s>HTML %s""" % (is_selected(of,"hb"), msg_brief[ln])
-        # is format made of numbers only? if yes, then propose it too:
-        if of and str(of[0:3]).isdigit():
-            cell_7_c += """<option value="%s" selected>%s MARC tag""" % (of, of)
-        cell_7_c += """</select>"""
-        # records in groups of: 
-        cell_7_b = """
-        <select name="rg" class="address">
-        <option value="10"%s>10 %s
-        <option value="25"%s>25 %s
-        <option value="50"%s>50 %s
-        <option value="100"%s>100 %s
-        <option value="250"%s>250 %s
-        <option value="500"%s>500 %s
-        </select>
-        <select name="sc" class="address">
-        <option value="0"%s>%s
-        <option value="1"%s>%s
-        </select> 
-        """ % (is_selected(rg,"10"), msg_results[ln], is_selected(rg,"25"), msg_results[ln], is_selected(rg,"50"), msg_results[ln], \
-               is_selected(rg,"100"), msg_results[ln], is_selected(rg,"250"), msg_results[ln], is_selected(rg,"500"), msg_results[ln], \
-               is_selected(sc,"0"), msg_single_list[ln], is_selected(sc,"1"), msg_split_by_collection[ln])
-        out += """
-            <table class="searchbox">
-             <thead>
-              <tr>
-               <th class="searchboxheader">
-                %s
-               </th>
-               <th class="searchboxheader">
-                %s
-               </th>
-               <th class="searchboxheader">
-                %s
-               </th>
-              </tr> 
-             </thead>
-             <tbody>
-              <tr valign="bottom">
-               <td valign="top" class="searchboxbody">%s</td>
-               <td valign="top" class="searchboxbody">%s</td>
-               <td valign="top" class="searchboxbody">%s</td>
-              </tr>
-             </tbody>
-            </table>""" % (msg_sort_by[ln], msg_display_results[ln], msg_output_format[ln], cell_7_a, cell_7_b, cell_7_c)
-    ## last but not least, print end of search box:
-    out += """</form>"""
-    ## now return the search box:
-    return out
+            formats.append({ 'value' : code,
+                             'text' : name
+                           })
+    else:
+        formats.append({'value' : 'hb',
+                        'text' : _("HTML brief")
+                       })
+
+    return websearch_templates.tmpl_search_box(
+             ln = ln,
+             weburl = weburl,
+             as = as,
+             cc_intl = cc_intl,
+             cc = cc,
+             ot = ot,
+             sp = sp,
+             action = action,
+             fieldslist = get_searchwithin_fields(ln = ln),
+             f1 = f1,
+             f2 = f2,
+             f3 = f3,
+             m1 = m1,
+             m2 = m2,
+             m3 = m3,
+             p1 = p1,
+             p2 = p2,
+             p3 = p3,
+             op1 = op1,
+             op2 = op2,
+             rm = rm,
+             p = p,
+             f = f,
+             coll_selects = coll_selects,
+             d1y = d1y, d2y = d2y, d1m = d1m, d2m = d2m, d1d = d1d, d2d = d2d,
+             sort_formats = sort_formats,
+             sf = sf,
+             so = so,
+             ranks = ranks,
+             sc = sc,
+             rg = rg,
+             formats = formats,
+             of = of,
+           )
 
 def create_navtrail_links(cc=cdsname,
                           as=0,
@@ -868,21 +575,22 @@ def create_navtrail_links(cc=cdsname,
                           self_p=1,
                           separator=" &gt; "):
     """Creates navigation trail links, i.e. links to collection ancestors (except Home collection).
-    If as==1, then links to Advanced Search interfaces; otherwise Simple Search.        
+    If as==1, then links to Advanced Search interfaces; otherwise Simple Search.
     """
-    out = ""
+
+    dads = []
     for dad in get_coll_ancestors(cc):
         if dad != cdsname: # exclude Home collection
-            if out:
-                out += separator
-            out += """<a class="navtrail" href="%s/?c=%s&amp;as=%d&amp;ln=%s">%s</a>""" % \
-                   (weburl, urllib.quote_plus(dad), as, ln, get_coll_i18nname(dad, ln))
+            dads.append ((dad, get_coll_i18nname (dad, ln)))
+
     if self_p and cc != cdsname:
-        if out:
-            out += separator
-        out += """<a class="navtrail" href="%s/?c=%s&amp;as=%d&amp;ln=%s">%s</a>""" % \
-               (weburl, urllib.quote_plus(cc), as, ln, get_coll_i18nname(cc, ln))        
-    return out
+        dads.append ((cc, get_coll_i18nname(cc, ln)))
+
+    return websearch_templates.tmpl_navtrail_links (as = as,
+                                     ln = ln,
+                                     weburl = weburl,
+                                     separator = separator,
+                                     dads = dads)
 
 def create_searchwithin_selection_box(fieldname='f', value='', ln='en'):
     "Produces 'search within' selection box for the current collection."
@@ -897,8 +605,23 @@ def create_searchwithin_selection_box(fieldname='f', value='', ln='en'):
                                                     get_field_i18nname(field_name, ln))
     if value and str(value[0]).isdigit():
         out += """<option value="%s" selected>%s MARC tag""" % (value, value)
-    out += """</select>""" 
+    out += """</select>"""
     return out
+
+def get_searchwithin_fields(ln='en'):
+    "Retrieves the fields name used in the 'search within' selection box for the current collection."
+    query = "SELECT code,name FROM field ORDER BY name ASC"
+    res = run_sql(query)
+    fields = [{
+                'value' : '',
+                'text' : get_field_i18nname("any field", ln)
+              }]
+    for field_code, field_name in res:
+        if field_code and field_code != "anyfield":
+            fields.append({ 'value' : field_code,
+                            'text' : get_field_i18nname(field_name, ln)
+                          })
+    return fields
 
 def create_andornot_box(name='op', value='', ln='en'):
     "Returns HTML code for the AND/OR/NOT selection box."
@@ -934,6 +657,9 @@ def create_matchtype_box(name='m', value='', ln='en'):
 
 def nice_number(num, ln=cdslang):
     "Returns nicely printed number NUM in language LN using thousands separator char defined in the I18N messages file."
+
+    if num is None: return None
+
     chars_in = list(str(num))
     num = len(chars_in)
     chars_out = []
@@ -1039,7 +765,7 @@ class HitSet:
     def __getitem__(self, index):
         "Support for the 'for item in set:' protocol."
         return Numeric.nonzero(self._set)[index]
-        
+
     def calculate_nbhits(self):
         "Calculates the number of records set in the hitset."
         self._nbhits = Numeric.sum(self._set.copy().astype(Numeric.Int))
@@ -1086,7 +812,7 @@ def wash_colls(cc, c, split_colls=0):
            of collections, i.e. collections as they appear on the page
            we started to search from;
     """
-       
+
     colls_out = []
     colls_out_for_display = []
 
@@ -1125,7 +851,7 @@ def wash_colls(cc, c, split_colls=0):
     l_cc_nonrestricted_sons = []
     l_c = colls
     for row in res:
-        l_cc_nonrestricted_sons.append(row[0]) 
+        l_cc_nonrestricted_sons.append(row[0])
     l_c.sort()
     l_cc_nonrestricted_sons.sort()
     if l_cc_nonrestricted_sons == l_c:
@@ -1136,7 +862,7 @@ def wash_colls(cc, c, split_colls=0):
     # remove duplicates:
     colls_out_for_display_nondups=filter(lambda x, colls_out_for_display=colls_out_for_display: colls_out_for_display[x-1] not in colls_out_for_display[x:], range(1, len(colls_out_for_display)+1))
     colls_out_for_display = map(lambda x, colls_out_for_display=colls_out_for_display:colls_out_for_display[x-1], colls_out_for_display_nondups)
-        
+
     # second, let us decide on collection splitting:
     if split_colls == 0:
         # type A - no sons are wanted
@@ -1188,7 +914,7 @@ def strip_accents(x):
     y = sre_unicode_uppercase_n.sub("N", y)
     # return UTF-8 representation of the Unicode string:
     return y.encode("utf-8")
- 
+
 def wash_pattern(p):
     """Wash pattern passed by URL. Check for sanity of the wildcard by
     removing wildcards if they are appended to extremely short words
@@ -1198,14 +924,14 @@ def wash_pattern(p):
     # strip accents:
     # p = strip_accents(p) # FIXME: when available, strip accents all the time
     # add leading/trailing whitespace for the two following wildcard-sanity checking regexps:
-    p = " " + p + " " 
+    p = " " + p + " "
     # get rid of wildcards at the beginning of words:
     p = sre_pattern_wildcards_at_beginning.sub("\\1", p)
     # replace spaces within quotes by __SPACE__ temporarily:
     p = sre_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p) 
     p = sre_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", p) 
     p = sre_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", p)
-    # get rid of extremely short words (1-3 letters with wildcards): 
+    # get rid of extremely short words (1-3 letters with wildcards):
     p = sre_pattern_short_words.sub("\\1", p)
     # replace back __SPACE__ by spaces:
     p = sre_pattern_space.sub(" ", p)
@@ -1214,7 +940,7 @@ def wash_pattern(p):
     # remove unnecessary whitespace:
     p = string.strip(p)
     return p
-    
+
 def wash_field(f):
     """Wash field passed by URL."""
     # get rid of unnecessary whitespace:
@@ -1227,7 +953,7 @@ def wash_field(f):
 def wash_dates(d1y, d1m, d1d, d2y, d2m, d2d):
     """Take user-submitted dates (day, month, year) of the web form and return (day1, day2) in YYYY-MM-DD format
     suitable for time restricted searching.  I.e. pay attention when months are not there to put 01 or 12
-    according to if it's the starting or the ending date, etc."""    
+    according to if it's the starting or the ending date, etc."""
     day1, day2 =  "", ""
     # sanity checking:
     if d1y==0 and d1m==0 and d1d==0 and d2y==0 and d2m==0 and d2d==0:
@@ -1269,11 +995,11 @@ def get_colID(c):
     res = run_sql("SELECT id FROM collection WHERE name=%s", (c,), 1)
     if res:
         colID = res[0][0]
-    return colID 
+    return colID
 
 def get_coll_i18nname(c, ln=cdslang):
     """Return nicely formatted collection name (of name type 'ln',
-    'long name') for collection C in language LN."""    
+    'long name') for collection C in language LN."""
     global collection_i18nname_cache
     global collection_i18nname_cache_timestamp
     # firstly, check whether the collectionname table was modified:
@@ -1306,10 +1032,10 @@ def get_field_i18nname(f, ln=cdslang):
     except KeyError:
         pass # translation in LN does not exist
     return out
-    
+
 def get_coll_ancestors(coll):
     "Returns a list of ancestors for collection 'coll'."
-    coll_ancestors = [] 
+    coll_ancestors = []
     coll_ancestor = coll
     while 1:
         query = "SELECT c.name FROM collection AS c "\
@@ -1317,7 +1043,7 @@ def get_coll_ancestors(coll):
                 "LEFT JOIN collection AS ccc ON ccc.id=cc.id_son "\
                 "WHERE ccc.name='%s' ORDER BY cc.id_dad ASC LIMIT 1" \
                 % escape_string(coll_ancestor)
-        res = run_sql(query, None, 1)        
+        res = run_sql(query, None, 1)
         if res:
             coll_name = res[0][0]
             coll_ancestors.append(coll_name)
@@ -1332,7 +1058,7 @@ def get_coll_sons(coll, type='r', public_only=1):
     """Return a list of sons (first-level descendants) of type 'type' for collection 'coll'.
        If public_only, then return only non-restricted son collections.
     """
-    coll_sons = [] 
+    coll_sons = []
     query = "SELECT c.name FROM collection AS c "\
             "LEFT JOIN collection_collection AS cc ON c.id=cc.id_son "\
             "LEFT JOIN collection AS ccc ON ccc.id=cc.id_dad "\
@@ -1340,7 +1066,7 @@ def get_coll_sons(coll, type='r', public_only=1):
             % (escape_string(type), escape_string(coll))
     if public_only:
         query += " AND c.restricted IS NULL "
-    query += " ORDER BY cc.score DESC" 
+    query += " ORDER BY cc.score DESC"
     res = run_sql(query)
     for name in res:
         coll_sons.append(name[0])
@@ -1351,7 +1077,7 @@ def get_coll_real_descendants(coll):
        IOW, we need to decompose compound collections like "A & B" into "A" and "B" provided
        that "A & B" has no associated database query defined.
     """
-    coll_sons = [] 
+    coll_sons = []
     query = "SELECT c.name,c.dbquery FROM collection AS c "\
             "LEFT JOIN collection_collection AS cc ON c.id=cc.id_son "\
             "LEFT JOIN collection AS ccc ON ccc.id=cc.id_dad "\
@@ -1398,7 +1124,7 @@ def coll_restricted_p(coll):
         return 0
     query = "SELECT restricted FROM collection WHERE name='%s'" % MySQLdb.escape_string(coll)
     res = run_sql(query, None, 1)
-    if res and res[0][0] != None:       
+    if res and res[0][0] != None:
         return 1
     else:
         return 0
@@ -1413,7 +1139,7 @@ def coll_restricted_group(coll):
         return res[0][0]
     else:
         return None
-    
+
 def create_collection_reclist_cache():
     """Creates list of records belonging to collections.  Called on startup
     and used later for intersecting search results with collection universe."""
@@ -1439,7 +1165,7 @@ except:
 
 def create_collection_i18nname_cache():
     """Create cache of I18N collection names of type 'ln' (=long name).
-    Called on startup and used later during the search time."""    
+    Called on startup and used later during the search time."""
     global collection_i18nname_cache_timestamp
     names = {}
     res = run_sql("SELECT c.name,cn.ln,cn.value FROM collectionname AS cn, collection AS c WHERE cn.id_collection=c.id AND cn.type='ln'") # ln=long name
@@ -1467,7 +1193,7 @@ except:
 
 def create_field_i18nname_cache():
     """Create cache of I18N field names of type 'ln' (=long name).
-    Called on startup and used later during the search time."""    
+    Called on startup and used later during the search time."""
     global field_i18nname_cache_timestamp
     names = {}
     res = run_sql("SELECT f.name,fn.ln,fn.value FROM fieldname AS fn, field AS f WHERE fn.id_field=f.id AND fn.type='ln'") # ln=long name
@@ -1495,6 +1221,10 @@ except:
 
 def browse_pattern(req, colls, p, f, rg, ln=cdslang):
     """Browse either biliographic phrases or words indexes, and display it."""
+
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     ## do we search in words indexes?
     if not f:
         return browse_in_bibwords(req, p, f)
@@ -1512,7 +1242,7 @@ def browse_pattern(req, colls, p, f, rg, ln=cdslang):
             browsed_phrases = get_nearest_terms_in_bibxxx(p, f, rg, 1)
         except:
             # probably there are no hits at all:
-            req.write("<p>No values found.")
+            req.write(_("No values found."))
             return
 
     ## try to check hits in these particular collection selection:
@@ -1538,74 +1268,30 @@ def browse_pattern(req, colls, p, f, rg, ln=cdslang):
                 browsed_phrases_in_colls.append([phrase, get_nbhits_in_bibxxx(phrase, f)])
 
     ## display results now:
-    out = """<table class="searchresultsbox">
-              <thead>
-               <tr>
-                <th class="searchresultsboxheader" align="left">
-                  hits
-                </th>
-                <th class="searchresultsboxheader" width="15">
-                  &nbsp;
-                </th>
-                <th class="searchresultsboxheader" align="left">
-                  %s
-                </th>
-               </tr>
-              </thead>
-              <tbody>""" % f
-    if len(browsed_phrases_in_colls) == 1:
-        # one hit only found:
-        phrase, nbhits = browsed_phrases_in_colls[0][0], browsed_phrases_in_colls[0][1]
-        out += """<tr>
-                   <td class="searchresultsboxbody" align="right">
-                    %s
-                   </td>
-                   <td class="searchresultsboxbody" width="15">
-                    &nbsp;
-                   </td>
-                   <td class="searchresultsboxbody" align="left">
-                    <a href="%s/search.py?p=%%22%s%%22&f=%s%s">%s</a>
-                   </td>
-                  </tr>""" % (nbhits, weburl, urllib.quote(phrase), urllib.quote(f), urlarg_colls, phrase)        
-    elif len(browsed_phrases_in_colls) > 1:
-        # first display what was found but the last one:
-        for phrase, nbhits in browsed_phrases_in_colls[:-1]:
-            out += """<tr>
-                       <td class="searchresultsboxbody" align="right">
-                        %s
-                       </td>
-                       <td class="searchresultsboxbody" width="15">
-                        &nbsp;
-                       </td>
-                       <td class="searchresultsboxbody" align="left">
-                        <a href="%s/search.py?p=%%22%s%%22&f=%s%s">%s</a>
-                       </td>
-                      </tr>""" % (nbhits, weburl, urllib.quote(phrase), urllib.quote(f), urlarg_colls, phrase)
-        # now display last hit as "next term":
-        phrase, nbhits = browsed_phrases_in_colls[-1]        
-        out += """<tr><td colspan="2" class="normal">
-                                   &nbsp;
-                                 </td>
-                                 <td class="normal">
-                                   <img src="%s/img/sn.gif" alt="" border="0">
-                                   <a href="%s/search.py?action=%s&p=%s&f=%s%s">next</a>
-                                 </td>
-                             </tr>""" % (weburl, weburl, msg_browse[ln], urllib.quote(phrase), urllib.quote(f), urlarg_colls)        
-    out += """</tbody>
-        </table>"""        
+    out = websearch_templates.tmpl_browse_pattern(
+            f = get_field_i18nname(f, ln),
+            ln = ln,
+            browsed_phrases_in_colls = browsed_phrases_in_colls,
+            weburl = weburl,
+            urlarg_colls = urlarg_colls,
+          )
     req.write(out)
-    return 
+    return
 
 def browse_in_bibwords(req, p, f, ln=cdslang):
     """Browse inside words indexes."""
     if not p:
         return
-    req.write("<p>Words nearest to <em>%s</em> " % p)
-    if f:
-        req.write(" inside <em>%s</em> " % f)
-    req.write(" in any collection are:<br>")
-    urlargs = string.replace(req.args, "action=%s" % msg_browse[ln], "action=%s" % msg_search[ln])
-    req.write(create_nearest_terms_box(urlargs, p, f, 'w', ln=ln, intro_text_p=0)) 
+    _ = gettext_set_language(ln)
+    urlargs = string.replace(req.args, "action=%s" % _("Browse"), "action=%s" % _("Search"))
+    nearest_box = create_nearest_terms_box(urlargs, p, f, 'w', ln=ln, intro_text_p=0)
+
+    req.write(websearch_templates.tmpl_search_in_bibwords(
+        p = p,
+        f = f,
+        ln = ln,
+        nearest_box = nearest_box
+    ))
     return
 
 def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=cdslang):
@@ -1635,7 +1321,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
 
        This function is suitable as a mid-level API.
     """
-    
+
     hitset_empty = HitSet()
     hitset_empty._nbhits = 0
     # sanity check:
@@ -1669,8 +1355,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             # either the hitset is non-empty, or the approximate
             # pattern treatment is switched off, or the search unit
             # was joined by an OR operator to preceding/following
-            # units so we do not require that it exists        
-            basic_search_units_hitsets.append(basic_search_unit_hitset)                    
+            # units so we do not require that it exists
+            basic_search_units_hitsets.append(basic_search_unit_hitset)
         else:
             # stage 2-2: no hits found for this search unit, try to replace non-alphanumeric chars inside pattern:
             if sre.search(r'[^a-zA-Z0-9\s\:]', bsu_p):
@@ -1696,7 +1382,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                             else:
                                 print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m, ln=ln))
                     return hitset_empty
-            else:        
+            else:
                 # stage 2-3: no hits found either, propose nearest indexed terms:
                 if of.startswith('h'):
                     if req:
@@ -1731,22 +1417,24 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     if hitset_in_any_collection._nbhits == 0:
         # no hits found, propose alternative boolean query:
         if of.startswith('h'):
-            text = msg_no_boolean_hits[ln]
-            text += """<blockquote><table class="nearesttermsbox" cellpadding="0" cellspacing="0" border="0">"""
+            nearestterms = []
             for idx_unit in range(0,len(basic_search_units)):
                 bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
                 bsu_nbhits = basic_search_units_hitsets[idx_unit]._nbhits
                 url_args_new = sre.sub(r'(^|\&)p=.*?(\&|$)', r'\1p='+urllib.quote(bsu_p)+r'\2', req.args)
                 url_args_new = sre.sub(r'(^|\&)f=.*?(\&|$)', r'\1f='+urllib.quote(bsu_f)+r'\2', url_args_new)
-                text += """<tr><td class="nearesttermsboxbody" align="right">%s</td>
-                               <td class="nearesttermsboxbody" width="15">&nbsp;</td>
-                               <td class="nearesttermsboxbody" align="left">
-                                <a class="nearestterms" href="%s/search.py?%s">%s</a>
-                               </td>
-                           </tr>""" % \
-                        (bsu_nbhits, weburl, url_args_new, bsu_p)
-            text += """</table></blockquote>"""
-            print_warning(req, text)                
+                nearestterms.append({
+                                      'nbhits' : bsu_nbhits,
+                                      'url_args' : url_args_new,
+                                      'p' : bsu_p,
+                                    })
+
+            text = websearch_templates.tmpl_search_no_boolean_hits(
+                     ln = ln,
+                     weburl = weburl,
+                     nearestterms = nearestterms,
+                   )
+            print_warning(req, text)
     if verbose and of.startswith("h"):
         t2 = os.times()[4]
         print_warning(req, "Search stage 3: boolean query gave %d hits." % hitset_in_any_collection._nbhits)
@@ -1756,7 +1444,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
 def search_unit(p, f=None, m=None):
     """Search for basic search unit defined by pattern 'p' and field
        'f' and matching type 'm'.  Return hitset of recIDs.
-    
+
        All the parameters are assumed to have been previously washed.
        'p' is assumed to be already a ``basic search unit'' so that it
        is searched as such and is not broken up in any way.  Only
@@ -1764,11 +1452,11 @@ def search_unit(p, f=None, m=None):
 
        This function is suitable as a low-level API.
     """
-    
+
     ## create empty output results set:
     set = HitSet()
     if not p: # sanity checking
-        return set 
+        return set
     if m == 'a' or m == 'r':
         # we are doing either direct bibxxx search or phrase search or regexp search
         set = search_unit_in_bibxxx(p, f, m)
@@ -1810,7 +1498,7 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
         # add the results:
         if set_used:
             set.union(hitset_bibwrd)
-        else:            
+        else:
             set = hitset_bibwrd
             set_used = 1
     # okay, return result set:
@@ -1840,7 +1528,7 @@ def search_unit_in_bibxxx(p, f, type):
         tl.append(f) # 'f' seems to be okay as it starts by two digits
     else:
         # convert old ALEPH tag names, if appropriate: (TODO: get rid of this before entering this function)
-        if cfg_fields_convert.has_key(string.lower(f)): 
+        if cfg_fields_convert.has_key(string.lower(f)):
             f = cfg_fields_convert[string.lower(f)]
         # deduce desired MARC tags on the basis of chosen 'f'
         tl = get_field_tags(f)
@@ -1863,7 +1551,7 @@ def search_unit_in_bibxxx(p, f, type):
                         (bx, bibx, pattern, t)
             else:
                 query = "SELECT bibx.id_bibrec FROM %s AS bx LEFT JOIN %s AS bibx ON bx.id=bibx.id_bibxxx WHERE bx.value %s AND bx.tag='%s'" %\
-                        (bx, bibx, pattern, t)        
+                        (bx, bibx, pattern, t)
         # launch the query:
         res = run_sql(query)
         # fill the result set:
@@ -1889,7 +1577,7 @@ def search_unit_in_bibrec(day1, day2, type='creation_date'):
                   (day1, day2))
     l = []
     for row in res:
-        l.append(row[0])        
+        l.append(row[0])
     set.addlist(Numeric.array(l))
     return set
 
@@ -1904,7 +1592,7 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
         results[coll] = HitSet()
         results[coll]._set = Numeric.bitwise_and(hitset_in_any_collection._set, get_collection_reclist(coll)._set)
         results[coll].calculate_nbhits()
-        results_nbhits += results[coll]._nbhits    
+        results_nbhits += results[coll]._nbhits
     if results_nbhits == 0:
         # no hits found, try to search in Home:
         results_in_Home = HitSet()
@@ -1929,7 +1617,7 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
     if verbose and of.startswith("h"):
         t2 = os.times()[4]
         print_warning(req, "Search stage 4: intersecting with collection universe gave %d hits." % results_nbhits)
-        print_warning(req, "Search stage 4: execution took %.2f seconds." % (t2 - t1))                                        
+        print_warning(req, "Search stage 4: execution took %.2f seconds." % (t2 - t1))
     return results
 
 def intersect_results_with_hitset(req, results, hitset, ap=0, aptext="", of="hb"):
@@ -1943,7 +1631,7 @@ def intersect_results_with_hitset(req, results, hitset, ap=0, aptext="", of="hb"
        and return the original 'results' set unchanged.  If 'ap' is
        false, then return empty results set.
     """
-    
+
     if ap:
         results_ap = copy.deepcopy(results)
     else:
@@ -1957,7 +1645,7 @@ def intersect_results_with_hitset(req, results, hitset, ap=0, aptext="", of="hb"
         if of.startswith("h"):
             print_warning(req, aptext)
         results = results_ap
-    return results        
+    return results
 
 def create_similarly_named_authors_link_box(author_name, ln=cdslang):
     """Return a box similar to ``Not satisfied...'' one by proposing
@@ -1972,7 +1660,7 @@ def create_similarly_named_authors_link_box(author_name, ln=cdslang):
     # return nothing if not configured:
     if cfg_create_similarly_named_authors_link_box == 0:
         return ""
-    # return empty box if there is no initial: 
+    # return empty box if there is no initial:
     if sre.match(r'[^ ,]+, [^ ]', author_name) is None:
         return ""
     # firstly find name comma initial:
@@ -1980,7 +1668,7 @@ def create_similarly_named_authors_link_box(author_name, ln=cdslang):
     print author_name_to_search
     # secondly search for similar name forms:
     similar_author_names = {}
-    for tag in get_field_tags("author"):  
+    for tag in get_field_tags("author"):
         # deduce into which bibxxx table we will search:
         digit1, digit2 = int(tag[0]), int(tag[1])
         bx = "bib%d%dx" % (digit1, digit2)
@@ -1988,10 +1676,10 @@ def create_similarly_named_authors_link_box(author_name, ln=cdslang):
         if len(tag) != 6 or tag[-1:]=='%':
             # only the beginning of field 't' is defined, so add wildcard character:
             query = "SELECT bx.value FROM %s AS bx WHERE bx.value LIKE '%s%%' AND bx.tag LIKE '%s%%'" \
-                    % (bx, escape_string(author_name_to_search), tag)        
+                    % (bx, escape_string(author_name_to_search), tag)
         else:
             query = "SELECT bx.value FROM %s AS bx WHERE bx.value LIKE '%s%%' AND bx.tag='%s'" \
-                    % (bx, escape_string(author_name_to_search), tag)        
+                    % (bx, escape_string(author_name_to_search), tag)
         res = run_sql(query)
         for row in res:
             similar_author_names[row[0]] = 1
@@ -2000,23 +1688,24 @@ def create_similarly_named_authors_link_box(author_name, ln=cdslang):
         del similar_author_names[author_name]
     except KeyError:
         pass
-    # thirdly print the box:    
+    # thirdly print the box:
     out = ""
     if similar_author_names:
         out_authors = similar_author_names.keys()
         out_authors.sort()
-        out += """<a name="googlebox"></a>"""
-        out += """<table class="googlebox"><tr><th colspan="2" class="googleboxheader">"""
-        out += msg_see_also_similar_author_names[ln]
-        out += """</th></tr>"""
+
+        tmp_authors = []
         for out_author in out_authors:
-            out += "<tr>"
-            out += """<td class="googleboxbody">%d</td>""" % get_nbhits_in_bibxxx(out_author, "author")
-            out += """<td class="googleboxbody">"""
-            out += """<a class="google" href="%s/search.py?p=%s&amp;f=author">%s</a>""" % \
-                   (weburl, urllib.quote(out_author), out_author)                   
-            out += """</td></tr>"""
-        out += """</table>"""
+            tmp_authors.append({
+                               'nb' : get_nbhits_in_bibxxx(out_author, "author"),
+                               'name' : out_author,
+                               })
+        out += websearch_templates.tmpl_similar_author_names(
+                 ln = ln,
+                 weburl = weburl,
+                 authors = tmp_authors,
+               )
+
     return out
 
 def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang, intro_text_p=1):
@@ -2026,7 +1715,10 @@ def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang, intro_text_p
        Propose new searches according to `urlargs' with the new words.
        If `intro_text_p' is true, then display the introductory message,
        otherwise print only the nearest terms in the box content.
-    """    
+    """
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     out = ""
     nearest_terms = []
     if not p: # sanity check
@@ -2035,51 +1727,38 @@ def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang, intro_text_p
     if t == 'w':
         nearest_terms = get_nearest_terms_in_bibwords(p, f, n, n)
         if not nearest_terms:
-            return "%s%s." % (msg_no_words_index_available[ln], get_field_i18nname(f, ln))         
+            return "%s %s." % (_("No words index available for"), get_field_i18nname(f, ln))
     else:
         nearest_terms = get_nearest_terms_in_bibxxx(p, f, n, n)
         if not nearest_terms:
-            return "%s %s." % (msg_no_phrase_index_available[ln], get_field_i18nname(f, ln)) 
-    # display them:
-    out += """<table class="nearesttermsbox" cellpadding="0" cellspacing="0" border="0">"""
+            return "%s %s." % (_("No phrase index available for"), get_field_i18nname(f, ln))
+
+    termargs = []
+    termhits = []
     for term in nearest_terms:
         if t == 'w':
-            term_nbhits = get_nbhits_in_bibwords(term, f)
+            termhits.append(get_nbhits_in_bibwords(term, f))
         else:
-            term_nbhits = get_nbhits_in_bibxxx(term, f)
-        if term == p: # print search word for orientation:
-            if term_nbhits > 0:
-                out += """<tr>
-                           <td class="nearesttermsboxbodyselected" align="right">%d</td>
-                           <td class="nearesttermsboxbodyselected" width="15">&nbsp;</td>
-                           <td class="nearesttermsboxbodyselected" align="left">
-                             <a class="nearesttermsselected" href="%s/search.py?%s">%s</a>
-                           </td>
-                          </tr>""" % \
-                           (term_nbhits, weburl, urlargs_replace_text_in_arg(urlargs, r'^p\d?$', p, term), term)
-            else:
-                out += """<tr>
-                           <td class="nearesttermsboxbodyselected" align="right">-</td>
-                           <td class="nearesttermsboxbodyselected" width="15">&nbsp;</td>
-                           <td class="nearesttermsboxbodyselected" align="left">%s</td>
-                          </tr>""" % term
-        else:
-            out += """<tr>
-                       <td class="nearesttermsboxbody" align="right">%s</td>
-                       <td class="nearesttermsboxbody" width="15">&nbsp;</td>
-                       <td class="nearesttermsboxbody" align="left">
-                         <a class="nearestterms" href="%s/search.py?%s">%s</a>
-                       </td>
-                      </tr>""" % \
-                       (term_nbhits, weburl, urlargs_replace_text_in_arg(urlargs, r'^p\d?$', p, term), term)
-    out += "</table>"
+            termhits.append(get_nbhits_in_bibxxx(term, f))
+        termargs.append(urlargs_replace_text_in_arg(urlargs, r'^p\d?$', p, term))
+
     intro = ""
     if intro_text_p: # add full leading introductory text
-        intro = msg_search_term[ln] % p
+        intro = _("Search term <em>%s</em>") % p
         if f:
-            intro += " " + msg_inside_index[ln] % get_field_i18nname(f, ln)
-        intro += " " + msg_did_not_match[ln]
-    return intro + "<blockquote>" + out + "</blockquote>"
+            intro += " " + _("inside <em>%s</em> index") % get_field_i18nname(f, ln)
+        intro += " " + _("did not match any record.  Nearest terms in any collection are:")
+
+    return websearch_templates.tmpl_nearest_term_box(
+             p = p,
+             ln = ln,
+             f = f,
+             weburl = weburl,
+             terms = nearest_terms,
+             termargs = termargs,
+             termhits = termhits,
+             intro = intro,
+           )
 
 def get_nearest_terms_in_bibwords(p, f, n_below, n_above):
     """Return list of +n -n nearest terms to word `p' in index for field `f'."""
@@ -2104,7 +1783,7 @@ def get_nearest_terms_in_bibwords(p, f, n_below, n_above):
     query = "SELECT term FROM %s WHERE term>'%s' ORDER BY term ASC LIMIT %d" % (bibwordsX, escape_string(p), n_below)
     res = run_sql(query)
     for row in res:
-        nearest_words.append(row[0])        
+        nearest_words.append(row[0])
     return nearest_words
 
 def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
@@ -2223,7 +1902,7 @@ def get_nbhits_in_bibxxx(p, f):
         res = run_sql(query)
         for row in res:
             recIDs[row[0]] = 1
-    return len(recIDs)         
+    return len(recIDs)
 
 def get_mysql_recid_from_aleph_sysno(sysno):
     """Returns MySQL's recID for ALEPH sysno passed in the argument (e.g. "002379334CER").
@@ -2232,7 +1911,7 @@ def get_mysql_recid_from_aleph_sysno(sysno):
     query = "SELECT bb.id_bibrec FROM bibrec_bib97x AS bb, bib97x AS b WHERE b.value='%s' AND b.tag='970__a' AND bb.id_bibxxx=b.id" %\
             (escape_string(sysno))
     res = run_sql(query, None, 1)
-    if res:        
+    if res:
         out = res[0][0]
     return out
 
@@ -2248,11 +1927,11 @@ def guess_primary_collection_of_a_record(recID):
         if res:
             out = res[0][0]
     return out
-    
+
 def get_tag_name(tag_value, prolog="", epilog=""):
     """Return tag name from the known tag value, by looking up the 'tag' table.
        Return empty string in case of failure.
-       Example: input='100__%', output=first author'."""    
+       Example: input='100__%', output=first author'."""
     out = ""
     res = run_sql("SELECT name FROM tag WHERE value=%s", (tag_value,))
     if res:
@@ -2301,7 +1980,7 @@ def get_fieldvalues(recID, tag):
 
 def get_fieldvalues_alephseq_like(recID, tags):
     """Return textual lines in ALEPH sequential like format for field 'tag' inside record 'recID'."""
-    out = ""    
+    out = ""
     # clean passed 'tag':
     tags_in = string.split(tags, ",")
     if len(tags_in) == 1 and len(tags_in[0]) == 6:
@@ -2309,7 +1988,7 @@ def get_fieldvalues_alephseq_like(recID, tags):
         ##         (use with care: can false you if field has multiple occurrences)
         out += string.join(get_fieldvalues(recID, tags_in[0]),"\n")
     else:
-        ## case B: print our "text MARC" format; works safely all the time        
+        ## case B: print our "text MARC" format; works safely all the time
         tags_out = []
         for tag in tags_in:
             if len(tag) == 0:
@@ -2318,7 +1997,7 @@ def get_fieldvalues_alephseq_like(recID, tags):
                         tags_out.append("%d%d%%" % (i, j))
             elif len(tag) == 1:
                 for j in range(0,10):
-                    tags_out.append("%s%d%%" % (tag, j))        
+                    tags_out.append("%s%d%%" % (tag, j))
             elif len(tag) < 5:
                 tags_out.append("%s%%" % tag)
             elif tag >= 6:
@@ -2345,7 +2024,7 @@ def get_fieldvalues_alephseq_like(recID, tags):
                 if ind1 == "_":
                     ind1 = ""
                 if ind2 == "_":
-                    ind2 = ""                        
+                    ind2 = ""
                 # print field tag
                 if field_number != field_number_old or field[:-1] != field_old[:-1]:
                     if out:
@@ -2371,7 +2050,7 @@ def record_exists(recID):
             out = -1 # exists, but marked as deleted
         else:
             out = 1 # exists fine
-    return out    
+    return out
 
 def record_public_p(recID):
     """Return 1 if the record is public, i.e. if it can be found in the Home collection.
@@ -2383,7 +2062,7 @@ def get_creation_date(recID, fmt="%Y-%m-%d"):
     "Returns the creation date of the record 'recID'."
     out = ""
     res = run_sql("SELECT DATE_FORMAT(creation_date,%s) FROM bibrec WHERE id=%s", (fmt, recID), 1)
-    if res:        
+    if res:
         out = res[0][0]
     return out
 
@@ -2391,17 +2070,20 @@ def get_modification_date(recID, fmt="%Y-%m-%d"):
     "Returns the date of last modification for the record 'recID'."
     out = ""
     res = run_sql("SELECT DATE_FORMAT(modification_date,%s) FROM bibrec WHERE id=%s", (fmt, recID), 1)
-    if res:        
+    if res:
         out = res[0][0]
     return out
 
 def print_warning(req, msg, type='', prologue='<br>', epilogue='<br>'):
     "Prints warning message and flushes output."
     if req and msg:
-        req.write('\n%s<span class="quicknote">' % (prologue))
-        if type:
-            req.write('%s: ' % type)
-        req.write('%s</span>%s' % (msg, epilogue))
+        req.write(websearch_templates.tmpl_print_warning(
+                   msg = msg,
+                   type = type,
+                   prologue = prologue,
+                   epilogue = epilogue,
+                 ))
+        return
 
 def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=cdsname, nb_found=-1, jrec=1, rg=10,
                       as=0, ln=cdslang, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
@@ -2414,128 +2096,80 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=cdsname, nb_found
        This is suitable for displaying navigation links at the bottom of the search results page."""
 
     out = ""
-    # left table cells: print collection name
-    if not middle_only:
-        out += "\n<a name=\"%s\"></a>" \
-              "\n<form action=\"%s/search.py\" method=\"get\">"\
-              "\n<table class=\"searchresultsbox\"><tr><td class=\"searchresultsboxheader\" align=\"left\">" \
-              "<strong><big>" \
-              "<a href=\"%s/?c=%s&amp;as=%d&amp;ln=%s\">%s</a></big></strong></td>\n" % \
-              (urllib.quote(collection), weburl, weburl, urllib.quote_plus(collection), as, ln, get_coll_i18nname(collection, ln))
-    else:
-        out += """\n<form action="%s/search.py" method="get"><div align="center">\n""" % weburl
 
     # sanity check:
     if jrec < 1:
         jrec = 1
     if jrec > nb_found:
-        jrec = max(nb_found-rg+1, 1)        
+        jrec = max(nb_found-rg+1, 1)
 
-    # middle table cell: print beg/next/prev/end arrows:
-    if not middle_only:
-        out += "<td class=\"searchresultsboxheader\" align=\"center\">\n"
-        out += msg_x_records_found[ln] % nice_number(nb_found, ln) + " &nbsp; "
-    else:
-        out += "<small>"
-        if nb_found > rg:
-            out += get_coll_i18nname(collection, ln) + " : " + msg_x_records_found[ln] % nice_number(nb_found, ln) + " &nbsp; "
+    return websearch_templates.tmpl_print_search_info(
+             ln = ln,
+             weburl = weburl,
+             collection = collection,
+             as = as,
+             collection_name = get_coll_i18nname(collection, ln),
+             middle_only = middle_only,
+             rg = rg,
+             nb_found = nb_found,
+             sf = sf,
+             so = so,
+             rm = rm,
+             of = of,
+             ot = ot,
+             p = p,
+             f = f,
+             p1 = p1,
+             p2 = p2,
+             p3 = p3,
+             f1 = f1,
+             f2 = f2,
+             f3 = f3,
+             m1 = m1,
+             m2 = m2,
+             m3 = m3,
+             op1 = op1,
+             op2 = op2,
+             pl_in_url = pl_in_url,
+             d1y = d1y,
+             d1m = d1m,
+             d1d = d1d,
+             d2y = d2y,
+             d2m = d2m,
+             d2d = d2d,
+             jrec = jrec,
+             sc = sc,
+             sp = sp,
+             all_fieldcodes = get_fieldcodes(),
+             cpu_time = cpu_time,
+           )
 
-    if nb_found > rg: # navig.arrows are needed, since we have many hits
-        url = '%s/search.py?p=%s&amp;cc=%s&amp;f=%s&amp;sf=%s&amp;so=%s&amp;sp=%s&amp;rm=%s&amp;of=%s&amp;ot=%s' % (weburl, urllib.quote(p), urllib.quote(collection), f, sf, so, sp, rm, of, ot)
-        url += '&amp;as=%s&amp;ln=%s&amp;p1=%s&amp;p2=%s&amp;p3=%s&amp;f1=%s&amp;f2=%s&amp;f3=%s&amp;m1=%s&amp;m2=%s&amp;m3=%s&amp;op1=%s&amp;op2=%s' \
-               % (as, ln, urllib.quote(p1), urllib.quote(p2), urllib.quote(p3), f1, f2, f3, m1, m2, m3, op1, op2)
-        url += '&amp;sc=%d' % 0 + pl_in_url # sc=0, since we do not want to split by collection in `next/previous' pages
-        url += '&amp;d1y=%d&amp;d1m=%d&amp;d1d=%d&amp;d2y=%d&amp;d2m=%d&amp;d2d=%d' \
-               % (d1y, d1m, d1d, d2y, d2m, d2d)
-        if jrec-rg > 1:
-            out += "<a class=\"img\" href=\"%s&amp;jrec=1&amp;rg=%d\"><img src=\"%s/img/sb.gif\" alt=\"begin\" border=0></a>" % (url, rg, weburl)
-        if jrec > 1:
-            out += "<a class=\"img\" href=\"%s&amp;jrec=%d&amp;rg=%d\"><img src=\"%s/img/sp.gif\" alt=\"previous\" border=0></a>" % (url, max(jrec-rg,1), rg, weburl)
-        if jrec+rg-1 < nb_found:
-            out += "%d - %d" % (jrec, jrec+rg-1)
-        else:
-            out += "%d - %d" % (jrec, nb_found)
-        if nb_found >= jrec+rg:
-            out += "<a class=\"img\" href=\"%s&amp;jrec=%d&amp;rg=%d\"><img src=\"%s/img/sn.gif\" alt=\"next\" border=0></a>" % \
-                  (url, jrec+rg, rg, weburl)
-        if nb_found >= jrec+rg+rg:
-            out += "<a class=\"img\" href=\"%s&amp;jrec=%d&amp;rg=%d\"><img src=\"%s/img/se.gif\" alt=\"end\" border=0></a>" % \
-                  (url, nb_found-rg+1, rg, weburl)
-        out += "<input type=\"hidden\" name=\"p\" value=\"%s\">" % p
-        out += "<input type=\"hidden\" name=\"cc\" value=\"%s\">" % collection
-        out += "<input type=\"hidden\" name=\"f\" value=\"%s\">" % f 
-        out += "<input type=\"hidden\" name=\"sf\" value=\"%s\">" % sf
-        out += "<input type=\"hidden\" name=\"so\" value=\"%s\">" % so
-        out += "<input type=\"hidden\" name=\"of\" value=\"%s\">" % of
-        if ot:
-            out += """<input type="hidden" name="ot" value="%s">""" % ot
-        if sp:
-            out += """<input type="hidden" name="sp" value="%s">""" % sp
-        if rm:
-            out += "<input type=\"hidden\" name=\"rm\" value=\"%s\">" % rm
-        out += "<input type=\"hidden\" name=\"rg\" value=\"%d\">" % rg
-        out += "<input type=\"hidden\" name=\"as\" value=\"%d\">" % as
-        out += "<input type=\"hidden\" name=\"ln\" value=\"%s\">" % ln
-        out += "<input type=\"hidden\" name=\"p1\" value=\"%s\">" % p1
-        out += "<input type=\"hidden\" name=\"p2\" value=\"%s\">" % p2
-        out += "<input type=\"hidden\" name=\"p3\" value=\"%s\">" % p3
-        out += "<input type=\"hidden\" name=\"f1\" value=\"%s\">" % f1
-        out += "<input type=\"hidden\" name=\"f2\" value=\"%s\">" % f2
-        out += "<input type=\"hidden\" name=\"f3\" value=\"%s\">" % f3
-        out += "<input type=\"hidden\" name=\"m1\" value=\"%s\">" % m1
-        out += "<input type=\"hidden\" name=\"m2\" value=\"%s\">" % m2
-        out += "<input type=\"hidden\" name=\"m3\" value=\"%s\">" % m3
-        out += "<input type=\"hidden\" name=\"op1\" value=\"%s\">" % op1
-        out += "<input type=\"hidden\" name=\"op2\" value=\"%s\">" % op2
-        out += "<input type=\"hidden\" name=\"sc\" value=\"0\">" # sc=0, since we do not want to split by collection in `next/previous' pages
-        out += "<input type=\"hidden\" name=\"d1y\" value=\"%d\">" % d1y
-        out += "<input type=\"hidden\" name=\"d1m\" value=\"%d\">" % d1m
-        out += "<input type=\"hidden\" name=\"d1d\" value=\"%d\">" % d1d
-        out += "<input type=\"hidden\" name=\"d2y\" value=\"%d\">" % d2y
-        out += "<input type=\"hidden\" name=\"d2m\" value=\"%d\">" % d2m
-        out += "<input type=\"hidden\" name=\"d2d\" value=\"%d\">" % d2d
-        if pl_in_url:
-            fieldargs = cgi.parse_qs(pl_in_url)
-            for fieldcode in get_fieldcodes():
-                if fieldargs.has_key(fieldcode):
-                    for val in fieldargs[fieldcode]:
-                        out += "<input type=\"hidden\" name=\"%s\" value=\"%s\">" % (cgi.escape(fieldcode), cgi.escape(val))
-        out += "&nbsp; %s <input type=\"text\" name=\"jrec\" size=\"4\" value=\"%d\">" % (msg_jump_to_record[ln], jrec)
-    if not middle_only:
-        out += "</td>"
-    else:
-        out += "</small>"
-        
-    # right table cell: cpu time info
-    if not middle_only:
-        if cpu_time > -1:            
-            out +="<td class=\"searchresultsboxheader\" align=\"right\"><small>%s</small>&nbsp;</td>" % (msg_search_took_x_seconds[ln] % cpu_time)
-        out += "</tr></table>"
-    else:
-        out += "</div>"
-    out += "</form>"
-    return out
-
-def print_results_overview(colls, results_final_nb_total, results_final_nb, cpu_time, ln=cdslang):
+def print_results_overview(req, colls, results_final_nb_total, results_final_nb, cpu_time, ln=cdslang):
     "Prints results overview box with links to particular collections below."
     out = ""
-    if len(colls) == 1:
-        # if one collection only, print nothing:
-        return out
-    # first find total number of hits:
-    out += "<p><table class=\"searchresultsbox\">" \
-           "<thead><tr><th class=\"searchresultsboxheader\">%s</th></tr></thead>" % \
-             (msg_results_overview_found_x_records_in_y_seconds[ln] % (nice_number(results_final_nb_total, ln), cpu_time))
-    # then print hits per collection:
-    out += "<tbody><tr><td class=\"searchresultsboxbody\">"
+    new_colls = []
     for coll in colls:
-        if results_final_nb.has_key(coll) and results_final_nb[coll] > 0:
-            out += "<strong><a href=\"#%s\">%s</a></strong>, " \
-                  "<a href=\"#%s\">%s</a><br>" \
-                  % (urllib.quote(coll), get_coll_i18nname(coll, ln), urllib.quote(coll),
-                     msg_x_records_found[ln] % nice_number(results_final_nb[coll], ln))
-    out += "</td></tr></tbody></table>\n"
-    return out
+        new_colls.append({
+                          'code' : coll,
+                          'name' : get_coll_i18nname(coll, ln),
+                         })
+
+    # deduce url without 'of' argument:
+    args = req.args or ''
+    
+    url_args = sre.sub(r'(^|\&)of=.*?(\&|$)',r'\1',args)
+    url_args = sre.sub(r'^\&+', '', url_args)
+    url_args = sre.sub(r'\&+$', '', url_args)
+
+    return websearch_templates.tmpl_print_results_overview(
+             ln = ln,
+             weburl = weburl,
+             results_final_nb_total = results_final_nb_total,
+             results_final_nb = results_final_nb,
+             cpu_time = cpu_time,
+             colls = new_colls,
+             url_args = url_args,
+           )
 
 def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0):
     """Sort records in 'recIDs' list according sort field 'sort_field' in order 'sort_order'.
@@ -2576,7 +2210,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         print_warning(req, "Sorting by tags %s." % tags)
         if sort_pattern:
             print_warning(req, "Sorting preferentially by %s." % sort_pattern)
-        
+
     ## check if we have sorting tag defined:
     if tags:
         # fetch the necessary field values:
@@ -2585,16 +2219,16 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
             vals = [] # will hold all values found in sorting tag for recID
             for tag in tags:
                 vals.extend(get_fieldvalues(recID, tag))
-            if sort_pattern: 
+            if sort_pattern:
                 # try to pick that tag value that corresponds to sort pattern
                 bingo = 0
-                for v in vals: 
+                for v in vals:
                     if v.startswith(sort_pattern): # bingo!
                         bingo = 1
                         val = v
                         break
                 if not bingo: # sort_pattern not present, so add other vals after spaces
-                    val = sort_pattern + "          " + string.join(vals)  
+                    val = sort_pattern + "          " + string.join(vals)
             else:
                 # no sort pattern defined, so join them all together
                 val = string.join(vals)
@@ -2609,7 +2243,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         # now that keys are sorted, create output array:
         for k in recIDs_dict_keys:
             for s in recIDs_dict[k]:
-                recIDs_out.append(s)        
+                recIDs_out.append(s)
         # ascending or descending?
         if sort_order == 'a':
             recIDs_out.reverse()
@@ -2618,9 +2252,10 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
     else:
         # good, no sort needed
         return recIDs
-        
+
 def print_record_list_for_similarity_boxen(req, title, recID_score_list, ln=cdslang):
     """Print list of records in the "hs" (HTML Similarity) format for similarity boxes.
+    FIXME: templatize.
     """
     recID_score_list_to_be_printed = []
     # firstly find 5 first public records to print:
@@ -2651,6 +2286,9 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
     Print also list of RELEVANCES for each record (if defined), in between RELEVANCE_PROLOGUE and RELEVANCE_EPILOGUE.
     """
 
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     # sanity checking:
     if req == None:
         return
@@ -2674,7 +2312,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
             irec_min = -1
         if irec_max >= nb_found:
             irec_max = nb_found - 1
-        
+
         #req.write("%s:%d-%d" % (recIDs, irec_min, irec_max))
 
         if format.startswith('x'):
@@ -2694,23 +2332,28 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
             if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
                 # portfolio and on-the-fly formats:
                 for irec in range(irec_max,irec_min,-1):
-                    req.write(print_record(recIDs[irec], format, ot, ln))                
+                    req.write(print_record(recIDs[irec], format, ot, ln))
             elif format.startswith("hb"):
                 # HTML brief format:
-                req.write("""\n<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
-                req.write("""\n<table>""")            
+                rows = []
                 for irec in range(irec_max,irec_min,-1):
-                    req.write("""\n<tr><td valign="top" align="right" nowrap><input name="recid" type="checkbox" value="%s">""" % recIDs[irec])
-                    req.write("""%d.""" % (jrec+irec_max-irec))
+                    temp = {
+                             'number' : jrec+irec_max-irec,
+                             'recid' : recIDs[irec],
+                           }
                     if relevances and relevances[irec]:
-                        req.write("""<br><div class="rankscoreinfo"><a title="rank score">%s%s%s</a></div>""" % \
-                                  (relevances_prologue, relevances[irec], relevances_epilogue))
-                    req.write("""</td><td valign="top">""")
-                    req.write(print_record(recIDs[irec], format, ot, ln))
-                    req.write("</td></tr>")
-                req.write("\n</table>")
-                req.write("""<br><input class="formbutton" type="submit" name="action" value="%s">""" % msg_add_to_basket[ln])
-                req.write("""\n</form>""")
+                        temp['relevance'] = relevances[irec]
+                    else:
+                        temp['relevance'] = ''
+                    temp['record'] = print_record(recIDs[irec], format, ot, ln)
+                    rows.append(temp)
+                req.write(websearch_templates.tmpl_records_format_htmlbrief(
+                           ln = ln,
+                           weburl = weburl,
+                           rows = rows,
+                           relevances_prologue = relevances_prologue,
+                           relevances_epilogue = relevances_epilogue,
+                         ))
             else:
                 # HTML detailed format:
                 # deduce url without 'of' argument:
@@ -2718,80 +2361,48 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                 url_args = sre.sub(r'^\&+', '', url_args)
                 url_args = sre.sub(r'\&+$', '', url_args)
                 # print other formatting choices:
-                req.write("""<p><div align="right"><small>Format: \n""")
-                if format != "hm":
-                    req.write('HTML | <a href="%s/search.py?%s&of=hm">HTML MARC</a> | <a href="%s/search.py?%s&of=xd">XML DC</a> | <a href="%s/search.py?%s&of=xm">XML MARC</a>' % (weburl, url_args, weburl, url_args, weburl, url_args))
-                else:
-                    req.write('<a href="%s/search.py?%s">HTML</a> | HTML MARC | <a href="%s/search.py?%s&of=xd">XML DC</a> | <a href="%s/search.py?%s&of=xm">XML MARC</a>' % (weburl, url_args, weburl, url_args, weburl, url_args))
-                req.write("</small></div>\n")
+
+                rows = []
                 for irec in range(irec_max,irec_min,-1):
-                    # print record:
-                    req.write(print_record(recIDs[irec], format, ot, ln))
+                    temp = {
+                             'record'      : print_record(recIDs[irec], format, ot, ln),
+                             'recid'       : recIDs[irec],
+                             'creationdate': '',
+                             'modifydate'  : '',
+                           }
                     if record_exists(recIDs[irec])==1:
-                        # print last modified info:
-                        req.write("""\n<div class="recordlastmodifiedbox">%s</div>""" % \
-                                  (msg_record_last_modified[ln] % (get_creation_date(recIDs[irec]),get_modification_date(recIDs[irec]))))
-                        req.write("""<p><span class="moreinfo"><a class="moreinfo" href="%s/search.py?p=recid:%d&amp;rm=wrd&amp;ln=%s">%s</a></span>\n""" % \
-                                  (weburl, recIDs[irec], ln, msg_similar_records[ln]))
-                        # print add to basket:
-                        req.write("""\n<form action="%s/yourbaskets.py/add" method="post">""" % weburl)
-                        req.write("""<input name="recid" type="hidden" value="%s">""" % recIDs[irec])
-                        req.write("""<br><input class="formbutton" type="submit" name="action" value="%s">"""  % msg_add_to_basket[ln])
-                        req.write("""\n</form>""")
-                        # print similarity boxen:
-                        if cfg_experimental_features:
-                            req.write("""<table>""")
-                            # cited by box:
-                            citing_list = calculate_cited_by_list(recIDs[irec])
-                            if citing_list:
-                                req.write("""<tr><td>""")
-                                print_record_list_for_similarity_boxen(req,
-                                                                       msg_cited_by_x_records[ln] % len(citing_list),
-                                                                       citing_list,
-                                                                       ln)                           
-                                req.write("""&nbsp;<a  href="%s/search.py?p=recid:%d&amp;rm=cit&amp;ln=%s">%s</a><br><br>\n""" % \
-                                          (weburl, recIDs[irec], ln, msg_more[ln]))
-                                req.write("""</td><tr>""")
-                            # co-cited with box:
-                            co_cited_list = calculate_co_cited_with_list(recIDs[irec])
-                            if co_cited_list:
-                                req.write("""<tr><td>""")
-                                print_record_list_for_similarity_boxen(req,
-                                                                       msg_cocited_with_x_records[ln] % len(co_cited_list),
-                                                                       co_cited_list,
-                                                                       ln)                           
-                                req.write("""&nbsp;<a href="%s/search.py?p=cocitedwith:%d&amp;ln=%s">%s</a><br>\n""" % \
-                                          (weburl, recIDs[irec], ln, msg_more[ln]))
-                                req.write("""</td></tr>""")
-                            # citation history graph:
-                            if citing_list:
-                                req.write("""<tr><td>""")
-                                req.write(create_citation_history_graph_and_box(recIDs[irec], ln))
-                                req.write("""</td></tr>""")
-                            # download similarity box:
-                            download_similarity_list = calculate_reading_similarity_list(recIDs[irec], "downloads")
-                            if download_similarity_list:
-                                req.write("""<tr><td>""")
-                                req.write(create_download_history_graph_and_box(recIDs[irec], ln))
-                                req.write("""</td><tr>""")
-                                req.write("""<tr><td>""")
-                                print_record_list_for_similarity_boxen(req,
-                                                                       msg_people_who_downloaded_this_document[ln],
-                                                                       download_similarity_list,
-                                                                       ln)
-                                req.write("""</td></tr>""")
-                            req.write("""</table>""")   
-                        # print page view similarity box:
-                        page_view_similarity_list = calculate_reading_similarity_list(recIDs[irec], "pageviews")
-                        if page_view_similarity_list:
-                            req.write("<p>&nbsp;")
-                            print_record_list_for_similarity_boxen(req,
-                                                                   msg_people_who_viewed_this_page[ln],
-                                                                   page_view_similarity_list,
-                                                                   ln)
-                    req.write("<p>&nbsp;")
-    else:        
-        print_warning(req, 'Use different search terms.')        
+                        temp['creationdate'] = get_creation_date(recIDs[irec])
+                        temp['modifydate'] = get_modification_date(recIDs[irec])
+
+                    if cfg_experimental_features:
+                       r = calculate_cited_by_list(recIDs[irec])
+                       if r:
+                           temp ['citinglist'] = r
+                           temp ['citationhistory'] = create_citation_history_graph_and_box(recIDs[irec], ln)
+
+                       r = calculate_co_cited_with_list(recIDs[irec])
+                       if r: temp ['cociting'] = r
+
+                       r = calculate_reading_similarity_list(recIDs[irec], "downloads")
+                       if r:
+                           temp ['downloadsimilarity'] = r
+                           temp ['downloadhistory'] = create_download_history_graph_and_box(recIDs[irec], ln)
+
+
+                    r = calculate_reading_similarity_list(recIDs[irec], "pageviews")
+                    if r: temp ['viewsimilarity'] = r
+                    
+                    rows.append(temp)
+
+                req.write(websearch_templates.tmpl_records_format_other(
+                           ln = ln,
+                           weburl = weburl,
+                           url_args = url_args,
+                           rows = rows,
+                           format = format,
+                         ))
+    else:
+        print_warning(req, _("Use different search terms."))
 
 def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompress):
     "Prints record 'recID' formatted accoding to 'format'."
@@ -2851,7 +2462,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                             if ind1 == "_":
                                 ind1 = ""
                             if ind2 == "_":
-                                ind2 = ""                        
+                                ind2 = ""
                             # print field tag
                             if field_number != field_number_old or field[:-1] != field_old[:-1]:
                                 if format.startswith("xm") or format == "marcxml":
@@ -2906,10 +2517,10 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 out += "        <identifier>%s</identifier>\n" % encode_for_xml(f)
 
             for f in get_fieldvalues(recID, "520__a"):
-                out += "        <description>%s</description>\n" % encode_for_xml(f)            
+                out += "        <description>%s</description>\n" % encode_for_xml(f)
 
             out += "        <date>%s</date>\n" % get_creation_date(recID)
-        out += "    </dc>\n"                    
+        out += "    </dc>\n"
 
     elif format.startswith("x_"):
         # underscore means that XML formats should be called on-the-fly; suitable for testing formats
@@ -2961,67 +2572,11 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 if cfg_call_bibformat:
                     out += call_bibformat(recID)
                 else:
-                    # okay, need to construct a simple "Detailed record" format of our own:
-                    out += "<p>&nbsp;"
-                    # secondly, title:
-                    titles = get_fieldvalues(recID, "245__a")
-                    for title in titles:
-                        out += "<p><p><center><big><strong>%s</strong></big></center>" % title
-                    # thirdly, authors:
-                    authors = get_fieldvalues(recID, "100__a") + get_fieldvalues(recID, "700__a")
-                    if authors:
-                        out += "<p><p><center>"
-                        for author in authors:
-                            out += """<a href="%s/search.py?p=%s&f=author">%s</a> ;""" % (weburl, urllib.quote(author), author)
-                        out += "</center>"
-                    # fourthly, date of creation:
-                    dates = get_fieldvalues(recID, "260__c")
-                    for date in dates:
-                        out += "<p><center><small>%s</small></center>" % date
-                    # fifthly, abstract:
-                    abstracts = get_fieldvalues(recID, "520__a")
-                    for abstract in abstracts:
-                        out += """<p style="margin-left: 15%%; width: 70%%">
-                                 <small><strong>Abstract:</strong> %s</small></p>""" % abstract
-                    # fifthly bis, keywords:
-                    keywords = get_fieldvalues(recID, "6531_a")
-                    if len(keywords):
-                        out += """<p style="margin-left: 15%; width: 70%">
-                                 <small><strong>Keyword(s):</strong></small>"""
-                        for keyword in keywords:
-                            out += """<small><a href="%s/search.py?p=%s&f=keyword">%s</a> ;</small> """ % (weburl, urllib.quote(keyword), keyword)
-                    # fifthly bis bis, published in:
-                    prs_p = get_fieldvalues(recID, "909C4p")
-                    prs_v = get_fieldvalues(recID, "909C4v")
-                    prs_y = get_fieldvalues(recID, "909C4y")
-                    prs_n = get_fieldvalues(recID, "909C4n")
-                    prs_c = get_fieldvalues(recID, "909C4c")
-                    for idx in range(0,len(prs_p)):
-                        out += """<p style="margin-left: 15%%; width: 70%%">
-                                 <small><strong>Publ. in:</strong> %s"""  % prs_p[idx]
-                        if prs_v and prs_v[idx]:
-                            out += """<strong>%s</strong>""" % prs_v[idx]
-                        if prs_y and prs_y[idx]:
-                            out += """(%s)""" % prs_y[idx]
-                        if prs_n and prs_n[idx]:
-                            out += """, no.%s""" % prs_n[idx]
-                        if prs_c and prs_c[idx]:
-                            out += """, p.%s""" % prs_c[idx]
-                        out += """.</small>"""
-                    # sixthly, fulltext link:
-                    urls_z = get_fieldvalues(recID, "8564_z")
-                    urls_u = get_fieldvalues(recID, "8564_u")
-                    for idx in range(0,len(urls_u)):
-                        link_text = "URL"
-                        try:
-                            if urls_z[idx]:
-                                link_text = urls_z[idx]
-                        except IndexError:
-                            pass
-                        out += """<p style="margin-left: 15%%; width: 70%%">
-                        <small><strong>%s:</strong> <a href="%s">%s</a></small>""" % (link_text, urls_u[idx], urls_u[idx])
-                    # print some white space at the end:
-                    out += "<p><p>"
+                    out += websearch_templates.tmpl_print_record_detailed(
+                             ln = ln,
+                             recID = recID,
+                             weburl = weburl,
+                           )
 
     elif format.startswith("hb_") or format.startswith("hd_"):
         # underscore means that HTML brief/detailed formats should be called on-the-fly; suitable for testing formats
@@ -3087,62 +2642,21 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 # record 'recID' is formatted in 'format', so print it
                 out += "%s" % decompress(res[0][0])
             else:
-                # record 'recID' does not exist in format 'format', so print some default format:
-                # firstly, title:
-                titles = get_fieldvalues(recID, "245__a")
-                for title in titles:
-                    out += "<strong>%s</strong> " % title
-                # secondly, authors:
-                authors = get_fieldvalues(recID, "100__a") + get_fieldvalues(recID, "700__a")
-                if authors:
-                    out += " / "
-                    for i in range (0,cfg_author_et_al_threshold):
-                        if i < len(authors):
-                            out += """<a href="%s/search.py?p=%s&f=author">%s</a> ;""" % (weburl, urllib.quote(authors[i]), authors[i])
-                    if len(authors) > cfg_author_et_al_threshold:
-                        out += " <em>et al</em>"
-                # thirdly, date of creation:
-                dates = get_fieldvalues(recID, "260__c")
-                for date in dates:
-                    out += " %s." % date
-                # thirdly bis, report numbers:
-                rns = get_fieldvalues(recID, "037__a")
-                for rn in rns:
-                    out += """ <small class="quicknote">[%s]</small>""" % rn
-                rns = get_fieldvalues(recID, "088__a")
-                for rn in rns:
-                    out += """ <small class="quicknote">[%s]</small>""" % rn
-                # fourthly, beginning of abstract:
-                abstracts = get_fieldvalues(recID, "520__a")
-                for abstract in abstracts:
-                    out += "<br><small>%s [...]</small>" % abstract[:1+string.find(abstract, '.')]
-                # fifthly, fulltext link:
-                urls_z = get_fieldvalues(recID, "8564_z")
-                urls_u = get_fieldvalues(recID, "8564_u")
-                for idx in range(0,len(urls_u)):
-                    out += """<br><small class="note"><a class="note" href="%s">%s</a></small>""" % (urls_u[idx], urls_u[idx])
+                out += websearch_templates.tmpl_print_record_brief(
+                         ln = ln,
+                         recID = recID,
+                         weburl = weburl,
+                       )
 
             # at the end of HTML brief mode, print the "Detailed record" functionality:
             if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
                 pass # do nothing for portfolio and on-the-fly formats
             else:
-                if cfg_use_aleph_sysnos:
-                    alephsysnos = get_fieldvalues(recID, "970__a")
-                    if len(alephsysnos)>0:
-                        alephsysno = alephsysnos[0]
-                        out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?sysno=%s&amp;ln=%s">%s</a></span>""" \
-                               % (weburl, alephsysno, ln, msg_detailed_record[ln])
-                    else:
-                        out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s&amp;ln=%s">%s</a></span>""" \
-                               % (weburl, recID, ln, msg_detailed_record[ln])
-                else:
-                    out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s&amp;ln=%s">%s</a></span>""" \
-                           % (weburl, recID, ln, msg_detailed_record[ln])
-                    out += """<span class="moreinfo"> - <a class="moreinfo" href="%s/search.py?p=recid:%d&amp;rm=wrd&amp;ln=%s">%s</a></span>\n""" % \
-                           (weburl, recID, ln, msg_similar_records[ln])
-                    if cfg_experimental_features:
-                        out += """<span class="moreinfo"> - <a class="moreinfo" href="%s/search.py?p=recid:%d&amp;rm=cit&amp;ln=%s">%s</a></span>\n""" % \
-                               (weburl, recID, ln, msg_cited_by[ln]) 
+                out += websearch_templates.tmpl_print_record_brief_links(
+                         ln = ln,
+                         recID = recID,
+                         weburl = weburl,
+                       )
 
     # print record closing tags, if needed:
     if format == "marcxml" or format == "oai_dc":
@@ -3176,7 +2690,7 @@ def log_query(hostname, query_args, uid=-1):
         try:
             id_query = res[0][0]
         except:
-            id_query = run_sql("INSERT INTO query (type, urlargs) VALUES ('r', %s)", (query_args,))        
+            id_query = run_sql("INSERT INTO query (type, urlargs) VALUES ('r', %s)", (query_args,))
         if id_query:
             run_sql("INSERT INTO user_query (id_user, id_query, hostname, date) VALUES (%s, %s, %s, %s)",
                     (uid, id_query, hostname,
@@ -3238,7 +2752,7 @@ def wash_url_argument(var, new_type):
                 out = 0
         else:
             out = 0
-    return out       
+    return out
 
 ### CALLABLES
 
@@ -3269,7 +2783,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                per collection in the search results page are
                displayed.
 
-          sf - sort field (e.g. "title").  
+          sf - sort field (e.g. "title").
 
           so - sort order ("a"=ascending, "d"=descending).
 
@@ -3285,104 +2799,104 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                detailed), "x" means XML output, "t" means plain text
                output, "id" means no output at all but to return list
                of recIDs found.  (Suitable for high-level API.)
-          
+
           ot - output only these MARC tags (e.g. "100,700,909C0b").
                Useful if only some fields are to be shown in the
                output, e.g. for library to control some fields.
-          
+
           as - advanced search ("0" means no, "1" means yes).  Whether
                search was called from within the advanced search
                interface.
-          
+
           p1 - first pattern to search for in the advanced search
                interface.  Much like 'p'.
-          
+
           f1 - first field to search within in the advanced search
                interface.  Much like 'f'.
-          
+
           m1 - first matching type in the advanced search interface.
                ("a" all of the words, "o" any of the words, "e" exact
                phrase, "p" partial phrase, "r" regular expression).
-          
+
          op1 - first operator, to join the first and the second unit
                in the advanced search interface.  ("a" add, "o" or,
                "n" not).
 
           p2 - second pattern to search for in the advanced search
                interface.  Much like 'p'.
-          
+
           f2 - second field to search within in the advanced search
                interface.  Much like 'f'.
-          
+
           m2 - second matching type in the advanced search interface.
                ("a" all of the words, "o" any of the words, "e" exact
                phrase, "p" partial phrase, "r" regular expression).
-          
+
          op2 - second operator, to join the second and the third unit
                in the advanced search interface.  ("a" add, "o" or,
                "n" not).
 
           p3 - third pattern to search for in the advanced search
                interface.  Much like 'p'.
-          
+
           f3 - third field to search within in the advanced search
                interface.  Much like 'f'.
-          
+
           m3 - third matching type in the advanced search interface.
                ("a" all of the words, "o" any of the words, "e" exact
                phrase, "p" partial phrase, "r" regular expression).
-          
+
           sc - split by collection ("0" no, "1" yes).  Governs whether
                we want to present the results in a single huge list,
                or splitted by collection.
-          
+
         jrec - jump to record (e.g. "234").  Used for navigation
                inside the search results.
-          
+
        recid - display record ID (e.g. "20000").  Do not
                search/browse but go straight away to the Detailed
                record page for the given recID.
-       
+
       recidb - display record ID bis (e.g. "20010").  If greater than
                'recid', then display records from recid to recidb.
                Useful for example for dumping records from the
                database for reformatting.
-      
+
        sysno - display old system SYS number (e.g. "").  If you
                migrate to CDSware from another system, and store your
                old SYS call numbers, you can use them instead of recid
                if you wish so.
-       
+
           id - the same as recid, in case recid is not set.  For
                backwards compatibility.
-          
+
          idb - the same as recid, in case recidb is not set.  For
                backwards compatibility.
 
        sysnb - the same as sysno, in case sysno is not set.  For
                backwards compatibility.
-               
+
       action - action to do.  "SEARCH" for searching, "Browse" for
                browsing.  Default is to search.
-      
+
          d1y - first date year (e.g. "1998").  Useful for search
                limits on creation date.
-                    
+
          d1m - first date month (e.g. "08").  Useful for search
                limits on creation date.
-               
+
          d1d - first date day (e.g. "23").  Useful for search
                limits on creation date.
-               
+
          d2y - second date year (e.g. "1998").  Useful for search
                limits on creation date.
-                    
+
          d2m - second date month (e.g. "09").  Useful for search
                limits on creation date.
-               
+
          d2d - second date day (e.g. "02").  Useful for search limits
                on creation date.
-               
+
      verbose - verbose level (0=min, 9=max).  Useful to print some
                internal information on the searching process in case
                something goes wrong.
@@ -3394,9 +2908,9 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
 
           ln - language of the search interface (e.g. "en").  Useful
                for internationalization.
-          
+
     """
-    
+
     # wash all passed arguments:
     cc = wash_url_argument(cc, 'str')
     sc = wash_url_argument(sc, 'int')
@@ -3459,7 +2973,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                     pl += "+%s:\"%s\" " % (fieldcode, val)
                     pl_in_url += "&amp;%s=%s" % (urllib.quote(fieldcode), urllib.quote(val))
     # deduce recid from sysno argument (if applicable):
-    if sysno: # ALEPH SYS number was passed, so deduce MySQL recID for the record:            
+    if sysno: # ALEPH SYS number was passed, so deduce MySQL recID for the record:
         recid = get_mysql_recid_from_aleph_sysno(sysno)
     # deduce collection we are in (if applicable):
     if recid>0:
@@ -3501,11 +3015,11 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         except:
             if of.startswith("h"):
                 req.write(create_error_box(req, verbose=verbose, ln=ln))
-            return page_end(req, of, ln)            
+            return page_end(req, of, ln)
 
     elif rm and p.startswith("recid:"):
         ## 3-ter - similarity search needed
-        page_start(req, of, cc, as, ln, uid, msg_search_results[ln]) 
+        page_start(req, of, cc, as, ln, uid, msg_search_results[ln])
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
@@ -3591,7 +3105,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 if results_in_any_collection._nbhits == 0:
                     if of.startswith("h"):
                         req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
-                    return page_end(req, of, ln)     
+                    return page_end(req, of, ln)
                 if p2:
                     results_tmp = search_pattern(req, p2, f2, m2, ap=ap, of=of, verbose=verbose, ln=ln)
                     if op1 == "a": # add
@@ -3607,7 +3121,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                     if results_in_any_collection._nbhits == 0:
                         if of.startswith("h"):
                             req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
-                        return page_end(req, of, ln)                
+                        return page_end(req, of, ln)
                 if p3:
                     results_tmp = search_pattern(req, p3, f3, m3, ap=ap, of=of, verbose=verbose, ln=ln)
                     if op2 == "a": # add
@@ -3618,13 +3132,13 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                         results_in_any_collection.difference(results_tmp)
                     else:
                         if of.startswith("h"):
-                            print_warning(req, "Invalid set operation %s." % op2, "Error")            
+                            print_warning(req, "Invalid set operation %s." % op2, "Error")
                     results_in_any_collection.calculate_nbhits()
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
                     req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
-                return page_end(req, of, ln)                            
+                return page_end(req, of, ln)
         else:
             ## 3B - simple search
             try:
@@ -3639,11 +3153,11 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
             if of.startswith("h"):
                 req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
             return page_end(req, of, ln)
-                
-#             search_cache_key = p+"@+f+"@"+string.join(colls_to_search,",")
+
+#             search_cache_key = p+"@"+f+"@"+string.join(colls_to_search,",")
 #             if search_cache.has_key(search_cache_key): # is the result in search cache?
-#                 results_final = search_cache[search_cache_key]        
-#             else:       
+#                 results_final = search_cache[search_cache_key]
+#             else:
 #                 results_final = search_pattern(req, p, f, colls_to_search)
 #                 search_cache[search_cache_key] = results_final
 #             if len(search_cache) > cfg_search_cache_size: # is the cache full? (sanity cleaning)
@@ -3657,12 +3171,12 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 req.write(create_error_box(req, verbose=verbose, ln=ln))
                 req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
             return page_end(req, of, ln)
-        
+
         if results_final == {}:
             if of.startswith("h"):
                 req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
             return page_end(req, of, ln)
-        
+
         # search stage 5: apply search option limits and restrictions:
         if day1 != "":
             try:
@@ -3675,13 +3189,13 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
                     req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
-                return page_end(req, of, ln)                            
+                return page_end(req, of, ln)
             if results_final == {}:
                 if of.startswith("h"):
                     req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
                 return page_end(req, of, ln)
 
-        
+
 
         if pl:
             try:
@@ -3694,7 +3208,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
                     req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
-                return page_end(req, of, ln)                            
+                return page_end(req, of, ln)
             if results_final == {}:
                 if of.startswith("h"):
                     req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
@@ -3702,7 +3216,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
 
         t2 = os.times()[4]
         cpu_time = t2 - t1
-        ## search stage 6: display results:            
+        ## search stage 6: display results:
         results_final_nb_total = 0
         results_final_nb = {} # will hold number of records found in each collection
                               # (in simple dict to display overview more easily; may refactor later)
@@ -3715,7 +3229,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         else:
             # yes, some hits found: good!
             # collection list may have changed due to not-exact-match-found policy so check it out:
-            for coll in results_final.keys(): 
+            for coll in results_final.keys():
                 if coll not in colls_to_search:
                     colls_to_search.append(coll)
             # print results overview:
@@ -3731,15 +3245,15 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                     results_final_for_all_colls_rank_records_output = rank_records(rm, 0, results_final_for_all_colls,
                                                                                    string.split(p) + string.split(p1) +
                                                                                    string.split(p2) + string.split(p3), verbose)
-                    if results_final_for_all_colls_rank_records_output[0]:                        
+                    if results_final_for_all_colls_rank_records_output[0]:
                         recIDs = results_final_for_all_colls_rank_records_output[0]
                 return recIDs
             elif of.startswith("h"):
-                req.write(print_results_overview(colls_to_search, results_final_nb_total, results_final_nb, cpu_time, ln))
+                req.write(print_results_overview(req, colls_to_search, results_final_nb_total, results_final_nb, cpu_time, ln))
             # print records:
             if len(colls_to_search)>1:
                 cpu_time = -1 # we do not want to have search time printed on each collection
-            for coll in colls_to_search:                
+            for coll in colls_to_search:
                 if results_final.has_key(coll) and results_final[coll]._nbhits:
                     if of.startswith("h"):
                         req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
@@ -3764,13 +3278,13 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                         else:
                             # rank_records failed and returned some error message to display:
                             print_warning(req, results_final_relevances_prologue)
-                            print_warning(req, results_final_relevances_epilogue)                                
+                            print_warning(req, results_final_relevances_epilogue)
                     print_records(req, results_final_recIDs, jrec, rg, of, ot, ln,
                                   results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue)
                     if of.startswith("h"):
                         req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
                                                     jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
-                                                    sc, pl_in_url, 
+                                                    sc, pl_in_url,
                                                     d1y, d1m, d1d, d2y, d2m, d2d, cpu_time, 1))
             if f == "author" and of.startswith("h"):
                 req.write(create_similarly_named_authors_link_box(p, ln))
@@ -3796,7 +3310,7 @@ def perform_request_cache(req, action="show"):
     global collection_i18nname_cache
     global collection_i18nname_cache_timestamp
     req.content_type = "text/html"
-    req.send_http_header() 
+    req.send_http_header()
     out = ""
     out += "<h1>Search Cache</h1>"
     # clear cache if requested:
@@ -3860,7 +3374,7 @@ def perform_request_cache(req, action="show"):
 def perform_request_log(req, date=""):
     """Display search log information for given date."""
     req.content_type = "text/html"
-    req.send_http_header() 
+    req.send_http_header()
     req.write("<h1>Search Log</h1>")
     if date: # case A: display stats for a day
         yyyymmdd = string.atoi(date)
@@ -3893,7 +3407,7 @@ def perform_request_log(req, date=""):
                 req.write("""<tr><td>%s</td><td align="right"><a href="%s/search.py/log?date=%d">%s</a></td></tr>""" % (day, weburl,day,line))
             p.close()
         req.write("</table>")
-    return "\n"    
+    return "\n"
 
 def profile(p="", f="", c=cdsname):
     """Profile search time."""
@@ -3901,7 +3415,7 @@ def profile(p="", f="", c=cdsname):
     import pstats
     profile.run("perform_request_search(p='%s',f='%s', c='%s')" % (p, f, c), "perform_request_search_profile")
     p = pstats.Stats("perform_request_search_profile")
-    p.strip_dirs().sort_stats("cumulative").print_stats()        
+    p.strip_dirs().sort_stats("cumulative").print_stats()
     return 0
 
 ## test cases:
@@ -3929,4 +3443,5 @@ def profile(p="", f="", c=cdsname):
 
 ## profiling:
 #profile("of the this")
+
 
