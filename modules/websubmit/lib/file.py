@@ -39,6 +39,11 @@ from messages import *
 from mod_python import apache
 from websubmit_config import *
 
+from messages import gettext_set_language
+
+import template
+websubmit_templates = template.load('websubmit')
+
 archivepath = filedir
 archivesize = filedirsize
 
@@ -52,38 +57,38 @@ class BibRecDocs:
         self.id = recid
         self.bibdocs = []
         self.buildBibDocList()
-    
+
     def buildBibDocList(self):
         self.bibdocs = []
         res = run_sql("select id_bibdoc,type from bibrec_bibdoc,bibdoc where id=id_bibdoc and id_bibrec=%s and status!='deleted'", (self.id,))
         for row in res:
                 self.bibdocs.append(BibDoc(bibdocid=row[0],recid=self.id))
-    
+
     def listBibDocs(self,type=""):
         tmp=[]
         for bibdoc in self.bibdocs:
             if type=="" or type == bibdoc.getType():
                 tmp.append(bibdoc)
         return tmp
-        
+
     def getBibDocNames(self,type="Main"):
         names = []
         for bibdoc in self.listBibDocs(type):
             names.append(bibdoc.getDocName())
         return names
-        
+
     def getBibDoc(self,bibdocid):
         for bibdoc in self.bibdocs:
             if bibdoc.getId() == bibdocid:
                 return bibdoc
         return None
-        
+
     def deleteBibDoc(self,bibdocid):
         for bibdoc in self.bibdocs:
             if bibdoc.getId() == bibdocid:
                 bibdoc.delete()
         self.buildBibDocList()
-        
+
     def addBibDoc(self,type="Main",docname="file"):
         while docname in self.getBibDocNames(type):
             match = re.match("(.*_)([^_]*)",docname)
@@ -98,7 +103,7 @@ class BibRecDocs:
         if bibdoc != None:
             self.bibdocs.append(bibdoc)
         return bibdoc
-        
+
     def addNewFile(self,fullpath,type="Main"):
         filename = re.sub("\..*","",re.sub(r".*[\\/:]", "", fullpath))
         bibdoc = self.addBibDoc(type,filename)
@@ -106,7 +111,7 @@ class BibRecDocs:
             bibdoc.addFilesNewVersion(files=[fullpath])
             return bibdoc
         return None
-            
+
     def addNewVersion(self,fullpath,bibdocid):
         bibdoc = self.getBibDoc(bibdocid)
         if bibdoc != None:
@@ -125,21 +130,21 @@ class BibRecDocs:
                 bibdoc.changeName(docname)
             return bibdoc
         return None
-        
+
     def addNewFormat(self,fullpath,bibdocid):
         bibdoc = self.getBibDoc(bibdocid)
         if bibdoc != None:
             bibdoc.addFilesNewFormat(files=[fullpath])
             return bibdoc
         return None
-         
+
     def listLatestFiles(self,type=""):
         docfiles = []
         for bibdoc in self.listBibDocs(type):
             for docfile in bibdoc.listLatestFiles():
                 docfiles.append(docfile)
         return docfiles
-        
+
     def checkFileExists(self,fullpath,type=""):
         if os.path.exists(fullpath):
             docfiles = self.listLatestFiles(type)
@@ -148,8 +153,8 @@ class BibRecDocs:
                     return docfile.getBibDocId()
         else:
             return 0
-            
-    def display(self,bibdocid="",version="",type=""):
+
+    def display(self,bibdocid="",version="",type="", ln = cdslang):
         t=""
         bibdocs = []
         if bibdocid!="":
@@ -160,20 +165,28 @@ class BibRecDocs:
             bibdocs = self.listBibDocs(type)
         if len(bibdocs) > 0:
             types = listTypesFromArray(bibdocs)
+            fulltypes = []
             for mytype in types:
-                t+="<small><b>%s</b> file(s):</small>" % mytype
-                t+="<ul>"
+                fulltype = {
+                            'name' : mytype,
+                            'content' : [],
+                           }
                 for bibdoc in bibdocs:
                     if mytype == bibdoc.getType():
-                        t+=bibdoc.display(version)
-                t+="</ul>"
+                         fulltype['content'].append(bibdoc.display(version, ln = ln))
+                fulltypes.append(fulltype)
+
+            t = websubmit_templates.tmpl_bibrecdoc_filelist(
+                  ln = ln,
+                  types = fulltypes,
+                )
         return t
 
 class BibDoc:
     """this class represents one file attached to a record
-        there is a one to one mapping between an instance of this class and 
+        there is a one to one mapping between an instance of this class and
         an entry in the bibdoc db table"""
-        
+
     def __init__ (self,bibdocid="",recid="",docname="file",type="Main"):
         # bibdocid is known, the document already exists
         if bibdocid != "":
@@ -228,7 +241,7 @@ class BibDoc:
         # link with relatedFiles
         self.relatedFiles = {}
         self.BuildRelatedFileList()
-        
+
     def addFilesNewVersion(self,files=[]):
         """add a new version of a file to an archive"""
         latestVersion = self.getLatestVersion()
@@ -241,7 +254,7 @@ class BibDoc:
                 filename = re.sub(r".*[\\/:]", "", file)
                 shutil.copy(file,"%s/%s;%s" % (self.basedir,filename,myversion))
         self.BuildFileList()
-               
+
     def addFilesNewFormat(self,files=[],version=""):
         """add a new format of a file to an archive"""
         if version == "":
@@ -251,13 +264,13 @@ class BibDoc:
                 filename = re.sub(r".*[\\/:]", "", file)
                 shutil.copy(file,"%s/%s;%s" % (self.basedir,filename,version))
         self.BuildFileList()
-               
+
     def getIcon(self):
         if self.relatedFiles.has_key('Icon'):
             return self.relatedFiles['Icon'][0]
         else:
             return None
-               
+
     def addIcon(self,file):
         """link an icon with the bibdoc object"""
         #first check if an icon already exists
@@ -275,14 +288,14 @@ class BibDoc:
                 fp.write(str(self.id))
                 fp.close()
         self.BuildRelatedFileList()
-        
+
     def deleteIcon(self):
         existingIcon = self.getIcon()
         if existingIcon != None:
             existingIcon.delete()
         self.BuildRelatedFileList()
 
-    def display(self,version=""):
+    def display(self,version="", ln = cdslang):
         t=""
         if version == "all":
             docfiles = self.listAllFiles()
@@ -295,45 +308,55 @@ class BibDoc:
             imagepath = "%s/getfile.py?docid=%s&name=%s&format=gif" % (weburl,existingIcon.getId(),urllib.quote(existingIcon.getDocName()))
         else:
             imagepath = "%s/smallfiles.gif" % images
-        t+="<table border=0 cellspacing=1 class=\"searchbox\"><tr><td align=left colspan=2 class=\"portalboxheader\"><img src='%s' border=0>&nbsp;&nbsp;%s</td></tr>" % (imagepath,self.docname)
+
+        versions = []
         for version in listVersionsFromArray(docfiles):
+            currversion = {
+                            'version' : version,
+                            'previous' : 0,
+                            'content' : []
+                          }
             if version == self.getLatestVersion() and version != "1":
-                versiontext =  "<br>(see <a href=\"%s/getfile.py?docid=%s&version=all\">previous</a>)" % (weburl,self.id)
-            else:
-                versiontext = ""
-            t+="<tr><td class=\"portalboxheader\"><font size=-2>version %s%s</td><td>" % (version,versiontext)
-            t+="<table>"
+                currversion['previous'] = 1
             for docfile in docfiles:
                 if docfile.getVersion() == version:
-                    t +=docfile.display()
-            t+="</table></td></tr>"
-        t+="</table>"
+                    currversion['content'].append(docfile.display(ln = ln))
+            versions.append(currversion)
+
+        t = websubmit_templates.tmpl_bibdoc_filelist(
+              ln = ln,
+              weburl = weburl,
+              versions = versions,
+              imagepath = imagepath,
+              docname = self.docname,
+              id = self.id,
+            )
         return t
-        
+
     def changeName(self,newname):
         run_sql("update bibdoc set docname=%s where id=%s",(newname,self.id,))
         self.docname = newname
-        
+
     def getDocName(self):
         """retrieve bibdoc name"""
         return self.docname
-        
+
     def getBaseDir(self):
         """retrieve bibdoc base directory"""
         return self.basedir
-        
+
     def getType(self):
         """retrieve bibdoc type"""
         return self.type
-        
+
     def getRecid(self):
         """retrieve bibdoc recid"""
         return self.recid
-        
+
     def getId(self):
         """retrieve bibdoc id"""
         return self.id
-        
+
     def getFile(self,name,format,version):
         if version == "":
             docfiles = self.listLatestFiles()
@@ -350,11 +373,11 @@ class BibDoc:
             if not docfile.getVersion() in versions:
                 versions.append(docfile.getVersion())
         return versions
-        
+
     def delete(self):
         """delete the current bibdoc instance"""
         run_sql("update bibdoc set status='deleted' where id=%s",(self.id,))
-        
+
     def BuildFileList(self):
         """lists all files attached to the bibdoc"""
         self.docfiles = []
@@ -384,7 +407,7 @@ class BibDoc:
                         fullname_extension = fullname[fullname_extension_postition+1:]
                     # we can append file:
                     self.docfiles.append(BibDocFile(filepath,self.type,fileversion,fullname_basename,fullname_extension,self.id))
-    
+
     def BuildRelatedFileList(self):
         res = run_sql("select ln.id_bibdoc2,ln.type from bibdoc_bibdoc as ln,bibdoc where id=ln.id_bibdoc2 and ln.id_bibdoc1=%s and status!='deleted'",(self.id,))
         for row in res:
@@ -393,10 +416,10 @@ class BibDoc:
             if not self.relatedFiles.has_key(type):
                 self.relatedFiles[type] = []
             self.relatedFiles[type].append(BibDoc(bibdocid=bibdocid))
-            
+
     def listAllFiles(self):
         return self.docfiles
-        
+
     def listLatestFiles(self):
         return self.listVersionFiles(self.getLatestVersion())
 
@@ -406,7 +429,7 @@ class BibDoc:
             if docfile.getVersion() == version:
                 tmp.append(docfile)
         return tmp
-        
+
     def getLatestVersion(self):
         if len(self.docfiles) > 0:
             self.docfiles.sort(orderFilesWithVersion)
@@ -420,9 +443,10 @@ class BibDoc:
     def registerDownload(self,addressIp,version,format,userid=0):
         return run_sql("INSERT INTO rnkDOWNLOADS (id_bibrec,id_bibdoc,file_version,file_format,id_user,client_host,download_time) VALUES (%s,%s,%s,%s,%s,INET_ATON(%s),NOW())",
                        (self.recid,self.id,version,string.upper(format),userid,addressIp,))
+
 class BibDocFile:
     """this class represents a physical file in the CDSware filesystem"""
-    
+
     def __init__(self,fullpath,type,version,name,format,bibdocid):
         self.fullpath = fullpath
         self.type = type
@@ -430,10 +454,10 @@ class BibDocFile:
         self.version = version
         self.size = os.path.getsize(fullpath)
         self.md = os.path.getmtime(fullpath)
-	try:
+        try:
             self.cd = os.path.getctime(fullpath)
-	except:
-	    self.cd = self.md
+        except:
+            self.cd = self.md
         self.name = name
         self.format = format
         self.dir = os.path.dirname(fullpath)
@@ -445,39 +469,48 @@ class BibDocFile:
             self.fullname = "%s.%s" % (name,format)
             (self.mime,self.encoding) = mimetypes.guess_type(self.fullname)
             if self.mime == None:
-              self.mime = "text/plain"
-        
-    def display(self):
+                self.mime = "text/plain"
+
+    def display(self, ln = cdslang):
         if self.format != "":
             format = ".%s" % self.format
         else:
             format = ""
-        return "<tr><td valign=top><small><a href=\"%s/getfile.py?docid=%s&name=%s&format=%s&version=%s\">%s%s</a></td><td valign=top><font size=-2 color=green>[%s&nbsp;B]</font></td></tr>\n""" % (weburl,self.bibdocid,urllib.quote(self.name),urllib.quote(self.format),self.version,self.name,format,self.size)
- 
+        return websubmit_templates.tmpl_bibdocfile_filelist(
+                 ln = ln,
+                 weburl = weburl,
+                 id = self.bibdocid,
+                 selfformat = self.format,
+                 version = self.version,
+                 name = self.name,
+                 format = format,
+                 size = self.size,
+               )
+
     def getType(self):
         return self.type
-        
+
     def getPath(self):
         return self.fullpath
-        
+
     def getBibDocId(self):
         return self.bibdocid
-        
+
     def getName(self):
         return self.name
-        
+
     def getFormat(self):
         return self.format
-        
+
     def getSize(self):
         return self.size
-        
+
     def getVersion(self):
         return self.version
-        
+
     def getRecid(self):
         return run_sql("select id_bibrec from bibrec_bibdoc where id_bibdoc=%s",(self.bibdocid,))[0][0]
-        
+
     def stream(self,req):
         if os.path.exists(self.fullpath):
             req.content_type = self.mime
@@ -489,7 +522,7 @@ class BibDocFile:
             content = fp.read()
             fp.close()
             return content
-    
+
 def readfile(path):
     if os.path.exists(path):
         fp = open(path,"r")
@@ -503,14 +536,14 @@ def listTypesFromArray(bibdocs):
         if not bibdoc.getType() in types:
             types.append(bibdoc.getType())
     return types
-    
+
 def listVersionsFromArray(docfiles):
     versions = []
     for docfile in docfiles:
         if not docfile.getVersion() in versions:
             versions.append(docfile.getVersion())
     return versions
-    
+
 def orderFilesWithVersion(docfile1,docfile2):
     """order docfile objects according to their version"""
     version1 = int(docfile1.getVersion())

@@ -1,5 +1,5 @@
 ## $Id$
-##
+
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -20,7 +20,6 @@
 ## import interesting modules:
 import os
 import sys
-
 from cdsware.config import weburl,cdsname,cdslang
 from cdsware.dbquery import run_sql
 from cdsware.access_control_engine import acc_authorize_action
@@ -32,9 +31,18 @@ from cdsware.websubmit_config import *
 from cdsware.search_engine import search_pattern
 from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
+from cdsware.messages import gettext_set_language
+
+import cdsware.template
+websubmit_templates = cdsware.template.load('websubmit')
+
 def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedAction="",deletedDoctype=""):
     global uid
     ln = wash_language(ln)
+
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     t=""
     # get user ID:
     try:
@@ -43,34 +51,41 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
             return page_not_authorized(req, "../yourapprovals.py/index")
         u_email = get_email(uid)
     except MySQLdb.Error, e:
-        return errorMsg(e.value,req)
-    t+="""
- <table class="searchbox" width="100%" summary="">
-    <tr>
-        <th class="portalboxheader">Refereed Documents</th>
-    </tr>
-    <tr>
-    <td class=\"portalboxbody\">"""
+        return errorMsg(e.value,req, ln = ln)
+
     res = run_sql("select sdocname,ldocname from sbmDOCTYPE")
+    referees = []
     for row in res:
         doctype = row[0]
         docname = row[1]
         reftext = ""
         if isReferee(uid,doctype,"*"):
-            reftext+= "<LI><A HREF=\"publiline.py?doctype=%s\">You are general referee</a><br>" % doctype
             res2 = run_sql("select sname,lname from sbmCATEGORIES where doctype=%s",(doctype,))
+            categories = []
             for row2 in res2:
                 category = row2[0]
                 categname = row2[1]
                 if isReferee(uid,doctype,category):
-                    reftext+= "<LI><A HREF=\"publiline.py?doctype=%s&categ=%s\">You are referee for category: %s (%s)</a><br>" % (doctype,category,categname,category)
-        if reftext != "":
-            t+= "<UL><LI><b>%s</b><UL><small>" % docname
-            t+=reftext
-            t+="</small></UL></UL>"
-    t+="</td></tr></table>"
-    return page(title="Your Approvals",
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                    categories.append({
+                                        'id' : category,
+                                        'name' : categname,
+                                      })
+            referees.append({
+                            'doctype' : doctype,
+                            'docname' : docname,
+                            'categories' : categories
+                           })
+
+
+    t = websubmit_templates.tmpl_yourapprovals(
+          ln = ln,
+          referees = referees
+        )
+    return page(title=_("Your Approvals"),
+                navtrail= """<a class="navtrail" href="%(weburl)s/youraccount.py/display">%(account)s</a>""" % {
+                             'weburl' : weburl,
+                             'account' : _("Your Account"),
+                          },
                 body=t,
                 description="",
                 keywords="",
@@ -88,7 +103,7 @@ def isReferee(uid,doctype="",categ=""):
 def errorMsg(title,req,c=cdsname,ln=cdslang):
     return page(title="error",
                     body = create_error_box(req, title=title,verbose=0, ln=ln),
-                    description="%s - Internal Error" % c, 
+                    description="%s - Internal Error" % c,
                     keywords="%s, CDSware, Internal Error" % c,
                     language=ln,
                     urlargs=req.args)

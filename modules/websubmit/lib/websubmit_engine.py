@@ -1,5 +1,4 @@
 ## $Id$
-## CDSware WebSubmit in mod_python.
 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
@@ -17,8 +16,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-"""CDSware Submission Web Interface."""
 
 ## import interesting modules:
 import string
@@ -41,15 +38,24 @@ from mod_python import apache
 from websubmit_config import *
 from file import *
 
+from messages import gettext_set_language
+
+import template
+websubmit_templates = template.load('websubmit')
+
 def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="", access="",mainmenu="",fromdir="",file="",nextPg="",nbPg="",curpage=1):
     ln = wash_language(ln)
+
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     sys.stdout = req
     # get user ID:
     try:
         uid = getUid(req)
         uid_email = get_email(uid)
     except MySQLdb.Error, e:
-        return errorMsg(e.value,req)
+        return errorMsg(e.value,req, c, ln)
     # variable initialisation
     t = ""
     field = []
@@ -66,34 +72,38 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     # Preliminary tasks
     # check that the user is logged in
     if uid_email == "" or uid_email == "guest":
-        warningMsg("<center><font color=red>Sorry, you must log in to perform this action. Please use the top right menu to do so.</font></center>",req)
+        return warningMsg(websubmit_templates.tmpl_warning_message(
+                           ln = ln,
+                           msg = _("Sorry, you must log in to perform this action. Please use the top right menu to do so.")
+                         ), req, ln)
+        # warningMsg("""<center><font color="red"></font></center>""",req, ln)
     # check we have minimum fields
     if doctype=="" or act=="" or access=="":
-        return errorMsg("invalid parameter",req)
+        return errorMsg(_("invalid parameter"),req, c, ln)
     # retrieve the action and doctype data
     if indir == "":
         res = run_sql("select dir from sbmACTION where sactname=%s",(act,))
         if len(res) == 0:
-            return errorMsg("cannot find submission directory",req)
+            return errorMsg(_("cannot find submission directory"),req, c, ln)
         else:
             row = res[0]
             indir = row[0]
     res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE sdocname=%s",(doctype,))
     if len(res) == 0:
-        return errorMsg("unknown document type",req)
+        return errorMsg(_("unknown document type"),req, c, ln)
     else:
         docname = res[0][0]
         docname = string.replace(docname," ","&nbsp;")
     res = run_sql("SELECT lactname FROM sbmACTION WHERE sactname=%s",(act,))
     if len(res) == 0:
-        return errorMsg("unknown action",req)
+        return errorMsg(_("unknown action"),req, c, ln)
     else:
         actname = res[0][0]
         actname = string.replace(actname," ","&nbsp;")
     subname = "%s%s" % (act,doctype)
     res = run_sql("SELECT nbpg FROM sbmIMPLEMENT WHERE  subname=%s", (subname,))
     if len(res) == 0:
-        return errorMsg("can't figure number of pages",req)
+        return errorMsg(_("can't figure number of pages"),req, c, ln)
     else:
         nbpages = res[0][0]
     #Get current page
@@ -119,7 +129,7 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         try:
             os.makedirs(curdir)
         except:
-            return errorMsg("can't create submission directory",req)
+            return errorMsg(_("can't create submission directory"),req, c, ln)
     # retrieve the original main menu url ans save it in the "mainmenu" file
     if mainmenu != "":
         fp = open("%s/mainmenu" % curdir,"w")
@@ -143,7 +153,7 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     (auth_code, auth_message) = acc_authorize_action(uid, "submit",verbose=0,doctype=doctype, act=act)
     if acc_isRole("submit",doctype=doctype,act=act) and auth_code != 0:
         return warningMsg("<center><font color=red>%s</font></center>" % auth_message, req)
-    # then we update the "journal of submission" 
+    # then we update the "journal of submission"
     res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE  doctype=%s and action=%s and id=%s and email=%s", (doctype,act,access,uid_email,))
     if len(res) == 0:
         run_sql("INSERT INTO sbmSUBMISSIONS values (%s,%s,%s,'pending',%s,'',NOW(),NOW())", (uid_email,doctype,act,access,))
@@ -180,7 +190,7 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
                 try:
                     os.makedirs("%s/files/%s" % (curdir,key))
                 except:
-                    return errorMsg("can't create submission directory",req)
+                    return errorMsg(_("can't create submission directory"),req, c, ln)
             filename = formfields.filename
             if filename != "":
                 # This may be dangerous if the file size is bigger than the available memory
@@ -209,42 +219,16 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             if len(res) > 0:
                 if res[0][0] == 1:
                     setCookie(key,value,uid)
+
     # create interface
-    # top menu
-    t=t+"<FORM method=\"POST\" action=\"submit.py\" onSubmit=\"return tester();\">"
-    t=t+"<center><TABLE cellspacing=0 cellpadding=0 border=0><TR>"
-    t=t+"   <TD class=submitHeader><B>%s&nbsp;</B></TD>" % docname
-    t=t+"   <TD class=submitHeader><small>&nbsp;%s&nbsp;</small></TD>" % actname
-    t=t+"""
-    <TD valign=bottom>
-        <TABLE cellspacing=0 cellpadding=0 border=0 width=100%>
-        <TR><TD class=submitEmptyPage>&nbsp;&nbsp;</TD>"""
-    for i in range(1,nbpages+1):
-        if i == int(curpage):
-            t=t+"<TD class=submitCurrentPage><small>&nbsp;page:%s&nbsp;</small></TD>" % curpage
-        else:
-            t=t+"<TD class=submitPage><small>&nbsp;<A HREF='' onClick=\"if (tester2() == 1){document.forms[0].curpage.value=%s;document.forms[0].submit();return false;} else { return false; }\">%s</A>&nbsp;</small></TD>" % (i,i)
-    t=t+"<TD class=submitEmptyPage>&nbsp;&nbsp;</TD></TR></TABLE></TD>\n"
-    t=t+"<TD class=submitHeader align=right>&nbsp;<A HREF='' onClick=\"window.open('summary.py?doctype=%s&act=%s&access=%s&indir=%s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;\"><font color=white><small>SUMMARY(2)</small></font></A>&nbsp;</TD>\n" % (doctype,act,access,indir)
-    t=t+"</TR>"
-    # main cell
-    t=t+"<TR><TD colspan=5 class=submitHeader><TABLE border=0 cellspacing=0 cellpadding=15 width=\"100%\" class=submitBody><TR><TD><BR>"
-    # display the static form fields
-    t=t+"<INPUT type=\"hidden\" name=\"file\" value=\"%s\">\n" % file
-    t=t+"<INPUT type=\"hidden\" name=\"nextPg\" value=\"%s\">\n" % nextPg
-    t=t+"<INPUT type=\"hidden\" name=\"access\" value=\"%s\">\n" % access
-    t=t+"<INPUT type=\"hidden\" name=\"curpage\" value=\"%s\">\n" % curpage
-    t=t+"<INPUT type=\"hidden\" name=\"nbPg\" value=\"%s\">\n" % nbPg
-    t = t +"<INPUT type=\"hidden\" name=\"doctype\" value=\"%s\">\n" % doctype
-    t=t+"<INPUT type=\"hidden\" name=\"act\" value=\"%s\">\n" % act
-    t=t+"<INPUT type=\"hidden\" name=\"indir\" value=\"%s\">\n" % indir
-    t=t+"<INPUT type=\"hidden\" name=\"mode\" value=\"U\">\n"
-    t=t+"<INPUT type=\"hidden\" name=\"step\" value=\"0\">\n"
     # For each field to be displayed on the page
     subname = "%s%s" % (act,doctype)
     res = run_sql("SELECT * FROM sbmFIELD WHERE  subname=%s and pagenb=%s ORDER BY fieldnb,fieldnb", (subname,curpage,))
-    nbFields = 0
+
+    full_fields = []
+    values = []
     for arr in res:
+        full_field = {}
         # We retrieve its HTML description
         res3 = run_sql("SELECT * FROM sbmFIELDDESC WHERE  name=%s", (arr[3],))
         arr3 = res3[0]
@@ -253,40 +237,32 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         else:
             val=arr3[8]
         # we also retrieve and add the javascript code of the checking function, if needed
+        full_field['javascript'] = ''
         if arr[7] != '':
             res2 = run_sql("SELECT chdesc FROM sbmCHECKS WHERE  chname=%s", (arr[7],))
-            t=t+"<SCRIPT LANGUAGE=\"JavaScript1.1\"  TYPE=\"text/javascript\">\n";
-            t=t+res2[0][0]
-            t=t+"</SCRIPT>\n"
-        # If the field is a textarea
-        if arr3[3] == 'T':
-            text="<TEXTAREA name=\"%s\" rows=%s cols=%s>%s</TEXTAREA>" % (arr[3],arr3[5],arr3[6],val)
-        # If the field is a file upload
-        elif arr3[3] == 'F':
-            text="<INPUT TYPE=file name=\"%s\" size=%s maxlength=%s>" % (arr[3],arr3[4],arr3[7]);
-        # If the field is a text input
-        elif arr3[3] == 'I':
-            text="<INPUT name=\"%s\" size=%s value=\"%s\">" % (arr[3],arr3[4],val)
-        # If the field is a hidden input
-        elif arr3[3] == 'H':
-            text="<INPUT type=\"hidden\" name=\"%s\" value=\"%s\">" % (arr[3],val)
-        # If the field is user-defined
-        elif arr3[3] == 'D':
-            text=arr3[9]
-        # If the field is a select box
-        elif arr3[3] == 'S':
-            text=arr3[9]
-        # If the field is an evaluated script
-        # the execed code should set variable text
-        elif arr3[3] == 'R':
-            co = compile(arr3[9].replace("\r\n","\n"),"<string>","exec")
+            full_field['javascript'] = res2[0][0]
+        full_field['type'] = arr3[3]
+        full_field['name'] = arr[3]
+        full_field['rows'] = arr3[5]
+        full_field['cols'] = arr3[6]
+        full_field['val'] = val
+        full_field['size'] = arr3[4]
+        full_field['maxlength'] = arr3[7]
+        full_field['htmlcode'] = arr3[9]
+        full_field['typename'] = arr[1]
+
+        # The 'R' fields must be executed in the engine's environment,
+        # as the runtime functions access some global and local
+        # variables.
+        if full_field ['type'] == 'R':
+            co = compile (full_field ['htmlcode'].replace("\r\n","\n"),"<string>","exec")
             exec(co)
-        # If the field type is not recognized
         else:
-            text="%s: unknown field type" % arr[1]
+            text = websubmit_templates.tmpl_submit_field (ln = ln, field = full_field)
+
         # we now determine the exact type of the created field
-        if arr3[3] not in [ 'D','R']:
-            field.append(arr[3])
+        if full_field['type'] not in [ 'D','R']:
+            field.append(full_field['name'])
             level.append(arr[5])
             fullDesc.append(arr[4])
             txt.append(arr[6])
@@ -299,12 +275,12 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             else:
                 select.append(0)
             # checks whether it is a radio field or not
-            if re.search("TYPE=radio",text,re.IGNORECASE) != None:
+            if re.search(r"TYPE=[\"']?radio",text,re.IGNORECASE) != None:
                 radio.append(1)
             else:
                 radio.append(0)
             # checks whether it is a file upload or not
-            if re.search("TYPE=file",text,re.IGNORECASE) != None:
+            if re.search(r"TYPE=[\"']?file",text,re.IGNORECASE) != None:
                 upload.append(1)
             else:
                 upload.append(0)
@@ -322,8 +298,6 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             year = time.strftime("%Y");
             text = text.replace("<YYYY>",year)
             fieldhtml.append(text)
-            # increment the fields counter
-            nbFields = nbFields + 1
         else:
             select.append(0)
             radio.append(0)
@@ -335,95 +309,13 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             fullDesc.append(arr[4])
             check.append(arr[7])
             fieldhtml.append(text)
-            nbFields = nbFields+1
-        # now displays the html form field(s)
-        t+="%s\n" % fullDesc[nbFields-1]
-        t+=text+"\n"
-    # if there is a file upload field, we change the encoding type
-    t=t+"<SCRIPT LANGUAGE=\"JavaScript1.1\" TYPE=\"text/javascript\">\n"
-    for i in range(0,nbFields):
-        if upload[i] == 1:
-            t=t+"document.forms[0].encoding = \"multipart/form-data\";\n"
-    # we don't want the form to be submitted if the user enters 'Return'
-    t=t+"function tester(){return false;}\n"
-    # tests if mandatory fields are well filled
-    t=t+"function tester2(){\n"
-    for i in range(0,nbFields):
-        if re.search("%s\[\]"%field[i],fieldhtml[i]):
-            fieldname = "%s[]" % field[i]
-        else:
-            fieldname = field[i]
-        t=t+"  el = document.forms[0].elements['%s'];;;;;\n" % fieldname
-        # If the field must be checked we call the checking function
-        if check[i] != "":
-            t=t+"if (%s(el.value)== 0){\n" % check[i]
-            t=t+"    el.focus();\n"
-            t=t+"    return 0;\n"
-            t=t+"}\n"
-        # If the field is mandatory, we check a value has been selected
-        if level[i] == 'M':
-            if select[i] != 0:
-                # If the field is a select box
-                t=t+"if ((el.selectedIndex == -1)||(el.selectedIndex == 0)){\n"
-                t=t+"    alert(\"The field `%s` is Mandatory.\\n Please make a choice in the 'Select:' box\");\n" % txt[i]
-                t=t+"    return 0;\n"
-                t=t+"}\n"
-            elif radio[i] != 0:
-                # If the field is a radio buttonset
-                t=t+"var check=0;\n"
-                t=t+"for (var j=0;j<el.length;j++){\n"
-                t=t+"    if (el.options[j].checked){check++;}\n"
-                t=t+"}\n"
-                t=t+"if (check == 0){\n"
-                t=t+"    alert(\"Please press a button.\");\n"
-                t=t+"    return 0;\n"
-                t=t+"}\n"
-            else:
-                # If the field is a text input
-                t=t+"if (el.value == ''){\n"
-                t=t+"    alert(\"The field `%s` is Mandatory. Please fill it in.\");\n" % txt[i]
-                t=t+"    return 0;\n"
-                t=t+"}\n"
-    t=t+"return 1;\n"
-    t=t+"}\n"
-    t=t+"</SCRIPT><BR>&nbsp;<BR>&nbsp;</TD></TR></TABLE></TD></TR>\n"
-    # Display the navigation cell
-    # Display "previous page" navigation arrows
-    t=t+"<TR><TD colspan=5><TABLE border=0 cellpadding=0 cellspacing=0 width=\"100%\"><TR>\n"
-    if int(curpage) != 1:
-        t=t+"        <TD class=submitHeader align=left>&nbsp;\n"
-        t=t+"            <A HREF='' onClick=\"if (tester2() == 1){document.forms[0].curpage.value=%s;document.forms[0].submit();return false;} else { return false; }\">" % (int(curpage)-1)
-        t=t+"            <IMG SRC=\"%s/left-trans.gif\" alt=\"previous page\" border=0>\n" % images
-        t=t+"            <strong><font color=white>previous page</A></font></strong></TD>\n"
-    else:
-        t=t+" <TD class=submitHeader>&nbsp;</TD>\n"
-    # Display the submission number
-    t=t+" <TD class=submitHeader align=center><small>Submission no(1): %s</small></TD>\n" % access
-    # Display the "next page" navigation arrow
-    if int(curpage) != int(nbpages):
-        t=t+"        <TD class=submitHeader align=right>\n"
-        t=t+"            <A HREF='' onClick=\"if (tester2()){document.forms[0].curpage.value=%s;document.forms[0].submit();return false;} else {return false;}; return false;\">\n" % (int(curpage)+1)
-        t=t+"            <strong><font color=white> next page</font></strong>\n"
-        t=t+"            <IMG SRC=\"%s/right-trans.gif\" alt=\"next page\" border=0></A>&nbsp;" % images
-    else:
-        t=t+" <TD class=submitHeader>&nbsp;</TD>\n"
-    t=t+"</TR></TABLE></TD></TR></TABLE></center></FORM>"
+        full_field['fullDesc'] = arr[4]
+        full_field['text'] = text
 
-    # # # # # # # # # # # # # # # # # # # # # # # # #
-    # Fill the fields with the previously saved values
-    # # # # # # # # # # # # # # # # # # # # # # # # #
-    t=t+"<SCRIPT LANGUAGE=\"JavaScript1.1\" TYPE=\"text/javascript\">\n"
-    t=t+"<!-- Fill the fields in with the previous saved values-->\n"
-    # For each actual form field
-    for i in range(0,nbFields):
-        if re.search("%s\[\]"%field[i],fieldhtml[i]):
-            fieldname = "%s[]" % field[i]
-        else:
-            fieldname = field[i]
-        text = ''
         # If a file exists with the name of the field we extract the saved value
-        if os.path.exists("%s/%s" % (curdir,field[i])):
-            file = open("%s/%s" % (curdir,field[i]),"r");
+        text = ''
+        if os.path.exists("%s/%s" % (curdir,full_field['name'])):
+            file = open("%s/%s" % (curdir,full_field['name']),"r");
             text = file.read()
             text = re.compile("[\n\r]*$").sub("",text)
             text = re.compile("\n").sub("\\n",text)
@@ -432,59 +324,29 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         # Or if a cookie is set
         # If a cookie is found corresponding to the name of the current
         # field, we set the value of the field to the cookie's value
-        elif getCookie(field[i],uid) != None:
-            value = getCookie(field[i],uid)
+        elif getCookie(full_field['name'],uid) != None:
+            value = getCookie(full_field['name'],uid)
             value = re.compile("\r").sub("",value)
             value = re.compile("\n").sub("\\n",value)
             text = value
-        # If the value isn't empty
-        if text != '':
-            if select[i] != 0:
-                # If the field is a SELECT element
-                values = text.split("\n")
-                tmp=""
-                for val in values:
-                    if tmp != "":
-                        tmp = tmp + " || "
-                    tmp = tmp + "el.options[j].value == \"%s\" || el.options[j].text == \"%s\"" % (val,val)
-                if tmp != "":
-                    t=t+"\n<!--SELECT field found-->\n"
-                    t=t+"el = document.forms[0].elements['%s'];\n" % fieldname
-                    t=t+"for (var j=0;j<el.length;j++){\n"
-                    t=t+"    if (%s){\n" % tmp
-                    t=t+"        el.options[j].selected = true;}}\n"
-            elif radio[i] != 0:
-                # If the field is a RADIO element
-                t=t+"\n<!--RADIO field found-->\n"
-                t=t+"el = document.forms[0].elements['%s'];\n" % fieldname
-                t=t+"if (el.value == \"%s\"){\n" % text
-                t=t+"    el.checked=true;}\n"
-            elif upload[i] == 0:
-                # If the field is not an upload element
-                t=t+"\n<!--INPUT field found-->\n"
-                t=t+"el = document.forms[0].elements['%s'];\n" % fieldname
-                text = text.replace('"','\"')
-                text = text.replace("\n","\\n")
-                t=t+"el.value=\"%s\";\n" % text
-    t=t+"<!--End Fill in section-->\n"
+        values.append(text)
 
-    # JS function finish
-    # This function tests each mandatory field in the whole submission and checks whether
-    # the field has been correctly filled in or not
-    # This function is called when the user presses the "End
-    # Submission" button
+        full_fields.append(full_field)
+
+    returnto = {}
     if int(curpage) == int(nbpages):
-        t=t+"\n\nfunction finish() {\n"
         subname = "%s%s" % (act,doctype)
         res = run_sql("SELECT * FROM sbmFIELD WHERE  subname=%s and pagenb!=%s", (subname,curpage,))
-        nbFields=0
+        nbFields = 0
         message = ""
-        select = []
-        radio = []
-        upload = []
-        field = []
-        level = []
-        txt = []
+        fullcheck_select = []
+        fullcheck_radio = []
+        fullcheck_upload = []
+        fullcheck_field = []
+        fullcheck_level = []
+        fullcheck_txt = []
+        fullcheck_noPage = []
+        fullcheck_check = []
         for arr in res:
             if arr[5] == "M":
                 res2 = run_sql("SELECT * FROM   sbmFIELDDESC WHERE  name=%s", (arr[3],));
@@ -502,77 +364,102 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
                             for value in names:
                                 if value != "":
                                     value = re.compile("[\"']+").sub("",value)
-                                    field.append(value)
-                                    level.append(arr[5])
-                                    txt.append(arr[6])
-                                    noPage.append(arr[1])
-                                    check.append(arr[7])
+                                    fullcheck_field.append(value)
+                                    fullcheck_level.append(arr[5])
+                                    fullcheck_txt.append(arr[6])
+                                    fullcheck_noPage.append(arr[1])
+                                    fullcheck_check.append(arr[7])
                                     nbFields = nbFields+1
                 else:
-                    noPage.append(arr[1])
-                    field.append(arr[3])
-                    level.append(arr[5])
-                    txt.append(arr[6])
-                    check.append(arr[7])
+                    fullcheck_noPage.append(arr[1])
+                    fullcheck_field.append(arr[3])
+                    fullcheck_level.append(arr[5])
+                    fullcheck_txt.append(arr[6])
+                    fullcheck_check.append(arr[7])
                     nbFields = nbFields+1
         # tests each mandatory field
+        fld = 0
+        res = 1
         for i in range (0,nbFields):
             res = 1
-            if not os.path.exists("%s/%s" % (curdir,field[i])):
+            if not os.path.exists("%s/%s" % (curdir,fullcheck_field[i])):
                 res=0
             else:
-                file = open("%s/%s" % (curdir,field[i]),"r")
+                file = open("%s/%s" % (curdir,fullcheck_field[i]),"r")
                 text = file.read()
                 if text == '':
                     res=0
                 else:
                     if text == "Select:":
                         res=0
-        if res==0:
-            message = "    alert (\"The field '%s' is mandatory.\\nGoing back to page %s\");\n" % (txt[i],noPage[i])
-            message = message + "    document.forms[0].curpage.value=\"%s\";\n" % noPage[i]
-            message = message + "    document.forms[0].submit();\n"
-        if message != "":
-            t=t+message
-        else:
-            t=t+"if (tester2()){\n";
-            t=t+"        document.forms[0].action=\"submit.py\";\n"
-            t=t+"        document.forms[0].step.value=1;\n"
-            t=t+"        document.forms[0].submit();\n"
-            t=t+"        } \n"
-            t=t+"        else \n"
-            t=t+"        { \n"
-            t=t+"        return false;\n"
-            t=t+"        }\n"
-            t=t+"}\n"
-    t=t+"""
-</SCRIPT>
-<BR>
-<BR>"""
-    # Display the "back to main menu" button
-    t=t+"<A HREF=\"%s\" onClick=\"return confirm('Are you sure you want to quit this submission?')\">\n" % mainmenu
-    t=t+"<IMG SRC=\"%s/mainmenu.gif\" border=0 ALT=\"back to main menu\" align=right></A><BR><BR>\n" % images
-    t=t+"""
-<HR>
-    <small>(1) you should take note of this number at the beginning of the submission, it will allow you to get your information back in case your browser crashes before the end of the submission.</small><BR>"""
-    # Add the summary window definition if needed
-    t=t+"    <small>(2) mandatory fields appear in red in the 'Summary' window.</small><BR>\n"
+            if res == 0:
+                fld = i
+                break
+        if not res:
+            returnto = {
+                         'field' : fullcheck_txt[fld],
+                         'page'  : fullcheck_noPage[fld],
+                       }
+
+    t += websubmit_templates.tmpl_page_interface(
+          ln = ln,
+          docname = docname,
+          actname = actname,
+          curpage = curpage,
+          nbpages = nbpages,
+          file = file,
+          nextPg = nextPg,
+          access = access,
+          nbPg = nbPg,
+          doctype = doctype,
+          act = act,
+          indir = indir,
+          fields = full_fields,
+          javascript = websubmit_templates.tmpl_page_interface_js(
+                         ln = ln,
+                         upload = upload,
+                         field = field,
+                         fieldhtml = fieldhtml,
+                         txt = txt,
+                         check = check,
+                         level = level,
+                         curdir = curdir,
+                         values = values,
+                         select = select,
+                         radio = radio,
+                         curpage = curpage,
+                         nbpages = nbpages,
+                         images = images,
+                         returnto = returnto,
+                       ),
+          images = images,
+          mainmenu = mainmenu,
+         )
+
     # start display:
     req.content_type = "text/html"
     req.send_http_header()
-    p_navtrail = "<a href=\"submit.py\">Submit</a>&nbsp;>&nbsp;<a href=\"submit.py?doctype=%s\">%s</a>&nbsp;>&nbsp;%s" % (doctype,docname,actname)
-    return page(title="" ,
-                    body=t,
-                    navtrail = p_navtrail,
-                    description="",
-                    keywords="",
-                    uid=uid,
-                    language=ln,
-                    urlargs=req.args)
+    p_navtrail = """<a href="submit.py">%(submit)s</a>&nbsp;>&nbsp;<a href="submit.py?doctype=%(doctype)s\">%(docname)s</a>&nbsp;""" % {
+                   'submit' : _("Submit"),
+                   'doctype' : doctype,
+                   'docname' : docname,
+                 }
+    return page(title= actname,
+                body = t,
+                navtrail = p_navtrail,
+                description = "submit documents in CDSWare",
+                keywords = "submit, CDSWare",
+                uid = uid,
+                language = ln,
+                urlargs = req.args)
 
 
 def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="", access="",mainmenu="",fromdir="",file="",nextPg="",nbPg="",curpage=1,step=1,mode="U"):
-    global rn,sysno,dismode,curdir,uid,uid_email,lats_step,action_score
+    global rn,sysno,dismode,curdir,uid,uid_email,last_step,action_score
+
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     try:
         rn
     except NameError:
@@ -586,19 +473,22 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         uid = getUid(req)
         uid_email = get_email(uid)
     except MySQLdb.Error, e:
-        return errorMsg(e.value)
+        return errorMsg(e.value, req, c, ln)
     # Preliminary tasks
     # check that the user is logged in
     if uid_email == "" or uid_email == "guest":
-        return warningMsg("<center><font color=red>Sorry, you must log in to perform this action. Please use the top right menu to do so.</font></center>",req,cdsname,ln)
+        return warningMsg(websubmit_templates.tmpl_warning_message(
+                           ln = ln,
+                           msg = _("Sorry, you must log in to perform this action. Please use the top right menu to do so.")
+                         ), req, ln)
     # check we have minimum fields
     if doctype=="" or act=="" or access=="":
-        return errorMsg("invalid parameter",req,cdsname,ln)
+        return errorMsg(_("invalid parameter"),req, c, ln)
     # retrieve the action and doctype data
     if indir == "":
         res = run_sql("select dir from sbmACTION where sactname=%s", (act,))
         if len(res) == 0:
-            return errorMsg("cannot find submission directory",req,cdsname,ln)
+            return errorMsg(_("cannot find submission directory"),req, c, ln)
         else:
             row = res[0]
             indir = row[0]
@@ -611,7 +501,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         try:
             os.makedirs(curdir)
         except:
-            return errorMsg("can't create submission directory",req,cdsname,ln)
+            return errorMsg(_("can't create submission directory"),req, c, ln)
     # retrieve the original main menu url ans save it in the "mainmenu" file
     if mainmenu != "":
         fp = open("%s/mainmenu" % curdir,"w")
@@ -635,7 +525,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     # Now we test whether the user has already completed the action and
     # reloaded the page (in this case we don't want the functions to be called
     # once again
-    reloaded = Test_Reload(uid_email,doctype,act,access)
+    # reloaded = Test_Reload(uid_email,doctype,act,access)
     # if the action has been completed
     #if reloaded:
     #    return warningMsg("<b> Sorry, this action has already been completed. Please go back to the main menu to start a new action.</b>",req)
@@ -705,87 +595,55 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             if len(res) > 0:
                 if res[0][0] == 1:
                     setCookie(key,value,uid)
-    # those fields are necessary for the navigation
-    t=t+"<FORM ENCTYPE=\"multipart/form-data\" action=\"submit.py\" method=\"POST\">\n"
-    t=t+"<INPUT type=\"hidden\" name=\"file\" value=\"%s\">\n" % file
-    t=t+"<INPUT type=\"hidden\" name=\"nextPg\" value=\"%s\">\n" % nextPg
-    t=t+"<INPUT type=\"hidden\" name=\"startPg\" value=\"%s\">\n" % startPg
-    t=t+"<INPUT type=\"hidden\" name=\"access\" value=\"%s\">\n" % access
-    t=t+"<INPUT type=\"hidden\" name=\"curpage\" value=\"%s\">\n" % curpage
-    t=t+"<INPUT type=\"hidden\" name=\"nbPg\" value=\"%s\">\n" % nbPg
-    t=t+"<INPUT type=\"hidden\" name=\"doctype\" value=\"%s\">\n" % doctype
-    t=t+"<INPUT type=\"hidden\" name=\"act\" value=\"%s\">\n" %act
-    t=t+"<INPUT type=\"hidden\" name=\"indir\" value=\"%s\">\n" % indir
-    t=t+"<INPUT type=\"hidden\" name=\"fromdir\" value=\"\">\n"
-    t=t+"<INPUT type=\"hidden\" name=\"mainmenu\" value=\"%s\">\n" % mainmenu
-    # parameters for new MESS end scripts
-    t=t+"<INPUT type=\"hidden\" name=\"mode\" value=\"U\">\n"
-    t=t+"<INPUT type=\"hidden\" name=\"step\" value=\"1\">\n"
-    t=t+"<INPUT type=\"hidden\" name=\"deleted\" value=\"no\">\n"
-    t=t+"<INPUT type=\"hidden\" name=\"file_path\" value=\"\">\n"
-    t=t+"<INPUT type=\"hidden\" name=\"userfile_name\" value=\"\">\n"
+
     # Get document name
     res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname=%s", (doctype,))
     if len(res) > 0:
        docname = res[0][0]
     else:
-        return errorMsg("unknown type of document",req,cdsname,ln)
+        return errorMsg(_("unknown type of document"),req,cdsname,ln)
     # Get action name
     res = run_sql("SELECT lactname FROM sbmACTION WHERE  sactname=%s", (act,))
     if len(res) > 0:
        actname = res[0][0]
     else:
-        return errorMsg("unknown action",req,cdsname,ln)
+        return errorMsg(_("unknown action"),req,cdsname,ln)
     # Get number of pages
     subname = "%s%s" % (act,doctype)
     res = run_sql("SELECT nbpg FROM sbmIMPLEMENT WHERE  subname=%s",(subname,))
     if len(res) > 0:
        nbpages = res[0][0]
     else:
-        return errorMsg("this action does not apply on this type of document",req,cdsname,ln)
-    # Display table header
-    t=t+"<center><TABLE cellspacing=0 cellpadding=0 border=0><TR>"
-    t=t+"   <TD class=submitHeader><B>%s&nbsp;</B></TD>" % docname
-    t=t+"   <TD class=submitHeader><small>&nbsp;%s&nbsp;</small></TD>" % actname
-    t=t+"""
-    <TD valign=bottom>
-        <TABLE cellspacing=0 cellpadding=0 border=0 width=100%>
-        <TR><TD class=submitEmptyPage>&nbsp;&nbsp;</TD>"""
-    if finished == 1:
-        t=t+"<TD class=submitCurrentPage>finished!</TD><TD class=submitEmptyPage>&nbsp;&nbsp;</TD></TR></TABLE></TD>\n"
-        t=t+"<TD class=submitEmptyPage align=right>&nbsp;</TD>\n"
-    else:
-        for i in range(1,nbpages+1):
-            t=t+"<TD class=submitPage><small>&nbsp;<A HREF='' onClick=\"document.forms[0].curpage.value=%s;document.forms[0].action='submit.py';document.forms[0].step.value=0;document.forms[0].submit();return false;\">%s</A>&nbsp;</small></TD>" % (i,i)
-        t=t+"<TD class=submitCurrentPage>end of action</TD><TD class=submitEmptyPage>&nbsp;&nbsp;</TD></TR></TABLE></TD>\n"
-        t=t+"<TD class=submitHeader align=right>&nbsp;<A HREF='' onClick=\"window.open('summary.py?doctype=%s&act=%s&access=%s&indir=%s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;\"><font color=white><small>SUMMARY(2)</small></font></A>&nbsp;</TD>\n" % (doctype,act,access,indir)
-    t=t+"</TR>\n"
-    # Display main cell
-    t=t+"<TR>\n"
-    t=t+"    <TD colspan=5 class=submitBody>\n"
-    t=t+"        <small><BR><BR>\n"
+        return errorMsg(_("this action does not apply on this type of document"),req,cdsname,ln)
+
     # we specify here whether we are in the last step of the action or not
     res = run_sql("SELECT step FROM   sbmFUNCTIONS WHERE  action=%s and doctype=%s and step>%s", (act,doctype,step,))
     if len(res) == 0:
         last_step = 1
     else:
         last_step = 0
+
     # Prints the action details, returning the mandatory score
     action_score = action_details(doctype,act)
     current_level = get_level(doctype, act)
+
     # Calls all the function's actions
+    function_content = ''
     try:
-        t=t+print_function_calls(doctype, act, step, form)
+        function_content = print_function_calls(doctype, act, step, form)
     except functionError,e:
-        return errorMsg(e.value,req)
+        return errorMsg(e.value,req, c, ln)
     except functionStop,e:
         if e.value != None:
-            t=t+e.value
+            function_content = e.value
         else:
-            t=t+e
+            function_content = e
+
     # If the action was mandatory we propose the next mandatory action (if any)
+    next_action = ''
     if action_score != -1 and last_step == 1:
-        t=t+Propose_Next_Action(doctype,action_score,access,current_level,indir)
+        next_action = Propose_Next_Action(doctype,action_score,access,current_level,indir)
+
     # If we are in the last step of an action, we can update the "journal of submissions"
     if last_step == 1:
         if uid_email != "" and uid_email != "guest" and rn != "":
@@ -794,44 +652,47 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
                 run_sql("INSERT INTO sbmSUBMISSIONS values(%s,%s,%s,'finished',%s,%s,NOW(),NOW())", (uid_email,doctype,act,access,rn,))
             else:
                run_sql("UPDATE sbmSUBMISSIONS SET md=NOW(),reference=%s,status='finished' WHERE  doctype=%s and action=%s and id=%s and email=%s", (rn,doctype,act,access,uid_email,))
-    t=t+"""    <BR><BR>
-        </TD>
-    </TR>
-    <TR class=submitHeader>
-        <TD class=submitHeader colspan=5 align=center>"""
-    if finished == 0:
-        t=t+"<small>Submission no</small>&sup2;:\n"
-        t=t+"<small>%s</small>\n" % access
-    else:
-        t=t+"&nbsp;\n"
-    t=t+"""
-        </TD>
-    </TR>
-    </TABLE>
-    </center>
-    </form>
-    <br>
-    <br>"""
-    # Add the "back to main menu" button
-    if finished == 0:
-        t=t+ "    <A HREF=\"%s\" onClick=\"return confirm('Are you sure you want to quit this submission?')\">\n" % mainmenu
-    else:
-        t=t+"    <A HREF=\"%s\">\n" % mainmenu
-    t=t+"<IMG SRC=\"%s/mainmenu.gif\" border=0 ALT=\"back to main menu\" align=\"right\"></A><BR><BR>\n" % images
+
+    t = websubmit_templates.tmpl_page_endaction(
+          ln = ln,
+          weburl = weburl,
+          # these fields are necessary for the navigation
+          file = file,
+          nextPg = nextPg,
+          startPg = startPg,
+          access = access,
+          curpage = curpage,
+          nbPg = nbPg,
+          nbpages = nbpages,
+          doctype = doctype,
+          act = act,
+          docname = docname,
+          actname = actname,
+          indir = indir,
+          mainmenu = mainmenu,
+          finished = finished,
+          images = images,
+          function_content = function_content,
+          next_action = next_action,
+        )
 
     # start display:
     req.content_type = "text/html"
     req.send_http_header()
 
-    p_navtrail = "<a href=\"submit.py\">Submit</a>&nbsp;>&nbsp;<a href=\"submit.py?doctype=%s\">%s</a>&nbsp;>&nbsp;%s" % (doctype,docname,actname)
-    return page(title="",
-                    body=t,
-                    navtrail = p_navtrail,
-                    description="",
-                    keywords="",
-                    uid=uid,
-                    language=ln,
-                    urlargs=req.args)
+    p_navtrail = """<a href="submit.py">""" + _("Submit") +\
+                 """</a>&nbsp;>&nbsp;<a href="submit.py?doctype=%(doctype)s">%(docname)s</a>""" % {
+                   'doctype' : doctype,
+                   'docname' : docname,
+                 }
+    return page(title= actname,
+                body = t,
+                navtrail = p_navtrail,
+                description="submit documents in CDSWare",
+                keywords="submit, CDSWare",
+                uid = uid,
+                language = ln,
+                urlargs = req.args)
 
 
 def simpleendaction(doctype="", act="", startPg=1, indir="", access="",step=1,mode="U"):
@@ -891,62 +752,71 @@ def home(req,c=cdsname,ln=cdslang):
     # start display:
     req.content_type = "text/html"
     req.send_http_header()
-    finaltext = ""
-    finaltext = finaltext + """
-<SCRIPT TYPE="text/javascript" LANGUAGE="Javascript1.2">
-var allLoaded = 1;
-</SCRIPT>
- <table class="searchbox" width="100%" summary="">
-    <tr>
-        <th class="portalboxheader">Document types available for submission:</th>
-    </tr>
-    <tr>
-        <td class="portalboxbody">
-<BR>
-Please select the type of document you want to submit:
-<BR><BR>
-<TABLE width="100%">
-<TR>
-    <TD width="50%" class="narrowsearchboxbody">
-"""
-    finaltext = finaltext + "<FORM method=get action=\"submit.py\">\n"
-    finaltext = finaltext + "<INPUT type=\"hidden\" name=\"doctype\">"
-    # Initialise catalogues array
-    finaltext = finaltext + makeCataloguesTable()
-    finaltext = finaltext + """
-    </TD>
-</TR>
-</TABLE>
-</FORM>
-        </td>
-    </tr>
-</table>"""
-    p_navtrail = "Submit"
-    return page(title="",
-                     body=finaltext,
-                     navtrail=p_navtrail,
-                     description="toto",
-                     keywords="keywords",
-                     uid=uid,
-                     language=ln,
-                     urlargs=req.args
-                     )
 
-def makeCataloguesTable():
+    # load the right message language
+    _ = gettext_set_language(ln)
+
+    finaltext = websubmit_templates.tmpl_submit_home_page(
+                    ln = ln,
+                    catalogues = makeCataloguesTable(ln)
+                )
+
+    return page(title=_("Submit"),
+               body=finaltext,
+               navtrail=[],
+               description="submit documents in CDSWare",
+               keywords="submit, CDSWare",
+               uid=uid,
+               language=ln,
+               urlargs=req.args
+               )
+
+def makeCataloguesTable(ln):
     text = ""
     catalogues = []
     queryResult = run_sql("SELECT id_son FROM sbmCOLLECTION_sbmCOLLECTION WHERE id_father=0 ORDER BY catalogue_order");
     if len(queryResult) != 0:
         # Query has executed successfully, so we can proceed to display all
         # catalogues in the EDS system...
-        text = "<UL>\n"
         for row in queryResult:
-            catalogues.append(row[0])
-            text = text + displayCatalogueBranch(row[0],1,catalogues)
-        text = text + "</UL>\n"
+            catalogues.append(getCatalogueBranch(row[0], 1))
+
+        text = websubmit_templates.tmpl_submit_home_catalogs(
+                 ln = ln,
+                 catalogs = catalogues
+               )
     else:
-        text = "<h3>No document types yet...</h3>\n"
+        text = websubmit_templates.tmpl_submit_home_catalog_no_content(ln = ln)
     return text
+
+def getCatalogueBranch(id_father,level):
+    elem = {}
+    queryResult = run_sql("SELECT name, id FROM   sbmCOLLECTION WHERE  id=%s", (id_father,))
+    if len(queryResult) != 0:
+        row = queryResult[0]
+        elem['name'] = row[0]
+        elem['id'] = row[1]
+        elem['level'] = level
+    # display the son document types
+    elem['docs'] = []
+    res1 = run_sql("SELECT id_son FROM   sbmCOLLECTION_sbmDOCTYPE WHERE  id_father=%s ORDER BY catalogue_order", (id_father,))
+    if len(res1) != 0:
+        for row in res1:
+            elem['docs'].append(getDoctypeBranch(row[0]))
+
+    elem['sons'] = []
+    res2 = run_sql("SELECT id_son FROM   sbmCOLLECTION_sbmCOLLECTION WHERE  id_father=%s ORDER BY catalogue_order", (id_father,))
+    if len(res2) != 0:
+        for row in res2:
+            elem['sons'].append(getCatalogueBranch(row[0], level + 1))
+
+    return elem
+
+def getDoctypeBranch(doctype):
+    res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname=%s", (doctype,))
+    return {'id' : doctype,
+            'name' : res[0][0],
+           }
 
 def displayCatalogueBranch(id_father,level,catalogues):
     text = ""
@@ -988,6 +858,9 @@ def displayDoctypeBranch(doctype,catalogues):
 
 
 def action(req,c=cdsname,ln=cdslang,doctype=""):
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     nbCateg = 0
     snameCateg = []
     lnameCateg = []
@@ -1002,7 +875,7 @@ def action(req,c=cdsname,ln=cdslang,doctype=""):
         uid = getUid(req)
         uid_email = get_email(uid)
     except MySQLdb.Error, e:
-        return errorMsg(e.value, req)
+        return errorMsg(e.value, req, ln)
     #parses database to get all data
     #first the list of categories
     res = run_sql("SELECT * FROM sbmCATEGORIES WHERE  doctype=%s ORDER BY lname", (doctype,))
@@ -1019,7 +892,7 @@ def action(req,c=cdsname,ln=cdslang,doctype=""):
         docShortDesc = arr[1]
         description = arr[4]
     else:
-        return errorMsg ("Cannot find document %s" % doctype, req)
+        return errorMsg (_("Cannot find document %s") % doctype, req)
     #then data about associated actions
     res2 = run_sql("SELECT * FROM sbmIMPLEMENT LEFT JOIN sbmACTION on sbmACTION.sactname=sbmIMPLEMENT.actname WHERE  docname=%s and displayed='Y' ORDER BY sbmIMPLEMENT.buttonorder", (docShortDesc,))
     for arr2 in res2:
@@ -1030,115 +903,33 @@ def action(req,c=cdsname,ln=cdslang,doctype=""):
             actionbutton.append(arr[5])
             statustext.append(arr[6])
 
-    t = """
-<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
-var checked=0;
-function tester()
-{
-"""
-    if (uid_email == "" or uid_email == "guest"):
-        t = t + "alert(\"please log in first.\\nUse the top right menu to log in.\");return false;\n";
-
-    t = t + """
-    if (checked == 0)
-    {
-        alert ("please select a category");
-        return false;
-    }
-    else
-    {
-        return true;
-    }
-}
-
-function clicked()
-{
-    checked=1;
-}
-
-function selectdoctype(nb)
-{
-    document.forms[0].act.value = docname[nb];
-}
-</SCRIPT>
-<FORM method=get action="submit.py">"""
-    t = t + "<INPUT type=\"hidden\" name=\"doctype\" value=\"%s\">\n" % doctype
-    t = t + "<INPUT type=\"hidden\" name=\"indir\">"
-
-    pid = os.getpid()
-    now = time.time()
-    t = t + "<input type=hidden name=access value=\"%i_%s\">" % (now,pid)
-    t = t + """
-<INPUT type="hidden" name="act">
-<INPUT type="hidden" name="startPg" value=1>"""
-    t = t + "<INPUT type=hidden name=mainmenu value=\"submit.py?doctype=%s\">\n" % doctype
-    t = t + """
- <table class="searchbox" width="100%" summary="">
-    <tr>"""
-    t+="        <th class=\"portalboxheader\">%s</th>" % docFullDesc
-    t+="""
-    </tr>
-    <tr>
-        <td class="portalboxbody">"""
-    if description != "":
-        t = t + "%s" % description
-    t = t + """
-<BR>
-<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
-var nbimg = document.images.length + 1;
-</SCRIPT>
-<BR>
-<TABLE align=center cellpadding=0 cellspacing=0 border=0>
-<TR>"""
-    if nbCateg != 0:
-        t = t + "<TD align=right>\n"
-        for i in range(0,nbCateg):
-            t = t + "%s<INPUT TYPE=radio NAME=\"combo%s\" value=\"%s\" onClick=\"clicked()\">&nbsp;<BR>\n" % (lnameCateg[i],doctype,snameCateg[i])
-        t = t + "</TD>\n"
-    else:
-        t = t + "<SCRIPT>checked=1;</SCRIPT>\n"
-    t = t + """
-    <TD>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    </TD>
-    <TD>
-        <TABLE>"""
-    #display list of actions
-    for i in range(0,len(actionShortDesc)):
-        t+="<input type=\"submit\" class=\"adminbutton\" value=\"%s\" onClick=\"if (tester()){document.forms[0].indir.value='%s';document.forms[0].act.value='%s';document.forms[0].submit();}; return false;\"><br>" % (statustext[i],indir[i],actionShortDesc[i])
-    t = t + """
-        </TABLE>
-    </TD>
-</TR>
-</TABLE>
-<BR>"""
-    if nbCateg != 0:
-        t = t + "<STRONG class=headline>Notice:</STRONG><BR>\nSelect a category and then click the button to perform the action you chose.\n"
-    t = t + """
-<BR><BR>
-<BR>
-</FORM>
-<FORM action="submit.py"><HR>
-<font color=black><small>To continue an interrupted submission,
-enter your access number directly in the input box.</small></FONT>
-<TABLE border=0 bgcolor="#CCCCCC" width="100%"><TR>
-<TD width="100%">
-<small>Access Number: <INPUT size=15 name=AN>"""
-    t = t + "<INPUT type=hidden name=doctype value=\"%s\"> <INPUT class=\"adminbutton\" type=submit value=\" go! \">" % doctype
-    t = t + """</small></TD></TR></TABLE><HR></FORM>
-        </td>
-    </tr>
-</table>"""
-    p_navtrail = "<a href=\"submit.py\">Submit</a>&nbsp;>&nbsp;%s" % docFullDesc
-    return page(title="",
-                     body=t,
-                     navtrail=p_navtrail,
-                     description="toto",
-                     keywords="keywords",
-                     uid=uid,
-                     language=ln,
-                     urlargs=req.args
-                     )
+    t = websubmit_templates.tmpl_action_page(
+          ln = ln,
+          guest = (uid_email == "" or uid_email == "guest"),
+          pid = os.getpid(),
+          now = time.time(),
+          doctype = doctype,
+          description = description,
+          docfulldesc = docFullDesc,
+          snameCateg = snameCateg,
+          lnameCateg = lnameCateg,
+          actionShortDesc = actionShortDesc,
+          indir = indir,
+          # actionbutton = actionbutton,
+          statustext = statustext,
+        )
+    
+    p_navtrail = """<a href="submit.py">%(submit)s</a>""" % {'submit' : _("Submit")}
+    
+    return page(title = docFullDesc,
+                body=t,
+                navtrail=p_navtrail,
+                description="submit documents in CDSWare",
+                keywords="submit, CDSWare",
+                uid=uid,
+                language=ln,
+                urlargs=req.args
+               )
 
 
 def set_report_number (newrn):
@@ -1222,7 +1013,7 @@ def action_details (doctype, action):
 def print_function_calls (doctype, action, step, form):
     # Calls the functions required by an "action" action on a "doctype" document
     # In supervisor mode, a table of the function calls is produced
-    global htdocsdir,storage,access,pylibdir
+    global htdocsdir,storage,access,pylibdir,dismode
     t=""
     # Get the list of functions to be called
     res = run_sql("SELECT * FROM sbmFUNCTIONS WHERE action=%s and doctype=%s and step=%s ORDER BY score", (action,doctype,step,))
@@ -1230,31 +1021,44 @@ def print_function_calls (doctype, action, step, form):
     if len(res) == 0:
         res = run_sql("SELECT * FROM sbmFUNCTIONS WHERE action=%s and doctype='DEF' and step=%s ORDER BY score", (action,step,))
     if len(res) > 0:
-        t=t+Request_Print("S",  "<br><br>Here is the %s function list for %s documents at level %s <P>" % (action,doctype,step))
-        t=t+Request_Print("S", "<table border cellpadding = 15><tr><th>Function</th><th>Score</th><th>Running Function</th></tr>")
         # while there are functions left...
-        for  function in res:
+        functions = []
+        for function in res:
             function_name = function[2]
             function_score = function[3]
+            currfunction = {
+              'name' : function_name,
+              'score' : function_score,
+              'error' : 0,
+              'text' : '',
+            }
             if os.path.exists("%s/cdsware/websubmit_functions/%s.py" % (pylibdir,function_name)):
-                t=t+Request_Print("S", "<tr><td>%s</td><td>%s</td><td>" % (function_name,function_score))
                 # import the function itself
                 #function = getattr(cdsware.websubmit_functions, function_name)
                 execfile("%s/cdsware/websubmit_functions/%s.py" % (pylibdir,function_name),globals())
                 if not globals().has_key(function_name):
-                    t=t+"function %s does not exist...<br>" % function_name
+                    currfunction['error'] = 1
                 else:
                     function = globals()[function_name]
                     # Evaluate the parameters, and place them in an array
                     parameters = Get_Parameters(function_name,doctype)
                     # Call function
-                    t=t+function(parameters,curdir,form)
-                    t=t+Request_Print("S","</td></tr>")
+                    currfunction['text'] = function(parameters,curdir,form)
             else:
-                t=t+"function %s does not exist...<br>" % function_name
-        t=t+Request_Print("S","</table>")
+                currfunction['error'] = 1
+            functions.append(currfunction)
+
+        t = websubmit_templates.tmpl_function_output(
+              ln = ln,
+              display_on = (dismode == 'S'),
+              action = action,
+              doctype = doctype,
+              step = step,
+              functions = functions,
+            )
     else :
-        t=t+Request_Print("S","<br><br><b>Your chosen action is not supported by the document</b>")
+        if dismode == 'S':
+            t = "<br><br><b>" + _("Your chosen action is not supported by the document") + "<b>"
     return t
 
 def Propose_Next_Action (doctype,action_score,access,currentlevel,indir):
@@ -1262,17 +1066,28 @@ def Propose_Next_Action (doctype,action_score,access,currentlevel,indir):
     t=""
     res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE docname=%s and level!='0' and level=%s and score>%s ORDER BY score", (doctype,currentlevel,action_score,))
     if len(res) > 0:
-        t=t+Request_Print("A","<BR><BR>You now have to<ul>")
+        actions = []
         first_score = res[0][10]
         for i in range(0,len(res)):
             action = res[i]
             if action[10] == first_score:
-                if i > 0:
-                    t=t+Request_Print("A"," <b>or</b>");
                 res2 = run_sql("SELECT dir FROM sbmACTION WHERE sactname=%s", (action[1],))
                 nextdir = res2[0][0]
-                t=t+Request_Print("A","<LI><A HREF=\"\" onClick=\"document.forms[0].action='submit.py';document.forms[0].curpage.value='%s';document.forms[0].startPg.value='%s';document.forms[0].act.value='%s';document.forms[0].doctype.value='%s';document.forms[0].indir.value='%s';document.forms[0].access.value='%s';document.forms[0].fromdir.value='%s';document.forms[0].submit();return false;\"> %s </a>" % (action[11],action[11],action[1],doctype,nextdir,access,indir,action[12]))
-        t=t+Request_Print("A","</ul>")
+                curraction = {
+                  'page' : action[11],
+                  'action' : action[1],
+                  'doctype' : doctype,
+                  'nextdir' : nextdir,
+                  'access' : access,
+                  'indir' : indir,
+                  'name' : action[12],
+                }
+                actions.append(curraction)
+
+        t = websubmit_templates.tmpl_next_action(
+              ln = ln,
+              actions = actions,
+            )
     return t
 
 def Test_Reload(uid_email,doctype,act,access):
@@ -1295,20 +1110,26 @@ class functionStop(Exception):
         return repr(self.value)
 
 def errorMsg(title,req,c=cdsname,ln=cdslang):
-    return page(title="error",
-                    body = create_error_box(req, title=title,verbose=0, ln=ln),
-                    description="%s - Internal Error" % c,
-                    keywords="%s, CDSware, Internal Error" % c,
-                    language=ln,
-                    urlargs=req.args)
+    # load the right message language
+    _ = gettext_set_language(ln)
+
+    return page(title = _("error"),
+                body = create_error_box(req, title=title,verbose=0, ln=ln),
+                description="%s - Internal Error" % c,
+                keywords="%s, CDSware, Internal Error" % c,
+                language=ln,
+                urlargs=req.args)
 
 def warningMsg(title,req,c=cdsname,ln=cdslang):
-    return page(title="warning",
-                    body = title,
-                    description="%s - Internal Error" % c,
-                    keywords="%s, CDSware, Internal Error" % c,
-                    language=ln,
-                    urlargs=req.args)
+    # load the right message language
+    _ = gettext_set_language(ln)
+
+    return page(title = _("warning"),
+                body = title,
+                description="%s - Internal Error" % c,
+                keywords="%s, CDSware, Internal Error" % c,
+                language=ln,
+                urlargs=req.args)
 
 def getCookie(name,uid):
     # these are not real http cookies but are stored in the DB
@@ -1334,5 +1155,3 @@ def specialchars(text):
     text = string.replace(text,"&#151;","\055");
     text = string.replace(text,"&#133;","\056\056\056");
     return text
-
-

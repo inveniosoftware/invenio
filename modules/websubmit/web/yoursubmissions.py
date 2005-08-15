@@ -1,5 +1,5 @@
 ## $Id$
-##
+
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -27,7 +27,6 @@ import re
 import MySQLdb
 import shutil
 import operator
-
 from cdsware.config import weburl,cdsname,cdslang
 from cdsware.dbquery import run_sql
 from cdsware.access_control_engine import acc_authorize_action
@@ -39,9 +38,18 @@ from cdsware.websubmit_config import *
 from cdsware.search_engine import search_pattern
 from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
+from cdsware.messages import gettext_set_language
+
+import cdsware.template
+websubmit_templates = cdsware.template.load('websubmit')
+
 def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedAction="",deletedDoctype=""):
     global uid
     ln = wash_language(ln)
+
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     t=""
     # get user ID:
     try:
@@ -50,30 +58,29 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
             return page_not_authorized(req, "../yoursubmissions.py/index")
         u_email = get_email(uid)
     except MySQLdb.Error, e:
-        return errorMsg(e.value,req)
+        return errorMsg(e.value, req, ln)
+
+    if u_email == "guest" or u_email == "":
+        return warningMsg(websubmit_templates.tmpl_warning_message(
+                 ln = ln,
+                 msg = _("You first have to login before using this feature. Use the left menu to log in."),
+               ),req, ln = ln)
+
+
     if deletedId != "":
-        t+=deleteSubmission(deletedId,deletedAction,deletedDoctype,u_email)
-    t+="""
-<BR>
-<SMALL>
-<form>
-<input type=hidden value='%s' name=order>""" % order
-    t+="""
-<input type=hidden name=deletedId>
-<input type=hidden name=deletedDoctype>
-<input type=hidden name=deletedAction>
- <table class="searchbox" width="100%" summary="">
-    <tr>
-        <th class="portalboxheader">For&nbsp;"""
-    t+="<select name=doctype onchange=\"document.forms[0].submit();\"><option value=\"\">all types of document"
+        t += deleteSubmission(deletedId,deletedAction,deletedDoctype,u_email)
+
+    # doctypes
     res = run_sql("select ldocname,sdocname from sbmDOCTYPE order by ldocname")
+    doctypes = []
     for row in res:
-        if doctype==row[1]:
-            t+="<option value=%s selected>%s" % (row[1],row[0])
-        else:
-            t+="<option value=%s>%s" % (row[1],row[0])
-    t+="</th></tr><tr><td class=\"portalboxbody\">\n"
-    t+="<table><tr><td></td></tr>"
+        doctypes.append({
+                          'id' : row[1],
+                          'name' : row[0],
+                          'selected' : (doctype == row[1]),
+                        })
+
+    # submissions
     # request order default value
     reqorder = "sbmSUBMISSIONS.md DESC, lactname"
     # requested value
@@ -101,14 +108,13 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
         docselect = " and doctype='%s' " % doctype
     else:
         docselect = ""
-    if u_email == "guest" or u_email == "":
-        return warningMsg("<font color=red size=+1>You first have to login  before using this feature. Use the left menu to log in.</font>",req)
-    else:
-        res = run_sql("SELECT sbmSUBMISSIONS.* FROM sbmSUBMISSIONS,sbmACTION WHERE sactname=action and email=%s and id!='' "+docselect+" ORDER BY doctype,"+reqorder,(u_email,))
+
+    res = run_sql("SELECT sbmSUBMISSIONS.* FROM sbmSUBMISSIONS,sbmACTION WHERE sactname=action and email=%s and id!='' "+docselect+" ORDER BY doctype,"+reqorder,(u_email,))
     currentdoctype = ""
     currentaction = ""
     currentstatus = ""
-    num = 0
+
+    submissions = []
     for row in res:
         if currentdoctype != row[1]:
             currentdoctype = row[1]
@@ -116,66 +122,54 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
             currentstatus = ""
             res2 = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname=%s",(currentdoctype,))
             ldocname = res2[0][0]
-            t+= "</table>\n"
-            t+="%s<br>\n" % ldocname
-            t+="<table border=\"0\" class=\"searchbox\" align=\"left\" width=\"100%\">\n"
-            t+="<tr><th class=headerselected>Action&nbsp;&nbsp;"
-            t+="<a href='' onClick='document.forms[0].order.value=\"actiondown\";document.forms[0].submit();return false;'><img src=%s/smalldown.gif border=0></a>&nbsp;" % images
-            t+="<a href='' onClick='document.forms[0].order.value=\"actionup\";document.forms[0].submit();return false;'><img src=%s/smallup.gif border=0></a></th>" % images
-            t+="\n<th class=headerselected>Status&nbsp;&nbsp;"
-            t+="<a href='' onClick='document.forms[0].order.value=\"statusdown\";document.forms[0].submit();return false;'><img src=%s/smalldown.gif border=0></a>&nbsp;" % images
-            t+="<a href='' onClick='document.forms[0].order.value=\"statusup\";document.forms[0].submit();return false;'><img src=%s/smallup.gif border=0></a></th>" % images
-            t+="\n<th class=headerselected>id</th><th class=headerselected>reference&nbsp;&nbsp;"
-            t+="<a href='' onClick='document.forms[0].order.value=\"refdown\";document.forms[0].submit();return false;'><img src=%s/smalldown.gif border=0></a>&nbsp;" % images
-            t+="<a href='' onClick='document.forms[0].order.value=\"refup\";document.forms[0].submit();return false;'><img src=%s/smallup.gif border=0></a></th>" % images
-            t+="\n<th class=headerselected>first access&nbsp;&nbsp;"
-            t+="<a href='' onClick='document.forms[0].order.value=\"cddown\";document.forms[0].submit();return false;'><img src=%s/smalldown.gif border=0></a>&nbsp;" % images
-            t+="<a href='' onClick='document.forms[0].order.value=\"cdup\";document.forms[0].submit();return false;'><img src=%s/smallup.gif border=0></a></th>" % images
-            t+="\n<th class=headerselected>last access&nbsp;&nbsp;"
-            t+="<a href='' onClick='document.forms[0].order.value=\"mddown\";document.forms[0].submit();return false;'><img src=%s/smalldown.gif border=0></a>&nbsp;" % images
-            t+="<a href='' onClick='document.forms[0].order.value=\"mdup\";document.forms[0].submit();return false;'><img src=%s/smallup.gif border=0></a></th></tr>\n" % images
+
         if currentaction != row[2]:
             currentaction = row[2]
             res2 = run_sql("SELECT lactname FROM sbmACTION WHERE  sactname=%s",(currentaction,))
             lactname = res2[0][0]
         else:
             lactname = "\""
-        cdate = str(row[6]).replace(" ","&nbsp;")
-        mdate= str(row[7]).replace(" ","&nbsp;")
+
         if currentstatus != row[3]:
             currentstatus = row[3]
             status=row[3]
         else:
             status = "\""
-        if row[3] == "pending":
-            idtext = "<a href=\"sub.py?access=%s@%s%s\">%s</a>" % (row[4],currentaction,currentdoctype,row[4])
-            idtext+= "&nbsp;<a onClick='if (confirm(\"Are you sure you want to delete this submission?\")){document.forms[0].deletedId.value=\"%s\";document.forms[0].deletedDoctype.value=\"%s\";document.forms[0].deletedAction.value=\"%s\";document.forms[0].submit();return true;}else{return false;}' href=''><img src=%s/smallbin.gif border=0 alt='delete submission %s in %s'></a>" % (row[4],currentdoctype,currentaction,images,row[4],ldocname)
-        else:
-            idtext = row[4]
-        if row[5] == "":
-            reference = "<font color=red>not yet given</font>"
-        else:
-            reference = row[5]
-        if operator.mod(num,2) == 0:
-            t+= "<tr bgcolor=\"#e0e0e0\">\n"
-        else:
-            t+= "<tr bgcolor=\"#eeeeee\">\n"
-        t+="<td align=center class=mycdscell><small>%s</small></td>\n<td align=center class=mycdscell><small>%s</small></td>\n<td class=mycdscell><small>" % (lactname,status)
-        t+="%s</small></td>\n<td class=mycdscell><small>&nbsp;%s" % (idtext,reference)
-        t+="</small></td>\n<td class=mycdscell><small>%s</small></td>\n<td class=mycdscell><small>" % cdate
-        t+="%s</small></td>\n</tr>\n" % mdate
-        num+=1
-    t+="</table></td></tr></table></form>"
-    
+
+        submissions.append({
+                             'docname' : ldocname,
+                             'actname' : lactname,
+                             'status' : status,
+                             'cdate' : row[6],
+                             'mdate' : row[7],
+                             'reference' : row[5],
+                             'id' : row[4],
+                             'act' : currentaction,
+                             'doctype' : currentdoctype,
+                             'pending' : (row[3] == "pending")
+                           })
+    # display
+    t += websubmit_templates.tmpl_yoursubmissions(
+           ln = ln,
+           weburl = weburl,
+           images = images,
+           order = order,
+           doctypes = doctypes,
+           submissions = submissions,
+         )
+
     return page(title="Your Submissions",
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
+                navtrail= """<a class="navtrail" href="%(weburl)s/youraccount.py/display">%(account)s</a>""" % {
+                             'weburl' : weburl,
+                             'account' : _("Your Account"),
+                          },
                 body=t,
                 description="",
                 keywords="",
                 uid=uid,
                 language=ln,
                 urlargs=req.args)
- 
+
 def deleteSubmission(id, action, doctype, u_email):
     global storage
     run_sql("delete from sbmSUBMISSIONS WHERE doctype=%s and action=%s and email=%s and status='pending' and id=%s",(doctype,action,u_email,id,))
@@ -188,17 +182,17 @@ def deleteSubmission(id, action, doctype, u_email):
 
 def warningMsg(title,req,c=cdsname,ln=cdslang):
     return page(title="warning",
-                    body = title,
-                    description="%s - Internal Error" % c, 
-                    keywords="%s, CDSware, Internal Error" % c,
-                    language=ln,
-                    urlargs=req.args)
+                body = title,
+                description="%s - Internal Error" % c,
+                keywords="%s, CDSware, Internal Error" % c,
+                language=ln,
+                urlargs=req.args)
 
 def errorMsg(title,req,c=cdsname,ln=cdslang):
     return page(title="error",
-                    body = create_error_box(req, title=title,verbose=0, ln=ln),
-                    description="%s - Internal Error" % c, 
-                    keywords="%s, CDSware, Internal Error" % c,
-                    language=ln,
-                    urlargs=req.args)
+                body = create_error_box(req, title=title,verbose=0, ln=ln),
+                description="%s - Internal Error" % c,
+                keywords="%s, CDSware, Internal Error" % c,
+                language=ln,
+                urlargs=req.args)
 

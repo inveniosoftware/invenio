@@ -1,5 +1,5 @@
 ## $Id$
-##
+
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -36,7 +36,15 @@ from cdsware.websubmit_config import *
 from cdsware.file import *
 from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
+from cdsware.messages import gettext_set_language
+
+import cdsware.template
+websubmit_templates = cdsware.template.load('websubmit')
+
 def index(req,c=cdsname,ln=cdslang,recid="",docid="",version="",name="",format=""):
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     # get user ID:
     try:
         uid = getUid(req)
@@ -52,47 +60,46 @@ def index(req,c=cdsname,ln=cdslang,recid="",docid="",version="",name="",format="
     # if a precise file is requested, we stream it
     if name!="":
         if docid=="":
-            return errorMsg("Parameter docid missing",req)
+            return errorMsg(_("Parameter docid missing"), req, c, ln)
         else:
             doc = BibDoc(bibdocid=docid)
             docfile=doc.getFile(name,format,version)
             if docfile == None:
-                return warningMsg("can't find file...",req)
+                return warningMsg(_("can't find file..."),req, c, ln)
             else:
                 res = doc.registerDownload(ip, version, format, uid)
                 return docfile.stream(req)
     # all files attached to a record
     elif recid!="":
         bibarchive = BibRecDocs(recid)
-        filelist = bibarchive.display(docid,version)
+        filelist = bibarchive.display(docid, version, ln = ln)
     # a precise filename
     elif docid!="":
         bibdoc = BibDoc(bibdocid=docid)
         recid = bibdoc.getRecid()
-        filelist = bibdoc.display(version)
-    title = "record #<a href=\"search.py?recid=%s\">%s</a>" % (recid,recid)
-    if docid != "":
-        title += " document #%s" % docid
-    if version != "":
-        title += " version #%s" % version
-    t = """<center><table class="searchbox" summary="" width="500"><tr><th class="portalboxheader">Access&nbsp;to&nbsp;Fulltext&nbsp;&nbsp;&nbsp;&nbsp;<font size=-2>[%s]</font></th></tr><tr><td class="portalboxbody"><!--start file list-->\n""" % title
-    t+=filelist
-    t+="""<!--end file list--></td></tr></table></center>\n"""
-    p_navtrail = "Access to Fulltext"
+        filelist = bibdoc.display(version, ln = ln)
+    t = websubmit_templates.tmpl_filelist(
+          ln = ln,
+          recid = recid,
+          docid = docid,
+          version = version,
+          filelist = filelist,
+        )
+    p_navtrail = _("Access to Fulltext")
     return page(title="",
-                     body=t,
-                     navtrail = p_navtrail,
-                     description="",
-                     keywords="keywords",
-                     uid=uid,
-                     language=ln,
-                     urlargs=req.args
-                     )
-   
+                body=t,
+                navtrail = p_navtrail,
+                description="",
+                keywords="keywords",
+                uid=uid,
+                language=ln,
+                urlargs=req.args
+               )
+
 def errorMsg(title,req,c=cdsname,ln=cdslang):
     return page(title="error",
                     body = create_error_box(req, title=title,verbose=0, ln=ln),
-                    description="%s - Internal Error" % c, 
+                    description="%s - Internal Error" % c,
                     keywords="%s, CDSware, Internal Error" % c,
                     language=ln,
                     urlargs=req.args)
@@ -100,9 +107,8 @@ def errorMsg(title,req,c=cdsname,ln=cdslang):
 def warningMsg(title,req,c=cdsname,ln=cdslang):
     return page(title="warning",
                     body = title,
-                    description="%s - Internal Error" % c, 
+                    description="%s - Internal Error" % c,
                     keywords="%s, CDSware, Internal Error" % c,
                     language=ln,
                     urlargs=req.args)
-
 

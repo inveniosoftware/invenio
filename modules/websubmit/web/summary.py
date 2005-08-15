@@ -1,5 +1,5 @@
 ## $Id$
-##
+
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -17,8 +17,6 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""CDSware Submission Web Interface."""
-
 ## import interesting modules:
 import string
 import os
@@ -34,23 +32,31 @@ from cdsware.webuser import getUid,get_email, page_not_authorized
 from cdsware.messages import *
 from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
-def index(req,doctype="",act="",access="",indir=""):
+from cdsware.messages import gettext_set_language
+
+import cdsware.template
+websubmit_templates = cdsware.template.load('websubmit')
+
+def index(req,doctype="",act="",access="",indir="", ln=cdslang):
     uid = getUid(req)
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return page_not_authorized(req, "../summary.py/index")
 
-    t=""    
+    t=""
     curdir = "%s/%s/%s/%s" % (storage,indir,doctype,access)
     subname = "%s%s" % (act,doctype)
     res = run_sql("select sdesc,fidesc,pagenb,level from sbmFIELD where subname=%s order by pagenb,fieldnb", (subname,))
     nbFields = 0
-    t=t+"<body style=\"background-image: url(%s/header_background.gif);\"><table border=0>\n" % images
+
+    values = []
     for arr in res:
         if arr[0] != "":
-            if arr[3] == "M":
-                color = "red"
-            else:
-                color = ""
+            val = {
+                   'mandatory' : (arr[3] == 'M'),
+                   'value' : '',
+                   'page' : arr[2],
+                   'name' : arr[0],
+                  }
             if os.path.exists("%s/%s" % (curdir,arr[1])):
                 fd = open("%s/%s" % (curdir,arr[1]),"r")
                 value = fd.read()
@@ -59,8 +65,12 @@ def index(req,doctype="",act="",access="",indir=""):
                 value = value.replace("Select:","")
             else:
                 value = ""
-            #value = strip_tags($value);
-            t=t+ "<tr><td align=right><small><A HREF='' onClick=\"window.opener.document.forms[0].curpage.value='%s';window.opener.document.forms[0].action='submit.py';window.opener.document.forms[0].submit();return false;\"><FONT color=\"%s\">%s</FONT></A></small></td><td><I><small><font color=black>%s</font></small></I></td></tr>\n" % (arr[2],color,arr[0],value);
-    t=t+"</table>"
-    return t
+            val['value'] = value
+            values.append(val)
+
+    return websubmit_templates.tmpl_submit_summary(
+             ln = ln,
+             values = values,
+             images = images,
+           )
 

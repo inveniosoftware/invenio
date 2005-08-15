@@ -1,5 +1,5 @@
 ## $Id$
-##
+
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -26,7 +26,6 @@ import types
 import re
 import MySQLdb
 import shutil
-
 from cdsware.config import cdsname,cdslang,supportemail,pylibdir
 from cdsware.dbquery import run_sql
 from cdsware.access_control_engine import acc_authorize_action
@@ -41,9 +40,17 @@ from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 execfile("%s/cdsware/websubmit_functions/Retrieve_Data.py" % pylibdir)
 execfile("%s/cdsware/websubmit_functions/mail.py" % pylibdir)
 
+from cdsware.messages import gettext_set_language
+import cdsware.template
+websubmit_templates = cdsware.template.load('websubmit')
+
 def index(req,c=cdsname,ln=cdslang,doctype="",categ="",RN="",send=""):
     global uid
     ln = wash_language(ln)
+
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     t=""
     # get user ID:
     try:
@@ -52,69 +59,52 @@ def index(req,c=cdsname,ln=cdslang,doctype="",categ="",RN="",send=""):
             return page_not_authorized(req, "../publiline.py/index")
         uid_email = get_email(uid)
     except MySQLdb.Error, e:
-        return errorMsg(e.value,req)
+        return errorMsg(e.value,req, ln = ln)
     if doctype == "":
-        t=selectDoctype()
+        t = selectDoctype(ln)
     elif categ == "":
-        t=selectCateg(doctype)
+        t = selectCateg(doctype, ln)
     elif RN == "":
-        t=selectDocument(doctype,categ)
+        t = selectDocument(doctype,categ, ln)
     else:
-        t=displayDocument(doctype,categ,RN,send)
+        t = displayDocument(doctype,categ,RN,send, ln)
     return page(title="publication line",
-                    body=t,
-                    description="",
-                    keywords="",
-                    uid=uid,
-                    language=ln,
-                    urlargs=req.args)
-                    
-def selectDoctype():
-    t="""
- <table class="searchbox" width="100%" summary="">
-    <tr>
-        <th class="portalboxheader">List of refereed types of documents</th>
-    </tr>
-    <tr>
-        <td class="portalboxbody">
-    Select one of the following types of documents to check the documents status:</small>
-    <blockquote>"""
+                navtrail= """<a class="navtrail" href="%(weburl)s/youraccount.py/display">%(account)s</a>""" % {
+                             'weburl' : weburl,
+                             'account' : _("Your Account"),
+                          },
+                body=t,
+                description="",
+                keywords="",
+                uid=uid,
+                language=ln,
+                urlargs=req.args)
+
+def selectDoctype(ln = cdslang):
     res = run_sql("select DISTINCT doctype from sbmAPPROVAL")
+    docs = []
     for row in res:
         res2 = run_sql("select ldocname from sbmDOCTYPE where sdocname=%s", (row[0],))
-        t+="<li><A HREF='publiline.py?doctype=%s'>%s</A><BR>" % (row[0],res2[0][0])
-    t+="""</blockquote>
-        </td>
-    </tr>
-</table>"""
+        docs.append({
+                     'doctype' : row[0],
+                     'docname' : res2[0][0],
+                    })
+    t = websubmit_templates.tmpl_publiline_selectdoctype(
+          ln = ln,
+          docs = docs,
+        )
     return t
 
-def selectCateg(doctype):
+def selectCateg(doctype, ln = cdslang):
     t=""
     res = run_sql("select ldocname from sbmDOCTYPE where sdocname=%s",(doctype,))
     title = res[0][0]
     sth = run_sql("select * from sbmCATEGORIES where doctype=%s order by lname",(doctype,))
     if len(sth) == 0:
         categ = "unknown"
-        return selectDocument(doctype,categ)
-    t+="""
- <table class="searchbox" width="100%" summary="">
-    <tr>"""
-    t+=   "<th class=\"portalboxheader\">%s: List of refereed categories</th>" % title
-    t+="""
-    </tr>
-    <tr>
-        <td class="portalboxbody">
-        Please choose a category
-    <blockquote>
-        <FORM action="publiline.py" method=get>"""
-    t+="        <INPUT type=hidden name=doctype value='%s'>\n" % doctype
-    t+="        <INPUT type=hidden name=categ value=''>\n"
-    t+="        </FORM>\n"
-    t+="""
-<TABLE>
-<TR>
-    <TD align=left>"""
+        return selectDocument(doctype,categ, ln = ln)
+
+    categories = []
     for arr in sth:
         waiting = 0
         rejected = 0
@@ -125,86 +115,52 @@ def selectCateg(doctype):
         approved = sth2[0][0]
         sth2 = run_sql("select COUNT(*) from sbmAPPROVAL where doctype=%s and categ=%s and status='rejected'",(doctype,arr[1],))
         rejected = sth2[0][0]
-        num = waiting + approved + rejected
-        if waiting != 0: 
-            classtext = "class=blocknote"
-        else:
-            classtext = ""
-        t+="<A href=\"\" onClick=\"document.forms[0].categ.value='%s';document.forms[0].submit();return false;\"><SMALL %s>%s</SMALL></A><SMALL> (%s document<SMALL>(</SMALL>s<SMALL>)</SMALL>\n" % (arr[1],classtext,arr[2],num)
-        if waiting != 0:
-            t+= "| %s<IMG ALT=\"pending\" SRC=\"%s/waiting_or.gif\" border=0>\n" % (waiting,images)
-        if approved != 0:
-            t+= "| %s<IMG ALT=\"approved\" SRC=\"%s/smchk_gr.gif\" border=0>\n" % (approved,images)
-        if rejected != 0:
-            t+= "| %s<IMG ALT=\"rejected\" SRC=\"%s/cross_red.gif\" border=0>" % (rejected,images)
-        t+=")</SMALL><BR>\n"
-    t+="""
-    </TD>
-    <TD>
-         <table class="searchbox" width="100%" summary="">
-            <tr>
-                <th class="portalboxheader">Key:</th>
-            <tr>
-            <tr>
-                <td>"""
-    t+="        <IMG ALT=\"pending\" SRC=\"%s/waiting_or.gif\" border=0> waiting for approval<BR>" % images
-    t+="        <IMG ALT=\"approved\" SRC=\"%s/smchk_gr.gif\" border=0> already approved<BR>" % images
-    t+="        <IMG ALT=\"rejected\" SRC=\"%s/cross_red.gif\" border=0> rejected<BR><BR>\n" % images
-    t+="""
-                <SMALL class=blocknote>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</SMALL> some documents are pending<BR></SMALL>
-                </td>
-            </tr>
-        </table>
-    </TD>
-</TR>
-</TABLE>
-        </blockquote>
-        </td>
-    </tr>
-</table>"""
+        categories.append({
+                            'waiting' : waiting,
+                            'approved' : approved,
+                            'rejected' : rejected,
+                            'id' : arr[1],
+                          })
+
+    t = websubmit_templates.tmpl_publiline_selectcateg(
+          ln = ln,
+          categories = categories,
+          doctype = doctype,
+          title = title,
+          images = images,
+        )
     return t
 
-def selectDocument(doctype,categ):
+def selectDocument(doctype,categ, ln = cdslang):
     t=""
     res = run_sql("select ldocname from sbmDOCTYPE where sdocname=%s", (doctype,))
     title = res[0][0]
     if categ == "":
         categ == "unknown"
-    t+="""
- <table class="searchbox" width="100%" summary="">
-    <tr>"""
-    t+=   "<th class=\"portalboxheader\">%s - %s: List of refereed documents</th>" % (title,categ)
-    t+="""
-    </tr>
-    <tr>
-        <td class="portalboxbody">
-        Click on a report number to have more information
-    <blockquote>
-        <FORM action="publiline.py" method=get>"""
-    t+="        <INPUT type=hidden name=doctype value='%s'>\n" % doctype
-    t+="        <INPUT type=hidden name=categ value='%s'>\n" % categ
-    t+="        <INPUT type=hidden name=RN value=''>\n" 
-    t+="        </FORM>\n"
-    t+="<TABLE class=\"searchbox\">"
-    t+="<TR><TH class=\"portalboxheader\">Report  Number</TH><TH class=\"portalboxheader\">Pending</TH><TH class=\"portalboxheader\">Approved</TH><TH class=\"portalboxheader\">Rejected</TH></TR>"
+
+    docs = []
     sth = run_sql("select rn,status from sbmAPPROVAL where doctype=%s and categ=%s order by status DESC,rn DESC",(doctype,categ))
     for arr in sth:
-        RN = arr[0]
-        status = arr[1]
-        if status == "waiting":
-            t+= "<TR><TD align=center><A HREF=\"\" onClick=\"document.forms[0].RN.value='%s';document.forms[0].submit();return false;\">%s</A></TD><TD align=center><IMG ALT=\"check\" SRC=\"%s/waiting_or.gif\"></TD><TD align=center>&nbsp;</TD><TD align=center>&nbsp;</TD></TR>" % (RN,RN,images)
-        elif status == "rejected":
-            t+="<TR><TD align=center><A HREF=\"\" onClick=\"document.forms[0].RN.value='%s';document.forms[0].submit();return false;\">%s</A></TD><TD align=center>&nbsp;</TD><TD align=center>&nbsp;</TD><TD align=center><IMG ALT=\"check\" SRC=\"%s/cross_red.gif\"></TD></TR>" % (RN,RN,images)
-        elif status == "approved":
-            t+="<TR><TD align=center><A HREF=\"\" onClick=\"document.forms[0].RN.value='%s';document.forms[0].submit();return false;\">%s</A></TD><TD align=center>&nbsp;</TD><TD align=center><IMG ALT=\"check\" SRC=\"%s/smchk_gr.gif\"></TD><TD align=center>&nbsp;</TD></TR>" % (RN,RN,images)
-    t+= """</TABLE>
-        </blockquote>
-        </td>
-    </tr>
-</table>"""
+        docs.append({
+                     'RN' : arr[0],
+                     'status' : arr[1],
+                    })
+
+    t = websubmit_templates.tmpl_publiline_selectdocument(
+          ln = ln,
+          doctype = doctype,
+          title = title,
+          categ = categ,
+          images = images,
+          docs = docs,
+        )
     return t
 
-def displayDocument(doctype,categ,RN,send):
+def displayDocument(doctype,categ,RN,send, ln = cdslang):
+
+    # load the right message language
+    _ = gettext_set_language(ln)
+
     t=""
     res = run_sql("select ldocname from sbmDOCTYPE where sdocname=%s", (doctype,))
     docname = res[0][0]
@@ -213,85 +169,52 @@ def displayDocument(doctype,categ,RN,send):
     sth = run_sql("select rn,status,dFirstReq,dLastReq,dAction,access from sbmAPPROVAL where rn=%s",(RN,))
     if len(sth) > 0:
         arr = sth[0]
+        rn = arr[0]
         status = arr[1]
         dFirstReq = arr[2]
         dLastReq = arr[3]
         dAction = arr[4]
         access = arr[5]
-        if status == "waiting":
-            image = "<IMG SRC=\"%s/waiting_or.gif\" ALT=\"\" align=right>" % images
-        elif status == "approved":
-            image = "<IMG SRC=\"%s/smchk_gr.gif\" ALT=\"\" align=right>" % images
-        elif status == "rejected":
-            image = "<IMG SRC=\"%s/iconcross.gif\" ALT=\"\" align=right>" % images
-        else:
-            image = ""
-        t+="""
- <table class="searchbox" summary="">
-    <tr>"""
-        t+=   "<th class=\"portalboxheader\">%s%s</th>" % (image,RN)
-        t+="""
-    </tr>
-    <tr>
-        <td class="portalboxbody">"""
     else:
-        return warningMsg("This document has never been requested for approval!<BR>&nbsp;")
+        return warningMsg(_("This document has never been requested for approval!") + "<BR>&nbsp;", ln = ln)
+
     (authors,title,sysno,newrn) = getInfo(doctype,categ,RN)
-    if send == "Send Again":
+    confirm_send = 0
+    if send == _("Send Again"):
         if authors == "unknown" or title == "unknown":
-            SendWarning(doctype,categ,RN,title,authors,access)
+            SendWarning(doctype,categ,RN,title,authors,access, ln = ln)
         else:
+            # @todo - send in different languages
             SendEnglish(doctype,categ,RN,title,authors,access,sysno)
             run_sql("update sbmAPPROVAL set dLastReq=NOW() where rn=%s",(RN,))
-            t+= "<I><strong class=headline>Your request has been sent to the referee!</strong></I><BR><BR>"
-    t+= "<FORM action=\"publiline.py\">\n"
-    t+= "<INPUT type=hidden name=RN value=\"%s\">\n" % RN
-    t+= "<INPUT type=hidden name=categ value=\"%s\">\n" % categ
-    t+= "<INPUT type=hidden name=doctype value=\"%s\">\n" % doctype
-    t+="<SMALL>\n"
-    if title != "unknown":
-        t+= "<strong class=headline>Title:</strong>%s<BR><BR>\n" % title
-    if authors != "":
-        t+="<strong class=headline>Author:</strong>%s<BR><BR>\n" % authors
-    if sysno != "":
-        t+="<strong class=headline>More information:</strong>"
-        t+= " <A HREF=\"%s?id=%s\">click here</A><BR><BR>\n" % (accessurl,sysno)
+            confirm_send = 1
+
     if status == "waiting":
-        t+= "This Document is still <strong class=headline>waiting for approval</strong>.<BR><BR>"
-        t+="It has first been sent to approval on: <strong class=headline>%s</strong><BR>" % dFirstReq
-        if dLastReq == "0000-00-00 00:00:00":
-            t+= "Last approval e-mail was sent on: <strong class=headline>%s</strong><BR>" % dFirstReq
-        else:
-            t+= "Last approval e-mail was sent on: <strong class=headline>%s</strong><BR>" % dLastReq
-        t+="<BR>You can send an approval request e-mail again by clicking the following button:"
-        t+= "<BR><INPUT class=\"adminbutton\" type=submit name=send value=\"Send Again\" onClick=\"return confirm('WARNING! An e-mail will be send to your referee if you confirm.')\">"
-        # We also display a button for the referee
         (auth_code, auth_message) = acc_authorize_action(uid, "referee",verbose=0,doctype=doctype, categ=categ)
-        if auth_code == 0:
-            t+= "<br>As a referee for this document, you may click this button to approve or reject it:"
-            t+= "<BR><INPUT class=\"adminbutton\" type=submit name=approval value=\"Approve/Reject\" onClick=\"window.location='approve.py?%s';return false;\">" % access
-    if status == "approved":
-        t+="This Document has been <strong class=headline>approved</strong>.<BR>Its approved reference is: <strong class=headline>%s</strong><BR><BR>" % newrn
-        t+="It has first been sent to approval on: <strong class=headline>%s</strong><BR>" % dFirstReq
-        if dLastReq == "0000-00-00 00:00:00":
-            t+= "Last approval e-mail was sent on: <strong class=headline>%s</STRONG><BR>" % dFirstReq
-        else:
-            t+= "Last approval e-mail was sent on: <strong class=headline>%s</STRONG><BR>" % dLastReq
-            t+="It has been approved on: <strong class=headline>%s</STRONG><BR>" % dAction
-    if status == "rejected":
-        t+= "This Document has been <strong class=headline>rejected</STRONG>.<BR><BR>"
-        t+="It has first been sent to approval on: <strong class=headline>%s</STRONG><BR>" % dFirstReq
-        if dLastReq == "0000-00-00 00:00:00":
-            t+= "Last approval e-mail was sent on: <strong class=headline>%s</STRONG><BR>" % dFirstReq
-        else:
-            t+="Last approval e-mail was sent on: <strong class=headline>%s</STRONG><BR>" % dLastReq
-        t+= "It has been rejected on: <strong class=headline>%s</STRONG><BR>" % dAction
-    t+= "</SMALL></FORM>"
-    t+= """<BR></TD></TR></TABLE>
-        </blockquote>
-        </td>
-    </tr>
-</table>"""
+    else:
+        (auth_code, auth_message) = (None, None)
+        
+    t = websubmit_templates.tmpl_publiline_displaydoc(
+          ln = ln,
+          docname = docname,
+          doctype = doctype,
+          categ = categ,
+          rn = rn,
+          status = status,
+          dFirstReq = dFirstReq,
+          dLastReq = dLastReq,
+          dAction = dAction,
+          access = access,
+          images = images,
+          accessurl = accessurl,
+          confirm_send = confirm_send,
+          auth_code = auth_code,
+          auth_message = auth_message,
+          authors = authors,
+          title = title,
+          sysno = sysno,
+          newrn = newrn,
+        )
     return t
 
 # Retrieve info about document
@@ -393,17 +316,17 @@ def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
     message = """
     The document %s has been published as a Communication.
     Your approval is requested for it to become an official Note.
-    
+
     Title: %s
-    
+
     Author(s): %s
-    
+
     To access the document(s), select the file(s) from the location:
     <%s/getfile.py?recid=%s>
-    
+
     To approve/reject the document, you should go to this URL:
     <%s/approve.py?%s>
-    
+
     ---------------------------------------------
     Best regards.
     The submission team.""" % (RN,title,authors,urlpath,sysno,urlpath,access)
@@ -419,4 +342,20 @@ def SendWarning(doctype,categ,RN,title,authors,access):
     body = forge_email(FROMADDR,adminemail,"","Failed sending approval email request",message)
     send_email(FROMADDR,adminemail,body,0)
     return ""
+
+def errorMsg(title,req,c=cdsname,ln=cdslang):
+    return page(title="error",
+                body = create_error_box(req, title=title,verbose=0, ln=ln),
+                description="%s - Internal Error" % c,
+                keywords="%s, CDSware, Internal Error" % c,
+                language=ln,
+                urlargs=req.args)
+
+def warningMsg(title,req,c=cdsname,ln=cdslang):
+    return page(title="warning",
+                body = title,
+                description="%s - Internal Error" % c,
+                keywords="%s, CDSware, Internal Error" % c,
+                language=ln,
+                urlargs=req.args)
 
