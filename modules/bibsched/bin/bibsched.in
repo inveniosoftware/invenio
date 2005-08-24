@@ -594,24 +594,157 @@ def usage(exitcode=1, msg=""):
     """Prints usage info."""
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
-    sys.stderr.write("Usage: %s [options]\n" % sys.argv[0])
-    sys.stderr.write("Command options:\n")
-    sys.stderr.write("  -d, --daemon\t Launch BibSched in the daemon mode.\n")
-    sys.stderr.write("General options:\n")
-    sys.stderr.write("  -h, --help      \t\t Print this help.\n")
-    sys.stderr.write("  -V, --version   \t\t Print version information.\n")
+
+    sys.stderr.write ("""\
+Usage: %s [options] [start|stop|restart|monitor]
+
+The following commands are available for bibsched:
+
+  - start:   start bibsched in background
+  - stop:    stop a running bibsched
+  - restart: restart a running bibsched
+  - monitor: enter the interactive monitor
+  
+Command options:
+  -d, --daemon\t Launch BibSched in the daemon mode (deprecated, use 'start')
+General options:
+  -h, --help      \t\t Print this help.
+  -V, --version   \t\t Print version information.
+  """ % sys.argv [0])
+    
     #sys.stderr.write("  -v, --verbose=LEVEL \t Verbose level (0=min, 1=default, 9=max).\n")
     sys.exit(exitcode)
+
+
+import pwd, grp
+
+prefix = '@prefix@'
+
+pidfile = os.path.join (prefix, 'var', 'run', 'bibsched.pid')
+etcfile = os.path.join (prefix, 'etc', 'bibsched', 'config')
+
+
+bibsched_config = {
+    'user':  'cdsware',
+    'group': 'cdsware',
+    }
+
+
+def error (msg):
+    print >> sys.stderr, "error: " + msg
+    sys.exit (1)
+
+
+# Fetch the user and group from the configuration file
+try:
+    lines = [ line for line in open (etcfile)
+              if line.strip () and line [0] != '#' ]
+except IOError:
+    print >> sys.stderr, "warning: no configuration file %s" % etcfile
+    lines = []
     
+for line in lines:
+    key, value = [ element.strip () for element in line.split ('=') ]
+    bibsched_config [key] = value
+
+
+try:
+    uid = pwd.getpwnam (bibsched_config ['user'])  [2]
+except KeyError, msg:
+    error ("invalid bibsched user name: %s" % msg)
+    
+try:
+    gid = grp.getgrnam (bibsched_config ['group']) [2]
+except KeyError, msg:
+    error ("invalid bibsched group name: %s" % msg)
+
+
+def start ():
+    """ Fork this process in the background and start processing
+    requests. The process PID is stored in a pid file, so that it can
+    be stopped later on."""
+    
+    sys.stdout.write ("starting bibsched: ")
+    sys.stdout.flush ()
+    
+    try:
+        pid = int (open (pidfile).read ())
+        error ("another instance of bibsched (pid %d) is running" % pid)
+        
+    except IOError:
+        pass
+    
+    # start the child process using the "double fork" technique
+    pid = os.fork ()
+    if pid > 0: sys.exit (0)
+
+    os.setsid ()
+    os.chdir ('/')
+    
+    pid = os.fork ()
+    
+    if pid > 0:
+        sys.stdout.write ('pid %d\n' % pid)
+        open (pidfile, 'w').write ('%d' % pid)
+        return
+
+    os.setregid (gid, gid)
+    os.setreuid (uid, uid)
+    
+    sys.stdin.close ()
+    redirect_stdout_and_stderr ()
+
+    sched = BibSched()
+    Log ("daemon started")
+    sched.watch_loop ()
+    
+    return
+
+def stop ():
+    try:
+        pid = int (open (pidfile).read ())
+    except IOError:
+        error ('bibsched seems not to be running.')
+    
+    try: os.kill (pid, signal.SIGINT)
+    except OSError:
+        print >> sys.stderr, 'no bibsched process found'
+    
+    print "stopping bibsched: pid %d" % pid
+    os.unlink (pidfile)
+    return
+
+def monitor ():
+    redirect_stdout_and_stderr()
+    manager = Manager ()
+    return
+
+def restart ():
+    stop  ()
+    start ()
+    return
+
+
 def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hVd", ["--help","--version","--daemon"])
     except getopt.GetoptError, err:
-        Log( "Error: %s" % err)
+        Log ("Error: %s" % err)
         usage(1, err)
+
     if not opts:
-        redirect_stdout_and_stderr()
-        manager = Manager()
+        try:  cmd = args [0]
+        except IndexError: cmd = 'monitor'
+        
+        try:
+            { 'start':   start,
+              'stop':    stop,
+              'restart': restart,
+              'monitor': monitor } [cmd] ()
+
+        except KeyError:
+            usage (1, 'unkown command: %s' % `cmd`)
+            
     else:
         opt = opts[0] # we shall choose only the first option
         if opt[0] in ["-h", "--help"]:
