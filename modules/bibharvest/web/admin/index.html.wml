@@ -26,7 +26,7 @@
 
 <p>
  This is the gate to the admin area for BibHarvest. You need to
- <a href="<WEBURL>/youraccount.py/login?referer=<WEBURL>/admin/bibindex/">login</a> to enter.
+ <a href="<WEBURL>/youraccount.py/login?referer=<WEBURL>/admin/bibharvest/">login</a> to enter.
 </p>
 
 <dl>
@@ -34,6 +34,6 @@
  <dd>Configure your OAI sources and harvesting periodicity.</dd>
 </dl>
 <dl>
- <dt><a href="guide.html">BibIndex Admin Guide</a></dt>
- <dd>Everything you want to know about BibIndex administration</dd>
+ <dt><a href="guide.html">BibHarvest Admin Guide</a></dt>
+ <dd>Everything you want to know about BibHarvest administration</dd>
 </dl>
