@@ -1,0 +1,55 @@
+#!/usr/bin/python2.3
+## -*- mode: python; coding: utf-8; -*-
+##
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002, 2003, 2004, 2005 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""CDSware BibHarvest Admin Task.  
+        It launches bibharvest periodically by reading table oaiHARVEST.
+
+Usage: oaiharvest %s [options] 
+Examples:
+      oaiharvest -r arxiv -s 24h
+      oaiharvest -r pubmed -d 2005-05-05:2005-05-10 -t 10m
+
+ Specific options:
+ -r, --repository=NAME     name of the OAI repository to be harvested (default=all)
+
+ Scheduling options:
+ -u,  --user=USER          user name to store task, password needed
+ -s,  --sleeptime=SLEEP    time after which to repeat task (no)
+                           e.g.: 1s, 30m, 24h, 7d
+ -t,  --time=TIME          moment for the task to be active (now)
+                           e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26
+
+ General options:
+ -h,  --help               print this help and exit
+ -V,  --version            print version and exit
+ -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
+"""
+
+try:
+    import sys
+    pylibdir = "@prefix@/lib/python"
+    sys.path.append('%s' % pylibdir)
+    from cdsware.oaiharvestlib import main
+except ImportError, e:
+    print "Error: %s" % e
+    import sys
+    sys.exit(1)
+
+main()
