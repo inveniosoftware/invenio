@@ -2186,10 +2186,13 @@ CREATE TABLE IF NOT EXISTS oaiHARVEST (
   id mediumint(9) unsigned NOT NULL auto_increment,
   baseURL varchar(255) NOT NULL default '',
   metadataPrefix varchar(255) NOT NULL default 'oai_dc',
-  runtime datetime NOT NULL,
-  sleeptime varchar(20),
   arguments text,
   comment text,
+  bibConvertconfigfile varchar(50),
+  name varchar(255) NOT NULL,
+  lastrun datetime,
+  frequency mediumint(12) NOT NULL default '0',
+  postprocess varchar(5) NOT NULL default 'h__',
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
