@@ -17,8 +17,8 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = bibharvest
+bin_SCRIPTS = bibharvest oaiharvest
 
-EXTRA_DIST = bibharvest.in
+EXTRA_DIST = bibharvest.in oaiharvest.in
 
 CLEANFILES = *~ *.tmp bibharvestc
