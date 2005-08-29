@@ -20,7 +20,7 @@
 pylibdir = $(libdir)/python/cdsware
 
 pylib_DATA = oai_repository.py oai_repository_config.py oai_repository_tests.py \
-             bibharvestadminlib.py bibharvest_templates.py
+             bibharvestadminlib.py bibharvest_templates.py oaiharvestlib.py
 
 EXTRA_DIST = $(pylib_DATA)
 
