@@ -77,6 +77,8 @@ def_actions = (
                ('submit',                   'use webSubmit',    'doctype,act',  'yes'),
                ('runbibrank',         'run BibRank',       '',              'no'),
                ('cfgbibrank',         'configure BibRank',       '',              'no'),
+               ('cfgbibharvest',         'configure BibHarvest',       '',              'no'),
+               ('runoaiharvest',         'run oaiharvest task',       '',              'no'),
               )
 # authorizations
 #          role              action          arglistid  optional   arguments
@@ -95,6 +97,8 @@ def_auths = (
              (SUPERADMINROLE,    'submit',         -1,      1,       {}),
              (SUPERADMINROLE,    'runbibrank',           -1,      0,       {}),
              (SUPERADMINROLE,    'cfgbibrank',           -1,      0,       {}),
+             (SUPERADMINROLE,    'cfgbibharvest',           -1,      0,       {}),
+             (SUPERADMINROLE,    'runoaiharvest',            -1,      0,       {}),
             )
 cfg_webaccess_msgs = {
                                 0: 'Try to <a href="%s/youraccount.py/login?referer=%s/admin/%s">login</a> with another account.' % (weburl, weburl, "%s"),
