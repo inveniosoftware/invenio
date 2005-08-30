@@ -692,13 +692,16 @@ class Template:
         out += _("Here are some interesting web admin links for you:")
 
         # print proposed links:
+        activities.sort(lambda x, y: cmp(string.lower(x), string.lower(y)))
         for action in activities:
             if action == "cfgbibformat":
                 out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/">%s</a>""" % (weburl, _("Configure BibFormat"))
-            if action == "cfgbibrank":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibrank/bibrankadmin.py">%s</a>""" % (weburl, _("Configure BibRank"))
+            if action == "cfgbibharvest":
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/bibharvestadmin.py">%s</a>""" % (weburl, _("Configure BibHarvest"))
             if action == "cfgbibindex":
                 out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibindex/bibindexadmin.py">%s</a>""" % (weburl, _("Configure BibIndex"))
+            if action == "cfgbibrank":
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibrank/bibrankadmin.py">%s</a>""" % (weburl, _("Configure BibRank"))
             if action == "cfgwebaccess":
                 out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/">%s</a>""" % (weburl, _("Configure WebAccess"))
             if action == "cfgwebsearch":
