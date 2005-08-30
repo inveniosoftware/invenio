@@ -2184,11 +2184,11 @@ CREATE TABLE IF NOT EXISTS oaiSET (
 
 CREATE TABLE IF NOT EXISTS oaiHARVEST (
   id mediumint(9) unsigned NOT NULL auto_increment,
-  baseURL varchar(255) NOT NULL default '',
-  metadataPrefix varchar(255) NOT NULL default 'oai_dc',
+  baseurl varchar(255) NOT NULL default '',
+  metadataprefix varchar(255) NOT NULL default 'oai_dc',
   arguments text,
   comment text,
-  bibConvertconfigfile varchar(50),
+  bibconvertcfgfile varchar(255),
   name varchar(255) NOT NULL,
   lastrun datetime,
   frequency mediumint(12) NOT NULL default '0',

@@ -348,7 +348,7 @@ def get_row_from_reposname(reposname):
 
 def get_all_rows_from_db():
     """ This method retrieves the full database of repositories and returns a list containing (in exact order):
-    | id | baseURL | metadataPrefix | arguments | comment | bibConvertconfigfile | name   | lastrun | frequency | postprocess |
+    | id | baseurl | metadataprefix | arguments | comment | bibconvertcfgfile | name   | lastrun | frequency | postprocess |
     """
     try:
         reposlist = []
