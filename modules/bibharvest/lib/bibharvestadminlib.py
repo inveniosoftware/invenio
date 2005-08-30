@@ -303,7 +303,7 @@ def perform_request_delsource(oai_src_id, ln=cdslang, callback='yes', confirm=0)
 
 def get_oai_src(oai_src_id=''):
     """Returns a row parameters for a given id"""
-    sql = "SELECT id,name,baseURL,metadataPrefix,frequency,bibConvertconfigfile,postprocess FROM oaiHARVEST"
+    sql = "SELECT id,name,baseurl,metadataprefix,frequency,bibconvertcfgfile,postprocess FROM oaiHARVEST"
     try:
         if oai_src_id:
             sql += " WHERE id=%s" % oai_src_id
@@ -319,13 +319,13 @@ def modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oa
     try:
         sql = "UPDATE oaiHARVEST SET name='%s' WHERE id=%s" % (MySQLdb.escape_string(oai_src_name), oai_src_id)
         res = run_sql(sql)
-        sql = "UPDATE oaiHARVEST SET baseURL='%s' WHERE id=%s" % (MySQLdb.escape_string(oai_src_baseurl), oai_src_id)
+        sql = "UPDATE oaiHARVEST SET baseurl='%s' WHERE id=%s" % (MySQLdb.escape_string(oai_src_baseurl), oai_src_id)
         res = run_sql(sql)
-        sql = "UPDATE oaiHARVEST SET metadataPrefix='%s' WHERE id=%s" % (MySQLdb.escape_string(oai_src_prefix), oai_src_id)
+        sql = "UPDATE oaiHARVEST SET metadataprefix='%s' WHERE id=%s" % (MySQLdb.escape_string(oai_src_prefix), oai_src_id)
         res = run_sql(sql)
         sql = "UPDATE oaiHARVEST SET frequency='%s' WHERE id=%s" % (MySQLdb.escape_string(oai_src_frequency), oai_src_id)
         res = run_sql(sql)
-        sql = "UPDATE oaiHARVEST SET bibConvertconfigfile='%s' WHERE id=%s" % (MySQLdb.escape_string(oai_src_config), oai_src_id)
+        sql = "UPDATE oaiHARVEST SET bibconvertcfgfile='%s' WHERE id=%s" % (MySQLdb.escape_string(oai_src_config), oai_src_id)
         res = run_sql(sql)
         sql = "UPDATE oaiHARVEST SET postprocess='%s' WHERE id=%s" % (MySQLdb.escape_string(oai_src_post), oai_src_id)
         res = run_sql(sql)
