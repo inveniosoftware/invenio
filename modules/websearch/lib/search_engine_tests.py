@@ -68,103 +68,109 @@ class TestQueryParser(unittest.TestCase):
 
     def test_parsing_single_word_query(self):
         "search engine - parsing single word queries"
-        self._check('word', '', None, [['|', 'word', '', 'w']])
+        self._check('word', '', None, [['+', 'word', '', 'w']])
+
+    def test_parsing_single_word_with_boolean_operators(self):
+        "search engine - parsing single word queries"
+        self._check('+word', '', None, [['+', 'word', '', 'w']])
+        self._check('-word', '', None, [['-', 'word', '', 'w']])
+        self._check('|word', '', None, [['|', 'word', '', 'w']])
 
     def test_parsing_single_word_in_field(self):
         "search engine - parsing single word queries in a logical field"
-        self._check('word', 'title', None, [['|', 'word', 'title', 'w']])
+        self._check('word', 'title', None, [['+', 'word', 'title', 'w']])
 
     def test_parsing_single_word_in_tag(self):
         "search engine - parsing single word queries in a physical tag"
-        self._check('word', '500', None, [['|', 'word', '500', 'a']])
+        self._check('word', '500', None, [['+', 'word', '500', 'a']])
 
     def test_parsing_query_with_commas(self):
         "search engine - parsing queries with commas"
-        self._check('word,word', 'title', None, [['|', 'word,word', 'title', 'a']])
+        self._check('word,word', 'title', None, [['+', 'word,word', 'title', 'a']])
 
     def test_parsing_exact_phrase_query(self):
         "search engine - parsing exact phrase"
-        self._check('"the word"', 'title', None, [['|', 'the word', 'title', 'a']])
+        self._check('"the word"', 'title', None, [['+', 'the word', 'title', 'a']])
         
     def test_parsing_exact_phrase_query_unbalanced(self):
         "search engine - parsing unbalanced exact phrase"
-        self._check('"the word', 'title', None, [['|', '"the', 'title', 'w'],
+        self._check('"the word', 'title', None, [['+', '"the', 'title', 'w'],
                                                  ['+', 'word', 'title', 'w']])
         
     def test_parsing_exact_phrase_query_in_any_field(self):
         "search engine - parsing exact phrase in any field"
-        self._check('"the word"', '', None, [['|', 'the word', 'anyfield', 'a']])
+        self._check('"the word"', '', None, [['+', 'the word', 'anyfield', 'a']])
         
     def test_parsing_partial_phrase_query(self):
         "search engine - parsing partial phrase"
-        self._check("'the word'", 'title', None, [['|', '%the word%', 'title', 'a']])
+        self._check("'the word'", 'title', None, [['+', '%the word%', 'title', 'a']])
 
     def test_parsing_partial_phrase_query_unbalanced(self):
         "search engine - parsing unbalanced partial phrase"
-        self._check("'the word", 'title', None, [['|', "'the", 'title', 'w'],
+        self._check("'the word", 'title', None, [['+', "'the", 'title', 'w'],
                                                  ['+', "word", 'title', 'w']])
     def test_parsing_partial_phrase_query_in_any_field(self):
         "search engine - parsing partial phrase in any field"
-        self._check("'the word'", '', None, [['|', "'the", '', 'w'],
-                                             ['|', "word'", '', 'w']])
+        self._check("'the word'", '', None, [['+', "'the", '', 'w'],
+                                             ['+', "word'", '', 'w']])
             
     def test_parsing_regexp_query(self):
         "search engine - parsing regex matches"
-        self._check("/the word/", 'title', None, [['|', 'the word', 'title', 'r']])
+        self._check("/the word/", 'title', None, [['+', 'the word', 'title', 'r']])
         
     def test_parsing_regexp_query_unbalanced(self):
         "search engine - parsing unbalanced regexp"
-        self._check("/the word", 'title', None, [['|', '/the', 'title', 'w'],
+        self._check("/the word", 'title', None, [['+', '/the', 'title', 'w'],
                                                  ['+', 'word', 'title', 'w']])
     def test_parsing_regexp_query_in_any_field(self):
         "search engine - parsing regexp searches in any field"
-        self._check("/the word/", '', None, [['|', "/the", '', 'w'],
-                                             ['|', "word/", '', 'w']])
+        self._check("/the word/", '', None, [['+', "/the", '', 'w'],
+                                             ['+', "word/", '', 'w']])
         
     def test_parsing_boolean_query(self):
         "search engine - parsing boolean query with several words"
-        self._check("muon kaon ellis cern", '', None, [['|', 'muon', '', 'w'],
+        self._check("muon kaon ellis cern", '', None, [['+', 'muon', '', 'w'],
                                                        ['+', 'kaon', '', 'w'],
                                                        ['+', 'ellis', '', 'w'],
                                                        ['+', 'cern', '', 'w']])
         
     def test_parsing_boolean_query_with_word_operators(self):
         "search engine - parsing boolean query with word operators"
-        self._check("muon and kaon or ellis not cern", '', None, [['|', 'muon', '', 'w'],
+        self._check("muon and kaon or ellis not cern", '', None, [['+', 'muon', '', 'w'],
                                                                   ['+', 'kaon', '', 'w'],
                                                                   ['|', 'ellis', '', 'w'],
                                                                   ['-', 'cern', '', 'w']])
         
     def test_parsing_boolean_query_with_symbol_operators(self):
         "search engine - parsing boolean query with symbol operators"
-        self._check("muon +kaon |ellis -cern", '', None, [['|', 'muon', '', 'w'],
+        self._check("muon +kaon |ellis -cern", '', None, [['+', 'muon', '', 'w'],
                                                           ['+', 'kaon', '', 'w'],
                                                           ['|', 'ellis', '', 'w'],
                                                           ['-', 'cern', '', 'w']])
         
     def test_parsing_boolean_query_with_symbol_operators_and_spaces(self):
         "search engine - parsing boolean query with symbol operators and spaces"
-        self._check("muon + kaon | ellis - cern", '', None, [['|', 'muon', '', 'w'],
+        self._check("muon + kaon | ellis - cern", '', None, [['+', 'muon', '', 'w'],
                                                              ['+', 'kaon', '', 'w'],
                                                              ['|', 'ellis', '', 'w'],
                                                              ['-', 'cern', '', 'w']])
         
     def test_parsing_boolean_query_with_symbol_operators_and_no_spaces(self):
         "search engine - parsing boolean query with symbol operators and no spaces"
-        self._check("muon+kaon|ellis-cern", '', None, [['|', 'muon+kaon|ellis-cern', '', 'w']])
+        self._check("muon+kaon|ellis-cern", '', None, [['+', 'muon+kaon|ellis-cern', '', 'w']])
         
     def test_parsing_combined_structured_query(self):
         "search engine - parsing combined structured query"
-        self._check("title:muon author:ellis", '', None, [['|', 'muon', 'title', 'w'],
+        self._check("title:muon author:ellis", '', None, [['+', 'muon', 'title', 'w'],
                                                           ['+', 'ellis', 'author', 'w']])
         
     def test_parsing_structured_regexp_query(self):
         "search engine - parsing structured regexp query"
-        self._check("title:/(one|two)/", '', None, [['|', '(one|two)', 'title', 'r']]),
+        self._check("title:/(one|two)/", '', None, [['+', '(one|two)', 'title', 'r']]),
         
     def test_parsing_combined_structured_query_in_a_field(self):
         "search engine - parsing structured query in a field"
-        self._check("title:muon author:ellis", 'abstract', None, [['|', 'muon', 'title', 'w'],
+        self._check("title:muon author:ellis", 'abstract', None, [['+', 'muon', 'title', 'w'],
                                                                   ['+', 'ellis', 'author', 'w']])
         
         
