@@ -103,7 +103,7 @@ update-v0.5.0-tables: local-dbexec
 	echo "UPDATE formatname SET ln='sv' WHERE ln='se';" | ./modules/miscutil/bin/dbexec
 	echo "UPDATE fieldname SET ln='sv' WHERE ln='se';" | ./modules/miscutil/bin/dbexec
 
-update-v0.7.0-tables: local-dbexec
+update-v0.7.1-tables: local-dbexec
 	echo "DROP TABLE oaiHARVEST;" | ./modules/miscutil/bin/dbexec 
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runoaiharvest','run BibHarvest oaiharvest','','no');" | ./modules/miscutil/bin/dbexec 
