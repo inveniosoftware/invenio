@@ -68,8 +68,11 @@ except ImportError, e:
 
 from messages import gettext_set_language
 
-import template
-websearch_templates = template.load('websearch')
+try:
+    import template
+    websearch_templates = template.load('websearch')
+except:
+    pass
 
 ## global vars:
 search_cache = {} # will cache results of previous searches
@@ -199,47 +202,47 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
         ## A - matching type is known; good!
         if m == 'e':
             # A1 - exact value:
-            opfts.append(['|',p,f,'a']) # '|' since we have only one unit
+            opfts.append(['+',p,f,'a']) # '+' since we have only one unit
         elif m == 'p':
             # A2 - phrase/substring:
-            opfts.append(['|',"%"+p+"%",f,'a']) # '|' since we have only one unit
+            opfts.append(['+',"%"+p+"%",f,'a']) # '+' since we have only one unit
         elif m == 'r':
             # A3 - regular expression:
-            opfts.append(['|',p,f,'r']) # '|' since we have only one unit
+            opfts.append(['+',p,f,'r']) # '+' since we have only one unit
         elif m == 'a' or m == 'w':
             # A4 - all of the words:
             p = strip_accents(p) # strip accents for 'w' mode, FIXME: delete when not needed
             for word in get_words_from_pattern(p):
-                if len(opfts)==0:
-                    opfts.append(['|',word,f,'w']) # '|' in the first unit
-                else:
-                    opfts.append(['+',word,f,'w']) # '+' in further units
+                opfts.append(['+',word,f,'w']) # '+' in all units
         elif m == 'o':
             # A5 - any of the words:
             p = strip_accents(p) # strip accents for 'w' mode, FIXME: delete when not needed
             for word in get_words_from_pattern(p):
-                opfts.append(['|',word,f,'w']) # '|' in all units
+                if len(opfts)==0:
+                    opfts.append(['+',word,f,'w']) # '+' in the first unit
+                else:
+                    opfts.append(['|',word,f,'w']) # '|' in further units
         else:
             if of.startswith("h"):
                 print_warning(req, "Matching type '%s' is not implemented yet." % m, "Warning")
-            opfts.append(['|',"%"+p+"%",f,'a'])
+            opfts.append(['+',"%"+p+"%",f,'a'])
     else:
         ## B - matching type is not known: let us try to determine it by some heuristics
         if f and p[0]=='"' and p[-1]=='"':
             ## B0 - does 'p' start and end by double quote, and is 'f' defined? => doing ACC search
-            opfts.append(['|',p[1:-1],f,'a'])
+            opfts.append(['+',p[1:-1],f,'a'])
         elif f and p[0]=="'" and p[-1]=="'":
             ## B0bis - does 'p' start and end by single quote, and is 'f' defined? => doing ACC search
-            opfts.append(['|','%'+p[1:-1]+'%',f,'a'])
+            opfts.append(['+','%'+p[1:-1]+'%',f,'a'])
         elif f and p[0]=="/" and p[-1]=="/":
             ## B0ter - does 'p' start and end by a slash, and is 'f' defined? => doing regexp search
-            opfts.append(['|',p[1:-1],f,'r'])
+            opfts.append(['+',p[1:-1],f,'r'])
         elif f and string.find(p, ',') >= 0:
             ## B1 - does 'p' contain comma, and is 'f' defined? => doing ACC search
-            opfts.append(['|',p,f,'a'])
+            opfts.append(['+',p,f,'a'])
         elif f and str(f[0:2]).isdigit():
             ## B2 - does 'f' exist and starts by two digits?  => doing ACC search
-            opfts.append(['|',p,f,'a'])
+            opfts.append(['+',p,f,'a'])
         else:
             ## B3 - doing WRD search, but maybe ACC too
             # search units are separated by spaces unless the space is within single or double quotes
@@ -257,18 +260,11 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                 pi = sre_pattern_space.sub(" ", pi) # replace back '__SPACE__' by ' '
                 # firstly, determine set operator
                 if pi[0] == '+' or pi[0] == '-' or pi[0] == '|':
-                    if len(opfts) or pi[0] == '-': # either not first unit, or '-' for the first unit
-                        oi = pi[0]
-                    else:
-                        oi = "|" # we are in the first unit and operator is not '-', so let us do
-                                 # set union (with still null result set)
+                    oi = pi[0]
                     pi = pi[1:]
                 else:
                     # okay, there is no operator, so let us decide what to do by default
-                    if len(opfts):
-                        oi = '+' # by default we are doing set intersection...
-                    else:
-                        oi = "|" # ...unless we are in the first unit
+                    oi = '+' # by default we are doing set intersection...
                 # secondly, determine search pattern and field:
                 if string.find(pi, ":") > 0:
                     fi, pi = split(pi, ":", 1)
@@ -1349,7 +1345,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (bsu_p, Numeric.nonzero(basic_search_unit_hitset._set)))
         if basic_search_unit_hitset._nbhits>0 or \
            ap==0 or \
-           (idx_unit>0 and bsu_o=="|") or \
+           bsu_o=="|" or \
            ((idx_unit+1)<len(basic_search_units) and basic_search_units[idx_unit+1][0]=="|"):
             # stage 2-1: this basic search unit is retained, since
             # either the hitset is non-empty, or the approximate
@@ -1400,7 +1396,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     # search stage 3: apply boolean query for each search unit:
     if verbose and of.startswith("h"):
         t1 = os.times()[4]
-    hitset_in_any_collection = HitSet()
+    # let the initial set be the complete universe:
+    hitset_in_any_collection = HitSet(Numeric.ones(cfg_max_recID+1, Numeric.Int0))
     for idx_unit in range(0,len(basic_search_units)):
         this_unit_operation = basic_search_units[idx_unit][0]
         this_unit_hitset = basic_search_units_hitsets[idx_unit]
@@ -3443,5 +3440,5 @@ def profile(p="", f="", c=cdsname):
 
 ## profiling:
 #profile("of the this")
-
+#print perform_request_search(p="ellis")
 
