@@ -479,6 +479,7 @@ AC_CONFIG_FILES([config.nice \
 	  modules/bibharvest/Makefile \
 	  modules/bibharvest/bin/Makefile \
 	  modules/bibharvest/bin/bibharvest \
+	  modules/bibharvest/bin/oaiharvest \
 	  modules/bibharvest/doc/Makefile \
 	  modules/bibharvest/doc/admin/Makefile \
 	  modules/bibharvest/doc/hacking/Makefile \
