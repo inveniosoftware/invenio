@@ -2567,7 +2567,7 @@
 <define-tag MSG_PEOPLE_WHO_VIEWED_THIS_PAGE whitespace=delete>
   <en>People who viewed this page also viewed:</en>
   <fr>Les utilisateurs qui ont vu cette page ont aussi vu:</fr>
-  <de>Benutzer, die diese Seite sahen, haben auch dargestellt:</de>
+  <de>Benutzer, die diese Seite sahen, haben auch angeschaut:</de>
   <es>La gente que vió esta página también vió:</es>
   <ca>Els usuaris que han vist aquesta pàgina també han vist:</ca>
   <pt>Pessoas que visitaram esta página também visitaram:</pt>
