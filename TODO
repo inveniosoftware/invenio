@@ -256,6 +256,13 @@ creation rules.
 
 XML MARC not stored in bibfmt when bibupload -c is used.
 
+** BibUpload-20050913: XML MARC obtained via OAI badly stored ``as is''
+
+A silent error happens when one tries to bibupload records in XML MARC
+obtained via OAI ``as such''.  Record gets inserted, but Detailed
+record page in XML MARC does not work -- apparently the record gets
+stored badly in bibfmt.
+
 * Miscellaneous
 
 ** Miscellaneous-20040315: Personalization part is not I18N-ized yet
