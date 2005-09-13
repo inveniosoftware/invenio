@@ -79,6 +79,7 @@ def_actions = (
                ('cfgbibrank',         'configure BibRank',       '',              'no'),
                ('cfgbibharvest',         'configure BibHarvest',       '',              'no'),
                ('runoaiharvest',         'run oaiharvest task',       '',              'no'),
+               ('cfgwebcomment',         'configure WebComment',       '',              'no'),
               )
 # authorizations
 #          role              action          arglistid  optional   arguments
@@ -99,6 +100,7 @@ def_auths = (
              (SUPERADMINROLE,    'cfgbibrank',           -1,      0,       {}),
              (SUPERADMINROLE,    'cfgbibharvest',           -1,      0,       {}),
              (SUPERADMINROLE,    'runoaiharvest',            -1,      0,       {}),
+             (SUPERADMINROLE,    'cfgwebcomment',            -1,      0,       {}),
             )
 cfg_webaccess_msgs = {
                                 0: 'Try to <a href="%s/youraccount.py/login?referer=%s/admin/%s">login</a> with another account.' % (weburl, weburl, "%s"),
