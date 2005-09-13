@@ -980,4 +980,25 @@ input,select {
    color: #603;
    background: #ffffff;
 }
+.commentbox {
+   color: #000;
+   width: 100%;
+   padding-left: 10px;
+   padding-right: 10px;
+   border-left: 2px solid #3366cc;
+}
+.warninggreen {
+   color: #060;
+   background: transparent;
+}
+.warningred {
+   color: #f00;
+   background: transparent;
+}
+.reportabuse {
+   color: #000;
+   background: #fff;
+   font-size: small;
+   vertical-align: bottom;
+}
 /* end of cds.css */
