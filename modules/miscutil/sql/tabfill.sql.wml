@@ -1542,9 +1542,9 @@ INSERT INTO accACTION VALUES (12,'cfgwebsubmit','configure webSubmit','','no');
 INSERT INTO accACTION VALUES (13,'referee','referee document type doctype','doctype,categ','yes');
 INSERT INTO accACTION VALUES (14,'runbibrank','run BibRank','','no');
 INSERT INTO accACTION VALUES (15,'cfgbibrank','configure BibRank','','no');
-INSERT INTO accACTION VALUES (16,'cfgbibharvest','configure BibHarvest','','no');
-INSERT INTO accACTION VALUES (17,'cfgbibindex','configure BibIndex','','no');
-INSERT INTO accACTION VALUES (18,'runoaiharvest','run oaiharvest task','','no');
+INSERT INTO accACTION VALUES (16,'cfgbibindex','configure BibIndex','','no');
+INSERT INTO accACTION VALUES (17,'cfgbibharvest','configure BibHarvest','','no');
+INSERT INTO accACTION VALUES (18,'runoaiharvest','run BibHarvest periodical harvesting','','no');
 INSERT INTO accACTION VALUES (19,'cfgwebcomment','configure WebComment','','no');
 
 INSERT INTO accARGUMENT VALUES (1,'collection','Pictures');
