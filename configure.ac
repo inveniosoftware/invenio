@@ -541,6 +541,7 @@ AC_CONFIG_FILES([config.nice \
 	  modules/miscutil/lib/Makefile \
 	  modules/miscutil/demo/Makefile \
 	  modules/miscutil/sql/Makefile \
+	  modules/miscutil/web/Makefile \
 	  modules/webaccess/Makefile \
 	  modules/webaccess/bin/Makefile \
 	  modules/webaccess/bin/authaction \
