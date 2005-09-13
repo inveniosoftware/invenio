@@ -160,3 +160,12 @@ cfg_bibindex_remove_html_markup = <CFG_BIBINDEX_REMOVE_HTML_MARKUP>
 cfg_bibindex_min_word_length = <CFG_BIBINDEX_MIN_WORD_LENGTH>
 cfg_bibindex_urlopener_username = "<CFG_BIBINDEX_URLOPENER_USERNAME>"
 cfg_bibindex_urlopener_password = "<CFG_BIBINDEX_URLOPENER_PASSWORD>"
+
+## for commenting:
+cfg_webcomment_allow_comments = 1
+cfg_webcomment_allow_reviews = 1
+cfg_webcomment_nb_reports_before_send_email_to_admin = 5
+cfg_webcomment_nb_comments_in_detailed_view = 1
+cfg_webcomment_nb_reviews_in_detailed_view = 1
+cfg_webcomment_admin_notification_level = 1
+
