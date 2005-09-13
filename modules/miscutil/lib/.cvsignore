@@ -3,7 +3,9 @@ Makefile.in
 z_*
 *.O
 *~
-*.py
+messages.py
+dbquery.py
+config.py
 *.pyc
 *.shtml
 *.php
