@@ -54,6 +54,7 @@
   <navbar:button id=webaccess txt="WebAccess Admin" url="<WEBURL>/admin/webaccess/" hint="CDSware Web Access Rights Admin" menu="admin-webaccess">
   <navbar:button id=webalert txt="WebAlert Admin" url="<WEBURL>/admin/webalert/" hint="CDSware WebAlert Admin" menu="admin-webalert">
   <navbar:button id=webbasket txt="WebBasket Admin" url="<WEBURL>/admin/webbasket/" hint="CDSware WebBasket Admin" menu="admin-webbasket">
+  <navbar:button id=webcomment txt="WebComment Admin" url="<WEBURL>/admin/webcomment/" hint="CDSware WebComment Admin" menu="admin-webcomment">
   <navbar:button id=websearch txt="WebSearch Admin" url="<WEBURL>/admin/websearch/" hint="CDSware Web Search Interface Admin" menu="admin-websearch">
   <navbar:button id=websession txt="WebSession Admin" url="<WEBURL>/admin/websession/" hint="CDSware WebSession Admin" menu="admin-websession">
   <navbar:button id=webstat txt="WebStat Admin" url="<WEBURL>/admin/webstat/" hint="CDSware WebStat Admin" menu="admin-webstat">
@@ -295,6 +296,25 @@
   <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
   <navbar:button id=webbasket-admin-guide txt="Guide" url="<WEBURL>/admin/webbasket/guide.html">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar admin-webcomment:
+<navbar:define name=admin-webcomment
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=webcomment-admin-interface txt="Interface" url="<WEBURL>/admin/webcomment/webcommentadmin.py">
+  <navbar:button id=webcomment-admin-guide txt="Guide" url="<WEBURL>/admin/webcomment/guide.html">
 
   <navbar:epilog> </td><td></td></tr> </navbar:epilog>
 
