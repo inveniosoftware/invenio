@@ -2363,8 +2363,11 @@ CREATE TABLE IF NOT EXISTS user (
   password varchar(20) default NULL,
   note varchar(255) default NULL,
   settings varchar(255) default NULL,
+  nickname varchar(255) NOT NULL default '',
+  last_login datetime NOT NULL default '0000-00-00 00:00:00',
   UNIQUE KEY id (id),
-  KEY email (email)
+  KEY email (email),
+  KEY nickname (nickname)
 ) TYPE=MyISAM;
 
 -- tables for access control engine
@@ -2474,8 +2477,24 @@ CREATE TABLE IF NOT EXISTS user_query_basket (
   KEY alert_name (alert_name)
 ) TYPE=MyISAM;
 
--- tables for FlexElink:
+--tables for WebComment
+CREATE TABLE IF NOT EXISTS cmtRECORDCOMMENT (
+  id int(15) unsigned NOT NULL auto_increment,
+  id_bibrec int(15) unsigned NOT NULL default '0',
+  id_user int(15) unsigned NOT NULL default '0',
+  title varchar(255) NOT NULL default '',
+  body text NOT NULL default '',
+  date_creation datetime NOT NULL default '0000-00-00 00:00:00',
+  star_score tinyint(5) unsigned NOT NULL default '0',
+  nb_votes_yes int(10) NOT NULL default '0',
+  nb_votes_total int(10) unsigned NOT NULL default '0',
+  nb_abuse_reports int(10) NOT NULL default '0',
+  PRIMARY KEY  (id),
+  KEY id_bibrec (id_bibrec),
+  KEY id_user (id_user)
+) TYPE=MyISAM;
 
+-- tables for BibFormat, formely known as FlexElink:
 CREATE TABLE IF NOT EXISTS flxFORMATS (
   name varchar(255) NOT NULL default '',
   value text,

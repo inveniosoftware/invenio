@@ -41,7 +41,7 @@ INSERT INTO collection VALUES (1,'<CDSNAME>',NULL,NULL,NULL,NULL);
 <el>INSERT INTO collectionname VALUES (1,'el','ln','<CDSNAMEINTL>');</el>
 <uk>INSERT INTO collectionname VALUES (1,'uk','ln','<CDSNAMEINTL>');</uk>
 
-INSERT INTO user VALUES (1, '<ADMINEMAIL>', '', NULL, NULL);
+INSERT INTO user VALUES (1, '<ADMINEMAIL>', '', NULL, NULL, 'admin', '');
 INSERT INTO flxLINKTYPES VALUES ('AUTHOR_SEARCH','N','EXT','','');
 INSERT INTO flxLINKTYPES VALUES ('KEYWORD_SEARCH','N','EXT','','');
 INSERT INTO flxLINKTYPECONDITIONS VALUES ('AUTHOR_SEARCH',0,' \"\"=\"\"	','\"<WEBURL>/search.py?f=author&p=\" urlencode($author)','EXT','','');
@@ -1545,6 +1545,7 @@ INSERT INTO accACTION VALUES (15,'cfgbibrank','configure BibRank','','no');
 INSERT INTO accACTION VALUES (15,'cfgbibharvest','configure BibHarvest','','no');
 INSERT INTO accACTION VALUES (16,'cfgbibindex','configure BibIndex','','no');
 INSERT INTO accACTION VALUES (17,'runoaiharvest','run oaiharvest task','','no');
+INSERT INTO accACTION VALUES (18,'cfgwebcomment','configure WebComment','','no');
 
 INSERT INTO accARGUMENT VALUES (1,'collection','Pictures');
 
