@@ -595,6 +595,13 @@ AC_CONFIG_FILES([config.nice \
 	  modules/webstyle/doc/hacking/Makefile \
 	  modules/webstyle/img/Makefile \
 	  modules/webstyle/lib/Makefile \
+	  modules/webcomment/Makefile \
+	  modules/webcomment/doc/Makefile \
+	  modules/webcomment/doc/admin/Makefile \
+	  modules/webcomment/doc/hacking/Makefile \
+	  modules/webcomment/lib/Makefile \
+	  modules/webcomment/web/Makefile \
+	  modules/webcomment/web/admin/Makefile \
 	  modules/webbasket/Makefile \
 	  modules/webbasket/doc/Makefile \
 	  modules/webbasket/doc/admin/Makefile \
