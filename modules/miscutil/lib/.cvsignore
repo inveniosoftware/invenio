@@ -4,5 +4,6 @@ z_*
 *.O
 *~
 *.py
+*.pyc
 *.shtml
 *.php
