@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ## $Id$
 ## Comments and reviews for records.
-                                                                                                                                                                                                     
+                                              
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -18,7 +18,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-                                                                                                                                                                                                     
+                                           
 __lastupdated__ = """FIXME: last updated"""
 
 import urllib
@@ -27,7 +27,6 @@ import string
 
 from config import *
 from messages import gettext_set_language, language_list_long
-from bibrankadminlib import addadminbox
 
 class Template:
     def tmpl_get_first_comments_without_ranking(self, recID, ln, comments, nb_comments_total, warnings):
@@ -736,8 +735,8 @@ class Template:
             out += '''
             <tr><td><br>Comments and reviews are disabled</td></tr>'''
         out += '''</table>'''
+        from bibrankadminlib import addadminbox
         return addadminbox('<b>Menu</b>', [out])
-
 
     def tmpl_admin_delete_form(self, ln, warnings):
         """
@@ -893,7 +892,7 @@ class Template:
         @param **hidden: dictionary with name=value pairs for hidden input
         @return html form
         """
-                                                                                                                                                                                                     
+        
         output  = '<form action="%s" method="%s">\n' % (action, string.lower(method).strip() in ['get','post'] and method or 'Get')
         output += '<table>\n<tr><td style="vertical-align: top">'
         output += text
@@ -909,7 +908,7 @@ class Template:
         output += ' <input class="adminbutton" type="submit" value="%s"/>\n' % (button, )
         output += '</td></tr></table>'
         output += '</form>\n'
-                                                                                                                                                                                                     
+        
         return output
 
 
