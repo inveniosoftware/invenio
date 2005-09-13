@@ -29,6 +29,8 @@ import time
 import traceback
 import urllib
 
+from errorlib import get_msgs_for_code_list, register_errors 
+
 import template
 webstyle_templates = template.load('webstyle')
 
@@ -52,7 +54,7 @@ def create_navtrailbox_body(title,
                                                     prolog = prolog,
                                                     epilog = epilog)
 
-def page(title, body, navtrail="", description="", keywords="", uid=0, cdspageheaderadd="", cdspageboxlefttopadd="", cdspageboxleftbottomadd="", cdspageboxrighttopadd="", cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="", language=cdslang, urlargs="", verbose=1, titleprologue="", titleepilogue=""):
+def page(title, body, navtrail="", description="", keywords="", uid=0, cdspageheaderadd="", cdspageboxlefttopadd="", cdspageboxleftbottomadd="", cdspageboxrighttopadd="", cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="", language=cdslang, urlargs="", verbose=1, titleprologue="", titleepilogue="", req=None, errors=[], warnings=[]):
     """page(): display CDS web page
         input: title of the page
                body of the page in html format
@@ -70,6 +72,9 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagehe
                verbose is verbosity of the page (useful for debugging)
                titleprologue is to be printed right before page title
                titleepilogue is to be printed right after page title
+               req is the mod_python request
+               errors is the list of error codes as defined in the moduleName_config.py file of the calling module
+               log is the string of data that should be appended to the log file (errors automatically logged)
        output: the final cds page with header, footer, etc.
     """
 
@@ -77,6 +82,17 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagehe
         headerstitle = msg_home[language]
     else:
         headerstitle = title
+
+    # if there are event
+    if warnings:
+        warnings= get_msgs_for_code_list(warnings, 'warning')
+        register_errors(warnings, 'warning')
+
+    # if there are errors
+    if errors:
+        errors = get_msgs_for_code_list(errors, 'error')
+        register_errors(errors, 'error', req)
+        body = create_error_box(req, errors=errors) 
 
     return webstyle_templates.tmpl_page(weburl = weburl,
                                         ln = language,
@@ -140,7 +156,7 @@ def pagefooteronly(cdspagefooteradd="", lastupdated="", language=cdslang, urlarg
                                               lastupdated = lastupdated,
                                               pagefooteradd = cdspagefooteradd)
 
-def create_error_box(req, title=None, verbose=1, ln=cdslang):
+def create_error_box(req, title=None, verbose=1, ln=cdslang, errors=None):
     """Analyse the req object and the sys traceback and return a text
        message box with internal information that would be suitful to
        display when something bad has happened.
@@ -149,4 +165,5 @@ def create_error_box(req, title=None, verbose=1, ln=cdslang):
                                              ln = ln,
                                              verbose = verbose,
                                              req = req,
-                                             supportemail = supportemail)
+                                             supportemail = supportemail,
+                                             errors = errors)
