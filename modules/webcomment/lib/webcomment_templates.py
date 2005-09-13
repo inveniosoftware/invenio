@@ -126,10 +126,10 @@ class Template:
         c_nickname = 0
         c_date_creation = 1
         c_body = 2
-        c_vote_value = 3
-        c_nb_votes = 4
+        c_nb_votes_yes = 3
+        c_nb_votes_total = 4
         c_star_score = 5
-        c_star_note = 6
+        c_title = 6
         c_id = 7
 
         warnings = self.tmpl_warnings(warnings)
@@ -158,7 +158,7 @@ class Template:
                     <tr>
                         <td>'''
             comment_rows += self.tmpl_get_comment_with_ranking(recID, ln, comment[c_nickname], comment[c_date_creation], comment[c_body], 
-                                                                    comment[c_nb_votes], comment[c_vote_value], comment[c_star_score], comment[c_star_note])
+                                                                    comment[c_nb_votes_total], comment[c_nb_votes_yes], comment[c_star_score], comment[c_title])
             comment_rows += '''
                         Was this review helpful? %s / %s<br>''' % (useful_yes % {'comid':comment[c_id]}, useful_no % {'comid':comment[c_id]})
             comment_rows +=  '''
@@ -254,17 +254,17 @@ class Template:
         return out
 
 
-    def tmpl_get_comment_with_ranking(self, recID, ln, nickname, date_creation, body, nb_votes, vote_value, star_score, star_note):
+    def tmpl_get_comment_with_ranking(self, recID, ln, nickname, date_creation, body, nb_votes_total, nb_votes_yes, star_score, title):
         """
         private function
         @param ln: language
         @param nickname: nickname
         @param date_creation: date comment was written
         @param body: comment body
-        @param nb_votes: total number of votes for this review
-        @param vote_value: number of positive votes for this record
+        @param nb_votes_total: total number of votes for this review
+        @param nb_votes_yes: number of positive votes for this record
         @param star_score: star score for this record
-        @param star_note: title of review
+        @param title: title of review
         @return html table of review
         """
         # load the right message language
@@ -289,9 +289,9 @@ class Template:
                 <table width="100%%">
                     <tr>
                         <td> 
-                        <img src="%(weburl)s/img/%(star_score_img)s" alt="%(star_score)s" border="0"> <b>%(star_note)s</b><br>
+                        <img src="%(weburl)s/img/%(star_score_img)s" alt="%(star_score)s" border="0"> <b>%(title)s</b><br>
                         Reviewed by <i>%(nickname)s</i> on %(date_creation)s<br>
-                        %(vote_value)s out of %(nb_votes)s people found this review useful.<br>
+                        %(nb_votes_yes)s out of %(nb_votes_total)s people found this review useful.<br>
                         </td>
                     </tr>
                     <tr>
@@ -305,10 +305,10 @@ class Template:
                 'star_score_img': star_score_img,
                 'date_creation' : date_creation,
                 'body'          : body, 
-                'nb_votes'      : nb_votes,
+                'nb_votes_total'      : nb_votes_total,
                 'star_score'    : star_score,
-                'star_note'     : star_note, 
-                'vote_value'    : vote_value<0 and "0" or vote_value
+                'title'     : title, 
+                'nb_votes_yes'    : nb_votes_yes<0 and "0" or nb_votes_yes
         }
         return out
 
@@ -348,10 +348,10 @@ class Template:
             c_nickname = 0
             c_date_creation = 1
             c_body = 2
-            c_vote_value = 3
-            c_nb_votes = 4
+            c_nb_votes_yes = 3
+            c_nb_votes_total = 4
             c_star_score = 5
-            c_star_note = 6
+            c_title = 6
             c_id = 7
         else:
             c_nickname = 0
@@ -398,7 +398,7 @@ class Template:
             else:
                 report_link = '''%(weburl)s/comments.py/report?recid=%(recID)s&amp;ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;reviews=%(reviews)s&amp;referer=%(weburl)s/comments.py/display''' % useful_dict % {'comid':comment[c_id]}
                 comments_rows += self.tmpl_get_comment_with_ranking(recID, ln, comment[c_nickname], comment[c_date_creation], comment[c_body], 
-                                                                        comment[c_nb_votes], comment[c_vote_value], comment[c_star_score], comment[c_star_note])
+                                                                        comment[c_nb_votes_total], comment[c_nb_votes_yes], comment[c_star_score], comment[c_title])
                 comments_rows += '''<table>
                                         <tr>
                                             <td>Was this review helpful? %(tab)s</td>
@@ -771,15 +771,15 @@ class Template:
     def tmpl_admin_users(self, ln, users_data):
         """
         @param users_data:  tuple of ct, i.e. (ct, ct, ...)
-                            where ct is a tuple (total_number_reported, total_comments_reported, total_reviews_reported, total_vote_value_of_reported, 
-                                                 total_nb_votes_of_reported, user_id, user_email, user_nickname)
+                            where ct is a tuple (total_number_reported, total_comments_reported, total_reviews_reported, total_nb_votes_yes_of_reported, 
+                                                 total_nb_votes_total_of_reported, user_id, user_email, user_nickname)
                             sorted by order of ct having highest total_number_reported
         """
         u_reports = 0
         u_comment_reports = 1
         u_reviews_reports = 2
-        u_vote_value = 3
-        u_nb_votes = 4
+        u_nb_votes_yes = 3
+        u_nb_votes_total = 4
         u_uid = 5
         u_email = 6
         u_nickname = 7
@@ -807,7 +807,7 @@ class Template:
                     'uid'       : utuple[u_uid],
                     'reports'   : utuple[u_reports],
                     'review_row': cfg_webcomment_allow_reviews>0 and "<td>%s</td><td>%s</td><td>%s</td>" % \
-                                  (utuple[u_vote_value], utuple[u_nb_votes]-utuple[u_vote_value], utuple[u_nb_votes]) or "",
+                                  (utuple[u_nb_votes_yes], utuple[u_nb_votes_total]-utuple[u_nb_votes_yes], utuple[u_nb_votes_total]) or "",
                     'weburl'    : weburl,
                     'ln'        : ln,
                     'com_link'  : cfg_webcomment_allow_comments>0 and com_link or "",
@@ -840,7 +840,7 @@ class Template:
         @param comment_data: same type of tuple as that which is returned by webcomment.py/query_retrieve_comments_or_remarks i.e.
                              tuple of comment where comment is
                              tuple (nickname, date_creation, body, id) if ranking disabled or
-                             tuple (nickname, date_creation, body, vote_value, nb_votes, star_score, star_note, id)
+                             tuple (nickname, date_creation, body, nb_votes_yes, nb_votes_total, star_score, title, id)
         """
         comments = self.tmpl_get_comments(recID=-1, ln=ln, nb_per_page=0, page=1, nb_pages=1, display_order='od', display_since='all', 
                                           cfg_webcomment_allow_reviews=cfg_webcomment_allow_reviews, comments=comment_data, total_nb_comments=len(comment_data), 

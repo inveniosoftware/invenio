@@ -89,12 +89,12 @@ def query_get_users_reported():
     Get the users who have been reported at least one.
     @return tuple of ct, i.e. (ct, ct, ...)
             where ct is a tuple (total_number_reported, total_comments_reported, total_reviews_reported, 
-                                 total_vote_value_of_reported, total_nb_votes_of_reported, user_id, user_email, user_nickname)
+                                 total_nb_votes_yes_of_reported, total_nb_votes_total_of_reported, user_id, user_email, user_nickname)
             sorted by order of ct having highest total_number_reported
     """
-    query1 = "SELECT c.nb_reported, c.vote_value, c.nb_votes, u.id, u.email, u.nickname, c.star_score " \
+    query1 = "SELECT c.nb_abuse_reports, c.nb_votes_yes, c.nb_votes_total, u.id, u.email, u.nickname, c.star_score " \
              "FROM user AS u, cmtRECORDCOMMENT AS c " \
-             "WHERE c.id_user=u.id AND c.nb_reported > 0 " \
+             "WHERE c.id_user=u.id AND c.nb_abuse_reports > 0 " \
              "ORDER BY u.id "
     res1 = run_sql(query1)
     if type(res1) is None:
@@ -133,17 +133,17 @@ def query_get_comments(uid, comID, reviews):
     @return same type of tuple as that which is returned by webcomment.py/query_retrieve_comments_or_remarks i.e.
             tuple of comment where comment is
             tuple (nickname, date_creation, body, id) if ranking disabled or
-            tuple (nickname, date_creation, body, vote_value, nb_votes, star_score, star_note, id)
+            tuple (nickname, date_creation, body, nb_votes_yes, nb_votes_total, star_score, title, id)
     """
     query1 = "SELECT u.nickname, c.date_creation, c.body, %s c.id, c.id_bibrec, c.id_user, " \
-             "c.nb_reported, u.id, u.email, u.nickname " \
+             "c.nb_abuse_reports, u.id, u.email, u.nickname " \
              "FROM user AS u, cmtRECORDCOMMENT AS c " \
              "WHERE c.id_user=u.id %s %s %s " \
-             "ORDER BY c.nb_reported DESC, c.vote_value DESC, c.date_creation "
-    params1 = ( reviews>0 and " c.vote_value, c.nb_votes, c.star_score, c.star_note, " or "",
+             "ORDER BY c.nb_abuse_reports DESC, c.nb_votes_yes DESC, c.date_creation "
+    params1 = ( reviews>0 and " c.nb_votes_yes, c.nb_votes_total, c.star_score, c.title, " or "",
                 reviews>0 and " AND c.star_score>0 " or " AND c.star_score=0 ",
                 uid>0 and " AND c.id_user=%s " % uid or "",
-                comID>0 and " AND c.id=%s " % comID or " AND c.nb_reported>0 " )
+                comID>0 and " AND c.id=%s " % comID or " AND c.nb_abuse_reports>0 " )
     res1 = run_sql(query1 % params1)
     res2 = []
     for qtuple1 in res1:

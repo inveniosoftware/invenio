@@ -168,12 +168,12 @@ def perform_request_report(comID):
     comID = wash_url_argument(comID, 'int')
     if comID <= 0:
         return 0
-    (query_res, nb_reported) = query_record_report_this(comID)
+    (query_res, nb_abuse_reports) = query_record_report_this(comID)
     if query_res == 0:
         return 0
-    if nb_reported % cfg_webcomment_nb_reports_before_send_email_to_admin == 0:
-        (comID2, id_bibrec, id_user, com_body, com_date, com_star, com_vote, com_nb_votes, com_star_note, com_reported) = query_get_comment(comID)
-        (user_nb_reported, user_votes, user_nb_votes) = query_get_user_reports_and_votes(int(id_user))
+    if nb_abuse_reports % cfg_webcomment_nb_reports_before_send_email_to_admin == 0:
+        (comID2, id_bibrec, id_user, com_body, com_date, com_star, com_vote, com_nb_votes_total, com_title, com_reported) = query_get_comment(comID)
+        (user_nb_abuse_reports, user_votes, user_nb_votes_total) = query_get_user_reports_and_votes(int(id_user))
         (nickname, user_email, last_login) = query_get_user_contact_info(id_user)
         from_addr = 'CDS Alert Engine <%s>' % alertengineemail
         to_addr = adminemail
@@ -184,7 +184,7 @@ Author:     nickname    = %(nickname)s
             email       = %(user_email)s 
             user_id     = %(uid)s
             This user has:
-                total number of reports         = %(user_nb_reported)s 
+                total number of reports         = %(user_nb_abuse_reports)s 
                 %(votes)s
 Comment:    comment_id      = %(comID)s
             record_id       = %(id_bibrec)s
@@ -201,17 +201,17 @@ Please go to the Comments Admin Panel %(comment_admin_link)s to delete this mess
                     'nickname'              : nickname,
                     'user_email'            : user_email,
                     'uid'                   : id_user,
-                    'user_nb_reported'      : user_nb_reported,
+                    'user_nb_abuse_reports'      : user_nb_abuse_reports,
                     'user_votes'            : user_votes,
                     'votes'                 : cfg_webcomment_allow_reviews and \
                                               "total number of positive votes\t= %s\n\t\t\t\ttotal number of negative votes\t= %s" % \
-                                              (user_votes, (user_nb_votes - user_votes)) or "\n",
+                                              (user_votes, (user_nb_votes_total - user_votes)) or "\n",
                     'comID'                 : comID, 
                     'id_bibrec'             : id_bibrec,
                     'com_date'              : com_date,
                     'com_reported'          : com_reported,
                     'review_stuff'          : cfg_webcomment_allow_reviews and \
-                                              "star score\t\t= %s\n\t\t\treview title\t\t= %s" % (com_star, com_star_note) or "",
+                                              "star score\t\t= %s\n\t\t\treview title\t\t= %s" % (com_star, com_title) or "",
                     'com_body'              : com_body,
                     'comment_admin_link'    : "http://%s/admin/webcomment/" % weburl, 
                     'user_admin_link'       : "user_admin_link" #! FIXME
@@ -246,26 +246,26 @@ def query_get_user_reports_and_votes(uid):
     """
     Retrieve total number of reports and votes of a particular user
     @param uid: user id
-    @return tuple (total_nb_reports, total_vote_value, total_nb_votes)
+    @return tuple (total_nb_reports, total_nb_votes_yes, total_nb_votes_total)
             if none found return ()
     """
-    query1 = "SELECT vote_value, nb_votes, nb_reported FROM cmtRECORDCOMMENT WHERE id_user=%s"
+    query1 = "SELECT nb_votes_yes, nb_votes_total, nb_abuse_reports FROM cmtRECORDCOMMENT WHERE id_user=%s"
     params1 = (uid,)
     res1 = run_sql(query1, params1)
     if len(res1)==0:
         return ()
-    vote_value = nb_votes = nb_reported = 0
+    nb_votes_yes = nb_votes_total = nb_abuse_reports = 0
     for cmt_tuple in res1:
-        vote_value += int(cmt_tuple[0])
-        nb_votes += int(cmt_tuple[1])
-        nb_reported += int(cmt_tuple[2])
-    return (nb_reported, vote_value, nb_votes)
+        nb_votes_yes += int(cmt_tuple[0])
+        nb_votes_total += int(cmt_tuple[1])
+        nb_abuse_reports += int(cmt_tuple[2])
+    return (nb_abuse_reports, nb_votes_yes, nb_votes_total)
 
 def query_get_comment(comID):
     """
     Get all fields of a comment
     @param comID: comment id
-    @return tuple (comID, id_bibrec, id_user, body, date_creation, star_score, vote_value, nb_votes, star_note, nb_reported)
+    @return tuple (comID, id_bibrec, id_user, body, date_creation, star_score, nb_votes_yes, nb_votes_total, title, nb_abuse_reports)
             if none found return ()
     """
     query1 = "SELECT * FROM cmtRECORDCOMMENT WHERE id=%s"
@@ -283,19 +283,19 @@ def query_record_report_this(comID):
     @return tuple (success, new_total_nb_reports_for_this_comment) where success is integer 1 if success, integer 0 if not
             if none found, return ()
     """
-    #retrieve nb_reported
-    query1 = "SELECT nb_reported FROM cmtRECORDCOMMENT WHERE id=%s"
+    #retrieve nb_abuse_reports
+    query1 = "SELECT nb_abuse_reports FROM cmtRECORDCOMMENT WHERE id=%s"
     params1 = (comID,)
     res1 = run_sql(query1, params1)
     if len(res1)==0:
         return ()
 
     #increment and update
-    nb_reported = int(res1[0][0]) + 1
-    query2 = "UPDATE cmtRECORDCOMMENT SET nb_reported=%s WHERE id=%s"
-    params2 = (nb_reported, comID)
+    nb_abuse_reports = int(res1[0][0]) + 1
+    query2 = "UPDATE cmtRECORDCOMMENT SET nb_abuse_reports=%s WHERE id=%s"
+    params2 = (nb_abuse_reports, comID)
     res2 = run_sql(query2, params2)
-    return (int(res2), nb_reported)
+    return (int(res2), nb_abuse_reports)
 
 def query_record_useful_review(comID, value):
     """
@@ -306,17 +306,17 @@ def query_record_useful_review(comID, value):
     @return integer 1 if successful, integer 0 if not
     """
     # retrieve nb_useful votes
-    query1 = "SELECT nb_votes, vote_value FROM cmtRECORDCOMMENT WHERE id=%s"
+    query1 = "SELECT nb_votes_total, nb_votes_yes FROM cmtRECORDCOMMENT WHERE id=%s"
     params1 = (comID,)
     res1 = run_sql(query1, params1)
     if len(res1)==0:
         return 0
 
     # modify and insert new nb_useful votes
-    vote_value = int(res1[0][1]) + value
-    nb_votes = int(res1[0][0]) + 1
-    query2 = "UPDATE cmtRECORDCOMMENT SET nb_votes=%s, vote_value=%s WHERE id=%s"
-    params2 = (nb_votes, vote_value, comID)
+    nb_votes_yes = int(res1[0][1]) + value
+    nb_votes_total = int(res1[0][0]) + 1
+    query2 = "UPDATE cmtRECORDCOMMENT SET nb_votes_total=%s, nb_votes_yes=%s WHERE id=%s"
+    params2 = (nb_votes_total, nb_votes_yes, comID)
     res2 = run_sql(query2, params2)
     return int(res2)
 
@@ -335,13 +335,13 @@ def query_retrieve_comments_or_remarks (recID=-1, display_order='od', display_si
     @param ranking: boolean, enabled if reviews, disabled for comments
     @return tuple of comment where comment is 
             tuple (nickname, date_creation, body, id) if ranking disabled or 
-            tuple (nickname, date_creation, body, vote_value, nb_votes, star_score, star_note, id)
+            tuple (nickname, date_creation, body, nb_votes_yes, nb_votes_total, star_score, title, id)
     Note: for the moment, if no nickname, will return email address up to '@'
     """
     display_since = calculate_start_date(display_since)
 
-    order_dict =    {   'hh'   : "c.vote_value/(c.nb_votes+1) DESC, c.date_creation DESC ", 
-                        'lh'   : "c.vote_value/(c.nb_votes+1) ASC, c.date_creation ASC ",
+    order_dict =    {   'hh'   : "c.nb_votes_yes/(c.nb_votes_total+1) DESC, c.date_creation DESC ", 
+                        'lh'   : "c.nb_votes_yes/(c.nb_votes_total+1) ASC, c.date_creation ASC ",
                         'ls'   : "c.star_score ASC, c.date_creation DESC ",
                         'hs'   : "c.star_score DESC, c.date_creation DESC ",
                         'od'   : "c.date_creation ASC ",
@@ -371,7 +371,7 @@ def query_retrieve_comments_or_remarks (recID=-1, display_order='od', display_si
             "%(display_since)s " \
             "ORDER BY %(display_order)s " 
 
-    params = {  'ranking'       : ranking and ' c.vote_value, c.nb_votes, c.star_score, c.star_note, ' or '',
+    params = {  'ranking'       : ranking and ' c.nb_votes_yes, c.nb_votes_total, c.star_score, c.title, ' or '',
                 'ranking_only'  : ranking and ' AND c.star_score>0 ' or ' AND c.star_score=0 ',
                 'id_bibrec'     : recID>0 and 'c.id_bibrec' or 'c.id_bskBASKET_bibrec_bskEXTREC',
                 'table'         : recID>0 and 'cmtRECORDCOMMENT' or 'bskREMARK',
@@ -415,7 +415,7 @@ def query_add_comment_or_remark(recID=-1, uid=-1, msg="", note="", score=0, prio
         #unicode
         msg = msg.encode('utf-8')
         note = note.encode('utf-8')
-        query = "INSERT INTO cmtRECORDCOMMENT (id_bibrec, id_user, body, date_creation, star_score, nb_votes, star_note) " \
+        query = "INSERT INTO cmtRECORDCOMMENT (id_bibrec, id_user, body, date_creation, star_score, nb_votes_total, title) " \
                 "VALUES (%s, %s, %s, %s, %s, %s, %s)" 
         params = (recID, uid, msg, current_date, score, 0, note)
     else:
@@ -560,10 +560,10 @@ def calculate_avg_score(res):
     c_nickname = 0
     c_date_creation = 1
     c_body = 2
-    c_vote_value = 3
-    c_nb_votes = 4
+    c_nb_votes_yes = 3
+    c_nb_votes_total = 4
     c_star_score = 5
-    c_star_note = 6
+    c_title = 6
     c_id = 7
 
     avg_score = 0.0
@@ -689,7 +689,7 @@ def notify_admin_of_new_comment(comID):
     """
     comment = query_get_comment(comID)
     if len(comment) > 0:
-        (comID2, id_bibrec, id_user, body, date_creation, star_score, vote_value, nb_votes, star_note, nb_reported) = comment
+        (comID2, id_bibrec, id_user, body, date_creation, star_score, nb_votes_yes, nb_votes_total, title, nb_abuse_reports) = comment
     else:
         return
     user_info = query_get_user_contact_info(id_user) 
@@ -705,7 +705,7 @@ def notify_admin_of_new_comment(comID):
  
     review_stuff = ''' 
     Star score  = %s
-    Title       = %s''' % (star_score, star_note)
+    Title       = %s''' % (star_score, title)
 
     out = '''
 The following %(comment_or_review)s has just been posted (%(date)s).
@@ -719,7 +719,7 @@ RECORD CONCERNED:
     Record ID   = %(recID)s
     Record      = %(record_details)s
 
-%(comment_or_review2)s:
+%(comment_or_review_caps)s:
     %(comment_or_review)s ID    = %(comID)s %(review_stuff)s
     Body        = 
 %(body)s
@@ -728,7 +728,7 @@ ADMIN OPTIONS:
 To delete comment go to %(weburl)s/admin/webcomment/webcommentadmin.py/delete?comid=%(comID)s
     ''' % \
         {   'comment_or_review'     : star_score>0 and 'review' or 'comment',
-            'comment_or_review'     : star_score>0 and 'REVIEW' or 'COMMENT',
+            'comment_or_review_caps': star_score>0 and 'REVIEW' or 'COMMENT',
             'date'                  : date_creation,
             'nickname'              : nickname,
             'email'                 : email,
