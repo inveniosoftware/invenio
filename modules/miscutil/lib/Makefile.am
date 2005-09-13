@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir=$(libdir)/python/cdsware
-pylib_DATA=__init__.py config.py dbquery.py messages.py
+pylib_DATA=__init__.py config.py dbquery.py messages.py errorlib.py errorlib_tests.py
 
 phplibdir=$(libdir)/php/cdsware/errors
 phplib_DATA=errorHandling.php
