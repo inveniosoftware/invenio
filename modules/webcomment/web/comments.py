@@ -110,7 +110,7 @@ def add(req, ln=cdslang, recid=-1, action='DISPLAY', msg="", note="", score="", 
     if isGuestUser(uid):
         msg = "Before you add your comment, you need to log in first"
         referer = "%s/comments.py/add?recid=%s&amp;ln=%s&amp;reviews=%s&amp;comid=%s&amp;action=%s" % (weburl, recid, ln, reviews, comid, action)
-        login_box = create_login_page_box(referer)
+        login_box = create_login_page_box(referer=referer, ln=ln)
         return page(title="Login", body=msg+login_box, navtrail=navtrail, description="", keywords="", 
             uid=uid, cdspageheaderadd="", cdspageboxlefttopadd="", cdspageboxleftbottomadd="", 
             cdspageboxrighttopadd="", cdspageboxrightbottomadd="", cdspagefooteradd="", 
