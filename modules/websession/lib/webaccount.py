@@ -171,7 +171,7 @@ def perform_set(email,password, ln):
     return out
 
 ##  create_register_page_box(): register a new account
-def create_register_page_box(referer='', ln=''):
+def create_register_page_box(referer='', ln=cdslang):
 
     return websession_templates.tmpl_register_page(
              referer = referer,
@@ -182,7 +182,7 @@ def create_register_page_box(referer='', ln=''):
            )
 
 ##  create_login_page_box(): ask for the user's email and password, for login into the system
-def create_login_page_box(referer='', ln=''):
+def create_login_page_box(referer='', ln=cdslang):
 
     internal = None
     for system in CFG_EXTERNAL_AUTHENTICATION.keys():
