@@ -100,7 +100,7 @@ def comments(req, ln=cdslang, uid="", comid="", reviews=0):
     if not auth_code:
         return page(title="View all Reported %s" % (reviews>0 and "Reviews" or "Comments",),
                 body=perform_request_comments(ln=ln, uid=uid, comID=comid, reviews=reviews),
-                uid=uid,
+                uid=auid,
                 language=ln,
                 urlargs=req.args,
                 navtrail = navtrail_previous_links,
