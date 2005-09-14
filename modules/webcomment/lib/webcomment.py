@@ -315,14 +315,16 @@ def query_record_useful_review(comID, value):
         return 0
 
     # modify and insert new nb_useful votes
-    nb_votes_yes = int(res1[0][1]) + value
+    nb_votes_yes = int(res1[0][1])
+    if value >= 1:
+        nb_votes_yes = int(res1[0][1]) + 1
     nb_votes_total = int(res1[0][0]) + 1
     query2 = "UPDATE cmtRECORDCOMMENT SET nb_votes_total=%s, nb_votes_yes=%s WHERE id=%s"
     params2 = (nb_votes_total, nb_votes_yes, comID)
     res2 = run_sql(query2, params2)
     return int(res2)
 
-def query_retrieve_comments_or_remarks (recID=-1, display_order='od', display_since='0000-00-00 00:00:00', ranking=0):
+def query_retrieve_comments_or_remarks (recID, display_order='od', display_since='0000-00-00 00:00:00', ranking=0):
     """ 
     Private function
     Retrieve tuple of comments or remarks from the database
@@ -349,6 +351,10 @@ def query_retrieve_comments_or_remarks (recID=-1, display_order='od', display_si
                         'od'   : "c.date_creation ASC ",
                         'nd'   : "c.date_creation DESC "
                     } 
+
+    #FIXME: temporary fix due to new basket tables not existing yet.
+    if recID < 1:
+        return ()
 
     # Ranking only done for comments and when allowed
     if ranking:
