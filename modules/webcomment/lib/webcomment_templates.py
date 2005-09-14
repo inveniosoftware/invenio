@@ -249,10 +249,9 @@ class Template:
                 'nickname'      : nickname,
                 'date_creation' : date_creation,
                 'body'          : body,
-                'links'         : (report_link!=None and reply_link!=None) and "<a href=\"%s\">Report this</a> | <a href=\"%s\">Reply</a>" % (report_link, reply_link) or ""
+                'links'         : (report_link!=None and reply_link!=None) and " <a href=\"%s\">Reply</a> | <a href=\"%s\">Report abuse</a>" % (reply_link, report_link) or ""
             }
         return out
-
 
     def tmpl_get_comment_with_ranking(self, recID, ln, nickname, date_creation, body, nb_votes_total, nb_votes_yes, star_score, title):
         """
