@@ -177,6 +177,7 @@ def perform_request_report(comID):
         (nickname, user_email, last_login) = query_get_user_contact_info(id_user)
         from_addr = 'CDS Alert Engine <%s>' % alertengineemail
         to_addr = adminemail
+        subject = "An error report has been sent from a user"
         body = '''
 The following comment has been reported a total of %(com_reported)s times.
 
@@ -220,7 +221,8 @@ Please go to the Comments Admin Panel %(comment_admin_link)s to delete this mess
         #FIXME to be added to email
         #If you wish to ban the user, you can do so via the User Admin Panel %(user_admin_link)s.
         
-        from alert_engine import send_email
+        from alert_engine import send_email, forge_email
+        body = forge_email(from_addr, to_addr, subject, body)
         send_email(from_addr, to_addr, body)
     return 1
 
@@ -268,7 +270,7 @@ def query_get_comment(comID):
     @return tuple (comID, id_bibrec, id_user, body, date_creation, star_score, nb_votes_yes, nb_votes_total, title, nb_abuse_reports)
             if none found return ()
     """
-    query1 = "SELECT * FROM cmtRECORDCOMMENT WHERE id=%s"
+    query1 = "SELECT id, id_bibrec, id_user, body, date_creation, star_score, nb_votes_yes, nb_votes_total, title, nb_abuse_reports FROM cmtRECORDCOMMENT WHERE id=%s"
     params1 = (comID,)
     res1 = run_sql(query1, params1)
     if len(res1)>0:
@@ -480,7 +482,7 @@ def calculate_start_date(display_since):
                         start_time[8]))
     return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(start_time))
 
-def get_first_comments_or_remarks(recID=-1, ln=cdslang, nb='all', voted=-1, reported=-1):
+def get_first_comments_or_remarks(recID=-1, ln=cdslang, nb_comments='all', nb_reviews='all', voted=-1, reported=-1):
     """
     Gets nb number comments/reviews or remarks.
     In the case of comments, will get both comments and reviews
@@ -506,8 +508,8 @@ def get_first_comments_or_remarks(recID=-1, ln=cdslang, nb='all', voted=-1, repo
             res_reviews = query_retrieve_comments_or_remarks(recID=recID, display_order="hh", ranking=1) 
             nb_res_reviews = len(res_reviews)
             ## check nb argument
-            if type(nb) is int and nb < len(res_reviews):
-                first_res_reviews = res_reviews[:nb]
+            if type(nb_reviews) is int and nb_reviews < len(res_reviews):
+                first_res_reviews = res_reviews[:nb_reviews]
             else:
                 if nb_res_reviews  > cfg_webcomment_nb_reviews_in_detailed_view:
                     first_res_reviews = res_reviews[:cfg_comment_nb_reports_before_send_email_to_admin]
@@ -517,8 +519,8 @@ def get_first_comments_or_remarks(recID=-1, ln=cdslang, nb='all', voted=-1, repo
             res_comments = query_retrieve_comments_or_remarks(recID=recID, display_order="od", ranking=0)
             nb_res_comments = len(res_comments)
             ## check nb argument
-            if type(nb) is int and nb < len(res_comments):
-                first_res_comments = res_comments[:nb]
+            if type(nb_comments) is int and nb_comments < len(res_comments):
+                first_res_comments = res_comments[:nb_comments]
             else:
                 if nb_res_comments  > cfg_webcomment_nb_comments_in_detailed_view:
                     first_res_comments = res_comments[:cfg_webcomment_nb_comments_in_detailed_view]
@@ -717,12 +719,17 @@ AUTHOR:
 
 RECORD CONCERNED:
     Record ID   = %(recID)s
-    Record      = %(record_details)s
+    Record      = 
+<!-- start record details -->
+%(record_details)s
+<!-- end record details -->
 
 %(comment_or_review_caps)s:
     %(comment_or_review)s ID    = %(comID)s %(review_stuff)s
     Body        = 
+<!-- start body -->
 %(body)s
+<!-- end body -->
 
 ADMIN OPTIONS:
 To delete comment go to %(weburl)s/admin/webcomment/webcommentadmin.py/delete?comid=%(comID)s
@@ -743,8 +750,10 @@ To delete comment go to %(weburl)s/admin/webcomment/webcommentadmin.py/delete?co
 
     from_addr = 'CDS Alert Engine <%s>' % alertengineemail
     to_addr = adminemail
+    subject = "A new comment/review has just been posted"
  
-    from alert_engine import send_email
+    from alert_engine import send_email, forge_email
+    out = forge_email(from_addr, to_addr, subject, out)
     send_email(from_addr, to_addr, out)
 
 def check_recID_is_in_range(recID, errors):
