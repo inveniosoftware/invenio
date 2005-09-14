@@ -528,7 +528,7 @@ class Template:
               }
 
         if register_available:
-            out += _("""If you don't own an account yet, please <a href="./register">register</a> an internal account.""")
+            out += _("""If you don't own an account yet, please <a href="../youraccount.py/register">register</a> an internal account.""")
         else:
             out += _("""It is not possible to create an account yourself. Contact %s if you want an account.""") % (
                       """<a href="mailto:%(email)s">%(email)s</a>""" % { 'email' : supportemail }
