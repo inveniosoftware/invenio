@@ -2041,7 +2041,14 @@ class Template:
                 out += '<p>&nbsp'
                 out += self.tmpl_print_record_list_for_similarity_boxen (
                     _("People who viewed this page also viewed::"), row ['viewsimilarity'], ln)
-            
+
+            if row.has_key ('reviews'):
+                out += '<p>&nbsp'
+                out += row['reviews']
+           
+            if row.has_key ('comments'):
+                out += row['comments']
+
             out += "<p>&nbsp;"
         return out
 

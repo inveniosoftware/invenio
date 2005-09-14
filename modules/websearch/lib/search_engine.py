@@ -2384,7 +2384,16 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                        if r:
                            temp ['downloadsimilarity'] = r
                            temp ['downloadhistory'] = create_download_history_graph_and_box(recIDs[irec], ln)
-
+                    
+                    # Get comments and reviews for this record if exist
+                    # FIXME: templatize me
+                    if cfg_webcomment_allow_comments or cfg_webcomment_allow_reviews:
+                        from webcomment import get_first_comments_or_remarks
+                        (comments, reviews) = get_first_comments_or_remarks(recID=recIDs[irec], ln=ln, 
+                                                                            nb_comments=cfg_webcomment_nb_comments_in_detailed_view, 
+                                                                            nb_reviews=cfg_webcomment_nb_reviews_in_detailed_view)
+                        temp['comments'] = comments
+                        temp['reviews']  = reviews
 
                     r = calculate_reading_similarity_list(recIDs[irec], "pageviews")
                     if r: temp ['viewsimilarity'] = r
