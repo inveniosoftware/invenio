@@ -743,6 +743,9 @@ def simpleendaction(doctype="", act="", startPg=1, indir="", access="",step=1,mo
 
 
 def home(req,c=cdsname,ln=cdslang):
+    """
+       Generates and displays the default "home page" for Web-submit - contains a list of links to the various document submissions.
+    """
     ln = wash_language(ln)
     # get user ID:
     try:
