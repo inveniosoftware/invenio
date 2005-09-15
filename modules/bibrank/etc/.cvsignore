@@ -3,3 +3,8 @@ Makefile.in
 z_*
 *.O
 *~
+bibrankgkb.cfg
+demo_jif.cfg
+template_single_tag_rank_method.cfg
+template_word_similarity.cfg
+wrd.cfg
