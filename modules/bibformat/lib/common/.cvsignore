@@ -3,3 +3,5 @@ Makefile.in
 z_*
 *.O
 *~
+dbparams.inc.php
+global.inc.php
