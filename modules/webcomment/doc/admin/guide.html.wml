@@ -20,7 +20,7 @@
 
 #include "cdspage.wml" \
     title="WebComment Admin Guide" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websearch/>WebComment Admin</a>" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/webcomment/>WebComment Admin</a>" \
     navbar_name="admin" \
     navbar_select="webcomment-admin-guide"
 
