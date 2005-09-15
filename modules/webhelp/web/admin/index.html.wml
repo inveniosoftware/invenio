@@ -312,6 +312,22 @@ set up personal email notification alerts.
 </td>
 </tr>
 
+<tr>
+<td>
+  <strong>WebComment Admin</strong>
+</td>
+<td>
+  Enables you to manipulate readers comments and reviews, 
+  see which ones were reported as abuse/spam, delete them, etc.  
+</td>
+<td>
+  <a href="webcomment/webcommentadmin.py">WebComment Admin Interface</a>
+</td>
+<td>
+  <a href="webcomment/guide.html">WebComment Admin Guide</a>
+</td>
+</tr>
+
 </table>
 
 <h3>System glue modules</h3>
