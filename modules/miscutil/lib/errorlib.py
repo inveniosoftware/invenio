@@ -39,7 +39,7 @@ def get_client_info(req):
         return \
         {   'host'      : req.hostname,
             'url'       : req.unparsed_uri,
-            'time'      : time.strftime("%Y-%m-%d_%H:%M:%S_%z"),
+            'time'      : time.strftime("%Y-%m-%d %H:%M:%S"),
             'browser'   : req.headers_in.has_key('User-Agent') and req.headers_in['User-Agent'] or "NA",
             'client_ip' : req.connection.remote_ip
         }
@@ -69,7 +69,7 @@ def get_tracestack():
                                                                                                                                                                                                      
 def register_errors(errors_or_warnings_list, file, req=None):
     """
-    log errors to cdsware.err and warnings to cdsware.wrn
+    log errors to cdsware.err and warnings to cdsware.log
     errors will be logged with client information (if req is given) and a tracestack
     warnings will be logged with just the warning message
     @param errors_or_warnings_list: list of tuples (err_name, err_msg)
@@ -119,9 +119,9 @@ def register_errors(errors_or_warnings_list, file, req=None):
     if file == 'error':
         file = 'err'
     elif file == 'warning':
-        file = 'wrn'
+        file = 'log'
     else:
-        file = 'wrn'
+        file = 'log'
         errors_or_warnings_list.append(('ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED', "Invalid argument %s was passed") % file)
                                                                                                                                                                 
     ## update log_errors
@@ -136,7 +136,7 @@ def register_errors(errors_or_warnings_list, file, req=None):
         errors = errors[(4*7+1):-3] # get rid of begining spaces and last '\n'
     msg = '''
 %(time)s --> %(errors)s%(error_file)s''' % \
-    {   'time'          : client_info_dict and client_info_dict['time'] or time.strftime("%Y-%m-%d_%H:%M:%S_%z"),
+    {   'time'          : client_info_dict and client_info_dict['time'] or time.strftime("%Y-%m-%d %H:%M:%S"),
         'errors'        : errors,
         'error_file'    : file=='err' and "\n%s%s\n%s\n" % (' '*4, client_info, tracestack_pretty) or ""
     }
@@ -203,7 +203,7 @@ def get_msgs_for_code_list(code_list, file):
             out.append(('ERR_MISCUTIL_PROGRAMMING_ERROR', "Trying to write a non error message to cdsware.err log"))
             continue
         elif file=='warning' and not err_code.startswith('ERR') and not err_code.startswith('WRN'):
-            out.append(('ERR_MISCUTIL_PROGRAMMING_ERROR', "Trying to write a non error message or non warning message to cdsware.wrn log"))
+            out.append(('ERR_MISCUTIL_PROGRAMMING_ERROR', "Trying to write a non error message or non warning message to cdsware.log log"))
             continue
         err_msg  = get_msg_associated_to_code(err_code, file)[1]
         nb_msg_args = err_msg.count('%s')
