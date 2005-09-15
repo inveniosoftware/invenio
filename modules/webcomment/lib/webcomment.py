@@ -415,22 +415,28 @@ def query_add_comment_or_remark(recID=-1, uid=-1, msg="", note="", score=0, prio
     """
     current_date = calculate_start_date('0d')
     if recID > 0:
+        #change utf-8 message into general unicode
+        msg = msg.decode('utf-8')
+        note = note.decode('utf-8')
         # get rid of html tags in msg but keep newlines
         msg = msg.replace ('\n', "#br#")
         msg= html2txt(msg)
         msg = msg.replace('#br#', '<br>')
         note= html2txt(note)
-        #unicode
+        #change general unicode back to utf-8
         msg = msg.encode('utf-8')
         note = note.encode('utf-8')
         query = "INSERT INTO cmtRECORDCOMMENT (id_bibrec, id_user, body, date_creation, star_score, nb_votes_total, title) " \
                 "VALUES (%s, %s, %s, %s, %s, %s, %s)" 
         params = (recID, uid, msg, current_date, score, 0, note)
     else:
+        #change utf-8 message into general unicode
+        msg = msg.decode('utf-8')
         # get rid of html tags in msg but keep newlines
         msg = msg.replace ('\n', "#br#")
         msg= html2txt(msg)
         msg = msg.replace('#br#', '<br>')
+        #change general unicode back to utf-8
         msg = msg.encode('utf-8')
         query = "INSERT INTO bskREMARK (id_bskBASKET_bibrec_bibEXTREC, id_user, body, date_creation, priority) " \
                 "VALUES (%s, %s, %s, %s, %s)"
