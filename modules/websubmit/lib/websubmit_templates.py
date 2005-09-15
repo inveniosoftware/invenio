@@ -182,7 +182,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        return """<LI><a href="" onmouseover="javascript:popUpTextWindow('%(id)s',true,event);" onmouseout="javascript:popUpTextWindow('%(id)s',false,event);" onClick="document.forms[0].doctype.value='%(id)s';document.forms[0].submit();return false;">%(name)s</a>""" % doc
+        return """<LI><a href="" onClick="document.forms[0].doctype.value='%(id)s';document.forms[0].submit();return false;">%(name)s</a>""" % doc
 
     def tmpl_action_page(self, ln, guest, pid, now, doctype, description, docfulldesc, snameCateg, lnameCateg, actionShortDesc, indir, statustext):
         """
