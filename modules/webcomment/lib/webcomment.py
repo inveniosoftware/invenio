@@ -76,7 +76,7 @@ def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order
     reviews = wash_url_argument(reviews, 'int')
 
     # vital argument check
-    check_recID_is_in_range(recID, errors)
+    check_recID_is_in_range(recID, warnings, ln)
 
     # Query the database and filter results
     res = query_retrieve_comments_or_remarks(recID, display_order, display_since, reviews)
@@ -628,7 +628,7 @@ def perform_request_add_comment_or_remark(recID=-1, uid=-1, action='DISPLAY', ln
     comID = wash_url_argument(comID, 'int')
 
     ## check arguments
-    check_recID_is_in_range(recID, errors)
+    check_recID_is_in_range(recID, warnings, ln)
     if uid <= 0:
         errors.append(('ERR_WEBCOMMENT_UID_INVALID', uid))
     else:
@@ -762,25 +762,42 @@ To delete comment go to %(weburl)s/admin/webcomment/webcommentadmin.py/delete?co
     out = forge_email(from_addr, to_addr, subject, out)
     send_email(from_addr, to_addr, out)
 
-def check_recID_is_in_range(recID, errors):
+def check_recID_is_in_range(recID, warnings=[], ln=cdslang):
     """
     Check that recID is >= 0 or <= -100
     Append error messages to errors listi
     @param recID: record id
-    @param errors: list of error tuples (error_id, value)
-    @return boolean (1=true, 0=false)
+    @param warnings: the warnings list of the calling function
+    @return tuple (boolean, html) where boolean (1=true, 0=false) 
+                                  and html is the body of the page to display if there was a problem
     """
     # Make errors into a list if needed
-    if type(errors) is not list:
-        errors = [errors]
+    if type(warnings) is not list:
+        errors = [warnings]
+
+    try:
+        recID = int(recID)
+    except:
+        pass
 
     if type(recID) is int:
         if recID >= 1 or recID <= -100:
-            return
+            from search_engine import record_exists
+            success = record_exists(recID)
+            if success == 1: 
+                return (1,"")
+            else:
+                warnings.append(('ERR_WEBCOMMENT_RECID_INEXISTANT', recID))
+                return (0, webcomment_templates.tmpl_record_not_found(status='inexistant', recID=recID, ln=ln))
+        elif recID == -1:
+            warnings.append(('ERR_WEBCOMMENT_RECID_MISSING',))
+            return (0, webcomment_templates.tmpl_record_not_found(status='missing', recID=recID, ln=ln))
         else:
-            errors.append(('ERR_WEBCOMMENT_RECID_INVALID', recID))
+            warnings.append(('ERR_WEBCOMMENT_RECID_INVALID', recID))
+            return (0, webcomment_templates.tmpl_record_not_found(status='invalid', recID=recID, ln=ln))
     else:
-        errors.append(('ERR_WEBCOMMENT_RECID_INVALID', recID))
+        warnings.append(('ERR_WEBCOMMENT_RECID_NAN', recID))
+        return (0, webcomment_templates.tmpl_record_not_found(status='nan', recID=recID, ln=ln))
 
 def check_int_arg_is_in_range(value, name, errors, gte_value, lte_value=None):
     """

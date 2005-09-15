@@ -109,6 +109,27 @@ class Template:
 
         return out
 
+    def tmpl_record_not_found(self, status='missing', recID="", ln=cdslang):
+        """
+        Displays a page when bad or missing record ID was given.
+        @param status:  'missing'   : no recID was given
+                        'inexistant': recID doesn't have an entry in the database
+                        'nan'       : recID is not a number
+                        'invalid'   : recID is an error code, i.e. in the interval [-99,-1]
+        @param return: body of the page
+        """
+        if status == 'inexistant':
+            body = "Sorry, the record %s does not seem to exist." % (recID,)
+        elif status == 'nan':
+            body = "Sorry, the record %s does not seem to be a number." % (recID,)
+        elif status == 'invalid':
+            body = "Sorry, the record %s is not a valid ID value." % (recID,)
+        else:
+            body = "Sorry, no record ID was provided."
+
+        body += "<br><br>You may want to start browsing from <a href=\"%s?ln=%s\">%s</a>." % (weburl, ln, cdsnameintl[ln])
+        return body
+
     def tmpl_get_first_comments_with_ranking(self, recID, ln, comments=None, nb_comments_total=None, avg_score=None, warnings=[]):
         """
         @param recID: record id
@@ -450,7 +471,7 @@ class Template:
                 avg_score_img = 'stars-' + str(avg_score).split('.')[0] + '-' + str(avg_score).split('.')[1] + '.gif'
             else:
                 avg_score_img = "stars-except.gif"
-            ranking_average = '''<br><b>Average review socre: </b><img src="%(weburl)s/img/%(avg_score_img)s" alt="%(avg_score)s" border="0"> based on %(nb_comments_total)s reviews<br>''' \
+            ranking_average = '''<br><b>Average review score: </b><img src="%(weburl)s/img/%(avg_score_img)s" alt="%(avg_score)s" border="0"> based on %(nb_comments_total)s reviews<br>''' \
                                 % { 'weburl'            : weburl,
                                     'avg_score'         : avg_score,
                                     'avg_score_img'     : avg_score_img,

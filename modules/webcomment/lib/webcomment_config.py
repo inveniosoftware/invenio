@@ -51,7 +51,10 @@ cfg_webcomment_warning_messages = \
     'WRN_WEBCOMMENT_ADMIN_COMID_NAN'                : 'comment ID must be a number, try again',
     'WRN_WEBCOMMENT_ADMIN_INVALID_COMID'            : 'Invalid comment ID, try again',
     'WRN_WEBCOMMENT_ADMIN_COMID_INEXISTANT'         : "Comment ID %s does not exist, try again",
-
+    'ERR_WEBCOMMENT_RECID_MISSING'                  : "No record ID was given",
+    'ERR_WEBCOMMENT_RECID_INEXISTANT'               : "Record ID %s does not exist in the database",
+    'ERR_WEBCOMMENT_RECID_INVALID'                  : "Record ID %s is an invalid ID",
+    'ERR_WEBCOMMENT_RECID_NAN'                      : "Record ID %s is not a number",
 }
 
 
