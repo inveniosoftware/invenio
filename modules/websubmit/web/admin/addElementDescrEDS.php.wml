@@ -426,9 +426,8 @@
          # In this case, this is a self-referential call to the form, and
          # it is time to process the addition of the new element.
 
-         # Carry out some form validation (I'm not using JavaScript any
-         # more for this, as it is rubbish), and take the relevant action
-         # based upon the resuts...
+         # Carry out some form validation and take the relevant action
+         # based upon the resuts
 
          if($type == "NONE_SELECTED")
          {
@@ -447,7 +446,7 @@
          else
          {
             # The element type was selected, but we must now ensure that
-            # the other various field combos were correct...
+            # the other various field combos were correct
 
             if(!$elename)
             {
@@ -464,9 +463,7 @@
             {
                if(!test_key_legal($elename))
                {
-                  # Damn...invalid characters in either the alephcode or
-                  # the element name...
-
+                  # invalid characters in either the alephcode or the element name
                   print("<P STYLE=\"font-size: medium; text-align: center"
                    . "; font-weight: bold; color: red\">The Element Name "
                    . "May Only Contain Alphabetical"
@@ -479,7 +476,7 @@
                else
                {
                   # General Mandatory fields all filled correctly.  Now
-                  # make specialised tests...
+                  # make specialised tests
 
                   if($type == "T")
                   {
@@ -489,14 +486,13 @@
                      {
                         if(!charIsInt($rows))
                         {
-                           # Damn...user has given a non-int value for
-                           # $rows
+                           # non-int value given for $rows
                            print("<P STYLE=\"font-size: medium; text-ali"
                            . "gn: center; font-weight: bold; color: "
                            . "red\">The <EM>No. Rows</EM> Field Must Have"
                            . " an Integer Value.</P>");
 
-                           # Make an error flag to mark this fact...
+                           # Make an error flag to mark this fact
                            $rowsInvalid = true;
 
                            enterEDSelementDescr($elename,
@@ -511,8 +507,7 @@
                      {
                         if(!charIsInt($cols))
                         {
-                           # Damn...user has given a non-int value for
-                           # $rows
+                           # non-int value given for $rows
                            print("<P STYLE=\"font-size: medium; text-ali"
                            . "gn: center; font-weight: bold; color: "
                            . "red\">The <EM>No. Cols</EM> Field Must Have"
@@ -531,9 +526,7 @@
                      if(!$rowsInvalid && !$colsInvalid)
                      {
                         # Well now.  If we have reached this far, then the
-                        # data for the TEXTAREA must all be present and
-                        # valid, so we can finally make this new element
-                        # description, and commit it to the DB.
+                        # TEXTAREA present and valid: make new element description and commit to DB
 
                         $insStr = "INSERT INTO sbmFIELDDESC (name, alephcode"
                         . ", marccode,  type, size, rows, cols, maxlength, val, "
@@ -543,60 +536,51 @@
                         # Deal with rows
                         if(isset($rows) && $rows != "")
                         {
-                           # A value was provided for rows...
+                           # A value was provided for rows
                            $insStr .= "'$rows', ";
                         } // END if
                         else
                         {
-                           # No value was provided for rows...
+                           # No value was provided for rows
                            $insStr .= "NULL, ";
                         } // END else
 
                         # Deal with cols
                         if(isset($cols) && $cols != "")
                         {
-                           # A value was provided for rows...
+                           # A value was provided for rows
                            $insStr .= "'$cols', ";
                         } // END if
                         else
                         {
-                           # No value was provided for rows...
+                           # No value was provided for rows
                            $insStr .= "NULL, ";
                         } // END else
 
                         $insStr .= "NULL, NULL, NULL, NOW(), NOW(), ".(isset($modifytext)?"'$modifytext', ":"NULL, ") . " NULL, '$cookie')";
 
-                        # Execute the insertion
                         $insRes = mysql_query($insStr);
 
                         if($insRes)
                         {
-                           # In this case, the insertion of the new
-                           # element description has been successful.
-                           # Therefore we need to inform the user and
-                           # redirect the browser.
-
+                           # insert of element description successful.
                            emailRecord($elename);
                            insertBon($elename);
                         } // END if
                         else
                         {
-                           # If the insert failed...
                            insertMal();
                         } // END else
                      } // END if
                   } // END if
                   elseif($type == "I")
                   {
-                     # Element is HTML text input - needs size, maxlength,
-                     # val
-
+                     # Element is HTML text input - needs size, maxlength, val
                      if($size)
                      {
                         if(!charIsInt($size))
                         {
-                           # Damn...user has given a non-int value for
-                           # $size
+                           # non-int value given for $size
                            print("<P STYLE=\"font-size: medium; text-ali"
                            . "gn: center; font-weight: bold; color: "
                            . "red\">The <EM>Size</EM> Field Must Have an"
@@ -616,7 +600,7 @@
                      {
                         if(!charIsInt($maxlength))
                         {
-                           # User has given a non-int value for $maxlength
+                           # non-int value given for $maxlength
                            print("<P STYLE=\"font-size: medium; text-alig"
                            . "n: center; font-weight: bold; color: red\">"
                            . "The <EM>Max Length</EM> Field Must Have an "
@@ -634,10 +618,7 @@
 
                      if(!$sizeFailed && !$maxlengthFailed)
                      {
-                        # Well now.  If we have reached this far, then the
-                        # data for the input must all be present and
-                        # valid, so we can finally make this new element
-                        # description, and commit it to the DB.
+                        # commit new element description to DB
 
                         $insStr = "INSERT INTO sbmFIELDDESC (name, alephcode, marccode"
                         . ", type, size, rows, cols, maxlength, val, "
@@ -647,12 +628,12 @@
                         # Deal with size
                         if(isset($size) && $size != "")
                         {
-                           # A value was provided for rows...
+                           # A value was provided for rows
                            $insStr .= "'$size', ";
                         } // END if
                         else
                         {
-                           # No value was provided for rows...
+                           # No value was provided for rows
                            $insStr .= "NULL, ";
                         } // END else
 
@@ -661,46 +642,40 @@
                         # Deal with maxlength
                         if(isset($maxlength) && $maxlength != "")
                         {   
-                           # A value was provided for rows...
+                           # A value was provided for rows
                            $insStr .= "'$maxlength', ";
                         } // END if
                         else
                         {
-                           # No value was provided for rows...
+                           # No value was provided for rows
                            $insStr .= "NULL, ";
                         } // END else
 
                         # Deal with val
                         if(isset($val) && $val != "")
                         {
-                           # A value was provided for rows...
+                           # A value was provided for rows
                            $insStr .= "'$val', ";
                         } // END if
                         else
                         {
-                           # No value was provided for rows...
+                           # No value was provided for rows
                            $insStr .= "NULL, ";
                         } // END else
 
                         $insStr .= "NULL, NOW(), NOW(), ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
                          . "'$cookie')";
 
-                        # Execute the insertion
                         $insRes = mysql_query($insStr);
 
                         if($insRes)
                         {
-                           # In this case, the insertion of the new
-                           # element description has been successful.
-                           # Therefore we need to inform the user and
-                           # redirect the browser.
-
+                           # insert of element description successful
                            emailRecord($elename);
                            insertBon($elename);
                         } // END if
                         else
                         {
-                           # Insert failed...
                            insertMal();
                         } // END else
                      } // END if
@@ -708,7 +683,6 @@
                   elseif($type == "H")
                   {
                      # Element is hidden - can have val
-
                      $insStr = "INSERT INTO sbmFIELDDESC (name, alephcode, marccode, "
                       . "type, size, rows, cols, maxlength, val, fidesc, "
                       . "cd, md, modifytext, fddfi2, cookie) VALUES('"
@@ -718,28 +692,22 @@
                      # Deal with val
                      if(isset($val) && $val != "")
                      {
-                        # A value was provided for rows...
+                        # A value was provided for rows
                         $insStr .= "'$val', ";
                      } // END if
                      else
                      {
-                        # No value was provided for rows...
+                        # No value was provided for rows
                         $insStr .= "NULL, ";
                      } // END else
 
                      $insStr .= "NULL, NOW(), NOW(), ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
                       . "'$cookie')";
-
-                     # Execute the insertion
                      $insRes = mysql_query($insStr);
 
                      if($insRes)
                      {
-                        # In this case, the insertion of the new element
-                        # description has been successful.  Therefore we
-                        # need to inform the user and redirect the
-                        # browser.
-
+                        # Insert successful
                         emailRecord($elename);
                         insertBon($elename);
                      } // END if
@@ -752,13 +720,11 @@
                   elseif($type == "F")
                   {
                      # Element is file - needs size, maxlength
-
                      if($size)
                      {
                         if(!charIsInt($size))
                         {  
-                           # Damn...user has given a non-int value for
-                           # $size
+                           # non-int value given for $size
                            print("<P STYLE=\"font-size: medium; text-"
                             . "align: center; font-weight: bold; color:"
                             . " red\">The <EM>Size</EM> Field Must Have "
@@ -778,7 +744,7 @@
                      {
                         if(!charIsInt($maxlength))
                         {
-                           # User has given a non-int value for $maxlength
+                           # non-int value given for $maxlength
                            print("<P STYLE=\"font-size: medium; text-alig"
                            . "n: center; font-weight: bold; color: red\">"
                            . "The <EM>Max Length</EM> Field Must Have an "
@@ -796,11 +762,7 @@
 
                      if(!$sizeFailed && !$maxlengthFailed)
                      {
-                        # Well now.  If we have reached this far, then the
-                        # data for the input must all be present and
-                        # valid, so we can finally make this new element
-                        # description, and commit it to the DB.
-
+                        # commit new element to DB
                         $insStr = "INSERT INTO sbmFIELDDESC (name, alephcode"
                         . ", marccode, type, size, rows, cols, maxlength, val, "
                         . "fidesc, cd, md, modifytext, fddfi2, cookie) "
@@ -809,12 +771,12 @@
                         # Deal with size
                         if(isset($size) && $size != "")
                         {
-                           # A value was provided for rows...
+                           # A value was provided for rows
                            $insStr .= "'$size', ";
                         } // END if
                         else
                         {
-                           # No value was provided for rows...
+                           # No value was provided for rows
                            $insStr .= "NULL, ";
                         } // END else
 
@@ -823,12 +785,12 @@
                         # Deal with maxlength
                         if(isset($maxlength) && $maxlength != "")
                         {
-                           # A value was provided for rows...
+                           # A value was provided for rows
                            $insStr .= "'$maxlength', ";
                         } // END if
                         else
                         {
-                           # No value was provided for rows...
+                           # No value was provided for rows
                            $insStr .= "NULL, ";
                         } // END else
 
@@ -840,17 +802,11 @@
 
                         if($insRes)
                         {
-                           # In this case, the insertion of the new
-                           # element description has been successful.
-                           # Therefore we need to inform the user and
-                           # redirect the browser.
-
                            emailRecord($elename);
                            insertBon($elename);
                         } // END if
                         else
                         {
-                           # Insert failed
                            insertMal();
                         } // END else
                      } // END if
@@ -858,7 +814,6 @@
                   elseif($type == "D")
                   {
                      # Element is user defined - needs fidesc
-
                      $insStr = "INSERT INTO sbmFIELDDESC (name, alephcode, marccode, "
                       . "type, size, rows, cols, maxlength, val, fidesc, "
                       . "cd, md, modifytext, fddfi2, cookie) VALUES('"
@@ -873,11 +828,7 @@
 
                      if($insRes)
                      {
-                        # In this case, the insertion of the new element
-                        # description has been successful.  Therefore we
-                        # need to inform the user and redirect the
-                        # browser.
-
+                        # Insert succesful
                         emailRecord($elename);
                         insertBon($elename);
                      } // END if
@@ -890,7 +841,6 @@
                   elseif($type == "R")
                   {
                      # Element is of response type - needs fidesc
-
                      $insStr = "INSERT INTO sbmFIELDDESC (name, alephcode, marccode, "
                       . "type, size, rows, cols, maxlength, val, fidesc, "
                       . "cd, md, modifytext, fddfi2, cookie) VALUES('"
@@ -900,29 +850,21 @@
                      $insStr .= "'$fidesc', NOW(), NOW(), ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
                       . "'$cookie')";
 
-                     # Execute the insertion
                      $insRes = mysql_query($insStr);
 
                      if($insRes)
                      {
-                        # In this case, the insertion of the new element
-                        # description has been successful.  Therefore we
-                        # need to inform the user and redirect the
-                        # browser.
-
                         emailRecord($elename);
                         insertBon($elename);
                      } // END if
                      else
                      {
-                        # Insert failed
                         insertMal();
                      } // END else
                   } // END elseif
                   elseif($type == "S")
                   {
                      # Element is user defined - needs fidesc
-
                      $insStr = "INSERT INTO sbmFIELDDESC (name, alephcode, marccode, "
                       . "type, size, rows, cols, maxlength, val, fidesc, "
                       . "cd, md, modifytext, fddfi2, cookie) VALUES('"
@@ -931,36 +873,24 @@
 
                      $insStr .= "'$fidesc', NOW(), NOW(), ".(isset($modifytext)?"'$modifytext', ":"NULL, ")."NULL, "
                       . "'$cookie')";
-
-                     # Execute the insertion
                      $insRes = mysql_query($insStr);
 
                      if($insRes)
                      {
-                        # In this case, the insertion of the new element
-                        # description has been successful.  Therefore we
-                        # need to inform the user and redirect the
-                        # browser.
-
                         emailRecord($elename);
                         insertBon($elename);
                      } // END if
                      else
                      {
-                        # Insert failed
                         insertMal();
                      } // END else
                   } // END elseif
                   else
                   {
-                     # Oops!  Element type invalid!  We must deny
-                     # commitment, and represent the form for the user to
-                     # once again attempt to fill in.
-
+                     # Element type invalid! deny commit, redisplay form
                      print("<P STYLE=\"font-size: medium; text-align: "
                      . "center; font-weight: bold; color: red\">Invalid "
                      . "Element Type is Mandatory.</P>\n");
-
                      enterEDSelementDescr($elename, $alephcode,
                        $size, $rows, $cols, $maxlength,
                        stripslashes($val), stripslashes($fidesc),
@@ -975,7 +905,6 @@
          # In this case, this is not a self-referential call to this page,
          # and it is therefore time to display a form in which the user
          # can enter the details of the element description...
-
          enterEDSelementDescr();
       } // END else
    }
