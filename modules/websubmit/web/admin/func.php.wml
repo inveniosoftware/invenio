@@ -47,7 +47,6 @@
       ****************************************************************/
 
       # Display the button...
-
       print("<BR><TABLE BORDER=0 CELLSPACING=0 ALIGN='center'><TR>");  
       print("<FORM ACTION='$returnTo' METHOD='post'><TD>\n");
 
@@ -127,25 +126,18 @@
          {
             if(mysql_num_rows($querRes) == 1)
             {
-               # Great, we can display our parameter.  We must however
-               # test to see if the current function is the
-               # "Make_Weblib_Record" function.  If it is, it means that
-               # we must link to the file that is this functions
-               # parameter.  We must allow it to be edited by providing a
-               # link to it.
+               # Display parameter details.
+               # If function is "Make_Record" or "Make_Modify_Record", link to upload template file so that it can be edited.
   
                # Get the parameters value...
                list($value) = mysql_fetch_row($querRes);
     
-               if(($functionName == "Make_Weblib_Record") ||
+               if(($functionName == "Make_Record") ||
                   ($functionName == "Make_Modify_Record"))
                {
-                  # Ok, it is the "Make_Weblib_Record"
-                  # or"Make_Modify_Record" function, so link to the text
-                  # file editor script...
-
-                  print("<A TITLE='EDIT THE FILE' HREF='editRecordFile"
-                  . ".php?file=$HTDOCSDIR/submit/bibconvert/config/" . ltrim(ereg_replace("'", "&#39;",
+                  # link to the text file editor script...
+                  print("<A TITLE=\"EDIT THE FILE\" HREF=\"editRecordFile"
+                  . ".php?file=" . ltrim(ereg_replace("'", "&#39;",
                              htmlspecialchars($value))) . "&amp;doctype="
                   . ereg_replace("'", "&#39;",
                              htmlspecialchars($doctype)) . "&amp;function"
@@ -154,16 +146,13 @@
                   . "action=" . ereg_replace("'", "&#39;",
                              htmlspecialchars($action)) . "&amp;returnTo="
                   . ereg_replace("'", "&#39;",
-                             htmlspecialchars($returnTo)) . "'>"
+                             htmlspecialchars($returnTo)) . "\">"
                   . ereg_replace("'", "&#39;",
                              htmlspecialchars($value)) . "</A>\n");
                } // END if
                else
                {
-                  # Okay, it's not the "Make_Weblib_Record" or
-                  # "Make_Modify_Record" function, so just display the
-                  # value as a standard text field.
-               
+                  # so just display the value as a standard text field.
                   print(htmlspecialchars($value));
                } // END else
             } // END if
@@ -208,10 +197,10 @@
                # no value in the DB for the parameter on this doctype, so
                # a little warning will be displayed in the value cell!
 
-               print("<IMG SRC='".$IMAGES."/noway.gif' ALT='No value"
+               print("<IMG SRC=\"".$IMAGES."/noway.gif\" ALT=\"No value"
                    . " stored in the " . $rowData['param'] . " column of"
                    . " the parameters table for the "
-                   . "$doctype document type.' BORDER=0 WIDTH=14 "
+                   . "$doctype document type.\" BORDER=0 WIDTH=14 "
                    . "HEIGHT=14>\n");
             } // END else
          } // END if
@@ -228,7 +217,6 @@
                 . " table for $doctype document type');</SCRIPT>");
          } // END else
 
-         # Close the value table data cell...
          print("</TD>\n");
 
          # Now display an icon to allow the user to edit the value of the
@@ -309,8 +297,6 @@
 
          makeFuncParamsTableBody($queryResult, $columns, $functionName,
                                             $returnTo, $doctype, $action);
-
-         # Close the table, as it is now complete...
          print("</TABLE>\n");
       } // End if
       else  # If there are no parameters to display...
@@ -360,7 +346,6 @@
 	  . " bold; font-size: large'><SPAN STYLE='color: red'>Error:"
 	  . "</SPAN> Unable to lock sbmFUNDESC table.</DIV>\n<BR>\n");
 
-         # Display a 'OK' button...
          displayReturnButton("OK", $returnTo, $doctype,
                                                 $functionName, $action);
       } # END else
