@@ -153,15 +153,6 @@ function checkRequired(param)
          . "large; text-align: center\">The New Element Has Been Added"
          . "</P>\n");
 
-         # Now output a javascript alert saying more or less the same, in
-         # a little more detail
-         print("<SCRIPT TYPE='text/javascript'>alert('The $fidesc element"
-         . " has been added to page $pageNumber of the\\n$subname "
-         . "submission of the $doctype document type.\\nIt was added "
-         . "into element position $fieldnb.\\n\\nYour browser has been re"
-         . "directed to the page where you can view the details of this"
-         . " submission page.');</SCRIPT>\n");
-
          # Now make a message and send it to the system administrator to
          # inform them that this element addition has taken place.
          $msgTxt = "A new element has been added to page $pageNumber of "
@@ -192,14 +183,6 @@ function checkRequired(param)
          print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">ERROR:"
          . "</SPAN> Unable To Add This Element To The <EM>$subname</EM>" 
          . " Submission</P>\n");
-
-         # Now output a javascript alert saying more or less the same, in
-         # a little more detail
-         print("<SCRIPT TYPE='text/javascript'>alert('Error: It was not "
-         . " possible to add the $fidesc element\\n to page $pageNumber "
-         . "of the $subname submission of the $doctype document type.\\n"
-         . "This is because it was not possible to commit values to the "
-         . "sbmFIELD table.');</SCRIPT>\n");
 
          # Now make a message and send it to the system administrator to
          # inform them that this element addition has taken place.
@@ -645,16 +628,6 @@ function checkRequired(param)
          . "the element descriptions from the <EM>sbmFIELDDESC</EM> "
          . "table.<BR>Unable to add element.</P>\n");
 
-         # Now display a JavaScript alert saying more or less the same as 
-         # the above message...
-            
-         print("<SCRIPT TYPE=\"text/javascript\">alert('ERROR: It was not"
-         . " possible to retrieve the details for the descriptions of the"
-         . " EDS elements\\nfrom the sbmFIELDDESC table.\\nThis meant that " 
-         . "it was not possible to add a new element to the requested "   
-         . "submission page.\\n\\nPlease inform the system administrator "
-         . "of this problem.');</SCRIPT>\n");
-            
          # Now redirect the browser
          sendToPageDets($subname, $pageNumber, $nPgs, $doctype);
       } // END else   
@@ -697,7 +670,7 @@ function displayPage()
       } // END if
       elseif($fidesc_A != "--X--")
       {
-         # Perfect...we take the left-most, which in this case is
+         # take the left-most, which in this case is
          # $fidesc_A, so it does not matter if $fidesc_B or $fidesc_C
          # are selected or not - we don't care.
 
