@@ -58,16 +58,11 @@
 
          if(mysql_num_rows($dataRes) > 0)
          {
-            # Rows returned!  Build the table...
-
-            # Make the headers...
             print("<TABLE WIDTH='50%' ALIGN='center' BORDER=1 "
             . "CELLSPACING=0 CELLPADDING=0><TR BGCOLOR='#CCDDFF'>"
             . "<TH>Category ID</TH><TH>Category"
             . " Description</TH><TH>&nbsp;</TH><TH>&nbsp;</TH>"
             . "</TR>");
-
-            # Now fill the table with its contents...
 
             while($row = mysql_fetch_array($dataRes))
             {
@@ -85,7 +80,7 @@
                . "submit();\" ALIGN='center' WIDTH=18 HEIGHT=18></TD>"
                . "</FORM>");
 
-               # Now add a form for deleting this cat...
+               # Now add a form for deleting this cat
                print("<FORM ACTION='doctypeCategoriesEDS.php' METHOD='"
                . "post'><INPUT TYPE='hidden' NAME='delCat' VALUE='"
                . "true'><INPUT TYPE='hidden' NAME='doctype' VALUE='"
@@ -93,18 +88,14 @@
                . $row["sname"] . "'><TD ALIGN='center'><INPUT TYPE='"
                . "image' SRC='".$IMAGES."/answer_bad.gif' BORDER=0 ALIGN='"
                . "center' WIDTH=14 HEIGHT=14></TD></FORM>");
-
-               # Close up current row...
                print("</TR>");
             } // END while
-
-            # Close table of cats...
             print("</TABLE>");
          } // END if
          else
          {
-            # No rows returned.  Simply output a message saying that the
-            # current doctype does not yet have any categories...
+            # No rows returned - output a message saying that the
+            # current doctype does not yet have any categories
 
             print("<P STYLE=\"color: green; font-size: large; text-align:"
                . " center; font-weight: bold\"><EM>$doctype</EM> "
@@ -112,7 +103,7 @@
          } // END else
 
          # Now make a button that the user can press in order to add a new
-         # category...
+         # category
 
          print("<FORM ACTION='doctypeCategoriesEDS.php' METHOD='post'>"
             . "<INPUT TYPE='hidden' NAME='addCatForm' VALUE='true'>"
@@ -120,21 +111,16 @@
             . "<TABLE ALIGN='center' BORDER=0><TR><TD ALIGN='center'>"
             . "<INPUT TYPE='button' VALUE='ADD A CATEGORY' onClick=\""
             . "submit();\"></TD></TR></TABLE></FORM>");
-
-         # Free the query result...
          mysql_free_result($dataRes);
       } // END if
       else
       {
          # In this case, the query failed, so we just output the warning
-
          print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">ERROR"
             . ":</SPAN> Unable To Retrieve Details of Categories for "
             . "<EM>$doctype</EM> Document Type.<BR>Inform System Adminis"
             . "trator.</P>");
       } // END else
-
-      # Make a finished button...
       print("<FORM ACTION='documentEDS.php' METHOD='post'><INPUT "
          . "TYPE='hidden' NAME='doctype' VALUE='$doctype'><TABLE "
          . "ALIGN='center' BORDER=0><TR><TD ALIGN='center'>"
@@ -166,14 +152,11 @@
          Last Modified:  15/01/2001
       *******************************************************************/
 
-      # Reset an error flag...
+      # Reset error flag
       $editQError = 0;
 
       if($formType != "ADD")
       {
-         # Then this must be an edit call, so select the details of the
-         # cat to edit.
-
          $res = mysql_query("SELECT * FROM sbmCATEGORIES WHERE doctype = '"
               . "$doctype' AND sname = '$sname'");
 
@@ -183,51 +166,40 @@
             print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
             . "ERROR:</SPAN> Unable To Retrieve Details Of <EM>$sname</EM"
             . "> Category.</P>");
-
             showCatsEDS($doctype);
          } // END if
          else
          {
             if(mysql_num_rows($res) < 1)
             {
-               # Oh dear, unable to retrieve the dets of this cat
-
                $editQError = 1;
                print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"   
                . "ERROR:</SPAN> Unable To Retrieve Details Of <EM>$sname"
                . "</EM> Category.</P>");
-
                showCatsEDS($doctype);
             } // END if
             elseif(mysql_num_rows($res) > 1)
             {
                # Too many rows.  Data inconsistency problem.
-
                $editQError = 1;
                print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
                . "ERROR:</SPAN> More Than 1 Category Was Found With The "
                . "ID <EM>$sname</EM For The <EM>$doctype</EM> Document "
                . "Type.<BR>Inform System Administrator.</P>");
-
                showCatsEDS($doctype);
             } // END elseif
             else
             {
-               # Perfect!  1 row as expected
                $dataRow = mysql_fetch_array($res);
             } // END else
          } // END else
       } // END if
-
-      # Now, if the $editQError flag has not been set, continue building
-      # the form...
-
+      # if the $editQError flag has not been set, continue building form
       if(!$editQError)
       {
          # Get a list of the fields in the sbmCATEGORIES table
          $columns = mysql_list_fields(DOCS_DATABASE, "sbmCATEGORIES");
 
-         # Make page title..
          print("<P CLASS=\"errorMsg\">");
 
          print("</P><TABLE WIDTH='90%' BGCOLOR='#D3DCE3' ALIGN='"
@@ -254,13 +226,10 @@
             . "edited, click on the \"SAVE DETAILS\" button to commit the"
             . " changes.");
          } // END else
-
          print("</P></TD></TR></TABLE>");
 
-         # Make a horizontal rule to divide the page sections...
          drawSeparator();
 
-         # Now begin making the form...
          print("<TABLE WIDTH='100%' ALIGN='center' BORDER=0 CELLSPACING=0"
          . " CELLPADDING=0><FORM ACTION='doctypeCategoriesEDS.php' "
          . "METHOD='post'><INPUT TYPE='hidden' NAME='");
@@ -330,32 +299,21 @@
 
    } // END function addEditCatForm()
 
-
-
    function displayCategoriesList($doctype,$delCat,$addCatForm,$editCatForm,$editCatCommit,$addCatCommit)
    {
       global $sname,$lname;
-
       if(isset($delCat))
       {
-         # This is a call to delete a given category from the current
-         # doctype.
-
-         # Free the $delCat variable...
+         # This is a call to delete a given category from the current doctype
          unset($delCat);
 
          $delStr = "DELETE FROM sbmCATEGORIES WHERE doctype = '$doctype' AND"
          . " sname = '$sname'";
-
-         # Execute the delete query...
          $delRes = mysql_query($delStr);
 
          if($delRes && mysql_affected_rows() > 0)
          {
-            # In this case, the query has been successful, and rows have
-            # been deleted...
-
-            # Print a message letting the user know of the deletion.
+            # Print a message letting the user know of the delete
             print("<P STYLE=\"color: red; text-align: center; font-size: "
             . "small; font-weight: bold\">Category Deleted</P>");
 
@@ -369,7 +327,6 @@
 
             if($mdRes)
             {
-               # Free this query result...
                mysql_free_result($mdRes);
             } // END if
             else
@@ -385,21 +342,14 @@
             . "WebSubmit Administrator (";
             $msgTxt .= makeDate();
             $msgTxt .= ")";
-
-            # Now send the mail..
             mail(ADMIN_EMAIL, "${doctype}.$sname Category Deleted",
                          $msgTxt, "From: WebSubmit_Administrator");
 
-
-            # Now simply redisplay the table containing the categories
+            # redisplay the table containing the categories
             showCatsEDS($doctype);
          } // END if
          else
          {
-            # In this case the deletion has failed.  This means that we
-            # must simply output a warning message on the screen, and
-            # redisplay cats
-
             print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
             . "ERROR:</SPAN> Unable To Delete Category.  Retry or Inform"
             . " System Administrator.</P>");
@@ -407,20 +357,13 @@
       } // END if
       elseif(isset($addCatForm))
       {
-         # In this case, we wish to add a new category, so we can simply
-         # make a form, allowing the details of the new cat to be
-         # entered...
-
          unset($addCatForm);
          addEditCatForm($doctype, "ADD");
       } // END elseif
       elseif(isset($addCatCommit))
       {
-         # In this case, we have displayed the form, it has been filled,
-         # and now we must commit the new cat to the database!
-
+         # commit new categ to the database
          unset($addCatCommit);
-
          if($sname != "" && test_key_legal($sname))
          {
             $testRes = mysql_query("SELECT * FROM sbmCATEGORIES WHERE "
@@ -428,34 +371,26 @@
 
             if($testRes)
             {
-               # Query worked, so we can now ensure that no rows were
-               # returned
                if(mysql_num_rows($testRes) > 0)
                {
-                  # Oh dear.  This category appears to exist already.
-                  # Better inform them, and simply redisplay all cats.
+                  # Category does not have unique name. warn user.
                   print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: "
                   . "red\">Warning.</SPAN>  The Category Was Not Given A"
                   . " Unique Name.<BR>Could Not Commit.</P>");
-
                   showCatsEDS($doctype);
                } // END if
                else
                {
-                  # No other categories with this name.  Commit it!
                   $addStr = "INSERT INTO sbmCATEGORIES (doctype, sname, "
                   . "lname) VALUES('$doctype', '$sname', '$lname')";
-
                   $addRes = mysql_query($addStr);
-
                   if($addRes && mysql_affected_rows() == 1)
                   {
-                     # Cool, insert successful
                      print("<P STYLE=\"color: red; font-size: medium; "
                      . "font-weight: bold; text-align: center\">Categ"
                      . "ory Added</P>");
 
-                     # Now update modify date for doctype
+                     # update modify date for doctype
                      $modifiedDate = makeEDSmdDate();
 
                      $mdRes = mysql_query("UPDATE sbmDOCTYPE SET md = '"
@@ -463,7 +398,6 @@
 
                      if($mdRes)
                      {
-                        # Free this query result...
                         mysql_free_result($mdRes);
                      } // END if
                      else
@@ -473,14 +407,11 @@
                         . "Doctype.');</SCRIPT>");
                      } // END else
 
-                     # Now email admin for records sakes...
                      $msgTxt = "The $sname Category has been added to the"
                      . " $doctype doctype in the " . DOCS_DATABASE
                      . " database.WebSubmit Administrator (";
                      $msgTxt .= makeDate();
                      $msgTxt .= ")";
-
-                     # Now send the mail..
                      mail(ADMIN_EMAIL, "$sname Category Added To "
                        . "$doctype",
                               $msgTxt, "From: WebSubmit_Administrator");
@@ -488,11 +419,9 @@
                   } // END if
                   else
                   {
-                     # Bummer, could not insert this cat!
                      print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: "
                      . "red\">ERROR:</SPAN> Unable to insert category "
                      . "correctly.</P>");
-
                      showCatsEDS($doctype);
                   } // END else
                } // END else
@@ -501,11 +430,9 @@
             {
                # Unable to retrieve results of test query.  Therefore cant
                # commit new cat.
-
                print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
                . "ERROR:</SPAN> Unable to Verify Category Name.  Cannot "
                . "Insert.</P>");
-
                showCatsEDS($doctype);
             } // END else
          } // END if
@@ -514,15 +441,13 @@
             print("<P STYLE=\"color: red; text-align: center; font-weig"
             . "ht: bold; font-size: medium\">Illegal Characters Used In"
             . " Category Name.  Please Retry.</P>");
-
             showCatsEDS($doctype);
          } // END else
       } // END elseif
       elseif(isset($editCatForm))
       {
          # In this case, we must display the details of the selected cat
-         # in a form for editing...
-
+         # in a form for editing
          unset($editCatForm);
          addEditCatForm($doctype, "EDIT", $sname);
       } // END elseif
@@ -530,7 +455,6 @@
       {
          # In this case, the user has alterred the details of the selected
          # cat, and we must commit the update to the DB.
-
          unset($editCatCommit);
 
          $updRes = mysql_query("UPDATE sbmCATEGORIES SET lname = '$lname' "
@@ -538,12 +462,8 @@
 
          if($updRes)
          {
-            # Query worked...
-
             if(mysql_affected_rows() > 0)
             {
-               # Hey hey!  An updated was actually carried out!
-
                # Now update modify date for doctype
                $modifiedDate = makeEDSmdDate();
 
@@ -552,7 +472,6 @@
 
                if($mdRes)
                {
-                  # Free this query result...
                   mysql_free_result($mdRes);
                } // END if
                else
@@ -562,15 +481,11 @@
                   . "Doctype.');</SCRIPT>");
                } // END else
 
-
-               # Now email admin for records sakes...
                $msgTxt = "The description of the $sname Category of the"
                   . " $doctype doctype has been updated in the "
                   . DOCS_DATABASE . " database.WebSubmit Administrator (";
                $msgTxt .= makeDate();
                $msgTxt .= ")";
-
-               # Now send the mail..
                mail(ADMIN_EMAIL, "${doctype}.$sname Category Updated",
                               $msgTxt, "From: WebSubmit_Administrator");            
 
@@ -582,8 +497,6 @@
             } // END if
             else
             {
-               # Well, no update was carried out.
-
                print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
                . "ERROR:</SPAN> No Categories Were Updated.<BR>Please "
                . "Retry.</P>");
@@ -593,8 +506,6 @@
          } // END if
          else
          {
-            # Update Query Failed...
-
             print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
             . "ERROR:</SPAN> Unable To Update Category.<BR>Please Retry"
             . ".</P>");
@@ -604,9 +515,6 @@
       } // END elseif
       else
       {
-         # In this case, this is 1st call to this page.  Display the
-        # categories then!
-
          showCatsEDS($doctype);
       } // END else
    }
