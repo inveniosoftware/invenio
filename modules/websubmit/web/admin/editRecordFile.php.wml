@@ -173,7 +173,7 @@
    function displayPage($uploadTplPath)
    {
       global $doctype,$saveDets,$functionName,$action,$returnTo,$content,$file;
-
+      $file=basename($file);
       # Now perform tests to determine what to do
       if(isset($saveDets))
       {
