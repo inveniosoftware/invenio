@@ -54,13 +54,7 @@
                
       if($queryResult)
       {
-         # In this case, the query has executed successfully, and we have
-         # retrieved all of the details about the given doctype.  We can
-         # now display them...
-
-         # First, we must conduct a test to ensure that there are not
-         # multiple rows returned, or no rows returned, etc...
-                  
+         # test for multiple or no rows returned
          if(mysql_num_rows($queryResult) > 1)
          {
             # If this clause is reached, too many rows have been returned
@@ -356,8 +350,6 @@
                       . '_bad.gif" WIDTH=14 HEIGHT=14 BORDER=0 ALT="Delet'
                       . 'e Submission" onClick="submit();"></TD>'
                       . '</FORM>');
-                               
-                     # Close up the current row...
                      print("</TR>");
                   } // END while
                            
@@ -440,47 +432,32 @@
 
       if($subDelRes)
       {
-         # Query worked
-
          # Get the number of rows deleted..
          $noRowsDel = mysql_affected_rows();
 
          if($noRowsDel == 1)
          {
-            # Perfect.
-
-            # Free some wasted space.
             mysql_free_result($subDelRes);
 
             print('<SCRIPT TYPE="text/javascript">alert("'.$subname
              . ' submission deleted.");</SCRIPT>');
-
-            # Mail the admin...
             $msgTxt = "The $subname submission has been deleted "
               . "WebSubmit Administrator(" . makeDate()
               . ")";
-
-            # Now send the mail..
             mail(ADMIN_EMAIL, "$subname Submission Deleted", $msgTxt,
                                             "From: WebSubmit_Administrator");
          } // END if
          elseif($noRowsDel < 1)
          {
-            # Couldn't delete the submission.  damn.
-
-            # Free wasted space...
+            # Couldn't delete the submission.
             mysql_free_result($subDelRes);
-
             print('<SCRIPT TYPE="text/javascript">alert("Unable to '
              . 'delete submission. Please retry.");</SCRIPT>');
          } // END elseif
          else
          {
-            # We have deleted many rows.  Etrange.
-
-            # Free some wasted space.
+            # Multiple rows deleted
             mysql_free_result($subDelRes);
-
             print('<SCRIPT TYPE="text/javascript">alert("'.$subname
              . ' submission deleted.HOWEVER, '.$noRowsDel
              . ' submission records were deleted from database.  It is '
@@ -488,15 +465,12 @@
              . 'submission, which would break consistency rules.'
              . 'They have now however, been removed.");</SCRIPT>');
 
-            # Mail the admin...
             $msgTxt = "The $subname submission has been deleted "
               . ".  However, $noRowsDel rows were "
               . "deleted from IMPLEMENT for this submission.  It is "
               . "possible that for some reason, there were several "
               . "rows for the same submission in this table."
               . "WebSubmit Administrator(" . makeDate() . ")";
-      
-            # Now send the mail..
             mail(ADMIN_EMAIL, "ERROR: Several Records Deleted "
                  . "For $subname Submission", $msgTxt,
                                             "From: WebSubmit_Administrator");
@@ -504,7 +478,6 @@
       } // END if
       else
       {
-         # Query failed
          print('<SCRIPT TYPE="text/javascript">alert("Unable to delete'
           . ' $subname.Please Retry.");</SCRIPT>');
       } // END else
@@ -543,48 +516,40 @@
 	$res = mysql_query("DELETE FROM sbmFUNCTIONS where doctype='$doctype' and action='$action'");
 
       # First, execute a query to see how many elements there are for the
-      # current submission...
+      # current submission
       $noElesRes = mysql_query("SELECT * FROM sbmFIELD WHERE subname = '"
         . "$subname'");
 
       if($noElesRes)
       {
-         # Good, query success...
+         # Good, query success
          $noEles = mysql_num_rows($noElesRes);
 
          # Free up the $noElesRes result set to quicken the pace
          mysql_free_result($noElesRes);
 
-         # Delete all elements for the current doctype submission...
+         # Delete all elements for the current doctype submission
          $eleDelRes = mysql_query("DELETE FROM sbmFIELD WHERE subname = '"
            . "$subname'");
 
          if($eleDelRes)
          {
-            # Cool, the query was successful
-
             # Get the date for the created date & modification date  
             $theDate = makeEDSmdDate();
 
             if(mysql_affected_rows() == $noEles)
             {
-               # Perfect!  Just the right number of elements deleted!
-
-               # Free some wasted space...
                mysql_free_result($eleDelRes);
 
                # Update the md field for our doctype
                updateEDSDOCTYPEmd($doctype, $theDate);
 
-               # Now carry on with the deletion of the submission...
+               # Now carry on with the deletion of the submission
                killSub($subname);
             } // END if
             elseif(mysql_affected_rows() > $noEles)
             {
-               # Oh dear.  We have deleted more elements than we meant to!
-
-               # Better tell the user, and mail the admin...
-
+               # Too many rows deleted - error
                print('<SCRIPT TYPE="text/javascript">alert("ERROR: '
                 . 'When the page elements of the '.$subname.' submission '
                 . 'were deleted,' . mysql_affected_rows()
@@ -600,29 +565,21 @@
                 . "continued, as there is no way to counteract this fact,"
                 . " or determine which extra elements were deleted."
                 . "WebSubmit Administrator(" . makeDate() . ")";
-
-               # Now send the mail..
                mail(ADMIN_EMAIL, "ERROR: Too Many Elements Deleted "
                  . "During $subname Submission Deletion", $msgTxt,  
                                             "From: WebSubmit_Administrator");
 
-               # Free some wasted space...
                mysql_free_result($eleDelRes);
 
                # Update the md field for our doctype
                updateEDSDOCTYPEmd($doctype, $theDate);
 
-               # Now carry on with the deletion of the submission...
+               # Now carry on with the deletion of the submission
                killSub($subname);
             } // END elseif
             else
             {
-               # Oh dear!  We have deleted less elements than we meant to.
-               # We won't do any more of the deletion, and will simply let
-               # the user know this fact, and also that they should try
-               # again.
-
-               # Free some wasted space...
+               # Too few elements deleted - error
                mysql_free_result($eleDelRes);
 
                # Update the md field for our doctype
@@ -637,18 +594,13 @@
          } // END if
          else
          {
-            # Damn.  We could not actually perform the deletion.
-
+            # could not delete
             print('<SCRIPT TYPE="text/javascript">alert("Unable To '
-             . 'Perform Deletion.Please Retry.");</SCRIPT>');
+             . 'Perform Delete. Please Retry.");</SCRIPT>');
          } // END else
       } // END if
       else
       {
-         # We could not see how many elements there were for this
-         # submission, as our query failed.  Therefore, don't go any
-         # further.
-
          print('<SCRIPT TYPE="text/javascript">alert("Unable To Perfor'
           . 'm Deletion - Could Not Retrieve Details Of Submissions '
           . 'Page Elements.Please Retry.");</SCRIPT>');
@@ -671,20 +623,15 @@
    {
       if(isset($deleteSub))
       {
-         # Okay then, the page has been called to delete a submission
-
-         # Free some wasted space...
          unset($deleteSub);
-
-         # Delete the submission in question...
+         # Delete submission
          deleteAsubmission($subname, $doctype);
-
-         # Redisplay the page...
+         # Redisplay the page
          displayDocsAndSubs($doctype);
       } // END if
       else
       {
-         # Non self-referential call to this script, so display our page!
+         # display page
          displayDocsAndSubs($doctype);
       } // END else
    }
