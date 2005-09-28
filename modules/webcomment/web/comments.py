@@ -130,7 +130,7 @@ def add(req, ln=cdslang, recid=-1, action='DISPLAY', msg="", note="", score="", 
         # user logged in
         else:
             (body, errors, warnings) = webcomment.perform_request_add_comment_or_remark(recID=recid, uid=uid, action=action, msg=msg, note=note, score=score, reviews=reviews, comID=comid)
-            title = "Add %s" % (reviews==1 and 'Review' or 'Comment')
+            title = "Add %s" % (reviews in [1, '1'] and 'Review' or 'Comment')
             return page(title=title, body=body, navtrail=navtrail, description="", keywords="", uid=uid, 
                 cdspageheaderadd="", cdspageboxlefttopadd="", cdspageboxleftbottomadd="", 
                 cdspageboxrighttopadd="", cdspageboxrightbottomadd="", cdspagefooteradd="", 
