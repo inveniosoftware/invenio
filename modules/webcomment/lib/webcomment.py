@@ -414,6 +414,21 @@ def query_add_comment_or_remark(recID=-1, uid=-1, msg="", note="", score=0, prio
     @return integer >0 representing id if successful, integer 0 if not
     """
     current_date = calculate_start_date('0d')
+    if msg.count('>>') == 0: #if not replying, but write a fresh comment, limit line length to 80 char
+        msg_words = msg.split(' ')
+        new_msg = []
+        char_on_this_line = 0
+        for word in msg_words:
+            char_on_this_line += len(word) + 1
+            if char_on_this_line >= 80:
+                new_msg.append('\n' + word)
+                char_on_this_line = len(word) + 1
+            else:
+                if word.find('\n') > 0:
+                    char_on_this_line = 0
+                new_msg.append(word)
+        import string
+        msg = string.join(new_msg, ' ')
     if recID > 0:
         #change utf-8 message into general unicode
         msg = msg.decode('utf-8')
@@ -421,10 +436,10 @@ def query_add_comment_or_remark(recID=-1, uid=-1, msg="", note="", score=0, prio
         # get rid of html tags in msg but keep newlines
         msg = msg.replace ('\n', "#br#")
         msg= html2txt(msg)
-        msg = msg.replace('#br#', '<br>')
         note= html2txt(note)
         #change general unicode back to utf-8
         msg = msg.encode('utf-8')
+        msg = msg.replace('#br#', '<br>')
         note = note.encode('utf-8')
         query = "INSERT INTO cmtRECORDCOMMENT (id_bibrec, id_user, body, date_creation, star_score, nb_votes_total, title) " \
                 "VALUES (%s, %s, %s, %s, %s, %s, %s)" 
@@ -435,9 +450,9 @@ def query_add_comment_or_remark(recID=-1, uid=-1, msg="", note="", score=0, prio
         # get rid of html tags in msg but keep newlines
         msg = msg.replace ('\n', "#br#")
         msg= html2txt(msg)
-        msg = msg.replace('#br#', '<br>')
         #change general unicode back to utf-8
         msg = msg.encode('utf-8')
+        msg = msg.replace('#br#', '<br>')
         query = "INSERT INTO bskREMARK (id_bskBASKET_bibrec_bibEXTREC, id_user, body, date_creation, priority) " \
                 "VALUES (%s, %s, %s, %s, %s)"
         params = (recID, uid, msg, current_date, priority) 
@@ -659,9 +674,14 @@ def perform_request_add_comment_or_remark(recID=-1, uid=-1, action='DISPLAY', ln
                 if comment: 
                     user_info = query_get_user_contact_info(comment[2])
                     if user_info:
-                        msg = comment[3].replace('\n', ' ')
-                        msg = msg.replace('<br>', '\n')
-                        msg = "Quoting %s:\n%s\n" % (user_info[0], msg)
+                        msg = comment[3]
+#                        msg = comment[3].replace('\n', ' ')
+#                        msg = msg.replace('<br>', '\n')
+                        date_creation = str(comment[4])
+                        date_creation = date_creation[:18]
+                        date_creation = time.strptime(str(date_creation), "%Y-%m-%d %H:%M:%S")
+                        date_creation = time.strftime("%d %b %Y %H:%M:%S %Z", date_creation)
+                        msg = "%s wrote on %s:\n%s" % (user_info[0], date_creation, msg)
             return (webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings), errors, warnings)
         else:
             errors.append(('ERR_WEBCOMMENT_COMMENTS_NOT_ALLOWED',))

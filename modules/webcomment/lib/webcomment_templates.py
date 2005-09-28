@@ -102,7 +102,7 @@ class Template:
             out = '''
             <!--  comments title table -->
             <table><tr><td class="blocknote">Discuss this document:</td></tr></table>
-            Open a a discussion about any aspect of this document. 
+            Start a discussion about any aspect of this document. 
             <br>
             %s
             <br>''' % (write_button_form,)
@@ -226,7 +226,7 @@ class Template:
             out = '''
                  <!--  review title table -->
                 <table><tr><td class="blocknote">Rate this document:</td></tr></table>
-                Have the honor of being the first to review this document.<br>
+                Be the first to review this document.<br>
                 %s
                 <br>''' % (write_button_form,)
         return out
@@ -256,6 +256,23 @@ class Template:
         # load the right message language
         #_ = gettext_set_language(ln)
 
+        # format the msg so that the '>>' chars give vertical lines
+        body_rows = body.split('<br>')
+        final_body = "\n<table cellpadding=0 cellspacing=0>"
+        for row in body_rows:
+            final_body += "\n\t<tr>"
+            nb_quotes = row.count('>>')
+            final_body += '\n\t\t<td>'
+            if len(row.split('>>')[-1].strip()) == 0:
+                row += '&nbsp;'
+            row = row.replace('>>', "\t\t\t<table cellpadding=0 cellspacing=0><tr><td class=\"commentbox\">")
+            for line in range(nb_quotes):
+                row += '</td></tr></table>'
+            final_body += row
+            final_body += '\n\t\t</td>'
+            final_body += "\n\t</tr>"
+        final_body += "\n</table>"
+
         out += """
                 <table width="100%%">
                     <tr>
@@ -269,7 +286,7 @@ class Template:
             {   #! FIXME  put send_a_private_message view_shared_baskets 
                 'nickname'      : nickname,
                 'date_creation' : date_creation,
-                'body'          : body,
+                'body'          : final_body,
                 'links'         : (report_link!=None and reply_link!=None) and " <a href=\"%s\">Reply</a> | <a href=\"%s\">Report abuse</a>" % (reply_link, report_link) or ""
             }
         return out
@@ -489,7 +506,7 @@ class Template:
         ## html
         body = '''
            
-            <table width="100%%"><tr><td> <h1>Record %(recid)s</h1></td><td valign=top align=right><a href="%(weburl)s/search.py?recid=%(recid)s&amp;ln=%(ln)s">Back to search results</a></td></tr></table>
+            <table width="100%%"><tr><td> <h1>Record %(recid)s</h1></td><td valign=top class="backtosearch" align=right><a href="%(weburl)s/search.py?recid=%(recid)s&amp;ln=%(ln)s">(Back to search results)</a></td></tr></table>
             <br>
             %(record_details)s
             <br>
@@ -505,7 +522,7 @@ class Template:
             <table width="100%%">
                 <tr>
                     <td>%(write_button_form_again)s</td>
-                    <td align=right><a href="%(weburl)s/search.py?recid=%(recid)s&amp;ln=%(ln)s">Back to search results</a></td>
+                    <td class="reportabuse" align=right><a href="%(weburl)s/search.py?recid=%(recid)s&amp;ln=%(ln)s">(Back to search results)</a></td>
                 </tr>
             </table>
             <br>
@@ -600,7 +617,7 @@ class Template:
                     output += ' <input type="hidden" name="%s" value="%s"/>\n' % (key, value)
             else:
                 output += ' <input type="hidden" name="%s" value="%s"/>\n' % (key, hidden[key])
-        output += '</td><td style="vertical-align: bottom">'
+        output += '</td></tr><tr><td>'
         output += ' <input class="adminbutton" type="submit" value="%s"/>\n' % (button, )
         output += '</td></tr></table>'
         output += '</form>\n'
@@ -653,21 +670,64 @@ class Template:
         from search_engine import print_record
         record_details = print_record(recID=recID, format='hb')
 
+        (msg_formated, max_line_length) = self.format_quote(urllib.unquote(msg))
         warnings = self.tmpl_warnings(warnings)
         form = '''
                 <table width="100%%">
                     <tr><td>Article:</td></tr>
-                    <tr><td>%(record)s<br><br></td></tr>
-                    <tr><td>Your nickname: %(nickname)s<br><br></td></tr>
+                    <tr><td><blockquote>%(record)s<br><br></blockquote></td></tr>
                     <tr><td>Comment:</td></tr>
-                    <tr><td><textarea name="msg" rows=20 cols=80>%(msg)s</textarea></td></tr>
+                    <tr><td><textarea name="msg" rows=20 cols=%(max_line_length)s>%(msg)s</textarea></td></tr>
+                    <tr><td class="reportabuse">Note: Your nickname, <i>%(nickname)s</i>, will be displayed as author of this comment<br></td></tr>
                 </table>
-                <br><br> ''' % { 'msg'      : msg!='None' and urllib.unquote(msg) or "",
-                                 'nickname' : nickname,
-                                 'record'   : record_details                                } 
+                <br><br> ''' % { 'msg'              : msg!="" and msg_formated or "",
+                                 'max_line_length'  : max_line_length>80 and max_line_length or 80,
+                                 'nickname'         : nickname,
+                                 'record'           : record_details                                } 
         form_link = "%(weburl)s/%(module)s/%(function)s?%(arguments)s" % link_dic
         form = self.createhiddenform(action=form_link, method="Post", text=form, button='Add comment')
         return warnings + form
+
+    def format_quote(self, msg):
+        """
+        Formats the msg so that the reply has correctly inserted '>>' characters
+        @return tuple (formated_msg, max_line_length)
+                max_line_length helps to determine optimal size of input field
+        """
+        import string 
+
+        msg = msg.replace('CET:', 'CET:<br>', 1)
+        msg = msg.replace('\n', '')
+        msg = msg.replace('<br>', ' \n ')
+        msg_words = msg.split(' ')
+        final_words = []
+        char_on_this_line = 0
+        previous_word_is_quote = 0
+        max_line_len = 0
+        for word in msg_words:    
+            if word.strip() == '>>':
+                if not previous_word_is_quote:
+                    final_words.append('\n' + '>>')
+                    if char_on_this_line > max_line_len:
+                        max_line_len = char_on_this_line
+                    char_on_this_line = 3
+                    previous_word_is_quote = 1
+                previous_word_is_quote = 1
+                final_words.append('>>')
+                char_on_this_line += 3
+            elif word == '\n':
+                final_words.append('\n' + '>>')
+                if char_on_this_line > max_line_len:
+                    max_line_len = char_on_this_line
+                char_on_this_line = 3
+                previous_word_is_quote = 1
+            else:
+                final_words.append(word)
+                char_on_this_line += len(word) + 1
+                previous_word_is_quote = 0
+
+        msg = string.join(final_words,' ')
+        return (msg, max_line_len)
 
     def tmpl_add_comment_form_with_ranking(self, recID, uid, nickname, ln, msg, score, note, warnings):
         """
@@ -693,24 +753,24 @@ class Template:
         form = '''
                 <table width="100%%">
                     <tr><td>Article: </td></tr>
-                    <tr><td>%(record)s<br><br></td></tr>
-                    <tr><td>Select your score:  <select name=\"score\" size=\"1\"> 
-                                                    <option value=\"0\" selected>None</option>
-                                                    <option value=\"1\">1(worst)</option>
-                                                    <option value=\"2\">2</option>
-                                                    <option value=\"3\">3</option>
-                                                    <option value=\"4\">4</option>
-                                                    <option value=\"5\">5(best)</option>
+                    <tr><td><blockquote>%(record)s<br><br></blockquote></td></tr>
+                    <tr><td>Rate this article: <select name=\"score\" size=\"1\"> 
+                                                    <option value=\"0\" selected>-Select a score-</option>
+                                                    <option value=\"5\">***** (best)</option>
+                                                    <option value=\"4\">****</option>
+                                                    <option value=\"3\">***</option>
+                                                    <option value=\"2\">**</option>
+                                                    <option value=\"1\">*     (worst)</option>
                                                 </select><br><br>
                     </td></tr>
-                    <tr><td>Your nickname: %(nickname)s<br><br></td></tr>
                     <tr><td>Give a title to your review:</td></tr>
                     <tr><td><input type=text name="note" size=80 maxlength=250 value="%(note)s"><br><br></td></tr>
                     <tr><td>Write your review:</td></tr>
                     <tr><td><textarea name="msg" rows=20 cols=80>%(msg)s</textarea></td></tr>
+                    <tr><td class="reportabuse">Note: Your nickname, <i>%(nickname)s</i>, will be displayed as the author of this review<br></td></tr>
                 </table>
-                <br><br>''' % { 'note'      : note!='None' and note or "", 
-                                'msg'       : msg!='None' and msg or "",
+                <br><br>''' % { 'note'      : note!='' and note or "", 
+                                'msg'       : msg!='' and msg or "",
                                 'nickname'  : nickname,
                                 'record'    : record_details    } 
         form_link = "%(weburl)s/%(module)s/%(function)s?%(arguments)s" % link_dic
@@ -900,35 +960,3 @@ class Template:
         <table>''' % (table_rows)
 
         return out
-
-    def createhiddenform(self, action="", method="Get", text="", button="confirm", cnfrm='', **hidden):
-        """
-        create select with hidden values and submit button
-        @param action: name of the action to perform on submit
-        @param method: 'get' or 'post'
-        @param text: additional text, can also be used to add non hidden input
-        @param button: value/caption on the submit button
-        @param cnfrm: if given, must check checkbox to confirm
-        @param **hidden: dictionary with name=value pairs for hidden input
-        @return html form
-        """
-        
-        output  = '<form action="%s" method="%s">\n' % (action, string.lower(method).strip() in ['get','post'] and method or 'Get')
-        output += '<table>\n<tr><td style="vertical-align: top">'
-        output += text
-        if cnfrm:
-            output += ' <input type="checkbox" name="confirm" value="1"/>'
-        for key in hidden.keys():
-            if type(hidden[key]) is list:
-                for value in hidden[key]:
-                    output += ' <input type="hidden" name="%s" value="%s"/>\n' % (key, value)
-            else:
-                output += ' <input type="hidden" name="%s" value="%s"/>\n' % (key, hidden[key])
-        output += '</td><td style="vertical-align: bottom">'
-        output += ' <input class="adminbutton" type="submit" value="%s"/>\n' % (button, )
-        output += '</td></tr></table>'
-        output += '</form>\n'
-        
-        return output
-
-
