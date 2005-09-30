@@ -113,7 +113,6 @@ class Manager:
         self.first_visible_line = 0
         self.move_mode = 0
         self.auto_mode = 0
-        self.bibsched_daemon_id = 0
         self.currentrow = ["","","","","","",""]
         wrapper( self.start )
         
@@ -329,17 +328,16 @@ class Manager:
 
     def change_auto_mode(self):
         if self.auto_mode:
-            if self.bibsched_daemon_id != 0:
-                os.kill(self.bibsched_daemon_id,signal.SIGKILL)
-                Log("daemon stopped")
-            else:
-                self.display_in_footer('Cannot find daemon process')
+            program = os.path.join( bindir, "bibsched")
+            COMMAND = "%s -q stop" % program
+            os.system(COMMAND)
+
             self.auto_mode = 0
         else:
             program = os.path.join( bindir, "bibsched")
-            COMMAND = "%s -d &" % program
+            COMMAND = "%s -q start" % program
             os.system(COMMAND)
-            self.bibsched_daemon_id = get_my_pid("bibsched","-d")
+
             self.auto_mode = 1
             self.move_mode = 0
         self.stdscr.refresh()
@@ -459,9 +457,7 @@ class Manager:
         curses.panel.update_panels()
         self.height,self.width = stdscr.getmaxyx()
         self.stdscr.clear()
-        self.bibsched_daemon_id = get_my_pid("bibsched","-d")
-        if self.bibsched_daemon_id != 0:
-            self.auto_mode = 1
+        if server_pid (): self.auto_mode = 1
         if self.display == 1:
             where = "and status='DONE'"
             order = "DESC"
@@ -618,61 +614,43 @@ General options:
 
 import pwd, grp
 
-prefix = '@prefix@'
-
+prefix  = '@prefix@'
 pidfile = os.path.join (prefix, 'var', 'run', 'bibsched.pid')
-etcfile = os.path.join (prefix, 'etc', 'bibsched', 'config')
-
-
-bibsched_config = {
-    'user':  'cdsware',
-    'group': 'cdsware',
-    }
-
 
 def error (msg):
     print >> sys.stderr, "error: " + msg
     sys.exit (1)
 
 
-# Fetch the user and group from the configuration file
-try:
-    lines = [ line for line in open (etcfile)
-              if line.strip () and line [0] != '#' ]
-except IOError:
-    print >> sys.stderr, "warning: no configuration file %s" % etcfile
-    lines = []
-    
-for line in lines:
-    key, value = [ element.strip () for element in line.split ('=') ]
-    bibsched_config [key] = value
+def server_pid ():
+    # The pid must be stored on the filesystem
+    try:
+        pid = int (open (pidfile).read ())
+    except IOError:
+        return None
+
+    # Even if the pid is available, we check if it corresponds to an
+    # actual process, as it might have been killed externally
+    try:
+        os.kill (pid, signal.SIGCONT)
+    except OSError:
+        return None
+
+    return pid
 
 
-try:
-    uid = pwd.getpwnam (bibsched_config ['user'])  [2]
-except KeyError, msg:
-    error ("invalid bibsched user name: %s" % msg)
-    
-try:
-    gid = grp.getgrnam (bibsched_config ['group']) [2]
-except KeyError, msg:
-    error ("invalid bibsched group name: %s" % msg)
-
-
-def start ():
+def start (verbose = True):
     """ Fork this process in the background and start processing
     requests. The process PID is stored in a pid file, so that it can
     be stopped later on."""
-    
-    sys.stdout.write ("starting bibsched: ")
-    sys.stdout.flush ()
-    
-    try:
-        pid = int (open (pidfile).read ())
+
+    if verbose:
+        sys.stdout.write ("starting bibsched: ")
+        sys.stdout.flush ()
+
+    pid = server_pid ()
+    if pid:
         error ("another instance of bibsched (pid %d) is running" % pid)
-        
-    except IOError:
-        pass
     
     # start the child process using the "double fork" technique
     pid = os.fork ()
@@ -684,13 +662,12 @@ def start ():
     pid = os.fork ()
     
     if pid > 0:
-        sys.stdout.write ('pid %d\n' % pid)
+        if verbose:
+            sys.stdout.write ('pid %d\n' % pid)
+        
         open (pidfile, 'w').write ('%d' % pid)
         return
 
-    os.setregid (gid, gid)
-    os.setreuid (uid, uid)
-    
     sys.stdin.close ()
     redirect_stdout_and_stderr ()
 
@@ -700,66 +677,75 @@ def start ():
     
     return
 
-def stop ():
-    try:
-        pid = int (open (pidfile).read ())
-    except IOError:
+def stop (verbose = True):
+
+    pid = server_pid ()
+    if not pid:
         error ('bibsched seems not to be running.')
     
     try: os.kill (pid, signal.SIGINT)
     except OSError:
         print >> sys.stderr, 'no bibsched process found'
-    
-    print "stopping bibsched: pid %d" % pid
+
+    if verbose: print "stopping bibsched: pid %d" % pid
     os.unlink (pidfile)
     return
 
-def monitor ():
+
+def monitor (verbose = True):
     redirect_stdout_and_stderr()
     manager = Manager ()
     return
 
-def restart ():
-    stop  ()
-    start ()
+
+def restart (verbose = True):
+    stop  (verbose)
+    start (verbose)
     return
 
 
 def main():
+    verbose = True
+
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hVd", ["--help","--version","--daemon"])
+        opts, args = getopt.getopt(sys.argv[1:], "hVdq", [
+            "--help","--version","--daemon", "--quiet"])
     except getopt.GetoptError, err:
         Log ("Error: %s" % err)
         usage(1, err)
 
-    if not opts:
-        try:  cmd = args [0]
-        except IndexError: cmd = 'monitor'
-        
-        try:
-            { 'start':   start,
-              'stop':    stop,
-              'restart': restart,
-              'monitor': monitor } [cmd] ()
+    for opt, arg in opts:
+        if opt in ["-h", "--help"]:
+            usage (0)
 
-        except KeyError:
-            usage (1, 'unkown command: %s' % `cmd`)
-            
-    else:
-        opt = opts[0] # we shall choose only the first option
-        if opt[0] in ["-h", "--help"]:
-            usage(0)
-        elif opt[0] in ["-V", "--version"]:
+        elif opt in ["-V", "--version"]:
             print __version__
             sys.exit(0)
-        elif opt[0] in ["-d", "--daemon"]:
-            redirect_stdout_and_stderr()
+
+        elif opt in ["-d", "--daemon"]:
+            redirect_stdout_and_stderr ()
             sched = BibSched()
             Log("daemon started")
             sched.watch_loop()
+
+        elif opt in ['-q', '--quiet']:
+            verbose = False
+
         else:
             usage(1)
-    sys.stderr.close()
+
+    try:  cmd = args [0]
+    except IndexError: cmd = 'monitor'
+
+    try:
+        { 'start':   start,
+          'stop':    stop,
+          'restart': restart,
+          'monitor': monitor } [cmd] (verbose)
+
+    except KeyError:
+        usage (1, 'unkown command: %s' % `cmd`)
+            
     return
     
 if __name__ == '__main__':
