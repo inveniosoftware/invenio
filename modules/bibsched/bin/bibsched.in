@@ -665,6 +665,7 @@ def start (verbose = True):
         if verbose:
             sys.stdout.write ('pid %d\n' % pid)
         
+        Log ("daemon started (pid %d)" % pid)
         open (pidfile, 'w').write ('%d' % pid)
         return
 
@@ -672,7 +673,6 @@ def start (verbose = True):
     redirect_stdout_and_stderr ()
 
     sched = BibSched()
-    Log ("daemon started")
     sched.watch_loop ()
     
     return
@@ -683,9 +683,11 @@ def stop (verbose = True):
     if not pid:
         error ('bibsched seems not to be running.')
     
-    try: os.kill (pid, signal.SIGINT)
+    try: os.kill (pid, signal.SIGKILL)
     except OSError:
         print >> sys.stderr, 'no bibsched process found'
+
+    Log ("daemon stopped (pid %d)" % pid)
 
     if verbose: print "stopping bibsched: pid %d" % pid
     os.unlink (pidfile)
