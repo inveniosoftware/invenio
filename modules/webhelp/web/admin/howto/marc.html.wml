@@ -30,7 +30,7 @@ Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
 <p>All the bibliographic data in the CDSware system are
 internally represented in the <a
-href="http://www.itsmarc.com/crs/bib0001.htm">MARC 21</a> format.
+href="http://www.loc.gov/marc/bibliographic/">MARC 21</a> format.
 There are several good reasons for this:
 
 <ul>
