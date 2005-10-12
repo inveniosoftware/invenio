@@ -521,15 +521,11 @@
          
                   if(mysql_affected_rows() == 1)
                   {
-                     # Perfect!  1 row deleted as expected.
+                     # 1 row deleted as expected.
 
-		     # We must unlock our table...
+		     # unlock table
     	             $unlockRes = mysql_query("UNLOCK TABLES");
 
-                     print("<SCRIPT TYPE='text/javascript'>\nalert('"
-			. " Function deleted from action.');\n<"
-			. "/SCRIPT>\n");
-            
                      # Mail the admin.  
                      # Get the current date and time...
                      $dateDets = getdate();
@@ -543,19 +539,17 @@
                      . $dateDets['month'] . " " .  $dateDets['year']
                      . ", at " . $dateDets['hours'] . ":"
                      . $dateDets['minutes'] . ".\n\nWebSubmit Administrator.";
-             
-                     # Send the message...
                      mail(ADMIN_EMAIL, "${action}.${doctype}.$function "
                               . "function Deletion", $msgTxt,
                                             "From: WebSubmit_Administrator");
                   } // END if
                   elseif(mysql_affected_rows() > 1)
                   {
-                     # Hmmm!  We seem to have deleted more than 1 row.
+                     # deleted more than 1 row.
 		     # Maybe we had a function in twice with exactly the
-		     # same dets or something?
+		     # same details?
                 
-                     # We must unlock our table...
+                     # unlock table...
                      $unlockRes = mysql_query("UNLOCK TABLES");
                      # Free the lock & unlock query results...
                      mysql_free_result($lockRes);
@@ -570,9 +564,7 @@
                   } // END elseif
                   else
                   {
-                     # Ahhhhhh!  We have deleted no function!
-                  
-                     # We must unlock our table...
+                     # deleted no function!
                      $unlockRes = mysql_query("UNLOCK TABLES");
 
                      print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR:"
@@ -584,8 +576,6 @@
                else
                {
                   # Deletion query failed.
-
-                  # We must unlock our table...
                   $unlockRes = mysql_query("UNLOCK TABLES");
                   
                   print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR: "
