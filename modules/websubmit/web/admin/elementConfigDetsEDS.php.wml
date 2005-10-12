@@ -45,9 +45,6 @@
          function, passing the relevant params to it, and makes the submit
          button to pass the relevant params to the function.
 
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
-                 ca8nro@yahoo.co.uk
          Created:       06/12/2000
          Last Modified: 28/01/2001
       ***************************************************************/
@@ -420,7 +417,7 @@
             } // END if
             elseif($leType == "I")
             {
-               # We can draw a normal HTML input...
+               # normal HTML input...
                
                print("<INPUT TYPE='text' SIZE=" . $dataRow["size"]  
                 . " VALUE='"
@@ -430,7 +427,7 @@
             } // END elseif
             elseif($leType == "H")
             {
-               # We can simply say that it is a hidden input field...
+               # say that it is a hidden input field...
                
                print("<DIV STYLE='color: green; text-align: center; "     
                 . "font-weight: bold; font-size: medium'>Hidden Input."   
@@ -441,14 +438,14 @@
             } // END elseif
             elseif($leType == "F")
             {
-               # We can display a File input...
+               # display a File input...
                
                print("<INPUT TYPE='file' SIZE=" . $dataRow["size"]  
                 . ">\n");
             } // END elseif
             elseif($leType == "D")
             {
-               # We can display the user defined item - whatever it is
+               # display the user defined item - whatever it is
 
                if($dataRow["fidesc"] != "")
                {
@@ -464,7 +461,7 @@
             } // END elseif
             elseif($leType == "S")
             {
-               # We can display the select box
+               # display the select box
 
                if($dataRow["fidesc"] != "")
                {
@@ -480,7 +477,7 @@
             } // END elseif
             elseif($leType == "R")
             {
-               # We cannot display the response element
+               # cannot display the response element
 
                print("<SPAN STYLE=\"color: green; font-size: medium; "
                    . "text-align: center; font-weight: bold\">Response "
@@ -494,20 +491,20 @@
                 . "Element Type.  Cannot Display.</DIV>\n");
             } // END else
                
-            # Close up form & table stuff...
+            # Close up form & table
             print("</TD>\n</TR>\n</TABLE>\n</FORM>\n");
 
             # Make a horizontal rule to divide the page sections...
             drawSeparator();
        
-            # Now, we are ready to display the details of the given
+            # ready to display the details of the
             # element description in a form within a table.  Each field of
             # the element description will be contained within a form  
             # input box so that it can be edited if this is desirable.
 
-            # Now let us begin allowing the user to edit certain fields
+            # begin allowing the user to edit certain fields
             # Element type (Will be a combo box, that allows you to change
-            # the type of the element...
+            # the type of the element
 
             print("<FORM ACTION='elementConfigDetsEDS.php' METHOD='post'>"
             . "\n<INPUT TYPE='hidden' NAME='changeType' VALUE='true'>\n" 
@@ -515,7 +512,7 @@
             . "<INPUT TYPE='hidden' NAME='name' VALUE='"
             . $dataRow["name"] . "'>\n");
 
-            # Add extra fields (if necessary)...
+            # Add extra fields (if necessary)
             if($caller == "pageDetsEDS.php")
             {
                print("<INPUT TYPE='hidden' NAME='subname' VALUE='"
@@ -536,7 +533,6 @@
             print("<OPTION ");
             if($dataRow["type"] == "D")
             {
-               # D was already selected...
                print("SELECTED ");
             } // END if
             print("VALUE='D'>User Defined Input</OPTION>\n");
@@ -545,7 +541,6 @@
             print("<OPTION ");
             if($dataRow["type"] == "S")
             {
-               # S was already selected...
                print("SELECTED ");
             } // END if
             print("VALUE='S'>Select Box</OPTION>\n");
@@ -554,7 +549,6 @@
             print("<OPTION ");
             if($dataRow["type"] == "F")
             {
-               # F was already selected...
                print("SELECTED ");
             } // END if
             print("VALUE='F'>File Input</OPTION>\n");
@@ -563,7 +557,6 @@
             print("<OPTION ");
             if($dataRow["type"] == "H")
             {
-               # H was already selected...
                print("SELECTED ");
             } // END if
             print("VALUE='H'>Hidden Input</OPTION>\n");
@@ -572,7 +565,6 @@
             print("<OPTION ");
             if($dataRow["type"] == "I")
             {
-               # I was already selected...
                print("SELECTED ");
             } // END if
             print("VALUE='I'>Text Input</OPTION>\n");
@@ -581,7 +573,6 @@
             print("<OPTION ");
             if($dataRow["type"] == "R")
             {
-               # I was already selected...
                print("SELECTED ");
             } // END if
             print("VALUE='R'>Response</OPTION>\n");
@@ -590,13 +581,12 @@
             print("<OPTION ");
             if($dataRow["type"] == "T")
             {
-               # T was already selected...
                print("SELECTED ");
             } // END if
             print("VALUE='T'>Text Area Element</OPTION>\n</SELECT>\n</TD>"
             . "\n</TR>\n</TABLE>\n</FORM>\n");
 
-            # Now make the main form...
+            # Now make main form
             print("<FORM ACTION='elementConfigDetsEDS.php' METHOD='post'>"
             . "\n<INPUT TYPE='hidden' NAME='update' VALUE='true'>\n"
             . "<INPUT TYPE='hidden' NAME='caller' VALUE='$caller'>\n"
@@ -605,7 +595,7 @@
             . "<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0 ALIGN='center"
             . "' WIDTH='100%'>\n");
          
-            # Now make the table: names & fields...
+            # Now make the table: names & fields
 
             # Get the columns list
             $columns =  mysql_list_fields(DOCS_DATABASE, "sbmFIELDDESC");  
@@ -633,7 +623,7 @@
             . "#FFFFCC'><INPUT TYPE='readonly' NAME='md' VALUE='"
             . $dataRow["md"] . "'>\n</TD>\n</TR>\n";
 
-            # Now make the alephcode field...
+            # Now make the alephcode field
             $tblHead .= "<TR>\n<TH "
             . "BGCOLOR='#87CEFA' ALIGN='right' WIDTH='20%'>\nAleph Code:"
             . "&nbsp;</TH>\n<TD ALIGN='left' BGCOLOR='#FFFFCC' WIDTH='80%"
@@ -641,7 +631,7 @@
             . $dataRow["alephcode"] . "' SIZE="
             . mysql_field_len($columns, 1) . ">\n</TD>\n</TR>\n";
 
-            # Now make the marccode field...
+            # Now make the marccode field
             $tblHead .= "<TR>\n<TH "
             . "BGCOLOR='#87CEFA' ALIGN='right' WIDTH='20%'>\nMarc Code:"
             . "&nbsp;</TH>\n<TD ALIGN='left' BGCOLOR='#FFFFCC' WIDTH='80%"
@@ -649,7 +639,7 @@
             . $dataRow["marccode"] . "' SIZE="
             . mysql_field_len($columns, 2) . ">\n</TD>\n</TR>\n";
 
-            # Now make the modifytext field...
+            # Now make the modifytext field
             $tblHead .= "<TR>\n<TH "
             . "BGCOLOR='#87CEFA' ALIGN='right' WIDTH='20%'>\nModification Text:"
             . "&nbsp;</TH>\n<TD ALIGN='left' BGCOLOR='#FFFFCC' WIDTH='80%"
@@ -657,8 +647,8 @@
             . $dataRow["modifytext"] . "' SIZE="
             . mysql_field_len($columns, 2) . ">\n</TD>\n</TR>\n";
 
-            # Now it is possible to show the rest of the data that will be
-            # editable.  The key thing to pay attention to here is
+            # it is possible to show the rest of the data that will be
+            # editable.
             # elements are a form of html forms input.  This means that
             # there can be several different types of input (text, file,  
             # etc).  Different types of html input use different
@@ -668,7 +658,6 @@
             # remain hidden, as they are not used by this element.  This
             # means that we must test to see what type of element it is, 
             # and then display the relevant fields based upon this
-            # determination.
          
             $elementType = $dataRow["type"];
 
@@ -693,13 +682,12 @@
             
                printCookie($dataRow["cookie"]);
       
-               # Okay, close up the current row (it is actually the last
-               # row)
+               # close up the current row (it is actually the last row)
                print("</TD>\n</TR>\n");
             } // END if
             elseif($elementType == "I")
             {
-               # Our item is a normal html text input
+               # item is a normal html text input
       
                print("$tblHead");
                print("<TR>\n<TH BGCOLOR='#87CEFA' ALIGN='right' WIDTH='"  
@@ -725,13 +713,12 @@
              
                printCookie($dataRow["cookie"]);
       
-               # Okay, close up the current row (it is actually the last
-               # row)
+               # close up the current row (it is actually the last row)
                print("</TD>\n</TR>\n");
             } // END elseif
             elseif($elementType == "H")
             {
-               # Our item is a hidden input field.
+               # item is a hidden input field.
                
                print("$tblHead");
                print("<TR>\n<TH BGCOLOR='#87CEFA' ALIGN='right' WIDTH='" 
@@ -746,13 +733,12 @@
                
                printCookie($dataRow["cookie"]);
 
-               # Okay, close up the current row (it is actually the last 
-               # row)
+               # close up the current row (it is actually the last row)
                print("</TD>\n</TR>\n");
             } // END elseif
             elseif($elementType == "F")
             {
-               # Our item is a file input type.
+               # item is a file input type.
                
                print("$tblHead");
                print("<TR>\n<TH BGCOLOR='#87CEFA' ALIGN='right' WIDTH='"
@@ -772,13 +758,12 @@
          
                printCookie($dataRow["cookie"]);
                
-               # Okay, close up the current row (it is actually the last
-               # row)
+               # close up the current row (it is actually the last row)
                print("</TD>\n</TR>\n");
             } // END elseif
             elseif($elementType == "D")
             {
-               # Our item is a user defined input type.
+               # item is a user defined input type.
                
                print("$tblHead");
                print("<TR>\n<TH BGCOLOR='#87CEFA' ALIGN='right' WIDTH='"  
@@ -792,13 +777,12 @@
 
                printCookie($dataRow["cookie"]);
 
-               # Okay, close up the current row (it is actually the last
-               # row)
+               # close up the current row (it is actually the last row)
                print("</TD>\n</TR>\n");
             } // END elseif
             elseif($elementType == "R")
             {
-               # Our item is a response input type.
+               # item is a response input type.
                
                print("$tblHead");
                print("<TR>\n<TH BGCOLOR='#87CEFA' ALIGN='right' WIDTH='"  
@@ -810,7 +794,7 @@
             } // END elseif
             elseif($elementType == "S")
             {
-               # Our item is a select box input type.
+               # item is a select box input type.
                
                print("$tblHead");
                print("<TR>\n<TH BGCOLOR='#87CEFA' ALIGN='right' WIDTH='"  
@@ -824,19 +808,9 @@
 
                printCookie($dataRow["cookie"]);
 
-               # Okay, close up the current row (it is actually the last
-               # row)
+               # close up the current row (it is actually the last row)
                print("</TD>\n</TR>\n");
             } // END elseif
-            else
-            {  
-               # Oh dear, this is an element type that is not recognised,
-               # so we don't want to show the details of it (it would be
-               # unsafe to do so, as we wouldn't know which fields were
-               # relevant for showing).  We'll just display an error
-               # message.
-
-            } // END else
                
             print("</TABLE>\n");
                
@@ -861,7 +835,7 @@
             # displayed, display links to all of the other submission
             # pages that use an instance of this element.
 
-            # Make a horizontal rule to divide the page sections...
+            # divide page sections
             drawSeparator();
 
             $othersRes = mysql_query("SELECT subname, pagenb  FROM "
@@ -930,22 +904,21 @@
                   . " Not Used In EDS Submissions</SPAN>\n</TD>\n</TR>");
                } // END else
 
-               # Close the table up...
                print("</TABLE>\n");
 
-               # Make a horizontal rule to divide the page sections...
+               # divide page sections
                drawSeparator();
 
-               # Open a new table, in which to put a "finished" button
+               # finished button:
 
                print("<TABLE ALIGN='center' BORDER=0 CELLSPACING=0 "
                . "CELLPADDING=0>\n<TR>\n<TD ALIGN='center'>\n"
                . "<FORM ACTION='");
 
-               # Send the browser to the correct page...
+               # Send browser to correct page
                if($caller == "pageDetsEDS.php")
                {
-                  # In this case, we need to pass back all of the extra
+                  # pass back all of the extra
                   # info that is needed for going back to a given page of
                   # a given submission
 
@@ -958,7 +931,7 @@
                } // END if
                else
                {
-                  # Came from allElementsEDS.php area, so go back!
+                  # Came from allElementsEDS.php area, so go back
 
                   print("allElementsEDS.php' METHOD='post'>\n");
                } // END else
@@ -967,16 +940,16 @@
                . "VALUE='FINISHED' onClick=\"submit();\">\n</TD>\n</FORM>"
                . "\n</TR>\n</TABLE>\n</P>\n");
 
-               # Free the query result used to get these links...
+               # Free query result
                mysql_free_result($othersRes);
             } // END if
          } // END if
          elseif(mysql_num_rows($queryResult) > 1)
          {     
-            # In this case, there are more than 1 row for the given
+            # more than 1 row for the
             # element DESCRIPTION stored in the sbmFIELDDESC table, which
             # means that the sbmFIELDDESC table must have some kind of 
-            # primary key violations..
+            # primary key violations
             
             print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">ERROR:"
             . "</SPAN> More than one row of data concerning the element "
@@ -1000,17 +973,16 @@
             $msgTxt .= makeDate();
             $msgTxt .= ")";
             
-            # Now send the mail..
             mail(ADMIN_EMAIL, "sbmFIELDDESC Table Possible Key Violation!",
                         $msgTxt, "From: WebSubmit_Administrator");
          } // END elseif
          elseif(mysql_num_rows($queryResult) == 0)
          {
-            # This means that the given element DESCRIPTION has no entry
+            # element DESCRIPTION has no entry
             # in the sbmFIELDDESC table.  This is a problem, as a link was
             # clicked to get to this element, so there are references
             # (probably element instances of it) somewhere in EDS, when
-            # the description of it doesn't exist.  In short, this is a
+            # the description of it doesn't exist.  this is a
             # data inconsistency problem.
       
             print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">"
@@ -1021,7 +993,7 @@
             . "system administrator.</P>\n");
          
             # Now send an email to the administrator(s) to inform them of
-            # this serious error...
+            # this error
             
             $msgTxt = "When the elementConfigDetsEDS.php script attempted"
             . " to retrieve the details of the $name element description,"
@@ -1036,7 +1008,6 @@
             $msgTxt .= makeDate();
             $msgTxt .= ")";
          
-            # Now send the mail..
             mail(ADMIN_EMAIL, "Possible Data Inconsistency Error!",
                                  $msgTxt, "From: WebSubmit_Administrator");
          } // END elseif
@@ -1051,13 +1022,13 @@
             . ".<BR>Please inform system administrator.</P>\n");
          } // END else
             
-         # Now, free the query result, as it is no longer needed...
+         # free query result
          mysql_free_result($queryResult);
       } // END if
       else
       {
          # In this case, the query failed, so we must display the relevant
-         # error message...
+         # error message
             
          print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">"
          . "ERROR:</SPAN> Unable to conduct a query on the "
@@ -1073,7 +1044,7 @@
 
       # Conduct a test to see if this is the first call to this page, or a
       # recursive call whereby the user is attempting to update the
-      # element descriptions details...
+      # element descriptions details
 
       if($update)
       {
@@ -1082,47 +1053,47 @@
 
          $updtStr = "UPDATE sbmFIELDDESC SET ";
 
-         # Now, it is necessary to determine what kind of element we are
+         # determine what kind of element we are
          # actually updating here, as we only need to amend certain fields
-         # for certain elements, and not for others etc.
+         # for certain elements
 
          if($type == "T")
          {
-            # In this case, the element is a <TEXTAREA> element.
+            # <TEXTAREA> element.
 
             $updtStr .="rows = '$rows', cols = '$cols', cookie = "
                   . "'$cookie', alephcode = '$alephcode', marccode = '$marccode', modifytext = '$modifytext'";
          } // END if
          elseif($type == "I")
          {
-            # Our item is a normal html text input
+            # normal html text input
             $updtStr .= "size = '$size', maxlength = '$maxlength', val = "
             . "'$val', cookie = '$cookie', alephcode = '$alephcode', marccode = '$marccode', modifytext = '$modifytext'";
          } // END elseif
          elseif($type == "H")
          {
-            # Our item is a hidden input field.
+            # hidden input field.
             $updtStr .= "val = '$val', cookie = '$cookie', alephcode = '$alephcode', marccode = '$marccode', modifytext = '$modifytext'";
          } // END elseif
          elseif($type == "F")
          {
-            # Our item is a file input type.
+            # file input type.
             $updtStr .= "size = '$size', maxlength = '$maxlength', cookie"
             . " = '$cookie', alephcode = '$alephcode', marccode = '$marccode', modifytext = '$modifytext'";
          } // END elseif
          elseif($type == "D")
          {
-            # Our item is a user defined input type.
+            # user defined input type.
             $updtStr .= "fidesc = '$fidesc', cookie = '$cookie', alephcode = '$alephcode', marccode = '$marccode', modifytext = '$modifytext'";
          } // END elseif
          elseif($type == "R")
          {
-            # Our item is a response input type.
+            # response input type.
             $updtStr .= "fidesc = '$fidesc', alephcode = '$alephcode', marccode = '$marccode', modifytext = '$modifytext'";
          } // END elseif
          elseif($type == "S")
          {
-            # Our item is a select box input type.
+            # select box input type.
             $updtStr .= "fidesc = '$fidesc', cookie = '$cookie', alephcode = '$alephcode', marccode = '$marccode', modifytext = '$modifytext'";
          } // END elseif
          else
@@ -1140,16 +1111,13 @@
             # display an error message, and redirect the page to
             # pageDetsEDS.php.
 
-            print("<SCRIPT TYPE='text/javascript'>alert('Unknown Element "
-            . "Type.  No Update Carried Out.');</SCRIPT>\n");
-
             print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
             . "ERROR:</SPAN> Invalid Element Type.  Cannot Update."
             . "</P>\n");
 
             print("<FORM ACTION='");
 
-            # Send the browser to the relevant page...
+            # Send the browser to the relevant page
             if($caller == "pageDetsEDS.php")
             {
                print("pageDetsEDS.php' METHOD='post' "
@@ -1174,10 +1142,8 @@
          } // END if
          else
          {
-            # Continue making the query string...
-
             # Get the data, so that it can be committed for the
-            # modification date field (md)...
+            # modification date field (md)
             $dateDets = getdate();
 
             # Now put the date into a variable in a nice MySQL friendly
@@ -1188,20 +1154,16 @@
             $updtStr .= ", md = '$modifiedDate'  WHERE name = '$name'";
 
             # Now execute the query, and take the relevant action based
-            # upon its result...
+            # upon its result
 
             $updtRes = mysql_query($updtStr);
 
             if($updtStr)
             {
-               # In this case, the update has been executed successfully
+               # update has been executed successfully
 
-               # If the query could actually be executed without error
                if(mysql_affected_rows() == 1)
                {
-                  # In this case, only 1 row was updated, which is as
-                  # expected
-
                   # Display a nice message informing the user that the
                   # update has been carried out...
                   print("<P STYLE=\"color: green; text-align: center; "
@@ -1209,7 +1171,7 @@
                   . "Description Modification Complete</P>\n");
 
                   # Send the administrator a message to inform them of the
-                  # update that has taken place...
+                  # update that has taken place
 
                   $msgTxt = "An update has been carried out on the $name"
                   . " element description in the " . DOCS_DATABASE
@@ -1218,7 +1180,6 @@
                   $msgTxt .= makeDate();
                   $msgTxt .= ")";
 
-                  # Now send the mail..
                   mail(ADMIN_EMAIL, "$name Element Description Updated",
                                  $msgTxt, "From: WebSubmit_Administrator");
 
@@ -1226,7 +1187,7 @@
                   # showing the details of the element as it appears
                   # on the given submission type, or simply redisplay the
                   # form with the elements details in it if this came from
-                  # the allElementsEDS.php area...
+                  # the allElementsEDS.php area
 
                   print("<FORM ACTION='");
 
@@ -1287,14 +1248,12 @@
                   $msgTxt .= makeDate();
                   $msgTxt .= ")";
 
-                  # Now send the mail..
                   mail(ADMIN_EMAIL, "ERROR: sbmFIELDDESC Table Multiple Row"
                     . " Update!", $msgTxt, "From: WebSubmit_Administrator");
                } // END elseif
                else
                {
-                  # No rows were updated -> Something strange here!
-
+                  # No rows were updated
                   # Display an error message about this...
                   print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">"
                   . "ERROR:</SPAN> No rows have been updated in the "
@@ -1303,7 +1262,7 @@
                   . "problems.<BR>Please inform the system administrator"
                   . ".</P>\n");
 
-                  # Better email the administrator & let them know...
+                  # email the administrator & let them know...
                   $msgTxt = "When a user attempted to update the details"
                   . " of the $name element description using the EDS "
                   . "Administrator, no rows were affected in the sbmFIELDDE"
@@ -1319,7 +1278,6 @@
                   $msgTxt .= makeDate();
                   $msgTxt .= ")";
 
-                  # Now send the mail..
                   mail(ADMIN_EMAIL, "Error: Possible Concurrency "
                      . "Problems", $msgTxt, "From: WebSubmit_Administrator");
                } // END else
@@ -1340,19 +1298,17 @@
       } // END if
       elseif(isset($changeType))
       {
-         # In this case, we are changing the element type of the element,
+         # we are changing the element type of the element,
          # so we must update the type to the new type, then redisplay the
          # form.
-
-         # Free wasted space...
          unset($changeType);
 
-         # Now we must update the type of the element to be whatever was
+         # update the type of the element to be whatever was
          # selected.
 
          if($type == "UNKNOWN_TYPE")
          {
-            # In this case, we can simply redisplay the form, as the user
+            # simply redisplay the form, as the user
             # has attempted to set the element type to unknown.
 
             if($caller == "pageDetsEDS.php")
@@ -1373,8 +1329,7 @@
          } // END if
          else
          {
-            # In this case, the element is ready for updating to the new
-            # type...
+            # element is ready for updating to the new type
 
             # Get the data, so that it can be committed for the
             # modification date field (md)...
@@ -1388,7 +1343,7 @@
             $chTypeQ = "UPDATE sbmFIELDDESC SET type = '$type', "
              . "md = '$modifiedDate'";
 
-            # We need to check if the fields concerned with each row are
+            # check if the fields concerned with each row are
             # blank, and if so, add some default values to them.
             # Therefore, we must query the sbmFIELDDESC table.
 
@@ -1397,9 +1352,6 @@
 
             if($valsRes)
             {
-               # Query successful
-
-               # Read in the result!!!!!
                $valsRow = mysql_fetch_array($valsRes);
 
                if($type == "F" || $type == "I")
@@ -1415,14 +1367,14 @@
 
                   if($valsRow["maxlength"] == "")
                   {
-                     # No val for maxlength, so give it one!
+                     # No val for maxlength, so give it one
                      $chTypeQ .= ", maxlength = '" . DEFAULT_MAXLENGTH
                        . "'";
                   } // END if
                } // END if
                elseif($type == "T")
                {
-                  # We are changing the element to a <textarea> field..
+                  # changing the element to a <textarea> field..
 
                   if($valsRow["rows"] == "")
                   {
@@ -1436,20 +1388,12 @@
                      $chTypeQ .= ", cols = '" . DEFAULT_COLS . "'";
                   } // END if
                } // END elseif
-               # (There is no "else", as our select list forbids illegal
-               #  values) - (Also, the other element types can't have
-               # defaults)
 
-               # Free now wasted result space...
                mysql_free_result($valsRes);
             } // END if
-            # (No else, as if the query didn't work, we will simply not
-            # give the element any default values, hence taking chances as
-            # to whether or not the element can be displayed).
 
             $chTypeQ .= " WHERE name = '$name'";
 
-            # Now execute our query.
             $chTypeQres = mysql_query($chTypeQ);
 
             if(!$chTypeQres)
@@ -1462,11 +1406,9 @@
             } // END if
             else
             {
-               # Good.  The query worked.
-
                if(mysql_affected_rows() < 1)
                {
-                  # Hmmmm.  No update has been made.  Better just tell the
+                  # No update has been made.  Better just tell the
                   # user & redisplay the form
 
                   print("<SCRIPT TYPE='text/javascript'>\nalert('Unable "
@@ -1474,7 +1416,7 @@
                } // END if
                elseif(mysql_affected_rows() > 1)
                {
-                  # Damn.  More than 1 row was affected.
+                  # More than 1 row was affected.
                   print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR: "
                    . "Multiple Element Descriptions Updated');\n"
                    . "</SCRIPT>\n");
@@ -1486,19 +1428,15 @@
                    . "the sbmFIELDDESC table.\n\nWebSubmit Administrator ("
                    . makeDate() . ")";
             
-                  # Now send the mail..
                   mail(ADMIN_EMAIL, "Error: $name Element Desc - Multiple"
                      . " Updates", $msgTxt, "From: WebSubmit_Administrator");
                } // END elseif
                else
                {
-                  # Cool! 1 element - 1 row - 1 update!
-
                   $msgTxt = "The type of the $name element description in"
                    . " the " . DOCS_DATABASE . " database, has been "
                    . "changed.\n\nWebSubmit Administrator (" . makeDate() . ")";
 
-                  # Now send the mail..
                   mail(ADMIN_EMAIL, "$name Element Desc Type Change",
                                       $msgTxt, "From: WebSubmit_Administrator");
                } // END else
