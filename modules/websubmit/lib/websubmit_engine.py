@@ -297,6 +297,9 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             # if there is a <YYYY> tag in it, replace it by the current year
             year = time.strftime("%Y");
             text = text.replace("<YYYY>",year)
+            # if there is a <TODAY> tag in it, replace it by the current year
+            today = time.strftime("%d/%m/%Y");
+            text = text.replace("<TODAY>",today)
             fieldhtml.append(text)
         else:
             select.append(0)
