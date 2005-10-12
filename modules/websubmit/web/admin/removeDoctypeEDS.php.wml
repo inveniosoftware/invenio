@@ -47,9 +47,6 @@
 
          if($q1Res)
          {
-            # Cool, query worked.  Now for each of the subnames, delete
-            # all of its elements.
-
             while($sub = mysql_fetch_array($q1Res))
             {
                # Delete all elements & pages for the given submission.
@@ -60,10 +57,9 @@
 
                if(!$q2Res)
                {
-                  # Bad.  Query failed.  Output the detailed error message
-                  # on the screen.
-
-                  print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR:"
+                  # Query failed. Output detailed error message
+  
+                  print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR:"
                   . "\\n\\nIt was not possible to conduct a delete query"
                   . " in order to remove any rows belonging to the "
                   . $sub["subname"] . " submission\\nof the $doc2delete "
@@ -84,9 +80,9 @@
 
             if(!$q3Res)
             {
-               # Bad, query didn't work.  Alert the user.
+               # query failed
 
-               print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR:\\n"
+               print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR:\\n"
                . "\\nIt was not possible to conduct a delete query in "
                . "order to remove any rows belonging to the $doc2delete"
                . " document type from the sbmIMPLEMENT table.\\nWhen the "
@@ -97,16 +93,16 @@
             } // END if
 
             # Now delete the record of the doctype from the "sbmCATEGORIES"
-            # table...
+            # table
             $q4Res = mysql_query("DELETE FROM sbmCATEGORIES WHERE doctype = "
             . "'$doc2delete'");
 
             if(!$q4Res)
             {
-               # Oh dear.  Unable to delete the doctypes dets from the
-               # sbmCATEGORIES table.  Alert the user.
+               # Unable to delete doctype details from
+               # sbmCATEGORIES table. Alert user
 
-               print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR:\\n"
+               print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR:\\n"
                . "\\nIt was not possible to conduct a delete query in "
                . "order to remove any rows belonging to the $doc2delete "
                . "document type from the sbmCATEGORIES table.\\nWhen the "
@@ -125,7 +121,7 @@
             {
                # Unable to delete.  Alert the user.
 
-               print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR:\\n"
+               print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR:\\n"
                . "\\nIt was not possible to delete the functions\\nof the "
                . "$doc2delete document type from the functions table.\\n"
                . "\\nThis means that it will be necessary to manually "
@@ -140,9 +136,9 @@
 
             if(!$q7Res)
             {
-               # Unable to delete.  Alert the user.
+               # Unable to delete. Alert the user.
 
-               print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR:\\n"
+               print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR:\\n"
                . "\\nIt was not possible to delete the parameters\\nof the "
                . "$doc2delete document type from the parameters table.\\n"
                . "\\nThis means that it will be necessary to manually "
@@ -157,9 +153,9 @@
 
             if(!$q8Res)
             {
-               # Unable to delete.  Alert the user.
+               # Unable to delete. Alert the user.
 
-               print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR:\\n"
+               print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR:\\n"
                . "\\nIt was not possible to delete the details\\nof the "
                . "$doc2delete document type from the sbmSUBMISSIONS table.\\n"
                . "\\nThis means that it will be necessary to manually "
@@ -174,9 +170,9 @@
 
             if(!$q9Res)
             {
-               # Unable to delete.  Alert the user.
+               # Unable to delete. Alert the user.
 
-               print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR:\\n"
+               print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR:\\n"
                . "\\nIt was not possible to delete the details\\nof the "
                . "$doc2delete document type from the sbmCOLLECTION_sbmDOCTYPE table.\\n"
                . "\\nThis means that it will be necessary to manually "
@@ -192,9 +188,9 @@
             if(!$q5Res)
             {
                # Unable to delete the record of the doctype from the
-               # sbmDOCTYPE table.  Alert the user.
+               # sbmDOCTYPE table. Alert the user.
 
-               print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR:\\n"
+               print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR:\\n"
                . "\\nIt was not possible to delete the details\\nof the "
                . "$doc2delete document type from the sbmDOCTYPE table.\\n"
                . "\\nThis means that it will be necessary to manually "
@@ -202,15 +198,12 @@
                . "$doc2delete doctype.');\n</SCRIPT>\n");
             } // END if
 
-            # Our work here is done, so we can alert the user of this, and
-            # then redirect the browser to the "home page".
-
             print("<P STYLE=\"text-size: medium; color: green; text-align"
             . ": center; font-weight: bold\">The $doc2delete document typ"
             . "e has been deleted from the " . DOCS_DATABASE
             . " database.</P>\n");
 
-            print("<SCRIPT TYPE='text/javascript'>\nalert('The "
+            print("<SCRIPT TYPE=\"text/javascript\">\nalert('The "
             . "$doc2delete document type has been deleted from the "
             . DOCS_DATABASE . " database.\\n\\nYou should not ignore any "
             . "warnings that you may have received on the screen during "
@@ -218,21 +211,19 @@
             . " that could not be deleted for this doctype.');\n"
             . "</SCRIPT>\n");
 
-            # Redirect the browser...
-            print("<FORM ACTION='index.php' METHOD='post' "
-            . "NAME='referForm'>\n"
-            . "<INPUT TYPE='hidden'>\n</FORM>\n");
+            print("<FORM ACTION=\"index.php\" METHOD=\"post\" "
+            . "NAME=\"referForm\">\n"
+            . "<INPUT TYPE=\"hidden\">\n</FORM>\n");
 
-            print("<SCRIPT TYPE='text/javascript'>\n"
+            print("<SCRIPT TYPE=\"text/javascript\">\n"
             . "setTimeout(\"document.referForm.submit();\", 0);\n"
             . "</SCRIPT>\n");
          } // END if
          else
          {
-            # Damn, query failed...
-            # Alert the user, and redirect browser to 
+            # Alert the user, and redirect browser
 
-            print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR:\\n\\n"
+            print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR:\\n\\n"
             . "It was not possible to conduct a query to retrieve the "
             . "details of the submissions belonging\\nto the $doc2delete "
             . "document type from the sbmIMPLEMENT table of the "
@@ -251,59 +242,50 @@
       } // END if
       else
       {
-         # In this case, this is the first call to the script, so we just
-         # need to display the interface for selecting which doctype to
-         # delete.
-
-         # Display a title...
+         # first call to page
          print("<P CLASS=\"errorMsg\">Delete A Doctype</P>\n");
 
-         # Get all of the doctypes...
+         # Get all doctypes
          $myRes = mysql_query("SELECT sdocname, ldocname FROM sbmDOCTYPE "
          . "ORDER BY ldocname");
 
          if($myRes)
          {
-            # In this case, the query worked...
-
-            # Make a little info box...
-            print("<TABLE WIDTH='90%' BGCOLOR='#D3DCE3' ALIGN='center' "
+            print("<TABLE WIDTH=\"90%\" BGCOLOR=\"#D3DCE3\" ALIGN=\"center\" "
             . "CELLSPACING=0 CELLPADDING=0 BORDER=1>\n<TR><TD "
-            . "ALIGN='center'>\n<P STYLE=\"color: blue; text-align: "
+            . "ALIGN=\"center\">\n<P STYLE=\"color: blue; text-align: "
             . "center; font-size: small; font-weight: bold\">You can "
             . "delete a doctype and all of its submissions and their "
             . "elements.<BR>Simply choose the doctype from the list, "
             . "and click on the \"REMOVE DOCTYPE\" button.</P>\n</TD>\n"
             . "</TR>\n</TABLE>\n");
 
-            # Make the input form for the element deletion...
-            print("<FORM ACTION='removeDoctypeEDS.php' METHOD='post'>\n"
-            . "<INPUT TYPE='hidden' NAME='killIt' VALUE='true'>\n"
-            . "<TABLE ALIGN='center' CELLSPACING=0 CELLPADDING=0 "
-            . "BORDER=0>\n<TR>\n<TH ALIGN='right' BGCOLOR='#87CEFA'>"
-            . "Document Type:&nbsp;</TH>\n<TD BGCOLOR='#FFFFCC' "
-            . "ALIGN='center'><SELECT NAME='doc2delete'><OPTION SELECTED "
-            . "VALUE='DO_NOT_DELETE'>Select A Doctype To Delete"
+            # Make the input form for the element deletion
+            print("<FORM ACTION=\"removeDoctypeEDS.php\" METHOD=\"post\">\n"
+            . "<INPUT TYPE=\"hidden\" NAME=\"killIt\" VALUE=\"true\">\n"
+            . "<TABLE ALIGN=\"center\" CELLSPACING=0 CELLPADDING=0 "
+            . "BORDER=0>\n<TR>\n<TH ALIGN=\"right\" BGCOLOR=\"#87CEFA\">"
+            . "Document Type:&nbsp;</TH>\n<TD BGCOLOR=\"#FFFFCC\" "
+            . "ALIGN=\"center\"><SELECT NAME=\"doc2delete\"><OPTION SELECTED "
+            . "VALUE=\"DO_NOT_DELETE\">Select A Doctype To Delete"
             . "</OPTION>");
 
             # Now fill the select list with all of the doctype values
             while(list($code, $desc) = mysql_fetch_row($myRes))
             {
-               print("<OPTION VALUE='"
-                            . ereg_replace("'", "&#39;",
-                                       htmlspecialchars($code))
-                            . "'>"
-                            . ereg_replace("'", "&#39;",
-                                       htmlspecialchars($desc))
+               print("<OPTION VALUE=\""
+                            . ereg_replace("\"","&#34;",ereg_replace("'", "&#39;",
+                                       htmlspecialchars($code)))
+                            . "\">"
+                            . ereg_replace("\"","&#34;",ereg_replace("'", "&#39;",
+                                       htmlspecialchars($desc)))
                             . "</OPTION>\n");
             } // END while
 
-            # Close up the table...
             print("</SELECT></TD>\n</TR>\n</TABLE>\n");
 
-            # Produce the submit button...
-            print("<TABLE ALIGN='center' BORDER=0>\n<TR>\n<TD ALIGN='"
-            . "center'><INPUT TYPE='button' VALUE='REMOVE DOCTYPE' "
+            print("<TABLE ALIGN=\"center\" BORDER=0>\n<TR>\n<TD ALIGN=\""
+            . "center\"><INPUT TYPE=\"button\" VALUE=\"REMOVE DOCTYPE\" "
             . "onClick=\"for(i=0; i < doc2delete.length; i++) { "
             . "if(doc2delete[i].selected) { break; } }"
             . " if(doc2delete[i].value != 'DO_NOT_DELETE') { "
@@ -314,21 +296,15 @@
          } // END if
          else
          {
-            # In this case, the query failed, so we can just output the
-            # relevant error message, and provide a button for the user to
-            # click to get back to the "index.php" page.
-
-            # Make a message on the screen...
+            # query failed
             print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">ERRO"
             . "R:</SPAN> It was not possible to obtain a list of documen"
             . "t types from the sbmDOCTYPE table.<BR>This means that it is "
             . "not possible to delete a doctype.</P>\n");
 
-            # Provide a button for the user to press to escape this
-            # situation
-            print("<FORM ACTION='index.php' METHOD='post'>\n<TABLE ALIG"
-            . "N='center' BORDER=0 CELLSPACING=0 CELLPADDING=0>\n<TR>\n<"
-            . "TD ALIGN='center'>\n<INPUT TYPE='button' VALUE='OK' "
+            print("<FORM ACTION=\"index.php\" METHOD=\"post\">\n<TABLE ALIG"
+            . "N=\"center\" BORDER=0 CELLSPACING=0 CELLPADDING=0>\n<TR>\n<"
+            . "TD ALIGN=\"center\">\n<INPUT TYPE=\"button\" VALUE=\"OK\" "
             . "onClick=\"submit();\">\n</TD>\n</TR>\n</TABLE>\n</FORM>"
             . "\n");
          } // END else
