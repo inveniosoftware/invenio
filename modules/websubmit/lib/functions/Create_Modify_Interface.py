@@ -25,8 +25,61 @@
    ##                              "+"-separated list of fields to modify
 
 execfile("%s/cdsware/websubmit_functions/Retrieve_Data.py" % pylibdir)
+import re,os
+
+def Create_Modify_Interface_getfieldval_fromfile(cur_dir, fld=""):
+    """Read a field's value from its corresponding text file in 'cur_dir' (if it exists) into memory.
+       Delete the text file after having read-in its value.
+       This function is called on the reload of the modify-record page. This way, the field in question
+       can be populated with the value last entered by the user (before reload), instead of always being
+       populated with the value still found in the DB.
+    """
+    fld_val = ""
+    if len(fld) > 0 and os.access("%s/%s" % (cur_dir,fld), os.R_OK|os.W_OK):
+        fp = open( "%s/%s" % (cur_dir,fld), "r" )
+        fld_val = fp.read()
+        fp.close()
+        try:
+            os.unlink("%s/%s"%(cur_dir,fld))
+        except OSError:
+            # Cannot unlink file - ignore, let websubmit main deal with this
+            pass
+        fld_val = fld_val.strip()
+    return fld_val
+def Create_Modify_Interface_getfieldval_fromDBrec(fieldcode, recid):
+    """Read a field's value from the record stored in the DB.
+       This function is called when the Create_Modify_Interface function is called for the first time
+       when modifying a given record, and field values must be retrieved from the database.
+    """
+    fld_val = ""
+    if fieldcode != "":
+        fld_val = Get_Field(fieldcode,recid)
+    return fld_val
+def Create_Modify_Interface_transform_date(fld_val):
+    """Accept a field's value as a string. If the value is a date in one of the following formats:
+          DD Mon YYYY (e.g. 23 Apr 2005)
+          YYYY-MM-DD  (e.g. 2005-04-23)
+       ...transform this date value into "DD/MM/YYYY" (e.g. 23/04/2005).
+    """
+    if re.search("^[0-9]{2} [a-z]{3} [0-9]{4}$",fld_val,re.IGNORECASE) is not None:
+        try:
+            fld_val = time.strftime("%d/%m/%Y",time.strptime(fld_val,"%d %b %Y"))
+        except (ValueError,TypeError):
+            # bad date format:
+            pass
+    elif re.search("^[0-9]{4}-[0-9]{2}-[0-9]{2}$",fld_val,re.IGNORECASE) is not None:
+        try:
+            fld_val = time.strftime("%d/%m/%Y",time.strptime(fld_val,"%Y-%m-%d"))
+        except (ValueError,TypeError):
+            # bad date format:
+            pass
+    return fld_val
+
 
 def Create_Modify_Interface(parameters,curdir,form):
+    """Create an interface for the modification of a document, based on the fields that the user has
+       chosen to modify
+    """
     global sysno,rn
     t=""
     # variables declaration
@@ -57,19 +110,14 @@ def Create_Modify_Interface(parameters,curdir,form):
         if len(res) > 0:
             marccode = res[0][0]
         # then retrieve the previous value of the field
-        if marccode != "":
-            value = Get_Field(marccode,sysno)
-            # if this is a date
-            if re.search("^[0-9]{2} [a-z]{3} [0-9]{4}$",value,re.IGNORECASE):
-                try:
-                    value = time.strftime("%d/%m/%Y",time.strptime(value,"%d %b %Y"))
-                except:
-                    value=value
-            if re.search("^[0-9]{4}-[0-9]{2}-[0-9]{2}$",value,re.IGNORECASE):
-                try:
-                    value = time.strftime("%d/%m/%Y",time.strptime(value,"%Y-%m-%d"))
-                except:
-                    value=value
+        if os.path.exists("%s/%s" % (curdir,"Create_Modify_Interface_DONE")):
+            # Page has been reloaded - get field value from text file on server, not from DB record
+            value = Create_Modify_Interface_getfieldval_fromfile(curdir,field)
+        else:
+            # First call to page - get field value from DB record
+            value = Create_Modify_Interface_getfieldval_fromDBrec(marccode, sysno)
+        # If field is a date value, transform date into format DD/MM/YYYY:
+        value = Create_Modify_Interface_transform_date(value)
         res = run_sql("SELECT * FROM sbmFIELDDESC WHERE name=%s", (field,))
         if len(res) > 0:
             type = res[0][3]
@@ -127,5 +175,17 @@ def Create_Modify_Interface(parameters,curdir,form):
             t = t+"<small>%s</small>" % text
     # output some more text
     t=t+"<BR><BR><CENTER><small><INPUT type=\"button\" width=400 height=50 name=\"End\" value=\"END\" onClick=\"document.forms[0].step.value = 2;document.forms[0].submit();\"></small></CENTER></H4>"
+    # Flag File to be written if first call to page, which tells function that if page is reloaded,
+    # it should get field values from text files in curdir, instead of from DB record:
+    if not os.path.exists("%s/%s" % (curdir,"Create_Modify_Interface_DONE")):
+        # Write flag file:
+        try:
+            fp = open( "%s/%s" % (curdir,"Create_Modify_Interface_DONE"), "w")
+            fp.write("DONE\n")
+            fp.flush()
+            fp.close()
+        except IOError, e:
+            # Can't open flag file for writing
+            pass
     return t
 
