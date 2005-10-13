@@ -41,14 +41,14 @@ def Create_Modify_Interface(parameters,curdir,form):
     fieldstext = re.sub("\+","\n",fieldstext)
     fields = fieldstext.split("\n")
     #output some text    
-    t=t+"<CENTER bgcolor=white>The document <B>%s</B> has been found in the database.</CENTER><BR>Please modify the following fields:<BR>Then press the 'END' button at the bottom of the page<BR>\n" % rn
+    t=t+"<CENTER bgcolor=\"white\">The document <B>%s</B> has been found in the database.</CENTER><BR>Please modify the following fields:<BR>Then press the 'END' button at the bottom of the page<BR>\n" % rn
     for field in fields:
         subfield = ""
         value = ""
         marccode = ""
         text = ""
         # retrieve and display the modification text
-        t=t+"<FONT color=darkblue>\n"
+        t=t+"<FONT color=\"darkblue\">\n"
         res = run_sql("SELECT modifytext FROM sbmFIELDDESC WHERE  name=%s", (field,))
         if len(res)>0:
             t=t+"<small>%s</small> </FONT>\n" % res[0][0]
@@ -59,6 +59,17 @@ def Create_Modify_Interface(parameters,curdir,form):
         # then retrieve the previous value of the field
         if marccode != "":
             value = Get_Field(marccode,sysno)
+            # if this is a date
+            if re.search("^[0-9]{2} [a-z]{3} [0-9]{4}$",value,re.IGNORECASE):
+                try:
+                    value = time.strftime("%d/%m/%Y",time.strptime(value,"%d %b %Y"))
+                except:
+                    value=value
+            if re.search("^[0-9]{4}-[0-9]{2}-[0-9]{2}$",value,re.IGNORECASE):
+                try:
+                    value = time.strftime("%d/%m/%Y",time.strptime(value,"%Y-%m-%d"))
+                except:
+                    value=value
         res = run_sql("SELECT * FROM sbmFIELDDESC WHERE name=%s", (field,))
         if len(res) > 0:
             type = res[0][3]
@@ -71,14 +82,14 @@ def Create_Modify_Interface(parameters,curdir,form):
             if type == "T":
                 text="<TEXTAREA name=\"%s\" rows=%s cols=%s wrap>%s</TEXTAREA>" % (field,numrows,numcols,value)
             elif type == "F":
-                text="<INPUT TYPE=file name=\"%s\" size=%s maxlength=%s>" % (field,size,maxlength)
+                text="<INPUT TYPE=\"file\" name=\"%s\" size=%s maxlength=%s>" % (field,size,maxlength)
             elif type == "I":
                 # JY correction, 15.6.01
                 value = re.sub("[\n\r\t]+","",value)
                 text="<INPUT name=\"%s\" size=%s value=\"%s\"> " % (field,size,val)
                 text= text + "<SCRIPT>document.forms[0].%s.value=\"%s\";</SCRIPT>" % (field,value)
             elif type == "H":
-                text="<INPUT type=hidden name=\"%s\" value=\"%s\">" % (field,val)
+                text="<INPUT type=\"hidden\" name=\"%s\" value=\"%s\">" % (field,val)
                 text=text+"<SCRIPT>document.forms[0].%s.value=\"%s\";</SCRIPT>" % (field,value)
             elif type == "S":
                 values = re.split("[\n\r]+",value)
@@ -115,6 +126,6 @@ def Create_Modify_Interface(parameters,curdir,form):
                 text="%s: unknown field type" % field
             t = t+"<small>%s</small>" % text
     # output some more text
-    t=t+"<BR><BR><CENTER><small><INPUT type=button width=400 height=50 name=End value=END onClick=\"document.forms[0].step.value = 2;document.forms[0].submit();\"></small></CENTER></H4>"
+    t=t+"<BR><BR><CENTER><small><INPUT type=\"button\" width=400 height=50 name=\"End\" value=\"END\" onClick=\"document.forms[0].step.value = 2;document.forms[0].submit();\"></small></CENTER></H4>"
     return t
 
