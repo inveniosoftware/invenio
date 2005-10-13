@@ -25,7 +25,6 @@
 
 def Print_Success_DEL(parameters,curdir,form): 
     global rn
-    t=""
-    t+="<br><br><b>Document %s was successfully deleted.</b>" % rn
+    t="<br><br><b>Document %s was successfully deleted.</b>" % rn
     return t
 
