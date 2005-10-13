@@ -51,7 +51,7 @@ def Send_Approval_Request (parameters,curdir,form):
     if os.path.exists("%s/date" % curdir):
         fp = open("%s/date" % curdir, "r")
         date = fp.read()
-        fp.close
+        fp.close()
     else:
         date = ""
     if os.path.exists("%s/%s" % (curdir,parameters['titleFile'])):
