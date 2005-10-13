@@ -31,7 +31,7 @@ def Print_Success(parameters,curdir,form):
         additional_rn = " and %s" % additional_rn
     else:
         additional_rn = ""
-    t=t+Request_Print("A",  "<br><br><B>Submission Complete!!</B><br><BR>")
+    t=t+Request_Print("A",  "<br><br><B>Submission Complete!</B><br><BR>")
     t=t+Request_Print("A",  "Your document has the following reference(s): <b>%s%s</b><br><br>" % (rn,additional_rn))
     if status == "APPROVAL":
         t=t+Request_Print("A",  "An email has been sent to the referee. You will be warned by email as soon as the referee takes his/her decision regarding your document.<br><br>\n")
