@@ -38,11 +38,6 @@
 function validateIsInt(param)
 // This function validates its parameter to ensure that it is an integer
 // value.
-// Author: Nicholas Robinson
-// Email:  Nicholas.Robinson@cern.ch
-//         ca8nro@yahoo.co.uk
-// Created:           16/11/2000
-// Last Modified:     16/11/2000
 {
    // Create a flag to indicate that we have found a non-digit value
    var nonDigit = false;
@@ -56,11 +51,11 @@ function validateIsInt(param)
 
          nonDigit = true;
          break;
-      } // END if
-   } // END for
+      }
+   }
 
    return true;
-} // END function validateIsInt(param)
+}
 
 
 function verifyChanges(curLactname, sugLactname, curDir, sugDir,
@@ -69,10 +64,6 @@ curActionbutton, sugActionbutton, curStatustext, sugStatustext)
 // have actually been changed by the user when they submit them to the
 // database for update.  If not, the function returns false.  If so, the
 // function returns true.
-// Author: Nicholas Robinson
-// Email: Nicholas.Robinson@cern.ch
-// Created:        27/07/2000
-// Last Modified:  16/11/2000
 {
    if((curLactname == sugLactname) &&
       (curDir  == sugDir) && (curActionbutton == sugActionbutton) &&
@@ -80,12 +71,12 @@ curActionbutton, sugActionbutton, curStatustext, sugStatustext)
    {
       alert("No Change In The Data Has Been Made!  Cannot Submit.");
       return false;
-   } // End if
+   }
    else
    {
       return true;
-   } // End else
-} // End function verifyChanges()
+   }
+}
 
 // -->
 
@@ -100,18 +91,12 @@ curActionbutton, sugActionbutton, curStatustext, sugStatustext)
          details form.  It is bundled into a function, as it is quite a
          messy piece of code due to the large parameters to the
          JavaScript function "verifyChanges".
-
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
-                 ca8nro@yahoo.co.uk
-         Created:         16/11/2000
-         Last Modified:   19/12/2000
       **************************************************************/
 
       print("<P>\n");
-      print("<TABLE ALIGN='center' BORDER=0 CELLSPACING=0 "
-      . "CELLPADDING=0 WIDTH='100%'>\n<TR>\n<TD ALIGN='right'>"
-      . "\n<INPUT TYPE='button' VALUE='SAVE CHANGES' onClick=\""
+      print("<TABLE ALIGN=\"center\" BORDER=0 CELLSPACING=0 "
+      . "CELLPADDING=0 WIDTH=\"100%\">\n<TR>\n<TD ALIGN=\"right\">"
+      . "\n<INPUT TYPE=\"button\" VALUE=\"SAVE CHANGES\" onClick=\""
       . "if(verifyChanges(escape('" . ereg_replace("'","\\'",
                      htmlspecialchars($dataRow["lactname"]))
       . "'), escape(lactname.value), escape('"
@@ -128,14 +113,13 @@ curActionbutton, sugActionbutton, curStatustext, sugStatustext)
 
       if($caller == "documentEDS.php")
       {
-         # Pass a doctype back to it...
-         print("<INPUT TYPE='hidden' NAME='doctype' VALUE='$doctype'>\n");
-      } // END if
+         // Pass a doctype back to it...
+         print("<INPUT TYPE=\"hidden\" NAME=\"doctype\" VALUE=\"$doctype\">\n");
+      }
 
-      print("<TD ALIGN='left'>\n<INPUT TYPE='button' VALUE='FINISHED' "
-      . "onClick=\"submit();\">\n</TD>\n</FORM>\n</TR>\n</TABLE>\n</P>"
-      . "\n");
-   } // END function makeButtons()
+      print("<TD ALIGN=\"left\">\n<INPUT TYPE=\"submit\" VALUE=\"FINISHED\">"
+      . "</TD>\n</FORM>\n</TR>\n</TABLE>\n</P>\n");
+   }
 
    //*************
 
@@ -147,170 +131,118 @@ curActionbutton, sugActionbutton, curStatustext, sugStatustext)
          modified and resubmitted to the database.  This function
          basically has the task of producing the page to be displayed for
          the 'viewActionEDS.php' page.
-
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
-                 ca8nro@yahoo.co.uk
-         Created:           16/11/2000
-         Last Modified:     17/01/2001
       *******************************************************************/
 
-      # Execute a query on the sbmACTION table for the given action...
+      // Execute a query on the sbmACTION table for the given action
       $queryResult = mysql_query("SELECT * from sbmACTION WHERE sactname = "
                                . "'$actname'");
 
       if($queryResult)
       {
-         # The query has executed successfully, so we can continue with
-         # the production of the page...
-
-         # Produce the appropriate output, depending upon the number of
-         # rows returned by the query...
-
          if(mysql_num_rows($queryResult) == 1)
          {
-            # In this case, as expected, there is one entry for the given
-            # action in the sbmACTION table..
+            // as expected there is one entry for the given
+            // action in the sbmACTION table
 
-            # Now, display a quick set of page instructions for the user..
-            print("<TABLE WIDTH='90%' BGCOLOR='#D3DCE3' ALIGN='center' "
+            print("<TABLE WIDTH=\"90%\" BGCOLOR=\"#D3DCE3\" ALIGN=\"center\" "
             . "CELLSPACING=0 CELLPADDING=0 BORDER=1>\n<TR><TD "
-            . "ALIGN='center'>\n<P STYLE=\"color: blue; text-align: "
+            . "ALIGN=\"center\">\n<P STYLE=\"color: blue; text-align: "
             . "center; font-size: small; font-weight: bold\">Below are "
             . "the details of the <EM>$actname</EM> action.<BR>You can "
             . "edit them by alterring values in boxes, and clicking on "
             . "\"SAVE CHANGES\".</P>\n</TD>\n</TR>\n</TABLE>\n");
 
-            # Make a horizontal rule to divide the page sections...
             drawSeparator();
-
-            # Now, we are ready to display the details of the given action
-            # in a table.  Each data item will be contained within a form
-            # input box so that it can be edited if this is desirable.
-
-            print("<FORM ACTION='viewActionEDS.php' METHOD='post'>\n"
-            . "<INPUT TYPE='hidden' NAME='update' VALUE='true'>\n"
-            . "<INPUT TYPE='hidden' NAME='caller' VALUE='$caller'>\n");
+            print("<FORM ACTION=\"viewActionEDS.php\" METHOD=\"post\">\n"
+            . "<INPUT TYPE=\"hidden\" NAME=\"update\" VALUE=\"true\">\n"
+            . "<INPUT TYPE=\"hidden\" NAME=\"caller\" VALUE=\"$caller\">\n");
 
             if($caller == "documentEDS.php")
             {
-               # Add a doctype into the equation
-               print("<INPUT TYPE='hidden' NAME='doctype' VALUE='$doctype"
-               . "'>\n");
-            } // END if
+               // Add a doctype
+               print("<INPUT TYPE=\"hidden\" NAME=\"doctype\" VALUE=\"$doctype\">\n");
+            }
 
-            print("<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0 "
-            . "ALIGN='center' WIDTH='100%'>\n");
+            print("<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0 ALIGN=\"center\" WIDTH=\"100%\">\n");
 
-            # Now make the table: names & fields...
-
-            # Get the columns list
             $columns =  mysql_list_fields(DOCS_DATABASE, "sbmACTION");
-
-            # Get the number of field
             $numTblFlds = mysql_num_fields($columns);
-
-            # Get the row of data
             $dataRow = mysql_fetch_array($queryResult);
 
-            # Before we display most of the table, we can first display
-            # the upper part of the table, which will be the sactname, cd,
-            # and md fields, that can't be modified...
+            // Before we display most of the table, we can first display
+            // the upper part of the table, which will be the sactname, cd,
+            // and md fields, that can't be modified...
+            print("<TABLE WIDTH=\"100%\" ALIGN=\"center\" CELLSPACING=0 "
+            . "CELLPADDING=0 BORDER=0>\n<TR>\n<TH BGCOLOR=\"#D3DCE3\" ALIGN"
+            . "=\"right\" WIDTH=\"20%\">\nAction Code:&nbsp;</TH>\n<TD "
+            . "ALIGN=\"left\" BGCOLOR=\"#FFFFCC\" WIDTH=\"80%\"><INPUT "
+            . "TYPE=\"readonly\" NAME=\"sactname\" VALUE=\""
+            . $dataRow["sactname"] . "\">\n</TD>\n</TR>\n<TR>\n<TH "
+            . "BGCOLOR=\"#D3DCE3\" ALIGN=\"right\" WIDTH=\"20%\">\nCreation "
+            . "Date:&nbsp;</TH>\n<TD WIDTH=\"80%\" ALIGN=\"left\" BGCOLOR="
+            . "\"#FFFFCC\"><INPUT TYPE=\"readonly\" NAME=\"cd\" VALUE=\""
+            . $dataRow["cd"] . "\">\n</TD>\n</TR>\n<TR>\n<TH WIDTH=\"20%\""
+            . " BGCOLOR=\"#D3DCE3\" ALIGN=\"right\">\nModification "
+            . "Date:&nbsp;</TH>\n<TD WIDTH=\"80%\" ALIGN=\"left\" "
+            . "BGCOLOR=\"#FFFFCC\"><INPUT TYPE=\"readonly\" NAME=\"md\" "
+            . "VALUE=\"" . $dataRow["md"] . "\">\n</TD>\n</TR>\n");
+            print("<input type=\"hidden\" name=\"actionbutton\" value=\"\">");
 
-            print("<TABLE WIDTH='100%' ALIGN='center' CELLSPACING=0 "
-            . "CELLPADDING=0 BORDER=0>\n<TR>\n<TH BGCOLOR='#D3DCE3' ALIGN"
-            . "='right' WIDTH='20%'>\nAction Code:&nbsp;</TH>\n<TD "
-            . "ALIGN='left' BGCOLOR='#FFFFCC' WIDTH='80%'><INPUT "
-            . "TYPE='readonly' NAME='sactname' VALUE='"
-            . $dataRow["sactname"] . "'>\n</TD>\n</TR>\n<TR>\n<TH "
-            . "BGCOLOR='#D3DCE3' ALIGN='right' WIDTH='20%'>\nCreation "
-            . "Date:&nbsp;</TH>\n<TD WIDTH='80%' ALIGN='left' BGCOLOR="
-            . "'#FFFFCC'><INPUT TYPE='readonly' NAME='cd' VALUE='"
-            . $dataRow["cd"] . "'>\n</TD>\n</TR>\n<TR>\n<TH WIDTH='20%'"
-            . " BGCOLOR='#D3DCE3' ALIGN='right'>\nModification "
-            . "Date:&nbsp;</TH>\n<TD WIDTH='80%' ALIGN='left' "
-            . "BGCOLOR='#FFFFCC'><INPUT TYPE='readonly' NAME='md' "
-            . "VALUE='" . $dataRow["md"] . "'>\n</TD>\n</TR>\n");
-	    print("<input type=\"hidden\" name=\"actionbutton\" value=\"\">");
-
-            # Now fill this new table with all of the details...
-
+            // Now fill this new table with all of the details
             for($indx = 0; $indx < $numTblFlds; $indx++)
             {
-               # Get the name of the current field...
                $currentField = mysql_field_name($columns, $indx);
-
-               # Ensure that we don't once again print our non-editable
-               # fields out...
-
                if(($currentField != "sactname") && ($currentField != "cd")
                   && ($currentField != "md") && ($currentField != "actionbutton"))
                {
-                  # First, display the field name...
-                  print("<TR>\n<TH BGCOLOR='#87CEFA' ALIGN='right' "
-                  . "WIDTH='20%'>\n");
+                  print("<TR>\n<TH BGCOLOR=\"#87CEFA\" ALIGN=\"right\" WIDTH=\"20%\">\n");
 
                   if($currentField == "lactname")
                   {
                      print("Action Description:&nbsp;");
-                  } // END if
+                  }
                   else
                   {
                      print("$currentField" . ":&nbsp;");
-                  } // END else
+                  }
 
-                  print("&nbsp;</TH>\n<TD ALIGN='left' WIDTH='80%' "
-                  . "BGCOLOR='#FFFFCC'>\n<INPUT TYPE='text' NAME="
-                  . "'$currentField' SIZE=");
+                  print("&nbsp;</TH>\n<TD ALIGN=\"left\" WIDTH=\"80%\" "
+                  . "BGCOLOR=\"#FFFFCC\">\n<INPUT TYPE=\"text\" NAME="
+                  . "\"$currentField\" SIZE=");
 
                   if(mysql_field_type($columns, $indx) == "blob")
                   {
                      print("60");
-                  } // END if
+                  }
                   else
                   {
                      print(mysql_field_len($columns, $indx));
-                  } // END else
+                  }
 
-                  print(" VALUE='" . ereg_replace("'", "&#39;",
+                  print(" VALUE=\"" . ereg_replace("'", "&#39;",
                                       htmlspecialchars($dataRow[$indx]))
-                  . "'>\n</TD>\n</TR>\n");
-               } // END if
-            } // END for
-
-            # Now that the table has been filled with all of the actions
-            # details, it can be closed..
+                  . "\">\n</TD>\n</TR>\n");
+               }
+            }
             print("</TABLE>\n</TABLE>\n");
-
-            # Now that the form has been drawn, it is possible to produce
-            # a new table underneath, containing buttons.  There will be a
-            # "SAVE" button, and a "FINISHED button.
-
+            // "SAVE" button, and a "FINISHED button:
             if($caller == "documentEDS.php")
             {
                makeButtons($dataRow, $caller, $doctype);
-            } // END if
+            }
             else
             {
                makeButtons($dataRow, $caller);
-            } // END else
-         } // END if
+            }
+         }
          elseif(mysql_num_rows($queryResult) > 1)
          {
-            # In this case, there are many rows for the given action in
-            # the sbmACTIONS table, which means that the sbmACTIONS table has
-            # primary key violations..
-
-            print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">"
-            . "ERROR:</SPAN> More "
-            . "than one row of data concerning the <EM>$actname</EM> "
+            // too many rows for the action
+            print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
+            . "ERROR:</SPAN> More than one row of data concerning the <EM>$actname</EM> "
             . "action was returned from the <EM>sbmACTION</EM> table of "
             . "the" . DOCS_DATABASE . ".<BR>This indicates primary key "
-            . "duplication in this table.<BR>Please inform system "
-            . "administrator.</P>\n");
-
-            # Send a mail to the system admin people to warn them about
-            # this serious error..
+            . "duplication in this table.<BR>Please inform system administrator.</P>\n");
 
             $msgTxt = "When a user attempted to look at the details of "
             . "the $actname action using the WebSubmit Administrator, several "
@@ -323,29 +255,18 @@ curActionbutton, sugActionbutton, curStatustext, sugStatustext)
 
             $msgTxt .= makeDate();
             $msgTxt .= ")";
-
-            # Now send the mail..
             mail(ADMIN_EMAIL, "sbmACTION Table Key Violation!", $msgTxt,
                                               "From: WebSubmit_Administrator");
-         } // END elseif
+         }
          elseif(mysql_num_rows($queryResult) == 0)
          {
-            # This means that the given action has no row in the sbmACTIONS
-            # table..Signifies a database inconsistency error.
-
-            print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">"
-            . "ERROR:</SPAN> No data"
-            . " concerning the <EM>$actname</EM> action was found in the"
+            print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
+            . "ERROR:</SPAN> No data concerning the <EM>$actname</EM> action was found in the"
             . " <EM>sbmACTION</EM> table.<BR>This suggests a data "
             . "consistency error in the " . DOCS_DATABASE . " database."
             . "<BR>Please inform the system administrator.</P>\n");
 
-            # Now send an email to the administrator(s) to inform them of
-            # this serious error...
-
-            # Get the current date and time...
             $dateDets = getdate();
-
             $msgTxt = "When a user attempted to look at the details of "
             . "the $actname action using the WebSubmit Administrator, no rows "
             . "were returned from the sbmACTION table for this "
@@ -354,123 +275,79 @@ curActionbutton, sugActionbutton, curStatustext, sugStatustext)
             . "other tables of EDS.  This means that there are data "
             . "inconsistencies within EDS.\n\nThis should be investigated"
             . " and corrected ASAP.\n\nWebSubmit Administrator (";
-
             $msgTxt .= makeDate();
             $msgTxt .= ")";
 
-            # Now send the mail..
             mail(ADMIN_EMAIL, "Data Inconsistency Error!", $msgTxt,
                                               "From: WebSubmit_Administrator");
-         } // END elseif
+         }
          else
          {
-            # Some other sort of error has ocurred, so present the error
-            # message on the screen.
-
-            print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">"
-            . "ERROR:</SPAN> Unable"
-            . " to correctly retrieve data from the <EM>sbmACTION</EM> "
+            print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
+            . "ERROR:</SPAN> Unable to correctly retrieve data from the <EM>sbmACTION</EM> "
             . "table of " . DOCS_DATABASE . ".<BR>Please inform system "
             . "administrator.</P>\n");
-         } // END else
-      } // END if
+         }
+      }
       else
       {
-         # Unfortunately, the query has failed, so we can display an error
-         # message.
-
-         print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">"
+         print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
          . "ERROR:</SPAN> Unable to conduct a query on the "
          . "<EM>sbmACTION</EM> table of " . DOCS_DATABASE . ".<BR>Please"
          . " inform system administrator.</P>\n");
-      } // END else
-
-   } // END function displayEDSaction()
-
+      }
+   }
 
    function displayPage($update,$actname)
    {
       global $lactname,$sactname,$dir,$actionbutton,$statustext;
 
-      # Conduct a test to see if this is the first call to this script, or
-      # if it is a self-referential call, whereby the user has chosen to
-      # update values of the given action...
-
       if($update)
       {
-         # In this case, this is a call to update the actions details...
-
-         # Free memory space associated with $update...
+         // update the actions details
          unset($update);
-
-         # Get the data, so that it can be committed for the modification
-         # date field (md)...
          $dateDets = getdate();
-
-         # Now put the date into a variable in a nice MySQL friendly
-         # format
          $modifiedDate = $dateDets['year'] . "-" . $dateDets['mon'] . "-"
                        . $dateDets['mday'];
-
-         # Begin constructing the UPDATE query string...
 
          $queryString = "UPDATE sbmACTION SET lactname = '$lactname', dir ="
          . " '$dir', md = '$modifiedDate', actionbutton = '$actionbutton'"
          . ", statustext = '$statustext' "
          . "WHERE sactname = '$sactname'";
-
-         # Now actually execute the update query
          $updateResult = mysql_query($queryString);
 
          if($updateResult)
          {
-            # If the query could actually be executed without error
             if(mysql_affected_rows() == 1)
             {
-               # In this case, only 1 rows was updated, which is as
-               # expected
-
-               # Send the administrator a message to inform them of the
-               # update that has taken place...
-
-               # Get the current date and time...
                $dateDets = getdate();
-
                $msgTxt = "An update has been carried out on the $sactname"
                . " action in the " . DOCS_DATABASE . " database.\n\nEDS "
                . "Administrator (";
-
                $msgTxt .= makeDate();
                $msgTxt .= ")";
 
-               # Now send the mail..
                mail(ADMIN_EMAIL, "EDS Action Updated", $msgTxt,
                                            "From: WebSubmit_Administrator");
-
-               # We can now redisplay all of the details for the action
+               // now redisplay all of the details for the action
 
                if($caller == "documentEDS.php")
                {
                   displayEDSaction($sactname, $caller, $doctype);
-               } // END if
+               }
                else
                {
                   displayEDSaction($sactname, $caller);
-               } // END else
-            } // END if
+               }
+            }
             elseif(mysql_affected_rows() > 1)
             {
-               # More than 1 row was updated -> bad news: key duplication
-
-               # Display an error message about this...
-               print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">"
+               // More than 1 row was updated
+               print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
                . "ERROR:</SPAN> Multiple rows have been updated in the "
                . "<EM>sbmACTION</EM> table.<BR>This has resulted from an "
                . "attempt to update the <EM>$sactname</EM> action.<BR>"
                . "Please inform the system administrator.</P>\n");
-
-               # Now, email the administrator to let them know this, as it
-               # is a potentially dangerous error.
 
                $msgTxt = "When a user updated the details of "
                . "the $sactname action using the WebSubmit Administrator, seve"
@@ -482,28 +359,20 @@ curActionbutton, sugActionbutton, curStatustext, sugStatustext)
                . "affected by this update.\n\nThis problem should be "
                . "investigated and corrected immediately.\n\nEDS Administ"
                . "rator (";
-
                $msgTxt .= makeDate();
                $msgTxt .= ")";
-
-               # Now send the mail..
                mail(ADMIN_EMAIL, "ERROR: sbmACTIONS Table Multiple Row "
                 . "Update!", $msgTxt, "From: WebSubmit_Administrator");
 
-            } // END elseif
+            }
             else
             {
-               # No rows were updated -> Something strange here!
-
-               # Display an error message about this...
-               print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">"
+               // No rows were updated
+               print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
                . "ERROR:</SPAN> No rows have been updated in the <EM>"
                . "sbmACTION</EM> table.<BR>This suggests that there could "
                . "be data inconsistencies or concurrency problems.<BR>"
                . "Please inform the system administrator.</P>\n");
-
-               # Better email the administrator & let them know...
-
                $msgTxt = "When a user attempted to update the details of "
                . "the $sactname action using the WebSubmit Administrator, no "
                . "rows were affected in the sbmACTION table by this update."
@@ -515,50 +384,41 @@ curActionbutton, sugActionbutton, curStatustext, sugStatustext)
                . "inconsistency problems in this table.\n\nThis should be"
                . " investigated and corrected ASAP.\n\nWebSubmit Administrator "
                . "(";
-
                $msgTxt .= makeDate();
                $msgTxt .= ")";
-
-               # Now send the mail..
                mail(ADMIN_EMAIL, "Error: Possible Concurrency Problems",
                               $msgTxt, "From: WebSubmit_Administrator");
-
-            } // END else
-         } // END if
+            }
+         }
          else
          {
-            # The query couldn't be executed due to error(s) ocurring, so
-            # display an error message
-
-            print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">ERROR:"
+            // The query couldn't be executed
+            print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">ERROR:"
             . "</SPAN> Unable to update deatails for <EM>$sactname</EM> "
             . "action in <EM>sbmACTION</EM> table.<BR>Please inform system "
             . "administrator.</P>\n");
-         } // END else
-      } // END if
+         }
+      }
       else
       {
-         # In this case, this is the first call to the page, so we can
-         # basically just display the details of the given action...
-
          if($caller == "documentEDS.php")
          {
             displayEDSaction($actname, $caller, $doctype);
-         } // END if
+         }
          else
-        {
+         {
             displayEDSaction($actname, $caller);
-         } // END else
-      } // END else
+         }
+      }
    }
 
 
    /**********************Start of main script***************************/
 
-   # Connect to the MySQL server
+   // Connect to the MySQL server
    serverConnect(MYSQLDOCMACHINE, MYSQLDOCUSERID, MYSQLDOCPASSWORD);
 
-   # Select the CDS Search database...
+   // Select the CDS Search database...
    dbSelect(DOCS_DATABASE);
 
    $auth = canUseWebSubmitAdmin($uid);
