@@ -38,11 +38,6 @@
 function checkRequired(param)
 // This is a function to ensure that the user enters the required
 // parameter for the action.
-// Author: Nicholas Robinson
-// Email:  Nicholas.Robinson@cern.ch
-//         ca8nro@yahoo.co.uk
-// Created:         Long ago!
-// Last Modified:   23/11/2000
 {
    // If the field is left blank by the user...
 
@@ -64,10 +59,6 @@ curStatustext, sugStatustext)
 // have actually been changed by the user when they submit them to the
 // database for update.  If not, the function returns false.  If so, the
 // function returns true.
-// Author: Nicholas Robinson
-// Email: Nicholas.Robinson@cern.ch
-// Created:        27/07/2000
-// Last Modified:  23/11/2000
 {
    if(((curLevel == sugLevel) || (sugLevel == curLevel.toLowerCase())) &&
       (curButtonorder  == sugButtonorder) &&
@@ -99,35 +90,22 @@ curStatustext, sugStatustext)
          as they see fit. Links to the pages that the submission is
          composed of are also provided.  The user can follow these links
          to see the details of each of these pages.
-
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
-                 ca8nro@yahoo.co.uk
-         Created:         23/11/2000
-         Last Modified:   15/03/2001
       *******************************************************************/
 
       global $IMAGES;
 
-      # Execute a select query top get the data for the given submission
+      // Execute a select query top get the data for the given submission
       $queryResult = mysql_query("SELECT * FROM sbmIMPLEMENT WHERE subname ="
                             . " '$subname'");
 
-      # Now check to ensure that the query executed correctly
-
       if($queryResult)
       {
-         # Everything was fine with the query
-         # Now check the No. rows returned by the query (should be 1)
-
          if(mysql_num_rows($queryResult) == 1)
          {
-            # In this case, everything is as expected...
-
-            # Now, display a quick set of page instructions for the user..
-            print("<TABLE WIDTH='90%' BGCOLOR='#D3DCE3' ALIGN='center' "
+            // Now, display a quick set of page instructions for the user..
+            print("<TABLE WIDTH=\"90%\" BGCOLOR=\"#D3DCE3\" ALIGN=\"center\" "
             . "CELLSPACING=0 CELLPADDING=0 BORDER=1>\n<TR><TD "
-            . "ALIGN='center'>\n<P STYLE=\"color: blue; text-align: "
+            . "ALIGN=\"center\">\n<P STYLE=\"color: blue; text-align: "
             . "center; font-size: small; font-weight: bold\">Shown below,"
             . " are the details of the \"$subname\" EDS submission.<BR>"
             . "Each page number is a link that when clicked, allows you "
@@ -137,146 +115,129 @@ curStatustext, sugStatustext)
             . "Click \"ADD PAGE\" to do this.</P>\n"
             . "</TD>\n</TR>\n</TABLE>\n");
 
-            # Make a horizontal rule to divide the page sections...
             drawSeparator();
 
-            # Now, we can display the details of the submission in a table
 
-            print("<FORM ACTION='viewEditSubmissionEDS.php' METHOD='post'"
-            . ">\n<INPUT TYPE='hidden' NAME='update' VALUE='true'>\n"
-            . "<INPUT TYPE='hidden' NAME='doctype' VALUE='$doctype'>"
-            . "<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0 ALIGN='center"
-            . "' WIDTH='100%'>\n");
+            print("<FORM ACTION=\"viewEditSubmissionEDS.php\" METHOD=\"post\""
+            . ">\n<INPUT TYPE=\"hidden\" NAME=\"update\" VALUE=\"true\">\n"
+            . "<INPUT TYPE=\"hidden\" NAME=\"doctype\" VALUE=\"$doctype\">"
+            . "<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0 ALIGN=\"center"
+            . "\" WIDTH=\"100%\">\n");
 
-            # Now make the table: names & fields...
+            // Now make the table: names & fields...
 
-            # Get a list of the columns in the sbmIMPLEMENT table...
+            // Get a list of the columns in the sbmIMPLEMENT table...
             $columns = mysql_list_fields(DOCS_DATABASE, "sbmIMPLEMENT");
 
-            # Get the number of fields
             $numTblFlds = mysql_num_fields($columns);
-
-            # Get the row of data
             $dataRow = mysql_fetch_array($queryResult);
 
-            # Before we display most of the table, we can first display
-            # the upper part of the table, which will contain fields
-            # should be seen, but not be modifiable...  
+            // Before we display most of the table, we can first display
+            // the upper part of the table, which will contain fields
+            // should be seen, but not be modifiable
 
-            print("<TABLE WIDTH='100%' ALIGN='center' CELLSPACING=0 "
-            . "CELLPADDING=0 BORDER=0>\n<TR>\n<TH BGCOLOR='#D3DCE3' ALIGN"
-            . "='right' WIDTH='20%'>\nSubmission Code:&nbsp;</TH>\n<TD "
-            . "ALIGN='left' BGCOLOR='#FFFFCC' WIDTH='80%'><INPUT "
-            . "TYPE='readonly' NAME='subname' VALUE='"
-            . $dataRow["subname"] . "'>\n</TD>\n</TR>\n<TR>\n<TH "
-            . "BGCOLOR='#D3DCE3' ALIGN='right' WIDTH='20%'>\nNumber of "  
-            . "Pages:&nbsp;</TH>\n<TD WIDTH='80%' ALIGN='left' BGCOLOR="
-            . "'#FFFFCC'><INPUT TYPE='readonly' NAME='nbpg' VALUE='"
-            . $dataRow["nbpg"] . "'>\n</TD>\n</TR>\n<TR>\n<TH "
-            . "BGCOLOR='#D3DCE3' ALIGN='right' WIDTH='20%'>\nCreation "
-            . "Date:&nbsp;</TH>\n<TD WIDTH='80%' ALIGN='left' BGCOLOR="
-            . "'#FFFFCC'><INPUT TYPE='readonly' NAME='cd' VALUE='"
-            . $dataRow["cd"] . "'>\n</TD>\n</TR>\n<TR>\n<TH WIDTH='20%'"
-            . " BGCOLOR='#D3DCE3' ALIGN='right'>\nModification "
-            . "Date:&nbsp;</TH>\n<TD WIDTH='80%' ALIGN='left' "
-            . "BGCOLOR='#FFFFCC'><INPUT TYPE='readonly' NAME='md' "
-            . "VALUE='" . $dataRow["md"] . "'>\n</TD>\n</TR>\n");
-
-            # Now fill this new table with all of the details...
+            print("<TABLE WIDTH=\"100%\" ALIGN=\"center\" CELLSPACING=0 "
+            . "CELLPADDING=0 BORDER=0>\n<TR>\n<TH BGCOLOR=\"#D3DCE3\" ALIGN"
+            . "=\"right\" WIDTH=\"20%\">\nSubmission Code:&nbsp;</TH>\n<TD "
+            . "ALIGN=\"left\" BGCOLOR=\"#FFFFCC\" WIDTH=\"80%\"><INPUT "
+            . "TYPE=\"readonly\" NAME=\"subname\" VALUE=\""
+            . $dataRow["subname"] . "\">\n</TD>\n</TR>\n<TR>\n<TH "
+            . "BGCOLOR=\"#D3DCE3\" ALIGN=\"right\" WIDTH=\"20%\">\nNumber of "  
+            . "Pages:&nbsp;</TH>\n<TD WIDTH=\"80%\" ALIGN=\"left\" BGCOLOR="
+            . "\"#FFFFCC\"><INPUT TYPE=\"readonly\" NAME=\"nbpg\" VALUE=\""
+            . $dataRow["nbpg"] . "\">\n</TD>\n</TR>\n<TR>\n<TH "
+            . "BGCOLOR=\"#D3DCE3\" ALIGN=\"right\" WIDTH=\"20%\">\nCreation "
+            . "Date:&nbsp;</TH>\n<TD WIDTH=\"80%\" ALIGN=\"left\" BGCOLOR="
+            . "\"#FFFFCC\"><INPUT TYPE=\"readonly\" NAME=\"cd\" VALUE=\""
+            . $dataRow["cd"] . "\">\n</TD>\n</TR>\n<TR>\n<TH WIDTH=\"20%\""
+            . " BGCOLOR=\"#D3DCE3\" ALIGN=\"right\">\nModification "
+            . "Date:&nbsp;</TH>\n<TD WIDTH=\"80%\" ALIGN=\"left\" "
+            . "BGCOLOR=\"#FFFFCC\"><INPUT TYPE=\"readonly\" NAME=\"md\" "
+            . "VALUE=\"" . $dataRow["md"] . "\">\n</TD>\n</TR>\n");
 
             for($indx = 0; $indx < $numTblFlds; $indx++)
             {
-               # Get the name of the current field...
                $currentField = mysql_field_name($columns, $indx);
-
-               # Ensure that we don't once again print our non-editable
-               # fields out...
             } // END for
 
-            # Now add the list of pages into the equation...
-            print("<TR>\n<TH BGCOLOR='#87CEFA' ALIGN='right' WIDTH='20%'>"
-            . "\nSubmission Pages:&nbsp;</TH>\n<TD ALIGN='left' WIDTH="
-            . "'80%' BGCOLOR='#FFFFCC'>\n");
-
-            # Display a link to each page...
-            print("<TABLE BORDER=0 ALIGN='left' CELLPADDING=0 CELLSPACING"
+            // Now add the list of pages
+            print("<TR>\n<TH BGCOLOR=\"#87CEFA\" ALIGN=\"right\" WIDTH=\"20%\">"
+            . "\nSubmission Pages:&nbsp;</TH>\n<TD ALIGN=\"left\" WIDTH="
+            . "\"80%\" BGCOLOR=\"#FFFFCC\">\n");
+            print("<TABLE BORDER=0 ALIGN=\"left\" CELLPADDING=0 CELLSPACING"
             . "=0><TR>");
 
             for($count = 1; $count <= $dataRow["nbpg"]; $count++)
             {
-               print("<TD ALIGN='center'>[<A HREF='pageDetsEDS.php?subna"
+               print("<TD ALIGN=\"center\">[<A HREF=\"pageDetsEDS.php?subna"
                . "me=" . $dataRow["subname"] . "&pageNumber=$count&nPgs="
-               . $dataRow["nbpg"] . "&doctype=$doctype'>"
+               . $dataRow["nbpg"] . "&doctype=$doctype\">"
                . $dataRow["subname"] . " Page $count</A>]&nbsp;</TD>");
             } // END for
-
             print("</TR>\n<TR>\n");
 
-            # Now add "move a page higher in the order" and "move a page
-            # lower in the order" buttons...
+            // Now add "move a page higher in the order" and "move a page
+            // lower in the order" buttons
             for($count = 1; $count <= $dataRow["nbpg"]; $count++)
             {
-               print("<TD ALIGN='center'><TABLE BORDER=0 CELLSPACING=0 "
-               . "CELLPADDING=0 ALIGN='center'><TR><TD ALIGN='center'>");
+               print("<TD ALIGN=\"center\"><TABLE BORDER=0 CELLSPACING=0 "
+               . "CELLPADDING=0 ALIGN=\"center\"><TR><TD ALIGN=\"center\">");
 
-               # Test to see if this is the first page or the last page.
-               # If so, then we must only print an image <IMG> of an
-               # arrow, as opposed to an <A><IMG></A> arrow, as we don't
-               # want the page to be moved beyond the page 1, or page x
-               # (at the end) boundaries.
+               // Test to see if this is the first page or the last page.
+               // If so, then we must only print an image <IMG> of an
+               // arrow, as opposed to an <A><IMG></A> arrow, as we don't
+               // want the page to be moved beyond the page 1, or page x
+               // (at the end) boundaries.
 
-               # Add the "left" arrow...
+               // Add the "left" arrow
                if($count == 1)
                {
-                  # Only use a picture
-                  print("<IMG SRC='".$IMAGES."/forbidden_left.gif' ALT='"
+                  print("<IMG SRC=\"".$IMAGES."/forbidden_left.gif\" ALT=\""
                   . "Unable To Increase Page Order Weighting: Already "
-                  . "First Page!' HEIGHT=14 WIDTH=14>");
-               } // END if
+                  . "First Page!\" HEIGHT=14 WIDTH=14>");
+               }
                else
                {
-                  print("<A HREF='viewEditSubmissionEDS.php?doctype="
+                  print("<A HREF=\"viewEditSubmissionEDS.php?doctype="
                   . "$doctype&pageNumber=$count&nPgs=" . $dataRow["nbpg"]
                   . "&subname=" . $dataRow["subname"] . "&pageLeft=true'"
                   . " onClick=\"if(confirm('Taking this action will move "
                   . "a page and all of its elements one page sooner in "
                   . "the page order sequence.\\nAre you sure you want to "
                   . "do this?')) { return true; } else { return false; "
-                  . "}\"><IMG BORDER=0 SRC='".$IMAGES."/left.gif' ALT='Incre"
-                  . "ase Page Weighting Order...' HEIGHT=14 WIDTH=14>"
+                  . "}\"><IMG BORDER=0 SRC=\"".$IMAGES."/left.gif\" ALT=\"Incre"
+                  . "ase Page Weighting Order\" HEIGHT=14 WIDTH=14>"
                   . "</A>");
-               } // END else
-               print("</TD><TD ALIGN='center'>");
+               }
+               print("</TD><TD ALIGN=\"center\">");
 
-               # Add the "right" arrow...
+               // Add the "right" arrow
                if($count == $dataRow["nbpg"])
                {
-                  # Last page, so only use a picture
-                  print("<IMG SRC='".$IMAGES."/forbidden_right.gif' ALT='"
+                  print("<IMG SRC=\"".$IMAGES."/forbidden_right.gif\" ALT=\""
                   . "Unable To Decrease Page Order Weighting: Already "
-                  . "Last Page!' HEIGHT=14 WIDTH=14>");
-               } // END if
+                  . "Last Page!\" HEIGHT=14 WIDTH=14>");
+               }
                else
                {
-                  print("<A HREF='viewEditSubmissionEDS.php?doctype="
+                  print("<A HREF=\"viewEditSubmissionEDS.php?doctype="
                   . "$doctype&pageNumber=$count&nPgs=" . $dataRow["nbpg"]
                   . "&subname=" . $dataRow["subname"] . "&pageRight=true'"
                   . " onClick=\"if(confirm('Taking this action will move "
                   . "a page and all of its elements one page later in the"
                   . " page order sequence.\\nAre you sure you want to do "
                   . "this?')) { return true; } else { return false; }\">"
-                  . "<IMG BORDER=0 SRC='".$IMAGES."/right.gif' ALT='Decreas"
-                  . "e Page Weighting Order...' HEIGHT=14 WIDTH=14></A>");
-               } // END else
+                  . "<IMG BORDER=0 SRC=\"".$IMAGES."/right.gif\" ALT=\"Decreas"
+                  . "e Page Weighting Order\" HEIGHT=14 WIDTH=14></A>");
+               }
                print("</TD></TR></TABLE></TD>\n");
-            } // END for
-
+            }
             print("</TR>\n<TR>\n");
 
-            # Now add a delete button for each page of the submission
+            // Now add a delete button for each page of the submission
             for($count = 1; $count <= $dataRow["nbpg"]; $count++)
             {
-               print("<TD ALIGN='center'><A HREF='viewEditSubmissionEDS."
+               print("<TD ALIGN=\"center\"><A HREF=\"viewEditSubmissionEDS."
                . "php?doctype=$doctype&pageNumber=$count&nPgs="
                . $dataRow["nbpg"] . "&subname=" . $dataRow["subname"]
                . "&deletePage=true' onClick=\"if(confirm('Warning: Taking"
@@ -284,42 +245,35 @@ curStatustext, sugStatustext)
                . "of the elements on it.\\nThis action is irreversable!"
                . "\\nAre you sure you want to do this?'))"
                . "{ return true; } else { return false; }\"><IMAGE "
-               . "SRC='".$IMAGES."/answer_bad.gif' BORDER=0 WIDTH=12 HEIGHT="
-               . "12 ALT='Delete Page And All Elements'></A></TD>");
-            } // END for
-
-            # Now close up the inner table...
+               . "SRC=\"".$IMAGES."/answer_bad.gif\" BORDER=0 WIDTH=12 HEIGHT="
+               . "12 ALT=\"Delete Page And All Elements\"></A></TD>");
+            }
             print("</TR>\n</TABLE>");
-
-            # Now that the table has been filled with all of the actions
-            # details, it can be closed..
             print("&nbsp;</TD>\n</TR>\n</TABLE>\n</TABLE>\n");
 
-            # Now make the buttons (SAVE CHANGES, ADD PAGE, and FINISH)...
-
-            print("<TABLE ALIGN='center' CELLSPACING=2 CELLPADDING=0 "
-            . "BORDER=0><TR><TD ALIGN='center'></TD></FORM>"
-            . "<FORM ACTION='viewEditSubmissionEDS.php' METHOD='post'>"
-            . "<INPUT TYPE='hidden' NAME='nPgs' VALUE='"
-            . $dataRow["nbpg"] . "'>"
-            . "<INPUT TYPE='hidden' NAME='addPage' VALUE='true'><INPUT "
-            . "TYPE='hidden' NAME='subname' VALUE='$subname'><INPUT TYPE="
-            . "'hidden' NAME='doctype' VALUE='$doctype'><TD><INPUT "
-            . "TYPE='button' VALUE='ADD A PAGE' onClick=\"if(confirm('Are"
+            print("<TABLE ALIGN=\"center\" CELLSPACING=2 CELLPADDING=0 "
+            . "BORDER=0><TR><TD ALIGN=\"center\"></TD></FORM>"
+            . "<FORM ACTION=\"viewEditSubmissionEDS.php\" METHOD=\"post\">"
+            . "<INPUT TYPE=\"hidden\" NAME=\"nPgs\" VALUE=\""
+            . $dataRow["nbpg"] . "\">"
+            . "<INPUT TYPE=\"hidden\" NAME=\"addPage\" VALUE=\"true\"><INPUT "
+            . "TYPE=\"hidden\" NAME=\"subname\" VALUE=\"$subname\"><INPUT TYPE="
+            . "\"hidden\" NAME=\"doctype\" VALUE=\"$doctype\"><TD><INPUT "
+            . "TYPE=\"button\" VALUE=\"ADD A PAGE\" onClick=\"if(confirm('Are"
             . " You Certain You Wish To Add Another Page To This "
             . "Submission?')) { submit(); } else { return false; }\">"
-            . "</TD></FORM><FORM ACTION='documentEDS.php' METHOD='post'>"
-            . "<INPUT TYPE='hidden' NAME='doctype' VALUE='$doctype'><TD>"
-            . "<INPUT TYPE='button' VALUE='FINISHED' onClick=\"submit();"
+            . "</TD></FORM><FORM ACTION=\"documentEDS.php\" METHOD=\"post\">"
+            . "<INPUT TYPE=\"hidden\" NAME=\"doctype\" VALUE=\"$doctype\"><TD>"
+            . "<INPUT TYPE=\"button\" VALUE=\"FINISHED\" onClick=\"submit();"
             . "\"></TD></FORM></TR></TABLE>");
-         } // END if
+         }
          elseif(mysql_num_rows($queryResult) > 1)
          {
-            # Oops, we have too many rows in the result set.  This
-            # indicates some sort of key duplication in the sbmIMPLEMENT
-            # table.
+            // too many rows in the result set.  This
+            // indicates some sort of key duplication in the sbmIMPLEMENT
+            // table.
 
-            print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">"
+            print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
             . "ERROR:</SPAN> More "
             . "than one row of data concerning the <EM>$subname</EM> "
             . "action was returned from the <EM>sbmIMPLEMENT</EM> table of "
@@ -327,9 +281,7 @@ curStatustext, sugStatustext)
             . "primary key duplication in this table.<BR>Please inform "
             . "system administrator.</P>\n");
 
-            # Send a mail to the system admin people to warn them about
-            # this serious error..
-
+            // warn admin
             $msgTxt = "When a user attempted to look further into the "
             . "details of the $subname submission using the EDS "
             . "Administrator, several rows were returned for this "
@@ -342,25 +294,20 @@ curStatustext, sugStatustext)
 
             $msgTxt .= makeDate();
             $msgTxt .= ")";
-
-            # Now send the mail..
             mail(ADMIN_EMAIL, "sbmIMPLEMENT Table Key Violation!", $msgTxt,
                                               "From: WebSubmit_Administrator");
-         } // END elseif
+         }
          elseif(mysql_num_rows($queryResult) == 0)
          {
-            # Oops, we have no rows returned...how can this be?
-
-            print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">"
+            // no rows returned
+            print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
             . "ERROR:</SPAN> No data concerning the <EM>$subname</EM> "
             . "submission was found in the <EM>sbmIMPLEMENT</EM> table.<BR>"
             . "This suggests a data consistency error in the "
             . DOCS_DATABASE . " database.<BR>Please inform the system "
             . "administrator.</P>\n");
 
-            # Now send an email to the administrator(s) to inform them of
-            # this serious error...
-
+            // warn admin
             $msgTxt = "When a user attempted to look further into the "
             . "details of the $subname submission using the EDS "
             . "Administrator, no rows were returned from the sbmIMPLEMENT "
@@ -370,32 +317,25 @@ curStatustext, sugStatustext)
             . " that there are data inconsistencies within EDS.\n\nThis "
             . "should be investigated and corrected ASAP.\n\nEDS "
             . "Administrator (";
-
             $msgTxt .= makeDate();
             $msgTxt .= ")";
-
-            # Now send the mail..
             mail(ADMIN_EMAIL, "Possible Data Inconsistency Error!",
                                  $msgTxt, "From: WebSubmit_Administrator");
-         } // END elseif
+         }
          else
          {     
-            # Some sort of weird query error must have ocurred.
-
-            print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">"
+            print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
             . "ERROR:</SPAN> Unable to correctly retrieve data from the "
             . "<EM>sbmIMPLEMENT</EM> table of " . DOCS_DATABASE
             . ".<BR>Please inform system administrator.</P>\n");
-         } // END else
-      } // END if
+         }
+      }
       else
       {
-         # In this case, the query failed...
-
-         print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">ERROR:"
+         print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">ERROR:"
          . "</SPAN> Unable to query the <EM>sbmIMPLEMENT</EM> table.<BR>"   
          . "Please inform system administrator.</P>\n");
-      } // END else
+      }
    } // END function displayEDSsubDetsForm($subname, $doctype)
 
    //**************
@@ -441,114 +381,79 @@ curStatustext, sugStatustext)
          message feedback at all stages possible, letting the admin/user
          know whether or not recovery succeeded etc, or where it failed,
          and offers suggestions on how to correct the problems.
-         
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
-                 ca8nro@yahoo.co.uk
-         Created:        18/12/2000
-         Last Modified:  18/12/2000
       *****************************************************************/
 
-      # Get the current date for the "md" field...
+      // Get the current date for the "md" field...
       $modifiedDate = makeEDSmdDate();
          
-      # Make a query string to set the 'pagenb' field of all elements on 
-      # the current page to '0' (zero).  Done as a temporary measure for
-      # swapping pages around.
+      // Make a query string to set the 'pagenb' field of all elements on 
+      // the current page to '0' (zero).  Done as a temporary measure for
+      // swapping pages around.
       $qStr1 = "UPDATE sbmFIELD SET pagenb = '0' WHERE subname = '$subname'" 
       . " AND pagenb = '$pageNumber'";
-         
-      # Now execute the query
       $qRes1 = mysql_query($qStr1);
             
       if($qRes1)
       {
-         # Query worked fine, so carry on alterring values
-         
-         # Set the value of the pagenb field for all elements of the page
-         # before the page to be moved to have a pagenb value of the
-         # current page (that which we are moving).
-         
+         // Set the value of the pagenb field for all elements of the page
+         // before the page to be moved to have a pagenb value of the
+         // current page (that which we are moving).
          $qStr2 = "UPDATE sbmFIELD SET pagenb = '$pageNumber', md = '"
          . "$modifiedDate' WHERE subname = '$subname' AND pagenb = '"
          . "$page2move2'";
-         
-         # Now execute the query
          $qRes2 = mysql_query($qStr2);
 
          if($qRes2)
          {
-            # In this case, the query was fine, and we have just moved all
-            # elements of the page that was before the page we are moving
-            # to effectively be in the place of the page that we are
-            # moving...i.e. the page before it now sits in its place.
+            // have moved all elements of the page that was before the page we are moving
+            // to effectively be in the place of the page that we are
+            // moving. i.e. the page before it now sits in its place.
 
-            # Now make a query string to move the elements that are on
-            # "page zero" to their final position...
+            // Now make a query string to move the elements that are on
+            // "page zero" to their final position...
             $qStr3 = "UPDATE sbmFIELD SET pagenb = '$page2move2"
             . "', md = '$modifiedDate' WHERE subname = '$subname' AND "
             . "pagenb = '0'";
-       
-            # Now execute this query...
             $qRes3 = mysql_query($qStr3);
          
             if($qRes3)
             {
-               # In this case, the query has been successful, and we
-               # should now have fully switched our pages around.  We
-               # should now update the md field of the submission in 
-               # sbmIMPLEMENT, and the doctype in sbmDOCTYPE...
-         
-               # Update the submissions md field...
+               // we should now have fully switched our pages around.  We
+               // should now update the md field of the submission in 
+               // sbmIMPLEMENT, and the doctype in sbmDOCTYPE...
                $mdResult = mysql_query("UPDATE sbmIMPLEMENT SET md = "
                . "'$modifiedDate' WHERE subname = '$subname'");
          
                if($mdResult)
                {
-                  # Free the result left by this update
                   mysql_free_result($mdResult);
-               } // END if
+               }
                else
                {
-                  # The update the date query has failed for some reason
+                  // The update the date query failed
                   print("<SCRIPT LANGUAGE=\"JavaScript\">alert('Error: "
                   . "Couldn't update the md in sbmIMPLEMENT!');</SCRIPT>\n");
-               } // END else 
-       
-               # We must also modify the md field of the doctype record to
-               # which this submission belongs
+               }
+               // We must also modify the md field of the doctype record to
+               // which this submission belongs
                updateEDSDOCTYPEmd($doctype, $modifiedDate);
-            
-               # Now alert the user of the success
-               print("<SCRIPT TYPE='text/javascript'>\nalert('Page Moved "
+               print("<SCRIPT TYPE=\"text/javascript\">\nalert('Page Moved "
                . "Successfully.');\n</SCRIPT>\n");
                
-               # Now let the admin know of the page movement...
+               // Now let the admin know of the page movement...
                $msgTxt = "Page $pageNumber of the $subname submission of "
                . "the $doctype document type has been moved to another "
                . "position.\n\nWebSubmit Administrator (";
 
                $msgTxt .= makeDate();
                $msgTxt .= ")";
-                
-               # Now send the mail..
                mail(ADMIN_EMAIL, "$subname Submission Page Movement",
                           $msgTxt, "From: WebSubmit_Administrator");
-            } // END if
+            }
             else
             {
-               # Nightmare!  We now have really messed up data.  We have
-               # the data of the page we wanted to move on a temporary
-               # page 0. The data of the page whose position we wanted to
-               # move our original page to is now on our original page!
-               # The final thing is that we now can't move our data from  
-               # page zero to its final location.  I think the best thing
-               # to do here is to attempt to move the data that is now on
-               # the original page (the elements we moved in query 2, to
-               # their original position, and then move the data from page
-               # Zero back to our current page - hence undoing the whole  
-               # lot of trouble.  Hope it works!  
-               
+               // Failure. Attempt to recover by moving things back to their
+               // original positions:
                $majorRecoveryStr1 = "UPDATE sbmFIELD SET pagenb = '"
                . "$page2move2' WHERE subname = '$subname' AND "
                . "pagenb = '$pageNumber'";
@@ -557,22 +462,16 @@ curStatustext, sugStatustext)
          
                if($majorRecoveryRes1)
                {
-                  # Nice...first step recovered!  Now attempt to return
-                  # the elements on page 0 to their original page...
-                          
+                  // first step recovered.  Now attempt to return
+                  // the elements on page 0 to their original page...
                   $majorRecoveryStr2 = "UPDATE sbmFIELD SET pagenb = '"
                   . "$pageNumber' WHERE subname = '$subname' AND pagenb ="
                   . " '0'";
-               
                   $majorRecoveryRes2 = mysql_query($majorRecoveryStr2);
-               
                   if($majorRecoveryRes2)
                   {
-                     # Very nice....we have managed to completely recover
-                     # from the whole mess, so we can just inform the user
-                     # that the page movement did not work.  Phew!
-               
-                     print("<SCRIPT TYPE='text/javascript'>\nalert('An "  
+                     // completely recovered
+                     print("<SCRIPT TYPE=\"text/javascript\">\nalert('An "  
                      . "error occurred when an attempt was made to move "
                      . "the requested submission page.\\nWhen a "
                      . "submission page is moved, all of "
@@ -606,7 +505,7 @@ curStatustext, sugStatustext)
                      . "\\nYou should inform the system administrator of "
                      . "this problem.');\n</SCRIPT>\n");
                      
-                     # Now email the administrator and say the same thing 
+                     // email the administrator
                      $msgTxt = "A major problem has ocurred with the data"
                      . " for the $subname submission.  An attempt was " 
                      . "made to move page $pageNumber to another position"
@@ -644,18 +543,13 @@ curStatustext, sugStatustext)
                
                      $msgTxt .= makeDate();
                      $msgTxt .= ")";
-                     
-                     # Now send the mail..
                      mail(ADMIN_EMAIL, "$subname Submission Page Movement"
                           . " Error", $msgTxt, "From: WebSubmit_Administrator"); 
-                  } // END if
+                  }
                   else
                   {
-                     # Couldnt return our page 0 elements to their orig
-                     # page.
-                     
-                     # Let the user know
-                     print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR"
+                     // Couldnt return our page 0 elements to their original page
+                     print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR"
                      . ": A major problem has ocurred with the data for " 
                      . "this submission.\\nWhen a page is moved, all of "
                      . "the elements on the page to be moved are given a" 
@@ -688,7 +582,6 @@ curStatustext, sugStatustext)
                      . "system administrator of this problem immediately "
                      . "so that it can be corrected.');\n</SCRIPT>\n");  
                      
-                     # Now email the sys admin to let them know
                      $msgTxt = "A major problem has ocurred with the data"
                      . " for the $subname submission.  An attempt was "   
                      . "made to move page $pageNumber to another position"
@@ -726,19 +619,14 @@ curStatustext, sugStatustext)
                      
                      $msgTxt .= makeDate();
                      $msgTxt .= ")";
-                     
-                     # Now send the mail..
                      mail(ADMIN_EMAIL, "$subname Submission Page Movement"
                           . " Error", $msgTxt, "From: WebSubmit_Administrator"); 
-                  } // END else
-               } // END if
+                  }
+               }
                else
                {
-                  # In this case, we couldn't recover from the major error
-                  # at all....We must let both the user & admin know.
-         
-                  # Let the user know.
-                  print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR: " 
+                  // could not recover from error
+                  print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR: " 
                   . "A major problem has ocurred with the data for "
                      . "this submission.\\nWhen a page is moved, all of "
                      . "the elements on the page to be moved are given a" 
@@ -768,7 +656,6 @@ curStatustext, sugStatustext)
                      . "administrator immediately\\nto ensure that this "
                      . "situation is rectified.');\n</SCRIPT>\n");
                      
-                  # Let the administrator know...
                   $msgTxt = "A major problem has ocurred with the data"   
                      . " for the $subname submission.  An attempt was "  
                      . "made to move page $pageNumber to another position"
@@ -803,47 +690,36 @@ curStatustext, sugStatustext)
                      
                   $msgTxt .= makeDate();
                   $msgTxt .= ")";
-                     
-                  # Now send the mail..
                   mail(ADMIN_EMAIL, "$subname Submission Page Movement "
                           . "Error", $msgTxt, "From: WebSubmit_Administrator");
-               } // END else
-            } // END else
-         } // END if
+               }
+            }
+         }
          else
          {
-            # We now have a problem.  We have altered the current pages   
-            # elements to be on page zero, but we can't seem to alter the
-            # position of the elements on the page before our current  
-            # page.  We had better just put back our page zero elements to
-            # the current page (and hope this works!), and leave the whole 
-            # thing unchenged.  We had also better inform our user & the
-            # administrator of the error.
-                     
-            # Move our page zero elements back - fast!
+            // have altered the current pages   
+            // elements to be on page zero, but can't seem to alter the
+            // position of the elements on the page before current  
+            // page. put back our page zero elements to
+            // the current page, and leave the whole 
+            // thing unchenged.
             $errorCorrect = mysql_query("UPDATE sbmFIELD SET pagenb = '"
             . "$pageNumber' WHERE subname = '$subname' AND pagenb = '"
             . "0'");
                      
             if($errorCorrect)
-            {        
-               # Query worked.  Database info is safe! Phew! Just inform
-               # of the errors...
-                     
-               print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR: It"
+            {
+               print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR: It"
                . " was not possible to move the elements of the page that"
                . "\\nwhose position page $pageNumber is to be moved to." 
                . "\\nThis has meant that it is not possible to move page "
                . "$pageNumber.\\n\\nPlease inform the system "
                . "administrator of this problem.');\n</SCRIPT>\n");
-            } // END if
+            }
             else
             {
-               # Oh dear..we have major problems!  Nothing more that we  
-               # can do, but inform the user and the administrator.    
-            
-               # Hey hey, let the user know
-               print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR: A "
+               // failed to recover
+               print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR: A "
                . "major problem has ocurred with the data for this "
                . "submission.\\nWhen a page is moved, all of the elements"
                . " on the page to be moved are given a temporary page "
@@ -864,8 +740,6 @@ curStatustext, sugStatustext)
                . "\\n\\nThe administrator should be informed of this "
                . "immediately!');\n</SCRIPT>\n");
             
-               # Now email the administrator and let them know of this
-               # major error!
                $msgTxt = "A serious error has ocurred while trying to "
                . "move a page of a submission to another position.\n\n"
                . "When a page is moved, all of the elements on the page "
@@ -896,26 +770,21 @@ curStatustext, sugStatustext)
             
                $msgTxt .= makeDate();
                $msgTxt .= ")";
-               
-               # Now send the mail..
                mail(ADMIN_EMAIL, "$subname Submission Page Movement "
                 . "Error", $msgTxt, "From: WebSubmit_Administrator");  
-            } // END else
-         } // END else
-      } // END if
+            }
+         }
+      }
       else
       {
-         # We couldn't change the pagenb field for the elements on the
-         # current field...error!
-         
-         # Display JavaScript alert giving details of the error...      
-         print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR: It was not"
+         // couldn't change the pagenb field for the elements on the
+         // current field
+         print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR: It was not"
          . " possible to alter the page numbers for the elements on the " 
          . "page to be moved.\\nThis error ocurred in the sbmFIELD table.\\n"
          . "Unable to carry out page movement - inform system "
          . "administrator.');\n</SCRIPT>\n");
                
-         # Now email the administrator about the problem that ocurred... 
          $msgTxt = "An error has ocurred while attempting to move a "
          . "submission page.  The submission was the $subname submission "
          . "of the $doctype document type, and an attempt was made to " 
@@ -928,11 +797,9 @@ curStatustext, sugStatustext)
                                     
          $msgTxt .= makeDate();
          $msgTxt .= ")";
-
-         # Now send the mail..
          mail(ADMIN_EMAIL, "$subname Submission Page Movement Error",
            $msgTxt, "From: WebSubmit_Administrator");   
-      } // END else
+      }
    } // END function moveSubPage()
 
    //*************
@@ -955,56 +822,33 @@ curStatustext, sugStatustext)
          renumberring is terminated to avoid further data corruption.  The
          admin is informed of this situation, and told what actions should
          be taken.
-
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
-                 ca8nro@yahoo.co.uk  
-         Created:         18/12/2000
-         Last Modified:   18/12/2000
       ******************************************************************/
 
       $updStr = "DELETE FROM sbmFIELD WHERE subname = '$subname' AND "
          . "pagenb = '$pageNumber'";
-
-      # Execute the above query...
       $updRes = mysql_query($updStr);
 
       if($updRes)
       {
-         # In this case, the deletion of the given page has been
-         # successful, so we can now move any page elements after it down
-         # to fill in the gap left by the absence of the page...
-
-         # Get the current date...
          $modifiedDate = makeEDSmdDate();
-
-         # Create an error flag & initialise it to 0...
          $errorOn = 0;
 
          for($i = $pageNumber + 1; $i <= $nPgs; $i++)
          {
-            # Make the re-order query string...
             $reorderStr = "UPDATE sbmFIELD SET pagenb = '" . ($i - 1)
             . "', md = '$modifiedDate' WHERE subname = '$subname' AND"
             . " pagenb = '$i'";
-
-            # Now execute the reorder query...
             $reorderRes = mysql_query($reorderStr);
 
             if($reorderRes)
             {
-               # The query worked so free its result...
                mysql_free_result($reorderRes);
-            } // END if
+            }
             else
             {
-               # Damn, we could not reorder the elements of this page to 
-               # appear on another.  The best thing to do is to stop any
-               # further reordering, and then warn both the user and the
-               # admin, telling the admin how it can be fixed...
-
-               # Let the user know...
-               print("<SCRIPT TYPE='text/javascript'>\nalert('Error: "
+               // could not reorder the elements of this page to 
+               // appear on another.
+               print("<SCRIPT TYPE=\"text/javascript\">\nalert('Error: "
                . "During the process of deleting the page, it is "
                . "necessary to first delete the elements of the current"
                . "\\npage, and then move the elements of all pages after"
@@ -1020,7 +864,6 @@ curStatustext, sugStatustext)
                . "be corrected manually, and you should inform the system"
                . " administrator ASAP.');\n</SCRIPT>\n");
 
-               # Now email the system admin about this...
                $msgTxt = "An error has ocurred during the deletion of a "
                . "page from the $subname submission of the $doctype "
                . "document type. When a page is deleted from a "
@@ -1045,26 +888,19 @@ curStatustext, sugStatustext)
 
                $msgTxt .= makeDate();
                $msgTxt .= ")";
-
-               # Now send the mail..
                mail(ADMIN_EMAIL, "$subname Page Deletion Error",
                                    $msgTxt, "From: WebSubmit_Administrator");
-
-               # Now set the value of the $errorOn flag to mark the fact 
-               # that an error has ocurred...
                $errorOn = 1;
-
-               # Break free of the loop...
                break;
-            } // END else
-         } // END for
+            }
+         }
 
-         # Now, if $errorOn has not been set, decrement the value of the 
-         # nbpg field in sbmIMPLEMENT for the current submission, and update
-         # the md field of the current doctype & submission...
+         // if $errorOn has not been set, decrement the value of the 
+         // nbpg field in sbmIMPLEMENT for the current submission, and update
+         // the md field of the current doctype & submission
          if(!$errorOn)
          {
-            # Update the number of pages for this submission
+            // Update the number of pages for this submission
             $nmPgUpdtStr = "UPDATE sbmIMPLEMENT SET nbpg = '" . ($nPgs - 1) 
             . "', md = '$modifiedDate' WHERE subname = '$subname'";
 
@@ -1072,10 +908,10 @@ curStatustext, sugStatustext)
 
             if(!$nmPgUpdtRes) 
             {  
-               # In this case, the query has failed, so we must inform the
-               # administrator that they must decrement the number of
-               # pages for the submission by 1.
-               print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR: The"
+               // In this case, the query has failed, so we must inform the
+               // administrator that they must decrement the number of
+               // pages for the submission by 1
+               print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR: The"
                . " page has been deleted successfully, but it was not "  
                . "possible\\nto decrement the number of submission pages "
                . "for this submission.\\n\\nPlease inform the system "
@@ -1090,46 +926,33 @@ curStatustext, sugStatustext)
                . "blank page in the submission.\n\nWebSubmit Administrator (";
                $msgTxt .= makeDate();
                $msgTxt .= ")";
-
-               # Now send the mail..
                mail(ADMIN_EMAIL, "$subname Page Deletion Error",
                                    $msgTxt, "From: WebSubmit_Administrator");
-            } // END if
+            }
             else
             {
-               # All went well, so we will inform both the user and the
-               # administrator that the page was deleted successfully.
-
-               # Inform the user
-               print("<SCRIPT TYPE='text/javascript'>\nalert('The page " 
+               // success
+               print("<SCRIPT TYPE=\"text/javascript\">\nalert('The page " 
                . "has been deleted successfully.');\n</SCRIPT>\n");
-
-               # Inform the sys admin
                $msgTxt = "Page $pageNumber has been deleted from the "
                . "$subname submission type.\n\nWebSubmit Administrator (";
                $msgTxt .= makeDate();
                $msgTxt .= ")";
-
-               # Now send the mail..
                mail(ADMIN_EMAIL, "$subname Submission Page $pageNumber "
                 . "Deleted", $msgTxt, "From: WebSubmit_Administrator");  
-            } // END else
-
-            # Update the md field for our doctype
+            }
             updateEDSDOCTYPEmd($doctype, $modifiedDate);
-         } // END if
-      } // END if
+         }
+      }
       else
       {
-         # We were unable to delete the page, so we can simply let the
-         # user know this, as there has been no change to the data.
-
-         print("<SCRIPT TYPE='text/javascript'>\nalert('An error ocurred"
+         # unable to delete page
+         print("<SCRIPT TYPE=\"text/javascript\">\nalert('An error ocurred"
          . " when trying to delete this page, which meant that its "
          . "deletion was impossible.\\nNo change to the submission data "
          . "has been made.\\n\\nTry again, or inform the system "
          . "administrator.');\n</SCRIPT>\n");
-      } // END else
+      }
    } // END function deleteSubmissionPage()
 
 
@@ -1139,58 +962,44 @@ curStatustext, sugStatustext)
 
       if(isset($update))
       {
-         # If this variable has been set, it means that this call to the
-         # page is a call to update the detials of a submission type.
+         // If this variable has been set, it means that this call to the
+         // page is a call to update the detials of a submission type.
 
-         # Ensure that "displayed" is storedin the database in uppercase...
+         // Ensure that "displayed" is storedin the database in uppercase...
          $displayed = strtoupper($displayed);
 
-         # Get the data, so that it can be committed for the modification
-         # date field (md)...
+         // Get the data, so that it can be committed for the modification
+         // date field (md)...
          $modifiedDate = makeEDSmdDate();
 
-         # Make a query update string...
          $updStr = "UPDATE sbmIMPLEMENT SET displayed = '$displayed', buttonorder =";
 
-	 # Ensure that we don't accidentally put the value '0' into the
-   	 # buttonorder field, when we actually want to put a NULL into it
-	 # (and vice- versa)...
+	 // Ensure that we don't accidentally put the value '0' into the
+   	 // buttonorder field, when we actually want to put a NULL into it
+	 // (and vice- versa)...
          if(!$buttonorder)
          {
             if($buttonorder == '0')
                $updStr .= " '$buttonorder', ";
             else
                $updStr .= " NULL, ";
-         } // END if
+         }
          else
          {
             $updStr .= " '$buttonorder', ";
-         } // END else
+         }
 
          $updStr .= "statustext = '$statustext', md = "
          . "'$modifiedDate' WHERE subname = '$subname'";
-
-         # Now carry out the query execution
          $updateRs = mysql_query($updStr);
 
          if($updateRs)
          {     
-            # If the query could actually be executed without error
             if(mysql_affected_rows() == 1)
             {
-               # In this case, only 1 row was updated, which is as
-               # expected
-
-               # Update the md field for our doctype
                updateEDSDOCTYPEmd($doctype, $modifiedDate);
-
-               # Display a nice message informing the user that the update
-               # has been carried out...
                print("<SMALL STYLE=\"color: green; font-weight: bold; "
                . "text-align: center\">Update Complete</SMALL>\n<BR>\n");
-
-               # Send the administrator a message to inform them of the
-               # update that has taken place...
 
                $msgTxt = "An update has been carried out on the $subname "
                . "submission type in the " . DOCS_DATABASE
@@ -1198,33 +1007,20 @@ curStatustext, sugStatustext)
 
                $msgTxt .= makeDate();
                $msgTxt .= ")";
-
-               # Now send the mail..
                mail(ADMIN_EMAIL, "$subname Submission Type Updated",
                  $msgTxt, "From: WebSubmit_Administrator");
-
-               # Now that we have updated the submission details, we can
-               # redisplay them in the form for further editing...
-
                displayEDSsubDetsForm($subname, $doctype);
-            } // END if
+            }
             elseif(mysql_affected_rows() > 1)
             {
-               # More than 1 row was updated -> bad news: key duplication
-
-               # Display an error message about this...
-               print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">"
+               // More than 1 row was updated
+               print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
                . "ERROR:</SPAN> Multiple rows have been updated in the "
                . "<EM>sbmIMPLEMENT</EM> table.<BR>This has resulted from an "
                . "attempt to update the <EM>$subname</EM> submission "
                . "type.<BR>Please inform the system administrator."
                . "</P>\n");
-
-               # Update the md field for our doctype
                updateEDSDOCTYPEmd($doctype, $modifiedDate);
-
-               # Now, email the administrator to let them know this, as it
-               # is a potentially dangerous error.
 
                $msgTxt = "When a user updated the details of "
                . "the $subname submission type using the EDS Administra"
@@ -1239,23 +1035,18 @@ curStatustext, sugStatustext)
 
                $msgTxt .= makeDate();
                $msgTxt .= ")";
-
-               # Now send the mail..
                mail(ADMIN_EMAIL, "ERROR: sbmIMPLEMENT Table Multiple Row "
                 . "Update!", $msgTxt, "From: WebSubmit_Administrator");
-            } // END elseif
+            }
             else
             {
-               # No rows were updated -> Something strange here!
+               // No rows were updated
 
-               # Display an error message about this...
-               print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">"
+               print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
                . "ERROR:</SPAN> No rows have been updated in the <EM>"
                . "sbmIMPLEMENT</EM> table.<BR>This suggests that there could"
                . " be data inconsistencies or concurrency problems.<BR>"
                . "Please inform the system administrator.</P>\n");
-
-               # Better email the administrator & let them know...
 
                $msgTxt = "When a user attempted to update the details of "
                . "the $subname submission type using the EDS Administrat"
@@ -1270,62 +1061,44 @@ curStatustext, sugStatustext)
 
                $msgTxt .= makeDate();
                $msgTxt .= ")";
-
-               # Now send the mail..
                mail(ADMIN_EMAIL, "Error: Possible Concurrency Problems",
                               $msgTxt, "From: WebSubmit_Administrator");
-            } // END else
-         } // END if
+            }
+         }
          else
          {
-            # Display an error message about this...
-            print("<P CLASS='errorMsg'><SPAN STYLE=\"color: red\">"
+            print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
             . "ERROR:</SPAN> No rows have been updated in the <EM>"
             . "sbmIMPLEMENT</EM> table.<BR>This suggests that there could"
             . " be data inconsistencies or concurrency problems.<BR>Plea"
             . "se inform the system administrator.</P>\n");
-         } // END else
-      } // END if
+         }
+      }
       elseif($addPage)
       {
-         # In this case, the user has clicked on the button to add a new
-         # page to the submission.  In this case, we must get the current
-         # number of pages in the document, increment it by 1, and then
-         # redirect the browser focus to the "pageDetsEDS.php" for the new
-         # page (which will of course have no elements on it)...
-
-         # We have been passed a value for the number of pages, so the
-         # first thing to do is to increment it
+         // add page to submission. get the current
+         // number of pages in the document, increment it by 1, and then
+         // redirect the browser focus to the "pageDetsEDS.php" for the new page
          $nPgs++;
 
-         # Get the date for modification date details
          $modifiedDate = makeEDSmdDate();
 
-         # Now, we can update the "nbpg" field in the sbmIMPLEMENT table to
-         # the value of this "$nPgs" variable, to reflect the addition of
-         # the new page.
+         // Now, we can update the "nbpg" field in the sbmIMPLEMENT table to
+         // the value of this "$nPgs" variable, to reflect the addition of
+         // the new page.
          $updRes = mysql_query("UPDATE sbmIMPLEMENT SET nbpg = '$nPgs', md ="
          . " '$modifiedDate' WHERE subname = '$subname'");
 
-         # Now ensure that this update has been successful...
          if($updRes)
          {
-            # In this case, the query has executed without error, but we
-            # should also ensure that it has only updated one row.  This
-            # should be the case of course, because there should only be
-            # one row for the current submission in the sbmIMPLEMENT table.
-
+            // query executed without error
+            // ensure that it has only updated one row.
             if(mysql_affected_rows() > 1)
             {
-               # In this case, too many rows have been updated.  This is
-               # actually quite a serious error, as it implies a key
-               # duplication situation in the sbmIMPLEMENT table.
-
-               # Update the md field for our doctype
+               // too many rows have been updated
                updateEDSDOCTYPEmd($doctype, $modifiedDate);
 
-               # Output a JavaScript alert about this...
-               print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR: "
+               print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR: "
                . "Several rows were updated in the sbmIMPLEMENT table for "
                . "the $subname submission when we added a page to "
                . "it.\\nBecause the \"subname\" field is the primary key"
@@ -1333,8 +1106,6 @@ curStatustext, sugStatustext)
                . "violation.\\n\\nPlease inform the system administrator "
                . "administrator');</SCRIPT>\n");
 
-               # Now we had better mail the administrator and ensure that
-               # they know about this problem...
                $msgTxt = "An error has ocurred when a new page was added "
                . "to the $subname submission.  When this action was under"
                . "taken, more than 1 rows was updated in the sbmIMPLEMENT "
@@ -1349,40 +1120,17 @@ curStatustext, sugStatustext)
 
                $msgTxt .= makeDate();
                $msgTxt .= ")";
-
-               # Now send the mail..
                mail(ADMIN_EMAIL, "Error - $subname Submission "
                            . "Duplication",
                                       $msgTxt, "From: WebSubmit_Administrator");
-
-               # Finally, we can redisplay the current submission pages
-               # details
                displayEDSsubDetsForm($subname, $doctype);
-            } // END if
+            }
             elseif(mysql_affected_rows() <= 0)
             {
-               # In this case, no rows have been updated, or a query error
-               # has ocurred (if the result set is -1)...
-
-               # Better output a quick message..
                print("<P CLASS=\"errorMsg\"><SPAN STYLE=\"color: red\">"
                . "ERROR:</SPAN> Unable to update $subname submission det"
                . "ails.  No page added.</P>");
 
-               # We'd better output a JavaScript alert informing the user
-               # that no rows were updated...
-               print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR: No "
-               . "rows were updated in the sbmIMPLEMENT table when an "
-               . "attempt was made\\nto add a new page to the $subname "
-               . "submission.\\nThis suggests that there is no data in "
-               . "the table for this submission, which suggests\\nsome "
-               . "sort of problem with concurrency.\\nIt is possible that"
-               . " another user deleted this submission at the same "
-               . "time\\nas the page was added.\\n\\nThe System Administr"
-               . "ator should be informed of this problem.');\n"
-               . "</SCRIPT>\n");
-
-               # Now email the administrator and let them know the problem
                $msgTxt = "An error has ocurred when trying to add a new "
                . "page to the $subname submission of the $doctype documen"
                . "t type.  When an attempt was made to increment the valu"
@@ -1398,51 +1146,27 @@ curStatustext, sugStatustext)
 
                $msgTxt .= makeDate();
                $msgTxt .= ")";
-
-               # Now send the mail..
                mail(ADMIN_EMAIL, "EDS Error - $subname Not Found",
                                    $msgTxt, "From: WebSubmit_Administrator");
 
-               # Here, instead of redisplaying the details of this
-               # submission, we must redirect the browser to the
-               # "documentEDS.php" page, as there is no point in
-               # redisplaying the submission details if it is possible
-               # that another user has deleted it.  If it still exists,
-               # the user can simply look at the submission again.
-
-               print("<FORM NAME='referForm ACTION='documentEDS.php' "
-               . "METHOD='post'>\n<INPUT TYPE='hidden' NAME='doctype' "
-               . "VALUE='$doctype'>\n</FORM>\n<SCRIPT TYPE='text/javas"
-               . "cript'>\nsetTimeout(\"document.referForm.submit();\","
+               // instead of redisplaying the details of this
+               // submission, redirect the browser to the
+               // "documentEDS.php" page, as there is no point in
+               // redisplaying the submission details if it is possible
+               // that another user has deleted it.  If it still exists,
+               // the user can simply look at the submission again.
+               print("<FORM NAME=\"referForm\" ACTION=\"documentEDS.php\" "
+               . "METHOD=\"post\">\n<INPUT TYPE=\"hidden\" NAME=\"doctype\" "
+               . "VALUE=\"$doctype\">\n</FORM>\n<SCRIPT TYPE=\"text/javas"
+               . "cript\">\nsetTimeout(\"document.referForm.submit();\","
                . " 1000);\n</SCRIPT>\n");
-            } // END elseif
+            }
             else
             {
-               # In this case, the query was perfect, and only 1 row was
-               # updated, exactly as planned.  In this case, we can output
-               # a JavaScript alert letting the user know of the success,
-               # email the admin informing them of the success, and
-               # redirect the browser to the "pageDetsEDS.php" page.
-
-               # Update the md field for our doctype
                updateEDSDOCTYPEmd($doctype, $modifiedDate);
-
-               # Now display a quick message on screen...
                print("<P STYLE=\"color: green; text-align: center; font-"
                . "size: large\">New Page Added To <EM>$subname</EM> "
                . "Submission.</P>\n");
-
-               # Now we can display a JavaScript Alert to say pretty much
-               # the same thing in a little more detail
-               print("<SCRIPT TYPE='text/javascript'>\nalert('A new page "
-               . "has been added to the $subname submission type.\\nThis "
-               . "new page has been added into position $nPgs.\\nThe new "
-               . "page currently has no elements on it, and your browser "
-               . "has been redirected to the \"pageDetsEDS.php\" page\\n"
-               . "where you can examine this new submission page, and add"
-               . " new elements to it.');\n</SCRIPT>\n");
-
-               # Now we can email the administrator to say much the same
 
                $msgTxt = "A new page has been added to the $subname "
                . "submission of the $doctype document type.  This new "
@@ -1452,86 +1176,62 @@ curStatustext, sugStatustext)
 
                $msgTxt .= makeDate();
                $msgTxt .= ")";
-
-               # Now send the mail..
                mail(ADMIN_EMAIL, "Page $nPgs Added To $subname "
                 . "Submission", $msgTxt, "From: WebSubmit_Administrator");
 
-               # Now redirect the browser to "pageDetsEDS.php"
+               // Now redirect the browser to "pageDetsEDS.php"
                sendToPageDets($subname, $nPgs, $nPgs, $doctype);
-            } // END else
-         } // END if
+            }
+         }
          else
          {
-            # In this case, the query has failed due to some kind of
-            # error.  We'd better let the user know this & the admin, and
-            # then simply redisplay the details of the current submission
-
-            print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR: It was "
+            // query failed
+            print("<SCRIPT TYPE=\"text/javascript\">\nalert('ERROR: It was "
             . "not possible to add a page to the $subname submission of "
             . "the $doctype document type.\\nThe system administrator "
             . "should be informed of this problem.');\n</SCRIPT>\n");
-
-            # Finally, we can redisplay the current submission pages
-            # details
             displayEDSsubDetsForm($subname, $doctype);
-         } // END else
-      } // END elseif
+         }
+      }
       elseif(isset($pageLeft))
       {
-         # If this clause has been reached, the user has chosen to move a
-         # page of the current submission to the left.  This means to give
-         # it a lower page number, and hence give it a higher priority in
-         # the page order sequence.
-
+         // move submission page to the left
+         // i.e. give it a lower page number, and hence give it a higher priority in
+         // the page order sequence.
          moveSubPage($doctype, $pageNumber, $nPgs, $subname,
                                                    $pageNumber - 1);
 
-         # Now simply redisplay the page that gives details of the
-         # submission...
          displayEDSsubDetsForm($subname, $doctype);
-      } // END elseif
+      }
       elseif(isset($pageRight))
       {
-         # If this clause has been reached, the user has chosen to move a
-         # page of the current submission to the right (give it a higher
-         # page number, and hence a lower priority in the order sequence)
-
+         // move a page to the right
+         // i.e. give it a higher page number, and hence a lower priority in the order sequence)
          moveSubPage($doctype, $pageNumber, $nPgs, $subname,
                                                    $pageNumber + 1);
 
-         # Now simply redisplay the page that gives details of the
-         # submission...
          displayEDSsubDetsForm($subname, $doctype);
-      } // END elseif
+      }
       elseif(isset($deletePage))
       {
-         # If this clause has been reached, the user has chosen to delete
-         # a page and all of its elements from the current submission.
-
-         # Process the deletion of an element
+         // delete a page and its contents
          deleteSubmissionPage($subname, $pageNumber, $nPgs, $doctype);
 
-         # Now simply redisplay the page that gives details of the
-         # submission...
          displayEDSsubDetsForm($subname, $doctype);
-      } // END elseif
+      }
       else
       {
-         # In this case, this is the first call to the page.  We can
-         # therefore simply display the details of the submission
-
          displayEDSsubDetsForm($subname, $doctype);
-      } // END else
+      }
    }
 
 
    /**********************Start of main script***************************/
 
-   # Connect to the MySQL server
+   // Connect to the MySQL server
    serverConnect(MYSQLDOCMACHINE, MYSQLDOCUSERID, MYSQLDOCPASSWORD);
 
-   # Select the CDS Search database...
+   // Select the Search database
    dbSelect(DOCS_DATABASE);
 
    $auth = canUseWebSubmitAdmin($uid,$doctype);
