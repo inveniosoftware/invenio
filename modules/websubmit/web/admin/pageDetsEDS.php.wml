@@ -41,12 +41,6 @@
          page), this function retrieves the configuration information for
          this element from the sbmFIELDDESC table, and uses this information
          to display the element.
-
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
-                 ca8nro@yahoo.co.uk
-         Created:          24/11/2000
-         Last Modified:    24/11/2000
       ******************************************************************/
 
       # Open an outer table, in which another table will be placed.  The
@@ -92,11 +86,6 @@
 
             if($configRes)
             {
-               # Hey hey, everything was fine with query execution.  We
-               # can now proceed to get the properties for the current
-               # item.
-               
-               # Get the number of rows returned by this query
                $numItemConfigs = mysql_num_rows($configRes);
          
                $anItemsProperties = mysql_fetch_array($configRes);
@@ -126,7 +115,6 @@
                elseif($anItemsProperties["type"] == "H")
                {
                   # Our item is a hidden input field.
-                  # Display it (or not!!)...
                
                   print("<INPUT TYPE=\"hidden\" NAME=\""
                   . $anItem["fidesc"] . "\" VALUE=\""
@@ -135,7 +123,7 @@
                elseif($anItemsProperties["type"] == "F")
                {
                   # Our item is a file input type.
-                  # Display it...
+                  # Display it
                 
                   print("<INPUT TYPE=\"file\" NAME=\"" . $anItem["fidesc"]
                   . "\" SIZE=" . $anItemsProperties["size"]
@@ -178,7 +166,7 @@
                # If the number of rows returned by the query of the
                # sbmFIELDDESC table was greater than 1, we can display a
                # small GREEN message so that the user to be aware of this
-               # error...
+               # error
        
                if($numItemConfigs > 1)
                {
@@ -237,12 +225,6 @@
          (which is the number of pages that make up the given submission),
          and the $doctype variable (which is the document type that the
          submission belongs to).
-         
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
-                 ca8nro@yahoo.co.uk
-         Created:        24/11/2000
-         Last Modified:  14/01/2001
       ******************************************************************/
 
       global $IMAGES;
@@ -270,7 +252,7 @@
       # Get the number of elements on the page...
       $noElements = mysql_num_rows($res);
 
-      # Ok, we want to output the fields of the result set in a certain  
+      # we want to output the fields of the result set in a certain  
       # order.  To do this, we don't want to have to write the code many 
       # times.  This means that we can simply make an array, whereby each
       # cell has an index number (corresponding to a certain field of the
@@ -585,12 +567,6 @@
          appears on), the $nPgs value (which is the number of pages that
          make up the given submission), and the $doctype variable (which
          is the document type that the submission belongs to).
-
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
-                 ca8nro@yahoo.co.uk
-         Created:         24/11/2000
-         Last Modified:   24/11/2000
       *******************************************************************/
 
       # Now, display a quick set of page instructions for the user..
@@ -607,29 +583,19 @@
       . "elements to the page.  You can also alter the order of "
       . "appearance that elements take on the submission page.</LI>\n"
       . "</OL>\n</P>\n</TD>\n</TR>\n</TABLE>\n");
-
-      # Make a horizontal rule to divide the page sections...
       drawSeparator();
-
-      # Okay, run a select query to get all elements that appear on the
-      # current page of the submission type...
 
       $res = mysql_query("SELECT * FROM sbmFIELD WHERE subname = '$subname'"
       . " AND pagenb = $pageNumber ORDER BY fieldnb");
 
       if(res)
       {
-         # Hey hey.  Everything was good with the query...
-
          makeSubmPgePrev($res, $pageNumber);
 
          # Now that we have produced a nice preview of the current page of
          # the submission, it is possible to actually give the details of
          # each element.
-
-         # Make a horizontal rule to divide the page sections...
          drawSeparator();
-
          buildPgeElemntTbl($res, $subname, $pageNumber, $nPgs,  
                            $doctype);
       } // END if
@@ -662,12 +628,6 @@
          value, the $fidesc value, the $currFieldnb value, the $link   
          pointer, the $nPgs value, the $doctype value, and the
          $previousfiDesc value.
-
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
-                 ca8nro@yahoo.co.uk
-         Created:          24/11/2000
-         Last Modified:    14/12/2000
       ******************************************************************/
             
       # Get the current date so that an elements modification date can be
@@ -704,7 +664,6 @@
          {
             # In this case, both queries have executed successfully.     
                     
-            # Free the 2 update query results..
             mysql_free_result($queryResultA);
             mysql_free_result($queryResultB);
 
@@ -718,7 +677,6 @@
 
             if($mdResult)
             {
-               # Free the result left by this update
                mysql_free_result($mdResult);
             } // END if
             else
@@ -779,12 +737,6 @@
          the $fidesc value, the $currFieldnb value and the $nextfiDesc 
          value.  These are all needed for the execution of the queries to
          move the elements.
-
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
-                 ca8nro@yahoo.co.uk
-         Created:          24/11/2000
-         Last Modified:    14/12/2000
       ******************************************************************/
 
       # Get the current date so that an elements modification date can be
@@ -903,15 +855,8 @@
          $subname value, the $pageNumber value, the $currFieldnb value,
          the $fidesc value, the $maxRowNo value, the $nPgs value, the
          $doctype value and the $elementPos value.
-         
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
-                 ca8nro@yahoo.co.uk
-         Created:            24/11/2000
-         Last Modified:      14/12/2000
       ******************************************************************/
 
-      # Get the date for modification date details
       $modifiedDate = makeEDSmdDate();
 
       # Now get a list of all of the elements on the page
@@ -971,15 +916,8 @@ WHERE	subname='$subname' and
          The function is passed several parameters.  These are the
          $subname value, the $pageNumber value, the $currFieldnb value and
          the $fidesc value.
-          
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
-                 ca8nro@yahoo.co.uk
-         Created:          24/11/2000
-         Last Modified:    14/12/2000
       ******************************************************************/
                
-      # Get the date for modification date details
       $dateDets = getdate();
             
       # Now put the date into a variable in a nice MySQL friendly format
@@ -1074,12 +1012,10 @@ WHERE	subname='$subname' and
             . "AND pagenb ='$pageNumber' AND fieldnb = '$currFieldnb' "
             . "AND fidesc = '$fidesc'";
             
-         # Execute the query to remove the element
          $finalDelRes = mysql_query($finalDelStr);
             
          if($finalDelRes)
          {
-            # Free the result pointer left by this deletion
             mysql_free_result($finalDelRes);
 
             # Now, we can send a quick email to the administrator, saying
@@ -1092,8 +1028,6 @@ WHERE	subname='$subname' and
        
             $msgTxt .= makeDate();
             $msgTxt .= ")";
-       
-            # Now send the mail..
             mail(ADMIN_EMAIL, "$subname Submission Type Updated", $msgTxt,
                                         "From: WebSubmit_Administrator");
          } // END if
@@ -1144,7 +1078,6 @@ WHERE	subname='$subname' and
          # the up arrow button to move an element up in the order in which
          # it is placed on the page...
 
-         # Free memory associated with X, Y, and up variables...
          unset($x);
          unset($y);
          unset($moveUp);
@@ -1162,7 +1095,6 @@ WHERE	subname='$subname' and
          # down arrow button to move an element down in the order in which
          # it is located on the page.
 
-         # Free memory associated with X, Y, and up variables...
          unset($x);
          unset($y);
          unset($moveDown);
@@ -1186,7 +1118,6 @@ WHERE	subname='$subname' and
             the element to be moved.
          ***************************************************************/
 
-         # Free any memory space used by the moveDigital variable.
          unset($moveDigital);
 
          # Process the element movement
@@ -1204,7 +1135,6 @@ WHERE	subname='$subname' and
          # fill the gap left by this element.  We also need to alter the
          # modified date of the given submission.
 
-         # Free any memory space used by the deleteElement flag
          unset($deleteElement);
 
          # Process the element deletion...
