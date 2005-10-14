@@ -32,127 +32,103 @@
 
    function displayPage()
    {
-      # Conduct a select query in order to retrieve the details of all of
-      # the EDS element descriptions.
+      // get all element descriptions.
       $queryResult = mysql_query("SELECT name FROM sbmFIELDDESC ORDER BY "
        . "name");
 
       if($queryResult)
       {
-         # Query worked
-
          if(mysql_num_rows($queryResult) < 1)
          {
-            # No elements in EDS
-
+            // No elements
             print("<P CLASS=\"errorMsg\">There Are Currently No Element "
              . "Descriptions In " . DOCS_DATABASE . "</P>\n");
-         } // END if
+         }
          else
          {
-            # In this case, there are elements to display...
-
-            # Display the table header..
-            print("<TABLE BORDER=1 CELLSPACING=3 ALIGN='center'>\n"
+            print("<TABLE BORDER=1 CELLSPACING=3 ALIGN=\"center\">\n"
              . "<TR>\n");
 
-            # We only want to display 25 items in a table column (as there
-            # are many elements desciptions in EDS), so we need to have a
-            # counter...
+            // only display 25 items in a table column
             $itemCount = 0;
-
             $numEls = mysql_num_rows($queryResult);
-            # Put all of the elements in an array...
+            // Put all of the elements in an array
             $allOfThem = resToArray($queryResult);
 
             for($i = 0; $i < $numEls; $i++)
             {
-               # Hey, display the element names...
-
                if($itemCount == 0)
                {
-                  # First item of a table
-                  print("<TD ALIGN='center' VALIGN='top'>\n"
-                   . "<TABLE ALIGN='center' BORDER=0"
-                   . " CELLSPACING=0 CELLPADDING=0>\n<TR>\n<TD ALIGN='"
-                   . "left'>\n<A HREF='elementConfigDetsEDS.php?name="
-                   . ereg_replace("'", "&#39;",
+                  // First item of a table
+                  print("<TD ALIGN=\"center\" VALIGN=\"top\">\n"
+                   . "<TABLE ALIGN=\"center\" BORDER=0"
+                   . " CELLSPACING=0 CELLPADDING=0>\n<TR><TD ALIGN=\""
+                   . "left\">\n<A HREF=\"elementConfigDetsEDS.php?name="
+                   . ereg_replace("\"", "&#34;",
                                     htmlspecialchars($allOfThem[$i][0]))
-                   . "&caller=allElementsEDS.php'>"
-                   . ereg_replace("'", "&#39;",
+                   . "&caller=allElementsEDS.php\">"
+                   . ereg_replace("\"", "&#34;",
                                     htmlspecialchars($allOfThem[$i][0]))
-                   . "</A>&nbsp;</TD>\n</TR>\n");
+                   . "</A>&nbsp;</TD></TR>\n");
 
                   $itemCount++;
-               } // END if
+               }
                elseif($itemCount == 24)
                {
-                  # Last item for the current table column...
-                  print("<TR>\n<TD ALIGN='left'>\n<A HREF='elementConfig"
-                  . "DetsEDS.php?name=" . ereg_replace("'", "&#39;", 
+                  // Last item for the current table column
+                  print("<TR><TD ALIGN=\"left\">\n<A HREF=\"elementConfig"
+                  . "DetsEDS.php?name=" . ereg_replace("\"", "&#34;", 
                                     htmlspecialchars($allOfThem[$i][0]))  
-                  . "&caller=allElementsEDS.php'>"
-                  . ereg_replace("'", "&#39;", 
+                  . "&caller=allElementsEDS.php\">"
+                  . ereg_replace("\"", "&#34;", 
                                     htmlspecialchars($allOfThem[$i][0]))
-                  . "</A>&nbsp;</TD>\n</TR>\n</TABLE>\n</TD>\n");
+                  . "</A>&nbsp;</TD></TR>\n</TABLE>\n</TD>\n");
 
                   $itemCount = 0;
-               } // END elseif
+               }
                else
                {
-                  # Just a normal column element
-                  print("<TR>\n<TD ALIGN='left'><A HREF='elementConfigD"
-                  . "etsEDS.php?name=" . ereg_replace("'", "&#39;",
+                  // Just a normal column element
+                  print("<TR><TD ALIGN=\"left\"><A HREF=\"elementConfigD"
+                  . "etsEDS.php?name=" . ereg_replace("\"", "&#34;",
                                     htmlspecialchars($allOfThem[$i][0]))
-                  . "&caller=allElementsEDS.php'>" 
-                  . ereg_replace("'", "&#39;",   
+                  . "&caller=allElementsEDS.php\">" 
+                  . ereg_replace("\"", "&#34;",   
                                     htmlspecialchars($allOfThem[$i][0]))
-                  . "</A>&nbsp;</TD>\n</TR>\n");
+                  . "</A>&nbsp;</TD></TR>\n");
 
                   $itemCount++;
-               } // END else
-            } // END for
+               }
+            }
 
             if($itemCount != 0)
             {
-               # Our inner table has not yet been closed up, so we can do
-               # this
-               print("</TABLE>\n</TD>\n");
-            } // END if
-
-            # Now that the table has been made, it is possible to close it
+               print("</TABLE>\n</TD>");
+            }
             print("</TR>\n</TABLE>\n");
-         } // END else
-
-         # Now that the Element description names have been displayed, we
-         # can display a button that will allow the addition of a new
-         # element to EDS.
-
-         print("<FORM ACTION='addElementDescrEDS.php' METHOD='post'><TA"
-         . "BLE BORDER=0 CELLSPACING=0 CELLPADDING=0 ALIGN='left' "
-         . "WIDTH='100%'>\n<TR><TD ALIGN='left'>\n<INPUT TYPE='button'"
-         . " VALUE='CREATE NEW ELEMENT DESCRIPTION' onClick=\"submit();\">\n"
+         }
+         print("<FORM ACTION=\"addElementDescrEDS.php\" METHOD=\"post\"><TA"
+         . "BLE BORDER=0 CELLSPACING=0 CELLPADDING=0 ALIGN=\"left\" "
+         . "WIDTH=\"100%\">\n<TR><TD ALIGN=\"center\">\n<INPUT TYPE=\"submit\""
+         . " VALUE=\"CREATE NEW ELEMENT DESCRIPTION\">\n"
          . "</TD>\n</TR>\n</TABLE>\n</FORM>\n");
-      } // END if
+      }
       else
       {
-         # In this case, the query has failed, so we can display an error
-         # message to the user..
-
          print("<P STYLE=\"font-size: large; color: navy; text-align: "
          . "center\"><SPAN STYLE=\"color: red\">ERROR:</SPAN> Unable to "
          . "query the <EM>sbmFIELDDESC</EM> table of the " . DOCS_DATABASE
          . " database.<BR>Please contact system administrator.</P>\n");
-      } // END else 
+      }
    }
 
 
    /**********************Start of main script***************************/
 
-   # Connect to the MySQL server
+   // Connect to the MySQL server
    serverConnect(MYSQLDOCMACHINE, MYSQLDOCUSERID, MYSQLDOCPASSWORD);
 
-   # Select the CDS Search database...
+   // Select the Search database...
    dbSelect(DOCS_DATABASE);
 
    $auth = canUseWebSubmitAdmin($uid);
