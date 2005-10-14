@@ -108,8 +108,8 @@ curActionbutton, sugActionbutton, curStatustext, sugStatustext)
       . "'), escape(actionbutton.value), escape('"
       . ereg_replace("'","\\'",
                      htmlspecialchars($dataRow["statustext"]))
-      . "'), escape(statustext.value))) { submit(); }\">\n</TD>\n</FORM>\n<FORM ACTION='$caller"
-      . "' METHOD='post'>\n");
+      . "'), escape(statustext.value))) { submit(); }\">\n</TD>\n</FORM>\n<FORM ACTION=\"$caller"
+      . "\" METHOD=\"post\">\n");
 
       if($caller == "documentEDS.php")
       {
@@ -300,7 +300,7 @@ curActionbutton, sugActionbutton, curStatustext, sugStatustext)
 
    function displayPage($update,$actname)
    {
-      global $lactname,$sactname,$dir,$actionbutton,$statustext;
+      global $lactname,$sactname,$dir,$actionbutton,$statustext,$caller,$doctype;
 
       if($update)
       {
