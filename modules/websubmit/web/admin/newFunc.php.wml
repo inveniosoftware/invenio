@@ -42,21 +42,14 @@
          the finish button sends the page focus to whatever page name is
          passed as an argument to the function.
 
-         It should be noted that the function does not place any hidden
-         inputs into the form, so this function is unacceptable if you
-         wish to call a page that requires CGI variables to be passed to
-         it.
-
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
          Created:          01/10/2000
          Last Modified:    03/10/2000
       **************************************************************/
 
-      print("<TABLE ALIGN='center' BORDER=0 CELLPADDING=0 "
-          . "CELLSPACING=0>\n<TR>\n<TD ALIGN='center'>\n"
-          . "<FORM ACTION='$action' METHOD='post'>\n"
-          . "<INPUT TYPE='button' VALUE='$buttonTxt' "
+      print("<TABLE ALIGN=\"center\" BORDER=0 CELLPADDING=0 "
+          . "CELLSPACING=0>\n<TR>\n<TD ALIGN=\"center\">\n"
+          . "<FORM ACTION=\"$action\" METHOD=\"post\">\n"
+          . "<INPUT TYPE=\"button\" VALUE='$buttonTxt' "
           . "onClick=\"submit();\">\n"
           . "</FORM>\n</TD>\n</TR>\n</TABLE>\n");
    } // END function changePageFocusButton($action, $buttonTxt)
@@ -71,65 +64,61 @@
          produce a form with 2 inputs - one for the function name, and
          another for the function description.
 
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
          Created:         02/10/2000
          Last Modified:   03/10/2000
       ***************************************************************/
          
 	global $URLPATH;
 
-      # Add a description of the page...
+      // Add a description of the page...
       print("<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0 "
-          . "ALIGN='center' BGCOLOR='#E0E0E0'>\n<TR><TD "
-          . "ALIGN='left'>\n<SMALL><I>Using this facility, it is"
+          . "ALIGN=\"center\" BGCOLOR=\"#E0E0E0\">\n<TR><TD "
+          . "ALIGN=\"left\">\n<SMALL><I>Using this facility, it is"
           . " possible to add new functions to the WebSubmit system.  "
           . "The first stage, is to enter the name and the "
           . "description of the function into the form below, and "
           . "then submit these details...</I>\n</SMALL>\n"
           . "</TD>\n</TR>\n</TABLE>\n");
 
-      # Get a list of the fields in the sbmALLFUNCDESCR table
+      // Get a list of the fields in the sbmALLFUNCDESCR table
       $fields = mysql_list_fields(DOCS_DATABASE, "sbmALLFUNCDESCR");
 
-      # Get the length of the function field...
+      // Get the length of the function field...
       $funcLen = mysql_field_len($fields, 0);
 
-      # Now get the length of the description field...
+      // Now get the length of the description field...
       $descLen = mysql_field_len($fields, 1);
 
-      # Open an HTML form to allow the user to enter the details of 
-      # the function name, and description fields...
+      // Open an HTML form to allow the user to enter the details of 
+      // the function name, and description fields...
 
-      print("<FORM METHOD='post' ACTION='newFunc.php'>\n"
+      print("<FORM METHOD=\"post\" ACTION=\"newFunc.php\">\n"
           . "<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>\n"
-          . "<TR>\n<TD ALIGN='right'><STRONG><H4>"
+          . "<TR>\n<TD ALIGN=\"right\"><STRONG><H4>"
           . "function:</H4></STRONG></TD>\n"
-          . "<TD>&nbsp;&nbsp;</TD>\n<TD ALIGN='left'><INPUT TYPE="
-          . "'text' NAME='thefunction' SIZE=$funcLen>\n"
-          . "</TD>\n</TR>\n<TR>\n<TD ALIGN='right'><STRONG>"
+          . "<TD>&nbsp;&nbsp;</TD>\n<TD ALIGN=\"left\"><INPUT TYPE="
+          . "\"text\" NAME=\"thefunction\" SIZE=$funcLen>\n"
+          . "</TD>\n</TR>\n<TR>\n<TD ALIGN=\"right\"><STRONG>"
           . "<H4>description:</H4></STRONG></TD>\n"
-          . "<TD>&nbsp;&nbsp;</TD>\n<TD ALIGN='left'>"
-          . "<INPUT TYPE='text' NAME='description' "
+          . "<TD>&nbsp;&nbsp;</TD>\n<TD ALIGN=\"left\">"
+          . "<INPUT TYPE=\"text\" NAME=\"description\" "
           . " SIZE=60></TD>\n</TR>\n</TABLE>\n");
 
-      # Now add a table to contain both a save button, and a cancel
-      # button...
       print("<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 "
-          . "ALIGN='center'>\n"
-          . "<INPUT TYPE='hidden' NAME='commitFunction' "
-          . "VALUE='true'>\n"
-          . "<TR>\n<TD ALIGN='center'>\n<INPUT TYPE='button' "
-          . "VALUE='SAVE DETAILS' onClick=\"if(thefunction.value =="
+          . "ALIGN=\"center\">\n"
+          . "<INPUT TYPE=\"hidden\" NAME=\"commitFunction\" "
+          . "VALUE=\"true\">\n"
+          . "<TR>\n<TD ALIGN=\"center\">\n<INPUT TYPE=\"button\" "
+          . "VALUE=\"SAVE DETAILS\" onClick=\"if(thefunction.value =="
           . " '') { alert('A function name must be entered!'); }"
           . " else if(confirm('Are you sure you wish to commit this"
           . " function to WebSubmit?')) { submit(); "
           . "}\">\n</TD>\n</FORM>\n"
-          . "<FORM ACTION='listFunctions.php' METHOD='post'>\n<TD>\n"
-          . "<INPUT TYPE='button' VALUE='CANCEL' "
+          . "<FORM ACTION=\"listFunctions.php\" METHOD=\"post\">\n<TD>\n"
+          . "<INPUT TYPE=\"button\" VALUE=\"CANCEL\" "
           . "onClick=\"submit();\">\n</TD>\n</FORM>\n</TR>\n"
           . "</TABLE>\n");
-   } // END function displayBlankForm()
+   }
 
    //***************
 
@@ -137,16 +126,13 @@
    {
       global $commitFunction,$thefunction,$description,$tableSelected,$insertParam,$function,$newParam,$theParam,$updateFunDets;
 
-      # Test to see which type of call to this page this actually is, and
-      # take the appropriate action based upon this...
+      // Test to see which type of call to this page this actually is, and
+      // take the appropriate action based upon this...
 
       if($commitFunction)
       {
-         # If this clause has been reached, it means that the user has
-         # entered the name &/or description for the new function, and has
-         # chosen to commit it to the WebSubmit database.
-
-	 ########LOCKS########
+         // user entered the name &/or description for the new function, and has
+         // chosen to commit it to the database.
 
 	 if($lockRes = mysql_query("LOCK TABLES sbmALLFUNCDESCR WRITE"))
 	 {
@@ -155,103 +141,63 @@
                                                     '$description')");
 
 	    $unlockRes = mysql_query("UNLOCK TABLES");
-
             if($commitResult)
             {
-               # In this case, the new function has successfully been
-	       # added to the WebSubmit database, so therefore we can display
-	       # the details for the function (name, description,
-	       # parameters), and also offer the user the opportunity to
-	       # add parameters to it...
-
-               # Send an email to the WebSubmit administrator, informing them
-	       # that a new function has been added to the WebSubmit system..
-
-               # Get the date for the message...
+               // function has been successfully added to DB
+               // Send an email to the administrator, informing them
+	       // that a new function has been added to the system..
                $dateDets = getDate();
 
-               # Create the message text...
-               $messageText = "Please be advised that the $thefunction "
-               . "function was added to WebSubmit on " . $dateDets['weekday']
+               $messageText = "The $thefunction "
+               . "function was added to the submission system on " . $dateDets['weekday']
                . " " . $dateDets['mday'] . " " . $dateDets['month'] . " "
                . $dateDets['year'] . ", at " . $dateDets['hours'] . ":"
                . $dateDets['minutes'] . ".\n\nWebSubmit Administrator.";
-
-               # Send the message...
                mail(ADMIN_EMAIL, "Warning: $thefunction Function Created",
                                $messageText, "From: WebSubmit_Administrator");
 
-               # Display an alert informing the user that the new function
-               # has been added to the WebSubmit system
-               print("<SCRIPT TYPE='text/javascript'>alert('The "
-                . "$thefunction function has been added to the WebSubmit "
-                . "system');</SCRIPT>\n");
-
-               # Display a header for the page...
-               print("<H3 ALIGN='center'>The <EM>$thefunction</EM> "
-	        . "Function"
-                . "</H3>\n<BR>\n");
-
-               # Now display all of the functions details, and offer the
-               # opportunity to add parameters to the function...
-
+               print("<H3 ALIGN=\"center\">The <EM>$thefunction</EM> "
+	        . "Function Has Been Added</H3>\n<BR>\n");
+               // Now display all of the functions details, and offer the
+               // opportunity to add parameters to the function
                makePageBody($thefunction, "newFunc.php");
-
-               # Display a finished button...
                changePageFocusButton("listFunctions.php", "FINISHED");
 
-            } // END if($commitResult)
+            }
             else
-            {   
-               # In this case, the insert query has been unable to insert
-	       # the new function data into the table, and therefore we
-	       # should display an error message, and redirect the browser
-	       # to the home page.
-            
-               print("<SCRIPT TYPE='text/javascript'>alert('ERROR:\\n\\n"
-                . "Unable to commit new function details to sbmALLFUNCDESCR"
-                . " table.\\n\\nInsert Cancelled.');</SCRIPT>\n");
-            } // END else
-         } # END if
+            {
+	       // unable to insert new function data
+               print("<DIV STYLE=\"color: navy; font-weight: bold; font-size:"
+               . " large; text-align: center\"><SPAN STYLE=\"color: red\">Error"
+               . ":</SPAN> Unable to commit function details.</DIV>\n<BR>\n");
+            }
+         }
 	 else
 	 {
-	    # Damn, we couldn't get a write lock -> output error message.
-            print("<DIV STYLE='color: navy; font-weight: bold; font-size:"
-            . " large; text-align: center'><SPAN STYLE='color: red'>Error"
+	    // couldn't get write lock -> output error message.
+            print("<DIV STYLE=\"color: navy; font-weight: bold; font-size:"
+            . " large; text-align: center\"><SPAN STYLE=\"color: red\">Error"
 	    . ":</SPAN> Unable to commit details.</DIV>\n<BR>\n");
-
-         
-            # Display a blank form into which the details of the function
-	    # can be entered by the user
             displayBlankForm();
-	 } # END else
-      } // END if($commitFunction)
+	 }
+      }
       elseif($tableSelected || $insertParam)
       {
-         # If this is the case, it is time to add a parameter to the
-         # function, whether it be a call to actually add a parameter to a
-         # function, or to actually just get the fields in a table (which
-         # is part of the add a parameter process!)...
-
+         // Add parameter to function
          if(isset($tableSelected))
          {
-            # Display a title...
-            print("<H3 ALIGN='center'>The <EM>$function</EM>"
+            print("<H3 ALIGN=\"center\">The <EM>$function</EM>"
                 . " Function</H3>\n<BR>\n");
 
-            # Make the page, including the table of parameters...
+            // Make the page, including the table of parameters
             makePageBody($function, "newFunc.php");
-
-            # Display a finished button
             changePageFocusButton("listFunctions.php", "FINISHED");
 
          } // END if
          elseif($insertParam)
          {
-            # here, we actually commit the new paramater, and then recall
-            # the whole thing...
-
-            #######LOCKS#######
+            // here, we actually commit the new paramater, and then recall
+            // the whole thing
 
 	    if($lockRes = mysql_query("LOCK TABLES sbmFUNDESC WRITE"))
 	    {
@@ -261,66 +207,49 @@
 		else
                		$insertParamRes = mysql_query("INSERT INTO sbmFUNDESC
                       VALUES('$function', '$theParam')");
-
-	       # Remove the locks...
 	       $unlockRes = mysql_query("UNLOCK TABLES");
 
-               # Perhaps here we should email admin to let them know that
-	       # the parameter has been added...
-
-               # Get the date for the message...
+               // email admin to let them know that the parameter has been added
                $dateDets = getDate();
 
-               # Create the message text...
-               $messageText = "Please be advised that a parameter was "
+               $messageText = "A parameter was "
 	       . "added to the new $function function on "
                . $dateDets['weekday']
                . " " . $dateDets['mday'] . " " . $dateDets['month'] . " "
                . $dateDets['year'] . ", at " . $dateDets['hours'] . ":"
                . $dateDets['minutes'] . ".\n\n"
-               . "Of course, the function should not yet be used by any"
-               . " doctypes or actions, but it should be noted that if it"
-               . " is to be utilised by these doctypes/actions, rows "
+               . "If the function is to be used by any doctypes/actions, rows "
 	       . "should be added for the relevant doctype in the "
 	       . "relevant tables of the various parameters."
                . "\n\nWebSubmit Administrator.";
-
-               # Send the message...
                mail(ADMIN_EMAIL, "Parameter Added To New $function "
 		. "Function",
                             $messageText, "From: WebSubmit_Administrator");
-	    } # END if
+	    }
 	    else
 	    {
-	       # Unable to lock table.
-	       print("<DIV STYLE='color: navy; font-weight: bold; "
-		. "font-size: large; text-align: center'><SPAN "
-		. "STYLE='color: red'>Error:</SPAN> Unable to commit"
+	       // Unable to lock table.
+	       print("<DIV STYLE=\"color: navy; font-weight: bold; "
+		. "font-size: large; text-align: center\"><SPAN "
+		. "STYLE=\"color: red\">Error:</SPAN> Unable to commit"
 		. " updates.</DIV>\n<BR>\n");
-	    } # END else
+	    }
 
-            # Display a title...
-            print("<H3 ALIGN='center'>The <EM>$function</EM>"
+            print("<H3 ALIGN=\"center\">The <EM>$function</EM>"
                 . " Function</H3>\n<BR>\n");
 
-            # Display the page again, so more parameters can be added.
+            // Display the page again, so more parameters can be added.
             makePageBody($function, "newFunc.php");
 
-            # Display a finished button
             changePageFocusButton("listFunctions.php", "FINISHED");
          } // END elseif($insertParam)
       } // END elseif($tableSelected || $insertParam)
       elseif($updateFunDets)
       {
-         # If this variable is set, then this instance of the page is a
-         # call to update the value of the description field, and hence
-         # the update query must be carried out, and then all details of
-         # the function displayed once again...
-   
-         # Free the $updateFunDets variable...
+         // update the value of the description field
          unset($updateFunDets);
 
-         # Place WRITE lock on the sbmALLFUNCDESCR table...
+         // Place WRITE lock on the sbmALLFUNCDESCR table
 	 if($lockRes = mysql_query("LOCK TABLES sbmALLFUNCDESCR WRITE"))
          {
             $updateDescRes = mysql_query("UPDATE sbmALLFUNCDESCR SET
@@ -331,61 +260,44 @@
       
             if(!$updateDescRes)
             {
-               # If this clause is reached, the script has been unable to
-               # update the value of description for some reason, and the
-               # user should be informed of this...
+               // unable to update the value of description for some reason, and the
+               // user should be informed of this
     
-               print("<SCRIPT TYPE='text/javascript'>alert('ERROR:\\n\\n"
+               print("<SCRIPT TYPE=\"text/javascript\">alert('ERROR:\\n\\n"
                 . "Unable to update value of description for $function\\n"
                 . "function in sbmALLFUNCDESCR table.\\n\\n"
                 . "Please inform administrator.</SCRIPT>\n");
             } // END if
-      
-            # Free up the space associated with the $updateDescRes query
-            # result...
             mysql_free_result($updateDescRes);
-         } # END if
+         } // END if
 	 else
  	 {
-	    # Couldn't lock table.  Output error message.
-	    print("<DIV STYLE='color: navy; font-weight: bold; font-size:"
-            . " large; text-align: center'><SPAN STYLE='color: "
-	    . "red'>Error:</SPAN> Unable to retrieve information.</DIV>\n"
+	    // Couldn't lock table.  Output error message.
+	    print("<DIV STYLE=\"color: navy; font-weight: bold; font-size:"
+            . " large; text-align: center\"><SPAN STYLE=\"color: "
+	    . "red\">Error:</SPAN> Unable to retrieve information.</DIV>\n"
 	    . mysql_error()."<BR>\n");
-	 } # END else
-
-         # Display a title...
-         print("<H3 ALIGN='center'>The <EM>$function</EM>"
+	 }
+         print("<H3 ALIGN=\"center\">The <EM>$function</EM>"
              . " Function</H3>\n<BR>\n");
-   
-         # Redisplay the page...
          makePageBody($function, "newFunc.php");
-
-         # Display a finished button
          changePageFocusButton("listFunctions.php", "FINISHED");
       }
       else
       {
-         # In this case, this is the first call to the script, and the
-         # default add a new function forms can be displayed for the
-         # user...
-
-
-         # Display a blank form into which the details of the function can
-         # be entered by the user
-
+         // Display a blank form into which the details of the function can
+         // be entered by the user
          displayBlankForm();
-
-      } // END else
+      }
    }
 
 
    /**********************Start of main script***************************/
 
-   # Connect to the MySQL server
+   // Connect to the MySQL server
    serverConnect(MYSQLDOCMACHINE, MYSQLDOCUSERID, MYSQLDOCPASSWORD);
 
-   # Select the CDS Search database...
+   // Select the CDS Search database...
    dbSelect(DOCS_DATABASE);
 
    $auth = canUseWebSubmitAdmin($uid);
