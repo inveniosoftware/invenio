@@ -64,22 +64,11 @@ function displayPage()
       all of the actions and doctypes that use this function, as they will
       need values inserting into the relevant tables for the new
       parameter.
-
-      Author: Nicholas Robinson
-      Email:  Nicholas.Robinson@cern.ch
    ******************************************************************/
 
       if(isset($updateFunDets))
       {
-         # If this variable is set, then this instance of the page is a
-         # call to update the value of the description field, and hence
-         # the update query must be carried out, and then all details of
-         # the function displayed once again...
-
-         # Free the $updateFunDets variable...
          unset($updateFunDets);
-
-	 # LOCK THE TABLES
 	 if($lockRes = mysql_query("LOCK TABLES sbmALLFUNCDESCR WRITE"))
          {
             $updateDescRes = mysql_query("UPDATE sbmALLFUNCDESCR SET "
@@ -90,51 +79,33 @@ function displayPage()
 
             if(!$updateDescRes)
             {
-               # If this clause is reached, the script has been unable to
-               # update the value of description for some reason, and the
-               # user should be informed of this...
-
-               print("<SCRIPT TYPE='text/javascript'>alert('ERROR:\\n\\n"
-                . "Unable to update value of description for $function\\n"
-                . "function in sbmALLFUNCDESCR table.\\n\\n"
-                . "Please inform administrator.</SCRIPT>\n");
-            } // END if
-	 } # END if
+               // unable to update the value of description: inform user
+               print("<DIV STYLE=\"color: navy; font-weight: bold; "
+               . "text-align: center; font-size: large\"><SPAN STYLE=\"color: "
+               . "red\">Error:</SPAN> Unable to update value of description for $function"
+               . "function</DIV>\n<BR>\n");
+            }
+	 }
 	 else
 	 {
-	    # Couldn't get lock - therefore no update allowed - tell user
-	    print("<DIV STYLE='color: navy; font-weight: bold; "
-	    . "text-align: center; font-size: large'><SPAN STYLE='color: "
-            . "red'>Error:</SPAN> Unable to update description.</DIV>\n"
+	    // Couldn't get lock - no update allowed - tell user
+	    print("<DIV STYLE=\"color: navy; font-weight: bold; "
+	    . "text-align: center; font-size: large\"><SPAN STYLE=\"color: "
+            . "red\">Error:</SPAN> Unable to update description.</DIV>\n"
             . "<BR>\n");
-	 } # END else
-
-         # Free up the space associated with the $updateDescRes query
-         # result...
+	 }
          mysql_free_result($updateDescRes);
-
-
-         # Redisplay the page...
          makePageBody($function, "veditFunDets.php");
-
-         # Now, add a finish button that allows the user to leave the page
-         # and return to the 'listFunctions.php' page...
-            
-         print("<TABLE ALIGN='center' BORDER=0 CELLPADDING=0 "
-             . "CELLSPACING=0>\n<TR>\n<TD ALIGN='center'>\n"
-             . "<FORM ACTION='listFunctions.php' METHOD='post'>\n"
-             . "<INPUT TYPE='button' VALUE='FINISHED' "
+         print("<TABLE ALIGN=\"center\" BORDER=0 CELLPADDING=0 "
+             . "CELLSPACING=0>\n<TR>\n<TD ALIGN=\"center\">\n"
+             . "<FORM ACTION=\"listFunctions.php\" METHOD=\"post\">\n"
+             . "<INPUT TYPE=\"button\" VALUE=\"FINISHED\" "
              . "onClick=\"submit();\">\n"
              . "</FORM>\n</TD>\n</TR>\n</TABLE>\n"); 
-
-
-      } // END if
+      }
       elseif(isset($insertParam))
       {
-         # If this variable is set, then this instance of the page is a
-         # call to add a new parameter to the function...
-
-         # LOCK THE TABLES
+         // call to add a new parameter to the function...
          if($lockRes = mysql_query("LOCK TABLES sbmFUNDESC WRITE"))
          {
 		if ($newParam != "")
@@ -143,38 +114,24 @@ function displayPage()
 		else
             		$insertParamRes = mysql_query("INSERT INTO sbmFUNDESC
                       VALUES('$function', '$theParam')");
-
             $unlockRes = mysql_query("UNLOCK TABLES");
-
             if($insertParamRes)
             {
-               # Now that the parameter has been added, it is necessary to
-               # display an alert informing the user that the parameter
-		# has been added, but that they must also update all
-		# doctypes that use the function to have an actual value
-		# in the relevant table...
+                // Now that the parameter has been added, it is necessary to
+                // display an message informing the user that the parameter
+		// has been added, but that they must also update all
+		// doctypes that use the function to have an actual value
+		// in the relevant table
+               print("<DIV STYLE=\"text-align: center; font-weight: bold; "
+               . "font-size: medium; color: navy\">The $function function will now "
+               . "use the parameter $theParam.<br>You will need to provide a value "
+               . "for this parameter for every doctype that uses the function.<br>"
+               . "Click the Continue button to see the usage of this function.</DIV>\n");
 
-               print("<SCRIPT TYPE='text/javascript'>alert('Parameter "
-		. "Added:"
-                . "\\n\\nThe $function function will now take a parameter"
-                . "\\nfrom the $theParam column of the $theTable table."
-                . "\\n\\nImportant:\\n\\nYour browser has now been "
-                . "redirected to a page displaying the\\ndocument types"
-                . " and the actions that this function is utilised in."
-                . "\\nIt is VERY important that you add a row into the\\n"
-                . "$theTable table for each of these document types, as"
-                . " the\\n$function function will now search for this row"
-                . " when it is called.');</SCRIPT>\n");
-
-               # Email the WebSubmit system administrator, and warn them that a
-               # function has been added to WebSubmit, and that they should
-	       # ensure that all relevant tables have been updated...
-
-               # Get the date for the message...
+               // Email the administrator, and warn them that a
+               // function has been added to WebSubmit
                $dateDets = getDate();
-
-               # Create the message text...
-               $messageText = "Please be advised that a parameter was "
+               $messageText = "A parameter was "
 	       . "added"
                . " to the $function function on " . $dateDets['weekday']
                . " " . $dateDets['mday'] . " " . $dateDets['month'] . " "
@@ -189,76 +146,49 @@ function displayPage()
                . "utilise this function can be found under the 'WebSubmit "
                . "Functions' section of the WebSubmit Administrator "
                . "menu.\n\nWebSubmit Administrator.";
-
-               # Send the message...
                mail(ADMIN_EMAIL, "Parameter Added To $function Function",
                             $messageText, "From: WebSubmit_Administrator");
 
-               # Make a form containing the function name for submitting
-		# to the 'funcUsage.php' script, so that it is able to
-		# display the usage of the function in question...
-
-               print("<FORM ACTION='funcUsage.php' METHOD='post' "
-                . "NAME='referForm'>\n<INPUT TYPE='hidden'"
-                . " NAME='function' VALUE='$function'>\n</FORM>\n");
-
-               # Now submit the form...
-
-               print("<SCRIPT TYPE='text/javascript'>\n"
-                . "setTimeout(\"document.referForm.submit();\", 0);\n"
-                . "</SCRIPT>\n");
-            } // END if
+               print("<br><br><TABLE ALIGN=\"center\" BORDER=0 CELLPADDING=0 "
+               . "CELLSPACING=0>\n<TR>\n<TD ALIGN=\"center\">\n"
+               . "<FORM ACTION=\"funcUsage.php\" METHOD=\"post\">\n"
+               . "<INPUT TYPE=\"hidden\" NAME=\"function\" VALUE=\"$function\">\n"
+               . "<INPUT TYPE=\"submit\" VALUE=\"Continue\">\n"
+               . "</FORM>\n</TD>\n</TR>\n</TABLE>\n");
+            }
             else
             {
-               # If the insert query did not execute...
-
-               print("<SCRIPT TYPE='text/javascript'>alert('ERROR:\\n\\n"
-                . "It was not possible to add this parameter to the "
-                . "function.');</SCRIPT>\n");
-
-
-               # Just redisplay the page...
+               // If the insert query did not execute
+	       print("<DIV STYLE=\"text-align: center; font-weight: bold; "
+	       . "font-size: large; color: navy\"><SPAN STYLE=\"color: red\">"
+	       . "Error:</SPAN> Unable to insert parameter.</DIV>\n");
                makePageBody($function, "veditFunDets.php");
-
-               # Now, add a finish button that allows the user to leave
-	       # the pa'e and return to the 'listFunctions.php' page...
-            
-               print("<TABLE ALIGN='center' BORDER=0 CELLPADDING=0 "
-                . "CELLSPACING=0>\n<TR>\n<TD ALIGN='center'>\n"
-                . "<FORM ACTION='listFunctions.php' METHOD='post'>\n"
-                . "<INPUT TYPE='button' VALUE='FINISHED' "
+               print("<TABLE ALIGN=\"center\" BORDER=0 CELLPADDING=0 "
+                . "CELLSPACING=0>\n<TR>\n<TD ALIGN=\"center\">\n"
+                . "<FORM ACTION=\"listFunctions.php\" METHOD=\"post\">\n"
+                . "<INPUT TYPE=\"button\" VALUE=\"FINISHED\" "
                 . "onClick=\"submit();\">\n"
                 . "</FORM>\n</TD>\n</TR>\n</TABLE>\n"); 
-            } // END else
-	 } # END if
+            }
+	 }
 	 else
 	 {
-	    # Unable to get a lock.  Don't commit at any costs!
-	    print("<DIV STYLE='text-align: center; font-weight: bold; "
-	    . "font-size: large; color: navy'><SPAN STYLE='color: red'>"
+	    // Unable to get a lock
+	    print("<DIV STYLE=\"text-align: center; font-weight: bold; "
+	    . "font-size: large; color: navy\"><SPAN STYLE=\"color: red\">"
 	    . "Error:</SPAN> Unable to insert parameter.</DIV>\n");
-
-               
-            # Just redisplay the page...
             makePageBody($function, "veditFunDets.php");
-               
-            # Now, add a finish button that allows the user to leave
-            # the page and return to the 'listFunctions.php' page...
-            
-            print("<TABLE ALIGN='center' BORDER=0 CELLPADDING=0 "
-                . "CELLSPACING=0>\n<TR>\n<TD ALIGN='center'>\n"
-                . "<FORM ACTION='listFunctions.php' METHOD='post'>\n"
-                . "<INPUT TYPE='button' VALUE='FINISHED' "
+            print("<TABLE ALIGN=\"center\" BORDER=0 CELLPADDING=0 "
+                . "CELLSPACING=0>\n<TR>\n<TD ALIGN=\"center\">\n"
+                . "<FORM ACTION=\"listFunctions.php\" METHOD=\"post\">\n"
+                . "<INPUT TYPE=\"button\" VALUE=\"FINISHED\" "
                 . "onClick=\"submit();\">\n"
                 . "</FORM>\n</TD>\n</TR>\n</TABLE>\n");
-         } # END else
-      } // END elseif
+         }
+      }
       elseif(isset($deleteParam))
       {
-         # This call to this script is a call to delete a given parameter
-         # from a function.
-
-         # LOCK THE TABLES
+         // delete a parameter from a function.
          if($lockRes = mysql_query("LOCK TABLES sbmFUNDESC WRITE"))
          {
             $delRes = mysql_query("DELETE FROM sbmFUNDESC WHERE function = '"
@@ -266,29 +196,18 @@ function displayPage()
          
             if($delRes)
             {
-               # Query worked
-            
                if(mysql_affected_rows() < 1)
                {
-                  # Damn.  We deleted no rows for some reason.
-      
-                  print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR: "
-                  . "Unable to delete requested parameter.\\nTry again "
-                  . "or inform system administrator.');\n</SCRIPT>\n");
+                  print("<DIV STYLE=\"text-align: center; font-weight: bold; "
+                  . "font-size: large; color: navy\"><SPAN STYLE=\"color: red\">"
+                  . "Error:</SPAN> Unable to delete parameter.</DIV>\n");
                } // END if
                else
                {
-                  # Woo Hoo!  We deleted the parameter!
-            
-                  print("<SCRIPT TYPE='text/javascript'>\nalert('Parameter"
-                  . " Deleted.\\n\\nWhen executed, the $function function"
-                  . " will no longer search for the deleted "
-		  . "parameter.');\n</SCRIPT>\n");
-       
-                  # Mail admin...
-                  # Get the current date and time...
+                  print("<DIV STYLE=\"text-align: center; font-weight: bold; "
+                  . "font-size: large; color: navy\">"
+                  . "Parameter Deleted!</DIV>\n");
                   $dateDets = getdate();
-         
                   $msgTxt = "A parameter has been deleted from the "
 		   . "$function"
                    . " function in the " . DOCS_DATABASE . "database.  This "
@@ -301,88 +220,67 @@ function displayPage()
                    . $dateDets['month'] . " " .  $dateDets['year']
                    . ", at " . $dateDets['hours'] . ":"
                    . $dateDets['minutes'] . ".\n\nWebSubmit Administrator.";
-               
-                   # Send the message...
                    mail(ADMIN_EMAIL, "Parameter Deleted From $function",
                                      $msgTxt, "From: WebSubmit_Administrator");
-               } // END else
-            } // END if
+               }
+            }
             else
-            {  
-               # Damn.  Query failed.
-                
-               print("<SCRIPT TYPE='text/javascript'>\nalert('ERROR: "
-		. "Unable "
-                . "to delete requested parameter.\\nTry again or inform "
-                . "system administrator.');\n</SCRIPT>\n");
-            } // END else
-	 } # END if
+            {
+               print("<DIV STYLE=\"text-align: center; font-weight: bold; "
+                  . "font-size: large; color: navy\"><SPAN STYLE=\"color: red\">"
+                  . "Error:</SPAN> Unable to delete parameter.</DIV>\n");
+            }
+	 }
          else
 	 {
-  	    # Unable to get lock - don't allow deletion.
-            print("<DIV STYLE='text-align: center; font-weight: bold; "
-            . "font-size: large; color: navy'><SPAN STYLE='color: red'>"
+  	    // Unable to get lock - don't allow deletion.
+            print("<DIV STYLE=\"text-align: center; font-weight: bold; "
+            . "font-size: large; color: navy\"><SPAN STYLE=\"color: red\">"
             . "Error:</SPAN> Unable to delete parameter.</DIV>\n");
-	 } # END else
-
-         # Now redisplay the page... 
+	 }
          makePageBody($function, "veditFunDets.php");
                
-         # Now, add a finish button that allows the user to leave the  
-         # page and return to the 'listFunctions.php' page...
-                   
-         print("<TABLE ALIGN='center' BORDER=0 CELLPADDING=0 "
-                . "CELLSPACING=0>\n<TR>\n<TD ALIGN='center'>\n"
-                . "<FORM ACTION='listFunctions.php' METHOD='post'>\n"
-                . "<INPUT TYPE='button' VALUE='FINISHED' "
+         print("<TABLE ALIGN=\"center\" BORDER=0 CELLPADDING=0 "
+                . "CELLSPACING=0>\n<TR>\n<TD ALIGN=\"center\">\n"
+                . "<FORM ACTION=\"listFunctions.php\" METHOD=\"post\">\n"
+                . "<INPUT TYPE=\"button\" VALUE=\"FINISHED\" "
                 . "onClick=\"submit();\">\n"
                 . "</FORM>\n</TD>\n</TR>\n</TABLE>\n");
-      } // END elseif
+      }
       else
       {
-
          if(isset($tableSelected))
          {
-            # Make the page, including the table of parameters...
             makePageBody($function, "veditFunDets.php",
                                          $tableSelected, $theTable);
-
-            # Now, add a finish button that allows the user to leave the
-            # page and return to the 'listFunctions.php' page...
-
-            print("<TABLE ALIGN='center' BORDER=0 CELLPADDING=0 "
-                . "CELLSPACING=0>\n<TR>\n<TD ALIGN='center'>\n"
-                . "<FORM ACTION='listFunctions.php' METHOD='post'>\n"
-                . "<INPUT TYPE='button' VALUE='FINISHED' "
+            print("<TABLE ALIGN=\"center\" BORDER=0 CELLPADDING=0 "
+                . "CELLSPACING=0>\n<TR>\n<TD ALIGN=\"center\">\n"
+                . "<FORM ACTION=\"listFunctions.php\" METHOD='post'>\n"
+                . "<INPUT TYPE=\"button\" VALUE=\"FINISHED\" "
                 . "onClick=\"submit();\">\n"
                 . "</FORM>\n</TD>\n</TR>\n</TABLE>\n"); 
 
-         } // END if
+         }
          else
          {
-            # Make the page once more, as a first call to it...
+            // Make the page once more, as a first call to it
             makePageBody($function, "veditFunDets.php");
-
-            # Now, add a finish button that allows the user to leave the
-            # page and return to the 'listFunctions.php' page...
-
-            print("<TABLE ALIGN='center' BORDER=0 CELLPADDING=0 "
-                . "CELLSPACING=0>\n<TR>\n<TD ALIGN='center'>\n"
-                . "<FORM ACTION='listFunctions.php' METHOD='post'>\n"
-                . "<INPUT TYPE='button' VALUE='FINISHED' "
+            print("<TABLE ALIGN=\"center\" BORDER=0 CELLPADDING=0 "
+                . "CELLSPACING=0>\n<TR>\n<TD ALIGN=\"center\">\n"
+                . "<FORM ACTION=\"listFunctions.php\" METHOD=\"post\">\n"
+                . "<INPUT TYPE=\"button\" VALUE=\"FINISHED\" "
                 . "onClick=\"submit();\">\n"
                 . "</FORM>\n</TD>\n</TR>\n</TABLE>\n"); 
-
-         } // END else
-      } // END else
+         }
+      }
    }
 
    /**********************Start of main script***************************/
 
-   # Connect to the MySQL server
+   // Connect to the MySQL server
    serverConnect(MYSQLDOCMACHINE, MYSQLDOCUSERID, MYSQLDOCPASSWORD);
 
-   # Select the CDS Search database...
+   // Select the database
    dbSelect(DOCS_DATABASE);
 
    $auth = canUseWebSubmitAdmin($uid);
