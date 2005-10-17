@@ -43,11 +43,6 @@
          database for update.  When the form is submitted, it recursively
          calls itself, updates the parameter value, and then redirects to
          the 'func.php' script.
-
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
-         Created:          22/08/2000
-         Last Modified:    22/03/2001
       *****************************************************************/
 
       # LOCK the given table as READ...
@@ -71,7 +66,7 @@
 	 . "='submit();'>\n</TD>\n</FORM>\n</TR>\n</TABLE>\n");
 
 	 return;
-      } # END if
+      }
 
       # Execute a select query on the WebSubmit2 database, getting the value of
       # the required parameter...
@@ -169,27 +164,21 @@
              . "<INPUT TYPE='button' VALUE='SAVE PARAMETER'"
              . " onClick=\"submit();\"></FORM>\n</TD>\n");
 
-         # Add a blank between columns...
          print("<TD>&nbsp;</TD>\n");
 
-         # Add a 'finished' button...
          print("<TD>");
          displayparamEditFinishedButton($doctype, $action,
                                     $functionName, $returnTo);   
              
-         # Close up the table...
          print("</TD>\n</TR>\n</TABLE>\n");
-      } // END if
+      }
       elseif($numRows ==1) # If 1 row was returned, everything is fine!
       {
          print("<H3 ALIGN='center'>Value Of The <EM>$param");
          print("</EM> Parameter:</H3>\n");
          
-         # Read the parameter into item, from queryResult...
          list($item) = mysql_fetch_row($queryResult);
       
-         # Replace all special html characters (<, >, " and &) with the
-         # html code for them.  This prevents html errors.
          $item=htmlspecialchars($item);
 
          /***********************************************************
@@ -222,7 +211,7 @@
 
          # Now open a new table in which to place the hidden fields and
          # the submit buttons.  This table will be located below the table
-         # with the text input form...
+         # with the text input form
 
          print("<TABLE ALIGN='center' CELLPADDING=0 CELLSPACING=0 "
              . "BORDER=0>\n<TR>\n");
@@ -247,31 +236,21 @@
          print(" onClick=");
          print( "\"submit()\"></FORM>\n</TD>\n");
 
-         # Add a blank column between buttons...
          print("<TD>&nbsp;</TD>\n");
-
-         # Add a finish button, to allow the user to change their mind
-         # about adjusting the parameter value, and go back to the
-         # 'func.php' page...
 
          print("<TD>");
          displayparamEditFinishedButton($doctype, $action,
                                     $functionName, $returnTo);
-
-         # Close up the table...
          print("</TD>\n</TR>\n</TABLE>\n");
 
-      } // End elseif
-      else       # IF more than 1 row returned from the query, there
-                 # are definite problems, as there should only be 1
-                 # value for a given function parameter, for a given
-                 # action on a given doctype!
+      }
+      else
       {
          print("<P>\n<H3 ALIGN='center'>SQL Error:  Too Many");
          print(" Rows Returned From Query!</H3>\n</P>\n");
 
-      } // END else
-   } // END function displayParamToUpdate($doctype, $param)   
+      }
+   }
 
    //***********************
 
@@ -282,11 +261,6 @@
          This function is used by the "parameterUpdate.php" script.  It
          displays a "Finished" button, which returns the administrator to
          the "func.php" script.
-   
-         Author: Nicholas Robinson
-         Email:  Nicholas.Robinson@cern.ch
-         Created:           22/08/2000
-         Last Modified:     28/08/2000
       *****************************************************************/
                          
       print("<FORM ACTION='func.php' METHOD='post'>\n");
@@ -298,15 +272,13 @@
       print("<INPUT TYPE='button' VALUE='FINISHED' onClick=\"");
       print("submit()\">\n</FORM>\n");
        
-   } // END function displayparamEditFinishedButton()
+   }
 
    // ******************************
 
    function displayPage()
    {
       global $calledBefore,$doctype,$param,$functionName,$action,$returnTo,$paramValue,$newValue;
-
-      # Now test to see if the script has been called before...
 
       if(!($calledBefore))
       {
@@ -324,9 +296,6 @@
       }// End if
       else
       {
-         # If this is the second calling of the script, this is where our
-         # updating fun starts...
-
          /*******************************************************
             We must now execute the update query on the database.  The
             update query will update the parameter value that is held in
@@ -337,29 +306,26 @@
             insert query instead of an update query...
          *******************************************************/
 
-	 # Place a lock on the relevant table...
 	 if($lockRes = mysql_query("LOCK TABLES sbmPARAMETERS WRITE"))
 	 {
-            # Determine the kind of update that must be carried out...
             if($newValue)
             {
                # If this is a call to add a parameter to the system,
-	       # execute an insert query on WebSubmit...
+	       # execute an insert query on WebSubmit
                $queryResult = mysql_query("INSERT INTO sbmPARAMETERS
                  (doctype, name, value) VALUES('$doctype','$param','$paramValue')");
-            } // END if
+            }
             else
             {
-               # If this is a call to update the parameters value...
+               # If this is a call to update the parameters value
                # Execute the update query on the WebSubmit2 database.
                $queryResult = mysql_query("UPDATE sbmPARAMETERS SET
                            value='$paramValue'
                            WHERE doctype = '$doctype' and name='$param'");
-            } // END else
+            }
 
-            if(mysql_affected_rows() == 1) // Update has worked...
+            if(mysql_affected_rows() == 1)
             {
-	       # We must unlock our table...
 	       $unlockRes = mysql_query("UNLOCK TABLES");
    
                print("<BR><H3 STYLE='color: red; text-align: "
@@ -367,7 +333,7 @@
 
                # Now redirect the browser to the "func.php" page once
 	       # more, in order to display all parameter values for the
-	       # function concerned...
+	       # function concerned
 
                print("<FORM ACTION='func.php' METHOD='post' "
                 . "NAME='referForm'>\n"
@@ -380,53 +346,25 @@
                 . "VALUE='$returnTo'>\n"
                 . "</FORM>\n");
       
-               # Now submit the form...
-       
                print("<SCRIPT TYPE='text/javascript'>\n"
                 . "setTimeout(\"document.referForm.submit();\", 0);\n"
                 . "</SCRIPT>\n");
-            } // END if
+            }
             elseif(mysql_affected_rows() > 1)
             {
                # If the number of rows updated was greater than 1, there
-	       # has been some DB consistency error, and the administrator
-	       # should be notified...
-
-               # We must unlock our table...
+	       # has been some DB consistency error
                $unlockRes = mysql_query("UNLOCK TABLES");
             
                print("<SCRIPT TYPE='text/javascript'>alert('ERROR:\\n\\n"
                 . "More than 1 row was affected by this update.');"
                 . "</SCRIPT>");
-
-               # Get the date and time of the error occurrence...
-               $dateDets = getdate();
-
-               # Now email the administrator with an error email...
-
-               $errMailTxt = "An error has occurred when attempting to "
-               . "update a parameter value for the $param "
-               . "parameter of the $functionName function.  The data was"
-               . "selected from the parameters table "
-               . "for the $doctype document type.\n\nPlease look "
-               . "into this problem, as it suggests that there are "
-               . "multiple values for this parameter, which breaks DB"
-               . "consistency.\n\n"
-               . "This error occurred on " . $dateDets['weekday'] . " "
-               . $dateDets['mday'] . " " . $dateDets['month'] . " "
-               . $dateDets['year'] . ", at " . $dateDets['hours'] . ":"
-               . $dateDets['minutes'] . ".";
-
-               mail(ADMIN_EMAIL, "Error: Multiple Values For A Parameter",
-                      $errMailTxt, "From: WebSubmit_Administrator");
-            } // END elseif
+            }
             else
             {
-               # If this condition has been reached, it means that the
-	       # query has not updated any rows, which is erroneous, as a
+	       # the query has not updated any rows, which is an error, as a
 	       # row should have been updated.
 
-               # We must unlock our table...
                $unlockRes = mysql_query("UNLOCK TABLES");
 
                print("<SCRIPT TYPE='text/javascript'>alert('ERROR:\\n\\n"
@@ -434,12 +372,10 @@
 
                displayParamToUpdate($doctype, $param,
    	                             $functionName, $action, $returnTo);
-
-            } // END else
-	 } # END if
+            }
+	 }
 	 else
 	 {
-	    # Couldn't lock the tables.  Don't allow update.
             print("<DIV STYLE='color: navy; font-weight: bold; font-size:"
             . " large; text-align: center'><SPAN STYLE='color: "
 	    . "red'>Error:</SPAN> Unable to commit updates.</DIV>\n"
@@ -447,8 +383,8 @@
 
             displayParamToUpdate($doctype, $param,
 				$functionName, $action, $returnTo);
-	 } # END else
-      } // END else
+	 }
+      }
    }
 
    /**********************Start of main script***************************/
