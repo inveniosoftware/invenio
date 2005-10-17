@@ -437,18 +437,6 @@ curStatustext, sugStatustext)
                // We must also modify the md field of the doctype record to
                // which this submission belongs
                updateEDSDOCTYPEmd($doctype, $modifiedDate);
-               print("<SCRIPT TYPE=\"text/javascript\">\nalert('Page Moved "
-               . "Successfully.');\n</SCRIPT>\n");
-               
-               // Now let the admin know of the page movement...
-               $msgTxt = "Page $pageNumber of the $subname submission of "
-               . "the $doctype document type has been moved to another "
-               . "position.\n\nWebSubmit Administrator (";
-
-               $msgTxt .= makeDate();
-               $msgTxt .= ")";
-               mail(ADMIN_EMAIL, "$subname Submission Page Movement",
-                          $msgTxt, "From: WebSubmit_Administrator");
             }
             else
             {
@@ -928,18 +916,6 @@ curStatustext, sugStatustext)
                $msgTxt .= ")";
                mail(ADMIN_EMAIL, "$subname Page Deletion Error",
                                    $msgTxt, "From: WebSubmit_Administrator");
-            }
-            else
-            {
-               // success
-               print("<SCRIPT TYPE=\"text/javascript\">\nalert('The page " 
-               . "has been deleted successfully.');\n</SCRIPT>\n");
-               $msgTxt = "Page $pageNumber has been deleted from the "
-               . "$subname submission type.\n\nWebSubmit Administrator (";
-               $msgTxt .= makeDate();
-               $msgTxt .= ")";
-               mail(ADMIN_EMAIL, "$subname Submission Page $pageNumber "
-                . "Deleted", $msgTxt, "From: WebSubmit_Administrator");  
             }
             updateEDSDOCTYPEmd($doctype, $modifiedDate);
          }
