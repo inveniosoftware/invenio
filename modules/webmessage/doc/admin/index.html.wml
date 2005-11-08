@@ -1,4 +1,5 @@
 ## $Id$
+
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -10,20 +11,19 @@
 ## The CDSware is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-docdir = $(WEBDIR)/admin/webmessage
+#include "cdspage.wml" \
+    title="WebMessage Admin" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a>"  \
+    navbar_name="admin" \
+    navbar_select="webmessage"
 
-doc_DATA = index.html guide.html
-
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
-
-CLEANFILES = $(doc_DATA) *~ *.tmp
-
-%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdsnavbar.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
+<dl>
+ <dt><a href="guide.html">WebMessage Admin Guide</a></dt>
+ <dd>Everything you want to know about configuring WebMessage.</dd>
+</dl>
