@@ -2458,14 +2458,16 @@ CREATE TABLE IF NOT EXISTS query (
 
 -- baskets
 
-CREATE TABLE IF NOT EXISTS user_basket (  --to be eliminated
+-- to be eliminated
+CREATE TABLE IF NOT EXISTS user_basket (  
   id_user int(15) unsigned NOT NULL default '0',
   id_basket int(15) unsigned NOT NULL default '0',
   date_modification date NOT NULL default '0000-00-00',
   PRIMARY KEY  (id_user,id_basket)
 ) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS basket ( -- to be eliminated
+-- to be eliminated
+CREATE TABLE IF NOT EXISTS basket (
   id int(15) unsigned NOT NULL auto_increment,
   name varchar(50) NOT NULL default '',
   public char(1) default 'n',
