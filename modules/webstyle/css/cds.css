@@ -274,7 +274,7 @@ a.navtrail:hover {
 }
 .info {
    color: #060;
-   background: transparent;    
+   background: transparent;
 }
 .snapshot {
    color: #000;
@@ -1000,5 +1000,238 @@ input,select {
    background: #fff;
    font-size: small;
    vertical-align: bottom;
+}
+
+.mailbox{
+   color: #000000;
+   background: #ffffee;
+   padding: 0px;
+   margin-top: 15px;
+   border-collapse: collapse;
+   border-top: 1px solid #ffcc00;
+   width: 100%;
+}
+
+.mailboxheader{
+   background: #ffffcc;
+   padding: 20px;
+   margin:5px;
+   text-align: left;
+   font-weight: normal;
+}
+.mailboxheader td{
+   padding: 5px;
+}
+
+.mailboxbody{
+   background: #ffffee;
+   border-top: 1px dotted #ffcc00;
+   border-bottom: 1px dotted #ffcc00;
+   padding: 2px;
+}
+.mailboxbody td{
+   padding:10px;    
+}
+
+.mailboxrecords{
+   background: transparent;
+   margin-left: 0px;
+   margin-right: 20px;
+}
+.mailboxrecords td{
+   padding:3px;
+}
+
+.mailboxinput{
+   width: 100%;
+}
+
+.mailboxlabel{
+   width: 80px;  
+}
+
+.nonsubmitbutton {
+   color: #000;
+   background: #ffcc00;
+   font-weight: bold;
+}
+
+.mailboxfoot{
+   align:right;
+   text-align:right;
+   padding-top:5px;
+   padding-bottom: 5px;
+   padding-right: 40px;
+}
+
+.confirmoperation{
+   margin: auto;
+   width: 400px;
+   height: 100px;
+   background-color: #ddf;
+}
+
+.confirmmessage{
+   font-weight: bold;
+   text-align: center;
+}
+
+.infobox{
+   background-color: #ffc;
+   padding:7px;
+   border-collapse: collapse;
+   border: 1px solid #ffcc00;
+}
+
+.warningbox{
+   background-color: #cff;
+   padding:7px;
+   border-collapse: collapse;
+   border: 1px solid #ccff00;
+}
+
+.quotabox{
+   background-color: #ffc;
+   width: 200px;
+   height: 15px;
+   border: 1px solid #fc0;
+   margin-top: 3px;
+   margin-bottom: 3px;
+}
+
+.quotabar{
+   background-color: #fc0;     
+   border: 0px none black;
+   height: 15px;             
+}
+
+.bskcontainer{
+   width: 100%;
+   margin: 0px;
+   padding:0px;
+}
+
+.bskbaskets{
+   width:100%;
+   background: #ffe;
+   padding: 0px;
+   margin-top: 0px;
+   margin-bottom: 0px;
+   border-spacing: 0px;
+   border: 1px solid #fc0;
+}
+
+.bskbasket{
+   width: 100%;
+   margin: 10px;
+   padding:0px;
+   border: 1px solid #fc0;
+}
+
+.bskbasketheader{
+   background-color: #ffc;
+}
+
+.bskbasketfooter{
+   background-color: #ffc;
+}
+
+.bskbasketheader td{
+   border-bottom: 1px solid #fc0;
+   border-collapse: collapse;
+}
+
+.bskbasketfooter td{
+   padding-top: 5px;
+   padding-bottom: 5px;
+}
+
+.bskactions{
+   border-bottom: 1px solid #fc0;
+   text-align: right;
+}
+
+.bskactions img{
+   border: 0px;
+}
+
+.bskcmtcol{
+   text-align: right;
+}
+
+.bskcontentcol{
+   border-bottom: 1px solid #fc0;
+   padding: 5px;
+}
+
+.headerbskbox {
+   color: #000;
+   padding: 0px;
+   margin-top: 0px;
+   margin-bottom: 0px;
+   border-collapse: collapse;
+   border-spacing: 0px;
+   border-bottom: 0px solid #ffe;
+}
+
+.headerbskbody {
+   color: #000;
+   background: #fc0;
+   font-size: x-small;
+   font-weight: bold;
+   text-align: center;
+   margin: 0px;
+   padding: 0px;
+   width: 75px;
+}
+.headerbskbodyblank {
+   width: 12px; 
+   padding: 0px;
+   margin: 0px;
+}
+.headerbskbodyselected {
+   background: #ffe;
+   font-size: x-small;
+   font-weight: bold;
+   text-align: center;
+   border-left: 1px solid #fc0;
+   border-right: 1px solid #fc0;
+   border-top: 1px solid #fc0;
+   border-bottom: hidden
+   margin: 0px;
+   padding: 0px;
+   width: 75px;
+}
+a.headerbsk:link {
+   color: #000;
+   text-decoration: none;
+}
+a.headerbsk:visited {
+   color: #000;
+   text-decoration: none;
+}
+a.headerbsk:active {
+   color: #000;
+   text-decoration: none;
+}
+a.headerbsk:hover {
+   color: #000;
+   text-decoration: none;
+}
+a.headerbskselected:link {
+   color: #000;
+   text-decoration: none;
+}
+a.headerbskselected:visited {
+   color: #000;
+   text-decoration: none;
+}
+a.headerbskselected:active {
+   color: #000;
+   text-decoration: none;
+}
+a.headerbskselected:hover {
+   color: #000;
+   text-decoration: none;
 }
 /* end of cds.css */
