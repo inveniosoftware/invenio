@@ -29,6 +29,7 @@ from cdsware import webaccount
 from cdsware import webbasket
 from cdsware import webalert
 from cdsware import webuser
+from cdsware.webmessage import account_new_mail
 from cdsware.access_control_config import *
 from mod_python import apache
 from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE, cfg_webaccess_warning_msgs, CFG_EXTERNAL_AUTHENTICATION
@@ -163,8 +164,9 @@ def display(req, ln=cdslang):
     bask = webbasket.account_list_baskets(uid, ln = ln)
     aler = webalert.account_list_alerts(uid, ln = ln)
     sear = webalert.account_list_searches(uid, ln = ln)
+    msgs = account_new_mail(uid, ln = ln)
     return page(title=_("Your Account"),
-                body=webaccount.perform_display_account(req,data,bask,aler,sear,ln),
+                body=webaccount.perform_display_account(req,data,bask,aler,sear,msgs,ln),
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
