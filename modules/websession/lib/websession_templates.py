@@ -374,7 +374,7 @@ class Template:
                           </table>""" % (title, body)
         return out
 
-    def tmpl_account_page(self, ln, weburl, accBody, baskets, alerts, searches, administrative):
+    def tmpl_account_page(self, ln, weburl, accBody, baskets, alerts, searches, messages, administrative):
         """
         Displays the your account page
 
@@ -392,6 +392,8 @@ class Template:
 
           - 'searches' *string* - The body of the searches block
 
+          - 'messages' *string* - The body of the messages block
+
           - 'administrative' *string* - The body of the administrative block
         """
 
@@ -402,6 +404,7 @@ class Template:
         out += self.tmpl_account_template(_("Your Account"), accBody, ln)
         #your baskets
         out += self.tmpl_account_template(_("Your Baskets"), baskets, ln)
+        out += self.tmpl_account_template(_("Your Messages"), messages, ln)
         out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln)
         out += self.tmpl_account_template(_("Your Searches"), searches, ln)
         out += self.tmpl_account_template(_("Your Submissions"),

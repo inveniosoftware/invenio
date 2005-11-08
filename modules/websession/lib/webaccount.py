@@ -77,7 +77,7 @@ def perform_youradminactivities(uid, ln):
            )
 
 # perform_display_account(): display a dynamic page that shows the user's account
-def perform_display_account(req,data,bask,aler,sear, ln):
+def perform_display_account(req,data,bask,aler,sear,msgs,ln):
 
     # load the right message language
     _ = gettext_set_language(ln)
@@ -87,7 +87,7 @@ def perform_display_account(req,data,bask,aler,sear, ln):
     if isGuestUser(uid):
         user = "guest"
         accBody = _("""You are logged in as guest. You may want to <A href="../youraccount.py/login">login</A> as a regular user""") + "<BR><BR>"
-        bask=aler= _("""The <strong class="headline">guest</strong> users need to <A href="../youraccount.py/login">register</A> first""")
+        bask=aler=msgs= _("""The <strong class="headline">guest</strong> users need to <A href="../youraccount.py/login">register</A> first""")
         sear= _("No queries found")
     else:
         user = data[0]
@@ -103,6 +103,7 @@ def perform_display_account(req,data,bask,aler,sear, ln):
              baskets = bask,
              alerts = aler,
              searches = sear,
+             messages = msgs,
              administrative = perform_youradminactivities(uid, ln)
            )
 
