@@ -1,0 +1,118 @@
+# -*- coding: utf-8 -*-
+## $Id$
+## 
+## Some functions on html
+##
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002, 2003, 2004, 2005 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+
+def email_quoted_txt2html(text,
+                          tabs_before=0,
+                          indent_txt='>>',
+                          linebreak_txt="\n",
+                          indent_html=('<div class="commentbox">', "</div>"),
+                          linebreak_html='<br/>'):
+    """
+    Takes a typical mail quoted text, e.g.:
+        hello,
+        you told me:
+        >> Your mother was a hamster and your father smelt of elderberries
+        I must tell you that I'm not convinced. Then in this discussion:
+        >>>> Is there someone else up there we could talk to?
+        >> No. Now, go away, or I shall taunt you a second time-a!
+        I think we're not going to be friends!
+    and return an html formatted output, e.g.:
+        hello,<br/>
+        you told me:<br/>
+        <div>
+          Your mother was a hamster and your father smelt of elderberries
+        </div>
+        I must tell you that I'm not convinced. Then in this discussion:
+        <div>
+          <div>
+            Is there someone else up there we could talk to?
+          </div>
+          No. Now, go away, or I shall taunt you a second time-a!
+        </div>
+        I think we're not going to be friends!
+        
+    @param text: the text in quoted format
+    @param tabs_before: number of tabulations before each line
+    @param indent_str: quote separator in email (default:'>>')
+    @param linebreak_str: line separator in email (default: '\n')
+    @param indent_html: tuple of (opening, closing) html tags.
+                        default: ('<div class="commentbox">', "</div>")
+    @param linebrak_html: line separator in html (default: '<br/>')
+    @return string containing html formatted output
+    """
+    final_body = ""
+    nb_indent = 0
+    lines = text.split(linebreak_txt)
+    for line in lines:
+        new_nb_indent = line.count(indent_txt)
+        if (new_nb_indent > nb_indent):
+            for _ in range(nb_indent, new_nb_indent):
+                final_body += tabs_before*"\t" + indent_html[0] + "\n"
+                tabs_before += 1
+        elif (new_nb_indent < nb_indent):
+            for _ in range(new_nb_indent, nb_indent):
+                tabs_before -= 1 
+                final_body += (tabs_before)*"\t" + indent_html[1] + "\n"
+        final_body += tabs_before*"\t" + line.replace(indent_txt, '')
+        final_body += linebreak_html + "\n"
+        nb_indent = new_nb_indent
+    for _ in range(0, nb_indent):
+        tabs_before -= 1
+        final_body += (tabs_before)*"\t" + "</div>\n"
+    return final_body
+
+
+def email_quote_txt(text,
+                    indent_txt='>>',
+                    linebreak_input="\n",
+                    linebreak_output="\n"):
+    """
+    Takes a text and returns it in a typical mail quoted format, e.g.:
+        C'est un lapin, lapin de bois.
+        >>Quoi?
+        Un cadeau.
+        >>What?
+        A present.
+        >>Oh, un cadeau.
+    will return:
+        >>C'est un lapin, lapin de bois.
+        >>>>Quoi?
+        >>Un cadeau.
+        >>>>What?
+        >>A present.
+        >>>>Oh, un cadeau.   
+    @param text: the string to quote
+    @param indent_txt: the string used for quoting (default: '>>')
+    @param linebreak_input: in the text param, string used for linebreaks
+                            default: '\n'
+    @param linebreak_output: linebreak used for output
+                             default: '\n'
+    @return the text as a quoted string
+    """
+    if (text == ""):
+        return ""
+    lines = text.split(linebreak_input)
+    text = ""
+    for line in lines:
+        text += indent_txt + line + linebreak_output
+    return text
