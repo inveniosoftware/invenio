@@ -2370,6 +2370,29 @@ CREATE TABLE IF NOT EXISTS user (
   KEY nickname (nickname)
 ) TYPE=MyISAM;
 
+-- tables for usergroups
+
+CREATE TABLE IF NOT EXISTS usergroup (
+  id int(15) unsigned NOT NULL auto_increment,
+  name varchar(50) NOT NULL default '',
+  description text default '',
+  join_policy tinyint(4) unsigned NOT NULL default '0',
+  PRIMARY KEY  (id),
+  KEY name (name)
+) TYPE=MyISAM;
+
+
+CREATE TABLE IF NOT EXISTS user_usergroup (
+  id_user int(15) unsigned NOT NULL default '0',
+  id_usergroup int(15) unsigned NOT NULL default '0',
+  user_status tinyint(4) NOT NULL default '0',
+  user_status_date datetime NOT NULL default '0000-00-00 00:00:00',  
+  KEY id_user (id_user),
+  KEY id_usergroup (id_usergroup)
+) TYPE=MyISAM;
+
+
+
 -- tables for access control engine
 
 CREATE TABLE IF NOT EXISTS accROLE (
@@ -2414,7 +2437,7 @@ CREATE TABLE IF NOT EXISTS accROLE_accACTION_accARGUMENT (
   KEY id_accARGUMENT (id_accARGUMENT)
 ) TYPE=MyISAM;
 
--- tables for personal features (baskets, alerts, searches):
+-- tables for personal/collaborative features (baskets, alerts, searches, messages, usergroups):
 
 CREATE TABLE IF NOT EXISTS user_query (
   id_user int(15) unsigned NOT NULL default '0',
@@ -2432,14 +2455,17 @@ CREATE TABLE IF NOT EXISTS query (
   KEY urlargs (urlargs(100))
 ) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS user_basket (
+
+-- baskets
+
+CREATE TABLE IF NOT EXISTS user_basket (  --to be eliminated
   id_user int(15) unsigned NOT NULL default '0',
   id_basket int(15) unsigned NOT NULL default '0',
   date_modification date NOT NULL default '0000-00-00',
   PRIMARY KEY  (id_user,id_basket)
 ) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS basket (
+CREATE TABLE IF NOT EXISTS basket ( -- to be eliminated
   id int(15) unsigned NOT NULL auto_increment,
   name varchar(50) NOT NULL default '',
   public char(1) default 'n',
@@ -2475,6 +2501,31 @@ CREATE TABLE IF NOT EXISTS user_query_basket (
   notification char(1) NOT NULL default 'y',
   PRIMARY KEY  (id_user,id_query,frequency,id_basket),
   KEY alert_name (alert_name)
+) TYPE=MyISAM;
+
+
+-- tables for messaging system
+
+CREATE TABLE IF NOT EXISTS msgMESSAGE (
+  id int(15) unsigned NOT NULL auto_increment,
+  id_user_from int(15) unsigned NOT NULL default '0',
+  sent_to_user_nicks text NOT NULL default '',
+  sent_to_group_names text NOT NULL default '',
+  subject text NOT NULL default '',
+  body text default NULL,
+  sent_date datetime NOT NULL default '0000-00-00 00:00:00',
+  received_date datetime NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY id (id),
+  KEY id_user_from (id_user_from)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS user_msgMESSAGE (
+  id_user_to int(15) unsigned NOT NULL default '0',
+  id_msgMESSAGE int(15) unsigned NOT NULL default '0',
+  status char(1) NOT NULL default 'N',
+  PRIMARY KEY id (id_user_to, id_msgMESSAGE),
+  KEY id_user_to (id_user_to),
+  KEY id_msgMESSAGE (id_msgMESSAGE)
 ) TYPE=MyISAM;
 
 --tables for WebComment
@@ -2870,6 +2921,7 @@ CREATE TABLE IF NOT EXISTS sbmCOOKIES (
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
+
 -- Scheduler tables
 
 CREATE TABLE IF NOT EXISTS schTASK (
@@ -2885,5 +2937,6 @@ CREATE TABLE IF NOT EXISTS schTASK (
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
+-- webMessage tables
 
 -- end of file
