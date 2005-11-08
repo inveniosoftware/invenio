@@ -23,7 +23,9 @@ pylib_DATA = __init__.py \
              errorlib_tests.py \
              config.py \
              dbquery.py \
-             messages.py 
+             messages.py \
+             textutils.py \
+             dateutils.py
 
 phplibdir = $(libdir)/php/cdsware/errors
 phplib_DATA = errorHandling.php
@@ -34,7 +36,9 @@ EXTRA_DIST = __init__.py \
              config.py.wml \
              dbquery.py.wml \
              messages.py.wml \
-             errorHandling.php.wml
+             errorHandling.php.wml \
+             textutils.py \
+             dateutils.py
 
 CLEANFILES = $(pylib_DATA) $(phplib_DATA) *~ *.tmp *.pyc
 
