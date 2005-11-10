@@ -741,7 +741,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = """<img src="%s/img/head.gif" border="0">""" % weburl
+        out = """<img src="%s/img/head.gif" border="0" alt="User">""" % weburl
         if guest:
             out += """%(guest_msg)s ::
     	       <a class="userinfo" href="%(weburl)s/youraccount.py/display?ln=%(ln)s">%(session)s</a> ::
