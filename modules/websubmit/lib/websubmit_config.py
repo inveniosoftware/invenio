@@ -47,6 +47,9 @@ from config import adminemail, \
 ## test:
 test = "FALSE"
 
+## CC all action confirmation mails to administrator? (0 == NO; 1 == YES)
+cfg_websubmit_copy_mails_to_admin = 0
+
 ## known compressed file extensions: 
 cfg_compressed_file_extensions = ["z", "gz", "tar", "tgz", "tar", "tar.gz",
                                   "zip", "rar", "arj", "arc", "pak", "lha", "lhz",
