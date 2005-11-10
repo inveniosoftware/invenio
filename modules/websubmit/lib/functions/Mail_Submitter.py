@@ -36,6 +36,8 @@
    ## OUTPUT: HTML
    ##
 
+from cdsware.websubmit_config import cfg_websubmit_copy_mails_to_admin
+
 execfile("%s/cdsware/websubmit_functions/mail.py" % pylibdir)
 
 def Mail_Submitter (parameters,curdir,form): 
@@ -85,10 +87,18 @@ def Mail_Submitter (parameters,curdir,form):
     elif parameters['status'] == "ADDED":
         email_txt = email_txt + "It will be soon added to our Document Server.\n\nOnce inserted, you will be able to check the  bibliographic information and the quality of the electronic documents at this URL:\n<%s/search.py?recid=%s>\nIf you detect an error please let us know by sending an email to %s. \n\n" % (htdocsurl,sysno,supportemail)
     email_txt = email_txt + "Thank you for using %s Submission Interface.\n" % cdsname
+
     # send the mail
-    body = forge_email(FROMADDR,m_recipient,adminemail,"%s: Document Received" % fullrn,email_txt)
-    tostring = "%s,%s" % (m_recipient,adminemail)
-    tolist = re.split(",",tostring)
-    send_email(FROMADDR,tolist,body,0)
+    tostring = m_recipient.strip()
+    if cfg_websubmit_copy_mails_to_admin:
+        # Copy mail to admins:
+        if len(tostring) > 0:
+            tostring += ",%s" % (adminemail,)
+        else:
+            tostring = adminemail
+    body = forge_email(FROMADDR,m_recipient,"","%s: Document Received" % fullrn,email_txt)
+    tolist = tostring.split(",")
+    if len(tolist[0]) > 0:
+        send_email(FROMADDR,tolist,body,0)
     return ""
 
