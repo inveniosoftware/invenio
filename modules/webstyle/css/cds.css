@@ -1005,7 +1005,6 @@ input,select {
 .mailbox{
    color: #000000;
    background: #ffffee;
-   padding: 0px;
    margin-top: 15px;
    border-collapse: collapse;
    border-top: 1px solid #ffcc00;
@@ -1027,11 +1026,8 @@ input,select {
    background: #ffffee;
    border-top: 1px dotted #ffcc00;
    border-bottom: 1px dotted #ffcc00;
-   padding: 2px;
 }
-.mailboxbody td{
-   padding:10px;    
-}
+
 
 .mailboxrecords{
    background: transparent;
@@ -1057,11 +1053,11 @@ input,select {
 }
 
 .mailboxfoot{
-   align:right;
-   text-align:right;
-   padding-top:5px;
-   padding-bottom: 5px;
-   padding-right: 40px;
+   padding-top:3px;
+   padding-bottom: 3px;
+   padding-right: 0px;
+   background-color: #ffc;
+   border-top: 1px dotted #ffcc00;   
 }
 
 .confirmoperation{
