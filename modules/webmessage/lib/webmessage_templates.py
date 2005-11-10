@@ -59,12 +59,20 @@ class Template:
 <table class="mailbox">
   <thead class="mailboxheader">
     <tr> 
-     <td>%s</td>
+      <td>%s</td>
       <td>%s</td>
       <td>%s</td>
       <td>&nbsp;</td>
     </tr>
   </thead>
+  <tfoot>
+    <tr style="height:0px;">
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tfoot>
   <tbody class="mailboxbody">""" %(_("Subject"), _("Sender"), _("Date"))
         if len(messages) == 0:
             inbox += """
@@ -74,9 +82,9 @@ class Template:
       </td>
     </tr>""" %(_("No new mail"),)
         for (msgid, junk, user_from_nick, subject, sent_date, status) in messages:
-            subject_link = '<a href="display_msg?msgid=%i&ln=%s">%s</a>'% (msgid, ln, subject)
-            from_link = '<a href="write?msg_to=%s&ln=%s">%s</a>'% (user_from_nick, ln, user_from_nick)
-            action_link = '<a href="delete?msgid=%i&ln=%s">%s</a>'% (msgid, ln, _("Delete"))
+            subject_link = '<a href="display_msg?msgid=%i&amp;ln=%s">%s</a>'% (msgid, ln, subject)
+            from_link = '<a href="write?msg_to=%s&amp;ln=%s">%s</a>'% (user_from_nick, ln, user_from_nick)
+            action_link = '<a href="delete?msgid=%i&amp;ln=%s">%s</a>'% (msgid, ln, _("Delete"))
             
             s_date = date_convert_MySQL_to_text(sent_date, ln)
             stat_style = ''
@@ -90,23 +98,20 @@ class Template:
       <td>%s</td>
     </tr>""" %(stat_style, subject_link, from_link, s_date, action_link)
         inbox += """
-  </tbody>
-  <tfoot>
-    <tr>
-      <td>
-      <form name="newMessage" action="write?ln=%(ln)s" method="post">
-          <input type="submit" name="del_all" value="%(write_label)s" class="formbutton"/>
+    <tr class="mailboxfoot">
+      <td colspan="2">
+        <form name="newMessage" action="write?ln=%(ln)s" method="post">
+          <input type="submit" name="del_all" value="%(write_label)s" class="formbutton" />
         </form>
       </td>
-      <td></td>
-      <td></td>
+      <td>&nbsp;</td>
       <td>
         <form name="deleteAll" action="delete_all?ln=%(ln)s" method="post">
-          <input type="submit" name="del_all" value="%(delete_all_label)s" class="formbutton"/>
+          <input type="submit" name="del_all" value="%(delete_all_label)s" class="formbutton" />
         </form>
       </td>
-    </tr>
-  </tfoot>
+    </tr> 
+  </tbody>
 </table>""" % {'ln': ln,
                'write_label': _("New message"),
                'delete_all_label': _("Delete All")}
@@ -204,6 +209,11 @@ class Template:
               </td>
             </tr>
           </thead>
+          <tfoot>
+            <tr>
+              <td style="height:0px" colspan="3"></td>
+            </tr>
+          </tfoot>
           <tbody class="mailboxbody">
             <tr>
               <td class="mailboxlabel">%(message_label)s</td>
@@ -223,14 +233,16 @@ class Template:
                 %(year_field)s
               </td>
             </tr>
-          </tbody>
-          <tfoot>
-            <tr>
+            <!-- This should normally go in a tfoot tag. Old browsers have problems with it
+                 as order must be: thead, tfoot, tbody.
+                 Tfoot is thus empty :(
+            -->
+            <tr class="mailboxfoot">
               <td colspan="3" class="mailboxfoot">
                 <input type="submit" name="send_button" value="%(send_label)s" class="formbutton"/>
               </td>
             </tr>
-          </tfoot>
+          </tbody>
         </table>
       </td>
       <td style="width:30%%; vertical-align:top;padding:5px;">
@@ -299,16 +311,16 @@ class Template:
         tos = msg_sent_to.split(cfg_webmessage_separator)
         if (tos):
             for to in tos[0:-1]:
-                sent_to_link += '<a href="write?msg_to=%s&ln=%s">'% (to, ln)
+                sent_to_link += '<a href="write?msg_to=%s&amp;ln=%s">'% (to, ln)
                 sent_to_link += '%s</a>%s '% (to, cfg_webmessage_separator)
-            sent_to_link += '<a href="write?msg_to=%s&ln=%s">%s</a>'% (tos[-1], ln, tos[-1])
+            sent_to_link += '<a href="write?msg_to=%s&amp;ln=%s">%s</a>'% (tos[-1], ln, tos[-1])
         group_to_link = ""
         groups = msg_sent_to_group.split(cfg_webmessage_separator)
         if (groups):
             for group in groups[0:-1]:
-                group_to_link += '<a href="write?msg_to_group=%s&ln=%s">'% (group, ln)
+                group_to_link += '<a href="write?msg_to_group=%s&amp;ln=%s">'% (group, ln)
                 group_to_link += '%s</a>%s '% (group, cfg_webmessage_separator)
-            group_to_link += '<a href="write?msg_to_group=%s&ln=%s">%s</a>'% (groups[-1], ln, groups[-1])
+            group_to_link += '<a href="write?msg_to_group=%s&amp;ln=%s">%s</a>'% (groups[-1], ln, groups[-1])
         # format the msg so that the '>>' chars give vertical lines
         final_body = email_quoted_txt2html(msg_body)
 
@@ -317,7 +329,7 @@ class Template:
   <thead class="mailboxheader">
     <tr>
       <td class="mailboxlabel">From:</td>
-      <td><a href="write?msg_to=%(from)s&ln=%(ln)s">%(from)s</a></td>
+      <td><a href="write?msg_to=%(from)s&amp;ln=%(ln)s">%(from)s</a></td>
     </tr>
     <tr>
       <td class="mailboxlabel">Subject:</td>
@@ -346,25 +358,29 @@ class Template:
     </tr>"""
         out += """
   </thead>
+  <tfoot>
+    <tr>
+      <td></td>
+      <td></td>
+    </tr>
+  </tfoot>
   <tbody class="mailboxbody">
     <tr>
       <td colspan="2" class="mailboxrecords">%(body)s</td>
     </tr>
-  </tbody>
-  <tfoot>
-    <tr>
+    <tr class="mailboxfoot">
       <td>
         <form name="reply" action="write?msg_reply_id=%(msg_id)s" method="post">
           <input class="formbutton" name="reply" value="%(reply_txt)s" type="submit" />
         </form>
       </td>
       <td>
-        <form name="deletemsg" action="delete?msgid=%(msg_id)s&ln=%(ln)s" method="post">
+        <form name="deletemsg" action="delete?msgid=%(msg_id)s&amp;ln=%(ln)s" method="post">
           <input class="formbutton" name="delete" value="%(delete_txt)s" type="submit" />
         </form>
       </td>
     </tr>
-  </tfoot>
+  </tbody>
 </table>
         """
         out = out % {'from' : msg_from_nickname,
