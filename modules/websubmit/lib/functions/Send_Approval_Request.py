@@ -30,6 +30,7 @@
    ##             titleFile: name of the file containing the title
 
 from cdsware.access_control_admin import acc_getRoleUsers,acc_getRoleId
+from cdsware.websubmit_config import cfg_websubmit_copy_mails_to_admin
 
 execfile("%s/cdsware/websubmit_functions/mail.py" % pylibdir)
 
@@ -97,9 +98,15 @@ def Send_Approval_Request (parameters,curdir,form):
     mail_referee +="To approve/reject the document, you should go to this URL:\n<%s/approve.py?%s>\n" % (urlpath,access)
     mail_referee +="---------------------------------------------\nBest regards.\nThe submission team.\n"
     #Send mail to referee
-    # Actually send the email
-    body = forge_email(FROMADDR,addresses,adminemail,title_referee,mail_referee)
-    tostring = "%s,%s" % (addresses,adminemail)
+    tostring = addresses.strip()
+    if cfg_websubmit_copy_mails_to_admin:
+        # Copy mail to admins:
+        if len(tostring) > 0:
+            tostring += ",%s" % (adminemail,)
+        else:
+            tostring = adminemail
+    body = forge_email(FROMADDR,addresses,"",title_referee,mail_referee)
     tolist = re.split(",",tostring)
-    send_email(FROMADDR,tolist,body,0)
+    if len(tolist[0]) > 0:
+        send_email(FROMADDR,tolist,body,0)
     return ""
