@@ -76,7 +76,8 @@ def Send_Modify_Mail (parameters,curdir,form):
             tostring = adminemail
     body = forge_email(FROMADDR,sub,"","%s modified" % rn,email_txt)
     tolist = tostring.split(",")
-    send_email(FROMADDR,tolist,body,0)
+    if len(tolist[0]) > 0:
+        send_email(FROMADDR,tolist,body,0)
     return ""
    
 
