@@ -28,6 +28,8 @@
    ##             emailFile: name of the file containing the email of the
    ##                        user
 
+from cdsware.websubmit_config import cfg_websubmit_copy_mails_to_admin
+
 execfile("%s/cdsware/websubmit_functions/mail.py" % pylibdir)
 
 def Send_Modify_Mail (parameters,curdir,form):
@@ -40,6 +42,9 @@ def Send_Modify_Mail (parameters,curdir,form):
         sub = sub.replace ("\n","")
     else:
         sub = ""
+    # Copy mail to:
+    addresses = parameters['addressesMBI']
+    addresses = addresses.strip()
     m_fields = parameters['fieldnameMBI']
     type = parameters['sourceDoc']
     rn = re.sub("[\n\r ]+","",rn)
@@ -57,9 +62,20 @@ def Send_Modify_Mail (parameters,curdir,form):
         email_txt += "<%s?id=%s>\n\n" % (accessurl,sysno)
     email_txt += "Please note that the modifications will be taken into account in a couple of minutes.\n\nBest regards,\nThe %s Server support Team" % cdsname
     # send the mail
-    body = forge_email(FROMADDR,sub,parameters['addressesMBI'],"%s modified" % rn,email_txt)
-    tostring = "%s,%s" % (sub,parameters['addressesMBI'])
-    tolist = re.split(",",tostring)
+    tostring = sub.strip()
+    if len(addresses) > 0:
+        if len(tostring) > 0:
+            tostring += ",%s" % (addresses,)
+        else:
+            tostring = addresses
+    if cfg_websubmit_copy_mails_to_admin:
+        # Copy mail to admins:
+        if len(tostring) > 0:
+            tostring += ",%s" % (adminemail,)
+        else:
+            tostring = adminemail
+    body = forge_email(FROMADDR,sub,"","%s modified" % rn,email_txt)
+    tolist = tostring.split(",")
     send_email(FROMADDR,tolist,body,0)
     return ""
    
