@@ -21,8 +21,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # External imports
-from time import strptime
-from datetime import date
+from time import strptime, strftime
 
 # CDS imports
 from cdsware.config import cdslang
@@ -65,7 +64,7 @@ def date_convert_to_MySQL(year, month, day):
     """
     format = "%Y-%m-%d %H:%M:%S"
     if ((year, month, day)!=(0, 0, 0)):
-        out = date(year, month, day).strftime(format)
+        out = strftime(format, (year, month, day, 0, 0, 0, 0, 0, 0))
     else:
         out = '0000-00-00 00:00:00'
     return out
