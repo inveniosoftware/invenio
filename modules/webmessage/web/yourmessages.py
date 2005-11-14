@@ -28,16 +28,11 @@ from mod_python import apache
 
 # CDSWare imports
 from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
-from cdsware.config                import weburl, cdslang
-from cdsware.webuser               import getUid, isGuestUser, page_not_authorized
-from cdsware.webmessage            import *
-from cdsware.webpage               import page
-from cdsware.messages              import wash_language, gettext_set_language
-
-
-
-from cdsware.webmessage_scalability_tests import my_tester
-
+from cdsware.config import weburl, cdslang
+from cdsware.webuser import getUid, isGuestUser, page_not_authorized
+from cdsware.webmessage import *
+from cdsware.webpage import page
+from cdsware.messages import wash_language, gettext_set_language
 
 ### CALLABLE INTERFACE
 def index(req):
