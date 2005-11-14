@@ -255,10 +255,11 @@ def get_uids_from_nicks(nicks):
     users = {}
     query = "SELECT nickname, id FROM user WHERE BINARY nickname in("
     if len(nicks)> 0:
-        users = dict.fromkeys(nicks)
-        for nick in nicks[0:-1]:
+        for nick in nicks:
+            users[nick] = None
+        for nick in users.keys()[0:-1]:
             query += "'%s'," % escape_string(nick)
-        query += "'%s')" % escape_string(nicks[-1])
+        query += "'%s')" % escape_string(users.keys()[-1])
         res = run_sql(query)  
         def enter_dict(couple):
             """ takes a a tuple and enters it into dict users """
@@ -277,10 +278,11 @@ def get_nicks_from_uids(uids):
     users = {}
     query = "SELECT id, nickname FROM user WHERE id in("
     if len(uids) > 0:
-        users = dict.fromkeys(uids)
-        for uid in uids[0:-1]:
+        for uid in uids:
+            users[uid] = None
+        for uid in users.keys()[0:-1]:
             query += "%i," % int(uid)
-        query += "%i)" % int(uids[-1])
+        query += "%i)" % int(users.keys()[-1])
         res = run_sql(query)  
         for (user_id, nickname) in res:
             users[int(user_id)] = nickname
@@ -297,10 +299,11 @@ def get_gids_from_groupnames(groupnames):
     groups = {}
     query = "SELECT name, id FROM usergroup WHERE BINARY name in("
     if len(groupnames) > 0:
-        groups = dict.fromkeys(groupnames)
-        for groupname in groupnames[0:-1]:
+        for groupname in groupnames:
+            groups[groupname] = None
+        for groupname in groups.keys()[0:-1]:
             query += "'%s'," % escape_string(groupname)
-        query += "'%s')" % escape_string(groupnames[-1])
+        query += "'%s')" % escape_string(groups.keys()[-1])
         res = run_sql(query)  
         def enter_dict(couple):
             """ enter a tuple into dictionary groups """
@@ -370,16 +373,14 @@ def send_message(uids_to, msgid, status=cfg_webmessage_status_code['NEW']):
     @return a list of users having their mailbox full
     """
     if not((type(uids_to) is list) or (type(uids_to) is tuple)):
-        uids_to = [uids_to]
-    
+        uids_to = [uids_to]   
     user_problem = []
     if len(uids_to) > 0:
         users_quotas = check_quota(cfg_webmessage_max_nb_of_messages - 1)
         query = """INSERT INTO user_msgMESSAGE
                            (id_user_to, id_msgMESSAGE, status)
                     VALUES """
-        fixed_value = "," + str(int(msgid)) + ",'" + escape_string(status) + "')"
-
+        fixed_value = ",%i,'%s')" % (int(msgid), status)
         def not_users_quotas_has_key(key):
             """ not(is key in users over  quota?)"""
             return not(users_quotas.has_key(key))
@@ -387,8 +388,8 @@ def send_message(uids_to, msgid, status=cfg_webmessage_status_code['NEW']):
         user_problem = filter(users_quotas.has_key, uids_to)
         if len(user_ids_to) > 0:
             for uid_to in user_ids_to[0:-1]:
-                query += "(%i" % int(uid_to) + fixed_value + ","
-            query += "(" + str(int(user_ids_to[-1])) + fixed_value
+                query += "(%i%s," % (int(uid_to), fixed_value)
+            query += "(%i%s" % (int(user_ids_to[-1]), fixed_value)
             run_sql(query)
     return user_problem
 

@@ -29,7 +29,8 @@ from cdsware.webmessage_config import *
 from cdsware.config import cdslang
 from cdsware.messages import gettext_set_language
 from cdsware.dateutils import date_convert_to_MySQL
-
+import cdsware.access_control_engine as acce
+from cdsware.access_control_config import WEBACCESSACTION
 import cdsware.template
 
 webmessage_templates = cdsware.template.load('webmessage')
@@ -100,8 +101,11 @@ def perform_request_display(uid, errors=[], warnings=[], infos=[], ln=cdslang):
     rows = []
     rows = get_all_messages_for_user(uid)
     nb_messages = 0
+
     
-    if (uid != 1):
+    acce.acc_authorize_action(uid, WEBACCESSACTION)
+
+    if (not(acce.acc_authorize_action(uid, WEBACCESSACTION))):
         nb_messages = count_nb_messages(uid)
         
     body = webmessage_templates.tmpl_display_inbox(messages=rows,
@@ -396,7 +400,6 @@ def perform_request_send(uid,
                           """)%(cfg_webmessage_max_size_of_message,))
         problem = 1
 
-
     users_dict = get_uids_from_nicks(users_to)
     users_to = users_dict.items()
     groups_dict = get_gids_from_groupnames(groups_to)
@@ -404,22 +407,24 @@ def perform_request_send(uid,
     gids_to = []
     for (group_name, group_id) in groups_to:
         if not(group_id):
-            warnings.append(_("Group '%s' doesn't exist\n")%(group_name))
+            warnings.append(_("Group '%s' doesn't exist\n")% (group_name))
             problem = 1
         else:
             gids_to.append(group_id)
         
     # Get uids from gids
     uids_from_group = get_uids_members_of_groups(gids_to)
-    # Add the original uids, and make sure  there is no double values. 
-    tmp_dict = dict.fromkeys(uids_from_group)
+    # Add the original uids, and make sure  there is no double values.
+    tmp_dict = {}
+    for uid in uids_from_group:
+        tmp_dict[uid] = None
     for (user_nick, user_id) in users_to:
         if user_id:
             if user_id not in tmp_dict:
                 uids_from_group.append(user_id)
                 tmp_dict[user_id] = None
         else:
-            warnings.append(_("User '%s' doesn't exist\n")%(user_nick))
+            warnings.append(_("User '%s' doesn't exist\n")% (user_nick))
             problem = 1
     if problem:
         body = webmessage_templates.tmpl_write(msg_to=users_to_str,
@@ -441,6 +446,7 @@ def perform_request_send(uid,
                                 send_on_date)
         uid_problem = send_message(uids_from_group, msg_id, status)
         if len(uid_problem) > 0:
+            return perform_request_display(uid, errors, warnings, infos, ln)
             usernames_problem_dict = get_nicks_from_uids(uid_problem)
             usernames_problem = usernames_problem_dict.values()
             def listing(name1, name2):
