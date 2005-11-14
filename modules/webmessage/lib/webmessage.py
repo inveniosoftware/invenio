@@ -19,18 +19,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+"""webmessage module, messaging system"""
 
 __lastupdated__ = """$Date$"""
-
-# External imports
-from datetime import date
 
 # CDSWare imports
 from cdsware.webmessage_dblayer import *
 from cdsware.webmessage_config import *
 from cdsware.config import cdslang
 from cdsware.messages import gettext_set_language
+from cdsware.dateutils import date_convert_to_MySQL
 
 import cdsware.template
 
@@ -382,7 +380,7 @@ def perform_request_send(uid,
         status = cfg_webmessage_status_code['REMINDER']
 
     try:
-        send_on_date = convert_date(msg_send_year, msg_send_month, msg_send_day)
+        send_on_date = date_convert_to_MySQL(msg_send_year, msg_send_month, msg_send_day)
     except ValueError:
         warnings.append(_("The chosen date (%i/%i/%i) is invalid")%(msg_send_year, msg_send_month, msg_send_day))
         problem = 1
@@ -467,23 +465,6 @@ def account_new_mail(uid, ln=cdslang):
     """
     nb_new_mail = get_nb_new_mail_for_user(uid)
     return webmessage_templates.tmpl_account_new_mail(nb_new_mail, ln)
-                                           
-
-def convert_date(year, month, day):
-    """
-    convert a given date to mySQL notation
-    @param year: year as an int
-    @param month: month as an int
-    @param day: day as an int
-    @return string representation of date
-    """
-    format = "%Y-%m-%d %H:%M:%S"
-    if ((year, month, day)!=(0, 0, 0)):
-        out = date(year, month, day).strftime(format)
-    else:
-        out = '0000-00-00 00:00:00'
-    return out
-
 
 def get_navtrail(ln=cdslang, title=""):
     """
