@@ -78,10 +78,16 @@ def run_sql(sql, param=None, n=0, with_desc=0):
             return recset       
     else:
         if string.upper(string.split(sql)[0]) == "INSERT":
-            rc =  cur.insert_id()
+            rc =  cur.lastrowid
         return rc
 
-def insert_id():
-    """Get insert ID of the last insert."""
-    db = _db_login()    
-    return db._db.insert_id()
+def blob_to_string(ablob):
+    """Return string representation of ABLOB.  Useful to treat MySQL
+    BLOBs in the same way for both recent and old MySQLdb versions.
+    """    
+    if type(ablob) is str:
+        # BLOB is already a string in MySQLdb 0.9.2
+        return ablob
+    else:
+        # BLOB is array.array in MySQLdb 1.0.0 and later 
+        return ablob.tostring()
