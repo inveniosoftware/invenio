@@ -51,3 +51,5 @@ cfg_webmessage_max_nb_of_messages = 30
 
 # list of roles (find them in accROLE table) without quota
 cfg_webmessage_roles_without_quota = ['superadmin']
+
+cfg_webmessage_days_before_delete_orphans = 60

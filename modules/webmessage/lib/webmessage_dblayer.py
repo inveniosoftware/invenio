@@ -27,7 +27,8 @@ from MySQLdb import escape_string
 from cdsware.dbquery import run_sql
 from cdsware.webmessage_config import cfg_webmessage_status_code, \
                                       cfg_webmessage_max_nb_of_messages, \
-                                      cfg_webmessage_roles_without_quota
+                                      cfg_webmessage_roles_without_quota, \
+                                      cfg_webmessage_days_before_delete_orphans
 from cdsware.webuser import list_users_in_roles
 
 def check_user_owns_message(uid, msgid):
@@ -486,6 +487,11 @@ def get_element(sql_res):
 
 def clean_messages():
     """ Cleans msgMESSAGE table"""
+    current_time = time.localtime()
+    seconds = time.mktime(current_time)
+    seconds -= cfg_webmessage_days_before_delete_orphans * 86400
+    format = "%Y-%m-%d %H:%M:%S"
+    sql_date = time.strftime(format, time.localtime(seconds))    
     deleted_items = 0
     #find id and email from every user who has got an email
     query1 = """SELECT distinct(umsg.id_user_to),
@@ -496,7 +502,6 @@ def clean_messages():
     res1 = run_sql(query1)
     # if there is no email, user has disappeared
     users_deleted = map(lambda u: int(u[0]), filter(lambda x: x[1] == None, res1))
-
     # find ids from messages in user's inbox
     query2 = """SELECT distinct(umsg.id_msgMESSAGE),
                        msg.id
@@ -518,15 +523,16 @@ def clean_messages():
         if len(messages_deleted):
             query3 += "id_msgMESSAGE IN (%s)" % reduce(tuplize, messages_deleted)
         deleted_items = int(run_sql(query3))
-
     # find every message that is nobody's inbox
     query4 = """SELECT msg.id
                 FROM msgMESSAGE msg
                      LEFT JOIN user_msgMESSAGE umsg
                                ON msg.id=umsg.id_msgMESSAGE
+                WHERE msg.sent_date<'%s'
                 GROUP BY umsg.id_msgMESSAGE
-                HAVING count(umsg.id_msgMESSAGE)=0"""
-    res4 = map(lambda x: x[0], run_sql(query4))
+                HAVING count(umsg.id_msgMESSAGE)=0
+                """
+    res4 = map(lambda x: x[0], run_sql(query4% sql_date))
     if len(res4):
         # delete these messages
         query5 = "DELETE FROM msgMESSAGE WHERE "
