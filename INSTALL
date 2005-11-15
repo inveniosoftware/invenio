@@ -57,8 +57,7 @@ Contents
      d) Python v2.2.2 or above (v2.3.2 and above recommended): 
          <http://python.org/>
         as well as the following Python modules:
-          - (mandatory) MySQLdb version 0.9.2 (higher versions like
-            MySQLdb 1.0.0 will not work!):
+          - (mandatory) MySQLdb:
              <http://sourceforge.net/projects/mysql-python>
           - (mandatory) Numeric module (v21 and above):
              <http://sourceforge.net/projects/numpy>

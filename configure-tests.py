@@ -30,7 +30,6 @@ __version__ = "$Id$"
 ## minimally recommended/required versions:
 cfg_min_python_version = "2.3"
 cfg_min_mysqldb_version = "0.9.2"
-cfg_max_mysqldb_version = "0.9.2"
 cfg_min_numeric_version = "21.0"
 
 ## 0) import modules needed for this testing:
@@ -218,19 +217,6 @@ if MySQLdb.__version__ < cfg_min_mysqldb_version:
     except KeyboardInterrupt:
         print "\n\nInstallation aborted."
         sys.exit(1)
-
-if MySQLdb.__version__ > cfg_max_mysqldb_version:
-    print """
-    *****************************************************
-    ** ERROR: PYTHON MODULE MYSQLDB %s DETECTED
-    *****************************************************
-    ** CDSware does not work with MySQLdb v%s yet.  **
-    ** You have to install MySQLdb version %s.      **
-    ** Please see our INSTALL file for more details    **
-    ** and fix the problem before continuing!          **
-    *****************************************************
-    """ % (MySQLdb.__version__, MySQLdb.__version__, cfg_min_mysqldb_version)
-    sys.exit(1)
 
 if Numeric.__version__ < cfg_min_numeric_version:
     print """
