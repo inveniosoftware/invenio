@@ -483,3 +483,54 @@ def get_element(sql_res):
     @return integer conversion of the number in tuple
     """
     return int(sql_res[0])
+
+def clean_messages():
+    """ Cleans msgMESSAGE table"""
+    deleted_items = 0
+    #find id and email from every user who has got an email
+    query1 = """SELECT distinct(umsg.id_user_to),
+                       user.email
+                FROM user_msgMESSAGE umsg
+                LEFT JOIN user ON
+                     umsg.id_user_to=user.id"""
+    res1 = run_sql(query1)
+    # if there is no email, user has disappeared
+    users_deleted = map(lambda u: int(u[0]), filter(lambda x: x[1] == None, res1))
+
+    # find ids from messages in user's inbox
+    query2 = """SELECT distinct(umsg.id_msgMESSAGE),
+                       msg.id
+                FROM user_msgMESSAGE umsg
+                LEFT JOIN msgMESSAGE msg ON
+                     umsg.id_msgMESSAGE=msg.id"""
+    res2 = run_sql(query2)
+    # if there is no id, message was deleted from table msgMESSAGE...
+    messages_deleted = map(lambda u: int(u[0]), filter(lambda x: x[1] == None, res2))
+    def tuplize(el1, el2):
+        return str(el1) + ',' + str(el2)
+    if len(users_deleted) or len(messages_deleted):
+        # Suppress every referential error from user_msgMESSAGE
+        query3 = "DELETE FROM user_msgMESSAGE WHERE "
+        if len(users_deleted):
+            query3 += "id_user_to IN (%s)" % reduce(tuplize, users_deleted)
+            if len(messages_deleted):
+                query3 += ' OR '
+        if len(messages_deleted):
+            query3 += "id_msgMESSAGE IN (%s)" % reduce(tuplize, messages_deleted)
+        deleted_items = int(run_sql(query3))
+
+    # find every message that is nobody's inbox
+    query4 = """SELECT msg.id
+                FROM msgMESSAGE msg
+                     LEFT JOIN user_msgMESSAGE umsg
+                               ON msg.id=umsg.id_msgMESSAGE
+                GROUP BY umsg.id_msgMESSAGE
+                HAVING count(umsg.id_msgMESSAGE)=0"""
+    res4 = map(lambda x: x[0], run_sql(query4))
+    if len(res4):
+        # delete these messages
+        query5 = "DELETE FROM msgMESSAGE WHERE "
+        query5 += "id IN (%s)" % reduce(tuplize, res4)
+        deleted_items += int(run_sql(query5))
+    return deleted_items
+    
