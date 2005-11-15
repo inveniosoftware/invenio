@@ -31,7 +31,8 @@ try:
     sys.path.append('%s' % pylibdir)
     from cdsware.config import supportemail
     from cdsware.webmessage_dblayer import clean_messages
-
+    from cdsware.dbquery import run_sql
+    
 except ImportError, e:
     print "Error: %s" % e
     import sys
