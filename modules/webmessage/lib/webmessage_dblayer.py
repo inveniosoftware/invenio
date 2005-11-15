@@ -26,8 +26,9 @@ from MySQLdb import escape_string
 
 from cdsware.dbquery import run_sql
 from cdsware.webmessage_config import cfg_webmessage_status_code, \
-                                      cfg_webmessage_max_nb_of_messages
-
+                                      cfg_webmessage_max_nb_of_messages, \
+                                      cfg_webmessage_roles_without_quota
+from cdsware.webuser import list_users_in_roles
 
 def check_user_owns_message(uid, msgid):
     """
@@ -393,17 +394,26 @@ def send_message(uids_to, msgid, status=cfg_webmessage_status_code['NEW']):
             run_sql(query)
     return user_problem
 
+
 def check_quota(nb_messages):
     """
     @param nb_messages: max number of messages a user can have
     @return a dictionary of users over-quota
     """
-    query = """SELECT id_user_to, count(id_user_to)
-               FROM user_msgMESSAGE
-               WHERE id_user_to!=1
+    where = ''
+    no_quota_users = list_users_in_roles(cfg_webmessage_roles_without_quota)
+    if len(no_quota_users) > 0:
+        where = """WHERE """
+        for uid in no_quota_users[:-1]:
+            where += "id_user_to!=%i AND " % uid
+        where += "id_user_to!=%i" % no_quota_users[-1]
+    query = """SELECT id_user_to,
+                      count(id_user_to)
+               FROM user_msgMESSAGE 
+               %s
                GROUP BY id_user_to
                HAVING count(id_user_to)>%i"""
-    res = run_sql(query % int(nb_messages))
+    res = run_sql(query % (where, int(nb_messages)))
     user_over_quota = {}
     def enter_dict(couple):
         """ enter a tuple in user_over_quota dict """

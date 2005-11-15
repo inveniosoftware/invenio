@@ -29,11 +29,15 @@ from cdsware.webmessage_config import *
 from cdsware.config import cdslang
 from cdsware.messages import gettext_set_language
 from cdsware.dateutils import date_convert_to_MySQL
-import cdsware.access_control_engine as acce
-from cdsware.access_control_config import WEBACCESSACTION
+from cdsware.webuser import list_users_in_roles
+from cdsware.search_engine import wash_url_argument
+
 import cdsware.template
 
-webmessage_templates = cdsware.template.load('webmessage')
+try:
+    webmessage_templates = cdsware.template.load('webmessage')
+except:
+    pass
 
 def perform_request_display_msg(uid, msgid, ln = cdslang):
     """
@@ -65,7 +69,7 @@ def perform_request_display_msg(uid, msgid, ln = cdslang):
          msg_sent_date,
          msg_received_date,
          msg_status) = get_message(uid, msgid)
-
+        
         if (msg_id == ""):
 	    # The message exists in table user_msgMESSAGE
 	    # but not in table msgMESSAGE => table inconsistency
@@ -83,10 +87,8 @@ def perform_request_display_msg(uid, msgid, ln = cdslang):
 							 msg_sent_date,
                                                          msg_received_date,
                                                          ln)
-          
     return (body, errors, warnings)
-													  
-
+            
 def perform_request_display(uid, errors=[], warnings=[], infos=[], ln=cdslang):
     """
     Displays the user's Inbox
@@ -101,11 +103,8 @@ def perform_request_display(uid, errors=[], warnings=[], infos=[], ln=cdslang):
     rows = []
     rows = get_all_messages_for_user(uid)
     nb_messages = 0
-
-    
-    acce.acc_authorize_action(uid, WEBACCESSACTION)
-
-    if (not(acce.acc_authorize_action(uid, WEBACCESSACTION))):
+    no_quota_users = list_users_in_roles(cfg_webmessage_roles_without_quota)
+    if (not(uid in no_quota_users)):
         nb_messages = count_nb_messages(uid)
         
     body = webmessage_templates.tmpl_display_inbox(messages=rows,
@@ -114,7 +113,6 @@ def perform_request_display(uid, errors=[], warnings=[], infos=[], ln=cdslang):
                                                    nb_messages=nb_messages,
                                                    ln=ln)
     return (body, errors, warnings)
-
 
 def perform_request_delete_msg(uid, msgid, ln=cdslang):
     """
@@ -142,9 +140,7 @@ def perform_request_delete_msg(uid, msgid, ln=cdslang):
             warnings.append(_("The message could not be deleted"))
         else:
             infos.append(_("Delete successful"))
-
     return perform_request_display(uid, errors, warnings, infos, ln) 
-
 
 def perform_request_delete_all(uid, confirmed=0, ln=cdslang):
     """
@@ -153,8 +149,7 @@ def perform_request_delete_all(uid, confirmed=0, ln=cdslang):
     @param confirmed: 0 will produce a confirmation message
     @param ln: language
     @return a (body, errors, warnings) tuple
-    """
-    
+    """    
     infos = []
     warnings = []
     errors = []
@@ -168,7 +163,6 @@ def perform_request_delete_all(uid, confirmed=0, ln=cdslang):
     else:
         body = webmessage_templates.tmpl_confirm_delete(ln)
         return (body, errors, warnings)
-
 
 def perform_request_write(uid,
                           msg_reply_id="",
@@ -232,8 +226,6 @@ def perform_request_write(uid,
                                            ln=ln)
     return (body, errors, warnings)
 
-
-
 def perform_request_write_with_search(msg_to_user="",
                                       msg_to_group="",
                                       msg_subject="",
@@ -265,8 +257,7 @@ def perform_request_write_with_search(msg_to_user="",
     @param add_values: if 1 users_to_add will be added to msg_to_user field..
     @param ln: language
     @return a (body, errors, warnings) formed tuple.
-    """
-    
+    """    
     # wash arguments
     users_to_add = wash_url_argument(users_to_add, 'list')
     groups_to_add = wash_url_argument(groups_to_add, 'list')
@@ -280,9 +271,7 @@ def perform_request_write_with_search(msg_to_user="",
     errors = []
     
     def separate(name1, name2):
-        """
-        name1, name2 => "name1, name2"
-        """
+        """ name1, name2 => "name1, name2" """
         return name1 + cfg_webmessage_separator + " " + name2
     
     if mode_user:
@@ -322,8 +311,7 @@ def perform_request_write_with_search(msg_to_user="",
                                            display_users_to_add=mode_user,
                                            ln=ln)
     return (body, errors, warnings)
-
-    
+  
 def perform_request_send(uid,
                          msg_to_user="",
                          msg_to_group="",
@@ -364,9 +352,9 @@ def perform_request_send(uid,
     users_to = map(strip_spaces, msg_to_user.split(cfg_webmessage_separator))
     groups_to = map(strip_spaces, msg_to_group.split(cfg_webmessage_separator))
 
-    if users_to == [""]:
+    if users_to == ['']:
         users_to = []
-    if groups_to == [""]:
+    if groups_to == ['']:
         groups_to = []
 
 
@@ -446,7 +434,6 @@ def perform_request_send(uid,
                                 send_on_date)
         uid_problem = send_message(uids_from_group, msg_id, status)
         if len(uid_problem) > 0:
-            return perform_request_display(uid, errors, warnings, infos, ln)
             usernames_problem_dict = get_nicks_from_uids(uid_problem)
             usernames_problem = usernames_problem_dict.values()
             def listing(name1, name2):
@@ -459,8 +446,9 @@ def perform_request_send(uid,
 
         if len(uids_from_group) != len(uid_problem):
             infos.append(_("Your message has been sent."))
+        else:
+            check_if_need_to_delete_message_permanently([msg_id])
         return perform_request_display(uid, errors, warnings, infos, ln)
-
 
 def account_new_mail(uid, ln=cdslang):
     """
@@ -481,54 +469,3 @@ def get_navtrail(ln=cdslang, title=""):
     """
     navtrail = webmessage_templates.tmpl_navtrail(ln, title)
     return navtrail
-
-def wash_url_argument(var, new_type):
-    """
-    Wash argument into 'new_type', that can be 'list', 'str', or 'int'.
-    If var is a list, will change first element into new_type.
-    If int check unsuccessful, returns 0
-    If needed, the check 'type(var) is not None' should be done before calling this function
-    """
-    out = []
-    if new_type == 'list':  # return lst
-        if type(var) is list or type(var) is tuple:
-            out = var
-        else:
-            out = [var]
-    elif new_type == 'str':  # return str
-        if type(var) is list:
-            try:
-                out = "%s" % var[0]
-            except:
-                out = ""
-        elif type(var) is str:
-            out = var
-        else:
-            out = "%s" % var
-    elif new_type == 'int': # return int
-        if type(var) is list:
-            try:
-                out = int(var[0])
-            except:
-                out = 0
-        elif type(var) is int:
-            out = var
-        elif type(var) is str:
-            try:
-                out = int(var)
-            except:
-                out = 0
-        else:
-            out = 0
-    elif new_type == 'tuple': # return tuple
-        if type(var) is tuple:
-            out = var
-        else:
-            out = (var,)
-    elif new_type == 'dict': # return dictionary
-        if type(var) is dict:
-            out = var
-        else:
-            out = {0:var}
-    return out
-
