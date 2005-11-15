@@ -28,7 +28,7 @@ by using a MySQL table. Consists of the following classes:
 """
 import cPickle
 import time
-from dbquery import run_sql
+from dbquery import run_sql, blob_to_string
 import session
 from session import Session
 from UserDict import UserDict
@@ -82,7 +82,7 @@ class pSession(Session):
         res = run_sql(sql)
         if len(res)==0:
             raise SessionNotInDb("Session %s doesn't exist"%sessionId)
-        s = cPickle.loads( res[0][0] )
+        s = cPickle.loads(blob_to_string(res[0][0]))
         return s
     retrieve = classmethod( retrieve )
 
