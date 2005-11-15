@@ -474,6 +474,42 @@ def list_registered_users():
     """List all registered users."""
     return run_sql("SELECT id,email FROM user where email!=''")
 
+def list_users_in_role(role):
+    """List all users of a given role (see table accROLE)
+    @param role: role of user (string)
+    @return list of uids
+    """
+    query = """SELECT uacc.id_user
+               FROM user_accROLE uacc JOIN accROLE acc
+                    ON uacc.id_accROLE=acc.id
+               WHERE acc.name='%s'"""
+    res = run_sql(query% MySQLdb.escape_string(role))
+    if res:
+        return map(lambda x: int(x[0]), res)
+    return []
+
+def list_users_in_roles(role_list):
+    """List all users of given roles (see table accROLE)
+    @param role_list: list of roles [string]
+    @return list of uids
+    """
+    if not(type(role_list) is list or type(role_list) is tuple):
+        role_list = [role_list]
+    params=''
+    query = """SELECT distinct(uacc.id_user)
+               FROM user_accROLE uacc JOIN accROLE acc
+                    ON uacc.id_accROLE=acc.id
+               %s"""
+    if len(role_list) > 0:
+        params = 'WHERE '
+        for role in role_list[:-1]:
+            params += "acc.name='%s' OR " % MySQLdb.escape_string(role)
+        params += "acc.name='%s'" % MySQLdb.escape_string(role_list[-1])
+    res = run_sql(query% params)
+    if res:
+        return map(lambda x: int(x[0]), res)
+    return []
+
 ## --- follow some functions for Apache user/group authentication
 
 def auth_apache_user_p(user, password):
