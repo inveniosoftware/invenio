@@ -743,12 +743,13 @@ class Template:
                 'fieldname' : fieldname,
               }
 
-        for pair in values:
-            out += """<option value="%(value)s"%(selected)s>%(text)s""" % {
-                     'value'    : pair['value'],
-                     'selected' : self.tmpl_is_selected(pair['value'], selected),
-                     'text'     : pair['text']
-                   }
+        if values:
+            for pair in values:
+                out += """<option value="%(value)s"%(selected)s>%(text)s""" % {
+                         'value'    : pair['value'],
+                         'selected' : self.tmpl_is_selected(pair['value'], selected),
+                         'text'     : pair['text']
+                       }
         out += """</select>"""
         return out
 
@@ -1293,7 +1294,7 @@ class Template:
               'advanced_search' : _("Advanced search"),
               'google' : google,
             }
-
+            
         ## secondly, print Collection(s) box:
         selects = ''
         for sel in coll_selects:
@@ -1454,12 +1455,12 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
+        out = fields
         if value and str(value[0:chars]).isdigit():
-            return fields.append({'value' : value,
-                                  'text' : value + _("MARC tag")
-                                 })
-        else:
-            return fields
+            out.append({'value' : value,
+                        'text' : str(value) + " " + _("MARC tag")
+                        })
+        return out
 
     def tmpl_google_box(self, ln, cc, p, f, prolog_start, prolog_end, column_separator, link_separator, epilog):
         """Creates the box that proposes links to other useful search engines like Google.
