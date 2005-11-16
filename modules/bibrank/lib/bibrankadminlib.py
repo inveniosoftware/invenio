@@ -604,9 +604,9 @@ def get_rnk(rnkID=''):
     
     try:
         if rnkID:
-            res = run_sql("SELECT id,name,last_updated from rnkMETHOD WHERE id=%s" % rnkID)
+            res = run_sql("SELECT id,name,DATE_FORMAT(last_updated, '%%Y-%%m-%%d %%H:%%i:%%s') from rnkMETHOD WHERE id=%s" % rnkID)
         else:
-            res = run_sql("SELECT id,name,last_updated from rnkMETHOD")
+            res = run_sql("SELECT id,name,DATE_FORMAT(last_updated, '%%Y-%%m-%%d %%H:%%i:%%s') from rnkMETHOD")
         return res
     except StandardError, e:
         return ()
