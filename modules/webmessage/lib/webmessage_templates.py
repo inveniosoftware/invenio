@@ -27,7 +27,7 @@ from cdsware.webmessage_config import cfg_webmessage_status_code, \
                                       cfg_webmessage_separator, \
                                       cfg_webmessage_max_nb_of_messages
 from cdsware.textutils import indent_text
-from cdsware.dateutils import get_i18n_dbdatetext, \
+from cdsware.dateutils import convert_datetext_to_dategui, \
                               create_day_selectbox, \
                               create_month_selectbox, \
                               create_year_selectbox
@@ -86,7 +86,7 @@ class Template:
             from_link = '<a href="write?msg_to=%s&amp;ln=%s">%s</a>'% (user_from_nick, ln, user_from_nick)
             action_link = '<a href="delete?msgid=%i&amp;ln=%s">%s</a>'% (msgid, ln, _("Delete"))
             
-            s_date = get_i18n_dbdatetext(sent_date, ln)
+            s_date = convert_datetext_to_dategui(sent_date, ln)
             stat_style = ''
             if (status == cfg_webmessage_status_code['NEW']):
                 stat_style = ' style="font-weight:bold"' 
@@ -384,8 +384,8 @@ class Template:
 </table>
         """
         out = out % {'from' : msg_from_nickname,
-                     'sent_date' : get_i18n_dbdatetext(msg_sent_date, ln),
-                     'received_date': get_i18n_dbdatetext(msg_received_date, ln),
+                     'sent_date' : convert_datetext_to_dategui(msg_sent_date, ln),
+                     'received_date': convert_datetext_to_dategui(msg_received_date, ln),
                      'sent_to': sent_to_link,
                      'sent_to_group': group_to_link,
                      'subject' : msg_subject,

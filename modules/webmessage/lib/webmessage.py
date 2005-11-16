@@ -28,7 +28,7 @@ from cdsware.webmessage_dblayer import *
 from cdsware.webmessage_config import *
 from cdsware.config import cdslang
 from cdsware.messages import gettext_set_language
-from cdsware.dateutils import get_db_date
+from cdsware.dateutils import datetext_default, get_datetext
 from cdsware.webuser import list_users_in_roles
 from cdsware.search_engine import wash_url_argument
 
@@ -366,17 +366,19 @@ def perform_request_send(uid,
     users_to_str = cfg_webmessage_separator.join(users_to)
     groups_to_str = cfg_webmessage_separator.join(groups_to)
     
+    send_on_date = get_datetext(msg_send_year, msg_send_month, msg_send_day)
     if (msg_send_year == msg_send_month == msg_send_day == 0):
         status = cfg_webmessage_status_code['NEW']
     else:
         status = cfg_webmessage_status_code['REMINDER']
-
-    try:
-        send_on_date = get_db_date(msg_send_year, msg_send_month, msg_send_day)
-    except ValueError:
-        warnings.append(_("The chosen date (%i/%i/%i) is invalid")%(msg_send_year, msg_send_month, msg_send_day))
-        problem = 1
-        
+        if send_on_date == datetext_default:
+            warning = _("The chosen date (%(year)i/%(month)i/%(day)i) is invalid")
+            warning = warning % {'year': msg_send_year,
+                                 'month': msg_send_month,
+                                 'day': msg_send_day}
+            warnings.append(warning)
+            problem = 1
+            
     if not(users_to_str or groups_to_str):
         # <=> not(users_to_str) AND not(groups_to_str)
         warnings.append(_("Please enter a user name or a group name"))
