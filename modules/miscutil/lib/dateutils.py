@@ -214,7 +214,7 @@ def create_year_selectbox(name, from_year=-1, length=10, selected_year=0, ln=cds
     @param ln: language
     @return html as string
     """
-    #_ = gettext_set_language(ln)
+    _ = gettext_set_language(ln)
     if from_year < 0:
         from_year = localtime()[0]
     out = "<select name=\"%s\">\n"% name
