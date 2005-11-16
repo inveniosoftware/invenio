@@ -21,7 +21,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # External imports
-from time import strptime, strftime
+from time import strptime, strftime, localtime
 
 # CDS imports
 from cdsware.config import cdslang
@@ -193,6 +193,7 @@ def create_month_selectbox(name, selected_month=0, ln=cdslang):
     out += "</select>\n"
     return out
 
+
 def create_year_inputbox(name, value=0):
     """
     Creates an HTML field (simple input) for year selection.
@@ -200,27 +201,31 @@ def create_year_inputbox(name, value=0):
     @param value: prefilled value (int)
     @return html as string
     """
-    out = "<input type=\"text\" name=\"%s\" value=\"%i\"/>\n"% (name, value)
+    out = "<input type=\"text\" name=\"%s\" value=\"%i\" maxlength=\"4\" size=\"4\"/>\n"% (name, value)
     return out
 
-def create_year_selectbox(name, from_year, to_year, selected_year=0, ln=cdslang):
+def create_year_selectbox(name, from_year=-1, length=10, selected_year=0, ln=cdslang):
     """
-    Creates an HTML menu for year selection. Value of selected field is numeric
-    @param name: name of the control (your form will be sent with name=value...)
-    @param from_year: first year selectable (int)
-    @param to_year: last year selectable (int)
-    @param selected_year: preselect a month. use 0 for the Label 'Year'
-    @param ln: language of the menu
+    Creates an HTML menu (dropdownbox) for year selection.
+    @param name: name of control( i.e. name of the variable you'll get)
+    @param from_year: year on which to begin. if <0 assume it is current year
+    @param length: number of items in menu
+    @param selected_year: initial selected year (if in range), else: label is selected
+    @param ln: language
     @return html as string
     """
-    _ = gettext_set_language(ln)
+    #_ = gettext_set_language(ln)
+    if from_year < 0:
+        from_year = localtime()[0]
     out = "<select name=\"%s\">\n"% name
-    for i in range(from_year, to_year + 1):
+    out += '  <option value="0"'
+    if selected_year == 0:
+        out += ' selected="selected"'
+    out += ">%s</option>\n"% _("Year")
+    for i in range(from_year, from_year + length):
         out += "<option value=\"%i\""% i
         if (i == selected_year):
             out += " selected=\"selected\""
-        if (i == 0):
-            out += ">%s</option>\n"% _("Year")
         out += ">%i</option>\n"% i
     out += "</select>\n"
     return out
