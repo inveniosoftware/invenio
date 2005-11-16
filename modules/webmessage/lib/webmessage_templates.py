@@ -27,10 +27,10 @@ from cdsware.webmessage_config import cfg_webmessage_status_code, \
                                       cfg_webmessage_separator, \
                                       cfg_webmessage_max_nb_of_messages
 from cdsware.textutils import indent_text
-from cdsware.dateutils import date_convert_MySQL_to_text, \
+from cdsware.dateutils import get_i18n_dbdatetext, \
                               create_day_selectbox, \
                               create_month_selectbox, \
-                              create_year_inputbox
+                              create_year_selectbox
 from cdsware.config import weburl, cdslang
 from cdsware.messages import gettext_set_language
 
@@ -86,7 +86,7 @@ class Template:
             from_link = '<a href="write?msg_to=%s&amp;ln=%s">%s</a>'% (user_from_nick, ln, user_from_nick)
             action_link = '<a href="delete?msgid=%i&amp;ln=%s">%s</a>'% (msgid, ln, _("Delete"))
             
-            s_date = date_convert_MySQL_to_text(sent_date, ln)
+            s_date = get_i18n_dbdatetext(sent_date, ln)
             stat_style = ''
             if (status == cfg_webmessage_status_code['NEW']):
                 stat_style = ' style="font-weight:bold"' 
@@ -256,7 +256,7 @@ class Template:
         write_box += "%(body)s" "</textarea>"+ write_box_part2
         day_field = create_day_selectbox('msg_send_day', msg_send_day, ln)
         month_field = create_month_selectbox('msg_send_month', msg_send_month, ln)
-        year_field = create_year_inputbox('msg_send_year', msg_send_year)
+        year_field = create_year_selectbox('msg_send_year', -1, 10, msg_send_year, ln)
         write_box = write_box % {'to_users' : msg_to,
                                  'to_groups': msg_to_group,
                                  'subject' : msg_subject,
@@ -384,8 +384,8 @@ class Template:
 </table>
         """
         out = out % {'from' : msg_from_nickname,
-                     'sent_date' : date_convert_MySQL_to_text(msg_sent_date, ln),
-                     'received_date': date_convert_MySQL_to_text(msg_received_date, ln),
+                     'sent_date' : get_i18n_dbdatetext(msg_sent_date, ln),
+                     'received_date': get_i18n_dbdatetext(msg_received_date, ln),
                      'sent_to': sent_to_link,
                      'sent_to_group': group_to_link,
                      'subject' : msg_subject,

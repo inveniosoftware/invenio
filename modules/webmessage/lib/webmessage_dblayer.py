@@ -71,8 +71,8 @@ def get_message(uid, msgid):
                       m.sent_to_group_names,
                       m.subject,
                       m.body,
-                      m.sent_date,
-                      m.received_date,
+                      DATE_FORMAT(m.sent_date, '%%Y-%%m-%%d %%H:%%i:%%s'),
+                      DATE_FORMAT(m.received_date, '%%Y-%%m-%%d %%H:%%i:%%s'),
                       um.status
                FROM   msgMESSAGE m, 
                       user_msgMESSAGE um,
@@ -148,7 +148,7 @@ def get_all_messages_for_user(uid):
                        m.id_user_from,
                        u.nickname,
                        m.subject,
-                       m.sent_date,
+                       DATE_FORMAT(m.sent_date, '%%Y-%%m-%%d %%H:%%i:%%s'),
                        um.status
                 FROM   user_msgMESSAGE um,
                        msgMESSAGE m,

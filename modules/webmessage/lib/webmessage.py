@@ -28,7 +28,7 @@ from cdsware.webmessage_dblayer import *
 from cdsware.webmessage_config import *
 from cdsware.config import cdslang
 from cdsware.messages import gettext_set_language
-from cdsware.dateutils import date_convert_to_MySQL
+from cdsware.dateutils import get_db_date
 from cdsware.webuser import list_users_in_roles
 from cdsware.search_engine import wash_url_argument
 
@@ -372,7 +372,7 @@ def perform_request_send(uid,
         status = cfg_webmessage_status_code['REMINDER']
 
     try:
-        send_on_date = date_convert_to_MySQL(msg_send_year, msg_send_month, msg_send_day)
+        send_on_date = get_db_date(msg_send_year, msg_send_month, msg_send_day)
     except ValueError:
         warnings.append(_("The chosen date (%i/%i/%i) is invalid")%(msg_send_year, msg_send_month, msg_send_day))
         problem = 1
