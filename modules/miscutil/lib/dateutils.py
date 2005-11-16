@@ -27,8 +27,7 @@ from time import strptime, strftime, localtime
 from cdsware.config import cdslang
 from cdsware.messages import gettext_set_language
 
-
-def date_convert_MySQL_to_text(db_date, ln=cdslang):
+def get_i18n_dbdatetext(db_date, ln=cdslang):
     """
     Convert a date from mySQL to the appropriate format.
     e.g.: "2004-02-28 14:53:02" => "28 feb 2004, 14:53"
@@ -36,55 +35,27 @@ def date_convert_MySQL_to_text(db_date, ln=cdslang):
     @param db_date: date from mySQL
     @return a formatted string
     """
-    def to_str(int_val):
-        """
-        """
-        if int_val == 0:
-            return '00'
-        else:
-            return str(int_val)
     _ = gettext_set_language(ln)
-    format = "%Y-%m-%d %H:%M:%S"
-    pythonic_date = (0,0,0,0,0,0,0,0,-1)
+    input_format = "%Y-%m-%d %H:%M:%S"
     try:
-        pythonic_date = strptime(db_date, format)
+        pythonic_date = strptime(db_date, input_format)
+        month = get_i18n_month_name(pythonic_date[1], ln=ln)
+        output_format = "%02d " + month + " %04Y, %02H:%02M"
+        return strftime(output_format, pythonic_date)
     except ValueError:
-        pass
-    (y, m, d, h, mm, junk, junk, junk, junk) = map(to_str, pythonic_date)
-    return ("%s %s %s, %s:%s") %\
-           (d, get_i18n_month_name(month_nb=int(m),ln=ln),y, h, mm)
-
-def date_convert_to_MySQL(year, month, day):
-    """
-    convert a given date to mySQL notation
-    @param year: year as an int
-    @param month: month as an int
-    @param day: day as an int
-    @return string representation of date
-    """
-    format = "%Y-%m-%d %H:%M:%S"
-    if ((year, month, day)!=(0, 0, 0)):
-        out = strftime(format, (year, month, day, 0, 0, 0, 0, 0, 0))
-    else:
-        out = '0000-00-00 00:00:00'
-    return out
-
-def get_i18n_date(pythonic_date, ln=cdslang):
-    """
-    Convert a given date (formatted in python's way to a textual representation
-    """
-    def to_str(int_val):
-        """
-        """
-        if int_val == 0:
-            return '00'
-        else:
-            return str(int_val)
-    _ = gettext_set_language(ln)
-    (y, m, d, h, mm, junk, junk, junk, junk) = map(to_str, pythonic_date)
+        return _("N/A")
     
-    return ("%s %s %s, %s:%s") %\
-           (d, get_i18n_month_name(month_nb=int(m),ln=ln),y, h, mm)
+def get_i18n_pythondatetext(pythonic_date, ln=cdslang):
+    """
+    Convert a given date (formatted in python's time struct) to a textual representation
+    """
+    _ = gettext_set_language(ln)
+    try:
+        month = get_i18n_month_name(pythonic_date[1], ln=ln)
+        output_format = "%02d " + month + " %04Y, %02H:%02M"
+        return strftime(output_format, pythonic_date)
+    except ValueError:
+        return _("N/A") 
 
     
 def get_i18n_day_name(day_nb, display='short', ln=cdslang):
@@ -126,18 +97,18 @@ def get_i18n_month_name(month_nb, display='short', ln=cdslang):
     _ = gettext_set_language(ln)
     if display == 'short':
         monthes = {0: _("Month"),
-                   1: _("jan"),
-                   2: _("feb"),
-                   3: _("mar"),
-                   4: _("apr"),
-                   5: _("may"),
-                   6: _("jun"),
-                   7: _("jul"),
-                   8: _("aug"),
-                   9: _("sep"),
-                   10: _("oct"),
-                   11: _("nov"),
-                   12: _("dec")}
+                   1: _("Jan"),
+                   2: _("Feb"),
+                   3: _("Mar"),
+                   4: _("Apr"),
+                   5: _("May"),
+                   6: _("Jun"),
+                   7: _("Jul"),
+                   8: _("Aug"),
+                   9: _("Sep"),
+                   10: _("Oct"),
+                   11: _("Nov"),
+                   12: _("Dec")}
     else:
         monthes = {0: _("Month"),
                    1: _("january"),
@@ -153,6 +124,19 @@ def get_i18n_month_name(month_nb, display='short', ln=cdslang):
                    11: _("november"),
                    12: _("december")}
     return monthes[month_nb]
+
+def get_db_date(year, month, day):
+    """
+    convert a given date to mySQL notation
+    @param year: year as an int
+    @param month: month as an int
+    @param day: day as an int
+    @return string representation of date or throws ValueError exception
+    """
+    input_format = "%Y-%m-%d"
+    pythonic_date = strptime("%i-%i-%i"% (year, month, day), input_format)
+    output_format = "%Y-%m-%d %H:%M:%S"
+    return strftime(output_format, pythonic_date)
 
 def create_day_selectbox(name, selected_day=0, ln=cdslang):
     """
