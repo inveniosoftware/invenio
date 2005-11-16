@@ -791,12 +791,13 @@ def tupletotable(header=[], tuple=[], start='', end='', extracolumn=''):
             align = ['admintdleft']
         else:
             for item in firstrow:
-                try: align.append(type(int(item)) is int and 'admintdright')
-                except ValueError: align.append('admintdleft')
+                if type(item) is int:
+                    align.append('admintdright')
+                else:
+                    align.append('admintdleft')
     except IndexError:
         firstrow = []
-                    
-    
+                        
     tblstr = ''
     for h in header + ['']:
         tblstr += '  <th class="adminheader">%s</th>\n' % (h, )
