@@ -20,6 +20,26 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+API for date conversion and date related GUI creation.
+Lexicon
+    datetext:
+        textual format => 'YEAR-MONTH-DAY HOUR:MINUTE:SECOND'
+        e.g. '2005-11-16 15:11:44'
+        default value: '0000-00-00 00:00:00'
+        
+    datestruct:
+        tuple format => see http://docs.python.org/lib/module-time.html
+        (YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, WEEKDAY, YEARDAY, DAYLIGHT)
+        e.g. (2005, 11, 16, 15, 11, 44, 2, 320, 0)
+        default value: (0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+    dategui:
+        textual format for output => 'DAY MONTH YEAR, HOUR:MINUTE'
+        e.g. '16 nov 2005, 15:11'
+        default value: _("N/A")
+"""
+
 # External imports
 from time import strptime, strftime, localtime
 
@@ -27,42 +47,88 @@ from time import strptime, strftime, localtime
 from cdsware.config import cdslang
 from cdsware.messages import gettext_set_language
 
-def get_i18n_dbdatetext(db_date, ln=cdslang):
+datetext_default = '0000-00-00 00:00:00'
+datestruct_default = (0, 0, 0, 0, 0, 0, 0, 0, 0)
+datetext_format = "%Y-%m-%d %H:%M:%S"
+
+
+
+def convert_datetext_to_dategui(datetext, ln=cdslang):
     """
-    Convert a date from mySQL to the appropriate format.
-    e.g.: "2004-02-28 14:53:02" => "28 feb 2004, 14:53"
+    Convert:
+    '2005-11-16 15:11:57' => '16 nov 2005, 15:11'
     Month is internationalized 
-    @param db_date: date from mySQL
-    @return a formatted string
-    """
-    _ = gettext_set_language(ln)
-    input_format = "%Y-%m-%d %H:%M:%S"
+    """ 
     try:
-        pythonic_date = strptime(db_date, input_format)
-        month = get_i18n_month_name(pythonic_date[1], ln=ln)
+        datestruct = convert_datetext_to_datestruct(datetext)
+        month = get_i18n_month_name(datestruct[1], ln=ln)
         output_format = "%02d " + month + " %04Y, %02H:%02M"
-        return strftime(output_format, pythonic_date)
+        return strftime(output_format, datestruct)
     except ValueError:
+        _ = gettext_set_language(ln)
         return _("N/A")
-    
-def get_i18n_pythondatetext(pythonic_date, ln=cdslang):
+
+def convert_datetext_to_datestruct(datetext):
     """
-    Convert a given date (formatted in python's time struct) to a textual representation
+    Convert:
+    '2005-11-16 15:11:57' => (2005, 11, 16, 15, 11, 44, 2, 320, 0)
     """
-    _ = gettext_set_language(ln)
     try:
-        month = get_i18n_month_name(pythonic_date[1], ln=ln)
-        output_format = "%02d " + month + " %04Y, %02H:%02M"
-        return strftime(output_format, pythonic_date)
+        return strptime(datetext, datetext_format)
     except ValueError:
+        return datestruct_default
+    
+def convert_datestruct_to_dategui(datestruct, ln=cdslang):
+    """
+    Convert:
+    (2005, 11, 16, 15, 11, 44, 2, 320, 0) => '16 nov 2005, 15:11'
+    Month is internationalized
+    """
+    try:
+        month = get_i18n_month_name(datestruct[1], ln=ln)
+        output_format = "%02d " + month + " %04Y, %02H:%02M"
+        return strftime(output_format, datestruct)
+    except ValueError:
+        _ = gettext_set_language(ln)
         return _("N/A") 
 
+def convert_datestruct_to_datetext(datestruct):
+    """
+    Convert:
+    (2005, 11, 16, 15, 11, 44, 2, 320, 0) => '2005-11-16 15:11:57'
+    """
+    try:
+        return strftime(datetext_format, datestruct)
+    except ValueError:
+        return datetext_default
+
+
+def get_datetext(year, month, day):
+    """
+    year=2005, month=11, day=16 => '2005-11-16 00:00:00'
+    """
+    input_format = "%Y-%m-%d"
+    try:
+        datestruct = strptime("%i-%i-%i"% (year, month, day), input_format)
+        return strftime(datetext_format, datestruct)
+    except ValueError:
+        return datetext_default
+
+def get_datestruct(year, month, day):
+    """
+    year=2005, month=11, day=16 => (2005, 11, 16, 0, 0, 0, 2, 320, -1)
+    """
+    input_format = "%Y-%m-%d"
+    try:
+        return strptime("%i-%i-%i"% (year, month, day), input_format)
+    except ValueError:
+        return datestruct_default
     
 def get_i18n_day_name(day_nb, display='short', ln=cdslang):
     """
     get the string representation of a weekday, internationalized
     @param day_nb: number of weekday UNIX like.
-                   =>0=Sunday
+                   => 0=Sunday
     @param ln: language for output
     @return the string representation of the day
     """
@@ -111,32 +177,19 @@ def get_i18n_month_name(month_nb, display='short', ln=cdslang):
                    12: _("Dec")}
     else:
         monthes = {0: _("Month"),
-                   1: _("january"),
-                   2: _("february"),
-                   3: _("march"),
-                   4: _("april"),
-                   5: _("may"),
-                   6: _("june"),
-                   7: _("july"),
-                   8: _("august"),
-                   9: _("september"),
-                   10: _("october"),
-                   11: _("november"),
-                   12: _("december")}
+                   1: _("January"),
+                   2: _("February"),
+                   3: _("March"),
+                   4: _("April"),
+                   5: _("May"),
+                   6: _("June"),
+                   7: _("July"),
+                   8: _("August"),
+                   9: _("September"),
+                   10: _("October"),
+                   11: _("November"),
+                   12: _("December")}
     return monthes[month_nb]
-
-def get_db_date(year, month, day):
-    """
-    convert a given date to mySQL notation
-    @param year: year as an int
-    @param month: month as an int
-    @param day: day as an int
-    @return string representation of date or throws ValueError exception
-    """
-    input_format = "%Y-%m-%d"
-    pythonic_date = strptime("%i-%i-%i"% (year, month, day), input_format)
-    output_format = "%Y-%m-%d %H:%M:%S"
-    return strftime(output_format, pythonic_date)
 
 def create_day_selectbox(name, selected_day=0, ln=cdslang):
     """
@@ -176,7 +229,6 @@ def create_month_selectbox(name, selected_month=0, ln=cdslang):
         out += ">%s</option>\n"% get_i18n_month_name(i, ln)
     out += "</select>\n"
     return out
-
 
 def create_year_inputbox(name, value=0):
     """
