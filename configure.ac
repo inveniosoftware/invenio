@@ -538,6 +538,7 @@ AC_CONFIG_FILES([config.nice \
 	  modules/miscutil/bin/dbexec \
 	  modules/miscutil/bin/dbtest \
 	  modules/miscutil/bin/testsuite \
+	  modules/miscutil/i18n/Makefile \
 	  modules/miscutil/lib/Makefile \
 	  modules/miscutil/demo/Makefile \
 	  modules/miscutil/sql/Makefile \

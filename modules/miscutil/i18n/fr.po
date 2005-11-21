@@ -1,0 +1,2553 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CDSware 0.7\n"
+"POT-Creation-Date: Mon Nov 21 15:45:07 2005\n"
+"PO-Revision-Date: 2005-11-21 15:46+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: ../../../modules/bibharvest/lib/bibharvest_templates.py:51
+#: ../../../modules/bibharvest/lib/bibharvest_templates.py:69
+msgid "See Guide"
+msgstr ""
+
+#: ../../../modules/bibharvest/lib/bibharvest_templates.py:106
+msgid "OAI sources currently present in the database"
+msgstr ""
+
+#: ../../../modules/bibharvest/lib/bibharvest_templates.py:107
+msgid "No OAI sources currently present in the database"
+msgstr ""
+
+#: ../../../modules/bibharvest/lib/bibharvest_templates.py:117
+msgid "Next oaiharvest task"
+msgstr ""
+
+#: ../../../modules/bibharvest/lib/bibharvest_templates.py:118
+msgid "scheduled time:"
+msgstr ""
+
+#: ../../../modules/bibharvest/lib/bibharvest_templates.py:119
+msgid "current status:"
+msgstr ""
+
+#: ../../../modules/bibharvest/lib/bibharvest_templates.py:120
+msgid "No oaiharvest task currently scheduled"
+msgstr ""
+
+#: ../../../modules/bibharvest/lib/bibharvest_templates.py:221
+msgid "successfully validated!"
+msgstr ""
+
+#: ../../../modules/bibharvest/lib/bibharvest_templates.py:222
+msgid "does not seem to be a OAI-compliant baseURL..."
+msgstr ""
+
+#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:23
+msgid ""
+"pygettext -- Python equivalent of xgettext(1)\n"
+"\n"
+"Many systems (Solaris, Linux, Gnu) provide extensive tools that ease the\n"
+"internationalization of C programs. Most of these tools are independent of\n"
+"the programming language and can be used from within Python programs.\n"
+"Martin von Loewis' work[1] helps considerably in this regard.\n"
+"\n"
+"There's one problem though; xgettext is the program that scans source code\n"
+"looking for message strings, but it groks only C (or C++). Python\n"
+"introduces a few wrinkles, such as dual quoting characters, triple quoted\n"
+"strings, and raw strings. xgettext understands none of this.\n"
+"\n"
+"Enter pygettext, which uses Python's standard tokenize module to scan\n"
+"Python source code, generating .pot files identical to what GNU xgettext[2]\n"
+"generates for C and C++ code. From there, the standard GNU tools can be\n"
+"used.\n"
+"\n"
+"A word about marking Python strings as candidates for translation. GNU\n"
+"xgettext recognizes the following keywords: gettext, dgettext, dcgettext,\n"
+"and gettext_noop. But those can be a lot of text to include all over your\n"
+"code. C and C++ have a trick: they use the C preprocessor. Most\n"
+"internationalized C source includes a #define for gettext() to _() so that\n"
+"what has to be written in the source is much less. Thus these are both\n"
+"translatable strings:\n"
+"\n"
+"    gettext(\"Translatable String\")\n"
+"    _(\"Translatable String\")\n"
+"\n"
+"Python of course has no preprocessor so this doesn't work so well.  Thus,\n"
+"pygettext searches only for _() by default, but see the -k/--keyword flag\n"
+"below for how to augment this.\n"
+"\n"
+" [1] http://www.python.org/workshops/1997-10/proceedings/loewis.html\n"
+" [2] http://www.gnu.org/software/gettext/gettext.html\n"
+"\n"
+"NOTE: pygettext attempts to be option and feature compatible with GNU\n"
+"xgettext where ever possible. However some options are still missing or are\n"
+"not fully implemented. Also, xgettext's use of command line switches with\n"
+"option arguments is broken, and in these cases, pygettext just defines\n"
+"additional switches.\n"
+"\n"
+"Usage: pygettext [options] inputfile ...\n"
+"\n"
+"Options:\n"
+"\n"
+"    -a\n"
+"    --extract-all\n"
+"        Extract all strings.\n"
+"\n"
+"    -d name\n"
+"    --default-domain=name\n"
+"        Rename the default output file from messages.pot to name.pot.\n"
+"\n"
+"    -E\n"
+"    --escape\n"
+"        Replace non-ASCII characters with octal escape sequences.\n"
+"\n"
+"    -D\n"
+"    --docstrings\n"
+"        Extract module, class, method, and function docstrings.  These do\n"
+"        not need to be wrapped in _() markers, and in fact cannot be for\n"
+"        Python to consider them docstrings. (See also the -X option).\n"
+"\n"
+"    -h\n"
+"    --help\n"
+"        Print this help message and exit.\n"
+"\n"
+"    -k word\n"
+"    --keyword=word\n"
+"        Keywords to look for in addition to the default set, which are:\n"
+"        %(DEFAULTKEYWORDS)s\n"
+"\n"
+"        You can have multiple -k flags on the command line.\n"
+"\n"
+"    -K\n"
+"    --no-default-keywords\n"
+"        Disable the default set of keywords (see above).  Any keywords\n"
+"        explicitly added with the -k/--keyword option are still recognized.\n"
+"\n"
+"    --no-location\n"
+"        Do not write filename/lineno location comments.\n"
+"\n"
+"    -n\n"
+"    --add-location\n"
+"        Write filename/lineno location comments indicating where each\n"
+"        extracted string is found in the source.  These lines appear before\n"
+"        each msgid.  The style of comments is controlled by the -S/--style\n"
+"        option.  This is the default.\n"
+"\n"
+"    -o filename\n"
+"    --output=filename\n"
+"        Rename the default output file from messages.pot to filename.  If\n"
+"        filename is `-' then the output is sent to standard out.\n"
+"\n"
+"    -p dir\n"
+"    --output-dir=dir\n"
+"        Output files will be placed in directory dir.\n"
+"\n"
+"    -S stylename\n"
+"    --style stylename\n"
+"        Specify which style to use for location comments.  Two styles are\n"
+"        supported:\n"
+"\n"
+"        Solaris  # File: filename, line: line-number\n"
+"        GNU      #: filename:line\n"
+"\n"
+"        The style name is case insensitive.  GNU style is the default.\n"
+"\n"
+"    -v\n"
+"    --verbose\n"
+"        Print the names of the files being processed.\n"
+"\n"
+"    -V\n"
+"    --version\n"
+"        Print the version of pygettext and exit.\n"
+"\n"
+"    -w columns\n"
+"    --width=columns\n"
+"        Set width of output to columns.\n"
+"\n"
+"    -x filename\n"
+"    --exclude-file=filename\n"
+"        Specify a file that contains a list of strings that are not be\n"
+"        extracted from the input files.  Each string to be excluded must\n"
+"        appear on a line by itself in the file.\n"
+"\n"
+"    -X filename\n"
+"    --no-docstrings=filename\n"
+"        Specify a file that contains a list of files (one per line) that\n"
+"        should not have their docstrings extracted.  This is only useful in\n"
+"        conjunction with the -D option above.\n"
+"\n"
+"If `inputfile' is -, standard input is read.\n"
+msgstr ""
+
+#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:179
+msgid ""
+"# SOME DESCRIPTIVE TITLE.\n"
+"# Copyright (C) YEAR ORGANIZATION\n"
+"# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.\n"
+"#\n"
+"msgid \"\"\n"
+"msgstr \"\"\n"
+"\"Project-Id-Version: PACKAGE VERSION\\n\"\n"
+"\"POT-Creation-Date: %(time)s\\n\"\n"
+"\"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n\"\n"
+"\"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n\"\n"
+"\"Language-Team: LANGUAGE <LL@li.org>\\n\"\n"
+"\"MIME-Version: 1.0\\n\"\n"
+"\"Content-Type: text/plain; charset=CHARSET\\n\"\n"
+"\"Content-Transfer-Encoding: ENCODING\\n\"\n"
+"\"Generated-By: pygettext.py %(version)s\\n\"\n"
+"\n"
+msgstr ""
+
+#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:426
+msgid "*** %(file)s:%(lineno)s: Seen unexpected token \"%(token)s\""
+msgstr ""
+
+#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:482
+msgid "# File: %(filename)s, line: %(lineno)d"
+msgstr ""
+
+#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:490
+msgid " %(filename)s:%(lineno)d"
+msgstr ""
+
+#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:567
+msgid "Invalid value for --style: %s"
+msgstr ""
+
+#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:575
+msgid "pygettext.py (xgettext for Python) %s"
+msgstr ""
+
+#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:581
+msgid "--width argument must be an integer: %s"
+msgstr ""
+
+#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:608
+msgid "Can't read --exclude-file: %s"
+msgstr ""
+
+#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:628
+msgid "Reading standard input"
+msgstr ""
+
+#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:633
+msgid "Working on %s"
+msgstr ""
+
+#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:666
+msgid "a unicode string"
+msgstr ""
+
+#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:668
+msgid "*** Seen unexpected token \"%(token)s\""
+msgstr ""
+
+#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:669
+msgid "morethanonestring"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:69
+#: ../../../modules/miscutil/lib/dateutils.py:93
+msgid "N/A"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:137
+msgid "Sun"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:138
+msgid "Mon"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:139
+msgid "Tue"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:140
+msgid "Wed"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:141
+msgid "Thu"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:142
+msgid "Fri"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:143
+msgid "Sat"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:145
+msgid "Sunday"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:146
+msgid "Monday"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:147
+msgid "Tuesday"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:148
+msgid "Wednesday"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:149
+msgid "Thursday"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:150
+msgid "Friday"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:151
+msgid "Saturday"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:165
+#: ../../../modules/miscutil/lib/dateutils.py:179
+msgid "Month"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:166
+msgid "Jan"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:167
+msgid "Feb"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:168
+msgid "Mar"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:169
+msgid "Apr"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:170
+#: ../../../modules/miscutil/lib/dateutils.py:184
+#: ../../../modules/websearch/lib/websearch_templates.py:506
+msgid "May"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:171
+msgid "Jun"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:172
+msgid "Jul"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:173
+msgid "Aug"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:174
+msgid "Sep"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:175
+msgid "Oct"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:176
+msgid "Nov"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:177
+msgid "Dec"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:180
+#: ../../../modules/websearch/lib/websearch_templates.py:505
+msgid "January"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:181
+#: ../../../modules/websearch/lib/websearch_templates.py:505
+msgid "February"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:182
+#: ../../../modules/websearch/lib/websearch_templates.py:505
+msgid "March"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:183
+#: ../../../modules/websearch/lib/websearch_templates.py:505
+msgid "April"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:185
+#: ../../../modules/websearch/lib/websearch_templates.py:506
+msgid "June"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:186
+#: ../../../modules/websearch/lib/websearch_templates.py:506
+msgid "July"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:187
+#: ../../../modules/websearch/lib/websearch_templates.py:506
+msgid "August"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:188
+#: ../../../modules/websearch/lib/websearch_templates.py:507
+msgid "September"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:189
+#: ../../../modules/websearch/lib/websearch_templates.py:507
+msgid "October"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:190
+#: ../../../modules/websearch/lib/websearch_templates.py:507
+msgid "November"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:191
+#: ../../../modules/websearch/lib/websearch_templates.py:507
+msgid "December"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:209
+msgid "Day"
+msgstr ""
+
+#: ../../../modules/miscutil/lib/dateutils.py:260
+msgid "Year"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert.py:58
+msgid "You already have an alert which name is <b>%(name)s</b>"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert.py:117
+msgid "unknown"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert.py:196
+msgid "You already have an alert defined for the specified query and basket"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert.py:220
+#: ../../../modules/webalert/lib/webalert.py:340
+msgid "The alert name cannot be <b>empty</b>."
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert.py:232
+#: ../../../modules/webalert/lib/webalert.py:360
+msgid "The <I>private</I> basket <B>%(name)s</B> has been created."
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert.py:235
+#: ../../../modules/webalert/lib/webalert.py:363
+#: ../../../modules/webbasket/lib/webbasket.py:357
+#: ../../../modules/webbasket/lib/webbasket.py:414
+msgid "You already have a basket which name is '%s'"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert.py:242
+msgid "The alert <B>%s</B> has been added to your profile."
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert.py:374
+msgid "The alert <B>%s</B> has been successfully updated."
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert.py:439
+msgid " You have made %(number)s queries. A %(detailed_list)s is available with a posibility to (a) view search results and (b) subscribe for automatic email alerting service for these queries"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert.py:440
+msgid "detailed list"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:71
+msgid "Pattern"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:73
+msgid "Field"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:75
+msgid "Pattern 1"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:77
+msgid "Field 1"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:79
+msgid "Pattern 2"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:81
+msgid "Field 2"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:83
+msgid "Pattern 3"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:85
+msgid "Field 3"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:87
+msgid "Collections"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:89
+msgid "Collection"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:110
+msgid "You own following alerts:"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:111
+msgid "alert name"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:119
+msgid "SHOW"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:161
+msgid "This alert will notify you each time/only if a new item satisfy the following query"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:162
+msgid "QUERY"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:193
+msgid "Alert identification name:"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:195
+msgid "Search-checking frequency:"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:199
+#: ../../../modules/webalert/lib/webalert_templates.py:325
+msgid "monthly"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:200
+#: ../../../modules/webalert/lib/webalert_templates.py:323
+msgid "weekly"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:201
+#: ../../../modules/webalert/lib/webalert_templates.py:320
+msgid "daily"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:202
+msgid "Send notification e-mail?"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:205
+#: ../../../modules/webalert/lib/webalert_templates.py:328
+msgid "yes"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:206
+#: ../../../modules/webalert/lib/webalert_templates.py:330
+msgid "no"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:207
+msgid "if <B>no</B> you must specify a basket"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:208
+msgid "Store results in basket?"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:209
+msgid "no basket"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:234
+msgid "or insert a new basket name"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:236
+msgid "SET ALERT"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:237
+msgid "CLEAR DATA"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:288
+msgid "Set a new alert from %(your_searches)s, the %(popular_searches)s or the input form."
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:289
+msgid "your searches"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:290
+msgid "most popular searches"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:306
+#: ../../../modules/webbasket/lib/webbasket_templates.py:78
+#: ../../../modules/webmessage/lib/webmessage_templates.py:450
+msgid "No"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:307
+msgid "Name"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:308
+msgid "Search checking frequency"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:309
+msgid "Notification by e-mail"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:310
+msgid "Result in basket"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:311
+msgid "Date last run"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:312
+msgid "Creation date"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:313
+msgid "Query"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:314
+#: ../../../modules/webalert/lib/webalert_templates.py:437
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1388
+msgid "Action"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:359
+msgid "Remove"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:360
+msgid "Modify"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:362
+#: ../../../modules/webalert/lib/webalert_templates.py:455
+msgid "Execute search"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:369
+msgid "You have defined <B>%(number)s</B> alerts."
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:412
+msgid "You have not executed any search yet. %(click_here)s for search."
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:415
+msgid "Click here"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:423
+msgid "You have performed <B>%(number)d</B> searches (<strong>%(different)d</strong> different questions) during the last 30 days or so."
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:435
+msgid "#"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:436
+msgid "Question"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:440
+msgid "Last Run"
+msgstr ""
+
+#: ../../../modules/webalert/lib/webalert_templates.py:456
+msgid "Set new alert"
+msgstr ""
+
+#: ../../../modules/webalert/web/youralerts.py:61
+msgid "Display searches"
+msgstr ""
+
+#: ../../../modules/webalert/web/youralerts.py:65
+#: ../../../modules/webalert/web/youralerts.py:93
+#: ../../../modules/webalert/web/youralerts.py:121
+#: ../../../modules/webalert/web/youralerts.py:142
+#: ../../../modules/webalert/web/youralerts.py:167
+#: ../../../modules/webalert/web/youralerts.py:192
+#: ../../../modules/webalert/web/youralerts.py:213
+#: ../../../modules/webmessage/lib/webmessage_templates.py:415
+#: ../../../modules/websession/lib/websession_templates.py:404
+#: ../../../modules/websession/web/youraccount.py:57
+#: ../../../modules/websession/web/youraccount.py:120
+#: ../../../modules/websession/web/youraccount.py:138
+#: ../../../modules/websession/web/youraccount.py:155
+#: ../../../modules/websession/web/youraccount.py:168
+#: ../../../modules/websession/web/youraccount.py:191
+#: ../../../modules/websession/web/youraccount.py:202
+#: ../../../modules/websession/web/youraccount.py:255
+#: ../../../modules/websession/web/youraccount.py:273
+#: ../../../modules/websession/web/youraccount.py:292
+#: ../../../modules/websession/web/youraccount.py:313
+#: ../../../modules/websession/web/youraccount.py:342
+#: ../../../modules/websession/web/youraccount.py:362
+#: ../../../modules/websession/web/youraccount.py:401
+#: ../../../modules/websubmit/web/publiline.py:74
+#: ../../../modules/websubmit/web/yourapprovals.py:87
+#: ../../../modules/websubmit/web/yoursubmissions.py:164
+msgid "Your Account"
+msgstr ""
+
+#: ../../../modules/webalert/web/youralerts.py:89
+msgid "Set a new alert"
+msgstr ""
+
+#: ../../../modules/webalert/web/youralerts.py:117
+msgid "Modify alert settings"
+msgstr ""
+
+#: ../../../modules/webalert/web/youralerts.py:138
+#: ../../../modules/webalert/web/youralerts.py:163
+#: ../../../modules/webalert/web/youralerts.py:188
+#: ../../../modules/webalert/web/youralerts.py:209
+msgid "Display alerts"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:80
+#: ../../../modules/webbasket/lib/webbasket_templates.py:103
+#: ../../../modules/webbasket/lib/webbasket_templates.py:175
+#: ../../../modules/webmessage/lib/webmessage_templates.py:397
+msgid "DELETE"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:82
+#: ../../../modules/webbasket/lib/webbasket.py:310
+#: ../../../modules/webbasket/lib/webbasket_templates.py:98
+msgid "CONFIRM"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:82
+#: ../../../modules/webbasket/lib/webbasket_templates.py:99
+msgid "CANCEL"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:88
+msgid "The basket has not been deleted: %s"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:100
+#: ../../../modules/webbasket/lib/webbasket_templates.py:143
+#: ../../../modules/webbasket/lib/webbasket_templates.py:163
+#: ../../../modules/webbasket/lib/webbasket_templates.py:548
+msgid "CREATE NEW"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:106
+#: ../../../modules/webbasket/lib/webbasket.py:545
+msgid "The <I>private</I> basket <B>%s</B> has been created."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:109
+#: ../../../modules/webbasket/lib/webbasket.py:547
+#: ../../../modules/webbasket/lib/webbasket.py:652
+msgid "The basket %s has not been created: %s"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:111
+msgid "The basket has not been created: specify a basket name."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:114
+#: ../../../modules/webbasket/lib/webbasket_templates.py:176
+msgid "RENAME"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:120
+msgid ""
+"The basket <B>%s</B> has been renamed to <B>%s</B>.\n"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:123
+msgid "The basket has not been renamed: %s"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:125
+msgid "The basket has not been renamed: specify a basket name."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:127
+#: ../../../modules/webbasket/lib/webbasket_templates.py:185
+msgid "SET PUBLIC"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:133
+msgid "The selected basket is now publicly accessible at the following URL:"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:136
+msgid "The basket has not been made public: %s"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:138
+#: ../../../modules/webbasket/lib/webbasket_templates.py:195
+msgid "SET PRIVATE"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:142
+msgid "The selected basket is no more publically accessible."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:144
+msgid "The basket has not been made private: %s"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:146
+#: ../../../modules/webbasket/lib/webbasket_templates.py:260
+msgid "REMOVE"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:150
+msgid "The selected items have been removed."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:152
+msgid "The items have not been removed: %s"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:154
+#: ../../../modules/webbasket/lib/webbasket.py:539
+#: ../../../modules/webbasket/lib/webbasket_templates.py:281
+#: ../../../modules/webbasket/lib/webbasket_templates.py:361
+msgid "EXECUTE"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:157
+msgid "Select a destination basket to copy/move items."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:160
+msgid "The selected items have been copied/moved."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:167
+msgid "The items have not been re-ordered: %s"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:313
+#: ../../../modules/webbasket/lib/webbasket.py:360
+#: ../../../modules/webbasket/lib/webbasket.py:445
+#: ../../../modules/webbasket/lib/webbasket.py:461
+#: ../../../modules/webbasket/lib/webbasket.py:515
+msgid "You are not the owner of this basket"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:315
+msgid "The selected basket has been deleted."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:321
+msgid "The related alerts have been removed."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:550
+msgid "Select a destination basket to copy the selected items."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:553
+msgid "The selected items have been copied."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:559
+msgid "Non existing basket"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:567
+msgid "The basket is private"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:615
+msgid "Content of the public basket <B>%s</B> :"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:645
+msgid "No records to add."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:672
+#: ../../../modules/websession/lib/websession_templates.py:756
+#: ../../../modules/websession/lib/websession_templates.py:769
+msgid "baskets"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:676
+msgid "Adding %s records to basket(s)..."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:685
+msgid "...done."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket.py:687
+msgid "sorry, you are not the owner of this basket."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:58
+#: ../../../modules/webbasket/lib/webbasket_templates.py:202
+msgid "There isn't any alert related to this basket."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:61
+msgid "The following <A href=\"../youralerts.py/list\">alerts</A> are related to this basket:"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:77
+msgid "Do you want to remove the related alerts too?"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:79
+#: ../../../modules/webmessage/lib/webmessage_templates.py:449
+msgid "Yes"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:102
+msgid "Delete the basket"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:140
+#: ../../../modules/webbasket/lib/webbasket_templates.py:544
+msgid "No baskets have been defined."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:141
+#: ../../../modules/webbasket/lib/webbasket_templates.py:490
+msgid "New basket name:"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:146
+msgid "You own <B>%s</B> baskets."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:147
+msgid "Select an existing basket"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:151
+#: ../../../modules/webbasket/lib/webbasket_templates.py:531
+msgid "basket name"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:162
+#: ../../../modules/webbasket/lib/webbasket_templates.py:271
+#: ../../../modules/webbasket/lib/webbasket_templates.py:539
+#: ../../../modules/websearch/lib/search_engine.py:509
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1041
+msgid "or"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:162
+#: ../../../modules/webbasket/lib/webbasket_templates.py:538
+msgid "SELECT"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:173
+msgid "The selected basket is"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:184
+msgid "Basket access is set to <I>private</I>, convert to <I>public</I>?"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:194
+msgid "Basket access is set to <I>public</I>, convert to <I>private</I>?"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:196
+msgid "Public URL"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:205
+msgid "The following <A href=\"../youralerts.py/list\">alerts</A> are related to this basket: "
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:259
+msgid "Selected items"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:272
+msgid "Copy"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:273
+msgid "Move"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:274
+msgid "to"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:275
+#: ../../../modules/webbasket/lib/webbasket_templates.py:350
+msgid "select basket"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:287
+#: ../../../modules/webbasket/lib/webbasket_templates.py:367
+msgid "The basket <B>%s</B> is empty."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:347
+msgid "Copy the selected items to "
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:356
+msgid "Copy the selected items to new basket"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:442
+msgid "Please choose the basket you want to add %d records to:"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:455
+#: ../../../modules/websearch/lib/websearch_templates.py:1932
+#: ../../../modules/websearch/lib/websearch_templates.py:1989
+msgid "ADD TO BASKET"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:479
+msgid "You don't own baskets defined yet."
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:491
+msgid "CREATE NEW BASKET"
+msgstr ""
+
+#: ../../../modules/webbasket/lib/webbasket_templates.py:529
+msgid "You own the following baskets"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage.py:140
+msgid "The message could not be deleted"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage.py:142
+msgid "Delete successful"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage.py:161
+msgid "Your mailbox has been emptied"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage.py:375
+msgid "The chosen date (%(year)i/%(month)i/%(day)i) is invalid"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage.py:384
+msgid "Please enter a user name or a group name"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage.py:388
+msgid ""
+"Your message is too long, please edit it.\n"
+"                             Max size allowed is %i characters\n"
+"                          "
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage.py:400
+msgid ""
+"Group '%s' doesn't exist\n"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage.py:417
+msgid ""
+"User '%s' doesn't exist\n"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage.py:444
+msgid ""
+"Your message couldn't be sent to the following recipients\n"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage.py:445
+msgid "These users are overquota: "
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage.py:450
+msgid "Your message has been sent."
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:76
+msgid "Date"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:76
+msgid "Sender"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:76
+msgid "Subject"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:83
+msgid "No new mail"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:87
+msgid "Delete"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:116
+msgid "New message"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:117
+msgid "Delete All"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:175
+msgid "Re: "
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:269
+msgid "Send Later:"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:270
+msgid "To:"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:271
+msgid "Users"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:272
+msgid "Groups"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:273
+msgid "Subject:"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:274
+msgid "Message:"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:275
+msgid "SEND"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:396
+msgid "REPLY"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:413
+#: ../../../modules/webmessage/web/yourmessages.py:62
+#: ../../../modules/webmessage/web/yourmessages.py:194
+#: ../../../modules/webmessage/web/yourmessages.py:224
+#: ../../../modules/webmessage/web/yourmessages.py:254
+#: ../../../modules/websession/lib/websession_templates.py:407
+msgid "Your Messages"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:447
+msgid "Are your sure you want to empty your whole mailbox?"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:508
+msgid "Quota: %.1f%%"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:526
+msgid "Please select value(s)"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:567
+msgid "Add to users"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:585
+msgid "Add to groups"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:608
+msgid "Find a user"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:609
+msgid "Find a group"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:610
+#: ../../../modules/websearch/lib/search_engine.py:1282
+#: ../../../modules/websearch/lib/websearch_templates.py:204
+#: ../../../modules/websearch/lib/websearch_templates.py:308
+#: ../../../modules/websearch/lib/websearch_templates.py:1134
+#: ../../../modules/websearch/lib/websearch_templates.py:1227
+#: ../../../modules/websearch/lib/websearch_templates.py:1285
+#: ../../../modules/webstyle/lib/webstyle_templates.py:342
+#: ../../../modules/webstyle/lib/webstyle_templates.py:415
+msgid "Search"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:626
+msgid ""
+"You got <b>%i</b> new messages.<br/>\n"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:627
+msgid "You can see all your messages in your <a href=\"/yourmessages.py?ln=%s\">inbox</a>"
+msgstr ""
+
+#: ../../../modules/webmessage/web/yourmessages.py:101
+msgid "Write a message"
+msgstr ""
+
+#: ../../../modules/webmessage/web/yourmessages.py:284
+msgid "Read a message"
+msgstr ""
+
+#: ../../../modules/websearch/lib/search_engine.py:474
+#: ../../../modules/websearch/lib/search_engine.py:489
+msgid "any collection"
+msgstr ""
+
+#: ../../../modules/websearch/lib/search_engine.py:485
+msgid "add another collection"
+msgstr ""
+
+#: ../../../modules/websearch/lib/search_engine.py:494
+msgid "latest first"
+msgstr ""
+
+#: ../../../modules/websearch/lib/search_engine.py:509
+msgid "rank by"
+msgstr ""
+
+#: ../../../modules/websearch/lib/search_engine.py:529
+msgid "HTML brief"
+msgstr ""
+
+#: ../../../modules/websearch/lib/search_engine.py:1241
+msgid "No values found."
+msgstr ""
+
+#: ../../../modules/websearch/lib/search_engine.py:1282
+#: ../../../modules/websearch/lib/websearch_templates.py:205
+#: ../../../modules/websearch/lib/websearch_templates.py:309
+#: ../../../modules/websearch/lib/websearch_templates.py:1057
+#: ../../../modules/websearch/lib/websearch_templates.py:1135
+#: ../../../modules/websearch/lib/websearch_templates.py:1136
+#: ../../../modules/websearch/lib/websearch_templates.py:1228
+#: ../../../modules/websearch/lib/websearch_templates.py:1286
+#: ../../../modules/websearch/lib/websearch_templates.py:1327
+#: ../../../modules/websearch/lib/websearch_templates.py:1349
+#: ../../../modules/websearch/lib/websearch_templates.py:1379
+msgid "Browse"
+msgstr ""
+
+#: ../../../modules/websearch/lib/search_engine.py:1727
+msgid "No words index available for"
+msgstr ""
+
+#: ../../../modules/websearch/lib/search_engine.py:1731
+msgid "No phrase index available for"
+msgstr ""
+
+#: ../../../modules/websearch/lib/search_engine.py:1744
+msgid "Search term <em>%s</em>"
+msgstr ""
+
+#: ../../../modules/websearch/lib/search_engine.py:1746
+msgid "inside <em>%s</em> index"
+msgstr ""
+
+#: ../../../modules/websearch/lib/search_engine.py:1747
+msgid "did not match any record.  Nearest terms in any collection are:"
+msgstr ""
+
+#: ../../../modules/websearch/lib/search_engine.py:2411
+msgid "Use different search terms."
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:206
+#: ../../../modules/websearch/lib/websearch_templates.py:310
+#: ../../../modules/websearch/lib/websearch_templates.py:1231
+#: ../../../modules/websearch/lib/websearch_templates.py:1289
+msgid "Search Tips"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:207
+#: ../../../modules/websearch/lib/websearch_templates.py:1294
+msgid "Advanced search"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:311
+#: ../../../modules/websearch/lib/websearch_templates.py:1236
+msgid "Simple search"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:329
+msgid "Search options"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:376
+#: ../../../modules/websearch/lib/websearch_templates.py:1372
+msgid "Added since:"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:377
+#: ../../../modules/websearch/lib/websearch_templates.py:1373
+msgid "Until"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:381
+#: ../../../modules/websearch/lib/websearch_templates.py:1412
+msgid "Sort by:"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:382
+#: ../../../modules/websearch/lib/websearch_templates.py:1413
+msgid "Display results:"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:383
+msgid "Output format:"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:416
+msgid "All of the words:"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:418
+msgid "Any of the words:"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:420
+msgid "Exact phrase:"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:422
+msgid "Partial phrase:"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:424
+msgid "Regular expression:"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:466
+msgid "AND"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:467
+msgid "OR"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:468
+msgid "AND NOT"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:490
+msgid "any day"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:502
+msgid "any month"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:516
+msgid "Any year"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:600
+msgid "restricted"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:635
+msgid "Latest additions:"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:676
+msgid "The contents of this collection is restricted."
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:691
+msgid "This collection does not contain any document yet."
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:725
+#: ../../../modules/websearch/lib/websearch_templates.py:2005
+#: ../../../modules/websearch/lib/websearch_templates.py:2019
+#: ../../../modules/websearch/lib/websearch_templates.py:2035
+msgid "more"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:812
+#: ../../../modules/websearch/lib/websearch_templates.py:2343
+#: ../../../modules/websearch/lib/websearch_templates.py:2346
+#: ../../../modules/websearch/lib/websearch_templates.py:2349
+msgid "Detailed record"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:813
+#: ../../../modules/websearch/lib/websearch_templates.py:1988
+#: ../../../modules/websearch/lib/websearch_templates.py:2351
+msgid "Similar records"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:818
+#: ../../../modules/websearch/lib/websearch_templates.py:2355
+msgid "Cited by"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:888
+msgid "Words nearest to"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:893
+msgid "inside"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:896
+msgid "in any collection are:"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:999
+msgid "Hits"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1058
+#: ../../../modules/websearch/lib/websearch_templates.py:1814
+msgid "next"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1143
+#: ../../../modules/websearch/lib/websearch_templates.py:1244
+msgid "Try your search on..."
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1322
+msgid "collections"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1383
+msgid "results"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1414
+msgid "Output format"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1418
+msgid "asc."
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1421
+msgid "desc."
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1427
+msgid "single list"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1430
+msgid "split by collection"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1461
+msgid "MARC tag"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1490
+#: ../../../modules/websearch/lib/websearch_templates.py:1492
+#: ../../../modules/websearch/lib/websearch_templates.py:1495
+#: ../../../modules/websearch/lib/websearch_templates.py:1499
+#: ../../../modules/websearch/lib/websearch_templates.py:1501
+#: ../../../modules/websearch/lib/websearch_templates.py:1515
+#: ../../../modules/websearch/lib/websearch_templates.py:1524
+#: ../../../modules/websearch/lib/websearch_templates.py:1526
+#: ../../../modules/websearch/lib/websearch_templates.py:1534
+#: ../../../modules/websearch/lib/websearch_templates.py:1536
+#: ../../../modules/websearch/lib/websearch_templates.py:1540
+#: ../../../modules/websearch/lib/websearch_templates.py:1544
+#: ../../../modules/websearch/lib/websearch_templates.py:1550
+#: ../../../modules/websearch/lib/websearch_templates.py:1552
+#: ../../../modules/websearch/lib/websearch_templates.py:1554
+#: ../../../modules/websearch/lib/websearch_templates.py:1556
+#: ../../../modules/websearch/lib/websearch_templates.py:1560
+#: ../../../modules/websearch/lib/websearch_templates.py:1573
+#: ../../../modules/websearch/lib/websearch_templates.py:1576
+#: ../../../modules/websearch/lib/websearch_templates.py:1579
+#: ../../../modules/websearch/lib/websearch_templates.py:1584
+#: ../../../modules/websearch/lib/websearch_templates.py:1586
+#: ../../../modules/websearch/lib/websearch_templates.py:1588
+#: ../../../modules/websearch/lib/websearch_templates.py:1612
+#: ../../../modules/websearch/lib/websearch_templates.py:1615
+#: ../../../modules/websearch/lib/websearch_templates.py:1618
+#: ../../../modules/websearch/lib/websearch_templates.py:1621
+#: ../../../modules/websearch/lib/websearch_templates.py:1624
+msgid "in"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1629
+msgid "Haven't found what you were looking for?  Try your search on other servers:"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1743
+#: ../../../modules/websearch/lib/websearch_templates.py:1748
+#: ../../../modules/websearch/lib/websearch_templates.py:2100
+msgid "<strong>%s</strong> records found"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1794
+msgid "begin"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1802
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1152
+msgid "previous"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1822
+msgid "end"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1841
+msgid "jump to record"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1854
+msgid "Search took %.2f seconds."
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1964
+msgid "Format"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1984
+msgid "Record created %s, last modified %s"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1998
+msgid "Cited by: %s records"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:2012
+msgid "Co-cited with: %s records"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:2029
+msgid "People who downloaded this document also downloaded:"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:2044
+msgid "People who viewed this page also viewed::"
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:2091
+msgid "<strong>Results overview:</strong> Found <strong>%s</strong> records in %.2f seconds."
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:2127
+msgid "Boolean query returned no hits. Please combine your search terms differently."
+msgstr ""
+
+#: ../../../modules/websearch/lib/websearch_templates.py:2167
+msgid "See also: similar author names"
+msgstr ""
+
+#: ../../../modules/websession/lib/webaccount.py:89
+msgid "You are logged in as guest. You may want to <A href=\"../youraccount.py/login\">login</A> as a regular user"
+msgstr ""
+
+#: ../../../modules/websession/lib/webaccount.py:90
+msgid "The <strong class=\"headline\">guest</strong> users need to <A href=\"../youraccount.py/login\">register</A> first"
+msgstr ""
+
+#: ../../../modules/websession/lib/webaccount.py:91
+msgid "No queries found"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:45
+msgid "If you have lost password for your CERN Document Server internal account, then please enter your email address below and the lost password will be emailed to you."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:47
+msgid "Note that if you have been using an external login system (such as CERN NICE), then we cannot do anything and you have to ask there."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:48
+msgid "Alternatively, you can ask %s to change your login system from external to internal."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:140
+msgid "If you want to change your email address or password, please set new values in the form below."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:141
+msgid "New email address"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:142
+#: ../../../modules/websession/lib/websession_templates.py:651
+msgid "mandatory"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:143
+#: ../../../modules/websession/lib/websession_templates.py:653
+msgid "Example"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:144
+msgid "New password"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:145
+#: ../../../modules/websession/lib/websession_templates.py:652
+msgid "optional"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:146
+#: ../../../modules/websession/lib/websession_templates.py:654
+msgid "Note"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:147
+#: ../../../modules/websession/lib/websession_templates.py:655
+msgid "The password phrase may contain punctuation, spaces, etc."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:148
+msgid "Retype password"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:149
+msgid "Set new values"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:183
+msgid "Edit login method"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:184
+msgid "Please select which login method you would like to use to authenticate yourself"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:185
+#: ../../../modules/websession/lib/websession_templates.py:197
+msgid "Select method"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:233
+#: ../../../modules/websession/lib/websession_templates.py:649
+msgid "Email address"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:234
+msgid "Send lost password"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:260
+msgid "The CDS Search offers you a possibility to personalize the interface, to set up your own personal library of documents, or to set up an automatic alert query that would run periodically and would notify you of search results by email."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:268
+#: ../../../modules/websession/web/youraccount.py:55
+msgid "Your Settings"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:269
+msgid "Set or change your account Email address or password. Specify your preferences about the way the interface looks like."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:278
+#: ../../../modules/websession/lib/websession_templates.py:409
+msgid "Your Searches"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:279
+msgid "View all the searches you performed during the last 30 days."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:280
+#: ../../../modules/websession/lib/websession_templates.py:406
+msgid "Your Baskets"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:281
+msgid "With baskets you can define specific collections of items, store interesting records you want to access later or share with others."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:288
+msgid "Your Alerts"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:289
+msgid "Subscribe to a search which will be run periodically by our service.  The result can be sent to you via Email or stored in one of your baskets."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:298
+msgid "Your Loans"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:299
+msgid "Check out book you have on load, submit borrowing requests, etc.  Requires CERN ID."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:322
+msgid ""
+"You are logged in as a guest user, so your %s will disappear at the end of the current session. If you wish you can\n"
+"               <a href=\"../youraccount.py/login\">login or register here</a>."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:346
+msgid "You are logged in as %s. You may want to a) <A href=\"../youraccount.py/logout\">logout</A>; b) edit your <A href=\"../youraccount.py/edit\">account settings</a>."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:408
+msgid "Your Alert Searches"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:410
+msgid "Your Submissions"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:411
+msgid "You can consult the list of %(your_submissions)s and inquire about their status."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:415
+msgid "your submissions"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:418
+#: ../../../modules/websubmit/web/yourapprovals.py:84
+msgid "Your Approvals"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:419
+msgid "You can consult the list of %(your_approvals)s with the documents you approved or refereed."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:423
+msgid "your approvals"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:426
+#: ../../../modules/websession/web/youraccount.py:253
+msgid "Your Administrative Activities"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:452
+msgid "Try again"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:471
+msgid "Okay, password has been emailed to %s"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:486
+msgid "Deleting your account"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:502
+msgid "You are no longer recognized.  If you wish you can <A href=\"./login\">login here</A>."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:530
+msgid "If you already have an account, please login using the form below."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:534
+msgid "If you don't own an account yet, please <a href=\"../youraccount.py/register\">register</a> an internal account."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:536
+msgid "It is not possible to create an account yourself. Contact %s if you want an account."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:558
+msgid "Login via:"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:580
+msgid "Username"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:581
+#: ../../../modules/websession/lib/websession_templates.py:650
+msgid "Password"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:582
+#: ../../../modules/websession/lib/websession_templates.py:757
+#: ../../../modules/websession/web/youraccount.py:309
+msgid "login"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:586
+#: ../../../modules/websession/web/youraccount.py:136
+msgid "Lost your password?"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:615
+msgid "Please enter your email address and desired password:"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:617
+msgid "The account will not be possible to use before it has been verified and activated."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:656
+msgid "Retype Password"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:657
+#: ../../../modules/websession/web/youraccount.py:400
+msgid "register"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:658
+msgid "Please do not use valuable passwords such as your Unix, AFS or NICE passwords with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you for personal services of %s. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:687
+msgid "You seem to be the guest user.  You have to <a href=\"../youraccount.py/login\">login</a> first."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:691
+msgid "You are not authorized to access administrative functions."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:694
+msgid "You seem to be <em>%s</em>."
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:695
+msgid "Here are some interesting web admin links for you:"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:701
+msgid "Configure BibFormat"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:703
+msgid "Configure BibHarvest"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:705
+msgid "Configure BibIndex"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:707
+msgid "Configure BibRank"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:709
+msgid "Configure WebAccess"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:711
+msgid "Configure WebSearch"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:713
+msgid "Configure WebSubmit"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:714
+msgid "For more admin-level activities, see the complete %(admin_area)s"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:715
+msgid "Admin Area"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:753
+msgid "guest"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:754
+msgid "session"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:755
+#: ../../../modules/websession/lib/websession_templates.py:768
+msgid "alerts"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:767
+msgid "account"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:775
+msgid "submissions"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:781
+msgid "approvals"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:787
+msgid "administration"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:792
+msgid "logout"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:74
+#: ../../../modules/websession/web/youraccount.py:96
+msgid "Settings edited"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:76
+#: ../../../modules/websession/web/youraccount.py:95
+msgid "Show account"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:80
+msgid "Login method successfully selected."
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:91
+msgid "Password successfully edited."
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:93
+msgid "Settings successfully edited."
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:98
+msgid "The email address is already in use, please try again."
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:100
+#: ../../../modules/websession/web/youraccount.py:105
+#: ../../../modules/websession/web/youraccount.py:110
+#: ../../../modules/websession/web/youraccount.py:115
+msgid "Edit settings"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:101
+#: ../../../modules/websession/web/youraccount.py:106
+#: ../../../modules/websession/web/youraccount.py:111
+#: ../../../modules/websession/web/youraccount.py:116
+msgid "Editing settings failed"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:103
+msgid "The email address is not valid, please try again."
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:108
+msgid "The passwords do not match, please try again."
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:113
+msgid "Could not update settings."
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:201
+msgid "The entered e-mail address doesn't exist in the database"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:213
+msgid "Credentials for"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:214
+msgid "Here are your user credentials for"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:215
+msgid "password"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:215
+msgid "username"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:216
+msgid "You can login at"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:226
+msgid "The entered email address is incorrect, please check that it is written correctly (e.g. johndoe@example.com)."
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:227
+msgid "Incorrect email address"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:236
+msgid "Lost password sent"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:271
+msgid "Delete Account"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:290
+msgid "Logout"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:311
+#: ../../../modules/websession/web/youraccount.py:340
+#: ../../../modules/websession/web/youraccount.py:341
+msgid "Login"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:360
+msgid "Register"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:377
+msgid "Your account has been successfully created."
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:378
+msgid "Account created"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:380
+msgid " An email has been sent to the given address with the account information."
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:382
+msgid " A second email will be sent when the account has been activated and can be used."
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:384
+msgid " You can now access your <a href=\"%s\">account</a>."
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:387
+msgid "The user already exists in the database, please try again."
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:389
+#: ../../../modules/websession/web/youraccount.py:393
+#: ../../../modules/websession/web/youraccount.py:397
+msgid "Register failure"
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:391
+msgid "Both passwords must match, please try again."
+msgstr ""
+
+#: ../../../modules/websession/web/youraccount.py:395
+msgid "The email address given is not valid, please try again."
+msgstr ""
+
+#: ../../../modules/webstyle/lib/webstyle_templates.py:66
+#: ../../../modules/webstyle/lib/webstyle_templates.py:75
+msgid "Home"
+msgstr ""
+
+#: ../../../modules/webstyle/lib/webstyle_templates.py:150
+#: ../../../modules/webstyle/lib/webstyle_templates.py:384
+msgid "Last updated:"
+msgstr ""
+
+#: ../../../modules/webstyle/lib/webstyle_templates.py:343
+#: ../../../modules/webstyle/lib/webstyle_templates.py:416
+#: ../../../modules/websubmit/lib/websubmit_engine.py:446
+#: ../../../modules/websubmit/lib/websubmit_engine.py:686
+#: ../../../modules/websubmit/lib/websubmit_engine.py:770
+#: ../../../modules/websubmit/lib/websubmit_engine.py:928
+msgid "Submit"
+msgstr ""
+
+#: ../../../modules/webstyle/lib/webstyle_templates.py:344
+#: ../../../modules/webstyle/lib/webstyle_templates.py:417
+msgid "Personalize"
+msgstr ""
+
+#: ../../../modules/webstyle/lib/webstyle_templates.py:345
+#: ../../../modules/webstyle/lib/webstyle_templates.py:418
+msgid "Help"
+msgstr ""
+
+#: ../../../modules/webstyle/lib/webstyle_templates.py:420
+msgid "Powered by"
+msgstr ""
+
+#: ../../../modules/webstyle/lib/webstyle_templates.py:421
+msgid "Maintained by"
+msgstr ""
+
+#: ../../../modules/webstyle/lib/webstyle_templates.py:462
+msgid "This site is also available in the following languages:"
+msgstr ""
+
+#: ../../../modules/webstyle/lib/webstyle_templates.py:493
+msgid "Internal Error"
+msgstr ""
+
+#: ../../../modules/webstyle/lib/webstyle_templates.py:570
+msgid "Please contact <a href=\"mailto:%s\">%s</a> quoting the following information:"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_engine.py:77
+#: ../../../modules/websubmit/lib/websubmit_engine.py:485
+msgid "Sorry, you must log in to perform this action. Please use the top right menu to do so."
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_engine.py:82
+#: ../../../modules/websubmit/lib/websubmit_engine.py:489
+msgid "invalid parameter"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_engine.py:87
+#: ../../../modules/websubmit/lib/websubmit_engine.py:494
+msgid "cannot find submission directory"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_engine.py:93
+msgid "unknown document type"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_engine.py:99
+#: ../../../modules/websubmit/lib/websubmit_engine.py:613
+msgid "unknown action"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_engine.py:106
+msgid "can't figure number of pages"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_engine.py:132
+#: ../../../modules/websubmit/lib/websubmit_engine.py:193
+#: ../../../modules/websubmit/lib/websubmit_engine.py:507
+msgid "can't create submission directory"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_engine.py:607
+msgid "unknown type of document"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_engine.py:620
+msgid "this action does not apply on this type of document"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_engine.py:901
+msgid "Cannot find document %s"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_engine.py:1067
+msgid "Your chosen action is not supported by the document"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_engine.py:1122
+msgid "error"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_engine.py:1133
+msgid "warning"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:74
+msgid "Document types available for submission"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:75
+msgid "Please select the type of document you want to submit"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:91
+msgid "No document types yet..."
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:230
+msgid "please log in first.\\nUse the top right menu to log in."
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:273
+msgid "please select a category"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:311
+msgid "Notice"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:312
+msgid "Select a category and then click the button to perform the action you chose."
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:333
+msgid "To continue an interrupted submission, enter your access number directly in the input box."
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:335
+msgid "go"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:460
+#: ../../../modules/websubmit/lib/websubmit_templates.py:895
+msgid "SUMMARY"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:497
+msgid "previous page"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:503
+msgid "Submission no(1)"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:517
+msgid "next page"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:532
+#: ../../../modules/websubmit/lib/websubmit_templates.py:934
+msgid "Are you sure you want to quit this submission?"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:533
+#: ../../../modules/websubmit/lib/websubmit_templates.py:941
+msgid "back to main menu"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:536
+msgid "(1) you should take note of this number at the beginning of the submission, it will allow you to get your information back in case your browser crashes before the end of the submission."
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:537
+msgid "(2) mandatory fields appear in red in the 'Summary' window."
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:677
+msgid "The field `%s` is Mandatory.\\n Please make a choice in the 'Select:' box"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:691
+msgid "Please press a button."
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:699
+msgid "The field `%s` is Mandatory. Please fill it in."
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:775
+msgid "The field '%(field)s' is mandatory.\\nGoing back to page %(page)s"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:886
+msgid "finished!"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:894
+msgid "end of action"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:918
+msgid "Submission no"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:984
+msgid "Here is the %(action)s function list for %(doctype)s documents at level %(step)s"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:989
+msgid "Function"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:990
+msgid "Score"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:991
+msgid "Running Function"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:997
+msgid "function %s does not exist..."
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1036
+msgid "You now have to"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1068
+msgid "record #%s"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1070
+msgid " document #%s"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1072
+msgid " version #%s"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1101
+msgid "file(s)"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1149
+msgid "see"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1163
+msgid "version"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1335
+msgid "For"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1336
+msgid "all types of document"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1389
+msgid "Status"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1390
+msgid "id"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1391
+msgid "reference"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1393
+msgid "first access"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1394
+msgid "last access"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1404
+msgid "Are you sure you want to delete this submission?"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1405
+msgid "delete submission %(id)s in %(docname)s"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1421
+msgid "reference not yet given"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1492
+msgid "Refereed Documents"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1501
+msgid "You are general referee"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1505
+msgid "You are referee for category: %(name)s (%(id)s)"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1545
+msgid "List of refereed types of documents"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1546
+msgid "Select one of the following types of documents to check the documents status:"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1604
+msgid "List of refereed categories"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1605
+msgid "Please choose a category"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1624
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1665
+msgid "pending"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1630
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1668
+msgid "approved"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1636
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1670
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1671
+msgid "rejected"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1664
+msgid "Key"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1667
+msgid "waiting for approval"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1669
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1672
+msgid "already approved"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1673
+msgid "some documents are pending"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1728
+msgid "List of refereed documents"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1729
+msgid "Click on a report number to have more information"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1730
+msgid "Report Number"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1731
+msgid "Pending"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1732
+msgid "Approved"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1733
+msgid "Rejected"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1853
+msgid "Your request has been sent to the referee!"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1867
+msgid "Title"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1873
+msgid "Author"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1881
+msgid "More information"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1882
+msgid "click here"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1888
+msgid "This Document is still <strong class=\"headline\">waiting for approval</strong>."
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1889
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1908
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1916
+msgid "It has first been sent to approval on: <strong class=\"headline\">%(date)s</strong>"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1891
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1893
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1910
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1912
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1918
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1920
+msgid "Last approval e-mail was sent on: <strong class=\"headline\">%(date)s</strong>"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1894
+msgid "You can send an approval request e-mail again by clicking the following button:"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1896
+#: ../../../modules/websubmit/web/publiline.py:183
+msgid "Send Again"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1897
+msgid "WARNING! An e-mail will be send to your referee if you confirm."
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1900
+msgid "As a referee for this document, you may click this button to approve or reject it:"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1902
+msgid "Approve/Reject"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1906
+msgid "This Document has been <strong class=\"headline\">approved</strong>."
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1907
+msgid "Its approved reference is: <strong class=\"headline\">%(rn)s</strong>"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1913
+msgid "It has been approved on: <strong class=\"headline\">%(date)s</strong>"
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1915
+msgid "This Document has been <strong class=\"headline\">rejected</strong>."
+msgstr ""
+
+#: ../../../modules/websubmit/lib/websubmit_templates.py:1921
+msgid "It has been rejected on: <strong class=\"headline\">%(date)s</strong>"
+msgstr ""
+
+#: ../../../modules/websubmit/web/getfile.py:63
+msgid "Parameter docid missing"
+msgstr ""
+
+#: ../../../modules/websubmit/web/getfile.py:68
+msgid "can't find file..."
+msgstr ""
+
+#: ../../../modules/websubmit/web/getfile.py:88
+msgid "Access to Fulltext"
+msgstr ""
+
+#: ../../../modules/websubmit/web/publiline.py:179
+msgid "This document has never been requested for approval!"
+msgstr ""
+
+#: ../../../modules/websubmit/web/yoursubmissions.py:66
+msgid "You first have to login before using this feature. Use the left menu to log in."
+msgstr ""
+
