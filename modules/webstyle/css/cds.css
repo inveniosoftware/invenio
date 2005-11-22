@@ -295,8 +295,8 @@ a.navtrail:hover {
 .pagebody {
    color: #000;
    background: transparent;
+   margin:0px;
    padding: 20px;
-   margin:  0px;
 }
 .pagebodystripeleft {
    color: #000;
@@ -309,15 +309,16 @@ a.navtrail:hover {
 }
 .pagebodystripemiddle {
    color: #000;
-   background: transparent;
+   background: #fff;
+   padding: 0px;
+   margin: 0px;
+   width: 100%;
 }
 .pagebodystriperight {
    color: #000;
    background: #fff;
    font-size: x-small;
    width: 120px;
-   margin: 0px;
-   padding-left: 10px;
    float: right;
 }
 .pageboxlefttop {
@@ -1001,91 +1002,98 @@ input,select {
    font-size: small;
    vertical-align: bottom;
 }
-
+/* WebMessage module */
 .mailbox{
-   color: #000000;
-   background: #ffffee;
-   margin-top: 15px;
    border-collapse: collapse;
-   border-top: 1px solid #ffcc00;
+   border-spacing:1px;
+   color: #000;
+   margin-top: 15px;
+   padding: 0px;
+   width: auto;
+}
+
+.mailboxheader tr{
+   background: #ffc;   
+}
+.inboxheader {
+   text-align:center;
+   padding: 5px 30px 5px 30px;
+   border-top: 1px solid #fc0;
+   border-bottom: 1px solid #fc0;
+}
+.messageheader{
    width: 100%;
+   padding: 0px;
+   border: 0px;
 }
-
-.mailboxheader{
-   background: #ffffcc;
-   padding: 20px;
-   margin:5px;
-   text-align: left;
-   font-weight: normal;
-}
-.mailboxheader td{
-   padding: 5px;
-}
-
-.mailboxbody{
-   background: #ffffee;
-   border-top: 1px dotted #ffcc00;
-   border-bottom: 1px dotted #ffcc00;
-}
-
-
-.mailboxrecords{
-   background: transparent;
-   margin-left: 0px;
-   margin-right: 20px;
-}
-.mailboxrecords td{
-   padding:3px;
-}
-
 .mailboxinput{
    width: 100%;
 }
-
 .mailboxlabel{
-   width: 80px;  
+   white-space: nowrap;
+   padding-right: 15px;  
+}
+.mailboxbody{
+   background: #ffe;
+}
+.mailboxrecord{
+/* each record */
+}
+.mailboxrecord td{
+/* each cell of a record */
+   padding-left: 30px;
+   padding-right: 30px;
+   padding-top: 4px;
+   padding-bottom: 4px;
+   border-top: 1px dashed #fff;
+}
+.mailboxfooter{
+   background-color: #fff;
+}
+.mailboxfooter td{
+   padding-top:10px;
+   pading-bottom:0px;
+   border-top: 1px solid  #fc0;  
+   border-bottom: none;
+   border-left: none;
+   border-right: none; 
+}
+.mailboxsearch td {
+   padding-top: 10px;
+   padding-bottom: 10px;
+}
+.mailboxresults td {
+   padding-bottom: 5px;
+   border-bottom: 1px solid  #fc0;
 }
 
 .nonsubmitbutton {
    color: #000;
-   background: #ffcc00;
+   background: #fc0;
    font-weight: bold;
 }
-
-.mailboxfoot{
-   padding-top:3px;
-   padding-bottom: 3px;
-   padding-right: 0px;
-   background-color: #ffc;
-   border-top: 1px dotted #ffcc00;   
-}
-
 .confirmoperation{
    margin: auto;
    width: 400px;
    height: 100px;
    background-color: #ddf;
 }
-
 .confirmmessage{
    font-weight: bold;
    text-align: center;
 }
-
 .infobox{
    background-color: #ffc;
    padding:7px;
    border-collapse: collapse;
-   border: 1px solid #ffcc00;
+   border: 1px solid #fc0;
 }
-
 .warningbox{
    background-color: #cff;
    padding:7px;
    border-collapse: collapse;
    border: 1px solid #ccff00;
 }
-
 .quotabox{
    background-color: #ffc;
    width: 200px;
@@ -1094,13 +1102,12 @@ input,select {
    margin-top: 3px;
    margin-bottom: 3px;
 }
-
 .quotabar{
    background-color: #fc0;     
    border: 0px none black;
    height: 15px;             
 }
-
+/* WebBasket module */
 .bskcontainer{
    width: 100%;
    margin: 0px;
