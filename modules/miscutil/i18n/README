@@ -11,6 +11,25 @@ documentation for more information.
   <http://www.gnu.org/software/gettext/>
 
 
+* What are all those files?
+
+The directory contains a few scripts (i18n-*.py) and the actual
+translation files.
+
+  - <xx>.po files are the master translations. These are the files
+    containing the actual work of the translators
+
+  - <xx>.mo are compiled translation files. They are recomputed during
+    build time, and installed in the target directory
+
+  - cdsware.pot is the template containing all the requested
+    translations, fetched from the source code.
+
+  - compendium-<xx>.po is a base of known translations, extracted from
+    messages.py. It is only necessary during the transition from the
+    previous system.
+
+
 * Adding a new language file
 
 To add support for a new language <xx>, do:

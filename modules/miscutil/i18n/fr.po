@@ -1,19 +1,30 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR ORGANIZATION
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# # This file is part of the CERN Document Server Software (CDSware).
+# # Copyright (C) 2002, 2003, 2004, 2005 CERN.
+# #
+# # The CDSware is free software; you can redistribute it and/or
+# # modify it under the terms of the GNU General Public License as
+# # published by the Free Software Foundation; either version 2 of the
+# # License, or (at your option) any later version.
+# #
+# # The CDSware is distributed in the hope that it will be useful, but
+# # WITHOUT ANY WARRANTY; without even the implied warranty of
+# # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# # General Public License for more details.
+# #
+# # You should have received a copy of the GNU General Public License
+# # along with CDSware; if not, write to the Free Software Foundation, Inc.,
+# # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
 "Project-Id-Version: CDSware 0.7\n"
-"POT-Creation-Date: Mon Nov 21 15:45:07 2005\n"
-"PO-Revision-Date: 2005-11-21 15:46+0100\n"
+"POT-Creation-Date: Tue Nov 22 10:30:50 2005\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
-
 
 #: ../../../modules/bibharvest/lib/bibharvest_templates.py:51
 #: ../../../modules/bibharvest/lib/bibharvest_templates.py:69
@@ -50,211 +61,6 @@ msgstr ""
 
 #: ../../../modules/bibharvest/lib/bibharvest_templates.py:222
 msgid "does not seem to be a OAI-compliant baseURL..."
-msgstr ""
-
-#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:23
-msgid ""
-"pygettext -- Python equivalent of xgettext(1)\n"
-"\n"
-"Many systems (Solaris, Linux, Gnu) provide extensive tools that ease the\n"
-"internationalization of C programs. Most of these tools are independent of\n"
-"the programming language and can be used from within Python programs.\n"
-"Martin von Loewis' work[1] helps considerably in this regard.\n"
-"\n"
-"There's one problem though; xgettext is the program that scans source code\n"
-"looking for message strings, but it groks only C (or C++). Python\n"
-"introduces a few wrinkles, such as dual quoting characters, triple quoted\n"
-"strings, and raw strings. xgettext understands none of this.\n"
-"\n"
-"Enter pygettext, which uses Python's standard tokenize module to scan\n"
-"Python source code, generating .pot files identical to what GNU xgettext[2]\n"
-"generates for C and C++ code. From there, the standard GNU tools can be\n"
-"used.\n"
-"\n"
-"A word about marking Python strings as candidates for translation. GNU\n"
-"xgettext recognizes the following keywords: gettext, dgettext, dcgettext,\n"
-"and gettext_noop. But those can be a lot of text to include all over your\n"
-"code. C and C++ have a trick: they use the C preprocessor. Most\n"
-"internationalized C source includes a #define for gettext() to _() so that\n"
-"what has to be written in the source is much less. Thus these are both\n"
-"translatable strings:\n"
-"\n"
-"    gettext(\"Translatable String\")\n"
-"    _(\"Translatable String\")\n"
-"\n"
-"Python of course has no preprocessor so this doesn't work so well.  Thus,\n"
-"pygettext searches only for _() by default, but see the -k/--keyword flag\n"
-"below for how to augment this.\n"
-"\n"
-" [1] http://www.python.org/workshops/1997-10/proceedings/loewis.html\n"
-" [2] http://www.gnu.org/software/gettext/gettext.html\n"
-"\n"
-"NOTE: pygettext attempts to be option and feature compatible with GNU\n"
-"xgettext where ever possible. However some options are still missing or are\n"
-"not fully implemented. Also, xgettext's use of command line switches with\n"
-"option arguments is broken, and in these cases, pygettext just defines\n"
-"additional switches.\n"
-"\n"
-"Usage: pygettext [options] inputfile ...\n"
-"\n"
-"Options:\n"
-"\n"
-"    -a\n"
-"    --extract-all\n"
-"        Extract all strings.\n"
-"\n"
-"    -d name\n"
-"    --default-domain=name\n"
-"        Rename the default output file from messages.pot to name.pot.\n"
-"\n"
-"    -E\n"
-"    --escape\n"
-"        Replace non-ASCII characters with octal escape sequences.\n"
-"\n"
-"    -D\n"
-"    --docstrings\n"
-"        Extract module, class, method, and function docstrings.  These do\n"
-"        not need to be wrapped in _() markers, and in fact cannot be for\n"
-"        Python to consider them docstrings. (See also the -X option).\n"
-"\n"
-"    -h\n"
-"    --help\n"
-"        Print this help message and exit.\n"
-"\n"
-"    -k word\n"
-"    --keyword=word\n"
-"        Keywords to look for in addition to the default set, which are:\n"
-"        %(DEFAULTKEYWORDS)s\n"
-"\n"
-"        You can have multiple -k flags on the command line.\n"
-"\n"
-"    -K\n"
-"    --no-default-keywords\n"
-"        Disable the default set of keywords (see above).  Any keywords\n"
-"        explicitly added with the -k/--keyword option are still recognized.\n"
-"\n"
-"    --no-location\n"
-"        Do not write filename/lineno location comments.\n"
-"\n"
-"    -n\n"
-"    --add-location\n"
-"        Write filename/lineno location comments indicating where each\n"
-"        extracted string is found in the source.  These lines appear before\n"
-"        each msgid.  The style of comments is controlled by the -S/--style\n"
-"        option.  This is the default.\n"
-"\n"
-"    -o filename\n"
-"    --output=filename\n"
-"        Rename the default output file from messages.pot to filename.  If\n"
-"        filename is `-' then the output is sent to standard out.\n"
-"\n"
-"    -p dir\n"
-"    --output-dir=dir\n"
-"        Output files will be placed in directory dir.\n"
-"\n"
-"    -S stylename\n"
-"    --style stylename\n"
-"        Specify which style to use for location comments.  Two styles are\n"
-"        supported:\n"
-"\n"
-"        Solaris  # File: filename, line: line-number\n"
-"        GNU      #: filename:line\n"
-"\n"
-"        The style name is case insensitive.  GNU style is the default.\n"
-"\n"
-"    -v\n"
-"    --verbose\n"
-"        Print the names of the files being processed.\n"
-"\n"
-"    -V\n"
-"    --version\n"
-"        Print the version of pygettext and exit.\n"
-"\n"
-"    -w columns\n"
-"    --width=columns\n"
-"        Set width of output to columns.\n"
-"\n"
-"    -x filename\n"
-"    --exclude-file=filename\n"
-"        Specify a file that contains a list of strings that are not be\n"
-"        extracted from the input files.  Each string to be excluded must\n"
-"        appear on a line by itself in the file.\n"
-"\n"
-"    -X filename\n"
-"    --no-docstrings=filename\n"
-"        Specify a file that contains a list of files (one per line) that\n"
-"        should not have their docstrings extracted.  This is only useful in\n"
-"        conjunction with the -D option above.\n"
-"\n"
-"If `inputfile' is -, standard input is read.\n"
-msgstr ""
-
-#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:179
-msgid ""
-"# SOME DESCRIPTIVE TITLE.\n"
-"# Copyright (C) YEAR ORGANIZATION\n"
-"# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.\n"
-"#\n"
-"msgid \"\"\n"
-"msgstr \"\"\n"
-"\"Project-Id-Version: PACKAGE VERSION\\n\"\n"
-"\"POT-Creation-Date: %(time)s\\n\"\n"
-"\"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n\"\n"
-"\"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n\"\n"
-"\"Language-Team: LANGUAGE <LL@li.org>\\n\"\n"
-"\"MIME-Version: 1.0\\n\"\n"
-"\"Content-Type: text/plain; charset=CHARSET\\n\"\n"
-"\"Content-Transfer-Encoding: ENCODING\\n\"\n"
-"\"Generated-By: pygettext.py %(version)s\\n\"\n"
-"\n"
-msgstr ""
-
-#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:426
-msgid "*** %(file)s:%(lineno)s: Seen unexpected token \"%(token)s\""
-msgstr ""
-
-#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:482
-msgid "# File: %(filename)s, line: %(lineno)d"
-msgstr ""
-
-#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:490
-msgid " %(filename)s:%(lineno)d"
-msgstr ""
-
-#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:567
-msgid "Invalid value for --style: %s"
-msgstr ""
-
-#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:575
-msgid "pygettext.py (xgettext for Python) %s"
-msgstr ""
-
-#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:581
-msgid "--width argument must be an integer: %s"
-msgstr ""
-
-#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:608
-msgid "Can't read --exclude-file: %s"
-msgstr ""
-
-#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:628
-msgid "Reading standard input"
-msgstr ""
-
-#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:633
-msgid "Working on %s"
-msgstr ""
-
-#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:666
-msgid "a unicode string"
-msgstr ""
-
-#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:668
-msgid "*** Seen unexpected token \"%(token)s\""
-msgstr ""
-
-#: ../../../modules/miscutil/i18n/i18n-update-potfile.py:669
-msgid "morethanonestring"
 msgstr ""
 
 #: ../../../modules/miscutil/lib/dateutils.py:69
@@ -343,7 +149,7 @@ msgstr ""
 #: ../../../modules/miscutil/lib/dateutils.py:184
 #: ../../../modules/websearch/lib/websearch_templates.py:506
 msgid "May"
-msgstr ""
+msgstr "mai"
 
 #: ../../../modules/miscutil/lib/dateutils.py:171
 msgid "Jun"
@@ -376,57 +182,57 @@ msgstr ""
 #: ../../../modules/miscutil/lib/dateutils.py:180
 #: ../../../modules/websearch/lib/websearch_templates.py:505
 msgid "January"
-msgstr ""
+msgstr "janvier"
 
 #: ../../../modules/miscutil/lib/dateutils.py:181
 #: ../../../modules/websearch/lib/websearch_templates.py:505
 msgid "February"
-msgstr ""
+msgstr "février"
 
 #: ../../../modules/miscutil/lib/dateutils.py:182
 #: ../../../modules/websearch/lib/websearch_templates.py:505
 msgid "March"
-msgstr ""
+msgstr "mars"
 
 #: ../../../modules/miscutil/lib/dateutils.py:183
 #: ../../../modules/websearch/lib/websearch_templates.py:505
 msgid "April"
-msgstr ""
+msgstr "avril"
 
 #: ../../../modules/miscutil/lib/dateutils.py:185
 #: ../../../modules/websearch/lib/websearch_templates.py:506
 msgid "June"
-msgstr ""
+msgstr "juin"
 
 #: ../../../modules/miscutil/lib/dateutils.py:186
 #: ../../../modules/websearch/lib/websearch_templates.py:506
 msgid "July"
-msgstr ""
+msgstr "juillet"
 
 #: ../../../modules/miscutil/lib/dateutils.py:187
 #: ../../../modules/websearch/lib/websearch_templates.py:506
 msgid "August"
-msgstr ""
+msgstr "août"
 
 #: ../../../modules/miscutil/lib/dateutils.py:188
 #: ../../../modules/websearch/lib/websearch_templates.py:507
 msgid "September"
-msgstr ""
+msgstr "septembre"
 
 #: ../../../modules/miscutil/lib/dateutils.py:189
 #: ../../../modules/websearch/lib/websearch_templates.py:507
 msgid "October"
-msgstr ""
+msgstr "octobre"
 
 #: ../../../modules/miscutil/lib/dateutils.py:190
 #: ../../../modules/websearch/lib/websearch_templates.py:507
 msgid "November"
-msgstr ""
+msgstr "novembre"
 
 #: ../../../modules/miscutil/lib/dateutils.py:191
 #: ../../../modules/websearch/lib/websearch_templates.py:507
 msgid "December"
-msgstr ""
+msgstr "décembre"
 
 #: ../../../modules/miscutil/lib/dateutils.py:209
 msgid "Day"
@@ -474,7 +280,10 @@ msgid "The alert <B>%s</B> has been successfully updated."
 msgstr ""
 
 #: ../../../modules/webalert/lib/webalert.py:439
-msgid " You have made %(number)s queries. A %(detailed_list)s is available with a posibility to (a) view search results and (b) subscribe for automatic email alerting service for these queries"
+msgid ""
+" You have made %(number)s queries. A %(detailed_list)s is available with a "
+"posibility to (a) view search results and (b) subscribe for automatic email "
+"alerting service for these queries"
 msgstr ""
 
 #: ../../../modules/webalert/lib/webalert.py:440
@@ -534,7 +343,9 @@ msgid "SHOW"
 msgstr ""
 
 #: ../../../modules/webalert/lib/webalert_templates.py:161
-msgid "This alert will notify you each time/only if a new item satisfy the following query"
+msgid ""
+"This alert will notify you each time/only if a new item satisfy the "
+"following query"
 msgstr ""
 
 #: ../../../modules/webalert/lib/webalert_templates.py:162
@@ -603,7 +414,9 @@ msgid "CLEAR DATA"
 msgstr ""
 
 #: ../../../modules/webalert/lib/webalert_templates.py:288
-msgid "Set a new alert from %(your_searches)s, the %(popular_searches)s or the input form."
+msgid ""
+"Set a new alert from %(your_searches)s, the %(popular_searches)s or the "
+"input form."
 msgstr ""
 
 #: ../../../modules/webalert/lib/webalert_templates.py:289
@@ -680,7 +493,9 @@ msgid "Click here"
 msgstr ""
 
 #: ../../../modules/webalert/lib/webalert_templates.py:423
-msgid "You have performed <B>%(number)d</B> searches (<strong>%(different)d</strong> different questions) during the last 30 days or so."
+msgid ""
+"You have performed <B>%(number)d</B> searches (<strong>%(different)d</"
+"strong> different questions) during the last 30 days or so."
 msgstr ""
 
 #: ../../../modules/webalert/lib/webalert_templates.py:435
@@ -797,8 +612,7 @@ msgid "RENAME"
 msgstr ""
 
 #: ../../../modules/webbasket/lib/webbasket.py:120
-msgid ""
-"The basket <B>%s</B> has been renamed to <B>%s</B>.\n"
+msgid "The basket <B>%s</B> has been renamed to <B>%s</B>.\n"
 msgstr ""
 
 #: ../../../modules/webbasket/lib/webbasket.py:123
@@ -911,7 +725,7 @@ msgstr ""
 #: ../../../modules/websession/lib/websession_templates.py:756
 #: ../../../modules/websession/lib/websession_templates.py:769
 msgid "baskets"
-msgstr ""
+msgstr "paniers"
 
 #: ../../../modules/webbasket/lib/webbasket.py:676
 msgid "Adding %s records to basket(s)..."
@@ -931,7 +745,9 @@ msgid "There isn't any alert related to this basket."
 msgstr ""
 
 #: ../../../modules/webbasket/lib/webbasket_templates.py:61
-msgid "The following <A href=\"../youralerts.py/list\">alerts</A> are related to this basket:"
+msgid ""
+"The following <A href=\"../youralerts.py/list\">alerts</A> are related to "
+"this basket:"
 msgstr ""
 
 #: ../../../modules/webbasket/lib/webbasket_templates.py:77
@@ -1000,7 +816,9 @@ msgid "Public URL"
 msgstr ""
 
 #: ../../../modules/webbasket/lib/webbasket_templates.py:205
-msgid "The following <A href=\"../youralerts.py/list\">alerts</A> are related to this basket: "
+msgid ""
+"The following <A href=\"../youralerts.py/list\">alerts</A> are related to "
+"this basket: "
 msgstr ""
 
 #: ../../../modules/webbasket/lib/webbasket_templates.py:259
@@ -1045,7 +863,7 @@ msgstr ""
 #: ../../../modules/websearch/lib/websearch_templates.py:1932
 #: ../../../modules/websearch/lib/websearch_templates.py:1989
 msgid "ADD TO BASKET"
-msgstr ""
+msgstr "AJOUTER DANS PANIER"
 
 #: ../../../modules/webbasket/lib/webbasket_templates.py:479
 msgid "You don't own baskets defined yet."
@@ -1087,18 +905,15 @@ msgid ""
 msgstr ""
 
 #: ../../../modules/webmessage/lib/webmessage.py:400
-msgid ""
-"Group '%s' doesn't exist\n"
+msgid "Group '%s' doesn't exist\n"
 msgstr ""
 
 #: ../../../modules/webmessage/lib/webmessage.py:417
-msgid ""
-"User '%s' doesn't exist\n"
+msgid "User '%s' doesn't exist\n"
 msgstr ""
 
 #: ../../../modules/webmessage/lib/webmessage.py:444
-msgid ""
-"Your message couldn't be sent to the following recipients\n"
+msgid "Your message couldn't be sent to the following recipients\n"
 msgstr ""
 
 #: ../../../modules/webmessage/lib/webmessage.py:445
@@ -1220,15 +1035,16 @@ msgstr ""
 #: ../../../modules/webstyle/lib/webstyle_templates.py:342
 #: ../../../modules/webstyle/lib/webstyle_templates.py:415
 msgid "Search"
-msgstr ""
+msgstr "Recherche"
 
 #: ../../../modules/webmessage/lib/webmessage_templates.py:626
-msgid ""
-"You got <b>%i</b> new messages.<br/>\n"
+msgid "You got <b>%i</b> new messages.<br/>\n"
 msgstr ""
 
 #: ../../../modules/webmessage/lib/webmessage_templates.py:627
-msgid "You can see all your messages in your <a href=\"/yourmessages.py?ln=%s\">inbox</a>"
+msgid ""
+"You can see all your messages in your <a href=\"/yourmessages.py?ln=%s"
+"\">inbox</a>"
 msgstr ""
 
 #: ../../../modules/webmessage/web/yourmessages.py:101
@@ -1242,19 +1058,19 @@ msgstr ""
 #: ../../../modules/websearch/lib/search_engine.py:474
 #: ../../../modules/websearch/lib/search_engine.py:489
 msgid "any collection"
-msgstr ""
+msgstr "toutes les collections"
 
 #: ../../../modules/websearch/lib/search_engine.py:485
 msgid "add another collection"
-msgstr ""
+msgstr "ajouter une nouvelle collection"
 
 #: ../../../modules/websearch/lib/search_engine.py:494
 msgid "latest first"
-msgstr ""
+msgstr "derniers en premier"
 
 #: ../../../modules/websearch/lib/search_engine.py:509
 msgid "rank by"
-msgstr ""
+msgstr "ranger par"
 
 #: ../../../modules/websearch/lib/search_engine.py:529
 msgid "HTML brief"
@@ -1276,27 +1092,29 @@ msgstr ""
 #: ../../../modules/websearch/lib/websearch_templates.py:1349
 #: ../../../modules/websearch/lib/websearch_templates.py:1379
 msgid "Browse"
-msgstr ""
+msgstr "Liste"
 
 #: ../../../modules/websearch/lib/search_engine.py:1727
 msgid "No words index available for"
-msgstr ""
+msgstr "Aucun index de mots n'est disponible pour"
 
 #: ../../../modules/websearch/lib/search_engine.py:1731
 msgid "No phrase index available for"
-msgstr ""
+msgstr "Aucun index de phrases n'est disponible pour"
 
 #: ../../../modules/websearch/lib/search_engine.py:1744
 msgid "Search term <em>%s</em>"
-msgstr ""
+msgstr "Le terme de recherche <em>%s</em>"
 
 #: ../../../modules/websearch/lib/search_engine.py:1746
 msgid "inside <em>%s</em> index"
-msgstr ""
+msgstr "dans l'index <em>%s</em>"
 
 #: ../../../modules/websearch/lib/search_engine.py:1747
 msgid "did not match any record.  Nearest terms in any collection are:"
 msgstr ""
+"ne se trouve dans aucune notice.  Les termes les plus proches de toutes les "
+"collections sont:"
 
 #: ../../../modules/websearch/lib/search_engine.py:2411
 msgid "Use different search terms."
@@ -1307,7 +1125,7 @@ msgstr ""
 #: ../../../modules/websearch/lib/websearch_templates.py:1231
 #: ../../../modules/websearch/lib/websearch_templates.py:1289
 msgid "Search Tips"
-msgstr ""
+msgstr "Conseils de recherche"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:207
 #: ../../../modules/websearch/lib/websearch_templates.py:1294
@@ -1326,7 +1144,7 @@ msgstr ""
 #: ../../../modules/websearch/lib/websearch_templates.py:376
 #: ../../../modules/websearch/lib/websearch_templates.py:1372
 msgid "Added since:"
-msgstr ""
+msgstr "Ajouté depuis:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:377
 #: ../../../modules/websearch/lib/websearch_templates.py:1373
@@ -1336,56 +1154,56 @@ msgstr ""
 #: ../../../modules/websearch/lib/websearch_templates.py:381
 #: ../../../modules/websearch/lib/websearch_templates.py:1412
 msgid "Sort by:"
-msgstr ""
+msgstr "Trier par:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:382
 #: ../../../modules/websearch/lib/websearch_templates.py:1413
 msgid "Display results:"
-msgstr ""
+msgstr "Afficher:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:383
 msgid "Output format:"
-msgstr ""
+msgstr "Format de sortie:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:416
 msgid "All of the words:"
-msgstr ""
+msgstr "Tous les mots:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:418
 msgid "Any of the words:"
-msgstr ""
+msgstr "Au moins un des mots:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:420
 msgid "Exact phrase:"
-msgstr ""
+msgstr "Phrase exacte:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:422
 msgid "Partial phrase:"
-msgstr ""
+msgstr "Phrase partielle:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:424
 msgid "Regular expression:"
-msgstr ""
+msgstr "Expression régulière:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:466
 msgid "AND"
-msgstr ""
+msgstr "ET"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:467
 msgid "OR"
-msgstr ""
+msgstr "OU"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:468
 msgid "AND NOT"
-msgstr ""
+msgstr "ET NON PAS"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:490
 msgid "any day"
-msgstr ""
+msgstr "tous les jours"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:502
 msgid "any month"
-msgstr ""
+msgstr "tous les mois"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:516
 msgid "Any year"
@@ -1393,44 +1211,44 @@ msgstr ""
 
 #: ../../../modules/websearch/lib/websearch_templates.py:600
 msgid "restricted"
-msgstr ""
+msgstr "restreint"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:635
 msgid "Latest additions:"
-msgstr ""
+msgstr "Derniers ajouts:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:676
 msgid "The contents of this collection is restricted."
-msgstr ""
+msgstr "Le contenu de cette collection est restreint."
 
 #: ../../../modules/websearch/lib/websearch_templates.py:691
 msgid "This collection does not contain any document yet."
-msgstr ""
+msgstr "Cette collection ne contient pas encore de document."
 
 #: ../../../modules/websearch/lib/websearch_templates.py:725
 #: ../../../modules/websearch/lib/websearch_templates.py:2005
 #: ../../../modules/websearch/lib/websearch_templates.py:2019
 #: ../../../modules/websearch/lib/websearch_templates.py:2035
 msgid "more"
-msgstr ""
+msgstr "davantage"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:812
 #: ../../../modules/websearch/lib/websearch_templates.py:2343
 #: ../../../modules/websearch/lib/websearch_templates.py:2346
 #: ../../../modules/websearch/lib/websearch_templates.py:2349
 msgid "Detailed record"
-msgstr ""
+msgstr "Notice détaillée"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:813
 #: ../../../modules/websearch/lib/websearch_templates.py:1988
 #: ../../../modules/websearch/lib/websearch_templates.py:2351
 msgid "Similar records"
-msgstr ""
+msgstr "Notices similaires"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:818
 #: ../../../modules/websearch/lib/websearch_templates.py:2355
 msgid "Cited by"
-msgstr ""
+msgstr "Cité par"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:888
 msgid "Words nearest to"
@@ -1456,15 +1274,15 @@ msgstr ""
 #: ../../../modules/websearch/lib/websearch_templates.py:1143
 #: ../../../modules/websearch/lib/websearch_templates.py:1244
 msgid "Try your search on..."
-msgstr ""
+msgstr "Essayer votre requête sur..."
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1322
 msgid "collections"
-msgstr ""
+msgstr "collections"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1383
 msgid "results"
-msgstr ""
+msgstr "résultats"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1414
 msgid "Output format"
@@ -1472,19 +1290,19 @@ msgstr ""
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1418
 msgid "asc."
-msgstr ""
+msgstr "asc."
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1421
 msgid "desc."
-msgstr ""
+msgstr "desc."
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1427
 msgid "single list"
-msgstr ""
+msgstr "liste unique"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1430
 msgid "split by collection"
-msgstr ""
+msgstr "regroupés par collection"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1461
 msgid "MARC tag"
@@ -1519,17 +1337,20 @@ msgstr ""
 #: ../../../modules/websearch/lib/websearch_templates.py:1621
 #: ../../../modules/websearch/lib/websearch_templates.py:1624
 msgid "in"
-msgstr ""
+msgstr "dans"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1629
-msgid "Haven't found what you were looking for?  Try your search on other servers:"
+msgid ""
+"Haven't found what you were looking for?  Try your search on other servers:"
 msgstr ""
+"Vous n'avez pas trouvé ce que vous avez cherché?  Essayez votre requête sur "
+"d'autres serveurs:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1743
 #: ../../../modules/websearch/lib/websearch_templates.py:1748
 #: ../../../modules/websearch/lib/websearch_templates.py:2100
 msgid "<strong>%s</strong> records found"
-msgstr ""
+msgstr "<strong>%s</strong> notices trouvées"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1794
 msgid "begin"
@@ -1550,7 +1371,7 @@ msgstr ""
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1854
 msgid "Search took %.2f seconds."
-msgstr ""
+msgstr "La recherche a duré %.2f secondes."
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1964
 msgid "Format"
@@ -1558,42 +1379,51 @@ msgstr ""
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1984
 msgid "Record created %s, last modified %s"
-msgstr ""
+msgstr "Notice créée %s, modifiée %s"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1998
 msgid "Cited by: %s records"
-msgstr ""
+msgstr "Cité par: %s notices"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:2012
 msgid "Co-cited with: %s records"
-msgstr ""
+msgstr "Co-cité avec: %s notices"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:2029
 msgid "People who downloaded this document also downloaded:"
-msgstr ""
+msgstr "Les utilisateurs qui ont téléchargé ce document ont aussi téléchargé:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:2044
 msgid "People who viewed this page also viewed::"
 msgstr ""
 
 #: ../../../modules/websearch/lib/websearch_templates.py:2091
-msgid "<strong>Results overview:</strong> Found <strong>%s</strong> records in %.2f seconds."
+msgid ""
+"<strong>Results overview:</strong> Found <strong>%s</strong> records in %.2f "
+"seconds."
 msgstr ""
+"<strong>Vue d'ensemble sur des résultats:</strong> Trouvé <strong>%s</"
+"strong> notices en %.2f secondes."
 
 #: ../../../modules/websearch/lib/websearch_templates.py:2127
-msgid "Boolean query returned no hits. Please combine your search terms differently."
+msgid ""
+"Boolean query returned no hits. Please combine your search terms differently."
 msgstr ""
 
 #: ../../../modules/websearch/lib/websearch_templates.py:2167
 msgid "See also: similar author names"
-msgstr ""
+msgstr "Voir aussi: noms d'auteurs similaires"
 
 #: ../../../modules/websession/lib/webaccount.py:89
-msgid "You are logged in as guest. You may want to <A href=\"../youraccount.py/login\">login</A> as a regular user"
+msgid ""
+"You are logged in as guest. You may want to <A href=\"../youraccount.py/login"
+"\">login</A> as a regular user"
 msgstr ""
 
 #: ../../../modules/websession/lib/webaccount.py:90
-msgid "The <strong class=\"headline\">guest</strong> users need to <A href=\"../youraccount.py/login\">register</A> first"
+msgid ""
+"The <strong class=\"headline\">guest</strong> users need to <A href=\"../"
+"youraccount.py/login\">register</A> first"
 msgstr ""
 
 #: ../../../modules/websession/lib/webaccount.py:91
@@ -1601,19 +1431,28 @@ msgid "No queries found"
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:45
-msgid "If you have lost password for your CERN Document Server internal account, then please enter your email address below and the lost password will be emailed to you."
+msgid ""
+"If you have lost password for your CERN Document Server internal account, "
+"then please enter your email address below and the lost password will be "
+"emailed to you."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:47
-msgid "Note that if you have been using an external login system (such as CERN NICE), then we cannot do anything and you have to ask there."
+msgid ""
+"Note that if you have been using an external login system (such as CERN "
+"NICE), then we cannot do anything and you have to ask there."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:48
-msgid "Alternatively, you can ask %s to change your login system from external to internal."
+msgid ""
+"Alternatively, you can ask %s to change your login system from external to "
+"internal."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:140
-msgid "If you want to change your email address or password, please set new values in the form below."
+msgid ""
+"If you want to change your email address or password, please set new values "
+"in the form below."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:141
@@ -1662,7 +1501,9 @@ msgid "Edit login method"
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:184
-msgid "Please select which login method you would like to use to authenticate yourself"
+msgid ""
+"Please select which login method you would like to use to authenticate "
+"yourself"
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:185
@@ -1680,7 +1521,11 @@ msgid "Send lost password"
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:260
-msgid "The CDS Search offers you a possibility to personalize the interface, to set up your own personal library of documents, or to set up an automatic alert query that would run periodically and would notify you of search results by email."
+msgid ""
+"The CDS Search offers you a possibility to personalize the interface, to set "
+"up your own personal library of documents, or to set up an automatic alert "
+"query that would run periodically and would notify you of search results by "
+"email."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:268
@@ -1689,7 +1534,9 @@ msgid "Your Settings"
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:269
-msgid "Set or change your account Email address or password. Specify your preferences about the way the interface looks like."
+msgid ""
+"Set or change your account Email address or password. Specify your "
+"preferences about the way the interface looks like."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:278
@@ -1707,7 +1554,9 @@ msgid "Your Baskets"
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:281
-msgid "With baskets you can define specific collections of items, store interesting records you want to access later or share with others."
+msgid ""
+"With baskets you can define specific collections of items, store interesting "
+"records you want to access later or share with others."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:288
@@ -1715,7 +1564,9 @@ msgid "Your Alerts"
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:289
-msgid "Subscribe to a search which will be run periodically by our service.  The result can be sent to you via Email or stored in one of your baskets."
+msgid ""
+"Subscribe to a search which will be run periodically by our service.  The "
+"result can be sent to you via Email or stored in one of your baskets."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:298
@@ -1723,17 +1574,24 @@ msgid "Your Loans"
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:299
-msgid "Check out book you have on load, submit borrowing requests, etc.  Requires CERN ID."
+msgid ""
+"Check out book you have on load, submit borrowing requests, etc.  Requires "
+"CERN ID."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:322
 msgid ""
-"You are logged in as a guest user, so your %s will disappear at the end of the current session. If you wish you can\n"
-"               <a href=\"../youraccount.py/login\">login or register here</a>."
+"You are logged in as a guest user, so your %s will disappear at the end of "
+"the current session. If you wish you can\n"
+"               <a href=\"../youraccount.py/login\">login or register here</"
+"a>."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:346
-msgid "You are logged in as %s. You may want to a) <A href=\"../youraccount.py/logout\">logout</A>; b) edit your <A href=\"../youraccount.py/edit\">account settings</a>."
+msgid ""
+"You are logged in as %s. You may want to a) <A href=\"../youraccount.py/"
+"logout\">logout</A>; b) edit your <A href=\"../youraccount.py/edit\">account "
+"settings</a>."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:408
@@ -1745,7 +1603,9 @@ msgid "Your Submissions"
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:411
-msgid "You can consult the list of %(your_submissions)s and inquire about their status."
+msgid ""
+"You can consult the list of %(your_submissions)s and inquire about their "
+"status."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:415
@@ -1758,7 +1618,9 @@ msgid "Your Approvals"
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:419
-msgid "You can consult the list of %(your_approvals)s with the documents you approved or refereed."
+msgid ""
+"You can consult the list of %(your_approvals)s with the documents you "
+"approved or refereed."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:423
@@ -1783,7 +1645,9 @@ msgid "Deleting your account"
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:502
-msgid "You are no longer recognized.  If you wish you can <A href=\"./login\">login here</A>."
+msgid ""
+"You are no longer recognized.  If you wish you can <A href=\"./login\">login "
+"here</A>."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:530
@@ -1791,11 +1655,15 @@ msgid "If you already have an account, please login using the form below."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:534
-msgid "If you don't own an account yet, please <a href=\"../youraccount.py/register\">register</a> an internal account."
+msgid ""
+"If you don't own an account yet, please <a href=\"../youraccount.py/register"
+"\">register</a> an internal account."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:536
-msgid "It is not possible to create an account yourself. Contact %s if you want an account."
+msgid ""
+"It is not possible to create an account yourself. Contact %s if you want an "
+"account."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:558
@@ -1815,7 +1683,7 @@ msgstr ""
 #: ../../../modules/websession/lib/websession_templates.py:757
 #: ../../../modules/websession/web/youraccount.py:309
 msgid "login"
-msgstr ""
+msgstr "login"
 
 #: ../../../modules/websession/lib/websession_templates.py:586
 #: ../../../modules/websession/web/youraccount.py:136
@@ -1827,7 +1695,9 @@ msgid "Please enter your email address and desired password:"
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:617
-msgid "The account will not be possible to use before it has been verified and activated."
+msgid ""
+"The account will not be possible to use before it has been verified and "
+"activated."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:656
@@ -1840,11 +1710,19 @@ msgid "register"
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:658
-msgid "Please do not use valuable passwords such as your Unix, AFS or NICE passwords with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you for personal services of %s. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email."
+msgid ""
+"Please do not use valuable passwords such as your Unix, AFS or NICE "
+"passwords with this service. Your email address will stay strictly "
+"confidential and will not be disclosed to any third party. It will be used "
+"to identify you for personal services of %s. For example, you may set up an "
+"automatic alert search that will look for new preprints and will notify you "
+"daily of new arrivals by email."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:687
-msgid "You seem to be the guest user.  You have to <a href=\"../youraccount.py/login\">login</a> first."
+msgid ""
+"You seem to be the guest user.  You have to <a href=\"../youraccount.py/login"
+"\">login</a> first."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:691
@@ -1893,40 +1771,40 @@ msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:715
 msgid "Admin Area"
-msgstr ""
+msgstr "Coin administrateur"
 
 #: ../../../modules/websession/lib/websession_templates.py:753
 msgid "guest"
-msgstr ""
+msgstr "visiteur"
 
 #: ../../../modules/websession/lib/websession_templates.py:754
 msgid "session"
-msgstr ""
+msgstr "session"
 
 #: ../../../modules/websession/lib/websession_templates.py:755
 #: ../../../modules/websession/lib/websession_templates.py:768
 msgid "alerts"
-msgstr ""
+msgstr "alertes"
 
 #: ../../../modules/websession/lib/websession_templates.py:767
 msgid "account"
-msgstr ""
+msgstr "compte"
 
 #: ../../../modules/websession/lib/websession_templates.py:775
 msgid "submissions"
-msgstr ""
+msgstr "soumissions"
 
 #: ../../../modules/websession/lib/websession_templates.py:781
 msgid "approvals"
-msgstr ""
+msgstr "approbations"
 
 #: ../../../modules/websession/lib/websession_templates.py:787
 msgid "administration"
-msgstr ""
+msgstr "administration"
 
 #: ../../../modules/websession/lib/websession_templates.py:792
 msgid "logout"
-msgstr ""
+msgstr "logout"
 
 #: ../../../modules/websession/web/youraccount.py:74
 #: ../../../modules/websession/web/youraccount.py:96
@@ -2005,7 +1883,9 @@ msgid "You can login at"
 msgstr ""
 
 #: ../../../modules/websession/web/youraccount.py:226
-msgid "The entered email address is incorrect, please check that it is written correctly (e.g. johndoe@example.com)."
+msgid ""
+"The entered email address is incorrect, please check that it is written "
+"correctly (e.g. johndoe@example.com)."
 msgstr ""
 
 #: ../../../modules/websession/web/youraccount.py:227
@@ -2043,11 +1923,14 @@ msgid "Account created"
 msgstr ""
 
 #: ../../../modules/websession/web/youraccount.py:380
-msgid " An email has been sent to the given address with the account information."
+msgid ""
+" An email has been sent to the given address with the account information."
 msgstr ""
 
 #: ../../../modules/websession/web/youraccount.py:382
-msgid " A second email will be sent when the account has been activated and can be used."
+msgid ""
+" A second email will be sent when the account has been activated and can be "
+"used."
 msgstr ""
 
 #: ../../../modules/websession/web/youraccount.py:384
@@ -2075,7 +1958,7 @@ msgstr ""
 #: ../../../modules/webstyle/lib/webstyle_templates.py:66
 #: ../../../modules/webstyle/lib/webstyle_templates.py:75
 msgid "Home"
-msgstr ""
+msgstr "Accueil"
 
 #: ../../../modules/webstyle/lib/webstyle_templates.py:150
 #: ../../../modules/webstyle/lib/webstyle_templates.py:384
@@ -2089,41 +1972,45 @@ msgstr ""
 #: ../../../modules/websubmit/lib/websubmit_engine.py:770
 #: ../../../modules/websubmit/lib/websubmit_engine.py:928
 msgid "Submit"
-msgstr ""
+msgstr "Soumission"
 
 #: ../../../modules/webstyle/lib/webstyle_templates.py:344
 #: ../../../modules/webstyle/lib/webstyle_templates.py:417
 msgid "Personalize"
-msgstr ""
+msgstr "Personnaliser"
 
 #: ../../../modules/webstyle/lib/webstyle_templates.py:345
 #: ../../../modules/webstyle/lib/webstyle_templates.py:418
 msgid "Help"
-msgstr ""
+msgstr "Aide"
 
 #: ../../../modules/webstyle/lib/webstyle_templates.py:420
 msgid "Powered by"
-msgstr ""
+msgstr "Powered by"
 
 #: ../../../modules/webstyle/lib/webstyle_templates.py:421
 msgid "Maintained by"
-msgstr ""
+msgstr "Maintenu par"
 
 #: ../../../modules/webstyle/lib/webstyle_templates.py:462
 msgid "This site is also available in the following languages:"
-msgstr ""
+msgstr "Ce site est aussi disponible dans les langues suivantes:"
 
 #: ../../../modules/webstyle/lib/webstyle_templates.py:493
 msgid "Internal Error"
-msgstr ""
+msgstr "Erreur interne"
 
 #: ../../../modules/webstyle/lib/webstyle_templates.py:570
-msgid "Please contact <a href=\"mailto:%s\">%s</a> quoting the following information:"
+msgid ""
+"Please contact <a href=\"mailto:%s\">%s</a> quoting the following "
+"information:"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_engine.py:77
 #: ../../../modules/websubmit/lib/websubmit_engine.py:485
-msgid "Sorry, you must log in to perform this action. Please use the top right menu to do so."
+msgid ""
+"Sorry, you must log in to perform this action. Please use the top right menu "
+"to do so."
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_engine.py:82
@@ -2204,11 +2091,14 @@ msgid "Notice"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:312
-msgid "Select a category and then click the button to perform the action you chose."
+msgid ""
+"Select a category and then click the button to perform the action you chose."
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:333
-msgid "To continue an interrupted submission, enter your access number directly in the input box."
+msgid ""
+"To continue an interrupted submission, enter your access number directly in "
+"the input box."
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:335
@@ -2243,7 +2133,10 @@ msgid "back to main menu"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:536
-msgid "(1) you should take note of this number at the beginning of the submission, it will allow you to get your information back in case your browser crashes before the end of the submission."
+msgid ""
+"(1) you should take note of this number at the beginning of the submission, "
+"it will allow you to get your information back in case your browser crashes "
+"before the end of the submission."
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:537
@@ -2251,7 +2144,8 @@ msgid "(2) mandatory fields appear in red in the 'Summary' window."
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:677
-msgid "The field `%s` is Mandatory.\\n Please make a choice in the 'Select:' box"
+msgid ""
+"The field `%s` is Mandatory.\\n Please make a choice in the 'Select:' box"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:691
@@ -2279,7 +2173,9 @@ msgid "Submission no"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:984
-msgid "Here is the %(action)s function list for %(doctype)s documents at level %(step)s"
+msgid ""
+"Here is the %(action)s function list for %(doctype)s documents at level %"
+"(step)s"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:989
@@ -2383,7 +2279,8 @@ msgid "List of refereed types of documents"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1546
-msgid "Select one of the following types of documents to check the documents status:"
+msgid ""
+"Select one of the following types of documents to check the documents status:"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1604
@@ -2472,13 +2369,17 @@ msgid "click here"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1888
-msgid "This Document is still <strong class=\"headline\">waiting for approval</strong>."
+msgid ""
+"This Document is still <strong class=\"headline\">waiting for approval</"
+"strong>."
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1889
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1908
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1916
-msgid "It has first been sent to approval on: <strong class=\"headline\">%(date)s</strong>"
+msgid ""
+"It has first been sent to approval on: <strong class=\"headline\">%(date)s</"
+"strong>"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1891
@@ -2487,11 +2388,15 @@ msgstr ""
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1912
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1918
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1920
-msgid "Last approval e-mail was sent on: <strong class=\"headline\">%(date)s</strong>"
+msgid ""
+"Last approval e-mail was sent on: <strong class=\"headline\">%(date)s</"
+"strong>"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1894
-msgid "You can send an approval request e-mail again by clicking the following button:"
+msgid ""
+"You can send an approval request e-mail again by clicking the following "
+"button:"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1896
@@ -2504,7 +2409,9 @@ msgid "WARNING! An e-mail will be send to your referee if you confirm."
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1900
-msgid "As a referee for this document, you may click this button to approve or reject it:"
+msgid ""
+"As a referee for this document, you may click this button to approve or "
+"reject it:"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1902
@@ -2548,6 +2455,7 @@ msgid "This document has never been requested for approval!"
 msgstr ""
 
 #: ../../../modules/websubmit/web/yoursubmissions.py:66
-msgid "You first have to login before using this feature. Use the left menu to log in."
+msgid ""
+"You first have to login before using this feature. Use the left menu to log "
+"in."
 msgstr ""
-

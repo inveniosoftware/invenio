@@ -17,7 +17,7 @@
 
 LANGUAGES = ca cs de el en es fr it no pt ru sk sv uk
 
-FILES = `find $(top_srcdir)/modules -name "*.py" -or -name "*.wml" -not -name '*.php.wml' -not -name '*.html.wml'`
+FILES = `find $(top_srcdir)/modules "("  -name "*.py" -or -name "*.wml" ")" -a -not "(" -name '*.php.wml' -o -name '*.html.wml' -o -wholename "*/miscutil/i18n/*" ")"`
 
 MO = $(LANGUAGES:%=%.mo)
 
@@ -39,7 +39,7 @@ check-translations:
 	  echo $${l}.po >> ,,intl-1.tmp ; \
 	done
 	@cat ,,intl-1.tmp | sort > ,,intl-1 && rm -f ,,intl-1.tmp
-	@find $(srcdir) -name '*.po' -exec basename {} \; | sort > ,,intl-2
+	@find $(srcdir) -name '??.po' -exec basename {} \; | sort > ,,intl-2
 	@diff ,,intl-1 ,,intl-2
 	@rm -f ,,intl-1 ,,intl-2
 	@echo "** statistics on individual translation files"
@@ -48,9 +48,10 @@ check-translations:
 	done
 
 update-po-files:
+	$(PYTHON) $(srcdir)/i18n-import-messages.py $(top_srcdir)/config/messages.wml
 	$(PYTHON) $(srcdir)/i18n-update-potfile.py -d cdsware $(FILES)
-	for f in $(LANGUAGES) ; \
-		do msgmerge -U $(srcdir)/$${f}.po cdsware.pot; \
+	for f in $(LANGUAGES) ; do \
+		msgmerge -C compendium-$${f}.po -U $(srcdir)/$${f}.po cdsware.pot; \
 	done
 
 %.mo: %.po

@@ -2,3 +2,4 @@ Makefile
 Makefile.in
 *.mo
 cdsware.pot
+compendium-*.po
