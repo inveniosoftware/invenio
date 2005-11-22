@@ -19,7 +19,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+""" templates for webmessage module """
 
 # CDS imports
 from cdsware.webmessage_mailutils import email_quoted_txt2html, email_quote_txt
@@ -28,6 +28,7 @@ from cdsware.webmessage_config import cfg_webmessage_status_code, \
                                       cfg_webmessage_max_nb_of_messages
 from cdsware.textutils import indent_text
 from cdsware.dateutils import convert_datetext_to_dategui, \
+                              datetext_default, \
                               create_day_selectbox, \
                               create_month_selectbox, \
                               create_year_selectbox
@@ -58,11 +59,11 @@ class Template:
         inbox += """
 <table class="mailbox">
   <thead class="mailboxheader">
-    <tr> 
+    <tr class="inboxheader"> 
       <td>%s</td>
       <td>%s</td>
       <td>%s</td>
-      <td>&nbsp;</td>
+      <td>%s</td>
     </tr>
   </thead>
   <tfoot>
@@ -73,32 +74,38 @@ class Template:
       <td></td>
     </tr>
   </tfoot>
-  <tbody class="mailboxbody">""" %(_("Subject"), _("Sender"), _("Date"))
+  <tbody class="mailboxbody">""" %(_("Subject"), _("Sender"), _("Date"), _("Action"))
         if len(messages) == 0:
             inbox += """
-    <tr class="mailboxrecords" style="height: 100px;">
+    <tr class="mailboxrecord" style="height: 100px;">
       <td colspan="4" style="text-align: center;">
         <b>%s</b>
       </td>
     </tr>""" %(_("No new mail"),)
         for (msgid, junk, user_from_nick, subject, sent_date, status) in messages:
-            subject_link = '<a href="display_msg?msgid=%i&amp;ln=%s">%s</a>'% (msgid, ln, subject)
-            from_link = '<a href="write?msg_to=%s&amp;ln=%s">%s</a>'% (user_from_nick, ln, user_from_nick)
-            action_link = '<a href="delete?msgid=%i&amp;ln=%s">%s</a>'% (msgid, ln, _("Delete"))
-            
+            subject_link = '<a href="display_msg?msgid=%i&amp;ln=%s">%s</a>'% (msgid,
+                                                                               ln,
+                                                                               subject)
+            from_link = '%s'% (user_from_nick)
+            action_link = '<a href="write?msg_reply_id=%i&amp;ln=%s">%s</a> / '% (msgid,
+                                                                                 ln,
+                                                                                 _("Reply"))
+            action_link += '<a href="delete?msgid=%i&amp;ln=%s">%s</a>'% (msgid,
+                                                                            ln,
+                                                                            _("Delete"))
             s_date = convert_datetext_to_dategui(sent_date, ln)
             stat_style = ''
             if (status == cfg_webmessage_status_code['NEW']):
                 stat_style = ' style="font-weight:bold"' 
             inbox += """
-    <tr class="mailboxrecords">
+    <tr class="mailboxrecord">
       <td%s>%s</td>
       <td>%s</td>
       <td>%s</td>
       <td>%s</td>
     </tr>""" %(stat_style, subject_link, from_link, s_date, action_link)
         inbox += """
-    <tr class="mailboxfoot">
+    <tr class="mailboxfooter">
       <td colspan="2">
         <form name="newMessage" action="write?ln=%(ln)s" method="post">
           <input type="submit" name="del_all" value="%(write_label)s" class="formbutton" />
@@ -113,7 +120,7 @@ class Template:
     </tr> 
   </tbody>
 </table>""" % {'ln': ln,
-               'write_label': _("New message"),
+               'write_label': _("Write new message"),
                'delete_all_label': _("Delete All")}
         return indent_text(inbox, 2)
 
@@ -127,11 +134,9 @@ class Template:
                    msg_send_month=0,
                    msg_send_day=0,
                    warnings=[],
-                   users_to_add=[],
-                   groups_to_add=[],
-                   user_search_pattern="",
-                   group_search_pattern="",
-                   display_users_to_add=1,
+                   search_results_list=[],
+                   search_pattern="",
+                   results_field='none',
                    ln=cdslang):
         """
         Displays a writing message form with optional prefilled fields
@@ -142,11 +147,9 @@ class Template:
         @param msg_send_month: prefills the month field
         @param msg_send_day: prefills the day field
         @param warnings: display warnings on top of page
-        @param users_to_add: list to select users
-        @param groups_to_add: list to select groups
-        @param user_search_pattern: prefills this field!
-        @param group_search_pattern: idem
-        @param display_users_to_add: 1: display user search box, 0: group... 
+        @param search_results_list: list of tuples. (user/groupname, is_selected)
+        @param search_pattern: pattern used for searching
+        @param results_field: 'none', 'user' or 'group'
         @param ln: language of the form
         @return the form in HTML format
         """
@@ -158,19 +161,12 @@ class Template:
         msg_to = msg_to.replace('"', '&quot;')
         msg_to_group = msg_to_group.replace('"', '&quot;')
         msg_subject = msg_subject.replace('"', '&quot;')
-        user_search_pattern = user_search_pattern.replace('"','&quot;')
-        group_search_pattern = group_search_pattern.replace('"','&quot;')
+        search_pattern = search_pattern.replace('"','&quot;')
 
-        if display_users_to_add:
-            to_select = self.tmpl_user_or_group_search(users_to_add,
-                                                       user_search_pattern,
-                                                       1,
-                                                       ln)
-        else:
-            to_select = self.tmpl_user_or_group_search(groups_to_add,
-                                                       group_search_pattern,
-                                                       0,
-                                                       ln)
+        to_select = self.tmpl_user_or_group_search(search_results_list,
+                                                   search_pattern,
+                                                   results_field,
+                                                   ln)
         if (msg_id != 0):
             msg_subject = _("Re: ") + msg_subject
             msg_body = email_quote_txt(msg_body)
@@ -178,78 +174,78 @@ class Template:
         write_box += """
 <form name="write_message" action="send" method="post">
   <input type="hidden" name="ln" value="%(ln)s"/>
-  <table style="width:100%%; ">
-    <tr>
-      <td style="width:70%%; vertical-align:text-top; padding:5px;">
-        <table class="mailbox">
-          <thead class="mailboxheader">
-            <tr>
-              <td class="mailboxlabel">%(to_label)s</td>
-              <td class="mailboxlabel">%(users_label)s</td>
-              <td>
-                <input class="mailboxinput" type="text" name="msg_to_user" value="%(to_users)s"/>
-              </td>
-            </tr>
-            <tr>
-              <td class="mailboxlabel">&nbsp;</td>
-              <td class="mailboxlabel">%(groups_label)s</td>
-              <td>
-                <input class="mailboxinput" type="text" name="msg_to_group" value="%(to_groups)s"/>
-              </td>
-            </tr>
-            <tr>
-              <td class="mailboxlabel">&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-            </tr>
-            <tr>
-              <td class="mailboxlabel">%(subject_label)s</td>
-              <td colspan="2">
-                <input class="mailboxinput" type="text" name="msg_subject" value="%(subject)s"/>
-              </td>
-            </tr>
-          </thead>
-          <tfoot>
-            <tr>
-              <td style="height:0px" colspan="3"></td>
-            </tr>
-          </tfoot>
-          <tbody class="mailboxbody">
-            <tr>
-              <td class="mailboxlabel">%(message_label)s</td>
-              <td colspan="2" class="mailboxrecords">
-                <textarea name="msg_body" rows="10" cols="50">"""
+  <div style="float: left; vertical-align:text-top; margin-right: 10px;">
+    <table class="mailbox">
+      <thead class="mailboxheader">
+        <tr>
+          <td class="inboxheader" colspan="2">
+            <table class="messageheader">
+              <tr>
+                <td class="mailboxlabel">%(to_label)s</td>
+                <td class="mailboxlabel">%(users_label)s</td>
+                <td style="width:100%%;">
+                  <input class="mailboxinput" type="text" name="msg_to_user" value="%(to_users)s"/>
+                </td>
+              </tr>
+              <tr>
+                <td class="mailboxlabel">&nbsp;</td>
+                <td class="mailboxlabel">%(groups_label)s</td>
+                <td style="width:100%%;">
+                  <input class="mailboxinput" type="text" name="msg_to_group" value="%(to_groups)s"/>
+                </td>
+              </tr>
+              <tr>
+                <td class="mailboxlabel">&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="mailboxlabel">%(subject_label)s</td>
+                <td colspan="2">
+                  <input class="mailboxinput" type="text" name="msg_subject" value="%(subject)s"/>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <td style="height:0px" colspan="2"></td>
+        </tr>
+      </tfoot>
+      <tbody class="mailboxbody">
+        <tr>
+          <td class="mailboxlabel">%(message_label)s</td>
+          <td>
+            <textarea name="msg_body" rows="10" cols="50">"""
         write_box = indent_text(write_box, 2)
         write_box_part2 = """
-              </td>
-            </tr>
-            <tr>
-              <td class="mailboxlabel">
-                %(send_later_label)s
-              </td>
-              <td colspan="2" class="mailbox_records">
-                %(day_field)s
-                %(month_field)s
-                %(year_field)s
-              </td>
-            </tr>
-            <!-- This should normally go in a tfoot tag. Old browsers have problems with it
-                 as order must be: thead, tfoot, tbody.
-                 Tfoot is thus empty :(
-            -->
-            <tr class="mailboxfoot">
-              <td colspan="3" class="mailboxfoot">
-                <input type="submit" name="send_button" value="%(send_label)s" class="formbutton"/>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-      <td style="width:30%%; vertical-align:top;padding:5px;">
-        %(to_select)s
-      </td>
-    </tr>
-  </table>
+          </td>
+        </tr>
+        <tr>
+          <td class="mailboxlabel">%(send_later_label)s</td>
+          <td>
+            %(day_field)s
+            %(month_field)s
+            %(year_field)s
+          </td>
+        </tr>
+        <!-- This should normally go in a tfoot tag. Old browsers have problems with it
+             as order must be: thead, tfoot, tbody.
+             Tfoot is thus empty :(
+        -->
+        <tr class="mailboxfooter">
+          <td colspan="2" class="mailboxfoot">
+            <input type="submit" name="send_button" value="%(send_label)s" class="formbutton"/>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="vertical-align:top; margin-left: 5px; float: left;">
+    %(to_select)s
+  </div>
 </form>
 """
         write_box_part2 = indent_text(write_box_part2, 2)
@@ -284,7 +280,7 @@ class Template:
                          msg_subject="",
                          msg_body="",
                          msg_sent_date="",
-                         msg_received_date="0000-00-00 00:00:00",
+                         msg_received_date=datetext_default,
                          ln=cdslang):
         """
         Displays a given message
@@ -325,38 +321,44 @@ class Template:
         final_body = email_quoted_txt2html(msg_body)
 
         out = """
-<table class="mailbox">
+<table class="mailbox" style="width: 70%%;">
   <thead class="mailboxheader">
     <tr>
-      <td class="mailboxlabel">From:</td>
-      <td><a href="write?msg_to=%(from)s&amp;ln=%(ln)s">%(from)s</a></td>
-    </tr>
-    <tr>
-      <td class="mailboxlabel">Subject:</td>
-      <td>%(subject)s</td>
-    </tr>
-    <tr>
-      <td class="mailboxlabel">Sent:</td>
-      <td>%(sent_date)s</td>
-    </tr>"""
-        if (msg_received_date != '0000-00-00 00:00:00'):
+      <td class="inboxheader" colspan="2">
+        <table class="messageheader">
+          <tr>
+            <td class="mailboxlabel">%(from_label)s:</td>
+            <td><a href="write?msg_to=%(from)s&amp;ln=%(ln)s">%(from)s</a></td>
+          </tr>
+          <tr>
+            <td class="mailboxlabel">%(subject_label)s:</td>
+            <td style="width: 100%%;">%(subject)s</td>
+          </tr>
+          <tr>
+            <td class="mailboxlabel">%(sent_label)s:</td>
+            <td>%(sent_date)s</td>
+          </tr>"""
+        if (msg_received_date != datetext_default):
             out += """
-    <tr>
-      <td class="mailboxlabel">Received:</td>
-      <td>%(received_date)s</td>
-    </tr>"""
+          <tr>
+            <td class="mailboxlabel">%(received_label)s:</td>
+            <td>%(received_date)s</td>
+          </tr>"""
         out += """
-    <tr>
-      <td class="mailboxlabel">CC:</td>
-      <td>%(sent_to)s</td>
-    </tr>"""
+          <tr>
+            <td class="mailboxlabel">%(sent_to_label)s:</td>
+            <td>%(sent_to)s</td>
+          </tr>"""
         if (msg_sent_to_group != ""):
             out += """
-    <tr>
-      <td class="mailboxlabel">Groups:</td>
-      <td>%(sent_to_group)s</td>
-    </tr>"""
+          <tr>
+            <td class="mailboxlabel">%(groups_label)s:</td>
+            <td>%(sent_to_group)s:</td>
+          </tr>"""
         out += """
+        </table>
+      </td>
+    </tr>
   </thead>
   <tfoot>
     <tr>
@@ -365,18 +367,18 @@ class Template:
     </tr>
   </tfoot>
   <tbody class="mailboxbody">
-    <tr>
-      <td colspan="2" class="mailboxrecords">%(body)s</td>
+    <tr class="mailboxrecord">
+      <td colspan="2">%(body)s</td>
     </tr>
-    <tr class="mailboxfoot">
+    <tr class="mailboxfooter">
       <td>
         <form name="reply" action="write?msg_reply_id=%(msg_id)s" method="post">
-          <input class="formbutton" name="reply" value="%(reply_txt)s" type="submit" />
+          <input class="formbutton" name="reply" value="%(reply_but_label)s" type="submit" />
         </form>
       </td>
       <td>
         <form name="deletemsg" action="delete?msgid=%(msg_id)s&amp;ln=%(ln)s" method="post">
-          <input class="formbutton" name="delete" value="%(delete_txt)s" type="submit" />
+          <input class="formbutton" name="delete" value="%(delete_but_label)s" type="submit" />
         </form>
       </td>
     </tr>
@@ -393,8 +395,14 @@ class Template:
                      'reply_to': msg_from_id,
                      'msg_id': msg_id,
                      'ln': ln,
-                     'reply_txt':_("REPLY"),
-                     'delete_txt': _("DELETE")}
+                     'from_label':_("From"),
+                     'subject_label':_("Subject"),
+                     'sent_label': _("Sent on"),
+                     'received_label':_("Received on"),
+                     'sent_to_label': _("Sent to"),
+                     'groups_label': _("Sent to groups"),
+                     'reply_but_label':_("REPLY"),
+                     'delete_but_label': _("DELETE")}
         return indent_text(out, 2)
 
     def tmpl_navtrail(self, ln=cdslang, title=""):
@@ -521,9 +529,7 @@ class Template:
         if not((type(tuples_list) is list) or (type(tuples_list) is tuple)):
             tuples_list = [tuples_list]
         out = """
-<select name="%s" multiple="multiple" style="width:100%%">
-  <option value="" disabled="disabled">%s</option>
-""" % (select_name,_("Please select value(s)"))
+<select name="%s" multiple="multiple" style="width:100%%">"""% (select_name)
         for (value, is_selected) in tuples_list:
             out += "  <option value=\"%s\""% value
             if is_selected:
@@ -536,66 +542,56 @@ class Template:
     def tmpl_user_or_group_search(self,
                                   tuples_list=[],
                                   search_pattern="",
-                                  display_user=1,
+                                  results_field='none',
                                   ln=cdslang):
         """
         Display a box for user searching
         @param tuples_list: list of (value, is_selected) tuples
         @param search_pattern: text to display in this field
-        @param display_user: 1 for user 0 for group
+        @param results_field: either 'none', 'user', 'group' 
         @param ln: language
         @return html output
         """
         _ = gettext_set_language(ln)
-        if display_user:
-            header = """
+        multiple_select = ''
+        add_button = ''
+        if results_field != 'none' and results_field in ('user', 'group'):
+            if len(tuples_list):
+                multiple_select = self.tmpl_multiple_select('names_selected', tuples_list)
+                add_button = '<input type="submit" name="%s" value="%s" class="nonsubmitbutton" />'
+                if results_field == 'user':
+                    add_button = add_button % ('add_user', _("Add to users"))
+                else:
+                    add_button = add_button % ('add_group', _("Add to groups"))
+            else:
+                if results_field == 'user':
+                    multiple_select = _("No matching user")
+                else:
+                    multiple_select = _("No matching group")
+        out = """
+<table class="mailbox">
   <thead class="mailboxheader">
-    <tr>
-      <td>
-        %(search_user_label)s
-      </td>
-      <td>
-        <input type="submit" name="switch_to_group_button" value="%(search_group_label)s" class="nonsubmitbutton" />
+    <tr class ="inboxheader">
+      <td colspan="3">
+        %(title_label)s
+        <input type="hidden" name="results_field" value="%(results_field)s" />
       </td>
     </tr>
   </thead>
-"""
-            search_field_name = "user_search_pattern"
-            search_button_name = "search_user_button"
-            multiple_select = self.tmpl_multiple_select('users_to_add', tuples_list)
-            add_button = "<input type=\"submit\" name=\"add_to_user_button\" value=\"%s\" class=\"nonsubmitbutton\" />"
-            add_button = add_button % _("Add to users")
-        else:
-            header = """
-  <thead class="mailboxheader">
-    <tr>
-      <td>
-        <input type="submit" name="switch_to_user_button" value="%(search_user_label)s" class="nonsubmitbutton" />
-      </td>
-      <td>
-        %(search_group_label)s
-      </td>
-    </tr>
-  </thead>
-"""
-            search_field_name = "group_search_pattern"
-            search_button_name = "search_group_button"
-            multiple_select = self.tmpl_multiple_select('groups_to_add', tuples_list)
-            add_button = "<input type=\"submit\" name=\"add_to_group_button\" value=\"%s\" class=\"nonsubmitbutton\" />"
-            add_button = add_button % _("Add to groups")
-
-        out = "<table class=\"mailbox\">\n" + header
-        out += """
   <tbody class="mailboxbody">
-    <tr>
-      <td style="text-align:center;">
-        <input type="text" name="%(search_field_name)s" value="%(search_pattern)s" />
-      </td>
-      <td style="text-align:center">
-        <input type="submit" name="%(search_button_name)s" value="%(search_button_label)s" class="nonsubmitbutton" />
-    </tr>
-    <tr>
+  <tr class="mailboxsearch">
       <td>
+        <input type="text" name="search_pattern" value="%(search_pattern)s" />
+      </td>
+      <td>
+        <input type="submit" name="search_user" value="%(search_user_label)s" class="nonsubmitbutton" />
+      </td>
+      <td>
+        <input type="submit" name="search_group" value="%(search_group_label)s" class="nonsubmitbutton" />
+      </td>
+    </tr>
+    <tr class="mailboxresults">
+      <td colspan="2">
         %(multiple_select)s
       </td>
       <td>
@@ -605,26 +601,24 @@ class Template:
   </tbody>
 </table>
 """
-        out = out% {'search_user_label'  : _("Find a user"),
+        out = out% {'title_label'        : _("Find users or groups"),
+                    'search_user_label'  : _("Find a user"),
                     'search_group_label' : _("Find a group"),
-                    'search_button_label': _("Search"),
-                    'search_field_name'  : search_field_name,
+                    'results_field'      : results_field,
                     'search_pattern'     : search_pattern,
-                    'search_button_name' : search_button_name,
                     'multiple_select'    : multiple_select,
                     'add_button'         : add_button}
         return out
 
-    def tmpl_account_new_mail(self, nb_new_mail=0, ln=cdslang):
+    def tmpl_account_new_mail(self, nb_new_mail=0, total_mail=0, ln=cdslang):
         """
         display infos about inbox (used by myaccount.py)
         @param nb_new_mail: number of new mails
         @param ln: language
-        retourn: html output.
+        return: html output.
         """
         _ = gettext_set_language(ln)
-        out = _("You got <b>%i</b> new messages.<br/>\n")% nb_new_mail
-        out += _("You can see all your messages in your <a href=\"/yourmessages.py?ln=%s\">inbox</a>")% ln
+        out = _("You have <b>%i</b> new messages out of <a href=\"%s/yourmessages.py?ln=%s\">%i total messages</a>")% (nb_new_mail, weburl, ln, total_mail)
         return out
 
     

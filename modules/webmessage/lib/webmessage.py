@@ -233,11 +233,9 @@ def perform_request_write_with_search(msg_to_user="",
                                       msg_send_year=0,
                                       msg_send_month=0,
                                       msg_send_day=0,
-                                      users_to_add=[],
-                                      groups_to_add=[], 
-                                      user_search_pattern="",
-                                      group_search_pattern="",
-                                      mode_user=1,
+                                      names_selected=[],
+                                      search_pattern="",
+                                      results_field='none',
                                       add_values=0,
                                       ln=cdslang):
     """
@@ -259,43 +257,45 @@ def perform_request_write_with_search(msg_to_user="",
     @return a (body, errors, warnings) formed tuple.
     """    
     # wash arguments
-    users_to_add = wash_url_argument(users_to_add, 'list')
-    groups_to_add = wash_url_argument(groups_to_add, 'list')
+    names_selected = wash_url_argument(names_selected, 'list')
     msg_send_year = wash_url_argument(msg_send_year, 'int')
     msg_send_month = wash_url_argument(msg_send_month, 'int')
     msg_send_day = wash_url_argument(msg_send_day, 'int')
     
-    user_list_output = []
-    group_list_output = []
     warnings = []
     errors = []
+    search_results_list = []
     
-    def separate(name1, name2):
-        """ name1, name2 => "name1, name2" """
+    def cat_names(name1, name2):
+        """ name1, name2 => 'name1, name2' """
         return name1 + cfg_webmessage_separator + " " + name2
     
-    if mode_user:
-        if add_values and users_to_add:
-            tmp = users_to_add
+    if results_field == 'user':
+        if add_values:
+            usernames_to_add = reduce(cat_names, names_selected)
             if msg_to_user:
-                tmp.insert(0, msg_to_user)
-            msg_to_user = reduce(separate, tmp)
-        if user_search_pattern:
-            users_found = get_nicknames_like(user_search_pattern)
-            if users_found:
-                for user_name in users_found:
-                    user_list_output.append((user_name[0], user_name[0] in users_to_add))
-    else: 
-        if add_values and groups_to_add:
-            tmp = groups_to_add
+                msg_to_user = cat_names(msg_to_user, usernames_to_add)
+            else:
+                msg_to_user = usernames_to_add
+                
+        users_found = get_nicknames_like(search_pattern)
+        if users_found:
+            for user_name in users_found:
+                search_results_list.append((user_name[0], user_name[0] in names_selected))
+        
+    elif results_field == 'group':
+        if add_values:
+            groupnames_to_add = reduce(cat_names, names_selected)
             if msg_to_group:
-                tmp.insert(0, msg_to_group)
-            msg_to_group = reduce(separate, tmp)
-        if group_search_pattern:
-            groups_found = get_groupnames_like(group_search_pattern)
-            if groups_found:
-                for group_name in groups_found:
-                    group_list_output.append((group_name[0], group_name[0] in groups_to_add))        
+                msg_to_group = cat_names(msg_to_group, groupnames_to_add)
+            else:
+                msg_to_group = groupnames_to_add
+                
+        groups_found = get_groupnames_like(search_pattern)
+        if groups_found:
+            for group_name in groups_found:
+                search_results_list.append((group_name[0], group_name[0] in names_selected))
+       
     body = webmessage_templates.tmpl_write(msg_to=msg_to_user,
                                            msg_to_group=msg_to_group,
                                            msg_subject=msg_subject,
@@ -304,11 +304,9 @@ def perform_request_write_with_search(msg_to_user="",
                                            msg_send_month=msg_send_month,
                                            msg_send_day=msg_send_day,
                                            warnings=warnings,
-                                           users_to_add=user_list_output,
-                                           groups_to_add=group_list_output,
-                                           user_search_pattern=user_search_pattern,
-                                           group_search_pattern=group_search_pattern,
-                                           display_users_to_add=mode_user,
+                                           search_results_list=search_results_list,
+                                           search_pattern=search_pattern,
+                                           results_field=results_field, 
                                            ln=ln)
     return (body, errors, warnings)
   
@@ -426,7 +424,9 @@ def perform_request_send(uid,
                                                msg_send_day=msg_send_day,
                                                warnings=warnings,
                                                ln=ln)
-        return (body, errors, warnings)
+        title =  _("Write a message")
+        navtrail = get_navtrail(ln, title)
+        return (body, errors, warnings, title, navtrail)
     else:
         msg_id = create_message(uid,
                                 users_to_str,
@@ -450,8 +450,9 @@ def perform_request_send(uid,
             infos.append(_("Your message has been sent."))
         else:
             check_if_need_to_delete_message_permanently([msg_id])
-        return perform_request_display(uid, errors, warnings, infos, ln)
-
+        (body, errors, warnings) = perform_request_display(uid, errors, warnings, infos, ln)
+        title = _("Your Messages")
+        return (body, errors, warnings, title, get_navtrail(ln))
 def account_new_mail(uid, ln=cdslang):
     """
     display new mail info for myaccount.py page.
@@ -459,8 +460,9 @@ def account_new_mail(uid, ln=cdslang):
     @param ln: language
     @return html body
     """
-    nb_new_mail = get_nb_new_mail_for_user(uid)
-    return webmessage_templates.tmpl_account_new_mail(nb_new_mail, ln)
+    nb_new_mail = get_nb_new_messages_for_user(uid)
+    total_mail = get_nb_readable_messages_for_user(uid)
+    return webmessage_templates.tmpl_account_new_mail(nb_new_mail, total_mail, ln)
 
 def get_navtrail(ln=cdslang, title=""):
     """

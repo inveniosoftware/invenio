@@ -120,17 +120,14 @@ def send(req,
          msg_send_year="0000",
          msg_send_month="00",
          msg_send_day="00",
-         users_to_add=[],
-         groups_to_add=[], 
-         user_search_pattern="",
-         group_search_pattern="",
+         results_field='none',
+         names_selected=[],
+         search_pattern="",
          send_button="",
-         switch_to_group_button="",
-         switch_to_user_button="",
-         search_user_button="",
-         search_group_button="",
-         add_to_group_button="",
-         add_to_user_button="",
+         search_user="",
+         search_group="",
+         add_group="",
+         add_user="",
          ln=cdslang):
     """
     Sends the message
@@ -141,11 +138,8 @@ def send(req,
     @param msg_send_year: year to send this message on (int)
     @param_msg_send_month: month to send this message on (int)
     @param_msg_send_day: day to send this message on (int)
-    @param users_to_add: list of usernames ['str'] to add to msg_to_user
-    @param groups_to_add: list of groupnames ['str'] to add to msg_to_group
-    @param user_search_pattern: will search users with this pattern (str)
-    @param group_search_pattern: will search groups with this pattern (str)
-    @param mode_user: if 1 display user search box, else group search box
+    @param names_to_add: list of usernames ['str'] to add to msg_to_user / group
+    @param search_pattern: will search for users/groups with this pattern (str)
     @param add_values: if 1 users_to_add will be added to msg_to_user field..
     @param *button: which button was pressed
     @param ln: language
@@ -161,21 +155,24 @@ def send(req,
     _ = gettext_set_language(ln)
 
     if send_button:
-       (body, errors, warnings) = perform_request_send(uid,
-                                                       msg_to_user,
-                                                       msg_to_group,
-                                                       msg_subject,
-                                                       msg_body,
-                                                       msg_send_year,
-                                                       msg_send_month,
-                                                       msg_send_day,
-                                                       ln)
-    else:       
-        mode_user = 1
+       (body, errors, warnings, title, navtrail) = perform_request_send(uid,
+                                                                        msg_to_user,
+                                                                        msg_to_group,
+                                                                        msg_subject,
+                                                                        msg_body,
+                                                                        msg_send_year,
+                                                                        msg_send_month,
+                                                                        msg_send_day,
+                                                                        ln)
+    else:
+        title = _('Write a message')
+        navtrail = get_navtrail(ln, title)
+        if search_user:
+            results_field = 'user'
+        elif search_group:
+            results_field = 'group'
         add_values = 0
-        if switch_to_group_button or search_group_button or add_to_group_button:
-            mode_user = 0
-        if add_to_group_button or add_to_user_button:
+        if add_group or add_user:
             add_values = 1
         (body, errors, warnings) = perform_request_write_with_search(msg_to_user,
                                                                      msg_to_group,
@@ -184,16 +181,14 @@ def send(req,
                                                                      msg_send_year,
                                                                      msg_send_month,
                                                                      msg_send_day,
-                                                                     users_to_add,
-                                                                     groups_to_add, 
-                                                                     user_search_pattern,
-                                                                     group_search_pattern,
-                                                                     mode_user,
+                                                                     names_selected,
+                                                                     search_pattern,
+                                                                     results_field,
                                                                      add_values,
                                                                      ln=cdslang)
-    return page(title       = _("Your Messages"),
+    return page(title       = title,
                 body        = body,
-                navtrail    = get_navtrail(ln),
+                navtrail    = navtrail,
                 description = "",
                 keywords    = "",
                 uid         = uid,

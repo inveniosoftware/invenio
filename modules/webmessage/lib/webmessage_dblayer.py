@@ -20,15 +20,18 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import time
+
 
 from MySQLdb import escape_string
+from time import localtime, mktime
 
 from cdsware.dbquery import run_sql
 from cdsware.webmessage_config import cfg_webmessage_status_code, \
                                       cfg_webmessage_max_nb_of_messages, \
                                       cfg_webmessage_roles_without_quota, \
                                       cfg_webmessage_days_before_delete_orphans
+from cdsware.dateutils import datetext_default, \
+                              convert_datestruct_to_datetext
 from cdsware.webuser import list_users_in_roles
 
 def check_user_owns_message(uid, msgid):
@@ -111,7 +114,7 @@ def set_message_status(uid, msgid, new_status):
     params = (escape_string(new_status), uid, msgid)   
     return int(run_sql(query%params))
 
-def get_nb_new_mail_for_user(uid):
+def get_nb_new_messages_for_user(uid):
     """ Get number of new mails for a given user
     @param uid: user id (int)
     @return number of new mails as int.
@@ -123,11 +126,27 @@ def get_nb_new_mail_for_user(uid):
                WHERE id_user_to=%i AND
                      BINARY status='%s'"""
     params = (int(uid), escape_string(new_status))
-    res = run_sql(query%params)
+    res = run_sql(query% params)
     if res:
         return res[0][0]
-    else:
-        return 0
+    return 0
+
+def get_nb_readable_messages_for_user(uid):
+    """ Get number of mails of a fiven user. Reminders are not counted
+    @param uid: user id (int)
+    @return number of messages (int)
+    """
+    reminder_status = cfg_webmessage_status_code['REMINDER']
+    query = """SELECT count(id_msgMESSAGE)
+               FROM user_msgMESSAGE
+               WHERE id_user_to=%i AND
+                     BINARY status!='%s'"""
+    params = (int(uid), reminder_status)
+    res = run_sql(query% params)
+    if res:
+        return res[0][0]
+    return 0
+    
     
 def get_all_messages_for_user(uid):
     """
@@ -334,7 +353,7 @@ def create_message(uid_from,
                    groups_to_str="",
                    msg_subject="",
                    msg_body="",
-                   msg_send_on_date="0000-00-00 00:00:00"):
+                   msg_send_on_date=datetext_default):
     """
     Creates a message in the msgMESSAGE table. Does NOT send the message.
     This function is like a datagramPacket...
@@ -344,10 +363,10 @@ def create_message(uid_from,
     @param msg_subject: string containing the subject of the message
     @param msg_body: string containing the body of the message
     @param msg_send_on_date: date on which message must be sent. Has to be a
-                             mySQL format (i.e. YYYY-mm-dd HH:MM:SS)
+                             datetex format (i.e. YYYY-mm-dd HH:MM:SS)
     @return id of the created message
     """
-    now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))        
+    now = convert_datestruct_to_datetext(localtime())        
     query = """INSERT INTO msgMESSAGE(id_user_from,
                                       sent_to_user_nicks,
                                       sent_to_group_names,
@@ -428,7 +447,7 @@ def update_user_inbox_for_reminders(uid):
     @param uid: user id
     @return integer number of new expired reminders
     """
-    now =  time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+    now =  convert_datestruct_to_datetext(localtime())
     reminder_status = cfg_webmessage_status_code['REMINDER']
     new_status = cfg_webmessage_status_code['NEW']
         
@@ -466,17 +485,21 @@ def update_user_inbox_for_reminders(uid):
 
 def get_nicknames_like(pattern):
     """get nicknames like pattern"""
-    query = "SELECT nickname FROM user WHERE nickname RLIKE '%s'"
-    pattern = escape_string(pattern)
-    res = run_sql(query%pattern)
-    return res
+    if pattern:
+        query = "SELECT nickname FROM user WHERE nickname RLIKE '%s'"
+        pattern = escape_string(pattern)
+        res = run_sql(query%pattern)
+        return res
+    return ()
 
 def get_groupnames_like(pattern):
     """Get groupnames like pattern"""
-    query = "SELECT name FROM usergroup WHERE name RLIKE '%s'"
-    pattern = escape_string(pattern)
-    res = run_sql(query%pattern)
-    return res
+    if pattern:
+        query = "SELECT name FROM usergroup WHERE name RLIKE '%s'"
+        pattern = escape_string(pattern)
+        res = run_sql(query%pattern)
+        return res
+    return ()
 
 def get_element(sql_res):
     """convert mySQL output
@@ -487,11 +510,11 @@ def get_element(sql_res):
 
 def clean_messages():
     """ Cleans msgMESSAGE table"""
-    current_time = time.localtime()
-    seconds = time.mktime(current_time)
+    current_time = localtime()
+    seconds = mktime(current_time)
     seconds -= cfg_webmessage_days_before_delete_orphans * 86400
     format = "%Y-%m-%d %H:%M:%S"
-    sql_date = time.strftime(format, time.localtime(seconds))    
+    sql_date = convert_datestruct_to_datetext(localtime(seconds))    
     deleted_items = 0
     #find id and email from every user who has got an email
     query1 = """SELECT distinct(umsg.id_user_to),
