@@ -52,9 +52,11 @@ def get_fieldvalues(recID, tag):
 
 class Template:
 
-    # This dictionnary maps CDSware language code to locale codes (ISO 639)
+    # This dictionary maps CDSware language code to locale codes (ISO 639)
     tmpl_localemap = {
+        'ca': 'ca_ES',
         'de': 'de_DE',
+        'el': 'el_GR',
         'en': 'en_US',
         'es': 'es_ES',
         'pt': 'pt_BR',
@@ -65,7 +67,9 @@ class Template:
         'cs': 'cs_CZ',
         'no': 'no_NO',
         'sv': 'sv_SE',
+        'uk': 'uk_UA',
         }
+    tmpl_default_locale = "en_US" # which locale to use by default, useful in case of failure
 
     def tmpl_navtrail_links(self, as, ln, weburl, separator, dads):
         """
@@ -1861,22 +1865,17 @@ class Template:
 
     def tmpl_nice_number(self, number, ln):
         "Returns nicely printed number NUM in language LN using the locale."
-
-        if number is None: return None
-
+        if number is None:
+            return None
         # Temporarily switch the numeric locale to the requeted one, and format the number
         # In case the system has no locale definition, use the vanilla form
-
-        ol = locale.getlocale (locale.LC_NUMERIC)
+        ol = locale.getlocale(locale.LC_NUMERIC)
         try:
-            locale.setlocale (locale.LC_NUMERIC, self.tmpl_localemap [ln])
+            locale.setlocale(locale.LC_NUMERIC, self.tmpl_localemap.get(ln, self.tmpl_default_locale))
         except locale.Error:
-            return str (number)
-
-        number = locale.format ('%d', number, True)
-
-        locale.setlocale (locale.LC_NUMERIC, ol)
-
+            return str(number)
+        number = locale.format('%d', number, True)
+        locale.setlocale(locale.LC_NUMERIC, ol)
         return number
 
     def tmpl_records_format_htmlbrief(self, ln, weburl, rows, relevances_prologue, relevances_epilogue):
