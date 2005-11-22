@@ -28,7 +28,7 @@ import sre
 
 from config import *
 from dbquery import run_sql
-from messages import gettext_set_language,msg_in
+from messages import gettext_set_language
 from search_engine_config import *
 
 def get_fieldvalues(recID, tag):
@@ -204,7 +204,7 @@ class Template:
                  'msg_search' : _('Search'),
                  'msg_browse' : _('Browse'),
                  'msg_search_tips' : _('Search Tips'),
-                 'msg_advanced_search' : _('Advanced search'),
+                 'msg_advanced_search' : _('Advanced Search'),
                }
         return out
 
@@ -308,7 +308,7 @@ class Template:
                  'msg_search' : _("Search"),
                  'msg_browse' : _("Browse"),
                  'msg_search_tips' : _("Search Tips"),
-                 'msg_simple_search' : _("Simple search")
+                 'msg_simple_search' : _("Simple Search")
                }
 
         if (searchoptions):
@@ -326,7 +326,7 @@ class Template:
                        </tr>
                       <tbody>
                      </table>""" % {
-                       'searchheader' : _("Search options"),
+                       'searchheader' : _("Search options:"),
                        'searchoptions' : searchoptions
                      }
 
@@ -513,7 +513,7 @@ class Template:
                   <option value=""%(sel)s>%(any)s
                """ % {
                  'name' : name,
-                 'any' : _("Any year"),
+                 'any' : _("any year"),
                  'sel' : self.tmpl_is_selected(sy, 0)
                }
         this_year = int(time.strftime("%Y", time.localtime()))
@@ -1233,7 +1233,7 @@ class Template:
               'f1_qt' : urllib.quote(f1),
               'rm' : urllib.quote(rm),
               'cc' : urllib.quote(cc),
-              'simple_search' : _("Simple search"),
+              'simple_search' : _("Simple Search"),
               'google' : google,
             }
         else:
@@ -1291,7 +1291,7 @@ class Template:
               'f_qt' : urllib.quote(f),
               'rm' : urllib.quote(rm),
               'cc' : urllib.quote(cc),
-              'advanced_search' : _("Advanced search"),
+              'advanced_search' : _("Advanced Search"),
               'google' : google,
             }
             
@@ -1411,7 +1411,7 @@ class Template:
                 </table>""" % {
                   'sort_by' : _("Sort by:"),
                   'display_res' : _("Display results:"),
-                  'out_format' : _("Output format"),
+                  'out_format' : _("Output format:"),
                   'select_sf' : self.tmpl_select(fieldname = 'sf', values = sort_formats, selected = sf, css_class = 'address'),
                   'select_so' : self.tmpl_select(fieldname = 'so', values = [{
                                     'value' : 'a',
@@ -1503,13 +1503,13 @@ class Template:
         if cfg_google_box_servers.get('CERN Agenda', 0):
             # FIXME: reusing CERN Agenda config variable until we can enter CERN EDMS into config.wml
             if f == "author":
-                out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=ADVANCED&p_author=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, msg_in[ln]))
+                out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=ADVANCED&p_author=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, _("in")))
             elif f == "title" or f == "abstract" or f == "keyword":
-                out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=ADVANCED&p_title=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, msg_in[ln]))
+                out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=ADVANCED&p_title=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, _("in")))
             elif f == "reportnumber":
-                out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=ADVANCED&p_document_id=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, msg_in[ln]))
+                out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=ADVANCED&p_document_id=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, _("in")))
             else:
-                out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=BASE&p_free_text=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, msg_in[ln]))
+                out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=BASE&p_free_text=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, _("in")))
         # CiteSeer:
         if cfg_google_box_servers.get('CiteSeer', 0):
             out_links.append("""<a class="google" href="http://citeseer.ist.psu.edu/cs?q=%s">%s %s CiteSeer</a>""" % (p_quoted, p, _('in')))
@@ -1517,7 +1517,7 @@ class Template:
         if cfg_google_box_servers.get('Google Scholar', 0):
             # FIXME: reusing Google Scholar config variable until we can enter Google Print into config.wml
             if string.find(cc, "Book") >= 0:
-                out_links.append("""<a class="google" href="http://print.google.com/print?q=%s">%s %s Google Print</a>""" % (p_quoted, p, msg_in[ln]))
+                out_links.append("""<a class="google" href="http://print.google.com/print?q=%s">%s %s Google Print</a>""" % (p_quoted, p, _("in")))
         # Google Scholar:
         if cfg_google_box_servers.get('Google Scholar', 0):
             if f == "author":
@@ -1590,13 +1590,13 @@ class Template:
         if cfg_google_box_servers.get('Google Scholar', 0):
             # FIXME: reusing Google Scholar config variable until we can enter Scirus into config.wml
             if f == "author":
-                out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=author%%3A%s">%s %s Scirus</a>""" % (p_quoted, p, msg_in[ln]))
+                out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=author%%3A%s">%s %s Scirus</a>""" % (p_quoted, p, _("in")))
             elif f == "title":
-                out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=title%%3A%s">%s %s Scirus</a>""" % (p_quoted, p, msg_in[ln]))
+                out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=title%%3A%s">%s %s Scirus</a>""" % (p_quoted, p, _("in")))
             elif f == "keyword":
-                out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=keywords%%3A%s">%s %s Scirus</a>""" % (p_quoted, p, msg_in[ln]))
+                out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=keywords%%3A%s">%s %s Scirus</a>""" % (p_quoted, p, _("in")))
             else:
-                out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=%s">%s %s Scirus</a>""" % (p_quoted, p, msg_in[ln]))
+                out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=%s">%s %s Scirus</a>""" % (p_quoted, p, _("in")))
         # SPIRES
         if cfg_google_box_servers.get('SPIRES', 0):
             spires_search_title = "SLAC SPIRES HEP"
@@ -1626,7 +1626,7 @@ class Template:
         out = ""
         if out_links:
             out += """<a name="googlebox"></a>"""
-            out += prolog_start + _("Haven't found what you were looking for?  Try your search on other servers:") + prolog_end
+            out += prolog_start + _("Haven't found what you were looking for? Try your search on other servers:") + prolog_end
             nb_out_links_in_one_column = len(out_links)/2
             out += string.join(out_links[:nb_out_links_in_one_column], link_separator)
             out += column_separator
@@ -1838,7 +1838,7 @@ class Template:
                         for val in fieldargs[fieldcode]:
                             out += self.tmpl_input_hidden(name = cgi.escape(fieldcode), value = cgi.escape(val))
             out += """&nbsp; %(jump)s <input type="text" name="jrec" size="4" value="%(jrec)d">""" % {
-                     'jump' : _("jump to record"),
+                     'jump' : _("jump to record:"),
                      'jrec' : jrec,
                    }
 
@@ -2041,7 +2041,7 @@ class Template:
             if row.has_key ('viewsimilarity'):
                 out += '<p>&nbsp'
                 out += self.tmpl_print_record_list_for_similarity_boxen (
-                    _("People who viewed this page also viewed::"), row ['viewsimilarity'], ln)
+                    _("People who viewed this page also viewed:"), row ['viewsimilarity'], ln)
 
             if row.has_key ('reviews'):
                 out += '<p>&nbsp'

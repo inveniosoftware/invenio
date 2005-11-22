@@ -49,7 +49,7 @@ import unicodedata
 
 ## import CDSware stuff:
 from config import *
-from messages import *
+
 from search_engine_config import *
 from bibrank_record_sorter import get_bibrank_methods,rank_records
 from bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
@@ -66,7 +66,7 @@ try:
 except ImportError, e:
     pass # ignore user personalisation, needed e.g. for command-line
 
-from messages import gettext_set_language
+from messages import gettext_set_language, wash_language
 
 try:
     import template
@@ -336,8 +336,13 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
     ## return search units:
     return opfts
 
-def page_start(req, of, cc, as, ln, uid, title_message=msg_search_results[cdslang]):
+def page_start(req, of, cc, as, ln, uid, title_message=None):
     "Start page according to given output format."
+
+    _ = gettext_set_language(ln)
+
+    if not title_message: title_message = _("Search Results")
+    
     if not req: 
         return # we were called from CLI
     if of.startswith('x'):
@@ -361,7 +366,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=msg_search_results[cdslan
         req.send_http_header()
         req.write(pageheaderonly(title=title_message,
                                  navtrail=create_navtrail_links(cc, as, ln, 1),
-                                 description="%s %s." % (cc, msg_search_results[ln]),
+                                 description="%s %s." % (cc, _("Search Results")),
                                  keywords="CDSware, WebSearch, %s" % cc,
                                  uid=uid,
                                  language=ln,
@@ -383,24 +388,27 @@ def page_end(req, of="hb", ln=cdslang):
 
 def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_day=0, ln=cdslang):
     "Produces 'From Date', 'Until Date' kind of selection box.  Suitable for search options."
+
+    _ = gettext_set_language(ln)
+
     box = ""
     # day
     box += """<select name="%sd">""" % name
-    box += """<option value="">%s""" % msg_any_day[ln]
+    box += """<option value="">%s""" % _("any day")
     for day in range(1,32):
         box += """<option value="%02d"%s>%02d""" % (day, is_selected(day, selected_day), day)
     box += """</select>"""
     # month
     box += """<select name="%sm">""" % name
-    box += """<option value="">%s""" % msg_any_month[ln]
-    for mm, month in [(1,msg_january[ln]), (2,msg_february[ln]), (3,msg_march[ln]), (4,msg_april[ln]), \
-                      (5,msg_may[ln]), (6,msg_june[ln]), (7,msg_july[ln]), (8,msg_august[ln]), \
-                      (9,msg_september[ln]), (10,msg_october[ln]), (11,msg_november[ln]), (12,msg_december[ln])]:
+    box += """<option value="">%s""" % _("any month")
+    for mm, month in [(1,_("January")), (2,_("February")), (3,_("March")), (4,_("April")), \
+                      (5,_("May")), (6,_("June")), (7,_("July")), (8,_("August")), \
+                      (9,_("September")), (10,_("October")), (11,_("November")), (12,_("December"))]:
         box += """<option value="%02d"%s>%s""" % (mm, is_selected(mm, selected_month), month)
     box += """</select>"""
     # year
     box += """<select name="%sy">""" % name
-    box += """<option value="">%s""" % msg_any_year[ln]
+    box += """<option value="">%s""" % _("any year")
     this_year = int(time.strftime("%Y", time.localtime()))
     for year in range(this_year-20, this_year+1):
         box += """<option value="%d"%s>%d""" % (year, is_selected(year, selected_year), year)
@@ -506,7 +514,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
     ## ranking methods
     ranks = [{
                'value' : '',
-               'text' : "- %s %s -" % (_("or"), _("rank by")),
+               'text' : "- %s %s -" % (_("OR").lower (), _("rank by")),
              }]
     for (code,name) in get_bibrank_methods(get_colID(cc), ln):
         # propose found rank methods:
@@ -621,6 +629,9 @@ def get_searchwithin_fields(ln='en'):
 
 def create_andornot_box(name='op', value='', ln='en'):
     "Returns HTML code for the AND/OR/NOT selection box."
+
+    _ = gettext_set_language(ln)
+
     out = """
     <select name="%s">
     <option value="a"%s>%s
@@ -628,13 +639,17 @@ def create_andornot_box(name='op', value='', ln='en'):
     <option value="n"%s>%s
     </select>
     """ % (name,
-           is_selected('a', value), msg_and[ln],
-           is_selected('o', value), msg_or[ln],
-           is_selected('n', value), msg_and_not[ln])
+           is_selected('a', value), _("AND"),
+           is_selected('o', value), _("OR"),
+           is_selected('n', value), _("AND NOT"))
+    
     return out
 
 def create_matchtype_box(name='m', value='', ln='en'):
     "Returns HTML code for the 'match type' selection box."
+
+    _ = gettext_set_language(ln)
+
     out = """
     <select name="%s">
     <option value="a"%s>%s
@@ -644,11 +659,11 @@ def create_matchtype_box(name='m', value='', ln='en'):
     <option value="r"%s>%s
     </select>
     """ % (name,
-           is_selected('a', value), msg_all_of_the_words[ln],
-           is_selected('o', value), msg_any_of_the_words[ln],
-           is_selected('e', value), msg_exact_phrase[ln],
-           is_selected('p', value), msg_partial_phrase[ln],
-           is_selected('r', value), msg_regular_expression[ln])
+           is_selected('a', value), _("All of the words:"),
+           is_selected('o', value), _("Any of the words:"),
+           is_selected('e', value), _("Exact phrase:"),
+           is_selected('p', value), _("Partial phrase:"),
+           is_selected('r', value), _("Regular expression:"))
     return out
 
 def nice_number(num, ln=cdslang):
@@ -656,12 +671,16 @@ def nice_number(num, ln=cdslang):
 
     if num is None: return None
 
+    _ = gettext_set_language(ln)
+
+    separator = _(",")
+    
     chars_in = list(str(num))
     num = len(chars_in)
     chars_out = []
     for i in range(0,num):
         if i % 3 == 0 and i != 0:
-            chars_out.append(msg_thousands_separator[ln])
+            chars_out.append(separator)
         chars_out.append(chars_in[num-i-1])
     chars_out.reverse()
     return ''.join(chars_out)
@@ -1318,6 +1337,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
        This function is suitable as a mid-level API.
     """
 
+    _ = gettext_set_language(ln)
+
     hitset_empty = HitSet()
     hitset_empty._nbhits = 0
     # sanity check:
@@ -1366,7 +1387,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 if basic_search_unit_hitset._nbhits > 0:
                     # we retain the new unit instead
                     if of.startswith('h'):
-                        print_warning(req, msg_no_exact_match_for_foo_using_bar_instead[ln] % (bsu_p,bsu_pn))
+                        print_warning(req, _("No exact match found for <em>%s</em>, using <em>%s</em> instead...") % (bsu_p,bsu_pn))
                     basic_search_units[idx_unit][1] = bsu_pn
                     basic_search_units_hitsets.append(basic_search_unit_hitset)
                 else:
@@ -1580,6 +1601,8 @@ def search_unit_in_bibrec(day1, day2, type='creation_date'):
 
 def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0, ln=cdslang):
     """Return dict of hitsets given by intersection of hitset with the collection universes."""
+    _ = gettext_set_language(ln)
+    
     # search stage 4: intersect with the collection universe:
     if verbose and of.startswith("h"):
         t1 = os.times()[4]
@@ -1603,13 +1626,16 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
             url_args = sre.sub(r'^\&+', '', url_args)
             url_args = sre.sub(r'\&+$', '', url_args)
             if of.startswith("h"):
-                print_warning(req, msg_no_hits_in_given_collection[ln] %
+                print_warning(req, _("No match found in collection %s. Other public collections gave "
+                                     "<a class=\"nearestterms\" href=\"%s/search.py?%s\">%d hits</a>.") %
                               (string.join(colls, ","), weburl, url_args, results_in_Home._nbhits))
             results = {}
         else:
             # no hits found in Home, recommend different search terms:
             if of.startswith("h"):
-                print_warning(req, msg_no_public_hits[ln])
+                print_warning(req, _("No public collection matched your query. "
+                                     "If you were looking for a non-public document, please choose "
+                                     "the desired restricted collection first."))
             results = {}
     if verbose and of.startswith("h"):
         t2 = os.times()[4]
@@ -1744,7 +1770,7 @@ def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang, intro_text_p
         intro = _("Search term <em>%s</em>") % p
         if f:
             intro += " " + _("inside <em>%s</em> index") % get_field_i18nname(f, ln)
-        intro += " " + _("did not match any record.  Nearest terms in any collection are:")
+        intro += " " + _("did not match any record. Nearest terms in any collection are:")
 
     return websearch_templates.tmpl_nearest_term_box(
              p = p,
@@ -2412,6 +2438,9 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
 
 def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompress):
     "Prints record 'recID' formatted accoding to 'format'."
+
+    _ = gettext_set_language(ln)
+
     out = ""
 
     # sanity check:
@@ -2564,7 +2593,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     elif format == "hd":
         # HTML detailed format
         if record_exist_p == -1:
-            out += msg_record_deleted[ln]
+            out += _("The record has been deleted.")
         else:
             # look for detailed format existence:
             query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
@@ -2587,14 +2616,14 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     elif format.startswith("hb_") or format.startswith("hd_"):
         # underscore means that HTML brief/detailed formats should be called on-the-fly; suitable for testing formats
         if record_exist_p == -1:
-            out += msg_record_deleted[ln]
+            out += _("The record has been deleted.")
         else:
             out += call_bibformat(recID, format)
 
     elif format.startswith("hs"):
         # for citation/download similarity navigation links:        
         if record_exist_p == -1:
-            out += msg_record_deleted[ln]
+            out += _("The record has been deleted.")
         else:
             out += """<a href="%s/search.py?recid=%s&ln=%s">""" % (weburl, recID, ln)
             # firstly, title:
@@ -2640,7 +2669,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     else:
         # HTML brief format by default
         if record_exist_p == -1:
-            out += msg_record_deleted[ln]
+            out += _("The record has been deleted.")
         else:
             query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
             res = run_sql(query)
@@ -2962,6 +2991,9 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
     verbose = wash_url_argument(verbose, 'int')
     ap = wash_url_argument(ap, 'int')
     ln = wash_language(ln)
+
+    _ = gettext_set_language(ln)
+
     # backwards compatibility: id, idb, sysnb -> recid, recidb, sysno (if applicable)
     if sysnb != "" and sysno == "":
         sysno = sysnb
@@ -2971,7 +3003,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         recidb = idb
     # TODO deduce passed search limiting criterias (if applicable)
     pl, pl_in_url = "", "" # no limits by default
-    if action != msg_browse[ln] and req and req.args: # we do not want to add options while browsing or while calling via command-line
+    if action != _("Browse") and req and req.args: # we do not want to add options while browsing or while calling via command-line
         fieldargs = cgi.parse_qs(req.args)
         for fieldcode in get_fieldcodes():
             if fieldargs.has_key(fieldcode):
@@ -2992,7 +3024,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
     ## 0 - start output
     if recid>0:
         ## 1 - detailed record display
-        page_start(req, of, cc, as, ln, uid, msg_detailed_record[ln] + " #%d" % recid)
+        page_start(req, of, cc, as, ln, uid, _("Detailed record") + " #%d" % recid)
         if of == "hb":
             of = "hd"
         if record_exists(recid):
@@ -3005,9 +3037,9 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         else: # record does not exist
             if of.startswith("h"):
                 print_warning(req, "Requested record does not seem to exist.")
-    elif action == msg_browse[ln]:
+    elif action == _("Browse"):
         ## 2 - browse needed
-        page_start(req, of, cc, as, ln, uid, msg_browse[ln])
+        page_start(req, of, cc, as, ln, uid, _("Browse"))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
@@ -3025,7 +3057,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
 
     elif rm and p.startswith("recid:"):
         ## 3-ter - similarity search needed
-        page_start(req, of, cc, as, ln, uid, msg_search_results[ln])
+        page_start(req, of, cc, as, ln, uid, _("Search Results"))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
@@ -3064,7 +3096,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
 
     elif cfg_experimental_features and p.startswith("cocitedwith:"):
         ## 3-terter - cited by search needed
-        page_start(req, of, cc, as, ln, uid, msg_search_results[ln]) 
+        page_start(req, of, cc, as, ln, uid, _("Search Results")) 
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
@@ -3098,7 +3130,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                     return []
     else:
         ## 3 - common search needed
-        page_start(req, of, cc, as, ln, uid, msg_search_results[ln])
+        page_start(req, of, cc, as, ln, uid, _("Search Results"))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
@@ -3190,7 +3222,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                                                               results_final,
                                                               search_unit_in_bibrec(day1, day2),
                                                               ap,
-                                                              aptext=msg_no_match_within_time_limits[ln])
+                                                              aptext= _("No match within your time limits, "
+                                                                        "discarding this condition..."))
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
@@ -3209,7 +3242,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                                                               results_final,
                                                               search_pattern(req, pl, ap=0, ln=ln),
                                                               ap,
-                                                              aptext=msg_no_match_within_search_limits[ln])
+                                                              aptext=_("No match within your search limits, "
+                                                                       "discarding this condition..."))
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))

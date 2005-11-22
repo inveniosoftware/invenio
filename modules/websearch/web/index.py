@@ -27,7 +27,7 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
     "Display search interface page for collection c by looking in the collection cache."
     from cdsware.webpage import page, create_error_box
     from cdsware.webuser import getUid, page_not_authorized
-    from cdsware.messages import wash_language,msg_internal_error,msg_collection_not_found_head,msg_collection_not_found_body
+    from cdsware.messages import wash_language, gettext_set_language
     from cdsware.search_engine import get_colID, get_coll_i18nname
     # wash params:
     try:
@@ -41,13 +41,16 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
     if type(c) is list:
         c = c[0]
     ln = wash_language(ln)
+
+    _ = gettext_set_language(ln)
+
     # get user ID:
     try:
         uid = getUid(req)
         if uid == -1:
             return page_not_authorized(req, "../")
     except MySQLdb.Error, e:
-        return page(title=msg_internal_error[ln],
+        return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=verbose, ln=ln),
                     description="%s - Internal Error" % cdsname, 
                     keywords="%s, CDSware, Internal Error" % cdsname,
@@ -59,8 +62,9 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
     # deduce collection id:
     colID = get_colID(c)
     if type(colID) is not int:
-         return page(title=msg_collection_not_found_head[ln] % c,
-                     body=msg_collection_not_found_body[ln] % (c, "%s?ln=%s" % (weburl, ln), cdsnameintl[ln]),
+         return page(title=_("Collection %s Not Found") % c,
+                     body=_("<p>Sorry, collection <strong>%s</strong> does not seem to exist. "
+                            "<p>You may want to start browsing from <a href=\"%s\">%s</a>.") % (c, "%s?ln=%s" % (weburl, ln), cdsnameintl[ln]),
                      description="%s - Not found: %s " % (cdsname, c),
                      keywords="%s, CDSware" % cdsname,
                      uid=uid,
@@ -114,7 +118,7 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
             req.write("<br>ln=%s" % ln)        
             req.write("<br>colID=%s" % colID)
             req.write("<br>uid=%s" % uid)
-        return page(title=msg_internal_error[ln],
+        return page(title=_("Internal Error"),
                     body = create_error_box(req, ln=ln),
                     description="%s - Internal Error" % cdsname, 
                     keywords="%s, CDSware, Internal Error" % cdsname,

@@ -52,6 +52,8 @@ def lexer (name):
             else:
                 yield ('T', part)
 
+        yield ('T', ' ')
+        
     return
             
 OUTSIDE, IN_MSG, IN_TEXT = range (3)
@@ -112,7 +114,12 @@ msgs = [ x for x in db.keys () ]
 msgs.sort ()
 
 def quote (text):
+    # Normalize and quote
+    
     return text.\
+           strip ().\
+           replace ('\\"', '"').\
+           replace ('  ', ' ').\
            replace ('\\', '\\\\').\
            replace ('\n', '\\\\n').\
            replace ('"',  '\\"')

@@ -514,7 +514,7 @@ class Collection:
         query = """SELECT f.code,f.name FROM field AS f, collection_field_fieldvalue AS cff
                    WHERE id_collection=%d AND cff.type='soo' AND cff.id_field=f.id
                    ORDER BY cff.score DESC, f.name ASC""" % self.id
-        values = [{'value' : '', 'text': "- %s -" % _("Latest first")}]
+        values = [{'value' : '', 'text': "- %s -" % _("latest first")}]
         res = run_sql(query)
         if res:
             for row in res:

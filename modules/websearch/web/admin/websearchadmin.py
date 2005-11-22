@@ -27,6 +27,7 @@ import cdsware.websearchadminlib as wsc
 from cdsware.webpage import page, create_error_box
 from cdsware.config import weburl,cdslang
 from cdsware.webuser import getUid, page_not_authorized
+from messages import gettext_set_language
 
 __version__ = "$Id$"
 
@@ -1042,8 +1043,10 @@ def index(req, colID=1, ln=cdslang, mtype='', content='', confirm=0):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def error_page(req):
-    return page(title=msg_internal_error[ln],
+def error_page(req, ln = cdslang):
+    _ = gettext_set_language(ln)
+    
+    return page(title=_("Internal Error"),
                 body = create_error_box(req, verbose=verbose, ln=ln),
                 description="%s - Internal Error" % cdsname, 
                 keywords="%s, CDSware, Internal Error" % cdsname,

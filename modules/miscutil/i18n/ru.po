@@ -17,8 +17,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: CDSware 0.7\n"
-"POT-Creation-Date: Tue Nov 22 10:30:50 2005\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: Tue Nov 22 16:44:03 2005\n"
+"PO-Revision-Date: 2005-11-22 11:20+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -28,8 +28,9 @@ msgstr ""
 
 #: ../../../modules/bibharvest/lib/bibharvest_templates.py:51
 #: ../../../modules/bibharvest/lib/bibharvest_templates.py:69
+#, fuzzy
 msgid "See Guide"
-msgstr ""
+msgstr "Руководство"
 
 #: ../../../modules/bibharvest/lib/bibharvest_templates.py:106
 msgid "OAI sources currently present in the database"
@@ -97,12 +98,14 @@ msgid "Sat"
 msgstr ""
 
 #: ../../../modules/miscutil/lib/dateutils.py:145
+#, fuzzy
 msgid "Sunday"
-msgstr ""
+msgstr "любой день"
 
 #: ../../../modules/miscutil/lib/dateutils.py:146
+#, fuzzy
 msgid "Monday"
-msgstr ""
+msgstr "май"
 
 #: ../../../modules/miscutil/lib/dateutils.py:147
 msgid "Tuesday"
@@ -130,46 +133,54 @@ msgid "Month"
 msgstr ""
 
 #: ../../../modules/miscutil/lib/dateutils.py:166
+#, fuzzy
 msgid "Jan"
-msgstr ""
+msgstr "январь"
 
 #: ../../../modules/miscutil/lib/dateutils.py:167
 msgid "Feb"
 msgstr ""
 
 #: ../../../modules/miscutil/lib/dateutils.py:168
+#, fuzzy
 msgid "Mar"
-msgstr ""
+msgstr "март"
 
 #: ../../../modules/miscutil/lib/dateutils.py:169
+#, fuzzy
 msgid "Apr"
-msgstr ""
+msgstr "апрель"
 
 #: ../../../modules/miscutil/lib/dateutils.py:170
 #: ../../../modules/miscutil/lib/dateutils.py:184
+#: ../../../modules/websearch/lib/search_engine.py:405
 #: ../../../modules/websearch/lib/websearch_templates.py:506
 msgid "May"
 msgstr "май"
 
 #: ../../../modules/miscutil/lib/dateutils.py:171
+#, fuzzy
 msgid "Jun"
-msgstr ""
+msgstr "июнь"
 
 #: ../../../modules/miscutil/lib/dateutils.py:172
+#, fuzzy
 msgid "Jul"
-msgstr ""
+msgstr "июль"
 
 #: ../../../modules/miscutil/lib/dateutils.py:173
+#, fuzzy
 msgid "Aug"
-msgstr ""
+msgstr "август"
 
 #: ../../../modules/miscutil/lib/dateutils.py:174
 msgid "Sep"
 msgstr ""
 
 #: ../../../modules/miscutil/lib/dateutils.py:175
+#, fuzzy
 msgid "Oct"
-msgstr ""
+msgstr "октябрь"
 
 #: ../../../modules/miscutil/lib/dateutils.py:176
 msgid "Nov"
@@ -180,67 +191,80 @@ msgid "Dec"
 msgstr ""
 
 #: ../../../modules/miscutil/lib/dateutils.py:180
+#: ../../../modules/websearch/lib/search_engine.py:404
 #: ../../../modules/websearch/lib/websearch_templates.py:505
 msgid "January"
 msgstr "январь"
 
 #: ../../../modules/miscutil/lib/dateutils.py:181
+#: ../../../modules/websearch/lib/search_engine.py:404
 #: ../../../modules/websearch/lib/websearch_templates.py:505
 msgid "February"
 msgstr "февраль"
 
 #: ../../../modules/miscutil/lib/dateutils.py:182
+#: ../../../modules/websearch/lib/search_engine.py:404
 #: ../../../modules/websearch/lib/websearch_templates.py:505
 msgid "March"
 msgstr "март"
 
 #: ../../../modules/miscutil/lib/dateutils.py:183
+#: ../../../modules/websearch/lib/search_engine.py:404
 #: ../../../modules/websearch/lib/websearch_templates.py:505
 msgid "April"
 msgstr "апрель"
 
 #: ../../../modules/miscutil/lib/dateutils.py:185
+#: ../../../modules/websearch/lib/search_engine.py:405
 #: ../../../modules/websearch/lib/websearch_templates.py:506
 msgid "June"
 msgstr "июнь"
 
 #: ../../../modules/miscutil/lib/dateutils.py:186
+#: ../../../modules/websearch/lib/search_engine.py:405
 #: ../../../modules/websearch/lib/websearch_templates.py:506
 msgid "July"
 msgstr "июль"
 
 #: ../../../modules/miscutil/lib/dateutils.py:187
+#: ../../../modules/websearch/lib/search_engine.py:405
 #: ../../../modules/websearch/lib/websearch_templates.py:506
 msgid "August"
 msgstr "август"
 
 #: ../../../modules/miscutil/lib/dateutils.py:188
+#: ../../../modules/websearch/lib/search_engine.py:406
 #: ../../../modules/websearch/lib/websearch_templates.py:507
 msgid "September"
 msgstr "сентябрь"
 
 #: ../../../modules/miscutil/lib/dateutils.py:189
+#: ../../../modules/websearch/lib/search_engine.py:406
 #: ../../../modules/websearch/lib/websearch_templates.py:507
 msgid "October"
 msgstr "октябрь"
 
 #: ../../../modules/miscutil/lib/dateutils.py:190
+#: ../../../modules/websearch/lib/search_engine.py:406
 #: ../../../modules/websearch/lib/websearch_templates.py:507
 msgid "November"
 msgstr "ноябрь"
 
 #: ../../../modules/miscutil/lib/dateutils.py:191
+#: ../../../modules/websearch/lib/search_engine.py:406
 #: ../../../modules/websearch/lib/websearch_templates.py:507
 msgid "December"
 msgstr "декабрь"
 
 #: ../../../modules/miscutil/lib/dateutils.py:209
+#, fuzzy
 msgid "Day"
-msgstr ""
+msgstr "май"
 
 #: ../../../modules/miscutil/lib/dateutils.py:260
+#, fuzzy
 msgid "Year"
-msgstr ""
+msgstr "Искать"
 
 #: ../../../modules/webalert/lib/webalert.py:58
 msgid "You already have an alert which name is <b>%(name)s</b>"
@@ -287,8 +311,9 @@ msgid ""
 msgstr ""
 
 #: ../../../modules/webalert/lib/webalert.py:440
+#, fuzzy
 msgid "detailed list"
-msgstr ""
+msgstr "подробный"
 
 #: ../../../modules/webalert/lib/webalert_templates.py:71
 msgid "Pattern"
@@ -323,20 +348,23 @@ msgid "Field 3"
 msgstr ""
 
 #: ../../../modules/webalert/lib/webalert_templates.py:87
+#, fuzzy
 msgid "Collections"
-msgstr ""
+msgstr "наборы"
 
 #: ../../../modules/webalert/lib/webalert_templates.py:89
+#, fuzzy
 msgid "Collection"
-msgstr ""
+msgstr "наборы"
 
 #: ../../../modules/webalert/lib/webalert_templates.py:110
 msgid "You own following alerts:"
 msgstr ""
 
 #: ../../../modules/webalert/lib/webalert_templates.py:111
+#, fuzzy
 msgid "alert name"
-msgstr ""
+msgstr "сообщения"
 
 #: ../../../modules/webalert/lib/webalert_templates.py:119
 msgid "SHOW"
@@ -362,8 +390,9 @@ msgstr ""
 
 #: ../../../modules/webalert/lib/webalert_templates.py:199
 #: ../../../modules/webalert/lib/webalert_templates.py:325
+#, fuzzy
 msgid "monthly"
-msgstr ""
+msgstr "любой месяц"
 
 #: ../../../modules/webalert/lib/webalert_templates.py:200
 #: ../../../modules/webalert/lib/webalert_templates.py:323
@@ -372,8 +401,9 @@ msgstr ""
 
 #: ../../../modules/webalert/lib/webalert_templates.py:201
 #: ../../../modules/webalert/lib/webalert_templates.py:320
+#, fuzzy
 msgid "daily"
-msgstr ""
+msgstr "подробный"
 
 #: ../../../modules/webalert/lib/webalert_templates.py:202
 msgid "Send notification e-mail?"
@@ -398,8 +428,9 @@ msgid "Store results in basket?"
 msgstr ""
 
 #: ../../../modules/webalert/lib/webalert_templates.py:209
+#, fuzzy
 msgid "no basket"
-msgstr ""
+msgstr "корзины"
 
 #: ../../../modules/webalert/lib/webalert_templates.py:234
 msgid "or insert a new basket name"
@@ -420,8 +451,9 @@ msgid ""
 msgstr ""
 
 #: ../../../modules/webalert/lib/webalert_templates.py:289
+#, fuzzy
 msgid "your searches"
-msgstr ""
+msgstr "Попробуйте искать с..."
 
 #: ../../../modules/webalert/lib/webalert_templates.py:290
 msgid "most popular searches"
@@ -429,7 +461,7 @@ msgstr ""
 
 #: ../../../modules/webalert/lib/webalert_templates.py:306
 #: ../../../modules/webbasket/lib/webbasket_templates.py:78
-#: ../../../modules/webmessage/lib/webmessage_templates.py:450
+#: ../../../modules/webmessage/lib/webmessage_templates.py:458
 msgid "No"
 msgstr ""
 
@@ -463,13 +495,15 @@ msgstr ""
 
 #: ../../../modules/webalert/lib/webalert_templates.py:314
 #: ../../../modules/webalert/lib/webalert_templates.py:437
+#: ../../../modules/webmessage/lib/webmessage_templates.py:77
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1388
 msgid "Action"
 msgstr ""
 
 #: ../../../modules/webalert/lib/webalert_templates.py:359
+#, fuzzy
 msgid "Remove"
-msgstr ""
+msgstr "ещё"
 
 #: ../../../modules/webalert/lib/webalert_templates.py:360
 msgid "Modify"
@@ -503,20 +537,23 @@ msgid "#"
 msgstr ""
 
 #: ../../../modules/webalert/lib/webalert_templates.py:436
+#, fuzzy
 msgid "Question"
-msgstr ""
+msgstr "сеанс"
 
 #: ../../../modules/webalert/lib/webalert_templates.py:440
+#, fuzzy
 msgid "Last Run"
-msgstr ""
+msgstr "Последнее изменение"
 
 #: ../../../modules/webalert/lib/webalert_templates.py:456
 msgid "Set new alert"
 msgstr ""
 
 #: ../../../modules/webalert/web/youralerts.py:61
+#, fuzzy
 msgid "Display searches"
-msgstr ""
+msgstr "Представить результаты:"
 
 #: ../../../modules/webalert/web/youralerts.py:65
 #: ../../../modules/webalert/web/youralerts.py:93
@@ -525,7 +562,7 @@ msgstr ""
 #: ../../../modules/webalert/web/youralerts.py:167
 #: ../../../modules/webalert/web/youralerts.py:192
 #: ../../../modules/webalert/web/youralerts.py:213
-#: ../../../modules/webmessage/lib/webmessage_templates.py:415
+#: ../../../modules/webmessage/lib/webmessage_templates.py:423
 #: ../../../modules/websession/lib/websession_templates.py:404
 #: ../../../modules/websession/web/youraccount.py:57
 #: ../../../modules/websession/web/youraccount.py:120
@@ -544,8 +581,9 @@ msgstr ""
 #: ../../../modules/websubmit/web/publiline.py:74
 #: ../../../modules/websubmit/web/yourapprovals.py:87
 #: ../../../modules/websubmit/web/yoursubmissions.py:164
+#, fuzzy
 msgid "Your Account"
-msgstr ""
+msgstr "счёт"
 
 #: ../../../modules/webalert/web/youralerts.py:89
 msgid "Set a new alert"
@@ -559,13 +597,14 @@ msgstr ""
 #: ../../../modules/webalert/web/youralerts.py:163
 #: ../../../modules/webalert/web/youralerts.py:188
 #: ../../../modules/webalert/web/youralerts.py:209
+#, fuzzy
 msgid "Display alerts"
-msgstr ""
+msgstr "Представить результаты:"
 
 #: ../../../modules/webbasket/lib/webbasket.py:80
 #: ../../../modules/webbasket/lib/webbasket_templates.py:103
 #: ../../../modules/webbasket/lib/webbasket_templates.py:175
-#: ../../../modules/webmessage/lib/webmessage_templates.py:397
+#: ../../../modules/webmessage/lib/webmessage_templates.py:405
 msgid "DELETE"
 msgstr ""
 
@@ -581,8 +620,9 @@ msgid "CANCEL"
 msgstr ""
 
 #: ../../../modules/webbasket/lib/webbasket.py:88
+#, fuzzy
 msgid "The basket has not been deleted: %s"
-msgstr ""
+msgstr "The record has been deleted."
 
 #: ../../../modules/webbasket/lib/webbasket.py:100
 #: ../../../modules/webbasket/lib/webbasket_templates.py:143
@@ -655,8 +695,9 @@ msgid "REMOVE"
 msgstr ""
 
 #: ../../../modules/webbasket/lib/webbasket.py:150
+#, fuzzy
 msgid "The selected items have been removed."
-msgstr ""
+msgstr "The record has been deleted."
 
 #: ../../../modules/webbasket/lib/webbasket.py:152
 msgid "The items have not been removed: %s"
@@ -690,12 +731,14 @@ msgid "You are not the owner of this basket"
 msgstr ""
 
 #: ../../../modules/webbasket/lib/webbasket.py:315
+#, fuzzy
 msgid "The selected basket has been deleted."
-msgstr ""
+msgstr "The record has been deleted."
 
 #: ../../../modules/webbasket/lib/webbasket.py:321
+#, fuzzy
 msgid "The related alerts have been removed."
-msgstr ""
+msgstr "The record has been deleted."
 
 #: ../../../modules/webbasket/lib/webbasket.py:550
 msgid "Select a destination basket to copy the selected items."
@@ -723,7 +766,7 @@ msgstr ""
 
 #: ../../../modules/webbasket/lib/webbasket.py:672
 #: ../../../modules/websession/lib/websession_templates.py:756
-#: ../../../modules/websession/lib/websession_templates.py:769
+#: ../../../modules/websession/lib/websession_templates.py:771
 msgid "baskets"
 msgstr "корзины"
 
@@ -755,7 +798,7 @@ msgid "Do you want to remove the related alerts too?"
 msgstr ""
 
 #: ../../../modules/webbasket/lib/webbasket_templates.py:79
-#: ../../../modules/webmessage/lib/webmessage_templates.py:449
+#: ../../../modules/webmessage/lib/webmessage_templates.py:457
 msgid "Yes"
 msgstr ""
 
@@ -783,16 +826,17 @@ msgstr ""
 
 #: ../../../modules/webbasket/lib/webbasket_templates.py:151
 #: ../../../modules/webbasket/lib/webbasket_templates.py:531
+#, fuzzy
 msgid "basket name"
-msgstr ""
+msgstr "корзины"
 
 #: ../../../modules/webbasket/lib/webbasket_templates.py:162
 #: ../../../modules/webbasket/lib/webbasket_templates.py:271
 #: ../../../modules/webbasket/lib/webbasket_templates.py:539
-#: ../../../modules/websearch/lib/search_engine.py:509
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1041
+#, fuzzy
 msgid "or"
-msgstr ""
+msgstr "ещё"
 
 #: ../../../modules/webbasket/lib/webbasket_templates.py:162
 #: ../../../modules/webbasket/lib/webbasket_templates.py:538
@@ -839,8 +883,9 @@ msgstr ""
 
 #: ../../../modules/webbasket/lib/webbasket_templates.py:275
 #: ../../../modules/webbasket/lib/webbasket_templates.py:350
+#, fuzzy
 msgid "select basket"
-msgstr ""
+msgstr "корзины"
 
 #: ../../../modules/webbasket/lib/webbasket_templates.py:287
 #: ../../../modules/webbasket/lib/webbasket_templates.py:367
@@ -870,16 +915,18 @@ msgid "You don't own baskets defined yet."
 msgstr ""
 
 #: ../../../modules/webbasket/lib/webbasket_templates.py:491
+#, fuzzy
 msgid "CREATE NEW BASKET"
-msgstr ""
+msgstr "ДОБАВИТь В КОРЗИНУ"
 
 #: ../../../modules/webbasket/lib/webbasket_templates.py:529
 msgid "You own the following baskets"
 msgstr ""
 
 #: ../../../modules/webmessage/lib/webmessage.py:140
+#, fuzzy
 msgid "The message could not be deleted"
-msgstr ""
+msgstr "The record has been deleted."
 
 #: ../../../modules/webmessage/lib/webmessage.py:142
 msgid "Delete successful"
@@ -889,27 +936,33 @@ msgstr ""
 msgid "Your mailbox has been emptied"
 msgstr ""
 
-#: ../../../modules/webmessage/lib/webmessage.py:375
+#: ../../../modules/webmessage/lib/webmessage.py:373
 msgid "The chosen date (%(year)i/%(month)i/%(day)i) is invalid"
 msgstr ""
 
-#: ../../../modules/webmessage/lib/webmessage.py:384
+#: ../../../modules/webmessage/lib/webmessage.py:382
 msgid "Please enter a user name or a group name"
 msgstr ""
 
-#: ../../../modules/webmessage/lib/webmessage.py:388
+#: ../../../modules/webmessage/lib/webmessage.py:386
 msgid ""
 "Your message is too long, please edit it.\n"
 "                             Max size allowed is %i characters\n"
 "                          "
 msgstr ""
 
-#: ../../../modules/webmessage/lib/webmessage.py:400
+#: ../../../modules/webmessage/lib/webmessage.py:398
 msgid "Group '%s' doesn't exist\n"
 msgstr ""
 
-#: ../../../modules/webmessage/lib/webmessage.py:417
+#: ../../../modules/webmessage/lib/webmessage.py:415
 msgid "User '%s' doesn't exist\n"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage.py:427
+#: ../../../modules/webmessage/web/yourmessages.py:101
+#: ../../../modules/webmessage/web/yourmessages.py:168
+msgid "Write a message"
 msgstr ""
 
 #: ../../../modules/webmessage/lib/webmessage.py:444
@@ -924,163 +977,294 @@ msgstr ""
 msgid "Your message has been sent."
 msgstr ""
 
-#: ../../../modules/webmessage/lib/webmessage_templates.py:76
-msgid "Date"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:76
-msgid "Sender"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:76
-msgid "Subject"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:83
-msgid "No new mail"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:87
-msgid "Delete"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:116
-msgid "New message"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:117
-msgid "Delete All"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:175
-msgid "Re: "
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:269
-msgid "Send Later:"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:270
-msgid "To:"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:271
-msgid "Users"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:272
-msgid "Groups"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:273
-msgid "Subject:"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:274
-msgid "Message:"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:275
-msgid "SEND"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:396
-msgid "REPLY"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:413
+#: ../../../modules/webmessage/lib/webmessage.py:454
+#: ../../../modules/webmessage/lib/webmessage_templates.py:421
 #: ../../../modules/webmessage/web/yourmessages.py:62
-#: ../../../modules/webmessage/web/yourmessages.py:194
-#: ../../../modules/webmessage/web/yourmessages.py:224
-#: ../../../modules/webmessage/web/yourmessages.py:254
+#: ../../../modules/webmessage/web/yourmessages.py:219
+#: ../../../modules/webmessage/web/yourmessages.py:249
 #: ../../../modules/websession/lib/websession_templates.py:407
 msgid "Your Messages"
 msgstr ""
 
-#: ../../../modules/webmessage/lib/webmessage_templates.py:447
+#: ../../../modules/webmessage/lib/webmessage_templates.py:77
+msgid "Date"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:77
+msgid "Sender"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:77
+#: ../../../modules/webmessage/lib/webmessage_templates.py:399
+#, fuzzy
+msgid "Subject"
+msgstr "Внести"
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:84
+msgid "No new mail"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:92
+msgid "Reply"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:95
+msgid "Delete"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:123
+msgid "Write new message"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:124
+msgid "Delete All"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:171
+msgid "Re: "
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:265
+msgid "Send Later:"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:266
+msgid "To:"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:267
+msgid "Users"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:268
+msgid "Groups"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:269
+msgid "Subject:"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:270
+msgid "Message:"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:271
+msgid "SEND"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:398
+msgid "From"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:400
+msgid "Sent on"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:401
+msgid "Received on"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:402
+msgid "Sent to"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:403
+msgid "Sent to groups"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:404
+msgid "REPLY"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:455
 msgid "Are your sure you want to empty your whole mailbox?"
 msgstr ""
 
-#: ../../../modules/webmessage/lib/webmessage_templates.py:508
+#: ../../../modules/webmessage/lib/webmessage_templates.py:516
 msgid "Quota: %.1f%%"
 msgstr ""
 
-#: ../../../modules/webmessage/lib/webmessage_templates.py:526
-msgid "Please select value(s)"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:567
+#: ../../../modules/webmessage/lib/webmessage_templates.py:563
 msgid "Add to users"
 msgstr ""
 
-#: ../../../modules/webmessage/lib/webmessage_templates.py:585
+#: ../../../modules/webmessage/lib/webmessage_templates.py:565
 msgid "Add to groups"
 msgstr ""
 
-#: ../../../modules/webmessage/lib/webmessage_templates.py:608
+#: ../../../modules/webmessage/lib/webmessage_templates.py:568
+msgid "No matching user"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:570
+msgid "No matching group"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:604
+msgid "Find users or groups"
+msgstr ""
+
+#: ../../../modules/webmessage/lib/webmessage_templates.py:605
 msgid "Find a user"
 msgstr ""
 
-#: ../../../modules/webmessage/lib/webmessage_templates.py:609
+#: ../../../modules/webmessage/lib/webmessage_templates.py:606
 msgid "Find a group"
 msgstr ""
 
-#: ../../../modules/webmessage/lib/webmessage_templates.py:610
-#: ../../../modules/websearch/lib/search_engine.py:1282
-#: ../../../modules/websearch/lib/websearch_templates.py:204
-#: ../../../modules/websearch/lib/websearch_templates.py:308
-#: ../../../modules/websearch/lib/websearch_templates.py:1134
-#: ../../../modules/websearch/lib/websearch_templates.py:1227
-#: ../../../modules/websearch/lib/websearch_templates.py:1285
-#: ../../../modules/webstyle/lib/webstyle_templates.py:342
-#: ../../../modules/webstyle/lib/webstyle_templates.py:415
-msgid "Search"
-msgstr "Искать"
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:626
-msgid "You got <b>%i</b> new messages.<br/>\n"
-msgstr ""
-
-#: ../../../modules/webmessage/lib/webmessage_templates.py:627
+#: ../../../modules/webmessage/lib/webmessage_templates.py:621
 msgid ""
-"You can see all your messages in your <a href=\"/yourmessages.py?ln=%s"
-"\">inbox</a>"
+"You have <b>%i</b> new messages out of <a href=\"%s/yourmessages.py?ln=%s\">%"
+"i total messages</a>"
 msgstr ""
 
-#: ../../../modules/webmessage/web/yourmessages.py:101
-msgid "Write a message"
-msgstr ""
-
-#: ../../../modules/webmessage/web/yourmessages.py:284
+#: ../../../modules/webmessage/web/yourmessages.py:279
 msgid "Read a message"
 msgstr ""
 
-#: ../../../modules/websearch/lib/search_engine.py:474
-#: ../../../modules/websearch/lib/search_engine.py:489
-msgid "any collection"
-msgstr "любой набор"
+#: ../../../modules/websearch/bin/webcoll.in:347
+msgid "Narrow by collection:"
+msgstr "Сократить набор:"
 
-#: ../../../modules/websearch/lib/search_engine.py:485
-msgid "add another collection"
-msgstr "добавить другой набор"
+#: ../../../modules/websearch/bin/webcoll.in:348
+msgid "Focus on:"
+msgstr "Указание на:"
 
-#: ../../../modules/websearch/lib/search_engine.py:494
+#: ../../../modules/websearch/bin/webcoll.in:517
+#: ../../../modules/websearch/lib/search_engine.py:502
 msgid "latest first"
 msgstr "сначала последний запрос"
 
-#: ../../../modules/websearch/lib/search_engine.py:509
+#: ../../../modules/websearch/bin/webcoll.in:535
+#: ../../../modules/websearch/lib/websearch_templates.py:1418
+msgid "asc."
+msgstr "восх."
+
+#: ../../../modules/websearch/bin/webcoll.in:536
+#: ../../../modules/websearch/lib/websearch_templates.py:1421
+msgid "desc."
+msgstr "нисх."
+
+#: ../../../modules/websearch/bin/webcoll.in:547
+#: ../../../modules/websearch/lib/search_engine.py:517
 msgid "rank by"
 msgstr "упорядочить по"
 
-#: ../../../modules/websearch/lib/search_engine.py:529
-msgid "HTML brief"
-msgstr ""
+#: ../../../modules/websearch/bin/webcoll.in:547
+#: ../../../modules/websearch/lib/search_engine.py:517
+#: ../../../modules/websearch/lib/search_engine.py:643
+#: ../../../modules/websearch/lib/websearch_templates.py:467
+msgid "OR"
+msgstr "ИЛИ"
 
-#: ../../../modules/websearch/lib/search_engine.py:1241
+#: ../../../modules/websearch/bin/webcoll.in:565
+#: ../../../modules/websearch/lib/websearch_templates.py:1383
+msgid "results"
+msgstr "результаты"
+
+#: ../../../modules/websearch/bin/webcoll.in:578
+#: ../../../modules/websearch/lib/websearch_templates.py:1430
+msgid "split by collection"
+msgstr "разделить по наборам"
+
+#: ../../../modules/websearch/bin/webcoll.in:579
+#: ../../../modules/websearch/lib/websearch_templates.py:1427
+msgid "single list"
+msgstr "один лист"
+
+#: ../../../modules/websearch/bin/webcoll.in:599
+msgid "brief"
+msgstr "краткий"
+
+#: ../../../modules/websearch/bin/webcoll.in:661
+#: ../../../modules/websearch/bin/webcoll.in:682
+msgid "Search %s records for:"
+msgstr "Искать до %s записей для:"
+
+#: ../../../modules/websearch/lib/search_engine.py:344
+#: ../../../modules/websearch/lib/search_engine.py:369
+#: ../../../modules/websearch/lib/search_engine.py:3060
+#: ../../../modules/websearch/lib/search_engine.py:3099
+#: ../../../modules/websearch/lib/search_engine.py:3133
+msgid "Search Results"
+msgstr "Результаты поиска"
+
+#: ../../../modules/websearch/lib/search_engine.py:397
+#: ../../../modules/websearch/lib/websearch_templates.py:490
+msgid "any day"
+msgstr "любой день"
+
+#: ../../../modules/websearch/lib/search_engine.py:403
+#: ../../../modules/websearch/lib/websearch_templates.py:502
+msgid "any month"
+msgstr "любой месяц"
+
+#: ../../../modules/websearch/lib/search_engine.py:411
+#: ../../../modules/websearch/lib/websearch_templates.py:516
+msgid "any year"
+msgstr "любой год"
+
+#: ../../../modules/websearch/lib/search_engine.py:482
+#: ../../../modules/websearch/lib/search_engine.py:497
+msgid "any collection"
+msgstr "любой набор"
+
+#: ../../../modules/websearch/lib/search_engine.py:493
+msgid "add another collection"
+msgstr "добавить другой набор"
+
+#: ../../../modules/websearch/lib/search_engine.py:537
+#, fuzzy
+msgid "HTML brief"
+msgstr "краткий"
+
+#: ../../../modules/websearch/lib/search_engine.py:642
+#: ../../../modules/websearch/lib/websearch_templates.py:466
+msgid "AND"
+msgstr "И"
+
+#: ../../../modules/websearch/lib/search_engine.py:644
+#: ../../../modules/websearch/lib/websearch_templates.py:468
+msgid "AND NOT"
+msgstr "И НЕТ"
+
+#: ../../../modules/websearch/lib/search_engine.py:662
+#: ../../../modules/websearch/lib/websearch_templates.py:416
+msgid "All of the words:"
+msgstr "Все слова:"
+
+#: ../../../modules/websearch/lib/search_engine.py:663
+#: ../../../modules/websearch/lib/websearch_templates.py:418
+msgid "Any of the words:"
+msgstr "Любое из слов:"
+
+#: ../../../modules/websearch/lib/search_engine.py:664
+#: ../../../modules/websearch/lib/websearch_templates.py:420
+msgid "Exact phrase:"
+msgstr "Точная фраза:"
+
+#: ../../../modules/websearch/lib/search_engine.py:665
+#: ../../../modules/websearch/lib/websearch_templates.py:422
+msgid "Partial phrase:"
+msgstr "Часть фразы:"
+
+#: ../../../modules/websearch/lib/search_engine.py:666
+#: ../../../modules/websearch/lib/websearch_templates.py:424
+msgid "Regular expression:"
+msgstr "Регулярное выражение:"
+
+#: ../../../modules/websearch/lib/search_engine.py:676
+msgid ","
+msgstr ","
+
+#: ../../../modules/websearch/lib/search_engine.py:1260
 msgid "No values found."
 msgstr ""
 
-#: ../../../modules/websearch/lib/search_engine.py:1282
+#: ../../../modules/websearch/lib/search_engine.py:1301
+#: ../../../modules/websearch/lib/search_engine.py:3006
+#: ../../../modules/websearch/lib/search_engine.py:3040
+#: ../../../modules/websearch/lib/search_engine.py:3042
 #: ../../../modules/websearch/lib/websearch_templates.py:205
 #: ../../../modules/websearch/lib/websearch_templates.py:309
 #: ../../../modules/websearch/lib/websearch_templates.py:1057
@@ -1094,29 +1278,88 @@ msgstr ""
 msgid "Browse"
 msgstr "Просмотреть"
 
-#: ../../../modules/websearch/lib/search_engine.py:1727
+#: ../../../modules/websearch/lib/search_engine.py:1301
+#: ../../../modules/websearch/lib/websearch_templates.py:204
+#: ../../../modules/websearch/lib/websearch_templates.py:308
+#: ../../../modules/websearch/lib/websearch_templates.py:1134
+#: ../../../modules/websearch/lib/websearch_templates.py:1227
+#: ../../../modules/websearch/lib/websearch_templates.py:1285
+#: ../../../modules/webstyle/lib/webstyle_templates.py:342
+#: ../../../modules/webstyle/lib/webstyle_templates.py:415
+msgid "Search"
+msgstr "Искать"
+
+#: ../../../modules/websearch/lib/search_engine.py:1390
+msgid "No exact match found for <em>%s</em>, using <em>%s</em> instead..."
+msgstr ""
+"Ни один результат не найден для <em>%s</em>, взамен используется <em>%s</"
+"em> ..."
+
+#: ../../../modules/websearch/lib/search_engine.py:1629
+msgid ""
+"No match found in collection %s. Other public collections gave <a class="
+"\"nearestterms\" href=\"%s/search.py?%s\">%d hits</a>."
+msgstr ""
+"Не найден результат в наборе %s. Other public collections gave <a class="
+"\"nearestterms\" href=\"%s/search.py?%s\">%d hits</a>."
+
+#: ../../../modules/websearch/lib/search_engine.py:1636
+msgid ""
+"No public collection matched your query. If you were looking for a non-"
+"public document, please choose the desired restricted collection first."
+msgstr ""
+"Ваш запрос не удовлетворён ни одним доступным набором. Для поиска документа "
+"ограниченного доступа, выберете сначала ваш набор."
+
+#: ../../../modules/websearch/lib/search_engine.py:1753
 msgid "No words index available for"
 msgstr "Не найден лексический индекс для"
 
-#: ../../../modules/websearch/lib/search_engine.py:1731
+#: ../../../modules/websearch/lib/search_engine.py:1757
 msgid "No phrase index available for"
 msgstr "Не найден фразовый индех для"
 
-#: ../../../modules/websearch/lib/search_engine.py:1744
+#: ../../../modules/websearch/lib/search_engine.py:1770
 msgid "Search term <em>%s</em>"
 msgstr "Искомый термин <em>%s</em>"
 
-#: ../../../modules/websearch/lib/search_engine.py:1746
+#: ../../../modules/websearch/lib/search_engine.py:1772
 msgid "inside <em>%s</em> index"
 msgstr "в индексе <em>%s</em>"
 
-#: ../../../modules/websearch/lib/search_engine.py:1747
-msgid "did not match any record.  Nearest terms in any collection are:"
+#: ../../../modules/websearch/lib/search_engine.py:1773
+msgid "did not match any record. Nearest terms in any collection are:"
 msgstr "не найден. Возможные термины:"
 
-#: ../../../modules/websearch/lib/search_engine.py:2411
+#: ../../../modules/websearch/lib/search_engine.py:2437
 msgid "Use different search terms."
 msgstr ""
+
+#: ../../../modules/websearch/lib/search_engine.py:2596
+#: ../../../modules/websearch/lib/search_engine.py:2619
+#: ../../../modules/websearch/lib/search_engine.py:2626
+#: ../../../modules/websearch/lib/search_engine.py:2672
+msgid "The record has been deleted."
+msgstr "The record has been deleted."
+
+#: ../../../modules/websearch/lib/search_engine.py:3027
+#: ../../../modules/websearch/lib/websearch_templates.py:812
+#: ../../../modules/websearch/lib/websearch_templates.py:2343
+#: ../../../modules/websearch/lib/websearch_templates.py:2346
+#: ../../../modules/websearch/lib/websearch_templates.py:2349
+msgid "Detailed record"
+msgstr "Подробная запись"
+
+#: ../../../modules/websearch/lib/search_engine.py:3225
+msgid "No match within your time limits, discarding this condition..."
+msgstr ""
+"Не найден ни один результат в пределах данного временного интервала, отмена "
+"условия..."
+
+#: ../../../modules/websearch/lib/search_engine.py:3245
+msgid "No match within your search limits, discarding this condition..."
+msgstr ""
+"Не найден ни один результат для вашего ограничения поиска, отмена условия..."
 
 #: ../../../modules/websearch/lib/websearch_templates.py:206
 #: ../../../modules/websearch/lib/websearch_templates.py:310
@@ -1127,17 +1370,17 @@ msgstr "Указания для поиска"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:207
 #: ../../../modules/websearch/lib/websearch_templates.py:1294
-msgid "Advanced search"
-msgstr ""
+msgid "Advanced Search"
+msgstr "Расширенный Поиск"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:311
 #: ../../../modules/websearch/lib/websearch_templates.py:1236
-msgid "Simple search"
-msgstr ""
+msgid "Simple Search"
+msgstr "Простой Поиск"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:329
-msgid "Search options"
-msgstr ""
+msgid "Search options:"
+msgstr "Опции поиска:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:376
 #: ../../../modules/websearch/lib/websearch_templates.py:1372
@@ -1146,8 +1389,9 @@ msgstr "Добавлено с:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:377
 #: ../../../modules/websearch/lib/websearch_templates.py:1373
+#, fuzzy
 msgid "Until"
-msgstr ""
+msgstr "до:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:381
 #: ../../../modules/websearch/lib/websearch_templates.py:1412
@@ -1160,52 +1404,9 @@ msgid "Display results:"
 msgstr "Представить результаты:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:383
+#: ../../../modules/websearch/lib/websearch_templates.py:1414
 msgid "Output format:"
 msgstr "Формат представления:"
-
-#: ../../../modules/websearch/lib/websearch_templates.py:416
-msgid "All of the words:"
-msgstr "Все слова:"
-
-#: ../../../modules/websearch/lib/websearch_templates.py:418
-msgid "Any of the words:"
-msgstr "Любое из слов:"
-
-#: ../../../modules/websearch/lib/websearch_templates.py:420
-msgid "Exact phrase:"
-msgstr "Точная фраза:"
-
-#: ../../../modules/websearch/lib/websearch_templates.py:422
-msgid "Partial phrase:"
-msgstr "Часть фразы:"
-
-#: ../../../modules/websearch/lib/websearch_templates.py:424
-msgid "Regular expression:"
-msgstr "Регулярное выражение:"
-
-#: ../../../modules/websearch/lib/websearch_templates.py:466
-msgid "AND"
-msgstr "И"
-
-#: ../../../modules/websearch/lib/websearch_templates.py:467
-msgid "OR"
-msgstr "ИЛИ"
-
-#: ../../../modules/websearch/lib/websearch_templates.py:468
-msgid "AND NOT"
-msgstr "И НЕТ"
-
-#: ../../../modules/websearch/lib/websearch_templates.py:490
-msgid "any day"
-msgstr "любой день"
-
-#: ../../../modules/websearch/lib/websearch_templates.py:502
-msgid "any month"
-msgstr "любой месяц"
-
-#: ../../../modules/websearch/lib/websearch_templates.py:516
-msgid "Any year"
-msgstr ""
 
 #: ../../../modules/websearch/lib/websearch_templates.py:600
 msgid "restricted"
@@ -1230,13 +1431,6 @@ msgstr "Этот набор не содержит пока ни одной за�
 msgid "more"
 msgstr "ещё"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:812
-#: ../../../modules/websearch/lib/websearch_templates.py:2343
-#: ../../../modules/websearch/lib/websearch_templates.py:2346
-#: ../../../modules/websearch/lib/websearch_templates.py:2349
-msgid "Detailed record"
-msgstr "Подробная запись"
-
 #: ../../../modules/websearch/lib/websearch_templates.py:813
 #: ../../../modules/websearch/lib/websearch_templates.py:1988
 #: ../../../modules/websearch/lib/websearch_templates.py:2351
@@ -1257,8 +1451,9 @@ msgid "inside"
 msgstr ""
 
 #: ../../../modules/websearch/lib/websearch_templates.py:896
+#, fuzzy
 msgid "in any collection are:"
-msgstr ""
+msgstr "любой набор"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:999
 msgid "Hits"
@@ -1278,30 +1473,6 @@ msgstr "Попробуйте искать с..."
 msgid "collections"
 msgstr "наборы"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:1383
-msgid "results"
-msgstr "результаты"
-
-#: ../../../modules/websearch/lib/websearch_templates.py:1414
-msgid "Output format"
-msgstr ""
-
-#: ../../../modules/websearch/lib/websearch_templates.py:1418
-msgid "asc."
-msgstr "восх."
-
-#: ../../../modules/websearch/lib/websearch_templates.py:1421
-msgid "desc."
-msgstr "нисх."
-
-#: ../../../modules/websearch/lib/websearch_templates.py:1427
-msgid "single list"
-msgstr "один лист"
-
-#: ../../../modules/websearch/lib/websearch_templates.py:1430
-msgid "split by collection"
-msgstr "разделить по наборам"
-
 #: ../../../modules/websearch/lib/websearch_templates.py:1461
 msgid "MARC tag"
 msgstr ""
@@ -1311,7 +1482,12 @@ msgstr ""
 #: ../../../modules/websearch/lib/websearch_templates.py:1495
 #: ../../../modules/websearch/lib/websearch_templates.py:1499
 #: ../../../modules/websearch/lib/websearch_templates.py:1501
+#: ../../../modules/websearch/lib/websearch_templates.py:1506
+#: ../../../modules/websearch/lib/websearch_templates.py:1508
+#: ../../../modules/websearch/lib/websearch_templates.py:1510
+#: ../../../modules/websearch/lib/websearch_templates.py:1512
 #: ../../../modules/websearch/lib/websearch_templates.py:1515
+#: ../../../modules/websearch/lib/websearch_templates.py:1520
 #: ../../../modules/websearch/lib/websearch_templates.py:1524
 #: ../../../modules/websearch/lib/websearch_templates.py:1526
 #: ../../../modules/websearch/lib/websearch_templates.py:1534
@@ -1329,6 +1505,10 @@ msgstr ""
 #: ../../../modules/websearch/lib/websearch_templates.py:1584
 #: ../../../modules/websearch/lib/websearch_templates.py:1586
 #: ../../../modules/websearch/lib/websearch_templates.py:1588
+#: ../../../modules/websearch/lib/websearch_templates.py:1593
+#: ../../../modules/websearch/lib/websearch_templates.py:1595
+#: ../../../modules/websearch/lib/websearch_templates.py:1597
+#: ../../../modules/websearch/lib/websearch_templates.py:1599
 #: ../../../modules/websearch/lib/websearch_templates.py:1612
 #: ../../../modules/websearch/lib/websearch_templates.py:1615
 #: ../../../modules/websearch/lib/websearch_templates.py:1618
@@ -1339,8 +1519,8 @@ msgstr "в"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1629
 msgid ""
-"Haven't found what you were looking for?  Try your search on other servers:"
-msgstr "Haven't found what you were looking for?  Попробуйте искать с:"
+"Haven't found what you were looking for? Try your search on other servers:"
+msgstr "Haven't found what you were looking for? Попробуйте искать с:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1743
 #: ../../../modules/websearch/lib/websearch_templates.py:1748
@@ -1349,8 +1529,9 @@ msgid "<strong>%s</strong> records found"
 msgstr "<strong>%s</strong> найденных записей"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1794
+#, fuzzy
 msgid "begin"
-msgstr ""
+msgstr "записаться"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1802
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1152
@@ -1358,12 +1539,13 @@ msgid "previous"
 msgstr ""
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1822
+#, fuzzy
 msgid "end"
-msgstr ""
+msgstr "Повестка"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1841
-msgid "jump to record"
-msgstr ""
+msgid "jump to record:"
+msgstr "идти к записи:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1854
 msgid "Search took %.2f seconds."
@@ -1390,8 +1572,8 @@ msgid "People who downloaded this document also downloaded:"
 msgstr "People who downloaded this document also downloaded:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:2044
-msgid "People who viewed this page also viewed::"
-msgstr ""
+msgid "People who viewed this page also viewed:"
+msgstr "People who viewed this page also viewed:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:2091
 msgid ""
@@ -1405,10 +1587,31 @@ msgstr ""
 msgid ""
 "Boolean query returned no hits. Please combine your search terms differently."
 msgstr ""
+"Болеанный запрос не дал никакого результата. Пожалуйста сформулируйте ваш "
+"запрос иначе."
 
 #: ../../../modules/websearch/lib/websearch_templates.py:2167
 msgid "See also: similar author names"
 msgstr "Смотрите также: similar author names"
+
+#: ../../../modules/websearch/web/admin/websearchadmin.py:1049
+#: ../../../modules/websearch/web/index.py:53
+#: ../../../modules/websearch/web/index.py:121
+#: ../../../modules/webstyle/lib/webstyle_templates.py:493
+msgid "Internal Error"
+msgstr "Внутренная Ошибка"
+
+#: ../../../modules/websearch/web/index.py:65
+msgid "Collection %s Not Found"
+msgstr "Набор %s не существует"
+
+#: ../../../modules/websearch/web/index.py:66
+msgid ""
+"<p>Sorry, collection <strong>%s</strong> does not seem to exist. <p>You may "
+"want to start browsing from <a href=\"%s\">%s</a>."
+msgstr ""
+"<p>Извините, набор <strong>%s</strong> не существует. <p>Вы можете ещё раз "
+"начать с <a href=\"%s\">%s</a>."
 
 #: ../../../modules/websession/lib/webaccount.py:89
 msgid ""
@@ -1457,8 +1660,9 @@ msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:142
 #: ../../../modules/websession/lib/websession_templates.py:651
+#, fuzzy
 msgid "mandatory"
-msgstr ""
+msgstr "любой день"
 
 #: ../../../modules/websession/lib/websession_templates.py:143
 #: ../../../modules/websession/lib/websession_templates.py:653
@@ -1537,8 +1741,9 @@ msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:278
 #: ../../../modules/websession/lib/websession_templates.py:409
+#, fuzzy
 msgid "Your Searches"
-msgstr ""
+msgstr "Искать"
 
 #: ../../../modules/websession/lib/websession_templates.py:279
 msgid "View all the searches you performed during the last 30 days."
@@ -1546,8 +1751,9 @@ msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:280
 #: ../../../modules/websession/lib/websession_templates.py:406
+#, fuzzy
 msgid "Your Baskets"
-msgstr ""
+msgstr "корзины"
 
 #: ../../../modules/websession/lib/websession_templates.py:281
 msgid ""
@@ -1595,8 +1801,9 @@ msgid "Your Alert Searches"
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:410
+#, fuzzy
 msgid "Your Submissions"
-msgstr ""
+msgstr "записи"
 
 #: ../../../modules/websession/lib/websession_templates.py:411
 msgid ""
@@ -1605,13 +1812,15 @@ msgid ""
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:415
+#, fuzzy
 msgid "your submissions"
-msgstr ""
+msgstr "записи"
 
 #: ../../../modules/websession/lib/websession_templates.py:418
 #: ../../../modules/websubmit/web/yourapprovals.py:84
+#, fuzzy
 msgid "Your Approvals"
-msgstr ""
+msgstr "подтверждения"
 
 #: ../../../modules/websession/lib/websession_templates.py:419
 msgid ""
@@ -1620,8 +1829,9 @@ msgid ""
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:423
+#, fuzzy
 msgid "your approvals"
-msgstr ""
+msgstr "подтверждения"
 
 #: ../../../modules/websession/lib/websession_templates.py:426
 #: ../../../modules/websession/web/youraccount.py:253
@@ -1726,8 +1936,9 @@ msgid "You are not authorized to access administrative functions."
 msgstr ""
 
 #: ../../../modules/websession/lib/websession_templates.py:694
+#, fuzzy
 msgid "You seem to be <em>%s</em>."
-msgstr ""
+msgstr "Искомый термин <em>%s</em>"
 
 #: ../../../modules/websession/lib/websession_templates.py:695
 msgid "Here are some interesting web admin links for you:"
@@ -1778,27 +1989,31 @@ msgid "session"
 msgstr "сеанс"
 
 #: ../../../modules/websession/lib/websession_templates.py:755
-#: ../../../modules/websession/lib/websession_templates.py:768
+#: ../../../modules/websession/lib/websession_templates.py:769
 msgid "alerts"
 msgstr "сообщения"
 
-#: ../../../modules/websession/lib/websession_templates.py:767
+#: ../../../modules/websession/lib/websession_templates.py:768
 msgid "account"
 msgstr "счёт"
 
-#: ../../../modules/websession/lib/websession_templates.py:775
+#: ../../../modules/websession/lib/websession_templates.py:770
+msgid "messages"
+msgstr ""
+
+#: ../../../modules/websession/lib/websession_templates.py:777
 msgid "submissions"
 msgstr "записи"
 
-#: ../../../modules/websession/lib/websession_templates.py:781
+#: ../../../modules/websession/lib/websession_templates.py:783
 msgid "approvals"
 msgstr "подтверждения"
 
-#: ../../../modules/websession/lib/websession_templates.py:787
+#: ../../../modules/websession/lib/websession_templates.py:789
 msgid "administration"
 msgstr "администрация"
 
-#: ../../../modules/websession/lib/websession_templates.py:792
+#: ../../../modules/websession/lib/websession_templates.py:794
 msgid "logout"
 msgstr "выход"
 
@@ -1809,8 +2024,9 @@ msgstr ""
 
 #: ../../../modules/websession/web/youraccount.py:76
 #: ../../../modules/websession/web/youraccount.py:95
+#, fuzzy
 msgid "Show account"
-msgstr ""
+msgstr "счёт"
 
 #: ../../../modules/websession/web/youraccount.py:80
 msgid "Login method successfully selected."
@@ -1897,14 +2113,16 @@ msgid "Delete Account"
 msgstr ""
 
 #: ../../../modules/websession/web/youraccount.py:290
+#, fuzzy
 msgid "Logout"
-msgstr ""
+msgstr "выход"
 
 #: ../../../modules/websession/web/youraccount.py:311
 #: ../../../modules/websession/web/youraccount.py:340
 #: ../../../modules/websession/web/youraccount.py:341
+#, fuzzy
 msgid "Login"
-msgstr ""
+msgstr "записаться"
 
 #: ../../../modules/websession/web/youraccount.py:360
 msgid "Register"
@@ -1958,8 +2176,9 @@ msgstr "Главная страница"
 
 #: ../../../modules/webstyle/lib/webstyle_templates.py:150
 #: ../../../modules/webstyle/lib/webstyle_templates.py:384
+#, fuzzy
 msgid "Last updated:"
-msgstr ""
+msgstr "Последнее изменение"
 
 #: ../../../modules/webstyle/lib/webstyle_templates.py:343
 #: ../../../modules/webstyle/lib/webstyle_templates.py:416
@@ -1992,15 +2211,13 @@ msgstr "Поддерживает"
 msgid "This site is also available in the following languages:"
 msgstr "Этот сайт также доступен на следующих языках:"
 
-#: ../../../modules/webstyle/lib/webstyle_templates.py:493
-msgid "Internal Error"
-msgstr "Внутренная Ошибка"
-
 #: ../../../modules/webstyle/lib/webstyle_templates.py:570
 msgid ""
 "Please contact <a href=\"mailto:%s\">%s</a> quoting the following "
 "information:"
 msgstr ""
+"Пожалуйста свяжитесь с <a href=\"mailto:%s\">%s</a> и укажите следующую "
+"информацию:"
 
 #: ../../../modules/websubmit/lib/websubmit_engine.py:77
 #: ../../../modules/websubmit/lib/websubmit_engine.py:485
@@ -2043,8 +2260,9 @@ msgid "unknown type of document"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_engine.py:620
+#, fuzzy
 msgid "this action does not apply on this type of document"
-msgstr ""
+msgstr "Этот набор не содержит пока ни одной записи."
 
 #: ../../../modules/websubmit/lib/websubmit_engine.py:901
 msgid "Cannot find document %s"
@@ -2111,8 +2329,9 @@ msgid "previous page"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:503
+#, fuzzy
 msgid "Submission no(1)"
-msgstr ""
+msgstr "записи"
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:517
 msgid "next page"
@@ -2165,8 +2384,9 @@ msgid "end of action"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:918
+#, fuzzy
 msgid "Submission no"
-msgstr ""
+msgstr "записи"
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:984
 msgid ""
@@ -2179,8 +2399,9 @@ msgid "Function"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:990
+#, fuzzy
 msgid "Score"
-msgstr ""
+msgstr "ещё"
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:991
 msgid "Running Function"
@@ -2215,8 +2436,9 @@ msgid "see"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1163
+#, fuzzy
 msgid "version"
-msgstr ""
+msgstr "сеанс"
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1335
 msgid "For"
@@ -2294,14 +2516,16 @@ msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1630
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1668
+#, fuzzy
 msgid "approved"
-msgstr ""
+msgstr "подтверждения"
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1636
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1670
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1671
+#, fuzzy
 msgid "rejected"
-msgstr ""
+msgstr "ограничено"
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1664
 msgid "Key"
@@ -2329,8 +2553,9 @@ msgid "Click on a report number to have more information"
 msgstr ""
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1730
+#, fuzzy
 msgid "Report Number"
-msgstr ""
+msgstr "сентябрь"
 
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1731
 msgid "Pending"

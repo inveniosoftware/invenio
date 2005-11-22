@@ -17,7 +17,7 @@
 
 LANGUAGES = ca cs de el en es fr it no pt ru sk sv uk
 
-FILES = `find $(top_srcdir)/modules "("  -name "*.py" -or -name "*.wml" ")" -a -not "(" -name '*.php.wml' -o -name '*.html.wml' -o -wholename "*/miscutil/i18n/*" ")"`
+FILES = `find $(top_srcdir)/modules "("  -name "*.py" -o -name "*.wml" -o -name "*.in" ")" -a -not "(" -name '*.php.wml' -o -name '*.html.wml' -o -wholename "*/miscutil/i18n/*" -o -name "Makefile.in" ")"`
 
 MO = $(LANGUAGES:%=%.mo)
 
