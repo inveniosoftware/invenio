@@ -50,8 +50,9 @@ def write_coordinates_in_tmp_file(lists_coordinates):
     With gnuplot, first column is used as  x coordinates, and second column as y coordinates.
     One set represents a curve in the graph.
     """
-    max_y_datas = 0 
-    tempfile.tempdir = webdir + "/img" 
+    max_y_datas = 0
+    #print "list coordonee " + str(lists_coordinates)
+    tempfile.tempdir = webdir + "img" 
     fname = tempfile.mktemp() 
     file_dest = open(fname, 'a') 
     for list_elem in lists_coordinates: 
@@ -65,8 +66,9 @@ def write_coordinates_in_tmp_file(lists_coordinates):
             max_tmp = max(y_axe) 
         if max_tmp > max_y_datas: 
             max_y_datas = max_tmp 
-        file_dest.write("\n\n") 
+        file_dest.write("\n\n")
     file_dest.close()
+
     return [fname, max_y_datas] 
  
 def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, origin_tuple, y_max, docid_list, graphe_titles, intervals):
@@ -86,7 +88,7 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
     y_max          - Max value of y. Used to set y range.
     docid_list     - In download_history case, docid_list is used to plot multiple curves.
     graphe_titles  - List of graph titles. It's used to name the curve in the legend.
-    intervals      - x tics location"""
+    intervals      - x tics location and xrange specification"""
     
     if cfg_gnuplot_available==0: 
         return (None, None)
@@ -118,29 +120,40 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
     #Will be passed to g at the end to plot the graphe 
     plot_text = "" 
      
-    if kind_of_graphe == 'download_history': 
+    if kind_of_graphe == 'download_history':
         g('set xdata time') #Set x scale as date 
         g('set timefmt "%m/%Y"') #Inform about format in file .dat 
-        g('set format x "%b %y"') #Format displaying 
-        g('set xrange ["%s":"%s"]' % (intervals[0], intervals[len_intervals-1])) 
+        g('set format x "%b %y"') #Format displaying
+        if len(intervals) > 1 :
+            g('set xrange ["%s":"%s"]' % (intervals[0], intervals[len_intervals-1])) 
         y_offset = max(3, float(y_max)/60)
         g('set yrange [0:%s]' %str(y_max + y_offset))
         if len_intervals > 1 and len_intervals <= 12: 
-            g('set xtics rotate %s' % str(tuple(intervals)))#to prevent duplicate tics 
+            g('set xtics rotate %s' % str(tuple(intervals)))#to prevent duplicate tics
         elif len_intervals > 12 and len_intervals <= 24: 
-            g('set xtics rotate "%s", 7776000, "%s"' % (intervals[0], intervals[len_intervals-1]))#3 months intervalls 
+            g('set xtics rotate "%s", 7776000, "%s"' % (intervals[0], intervals[len_intervals-1]))            #3 months intervalls 
         else :
-            g('set xtics rotate "%s", 15552000, "%s"' % (intervals[0], intervals[len_intervals-1]))#6 months intervalls 
+            g('set xtics rotate "%s",15552000, "%s"' % (intervals[0], intervals[len_intervals-1]))            #6 months intervalls 
              
-        if len_docid_list <= 1: #Only one curve represented as boxes 
-            g('set style fill solid 0.25') 
-            plot_text = plot_command(1, data_file, (0, 0), "", "steps", color_line_list[0], 3) 
-        elif len_docid_list > 1: #Multiple curves 
-            plot_text = plot_command(1, data_file, (0, 0), graphe_titles[0], "linespoints", color_line_list[0], 1, "pt 26", "ps 0.5") 
-            for d in range(1, len_docid_list): 
-                plot_text += plot_command(0, data_file, (d, d) , graphe_titles[d], "linespoints", color_line_list[d], 1, "pt 26", "ps 0.5") 
-            plot_text += plot_command(0, data_file, (len_docid_list, len_docid_list), "", "impulses", 0, 2 ) 
-            plot_text += plot_command(0, data_file, (len_docid_list, len_docid_list), "TOTAL", "lines", 0, 5) 
+        if len_docid_list <= 1: #Only one curve
+            #g('set style fill solid 0.25') 
+            if len(intervals)<=4:
+                plot_text = plot_command(1, data_file, (0, 0), "", "imp", color_line_list[0], 20)
+            else:
+                plot_text = plot_command(1, data_file, (0, 0), "", "linespoint", color_line_list[0], 1, "pt 26", "ps 0.5")
+        elif len_docid_list > 1: #Multiple curves
+            if len(intervals)<=4:
+                plot_text = plot_command(1, data_file, (0, 0), graphe_titles[0], "imp", color_line_list[0], 20)
+            else:
+                plot_text = plot_command(1, data_file, (0, 0), graphe_titles[0], "linespoint", color_line_list[0], 1, "pt 26", "ps 0.5")
+            for d in range(1, len_docid_list):
+                if len(intervals)<=4:
+                    plot_text += plot_command(0, data_file, (d, d) , graphe_titles[d], "imp", color_line_list[d], 20)
+                else :
+                    plot_text += plot_command(0, data_file, (d, d) , graphe_titles[d], "linespoint", color_line_list[d], 1, "pt 26", "ps 0.5")
+            if len(intervals)>2:
+                plot_text += plot_command(0, data_file, (len_docid_list, len_docid_list), "", "impulses", 0, 2 ) 
+                plot_text += plot_command(0, data_file, (len_docid_list, len_docid_list), "TOTAL", "lines", 0, 5) 
              
     elif kind_of_graphe == 'download_users': 
         g('set size 0.25,0.5') 
@@ -187,12 +200,7 @@ def plot_command(first_line, file_source, indexes, title, style, line_type, line
     point_type   - optionnal parameter: if not mentionned it's a wide string.
                    Using in the case of style = linespoints to set point style"""
     if first_line: 
-        plot_text = """plot "%s" index %s:%s using 1:2 title "%s" with %s lt %s lw %s %s %s"""  % \ 
-                    (file_source, indexes[0], indexes[1], title, style, line_type, line_width, point_type, point_size) 
+        plot_text = """plot "%s" index %s:%s using 1:2 title "%s" with %s lt %s lw %s %s %s"""  % (file_source, indexes[0], indexes[1], title, style, line_type, line_width, point_type, point_size) 
     else: 
-        plot_text = """, "%s" index %s:%s using 1:2 title "%s" with %s lt %s lw %s %s %s"""  % \ 
-                    (file_source, indexes[0], indexes[1], title, style, line_type, line_width, point_type, point_size) 
+        plot_text = """, "%s" index %s:%s using 1:2 title "%s" with %s lt %s lw %s %s %s"""  % (file_source, indexes[0], indexes[1], title, style, line_type, line_width, point_type, point_size) 
     return plot_text 
- 
- 
-
