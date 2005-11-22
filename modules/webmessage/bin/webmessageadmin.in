@@ -67,7 +67,7 @@ def main():
     elif alen > 1 and sys.argv[1] in ["-V", "--version"]:
         print __version__
         sys.exit(0)    
-    if alen != 2 or sys.argv[1] not in ['clean', 'send']: 
+    if alen != 2 or sys.argv[1] not in ['clean']: 
         usage(1)
 
     # getting input from user
@@ -91,20 +91,8 @@ def main():
     if sys.argv[1] == 'clean':
         cleaned = clean_messages()
         print 'Database cleaned. %i suppressed messages' % int(cleaned)
-    elif sys.argv[1] == 'send':
-        send(user)
 
     return perform
-
-
-def send(user):
-    try:
-        usernames = raw_input('To usernames (comma separated): ')
-        groupnames = raw_input('To groupnames (comma separated): ')
-        subject = raw_input('Subject: ')
-        body = raw_input('Message: ')
-    except KeyboardInterrupt:
-        print 'Interrupt. Your message was not sent'
 
 
 if __name__ == '__main__':
