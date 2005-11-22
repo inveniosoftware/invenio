@@ -71,9 +71,23 @@ def calculate_citation_graphe_x_coordinates(recid):
     recordyear = get_field_values(recid, '773__y')
     if not recordyear: recordyear = get_field_values(recid, '260__c')
     currentyear = time.localtime()[0]
-    interval = range(int(recordyear[0]), currentyear+1)
+    if recordyear == []:
+        recordyear = currentyear
+    else:
+        recordyear = find_year(recordyear[0])
+    interval = range(int(recordyear), currentyear+1)
     return interval
 
+def find_year(recordyear):
+    """find the year in the string as a suite of 4 int"""
+    s = ""
+    for i in range(len(recordyear)-3):
+        s = recordyear[i:i+4]
+        if s.isalnum():
+            print s
+            break
+    return s
+    
 def get_initial_result(rec_years):
     """return an initial dictionary with year of record publication as key
        and zero as value
