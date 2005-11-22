@@ -741,7 +741,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = """<img src="%s/img/head.gif" border="0" alt="User">""" % weburl
+        out = """<img src="%s/img/head.gif" border="0" alt="">""" % weburl
         if guest:
             out += """%(guest_msg)s ::
     	       <a class="userinfo" href="%(weburl)s/youraccount.py/display?ln=%(ln)s">%(session)s</a> ::
@@ -760,12 +760,14 @@ class Template:
             out += """%(email)s ::
     	       <a class="userinfo" href="%(weburl)s/youraccount.py/display?ln=%(ln)s">%(account)s</a> ::
                    <a class="userinfo" href="%(weburl)s/youralerts.py/list?ln=%(ln)s">%(alerts)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/yourbaskets.py/display?ln=%(ln)s">%(baskets)s</a> :: """ % {
+                   <a class="userinfo" href="%(weburl)s/yourmessages.py/display?ln=%(ln)s">%(messages)s</a> ::
+		   <a class="userinfo" href="%(weburl)s/yourbaskets.py/display?ln=%(ln)s">%(baskets)s</a> :: """ % {
                      'email' : email,
                      'weburl' : weburl,
                      'ln' : ln,
                      'account' : _("account"),
                      'alerts' : _("alerts"),
+		     'messages': _("messages"),
                      'baskets' : _("baskets"),
                    }
             if submitter:
