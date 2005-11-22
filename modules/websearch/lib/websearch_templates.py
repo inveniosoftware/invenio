@@ -1636,11 +1636,11 @@ class Template:
 
     def tmpl_search_pagestart(self, ln) :
         "page start for search page. Will display after the page header"
-        return """<div class="pagebody">"""
+        return """<div class="pagebody"><div class="pagebodystripemiddle">"""
 
     def tmpl_search_pageend(self, ln) :
         "page end for search page. Will display just before the page footer"
-        return """</div>"""
+        return """</div></div>"""
 
     def tmpl_print_warning(self, msg, type, prologue, epilogue):
         """Prints warning message and flushes output.
