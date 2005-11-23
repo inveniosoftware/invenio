@@ -53,20 +53,20 @@ def create_download_history_graph_and_box(id_bibrec, ln=cdslang):
         users_analysis_text = "and Users repartition"
         #remove images older than 10 minutes
         remove_old_img("download")
-        #Users analysis graphe
+        #Users analysis graph
         ips = database_tuples_to_single_list(run_sql("select client_host from rnkDOWNLOADS where id_bibrec=%s;" % id_bibrec))
         if ips == []:
             pass
         else :
             users_analysis_results = create_users_analysis_graph(id_bibrec, ips)
-            graphe_file_users = weburl + "/img/"  + users_analysis_results[0]
+            graph_file_users = weburl + "/img/"  + users_analysis_results[0]
             file_to_close_users = users_analysis_results[1]      
-            html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graphe_file_users
+            html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graph_file_users
             if file_to_close_users:
                 if os.path.exists(file_to_close_users):
                     os.unlink(file_to_close_users)
     
-    #Downloads history graphe and return html code used by get_file or search_engine
+    #Downloads history graph and return html code used by get_file or search_engine
     if cfg_bibrank_print_download_history:
         remove_old_img("download")
         nb_id_bibdoc = run_sql("select distinct id_bibdoc from rnkDOWNLOADS where id_bibrec=%s;" % id_bibrec)
@@ -78,7 +78,6 @@ def create_download_history_graph_and_box(id_bibrec, ln=cdslang):
         else:
             history_analysis_results = draw_downloads_statistics(id_bibrec, [])
         if history_analysis_results:
-            ###return str(history_analysis_results) (none,none)
             graph_file_history = weburl + "/img/" + history_analysis_results[0]
             file_to_close_history = history_analysis_results[1]
             html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graph_file_history
@@ -115,7 +114,7 @@ def draw_downloads_statistics(id_bibrec, id_bibdoc_list):
     creation_date_res = run_sql("""SELECT DATE_FORMAT(creation_date,"%%Y-%%m-%%d-%%H:%%i:%%s") FROM bibrec WHERE id=%s;""" % id_bibrec)
     if creation_date_res == ():
         creation_date_res = run_sql("""SELECT DATE_FORMAT(MIN(download_time),"%%Y-%%m-%%d-%%H:%%i:%%s") FROM rnkDOWNLOADS where id_bibrec=%s;""" % id_bibrec)
-    creation_date_year, creation_date_month, creation_date_day,creation_date_time = string.split(creation_date_res[0][0], "-")
+    creation_date_year, creation_date_month, creation_date_day, creation_date_time = string.split(creation_date_res[0][0], "-")
     creation_date_year = string.atoi(creation_date_year)
     creation_date_month = string.atoi(creation_date_month)
     creation_date_day = string.atoi(creation_date_day)
@@ -123,7 +122,6 @@ def draw_downloads_statistics(id_bibrec, id_bibdoc_list):
         
     #create intervals and corresponding values
     local_time = time.localtime()
-    #local_time = time.localtime(time.mktime((2006, 04, 15, 9, 5, 3, 1, 319, 0)))
     res = create_tic_intervals(local_time, creation_date_year, creation_date_month)
     intervals = res[1]
     tic_list = res[0]
@@ -134,7 +132,6 @@ def draw_downloads_statistics(id_bibrec, id_bibdoc_list):
     else :
         for i in range(len(id_bibdoc_list)):
             datas = create_list_tuple_data(intervals, id_bibrec, id_bibdoc_query_addition="and id_bibdoc=%s" % id_bibdoc_list[i][0])
-            #print "datas" + str(datas)
             coordinates_list.append(datas)
             docfile_name_list.append(run_sql("select docname from bibdoc where id=%s;" % id_bibdoc_list[i][0])[0][0])
         #In case of multiple id_bibdocs datas_max will be used to draw a line which is the total of the others lines 
@@ -147,26 +144,23 @@ def draw_downloads_statistics(id_bibrec, id_bibdoc_list):
     fname = result2[0]
     y_max = result2[1]
     #Use create the graph from the temporary file
-    return create_temporary_image(id_bibrec, 'download_history', fname, '', 'Downloads/month', (0, 0),y_max, id_bibdoc_list, docfile_name_list,tic_list)
+    return create_temporary_image(id_bibrec, 'download_history', fname, '', 'Downloads/month', (0, 0), y_max, id_bibdoc_list, docfile_name_list, tic_list)
     
 def create_list_tuple_data(intervals, id_bibrec, id_bibdoc_query_addition=""):
     """-Return a list of tuple of the form [('10/2004',3),(..)] used to plot graph
         Where 3 is the number of downloads between 01/10/2004 and 31/10/2004"""    
     list_tuple = []
-    start_of_month = '01'
-    text = "-%s 00:00:00" % (start_of_month)
     for elem in intervals:
         main_date_end = string.split(elem[1], '/')
-        end_of_month_end = calendar.monthrange(string.atoi(main_date_end[1]),string.atoi(main_date_end[0]))[1]
-        s0 = string.split(elem[0],"/")
-        s1 = string.split(elem[1],"/")
+        end_of_month_end = calendar.monthrange(string.atoi(main_date_end[1]), string.atoi(main_date_end[0]))[1]
+        s0 = string.split(elem[0], "/")
+        s1 = string.split(elem[1], "/")
         elem0 = s0[1] + "-" + s0[0]
         elem1 = s1[1] + "-" + s1[0]
-        date1 = "%s%s" % (elem0,"-01 00:00:00")
-        date2 = "%s%s" % (elem1,"-%s 00:00:00" % str(end_of_month_end))
-        q = "select count(*) from rnkDOWNLOADS where id_bibrec=%s %s and download_time>='%s' and download_time<'%s';" % (id_bibrec, id_bibdoc_query_addition, date1, date2)
-        print q
-        res = run_sql(q)[0][0]
+        date1 = "%s%s" % (elem0, "-01 00:00:00")
+        date2 = "%s%s" % (elem1, "-%s 00:00:00" % str(end_of_month_end))
+        sql_query = "select count(*) from rnkDOWNLOADS where id_bibrec=%s %s and download_time>='%s' and download_time<'%s';" % (id_bibrec, id_bibdoc_query_addition, date1, date2)
+        res = run_sql(sql_query)[0][0]
         list_tuple.append((elem[0], res))
     #list_tuple = sort_list_tuple_by_date(list_tuple)
     return (list_tuple)
@@ -216,43 +210,43 @@ def create_tic_intervals(local_time, creation_date_year, creation_date_month):
     while (creation_date_year, creation_date_month) <= (local_year, local_month) and creation_date_month <= 12:
         date_elem = "%s/%s" % (creation_date_month, creation_date_year)
         tic_list.append(date_elem)
-        #print "date_elem" + date_elem
-        interval_list.append((date_elem,date_elem))
+        interval_list.append((date_elem, date_elem))
         if creation_date_month != 12:
-                creation_date_month = creation_date_month+1
+            creation_date_month = creation_date_month+1
         else :
-                creation_date_year = creation_date_year+1
-                creation_date_month = 1
+            creation_date_year = creation_date_year+1
+            creation_date_month = 1
 
-        next_period = (creation_date_month,creation_date_year)
+        next_period = (creation_date_month, creation_date_year)
         
         #additional periods for the short period
     
     if len(interval_list) <= 2:
-        #print len(interval_list)
-        period_before = "%s/%s" % (sub_month(original_date[0],original_date[1]))
+        period_before = "%s/%s" % (sub_month(original_date[0], original_date[1]))
         period_after = "%s/%s" % next_period
-        interval_list.insert(0,(period_before,period_before))
-        interval_list.append((period_after,period_after))
+        interval_list.insert(0, (period_before, period_before))
+        interval_list.append((period_after, period_after))
         tic_list.insert(0, period_before)
         tic_list.append(period_after)
     return (tic_list, interval_list)
 
-def add_month(month,year):
+def add_month(month, year):
+    """Add a month and increment the year if necessary"""
     if month == 12:
         month = 1
         year += 1
     else  :
         month += 1
-    return (month,year)
+    return (month, year)
 
 def sub_month(month, year):
+    """Add a month and decrease the year if necessary"""
     if month == 1:
         month = 12
         year = year -1
     else :
         month -= 1
-    return (month,year)
+    return (month, year)
 
 def create_users_analysis_graph(id_bibrec, ips):
     """For a given id_bibrec, classify cern users and other users
@@ -272,7 +266,7 @@ def create_users_analysis_graph(id_bibrec, ips):
     coordinates_list.append((3, str(float(other_users)/tot*100)))
     #write coordinates in a temporary file 
     result2 = write_coordinates_in_tmp_file([coordinates_list])
-    #plot the graphe
+    #plot the graph
     return create_temporary_image(id_bibrec, 'download_users', result2[0], '', '', (0, 0), result2[1], [], [], [1, 3])
 
 
