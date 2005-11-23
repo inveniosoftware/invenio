@@ -19,9 +19,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
-    title="<MSG_SEARCH_HELP>" \
+    title="_(Search Help)_" \
     navbar_name="search-new" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a>" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>>_(Help Central)_</a>" \
     navbar_select="tips"
 
 <es>
@@ -29,14 +29,15 @@
    <thead>
    <tr>
    <th class="errorboxheader">
-     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+     _(ENGLISH TRANSLATION UNDER WAY)_
    </th>
    </tr>
    </thead>
    <tbody>
    <tr>
    <td class="errorboxbody">
-     <MSG_PAGE_BEING_TRANSLATED_BODY>
+     _(At the moment the English version of this page isn't available
+       yet. Please use the version presented below. Thanks for your understanding.)_
    </td>
    </tr>
    </tbody>
@@ -47,14 +48,15 @@
    <thead>
    <tr>
    <th class="errorboxheader">
-     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+     _(ENGLISH TRANSLATION UNDER WAY)_
    </th>
    </tr>
    </thead>
    <tbody>
    <tr>
    <td class="errorboxbody">
-     <MSG_PAGE_BEING_TRANSLATED_BODY>
+     _(At the moment the English version of this page isn't available
+       yet. Please use the version presented below. Thanks for your understanding.)_
    </td>
    </tr>
    </tbody>
@@ -65,14 +67,15 @@
    <thead>
    <tr>
    <th class="errorboxheader">
-     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+     _(ENGLISH TRANSLATION UNDER WAY)_
    </th>
    </tr>
    </thead>
    <tbody>
    <tr>
    <td class="errorboxbody">
-     <MSG_PAGE_BEING_TRANSLATED_BODY>
+     _(At the moment the English version of this page isn't available
+       yet. Please use the version presented below. Thanks for your understanding.)_
    </td>
    </tr>
    </tbody>
@@ -83,14 +86,15 @@
    <thead>
    <tr>
    <th class="errorboxheader">
-     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+     _(ENGLISH TRANSLATION UNDER WAY)_
    </th>
    </tr>
    </thead>
    <tbody>
    <tr>
    <td class="errorboxbody">
-     <MSG_PAGE_BEING_TRANSLATED_BODY>
+     _(At the moment the English version of this page isn't available
+       yet. Please use the version presented below. Thanks for your understanding.)_
    </td>
    </tr>
    </tbody>
@@ -116,7 +120,7 @@
 <blockquote>
 <dl>
 
-<dt><a href="<lang:star: tips.*.html>"><MSG_SEARCH_TIPS></a>
+<dt><a href="<lang:star: tips.*.html>">_(Search Tips)_</a>
 
 <dd>
     <en>

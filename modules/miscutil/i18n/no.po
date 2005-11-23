@@ -26,6 +26,102 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 
+#: ../../../modules/websearch/doc/admin/guide.html.wml:23
+#: ../../../modules/websession/lib/websession_templates.py:715
+msgid "Admin Area"
+msgstr "Administratorområde"
+
+#: ../../../modules/websearch/doc/index.html.wml:123
+#: ../../../modules/websearch/doc/tips.html.wml:22
+#: ../../../modules/websearch/lib/websearch_templates.py:206
+#: ../../../modules/websearch/lib/websearch_templates.py:310
+#: ../../../modules/websearch/lib/websearch_templates.py:1231
+#: ../../../modules/websearch/lib/websearch_templates.py:1289
+msgid "Search Tips"
+msgstr "Søketips"
+
+#: ../../../modules/websearch/doc/guide.html.wml:32
+#: ../../../modules/websearch/doc/guide.html.wml:51
+#: ../../../modules/websearch/doc/guide.html.wml:70
+#: ../../../modules/websearch/doc/guide.html.wml:89
+#: ../../../modules/websearch/doc/guide.html.wml:108
+#: ../../../modules/websearch/doc/guide.html.wml:127
+#: ../../../modules/websearch/doc/guide.html.wml:146
+#: ../../../modules/websearch/doc/guide.html.wml:165
+#: ../../../modules/websearch/doc/guide.html.wml:184
+#: ../../../modules/websearch/doc/guide.html.wml:203
+#: ../../../modules/websearch/doc/guide.html.wml:222
+#: ../../../modules/websearch/doc/guide.html.wml:241
+#: ../../../modules/websearch/doc/guide.html.wml:260
+#: ../../../modules/websearch/doc/index.html.wml:32
+#: ../../../modules/websearch/doc/index.html.wml:51
+#: ../../../modules/websearch/doc/index.html.wml:70
+#: ../../../modules/websearch/doc/index.html.wml:89
+#: ../../../modules/websearch/doc/tips.html.wml:32
+#: ../../../modules/websearch/doc/tips.html.wml:51
+#: ../../../modules/websearch/doc/tips.html.wml:70
+#: ../../../modules/websearch/doc/tips.html.wml:89
+#: ../../../modules/websearch/doc/tips.html.wml:108
+#: ../../../modules/websearch/doc/tips.html.wml:127
+#: ../../../modules/websearch/doc/tips.html.wml:146
+#: ../../../modules/websearch/doc/tips.html.wml:165
+#: ../../../modules/websearch/doc/tips.html.wml:184
+#: ../../../modules/websearch/doc/tips.html.wml:203
+#: ../../../modules/websearch/doc/tips.html.wml:222
+#: ../../../modules/websearch/doc/tips.html.wml:241
+#: ../../../modules/websearch/doc/tips.html.wml:260
+msgid "ENGLISH TRANSLATION UNDER WAY"
+msgstr "NORSK OVERSETTELSE UNDERVEIS"
+
+#: ../../../modules/websearch/doc/guide.html.wml:24
+#: ../../../modules/websearch/doc/index.html.wml:24
+#: ../../../modules/websearch/doc/tips.html.wml:24
+msgid "Help Central"
+msgstr "Hjelpesentral"
+
+#: ../../../modules/websearch/doc/guide.html.wml:39
+#: ../../../modules/websearch/doc/guide.html.wml:58
+#: ../../../modules/websearch/doc/guide.html.wml:77
+#: ../../../modules/websearch/doc/guide.html.wml:96
+#: ../../../modules/websearch/doc/guide.html.wml:115
+#: ../../../modules/websearch/doc/guide.html.wml:134
+#: ../../../modules/websearch/doc/guide.html.wml:153
+#: ../../../modules/websearch/doc/guide.html.wml:172
+#: ../../../modules/websearch/doc/guide.html.wml:191
+#: ../../../modules/websearch/doc/guide.html.wml:210
+#: ../../../modules/websearch/doc/guide.html.wml:229
+#: ../../../modules/websearch/doc/guide.html.wml:248
+#: ../../../modules/websearch/doc/guide.html.wml:267
+#: ../../../modules/websearch/doc/index.html.wml:39
+#: ../../../modules/websearch/doc/index.html.wml:58
+#: ../../../modules/websearch/doc/index.html.wml:77
+#: ../../../modules/websearch/doc/index.html.wml:96
+#: ../../../modules/websearch/doc/tips.html.wml:39
+#: ../../../modules/websearch/doc/tips.html.wml:58
+#: ../../../modules/websearch/doc/tips.html.wml:77
+#: ../../../modules/websearch/doc/tips.html.wml:96
+#: ../../../modules/websearch/doc/tips.html.wml:115
+#: ../../../modules/websearch/doc/tips.html.wml:134
+#: ../../../modules/websearch/doc/tips.html.wml:153
+#: ../../../modules/websearch/doc/tips.html.wml:172
+#: ../../../modules/websearch/doc/tips.html.wml:191
+#: ../../../modules/websearch/doc/tips.html.wml:210
+#: ../../../modules/websearch/doc/tips.html.wml:229
+#: ../../../modules/websearch/doc/tips.html.wml:248
+#: ../../../modules/websearch/doc/tips.html.wml:267
+msgid ""
+"At the moment the English version of this page isn't available yet. Please "
+"use the version presented below. Thanks for your understanding."
+msgstr ""
+"For øyeblikket er ikke den norske oversettelsen klar. Vennligst bruk "
+"versjonen som er presentert under."
+
+#: ../../../modules/websearch/doc/guide.html.wml:24
+#: ../../../modules/websearch/doc/index.html.wml:22
+#: ../../../modules/websearch/doc/tips.html.wml:24
+msgid "Search Help"
+msgstr "Søkehjelp"
+
 #: ../../../modules/bibharvest/lib/bibharvest_templates.py:51
 #: ../../../modules/bibharvest/lib/bibharvest_templates.py:69
 #, fuzzy
@@ -1358,13 +1454,6 @@ msgstr "Ingen treff innen angitt tidsbegrensning, forkaster dette kriteriet..."
 msgid "No match within your search limits, discarding this condition..."
 msgstr "Ingen treff innen dine søkebegrensninger, forkaster dette kriteriet..."
 
-#: ../../../modules/websearch/lib/websearch_templates.py:206
-#: ../../../modules/websearch/lib/websearch_templates.py:310
-#: ../../../modules/websearch/lib/websearch_templates.py:1231
-#: ../../../modules/websearch/lib/websearch_templates.py:1289
-msgid "Search Tips"
-msgstr "Søketips"
-
 #: ../../../modules/websearch/lib/websearch_templates.py:207
 #: ../../../modules/websearch/lib/websearch_templates.py:1294
 msgid "Advanced Search"
@@ -1972,10 +2061,6 @@ msgstr ""
 #: ../../../modules/websession/lib/websession_templates.py:714
 msgid "For more admin-level activities, see the complete %(admin_area)s"
 msgstr ""
-
-#: ../../../modules/websession/lib/websession_templates.py:715
-msgid "Admin Area"
-msgstr "Administratorområde"
 
 #: ../../../modules/websession/lib/websession_templates.py:753
 msgid "guest"

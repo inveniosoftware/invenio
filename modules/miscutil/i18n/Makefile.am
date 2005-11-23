@@ -17,7 +17,9 @@
 
 LANGUAGES = ca cs de el en es fr it no pt ru sk sv uk
 
-FILES = `find $(top_srcdir)/modules "("  -name "*.py" -o -name "*.wml" -o -name "*.in" ")" -a -not "(" -name '*.php.wml' -o -name '*.html.wml' -o -wholename "*/miscutil/i18n/*" -o -name "Makefile.in" ")"`
+PYFILES = `find $(top_srcdir)/modules "("  -name "*.py" -o -name "*.wml" -o -name "*.in" ")" -a -not "(" -name '*.php.wml' -o -name '*.html.wml' -o -wholename "*/miscutil/i18n/*" -o -name "Makefile.in" ")"`
+
+WMLFILES = `find $(top_srcdir)/modules -name "*.html.wml"`
 
 MO = $(LANGUAGES:%=%.mo)
 
@@ -49,7 +51,9 @@ check-translations:
 
 update-po-files:
 	$(PYTHON) $(srcdir)/i18n-import-messages.py $(top_srcdir)/config/messages.wml
-	$(PYTHON) $(srcdir)/i18n-update-potfile.py -d cdsware $(FILES)
+	$(PYTHON) $(srcdir)/i18n-update-potfile.py -d python $(PYFILES)
+	$(PYTHON) $(srcdir)/i18n-extract-from-wml.py $(WMLFILES) > wml.pot
+	msgcat wml.pot python.pot > cdsware.pot
 	for f in $(LANGUAGES) ; do \
 		msgmerge -C compendium-$${f}.po -U $(srcdir)/$${f}.po cdsware.pot; \
 	done

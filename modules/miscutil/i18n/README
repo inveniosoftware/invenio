@@ -23,7 +23,7 @@ translation files.
     build time, and installed in the target directory
 
   - cdsware.pot is the template containing all the requested
-    translations, fetched from the source code.
+    translations, fetched from the source code and the html files.
 
   - compendium-<xx>.po is a base of known translations, extracted from
     messages.py. It is only necessary during the transition from the
