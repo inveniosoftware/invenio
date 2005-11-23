@@ -20,19 +20,19 @@
 #include "configbis.wml"
 #include "cdspage.wml" \
     title="General overview of the manager tool" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a> &gt; <a class=navtrail href=<lang:star: index.*.html>><MSG_GUIDE></a>"  \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>>_(Admin Area)_</a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/>_(WebSubmit Administration)_</a> &gt; <a class=navtrail href=<lang:star: index.*.html>>_(Guide)_</a>"  \
     navbar_name="admin" \
     navbar_select="websubmit-admin-guide"
 
-    <fr><MSG_PAGE_BEING_TRANSLATED_BODY></fr>
-    <de><MSG_PAGE_BEING_TRANSLATED_BODY></de>
-    <es><MSG_PAGE_BEING_TRANSLATED_BODY></es>
-    <pt><MSG_PAGE_BEING_TRANSLATED_BODY></pt>
-    <it><MSG_PAGE_BEING_TRANSLATED_BODY></it>
-    <ru><MSG_PAGE_BEING_TRANSLATED_BODY></ru>
-    <sk><MSG_PAGE_BEING_TRANSLATED_BODY></sk>
-    <cs><MSG_PAGE_BEING_TRANSLATED_BODY></cs>
-    <no><MSG_PAGE_BEING_TRANSLATED_BODY></no>
+    <fr>_(At the moment the English version of this page isn't available yet. Please use the version presented below. Thanks for your understanding.)_</fr>
+    <de>_(At the moment the English version of this page isn't available yet. Please use the version presented below. Thanks for your understanding.)_</de>
+    <es>_(At the moment the English version of this page isn't available yet. Please use the version presented below. Thanks for your understanding.)_</es>
+    <pt>_(At the moment the English version of this page isn't available yet. Please use the version presented below. Thanks for your understanding.)_</pt>
+    <it>_(At the moment the English version of this page isn't available yet. Please use the version presented below. Thanks for your understanding.)_</it>
+    <ru>_(At the moment the English version of this page isn't available yet. Please use the version presented below. Thanks for your understanding.)_</ru>
+    <sk>_(At the moment the English version of this page isn't available yet. Please use the version presented below. Thanks for your understanding.)_</sk>
+    <cs>_(At the moment the English version of this page isn't available yet. Please use the version presented below. Thanks for your understanding.)_</cs>
+    <no>_(At the moment the English version of this page isn't available yet. Please use the version presented below. Thanks for your understanding.)_</no>
 
         <h3>Things to know before using the Manager:</h3>
         <BLOCKQUOTE>

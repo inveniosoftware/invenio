@@ -19,8 +19,8 @@
 
 #include "configbis.wml"
 #include "cdspage.wml" \
-    title="<MSG_SUBMIT_HELP>" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a>"
+    title="_(Submit Help)_" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>>_(Help Central)_</a>"
 
         <h3>Table of Contents</h3>
         <UL>

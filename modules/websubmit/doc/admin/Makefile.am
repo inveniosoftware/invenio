@@ -65,3 +65,7 @@ CLEANFILES = $(doc_DATA) *~ *.tmp *.php
 	       -o\(ALL-LANG_*\)+LANG_SV:$*.sv.html \
 	       -o\(ALL-LANG_*\)+LANG_EL:$*.el.html \
 	       -o\(ALL-LANG_*\)+LANG_UK:$*.uk.html $<
+	for lang in $(ALL_LINGUAS); do \
+		$(PYTHON) $(top_srcdir)/modules/miscutil/i18n/i18n-update-wml.py \
+			$(top_builddir)/modules/miscutil/i18n $${lang} $(<:%.html.wml=%).$${lang}.html ; \
+	done

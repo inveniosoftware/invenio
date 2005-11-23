@@ -27,6 +27,31 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 
 #: ../../../modules/websearch/doc/admin/guide.html.wml:23
+#: ../../../modules/websubmit/doc/admin/actionimplement.html.wml:23
+#: ../../../modules/websubmit/doc/admin/actionmodify.html.wml:23
+#: ../../../modules/websubmit/doc/admin/actionnew.html.wml:23
+#: ../../../modules/websubmit/doc/admin/actionremove.html.wml:23
+#: ../../../modules/websubmit/doc/admin/actions.html.wml:23
+#: ../../../modules/websubmit/doc/admin/bibconvert.html.wml:23
+#: ../../../modules/websubmit/doc/admin/catalogues.html.wml:23
+#: ../../../modules/websubmit/doc/admin/description.html.wml:23
+#: ../../../modules/websubmit/doc/admin/documentmodify.html.wml:23
+#: ../../../modules/websubmit/doc/admin/documentnew.html.wml:23
+#: ../../../modules/websubmit/doc/admin/documentremove.html.wml:23
+#: ../../../modules/websubmit/doc/admin/documents.html.wml:23
+#: ../../../modules/websubmit/doc/admin/example.html.wml:23
+#: ../../../modules/websubmit/doc/admin/faq.html.wml:23
+#: ../../../modules/websubmit/doc/admin/functiondelete.html.wml:23
+#: ../../../modules/websubmit/doc/admin/functiondescription.html.wml:23
+#: ../../../modules/websubmit/doc/admin/functionedit.html.wml:23
+#: ../../../modules/websubmit/doc/admin/functionnew.html.wml:23
+#: ../../../modules/websubmit/doc/admin/functions.html.wml:23
+#: ../../../modules/websubmit/doc/admin/implementfunctions.html.wml:23
+#: ../../../modules/websubmit/doc/admin/implementwebform.html.wml:23
+#: ../../../modules/websubmit/doc/admin/index.html.wml:23
+#: ../../../modules/websubmit/doc/admin/introduction.html.wml:23
+#: ../../../modules/websubmit/doc/admin/philosophy.html.wml:23
+#: ../../../modules/websubmit/doc/admin/protection.html.wml:23
 #: ../../../modules/websession/lib/websession_templates.py:715
 msgid "Admin Area"
 msgstr "Àrea de l&quot;admistrador"
@@ -73,11 +98,74 @@ msgstr "Consells de cerca"
 msgid "ENGLISH TRANSLATION UNDER WAY"
 msgstr "TRADUCCIÓ CATALANA EN CURS"
 
+#: ../../../modules/websubmit/doc/admin/actionimplement.html.wml:23
+#: ../../../modules/websubmit/doc/admin/actionmodify.html.wml:23
+#: ../../../modules/websubmit/doc/admin/actionnew.html.wml:23
+#: ../../../modules/websubmit/doc/admin/actionremove.html.wml:23
+#: ../../../modules/websubmit/doc/admin/actions.html.wml:23
+#: ../../../modules/websubmit/doc/admin/bibconvert.html.wml:23
+#: ../../../modules/websubmit/doc/admin/catalogues.html.wml:23
+#: ../../../modules/websubmit/doc/admin/description.html.wml:23
+#: ../../../modules/websubmit/doc/admin/documentmodify.html.wml:23
+#: ../../../modules/websubmit/doc/admin/documentnew.html.wml:23
+#: ../../../modules/websubmit/doc/admin/documentremove.html.wml:23
+#: ../../../modules/websubmit/doc/admin/documents.html.wml:23
+#: ../../../modules/websubmit/doc/admin/example.html.wml:23
+#: ../../../modules/websubmit/doc/admin/faq.html.wml:23
+#: ../../../modules/websubmit/doc/admin/functiondelete.html.wml:23
+#: ../../../modules/websubmit/doc/admin/functiondescription.html.wml:23
+#: ../../../modules/websubmit/doc/admin/functionedit.html.wml:23
+#: ../../../modules/websubmit/doc/admin/functionnew.html.wml:23
+#: ../../../modules/websubmit/doc/admin/functions.html.wml:23
+#: ../../../modules/websubmit/doc/admin/implementfunctions.html.wml:23
+#: ../../../modules/websubmit/doc/admin/implementwebform.html.wml:23
+#: ../../../modules/websubmit/doc/admin/index.html.wml:23
+#: ../../../modules/websubmit/doc/admin/introduction.html.wml:23
+#: ../../../modules/websubmit/doc/admin/philosophy.html.wml:23
+#: ../../../modules/websubmit/doc/admin/protection.html.wml:23
+msgid "WebSubmit Administration"
+msgstr "Administració de trameses"
+
 #: ../../../modules/websearch/doc/guide.html.wml:24
 #: ../../../modules/websearch/doc/index.html.wml:24
 #: ../../../modules/websearch/doc/tips.html.wml:24
+#: ../../../modules/websubmit/doc/access.html.wml:23
+#: ../../../modules/websubmit/doc/actions.html.wml:23
+#: ../../../modules/websubmit/doc/approval.html.wml:23
+#: ../../../modules/websubmit/doc/approvals.html.wml:23
+#: ../../../modules/websubmit/doc/bibliographic_fields.html.wml:23
+#: ../../../modules/websubmit/doc/description.html.wml:23
+#: ../../../modules/websubmit/doc/file_transfer.html.wml:23
+#: ../../../modules/websubmit/doc/index.html.wml:23
+#: ../../../modules/websubmit/doc/introduction.html.wml:23
+#: ../../../modules/websubmit/doc/login.html.wml:23
+#: ../../../modules/websubmit/doc/modification.html.wml:23
+#: ../../../modules/websubmit/doc/password.html.wml:23
+#: ../../../modules/websubmit/doc/pending.html.wml:23
+#: ../../../modules/websubmit/doc/revised_version.html.wml:24
+#: ../../../modules/websubmit/doc/submission.html.wml:23
+#: ../../../modules/websubmit/doc/subnumber.html.wml:23
 msgid "Help Central"
 msgstr "Centre d&quot;ajuda"
+
+#: ../../../modules/websubmit/doc/access.html.wml:23
+#: ../../../modules/websubmit/doc/actions.html.wml:23
+#: ../../../modules/websubmit/doc/approval.html.wml:23
+#: ../../../modules/websubmit/doc/approvals.html.wml:23
+#: ../../../modules/websubmit/doc/bibliographic_fields.html.wml:23
+#: ../../../modules/websubmit/doc/description.html.wml:23
+#: ../../../modules/websubmit/doc/file_transfer.html.wml:23
+#: ../../../modules/websubmit/doc/index.html.wml:22
+#: ../../../modules/websubmit/doc/introduction.html.wml:23
+#: ../../../modules/websubmit/doc/login.html.wml:23
+#: ../../../modules/websubmit/doc/modification.html.wml:23
+#: ../../../modules/websubmit/doc/password.html.wml:23
+#: ../../../modules/websubmit/doc/pending.html.wml:23
+#: ../../../modules/websubmit/doc/revised_version.html.wml:24
+#: ../../../modules/websubmit/doc/submission.html.wml:23
+#: ../../../modules/websubmit/doc/subnumber.html.wml:23
+msgid "Submit Help"
+msgstr "Ajuda per la tramesa"
 
 #: ../../../modules/websearch/doc/guide.html.wml:39
 #: ../../../modules/websearch/doc/guide.html.wml:58
@@ -109,6 +197,60 @@ msgstr "Centre d&quot;ajuda"
 #: ../../../modules/websearch/doc/tips.html.wml:229
 #: ../../../modules/websearch/doc/tips.html.wml:248
 #: ../../../modules/websearch/doc/tips.html.wml:267
+#: ../../../modules/websubmit/doc/admin/description.html.wml:27
+#: ../../../modules/websubmit/doc/admin/description.html.wml:28
+#: ../../../modules/websubmit/doc/admin/description.html.wml:29
+#: ../../../modules/websubmit/doc/admin/description.html.wml:30
+#: ../../../modules/websubmit/doc/admin/description.html.wml:31
+#: ../../../modules/websubmit/doc/admin/description.html.wml:32
+#: ../../../modules/websubmit/doc/admin/description.html.wml:33
+#: ../../../modules/websubmit/doc/admin/description.html.wml:34
+#: ../../../modules/websubmit/doc/admin/description.html.wml:35
+#: ../../../modules/websubmit/doc/admin/documents.html.wml:27
+#: ../../../modules/websubmit/doc/admin/documents.html.wml:28
+#: ../../../modules/websubmit/doc/admin/documents.html.wml:29
+#: ../../../modules/websubmit/doc/admin/documents.html.wml:30
+#: ../../../modules/websubmit/doc/admin/documents.html.wml:31
+#: ../../../modules/websubmit/doc/admin/documents.html.wml:32
+#: ../../../modules/websubmit/doc/admin/documents.html.wml:33
+#: ../../../modules/websubmit/doc/admin/documents.html.wml:34
+#: ../../../modules/websubmit/doc/admin/documents.html.wml:35
+#: ../../../modules/websubmit/doc/admin/example.html.wml:27
+#: ../../../modules/websubmit/doc/admin/example.html.wml:28
+#: ../../../modules/websubmit/doc/admin/example.html.wml:29
+#: ../../../modules/websubmit/doc/admin/example.html.wml:30
+#: ../../../modules/websubmit/doc/admin/example.html.wml:31
+#: ../../../modules/websubmit/doc/admin/example.html.wml:32
+#: ../../../modules/websubmit/doc/admin/example.html.wml:33
+#: ../../../modules/websubmit/doc/admin/example.html.wml:34
+#: ../../../modules/websubmit/doc/admin/example.html.wml:35
+#: ../../../modules/websubmit/doc/admin/index.html.wml:27
+#: ../../../modules/websubmit/doc/admin/index.html.wml:28
+#: ../../../modules/websubmit/doc/admin/index.html.wml:29
+#: ../../../modules/websubmit/doc/admin/index.html.wml:30
+#: ../../../modules/websubmit/doc/admin/index.html.wml:31
+#: ../../../modules/websubmit/doc/admin/index.html.wml:32
+#: ../../../modules/websubmit/doc/admin/index.html.wml:33
+#: ../../../modules/websubmit/doc/admin/index.html.wml:34
+#: ../../../modules/websubmit/doc/admin/index.html.wml:35
+#: ../../../modules/websubmit/doc/admin/introduction.html.wml:27
+#: ../../../modules/websubmit/doc/admin/introduction.html.wml:28
+#: ../../../modules/websubmit/doc/admin/introduction.html.wml:29
+#: ../../../modules/websubmit/doc/admin/introduction.html.wml:30
+#: ../../../modules/websubmit/doc/admin/introduction.html.wml:31
+#: ../../../modules/websubmit/doc/admin/introduction.html.wml:32
+#: ../../../modules/websubmit/doc/admin/introduction.html.wml:33
+#: ../../../modules/websubmit/doc/admin/introduction.html.wml:34
+#: ../../../modules/websubmit/doc/admin/introduction.html.wml:35
+#: ../../../modules/websubmit/doc/admin/philosophy.html.wml:27
+#: ../../../modules/websubmit/doc/admin/philosophy.html.wml:28
+#: ../../../modules/websubmit/doc/admin/philosophy.html.wml:29
+#: ../../../modules/websubmit/doc/admin/philosophy.html.wml:30
+#: ../../../modules/websubmit/doc/admin/philosophy.html.wml:31
+#: ../../../modules/websubmit/doc/admin/philosophy.html.wml:32
+#: ../../../modules/websubmit/doc/admin/philosophy.html.wml:33
+#: ../../../modules/websubmit/doc/admin/philosophy.html.wml:34
+#: ../../../modules/websubmit/doc/admin/philosophy.html.wml:35
 msgid ""
 "At the moment the English version of this page isn't available yet. Please "
 "use the version presented below. Thanks for your understanding."
@@ -122,6 +264,34 @@ msgstr ""
 #: ../../../modules/websearch/doc/tips.html.wml:24
 msgid "Search Help"
 msgstr "Ajuda a la cerca"
+
+#: ../../../modules/websubmit/doc/admin/actionimplement.html.wml:23
+#: ../../../modules/websubmit/doc/admin/actionmodify.html.wml:23
+#: ../../../modules/websubmit/doc/admin/actionnew.html.wml:23
+#: ../../../modules/websubmit/doc/admin/actionremove.html.wml:23
+#: ../../../modules/websubmit/doc/admin/actions.html.wml:23
+#: ../../../modules/websubmit/doc/admin/bibconvert.html.wml:23
+#: ../../../modules/websubmit/doc/admin/catalogues.html.wml:23
+#: ../../../modules/websubmit/doc/admin/description.html.wml:23
+#: ../../../modules/websubmit/doc/admin/documentmodify.html.wml:23
+#: ../../../modules/websubmit/doc/admin/documentnew.html.wml:23
+#: ../../../modules/websubmit/doc/admin/documentremove.html.wml:23
+#: ../../../modules/websubmit/doc/admin/documents.html.wml:23
+#: ../../../modules/websubmit/doc/admin/example.html.wml:23
+#: ../../../modules/websubmit/doc/admin/faq.html.wml:23
+#: ../../../modules/websubmit/doc/admin/functiondelete.html.wml:23
+#: ../../../modules/websubmit/doc/admin/functiondescription.html.wml:23
+#: ../../../modules/websubmit/doc/admin/functionedit.html.wml:23
+#: ../../../modules/websubmit/doc/admin/functionnew.html.wml:23
+#: ../../../modules/websubmit/doc/admin/functions.html.wml:23
+#: ../../../modules/websubmit/doc/admin/implementfunctions.html.wml:23
+#: ../../../modules/websubmit/doc/admin/implementwebform.html.wml:23
+#: ../../../modules/websubmit/doc/admin/index.html.wml:22
+#: ../../../modules/websubmit/doc/admin/introduction.html.wml:23
+#: ../../../modules/websubmit/doc/admin/philosophy.html.wml:23
+#: ../../../modules/websubmit/doc/admin/protection.html.wml:23
+msgid "Guide"
+msgstr "Guia"
 
 #: ../../../modules/bibharvest/lib/bibharvest_templates.py:51
 #: ../../../modules/bibharvest/lib/bibharvest_templates.py:69
@@ -1482,9 +1652,7 @@ msgid "Added since:"
 msgstr "Afegit des de:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:381
-#: ../../../modules/websearch/lib/websearch_templates.py:1377
-#, fuzzy
-msgid "Until"
+msgid "until:"
 msgstr "fins:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:385
@@ -1566,6 +1734,11 @@ msgstr "Proveu la vostra cerca a..."
 #: ../../../modules/websearch/lib/websearch_templates.py:1326
 msgid "collections"
 msgstr "col·leccions"
+
+#: ../../../modules/websearch/lib/websearch_templates.py:1377
+#, fuzzy
+msgid "Until"
+msgstr "fins:"
 
 #: ../../../modules/websearch/lib/websearch_templates.py:1465
 msgid "MARC tag"

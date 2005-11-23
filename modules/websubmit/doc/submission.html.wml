@@ -20,7 +20,7 @@
 #include "configbis.wml"
 #include "cdspage.wml" \
     title="Submit New Record" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>><MSG_HELP_CENTRAL></a> &gt; <a class=navtrail href=<WEBURL>/help/submit/<lang:star: index.*.html>><MSG_SUBMIT_HELP></a>" 
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/help/<lang:star: index.*.html>>_(Help Central)_</a> &gt; <a class=navtrail href=<WEBURL>/help/submit/<lang:star: index.*.html>>_(Submit Help)_</a>" 
 
         <h3>Description:</h3>
         <BLOCKQUOTE>

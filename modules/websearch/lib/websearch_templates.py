@@ -378,7 +378,7 @@ class Template:
               """ % {
 
                     'added' : _("Added since:"),
-                    'until' : _("Until"),
+                    'until' : _("until:"),
                     'date_added' : self.tmpl_inputdate("d1", ln=ln),
                     'date_until' : self.tmpl_inputdate("d2", ln=ln),
 

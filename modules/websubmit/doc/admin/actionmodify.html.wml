@@ -20,7 +20,7 @@
 #include "configbis.wml"
 #include "cdspage.wml" \
     title="Modify an existing action" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a> &gt; <a class=navtrail href=<lang:star: index.*.html>><MSG_GUIDE></a>"  \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>>_(Admin Area)_</a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/>_(WebSubmit Administration)_</a> &gt; <a class=navtrail href=<lang:star: index.*.html>>_(Guide)_</a>"  \
     navbar_name="admin" \
     navbar_select="websubmit-admin-guide"
 
