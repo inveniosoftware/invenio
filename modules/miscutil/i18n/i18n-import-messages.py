@@ -20,34 +20,41 @@ This script extracts translations from messages.py and writes them in
 a format suitable for gettext.
 """
 
-import sys, time, locale, pprint, re
+import sys
+import re
 
-if len (sys.argv) == 1 or sys.argv [0] in ["-h","--help"]:
+if len(sys.argv) == 1 or sys.argv[0] in ["-h", "--help"]:
     print "Usage: i18n-import-messages.py msgfile"
     sys.exit()
 
 
-msgfile = sys.argv [1]
+msgfile = sys.argv[1]
 
 
 # Parse the wml file with a custom parser
 
-_tag_re = re.compile ('(</?[\w\s=_-]+>)')
+_tag_re = re.compile('(</?[\w\s=_-]+>)')
 
-def lexer (name):
+def lexer(filename):
+    """This generator returns a sequence of tokens (type, value) from
+    the content of the messages.wml file. The token types can be tag
+    opening ('<'), tag closing ('>') or plain text ('T').
+    """
     
-    for line in open (msgfile):
-        if line.startswith ('#'): continue
+    for line in open(filename):
+        if line.startswith('#'):
+            continue
 
-        line = line.strip ()
-        if not line: continue
+        line = line.strip()
+        if not line:
+            continue
 
         for part in _tag_re.split (line):
-            if part and part [0] == '<':
-                if part [1] == '/':
-                    yield ('>', part [2:-1])
+            if part and part[0] == '<':
+                if part[1] == '/':
+                    yield ('>', part[2:-1])
                 else:
-                    args = part [1:-1].split ()
+                    args = part[1:-1].split()
                     yield ('<', args)
             else:
                 yield ('T', part)
@@ -56,24 +63,25 @@ def lexer (name):
         
     return
             
-OUTSIDE, IN_MSG, IN_TEXT = range (3)
+OUTSIDE, IN_MSG, IN_TEXT = range(3)
 
 state = OUTSIDE
 db    = {}
 
 all_langs = {}
 
-for token, value in lexer (msgfile):
+for token, value in lexer(msgfile):
 
     if state == OUTSIDE:
-        if token == 'T': continue
+        if token == 'T':
+            continue
         
-        if token != '<' or value [0] != 'define-tag':
-            raise SyntaxError ('unexpected token %s' % repr ((token, value)))
+        if token != '<' or value[0] != 'define-tag':
+            raise SyntaxError ('unexpected token %s' % repr((token, value)))
 
         state = IN_MSG
-        msg   = value [1]
-        wsd   =  'whitespace=delete' in value
+        msg   = value[1]
+        wsd   = 'whitespace=delete' in value
         table = {}
         continue
 
@@ -82,20 +90,20 @@ for token, value in lexer (msgfile):
             assert value == 'define-tag'
 
             state = OUTSIDE
-            db [msg] = table
+            db[msg] = table
             continue
 
         if token == '<':
             state = IN_TEXT
-            ln    = value [0]
-            all_langs [ln] = True
-            text  = ''
+            ln = value[0]
+            all_langs[ln] = True
+            text = ''
             continue
 
     elif state == IN_TEXT:
         if token == '>':
             if value == ln:
-                table [ln] = text
+                table[ln] = text
                 state = IN_MSG
             else:
                 # this is an internal token
@@ -107,26 +115,26 @@ for token, value in lexer (msgfile):
             continue
 
         if token == '<':
-            text += '<%s>' % ' '.join (value)
+            text += '<%s>' % ' '.join(value)
             continue
             
-msgs = [ x for x in db.keys () ]
-msgs.sort ()
+msgs = [x for x in db.keys()]
+msgs.sort()
 
-def quote (text):
-    # Normalize and quote
+def quote(text):
+    """Normalize and quote a string to be used in a po file."""
     
     return text.\
-           strip ().\
-           replace ('\\"', '"').\
-           replace ('  ', ' ').\
-           replace ('\\', '\\\\').\
-           replace ('\n', '\\\\n').\
-           replace ('"',  '\\"')
+           strip().\
+           replace('\\"', '"').\
+           replace('  ', ' ').\
+           replace('\\', '\\\\').\
+           replace('\n', '\\\\n').\
+           replace('"',  '\\"')
 
 
-for lang in all_langs.keys ():
-    out = open ('compendium-%s.po' % lang, 'w')
+for lang in all_langs.keys():
+    out = open('compendium-%s.po' % lang, 'w')
     
     # Output the PO file
 
@@ -149,12 +157,12 @@ msgstr ""
     for key in msgs:
 
         try:
-            ref = db [key] ['en']
-            trs = db [key] [lang]
+            ref = db[key]['en']
+            trs = db[key][lang]
         except KeyError:
             print >> sys.stderr, "warning: cannot translate %s in %s" % (key, lang)
             continue
 
-        out.write ('#: %s\n' % key)
-        out.write ('msgid "%s"\n' % quote (ref))
-        out.write ('msgstr "%s"\n\n' % quote (trs))
+        out.write('#: %s\n' % key)
+        out.write('msgid "%s"\n' % quote(ref))
+        out.write('msgstr "%s"\n\n' % quote(trs))
