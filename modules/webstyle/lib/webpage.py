@@ -20,7 +20,7 @@
 """CDSware Web Page Functions"""
 
 from config import *
-from messages import *
+from messages import gettext_set_language
 from webuser import create_userinfobox_body
 import re
 import string
@@ -78,8 +78,10 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagehe
        output: the final cds page with header, footer, etc.
     """
 
+    _ = gettext_set_language(language)
+    
     if title == cdsnameintl[language]:
-        headerstitle = msg_home[language]
+        headerstitle = _("Home")
     else:
         headerstitle = title
 

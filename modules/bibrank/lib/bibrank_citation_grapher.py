@@ -26,7 +26,7 @@ from marshal import loads
 from zlib import decompress
 from config import weburl, cdslang
 from dbquery import run_sql    
-from messages import msg_citation_history
+from messages import gettext_set_language
 from bibrank_grapher import create_temporary_image, write_coordinates_in_tmp_file, remove_old_img
 from bibrank_citation_searcher import calculate_cited_by_list
 
@@ -107,11 +107,14 @@ def create_citation_history_graph_and_box(recid, ln=cdslang):
        temporary file) and return HTML box refering to that image.
        Called by Detailed record pages.
     """
+
+    _ = gettext_set_language(ln)
+    
     html_result = ""
     if cfg_bibrank_print_citation_history:
         coordinates = calculate_citation_history_coordinates(recid)
         if coordinates:
-            html_head = """</br><table><tr><td class="blocknote">%s</td></tr></table>""" % msg_citation_history[ln]
+            html_head = """</br><table><tr><td class="blocknote">%s</td></tr></table>""" % _("Citation history:")
             graphe_file_name = 'citation_%s_stats.png' % str(recid)
             remove_old_img(graphe_file_name)
             years = calculate_citation_graphe_x_coordinates(recid)

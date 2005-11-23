@@ -330,6 +330,14 @@ msgstr ""
 msgid "does not seem to be a OAI-compliant baseURL..."
 msgstr ""
 
+#: ../../../modules/bibrank/lib/bibrank_citation_grapher.py:117
+msgid "Citation history:"
+msgstr "Citační historie:"
+
+#: ../../../modules/bibrank/lib/bibrank_downloads_grapher.py:95
+msgid "Downloads history:"
+msgstr "Historie stahování:"
+
 #: ../../../modules/miscutil/lib/dateutils.py:69
 #: ../../../modules/miscutil/lib/dateutils.py:93
 msgid "N/A"

@@ -26,7 +26,7 @@ import time
 import tempfile
 import calendar
 from config import weburl, cdslang
-from messages import msg_downloads_history
+from messages import gettext_set_language
 from dbquery import run_sql
 from bibrank_downloads_indexer import database_tuples_to_single_list
 from bibrank_grapher import *
@@ -46,6 +46,8 @@ def create_download_history_graph_and_box(id_bibrec, ln=cdslang):
         if nb_id_bibdoc > cfg_id_bibdoc_id_bibrec draw only one line which hold simultaneously the downloads per id_bibdoc
         Each time this function is called, all the images older than 10 minutes are deleted.
     """
+    _ = gettext_set_language(ln)
+
     html_code = ""
     html_content = ""
     users_analysis_text = ""
@@ -89,7 +91,7 @@ def create_download_history_graph_and_box(id_bibrec, ln=cdslang):
     if html_content != "":
         out += """<br/><br/><table><tr><td class="blocknote">
                   %s %s</td></tr><tr><td>
-                  <table border="0" cellspacing="1" cellpadding="1">""" %  (msg_downloads_history[ln], users_analysis_text)
+                  <table border="0" cellspacing="1" cellpadding="1">""" %  (_("Downloads history:"), users_analysis_text)
         out += html_content
         out += "</table></td></tr></table>"
     return out
