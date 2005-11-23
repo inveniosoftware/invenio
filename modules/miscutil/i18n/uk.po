@@ -33,10 +33,10 @@ msgstr "Область адміністратора"
 
 #: ../../../modules/websearch/doc/index.html.wml:123
 #: ../../../modules/websearch/doc/tips.html.wml:22
-#: ../../../modules/websearch/lib/websearch_templates.py:206
-#: ../../../modules/websearch/lib/websearch_templates.py:310
-#: ../../../modules/websearch/lib/websearch_templates.py:1231
-#: ../../../modules/websearch/lib/websearch_templates.py:1289
+#: ../../../modules/websearch/lib/websearch_templates.py:210
+#: ../../../modules/websearch/lib/websearch_templates.py:314
+#: ../../../modules/websearch/lib/websearch_templates.py:1235
+#: ../../../modules/websearch/lib/websearch_templates.py:1293
 msgid "Search Tips"
 msgstr "Вказівки для пошуку"
 
@@ -250,7 +250,7 @@ msgstr "квітень"
 #: ../../../modules/miscutil/lib/dateutils.py:170
 #: ../../../modules/miscutil/lib/dateutils.py:184
 #: ../../../modules/websearch/lib/search_engine.py:405
-#: ../../../modules/websearch/lib/websearch_templates.py:506
+#: ../../../modules/websearch/lib/websearch_templates.py:510
 msgid "May"
 msgstr "травень"
 
@@ -288,67 +288,67 @@ msgstr ""
 
 #: ../../../modules/miscutil/lib/dateutils.py:180
 #: ../../../modules/websearch/lib/search_engine.py:404
-#: ../../../modules/websearch/lib/websearch_templates.py:505
+#: ../../../modules/websearch/lib/websearch_templates.py:509
 msgid "January"
 msgstr "січень"
 
 #: ../../../modules/miscutil/lib/dateutils.py:181
 #: ../../../modules/websearch/lib/search_engine.py:404
-#: ../../../modules/websearch/lib/websearch_templates.py:505
+#: ../../../modules/websearch/lib/websearch_templates.py:509
 msgid "February"
 msgstr "лютий"
 
 #: ../../../modules/miscutil/lib/dateutils.py:182
 #: ../../../modules/websearch/lib/search_engine.py:404
-#: ../../../modules/websearch/lib/websearch_templates.py:505
+#: ../../../modules/websearch/lib/websearch_templates.py:509
 msgid "March"
 msgstr "березень"
 
 #: ../../../modules/miscutil/lib/dateutils.py:183
 #: ../../../modules/websearch/lib/search_engine.py:404
-#: ../../../modules/websearch/lib/websearch_templates.py:505
+#: ../../../modules/websearch/lib/websearch_templates.py:509
 msgid "April"
 msgstr "квітень"
 
 #: ../../../modules/miscutil/lib/dateutils.py:185
 #: ../../../modules/websearch/lib/search_engine.py:405
-#: ../../../modules/websearch/lib/websearch_templates.py:506
+#: ../../../modules/websearch/lib/websearch_templates.py:510
 msgid "June"
 msgstr "червень"
 
 #: ../../../modules/miscutil/lib/dateutils.py:186
 #: ../../../modules/websearch/lib/search_engine.py:405
-#: ../../../modules/websearch/lib/websearch_templates.py:506
+#: ../../../modules/websearch/lib/websearch_templates.py:510
 msgid "July"
 msgstr "липень"
 
 #: ../../../modules/miscutil/lib/dateutils.py:187
 #: ../../../modules/websearch/lib/search_engine.py:405
-#: ../../../modules/websearch/lib/websearch_templates.py:506
+#: ../../../modules/websearch/lib/websearch_templates.py:510
 msgid "August"
 msgstr "серпень"
 
 #: ../../../modules/miscutil/lib/dateutils.py:188
 #: ../../../modules/websearch/lib/search_engine.py:406
-#: ../../../modules/websearch/lib/websearch_templates.py:507
+#: ../../../modules/websearch/lib/websearch_templates.py:511
 msgid "September"
 msgstr "вересень"
 
 #: ../../../modules/miscutil/lib/dateutils.py:189
 #: ../../../modules/websearch/lib/search_engine.py:406
-#: ../../../modules/websearch/lib/websearch_templates.py:507
+#: ../../../modules/websearch/lib/websearch_templates.py:511
 msgid "October"
 msgstr "жовтень"
 
 #: ../../../modules/miscutil/lib/dateutils.py:190
 #: ../../../modules/websearch/lib/search_engine.py:406
-#: ../../../modules/websearch/lib/websearch_templates.py:507
+#: ../../../modules/websearch/lib/websearch_templates.py:511
 msgid "November"
 msgstr "листопад"
 
 #: ../../../modules/miscutil/lib/dateutils.py:191
 #: ../../../modules/websearch/lib/search_engine.py:406
-#: ../../../modules/websearch/lib/websearch_templates.py:507
+#: ../../../modules/websearch/lib/websearch_templates.py:511
 msgid "December"
 msgstr "грудень"
 
@@ -1001,8 +1001,8 @@ msgid "Please choose the basket you want to add %d records to:"
 msgstr ""
 
 #: ../../../modules/webbasket/lib/webbasket_templates.py:455
-#: ../../../modules/websearch/lib/websearch_templates.py:1932
-#: ../../../modules/websearch/lib/websearch_templates.py:1989
+#: ../../../modules/websearch/lib/websearch_templates.py:1931
+#: ../../../modules/websearch/lib/websearch_templates.py:1988
 msgid "ADD TO BASKET"
 msgstr "ДОДАТИ ДО КОШИКА"
 
@@ -1232,12 +1232,12 @@ msgid "latest first"
 msgstr "останні спочатку"
 
 #: ../../../modules/websearch/bin/webcoll.in:535
-#: ../../../modules/websearch/lib/websearch_templates.py:1418
+#: ../../../modules/websearch/lib/websearch_templates.py:1422
 msgid "asc."
 msgstr "зрост."
 
 #: ../../../modules/websearch/bin/webcoll.in:536
-#: ../../../modules/websearch/lib/websearch_templates.py:1421
+#: ../../../modules/websearch/lib/websearch_templates.py:1425
 msgid "desc."
 msgstr "спад."
 
@@ -1249,22 +1249,22 @@ msgstr "впорядкувати за"
 #: ../../../modules/websearch/bin/webcoll.in:547
 #: ../../../modules/websearch/lib/search_engine.py:517
 #: ../../../modules/websearch/lib/search_engine.py:643
-#: ../../../modules/websearch/lib/websearch_templates.py:467
+#: ../../../modules/websearch/lib/websearch_templates.py:471
 msgid "OR"
 msgstr "АБО"
 
 #: ../../../modules/websearch/bin/webcoll.in:565
-#: ../../../modules/websearch/lib/websearch_templates.py:1383
+#: ../../../modules/websearch/lib/websearch_templates.py:1387
 msgid "results"
 msgstr "результати"
 
 #: ../../../modules/websearch/bin/webcoll.in:578
-#: ../../../modules/websearch/lib/websearch_templates.py:1430
+#: ../../../modules/websearch/lib/websearch_templates.py:1434
 msgid "split by collection"
 msgstr "розділити за розділами"
 
 #: ../../../modules/websearch/bin/webcoll.in:579
-#: ../../../modules/websearch/lib/websearch_templates.py:1427
+#: ../../../modules/websearch/lib/websearch_templates.py:1431
 msgid "single list"
 msgstr "один список"
 
@@ -1286,17 +1286,17 @@ msgid "Search Results"
 msgstr "Результати пошуку"
 
 #: ../../../modules/websearch/lib/search_engine.py:397
-#: ../../../modules/websearch/lib/websearch_templates.py:490
+#: ../../../modules/websearch/lib/websearch_templates.py:494
 msgid "any day"
 msgstr "будь-який день"
 
 #: ../../../modules/websearch/lib/search_engine.py:403
-#: ../../../modules/websearch/lib/websearch_templates.py:502
+#: ../../../modules/websearch/lib/websearch_templates.py:506
 msgid "any month"
 msgstr "будь-який місяць"
 
 #: ../../../modules/websearch/lib/search_engine.py:411
-#: ../../../modules/websearch/lib/websearch_templates.py:516
+#: ../../../modules/websearch/lib/websearch_templates.py:520
 msgid "any year"
 msgstr "будь-який рік"
 
@@ -1315,37 +1315,37 @@ msgid "HTML brief"
 msgstr "короткий"
 
 #: ../../../modules/websearch/lib/search_engine.py:642
-#: ../../../modules/websearch/lib/websearch_templates.py:466
+#: ../../../modules/websearch/lib/websearch_templates.py:470
 msgid "AND"
 msgstr "ТА"
 
 #: ../../../modules/websearch/lib/search_engine.py:644
-#: ../../../modules/websearch/lib/websearch_templates.py:468
+#: ../../../modules/websearch/lib/websearch_templates.py:472
 msgid "AND NOT"
 msgstr "ТА НЕ"
 
 #: ../../../modules/websearch/lib/search_engine.py:662
-#: ../../../modules/websearch/lib/websearch_templates.py:416
+#: ../../../modules/websearch/lib/websearch_templates.py:420
 msgid "All of the words:"
 msgstr "Всі слова"
 
 #: ../../../modules/websearch/lib/search_engine.py:663
-#: ../../../modules/websearch/lib/websearch_templates.py:418
+#: ../../../modules/websearch/lib/websearch_templates.py:422
 msgid "Any of the words:"
 msgstr "Будь-яке з слів:"
 
 #: ../../../modules/websearch/lib/search_engine.py:664
-#: ../../../modules/websearch/lib/websearch_templates.py:420
+#: ../../../modules/websearch/lib/websearch_templates.py:424
 msgid "Exact phrase:"
 msgstr "Точна фраза:"
 
 #: ../../../modules/websearch/lib/search_engine.py:665
-#: ../../../modules/websearch/lib/websearch_templates.py:422
+#: ../../../modules/websearch/lib/websearch_templates.py:426
 msgid "Partial phrase:"
 msgstr "Частина фрази:"
 
 #: ../../../modules/websearch/lib/search_engine.py:666
-#: ../../../modules/websearch/lib/websearch_templates.py:424
+#: ../../../modules/websearch/lib/websearch_templates.py:428
 msgid "Regular expression:"
 msgstr "Регулярний вираз:"
 
@@ -1361,25 +1361,25 @@ msgstr ""
 #: ../../../modules/websearch/lib/search_engine.py:3006
 #: ../../../modules/websearch/lib/search_engine.py:3040
 #: ../../../modules/websearch/lib/search_engine.py:3042
-#: ../../../modules/websearch/lib/websearch_templates.py:205
-#: ../../../modules/websearch/lib/websearch_templates.py:309
-#: ../../../modules/websearch/lib/websearch_templates.py:1057
-#: ../../../modules/websearch/lib/websearch_templates.py:1135
-#: ../../../modules/websearch/lib/websearch_templates.py:1136
-#: ../../../modules/websearch/lib/websearch_templates.py:1228
-#: ../../../modules/websearch/lib/websearch_templates.py:1286
-#: ../../../modules/websearch/lib/websearch_templates.py:1327
-#: ../../../modules/websearch/lib/websearch_templates.py:1349
-#: ../../../modules/websearch/lib/websearch_templates.py:1379
+#: ../../../modules/websearch/lib/websearch_templates.py:209
+#: ../../../modules/websearch/lib/websearch_templates.py:313
+#: ../../../modules/websearch/lib/websearch_templates.py:1061
+#: ../../../modules/websearch/lib/websearch_templates.py:1139
+#: ../../../modules/websearch/lib/websearch_templates.py:1140
+#: ../../../modules/websearch/lib/websearch_templates.py:1232
+#: ../../../modules/websearch/lib/websearch_templates.py:1290
+#: ../../../modules/websearch/lib/websearch_templates.py:1331
+#: ../../../modules/websearch/lib/websearch_templates.py:1353
+#: ../../../modules/websearch/lib/websearch_templates.py:1383
 msgid "Browse"
 msgstr "Переглянути"
 
 #: ../../../modules/websearch/lib/search_engine.py:1301
-#: ../../../modules/websearch/lib/websearch_templates.py:204
-#: ../../../modules/websearch/lib/websearch_templates.py:308
-#: ../../../modules/websearch/lib/websearch_templates.py:1134
-#: ../../../modules/websearch/lib/websearch_templates.py:1227
-#: ../../../modules/websearch/lib/websearch_templates.py:1285
+#: ../../../modules/websearch/lib/websearch_templates.py:208
+#: ../../../modules/websearch/lib/websearch_templates.py:312
+#: ../../../modules/websearch/lib/websearch_templates.py:1138
+#: ../../../modules/websearch/lib/websearch_templates.py:1231
+#: ../../../modules/websearch/lib/websearch_templates.py:1289
 #: ../../../modules/webstyle/lib/webstyle_templates.py:342
 #: ../../../modules/webstyle/lib/webstyle_templates.py:415
 msgid "Search"
@@ -1440,10 +1440,10 @@ msgid "The record has been deleted."
 msgstr "Запис видалено"
 
 #: ../../../modules/websearch/lib/search_engine.py:3027
-#: ../../../modules/websearch/lib/websearch_templates.py:812
-#: ../../../modules/websearch/lib/websearch_templates.py:2343
-#: ../../../modules/websearch/lib/websearch_templates.py:2346
-#: ../../../modules/websearch/lib/websearch_templates.py:2349
+#: ../../../modules/websearch/lib/websearch_templates.py:816
+#: ../../../modules/websearch/lib/websearch_templates.py:2342
+#: ../../../modules/websearch/lib/websearch_templates.py:2345
+#: ../../../modules/websearch/lib/websearch_templates.py:2348
 msgid "Detailed record"
 msgstr "Детальний запис"
 
@@ -1455,214 +1455,214 @@ msgstr "За відведений час результатів не знайд�
 msgid "No match within your search limits, discarding this condition..."
 msgstr "За даних обмежень результатів не знайдено, умова скасовується"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:207
-#: ../../../modules/websearch/lib/websearch_templates.py:1294
+#: ../../../modules/websearch/lib/websearch_templates.py:211
+#: ../../../modules/websearch/lib/websearch_templates.py:1298
 msgid "Advanced Search"
 msgstr "Розширений пошук"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:311
-#: ../../../modules/websearch/lib/websearch_templates.py:1236
+#: ../../../modules/websearch/lib/websearch_templates.py:315
+#: ../../../modules/websearch/lib/websearch_templates.py:1240
 msgid "Simple Search"
 msgstr "Простий пошук"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:329
+#: ../../../modules/websearch/lib/websearch_templates.py:333
 msgid "Search options:"
 msgstr "Опції пошуку"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:376
-#: ../../../modules/websearch/lib/websearch_templates.py:1372
+#: ../../../modules/websearch/lib/websearch_templates.py:380
+#: ../../../modules/websearch/lib/websearch_templates.py:1376
 msgid "Added since:"
 msgstr "Додано з:"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:377
-#: ../../../modules/websearch/lib/websearch_templates.py:1373
+#: ../../../modules/websearch/lib/websearch_templates.py:381
+#: ../../../modules/websearch/lib/websearch_templates.py:1377
 #, fuzzy
 msgid "Until"
 msgstr "до:"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:381
-#: ../../../modules/websearch/lib/websearch_templates.py:1412
+#: ../../../modules/websearch/lib/websearch_templates.py:385
+#: ../../../modules/websearch/lib/websearch_templates.py:1416
 msgid "Sort by:"
 msgstr "Впорядкувати за:"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:382
-#: ../../../modules/websearch/lib/websearch_templates.py:1413
+#: ../../../modules/websearch/lib/websearch_templates.py:386
+#: ../../../modules/websearch/lib/websearch_templates.py:1417
 msgid "Display results:"
 msgstr "Показати результат:"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:383
-#: ../../../modules/websearch/lib/websearch_templates.py:1414
+#: ../../../modules/websearch/lib/websearch_templates.py:387
+#: ../../../modules/websearch/lib/websearch_templates.py:1418
 msgid "Output format:"
 msgstr "Формат представлення:"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:600
+#: ../../../modules/websearch/lib/websearch_templates.py:604
 msgid "restricted"
 msgstr "обмежено"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:635
+#: ../../../modules/websearch/lib/websearch_templates.py:639
 msgid "Latest additions:"
 msgstr "Останні надходження:"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:676
+#: ../../../modules/websearch/lib/websearch_templates.py:680
 msgid "The contents of this collection is restricted."
 msgstr "Доступ до змісту цього розділу обмежений"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:691
+#: ../../../modules/websearch/lib/websearch_templates.py:695
 msgid "This collection does not contain any document yet."
 msgstr "Цей розділ поки що не містить записів"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:725
-#: ../../../modules/websearch/lib/websearch_templates.py:2005
-#: ../../../modules/websearch/lib/websearch_templates.py:2019
-#: ../../../modules/websearch/lib/websearch_templates.py:2035
+#: ../../../modules/websearch/lib/websearch_templates.py:729
+#: ../../../modules/websearch/lib/websearch_templates.py:2004
+#: ../../../modules/websearch/lib/websearch_templates.py:2018
+#: ../../../modules/websearch/lib/websearch_templates.py:2034
 msgid "more"
 msgstr "далі"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:813
-#: ../../../modules/websearch/lib/websearch_templates.py:1988
-#: ../../../modules/websearch/lib/websearch_templates.py:2351
+#: ../../../modules/websearch/lib/websearch_templates.py:817
+#: ../../../modules/websearch/lib/websearch_templates.py:1987
+#: ../../../modules/websearch/lib/websearch_templates.py:2350
 msgid "Similar records"
 msgstr "Подібні записи"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:818
-#: ../../../modules/websearch/lib/websearch_templates.py:2355
+#: ../../../modules/websearch/lib/websearch_templates.py:822
+#: ../../../modules/websearch/lib/websearch_templates.py:2354
 msgid "Cited by"
 msgstr "Cited by"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:888
+#: ../../../modules/websearch/lib/websearch_templates.py:892
 msgid "Words nearest to"
 msgstr ""
 
-#: ../../../modules/websearch/lib/websearch_templates.py:893
+#: ../../../modules/websearch/lib/websearch_templates.py:897
 msgid "inside"
 msgstr ""
 
-#: ../../../modules/websearch/lib/websearch_templates.py:896
+#: ../../../modules/websearch/lib/websearch_templates.py:900
 #, fuzzy
 msgid "in any collection are:"
 msgstr "будь-який розділ"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:999
+#: ../../../modules/websearch/lib/websearch_templates.py:1003
 msgid "Hits"
 msgstr ""
 
-#: ../../../modules/websearch/lib/websearch_templates.py:1058
-#: ../../../modules/websearch/lib/websearch_templates.py:1814
+#: ../../../modules/websearch/lib/websearch_templates.py:1062
+#: ../../../modules/websearch/lib/websearch_templates.py:1818
 msgid "next"
 msgstr ""
 
-#: ../../../modules/websearch/lib/websearch_templates.py:1143
-#: ../../../modules/websearch/lib/websearch_templates.py:1244
+#: ../../../modules/websearch/lib/websearch_templates.py:1147
+#: ../../../modules/websearch/lib/websearch_templates.py:1248
 msgid "Try your search on..."
 msgstr "Спробуйте шукати..."
 
-#: ../../../modules/websearch/lib/websearch_templates.py:1322
+#: ../../../modules/websearch/lib/websearch_templates.py:1326
 msgid "collections"
 msgstr "розділи"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:1461
+#: ../../../modules/websearch/lib/websearch_templates.py:1465
 msgid "MARC tag"
 msgstr ""
 
-#: ../../../modules/websearch/lib/websearch_templates.py:1490
-#: ../../../modules/websearch/lib/websearch_templates.py:1492
-#: ../../../modules/websearch/lib/websearch_templates.py:1495
+#: ../../../modules/websearch/lib/websearch_templates.py:1494
+#: ../../../modules/websearch/lib/websearch_templates.py:1496
 #: ../../../modules/websearch/lib/websearch_templates.py:1499
-#: ../../../modules/websearch/lib/websearch_templates.py:1501
-#: ../../../modules/websearch/lib/websearch_templates.py:1506
-#: ../../../modules/websearch/lib/websearch_templates.py:1508
+#: ../../../modules/websearch/lib/websearch_templates.py:1503
+#: ../../../modules/websearch/lib/websearch_templates.py:1505
 #: ../../../modules/websearch/lib/websearch_templates.py:1510
 #: ../../../modules/websearch/lib/websearch_templates.py:1512
-#: ../../../modules/websearch/lib/websearch_templates.py:1515
-#: ../../../modules/websearch/lib/websearch_templates.py:1520
+#: ../../../modules/websearch/lib/websearch_templates.py:1514
+#: ../../../modules/websearch/lib/websearch_templates.py:1516
+#: ../../../modules/websearch/lib/websearch_templates.py:1519
 #: ../../../modules/websearch/lib/websearch_templates.py:1524
-#: ../../../modules/websearch/lib/websearch_templates.py:1526
-#: ../../../modules/websearch/lib/websearch_templates.py:1534
-#: ../../../modules/websearch/lib/websearch_templates.py:1536
+#: ../../../modules/websearch/lib/websearch_templates.py:1528
+#: ../../../modules/websearch/lib/websearch_templates.py:1530
+#: ../../../modules/websearch/lib/websearch_templates.py:1538
 #: ../../../modules/websearch/lib/websearch_templates.py:1540
 #: ../../../modules/websearch/lib/websearch_templates.py:1544
-#: ../../../modules/websearch/lib/websearch_templates.py:1550
-#: ../../../modules/websearch/lib/websearch_templates.py:1552
+#: ../../../modules/websearch/lib/websearch_templates.py:1548
 #: ../../../modules/websearch/lib/websearch_templates.py:1554
 #: ../../../modules/websearch/lib/websearch_templates.py:1556
+#: ../../../modules/websearch/lib/websearch_templates.py:1558
 #: ../../../modules/websearch/lib/websearch_templates.py:1560
-#: ../../../modules/websearch/lib/websearch_templates.py:1573
-#: ../../../modules/websearch/lib/websearch_templates.py:1576
-#: ../../../modules/websearch/lib/websearch_templates.py:1579
-#: ../../../modules/websearch/lib/websearch_templates.py:1584
-#: ../../../modules/websearch/lib/websearch_templates.py:1586
+#: ../../../modules/websearch/lib/websearch_templates.py:1564
+#: ../../../modules/websearch/lib/websearch_templates.py:1577
+#: ../../../modules/websearch/lib/websearch_templates.py:1580
+#: ../../../modules/websearch/lib/websearch_templates.py:1583
 #: ../../../modules/websearch/lib/websearch_templates.py:1588
-#: ../../../modules/websearch/lib/websearch_templates.py:1593
-#: ../../../modules/websearch/lib/websearch_templates.py:1595
+#: ../../../modules/websearch/lib/websearch_templates.py:1590
+#: ../../../modules/websearch/lib/websearch_templates.py:1592
 #: ../../../modules/websearch/lib/websearch_templates.py:1597
 #: ../../../modules/websearch/lib/websearch_templates.py:1599
-#: ../../../modules/websearch/lib/websearch_templates.py:1612
-#: ../../../modules/websearch/lib/websearch_templates.py:1615
-#: ../../../modules/websearch/lib/websearch_templates.py:1618
-#: ../../../modules/websearch/lib/websearch_templates.py:1621
-#: ../../../modules/websearch/lib/websearch_templates.py:1624
+#: ../../../modules/websearch/lib/websearch_templates.py:1601
+#: ../../../modules/websearch/lib/websearch_templates.py:1603
+#: ../../../modules/websearch/lib/websearch_templates.py:1616
+#: ../../../modules/websearch/lib/websearch_templates.py:1619
+#: ../../../modules/websearch/lib/websearch_templates.py:1622
+#: ../../../modules/websearch/lib/websearch_templates.py:1625
+#: ../../../modules/websearch/lib/websearch_templates.py:1628
 msgid "in"
 msgstr "в"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:1629
+#: ../../../modules/websearch/lib/websearch_templates.py:1633
 msgid ""
 "Haven't found what you were looking for? Try your search on other servers:"
 msgstr "Не знайшли потрібного? Спробуйте пошуковий сервер:"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:1743
-#: ../../../modules/websearch/lib/websearch_templates.py:1748
-#: ../../../modules/websearch/lib/websearch_templates.py:2100
+#: ../../../modules/websearch/lib/websearch_templates.py:1747
+#: ../../../modules/websearch/lib/websearch_templates.py:1752
+#: ../../../modules/websearch/lib/websearch_templates.py:2099
 msgid "<strong>%s</strong> records found"
 msgstr "<strong>%s</strong> знайдених записів"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:1794
+#: ../../../modules/websearch/lib/websearch_templates.py:1798
 #, fuzzy
 msgid "begin"
 msgstr "увійти"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:1802
+#: ../../../modules/websearch/lib/websearch_templates.py:1806
 #: ../../../modules/websubmit/lib/websubmit_templates.py:1152
 msgid "previous"
 msgstr ""
 
-#: ../../../modules/websearch/lib/websearch_templates.py:1822
+#: ../../../modules/websearch/lib/websearch_templates.py:1826
 #, fuzzy
 msgid "end"
 msgstr "Оголошення"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:1841
+#: ../../../modules/websearch/lib/websearch_templates.py:1845
 msgid "jump to record:"
 msgstr "перейти до запису:"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:1854
+#: ../../../modules/websearch/lib/websearch_templates.py:1858
 msgid "Search took %.2f seconds."
 msgstr "Пошук тривав %.2f секунд."
 
-#: ../../../modules/websearch/lib/websearch_templates.py:1964
+#: ../../../modules/websearch/lib/websearch_templates.py:1963
 msgid "Format"
 msgstr ""
 
-#: ../../../modules/websearch/lib/websearch_templates.py:1984
+#: ../../../modules/websearch/lib/websearch_templates.py:1983
 msgid "Record created %s, last modified %s"
 msgstr "Запис створено %s, остання зміна %s"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:1998
+#: ../../../modules/websearch/lib/websearch_templates.py:1997
 msgid "Cited by: %s records"
 msgstr "Cited by: %s records"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:2012
+#: ../../../modules/websearch/lib/websearch_templates.py:2011
 msgid "Co-cited with: %s records"
 msgstr "Co-cited with: %s records"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:2029
+#: ../../../modules/websearch/lib/websearch_templates.py:2028
 msgid "People who downloaded this document also downloaded:"
 msgstr "People who downloaded this document also downloaded:"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:2044
+#: ../../../modules/websearch/lib/websearch_templates.py:2043
 msgid "People who viewed this page also viewed:"
 msgstr "People who viewed this page also viewed:"
 
-#: ../../../modules/websearch/lib/websearch_templates.py:2091
+#: ../../../modules/websearch/lib/websearch_templates.py:2090
 msgid ""
 "<strong>Results overview:</strong> Found <strong>%s</strong> records in %.2f "
 "seconds."
@@ -1670,14 +1670,14 @@ msgstr ""
 "<strong>Результат:</strong> Знайдено <strong>%s</strong> записів за %.2f "
 "секунд."
 
-#: ../../../modules/websearch/lib/websearch_templates.py:2127
+#: ../../../modules/websearch/lib/websearch_templates.py:2126
 msgid ""
 "Boolean query returned no hits. Please combine your search terms differently."
 msgstr ""
 "Результатів для умовного запиту не знайдено. Виберіть іншу комбінацію "
 "термінів."
 
-#: ../../../modules/websearch/lib/websearch_templates.py:2167
+#: ../../../modules/websearch/lib/websearch_templates.py:2166
 msgid "See also: similar author names"
 msgstr "Див. також: подібні прізвища авторів"
 

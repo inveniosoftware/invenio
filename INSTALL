@@ -151,6 +151,11 @@ Contents
           <http://www.cons.org/cmucl/>
           <http://sbcl.sourceforge.net/>     
 
+     n) GNU Gettext, a set of tools that makes it possible to
+	translate the application in multiple languages. 
+           <http://www.gnu.org/software/gettext/>
+	This is available by default on many systems.
+
    Note that the configure script checks whether you have all
    the prerequisite software installed and that it won't let
    you to continue unless everything is in order.  It also warns you 

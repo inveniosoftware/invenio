@@ -23,6 +23,9 @@
 AC_INIT(cdsware, 0.7.1.20051115, cds.support@cern.ch)
 AM_INIT_AUTOMAKE(cdsware, 0.7.1.20051115)
 
+# This is the list of _all_ the languages supported by CDSware
+ALL_LINGUAS="ca cs de el en es fr it no pt ru sk sv uk"
+
 ## Check for install:
 AC_PROG_INSTALL
 
@@ -73,6 +76,16 @@ if test -z "$DBPASS"; then
    You have not used the "--with-dbpass" argument that should define DB user password.  
    Example: "--with-dbpass=myp1ss".])
 fi   
+
+## Check for gettext and define the full list of supported languages
+AC_SUBST(ALL_LINGUAS)
+# Only msgfmt is needed by the end user (to convert po files into mo files)
+AC_PATH_PROG(MSGFMT, [msgfmt])
+if test -z "$MSGFMT"; then
+  AC_MSG_ERROR([
+  msgfmt (part of GNU Gettext) was not found in your PATH. Please install it first.
+  Available from <http://www.gnu.org/software/gettext/>.])
+fi
 
 ## Check for WML:
 AC_PATH_PROG(WML, wml)
