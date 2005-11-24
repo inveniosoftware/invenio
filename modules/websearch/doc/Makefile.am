@@ -30,8 +30,10 @@ EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 
-%.en.html %.fr.html %.de.html %.es.html %.ca.html %.pt.html %.it.html %.ru.html %.sk.html %.cs.html %.no.html %.sv.html %.el.html %.uk.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-           $(top_srcdir)/config/messages.wml
+LINGUAS = $(shell grep -v '^\#' $(top_srcdir)/po/LINGUAS)
+MO = $(LINGUAS:%=$(top_builddir)/po/%.gmo)
+
+%.en.html %.fr.html %.de.html %.es.html %.ca.html %.pt.html %.it.html %.ru.html %.sk.html %.cs.html %.no.html %.sv.html %.el.html %.uk.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(MO)
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$*.en.html \
 	       -o\(ALL-LANG_*\)+LANG_FR:$*.fr.html \
 	       -o\(ALL-LANG_*\)+LANG_DE:$*.de.html \
@@ -47,8 +49,7 @@ CLEANFILES = $(doc_DATA) *~ *.tmp
 	       -o\(ALL-LANG_*\)+LANG_EL:$*.el.html \
 	       -o\(ALL-LANG_*\)+LANG_UK:$*.uk.html $<
 
-	for lang in $(ALL_LINGUAS); do \
-		$(PYTHON) $(top_srcdir)/modules/miscutil/i18n/i18n-update-wml.py \
-			$(top_builddir)/modules/miscutil/i18n $${lang} $(<:%.html.wml=%).$${lang}.html ; \
+	for lang in $(LINGUAS); do \
+		$(PYTHON) $(top_srcdir)/po/i18n_update_wml.py $${lang} "$*.$${lang}.html" ; \
 	done
 

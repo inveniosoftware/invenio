@@ -23,9 +23,6 @@
 AC_INIT(cdsware, 0.7.1.20051115, cds.support@cern.ch)
 AM_INIT_AUTOMAKE(cdsware, 0.7.1.20051115)
 
-# This is the list of _all_ the languages supported by CDSware
-ALL_LINGUAS="ca cs de el en es fr it no pt ru sk sv uk"
-
 ## Check for install:
 AC_PROG_INSTALL
 
@@ -77,15 +74,8 @@ if test -z "$DBPASS"; then
    Example: "--with-dbpass=myp1ss".])
 fi   
 
-## Check for gettext and define the full list of supported languages
-AC_SUBST(ALL_LINGUAS)
-# Only msgfmt is needed by the end user (to convert po files into mo files)
-AC_PATH_PROG(MSGFMT, [msgfmt])
-if test -z "$MSGFMT"; then
-  AC_MSG_ERROR([
-  msgfmt (part of GNU Gettext) was not found in your PATH. Please install it first.
-  Available from <http://www.gnu.org/software/gettext/>.])
-fi
+## Check for gettext support
+AM_GNU_GETTEXT(external)
 
 ## Check for WML:
 AC_PATH_PROG(WML, wml)
@@ -453,8 +443,10 @@ AC_SUBST(GIFINTER)
 AC_SUBST(GIFRSIZE)
 
 ## Define output files:
-AC_CONFIG_FILES([config.nice \
+AC_CONFIG_FILES([config.nice  \
 	  Makefile \
+          po/Makefile.in \
+          m4/Makefile \
 	  config/Makefile \
 	  config/configbis.wml \
 	  modules/Makefile \
@@ -551,7 +543,6 @@ AC_CONFIG_FILES([config.nice \
 	  modules/miscutil/bin/dbexec \
 	  modules/miscutil/bin/dbtest \
 	  modules/miscutil/bin/testsuite \
-	  modules/miscutil/i18n/Makefile \
 	  modules/miscutil/lib/Makefile \
 	  modules/miscutil/demo/Makefile \
 	  modules/miscutil/sql/Makefile \

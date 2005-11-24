@@ -28,5 +28,4 @@ CLEANFILES = $(doc_DATA) *~ *.tmp
 
 %.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdsnavbar.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-	$(PYTHON) $(top_srcdir)/modules/miscutil/i18n/i18n-update-wml.py \
-		$(top_builddir)/modules/miscutil/i18n en $@
+	$(PYTHON) $(top_srcdir)/po/i18n_update_wml.py en $@

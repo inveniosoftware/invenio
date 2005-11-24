@@ -20,9 +20,9 @@
 confignicedir = $(sysconfdir)/build
 confignice_SCRIPTS=config.nice
 
-SUBDIRS = config modules
+SUBDIRS = po m4 config modules
 
-EXTRA_DIST = UNINSTALL RELEASE-NOTES configure-tests.py config.nice.in
+EXTRA_DIST = config.rpath  UNINSTALL RELEASE-NOTES configure-tests.py config.nice.in
 
 ## submit stuff for demo data link creation
 sbmdir = $(WEBDIR)/submit/access/protected
@@ -229,3 +229,5 @@ remove-demo-records:
 	@echo "**********************************************************"
 
 CLEANFILES = *~
+
+ACLOCAL_AMFLAGS = -I m4
