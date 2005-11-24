@@ -22,7 +22,7 @@
 __version__ = "$Id$"
 
 ## import interesting modules: 
-import string 
+
 import os 
 import sys 
 import time 
@@ -51,7 +51,6 @@ def write_coordinates_in_tmp_file(lists_coordinates):
     One set represents a curve in the graph.
     """
     max_y_datas = 0
-    #print "list coordonee " + str(lists_coordinates)
     tempfile.tempdir = webdir + "img" 
     fname = tempfile.mktemp() 
     file_dest = open(fname, 'a') 
@@ -90,7 +89,7 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
     graphe_titles  - List of graph titles. It's used to name the curve in the legend.
     intervals      - x tics location and xrange specification"""
     
-    if cfg_gnuplot_available==0: 
+    if cfg_gnuplot_available == 0: 
         return (None, None)
     #For different curves 
     color_line_list = ['4', '3', '2', '9', '6'] 
