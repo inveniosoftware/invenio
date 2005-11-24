@@ -107,15 +107,12 @@ modules/miscutil/bin/dbexec.in
 modules/miscutil/bin/dbtest.in
 modules/miscutil/bin/testsuite.in
 modules/miscutil/demo/democfgdata.sql.wml
-modules/miscutil/lib/config.py
 modules/miscutil/lib/config.py.wml
 modules/miscutil/lib/dateutils.py
-modules/miscutil/lib/dbquery.py
 modules/miscutil/lib/dbquery.py.wml
 modules/miscutil/lib/errorlib.py
 modules/miscutil/lib/errorlib_tests.py
 modules/miscutil/lib/__init__.py
-modules/miscutil/lib/messages.py
 modules/miscutil/lib/messages.py.wml
 modules/miscutil/lib/textutils.py
 modules/miscutil/sql/tabfill.sql.wml
