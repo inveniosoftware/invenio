@@ -446,7 +446,6 @@ AC_SUBST(GIFRSIZE)
 AC_CONFIG_FILES([config.nice  \
 	  Makefile \
           po/Makefile.in \
-          m4/Makefile \
 	  config/Makefile \
 	  config/configbis.wml \
 	  modules/Makefile \
