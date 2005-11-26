@@ -4,4 +4,5 @@ POTFILES-*
 Makefile
 Makefile.in
 *.sed
+*.pyc
 stamp-po
