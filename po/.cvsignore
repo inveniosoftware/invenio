@@ -3,6 +3,5 @@ POTFILES
 POTFILES-*
 Makefile
 Makefile.in
-*.pot
 *.sed
 stamp-po
