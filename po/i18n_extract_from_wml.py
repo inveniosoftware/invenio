@@ -1,3 +1,5 @@
+## $Id$
+##
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -32,8 +34,12 @@ _ws_re = re.compile('\s+')
 
 def print_usage():
     """Print usage info."""
-    print "Usage: %s <dirname> <file-containing-filelist-relative-to-dirname>"
-    return 
+    print """Usage: %s <dirname> <potfiles-filename>
+Description: Extract translatable strings from the list of files read
+             from potfiles-filename.  The files specified there are
+             relative to dirname.  Print results on stdout.
+"""
+    return
 
 def quote(text):
     """Normalize and quote a string for inclusion in the po file."""    
@@ -44,15 +50,15 @@ def quote(text):
            replace('"',  '\\"')
 
 
-def extract_from_filelist(dirname, filelistfilename):
-    """Extract strings from the list of files read from
-    filelistfilename relative to dirname.
-    Print results on stdout.
+def extract_from_wml_files(dirname, potfiles_filename):
+    """Extract translatable strings from the list of files read from
+    potfiles_filename.  The files specified there are relative to
+    dirname.  Print results on stdout.
     """
 
     ## extract messages and fill db:
     db = {}
-    for f in [ f.strip() for f in open(filelistfilename) ]:
+    for f in [ f.strip() for f in open(potfiles_filename) ]:
         if not f or f.startswith('#'):
             continue
 
@@ -124,17 +130,17 @@ def extract_from_filelist(dirname, filelistfilename):
 if __name__ == "__main__":
     if len(sys.argv) == 3:
         dirname = sys.argv[1]
-        filelistfilename = sys.argv[2]
+        potfiles_filename = sys.argv[2]
         if not os.path.isdir(dirname):
-            print "E: %s is not a directory." % dirname
+            print "ERROR: %s is not a directory." % dirname
             print_usage()
             sys.exit(1)
-        elif not os.path.isfile(filelistfilename):
-            print "E: %s is not a file." % filelistfilename
+        elif not os.path.isfile(potfiles_filename):
+            print "ERROR: %s is not a file." % potfiles_filename
             print_usage()
             sys.exit(1)
         else:
-            extract_from_filelist(sys.argv[1], sys.argv[2])
+            extract_from_wml_files(sys.argv[1], sys.argv[2])
     else:
         print_usage()
 
