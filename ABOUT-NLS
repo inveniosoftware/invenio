@@ -1,5 +1,110 @@
--*- text -*-
+CERN DOCUMENT SERVER SOFTWARE (CDSware) NATIVE LANGUAGE SUPPORT
+===============================================================
 
-This package is mostly written in Python, so the usual requirements
-for i18n do not apply.
+Revision: $Id$
 
+About
+=====
+
+This document describes the Native Language Support (NLS) in CDSware.
+
+Contents
+========
+
+1. Native Language Support information for administrators
+2. Native Language Support information for translators
+3. Native Language Support information for programmers
+
+1. Native Language Support information for administrators
+=========================================================
+
+CDSware is currently available in the following languages:
+
+   ca = Catalan 
+   cs = Czech 
+   de = German 
+   el = Greek 
+   en = English 
+   es = Spanish 
+   fr = French 
+   it = Italian
+   no = Norwegian (Bokmål) 
+   pt = Portuguese 
+   ru = Russian 
+   sk = Slovak 
+   sv = Swedish
+   uk = Ukrainian
+
+If you are installing CDSware and you want to enable/disable some
+languages, please just follow the standard installation procedure as
+described in the INSTALL file.  The default language of the
+installation as well as the list of all user-seen languages can be
+selected in the general config.wml file, see variables CDSLANG and
+CDSLANGS.
+
+(Please note that some runtime CDSware daemons -- such as webcoll,
+responsible for updating the collection cache, running every hour or
+so -- may work twice as long when twice as many user-seen languages
+are selected, because it creates collection cache page elements for
+every user-seen language.  Therefore, if you have defined thousands of
+collections and if you find the webcoll speed to be slow in your
+setup, you may want to try to limit the list of selected languages.)
+
+2. Native Language Support information for translators
+======================================================
+
+If you want to contibute a translation to CDSware, then please follow
+the procedure below:
+
+  - Please check out the existence of po/LL.po file for your language,
+    where LL stands for the ISO 639 language code (e.g. `el' for
+    Greek).  If such a file exists, then this language is already
+    supported, in which case you may want to review the existing
+    translation (see below).  If the file does not exist yet, then you
+    can create an empty one by copying the cdsware.pot template file
+    into LL.po.
+
+  - Please edit LL.po to review existing translation.  The PO file
+    format is a standard GNU gettext one and so you can take advantage
+    of dedicated editing modes of programs such as GNU Emacs, KBabel,
+    or poEdit to edit it.  Pay special attention to strings marked as
+    fuzzy and untranslated.  (E.g. in the Emacs PO mode, press `f' and
+    `u' to find them.)  Do not forget to remove fuzzy marks for
+    reviewed translations.  (E.g. in the Emacs PO mode, press `TAB' to
+    remove fuzzy status of a string.)
+
+  - After you are done with translations, please validate your file to
+    make sure it does not contain formatting errors.  (E.g. in the
+    Emacs PO mode, press `V' to validate the file.)
+
+  - Please contribute your translation by emailing the file to
+    <cds.support@cern.ch>.  You help is greatly appreciated and will
+    be properly credited in the CREDITS file.
+
+See also the GNU gettext manual, especially the chapters 5, 6 and 11.
+<http://www.gnu.org/software/gettext/manual/html_chapter/gettext_toc.html>
+
+3. Native Language Support information for programmers
+======================================================
+
+CDSware uses standard GNU gettext I18N and L12N philosophy.
+
+In Python programs, all output strings should be made translatable via
+_() convention:
+
+   from messages import gettext_set_language
+   [...]
+   def square(x, ln=cdslang):
+       _ = gettext_set_language(ln)
+       print _("Hello there!")
+       print _("The square of %s is %s.") % (x, x*x)
+
+In WML source files, the convention is _()_:
+
+   _(Search Help)_
+
+Please follow the WebSearch module files for an example.
+
+       - CDS Development Group
+         <cds.support@cern.ch>
+         <http://cdsware.cern.ch/>
