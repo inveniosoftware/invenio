@@ -27,7 +27,7 @@ import cdsware.websearchadminlib as wsc
 from cdsware.webpage import page, create_error_box
 from cdsware.config import weburl,cdslang
 from cdsware.webuser import getUid, page_not_authorized
-from messages import gettext_set_language
+from cdsware.messages import gettext_set_language
 
 __version__ = "$Id$"
 
