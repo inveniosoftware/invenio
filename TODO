@@ -121,6 +121,22 @@ to JPEGs sitting on another server, so we cannot easily add
 next/previous links there.  But for the future we can rework the
 formats in order to allow it... I've put it into our TODO list.
 
+** BibFormat-20051010: adding new format to Detailed record pages
+
+> What I haven't been able to understand is how to make this
+> format available in the list of available formats in the
+> detailed record screen.  
+
+This has to be done by editing the source code.  Open
+search_engine.py, search for "XML DC", add a link to your new format
+in a similar way, and restart Apache.
+
+(Note that you can associate any format to any collection, but this
+will only modify the ``Output formats'' option on the Advanced Search
+interface pages for respective collections, not the Detailed record
+pages for associated records.  We shall add this.)
+
+
 * BibIndex
 
 ** BibIndex-20031217: make our own ACC indexes
@@ -290,7 +306,7 @@ Add comments on PHP and Python linking to the same MySQL library.
 Each module should have its own version numbering, to easily track
 what changed.  For example:
 
-  $ /soft/cdsware-PCDH23/bin/bibindex -V
+  $ /soft/cdsware-PCDH23/bin/bibindex -V  
   CDSware/0.3.3 bibindex/1.2
 
   $ /soft/cdsware-PCDH23/bin/bibformat -V
@@ -344,6 +360,27 @@ this.
 The config variables in config.py are dirty, as they are badly named
 and use different naming styles.  Harmonize them to a schema like
 cfg_general_for, cfg_webaccess_bar, etc.
+
+** Miscellaneous-20051114: mysql port and configure
+
+On Fri, 11 Nov 2005, guido pelzer wrote:
+> i want to run cdsware with mysql on another port than 3306. for
+> mysql i do: mysql -u <...> -p -h <...> -P <...> but what's the
+> matter with configure of cdsware?
+> 
+> ./configure 
+> --with-dbhost=IP PORT  
+> 
+> or
+> 
+> --with-dbhost=IP:PORT
+
+It won't work out of the box this way.  You would have to edit
+dbquery.py and put "port=XXXX" argument there.  Then you would also
+have also to edit PHP scripts.
+
+We'll add the port option to the configure script for one of the next
+releases.
 
 * OAI
 
@@ -594,6 +631,31 @@ were searching for authors with names between a- to zz.  Note:
 
 I think I'll just return an empty result in case the `chosen' tag
 (not773__p) does not exist.  It's good that you catched this!
+
+** WebSearch-20051017: WebSearch Admin and portalboxes
+
+On Thu, 13 Oct 2005, Ferran Jorba wrote:
+> - Create new portalbox: Fill Title and Body.  My little experience
+> is that titles should be unique.
+
+Actually, the titles do not have to be unique.  The portalboxes are
+recognized by IDs behind the scene.  The WebSearch Admin interface
+shows only the portalbox titles in several places though, which may
+not be very admin-friendly if several portalboxes have the same title.
+We'll fix this in the WebSearch Admin.  (Added to our TODO file.)
+
+** WebSearch-20051102: `Search collections' box should be I18N aware
+
+On Tue, 25 Oct 2005, guido pelzer wrote:
+> your pulldown "Search collections" on
+> http://cdsware.cern.ch:8000/search.py?sc=1&ln=en&p=&f=&action=Search&cc=Atlantis+Institute+of+Fictive+Science&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts
+> 
+> can you define translations for the entries or can you only display
+> the internal database name? example: multimedia & arts --- german
+> translation: multimedia & kunst
+
+This is not done currently, but indeed it's a good idea.  I've added
+it to my TODO file.
 
 * WebSession
 
