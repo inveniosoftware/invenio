@@ -14,6 +14,7 @@ Contents
 1. Native Language Support information for administrators
 2. Native Language Support information for translators
 3. Native Language Support information for programmers
+A. Introducing a new language
 
 1. Native Language Support information for administrators
 =========================================================
@@ -62,7 +63,10 @@ the procedure below:
     supported, in which case you may want to review the existing
     translation (see below).  If the file does not exist yet, then you
     can create an empty one by copying the cdsware.pot template file
-    into LL.po.
+    into LL.po that you can review as described in the next item.
+    (Please note that you would have to translate some dynamic
+    elements that are currently not located in the PO file, see the
+    appendix A below.)
 
   - Please edit LL.po to review existing translation.  The PO file
     format is a standard GNU gettext one and so you can take advantage
@@ -105,6 +109,80 @@ In WML source files, the convention is _()_:
 
 Please follow the WebSearch module files for an example.
 
+Appendix A. Introducing a new language
+======================================
+
+If you are introducing a new language for the first time, then please
+firstly create and edit the PO file as described above in Section 2.
+This will make the largest portion of the translating work done, but
+it is not fully enough, because we currently have also to translate
+some dynamic elements that aren't located in PO files.
+
+The development team can edit the respective files ourself, if the
+translator sends over the following translations by email:
+ 
+   - server name:
+ 
+        Atlantis Institute of Fictive Science
+ 
+   - field names, usually loaded from tabfill.sql.wml:
+ 
+        any field
+        title
+        author
+        abstract
+        keyword
+        report number
+        subject  
+        reference
+        fulltext
+        collection
+        division
+        year
+        experiment
+        record ID
+ 
+   - collection names, usually loaded from democfgdata.sql.wml:
+ 
+        Preprints
+        Books
+        Theses
+        Reports
+        Articles
+        Pictures
+        CERN Divisions
+        CERN Experiments
+        Theoretical Physics (TH)
+        Experimental Physics (EP)
+        Articles & Preprints
+        Books & Reports
+        Multimedia & Arts
+        Poetry
+ 
+   - the right-hand-side portalbox:
+ 
+        ABOUT THIS SITE
+        Welcome to the demo site of the CDSware, a free document server
+        software coming from CERN. Please feel free to explore all the
+        features of this demo site to the full.
+        SEE ALSO
+ 
+The development team will than edit various files (po/LINGUAS, config
+files, sql files, plenty of Makefile files, etc) as needed.
+
+The last phase of the initial introduction of the new language would
+be to translate some short static HTML pages:
+ 
+   - modules/webhelp/web/index.html.wml
+   - modules/websearch/doc/index.html.wml
+
+Thanks for helping to internationalize the CERN Document Server
+Software.
+
        - CDS Development Group
          <cds.support@cern.ch>
          <http://cdsware.cern.ch/>
+
+
+
+
