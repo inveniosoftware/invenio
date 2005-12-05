@@ -175,6 +175,34 @@ def get_fieldvalues(recID, tag):
         out.append(row[0])
     return out
 
+def get_associated_subfield_value(recID, tag, value, associated_subfield_code):
+    """Return list of ASSOCIATED_SUBFIELD_CODE, if exists, for record
+    RECID and TAG of value VALUE.  Used by fulltext indexer only.
+    Note: TAG must be 6 characters long (tag+ind1+ind2+sfcode),
+    otherwise en empty string is returned.
+    FIXME: what if many tag values have the same value but different
+    associated_subfield_code?  Better use bibrecord library for this.
+    """
+    out = ""
+    if len(tag) != 6:
+        return out
+    bibXXx = "bib" + tag[0] + tag[1] + "x"
+    bibrec_bibXXx = "bibrec_" + bibXXx
+    query = """SELECT bb.field_number, b.tag, b.value FROM %s AS b, %s AS bb
+               WHERE bb.id_bibrec=%s AND bb.id_bibxxx=b.id AND tag LIKE '%s%%'""" % \
+            (bibXXx, bibrec_bibXXx, recID, tag[:-1])
+    res = run_sql(query)
+    field_number = -1
+    for row in res:        
+        if row[1] == tag and row[2] == value:
+            field_number = row[0]
+    if field_number > 0:
+        for row in res:        
+            if row[0] == field_number and row[1] == tag[:-1] + associated_subfield_code:
+                out = row[2]
+                break
+    return out
+    
 def get_field_tags(field):
     """Returns a list of MARC tags for the field code 'field'.
        Returns empty list in case of error.
@@ -198,47 +226,63 @@ def get_fulltext_urls_from_html_page(htmlpagebody):
        """
     out = []
     for ext in conv_programs.keys():
-        expr = sre.compile( r"\"(http://[\w]+\.+[\w]+[^\"'><]*\.)(" + \
+        expr = sre.compile( r"\"(http://[\w]+\.+[\w]+[^\"'><]*\." + \
                            ext + r")\"") 
         match =  expr.search(htmlpagebody)
         if match:
-            out.append([ext,match.group()])
+            out.append([ext,match.group(1)])
         else: # FIXME: workaround for getfile, should use bibdoc tables
             expr_getfile = sre.compile(r"\"(http://.*getfile\.py\?.*format=" + ext + r"&version=.*)\"")
             match =  expr_getfile.search(htmlpagebody)
             if match:
-                out.append([ext,match.group()])            
+                out.append([ext,match.group(1)])            
     return out
 
-def get_words_from_fulltext(url_indirect,separators="[^\w]",split=string.split):
-    """Returns all the words contained in the fulltext whose url
-       is contained in the document pointed to in phrase.
-       Please note the double indirection. url_indirect
-       returns a document that has to be parsed to get the actual
-       urls."""
-    if cfg_bibindex_fulltext_index_local_files_only and string.find(url_indirect, weburl) < 0:
+def get_words_from_fulltext(url_direct_or_indirect,
+                            separators="[^\w]",
+                            split=string.split,
+                            force_file_extension=None):
+    """Returns all the words contained in the document specified by
+       URL_DIRECT_OR_INDIRECT with the words being split by
+       SEPARATORS.  If FORCE_FILE_EXTENSION is set (e.g. to "pdf",
+       then treat URL_DIRECT_OR_INDIRECT as a PDF file.  (This is
+       interesting to index Indico for example.)  Note also that
+       URL_DIRECT_OR_INDIRECT may be either a direct URL to the
+       fulltext file or an URL to a setlink-like page body that
+       presents the links to be indexed.  In the latter case the
+       URL_DIRECT_OR_INDIRECT is parsed to extract actual direct URLs
+       to fulltext documents, for all knows file extensions as
+       specified by global conv_programs config variable.
+    """
+
+    if cfg_bibindex_fulltext_index_local_files_only and string.find(url_direct_or_indirect, weburl) < 0:
         return []
     if options["verbose"] >= 2:
-        write_message("... reading fulltext files from %s started" % url_indirect)
-    url_direct = None
-    fulltext_urls = None
-    # check for direct link in url
-    url_indirect_ext = lower(split(url_indirect,".")[-1])
+        write_message("... reading fulltext files from %s started" % url_direct_or_indirect)
 
-    if url_indirect_ext in conv_programs.keys():
-        fulltext_urls = [(url_indirect_ext,url_indirect)]
-        
-    # Indirect url. Try to fetch the real fulltext(s)
-    if not fulltext_urls:
-        # read "setlink" data
-        try:
-            htmlpagebody = urllib.urlopen(url_indirect).read()
-        except:
-            sys.stderr.write("Error: Cannot read %s.\n" % url_indirect)
-            return []
-        fulltext_urls = get_fulltext_urls_from_html_page(htmlpagebody)
-        if options["verbose"] >= 9:
-            write_message("... fulltext_urls = %s" % fulltext_urls)
+    fulltext_urls = None
+    if not force_file_extension:
+        url_direct = None
+        fulltext_urls = None
+        # check for direct link in url
+        url_direct_or_indirect_ext = lower(split(url_direct_or_indirect,".")[-1])
+
+        if url_direct_or_indirect_ext in conv_programs.keys():
+            fulltext_urls = [(url_direct_or_indirect_ext,url_direct_or_indirect)]
+
+        # Indirect url. Try to fetch the real fulltext(s)
+        if not fulltext_urls:
+            # read "setlink" data
+            try:
+                htmlpagebody = urllib.urlopen(url_direct_or_indirect).read()
+            except:
+                sys.stderr.write("Error: Cannot read %s.\n" % url_direct_or_indirect)
+                return []
+            fulltext_urls = get_fulltext_urls_from_html_page(htmlpagebody)
+            if options["verbose"] >= 9:
+                write_message("... fulltext_urls = %s" % fulltext_urls)
+    else:
+        fulltext_urls = [[force_file_extension, url_direct_or_indirect]]
 
     words = {}
 
@@ -254,9 +298,9 @@ def get_words_from_fulltext(url_indirect,separators="[^\w]",split=string.split):
 
         # read fulltext file:
         try:
-            url = urllib.urlopen(url_direct[1:-1])
+            url = urllib.urlopen(url_direct)
         except:
-            sys.stderr.write("Error: Cannot read %s.\n" % url_direct[1:-1])
+            sys.stderr.write("Error: Cannot read %s.\n" % url_direct)
             break # try other fulltext files...
         
         tmp_name = tempfile.mktemp('cdsware.tmp')
@@ -358,7 +402,7 @@ def get_words_from_fulltext(url_indirect,separators="[^\w]",split=string.split):
         
 
     if options["verbose"] >= 2:
-        write_message("... reading fulltext files from %s ended" % url_indirect)
+        write_message("... reading fulltext files from %s ended" % url_direct_or_indirect)
         
     return words.keys()
 
@@ -963,8 +1007,9 @@ class WordTable:
         # secondly fetch all needed tags:
         for tag in self.fields_to_index:
 	    if tag in tagToWordsFunctions.keys():
-                get_words_function = tagToWordsFunctions[ tag ]
-	    else: get_words_function = get_words_from_phrase
+                get_words_function = tagToWordsFunctions[tag]
+	    else:
+                get_words_function = get_words_from_phrase
             bibXXx = "bib" + tag[0] + tag[1] + "x"
             bibrec_bibXXx = "bibrec_" + bibXXx
             query = """SELECT bb.id_bibrec,b.value FROM %s AS b, %s AS bb
@@ -976,7 +1021,25 @@ class WordTable:
             for row in res:
                 recID,phrase = row
                 if not wlist.has_key(recID): wlist[recID] = []
-                new_words = get_words_function(phrase) # ,self.separators
+                if tag == "8564_u":
+                    # Special treatment for fulltext indexing. 8564
+                    # $$u contains URL, and $$y link name.  If $$y is
+                    # actually a file name, that is if it ends with
+                    # something like .pdf or .ppt, then $$u is treated
+                    # as direct URL to the PDF file, and is indexed as
+                    # such.  This is useful to index Indico files.
+                    # FIXME: this is a quick fix only.  We should
+                    # rather download all 856 $$u files and analyze
+                    # content in order to decide how to index them
+                    # (directly for Indico, indirectly for Setlink).                    
+                    filename = get_associated_subfield_value(recID,'8564_u', phrase, 'y')
+                    filename_extension = lower(split(filename, ".")[-1])
+                    if filename_extension in conv_programs.keys():
+                        new_words = get_words_function(phrase, force_file_extension=filename_extension) # ,self.separators
+                    else:
+                        new_words = get_words_function(phrase) # ,self.separators
+                else:
+                    new_words = get_words_function(phrase) # ,self.separators
                 wlist[recID] = list_union(new_words,wlist[recID])
 
         # were there some words for these recIDs found?
