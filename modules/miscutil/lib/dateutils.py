@@ -51,8 +51,6 @@ datetext_default = '0000-00-00 00:00:00'
 datestruct_default = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 datetext_format = "%Y-%m-%d %H:%M:%S"
 
-
-
 def convert_datetext_to_dategui(datetext, ln=cdslang):
     """
     Convert:
@@ -61,10 +59,12 @@ def convert_datetext_to_dategui(datetext, ln=cdslang):
     """ 
     try:
         datestruct = convert_datetext_to_datestruct(datetext)
+        if datestruct == datestruct_default:
+            raise ValueError
         month = get_i18n_month_name(datestruct[1], ln=ln)
         output_format = "%02d " + month + " %04Y, %02H:%02M"
         return strftime(output_format, datestruct)
-    except ValueError:
+    except:
         _ = gettext_set_language(ln)
         return _("N/A")
 
@@ -75,7 +75,7 @@ def convert_datetext_to_datestruct(datetext):
     """
     try:
         return strptime(datetext, datetext_format)
-    except ValueError:
+    except:
         return datestruct_default
     
 def convert_datestruct_to_dategui(datestruct, ln=cdslang):
@@ -88,7 +88,7 @@ def convert_datestruct_to_dategui(datestruct, ln=cdslang):
         month = get_i18n_month_name(datestruct[1], ln=ln)
         output_format = "%02d " + month + " %04Y, %02H:%02M"
         return strftime(output_format, datestruct)
-    except ValueError:
+    except:
         _ = gettext_set_language(ln)
         return _("N/A") 
 
@@ -99,9 +99,8 @@ def convert_datestruct_to_datetext(datestruct):
     """
     try:
         return strftime(datetext_format, datestruct)
-    except ValueError:
+    except:
         return datetext_default
-
 
 def get_datetext(year, month, day):
     """
@@ -111,7 +110,7 @@ def get_datetext(year, month, day):
     try:
         datestruct = strptime("%i-%i-%i"% (year, month, day), input_format)
         return strftime(datetext_format, datestruct)
-    except ValueError:
+    except:
         return datetext_default
 
 def get_datestruct(year, month, day):
@@ -121,7 +120,7 @@ def get_datestruct(year, month, day):
     input_format = "%Y-%m-%d"
     try:
         return strptime("%i-%i-%i"% (year, month, day), input_format)
-    except ValueError:
+    except ValueError or TypeError:
         return datestruct_default
     
 def get_i18n_day_name(day_nb, display='short', ln=cdslang):
