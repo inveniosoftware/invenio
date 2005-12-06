@@ -121,12 +121,18 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
             currentaction = ""
             currentstatus = ""
             res2 = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname=%s",(currentdoctype,))
-            ldocname = res2[0][0]
+            if res2:
+                ldocname = res2[0][0]
+            else:
+                ldocname = """***Unknown Document Type - (%s)""" % (currentdoctype,)
 
         if currentaction != row[2]:
             currentaction = row[2]
             res2 = run_sql("SELECT lactname FROM sbmACTION WHERE  sactname=%s",(currentaction,))
-            lactname = res2[0][0]
+            if res2:
+                lactname = res2[0][0]
+            else:
+                lactname = "\""
         else:
             lactname = "\""
 
