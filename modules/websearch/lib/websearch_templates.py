@@ -1963,91 +1963,97 @@ class Template:
                 'format' : _("Format")
               }
 
-        if format != "hm":
-            out += """HTML | <a href="%(weburl)s/search.py?%(url_args)s&of=hm">HTML MARC</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=xd">XML DC</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=xm">XML MARC</a>""" % vars()
+        if format == "hm":
+            out += """<a href="%(weburl)s/search.py?%(url_args)s">HTML</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=hx">BibTeX</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=xd">DC</a> | MARC | <a href="%(weburl)s/search.py?%(url_args)s&of=xm">MARCXML</a>""" % vars()
+        elif format == "hx":
+            out += """<a href="%(weburl)s/search.py?%(url_args)s">HTML</a> | BibTeX | <a href="%(weburl)s/search.py?%(url_args)s&of=xd">DC</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=hm">MARC</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=xm">MARCXML</a>""" % vars()
         else:
-            out += """<a href="%(weburl)s/search.py?%(url_args)s">HTML</a> | HTML MARC | <a href="%(weburl)s/search.py?%(url_args)s&of=xd">XML DC</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=xm">XML MARC</a>""" % vars()
+            out += """HTML | <a href="%(weburl)s/search.py?%(url_args)s&of=hx">BibTeX</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=xd">DC</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=hm">MARC</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=xm">MARCXML</a>""" % vars()
+
         out += "</small></div>"
 
         for row in rows:
             out += row ['record']
+
+            if format.startswith("hd"):
+                # do not print further information but for HTML detailed formats
             
-            if row ['creationdate']:
-                out += """<div class="recordlastmodifiedbox">%(dates)s</div>
-                          <p><span class="moreinfo"><a class="moreinfo" href="%(weburl)s/search.py?p=recid:%(recid)d&amp;rm=wrd&amp;ln=%(ln)s">%(similar)s</a></span>
-                          <form action="%(weburl)s/yourbaskets.py/add" method="post">
-                            <input name="recid" type="hidden" value="%(recid)s">
-                            <br><input class="formbutton" type="submit" name="action" value="%(basket)s">
-                          </form>
-                       """ % {
-                         'dates' : _("Record created %s, last modified %s") % (row['creationdate'], row['modifydate']),
-                         'weburl' : weburl,
-                         'recid' : row['recid'],
-                         'ln' : ln,
-                         'similar' : _("Similar records"),
-                         'basket' : _("ADD TO BASKET")
-                         }
+                if row ['creationdate']:
+                    out += """<div class="recordlastmodifiedbox">%(dates)s</div>
+                              <p><span class="moreinfo"><a class="moreinfo" href="%(weburl)s/search.py?p=recid:%(recid)d&amp;rm=wrd&amp;ln=%(ln)s">%(similar)s</a></span>
+                              <form action="%(weburl)s/yourbaskets.py/add" method="post">
+                                <input name="recid" type="hidden" value="%(recid)s">
+                                <br><input class="formbutton" type="submit" name="action" value="%(basket)s">
+                              </form>
+                           """ % {
+                             'dates' : _("Record created %s, last modified %s") % (row['creationdate'], row['modifydate']),
+                             'weburl' : weburl,
+                             'recid' : row['recid'],
+                             'ln' : ln,
+                             'similar' : _("Similar records"),
+                             'basket' : _("ADD TO BASKET")
+                             }
 
-            out += '<table>'
-            
-            if row.has_key ('citinglist'):
-                cs = row ['citinglist']
-                
-                similar = self.tmpl_print_record_list_for_similarity_boxen (
-                    _("Cited by: %s records") % len (cs), cs, ln)
+                out += '<table>'
 
-                out += '''
-                <tr><td>
-                  %(similar)s&nbsp;<a href="%(weburl)s/search.py?p=recid:%(recid)d&amp;rm=cit&amp;ln=%(ln)s">%(more)s</a>
-                  <br><br>
-                </td></tr>''' % { 'weburl': weburl,   'recid': row ['recid'], 'ln': ln,
-                                  'similar': similar, 'more': _("more"),
-                                  }
+                if row.has_key ('citinglist'):
+                    cs = row ['citinglist']
 
-            if row.has_key ('cociting'):
-                cs = row ['cociting']
-                
-                similar = self.tmpl_print_record_list_for_similarity_boxen (
-                    _("Co-cited with: %s records") % len (cs), cs, ln)
+                    similar = self.tmpl_print_record_list_for_similarity_boxen (
+                        _("Cited by: %s records") % len (cs), cs, ln)
 
-                out += '''
-                <tr><td>
-                  %(similar)s&nbsp;<a href="%(weburl)s/search.py?p=cocitedwith:%(recid)d&amp;ln=%(ln)s">%(more)s</a>
-                  <br>
-                </td></tr>''' % { 'weburl': weburl,   'recid': row ['recid'], 'ln': ln,
-                                  'similar': similar, 'more': _("more"),
-                                  }
-            
-            if row.has_key ('citationhistory'):
-                out += '<tr><td>%s</td></tr>' % row ['citationhistory']
+                    out += '''
+                    <tr><td>
+                      %(similar)s&nbsp;<a href="%(weburl)s/search.py?p=recid:%(recid)d&amp;rm=cit&amp;ln=%(ln)s">%(more)s</a>
+                      <br><br>
+                    </td></tr>''' % { 'weburl': weburl,   'recid': row ['recid'], 'ln': ln,
+                                      'similar': similar, 'more': _("more"),
+                                      }
 
-            if row.has_key ('downloadsimilarity'):
-                cs = row ['downloadsimilarity']
-                
-                similar = self.tmpl_print_record_list_for_similarity_boxen (
-                    _("People who downloaded this document also downloaded:"), cs, ln)
+                if row.has_key ('cociting'):
+                    cs = row ['cociting']
 
-                out += '''
-                <tr><td>%(graph)s</td></tr>
-                <tr><td>%(similar)s</td></tr
-                >''' % { 'weburl': weburl,   'recid': row ['recid'], 'ln': ln,
-                         'similar': similar, 'more': _("more"),
-                         'graph': row ['downloadhistory']
-                         }
+                    similar = self.tmpl_print_record_list_for_similarity_boxen (
+                        _("Co-cited with: %s records") % len (cs), cs, ln)
 
-            out += '</table>'
+                    out += '''
+                    <tr><td>
+                      %(similar)s&nbsp;<a href="%(weburl)s/search.py?p=cocitedwith:%(recid)d&amp;ln=%(ln)s">%(more)s</a>
+                      <br>
+                    </td></tr>''' % { 'weburl': weburl,   'recid': row ['recid'], 'ln': ln,
+                                      'similar': similar, 'more': _("more"),
+                                      }
 
-            if row.has_key ('viewsimilarity'):
-                out += '<p>&nbsp'
-                out += self.tmpl_print_record_list_for_similarity_boxen (
-                    _("People who viewed this page also viewed:"), row ['viewsimilarity'], ln)
+                if row.has_key ('citationhistory'):
+                    out += '<tr><td>%s</td></tr>' % row ['citationhistory']
 
-            if row.has_key ('reviews'):
-                out += '<p>&nbsp'
-                out += row['reviews']
-           
-            if row.has_key ('comments'):
-                out += row['comments']
+                if row.has_key ('downloadsimilarity'):
+                    cs = row ['downloadsimilarity']
+
+                    similar = self.tmpl_print_record_list_for_similarity_boxen (
+                        _("People who downloaded this document also downloaded:"), cs, ln)
+
+                    out += '''
+                    <tr><td>%(graph)s</td></tr>
+                    <tr><td>%(similar)s</td></tr
+                    >''' % { 'weburl': weburl,   'recid': row ['recid'], 'ln': ln,
+                             'similar': similar, 'more': _("more"),
+                             'graph': row ['downloadhistory']
+                             }
+
+                out += '</table>'
+
+                if row.has_key ('viewsimilarity'):
+                    out += '<p>&nbsp'
+                    out += self.tmpl_print_record_list_for_similarity_boxen (
+                        _("People who viewed this page also viewed:"), row ['viewsimilarity'], ln)
+
+                if row.has_key ('reviews'):
+                    out += '<p>&nbsp'
+                    out += row['reviews']
+
+                if row.has_key ('comments'):
+                    out += row['comments']
 
             out += "<p>&nbsp;"
         return out
