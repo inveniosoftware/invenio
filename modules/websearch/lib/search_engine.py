@@ -2620,6 +2620,13 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
         else:
             out += call_bibformat(recID, format)
 
+    elif format.startswith("hx"):
+        # BibTeX format, called on the fly:
+        if record_exist_p == -1:
+            out += _("The record has been deleted.")
+        else:
+            out += call_bibformat(recID, format)
+        
     elif format.startswith("hs"):
         # for citation/download similarity navigation links:        
         if record_exist_p == -1:
