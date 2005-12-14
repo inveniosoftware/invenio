@@ -2569,6 +2569,12 @@ CREATE TABLE IF NOT EXISTS flxKBDBCOLLID2COLL (
   PRIMARY KEY  (vkey)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS flxKBDBCOLLID2BIBTEX (
+  vkey varchar(255) NOT NULL default '',
+  value text,
+  PRIMARY KEY  (vkey)
+) TYPE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS flxKBEJOURNALS (
   vkey varchar(255) NOT NULL default '',
   value text,
