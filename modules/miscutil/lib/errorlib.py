@@ -22,7 +22,9 @@
 __lastupdated__ = """FIXME: last updated"""
 
 from config import *
+from miscutil_config import cfg_miscutil_error_messages  
 from webcomment import wash_url_argument
+from cdsware.messages import wash_language, gettext_set_language
 
 import time
 import string
@@ -122,8 +124,8 @@ def register_errors(errors_or_warnings_list, file, req=None):
         file = 'log'
     else:
         file = 'log'
-        errors_or_warnings_list.append(('ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED', "Invalid argument %s was passed") % file)
-                                                                                                                                                                
+        error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
+        errors_or_warnings_list.append((error, eval(cfg_miscutil_error_messages[error])% file))
     ## update log_errors
     file_pwd = logdir + '/cdsware.' + file
     errors = ''
@@ -146,29 +148,41 @@ def register_errors(errors_or_warnings_list, file, req=None):
         file_to_write.close()
         return_value = 1
     except :
-        errors_or_warnings_list.append(('ERR_MISCUTIL_WRITE_FAILED', "Unable to write to file '%s'\n" % file_pwd))
+        error = 'ERR_MISCUTIL_WRITE_FAILED'
+        errors_or_warnings_list.append((error, cfg_miscutil_error_messages[error] % file_pwd))
         return_value = 0
     return return_value
 
-def get_msg_associated_to_code(code, file):
+def get_msg_associated_to_code(err_code, file='error'):
     """
     Returns formated string of code
     @param code: error or warning code
     @param file: 'error' or 'warning'
-    @return tuple (code, formated_message)
+    @return tuple (err_code, formatted_message)
     """
-    module_directory_name = code.split('_')[1].lower()
-    module_config = module_directory_name + '_config'
-    module_dict = "cfg_" + module_directory_name + "_%s_messages" % file
-    module_dict_call = "cdsware." + module_config + '.' + module_dict
+    err_code = wash_url_argument(err_code, 'str')
+    file = wash_url_argument(file, 'str')
     try:
-        import cdsware
-        err_msg = eval(module_dict_call)[code]
+        module_directory_name = err_code.split('_')[1].lower()
+        module_config = module_directory_name + '_config'
+        module_dict = "cfg_" + module_directory_name + "_%s_messages" % file
+        __import__(module_config, globals(), locals(),[module_dict])
+        err_msg = eval(module_dict)[err_code]
+    except ImportError:
+        error = 'ERR_MISCUTIL_IMPORT_ERROR'
+        err_msg = cfg_miscutil_error_messages[error] % (err_code, module_config + '.' + module_dict)
+        err_code = error
+    except KeyError:
+        error = 'ERR_MISCUTIL_NO_MESSAGE_IN_DICT'
+        err_msg = cfg_miscutil_error_messages[error] % (err_code, module_config + '.' + module_dict)
+        err_code = error
     except:
-        err_msg = "### Error retrieval failure: could not retrieve error msg because of programming error - could not retrieve %s in errors.py/get_msg_associated_to_code" % (module_dict_call + "['" + code + "']")
-    return (code, err_msg) 
+        error = 'ERR_MISCUTIL_UNDEFINED_ERROR'
+        err_msg = cfg_miscutil_error_messages[error] % err_code
+        err_code = error
+    return (err_code, err_msg) 
 
-def get_msgs_for_code_list(code_list, file):
+def get_msgs_for_code_list(code_list, file='error', ln=cdslang):
     """
     @param code_list: list of tuples  [(err_name, arg1, ..., argN), ...]
     
@@ -179,7 +193,7 @@ def get_msgs_for_code_list(code_list, file):
         webcomment_config.py contains
             cfg_webcomment_error_messages = 
             {   'ERR_WEBCOMMENT_INVALID_RECID' : "The record id %s is invalid. Record ids must be %s", ...  }
-        errors_or_warnings_list = [('ERR_WEBCOMMENT_INVALID_RECID', "The record id -3 is invalid. Record ids must be greater than zero"), ....]
+        errors_or_warnings_list = [('ERR_WEBCOMMENT_INVALID_RECID', "The record id -3 is invalid. Record ids must be greater than zero"), ...]
         use get_msgs_for_code_list to produce the wanted errors_or_warnings_list from the dictionary values
 
     For warnings, same thing except:
@@ -190,6 +204,9 @@ def get_msgs_for_code_list(code_list, file):
             if code_list empty, will return None.
             if errors retrieving error messages, will append an error to the list
     """
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+
     out = []
     if type(code_list) is None:
         return None
@@ -200,33 +217,42 @@ def get_msgs_for_code_list(code_list, file):
         nb_tuple_args = len(code_tuple) - 1
         err_code = code_tuple[0]
         if file=='error' and not err_code.startswith('ERR'):
-            out.append(('ERR_MISCUTIL_PROGRAMMING_ERROR', "Trying to write a non error message to cdsware.err log"))
+            error = 'ERR_MISCUTIL_NO_ERROR_MESSAGE'
+            out.append((error, eval(cfg_miscutil_error_messages[error])))
             continue
-        elif file=='warning' and not err_code.startswith('ERR') and not err_code.startswith('WRN'):
-            out.append(('ERR_MISCUTIL_PROGRAMMING_ERROR', "Trying to write a non error message or non warning message to cdsware.log log"))
+        elif file=='warning' and not (err_code.startswith('ERR') or err_code.startswith('WRN')):
+            error = 'ERR_MISCUTIL_NO_WARNING_MESSAGE'
+            out.append((error, eval(cfg_miscutil_error_messages[error])))
             continue
-        err_msg  = get_msg_associated_to_code(err_code, file)[1]
-        nb_msg_args = err_msg.count('%s')
+        (new_err_code, err_msg) = get_msg_associated_to_code(err_code, file)
+        if err_msg[:2] == '_(' and err_msg[-1] == ')':
+            # err_msg is internationalized
+            err_msg = eval(err_msg)
+        nb_msg_args = err_msg.count('%') - err_msg.count('%%')
         parsing_error = ""
-        if err_msg.startswith('###') or nb_msg_args==0: #if error or no %s in err_msg
-            out.append((err_code, err_msg))
+
+        if new_err_code != err_code or nb_msg_args == 0:
+            # undefined_error or immediately displayable error
+            out.append((new_err_code, err_msg))
             continue
         if nb_msg_args == nb_tuple_args:
             err_msg = err_msg % code_tuple[1:]
         elif nb_msg_args < nb_tuple_args:
             err_msg = err_msg % code_tuple[1:nb_msg_args+1]
-            parsing_error = " Programming error: Too many arguments given for error %s " % code_tuple[0]
+            parsing_error =  'ERR_MISCUTIL_TOO_MANY_ARGUMENT'
+            parsing_error_message = eval(cfg_miscutil_error_messages[parsing_error])%code_tuple[0]
         elif nb_msg_args > nb_tuple_args:
             code_tuple = list(code_tuple)
             for i in range(nb_msg_args - nb_tuple_args):
                 code_tuple.append('???')
             code_tuple = tuple(code_tuple)
             err_msg = err_msg % code_tuple[1:]
-            parsing_error = " Programming error: Too few arguments given for error %s " % code_tuple[0]
+            parsing_error = 'ERR_MISCUTIL_TOO_FEW_ARGUMENT'
+            parsing_error_message = eval(cfg_miscutil_error_messages[parsing_error])%code_tuple[0]
         out.append((err_code, err_msg))
         if parsing_error:
-            out.append(('ERR_MISUTIL_PROGRAMMING_ERROR', parsing_error))
-    if not out:
+            out.append((parsing_error, parsing_error_message))
+    if not(out):
         out = None
     return out
 
@@ -256,7 +282,7 @@ Please see the %(logdir)s/errors.log for traceback details.
         {   'header'    : header,
             'url'       : url,
             'time'      : time,
-            'broser'    : browser,
+            'browser'    : browser,
             'client'    : client,
             'error'     : error,
             'sys_error' : sys_error,

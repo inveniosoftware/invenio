@@ -23,6 +23,7 @@ pylib_DATA = __init__.py \
              errorlib_tests.py \
              config.py \
              dbquery.py \
+	     miscutil_config.py \
              messages.py \
              textutils.py \
              dateutils.py
@@ -33,6 +34,7 @@ phplib_DATA = errorHandling.php
 EXTRA_DIST = __init__.py \
              errorlib.py \
              errorlib_tests.py \
+	     miscutil_config.py \
              config.py.wml \
              dbquery.py.wml \
              messages.py.wml \

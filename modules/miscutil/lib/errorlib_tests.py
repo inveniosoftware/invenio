@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## CDSware Search Engine unit tests.
-
+## CDSware ErrorLib unit tests.
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -18,35 +17,104 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+""" Test unit for the miscutil/errorlib module. """
+__lastupdated__ = """$Date$"""
 
 
-__version__ =  """FIXME: last updated"""
-
-import errorlib
+from errorlib import get_msg_associated_to_code, get_msgs_for_code_list
 import unittest
 
 class TestInternalErrorlibErrors(unittest.TestCase):
     """
     """
+    def test_get_msg_associated_to_code(self):
+        """ Test for error code to message association """
+        input_err_code = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
+        (output_err_code, err_msg) = get_msg_associated_to_code(input_err_code, 'error') 
+        self.assertEqual(output_err_code, input_err_code)
+        
+        input_err_code ='ERR_BADMODULEIDENTIFIER_WITH_BAD_ERRORNAME'
+        (output_err_code, err_msg) = get_msg_associated_to_code(input_err_code, 'error')
+        expected_output_err_code = 'ERR_MISCUTIL_IMPORT_ERROR'
+        self.assertEqual(output_err_code, expected_output_err_code)
+        
+        input_err_code ='ERR_MISCUTIL_IDENTIFIER_WONT_BE_FOUND_IN_DICTIONNARY'
+        (output_err_code, err_msg) = get_msg_associated_to_code(input_err_code, 'error')
+        expected_output_err_code = 'ERR_MISCUTIL_NO_MESSAGE_IN_DICT'
+        self.assertEqual(output_err_code, expected_output_err_code)
+
+        input_err_code = 'STRANGEERROR'
+        (output_err_code, err_msg) = get_msg_associated_to_code(input_err_code, 'error')
+        expected_output_err_code = 'ERR_MISCUTIL_UNDEFINED_ERROR'
+        self.assertEqual(output_err_code, expected_output_err_code)
+        
     def test_get_msgs_for_code_list(self):
-        """
-        """
-        self.assertEqual([('ERR_WEBCOMMENT_FOR_TESTING_PURPOSES', ' THIS IS FOR TESTING PURPOSES ONLY var1=var1 var2=var2 var3=var3 var4=var4 var5=var5 var6=var6 ')], 
-                         errorlib.get_msgs_for_code_list([('ERR_WEBCOMMENT_FOR_TESTING_PURPOSES', 'var1', 'var2', 'var3', 'var4', 'var5', 'var6')]))
-        self.assertEqual([('ERR_WEBCOMMENT_FOR_TESTING_PURPOSES', ' THIS IS FOR TESTING PURPOSES ONLY var1=var1 var2=var2 var3=var3 var4=??? var5=??? var6=??? '),
-                        ('ERR_MISUTIL_PROGRAMMING_ERROR', " Programming error: Too few arguments given for error ERR_WEBCOMMENT_FOR_TESTING_PURPOSES ")], 
-                         errorlib.get_msgs_for_code_list([('ERR_WEBCOMMENT_FOR_TESTING_PURPOSES', 'var1', 'var2', 'var3')]))
-        self.assertEqual([('ERR_WEBCOMMENT_FOR_TESTING_PURPOSES', ' THIS IS FOR TESTING PURPOSES ONLY var1=var1 var2=var2 var3=var3 var4=var4 var5=var5 var6=var6 '), 
-                        ('ERR_MISUTIL_PROGRAMMING_ERROR', " Programming error: Too many arguments given for error ERR_WEBCOMMENT_FOR_TESTING_PURPOSES ")], 
-                         errorlib.get_msgs_for_code_list([('ERR_WEBCOMMENT_FOR_TESTING_PURPOSES', 'var1', 'var2', 'var3', 'var4', 'var5', 'var6', 'var7')]))
+        """ Test error message output """
+        messages = []
+        # displayable error
+        error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
+        output_list = get_msgs_for_code_list((error, 'junk'))
+        self.assertEqual(1, len(output_list))
+        self.assertEqual(2, len(output_list[0]))
+        self.assertEqual(error, output_list[0][0])
+        messages.append(output_list[0][1])
+        
+        # displayable errors
+        error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
+        output_list = get_msgs_for_code_list([(error, 'junk'), (error, 'junk')])
+        self.assertEqual(2, len(output_list))
+        self.assertEqual(2, len(output_list[0]))
+        self.assertEqual(2, len(output_list[1]))
+        self.assertEqual(error, output_list[0][0])
+        self.assertEqual(error, output_list[1][0])
+        messages.append(output_list[0][1])
+        messages.append(output_list[1][1])
 
+        # undefined error
+        error = 'ERRMISCUTIL'
+        expected_error = 'ERR_MISCUTIL_UNDEFINED_ERROR'
+        output_list = get_msgs_for_code_list([(error)])
+        self.assertEqual(1, len(output_list))
+        self.assertEqual(2, len(output_list[0]))
+        self.assertEqual(expected_error, output_list[0][0])
+        messages.append(output_list[0][1])               
+        
+        # too many arguments
+        error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
+        other_error = 'ERR_MISCUTIL_TOO_MANY_ARGUMENT'
+        output_list = get_msgs_for_code_list([(error, 'junk', 'junk', 'junk')])
+        self.assertEqual(2, len(output_list))
+        self.assertEqual(2, len(output_list[0]))
+        self.assertEqual(2, len(output_list[1]))
+        self.assertEqual(error, output_list[0][0])
+        self.assertEqual(other_error, output_list[1][0])
+        messages.append(output_list[0][1])
+        messages.append(output_list[1][1])
+        
+        # too few argument
+        error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
+        other_error = 'ERR_MISCUTIL_TOO_FEW_ARGUMENT'
+        output_list = get_msgs_for_code_list([(error)])
+        self.assertEqual(2, len(output_list))
+        self.assertEqual(2, len(output_list[0]))
+        self.assertEqual(2, len(output_list[1]))
+        self.assertEqual(error, output_list[0][0])
+        self.assertEqual(other_error, output_list[1][0])
+        messages.append(output_list[0][1])
+        messages.append(output_list[1][1])
 
+        # string replacement
+        messages = reduce(lambda x, y: str(x) + str(y), messages)
+        self.assertEqual(0, messages.count('%') - messages.count('%%'))
 
+        # string internationalization
+        self.assertEqual(0, messages.count('_('))
+        
 def create_test_suite():
     """
     Return test suite for the search engine.
     """
-    return unittest.TestSuite((unittest.makeSuite(TestInternalErrorlibErrors,'test'),))
+    return unittest.TestSuite((unittest.makeSuite(TestInternalErrorlibErrors, 'test'),))
 
 if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())
