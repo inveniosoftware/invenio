@@ -165,20 +165,25 @@ def get_msg_associated_to_code(err_code, file='error'):
     try:
         module_directory_name = err_code.split('_')[1].lower()
         module_config = module_directory_name + '_config'
-        module_dict = "cfg_" + module_directory_name + "_%s_messages" % file
-        __import__(module_config, globals(), locals(),[module_dict])
-        err_msg = eval(module_dict)[err_code]
+        module_dict_name = "cfg_" + module_directory_name + "_%s_messages" % file
+        module = __import__(module_config, globals(), locals(), [module_dict_name])
+        module_dict = getattr(module, module_dict_name)
+        err_msg = module_dict[err_code]
     except ImportError:
         error = 'ERR_MISCUTIL_IMPORT_ERROR'
-        err_msg = cfg_miscutil_error_messages[error] % (err_code, module_config + '.' + module_dict)
+        err_msg = cfg_miscutil_error_messages[error] %(err_code, module_config)
+        err_code = error
+    except AttributeError:
+        error = 'ERR_MISCUTIL_NO_DICT'
+        err_msg = cfg_miscutil_error_messages[error] %(err_code, module_config, module_dict_name)
         err_code = error
     except KeyError:
         error = 'ERR_MISCUTIL_NO_MESSAGE_IN_DICT'
-        err_msg = cfg_miscutil_error_messages[error] % (err_code, module_config + '.' + module_dict)
+        err_msg = cfg_miscutil_error_messages[error] %(err_code, module_config + '.' + module_dict_name)
         err_code = error
     except:
         error = 'ERR_MISCUTIL_UNDEFINED_ERROR'
-        err_msg = cfg_miscutil_error_messages[error] % err_code
+        err_msg = cfg_miscutil_error_messages[error] %err_code
         err_code = error
     return (err_code, err_msg) 
 

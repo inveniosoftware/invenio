@@ -31,6 +31,7 @@ cfg_miscutil_error_messages = \
     'ERR_MISCUTIL_TOO_MANY_ARGUMENT': '_("Unable to display error: Too many arguments given for error %s")',
     'ERR_MISCUTIL_TOO_FEW_ARGUMENT':'_("Unable to display error: Too few arguments given for error %s")',
     'ERR_MISCUTIL_IMPORT_ERROR': '_("An undefined error has occured (%s). \'%s\' does not exist")',
+    'ERR_MISCUTIL_NO_DICT': '_("An undefined error has occured (%s). %s does not contain %s")',
     'ERR_MISCUTIL_NO_MESSAGE_IN_DICT': '_("An undefined error has occured. %s not defined in %s")',
     'ERR_MISCUTIL_UNDEFINED_ERROR': '_("An undefined error has occured (%s)")'
 }

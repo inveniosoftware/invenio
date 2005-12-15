@@ -29,20 +29,30 @@ class TestInternalErrorlibErrors(unittest.TestCase):
     """
     def test_get_msg_associated_to_code(self):
         """ Test for error code to message association """
+        # correct input
         input_err_code = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
         (output_err_code, err_msg) = get_msg_associated_to_code(input_err_code, 'error') 
         self.assertEqual(output_err_code, input_err_code)
-        
+
+        # no file module_config
         input_err_code ='ERR_BADMODULEIDENTIFIER_WITH_BAD_ERRORNAME'
         (output_err_code, err_msg) = get_msg_associated_to_code(input_err_code, 'error')
         expected_output_err_code = 'ERR_MISCUTIL_IMPORT_ERROR'
         self.assertEqual(output_err_code, expected_output_err_code)
-        
+
+        # file exists, but no dictionary
+        input_err_code ='ERR_MISCUTIL_NODICTIONARY'
+        (output_err_code, err_msg) = get_msg_associated_to_code(input_err_code, 'nodict')
+        expected_output_err_code = 'ERR_MISCUTIL_NO_DICT'
+        self.assertEqual(output_err_code, expected_output_err_code)
+
+        # identifier not in dictionary
         input_err_code ='ERR_MISCUTIL_IDENTIFIER_WONT_BE_FOUND_IN_DICTIONNARY'
         (output_err_code, err_msg) = get_msg_associated_to_code(input_err_code, 'error')
         expected_output_err_code = 'ERR_MISCUTIL_NO_MESSAGE_IN_DICT'
         self.assertEqual(output_err_code, expected_output_err_code)
 
+        # identifier does not begin with ERR or WRN
         input_err_code = 'STRANGEERROR'
         (output_err_code, err_msg) = get_msg_associated_to_code(input_err_code, 'error')
         expected_output_err_code = 'ERR_MISCUTIL_UNDEFINED_ERROR'
