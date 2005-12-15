@@ -87,14 +87,14 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagehe
 
     # if there are event
     if warnings:
-        warnings= get_msgs_for_code_list(warnings, 'warning')
+        warnings = get_msgs_for_code_list(warnings, 'warning', language)
         register_errors(warnings, 'warning')
 
     # if there are errors
     if errors:
-        errors = get_msgs_for_code_list(errors, 'error')
+        errors = get_msgs_for_code_list(errors, 'error', language)
         register_errors(errors, 'error', req)
-        body = create_error_box(req, errors=errors) 
+        body = create_error_box(req, errors=errors, ln=language) 
 
     return webstyle_templates.tmpl_page(weburl = weburl,
                                         ln = language,
@@ -163,6 +163,7 @@ def create_error_box(req, title=None, verbose=1, ln=cdslang, errors=None):
        message box with internal information that would be suitful to
        display when something bad has happened.
     """
+    _ = gettext_set_language(ln)
     return webstyle_templates.tmpl_error_box(title = title,
                                              ln = ln,
                                              verbose = verbose,

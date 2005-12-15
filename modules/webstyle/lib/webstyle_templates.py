@@ -483,34 +483,36 @@ class Template:
 
         # load the right message language
         _ = gettext_set_language(ln)
-
-        info_not_available = "NA"
+        info_not_available = _("N/A")
 
         if title == None:
             if errors: 
-                title = "Error: %s" % errors[0][1]
+                title = _("Error: %s") % errors[0][1]
             else:    
                 title = _("Internal Error")
 
+        browser_s = _("Browser")
         if req:
             try:
-                browser_s = ''
                 if req.headers_in.has_key('User-Agent'):
-                    browser_s = """Browser: %s\n""" % req.headers_in['User-Agent']
+                    browser_s += ': ' + req.headers_in['User-Agent']
+                else:
+                    browser_s += ': ' + info_not_available
                 host_s = req.hostname
                 page_s = req.unparsed_uri
                 client_s = req.connection.remote_ip 
             except:
                 pass
         else:    
-            browser_s = "Browser: NA\n"
+            browser_s += ': ' + info_not_available
             host_s = page_s = client_s = info_not_available
 
         error_s = ''
         sys_error_s = ''
         traceback_s = ''
         if verbose >= 1:
-            sys_error_s = """System Error: %s %s\n""" % (sys.exc_info()[0], sys.exc_info()[1])
+            if sys.exc_info()[0]:
+                sys_error_s = _("System Error: %s %s\n") % (sys.exc_info()[0], sys.exc_info()[1])
             if errors:
                 errs = ''
                 for error_tuple in errors:
@@ -519,54 +521,61 @@ class Template:
                     except:
                         errs += "%s%s\n" % (' '*6, error_tuple)
                 errs = errs[6:-2] # get rid of trainling ','
-                error_s = "Error: %s \n" % errs
+                error_s = _("Error: %s")% errs + "\n"
             else:
-                error_s = "Error: None None\n"
+                error_s = _("Error") + ': ' + info_not_available
         if verbose >= 9:
-            traceback_s = "Traceback: \n%s" % string.join(traceback.format_tb(sys.exc_info()[2]),"\n")
+            traceback_s = _("Traceback: \n%s") % string.join(traceback.format_tb(sys.exc_info()[2]),"\n")
 
         out = """
               <table class="errorbox">
-               <thead>
-                <tr>
-                 <th class="errorboxheader">
-                   <p> %(title)s %(sys1)s %(sys2)s
-                 </th>
-                </tr>
-               </thead>
-               <tbody>
-                <tr>
-                  <td class="errorboxbody">
-                    <p>%(contact)s
-                    <blockquote><pre>
+                <thead>
+                  <tr>
+                    <th class="errorboxheader">
+                      <p> %(title)s %(sys1)s %(sys2)s</p>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="errorboxbody">
+                      <p>%(contact)s</p>
+                        <blockquote><pre>
 URI: http://%(host)s%(page)s
-Time: %(time)s
-%(browser)sClient: %(client)s
+%(time_label)s: %(time)s
+%(browser)s
+%(client_label)s: %(client)s
 %(error)s%(sys_error)s%(traceback)s
 </pre></blockquote>
-                  </td>
-                </tr>
-                <tr>
-                    <td><form action="%(weburl)s/error.py/send_report" method="POST">
-                            Please send an error report to the Administrator <input class="adminbutton" type="submit" value="send error report" /><br>
-                            <input type="hidden" name="header" value="%(title)s %(sys1)s %(sys2)s" />
-                            <input type="hidden" name="url" value="URI: http://%(host)s%(page)s" />
-                            <input type="hidden" name="time" value="Time: %(time)s" />
-                            <input type="hidden" name="browser" value="%(browser)s" />
-                            <input type="hidden" name="client" value="Client: %(client)s" />
-                            <input type="hidden" name="error" value="%(error)s" />
-                            <input type="hidden" name="sys_error" value="%(sys_error)s" />
-                            <input type="hidden" name="traceback" value="%(traceback)s" />
-                            <input type="hidden" name="referer" value="%(referer)s" />
-                        </form>
                     </td>
-                </tr>
-               </tbody>
+                  </tr>
+                  <tr>
+                    <td>
+                      <form action="%(weburl)s/error.py/send_report" method="POST">
+                        %(send_error_label)s
+                        <input class="adminbutton" type="submit" value="%(send_label)s" />
+                        <input type="hidden" name="header" value="%(title)s %(sys1)s %(sys2)s" />
+                        <input type="hidden" name="url" value="URI: http://%(host)s%(page)s" />
+                        <input type="hidden" name="time" value="Time: %(time)s" />
+                        <input type="hidden" name="browser" value="%(browser)s" />
+                        <input type="hidden" name="client" value="Client: %(client)s" />
+                        <input type="hidden" name="error" value="%(error)s" />
+                        <input type="hidden" name="sys_error" value="%(sys_error)s" />
+                        <input type="hidden" name="traceback" value="%(traceback)s" />
+                        <input type="hidden" name="referer" value="%(referer)s" />
+                      </form>
+                    </td>
+                  </tr>
+                </tbody>
               </table>
               """ % {
                 'title'     : title,
-                'sys1'      : sys.exc_info()[0],
-                'sys2'      : sys.exc_info()[1],
+                'time_label': _("Time"),
+                'client_label': _("Client"),
+                'send_error_label': _("Please send an error report to the Administrator"),
+                'send_label': _("Send error report"),
+                'sys1'      : sys.exc_info()[0] or '',
+                'sys2'      : sys.exc_info()[1] or '',
                 'contact'   : _("Please contact <a href=\"mailto:%s\">%s</a> quoting the following information:")  % (urllib.quote(supportemail), supportemail),
                 'host'      : host_s,
                 'page'      : page_s,
@@ -581,16 +590,3 @@ Time: %(time)s
               }
  
         return out
-
-
-
-
-
-
-
-
-
-
-
-
-
