@@ -24,11 +24,12 @@
 
 __version__ = "$Id$"
 
-from config import *
-from search_engine import print_record
 from HTMLParser import HTMLParser
-import textwrap
 from string import split
+
+from cdsware.config import *
+from cdsware.search_engine import print_record
+from cdsware import textwrap
 
 WRAPWIDTH = 72
 

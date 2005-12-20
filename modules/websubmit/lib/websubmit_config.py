@@ -20,29 +20,29 @@
 """CDSware Submission Web Interface config file."""
 
 ## import config variables defined from config.wml:
-from config import adminemail, \
-                   supportemail, \
-                   images, \
-                   urlpath, \
-                   accessurl, \
-                   counters, \
-                   storage, \
-                   filedir, \
-                   filedirsize, \
-                   gfile, \
-                   gzip, \
-                   tar, \
-                   gunzip, \
-                   acroread, \
-                   distiller, \
-                   convert, \
-                   tmpdir, \
-                   bibupload, \
-                   bibformat, \
-                   bibwords, \
-                   bibconvert, \
-                   bibconvertconf, \
-                   htdocsurl
+from cdsware.config import adminemail, \
+     supportemail, \
+     images, \
+     urlpath, \
+     accessurl, \
+     counters, \
+     storage, \
+     filedir, \
+     filedirsize, \
+     gfile, \
+     gzip, \
+     tar, \
+     gunzip, \
+     acroread, \
+     distiller, \
+     convert, \
+     tmpdir, \
+     bibupload, \
+     bibformat, \
+     bibwords, \
+     bibconvert, \
+     bibconvertconf, \
+     htdocsurl
 
 ## test:
 test = "FALSE"

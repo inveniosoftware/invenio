@@ -26,16 +26,15 @@ import time
 import zlib
 import urllib
 import time
+from mod_python import apache
 
 from cdsware.config import weburl, cdslang, cdsname
 from cdsware.webpage import page
 from cdsware import webalert
 from cdsware.webuser import getUid, page_not_authorized
-from mod_python import apache
 from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
 from cdsware.messages import gettext_set_language
-
 import cdsware.template
 webalert_templates = cdsware.template.load('webalert')
 

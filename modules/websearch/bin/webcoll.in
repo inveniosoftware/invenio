@@ -50,8 +50,6 @@ except ImportError, e:
     sys.exit(1)
 
 try:
-    pylibdir = "@prefix@/lib/python"
-    sys.path.append('%s' % pylibdir)
     from cdsware.config import *
     from cdsware.messages import gettext_set_language, language_list_long
     from cdsware.search_engine import HitSet, search_pattern, get_creation_date, nice_number, get_field_i18nname

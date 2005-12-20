@@ -31,8 +31,6 @@ except ImportError, e:
     sys.exit(1)
 
 try:
-    pylibdir = "@prefix@/lib/python"
-    sys.path.append('%s' % pylibdir)
     from cdsware.config import version
     from cdsware import search_engine_tests 
     from cdsware import bibindex_engine_tests 

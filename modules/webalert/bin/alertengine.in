@@ -26,8 +26,6 @@ __version__ = "$Id$"
 
 try:
     import sys
-    pylibdir = "@prefix@/lib/python"
-    sys.path.append('%s' % pylibdir)
     import getopt
     from cdsware.config import version, supportemail
     from cdsware.alert_engine import run_alerts

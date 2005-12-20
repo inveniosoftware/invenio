@@ -23,8 +23,9 @@
 
 __version__ = "$Id$"
 
-import bibindex_engine
 import unittest
+
+from cdsware import bibindex_engine
 
 class TestListSetOperations(unittest.TestCase):
     """Test list set operations."""

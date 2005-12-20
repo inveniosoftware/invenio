@@ -37,9 +37,9 @@ except ImportError, e:
     sys.exit(1)
 
 try:
-    from config import *
-    from search_engine import perform_request_search
-    from oai_repository_config import oaiidprefix
+    from cdsware.config import *
+    from cdsware.search_engine import perform_request_search
+    from cdsware.oai_repository_config import oaiidprefix
 except ImportError, e:
     print "Error: %s" % e
     sys.exit(1)

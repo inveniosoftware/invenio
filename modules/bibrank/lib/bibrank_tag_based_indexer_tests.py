@@ -25,8 +25,9 @@ __lastupdated__ = """$Date$"""
 
 __version__ = "$Id$"
 
-import bibrank_tag_based_indexer
 import unittest
+
+from cdsware import bibrank_tag_based_indexer
 
 class TestListSetOperations(unittest.TestCase):
     """Test list set operations."""

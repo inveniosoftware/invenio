@@ -30,9 +30,9 @@ import sys
 import time
 import md5
 
-from oai_repository_config import *
-from config import *
-from dbquery import run_sql
+from cdsware.oai_repository_config import *
+from cdsware.config import *
+from cdsware.dbquery import run_sql
 
 verbs = {
     "Identify"            : [""],

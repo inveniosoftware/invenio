@@ -28,10 +28,10 @@ by using a MySQL table. Consists of the following classes:
 """
 import cPickle
 import time
-from dbquery import run_sql, blob_to_string
-import session
-from session import Session
 from UserDict import UserDict
+
+from cdsware.dbquery import run_sql, blob_to_string
+from cdsware.session import Session
 
 class SessionNotInDb(Exception):
     """Exception to be raised when a requested session doesn't exist in the DB

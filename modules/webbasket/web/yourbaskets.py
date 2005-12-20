@@ -25,13 +25,13 @@ import sys
 import time
 import zlib
 import urllib
+from mod_python import apache
 
 from cdsware.config import weburl,webdir
 from cdsware.webpage import page
 from cdsware.dbquery import run_sql
 from cdsware.webuser import getUid,page_not_authorized
 from cdsware import webbasket
-from mod_python import apache
 from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
 imagesurl = "%s/img" % webdir

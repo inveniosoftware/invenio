@@ -29,12 +29,12 @@ __version__ = "$Id$"
 
 import sys
 import time
-from access_control_engine import acc_authorize_action    
-from access_control_config import *
-from config import *
-from dbquery import run_sql
 from MySQLdb import ProgrammingError
 
+from cdsware.access_control_engine import acc_authorize_action    
+from cdsware.access_control_config import *
+from cdsware.config import *
+from cdsware.dbquery import run_sql
 
 # ACTIONS
 

@@ -23,8 +23,9 @@
 
 __version__ = "$Id$"
 
-import bibindex_engine_stemmer
 import unittest
+
+from cdsware import bibindex_engine_stemmer
 
 class TestStemmer(unittest.TestCase):
     """Test stemming, if available."""

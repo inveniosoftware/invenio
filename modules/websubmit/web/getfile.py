@@ -24,8 +24,8 @@ import time
 import types
 import re
 from mod_python import apache
-
 import sys
+
 from cdsware.config import cdsname,cdslang
 from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import acc_isRole
@@ -37,7 +37,6 @@ from cdsware.file import *
 from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
 from cdsware.messages import gettext_set_language
-
 import cdsware.template
 websubmit_templates = cdsware.template.load('websubmit')
 

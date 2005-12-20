@@ -24,27 +24,27 @@ BibIndex indexing engine configuration parameters.
 """
 
 ## configuration parameters read from the general config file:
-from config import cfg_bibindex_fulltext_index_local_files_only, \
-                   cfg_bibindex_stemmer_default_language, \
-                   cfg_bibindex_remove_stopwords, \
-                   cfg_bibindex_path_to_stopwords_file, \
-                   cfg_bibindex_chars_alphanumeric_separators, \
-                   cfg_bibindex_chars_punctuation, \
-                   cfg_bibindex_remove_html_markup, \
-                   cfg_bibindex_min_word_length, \
-                   cfg_bibindex_urlopener_username, \
-                   cfg_bibindex_urlopener_password, \
-                   version, \
-                   pdftotext, \
-                   pstotext, \
-                   pstoascii, \
-                   antiword, \
-                   catdoc, \
-                   wvtext, \
-                   ppthtml, \
-                   xlhtml, \
-                   htmltotext, \
-                   gzip
+from cdsware.config import cfg_bibindex_fulltext_index_local_files_only, \
+     cfg_bibindex_stemmer_default_language, \
+     cfg_bibindex_remove_stopwords, \
+     cfg_bibindex_path_to_stopwords_file, \
+     cfg_bibindex_chars_alphanumeric_separators, \
+     cfg_bibindex_chars_punctuation, \
+     cfg_bibindex_remove_html_markup, \
+     cfg_bibindex_min_word_length, \
+     cfg_bibindex_urlopener_username, \
+     cfg_bibindex_urlopener_password, \
+     version, \
+     pdftotext, \
+     pstotext, \
+     pstoascii, \
+     antiword, \
+     catdoc, \
+     wvtext, \
+     ppthtml, \
+     xlhtml, \
+     htmltotext, \
+     gzip
 
 ## version number:
 bibindex_engine_version = "CDSware/%s bibindex/%s" % (version, version)

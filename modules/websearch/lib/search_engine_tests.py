@@ -23,8 +23,9 @@
 
 __version__ = "$Id$"
 
-import search_engine
 import unittest
+
+from cdsware import search_engine
 
 class TestWashQueryParameters(unittest.TestCase):
     """Test for washing of search query parameters."""

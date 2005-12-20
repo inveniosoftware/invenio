@@ -24,26 +24,24 @@ __lastupdated__ = """$Date$"""
 
 ## fill config variables:
 
-import access_control_engine as acce
-import access_control_admin as acca
-# reload(acce)
-# reload(acca)
 import cgi
 import re
 import random
 import MySQLdb
 import string
 import smtplib
-
-from bibrankadminlib import adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform
-from access_control_config import * 
-from dbquery import run_sql
-from config import *
-from webpage import page, pageheaderonly, pagefooteronly
-from webuser import getUid, get_email, page_not_authorized
 from mod_python import apache
-from search_engine import print_record
-from webuser import checkemail, get_user_preferences, set_user_preferences
+
+import cdsware.access_control_engine as acce
+import cdsware.access_control_admin as acca
+from cdsware.bibrankadminlib import adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform
+from cdsware.access_control_config import * 
+from cdsware.dbquery import run_sql
+from cdsware.config import *
+from cdsware.webpage import page, pageheaderonly, pagefooteronly
+from cdsware.webuser import getUid, get_email, page_not_authorized
+from cdsware.search_engine import print_record
+from cdsware.webuser import checkemail, get_user_preferences, set_user_preferences
 
 __version__ = "$Id$"
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ## $Id$
 ## Comments and reviews for records.
-                                                                                                                                                                                                     
+
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -18,24 +18,22 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-                                                                                                                                                                                                     
-__lastupdated__ = """FIXME: last updated"""
 
-# non CDSware imports:
+__lastupdated__ = """$Date$"""
+
 from email.Utils import quote
 import time
 import math
 import string
 from cgi import escape 
 
-# import CDSware stuff:
-from webcomment_config import *
-from dbquery import run_sql
-from config import cdslang
-from elmsubmit_html2txt import html2txt
+from cdsware.webcomment_config import *
+from cdsware.dbquery import run_sql
+from cdsware.config import cdslang
+from cdsware.elmsubmit_html2txt import html2txt
 
-import template
-webcomment_templates = template.load('webcomment')
+import cdsware.template
+webcomment_templates = cdsware.template.load('webcomment')
 
 def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order='od', display_since='all', nb_per_page=100, page=1, voted=-1, reported=-1, reviews=0):
     """ 

@@ -26,10 +26,10 @@ import string
 import locale
 import sre
 
-from config import *
-from dbquery import run_sql
-from messages import gettext_set_language
-from search_engine_config import *
+from cdsware.config import *
+from cdsware.dbquery import run_sql
+from cdsware.messages import gettext_set_language
+from cdsware.search_engine_config import *
 
 def get_fieldvalues(recID, tag):
     """Return list of field values for field TAG inside record RECID.

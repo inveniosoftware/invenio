@@ -26,8 +26,6 @@ __version__ = "$Id$"
 
 try:
     import sys
-    pylibdir = "@prefix@/lib/python"
-    sys.path.append('%s' % pylibdir)
     from cdsware.config import *
     from cdsware.access_control_engine import acc_authorize_action
     from cdsware.access_control_config import cfg_webaccess_warning_msgs

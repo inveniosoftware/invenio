@@ -42,13 +42,13 @@ import math
 import re
 import ConfigParser
 
-from config import *
-from search_engine_config import cfg_max_recID
-from search_engine import perform_request_search, strip_accents, HitSet
-from dbquery import run_sql
-from bibindex_engine_stemmer import is_stemmer_available_for_language, stem
-from bibindex_engine_stopwords import is_stopword
-from bibindex_engine_config import conv_programs, conv_programs_helpers
+from cdsware.config import *
+from cdsware.search_engine_config import cfg_max_recID
+from cdsware.search_engine import perform_request_search, strip_accents, HitSet
+from cdsware.dbquery import run_sql
+from cdsware.bibindex_engine_stemmer import is_stemmer_available_for_language, stem
+from cdsware.bibindex_engine_stopwords import is_stopword
+from cdsware.bibindex_engine_config import conv_programs, conv_programs_helpers
 
 ## safety parameters concerning MySQL thread-multiplication problem:
 cfg_check_mysql_threads = 0 # to check or not to check the problem? 

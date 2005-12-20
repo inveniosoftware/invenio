@@ -20,6 +20,7 @@
 ## import interesting modules:
 import os
 import sys
+
 from cdsware.config import weburl,cdsname,cdslang
 from cdsware.dbquery import run_sql
 from cdsware.access_control_engine import acc_authorize_action
@@ -32,7 +33,6 @@ from cdsware.search_engine import search_pattern
 from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
 from cdsware.messages import gettext_set_language
-
 import cdsware.template
 websubmit_templates = cdsware.template.load('websubmit')
 

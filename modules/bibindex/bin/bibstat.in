@@ -29,8 +29,6 @@ __version__ = "$Id$"
 ## import interesting modules:
 try:
     import sys
-    pylibdir = "@prefix@/lib/python"    
-    sys.path.append('%s' % pylibdir)
     from cdsware.dbquery import run_sql
     from marshal import loads,dumps
     from zlib import compress,decompress

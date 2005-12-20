@@ -24,7 +24,6 @@ __lastupdated__ = """$Date$"""
 
 ## fill config variables:
 
-import access_control_engine as acce
 import cgi
 import re
 import MySQLdb
@@ -32,12 +31,14 @@ import Numeric
 import os
 import ConfigParser
 from zlib import compress,decompress
-from messages import *
-from dbquery import run_sql
-from config import *
-from webpage import page, pageheaderonly, pagefooteronly
-from webuser import getUid, get_email
 from mod_python import apache
+
+import cdsware.access_control_engine as acce
+from cdsware.messages import *
+from cdsware.dbquery import run_sql
+from cdsware.config import *
+from cdsware.webpage import page, pageheaderonly, pagefooteronly
+from cdsware.webuser import getUid, get_email
 
 __version__ = "$Id$"
 

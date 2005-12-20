@@ -48,29 +48,28 @@ import base64
 import unicodedata
 
 ## import CDSware stuff:
-from config import *
-
-from search_engine_config import *
-from bibrank_record_sorter import get_bibrank_methods,rank_records
-from bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
+from cdsware.config import *
+from cdsware.search_engine_config import *
+from cdsware.bibrank_record_sorter import get_bibrank_methods,rank_records
+from cdsware.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 if cfg_experimental_features:
-    from bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
-    from bibrank_citation_grapher import create_citation_history_graph_and_box
-    from bibrank_downloads_grapher import create_download_history_graph_and_box
-from dbquery import run_sql
+    from cdsware.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
+    from cdsware.bibrank_citation_grapher import create_citation_history_graph_and_box
+    from cdsware.bibrank_downloads_grapher import create_download_history_graph_and_box
+from cdsware.dbquery import run_sql
 try:
     from mod_python import apache
-    from webuser import getUid
-    from webpage import pageheaderonly, pagefooteronly, create_error_box
+    from cdsware.webuser import getUid
+    from cdsware.webpage import pageheaderonly, pagefooteronly, create_error_box
 
 except ImportError, e:
     pass # ignore user personalisation, needed e.g. for command-line
 
-from messages import gettext_set_language, wash_language
+from cdsware.messages import gettext_set_language, wash_language
 
 try:
-    import template
-    websearch_templates = template.load('websearch')
+    import cdsware.template
+    websearch_templates = cdsware.template.load('websearch')
 except:
     pass
 

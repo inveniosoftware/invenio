@@ -24,7 +24,8 @@
 __version__ = "$Id$"
 
 import unittest
-from bibrank_citation_indexer import last_updated_result
+
+from cdsware.bibrank_citation_indexer import last_updated_result
 
 class TestCitationIndexer(unittest.TestCase):
 

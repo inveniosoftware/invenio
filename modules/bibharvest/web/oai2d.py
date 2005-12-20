@@ -24,12 +24,12 @@ __version__ = "$Id$"
 
 import sys
 import urllib
+from mod_python import apache
+
 from cdsware.dbquery import run_sql
 from cdsware.oai_repository_config import *
 from cdsware import oai_repository
 from cdsware.config import logdir
-from mod_python import apache
-
 
 def index (req):
     "OAI repository interface"

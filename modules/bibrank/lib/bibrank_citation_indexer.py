@@ -24,9 +24,10 @@ import time
 import os
 from marshal import loads, dumps
 from zlib import decompress, compress
-from dbquery import run_sql
-from search_engine import print_record, search_pattern
-from bibrecord import create_records, record_get_field_values
+
+from cdsware.dbquery import run_sql
+from cdsware.search_engine import print_record, search_pattern
+from cdsware.bibrecord import create_records, record_get_field_values
 
 class memoise:
     def __init__(self, function):

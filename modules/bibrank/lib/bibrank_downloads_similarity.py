@@ -19,9 +19,9 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from config import *
-from dbquery import run_sql
-from bibrank_downloads_indexer import database_tuples_to_single_list
+from cdsware.config import *
+from cdsware.dbquery import run_sql
+from cdsware.bibrank_downloads_indexer import database_tuples_to_single_list
 
 def get_fieldvalues(recID, tag):
     """Return list of field values for field TAG inside record RECID.

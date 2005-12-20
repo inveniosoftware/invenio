@@ -44,8 +44,6 @@ Examples:
 
 try:
     import sys
-    pylibdir = "@prefix@/lib/python"
-    sys.path.append('%s' % pylibdir)
     from cdsware.oaiharvestlib import main
 except ImportError, e:
     print "Error: %s" % e

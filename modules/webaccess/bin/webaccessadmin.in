@@ -27,8 +27,6 @@ __version__ = "$Id$"
 try:
     import getpass
     import sys
-    pylibdir = "@prefix@/lib/python"
-    sys.path.append('%s' % pylibdir)
     from cdsware.config import supportemail
     from cdsware.access_control_admin import acc_reset_default_settings
     from cdsware.access_control_admin import acc_add_default_settings

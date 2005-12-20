@@ -45,7 +45,7 @@ except ImportError, e:
     err1 = e
 
 try:
-    from bibrecord_config import *
+    from cdsware.bibrecord_config import *
     verbose = cfg_bibrecord_default_verbose_level
     correct = cfg_bibrecord_default_correct
     parsers = cfg_bibrecord_parsers_available

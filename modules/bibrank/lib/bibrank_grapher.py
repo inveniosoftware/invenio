@@ -21,14 +21,13 @@
 
 __version__ = "$Id$"
 
-## import interesting modules: 
-
 import os 
 import sys 
 import time 
 import tempfile 
-from config import webdir 
-from websubmit_config import * 
+
+from cdsware.config import webdir 
+from cdsware.websubmit_config import * 
  
 ## test gnuplot presence:   
 cfg_gnuplot_available = 1 

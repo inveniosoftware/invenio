@@ -22,8 +22,8 @@
 try:
     import sys, re, string, time
     import os, getopt, cgi
-    from refextract_config import *
     from cStringIO import StringIO
+    from cdsware.refextract_config import *
 except ImportError, e:
     raise ImportError(e)
 

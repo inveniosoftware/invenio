@@ -20,9 +20,10 @@
 """CDSware Search Engine Web Interface."""
 
 import sys    
+from mod_python import apache    
+
 from cdsware.config import weburl,cdsname
 from cdsware import search_engine
-from mod_python import apache    
 from cdsware.webuser import getUid, page_not_authorized
 
 __version__ = "$Id$"

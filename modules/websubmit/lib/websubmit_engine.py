@@ -26,22 +26,21 @@ import types
 import re
 import MySQLdb
 import shutil
-
-from config import *
-from dbquery import run_sql
-from access_control_engine import acc_authorize_action
-from access_control_admin import acc_isRole
-from webpage import page, create_error_box
-from webuser import getUid, get_email
-from messages import *
 from mod_python import apache
-from websubmit_config import *
-from file import *
 
-from messages import gettext_set_language
+from cdsware.config import *
+from cdsware.dbquery import run_sql
+from cdsware.access_control_engine import acc_authorize_action
+from cdsware.access_control_admin import acc_isRole
+from cdsware.webpage import page, create_error_box
+from cdsware.webuser import getUid, get_email
+from cdsware.messages import *
+from cdsware.websubmit_config import *
+from cdsware.file import *
 
-import template
-websubmit_templates = template.load('websubmit')
+from cdsware.messages import gettext_set_language
+import cdsware.template
+websubmit_templates = cdsware.template.load('websubmit')
 
 def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="", access="",mainmenu="",fromdir="",file="",nextPg="",nbPg="",curpage=1):
     ln = wash_language(ln)

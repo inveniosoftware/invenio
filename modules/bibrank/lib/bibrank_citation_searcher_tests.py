@@ -23,8 +23,9 @@
 
 __version__ = "$Id$"
 
-import bibrank_citation_searcher
 import unittest
+
+from cdsware import bibrank_citation_searcher
 
 class TestCitationSearcher(unittest.TestCase):
     def setUp(self):

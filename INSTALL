@@ -188,6 +188,8 @@ Contents
       $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
       $ sudo vi /path/to/php/conf/php.ini ## see below in part 2
       $ sudo /path/to/apache/bin/apachectl graceful
+      $ sudo ln -s /usr/local/cdsware-DEMO/lib/python/cdsware \
+                   /usr/lib/python2.3/site-packages/cdsware
       $ make create-tables       ## optional
       $ make install
       $ make test                ## optional
@@ -411,6 +413,16 @@ Contents
 
           After these admin-level tasks to be performed as root, let's
           now go back to finish the installation of the CDSware package.
+
+      $ sudo ln -s /usr/local/cdsware-DEMO/lib/python/cdsware \
+                   /usr/lib/python2.3/site-packages/cdsware
+
+          You have to create a symbolic link inside Python's
+          site-packages directory that would indicate Python where to
+          find CDSware files.  Note that the exact location of the
+          symlink depends on the --prefix option you have used and on
+          the Python version you are using.  (See also --with-python
+          configure option.)
 
       $ make create-tables     ## optional
 

@@ -38,8 +38,6 @@ except ImportError, e:
     sys.exit(1)
 
 try:
-    pylibdir = "@prefix@/lib/python"
-    sys.path.append('%s' % pylibdir)
     from cdsware.config import adminemail, version, cdsname
 except ImportError, e:
     print "Error: %s" % e

@@ -21,7 +21,7 @@
 
 """bibrecord configuration"""
 
-from config import etcdir
+from cdsware.config import etcdir
 
 # location of the MARC21 DTD file:
 cfg_marc21_dtd = "%s/bibedit/MARC21slim.dtd" % etcdir

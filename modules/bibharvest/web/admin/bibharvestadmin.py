@@ -22,8 +22,8 @@
 __lastupdated__ = """$Date$"""
 
 import sys
+
 import cdsware.bibharvestadminlib as bhc
-reload(bhc)
 from cdsware.webpage import page, create_error_box
 from cdsware.config import weburl,cdslang
 from cdsware.webuser import getUid, page_not_authorized

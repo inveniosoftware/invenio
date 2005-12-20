@@ -18,8 +18,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 ## read config variables
 
-import bibrank_downloads_indexer
 import unittest
+
+from cdsware import bibrank_downloads_indexer
 
 class TestListSetOperations(unittest.TestCase):
     """Test list set operations."""

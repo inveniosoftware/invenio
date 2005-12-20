@@ -88,8 +88,6 @@ except ImportError, e:
     import sys
 
 try:
-    pylibdir = "@prefix@/lib/python"
-    sys.path.append('%s' % pylibdir)
     from cdsware.dbquery import run_sql
     from cdsware.bibrank_tag_based_indexer import *
     from cdsware.bibrank_word_indexer import *

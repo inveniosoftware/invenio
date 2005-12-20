@@ -28,21 +28,20 @@ import mimetypes
 import shutil
 import md5
 import urllib
-
-from config import *
-from access_control_engine import acc_authorize_action
-from access_control_admin import acc_isRole
-from webpage import page, create_error_box
-from webuser import getUid, get_email
-from dbquery import run_sql
-from messages import *
 from mod_python import apache
-from websubmit_config import *
 
-from messages import gettext_set_language
+from cdsware.config import *
+from cdsware.access_control_engine import acc_authorize_action
+from cdsware.access_control_admin import acc_isRole
+from cdsware.webpage import page, create_error_box
+from cdsware.webuser import getUid, get_email
+from cdsware.dbquery import run_sql
+from cdsware.messages import *
+from cdsware.websubmit_config import *
 
-import template
-websubmit_templates = template.load('websubmit')
+from cdsware.messages import gettext_set_language
+import cdsware.template
+websubmit_templates = cdsware.template.load('websubmit')
 
 archivepath = filedir
 archivesize = filedirsize

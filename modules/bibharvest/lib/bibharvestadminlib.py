@@ -30,16 +30,17 @@ import time
 import random
 import urllib
 import sre
-from bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
-from dbquery import run_sql
-from messages import *
-from config import *
-from webpage import page, pageheaderonly, pagefooteronly
-from webuser import getUid, get_email
 from mod_python import apache
 
-import template
-bibharvest_templates = template.load('bibharvest')
+from cdsware.bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
+from cdsware.dbquery import run_sql
+from cdsware.messages import *
+from cdsware.config import *
+from cdsware.webpage import page, pageheaderonly, pagefooteronly
+from cdsware.webuser import getUid, get_email
+
+import cdsware.template
+bibharvest_templates = cdsware.template.load('bibharvest')
 
 tmppath = tmpdir + '/bibharvestadmin.' + str(os.getpid())
 guideurl = "admin/bibharvest/guide.html"

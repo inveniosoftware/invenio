@@ -40,19 +40,17 @@ import session
 import websession
 import smtplib
 import MySQLdb
-from websession import pSession, pSessionMapping
-from session import SessionError
-from config import *
-from messages import *
-from access_control_engine import acc_authorize_action
-from access_control_admin import acc_findUserRoleActions
-from access_control_config import *
 
-import cdsware.template
-# language for gettext
+from cdsware.websession import pSession, pSessionMapping
+from cdsware.session import SessionError
+from cdsware.config import *
+from cdsware.messages import *
+from cdsware.access_control_engine import acc_authorize_action
+from cdsware.access_control_admin import acc_findUserRoleActions
+from cdsware.access_control_config import *
+
 from cdsware.messages import gettext_set_language
-
-## templating engine
+import cdsware.template
 tmpl = cdsware.template.load('websession')
 
 def createGuestUser():

@@ -22,6 +22,9 @@
 __lastupdated__ = """$Date$"""
 
 import sys
+from mod_python import apache
+import smtplib
+
 from cdsware import webuser
 from cdsware.config import weburl,cdsname,cdslang,supportemail
 from cdsware.webpage import page
@@ -31,12 +34,9 @@ from cdsware import webalert
 from cdsware import webuser
 from cdsware.webmessage import account_new_mail
 from cdsware.access_control_config import *
-from mod_python import apache
 from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE, cfg_webaccess_warning_msgs, CFG_EXTERNAL_AUTHENTICATION
-import smtplib
 
 from cdsware.messages import gettext_set_language
-
 import cdsware.template
 websession_templates = cdsware.template.load('websession')
 

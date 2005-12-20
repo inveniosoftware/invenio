@@ -19,9 +19,6 @@
 
 """CDSware Web Page Functions"""
 
-from config import *
-from messages import gettext_set_language
-from webuser import create_userinfobox_body
 import re
 import string
 import sys
@@ -29,10 +26,13 @@ import time
 import traceback
 import urllib
 
-from errorlib import get_msgs_for_code_list, register_errors 
+from cdsware.config import *
+from cdsware.messages import gettext_set_language
+from cdsware.webuser import create_userinfobox_body
+from cdsware.errorlib import get_msgs_for_code_list, register_errors 
 
-import template
-webstyle_templates = template.load('webstyle')
+import cdsware.template
+webstyle_templates = cdsware.template.load('webstyle')
 
 def create_navtrailbox_body(title,
                             previous_links,

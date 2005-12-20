@@ -20,21 +20,21 @@
 """CDSware Search Engine config parameters."""
 
 ## import config variables defined from config.wml:
-from config import cfg_max_recID, \
-                   cfg_instant_browse, \
-                   cfg_author_et_al_threshold, \
-                   cfg_search_cache_size, \
-                   cfg_nb_records_to_sort, \
-                   cfg_call_bibformat, \
-                   cfg_use_aleph_sysnos, \
-                   cfg_fields_convert, \
-                   cfg_simplesearch_pattern_box_width, \
-                   cfg_advancedsearch_pattern_box_width, \
-                   cfg_narrow_search_show_grandsons, \
-                   cfg_oaiidtag, \
-                   cfg_create_similarly_named_authors_link_box, \
-                   cfg_google_box, \
-                   cfg_google_box_servers
+from cdsware.config import cfg_max_recID, \
+     cfg_instant_browse, \
+     cfg_author_et_al_threshold, \
+     cfg_search_cache_size, \
+     cfg_nb_records_to_sort, \
+     cfg_call_bibformat, \
+     cfg_use_aleph_sysnos, \
+     cfg_fields_convert, \
+     cfg_simplesearch_pattern_box_width, \
+     cfg_advancedsearch_pattern_box_width, \
+     cfg_narrow_search_show_grandsons, \
+     cfg_oaiidtag, \
+     cfg_create_similarly_named_authors_link_box, \
+     cfg_google_box, \
+     cfg_google_box_servers
 
 ## do we want experimental features? (0=no, 1=yes)
 cfg_experimental_features = 0

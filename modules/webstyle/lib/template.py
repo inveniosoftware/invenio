@@ -21,7 +21,7 @@
 
 __version__ = "$Id$"
 
-from config import cfg_template_skin
+from cdsware.config import cfg_template_skin
 
 def load(module=''):
     """ Load and returns a template class, given a module name (like

@@ -43,8 +43,6 @@ Options:
 try:
     import sys
     import os
-    pylibdir = "@prefix@/lib/python"
-    sys.path.append('%s' % pylibdir)
     from cdsware.refextract import *
 except ImportError, e:
     import sys

@@ -65,8 +65,6 @@ except ImportError, e:
     import sys
 
 try:
-    pylibdir = "@prefix@/lib/python"
-    sys.path.append('%s' % pylibdir)
     from cdsware.config import *
     from cdsware.search_engine_config import cfg_max_recID
     from cdsware.search_engine import perform_request_search, strip_accents

@@ -19,10 +19,11 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from config import tmpdir, etcdir
-import bibrecord
 import unittest
 from string import expandtabs, replace
+
+from cdsware.config import tmpdir, etcdir
+from cdsware import bibrecord
 
 class SanityTest(unittest.TestCase):
     """ bibrecord - sanity test (xml -> create records -> xml)"""

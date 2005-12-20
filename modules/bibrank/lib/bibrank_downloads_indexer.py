@@ -19,14 +19,14 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-## import interesting modules:
 import os
 import time
 import calendar
 import ConfigParser
 import string
-from config import *
-from dbquery import run_sql
+
+from cdsware.config import *
+from cdsware.dbquery import run_sql
 
 def append_to_file(path, content):
     """print result in a file"""

@@ -24,7 +24,7 @@ import gettext
 import string
 import locale
 
-from config import *
+from cdsware.config import *
 from cdsware.messages import gettext_set_language
 
 class Template:

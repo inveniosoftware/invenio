@@ -45,13 +45,13 @@ import copy
 import types
 import ConfigParser
 
-from config import *
-from search_engine_config import cfg_max_recID
-from search_engine import perform_request_search, strip_accents
-from search_engine import HitSet, get_index_id, create_basic_search_units
-from bibrank_citation_indexer import get_citation_weight
-from bibrank_downloads_indexer import *
-from dbquery import run_sql
+from cdsware.config import *
+from cdsware.search_engine_config import cfg_max_recID
+from cdsware.search_engine import perform_request_search, strip_accents
+from cdsware.search_engine import HitSet, get_index_id, create_basic_search_units
+from cdsware.bibrank_citation_indexer import get_citation_weight
+from cdsware.bibrank_downloads_indexer import *
+from cdsware.dbquery import run_sql
 
 options = {}
 def citation_exec(rank_method_code, name, config):

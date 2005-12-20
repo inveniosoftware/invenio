@@ -23,9 +23,10 @@
 
 __version__ = "$Id$"
 
-import bibrank_record_sorter
 import unittest
-from search_engine import HitSet
+
+from cdsware import bibrank_record_sorter
+from cdsware.search_engine import HitSet
 
 class TestListSetOperations(unittest.TestCase):
     """Test list set operations."""

@@ -22,11 +22,11 @@
 
 __version__ = "$Id$"
 
-## import interesting modules:
-from config import *
-from dbquery import run_sql
 from MySQLdb import ProgrammingError
-from access_control_config import SUPERADMINROLE, cfg_webaccess_warning_msgs, cfg_webaccess_msgs, CFG_ACCESS_CONTROL_LEVEL_GUESTS, CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS#, CFG_EXTERNAL_ACCESS_CONTROL
+
+from cdsware.config import *
+from cdsware.dbquery import run_sql
+from cdsware.access_control_config import SUPERADMINROLE, cfg_webaccess_warning_msgs, cfg_webaccess_msgs, CFG_ACCESS_CONTROL_LEVEL_GUESTS, CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS#, CFG_EXTERNAL_ACCESS_CONTROL
 
 called_from = 1 #1=web,0=cli
 try:

@@ -26,8 +26,8 @@ import sre
 import urllib
 import sys
 
-from config import *
-from messages import gettext_set_language, language_list_long
+from cdsware.config import *
+from cdsware.messages import gettext_set_language, language_list_long
 
 class Template:
     def tmpl_getnavtrail(self, ln, previous):

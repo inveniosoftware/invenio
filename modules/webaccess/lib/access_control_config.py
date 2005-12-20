@@ -22,11 +22,11 @@
 __version__ = "$Id$"
 
 ## global configuration parameters:
-from config import *
+from cdsware.config import *
 
 ## local configuration parameters:
 
-from external_authentication import *
+from cdsware.external_authentication import *
 
 # VALUES TO BE EXPORTED
 # CURRENTLY USED BY THE FILES access_control_engine.py access_control_admin.py webaccessadmin_lib.py

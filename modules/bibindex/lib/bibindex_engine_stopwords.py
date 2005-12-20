@@ -20,7 +20,7 @@
 
 import string
 
-from bibindex_engine_config import *
+from cdsware.bibindex_engine_config import *
 
 def create_stopwords(filename=cfg_bibindex_path_to_stopwords_file):
     """Create stopword dictionary out of FILENAME."""

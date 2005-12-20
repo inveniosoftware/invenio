@@ -27,8 +27,8 @@ import re
 import operator
 import os
 
-from config import *
-from messages import gettext_set_language
+from cdsware.config import *
+from cdsware.messages import gettext_set_language
 
 class Template:
     def tmpl_submit_home_page(self, ln, catalogues):

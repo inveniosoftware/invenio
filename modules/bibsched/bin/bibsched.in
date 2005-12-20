@@ -49,8 +49,6 @@ except ImportError, e:
     sys.exit(1)
 
 try:
-    pylibdir = "@prefix@/lib/python"    
-    sys.path.append('%s' % pylibdir)
     from cdsware.config import *
     from cdsware.dbquery import run_sql
 except ImportError, e:

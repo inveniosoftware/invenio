@@ -24,9 +24,10 @@
 
 __version__ = "$Id$"
 
-import oai_repository
 import unittest
 import re
+
+from cdsware import oai_repository
 
 class TestVerbs(unittest.TestCase):
     """Test for OAI verb functionality."""

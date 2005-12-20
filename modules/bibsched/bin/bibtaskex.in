@@ -29,8 +29,6 @@ __version__ = "$Id$"
 ## import interesting modules:
 try:
     import sys
-    pylibdir = "@prefix@/lib/python"
-    sys.path.append('%s' % pylibdir)
     from cdsware.dbquery import run_sql
     from cdsware.access_control_engine import acc_authorize_action
     import getopt

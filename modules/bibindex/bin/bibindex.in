@@ -59,9 +59,6 @@ Examples:
 """
 
 try:
-    import sys
-    pylibdir = "@prefix@/lib/python"
-    sys.path.append('%s' % pylibdir)
     from cdsware.bibindex_engine import main
 except ImportError, e:
     print "Error: %s" % e

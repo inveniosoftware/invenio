@@ -30,8 +30,6 @@ import sys
 
 try:
     import sys
-    pylibdir = "@prefix@/lib/python"
-    sys.path.append('%s' % pylibdir)
     from cdsware.bibrecord import *
 except ImportError, e:
     print "Error: %s" % e

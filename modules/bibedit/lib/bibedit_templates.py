@@ -18,5 +18,5 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from config import *
-from messages import gettext_set_language, language_list_long
+from cdsware.config import *
+from cdsware.messages import gettext_set_language, language_list_long

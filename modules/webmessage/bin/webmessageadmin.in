@@ -28,8 +28,6 @@ try:
     import getpass
     import readline
     import sys
-    pylibdir = "/home/cdsware/lib/python"
-    sys.path.append('%s' % pylibdir)
     from cdsware.config import supportemail
     from cdsware.webmessage_dblayer import clean_messages
     from cdsware.dbquery import run_sql

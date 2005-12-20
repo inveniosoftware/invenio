@@ -34,10 +34,11 @@ import Numeric
 import signal
 import traceback
 import calendar
-from config import *
-from bibindex_engine_config import *
-from dbquery import run_sql
-from access_control_engine import acc_authorize_action
+
+from cdsware.config import *
+from cdsware.bibindex_engine_config import *
+from cdsware.dbquery import run_sql
+from cdsware.access_control_engine import acc_authorize_action
 
 ## precompile some often-used regexp for speed reasons:
 sre_subfields = sre.compile('\$\$\w');

@@ -24,11 +24,12 @@ import time
 import tempfile
 from marshal import loads
 from zlib import decompress
-from config import weburl, cdslang
-from dbquery import run_sql    
-from messages import gettext_set_language
-from bibrank_grapher import create_temporary_image, write_coordinates_in_tmp_file, remove_old_img
-from bibrank_citation_searcher import calculate_cited_by_list
+
+from cdsware.config import weburl, cdslang
+from cdsware.dbquery import run_sql    
+from cdsware.messages import gettext_set_language
+from cdsware.bibrank_grapher import create_temporary_image, write_coordinates_in_tmp_file, remove_old_img
+from cdsware.bibrank_citation_searcher import calculate_cited_by_list
 
 cfg_bibrank_print_citation_history = 1 
 color_line_list = ['9', '19', '10', '15', '21', '18']

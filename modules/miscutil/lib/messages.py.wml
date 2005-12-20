@@ -27,7 +27,7 @@
 
 import string
 import sre
-from config import localedir
+from cdsware.config import localedir
 
 ## prepare messages:
 msg_search = {}

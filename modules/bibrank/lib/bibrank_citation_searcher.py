@@ -21,7 +21,8 @@
 
 from marshal import loads
 from zlib import decompress
-from dbquery import run_sql
+
+from cdsware.dbquery import run_sql
 
 def init_cited_by_dictionary():
     """return citation list dictionary from rnkCITATIONDATA

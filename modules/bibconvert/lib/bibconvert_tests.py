@@ -24,9 +24,10 @@
 
 __version__ = "$Id$"
 
-import bibconvert
 import unittest
 import re
+
+from cdsware import bibconvert
 
 class TestFormattingFunctions(unittest.TestCase):
     """Test bibconvert formatting functions."""

@@ -19,7 +19,7 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from config import version, etcdir, pdftotext
+from cdsware.config import version, etcdir, pdftotext
 
 # version number:
 cfg_refextract_version = "CDSware/%s refextract/%s" % (version, version)

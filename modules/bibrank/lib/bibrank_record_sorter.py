@@ -33,12 +33,13 @@ import ConfigParser
 import traceback
 import copy
 
-from config import *
-from dbquery import run_sql
-from bibindex_engine_stemmer import stem
-from bibindex_engine_stopwords import is_stopword
-from search_engine_config import cfg_max_recID
-from bibrank_citation_searcher import calculate_cited_by_list
+from cdsware.config import *
+from cdsware.dbquery import run_sql
+from cdsware.bibindex_engine_stemmer import stem
+from cdsware.bibindex_engine_stopwords import is_stopword
+from cdsware.search_engine_config import cfg_max_recID
+from cdsware.bibrank_citation_searcher import calculate_cited_by_list
+
 class HitSet:
     """Class describing set of records, implemented as bit vectors of recIDs.
     Using Numeric arrays for speed (1 value = 8 bits), can use later "real"

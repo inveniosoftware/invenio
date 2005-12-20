@@ -25,11 +25,12 @@ import sys
 import time
 import tempfile
 import calendar
-from config import weburl, cdslang
-from messages import gettext_set_language
-from dbquery import run_sql
-from bibrank_downloads_indexer import database_tuples_to_single_list
-from bibrank_grapher import *
+
+from cdsware.config import weburl, cdslang
+from cdsware.messages import gettext_set_language
+from cdsware.dbquery import run_sql
+from cdsware.bibrank_downloads_indexer import database_tuples_to_single_list
+from cdsware.bibrank_grapher import *
 
 color_line_list = ['9', '19', '10', '15', '21', '18']
 cfg_id_bibdoc_id_bibrec = 5

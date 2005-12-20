@@ -27,8 +27,8 @@ import sre
 import urllib
 import sys
 
-from config import *
-from messages import gettext_set_language, language_list_long
+from cdsware.config import *
+from cdsware.messages import gettext_set_language, language_list_long
 
 class Template:
     def tmpl_navtrailbox_body(self, weburl, ln, title, previous_links, separator, prolog, epilog):

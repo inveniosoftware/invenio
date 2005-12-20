@@ -23,20 +23,19 @@ import sys
 import time
 import zlib
 import urllib
-from config import *
-from webpage import page
-from dbquery import run_sql
-from webuser import getUid, getDataUid,isGuestUser
-from search_engine import print_record
-from webaccount import warning_guest_user
+
+from cdsware.config import *
+from cdsware.webpage import page
+from cdsware.dbquery import run_sql
+from cdsware.webuser import getUid, getDataUid,isGuestUser
+from cdsware.search_engine import print_record
+from cdsware.webaccount import warning_guest_user
+
+from cdsware.messages import gettext_set_language
+import cdsware.template
+webbasket_templates = cdsware.template.load('webbasket')
 
 imagesurl = "%s/img" % weburl
-
-from messages import gettext_set_language
-
-import template
-webbasket_templates = template.load('webbasket')
-
 
 ### IMPLEMENTATION
 

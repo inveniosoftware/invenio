@@ -25,8 +25,8 @@ import urllib
 import time
 import string
 
-from config import *
-from messages import gettext_set_language, language_list_long
+from cdsware.config import *
+from cdsware.messages import gettext_set_language, language_list_long
 
 class Template:
     def tmpl_get_first_comments_without_ranking(self, recID, ln, comments, nb_comments_total, warnings):

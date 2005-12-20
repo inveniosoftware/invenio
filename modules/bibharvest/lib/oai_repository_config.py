@@ -19,12 +19,12 @@
 
 """OAI repository config"""
 
-from config import oaiidprefix, \
-                   oaisampleidentifier, \
-                   oaiidentifydescription, \
-                   oaiidfield, \
-                   oaisetfield, \
-                   oaideleted, \
-                   oai_rt_expire, \
-                   nb_records_in_resume
+from cdsware.config import oaiidprefix, \
+     oaisampleidentifier, \
+     oaiidentifydescription, \
+     oaiidfield, \
+     oaisetfield, \
+     oaideleted, \
+     oai_rt_expire, \
+     nb_records_in_resume
 

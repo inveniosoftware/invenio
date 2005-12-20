@@ -20,17 +20,18 @@
 import sys
 import string
 import cgi
-from config import *
-from webpage import page
-from dbquery import run_sql
-from webuser import getUid,isGuestUser, get_user_preferences, set_user_preferences
-from access_control_admin import acc_findUserRoleActions
-from access_control_config import CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, CFG_EXTERNAL_AUTHENTICATION
 
-from messages import gettext_set_language
+from cdsware.config import *
+from cdsware.webpage import page
+from cdsware.dbquery import run_sql
+from cdsware.webuser import getUid,isGuestUser, get_user_preferences, set_user_preferences
+from cdsware.access_control_admin import acc_findUserRoleActions
+from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, CFG_EXTERNAL_AUTHENTICATION
 
-import template
-websession_templates = template.load('websession')
+from cdsware.messages import gettext_set_language
+
+import cdsware.template
+websession_templates = cdsware.template.load('websession')
 
 imagesurl = "%s/img" % weburl
 

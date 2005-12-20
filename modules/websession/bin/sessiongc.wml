@@ -33,16 +33,11 @@ Guest user sessions garbage collector.  To be run via cron once per day. (say)
 
 __version__ = "<: print generate_pretty_version_string('$Id$'); :>"
 
-## fill config variables:
-pylibdir = "<LIBDIR>/python"
-
 ## okay, rest of the Python code goes below
 #######
 
 import sys
 try:
-    sys.path.append('%s' % pylibdir)
-    from cdsware.dbquery import run_sql
     import getopt
     import time
 except ImportError, e:

@@ -26,7 +26,7 @@ import locale
 import re
 import operator
 
-from config import *
+from cdsware.config import *
 from cdsware.messages import gettext_set_language
 
 class Template:

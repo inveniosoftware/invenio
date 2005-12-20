@@ -25,19 +25,18 @@ import sys
 import time
 import urllib
 import zlib
-
-from config import *
-from webpage import page
-from dbquery import run_sql
-from webuser import getUid, isGuestUser
-from webaccount import warning_guest_user
-from webbasket import perform_create_basket, BasketNameAlreadyExists
 from mod_python import apache
 
-from messages import gettext_set_language
+from cdsware.config import *
+from cdsware.webpage import page
+from cdsware.dbquery import run_sql
+from cdsware.webuser import getUid, isGuestUser
+from cdsware.webaccount import warning_guest_user
+from cdsware.webbasket import perform_create_basket, BasketNameAlreadyExists
+from cdsware.messages import gettext_set_language
 
-import template
-webalert_templates = template.load('webalert')
+import cdsware.template
+webalert_templates = cdsware.template.load('webalert')
 
 ### IMPLEMENTATION
 

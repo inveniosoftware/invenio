@@ -21,7 +21,7 @@
                                                                                                                                                                                                      
 __lastupdated__ = """FIXME: last updated"""
 
-from config import  *
+from cdsware.config import  *
 
 cfg_webcomment_error_messages = \
 {   'ERR_WEBCOMMENT_RECID_INVALID'       :  ' %s is an invalid record ID ',

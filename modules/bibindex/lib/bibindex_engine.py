@@ -43,14 +43,14 @@ import unicodedata
 import traceback
 import cStringIO
 
-from config import *
-from bibindex_engine_config import *
-from search_engine_config import cfg_max_recID
-from search_engine import perform_request_search, strip_accents
-from dbquery import run_sql
-from access_control_engine import acc_authorize_action
-from bibindex_engine_stopwords import is_stopword
-from bibindex_engine_stemmer import stem
+from cdsware.config import *
+from cdsware.bibindex_engine_config import *
+from cdsware.search_engine_config import cfg_max_recID
+from cdsware.search_engine import perform_request_search, strip_accents
+from cdsware.dbquery import run_sql
+from cdsware.access_control_engine import acc_authorize_action
+from cdsware.bibindex_engine_stopwords import is_stopword
+from cdsware.bibindex_engine_stemmer import stem
 
 ## import optional modules:
 try:
