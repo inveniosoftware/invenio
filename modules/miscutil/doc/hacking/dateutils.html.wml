@@ -1,0 +1,182 @@
+## $Id$
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002, 2003, 2004, 2005 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="Date library" \
+    navbar_name="hacking-miscutil-dateutils" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt;  <a class=navtrail href=<WEBURL>/hacking/miscutil/index.html>MiscUtil Internals</a> " \
+    navbar_select="hacking-miscutil-dateutils" 
+
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
+<p>These are the functions and methodologies for date handling in CDSware.</p>
+
+
+<h2>Contents</h2>
+<ol>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#converting">Converting dates</a></li>
+<li><a href="#i18n">Internationalizing parts of dates</a></li>
+<li><a href="#generating">Generating GUI elements</a></li>
+</ol>
+
+ 
+<h2>1. <a name="overview">Overview</a></h2>
+
+Three ways of representing dates  are handled by this library:
+
+<dl>
+    <dt><b>datetext:</b></dt>
+    <dd>textual format =&gt; <code>'YEAR-MONTH-DAY HOUR:MINUTE:SECOND'</code><br />
+        e.g. <code>'2005-11-16 15:11:44'</code><br />
+        default value: <code>'0000-00-00 00:00:00'</code><br />
+        This format is the the one used by current Database for storing dates.
+    </dd>
+    
+    <dt><b>datestruct:</b></dt>
+    <dd>
+        tuple format =&gt; see <a href="http://docs.python.org/lib/module-time.html">Python reference</a> <br />
+        <code>(YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, WEEKDAY, YEARDAY, DAYLIGHT)</code><br />
+        e.g. <code>(2005, 11, 16, 15, 11, 44, 2, 320, 0)</code><br />
+        default value: <code>(0, 0, 0, 0, 0, 0, 0, 0, 0)</code><br />
+        This format is the one used by python. Time module provides methods for
+        calculations.
+    </dd>
+    
+    <dt><b>dategui:</b></dt>
+    <dd>
+        textual format for output =&gt; <code>'DAY MONTH YEAR, HOUR:MINUTE'</code><br />
+        e.g. <code>'16 nov 2005, 15:11'</code>
+        default value: <code>_("N/A")</code>
+    </dd>
+</dl>
+<p>The dateutils python module provides ways of converting between these formats.
+The default value is used whenever a date is non-valid (for python, dates before
+epoch are unvalid!).</p>
+
+<h2>2. <a name="converting">Converting dates</a></h2>
+The functions for conversion are listed below.
+<dl>
+    <dt><b><code>convert_datestruct_to_dategui(datestruct, ln=cdslang)</code></b></dt>
+    <dd>
+        <code>(2005, 11, 16, 15, 11, 44, 2, 320, 0) =&gt; '16 nov 2005, 15:11'</code><br/>
+        Month is internationalized
+    </dd>
+    <dt><b><code>convert_datestruct_to_datetext(datestruct)</code></b></dt>
+    <dd>
+        <code>(2005, 11, 16, 15, 11, 44, 2, 320, 0) =&gt; '2005-11-16 15:11:57'</code>
+    </dd>
+
+    <dt><b><code>convert_datetext_to_dategui(datetext, ln=cdslang)</code></b></dt>
+    <dd>
+        <code>'2005-11-16 15:11:57' =&gt; '16 nov 2005, 15:11'</code><br />
+        Month is internationalized
+    </dd>
+
+    <dt><b><code>convert_datetext_to_datestruct(datetext)</code></b></dt>
+    <dd>
+        <code>'2005-11-16 15:11:57' =&gt; (2005, 11, 16, 15, 11, 44, 2, 320, 0)</code>
+    </dd>
+    
+    <dt><b><code>get_datestruct(year, month, day)</code></b></dt>
+    <dd>
+        <code>year=2005, month=11, day=16 =&gt; (2005, 11, 16, 0, 0, 0, 2, 320, -1)</code>
+    </dd>
+
+    <dt><b><code>get_datetext(year, month, day)</code></b></dt>
+    <dd>
+        <code>year=2005, month=11, day=16 =&gt; '2005-11-16 00:00:00'</code>
+    </dd>
+</dl>
+
+<h2>3. <a name="i18n">Internationalizing parts of dates</a></h2>
+
+The following functions provide means of internationalizing part of dates.
+
+<dl>
+    <dt>
+      <b><code>get_i18n_day_name(day_nb, display='short', ln=cdslang)</code></b>
+    </dt>
+    <dd>
+        get the string representation of a weekday, internationalized<br />
+        <code>
+@param day_nb: number of weekday UNIX like. =&gt; 0=Sunday<br />
+@param ln: language for output<br />
+@return the string representation of the day
+        </code>
+    </dd>
+    <dt>
+        <b><code>get_i18n_month_name(month_nb, display='short', ln=cdslang)</code></b>
+    </dt>
+    <dd>
+        get a non-numeric representation of a month, internationalized.<br />
+        <code>
+@param month_nb: number of month, (1 based!) =&gt; 1=jan,..,12=dec<br />
+@param ln: language for output<br />
+@return the string representation of month
+        </code>
+    </dd>
+</dl>
+ 
+<h2>4. <a name="generating">Generating GUI elements</a></h2>
+
+The following functions create HTML fields for date selection:
+<dl>
+
+<dt>
+    <b><code>create_day_selectbox(name, selected_day=0, ln=cdslang)</code></b>
+</dt>
+<dd>Creates an HTML menu for day selection. (<code>0..31</code> values).<br />
+<code>@param name: name of the control (i.e. name of the var you'll get)<br />
+@param selected_day: preselect a day. Use 0 for the label 'Day'<br />
+@param ln: language of the menu<br />
+@return html as string
+</code>
+</dd>
+<dt>
+    <b><code>create_month_selectbox(name, selected_month=0, ln=cdslang)</code></b>
+</dt>
+<dd>Creates an HTML menu for month selection. Value of selected field is numeric<br />
+<code>@param name: name of the control (your form will be sent with name=value...)<br />
+@param selected_month: preselect a month. use 0 for the Label 'Month'<br />
+@param ln: language of the menu<br />
+@return html as string
+</code>
+</dd>
+<dt>
+    <b><code>create_year_inputbox(name, value=0)</code></b>
+</dt>
+<dd>
+Creates an HTML field (simple input) for year selection.<br />
+<code>@param name: name of the control (i.e. name of the variable you'll get)<br />
+@param value: prefilled value (int)<br />
+@return html as string
+</code>
+<dt>
+    <b><code>create_year_selectbox(name, from_year=-1, length=10, selected_year=0, ln=cdslang)</code></b>
+</dt>
+<dd>
+Creates an HTML menu (dropdownbox) for year selection.<br />
+<code>@param name: name of control( i.e. name of the variable you'll get)<br />
+@param from_year: year on which to begin. if <0 assume it is current year<br />
+@param length: number of items in menu<br />
+@param selected_year: initial selected year (if in range), else: label is selected<br />
+@param ln: language<br />
+@return html as string
+</code>
+</dl>

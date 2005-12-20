@@ -21,11 +21,12 @@
 __lastupdated__ = """$Date$"""
 
 
-from errorlib import get_msg_associated_to_code, get_msgs_for_code_list
+from cdsware.errorlib import get_msg_associated_to_code, get_msgs_for_code_list
 import unittest
 
 class TestInternalErrorlibErrors(unittest.TestCase):
     """
+    Class for testing!
     """
     def test_get_msg_associated_to_code(self):
         """ Test for error code to message association """
@@ -113,6 +114,16 @@ class TestInternalErrorlibErrors(unittest.TestCase):
         messages.append(output_list[0][1])
         messages.append(output_list[1][1])
 
+        # bad argument type
+        error = 'ERR_MISCUTIL_DEBUG'
+        other_error = 'ERR_MISCUTIL_BAD_ARGUMENT_TYPE'
+        output_list = get_msgs_for_code_list([(error, 'should be an int')])
+        self.assertEqual(2, len(output_list))
+        self.assertEqual(2, len(output_list[0]))
+        self.assertEqual(2, len(output_list[1]))
+        self.assertEqual(error, output_list[0][0])
+        self.assertEqual(other_error, output_list[1][0])
+        
         # string replacement
         messages = reduce(lambda x, y: str(x) + str(y), messages)
         self.assertEqual(0, messages.count('%') - messages.count('%%'))

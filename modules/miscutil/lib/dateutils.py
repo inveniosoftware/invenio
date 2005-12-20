@@ -43,7 +43,7 @@ Lexicon
 # External imports
 from time import strptime, strftime, localtime
 
-# CDS imports
+# CDSware imports
 from cdsware.config import cdslang
 from cdsware.messages import gettext_set_language
 

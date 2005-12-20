@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## Comments and reviews for records.
-                                                                                                                                                                                                     
+
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -18,19 +17,22 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-                                                                                                                                                                                                     
-__lastupdated__ = """FIXME: last updated"""
+""" Error handling library """
 
-from config import *
-from miscutil_config import cfg_miscutil_error_messages  
-from webcomment import wash_url_argument
+__lastupdated__ = """$Date$"""
+
+# CDSware imports
+from cdsware.config import cdslang, logdir, alertengineemail, adminemail, supportemail
+from cdsware.miscutil_config import cfg_miscutil_error_messages  
+from cdsware.urlutils import wash_url_argument
 from cdsware.messages import wash_language, gettext_set_language
+from cdsware.dateutils import convert_datestruct_to_datetext
 
-import time
-import string
+
+#External imports
 import traceback
 import sys
-import urllib
+import time
 
 def get_client_info(req):
     """
@@ -41,8 +43,8 @@ def get_client_info(req):
         return \
         {   'host'      : req.hostname,
             'url'       : req.unparsed_uri,
-            'time'      : time.strftime("%Y-%m-%d %H:%M:%S"),
-            'browser'   : req.headers_in.has_key('User-Agent') and req.headers_in['User-Agent'] or "NA",
+            'time'      : convert_datestruct_to_datetext(time.localtime()),
+            'browser'   : req.headers_in.has_key('User-Agent') and req.headers_in['User-Agent'] or "N/A",
             'client_ip' : req.connection.remote_ip
         }
     except:
@@ -53,7 +55,8 @@ def get_tracestack():
     If an exception has been caught, return the system tracestack or else return tracestack of what is currently in the stack 
     """
     if traceback.format_tb(sys.exc_info()[2]):
-        tracestack_pretty = "Traceback: \n%s" % string.join(traceback.format_tb(sys.exc_info()[2]),"\n")
+        delimiter = "\n"
+        tracestack_pretty = "Traceback: \n%s" % delimiter.join(traceback.format_tb(sys.exc_info()[2]))
     else:
         tracestack = traceback.extract_stack()[:-1] #force traceback except for this call
         tracestack_pretty = "%sForced traceback (most recent call last)" % (' '*4,)
@@ -68,26 +71,17 @@ def get_tracestack():
                 }
     return tracestack_pretty
 
-                                                                                                                                                                                                     
+
 def register_errors(errors_or_warnings_list, file, req=None):
     """
     log errors to cdsware.err and warnings to cdsware.log
     errors will be logged with client information (if req is given) and a tracestack
     warnings will be logged with just the warning message
     @param errors_or_warnings_list: list of tuples (err_name, err_msg)
+
     err_name = ERR_ + %(module_directory_name)s + _ + %(error_name)s #ALL CAPS
     err_name must be stored in file:  module_directory_name + _config.py
-             as the key for dict with name:  cfg_ + %(module_directory_name)s + _error_messages
-    example:
-        webcomment_config.py contains
-            cfg_webcomment_error_messages = 
-            {   'ERR_WEBCOMMENT_INVALID_RECID' : "The record id %s is invalid. Record ids must be %s", ...  }
-        errors_or_warnings_list = [('ERR_WEBCOMMENT_INVALID_RECID', "The record id -3 is invalid. Record ids must be greater than zero"), ....]
-        use get_msgs_for_code_list to produce the wanted errors_or_warnings_list from the dictionary values
-
-    For warnings, same thing except:
-        err_name can begin with either 'ERR' or 'WRN'
-        dict name ends with _warning_messages
+    as the key for dict with name:  cfg_ + %(module_directory_name)s + _error_messages
 
     @param req = mod_python request
     @return tuple integer 1 if successfully wrote to file, integer 0 if not
@@ -97,8 +91,7 @@ def register_errors(errors_or_warnings_list, file, req=None):
     if file == "error":
         # call the stack trace now
         tracestack_pretty = get_tracestack()
-
-        ## if req is given, get client info
+        # if req is given, get client info
         if req:
             client_info_dict = get_client_info(req)
             if client_info_dict:
@@ -110,13 +103,11 @@ def register_errors(errors_or_warnings_list, file, req=None):
                 client_info = "No client information available"
         else:
             client_info = "No client information available"
-
     # check arguments
     errors_or_warnings_list = wash_url_argument(errors_or_warnings_list, 'list')
     file = wash_url_argument(file, 'str')
     for etuple in errors_or_warnings_list:
-        etuple = wash_url_argument(etuple, 'tuple')
-                                     
+        etuple = wash_url_argument(etuple, 'tuple')                        
     # check file arg, if error default to warnings file + add error
     if file == 'error':
         file = 'err'
@@ -126,7 +117,7 @@ def register_errors(errors_or_warnings_list, file, req=None):
         file = 'log'
         error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
         errors_or_warnings_list.append((error, eval(cfg_miscutil_error_messages[error])% file))
-    ## update log_errors
+    # update log_errors
     file_pwd = logdir + '/cdsware.' + file
     errors = ''
     for etuple in errors_or_warnings_list:
@@ -155,7 +146,7 @@ def register_errors(errors_or_warnings_list, file, req=None):
 
 def get_msg_associated_to_code(err_code, file='error'):
     """
-    Returns formated string of code
+    Returns string of code
     @param code: error or warning code
     @param file: 'error' or 'warning'
     @return tuple (err_code, formatted_message)
@@ -171,19 +162,23 @@ def get_msg_associated_to_code(err_code, file='error'):
         err_msg = module_dict[err_code]
     except ImportError:
         error = 'ERR_MISCUTIL_IMPORT_ERROR'
-        err_msg = cfg_miscutil_error_messages[error] %(err_code, module_config)
+        err_msg = cfg_miscutil_error_messages[error] % (err_code,
+                                                        module_config)
         err_code = error
     except AttributeError:
         error = 'ERR_MISCUTIL_NO_DICT'
-        err_msg = cfg_miscutil_error_messages[error] %(err_code, module_config, module_dict_name)
+        err_msg = cfg_miscutil_error_messages[error] % (err_code,
+                                                        module_config,
+                                                        module_dict_name)
         err_code = error
     except KeyError:
         error = 'ERR_MISCUTIL_NO_MESSAGE_IN_DICT'
-        err_msg = cfg_miscutil_error_messages[error] %(err_code, module_config + '.' + module_dict_name)
+        err_msg = cfg_miscutil_error_messages[error] % (err_code,
+                                                        module_config + '.' + module_dict_name)
         err_code = error
     except:
         error = 'ERR_MISCUTIL_UNDEFINED_ERROR'
-        err_msg = cfg_miscutil_error_messages[error] %err_code
+        err_msg = cfg_miscutil_error_messages[error] % err_code
         err_code = error
     return (err_code, err_msg) 
 
@@ -193,14 +188,7 @@ def get_msgs_for_code_list(code_list, file='error', ln=cdslang):
     
     err_name = ERR_ + %(module_directory_name)s + _ + %(error_name)s #ALL CAPS
     err_name must be stored in file:  module_directory_name + _config.py
-             as the key for dict with name:  cfg_ + %(module_directory_name)s + _error_messages
-    example:
-        webcomment_config.py contains
-            cfg_webcomment_error_messages = 
-            {   'ERR_WEBCOMMENT_INVALID_RECID' : "The record id %s is invalid. Record ids must be %s", ...  }
-        errors_or_warnings_list = [('ERR_WEBCOMMENT_INVALID_RECID', "The record id -3 is invalid. Record ids must be greater than zero"), ...]
-        use get_msgs_for_code_list to produce the wanted errors_or_warnings_list from the dictionary values
-
+    as the key for dict with name:  cfg_ + %(module_directory_name)s + _error_messages
     For warnings, same thing except:
         err_name can begin with either 'ERR' or 'WRN'
         dict name ends with _warning_messages
@@ -211,21 +199,21 @@ def get_msgs_for_code_list(code_list, file='error', ln=cdslang):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-
     out = []
     if type(code_list) is None:
         return None
     code_list = wash_url_argument(code_list, 'list')
     file = wash_url_argument(file, 'str')
     for code_tuple in code_list:
-        code_tuple = wash_url_argument(code_tuple, 'tuple')
+        if not(type(code_tuple) is tuple):
+            code_tuple = (code_tuple,)
         nb_tuple_args = len(code_tuple) - 1
         err_code = code_tuple[0]
-        if file=='error' and not err_code.startswith('ERR'):
+        if file == 'error' and not err_code.startswith('ERR'):
             error = 'ERR_MISCUTIL_NO_ERROR_MESSAGE'
             out.append((error, eval(cfg_miscutil_error_messages[error])))
             continue
-        elif file=='warning' and not (err_code.startswith('ERR') or err_code.startswith('WRN')):
+        elif file == 'warning' and not (err_code.startswith('ERR') or err_code.startswith('WRN')):
             error = 'ERR_MISCUTIL_NO_WARNING_MESSAGE'
             out.append((error, eval(cfg_miscutil_error_messages[error])))
             continue
@@ -235,25 +223,31 @@ def get_msgs_for_code_list(code_list, file='error', ln=cdslang):
             err_msg = eval(err_msg)
         nb_msg_args = err_msg.count('%') - err_msg.count('%%')
         parsing_error = ""
-
         if new_err_code != err_code or nb_msg_args == 0:
             # undefined_error or immediately displayable error
             out.append((new_err_code, err_msg))
             continue
-        if nb_msg_args == nb_tuple_args:
-            err_msg = err_msg % code_tuple[1:]
-        elif nb_msg_args < nb_tuple_args:
-            err_msg = err_msg % code_tuple[1:nb_msg_args+1]
-            parsing_error =  'ERR_MISCUTIL_TOO_MANY_ARGUMENT'
-            parsing_error_message = eval(cfg_miscutil_error_messages[parsing_error])%code_tuple[0]
-        elif nb_msg_args > nb_tuple_args:
-            code_tuple = list(code_tuple)
-            for i in range(nb_msg_args - nb_tuple_args):
-                code_tuple.append('???')
-            code_tuple = tuple(code_tuple)
-            err_msg = err_msg % code_tuple[1:]
-            parsing_error = 'ERR_MISCUTIL_TOO_FEW_ARGUMENT'
-            parsing_error_message = eval(cfg_miscutil_error_messages[parsing_error])%code_tuple[0]
+        try:
+            if nb_msg_args == nb_tuple_args:
+                err_msg = err_msg % code_tuple[1:]
+            elif nb_msg_args < nb_tuple_args:
+                err_msg = err_msg % code_tuple[1:nb_msg_args+1]
+                parsing_error =  'ERR_MISCUTIL_TOO_MANY_ARGUMENT'
+                parsing_error_message = eval(cfg_miscutil_error_messages[parsing_error])
+                parsing_error_message %= code_tuple[0]
+            elif nb_msg_args > nb_tuple_args:
+                code_tuple = list(code_tuple)
+                for i in range(nb_msg_args - nb_tuple_args):
+                    code_tuple.append('???')
+                    code_tuple = tuple(code_tuple)
+                err_msg = err_msg % code_tuple[1:]
+                parsing_error = 'ERR_MISCUTIL_TOO_FEW_ARGUMENT'
+                parsing_error_message = eval(cfg_miscutil_error_messages[parsing_error])
+                parsing_error_message %= code_tuple[0]
+        except:
+            parsing_error = 'ERR_MISCUTIL_BAD_ARGUMENT_TYPE'
+            parsing_error_message = eval(cfg_miscutil_error_messages[parsing_error])
+            parsing_error_message %= code_tuple[0]           
         out.append((err_code, err_msg))
         if parsing_error:
             out.append((parsing_error, parsing_error_message))
@@ -261,14 +255,15 @@ def get_msgs_for_code_list(code_list, file='error', ln=cdslang):
         out = None
     return out
 
-def send_error_report_to_admin(header, url, time, browser, client, error, sys_error, traceback):
+def send_error_report_to_admin(header, url, time_msg,
+                               browser, client, error,
+                               sys_error, traceback_msg):
     """
     Sends an email to the admin with client info and tracestack
     """
     from_addr =  'CDS Alert Engine <%s>' % alertengineemail
     to_addr = adminemail 
-
-    body = '''
+    body = """
 The following error was seen by a user and sent to you.
 %(contact)s
 
@@ -276,26 +271,24 @@ The following error was seen by a user and sent to you.
 
 %(url)s
 %(time)s
-%(broser)s
+%(browser)s
 %(client)s
 %(error)s
 %(sys_error)s
 %(traceback)s
 
-Please see the %(logdir)s/errors.log for traceback details.                                                                                                                                                                                                     
-    ''' % \
+Please see the %(logdir)s/errors.log for traceback details.""" % \
         {   'header'    : header,
             'url'       : url,
-            'time'      : time,
+            'time'      : time_msg,
             'browser'    : browser,
             'client'    : client,
             'error'     : error,
             'sys_error' : sys_error,
-            'traceback' : traceback,
+            'traceback' : traceback_msg,
             'logdir'    : logdir,
             'contact'   : "Please contact %s quoting the following information:"  % (supportemail,) #! is support email always cds?
         }
-
-    from alert_engine import send_email
+    from cdsware.alert_engine import send_email
     send_email(from_addr, to_addr, body)
 

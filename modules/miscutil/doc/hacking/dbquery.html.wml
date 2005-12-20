@@ -1,0 +1,96 @@
+## $Id$
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002, 2003, 2004, 2005 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="Database access API" \
+    navbar_name="hacking-miscutil" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt;  <a class=navtrail href=<WEBURL>/hacking/miscutil/index.html>MiscUtil Internals</a> " \
+    navbar_select="hacking-miscutil-dbquery" 
+
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
+<p>
+DBQuery handles connection to database and queries.
+</p>
+<h2>Contents</h2>
+<ol>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#notes">Notes</a></li>
+</ol>
+
+<h2>1. <a name="overview">Overview</a></h2>
+
+<p>DBQuery provides a method, <code>run_sql</code> which handles SQL requests. It establishes
+a connection if necessary, sends requests and returns tuples.</p>
+
+
+<h2>2. <a name="usage">Usage</a></h2>
+
+<p>As DBQuery automatically handles connection establishment, usage of a single
+function is necessary:</p>
+<pre>
+    run_sql(sql, param=None, n=0, with_desc=0)
+        Run SQL on the server and returns result.
+        @param param: tuple of string params to insert in the query
+                      (see notes below)
+        @param n: number of tuples in result (0 for unbounded)
+        @param with_desc: if true, will return a
+                          DB API 7-tuple describing columns in query
+        @return: if SELECT, SHOW, DESCRIBE statements: tuples of data, followed
+                                                       by description if parameter
+                                                       provided
+                 if INSERT: last row id.
+                 else: SQL result as provided by database
+</pre>
+
+<h2>3. <a name="notes">Notes</a></h2>
+
+<h3>3.1 Params</h3>
+As said before, params must be of type string. Trying to pass non character data
+may lead to an error. Developers should consider converting to string, or render
+string before sending, giving no param:
+<pre>
+    initial_params=(1234,)
+    query = "SELECT id FROM user where id>%s"
+    params = (str(initial_params[0]),)
+    run_sql(query, params)
+</pre>
+    or
+<pre>
+    query = "SELECT id FROM user where id>%d" % 1234
+    run_sql(query)
+</pre>
+<p>When using this last technique, be careful with SQL injection problem. One should
+use the <code>MySQLdb.escape_string()</code> method.
+
+<h3>3.2 Dates</h3>
+<p>Switching from MySQLdb 0.9 to MySQLdb 1.2, while using Python 2.2 or 2.3
+led to discovery of incompatibilities</p>
+<p>If a date field is in the received tuple, its format will be:</p>
+<ul>
+<li>string with MySQLdb 0.9</li>
+<li>datetime with MySQLdb 1.2</li>
+</ul>
+<p>As Python 2.2 doesn't provide <code>datetime</code> class, handling of this
+problem should be done for backwards compatibility reasons. The
+solution is to force MySQL to convert date to a textual format:</p>
+<pre>
+    SELECT DATE_FORMAT(date_field,'%%Y-%%m-%%d %%H:%%i:%%s') FROM table
+</pre>
+<p>This conversion will return a datetext format as described in <a href="./dateutils.html">dateutils library</a><code>(YEAR-MONTH-DAY HOUR:MINUTE:SECOND)</code></p>

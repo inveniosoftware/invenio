@@ -33,5 +33,7 @@ cfg_miscutil_error_messages = \
     'ERR_MISCUTIL_IMPORT_ERROR': '_("An undefined error has occured (%s). \'%s\' does not exist")',
     'ERR_MISCUTIL_NO_DICT': '_("An undefined error has occured (%s). %s does not contain %s")',
     'ERR_MISCUTIL_NO_MESSAGE_IN_DICT': '_("An undefined error has occured. %s not defined in %s")',
-    'ERR_MISCUTIL_UNDEFINED_ERROR': '_("An undefined error has occured (%s)")'
+    'ERR_MISCUTIL_UNDEFINED_ERROR': '_("An undefined error has occured (%s)")',
+    'ERR_MISCUTIL_BAD_ARGUMENT_TYPE': '_("Unable to display error: Arguments do not match for error %s")',
+    'ERR_MISCUTIL_DEBUG': 'Error nb %i'
 }

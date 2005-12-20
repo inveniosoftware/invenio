@@ -1,0 +1,320 @@
+## $Id$
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002, 2003, 2004, 2005 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="Error Library" \
+    navbar_name="hacking-miscutil" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt;  <a class=navtrail href=<WEBURL>/hacking/miscutil/index.html>MiscUtil Internals</a> " \
+    navbar_select="hacking-miscutil-error-management" 
+
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
+<p>
+These are the functions and methodologies for error handling in CDSware.
+</p>
+
+<h2>Contents</h2>
+<ol>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#creating">Creating errors</a></li>
+<li><a href="#using">Using error library</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+</ol>
+
+<h2>1. <a name="overview">Overview</a></h2>
+
+<p>This API handles two concepts: Errors and Warnings.
+
+<p>An error is an unexpected behavior that leads to the stopping of current process.
+Discussing of web pages, errors should be displayed by instead of the
+requested page. Errors are logged into <code>cdsware/var/log/cdsware.err</code>.
+Errors can be logged with client information and a tracestack.</p>
+
+<p>A warning is an unexpected behavior that can be ignored. Warnings are logged into
+<code>cdsware/var/log/cdsware.log</code> with just the warning message.</p>
+
+<p>Errors and warnings should be internationalized (see <a href="#i18n">below</a>).</p>
+
+
+<h2>2. <a name="creating">Creating errors</a></h2>
+<h3>2.1 Configuration file</h3>
+<p>Every module should create a file containing error definitions, warning
+definitions, variables avoiding &quot;magic&quot; number or strings, etc.</p>
+
+<p>This file has to be named against a convention:</p>
+<pre>
+    &lt;module-name&gt;_config.py
+</pre>
+<p>e.g. <code>webmessage_config.py</code> for the WebMessage module.</p>
+<h3>2.2 Dictionaries of errors</h3>
+<p>Errors and warnings are eventually stored into dictionaries. The dictionaries
+are to be named against the following convention:</p>
+<pre>
+    cfg_&lt;module-name&gt;_error_messages and
+    cfg_&lt;module-name&gt;_warning_messages
+</pre>
+<p>These two dictionaries (one can choose to implement only one if he doesn&apos;t
+need warnings, for example) contain an error-name -&gt; displayable message
+association.</p>
+
+<p>Errors are to be named against the following convention:</p>
+<pre>
+    ERR_&lt;MODULE-NAME&gt;_ERROR_NAME
+</pre>
+<p>Please note the use of uppercase.</p>
+
+<p>Warnings can also be named as errors if convenient, and so have to
+follow one of these rules:</p>
+<pre>
+    WRN_&lt;MODULE-NAME&gt;_WARNING_NAME or
+    ERR_&lt;MODULE-NAME&gt;_WARNING_NAME
+</pre>
+<p>The associated message can obviously contain substituted variables like <code>%s</code>, <code>%d</code>...
+
+<h3><a name="i18n">Internationalization</a></h3>
+<p>Errors should also be internationalized. As the config file cannot receive
+parameters, this is done by the error handling library. The convenient way that has
+been chosen is to nest the classical <code>_()</code> function inside the string.</p>
+<p>An internationalized error message should look like this:</p>
+<pre>
+    '_("Internationalized error (%s) message")'
+</pre>
+<p>A complete example of correct dictionnary is given below:</p>
+<pre>    
+    cfg_webcomment_error_messages =
+    {   'ERR_WEBCOMMENT_RECID_INVALID'       :  '_("%i is an invalid record ID")',
+        'ERR_WEBCOMMENT_RECID_NAN'           :  '_("Record ID %i is not a number")',
+        'ERR_WEBCOMMENT_UID_INVALID'         :  '_("%i is an invalid user ID")'
+    }
+</pre>
+
+<h2>3. <a name="using">Using error library</a></h2>
+
+<h3>3.1 From a web interface</h3>
+<p>When displaying a page, the <code>modules/webstyle/lib/webpage.py</code> python module should
+be used. This module provides a <code>page()</code> function, convenient for webpage output,
+which can handle errors (display and log).<br />
+A call to this function should use the following arguments, assuming that language
+information is stored in a variable called <code>ln</code>, and request information
+are stored in req (will be used for IP logging, for example):</p>
+<pre>
+    page(...,
+         req=req,
+         language=ln,
+         errors=error_list,
+         warnings=warnings_list,
+         ...)
+</pre>
+<p>list of errors and warnings are behaving the same way. They are lists of tuples:</p>
+<pre>
+    [(error_name, param1, ..., paramN), ...]
+</pre>
+<p>The params are used to represent substitued values in messages. For example if
+you want to throw one of the errors above, error_list should look like this:</p>
+<pre>
+    error_list = [('ERR_WEBCOMMENT_RECID_INVALID', 123456)]
+</pre>
+<h4>Example</h4>
+<p>Business logic should be separated from web interface. We consider three files in the
+following (real) example:
+<ol>
+<li><code>yourmessages.py</code>, which is the page as viewed by a browser,</li>
+<li><code>webmessage.py</code>, which contains the business logic,</li>
+<li><code>webmessage_config</code>, which contains error definitions</li>
+</ol>
+<p>In this example, a user tries to read a message. We must ensure he doesn't
+read another's message, and that this message really exist in the system. For
+a more convenient reading, some (non error-related) parts of code have been suppressed.</p>
+<h5>webmessage_config.py</h5>
+<pre>
+&#35; error messages. (should not happen, except in case of reload, or url altering) 
+cfg_webmessage_error_messages = \
+{   'ERR_WEBMESSAGE_NOTOWNER':  '_("This message is not in your mailbox")',
+    'ERR_WEBMESSAGE_NONICKNAME':'_("No nickname or user for uid #%s")',
+    'ERR_WEBMESSAGE_NOMESSAGE': '_("This message doesn\'t exist")'
+}
+</pre>
+
+<h5>webmessage.py: business logic</h5>
+<pre>
+from cdsware.webmessage_config import cfg_webmessage_error_messages
+
+def perform_request_display_msg(uid, msgid, ln=cdslang):
+    uid   = wash_url_argument(uid, 'int')
+    msgid = wash_url_argument(msgid, 'int')
+    ln    = wash_language(ln)
+    errors = []
+    warnings = []
+    body = ""
+    if (check_user_owns_message(uid, msgid) == 0):
+        &#35; The user doesn't own this message
+        errors.append(('ERR_WEBMESSAGE_NOTOWNER',))
+    else:
+        (msg_id, ...) = get_message(uid, msgid)        
+        if (msg_id == ""):
+	    &#35; The message exists in table user_msgMESSAGE
+	    &#35; but not in table msgMESSAGE => table inconsistency
+            errors.append(('ERR_WEBMESSAGE_NOMESSAGE',))
+        else:
+            body = webmessage_templates.tmpl_display_msg( ... )
+    return (body, errors, warnings)
+</pre>
+
+<h5>yourmessages.py: web interface</h5>
+<pre>
+from cdsware.webpage import page
+from cdsware.webmessage import perform_request_display_msg
+
+def display_msg(req, msgid=-1, ln=cdslang):
+    _ = gettext_set_language(ln)
+    # Generate content
+    (body, errors, warnings) = perform_request_display_msg(uid, msgid, ln)
+    title = _("Read a message")
+    return page(title       = title,
+                body        = body,
+                navtrail    = get_navtrail(ln, title),
+                uid         = uid,
+                lastupdated = __lastupdated__,
+                req         = req,
+                language    = ln,
+                errors      = errors,
+                warnings    = warnings)
+
+</pre>
+
+<h3>3.2 From a command line interface</h3>
+
+<p>The following functions can be useful (see source code for other functions):</p>
+<pre>
+   get_msgs_for_code_list(code_list, file='error', ln=cdslang)
+        Returns formatted strings for the given errors 
+        @param code_list: list of tuples  [(err_name, arg1, ..., argN), ...]
+        @param file: 'error' or 'warning'
+        @return list of tuples of length 2 [('ERR_...', err_msg), ...]
+                if code_list empty, will return None.
+                if errors retrieving error messages, will append an error to
+                the list     
+
+    register_errors(errors_or_warnings_list, file, req=None)
+        log errors to cdsware.err and warnings to cdsware.log
+        errors will be logged with client information (if req is given)
+        and a tracestack
+        warnings will be logged with just the warning message
+        @param errors_or_warnings_list: list of tuples (err_name, err_msg)
+        @param file: 'error' or 'warning'
+        @param req = mod_python request
+        @return integer 1 if successfully wrote to file, integer 0 if not
+                will append another error to errors_list if unsuccessful
+
+    send_error_report_to_admin(header, url, time, browser, client,
+                               error, sys_error, traceback)
+        Sends an email to the admin with client info and tracestack
+</pre>
+<h4>Example</h4>
+<p>In the following example, two files are used:</p>
+<ol>
+<li><code>webmessage_config</code>, containing error messages</li>
+<li><code>webmessage_example_bin.py</code>, containing business logic</li>
+</ol>
+<p>Scenario: a function receives an error and wants to register it only if it is not a
+messaging error</p>
+<h5>webmessage_config.py</h5>
+<pre>
+&#35; error messages. (should not happen, except in case of reload, or url altering) 
+cfg_webmessage_error_messages = \
+{   'ERR_WEBMESSAGE_NOTOWNER':  '_("This message is not in your mailbox")',
+    'ERR_WEBMESSAGE_NONICKNAME':'_("No nickname or user for uid #%s")',
+    'ERR_WEBMESSAGE_NOMESSAGE': '_("This message doesn\'t exist")'
+}
+</pre>
+
+<h5>webmessage_example_bin.py</h5>
+<pre>
+from cdsware.webmessage_config import cfg_webmessage_error_messages
+from cdsware.errorlib import get_msgs_for_code_list, register_errors
+
+def handle_error(error):
+    errorlist = get_msgs_for_code_list([error])
+
+    &#35; error is a tuple of error name, arguments => we only need the name
+    if cfg_webmessage_error_messages[error[0]]:
+        print("Error in webmessage: %s" % errorlist[0][1])
+    else:
+        for error in errorlist:
+            print("Error: %s" % error[1])
+        register_errors(errorlist, 'error')
+</pre>
+<h2>4. <a name="troubleshooting">Troubleshooting</a></h2>
+
+<p>MiscUtil can generate errors. See miscutil_config.py for a complete list.
+One can see below some usual errors and their solutions:</p>
+<dl>
+<dt><b><code>ERR_MISCUTIL_IMPORT_ERROR</code></b></dt>
+<dd>The <code>&lt;module-name&gt;_config.py</code> file has not been found. Check it
+has the correct name and is deployed.<br />
+Check that the error is named following this pattern:
+<pre>
+    WRN_&lt;MODULE-NAME&gt;_WARNING_NAME or
+    ERR_&lt;MODULE-NAME&gt;_WARNING_NAME 
+</pre>
+</dd>
+
+<dt><b><code>ERR_MISCUTIL_NO_DICT</code></b></dt>
+<dd>No dictionary could be found in <code>&lt;module-name&gt;_config.py</code>. Check
+that your dictionary is correctly named:
+<pre>
+    cfg_&lt;module-name&gt;_error_messages
+</pre>
+You could also have inverted errors and warnings if only one dictionary was provided.<br/>
+This can also happen when using direct API if the <code>file</code> argument is misspelled.
+</dd>
+
+<dt><b><code>ERR_MISCUTIL_NO_MESSAGE_IN_DICT</code></b></dt>
+<dd>A dictionary was found but not the error in it. You probably misspelled
+<code>error_name</code>, or inverted errors and warnings dictionaries.
+</dd>
+
+<dt><b><code>ERR_MISCUTIL_UNDEFINED_ERROR</code></b></dt>
+<dd>The library couldn't guess the name of module. Check that the error name is beginning
+with <code>ERR_MODULE-NAME_</code> or <code>WRN_MODULE-NAME_</code>. This library uses
+underscores as separators to guess module name.
+</dd>
+
+<dt><b><code>ERR_MISCUTIL_TOO_MANY_ARGUMENT</code></b></dt>
+<dd>As the library was rendering the display of error, a surnumerous text substitute was
+found (surnumerous are ignored for final rendering, and this error is appened to list of errors):
+<pre>
+    'ERR_KNIGHTS': '_("We are the knights who say %s!")'
+    errors = ('ERR_KNIGHTS', 'ni', 'ni')
+</pre>
+</dd>
+
+<dt><b><code>ERR_MISCUTIL_TOO_FEW_ARGUMENT</code></b></dt>
+<dd>Not enough arguments (text substitutes) were given for an error. Missing ones are
+replaced by <code>'???'</code>:
+<pre>
+    'ERR_KNIGHTS': '_("We are the knights who say %s! We demand a %s")'
+    errors = ('ERR_KNIGHTS', 'ni')
+</pre>
+</dd>
+
+<dt><b><code>ERR_MISCUTIL_BAD_ARGUMENT_TYPE</code></b></dt>
+<dd>Your arguments (text substitutes) did not match with the error declaration<br />
+e.g. inversion between integer (<code>%i</code>) and string (<code>%s</code>)
+</dd>    
+</dl>
