@@ -27,6 +27,7 @@ all:
 	chmod u+x ./dbtest ./dbexec
 
 install-data-local:
+	chmod u+x ./dbtest ./dbexec
 	./dbtest
 
 CLEANFILES = *~ *.tmp
