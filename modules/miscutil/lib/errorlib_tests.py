@@ -28,48 +28,59 @@ class TestInternalErrorlibErrors(unittest.TestCase):
     """
     Class for testing!
     """
-    def test_get_msg_associated_to_code(self):
-        """ Test for error code to message association """
+    messages = []
+    
+    def test_correct_association(self):
+        """errorlib - code association: correct code"""
         # correct input
         input_err_code = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
         (output_err_code, err_msg) = get_msg_associated_to_code(input_err_code, 'error') 
         self.assertEqual(output_err_code, input_err_code)
 
+    def test_no_module(self):
+        """errorlib - code association: no <module>_config"""
         # no file module_config
         input_err_code ='ERR_BADMODULEIDENTIFIER_WITH_BAD_ERRORNAME'
         (output_err_code, err_msg) = get_msg_associated_to_code(input_err_code, 'error')
         expected_output_err_code = 'ERR_MISCUTIL_IMPORT_ERROR'
         self.assertEqual(output_err_code, expected_output_err_code)
 
+    def test_no_dictionary(self):
+        """errorlib - code association: no error dictionary"""
         # file exists, but no dictionary
         input_err_code ='ERR_MISCUTIL_NODICTIONARY'
         (output_err_code, err_msg) = get_msg_associated_to_code(input_err_code, 'nodict')
         expected_output_err_code = 'ERR_MISCUTIL_NO_DICT'
         self.assertEqual(output_err_code, expected_output_err_code)
 
+    def test_no_identifier(self):
+        """errorlib - code association: no identifier"""
         # identifier not in dictionary
         input_err_code ='ERR_MISCUTIL_IDENTIFIER_WONT_BE_FOUND_IN_DICTIONNARY'
         (output_err_code, err_msg) = get_msg_associated_to_code(input_err_code, 'error')
         expected_output_err_code = 'ERR_MISCUTIL_NO_MESSAGE_IN_DICT'
         self.assertEqual(output_err_code, expected_output_err_code)
-
+        
+    def test_not_an_error(self):
+        """errorlib - code association: badly named error"""
         # identifier does not begin with ERR or WRN
         input_err_code = 'STRANGEERROR'
         (output_err_code, err_msg) = get_msg_associated_to_code(input_err_code, 'error')
         expected_output_err_code = 'ERR_MISCUTIL_UNDEFINED_ERROR'
         self.assertEqual(output_err_code, expected_output_err_code)
         
-    def test_get_msgs_for_code_list(self):
-        """ Test error message output """
-        messages = []
+    def test_correct_argument_validation(self):
+        """errorlib - single argument"""
         # displayable error
         error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
         output_list = get_msgs_for_code_list((error, 'junk'))
         self.assertEqual(1, len(output_list))
         self.assertEqual(2, len(output_list[0]))
         self.assertEqual(error, output_list[0][0])
-        messages.append(output_list[0][1])
-        
+        self.messages.append(output_list[0][1])
+
+    def test_correct_arguments_validation(self):
+        """errorlib - multiple errors"""
         # displayable errors
         error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
         output_list = get_msgs_for_code_list([(error, 'junk'), (error, 'junk')])
@@ -78,9 +89,12 @@ class TestInternalErrorlibErrors(unittest.TestCase):
         self.assertEqual(2, len(output_list[1]))
         self.assertEqual(error, output_list[0][0])
         self.assertEqual(error, output_list[1][0])
-        messages.append(output_list[0][1])
-        messages.append(output_list[1][1])
+        # store error message for further tests
+        self.messages.append(output_list[0][1])
+        self.messages.append(output_list[1][1])
 
+    def test_undefined_error(self):
+        """errorlib - no underscore in error"""
         # undefined error
         error = 'ERRMISCUTIL'
         expected_error = 'ERR_MISCUTIL_UNDEFINED_ERROR'
@@ -88,8 +102,11 @@ class TestInternalErrorlibErrors(unittest.TestCase):
         self.assertEqual(1, len(output_list))
         self.assertEqual(2, len(output_list[0]))
         self.assertEqual(expected_error, output_list[0][0])
-        messages.append(output_list[0][1])               
-        
+        # store error messages for further tests
+        self.messages.append(output_list[0][1])               
+
+    def test_too_many_arguments(self):
+        """errorlib - arguments: too many arguments"""
         # too many arguments
         error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
         other_error = 'ERR_MISCUTIL_TOO_MANY_ARGUMENT'
@@ -99,9 +116,12 @@ class TestInternalErrorlibErrors(unittest.TestCase):
         self.assertEqual(2, len(output_list[1]))
         self.assertEqual(error, output_list[0][0])
         self.assertEqual(other_error, output_list[1][0])
-        messages.append(output_list[0][1])
-        messages.append(output_list[1][1])
-        
+        # store error messages for further tests
+        self.messages.append(output_list[0][1])
+        self.messages.append(output_list[1][1])
+
+    def test_too_few_arguments(self):
+        """errorlib - arguments: too few arguments"""
         # too few argument
         error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
         other_error = 'ERR_MISCUTIL_TOO_FEW_ARGUMENT'
@@ -111,9 +131,12 @@ class TestInternalErrorlibErrors(unittest.TestCase):
         self.assertEqual(2, len(output_list[1]))
         self.assertEqual(error, output_list[0][0])
         self.assertEqual(other_error, output_list[1][0])
-        messages.append(output_list[0][1])
-        messages.append(output_list[1][1])
+        # store error messages for further tests
+        self.messages.append(output_list[0][1])
+        self.messages.append(output_list[1][1])
 
+    def test_bad_type(self):
+        """errorlib - arguments: bad argument type"""
         # bad argument type
         error = 'ERR_MISCUTIL_DEBUG'
         other_error = 'ERR_MISCUTIL_BAD_ARGUMENT_TYPE'
@@ -123,13 +146,20 @@ class TestInternalErrorlibErrors(unittest.TestCase):
         self.assertEqual(2, len(output_list[1]))
         self.assertEqual(error, output_list[0][0])
         self.assertEqual(other_error, output_list[1][0])
-        
-        # string replacement
-        messages = reduce(lambda x, y: str(x) + str(y), messages)
-        self.assertEqual(0, messages.count('%') - messages.count('%%'))
 
+    # z because this function must execute lately for more interesting results
+    def test_zsubstitution(self):
+        """errorlib - arguments: every argument substituted"""
+        # string replacement
+        testmessages = reduce(lambda x, y: str(x) + str(y), self.messages)
+        self.assertEqual(0, testmessages.count('%') - testmessages.count('%%'))
+
+    # z because this function must also execute lately for more interesting results
+    def test_zinternationalization(self):
+        """errorlib - internationalization"""
         # string internationalization
-        self.assertEqual(0, messages.count('_('))
+        testmessages = reduce(lambda x, y: str(x) + str(y), self.messages)
+        self.assertEqual(0, testmessages.count('_('))
         
 def create_test_suite():
     """
