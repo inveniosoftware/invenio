@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cdsware, 0.7.1.20051115, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.7.1.20051115)
+AC_INIT(cdsware, 0.9.0.20051220, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cdsware, 0.9.0.20051220)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -546,6 +546,8 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/miscutil/demo/Makefile \
 	  modules/miscutil/sql/Makefile \
 	  modules/miscutil/web/Makefile \
+	  modules/miscutil/doc/Makefile \
+	  modules/miscutil/doc/hacking/Makefile \
 	  modules/webaccess/Makefile \
 	  modules/webaccess/bin/Makefile \
 	  modules/webaccess/bin/authaction \
