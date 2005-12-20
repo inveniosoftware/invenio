@@ -2,7 +2,6 @@
 ## $Id$
 ## Messaging system (internal)
 
-
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -19,12 +18,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-
+""" Web interface for WebMessage """
 __lastupdated__ = """$Date$"""
-
-# external imports
-from mod_python import apache
 
 # CDSWare imports
 from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
@@ -33,16 +28,15 @@ from cdsware.webuser import getUid, isGuestUser, page_not_authorized
 from cdsware.webmessage import *
 from cdsware.webpage import page
 from cdsware.messages import wash_language, gettext_set_language
+from cdsware.urlutils import redirect_to_url
 
 ### CALLABLE INTERFACE
 def index(req):
     """ The function called by default
     """
-    req.err_headers_out.add("Location", "%s/yourmessages.py/display?%s" % (weburl, req.args))
-    raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
-	
+    redirect_to_url(req, "%s/yourmessages.py/display?%s" % (weburl, req.args))
 
-def display(req, ln = cdslang):
+def display(req, ln=cdslang):
     """
     Displays the Inbox of a given user
     @param ln:  language
@@ -62,10 +56,9 @@ def display(req, ln = cdslang):
     return page(title       = _("Your Messages"),
                 body        = body,
                 navtrail    = get_navtrail(ln),
-                description = "",
-                keywords    = "",
                 uid         = uid,
                 lastupdated = __lastupdated__,
+                req         = req,
                 language    = ln,
                 errors      = errors,
                 warnings    = warnings)
@@ -103,10 +96,9 @@ def write(req, msg_reply_id="", msg_to="", msg_to_group="", mode_user=1, ln=cdsl
     return page(title       = title,
                 body        = body,
                 navtrail    = get_navtrail(ln, title),
-                description = "",
-                keywords    = "",
                 uid         = uid,
                 lastupdated = __lastupdated__,
+                req         = req,
                 language    = ln,
                 errors      = errors,
                 warnings    = warnings)
@@ -189,10 +181,9 @@ def send(req,
     return page(title       = title,
                 body        = body,
                 navtrail    = navtrail,
-                description = "",
-                keywords    = "",
                 uid         = uid,
                 lastupdated = __lastupdated__,
+                req         = req,
                 language    = ln,
                 errors      = errors,
                 warnings    = warnings)
@@ -219,10 +210,9 @@ def delete(req, msgid=-1, ln = cdslang):
     return page(title       = _("Your Messages"),
                 body        = body,
                 navtrail    = get_navtrail(ln),
-                description = "",
-                keywords    = "",
                 uid         = uid,
                 lastupdated = __lastupdated__,
+                req         = req,
                 language    = ln,
                 errors      = errors,
                 warnings    = warnings)
@@ -249,10 +239,9 @@ def delete_all(req, confirmed=0, ln=cdslang):
     return page(title       = _("Your Messages"),
                 body        = body,
                 navtrail    = get_navtrail(ln),
-                description = "",
-                keywords    = "",
                 uid         = uid,
                 lastupdated = __lastupdated__,
+                req         = req,
                 language    = ln,
                 errors      = errors,
                 warnings    = warnings)
@@ -280,10 +269,9 @@ def display_msg(req, msgid=-1, ln=cdslang):
     return page(title       = title,
                 body        = body,
                 navtrail    = get_navtrail(ln, title),
-                description = "",
-                keywords    = "",
                 uid         = uid,
                 lastupdated = __lastupdated__,
+                req         = req,
                 language    = ln,
                 errors      = errors,
                 warnings    = warnings)

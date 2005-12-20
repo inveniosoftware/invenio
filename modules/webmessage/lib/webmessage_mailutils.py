@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## 
-## Some functions on html
-##
+
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -19,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+""" Library for quoting text, email style """
 
 def email_quoted_txt2html(text,
                           tabs_before=0,

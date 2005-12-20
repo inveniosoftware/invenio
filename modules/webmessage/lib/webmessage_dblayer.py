@@ -20,8 +20,6 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-
-
 from MySQLdb import escape_string
 from time import localtime, mktime
 
@@ -163,7 +161,7 @@ def get_all_messages_for_user(uid):
     """
     update_user_inbox_for_reminders(uid)
     reminder_status = cfg_webmessage_status_code['REMINDER']
-    query = """SELECT m.id,
+    query = """SELECT  m.id,
                        m.id_user_from,
                        u.nickname,
                        m.subject,
@@ -348,6 +346,14 @@ def get_uids_members_of_groups(gids):
         return map(get_element, run_sql(query))
     return []
 
+def user_exists(uid):
+    """ checks if a user exists in the system, given his uid. return 0 or 1"""
+    query = "SELECT count(id) FROM user WHERE id=%i GROUP BY id"
+    res = run_sql(query % uid)
+    if res:
+        return int(res[0][0])
+    return 0
+
 def create_message(uid_from,
                    users_to_str="",
                    groups_to_str="",
@@ -449,8 +455,7 @@ def update_user_inbox_for_reminders(uid):
     """
     now =  convert_datestruct_to_datetext(localtime())
     reminder_status = cfg_webmessage_status_code['REMINDER']
-    new_status = cfg_webmessage_status_code['NEW']
-        
+    new_status = cfg_webmessage_status_code['NEW']        
     query1 = """SELECT m.id
                 FROM   msgMESSAGE m,
                        user_msgMESSAGE um
@@ -461,26 +466,20 @@ def update_user_inbox_for_reminders(uid):
                 """
     params1 = {'uid': int(uid),
                'date': now,
-               'old_status': reminder_status
-              }
-
-    res_ids = run_sql(query1%params1)
-        
+               'old_status': reminder_status}
+    res_ids = run_sql(query1%params1)       
     out = len(res_ids)
     if (out>0):
         query2 = """UPDATE user_msgMESSAGE
                     SET    status='%(new_status)s'
-                    WHERE  id_user_to=%(uid)i AND ("""
-                  
+                    WHERE  id_user_to=%(uid)i AND ("""             
         for msg_id in res_ids[0:-1]:
             query2 += "id_msgMESSAGE=" + str(int(msg_id[0])) + " OR "
-
         params2 = {'uid': int(uid),
                    'new_status': new_status,
                    }
         query2 += "id_msgMESSAGE=" + str(int(res_ids[-1][0])) + ")"
-        run_sql(query2%params2)
-    
+        run_sql(query2%params2)    
     return out
 
 def get_nicknames_like(pattern):

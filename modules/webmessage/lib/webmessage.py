@@ -19,9 +19,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""webmessage module, messaging system"""
+""" WebMessage module, messaging system"""
 
-__lastupdated__ = """$Date$"""
+__lastupdated__ = "$Date$"
+__version__ = "$Id$"
 
 # CDSWare imports
 from cdsware.webmessage_dblayer import *
@@ -75,8 +76,8 @@ def perform_request_display_msg(uid, msgid, ln = cdslang):
 	    # but not in table msgMESSAGE => table inconsistency
             errors.append(('ERR_WEBMESSAGE_NOMESSAGE',))
         else:
-            if (msg_status == 'N'):
-                set_message_status(uid, msgid, 'R')
+            if (msg_status == cfg_webmessage_status_code['NEW']):
+                set_message_status(uid, msgid, cfg_webmessage_status_code['READ'])
             body = webmessage_templates.tmpl_display_msg(msg_id, 
                                                          msg_from_id,
                                                          msg_from_nickname,
@@ -156,7 +157,7 @@ def perform_request_delete_all(uid, confirmed=0, ln=cdslang):
     confirmed = wash_url_argument(confirmed, 'int')
 
     _ = gettext_set_language(ln)
-    if (confirmed == 1):
+    if confirmed:
         delete_all_messages(uid)
         infos = [_("Your mailbox has been emptied")]
         return perform_request_display(uid, warnings, errors, infos, ln)
@@ -201,7 +202,7 @@ def perform_request_write(uid,
             # Junk== make pylint happy!
             junk = 0
             (msg_id,
-             junk,
+             msg_from_id,
              msg_from_nickname,
              junk,
              junk,
@@ -215,7 +216,7 @@ def perform_request_write(uid,
                 # but not in table msgMESSAGE => table inconsistency
                 errors.append(('ERR_WEBMESSAGE_NOMESSAGE',))
             else:
-                msg_to = msg_from_nickname
+                msg_to = msg_from_nickname or str(msg_from_id)
     
     body = webmessage_templates.tmpl_write(msg_to=msg_to,
                                            msg_to_group=msg_to_group,
@@ -389,7 +390,7 @@ def perform_request_send(uid,
         problem = 1
 
     users_dict = get_uids_from_nicks(users_to)
-    users_to = users_dict.items()
+    users_to = users_dict.items() # users_to=[(nick, uid),(nick2, uid2)]
     groups_dict = get_gids_from_groupnames(groups_to)
     groups_to = groups_dict.items()
     gids_to = []
@@ -412,8 +413,14 @@ def perform_request_send(uid,
                 uids_from_group.append(user_id)
                 tmp_dict[user_id] = None
         else:
-            warnings.append(_("User '%s' doesn't exist\n")% (user_nick))
-            problem = 1
+            if type(user_nick) == int or type(user_nick) == str and user_nick.isdigit():
+                user_nick = int(user_nick)
+                if user_exists(user_nick) and user_nick not in tmp_dict:
+                    uids_from_group.append(user_nick)
+                    tmp_dict[user_nick] = None
+            else:                    
+                warnings.append(_("User '%s' doesn't exist\n")% (user_nick))
+                problem = 1
     if problem:
         body = webmessage_templates.tmpl_write(msg_to=users_to_str,
                                                msg_to_group=groups_to_str,
@@ -453,6 +460,7 @@ def perform_request_send(uid,
         (body, errors, warnings) = perform_request_display(uid, errors, warnings, infos, ln)
         title = _("Your Messages")
         return (body, errors, warnings, title, get_navtrail(ln))
+
 def account_new_mail(uid, ln=cdslang):
     """
     display new mail info for myaccount.py page.

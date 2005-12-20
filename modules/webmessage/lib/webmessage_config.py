@@ -27,9 +27,9 @@ __revision__ = '1.3, 15 nov 2005 '
 
 # error messages. (should not happen, except in case of reload, or url altering) 
 cfg_webmessage_error_messages = \
-{   'ERR_WEBMESSAGE_NOTOWNER':  " This message is not in your mailbox ",
-    'ERR_WEBMESSAGE_NONICKNAME':' No nickname or user for uid #%s ',
-    'ERR_WEBMESSAGE_NOMESSAGE': " This message doesn't exist "
+{   'ERR_WEBMESSAGE_NOTOWNER':  '_("This message is not in your mailbox")',
+    'ERR_WEBMESSAGE_NONICKNAME':'_("No nickname or user for uid #%s")',
+    'ERR_WEBMESSAGE_NOMESSAGE': '_("This message doesn\'t exist")'
 }
 
 # status of message (table user_msgMESSAGE)

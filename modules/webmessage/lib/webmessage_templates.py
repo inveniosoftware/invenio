@@ -34,7 +34,7 @@ from cdsware.dateutils import convert_datetext_to_dategui, \
                               create_year_selectbox
 from cdsware.config import weburl, cdslang
 from cdsware.messages import gettext_set_language
-
+from cdsware.webuser import get_user_info
 
 class Template:
     def tmpl_display_inbox(self, messages, infos=[], warnings=[], nb_messages=0, ln=cdslang):
@@ -82,11 +82,16 @@ class Template:
         <b>%s</b>
       </td>
     </tr>""" %(_("No new mail"),)
-        for (msgid, junk, user_from_nick, subject, sent_date, status) in messages:
+        for (msgid, id_user_from, user_from_nick, subject, sent_date, status) in messages:
+            if not(subject):
+                subject = _("[No subject]")
             subject_link = '<a href="display_msg?msgid=%i&amp;ln=%s">%s</a>'% (msgid,
                                                                                ln,
                                                                                subject)
-            from_link = '%s'% (user_from_nick)
+            if user_from_nick:
+                from_link = '%s'% (user_from_nick)
+            else:
+                from_link = get_user_info(id_user_from, ln)[2]
             action_link = '<a href="write?msg_reply_id=%i&amp;ln=%s">%s</a> / '% (msgid,
                                                                                  ln,
                                                                                  _("Reply"))
@@ -303,13 +308,20 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
         
-        sent_to_link = ""
+        sent_to_link = ''
         tos = msg_sent_to.split(cfg_webmessage_separator)
         if (tos):
             for to in tos[0:-1]:
+                to_display = to
+                if to.isdigit():
+                    (junk, to, to_display) = get_user_info(int(to), ln)
                 sent_to_link += '<a href="write?msg_to=%s&amp;ln=%s">'% (to, ln)
-                sent_to_link += '%s</a>%s '% (to, cfg_webmessage_separator)
-            sent_to_link += '<a href="write?msg_to=%s&amp;ln=%s">%s</a>'% (tos[-1], ln, tos[-1])
+                sent_to_link += '%s</a>%s '% (to_display, cfg_webmessage_separator)
+            to_display = tos[-1]
+            to = tos[-1]
+            if to.isdigit():
+                (junk, to, to_display) = get_user_info(int(to), ln)
+            sent_to_link += '<a href="write?msg_to=%s&amp;ln=%s">%s</a>'% (to, ln, to_display)
         group_to_link = ""
         groups = msg_sent_to_group.split(cfg_webmessage_separator)
         if (groups):
@@ -328,7 +340,7 @@ class Template:
         <table class="messageheader">
           <tr>
             <td class="mailboxlabel">%(from_label)s:</td>
-            <td><a href="write?msg_to=%(from)s&amp;ln=%(ln)s">%(from)s</a></td>
+            <td><a href="write?msg_to=%(from)s&amp;ln=%(ln)s">%(from_display)s</a></td>
           </tr>
           <tr>
             <td class="mailboxlabel">%(subject_label)s:</td>
@@ -385,7 +397,14 @@ class Template:
   </tbody>
 </table>
         """
+        if msg_from_nickname:
+            msg_from_display = msg_from_nickname
+        else:
+            msg_from_display = get_user_info(msg_from_id, ln)[2]
+            msg_from_nickname = msg_from_id
+
         out = out % {'from' : msg_from_nickname,
+                     'from_display': msg_from_display,
                      'sent_date' : convert_datetext_to_dategui(msg_sent_date, ln),
                      'received_date': convert_datetext_to_dategui(msg_received_date, ln),
                      'sent_to': sent_to_link,
