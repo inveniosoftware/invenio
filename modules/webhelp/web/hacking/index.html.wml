@@ -65,8 +65,9 @@ sources get installed to, what is the visible URL policy, etc.</dd>
 ranking methods available in bibrank works, and how they can
 be tweaked to give various output.</dd>
 
-<dt><a href="miscutil/index.html">Miscutil Internals</a></dt>
-<dd>Describes information useful to understand what can be found inside the miscutil module, like database access, error management, date handling library, etc.</dd>
+<dt><a href="miscutil/index.html">MiscUtil Internals</a></dt>
+<dd>Describes information useful to understand what can be found inside the miscellaneous utilities
+module, like database access, error management, date handling library, etc.</dd>
 
 <dt><a href="websearch/index.html">WebSearch Internals</a></dt>
 <dd>Describes information useful to understand the search process
