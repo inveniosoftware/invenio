@@ -33,24 +33,24 @@ href="<WEBURL>/admin/">admin-level</a> documentation as well.  And now, back to 
 <blockquote>
 <dl>
 
-<dt><a href="concepts.html">Common Concepts</a>
-<dd>Summarizing common terms you will encounter here and there.
+<dt><a href="concepts.html">Common Concepts</a></dt>
+<dd>Summarizing common terms you will encounter here and there.</dd>
 
-<dt><a href="style.html">Coding Style</a>
-<dd>A policy we try to follow, for good or bad.
+<dt><a href="style.html">Coding Style</a></dt>
+<dd>A policy we try to follow, for good or bad.</dd>
 
-<dt><a href="releases.html">Release Numbering Scheme</a>
-<dd>Presenting the version numbering scheme adopted for CDSware stable and development releases.
+<dt><a href="releases.html">Release Numbering Scheme</a></dt>
+<dd>Presenting the version numbering scheme adopted for CDSware stable and development releases.</dd>
 
-<dt><a href="directory.html">Directory Organization</a>
+<dt><a href="directory.html">Directory Organization</a></dt>
 <dd>How the source and target directories are organized, where the
-sources get installed to, what is the visible URL policy, etc.
+sources get installed to, what is the visible URL policy, etc.</dd>
 
-<dt><a href="modules.html">Modules Overview</a>
-<dd>Presenting a summary of various CDSware modules and their relationships.
+<dt><a href="modules.html">Modules Overview</a></dt>
+<dd>Presenting a summary of various CDSware modules and their relationships.</dd>
 
-<dt><a href="testsuite.html">Test Suite Strategy</a>
-<dd>Describes our test suite strategy.
+<dt><a href="testsuite.html">Test Suite Strategy</a></dt>
+<dd>Describes our test suite strategy.</dd>
 
 </dl>
 </blockquote>
@@ -60,18 +60,22 @@ sources get installed to, what is the visible URL policy, etc.
 <blockquote>
 <dl>
 
-<dt><a href="bibrank/index.html">BibRank Internals</a>
+<dt><a href="bibrank/index.html">BibRank Internals</a></dt>
 <dd>Describes information useful to understand how the various
 ranking methods available in bibrank works, and how they can
-be tweaked to give various output.
-<dt><a href="websearch/index.html">WebSearch Internals</a>
+be tweaked to give various output.</dd>
+
+<dt><a href="miscutil/index.html">Miscutil Internals</a></dt>
+<dd>Describes information useful to understand what can be found inside the miscutil module, like database access, error management, date handling library, etc.</dd>
+
+<dt><a href="websearch/index.html">WebSearch Internals</a></dt>
 <dd>Describes information useful to understand the search process
 internals, like the different search stages, the high- and low-level
-API, etc.
+API, etc.</dd>
 
-<dt><a href="webaccess/index.html">WebAccess Internals</a>
+<dt><a href="webaccess/index.html">WebAccess Internals</a></dt>
 <dd>Describes information useful to understand the access control process
-internals, its API, etc.
+internals, its API, etc.</dd>
 
 </dl>
 </blockquote>
