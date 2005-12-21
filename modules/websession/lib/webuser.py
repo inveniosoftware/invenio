@@ -30,17 +30,16 @@ It also contains Apache-related user authentication stuff.
 
 from marshal import loads,dumps
 from zlib import compress,decompress
-from dbquery import run_sql
 import sys
 import time
 import os
 import crypt
 import string
-import session
-import websession
 import smtplib
 import MySQLdb
 
+from cdsware import session, websession
+from cdsware.dbquery import run_sql
 from cdsware.websession import pSession, pSessionMapping
 from cdsware.session import SessionError
 from cdsware.config import *
@@ -142,6 +141,27 @@ def setUid(req,uid):
     s.setUid(uid)
     sm.maintain_session(req,s)
     return uid
+
+def get_user_info(uid, ln=cdslang):
+    """Get infos for a given user.
+    @param uid: user id (int)
+    @return tuple: (uid, nickname, display_name)
+    """
+    _ = gettext_set_language(ln)
+    query = """SELECT id, nickname
+               FROM user
+               WHERE id=%i"""
+    res = run_sql(query%uid)
+    if res:
+        if res[0]:
+            user = list(res[0])
+            if user[1]:
+                user.append(user[1])
+            else:
+                user[1] = str(user[0])
+                user.append(_("user #%i")% user[0])
+            return tuple(user)
+    return (uid, '', _("N/A"))
 
 def isGuestUser(uid):
     """It Checks if the userId corresponds to a guestUser or not
