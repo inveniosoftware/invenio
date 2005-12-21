@@ -50,20 +50,20 @@
 <:
     $header = '<CDSPAGEHEADER>';
     $header =~ s/<!--CDSNAMEINTL-->/<CDSNAMEINTL>/g;
-    $header =~ s/<!--MSGSEARCH-->/<MSG_SEARCH>/g;
-    $header =~ s/<!--MSGSUBMIT-->/<MSG_SUBMIT>/g;
-    $header =~ s/<!--MSGCONVERT-->/<MSG_CONVERT>/g;
-    $header =~ s/<!--MSGAGENDA-->/<MSG_AGENDA>/g;
-    $header =~ s/<!--MSGWEBCAST-->/<MSG_WEBCAST>/g;
-    $header =~ s/<!--MSGBULLETIN-->/<MSG_BULLETIN>/g;
-    $header =~ s/<!--MSGLIBRARY-->/<MSG_LIBRARY>/g;
-    $header =~ s/<!--MSGHELP-->/<MSG_HELP>/g;
-    $header =~ s/<!--MSGPERSONALIZE-->/<MSG_PERSONALIZE>/g;
+    $header =~ s/<!--MSGSEARCH-->/_(Search)_/g;
+    $header =~ s/<!--MSGSUBMIT-->/_(Submit)_/g;
+    $header =~ s/<!--MSGCONVERT-->/_(Convert)_/g;
+    $header =~ s/<!--MSGAGENDA-->/_(Agenda)_/g;
+    $header =~ s/<!--MSGWEBCAST-->/_(Webcast)_/g;
+    $header =~ s/<!--MSGBULLETIN-->/_(Bulletin)_/g;
+    $header =~ s/<!--MSGLIBRARY-->/_(Library)_/g;
+    $header =~ s/<!--MSGHELP-->/_(Help)_/g;
+    $header =~ s/<!--MSGPERSONALIZE-->/_(Personalize)_/g;
     $header =~ s/<!--LN-->/<lang:star: *>/g;
     if ('$(navtrail_previous_links)' =~ /\w/) {
-        $navtrailboxbody = '<a class="navtrail" href="<WEBURL>/?ln=<lang:star: *>"><MSG_HOME></a> &gt; $(navtrail_previous_links) &gt; $(title)';
+        $navtrailboxbody = '<a class="navtrail" href="<WEBURL>/?ln=<lang:star: *>">_(Home)_</a> &gt; $(navtrail_previous_links) &gt; $(title)';
     } elsif ('$(navtrail_body)' eq '') {
-        $navtrailboxbody = '<a class="navtrail" href="<WEBURL>/?ln=<lang:star: *>"><MSG_HOME></a> &gt; $(title)';
+        $navtrailboxbody = '<a class="navtrail" href="<WEBURL>/?ln=<lang:star: *>">_(Home)_</a> &gt; $(title)';
     } elsif ('$(navtrail_body)' =~ /\w/) {
         $navtrailboxbody = '$(navtrail_body)';
     }     
@@ -136,14 +136,14 @@ $(cdspagefooteradd)
     $footer = '<CDSPAGEFOOTER>';
     $lastupdated = `date +"%d %b %Y %H:%M:%S %Z"`;
     $footer =~ s/<!--CDSNAMEINTL-->/<CDSNAMEINTL>/g;
-    $footer =~ s/<!--MSGSEARCH-->/<MSG_SEARCH>/g;
-    $footer =~ s/<!--MSGSUBMIT-->/<MSG_SUBMIT>/g;
-    $footer =~ s/<!--MSGHELP-->/<MSG_HELP>/g;
-    $footer =~ s/<!--MSGPERSONALIZE-->/<MSG_PERSONALIZE>/g;
+    $footer =~ s/<!--MSGSEARCH-->/_(Search)_/g;
+    $footer =~ s/<!--MSGSUBMIT-->/_(Submit)_/g;
+    $footer =~ s/<!--MSGHELP-->/_(Help)_/g;
+    $footer =~ s/<!--MSGPERSONALIZE-->/_(Personalize)_/g;
     $footer =~ s/<!--LN-->/<lang:star: *>/g;
-    $footer =~ s/<!--LASTUPDATED-->/<MSG_LAST_UPDATED> $lastupdated/g;
-    $footer =~ s/<!--MAINTAINEDBY-->/<MSG_MAINTAINED_BY>/g;
-    $footer =~ s/<!--POWEREDBY-->/<MSG_POWERED_BY>/g;
+    $footer =~ s/<!--LASTUPDATED-->/_(Last updated:)_ $lastupdated/g;
+    $footer =~ s/<!--MAINTAINEDBY-->/_(Maintained by)_/g;
+    $footer =~ s/<!--POWEREDBY-->/_(Powered by)_/g;
     $footer =~ s/<!--LANGUAGESELECTIONBOX-->/&generate_language_selection_box_for_html;/ge;
     print $footer;
 :>
