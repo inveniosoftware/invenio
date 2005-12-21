@@ -263,18 +263,20 @@ class Template:
         if not guest:
             out += """
                    <dt>
-                   <A href="./edit">%(your_settings)s</A>
+                   <A href="./edit?ln=%(ln)s">%(your_settings)s</A>
                    <dd>%(change_account)s""" % {
+                     'ln' : ln,
                      'your_settings' : _("Your Settings"),
                      'change_account' : _("Set or change your account Email address or password. Specify your preferences about the way the interface looks like.")
                    }
 
         out += """
-        <dt><A href="../youralerts.py/display">%(your_searches)s</A>
+        <dt><A href="../youralerts.py/display?ln=%(ln)s">%(your_searches)s</A>
         <dd>%(search_explain)s
 
-        <dt><A href="../yourbaskets.py/display">%(your_baskets)s</A>
+        <dt><A href="../yourbaskets.py/display?ln=%(ln)s">%(your_baskets)s</A>
         <dd>%(basket_explain)s""" % {
+          'ln' : ln,
           'your_searches' : _("Your Searches"),
           'search_explain' : _("View all the searches you performed during the last 30 days."),
           'your_baskets' : _("Your Baskets"),
@@ -283,8 +285,9 @@ class Template:
         if guest:
             out += self.tmpl_warning_guest_user(ln = ln, type = "baskets")
         out += """
-        <dt><A href="../youralerts.py/list">%(your_alerts)s</A>
+        <dt><A href="../youralerts.py/list?ln=%s">%(your_alerts)s</A>
         <dd>%(explain_alerts)s""" % {
+          'ln' : ln,
           'your_alerts' : _("Your Alerts"),
           'explain_alerts' : _("Subscribe to a search which will be run periodically by our service.  The result can be sent to you via Email or stored in one of your baskets."),
         }
@@ -320,7 +323,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         msg= _("""You are logged in as a guest user, so your %s will disappear at the end of the current session. If you wish you can
-               <a href="../youraccount.py/login">login or register here</a>.""") % type
+               <a href="../youraccount.py/login?ln=%s">login or register here</a>.""") % (type, ln)
         return """<table class="errorbox" summary="">
                            <thead>
                             <tr>
@@ -343,7 +346,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        return _("""You are logged in as %s. You may want to a) <A href="../youraccount.py/logout">logout</A>; b) edit your <A href="../youraccount.py/edit">account settings</a>.""") % user + "<BR><BR>"
+        return _("""You are logged in as %s. You may want to a) <A href="../youraccount.py/logout?ln=%s">logout</A>; b) edit your <A href="../youraccount.py/edit?ln=%s">account settings</a>.""") % (user, ln, ln) + "<BR><BR>"
 
     def tmpl_account_template(self, title, body, ln):
         """
@@ -410,7 +413,8 @@ class Template:
         out += self.tmpl_account_template(_("Your Submissions"),
                                _("You can consult the list of %(your_submissions)s and inquire about their status.") % {
                                  'your_submissions' :
-                                    """<a href="%(weburl)s/yoursubmissions.py">%(your_sub)s</a>""" % {
+                                    """<a href="%(weburl)s/yoursubmissions.py?ln=%(ln)s">%(your_sub)s</a>""" % {
+                                      'ln' : ln,
                                       'weburl' : weburl,
                                       'your_sub' : _("your submissions")
                                     }
@@ -418,7 +422,8 @@ class Template:
         out += self.tmpl_account_template(_("Your Approvals"),
                                _("You can consult the list of %(your_approvals)s with the documents you approved or refereed.") % {
                                  'your_approvals' :
-                                    """ <a href="%(weburl)s/yourapprovals.py">%(your_app)s</a>""" % {
+                                    """ <a href="%(weburl)s/yourapprovals.py?ln=%(ln)s">%(your_app)s</a>""" % {
+                                      'ln' : ln,
                                       'weburl' : weburl,
                                       'your_app' : _("your approvals"),
                                     }
@@ -443,11 +448,12 @@ class Template:
         out =""
         out +="""
         <body>
-           %(msg)s <A href="../youraccount.py/lost">%(try_again)s</A>
+           %(msg)s <A href="../youraccount.py/lost?ln=%(ln)s">%(try_again)s</A>
 
               </body>
 
           """ % {
+            'ln' : ln,
             'msg' : msg,
             'try_again' : _("Try again")
           }
@@ -499,7 +505,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = ""
-        out += _("""You are no longer recognized.  If you wish you can <A href="./login">login here</A>.""")
+        out += _("""You are no longer recognized.  If you wish you can <A href="./login?ln=%s">login here</A>.""") % ln
         return out
 
     def tmpl_login_form(self, ln, referer, internal, register_available, methods, selected_method, supportemail):
@@ -531,7 +537,7 @@ class Template:
               }
 
         if register_available:
-            out += _("""If you don't own an account yet, please <a href="../youraccount.py/register">register</a> an internal account.""")
+            out += _("""If you don't own an account yet, please <a href="../youraccount.py/register?ln=%s">register</a> an internal account.""") % ln
         else:
             out += _("""It is not possible to create an account yourself. Contact %s if you want an account.""") % (
                       """<a href="mailto:%(email)s">%(email)s</a>""" % { 'email' : supportemail }
@@ -563,7 +569,10 @@ class Template:
             out += """<input type="hidden" name="login_method" value="%s">""" % (methods[0])
 
         out += """<tr>
-                   <td align="right"><input type="hidden" name="referer" value="%(referer)s"><strong>%(username)s:</strong>
+                   <td align="right">
+                     <input type="hidden" name="ln" value="%(ln)s">
+                     <input type="hidden" name="referer" value="%(referer)s">
+                     <strong>%(username)s:</strong>
                    </td>
                    <td><input type="text" size="25" name="p_email" value=""></td>
                    <td></td>
@@ -576,13 +585,15 @@ class Template:
                   <tr>
                    <td></td>
                    <td align="center" colspan="3"><code class="blocknote"><input class="formbutton" type="submit" name="action" value="%(login)s"></code>""" % {
-                            'referer' : cgi.escape(referer),
-                            'username' : _("Username"),
-                            'password' : _("Password"),
-                            'login' : _("login"),
-                          }
+                       'ln': ln,
+                       'referer' : cgi.escape(referer),
+                       'username' : _("Username"),
+                       'password' : _("Password"),
+                       'login' : _("login"),
+                       }
         if internal:
-            out += """&nbsp;&nbsp;&nbsp;(<a href="./lost">%(lost_pass)s</a>)""" % {
+            out += """&nbsp;&nbsp;&nbsp;(<a href="./lost?ln=%(ln)s">%(lost_pass)s</a>)""" % {
+                     'ln' : ln,
                      'lost_pass' : _("Lost your password?")
                    }
         out += """</td><td></td>
@@ -684,7 +695,7 @@ class Template:
         out = ""
         # guest condition
         if guest:
-            return _("""You seem to be the guest user.  You have to <a href="../youraccount.py/login">login</a> first.""")
+            return _("""You seem to be the guest user.  You have to <a href="../youraccount.py/login?ln=%s">login</a> first.""") % ln
 
         # no rights condition
         if not roles:
@@ -698,21 +709,21 @@ class Template:
         activities.sort(lambda x, y: cmp(string.lower(x), string.lower(y)))
         for action in activities:
             if action == "cfgbibformat":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/">%s</a>""" % (weburl, _("Configure BibFormat"))
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibFormat"))
             if action == "cfgbibharvest":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/bibharvestadmin.py">%s</a>""" % (weburl, _("Configure BibHarvest"))
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/bibharvestadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibHarvest"))
             if action == "cfgbibindex":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibindex/bibindexadmin.py">%s</a>""" % (weburl, _("Configure BibIndex"))
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibindex/bibindexadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibIndex"))
             if action == "cfgbibrank":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibrank/bibrankadmin.py">%s</a>""" % (weburl, _("Configure BibRank"))
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibrank/bibrankadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibRank"))
             if action == "cfgwebaccess":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/">%s</a>""" % (weburl, _("Configure WebAccess"))
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebAccess"))
             if action == "cfgwebsearch":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py">%s</a>""" % (weburl, _("Configure WebSearch"))
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSearch"))
             if action == "cfgwebsubmit":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/">%s</a>""" % (weburl, _("Configure WebSubmit"))
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSubmit"))
         out += "<br>" + _("""For more admin-level activities, see the complete %(admin_area)s""") % {
-                           'admin_area' : """<a href="%s/admin/">%s</a>.""" % (weburl, _("Admin Area"))
+                           'admin_area' : """<a href="%s/admin/index.%s.html">%s</a>.""" % (weburl, ln, _("Admin Area"))
                          }
 
         return out
