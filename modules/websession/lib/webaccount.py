@@ -87,8 +87,8 @@ def perform_display_account(req,data,bask,aler,sear,msgs,ln):
     #your account
     if isGuestUser(uid):
         user = "guest"
-        accBody = _("""You are logged in as guest. You may want to <A href="../youraccount.py/login">login</A> as a regular user""") + "<BR><BR>"
-        bask=aler=msgs= _("""The <strong class="headline">guest</strong> users need to <A href="../youraccount.py/login">register</A> first""")
+        accBody = _("""You are logged in as guest. You may want to <A href="../youraccount.py/login?ln=%s">login</A> as a regular user""") % ln + "<BR><BR>"
+        bask=aler=msgs= _("""The <strong class="headline">guest</strong> users need to <A href="../youraccount.py/login?ln=%s">register</A> first""") % ln
         sear= _("No queries found")
     else:
         user = data[0]
