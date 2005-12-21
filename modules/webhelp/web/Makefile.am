@@ -21,15 +21,18 @@ SUBDIRS = admin hacking
 
 docdir = $(WEBDIR)/help
 
-doc_DATA=index.en.html index.fr.html index.de.html index.pt.html index.es.html index.ca.html index.it.html index.ru.html index.sk.html index.cs.html index.no.html index.sv.html index.el.html index.uk.html
+doc_DATA=index.en.html index.fr.html index.de.html index.pt.html index.es.html index.ca.html index.it.html index.ja.html index.ru.html index.sk.html index.cs.html index.no.html index.sv.html index.el.html index.uk.html
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 
-%.en.html %.fr.html %.de.html %.es.html %.ca.html %.pt.html %.it.html %.ru.html %.sk.html %.cs.html %.no.html %.sv.html %.el.html %.uk.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-           $(top_srcdir)/config/messages.wml
+LINGUAS = $(shell grep -v '^\#' $(top_srcdir)/po/LINGUAS)
+MO = $(LINGUAS:%=$(top_builddir)/po/%.gmo)
+
+%.en.html %.fr.html %.de.html %.es.html %.ca.html %.pt.html %.it.html %.ja.html %.ru.html %.sk.html %.cs.html %.no.html %.sv.html %.el.html %.uk.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
+           $(top_srcdir)/config/messages.wml $(MO)
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$*.en.html \
 	       -o\(ALL-LANG_*\)+LANG_FR:$*.fr.html \
 	       -o\(ALL-LANG_*\)+LANG_DE:$*.de.html \
@@ -37,6 +40,7 @@ CLEANFILES = $(doc_DATA) *~ *.tmp
 	       -o\(ALL-LANG_*\)+LANG_CA:$*.ca.html \
 	       -o\(ALL-LANG_*\)+LANG_PT:$*.pt.html \
 	       -o\(ALL-LANG_*\)+LANG_IT:$*.it.html \
+	       -o\(ALL-LANG_*\)+LANG_JA:$*.ja.html \
 	       -o\(ALL-LANG_*\)+LANG_RU:$*.ru.html \
 	       -o\(ALL-LANG_*\)+LANG_SK:$*.sk.html \
 	       -o\(ALL-LANG_*\)+LANG_CS:$*.cs.html \
@@ -44,3 +48,6 @@ CLEANFILES = $(doc_DATA) *~ *.tmp
 	       -o\(ALL-LANG_*\)+LANG_SV:$*.sv.html \
 	       -o\(ALL-LANG_*\)+LANG_EL:$*.el.html \
 	       -o\(ALL-LANG_*\)+LANG_UK:$*.uk.html $<
+	for lang in $(LINGUAS); do \
+		$(PYTHON) $(top_srcdir)/po/i18n_update_wml.py $${lang} "$*.$${lang}.html" ; \
+	done

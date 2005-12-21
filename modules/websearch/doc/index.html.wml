@@ -100,6 +100,25 @@
    </tbody>
    </table>
 </uk>
+<ja>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     _(ENGLISH TRANSLATION UNDER WAY)_
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     _(At the moment the English version of this page isn't available
+       yet. Please use the version presented below. Thanks for your understanding.)_
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</ja>
 
 <p><en>Find out all about searching</en>
    <fr>Trouvez tout sur la recherche de</fr>
@@ -115,6 +134,7 @@
    <sv>Finn ut allt om sökning av</sv>
    <el>Find out all about searching</el>
    <uk>Find out all about searching</uk>
+   <ja>Find out all about searching</ja>
    <CDSNAMEINTL>:
 
 <blockquote>
@@ -179,6 +199,10 @@
       This page presents you with useful tips and techniques in order to
       help you use the <CDSNAMEINTL> site to the full.
     </uk>  
+    <ja>
+      This page presents you with useful tips and techniques in order to
+      help you use the <CDSNAMEINTL> site to the full.
+    </ja>  
 
 <dt><a href="<lang:star: guide.*.html>">
      <en>Search Guide</en>
@@ -195,6 +219,7 @@
      <sv>Search Guide</sv>
      <el>Search Guide</el>
      <uk>Search Guide</uk>
+     <ja>Search Guide</ja>
     </a>
 
 <dd><en>Full guide on how to search</en>
@@ -211,6 +236,7 @@
     <sv>Full guide on how to search</sv>
     <el>Full guide on how to search</el>
     <uk>Full guide on how to search</uk>
+    <ja>Full guide on how to search</ja>
     <CDSNAMEINTL>.
 
 </dl>

@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
-    title="<MSG_HELP_CENTRAL>" \
+    title="_(Help Central)_" \
     navbar_name="help" \
     navtrail_previous_links="" \
     navbar_select="tips"
@@ -29,14 +29,15 @@
    <thead>
    <tr>
    <th class="errorboxheader">
-     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+     _(ENGLISH TRANSLATION UNDER WAY)_
    </th>
    </tr>
    </thead>
    <tbody>
    <tr>
    <td class="errorboxbody">
-     <MSG_PAGE_BEING_TRANSLATED_BODY>
+     _(At the moment the English version of this page isn't available
+       yet. Please use the version presented below. Thanks for your understanding.)_
    </td>
    </tr>
    </tbody>
@@ -47,14 +48,15 @@
    <thead>
    <tr>
    <th class="errorboxheader">
-     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+     _(ENGLISH TRANSLATION UNDER WAY)_
    </th>
    </tr>
    </thead>
    <tbody>
    <tr>
    <td class="errorboxbody">
-     <MSG_PAGE_BEING_TRANSLATED_BODY>
+     _(At the moment the English version of this page isn't available
+       yet. Please use the version presented below. Thanks for your understanding.)_
    </td>
    </tr>
    </tbody>
@@ -65,14 +67,15 @@
    <thead>
    <tr>
    <th class="errorboxheader">
-     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+     _(ENGLISH TRANSLATION UNDER WAY)_
    </th>
    </tr>
    </thead>
    <tbody>
    <tr>
    <td class="errorboxbody">
-     <MSG_PAGE_BEING_TRANSLATED_BODY>
+     _(At the moment the English version of this page isn't available
+       yet. Please use the version presented below. Thanks for your understanding.)_
    </td>
    </tr>
    </tbody>
@@ -83,40 +86,61 @@
    <thead>
    <tr>
    <th class="errorboxheader">
-     <MSG_PAGE_BEING_TRANSLATED_HEAD>
+     _(ENGLISH TRANSLATION UNDER WAY)_
    </th>
    </tr>
    </thead>
    <tbody>
    <tr>
    <td class="errorboxbody">
-     <MSG_PAGE_BEING_TRANSLATED_BODY>
+     _(At the moment the English version of this page isn't available
+       yet. Please use the version presented below. Thanks for your understanding.)_
    </td>
    </tr>
    </tbody>
    </table>
 </uk>
+<ja>
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+     _(ENGLISH TRANSLATION UNDER WAY)_
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+     _(At the moment the English version of this page isn't available
+       yet. Please use the version presented below. Thanks for your understanding.)_
+   </td>
+   </tr>
+   </tbody>
+   </table>
+</ja>
 
 <p>
-<en>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</en>
-<fr>Bienvenu au <MSG_HELP_CENTRAL> de <CDSNAMEINTL>.</fr>
-<de>Herzlich Willkommen in der <MSG_HELP_CENTRAL> von <CDSNAMEINTL>.</de>
-<es>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</es>
-<ca>Benvinguts al <MSG_HELP_CENTRAL> de <CDSNAMEINTL>.</ca>
-<pt>Bem vindo à <MSG_HELP_CENTRAL> do <CDSNAMEINTL>.</pt>
-<it>Benvenuti nell'<MSG_HELP_CENTRAL> di <CDSNAMEINTL>.</it>
-<ru>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</ru>
-<sk>Víta Vás <MSG_HELP_CENTRAL> <CDSNAMEINTL>.</sk>
-<cs>Vítá Vás <MSG_HELP_CENTRAL> <CDSNAMEINTL>.</cs>
-<no>Velkommen til <MSG_HELP_CENTRAL> for <CDSNAMEINTL>.</no>
-<sv>Välkommen till <MSG_HELP_CENTRAL>en för <CDSNAMEINTL>.</sv>
-<el>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</el>
-<uk>Welcome to <MSG_HELP_CENTRAL> of the <CDSNAMEINTL>.</uk>
+<en>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</en>
+<fr>Bienvenu au _(Help Central)_ de <CDSNAMEINTL>.</fr>
+<de>Herzlich Willkommen in der _(Help Central)_ von <CDSNAMEINTL>.</de>
+<es>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</es>
+<ca>Benvinguts al _(Help Central)_ de <CDSNAMEINTL>.</ca>
+<pt>Bem vindo à _(Help Central)_ do <CDSNAMEINTL>.</pt>
+<it>Benvenuti nell'_(Help Central)_ di <CDSNAMEINTL>.</it>
+<ru>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</ru>
+<sk>Víta Vás _(Help Central)_ <CDSNAMEINTL>.</sk>
+<cs>Vítá Vás _(Help Central)_ <CDSNAMEINTL>.</cs>
+<no>Velkommen til _(Help Central)_ for <CDSNAMEINTL>.</no>
+<sv>Välkommen till _(Help Central)_en för <CDSNAMEINTL>.</sv>
+<el>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</el>
+<uk>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</uk>
+<ja>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</ja>
 
 <blockquote>
 <dl>
 
-<dt><a href="search/<lang:star: index.*.html>"><MSG_SEARCH_HELP></a>
+<dt><a href="search/<lang:star: index.*.html>">_(Search Help)_</a>
 <dd><en>Get help with searching <CDSNAMEINTL>.</en>
     <fr>Obtenez de l'aide avec la recherche sur <CDSNAMEINTL>.</fr>
     <de>Hier können Sie die Suchhilfe für den <CDSNAMEINTL> konsultieren.</de>
@@ -131,7 +155,8 @@
     <sv>För hjälp med sökning av <CDSNAMEINTL>.</sv>
     <el>Get help with searching <CDSNAMEINTL>.</el>
     <uk>Get help with searching <CDSNAMEINTL>.</uk>
-<dt><a href="submit/<lang:star: index.*.html>"><MSG_SUBMIT_HELP></a>
+    <ja>Get help with searching <CDSNAMEINTL>.</ja>
+<dt><a href="submit/<lang:star: index.*.html>">_(Submit Help)_</a>
 <dd><en>Get help with submitting to <CDSNAMEINTL>.</en>
     <fr>Obtenez de l'aide avec la soumission dans <CDSNAMEINTL>.</fr>
     <de>Hier können Sie die Eintragehilfe für den <CDSNAMEINTL> konsultieren.</de>
@@ -146,5 +171,6 @@
     <sv>För hjälp med publicering i <CDSNAMEINTL>.</sv>
     <el>Get help with submitting to <CDSNAMEINTL>.</el>
     <uk>Get help with submitting to <CDSNAMEINTL>.</uk>
+    <ja>Get help with submitting to <CDSNAMEINTL>.</ja>
 </dl>
 </blockquote>

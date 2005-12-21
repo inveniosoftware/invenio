@@ -68,6 +68,7 @@ class Template:
         'no': 'no_NO',
         'sv': 'sv_SE',
         'uk': 'uk_UA',
+        'ja': 'ja_JA'
         }
     tmpl_default_locale = "en_US" # which locale to use by default, useful in case of failure
 
@@ -2265,7 +2266,7 @@ class Template:
            FIXME: bad symbol names again, e.g. SCORE_LIST is *not* a list of scores.  Humph.
         """
 
-        from search_engine import print_record
+        from cdsware.search_engine import print_record
 
         out = '''
         <table><tr><td>

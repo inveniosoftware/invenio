@@ -62,14 +62,14 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
     # deduce collection id:
     colID = get_colID(c)
     if type(colID) is not int:
-         return page(title=_("Collection %s Not Found") % c,
-                     body=_("<p>Sorry, collection <strong>%s</strong> does not seem to exist. "
-                            "<p>You may want to start browsing from <a href=\"%s\">%s</a>.") % (c, "%s?ln=%s" % (weburl, ln), cdsnameintl[ln]),
-                     description="%s - Not found: %s " % (cdsname, c),
-                     keywords="%s, CDSware" % cdsname,
-                     uid=uid,
-                     language=ln,
-                     urlargs=req.args)
+        return page(title=_("Collection %s Not Found") % c,
+                    body=_("<p>Sorry, collection <strong>%s</strong> does not seem to exist. "
+                           "<p>You may want to start browsing from <a href=\"%s\">%s</a>.") % (c, "%s?ln=%s" % (weburl, ln), cdsnameintl[ln]),
+                    description="%s - Not found: %s " % (cdsname, c),
+                    keywords="%s, CDSware" % cdsname,
+                    uid=uid,
+                    language=ln,
+                    urlargs=req.args)
     # display collection interface page:
     try:
         fp = open("%s/collections/%d/navtrail-as=%d-ln=%s.html" % (cachedir, colID, as, ln), "r")

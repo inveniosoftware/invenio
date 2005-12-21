@@ -62,6 +62,7 @@ cdsnameintl = {}
 <sv>cdsnameintl['sv'] = "<CDSNAMEINTL>"</sv>
 <el>cdsnameintl['el'] = "<CDSNAMEINTL>"</el>
 <uk>cdsnameintl['uk'] = "<CDSNAMEINTL>"</uk>
+<ja>cdsnameintl['ja'] = "<CDSNAMEINTL>"</ja>
 
 ## Apache password/group files:
 cfg_apache_password_file = "<CFG_APACHE_PASSWORD_FILE>"

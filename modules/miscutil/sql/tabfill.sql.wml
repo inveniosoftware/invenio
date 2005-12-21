@@ -33,6 +33,7 @@ INSERT INTO collection VALUES (1,'<CDSNAME>',NULL,NULL,NULL,NULL);
 <ca>INSERT INTO collectionname VALUES (1,'ca','ln','<CDSNAMEINTL>');</ca>
 <pt>INSERT INTO collectionname VALUES (1,'pt','ln','<CDSNAMEINTL>');</pt>
 <it>INSERT INTO collectionname VALUES (1,'it','ln','<CDSNAMEINTL>');</it>
+<ja>INSERT INTO collectionname VALUES (1,'ja','ln','<CDSNAMEINTL>');</ja>
 <ru>INSERT INTO collectionname VALUES (1,'ru','ln','<CDSNAMEINTL>');</ru>
 <sk>INSERT INTO collectionname VALUES (1,'sk','ln','<CDSNAMEINTL>');</sk>
 <cs>INSERT INTO collectionname VALUES (1,'cs','ln','<CDSNAMEINTL>');</cs>
@@ -61,6 +62,7 @@ INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,1,
 <ca>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'ca','ln','<MSG_WORD_SIMILARITY>');</ca>
 <pt>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'pt','ln','<MSG_WORD_SIMILARITY>');</pt>
 <it>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'it','ln','<MSG_WORD_SIMILARITY>');</it>
+<ja>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'ja','ln','<MSG_WORD_SIMILARITY>');</ja>
 <ru>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'ru','ln','<MSG_WORD_SIMILARITY>');</ru>
 <sk>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'sk','ln','<MSG_WORD_SIMILARITY>');</sk>
 <cs>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'cs','ln','<MSG_WORD_SIMILARITY>');</cs>

@@ -35,6 +35,7 @@
 <lang:new id=sv short>
 <lang:new id=el short>
 <lang:new id=uk short>
+<lang:new id=ja short>
 
 ## library of WML functions of general interest:
 
@@ -57,7 +58,8 @@
                       'no' => 'Norsk/Bokmål',
                       'sv' => 'Svenska',
                       'el' => 'Ελληνικά',
-                      'uk' => 'Українська');
+                      'uk' => 'Українська',
+                      'ja' => '日本語');
         return $longnames{$ln};
     }
     
@@ -83,7 +85,7 @@
         ## Return HTML-ready language selection box links.
         ## Output example: 
         ($filenamebase, $filenameextension) = split /\./, '$(WML_SRC_BASENAME)';
-        $out = "<MSG_THIS_PAGE_IN_LANGUAGES> <br> ";
+        $out = "_(This site is also available in the following languages:)_<br>";
         foreach $ln (split /\s*,\s*/, '<CDSLANGS>') {
             $out .= ' <a class="langinfo" href="'.$filenamebase.'.'.$ln.'.'.$filenameextension.'">'.get_language_name($ln).'</a> &nbsp; ';
         }
