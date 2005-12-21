@@ -26,5 +26,12 @@ EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(wildcard *.php) *~ *.tmp
 
-%.php: %.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml $(top_srcdir)/config/cdsnavbar.wml
+LINGUAS = $(shell grep -v '^\#' $(top_srcdir)/po/LINGUAS)
+MO = $(LINGUAS:%=$(top_builddir)/po/%.gmo)
+
+%.php: %.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
+       $(top_srcdir)/config/cdspage.wml $(top_srcdir)/config/cdsnavbar.wml $(MO)
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
+	for lang in en; do \
+		$(PYTHON) $(top_srcdir)/po/i18n_update_wml.py $${lang} "$*.php" ; \
+	done
