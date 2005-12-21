@@ -27,6 +27,12 @@ EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) referees.py
 
 CLEANFILES = $(FILESWML:$(srcdir)/%.wml=%) *~ *.tmp
 
+LINGUAS = $(shell grep -v '^\#' $(top_srcdir)/po/LINGUAS)
+MO = $(LINGUAS:%=$(top_builddir)/po/%.gmo)
+
 %.php: %.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-           $(top_srcdir)/config/messages.wml
+           $(top_srcdir)/config/messages.wml $(MO)
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
+	for lang in en; do \
+		$(PYTHON) $(top_srcdir)/po/i18n_update_wml.py $${lang} "$*.php" ; \
+	done
