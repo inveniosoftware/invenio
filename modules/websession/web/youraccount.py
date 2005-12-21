@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ## $Id$
 
 ## This file is part of the CERN Document Server Software (CDSware).
@@ -299,16 +300,17 @@ def logout(req, ln=cdslang):
 def login(req, p_email=None, p_pw=None, login_method=None, action='login', referer='', ln=cdslang):
 
     if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
-        return webuser.page_not_authorized(req, "../youraccount.py/login")
+        return webuser.page_not_authorized(req, "../youraccount.py/login?ln=%s" % ln)
 
     uid = webuser.getUid(req)
 
     # load the right message language
     _ = gettext_set_language(ln)
 
-    if action == _('login'):
-       if p_email==None or not login_method:
-           return  page(title=_("Login"),
+    #return action+_("login")
+    if action == "login" or action == _("login"):
+        if p_email==None or not login_method:
+            return page(title=_("Login"),
                         body=webaccount.create_login_page_box(referer, ln),
                         navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
                         description="CDS Personalize, Main page",
@@ -316,40 +318,42 @@ def login(req, p_email=None, p_pw=None, login_method=None, action='login', refer
                         uid=uid,
                         language=ln,
                         lastupdated=__lastupdated__)
-       (iden, p_email, p_pw, msgcode) = webuser.loginUser(req,p_email,p_pw, login_method)
-       if len(iden)>0:
-
-           uid = webuser.update_Uid(req,p_email,p_pw)
-           uid2 = webuser.getUid(req)
-           if uid2 == -1:
-               webuser.logoutUser(req)
-               return webuser.page_not_authorized(req, "../youraccount.py/login?ln=%s" % ln, uid=uid)
-
-           # login successful!
-           if referer:
-               req.err_headers_out.add("Location", referer)
-               raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
-           else:
-               return display(req)
-       else:
-           mess = cfg_webaccess_warning_msgs[msgcode] % login_method
-           if msgcode == 14:
-      	       if not webuser.userNotExist(p_email,p_pw) or p_email=='' or p_email==' ':
-                   mess = cfg_webaccess_warning_msgs[15] % login_method
-           act = "login"
-	   return page(title=_("Login"),
-                       body=webaccount.perform_back(mess,act, _("Login"), ln),
-                       navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
-                       description="CDS Personalize, Main page",
-                       keywords="CDS, personalize",
-                       uid=uid,
-                       language=ln,
-                       lastupdated=__lastupdated__)
+        (iden, p_email, p_pw, msgcode) = webuser.loginUser(req,p_email,p_pw, login_method)
+        if len(iden)>0:
+            
+            uid = webuser.update_Uid(req,p_email,p_pw)
+            uid2 = webuser.getUid(req)
+            if uid2 == -1:
+                webuser.logoutUser(req)
+                return webuser.page_not_authorized(req, "../youraccount.py/login?ln=%s" % ln, uid=uid)
+            
+            # login successful!
+            if referer:
+                req.err_headers_out.add("Location", referer)
+                raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
+            else:
+                return display(req, ln)
+        else:
+            mess = cfg_webaccess_warning_msgs[msgcode] % login_method
+            if msgcode == 14:
+                if not webuser.userNotExist(p_email,p_pw) or p_email=='' or p_email==' ':
+                    mess = cfg_webaccess_warning_msgs[15] % login_method
+            act = "login"
+            return page(title=_("Login"),
+                        body=webaccount.perform_back(mess,act, _("login"), ln),
+                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
+                        description="CDS Personalize, Main page",
+                        keywords="CDS, personalize",
+                        uid=uid,
+                        language=ln,
+                        lastupdated=__lastupdated__)
+    else:
+        return "This should have never happened.  Please contact %s." % supportemail
 
 def register(req, p_email=None, p_pw=None, p_pw2=None, action='login', referer='', ln=cdslang):
 
     if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
-        return webuser.page_not_authorized(req, "../youraccount.py/register")
+        return webuser.page_not_authorized(req, "../youraccount.py/register?ln=%s" % ln)
 
     uid = webuser.getUid(req)
 
