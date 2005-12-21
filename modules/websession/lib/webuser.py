@@ -65,7 +65,7 @@ def createGuestUser():
 
 def page_not_authorized(req, referer='', uid='', text='', navtrail=''):
     """Show error message when account is not activated"""
-    from webpage import page
+    from cdsware.webpage import page
 
     if not CFG_ACCESS_CONTROL_LEVEL_SITE:
         title = cfg_webaccess_msgs[5]
@@ -542,7 +542,7 @@ def auth_apache_user_collection_p(user, password, coll):
     Apache password data file, and whether this user is authorized to
     see the given collections.  Return 0 in case of failure, 1 in case
     of success."""
-    from search_engine import coll_restricted_p, coll_restricted_group
+    from cdsware.search_engine import coll_restricted_p, coll_restricted_group
     if not auth_apache_user_p(user, password):
         return 0
     if not coll_restricted_p(coll):
