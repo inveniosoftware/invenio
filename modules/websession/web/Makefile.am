@@ -27,3 +27,4 @@ CLEANFILES = sessinit.inc.php *~ *.tmp
 
 sessinit.inc.php: sessinit.inc.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o $@ $<
+	$(PYTHON) $(top_srcdir)/po/i18n_update_wml.py en $@

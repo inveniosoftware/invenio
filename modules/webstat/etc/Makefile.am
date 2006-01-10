@@ -28,3 +28,4 @@ CLEANFILES = $(wildcard *.cfg) *~ *.tmp
 
 %.cfg: %.cfg.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
 	$(WML) -o $@ $<
+	$(PYTHON) $(top_srcdir)/po/i18n_update_wml.py en $@

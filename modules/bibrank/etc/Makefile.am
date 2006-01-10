@@ -55,6 +55,8 @@ CLEANFILES = template_word_similarity.cfg wrd.cfg *.tmp
 
 wrd.cfg: wrd.cfg.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
 	$(WML) -o $@ $<
+	$(PYTHON) $(top_srcdir)/po/i18n_update_wml.py en $@
 
 template_word_similarity.cfg: template_word_similarity.cfg.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
 	$(WML) -o $@ $<
+	$(PYTHON) $(top_srcdir)/po/i18n_update_wml.py en $@

@@ -26,4 +26,5 @@ CLEANFILES = $(bin_SCRIPTS) *~ *.tmp sessiongcc
 
 %: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdswmllib.wml
 	$(WML) -o $@ $<
+	$(PYTHON) $(top_srcdir)/po/i18n_update_wml.py en $@
 	chmod u+x $@
