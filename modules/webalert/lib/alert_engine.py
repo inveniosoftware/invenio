@@ -27,13 +27,13 @@ __version__ = "$Id$"
 from cgi import parse_qs
 from sre import search, sub
 from time import localtime, strftime, mktime, sleep
+from string import split
 import smtplib
 
 from cdsware.config import *
 from cdsware.search_engine import perform_request_search
 from cdsware.dbquery import run_sql
 from cdsware.htmlparser import *
-from cdsware.string import split
 
 MAXIDS = 50
 FROMADDR = 'CDS Alert Engine <%s>' % alertengineemail
