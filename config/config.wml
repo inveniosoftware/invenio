@@ -68,7 +68,6 @@ Atlantis Institute of Fictive Science
 ## CDSNAMEINTL -- the international versions of CDSNAME in various
 ## languages, defined using the standard locale-like language codes.
 ##  (example: "<fr>Mon Serveur des Documents</fr>")
-
 <define-tag CDSNAMEINTL whitespace=delete>
  <en>Atlantis Institute of Fictive Science</en>
  <fr>Atlantis Institut des Sciences Fictives</fr>
@@ -85,6 +84,7 @@ Atlantis Institute of Fictive Science
  <el>Ινστιτούτο Φανταστικών Επιστημών Ατλαντίδος</el>
  <uk>Інститут вигаданих наук в Атлантісі</uk>
  <ja>Fictive 科学のAtlantis の協会</ja>
+ <pl>Instytut Fikcyjnej Nauki Atlantis</pl>
 </define-tag>
 
 ## CDSLANG -- the default language of the interface:
@@ -98,12 +98,13 @@ en
 ## be respected on the interface pages.  A good default would be to
 ## use the alphabetical order.  Currently supported languages include
 ## Catalan, Czech, German, Greek, English, Spanish, French, Italian,
-## Japanese, Norwegian, Portuguese, Russian, Slovak, Swedish, and
-## Ukrainian, so that the current eventual maximum you can currently
-## select is "ca,cs,de,el,en,es,fr,it,ja,no,pt,ru,sk,sv,uk".
+## Japanese, Norwegian, Polish, Portuguese, Russian, Slovak, Swedish,
+## and Ukrainian, so that the current eventual maximum you can
+## currently select is
+## "ca,cs,de,el,en,es,fr,it,ja,no,pl,pt,ru,sk,sv,uk".
 ##  (example: "de,en,fr,it")
 <define-tag CDSLANGS whitespace=delete>
-ca,cs,de,el,en,es,fr,it,ja,no,pt,ru,sk,sv,uk
+ca,cs,de,el,en,es,fr,it,ja,no,pl,pt,ru,sk,sv,uk
 </define-tag>
 
 ## ALERTENGINEEMAIL -- the email address from which the alert emails will appear to be send:

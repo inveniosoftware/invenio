@@ -36,6 +36,7 @@
 <lang:new id=el short>
 <lang:new id=uk short>
 <lang:new id=ja short>
+<lang:new id=pl short>
 
 ## library of WML functions of general interest:
 
@@ -59,7 +60,8 @@
                       'sv' => 'Svenska',
                       'el' => 'Ελληνικά',
                       'uk' => 'Українська',
-                      'ja' => '日本語');
+                      'ja' => '日本語',
+                      'pl' => 'Polski');
         return $longnames{$ln};
     }
     

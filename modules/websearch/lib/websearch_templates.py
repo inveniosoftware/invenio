@@ -68,7 +68,8 @@ class Template:
         'no': 'no_NO',
         'sv': 'sv_SE',
         'uk': 'uk_UA',
-        'ja': 'ja_JA'
+        'ja': 'ja_JA',
+        'pl': 'pl_PL'
         }
     tmpl_default_locale = "en_US" # which locale to use by default, useful in case of failure
 

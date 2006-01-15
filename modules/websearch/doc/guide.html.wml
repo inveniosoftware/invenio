@@ -342,6 +342,16 @@ search, including an combined metadata, fulltext and reference search
 in one go.  This page lists several tips and tricks that you may find
 useful to this effect.
 </ca>
+<pl>
+<p>Our search engine tries to offer today's typical web searching
+experience, as gained with popular search engines such as <a
+href="http://google.com/">Google</a>.  The nature of bibliographic
+searching differs from that of a web page searching, though.  We
+provide many extensions to enable a complex and precise structured
+search, including an combined metadata, fulltext and reference search
+in one go.  This page lists several tips and tricks that you may find
+useful to this effect.
+</pl>
 <pt>
 <p>Our search engine tries to offer today's typical web searching
 experience, as gained with popular search engines such as <a
@@ -548,6 +558,27 @@ useful to this effect.
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
 </ca>
+<pl>
+<h3><strong class="headerboxbodylogo">Index</strong></h3>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Regular expressions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">How to search for publications by a given author</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">How to sort according to a certain pattern</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">How to get documents from other servers (Google, SPIRES, KEK)</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-fulltext">How to search in fulltext files</a>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-citations">How to search for citations</a>
+</pl>
 <pt>
 <h3><strong class="headerboxbodylogo">Index</strong></h3>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Simple versus advanced search</a>
@@ -765,6 +796,7 @@ useful to this effect.
 <de>Einfache versus erweiterte Suche</de>
 <es>Simple versus advanced search</es>
 <ca>Simple versus advanced search</ca>
+<pl>Simple versus advanced search</pl>
 <pt>Simple versus advanced search</pt>
 <it>Simple versus advanced search</it>
 <ru>Simple versus advanced search</ru>
@@ -890,6 +922,7 @@ to the Advanced Search for more query assistance.
 <de>Grundlagen</de>
 <es>Search guidance</es>
 <ca>Search guidance</ca>
+<pl>Search guidance</pl>
 <pt>Search guidance</pt>
 <it>Search guidance</it>
 <ru>Search guidance</ru>
@@ -933,6 +966,7 @@ reply.
 <de>Suche nach Wörtern und Wortgruppen</de>
 <es>Searching for words versus phrases</es>
 <ca>Searching for words versus phrases</ca>
+<pl>Searching for words versus phrases</pl>
 <pt>Searching for words versus phrases</pt>
 <it>Searching for words versus phrases</it>
 <ru>Searching for words versus phrases</ru>
@@ -1035,6 +1069,7 @@ href="#regexp">regular expression</a> section of this guide.
 <de>Boolsche Suche</de>
 <es>Boolean queries</es>
 <ca>Boolean queries</ca>
+<pl>Boolean queries</pl>
 <pt>Boolean queries</pt>
 <it>Boolean queries</it>
 <ru>Boolean queries</ru>
@@ -1172,6 +1207,7 @@ satisfied.
 <de>Spezielle Zeichen und Notation</de>
 <es>Special characters and punctuation</es>
 <ca>Special characters and punctuation</ca>
+<pl>Special characters and punctuation</pl>
 <pt>Special characters and punctuation</pt>
 <it>Special characters and punctuation</it>
 <ru>Special characters and punctuation</ru>
@@ -1242,6 +1278,7 @@ satisfied.
 <de>Internationale Zeichen</de>
 <es>International characters</es>
 <ca>International characters</ca>
+<pl>International characters</pl>
 <pt>International characters</pt>
 <it>International characters</it>
 <ru>International characters</ru>
@@ -1303,6 +1340,7 @@ satisfied.
 <de>Trunkierung</de>
 <es>Word truncation/stemming</es>
 <ca>Word truncation/stemming</ca>
+<pl>Word truncation/stemming</pl>
 <pt>Word truncation/stemming</pt>
 <it>Word truncation/stemming</it>
 <ru>Word truncation/stemming</ru>
@@ -1379,6 +1417,7 @@ satisfied.
 <de>Strukturierte Metadatensuche</de>
 <es>Structured metadata search</es>
 <ca>Structured metadata search</ca>
+<pl>Structured metadata search</pl>
 <pt>Structured metadata search</pt>
 <it>Structured metadata search</it>
 <ru>Structured metadata search</ru>
@@ -1441,6 +1480,7 @@ satisfied.
 <de>Regular expressions</de>
 <es>Regular expressions</es>
 <ca>Regular expressions</ca>
+<pl>Regular expressions</pl>
 <pt>Regular expressions</pt>
 <it>Regular expressions</it>
 <ru>Regular expressions</ru>
@@ -1532,6 +1572,7 @@ documentation</a>.
 <de>Bereichs-Recherche</de>
 <es>Span queries</es>
 <ca>Span queries</ca>
+<pl>Span queries</pl>
 <pt>Span queries</pt>
 <it>Span queries</it>
 <ru>Span queries</ru>
@@ -1573,6 +1614,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
 <de>Kombinierte Metadaten-/Volltext-/Zitatsuche</de>
 <es>Combined metadata/fulltext/citation search</es>
 <ca>Combined metadata/fulltext/citation search</ca>
+<pl>Combined metadata/fulltext/citation search</pl>
 <pt>Combined metadata/fulltext/citation search</pt>
 <it>Combined metadata/fulltext/citation search</it>
 <ru>Combined metadata/fulltext/citation search</ru>
@@ -1655,6 +1697,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
 <de>FAQ</de>
 <es>Frequently asked questions</es>
 <ca>Frequently asked questions</ca>
+<pl>Frequently asked questions</pl>
 <pt>Frequently asked questions</pt>
 <it>Frequently asked questions</it>
 <ru>Frequently asked questions</ru>
@@ -1673,6 +1716,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
 <de>Wie wähle ich am geschicktesten meinen Suchbegriff</de>
 <es>How to wisely choose your search terms (speed-wise)</es>
 <ca>How to wisely choose your search terms (speed-wise)</ca>
+<pl>How to wisely choose your search terms (speed-wise)</pl>
 <pt>How to wisely choose your search terms (speed-wise)</pt>
 <it>How to wisely choose your search terms (speed-wise)</it>
 <ru>How to wisely choose your search terms (speed-wise)</ru>
@@ -1702,6 +1746,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
 <de>Wie suche ich nach Publikationen eines bestimmten Autors</de>
 <es>How to search for publications by a given author</es>
 <ca>How to search for publications by a given author</ca>
+<pl>How to search for publications by a given author</pl>
 <pt>How to search for publications by a given author</pt>
 <it>How to search for publications by a given author</it>
 <ru>How to search for publications by a given author</ru>
@@ -1857,6 +1902,7 @@ database content will ensure a proper author searching behaviour.
 <de>Wie lasse ich Ergebnisse auf eine bestimmte Weise sortieren</de>
 <es>How to sort according to a certain pattern</es>
 <ca>How to sort according to a certain pattern</ca>
+<pl>How to sort according to a certain pattern</pl>
 <pt>How to sort according to a certain pattern</pt>
 <it>How to sort according to a certain pattern</it>
 <ru>How to sort according to a certain pattern</ru>
@@ -1910,6 +1956,7 @@ database content will ensure a proper author searching behaviour.
 <de>Wie bekomme ich Dokumente anderer Server (Google, SPIRES, KEK)</de>
 <es>How to get documents from other servers (Google, SPIRES, KEK)</es>
 <ca>How to get documents from other servers (Google, SPIRES, KEK)</ca>
+<pl>How to get documents from other servers (Google, SPIRES, KEK)</pl>
 <pt>How to get documents from other servers (Google, SPIRES, KEK)</pt>
 <it>How to get documents from other servers (Google, SPIRES, KEK)</it>
 <ru>How to get documents from other servers (Google, SPIRES, KEK)</ru>
@@ -1960,6 +2007,7 @@ support it.  For example, SPIRES or KEK cannot search for terms within
 <de>Wie kann ich in verknüpften Volltextdateien suchen</de>
 <es>How to search in fulltext files</es>
 <ca>How to search in fulltext files</ca>
+<pl>How to search in fulltext files</pl>
 <pt>How to search in fulltext files</pt>
 <it>How to search in fulltext files</it>
 <ru>How to search in fulltext files</ru>
@@ -2028,6 +2076,7 @@ metadata or in the fulltext, type:
 <de>Wie kann ich nach Zitaten suchen</de>
 <es>How to search for citations</es>
 <ca>How to search for citations</ca>
+<pl>How to search for citations</pl>
 <pt>How to search for citations</pt>
 <it>How to search for citations</it>
 <ru>How to search for citations</ru>
