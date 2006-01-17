@@ -90,3 +90,7 @@ def redirect_to_url(req, url):
     @param url: url to redirect to"""
     req.err_headers_out.add("Location", url)
     raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
+
+def get_client_ip_address(req):
+    """ Returns IP address as string from an apache request """
+    return str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
