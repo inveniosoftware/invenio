@@ -2547,6 +2547,20 @@ CREATE TABLE IF NOT EXISTS cmtRECORDCOMMENT (
   KEY id_user (id_user)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS cmtACTIONHISTORY (
+  id_cmtRECORDCOMMENT int(15) unsigned NULL,
+  id_bibrec int(15) unsigned NULL,
+  id_user int(15) unsigned NULL default NULL,
+  client_host int(10) unsigned NOT NULL,
+  action_time datetime NOT NULL default '0000-00-00 00:00:00',
+  action_code char(1) NOT NULL,
+  KEY id_cmtRECORDCOMMENT (id_cmtRECORDCOMMENT),
+  KEY client_host (client_host),
+  KEY id_user (id_user),
+  KEY action_code (action_code)
+) TYPE=MyISAM;
+
+
 -- tables for BibFormat, formely known as FlexElink:
 CREATE TABLE IF NOT EXISTS flxFORMATS (
   name varchar(255) NOT NULL default '',
