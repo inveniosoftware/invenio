@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## Comments and reviews for records.
-                                                                                                                                                                                                     
+## Comments and reviews for records. 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -18,27 +17,25 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-                                                                                                                                                                                                     
-__lastupdated__ = """FIXME: last updated"""
 
-from mod_python import apache
+__lastupdated__ = """$Date$"""
 
-from cdsware.bibrankadminlib import check_user
-                            #write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,
-                            #adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,
-                            #serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,
-                            #serialize_via_marshal,deserialize_via_marshal
-from cdsware.config import *
-from cdsware.webcomment import wash_url_argument, query_get_comment, query_get_user_contact_info
+from cdsware.config import cdslang, weburl
+from cdsware.webcomment import query_get_comment
+from cdsware.urlutils import wash_url_argument
 from cdsware.dbquery import run_sql
+from cdsware.messages import gettext_set_language, wash_language
+from cdsware.webuser import get_user_info
 
 import cdsware.template
 webcomment_templates = cdsware.template.load('webcomment')
 
-def getnavtrail(previous = ''):
+def getnavtrail(previous = '', ln=cdslang):
     """Get the navtrail"""
-    
-    navtrail = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/webcomment/">WebComment Admin</a> """ % (weburl, weburl)
+    previous = wash_url_argument(previous, 'str')
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    navtrail = """<a class=navtrail href="%s/admin/">%s</a> &gt; <a class=navtrail href="%s/admin/webcomment/">%s</a> """ % (weburl, _("Admin Area"), weburl, _("WebComment Admin"))
     navtrail = navtrail + previous
     return navtrail
 
@@ -47,12 +44,12 @@ def perform_request_index(ln=cdslang):
     """ 
     return webcomment_templates.tmpl_admin_index(ln=ln)
 
-def perform_request_delete(ln=cdslang, comID=-1):
+def perform_request_delete(comID=-1, ln=cdslang):
     """
     """
     warnings = []
 
-    ln = wash_url_argument(ln, 'str')
+    ln = wash_language(ln)
     comID = wash_url_argument(comID, 'int')
 
     if comID is not None:
@@ -78,10 +75,9 @@ def perform_request_delete(ln=cdslang, comID=-1):
 def perform_request_users(ln=cdslang):
     """
     """
-    ln = wash_url_argument(ln, 'str')
+    ln = wash_language(ln)
 
     users_data = query_get_users_reported()
-
     return webcomment_templates.tmpl_admin_users(ln=ln, users_data=users_data)
 
 def query_get_users_reported():
@@ -116,62 +112,74 @@ def query_get_users_reported():
 def perform_request_comments(ln=cdslang, uid="", comID="", reviews=0):
     """
     """
-    warning = []
-
-    ln = wash_url_argument(ln, 'str')
+    ln = wash_language(ln)
     uid = wash_url_argument(uid, 'int')
     comID = wash_url_argument(comID, 'int')
     reviews = wash_url_argument(reviews, 'int')
+    
+    comments = query_get_comments(uid, comID, reviews, ln)
+    return webcomment_templates.tmpl_admin_comments(ln=ln, uid=uid,
+                                                    comID=comID,
+                                                    comment_data=comments,
+                                                    reviews=reviews)
 
-    comments = query_get_comments(uid, comID, reviews)
-    return webcomment_templates.tmpl_admin_comments(ln=ln, uid=uid, comID=comID, comment_data=comments, reviews=reviews)
-
-def query_get_comments(uid, comID, reviews):
+def query_get_comments(uid, cmtID, reviews, ln):
     """
-    private funciton
-    Get the reported comments of user uid or get the comment comID or get the comment comID which was written by user uid
-    @return same type of tuple as that which is returned by webcomment.py/query_retrieve_comments_or_remarks i.e.
-            tuple of comment where comment is
-            tuple (nickname, date_creation, body, id) if ranking disabled or
-            tuple (nickname, date_creation, body, nb_votes_yes, nb_votes_total, star_score, title, id)
+    private function
+    tuple of comment where comment is
+    tuple (nickname, uid, date_creation, body, id) if ranking disabled or
+    tuple (nickname, uid, date_creation, body, nb_votes_yes, nb_votes_total, star_score, title, id)
     """
-    query1 = "SELECT u.nickname, c.date_creation, c.body, %s c.id, c.id_bibrec, c.id_user, " \
-             "c.nb_abuse_reports, u.id, u.email, u.nickname " \
-             "FROM user AS u, cmtRECORDCOMMENT AS c " \
-             "WHERE c.id_user=u.id %s %s %s " \
-             "ORDER BY c.nb_abuse_reports DESC, c.nb_votes_yes DESC, c.date_creation "
-    params1 = ( reviews>0 and " c.nb_votes_yes, c.nb_votes_total, c.star_score, c.title, " or "",
-                reviews>0 and " AND c.star_score>0 " or " AND c.star_score=0 ",
-                uid>0 and " AND c.id_user=%s " % uid or "",
-                comID>0 and " AND c.id=%s " % comID or " AND c.nb_abuse_reports>0 " )
-    res1 = run_sql(query1 % params1)
-    res2 = []
-    for qtuple1 in res1:
-        # exceptional use of html here for giving admin extra information
-        new_info = """          <br>user (nickname=%s, email=%s, id=%s)<br>
-                                comment/review id = %s<br>
-                                commented <a href="%s/search.py/index?recid=%s">this record (id=%s)</a><br>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><span class="important"><b>reported %s times</b></span></td>
-                            <td>&nbsp;</td>
-                            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                            <td align=right><input type=checkbox name="comid%s"></td>
-                        </tr>
-                        <tr>
-                            <td>""" \
-                        % (len(qtuple1[0])>0 and qtuple1[0] or qtuple1[-2].split('@')[0], 
-                           qtuple1[-2], qtuple1[-5], qtuple1[-7], weburl, qtuple1[-6], qtuple1[-6], qtuple1[-4], qtuple1[-7])
+    qdict = {'id': 0, 'id_bibrec': 1, 'uid': 2, 'date_creation': 3, 'body': 4,
+             'nb_abuse_reports': 5, 'nb_votes_yes': 6, 'nb_votes_total': 7,
+             'star_score': 8, 'title': 9, 'email': -2, 'nickname': -1}
+    query = """SELECT c.id, c.id_bibrec, c.id_user,
+                      c.date_creation, c.body,
+                      c.nb_abuse_reports,
+                      %s
+                      u.email, u.nickname
+               FROM cmtRECORDCOMMENT c LEFT JOIN user u
+                                       ON c.id_user = u.id
+               %s
+               ORDER BY c.nb_abuse_reports DESC, c.nb_votes_yes DESC, c.date_creation
+    """
+    select_fields = reviews and 'c.nb_votes_yes, c.nb_votes_total, c.star_score, c.title,' or ''
+    where_clause = "WHERE " + (reviews and 'c.star_score>0' or 'c.star_score=0')
+    if uid:
+        where_clause += ' AND c.id_user=%i' % uid
+    if cmtID:
+        where_clause += ' AND c.id=%i' % cmtID
+    else:
+        where_clause += ' AND c.nb_abuse_reports>0'
+    res = run_sql(query % (select_fields, where_clause))
+    output = []
+    for qtuple in res:
+        nickname = qtuple[qdict['nickname']] or get_user_info(qtuple[qdict['uid']], ln)[2]
         if reviews:
-            qtuple2 = (len(qtuple1[0])>0 and qtuple1[0] or qtuple1[-2].split('@')[0], 
-                       str(qtuple1[1])+new_info, qtuple1[2], qtuple1[3], qtuple1[4], qtuple1[5], qtuple1[6], qtuple1[7])
+            comment_tuple = (nickname,
+                             qtuple[qdict['uid']],
+                             qtuple[qdict['date_creation']],
+                             qtuple[qdict['body']],
+                             qtuple[qdict['nb_votes_yes']],
+                             qtuple[qdict['nb_votes_total']],
+                             qtuple[qdict['star_score']],
+                             qtuple[qdict['title']],
+                             qtuple[qdict['id']])
         else:
-            qtuple2 = (len(qtuple1[0])>0 and qtuple1[0] or qtuple1[-2].split('@')[0],
-                       str(qtuple1[1])+new_info, qtuple1[2], qtuple1[3])
-                                                                                                                                                                                                     
-        res2.append(qtuple2)
-    return tuple(res2)
+            comment_tuple = (nickname,
+                             qtuple[qdict['uid']],
+                             qtuple[qdict['date_creation']],
+                             qtuple[qdict['body']],
+                             qtuple[qdict['id']])
+        general_infos_tuple = (nickname,
+                               qtuple[qdict['uid']],
+                               qtuple[qdict['email']],
+                               qtuple[qdict['id']],
+                               qtuple[qdict['id_bibrec']],
+                               qtuple[qdict['nb_abuse_reports']])
+        out_tuple = (comment_tuple, general_infos_tuple)
+        output.append(out_tuple)
+    return tuple(output)
 
 def perform_request_del_com(ln=cdslang, comIDs=[]):
     """
@@ -180,20 +188,50 @@ def perform_request_del_com(ln=cdslang, comIDs=[]):
     @param ln: language
     @param comIDs: list of comment ids
     """
-    ln = wash_url_argument(ln, 'str')
+    ln = wash_language(ln)
     comIDs = wash_url_argument(comIDs, 'list')
     # map ( fct, list, arguments of function)
     comIDs = map(wash_url_argument, comIDs, ('int '*len(comIDs)).split(' ')[:-1])
 
     if not comIDs:
         comIDs = map(coerce, comIDs, ('0 '*len(comIDs)).split(' ')[:-1])
-        return webcomment_templates.tmpl_admin_del_com(del_res=comIDs)
+        return webcomment_templates.tmpl_admin_del_com(del_res=comIDs, ln=ln)
  
     del_res=[]
     for id in comIDs:
         del_res.append((id, query_delete_comment(id)))
-    return webcomment_templates.tmpl_admin_del_com(del_res=del_res)
+    return webcomment_templates.tmpl_admin_del_com(del_res=del_res, ln=ln)
 
+def suppress_abuse_report(ln=cdslang, comIDs=[]):
+    """
+    private function
+    suppress the abuse reports for the given comIDs.
+    @param ln: language
+    @param comIDs: list of ids to suppress attached reports.
+    """
+    ln = wash_language(ln)
+    comIDs = wash_url_argument(comIDs, 'list')
+    # map ( fct, list, arguments of function)
+    comIDs = map(wash_url_argument, comIDs, ('int '*len(comIDs)).split(' ')[:-1])
+
+    if not comIDs:
+        comIDs = map(coerce, comIDs, ('0 '*len(comIDs)).split(' ')[:-1])
+        return webcomment_templates.tmpl_admin_del_com(del_res=comIDs, ln=ln)
+ 
+    del_res=[]
+    for id in comIDs:
+        del_res.append((id, query_suppress_abuse_report(id)))
+    return webcomment_templates.tmpl_admin_suppress_abuse_report(del_res=del_res, ln=ln)
+
+def query_suppress_abuse_report(comID):
+    """ suppress abuse report for a given comment
+    @return integer 1 if successful, integer 0 if not
+    """
+    query = "UPDATE cmtRECORDCOMMENT SET nb_abuse_reports=0 WHERE id=%i"
+    params = comID
+    res = run_sql(query%params)
+    return int(res)
+    
 def query_delete_comment(comID):
     """
     delete comment with id comID
@@ -203,30 +241,3 @@ def query_delete_comment(comID):
     params1 = (comID,)
     res1 = run_sql(query1, params1)
     return int(res1)
-
-def getnavtrail(previous = ''):
-    """
-    Get the navtrail
-    """
-    
-    navtrail = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/webcomment/">WebComment Admin</a> """ % (weburl, weburl)
-    navtrail = navtrail + previous
-    return navtrail
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

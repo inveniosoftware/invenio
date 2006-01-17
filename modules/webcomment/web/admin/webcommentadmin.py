@@ -22,31 +22,39 @@
 __lastupdated__ = """$Date$"""
 
 from cdsware.webcommentadminlib import *
+from cdsware.bibrankadminlib import check_user
 from cdsware.webpage import page, create_error_box
 from cdsware.config import weburl,cdslang
 from cdsware.webuser import getUid, page_not_authorized
+from cdsware.urlutils import wash_url_argument, redirect_to_url
+from cdsware.messages import wash_language, gettext_set_language
 
 def index(req, ln=cdslang):
     """
     Menu of admin options
     @param ln: language  
     """
-    navtrail_previous_links = getnavtrail() + """ &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">Comment Management</a>""" % (weburl,)
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    navtrail_previous_links = getnavtrail()
+    navtrail_previous_links +=' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % weburl
+    navtrail_previous_links += _("Comment Management") + '</a>'
 
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
+    (auth_code, auth_msg) = check_user(uid, 'cfgwebcomment')
     if not auth_code:
-        return page(title="Comment Management",
+        return page(title=_("Comment Management"),
                 body=perform_request_index(ln=ln),
                 uid=uid,
                 language=ln,
                 urlargs=req.args,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__,
+                req=req)   
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
@@ -56,8 +64,12 @@ def delete(req, ln=cdslang, comid=""):
     @param ln: language
     @param comid: comment id
     """
-    navtrail_previous_links = getnavtrail() + """ &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">Comment Management</a>""" % (weburl,)
-                                                                                                                                                                                                     
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    navtrail_previous_links = getnavtrail()
+    navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % weburl
+    navtrail_previous_links += _("Comment Management") + '</a>'
+
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
@@ -66,7 +78,7 @@ def delete(req, ln=cdslang, comid=""):
     (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
     if not auth_code:
         (body, errors, warnings) = perform_request_delete(ln=ln, comID=comid)
-        return page(title="Delete Comment",
+        return page(title=_("Delete Comment"),
                 body=body,
                 uid=uid,
                 language=ln,
@@ -88,22 +100,29 @@ def comments(req, ln=cdslang, uid="", comid="", reviews=0):
     @param comid: comment id
     @param reviews: boolean enabled for reviews, disabled for comments
     """
-    navtrail_previous_links = getnavtrail() + """ &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">Comment Management</a>""" % (weburl,)
-                                                                                                                                                                                                     
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    navtrail_previous_links = getnavtrail()
+    navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % weburl
+    navtrail_previous_links += _("Comment Management") + '</a>'
+    
     try:
         auid = getUid(req)
     except MySQLdb.Error, e:
         return error_page(req)
-                                                                                                                                                                                                     
+    
     (auth_code, auth_msg) = check_user(auid,'cfgwebcomment')
     if not auth_code:
-        return page(title="View all Reported %s" % (reviews>0 and "Reviews" or "Comments",),
+        if reviews==0:
+            raise ValueError
+        return page(title=_("View all Reported %s") % (reviews>0 and _("Reviews") or _("Comments")),
                 body=perform_request_comments(ln=ln, uid=uid, comID=comid, reviews=reviews),
                 uid=auid,
                 language=ln,
                 urlargs=req.args,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)
+                lastupdated=__lastupdated__,
+                req=req)
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
@@ -113,39 +132,48 @@ def users(req, ln=cdslang):
     View a list of all the users that have been reported, sorted by most reported
     @param ln: language 
     """
-    navtrail_previous_links = getnavtrail() + """ &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">Comment Management</a>""" % (weburl,)
-                                                                                                                                                                                                     
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    navtrail_previous_links = getnavtrail()
+    navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % weburl
+    navtrail_previous_links += _("Comment Management") + '</a>'
+
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
         return error_page(req)
-                                                                                                                                                                                                     
     (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
     if not auth_code:
-        return page(title="View all Reported Users",
-                body=perform_request_users(ln=ln),
-                uid=uid,
-                language=ln,
-                urlargs=req.args,
-                navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)
+        return page(title=_("View all Reported Users"),
+                    body=perform_request_users(ln=ln),
+                    uid=uid,
+                    language=ln,
+                    urlargs=req.args,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
     else:
+
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
-def del_com(req, ln=cdslang, **hidden):
+def del_com(req, ln=cdslang, action="delete", **hidden):
     """
     private funciton
     Delete a comment
     @param ln: language
     @param **hidden: ids of comments to delete sent as individual variables comidX=on, where X is id
     """
-    navtrail_previous_links = getnavtrail() + """ &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">Comment Management</a>""" % (weburl,)
-                                                                                                                                                                                                     
+    ln = wash_language(ln)
+    action = wash_url_argument(action, 'str')
+    _ = gettext_set_language(ln)
+    navtrail_previous_links = getnavtrail()
+    navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % weburl
+    navtrail_previous_links += _("Comment Management") + '</a>'
+
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
         return error_page(req)
-                                                                                                                                                                                                     
     (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
     if not auth_code:
         comIDs = []
@@ -155,13 +183,21 @@ def del_com(req, ln=cdslang, **hidden):
                 comIDs.append(int(var.split('comid')[1]))
             except:
                 pass
-        return page(title="Delete Comments",
-                body=perform_request_del_com(ln=ln, comIDs=comIDs),
-                uid=uid,
-                language=ln,
-                urlargs=req.args,
-                navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)
+        if action == 'delete':
+            body = perform_request_del_com(ln=ln, comIDs=comIDs)
+            title = _("Delete comments")
+        elif action == 'unreport':
+            body = suppress_abuse_report(ln=ln, comIDs=comIDs)
+            title = _("Suppress abuse reports")
+        else:
+            redirect_to_url(req, weburl + '/admin/webcomment/webcommentadmin.py')
+        return page(title=title,
+                    body=body,
+                    uid=uid,
+                    language=ln,
+                    urlargs=req.args,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
-

@@ -18,25 +18,34 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+""" Comments and reviews for records: web interface """
 
 __lastupdated__ = """$Date$"""
+__revision__ = """$Id$"""
 
-from mod_python import apache
-import urllib
-
-from cdsware import webcomment
-from cdsware.config import *
+from cdsware.webcomment import check_recID_is_in_range, \
+                               perform_request_display_comments_or_remarks,\
+                               perform_request_add_comment_or_remark,\
+                               perform_request_vote,\
+                               perform_request_report
+from cdsware.config import cdslang, \
+                           weburl,\
+                           cfg_webcomment_allow_comments,\
+                           cfg_webcomment_allow_reviews
 from cdsware.webuser import getUid, page_not_authorized, isGuestUser
-from cdsware.webaccount import create_login_page_box, create_register_page_box
-from cdsware.webpage import page, create_error_box
+from cdsware.webaccount import create_login_page_box
+from cdsware.webpage import page
 from cdsware.search_engine import create_navtrail_links, guess_primary_collection_of_a_record
+from cdsware.urlutils import get_client_ip_address, \
+                             redirect_to_url, \
+                             wash_url_argument
+from cdsware.messages import wash_language, gettext_set_language
 
 def index(req):
     """
     Redirects to display function
     """
-    req.err_headers_out.add("Location", "%s/comments.py/display?%s" % (weburl, req.args))
-    raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
+    redirect_to_url(req,"%s/comments.py/display?%s" % (weburl, req.args))
 
 def display(req, recid=-1, ln=cdslang, do='od', ds='all', nb=100, p=1, voted=-1, reported=-1, reviews=0):
     """
@@ -63,27 +72,37 @@ def display(req, recid=-1, ln=cdslang, do='od', ds='all', nb=100, p=1, voted=-1,
     @param reviews: boolean, enabled for reviews, disabled for comments
     @return the full html page.
     """
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
     uid = getUid(req)
     check_warnings = []
    
-    (ok, problem) = webcomment.check_recID_is_in_range(recid, check_warnings, ln) 
+    (ok, problem) = check_recID_is_in_range(recid, check_warnings, ln) 
     if ok:
-        (body, errors_to_display, warnings) = webcomment.perform_request_display_comments_or_remarks(recID=recid, display_order=do, display_since=ds, nb_per_page=nb, 
-                                                                                                          page=p, ln=ln, voted=voted, reported=reported, reviews=reviews)
+        (body, errors, warnings) = perform_request_display_comments_or_remarks(recID=recid, display_order=do, display_since=ds, nb_per_page=nb, page=p, ln=ln, voted=voted, reported=reported, reviews=reviews)
 
-        navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(recid)) + \
-                    """ &gt; <a class="navtrail" href="%s/search.py?recid=%s&ln=%s">Detailed record #%s</a>""" % (weburl, recid, ln, recid) + \
-                    """ &gt; <a class="navtrail">%s</a>""" % (reviews==1 and "Reviews" or "Comments",)
+        navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(recid))
+        navtrail += '&gt; <a class="navtrail" href="%s/search.py?recid=%s&ln=%s">'% (weburl, recid, ln)
+        navtrail += _("Detailed record #%s") % recid
+        navtrail += '</a>'
+        navtrail += ' &gt; <a class="navtrail">%s</a>' % (reviews==1 and _("Reviews") or _("Comments"))
 
-        return page(title="", body=body, navtrail=navtrail, description="", keywords="", uid=uid,
-                    cdspageheaderadd="", cdspageboxlefttopadd="", cdspageboxleftbottomadd="", cdspageboxrighttopadd="",
-                    cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="", urlargs="", verbose=1, titleprologue="", titleepilogue="",
-                    req=req, errors=errors_to_display, warnings=warnings)
+        return page(title="",
+                    body=body,
+                    navtrail=navtrail,
+                    uid=uid,
+                    verbose=1,
+                    req=req,
+                    language=ln,
+                    errors=errors, warnings=warnings)
     else:
-        return page(title="Record Not Found", body=problem, description="", keywords="", uid=uid,
-                    cdspageheaderadd="", cdspageboxlefttopadd="", cdspageboxleftbottomadd="", cdspageboxrighttopadd="",
-                    cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="", urlargs="", verbose=1, titleprologue="", titleepilogue="",
-                    req=req, warnings=check_warnings, errors=[])
+        return page(title=_("Record Not Found"),
+                    body=problem,
+                    uid=uid,
+                    verbose=1,
+                    req=req,
+                    language=ln,
+                    warnings=check_warnings, errors=[])
 
 def add(req, ln=cdslang, recid=-1, action='DISPLAY', msg="", note="", score="", reviews=0, comid=-1):
     """
@@ -100,46 +119,68 @@ def add(req, ln=cdslang, recid=-1, action='DISPLAY', msg="", note="", score="", 
     @param comid: comment id, needed for replying
     @return the full html page.
     """
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    reviews = wash_url_argument(reviews, 'int')
+    action = wash_url_argument(action, 'str')
+    comid = wash_url_argument(comid, 'int')
+    
     actions = ['DISPLAY', 'REPLY', 'SUBMIT']
-
     uid = getUid(req)
+    client_ip_address = get_client_ip_address(req)
     check_warnings = []
 
-    (ok, problem) = webcomment.check_recID_is_in_range(recid, check_warnings, ln) 
+    (ok, problem) = check_recID_is_in_range(recid, check_warnings, ln) 
     if ok:
-        navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(recid)) + \
-                    """ &gt; <a class="navtrail" href="%s/search.py?recid=%s&ln=%s">Detailed record #%s</a>""" % (weburl, recid, ln, recid) + \
-                    """ &gt; <a class="navtrail" href="%s/comments.py/display?recid=%s&ln=%s">%s</a>""" % (weburl, recid, ln, reviews==1 and 'Reviews' or 'Comments') 
+        navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(recid))
+        navtrail += ' &gt; <a class="navtrail" href="%s/search.py?recid=%s&ln=%s">'% (weburl, recid, ln)
+        navtrail += _("Detailed record #%s") % recid
+        navtrail += '</a>'
+        navtrail += '&gt; <a class="navtrail" href="%s/comments.py/display?recid=%s&ln=%s">%s</a>' % (weburl, recid, ln, reviews==1 and _('Reviews') or _('Comments')) 
 
         if action not in actions:
             action = 'DISPLAY'
 
         # is page allowed to be viewed
-        if uid == -1 or (not cfg_webcomment_allow_comments and not cfg_comment_allow_reviews):
+        if uid == -1 or (not cfg_webcomment_allow_comments and not cfg_webcomment_allow_reviews):
             return page_not_authorized(req, "../comments.py/add")
 
         # if guest, must log in first 
         if isGuestUser(uid):
-            msg = "Before you add your comment, you need to log in first"
+            msg = _("Before you add your comment, you need to log in first")
             referer = "%s/comments.py/add?recid=%s&amp;ln=%s&amp;reviews=%s&amp;comid=%s&amp;action=%s" % (weburl, recid, ln, reviews, comid, action)
             login_box = create_login_page_box(referer=referer, ln=ln)
-            return page(title="Login", body=msg+login_box, navtrail=navtrail, description="", keywords="", 
-                uid=uid, cdspageheaderadd="", cdspageboxlefttopadd="", cdspageboxleftbottomadd="", 
-                cdspageboxrighttopadd="", cdspageboxrightbottomadd="", cdspagefooteradd="", 
-                lastupdated="", language=cdslang, urlargs="", verbose=1, titleprologue="", titleepilogue="")
+            return page(title=_("Login"),
+                        body=msg+login_box,
+                        navtrail=navtrail,
+                        uid=uid,
+                        language=cdslang,
+                        verbose=1,
+                        req=req)
         # user logged in
         else:
-            (body, errors, warnings) = webcomment.perform_request_add_comment_or_remark(recID=recid, uid=uid, action=action, msg=msg, note=note, score=score, reviews=reviews, comID=comid)
-            title = "Add %s" % (reviews in [1, '1'] and 'Review' or 'Comment')
-            return page(title=title, body=body, navtrail=navtrail, description="", keywords="", uid=uid, 
-                cdspageheaderadd="", cdspageboxlefttopadd="", cdspageboxleftbottomadd="", 
-                cdspageboxrighttopadd="", cdspageboxrightbottomadd="", cdspagefooteradd="", 
-                lastupdated="", language=cdslang, urlargs="", verbose=1, titleprologue="", titleepilogue="", errors=errors, warnings=warnings)
+            (body, errors, warnings) = perform_request_add_comment_or_remark(recID=recid, uid=uid, action=action, msg=msg, note=note, score=score, reviews=reviews, comID=comid, client_ip_address=client_ip_address)
+            if reviews:
+                title = _("Add Review")
+            else:
+                title = _("Add Comment")
+            return page(title=title,
+                        body=body,
+                        navtrail=navtrail,
+                        uid=uid, 
+                        language=cdslang,
+                        verbose=1,
+                        errors=errors,
+                        warnings=warnings,
+                        req=req)
+    # id not in range
     else:
-        return page(title="Record Not Found", body=problem, description="", keywords="", uid=uid,
-                    cdspageheaderadd="", cdspageboxlefttopadd="", cdspageboxleftbottomadd="", cdspageboxrighttopadd="",
-                    cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="", urlargs="", verbose=1, titleprologue="", titleepilogue="",
-                    req=req, warnings=check_warnings, errors=[])
+        return page(title=_("Record Not Found"),
+                    body=problem,
+                    uid=uid,
+                    verbose=1,
+                    req=req,
+                    warnings=check_warnings, errors=[])
 
 def vote(req, comid=-1, com_value=0, recid=-1, ln=cdslang, do='od', ds='all', nb=100, p=1, referer=None, reviews=0):
     """
@@ -166,15 +207,17 @@ def vote(req, comid=-1, com_value=0, recid=-1, ln=cdslang, do='od', ds='all', nb
     @param referer: http address of the calling function to redirect to (refresh)
     @param reviews: boolean, enabled for reviews, disabled for comments
     """
-    success = webcomment.perform_request_vote(comid, com_value)
+    client_ip_address = get_client_ip_address(req)
+    uid = getUid(req)
+    success = perform_request_vote(comid, client_ip_address, com_value, uid)
     if referer:
-        referer = referer + '''?recid=%s&amp;ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;voted=%s&amp;reviews=%s''' % \
-                            (recid, ln, do, ds, nb, p, success, reviews)
-        req.err_headers_out.add("Location", referer)
-        raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
-    else: #Note: sent to commetns display
-        req.err_headers_out.add("Location", "%s/comments.py/display?recid=%s&amp;ln=%s&amp;reviews=1&amp;voted=1" % (weburl, recid, ln))
-        raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
+        referer += "?recid=%s&amp;ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;voted=%s&amp;reviews=%s" % (recid, ln, do, ds, nb, p, success, reviews)
+        redirect_to_url(req, referer)
+    else:
+        #Note: sent to commetns display
+        referer = "%s/comments.py/display?recid=%s&amp;ln=%s&amp;reviews=1&amp;voted=1"
+        referer %= (weburl, recid, ln)
+        redirect_to_url(req, referer)
 
 def report(req, comid=-1, recid=-1, ln=cdslang, do='od', ds='all', nb=100, p=1, referer=None, reviews=0):
     """
@@ -199,12 +242,14 @@ def report(req, comid=-1, recid=-1, ln=cdslang, do='od', ds='all', nb=100, p=1, 
     @param referer: http address of the calling function to redirect to (refresh)
     @param reviews: boolean, enabled for reviews, disabled for comments
     """
-    success = webcomment.perform_request_report(comid)
+    client_ip_address = get_client_ip_address(req)
+    uid = getUid(req)
+    success = perform_request_report(comid, client_ip_address, uid)
     if referer:
-        referer = referer + '''?recid=%s&amp;ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;reported=%s&amp;reviews=%s''' % \
-                            (recid, ln, do, ds, nb, p, success, reviews)
-        req.err_headers_out.add("Location", referer)
-        raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
-    else: #Note: sent to comments display 
-        req.err_headers_out.add("Location", "%s/comments.py/display?recid=%s&amp;ln=%s&amp;reviews=1&amp;voted=1" % (weburl, recid, ln))
-        raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
+        referer += "?recid=%s&amp;ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;reported=%s&amp;reviews=%s" % (recid, ln, do, ds, nb, p, success, reviews)
+        redirect_to_url(req, referer)
+    else:
+        #Note: sent to comments display 
+        referer = "%s/comments.py/display?recid=%s&amp;ln=%s&amp;reviews=1&amp;voted=1"
+        referer %= (weburl, recid, ln)
+        redirect_to_url(referer)

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## Comments and reviews for records.
 
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
@@ -18,22 +17,45 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+""" Comments and reviews for records """
 
 __lastupdated__ = """$Date$"""
 
-from email.Utils import quote
+# non CDSware imports:
 import time
 import math
-import string
-from cgi import escape 
 
-from cdsware.webcomment_config import *
+# CDSware imports:
+
 from cdsware.dbquery import run_sql
-from cdsware.config import cdslang
-from cdsware.elmsubmit_html2txt import html2txt
+from cdsware.config import cdslang, \
+                           alertengineemail,\
+                           adminemail,\
+                           weburl,\
+                           cfg_webcomment_allow_reviews,\
+                           cfg_webcomment_allow_comments,\
+                           cfg_webcomment_admin_notification_level,\
+                           cfg_webcomment_nb_reviews_in_detailed_view,\
+                           cfg_webcomment_nb_reports_before_send_email_to_admin,\
+                           cfg_webcomment_nb_comments_in_detailed_view,\
+                           cfg_webcomment_timelimit_processing_comments_in_seconds,\
+                           cfg_webcomment_timelimit_processing_reviews_in_seconds
+from cdsware.webmessage_mailutils import email_quote_txt
+from cdsware.webuser import get_user_info
+from cdsware.dateutils import convert_datetext_to_dategui, \
+                              datetext_default, \
+                              convert_datestruct_to_datetext 
+from cdsware.messages import wash_language, gettext_set_language
+from cdsware.urlutils import wash_url_argument
+from cdsware.webuser import isGuestUser
+from cdsware.webcomment_config import cfg_webcomment_action_code
 
-import cdsware.template
-webcomment_templates = cdsware.template.load('webcomment')
+try:
+    import cdsware.template
+    webcomment_templates = cdsware.template.load('webcomment')
+except:
+    pass
+
 
 def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order='od', display_since='all', nb_per_page=100, page=1, voted=-1, reported=-1, reviews=0):
     """ 
@@ -63,8 +85,8 @@ def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order
     warnings = []
 
     # wash arguments
-    recID= wash_url_argument(recID, 'int')
-    ln = wash_url_argument(ln, 'str')
+    recID = wash_url_argument(recID, 'int')
+    ln = wash_language(ln)
     display_order = wash_url_argument(display_order, 'str')
     display_since = wash_url_argument(display_since, 'str')
     nb_per_page = wash_url_argument(nb_per_page, 'int')
@@ -74,13 +96,14 @@ def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order
     reviews = wash_url_argument(reviews, 'int')
 
     # vital argument check
-    check_recID_is_in_range(recID, warnings, ln)
-
+    (valid, error_body) = check_recID_is_in_range(recID, warnings, ln)
+    if not(valid):
+        return (error_body, errors, warnings)
     # Query the database and filter results
     res = query_retrieve_comments_or_remarks(recID, display_order, display_since, reviews)
     nb_res = len(res)
 
-    # chekcing non vital arguemnts - will be set to default if wrong
+    # checking non vital arguemnts - will be set to default if wrong
     #if page <= 0 or page.lower() != 'all':
     if page < 0:
         page = 1
@@ -117,67 +140,164 @@ def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order
         last_page = 1
 
     # Send to template
-    # record is an internal record
-    if recID >  0: 
-        avg_score = 0.0
-        if not cfg_webcomment_allow_comments and not cfg_webcomment_allow_reviews: # comments not allowed by admin
-            errors.append(('ERR_WEBCOMMENT_COMMENTS_NOT_ALLOWED',))
-        if reported > 0:
-            warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED_GREEN_TEXT',))
-        elif reported == 0:
-            warnings.append(('WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED_RED_TEXT',))
-        if cfg_webcomment_allow_reviews and reviews:
-            avg_score = calculate_avg_score(res)
-            if voted>0:
-                warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED_GREEN_TEXT',))
-            elif voted == 0:
-                warnings.append(('WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED_RED_TEXT',))
-        body = webcomment_templates.tmpl_get_comments(recID, ln, nb_per_page, page, last_page, display_order, display_since, cfg_webcomment_allow_reviews, res, 
-                                                      nb_res, avg_score, warnings, border=0, reviews=reviews)
-        return (body, errors, warnings)
-    # record is an external record    
-    else: 
-        return ("TODO", errors, warnings) #!FIXME
-
-def perform_request_vote(comID, value):
+    avg_score = 0.0
+    if not cfg_webcomment_allow_comments and not cfg_webcomment_allow_reviews: # comments not allowed by admin
+        errors.append(('ERR_WEBCOMMENT_COMMENTS_NOT_ALLOWED',))
+    if reported > 0:
+        warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED',))
+    elif reported == 0:
+        warnings.append(('WRN_WEBCOMMENT_ALREADY_REPORTED',))
+    if cfg_webcomment_allow_reviews and reviews:
+        avg_score = calculate_avg_score(res)
+        if voted > 0:
+            warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED',))
+        elif voted == 0:
+            warnings.append(('WRN_WEBCOMMENT_ALREADY_VOTED',))
+    body = webcomment_templates.tmpl_get_comments(recID,
+                                                  ln,
+                                                  nb_per_page, page, last_page,
+                                                  display_order, display_since,
+                                                  cfg_webcomment_allow_reviews,
+                                                  res, nb_res, avg_score,
+                                                  warnings,
+                                                  border=0,
+                                                  reviews=reviews)
+    return (body, errors, warnings)
+    
+def perform_request_vote(cmt_id, client_ip_address, value, uid=-1):
     """
     Vote positively or negatively for a comment/review
-    @param comID: review id
+    @param cmt_id: review id
     @param value: +1 for voting positively
                   -1 for voting negatively
     @return integer 1 if successful, integer 0 if not
     """
-    #FIXME should record IP address and not allow voters to vote more than once
-    comID = wash_url_argument(comID, 'int')
+    cmt_id = wash_url_argument(cmt_id, 'int')
+    client_ip_address = wash_url_argument(client_ip_address, 'str')
     value = wash_url_argument(value, 'int')
-    if comID > 0 and value in [-1, 1]:
-        return query_record_useful_review(comID, value)
+    uid = wash_url_argument(uid, 'int')
+    if cmt_id > 0 and value in [-1, 1] and check_user_can_vote(cmt_id, client_ip_address, uid):
+        action_date = convert_datestruct_to_datetext(time.localtime())
+        action_code = cfg_webcomment_action_code['VOTE']
+        query = """INSERT INTO cmtACTIONHISTORY
+                   VALUES (%i, NULL ,%i, inet_aton('%s'), '%s', '%s')"""
+        query %= (cmt_id, uid, client_ip_address, action_date, action_code)
+        run_sql(query)
+        return query_record_useful_review(cmt_id, value)
     else:
         return 0
 
-def perform_request_report(comID):
+def check_user_can_comment(recID, client_ip_address, uid=-1):
+    """ Check if a user hasn't already commented within the last seconds
+    time limit: cfg_webcomment_timelimit_processing_comments_in_seconds
+    @param recID: record id
+    @param client_ip_address: IP => use: str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+    @param uid: user id, as given by cdsware.webuser.getUid(req)
+    """
+    recID = wash_url_argument(recID, 'int')
+    client_ip_address = wash_url_argument(client_ip_address, 'str')
+    uid = wash_url_argument(uid, 'int')
+    max_action_time = time.time() - cfg_webcomment_timelimit_processing_comments_in_seconds
+    max_action_time = convert_datestruct_to_datetext(time.localtime(max_action_time))
+    action_code = cfg_webcomment_action_code['ADD_COMMENT']
+    query = """SELECT id_bibrec
+               FROM cmtACTIONHISTORY
+               WHERE id_bibrec=%i AND
+                     action_code='%s' AND
+                     action_time>'%s'
+            """ % (recID, action_code, max_action_time)
+    if uid < 0:
+        query += " AND client_host=inet_aton('%s')" % client_ip_address 
+    else:
+        query += " AND id_user=%i" % uid
+    res = run_sql(query)
+    return len(res) == 0
+    
+def check_user_can_review(recID, client_ip_address, uid=-1):
+    """ Check if a user hasn't already reviewed within the last seconds
+    time limit: cfg_webcomment_timelimit_processing_reviewss_in_seconds
+    @param cmt_id: comment id
+    @param client_ip_address: IP => use: str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+    @param uid: user id, as given by cdsware.webuser.getUid(req)
+    """
+    recID = wash_url_argument(recID, 'int')
+    client_ip_address = wash_url_argument(client_ip_address, 'str')
+    uid = wash_url_argument(uid, 'int')
+    max_action_time = time.time() - cfg_webcomment_timelimit_processing_reviews_in_seconds
+    max_action_time = convert_datestruct_to_datetext(time.localtime(max_action_time))
+    action_code = cfg_webcomment_action_code['ADD_REVIEW']
+    query = """SELECT id_bibrec
+               FROM cmtACTIONHISTORY
+               WHERE id_bibrec=%i AND
+                     action_code='%s' AND
+                     action_time>'%s'
+            """ % (recID, action_code, max_action_time)
+    if uid < 0:
+        query += " AND client_host=inet_aton('%s')" % client_ip_address 
+    else:
+        query += " AND id_user=%i" % uid
+    res = run_sql(query)
+    return len(res) == 0
+
+def check_user_can_vote(cmt_id, client_ip_address, uid=-1):
+    """ Checks if a user hasn't already voted
+    @param cmt_id: comment id
+    @param client_ip_address: IP => use: str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+    @param uid: user id, as given by cdsware.webuser.getUid(req)
+    """
+    cmt_id = wash_url_argument(cmt_id, 'int')
+    client_ip_address = wash_url_argument(client_ip_address, 'str')
+    uid = wash_url_argument(uid, 'int')    
+    query = """SELECT id_cmtRECORDCOMMENT
+               FROM cmtACTIONHISTORY
+               WHERE id_cmtRECORDCOMMENT=%i""" % cmt_id
+    if uid < 0:
+        query += " AND client_host=inet_aton('%s')" % client_ip_address 
+    else:
+        query += " AND id_user=%i" % uid
+    res = run_sql(query)
+    return (len(res) == 0)
+    
+def perform_request_report(cmt_id, client_ip_address, uid=-1):
     """
     Report a comment/review for inappropriate content.
     Will send an email to the administrator if number of reports is a multiple of config.py/cfg_comment_nb_reports_before_send_email_to_admin
-    @param comID: comment id
+    @param cmt_id: comment id
     @return integer 1 if successful, integer 0 if not
     """
-    #FIXME should record IP address and not allow reporters to report more than once
-    comID = wash_url_argument(comID, 'int')
-    if comID <= 0:
+    cmt_id = wash_url_argument(cmt_id, 'int')
+    if cmt_id <= 0:
         return 0
-    (query_res, nb_abuse_reports) = query_record_report_this(comID)
+    (query_res, nb_abuse_reports) = query_record_report_this(cmt_id)
     if query_res == 0:
         return 0
+    if not(check_user_can_report(cmt_id, client_ip_address, uid)):
+        return 0
+    action_date = convert_datestruct_to_datetext(time.localtime())
+    action_code = cfg_webcomment_action_code['REPORT_ABUSE']
+    query = """INSERT INTO cmtACTIONHISTORY
+               VALUES (%i, NULL, %i, inet_aton('%s'), '%s', '%s')"""
+    query %= (cmt_id, uid, client_ip_address, action_date, action_code)
+    run_sql(query)
     if nb_abuse_reports % cfg_webcomment_nb_reports_before_send_email_to_admin == 0:
-        (comID2, id_bibrec, id_user, com_body, com_date, com_star, com_vote, com_nb_votes_total, com_title, com_reported) = query_get_comment(comID)
-        (user_nb_abuse_reports, user_votes, user_nb_votes_total) = query_get_user_reports_and_votes(int(id_user))
+        (cmt_id2,
+         id_bibrec,
+         id_user,
+         cmt_body,
+         cmt_date,
+         cmt_star,
+         cmt_vote, cmt_nb_votes_total,
+         cmt_title,
+         cmt_reported) = query_get_comment(cmt_id)
+        (user_nb_abuse_reports,
+         user_votes,
+         user_nb_votes_total) = query_get_user_reports_and_votes(int(id_user))
         (nickname, user_email, last_login) = query_get_user_contact_info(id_user)
         from_addr = 'CDS Alert Engine <%s>' % alertengineemail
         to_addr = adminemail
         subject = "An error report has been sent from a user"
         body = '''
-The following comment has been reported a total of %(com_reported)s times.
+The following comment has been reported a total of %(cmt_reported)s times.
 
 Author:     nickname    = %(nickname)s
             email       = %(user_email)s 
@@ -185,14 +305,14 @@ Author:     nickname    = %(nickname)s
             This user has:
                 total number of reports         = %(user_nb_abuse_reports)s 
                 %(votes)s
-Comment:    comment_id      = %(comID)s
+Comment:    comment_id      = %(cmt_id)s
             record_id       = %(id_bibrec)s
-            date written    = %(com_date)s 
-            nb reports      = %(com_reported)s 
+            date written    = %(cmt_date)s 
+            nb reports      = %(cmt_reported)s 
             %(review_stuff)s
             body            =
 ---start body---
-%(com_body)s
+%(cmt_body)s
 ---end body---
 
 Please go to the Comments Admin Panel %(comment_admin_link)s to delete this message if necessary. A warning will be sent to the user in question.''' % \
@@ -200,29 +320,48 @@ Please go to the Comments Admin Panel %(comment_admin_link)s to delete this mess
                     'nickname'              : nickname,
                     'user_email'            : user_email,
                     'uid'                   : id_user,
-                    'user_nb_abuse_reports'      : user_nb_abuse_reports,
+                    'user_nb_abuse_reports' : user_nb_abuse_reports,
                     'user_votes'            : user_votes,
                     'votes'                 : cfg_webcomment_allow_reviews and \
                                               "total number of positive votes\t= %s\n\t\t\t\ttotal number of negative votes\t= %s" % \
                                               (user_votes, (user_nb_votes_total - user_votes)) or "\n",
-                    'comID'                 : comID, 
+                    'cmt_id'                : cmt_id, 
                     'id_bibrec'             : id_bibrec,
-                    'com_date'              : com_date,
-                    'com_reported'          : com_reported,
+                    'cmt_date'              : cmt_date,
+                    'cmt_reported'          : cmt_reported,
                     'review_stuff'          : cfg_webcomment_allow_reviews and \
-                                              "star score\t\t= %s\n\t\t\treview title\t\t= %s" % (com_star, com_title) or "",
-                    'com_body'              : com_body,
+                                              "star score\t\t= %s\n\t\t\treview title\t\t= %s" % (cmt_star, cmt_title) or "",
+                    'cmt_body'              : cmt_body,
                     'comment_admin_link'    : "http://%s/admin/webcomment/" % weburl, 
                     'user_admin_link'       : "user_admin_link" #! FIXME
                 }
 
-        #FIXME to be added to email
+        #FIXME to be added to email when websession module is over:
         #If you wish to ban the user, you can do so via the User Admin Panel %(user_admin_link)s.
         
-        from alert_engine import send_email, forge_email
+        from cdsware.alert_engine import send_email, forge_email
         body = forge_email(from_addr, to_addr, subject, body)
         send_email(from_addr, to_addr, body)
     return 1
+
+def check_user_can_report(cmt_id, client_ip_address, uid=-1):
+    """ Checks if a user hasn't already reported a comment
+    @param cmt_id: comment id
+    @param client_ip_address: IP => use: str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+    @param uid: user id, as given by cdsware.webuser.getUid(req)
+    """
+    cmt_id = wash_url_argument(cmt_id, 'int')
+    client_ip_address = wash_url_argument(client_ip_address, 'str')
+    uid = wash_url_argument(uid, 'int')    
+    query = """SELECT id_cmtRECORDCOMMENT
+               FROM cmtACTIONHISTORY
+               WHERE id_cmtRECORDCOMMENT=%i""" % cmt_id
+    if uid < 0:
+        query += " AND client_host=inet_aton('%s')" % client_ip_address 
+    else:
+        query += " AND id_user=%i" % uid
+    res = run_sql(query)
+    return (len(res) == 0)
 
 def query_get_user_contact_info(uid):
     """
@@ -233,14 +372,11 @@ def query_get_user_contact_info(uid):
     query1 = "SELECT email, nickname, last_login FROM user WHERE id=%s"
     params1 = (uid,)
     res1 = run_sql(query1, params1)
-    if len(res1)==0:
+    if res1:
+        return res1[0]
+    else:
         return ()
-    #!FIXME - extra code because still possible to have no nickname
-    res2 = list(res1[0])
-    if not res2[1]:
-        res2[1] = res2[0].split('@')[0]
-    return (res2[1], res2[0], res2[2])
-#    return (res1[0][1], res1[0][0], res1[0][2])
+   
 
 def query_get_user_reports_and_votes(uid):
     """
@@ -249,10 +385,14 @@ def query_get_user_reports_and_votes(uid):
     @return tuple (total_nb_reports, total_nb_votes_yes, total_nb_votes_total)
             if none found return ()
     """
-    query1 = "SELECT nb_votes_yes, nb_votes_total, nb_abuse_reports FROM cmtRECORDCOMMENT WHERE id_user=%s"
+    query1 = """SELECT nb_votes_yes,
+                       nb_votes_total,
+                       nb_abuse_reports
+                FROM cmtRECORDCOMMENT
+                WHERE id_user=%s"""
     params1 = (uid,)
     res1 = run_sql(query1, params1)
-    if len(res1)==0:
+    if len(res1) == 0:
         return ()
     nb_votes_yes = nb_votes_total = nb_abuse_reports = 0
     for cmt_tuple in res1:
@@ -268,7 +408,18 @@ def query_get_comment(comID):
     @return tuple (comID, id_bibrec, id_user, body, date_creation, star_score, nb_votes_yes, nb_votes_total, title, nb_abuse_reports)
             if none found return ()
     """
-    query1 = "SELECT id, id_bibrec, id_user, body, date_creation, star_score, nb_votes_yes, nb_votes_total, title, nb_abuse_reports FROM cmtRECORDCOMMENT WHERE id=%s"
+    query1 = """SELECT id,
+                       id_bibrec,
+                       id_user,
+                       body,
+                       date_creation,
+                       star_score,
+                       nb_votes_yes,
+                       nb_votes_total,
+                       title,
+                       nb_abuse_reports
+                FROM cmtRECORDCOMMENT
+                WHERE id=%s"""
     params1 = (comID,)
     res1 = run_sql(query1, params1)
     if len(res1)>0:
@@ -280,7 +431,8 @@ def query_record_report_this(comID):
     """
     Increment the number of reports for a comment
     @param comID: comment id
-    @return tuple (success, new_total_nb_reports_for_this_comment) where success is integer 1 if success, integer 0 if not
+    @return tuple (success, new_total_nb_reports_for_this_comment) where
+    success is integer 1 if success, integer 0 if not
             if none found, return ()
     """
     #retrieve nb_abuse_reports
@@ -342,64 +494,55 @@ def query_retrieve_comments_or_remarks (recID, display_order='od', display_since
     """
     display_since = calculate_start_date(display_since)
 
-    order_dict =    {   'hh'   : "c.nb_votes_yes/(c.nb_votes_total+1) DESC, c.date_creation DESC ", 
-                        'lh'   : "c.nb_votes_yes/(c.nb_votes_total+1) ASC, c.date_creation ASC ",
-                        'ls'   : "c.star_score ASC, c.date_creation DESC ",
-                        'hs'   : "c.star_score DESC, c.date_creation DESC ",
-                        'od'   : "c.date_creation ASC ",
-                        'nd'   : "c.date_creation DESC "
+    order_dict =    {   'hh'   : "cmt.nb_votes_yes/(cmt.nb_votes_total+1) DESC, cmt.date_creation DESC ", 
+                        'lh'   : "cmt.nb_votes_yes/(cmt.nb_votes_total+1) ASC, cmt.date_creation ASC ",
+                        'ls'   : "cmt.star_score ASC, cmt.date_creation DESC ",
+                        'hs'   : "cmt.star_score DESC, cmt.date_creation DESC ",
+                        'od'   : "cmt.date_creation ASC ",
+                        'nd'   : "cmt.date_creation DESC "
                     } 
 
-    #FIXME: temporary fix due to new basket tables not existing yet.
-    if recID < 1:
-        return ()
-
     # Ranking only done for comments and when allowed
-    if ranking:
+    if ranking and recID > 0:
         try:
             display_order = order_dict[display_order] 
         except:
             display_order = order_dict['od'] 
     else:
-        try:
-            if display_order[-1] == 'd':
-                display_order = order_dict[display_order]
-            else:
-                display_order = order_dict['od']
-        except:
+        # in case of recID > 0 => external record => no ranking!
+        ranking = 0        
+    try:
+        if display_order[-1] == 'd':
+            display_order = order_dict[display_order]
+        else:
             display_order = order_dict['od']
-
-    query = "SELECT u.nickname, c.date_creation, c.body, %(ranking)s c.id " \
-            "FROM %(table)s AS c, user AS u " \
-            "WHERE %(id_bibrec)s=\'%(recID)s\' " \
-            "AND c.id_user=u.id "\
-            "%(ranking_only)s " \
-            "%(display_since)s " \
-            "ORDER BY %(display_order)s " 
-
-    params = {  'ranking'       : ranking and ' c.nb_votes_yes, c.nb_votes_total, c.star_score, c.title, ' or '',
-                'ranking_only'  : ranking and ' AND c.star_score>0 ' or ' AND c.star_score=0 ',
-                'id_bibrec'     : recID>0 and 'c.id_bibrec' or 'c.id_bskBASKET_bibrec_bskEXTREC',
-                'table'         : recID>0 and 'cmtRECORDCOMMENT' or 'bskREMARK',
+    except:
+        display_order = order_dict['od']
+    query = """SELECT user.nickname,
+                      cmt.id_user,
+                      cmt.date_creation,
+                      cmt.body,
+                      %(ranking)s cmt.id
+               FROM   %(table)s cmt LEFT JOIN user ON
+                                              user.id=cmt.id_user
+               WHERE %(id_bibrec)s=%(recID)i
+               %(ranking_only)s
+               %(display_since)s
+               ORDER BY %(display_order)s"""
+    params = {  'ranking'       : ranking and ' cmt.nb_votes_yes, cmt.nb_votes_total, cmt.star_score, cmt.title, ' or '',
+                'ranking_only'  : ranking and ' AND cmt.star_score>0 ' or ' AND cmt.star_score=0 ',
+                'id_bibrec'     : recID > 0 and 'cmt.id_bibrec' or 'cmt.id_bibrec_or_bskEXTREC',
+                'table'         : recID > 0 and 'cmtRECORDCOMMENT' or 'bskRECORDCOMMENT',
                 'recID'         : recID,
-                'display_since' : display_since=='0000-00-00 00:00:00' and ' ' or 'AND c.date_creation>=\'%s\' ' % display_since, 
+                'display_since' : display_since=='0000-00-00 00:00:00' and ' ' or 'AND cmt.date_creation>=\'%s\' ' % display_since, 
                 'display_order' : display_order      
             }
-    # return run_sql(query % params)
-    #FIXME - Extra horrible code cause nickname can still be blank
-    res = run_sql(query % params) #!FIXME
-    res2= []
-    for comment in res:
-        if not comment[0]:
-            comment2 = list(comment)
-            user_id = query_get_comment(comment[-1])[2]
-            comment2[0] = query_get_user_contact_info(user_id)[1].split('@')[0]
-            res2.append(comment2)
-        else:
-            res2.append(comment)
-    return tuple(res2)
+    res = run_sql(query % params)
+    if res:
+        return res
+    return ()
 
-def query_add_comment_or_remark(recID=-1, uid=-1, msg="", note="", score=0, priority=0):
+def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="", note="", score=0, priority=0, client_ip_address=''):
     """ 
     Private function
     Insert a comment/review or remarkinto the database
@@ -412,51 +555,25 @@ def query_add_comment_or_remark(recID=-1, uid=-1, msg="", note="", score=0, prio
     @return integer >0 representing id if successful, integer 0 if not
     """
     current_date = calculate_start_date('0d')
-    if msg.count('>>') == 0: #if not replying, but write a fresh comment, limit line length to 80 char
-        msg_words = msg.split(' ')
-        new_msg = []
-        char_on_this_line = 0
-        for word in msg_words:
-            char_on_this_line += len(word) + 1
-            if char_on_this_line >= 80:
-                new_msg.append('\n' + word)
-                char_on_this_line = len(word) + 1
-            else:
-                if word.find('\n') > 0:
-                    char_on_this_line = 0
-                new_msg.append(word)
-        import string
-        msg = string.join(new_msg, ' ')
-    if recID > 0:
-        #change utf-8 message into general unicode
-        msg = msg.decode('utf-8')
-        note = note.decode('utf-8')
-        # get rid of html tags in msg but keep newlines
-        msg = msg.replace ('\n', "#br#")
-        msg= html2txt(msg)
-        note= html2txt(note)
-        #change general unicode back to utf-8
-        msg = msg.encode('utf-8')
-        msg = msg.replace('#br#', '<br>')
-        note = note.encode('utf-8')
-        query = "INSERT INTO cmtRECORDCOMMENT (id_bibrec, id_user, body, date_creation, star_score, nb_votes_total, title) " \
+    #change utf-8 message into general unicode
+    msg = msg.decode('utf-8')
+    note = note.decode('utf-8')
+    #change general unicode back to utf-8
+    msg = msg.encode('utf-8')
+    note = note.encode('utf-8')
+    query = "INSERT INTO cmtRECORDCOMMENT (id_bibrec, id_user, body, date_creation, star_score, nb_votes_total, title) " \
                 "VALUES (%s, %s, %s, %s, %s, %s, %s)" 
-        params = (recID, uid, msg, current_date, score, 0, note)
-    else:
-        #change utf-8 message into general unicode
-        msg = msg.decode('utf-8')
-        # get rid of html tags in msg but keep newlines
-        msg = msg.replace ('\n', "#br#")
-        msg= html2txt(msg)
-        #change general unicode back to utf-8
-        msg = msg.encode('utf-8')
-        msg = msg.replace('#br#', '<br>')
-        query = "INSERT INTO bskREMARK (id_bskBASKET_bibrec_bibEXTREC, id_user, body, date_creation, priority) " \
-                "VALUES (%s, %s, %s, %s, %s)"
-        params = (recID, uid, msg, current_date, priority) 
-
-    return int(run_sql(query, params))
-
+    params = (recID, uid, msg, current_date, score, 0, note)
+    res = run_sql(query, params)
+    if res:
+        action_code = cfg_webcomment_action_code[reviews and 'ADD_REVIEW' or 'ADD_COMMENT']
+        action_time = convert_datestruct_to_datetext(time.localtime()) 
+        query2 = """INSERT INTO cmtACTIONHISTORY
+                    values ('', %i, %i, inet_aton('%s'), '%s', '%s')"""
+        params2 = (recID, uid, client_ip_address, action_time, action_code)
+        run_sql(query2%params2)
+        return int(res)
+    
 def calculate_start_date(display_since):
     """ 
     Private function
@@ -469,24 +586,26 @@ def calculate_start_date(display_since):
                             ny = n years ago
                             where n is a single digit number
     @return string of wanted datetime.
-            If 'all' given as argument, will return "0000-00-00 00:00:00"
-            If bad arguement given, will return "0000-00-00 00:00:00"
+            If 'all' given as argument, will return datetext_default
+            datetext_default is defined in miscutils/lib/dateutils and
+            equals 0000-00-00 00:00:00 => MySQL format
+            If bad arguement given, will return datetext_default
     """
     # time type and seconds coefficients 
-    time_types = {'d':0,'w':0,'m':0,'y':0}
+    time_types = {'d':0, 'w':0, 'm':0, 'y':0}
 
     ## verify argument
     # argument wrong size
     if (display_since==(None or 'all')) or (len(display_since) > 2):
-        return ("0000-00-00 00:00:00")
+        return datetext_default
     try:
         nb = int(display_since[0])
     except:
-        return ("0000-00-00 00:00:00")
+        return datetext_default
     if str(display_since[1]) in time_types:
         time_type = str(display_since[1])
     else:
-        return ("0000-00-00 00:00:00")
+        return datetext_default
 
     ## calculate date
     # initialize the coef
@@ -495,19 +614,24 @@ def calculate_start_date(display_since):
     else:
         time_types[time_type] = 1
 
-    start_time = time.localtime(time.time())
-    start_time = time.mktime((   start_time[0] - nb*time_types['y'],
-                        start_time[1] - nb*time_types['m'],
-                        start_time[2] - nb*time_types['d'] - nb*time_types['w'],
-                        start_time[3],
-                        start_time[4],
-                        start_time[5],
-                        start_time[6],
-                        start_time[7],
-                        start_time[8]))
-    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(start_time))
+    start_time = time.localtime()
+    start_time = (start_time[0] - nb*time_types['y'],
+                  start_time[1] - nb*time_types['m'],
+                  start_time[2] - nb*time_types['d'] - nb*time_types['w'],
+                  start_time[3],
+                  start_time[4],
+                  start_time[5],
+                  start_time[6],
+                  start_time[7],
+                  start_time[8])
+    return convert_datestruct_to_datetext(start_time)
 
-def get_first_comments_or_remarks(recID=-1, ln=cdslang, nb_comments='all', nb_reviews='all', voted=-1, reported=-1):
+def get_first_comments_or_remarks(recID=-1,
+                                  ln=cdslang,
+                                  nb_comments='all',
+                                  nb_reviews='all',
+                                  voted=-1,
+                                  reported=-1):
     """
     Gets nb number comments/reviews or remarks.
     In the case of comments, will get both comments and reviews
@@ -528,7 +652,7 @@ def get_first_comments_or_remarks(recID=-1, ln=cdslang, nb_comments='all', nb_re
     ## check recID argument 
     if type(recID) is not int:
         return ()
-    if recID >= 1 or recID <= -100: #comment or remark
+    if recID >= 1: #comment or review. NB: suppressed reference to basket (handled in webbasket)
         if cfg_webcomment_allow_reviews:
             res_reviews = query_retrieve_comments_or_remarks(recID=recID, display_order="hh", ranking=1) 
             nb_res_reviews = len(res_reviews)
@@ -537,7 +661,7 @@ def get_first_comments_or_remarks(recID=-1, ln=cdslang, nb_comments='all', nb_re
                 first_res_reviews = res_reviews[:nb_reviews]
             else:
                 if nb_res_reviews  > cfg_webcomment_nb_reviews_in_detailed_view:
-                    first_res_reviews = res_reviews[:cfg_comment_nb_reports_before_send_email_to_admin]
+                    first_res_reviews = res_reviews[:cfg_webcomment_nb_reports_before_send_email_to_admin]
                 else:
                     first_res_reviews = res_reviews
         if cfg_webcomment_allow_comments:
@@ -613,7 +737,17 @@ def calculate_avg_score(res):
         avg_score = 5.0
     return avg_score
 
-def perform_request_add_comment_or_remark(recID=-1, uid=-1, action='DISPLAY', ln=cdslang, msg=None, score=None, note=None, priority=None, reviews=0, comID=-1):
+def perform_request_add_comment_or_remark(recID=0,
+                                          uid=-1,
+                                          action='DISPLAY',
+                                          ln=cdslang,
+                                          msg=None,
+                                          score=None,
+                                          note=None,
+                                          priority=None,
+                                          reviews=0,
+                                          comID=-1,
+                                          client_ip_address=None):
     """
     Add a comment/review or remark
     @param recID: record id
@@ -631,7 +765,6 @@ def perform_request_add_comment_or_remark(recID=-1, uid=-1, action='DISPLAY', ln
     @return html add form if action is display or reply 
             html successful added form if action is submit
     """
-
     warnings = []
     errors = []
 
@@ -645,14 +778,21 @@ def perform_request_add_comment_or_remark(recID=-1, uid=-1, action='DISPLAY', ln
     priority = wash_url_argument(priority, 'int')
     reviews = wash_url_argument(reviews, 'int')
     comID = wash_url_argument(comID, 'int')
+    ln = wash_language(ln)
+    
+    _ = gettext_set_language(ln)
 
     ## check arguments
     check_recID_is_in_range(recID, warnings, ln)
     if uid <= 0:
         errors.append(('ERR_WEBCOMMENT_UID_INVALID', uid))
-    else:
-        nickname = query_get_user_contact_info(uid)[0]
-
+        return ('', errors, warnings)
+    
+    user_contact_info = query_get_user_contact_info(uid)
+    nickname = ''
+    if user_contact_info:
+        if user_contact_info[1]:
+            nickname = user_contact_info[1]
     # show the form 
     if action == 'DISPLAY':
         if reviews and cfg_webcomment_allow_reviews:
@@ -667,19 +807,15 @@ def perform_request_add_comment_or_remark(recID=-1, uid=-1, action='DISPLAY', ln
             errors.append(('ERR_WEBCOMMENT_REPLY_REVIEW',))
             return (webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, msg, score, note, warnings), errors, warnings)
         elif not reviews and cfg_webcomment_allow_comments:
-            if comID>0:
+            if comID > 0:
                 comment = query_get_comment(comID)
                 if comment: 
-                    user_info = query_get_user_contact_info(comment[2])
+                    user_info = get_user_info(comment[2])
                     if user_info:
-                        msg = comment[3]
-#                        msg = comment[3].replace('\n', ' ')
-#                        msg = msg.replace('<br>', '\n')
-                        date_creation = str(comment[4])
-                        date_creation = date_creation[:18]
-                        date_creation = time.strptime(str(date_creation), "%Y-%m-%d %H:%M:%S")
-                        date_creation = time.strftime("%d %b %Y %H:%M:%S %Z", date_creation)
-                        msg = "%s wrote on %s:\n%s" % (user_info[0], date_creation, msg)
+                        date_creation = convert_datetext_to_dategui(str(comment[4]))
+                        msg = _("%s wrote on %s:")% (user_info[2], date_creation)
+                        msg += "\n\n" + comment[3]
+                        msg = email_quote_txt(text=msg)
             return (webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings), errors, warnings)
         else:
             errors.append(('ERR_WEBCOMMENT_COMMENTS_NOT_ALLOWED',))
@@ -695,13 +831,22 @@ def perform_request_add_comment_or_remark(recID=-1, uid=-1, action='DISPLAY', ln
             warnings.append(('WRN_WEBCOMMENT_ADD_NO_BODY',))
         # if no warnings, submit
         if len(warnings) == 0:
-            success = query_add_comment_or_remark(recID=recID, uid=uid, msg=msg, note=note, score=score, priority=0)
+            if reviews:
+                can_submit = check_user_can_review(recID, client_ip_address, uid)
+            else:
+                can_submit = check_user_can_comment(recID, client_ip_address, uid)
+            if can_submit:
+                success = query_add_comment_or_remark(reviews, recID=recID, uid=uid, msg=msg,
+                                                      note=note, score=score, priority=0,
+                                                      client_ip_address=client_ip_address)
+            else:
+                success = 1 #already added!
             if success > 0:
                 if cfg_webcomment_admin_notification_level > 0:
                     notify_admin_of_new_comment(comID=success)
                 return (webcomment_templates.tmpl_add_comment_successful(recID, ln, reviews), errors, warnings)
             else:
-                errors.append(('ERR_WEBCOMMENT_DB_INSERT_ERROR',))
+                errors.append(('ERR_WEBCOMMENT_DB_INSERT_ERROR'))
         # if are warnings or if inserting comment failed, show user where warnings are
         if reviews and cfg_webcomment_allow_reviews:
             return (webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, msg, score, note, warnings), errors, warnings)
@@ -715,13 +860,22 @@ def perform_request_add_comment_or_remark(recID=-1, uid=-1, action='DISPLAY', ln
         else:
             return (webcomment_templates.tmpl_add_comment_form(recID, uid, ln, msg, warnings), errors, warnings)
 
+    return ('', errors, warnings)
+
 def notify_admin_of_new_comment(comID):
     """
     Sends an email to the admin with details regarding comment with ID = comID
     """
     comment = query_get_comment(comID)
     if len(comment) > 0:
-        (comID2, id_bibrec, id_user, body, date_creation, star_score, nb_votes_yes, nb_votes_total, title, nb_abuse_reports) = comment
+        (comID2,
+         id_bibrec,
+         id_user,
+         body,
+         date_creation,
+         star_score, nb_votes_yes, nb_votes_total,
+         title,
+         nb_abuse_reports) = comment
     else:
         return
     user_info = query_get_user_contact_info(id_user) 
@@ -732,7 +886,7 @@ def notify_admin_of_new_comment(comID):
     else:
         nickname = email = last_login = "ERROR: Could not retrieve"
 
-    from search_engine import print_record    
+    from cdsware.search_engine import print_record    
     record = print_record(recID=id_bibrec, format='hs')
  
     review_stuff = ''' 
@@ -782,13 +936,13 @@ To delete comment go to %(weburl)s/admin/webcomment/webcommentadmin.py/delete?co
     to_addr = adminemail
     subject = "A new comment/review has just been posted"
  
-    from alert_engine import send_email, forge_email
+    from cdsware.alert_engine import send_email, forge_email
     out = forge_email(from_addr, to_addr, subject, out)
     send_email(from_addr, to_addr, out)
 
 def check_recID_is_in_range(recID, warnings=[], ln=cdslang):
     """
-    Check that recID is >= 0 or <= -100
+    Check that recID is >= 0
     Append error messages to errors listi
     @param recID: record id
     @param warnings: the warnings list of the calling function
@@ -798,22 +952,21 @@ def check_recID_is_in_range(recID, warnings=[], ln=cdslang):
     # Make errors into a list if needed
     if type(warnings) is not list:
         errors = [warnings]
-
     try:
         recID = int(recID)
     except:
         pass
 
     if type(recID) is int:
-        if recID >= 1 or recID <= -100:
-            from search_engine import record_exists
+        if recID > 0:
+            from cdsware.search_engine import record_exists
             success = record_exists(recID)
             if success == 1: 
                 return (1,"")
             else:
                 warnings.append(('ERR_WEBCOMMENT_RECID_INEXISTANT', recID))
                 return (0, webcomment_templates.tmpl_record_not_found(status='inexistant', recID=recID, ln=ln))
-        elif recID == -1:
+        elif recID == 0:
             warnings.append(('ERR_WEBCOMMENT_RECID_MISSING',))
             return (0, webcomment_templates.tmpl_record_not_found(status='missing', recID=recID, ln=ln))
         else:
@@ -857,57 +1010,3 @@ def check_int_arg_is_in_range(value, name, errors, gte_value, lte_value=None):
             errors.append(('ERR_WEBCOMMENT_ARGUMENT_INVALID', value))
             return 0
     return 1
-
-def wash_url_argument(var, new_type):
-    """
-    Wash argument into 'new_type', that can be 'list', 'str', or 'int'.
-    If needed, the check 'type(var) is not None' should be done before calling this function
-    @param var: variable value
-    @param new_type: variable type, 'list', 'str' or 'int'
-    @return as much as possible, value var as type new_type
-            If var is a list, will change first element into new_type.
-            If int check unsuccessful, returns 0
-    """
-    out = []
-    if new_type == 'list':  # return lst
-        if type(var) is list:
-            out = var
-        else:
-            out = [var]
-    elif new_type == 'str':  # return str
-        if type(var) is list:
-            try:
-                out = "%s" % var[0]
-            except:
-                out = ""
-        elif type(var) is str:
-            out = var
-        else:
-            out = "%s" % var
-    elif new_type == 'int': # return int
-        if type(var) is list:
-            try:
-                out = int(var[0])
-            except:
-                out = 0
-        elif type(var) is int:
-            out = var
-        elif type(var) is str:
-            try:
-                out = int(var)
-            except:
-                out = 0
-        else:
-            out = 0
-    elif new_type == 'tuple': # return tuple
-        if type(var) is tuple:
-            out = var
-        else:
-            out = (var,)
-    elif new_type == 'dict': # return dictionary
-        if type(var) is dict:
-            out = var
-        else:
-            out = {0:var}
-    return out
-
