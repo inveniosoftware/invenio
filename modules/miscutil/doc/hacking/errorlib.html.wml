@@ -58,15 +58,15 @@ definitions, variables avoiding &quot;magic&quot; number or strings, etc.</p>
 
 <p>This file has to be named against a convention:</p>
 <pre>
-    &lt;module-name&gt;_config.py
+    &lt;module-name&gt;&#95;config.py
 </pre>
-<p>e.g. <code>webmessage_config.py</code> for the WebMessage module.</p>
+<p>e.g. <code>webmessage&#95;config.py</code> for the WebMessage module.</p>
 <h3>2.2 Dictionaries of errors</h3>
 <p>Errors and warnings are eventually stored into dictionaries. The dictionaries
 are to be named against the following convention:</p>
 <pre>
-    cfg_&lt;module-name&gt;_error_messages and
-    cfg_&lt;module-name&gt;_warning_messages
+    cfg&#95;&lt;module-name&gt;&#95;error&#95;messages and
+    cfg&#95;&lt;module-name&gt;&#95;warning&#95;messages
 </pre>
 <p>These two dictionaries (one can choose to implement only one if he doesn&apos;t
 need warnings, for example) contain an error-name -&gt; displayable message
@@ -74,32 +74,32 @@ association.</p>
 
 <p>Errors are to be named against the following convention:</p>
 <pre>
-    ERR_&lt;MODULE-NAME&gt;_ERROR_NAME
+    ERR&#95;&lt;MODULE-NAME&gt;&#95;ERROR&#95;NAME
 </pre>
 <p>Please note the use of uppercase.</p>
 
 <p>Warnings can also be named as errors if convenient, and so have to
 follow one of these rules:</p>
 <pre>
-    WRN_&lt;MODULE-NAME&gt;_WARNING_NAME or
-    ERR_&lt;MODULE-NAME&gt;_WARNING_NAME
+    WRN&#95;&lt;MODULE-NAME&gt;&#95;WARNING&#95;NAME or
+    ERR&#95;&lt;MODULE-NAME&gt;&#95;WARNING&#95;NAME
 </pre>
 <p>The associated message can obviously contain substituted variables like <code>%s</code>, <code>%d</code>...
 
 <h3><a name="i18n">Internationalization</a></h3>
 <p>Errors should also be internationalized. As the config file cannot receive
 parameters, this is done by the error handling library. The convenient way that has
-been chosen is to nest the classical <code>_()</code> function inside the string.</p>
+been chosen is to nest the classical <code>&#95;()</code> function inside the string.</p>
 <p>An internationalized error message should look like this:</p>
 <pre>
-    '_("Internationalized error (%s) message")'
+    '&#95;("Internationalized error (%s) message")'
 </pre>
-<p>A complete example of correct dictionnary is given below:</p>
+<p>A complete example of correct dictionary is given below:</p>
 <pre>    
-    cfg_webcomment_error_messages =
-    {   'ERR_WEBCOMMENT_RECID_INVALID'       :  '_("%i is an invalid record ID")',
-        'ERR_WEBCOMMENT_RECID_NAN'           :  '_("Record ID %i is not a number")',
-        'ERR_WEBCOMMENT_UID_INVALID'         :  '_("%i is an invalid user ID")'
+    cfg&#95;webcomment&#95;error&#95;messages =
+    {   'ERR&#95;WEBCOMMENT&#95;RECID&#95;INVALID'       :  '&#95;("%i is an invalid record ID")',
+        'ERR&#95;WEBCOMMENT&#95;RECID&#95;NAN'           :  '&#95;("Record ID %i is not a number")',
+        'ERR&#95;WEBCOMMENT&#95;UID&#95;INVALID'         :  '&#95;("%i is an invalid user ID")'
     }
 </pre>
 
@@ -116,18 +116,18 @@ are stored in req (will be used for IP logging, for example):</p>
     page(...,
          req=req,
          language=ln,
-         errors=error_list,
-         warnings=warnings_list,
+         errors=error&#95;list,
+         warnings=warnings&#95;list,
          ...)
 </pre>
 <p>list of errors and warnings are behaving the same way. They are lists of tuples:</p>
 <pre>
-    [(error_name, param1, ..., paramN), ...]
+    [(error&#95;name, param1, ..., paramN), ...]
 </pre>
 <p>The params are used to represent substitued values in messages. For example if
-you want to throw one of the errors above, error_list should look like this:</p>
+you want to throw one of the errors above, error&#95;list should look like this:</p>
 <pre>
-    error_list = [('ERR_WEBCOMMENT_RECID_INVALID', 123456)]
+    error&#95;list = [('ERR&#95;WEBCOMMENT&#95;RECID&#95;INVALID', 123456)]
 </pre>
 <h4>Example</h4>
 <p>Business logic should be separated from web interface. We consider three files in the
@@ -135,61 +135,61 @@ following (real) example:
 <ol>
 <li><code>yourmessages.py</code>, which is the page as viewed by a browser,</li>
 <li><code>webmessage.py</code>, which contains the business logic,</li>
-<li><code>webmessage_config</code>, which contains error definitions</li>
+<li><code>webmessage&#95;config</code>, which contains error definitions</li>
 </ol>
 <p>In this example, a user tries to read a message. We must ensure he doesn't
 read another's message, and that this message really exist in the system. For
 a more convenient reading, some (non error-related) parts of code have been suppressed.</p>
-<h5>webmessage_config.py</h5>
+<h5>webmessage&#95;config.py</h5>
 <pre>
 &#35; error messages. (should not happen, except in case of reload, or url altering) 
-cfg_webmessage_error_messages = \
-{   'ERR_WEBMESSAGE_NOTOWNER':  '_("This message is not in your mailbox")',
-    'ERR_WEBMESSAGE_NONICKNAME':'_("No nickname or user for uid #%s")',
-    'ERR_WEBMESSAGE_NOMESSAGE': '_("This message doesn\'t exist")'
+cfg&#95;webmessage&#95;error&#95;messages = \
+{   'ERR&#95;WEBMESSAGE&#95;NOTOWNER':  '&#95;("This message is not in your mailbox")',
+    'ERR&#95;WEBMESSAGE&#95;NONICKNAME':'&#95;("No nickname or user for uid #%s")',
+    'ERR&#95;WEBMESSAGE&#95;NOMESSAGE': '&#95;("This message doesn\'t exist")'
 }
 </pre>
 
 <h5>webmessage.py: business logic</h5>
 <pre>
-from cdsware.webmessage_config import cfg_webmessage_error_messages
+from cdsware.webmessage&#95;config import cfg&#95;webmessage&#95;error&#95;messages
 
-def perform_request_display_msg(uid, msgid, ln=cdslang):
-    uid   = wash_url_argument(uid, 'int')
-    msgid = wash_url_argument(msgid, 'int')
-    ln    = wash_language(ln)
+def perform&#95;request&#95;display&#95;msg(uid, msgid, ln=cdslang):
+    uid   = wash&#95;url&#95;argument(uid, 'int')
+    msgid = wash&#95;url&#95;argument(msgid, 'int')
+    ln    = wash&#95;language(ln)
     errors = []
     warnings = []
     body = ""
-    if (check_user_owns_message(uid, msgid) == 0):
+    if (check&#95;user&#95;owns&#95;message(uid, msgid) == 0):
         &#35; The user doesn't own this message
-        errors.append(('ERR_WEBMESSAGE_NOTOWNER',))
+        errors.append(('ERR&#95;WEBMESSAGE&#95;NOTOWNER',))
     else:
-        (msg_id, ...) = get_message(uid, msgid)        
-        if (msg_id == ""):
-	    &#35; The message exists in table user_msgMESSAGE
+        (msg&#95;id, ...) = get&#95;message(uid, msgid)        
+        if (msg&#95;id == ""):
+	    &#35; The message exists in table user&#95;msgMESSAGE
 	    &#35; but not in table msgMESSAGE => table inconsistency
-            errors.append(('ERR_WEBMESSAGE_NOMESSAGE',))
+            errors.append(('ERR&#95;WEBMESSAGE&#95;NOMESSAGE',))
         else:
-            body = webmessage_templates.tmpl_display_msg( ... )
+            body = webmessage&#95;templates.tmpl&#95;display&#95;msg( ... )
     return (body, errors, warnings)
 </pre>
 
 <h5>yourmessages.py: web interface</h5>
 <pre>
 from cdsware.webpage import page
-from cdsware.webmessage import perform_request_display_msg
+from cdsware.webmessage import perform&#95;request&#95;display&#95;msg
 
-def display_msg(req, msgid=-1, ln=cdslang):
-    _ = gettext_set_language(ln)
+def display&#95;msg(req, msgid=-1, ln=cdslang):
+    &#95; = gettext&#95;set&#95;language(ln)
     # Generate content
-    (body, errors, warnings) = perform_request_display_msg(uid, msgid, ln)
-    title = _("Read a message")
+    (body, errors, warnings) = perform&#95;request&#95;display&#95;msg(uid, msgid, ln)
+    title = &#95;("Read a message")
     return page(title       = title,
                 body        = body,
-                navtrail    = get_navtrail(ln, title),
+                navtrail    = get&#95;navtrail(ln, title),
                 uid         = uid,
-                lastupdated = __lastupdated__,
+                lastupdated = &#95;&#95;lastupdated&#95;&#95;,
                 req         = req,
                 language    = ln,
                 errors      = errors,
@@ -201,119 +201,121 @@ def display_msg(req, msgid=-1, ln=cdslang):
 
 <p>The following functions can be useful (see source code for other functions):</p>
 <pre>
-   get_msgs_for_code_list(code_list, file='error', ln=cdslang)
+   get&#95;msgs&#95;for&#95;code&#95;list(code&#95;list, file='error', ln=cdslang)
         Returns formatted strings for the given errors 
-        @param code_list: list of tuples  [(err_name, arg1, ..., argN), ...]
+        @param code&#95;list: list of tuples  [(err&#95;name, arg1, ..., argN), ...]
         @param file: 'error' or 'warning'
-        @return list of tuples of length 2 [('ERR_...', err_msg), ...]
-                if code_list empty, will return None.
+        @return list of tuples of length 2 [('ERR&#95;...', err&#95;msg), ...]
+                if code&#95;list empty, will return None.
                 if errors retrieving error messages, will append an error to
                 the list     
 
-    register_errors(errors_or_warnings_list, file, req=None)
+    register&#95;errors(errors&#95;or&#95;warnings&#95;list, file, req=None)
         log errors to cdsware.err and warnings to cdsware.log
         errors will be logged with client information (if req is given)
         and a tracestack
         warnings will be logged with just the warning message
-        @param errors_or_warnings_list: list of tuples (err_name, err_msg)
+        @param errors&#95;or&#95;warnings&#95;list: list of tuples (err&#95;name, err&#95;msg)
         @param file: 'error' or 'warning'
-        @param req = mod_python request
+        @param req = mod&#95;python request
         @return integer 1 if successfully wrote to file, integer 0 if not
-                will append another error to errors_list if unsuccessful
+                will append another error to errors&#95;list if unsuccessful
 
-    send_error_report_to_admin(header, url, time, browser, client,
-                               error, sys_error, traceback)
+    send&#95;error&#95;report&#95;to&#95;admin(header, url, time, browser, client,
+                               error, sys&#95;error, traceback)
         Sends an email to the admin with client info and tracestack
 </pre>
 <h4>Example</h4>
 <p>In the following example, two files are used:</p>
 <ol>
-<li><code>webmessage_config</code>, containing error messages</li>
-<li><code>webmessage_example_bin.py</code>, containing business logic</li>
+<li><code>webmessage&#95;config</code>, containing error messages</li>
+<li><code>webmessage&#95;example&#95;bin.py</code>, containing business logic</li>
 </ol>
 <p>Scenario: a function receives an error and wants to register it only if it is not a
 messaging error</p>
-<h5>webmessage_config.py</h5>
+<h5>webmessage&#95;config.py</h5>
 <pre>
 &#35; error messages. (should not happen, except in case of reload, or url altering) 
-cfg_webmessage_error_messages = \
-{   'ERR_WEBMESSAGE_NOTOWNER':  '_("This message is not in your mailbox")',
-    'ERR_WEBMESSAGE_NONICKNAME':'_("No nickname or user for uid #%s")',
-    'ERR_WEBMESSAGE_NOMESSAGE': '_("This message doesn\'t exist")'
+cfg&#95;webmessage&#95;error&#95;messages = \
+{   'ERR&#95;WEBMESSAGE&#95;NOTOWNER':  '&#95;("This message is not in your mailbox")',
+    'ERR&#95;WEBMESSAGE&#95;NONICKNAME':'&#95;("No nickname or user for uid #%s")',
+    'ERR&#95;WEBMESSAGE&#95;NOMESSAGE': '&#95;("This message doesn\'t exist")'
 }
 </pre>
 
-<h5>webmessage_example_bin.py</h5>
+<h5>webmessage&#95;example&#95;bin.py</h5>
 <pre>
-from cdsware.webmessage_config import cfg_webmessage_error_messages
-from cdsware.errorlib import get_msgs_for_code_list, register_errors
+from cdsware.webmessage&#95;config import cfg&#95;webmessage&#95;error&#95;messages
+from cdsware.errorlib import get&#95;msgs&#95;for&#95;code&#95;list, register&#95;errors
 
-def handle_error(error):
-    errorlist = get_msgs_for_code_list([error])
+def handle&#95;error(error):
+    errorlist = get&#95;msgs&#95;for&#95;code&#95;list([error])
 
     &#35; error is a tuple of error name, arguments => we only need the name
-    if cfg_webmessage_error_messages[error[0]]:
+    if cfg&#95;webmessage&#95;error&#95;messages[error[0]]:
         print("Error in webmessage: %s" % errorlist[0][1])
     else:
         for error in errorlist:
             print("Error: %s" % error[1])
-        register_errors(errorlist, 'error')
+        register&#95;errors(errorlist, 'error')
 </pre>
 <h2>4. <a name="troubleshooting">Troubleshooting</a></h2>
 
-<p>MiscUtil can generate errors. See miscutil_config.py for a complete list.
+<p>MiscUtil can generate errors. See miscutil&#95;config.py for a complete list.
 One can see below some usual errors and their solutions:</p>
 <dl>
-<dt><b><code>ERR_MISCUTIL_IMPORT_ERROR</code></b></dt>
-<dd>The <code>&lt;module-name&gt;_config.py</code> file has not been found. Check it
+<dt><b><code>ERR&#95;MISCUTIL&#95;IMPORT&#95;ERROR</code></b></dt>
+<dd>The <code>&lt;module-name&gt;&#95;config.py</code> file has not been found. Check it
 has the correct name and is deployed.<br />
 Check that the error is named following this pattern:
 <pre>
-    WRN_&lt;MODULE-NAME&gt;_WARNING_NAME or
-    ERR_&lt;MODULE-NAME&gt;_WARNING_NAME 
+    WRN&#95;&lt;MODULE-NAME&gt;&#95;WARNING&#95;NAME or
+    ERR&#95;&lt;MODULE-NAME&gt;&#95;WARNING&#95;NAME 
 </pre>
 </dd>
 
-<dt><b><code>ERR_MISCUTIL_NO_DICT</code></b></dt>
-<dd>No dictionary could be found in <code>&lt;module-name&gt;_config.py</code>. Check
+<dt><b><code>ERR&#95;MISCUTIL&#95;NO&#95;DICT</code></b></dt>
+<dd>No dictionary could be found in <code>&lt;module-name&gt;&#95;config.py</code>. Check
 that your dictionary is correctly named:
 <pre>
-    cfg_&lt;module-name&gt;_error_messages
+    cfg&#95;&lt;module-name&gt;&#95;error&#95;messages
 </pre>
 You could also have inverted errors and warnings if only one dictionary was provided.<br/>
 This can also happen when using direct API if the <code>file</code> argument is misspelled.
 </dd>
 
-<dt><b><code>ERR_MISCUTIL_NO_MESSAGE_IN_DICT</code></b></dt>
+<dt><b><code>ERR&#95;MISCUTIL&#95;NO&#95;MESSAGE&#95;IN&#95;DICT</code></b></dt>
 <dd>A dictionary was found but not the error in it. You probably misspelled
-<code>error_name</code>, or inverted errors and warnings dictionaries.
+<code>error&#95;name</code>, or inverted errors and warnings dictionaries.
 </dd>
 
-<dt><b><code>ERR_MISCUTIL_UNDEFINED_ERROR</code></b></dt>
+<dt><b><code>ERR&#95;MISCUTIL&#95;UNDEFINED&#95;ERROR</code></b></dt>
 <dd>The library couldn't guess the name of module. Check that the error name is beginning
-with <code>ERR_MODULE-NAME_</code> or <code>WRN_MODULE-NAME_</code>. This library uses
+with <code>ERR&#95;MODULE-NAME&#95;</code> or <code>WRN&#95;MODULE-NAME&#95;</code>. This library uses
 underscores as separators to guess module name.
 </dd>
 
-<dt><b><code>ERR_MISCUTIL_TOO_MANY_ARGUMENT</code></b></dt>
+<dt><b><code>ERR&#95;MISCUTIL&#95;TOO&#95;MANY&#95;ARGUMENT</code></b></dt>
 <dd>As the library was rendering the display of error, a surnumerous text substitute was
 found (surnumerous are ignored for final rendering, and this error is appened to list of errors):
 <pre>
-    'ERR_KNIGHTS': '_("We are the knights who say %s!")'
-    errors = ('ERR_KNIGHTS', 'ni', 'ni')
+    # Module knights:
+    'ERR&#95;KNIGHTS': '&#95;("We are the knights who say %s!")'
+    errors = ('ERR&#95;KNIGHTS', 'ni', 'ni')
 </pre>
 </dd>
 
-<dt><b><code>ERR_MISCUTIL_TOO_FEW_ARGUMENT</code></b></dt>
+<dt><b><code>ERR&#95;MISCUTIL&#95;TOO&#95;FEW&#95;ARGUMENT</code></b></dt>
 <dd>Not enough arguments (text substitutes) were given for an error. Missing ones are
 replaced by <code>'???'</code>:
 <pre>
-    'ERR_KNIGHTS': '_("We are the knights who say %s! We demand a %s")'
-    errors = ('ERR_KNIGHTS', 'ni')
+    # Module knights
+    'ERR&#95;KNIGHTS': '&#95;("We are the knights who say %s! We demand a %s")'
+    errors = ('ERR&#95;KNIGHTS', 'ni') # so, where is the shrubbery??
 </pre>
 </dd>
 
-<dt><b><code>ERR_MISCUTIL_BAD_ARGUMENT_TYPE</code></b></dt>
+<dt><b><code>ERR&#95;MISCUTIL&#95;BAD&#95;ARGUMENT&#95;TYPE</code></b></dt>
 <dd>Your arguments (text substitutes) did not match with the error declaration<br />
 e.g. inversion between integer (<code>%i</code>) and string (<code>%s</code>)
 </dd>    

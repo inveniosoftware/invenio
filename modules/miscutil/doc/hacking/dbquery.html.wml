@@ -36,7 +36,7 @@ DBQuery handles connection to database and queries.
 
 <h2>1. <a name="overview">Overview</a></h2>
 
-<p>DBQuery provides a method, <code>run_sql</code> which handles SQL requests. It establishes
+<p>DBQuery provides a method, <code>run&#95;sql</code> which handles SQL requests. It establishes
 a connection if necessary, sends requests and returns tuples.</p>
 
 
@@ -45,12 +45,12 @@ a connection if necessary, sends requests and returns tuples.</p>
 <p>As DBQuery automatically handles connection establishment, usage of a single
 function is necessary:</p>
 <pre>
-    run_sql(sql, param=None, n=0, with_desc=0)
+    run&#95;sql(sql, param=None, n=0, with&#95;desc=0)
         Run SQL on the server and returns result.
         @param param: tuple of string params to insert in the query
                       (see notes below)
         @param n: number of tuples in result (0 for unbounded)
-        @param with_desc: if true, will return a
+        @param with&#95;desc: if true, will return a
                           DB API 7-tuple describing columns in query
         @return: if SELECT, SHOW, DESCRIBE statements: tuples of data, followed
                                                        by description if parameter
@@ -66,18 +66,18 @@ As said before, params must be of type string. Trying to pass non character data
 may lead to an error. Developers should consider converting to string, or render
 string before sending, giving no param:
 <pre>
-    initial_params=(1234,)
+    initial&#95;params=(1234,)
     query = "SELECT id FROM user where id>%s"
-    params = (str(initial_params[0]),)
-    run_sql(query, params)
+    params = (str(initial&#95;params[0]),)
+    run&#95;sql(query, params)
 </pre>
     or
 <pre>
     query = "SELECT id FROM user where id>%d" % 1234
-    run_sql(query)
+    run&#95;sql(query)
 </pre>
 <p>When using this last technique, be careful with SQL injection problem. One should
-use the <code>MySQLdb.escape_string()</code> method.
+use the <code>MySQLdb.escape&#95;string()</code> method.
 
 <h3>3.2 Dates</h3>
 <p>Switching from MySQLdb 0.9 to MySQLdb 1.2, while using Python 2.2 or 2.3
@@ -91,6 +91,6 @@ led to discovery of incompatibilities</p>
 problem should be done for backwards compatibility reasons. The
 solution is to force MySQL to convert date to a textual format:</p>
 <pre>
-    SELECT DATE_FORMAT(date_field,'%%Y-%%m-%%d %%H:%%i:%%s') FROM table
+    SELECT DATE&#95;FORMAT(date&#95;field,'%%Y-%%m-%%d %%H:%%i:%%s') FROM table
 </pre>
 <p>This conversion will return a datetext format as described in <a href="./dateutils.html">dateutils library</a><code>(YEAR-MONTH-DAY HOUR:MINUTE:SECOND)</code></p>
