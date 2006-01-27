@@ -90,6 +90,22 @@ Xcount  = 0
 for opt, opt_value in opts:
     if opt in ["-c", "--config"]:
 
+        separator            = bibconvert.get_other_par("_RECSEP_", opt_value)
+        output_rec_sep       = ""
+        query_string         = bibconvert.get_other_par("_QRYSTR_", opt_value)
+        match_mode           = bibconvert.get_other_par("_MATCH_", opt_value)
+        begin_header         = bibconvert.get_other_par("_HEAD_", opt_value)
+        ending_footer        = bibconvert.get_other_par("_FOOT_", opt_value)
+        begin_record_header  = bibconvert.get_other_par("_RECHEAD_", opt_value)
+        ending_record_footer = bibconvert.get_other_par("_RECFOOT_", opt_value)
+
+        if(match_mode == ""):
+            match_mode = -1
+
+
+for opt, opt_value in opts:
+    if opt in ["-c", "--config"]:
+
         extract_tpl = opt_value
         extract_tpl_parsed  = bibconvert.parse_common_template(extract_tpl,1)
 
@@ -158,6 +174,10 @@ for opt, opt_value in opts:
         if opt_value[0:1] == "s":
             source_tpl    = opt_value[1:]
             source_tpl_parsed  = bibconvert.parse_template(source_tpl)
+
+if(separator == "EOLEOL"):
+    separator = ""
+
 
 ar_.append(dirmode)
 ar_.append(Xcount)

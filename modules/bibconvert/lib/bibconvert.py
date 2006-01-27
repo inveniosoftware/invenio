@@ -40,6 +40,7 @@ try:
     from cdsware.config import *
     from cdsware.search_engine import perform_request_search
     from cdsware.oai_repository_config import oaiidprefix
+
 except ImportError, e:
     print "Error: %s" % e
     sys.exit(1)
@@ -93,6 +94,46 @@ def get_pars(fn):
     out.append(re.split(',', re.split('\(|\)', fn)[1]))
 
     return out
+
+def get_other_par(par, cfg):
+    "Get other parameter (par) from the configuration file (cfg)"
+
+    out = ""
+
+    other_parameters = {
+
+    '_QRYSTR_' : '_QRYSTR_---.*$',
+    '_MATCH_'  : '_MATCH_---.*$',
+    '_RECSEP_' : '_RECSEP_---.*$',
+    '_EXTCFG_' : '_EXTCFG_---.*$',
+    '_SRCTPL_' : '_SRCTPL_---.*$',
+    '_DSTTPL_' : '_DSTTPL_---.*$',
+    '_RECHEAD_': '_RECHEAD_---.*$',
+    '_RECFOOT_': '_RECFOOT_---.*$',
+    '_HEAD_'   : '_HEAD_---.*$',
+    '_FOOT_'   : '_FOOT_---.*$',
+    '_EXT_'    : '_EXT_---.*$',
+    '_SEP_'    : '_SEP_---.*$',
+    '_COD_'    : '_COD_---.*$',
+    '_FRK_'    : '_FRK_---.*$',
+    '_NC_'     : '_NC_---.*$',
+    '_MCH_'    : '_MCH_---.*$',
+    '_UPL_'    : '_UPL_---.*$',
+    '_AUTO_'   : '_AUTO_---.*$'
+    
+    }
+    
+    parameters = other_parameters.keys()
+
+    for line in fileinput.input(cfg):
+
+        pattern   = re.compile(other_parameters[par])
+        items     = pattern.findall(line)
+        for item in items:
+            out  = item.split('---')[1]
+
+    return out
+
 
 def append_to_output_file(filename, output):
     "bibconvert output file creation by output line"
@@ -1444,6 +1485,9 @@ def convert(ar_):
     dirmode, Xcount, conv_setting, sysno, sysno500, separator, tcounter, source_data, query_string, match_mode, begin_record_header ,ending_record_footer,output_rec_sep, begin_header, ending_footer, oai_identifier_from, source_tpl, source_tpl_parsed, target_tpl, target_tpl_parsed, extract_tpl, extract_tpl_parsed = ar_
 #    separator = spt
 
+    # Added by Alberto
+    separator = sub_keywd(separator)
+    
     if dirmode:
         if (os.path.isdir(source_data)):
             data_parsed = parse_input_data_d(source_data,source_tpl)
