@@ -441,7 +441,7 @@ class Template:
 
           - 'fld' *string* - Second value to compare
         """
-        if var == fld or (var == True and fld) or (fld == True and var):
+        if var == fld:
             return " selected"
         else:
             return ""
@@ -1355,8 +1355,8 @@ class Template:
         if action == _("Browse") or (d1y==0 and d1m==0 and d1d==0 and d2y==0 and d2m==0 and d2d==0):
             pass # do not need it
         else:
-            cell_6_a = self.tmpl_inputdate_box("d1", d1y, d1m, d1d, ln=ln)
-            cell_6_b = create_inputdate_box("d2", d2y, d2m, d2d, ln=ln)
+            cell_6_a = self.tmpl_inputdate("d1", ln, d1y, d1m, d1d)
+            cell_6_b = self.tmpl_inputdate("d2", ln, d2y, d2m, d2d)
             out += """<table class="searchbox">
                        <thead>
                         <tr>
@@ -1376,9 +1376,9 @@ class Template:
                        </tbody>
                       </table>""" % {
                         'added' : _("Added since:"),
-                        'until' : _("Until"),
-                        'date1' : self.tmpl_inputdate_box("d1", d1y, d1m, d1d, ln=ln),
-                        'date2' : self.tmpl_inputdate_box("d2", d2y, d2m, d2d, ln=ln),
+                        'until' : _("until:"),
+                        'date1' : self.tmpl_inputdate("d1", ln, d1y, d1m, d1d),
+                        'date2' : self.tmpl_inputdate("d2", ln, d2y, d2m, d2d),
                       }
 
         ## fifthly, print Display results box, including sort/rank, formats, etc:
