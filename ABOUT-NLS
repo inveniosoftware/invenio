@@ -83,6 +83,22 @@ the procedure below:
     make sure it does not contain formatting errors.  (E.g. in the
     Emacs PO mode, press `V' to validate the file.)
 
+  - If you have access to a test installation of CDSware, you may want
+    to see your modified PO file in action:
+
+       $ cd po 
+       $ emacs ja.po                      # edit Japanese translation
+       $ make update-gmo
+       $ make install
+       $ sudo apachectl restart
+       $ firefox http://your.site/?ln=ja  # check it out in context
+
+    If you do not have access to a test installation, please
+    contribute your PO file (see next step) and the CDSware developers
+    will install it on a test site and will contact you so that you
+    would be able to check your translations in the global context of
+    the application.
+
   - Please contribute your translation by emailing the file to
     <cds.support@cern.ch>.  You help is greatly appreciated and will
     be properly credited in the CREDITS file.
