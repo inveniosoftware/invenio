@@ -25,4 +25,4 @@ wmlinclude_DATA = cdsnavbar.wml cdsnavtrail.wml cdspage.wml config.wml configbis
 EXTRA_DIST = cdsnavbar.wml cdsnavtrail.wml cdspage.wml config.wml configbis.wml.in \
              messages.wml cdswmllib.wml
 
-CLEANFILES = *~ $(noinst_SCRIPTS)
+CLEANFILES = *~
