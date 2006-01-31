@@ -22,6 +22,7 @@
 __lastupdated__ = """$Date$"""
 __version__ = "$Id$"
 
+import os
 import sys
 import urllib
 from mod_python import apache
