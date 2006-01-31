@@ -44,7 +44,7 @@ EXTRA_DIST = __init__.py \
              dateutils.py \
 	     urlutils.py
 
-CLEANFILES = $(pylib_DATA) $(phplib_DATA) *~ *.tmp *.pyc
+CLEANFILES = config.py dbquery.py messages.py $(phplib_DATA) *~ *.tmp *.pyc
 
 config.py: config.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
       $(top_srcdir)/config/messages.wml $(top_srcdir)/config/cdswmllib.wml
