@@ -272,7 +272,7 @@ def perform_request_write_with_search(msg_to_user="",
         return name1 + cfg_webmessage_separator + " " + name2
     
     if results_field == 'user':
-        if add_values:
+        if add_values and len(names_selected):
             usernames_to_add = reduce(cat_names, names_selected)
             if msg_to_user:
                 msg_to_user = cat_names(msg_to_user, usernames_to_add)
@@ -285,7 +285,7 @@ def perform_request_write_with_search(msg_to_user="",
                 search_results_list.append((user_name[0], user_name[0] in names_selected))
         
     elif results_field == 'group':
-        if add_values:
+        if add_values and len(names_selected):
             groupnames_to_add = reduce(cat_names, names_selected)
             if msg_to_group:
                 msg_to_group = cat_names(msg_to_group, groupnames_to_add)
@@ -321,7 +321,7 @@ def perform_request_send(uid,
                          msg_send_day=0,
                          ln=cdslang):
     """
-    send a message. if unable return warenings to write page
+    send a message. if unable return warnings to write page
     @param uid: id of user from (int)
     @param msg_to_user: comma separated usernames (recipients) (str)
     @param msg_to_group: comma separated groupnames (recipeints) (str)
@@ -405,8 +405,8 @@ def perform_request_send(uid,
     uids_from_group = get_uids_members_of_groups(gids_to)
     # Add the original uids, and make sure  there is no double values.
     tmp_dict = {}
-    for uid in uids_from_group:
-        tmp_dict[uid] = None
+    for uid_receiver in uids_from_group:
+        tmp_dict[uid_receiver] = None
     for (user_nick, user_id) in users_to:
         if user_id:
             if user_id not in tmp_dict:

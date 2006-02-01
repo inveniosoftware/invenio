@@ -189,14 +189,14 @@ class Template:
                 <td class="mailboxlabel">%(to_label)s</td>
                 <td class="mailboxlabel">%(users_label)s</td>
                 <td style="width:100%%;">
-                  <input class="mailboxinput" type="text" name="msg_to_user" value="%(to_users)s"/>
+                  <input class="mailboxinput" type="text" name="msg_to_user" value="%(to_users)s" />
                 </td>
               </tr>
               <tr>
                 <td class="mailboxlabel">&nbsp;</td>
                 <td class="mailboxlabel">%(groups_label)s</td>
                 <td style="width:100%%;">
-                  <input class="mailboxinput" type="text" name="msg_to_group" value="%(to_groups)s"/>
+                  <input class="mailboxinput" type="text" name="msg_to_group" value="%(to_groups)s" />
                 </td>
               </tr>
               <tr>
@@ -207,7 +207,7 @@ class Template:
               <tr>
                 <td class="mailboxlabel">%(subject_label)s</td>
                 <td colspan="2">
-                  <input class="mailboxinput" type="text" name="msg_subject" value="%(subject)s"/>
+                  <input class="mailboxinput" type="text" name="msg_subject" value="%(subject)s" />
                 </td>
               </tr>
             </table>
@@ -236,10 +236,6 @@ class Template:
             %(year_field)s
           </td>
         </tr>
-        <!-- This should normally go in a tfoot tag. Old browsers have problems with it
-             as order must be: thead, tfoot, tbody.
-             Tfoot is thus empty :(
-        -->
         <tr class="mailboxfooter">
           <td colspan="2" class="mailboxfoot">
             <input type="submit" name="send_button" value="%(send_label)s" class="formbutton"/>
@@ -267,7 +263,7 @@ class Template:
                                  'month_field': month_field,
                                  'year_field': year_field,
                                  'to_select': to_select,
-                                 'send_later_label': _("Send Later:"),
+                                 'send_later_label': _("Send later?"),
                                  'to_label': _("To:"),
                                  'users_label': _("Users"),
                                  'groups_label': _("Groups"),
@@ -549,8 +545,10 @@ class Template:
             tuples_list = [tuples_list]
         out = """
 <select name="%s" multiple="multiple" style="width:100%%">"""% (select_name)
+        if len(tuples_list) > 0:
+            out += '  <option disabled="disabled">%s</option>\n' % _("Please select one or more:")
         for (value, is_selected) in tuples_list:
-            out += "  <option value=\"%s\""% value
+            out += '  <option value="%s"'% value
             if is_selected:
                 out += " selected=\"selected\""
             out += ">%s</option>\n"% value
@@ -620,7 +618,7 @@ class Template:
   </tbody>
 </table>
 """
-        out = out% {'title_label'        : _("Find users or groups"),
+        out = out% {'title_label'        : _("Find users or groups:"),
                     'search_user_label'  : _("Find a user"),
                     'search_group_label' : _("Find a group"),
                     'results_field'      : results_field,
