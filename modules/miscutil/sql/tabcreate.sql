@@ -2182,22 +2182,22 @@ CREATE TABLE IF NOT EXISTS oaiSET (
   UNIQUE KEY setSpec (setSpec)
 ) TYPE=MyISAM;
 
-> CREATE TABLE IF NOT EXISTS oaiARCHIVE (
->   id mediumint(9) unsigned NOT NULL auto_increment,
->   setName varchar(255) NOT NULL default '',
->   setSpec varchar(255) NOT NULL default '',
->   setCollection varchar(255) NOT NULL default '',
->   p1 text,
->   f1 text,
->   m1 text,
->   p2 text,
->   f2 text,
->   m2 text,
->   p3 text,
->   f3 text,
->   m3 text,
->   PRIMARY KEY (id)
-> ) TYPE=MyISAM;
+CREATE TABLE IF NOT EXISTS oaiARCHIVE (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  setName varchar(255) NOT NULL default '',
+  setSpec varchar(255) NOT NULL default '',
+  setCollection varchar(255) NOT NULL default '',
+  p1 text,
+  f1 text,
+  m1 text,
+  p2 text,
+  f2 text,
+  m2 text,
+  p3 text,
+  f3 text,
+  m3 text,
+  PRIMARY KEY (id)
+) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS oaiHARVEST (
   id mediumint(9) unsigned NOT NULL auto_increment,
