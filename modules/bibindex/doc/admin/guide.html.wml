@@ -63,6 +63,9 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.6 <a href="#3.6">Configure Removal of HTML Code</a></br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.7 <a href="#3.7">Configure Accent Stripping</a></br>
 <strong>4. <a href="#4">Run BibIndex Daemon</a></strong></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1 <a href="#4.1">Run BibIndex daemon</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.2 <a href="#4.2">Checking and repairing indexes</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.3 <a href="#4.3">Reindexing</a></br>
 
 <a name="1"></a><h2>1. Overview</h2>
 <a name="2"></a><h2>2. Configure Metadata Tags and Fields</h2>
@@ -142,4 +145,84 @@ from documents before indexing, and index only the text left.  (HTML
 code is defined as everything between '<' and '>' in a text.)
 
 <a name="3.7"></a><h3>3.7 Configure Accent Stripping</h3>
+
 <a name="4"></a><h2>4. Run BibIndex Daemon</h2>
+
+<a name="4.1"></a><h3>4.1 Run BibIndex daemon</h3>
+
+To index your newly created or modified documents, bibindex must be
+run periodically via bibsched.  This is achieved by the sleep option
+(-s) to bibindex.  For more information please see <a
+href="../howto/run.html">HOWTO Run</a> admin guide.
+
+
+<a name="4.2"></a><h3>4.2 Checking and repairing indexes</h3>
+
+Upon each indexing run, bibindex checks and reports any
+inconsistencies in the indexes.  You can also manually check for the
+index corruption yourself by using the check (-k) option to bibindex.
+
+<p>If a problem is found during the check, bibindex hints you to run
+repairing (-r).  If you run it, then during repair bibindex tries to
+correct problems automatically by its own means.  Usually it succeeds.
+
+<p>When the automatic repairing does not succeed though, then manual
+intervention is required.  The easiest thing to get the indexes back
+to shape are commands like: (assuming the problem is with the index ID
+1):
+
+<blockquote>
+<pre>
+  $ echo "DELETE FROM idxWORD01R WHERE type='TEMPORARY' or type='FUTURE';" | \
+    /path/to/cdsware/bin/dbexec
+</pre>
+</blockquote>
+
+to leave only the 'CURRENT' reverse index.  After that you can rerun
+the index checking procedure (-k) and, if successful, continue with
+the normal web site operation.  However, a full reindexing should be
+scheduled for the forthcoming night or weekend.
+
+<a name="4.3"></a><h3>4.3 Reindexing</h3>
+
+The procedure of reindexing is taking place into the real indexes that
+are also used for searching.  Therefore the end users will feel
+immediately any change in the indexes.  If you need to reindex your
+records from scratch (e.g. you would like to increase CFG_MAX_RECID in
+config.wml), then the best procedure is the following: wipe out
+existing indexes, reindex the collection index only (fast operation),
+recreate collection cache, and only after that reindex all the other
+indexes (slow operation).  This will ensure that the records in your
+system will be at least browsable while the indexes are being rebuilt.
+The steps to perform are:
+
+<blockquote>
+<pre>
+  $ bibsched # wait for all active tasks to finish, and put the queue into manual mode
+  $ cd cdsware-0.7.1 # source dir
+  $ echo "UPDATE collection SET reclist=NULL;" | \
+    /path/to/cdsware/bin/dbexec # clean collection cache
+  $ grep WORD ./modules/miscutil/sql/tabbibclean.sql | \
+    /path/to/cdsware/bin/dbexec # truncate word and rank indexes
+  $ echo "UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00';" | \
+    /path/to/cdsware/bin/dbexec # rewind the last indexing time
+  $ echo "UPDATE rnkMETHOD SET last_updated='0000-00-00 00:00:00';" | \
+    /path/to/cdsware/bin/dbexec # rewind the last ranking time
+  $ bibindex -f50000 -wcollection # reindex the collection index (slow)
+  $ webcoll -f # recreate the collection cache
+  $ bibsched # run the two above-submitted tasks  
+  $ sudo apachectl restart 
+  $ bibindex -f50000 # reindex other indexes (slow)
+  $ bibrank -f50000
+  $ webcoll -f
+  $ bibsched # run the three above-submitted tasks, and put the queue back in auto mode
+  $ sudo apachectl restart
+</pre>
+</blockquote>
+
+In the future CDSware should ideally run indexing into invisible
+tables that would be switched against the production ones once the
+indexing process is successfully over.  For the time being, if
+reindexing takes several hours in your installation (e.g. if you have
+500,000 records), you may want to mysqlhotcopy your tables and run
+reindexing on those copies yourself.
