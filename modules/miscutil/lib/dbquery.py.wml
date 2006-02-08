@@ -56,6 +56,7 @@ def _db_login(relogin = 0):
 
 def run_sql(sql, param=None, n=0, with_desc=0):
     """Run SQL on the server and returns result."""    
+    ### log_sql_query(sql, param) ### UNCOMMENT ONLY IF you REALLY want to log all queries
     db = _db_login()    
     if param:
         param = tuple(param)
@@ -91,3 +92,25 @@ def blob_to_string(ablob):
     else:
         # BLOB is array.array in MySQLdb 1.0.0 and later 
         return ablob.tostring()
+
+def log_sql_query(sql, param=None):
+    """Log SQL query into prefix/var/dbquery.log log file.  In order
+       to enable logging of all SQL queries, please uncomment one line
+       in run_sql() above. Useful for fine-level debugging only!
+    """
+    from cdsware.config import logdir
+    from cdsware.dateutils import convert_datestruct_to_datetext
+    import time
+    from cdsware.textutils import indent_text
+    log_path = logdir + '/dbquery.log'
+    date_of_log = convert_datestruct_to_datetext(time.localtime())
+    message = date_of_log + '-->\n'
+    message += indent_text('Query:\n' + indent_text(str(sql),2),2)
+    message += indent_text('Params:\n' + indent_text(str(param),2),2)
+    message += '-----------------------------\n\n'
+    try:
+        log_file = open(log_path, 'a+')
+        log_file.writelines(message)
+        log_file.close()
+    except:
+        pass
