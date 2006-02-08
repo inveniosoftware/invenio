@@ -171,7 +171,7 @@ directory that is good to clean up from time to time.  For example:
    </pre>
    </blockquote>
 
-<p>BibReformat creates temorary XML files in
+<p>BibReformat creates temporary XML files in
 <code><prefix>/var/tmp</code> that may be deleted after they are
 uploaded.  For example:
 
@@ -180,6 +180,18 @@ uploaded.  For example:
    $ find /usr/local/cdsware-DEMO/var/tmp -name "rec_fmt_*.xml" -size 0c -exec \rm -f {} \;   
    $ find /usr/local/cdsware-DEMO/var/tmp -name "rec_fmt_*.xml" -atime +28 -exec \rm -f {} \;
    $ find /usr/local/cdsware-DEMO/var/tmp -name "rec_fmt_*.xml" -atime +7 -exec gzip -9 {} \;
+   </pre>
+   </blockquote>
+
+<p>The BibHarvest admin tool (oaiharvest) creates temporary XML files in
+<code><prefix>/var/tmp</code> that may be deleted after they are
+uploaded.  For example:
+
+   <blockquote>
+   <pre>   
+   $ find /usr/local/cdsware-DEMO/var/tmp -name "bibharvestadmin.*" -exec \rm -f {} \;   
+   $ find /usr/local/cdsware-DEMO/var/tmp -name "bibconvertrun*" -exec \rm -f {} \;   
+   $ find /usr/local/cdsware-DEMO/var/tmp -name "oaiharvest*" -exec gzip -9 {} \;
    </pre>
    </blockquote>
 
