@@ -308,17 +308,33 @@ def update_lastrun(index):
 def call_bibharvest(prefix, baseurl, harvestpath, fro="", until=""):
     """ A method that calls bibharvest and writes harvested output to disk """
     try:
-        command = '%s/bibharvest -v ListRecords -p %s ' % (bindir, prefix)
+        command = '%s/bibharvest -o %s -v ListRecords -p %s ' % (bindir, harvestpath, prefix)
         if fro!="":
             command += '-f %s ' % fro
         if until!="":
             command += '-u %s ' % until
         command += baseurl
-        (stdin, harvesttext, stderr) = os.popen3(command)
-        harvestread = harvesttext.read()
-        ftmp = open(harvestpath, 'w')
-        ftmp.write(harvestread)
-        ftmp.close()
+	print "Start harvesting"
+	#print command
+        ret = os.system(command)
+	print "Harvesting finished, merging files"
+	harvestdir, filename = os.path.split(harvestpath)
+	#print "get files"
+	files = os.listdir(harvestdir)
+	#print "sort file"
+	files.sort()
+	#print "open dest file"
+	hf = file(harvestpath, 'w')
+	for f in files:
+	    if f[:len(filename)] == filename:
+	        print "processing file %s"%f
+	        rf = file(os.path.join(harvestdir, f), 'r')
+	        hf.write(rf.read())
+		hf.write("\n")
+	        rf.close()
+	        #os.remove(os.path.join(harvestdir, f))
+	hf.close()
+	print "Files merged"
         return 0
     except StandardError, e:
         return (0,e)
@@ -327,7 +343,7 @@ def call_bibconvert(config, harvestpath, convertpath):
     """ A method that reads from a file and converts according to a BibConvert Configuration file. Converted output is returned """
     command = """%s/bibconvert -c %s < %s > %s """ % (bindir, config, harvestpath, convertpath)
     stdout = os.popen(command)
-    return stdout
+    return 0 
 
 def call_bibupload(convertpath):
     """ A method that uploads a file to the database - calls bibUpload """
@@ -608,3 +624,4 @@ def main():
             task_update_status("ERROR")                                               
     else:
         command_line()
+
