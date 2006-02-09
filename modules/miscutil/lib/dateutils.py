@@ -85,9 +85,12 @@ def convert_datestruct_to_dategui(datestruct, ln=cdslang):
     Month is internationalized
     """
     try:
-        month = get_i18n_month_name(datestruct[1], ln=ln)
-        output_format = "%02d " + month + " %04Y, %02H:%02M"
-        return strftime(output_format, datestruct)
+        if datestruct[0] and datestruct[1] and datestruct[2]:
+            month = get_i18n_month_name(datestruct[1], ln=ln)
+            output_format = "%02d " + month + " %04Y, %02H:%02M"
+            return strftime(output_format, datestruct)
+        else:
+            raise ValueError
     except:
         _ = gettext_set_language(ln)
         return _("N/A") 
