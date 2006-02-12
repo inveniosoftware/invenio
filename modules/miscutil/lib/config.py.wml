@@ -170,4 +170,5 @@ cfg_webcomment_nb_reports_before_send_email_to_admin = 5
 cfg_webcomment_nb_comments_in_detailed_view = 1
 cfg_webcomment_nb_reviews_in_detailed_view = 1
 cfg_webcomment_admin_notification_level = 1
-
+cfg_webcomment_timelimit_processing_comments_in_seconds = 20
+cfg_webcomment_timelimit_processing_reviews_in_seconds = 20
