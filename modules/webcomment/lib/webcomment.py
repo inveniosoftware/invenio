@@ -369,7 +369,10 @@ def query_get_user_contact_info(uid):
     @return tuple (nickname, email, last_login), if none found return ()
     Note: for the moment, if no nickname, will return email address up to the '@'
     """
-    query1 = "SELECT email, nickname, last_login FROM user WHERE id=%s"
+    query1 = """SELECT email,
+                     nickname,
+                     DATE_FORMAT(last_login, '%%Y-%%m-%%d %%H:%%i:%%s')
+                     FROM user WHERE id=%s"""
     params1 = (uid,)
     res1 = run_sql(query1, params1)
     if res1:
@@ -412,7 +415,7 @@ def query_get_comment(comID):
                        id_bibrec,
                        id_user,
                        body,
-                       date_creation,
+                       DATE_FORMAT(date_creation, '%%Y-%%m-%%d %%H:%%i:%%s'),
                        star_score,
                        nb_votes_yes,
                        nb_votes_total,
@@ -520,7 +523,7 @@ def query_retrieve_comments_or_remarks (recID, display_order='od', display_since
         display_order = order_dict['od']
     query = """SELECT user.nickname,
                       cmt.id_user,
-                      cmt.date_creation,
+                      DATE_FORMAT(cmt.date_creation, '%%Y-%%m-%%d %%H:%%i:%%s'),
                       cmt.body,
                       %(ranking)s cmt.id
                FROM   %(table)s cmt LEFT JOIN user ON
@@ -561,8 +564,14 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="", note="", sco
     #change general unicode back to utf-8
     msg = msg.encode('utf-8')
     note = note.encode('utf-8')
-    query = "INSERT INTO cmtRECORDCOMMENT (id_bibrec, id_user, body, date_creation, star_score, nb_votes_total, title) " \
-                "VALUES (%s, %s, %s, %s, %s, %s, %s)" 
+    query = """INSERT INTO cmtRECORDCOMMENT (id_bibrec,
+                                           id_user,
+                                           body,
+                                           date_creation,
+                                           star_score,
+                                           nb_votes_total,
+                                           title) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s)"""
     params = (recID, uid, msg, current_date, score, 0, note)
     res = run_sql(query, params)
     if res:
