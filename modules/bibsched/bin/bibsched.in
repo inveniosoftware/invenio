@@ -79,7 +79,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
         return None
 
 def get_my_pid(process,args=''):
-    COMMAND = "ps -C %s o '%%p%%a' | grep '%s %s' | sed -n 1p" % (process,process,args)
+    COMMAND = "ps -C %s o '%%p%%a' | grep '%s %s' | grep -v 'grep' | sed -n 1p" % (process,process,args)
     answer = string.strip(os.popen(COMMAND).read())
     if answer=='':
         answer = 0
@@ -114,8 +114,7 @@ class Manager:
         self.currentrow = ["","","","","","",""]
         wrapper( self.start )
         
-    def handle_keys(self):
-        chr = self.stdscr.getch()
+    def handle_keys(self, chr):
         if chr == -1:
             return
         if self.auto_mode and (chr not in (curses.KEY_UP,curses.KEY_DOWN,curses.KEY_PPAGE,curses.KEY_NPAGE,ord("q"),ord("Q"),ord("a"),ord("A"),ord("1"),ord("2"))):
@@ -280,7 +279,7 @@ class Manager:
         id = self.currentrow[0]
         process = self.currentrow[1]
         status = self.currentrow[5]
-        mypid = get_my_pid(process,str(id))
+        mypid = get_my_pid(process, str(id))
         if mypid!=0:
             os.kill(mypid, signal.SIGINT)
             self.display_in_footer("INT signal sent to process #%s" % mypid)
@@ -439,17 +438,18 @@ class Manager:
         
     def start(self, stdscr):
         ring = 0
-        curses.start_color()
-        curses.init_pair(8, curses.COLOR_WHITE, curses.COLOR_BLACK)
-        curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
-        curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
-        curses.init_pair(4, curses.COLOR_RED, curses.COLOR_BLACK)
-        curses.init_pair(5, curses.COLOR_BLUE, curses.COLOR_BLACK)
-        curses.init_pair(6, curses.COLOR_CYAN, curses.COLOR_BLACK)
-        curses.init_pair(7, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+        if curses.has_colors():
+            curses.start_color()
+            curses.init_pair(8, curses.COLOR_WHITE, curses.COLOR_BLACK)
+            curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)
+            curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
+            curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+            curses.init_pair(4, curses.COLOR_RED, curses.COLOR_BLACK)
+            curses.init_pair(5, curses.COLOR_BLUE, curses.COLOR_BLACK)
+            curses.init_pair(6, curses.COLOR_CYAN, curses.COLOR_BLACK)
+            curses.init_pair(7, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+        
         self.stdscr = stdscr
-        self.stdscr.nodelay(1)
         self.base_panel = curses.panel.new_panel( self.stdscr )
         self.base_panel.bottom()
         curses.panel.update_panels()
@@ -464,10 +464,34 @@ class Manager:
             order = "ASC"
         self.rows = run_sql("SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s" % (where,order))
         self.repaint()
+        ring=0
         while self.running:
-            time.sleep( 0.1 )
-            self.handle_keys()
-            if ring == 20:
+            ring += 1
+            chr = -1
+            try:
+              chr = timed_out(self.stdscr.getch, 1)
+              if chr == 27: # escaping sequence
+                  chr = self.stdscr.getch()
+                  if chr == 79: # arrow
+                      chr = self.stdscr.getch()
+                      if chr == 65: #arrow up
+                          chr = curses.KEY_UP
+                      elif chr == 66: #arrow down
+                          chr = curses.KEY_DOWN
+                      elif chr == 72:
+                          chr = curses.KEY_PPAGE
+                      elif chr == 70:
+                          chr = curses.KEY_NPAGE
+                  elif chr == 91:
+                      chr = self.stdscr.getch()
+                      if chr == 53:
+                          chr = self.stdscr.getch()
+                          if chr == 126:
+                              chr = curses.KEY_HOME
+            except TimedOutExc:
+                chr = -1
+            self.handle_keys(chr)
+            if ring == 4:
                 if self.display == 1:
                     where = "and status='DONE'"
                     order = "DESC"
@@ -477,8 +501,6 @@ class Manager:
                 self.rows = run_sql("SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s" % (where,order))
                 ring = 0
                 self.repaint()
-            else:
-                ring = ring+1
 
             
 class BibSched:
@@ -571,6 +593,26 @@ class BibSched:
                 self.handle_row( row )
             time.sleep(1)
             rows = run_sql("SELECT id,proc,user,UNIX_TIMESTAMP(runtime),sleeptime,arguments,status FROM schTASK ORDER BY runtime ASC")
+
+class TimedOutExc(Exception):
+    def __init__(self, value = "Timed Out"):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
+
+def timed_out(f, timeout, *args, **kwargs):
+    def handler(signum, frame):
+        raise TimedOutExc()
+    
+    old = signal.signal(signal.SIGALRM, handler)
+    signal.alarm(timeout)
+    try:
+        result = f(*args, **kwargs)
+    finally:
+        signal.signal(signal.SIGALRM, old)
+    signal.alarm(0)
+    return result
+
 
 def Log(message):
     log=open(logdir + "/bibsched.log","a")
