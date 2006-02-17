@@ -324,35 +324,35 @@ def print_record(sysno, format='marcxml'):
 
         elif format == "xd":
         # XML Dublin Core format, possibly OAI -- select only some bibXXx fields:
-            out = out + "       <oaidc:dc xmlns=\"http://purl.org/dc/elements/1.1/\" xmlns:oaidc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">\n"
+            out = out + "       <oaidc:dc xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:oaidc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">\n"
 
             for field_ in get_field(sysno, "041__a"):
-                out =  "%s         <language>%s</language>\n" % (out, field_)
+                out =  "%s         <dc:language>%s</dc:language>\n" % (out, field_)
 
             for field_ in get_field(sysno, "100__a"):
-                out =  "%s         <creator>%s</creator>\n" % (out, encode_for_xml(field_))
+                out =  "%s         <dc:creator>%s</dc:creator>\n" % (out, encode_for_xml(field_))
  
             for field_ in get_field(sysno, "700__a"):
-                out =  "%s         <creator>%s</creator>\n" % (out, encode_for_xml(field_))
+                out =  "%s         <dc:creator>%s</dc:creator>\n" % (out, encode_for_xml(field_))
 
             for field_ in get_field(sysno, "245__a"):
-                out =  "%s         <title>%s</title>\n" % (out, encode_for_xml(field_))
+                out =  "%s         <dc:title>%s</dc:title>\n" % (out, encode_for_xml(field_))
 
             for field_ in get_field(sysno, "111__a"):
-                out =  "%s         <title>%s</title>\n" % (out, encode_for_xml(field_))
+                out =  "%s         <dc:title>%s</dc:title>\n" % (out, encode_for_xml(field_))
 
             for field_ in get_field(sysno, "65017a"):
-                out =  "%s         <subject>%s</subject>\n" % (out, encode_for_xml(field_))
+                out =  "%s         <dc:subject>%s</dc:subject>\n" % (out, encode_for_xml(field_))
 
             for field_ in get_field(sysno, "8564_u"):
-                out =  "%s         <identifier>%s</identifier>\n" % (out, encode_for_xml(escape_space(field_)))
+                out =  "%s         <dc:identifier>%s</dc:identifier>\n" % (out, encode_for_xml(escape_space(field_)))
         
             for field_ in get_field(sysno, "520__a"):
-                out = "%s         <description>%s</description>\n" % (out, encode_for_xml(field_))
+                out = "%s         <dc:description>%s</dc:description>\n" % (out, encode_for_xml(field_))
 
             date = get_creation_date(sysno)
  
-            out = "%s         <date>%s</date>\n" % (out, date)
+            out = "%s         <dc:date>%s</dc:date>\n" % (out, date)
             out = out + "    </oaidc:dc>\n"
 
     # print record closing tags:
