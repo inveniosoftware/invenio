@@ -47,6 +47,8 @@ import md5
 import base64
 import unicodedata
 
+from xml.dom import minidom
+
 ## import CDSware stuff:
 from cdsware.config import *
 from cdsware.search_engine_config import *
@@ -2604,7 +2606,12 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 # record 'recID' is not formatted in 'format', so either call BibFormat on the fly or use default format
                 # second, see if we are calling BibFormat on the fly:
                 if cfg_call_bibformat:
-                    out += call_bibformat(recID)
+                    xfm = call_bibformat(recID, format)
+                    dom = minidom.parseString(xfm)
+                    for e in dom.getElementsByTagName('subfield'):
+                        if e.getAttribute('code') == 'g':
+                            for t in e.childNodes:
+                                out += t.data.encode('utf-8')                    
                 else:
                     out += websearch_templates.tmpl_print_record_detailed(
                              ln = ln,
