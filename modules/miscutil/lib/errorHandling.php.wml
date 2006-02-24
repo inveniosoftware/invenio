@@ -24,6 +24,8 @@
 <?
    $ADMINEMAIL = "<ADMINEMAIL>";
 
+   $CFG_CERN_SITE = <CFG_CERN_SITE>;
+
    #######################################################
    #
    # Name:		 errorHandling.php

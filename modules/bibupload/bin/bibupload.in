@@ -60,6 +60,12 @@ if (!extension_loaded('mysql')) {
 // time limit for script execution
 set_time_limit(86340);
 
+$prefix = "@prefix@";
+$exec_prefix="@exec_prefix@";
+$libdir = "@libdir@";
+
+include("${libdir}/php/cdsware/errors/errorHandling.php");
+
 // array of all the "untouchable" field tags
 $strongtags = array("909COo");
 
@@ -1253,7 +1259,13 @@ function integrate ($rec)
     // no record matching the main criteria was found
     if ($recid == "000") {
         // test on A500 system number
-        $oldsysno = strtoupper($rec->get_subfield("970","_","_","a"));
+        $oldsysno = $rec->get_subfield("970","_","_","a");
+
+	// Aleph500 imports for CERN must be done on uppercase keys
+	if ($CFG_CERN_SITE) {
+	    $oldsysno = strtoupper($oldsysno);
+	}
+
         $oldsysnoExists = Test_In_DB($oldsysno,"970__a","bib97x");
         if ($oldsysnoExists)
             $recid = $oldsysnoExists;
