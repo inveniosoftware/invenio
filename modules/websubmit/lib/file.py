@@ -28,6 +28,7 @@ import mimetypes
 import shutil
 import md5
 import urllib
+from xml.sax.saxutils import quoteattr
 from mod_python import apache
 
 from cdsware.config import *
@@ -515,7 +516,7 @@ class BibDocFile:
             req.content_type = self.mime
             req.encoding = self.encoding
             req.filename = self.fullname
-            req.headers_out["Content-Disposition"] = "file; filename=%s" % self.fullname
+            req.headers_out["Content-Disposition"] = "file; filename=%s" % quoteattr(self.fullname)
             req.send_http_header()
             fp = file(self.fullpath,"r")
             content = fp.read()
