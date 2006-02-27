@@ -27,7 +27,8 @@ import zlib
 import urllib
 from mod_python import apache
 
-from cdsware.config import weburl,webdir
+from cdsware.config import weburl,webdir,cdslang
+from cdsware.messages import gettext_set_language
 from cdsware.webpage import page
 from cdsware.dbquery import run_sql
 from cdsware.webuser import getUid,page_not_authorized
@@ -44,7 +45,9 @@ def index(req):
     req.err_headers_out.add("Location", "%s/yourbaskets.py/display?%s" % (weburl, req.args))
     raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
 
-def display(req, action="", title="Your Baskets", delete_alerts="", confirm_action="", id_basket=0, bname="", newname="", newbname="", mark=[], to_basket="", copy_move="", idup="", ordup="", iddown="", orddown="", of="hb"):
+def display(req, action="", title="Your Baskets", delete_alerts="", confirm_action="",
+            id_basket=0, bname="", newname="", newbname="", mark=[], to_basket="",
+            copy_move="", idup="", ordup="", iddown="", orddown="", of="hb"):
 
     uid = getUid(req)
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
@@ -53,14 +56,17 @@ def display(req, action="", title="Your Baskets", delete_alerts="", confirm_acti
     if action=="DELETE":
         title="Delete basket"
     return page(title=title,
-                body=webbasket.perform_display(uid, action, delete_alerts, confirm_action, id_basket, bname, newname, newbname, mark, to_basket, copy_move, idup, ordup, iddown, orddown, of),
+                body=webbasket.perform_display(uid, action, delete_alerts, confirm_action, id_basket,
+                                               bname, newname, newbname, mark, to_basket, copy_move,
+                                               idup, ordup, iddown, orddown, of),
                 navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
                 description="CDS Personalize, Display baskets",
                 keywords="CDS, personalize",
                 uid=uid,
                 lastupdated=__lastupdated__)
 
-def display_public(req, id_basket=0, name="", action="", to_basket="", mark=[], newname="", of="hb"):
+def display_public(req, id_basket=0, name="", action="", to_basket="", mark=[],
+                   newname="", of="hb", ln=cdslang):
     title = "Display basket"
     uid = getUid(req)    
 
@@ -68,14 +74,28 @@ def display_public(req, id_basket=0, name="", action="", to_basket="", mark=[], 
         return page_not_authorized(req, "../yourbaskets.py/display_public")
     if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1 and action == "EXECUTE":
         return page_not_authorized(req, "../yourbaskets.py/display_public")
-        
-    return page(title=title,
-                body=webbasket.perform_display_public(uid, id_basket, name, action, to_basket, mark, newname, of),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
-                description="CDS Personalize, Display baskets",
-                keywords="CDS, personalize",
-                uid=uid,
-                lastupdated=__lastupdated__)
+
+    _ = gettext_set_language(ln)
+    
+    if of and of [0] == 'x':
+        req.content_type = "text/xml"
+        req.send_http_header()
+
+        req.write('''<?xml version="1.0" encoding="UTF-8"?>\n''')
+
+        return webbasket.perform_display_public(uid, id_basket, name, action, to_basket,
+                                                mark, newname, of, ln)
+    
+    else:
+        return page(title=title,
+                    body=webbasket.perform_display_public(uid, id_basket, name, action, to_basket,
+                                                          mark, newname, of, ln),
+                    navtrail='''<a class="navtrail" href="%s/youraccount.py/display">''' % weburl +
+                    _("Your Account") + """</a>""",
+                    description="CDS Personalize, Display baskets",
+                    keywords="CDS, personalize",
+                    uid=uid,
+                    lastupdated=__lastupdated__)
 
 def add(req, recid=[], bid=[], bname=[]):
     """Add records to basket.  If bid isn't set, it'll ask user into which baskets to add them.
