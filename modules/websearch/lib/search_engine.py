@@ -2195,17 +2195,20 @@ def print_results_overview(req, colls, results_final_nb_total, results_final_nb,
              url_args = url_args,
            )
 
-def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0):
+def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=cdslang):
     """Sort records in 'recIDs' list according sort field 'sort_field' in order 'sort_order'.
        If more than one instance of 'sort_field' is found for a given record, try to choose that that is given by
        'sort pattern', for example "sort by report number that starts by CERN-PS".
        Note that 'sort_field' can be field code like 'author' or MARC tag like '100__a' directly."""
 
+    _ = gettext_set_language(ln)
+
     ## check arguments:
     if not sort_field:
         return recIDs
     if len(recIDs) > cfg_nb_records_to_sort:
-        print_warning(req, "Sorry, sorting is allowed on sets of up to %d records only.  Using default sort order (\"latest first\")." % cfg_nb_records_to_sort,"Warning")
+        if of.startswith('h'):
+            print_warning(req, _("Sorry, sorting is allowed on sets of up to %d records only. Using default sort order (\"latest first\").") % cfg_nb_records_to_sort, "Warning")
         return recIDs
 
     sort_fields = string.split(sort_field, ",")
@@ -2228,7 +2231,8 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
                 for row in res:
                     tags.append(row[0])
             else:
-                print_warning(req, "Sorry, '%s' does not seem to be a valid sort option.  Choosing title sort instead." % sort_field, "Error")
+                if of.startswith('h'):
+                    print_warning(req, _("Sorry, '%s' does not seem to be a valid sort option. Choosing title sort instead.") % sort_field, "Error")
                 tags.append("245__a")
     if verbose >= 3:
         print_warning(req, "Sorting by tags %s." % tags)
@@ -3293,7 +3297,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                     results_final_for_all_colls.union(results_final[coll])
                 recIDs = results_final_for_all_colls.items().tolist()
                 if sf: # do we have to sort?
-                    recIDs = sort_records(req, recIDs, sf, so, sp, verbose)
+                    recIDs = sort_records(req, recIDs, sf, so, sp, verbose, of)
                 elif rm: # do we have to rank?
                     results_final_for_all_colls_rank_records_output = rank_records(rm, 0, results_final_for_all_colls,
                                                                                    string.split(p) + string.split(p1) +
@@ -3318,7 +3322,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                     results_final_relevances_prologue = ""
                     results_final_relevances_epilogue = ""
                     if sf: # do we have to sort?
-                        results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose)
+                        results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of)
                     elif rm: # do we have to rank?
                         results_final_recIDs_ranked, results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue, results_final_comments = \
                                                      rank_records(rm, 0, results_final[coll],
