@@ -2484,7 +2484,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 if oai_ids:
                     out += "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\"><subfield code=\"%s\">%s</subfield></datafield>\n" % \
                            (cfg_oaiidtag[0:3], cfg_oaiidtag[3:4], cfg_oaiidtag[4:5], cfg_oaiidtag[5:6], oai_ids[0])
-                out += "<datafield tag=\"980\" ind1=\"\" ind2=\"\"><subfield code=\"a\">DELETED</subfield></datafield>\n"
+                out += "<datafield tag=\"980\" ind1=\"\" ind2=\"\"><subfield code=\"c\">DELETED</subfield></datafield>\n"
             else:
                 for digit1 in range(0,10):
                     for digit2 in range(0,10):
