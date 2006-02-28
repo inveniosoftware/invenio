@@ -30,6 +30,10 @@ from time import localtime, strftime, mktime, sleep
 from string import split
 import smtplib
 
+from email.Header import Header
+from email.Message import Message
+from email.MIMEText import MIMEText
+
 from cdsware.config import *
 from cdsware.search_engine import perform_request_search
 from cdsware.dbquery import run_sql
@@ -135,8 +139,13 @@ def send_email(fromaddr, toaddr, body, attempt=0):
 
 
 def forge_email(fromaddr, toaddr, subject, content):
-    body = 'From: %s\nTo: %s\nContent-Type: text/plain; charset=utf-8\nSubject: %s\n%s' % (fromaddr, toaddr, subject, content)
-    return body
+    msg = MIMEText(content, _charset='utf-8')
+    
+    msg ['From'] = fromaddr
+    msg ['To'] = toaddr
+    msg ['Subject'] = Header(subject, 'utf-8')
+
+    return msg.as_string()
 
 
 def format_frequency(freq):
