@@ -103,7 +103,7 @@ sre_unicode_lowercase_i = sre.compile(unicode(r"(?u)[íìïî]", "utf-8"))
 sre_unicode_lowercase_o = sre.compile(unicode(r"(?u)[óòöôõø]", "utf-8"))
 sre_unicode_lowercase_u = sre.compile(unicode(r"(?u)[úùüû]", "utf-8"))
 sre_unicode_lowercase_y = sre.compile(unicode(r"(?u)[ýÿ]", "utf-8"))
-sre_unicode_lowercase_c = sre.compile(unicode(r"(?u)[ç]", "utf-8"))
+sre_unicode_lowercase_c = sre.compile(unicode(r"(?u)[çć]", "utf-8"))
 sre_unicode_lowercase_n = sre.compile(unicode(r"(?u)[ñ]", "utf-8"))
 sre_unicode_uppercase_a = sre.compile(unicode(r"(?u)[ÁÀÄÂÃÅ]", "utf-8"))
 sre_unicode_uppercase_ae = sre.compile(unicode(r"(?u)[Æ]", "utf-8"))
@@ -112,7 +112,7 @@ sre_unicode_uppercase_i = sre.compile(unicode(r"(?u)[ÍÌÏÎ]", "utf-8"))
 sre_unicode_uppercase_o = sre.compile(unicode(r"(?u)[ÓÒÖÔÕØ]", "utf-8"))
 sre_unicode_uppercase_u = sre.compile(unicode(r"(?u)[ÚÙÜÛ]", "utf-8"))
 sre_unicode_uppercase_y = sre.compile(unicode(r"(?u)[Ý]", "utf-8"))
-sre_unicode_uppercase_c = sre.compile(unicode(r"(?u)[Ç]", "utf-8"))
+sre_unicode_uppercase_c = sre.compile(unicode(r"(?u)[ÇĆ]", "utf-8"))
 sre_unicode_uppercase_n = sre.compile(unicode(r"(?u)[Ñ]", "utf-8"))
 
 def get_alphabetically_ordered_collection_list(collid=1, level=0):
@@ -1689,24 +1689,25 @@ def create_similarly_named_authors_link_box(author_name, ln=cdslang):
         return ""
     # firstly find name comma initial:
     author_name_to_search = sre.sub(r'^([^ ,]+, +[^ ,]).*$', '\\1', author_name)
-    print author_name_to_search
+
     # secondly search for similar name forms:
     similar_author_names = {}
-    for tag in get_field_tags("author"):
-        # deduce into which bibxxx table we will search:
-        digit1, digit2 = int(tag[0]), int(tag[1])
-        bx = "bib%d%dx" % (digit1, digit2)
-        bibx = "bibrec_bib%d%dx" % (digit1, digit2)
-        if len(tag) != 6 or tag[-1:]=='%':
-            # only the beginning of field 't' is defined, so add wildcard character:
-            query = "SELECT bx.value FROM %s AS bx WHERE bx.value LIKE '%s%%' AND bx.tag LIKE '%s%%'" \
-                    % (bx, escape_string(author_name_to_search), tag)
-        else:
-            query = "SELECT bx.value FROM %s AS bx WHERE bx.value LIKE '%s%%' AND bx.tag='%s'" \
-                    % (bx, escape_string(author_name_to_search), tag)
-        res = run_sql(query)
-        for row in res:
-            similar_author_names[row[0]] = 1
+    for name in author_name_to_search, strip_accents(author_name_to_search):
+        for tag in get_field_tags("author"):
+            # deduce into which bibxxx table we will search:
+            digit1, digit2 = int(tag[0]), int(tag[1])
+            bx = "bib%d%dx" % (digit1, digit2)
+            bibx = "bibrec_bib%d%dx" % (digit1, digit2)
+            if len(tag) != 6 or tag[-1:]=='%':
+                # only the beginning of field 't' is defined, so add wildcard character:
+                query = "SELECT bx.value FROM %s AS bx WHERE bx.value LIKE '%s%%' AND bx.tag LIKE '%s%%'" \
+                        % (bx, escape_string(name), tag)
+            else:
+                query = "SELECT bx.value FROM %s AS bx WHERE bx.value LIKE '%s%%' AND bx.tag='%s'" \
+                        % (bx, escape_string(name), tag)
+            res = run_sql(query)
+            for row in res:
+                similar_author_names[row[0]] = 1
     # remove the original name and sort the list:
     try:
         del similar_author_names[author_name]
@@ -1720,10 +1721,10 @@ def create_similarly_named_authors_link_box(author_name, ln=cdslang):
 
         tmp_authors = []
         for out_author in out_authors:
-            tmp_authors.append({
-                               'nb' : get_nbhits_in_bibxxx(out_author, "author"),
-                               'name' : out_author,
-                               })
+            nbhits = get_nbhits_in_bibxxx(out_author, "author")
+            if nbhits:
+                tmp_authors.append({'nb': nbhits,
+                                    'name': out_author})
         out += websearch_templates.tmpl_similar_author_names(
                  ln = ln,
                  weburl = weburl,
