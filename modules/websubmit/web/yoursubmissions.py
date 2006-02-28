@@ -181,9 +181,10 @@ def deleteSubmission(id, action, doctype, u_email):
     run_sql("delete from sbmSUBMISSIONS WHERE doctype=%s and action=%s and email=%s and status='pending' and id=%s",(doctype,action,u_email,id,))
     res = run_sql("select dir from sbmACTION where sactname=%s",(action,))
     dir = res[0][0]
-    if re.search("\.\.",doctype) == None and re.search("\.\.",id) == None and id != "":
-        if os.path.exists("%s/%s/%s/%s" % (storage,dir,doctype,id)):
-            os.rmdir("%s/%s/%s/%s" % (storage,dir,doctype,id))
+    if not ('..' in doctype or '..' in id) and id != "":
+        full = os.path.join(storage, dir, doctype, id)
+        if os.path.isdir(full):
+            shutil.rmtree(full)        
     return ""
 
 def warningMsg(title,req,c=cdsname,ln=cdslang):
