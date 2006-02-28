@@ -24,6 +24,7 @@ import sys
 import time
 import types
 import re
+from urllib import quote
 from mod_python import apache
 
 from cdsware.config import cdsname,cdslang
@@ -72,7 +73,8 @@ def index(req,c=cdsname,ln=cdslang,sub=""):
         mainmenu = req.headers_in['Referer']
     except:
         mainmenu = ""
-    url = "submit.py?doctype=%s&dir=%s&access=%s&act=%s&startPg=1%s&mainmenu=%s" % (doctype,dir,access,action,params,mainmenu)
+    url = "submit.py?doctype=%s&dir=%s&access=%s&act=%s&startPg=1%s&mainmenu=%s" % (
+        doctype,dir,access,action,params,quote(mainmenu))
     req.err_headers_out.add("Location", url)
     raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
     return ""
