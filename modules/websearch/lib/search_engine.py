@@ -3241,7 +3241,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                                                               search_unit_in_bibrec(day1, day2),
                                                               ap,
                                                               aptext= _("No match within your time limits, "
-                                                                        "discarding this condition..."))
+                                                                        "discarding this condition..."),
+                                                              of=of)
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
@@ -3261,7 +3262,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                                                               search_pattern(req, pl, ap=0, ln=ln),
                                                               ap,
                                                               aptext=_("No match within your search limits, "
-                                                                       "discarding this condition..."))
+                                                                       "discarding this condition..."),
+                                                              of=of)
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
