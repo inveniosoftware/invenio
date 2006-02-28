@@ -22,7 +22,7 @@
 import sys    
 from mod_python import apache    
 
-from cdsware.config import weburl,cdsname
+from cdsware.config import weburl,cdsname,cdslang
 from cdsware import search_engine
 from cdsware.webuser import getUid, page_not_authorized
 
@@ -31,7 +31,7 @@ __version__ = "$Id$"
 def index(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", rm="", of="hb", ot="", as="0",
           p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
           recid="-1", recidb="-1", sysno="", id="-1", idb="-1", sysnb="", action="",
-          d1y="0", d1m="0", d1d="0", d2y="0", d2m="0", d2d="0", verbose="0", ap="1", ln="en"):
+          d1y="0", d1m="0", d1d="0", d2y="0", d2m="0", d2d="0", verbose="0", ap="1", ln=cdslang):
     """Main entry point to WebSearch search engine.  See the docstring
        of search_engine.perform_request_search for the detailed
        explanation of arguments.
@@ -72,7 +72,7 @@ def index(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", rm
 def authenticate(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", rm="", of="hb", ot="", as="0",
                  p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
                  recid="-1", recidb="-1", sysno="", id="-1", idb="-1", sysnb="", action="",
-                 d1y="0", d1m="0", d1d="0", d2y="0", d2m="0", d2d="0", verbose="0", ap="1", ln="en"):
+                 d1y="0", d1m="0", d1d="0", d2y="0", d2m="0", d2d="0", verbose="0", ap="1", ln=cdslang):
     """Authenticate the user before launching the search.  See the
        docstring of search_engine.perform_request_search for the
        detailed explanation of arguments.
