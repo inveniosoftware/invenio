@@ -1493,22 +1493,23 @@ class Template:
                     }
 
         for doctype in referees:
-            out += """<UL><LI><b>%(docname)s</b><UL><small>
-                      <LI><A HREF="publiline.py?doctype=%(doctype)s">%(generalref)s</a><br>
-                   """ % {
-                     'docname' : doctype['docname'],
-                     'doctype' : doctype['doctype'],
-                     'generalref' : _("You are general referee"),
-                   }
-            for category in doctype['categories']:
-                out += """<LI><A HREF="publiline.py?doctype=%(doctype)s&categ=%(categ)s">%(referee)s</a><br>""" % {
-                         'referee' : (_("You are referee for category: %(name)s (%(id)s)") % {
-                                      'name' : category['name'],
-                                       'id'   : category['id'],
-                                     }),
-                         'doctype' : doctype['doctype'],
-                         'categ' : category['id'],
-                       }
+            out += """<UL><LI><b>%(docname)s</b><UL><small>""" % doctype
+
+            if doctype ['categories'] is None:            
+                out += '''<LI><A HREF="publiline.py?doctype=%(doctype)s">%(generalref)s</a><br>''' % {
+                    'docname' : doctype['docname'],
+                    'doctype' : doctype['doctype'],
+                    'generalref' : _("You are general referee")}
+
+            else:
+                for category in doctype['categories']:
+                    out += """<LI><A HREF="publiline.py?doctype=%(doctype)s&categ=%(categ)s">%(referee)s</a><br>""" % {
+                        'referee' : (_("You are referee for category: %(name)s (%(id)s)") % {
+                                       'name' : category['name'],
+                                       'id'   : category['id']}),
+                        'doctype' : doctype['doctype'],
+                        'categ' : category['id']}
+                    
             out += "</small></UL></UL>"
 
         out += "</td></tr></table>"

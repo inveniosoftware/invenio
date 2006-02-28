@@ -60,6 +60,10 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
         docname = row[1]
         reftext = ""
         if isReferee(uid,doctype,"*"):
+            referees.append ({'doctype': doctype,
+                              'docname': docname,
+                              'categories': None})
+        else:
             res2 = run_sql("select sname,lname from sbmCATEGORIES where doctype=%s",(doctype,))
             categories = []
             for row2 in res2:
