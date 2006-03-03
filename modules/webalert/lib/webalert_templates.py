@@ -28,6 +28,7 @@ import operator
 
 from cdsware.config import *
 from cdsware.messages import gettext_set_language
+from cdsware.htmlparser import get_as_text, wrap
 
 class Template:
     def tmpl_errorMsg(self, ln, error_msg, rest = ""):
@@ -463,3 +464,90 @@ class Template:
             out += guesttxt
 
         return out
+
+    def tmpl_alert_email_headers(self, name, headers):
+        
+        headers['Subject'] = 'Alert %s run on %s' % (
+            name, time.strftime("%Y-%m-%d"))
+        
+        headers['From'] = 'CDS Alert Engine <%s>' % alertengineemail
+
+    
+    def tmpl_alert_email_body(self, name, url, records, pattern,
+                              catalogues, frequency):
+
+        MAXIDS = 5
+
+
+        l = len(catalogues)
+        if l == 0:
+            collections = ''
+        elif l == 1:
+            collections = "collection: %s\n" % catalogues[0]
+        else:
+            collections = "collections: %s\n" % wrap(', '.join(catalogues))
+
+        if pattern:
+            pattern = 'pattern: %s\n' % pattern
+
+        frequency = {'day': 'daily',
+                     'month': 'monthly',
+                     'year': 'yearly'}[frequency]
+
+        l = len(records)
+        if l == 1:
+            total = '1 record'
+        else:
+            total = '%d records' % l
+
+        
+        body = """\
+Hello,
+
+Below are the results of the email alert that you set up with the CERN
+Document Server. This is an automatic message, please don't reply to
+its address.  For any question, use <%(supportemail)s> instead.
+
+alert name: %(name)s
+%(pattern)s%(collections)sfrequency: %(frequency)s
+run time: %(runtime)s
+found: %(total)s
+url: <%(url)s>
+
+
+""" % {'supportemail': supportemail,
+       'name': name,
+       'pattern': pattern,
+       'collections': collections,
+       'frequency': frequency,
+       'runtime': time.strftime("%a %Y-%m-%d %H:%M:%S"),
+       'total': total,
+       'url': url}
+        
+        
+        for index, recid in enumerate(records[:MAXIDS]):
+            body += self.tmpl_alert_email_record(index, recid)
+
+        if len(records) > MAXIDS:
+            body += '''
+
+Only the first %s records were displayed.  Please consult the search
+URL given at the top of this email to see all the results.
+''' % MAXIDS
+
+
+        body += '''
+
+-- 
+CERN Document Server Alert Service <%s>
+Unsubscribe?  See <%s>
+Need human intervention?  Contact <%s>
+''' % (weburl, weburl + '/youralerts.py/list', supportemail)
+        
+        return body
+
+
+    def tmpl_alert_email_record(self, index, recid):
+        """ Format a single record."""
+
+        return wrap('\n\n%s) %s' % (index+1, get_as_text(recid))) + '\n'

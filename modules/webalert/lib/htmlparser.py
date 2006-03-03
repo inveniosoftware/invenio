@@ -34,8 +34,6 @@ from cdsware import textwrap
 WRAPWIDTH = 72
 
 def wrap(text):
-    global WRAPWIDTH
-    
     lines = textwrap.wrap(text, WRAPWIDTH)
     r = ''
     for l in lines:
@@ -43,8 +41,6 @@ def wrap(text):
     return r
 
 def wrap_records(text):
-    global WRAPWIDTH
-    
     lines = split(text, '\n')
     result = ''
     for l in lines:

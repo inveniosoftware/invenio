@@ -29,6 +29,7 @@ from sre import search, sub
 from time import localtime, strftime, mktime, sleep
 from string import split
 import smtplib
+import datetime
 
 from email.Header import Header
 from email.Message import Message
@@ -39,9 +40,10 @@ from cdsware.search_engine import perform_request_search
 from cdsware.dbquery import run_sql
 from cdsware.htmlparser import *
 
-MAXIDS = 50
-FROMADDR = 'CDS Alert Engine <%s>' % alertengineemail
-ALERTURL = weburl + '/youralerts.py/list'
+import cdsware.template
+webalert_templates = cdsware.template.load('webalert')
+
+
 DEVELOPERADDR = [supportemail]
 
 # Debug levels:
@@ -84,7 +86,6 @@ def get_alerts(query, frequency):
 
 # Optimized version:
 def add_records_to_basket(record_ids, basket_id):
-    global DEBUGLEVEL
   
     nrec = len(record_ids)
     if nrec > 0:
@@ -115,7 +116,6 @@ def get_query(alert_id):
     return r[0][0]
 
 def send_email(fromaddr, toaddr, body, attempt=0):
-    global DEBUGLEVEL
 
     if attempt > 2:
         log('error sending email to %s: SMTP error; gave up after 3 attempts' % toaddr)
@@ -141,43 +141,14 @@ def send_email(fromaddr, toaddr, body, attempt=0):
 def forge_email(fromaddr, toaddr, subject, content):
     msg = MIMEText(content, _charset='utf-8')
     
-    msg ['From'] = fromaddr
-    msg ['To'] = toaddr
-    msg ['Subject'] = Header(subject, 'utf-8')
+    msg['From'] = fromaddr
+    msg['To'] = toaddr
+    msg['Subject'] = Header(subject, 'utf-8')
 
     return msg.as_string()
 
 
-def format_frequency(freq):
-    frequency = freq
-    if frequency == "day":
-        return 'daily'
-    else:
-        return frequency + 'ly'
-
-
-def print_records(record_ids):
-    global MAXIDS
-    msg = ''
-    c = 1
-    for i in record_ids:
-        if c > MAXIDS:
-            break
-        msg += '\n\n%s) %s' % (c, get_as_text(i))
-        c += 1
-
-    if c > MAXIDS:
-        msg += '\n\n' + wrap('Only the first %s records were displayed.  Please consult the search URL given at the top of this email to see all the results.' % MAXIDS)
-
-    return msg
-
-
-
 def email_notify(alert, records, argstr):
-    global FROMADDR
-    global ALERTURL
-    global DEBUGLEVEL
-    global DEVELOPERADDR
 
     if len(records) == 0:
         return
@@ -187,40 +158,30 @@ def email_notify(alert, records, argstr):
     if DEBUGLEVEL > 0:
         msg = "*** THIS MESSAGE WAS SENT IN DEBUG MODE ***\n\n"
 
-    msg += "Hello\n\n"
-    msg += wrap("Below are the results of the email alert that you set up with the CERN Document Server.  This is an automatic message, please don't reply to its address.  For any question, use <%s> instead." % supportemail)
-
-    email = get_email(alert[0])
-        
     url = weburl + "/search.py?" + argstr
-    pattern = get_pattern(argstr)
-    catalogue = get_catalogue(argstr)
-    catword = 'collection'
-    if get_catalogue_num(argstr) > 1:
-        catword += 's'
+
+    # Extract the pattern and catalogue list from the formatted query
+    query = parse_qs(argstr)
+    pattern = query.get('p', [''])[0]
+    catalogues = query.get('c', [])
+
+    frequency = alert[3]
     
-    time = strftime("%Y-%m-%d")
+    msg += webalert_templates.tmpl_alert_email_body(
+        alert[5], url, records, pattern, catalogues, frequency)
 
-    msg += '\n' + wrap('alert name: %s' % alert[5])
-    if pattern:
-        msg += wrap('pattern: %s' % pattern)
-    if catalogue:
-        msg += wrap('%s: %s' % (catword, catalogue))
-    msg += wrap('frequency: %s ' % format_frequency(alert[3]))
-    msg += wrap('run time: %s ' % strftime("%a %Y-%m-%d %H:%M:%S"))
-    recword = 'record'
-    if len(records) > 1:
-        recword += 's'
-    msg += wrap('found: %s %s' % (len(records), recword))
-    msg += "url: <%s/search.py?%s>\n" % (weburl, argstr)
-
-    msg += wrap_records(print_records(records))
-
-    msg += "\n-- \nCERN Document Server Alert Service <%s>\nUnsubscribe?  See <%s>\nNeed human intervention?  Contact <%s>" % (weburl, ALERTURL, supportemail)
-
-    subject = 'Alert %s run on %s' % (alert[5], time)
+    email = get_email(alert[0])    
+        
+    msg = MIMEText(msg, _charset='utf-8')
     
-    body = forge_email(FROMADDR, email, subject, msg)
+    msg['To'] = email
+
+    # Let the template fill in missing fields
+    webalert_templates.tmpl_alert_email_headers(alert[5], msg)
+
+    sender = msg['From']
+    
+    body = msg.as_string()
 
     if DEBUGLEVEL > 0:
         print "********************************************************************************"
@@ -228,17 +189,20 @@ def email_notify(alert, records, argstr):
         print "********************************************************************************"
 
     if DEBUGLEVEL < 2:
-        send_email(FROMADDR, email, body)
+        send_email(sender, email, body)
     if DEBUGLEVEL == 4:
         for a in DEVELOPERADDR:
-            send_email(FROMADDR, a, body)
+            send_email(sender, a, body)
 
 def get_argument(args, argname):
     if args.has_key(argname):
         return args[argname]
     else:
         return []
-    
+
+def _date_to_tuple(date):
+    return [str(part) for part in (date.year, date.month, date.day)]
+
 def get_record_ids(argstr, date_from, date_until):
     args = parse_qs(argstr)
     p       = get_argument(args, 'p')
@@ -265,10 +229,13 @@ def get_record_ids(argstr, date_from, date_until):
     sc      = get_argument(args, 'sc')
     # search  = get_argument(args, 'search')
 
-    d1y, d1m, d1d = date_from
-    d2y, d2m, d2d = date_until
+    d1y, d1m, d1d = _date_to_tuple(date_from)
+    d2y, d2m, d2d = _date_to_tuple(date_until)
 
-    return perform_request_search(of='id', p=p, c=c, cc=cc, f=f, so=so, sp=sp, ot=ot, as=as, p1=p1, f1=f1, m1=m1, op1=op1, p2=p2, f2=f2, m2=m2, op2=op2, p3=p3, f3=f3, m3=m3, sc=sc, d1y=d1y, d1m=d1m, d1d=d1d, d2y=d2y, d2m=d2m, d2d=d2d)
+    return perform_request_search(of='id', p=p, c=c, cc=cc, f=f, so=so, sp=sp, ot=ot,
+                                  as=as, p1=p1, f1=f1, m1=m1, op1=op1, p2=p2, f2=f2,
+                                  m2=m2, op2=op2, p3=p3, f3=f3, m3=m3, sc=sc, d1y=d1y,
+                                  d1m=d1m, d1d=d1d, d2y=d2y, d2m=d2m, d2d=d2d)
 
 
 def get_argument_as_string(argstr, argname):
@@ -292,44 +259,32 @@ def get_catalogue_num(argstr):
     a = get_argument(args, 'c')
     return len(a)
 
-def get_date_from(time, freq):
-    t = mktime(time)
-    if freq == 'day':
-        time2 = localtime(t - 86400)
-    elif freq == 'month':
-        m = time[1] - 1
-        y = time[0]
-        if m == 0:
-            m = 12
-            y -= 1
-        time2 = (y, m, time[2], time[3], time[4], time[5], time[6], time[7], time[8])
-    elif freq == 'week':
-        time2 = localtime(t - 604800)
-        
-    ystr = strftime("%Y", time2)
-    mstr = strftime("%m", time2)
-    dstr = strftime("%d", time2)
 
-    return (ystr, mstr, dstr)
-
-def run_query(query, frequency):
+def run_query(query, frequency, date_until):
     """Return a dictionary containing the information of the performed query.
 
     The information contains the id of the query, the arguments as a
     string, and the list of found records."""
 
-    time = localtime()
-    # Override time here for testing purposes (beware of localtime offset):
-    #time = (2002, 12, 21, 2, 0, 0, 2, 120, 1)
-    # Override frequency here for testing
-    #frequency = 'week'
-    ystr = strftime("%Y", time)
-    mstr = strftime("%m", time)
-    dstr = strftime("%d", time)
-    date_until = (ystr, mstr, dstr)
-    
-    date_from = get_date_from(time, frequency)
+    if frequency == 'day':
+        date_from = date_until - datetime.timedelta(days=1)
 
+    elif frequency == 'week':
+        date_from = date_until - datetime.timedelta(weeks=1)
+
+    else:
+        # Months are not an explicit notion of timedelta (it's the
+        # most ambiguous too). So we explicitely take the same day of
+        # the previous month.
+        d, m, y = (date_until.day, date_until.month, date_until.year)
+        m = m - 1
+
+        if m == 0:
+            m = 12
+            y = y - 1
+
+        date_from = datetime.date(year=y, month=m, day=d)
+    
     recs = get_record_ids(query[1], date_from, date_until)
 
     n = len(recs)
@@ -337,12 +292,14 @@ def run_query(query, frequency):
         log('query %08s produced %08s records' % (query[0], len(recs)))
     
     if DEBUGLEVEL > 2:
-        print "[%s] run query: %s with dates: from=%s, until=%s\n  found rec ids: %s" % (strftime("%c"), query, date_from, date_until, recs)
+        print "[%s] run query: %s with dates: from=%s, until=%s\n  found rec ids: %s" % (
+            strftime("%c"), query, date_from, date_until, recs)
 
-    return {'id_query': query[0], 'argstr': query[1], 'records': recs, 'date_from': date_from, 'date_until': date_until}
+    return {'id_query': query[0], 'argstr': query[1],
+            'records': recs, 'date_from': date_from, 'date_until': date_until}
 
 
-def process_alert_queries(frequency):
+def process_alert_queries(frequency, date):
     """Run the alerts according to the frequency.
 
     Retrieves the queries for which an alert exists, performs it, and
@@ -351,7 +308,7 @@ def process_alert_queries(frequency):
     alert_queries = get_alert_queries(frequency)
 
     for aq in alert_queries:
-        q = run_query(aq, frequency)
+        q = run_query(aq, frequency, date)
         alerts = get_alerts(q, frequency)
         process_alerts(alerts)
 
@@ -373,8 +330,8 @@ def update_arguments(argstr, date_from, date_until):
 
     Absent arguments are added."""
     
-    d1y, d1m, d1d = date_from
-    d2y, d2m, d2d = date_until
+    d1y, d1m, d1d = _date_to_tuple(date_from)
+    d2y, d2m, d2d = _date_to_tuple(date_until)
 
     r = replace_argument(argstr, 'd1y', d1y)
     r = replace_argument(r, 'd1m', d1m)
@@ -416,23 +373,21 @@ def alert_use_notification_p(alert):
     return alert[6] == 'y'
 
 
-def run_alerts():
+def run_alerts(date):
     """Run the alerts.
 
     First decide which alerts to run according to the current local
     time, and runs them."""
-    
-    t = localtime()
-    if t[2] == 1: # first of the month
-        process_alert_queries('month')
-        
-    t = strftime("%A")
-    if t == 'Monday': # first day of the week
-        process_alert_queries('week')
-        
-    process_alert_queries('day')
 
-def process_alert_queries_for_user(uid):
+    if date.day == 1:
+        process_alert_queries('month', date)
+
+    if date.isoweekday() == 1: # first day of the week
+        process_alert_queries('week', date)
+        
+    process_alert_queries('day', date)
+
+def process_alert_queries_for_user(uid, date):
     """Process the alerts for the given user id.
 
     All alerts are with reference date set as the current local time."""
@@ -442,7 +397,7 @@ def process_alert_queries_for_user(uid):
 
     for aq in alert_queries:
         frequency = aq[2]
-        q = run_query(aq, frequency)
+        q = run_query(aq, frequency, date)
         alerts = get_alerts(q, frequency)
         process_alerts(alerts)
 

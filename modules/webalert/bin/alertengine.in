@@ -35,20 +35,28 @@ except ImportError, e:
     import sys
     sys.exit(1)
 
-DEBUGLEVEL = 0
+import datetime
+
 
 def usage():
     print """Usage: alertengine [OPTION]
-Run the alert engine.\n
+Run the alert engine.
+
   -h, --help          display this help and exit
-  -V, --version       output version information and exit\n
+  -V, --version       output version information and exit
+
+  -d  --date="YEAR-MONTH-DAY" run the alertengine as if we were the
+                              specified day, for test purposes (today)
+
 Report bugs to <%s>""" % supportemail
         
 def main():
-    global DEBUGLEVEL
 
+    date = datetime.date.today()
+    
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hV", ["help", "version"])
+        opts, args = getopt.getopt(sys.argv[1:], "hVd:",
+                                   ["help", "version", "date="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -60,9 +68,12 @@ def main():
         if o in ("-V", "--version"):
             print __version__
             sys.exit(0)
-
-    
-    run_alerts()
+        if o in ("-d", "--date"):
+            year, month, day = map(int, a.split('-'))
+            date = datetime.date(year, month, day)
+            
+        
+    run_alerts(date)
 
 if __name__ == "__main__":
     t0 = time()
