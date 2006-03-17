@@ -1,0 +1,67 @@
+#!@PYTHON@
+## -*- mode: python; coding: utf-8; -*-
+##
+## $Id$
+##
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""
+Match bibliographic data in a MARCXML file against database content.
+
+ Usage: bibmatch [options] < input.xml > output.xml
+ Examples:
+  
+ $ bibmatch [--print-new] --field=\"title\" < input.xml > output.xml
+ $ bibmatch --print-match --field=\"245__a\" --mode=\"a\" < input.xml > output.xml
+ $ bibmatch --print-ambiguous --query-string=\"245__a||100__a\" < input.xml > output.xml
+
+ Options:
+
+ Output:
+
+ -0 --print-new (default)
+ -1 --print-match
+ -2 --print-ambiguous
+ -b --batch-output=(filename)
+
+ Simple query:
+
+ -f --field=(field)
+
+ Advanced query:
+
+ -c --config=(config-filename)
+ -q --query-string=(uploader_querystring)
+ -m --mode=(a|e|o|p|r)[3]
+ -o --operator=(a|o)[2]
+
+ General options:
+
+ -h,  --help               print this help and exit
+ -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
+
+"""
+
+try:
+    from cdsware.bibmatch_engine import main
+except ImportError, e:
+    print "Error: %s" % e
+    import sys
+    sys.exit(1)
+
+main()
