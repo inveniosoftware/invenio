@@ -107,12 +107,12 @@ all indexes and collections updated, as necessary.
 anymore (i.e. to wipe it out and to reuse its record ID for another
 record) for a variety of reasons.  For example, some users may have
 put this record already into their baskets in the meantime, or the
-record might have been already announced by alert emails to the
+record might have already been announced by alert emails to the
 external world, or the OAI harvestors might have harvested it already,
 etc.  We usually prefer only to *mark* records as deleted, so that our
 record IDs are ensured to stay permanent.
 
-Thus said, the canonical way to delete a record ID 1234 in CDSware
+<p>Thus said, the canonical way to delete the record #1234 in CDSware
 v0.1.x development branch is to download its XML MARC:
 
        <pre>
@@ -123,7 +123,7 @@ and to mark it as deleted by adding the indicator ``DELETED'' into the
 MARC 980 $$c tag:
 
        <pre>
-       $ vi z.xml
+       $ emacs z.xml
        [...]
         &lt;datafield tag="980" ind1="" ind2=""&gt;
           &lt;subfield code="a"&gt;PREPRINT&lt;/subfield&gt;
@@ -141,36 +141,36 @@ and upload thusly modified record in the `replace' mode:
 and watch the progress via <code>bibsched</code>, as mentioned in the
 <a href="#3">section 3</a>.
 
-<p>This procedure will remove all necessary entries from the words index
-space, the collection cache space, etc, so that the record will not be
-findable anymore from the search interface by usual means.  But, the
-record HTML brief and detailed displays will remain untouched, so that
-the record will still be shown to the end users as it used to be when
-they will access their baskets, or when they access it via direct URL
-distributed by the alert engine (search.py?recid=1234).
-
-<p>In some cases this may not be what is wanted.  For example you may
-want to warn the users that the record has been deleted and hide its
-old contents.  To do this, just modify the contents of the other MARC
-tags as appropriate, for example you can remove everything and leave
-only a title warning:
+<p>This procedure will remove the record from the collection cache so
+that the record won't be findable anymore.  In addition, if the users
+try to access this record via direct URL such as distributed by the
+alert engine (search.py?recid=1234) or via their baskets, they will
+see a message ``This record has been deleted''.  Please note though
+that the original MARCXML of the record stays kept in the database,
+for example you can access it by:
 
 <pre>
-       $ cat z.xml
-       &lt;record&gt;
-       &lt;controlfield tag="001"&gt;1234&lt;/controlfield&gt;
-       &lt;datafield tag="245" ind1="" ind2=""&gt;
-          &lt;subfield code="a"&gt;The record has been deleted&lt;/subfield&gt;
-       &lt;/datafield&gt;
-       &lt;datafield tag="980" ind1="" ind2=""&gt;
-          &lt;subfield code="c"&gt;DELETED&lt;/subfield&gt;
-       &lt;/datafield&gt;
-       &lt;/record&gt;
+   $ python -c "from zlib import decompress; \\
+                from cdsware.dbquery import run_sql; \\
+                print decompress(run_sql('SELECT value FROM bibfmt \\
+                WHERE id_bibrec=1234 AND format=\'xm\'')[0][0])"
 </pre>
 
-so that the end users would see a message ``The record has been
-deleted'' instead of the usual title, authors, and stuff in their
-baskets.
+<p>In some cases you may want to hide the record from the searches,
+but to leave it accessible via direct URLs or via baskets.  In this
+case the best it to alter its collection tag (980) to some
+non-existent collection, for example:
+
+<pre>
+   $ wget -O z.xml 'http:://localhost/search.py?recid=1234&of=xm'
+   $ perl -pi -e 's,<subfield code="a">ARTICLE</subfield>,<subfield code="a">HIDDENARTICLE</subfield>,g' z.xml
+   $ bibupload -r z.xml
+</pre>
+
+This will make the record non-existent as far as the search engine is
+concerned, because it won't belong to any existing collection, but the
+record will exist ``on its own'' and the users knowing its recID will
+be able to access it.
 
 <p>P.S. Note that the ``bibXXx'' tables will keep having entries for the
      deleted records.  These entries are to be cleaned from time to
