@@ -208,7 +208,7 @@ The steps to perform are:
     /path/to/cdsware/bin/dbexec # rewind the last indexing time
   $ echo "UPDATE rnkMETHOD SET last_updated='0000-00-00 00:00:00';" | \
     /path/to/cdsware/bin/dbexec # rewind the last ranking time
-  $ bibindex -f50000 -wcollection # reindex the collection index (slow)
+  $ bibindex -f50000 -wcollection # reindex the collection index (fast)
   $ webcoll -f # recreate the collection cache
   $ bibsched # run the two above-submitted tasks  
   $ sudo apachectl restart 
