@@ -572,6 +572,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
              rg = rg,
              formats = formats,
              of = of,
+             pl = pl
            )
 
 def create_navtrail_links(cc=cdsname,
@@ -3504,4 +3505,3 @@ def profile(p="", f="", c=cdsname):
 ## profiling:
 #profile("of the this")
 #print perform_request_search(p="ellis")
-
