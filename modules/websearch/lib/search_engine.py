@@ -1496,6 +1496,8 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
         index_id = get_index_id(f)
         if index_id:
             bibwordsX = "idxWORD%02dF" % index_id
+        else:
+            return HitSet() # word index f does not exist
 
     # wash 'word' argument and construct query:
     word = string.replace(word, '*', '%') # we now use '*' as the truncation character
