@@ -1069,7 +1069,7 @@ class Template:
             </table>"""
         return out
 
-    def tmpl_search_box(self, ln, weburl, as, cc, cc_intl, ot, sp, action, fieldslist, f1, f2, f3, m1, m2, m3, p1, p2, p3, op1, op2, rm, p, f, coll_selects, d1y, d2y, d1m, d2m, d1d, d2d, sort_formats, sf, so, ranks, sc, rg, formats, of):
+    def tmpl_search_box(self, ln, weburl, as, cc, cc_intl, ot, sp, action, fieldslist, f1, f2, f3, m1, m2, m3, p1, p2, p3, op1, op2, rm, p, f, coll_selects, d1y, d2y, d1m, d2m, d1d, d2d, sort_formats, sf, so, ranks, sc, rg, formats, of, pl):
         """
           Displays the *Nearest search terms* box
 
@@ -1114,6 +1114,8 @@ class Template:
           - 'formats' *array* - available output formats
 
           - 'of' *string* - the selected output format
+
+          - 'pl' *string* - `limit to' search pattern
         """
 
         # load the right message language
@@ -1330,25 +1332,26 @@ class Template:
              }
 
         ## thirdly, print search limits, if applicable:
-        if action != _("Browse") and p1:
+        if action != _("Browse") and pl:
             out += """<table class="searchbox">
                        <thead>
                         <tr>
                           <th class="searchboxheader">
-                            Limit to:
+                            %(limitto)s:
                           </th>
                         </tr>
                        </thead>
                        <tbody>
                         <tr valign="bottom">
                           <td class="searchboxbody">
-                           <input type="text" name="pl" size="%(sizepattern)d" value="%(p1)s">
+                           <input type="text" name="pl" size="%(sizepattern)d" value="%(pl)s">
                           </td>
                         </tr>
                        </tbody>
                       </table>""" % {
+                        'limitto' : _("Limit to"),
                         'sizepattern' : cfg_advancedsearch_pattern_box_width,
-                        'p1' : cgi.escape(p1, 1),
+                        'pl' : cgi.escape(pl, 1),
                       }
 
         ## fourthly, print from/until date boxen, if applicable:
