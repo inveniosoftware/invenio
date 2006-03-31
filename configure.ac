@@ -457,6 +457,13 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/bibconvert/doc/hacking/Makefile \
 	  modules/bibconvert/etc/Makefile \
 	  modules/bibconvert/lib/Makefile \
+	  modules/bibmatch/Makefile \
+	  modules/bibmatch/bin/Makefile \
+	  modules/bibmatch/bin/bibmatch \
+	  modules/bibmatch/doc/Makefile \
+	  modules/bibmatch/doc/admin/Makefile \
+	  modules/bibmatch/etc/Makefile \
+	  modules/bibmatch/lib/Makefile \
 	  modules/bibedit/Makefile \
 	  modules/bibedit/bin/Makefile \
 	  modules/bibedit/bin/refextract \
