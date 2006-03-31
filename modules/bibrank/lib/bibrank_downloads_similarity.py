@@ -84,8 +84,10 @@ def calculate_reading_similarity_list(recid, type="pageviews"):
     else: # default
         tablename = "rnkPAGEVIEWS"        
     # firstly compute the set of client hosts who consulted recid:
-    client_host_list = run_sql("SELECT DISTINCT(client_host) FROM %s WHERE id_bibrec=%s;" % \
-                               (tablename, recid))
+    client_host_list = run_sql("SELECT DISTINCT(client_host)" \
+                               "  FROM " + tablename + \
+                               " WHERE id_bibrec=%s", 
+                               (recid,))
     # secondly look up all recids that were consulted by these client hosts,
     # and order them by the number of different client hosts reading them:
     res = []
@@ -94,8 +96,9 @@ def calculate_reading_similarity_list(recid, type="pageviews"):
         client_host_list = client_host_list.replace("L", "")
         client_host_list = client_host_list.replace("[", "")
         client_host_list = client_host_list.replace("]", "")
-        res = run_sql("SELECT id_bibrec,COUNT(DISTINCT(client_host)) AS c FROM %s " \
-                      "WHERE client_host IN (%s) AND id_bibrec != %s " \
-                      "GROUP BY id_bibrec ORDER BY c DESC LIMIT 10;" % \
-                      (tablename, client_host_list, recid))
+        res = run_sql("SELECT id_bibrec,COUNT(DISTINCT(client_host)) AS c" \
+                      "  FROM " + tablename + \
+                      " WHERE client_host IN (%s) AND id_bibrec != %s" \
+                      " GROUP BY id_bibrec ORDER BY c DESC LIMIT 10",
+                      (client_host_list, recid))
     return res
