@@ -677,12 +677,12 @@
                      . "fieldnb, fidesc, fitext, level, sdesc, checkn, "
                      . "cd, md, fiefi1, fiefi2) VALUES('"
                      . "${subToAdd}$doctype', '" . $element["pagenb"]
-                     . "', '" . $element["fieldnb"] . "', '"
-                     . $element["fidesc"] . "', '" . $element["fitext"]
-                     . "', '" . $element["level"] . "', '"
-                     . $element["sdesc"] . "', '" . $element["checkn"]
-                     . "', '$theDate', '$theDate', '" . $element["fiefi1"]
-                     . "', '" . $element["fiefi2"] . "')";
+                     . "', '" . mysql_escape_string($element["fieldnb"]) . "', '"
+                     . mysql_escape_string($element["fidesc"]) . "', '" . mysql_escape_string($element["fitext"])
+                     . "', '" . mysql_escape_string($element["level"]) . "', '"
+                     . mysql_escape_string($element["sdesc"]) . "', '" . mysql_escape_string($element["checkn"])
+                     . "', '$theDate', '$theDate', '" . mysql_escape_string($element["fiefi1"])
+                     . "', '" . mysql_escape_string($element["fiefi2"]) . "')";
 
                      # Now execute the above query string...
                      $eleInsRes = mysql_query($eleInsStr);
