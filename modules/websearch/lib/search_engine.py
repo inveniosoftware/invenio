@@ -1822,8 +1822,6 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
     ## determine browse field:
     if not f and string.find(p, ":") > 0: # does 'p' contain ':'?
         f, p = split(p, ":", 1)
-    ## wash 'p' argument:
-    p = sre_quotes.sub("", p)
     ## We are going to take max(n_below, n_above) as the number of
     ## values to ferch from bibXXx.  This is needed to work around
     ## MySQL UTF-8 sorting troubles in 4.0.x.  Proper solution is to
@@ -1903,8 +1901,6 @@ def get_nbhits_in_bibxxx(p, f):
     ## determine browse field:
     if not f and string.find(p, ":") > 0: # does 'p' contain ':'?
         f, p = split(p, ":", 1)
-    ## wash 'p' argument:
-    p = sre_quotes.sub("", p)
     ## construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
     if str(f[0]).isdigit() and str(f[1]).isdigit():
