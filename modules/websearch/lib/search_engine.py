@@ -1555,8 +1555,8 @@ def search_unit_in_bibxxx(p, f, type):
         # deduce desired MARC tags on the basis of chosen 'f'
         tl = get_field_tags(f)
         if not tl:
-            # by default we are searching in author index:
-            tl = get_field_tags("author")
+            # f index does not exist, nevermind
+            pass
     # okay, start search:
     l = [] # will hold list of recID that matched
     for t in tl:
