@@ -570,7 +570,7 @@ class Template:
         out = ''
         if type == 'r':
             out += """<input type="hidden" name="cc" value="%(name)s">""" % {
-                     'name' : father.name,
+                     'name' : cgi.escape(father.name, 1),
                    }
 
         if len(sons):
@@ -1132,7 +1132,7 @@ class Template:
                """ % {
                  'ccname' : cc_intl,
                  'weburl' : weburl,
-                 'cc' : cc,
+                 'cc' : cgi.escape(cc, 1),
                  'as' : as,
                  'ln' : ln
                }
@@ -1453,8 +1453,8 @@ class Template:
     def tmpl_input_hidden(self, name, value):
         "Produces the HTML code for a hidden field "
         return """<input type="hidden" name="%(name)s" value="%(value)s">""" % {
-                 'name' : name,
-                 'value' : value,
+                 'name' : cgi.escape(str(name), 1),
+                 'value' : cgi.escape(str(value), 1),
                }
 
     def _add_mark_to_field(self, value, fields, ln, chars = 1):
@@ -1845,7 +1845,7 @@ class Template:
                     # get_fieldcodes():
                     if fieldargs.has_key(fieldcode):
                         for val in fieldargs[fieldcode]:
-                            out += self.tmpl_input_hidden(name = cgi.escape(fieldcode), value = cgi.escape(val))
+                            out += self.tmpl_input_hidden(name = fieldcode, value = val)
             out += """&nbsp; %(jump)s <input type="text" name="jrec" size="4" value="%(jrec)d">""" % {
                      'jump' : _("jump to record:"),
                      'jrec' : jrec,
