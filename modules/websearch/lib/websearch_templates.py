@@ -1921,7 +1921,7 @@ class Template:
         for row in rows:
             out += """
                     <tr><td valign="top" align="right" nowrap><input name="recid" type="checkbox" value="%(recid)s">
-                    %(number)s
+                    %(number)s.
                    """ % row
             if row['relevance']:
                 out += """<br><div class="rankscoreinfo"><a title="rank score">%(prologue)s%(relevance)s%(epilogue)s</a></div>""" % {
