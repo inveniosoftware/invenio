@@ -1772,7 +1772,7 @@ def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang, intro_text_p
 
     intro = ""
     if intro_text_p: # add full leading introductory text
-        intro = _("Search term <em>%s</em>") % p
+        intro = _("Search term <em>%s</em>") % (p.startswith("%") and p.endswith("%") and p[1:-1] or p)
         if f:
             intro += " " + _("inside <em>%s</em> index") % get_field_i18nname(f, ln)
         intro += " " + _("did not match any record. Nearest terms in any collection are:")
