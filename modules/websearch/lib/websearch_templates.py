@@ -2103,8 +2103,8 @@ class Template:
         # then print hits per collection:
         for coll in colls:
             if results_final_nb.has_key(coll['code']) and results_final_nb[coll['code']] > 0:
-                out += """<strong><a href="\#%(coll)s">%(coll_name)s</a></strong>,
-                      <a href="\#%(coll)s">%(number)s</a><br>""" % {
+                out += """<strong><a href="#%(coll)s">%(coll_name)s</a></strong>,
+                      <a href="#%(coll)s">%(number)s</a><br>""" % {
                         'coll' : urllib.quote(coll['code']),
                         'coll_name' : coll['name'],
                         'number' : _("<strong>%s</strong> records found") % self.tmpl_nice_number(results_final_nb[coll['code']], ln)
