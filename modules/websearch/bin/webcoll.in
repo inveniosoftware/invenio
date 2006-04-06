@@ -600,6 +600,7 @@ class Collection:
                    css_class = 'address',
                    values = values
                   )
+        return box
 
     def create_searchwithin_selection_box(self, fieldname='f', value='', ln='en'):
         "Produces 'search within' selection box for the current collection."
