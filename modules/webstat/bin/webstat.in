@@ -21,17 +21,39 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## fill config variables:
+VERSION=$Id$
 LISPIMAGEDIR=@prefix@/lib/lisp/cdsware
 CONFIGDIR=@prefix@/etc/webstat
 CLISP=@CLISP@
 CMUCL=@CMUCL@
 SBCL=@SBCL@
 
+## usage helper function:
+usage () {
+    echo "Usage:" $0 "[options] <httpd-log-file>"
+    echo "General options:"
+    echo "  -h, --help             Print this help."
+    echo "  -V, --version          Print version information."
+    echo "Description: print interesting usage stats from the Apache log file."
+    echo "Note: Please analyze only moderately-sized logs, e.g. for a day or a week."
+}
+
+## looking for version number?
+if [ $1 = "-V" ] || [ $1 = "--version" ]; then
+    echo $VERSION
+    exit 1
+fi
+
+## looking for help?
+if [ $1 = "-h" ] || [ $1 = "--help" ]; then
+    usage
+    exit 1
+fi
+
 ## do we have enough arguments?
 if [ ! -n "$1" ]; then
     echo "Error: Not enough arguments."
-    echo "Usage:" $0 "<httpd-log-file>"
-    echo "Note: Please analyze only moderately-sized logs, e.g. for a day or a week."
+    usage
     exit 1
 fi
 
@@ -40,14 +62,12 @@ FILECFG=${CONFIGDIR}/webstat.cfg
 FILELOG=$1
 if [ ! -f $FILECFG ]; then 
     echo "Error: config file ${FILECFG} not found."
-    echo "Usage:" $0 "<httpd-log-file>"
-    echo "Note: Please analyze only moderately-sized logs, e.g. for a day or a week."
+    usage
     exit 1
 fi
 if [ ! -f $FILELOG ]; then 
     echo "Error: httpd log file not found."
-    echo "Usage:" $0 "<httpd-log-file>"
-    echo "Note: Please analyze only moderately-sized logs, e.g. for a day or a week."
+    usage
     exit 1
 fi
 
