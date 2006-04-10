@@ -55,6 +55,10 @@
       print $__version__."\n";
       exit();
     }
+    if ($value == "-h" || $value == "--help") {
+      print "Usage:\n\tbibformat [itype=<input type>] [otype=<output type>]\n";
+      exit();
+    }
     $par=explode("=", strtoupper(trim($value)));
     if(count($par)>1)
     {
