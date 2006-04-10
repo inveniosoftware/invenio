@@ -23,7 +23,7 @@
 """Call BibFormat engine and create HTML brief (and other) formats for bibliographic records.
    Upload formats via BibUpload."""
 
-__version__ = "<: print generate_pretty_version_string('$Id$'); :>"
+__version__ = "$Id$"
 
 ## import interesting modules:
 try:
