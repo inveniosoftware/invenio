@@ -350,16 +350,15 @@ def print_recs(listofrec,format=1):
 def record_xml_output(rec):
     """generates the XML for record 'rec' and returns it as a string"""
     xmltext = "<record>\n"
-    #add the tag 'tag' to each field in rec[tag]
-    fields=[]
-
-    for tag in rec.keys():
-        for field in rec[tag]:
-            fields.append((tag,field))
-    record_order_fields(fields)
-    
-    for field in fields:
-        xmltext = "%s%s" % (xmltext,field_xml_output(field[1],field[0]))#field[0]=tag
+    if rec:
+        # add the tag 'tag' to each field in rec[tag]
+        fields=[]
+        for tag in rec.keys():
+            for field in rec[tag]:
+                fields.append((tag,field))
+        record_order_fields(fields)    
+        for field in fields:
+            xmltext = "%s%s" % (xmltext,field_xml_output(field[1],field[0]))#field[0]=tag
     xmltext = "%s</record>" % xmltext
     return xmltext
 
