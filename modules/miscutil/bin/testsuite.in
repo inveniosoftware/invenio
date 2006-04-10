@@ -22,7 +22,10 @@
 
 """Run CDSware test suite."""
 
+__version__ = "$Id$"
+
 try:
+    import getopt
     import unittest
     import sys
 except ImportError, e:
@@ -49,6 +52,15 @@ except ImportError, e:
     import sys
     sys.exit(1)
 
+def usage():
+    """Print usage info on standard error output."""
+    sys.stderr.write("Usage: %s [options]\n" % sys.argv[0])
+    sys.stderr.write("General options:\n")
+    sys.stderr.write("  -h, --help      \t\t Print this help.\n")
+    sys.stderr.write("  -V, --version   \t\t Print version information.\n")
+    sys.stderr.write("Description: run CDSware test suite.\n")
+    return
+
 def create_all_test_suites():
     """Return all tests suites for all CDSware modules."""
     return unittest.TestSuite((search_engine_tests.create_test_suite(),
@@ -71,5 +83,17 @@ def print_info_line():
     print "=" * len(info_line)
 
 if __name__ == "__main__":
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hV", ["help", "version"])
+    except getopt.GetoptError:
+        usage()
+        sys.exit(2)
+    for opt in opts:
+        if opt[0] in ("-V","--version"):
+            print __version__
+            sys.exit(0)
+        elif opt[0] in ("-h","--help"):
+            usage()
+            sys.exit(0)
     print_info_line()
     unittest.TextTestRunner(verbosity=2).run(create_all_test_suites())
