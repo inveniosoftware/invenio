@@ -747,27 +747,6 @@ class Collection:
         self.update_reclist_run_already = 1
         return 0
 
-def usage(code, msg=''):
-    "Prints usage info."
-    if msg:
-        sys.stderr.write("Error: %s.\n" % msg)
-    sys.stderr.write("Usage: %s <action> [collection][+]\n" % sys.argv[0])
-    sys.stderr.write("""Description:
-    %s updates the collection cache
-    (record universe for a given collection plus web page elements)
-    based on WML and MySQL configuration parameters.
-    If the collection name is passed as the second argument, it'll update
-    this collection only.  If the collection name is immediately followed
-    by a plus sign, it will also update all its desdendants.  The
-    top-level collection name may be entered as the void string.\n""" % sys.argv[0])
-    sys.stderr.write("Example: %s update-reclist\n" % sys.argv[0])
-    sys.stderr.write("Example: %s update-webpage\n" % sys.argv[0])
-    sys.stderr.write("Example: %s update-webpage \"Articles & Preprints\"\n" % sys.argv[0])
-    sys.stderr.write("Example: %s update-webpage \"Articles & Preprints\"+\n" % sys.argv[0])
-    sys.stderr.write("Example: %s update-webpage \"\"\n" % sys.argv[0])
-    sys.stderr.write("Example: %s update-reclist \"\"+\n" % sys.argv[0])
-    sys.exit(code)
-
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
     """Returns a date string according to the format string.
        It can handle normal date strings and shifts with respect
