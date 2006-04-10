@@ -24,7 +24,7 @@
    $mysql_docid = "@DBUSER@";
    $mysql_docpw = "@DBPASS@";
 
-   $__version__ = "$Id$";
+   $__version__ = '$Id$';
 
    ##########################################################################
    # file: 	  bibupload
