@@ -21,6 +21,8 @@
 oaiharvest implementation.  See oaiharvest executable for entry point.
 """
 
+__version__ = "$Id$"
+
 from marshal import loads,dumps
 import getopt
 import getpass
@@ -435,7 +437,7 @@ def command_line():
             if opt == ("-h","")  or opt == ("--help",""):
                 usage(1)
             elif opt == ("-V","")  or opt == ("--version",""):
-                print "Version 0.0 FIXME"
+                print __version__
                 sys.exit(1)
             elif opt[0] in ["--verbose", "-v"]:
                 options["verbose"] = int(opt[1])
