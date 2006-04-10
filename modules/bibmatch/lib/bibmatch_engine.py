@@ -19,6 +19,7 @@
 
 """BibMatch tool to match records with database content."""
 
+__version__ = "$Id$"
 
 try:
     import fileinput
@@ -77,9 +78,10 @@ def usage():
  General options:
 
  -h,  --help               print this help and exit
+ -V,  --version            print version information and exit
  -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
 
-    """
+    """ % sys.argv[0]
     sys.exit(1)
 
     return
@@ -273,12 +275,13 @@ def main():
     # qrystr - querystring in the UpLoader format
     
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"012hm:f:q:c:nv:o:b:",
+        opts, args = getopt.getopt(sys.argv[1:],"012hVm:f:q:c:nv:o:b:",
                  [
                    "print-new",
                    "print-match",
                    "print-ambiguous",
                    "help",
+                   "version",
                    "mode=",
                    "field=",
                    "query-string=",
@@ -325,6 +328,10 @@ def main():
             noprocess = 1
         if opt in ["-h", "--help"]:
             usage()
+            sys.exit(0)
+        if opt in ["-V", "--version"]:
+            print __version__
+            sys.exit(0)
         if opt in ["-v", "--verbose"]:
             verbose = int(opt_value)
         if opt in ["-q", "--query-string"]:
