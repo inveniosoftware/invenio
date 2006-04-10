@@ -30,19 +30,19 @@ from mod_python import apache
 from cdsware.dbquery import run_sql
 from cdsware.oai_repository_config import *
 from cdsware import oai_repository
-from cdsware.config import logdir
+from cdsware.config import cachedir
 
 def index (req):
     "OAI repository interface"
 
 ## check availability
 
-    if os.path.exists("%s/RTdata/last_harvest_date" % logdir):
+    if os.path.exists("%s/RTdata/last_harvest_date" % cachedir):
         req.err_headers_out["Status-Code"] = "503"
         req.err_headers_out["Retry-After"] = "60"
         req.status = apache.HTTP_SERVICE_UNAVAILABLE
         return "%s" % apache.OK
-    command = "date > %s/RTdata/last_harvest_date" % logdir   
+    command = "date > %s/RTdata/last_harvest_date" % cachedir   
     os.system(command)
 
 ## parse input parameters
@@ -122,6 +122,6 @@ def index (req):
         req.write(oai_error)
         req.write(oai_repository.oai_footer(""))
 
-    command = "rm %s/RTdata/last_harvest_date" % logdir
+    command = "rm %s/RTdata/last_harvest_date" % cachedir
     os.system(command)
     return "\n"
