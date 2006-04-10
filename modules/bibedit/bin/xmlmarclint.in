@@ -45,7 +45,7 @@ badrecords = []
 listofrecs = []
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "hVv:", ["verbose=", "help", "version"])
+    opts, args = getopt.getopt(sys.argv[1:], "hVv:", ["help", "version", "verbose="])
 except getopt.GetoptError:
     print cmdusage
     sys.exit(2)
