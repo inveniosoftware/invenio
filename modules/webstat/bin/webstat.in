@@ -41,13 +41,13 @@ usage () {
 ## looking for version number?
 if [ "$1" = "-V" ] || [ "$1" = "--version" ]; then
     echo $VERSION
-    exit 1
+    exit 0
 fi
 
 ## looking for help?
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     usage
-    exit 1
+    exit 0
 fi
 
 ## do we have enough arguments?
