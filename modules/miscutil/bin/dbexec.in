@@ -21,6 +21,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## fill config variables:
+VERSION='$Id$'
 MYSQL="@MYSQL@"
 DBHOST="@DBHOST@"
 DBNAME="@DBNAME@"
@@ -38,7 +39,7 @@ fi
 
 # is version called?
 if [ "$1" = "-V" ] || [ "$1" = "--version" ]; then
-    echo "$Id$"
+    echo $VERSION
     exit 0
 fi 
  
