@@ -19,6 +19,8 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+   $__version__ = '$Id$';
+
    ########################################################
    #
    # Description:  Creates GIF thumbnails of bigger size x pixels
@@ -46,6 +48,19 @@
    $GIFINTER="@GIFINTER@";
    $GIFRSIZE="@GIFRSIZE@";
 
+   foreach($argv as $value)
+   {
+     if ($value == "-V" || $value == "--version") {
+       print $__version__."\n";
+       exit();
+     }
+     if ($value == "-h" || $value == "--help") {
+       print "usage : thumbmaker <path_to_picture> <path_to_thumbnail> "
+             . "<max_thumbnail_size>\n";
+       exit();
+     }
+   }
+ 
    if ($DJPEG == "")
    {
       print "\nthumbmaker: Cannot find djpeg\n";
