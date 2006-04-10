@@ -21,7 +21,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## fill config variables:
-VERSION=$Id$
+VERSION='$Id$'
 LISPIMAGEDIR=@prefix@/lib/lisp/cdsware
 CONFIGDIR=@prefix@/etc/webstat
 CLISP=@CLISP@
@@ -39,13 +39,13 @@ usage () {
 }
 
 ## looking for version number?
-if [ $1 = "-V" ] || [ $1 = "--version" ]; then
+if [ "$1" = "-V" ] || [ "$1" = "--version" ]; then
     echo $VERSION
     exit 1
 fi
 
 ## looking for help?
-if [ $1 = "-h" ] || [ $1 = "--help" ]; then
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     usage
     exit 1
 fi
@@ -62,12 +62,10 @@ FILECFG=${CONFIGDIR}/webstat.cfg
 FILELOG=$1
 if [ ! -f $FILECFG ]; then 
     echo "Error: config file ${FILECFG} not found."
-    usage
     exit 1
 fi
 if [ ! -f $FILELOG ]; then 
-    echo "Error: httpd log file not found."
-    usage
+    echo "Error: httpd log file ${FILELOG} not found."
     exit 1
 fi
 
