@@ -37,7 +37,6 @@ from cdsware.access_control_admin import acc_isRole
 from cdsware.webpage import page, create_error_box
 from cdsware.webuser import getUid, get_email
 from cdsware.dbquery import run_sql
-from cdsware.messages import *
 from cdsware.websubmit_config import *
 
 from cdsware.messages import gettext_set_language

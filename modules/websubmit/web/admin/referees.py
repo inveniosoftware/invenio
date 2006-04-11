@@ -32,7 +32,7 @@ from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import *
 from cdsware.webpage import page, create_error_box
 from cdsware.webuser import getUid, get_email, list_registered_users
-from cdsware.messages import *
+from cdsware.messages import wash_language
 from cdsware.websubmit_config import *
 
 def index(req,c=cdsname,ln=cdslang,todo="",id="",doctype="",categ="",addusers="",warningText="",role=""):

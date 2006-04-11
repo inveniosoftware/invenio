@@ -33,7 +33,7 @@ from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import *
 from cdsware.webpage import page, create_error_box
 from cdsware.webuser import getUid, get_email, list_registered_users, page_not_authorized
-from cdsware.messages import *
+from cdsware.messages import gettext_set_language, wash_language
 from cdsware.websubmit_config import *
 from cdsware.search_engine import search_pattern
 from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
@@ -41,7 +41,6 @@ from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 execfile("%s/cdsware/websubmit_functions/Retrieve_Data.py" % pylibdir)
 execfile("%s/cdsware/websubmit_functions/mail.py" % pylibdir)
 
-from cdsware.messages import gettext_set_language
 import cdsware.template
 websubmit_templates = cdsware.template.load('websubmit')
 

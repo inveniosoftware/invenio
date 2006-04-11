@@ -34,11 +34,10 @@ from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import acc_isRole
 from cdsware.webpage import page, create_error_box
 from cdsware.webuser import getUid, get_email
-from cdsware.messages import *
 from cdsware.websubmit_config import *
 from cdsware.file import *
 
-from cdsware.messages import gettext_set_language
+from cdsware.messages import gettext_set_language, wash_language
 import cdsware.template
 websubmit_templates = cdsware.template.load('websubmit')
 

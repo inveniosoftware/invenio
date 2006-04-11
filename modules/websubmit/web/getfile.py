@@ -31,7 +31,6 @@ from cdsware.access_control_engine import acc_authorize_action
 from cdsware.access_control_admin import acc_isRole
 from cdsware.webpage import page, create_error_box
 from cdsware.webuser import getUid, get_email, page_not_authorized
-from cdsware.messages import *
 from cdsware.websubmit_config import *
 from cdsware.file import *
 from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
