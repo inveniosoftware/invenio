@@ -1,0 +1,69 @@
+#!@PYTHON@
+## -*- mode: python; coding: utf-8; -*-
+##
+## $Id$
+##
+## This file is part of the CERN Document Server Software (CDSware).
+## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
+##
+## The CDSware is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## The CDSware is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""
+ OAI repository archive and management tool
+
+ Usage:  oaiarchive [options]
+
+ Options:
+
+     -s --set=       Specify setSpec
+     -h --help       Print this help
+     -V --version    Print version information and exit
+     
+     -a --add        Add records to OAI repository
+     -d --delete     Remove records from OAI repository
+     -r --report     Print OAI repository status
+     -i --info       Give info about OAI set (default)
+     
+     -u --upload     Upload records
+     -n --no-process Do not upload records (default)
+
+ Examples:
+     
+     Expose set -setname- via OAI gateway
+     oaiarchive --set='setname' --add --upload
+     oaiarchive -aus 'setname'
+
+     Remove records defined by set -setname- from OAI repository
+     oaiarchive --set='setname' --delete --upload
+     oaiarchive -dus 'setname'
+     
+     Expose entire repository via OAI gateway
+     oaiarchive --set=global --add --upload
+     oaiarchive -aus global
+
+     Print OAI repository status"
+     oaiarchive -r
+
+"""
+
+__version__ = ""
+
+try:
+    from cdsware.oaiarchive_engine import main
+except ImportError, e:
+    print "Error: %s" % e
+    import sys
+    sys.exit(1)
+
+main()

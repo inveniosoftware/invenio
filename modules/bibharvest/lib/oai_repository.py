@@ -446,7 +446,7 @@ def oailistrecords(args):
 
     if len(sysnos) == 0: # noRecordsMatch error
         
-        out = out + oai_error("noRecordsMatch", "no_ records correspond to the request")
+        out = out + oai_error("noRecordsMatch", "no records correspond to the request")
         out = oai_error_header(args, "ListRecords") + out + oai_error_footer("ListRecords")
         return out
 
@@ -464,10 +464,7 @@ def oailistrecords(args):
                         out = "%s <resumptionToken>%s</resumptionToken>\n" % (out, arg['resumptionToken'])
                 sysno.append(sysno_)
             else:
-                done = 0
-                for field_ in get_field(sysno_, "245__a"):
-                    if done == 0:
-                        out = out + print_record(sysno_, arg['metadataPrefix'])
+                out = out + print_record(sysno_, arg['metadataPrefix'])
 
     if i > nb_records_in_resume:
         oaicacheclean()
@@ -561,20 +558,16 @@ def oailistidentifiers(args):
                         out = "%s  <resumptionToken>%s</resumptionToken>\n" % (out, arg['resumptionToken'])
                 sysno.append(sysno_)
             else:
-                done = 0
-                for field_ in get_field(sysno_, "245__a"):
-                    if done == 0:
-                        for ident in get_field(sysno_, oaiidfield): 
-                            if is_deleted(sysno_) and oaideleted != "no":
-                                out = out + "    <header status=\"deleted\">\n"
-                            else:
-                                out = out + "    <header>\n"
-                            out = "%s      <identifier>%s</identifier>\n" % (out, escape_space(ident))
-                            out = "%s      <datestamp>%s</datestamp>\n" % (out, get_modification_date(oaigetsysno(ident)))
-                            for set in get_field(sysno_, oaisetfield):
-                                out = "%s      <setSpec>%s</setSpec>\n" % (out, set)
-                            out = out + "    </header>\n"
-                        done = 1
+                for ident in get_field(sysno_, oaiidfield): 
+                    if is_deleted(sysno_) and oaideleted != "no":
+                        out = out + "    <header status=\"deleted\">\n"
+                    else:
+                        out = out + "    <header>\n"
+                    out = "%s      <identifier>%s</identifier>\n" % (out, escape_space(ident))
+                    out = "%s      <datestamp>%s</datestamp>\n" % (out, get_modification_date(oaigetsysno(ident)))
+                    for set in get_field(sysno_, oaisetfield):
+                        out = "%s      <setSpec>%s</setSpec>\n" % (out, set)
+                    out = out + "    </header>\n"
 
     if i > nb_identifiers_in_resume:
         oaicacheclean() # clean cache from expired resumptionTokens
@@ -751,7 +744,7 @@ def get_sets():
     out = []
     row = ['', '']
 
-    query = "SELECT setSpec,setName,setDescription FROM oaiSET"
+    query = "SELECT setSpec,setName,setDescription FROM oaiARCHIVE"
     res = run_sql(query)
     for row in res:
         row_bis = [row[0], row[1], row[2]]
