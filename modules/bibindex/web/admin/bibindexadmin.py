@@ -635,7 +635,7 @@ def field(req, ln=cdslang, mtype='', content=''):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def error_page(req):
-    return page(title=msg_internal_error[ln],
+    return page(title="Internal Error",
                 body = create_error_box(req, verbose=verbose, ln=ln),
                 description="%s - Internal Error" % cdsname, 
                 keywords="%s, CDSware, Internal Error" % cdsname,
