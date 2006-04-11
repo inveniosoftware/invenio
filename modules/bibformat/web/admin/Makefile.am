@@ -33,5 +33,5 @@ MO = $(LINGUAS:%=$(top_builddir)/po/%.gmo)
        $(top_srcdir)/config/cdspage.wml $(top_srcdir)/config/cdsnavbar.wml $(MO)
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
 	for lang in en; do \
-		$(PYTHON) $(top_srcdir)/po/i18n_update_wml.py $${lang} "$*.php" ; \
+		$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py $${lang} "$*.php" ; \
 	done

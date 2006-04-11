@@ -51,6 +51,6 @@ MO = $(LINGUAS:%=$(top_builddir)/po/%.gmo)
 	       -o\(ALL-LANG_*\)+LANG_EL:$*.el.html \
 	       -o\(ALL-LANG_*\)+LANG_UK:$*.uk.html $<
 	for lang in $(LINGUAS); do \
-		$(PYTHON) $(top_srcdir)/po/i18n_update_wml.py $${lang} "$*.$${lang}.html" ; \
+		$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py $${lang} "$*.$${lang}.html" ; \
 	done
 

@@ -34,5 +34,5 @@ MO = $(LINGUAS:%=$(top_builddir)/po/%.gmo)
            $(MO)
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
 	for lang in en; do \
-		$(PYTHON) $(top_srcdir)/po/i18n_update_wml.py $${lang} "$*.php" ; \
+		$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py $${lang} "$*.php" ; \
 	done

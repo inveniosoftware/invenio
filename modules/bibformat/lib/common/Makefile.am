@@ -27,8 +27,8 @@ CLEANFILES = global.inc.php dbparams.inc.php *~ *.tmp
 
 global.inc.php: global.inc.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
 	$(WML) -o $@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml.py en $@
+	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
 
 dbparams.inc.php: dbparams.inc.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
 	$(WML) -o $@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml.py en $@
+	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
