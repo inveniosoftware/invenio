@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
-    title="<MSG_ADMIN_AREA>" \
+    title="_(Admin Area)_" \
     navbar_name="admin" \
     navtrail_previous_links="" \
     navbar_select="admin"

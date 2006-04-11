@@ -31,8 +31,7 @@ CLEANFILES = $(doc_DATA) *~ *.tmp
 LINGUAS = $(shell grep -v '^\#' $(top_srcdir)/po/LINGUAS)
 MO = $(LINGUAS:%=$(top_builddir)/po/%.gmo)
 
-%.en.html %.fr.html %.de.html %.es.html %.ca.html %.pl.html %.pt.html %.it.html %.ja.html %.ru.html %.sk.html %.cs.html %.no.html %.sv.html %.el.html %.uk.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-           $(top_srcdir)/config/messages.wml $(MO)
+%.en.html %.fr.html %.de.html %.es.html %.ca.html %.pl.html %.pt.html %.it.html %.ja.html %.ru.html %.sk.html %.cs.html %.no.html %.sv.html %.el.html %.uk.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(MO)
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$*.en.html \
 	       -o\(ALL-LANG_*\)+LANG_FR:$*.fr.html \
 	       -o\(ALL-LANG_*\)+LANG_DE:$*.de.html \

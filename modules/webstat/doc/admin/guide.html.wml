@@ -19,7 +19,7 @@
 
 #include "cdspage.wml" \
     title="WebStat Admin Guide" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/webstat/>WebStat Admin</a>" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>>_(Admin Area)_</a> &gt; <a class=navtrail href=<WEBURL>/admin/webstat/>WebStat Admin</a>" \
     navbar_name="admin" \
     navbar_select="webstat-admin-guide"
 

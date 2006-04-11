@@ -21,7 +21,7 @@
 ?>
 #include "cdspage.wml" \
     title="Update value of parameter <I><protect><?print $param;?></protect></i> for the <I><protect><?print $doctype;?></protect></i> document type" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/><MSG_ADMIN_SUBMIT></a>" \ 
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>>_(Admin Area)_</a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/>_(WebSubmit Administration)_</a>" \ 
     navbar_name="admin" \
     navbar_select="websubmit"
 	    	    

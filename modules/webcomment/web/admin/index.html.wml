@@ -19,7 +19,7 @@
 
 #include "cdspage.wml" \
     title="WebComment Admin" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>><MSG_ADMIN_AREA></a>" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>>_(Admin Area)_</a>" \
     navbar_name="admin" \
     navbar_select="webcomment" 
      
