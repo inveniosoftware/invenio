@@ -18,8 +18,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-This tool extracts sentences to be translated from HTML / WML
-files. The sentences to translate are marked with the following tag:
+This tool extracts sentences to be translated from HTML / WML source
+files.
+
+The sentences to translate are marked with the following tag:
 
  Blah blah _(To be translated)_ blah.
 
