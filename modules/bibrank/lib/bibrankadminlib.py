@@ -34,8 +34,7 @@ from zlib import compress,decompress
 from mod_python import apache
 
 import cdsware.access_control_engine as acce
-from cdsware.messages import *
-from cdsware.dbquery import run_sql
+from cdsware.messages import language_list_long
 from cdsware.config import *
 from cdsware.webpage import page, pageheaderonly, pagefooteronly
 from cdsware.webuser import getUid, get_email
