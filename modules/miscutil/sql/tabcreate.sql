@@ -2187,6 +2187,7 @@ CREATE TABLE IF NOT EXISTS oaiARCHIVE (
   setName varchar(255) NOT NULL default '',
   setSpec varchar(255) NOT NULL default '',
   setCollection varchar(255) NOT NULL default '',
+  setDescription text,
   p1 text,
   f1 text,
   m1 text,
