@@ -15,8 +15,9 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""This tool updates a file containing sentences to be translated. The
-sentences to translate are marked with the following tag:
+"""This tool updates WML target file still containing sentences to be
+translated. The sentences to translate are marked with the following
+tag:
 
  Blah blah _(To be translated)_ blah.
 
