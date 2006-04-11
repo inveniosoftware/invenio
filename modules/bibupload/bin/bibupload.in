@@ -67,7 +67,7 @@ $libdir = "@libdir@";
 include("${libdir}/php/cdsware/errors/errorHandling.php");
 
 // array of all the "untouchable" field tags
-$strongtags = array("909COo");
+$strongtags = array("");
 
 //////////////////////////////////////////////////////////////////////
 // BIBSCHED FUNCTIONS
