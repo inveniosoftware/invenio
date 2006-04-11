@@ -64,7 +64,7 @@ def perform_youradminactivities(uid, ln):
             your_admin_activities.append(action)
 
     if "superadmin" in your_roles:
-        for action in ["cfgbibformat", "cfgbibharvest", "cfgbibrank", "cfgbibindex", "cfgwebaccess", "cfgwebsearch", "cfgwebsubmit"]:
+        for action in ["cfgbibformat", "cfgbibharvest", "cfgbibrank", "cfgbibindex", "cfgwebaccess", "cfgwebcomment", "cfgwebsearch", "cfgwebsubmit"]:
             if action not in your_admin_activities:
                 your_admin_activities.append(action)
 
