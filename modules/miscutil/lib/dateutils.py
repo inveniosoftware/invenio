@@ -62,7 +62,7 @@ def convert_datetext_to_dategui(datetext, ln=cdslang):
         if datestruct == datestruct_default:
             raise ValueError
         month = get_i18n_month_name(datestruct[1], ln=ln)
-        output_format = "%02d " + month + " %04Y, %02H:%02M"
+        output_format = "%d " + month + " %Y, %H:%M"
         return strftime(output_format, datestruct)
     except:
         _ = gettext_set_language(ln)
@@ -87,7 +87,7 @@ def convert_datestruct_to_dategui(datestruct, ln=cdslang):
     try:
         if datestruct[0] and datestruct[1] and datestruct[2]:
             month = get_i18n_month_name(datestruct[1], ln=ln)
-            output_format = "%02d " + month + " %04Y, %02H:%02M"
+            output_format = "%d " + month + " %Y, %H:%M"
             return strftime(output_format, datestruct)
         else:
             raise ValueError
