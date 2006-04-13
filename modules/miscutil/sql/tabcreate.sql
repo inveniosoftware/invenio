@@ -2473,43 +2473,6 @@ CREATE TABLE IF NOT EXISTS query (
   KEY urlargs (urlargs(100))
 ) TYPE=MyISAM;
 
-
--- baskets
-
--- to be eliminated
-CREATE TABLE IF NOT EXISTS user_basket (  
-  id_user int(15) unsigned NOT NULL default '0',
-  id_basket int(15) unsigned NOT NULL default '0',
-  date_modification date NOT NULL default '0000-00-00',
-  PRIMARY KEY  (id_user,id_basket)
-) TYPE=MyISAM;
-
--- to be eliminated
-CREATE TABLE IF NOT EXISTS basket (
-  id int(15) unsigned NOT NULL auto_increment,
-  name varchar(50) NOT NULL default '',
-  public char(1) default 'n',
-  PRIMARY KEY  (id),
-  KEY name (name)
-) TYPE=MyISAM;
-
-CREATE TABLE IF NOT EXISTS basket_record (
-  id_basket int(15) unsigned NOT NULL default '0',
-  id_record int(15) unsigned NOT NULL default '0',
-  nb_order int(15) unsigned NOT NULL auto_increment,
-  PRIMARY KEY  (id_basket,id_record),
-  KEY nb_order (nb_order)
-) TYPE=MyISAM;
-
-CREATE TABLE IF NOT EXISTS record (
-  id int(15) unsigned NOT NULL auto_increment,
-  id_bibrec varchar(15) NOT NULL default '',
-  aleph text,
-  html text,
-  PRIMARY KEY  (id_bibrec),
-  UNIQUE KEY id (id)
-) TYPE=MyISAM;
-
 CREATE TABLE IF NOT EXISTS user_query_basket (
   id_user int(15) unsigned NOT NULL default '0',
   id_query int(15) unsigned NOT NULL default '0',
@@ -2517,12 +2480,80 @@ CREATE TABLE IF NOT EXISTS user_query_basket (
   frequency varchar(5) NOT NULL default '',
   date_creation date default NULL,
   date_lastrun date default '0000-00-00',
-  alert_name varchar(30) NOT NULL,
+  alert_name varchar(30) NOT NULL default '',
   notification char(1) NOT NULL default 'y',
   PRIMARY KEY  (id_user,id_query,frequency,id_basket),
   KEY alert_name (alert_name)
 ) TYPE=MyISAM;
 
+-- baskets
+CREATE TABLE IF NOT EXISTS bskBASKET (
+  id int(15) unsigned NOT NULL auto_increment,
+  id_owner int(15) unsigned NOT NULL default '0',
+  name varchar(50) NOT NULL default '',
+  date_modification datetime NOT NULL default '0000-00-00 00:00:00',
+  nb_views int(15) NOT NULL default '0',
+  PRIMARY KEY  (id),
+  KEY id_owner (id_owner),
+  KEY name (name)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS bskREC (
+  id_bibrec_or_bskEXTREC int(16) NOT NULL default '0',
+  id_bskBASKET int(15) unsigned NOT NULL default '0',
+  id_user_who_added_item int(15) NOT NULL default '0',
+  score int(15) NOT NULL default '0',
+  date_added datetime NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY  (id_bibrec_or_bskEXTREC,id_bskBASKET),
+  KEY id_bibrec_or_bskEXTREC (id_bibrec_or_bskEXTREC),
+  KEY id_bskBASKET (id_bskBASKET),
+  KEY score (score),
+  KEY date_added (date_added)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS bskEXTREC (
+  id int(15) unsigned NOT NULL default '0',
+  creation_date datetime NOT NULL default '0000-00-00 00:00:00',
+  modification_date datetime NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY  (id),
+  KEY id (id)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS user_bskBASKET (
+  id_user int(15) unsigned NOT NULL default '0',
+  id_bskBASKET int(15) unsigned NOT NULL default '0',
+  topic varchar(50) NOT NULL default '',
+  PRIMARY KEY  (id_user,id_bskBASKET),
+  KEY id_user (id_user),
+  KEY id_bskBASKET (id_bskBASKET)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS usergroup_bskBASKET (
+  id_usergroup int(15) unsigned NOT NULL default '0',
+  id_bskBASKET int(15) unsigned NOT NULL default '0',
+  topic varchar(50) NOT NULL default '',
+  date_shared datetime NOT NULL default '0000-00-00 00:00:00',
+  share_level char(2) NOT NULL default '',
+  PRIMARY KEY  (id_usergroup,id_bskBASKET),
+  KEY id_usergroup (id_usergroup),
+  KEY id_bskBASKET (id_bskBASKET)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS bskRECORDCOMMENT (
+  id int(15) unsigned NOT NULL auto_increment,
+  id_bibrec_or_bskEXTREC int(16) NOT NULL default '0',
+  id_bskBASKET int(15) unsigned NOT NULL default '0',
+  id_user int(15) unsigned NOT NULL default '0',
+  title varchar(255) NOT NULL default '',
+  body text NOT NULL,
+  date_creation datetime NOT NULL default '0000-00-00 00:00:00',
+  priority int(15) NOT NULL default '0',
+  PRIMARY KEY  (id),
+  KEY id (id),
+  KEY id_bskBASKET (id_bskBASKET),
+  KEY id_bibrec_or_bskEXTREC (id_bibrec_or_bskEXTREC),
+  KEY date_creation (date_creation)
+) TYPE=MyISAM;
 
 -- tables for messaging system
 
