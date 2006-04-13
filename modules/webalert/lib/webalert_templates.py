@@ -188,7 +188,7 @@ class Template:
                       </TR>
                       <TR>
                         <TD align="right" valign="top"><B>%(store_basket)s</B></TD>
-                        <TD><SELECT name="idb"><OPTION value="0">- %(no_basket)s -</OPTION>
+                        <TD>%(baskets)s
                """ % {
                  'action': action,
                  'alert_name' : _("Alert identification name:"),
@@ -207,18 +207,10 @@ class Template:
                  'no' : _("no"),
                  'specify' : _("if <B>no</B> you must specify a basket"),
                  'store_basket' : _("Store results in basket?"),
-                 'no_basket' : _("no basket"),
+                 'baskets': baskets 
                }
-        for basket in baskets:
-            out += """<OPTION value="%(id)s" %(selected)s>%(name)s</OPTION>""" % {
-                     'id' : basket['id'],
-                     'name' : basket['name'],
-                     'selected' : (basket['id'] == id_basket and "selected" or "")
-                   }
-
-        out += """   </SELECT><BR><SMALL>%(insert_basket)s</SMALL><BR>
-                     <INPUT type="text" name="bname" size="20" maxlength="50">
-                    </TD>
+        
+        out += """  </TD>
                    </TR>
                    <TR>
                     <TD colspan="2" align="center"><BR>
@@ -232,7 +224,6 @@ class Template:
                  </TR>
                 </TABLE>
                """ % {
-                     'insert_basket' : _("or insert a new basket name"),
                      'idq' : id_query,
                      'set_alert' : _("SET ALERT"),
                      'clear_data' : _("CLEAR DATA"),

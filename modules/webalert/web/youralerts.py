@@ -106,7 +106,7 @@ def modify(req, idq, old_idb, name="", freq="week", notif="y", idb=0, error_msg=
     # load the right message language
     _ = gettext_set_language(ln)
 
-    html = webalert.perform_input_alert("update", idq, name, freq, notif, idb,uid, old_idb, ln = ln)
+    html = webalert.perform_input_alert("update", idq, name, freq, notif, idb, uid, old_idb, ln = ln)
     if error_msg != "":
         html = webalert_templates.tmpl_errorMsg(
                  ln = ln,
@@ -146,7 +146,7 @@ def list(req, ln = cdslang):
                 language=ln,
                 lastupdated=__lastupdated__)
 
-def add(req, name, freq, notif, idb, bname, idq, ln = cdslang):
+def add(req, name, freq, notif, idb, idq, ln = cdslang):
     uid = getUid(req)
 
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
@@ -156,7 +156,7 @@ def add(req, name, freq, notif, idb, bname, idq, ln = cdslang):
     _ = gettext_set_language(ln)
 
     try:
-        html=webalert.perform_add_alert(name, freq, notif, idb, bname, idq,uid, ln = ln)
+        html=webalert.perform_add_alert(name, freq, notif, idb, idq, uid, ln = ln)
     except webalert.AlertError, e:
         return input(req, idq, name, freq, notif, idb, e, ln = ln)
     return page(title=_("Display alerts"),
@@ -171,7 +171,7 @@ def add(req, name, freq, notif, idb, bname, idq, ln = cdslang):
                 language=ln,
                 lastupdated=__lastupdated__)
 
-def update(req, name, freq, notif, idb, bname, idq, old_idb, ln = cdslang):
+def update(req, name, freq, notif, idb, idq, old_idb, ln = cdslang):
     uid = getUid(req)
 
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
@@ -181,7 +181,7 @@ def update(req, name, freq, notif, idb, bname, idq, old_idb, ln = cdslang):
     _ = gettext_set_language(ln)
 
     try:
-        html=webalert.perform_update_alert(name, freq, notif, idb, bname, idq, old_idb,uid, ln = ln)
+        html=webalert.perform_update_alert(name, freq, notif, idb, idq, old_idb,uid, ln = ln)
     except webalert.AlertError, e:
         return modify(req, idq, old_idb, name, freq, notif, idb, e, ln = ln)
     return page(title=_("Display alerts"),
@@ -217,7 +217,7 @@ def remove(req, name, idu, idq, idb, ln = cdslang):
                 language=ln,
                 lastupdated=__lastupdated__)
 
-def errorMsg(title,req,c=cdsname,ln=cdslang):
+def errorMsg(title, req, c=cdsname, ln=cdslang):
     return page(title="error",
                 body = create_error_box(req, title=title,verbose=0, ln=ln),
                 description="%s - Internal Error" % c,

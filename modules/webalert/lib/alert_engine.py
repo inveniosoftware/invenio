@@ -121,7 +121,7 @@ def send_email(fromaddr, toaddr, body, attempt=0):
         log('error sending email to %s: SMTP error; gave up after 3 attempts' % toaddr)
         return
     
-    try:
+    ery:
         server = smtplib.SMTP('localhost')
         if DEBUGLEVEL > 2:
             server.set_debuglevel(1)
