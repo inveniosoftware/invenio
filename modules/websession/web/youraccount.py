@@ -27,7 +27,7 @@ from mod_python import apache
 import smtplib
 
 from cdsware import webuser
-from cdsware.config import weburl,cdsname,cdslang,supportemail
+from cdsware.config import weburl, cdsname, cdslang, supportemail
 from cdsware.webpage import page
 from cdsware import webaccount
 from cdsware import webbasket
