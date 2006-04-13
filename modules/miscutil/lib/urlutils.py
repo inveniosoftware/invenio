@@ -33,7 +33,7 @@ except ImportError:
 def wash_url_argument(var, new_type):
     """
     Wash argument into 'new_type', that can be 'list', 'str', 'int', 'tuple' or 'dict'.
-    If needed, the check 'type(var) is not None' should be done before calling this function
+    If needed, the check 'type(var) is not None' should be done before calling this function.
     @param var: variable value
     @param new_type: variable type, 'list', 'str', 'int', 'tuple' or 'dict'
     @return as much as possible, value var as type new_type
@@ -85,12 +85,29 @@ def wash_url_argument(var, new_type):
 
 def redirect_to_url(req, url):
     """
-    Redirect current page to url
+    Redirect current page to url.
     @param req: request as received from apache
     @param url: url to redirect to"""
     req.err_headers_out.add("Location", url)
     raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
 
 def get_client_ip_address(req):
-    """ Returns IP address as string from an apache request """
+    """ Returns IP address as string from an apache request. """
     return str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+
+def get_referer(req, replace_ampersands=1):
+    """ Return the referring page of a request.
+    Referer (wikipedia): Referer is a common misspelling of the word "referrer";
+    so common, in fact, that it made it into the official specification of HTTP.
+    When visiting a webpage, the referer or referring page is the URL of the
+    previous webpage from which a link was followed.
+    @param req: request
+    @param replace_ampersands: if 1, replace & by &amp; in url (correct HTML cannot contain & characters alone).
+    """
+    try:
+        referer = req.headers_in['Referer']
+        if replace_ampersands==1:
+            return referer.replace('&', '&amp;')
+        return referer
+    except KeyError:
+        return ''
