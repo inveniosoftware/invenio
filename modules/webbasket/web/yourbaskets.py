@@ -21,18 +21,16 @@
 
 __lastupdated__ = """$Date$"""
 
-import sys
-import time
-import zlib
-import urllib
 from mod_python import apache
 
-from cdsware.config import weburl,webdir,cdslang
-from cdsware.messages import gettext_set_language
+from cdsware.config import weburl, webdir, cdslang
+from cdsware.messages import gettext_set_language, wash_language
 from cdsware.webpage import page
-from cdsware.dbquery import run_sql
-from cdsware.webuser import getUid,page_not_authorized
-from cdsware import webbasket
+from cdsware.webuser import getUid, page_not_authorized, isGuestUser
+from cdsware.messages import wash_language
+from cdsware.webbasket import *
+from cdsware.webbasket_config import cfg_webbasket_categories 
+from cdsware.urlutils import get_referer, redirect_to_url
 from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
 imagesurl = "%s/img" % webdir
@@ -42,74 +40,497 @@ imagesurl = "%s/img" % webdir
 ### CALLABLE INTERFACE
 
 def index(req):
-    req.err_headers_out.add("Location", "%s/yourbaskets.py/display?%s" % (weburl, req.args))
-    raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
+    redirect_to_url(req, '%s/yourbaskets.py/display?%s' % (weburl, req.args))
 
-def display(req, action="", title="Your Baskets", delete_alerts="", confirm_action="",
-            id_basket=0, bname="", newname="", newbname="", mark=[], to_basket="",
-            copy_move="", idup="", ordup="", iddown="", orddown="", of="hb"):
-
+def display(req,
+            category=cfg_webbasket_categories['PRIVATE'], topic=0, group=0,
+            bsk_to_sort=0, sort_by_title="", sort_by_date="",
+            ln=cdslang):
+    """Display basket"""
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
     uid = getUid(req)
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
         return page_not_authorized(req, "../yourbaskets.py/display")
+    (body, errors, warnings) = perform_request_display(uid, category,
+                                                       topic,
+                                                       group,
+                                                       ln)
+    if isGuestUser(uid):
+        body = create_guest_warning_box(ln) + body
+    navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+    navtrail %= (weburl, _("Your Account"))
+    navtrail_end = create_basket_navtrail(uid=uid,
+                                          category=category, topic=topic, group=group,
+                                          ln=ln)
+    return page(title       = _("Display baskets"),
+                body        = body,
+                navtrail    = navtrail + navtrail_end,
+                uid         = uid,
+                lastupdated = __lastupdated__,
+                language    = ln,
+                errors      = errors,
+                warnings    = warnings,
+                req         = req)
 
-    if action=="DELETE":
-        title="Delete basket"
-    return page(title=title,
-                body=webbasket.perform_display(uid, action, delete_alerts, confirm_action, id_basket,
-                                               bname, newname, newbname, mark, to_basket, copy_move,
-                                               idup, ordup, iddown, orddown, of),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a>""" % weburl,
-                description="CDS Personalize, Display baskets",
-                keywords="CDS, personalize",
-                uid=uid,
-                lastupdated=__lastupdated__)
 
-def display_public(req, id_basket=0, name="", action="", to_basket="", mark=[],
-                   newname="", of="hb", ln=cdslang):
-    title = "Display basket"
-    uid = getUid(req)    
-
-    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2: 
-        return page_not_authorized(req, "../yourbaskets.py/display_public")
-    if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1 and action == "EXECUTE":
-        return page_not_authorized(req, "../yourbaskets.py/display_public")
-
+def display_item(req,
+                 bskid=0, recid=0, format='hb',
+                 category=cfg_webbasket_categories['PRIVATE'], topic=0, group=0,
+                 ln=cdslang):
+    """ Display basket item """
+    ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    
-    if of and of [0] == 'x':
-        req.content_type = "text/xml"
-        req.send_http_header()
-
-        req.write('''<?xml version="1.0" encoding="UTF-8"?>\n''')
-
-        return webbasket.perform_display_public(uid, id_basket, name, action, to_basket,
-                                                mark, newname, of, ln)
-    
-    else:
-        return page(title=title,
-                    body=webbasket.perform_display_public(uid, id_basket, name, action, to_basket,
-                                                          mark, newname, of, ln),
-                    navtrail='''<a class="navtrail" href="%s/youraccount.py/display">''' % weburl +
-                    _("Your Account") + """</a>""",
-                    description="CDS Personalize, Display baskets",
-                    keywords="CDS, personalize",
-                    uid=uid,
-                    lastupdated=__lastupdated__)
-
-def add(req, recid=[], bid=[], bname=[]):
-    """Add records to basket.  If bid isn't set, it'll ask user into which baskets to add them.
-    If bname is set, it'll create new basket with this name, and add records there rather than to bid."""
-    title = "Adding records to baskets"
     uid = getUid(req)
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        return page_not_authorized(req, "../yourbaskets.py/display_item")
+    (body, errors, warnings) = perform_request_display_item(uid=uid,
+                                                            bskid=bskid,
+                                                            recid=recid,
+                                                            format=format,
+                                                            category=category,
+                                                            topic=topic,
+                                                            group_id=group,
+                                                            ln=ln)
+    if isGuestUser(uid):
+        body = create_guest_warning_box(ln) + body
+    navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+    navtrail %= (weburl, _("Your Account"))
+    navtrail_end = create_basket_navtrail(uid=uid,
+                                          category=category, topic=topic, group=group,
+                                          bskid=bskid, ln=ln) 
+    return page(title       = _("Details and comments"),
+                body        = body,
+                navtrail    = navtrail + navtrail_end,
+                uid         = uid,
+                lastupdated = __lastupdated__,
+                language    = ln,
+                errors      = errors,
+                warnings    = warnings,
+                req         = req)
 
+
+def write_comment(req,
+                  bskid=0, recid=0, cmtid=0,
+                  category=cfg_webbasket_categories['PRIVATE'], topic=0, group=0,
+                  ln=cdslang):
+    """Write a comment (just interface for writing)"""
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    uid = getUid(req)
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        return page_not_authorized(req, "../yourbaskets.py/write_comment")
+    (body, errors, warnings) = perform_request_write_comment(uid=uid,
+                                                             bskid=bskid,
+                                                             recid=recid,
+                                                             cmtid=cmtid,
+                                                             category=category,
+                                                             topic=topic,
+                                                             group_id=group,
+                                                             ln=ln)
+    navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+    navtrail %= (weburl, _("Your Account"))
+    navtrail_end = create_basket_navtrail(uid=uid,
+                                          category=category, topic=topic, group=group,
+                                          bskid=bskid, ln=ln) 
+    return page(title       = _("Write a comment"),
+                body        = body,
+                navtrail    = navtrail + navtrail_end,
+                uid         = uid,
+                lastupdated = __lastupdated__,
+                language    = ln,
+                errors      = errors,
+                warnings    = warnings,
+                req         = req)
+
+
+def save_comment(req, bskid=0, recid=0, title='', text='',
+                 category=cfg_webbasket_categories['PRIVATE'], topic=0, group=0,
+                 ln=cdslang):
+    """Save comment on record in basket"""
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    uid = getUid(req)
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        return page_not_authorized(req, "../yourbaskets.py/save_comment")
+    (errors_saving, infos) = perform_request_save_comment(uid=uid,
+                                                          bskid=bskid,
+                                                          recid=recid,
+                                                          title=title,
+                                                          text=text,
+                                                          ln=ln)
+    (body, errors_displaying, warnings) = perform_request_display_item(uid=uid,
+                                                                       bskid=bskid,
+                                                                       recid=recid,
+                                                                       format='hb',
+                                                                       category=category,
+                                                                       topic=topic,
+                                                                       group_id=group,
+                                                                       infos=infos,
+                                                                       ln=ln)
+    errors = errors_saving.extend(errors_displaying)
+    navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+    navtrail %= (weburl, _("Your Account"))
+    navtrail_end = create_basket_navtrail(uid=uid,
+                                          category=category, topic=topic, group=group,
+                                          bskid=bskid, ln=ln) 
+    return page(title       = _("Details and comments"),
+                body        = body,
+                navtrail    = navtrail + navtrail_end,
+                uid         = uid,
+                lastupdated = __lastupdated__,
+                language    = ln,
+                errors      = errors,
+                warnings    = warnings,
+                req         = req)
+
+def delete_comment(req, bskid=0, recid=0, cmtid=0, 
+                   category=cfg_webbasket_categories['PRIVATE'], topic=0, group=0,
+                   ln=cdslang):
+    """Delete a comment
+    @param bskid: id of basket (int)
+    @param recid: id of record (int)
+    @param cmtid: id of comment (int)
+    @param category: category (see webbasket_config) (str)
+    @param topic: nb of topic currently displayed (int)
+    @param group: id of group baskets currently displayed (int)
+    @param ln: language"""
+    uid = getUid(req)
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        return page_not_authorized(req, "../yourbaskets.py/delete_comment")
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    recid = wash_url_argument(recid, 'int')
+    bskid = wash_url_argument(bskid, 'int')
+    category = wash_url_argument(category, 'str')
+    topic = wash_url_argument(topic, 'int')
+    group = wash_url_argument(group, 'int')
+    url = weburl + '/yourbaskets.py/display_item?recid=%i&bskid=%i' % (recid, bskid)
+    url += '&category=%s&topic=%i&group=%i&ln=%s' % (category, topic, group, ln)
+    errors = perform_request_delete_comment(uid, bskid, recid, cmtid)
+    if not(len(errors)):
+        redirect_to_url(req, url) 
+    else:
+        return page(uid         = uid,
+                    language    = ln,
+                    errors      = errors,
+                    req         = req)
+    
+def add(req, recid=[], referer='',
+        new_basket_name='', new_topic_name='', create_in_topic='',
+        ln=cdslang, **args):
+    """Add records to baskets.
+    @param recid: list of records
+    @param bskid: list of baskets. If not set or empty, this function will display a form
+                  for the selection of baskets.
+    @param referer: url of the referer
+    @param ln: language
+    """
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    if not(type(recid) is list):
+        if recid.find(',') != -1:
+            recid = wash_url_argument(recid, 'str')
+            recid = recid.split(',')
+    bskid={}
+    for basket_id in args.values():
+        basket_id = wash_url_argument(basket_id, 'int')
+        if int(basket_id):
+            bskid[int(basket_id)] = 1
+    uid = getUid(req)
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
         return page_not_authorized(req, "../yourbaskets.py/add")
+    if not referer:
+        referer = get_referer(req)
+    (body, errors, warnings) = perform_request_add(uid=uid,
+                                                   recid=recid,
+                                                   bskid=bskid.keys(),
+                                                   referer=referer,
+                                                   new_basket_name=new_basket_name,
+                                                   new_topic_name=new_topic_name,
+                                                   create_in_topic=create_in_topic,
+                                                   ln=ln)
+    if isGuestUser(uid):
+        body = create_guest_warning_box(ln) + body
+    if not(len(warnings)) :
+        title = _("Your Baskets")
+    else:
+        title = _("Add records to baskets")
+    navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+    navtrail %= (weburl, _("Your Account"))
+    return page(title       = title,
+                body        = body,
+                navtrail    = navtrail,
+                uid         = uid,
+                lastupdated = __lastupdated__,
+                language    = ln,
+                errors      = errors,
+                warnings    = warnings,
+                req         = req)
 
-    return page(title=title,
-                body=webbasket.perform_request_add(uid, recid, bid, bname),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display">Your Account</a> &gt; <a class="navtrail" href="%s/yourbaskets.py/display">Your Baskets</a>""" % (weburl, weburl),
-                description="CDS Personalize, Add records to basket",
-                keywords="CDS, personalize",
-                uid=uid,
-                lastupdated=__lastupdated__)
+def delete(req, bskid=-1, confirmed=0,
+           category=cfg_webbasket_categories['PRIVATE'], topic=0, group=0,
+           ln=cdslang):
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    uid = getUid(req)
+    confirmed = wash_url_argument(confirmed, 'int')
+    category = wash_url_argument(category, 'str')
+    topic = wash_url_argument(topic, 'int')
+    group = wash_url_argument(group, 'int')
+    bskid = wash_url_argument(bskid, 'int')
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        return page_not_authorized(req, "../yourbaskets.py/delete")
+    (body, errors, warnings)=perform_request_delete(uid=uid,
+                                                    bskid=bskid,
+                                                    confirmed=confirmed,
+                                                    category=category,
+                                                    selected_topic=topic,
+                                                    selected_group_id=group,
+                                                    ln=ln)
+    if confirmed:
+        url = weburl + '/yourbaskets.py?category=%s&topic=%i&group=%i&ln=%s' % (category,
+                                                                                topic,
+                                                                                group,
+                                                                                ln)
+        redirect_to_url(req, url)
+    else:
+        navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+        navtrail %= (weburl, _("Your Account"))
+        navtrail_end = create_basket_navtrail(uid=uid,
+                                              category=category, topic=topic, group=group,
+                                              bskid=bskid, ln=ln)
+        if isGuestUser(uid):
+            body = create_guest_warning_box(ln) + body
+        return page(title = _("Delete a basket"),
+                    body        = body,
+                    navtrail    = navtrail + navtrail_end,
+                    uid         = uid,
+                    lastupdated = __lastupdated__,
+                    language    = ln,
+                    errors      = errors,
+                    warnings    = warnings,
+                    req         = req)
+
+def modify(req, action='', bskid=-1, recid=0,
+           category=cfg_webbasket_categories['PRIVATE'], topic=0, group=0, ln=cdslang):
+    ln = wash_language(ln)
+    category = wash_url_argument(category, 'str')
+    topic = wash_url_argument(topic, 'int')
+    group = wash_url_argument(group, 'int')
+    _ = gettext_set_language(ln)
+    uid = getUid(req)
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        return page_not_authorized(req, "../yourbaskets.py/modify")
+    action = wash_url_argument(action, 'str')
+    url = weburl + '/yourbaskets.py/display?category=%s&topic=%i&group=%i&ln=%s' % (category,
+                                                                                        topic,
+                                                                                        group,
+                                                                                        ln)
+    if action == cfg_webbasket_actions['DELETE']:
+        delete_record(uid, bskid, recid)       
+        redirect_to_url(req, url)
+    elif action == cfg_webbasket_actions['UP']:
+        move_record(uid, bskid, recid, action)
+        redirect_to_url(req, url)
+    elif action == cfg_webbasket_actions['DOWN']:
+        move_record(uid, bskid, recid, action)
+        redirect_to_url(req, url)
+    elif action == cfg_webbasket_actions['COPY']:
+        title = _("Copy record to basket")
+        referer = get_referer(req)
+        (body, errors, warnings) = perform_request_add(uid=uid,
+                                                       recid=[recid],
+                                                       referer=referer,
+                                                       ln=ln)
+        if isGuestUser(uid):
+            body = create_guest_warning_box(ln) + body
+    else:
+        title = ''
+        body = ''
+        warnings = ''
+        errors = [('ERR_WEBBASKET_UNDEFINED_ACTION',)]
+    navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+    navtrail %= (weburl, _("Your Account"))
+    navtrail_end = create_basket_navtrail(uid=uid,
+                                          category=category, topic=topic, group=group,
+                                          bskid=bskid, ln=ln) 
+    return page(title = title,
+                body        = body,
+                navtrail    = navtrail + navtrail_end,
+                uid         = uid,
+                lastupdated = __lastupdated__,
+                language    = ln,
+                errors      = errors,
+                warnings    = warnings,
+                req         = req)
+
+def move(req, bskids='', selected_topic=-1, new_topic_name='', ln=cdslang):
+    """Move one or more baskets to a given topic"""
+    uid = getUid(req)
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        return page_not_authorized(req, "../yourbaskets.py/move")
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    bskids = wash_url_argument(bskids, 'str')
+    selected_topic = wash_url_argument(selected_topic, 'int')
+    if bskids:
+        bskids = bskids.split(',')
+    if selected_topic != -1 or new_topic_name:
+        # a new topic has been chosen
+        (topic, errors) = perform_request_move(uid, bskids,
+                                               selected_topic, new_topic_name,
+                                               ln)
+        url = weburl + '/yourbaskets.py/display?category=%s&topic=%i&ln=%s'
+        url %= (cfg_webbasket_categories['PRIVATE'], topic, ln)
+        redirect_to_url(req, url)
+    else:
+        #user must select a topic to move basket to
+        (body, errors, warnings) = perform_request_move(uid=uid, bskids=bskids, ln=ln)
+        if isGuestUser(uid):
+            body = create_guest_warning_box(ln) + body
+        navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+        navtrail %= (weburl, _("Your Account"))
+        navtrail_end = create_basket_navtrail(uid=uid,
+                                              category=cfg_webbasket_categories['PRIVATE'],
+                                              topic=-1, group=0,
+                                              ln=ln) 
+
+        return page(title = _("Move basket to another topic"),
+                    body        = body,
+                    navtrail    = navtrail + navtrail_end,
+                    uid         = uid,
+                    lastupdated = __lastupdated__,
+                    language    = ln,
+                    errors      = errors,
+                    warnings    = warnings,
+                    req         = req)
+
+def manage_rights(req, bskid=0,
+                  topic='',
+                  external='',
+                  add_group='', submit='',
+                  new_group='',
+                  ln=cdslang,
+                  **groups):
+    """ manage rights for a basket. **groups should be of the form group_id=new_rights """
+    uid = getUid(req)
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        return page_not_authorized(req, "../yourbaskets.py/manage_rights")
+    ln = wash_language(ln)
+    topic = wash_url_argument(topic, 'int')
+    _ = gettext_set_language(ln)
+    if not(add_group):
+        (body, errors, warnings) = perform_request_manage_rights(uid, bskid, topic,
+                                                                 groups, external, ln)
+    if add_group and not(new_group):
+        body = perform_request_add_group(uid=uid, bskid=bskid, topic=topic, ln=ln)
+        errors = []
+        warnings = []
+    elif add_group and new_group:
+        perform_request_add_group(uid, bskid, topic, new_group, ln)
+        (body, errors, warnings) = perform_request_manage_rights(uid, bskid, topic,
+                                                                 groups, external, ln)
+    elif submit and not(len(errors)):
+        url = weburl + '/yourbaskets.py/display?category=%s&topic=%i&ln=%s'
+        url %= (cfg_webbasket_categories['PRIVATE'], topic, ln)
+        redirect_to_url(req, url)
+    navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+    navtrail %= (weburl, _("Your Account"))
+    navtrail_end = create_basket_navtrail(uid=uid,
+                                          category=cfg_webbasket_categories['PRIVATE'],
+                                          topic=topic,
+                                          group=0,
+                                          bskid=bskid, ln=ln)
+    if isGuestUser(uid):
+        body = create_guest_warning_box(ln) + body
+    return page(title = _("Manage rights"),
+                body        = body,
+                navtrail    = navtrail + navtrail_end,
+                uid         = uid,
+                lastupdated = __lastupdated__,
+                language    = ln,
+                errors      = errors,
+                warnings    = warnings,
+                req         = req)
+
+def create_basket(req, new_basket_name='',
+                  new_topic_name='', create_in_topic=-1, topic_number=-1,
+                  ln=cdslang):
+    """Create basket interface"""
+    uid = getUid(req)
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        return page_not_authorized(req, "../yourbaskets.py/manage_rights")
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    create_in_topic = wash_url_argument(create_in_topic, 'int')
+    if new_basket_name and (new_topic_name or create_in_topic != -1):
+        topic = perform_request_create_basket(uid=uid, new_basket_name=new_basket_name,
+                                              new_topic_name=new_topic_name,
+                                              create_in_topic=create_in_topic)
+        url = weburl + '/yourbaskets.py/display?category=%s&topic=%i&ln=%s'
+        url %= (cfg_webbasket_categories['PRIVATE'], int(topic), ln)
+        redirect_to_url(req, url)
+    else:
+        (body, errors, warnings) = perform_request_create_basket(uid=uid,
+                                                                 new_basket_name=new_basket_name,
+                                                                 new_topic_name=new_topic_name,
+                                                                 create_in_topic=create_in_topic,
+                                                                 topic_number=topic_number,
+                                                                 ln=ln)
+        navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+        navtrail %= (weburl, _("Your Account"))
+        if isGuestUser(uid):
+            body = create_guest_warning_box(ln) + body
+        return page(title = _("Create basket"),
+                    body        = body,
+                    navtrail    = navtrail,
+                    uid         = uid,
+                    lastupdated = __lastupdated__,
+                    language    = ln,
+                    errors      = errors,
+                    warnings    = warnings,
+                    req         = req)
+
+def display_public(req,bskid=0, of='hb', ln=cdslang):
+    """Display public basket. If of is x** then output will be XML"""
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    uid = getUid(req)    
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2: 
+        return page_not_authorized(req, "../yourbaskets.py/display_public")
+    of = wash_url_argument(of, 'str')
+    if len(of) and of[0]=='x':
+        req.content_type = "text/xml"
+        req.send_http_header()
+        return perform_request_display_public(bskid=bskid, of=of, ln=ln)
+    (body, errors, warnings) = perform_request_display_public(bskid=bskid, ln=ln)
+    return page(title = _("Public basket"),
+                body        = body,
+                navtrail    = '',
+                uid         = uid,
+                lastupdated = __lastupdated__,
+                language    = ln,
+                errors      = errors,
+                warnings    = warnings,
+                req         = req)
+    
+def unsubscribe(req, bskid=0, ln=cdslang):
+    uid = getUid(req)    
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2: 
+        return page_not_authorized(req, "../yourbaskets.py/unsubscribe")
+    perform_request_unsubscribe(uid, bskid)
+    url = weburl + '/yourbaskets.py/display?category=%s&ln=%s'
+    url %= (cfg_webbasket_categories['EXTERNAL'], ln)
+    redirect_to_url(req, url)
+
+def subscribe(req, bskid=0, ln=cdslang):
+    uid = getUid(req)
+    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2: 
+        return page_not_authorized(req, "../yourbaskets.py/subscribe")
+    errors = perform_request_subscribe(uid, bskid)
+    if len(errors):
+        return page(errors=errors, uid=uid, language=ln, req=req)
+    url = weburl + '/yourbaskets.py/display?category=%s&ln=%s'
+    url %= (cfg_webbasket_categories['EXTERNAL'], ln)
+    redirect_to_url(req, url)
