@@ -19,7 +19,7 @@
 
 pylibdir = $(libdir)/python/cdsware
 
-pylib_DATA = webbasket.py webbasket_templates.py
+pylib_DATA = webbasket.py webbasket_templates.py webbasket_dblayer.py webbasket_config.py
 
 EXTRA_DIST = $(pylib_DATA)
 

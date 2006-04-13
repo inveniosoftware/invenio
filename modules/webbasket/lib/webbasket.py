@@ -19,713 +19,847 @@
 
 """Web Baskets features."""
 
-import sys
-import time
-import zlib
-import urllib
+from zlib import decompress
 
-from cdsware.config import *
-from cdsware.webpage import page
-from cdsware.dbquery import run_sql
-from cdsware.webuser import getUid, getDataUid,isGuestUser
+from cdsware.config import cdslang, weburl
+from cdsware.messages import gettext_set_language, wash_language
+from cdsware.dateutils import convert_datetext_to_dategui, \
+                              convert_datetext_to_datestruct,\
+                              convert_datestruct_to_dategui
+from cdsware.urlutils import wash_url_argument
 from cdsware.search_engine import print_record
-from cdsware.webaccount import warning_guest_user
+from cdsware.webbasket_dblayer import *
+from cdsware.webbasket_config import cfg_webbasket_share_levels, \
+                                     cfg_webbasket_share_levels_ordered, \
+                                     cfg_webbasket_categories, \
+                                     cfg_webbasket_actions, \
+                                     cfg_webbasket_warning_messages, \
+                                     cfg_webbasket_error_messages
+try:
+    import cdsware.template
+    webbasket_templates = cdsware.template.load('webbasket')
+except ImportError:
+    pass
+    
+def perform_request_display(uid,
+                            category=cfg_webbasket_categories['PRIVATE'],
+                            selected_topic=0,
+                            selected_group_id=0,
+                            ln=cdslang):
+    """Display all the baskets of given category, topic or group.
+    @param uid: user id
+    @param category: selected category (see webbasket_config.py)
+    @param selected_topic: # of selected topic to display baskets
+    @param selected_group_id: id of group to display baskets
+    @param ln: language"""
+    warnings = []
+    errors = []
+    baskets_html = []
 
-from cdsware.messages import gettext_set_language
-import cdsware.template
-webbasket_templates = cdsware.template.load('webbasket')
-
-imagesurl = "%s/img" % weburl
-
-### IMPLEMENTATION
-
-# perform_display(): display the baskets defined by the current user
-# input:  default action="" display the list of baskets and the content of the selected basket;
-#         action="DELETE" delete the selected basket;
-#         action="RENAME" modify the basket name;
-#         action="CREATE NEW" create a new basket;
-#         action="SET PUBLIC" set access permission to public;
-#         action="SET PRIVATE" set access permission to private;
-#         action="REMOVE" remove selected items from basket;
-#         action="EXECUTE" copy/move selected items to another basket;
-#         action="ORDER" change the order of the items in the basket;
-#         id_basket is the identifier of the selected basket
-#         delete_alerts='n' if releted alerts shouldn't be deleted; 'y' if yes
-#         confirm_action="CANCEL"cancel the delete action/="CONFIRM" confirm the delete action;
-#         bname is the old basket name for renaming
-#         newname is the new name for renaming the basket
-#         mark[] contains the list of identifiers of the items to be removed
-#         to_basket is the destination basket identifier for copy or move items
-#         copy_move="1" if copy items is requested,"2" if move items is requested
-#         idup, ordup are the identifier and the order of the item to be moved up
-#         iddown, orddown are the identifier and the order of the item to be moved down
-#         of is the output format code
-# output: list of baskets in formatted html+content of the selected basket
-def perform_display(uid, action="", delete_alerts="", confirm_action="", id_basket=0, bname="", newname="", newbname="", mark=[], to_basket="", copy_move="", idup="", ordup="", iddown="", orddown="", of="hb", ln="en"):
-
-    # set variables
-    out = ""
-    basket_name = ""
-    public_basket="no"
-    permission = []
-    bname = get_basket_name( id_basket )
-
-    messages = []
-
-    # load the right message language
     _ = gettext_set_language(ln)
+    
+    selected_topic = wash_url_argument(selected_topic, 'int')
+    selected_group_id = wash_url_argument(selected_group_id, 'int')
+    nb_groups = count_groups_user_member_of(uid)
+    nb_external_baskets = count_external_baskets(uid)
+    selectionbox = ''
+    infobox = ''
+    if category == cfg_webbasket_categories['EXTERNAL']:
+        baskets = get_external_baskets_infos(uid)
+        if len(baskets):
+            map(list, baskets)
+        else:
+            category = cfg_webbasket_categories['PRIVATE']
+    if category == cfg_webbasket_categories['GROUP']:
+        groups = get_group_infos(uid)
+        if len(groups):
+            if selected_group_id == 0 and len(groups):
+                selected_group_id = groups[0][0]
+            selectionbox = webbasket_templates.tmpl_group_selection(groups,
+                                                                    selected_group_id,
+                                                                    ln)
+            baskets = get_group_baskets_infos(selected_group_id)
+            def adapt_group_rights(item):
+                """Suppress unused element in tuple."""
+                out = list(item)
+                if out[-1] == uid:
+                    out[-2] = cfg_webbasket_share_levels['MANAGE']
+                return out[:-1]
+            baskets = map(adapt_group_rights, baskets)
+        else:
+            category = cfg_webbasket_categories['PRIVATE']
+    if category == cfg_webbasket_categories['PRIVATE']:
+        topics_list = get_personal_topics(uid)
+        if not selected_topic and len(topics_list):
+            selected_topic = 0
+        selectionbox = webbasket_templates.tmpl_topic_selection(topics_list,
+                                                                selected_topic,
+                                                                ln)
+        if len(topics_list) > 0:
+            baskets = get_personal_baskets_infos(uid, topics_list[selected_topic][0])
+        else:
+            baskets = []
+        def add_manage_rights(item):
+            """ Convert a tuple to a list and add rights"""
+            out = list(item)
+            out.append(cfg_webbasket_share_levels['MANAGE'])
+            return out
+        baskets = map(add_manage_rights, baskets)
+    
+    bskids = []
+    for basket in baskets:
+        bskids.append(basket[0])
+    levels = dict(is_shared_to(bskids))
+    create_link = ''
+    if category == cfg_webbasket_categories['PRIVATE']:
+        create_link = webbasket_templates.tmpl_create_basket_link(selected_topic, ln)
+    infobox = webbasket_templates.tmpl_baskets_infobox(map(lambda x: (x[0], x[1], x[2]),
+                                                           baskets), 
+                                                       create_link,
+                                                       ln)
+    for (bskid, name, date_modification,
+         nb_views, nb_items, last_added, share_level) in baskets:
+        (bsk_html, bsk_e, bsk_w) = __display_basket(bskid,
+                                                    name,
+                                                    date_modification,
+                                                    nb_views,
+                                                    nb_items,
+                                                    last_added,
+                                                    share_level,
+                                                    levels[bskid],
+                                                    category,
+                                                    selected_topic,
+                                                    selected_group_id,
+                                                    ln)
+        baskets_html.append(bsk_html)
+        errors.extend(bsk_e)
+        warnings.extend(bsk_w)
+                        
+    body = webbasket_templates.tmpl_display(selectionbox,
+                                            infobox,
+                                            baskets_html,
+                                            category,
+                                            nb_groups,
+                                            nb_external_baskets,
+                                            ln)
+    return (body, errors, warnings)
 
-    # execute the requested action
-    if (action == _("DELETE")) and (id_basket != '0') and (id_basket != 0):
+    
+def __display_basket(bskid, name, date_modification, nb_views,
+                     nb_items, last_added,
+                     share_level, group_sharing_level,
+                     category=cfg_webbasket_categories['PRIVATE'],
+                     selected_topic=0, selected_group_id=0,
+                     ln=cdslang):
+    """Private function. Display a basket giving its category and topic or group.
+    @param category: selected category (see webbasket_config.py)
+    @param selected_topic: # of selected topic to display baskets
+    @param selected_group_id: id of group to display baskets
+    @param ln: language"""
+    
+    _ = gettext_set_language(ln)
+    errors = []
+    warnings = []
 
-        if (confirm_action == _("CANCEL")) or (confirm_action == _("CONFIRM")):
+    nb_bsk_cmts = 0
+    last_cmt = _("N/A")
+    records = []
+    cmt_dates = []
+    date_modification = convert_datetext_to_dategui(date_modification, ln)
+
+    items = get_basket_content(bskid, 'hb')
+    
+    for (recid, nb_cmt, last_cmt, ext_val, int_val, score) in items:
+        cmt_dates.append(convert_datetext_to_datestruct(last_cmt))
+        last_cmt = convert_datetext_to_dategui(last_cmt, ln)
+        val = ''
+        nb_bsk_cmts += nb_cmt
+        if recid < 0:
+            if ext_val:
+                val = decompress(ext_val)
+        else:
+            if int_val:
+                val = decompress(int_val)
+        records.append((recid, nb_cmt, last_cmt, val, score))
+
+    if len(cmt_dates) > 0:
+        last_cmt = convert_datestruct_to_dategui(max(cmt_dates), ln)
+     
+    body = webbasket_templates.tmpl_basket(bskid,
+                                           name,
+                                           date_modification,
+                                           nb_views,
+                                           nb_items, last_added,
+                                           (__check_sufficient_rights(share_level, cfg_webbasket_share_levels['READITM']),
+                                            __check_sufficient_rights(share_level, cfg_webbasket_share_levels['MANAGE']),
+                                            __check_sufficient_rights(share_level, cfg_webbasket_share_levels['MANAGE']),
+                                            __check_sufficient_rights(share_level, cfg_webbasket_share_levels['READCMT']),
+                                            __check_sufficient_rights(share_level, cfg_webbasket_share_levels['ADDITM']),
+                                            __check_sufficient_rights(share_level, cfg_webbasket_share_levels['DELITM'])),
+                                           nb_bsk_cmts, last_cmt,
+                                           group_sharing_level,
+                                           category, selected_topic, selected_group_id,
+                                           records,
+                                           ln)
+    return (body, errors, warnings)
+
+def perform_request_display_item(uid, bskid, recid, format='hd',
+                                 category=cfg_webbasket_categories['PRIVATE'],
+                                 topic=0, group_id=0,
+                                 infos=[],
+                                 ln=cdslang):
+    """Display an item of a basket of given category, topic or group.
+    @param uid: user id
+    @param bskid: basket_id
+    @param recid: record id
+    @param format: format of the record (hb, hd, etc.)
+    @param category: selected category (see webbasket_config.py)
+    @param selected_topic: # of selected topic to display baskets
+    @param selected_group_id: id of group to display baskets
+    @param ln: language""" 
+
+    bskid = wash_url_argument(bskid, 'int')
+    recid = wash_url_argument(recid, 'int')
+    category = wash_url_argument(category, 'str')
+    topic = wash_url_argument(topic, 'int')
+    group_id = wash_url_argument(group_id, 'int')
+    infos = wash_url_argument(infos, 'list')
+    ln = wash_language(ln)
+    
+    body = ''   
+    errors = []
+    warnings = []
+    
+    rights = get_max_user_rights_on_basket(uid, bskid)
+    if not(__check_sufficient_rights(rights, cfg_webbasket_share_levels['READITM'])):
+        errors.append('ERR_WEBBASKET_NO_RIGHTS')
+        return (body, errors, warnings)    
+    if category == cfg_webbasket_categories['PRIVATE']:
+        topics_list = get_personal_topics(uid)
+        if not topic and len(topics_list):
+            topic = 0
+        topicsbox = webbasket_templates.tmpl_topic_selection(topics_list, topic, ln)
+    elif category == cfg_webbasket_categories['GROUP']:
+        groups = get_group_infos(uid)
+        if group_id == 0 and len(groups):
+            group_id = groups[0][0]
+        topicsbox = webbasket_templates.tmpl_group_selection(groups, group_id, ln)    
+    else:
+        topicsbox = ''
+    record = get_basket_record(bskid, recid, format)    
+    comments = get_comments(bskid, recid)
+    group_sharing_level = None
+    levels = is_shared_to(bskid)
+    if len(levels):
+        group_sharing_level = levels[0][1]
+    basket = get_basket_general_infos(bskid)
+    if not(len(basket)):
+        errors.append('ERR_WEBBASKET_DB_ERROR')
+        return (body, errors, warnings)
+    basket = basket[0]
+    
+    item_html = webbasket_templates.tmpl_item(basket, 
+                                              recid, record, comments,
+                                              group_sharing_level, 
+                                              (__check_sufficient_rights(rights, cfg_webbasket_share_levels['READCMT']),
+                                               __check_sufficient_rights(rights, cfg_webbasket_share_levels['ADDCMT']),
+                                               __check_sufficient_rights(rights, cfg_webbasket_share_levels['DELCMT'])),
+                                              selected_category=category, selected_topic=topic, selected_group_id=group_id,
+                                              ln=ln)
+    body = webbasket_templates.tmpl_display(topicsbox=topicsbox, baskets=[item_html], 
+                                            selected_category=category, 
+                                            nb_groups=count_groups_user_member_of(uid),
+                                            nb_external_baskets=count_external_baskets(uid),
+                                            ln=ln)
+    return (body, errors, warnings)
+
+def perform_request_write_comment(uid, bskid, recid, cmtid=0,
+                                  category=cfg_webbasket_categories['PRIVATE'],
+                                  topic=0, group_id=0,
+                                  ln=cdslang):
+    """Display a comment writing form"""
+    uid = wash_url_argument(uid, 'int')
+    bskid = wash_url_argument(bskid, 'int')
+    recid = wash_url_argument(recid, 'int')
+    cmtid = wash_url_argument(cmtid, 'int')
+    category = wash_url_argument(category, 'str')
+    topic = wash_url_argument(topic, 'int')
+    group_id = wash_url_argument(group_id, 'int')
+    ln = wash_language(ln)
+
+    body = ''
+    warnings = []
+    errors = []
+    cmt_body = ''
+    if not __check_user_can_comment(uid, bskid):
+        errors.append(('ERR_WEBBASKET_CANNOT_COMMENT'))
+        return (body, errors, warnings)
+    if cmtid:
+        # this is a reply to another comment
+        comment = get_comment(cmtid)
+        if comment:
+            cmt_body = webbasket_templates.tmpl_quote_comment(comment[2], # title
+                                                              uid,
+                                                              comment[0], # nickname
+                                                              comment[4], # date
+                                                              comment[3],
+                                                              ln)
+        else:
+            warning = (cfg_webbasket_warning_messages['ERR_WEBBASKET_cmtid_INVALID'], cmtid)
+            warnings.append(warning)
+    record = get_basket_record(bskid, recid, 'hb')
+    body = webbasket_templates.tmpl_write_comment(bskid=bskid,
+                                                  recid=recid,
+                                                  cmt_body=cmt_body,
+                                                  record = record,
+                                                  selected_category=category,
+                                                  selected_topic=topic,
+                                                  selected_group_id=group_id,
+                                                  warnings=warnings)
+    if category == cfg_webbasket_categories['PRIVATE']:
+        topics_list = get_personal_topics(uid)
+        if not topic and len(topics_list):
+            topic = 0
+        topicsbox = webbasket_templates.tmpl_topic_selection(topics_list, topic, ln)
+    elif category == cfg_webbasket_categories['GROUP']:
+        groups = get_group_infos(uid)
+        if group_id == 0 and len(groups):
+            group_id = groups[0][0]
+        topicsbox = webbasket_templates.tmpl_group_selection(groups, group_id, ln)    
+    else:
+        topicsbox = ''
+    body = webbasket_templates.tmpl_display(topicsbox, '', [ body ], category, ln)
+    return (body, errors, warnings)
+
+def perform_request_save_comment(uid, bskid, recid, title='', text='', ln=cdslang):
+    """ Save a given comment if able to.
+    @param uid: user id (int)
+    @param bskid: basket id (int)
+    @param recid: record id (int)
+    @param title: title of comment (string)
+    @param text: comment's body (string)
+    @param ln: language (string)
+    @return (errors, infos) where errors: list of errors while saving
+                                  infos: list of informations to display"""
+    uid = wash_url_argument(uid, 'int')
+    bskid = wash_url_argument(bskid, 'int')
+    recid = wash_url_argument(recid, 'int')
+    text = wash_url_argument(text, 'str')
+    ln = wash_language(ln)
+    
+    _ = gettext_set_language(ln)
+    errors = []
+    infos = []
+    if not __check_user_can_comment(uid, bskid):
+        errors.append(('ERR_WEBBASKET_CANNOT_COMMENT'))
+        return (errors, infos)
+    if not(save_comment(uid, bskid, recid, title, text)):
+        errors.append(('ERR_WEBBASKET_DB_ERROR'))
+    else:
+        infos.append(_('Your comment has been successfully posted'))
+    return (errors, infos)
+
+def perform_request_delete_comment(uid, bskid, recid, cmtid):
+    """Delete comment cmtid on record recid for basket bskid."""
+    uid = wash_url_argument(uid, 'int')
+    bskid = wash_url_argument(bskid, 'int')
+    recid = wash_url_argument(recid, 'int')
+    cmtid = wash_url_argument(cmtid, 'int')
+    errors = []
+    if __check_user_can_perform_action(uid, bskid, cfg_webbasket_share_levels['DELCMT']):
+        delete_comment(bskid, recid, cmtid)
+    else:
+        errors.append('ERR_WEBBASKET_NO_RIGHTS')
+    return errors
+
+def perform_request_add(uid, recid=[], bskid=[], referer='',
+                        new_basket_name='', new_topic_name='', create_in_topic='',
+                        ln=cdslang):
+    """Add records to baskets
+    @param uid: user id
+    @param recid: list of records to add
+    @param bskid: list of baskets to add records to. if not provided, will return a
+                  page where user can select baskets
+    @param referer: URL of the referring page
+    @param ln: language
+    @return (body, errors, warnings) tuple
+    """
+    uid = wash_url_argument(uid, 'int')
+    recid = wash_url_argument(recid, 'list')
+    bskid = wash_url_argument(bskid, 'list')
+    referer = wash_url_argument(referer, 'str')
+    new_basket_name = wash_url_argument(new_basket_name, 'str')
+    new_topic_name = wash_url_argument(new_topic_name, 'str')
+    create_in_topic = wash_url_argument(create_in_topic, 'str')
+    ln = wash_language(ln)
+    
+    body = ''
+    errors = []
+    warnings = []
+    
+    if not(len(recid)):
+        warnings.append('WRN_WEBBASKET_NO_RECORD')
+        body += webbasket_templates.tmpl_warnings(warnings, ln)
+        if referer and not(referer.find(weburl) == -1):
+            body += webbasket_templates.tmpl_back_link(referer, ln)
+        return (body, errors, warnings)
+    
+    if new_basket_name != '':
+        topic = new_topic_name
+        if create_in_topic not in ('','0'):
+            topic = create_in_topic
+        if topic:
+            id_bsk = create_basket(uid, new_basket_name, topic)
+            bskid.append(id_bsk)
+    if len(bskid):       
+        # save
+        nb_modified_baskets = add_to_basket(uid, recid, bskid)
+        body = webbasket_templates.tmpl_added_to_basket(nb_modified_baskets, ln)
+        body += webbasket_templates.tmpl_back_link(referer, ln)
+    else:
+        # Display basket_selection
+        personal_baskets = get_all_personal_baskets_names(uid)
+        group_baskets = get_all_group_baskets_names(uid)
+        external_baskets = get_all_external_baskets_names(uid)
+        body = webbasket_templates.tmpl_add(recids=recid,
+                                            personal_baskets=personal_baskets,
+                                            group_baskets=group_baskets,
+                                            external_baskets=external_baskets,
+                                            topics=get_personal_topics(uid), #topics
+                                            referer=referer,
+                                            ln=ln)
+        body += webbasket_templates.tmpl_back_link(referer, ln)
+    return (body, errors, warnings)
+
+def perform_request_delete(uid, bskid, confirmed=0,
+                           category=cfg_webbasket_categories['PRIVATE'],
+                           selected_topic=0, selected_group_id=0,
+                           ln=cdslang):
+    """Delete a given basket.
+    @param uid: user id (user has to be owner of this basket)
+    @param bskid: basket id
+    @param confirmed: if 0 will return a confirmation page; if 1 will delete it.
+    @param category: category currently displayed
+    @param selected_topic: topic currently displayed
+    @param selected_group id: if category is group, id of the group currently displayed
+    @param ln: language
+    """
+    uid = wash_url_argument(uid, 'int')
+    bskid = wash_url_argument(bskid, 'int')
+    confirmed = wash_url_argument(confirmed, 'int')
+    category = wash_url_argument(category, 'str')
+    selected_topic = wash_url_argument(selected_topic, 'int')
+    selected_group_id = wash_url_argument(selected_group_id, 'int')
+    ln = wash_language(ln)
+    
+    body = ''
+    errors = []
+    warnings = []
+
+    if not(check_user_owns_baskets(uid, [bskid])):
+        errors.append(('ERR_WEBBASKET_NO_RIGHTS',))
+        return (body, errors, warnings)
+    if confirmed:
+        success = delete_basket(bskid)
+        if not success:
+            errors.append(('ERR_WEBBASKET_DB_ERROR',))
+    else:
+        body = webbasket_templates.tmpl_confirm_delete(bskid,
+                                                       count_subscribers(uid, bskid),
+                                                       category,
+                                                       selected_topic, selected_group_id,
+                                                       ln)
+    return (body, errors, warnings)
+
+def delete_record(uid, bskid, recid):
+    """Delete a given record in a given basket.
+    @param uid: user id (user has to have sufficient rights on basket
+    @param bskid: basket id
+    @param recid: record id
+    """
+    uid = wash_url_argument(uid, 'int')
+    bskid = wash_url_argument(bskid, 'int')
+    recid = wash_url_argument(recid, 'int')
+    if __check_user_can_perform_action(uid, bskid, cfg_webbasket_share_levels['DELITM']):
+        delete_item(bskid, recid)
+
+def perform_request_move(uid, bskids,
+                         selected_topic=-1, new_topic_name='',
+                         ln=cdslang):
+    """Move given baskets into new topic.
+    @param uid: user id (user has to be owner of baskets he wants to move)
+    @param bskids: list of basket ids
+    @param selected_topic: topic currently displayed
+    @param new_topic_name: name for topic in which to put the baskets
+    @param ln: language
+    """
+    uid = wash_url_argument(uid, 'int')
+    bskids = wash_url_argument(bskids, 'list')
+    selected_topic = wash_url_argument(selected_topic, 'int')
+    new_topic_name = wash_url_argument(new_topic_name, 'str')
+    ln = wash_language(ln)
+
+    body = ''
+    errors = []
+    warnings = []
+   
+    if new_topic_name:
+        if check_user_owns_baskets(uid, bskids):
+            move_baskets_to_topic(uid, bskids, new_topic_name)
+            # do not move the next line above,because of side effects!
+            topics = get_personal_topics(uid)
             try:
-                msg = perform_delete(uid, delete_alerts, confirm_action, id_basket, ln)
-                # out += "%s<BR>" % msg
-                messages.append(msg)
-            except BasketException, e:
-                msg = _("The basket has not been deleted: %s") % e
-                messages.append(msg)
-            show_actions = 1
+                topics = zip(topics, range(len(topics)))
+                topic = [elt[1] for elt in topics if elt[0][0] == new_topic_name][0]
+            except:
+                errors.append(('ERR_WEBBASKET_DB_ERROR'))
+                topic = 0
         else:
-            # goes to the form which deletes the selected basket
-            out += delete_basket(uid, id_basket, bname, ln)
-            basket_name = bname
-            show_actions = 0
-
-        id_basket = '0'
-    else:
-        show_actions = 1
-        if action == _("CREATE NEW"):
-            # create a new basket
-            if newname != "":
-                # create a new basket newname
-                try:
-                    id_basket = perform_create_basket(uid, newname, ln)
-                    messages.append(_("""The <I>private</I> basket <B>%s</B> has been created.""") % newname)
-                    bname = newname
-                except BasketException, e:
-                    messages.append(_("""The basket %s has not been created: %s""") % (newname, e))
-            else:
-                messages.append(_("""The basket has not been created: specify a basket name."""))
-        else:
-            if (id_basket != '0') and (id_basket != 0):
-                if action == _("RENAME"):
-                    # rename the selected basket
-                    if newbname != "":
-                        # rename basket to newname
-                        try:
-                            id_basket = perform_rename_basket(uid, id_basket,newbname, ln)
-                            messages.append(_("""The basket <B>%s</B> has been renamed to <B>%s</B>.\n""") % (bname, newbname))
-                            bname = newbname
-                        except BasketException, e:
-                            messages.append(_("""The basket has not been renamed: %s""") % e)
-                    else:
-                        messages.append(_("""The basket has not been renamed: specify a basket name."""))
-                else:
-                    if action == _("SET PUBLIC"):
-                        try:
-                            # set public permission
-                            set_permission(uid, id_basket, "y", ln)
-                            url_public_basket = """%s/yourbaskets.py/display_public?id_basket=%s""" \
-                                                % (weburl, id_basket)
-                            messages.append(_("""The selected basket is now publicly accessible at the following URL:""") +
-                                              """<A href="%s">%s</A><BR><BR>""" % (url_public_basket, url_public_basket))
-                        except BasketException, e:
-                            messages.append(_("The basket has not been made public: %s") % e)
-                    else:
-                        if action == _("SET PRIVATE"):
-                            # set private permission
-                            try:
-                                set_permission(uid, id_basket, "n", ln)
-                                messages.append(_("""The selected basket is no more publically accessible."""))
-                            except BasketException, e:
-                                 messages.append(_("The basket has not been made private: %s") % e)
-                        else:
-                            if action == _("REMOVE"):
-                                # remove the selected items from the basket
-                                try:
-                                    remove_items(uid, id_basket, mark, ln)
-                                    messages.append(_("""The selected items have been removed."""))
-                                except BasketException, e:
-                                    messages.append(_("""The items have not been removed: %s""")%e)
-                            else:
-                                if action == _("EXECUTE"):
-                                    # copy/move the selected items to another basket
-                                    if to_basket == '0':
-                                        messages.append(_("""Select a destination basket to copy/move items."""))
-                                    else:
-                                        move_items(uid, id_basket, mark, to_basket, copy_move, ln)
-                                        messages.append(_("""The selected items have been copied/moved."""))
-                                else:
-                                    if action == "ORDER":
-                                        # change the order of the items in the basket
-                                        try:
-                                            order_items(uid, id_basket,idup,ordup,iddown,orddown, ln)
-                                        except BasketException, e:
-                                            messages.append(_("""The items have not been re-ordered: %s""") % e)
-
-
-    # display the basket's action form
-    if (show_actions):
-
-        baskets = []
-        basket_permission = ''
-        # query the database for the list of baskets
-        query_result = run_sql("SELECT b.id, b.name, b.public, ub.date_modification "\
-                               "FROM basket b, user_basket ub "\
-                               "WHERE ub.id_user=%s AND b.id=ub.id_basket "\
-                               "ORDER BY b.name ASC ",
-                               (uid,))
-        if len(query_result) :
-            for row in query_result :
-                if str(id_basket) == str(row[0]):
-                    basket_permission = row[2]
-                baskets.append({
-                                'id'   : row[0],
-                                'name' : row[1],
-                                'permission' : row[2],
-                              })
-
-        alerts = []
-        if ((id_basket != '0') and (id_basket != 0)):
-            # is basket related to some alerts?
-            alert_query_result = run_sql("SELECT alert_name FROM user_query_basket WHERE id_user=%s AND id_basket=%s",
-                                         (uid, id_basket))
-            if len(alert_query_result):
-                for row in alert_query_result:
-                    alerts.append(row[0])
-
-        out += webbasket_templates.tmpl_display_basket_actions(
-                 ln          = ln,
-                 weburl      = weburl,
-                 messages    = messages,
-                 baskets     = baskets,
-                 id_basket   = id_basket,
-                 basket_name = bname,
-                 basket_permission = basket_permission,
-                 alerts      = alerts,
-               )
-
-    # display the content of the selected basket
-    if ((id_basket != '0') and (id_basket != 0)):
-        if (basket_name == ""):
-            if (newname != ""):
-                basket_name = newname
-            else:
-                if (newbname != ""):
-                    basket_name = newbname
-
-        out += display_basket_content(uid, id_basket, basket_name, of, ln)
-    # if is guest user print message of relogin
-    if isGuestUser(uid):
-        out += warning_guest_user(type="baskets", ln = ln) # modified it for gettext also
-    return out
-
-
-# display_basket_content: display the content of the selected basket
-# input:  the identifier of the basket
-#         the name of the basket
-# output: the basket's content
-def display_basket_content(uid, id_basket, basket_name, of, ln):
-
-    out = ""
-    out_tmp=""
-
-    # search for basket's items
-    if (id_basket != '0') and (id_basket != 0):
-        query_result = run_sql("SELECT br.id_record,br.nb_order "\
-                               "FROM basket_record br "\
-                               "WHERE br.id_basket=%s "\
-                               "ORDER BY br.nb_order DESC ",
-                               (id_basket,))
-        items = []
-        if len(query_result) > 0:
-            for row in query_result:
-                items.append({
-                              'id' : row[0],
-                              'order' : row[1],
-                              'abstract' : print_record(row[0], of),
-                             })
-        query_result = run_sql("SELECT b.id, b.name "\
-                               "FROM basket b, user_basket ub "\
-                               "WHERE ub.id_user=%s AND b.id=ub.id_basket AND b.id<>%s "\
-                               "ORDER BY b.name ASC ",
-                               (uid,id_basket))
-        baskets = []
-        if len(query_result) > 0:
-            for row in query_result:
-                baskets.append({
-                                'id'   : row[0],
-                                'name' : row[1],
-                              })
-        out = webbasket_templates.tmpl_display_basket_content(
-                ln          = ln,
-                items       = items,
-                baskets     = baskets,
-                id_basket   = id_basket,
-                basket_name = basket_name,
-                imagesurl   = imagesurl,
-              )
-    return out
-
-
-# delete_basket: present a form for the confirmation of the delete action
-# input:  the identifier of the selected basket
-#         the name of the selected basket
-# output: the information about the selected basket and the form for the confirmation of the delete action
-def delete_basket(uid, id_basket, basket_name, ln):
-
-    # set variables
-    out = ""
-
-    alerts = []
-    query_result = run_sql("SELECT alert_name FROM user_query_basket WHERE id_user=%s AND id_basket=%s",
-                           (uid, id_basket))
-    if len(query_result):
-        for row in query_result:
-            alerts.append(row[0])
-
-    return webbasket_templates.tmpl_delete_basket_form(
-             ln = ln,
-             alerts = alerts,
-             id_basket = id_basket,
-             basket_name = basket_name,
-           )
-
-# perform_delete: present a form for the confirmation of the delete action
-# input:  delete_alerts='n' if releted alerts shouldn't be deleted; 'y' if yes
-#         action='YES' if delete action has been confirmed; 'NO' otherwise
-#         id_basket contains the identifier of the selected basket
-# output: go back to the display baskets form with confirmation message
-def perform_delete(uid, delete_alerts, confirm_action, id_basket, ln):
-
-    # set variables
-    out = ""
-
-    # load the right message language
-    _ = gettext_set_language(ln)
-
-    if (confirm_action == _('CONFIRM')):
-        #check that the user which is changing the basket name is the owner of it
-        if not is_basket_owner( uid, id_basket ):
-            raise NotBasketOwner(_("You are not the owner of this basket"))
-        # perform the cancellation
-        msg = _("The selected basket has been deleted.")
-
-        if (delete_alerts=='y'):
-            # delete the related alerts, remove from the alerts table: user_query_basket
-            query_result = run_sql("DELETE FROM user_query_basket WHERE id_user=%s AND id_basket=%s",
-                                   (uid, id_basket))
-            msg += " " + _("The related alerts have been removed.")
-        else:
-            # replace the basket identifier with 0
-            # select the records to update
-            query_result = run_sql("SELECT id_query,alert_name,frequency,notification,date_creation,date_lastrun "\
-                                   "FROM user_query_basket WHERE id_user=%s AND id_basket=%s",
-                                   (uid, id_basket))
-            # update the records
-            for row in query_result:
-                query_result_temp = run_sql("UPDATE user_query_basket "\
-                                            "SET alert_name=%s,frequency=%s,notification=%s,"\
-                                            "date_creation=%s,date_lastrun=%s,id_basket='0' "\
-                                            "WHERE id_user=%s AND id_query=%s AND id_basket=%s",
-                                            (row[1],row[2],row[3],row[4],row[5],uid,row[0],id_basket))
-
-        # delete the relation with the user table
-        query_result = run_sql("DELETE FROM user_basket WHERE id_user=%s AND id_basket=%s", (uid, id_basket))
-        # delete the basket information
-        query_result = run_sql("DELETE FROM basket WHERE id=%s", (id_basket,))
-        # delete the basket content
-        query_result = run_sql("DELETE FROM basket_record WHERE id_basket=%s", (id_basket,))
-
-    else:
-        msg=""
-
-    return msg
-
-# perform_rename_basket: rename an existing basket
-# input:  basket identifier, basket new name
-# output: basket identifier
-def perform_rename_basket(uid, id_basket, newname, ln):
-    # load the right message language
-    _ = gettext_set_language(ln)
-
-    # check that there's no basket owned by this user with the same name
-    if has_user_basket( uid, newname):
-        raise BasketNameAlreadyExists(_("You already have a basket which name is '%s'") % newname)
-    #check that the user which is changing the basket name is the owner of it
-    if not is_basket_owner( uid, id_basket ):
-        raise NotBasketOwner(_("You are not the owner of this basket"))
-    # update a row to the basket table
-    tmp = run_sql("UPDATE basket SET name=%s WHERE id=%s", (newname, id_basket))
-
-    return id_basket
-
-class BasketException(Exception):
-    """base exception class for basket related errors
-    """
-    pass
-
-class BasketNameAlreadyExists(BasketException):
-    """exception which is raised when a basket already exists with a certain name for a user
-    """
-    pass
-
-class NotBasketOwner(BasketException):
-    """exception which is raised when a user which is not the owner of a basket tries
-        to perform an operation over it for which he has no privileges
-    """
-    pass
-
-def has_user_basket(uid, basket_name):
-    """checks if a user (uid) already has a basket which name is 'basket_name' (case-sensitive)
-    """
-    return run_sql("select b.id from basket b, user_basket ub where ub.id_user=%s and b.id=ub.id_basket and b.name=%s",
-                   (uid, basket_name.strip()))
-
-def is_basket_owner(uid, bid):
-    """checks whether or not the user (uid) is owner for the indicated basket (bid)
-    """
-    return run_sql("select id_basket from user_basket where id_user=%s and id_basket=%s",
-                   (uid, bid))
-
-
-def get_basket_name(bid):
-    """returns the name of the basket corresponding to the given id
-    """
-    res = run_sql("select name from basket where id=%s", (bid,))
-    if not res:
-        return ""
-    return res[0][0]
-
-
-# perform_create_basket: create a new basket and the relation with the user table
-# input:  basket name
-# output: basket identifier
-def perform_create_basket(uid, basket_name, ln):
-
-    # load the right message language
-    _ = gettext_set_language(ln)
-
-    # check that there's no basket owned by this user with the same name
-    if has_user_basket(uid, basket_name):
-        raise BasketNameAlreadyExists(_("You already have a basket which name is '%s'") % basket_name)
-    # add a row to the basket table
-    id_basket = run_sql("INSERT INTO basket(id,name,public) VALUES ('0',%s,'n')", (basket_name,))
-
-    # create the relation between the user and the basket: user_basket
-    query_result = run_sql("INSERT INTO user_basket(id_user,id_basket,date_modification) VALUES (%s,%s,%s)",
-                           (uid, id_basket, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
-    return id_basket
-
-
-# basket_exists checks if a basket is in the database
-# input:  the name of the basket
-# output: the id of the basket if it exists, 0 otherwise
-def basket_exists (basket_name, uid):
-    id_basket = run_sql("SELECT b.id FROM basket b, user_basket ub "\
-                        "WHERE b.name=%s "\
-                        "AND b.id=ub.id_basket "\
-                        "AND ub.id_user=%s",
-                        (basket_name, uid))
-    return id_basket
-
-# set_permission: set access permission on a basket
-# input:  basket identifier, basket public permission
-# output: basket identifier
-def set_permission(uid, id_basket, permission, ln):
-
-    # load the right message language
-    _ = gettext_set_language(ln)
-
-    #check that the user which is changing the basket name is the owner of it
-    if not is_basket_owner( uid, id_basket ):
-        raise NotBasketOwner(_("You are not the owner of this basket"))
-    # update a row to the basket table
-    id_basket = run_sql("UPDATE basket SET public=%s WHERE id=%s", (permission, id_basket))
-
-    return id_basket
-
-# remove_items: remove the selected items from the basket
-# input:  basket identifier, list of selected items
-# output: basket identifier
-def remove_items(uid, id_basket, mark, ln):
-
-    # load the right message language
-    _ = gettext_set_language(ln)
-
-    #check that the user which is changing the basket name is the owner of it
-    if not is_basket_owner( uid, id_basket ):
-        raise NotBasketOwner(_("You are not the owner of this basket"))
-    if type(mark)==list:
-        selected_items=mark
-    else:
-        selected_items=[mark]
-    for i in selected_items:
-        # delete the basket content
-        query_result = run_sql("DELETE FROM basket_record WHERE id_basket=%s AND id_record=%s",
-                               (id_basket, i))
-
-    return id_basket
-
-# check_copy: check if the record exists already in the basket
-# input:  basket identifier, list of selected items
-# output: boolean
-def check_copy(idbask,i):
-
-    query_result = run_sql("select * from basket_record where id_basket=%s and id_record=%s",
-                           (idbask,i))
-    if len(query_result)>0 :
-        return 0
-    return 1
-
-# copy/move the selected items to another basket
-# input: original basket identifier, list of selected items,
-#        destination basket identifier, copy or move option: "1"=copy, "2"=move
-#output: basket identifier
-def move_items(uid, id_basket, mark, to_basket, copy_move="1", ln="en"):
-    if type(mark)==list:
-        selected_items=mark
-    else:
-        selected_items=[mark]
-    for i in selected_items:
-	if check_copy(to_basket,i):
-            query_result = run_sql("INSERT INTO basket_record(id_basket,id_record,nb_order) VALUES (%s,%s,'0')",
-                                   (to_basket, i))
-
-    if copy_move=="2":
-        #delete from previous basket
-        remove_items(uid, id_basket, mark, ln)
-
-    return id_basket
-
-# change the order of the items in the basket
-# input: basket identifier
-#        identifiers and positions of the items to be moved
-#output: basket identifier
-def order_items(uid, id_basket,idup,ordup,iddown,orddown, ln):
-
-    # load the right message language
-    _ = gettext_set_language(ln)
-
-    #check that the user which is changing the basket name is the owner of it
-    if not is_basket_owner( uid, id_basket ):
-        raise NotBasketOwner(_("You are not the owner of this basket"))
-    # move up the item idup (by switching its order number with the other item):
-    query_result = run_sql("UPDATE basket_record SET nb_order=%s WHERE id_basket=%s AND id_record=%s",
-                           (orddown,id_basket,idup))
-
-    # move down the item iddown (by switching its order number with the other item):
-    query_result = run_sql("UPDATE basket_record SET nb_order=%s WHERE id_basket=%s AND id_record=%s",
-                           (ordup,id_basket,iddown))
-
-    return id_basket
-
-
-# perform_display_public: display the content of the selected basket, if public
-# input:  the identifier of the basket
-#         the name of the basket
-#         of is the output format code
-# output: the basket's content
-def perform_display_public(uid, id_basket, basket_name, action, to_basket, mark, newname, of, ln = "en"):
-    out = ""
-    messages = []
-
-    # load the right message language
-    _ = gettext_set_language(ln)
-
-    if action == _("EXECUTE"):
-        # perform actions
-        if newname != "":
-            # create a new basket
+            topic = 0
+            errors.append(('ERR_WEBBASKET_NOT_OWNER'))
+        return (topic, errors)
+    elif selected_topic != -1:
+        if check_user_owns_baskets(uid, bskids):
+            topics = get_personal_topics(uid)
             try:
-                to_basket = perform_create_basket(uid, newname, ln)
-                messages.append(_("""The <I>private</I> basket <B>%s</B> has been created.""") % newname)
-            except BasketException, e:
-                messages.append(_("""The basket %s has not been created: %s""") % (newname, e))
-        # copy the selected items
-        if to_basket == '0':
-            messages.append(_("""Select a destination basket to copy the selected items."""))
+                new_topic_name = topics[selected_topic][0]
+                move_baskets_to_topic(uid, bskids, topics[selected_topic][0])
+                topics = get_personal_topics(uid)
+                topics = zip(topics, range(len(topics)))
+                topic = [elt[1] for elt in topics if elt[0][0] == new_topic_name][0]
+            except:
+                errors.append(('ERR_WEBBASKET_DB_ERROR'))
+                topic = 0
         else:
-            move_items(uid, id_basket, mark, to_basket, '1', ln)
-            messages.append(_("""The selected items have been copied."""))
+            topic = 0
+            errors.append(('ERR_WEBBASKET_NOT_OWNER'))
+        return (topic, errors)
+    else:
+        topics = get_personal_topics(uid)
+        body = webbasket_templates.tmpl_move(bskids, topics, ln)
+        return (body, errors, warnings)      
 
-    # search for basket's items
-    if (id_basket != '0') and (id_basket != 0):
-        res = run_sql("select public from basket where id=%s", (id_basket,))
-        if len(res) == 0:
-            messages.append(_("""Non existing basket"""))
+def move_record(uid, bskid, recid, direction):
+    """Move a record up or down in a basket (change score).
+    @param uid: user id (user has to have manage rights over this basket)
+    @param bskid: basket id
+    @param recid: record we want to move
+    @param direction: cfg_webbasket_actions['UP'] or  cfg_webbasket_actions['DOWN'] (default)
+    """
+    uid = wash_url_argument(uid, 'int')
+    bskid = wash_url_argument(bskid, 'int')
+    recid = wash_url_argument(recid, 'int')
+    direction = wash_url_argument(direction, 'str')
+    if __check_user_can_perform_action(uid, bskid, cfg_webbasket_share_levels['MANAGE']):
+        move_item(bskid, recid, direction)
+    
+def perform_request_manage_rights(uid, bskid, topic=0,
+                                  groups={}, external='', ln=cdslang):
+    """Interface for management of rights. If groups or external is provided, will save new
+    rights into database, else will provide interface.
+    @param uid: user id (user has to have sufficient rights on this basket
+    @param bskid: basket id to change rights on
+    @param topic: topic currently used
+    @param groups: dictionary of {usergroup id: new rights}
+    @param external: rights for everybody (can be 'NO')
+    @param ln: language
+    """
+    uid = wash_url_argument(uid, 'int')
+    bskid = wash_url_argument(bskid, 'int')
+    topic = wash_url_argument(topic, 'int')
+    if not(type(groups) is dict):
+        groups = {}
+    external = wash_url_argument(external, 'str')
+    ln = wash_language(ln)
 
-            out += '<collection>'
-            out += webbasket_templates.tmpl_display_messages (of = of, ln = ln, messages = messages)
-            out += '</collection>'
-            return out
+    body = ''
+    errors = []
+    warnings = []
 
-        if str(res[0][0]).strip() != 'y':
-            messages.append(_("""The basket is private"""))
+    rights = get_max_user_rights_on_basket(uid, bskid)
+    if rights != cfg_webbasket_share_levels['MANAGE']:
+        errors.append(('ERR_WEBBASKET_NO_RIGHTS',))
+        return (body, errors, warnings)
+    if not(groups) and not(external):
+        bsk_name = get_basket_name(bskid)
+        groups_rights = get_groups_subscribing_to_basket(bskid)
+        external_rights = ''
+        if groups_rights and groups_rights[0][0] == 0:
+            external_rights = groups_rights[0][2]
+            groups_rights = groups_rights[1:]
+        body = webbasket_templates.tmpl_manage_rights(bskid, bsk_name,
+                                                      groups_rights, external_rights,
+                                                      topic, ln)
+    else:
+        groups['0'] = external
+        update_rights(bskid, groups)
+    return (body, errors, warnings)
 
-            out += '<collection>'
-            out += webbasket_templates.tmpl_display_messages (of = of, ln = ln, messages = messages)
-            out += '</collection>'
-            return out
+def perform_request_add_group(uid, bskid, topic=0, group_id=0, ln=cdslang):
+    """If group id is specified, share basket bskid to this group;
+    else return a page for selection of a group.
+    @param uid: user id (selection only of groups user is member of)
+    @param bskid: basket id
+    @param topic: topic currently displayed
+    @param ln: language
+    """
+    uid = wash_url_argument(uid, 'int')
+    bskid = wash_url_argument(bskid, 'int')
+    group_id = wash_url_argument(group_id, 'int')
+    topic = wash_url_argument(topic, 'int')
+    ln = wash_language(ln)
+    
+    if group_id:
+        share_basket_with_group(bskid, group_id, cfg_webbasket_share_levels['READITM'])
+    else:
+        groups = get_groups_user_member_of(uid)
+        body = webbasket_templates.tmpl_add_group(bskid, topic, groups, ln)
+        return body
 
-        query_result = run_sql("SELECT br.id_record,br.nb_order "\
-                               "FROM basket_record br "\
-                               "WHERE br.id_basket=%s "\
-                               "ORDER BY br.nb_order DESC ",
-                               (id_basket,))
-
-        # Shortcut the output in the case of XML format
-        if of == 'xm':
-            out = '<collection xmlns="http://www.loc.gov/MARC21/slim">\n'
-            for r in query_result:
-                out += print_record (r [0], of)
-            out += '\n</collection>\n'
-
-            return out
-        
-            
-        items = []
-        if len(query_result) > 0:
-            for row in query_result:
-                items.append({
-                              'id' : row[0],
-                              'order' : row[1],
-                              'abstract' : print_record(row[0], of),
-                             })
-
-        # copy selected items to basket
-        query_result = run_sql("SELECT b.id, b.name "\
-                               "FROM basket b, user_basket ub "\
-                               "WHERE ub.id_user=%s AND b.id=ub.id_basket "\
-                               "ORDER BY b.name ASC ",
-                               (uid,))
-        baskets = []
-        if len(query_result) > 0:
-            for row in query_result:
-                baskets.append({
-                                'id'   : row[0],
-                                'name' : row[1],
-                              })
-
-        out += webbasket_templates.tmpl_display_messages (of = of, ln = ln, messages = messages)
-
-        out += _("""Content of the public basket <B>%s</B> :""") % get_basket_name(id_basket) + "<BR>"
-        out += webbasket_templates.tmpl_display_public_basket_content(
-                ln          = ln,
-                items       = items,
-                baskets     = baskets,
-                id_basket   = id_basket,
-                basket_name = basket_name,
-                imagesurl   = imagesurl,
-              )
-    return out
-
-## --- new stuff starts here ---
-
-def perform_request_add(uid=-1, recid=[], bid=[], bname=[], ln="en"):
-    """Add records recid to baskets bid for user uid. If bid isn't set, it'll ask user into which baskets to add them.
-    If bname is set, it'll create new basket with this name, and add records there rather than to bid."""
-    out = ""
-
-    # load the right message language
-    _ = gettext_set_language(ln)
-
-    # wash arguments:
-    recIDs = recid
-    bskIDs = bid
-    if not type(recid) is list:
-        recIDs = [recid]
-    if not type(bid) is list:
-        bskIDs = [bid]
-    # sanity checking:
-    if recIDs == []:
-        return _("No records to add.")
-    # do we have to create some baskets?
-    if bname:
+def perform_request_create_basket(uid,
+                                  new_basket_name='',
+                                  new_topic_name='', create_in_topic=-1, topic_number=-1,
+                                  ln=cdslang):
+    """if new_basket_name and topic infos are given create a basket and return topic number,
+    else return (body, errors, warnings) tuple of basket creation form.
+    @param uid: user id (int)
+    @param new_basket_name: name of the basket to create (str)
+    @param new_topic_name: name of new topic to create new basket in (str)
+    @param create_in_topic: identification number of topic to create new basket in (int)
+    @param topic_number: number of topic to preselect on the creation form.
+    @pram ln: language
+    """
+    uid = wash_url_argument(uid, 'int')
+    new_basket_name = wash_url_argument(new_basket_name, 'str')
+    new_topic_name = wash_url_argument(new_topic_name, 'str')
+    create_in_topic = wash_url_argument(create_in_topic, 'int')
+    topic_number = wash_url_argument(topic_number, 'int')
+    ln = wash_language(ln)
+    
+    if new_basket_name and (new_topic_name or create_in_topic != -1):
+        if new_topic_name:
+            topic = new_topic_name
+        else:
+            topics = get_personal_topics(uid)
+            try:
+                topic = topics[create_in_topic][0]
+            except IndexError:
+                return 0
+        create_basket(uid, new_basket_name, topic)
+        topics_list = map(lambda x: x[0], get_personal_topics(uid))
         try:
-            new_basket_ID = perform_create_basket(uid, bname, ln)
-            bskIDs = [new_basket_ID]
-        except BasketException, e:
-            out += _("""The basket %s has not been created: %s""") % (bname, e)
-    basket_id_name_list = get_list_of_user_baskets(uid)
-    if len(basket_id_name_list) == 1:
-        bskIDs = [basket_id_name_list[0][0]]
-    if bskIDs == []:
-        # A - some information missing, so propose list of baskets to choose from
-        if basket_id_name_list != []:
-            # there are some baskets; good
-            out += webbasket_templates.tmpl_add_choose_basket(
-                     ln = ln,
-                     baskets = basket_id_name_list,
-                     recids = recIDs,
-                   )
-        else:
-            out += webbasket_templates.tmpl_add_create_basket(
-                     ln = ln,
-                     recids = recIDs,
-                   )
-            
-        if isGuestUser(uid):
-            out += warning_guest_user (type = _("baskets"), ln = ln)
+            return topics_list.index(topic)
+        except ValueError:
+            return 0
     else:
-        # B - we have baskets IDs, so we can add records
-        messages = []
-        messages.append(_("Adding %s records to basket(s)...") % len(recIDs))
-        for bskID in bskIDs:
-            if is_basket_owner(uid, bskID):
-                for recID in recIDs:
-                    try:
-                        res = run_sql("INSERT INTO basket_record(id_basket,id_record,nb_order) VALUES (%s,%s,%s)",
-                                      (bskID,recID,'0'))
-                    except:
-                        pass # maybe records were already there? page reload happened?
-                messages.append(_("...done."))
+        topics = get_personal_topics(uid)
+        if topic_number > -1 and topic_number < len(topics):
+            create_in_topic = topics[topic_number]
+            
+        body = webbasket_templates.tmpl_create_basket(new_basket_name,
+                                                      new_topic_name, create_in_topic,
+                                                      topics,
+                                                      ln)
+        return (body, [], [])
+      
+def perform_request_display_public(bskid=0, of='hb', ln=cdslang):
+    """return html representation of a public basket """
+    bskid = wash_url_argument(bskid, 'int')
+    of = wash_url_argument(of, 'str')
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    
+    body = ''
+    errors = []
+    warnings = []
+    basket = get_public_basket_infos(bskid)
+    if of[0]=='x':
+        items = []
+        if len(basket) == 7:
+            content = get_basket_content(bskid)
+            for item in content:
+                items.append(print_record(item[0], of))
+        return webbasket_templates.tmpl_xml_basket(items)
+    
+    if len(basket) == 7:
+        items = get_basket_content(bskid)
+        last_cmt = _("N/A")
+        records = []
+        cmt_dates = []
+        for (recid, nb_cmt, last_cmt, ext_val, int_val, score) in items:
+            cmt_dates.append(convert_datetext_to_datestruct(last_cmt))
+            last_cmt = convert_datetext_to_dategui(last_cmt, ln)
+            val = ''
+            if recid < 0:
+                if ext_val:
+                    val = decompress(ext_val)
             else:
-                messages.append(_("sorry, you are not the owner of this basket."))
-        out += webbasket_templates.tmpl_add_messages(
-                 ln = ln,
-                 messages = messages,
-               )
-        out += perform_display(uid=uid, id_basket=bskIDs[0], ln=ln)
+                if int_val:
+                    val = decompress(int_val)
+            records.append((recid, nb_cmt, last_cmt, val, score))
+        body = webbasket_templates.tmpl_display_public(basket, records, ln)        
+    else:
+        errors.append('ERR_WEBBASKET_RESTRICTED_ACCESS')
+    return (body, errors, warnings)
+    
+def perform_request_subscribe(uid, bskid):
+    """subscribe to external basket bskid"""
+    uid = wash_url_argument(uid, 'int')
+    bskid = wash_url_argument(bskid, 'int')
+    errors = []
+    if is_public(bskid):
+        subscribe(uid, bskid)
+    else:
+        errors.append('ERR_WEBBASKET_RESTRICTED_ACCESS')
+    return errors
+        
+def perform_request_unsubscribe(uid, bskid):
+    """unsubscribe to external basket bskid"""
+    uid = wash_url_argument(uid, 'int')
+    bskid = wash_url_argument(bskid, 'int')
+    unsubscribe(uid, bskid)
+    
+def __check_user_can_comment(uid, bskid):
+    """ Private function. check if a user can comment """
+    min_right = cfg_webbasket_share_levels['ADDCMT']
+    rights = get_max_user_rights_on_basket(uid, bskid)
+    if rights:
+        if cfg_webbasket_share_levels_ordered.index(rights) >= cfg_webbasket_share_levels_ordered.index(min_right):
+            return 1
+    return 0
+
+def __check_user_can_perform_action(uid, bskid, rights):
+    """ Private function, check if a user has sufficient rights"""
+    min_right = rights
+    rights = get_max_user_rights_on_basket(uid, bskid)
+    if rights:
+        if cfg_webbasket_share_levels_ordered.index(rights) >= cfg_webbasket_share_levels_ordered.index(min_right):
+            return 1
+    return 0
+
+def __check_sufficient_rights(rights_user_has, rights_needed):
+    """Private function, check if the rights are sufficient."""
+    try:
+        out = cfg_webbasket_share_levels_ordered.index(rights_user_has) >= cfg_webbasket_share_levels_ordered.index(rights_needed)
+    except ValueError:
+        out = 0
     return out
 
-def get_list_of_user_baskets(uid):
-    """Return list of lists [[basket_id, basket_name],[basket_id, basket_name],...] for the given user."""
-    out = []
-    res = run_sql("SELECT b.id, b.name "\
-                  "FROM basket b, user_basket ub "\
-                  "WHERE ub.id_user=%s AND b.id=ub.id_basket "\
-                  "ORDER BY b.name ASC ",
-                  (uid,))
-    for row in res:
-        out.append([row[0], row[1]])
+def create_guest_warning_box(ln=cdslang):
+    """return a warning message about logging into system"""
+    ln = wash_language(ln)
+    return webbasket_templates.tmpl_create_guest_warning_box(ln)
+
+def create_personal_baskets_selection_box(uid,
+                                          html_select_box_name='baskets',
+                                          selected_bskid=None,
+                                          ln=cdslang):
+    """Return HTML box for basket selection. Only for personal baskets.
+    @param uid: user id
+    @param html_select_box_name: name used in html form
+    @param selected_bskid: basket currently selected
+    @param ln: language
+    """
+    baskets = get_all_personal_baskets_names(uid)
+    return webbasket_templates.tmpl_personal_baskets_selection_box(baskets,
+                                                                   html_select_box_name,
+                                                                   selected_bskid,
+                                                                   ln)
+
+def create_basket_navtrail(uid, 
+                           category=cfg_webbasket_categories['PRIVATE'], topic=0, group=0, 
+                           bskid=0, ln=cdslang):
+    """display navtrail for basket navigation.
+    @param uid: user id (int)
+    @param category: selected category (see cfg_webbasket_categories)
+    @param topic: selected topic # if personal baskets
+    @param group: selected group id for displaying (int)
+    @param bskid: basket id (int)
+    @param ln: language"""
+    uid = wash_url_argument(uid, 'int')
+    category = wash_url_argument(category, 'str')
+    topic = wash_url_argument(topic, 'int')
+    group = wash_url_argument(group, 'int')
+    bskid = wash_url_argument(bskid, 'int')
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    out = ''
+    if category == cfg_webbasket_categories['PRIVATE']:
+        out += ' &gt; <a class="navtrail" href="%s/yourbaskets.py/display?%s">%s</a>'
+        out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Personal baskets"))
+        topics = get_personal_topics(uid)
+        if 0 <= topic < len(topics):
+            out += ' &gt; '
+            out += '<a class="navtrail" href="%s/yourbaskets.py/display?%s">%s</a>'
+            out %= (weburl,
+                    'category=' + category + '&amp;topic=' + str(topic) + '&amp;ln=' + ln,
+                    topics[topic][0])
+            if bskid:
+                basket = get_public_basket_infos(bskid)
+                if basket:
+                    out += ' &gt; '
+                    out += '<a class="navtrail" href="%s/yourbaskets.py/display?%s">%s</a>'
+                    out %= (weburl,
+                            'category=' + category + '&amp;topic=' + str(topic) + \
+                            '&amp;ln=' + ln + '#bsk' + str(bskid),
+                            basket[1])
+                
+    elif category == cfg_webbasket_categories['GROUP']:
+        out += ' &gt; <a class="navtrail" href="%s/yourbaskets.py/display?%s">%s</a>'
+        out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Group baskets"))
+        groups = get_group_infos(uid)
+        if group:
+            groups = filter(lambda x: x[0]==group, groups)
+        if len(groups):
+            out += ' &gt; '
+            out += '<a class="navtrail" href="%s/yourbaskets.py/display?%s">%s</a>'
+            out %= (weburl,
+                    'category=' + category + '&amp;group=' + str(group) + '&amp;ln=' + ln,
+                    groups[0][1])
+            if bskid:
+                basket = get_public_basket_infos(bskid)
+                if basket:
+                    out += ' &gt; '
+                    out += '<a class="navtrail" href="%s/yourbaskets.py/display?%s"">%s</a>'
+                    out %= (weburl,
+                            'category=' + category + '&amp;group=' + str(group) + \
+                            '&amp;ln=' + ln + '#bsk' + str(bskid),
+                            basket[1])
+    elif category == cfg_webbasket_categories['EXTERNAL']:
+        out += ' &gt; <a class="navtrail" href="%s/yourbaskets.py/display?%s">%s</a>'
+        out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Other's baskets"))
+        if bskid:
+            basket = get_public_basket_infos(bskid)
+            if basket:
+                out += ' &gt; '
+                out += '<a class="navtrail" href="%s/yourbaskets.py/display?%s"">%s</a>'
+                out %= (weburl,
+                        'category=' + category + '&amp;ln=' + ln + '#bsk' + str(bskid),
+                        basket[1])
     return out
 
-def account_list_baskets(uid, action="", id_basket=0, newname="", ln="en"):
-
-    out = ""
-    # query the database for the list of baskets
-    query_result = run_sql("SELECT b.id, b.name, b.public, ub.date_modification "\
-                           "FROM basket b, user_basket ub "\
-                           "WHERE ub.id_user=%s AND b.id=ub.id_basket "\
-                           "ORDER BY b.name ASC ",
-                           (uid,))
-
-    baskets = []
-    if len(query_result) :
-        for row in query_result :
-            if str(id_basket) == str(row[0]):
-                basket_permission = row[2]
-            baskets.append({
-                            'id'   : row[0],
-                            'name' : row[1],
-                            'permission' : row[2],
-                            'selected' : (str(id_basket) == str(row[0])) and "selected" or "",
-                          })
-
-    return webbasket_templates.tmpl_account_list_baskets(
-             ln = ln,
-             baskets = baskets,
-           )
+def account_list_baskets(uid, ln=cdslang):
+    """Display baskets informations on account page"""
+    ln = wash_language(ln)
+    uid = wash_url_argument(uid, 'int')
+    
+    _ = gettext_set_language(ln)
+    (personal, group, external) = count_baskets(uid)
+    link = '<a href="%s">%s</a>'
+    base_url = weburl + '/yourbaskets.py/display?category=%s&amp;ln=' + ln
+    personal_text = _("%i personal baskets") % personal
+    if personal:
+        url = base_url % cfg_webbasket_categories['PRIVATE']
+        personal_text = link % (url, personal_text)
+    group_text = _("%i group baskets") % group
+    if group:
+        url = base_url % cfg_webbasket_categories['GROUP']
+        group_text = link % (url, group_text)
+    external_text = _("%i other's baskets") % external
+    if external:
+        url = base_url % cfg_webbasket_categories['EXTERNAL']
+        external_text = link % (url, external_text)
+    out = _("You have %s and are subscribed to %s and %s.") % (personal_text,
+                                                               group_text,
+                                                               external_text)
+    return out
