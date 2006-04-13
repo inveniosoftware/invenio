@@ -59,23 +59,11 @@ sleeptime      = ""                           # default sleeptime
 format_string  = "%Y-%m-%d %H:%M:%S"          # date/time format
 sched_time     = time.strftime(format_string) # scheduled execution time in the date/time format
 
-### sql commands to be executed during the script run
-###
-
-sql = {
-
- "all" : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt,
- "last": "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='%s' and bf.last_updated < br.modification_date" % fmt,
- "q1"  : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='xm'",
- "q2"  : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt
-
-}
-
 
 ### run the bibreformat task bibsched scheduled
 ###
 
-def bibreformat_task(sql_queries, cds_query, process_format):
+def bibreformat_task(sql, sql_queries, cds_query, process_format):
     
     global process, fmt
 
@@ -87,7 +75,7 @@ def bibreformat_task(sql_queries, cds_query, process_format):
 
     if process_format:
         print "Querying database for records with missing format ..."
-        without_format = without_fmt()
+        without_format = without_fmt(sql)
 
     recIDs = []
 
@@ -187,15 +175,15 @@ def ldiff(l1, l2):
 ### Identify recIDs of records with missing format
 ###
 
-def without_fmt():
+def without_fmt(sql):
     "List of record IDs to be reformated, not having the specified format yet"
 
     global fmt
 
     xm1, xm2, format1, format2 = [],[],[],[]
     
-    q1 = sql['q1'] # "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='xm'"
-    q2 = sql['q2'] # "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt
+    q1 = sql['q1']
+    q2 = sql['q2']
 
     ## get complete recID list of xm formatted records
     xm1 = run_sql(q1)
@@ -519,8 +507,22 @@ def task_run(process_format):
 
     ## initialize parameters
 
+
+    if options.has_key("format"):
+        fmt = options["format"]
+    else:
+        fmt = "hb"
+
+    sql = {
+
+        "all" : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt,
+        "last": "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='%s' and bf.last_updated < br.modification_date" % fmt,
+        "q1"  : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='xm'",
+        "q2"  : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt
+
+    }
+
     if options.has_key("all"):
-#        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt)
         sql_queries.append(sql['all'])
     if options.has_key("without"):
         process_format = 1
@@ -529,7 +531,6 @@ def task_run(process_format):
         process = 0
 
     if options.has_key("last"):
-#        sql_queries.append("select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='%s' and bf.last_updated < br.modification_date" % fmt)
          sql_queries.append(sql['last'])
     if options.has_key("collection"):
         cds_query['collection'] = options['collection']
@@ -546,8 +547,9 @@ def task_run(process_format):
     else:
         cds_query['pattern']      = ""
 
-    if options.has_key("format"):
-        fmt = options["format"]
+
+### sql commands to be executed during the script run
+###
 
     ## check task status:
     task_status = task_read_status(task_id)
@@ -564,7 +566,7 @@ def task_run(process_format):
     signal.signal(signal.SIGINT, task_sig_unknown)
     ## run the task:
 
-    bibreformat_task(sql_queries, cds_query, process_format)
+    bibreformat_task(sql, sql_queries, cds_query, process_format)
 
     ## we are done:
     task_update_status("DONE")
