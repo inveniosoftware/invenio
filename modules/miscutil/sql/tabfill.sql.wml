@@ -22,7 +22,6 @@
 ## read config variables:
 #include "config.wml"
 #include "configbis.wml"
-#include "messages.wml"
 
 ## local defaults, i.e. WML config variables are to be used:
 INSERT INTO collection VALUES (1,'<CDSNAME>',NULL,NULL,NULL,NULL);
@@ -56,22 +55,22 @@ INSERT INTO flxLINKTYPEPARAMS VALUES ('KEYWORD_SEARCH','KEYWORD',0);
 ## generally suitable defaults:
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (1,'wrd','0000-00-00 00:00:00');
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,1,100);
-<en>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'en','ln','<MSG_WORD_SIMILARITY>');</en>
-<fr>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'fr','ln','<MSG_WORD_SIMILARITY>');</fr>
-<de>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'de','ln','<MSG_WORD_SIMILARITY>');</de>
-<es>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'es','ln','<MSG_WORD_SIMILARITY>');</es>
-<ca>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'ca','ln','<MSG_WORD_SIMILARITY>');</ca>
-<pl>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'pl','ln','<MSG_WORD_SIMILARITY>');</pl>
-<pt>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'pt','ln','<MSG_WORD_SIMILARITY>');</pt>
-<it>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'it','ln','<MSG_WORD_SIMILARITY>');</it>
-<ja>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'ja','ln','<MSG_WORD_SIMILARITY>');</ja>
-<ru>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'ru','ln','<MSG_WORD_SIMILARITY>');</ru>
-<sk>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'sk','ln','<MSG_WORD_SIMILARITY>');</sk>
-<cs>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'cs','ln','<MSG_WORD_SIMILARITY>');</cs>
-<no>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'no','ln','<MSG_WORD_SIMILARITY>');</no>
-<sv>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'sv','ln','<MSG_WORD_SIMILARITY>');</sv>
-<el>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'el','ln','<MSG_WORD_SIMILARITY>');</el>
-<uk>INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'uk','ln','<MSG_WORD_SIMILARITY>');</uk>
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'en','ln','word similarity');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'fr','ln','similarité de mots');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'de','ln','Wortähnlichkeit');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'es','ln','similitud de palabras');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'ca','ln','semblança de paraules');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'pl','ln','word similarity');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'pt','ln','similaridade por palavra');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'it','ln','word similarity');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'ja','ln','word similarity');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'ru','ln','word similarity');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'sk','ln','podobnosť slov');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'cs','ln','podobnost slov');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'no','ln','ord-likhet');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'sv','ln','ord-likhet');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'el','ln','ομοιότητα λέξης');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'uk','ln','подібні слова');
 
 <protect>
 INSERT INTO field VALUES (1,'any field','anyfield');

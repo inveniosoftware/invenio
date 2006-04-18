@@ -46,10 +46,9 @@
 ## WML elements below.  Feel free to edit as many as you need.  When done,
 ## return to the main CDSware source directory and type 'make'.  Good luck! :-)
 
-## Before starting, let's include messages and helper functions:
+## Before starting, let's include helper functions:
 #include "cdswmllib.wml"
 #include "configbis.wml"
-#include "messages.wml"
 
 ###################################
 ## Part 1:  Essential parameters ##

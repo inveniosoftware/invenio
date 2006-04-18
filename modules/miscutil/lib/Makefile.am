@@ -47,17 +47,17 @@ EXTRA_DIST = __init__.py \
 CLEANFILES = config.py dbquery.py messages.py $(phplib_DATA) *~ *.tmp *.pyc
 
 config.py: config.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-      $(top_srcdir)/config/messages.wml $(top_srcdir)/config/cdswmllib.wml
+      $(top_srcdir)/config/cdswmllib.wml
 	$(WML) -o $@ $<
 
 dbquery.py: dbquery.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-      $(top_srcdir)/config/messages.wml $(top_srcdir)/config/cdswmllib.wml
+      $(top_srcdir)/config/cdswmllib.wml
 	$(WML) -o $@ $<
 
 messages.py: messages.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-      $(top_srcdir)/config/messages.wml $(top_srcdir)/config/cdswmllib.wml
+      $(top_srcdir)/config/cdswmllib.wml
 	$(WML) -o $@ $<
 
 errorHandling.php: errorHandling.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-      $(top_srcdir)/config/messages.wml $(top_srcdir)/config/cdswmllib.wml
+      $(top_srcdir)/config/cdswmllib.wml
 	$(WML) -o $@ $<

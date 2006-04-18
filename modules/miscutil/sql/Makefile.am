@@ -24,6 +24,5 @@ EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) tabcreate.sql tabdrop.sql tabbibclean.sql
 
 CLEANFILES = $(noinst_DATA) *~ *.tmp tabfill.sql
 
-%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-   $(top_srcdir)/config/messages.wml      
+%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml 
 	$(WML) -o $@ $<

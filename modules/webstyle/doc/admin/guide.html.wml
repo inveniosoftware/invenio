@@ -33,9 +33,6 @@ href="http://cdsware.cern.ch/download/INSTALL">INSTALL</a> guide.  You
 can modify page header, footer, general portalboxes, etc.  See the
 installation guide for more details.
 
-<p>Messages emited by the web interface are to be edited during
-configuration time in the <code>messages.wml</code> file.  
-
 <h2>Run-time Configuration of Page Layout</h2>
 
 <p>During runtime you most probably want to modify mostly the <a
