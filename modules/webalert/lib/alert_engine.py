@@ -345,7 +345,7 @@ def update_arguments(argstr, date_from, date_until):
 def log(msg):
     try:
         log = open(logdir + '/alertengine.log', 'a')
-        log.write(strftime('%04Y%02m%02d%02H%02M%02S#'))
+        log.write(strftime('%Y%m%d%H%M%S#'))
         log.write(msg + '\n')
         log.close()
     except:

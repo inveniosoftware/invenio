@@ -579,7 +579,7 @@ URI: http://%(host)s%(page)s
                 'contact'   : _("Please contact <a href=\"mailto:%s\">%s</a> quoting the following information:")  % (urllib.quote(supportemail), supportemail),
                 'host'      : host_s,
                 'page'      : page_s,
-                'time'      : time.strftime("%02d/%b/%Y:%H:%M:%S %z"),
+                'time'      : time.strftime("%d/%b/%Y:%H:%M:%S %z"),
                 'browser'   : browser_s,
                 'client'    : client_s,
                 'error'     : error_s,

@@ -2309,7 +2309,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
 
     # reformat collection_web_update_time to the format suitable for comparisons
     try:
-        collection_web_update_time = time.strftime("%04Y-%02m-%02d %02H:%02M:%02S",
+        collection_web_update_time = time.strftime("%Y-%m-%d %H:%M:%S",
                            time.strptime(collection_web_update_time, "%d %b %Y %H:%M:%S"))
     except ValueError, e:
         pass

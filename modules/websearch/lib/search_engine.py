@@ -953,7 +953,7 @@ def wash_pattern(p):
     # replace back __SPACE__ by spaces:
     p = sre_pattern_space.sub(" ", p)
     # replace special terms:
-    p = sre_pattern_today.sub(time.strftime("%04Y-%02m-%02d", time.localtime()), p)
+    p = sre_pattern_today.sub(time.strftime("%Y-%m-%d", time.localtime()), p)
     # remove unnecessary whitespace:
     p = string.strip(p)
     return p
@@ -1167,7 +1167,7 @@ def create_collection_reclist_cache():
         collrecs[name] = None # this will be filled later during runtime by calling get_collection_reclist(coll)
     # update timestamp
     try:
-        collection_reclist_cache_timestamp = time.strftime("%04Y-%02m-%02d %02H:%02M:%02S", time.localtime())
+        collection_reclist_cache_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     except NameError:
         collection_reclist_cache_timestamp = 0
     return collrecs
@@ -1195,7 +1195,7 @@ def create_collection_i18nname_cache():
             names[c][ln] = i18nname
     # update timestamp
     try:
-        collection_i18nname_cache_timestamp = time.strftime("%04Y-%02m-%02d %02H:%02M:%02S", time.localtime())
+        collection_i18nname_cache_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     except NameError:
         collection_i18nname_cache_timestamp = 0
     return names
@@ -1223,7 +1223,7 @@ def create_field_i18nname_cache():
             names[f][ln] = i18nname
     # update timestamp
     try:
-        field_i18nname_cache_timestamp = time.strftime("%04Y-%02m-%02d %02H:%02M:%02S", time.localtime())
+        field_i18nname_cache_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     except NameError:
         field_i18nname_cache_timestamp = 0
     return names
@@ -2746,14 +2746,14 @@ def log_query(hostname, query_args, uid=-1):
         if id_query:
             run_sql("INSERT INTO user_query (id_user, id_query, hostname, date) VALUES (%s, %s, %s, %s)",
                     (uid, id_query, hostname,
-                     time.strftime("%04Y-%02m-%02d %02H:%02M:%02S", time.localtime())))
+                     time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
     return
 
 def log_query_info(action, p, f, colls, nb_records_found_total=-1):
     """Write some info to the log file for later analysis."""
     try:
         log = open(logdir + "/search.log", "a")
-        log.write(time.strftime("%04Y%02m%02d%02H%02M%02S#", time.localtime()))
+        log.write(time.strftime("%Y%m%d%H%M%S#", time.localtime()))
         log.write(action+"#")
         log.write(p+"#")
         log.write(f+"#")
@@ -3456,8 +3456,8 @@ def perform_request_log(req, date=""):
                 pass # ignore eventual wrong log lines
         req.write("</table>")
     else: # case B: display summary stats per day
-        yyyymm01 = int(time.strftime("%04Y%02m01", time.localtime()))
-        yyyymmdd = int(time.strftime("%04Y%02m%02d", time.localtime()))
+        yyyymm01 = int(time.strftime("%Y%m01", time.localtime()))
+        yyyymmdd = int(time.strftime("%Y%m%d", time.localtime()))
         req.write("""<table border="1">""")
         req.write("<tr><td><strong>%s</strong></td><td><strong>%s</strong></tr>" % ("Day", "Number of Queries"))
         for day in range(yyyymm01,yyyymmdd+1):
