@@ -1218,5 +1218,37 @@ input,select {
 dd{
    margin-bottom: 10px;
 }
+/* end of WebBasket module */
+/* WebSubmit module */
+form.hyperlinkform {
+   /* used in form tag for a form that should be hidden, but contains a button styled like a hyperlink */
+   display: inline;
+   padding: 0;
+   margin: 0;
+   height: 0;
+   width: 0;
+}
+input.hyperlinkformHiddenInput {
+   /* used in a hidden input tag for a form that should be hidden, but contains a button styled like a hyperlink */
+   display: inline;
+   padding: 0;
+   margin: 0;
+   height: 0;
+   width: 0;
+}
+input.hyperlinkformSubmitButton {
+   /* used in a submit input tag for a form that should be hidden, but contains a button styled like a hyperlink */
+   display: inline;
+   padding: 0;
+   margin: 0;
+   border: 0;
+   background-color: transparent;
+   font-size: 1em;
+   line-height: 1em;
+   text-decoration: underline;
+   cursor: pointer;
+   color: blue;
+}
+/* end of WebSubmit module */
 
 /* end of cds.css */
