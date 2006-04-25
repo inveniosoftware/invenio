@@ -103,8 +103,13 @@ import base64
 
 import re
 
-import rtf.Rtf2Txt
-from rtf.RtfParser import RtfException as _RtfException
+cfg_elmsubmit_have_rtflib = 0
+try:
+    import rtf.Rtf2Txt
+    from rtf.RtfParser import RtfException as _RtfException
+    cfg_elmsubmit_have_rtflib = 1 
+except ImportError:
+    pass
 
 import cdsware.elmsubmit_richtext2txt as _richtext2txt
 import cdsware.elmsubmit_enriched2txt as _enriched2txt

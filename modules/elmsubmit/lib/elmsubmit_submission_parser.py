@@ -136,91 +136,65 @@ __author__
     cdsoff:::
 
 ---------------------
-
 """
+# text values determining begin and end of submission
 
-
-
-import re
-
-tokens = (
-    'CDSON',
-    'CDSOFF',
-    'KEY',
-    'VALUE',
-    )
-
-# Tokens
-def t_CDSON(t):
-    r'\s*cdson:::\n+'
-    return t
-
-def t_KEY(t):
-    r'(?<=\n)[\ \t]*_+\w+?_+\s*\n+'
-    t.value = re.search(r'_+(\w+?)_+', t.value).group(1)
-    t.value = t.value.lower()
-    return t
-
-def t_VALUE(t):
-    r'.+?\S+.*?(?=([\ \t]*_+\w+?_+\s*\n|\n\s*cdsoff:::))'
-    t.value = t.value.strip()
-    return t
-
-def t_CDSOFF(t):
-    r'(?s)\n\s*cdsoff:::(\n.*)?'
-    match = re.search(r'(?s)\n\s*cdsoff:::(\n.*)?', t.value)
-    global trailing_text
-    if match.group(1) is not None:
-        # [1:] kills the extra newline we matched:
-        trailing_text = match.group(1)[1:]
-    else:
-        trailing_text = ''
-    return t
-
-def t_error(t):
-    print "Illegal character '%s'" % t.value[0]
-    raise ValueError('bad parsing')
-    
-# Build the lexer
-import lex
-lex.lex(optimize=1)
-
-# Parsing rules
-
-# Dictionary:
-data = {}
-
-def p_submission(p):
-    """submission : CDSON assignmentList CDSOFF"""
-    
-def p_assignmentList(p):
-    """assignmentList : assignment
-                      | assignment assignmentList"""
-
-def p_assignment(p):
-    """assignment : KEY VALUE"""
-    data[p[1]] = p[2]
-
-def p_error(p):
-    print "Syntax error at '%s'" % p.value
-    raise ValueError('syntax error')
-
-import yacc
-yacc.yacc()
+submission_frame_values = ['cdson:::', 'cdsoff:::']
 
 def parse_submission(string):
-    global data
-    global trailing_text
-    try:
-        try:
-            yacc.parse(string)
-            return (data, trailing_text)
-        except:
-            raise SubmissionParserError()
-    finally:
-        data = {}
-        trailing_text = ''
+    # function extracts the metadata from the string representing the mail content
+
+    # split the mail into lines
+
+    list_of_lines = string.splitlines()
+
+    # strip the lines from trailing whitespaces
+
+    list_of_lines =  map(lambda x: x.strip(), list_of_lines)
+
+    # throw out the empty lines
+    
+    list_of_lines = filter(None, list_of_lines)
+
+    submission_dict = {}
+
+    # indicator that the submission content has begun
+    submission_start = 0
+
+    # indicator that the submission content has ended
+    submission_end = 0
+
+    # current keyword
+    current_keyword = ''
+
+    
+    for line in list_of_lines:
+
+        # end of submission
+        if (submission_end == 1):
+            break
+
+        # submission in progress
+        if (submission_start == 1):
+
+            # found a keyword
+            if (line[0] == '_' and line[-1] == '_'):
+                current_keyword = line[1:-1]
+
+            # found end of submission
+            elif (line == submission_frame_values[1]):
+                submission_end = 1
+
+            # adding content to dictionary
+            elif (current_keyword <> ''):
+                submission_dict.setdefault(current_keyword, []).append(line)
+        else:
+
+            # found beginning of submission
+            if (line == submission_frame_values[0]):
+                submission_start = 1
+
+    return submission_dict
 
 class SubmissionParserError(Exception):
     pass
-

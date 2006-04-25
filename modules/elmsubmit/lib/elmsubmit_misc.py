@@ -201,6 +201,8 @@ def dict2file(dictionary, directory):
             os.mkdir(fullpath)
             dict2file(dictionary_or_data, fullpath)
 
+    print 'dict.items', dictionary.items()
+
     map(f, dictionary.items())
 
     return None

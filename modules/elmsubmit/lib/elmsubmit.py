@@ -22,25 +22,24 @@
 # import sys
 import os
 import os.path
-import cdsware.config2pyobj as config2pyobj
-import re
 import smtplib
 
 import cdsware.elmsubmit_EZEmail as elmsubmit_EZEmail
 import cdsware.elmsubmit_submission_parser as elmsubmit_submission_parser
+
+# import the config file 
+import cdsware.elmsubmit_config as elmsubmit_config
+
 import cdsware.elmsubmit_field_validation as elmsubmit_field_validation
+
 from cdsware.elmsubmit_misc import random_alphanum_string as _random_alphanum_string
-from cdsware.elmsubmit_misc import import_dots as _import_dots
 
-# Import the config file:
-from cdsware.config import etcdir
-
-#_this_module = sys.modules[__name__]
-#_this_module_dir = os.path.abspath(os.path.dirname(_this_module.__file__))
-elmconf = config2pyobj.configobj([os.path.join(etcdir, 'elmsubmit', 'elmsubmit.cfg')])
+import cdsware.elmsubmit_generate_marc as elmsubmit_generate_marc
 
 def process_email(email_string):
-
+    """ main entry point of the module, handles whole processing of the email
+    """
+    
     # See if we can parse the email:
 
     try:
@@ -49,13 +48,15 @@ def process_email(email_string):
         try:
             if err.basic_email_info['from'] is None:
                 raise ValueError
+
+
             response = elmsubmit_EZEmail.CreateMessage(to=err.basic_email_info['from'],
-                                                       _from=elmconf.people.admin,
-                                                       message=elmconf.nolangmsgs.bad_email,
+                                                       _from=elmsubmit_config.people['admin'],
+                                                       message=elmsubmit_config.nolangmsgs['bad_email'],
                                                        subject="Re: " + (err.basic_email_info.get('Subject', '') or ''),
                                                        references=[err.basic_email_info.get('message-id', '') or ''],
                                                        wrap_message=False)
-            _send_smtp(_from=elmconf.people.admin, to=err.basic_email_info['from'], msg=response)
+            _send_smtp(_from=elmsubmit_config.people['admin'], to=err.basic_email_info['from'], msg=response)
             raise elmsubmitError("Email could not be parsed. Reported to sender.")
         except ValueError:
             raise elmsubmitError("From: field of submission email could not be parsed. Could not report to sender.")
@@ -64,105 +65,75 @@ def process_email(email_string):
 
     try:
         # Note that this returns a dictionary loaded with utf8 byte strings:
-        (submission_dict, dummy_var) = elmsubmit_submission_parser.parse_submission(e.primary_message.encode('utf8'))
+        submission_dict = elmsubmit_submission_parser.parse_submission(e.primary_message.encode('utf8'))
         # Add the submitter's email:
         submission_dict['SuE'] = e.from_email.encode('utf8')
 
     except elmsubmit_submission_parser.SubmissionParserError:
-        _notify(msg=e, response=elmconf.nolangmsgs.bad_submission)
+        _notify(msg=e, response=elmsubmit_config.nolangmsgs.bad_submission)
         raise elmsubmitSubmissionError("Could not parse submission.")
-
-    # See if we can find a recognized document type specified by the TYPE field:
-
-    try:
-        doctype = submission_dict['type']
-        handler_module_name = elmconf.sub_handlers.__getattr__(doctype)
-    except KeyError:
-        _notify(msg=e, response=elmconf.nolangmsgs.missing_type)
-        raise elmsubmitSubmissionError("Submission does not specify document type.")
-    except config2pyobj.ConfigGetKeyError:
-        _notify(msg=e, response=elmconf.nolangmsgs.unsupported_type)
-        raise elmsubmitSubmissionError("Submission specifies unrecognized document type.")
-
-    # See if we can import the python module containing a handler for
-    # the document type:
-    handler_module = _import_dots('cdsware.' + handler_module_name)
-    handler_function = getattr(handler_module, 'handler')
-    required_fields = getattr(handler_module, 'required_fields')
 
     # Check we have been given the required fields:
     available_fields = submission_dict.keys()
     
-    if not len(filter(lambda x: x in available_fields, required_fields)) == len(required_fields):
-        response = elmconf.nolangmsgs.missing_fields_1 + (' %s ' % (doctype)) + elmconf.nolangmsgs.missing_fields_2 + "\n\n" + repr(required_fields)
+    if not len(filter(lambda x: x in available_fields, elmsubmit_config.required_fields)) == len(elmsubmit_config.required_fields):
+        response = elmsubmit_config.nolangmsgs['missing_fields_1'] + elmsubmit_config.nolangmsgs['missing_fields_2'] + "\n\n" + repr(elmsubmit_config.required_fields)
         _notify(msg=e, response=response)
-        raise elmsubmitSubmissionError("Submission does not contain the required fields for document type %s. Required fields: %s" % (doctype, required_fields))
+        raise elmsubmitSubmissionError("Submission does not contain the required fields for document type %s. Required fields: %s" % (doctype, elmsubmit_config.required_fields))
 
     # Check that the fields we have been given validate OK:
     
-    map(lambda field: validate_submission_field(e, submission_dict, field, submission_dict[field]), required_fields)
+    map(lambda field: validate_submission_field(e, submission_dict, field, submission_dict[field]), elmsubmit_config.required_fields)
 
-    # Map the fields to their proper storage names:
+    # Get a submission directory:
     
-    def f((field, value)):
-        try:
-            field = elmconf.field_mappings.__getattr__(field)
-        except config2pyobj.ConfigGetKeyError:
-            # No mapping defined for field:
-            pass
-        
-        return(field, value)
+    storage_dir = get_storage_dir(e)
 
-    submission_dict = dict(map(f, submission_dict.items()))
+    # Process the files list:
+    
+    process_files(e, submission_dict, storage_dir)
 
-    # Let the handler function process the email:
+    #generate the appropriate Marc_XML for the submission
 
-    (response_email, admin_response_email, error) = handler_function(msg=e, submission_dict=submission_dict, elmconf=elmconf)
+    marc_xml = elmsubmit_generate_marc.generate_marc(submission_dict)
 
-    # Reply to the sender if there was a problem:
+    print  marc_xml
 
-    if response_email is not None:
-        _notify(msg=e, response=response_email)
+    return marc_xml
 
-    # Reply to the admin if there was a failure:
-        
-    if admin_response_email is not None:
-        _notify_admin(response=admin_response_email)
-
-    if error is not None:
-        raise error
-
+    
 def validate_submission_field(msg, submission_dict, field, value):
 
     try:
-        (field_documentation, fixed_value, ok) = getattr(elmsubmit_field_validation, field)(value.decode('utf8'))
+        (field_documentation, fixed_value, validation_success) = getattr(elmsubmit_field_validation, field)(value.decode('utf8'))
         submission_dict[field] = fixed_value.encode('utf8')
 
-        if not ok:
-            _notify(msg=msg, response=elmconf.nolangmsgs.bad_field + ' ' + field.upper() + '\n\n'
-                    + elmconf.nolangmsgs.correct_format + '\n\n' + field_documentation)
+        if not validation_success:
+            _notify(msg=msg, response=elmsubmit_config.nolangmsgs['bad_field'] + ' ' + field.upper() + '\n\n'
+                    + elmsubmit_config.nolangmsgs['correct_format'] + '\n\n' + field_documentation)
             raise elmsubmitSubmissionError("Submission contains field %s which does not validate." % (field))
     except AttributeError:
         # No validation defined for this field:
         pass
 
-def get_storage_dir(msg, doctype):
+def get_storage_dir(msg):
 
-    path = os.path.join(elmconf.files.maildir, doctype, _random_alphanum_string(15))
+    path = os.path.join(elmsubmit_config.files['maildir'], _random_alphanum_string(15))
     while os.path.exists(path):
-        path = os.path.join(elmconf.files.maildir, doctype, _random_alphanum_string(15))
+        path = os.path.join(elmsubmit_config.files['maildir'], _random_alphanum_string(15))
 
     try:
-        os.mkdir(path)
+        os.makedirs(path)
     except EnvironmentError:
-        _notify(msg=msg, response=elmconf.nolangmsgs.temp_problem)
+        _notify(msg=msg, response=elmsubmit_config.nolangmsgs['temp_problem'])
         _notify_admin(response="Could not create directory: %s" % (path))
         raise elmsubmitError("Could not create directory: %s" % (path))
     return path
 
-def process_files(msg, submission_dict):
-
-    files = map(lambda filename: filename.decode('utf8'), submission_dict['files'].splitlines())
+def process_files(msg, submission_dict, storage_dir):
+    """ extract the files out of the email and include them in the submission dict
+    """
+    files = map(lambda filename: filename.decode('utf8'), submission_dict['files'])
 
     # Check for the special filename 'all': if we find it, add all of
     # the files attached to the email to the list of files to submit:
@@ -183,52 +154,96 @@ def process_files(msg, submission_dict):
 
     # Get the files out of the mail message:
 
-    file_list = {}
+    # file dictionary with file content needed for saving the file to proper directory
+    file_dict = {}
 
+    # file list needed to be included in submission_dict
+    file_list = []
+    
     for filename in files:
 
         # See if we have special keyword self (which uses the mail message itself as the file):
         if filename == 'self': 
-            file = msg.original_message
+            file_attachment = msg.original_message
             filename = _random_alphanum_string(8) + '_' + msg.date_sent_utc.replace(' ', '_').replace(':', '-') + '.msg'
         else:
             nominal_attachments = filter(lambda attachment: attachment['filename'].lower() == filename, msg.attachments)
             
             try:
-                file = nominal_attachments[0]['file']
+                file_attachment = nominal_attachments[0]['file']
             except IndexError:
-                _notify(msg=msg, response=elmconf.nolangmsgs.missing_attachment + ' ' + filename)
+                _notify(msg=msg, response=elmsubmit_config.nolangmsgs['missing_attachment'] + ' ' + filename)
                 raise elmsubmitSubmissionError("Submission is missing attached file: %s" % (filename))
 
-        file_list[filename.encode('utf8')] = file
+        file_dict[filename.encode('utf8')] = file_attachment
         
+        #merge the file name and the storage dir in the submission_dict
+
+        full_file_name = os.path.join(storage_dir, filename.encode('utf8'))
+        file_list.append(full_file_name)
+
     submission_dict['files'] = file_list
+
+    def create_files((path, dictionary_or_data)):
+        """
+        Take any dictionary, eg.:
+
+        { 'title' : 'The loveliest title.',
+          'name'  : 'Pete the dog.',
+          'info'  : 'pdf file content'
+        }
+
+        and create a set of files in the given directory:
+        directory/title
+        directory/name
+        directory/info
+        so that each filename is a dictionary key, and the contents of
+        each file is the value that the key pointed to.
+        """
+
+        fullpath = os.path.join(storage_dir, path)
+        
+        try:
+            dictionary_or_data.has_key
+        except AttributeError:
+            open(fullpath, 'wb').write(dictionary_or_data)
+
+    try:
+        map(create_files, file_dict.items())
+    except EnvironmentError:
+        response_email = elmsubmit_config.nolangmsgs['temp_problem']
+        admin_response_email = "There was a problem writing data to directory %s." % (storage_dir)
+        error = elmsubmitError("There was a problem writing data to directory %s." % (storage_dir))
+        return (response_email, admin_response_email, error)
+
+    return None
+
 
 
 def _send_smtp(_from, to, msg):
     
     s = smtplib.SMTP()
-    s.connect(host=elmconf.servers.smtp)
+    s.connect(host=elmsubmit_config.servers['smtp'])
     s.sendmail(_from, to, msg)
     s.close()
 
 def _notify(msg, response):
     response = elmsubmit_EZEmail.CreateMessage(to=[(msg.from_name, msg.from_email)],
-                                               _from=elmconf.people.admin,
+                                               _from=elmsubmit_config.people['admin'],
                                                message=response,
                                                subject="Re: " + msg.subject,
                                                references=[msg.message_id],
                                                wrap_message=False)
 
-    _send_smtp(_from=elmconf.people.admin, to=msg.from_email, msg=response)
+    _send_smtp(_from=elmsubmit_config.people['admin'], to=msg.from_email, msg=response)
 
 def _notify_admin(response):
-    response = elmsubmit_EZEmail.CreateMessage(to=elmconf.people.admin,
-                                               _from=elmconf.people.admin,
+    response = elmsubmit_EZEmail.CreateMessage(to=elmsubmit_config.people['admin'],
+                                               _from=elmsubmit_config.people['admin'],
                                                message=response,
                                                subject="CDSWare / elmsubmit problem.",
                                                wrap_message=False)
-    _send_smtp(_from=elmconf.people.admin, to=elmconf.people.admin, msg=response)
+    _send_smtp(_from=elmsubmit_config.people['admin'], to=elmsubmit_config.people['admin'], msg=response)
 
 class elmsubmitError(Exception):
     pass
