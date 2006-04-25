@@ -1440,6 +1440,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             nearestterms = []
             for idx_unit in range(0,len(basic_search_units)):
                 bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
+                if bsu_p.startswith("%") and bsu_p.endswith("%"):
+                    bsu_p = "'" + bsu_p[1:-1] + "'"
                 bsu_nbhits = basic_search_units_hitsets[idx_unit]._nbhits
                 url_args_new = sre.sub(r'(^|\&)p=.*?(\&|$)', r'\1p='+urllib.quote(bsu_p)+r'\2', req.args)
                 url_args_new = sre.sub(r'(^|\&)f=.*?(\&|$)', r'\1f='+urllib.quote(bsu_f)+r'\2', url_args_new)
@@ -1837,7 +1839,7 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
     ## start browsing to fetch list of hits:
     browsed_phrases = {} # will hold {phrase1: 1, phrase2: 1, ..., phraseN: 1} dict of browsed phrases (to make them unique)
     # always add self to the results set:
-    browsed_phrases[p] = 1
+    browsed_phrases[p.startswith("%") and p.endswith("%") and p[1:-1] or p] = 1
     for t in tl:
         # deduce into which bibxxx table we will search:
         digit1, digit2 = int(t[0]), int(t[1])
