@@ -47,6 +47,7 @@ try:
     from cdsware import oai_repository_tests 
     from cdsware import bibconvert_tests 
     from cdsware import errorlib_tests
+    from cdsware import elmsubmit_tests
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -74,7 +75,8 @@ def create_all_test_suites():
                                bibrank_tag_based_indexer_tests.create_test_suite(),
                                oai_repository_tests.create_test_suite(),
                                bibconvert_tests.create_test_suite(),
-			       errorlib_tests.create_test_suite()))
+			       errorlib_tests.create_test_suite(),
+                               elmsubmit_tests.create_test_suite()))
 
 def print_info_line():
     """Prints info line about tests to be executed."""
