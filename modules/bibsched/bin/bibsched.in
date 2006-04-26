@@ -751,7 +751,7 @@ def main():
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hVdq", [
-            "--help","--version","--daemon", "--quiet"])
+            "help","version","daemon", "quiet"])
     except getopt.GetoptError, err:
         Log ("Error: %s" % err)
         usage(1, err)
