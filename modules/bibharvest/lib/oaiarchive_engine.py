@@ -46,7 +46,7 @@ def printInfo():
 
     print " oaiarchive [options]\n"
     print "\n Options:"
-    print "\n -s --set=       Specify setSpec"
+    print "\n -o --oaiset=    Specify setSpec"
     print " -h --help       Print this help"
     print " -V --version    Print version information and exit"
     print "\n Modes"
@@ -55,25 +55,30 @@ def printInfo():
     print " -r --report     Print OAI repository status"
     print " -i --info       Give info about OAI set (default)"
     print "\n Additional parameters:"
-    print " -u --upload     Upload records"
+    print " -p --upload     Upload records"
     print " -n --no-process Do not upload records (default)\n"
+    print " -u --user=USER       User name to submit the task as, password needed."
+    print " -v --verbose=LEVEL   Verbose level (0=min,1=normal,9=max)."
+    print " -s --sleeptime=SLEEP Time after which to repeat tasks (no)"
+    print " -t --time=DATE       Moment for the task to be active (now)."
+
     print "\n Examples:\n"
 
     print " Expose set 'setname' via OAI repository gateway"
-    print " oaiarchive --set='setname' --add --upload"
-    print " oaiarchive -aus 'setname'"
+    print " oaiarchive --oaiset='setname' --add --upload"
+    print " oaiarchive -apo 'setname'"
     print "\n"
     print " Remove records defined by set 'setname' from OAI repository"
-    print " oaiarchive --set='setname' --delete --upload"
-    print " oaiarchive -dus 'setname'"
+    print " oaiarchive --oaiset='setname' --delete --upload"
+    print " oaiarchive -dpo 'setname'"
     print "\n"
     print " Expose entire repository via OAI gateway"
     print " oaiarchive --set=global --add --upload"
-    print " oaiarchive -aus global"
+    print " oaiarchive -apo global"
     print "\n" 
     print " Print OAI set status"
-    print " oaiarchive --set='setname' --info"
-    print " oaiarchive -is 'setname'"
+    print " oaiarchive --oaiset='setname' --info"
+    print " oaiarchive -io 'setname'"
     print "\n"
     print " Print OAI repository status"
     print " oaiarchive -r"
@@ -162,53 +167,15 @@ def get_recID_list(oai_sets, set):
 
 ### MAIN ###
 
-def main():
-    
-    opts, args = getopt.getopt(sys.argv[1:],"ads:hn:uirV",
-                 [
-                   "add",
-                   "delete",
-                   "set=",
-                   "help",
-                   "nice=",
-                   "upload",
-                   "info",
-                   "report",
-                   "version"
-                 ])
-    
-    #cpfm
+def oaiarchive_task(arg):
 
-    upload           = 0
+    upload           = arg["upload"]
     oaisetentrycount = 0
     oaiIDentrycount  = 0
-    mode             = 0
+    mode             = arg["mode"]
     i                = 0
-    nice             = 0
-    
-    for opt, opt_value in opts:
-    
-        if opt in ["-h", "--help"]:
-            printInfo()
-            sys.exit(0)
-        if opt in ["-V", "--version"]:
-            print __version__
-            sys.exit(0)
-        if opt in ["-n", "--nice"]:
-            nice = opt_value       
-        if opt in ["-s", "--set"]:
-            set = opt_value
-        if opt in ["-a", "--add"]:
-            mode = 1
-        if opt in ["-d", "--delete"]:
-            mode = 2
-        if opt in ["-u", "--upload"]:
-            upload = 1
-        if opt in ["-i", "--info"]:
-            mode = 0
-        if opt in ["-r", "--report"]:
-            mode = 3
-    
+    nice             = arg["nice"]
+    set              = arg["oaiset"]
 
     if(mode == 3):
     

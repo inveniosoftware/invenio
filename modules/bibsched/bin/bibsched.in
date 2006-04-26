@@ -26,7 +26,7 @@
 __version__ = "$Id$"
 
 ### -- local configuration section starts here ---
-cfg_valid_processes = ["bibindex","bibupload","bibreformat","webcoll","bibtaskex","bibrank","oaiharvest"] # which tasks are reconized as valid?
+cfg_valid_processes = ["bibindex","bibupload","bibreformat","webcoll","bibtaskex","bibrank","oaiharvest","oaiarchive"] # which tasks are reconized as valid?
 ### -- local configuration section ends here ---
 
 ## import interesting modules:

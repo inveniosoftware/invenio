@@ -14,7 +14,7 @@
 ## The CDSware is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
@@ -26,7 +26,7 @@
 
  Options:
 
-     -s --set=       Specify setSpec
+     -o --oaiset=    Specify setSpec
      -h --help       Print this help
      -V --version    Print version information and exit
      
@@ -35,35 +35,330 @@
      -r --report     Print OAI repository status
      -i --info       Give info about OAI set (default)
      
-     -u --upload     Upload records
+     -p --upload     Upload records
      -n --no-process Do not upload records (default)
 
  Examples:
      
      Expose set -setname- via OAI gateway
-     oaiarchive --set='setname' --add --upload
-     oaiarchive -aus 'setname'
+     oaiarchive --oaiset='setname' --add --upload
+     oaiarchive -apo 'setname'
 
      Remove records defined by set -setname- from OAI repository
-     oaiarchive --set='setname' --delete --upload
-     oaiarchive -dus 'setname'
+     oaiarchive --oaiset='setname' --delete --upload
+     oaiarchive -dpo 'setname'
      
      Expose entire repository via OAI gateway
-     oaiarchive --set=global --add --upload
-     oaiarchive -aus global
+     oaiarchive --oaiset=global --add --upload
+     oaiarchive -apo global
 
      Print OAI repository status"
      oaiarchive -r
 
 """
 
-__version__ = ""
+__version__ = "$Id$"
 
 try:
-    from cdsware.oaiarchive_engine import main
+    import sys
+    from cdsware.oaiarchive_engine import oaiarchive_task
+    from cdsware.oaiarchive_engine import printInfo
+    pylibdir = "@prefix@/lib/python"
+    sys.path.append('%s' % pylibdir)
+    from cdsware.dbquery import run_sql
+    from cdsware.config import *
+    from cdsware.search_engine import perform_request_search
+    from cdsware.search_engine import print_record
+    from cdsware.access_control_engine import acc_authorize_action
+    import getopt
+    import string
+    import marshal
+    import signal
+    import MySQLdb
+    import time
+    import re
+
 except ImportError, e:
     print "Error: %s" % e
     import sys
     sys.exit(1)
 
-main()
+
+sleeptime      = ""                           # default sleeptime
+format_string  = "%Y-%m-%d %H:%M:%S"          # date/time format
+sched_time     = time.strftime(format_string) # scheduled execution time in the date/time format
+
+### Bibshed compatibility procedures
+###
+
+def get_date(var, format_string = "%Y-%m-%d %H:%M:%S"):
+    """Returns a date string according to the format string.
+       It can handle normal date strings and shifts with respect
+       to now."""
+    date = time.time()
+    shift_re=re.compile("([-\+]{0,1})([\d]+)([dhms])")
+    factors = {"d":24*3600, "h":3600, "m":60, "s":1}
+    m = shift_re.match(var)
+    if m:
+        sign = m.groups()[0] == "-" and -1 or 1
+        factor = factors[m.groups()[2]]
+        value = float(m.groups()[1])
+        date = time.localtime(date + sign * factor * value)
+        date = time.strftime(format_string, date)
+    else:
+        date = time.strptime(var, format_string)
+        date = time.strftime(format_string, date)
+
+    return date
+
+
+def write_message(msg, stream=sys.stdout):
+    """Prints message and flush output stream (may be sys.stdout or sys.stderr).  Useful for debugging stuff."""
+    if stream == sys.stdout or stream == sys.stderr:
+        stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
+        stream.write("%s\n" % msg)
+        stream.flush()
+    else:
+        sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
+
+
+def task_sig_sleep(sig, frame):
+    """Signal handler for the 'sleep' signal sent by BibSched."""
+    write_message("sleeping...")
+    task_update_status("SLEEPING")
+    signal.pause() # wait for wake-up signal
+
+
+def task_sig_wakeup(sig, frame):
+    """Signal handler for the 'wakeup' signal sent by BibSched."""
+    write_message("continuing...")
+    task_update_status("CONTINUING")
+
+
+def task_sig_stop(sig, frame):
+    """Signal handler for the 'stop' signal sent by BibSched."""
+    write_message("stopping...")
+    task_update_status("STOPPING")
+    write_message("flushing cache or whatever...")
+    time.sleep(3)
+    write_message("closing tables or whatever...")
+    time.sleep(1)
+    write_message("stopped")
+    task_update_status("STOPPED")
+    sys.exit(0)
+
+    
+def task_sig_suicide(sig, frame):
+    """Signal handler for the 'suicide' signal sent by BibSched."""
+    write_message("suiciding myself now...")
+    task_update_status("SUICIDING")
+    write_message("suicided")
+    task_update_status("SUICIDED")
+    sys.exit(0)
+
+
+def task_sig_unknown(sig, frame):
+    """Signal handler for the other unknown signals sent by shell or user."""
+    write_message("unknown signal %d ignored" % sig) # do nothing for other signals
+
+def authenticate(user, header="OAI Archive Task Submission", action="runoaiarchive"):
+    """Authenticate the user against the user database.
+       Check for its password, if it exists.
+       Check for action access rights.
+       Return user name upon authorization success,
+       do system exit upon authorization failure.
+       """
+    print header
+    print "=" * len(header)
+    if user == "":
+        print >> sys.stdout, "\rUsername: ",
+        user = string.strip(string.lower(sys.stdin.readline()))
+    else:
+        print >> sys.stdout, "\rUsername: ", user        
+    ## first check user pw:
+    res = run_sql("select id,password from user where email=%s", (user,), 1)
+    if not res:
+        print "Sorry, %s does not exist." % user
+        sys.exit(1)        
+    else:
+        (uid_db, password_db) = res[0]
+        if password_db:
+            password_entered = getpass.getpass()
+            if password_db == password_entered:
+                pass
+            else:
+                print "Sorry, wrong credentials for %s." % user
+                sys.exit(1)
+        ## secondly check authorization for the action:
+        (auth_code, auth_message) = acc_authorize_action(uid_db, action)
+        if auth_code != 0:
+            print auth_message
+            sys.exit(1)
+    return user
+
+def task_submit(options):
+    """Submits task to the BibSched task queue.  This is what people will be invoking via command line."""
+
+    global sched_time, sleep_time
+
+    ## sanity check: remove eventual "task" option:
+    if options.has_key("task"):
+        del options["task"]
+    ## authenticate user:
+    user = authenticate(options.get("user", ""))
+    ## submit task:
+
+    task_id = run_sql("""INSERT INTO schTASK (id,proc,user,status,arguments,sleeptime,runtime) VALUES (NULL,'oaiarchive',%s,'WAITING',%s,%s,%s)""",
+                      (user, marshal.dumps(options),sleeptime,MySQLdb.escape_string(sched_time)))
+    ## update task number:
+    options["task"] = task_id
+    run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""", (marshal.dumps(options),task_id))
+    write_message("Task #%d submitted." % task_id)
+    return task_id
+
+
+def task_update_progress(msg):
+    """Updates progress information in the BibSched task table."""
+    global task_id
+    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, task_id))
+
+
+def task_update_status(val):
+    """Updates status information in the BibSched task table."""
+    global task_id
+    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, task_id))
+
+
+def task_read_status(task_id):
+    """Read status information in the BibSched task table."""
+    res = run_sql("SELECT status FROM schTASK where id=%s", (task_id,), 1)
+    try:
+        out = res[0][0]
+    except:
+        out = 'UNKNOWN'
+    return out
+
+
+def task_get_options(id):
+    """Returns options for the task 'id' read from the BibSched task queue table."""
+    out = {}
+    res = run_sql("SELECT arguments FROM schTASK WHERE id=%s AND proc='oaiarchive'", (id,))
+    try:
+        out = marshal.loads(res[0][0])
+    except:
+        write_message("Error: OAIarchive task %d does not seem to exist." % id)
+        sys.exit(1)
+    return out
+
+
+def task_run():
+    """Runs the task"""
+    
+    options = task_get_options(task_id) # get options from BibSched task table
+    ## check task id:
+    if not options.has_key("task"):
+        write_message("Error: The task #%d does not seem to be a OAI archive task." % task_id)
+        return
+
+    ## initialize parameters
+
+    if options.has_key("option"):
+        
+
+### sql commands to be executed during the script run
+###
+
+        ## check task status:
+        task_status = task_read_status(task_id)
+        if task_status != "WAITING":
+            write_message("Error: The task #%d is %s.  I expected WAITING." % (task_id, task_status))
+            return
+        ## update task status:
+        task_update_status("RUNNING")
+        ## initialize signal handler:
+        signal.signal(signal.SIGUSR1, task_sig_sleep)
+        signal.signal(signal.SIGTERM, task_sig_stop)
+        signal.signal(signal.SIGABRT, task_sig_suicide)
+        signal.signal(signal.SIGCONT, task_sig_wakeup)
+        signal.signal(signal.SIGINT, task_sig_unknown)
+        ## run the task:
+
+    oaiarchive_task(options)
+
+    ## we are done:
+    task_update_status("DONE")
+    return
+
+
+#########################
+
+def main():
+    """Main function that analyzes command line input and calls whatever is appropriate.
+       Useful for learning on how to write BibSched tasks."""
+    global task_id, sched_time, sleeptime
+    ## parse command line:
+    if len(sys.argv) == 2 and sys.argv[1].isdigit():
+        ## A - run the task
+        task_id = int(sys.argv[1])
+        task_run()
+    else:
+        ## B - submit the task
+        options = {} # will hold command-line options
+        options["verbose"] = 1
+        try:
+            opts, args = getopt.getopt(sys.argv[1:], "hVv:u:s:t:ado:pirn", ["help", "version", "verbose=","user=","sleeptime=","time=","add","delete","oaiset=","upload","info","report","no-process"])
+        except getopt.GetoptError, err:
+            printInfo()
+            sys.exit(1)
+
+        ## set defaults
+        options["upload"] = 0
+        options["mode"]   = 0
+        options["oaiset"] = ""
+        options["nice"]   = 0
+
+        try:
+
+            for opt in opts:
+                if opt[0] in ["-h", "--help"]:
+                    printInfo()
+                    sys.exit(0)
+                elif opt[0] in ["-V", "--version"]:
+                    print __version__
+                    sys.exit(0)
+                elif opt[0] in [ "-u", "--user"]:
+                    options["user"]   = opt[1]
+                elif opt[0] in ["-v", "--verbose"]:
+                    options["verbose"]  = int(opt[1])
+                elif opt[0] in ["-s", "--sleeptime" ]:
+                    get_date(opt[1])    # see if it is a valid shift
+                    sleeptime  = opt[1]
+                elif opt[0] in [ "-t", "--time" ]:
+                    sched_time = get_date(opt[1])
+                elif opt[0] in ["-n", "--nice"]:
+                    options["nice"] = opt[1]
+                elif opt[0] in ["-o", "--oaiset"]:
+                    options["oaiset"] = opt[1]
+                elif opt[0] in ["-a", "--add"]:
+                    options["mode"] = 1
+                elif opt[0] in ["-d", "--delete"]:
+                    options["mode"] = 2
+                elif opt[0] in ["-p", "--upload"]:
+                    options["upload"] = 1
+                elif opt[0] in ["-i", "--info"]:
+                    options["mode"] = 0
+                elif opt[0] in ["-r", "--report"]:
+                    options["mode"] = 3
+                elif opt[0] in ["-n", "--no-process"]:
+                    options["upload"] = 0
+
+        except StandardError, e:
+            printInfo()
+            sys.exit(1)
+        task_submit(options)
+    return
+
+
+### okay, here we go:
+if __name__ == '__main__':
+    main()
