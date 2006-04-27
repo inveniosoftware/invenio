@@ -2015,19 +2015,22 @@ def get_fieldvalues_alephseq_like(recID, tags):
         out += string.join(get_fieldvalues(recID, tags_in[0]),"\n")
     else:
         ## case B: print our "text MARC" format; works safely all the time
-        tags_out = []
+        # find out which tags to output:
+        dict_of_tags_out = {}
         for tag in tags_in:
             if len(tag) == 0:
                 for i in range(0,10):
                     for j in range(0,10):
-                        tags_out.append("%d%d%%" % (i, j))
+                        dict_of_tags_out["%d%d%%" % (i, j)] = 1
             elif len(tag) == 1:
                 for j in range(0,10):
-                    tags_out.append("%s%d%%" % (tag, j))
+                    dict_of_tags_out["%s%d%%" % (tag, j)] = 1
             elif len(tag) < 5:
-                tags_out.append("%s%%" % tag)
+                dict_of_tags_out["%s%%" % tag] = 1
             elif tag >= 6:
-                tags_out.append(tag[0:5])
+                dict_of_tags_out[tag[0:5]] = 1
+        tags_out = dict_of_tags_out.keys()
+        tags_out.sort()
         # search all bibXXx tables as needed:
         for tag in tags_out:
             digits = tag[0:2]
@@ -3501,6 +3504,7 @@ def profile(p="", f="", c=cdsname):
 #print get_nearest_terms_in_bibxxx("ellis", "author", 5, 5)
 #print call_bibformat(68, "HB_FLY")
 #print create_collection_i18nname_cache()
+#print get_fieldvalues_alephseq_like(11,"980__a")
 
 ## profiling:
 #profile("of the this")
