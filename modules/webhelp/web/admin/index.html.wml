@@ -208,6 +208,22 @@ engine.
 
 <tr>
 <td>
+  <strong>BibClassify Admin</strong>
+</td>
+<td>
+  Enables you to automatically classify documents according to
+  ontologies and keyword thesauri.
+</td>
+<td>
+  <a href="bibclassify/">BibClassify Admin Interface</a>
+</td>
+<td>
+  <a href="bibclassify/guide.html">BibClassify Admin Guide</a>
+</td>
+</tr>
+
+<tr>
+<td>
   <strong>BibFormat Admin</strong>
 </td>
 <td>

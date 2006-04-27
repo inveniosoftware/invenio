@@ -43,6 +43,7 @@
 
   <navbar:button id=admin txt="<strong>ADMIN AREA</strong>" url="<WEBURL>/admin/" hint="CDSware Administrators Area">
   <navbar:button id=howto txt="HOWTOs" url="<WEBURL>/admin/howto/" hint="CDSware Admin HOWTO Documents" menu="admin-howto">
+  <navbar:button id=bibclassify txt="BibClassify Admin" url="<WEBURL>/admin/bibclassify/" hint="CDSware BibClassify Admin" menu="admin-bibclassify">
   <navbar:button id=bibconvert txt="BibConvert Admin" url="<WEBURL>/admin/bibconvert/" hint="CDSware BibConvert Admin" menu="admin-bibconvert">
   <navbar:button id=bibedit txt="BibEdit Admin" url="<WEBURL>/admin/bibedit/" hint="CDSware BibEdit Admin" menu="admin-bibedit">
   <navbar:button id=bibformat txt="BibFormat Admin" url="<WEBURL>/admin/bibformat/" hint="CDSware BibFormat Admin" menu="admin-bibformat">
@@ -82,6 +83,24 @@
   <navbar:button id=howto_marc txt="HOWTO MARC" url="<WEBURL>/admin/howto/marc.html" hint="Admin's HOWTO Guides - How to MARC your medatada">
   <navbar:button id=howto_migrate txt="HOWTO Migrate" url="<WEBURL>/admin/howto/migrate.html" hint="Admin's HOWTO Guides - How to Migrate your old documents into CDSware">
   <navbar:button id=howto_run txt="HOWTO Run" url="<WEBURL>/admin/howto/run.html" hint="Admin's HOWTO Guides - How to Run your CDSware installation day-by-day">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar admin-bibclassify:
+<navbar:define name=admin-bibclassify
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=bibclassify-admin-guide txt="Guide" url="<WEBURL>/admin/bibclassify/guide.html">
 
   <navbar:epilog> </td><td></td></tr> </navbar:epilog>
 
