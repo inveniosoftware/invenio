@@ -71,6 +71,9 @@ Contents
              <http://4suite.org/>
           - (optional) Psyco, to speed up the code at places:
              <http://psyco.sourceforge.net/>
+          - (optional) RDFLib, to use RDF ontologies and thesauri:
+             <http://rdflib.net/>
+
  
      e) mod_python Apache module.  Tested mainly with versions
         3.0BETA4 and above.  mod_python 3.x is required for Apache 2.
