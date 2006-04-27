@@ -1,4 +1,4 @@
-#!/usr/bin/python2.3
+#!@PYTHON@
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of the CERN Document Server Software (CDSware).
