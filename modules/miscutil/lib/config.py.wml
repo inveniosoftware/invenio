@@ -148,6 +148,7 @@ oaiidfield = "<OAIIDTAG>"
 oaisetfield = "<OAISETTAG>"
 oaideleted = "<OAIDELETEDPOLICY>"
 oai_rt_expire = <OAIEXPIRE>
+oai_sleep = <OAISLEEP>
 nb_records_in_resume = <OAILOAD>
 nb_identifiers_in_resume = <OAILOAD>
 

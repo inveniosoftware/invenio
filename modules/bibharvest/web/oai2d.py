@@ -1,4 +1,4 @@
-## $Id$ 
+## $Id$
 ##
 ## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
@@ -10,7 +10,7 @@
 ##
 ## The CDSware is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
@@ -25,6 +25,7 @@ __version__ = "$Id$"
 import os
 import sys
 import urllib
+import time
 from mod_python import apache
 
 from cdsware.dbquery import run_sql
@@ -37,12 +38,14 @@ def index (req):
 
 ## check availability
 
-    if os.path.exists("%s/RTdata/last_harvest_date" % cachedir):
-        req.err_headers_out["Status-Code"] = "503"
-        req.err_headers_out["Retry-After"] = "60"
-        req.status = apache.HTTP_SERVICE_UNAVAILABLE
-        return "%s" % apache.OK
-    command = "date > %s/RTdata/last_harvest_date" % cachedir   
+    if os.path.exists("%s/RTdata/RTdata" % cachedir):
+        time_gap = int(time.time() - os.path.getmtime("%s/RTdata/RTdata" % cachedir))
+        if(time_gap < oai_sleep):
+            req.err_headers_out["Status-Code"] = "503"
+            req.err_headers_out["Retry-After"] = "%d" % (oai_sleep - time_gap)
+            req.status = apache.HTTP_SERVICE_UNAVAILABLE
+            return "Retry after %d seconds" % (oai_sleep - time_gap)
+    command = "touch %s/RTdata/RTdata" % cachedir   
     os.system(command)
 
 ## parse input parameters
@@ -56,7 +59,7 @@ def index (req):
         params = {}
         for key in req.form.keys():
             params[key] = req.form[key]
-        args = urllib.urlencode(params)    
+        args = urllib.urlencode(params)
 
     arg = oai_repository.parse_args(args)
 
@@ -122,6 +125,4 @@ def index (req):
         req.write(oai_error)
         req.write(oai_repository.oai_footer(""))
 
-    command = "rm %s/RTdata/last_harvest_date" % cachedir
-    os.system(command)
     return "\n"

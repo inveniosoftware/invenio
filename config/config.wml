@@ -561,6 +561,12 @@ atlantis.cern.ch
 90000
 </define-tag>
 
+## OAISLEEP -- service unavailable between two consecutive requests for OAISLEEP seconds
+##  (example: "10")
+<define-tag OAISLEEP whitespace=delete>
+10
+</define-tag>
+
 ##################################
 ## Part 6: WebSubmit parameters ##
 ##################################

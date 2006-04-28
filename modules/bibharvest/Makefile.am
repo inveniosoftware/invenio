@@ -19,7 +19,7 @@
 
 cachedir = $(localstatedir)/cache/RTdata
 
-cache_DATA = RTdata
+cache_DATA =
 
 SUBDIRS = bin doc lib web
 

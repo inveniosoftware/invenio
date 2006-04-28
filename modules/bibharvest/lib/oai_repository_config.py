@@ -26,5 +26,6 @@ from cdsware.config import oaiidprefix, \
      oaisetfield, \
      oaideleted, \
      oai_rt_expire, \
+     oai_sleep, \
      nb_records_in_resume
 
