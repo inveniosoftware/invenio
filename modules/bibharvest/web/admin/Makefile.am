@@ -19,12 +19,8 @@
 
 webappdir = $(WEBDIR)/admin/bibharvest
 
-webapp_DATA = bibharvestadmin.py index.html
+webapp_DATA = bibharvestadmin.py
 
-EXTRA_DIST = bibharvestadmin.py index.html.wml
+EXTRA_DIST = bibharvestadmin.py
 
-CLEANFILES = index.html *~ *.tmp
-
-%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
+CLEANFILES = *~ *.tmp
