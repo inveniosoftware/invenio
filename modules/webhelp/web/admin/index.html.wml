@@ -93,10 +93,26 @@ data are uploaded in CDSware, you may want to modify them via
     not-so-well-structured metadata.    
 </td>
 <td>
-  <small class=note>command-line program</small>
+  <small class="note">command-line program</small>
 </td>
 <td>
   <a href="bibconvert/guide.html">BibConvert Admin Guide</a>
+</td>
+</tr>
+
+<tr>
+<td>
+  <strong>BibMatch Admin</strong>
+</td>
+<td>
+    Tools for matching XML MARC files against the repository content.
+    Useful when importing third-party metadata files.
+</td>
+<td>
+  <small class="note">command-line program</small>
+</td>
+<td>
+  <a href="bibmatch/guide.html">BibMatch Admin Guide</a>
 </td>
 </tr>
 
@@ -109,7 +125,7 @@ data are uploaded in CDSware, you may want to modify them via
     done on the data being uploaded.
 </td>
 <td>
-  <small class=note>command-line program</small>
+  <small class="note">command-line program</small>
 </td>
 <td>
   <a href="bibupload/guide.html">BibUpload Admin Guide</a>
@@ -131,6 +147,21 @@ data are uploaded in CDSware, you may want to modify them via
 </td>
 <td>
   <a href="websubmit/guide/">WebSubmit Admin Guide</a>
+</td>
+</tr>
+
+<tr>
+<td>
+  <strong>ElmSubmit Admin</strong>
+</td>
+<td>
+    Enables you to configure the submission of documents by electronic mail.
+</td>
+<td>
+  <small class="note">command-line program</small>
+</td>
+<td>
+  <a href="elmsubmit/guide.html">ElmSubmit Admin Guide</a>
 </td>
 </tr>
 
@@ -260,6 +291,21 @@ engine.
 </td>
 </tr>
 
+<tr>
+<td>
+  <strong>WebStat Admin</strong>
+</td>
+<td>
+  Enables you to configure the usage statistics reporting system.  
+</td>
+<td>
+  <small class="note">command-line configuration</small>
+</td>
+<td>
+  <a href="webstat/guide.html">WebStat Admin Guide</a>
+</td>
+</tr>
+
 </table>
 
 <h3>Personalization related modules</h3>
@@ -289,7 +335,7 @@ set up personal email notification alerts.
   them; the status and details on registered users, etc.
 </td>
 <td>
-  <small class=note>not available, but see the guide for the command-line way</small>
+  <small class="note">not available, but see the guide for the command-line way</small>
 </td>
 <td>
   <a href="websession/guide.html">WebSession Admin Guide</a>
@@ -305,7 +351,7 @@ set up personal email notification alerts.
   system, to make them public/private, etc.
 </td>
 <td>
-  <small class=note>not available, but see the guide for the command-line way</small>
+  <small class="note">not available, but see the guide for the command-line way</small>
 </td>
 <td>
   <a href="webbasket/guide.html">WebBasket Admin Guide</a>
@@ -321,7 +367,7 @@ set up personal email notification alerts.
   system, to run the alert engine, etc.
 </td>
 <td>
-  <small class=note>not available, but see the guide for the command-line way</small>  
+  <small class="note">not available, but see the guide for the command-line way</small>  
 </td>
 <td>
   <a href="webalert/guide.html">WebAlert Admin Guide</a>
@@ -341,6 +387,21 @@ set up personal email notification alerts.
 </td>
 <td>
   <a href="webcomment/guide.html">WebComment Admin Guide</a>
+</td>
+</tr>
+
+<tr>
+<td>
+  <strong>WebMessage Admin</strong>
+</td>
+<td>
+  Enables you to configure the messaging system.  
+</td>
+<td>
+  <small class="note">command-line configuration</small>
+</td>
+<td>
+  <a href="webmessage/guide.html">WebMessage Admin Guide</a>
 </td>
 </tr>
 
@@ -372,7 +433,7 @@ define a common look and feel of CDSware web pages.
   reschedule jobs, to make priorities, to run periodical tasks, etc.
 </td>
 <td>
-  <small class=note>command-line program</small>
+  <small class="note">command-line program</small>
 </td>
 <td>
   <a href="bibsched/guide.html">BibSched Admin Guide</a>
@@ -405,7 +466,7 @@ define a common look and feel of CDSware web pages.
   Enables you to customize default CDSware page style and the CSS style sheet.
 </td>
 <td>
-  <small class=note>not available, but see the guide for the command-line way</small>
+  <small class="note">not available, but see the guide for the command-line way</small>
 </td>
 <td>
   <a href="webstyle/guide.html">WebStyle Admin Guide</a>
