@@ -40,6 +40,8 @@ descriptions the module relationship diagram is presented.
 
  <li><strong>BibCheck</strong>: FIXME 
 
+ <li><strong>BibClassify</strong>: FIXME 
+
  <li><strong>BibConvert</strong> allows metadata conversion from any
  structured or semi-structured proprietary format into any other
  format, typically the <a
@@ -105,6 +107,8 @@ descriptions the module relationship diagram is presented.
  were designed with the aim to provide fast user-response search times
  and are faster than native MySQL (full text) indexes.
 
+ <li><strong>BibMatch</strong>: FIXME.
+
  <li><strong>BibRank</strong>: FIXME 
   
  <li><strong>BibSched</strong> The bibliographic task scheduler is
@@ -155,11 +159,15 @@ descriptions the module relationship diagram is presented.
  either private or public, allowing a simple document sharing
  mechanism within a group.
   
+ <li><strong>WebComment</strong>: FIXME.
+
  <li><strong>WebHelp</strong> presents some global user-level,
  admin-level, and hacker-level documenation on CDSware.  The
  module-specific documentation is included within each particular
  module.
   
+ <li><strong>WebMessage</strong>: FIXME.
+
  <li><strong>WebSearch</strong> module handles user requests to search
  for a certain words or phrases in the database.  Two types of
  searching can be performed: a word search or a phrase search.  The
