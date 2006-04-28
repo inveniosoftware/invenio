@@ -21,9 +21,9 @@ webappdir = $(WEBDIR)/admin/websubmit
 
 FILESWML = $(wildcard $(srcdir)/*.wml)
 
-webapp_DATA = $(FILESWML:$(srcdir)/%.wml=%) referees.py
+webapp_DATA = $(FILESWML:$(srcdir)/%.wml=%) referees.py websubmitadmin.py
 
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) referees.py
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) referees.py websubmitadmin.py
 
 CLEANFILES = $(FILESWML:$(srcdir)/%.wml=%) *~ *.tmp
 

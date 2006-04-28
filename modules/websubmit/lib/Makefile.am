@@ -22,7 +22,11 @@ SUBDIRS = functions
 pylibdir = $(libdir)/python/cdsware
 
 pylib_DATA = websubmit_config.py websubmit_engine.py file.py	\
-             websubmit_templates.py
+             websubmit_templates.py \
+             websubmitadmin_config.py \
+             websubmitadmin_dblayer.py \
+             websubmitadmin_engine.py \
+             websubmitadmin_templates.py
 
 EXTRA_DIST = $(pylib_DATA)
 
