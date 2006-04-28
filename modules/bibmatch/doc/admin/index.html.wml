@@ -1,7 +1,7 @@
 ## $Id$
 
 ## This file is part of the CERN Document Server Software (CDSware).
-## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
 ## The CDSware is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -11,21 +11,19 @@
 ## The CDSware is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-docdir = $(WEBDIR)/admin/bibmatch
+#include "cdspage.wml" \
+    title="BibMatch Admin" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>>_(Admin Area)_</a>"  \
+    navbar_name="admin" \
+    navbar_select="bibmatch"
 
-doc_DATA = index.html guide.html
-
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
-
-CLEANFILES = $(doc_DATA) *~ *.tmp
-
-%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdsnavbar.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
+<dl>
+ <dt><a href="guide.html">BibMatch Admin Guide</a></dt>
+ <dd>Everything you want to know about configuring and running BibMatch.</dd>
+</dl>
