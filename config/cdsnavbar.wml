@@ -49,9 +49,11 @@
   <navbar:button id=bibformat txt="BibFormat Admin" url="<WEBURL>/admin/bibformat/" hint="CDSware BibFormat Admin" menu="admin-bibformat">
   <navbar:button id=bibharvest txt="BibHarvest Admin" url="<WEBURL>/admin/bibharvest/" hint="CDSware BibHarvest Admin" menu="admin-bibharvest">
   <navbar:button id=bibindex txt="BibIndex Admin" url="<WEBURL>/admin/bibindex/" hint="CDSware BibIndex Admin" menu="admin-bibindex">
+  <navbar:button id=bibmatch txt="BibMatch Admin" url="<WEBURL>/admin/bibmatch/" hint="CDSware BibMatch Admin" menu="admin-bibmatch">
   <navbar:button id=bibrank txt="BibRank Admin" url="<WEBURL>/admin/bibrank/" hint="CDSware BibRank Admin" menu="admin-bibrank">
   <navbar:button id=bibsched txt="BibSched Admin" url="<WEBURL>/admin/bibsched/" hint="CDSware BibSched Admin" menu="admin-bibsched">
   <navbar:button id=bibupload txt="BibUpload Admin" url="<WEBURL>/admin/bibupload/" hint="CDSware BibUpload Admin" menu="admin-bibupload">
+  <navbar:button id=elmsubmit txt="ElmSubmit Admin" url="<WEBURL>/admin/elmsubmit/" hint="CDSware ElmSubmit Admin" menu="admin-elmsubmit">
   <navbar:button id=webaccess txt="WebAccess Admin" url="<WEBURL>/admin/webaccess/" hint="CDSware Web Access Rights Admin" menu="admin-webaccess">
   <navbar:button id=webalert txt="WebAlert Admin" url="<WEBURL>/admin/webalert/" hint="CDSware WebAlert Admin" menu="admin-webalert">
   <navbar:button id=webbasket txt="WebBasket Admin" url="<WEBURL>/admin/webbasket/" hint="CDSware WebBasket Admin" menu="admin-webbasket">
@@ -212,6 +214,24 @@
   </navbar:footer>
 </navbar:define>
 
+## navbar admin-bibmatch:
+<navbar:define name=admin-bibmatch
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=bibmatch-admin-guide txt="Guide" url="<WEBURL>/admin/bibmatch/guide.html">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
 ## navbar admin-bibrank:
 <navbar:define name=admin-bibrank
         imgbase="img/" urlbase="$(ROOT)">
@@ -259,6 +279,24 @@
   <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
   <navbar:button id=bibupload-admin-guide txt="Guide" url="<WEBURL>/admin/bibupload/guide.html">
+
+  <navbar:epilog> </td><td></td></tr> </navbar:epilog>
+
+  <navbar:footer>
+    </table>
+  </navbar:footer>
+</navbar:define>
+
+## navbar admin-elmsubmit:
+<navbar:define name=admin-elmsubmit
+        imgbase="img/" urlbase="$(ROOT)">
+  <navbar:header>
+    <table class=adminbox>
+  </navbar:header>
+
+  <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
+
+  <navbar:button id=elmsubmit-admin-guide txt="Guide" url="<WEBURL>/admin/elmsubmit/guide.html">
 
   <navbar:epilog> </td><td></td></tr> </navbar:epilog>
 
