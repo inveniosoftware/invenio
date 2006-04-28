@@ -23,22 +23,6 @@
     navbar_name="admin" \
     navbar_select="elsubmit-admin-guide"
 
-   <p><table class="errorbox">
-   <thead>
-   <tr>
-   <th class="errorboxheader">
-     WARNING: THIS ADMIN GUIDE IS NOT FULLY COMPLETED
-   </th>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-     This Admin Guide is not yet completed.
-   </td>
-   </tr>
-   </tbody>
-   </table>
-
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
+FIXME.
