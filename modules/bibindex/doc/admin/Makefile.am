@@ -18,7 +18,7 @@
 
 docdir = $(WEBDIR)/admin/bibindex
 
-doc_DATA=guide.html
+doc_DATA = index.html guide.html
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
