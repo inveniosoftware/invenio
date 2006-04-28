@@ -23,11 +23,6 @@
     navbar_name="admin" \
     navbar_select="elmsubmit"
 
-<p>
- This is the gate to the admin area for ElmSubmit. You need to 
- <a href="<WEBURL>/youraccount.py/login?referer=<WEBURL>/admin/webbasket/">login</a> to enter.
-</p>
-
 <dl>
  <dt><a href="guide.html">ElmSubmit Admin Guide</a></dt>
  <dd>Everything you want to know about ElmSubmit administration</dd>
