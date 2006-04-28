@@ -144,14 +144,16 @@ def generate_keywords_rdf(textfile, dictfile, output, outwords, mode):
         # Slow mode: get all document
         text_string = str(rtmp.read())
         
-    text_string = text_string.lower()
+    # text_string = text_string.lower()
     rtmp.close()
 
     try:
-        if text_string.find("keywords:"):
-            safe_keys = text_string.split("keywords:")[1].split("\n")[0]
-        elif text_string.find("key words:"):
-            safe_keys = text_string.split("key words:")[1].split("\n")[0]
+        if text_string.find("Keywords:"):
+            safe_keys = text_string.split("Keywords:")[1].split("\n")[0]
+        elif text_string.find("Key words:"):
+            safe_keys = text_string.split("Key words:")[1].split("\n")[0]
+        elif text_string.find("Key Words:"):
+            safe_keys = text_string.split("Key Words:")[1].split("\n")[0]
     except:
         safe_keys = ""
 
@@ -165,17 +167,28 @@ def generate_keywords_rdf(textfile, dictfile, output, outwords, mode):
         relateds = " "
         safekey = 0
 
-        pattern = '\\b' + pref.lower().strip() + '\\b'
+        if pref[:2].isupper():
+            # First two letters are uppercase. This could be an acronym. Better leave case untouched
+            pattern = sre.compile('\\b' + pref.strip() + '\\b')
+        else:
+            # Let's do some case insensitive search
+            pattern = sre.compile('\\b' + pref.strip() + '\\b', sre.I)
+            
         dictOUT = len(sre.findall(pattern,text_string))
         safeOUT = len(sre.findall(pattern,safe_keys))
         
         for alt in store.objects(s, ns_skos["altLabel"]):
-            pattern_alt = '\\b' + alt.lower().strip() + '\\b' 
+            if alt[:2].isupper():
+                # First two letters are uppercase. This could be an acronym. Better leave case untouched
+                pattern_alt = sre.compile('\\b' + alt.strip() + '\\b')
+            else:
+                # Let's do some case insensitive search
+                pattern_alt = sre.compile('\\b' + alt.strip() + '\\b', sre.I)
+
             dictOUT_alt += len(sre.findall(pattern_alt,text_string))
             safeOUT += len(sre.findall(pattern_alt,safe_keys))
             
             alternatives += alt.strip() + ", "
-
 
         alternatives = alternatives[:-2] 
         dictOUT_total = int(dictOUT) + int(dictOUT_alt)
