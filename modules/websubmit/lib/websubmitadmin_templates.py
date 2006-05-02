@@ -201,7 +201,7 @@ class Template:
            return html formatted navtrail
         """
         nav_h1 =  '<a class="navtrail" href="%s/admin/">Admin Area</a>'
-        nav_h1 += ' &gt; <a class="navtrail" href="%s/admin/websubmit_new/websubmitadmin.py/">WebSubmit Admin</a>'
+        nav_h1 += ' &gt; <a class="navtrail" href="%s/admin/websubmit/websubmitadmin.py/">WebSubmit Admin</a>'
         return  nav_h1 % (weburl, weburl)
 
     def _create_adminbox(self, header="", datalist=[], cls="admin_wvar"):
