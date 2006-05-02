@@ -3,7 +3,7 @@
 ## Comments and reviews for records.
 
 ## This file is part of the CERN Document Server Software (CDSware).
-## Copyright (C) 2002, 2003, 2004, 2005 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
 ## The CDSware is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as

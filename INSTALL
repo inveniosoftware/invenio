@@ -87,7 +87,11 @@ Contents
         it against the same MySQL client library as mod_python, so
         that the two Apache modules are using the same MySQL client
         library.  We saw Apache/PHP/Python problems in the past when
-        they weren't.)  
+        they weren't.  A care should be taken even when you are using
+        precompiled packages.  For example, on Ubuntu 5.10 "Breezy
+        Badger" it seems that python2.4-mysqldb depends on
+        libmysqlclient14, while php5-mysql on libmysqlclient12, which
+        leads to Apache segmentation faults.)
           <http://www.php.net/>
 
      g) PHP compiled as a standalone command-line executable (CLI)
