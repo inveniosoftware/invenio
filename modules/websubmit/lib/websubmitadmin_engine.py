@@ -1013,7 +1013,7 @@ def _clone_functions_foraction_doctype(errors, warnings, user_msg, fromdoctype, 
         ## doctype had existing functions for the given action and they could not be deleted
         ## TODO : LOG ERRORS
         user_msg.append("""Functions already existed for the "%s" action of the document type "%s" but they could not be """ \
-                        """deleted. Unable to clone the functions doctype "%s" for action "%s".""" \
+                        """deleted. Unable to clone the functions of Document Type "%s" for action "%s".""" \
                         % (actname, todoctype, fromdoctype, action))
         ## critical - return 1 to signal this
         return 1
@@ -1026,7 +1026,7 @@ def _clone_functions_foraction_doctype(errors, warnings, user_msg, fromdoctype, 
     else:
         return 0  ## total success
 
-def _clone_functionparamaters_foraction_fromdoctype_todoctype(errors, warnings, user_msg, fromdoctype, todoctype, action):
+def _clone_functionparameters_foraction_fromdoctype_todoctype(errors, warnings, user_msg, fromdoctype, todoctype, action):
     """Clone the parameters/values of a given action of one document type, to the same action on another document type.
        @param errors: a list of errors encountered while cloning parameters
        @param warnings: a list of warnings encountered while cloning parameters
@@ -1048,7 +1048,6 @@ def _clone_functionparamaters_foraction_fromdoctype_todoctype(errors, warnings, 
         return 2 ## to signal that addition wasn't 100% successful
     else:
         return 0  ## all parameters were cloned
-
 
 def _add_doctype(errors, warnings, doctype, doctypename, doctypedescr, clonefrom):
     title = ""
@@ -1076,47 +1075,14 @@ def _add_doctype(errors, warnings, doctype, doctypename, doctypedescr, clonefrom
                                                        fromdoctype=clonefrom,
                                                        todoctype=doctype)
                 ## get details of clonefrom's submissions
-                all_submissions_clonefrom = get_submissiondetails_all_submissions_doctype(doctype=clonefrom)
-                if len(all_submissions_clonefrom) > 0:
+                all_actnames_submissions_clonefrom = get_actname_all_submissions_doctype(doctype=clonefrom)
+                if len(all_actnames_submissions_clonefrom) > 0:
                     ## begin cloning
-                    for submission in all_submissions_clonefrom:
-                        ## clone submission:
-                        (clonefrom_subname, clonefrom_docname, clonefrom_actname, clonefrom_displayed,
-                         clonefrom_nbpg, clonefrom_cd, clonefrom_md, clonefrom_buttonorder,
-                         clonefrom_statustext, clonefrom_level, clonefrom_score, clonefrom_stpage,
-                         clonefrom_endtxt) = submission
-                        ## clone the submission details:
-                        ## first, delete it if it exists:
-                        error_code = delete_submissiondetails_doctype(doctype=doctype, action=clonefrom_actname)
-                        if error_code == 0:
-                            ## could be deleted - now clone it
-                            error_code = insert_submission_details(doctype=doctype.upper(),
-                                                                   action=clonefrom_actname.upper(),
-                                                                   displayed=clonefrom_displayed,
-                                                                   nbpg=clonefrom_nbpg,
-                                                                   buttonorder=clonefrom_buttonorder,
-                                                                   statustext=clonefrom_statustext,
-                                                                   level=clonefrom_level,
-                                                                   score=clonefrom_score,
-                                                                   stpage=clonefrom_stpage,
-                                                                   endtext=clonefrom_endtxt
-                                                                  )
-                            if error_code == 0:
-                                ## submission inserted
-                                ## now clone functions:
-                                error_code = _clone_functions_foraction_doctype(errors=errors, warnings=warnings, user_msg=user_msg, \
-                                                        fromdoctype=clonefrom, todoctype=doctype, action=clonefrom_actname)
-                                if error_code in (0, 2):
-                                    ## no serious error - clone parameters:
-                                    error_code = _clone_functionparamaters_foraction_fromdoctype_todoctype(errors=errors,
-                                                                                                           warnings=warnings,
-                                                                                                           user_msg=user_msg,
-                                                                                                           fromdoctype=clonefrom,
-                                                                                                           todoctype=doctype,
-                                                                                                           action=clonefrom_actname)
-                                ## now clone pages/elements
-                                error_code = clone_submissionfields_from_doctypesubmission_to_doctypesubmission(fromsub=clonefrom_subname,
-                                                                                   tosub="%s%s" % (clonefrom_actname,doctype))
+                    for doc_submission_actname in all_actnames_submissions_clonefrom:
+                        ## clone submission details:
+                        action_name = doc_submission_actname[0]
+                        _clone_submission_fromdoctype_todoctype(errors=errors, warnings=errors, user_msg=user_msg,
+                                                                todoctype=doctype, action=action_name, clonefrom=clonefrom)
 
             user_msg.append("""The "%s" document type has been added.""" % (doctype,))
             title = """Available WebSubmit Document Types"""
@@ -1129,7 +1095,7 @@ def _add_doctype(errors, warnings, doctype, doctypename, doctypedescr, clonefrom
             (title, body) = _create_add_doctype_form(user_msg=user_msg)
 
     return (title, body)
-    
+
 def perform_request_add_doctype(doctype="", doctypename="", doctypedescr="", clonefrom="", doctypedetailscommit=""):
     errors = []
     warnings = []
@@ -1382,23 +1348,68 @@ def _delete_category_from_doctype(errors, warnings, doctype, categid):
     (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
+def _clone_submission_fromdoctype_todoctype(errors, warnings, user_msg, todoctype, action, clonefrom):
+    ## first, delete the submission from todoctype (if it exists):
+    error_code = delete_submissiondetails_doctype(doctype=todoctype, action=action)
+    if error_code == 0:
+        ## could be deleted - now clone it
+        error_code = insert_submission_details_clonefrom_submission(addtodoctype=todoctype, action=action, clonefromdoctype=clonefrom)
+        if error_code == 0:
+            ## submission inserted
+            ## now clone functions:
+            error_code = _clone_functions_foraction_doctype(errors=errors, warnings=warnings, user_msg=user_msg, \
+                                    fromdoctype=clonefrom, todoctype=todoctype, action=action)
+            if error_code in (0, 2):
+                ## no serious error - clone parameters:
+                error_code = _clone_functionparameters_foraction_fromdoctype_todoctype(errors=errors,
+                                                                                       warnings=warnings,
+                                                                                       user_msg=user_msg,
+                                                                                       fromdoctype=clonefrom,
+                                                                                       todoctype=todoctype,
+                                                                                       action=action)
+            ## now clone pages/elements
+            error_code = clone_submissionfields_from_doctypesubmission_to_doctypesubmission(fromsub="%s%s" % (action, clonefrom),
+                                                                                            tosub="%s%s" % (action, todoctype))
+            if error_code == 1:
+                ## could not delete all existing submission fields and therefore could no clone submission fields at all
+                ## TODO : LOG ERROR
+                user_msg.append("""Unable to delete existing submission fields for Submission "%s" of Document Type "%s" - """ \
+                                """cannot clone submission fields!""" % (action, todoctype))
+            elif error_code == 2:
+                ## could not clone all fields
+                ## TODO : LOG ERROR
+                user_msg.append("""Unable to clone all submission fields for submission "%s" on Document Type "%s" from Document""" \
+                                """ Type "%s" """ % (action, todoctype, clonefrom))
+        else:
+            ## could not insert submission details!
+            user_msg.append("""Unable to successfully insert details of submission "%s" into Document Type "%s" - cannot clone from "%s" """ \
+                            % (action, todoctype, clonefrom))
+            ## TODO : LOG ERROR
+    else:
+        ## could not delete details of existing submission (action) from 'todoctype' - cannot clone it as new
+        user_msg.append("""Unable to delete details of existing Submission "%s" from Document Type "%s" - cannot clone it from "%s" """ \
+                        % (action, todoctype, clonefrom))
+        ## TODO : LOG ERROR
+
 def _add_submission_to_doctype_clone(errors, warnings, doctype, action, clonefrom):
     user_msg = []
     ## does action exist?
-    ## does doctype already have action?
     numrows_action = get_number_actions_with_actid(actid=action)
     if numrows_action > 0:
-        ## the action exists - clone submission:
-        error_code = insert_submission_details_clonefrom_submission(addtodoctype=doctype, action=action, clonefromdoctype=clonefrom)
-        if error_code == 0:
-            ## insert successful
-            user_msg.append("The '%s' Submission has been added to the '%s' Document Type. Cloned from Document Type '%s'." \
-                            % (action, doctype, doctype))
-        else:
-            ## insert failed because this doctype already has the submission "action"
-            user_msg.append("The Document Type '%s' already implements the '%s' Submission. Unable to add again." \
-                            % (doctype, action))
+        ## The action exists, but is it already implemented as a submission by doctype?
+        numrows_submission_doctype = get_number_submissions_doctype_action(doctype=doctype, action=action)
+        if numrows_submission_doctype > 0:
+            ## this submission already exists for this document type - unable to add it again
+            user_msg.append("""The Submission "%s" already exists for Document Type "%s" - cannot add it again""" \
+                            %(action, doctype))
             ## TODO : LOG ERROR
+        else:
+            ## clone the submission
+            _clone_submission_fromdoctype_todoctype(errors=errors, warnings=errors, user_msg=user_msg,
+                                                    todoctype=doctype, action=action, clonefrom=clonefrom)
+            user_msg.append("""Cloning of Submission "%s" from Document Type "%s" has been carried out. You should not""" \
+                           """ ignore any warnings that you may have seen.""" % (action, clonefrom))
+            ## TODO : LOG WARNING OF NEW SUBMISSION CREATION BY CLONING
     else:
         ## this action doesn't exist! cannot add a submission based upon it!
         user_msg.append("The Action '%s' does not seem to exist in WebSubmit. Cannot add it as a Submission!" \
@@ -1406,7 +1417,6 @@ def _add_submission_to_doctype_clone(errors, warnings, doctype, action, clonefro
         ## TODO : LOG ERROR
     (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
-    
 
 def _add_submission_to_doctype(errors, warnings, doctype, action, displayed, buttonorder,
                                statustext, level, score, stpage, endtxt):
@@ -1613,7 +1623,6 @@ def perform_request_configure_doctype(doctype,
         if doctype_cloneactionfrom in ("", None, "None"):
             ## no clone - present form into which details of new submission should be entered
             (title, body) = _create_add_submission_form(errors=errors, warnings=warnings, doctype=doctype, action=action)
-            pass
         else:
             ## new submission should be cloned from doctype_cloneactionfrom
             (title, body) = _add_submission_to_doctype_clone(errors=errors, warnings=warnings,
