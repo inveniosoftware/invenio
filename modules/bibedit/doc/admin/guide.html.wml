@@ -1,21 +1,21 @@
 ## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
@@ -112,7 +112,7 @@ external world, or the OAI harvestors might have harvested it already,
 etc.  We usually prefer only to *mark* records as deleted, so that our
 record IDs are ensured to stay permanent.
 
-<p>Thus said, the canonical way to delete the record #1234 in CDSware
+<p>Thus said, the canonical way to delete the record #1234 in CDS Invenio
 v0.1.x development branch is to download its XML MARC:
 
        <pre>
@@ -151,7 +151,7 @@ for example you can access it by:
 
 <pre>
    $ python -c "from zlib import decompress; \\
-                from cdsware.dbquery import run_sql; \\
+                from invenio.dbquery import run_sql; \\
                 print decompress(run_sql('SELECT value FROM bibfmt \\
                 WHERE id_bibrec=1234 AND format=\'xm\'')[0][0])"
 </pre>
@@ -175,7 +175,7 @@ be able to access it.
 <p>P.S. Note that the ``bibXXx'' tables will keep having entries for the
      deleted records.  These entries are to be cleaned from time to
      time by the BibEdit garbage collector.  This GC isn't part of
-     CDSware yet; moreover in the future we plan to abolish all the
+     CDS Invenio yet; moreover in the future we plan to abolish all the
      bibXXx tables, so that this won't be necessary anymore.
 
 <a name="5"></a><h2>5. Delete all records</h2>
@@ -185,8 +185,8 @@ be able to access it.
        scratch again, you can launch:
                                   
      <pre>
-       $ /path/to/your/cdsware/bin/dbexec &lt; /path/to/your/cdsware-source/modules/miscutil/sql/tabbibclean.sql
-       $ /path/to/your/cdsware/bin/webcoll
+       $ /opt/cds-invenio/bin/dbexec &lt; /opt/cds-invenio/src/cds-invenio-0.90/modules/miscutil/sql/tabbibclean.sql
+       $ /opt/cds-invenio/bin/webcoll
      </pre>
 
      Note that you may also want to truncate some idxWORD11* tables,
@@ -194,6 +194,6 @@ be able to access it.
      <code>tabbibclean.sql</code> to see exactly what it does.
 
      Note that you may also want to delete the fulltext files and the
-     submission counters in <code>/path/to/your/cdsware/var/data</code>
+     submission counters in <code>/opt/cds-invenio/var/data</code>
      subdirectories, if you use WebSubmit.
 

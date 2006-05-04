@@ -2,7 +2,7 @@
 <!-- Processed by Id: cwm.py,v 1.164 2004/10/28 17:41:59 timbl Exp -->
 <!--     using base file:/home/adh/Desktop/CERESThes/thememodel3.n3-->
 
-<!-- Taken from http://cain.nbii.org/thesauri and modified as an example ontology for CDSware. -->
+<!-- Taken from http://cain.nbii.org/thesauri and modified as an example ontology for CDS Invenio. -->
 <!-- $Id$ -->
 
 <rdf:RDF xmlns="http://www.w3.org/2004/02/skos/core#"

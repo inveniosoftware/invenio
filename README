@@ -1,20 +1,19 @@
-CERN DOCUMENT SERVER SOFTWARE (CDSware) README
-==============================================
+CDS Invenio README
+==================
 
 Revision: $Id$
 
-CERN Document Server Software (CDSware) enables you to run your own
-electronic preprint server, your own online library catalogue or a
-digital document system on the web.  It complies with the Open Archive
-Initiative metadata harvesting protocol and uses MARC21 as its
-underlying bibliographic standard.
+CDS Invenio enables you to run your own electronic preprint server,
+your own online library catalogue or a digital document system on the
+web.  It complies with the Open Archive Initiative metadata harvesting
+protocol and uses MARC21 as its underlying bibliographic standard.
 
-CDSware is developed at, and maintained by, the CERN Document Handling
-Group.  At CERN, the CDSware installation manages over 400 collections
-of data, consisting of over 600,000 bibliographic records, including
-250,000 fulltext documents, covering preprints, articles, books,
-journals, photographs, videos, and more.  Please consult
-<http://cdsweb.cern.ch/> for details.
+CDS Invenio is developed at, and maintained by, the CERN Document
+Server Software Consortium.  At CERN, CDS Invenio installation manages
+over 600 collections of data, consisting of over 800,000 bibliographic
+records, including 400,000 fulltext documents, covering preprints,
+articles, books, journals, photographs, videos, and more.  Please
+consult <http://cdsweb.cern.ch/> for details.
 
 We aim at user friendliness and speed.  Among the features of CDS are:
 
@@ -27,7 +26,7 @@ We aim at user friendliness and speed.  Among the features of CDS are:
   - User personalization, including document baskets and email
     notification alerts.
 
-The CDS Software is free software licenced under terms of GNU General
+The CDS Invenio is free software licenced under terms of GNU General
 Public Licence (GPL).  It is provided on an "as is" basis.  However,
 please note that a support contract can be arranged with the CDS
 Development Group in which we, the developers, can help you to
@@ -37,11 +36,11 @@ local features should such a need arise.  If you are interested in
 concluding a support contract with us, please contact the CDS
 Development Group at <cds.support@cern.ch>.
 
-CDSware runs on Unix-like systems and requires MySQL database server
+CDS Invenio runs on Unix-like systems and requires MySQL database server
 and Apache/Python/PHP web application server.  Please consult the
 INSTALL file for more information.
 
-Good luck, and thanks for choosing the CERN Document Server Software.
+Good luck, and thanks for choosing CDS Invenio.
 
        - CDS Development Group
          <cds.support@cern.ch>

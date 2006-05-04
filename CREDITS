@@ -1,22 +1,14 @@
-CERN DOCUMENT SERVER SOFTWARE (CDSware) CREDITS
-===============================================
+CDS Invenio CREDITS
+===================
 
 Revision: $Id$
 
-Several people outside the CDSware Development Team 
+Several people outside the CDS Invenio Development Team 
 contributed to the project:
 
   - Thierry Thomas <thierry@FreeBSD.org>
-    Patches for compiling CDSware on FreeBSD.
+    Patches for compiling CDS Invenio on FreeBSD.
   
-  - Frédéric Gobry <frederic.gobry@epfl.ch>
-    Patches for building CDSware out of its source tree, with
-    wildcard expansion and localstatedir patch, and numerous other
-    patches.
-
-  - Tiberiu Dondera <tiberiu.dondera@pronet-consulting.com>
-    Patches for the WebSubmit engine and the admin interface.  
-
   - Guido Pelzer <guido.pelzer@web.de>
     Contributions to the German translation.
   

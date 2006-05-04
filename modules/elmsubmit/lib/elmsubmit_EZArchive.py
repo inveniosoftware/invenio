@@ -2,21 +2,21 @@
 ##
 ## $Id$
 ##
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import gzip
@@ -33,20 +33,20 @@ import sys
 
 WARN_SKIP = True
 
-from cdsware.elmsubmit_filename_generator import calculate_filename_extension as _calculate_filename_extension
-# from cdsware.elmsubmit_filename_generator import generate_filename as _generate_filename
-from cdsware.elmsubmit_misc import write_to_and_return_tempfile_name as _write_to_and_return_tempfile_name
-from cdsware.elmsubmit_misc import provide_dir_with_perms_then_exec as _provide_dir_with_perms_then_exec
-from cdsware.elmsubmit_misc import dirtree as _dirtree
-from cdsware.elmsubmit_misc import count_dotdot as _count_dotdot
-from cdsware.elmsubmit_misc import get_perms as _get_perms
-from cdsware.elmsubmit_misc import random_alphanum_string as _random_alphanum_string
-from cdsware.elmsubmit_misc import backup_directory as _backup_directory
-from cdsware.elmsubmit_misc import open_tempfile as _open_tempfile
-from cdsware.elmsubmit_misc import split_common_path as _split_common_path
-from cdsware.elmsubmit_misc import recursive_dir_contents as _recursive_dir_contents
-from cdsware.elmsubmit_misc import concat as _concat
-from cdsware.elmsubmit_misc import mkdir_parents as _mkdir_parents
+from invenio.elmsubmit_filename_generator import calculate_filename_extension as _calculate_filename_extension
+# from invenio.elmsubmit_filename_generator import generate_filename as _generate_filename
+from invenio.elmsubmit_misc import write_to_and_return_tempfile_name as _write_to_and_return_tempfile_name
+from invenio.elmsubmit_misc import provide_dir_with_perms_then_exec as _provide_dir_with_perms_then_exec
+from invenio.elmsubmit_misc import dirtree as _dirtree
+from invenio.elmsubmit_misc import count_dotdot as _count_dotdot
+from invenio.elmsubmit_misc import get_perms as _get_perms
+from invenio.elmsubmit_misc import random_alphanum_string as _random_alphanum_string
+from invenio.elmsubmit_misc import backup_directory as _backup_directory
+from invenio.elmsubmit_misc import open_tempfile as _open_tempfile
+from invenio.elmsubmit_misc import split_common_path as _split_common_path
+from invenio.elmsubmit_misc import recursive_dir_contents as _recursive_dir_contents
+from invenio.elmsubmit_misc import concat as _concat
+from invenio.elmsubmit_misc import mkdir_parents as _mkdir_parents
 
 # Store all files written out in two lists:
 # 1. remove_always is for temporary files, which we try to remove regardless.

@@ -1,20 +1,20 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
@@ -27,7 +27,7 @@
 
 <h2>Compile-time Configuration of Page Layout</h2>
 
-<p>The style of the CDSware installation is defined largely also
+<p>The style of the CDS Invenio installation is defined largely also
 during the configuration time, as explained in the <a
 href="http://cdsware.cern.ch/download/INSTALL">INSTALL</a> guide.  You
 can modify page header, footer, general portalboxes, etc.  See the

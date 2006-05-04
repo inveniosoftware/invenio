@@ -1,20 +1,20 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
@@ -174,7 +174,7 @@ to shape are commands like: (assuming the problem is with the index ID
 <blockquote>
 <pre>
   $ echo "DELETE FROM idxWORD01R WHERE type='TEMPORARY' or type='FUTURE';" | \
-    /path/to/cdsware/bin/dbexec
+    /opt/cds-invenio/bin/dbexec
 </pre>
 </blockquote>
 
@@ -199,15 +199,15 @@ The steps to perform are:
 <blockquote>
 <pre>
   $ bibsched # wait for all active tasks to finish, and put the queue into manual mode
-  $ cd cdsware-0.7.1 # source dir
+  $ cd cds-invenio-0.90 # source dir
   $ echo "UPDATE collection SET reclist=NULL;" | \
-    /path/to/cdsware/bin/dbexec # clean collection cache
+    /opt/cds-invenio/bin/dbexec # clean collection cache
   $ grep WORD ./modules/miscutil/sql/tabbibclean.sql | \
-    /path/to/cdsware/bin/dbexec # truncate word and rank indexes
+    /opt/cds-invenio/bin/dbexec # truncate word and rank indexes
   $ echo "UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00';" | \
-    /path/to/cdsware/bin/dbexec # rewind the last indexing time
+    /opt/cds-invenio/bin/dbexec # rewind the last indexing time
   $ echo "UPDATE rnkMETHOD SET last_updated='0000-00-00 00:00:00';" | \
-    /path/to/cdsware/bin/dbexec # rewind the last ranking time
+    /opt/cds-invenio/bin/dbexec # rewind the last ranking time
   $ bibindex -f50000 -wcollection # reindex the collection index (fast)
   $ webcoll -f # recreate the collection cache
   $ bibsched # run the two above-submitted tasks  
@@ -220,7 +220,7 @@ The steps to perform are:
 </pre>
 </blockquote>
 
-In the future CDSware should ideally run indexing into invisible
+In the future CDS Invenio should ideally run indexing into invisible
 tables that would be switched against the production ones once the
 indexing process is successfully over.  For the time being, if
 reindexing takes several hours in your installation (e.g. if you have

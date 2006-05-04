@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""CDSware ACCOUNT HANDLING"""
+"""CDS Invenio ACCOUNT HANDLING"""
 
 __lastupdated__ = """$Date$"""
 
@@ -26,20 +26,20 @@ import sys
 from mod_python import apache
 import smtplib
 
-from cdsware import webuser
-from cdsware.config import weburl, cdsname, cdslang, supportemail
-from cdsware.webpage import page
-from cdsware import webaccount
-from cdsware import webbasket
-from cdsware import webalert
-from cdsware import webuser
-from cdsware.webmessage import account_new_mail
-from cdsware.access_control_config import *
-from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE, cfg_webaccess_warning_msgs, CFG_EXTERNAL_AUTHENTICATION
+from invenio import webuser
+from invenio.config import weburl, cdsname, cdslang, supportemail
+from invenio.webpage import page
+from invenio import webaccount
+from invenio import webbasket
+from invenio import webalert
+from invenio import webuser
+from invenio.webmessage import account_new_mail
+from invenio.access_control_config import *
+from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE, cfg_webaccess_warning_msgs, CFG_EXTERNAL_AUTHENTICATION
 
-from cdsware.messages import gettext_set_language
-import cdsware.template
-websession_templates = cdsware.template.load('websession')
+from invenio.messages import gettext_set_language
+import invenio.template
+websession_templates = invenio.template.load('websession')
 
 def edit(req, ln=cdslang):
     uid = webuser.getUid(req)

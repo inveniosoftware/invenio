@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-05-02 12:14+0200\n"
+"POT-Creation-Date: 2006-05-03 19:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2568,9 +2568,8 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:45
 msgid ""
-"If you have lost password for your CERN Document Server internal account, "
-"then please enter your email address below and the lost password will be "
-"emailed to you."
+"If you have lost password for your CDS Invenio internal account, then please "
+"enter your email address below and the lost password will be emailed to you."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:47

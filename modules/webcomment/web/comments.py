@@ -2,44 +2,44 @@
 ## $Id$
 ## Comments and reviews for records.
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """ Comments and reviews for records: web interface """
 
 __lastupdated__ = """$Date$"""
 __revision__ = """$Id$"""
 
-from cdsware.webcomment import check_recID_is_in_range, \
+from invenio.webcomment import check_recID_is_in_range, \
                                perform_request_display_comments_or_remarks,\
                                perform_request_add_comment_or_remark,\
                                perform_request_vote,\
                                perform_request_report
-from cdsware.config import cdslang, \
+from invenio.config import cdslang, \
                            weburl,\
                            cfg_webcomment_allow_comments,\
                            cfg_webcomment_allow_reviews
-from cdsware.webuser import getUid, page_not_authorized, isGuestUser
-from cdsware.webaccount import create_login_page_box
-from cdsware.webpage import page
-from cdsware.search_engine import create_navtrail_links, guess_primary_collection_of_a_record
-from cdsware.urlutils import get_client_ip_address, \
+from invenio.webuser import getUid, page_not_authorized, isGuestUser
+from invenio.webaccount import create_login_page_box
+from invenio.webpage import page
+from invenio.search_engine import create_navtrail_links, guess_primary_collection_of_a_record
+from invenio.urlutils import get_client_ip_address, \
                              redirect_to_url, \
                              wash_url_argument
-from cdsware.messages import wash_language, gettext_set_language
+from invenio.messages import wash_language, gettext_set_language
 
 def index(req):
     """

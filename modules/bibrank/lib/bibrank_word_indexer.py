@@ -1,21 +1,21 @@
 ## $Id$
 ## BibRank word frequency indexer utility.
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __version__ = "$Id$"
@@ -42,13 +42,13 @@ import math
 import re
 import ConfigParser
 
-from cdsware.config import *
-from cdsware.search_engine_config import cfg_max_recID
-from cdsware.search_engine import perform_request_search, strip_accents, HitSet
-from cdsware.dbquery import run_sql
-from cdsware.bibindex_engine_stemmer import is_stemmer_available_for_language, stem
-from cdsware.bibindex_engine_stopwords import is_stopword
-from cdsware.bibindex_engine_config import conv_programs, conv_programs_helpers
+from invenio.config import *
+from invenio.search_engine_config import cfg_max_recID
+from invenio.search_engine import perform_request_search, strip_accents, HitSet
+from invenio.dbquery import run_sql
+from invenio.bibindex_engine_stemmer import is_stemmer_available_for_language, stem
+from invenio.bibindex_engine_stopwords import is_stopword
+from invenio.bibindex_engine_config import conv_programs, conv_programs_helpers
 
 ## safety parameters concerning MySQL thread-multiplication problem:
 cfg_check_mysql_threads = 0 # to check or not to check the problem? 

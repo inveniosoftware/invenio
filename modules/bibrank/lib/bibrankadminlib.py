@@ -1,24 +1,24 @@
 ## $Id$
 ## Administrator interface for BibRank
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## Youshould have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""CDSware BibRank Administrator Interface."""
+"""CDS Invenio BibRank Administrator Interface."""
 
 __lastupdated__ = """$Date$"""
 
@@ -33,11 +33,11 @@ import ConfigParser
 from zlib import compress,decompress
 from mod_python import apache
 
-import cdsware.access_control_engine as acce
-from cdsware.messages import language_list_long
-from cdsware.config import *
-from cdsware.webpage import page, pageheaderonly, pagefooteronly
-from cdsware.webuser import getUid, get_email
+import invenio.access_control_engine as acce
+from invenio.messages import language_list_long
+from invenio.config import *
+from invenio.webpage import page, pageheaderonly, pagefooteronly
+from invenio.webuser import getUid, get_email
 
 __version__ = "$Id$"
 
@@ -962,7 +962,7 @@ def get_languages():
 
 def get_def_name(ID, table):
     """Returns a list of the names, either with the name in the current language, the default language, or just the name from the given table
-    ln - a language supported by cdsware
+    ln - a language supported by CDS Invenio
     type - the type of value wanted, like 'ln', 'sn'"""
 
     name = "name"
@@ -982,7 +982,7 @@ def get_def_name(ID, table):
         
 def get_i8n_name(ID, ln, rtype, table):
     """Returns a list of the names, either with the name in the current language, the default language, or just the name from the given table
-    ln - a language supported by cdsware
+    ln - a language supported by CDS Invenio
     type - the type of value wanted, like 'ln', 'sn'"""
 
     name = "name"
@@ -1018,7 +1018,7 @@ def get_i8n_name(ID, ln, rtype, table):
 def get_name(ID, ln, rtype, table):
     """Returns the value from the table name based on arguments
     ID - id 
-    ln - a language supported by cdsware
+    ln - a language supported by CDS Invenio
     type - the type of value wanted, like 'ln', 'sn'
     table - tablename"""
 

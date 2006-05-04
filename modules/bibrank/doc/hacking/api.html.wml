@@ -1,33 +1,33 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
     title="BibRank Record Sorter API" \
     navbar_name="hacking-websearch" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt; <a class=navtrail href=index.html>WebSearch Internals</a> " \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDS Invenio</a> &gt; <a class=navtrail href=index.html>WebSearch Internals</a> " \
     navbar_select="hacking-websearch-api" 
 
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
 <protect> 
 <pre> 
-CDSware Bibrank Record Sorter can be called from within your Python 
+CDS Invenio Bibrank Record Sorter can be called from within your Python 
 programs via a high-level API and a mid-mid level API.
 
 1. High-level API
@@ -85,7 +85,7 @@ programs via a high-level API and a mid-mid level API.
    Examples:
  
       >>> # import the function:
-      >>> from cdsware.bibrank_record_sorter import rank_records
+      >>> from invenio.bibrank_record_sorter import rank_records
       >>> # rank all records with the words 'higgs boson' according to the method "wrd"
       >>> rank_records('wrd', 0, a_hitset, ['higgs', 'boson'], 0)
       >>> # find similar records to the record 12345, hitset is here ignored because of 'similar records'
@@ -127,7 +127,7 @@ programs via a high-level API and a mid-mid level API.
    Examples:
 
       >>> # import the function:
-      >>> from cdsware.bibrank_record_sorter import find_similar
+      >>> from invenio.bibrank_record_sorter import find_similar
       >>> # find records similar to 12345, hitset must be full
       >>> find_similar('wrd', 12345, hitset, 0, 0)
       >>> # rank records according to a method called jif, using the single_tag...based method.

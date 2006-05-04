@@ -2,33 +2,33 @@
 ## $Id$
 ## Comments and reviews for records.
                                               
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """HTML Templates for commenting features """                                           
 __lastupdated__ = """$Date$"""
 
-# non CDSware imports
+# non CDS Invenio imports
 import string
 
-# CDSware imports
-from cdsware.webuser import get_user_info
-from cdsware.dateutils import convert_datetext_to_dategui
-from cdsware.webmessage_mailutils import email_quoted_txt2html
-from cdsware.config import weburl, \
+# CDS Invenio imports
+from invenio.webuser import get_user_info
+from invenio.dateutils import convert_datetext_to_dategui
+from invenio.webmessage_mailutils import email_quoted_txt2html
+from invenio.config import weburl, \
                            cdslang, \
                            cdsnameintl,\
                            cfg_webcomment_nb_reviews_in_detailed_view, \
@@ -36,8 +36,8 @@ from cdsware.config import weburl, \
                            cfg_webcomment_allow_comments, \
                            cfg_webcomment_nb_comments_in_detailed_view
                            
-from cdsware.messages import gettext_set_language
-from cdsware.textutils import indent_text
+from invenio.messages import gettext_set_language
+from invenio.textutils import indent_text
 
 class Template:
     """templating class, refer to webcomment.py for examples of call"""
@@ -734,7 +734,7 @@ class Template:
         red_text_warnings = ['WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED',
                             'WRN_WEBCOMMENT_ALREADY_VOTED']
         green_text_warnings = ['WRN_WEBCOMMENT_FEEDBACK_RECORDED']
-        from cdsware.errorlib import get_msgs_for_code_list
+        from invenio.errorlib import get_msgs_for_code_list
         span_class = 'important'
         out = ""
         if type(warnings) is not list:
@@ -783,7 +783,7 @@ class Template:
             note = _("Note: you currently haven't %sdefined a nickname%s.<br /><i>%s</i> will temporarly be displayed as author of this comment.")
             note %= (link, '</a>', display)
 
-        from cdsware.search_engine import print_record
+        from invenio.search_engine import print_record
         record_details = print_record(recID=recID, format='hb')
 
         warnings = self.tmpl_warnings(warnings, ln)
@@ -993,7 +993,7 @@ class Template:
         else:
             out += _("Comments and reviews are disabled") + '<br />'
         out += '</ol>'
-        from cdsware.bibrankadminlib import addadminbox
+        from invenio.bibrankadminlib import addadminbox
         return addadminbox('<b>%s</b>'%_("Menu"), [out])
 
     def tmpl_admin_delete_form(self, ln, warnings):

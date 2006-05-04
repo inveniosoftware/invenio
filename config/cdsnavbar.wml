@@ -1,25 +1,25 @@
 ## $Id$
-## This file defines CDSware navbar and subnavbars.
+## This file defines CDS Invenio navbar and subnavbars.
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## You probably went here from "config.wml", so let's continue with
-## its numerotation of CDSware configuration parts...
+## its numerotation of CDS Invenio configuration parts...
 
 ################################
 ## Part 4: CDS navigation bar ##
@@ -28,7 +28,7 @@
 ## The navigation bar and sub-bars are defined here.  You may modify
 ## the definitions now, if you wish, and if you really know what you
 ## are doing. :-).  After that return to "config.wml" file, and the
-## main CDSware source directory, and type "make clean && make".
+## main CDS Invenio source directory, and type "make clean && make".
 
 #use wml::des::navbar
 
@@ -41,29 +41,29 @@
 
   <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> </navbar:prolog>
 
-  <navbar:button id=admin txt="<strong>ADMIN AREA</strong>" url="<WEBURL>/admin/" hint="CDSware Administrators Area">
-  <navbar:button id=howto txt="HOWTOs" url="<WEBURL>/admin/howto/" hint="CDSware Admin HOWTO Documents" menu="admin-howto">
-  <navbar:button id=bibclassify txt="BibClassify Admin" url="<WEBURL>/admin/bibclassify/" hint="CDSware BibClassify Admin" menu="admin-bibclassify">
-  <navbar:button id=bibconvert txt="BibConvert Admin" url="<WEBURL>/admin/bibconvert/" hint="CDSware BibConvert Admin" menu="admin-bibconvert">
-  <navbar:button id=bibedit txt="BibEdit Admin" url="<WEBURL>/admin/bibedit/" hint="CDSware BibEdit Admin" menu="admin-bibedit">
-  <navbar:button id=bibformat txt="BibFormat Admin" url="<WEBURL>/admin/bibformat/" hint="CDSware BibFormat Admin" menu="admin-bibformat">
-  <navbar:button id=bibharvest txt="BibHarvest Admin" url="<WEBURL>/admin/bibharvest/" hint="CDSware BibHarvest Admin" menu="admin-bibharvest">
-  <navbar:button id=bibindex txt="BibIndex Admin" url="<WEBURL>/admin/bibindex/" hint="CDSware BibIndex Admin" menu="admin-bibindex">
-  <navbar:button id=bibmatch txt="BibMatch Admin" url="<WEBURL>/admin/bibmatch/" hint="CDSware BibMatch Admin" menu="admin-bibmatch">
-  <navbar:button id=bibrank txt="BibRank Admin" url="<WEBURL>/admin/bibrank/" hint="CDSware BibRank Admin" menu="admin-bibrank">
-  <navbar:button id=bibsched txt="BibSched Admin" url="<WEBURL>/admin/bibsched/" hint="CDSware BibSched Admin" menu="admin-bibsched">
-  <navbar:button id=bibupload txt="BibUpload Admin" url="<WEBURL>/admin/bibupload/" hint="CDSware BibUpload Admin" menu="admin-bibupload">
-  <navbar:button id=elmsubmit txt="ElmSubmit Admin" url="<WEBURL>/admin/elmsubmit/" hint="CDSware ElmSubmit Admin" menu="admin-elmsubmit">
-  <navbar:button id=webaccess txt="WebAccess Admin" url="<WEBURL>/admin/webaccess/" hint="CDSware Web Access Rights Admin" menu="admin-webaccess">
-  <navbar:button id=webalert txt="WebAlert Admin" url="<WEBURL>/admin/webalert/" hint="CDSware WebAlert Admin" menu="admin-webalert">
-  <navbar:button id=webbasket txt="WebBasket Admin" url="<WEBURL>/admin/webbasket/" hint="CDSware WebBasket Admin" menu="admin-webbasket">
-  <navbar:button id=webcomment txt="WebComment Admin" url="<WEBURL>/admin/webcomment/" hint="CDSware WebComment Admin" menu="admin-webcomment">
-  <navbar:button id=webmessage txt="WebMessage Admin" url="<WEBURL>/admin/webmessage/" hint="CDSware WebMessage Admin" menu="admin-webmessage">
-  <navbar:button id=websearch txt="WebSearch Admin" url="<WEBURL>/admin/websearch/" hint="CDSware Web Search Interface Admin" menu="admin-websearch">
-  <navbar:button id=websession txt="WebSession Admin" url="<WEBURL>/admin/websession/" hint="CDSware WebSession Admin" menu="admin-websession">
-  <navbar:button id=webstat txt="WebStat Admin" url="<WEBURL>/admin/webstat/" hint="CDSware WebStat Admin" menu="admin-webstat">
-  <navbar:button id=webstyle txt="WebStyle Admin" url="<WEBURL>/admin/webstyle/" hint="CDSware WebStyle Admin" menu="admin-webstyle">
-  <navbar:button id=websubmit txt="WebSubmit Admin" url="<WEBURL>/admin/websubmit/" hint="CDSware Web Submit Interface Admin" menu="admin-websubmit">
+  <navbar:button id=admin txt="<strong>ADMIN AREA</strong>" url="<WEBURL>/admin/" hint="CDS Invenio Administrators Area">
+  <navbar:button id=howto txt="HOWTOs" url="<WEBURL>/admin/howto/" hint="CDS Invenio Admin HOWTO Documents" menu="admin-howto">
+  <navbar:button id=bibclassify txt="BibClassify Admin" url="<WEBURL>/admin/bibclassify/" hint="CDS Invenio BibClassify Admin" menu="admin-bibclassify">
+  <navbar:button id=bibconvert txt="BibConvert Admin" url="<WEBURL>/admin/bibconvert/" hint="CDS Invenio BibConvert Admin" menu="admin-bibconvert">
+  <navbar:button id=bibedit txt="BibEdit Admin" url="<WEBURL>/admin/bibedit/" hint="CDS Invenio BibEdit Admin" menu="admin-bibedit">
+  <navbar:button id=bibformat txt="BibFormat Admin" url="<WEBURL>/admin/bibformat/" hint="CDS Invenio BibFormat Admin" menu="admin-bibformat">
+  <navbar:button id=bibharvest txt="BibHarvest Admin" url="<WEBURL>/admin/bibharvest/" hint="CDS Invenio BibHarvest Admin" menu="admin-bibharvest">
+  <navbar:button id=bibindex txt="BibIndex Admin" url="<WEBURL>/admin/bibindex/" hint="CDS Invenio BibIndex Admin" menu="admin-bibindex">
+  <navbar:button id=bibmatch txt="BibMatch Admin" url="<WEBURL>/admin/bibmatch/" hint="CDS Invenio BibMatch Admin" menu="admin-bibmatch">
+  <navbar:button id=bibrank txt="BibRank Admin" url="<WEBURL>/admin/bibrank/" hint="CDS Invenio BibRank Admin" menu="admin-bibrank">
+  <navbar:button id=bibsched txt="BibSched Admin" url="<WEBURL>/admin/bibsched/" hint="CDS Invenio BibSched Admin" menu="admin-bibsched">
+  <navbar:button id=bibupload txt="BibUpload Admin" url="<WEBURL>/admin/bibupload/" hint="CDS Invenio BibUpload Admin" menu="admin-bibupload">
+  <navbar:button id=elmsubmit txt="ElmSubmit Admin" url="<WEBURL>/admin/elmsubmit/" hint="CDS Invenio ElmSubmit Admin" menu="admin-elmsubmit">
+  <navbar:button id=webaccess txt="WebAccess Admin" url="<WEBURL>/admin/webaccess/" hint="CDS Invenio Web Access Rights Admin" menu="admin-webaccess">
+  <navbar:button id=webalert txt="WebAlert Admin" url="<WEBURL>/admin/webalert/" hint="CDS Invenio WebAlert Admin" menu="admin-webalert">
+  <navbar:button id=webbasket txt="WebBasket Admin" url="<WEBURL>/admin/webbasket/" hint="CDS Invenio WebBasket Admin" menu="admin-webbasket">
+  <navbar:button id=webcomment txt="WebComment Admin" url="<WEBURL>/admin/webcomment/" hint="CDS Invenio WebComment Admin" menu="admin-webcomment">
+  <navbar:button id=webmessage txt="WebMessage Admin" url="<WEBURL>/admin/webmessage/" hint="CDS Invenio WebMessage Admin" menu="admin-webmessage">
+  <navbar:button id=websearch txt="WebSearch Admin" url="<WEBURL>/admin/websearch/" hint="CDS Invenio Web Search Interface Admin" menu="admin-websearch">
+  <navbar:button id=websession txt="WebSession Admin" url="<WEBURL>/admin/websession/" hint="CDS Invenio WebSession Admin" menu="admin-websession">
+  <navbar:button id=webstat txt="WebStat Admin" url="<WEBURL>/admin/webstat/" hint="CDS Invenio WebStat Admin" menu="admin-webstat">
+  <navbar:button id=webstyle txt="WebStyle Admin" url="<WEBURL>/admin/webstyle/" hint="CDS Invenio WebStyle Admin" menu="admin-webstyle">
+  <navbar:button id=websubmit txt="WebSubmit Admin" url="<WEBURL>/admin/websubmit/" hint="CDS Invenio Web Submit Interface Admin" menu="admin-websubmit">
 
   <navbar:epilog> </td><td></td></tr> </navbar:epilog>
   <navbar:epilog type=S> </td><td></td></tr></navbar:epilog>
@@ -83,8 +83,8 @@
   <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
   <navbar:button id=howto_marc txt="HOWTO MARC" url="<WEBURL>/admin/howto/marc.html" hint="Admin's HOWTO Guides - How to MARC your medatada">
-  <navbar:button id=howto_migrate txt="HOWTO Migrate" url="<WEBURL>/admin/howto/migrate.html" hint="Admin's HOWTO Guides - How to Migrate your old documents into CDSware">
-  <navbar:button id=howto_run txt="HOWTO Run" url="<WEBURL>/admin/howto/run.html" hint="Admin's HOWTO Guides - How to Run your CDSware installation day-by-day">
+  <navbar:button id=howto_migrate txt="HOWTO Migrate" url="<WEBURL>/admin/howto/migrate.html" hint="Admin's HOWTO Guides - How to Migrate your old documents into CDS Invenio">
+  <navbar:button id=howto_run txt="HOWTO Run" url="<WEBURL>/admin/howto/run.html" hint="Admin's HOWTO Guides - How to Run your CDS Invenio installation day-by-day">
 
   <navbar:epilog> </td><td></td></tr> </navbar:epilog>
 
@@ -498,5 +498,5 @@
 </navbar:define>
 
 
-## End of file.  Please return to "config.wml" file, and the main CDSware
+## End of file.  Please return to "config.wml" file, and the main CDS Invenio
 ## source directory, and type "make clean && make".

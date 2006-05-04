@@ -2,33 +2,33 @@
 ## $Id$
 ## Messaging system (internal)
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """ Web interface for WebMessage """
 __lastupdated__ = """$Date$"""
 
 # CDSWare imports
-from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
-from cdsware.config import weburl, cdslang
-from cdsware.webuser import getUid, isGuestUser, page_not_authorized
-from cdsware.webmessage import *
-from cdsware.webpage import page
-from cdsware.messages import wash_language, gettext_set_language
-from cdsware.urlutils import redirect_to_url
+from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
+from invenio.config import weburl, cdslang
+from invenio.webuser import getUid, isGuestUser, page_not_authorized
+from invenio.webmessage import *
+from invenio.webpage import page
+from invenio.messages import wash_language, gettext_set_language
+from invenio.urlutils import redirect_to_url
 
 ### CALLABLE INTERFACE
 def index(req):

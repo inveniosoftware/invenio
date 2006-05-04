@@ -3,24 +3,24 @@
 ##
 ## $Id$
 ##
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Run CDSware test suite."""
+"""Run CDS Invenio test suite."""
 
 __version__ = "$Id$"
 
@@ -34,20 +34,20 @@ except ImportError, e:
     sys.exit(1)
 
 try:
-    from cdsware.config import version
-    from cdsware import search_engine_tests 
-    from cdsware import bibindex_engine_tests 
-    from cdsware import bibindex_engine_stemmer_tests 
-    from cdsware import bibrecord_tests 
-    from cdsware import bibrank_citation_indexer_tests
-    from cdsware import bibrank_citation_searcher_tests
-    from cdsware import bibrank_downloads_indexer_tests
-    from cdsware import bibrank_record_sorter_tests
-    from cdsware import bibrank_tag_based_indexer_tests
-    from cdsware import oai_repository_tests 
-    from cdsware import bibconvert_tests 
-    from cdsware import errorlib_tests
-    from cdsware import elmsubmit_tests
+    from invenio.config import version
+    from invenio import search_engine_tests 
+    from invenio import bibindex_engine_tests 
+    from invenio import bibindex_engine_stemmer_tests 
+    from invenio import bibrecord_tests 
+    from invenio import bibrank_citation_indexer_tests
+    from invenio import bibrank_citation_searcher_tests
+    from invenio import bibrank_downloads_indexer_tests
+    from invenio import bibrank_record_sorter_tests
+    from invenio import bibrank_tag_based_indexer_tests
+    from invenio import oai_repository_tests 
+    from invenio import bibconvert_tests 
+    from invenio import errorlib_tests
+    from invenio import elmsubmit_tests
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -59,11 +59,11 @@ def usage():
     sys.stderr.write("General options:\n")
     sys.stderr.write("  -h, --help      \t\t Print this help.\n")
     sys.stderr.write("  -V, --version   \t\t Print version information.\n")
-    sys.stderr.write("Description: run CDSware test suite.\n")
+    sys.stderr.write("Description: run CDS Invenio test suite.\n")
     return
 
 def create_all_test_suites():
-    """Return all tests suites for all CDSware modules."""
+    """Return all tests suites for all CDS Invenio modules."""
     return unittest.TestSuite((search_engine_tests.create_test_suite(),
                                bibindex_engine_tests.create_test_suite(),
                                bibindex_engine_stemmer_tests.create_test_suite(),
@@ -80,7 +80,7 @@ def create_all_test_suites():
 
 def print_info_line():
     """Prints info line about tests to be executed."""
-    info_line = """CDSware v%s test suite results:""" % version
+    info_line = """CDS Invenio v%s test suite results:""" % version
     print info_line
     print "=" * len(info_line)
 

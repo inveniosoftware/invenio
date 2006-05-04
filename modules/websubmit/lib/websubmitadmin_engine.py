@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import re
-from cdsware.websubmitadmin_dblayer import *
-from cdsware.websubmitadmin_config import *
-from cdsware.access_control_admin import acc_getAllRoles, acc_getRoleUsers
-from cdsware.config import cdslang
+from invenio.websubmitadmin_dblayer import *
+from invenio.websubmitadmin_config import *
+from invenio.access_control_admin import acc_getAllRoles, acc_getRoleUsers
+from invenio.config import cdslang
 
-import cdsware.template
+import invenio.template
 
 try:
-    websubmitadmin_templates = cdsware.template.load('websubmitadmin')
+    websubmitadmin_templates = invenio.template.load('websubmitadmin')
 except:
     pass
 
@@ -1158,7 +1158,7 @@ def _delete_referee_doctype(errors, warnings, doctype, categid, refereeid):
 def _create_list_referees_doctype(doctype):
     referees = {}
     referees_details = {}
-    ## get all CDSware roles:
+    ## get all CDS Invenio roles:
     all_roles = acc_getAllRoles()
     for role in all_roles:
         (roleid, rolename) = (role[0], role[1])

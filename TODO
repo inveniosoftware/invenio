@@ -1,11 +1,12 @@
-;;; -*- mode: outline; coding: utf-8; outline-regexp: "[*\f]+"; -*-
-;;;
-;;; CDSware TODO and WISH list
-;;; ==========================
-;;; $Id$
+CDS Invenio TODO
+================
 
 As of March 2006 the TODO list is now handled by CERN Savannah:
 
    https://savannah.cern.ch/projects/cdsware/
 
-;;; End of file.
+Please use this resource from now on.
+
+       - CDS Development Group
+         <cds.support@cern.ch>
+         <http://cdsware.cern.ch/>

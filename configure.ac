@@ -1,49 +1,41 @@
 ## $Id$
-## Purpose: CERN Document Server Software (CDSware) main configure.ac file.
+## Purpose: CDS Invenio main configure.ac file.
 ## Note: If you change this file, please run "autoreconf" to regenerate the "configure" script.
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cdsware, 0.9.0.20060427, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cdsware, 0.9.0.20060427)
+AC_INIT(cds-invenio, 0.89.0.20060502, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.89.0.20060502)
 
 ## Check for install:
 AC_PROG_INSTALL
 
-## Define WEBDIR directory:
-AC_ARG_WITH(webdir, AC_HELP_STRING([--with-webdir], [specify where the web files go (e.g. /var/www/cdsware/)]), WEBDIR=${withval})
-if test -z "$WEBDIR"; then
-   AC_MSG_ERROR([
-   You have not used the "--with-webdir" argument that should define the installation directory for Web programs and documents.  
-   Example: "--with-webdir=/var/www/cdsware/".])
-fi   
-
 ## Define WEBURL URL:
-AC_ARG_WITH(weburl, AC_HELP_STRING([--with-weburl], [specify URL where web files will be reached (e.g. http://cdsdev.cern.ch/cdsware/)]), WEBURL=${withval})
+AC_ARG_WITH(weburl, AC_HELP_STRING([--with-weburl], [specify URL where web files will be reached (e.g. http://webserver.domain.com/doc/)]), WEBURL=${withval})
 if test -z "$WEBURL"; then
    AC_MSG_ERROR([
    You have not used the "--with-weburl" argument that should define the corresponding URL where the site will be reached.  
-   Example: "--with-weburl=http://webserver.domain.com/cdsware/".])
+   Example: "--with-weburl=http://webserver.domain.com/doc/".])
 fi   
 
 ## Define DBHOST database host:
-AC_ARG_WITH(dbhost, AC_HELP_STRING([--with-dbhost], [specify DB server (e.g. cdsdb.cern.ch)]), DBHOST=${withval})
+AC_ARG_WITH(dbhost, AC_HELP_STRING([--with-dbhost], [specify DB server (e.g. sqlserver.domain.com)]), DBHOST=${withval})
 if test -z "$DBHOST"; then
    AC_MSG_ERROR([
    You have not used the "--with-dbhost" argument that should define which DB server to use.  
@@ -51,19 +43,19 @@ if test -z "$DBHOST"; then
 fi   
 
 ## Define DBNAME database name:
-AC_ARG_WITH(dbname, AC_HELP_STRING([--with-dbname], [specify DB name (e.g. cdsware)]), DBNAME=${withval})
+AC_ARG_WITH(dbname, AC_HELP_STRING([--with-dbname], [specify DB name (e.g. cdsinvenio)]), DBNAME=${withval})
 if test -z "$DBNAME"; then
    AC_MSG_ERROR([
    You have not used the "--with-dbname" argument that should define DB name.  
-   Example: "--with-dbname=cdsware".])
+   Example: "--with-dbname=cdsinvenio".])
 fi   
 
 ## Define DBUSER user name:
-AC_ARG_WITH(dbuser, AC_HELP_STRING([--with-dbuser], [specify DB user name (e.g. cdsware)]), DBUSER=${withval})
+AC_ARG_WITH(dbuser, AC_HELP_STRING([--with-dbuser], [specify DB user name (e.g. cdsinvenio)]), DBUSER=${withval})
 if test -z "$DBUSER"; then
    AC_MSG_ERROR([
    You have not used the "--with-dbuser" argument that should define DB user name.  
-   Example: "--with-dbuser=cdsware".])
+   Example: "--with-dbuser=cdsinvenio".])
 fi   
 
 ## Define DBPASS user password:
@@ -76,6 +68,7 @@ fi
 
 ## Check for gettext support
 AM_GNU_GETTEXT(external)
+AM_GNU_GETTEXT_VERSION(0.14.4)
 
 ## Check for WML:
 AC_PATH_PROG(WML, wml)
@@ -134,7 +127,7 @@ if test -z "$ACROREAD"; then
    AC_MSG_WARN([
    Acrobat Reader was not found in your PATH.  It is used in 
    the WebSubmit module for automatic conversion of submitted documents.  
-   You can continue without it but you will miss some CDSware 
+   You can continue without it but you will miss some CDS Invenio 
    functionality.  We recommend you to install it first and to rerun 
    the configure script.  Acrobat Reader is available from
    <http://www.adobe.com/products/acrobat/readstep.html>.])
@@ -146,7 +139,7 @@ if test -z "$GZIP"; then
    AC_MSG_WARN([
    Gzip was not found in your PATH.  It is used in 
    the WebSubmit module to compress the data submitted in an archive.
-   You can continue without it but you will miss some CDSware 
+   You can continue without it but you will miss some CDS Invenio 
    functionality.  We recommend you to install it first and to rerun 
    the configure script.  Gzip is available from
    <http://www.gzip.org/>.])
@@ -159,7 +152,7 @@ if test -z "$GUNZIP"; then
    Gunzip was not found in your PATH.  It is used in 
    the WebSubmit module to correctly deal with submitted compressed
    files.
-   You can continue without it but you will miss some CDSware 
+   You can continue without it but you will miss some CDS Invenio 
    functionality.  We recommend you to install it first and to rerun 
    the configure script.  Gunzip is available from
    <http://www.gzip.org/>.])
@@ -171,7 +164,7 @@ if test -z "$TAR"; then
    AC_MSG_WARN([
    Tar was not found in your PATH.  It is used in 
    the WebSubmit module to pack the submitted data into an archive.
-   You can continue without it but you will miss some CDSware 
+   You can continue without it but you will miss some CDS Invenio 
    functionality.  We recommend you to install it first and to rerun 
    the configure script.  Tar is available from
    <ftp://prep.ai.mit.edu/pub/gnu/tar/>.])
@@ -183,7 +176,7 @@ if test -z "$PS2PDF"; then
    AC_MSG_WARN([
    ps2pdf was not found in your PATH.  It is used in 
    the WebSubmit module to convert submitted PostScripts into PDF.
-   You can continue without it but you will miss some CDSware 
+   You can continue without it but you will miss some CDS Invenio 
    functionality.  We recommend you to install it first and to rerun 
    the configure script.  PS2PDF is available from
    <http://www.cs.wisc.edu/~ghost/doc/AFPL/6.50/Ps2pdf.htm>.])
@@ -196,7 +189,7 @@ if test -z "$PDFTOTEXT"; then
    pdftotext was not found in your PATH.  It is used for the fulltext indexation 
    of PDF files.
    You can continue without it but you may miss fulltext searching capability 
-   of CDSware.  We recomend you to install it first and to rerun the configure 
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
    script.  pdftotext is available from <http://www.foolabs.com/xpdf/home.html>. 
    ])
 fi
@@ -208,7 +201,7 @@ if test -z "$PSTOTEXT"; then
    pstotext was not found in your PATH.  It is used for the fulltext indexation 
    of PDF and PostScript files.
    You can continue without it but you may miss fulltext searching capability 
-   of CDSware.  We recomend you to install it first and to rerun the configure 
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
    script.  pstotext is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
    ])
 fi
@@ -220,7 +213,7 @@ if test -z "$PSTOASCII"; then
    ps2ascii was not found in your PATH.  It is used for the fulltext indexation 
    of PostScript files.
    You can continue without it but you may miss fulltext searching capability 
-   of CDSware.  We recomend you to install it first and to rerun the configure 
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
    script.  ps2ascii is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
    ])
 fi
@@ -232,7 +225,7 @@ if test -z "$ANTIWORD"; then
    antiword was not found in your PATH.  It is used for the fulltext indexation 
    of Microsoft Word files.
    You can continue without it but you may miss fulltext searching capability 
-   of CDSware.  We recomend you to install it first and to rerun the configure 
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
    script.  antiword is available from <http://www.winfield.demon.nl/index.html>. 
    ])
 fi
@@ -244,7 +237,7 @@ if test -z "$CATDOC"; then
    catdoc was not found in your PATH.  It is used for the fulltext indexation 
    of Microsoft Word files.
    You can continue without it but you may miss fulltext searching capability 
-   of CDSware.  We recomend you to install it first and to rerun the configure 
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
    script.  catdoc is available from <http://www.ice.ru/~vitus/catdoc/index.html>.
    ])
 fi
@@ -256,7 +249,7 @@ if test -z "$WVTEXT"; then
    wvText was not found in your PATH.  It is used for the fulltext indexation 
    of Microsoft Word files.
    You can continue without it but you may miss fulltext searching capability 
-   of CDSware.  We recomend you to install it first and to rerun the configure 
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
    script.  wvText is available from <http://sourceforge.net/projects/wvware>.
    ])
 fi     
@@ -268,7 +261,7 @@ if test -z "$PPTHTML"; then
    ppthtml was found in your PATH. It is used for the fulltext indexation 
    of Microsoft PowerPoint files.
    You can continue without it but you may miss fulltext searching capability 
-   of CDSware.  We recomend you to install it first and to rerun the configure 
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
    script.  ppthtml is available from <http://www.xlhtml.org/>.
    ])
 fi
@@ -280,7 +273,7 @@ if test -z "$XLHTML"; then
    xlhtml was found in your PATH. It is used for the fulltext indexation 
    of Microsoft Excel files.
    You can continue without it but you may miss fulltext searching capability 
-   of CDSware.  We recomend you to install it first and to rerun the configure 
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
    script.  xlhtml is available from <http://chicago.sourceforge.net/xlhtml/>.
    ])
 fi
@@ -292,7 +285,7 @@ if test -z "$HTMLTOTEXT"; then
    html2text was found in your PATH. It is used for the fulltext indexation 
    of Microsoft PowerPoint and Excel files.
    You can continue without it but you may miss fulltext searching capability 
-   of CDSware.  We recomend you to install it first and to rerun the configure 
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
    script.  html2text is available from <http://userpage.fu-berlin.de/~mbayer/tools/html2text.html>.
    ])
 fi
@@ -303,7 +296,7 @@ if test -z "$GIFTEXT"; then
    AC_MSG_WARN([
    Giftext was not found in your PATH.  It is used in 
    the WebSubmit module to create an icon from a submitted picture.
-   You can continue without it but you will miss some CDSware 
+   You can continue without it but you will miss some CDS Invenio 
    functionality.  We recommend you to install it first and to rerun 
    the configure script.  Giftext is available from
    <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>.])
@@ -315,7 +308,7 @@ if test -z "$FILE"; then
    AC_MSG_WARN([
    File was not found in your PATH.  It is used in 
    the WebSubmit module to check the validity of the submitted files.
-   You can continue without it but you will miss some CDSware 
+   You can continue without it but you will miss some CDS Invenio 
    functionality.  We recommend you to install it first and to rerun 
    the configure script.  File is available from
    <ftp://ftp.astron.com/pub/file/>.])
@@ -327,7 +320,7 @@ if test -z "$CONVERT"; then
    AC_MSG_WARN([
    Convert was not found in your PATH.  It is used in 
    the WebSubmit module to create an icon from a submitted picture.
-   You can continue without it but you will miss some CDSware 
+   You can continue without it but you will miss some CDS Invenio 
    functionality.  We recommend you to install it first and to rerun 
    the configure script.  Convert is available from
    <http://www.imagemagick.org/>.])
@@ -343,7 +336,7 @@ else
    if test -z "$CLISP"; then
       AC_MSG_WARN([
       GNU CLISP was not found in your PATH.  It is used by the WebStat
-      module to produce statistics about CDSware usage.  (Alternatively,
+      module to produce statistics about CDS Invenio usage.  (Alternatively,
       SBCL or CMUCL can be used instead of CLISP.)
       You can continue without it but you will miss this feature.  We 
       recommend you to install it first (if you don't have neither CMUCL
@@ -366,7 +359,7 @@ else
    if test -z "$CMUCL"; then   
       AC_MSG_WARN([
       CMUCL was not found in your PATH.  It is used by the WebStat
-      module to produce statistics about CDSware usage.  (Alternatively,
+      module to produce statistics about CDS Invenio usage.  (Alternatively,
       CLISP or SBCL can be used instead of CMUCL.)
       You can continue without it but you will miss this feature.  We 
       recommend you to install it first (if you don't have neither CLISP
@@ -385,7 +378,7 @@ else
    if test -z "$SBCL"; then
       AC_MSG_WARN([
       SBCL was not found in your PATH.  It is used by the WebStat
-      module to produce statistics about CDSware usage.  (Alternatively,
+      module to produce statistics about CDS Invenio usage.  (Alternatively,
       CLISP or CMUCL can be used instead of SBCL.)
       You can continue without it but you will miss this feature.  We 
       recommend you to install it first (if you don't have neither CLISP
@@ -411,7 +404,6 @@ AC_SUBST(WML)
 AC_SUBST(MYSQL)
 AC_SUBST(PHP)
 AC_SUBST(PYTHON)
-AC_SUBST(WEBDIR)
 AC_SUBST(CLIDIR)
 AC_SUBST(WEBURL)
 AC_SUBST(DBHOST)
@@ -671,10 +663,9 @@ AC_OUTPUT
 
 ## Write help:
 AC_MSG_RESULT([****************************************************************************])
-AC_MSG_RESULT([** Your CERN Document Server Software (CDSware) installation is now ready **]) 
+AC_MSG_RESULT([** Your CDS Invenio installation is now ready                             **]) 
 AC_MSG_RESULT([** for building.  You have entered the following parameters:              **]) 
-AC_MSG_RESULT([**   - CDSware main install directory: ${prefix}])
-AC_MSG_RESULT([**   - Web install directory: $WEBDIR])
+AC_MSG_RESULT([**   - CDS Invenio main install directory: ${prefix}])
 AC_MSG_RESULT([**   - Web home URL: $WEBURL])
 AC_MSG_RESULT([**   - DB server: $DBHOST])
 AC_MSG_RESULT([**   - DB name: $DBNAME])
@@ -686,11 +677,11 @@ AC_MSG_RESULT([**   - CMUCL executable: $CMUCL])
 AC_MSG_RESULT([**   - SBCL executable: $SBCL])
 AC_MSG_RESULT([** Here are the steps to continue the building process:                   **])
 AC_MSG_RESULT([**   1) Customize self-explanatory config file './config/config.wml'.     **])
-AC_MSG_RESULT([**   2) Type 'make' to build your customized CDSware installation.        **])
+AC_MSG_RESULT([**   2) Type 'make' to build your customized CDS Invenio installation.    **])
 AC_MSG_RESULT([**   3) Type 'make create-tables' if you have not created tables before.  **])
 AC_MSG_RESULT([**   4) Type 'make install' to install the system.                        **])
 AC_MSG_RESULT([**   5) Type 'make create-demo-site' to install and test the demo site.   **])
-AC_MSG_RESULT([** Good luck, and thanks for choosing the CERN Document Server Software.  **])
+AC_MSG_RESULT([** Good luck, and thanks for choosing CDS Invenio.                        **])
 AC_MSG_RESULT([**              -- CDS Development Group <cds.support@cern.ch>            **])
 AC_MSG_RESULT([****************************************************************************])
 

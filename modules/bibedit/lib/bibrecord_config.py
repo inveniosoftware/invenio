@@ -1,27 +1,27 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ### CONFIGURATION OPTIONS FOR BIBRECORD LIBRARY
 
 """bibrecord configuration"""
 
-from cdsware.config import etcdir
+from invenio.config import etcdir
 
 # location of the MARC21 DTD file:
 cfg_marc21_dtd = "%s/bibedit/MARC21slim.dtd" % etcdir
@@ -37,7 +37,7 @@ cfg_bibrecord_warning_msgs = {
     6: 'Import Error\n',
     7: 'WARNING: value expected of type string.',
     8: 'WARNING: empty datafield',
-    98:'WARNING: problems importing cdsware',
+    98:'WARNING: problems importing invenio',
     99: 'Document not well formed'
     } 
 

@@ -3,34 +3,34 @@
 ## 
 ## Every db-related function of module webmessage
 ##
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MySQLdb import escape_string
 from time import localtime, mktime
 
-from cdsware.dbquery import run_sql
-from cdsware.webmessage_config import cfg_webmessage_status_code, \
+from invenio.dbquery import run_sql
+from invenio.webmessage_config import cfg_webmessage_status_code, \
                                       cfg_webmessage_max_nb_of_messages, \
                                       cfg_webmessage_roles_without_quota, \
                                       cfg_webmessage_days_before_delete_orphans
-from cdsware.dateutils import datetext_default, \
+from invenio.dateutils import datetext_default, \
                               convert_datestruct_to_datetext
-from cdsware.webuser import list_users_in_roles
+from invenio.webuser import list_users_in_roles
 
 def check_user_owns_message(uid, msgid):
     """

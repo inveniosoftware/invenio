@@ -1,20 +1,20 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
@@ -34,19 +34,19 @@ administrative tasks.
 <dt><a href="marc.html">HOWTO MARC</a>
 
 <dd>Describes how to choose the MARC representation of your metadata
-and how it will be stored in CDSware.
+and how it will be stored in CDS Invenio.
 
 <dt><a href="migrate.html">HOWTO Migrate</a>
 
 <dd>Describes how to migrate a bunch of your old data from any format
-you might have into CDSware.
+you might have into CDS Invenio.
 
 <dt><a href="run.html">HOWTO Run</a>
 
-<dd>Describes how to run your CDSware installation and how to take
+<dd>Describes how to run your CDS Invenio installation and how to take
 care of its normal operation day by day.
 
 </dl>
 </blockquote>
 
-<p>Haven't found what you were looking for?  <a href="mailto:<ADMINEMAIL>" title="CDSware-Suggest-a-HOWTO">Suggest a HOWTO</a>.
+<p>Haven't found what you were looking for?  <a href="mailto:<ADMINEMAIL>" title="CDS Invenio-Suggest-a-HOWTO">Suggest a HOWTO</a>.

@@ -1,20 +1,20 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
@@ -25,10 +25,10 @@
 
 Welcome to the Admin Area of the <CDSNAME>.  You'll find here pointers
 to the available runtime admin-level interfaces and admin-level guides
-on how to configure and run the CDSware system.
+on how to configure and run the CDS Invenio system.
 
 
-<p>CDSware comes as a suite of several more or less independent
+<p>CDS Invenio comes as a suite of several more or less independent
 modules.  You'll find brief descriptions for each admin module below.
 (More background information on each module may be read in the <a
 href="<WEBURL>/hacking/modules.html">modules overview</a> article.)
@@ -44,14 +44,14 @@ presented below.
 
 <h3>Data acquisition related modules</h3>
 
-<p>The metadata input into a running CDSware system can be done in two
+<p>The metadata input into a running CDS Invenio system can be done in two
 ways: <em>(i) admin-oriented batch mode</em>,
 i.e. <strong>BibHarvest</strong> to get data from OAI repositories,
 <strong>BibConvert</strong> to convert any input data into XML MARC,
-and <strong>BibUpload</strong> to upload XML MARC files into CDSware;
+and <strong>BibUpload</strong> to upload XML MARC files into CDS Invenio;
 and <em>(ii) author-oriented interactive mode</em>,
 i.e. <strong>WebSubmit</strong> to submit documents via Web.  Once the
-data are uploaded in CDSware, you may want to modify them via
+data are uploaded in CDS Invenio, you may want to modify them via
 <strong>BibEdit</strong> to edit the metadata.
 
 <table border="1" cellpadding="2">
@@ -71,7 +71,7 @@ data are uploaded in CDSware, you may want to modify them via
   Enables you to configure OAI metadata harvestor for eventual periodical
   batch upload of data.  For example, you can define from where to
   harvest, with what periodicity, how to transform data before
-  uploading them into CDSware, etc.
+  uploading them into CDS Invenio, etc.
 </td>
 <td>
   <a href="bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a>
@@ -185,7 +185,7 @@ data are uploaded in CDSware, you may want to modify them via
 
 <h3>Data provision related modules</h3>
 
-<p>The metadata output from a running CDSware system to the end-user
+<p>The metadata output from a running CDS Invenio system to the end-user
 is covered by several modules: <strong>BibIndex</strong> to index the
 metadata, <strong>BibRank</strong> to eventually rank them,
 <strong>BibFormat</strong> to format them for the output,
@@ -310,7 +310,7 @@ engine.
 
 <h3>Personalization related modules</h3>
 
-<p>The CDSware interface can be personalized to suit different needs
+<p>CDS Invenio interface can be personalized to suit different needs
 of different end-users.  This functionality is covered by several
 modules: <strong>WebSession</strong> to identify users and their
 personal configurations, <strong>WebBasket</strong> to provide
@@ -412,8 +412,8 @@ set up personal email notification alerts.
 <p>Modules that provide the necessary glue for those presented above
 are: <strong>BibSched</strong> to manage and schedule bibliographic
 tasks, <strong>WebAccess</strong> to define role-based access control
-system to all CDSware services, and <strong>WebStyle</strong> to
-define a common look and feel of CDSware web pages.
+system to all CDS Invenio services, and <strong>WebStyle</strong> to
+define a common look and feel of CDS Invenio web pages.
 
 <table border="1">
 
@@ -445,7 +445,7 @@ define a common look and feel of CDSware web pages.
   <strong>WebAccess Admin</strong>
 </td>
 <td>
-    Enables you to define who has got access or admin rights on various CDSware modules. 
+    Enables you to define who has got access or admin rights on various CDS Invenio modules. 
     For example, you can define that John is the bibliographic
     data manager, that Jim can modify the search interface pages, that
     Jill is the submission approval editor, etc.
@@ -463,7 +463,7 @@ define a common look and feel of CDSware web pages.
   <strong>WebStyle Admin</strong>
 </td>
 <td>
-  Enables you to customize default CDSware page style and the CSS style sheet.
+  Enables you to customize default CDS Invenio page style and the CSS style sheet.
 </td>
 <td>
   <small class="note">not available, but see the guide for the command-line way</small>

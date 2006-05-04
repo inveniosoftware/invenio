@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""CDSware Search Engine in mod_python."""
+"""CDS Invenio Search Engine in mod_python."""
 
 __lastupdated__ = """$Date$"""
 
@@ -49,29 +49,29 @@ import unicodedata
 
 from xml.dom import minidom
 
-## import CDSware stuff:
-from cdsware.config import *
-from cdsware.search_engine_config import *
-from cdsware.bibrank_record_sorter import get_bibrank_methods,rank_records
-from cdsware.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
+## import CDS Invenio stuff:
+from invenio.config import *
+from invenio.search_engine_config import *
+from invenio.bibrank_record_sorter import get_bibrank_methods,rank_records
+from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 if cfg_experimental_features:
-    from cdsware.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
-    from cdsware.bibrank_citation_grapher import create_citation_history_graph_and_box
-    from cdsware.bibrank_downloads_grapher import create_download_history_graph_and_box
-from cdsware.dbquery import run_sql
+    from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
+    from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
+    from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
+from invenio.dbquery import run_sql
 try:
     from mod_python import apache
-    from cdsware.webuser import getUid
-    from cdsware.webpage import pageheaderonly, pagefooteronly, create_error_box
+    from invenio.webuser import getUid
+    from invenio.webpage import pageheaderonly, pagefooteronly, create_error_box
 
 except ImportError, e:
     pass # ignore user personalisation, needed e.g. for command-line
 
-from cdsware.messages import gettext_set_language, wash_language
+from invenio.messages import gettext_set_language, wash_language
 
 try:
-    import cdsware.template
-    websearch_templates = cdsware.template.load('websearch')
+    import invenio.template
+    websearch_templates = invenio.template.load('websearch')
 except:
     pass
 
@@ -368,7 +368,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=None):
         req.write(pageheaderonly(title=title_message,
                                  navtrail=create_navtrail_links(cc, as, ln, 1),
                                  description="%s %s." % (cc, _("Search Results")),
-                                 keywords="CDSware, WebSearch, %s" % cc,
+                                 keywords="CDS Invenio, WebSearch, %s" % cc,
                                  uid=uid,
                                  language=ln,
                                  urlargs=req.args))
@@ -962,7 +962,7 @@ def wash_field(f):
     """Wash field passed by URL."""
     # get rid of unnecessary whitespace:
     f = string.strip(f)
-    # wash old-style CDSware/ALEPH 'f' field argument, e.g. replaces 'wau' and 'au' by 'author'
+    # wash old-style CDS Invenio/ALEPH 'f' field argument, e.g. replaces 'wau' and 'au' by 'author'
     if cfg_fields_convert.has_key(string.lower(f)):
         f = cfg_fields_convert[f]
     return f
@@ -2920,7 +2920,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
                database for reformatting.
 
        sysno - display old system SYS number (e.g. "").  If you
-               migrate to CDSware from another system, and store your
+               migrate to CDS Invenio from another system, and store your
                old SYS call numbers, you can use them instead of recid
                if you wish so.
 

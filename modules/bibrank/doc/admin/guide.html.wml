@@ -1,20 +1,20 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
@@ -78,7 +78,7 @@ order to create different kinds of ranking methods for the search engine to use.
 
 <a name="bai"></a><h2>3. BibRank Admin Interface</h2>
 The bibrank web interface enables you to modify the configuration of most aspects of BibRank. For full functionality, it is advised to
-let the http-daemon have write/read access to your cdsware/etc/bibrank directory. If this is not wanted, you have to edit the configuration files from the console using your favourite text editor.
+let the http-daemon have write/read access to your invenio/etc/bibrank directory. If this is not wanted, you have to edit the configuration files from the console using your favourite text editor.
 <a name="mi"></a><h3>3.1 Main interface</h3>
 In the main interface screen, you see a list of all rank methods currently added. Each rank method is identified by the rank method code. To find out about the functionality available, check out the topics below.
 
@@ -95,27 +95,27 @@ Which collections the rank method should be visible in.
 </blockquote>
 
 <a name="ar"></a><h3>3.2 Add rank method</h3>
-When pressing the link in the upper right corner from the main interface, you will see the interface for adding a new rank method. The two available options that needs to be decided upon, are the bibrank code and the template to use, both values can be changed later. The bibrank code is used by the bibrank daemon to run the method, and should be fairly short without spaces. Which template you are using, decides how the ranking will be done, and must before used, be changed to suit your cdsware configuration. When confirming to add a new rank method, it will be added to the list of possible rank methods, and a configuration file will be created if the httpd user has proper rights to the 'cdsware/etc/bibrank' directory. If not, the file has to manually be created with the name 'bibrankcode.cfg' where bibrankcode is the same as given in the interface.
+When pressing the link in the upper right corner from the main interface, you will see the interface for adding a new rank method. The two available options that needs to be decided upon, are the bibrank code and the template to use, both values can be changed later. The bibrank code is used by the bibrank daemon to run the method, and should be fairly short without spaces. Which template you are using, decides how the ranking will be done, and must before used, be changed to suit your CDS Invenio configuration. When confirming to add a new rank method, it will be added to the list of possible rank methods, and a configuration file will be created if the httpd user has proper rights to the 'invenio/etc/bibrank' directory. If not, the file has to manually be created with the name 'bibrankcode.cfg' where bibrankcode is the same as given in the interface.
 
 <a name="sd"></a><h3>3.3 Show details of rank method</h3>
 This interface gives you an overview of the current status of the rank method, and gives direct access to the various interfaces for changing the configuration.
 In the overview section, you see the bibrank code, for use with the bibrank daemon, and the date for the last run of the rank method.
-In the statistics section you see how many records have been added to the rank method and other statistic data. In the collection part, the collections which the rank method is visible to is shown. The translations part shows the various translations in the languages available in cdsware. On the bottom the configuration file is shown, if accessible.
+In the statistics section you see how many records have been added to the rank method and other statistic data. In the collection part, the collections which the rank method is visible to is shown. The translations part shows the various translations in the languages available in CDS Invenio. On the bottom the configuration file is shown, if accessible.
 
 <a name="mr"></a><h3>3.4 Modify rank method</h3>
 This interface gives access to modify the bibrank code given when creating the rank method and the configuration file of the rank method, if the file can be accessed. If not, it may not exist, or the httpd user doesn't have enough rights to read the file. On the bottom of the interface, it is possible to choose a template, see it, and copy it over the old rank method configuration if wanted. Remember that the values present in the template is an example, and must be changed where necessary. See this documentation for information about this, and the 'BibRank Internals' link below for additional information.
 
 <a name="dr"></a><h3>3.5 Delete rank method</h3>
-If it is necessary to delete a rank method, some precautions must be taken since the configuration of the method will be lost. When deleting a rank method, the configuration file will also be deleted ('cdsware/etc/bibrank/bibrankcode.cfg' where bibrankcode is the code of the rank method) if accessible to the httpd user. If not, the file can be deleted manually from console. Any bibrank tasks scheduled to run the deleted rank method must be modified or deleted manually.
+If it is necessary to delete a rank method, some precautions must be taken since the configuration of the method will be lost. When deleting a rank method, the configuration file will also be deleted ('invenio/etc/bibrank/bibrankcode.cfg' where bibrankcode is the code of the rank method) if accessible to the httpd user. If not, the file can be deleted manually from console. Any bibrank tasks scheduled to run the deleted rank method must be modified or deleted manually.
 
 <a name="mt"></a><h3>3.6 Modify translations</h3>
-If you want to use internalisation of the rank method names, you have to add them using the 'Modify translations' interface. Below a list of all the languages used in the cdsware installation will be shown with the possibility to add the translation for each language.
+If you want to use internalisation of the rank method names, you have to add them using the 'Modify translations' interface. Below a list of all the languages used in the CDS Invenio installation will be shown with the possibility to add the translation for each language.
 
 <a name="mc"></a><h3>3.7 Modify visibility toward collections</h3>
-If a rank method should be visible to the users of the cdsware search interface, it must be enabled for one or several collections. A rank method can be visible in the search interface of the whole site, or just one collection. The collections in the upper list box does not show the rank method in the search interface to the user. To change this select the wanted collection and press 'Enable' to enable the rank method for this collection. The collections that the method has been activated for, is  shown in the lower list box. To remove a collection, select it and press the 'Disable' button to remove it from the list of collections which the rank method is enabled for.
+If a rank method should be visible to the users of the CDS Invenio search interface, it must be enabled for one or several collections. A rank method can be visible in the search interface of the whole site, or just one collection. The collections in the upper list box does not show the rank method in the search interface to the user. To change this select the wanted collection and press 'Enable' to enable the rank method for this collection. The collections that the method has been activated for, is  shown in the lower list box. To remove a collection, select it and press the 'Disable' button to remove it from the list of collections which the rank method is enabled for.
 
 <a name="bd"></a><h2>4. BibRank Daemon</h2>
-The bibrank daemon read the necessary metadata from the cdsware database and combines the read metadata
+The bibrank daemon read the necessary metadata from the CDS Invenio database and combines the read metadata
 in different ways to create the ranking data necessary at searchtime to fast be able to rank the results.
 <a name="cli1"></a><h3>4.1 Command Line Interface</h3>
 <blockquote>
@@ -124,7 +124,7 @@ Usage bibrank:
        bibrank -wjif -a --id=0-30000,30001-860000 --verbose=9
        bibrank -wjif -d --modified='2002-10-27 13:57:26'
        bibrank -wwrd --recalculate --collection=Articles
-       bibrank -wwrd -a -i 234-250,293,300-500 -u admin@cdsware
+       bibrank -wwrd -a -i 234-250,293,300-500 -u admin@localhost
 
  Ranking options:
  -w, --run=r1[,r2]         runs each rank method in the order given
@@ -181,7 +181,7 @@ J. High Energy Phys.---8.664
 
 <h4>Step 3 - Modify the configuration file</h4>
 The configuration files for the different rank methods has different option, so verify that you are using the correct
-configuration file and rank method. A template for each rank method exists as examples, but may not work on all configurations of CDSware. 
+configuration file and rank method. A template for each rank method exists as examples, but may not work on all configurations of CDS Invenio. 
 For a description of each rank method and the configuration necessary, check section 6 below.
 
 <h4>Step 4 - Add the ranking method as a scheduled task</h4>
@@ -216,7 +216,7 @@ $ bibrank 2505
 2004-09-07 17:52:10 -->
 2004-09-07 17:52:10 --> Running rank method: Journal Impact Factor.
 2004-09-07 17:52:10 --> No new records added since last time method was run
-2004-09-07 17:52:11 --> Reading knowledgebase file: /soft/cdsware-CDSCERNWIENERDEV/etc/bibrank/cern_jif.kb
+2004-09-07 17:52:11 --> Reading knowledgebase file: /home/invenio/etc/bibrank/cern_jif.kb
 2004-09-07 17:52:11 --> Number of lines read from knowledgebase file: 420
 2004-09-07 17:52:11 --> Number of records available in rank method: 0
 2004-09-07 17:52:12 -->
@@ -248,7 +248,7 @@ function = single_tag_rank_method
 
 [single_tag_rank]
 tag = 909C4p
-kb_src = /usr/local/cdsware-DEMO/etc/bibrank/jif.kb
+kb_src = /home/invenio/etc/bibrank/jif.kb
 check_mandatory_tags = 909C4c,909C4v,909C4y
 </protect>
 </pre>
@@ -269,7 +269,7 @@ function = single_tag_rank_method
 tag = 909C4p
 
 ##The path to the kb file which got the content of the tag above on left side, and value on the left side
-kb_src = /log/cdsware-DEMODEV/etc/bibrank/jif.kb
+kb_src = /home/invenio/etc/bibrank/jif.kb
 
 ##Tags that must be included for a record to be added to the ranking data, to disable remove tags
 check_mandatory_tags = 909C4c,909C4v,909C4y
@@ -432,7 +432,7 @@ relevance_number_output_epilogue = )
 
 <a name="bt"></a><h2>6. bibrankgkb Tool</h2>
 For some ranking methods, like the single_tag_rank method, a knowledge base file (kb) with the needed data in the correct format is necessary. This file can be created using the bibrankgkb tool which can read the data either from
-the cdsware database, from several web pages using regular expressions, or from another file. In case one source
+the CDS Invenio database, from several web pages using regular expressions, or from another file. In case one source
 has another naming convention, bibrank can convert between them using a convert file.
 <a name="cli2"></a><h3>6.1 Command Line Interface</h3>
 
@@ -457,7 +457,7 @@ Usage: bibrankgkb %s [options]
 <a name="ubt"></a><h3>6.2 Using bibrankgkb</h3>
 
 <h4>Step 1 - Find sources</h4>
-Since some of the data used for ranking purposes is not freely available, it cannot be bundled with CDSware. To get hold of the necessary data,
+Since some of the data used for ranking purposes is not freely available, it cannot be bundled with CDS Invenio. To get hold of the necessary data,
 you may find it useful to ask your library if they have a copy of the data that can be used (like the Journal Impact Factors from the Science Citation Index), or use google to search the web for any public source.
 <h4>Step 2 - Create configuration file</h4>
 The default configuration file is shown below.
@@ -483,9 +483,9 @@ url_9 = http://www.taelinke.land.ru/impact_RZ.html
 url_regexp = 
 
 ##The various sources that can be read in, can either be a file, web page or from the database
-kb_1 = /home/trondaks/w/cdsware/modules/bibrank/etc/cern_jif.kb
-kb_2 = /home/trondaks/w/cdsware/modules/bibrank/etc/cdsware_jif.kb
-kb_2_filter = /home/trondaks/w/cdsware/modules/bibrank/etc/convert.kb
+kb_1 = /home/invenio/modules/bibrank/etc/cern_jif.kb
+kb_2 = /home/invenio/modules/bibrank/etc/demo_jif.kb
+kb_2_filter = /home/invenio/modules/bibrank/etc/convert.kb
 kb_3 = SELECT id_bibrec,value FROM bib93x,bibrec_bib93x WHERE tag='938__f' AND id_bibxxx=id
 kb_4 = SELECT id_bibrec,value FROM bib21x,bibrec_bib21x WHERE tag='210__a' AND id_bibxxx=id
 ##This points to the url above (the common part of the url is 'url_' followed by a number
@@ -511,7 +511,7 @@ create_1 = file,,%(kb_2_filter)s,,file,,%(kb_2)s
 </protect>
 When you have found a source for the data, created the configuration file, it may be necessary to
 create an convertion file, but this depends on the conversions used in the available data versus
-the convertion used in your cdsware installation.
+the convertion used in your CDS Invenio installation.
 <br>
 The available data may look like this:
 <pre>
@@ -519,7 +519,7 @@ The available data may look like this:
 COLLOID SURFACE A---1.98
 </pre>
 </blockquote>
-But in cdsware you are using:
+But in CDS Invenio you are using:
 <pre>
 <blockquote>
 Colloids Surf., A---1.98
@@ -546,10 +546,10 @@ The output may look like this:
 <blockquote>
 $ ./bibrankgkb -v9
 2004-03-11 17:30:17 --> Running: Generate Knowledge base.
-2004-03-11 17:30:17 --> Reading data from file: /log/cdsware-DEMODEV/etc/bibrank/jif.kb
-2004-03-11 17:30:17 --> Reading data from file: /log/cdsware-DEMODEV/etc/bibrank/conv.kb
+2004-03-11 17:30:17 --> Reading data from file: /home/invenio/etc/bibrank/jif.kb
+2004-03-11 17:30:17 --> Reading data from file: /home/invenio/etc/bibrank/conv.kb
 2004-03-11 17:30:17 --> Using last resource for converting values.
-2004-03-11 17:30:17 --> Reading data from file: /log/cdsware-DEMODEV/etc/bibrank/jif2.kb
+2004-03-11 17:30:17 --> Reading data from file: /home/invenio/etc/bibrank/jif2.kb
 2004-03-11 17:30:17 --> Converting between naming conventions given.
 2004-03-11 17:30:17 --> Colloids Surf., A---1.98
 2004-03-11 17:30:17 --> Phys. Rev. Lett.---6.462

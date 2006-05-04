@@ -1,25 +1,25 @@
 ## $Id$
-## CDSware User related utilities.
+## CDS Invenio User related utilities.
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-This file implements all methods necessary for working with users and sessions in cdsware.
+This file implements all methods necessary for working with users and sessions in invenio.
 Contains methods for logging/registration when a user log/register into the system, checking if it
 is a guest user or not.
 
@@ -38,18 +38,18 @@ import string
 import smtplib
 import MySQLdb
 
-from cdsware import session, websession
-from cdsware.dbquery import run_sql
-from cdsware.websession import pSession, pSessionMapping
-from cdsware.session import SessionError
-from cdsware.config import *
-from cdsware.access_control_engine import acc_authorize_action
-from cdsware.access_control_admin import acc_findUserRoleActions
-from cdsware.access_control_config import *
+from invenio import session, websession
+from invenio.dbquery import run_sql
+from invenio.websession import pSession, pSessionMapping
+from invenio.session import SessionError
+from invenio.config import *
+from invenio.access_control_engine import acc_authorize_action
+from invenio.access_control_admin import acc_findUserRoleActions
+from invenio.access_control_config import *
 
-from cdsware.messages import gettext_set_language
-import cdsware.template
-tmpl = cdsware.template.load('websession')
+from invenio.messages import gettext_set_language
+import invenio.template
+tmpl = invenio.template.load('websession')
 
 def createGuestUser():
     """Create a guest user , insert into user null values in all fields
@@ -63,7 +63,7 @@ def createGuestUser():
 
 def page_not_authorized(req, referer='', uid='', text='', navtrail=''):
     """Show error message when account is not activated"""
-    from cdsware.webpage import page
+    from invenio.webpage import page
 
     if not CFG_ACCESS_CONTROL_LEVEL_SITE:
         title = cfg_webaccess_msgs[5]
@@ -561,7 +561,7 @@ def auth_apache_user_collection_p(user, password, coll):
     Apache password data file, and whether this user is authorized to
     see the given collections.  Return 0 in case of failure, 1 in case
     of success."""
-    from cdsware.search_engine import coll_restricted_p, coll_restricted_group
+    from invenio.search_engine import coll_restricted_p, coll_restricted_group
     if not auth_apache_user_p(user, password):
         return 0
     if not coll_restricted_p(coll):

@@ -5,11 +5,11 @@ __lastupdated__ = """$Date$"""
 import sys
 from mod_python import apache
 
-from cdsware.websubmitadmin_engine import *
-from cdsware.config import cdslang
-from cdsware.webuser import getUid
-from cdsware.webpage import page
-from cdsware.messages import wash_language, gettext_set_language
+from invenio.websubmitadmin_engine import *
+from invenio.config import cdslang
+from invenio.webuser import getUid
+from invenio.webpage import page
+from invenio.messages import wash_language, gettext_set_language
 
 
 def index(req, ln=cdslang):

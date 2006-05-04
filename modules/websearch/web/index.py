@@ -1,34 +1,34 @@
 ## $Id$
 ##
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import sys
 import sre
 import MySQLdb
 
-from cdsware.config import weburl,cdsname,cdslang,cachedir,cdsnameintl
+from invenio.config import weburl,cdsname,cdslang,cachedir,cdsnameintl
 
 def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
     "Display search interface page for collection c by looking in the collection cache."
-    from cdsware.webpage import page, create_error_box
-    from cdsware.webuser import getUid, page_not_authorized
-    from cdsware.messages import wash_language, gettext_set_language
-    from cdsware.search_engine import get_colID, get_coll_i18nname
+    from invenio.webpage import page, create_error_box
+    from invenio.webuser import getUid, page_not_authorized
+    from invenio.messages import wash_language, gettext_set_language
+    from invenio.search_engine import get_colID, get_coll_i18nname
     # wash params:
     try:
         as = int(as)
@@ -53,7 +53,7 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=verbose, ln=ln),
                     description="%s - Internal Error" % cdsname, 
-                    keywords="%s, CDSware, Internal Error" % cdsname,
+                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
                     language=ln,
                     urlargs=req.args)
     # start display:
@@ -66,7 +66,7 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
                     body=_("<p>Sorry, collection <strong>%s</strong> does not seem to exist. "
                            "<p>You may want to start browsing from <a href=\"%s\">%s</a>.") % (c, "%s?ln=%s" % (weburl, ln), cdsnameintl[ln]),
                     description="%s - Not found: %s " % (cdsname, c),
-                    keywords="%s, CDSware" % cdsname,
+                    keywords="%s, CDS Invenio" % cdsname,
                     uid=uid,
                     language=ln,
                     urlargs=req.args)
@@ -102,7 +102,7 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
                     body=c_body,
                     navtrail=c_navtrail,
                     description="%s - %s" % (cdsname, c),
-                    keywords="%s, CDSware, %s" % (cdsname, c),
+                    keywords="%s, CDS Invenio, %s" % (cdsname, c),
                     uid=uid,
                     language=ln,
                     urlargs=req.args,
@@ -121,7 +121,7 @@ def index(req, c=cdsname, as="0", verbose="1", ln=cdslang):
         return page(title=_("Internal Error"),
                     body = create_error_box(req, ln=ln),
                     description="%s - Internal Error" % cdsname, 
-                    keywords="%s, CDSware, Internal Error" % cdsname,
+                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
                     uid=uid,
                     language=ln,
                     urlargs=req.args)

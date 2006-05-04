@@ -1,30 +1,30 @@
 ## $Id$
 ##
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""CDSware Search Engine Web Interface."""
+"""CDS Invenio Search Engine Web Interface."""
 
 import sys    
 from mod_python import apache    
 
-from cdsware.config import weburl,cdsname,cdslang
-from cdsware import search_engine
-from cdsware.webuser import getUid, page_not_authorized
+from invenio.config import weburl,cdsname,cdslang
+from invenio import search_engine
+from invenio.webuser import getUid, page_not_authorized
 
 __version__ = "$Id$"
 
@@ -83,8 +83,8 @@ def authenticate(req, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp
     def __auth__(req, user, password):
         """Is user authorized to proceed with the request?"""
         import sys 
-        from cdsware.config import cdsname
-        from cdsware.webuser import auth_apache_user_collection_p
+        from invenio.config import cdsname
+        from invenio.webuser import auth_apache_user_collection_p
         from cgi import parse_qs
         # let's parse collection list from given URL request:
         parsed_args = parse_qs(req.args)

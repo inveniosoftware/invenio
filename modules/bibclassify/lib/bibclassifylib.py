@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 ##
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
@@ -37,10 +37,10 @@ import traceback
 # rdflib-2.2.3
 import rdflib
 
-from cdsware.config import *
-from cdsware.bibindex_engine_config import *
-from cdsware.dbquery import run_sql
-from cdsware.access_control_engine import acc_authorize_action
+from invenio.config import *
+from invenio.bibindex_engine_config import *
+from invenio.dbquery import run_sql
+from invenio.access_control_engine import acc_authorize_action
 
 fontSize = [12, 14, 16, 18, 20, 22, 24, 26, 28, 30]
 

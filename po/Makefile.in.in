@@ -156,7 +156,7 @@ $(DOMAIN).pot-update: $(POTFILES) $(srcdir)/POTFILES.in remove-potcdate.sed
 	grep '\.wml$$' $(srcdir)/POTFILES.in > POTFILES-wml
 	grep -v '\.wml$$' $(srcdir)/POTFILES.in > POTFILES-py
 
-	$(PYTHON) $(srcdir)/i18n_extract_from_wml_source.py $(top_srcdir) POTFILES-wml > cdsware.po
+	$(PYTHON) $(srcdir)/i18n_extract_from_wml_source.py $(top_srcdir) POTFILES-wml > cds-invenio.po
 
 	if test -n '$(MSGID_BUGS_ADDRESS)' || test '$(PACKAGE_BUGREPORT)' = '@'PACKAGE_BUGREPORT'@'; then \
 	  msgid_bugs_address='$(MSGID_BUGS_ADDRESS)'; \

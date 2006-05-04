@@ -2,32 +2,32 @@
 ## $Id$
 ## Comments and reviews for records.
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __lastupdated__ = """$Date$"""
 
-from cdsware.webcommentadminlib import *
-from cdsware.bibrankadminlib import check_user
-from cdsware.webpage import page, create_error_box
-from cdsware.config import weburl,cdslang
-from cdsware.webuser import getUid, page_not_authorized
-from cdsware.urlutils import wash_url_argument, redirect_to_url
-from cdsware.messages import wash_language, gettext_set_language
+from invenio.webcommentadminlib import *
+from invenio.bibrankadminlib import check_user
+from invenio.webpage import page, create_error_box
+from invenio.config import weburl,cdslang
+from invenio.webuser import getUid, page_not_authorized
+from invenio.urlutils import wash_url_argument, redirect_to_url
+from invenio.messages import wash_language, gettext_set_language
 
 def index(req, ln=cdslang):
     """

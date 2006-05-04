@@ -1,20 +1,20 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## import interesting modules:
@@ -26,18 +26,18 @@ import re
 from mod_python import apache
 import sys
 
-from cdsware.config import cdsname,cdslang
-from cdsware.access_control_engine import acc_authorize_action
-from cdsware.access_control_admin import acc_isRole
-from cdsware.webpage import page, create_error_box
-from cdsware.webuser import getUid, get_email, page_not_authorized
-from cdsware.websubmit_config import *
-from cdsware.file import *
-from cdsware.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
+from invenio.config import cdsname,cdslang
+from invenio.access_control_engine import acc_authorize_action
+from invenio.access_control_admin import acc_isRole
+from invenio.webpage import page, create_error_box
+from invenio.webuser import getUid, get_email, page_not_authorized
+from invenio.websubmit_config import *
+from invenio.file import *
+from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
-from cdsware.messages import gettext_set_language
-import cdsware.template
-websubmit_templates = cdsware.template.load('websubmit')
+from invenio.messages import gettext_set_language
+import invenio.template
+websubmit_templates = invenio.template.load('websubmit')
 
 def index(req,c=cdsname,ln=cdslang,recid="",docid="",version="",name="",format=""):
     # load the right message language
@@ -98,7 +98,7 @@ def errorMsg(title,req,c=cdsname,ln=cdslang):
     return page(title="error",
                     body = create_error_box(req, title=title,verbose=0, ln=ln),
                     description="%s - Internal Error" % c,
-                    keywords="%s, CDSware, Internal Error" % c,
+                    keywords="%s, CDS Invenio, Internal Error" % c,
                     language=ln,
                     urlargs=req.args)
 
@@ -106,7 +106,7 @@ def warningMsg(title,req,c=cdsname,ln=cdslang):
     return page(title="warning",
                     body = title,
                     description="%s - Internal Error" % c,
-                    keywords="%s, CDSware, Internal Error" % c,
+                    keywords="%s, CDS Invenio, Internal Error" % c,
                     language=ln,
                     urlargs=req.args)
 

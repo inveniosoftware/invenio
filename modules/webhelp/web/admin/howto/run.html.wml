@@ -1,24 +1,24 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
-    title="HOWTO Run Your CDSware Installation" \
+    title="HOWTO Run Your CDS Invenio Installation" \
     navbar_name="admin" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/>Admin Area</a> &gt; <a class=navtrail href=<WEBURL>/admin/howto/>Admin HOWTOs</a>" \
     navbar_select="howto_run"
@@ -28,7 +28,7 @@ Version <: print generate_pretty_revision_date_string('$Id$'); :>
 <h2>Overview</h2>
 
 <p>This HOWTO guide intends to give you ideas on how to run your
-CDSware installation and how to take care of its normal operation day
+CDS Invenio installation and how to take care of its normal operation day
 by day.
 
 <h2>BibSched Periodical Tasks</h2>
@@ -48,7 +48,7 @@ the tasks according to their order or the date of programmed runtime.
 You can consider BibSched to be a kind of cron daemon for
 bibliographic tasks.
 
-<p>This means that after CDSware installation you want to have
+<p>This means that after CDS Invenio installation you want to have
 BibSched daemon running permanently.  To launch BibSched daemon, do:
 
    <blockquote>
@@ -165,9 +165,9 @@ directory that is good to clean up from time to time.  For example:
 
    <blockquote>
    <pre>
-   $ find /usr/local/cdsware-DEMO/var/log -name "bibsched_task_*" -size 0c -exec \rm -f {} \;   
-   $ find /usr/local/cdsware-DEMO/var/log -name "bibsched_task_*" -atime +28 -exec \rm -f {} \;
-   $ find /usr/local/cdsware-DEMO/var/log -name "bibsched_task_*" -atime +7 -exec gzip -9 {} \;
+   $ find /opt/cds-invenio/var/log -name "bibsched_task_*" -size 0c -exec \rm -f {} \;   
+   $ find /opt/cds-invenio/var/log -name "bibsched_task_*" -atime +28 -exec \rm -f {} \;
+   $ find /opt/cds-invenio/var/log -name "bibsched_task_*" -atime +7 -exec gzip -9 {} \;
    </pre>
    </blockquote>
 
@@ -177,9 +177,9 @@ uploaded.  For example:
 
    <blockquote>
    <pre>   
-   $ find /usr/local/cdsware-DEMO/var/tmp -name "rec_fmt_*.xml" -size 0c -exec \rm -f {} \;   
-   $ find /usr/local/cdsware-DEMO/var/tmp -name "rec_fmt_*.xml" -atime +28 -exec \rm -f {} \;
-   $ find /usr/local/cdsware-DEMO/var/tmp -name "rec_fmt_*.xml" -atime +7 -exec gzip -9 {} \;
+   $ find /opt/cds-invenio/var/tmp -name "rec_fmt_*.xml" -size 0c -exec \rm -f {} \;   
+   $ find /opt/cds-invenio/var/tmp -name "rec_fmt_*.xml" -atime +28 -exec \rm -f {} \;
+   $ find /opt/cds-invenio/var/tmp -name "rec_fmt_*.xml" -atime +7 -exec gzip -9 {} \;
    </pre>
    </blockquote>
 
@@ -189,9 +189,9 @@ uploaded.  For example:
 
    <blockquote>
    <pre>   
-   $ find /usr/local/cdsware-DEMO/var/tmp -name "bibharvestadmin.*" -exec \rm -f {} \;   
-   $ find /usr/local/cdsware-DEMO/var/tmp -name "bibconvertrun*" -exec \rm -f {} \;   
-   $ find /usr/local/cdsware-DEMO/var/tmp -name "oaiharvest*" -exec gzip -9 {} \;
+   $ find /opt/cds-invenio/var/tmp -name "bibharvestadmin.*" -exec \rm -f {} \;   
+   $ find /opt/cds-invenio/var/tmp -name "bibconvertrun*" -exec \rm -f {} \;   
+   $ find /opt/cds-invenio/var/tmp -name "oaiharvest*" -exec gzip -9 {} \;
    </pre>
    </blockquote>
 

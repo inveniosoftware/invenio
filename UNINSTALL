@@ -1,23 +1,23 @@
-CERN DOCUMENT SERVER SOFTWARE (CDSware) UNINSTALLATION
-======================================================
+CDS Invenio UNINSTALLATION
+==========================
 
 Revision: $Id$
 
 About
 =====
 
-This document specifies how to uninstall the CERN Document Server
-Software (CDSware).  See INSTALL if you look for information on how to
-install the system.  See RELEASE-NOTES if you are upgrading from a
-previous CDSware release.
+This document specifies how to uninstall the CDS Invenio.  See INSTALL
+if you look for information on how to install the system.  See
+RELEASE-NOTES if you are upgrading from a previous CDS Invenio
+release.
 
 Contents
 ========
 
-1. Quick instructions for the impatient CDSware admin
-2. Detailed instructions for the patient CDSware admin
+1. Quick instructions for the impatient CDS Invenio admin
+2. Detailed instructions for the patient CDS Invenio admin
 
-1. Quick instructions for the impatient CDSware admin
+1. Quick instructions for the impatient CDS Invenio admin
 ==================================================
 
       $ cd /usr/local/src/cdsware-0.9
@@ -28,13 +28,13 @@ Contents
           mysql> DROP DATABASE cdsware;
           mysql> REVOKE ALL PRIVILEGES ON cdsware.* FROM cdsware@webserver.domain.com;
 
-2. Detailed instructions for the patient CDSware admin
+2. Detailed instructions for the patient CDS Invenio admin
 ===================================================
 
       $ cd /usr/local/src/cdsware-0.9
  
           Change to the directory where you have configured and built
-          the CDS Software.
+          the CDS Invenio.
 
       $ gmake uninstall     ## NOTE: This has not been tested yet!!
 
@@ -46,7 +46,7 @@ Contents
           created.  We'll test this in the coming future.
 
           Also, you may want to remove the directories manually in
-          case you have added some non-CDSware files to the same place.
+          case you have added some non-CDS Invenio files to the same place.
 
       $ cd ..
   
@@ -54,19 +54,19 @@ Contents
 
       $ rm -rf cdsware-0.9.tar.gz cdsware-0.9
 
-          Wipe out the downloaded tarball and all the CDSware sources.
+          Wipe out the downloaded tarball and all the CDS Invenio sources.
 
       $ mysql -h sqlserver.domain.com -u root -p mysql
           mysql> DROP DATABASE cdsware;
           mysql> REVOKE ALL PRIVILEGES ON cdsware.* FROM cdsware@webserver.domain.com;
 
           Ask your MySQL administrator to execute the above commands
-          that will drop the CDSware databases and revoke access rights
-          to the CDSware user.
+          that will drop the CDS Invenio databases and revoke access rights
+          to the CDS Invenio user.
 
-Good luck, and thanks for testing the CERN Document Server Software.
-We would be glad to hear from you on your CDSware experience: please tell
-us what you think and thus help us to improve the system.  Thanks!
+Thanks for testing CDS Invenio.  We would be glad to hear from you
+about your CDS Invenio experience.  Please tell us what you think to
+help us to improve the system.  Thanks!
   
        - CDS Development Group
          <cds.support@cern.ch>

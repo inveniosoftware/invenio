@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from cdsware.dbquery import run_sql
+from invenio.dbquery import run_sql
 from MySQLdb import escape
 
 ## Functions relating to WebSubmit ACTIONS, their addition, and their modification:

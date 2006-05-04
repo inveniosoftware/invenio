@@ -1,26 +1,26 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
     title="Test Suite Strategy" \
     navbar_name="hacking-test-suite-strategy" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> " \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDS Invenio</a> " \
     navbar_select="hacking-test-suite-strategy" 
 
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
@@ -39,7 +39,7 @@
 <a name="1"></a><h2>1. General considerations</h2>
 
 <p>This documents presents guidelines for unit testing and regression
-testing homogenisation throughout all CDSware modules.
+testing homogenisation throughout all CDS Invenio modules.
 
 <p>Testing is an important coding activity.  Most authors believe that
 writing test cases should take between 10% and 30% of the project
@@ -86,7 +86,7 @@ write good code.  Therefore, think ahead!
 
 <a name="2"></a><h2>2. Running test suite</h2>
 
-<p>The CDSware test suite can be run in the source directory:
+<p>CDS Invenio test suite can be run in the source directory:
 
 <blockquote>
 <pre>
@@ -98,20 +98,20 @@ or anytime after the installation:
 
 <blockquote>
 <pre>
-$ /usr/local/cdsware-DEMO/bin/testsuite
+$ /opt/cds-invenio/bin/testsuite
 </pre>
 </blockquote>
 
 The ``testsuite'' executable will run all available unit tests,
 regression tests, and all the other kind of tests provided with
-CDSware.
+CDS Invenio.
 
 <p>The informative output is of the form:
 
 <blockquote>
 <pre>
 $ make test
-CDSware v0.3.2.20040519 test suite results:
+CDS Invenio v0.3.2.20040519 test suite results:
 ===========================================
 search engine washing of query patterns ... ok
 search engine washing of URL arguments ... ok
@@ -129,7 +129,7 @@ In case of problems you will see failures like:
 
 <blockquote>
 <pre>
-CDSware v0.3.2.20040519 test suite results:
+CDS Invenio v0.3.2.20040519 test suite results:
 ===========================================
 search engine washing of query patterns ... FAIL
 search engine washing of URL arguments ... ok
@@ -140,7 +140,7 @@ bibindex engine list union ... ok
 FAIL: search engine washing of query patterns
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/usr/local/cdsware-DEMO/lib/python/cdsware/search_engine_tests.py", line 25, in test_wash_pattern
+  File "/opt/cds-invenio/lib/python/invenio/search_engine_tests.py", line 25, in test_wash_pattern
     self.assertEqual("ell*", search_engine.wash_pattern('ell*'))
   File "/usr/lib/python2.3/unittest.py", line 302, in failUnlessEqual
     raise self.failureException, \
@@ -154,7 +154,7 @@ FAILED (failures=1)
 </blockquote>
 
 The test suite compliance should be checked before each CVS commit.
-(And, obviously, double-checked before each CDSware release.)
+(And, obviously, double-checked before each CDS Invenio release.)
 
 <a name="3"></a><h2>3. Writing test code</h2>
 
@@ -194,7 +194,7 @@ reapper.  (It also helps to scan the neighborhood of the bug, see the
 80/20 thumb rule cited above.)
 
 <p>As an example of a regression test, we have several BibConvert
-example configurations (*.cfg) in CDSware already.  For each
+example configurations (*.cfg) in CDS Invenio already.  For each
 configuration, we could write more or less complex input examples
 (*.dat) -- some of them are already in the distribution -- that would
 trigger a use of many or all BibConvert functionality.  In addition we
@@ -217,16 +217,16 @@ example <a
 href="http://www.xp123.com/xplor/xp0001/index.shtml">http://www.xp123.com/xplor/xp0001/index.shtml</a>.
 In our case mod_python is very unfriendly in this direction, it's
 impossible to run code from within Emacs or command line.  But, if the
-GUI code is structured in the usual CDSware way, then it may be done
+GUI code is structured in the usual CDS Invenio way, then it may be done
 via string comparisons.  That is, for functionality like printing of a
 basket we typically have a web-seen function
 <code>print_basket()</code> that looks, schematically:
 
 <blockquote>
 <pre>
-$ cat /path/to/apache/htdocs/yourbaskets.py
+$ cat /opt/cds-invenio/var/www/yourbaskets.py
 [...]
-from cdsware.webbasketlib import perform_print_basket
+from invenio.webbasketlib import perform_print_basket
 def print_basket(req, basket_name)
      uid = getUid(req)
      return perform_print_basket(uid, basket_name)
@@ -239,7 +239,7 @@ with all the logic being done inside the library
 
 <blockquote>
 <pre>
-$ cat /path/to/cdsware/lib/python/cdsware/webbasketlib.py
+$ cat /opt/cds-invenio/lib/python/invenio/webbasketlib.py
 [...]
 def perform_print_basket(uid, basket_name):    
     out = ""
@@ -274,7 +274,7 @@ An example for testing search engine query parameter washing function:
 
 <blockquote>
 <pre>
-$ cat /path/to/cdsware/lib/python/cdsware/search_engine_tests.py
+$ cat /opt/cds-invenio/lib/python/invenio/search_engine_tests.py
 [...]
 import search_engine
 import unittest
@@ -303,7 +303,7 @@ with all the tests available in this file:
 
 <blockquote>
 <pre>
-$ cat /path/to/cdsware/lib/python/cdsware/search_engine_tests.py
+$ cat /opt/cds-invenio/lib/python/invenio/search_engine_tests.py
 [...]
 def create_test_suite():
     """Return test suite for the search engine."""
@@ -318,13 +318,13 @@ def create_test_suite():
 
 <blockquote>
 <pre>
-$ cat /path/to/cdsware/source/modules/miscutil/bin/testsuite.wml
+$ cat /opt/cds-invenio/source/modules/miscutil/bin/testsuite.wml
 [...]
-from cdsware import search_engine_tests
-    from cdsware import bibindex_engine_tests 
+from invenio import search_engine_tests
+    from invenio import bibindex_engine_tests 
 
 def create_all_test_suites():
-    """Return all tests suites for all CDSware modules."""
+    """Return all tests suites for all CDS Invenio modules."""
     return unittest.TestSuite((search_engine_tests.create_test_suite(),
                                bibindex_engine_tests.create_test_suite()))
 [...] 
@@ -341,7 +341,7 @@ If you are interested in running tests only on a certain file (say
 
 <blockquote>
 <pre>
-$ python /path/to/cdsware/lib/python/cdsware/search_engine_tests.py
+$ python /opt/cds-invenio/lib/python/invenio/search_engine_tests.py
 </pre>
 </blockquote>
     
@@ -358,7 +358,7 @@ source distribution:
 
 <a name="4"></a><h2>4. Conclusions</h2>
 
-A uniform testing technique and a test suite for CDSware is
+A uniform testing technique and a test suite for CDS Invenio is
 introduced.  Python unittest module is used for both unit testing and
 regression testing, with proper calling of external scripts.  The
 functional core code is the most obvious candidate to start the

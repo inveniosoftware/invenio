@@ -3,21 +3,21 @@
 ## $Id$
 ## Ranking of records using different parameters and methods.
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __version__ = "$Id$"
@@ -45,13 +45,13 @@ import copy
 import types
 import ConfigParser
 
-from cdsware.config import *
-from cdsware.search_engine_config import cfg_max_recID
-from cdsware.search_engine import perform_request_search, strip_accents
-from cdsware.search_engine import HitSet, get_index_id, create_basic_search_units
-from cdsware.bibrank_citation_indexer import get_citation_weight
-from cdsware.bibrank_downloads_indexer import *
-from cdsware.dbquery import run_sql
+from invenio.config import *
+from invenio.search_engine_config import cfg_max_recID
+from invenio.search_engine import perform_request_search, strip_accents
+from invenio.search_engine import HitSet, get_index_id, create_basic_search_units
+from invenio.bibrank_citation_indexer import get_citation_weight
+from invenio.bibrank_downloads_indexer import *
+from invenio.dbquery import run_sql
 
 options = {}
 def citation_exec(rank_method_code, name, config):

@@ -1,25 +1,25 @@
 ## $Id$
-## CDSware Web Session utilities, implementing persistence.
+## CDS Invenio Web Session utilities, implementing persistence.
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Classes necessary for using in CDSware, as a complement of session, which adds persistence to sessions
+Classes necessary for using in CDS Invenio, as a complement of session, which adds persistence to sessions
 by using a MySQL table. Consists of the following classes:
 
 	- SessionNotInDb: Exception to be raised when a session doesn't exit
@@ -30,8 +30,8 @@ import cPickle
 import time
 from UserDict import UserDict
 
-from cdsware.dbquery import run_sql, blob_to_string
-from cdsware.session import Session
+from invenio.dbquery import run_sql, blob_to_string
+from invenio.session import Session
 
 class SessionNotInDb(Exception):
     """Exception to be raised when a requested session doesn't exist in the DB

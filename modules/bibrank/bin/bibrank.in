@@ -3,21 +3,21 @@
 ##
 ## $Id$
 ##
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
@@ -28,7 +28,7 @@ Usage: %s [options]
        %s -wjif -a --id=0-30000,30001-860000 --verbose=9
        %s -wjif -d --modified='2002-10-27 13:57:26'
        %s -wwrd --rebalance --collection=Articles
-       %s -wwrd -a -i 234-250,293,300-500 -u admin@cdsware
+       %s -wwrd -a -i 234-250,293,300-500 -u admin
  
  Ranking options:
  -w, --run=r1[,r2]         runs each rank method in the order given
@@ -88,11 +88,11 @@ except ImportError, e:
     import sys
 
 try:
-    from cdsware.dbquery import run_sql
-    from cdsware.bibrank_tag_based_indexer import *
-    from cdsware.bibrank_word_indexer import *
-    from cdsware.access_control_engine import acc_authorize_action 
-    from cdsware.search_engine import perform_request_search
+    from invenio.dbquery import run_sql
+    from invenio.bibrank_tag_based_indexer import *
+    from invenio.bibrank_word_indexer import *
+    from invenio.access_control_engine import acc_authorize_action 
+    from invenio.search_engine import perform_request_search
 except ImportError, e:
     import sys
 
@@ -158,7 +158,7 @@ def usage(code, msg=''):
        %s -wjif -a --id=0-30000,30001-860000 --verbose=9
        %s -wjif -d --modified='2002-10-27 13:57:26'
        %s -wjif --rebalance --collection=Articles
-       %s -wsbr -a -i 234-250,293,300-500 -u admin@cdsware
+       %s -wsbr -a -i 234-250,293,300-500 -u admin
  
  Ranking options:
  -w, --run=r1[,r2]         runs each rank method in the order given

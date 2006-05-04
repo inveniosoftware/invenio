@@ -1,24 +1,24 @@
 ## $Id$
 ## Administrator interface for WebSearch
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""CDSware WebSearch Administrator Interface."""
+"""CDS Invenio WebSearch Administrator Interface."""
 
 import cgi
 import re
@@ -32,11 +32,11 @@ import time
 from zlib import compress,decompress
 from mod_python import apache
 
-from cdsware.bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
-from cdsware.dbquery import run_sql
-from cdsware.config import *
-from cdsware.webpage import page, pageheaderonly, pagefooteronly
-from cdsware.webuser import getUid, get_email
+from invenio.bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
+from invenio.dbquery import run_sql
+from invenio.config import *
+from invenio.webpage import page, pageheaderonly, pagefooteronly
+from invenio.webuser import getUid, get_email
 
 __version__ = "$Id$"
 
@@ -1926,7 +1926,7 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     if cdsname != run_sql("SELECT name from collection WHERE id=1")[0][0]:
 	res = run_sql("update collection set name='%s' where id=1" % cdsname)
 	if res:
-	    fin_output += """<b><span class="info">The name of the root collection has been modified to be the same as the cdsware installation name given prior to installing cdsware.</span><b><br>"""
+	    fin_output += """<b><span class="info">The name of the root collection has been modified to be the same as the CDS Invenio installation name given prior to installing CDS Invenio.</span><b><br>"""
 	else:
 	    return "Error renaming root collection."
     fin_output += """

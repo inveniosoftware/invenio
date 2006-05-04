@@ -1,37 +1,48 @@
-CERN DOCUMENT SERVER SOFTWARE (CDSware) INSTALLATION
-====================================================
+CDS Invenio INSTALLATION
+========================
 
 Revision: $Id$
 
 About
 =====
 
-This document specifies how to build, customize, and install the CERN
-Document Server Software (CDSware) for the first time.  See
-RELEASE-NOTES if you are upgrading from a previous CDSware release.
+This document specifies how to build, customize, and install CDS
+Invenio for the first time.  See RELEASE-NOTES if you are upgrading
+from a previous CDS Invenio release.
 
 Contents
 ========
 
 0. Prerequisites
-1. Quick instructions for the impatient CDSware admin
-2. Detailed instructions for the patient CDSware admin
+1. Quick instructions for the impatient CDS Invenio admin
+2. Detailed instructions for the patient CDS Invenio admin
 3. Configuration philosophy explained and elucidated
 
 0. Prerequisites
 ================
 
    Here is the software you need to have around before you
-   start installing CDSware:
+   start installing CDS Invenio:
 
      a) Unix-like operating system.  The main development and
-        production platform for CDSware at CERN is Debian GNU/Linux,
+        production platform for CDS Invenio at CERN is Debian GNU/Linux,
         but any Unix system supporting the software listed below
         should do.  Note that localhost should have an MTA running
-        so that CDSware can email notification alerts or registration
+        so that CDS Invenio can email notification alerts or registration
         information to the end users, contact moderators and
         reviewers of submitted documents, inform administrators about
         various runtime system information, etc.
+
+        Note that if you are using Debian "Sarge" GNU/Linux, you can
+        install most of the prerequisites and recommendations listed
+        below by running:
+
+          $ sudo apt-get install libapache2-mod-python2.3 \
+              libapache2-mod-php4 apache2-mpm-prefork mysql-server \
+              mysql-client php4-cli php4-mysql python2.3-mysqldb \
+              python2.3-numeric python2.3-4suite python2.3-psyco rxp \
+              wml gnuplot xpdf-utils gs-common antiword catdoc wv \
+              html2text ppthtml xlhtml clisp sbcl cmucl gettext
 
      b) MySQL server (may be on a remote machine), and MySQL client
         (must be available locally too).  MySQL versions 4.0.x are
@@ -54,7 +65,7 @@ Contents
           LD_PRELOAD=/usr/lib/libc_r.so  # or libpthread.so
           export LD_PRELOAD
 
-     d) Python v2.2.2 or above (v2.3.2 and above recommended): 
+     d) Python v2.3 or above:
          <http://python.org/>
         as well as the following Python modules:
           - (mandatory) MySQLdb:
@@ -74,7 +85,6 @@ Contents
           - (optional) RDFLib, to use RDF ontologies and thesauri:
              <http://rdflib.net/>
 
- 
      e) mod_python Apache module.  Tested mainly with versions
         3.0BETA4 and above.  mod_python 3.x is required for Apache 2.
         Previous versions (as well as Apache 1 ones) exhibited some
@@ -163,77 +173,76 @@ Contents
            <http://www.gnu.org/software/gettext/>
 	This is available by default on many systems.
 
-   Note that the configure script checks whether you have all
-   the prerequisite software installed and that it won't let
-   you to continue unless everything is in order.  It also warns you 
-   if it cannot find some optional, but recommended software.
+   Note that the configure script checks whether you have all the
+   prerequisite software installed and that it won't let you continue
+   unless everything is in order.  It also warns you if it cannot find
+   some optional but recommended software.
+
  
-1. Quick instructions for the impatient CDSware admin
-=====================================================
+1. Quick instructions for the impatient CDS Invenio admin
+=========================================================
 
       $ cd /usr/local/src/
-      $ wget http://cdsware.cern.ch/download/cdsware-0.3.2.tar.gz
-      $ wget http://cdsware.cern.ch/download/cdsware-0.3.2.tar.gz.md5
-      $ wget http://cdsware.cern.ch/download/cdsware-0.3.2.tar.gz.sig
-      $ md5sum -v -c cdsware-0.3.2.tar.gz.md5 
-      $ gpg --verify cdsware-0.3.2.tar.gz.sig cdsware-0.3.2.tar.gz
-      $ tar xvfz cdsware-0.3.2.tar.gz
-      $ cd cdsware-0.3.2
-      $ ./configure --prefix=/usr/local/cdsware-DEMO \
-                    --with-webdir=/var/www/DEMO \
-                    --with-weburl=http://webserver.domain.com/DEMO \
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.90.tar.gz
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.90.tar.gz.md5
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.90.tar.gz.sig
+      $ md5sum -v -c cds-invenio-0.90.tar.gz.md5 
+      $ gpg --verify cds-invenio-0.90.tar.gz.sig cds-invenio-0.90.tar.gz
+      $ tar xvfz cds-invenio-0.90.tar.gz
+      $ cd cds-invenio-0.90
+      $ ./configure --prefix=/opt/cds-invenio \
+                    --with-weburl=http://webserver.domain.com \
                     --with-dbhost=sqlserver.domain.com \
-                    --with-dbname=cdsware \
-                    --with-dbuser=cdsware \
+                    --with-dbname=cdsinvenio \
+                    --with-dbuser=cdsinvenio \
                     --with-dbpass=myp1ss \
                     --with-python=/opt/python/bin/python2.3
       $ vi ./config/config.wml   ## optional, but strongly recommended
       $ make
       $ mysql -h sqlserver.domain.com -u root -p mysql
-          mysql> CREATE DATABASE cdsware;
-          mysql> GRANT ALL PRIVILEGES ON cdsware.* TO cdsware@webserver.domain.com IDENTIFIED BY 'myp1ss';
+          mysql> CREATE DATABASE cdsinvenio;
+          mysql> GRANT ALL PRIVILEGES ON cdsinvenio.* TO cdsinvenio@webserver.domain.com IDENTIFIED BY 'myp1ss';
       $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
       $ sudo vi /path/to/php/conf/php.ini ## see below in part 2
       $ sudo /path/to/apache/bin/apachectl graceful
-      $ sudo ln -s /usr/local/cdsware-DEMO/lib/python/cdsware \
-                   /usr/lib/python2.3/site-packages/cdsware
+      $ sudo ln -s /opt/cds-invenio/lib/python/invenio \
+                   /usr/lib/python2.3/site-packages/invenio
       $ make create-tables       ## optional
       $ make install
       $ make test                ## optional
-      $ sudo chown -R www-data /usr/local/cdsware-DEMO/var
+      $ sudo chown -R www-data /opt/cds-invenio/var
       $ make create-demo-site    ## optional
       $ make load-demo-records   ## optional
       $ make remove-demo-records ## optional
       $ make drop-demo-site   ## optional
-      $ netscape http://webserver.domain.com/cdsware/admin/ ## optional
+      $ firefox http://webserver.domain.com/admin/ ## optional
 
-2. Detailed instructions for the patient CDSware admin
-======================================================
+2. Detailed instructions for the patient CDS Invenio admin
+==========================================================
 
-   The CERN Document Server Software (CDSware) uses standard GNU autoconf
-   method to build and install its files.  This means that you proceed
-   as follows:
+   The CDS Invenio uses standard GNU autoconf method to build and
+   install its files.  This means that you proceed as follows:
 
       $ cd /usr/local/src/
  
           Change to a directory where we will configure and build the
-          CDS Software.  (The built files will be installed into
+          CDS Invenio.  (The built files will be installed into
           different "target" directories later.)
 
-      $ wget http://cdsware.cern.ch/download/cdsware-0.3.2.tar.gz
-      $ wget http://cdsware.cern.ch/download/cdsware-0.3.2.tar.gz.md5
-      $ wget http://cdsware.cern.ch/download/cdsware-0.3.2.tar.gz.sig
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.90.tar.gz
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.90.tar.gz.md5
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.90.tar.gz.sig
 
-          Fetch CDSware source tarball from the CDSware distribution
-          server, together with MD5 checksum and GnuPG cryptographic
-          signature files useful for verifying the integrity of the
-          tarball.
+          Fetch CDS Invenio source tarball from the CDS Software
+          Consortium distribution server, together with MD5 checksum
+          and GnuPG cryptographic signature files useful for verifying
+          the integrity of the tarball.
 
-      $ md5sum -v -c cdsware-0.3.2.tar.gz.md5
+      $ md5sum -v -c cds-invenio-0.90.tar.gz.md5
 
           Verify MD5 checksum.
 
-      $ gpg --verify cdsware-0.3.2.tar.gz.sig cdsware-0.3.2.tar.gz
+      $ gpg --verify cds-invenio-0.90.tar.gz.sig cds-invenio-0.90.tar.gz
 
           Verify GnuPG cryptographic signature.  Note that you may
           first have to import my public key into your keyring, if you
@@ -245,56 +254,49 @@ Contents
           warning that may follow after the signature has been
           successfully verified.
 
-      $ tar xvfz cdsware-0.3.2.tar.gz
+      $ tar xvfz cds-invenio-0.90.tar.gz
 
           Untar the distribution tarball.    
 
-      $ cd cdsware-0.3.2
+      $ cd cds-invenio-0.90
    
           Go to the source directory.
 
-      $ ./configure --prefix=/usr/local/cdsware-DEMO \
-                    --with-webdir=/var/www/DEMO \
-                    --with-weburl=http://webserver.domain.com/DEMO \
+      $ ./configure --prefix=/opt/cds-invenio \
+                    --with-weburl=http://webserver.domain.com \
                     --with-dbhost=sqlserver.domain.com \
-                    --with-dbname=cdsware \
-                    --with-dbuser=cdsware \
+                    --with-dbname=cdsinvenio \
+                    --with-dbuser=cdsinvenio \
                     --with-dbpass=myp1ss \
                     --with-python=/opt/python/bin/python2.3
 
-          Configure essential CDSware parameters, with the following
+          Configure essential CDS Invenio parameters, with the following
           signification:
 
-             --prefix=/usr/local/cdsware-DEMO 
+              --prefix=/opt/cds-invenio 
 
-                 The CDSware general installation directory, used to
+                 CDS Invenio general installation directory, used to
                  hold command-line binaries and program libraries
-                 containing the core CDSware functionality, but also
-                 to store runtime log and cache information.  Several
-                 subdirs like `bin', `lib', and `var' will be created
-                 inside the --prefix directory to this effect.  Note
-                 that the --prefix directory should be chosen outside
-                 of the Apache htdocs tree, since no file from this
-                 directory is to be accessible on the Web.
+                 containing the core CDS Invenio functionality, but
+                 also to store web pages, runtime log and cache
+                 information.  Several subdirs like `bin', `lib', and
+                 `var' will be created inside the --prefix directory
+                 to this effect.  Note that the --prefix directory
+                 should be chosen outside of the Apache htdocs tree,
+                 since only one subdirectory (prefix/var/www) is to be
+                 accessible directly on the Web (see below).
 
-             --with-webdir=/var/www/DEMO
+             --with-weburl=http://webserver.domain.com
 
-                 The directory holding the web interface to CDSware,
-                 i.e. containing all the callable scripts and web
-                 pages visible to the end user.  Must be located
-                 inside Apache htdocs tree.  The scripts within this
-                 directory will generally call core CDSware libraries
-                 and binaries installed in the --prefix directory.
-
-             --with-weburl=http://webserver.domain.com/DEMO
-
-                 The URL corresponding to the --with-webdir directory.
-                 It will denote the home URL of your CDSware
-                 installation.
+                 The URL denoting the home URL of your CDS Invenio
+                 installation.  The files served by this URL will be
+                 located in `prefix/var/www', so later on in your
+                 Apache config file you would map `weburl' to
+                 `prefix/var/www' (see below).
 
              --with-dbhost=sqlserver.domain.com
-             --with-dbname=cdsware
-             --with-dbuser=cdsware
+             --with-dbname=cdsinvenio
+             --with-dbuser=cdsinvenio
              --with-dbpass=myp1ss 
 
                  The database server host, the database name, and the
@@ -306,32 +308,36 @@ Contents
                  binary.  This is useful if you have more than one
                  Python installation on your system.  If you don't set
                  this option, then the first Python that will be found
-                 in your PATH will be chosen for running CDSware.
+                 in your PATH will be chosen for running CDS Invenio.
 
-          CDSware won't install to any other directory but to the two
-          mentioned in this configuration line.  Do not use trailing
-          slashes when specifying any of the above values.
+          CDS Invenio won't install to any other directory but to the
+          one mentioned in this configuration line.  
+
+          Do not use trailing slashes when specifying any of the above
+          values.
 
           This configuration step is mandatory, and is referred to as
           "pre-compile time configuration step a)" in the elucidative
           explanatory commentary below.  
 
-          (Note that if you prefer to build CDSware out of its source
-           tree, you may run the above configure command like this: 
-           $ mkdir build && cd build && ../configure --prefix=...)
+          Note that if you prefer to build CDS Invenio out of its
+          source tree, you may run the above configure command like
+          this: 
+             $ mkdir build && cd build && ../configure --prefix=...
 
       $ vi ./config/config.wml  ## optional, but strongly recommended
 
-          Optionally, customize your CDSware installation.  We
+          Optionally, customize your CDS Invenio installation.  We
           strongly recommend you to edit at least the top of this file
-          where you can define some very essential CDSware parameters
-          like the name of your CDSware document server or the email
-          address of the local CDSware administrator.  (The latter is
-          needed if you want to use administration modules, and you
-          certainly do!)
+          where you can define some very essential CDS Invenio
+          parameters like the name of your CDS Invenio document server
+          (look for CDSNAME and CDSNAMEINTL) or the email address of
+          the local CDS Invenio administrator (look for SUPPORTEMAIL
+          and ADMINEMAIL).  The latter is needed if you want to use
+          administration modules, and you will certainly do.
 
           The rest of the "config.wml" file enables you to change the
-          CDSware web page look and feel, and otherwise to influence
+          CDS Invenio web page look and feel, and otherwise to influence
           its behaviour and default parameters.
 
           This configuration step is optional, but strongly
@@ -341,7 +347,7 @@ Contents
 
       $ make
 
-          Launch the CDSware build.  Since many messages are printed
+          Launch the CDS Invenio build.  Since many messages are printed
           during the build process, you may want to run it in a
           fast-scrolling terminal such as rxvt or in a detached screen
           session.
@@ -350,25 +356,22 @@ Contents
           pre-created and customized based on the config you have
           edited in the previous step.
 
-          Before proceeding further with the CDSware installation, we
+          Before proceeding further with the CDS Invenio installation, we
           have to do some admin-level tasks on the MySQL and Apache
           servers.
 
       $ mysql -h sqlserver.domain.com -u root -p mysql
-          mysql> CREATE DATABASE cdsware;
-          mysql> GRANT ALL PRIVILEGES ON cdsware.* TO cdsware@webserver.domain.com IDENTIFIED BY 'myp1ss';
+          mysql> CREATE DATABASE cdsinvenio;
+          mysql> GRANT ALL PRIVILEGES ON cdsinvenio.* TO cdsinvenio@webserver.domain.com IDENTIFIED BY 'myp1ss';
         
           You need to create a dedicated database on your MySQL server
-          that the CDSware can use for its purposes.  Please
+          that the CDS Invenio can use for its purposes.  Please
           contact your MySQL administrator and ask him to execute the
-          above commands that will create the "cdsware" database, a
-          user called "cdsware" with password "myp1ss", and that will
-          grant all rights on the "cdsware" database to the "cdsware"
-          user.
-
-          (Of course, you are free to choose your own user credentials
-           and the database name; the above values were just an
-           example.  See also the configure line below.)
+          above commands that will create the "cdsinvenio" database, a
+          user called "cdsinvenio" with password "myp1ss", and that
+          will grant all rights on the "cdsinvenio" database to the
+          "cdsinvenio" user.  The credential values are the ones you
+          have chosen in the configure line above.
 
       $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
 
@@ -378,25 +381,41 @@ Contents
               AddDefaultCharset UTF-8
               AddType application/x-httpd-php .php
               AddType application/x-httpd-php-source .phps
-              DirectoryIndex index.en.html index.html index.py index.en.php index.php 
 
-          This is to ensure that the browsers will get UTF-8 as
-          the default page encoding, that "*.php" files will be
-          interpreted by the web server as PHP files, and that
-          "index.py" or "index.en.php" will be considered as directory
-          index file.
+          This is to ensure that the browsers will get UTF-8 as the
+          default page encoding, and that "*.php" files will be
+          interpreted by the web server as PHP files.
 
-          In addition, you have to ask Apache to interpret .py files
-          in the installation place via mod_python and to indicate
-          path to CDSware's Python library directory (composed from
-          your --prefix choice followed by `/lib/python'):
+          As mentioned above, the web pages will get installed into
+          the `prefix/var/www' directory.  Therefore you should
+          specify something along the lines of:
 
-              <Directory /var/www/DEMO/>
-                 AddHandler python-program .py
-                 PythonHandler mod_python.publisher
-                 PythonPath "['/usr/local/cdsware-DEMO/lib/python']+sys.path" 
-                 PythonDebug On
-              </Directory>
+              ServerSignature Off
+              ServerTokens Prod
+              NameVirtualHost *
+              <VirtualHost *>
+                      ServerName webserver.domain.com
+                      ServerAdmin cds.support@cern.ch
+                      DocumentRoot /opt/cds-invenio/var/www
+                      <Directory /opt/cds-invenio/var/www>
+                              Options Indexes FollowSymLinks MultiViews
+                              AllowOverride None
+                              Order allow,deny
+                              allow from all
+                      </Directory>
+                      ErrorLog /opt/cds-invenio/var/log/apache.err
+                      LogLevel warn
+                      CustomLog /opt/cds-invenio/var/log/apache.log combined
+                      DirectoryIndex index.en.html index.html index.py index.en.php index.php
+                      <Directory /opt/cds-invenio/var/www>
+                              AddHandler python-program .py
+                              PythonHandler mod_python.publisher
+                              PythonDebug On
+                      </Directory>
+              </VirtualHost>
+              
+          This will tell Apache where to find the files, how to
+          interpret .py files, which files to serve as indexes, etc.
             
       $ sudo vi /path/to/php/conf/php.ini ## see below in part 2
 
@@ -411,6 +430,13 @@ Contents
 	      short_open_tag = on
 
           This will set up some relevant PHP variables.
+
+          If your OS uses dynamic loading PHP MySQL libraries, such as
+          Debian "Sarge" GNU/Linux, you will also have to specify:
+
+              extension=mysql.so
+
+          in both /etc/php4/{cli,apache2}/php.ini files.
            
       $ sudo /path/to/apache/bin/apachectl graceful
 
@@ -419,23 +445,25 @@ Contents
           changes.
 
           After these admin-level tasks to be performed as root, let's
-          now go back to finish the installation of the CDSware package.
+          now go back to finish the installation of the CDS Invenio
+          package.
 
-      $ sudo ln -s /usr/local/cdsware-DEMO/lib/python/cdsware \
-                   /usr/lib/python2.3/site-packages/cdsware
+      $ sudo ln -s /opt/cds-invenio/lib/python/invenio \
+                   /usr/lib/python2.3/site-packages/invenio
 
           You have to create a symbolic link inside Python's
           site-packages directory that would indicate Python where to
-          find CDSware files.  Note that the exact location of the
-          symlink depends on the --prefix option you have used and on
-          the Python version you are using.  (See also --with-python
-          configure option.)
+          find CDS Invenio Python files.  Note that the exact symlink
+          target location depends on the --prefix location
+          (prefix/lib/python/invenio) and the exact symlink target
+          location depends on the Python version you are using, see
+          also --with-python configuration option.
 
       $ make create-tables     ## optional
 
-          Optionally, create CDSware tables on the MySQL server.  You
-          probably want to do this step only once, i.e. if you have
-          not created any CDSware database and tables yet.
+          Optionally, create CDS Invenio tables on the MySQL server.
+          You probably want to do this step only once, i.e. when you
+          have not created any CDS Invenio database and tables yet.
 
       $ make install
 
@@ -444,21 +472,21 @@ Contents
           specified earlier by the configure command.
 
           After this step, you should be able to point your browser to
-          the chosen URL of your local CDSware installation and see it
+          the chosen URL of your local CDS Invenio installation and see it
           running!
 
       $ make test
 
           Optionally, you can run our test suite to verify the results
-          of known tests on your local CDSware installation.  Note
+          of known tests on your local CDS Invenio installation.  Note
           that this command should be run only after you have
           installed the whole system via `make install'.
 
-      $ sudo chown -R www-data /usr/local/cdsware-DEMO/var
+      $ sudo chown -R www-data /opt/cds-invenio/var
 
           One more superuser step, as we need to enable Apache server
           to write some log information and to cache interesting
-          entities inside the "var" subdirectory of our CDSware
+          entities inside the "var" subdirectory of our CDS Invenio
           general installation directory.
 
           Here we assume that your Apache server processes are run
@@ -467,7 +495,7 @@ Contents
 
       $ make create-demo-site  ## optional
 
-          This step is recommended to test your local CDSware
+          This step is recommended to test your local CDS Invenio
           installation.  It should give you our "Atlantis Institute of
           Science" demo installation, exactly as you see it at
           <http://cdsware.cern.ch/DEMO/>.
@@ -475,7 +503,7 @@ Contents
       $ make load-demo-records  ## optional
 
           Optionally, load some demo records to be able to test
-          indexing and searching of your local demo CDSware
+          indexing and searching of your local demo CDS Invenio
           installation.
 
       $ make remove-demo-records ## optional
@@ -488,12 +516,12 @@ Contents
       $ make drop-demo-site ## optional
 
           Optionally, drop also all the demo configuration so that
-          you'll have a blank CDSware system for your production
+          you'll have a blank CDS Invenio system for your production
           purposes.
 
-      $ netscape http://webserver.domain.com/DEMO/admin/ ## optional
+      $ firefox http://webserver.domain.com/admin/ ## optional
 
-          Optionally, do further runtime configuration of the CDSware,
+          Optionally, do further runtime configuration of the CDS Invenio,
           like definition of data collections, document types,
           document formats, word file tables, etc.
 
@@ -504,7 +532,7 @@ Contents
 3. Configuration philosophy explained and elucidated
 ====================================================
 
-   As you could see from the above, the configuration of the CDSware is
+   As you could see from the above, the configuration of the CDS Invenio is
    threefold: 
 
       (a) pre-compile time configuration phase 
@@ -519,17 +547,17 @@ Contents
       (a) pre-compile time configuration phase 
           [uses command line options / while doing "configure"]
 
-          This configures essential CDSware parameters that makes your
-          CDSware copy installable and runable.  The essential parameters
-          include: general CDSware installation directory containing
+          This configures essential CDS Invenio parameters that makes your
+          CDS Invenio copy installable and runable.  The essential parameters
+          include: general CDS Invenio installation directory containing
           (among others) binaries, libraries, and log and cache
           directories; install directory for Web scripts and pages;
           and MySQL user and server credentials.
 
           This configuration step uses standard GNU autoconf approach,
           i.e. you will run the standard "configure" script.  Note
-          that the only arguments that CDSware takes into consideration
-          are the general "--prefix" one and CDSware-specific
+          that the only arguments that CDS Invenio takes into consideration
+          are the general "--prefix" one and CDS Invenio-specific
           "--with-foo" arguments, see the end of "configure --help"
           output.
 
@@ -542,8 +570,8 @@ Contents
       (b) compile time configuration phase 
           [uses WML / after "configure", while doing "make && make install"]
 
-          Optionally, you may choose to influence CDSware behaviour, to
-          set up CDSware system name, to choose its default parameters,
+          Optionally, you may choose to influence CDS Invenio behaviour, to
+          set up CDS Invenio system name, to choose its default parameters,
           to change its look and feel, to add your local web pages, etc.  
 
           This configuration step uses WML, the Website META Language.
@@ -552,7 +580,7 @@ Contents
           advanced user, you may edit other WML files in the
           distribution tree.
 
-          After that, when you type "make", the CDSware pages will be
+          After that, when you type "make", the CDS Invenio pages will be
           pre-generated.  We prefer that this configuration step is
           done during compile-time and not runtime, because of
           multiple reasons: (i) the pre-generated pages impose less
@@ -562,11 +590,11 @@ Contents
           compile-time configuration language we can share the same
           configuration variables across heterogeneous languages;
           (iii) use of WML and page templates enables you to easily
-          change anything in the CDSware system, even into deep
+          change anything in the CDS Invenio system, even into deep
           levels.
 
           If you are changing parameters and/or look and feel
-          of CDSware pages, you may want to repeat these step several
+          of CDS Invenio pages, you may want to repeat these step several
           times:
 
               $ vi config/config.wml
@@ -574,19 +602,19 @@ Contents
               $ make create-tables
               $ make create-demo-site
               $ make load-demo-records
-              $ netscape http://webserver.domain.com/DEMO/
+              $ firefox http://webserver.domain.com/
               [...]
 
           to see what it brings, until you are satisfied with the
           result.
 
           (Note that you may as well choose to change these parameters
-          inside the CDSware library configuration files later on,
+          inside the CDS Invenio library configuration files later on,
           during runtime, at least for non-static Python and PHP
           pages.)
 
       (c) runtime configuration phase 
-          [uses MySQL / after "make install", while doing "netscape http://webserver.domain.com/DEMO/admin/"]
+          [uses MySQL / after "make install", while doing "firefox http://webserver.domain.com/admin/"]
 
           Optionally, you will most probably want to define specific
           data collections, to configure submit and search page for those
@@ -597,8 +625,8 @@ Contents
           is done during the runtime, for your convenience.  It means
           that after previous configuration step (b), and after
           successful "make install", if you are happy with its result
-          you no longer edit WML files within the CDSware source tree but
-          rather configure "fully running" CDSware installation via
+          you no longer edit WML files within the CDS Invenio source tree but
+          rather configure "fully running" CDS Invenio installation via
           its Administration web interface.
          
           Usually, you will do this step many times in the future, to
@@ -606,18 +634,18 @@ Contents
           data types, etc.
 
           (Note that if you want to change something "deeper" in a
-          running CDSware installation, such as look and feel of pages,
+          running CDS Invenio installation, such as look and feel of pages,
           or to add some new pages, then you may want to edit library
           configuration files for Python and PHP non-static pages, as
           noted above.  But if you want to do really "deep" changes,
           you need to go back to WML source, so you may want to leave
-          your customized copy of the CDSware WML source tree around.)
+          your customized copy of the CDS Invenio WML source tree around.)
 
    We hope that this explains why we have chosen this three-level
    configuration model, and that you will find it convenient in real
    life.
 
-Good luck, and thanks for choosing the CERN Document Server Software.  
+Good luck, and thanks for choosing CDS Invenio.
   
        - CDS Development Group
          <cds.support@cern.ch>

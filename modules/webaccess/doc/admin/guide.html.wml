@@ -1,19 +1,19 @@
 ## $Id$
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
@@ -35,13 +35,13 @@
 <h2><a name="1">1. INTRODUCTION, USING ROLES</a></h2>
 <pre>
   WebAccess is a common RBAC, role based access control, for all of
-  CDSware. This means that users are connected to roles that cover
+  CDS Invenio. This means that users are connected to roles that cover
   different areas of access. I.e <em>administrator of the photo
   collection</em> or <em>system librarian</em>. Users can be active in
   different areas and of course connected to as many roles as needed.
   
   The roles are connected to actions. An action identifies a task you
-  can perform in CDSware. It can be defined to take any number of
+  can perform in CDS Invenio. It can be defined to take any number of
   arguments in order to more clearly describe what you are allowing
   connected users to do.
   
@@ -804,7 +804,7 @@ II. Example - connecting role and user</a>
 
 <h2><a name="4">IV. Managing accounts and access policy</a></h2>
 <pre>
-  Here you can administrate the accounts and the access policy for your CDSware installation.
+  Here you can administrate the accounts and the access policy for your CDS Invenio installation.
 
   - Access policy:
 
@@ -826,7 +826,7 @@ II. Example - connecting role and user</a>
        2 - Only administrators can create account. User cannot edit the email address.
        3 - Users cannot register or update account information (email/password)
        4 - User cannot change default login method
-    You can configure CDSware to send an email:
+    You can configure CDS Invenio to send an email:
        1. To an admin email-address when an account is created
        2. To the owner of an account when it is created
        3. To the owner of an account when it is activated
@@ -890,14 +890,14 @@ II. Example - connecting role and user</a>
 
 <h2><a name="5">V. Managing login methods</a></h2>
 <pre>
-   CDSware supports using external login systems to authenticate users.
+   CDS Invenio supports using external login systems to authenticate users.
  
    When a user wants to login, the username and password given by the user is checked against the selected 
    system, if the user is authenticated by the external system, a valid email-address is returned to
-   CDSware and used to recognize the user within CDSware. 
+   CDS Invenio and used to recognize the user within CDS Invenio. 
 
    If a new user is trying to login without having an account, using an external login system, an account
-   is automatically created in CDSware to recognize and store the users settings. The password for the
+   is automatically created in CDS Invenio to recognize and store the users settings. The password for the
    local account is randomly generated.
 
    If you want the user to be unable to change login method and account username / password, forcing use
@@ -919,7 +919,7 @@ II. Example - connecting role and user</a>
                                      (external_auth_nice(), False)}
 
    - A class must be added in the file external_authentication.py. This class must include the 
-     function auth_user. This function returns a valid email-address in CDSware if the user
+     function auth_user. This function returns a valid email-address in CDS Invenio if the user
      is authenticated, not necessarily the same entered by the user as username. If the user
      is not authenticated, return None.
 

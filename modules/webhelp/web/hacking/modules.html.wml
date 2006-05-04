@@ -1,31 +1,31 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
     title="Modules Overview" \
     navbar_name="hacking-modules" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> " \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDS Invenio</a> " \
     navbar_select="hacking-modules" 
 
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
-<p>CDSware consists of several more or less independent modules with
+<p>CDS Invenio consists of several more or less independent modules with
 precisely defined functionality.  The general criterion for module
 names is to use the ``Bib'' prefix to denote modules that work more
 with the bibliographic data, and the ``Web'' prefix to denote modules
@@ -46,14 +46,14 @@ descriptions the module relationship diagram is presented.
  structured or semi-structured proprietary format into any other
  format, typically the <a
  href="http://www.loc.gov/standards/marcxml/">MARC XML</a> that is
- natively used in CDSware. Nevertheless the input and output formats
+ natively used in CDS Invenio. Nevertheless the input and output formats
  are fully configurable and have been tested on data importations from
  more than one hundred data sources. The power of this utility lies in
  the fact that no structural attributes of data source are presumed,
  but they are defined in an extensive data source
  configuration. Inevitably, this leads to a high complexity of the
  BibConvert configuration language. Most frequent configurations are
- provided with the CDSware distribution, such as a sample
+ provided with the CDS Invenio distribution, such as a sample
  configuration from Qualified Dublin Core into the MARCXML.
 
  <br>In general the BibConvert configuration consists from the source
@@ -162,7 +162,7 @@ descriptions the module relationship diagram is presented.
  <li><strong>WebComment</strong>: FIXME.
 
  <li><strong>WebHelp</strong> presents some global user-level,
- admin-level, and hacker-level documenation on CDSware.  The
+ admin-level, and hacker-level documenation on CDS Invenio.  The
  module-specific documentation is included within each particular
  module.
   
@@ -197,7 +197,7 @@ descriptions the module relationship diagram is presented.
  <li><strong>WebStat</strong>: FIXME 
   
  <li><strong>WebStyle</strong> is a library of design-related modules
- that defines look and feel of CDSware pages.
+ that defines look and feel of CDS Invenio pages.
   
  <li><strong>WebSubmit</strong> is a comprehensive submission system
  allowing authorized individuals (authors, secretaries and repository

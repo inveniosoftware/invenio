@@ -1,29 +1,29 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
-    title="Hacking CDSware" \
+    title="Hacking CDS Invenio" \
     navbar_name="hacking" \
     navtrail_previous_links="" \
     navbar_select="hacking"
 
-Welcome to the CDSware Developers' corner.  Before diving into the
+Welcome to the CDS Invenio Developers' corner.  Before diving into the
 source, make sure you don't miss our <a
 href="<WEBURL>/help/">user-level</a> and <a
 href="<WEBURL>/admin/">admin-level</a> documentation as well.  And now, back to the source, and happy hacking!
@@ -40,14 +40,14 @@ href="<WEBURL>/admin/">admin-level</a> documentation as well.  And now, back to 
 <dd>A policy we try to follow, for good or bad.</dd>
 
 <dt><a href="releases.html">Release Numbering Scheme</a></dt>
-<dd>Presenting the version numbering scheme adopted for CDSware stable and development releases.</dd>
+<dd>Presenting the version numbering scheme adopted for CDS Invenio stable and development releases.</dd>
 
 <dt><a href="directory.html">Directory Organization</a></dt>
 <dd>How the source and target directories are organized, where the
 sources get installed to, what is the visible URL policy, etc.</dd>
 
 <dt><a href="modules.html">Modules Overview</a></dt>
-<dd>Presenting a summary of various CDSware modules and their relationships.</dd>
+<dd>Presenting a summary of various CDS Invenio modules and their relationships.</dd>
 
 <dt><a href="testsuite.html">Test Suite Strategy</a></dt>
 <dd>Describes our test suite strategy.</dd>

@@ -4,24 +4,24 @@
 ## This file enables you to configure the parameters of your local CDS
 ## installation.  It should be self-explanatory.  Just go ahead and
 ## change the values within "define-tag" elements according to your
-## needs.  When done, return to the main CDSware source directory and
+## needs.  When done, return to the main CDS Invenio source directory and
 ## type 'make'.
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## #####################
@@ -44,7 +44,7 @@
 ##
 ## The configuration is done by editing the content of the "define-tag" 
 ## WML elements below.  Feel free to edit as many as you need.  When done,
-## return to the main CDSware source directory and type 'make'.  Good luck! :-)
+## return to the main CDS Invenio source directory and type 'make'.  Good luck! :-)
 
 ## Before starting, let's include helper functions:
 #include "cdswmllib.wml"
@@ -54,11 +54,11 @@
 ## Part 1:  Essential parameters ##
 ###################################
 
-## This part defines essential CDSware internal parameters that
+## This part defines essential CDS Invenio internal parameters that
 ## everybody should modify, like the name of the server or the email
-## address of the local CDSware administrator.  
+## address of the local CDS Invenio administrator.  
 
-## CDSNAME -- the visible name of your CDSware installation:
+## CDSNAME -- the visible name of your CDS Invenio installation:
 ##  (example: "My Document Server")
 <define-tag CDSNAME whitespace=delete>
 Atlantis Institute of Fictive Science
@@ -120,7 +120,7 @@ cds.support@cern.ch
 
 ## ADMINEMAIL -- the email address of the 'superuser' for this
 ## installation.  Enter your email address below and login with this
-## address when using CDSware administration modules.  You will then
+## address when using CDS Invenio administration modules.  You will then
 ## be automatically recognized as superuser of the system.
 ##  (example: "cds.support@cern.ch")
 <define-tag ADMINEMAIL whitespace=delete>
@@ -297,7 +297,7 @@ default
  <div class="pagefooterstripeleft">
   <!--CDSNAMEINTL-->&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/?ln=<!--LN-->"><!--MSGSEARCH--></a>&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/submit.py?ln=<!--LN-->"><!--MSGSUBMIT--></a>&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/youraccount.py/display?ln=<!--LN-->"><!--MSGPERSONALIZE--></a>&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/help/index.<!--LN-->.html"><!--MSGHELP--></a>
   <br>
-  <!--POWEREDBY--> <a class="footer" href="http://cdsware.cern.ch/">CDSware</a> v<VERSION>
+  <!--POWEREDBY--> <a class="footer" href="http://cdsware.cern.ch/">CDS Invenio</a> v<VERSION>
   <br>
   <!--MAINTAINEDBY--> <a class="footer" href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a>
   <br>
@@ -340,7 +340,7 @@ default
 
 ## CFG_FIELDS_CONVERT -- if you migrate from an older system, you may
 ## want to map field codes of your old system (such as 'ti') to
-## CDSware/MySQL ("title").  Use Python dictionary syntax for the
+## CDS Invenio/MySQL ("title").  Use Python dictionary syntax for the
 ## translation table, see the example below.  Usually you don't want
 ## to do that, and would use empty dict {}.
 ##  (example: "{'wau':'author', 'wti':'title'}")
@@ -460,8 +460,8 @@ default
 ## Part 5: BibHarvest OAI parameters ##
 #######################################
 
-## This part defines parameters for the CDSware OAI gateway.
-## Useful if you are running CDSware as OAI data provider.
+## This part defines parameters for the CDS Invenio OAI gateway.
+## Useful if you are running CDS Invenio as OAI data provider.
 
 ## OAIIDSCHEME -- OAI identifier scheme:  
 ##  (example: "oai")

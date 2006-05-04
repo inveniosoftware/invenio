@@ -3,24 +3,24 @@
 
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Creates CDSware collection specific pages, using WML and MySQL configuration tables."""
+"""Creates CDS Invenio collection specific pages, using WML and MySQL configuration tables."""
 
 __version__ = "$Id$"
 
@@ -50,15 +50,15 @@ except ImportError, e:
     sys.exit(1)
 
 try:
-    from cdsware.config import *
-    from cdsware.messages import gettext_set_language, language_list_long
-    from cdsware.search_engine import HitSet, search_pattern, get_creation_date, nice_number, get_field_i18nname
-    from cdsware.search_engine_config import cfg_author_et_al_threshold, cfg_instant_browse, cfg_max_recID, cfg_narrow_search_show_grandsons
-    from cdsware.dbquery import run_sql
-    from cdsware.access_control_engine import acc_authorize_action
-    from cdsware.bibrank_record_sorter import get_bibrank_methods
-    import cdsware.template
-    websearch_templates = cdsware.template.load('websearch')
+    from invenio.config import *
+    from invenio.messages import gettext_set_language, language_list_long
+    from invenio.search_engine import HitSet, search_pattern, get_creation_date, nice_number, get_field_i18nname
+    from invenio.search_engine_config import cfg_author_et_al_threshold, cfg_instant_browse, cfg_max_recID, cfg_narrow_search_show_grandsons
+    from invenio.dbquery import run_sql
+    from invenio.access_control_engine import acc_authorize_action
+    from invenio.bibrank_record_sorter import get_bibrank_methods
+    import invenio.template
+    websearch_templates = invenio.template.load('websearch')
 except ImportError, e:
     print "Error: %s" % e
     import sys

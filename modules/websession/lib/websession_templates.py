@@ -1,20 +1,20 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import urllib
@@ -24,8 +24,8 @@ import gettext
 import string
 import locale
 
-from cdsware.config import *
-from cdsware.messages import gettext_set_language
+from invenio.config import *
+from invenio.messages import gettext_set_language
 
 class Template:
     def tmpl_lost_password_message(self, ln, supportemail):
@@ -42,7 +42,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        return _("If you have lost password for your CERN Document Server internal account, then please enter your email address below and the lost password will be emailed to you.") +\
+        return _("If you have lost password for your CDS Invenio internal account, then please enter your email address below and the lost password will be emailed to you.") +\
                "<br /><br />" +\
                _("Note that if you have been using an external login system (such as CERN NICE), then we cannot do anything and you have to ask there.") +\
                _("Alternatively, you can ask %s to change your login system from external to internal.") % ("""<a href="mailto:%(email)s">%(email)s</a>""" % { 'email' : supportemail }) +\
@@ -385,7 +385,7 @@ class Template:
 
           - 'ln' *string* - The language to display the interface in
 
-          - 'weburl' *string* - The URL of cdsware
+          - 'weburl' *string* - The URL of CDS Invenio
 
           - 'accBody' *string* - The body of the heading block
 

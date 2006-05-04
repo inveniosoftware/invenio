@@ -1,31 +1,31 @@
 ## $Id$
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
     title="Error Library" \
     navbar_name="hacking-miscutil" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDSware</a> &gt;  <a class=navtrail href=<WEBURL>/hacking/miscutil/index.html>MiscUtil Internals</a> " \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDS Invenio</a> &gt;  <a class=navtrail href=<WEBURL>/hacking/miscutil/index.html>MiscUtil Internals</a> " \
     navbar_select="hacking-miscutil-error-management" 
 
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
 <p>
-These are the functions and methodologies for error handling in CDSware.
+These are the functions and methodologies for error handling in CDS Invenio.
 </p>
 
 <h2>Contents</h2>
@@ -42,11 +42,11 @@ These are the functions and methodologies for error handling in CDSware.
 
 <p>An error is an unexpected behavior that leads to the stopping of current process.
 Discussing of web pages, errors should be displayed by instead of the
-requested page. Errors are logged into <code>cdsware/var/log/cdsware.err</code>.
+requested page. Errors are logged into <code>cds-invenio/var/log/cds-invenio.err</code>.
 Errors can be logged with client information and a tracestack.</p>
 
 <p>A warning is an unexpected behavior that can be ignored. Warnings are logged into
-<code>cdsware/var/log/cdsware.log</code> with just the warning message.</p>
+<code>cds-invenio/var/log/cds-invenio.log</code> with just the warning message.</p>
 
 <p>Errors and warnings should be internationalized (see <a href="#i18n">below</a>).</p>
 
@@ -152,7 +152,7 @@ cfg&#95;webmessage&#95;error&#95;messages = \
 
 <h5>webmessage.py: business logic</h5>
 <pre>
-from cdsware.webmessage&#95;config import cfg&#95;webmessage&#95;error&#95;messages
+from invenio.webmessage&#95;config import cfg&#95;webmessage&#95;error&#95;messages
 
 def perform&#95;request&#95;display&#95;msg(uid, msgid, ln=cdslang):
     uid   = wash&#95;url&#95;argument(uid, 'int')
@@ -177,8 +177,8 @@ def perform&#95;request&#95;display&#95;msg(uid, msgid, ln=cdslang):
 
 <h5>yourmessages.py: web interface</h5>
 <pre>
-from cdsware.webpage import page
-from cdsware.webmessage import perform&#95;request&#95;display&#95;msg
+from invenio.webpage import page
+from invenio.webmessage import perform&#95;request&#95;display&#95;msg
 
 def display&#95;msg(req, msgid=-1, ln=cdslang):
     &#95; = gettext&#95;set&#95;language(ln)
@@ -211,7 +211,7 @@ def display&#95;msg(req, msgid=-1, ln=cdslang):
                 the list     
 
     register&#95;errors(errors&#95;or&#95;warnings&#95;list, file, req=None)
-        log errors to cdsware.err and warnings to cdsware.log
+        log errors to invenio.err and warnings to invenio.log
         errors will be logged with client information (if req is given)
         and a tracestack
         warnings will be logged with just the warning message
@@ -245,8 +245,8 @@ cfg&#95;webmessage&#95;error&#95;messages = \
 
 <h5>webmessage&#95;example&#95;bin.py</h5>
 <pre>
-from cdsware.webmessage&#95;config import cfg&#95;webmessage&#95;error&#95;messages
-from cdsware.errorlib import get&#95;msgs&#95;for&#95;code&#95;list, register&#95;errors
+from invenio.webmessage&#95;config import cfg&#95;webmessage&#95;error&#95;messages
+from invenio.errorlib import get&#95;msgs&#95;for&#95;code&#95;list, register&#95;errors
 
 def handle&#95;error(error):
     errorlist = get&#95;msgs&#95;for&#95;code&#95;list([error])

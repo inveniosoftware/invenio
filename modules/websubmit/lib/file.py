@@ -1,20 +1,20 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## import interesting modules:
@@ -31,17 +31,17 @@ import urllib
 from xml.sax.saxutils import quoteattr
 from mod_python import apache
 
-from cdsware.config import *
-from cdsware.access_control_engine import acc_authorize_action
-from cdsware.access_control_admin import acc_isRole
-from cdsware.webpage import page, create_error_box
-from cdsware.webuser import getUid, get_email
-from cdsware.dbquery import run_sql
-from cdsware.websubmit_config import *
+from invenio.config import *
+from invenio.access_control_engine import acc_authorize_action
+from invenio.access_control_admin import acc_isRole
+from invenio.webpage import page, create_error_box
+from invenio.webuser import getUid, get_email
+from invenio.dbquery import run_sql
+from invenio.websubmit_config import *
 
-from cdsware.messages import gettext_set_language
-import cdsware.template
-websubmit_templates = cdsware.template.load('websubmit')
+from invenio.messages import gettext_set_language
+import invenio.template
+websubmit_templates = invenio.template.load('websubmit')
 
 archivepath = filedir
 archivesize = filedirsize
@@ -444,7 +444,7 @@ class BibDoc:
                        (self.recid,self.id,version,string.upper(format),userid,addressIp,))
 
 class BibDocFile:
-    """this class represents a physical file in the CDSware filesystem"""
+    """this class represents a physical file in the CDS Invenio filesystem"""
 
     def __init__(self,fullpath,type,version,name,format,bibdocid):
         self.fullpath = fullpath

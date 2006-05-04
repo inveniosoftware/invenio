@@ -1,25 +1,25 @@
-# # This file is part of the CERN Document Server Software (CDSware).
+# # This file is part of CDS Invenio.
 # # Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 # #
-# # The CDSware is free software; you can redistribute it and/or
+# # CDS Invenio is free software; you can redistribute it and/or
 # # modify it under the terms of the GNU General Public License as
 # # published by the Free Software Foundation; either version 2 of the
 # # License, or (at your option) any later version.
 # #
-# # The CDSware is distributed in the hope that it will be useful, but
+# # CDS Invenio is distributed in the hope that it will be useful, but
 # # WITHOUT ANY WARRANTY; without even the implied warranty of
 # # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # # General Public License for more details.
 # #
 # # You should have received a copy of the GNU General Public License
-# # along with CDSware; if not, write to the Free Software Foundation, Inc.,
+# # along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDSware 0.7\n"
+"Project-Id-Version: CDS-Invenio 0.89\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-05-02 12:14+0200\n"
-"PO-Revision-Date: 2005-11-24 14:13+0100\n"
+"POT-Creation-Date: 2006-05-03 19:01+0200\n"
+"PO-Revision-Date: 2006-05-02 17:35+0200\n"
 "Last-Translator: Frédéric Gobry <frederic.gobry@epfl.ch>\n"
 "Language-Team: SK <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -2700,9 +2700,8 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:45
 msgid ""
-"If you have lost password for your CERN Document Server internal account, "
-"then please enter your email address below and the lost password will be "
-"emailed to you."
+"If you have lost password for your CDS Invenio internal account, then please "
+"enter your email address below and the lost password will be emailed to you."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:47

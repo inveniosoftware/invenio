@@ -1,21 +1,21 @@
 ## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "cdspage.wml" \
@@ -28,7 +28,7 @@ Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
 <h2>Why to MARC at all?</h2>
 
-<p>All the bibliographic data in the CDSware system are
+<p>All the bibliographic data in the CDS Invenio system are
 internally represented in the <a
 href="http://www.loc.gov/marc/bibliographic/">MARC 21</a> format.
 There are several good reasons for this:
@@ -39,13 +39,13 @@ There are several good reasons for this:
 well established and has been used since 1960s.
 
 <li>MARC is flexible enough to represent any metadata structure you
-may need now or in the future.  Therefore, CDSware can adapt to your
+may need now or in the future.  Therefore, CDS Invenio can adapt to your
 needs without altering its internal data structure.
 
 <li>MARC technology, albeit developed in the punch card times
 (1960s!), can be well combined with recent technologies like XML.  In
 fact, whenever bibliographic metadata are to be worked with externally
-in a file format, CDSware uses recently standardized <a
+in a file format, CDS Invenio uses recently standardized <a
 href="http://www.loc.gov/standards/marcxml/">MARC XML</a> format
 provided by the Library of Congress.
 
@@ -60,7 +60,7 @@ provided by the Library of Congress.
 <li><p>You do not care much about internal MARC metadata structure as
 far as you can work with "more meaningful" metadata concepts like
 <em>author</em>, <em>abstract</em>, <em>title</em>, etc.  In this case
-we simply recommend you to stick to CDSware defaults that preset for
+we simply recommend you to stick to CDS Invenio defaults that preset for
 you the most commonly used metadata fields (in alphabetical order;
 non-exhaustive list):
 
@@ -89,17 +89,17 @@ URL (e.g. to fulltext)       8564 $u, $z
 </pre>
 </blockquote>
 
-<p>The advantage of using these CDSware defaults is that you can use
+<p>The advantage of using these CDS Invenio defaults is that you can use
 pre-defined configurations of <a href="../bibconvert/">BibConvert</a>,
 <a href="../bibformat/">BibFormat</a>, and <a
 href="../bibindex/">BibIndex</a>.
 
 <li><p>You do not care much about internal MARC metadata structure, so
-you are using CDSware defaults, but you need to introduce a new
+you are using CDS Invenio defaults, but you need to introduce a new
 metadata concept.  For example, you would like to store also the
 document shelf number, and you want to make it separately searchable.
 In this case you are free to choose any MARC tag of your own, for
-example <code>963 $6</code>.  After that you would configure CDSware
+example <code>963 $6</code>.  After that you would configure CDS Invenio
 as follows:
 
 <ul> 
@@ -132,7 +132,7 @@ configurations.  For each field you would simply follow the
 above-mentioned configuration procedure.
 
 <p>However, when designing your own MARC scheme, you need to think of
- two CDSware-related restrictions:
+ two CDS Invenio-related restrictions:
 
 <ul> 
 
@@ -152,7 +152,7 @@ subfields inside the same field instance does not matter.  For
 example, let us consider the tag <code>100</code> with the value
 <code>$a Foo $a Bar $a Baz</code>.  Then, the question "what is the
 second <code>$a</code> of the tag <code>100</code>?" is invalid within
-the CDSware MARC paradigm.  The CDSware would store a tag like that,
+the CDS Invenio MARC paradigm.  CDS Invenio would store a tag like that,
 but not the order of repetitive subfields themselves.  In our MARC
 paradigm, we prefer to code that information either (i) into different
 subfields within the same field instance (<code>100 $a Foo $b Bar $c
@@ -164,7 +164,7 @@ instance is a suspicious database design.)
 
 </ul>
 
-<p>These two restrictions were introduced in order to keep CDSware
+<p>These two restrictions were introduced in order to keep CDS Invenio
 bibliographic tables both simple and fast.  As explained above, we
 believe that any good database design will avoid these techniques
 anyway.
@@ -174,20 +174,20 @@ anyway.
 <h2>MARC representation in use at CERN</h2>
 
 <p>MARC schema that is used in the CERN library differs in some ways
-from the schema found in the CDSware default configuration and in the
+from the schema found in the CDS Invenio default configuration and in the
 demo records, described under point 1 of the preceding section.  This
 has got both an advantage and a disadvantage: (i) an advantage that it
-permits us to easily test the behaviour of CDSware in the context of
-different metadata schemata used by different CDSware installations in
+permits us to easily test the behaviour of CDS Invenio in the context of
+different metadata schemata used by different CDS Invenio installations in
 the world, and (ii) a disadvantage that the default schema may be
-prone to different extensions by different CDSware installations in
+prone to different extensions by different CDS Invenio installations in
 the world, while these extensions could have possibly been avoided by
 building local extensions on top of a richer default.  (There will
 probably always be local tag schema differences due to various local
 cataloguing traditions.)
 
 <p>As an example of an extensive MARC schema that could provide a
-possible richer default for the CDSware installations in the world, we
+possible richer default for the CDS Invenio installations in the world, we
 are listing below all MARC tags that are in production in the CERN
 Library.  Please note that in some cases the metadata choice was
 dictated by local policy of a Swiss library network that the CERN
@@ -197,7 +197,7 @@ the Library of Congress recommendations in some places to some extent.
 723, 724, 725, 773, 866.)
 
 <p>If this schema is found interesting, we may also provide CERN
-BibFormat etc configurations that implement it for CDSware.
+BibFormat etc configurations that implement it for CDS Invenio.
 
 <pre>
 <protect>
@@ -221,7 +221,7 @@ them like tag 246
 4. [CERN] indicates, that some modifications have been done to the tag to 
 suit the CERN Library needs, like adding one or more subfield code(s) like 
 tag "773" or slightly change the content of the field like tag "037"
-5. [CDSware/MySQL] indicates, that this tag is exlusively used for CDSware; 
+5. [CDS Invenio/MySQL] indicates, that this tag is exlusively used for CDS Invenio; 
 this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 6. To be able to find previous fields/tags mentioned under the title:
  "Additional field(s)/tag(s):", you can use the Find-command on your browser
@@ -234,7 +234,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
              creating, using or distributing the record. - [ARC,CER,IEX,MAN,MMD]
 
       {Created automatically at input via GUI/Cataloguing module}
-      NOTE: In MySQL used for CDSware record ID
+      NOTE: In MySQL used for CDS Invenio record ID
       
 
 003   CONTROL NUMBER IDENTIFIER (NR)
@@ -1988,7 +1988,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       {Not in use in AL300}
 
 
-960   BASE (R) [CDSware/MySQL]
+960   BASE (R) [CDS Invenio/MySQL]
 
       Indicators - Both undefined
 
@@ -1998,7 +1998,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          Taken from AL500 BAS
 
 
-961   CAT (R) [CDSware/MySQL]
+961   CAT (R) [CDS Invenio/MySQL]
 
       Indicators - Both undefined
 
@@ -2013,7 +2013,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          Taken from AL500 CAT
 
 
-962   ALEPH Linking Field (R) [CDSware/MySQL]
+962   ALEPH Linking Field (R) [CDS Invenio/MySQL]
 
       Indicators - Both undefined
 
@@ -2054,7 +2054,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          Taken from AL500 LKR
 
 
-963   OWNER (NR) [CDSware/MySQL]
+963   OWNER (NR) [CDS Invenio/MySQL]
 
       Indicators - Both undefined
 
@@ -2064,7 +2064,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          Taken from AL500 OWN
 
 
-964   ITEM (NR) [CDSware/MySQL]
+964   ITEM (NR) [CDS Invenio/MySQL]
 
       Indicators - Both undefined
 
@@ -2074,7 +2074,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          Taken from AL500 ITM
 
 
-970   SYSTEM NUMBER (NR) [CDSware/MySQL]
+970   SYSTEM NUMBER (NR) [CDS Invenio/MySQL]
 
       Indicators - Both undefined
 
@@ -2084,7 +2084,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          Taken from AL500 SYS
 
 
-980   COLLECTION INDICATOR (R) [CERN] [CDSware/MySQL]
+980   COLLECTION INDICATOR (R) [CERN] [CDS Invenio/MySQL]
 
       Indicators - Both undefined
 
@@ -2106,7 +2106,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       {Not in use in AL300; to be added for users of MySQL}
 
 
-999   REFERENCES (R) [CERN] [CDSware/MySQL]
+999   REFERENCES (R) [CERN] [CDS Invenio/MySQL]
 
       Indicators
       First   Origine of indicator

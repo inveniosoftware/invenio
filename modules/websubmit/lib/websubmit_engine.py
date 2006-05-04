@@ -1,20 +1,20 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## import interesting modules:
@@ -28,18 +28,18 @@ import MySQLdb
 import shutil
 from mod_python import apache
 
-from cdsware.config import *
-from cdsware.dbquery import run_sql
-from cdsware.access_control_engine import acc_authorize_action
-from cdsware.access_control_admin import acc_isRole
-from cdsware.webpage import page, create_error_box
-from cdsware.webuser import getUid, get_email
-from cdsware.websubmit_config import *
-from cdsware.file import *
+from invenio.config import *
+from invenio.dbquery import run_sql
+from invenio.access_control_engine import acc_authorize_action
+from invenio.access_control_admin import acc_isRole
+from invenio.webpage import page, create_error_box
+from invenio.webuser import getUid, get_email
+from invenio.websubmit_config import *
+from invenio.file import *
 
-from cdsware.messages import gettext_set_language, wash_language
-import cdsware.template
-websubmit_templates = cdsware.template.load('websubmit')
+from invenio.messages import gettext_set_language, wash_language
+import invenio.template
+websubmit_templates = invenio.template.load('websubmit')
 
 def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="", access="",mainmenu="",fromdir="",file="",nextPg="",nbPg="",curpage=1):
     ln = wash_language(ln)
@@ -1036,10 +1036,10 @@ def print_function_calls (doctype, action, step, form):
               'error' : 0,
               'text' : '',
             }
-            if os.path.exists("%s/cdsware/websubmit_functions/%s.py" % (pylibdir,function_name)):
+            if os.path.exists("%s/invenio/websubmit_functions/%s.py" % (pylibdir,function_name)):
                 # import the function itself
-                #function = getattr(cdsware.websubmit_functions, function_name)
-                execfile("%s/cdsware/websubmit_functions/%s.py" % (pylibdir,function_name),globals())
+                #function = getattr(invenio.websubmit_functions, function_name)
+                execfile("%s/invenio/websubmit_functions/%s.py" % (pylibdir,function_name),globals())
                 if not globals().has_key(function_name):
                     currfunction['error'] = 1
                 else:
@@ -1120,7 +1120,7 @@ def errorMsg(title,req,c=cdsname,ln=cdslang):
     return page(title = _("error"),
                 body = create_error_box(req, title=title,verbose=0, ln=ln),
                 description="%s - Internal Error" % c,
-                keywords="%s, CDSware, Internal Error" % c,
+                keywords="%s, CDS Invenio, Internal Error" % c,
                 language=ln,
                 urlargs=req.args)
 
@@ -1131,7 +1131,7 @@ def warningMsg(title,req,c=cdsname,ln=cdslang):
     return page(title = _("warning"),
                 body = title,
                 description="%s - Internal Error" % c,
-                keywords="%s, CDSware, Internal Error" % c,
+                keywords="%s, CDS Invenio, Internal Error" % c,
                 language=ln,
                 urlargs=req.args)
 

@@ -1,43 +1,43 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """Web Baskets features."""
 
 from zlib import decompress
 
-from cdsware.config import cdslang, weburl
-from cdsware.messages import gettext_set_language, wash_language
-from cdsware.dateutils import convert_datetext_to_dategui, \
+from invenio.config import cdslang, weburl
+from invenio.messages import gettext_set_language, wash_language
+from invenio.dateutils import convert_datetext_to_dategui, \
                               convert_datetext_to_datestruct,\
                               convert_datestruct_to_dategui
-from cdsware.urlutils import wash_url_argument
-from cdsware.search_engine import print_record
-from cdsware.webbasket_dblayer import *
-from cdsware.webbasket_config import cfg_webbasket_share_levels, \
+from invenio.urlutils import wash_url_argument
+from invenio.search_engine import print_record
+from invenio.webbasket_dblayer import *
+from invenio.webbasket_config import cfg_webbasket_share_levels, \
                                      cfg_webbasket_share_levels_ordered, \
                                      cfg_webbasket_categories, \
                                      cfg_webbasket_actions, \
                                      cfg_webbasket_warning_messages, \
                                      cfg_webbasket_error_messages
 try:
-    import cdsware.template
-    webbasket_templates = cdsware.template.load('webbasket')
+    import invenio.template
+    webbasket_templates = invenio.template.load('webbasket')
 except ImportError:
     pass
     

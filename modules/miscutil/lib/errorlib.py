@@ -1,32 +1,32 @@
 # -*- coding: utf-8 -*-
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """ Error handling library """
 
 __lastupdated__ = """$Date$"""
 
-# CDSware imports
-from cdsware.config import cdslang, logdir, alertengineemail, adminemail, supportemail
-from cdsware.miscutil_config import cfg_miscutil_error_messages  
-from cdsware.urlutils import wash_url_argument
-from cdsware.messages import wash_language, gettext_set_language
-from cdsware.dateutils import convert_datestruct_to_datetext
+# CDS Invenio imports
+from invenio.config import cdslang, logdir, alertengineemail, adminemail, supportemail
+from invenio.miscutil_config import cfg_miscutil_error_messages  
+from invenio.urlutils import wash_url_argument
+from invenio.messages import wash_language, gettext_set_language
+from invenio.dateutils import convert_datestruct_to_datetext
 
 
 #External imports
@@ -74,7 +74,7 @@ def get_tracestack():
 
 def register_errors(errors_or_warnings_list, file, req=None):
     """
-    log errors to cdsware.err and warnings to cdsware.log
+    log errors to invenio.err and warnings to invenio.log
     errors will be logged with client information (if req is given) and a tracestack
     warnings will be logged with just the warning message
     @param errors_or_warnings_list: list of tuples (err_name, err_msg)
@@ -118,7 +118,7 @@ def register_errors(errors_or_warnings_list, file, req=None):
         error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
         errors_or_warnings_list.append((error, eval(cfg_miscutil_error_messages[error])% file))
     # update log_errors
-    file_pwd = logdir + '/cdsware.' + file
+    file_pwd = logdir + '/invenio.' + file
     errors = ''
     for etuple in errors_or_warnings_list:
         try: 
@@ -289,6 +289,6 @@ Please see the %(logdir)s/errors.log for traceback details.""" % \
             'logdir'    : logdir,
             'contact'   : "Please contact %s quoting the following information:"  % (supportemail,) #! is support email always cds?
         }
-    from cdsware.alert_engine import send_email
+    from invenio.alert_engine import send_email
     send_email(from_addr, to_addr, body)
 

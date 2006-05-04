@@ -1,6 +1,6 @@
 """
 Test the suitability of Python core and the availability of various
-Python modules for running CDSware.  Warn the user if there are
+Python modules for running CDS Invenio.  Warn the user if there are
 eventual troubles.  Exit status: 0 if okay, 1 if not okay.  Useful for
 running from configure.ac.
 """
@@ -8,21 +8,21 @@ running from configure.ac.
 ## $Id$
 ## Tests availability of Python modules and their versions.
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __version__ = "$Id$"
@@ -50,7 +50,7 @@ if sys.version < cfg_min_python_version:
     ** --with-python configuration option to choose      **
     ** a specific (e.g. non system wide) Python binary.  **
     **                                                   **
-    ** We strongly recommend you to run CDSware with     **
+    ** We strongly recommend you to run CDS Invenio with     **
     ** at least Python %s.  Some older versions    ** 
     ** were known to be problematic with respect to      **
     ** encodings and mod_python, see for example         **
@@ -60,10 +60,10 @@ if sys.version < cfg_min_python_version:
     ** may backport important bugfixes to older Python   **
     ** releases, so your concrete Python installation    **
     ** may be immune to these problems already.          **  
-    ** If you are not sure, you may continue the CDSware **
+    ** If you are not sure, you may continue the CDS Invenio **
     ** installation now and recall that in case of       **
     ** problems you may need to upgrade Python and       **
-    ** reinstall CDSware from scratch.                   **
+    ** reinstall CDS Invenio from scratch.                   **
     *******************************************************
     """ % (string.replace(sys.version, "\n", ""), cfg_min_python_version)
     try:
@@ -117,11 +117,11 @@ except ImportError, e:
     ** WARNING: PYTHON IMPORT WARNING %s
     *****************************************************
     ** Note that Psyco is not really required but      **
-    ** we recommend it for faster CDSware operation.   **
+    ** we recommend it for faster CDS Invenio operation.   **
     **                                                 **
-    ** You can safely continue installing CDSware now, **
+    ** You can safely continue installing CDS Invenio now, **
     ** and add this module anytime later.  (I.e. even  **
-    ** after your CDSware installation is put into     **
+    ** after your CDS Invenio installation is put into     **
     ** production.)                                    **
     *****************************************************
     """ % e
@@ -143,7 +143,7 @@ except ImportError, e:
     ** in the indexing engine and to bump up the speed **
     ** and accuracy of word-frequency based rankings.  **
     **                                                 **
-    ** You can safely continue installing CDSware now, **
+    ** You can safely continue installing CDS Invenio now, **
     ** and add this module anytime later. (But better  **
     ** before you firstly run the indexation/ranking   **
     ** on real production data.)                       **
@@ -165,9 +165,9 @@ except ImportError, e:
     ** Note that PyRXP is not really required but      **
     ** we recommend it for fast XML MARC parsing.      **
     **                                                 **
-    ** You can safely continue installing CDSware now, **
+    ** You can safely continue installing CDS Invenio now, **
     ** and add this module anytime later.  (I.e. even  **
-    ** after your CDSware installation is put into     **
+    ** after your CDS Invenio installation is put into     **
     ** production.)                                    **
     *****************************************************
     """ % e
@@ -189,9 +189,9 @@ except ImportError, e:
     ** and citation history graphs on Detailed record  **
     ** pages.                                          **
     **                                                 **
-    ** You can safely continue installing CDSware now, **
+    ** You can safely continue installing CDS Invenio now, **
     ** and add this module anytime later.  (I.e. even  **
-    ** after your CDSware installation is put into     **
+    ** after your CDS Invenio installation is put into     **
     ** production.)                                    **
     *****************************************************
     """ % e

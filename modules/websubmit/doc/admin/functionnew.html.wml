@@ -1,20 +1,20 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "configbis.wml"
@@ -37,9 +37,9 @@
             &nbsp;<span class="guideheader">Y</span>ou will then reach a page where you can add parameters to your 
             new function.<br><br>
             &nbsp;<span class="guideheader">D</span>on't forget to add the function file inside the 
-            <LIBDIR>/python/cdsware/websubmit_functions directory and to name the file after the function. Functions must 
+            <LIBDIR>/python/invenio/websubmit_functions directory and to name the file after the function. Functions must 
             be written in Python. Here is an example implementation of a function:<BR><BR>
-            <LIBDIR>/python/cdsware/websubmit_functions/Get_Report_Number.py:</SMALL>
+            <LIBDIR>/python/invenio/websubmit_functions/Get_Report_Number.py:</SMALL>
             <TABLE border=0 width=75% bgcolor="eeeeff"><TR><TD><small><pre><br>
 def Get_Report_Number (parameters,curdir,form):
     global rn

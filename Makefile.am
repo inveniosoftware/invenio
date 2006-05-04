@@ -1,20 +1,20 @@
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 confignicedir = $(sysconfdir)/build
@@ -25,7 +25,7 @@ SUBDIRS = po config modules
 EXTRA_DIST = UNINSTALL RELEASE-NOTES configure-tests.py config.nice.in
 
 ## submit stuff for demo data link creation
-sbmdir = $(WEBDIR)/submit/access/protected
+sbmdir = $(localstatedir)/www/submit/access/protected
 sbmdat = SBITEXT MBITEXT FTTTEXT SRVTEXT TFUTEXT \
 	 SBIRTEXT MBIRTEXT FTTRTEXT SRVRTEXT TFURTEXT APPRTEXT \
 	 SBIPICT MBIPICT FTTPICT \
@@ -33,7 +33,7 @@ sbmdat = SBITEXT MBITEXT FTTTEXT SRVTEXT TFUTEXT \
 
 all:
 	@echo "**************************************************************"
-	@echo "** CDSware has been successfully built.  Proceed now by     **"
+	@echo "** CDS Invenio has been successfully built.  Proceed now by     **"
 	@echo "** running 'make install'.                                  **"
 	@echo "**************************************************************"
 
@@ -50,14 +50,14 @@ install-data-local:
 		chmod ug=rwx $(localstatedir)$$d ;	\
 	done
 	@echo "**************************************************************"
-	@echo "** CDSware has been successfully installed!                 **"
+	@echo "** CDS Invenio has been successfully installed!                 **"
 	@echo "**                                                          **"
-	@echo "** If you are installing CDSware for the first time, we     **"
+	@echo "** If you are installing CDS Invenio for the first time, we     **"
 	@echo "** recommend you to run 'make create-demo-site' now to      **"
 	@echo "** to test your installation.                               **"
 	@echo "**                                                          **"
-	@echo "** If you are reinstalling CDSware because you have been    **"
-	@echo "** editing CDSware sources or its WML configuration, you    **"
+	@echo "** If you are reinstalling CDS Invenio because you have been    **"
+	@echo "** editing CDS Invenio sources or its WML configuration, you    **"
 	@echo "** may want to restart your Apache server now by running    **"
 	@echo "** 'apachectl restart'.                                     **"
 	@echo "**************************************************************"

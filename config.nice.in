@@ -1,7 +1,6 @@
 #!/bin/sh
 # Automatically created during the building process.  Do not edit.
 ./configure --prefix=@prefix@ \
-            --with-webdir=@WEBDIR@ \
             --with-weburl=@WEBURL@ \
             --with-dbhost=@DBHOST@ \
             --with-dbname=@DBNAME@ \

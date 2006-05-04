@@ -1,34 +1,34 @@
 # -*- coding: utf-8 -*-
 ## $Id$
 
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """ Comments and reviews for records """
 
 __lastupdated__ = """$Date$"""
 
-# non CDSware imports:
+# non CDS Invenio imports:
 import time
 import math
 
-# CDSware imports:
+# CDS Invenio imports:
 
-from cdsware.dbquery import run_sql
-from cdsware.config import cdslang, \
+from invenio.dbquery import run_sql
+from invenio.config import cdslang, \
                            alertengineemail,\
                            adminemail,\
                            weburl,\
@@ -40,19 +40,19 @@ from cdsware.config import cdslang, \
                            cfg_webcomment_nb_comments_in_detailed_view,\
                            cfg_webcomment_timelimit_processing_comments_in_seconds,\
                            cfg_webcomment_timelimit_processing_reviews_in_seconds
-from cdsware.webmessage_mailutils import email_quote_txt
-from cdsware.webuser import get_user_info
-from cdsware.dateutils import convert_datetext_to_dategui, \
+from invenio.webmessage_mailutils import email_quote_txt
+from invenio.webuser import get_user_info
+from invenio.dateutils import convert_datetext_to_dategui, \
                               datetext_default, \
                               convert_datestruct_to_datetext 
-from cdsware.messages import wash_language, gettext_set_language
-from cdsware.urlutils import wash_url_argument
-from cdsware.webuser import isGuestUser
-from cdsware.webcomment_config import cfg_webcomment_action_code
+from invenio.messages import wash_language, gettext_set_language
+from invenio.urlutils import wash_url_argument
+from invenio.webuser import isGuestUser
+from invenio.webcomment_config import cfg_webcomment_action_code
 
 try:
-    import cdsware.template
-    webcomment_templates = cdsware.template.load('webcomment')
+    import invenio.template
+    webcomment_templates = invenio.template.load('webcomment')
 except:
     pass
 
@@ -192,7 +192,7 @@ def check_user_can_comment(recID, client_ip_address, uid=-1):
     time limit: cfg_webcomment_timelimit_processing_comments_in_seconds
     @param recID: record id
     @param client_ip_address: IP => use: str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
-    @param uid: user id, as given by cdsware.webuser.getUid(req)
+    @param uid: user id, as given by invenio.webuser.getUid(req)
     """
     recID = wash_url_argument(recID, 'int')
     client_ip_address = wash_url_argument(client_ip_address, 'str')
@@ -218,7 +218,7 @@ def check_user_can_review(recID, client_ip_address, uid=-1):
     time limit: cfg_webcomment_timelimit_processing_reviewss_in_seconds
     @param cmt_id: comment id
     @param client_ip_address: IP => use: str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
-    @param uid: user id, as given by cdsware.webuser.getUid(req)
+    @param uid: user id, as given by invenio.webuser.getUid(req)
     """
     recID = wash_url_argument(recID, 'int')
     client_ip_address = wash_url_argument(client_ip_address, 'str')
@@ -243,7 +243,7 @@ def check_user_can_vote(cmt_id, client_ip_address, uid=-1):
     """ Checks if a user hasn't already voted
     @param cmt_id: comment id
     @param client_ip_address: IP => use: str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
-    @param uid: user id, as given by cdsware.webuser.getUid(req)
+    @param uid: user id, as given by invenio.webuser.getUid(req)
     """
     cmt_id = wash_url_argument(cmt_id, 'int')
     client_ip_address = wash_url_argument(client_ip_address, 'str')
@@ -339,7 +339,7 @@ Please go to the Comments Admin Panel %(comment_admin_link)s to delete this mess
         #FIXME to be added to email when websession module is over:
         #If you wish to ban the user, you can do so via the User Admin Panel %(user_admin_link)s.
         
-        from cdsware.alert_engine import send_email, forge_email
+        from invenio.alert_engine import send_email, forge_email
         body = forge_email(from_addr, to_addr, subject, body)
         send_email(from_addr, to_addr, body)
     return 1
@@ -348,7 +348,7 @@ def check_user_can_report(cmt_id, client_ip_address, uid=-1):
     """ Checks if a user hasn't already reported a comment
     @param cmt_id: comment id
     @param client_ip_address: IP => use: str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
-    @param uid: user id, as given by cdsware.webuser.getUid(req)
+    @param uid: user id, as given by invenio.webuser.getUid(req)
     """
     cmt_id = wash_url_argument(cmt_id, 'int')
     client_ip_address = wash_url_argument(client_ip_address, 'str')
@@ -895,7 +895,7 @@ def notify_admin_of_new_comment(comID):
     else:
         nickname = email = last_login = "ERROR: Could not retrieve"
 
-    from cdsware.search_engine import print_record    
+    from invenio.search_engine import print_record    
     record = print_record(recID=id_bibrec, format='hs')
  
     review_stuff = ''' 
@@ -945,7 +945,7 @@ To delete comment go to %(weburl)s/admin/webcomment/webcommentadmin.py/delete?co
     to_addr = adminemail
     subject = "A new comment/review has just been posted"
  
-    from cdsware.alert_engine import send_email, forge_email
+    from invenio.alert_engine import send_email, forge_email
     out = forge_email(from_addr, to_addr, subject, out)
     send_email(from_addr, to_addr, out)
 
@@ -968,7 +968,7 @@ def check_recID_is_in_range(recID, warnings=[], ln=cdslang):
 
     if type(recID) is int:
         if recID > 0:
-            from cdsware.search_engine import record_exists
+            from invenio.search_engine import record_exists
             success = record_exists(recID)
             if success == 1: 
                 return (1,"")

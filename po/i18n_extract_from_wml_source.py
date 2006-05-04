@@ -1,20 +1,20 @@
 ## $Id$
 ##
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
@@ -87,25 +87,25 @@ def extract_from_wml_files(dirname, potfiles_filename):
 
     ## print po header:
     print r'''
-    # # This file is part of the CERN Document Server Software (CDSware).
+    # # This file is part of CDS Invenio.
     # # Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
     # #
-    # # The CDSware is free software; you can redistribute it and/or
+    # # CDS Invenio is free software; you can redistribute it and/or
     # # modify it under the terms of the GNU General Public License as
     # # published by the Free Software Foundation; either version 2 of the
     # # License, or (at your option) any later version.
     # #
-    # # The CDSware is distributed in the hope that it will be useful, but
+    # # CDS Invenio is distributed in the hope that it will be useful, but
     # # WITHOUT ANY WARRANTY; without even the implied warranty of
     # # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     # # General Public License for more details.
     # #
     # # You should have received a copy of the GNU General Public License
-    # # along with CDSware; if not, write to the Free Software Foundation, Inc.,
+    # # along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
     # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
     msgid ""
     msgstr ""
-    "Project-Id-Version: CDSware 0.7\n"
+    "Project-Id-Version: CDS Invenio 0.7\n"
     "POT-Creation-Date: Tue Nov 22 16:44:03 2005\n"
     "PO-Revision-Date: 2005-11-22 11:20+0100\n"
     "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"

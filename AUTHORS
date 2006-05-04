@@ -1,47 +1,66 @@
-CERN DOCUMENT SERVER SOFTWARE (CDSware) AUTHORS
-===============================================
+CDS Invenio AUTHORS
+===================
 
 Revision: $Id$
 
-The CDS Development Group currently consists of:
+CDS Invenio is developed at, and maintained by, the CERN Document
+Server Software Consortium, jointly by CERN (European Organization for
+Nuclear Research, Geneva, Switzerland) and EPFL (École Polytechnique
+Fédérale de Lausanne, Lausanne, Switzerland).
+
+The CERN development group currently consists of:
 
  - Jean-Yves Le Meur <jean-yves.le.meur@cern.ch>
      Head of the team.  Strategic planning and lead.
 
  - Tibor Simko <tibor.simko@cern.ch>
-     Head Developer.  Search engine, indexing engine, task scheduling
-     system, user interface and personalization, general system
-     architecture, release management.
-     Maintains mostly: WebSearch, BibWords, BibSched, WebStyle,
-                       WebHelp, WebAlert, WebBasket, MiscUtils.
+     Head Developer.  General system architecture, release management.
+     WebSearch, BibIndex, BibSched, WebStat, WebStyle, WebSession,
+     WebHelp, and more.
   
- - Thomas Baron <thomas.baron@cern.ch>
-     Submit interface, batch upload, administrative modules.
-     Maintains mostly: WebSubmit, BibUpload, BibSched.
-
  - Martin Vesely <martin.vesely@cern.ch>
-     Open Archive Initiative gateway, metadata conversion.
-     Maintains mostly: BibConvert, BibHarvest.
+     BibHarvest, BibConvert, BibMatch.
 
  - Nicholas Robinson <nicholas.robinson@cern.ch>
-     Reference extraction from PDF files, for the BibEdit module.
+     WebSubmit, reference extraction for the BibEdit module.
 
  - Alberto Pepe <alberto.pepe@cern.ch>
-     (upcoming)
-
- - Maja Gracco <maja.gracco@cern.ch>
-     System librarian, MARC21 expertise.
-
- - Chris Montarbaud <christiane.montarbaud@cern.ch>
-     Multimedia and photos.
-
-Many former group members (CERN fellows, technical and summer
-students) contributed to the project.  In an approximate decreasing
-chronological order:
+     BibClassify, BibHarvest Admin. 
 
  - Diane Berkovits <diane.berkovits@epfl.ch>
      Ranking by downloads, for the BibRank and WebSubmit
      modules. 
+
+ - Gregory Favre <gregory.favre@cern.ch>
+     WebBasket, WebMessage.  Improvements to WebComment.
+
+ - Krzysztof Jedrzejek <krzysztof.jedrzejek@cern.ch>
+     Improvements to ElmSubmit.
+
+ - Chris Montarbaud <christiane.montarbaud@cern.ch>
+     Multimedia and photo management.
+
+The EPFL development group currently consists of:
+
+ - Frédéric Gobry <frederic.gobry@epfl.ch>
+     Templating system, numerous patches.
+
+Many former group members (CERN and EPFL staff and fellows, technical
+students, diploma students, summer students) contributed to the
+project.  In an approximate decreasing chronological order:
+
+ - Paulo Cabral <paulo.cabral@cern.ch>
+     WebComment, error library, design of collaborative features.
+
+ - Thomas Baron <thomas.baron@cern.ch>
+     WebSubmit and BibUpload.  Improvements to BibSched.
+
+ - Maja Gracco <maja.gracco@cern.ch>
+     System librarian, MARC21 expertise.
+
+ - Tiberiu Dondera <tiberiu.dondera@pronet-consulting.com>
+     Patches for the WebSubmit engine and the admin interface. 
+     Templatizing codebase.
 
  - Anna Afshar <anna.afshar@novell.com>
      Ranking by citations, for the BibRank module.

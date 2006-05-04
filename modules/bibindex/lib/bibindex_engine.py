@@ -3,21 +3,21 @@
 ## $Id$
 ## BibIndxes bibliographic data, reference and fulltext indexing utility.
 ##
-## This file is part of the CERN Document Server Software (CDSware).
+## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## The CDSware is free software; you can redistribute it and/or
+## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## The CDSware is distributed in the hope that it will be useful, but
+## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDSware; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
@@ -43,14 +43,14 @@ import unicodedata
 import traceback
 import cStringIO
 
-from cdsware.config import *
-from cdsware.bibindex_engine_config import *
-from cdsware.search_engine_config import cfg_max_recID
-from cdsware.search_engine import perform_request_search, strip_accents
-from cdsware.dbquery import run_sql
-from cdsware.access_control_engine import acc_authorize_action
-from cdsware.bibindex_engine_stopwords import is_stopword
-from cdsware.bibindex_engine_stemmer import stem
+from invenio.config import *
+from invenio.bibindex_engine_config import *
+from invenio.search_engine_config import cfg_max_recID
+from invenio.search_engine import perform_request_search, strip_accents
+from invenio.dbquery import run_sql
+from invenio.access_control_engine import acc_authorize_action
+from invenio.bibindex_engine_stopwords import is_stopword
+from invenio.bibindex_engine_stemmer import stem
 
 ## import optional modules:
 try:
@@ -303,7 +303,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
             sys.stderr.write("Error: Cannot read %s.\n" % url_direct)
             break # try other fulltext files...
         
-        tmp_name = tempfile.mktemp('cdsware.tmp')
+        tmp_name = tempfile.mktemp('invenio.tmp')
         tmp_fd = open(tmp_name, "w")
         data_chunk = url.read(8*1024)
         while data_chunk:
@@ -503,7 +503,7 @@ def usage(code, msg=''):
     print >> sys.stderr, \
     """ Usage: %s [options] 
      Examples:
-       %s -a -i 234-250,293,300-500 -u admin@cdsware
+       %s -a -i 234-250,293,300-500 -u admin@localhost
        %s -a -w author,fulltext -M 8192 -v3
        %s -d -m +4d -A on --flush=10000
 

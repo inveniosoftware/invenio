@@ -1,12 +1,12 @@
-CERN DOCUMENT SERVER SOFTWARE (CDSware) NATIVE LANGUAGE SUPPORT
-===============================================================
+CDS Invenio NATIVE LANGUAGE SUPPORT
+===================================
 
 Revision: $Id$
 
 About
 =====
 
-This document describes the Native Language Support (NLS) in CDSware.
+This document describes the Native Language Support (NLS) in CDS Invenio.
 
 Contents
 ========
@@ -19,7 +19,7 @@ A. Introducing a new language
 1. Native Language Support information for administrators
 =========================================================
 
-CDSware is currently available in the following languages:
+CDS Invenio is currently available in the following languages:
 
    ca = Catalan 
    cs = Czech 
@@ -38,14 +38,14 @@ CDSware is currently available in the following languages:
    sv = Swedish
    uk = Ukrainian
 
-If you are installing CDSware and you want to enable/disable some
+If you are installing CDS Invenio and you want to enable/disable some
 languages, please just follow the standard installation procedure as
 described in the INSTALL file.  The default language of the
 installation as well as the list of all user-seen languages can be
 selected in the general config.wml file, see variables CDSLANG and
 CDSLANGS.
 
-(Please note that some runtime CDSware daemons -- such as webcoll,
+(Please note that some runtime CDS Invenio daemons -- such as webcoll,
 responsible for updating the collection cache, running every hour or
 so -- may work twice as long when twice as many user-seen languages
 are selected, because it creates collection cache page elements for
@@ -56,7 +56,7 @@ setup, you may want to try to limit the list of selected languages.)
 2. Native Language Support information for translators
 ======================================================
 
-If you want to contibute a translation to CDSware, then please follow
+If you want to contibute a translation to CDS Invenio, then please follow
 the procedure below:
 
   - Please check out the existence of po/LL.po file for your language,
@@ -64,7 +64,7 @@ the procedure below:
     Greek).  If such a file exists, then this language is already
     supported, in which case you may want to review the existing
     translation (see below).  If the file does not exist yet, then you
-    can create an empty one by copying the cdsware.pot template file
+    can create an empty one by copying the cds-invenio.pot template file
     into LL.po that you can review as described in the next item.
     (Please note that you would have to translate some dynamic
     elements that are currently not located in the PO file, see the
@@ -83,7 +83,7 @@ the procedure below:
     make sure it does not contain formatting errors.  (E.g. in the
     Emacs PO mode, press `V' to validate the file.)
 
-  - If you have access to a test installation of CDSware, you may want
+  - If you have access to a test installation of CDS Invenio, you may want
     to see your modified PO file in action:
 
        $ cd po 
@@ -94,7 +94,7 @@ the procedure below:
        $ firefox http://your.site/?ln=ja  # check it out in context
 
     If you do not have access to a test installation, please
-    contribute your PO file (see next step) and the CDSware developers
+    contribute your PO file (see next step) and the CDS Invenio developers
     will install it on a test site and will contact you so that you
     would be able to check your translations in the global context of
     the application.
@@ -109,7 +109,7 @@ See also the GNU gettext manual, especially the chapters 5, 6 and 11.
 3. Native Language Support information for programmers
 ======================================================
 
-CDSware uses standard GNU gettext I18N and L12N philosophy.
+CDS Invenio uses standard GNU gettext I18N and L12N philosophy.
 
 In Python programs, all output strings should be made translatable via
 _() convention:
@@ -180,7 +180,7 @@ translator sends over the following translations by email:
    - the right-hand-side portalbox:
  
         ABOUT THIS SITE
-        Welcome to the demo site of the CDSware, a free document server
+        Welcome to the demo site of the CDS Invenio, a free document server
         software coming from CERN. Please feel free to explore all the
         features of this demo site to the full.
         SEE ALSO
@@ -194,8 +194,7 @@ be to translate some short static HTML pages:
    - modules/webhelp/web/index.html.wml
    - modules/websearch/doc/index.html.wml
 
-Thanks for helping to internationalize the CERN Document Server
-Software.
+Thanks for helping to internationalize CDS Invenio.
 
        - CDS Development Group
          <cds.support@cern.ch>

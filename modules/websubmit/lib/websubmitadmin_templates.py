@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import cgi
-from cdsware.config import weburl, cdslang
-from cdsware.websubmitadmin_config import websubmitadmin_weburl
+from invenio.config import weburl, cdslang
+from invenio.websubmitadmin_config import websubmitadmin_weburl
 
 def create_html_table_from_tuple(tableheader=None, tablebody=None, start="", end=""):
     """Create a table from a tuple or a list.
@@ -192,7 +192,7 @@ def create_html_select_list(select_name, option_list, selected_values="", defaul
 
 
 class Template:
-    """CDSware Template class for creating Web interface"""
+    """CDS Invenio Template class for creating Web interface"""
     def tmpl_navtrail(self, ln=cdslang):
         """display the navtrail, e.g.:
            Home > Admin Area > WebSubmit Administration > Available WebSubmit Actions
@@ -318,7 +318,7 @@ class Template:
         """
         ## Open a dummy form and table in which to display a preview of the element
         body = """<div><br />
-        <form name="cdswaredummyeldisplay" action="%(adminurl)s/elementlist">
+        <form name="dummyeldisplay" action="%(adminurl)s/elementlist">
         <table class="admin_wvar" align="center">
         <thead>
          <tr>
@@ -335,14 +335,14 @@ class Template:
         ## Based on element type, display a preview of element:
         try:
             preview = {"D" : """&nbsp;&nbsp;%s&nbsp;&nbsp;""" % (elfidesc,),
-                       "F" : """<input type="file" %sname="cdswaredummyfile">""" % \
+                       "F" : """<input type="file" %sname="dummyfile">""" % \
                            ( (elsize != "" and """size="%s" """ % (cgi.escape(elsize, 1),) ) or (""),),
                        "H" : """<span class="info">Hidden Input. Contains Following Value: %s</span>""" % (cgi.escape(elval, 1),),
-                       "I" : """<input type="text" %sname="cdswaredummyinput" value="%s">""" % \
+                       "I" : """<input type="text" %sname="dummyinput" value="%s">""" % \
                          ( (elsize != "" and """size="%s" """ % (cgi.escape(elsize, 1),) ) or (""), cgi.escape(elval, 1)),
                        "R" : """<span class="info">Cannot Display Response Element - See Element Description</span>""",
                        "S" : """&nbsp;%s&nbsp;""" % (elfidesc,),
-                       "T" : """<textarea name="cdswaredummytextarea" %s%s></textarea>""" % \
+                       "T" : """<textarea name="dummytextarea" %s%s></textarea>""" % \
                            ( (elrows != "" and """rows="%s" """ % (cgi.escape(elrows, 1),) ) or (""),
                              (elcols != "" and """cols="%s" """ % (cgi.escape(elcols, 1),) ) or (""),)
                       }[eltype]
