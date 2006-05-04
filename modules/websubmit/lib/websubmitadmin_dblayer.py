@@ -554,6 +554,16 @@ def get_all_submissionnames_doctype(doctype):
     q = """SELECT subname FROM sbmIMPLEMENT WHERE docname=%s ORDER BY subname ASC"""
     return run_sql(q, (doctype,))
 
+def get_actname_all_submissions_doctype(doctype):
+    """Get and return a tuple of tuples containing the "action name" (actname) of all
+       submissions for the document type identified by "doctype".
+       In other words, get a list of the action IDs of the submissions implemented by document type "doctype".
+       @param doctype: unique ID of the document type whose actions are to be retrieved
+       @return: tuple of tuples (actname,)
+    """
+    q = """SELECT actname FROM sbmIMPLEMENT WHERE docname=%s ORDER BY actname ASC"""
+    return run_sql(q, (doctype,))
+
 def get_submissiondetails_doctype_action(doctype, action):
     """Get the details of all submissions for a given document type, ordered by the action name.
        @param doctype: details of the document type for which the details of all submissions are to be
@@ -1141,7 +1151,7 @@ def insert_submission_details_clonefrom_submission(addtodoctype, action, clonefr
     if numrows_submission_addtodoctype == 0:
         ## submission does not exist for "addtodoctype" - insert it
         q = """INSERT INTO sbmIMPLEMENT (docname, actname, displayed, subname, nbpg, cd, md, buttonorder, statustext, level, """ \
-            """score, stpage, endtxt) (SELECT %s, %s, displayed, %s, 0, CURDATE(), CURDATE(), buttonorder, statustext, level, """ \
+            """score, stpage, endtxt) (SELECT %s, %s, displayed, %s, nbpg, CURDATE(), CURDATE(), IFNULL(buttonorder, 100), statustext, level, """ \
             """score, stpage, endtxt FROM sbmIMPLEMENT WHERE docname=%s AND actname=%s LIMIT 1)"""
         run_sql(q, (addtodoctype, action, "%s%s" % (action, addtodoctype), clonefromdoctype, action))
         return 0 ## cloning executed - everything OK
