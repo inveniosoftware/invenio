@@ -2170,23 +2170,14 @@ CREATE TABLE IF NOT EXISTS collection_collection (
 
 -- tables for OAI sets:
 
-CREATE TABLE IF NOT EXISTS oaiSET (
-  id mediumint(9) unsigned NOT NULL auto_increment,
-  setName varchar(255) NOT NULL default '',
-  setSpec varchar(255) NOT NULL default '',
-  setDescription text,
-  setDefinition text NOT NULL default '',
-  setRecList longblob,
-  PRIMARY KEY  (id),
-  UNIQUE KEY setSpec (setSpec)
-) TYPE=MyISAM;
-
 CREATE TABLE IF NOT EXISTS oaiARCHIVE (
   id mediumint(9) unsigned NOT NULL auto_increment,
   setName varchar(255) NOT NULL default '',
   setSpec varchar(255) NOT NULL default '',
   setCollection varchar(255) NOT NULL default '',
   setDescription text,
+  setDefinition text NOT NULL default '',
+  setRecList longblob,
   p1 text,
   f1 text,
   m1 text,
