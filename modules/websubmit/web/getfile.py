@@ -95,17 +95,19 @@ def index(req,c=cdsname,ln=cdslang,recid="",docid="",version="",name="",format="
                )
 
 def errorMsg(title,req,c=cdsname,ln=cdslang):
-    return page(title="error",
+    _ = gettext_set_language(ln)
+    return page(title=_("Error"),
                     body = create_error_box(req, title=title,verbose=0, ln=ln),
-                    description="%s - Internal Error" % c,
+                    description=_("%s - Internal Error") % c,
                     keywords="%s, CDS Invenio, Internal Error" % c,
                     language=ln,
                     urlargs=req.args)
 
 def warningMsg(title,req,c=cdsname,ln=cdslang):
-    return page(title="warning",
+    _ = gettext_set_language(ln)
+    return page(title=_("Warning"),
                     body = title,
-                    description="%s - Internal Error" % c,
+                    description=_("%s - Internal Error") % c,
                     keywords="%s, CDS Invenio, Internal Error" % c,
                     language=ln,
                     urlargs=req.args)
