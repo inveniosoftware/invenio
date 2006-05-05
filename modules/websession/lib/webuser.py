@@ -534,7 +534,7 @@ def auth_apache_user_p(user, password):
     Apache password data file.  Return 0 in case of failure, 1 in case
     of success."""
     try:
-        pipe_input, pipe_output = os.popen2(["/bin/grep", "^" + user + ":", cfg_apache_password_file], 'r')
+        pipe_input, pipe_output = os.popen2(["grep", "^" + user + ":", cfg_apache_password_file], 'r')
         line =  pipe_output.readlines()[0]
         password_apache = string.split(string.strip(line),":")[1]
     except: # no pw found, so return not-allowed status
@@ -549,7 +549,7 @@ def auth_apache_user_in_groups(user):
     """Return list of Apache groups to which Apache user belong."""
     out = []
     try:
-        pipe_input,pipe_output = os.popen2(["/bin/grep", user, cfg_apache_group_file], 'r')
+        pipe_input,pipe_output = os.popen2(["grep", user, cfg_apache_group_file], 'r')
         for line in pipe_output.readlines():
             out.append(string.split(string.strip(line),":")[0])
     except: # no groups found, so return empty list
