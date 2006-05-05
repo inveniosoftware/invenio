@@ -67,6 +67,9 @@
 <define-tag WEBURL whitespace=delete>
 @WEBURL@
 </define-tag>
+<define-tag HTTPSURL whitespace=delete>
+@HTTPSURL@
+</define-tag>
 <define-tag DBHOST whitespace=delete>
 @DBHOST@
 </define-tag>

@@ -100,7 +100,7 @@ class Template:
 
         out = """
                 <p><big><strong class="headline">Edit parameters</strong></big></p>
-                <form method="post" action="../youraccount.py/change">
+                <form method="post" action="%(httpsurl)s/youraccount.py/change">
                 <p>%(change_user_pass)s</p>
                 <table>
                   <tr><td align="right"><strong>
@@ -152,6 +152,7 @@ class Template:
           'email_disabled' : email_disabled and "disabled" or "",
           'password' : password,
           'password_disabled' : password_disabled and "disabled" or "",
+          'httpsurl': httpsurl,
         }
         return out
 
@@ -174,7 +175,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = """
-                 <form method="post" action="../youraccount.py/change">
+                 <form method="post" action="%(httpsurl)s/youraccount.py/change">
                    <big><strong class="headline">%(edit_method)s</strong></big>
                    <p>%(explain_method)s:</p>
                    <table>
@@ -183,6 +184,7 @@ class Template:
                  'edit_method' : _("Edit login method"),
                  'explain_method' : _("Please select which login method you would like to use to authenticate yourself"),
                  'select_method' : _("Select method"),
+                 'httpsurl': httpsurl,
                }
         for system in methods:
             out += """<input type="radio" name="login_method" value="%(system)s" %(disabled)s %(selected)s>%(system)s<br>""" % {
@@ -323,7 +325,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         msg= _("""You are logged in as a guest user, so your %s will disappear at the end of the current session. If you wish you can
-               <a href="../youraccount.py/login?ln=%s">login or register here</a>.""") % (type, ln)
+               <a href="%s/youraccount.py/login?ln=%s">login or register here</a>.""") % (type, httpsurl, ln)
         return """<table class="errorbox" summary="">
                            <thead>
                             <tr>
@@ -346,7 +348,11 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        return _("""You are logged in as %s. You may want to a) <A href="../youraccount.py/logout?ln=%s">logout</A>; b) edit your <A href="../youraccount.py/edit?ln=%s">account settings</a>.""") % (user, ln, ln) + "<BR><BR>"
+        return _("""You are logged in as %(user)s. You may want to a) <A href="%(logout)s">logout</A>; b) edit your <A href="%(edit)s">account settings</a>.""") % {
+            'user': user,
+            'logout': '%s/youraccount.py/logout?ln=%s' % (httpsurl, ln),
+            'edit': '%s/youraccount.py/edit?ln=%s' % (httpsurl, ln)
+            } + "<BR><BR>"
 
     def tmpl_account_template(self, title, body, ln):
         """
@@ -760,8 +766,9 @@ class Template:
     	       <a class="userinfo" href="%(weburl)s/youraccount.py/display?ln=%(ln)s">%(session)s</a> ::
                    <a class="userinfo" href="%(weburl)s/youralerts.py/list?ln=%(ln)s">%(alerts)s</a> ::
                    <a class="userinfo" href="%(weburl)s/yourbaskets.py/display?ln=%(ln)s">%(baskets)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/youraccount.py/login?ln=%(ln)s">%(login)s</a>""" % {
+                   <a class="userinfo" href="%(httpsurl)s/youraccount.py/login?ln=%(ln)s">%(login)s</a>""" % {
                      'weburl' : weburl,
+                     'httpsurl': httpsurl,
                      'ln' : ln,
                      'guest_msg' : _("guest"),
                      'session' : _("session"),
