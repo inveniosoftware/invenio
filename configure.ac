@@ -34,9 +34,9 @@ if test -z "$WEBURL"; then
    Example: "--with-weburl=http://webserver.domain.com/doc/".])
 fi   
 
-AC_ARG_WITH(httpsurl, AC_HELP_STRING([--with-httpsurl], [specify URL where HTTPS files will be reached (e.g. https://cdsdev.cern.ch/)]), HTTPSURL=${withval})
-if test -z "${HTTPSURL}"; then
-   HTTPSURL="${WEBURL}"
+AC_ARG_WITH(sweburl, AC_HELP_STRING([--with-sweburl], [specify URL where HTTPS files will be reached (e.g. https://cdsdev.cern.ch/)]), SWEBURL=${withval})
+if test -z "${SWEBURL}"; then
+   SWEBURL="${WEBURL}"
    AC_MSG_WARN([
    You have not specified a secure URL for accessing the site. Authentification will be sent in clear text across the network.
    ])
@@ -414,7 +414,7 @@ AC_SUBST(PHP)
 AC_SUBST(PYTHON)
 AC_SUBST(CLIDIR)
 AC_SUBST(WEBURL)
-AC_SUBST(HTTPSURL)
+AC_SUBST(SWEBURL)
 AC_SUBST(DBHOST)
 AC_SUBST(DBNAME)
 AC_SUBST(DBUSER)
@@ -676,7 +676,7 @@ AC_MSG_RESULT([** Your CDS Invenio installation is now ready                    
 AC_MSG_RESULT([** for building.  You have entered the following parameters:              **]) 
 AC_MSG_RESULT([**   - CDS Invenio main install directory: ${prefix}])
 AC_MSG_RESULT([**   - Web home URL: $WEBURL])
-AC_MSG_RESULT([**   - Secure URL: $HTTPSURL])
+AC_MSG_RESULT([**   - Secure URL: $SWEBURL])
 AC_MSG_RESULT([**   - DB server: $DBHOST])
 AC_MSG_RESULT([**   - DB name: $DBNAME])
 AC_MSG_RESULT([**   - DB username: $DBUSER])
