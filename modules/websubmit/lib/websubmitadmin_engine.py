@@ -1234,6 +1234,21 @@ def _create_add_submission_form(errors, warnings, doctype, action, displayed="",
                                                                        )
     return (title, body)
 
+def _create_delete_submission_form(errors, warnings, doctype, action):
+    user_msg = []
+    title = """Delete Submission "%s" from Document Type "%s" """ % (action, doctype)
+    numrows_doctypesubmission = get_number_submissions_doctype_action(doctype=doctype, action=action)
+    if numrows_doctypesubmission > 0:
+        ## submission exists: create form to delete it:
+        body = websubmitadmin_templates.tmpl_display_delete_doctypesubmission_form(doctype=doctype, action=action)
+    else:
+        ## submission doesn't seem to exist. Display details of doctype only:
+        user_msg.append("""The Submission "%s" doesn't seem to exist for the Document Type "%s" - unable to delete it""" % (action, doctype))
+        ## TODO : LOG ERRORS
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+    return (title, body)
+
+
 def _create_edit_submission_form(errors, warnings, doctype, action, user_msg=""):
     if user_msg == "" or type(user_msg) not in (list, tuple, str, unicode):
         user_msg = []
@@ -1280,7 +1295,6 @@ def _create_edit_submission_form(errors, warnings, doctype, action, user_msg="")
         (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
     return (title, body)
 
-
 def _create_edit_category_form(errors, warnings, doctype, categid):
     title = "Edit Category Description"
     categ_details = get_all_categories_sname_lname_for_doctype_categsname(doctype=doctype, categsname=categid)
@@ -1298,7 +1312,6 @@ def _create_edit_category_form(errors, warnings, doctype, categid):
         ## TODO : LOG ERRORS
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
-    
 
 def _create_configure_doctype_form(doctype, user_msg=""):
     title = "Configure Document Type"
@@ -1444,6 +1457,50 @@ def _add_submission_to_doctype(errors, warnings, doctype, action, displayed, but
     (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)    
 
+## NICK
+def _delete_submission_from_doctype(errors, warnings, doctype, action):
+    """Delete a submission (action) from the document type identified by "doctype".
+       @param errors:  a list of errors encountered while deleting the submission
+       @param warnings: a list of warnings encountered while deleting the submission
+       @param doctype: the unique ID of the document type from which the submission is to be deleted
+       @param categid: the action ID of the submission to be deleted from doctype
+       @return: a tuple containing 2 strings: (page title, page body)
+    """
+    user_msg = []
+    ##numrows_doctypesubmission = get_number_submissions_doctype_action(doctype=doctype, action=action)
+    ## delete fields for this submission:
+    error_code = delete_all_submissionfields_submission("""%s%s""" % (action, doctype) )
+    if error_code != 0:
+        ## could not successfully delete all fields - report error
+        user_msg.append("""When deleting Submission "%s" from Document Type "%s", it wasn't possible to delete all Submission Fields""" \
+                        % (action, doctype))
+        ## TODO : LOG ERROR
+    ## delete parameters for this submission:
+    error_code = delete_functionparameters_doctype_submission(doctype=doctype, action=action)
+    if error_code != 0:
+        ## could not successfully delete all functions - report error
+        user_msg.append("""When deleting Submission "%s" from Document Type "%s", it wasn't possible to delete all Function Parameters""" \
+                        % (action, doctype))
+        ## TODO : LOG ERROR
+    ## delete functions for this submission:
+    error_code = delete_all_functions_foraction_doctype(doctype=doctype, action=action)
+    if error_code != 0:
+        ## could not successfully delete all functions - report error
+        user_msg.append("""When deleting Submission "%s" from Document Type "%s", it wasn't possible to delete all Functions""" \
+                        % (action, doctype))
+        ## TODO : LOG ERROR
+    ## delete this submission itself:
+    error_code = delete_submissiondetails_doctype(doctype=doctype, action=action)
+    if error_code == 0:
+        ## successful delete
+        user_msg.append("""The "%s" Submission has been deleted from the "%s" Document Type""" % (action, doctype))
+    else:
+        ## could not delete category
+        user_msg.append("""Unable to successfully delete the "%s" Submission from the "%s" Document Type""" % (action, doctype))
+        ## TODO : LOG ERROR
+    (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+    return (title, body)
+
 
 def _edit_submission_for_doctype(errors, warnings, doctype, action, displayed, buttonorder,
                                  statustext, level, score, stpage, endtxt):
@@ -1550,6 +1607,8 @@ def perform_request_configure_doctype(doctype,
                                       doctypecategoryeditcommit="",
                                       doctypecategorydelete="",
                                       doctypesubmissionadd="",
+                                      doctypesubmissiondelete="",
+                                      doctypesubmissiondeleteconfirm="",
                                       doctypesubmissionedit="",
                                       doctypesubmissionaddclonechosen="",
                                       doctypesubmissionadddetailscommit="",
@@ -1627,6 +1686,13 @@ def perform_request_configure_doctype(doctype,
             ## new submission should be cloned from doctype_cloneactionfrom
             (title, body) = _add_submission_to_doctype_clone(errors=errors, warnings=warnings,
                                                              doctype=doctype, action=action, clonefrom=doctype_cloneactionfrom)
+    elif doctypesubmissiondelete not in ("", None):
+        ## create form to prompt for confirmation of deletion of a submission:
+        (title, body) = _create_delete_submission_form(errors=errors, warnings=warnings, doctype=doctype, action=action)
+    elif doctypesubmissiondeleteconfirm not in ("", None):
+        ## process the deletion of a submission from the doctype concerned:
+        (title, body) = _delete_submission_from_doctype(errors=errors, warnings=warnings,
+                                                        doctype=doctype, action=action)
     elif doctypesubmissionedit not in ("", None):
         ## create form to update details of a submission
         (title, body) = _create_edit_submission_form(errors=errors, warnings=warnings, doctype=doctype, action=action)
