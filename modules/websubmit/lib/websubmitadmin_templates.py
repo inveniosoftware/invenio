@@ -1071,10 +1071,8 @@ class Template:
     def tmpl_display_delete_doctype_form(self, doctype="", alldoctypes="", user_msg=""):
         """TODO: DOCSTRING"""
         output = ""
+        output += self._create_user_message_string(user_msg)
         body_content = "<div>"
-        if user_msg != "":
-            ## Status message to display:
-            output += """<div align="center"><span class="info">%s</span></div><br>""" % (cgi.escape(user_msg, 1),)
         if doctype not in ("", None) and type(doctype) in (str, unicode):
             ## Display the confirmation message:
             body_content += """<form method="get" action="%(websubadmin_url)s/doctyperemove">""" \
@@ -1156,7 +1154,27 @@ class Template:
                                         datalist=[body_content])
         return output
 
+    def tmpl_display_delete_doctypesubmission_form(self, doctype="", action="", user_msg=""):
+        """TODO: DOCSTRING"""
+        output = ""
+        output += self._create_user_message_string(user_msg)
+        body_content = """<div>"""
+        ## Display the confirmation message:
+        body_content += """<form method="get" action="%(websubadmin_url)s/%(formaction)s">""" \
+                        """<input type="hidden" name="doctype" value="%(doctype)s" />\n""" \
+                        """<input type="hidden" name="action" value="%(action)s" />\n""" \
+                        % { 'websubadmin_url' : websubmitadmin_weburl,
+                            'formaction'      : "doctypeconfigure",
+                            'doctype'         : cgi.escape(doctype, 1),
+                            'action'          : cgi.escape(action, 1)
+                          }
+        body_content += """<div><span class="info"><i>Really</i> remove the Submission "%s" and all related details from Document Type "%s"?</span> <input name="doctypesubmissiondeleteconfirm" class="adminbutton" """ \
+                        """type="submit" value="Confirm" /></div>\n</form>\n""" % (cgi.escape(action, 1), cgi.escape(doctype, 1) )
 
+        body_content += """</div>"""
+        output += self._create_websubmitadmin_main_menu_header()
+        output += self._create_adminbox(header="""Delete Submission "%s" from Document Type "%s"\"""" % (action, doctype), datalist=[body_content])
+        return output
 
     def tmpl_display_submissiondetails_form(self,
                                             doctype,
@@ -1588,7 +1606,7 @@ class Template:
                                                """="hidden" />""" \
                                                """<input class="hyperlinkformHiddenInput" name="action" value="%(action)s" type""" \
                                                """="hidden" />""" \
-                                               """<input type="submit" name="deleteSubmission" value="delete submission" """\
+                                               """<input type="submit" name="doctypesubmissiondelete" value="delete submission" """\
                                                """class="hyperlinkformSubmitButton" />""" \
                                                """</form>""" % { 'doctype' : cgi.escape(doctype, 1),
                                                                  'action' : cgi.escape(str(subm[2]), 1),
