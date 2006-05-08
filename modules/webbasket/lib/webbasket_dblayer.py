@@ -737,7 +737,7 @@ def subscribe(uid, bskid):
         run_sql(query2 % (int(uid), int(bskid)))
         
 def unsubscribe(uid, bskid):
-    """unsubscribe to basket"""
+    """unsubscribe from basket"""
     query = "DELETE FROM user_bskBASKET WHERE id_user=%i AND id_bskBASKET=%i"
     run_sql(query % (int(uid), int(bskid)))
     

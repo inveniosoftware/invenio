@@ -370,7 +370,7 @@ class Template:
         if selected_category == cfg_webbasket_categories['EXTERNAL']:
             url = "%s/yourbaskets.py/unsubscribe?bskid=%i&amp;ln=%s" % (weburl, bskid, ln)
             action = "<a href=\"%s\">%s</a>"
-            action %= (url, _("Unsubscribe to this basket"))
+            action %= (url, _("Unsubscribe from this basket"))
             content += action
         footer = self.tmpl_basket_footer(bskid,
                                          selected_category,
@@ -646,7 +646,7 @@ class Template:
         if selected_category == cfg_webbasket_categories['EXTERNAL']:
             url = "%s/yourbaskets.py/unsubscribe?bskid=%i&amp;ln=%s" % (weburl, bskid, ln)
             action = "<a href=\"%s\">%s</a>"
-            action %= (url, _("Unsubscribe to this basket"))
+            action %= (url, _("Unsubscribe from this basket"))
             content += action
         footer = self.tmpl_basket_footer(bskid,
                                          selected_category,

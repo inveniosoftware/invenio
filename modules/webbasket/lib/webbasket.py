@@ -714,7 +714,7 @@ def perform_request_subscribe(uid, bskid):
     return errors
         
 def perform_request_unsubscribe(uid, bskid):
-    """unsubscribe to external basket bskid"""
+    """unsubscribe from external basket bskid"""
     uid = wash_url_argument(uid, 'int')
     bskid = wash_url_argument(bskid, 'int')
     unsubscribe(uid, bskid)
