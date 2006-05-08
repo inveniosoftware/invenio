@@ -877,6 +877,80 @@ def get_number_functionparameters_for_action_doctype(action, doctype):
            """WHERE par.doctype=%s AND func.action=%s"""
     return int(run_sql(q, (doctype, action))[0][0])
 
+def delete_functionparameters_doctype_submission(doctype, action):
+    def _get_list_params_to_delete(potential_delete_params, keep_params):
+        del_params = []
+        for param in potential_delete_params:
+            if param[0] not in keep_params and param[0] != "":
+                ## this parameter is not used by the other actions - it can be deleted
+                del_params.append(param[0])
+        return del_params
+
+    ## get the parameters belonging to the given submission of the doctype:
+    params_doctype_action = get_functionparameternames_doctype_action(doctype=doctype, action=action)
+    ## get all parameters for the given doctype that belong to submissions OTHER than the submission for which we must
+    ## delete parameters:
+    params_doctype_other_actions = get_functionparameternames_doctype_not_action(doctype=doctype, action=action)
+    ## "params_doctype_not_action" is a tuple of tuples, where each tuple contains only the parameter name: ((param,),(param,))
+    ## make a tuple of strings, instead of this tuple of tuples:
+    params_to_keep = map(lambda x: (type(x[0]) in (str, unicode) and x[0]) or (""), params_doctype_other_actions)
+    delete_params = _get_list_params_to_delete(potential_delete_params=params_doctype_action, keep_params=params_to_keep)
+    ## now, if there are parameters to delete, do it:
+    if len(delete_params) > 0:
+        q = """DELETE FROM sbmPARAMETERS WHERE doctype=%s AND (name=%s"""
+        if len(delete_params) > 1:
+            for i in range(1, len(delete_params)):
+                q += """ OR name=%s"""
+        q += """)"""
+        run_sql(q, [doctype,] + delete_params)
+        params_remaining_doctype_action = get_functionparameternames_doctype_action(doctype=doctype, action=action)
+        if len(_get_list_params_to_delete(potential_delete_params=params_remaining_doctype_action, keep_params=params_to_keep)) == 0:
+            ## Everything OK - all parameters deleted
+            return 0
+        else:
+            ## Everything NOT OK - some parameters remain: try one final time to delete them
+            run_sql(q, [doctype,] + delete_params)
+            params_remaining_doctype_action = get_functionparameternames_doctype_action(doctype=doctype, action=action)
+            if len(_get_list_params_to_delete(potential_delete_params=params_remaining_doctype_action, keep_params=params_to_keep)) > 0:
+                ## Everything OK - deleted successfully this time
+                return 0
+            else:
+                ## Still unable to delete - give up
+                return 1
+    ## no parameters to delete
+    return 0
+
+def get_functionparameternames_doctype_action(doctype, action):
+    """Get the unique NAMES function parameters for a given action of a given doctype.
+       @param doctype: the document type with which the parameters are associated
+       @param action: the action (of "doctype") with which the parameters are associated
+       @return: a tuple of tuples, where each tuple represents a parameter name:
+        (parameter name, parameter value, doctype)
+    """
+    q = """SELECT DISTINCT(par.name) FROM sbmFUNDESC AS fundesc """ \
+           """LEFT JOIN sbmPARAMETERS AS par ON fundesc.param = par.name """ \
+           """LEFT JOIN sbmFUNCTIONS AS func ON par.doctype = func.doctype AND fundesc.function = func.function """ \
+           """WHERE par.doctype=%s AND func.action=%s """\
+           """GROUP BY par.name """ \
+           """ORDER BY fundesc.function ASC, par.name ASC"""
+    return run_sql(q, (doctype, action))
+
+def get_functionparameternames_doctype_not_action(doctype, action):
+    """Get the unique NAMES function parameters for a given action of a given doctype.
+       @param doctype: the document type with which the parameters are associated
+       @param action: the action (of "doctype") with which the parameters are associated
+       @return: a tuple of tuples, where each tuple represents a parameter name:
+        (parameter name, parameter value, doctype)
+    """
+    q = """SELECT DISTINCT(par.name) FROM sbmFUNDESC AS fundesc """ \
+           """LEFT JOIN sbmPARAMETERS AS par ON fundesc.param = par.name """ \
+           """LEFT JOIN sbmFUNCTIONS AS func ON par.doctype = func.doctype AND fundesc.function = func.function """ \
+           """WHERE par.doctype=%s AND func.action <> %s """\
+           """GROUP BY par.name """ \
+           """ORDER BY fundesc.function ASC, par.name ASC"""
+    return run_sql(q, (doctype, action))
+
+
 def get_functionparameters_for_action_doctype(action, doctype):
     """Get the details of all function parameter values for a given action of a given doctype.
        @param doctype: the document type with which the parameter values are associated
