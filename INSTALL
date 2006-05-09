@@ -51,9 +51,10 @@ Contents
         ``my.cnf'' init file to at least 4M.
           <http://mysql.com/>
 
-     c) Apache 2 server, with support for loading DSO modules.
-        Tested mainly with version 2.0.43 and above.  Apache 2 is
-        required for the mod_python module (see below).  
+     c) Apache 2 server, with support for loading DSO modules, and
+        optionally with SSL support for HTTPS-secure user
+        authentication.  Tested mainly with version 2.0.43 and above.
+        Apache 2.x is required for the mod_python module (see below).
           <http://httpd.apache.org/>
 
         Note for FreeBSD users: Thierry Thomas <thierry@FreeBSD.org>
@@ -192,6 +193,7 @@ Contents
       $ cd cds-invenio-0.90
       $ ./configure --prefix=/opt/cds-invenio \
                     --with-weburl=http://webserver.domain.com \
+                    --with-sweburl=https://webserver.domain.com \
                     --with-dbhost=sqlserver.domain.com \
                     --with-dbname=cdsinvenio \
                     --with-dbuser=cdsinvenio \
@@ -264,6 +266,7 @@ Contents
 
       $ ./configure --prefix=/opt/cds-invenio \
                     --with-weburl=http://webserver.domain.com \
+                    --with-sweburl=https://webserver.domain.com \
                     --with-dbhost=sqlserver.domain.com \
                     --with-dbname=cdsinvenio \
                     --with-dbuser=cdsinvenio \
@@ -293,6 +296,18 @@ Contents
                  located in `prefix/var/www', so later on in your
                  Apache config file you would map `weburl' to
                  `prefix/var/www' (see below).
+
+             --with-sweburl=https://webserver.domain.com
+
+                 The URL denoting the HTTPS-secure equivalent of the
+                 home URL.  The secure home URL will be used for
+                 personalization pages, such as user login and
+                 registration page.  You must run SSL-enabled Apache
+                 in order to use this feature.  If you don't run
+                 SSL-enabled Apache, then the user authentication will
+                 be done via standard HTTP protocol, user credentials
+                 travelling in clear text across the net.  The
+                 --with-sweburl option is optional.
 
              --with-dbhost=sqlserver.domain.com
              --with-dbname=cdsinvenio
@@ -413,10 +428,40 @@ Contents
                               PythonDebug On
                       </Directory>
               </VirtualHost>
-              
+             
           This will tell Apache where to find the files, how to
           interpret .py files, which files to serve as indexes, etc.
-            
+
+          If you have configured the system to use secure URL for
+          login (see above), then you have to specify secure site too,
+          such as:
+
+              ServerSignature Off
+              ServerTokens Prod
+              NameVirtualHost *:443
+              SSLCertificateFile /etc/apache2/ssl/apache.pem
+              <VirtualHost *:443>
+                      ServerName webserver.domain.com
+                      ServerAdmin cds.support@cern.ch
+                      SSLEngine on
+                      DocumentRoot /opt/cds-invenio/var/www
+                      <Directory /opt/cds-invenio/var/www>
+                              Options Indexes FollowSymLinks MultiViews
+                              AllowOverride None
+                              Order allow,deny
+                              allow from all
+                      </Directory>
+                      ErrorLog /opt/cds-invenio/var/log/apache-ssl.err
+                      LogLevel warn
+                      CustomLog /opt/cds-invenio/var/log/apache-ssl.log combined
+                      DirectoryIndex index.en.html index.html index.py index.en.php index.php
+                      <Directory /opt/cds-invenio/var/www>
+                              AddHandler python-program .py
+                              PythonHandler mod_python.publisher
+                              PythonDebug On
+                      </Directory>
+              </VirtualHost>
+                                
       $ sudo vi /path/to/php/conf/php.ini ## see below in part 2
 
           Please ask your webserver administrator to put the following
