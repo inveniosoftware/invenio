@@ -20,25 +20,26 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.89.0.20060502, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.89.0.20060502)
+AC_INIT(cds-invenio, 0.89.0.20060509, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.89.0.20060509)
 
 ## Check for install:
 AC_PROG_INSTALL
 
 ## Define WEBURL URL:
-AC_ARG_WITH(weburl, AC_HELP_STRING([--with-weburl], [specify URL where web files will be reached (e.g. http://webserver.domain.com/doc/)]), WEBURL=${withval})
+AC_ARG_WITH(weburl, AC_HELP_STRING([--with-weburl], [specify URL where web files will be reached (e.g. http://webserver.domain.com)]), WEBURL=${withval})
 if test -z "$WEBURL"; then
    AC_MSG_ERROR([
    You have not used the "--with-weburl" argument that should define the corresponding URL where the site will be reached.  
    Example: "--with-weburl=http://webserver.domain.com/doc/".])
 fi   
 
-AC_ARG_WITH(sweburl, AC_HELP_STRING([--with-sweburl], [specify URL where HTTPS files will be reached (e.g. https://cdsdev.cern.ch/)]), SWEBURL=${withval})
+AC_ARG_WITH(sweburl, AC_HELP_STRING([--with-sweburl], [specify URL where HTTPS files will be reached (e.g. https://webserver.domain.com)]), SWEBURL=${withval})
 if test -z "${SWEBURL}"; then
    SWEBURL="${WEBURL}"
    AC_MSG_WARN([
-   You have not specified a secure URL for accessing the site. Authentification will be sent in clear text across the network.
+   You have not specified secure URL for accessing the site (--with-sweburl). 
+   User authentication will be done in clear text across the network.
    ])
 fi   
 
@@ -672,11 +673,11 @@ AC_OUTPUT
 
 ## Write help:
 AC_MSG_RESULT([****************************************************************************])
-AC_MSG_RESULT([** Your CDS Invenio installation is now ready                             **]) 
-AC_MSG_RESULT([** for building.  You have entered the following parameters:              **]) 
+AC_MSG_RESULT([** Your CDS Invenio installation is now ready for building.               **]) 
+AC_MSG_RESULT([** You have entered the following parameters:                             **]) 
 AC_MSG_RESULT([**   - CDS Invenio main install directory: ${prefix}])
 AC_MSG_RESULT([**   - Web home URL: $WEBURL])
-AC_MSG_RESULT([**   - Secure URL: $SWEBURL])
+AC_MSG_RESULT([**   - Secure web home URL: $SWEBURL])
 AC_MSG_RESULT([**   - DB server: $DBHOST])
 AC_MSG_RESULT([**   - DB name: $DBNAME])
 AC_MSG_RESULT([**   - DB username: $DBUSER])
