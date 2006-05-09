@@ -59,6 +59,7 @@ def edit(req, ln=cdslang):
                 description="CDS Personalize, Your Settings",
                 keywords="CDS, personalize",
                 uid=uid,
+                secure_page_p = 1,
                 language=ln,
                 lastupdated=__lastupdated__)
 
@@ -122,6 +123,7 @@ def change(req,email=None,password=None,password2=None,login_method="",ln=cdslan
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
+                secure_page_p = 1,
                 language=ln,
                 lastupdated=__lastupdated__)
 
@@ -140,6 +142,7 @@ def lost(req, ln=cdslang):
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
+                secure_page_p = 1,
                 language=ln,
                 lastupdated=__lastupdated__)
 
@@ -158,6 +161,7 @@ def display(req, ln=cdslang):
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
                     uid=uid,
+                    secure_page_p = 1,
                     language=ln,
                     lastupdated=__lastupdated__)
 
@@ -171,6 +175,7 @@ def display(req, ln=cdslang):
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
+                secure_page_p = 1,
                 language=ln,
                 lastupdated=__lastupdated__)
 
@@ -194,6 +199,7 @@ def send_email(req, p_email=None, ln=cdslang):
                         description="CDS Personalize, Main page",
                         keywords="CDS, personalize",
                         uid=uid,
+                        secure_page_p = 1,
                         language=ln,
                         lastupdated=__lastupdated__)
 
@@ -205,6 +211,7 @@ def send_email(req, p_email=None, ln=cdslang):
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
                     uid=uid,
+                    secure_page_p = 1,
                     language=ln,
                     lastupdated=__lastupdated__)
 
@@ -230,6 +237,7 @@ def send_email(req, p_email=None, ln=cdslang):
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
                     uid=uid,
+                    secure_page_p = 1,
                     language=ln,
                     lastupdated=__lastupdated__)
 
@@ -239,6 +247,7 @@ def send_email(req, p_email=None, ln=cdslang):
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
+                secure_page_p = 1,
                 language=ln,
                 lastupdated=__lastupdated__)
 
@@ -257,6 +266,7 @@ def youradminactivities(req, ln=cdslang):
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
+                secure_page_p = 1,
                 language=ln,
                 lastupdated=__lastupdated__)
 
@@ -275,6 +285,7 @@ def delete(req, ln=cdslang):
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
+                secure_page_p = 1,
                 language=ln,
                 lastupdated=__lastupdated__)
 
@@ -294,6 +305,7 @@ def logout(req, ln=cdslang):
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
+                secure_page_p = 1,
                 language=ln,
                 lastupdated=__lastupdated__)
 
@@ -316,6 +328,7 @@ def login(req, p_email=None, p_pw=None, login_method=None, action='login', refer
                         description="CDS Personalize, Main page",
                         keywords="CDS, personalize",
                         uid=uid,
+                        secure_page_p = 1,
                         language=ln,
                         lastupdated=__lastupdated__)
         (iden, p_email, p_pw, msgcode) = webuser.loginUser(req,p_email,p_pw, login_method)
@@ -345,6 +358,7 @@ def login(req, p_email=None, p_pw=None, login_method=None, action='login', refer
                         description="CDS Personalize, Main page",
                         keywords="CDS, personalize",
                         uid=uid,
+                        secure_page_p = 1,
                         language=ln,
                         lastupdated=__lastupdated__)
     else:
@@ -367,6 +381,7 @@ def register(req, p_email=None, p_pw=None, p_pw2=None, action='login', referer='
                      description="CDS Personalize, Main page",
                      keywords="CDS, personalize",
                      uid=uid,
+                     secure_page_p = 1,
                      language=ln,
                      lastupdated=__lastupdated__)
 
@@ -406,5 +421,6 @@ def register(req, p_email=None, p_pw=None, p_pw2=None, action='login', referer='
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
+                secure_page_p = 1,
                 language=ln,
                 lastupdated=__lastupdated__)
