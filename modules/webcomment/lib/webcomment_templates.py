@@ -29,6 +29,7 @@ from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.config import weburl, \
+                           sweburl, \
                            cdslang, \
                            cdsnameintl,\
                            cfg_webcomment_nb_reviews_in_detailed_view, \
@@ -779,7 +780,7 @@ class Template:
             note = _("Note: Your nickname, <i>%s</i>, will be displayed as author of this comment") % nickname
         else:
             (uid, nickname, display) = get_user_info(uid)
-            link = '<a href="%s/youraccount.py/edit">' % weburl
+            link = '<a href="%s/youraccount.py/edit">' % sweburl
             note = _("Note: you currently haven't %sdefined a nickname%s.<br /><i>%s</i> will temporarly be displayed as author of this comment.")
             note %= (link, '</a>', display)
 

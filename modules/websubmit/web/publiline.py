@@ -27,7 +27,7 @@ import re
 import MySQLdb
 import shutil
 
-from invenio.config import cdsname,cdslang,supportemail,pylibdir
+from invenio.config import cdsname,cdslang,supportemail,pylibdir, sweburl
 from invenio.dbquery import run_sql
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import *
@@ -69,8 +69,8 @@ def index(req,c=cdsname,ln=cdslang,doctype="",categ="",RN="",send=""):
     else:
         t = displayDocument(doctype,categ,RN,send, ln)
     return page(title="publication line",
-                navtrail= """<a class="navtrail" href="%(weburl)s/youraccount.py/display">%(account)s</a>""" % {
-                             'weburl' : weburl,
+                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount.py/display">%(account)s</a>""" % {
+                             'sweburl' : sweburl,
                              'account' : _("Your Account"),
                           },
                 body=t,

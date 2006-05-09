@@ -28,7 +28,7 @@ import urllib
 import time
 from mod_python import apache
 
-from invenio.config import weburl, cdslang, cdsname
+from invenio.config import weburl, sweburl, cdslang, cdsname
 from invenio.webpage import page
 from invenio import webalert
 from invenio.webuser import getUid, page_not_authorized
@@ -59,8 +59,8 @@ def display(req, p="n", ln = cdslang):
 
     return page(title=_("Display searches"),
                 body=webalert.perform_display(p,uid, ln = ln),
-                navtrail= """<a class="navtrail" href="%(weburl)s/youraccount.py/display">%(account)s</a>""" % {
-                             'weburl' : weburl,
+                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount.py/display">%(account)s</a>""" % {
+                             'sweburl' : sweburl,
                              'account' : _("Your Account"),
                           },
                 description="CDS Personalize, Display searches",
@@ -87,8 +87,8 @@ def input(req, idq, name="", freq="week", notif="y", idb=0, error_msg="", ln = c
                )
     return page(title=_("Set a new alert"),
                 body=html,
-                navtrail= """<a class="navtrail" href="%(weburl)s/youraccount.py/display">%(account)s</a>""" % {
-                             'weburl' : weburl,
+                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount.py/display">%(account)s</a>""" % {
+                             'sweburl' : sweburl,
                              'account' : _("Your Account"),
                           },
                 description="CDS Personalize, Set a new alert",
@@ -115,8 +115,8 @@ def modify(req, idq, old_idb, name="", freq="week", notif="y", idb=0, error_msg=
                )
     return page(title=_("Modify alert settings"),
                 body=html,
-                navtrail= """<a class="navtrail" href="%(weburl)s/youraccount.py/display">%(account)s</a>""" % {
-                             'weburl' : weburl,
+                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount.py/display">%(account)s</a>""" % {
+                             'sweburl' : sweburl,
                              'account' : _("Your Account"),
                           },
                 description="CDS Personalize, Modify alert settings",
@@ -136,8 +136,8 @@ def list(req, ln = cdslang):
 
     return page(title=_("Display alerts"),
                 body=webalert.perform_list_alerts(uid, ln = ln),
-                navtrail= """<a class="navtrail" href="%(weburl)s/youraccount.py/display">%(account)s</a>""" % {
-                             'weburl' : weburl,
+                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount.py/display">%(account)s</a>""" % {
+                             'sweburl' : sweburl,
                              'account' : _("Your Account"),
                           },
                 description="CDS Personalize, Display alerts",
@@ -161,8 +161,8 @@ def add(req, name, freq, notif, idb, idq, ln = cdslang):
         return input(req, idq, name, freq, notif, idb, e, ln = ln)
     return page(title=_("Display alerts"),
                 body=html,
-                navtrail= """<a class="navtrail" href="%(weburl)s/youraccount.py/display">%(account)s</a>""" % {
-                             'weburl' : weburl,
+                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount.py/display">%(account)s</a>""" % {
+                             'sweburl' : sweburl,
                              'account' : _("Your Account"),
                           },
                 description="CDS Personalize, Display alerts",
@@ -186,8 +186,8 @@ def update(req, name, freq, notif, idb, idq, old_idb, ln = cdslang):
         return modify(req, idq, old_idb, name, freq, notif, idb, e, ln = ln)
     return page(title=_("Display alerts"),
                 body=html,
-                navtrail= """<a class="navtrail" href="%(weburl)s/youraccount.py/display">%(account)s</a>""" % {
-                             'weburl' : weburl,
+                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount.py/display">%(account)s</a>""" % {
+                             'sweburl' : sweburl,
                              'account' : _("Your Account"),
                           },
                 description="CDS Personalize, Display alerts",
@@ -207,8 +207,8 @@ def remove(req, name, idu, idq, idb, ln = cdslang):
 
     return page(title=_("Display alerts"),
                 body=webalert.perform_remove_alert(name, idu, idq, idb, uid, ln = ln),
-                navtrail= """<a class="navtrail" href="%(weburl)s/youraccount.py/display">%(account)s</a>""" % {
-                             'weburl' : weburl,
+                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount.py/display">%(account)s</a>""" % {
+                             'sweburl' : sweburl,
                              'account' : _("Your Account"),
                           },
                 description="CDS Personalize, Display alerts",

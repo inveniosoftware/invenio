@@ -27,7 +27,7 @@ from mod_python import apache
 import smtplib
 
 from invenio import webuser
-from invenio.config import weburl, cdsname, cdslang, supportemail
+from invenio.config import weburl, sweburl, cdsname, cdslang, supportemail
 from invenio.webpage import page
 from invenio import webaccount
 from invenio import webbasket
@@ -55,7 +55,7 @@ def edit(req, ln=cdslang):
     passw = data[1]
     return page(title= _("Your Settings"),
                 body=webaccount.perform_set(email,passw, ln),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (sweburl, ln) + _("Your Account") + """</a>""",
                 description="CDS Personalize, Your Settings",
                 keywords="CDS, personalize",
                 uid=uid,
@@ -118,7 +118,7 @@ def change(req,email=None,password=None,password2=None,login_method="",ln=cdslan
 
     return page(title=title,
  	        body=webaccount.perform_back(mess,act, linkname, ln),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (sweburl, ln) + _("Your Account") + """</a>""",
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
@@ -136,7 +136,7 @@ def lost(req, ln=cdslang):
 
     return page(title=_("Lost your password?"),
                 body=webaccount.perform_lost(ln),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (sweburl, ln) + _("Your Account") + """</a>""",
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
@@ -214,7 +214,7 @@ def send_email(req, p_email=None, ln=cdslang):
     sub = "Subject: %s %s\n\n" % (_("Credentials for"), cdsname)
     body = "%s %s:\n\n" % (_("Here are your user credentials for"), cdsname)
     body += "   %s: %s\n   %s: %s\n\n" % (_("username"), p_email, _("password"), passw)
-    body += "%s %s/youraccount.py/login?ln=%s" % (_("You can login at"), weburl, ln)
+    body += "%s %s/youraccount.py/login?ln=%s" % (_("You can login at"), sweburl, ln)
     msg = to + sub + body
 
     server = smtplib.SMTP('localhost')
@@ -253,7 +253,7 @@ def youradminactivities(req, ln=cdslang):
 
     return page(title=_("Your Administrative Activities"),
                 body=webaccount.perform_youradminactivities(uid, ln),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (sweburl, ln) + _("Your Account") + """</a>""",
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
@@ -271,7 +271,7 @@ def delete(req, ln=cdslang):
 
     return page(title=_("Delete Account"),
                 body=webaccount.perform_delete(ln),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (sweburl, ln) + _("Your Account") + """</a>""",
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
@@ -290,7 +290,7 @@ def logout(req, ln=cdslang):
 
     return page(title=_("Logout"),
                 body=webaccount.perform_logout(req, ln),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (sweburl, ln) + _("Your Account") + """</a>""",
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,
@@ -312,7 +312,7 @@ def login(req, p_email=None, p_pw=None, login_method=None, action='login', refer
         if p_email==None or not login_method:
             return page(title=_("Login"),
                         body=webaccount.create_login_page_box(referer, ln),
-                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
+                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (sweburl, ln) + _("Your Account") + """</a>""",
                         description="CDS Personalize, Main page",
                         keywords="CDS, personalize",
                         uid=uid,
@@ -341,7 +341,7 @@ def login(req, p_email=None, p_pw=None, login_method=None, action='login', refer
             act = "login"
             return page(title=_("Login"),
                         body=webaccount.perform_back(mess,act, _("login"), ln),
-                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
+                        navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (sweburl, ln) + _("Your Account") + """</a>""",
                         description="CDS Personalize, Main page",
                         keywords="CDS, personalize",
                         uid=uid,
@@ -363,7 +363,7 @@ def register(req, p_email=None, p_pw=None, p_pw2=None, action='login', referer='
     if p_email==None:
         return  page(title=_("Register"),
                      body=webaccount.create_register_page_box(referer, ln),
-                     navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
+                     navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (sweburl, ln) + _("Your Account") + """</a>""",
                      description="CDS Personalize, Main page",
                      keywords="CDS, personalize",
                      uid=uid,
@@ -386,7 +386,7 @@ def register(req, p_email=None, p_pw=None, p_pw2=None, action='login', referer='
             mess += _(" A second email will be sent when the account has been activated and can be used.")
         else:
             mess += _(""" You can now access your <a href="%s">account</a>.""") % (
-                      "%s/youraccount.py/display?ln=%s" % (weburl, ln))
+                      "%s/youraccount.py/display?ln=%s" % (sweburl, ln))
     elif ruid == -1:
         mess = _("The user already exists in the database, please try again.")
         act = "register"
@@ -402,7 +402,7 @@ def register(req, p_email=None, p_pw=None, p_pw2=None, action='login', referer='
 
     return page(title=title,
                 body=webaccount.perform_back(mess,act, (act == 'register' and _("register") or ""), ln),
-                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (weburl, ln) + _("Your Account") + """</a>""",
+                navtrail="""<a class="navtrail" href="%s/youraccount.py/display?ln=%s">""" % (sweburl, ln) + _("Your Account") + """</a>""",
                 description="CDS Personalize, Main page",
                 keywords="CDS, personalize",
                 uid=uid,

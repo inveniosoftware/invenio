@@ -296,7 +296,7 @@ class Template:
              &nbsp;
        </td>
        <td class="headermoduleboxbody">
-             <a class=header href="%(weburl)s/youraccount.py/display?ln=%(ln)s">%(msg_personalize)s</a>
+             <a class=header href="%(sweburl)s/youraccount.py/display?ln=%(ln)s">%(msg_personalize)s</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
@@ -325,6 +325,7 @@ class Template:
 </div>
         """ % {
           'weburl' : weburl,
+          'sweburl' : sweburl,
           'ln' : ln,
 
           'sitename' : sitename,
@@ -390,7 +391,7 @@ class Template:
 %(pagefooteradd)s
 <!-- replaced page footer -->
  <div class="pagefooterstripeleft">
-  %(sitename)s&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/?ln=%(ln)s">%(msg_search)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/submit.py?ln=%(ln)s">%(msg_submit)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/youraccount.py/display?ln=%(ln)s">%(msg_personalize)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/help/index.%(ln)s.html">%(msg_help)s</a>
+  %(sitename)s&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/?ln=%(ln)s">%(msg_search)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/submit.py?ln=%(ln)s">%(msg_submit)s</a>&nbsp;::&nbsp;<a class="footer" href="%(sweburl)s/youraccount.py/display?ln=%(ln)s">%(msg_personalize)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/help/index.%(ln)s.html">%(msg_help)s</a>
   <br>
   %(msg_poweredby)s <a class="footer" href="http://cdsware.cern.ch/">CDS Invenio</a> v%(version)s
   <br>
@@ -407,6 +408,7 @@ class Template:
 </html>
         """ % {
           'weburl' : weburl,
+          'sweburl' : sweburl,
           'ln' : ln,
 
           'sitename' : sitename,

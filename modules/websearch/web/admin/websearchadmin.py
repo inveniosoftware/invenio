@@ -25,7 +25,7 @@ import sys
 import invenio.websearchadminlib as wsc
 #reload(wsc)
 from invenio.webpage import page, create_error_box
-from invenio.config import weburl,cdslang
+from invenio.config import weburl, sweburl, cdslang
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import gettext_set_language
 
@@ -635,7 +635,7 @@ def addexistingfield(req, colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', call
                 uid=uid,
                 body=wsc.adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount.py/login?referer=%s/admin/websearch/">login</a> with another account.""" % (weburl, weburl)]),
+                                     <a href="%s/youraccount.py/login?referer=%s/admin/websearch/">login</a> with another account.""" % (sweburl, weburl)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
     
@@ -665,7 +665,7 @@ def rearrangefield(req, colID, ln=cdslang, fmeth='', callback='yes', confirm=-1)
                 uid=uid,
                 body=wsc.adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount.py/login?referer=%s/admin/websearch/">login</a> with another account.""" % (weburl, weburl)]),
+                                     <a href="%s/youraccount.py/login?referer=%s/admin/websearch/">login</a> with another account.""" % (sweburl, weburl)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -695,7 +695,7 @@ def addexistingfieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm
                 uid=uid,
                 body=wsc.adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount.py/login?referer=%s/admin/websearch/">login</a> with another account.""" % (weburl, weburl)]),
+                                     <a href="%s/youraccount.py/login?referer=%s/admin/websearch/">login</a> with another account.""" % (sweburl, weburl)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -725,7 +725,7 @@ def rearrangefieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm=-
                 uid=uid,
                 body=wsc.adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount.py/login?referer=%s/admin/websearch/">login</a> with another account.""" % (weburl, weburl)]),
+                                     <a href="%s/youraccount.py/login?referer=%s/admin/websearch/">login</a> with another account.""" % (sweburl, weburl)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -911,7 +911,7 @@ def addexistingportalbox(req, colID, ln=cdslang, pbxID=-1, score=0, position='',
                 uid=uid,
                 body=wsc.adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount.py/login?referer=%s/admin/websearch/">login</a> with another account.""" % (weburl, weburl)]),
+                                     <a href="%s/youraccount.py/login?referer=%s/admin/websearch/">login</a> with another account.""" % (sweburl, weburl)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
