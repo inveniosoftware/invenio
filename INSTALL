@@ -289,7 +289,7 @@ Contents
                  since only one subdirectory (prefix/var/www) is to be
                  accessible directly on the Web (see below).
 
-             --with-weburl=http://webserver.domain.com
+              --with-weburl=http://webserver.domain.com
 
                  The URL denoting the home URL of your CDS Invenio
                  installation.  The files served by this URL will be
@@ -297,7 +297,7 @@ Contents
                  Apache config file you would map `weburl' to
                  `prefix/var/www' (see below).
 
-             --with-sweburl=https://webserver.domain.com
+              --with-sweburl=https://webserver.domain.com
 
                  The URL denoting the HTTPS-secure equivalent of the
                  home URL.  The secure home URL will be used for
@@ -309,10 +309,10 @@ Contents
                  travelling in clear text across the net.  The
                  --with-sweburl option is optional.
 
-             --with-dbhost=sqlserver.domain.com
-             --with-dbname=cdsinvenio
-             --with-dbuser=cdsinvenio
-             --with-dbpass=myp1ss 
+              --with-dbhost=sqlserver.domain.com
+              --with-dbname=cdsinvenio
+              --with-dbuser=cdsinvenio
+              --with-dbpass=myp1ss 
 
                  The database server host, the database name, and the
                  database user credentials.
