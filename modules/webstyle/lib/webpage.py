@@ -54,7 +54,7 @@ def create_navtrailbox_body(title,
                                                     prolog = prolog,
                                                     epilog = epilog)
 
-def page(title, body, navtrail="", description="", keywords="", uid=0, cdspageheaderadd="", cdspageboxlefttopadd="", cdspageboxleftbottomadd="", cdspageboxrighttopadd="", cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="", language=cdslang, urlargs="", verbose=1, titleprologue="", titleepilogue="", req=None, errors=[], warnings=[]):
+def page(title, body, navtrail="", description="", keywords="", uid=0, cdspageheaderadd="", cdspageboxlefttopadd="", cdspageboxleftbottomadd="", cdspageboxrighttopadd="", cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="", language=cdslang, urlargs="", verbose=1, titleprologue="", titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[]):
     """page(): display CDS web page
         input: title of the page
                body of the page in html format
@@ -75,6 +75,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagehe
                req is the mod_python request
                errors is the list of error codes as defined in the moduleName_config.py file of the calling module
                log is the string of data that should be appended to the log file (errors automatically logged)
+               secure_page_p is 0 or 1 and tells whether we are to use HTTPS friendly page elements or not
        output: the final cds page with header, footer, etc.
     """
 
@@ -106,6 +107,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagehe
                                         userinfobox = create_userinfobox_body(uid, language),
                                         navtrailbox = create_navtrailbox_body(title, navtrail, language=language),                                        
                                         uid = uid,
+                                        secure_page_p = secure_page_p,
                                         # pageheader = cdspageheader,
                                         pageheaderadd = cdspageheaderadd,                                        
                                         boxlefttop = cdspageboxlefttop,
@@ -126,7 +128,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagehe
                                         lastupdated = lastupdated,
                                         pagefooteradd = cdspagefooteradd)
 
-def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspageheaderadd="", language=cdslang, urlargs="", verbose=1):
+def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspageheaderadd="", language=cdslang, urlargs="", secure_page_p=0, verbose=1):
     """Return just the beginning of page(), with full headers.
        Suitable for the search results page and any long-taking scripts."""
 
@@ -139,7 +141,8 @@ def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspa
                                               keywords = keywords,                                              
                                               userinfobox = create_userinfobox_body(uid, language),
                                               navtrailbox = create_navtrailbox_body(title, navtrail, language=language),                                              
-                                              uid = uid,                                             
+                                              uid = uid,
+                                              secure_page_p = secure_page_p,
                                               # pageheader = cdspageheader,
                                               pageheaderadd = cdspageheaderadd,
                                               languagebox = webstyle_templates.tmpl_language_selection_box(urlargs, language))

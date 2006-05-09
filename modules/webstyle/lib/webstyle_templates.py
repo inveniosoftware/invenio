@@ -85,6 +85,7 @@ class Template:
                   version = "", lastupdated = None, languagebox = "",
                   pagefooteradd = "",
                   uid = 0,
+                  secure_page_p = 0
                  ):
         """Creates a complete page
 
@@ -138,6 +139,8 @@ class Template:
 
           - 'pagefooteradd' *string* - additional page footer HTML code
 
+          - 'secure_page_p' *int* (0 or 1) - are we to use HTTPS friendly page elements or not?
+
            Output:
 
           - HTML code of the page
@@ -162,6 +165,7 @@ class Template:
                   navtrailbox = navtrailbox,
                   pageheaderadd = pageheaderadd,
                   languagebox = languagebox,
+                  secure_page_p = secure_page_p
               ) + """
 <div class="pagebody">
   <div class="pagebodystripeleft">
@@ -213,6 +217,7 @@ class Template:
                           userinfobox = "", navtrailbox = "",
                           pageheaderadd = "", languagebox = "",
                           uid = 0,
+                          secure_page_p = 0
                        ):
         """Creates a page header
 
@@ -240,6 +245,8 @@ class Template:
 
           - 'languagebox' *string* - the HTML code for the language box
 
+          - 'secure_page_p' *int* (0 or 1) - are we to use HTTPS friendly page elements or not?
+
            Output:
 
           - HTML code of the page headers
@@ -255,7 +262,7 @@ class Template:
 <head>
  <title>%(sitename)s: %(headertitle)s</title>
  <link rev="made" href="mailto:%(supportemail)s">
- <link rel="stylesheet" href="%(weburl)s/img/cds.css">
+ <link rel="stylesheet" href="%(cssurl)s/img/cds.css">
  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
  <meta name="description" content="%(description)s">
  <meta name="keywords" content="%(keywords)s">
@@ -326,6 +333,7 @@ class Template:
         """ % {
           'weburl' : weburl,
           'sweburl' : sweburl,
+          'cssurl' : secure_page_p and sweburl or weburl,
           'ln' : ln,
 
           'sitename' : sitename,
