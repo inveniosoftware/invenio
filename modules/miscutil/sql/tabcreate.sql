@@ -2505,8 +2505,18 @@ CREATE TABLE IF NOT EXISTS bskEXTREC (
   id int(15) unsigned NOT NULL default '0',
   creation_date datetime NOT NULL default '0000-00-00 00:00:00',
   modification_date datetime NOT NULL default '0000-00-00 00:00:00',
-  PRIMARY KEY  (id),
-  KEY id (id)
+  PRIMARY KEY  (id)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS bskEXTFMT (  
+   id int(15) unsigned NOT NULL auto_increment,
+   id_bskEXTREC int(15) unsigned NOT NULL default '0',
+   format varchar(10) NOT NULL default '',
+   last_updated datetime NOT NULL default '0000-00-00 00:00:00',
+   value longblob,
+   PRIMARY KEY (id),
+   KEY id_bskEXTREC (id_bskEXTREC),
+   KEY format (format)
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS user_bskBASKET (
@@ -2539,7 +2549,6 @@ CREATE TABLE IF NOT EXISTS bskRECORDCOMMENT (
   date_creation datetime NOT NULL default '0000-00-00 00:00:00',
   priority int(15) NOT NULL default '0',
   PRIMARY KEY  (id),
-  KEY id (id),
   KEY id_bskBASKET (id_bskBASKET),
   KEY id_bibrec_or_bskEXTREC (id_bibrec_or_bskEXTREC),
   KEY date_creation (date_creation)
