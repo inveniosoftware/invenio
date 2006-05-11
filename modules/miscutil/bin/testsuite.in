@@ -24,34 +24,24 @@
 
 __version__ = "$Id$"
 
-try:
-    import getopt
-    import unittest
-    import sys
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+import getopt
+import unittest
+import sys
 
-try:
-    from invenio.config import version
-    from invenio import search_engine_tests 
-    from invenio import bibindex_engine_tests 
-    from invenio import bibindex_engine_stemmer_tests 
-    from invenio import bibrecord_tests 
-    from invenio import bibrank_citation_indexer_tests
-    from invenio import bibrank_citation_searcher_tests
-    from invenio import bibrank_downloads_indexer_tests
-    from invenio import bibrank_record_sorter_tests
-    from invenio import bibrank_tag_based_indexer_tests
-    from invenio import oai_repository_tests 
-    from invenio import bibconvert_tests 
-    from invenio import errorlib_tests
-    from invenio import elmsubmit_tests
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+from invenio.config import version
+from invenio import search_engine_tests 
+from invenio import bibindex_engine_tests 
+from invenio import bibindex_engine_stemmer_tests 
+from invenio import bibrecord_tests 
+from invenio import bibrank_citation_indexer_tests
+from invenio import bibrank_citation_searcher_tests
+from invenio import bibrank_downloads_indexer_tests
+from invenio import bibrank_record_sorter_tests
+from invenio import bibrank_tag_based_indexer_tests
+from invenio import oai_repository_tests 
+from invenio import bibconvert_tests 
+from invenio import errorlib_tests
+from invenio import elmsubmit_tests
 
 def usage():
     """Print usage info on standard error output."""
