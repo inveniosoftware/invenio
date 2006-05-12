@@ -30,6 +30,8 @@ import invenio.elmsubmit_EZEmail as elmsubmit_EZEmail
 import invenio.elmsubmit_submission_parser as elmsubmit_submission_parser
 
 # import the config file 
+
+from invenio.config import storage
 import invenio.elmsubmit_config as elmsubmit_config
 
 import invenio.elmsubmit_field_validation as elmsubmit_field_validation
@@ -120,9 +122,9 @@ def validate_submission_field(msg, submission_dict, field, value):
 
 def get_storage_dir(msg):
 
-    path = os.path.join(elmsubmit_config.files['maildir'], _random_alphanum_string(15))
+    path = os.path.join(storage, elmsubmit_config.files['mailprefix'], _random_alphanum_string(15))
     while os.path.exists(path):
-        path = os.path.join(elmsubmit_config.files['maildir'], _random_alphanum_string(15))
+        path = os.path.join(storage, elmsubmit_config.files['mailprefix'], _random_alphanum_string(15))
 
     try:
         os.makedirs(path)

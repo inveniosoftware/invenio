@@ -18,12 +18,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # elmsubmit configuration file:
-
-files = {'prefix': '/soft/cdsware-PCDH23',
-         'localstatedir': '/soft/cdsware-PCDH23/var',
-         'storagedir': '/soft/cdsware-PCDH23/var/data/submit/storage',
-         'maildir': '/soft/cdsware-PCDH23/var/data/submit/storage/mail'}
-
+files = {
+         'mailprefix': 'mail',
+         'testcaseprefix': 'elmsubmit_testmails'}
 # Messages we need to send to the user, before we've identified the
 # correct language to talk to them in (so we assume English!):
 

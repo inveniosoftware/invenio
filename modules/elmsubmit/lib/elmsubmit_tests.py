@@ -26,214 +26,236 @@ __version__ = "$Id$"
 
 import unittest
 import re
+import os
+import os.path
 from string import expandtabs, replace
+from cdsware.config import tmpdir
+import cdsware.elmsubmit_config as elmsubmit_config
 import xml.dom.minidom
 
 from invenio import elmsubmit
 
 class MarcTest(unittest.TestCase):
-    """ elmsubmit - test for sanity """
+    """ elmsubmit - test for saniy """
     def test_simple_marc(self):
         """ parse a simple email - generate Marc """
         print 'started testing'
-        f=open('/home/kjedrzej/testmails/test1','r')
-        email = f.read()
-        f.close()
-        # let's try to parse an example email and compare it with the appropriate marc xml
-        x = elmsubmit.process_email(email)
-        y  = """<record>
-        <datafield tag ="245" ind1="" ind2="">
-        <subfield code="a">something</subfield>
-        </datafield>
-        <datafield tag ="100" ind1="" ind2="">
-        <subfield code="a">Simko, T</subfield>
-        <subfield code="u">CERN</subfield>
-        </datafield>
-        <datafield tag ="FFT" ind1="" ind2="">
-        <subfield code="a">/soft/cdsware-PCDH23/var/data/submit/storage/mail/wndyvcmzfhsqcgs/in.txt</subfield>
-        </datafield>
-        </record>"""
 
-        # in order to properly compare the marc files we have to remove the FFT node, it includes a random generated file path 
+        try:        
+            f=open(os.path.join(tmpdir, elmsubmit_config.files['testcaseprefix'],'elmsubmit_test_mail_1.mbox'),'r')
+            email = f.read()
+            f.close()
 
-        dom_x = xml.dom.minidom.parseString(x)
-        datafields = dom_x.getElementsByTagName("datafield")
+            # let's try to parse an example email and compare it with the appropriate marc xml
+            x = elmsubmit.process_email(email)
+            y  = """<record>
+            <datafield tag ="245" ind1="" ind2="">
+            <subfield code="a">something</subfield>
+            </datafield>
+            <datafield tag ="100" ind1="" ind2="">
+            <subfield code="a">Simko, T</subfield>
+            <subfield code="u">CERN</subfield>
+            </datafield>
+            <datafield tag ="FFT" ind1="" ind2="">
+            <subfield code="a">/soft/cdsware-PCDH23/var/data/submit/storage/mail/wndyvcmzfhsqcgs/in.txt</subfield>
+            </datafield>
+            </record>"""
 
-        #remove all the FFT datafields
-        for node in datafields:
-            if (node.hasAttribute("tag") and  node.getAttribute("tag") == "FFT"):
-                node.parentNode.removeChild(node)
-                node.unlink()
+            # in order to properly compare the marc files we have to remove the FFT node, it includes a random generated file path 
 
-        datafields = dom_x.getElementsByTagName("datafield")
+            dom_x = xml.dom.minidom.parseString(x)
+            datafields = dom_x.getElementsByTagName("datafield")
 
-        new_x = dom_x.toprettyxml("","\n")
+            #remove all the FFT datafields
+            for node in datafields:
+                if (node.hasAttribute("tag") and  node.getAttribute("tag") == "FFT"):
+                    node.parentNode.removeChild(node)
+                    node.unlink()
 
-        # the same with the other xml
-        dom_y = xml.dom.minidom.parseString(y)
-        datafields = dom_y.getElementsByTagName("datafield")
+            datafields = dom_x.getElementsByTagName("datafield")
 
-        for node in datafields:
-            if (node.hasAttribute("tag") and  node.getAttribute("tag") == "FFT"):
-                node.parentNode.removeChild(node)
-                node.unlink()
+            new_x = dom_x.toprettyxml("","\n")
 
-        datafields = dom_y.getElementsByTagName("datafield")
+            # the same with the other xml
+            dom_y = xml.dom.minidom.parseString(y)
+            datafields = dom_y.getElementsByTagName("datafield")
 
-        new_y = dom_y.toprettyxml("","\n")
+            for node in datafields:
+                if (node.hasAttribute("tag") and  node.getAttribute("tag") == "FFT"):
+                    node.parentNode.removeChild(node)
+                    node.unlink()
 
-        # 'normalize' the two XML MARC files for the purpose of comparing
-        new_x = expandtabs(new_x)
-        new_y = expandtabs(new_y)
-        
-        new_x = new_x.replace(' ','')
-        new_y = new_y.replace(' ','')
+            datafields = dom_y.getElementsByTagName("datafield")
 
-        # compare the two xml marcs
-        self.assertEqual(new_x,new_y)
-        
+            new_y = dom_y.toprettyxml("","\n")
+
+            # 'normalize' the two XML MARC files for the purpose of comparing
+            new_x = expandtabs(new_x)
+            new_y = expandtabs(new_y)
+
+            new_x = new_x.replace(' ','')
+            new_y = new_y.replace(' ','')
+
+            # compare the two xml marcs
+            self.assertEqual(new_x,new_y)
+
+        except IOError:
+            print "The test case file does not exist, test will fail"
+
     def test_complex_marc(self):
         """ parse multiple fields """
-        f=open('/home/kjedrzej/testmails/test2','r')
-        email = f.read()
-        f.close()
-        # let's try to reproduce the demo XML MARC file by parsing it and printing it back:
-        x = elmsubmit.process_email(email)
-        y = """<record>
-        <datafield tag ="245" ind1="" ind2="">
-        <subfield code="a">something</subfield>
-        </datafield>
-        <datafield tag ="700" ind1="" ind2="">
-        <subfield code="a">Le Meur, J Y</subfield>
-        <subfield code="u">MIT</subfield>
-        </datafield>
-        <datafield tag ="700" ind1="" ind2="">
-        <subfield code="a">Jedrzejek, K J</subfield>
-        <subfield code="u">CERN2</subfield>
-        </datafield>
-        <datafield tag ="700" ind1="" ind2="">
-        <subfield code="a">Favre, G</subfield>
-        <subfield code="u">CERN3</subfield>
-        </datafield>
-        <datafield tag ="111" ind1="" ind2="">
-        <subfield code="a">test11</subfield>
-        <subfield code="c">test31</subfield>
-        </datafield>
-        <datafield tag ="111" ind1="" ind2="">
-        <subfield code="a">test12</subfield>
-        <subfield code="c">test32</subfield>
-        </datafield>
-        <datafield tag ="111" ind1="" ind2="">
-        <subfield code="a">test13</subfield>
-        <subfield code="c">test33</subfield>
-        </datafield>
-        <datafield tag ="111" ind1="" ind2="">
-        <subfield code="b">test21</subfield>
-        <subfield code="d">test41</subfield>
-        </datafield>
-        <datafield tag ="111" ind1="" ind2="">
-        <subfield code="b">test22</subfield>
-        <subfield code="d">test42</subfield>
-        </datafield>
-        <datafield tag ="111" ind1="" ind2="">
-        <subfield code="a">test14</subfield>
-        </datafield>
-        <datafield tag ="111" ind1="" ind2="">
-        <subfield code="e">test51</subfield>
-        </datafield>
-        <datafield tag ="111" ind1="" ind2="">
-        <subfield code="e">test52</subfield>
-        </datafield>
-        <datafield tag ="100" ind1="" ind2="">
-        <subfield code="a">Simko, T</subfield>
-        <subfield code="u">CERN</subfield>
-        </datafield>
-        <datafield tag ="FFT" ind1="" ind2="">
-        <subfield code="a">/soft/cdsware-PCDH23/var/data/submit/storage/mail/qgifhtwzczykwji/in2.txt</subfield>
-        </datafield>
-        <datafield tag ="FFT" ind1="" ind2="">
-        <subfield code="a">/soft/cdsware-PCDH23/var/data/submit/storage/mail/qgifhtwzczykwji/in.txt</subfield>
-        </datafield>
-        </record>"""
+        try:        
+            f=open(os.path.join(tmpdir, elmsubmit_config.files['testcaseprefix'],'elmsubmit_test_mail_2.mbox'),'r')
+            email = f.read()
+            f.close()
 
-        # in order to properly compare the marc files we have to remove the FFT node, it includes a random generated file path 
+            # let's try to reproduce the demo XML MARC file by parsing it and printing it back:
+            x = elmsubmit.process_email(email)
+            y = """<record>
+            <datafield tag ="245" ind1="" ind2="">
+            <subfield code="a">something</subfield>
+            </datafield>
+            <datafield tag ="700" ind1="" ind2="">
+            <subfield code="a">Le Meur, J Y</subfield>
+            <subfield code="u">MIT</subfield>
+            </datafield>
+            <datafield tag ="700" ind1="" ind2="">
+            <subfield code="a">Jedrzejek, K J</subfield>
+            <subfield code="u">CERN2</subfield>
+            </datafield>
+            <datafield tag ="700" ind1="" ind2="">
+            <subfield code="a">Favre, G</subfield>
+            <subfield code="u">CERN3</subfield>
+            </datafield>
+            <datafield tag ="111" ind1="" ind2="">
+            <subfield code="a">test11</subfield>
+            <subfield code="c">test31</subfield>
+            </datafield>
+            <datafield tag ="111" ind1="" ind2="">
+            <subfield code="a">test12</subfield>
+            <subfield code="c">test32</subfield>
+            </datafield>
+            <datafield tag ="111" ind1="" ind2="">
+            <subfield code="a">test13</subfield>
+            <subfield code="c">test33</subfield>
+            </datafield>
+            <datafield tag ="111" ind1="" ind2="">
+            <subfield code="b">test21</subfield>
+            <subfield code="d">test41</subfield>
+            </datafield>
+            <datafield tag ="111" ind1="" ind2="">
+            <subfield code="b">test22</subfield>
+            <subfield code="d">test42</subfield>
+            </datafield>
+            <datafield tag ="111" ind1="" ind2="">
+            <subfield code="a">test14</subfield>
+            </datafield>
+            <datafield tag ="111" ind1="" ind2="">
+            <subfield code="e">test51</subfield>
+            </datafield>
+            <datafield tag ="111" ind1="" ind2="">
+            <subfield code="e">test52</subfield>
+            </datafield>
+            <datafield tag ="100" ind1="" ind2="">
+            <subfield code="a">Simko, T</subfield>
+            <subfield code="u">CERN</subfield>
+            </datafield>
+            <datafield tag ="FFT" ind1="" ind2="">
+            <subfield code="a">/soft/cdsware-PCDH23/var/data/submit/storage/mail/qgifhtwzczykwji/in2.txt</subfield>
+            </datafield>
+            <datafield tag ="FFT" ind1="" ind2="">
+            <subfield code="a">/soft/cdsware-PCDH23/var/data/submit/storage/mail/qgifhtwzczykwji/in.txt</subfield>
+            </datafield>
+            <datafield tag ="FFT" ind1="" ind2="">
+            <subfield code="a">/soft/cdsware-PCDH23/var/data/submit/storage/mail/qgifhtwzczykwji/small_test_pdf.pdf</subfield>
+            </datafield>
+            </record>"""
 
-        dom_x = xml.dom.minidom.parseString(x)
-        datafields = dom_x.getElementsByTagName("datafield")
+            # in order to properly compare the marc files we have to remove the FFT node, it includes a random generated file path 
 
-        #remove all the FFT datafields
-        for node in datafields:
-            if (node.hasAttribute("tag") and  node.getAttribute("tag") == "FFT"):
-                node.parentNode.removeChild(node)
-                node.unlink()
+            dom_x = xml.dom.minidom.parseString(x)
+            datafields = dom_x.getElementsByTagName("datafield")
 
-        new_x = dom_x.toprettyxml("","\n")
+            #remove all the FFT datafields
+            for node in datafields:
+                if (node.hasAttribute("tag") and  node.getAttribute("tag") == "FFT"):
+                    node.parentNode.removeChild(node)
+                    node.unlink()
 
-        # the same with the other xml
-        dom_y = xml.dom.minidom.parseString(y)
-        datafields = dom_y.getElementsByTagName("datafield")
+            new_x = dom_x.toprettyxml("","\n")
 
-        for node in datafields:
-            if (node.hasAttribute("tag") and  node.getAttribute("tag") == "FFT"):
-                node.parentNode.removeChild(node)
-                node.unlink()
+            # the same with the other xml
+            dom_y = xml.dom.minidom.parseString(y)
+            datafields = dom_y.getElementsByTagName("datafield")
 
-        new_y = dom_y.toprettyxml("","\n")
+            for node in datafields:
+                if (node.hasAttribute("tag") and  node.getAttribute("tag") == "FFT"):
+                    node.parentNode.removeChild(node)
+                    node.unlink()
 
-        # 'normalize' the two XML MARC files for the purpose of comparing
-        new_x = expandtabs(new_x)
-        new_y = expandtabs(new_y)
-        
-        new_x = new_x.replace(' ','')
-        new_y = new_y.replace(' ','')
+            new_y = dom_y.toprettyxml("","\n")
 
-        # compare the two xml marcs
-        self.assertEqual(new_x,new_y)
-        
+            # 'normalize' the two XML MARC files for the purpose of comparing
+            new_x = expandtabs(new_x)
+            new_y = expandtabs(new_y)
+
+            new_x = new_x.replace(' ','')
+            new_y = new_y.replace(' ','')
+
+            # compare the two xml marcs
+            self.assertEqual(new_x,new_y)
+        except IOError:
+            print "The test case file does not exist, test will fail"
+
 class FileStorageTest(unittest.TestCase):
     """ testing proper storage of files """
     def test_read_text_files(self):
-        f=open('/home/kjedrzej/testmails/test2','r')
-        email = f.read()
-        f.close()
-        # let's try to see if the files were properly stored:
-        xml_marc = elmsubmit.process_email(email)
-        
-        dom = xml.dom.minidom.parseString(xml_marc)
-        datafields = dom.getElementsByTagName("datafield")
+        try:
+            
+            f=open(os.path.join(tmpdir, elmsubmit_config.files['testcaseprefix'],'elmsubmit_test_mail_2.mbox'),'r')
+            email = f.read()
+            f.close()
 
-        # get the file addresses
-        file_list = []
-        
-        for node in datafields:
-            if (node.hasAttribute("tag") and  node.getAttribute("tag") == "FFT"):
-                children = node.childNodes
-                for child in children:
-                    if (child.hasChildNodes()):
-                        file_list.append(child.firstChild.nodeValue)
-                        
-        f=open(file_list[0], 'r')
-        x = f.read()
-        f.close()
+            # let's try to see if the files were properly stored:
+            xml_marc = elmsubmit.process_email(email)
 
-        x.lstrip()
-        x.rstrip()
+            dom = xml.dom.minidom.parseString(xml_marc)
+            datafields = dom.getElementsByTagName("datafield")
 
-        y = """second attachment\n"""
-        
+            # get the file addresses
+            file_list = []
 
-        self.assertEqual(x,y)
+            for node in datafields:
+                if (node.hasAttribute("tag") and  node.getAttribute("tag") == "FFT"):
+                    children = node.childNodes
+                    for child in children:
+                        if (child.hasChildNodes()):
+                            file_list.append(child.firstChild.nodeValue)
 
-        f=open(file_list[1], 'r')
-        x = f.read()
-        f.close()
+            f=open(file_list[0], 'r')
+            x = f.read()
+            f.close()
 
-        x.lstrip()
-        x.rstrip()
+            x.lstrip()
+            x.rstrip()
 
-        y = """some attachment\n"""
-        self.assertEqual(x,y)
-         
+            y = """second attachment\n"""
+
+
+            self.assertEqual(x,y)
+
+            f=open(file_list[1], 'r')
+            x = f.read()
+            f.close()
+
+            x.lstrip()
+            x.rstrip()
+
+            y = """some attachment\n"""
+            self.assertEqual(x,y)
+        except IOError:
+            print "The test case file does not exist, test will fail"
+            
 def create_test_suite():
     """Return test suite for the elmsubmit module"""
     return unittest.TestSuite((unittest.makeSuite(MarcTest,'test'), unittest.makeSuite(FileStorageTest,'test')))
