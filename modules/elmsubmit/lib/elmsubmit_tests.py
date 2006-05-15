@@ -29,8 +29,8 @@ import re
 import os
 import os.path
 from string import expandtabs, replace
-from cdsware.config import tmpdir
-import cdsware.elmsubmit_config as elmsubmit_config
+from invenio.config import tmpdir
+import invenio.elmsubmit_config as elmsubmit_config
 import xml.dom.minidom
 
 from invenio import elmsubmit
@@ -38,9 +38,7 @@ from invenio import elmsubmit
 class MarcTest(unittest.TestCase):
     """ elmsubmit - test for saniy """
     def test_simple_marc(self):
-        """ parse a simple email - generate Marc """
-        print 'started testing'
-
+        """elmsubmit - parsing simple email"""
         try:        
             f=open(os.path.join(tmpdir, elmsubmit_config.files['testcaseprefix'],'elmsubmit_test_mail_1.mbox'),'r')
             email = f.read()
@@ -100,10 +98,10 @@ class MarcTest(unittest.TestCase):
             self.assertEqual(new_x,new_y)
 
         except IOError:
-            print "The test case file does not exist, test will fail"
+            self.fail("WARNING: the test case file does not exist; test not run.")
 
     def test_complex_marc(self):
-        """ parse multiple fields """
+        """elmsubmit - parsing complex email with multiple fields"""
         try:        
             f=open(os.path.join(tmpdir, elmsubmit_config.files['testcaseprefix'],'elmsubmit_test_mail_2.mbox'),'r')
             email = f.read()
@@ -205,11 +203,12 @@ class MarcTest(unittest.TestCase):
             # compare the two xml marcs
             self.assertEqual(new_x,new_y)
         except IOError:
-            print "The test case file does not exist, test will fail"
+            self.fail("WARNING: the test case file does not exist; test not run.")
 
 class FileStorageTest(unittest.TestCase):
     """ testing proper storage of files """
     def test_read_text_files(self):
+        """elmsubmit - reading text files"""
         try:
             
             f=open(os.path.join(tmpdir, elmsubmit_config.files['testcaseprefix'],'elmsubmit_test_mail_2.mbox'),'r')
@@ -254,7 +253,7 @@ class FileStorageTest(unittest.TestCase):
             y = """some attachment\n"""
             self.assertEqual(x,y)
         except IOError:
-            print "The test case file does not exist, test will fail"
+            self.fail("WARNING: the test case file does not exist; test not run.")
             
 def create_test_suite():
     """Return test suite for the elmsubmit module"""
