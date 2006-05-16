@@ -739,7 +739,7 @@ def simpleendaction(doctype="", act="", startPg=1, indir="", access="",step=1,mo
     action_score = action_details(doctype,act)
     current_level = get_level(doctype, act)
     # Calls all the function's actions
-    print_function_calls(doctype=doctype, action=act, step=step, form="", ln=ln)
+    print_function_calls(doctype=doctype, action=act, step=step, form="")
     return "ok"
 
 
