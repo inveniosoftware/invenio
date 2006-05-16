@@ -631,7 +631,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     # Calls all the function's actions
     function_content = ''
     try:
-        function_content = print_function_calls(doctype, act, step, form)
+        function_content = print_function_calls(doctype=doctype, action=act, step=step, form=form, ln=ln)
     except functionError,e:
         return errorMsg(e.value,req, c, ln)
     except functionStop,e:
@@ -739,7 +739,7 @@ def simpleendaction(doctype="", act="", startPg=1, indir="", access="",step=1,mo
     action_score = action_details(doctype,act)
     current_level = get_level(doctype, act)
     # Calls all the function's actions
-    print_function_calls(doctype, act, step, "")
+    print_function_calls(doctype=doctype, action=act, step=step, form="", ln=ln)
     return "ok"
 
 
@@ -1014,7 +1014,7 @@ def action_details (doctype, action):
     else:
         return -1
 
-def print_function_calls (doctype, action, step, form):
+def print_function_calls (doctype, action, step, form, ln=cdslang):
     # Calls the functions required by an "action" action on a "doctype" document
     # In supervisor mode, a table of the function calls is produced
     global htdocsdir,storage,access,pylibdir,dismode
