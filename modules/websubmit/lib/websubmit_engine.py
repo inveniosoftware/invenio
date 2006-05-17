@@ -41,7 +41,7 @@ from invenio.messages import gettext_set_language, wash_language
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 
-def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="", access="",mainmenu="",fromdir="",file="",nextPg="",nbPg="",curpage=1):
+def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="", access="", mainmenu="", fromdir="", file="", nextPg="", nbPg="", curpage=1):
     ln = wash_language(ln)
 
     # load the right message language
@@ -53,7 +53,7 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         uid = getUid(req)
         uid_email = get_email(uid)
     except MySQLdb.Error, e:
-        return errorMsg(e.value,req, c, ln)
+        return errorMsg(e.value, req, c, ln)
     # variable initialisation
     t = ""
     field = []
@@ -77,31 +77,31 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         # warningMsg("""<center><font color="red"></font></center>""",req, ln)
     # check we have minimum fields
     if doctype=="" or act=="" or access=="":
-        return errorMsg(_("invalid parameter"),req, c, ln)
+        return errorMsg(_("invalid parameter"), req, c, ln)
     # retrieve the action and doctype data
     if indir == "":
-        res = run_sql("select dir from sbmACTION where sactname=%s",(act,))
+        res = run_sql("select dir from sbmACTION where sactname=%s", (act,))
         if len(res) == 0:
-            return errorMsg(_("cannot find submission directory"),req, c, ln)
+            return errorMsg(_("cannot find submission directory"), req, c, ln)
         else:
             row = res[0]
             indir = row[0]
-    res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE sdocname=%s",(doctype,))
+    res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE sdocname=%s", (doctype,))
     if len(res) == 0:
-        return errorMsg(_("unknown document type"),req, c, ln)
+        return errorMsg(_("unknown document type"), req, c, ln)
     else:
         docname = res[0][0]
-        docname = string.replace(docname," ","&nbsp;")
-    res = run_sql("SELECT lactname FROM sbmACTION WHERE sactname=%s",(act,))
+        docname = string.replace(docname, " ", "&nbsp;")
+    res = run_sql("SELECT lactname FROM sbmACTION WHERE sactname=%s", (act,))
     if len(res) == 0:
-        return errorMsg(_("unknown action"),req, c, ln)
+        return errorMsg(_("unknown action"), req, c, ln)
     else:
         actname = res[0][0]
-        actname = string.replace(actname," ","&nbsp;")
-    subname = "%s%s" % (act,doctype)
+        actname = string.replace(actname, " ", "&nbsp;")
+    subname = "%s%s" % (act, doctype)
     res = run_sql("SELECT nbpg FROM sbmIMPLEMENT WHERE  subname=%s", (subname,))
     if len(res) == 0:
-        return errorMsg(_("can't figure number of pages"),req, c, ln)
+        return errorMsg(_("can't figure number of pages"), req, c, ln)
     else:
         nbpages = res[0][0]
     #Get current page
@@ -115,48 +115,48 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     else:
         edsrn = res[0][0]
     # This defines the path to the directory containing the action data
-    curdir = "%s/%s/%s/%s" % (storage,indir,doctype,access)
+    curdir = "%s/%s/%s/%s" % (storage, indir, doctype, access)
     # if this submission comes from another one ($fromdir is then set)
     # We retrieve the previous submission directory and put it in the proper one
     if fromdir != "":
-        olddir = "%s/%s/%s/%s" % (storage,fromdir,doctype,access)
+        olddir = "%s/%s/%s/%s" % (storage, fromdir, doctype, access)
         if os.path.exists(olddir):
-            os.rename(olddir,curdir)
+            os.rename(olddir, curdir)
     # If the submission directory still does not exist, we create it
     if not os.path.exists(curdir):
         try:
             os.makedirs(curdir)
         except:
-            return errorMsg(_("can't create submission directory"),req, c, ln)
+            return errorMsg(_("can't create submission directory"), req, c, ln)
     # retrieve the original main menu url ans save it in the "mainmenu" file
     if mainmenu != "":
-        fp = open("%s/mainmenu" % curdir,"w")
+        fp = open("%s/mainmenu" % curdir, "w")
         fp.write(mainmenu)
         fp.close()
     # and if the file containing the URL to the main menu exists
     # we retrieve it and store it in the $mainmenu variable
     if os.path.exists("%s/mainmenu" % curdir):
-        fp = open("%s/mainmenu" % curdir,"r");
+        fp = open("%s/mainmenu" % curdir, "r");
         mainmenu = fp.read()
         fp.close()
     else:
-        mainmenu = "%s/submit.py" %urlpath
+        mainmenu = "%s/submit.py" % (urlpath,)
     # various authentication related tasks...
     if uid_email != "guest" and uid_email != "":
         #First save the username (email address) in the SuE file. This way bibconvert will be able to use it if needed
-        fp = open("%s/SuE" % curdir,"w")
+        fp = open("%s/SuE" % curdir, "w")
         fp.write(uid_email)
         fp.close()
     # is user authorized to perform this action?
-    (auth_code, auth_message) = acc_authorize_action(uid, "submit",verbose=0,doctype=doctype, act=act)
-    if acc_isRole("submit",doctype=doctype,act=act) and auth_code != 0:
+    (auth_code, auth_message) = acc_authorize_action(uid, "submit", verbose=0, doctype=doctype, act=act)
+    if acc_isRole("submit", doctype=doctype, act=act) and auth_code != 0:
         return warningMsg("<center><font color=red>%s</font></center>" % auth_message, req)
     # then we update the "journal of submission"
-    res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE  doctype=%s and action=%s and id=%s and email=%s", (doctype,act,access,uid_email,))
+    res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE  doctype=%s and action=%s and id=%s and email=%s", (doctype, act, access, uid_email,))
     if len(res) == 0:
-        run_sql("INSERT INTO sbmSUBMISSIONS values (%s,%s,%s,'pending',%s,'',NOW(),NOW())", (uid_email,doctype,act,access,))
+        run_sql("INSERT INTO sbmSUBMISSIONS values (%s,%s,%s,'pending',%s,'',NOW(),NOW())", (uid_email, doctype, act, access,))
     else:
-        run_sql("UPDATE sbmSUBMISSIONS SET md=NOW() WHERE  doctype=%s and action=%s and id=%s and email=%s", (doctype,act,access,uid_email,))
+        run_sql("UPDATE sbmSUBMISSIONS SET md=NOW() WHERE  doctype=%s and action=%s and id=%s and email=%s", (doctype, act, access, uid_email,))
     # Save the form fields entered in the previous submission page
     # If the form was sent with the GET method
     form = req.form
@@ -164,49 +164,49 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     # we parse all the form variables
     for key in form.keys():
         formfields = form[key]
-        if re.search("\[\]",key):
-            filename = key.replace("[]","")
+        if re.search("\[\]", key):
+            filename = key.replace("[]", "")
         else:
             filename = key
         # the field is an array
-        if isinstance(formfields,types.ListType):
-            fp = open("%s/%s" % (curdir,filename),"w")
+        if isinstance(formfields, types.ListType):
+            fp = open("%s/%s" % (curdir, filename), "w")
             for formfield in formfields:
                 #stripslashes(value)
                 value = specialchars(formfield)
                 fp.write(value+"\n")
             fp.close()
         # the field is a normal string
-        elif isinstance(formfields,types.StringTypes) and formfields != "":
+        elif isinstance(formfields, types.StringTypes) and formfields != "":
             value = formfields
-            fp = open("%s/%s" % (curdir,filename),"w")
+            fp = open("%s/%s" % (curdir, filename), "w")
             fp.write(specialchars(value))
             fp.close()
         # the field is a file
         elif hasattr(formfields,"filename"):
-            if not os.path.exists("%s/files/%s" % (curdir,key)):
+            if not os.path.exists("%s/files/%s" % (curdir, key)):
                 try:
-                    os.makedirs("%s/files/%s" % (curdir,key))
+                    os.makedirs("%s/files/%s" % (curdir, key))
                 except:
-                    return errorMsg(_("can't create submission directory"),req, c, ln)
+                    return errorMsg(_("can't create submission directory"), req, c, ln)
             filename = formfields.filename
             if filename != "":
                 # This may be dangerous if the file size is bigger than the available memory
                 data = formfields.file.read()
-                fp = open("%s/files/%s/%s" % (curdir,key,filename),"w")
+                fp = open("%s/files/%s/%s" % (curdir, key, filename), "w")
                 fp.write(data)
                 fp.close()
-                fp = open("%s/lastuploadedfile" % curdir,"w")
+                fp = open("%s/lastuploadedfile" % curdir, "w")
                 fp.write(filename)
                 fp.close()
-                fp = open("%s/%s" % (curdir,key),"w")
+                fp = open("%s/%s" % (curdir, key), "w")
                 fp.write(filename)
                 fp.close()
         # if the found field is the reference of the document
         # we save this value in the "journal of submissions"
         if uid_email != "" and uid_email != "guest":
             if key == edsrn:
-                run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (value,doctype,access,uid_email,))
+                run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (value, doctype, access, uid_email,))
         # Now deal with the cookies
         # If the fields must be saved as a cookie, we do so
         # In this case, the value of the field will be retrieved and
@@ -216,12 +216,12 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             res = run_sql("SELECT cookie FROM sbmFIELDDESC WHERE  name=%s", (key,))
             if len(res) > 0:
                 if res[0][0] == 1:
-                    setCookie(key,value,uid)
+                    setCookie(key, value, uid)
 
     # create interface
     # For each field to be displayed on the page
-    subname = "%s%s" % (act,doctype)
-    res = run_sql("SELECT * FROM sbmFIELD WHERE  subname=%s and pagenb=%s ORDER BY fieldnb,fieldnb", (subname,curpage,))
+    subname = "%s%s" % (act, doctype)
+    res = run_sql("SELECT * FROM sbmFIELD WHERE  subname=%s and pagenb=%s ORDER BY fieldnb,fieldnb", (subname, curpage,))
 
     full_fields = []
     values = []
@@ -253,7 +253,7 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         # as the runtime functions access some global and local
         # variables.
         if full_field ['type'] == 'R':
-            co = compile (full_field ['htmlcode'].replace("\r\n","\n"),"<string>","exec")
+            co = compile (full_field ['htmlcode'].replace("\r\n","\n"), "<string>", "exec")
             exec(co)
         else:
             text = websubmit_templates.tmpl_submit_field (ln = ln, field = full_field)
@@ -268,36 +268,36 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             # If the field is not user-defined, we try to determine its type
             # (select, radio, file upload...)
             # check whether it is a select field or not
-            if re.search("SELECT",text,re.IGNORECASE) != None:
+            if re.search("SELECT", text, re.IGNORECASE) != None:
                 select.append(1)
             else:
                 select.append(0)
             # checks whether it is a radio field or not
-            if re.search(r"TYPE=[\"']?radio",text,re.IGNORECASE) != None:
+            if re.search(r"TYPE=[\"']?radio", text, re.IGNORECASE) != None:
                 radio.append(1)
             else:
                 radio.append(0)
             # checks whether it is a file upload or not
-            if re.search(r"TYPE=[\"']?file",text,re.IGNORECASE) != None:
+            if re.search(r"TYPE=[\"']?file", text, re.IGNORECASE) != None:
                 upload.append(1)
             else:
                 upload.append(0)
             # if the field description contains the "<COMBO>" string, replace
             # it by the category selected on the document page submission page
             combofile = "combo%s" % doctype
-            if os.path.exists("%s/%s" % (curdir,combofile)):
-                f = open("%s/%s" % (curdir,combofile),"r")
+            if os.path.exists("%s/%s" % (curdir, combofile)):
+                f = open("%s/%s" % (curdir, combofile), "r")
                 combo = f.read()
                 f.close()
             else:
                 combo=""
-            text = text.replace("<COMBO>",combo)
+            text = text.replace("<COMBO>", combo)
             # if there is a <YYYY> tag in it, replace it by the current year
             year = time.strftime("%Y");
-            text = text.replace("<YYYY>",year)
+            text = text.replace("<YYYY>", year)
             # if there is a <TODAY> tag in it, replace it by the current year
             today = time.strftime("%d/%m/%Y");
-            text = text.replace("<TODAY>",today)
+            text = text.replace("<TODAY>", today)
             fieldhtml.append(text)
         else:
             select.append(0)
@@ -315,20 +315,20 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
 
         # If a file exists with the name of the field we extract the saved value
         text = ''
-        if os.path.exists("%s/%s" % (curdir,full_field['name'])):
-            file = open("%s/%s" % (curdir,full_field['name']),"r");
+        if os.path.exists("%s/%s" % (curdir, full_field['name'])):
+            file = open("%s/%s" % (curdir, full_field['name']), "r");
             text = file.read()
-            text = re.compile("[\n\r]*$").sub("",text)
-            text = re.compile("\n").sub("\\n",text)
-            text = re.compile("\r").sub("",text)
+            text = re.compile("[\n\r]*$").sub("", text)
+            text = re.compile("\n").sub("\\n", text)
+            text = re.compile("\r").sub("", text)
             file.close()
         # Or if a cookie is set
         # If a cookie is found corresponding to the name of the current
         # field, we set the value of the field to the cookie's value
-        elif getCookie(full_field['name'],uid) != None:
-            value = getCookie(full_field['name'],uid)
-            value = re.compile("\r").sub("",value)
-            value = re.compile("\n").sub("\\n",value)
+        elif getCookie(full_field['name'], uid) != None:
+            value = getCookie(full_field['name'], uid)
+            value = re.compile("\r").sub("", value)
+            value = re.compile("\n").sub("\\n", value)
             text = value
         values.append(text)
 
@@ -336,8 +336,8 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
 
     returnto = {}
     if int(curpage) == int(nbpages):
-        subname = "%s%s" % (act,doctype)
-        res = run_sql("SELECT * FROM sbmFIELD WHERE  subname=%s and pagenb!=%s", (subname,curpage,))
+        subname = "%s%s" % (act, doctype)
+        res = run_sql("SELECT * FROM sbmFIELD WHERE  subname=%s and pagenb!=%s", (subname, curpage,))
         nbFields = 0
         message = ""
         fullcheck_select = []
@@ -359,12 +359,12 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
                         text = eval(row2[9])
                     formfields = text.split(">")
                     for formfield in formfields:
-                        match = re.match("name=([^ <>]+)",formfield,re.IGNORECASE)
+                        match = re.match("name=([^ <>]+)", formfield, re.IGNORECASE)
                         if match != None:
                             names = match.groups
                             for value in names:
                                 if value != "":
-                                    value = re.compile("[\"']+").sub("",value)
+                                    value = re.compile("[\"']+").sub("", value)
                                     fullcheck_field.append(value)
                                     fullcheck_level.append(arr[5])
                                     fullcheck_txt.append(arr[6])
@@ -381,12 +381,12 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
         # tests each mandatory field
         fld = 0
         res = 1
-        for i in range (0,nbFields):
+        for i in range (0, nbFields):
             res = 1
-            if not os.path.exists("%s/%s" % (curdir,fullcheck_field[i])):
+            if not os.path.exists("%s/%s" % (curdir, fullcheck_field[i])):
                 res=0
             else:
-                file = open("%s/%s" % (curdir,fullcheck_field[i]),"r")
+                file = open("%s/%s" % (curdir, fullcheck_field[i]), "r")
                 text = file.read()
                 if text == '':
                     res=0
@@ -441,7 +441,7 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     req.content_type = "text/html"
     req.send_http_header()
     p_navtrail = """<a href="submit.py">%(submit)s</a>&nbsp;>&nbsp;<a href="submit.py?doctype=%(doctype)s\">%(docname)s</a>&nbsp;""" % {
-                   'submit' : _("Submit"),
+                   'submit'  : _("Submit"),
                    'doctype' : doctype,
                    'docname' : docname,
                  }
@@ -455,8 +455,9 @@ def interface(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
                 urlargs = req.args)
 
 
-def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="", access="",mainmenu="",fromdir="",file="",nextPg="",nbPg="",curpage=1,step=1,mode="U"):
-    global rn,sysno,dismode,curdir,uid,uid_email,last_step,action_score
+def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="", \
+              access="", mainmenu="", fromdir="", file="", nextPg="", nbPg="", curpage=1, step=1, mode="U"):
+    global rn, sysno, dismode, curdir, uid, uid_email, last_step, action_score
 
     # load the right message language
     _ = gettext_set_language(ln)
@@ -484,41 +485,42 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
                          ), req, ln)
     # check we have minimum fields
     if doctype=="" or act=="" or access=="":
-        return errorMsg(_("invalid parameter"),req, c, ln)
+        return errorMsg(_("invalid parameter"), req, c, ln)
     # retrieve the action and doctype data
     if indir == "":
         res = run_sql("select dir from sbmACTION where sactname=%s", (act,))
         if len(res) == 0:
-            return errorMsg(_("cannot find submission directory"),req, c, ln)
+            return errorMsg(_("cannot find submission directory"), req, c, ln)
         else:
             row = res[0]
             indir = row[0]
     # The following words are reserved and should not be used as field names
-    reserved_words = ["stop","file","nextPg","startPg","access","curpage","nbPg","act","indir","doctype","mode","step","deleted","file_path","userfile_name"]
+    reserved_words = ["stop", "file", "nextPg", "startPg", "access", "curpage", "nbPg", "act", \
+                      "indir", "doctype", "mode", "step", "deleted", "file_path", "userfile_name"]
     # This defines the path to the directory containing the action data
-    curdir = "%s/%s/%s/%s" % (storage,indir,doctype,access)
+    curdir = "%s/%s/%s/%s" % (storage, indir, doctype, access)
     # If the submission directory still does not exist, we create it
     if not os.path.exists(curdir):
         try:
             os.makedirs(curdir)
         except:
-            return errorMsg(_("can't create submission directory"),req, c, ln)
+            return errorMsg(_("can't create submission directory"), req, c, ln)
     # retrieve the original main menu url ans save it in the "mainmenu" file
     if mainmenu != "":
-        fp = open("%s/mainmenu" % curdir,"w")
+        fp = open("%s/mainmenu" % curdir, "w")
         fp.write(mainmenu)
         fp.close()
     # and if the file containing the URL to the main menu exists
     # we retrieve it and store it in the $mainmenu variable
     if os.path.exists("%s/mainmenu" % curdir):
-        fp = open("%s/mainmenu" % curdir,"r");
+        fp = open("%s/mainmenu" % curdir, "r");
         mainmenu = fp.read()
         fp.close()
     else:
-        mainmenu = "%s/submit.py" % urlpath
+        mainmenu = "%s/submit.py" % (urlpath,)
     # retrieve the name of the file in which the reference of
     # the submitted document will be stored
-    res = run_sql("SELECT value FROM sbmPARAMETERS WHERE  doctype=%s and name='edsrn'",(doctype,))
+    res = run_sql("SELECT value FROM sbmPARAMETERS WHERE  doctype=%s and name='edsrn'", (doctype,))
     if len(res) == 0:
         edsrn = ""
     else:
@@ -531,7 +533,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     #if reloaded:
     #    return warningMsg("<b> Sorry, this action has already been completed. Please go back to the main menu to start a new action.</b>",req)
     # We must determine if the action is finished (ie there is no other steps after the current one
-    res = run_sql("SELECT step FROM sbmFUNCTIONS WHERE  action=%s and doctype=%s and step > %s", (act,doctype,step,))
+    res = run_sql("SELECT step FROM sbmFUNCTIONS WHERE  action=%s and doctype=%s and step > %s", (act, doctype, step,))
     if len(res) == 0:
         finished = 1
     else:
@@ -543,49 +545,49 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     # we parse all the form variables
     for key in form.keys():
         formfields = form[key]
-        if re.search("\[\]",key):
-            filename = key.replace("[]","")
+        if re.search("\[\]", key):
+            filename = key.replace("[]", "")
         else:
             filename = key
         # the field is an array
         if isinstance(formfields,types.ListType):
-            fp = open("%s/%s" % (curdir,filename),"w")
+            fp = open("%s/%s" % (curdir, filename), "w")
             for formfield in formfields:
                 #stripslashes(value)
                 value = specialchars(formfield)
                 fp.write(value+"\n")
             fp.close()
         # the field is a normal string
-        elif isinstance(formfields,types.StringTypes) and formfields != "":
+        elif isinstance(formfields, types.StringTypes) and formfields != "":
             value = formfields
-            fp = open("%s/%s" % (curdir,filename),"w")
+            fp = open("%s/%s" % (curdir, filename), "w")
             fp.write(specialchars(value))
             fp.close()
         # the field is a file
-        elif hasattr(formfields,"filename"):
-            if not os.path.exists("%s/files/%s" % (curdir,key)):
+        elif hasattr(formfields, "filename"):
+            if not os.path.exists("%s/files/%s" % (curdir, key)):
                 try:
-                    os.makedirs("%s/files/%s" % (curdir,key))
+                    os.makedirs("%s/files/%s" % (curdir, key))
                 except:
-                    return errorMsg("can't create submission directory",req,cdsname,ln)
+                    return errorMsg("can't create submission directory", req, cdsname, ln)
             filename = formfields.filename
             if filename != "":
                 # This may be dangerous if the file size is bigger than the available memory
                 data = formfields.file.read()
-                fp = open("%s/files/%s/%s" % (curdir,key,filename),"w")
+                fp = open("%s/files/%s/%s" % (curdir, key, filename), "w")
                 fp.write(data)
                 fp.close()
-                fp = open("%s/lastuploadedfile" % curdir,"w")
+                fp = open("%s/lastuploadedfile" % curdir, "w")
                 fp.write(filename)
                 fp.close()
-                fp = open("%s/%s" % (curdir,key),"w")
+                fp = open("%s/%s" % (curdir, key), "w")
                 fp.write(filename)
                 fp.close()
         # if the found field is the reference of the document
         # we save this value in the "journal of submissions"
         if uid_email != "" and uid_email != "guest":
             if key == edsrn:
-                run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (value,doctype,access,uid_email,))
+                run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (value, doctype, access, uid_email,))
         # Now deal with the cookies
         # If the fields must be saved as a cookie, we do so
         # In this case, the value of the field will be retrieved and
@@ -595,37 +597,37 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
             res = run_sql("SELECT cookie FROM sbmFIELDDESC WHERE  name=%s", (key,))
             if len(res) > 0:
                 if res[0][0] == 1:
-                    setCookie(key,value,uid)
+                    setCookie(key, value, uid)
 
     # Get document name
     res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname=%s", (doctype,))
     if len(res) > 0:
        docname = res[0][0]
     else:
-        return errorMsg(_("unknown type of document"),req,cdsname,ln)
+        return errorMsg(_("unknown type of document"), req, cdsname, ln)
     # Get action name
     res = run_sql("SELECT lactname FROM sbmACTION WHERE  sactname=%s", (act,))
     if len(res) > 0:
        actname = res[0][0]
     else:
-        return errorMsg(_("unknown action"),req,cdsname,ln)
+        return errorMsg(_("unknown action"), req, cdsname, ln)
     # Get number of pages
-    subname = "%s%s" % (act,doctype)
-    res = run_sql("SELECT nbpg FROM sbmIMPLEMENT WHERE  subname=%s",(subname,))
+    subname = "%s%s" % (act, doctype)
+    res = run_sql("SELECT nbpg FROM sbmIMPLEMENT WHERE  subname=%s", (subname,))
     if len(res) > 0:
        nbpages = res[0][0]
     else:
-        return errorMsg(_("this action does not apply on this type of document"),req,cdsname,ln)
+        return errorMsg(_("this action does not apply on this type of document"), req, cdsname, ln)
 
     # we specify here whether we are in the last step of the action or not
-    res = run_sql("SELECT step FROM   sbmFUNCTIONS WHERE  action=%s and doctype=%s and step>%s", (act,doctype,step,))
+    res = run_sql("SELECT step FROM   sbmFUNCTIONS WHERE  action=%s and doctype=%s and step>%s", (act, doctype, step,))
     if len(res) == 0:
         last_step = 1
     else:
         last_step = 0
 
     # Prints the action details, returning the mandatory score
-    action_score = action_details(doctype,act)
+    action_score = action_details(doctype, act)
     current_level = get_level(doctype, act)
 
     # Calls all the function's actions
@@ -633,7 +635,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     try:
         function_content = print_function_calls(doctype=doctype, action=act, step=step, form=form, ln=ln)
     except functionError,e:
-        return errorMsg(e.value,req, c, ln)
+        return errorMsg(e.value, req, c, ln)
     except functionStop,e:
         if e.value != None:
             function_content = e.value
@@ -643,16 +645,16 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
     # If the action was mandatory we propose the next mandatory action (if any)
     next_action = ''
     if action_score != -1 and last_step == 1:
-        next_action = Propose_Next_Action(doctype,action_score,access,current_level,indir)
+        next_action = Propose_Next_Action(doctype, action_score, access, current_level, indir)
 
     # If we are in the last step of an action, we can update the "journal of submissions"
     if last_step == 1:
         if uid_email != "" and uid_email != "guest" and rn != "":
-            res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE  doctype=%s and action=%s and id=%s and email=%s", (doctype,act,access,uid_email,))
+            res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE  doctype=%s and action=%s and id=%s and email=%s", (doctype, act, access, uid_email,))
             if len(res) == 0:
-                run_sql("INSERT INTO sbmSUBMISSIONS values(%s,%s,%s,'finished',%s,%s,NOW(),NOW())", (uid_email,doctype,act,access,rn,))
+                run_sql("INSERT INTO sbmSUBMISSIONS values(%s,%s,%s,'finished',%s,%s,NOW(),NOW())", (uid_email, doctype, act, access, rn,))
             else:
-               run_sql("UPDATE sbmSUBMISSIONS SET md=NOW(),reference=%s,status='finished' WHERE  doctype=%s and action=%s and id=%s and email=%s", (rn,doctype,act,access,uid_email,))
+               run_sql("UPDATE sbmSUBMISSIONS SET md=NOW(),reference=%s,status='finished' WHERE  doctype=%s and action=%s and id=%s and email=%s", (rn, doctype, act, access, uid_email,))
 
     t = websubmit_templates.tmpl_page_endaction(
           ln = ln,
@@ -695,55 +697,7 @@ def endaction(req,c=cdsname,ln=cdslang, doctype="", act="", startPg=1, indir="",
                 language = ln,
                 urlargs = req.args)
 
-
-def simpleendaction(doctype="", act="", startPg=1, indir="", access="",step=1,mode="U"):
-    global rn,sysno,dismode,curdir,uid,uid_email,lats_step,action_score
-    dismode = mode
-
-    # check we have minimum fields
-    if doctype=="" or act=="" or access=="":
-        return "invalid parameter"
-    # retrieve the action and doctype data
-    if indir == "":
-        res = run_sql("select dir from sbmACTION where sactname=%s", (act,))
-        if len(res) == 0:
-            return "cannot find submission directory"
-        else:
-            row = res[0]
-            indir = row[0]
-    # This defines the path to the directory containing the action data
-    curdir = "%s/%s/%s/%s" % (storage,indir,doctype,access)
-    # If the submission directory still does not exist, we create it
-    if not os.path.exists(curdir):
-        return "submission directory %s does not exist" % curdir
-    # retrieve the name of the file in which the reference of
-    # the submitted document will be stored
-    res = run_sql("SELECT value FROM sbmPARAMETERS WHERE  doctype=%s and name='edsrn'",(doctype,))
-    if len(res) == 0:
-        edsrn = ""
-    else:
-        edsrn = res[0][0]
-    # Get document name
-    res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname=%s", (doctype,))
-    if len(res) > 0:
-       docname = res[0][0]
-    else:
-        return "unknown type of document %s" % doctype
-    # Get action name
-    res = run_sql("SELECT lactname FROM sbmACTION WHERE  sactname=%s", (act,))
-    if len(res) > 0:
-       actname = res[0][0]
-    else:
-        return "unknown action %s" % act
-    # Prints the action details, returning the mandatory score
-    action_score = action_details(doctype,act)
-    current_level = get_level(doctype, act)
-    # Calls all the function's actions
-    print_function_calls(doctype=doctype, action=act, step=step, form="")
-    return "ok"
-
-
-def home(req,c=cdsname,ln=cdslang):
+def home(req, c=cdsname, ln=cdslang):
     """
        Generates and displays the default "home page" for Web-submit - contains a list of links to the various document submissions.
     """
@@ -793,7 +747,7 @@ def makeCataloguesTable(ln):
         text = websubmit_templates.tmpl_submit_home_catalog_no_content(ln = ln)
     return text
 
-def getCatalogueBranch(id_father,level):
+def getCatalogueBranch(id_father, level):
     elem = {}
     queryResult = run_sql("SELECT name, id FROM   sbmCOLLECTION WHERE  id=%s", (id_father,))
     if len(queryResult) != 0:
@@ -822,7 +776,7 @@ def getDoctypeBranch(doctype):
             'name' : res[0][0],
            }
 
-def displayCatalogueBranch(id_father,level,catalogues):
+def displayCatalogueBranch(id_father, level, catalogues):
     text = ""
     queryResult = run_sql("SELECT name, id FROM   sbmCOLLECTION WHERE  id=%s", (id_father,))
     if len(queryResult) != 0:
@@ -842,26 +796,26 @@ def displayCatalogueBranch(id_father,level,catalogues):
         text = text + "<UL>\n"
     if len(res1) != 0:
         for row in res1:
-            text = text + displayDoctypeBranch(row[0],catalogues)
+            text = text + displayDoctypeBranch(row[0], catalogues)
     # display the son catalogues
     for row in res2:
         catalogues.append(row[0])
-        text = text + displayCatalogueBranch(row[0],level+1,catalogues)
+        text = text + displayCatalogueBranch(row[0], level+1, catalogues)
     if len(res1) != 0 or len(res2) != 0:
         text = text + "</UL>\n"
     return text
 
 
 
-def displayDoctypeBranch(doctype,catalogues):
+def displayDoctypeBranch(doctype, catalogues):
     text = ""
     res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname=%s", (doctype,))
     row = res[0]
-    text = "<LI><a href=\"\" onmouseover=\"javascript:popUpTextWindow('%s',true,event);\" onmouseout=\"javascript:popUpTextWindow('%s',false,event);\" onClick=\"document.forms[0].doctype.value='%s';document.forms[0].submit();return false;\">%s</a>\n" % (doctype,doctype,doctype,row[0])
+    text = "<LI><a href=\"\" onmouseover=\"javascript:popUpTextWindow('%s',true,event);\" onmouseout=\"javascript:popUpTextWindow('%s',false,event);\" onClick=\"document.forms[0].doctype.value='%s';document.forms[0].submit();return false;\">%s</a>\n" % (doctype, doctype, doctype, row[0])
     return text
 
 
-def action(req,c=cdsname,ln=cdslang,doctype=""):
+def action(req, c=cdsname, ln=cdslang, doctype=""):
     # load the right message language
     _ = gettext_set_language(ln)
 
@@ -937,12 +891,12 @@ def action(req,c=cdsname,ln=cdslang,doctype=""):
 
 
 def set_report_number (newrn):
-        global uid_email,doctype,access,rn
+        global uid_email, doctype, access, rn
         # First we save the value in the global object
         rn = newrn
         # then we save this value in the "journal of submissions"
         if uid_email != "" and uid_email != "guest":
-            run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (newrn,doctype,access,uid_email,))
+            run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (newrn, doctype, access, uid_email,))
 
 def get_report_number():
     global rn
@@ -973,7 +927,7 @@ def Evaluate_Parameter (field, doctype):
     # uniquely determined by the doctype, i.e. doctype is the primary key in
     # the table
     # If the table name is not null, evaluate the parameter
-    res = run_sql("SELECT value FROM sbmPARAMETERS WHERE doctype=%s and name=%s", (doctype,field,))
+    res = run_sql("SELECT value FROM sbmPARAMETERS WHERE doctype=%s and name=%s", (doctype, field,))
     # If no data is found then the data concerning the DEF(ault) doctype is used
     if len(res) == 0:
         res = run_sql("SELECT value FROM sbmPARAMETERS WHERE doctype='DEF' and name=%s", (field,))
@@ -992,11 +946,11 @@ def Get_Parameters (function, doctype):
     res = run_sql("SELECT * FROM sbmFUNDESC WHERE function=%s", (function,))
     for i in range(0,len(res)):
         parameter = res[i][1]
-        parray[parameter] = Evaluate_Parameter (parameter , doctype)
+        parray[parameter] = Evaluate_Parameter (parameter, doctype)
     return parray
 
 def get_level (doctype, action):
-    res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE docname=%s and actname=%s", (doctype,action,))
+    res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE docname=%s and actname=%s", (doctype, action,))
     if len(res) > 0:
         return res[0][9]
     else:
@@ -1005,7 +959,7 @@ def get_level (doctype, action):
 def action_details (doctype, action):
     # Prints whether the action is mandatory or optional. The score of the
     # action is returned (-1 if the action was optional)
-    res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE docname=%s and actname=%s", (doctype,action,))
+    res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE docname=%s and actname=%s", (doctype, action,))
     if len(res)>0:
         if res[0][9] != "0":
             return res[0][10]
@@ -1020,10 +974,10 @@ def print_function_calls (doctype, action, step, form, ln=cdslang):
     global htdocsdir,storage,access,pylibdir,dismode
     t=""
     # Get the list of functions to be called
-    res = run_sql("SELECT * FROM sbmFUNCTIONS WHERE action=%s and doctype=%s and step=%s ORDER BY score", (action,doctype,step,))
+    res = run_sql("SELECT * FROM sbmFUNCTIONS WHERE action=%s and doctype=%s and step=%s ORDER BY score", (action, doctype, step,))
     # If no data is found then the data concerning the DEF(ault) doctype is used
     if len(res) == 0:
-        res = run_sql("SELECT * FROM sbmFUNCTIONS WHERE action=%s and doctype='DEF' and step=%s ORDER BY score", (action,step,))
+        res = run_sql("SELECT * FROM sbmFUNCTIONS WHERE action=%s and doctype='DEF' and step=%s ORDER BY score", (action, step,))
     if len(res) > 0:
         # while there are functions left...
         functions = []
@@ -1036,18 +990,18 @@ def print_function_calls (doctype, action, step, form, ln=cdslang):
               'error' : 0,
               'text' : '',
             }
-            if os.path.exists("%s/invenio/websubmit_functions/%s.py" % (pylibdir,function_name)):
+            if os.path.exists("%s/invenio/websubmit_functions/%s.py" % (pylibdir, function_name)):
                 # import the function itself
                 #function = getattr(invenio.websubmit_functions, function_name)
-                execfile("%s/invenio/websubmit_functions/%s.py" % (pylibdir,function_name),globals())
+                execfile("%s/invenio/websubmit_functions/%s.py" % (pylibdir, function_name), globals())
                 if not globals().has_key(function_name):
                     currfunction['error'] = 1
                 else:
                     function = globals()[function_name]
                     # Evaluate the parameters, and place them in an array
-                    parameters = Get_Parameters(function_name,doctype)
+                    parameters = Get_Parameters(function_name, doctype)
                     # Call function
-                    currfunction['text'] = function(parameters,curdir,form)
+                    currfunction['text'] = function(parameters, curdir, form)
             else:
                 currfunction['error'] = 1
             functions.append(currfunction)
@@ -1065,10 +1019,10 @@ def print_function_calls (doctype, action, step, form, ln=cdslang):
             t = "<br><br><b>" + _("Your chosen action is not supported by the document") + "<b>"
     return t
 
-def Propose_Next_Action (doctype,action_score,access,currentlevel,indir):
-    global machine,storage,act,rn
+def Propose_Next_Action (doctype, action_score, access, currentlevel, indir):
+    global machine, storage, act, rn
     t=""
-    res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE docname=%s and level!='0' and level=%s and score>%s ORDER BY score", (doctype,currentlevel,action_score,))
+    res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE docname=%s and level!='0' and level=%s and score>%s ORDER BY score", (doctype, currentlevel, action_score,))
     if len(res) > 0:
         actions = []
         first_score = res[0][10]
@@ -1094,8 +1048,8 @@ def Propose_Next_Action (doctype,action_score,access,currentlevel,indir):
             )
     return t
 
-def Test_Reload(uid_email,doctype,act,access):
-    res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE doctype=%s and action=%s and id=%s and email=%s and status='finished'", (doctype,act,access,uid_email,))
+def Test_Reload(uid_email, doctype, act, access):
+    res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE doctype=%s and action=%s and id=%s and email=%s and status='finished'", (doctype, act, access, uid_email,))
     if len(res) > 0:
         return 1
     else:
@@ -1113,18 +1067,18 @@ class functionStop(Exception):
     def __str__(self):
         return repr(self.value)
 
-def errorMsg(title,req,c=cdsname,ln=cdslang):
+def errorMsg(title, req, c=cdsname, ln=cdslang):
     # load the right message language
     _ = gettext_set_language(ln)
 
     return page(title = _("error"),
-                body = create_error_box(req, title=title,verbose=0, ln=ln),
+                body = create_error_box(req, title=title, verbose=0, ln=ln),
                 description="%s - Internal Error" % c,
                 keywords="%s, CDS Invenio, Internal Error" % c,
                 language=ln,
                 urlargs=req.args)
 
-def warningMsg(title,req,c=cdsname,ln=cdslang):
+def warningMsg(title, req, c=cdsname, ln=cdslang):
     # load the right message language
     _ = gettext_set_language(ln)
 
@@ -1135,27 +1089,27 @@ def warningMsg(title,req,c=cdsname,ln=cdslang):
                 language=ln,
                 urlargs=req.args)
 
-def getCookie(name,uid):
+def getCookie(name, uid):
     # these are not real http cookies but are stored in the DB
-    res = run_sql("select value from sbmCOOKIES where uid=%s and name=%s", (uid,name,))
+    res = run_sql("select value from sbmCOOKIES where uid=%s and name=%s", (uid, name,))
     if len(res) > 0:
         return res[0][0]
     else:
         return None
 
-def setCookie(name,value,uid):
+def setCookie(name, value, uid):
     # these are not real http cookies but are stored in the DB
-    res = run_sql("select id from sbmCOOKIES where uid=%s and name=%s", (uid,name,))
+    res = run_sql("select id from sbmCOOKIES where uid=%s and name=%s", (uid, name,))
     if len(res) > 0:
-        run_sql("update sbmCOOKIES set value=%s where uid=%s and name=%s", (value,uid,name,))
+        run_sql("update sbmCOOKIES set value=%s where uid=%s and name=%s", (value, uid, name,))
     else:
-        run_sql("insert into sbmCOOKIES(name,value,uid) values(%s,%s,%s)", (name,value,uid,))
+        run_sql("insert into sbmCOOKIES(name,value,uid) values(%s,%s,%s)", (name, value, uid,))
     return 1
 
 def specialchars(text):
-    text = string.replace(text,"&#147;","\042");
-    text = string.replace(text,"&#148;","\042");
-    text = string.replace(text,"&#146;","\047");
-    text = string.replace(text,"&#151;","\055");
-    text = string.replace(text,"&#133;","\056\056\056");
+    text = string.replace(text, "&#147;", "\042");
+    text = string.replace(text, "&#148;", "\042");
+    text = string.replace(text, "&#146;", "\047");
+    text = string.replace(text, "&#151;", "\055");
+    text = string.replace(text, "&#133;", "\056\056\056");
     return text
