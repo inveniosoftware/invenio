@@ -415,7 +415,7 @@ class Collection:
 
         # load instant browse parts, in case no descendants
         if not len(sons) and type == 'r':
-            instant_browse = self.create_instant_browse(ln=ln)
+            instant_browse = self.create_instant_browse(as=as, ln=ln)
         else:
             instant_browse = ''
 
@@ -445,7 +445,7 @@ class Collection:
                  grandsons = grandsons
                )
 
-    def create_instant_browse(self, rg=cfg_instant_browse, ln=cdslang):
+    def create_instant_browse(self, rg=cfg_instant_browse, as=0, ln=cdslang):
         "Searches database and produces list of last 'rg' records."
         box = ""
         if self.restricted_p():
@@ -467,6 +467,7 @@ class Collection:
                 for recid in passIDs:
                     recid['date'] = get_creation_date(recid['id'], fmt="%Y-%m-%d<br>%H:%i")
                 return websearch_templates.tmpl_instant_browse(
+                                 as = as,
                                  ln = ln,
                                  recids = passIDs,
                                  more_link = url
