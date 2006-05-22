@@ -696,11 +696,13 @@ class Template:
 
         return _("This collection does not contain any document yet.")
 
-    def tmpl_instant_browse(self, ln, recids, more_link = None):
+    def tmpl_instant_browse(self, as, ln, recids, more_link = None):
         """
           Formats a list of records (given in the recids list) from the database.
 
         Parameters:
+
+          - 'as' *int* - Advanced Search interface or not (0 or 1)
 
           - 'ln' *string* - The language to display
 
@@ -725,9 +727,10 @@ class Template:
                       }
         out += "</table>"
         if more_link:
-            out += """<div align="right"><small><a href="%(url)s&amp;ln=%(ln)s">[&gt;&gt; %(text)s]</a></small></div>""" % {
+            out += """<div align="right"><small><a href="%(url)s&amp;ln=%(ln)s%(advanced_search_addon)s">[&gt;&gt; %(text)s]</a></small></div>""" % {
                'url'  : more_link,
                'ln'   : ln,
+               'advanced_search_addon'  : as and "&amp;as=%d" % as or "",
                'text' : _("more")}
         return out
 
