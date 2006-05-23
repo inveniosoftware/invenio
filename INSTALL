@@ -207,9 +207,10 @@ Contents
       $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
       $ sudo vi /path/to/php/conf/php.ini ## see below in part 2
       $ sudo /path/to/apache/bin/apachectl graceful
-      $ sudo ln -s /opt/cds-invenio/lib/python/invenio \
-                   /usr/lib/python2.3/site-packages/invenio
       $ make create-tables       ## optional
+      $ sudo ln -s /opt/cds-invenio/lib/python/invenio \
+                   /usr/local/lib/python2.3/site-packages/invenio \
+                   ## optional
       $ make install
       $ make test                ## optional
       $ sudo chown -R www-data /opt/cds-invenio/var
@@ -493,22 +494,33 @@ Contents
           now go back to finish the installation of the CDS Invenio
           package.
 
-      $ sudo ln -s /opt/cds-invenio/lib/python/invenio \
-                   /usr/lib/python2.3/site-packages/invenio
-
-          You have to create a symbolic link inside Python's
-          site-packages directory that would indicate Python where to
-          find CDS Invenio Python files.  Note that the exact symlink
-          target location depends on the --prefix location
-          (prefix/lib/python/invenio) and the exact symlink target
-          location depends on the Python version you are using, see
-          also --with-python configuration option.
-
       $ make create-tables     ## optional
 
-          Optionally, create CDS Invenio tables on the MySQL server.
-          You probably want to do this step only once, i.e. when you
-          have not created any CDS Invenio database and tables yet.
+          If you are installing for the first time, you have to create
+          CDS Invenio tables in the database.
+
+          Note that the `make install' process will warn you in case
+          the tables were not created and will ask you to run this
+          step manually before completing the make install process.
+
+      $ sudo ln -s /opt/cds-invenio/lib/python/invenio \
+                   /usr/local/lib/python2.3/site-packages/invenio \
+                   ## optional
+
+          If you are installing for the first time, you will have to
+          create a symbolic link from Python's site-packages directory
+          that would indicate to Python where to find CDS Invenio's
+          Python files.
+
+          Note that the exact symlink target location depends on the
+          --prefix location (prefix/lib/python/invenio) and the exact
+          symlink source location depends on the Python version you
+          are using.  (See also --with-python configuration option.)
+
+          Note that the `make install' process will warn you in case
+          the symbolic link was not created and it will indicate you
+          the command to use to create it manually before completing
+          the make install process.
 
       $ make install
 
