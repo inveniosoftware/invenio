@@ -27,7 +27,9 @@ pylib_DATA = __init__.py \
              messages.py \
              textutils.py \
              dateutils.py \
-	     urlutils.py
+             urlutils.py 
+
+noinst_DATA = testimport.py
 
 phplibdir = $(libdir)/php/invenio/errors
 phplib_DATA = errorHandling.php
@@ -42,7 +44,11 @@ EXTRA_DIST = __init__.py \
              errorHandling.php.wml \
              textutils.py \
              dateutils.py \
-	     urlutils.py
+             urlutils.py \
+             testimport.py
+
+install-data-hook:
+	$(PYTHON) $(srcdir)/testimport.py ${prefix}
 
 CLEANFILES = config.py dbquery.py messages.py $(phplib_DATA) *~ *.tmp *.pyc
 
