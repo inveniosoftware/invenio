@@ -33,7 +33,7 @@ sbmdat = SBITEXT MBITEXT FTTTEXT SRVTEXT TFUTEXT \
 
 all:
 	@echo "**************************************************************"
-	@echo "** CDS Invenio has been successfully built.  Proceed now by     **"
+	@echo "** CDS Invenio has been successfully built.  Proceed now by **"
 	@echo "** running 'make install'.                                  **"
 	@echo "**************************************************************"
 
@@ -49,18 +49,18 @@ install-data-local:
 		mkdir -p $(localstatedir)$$d &&		\
 		chmod ug=rwx $(localstatedir)$$d ;	\
 	done
-	@echo "**************************************************************"
-	@echo "** CDS Invenio has been successfully installed!                 **"
-	@echo "**                                                          **"
-	@echo "** If you are installing CDS Invenio for the first time, we     **"
-	@echo "** recommend you to run 'make create-demo-site' now to      **"
-	@echo "** to test your installation.                               **"
-	@echo "**                                                          **"
-	@echo "** If you are reinstalling CDS Invenio because you have been    **"
-	@echo "** editing CDS Invenio sources or its WML configuration, you    **"
-	@echo "** may want to restart your Apache server now by running    **"
-	@echo "** 'apachectl restart'.                                     **"
-	@echo "**************************************************************"
+	@echo "************************************************************"
+	@echo "** CDS Invenio has been successfully installed!           **"
+	@echo "**                                                        **"
+	@echo "** If you are installing CDS Invenio for the first time,  **"
+	@echo "** we recommend you to run 'make create-demo-site' now to **"
+	@echo "** to test your installation.                             **"
+	@echo "**                                                        **"
+	@echo "** If you are reinstalling CDS Invenio because you have   **"
+	@echo "** editing CDS Invenio sources or its WML configuration,  **"
+	@echo "** you may want to restart your Apache server now by      **"
+	@echo "** running 'sudo apachectl restart'.                      **"
+	@echo "************************************************************"
 
 
 create-tables: local-dbexec local-tabfill

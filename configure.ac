@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.89.0.20060509, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.89.0.20060509)
+AC_INIT(cds-invenio, 0.89.0.20060523, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.89.0.20060523)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -117,7 +117,7 @@ fi
 AC_MSG_CHECKING(for required Python modules)
 $PYTHON ${srcdir}/configure-tests.py
 if test $? -ne 0; then
-   AC_MSG_ERROR([Please fix the above Python problems before continuing.])
+   AC_MSG_ERROR([Please fix the above Python problem before continuing.])
 fi
 AC_MSG_RESULT(found)
 
