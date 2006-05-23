@@ -51,14 +51,17 @@ try:
     row = cursor.fetchone()    
 except MySQLdb.Error, e:
     print """
-    *************************************************
+    ******************************************************
     ** DATABASE QUERY ERROR %d: %s.
-    *************************************************
-    ** Perhaps you need to create CDS Invenio tables?  **
-    ** If yes, then run 'make create-tables' now.  **
-    ** If not, then read the above error message   **
-    **   and fix the problem before continuing!    **
-    *************************************************
+    ******************************************************
+    ** Perhaps you need to create the tables?           **
+    **                                                  **
+    ** If yes, then please run 'make create-tables' now **
+    ** and continue with the 'make install' afterwards. **
+    **                                                  **
+    ** If not, then please inspect the above error      **
+    ** message and fix the problem before continuing.   **
+    ******************************************************
     """ % (e.args[0], e.args[1])
     sys.exit(1)
 
