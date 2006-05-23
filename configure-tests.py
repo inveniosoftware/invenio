@@ -1,13 +1,5 @@
-"""
-Test the suitability of Python core and the availability of various
-Python modules for running CDS Invenio.  Warn the user if there are
-eventual troubles.  Exit status: 0 if okay, 1 if not okay.  Useful for
-running from configure.ac.
-"""
-
 ## $Id$
-## Tests availability of Python modules and their versions.
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -25,6 +17,13 @@ running from configure.ac.
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+Test the suitability of Python core and the availability of various
+Python modules for running CDS Invenio.  Warn the user if there are
+eventual troubles.  Exit status: 0 if okay, 1 if not okay.  Useful for
+running from configure.ac.
+"""
+
 __version__ = "$Id$"
 
 ## minimally recommended/required versions:
@@ -41,36 +40,20 @@ import getpass
 if sys.version < cfg_min_python_version:
     print """
     *******************************************************
-    ** WARNING: OLD PYTHON DETECTED: %s 
+    ** ERROR: OLD PYTHON DETECTED: %s 
     *******************************************************
     ** You seem to be using an old version of Python.    **
+    ** You must use at least Python %s.                 **
     **                                                   **
     ** Note that if you have more than one Python        **
     ** installed on your system, you can specify the     **
     ** --with-python configuration option to choose      **
     ** a specific (e.g. non system wide) Python binary.  **
     **                                                   **
-    ** We strongly recommend you to run CDS Invenio with     **
-    ** at least Python %s.  Some older versions    ** 
-    ** were known to be problematic with respect to      **
-    ** encodings and mod_python, see for example         **
-    ** <http://www.modpython.org/pipermail/mod_python/2002-October/002607.html>.
-    **                                                   **
-    ** Note that some operating systems (such as Debian) **
-    ** may backport important bugfixes to older Python   **
-    ** releases, so your concrete Python installation    **
-    ** may be immune to these problems already.          **  
-    ** If you are not sure, you may continue the CDS Invenio **
-    ** installation now and recall that in case of       **
-    ** problems you may need to upgrade Python and       **
-    ** reinstall CDS Invenio from scratch.                   **
+    ** Please upgrade your Python before continuing.     **
     *******************************************************
     """ % (string.replace(sys.version, "\n", ""), cfg_min_python_version)
-    try:
-        getpass.getpass("Press ENTER to continue the installation anyhow...")
-    except KeyboardInterrupt:
-        print "\n\nInstallation aborted."
-        sys.exit(1)
+    sys.exit(1)
 
 ## 2) check for required modules:
 try:
@@ -98,7 +81,7 @@ try:
 except ImportError, e:
     print """
     *************************************************
-    ** ERROR: PYTHON IMPORT FAILURE %s
+    ** IMPORT ERROR %s
     *************************************************
     ** Perhaps you forgot to install some of the   **
     ** prerequisite Python modules?  Please look   **
@@ -114,15 +97,15 @@ try:
 except ImportError, e:
     print """
     *****************************************************
-    ** WARNING: PYTHON IMPORT WARNING %s
+    ** IMPORT WARNING %s
     *****************************************************
-    ** Note that Psyco is not really required but      **
-    ** we recommend it for faster CDS Invenio operation.   **
+    ** Note that Psyco is not really required but we   **
+    ** recommend it for faster CDS Invenio operation.  **
     **                                                 **
-    ** You can safely continue installing CDS Invenio now, **
-    ** and add this module anytime later.  (I.e. even  **
-    ** after your CDS Invenio installation is put into     **
-    ** production.)                                    **
+    ** You can safely continue installing CDS Invenio  **
+    ** now, and add this module anytime later.  (I.e.  **
+    ** even after your CDS Invenio installation is put **
+    ** into production.)                               **
     *****************************************************
     """ % e
     try:
@@ -136,17 +119,17 @@ try:
 except ImportError, e:
     print """
     *****************************************************
-    ** WARNING: PYTHON IMPORT WARNING %s
+    ** IMPORT WARNING %s
     *****************************************************
     ** Note that PyStemmer is not really required but  **
     ** we recommend it to enable the stemming feature  **
     ** in the indexing engine and to bump up the speed **
     ** and accuracy of word-frequency based rankings.  **
     **                                                 **
-    ** You can safely continue installing CDS Invenio now, **
-    ** and add this module anytime later. (But better  **
-    ** before you firstly run the indexation/ranking   **
-    ** on real production data.)                       **
+    ** You can safely continue installing CDS Invenio  **
+    ** now, and add this module anytime later.  (I.e.  **
+    ** even after your CDS Invenio installation is put **
+    ** into production.)                               **
     *****************************************************
     """ % e
     try:
@@ -160,15 +143,15 @@ try:
 except ImportError, e:
     print """
     *****************************************************
-    ** WARNING: PYTHON IMPORT WARNING %s
+    ** IMPORT WARNING %s
     *****************************************************
     ** Note that PyRXP is not really required but      **
     ** we recommend it for fast XML MARC parsing.      **
     **                                                 **
-    ** You can safely continue installing CDS Invenio now, **
-    ** and add this module anytime later.  (I.e. even  **
-    ** after your CDS Invenio installation is put into     **
-    ** production.)                                    **
+    ** You can safely continue installing CDS Invenio  **
+    ** now, and add this module anytime later.  (I.e.  **
+    ** even after your CDS Invenio installation is put **
+    ** into production.)                               **
     *****************************************************
     """ % e
     try:
@@ -182,17 +165,17 @@ try:
 except ImportError, e:
     print """
     *****************************************************
-    ** WARNING: PYTHON IMPORT WARNING %s
+    ** IMPORT WARNING %s
     *****************************************************
     ** Note that Gnuplot.py is not really required but **
     ** we recommend it in order to have nice download  **
     ** and citation history graphs on Detailed record  **
     ** pages.                                          **
     **                                                 **
-    ** You can safely continue installing CDS Invenio now, **
-    ** and add this module anytime later.  (I.e. even  **
-    ** after your CDS Invenio installation is put into     **
-    ** production.)                                    **
+    ** You can safely continue installing CDS Invenio  **
+    ** now, and add this module anytime later.  (I.e.  **
+    ** even after your CDS Invenio installation is put **
+    ** into production.)                               **
     *****************************************************
     """ % e
     try:
@@ -233,3 +216,4 @@ if Numeric.__version__ < cfg_min_numeric_version:
     except KeyboardInterrupt:
         print "\n\nInstallation aborted."
         sys.exit(1)
+
