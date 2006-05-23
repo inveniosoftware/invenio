@@ -35,7 +35,7 @@ class external_auth_nice:
 
         params = urllib.urlencode({'Username': username, 'Password': password})
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-        conn = httplib.HTTPSConnection("winservices.web.cern.ch") 
+        conn = httplib.HTTPSConnection("weba5.cern.ch") 
         conn.request("POST", "/WinServices/Authentication/CDS/default.asp", params, headers)
         response = conn.getresponse()
         data = response.read()
