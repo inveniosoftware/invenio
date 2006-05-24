@@ -178,8 +178,8 @@ def print_record(recID, format='hb', ln=cdslang):
                      rns = rns,
                      abstracts = abstracts,
                      urls_u = urls_u,
-                     urls_z = urls_z
-                    )
+                     urls_z = urls_z,
+                     ln=ln)
 
     # at the end of HTML mode, print "Detailed record" and "Mark record" functions:
     out += websearch_templates.tmpl_record_links(

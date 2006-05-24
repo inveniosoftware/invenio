@@ -892,7 +892,7 @@ class Template:
                  
         return out
 
-    def tmpl_record_body(self, weburl, titles, authors, dates, rns, abstracts, urls_u, urls_z):
+    def tmpl_record_body(self, weburl, titles, authors, dates, rns, abstracts, urls_u, urls_z, ln):
         """
           Displays the "HTML basic" format of a record
 
@@ -921,7 +921,7 @@ class Template:
             out += " / "
             for author in authors[:cfg_author_et_al_threshold]:
                 out += '%s; ' % \
-                       a_href(cgi.escape(authors[i]), 
+                       a_href(cgi.escape(author), 
                               href=self.build_search_url(p=author, f='author', ln=ln))
                     
             if len(authors) > cfg_author_et_al_threshold:
@@ -2371,7 +2371,7 @@ class Template:
                  abstracts = abstracts,
                  urls_u = urls_u,
                  urls_z = urls_z,
-               )
+                 ln=ln)
 
     def tmpl_print_record_brief_links(self, ln, recID, weburl):
         """Displays links for brief record on-the-fly
