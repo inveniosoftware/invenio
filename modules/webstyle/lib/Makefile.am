@@ -24,7 +24,7 @@ pylib_DATA = 			\
 	template.py 		\
 	webstyle_templates.py 	\
 	webinterface_handler.py \
-	webinterface_test.py 	\
+	webinterface_tests.py 	\
 	webinterface_layout.py
 
 EXTRA_DIST = $(pylib_DATA)

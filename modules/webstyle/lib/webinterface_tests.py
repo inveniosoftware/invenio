@@ -1,3 +1,4 @@
+## $Id$
 ##
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -59,7 +60,7 @@ class TestWashArgs(unittest.TestCase):
         self.failUnlessEqual(result, expected)
 
     def test_single_string(self):
-        """ webinterface - check the retrieval of a single string field """
+        """ webinterface - check retrieval of a single string field """
 
         default = {'c': (str, 'default')}
         
@@ -68,7 +69,7 @@ class TestWashArgs(unittest.TestCase):
         self._check('c=Invenio&c=CDSware', default, {'c': 'Invenio'})
 
     def test_string_list(self):
-        """ webinterface - check the retrieval of a list of values """
+        """ webinterface - check retrieval of a list of values """
 
         default = {'c': (list, ['default'])}
         
