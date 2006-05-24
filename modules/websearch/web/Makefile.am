@@ -19,10 +19,4 @@
 
 SUBDIRS = admin
 
-webappdir = $(localstatedir)/www
-
-webapp_DATA = search.py index.py
-
-EXTRA_DIST = $(webapp_DATA)
-
-CLEANFILES = *~ *.tmp search.pyc
+CLEANFILES = *~ *.tmp

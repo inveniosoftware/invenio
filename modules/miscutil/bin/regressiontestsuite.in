@@ -1,0 +1,55 @@
+#!@PYTHON@
+## -*- mode: python; coding: utf-8; -*-
+##
+## $Id$
+##
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""Run CDS Invenio regression test suite."""
+
+__version__ = "$Id$"
+
+
+# Harvest all the modules whose name ends in 'regression_tests', and
+# build up a complete suite to run from that list.
+
+import sys
+import os
+import unittest
+
+import invenio
+from invenio import testutils
+
+test_modules = []
+
+for candidate in os.listdir(os.path.dirname(invenio.__file__)):
+    base, ext = os.path.splitext(candidate)
+    
+    if ext != '.py' or not base.endswith('regression_tests'):
+        continue
+
+    module = __import__('invenio.' + base, globals(), locals(), ['test_suite'])
+    test_modules.append(module.test_suite)
+
+print "regressiontestsuite: detected %d regression test modules" % len(test_modules)
+testutils.warn_user_about_tests()
+
+complete_suite = unittest.TestSuite(test_modules)
+unittest.TextTestRunner(verbosity=2).run(complete_suite)
+
+

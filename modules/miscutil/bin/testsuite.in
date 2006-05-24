@@ -29,6 +29,7 @@ import unittest
 import sys
 
 from invenio.config import version
+from invenio import webinterface_test
 from invenio import search_engine_tests 
 from invenio import bibindex_engine_tests 
 from invenio import bibindex_engine_stemmer_tests 
@@ -66,7 +67,8 @@ def create_all_test_suites():
                                oai_repository_tests.create_test_suite(),
                                bibconvert_tests.create_test_suite(),
 			       errorlib_tests.create_test_suite(),
-                               elmsubmit_tests.create_test_suite()))
+                               elmsubmit_tests.create_test_suite(),
+                               webinterface_test.create_test_suite()))
 
 def print_info_line():
     """Prints info line about tests to be executed."""

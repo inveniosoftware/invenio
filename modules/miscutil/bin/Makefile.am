@@ -17,11 +17,11 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = dbexec testsuite
+bin_SCRIPTS = dbexec testsuite regressiontestsuite
 
 noinst_SCRIPTS = dbtest
 
-EXTRA_DIST = dbexec.in testsuite.in dbtest.in
+EXTRA_DIST = dbexec.in testsuite.in dbtest.in regressiontestsuite.in
 
 all:
 	chmod u+x ./dbtest ./dbexec

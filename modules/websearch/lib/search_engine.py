@@ -54,6 +54,7 @@ from invenio.config import *
 from invenio.search_engine_config import *
 from invenio.bibrank_record_sorter import get_bibrank_methods,rank_records
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
+
 if cfg_experimental_features:
     from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
     from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
@@ -114,6 +115,8 @@ sre_unicode_uppercase_u = sre.compile(unicode(r"(?u)[ÚÙÜÛ]", "utf-8"))
 sre_unicode_uppercase_y = sre.compile(unicode(r"(?u)[Ý]", "utf-8"))
 sre_unicode_uppercase_c = sre.compile(unicode(r"(?u)[ÇĆ]", "utf-8"))
 sre_unicode_uppercase_n = sre.compile(unicode(r"(?u)[Ñ]", "utf-8"))
+
+
 
 def get_alphabetically_ordered_collection_list(collid=1, level=0):
     """Returns nicely ordered (score respected) list of collections, more exactly list of tuples
@@ -1245,11 +1248,8 @@ def browse_pattern(req, colls, p, f, rg, ln=cdslang):
     ## do we search in words indexes?
     if not f:
         return browse_in_bibwords(req, p, f)
-    ## prepare collection urlargument for later printing:
+
     p_orig = p
-    urlarg_colls = ""
-    for coll in colls:
-        urlarg_colls += "&c=%s" % urllib.quote(coll)
     ## okay, "real browse" follows:
     browsed_phrases = get_nearest_terms_in_bibxxx(p, f, rg, 1)
     while not browsed_phrases:
@@ -1286,11 +1286,10 @@ def browse_pattern(req, colls, p, f, rg, ln=cdslang):
 
     ## display results now:
     out = websearch_templates.tmpl_browse_pattern(
-            f = get_field_i18nname(f, ln),
-            ln = ln,
-            browsed_phrases_in_colls = browsed_phrases_in_colls,
-            weburl = weburl,
-            urlarg_colls = urlarg_colls,
+            f=get_field_i18nname(f, ln),
+            ln=ln,
+            browsed_phrases_in_colls=browsed_phrases_in_colls,
+            colls=colls,
           )
     req.write(out)
     return
@@ -1300,8 +1299,12 @@ def browse_in_bibwords(req, p, f, ln=cdslang):
     if not p:
         return
     _ = gettext_set_language(ln)
-    urlargs = string.replace(req.args, "action=%s" % _("Browse"), "action=%s" % _("Search"))
-    nearest_box = create_nearest_terms_box(urlargs, p, f, 'w', ln=ln, intro_text_p=0)
+
+    urlargd = {}
+    urlargd.update(req.argd)
+    urlargd['action'] = 'search'
+    
+    nearest_box = create_nearest_terms_box(urlargd, p, f, 'w', ln=ln, intro_text_p=0)
 
     req.write(websearch_templates.tmpl_search_in_bibwords(
         p = p,
@@ -1399,7 +1402,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                             if bsu_f == "recid":
                                 print_warning(req, "Requested record does not seem to exist.")
                             else:
-                                print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m, ln=ln))
+                                print_warning(req, create_nearest_terms_box(req.argd, bsu_p, bsu_f, bsu_m, ln=ln))
                     return hitset_empty
             else:
                 # stage 2-3: no hits found either, propose nearest indexed terms:
@@ -1408,7 +1411,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                         if bsu_f == "recid":
                             print_warning(req, "Requested record does not seem to exist.")
                         else:
-                            print_warning(req, create_nearest_terms_box(req.args, bsu_p, bsu_f, bsu_m, ln=ln))
+                            print_warning(req, create_nearest_terms_box(req.argd, bsu_p, bsu_f, bsu_m, ln=ln))
                 return hitset_empty
     if verbose and of.startswith("h"):
         t2 = os.times()[4]
@@ -1443,19 +1446,18 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 if bsu_p.startswith("%") and bsu_p.endswith("%"):
                     bsu_p = "'" + bsu_p[1:-1] + "'"
                 bsu_nbhits = basic_search_units_hitsets[idx_unit]._nbhits
-                url_args_new = sre.sub(r'(^|\&)p=.*?(\&|$)', r'\1p='+urllib.quote(bsu_p)+r'\2', req.args)
-                url_args_new = sre.sub(r'(^|\&)f=.*?(\&|$)', r'\1f='+urllib.quote(bsu_f)+r'\2', url_args_new)
-                nearestterms.append({
-                                      'nbhits' : bsu_nbhits,
-                                      'url_args' : url_args_new,
-                                      'p' : bsu_p,
-                                    })
+
+                # create a similar query, but with the basic search unit only
+                argd = {}
+                argd.update(req.argd)
+
+                argd['p'] = bsu_p
+                argd['f'] = bsu_f
+                
+                nearestterms.append((bsu_p, bsu_nbhits, argd))
 
             text = websearch_templates.tmpl_search_no_boolean_hits(
-                     ln = ln,
-                     weburl = weburl,
-                     nearestterms = nearestterms,
-                   )
+                     ln=ln,  nearestterms=nearestterms)
             print_warning(req, text)
     if verbose and of.startswith("h"):
         t2 = os.times()[4]
@@ -1626,15 +1628,11 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
         results_in_Home.calculate_nbhits()
         if results_in_Home._nbhits > 0:
             # some hits found in Home, so propose this search:
-            url_args = req.args
-            url_args = sre.sub(r'(^|\&)cc=.*?(\&|$)', r'\2', url_args)
-            url_args = sre.sub(r'(^|\&)c=.*?(\&[^c]+=|$)', r'\2', url_args)
-            url_args = sre.sub(r'^\&+', '', url_args)
-            url_args = sre.sub(r'\&+$', '', url_args)
             if of.startswith("h"):
+                url = websearch_templates.build_search_url(req.argd, cc=cdsname, c=[])
                 print_warning(req, _("No match found in collection %s. Other public collections gave "
-                                     "<a class=\"nearestterms\" href=\"%s/search.py?%s\">%d hits</a>.") %
-                              (string.join(colls, ","), weburl, url_args, results_in_Home._nbhits))
+                                     "<a class=\"nearestterms\" href=\"%s\">%d hits</a>.") %
+                              (string.join(colls, ","), url, results_in_Home._nbhits))
             results = {}
         else:
             # no hits found in Home, recommend different search terms:
@@ -1728,17 +1726,13 @@ def create_similarly_named_authors_link_box(author_name, ln=cdslang):
         for out_author in out_authors:
             nbhits = get_nbhits_in_bibxxx(out_author, "author")
             if nbhits:
-                tmp_authors.append({'nb': nbhits,
-                                    'name': out_author})
+                tmp_authors.append((out_author, nbhits))
         out += websearch_templates.tmpl_similar_author_names(
-                 ln = ln,
-                 weburl = weburl,
-                 authors = tmp_authors,
-               )
+                 authors=tmp_authors, ln=ln)
 
     return out
 
-def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang, intro_text_p=1):
+def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=cdslang, intro_text_p=True):
     """Return text box containing list of 'n' nearest terms above/below 'p'
        for the field 'f' for matching type 't' (words/phrases) in
        language 'ln'.
@@ -1763,14 +1757,22 @@ def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang, intro_text_p
         if not nearest_terms:
             return "%s %s." % (_("No phrase index available for"), get_field_i18nname(f, ln))
 
-    termargs = []
-    termhits = []
+    terminfo = []
     for term in nearest_terms:
         if t == 'w':
-            termhits.append(get_nbhits_in_bibwords(term, f))
+            hits = get_nbhits_in_bibwords(term, f)
         else:
-            termhits.append(get_nbhits_in_bibxxx(term, f))
-        termargs.append(urlargs_replace_text_in_arg(urlargs, r'^p\d?$', p, term))
+            hits = get_nbhits_in_bibxxx(term, f)
+
+        argd = {}
+        argd.update(urlargd)
+
+        # check which fields contained the requested parameter, and replace it.
+        for field in ('p', 'p1', 'p2', 'p3'):
+            if field in argd and argd[field] == p:
+                argd[field] = term
+                break
+        terminfo.append((term, hits, argd))
 
     intro = ""
     if intro_text_p: # add full leading introductory text
@@ -1779,16 +1781,8 @@ def create_nearest_terms_box(urlargs, p, f, t='w', n=5, ln=cdslang, intro_text_p
             intro += " " + _("inside <em>%s</em> index") % get_field_i18nname(f, ln)
         intro += " " + _("did not match any record. Nearest terms in any collection are:")
 
-    return websearch_templates.tmpl_nearest_term_box(
-             p = p,
-             ln = ln,
-             f = f,
-             weburl = weburl,
-             terms = nearest_terms,
-             termargs = termargs,
-             termhits = termhits,
-             intro = intro,
-           )
+    return websearch_templates.tmpl_nearest_term_box(p=p, ln=ln, f=f, terminfo=terminfo,
+                                                     intro=intro)
 
 def get_nearest_terms_in_bibwords(p, f, n_below, n_above):
     """Return list of +n -n nearest terms to word `p' in index for field `f'."""
@@ -2004,11 +1998,10 @@ def get_fieldvalues(recID, tag):
             out.append(row[0])
     return out
 
-def get_fieldvalues_alephseq_like(recID, tags):
+def get_fieldvalues_alephseq_like(recID, tags_in):
     """Return textual lines in ALEPH sequential like format for field 'tag' inside record 'recID'."""
     out = ""
-    # clean passed 'tag':
-    tags_in = string.split(tags, ",")
+
     if len(tags_in) == 1 and len(tags_in[0]) == 6:
         ## case A: one concrete subfield asked, so print its value if found
         ##         (use with care: can false you if field has multiple occurrences)
@@ -2389,10 +2382,6 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                          ))
             else:
                 # HTML detailed format:
-                # deduce url without 'of' argument:
-                url_args = sre.sub(r'(^|\&)of=.*?(\&|$)',r'\1',req.args)
-                url_args = sre.sub(r'^\&+', '', url_args)
-                url_args = sre.sub(r'\&+$', '', url_args)
                 # print other formatting choices:
 
                 rows = []
@@ -2439,7 +2428,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                 req.write(websearch_templates.tmpl_records_format_other(
                            ln = ln,
                            weburl = weburl,
-                           url_args = url_args,
+                           url_argd = req.argd,
                            rows = rows,
                            format = format,
                          ))
@@ -2647,7 +2636,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
         if record_exist_p == -1:
             out += _("The record has been deleted.")
         else:
-            out += """<a href="%s/search.py?recid=%s&ln=%s">""" % (weburl, recID, ln)
+            out += '<a href="%s">' % websearch_templates.build_search_url(recid=recID, ln=ln)
             # firstly, title:
             titles = get_fieldvalues(recID, "245__a")
             if titles:
@@ -2968,51 +2957,18 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
 
     """
 
-    # wash all passed arguments:
-    cc = wash_url_argument(cc, 'str')
-    sc = wash_url_argument(sc, 'int')
+    # wash all arguments requiring special care
     (cc, colls_to_display, colls_to_search) = wash_colls(cc, c, sc) # which colls to search and to display?
-    p = wash_pattern(wash_url_argument(p, 'str'))
-    f = wash_field(wash_url_argument(f, 'str'))
-    rg = wash_url_argument(rg, 'int')
-    sf = wash_url_argument(sf, 'str')
-    so = wash_url_argument(so, 'str')
-    sp = wash_url_argument(sp, 'str')
-    rm = wash_url_argument(rm, 'str')
-    of = wash_url_argument(of, 'str')
-    if type(ot) is list:
-        ot = string.join(ot,",")
-    ot = wash_url_argument(ot, 'str')
-    as = wash_url_argument(as, 'int')
-    p1 = wash_pattern(wash_url_argument(p1, 'str'))
-    f1 = wash_field(wash_url_argument(f1, 'str'))
-    m1 = wash_url_argument(m1, 'str')
-    op1 = wash_url_argument(op1, 'str')
-    p2 = wash_pattern(wash_url_argument(p2, 'str'))
-    f2 = wash_field(wash_url_argument(f2, 'str'))
-    m2 = wash_url_argument(m2, 'str')
-    op2 = wash_url_argument(op2, 'str')
-    p3 = wash_pattern(wash_url_argument(p3, 'str'))
-    f3 = wash_field(wash_url_argument(f3, 'str'))
-    m3 = wash_url_argument(m3, 'str')
-    jrec = wash_url_argument(jrec, 'int')
-    recid = wash_url_argument(recid, 'int')
-    recidb = wash_url_argument(recidb, 'int')
-    sysno = wash_url_argument(sysno, 'str')
-    id = wash_url_argument(id, 'int')
-    idb = wash_url_argument(idb, 'int')
-    sysnb = wash_url_argument(sysnb, 'str')
-    action = wash_url_argument(action, 'str')
-    d1y = wash_url_argument(d1y, 'int')
-    d1m = wash_url_argument(d1m, 'int')
-    d1d = wash_url_argument(d1d, 'int')
-    d2y = wash_url_argument(d2y, 'int')
-    d2m = wash_url_argument(d2m, 'int')
-    d2d = wash_url_argument(d2d, 'int')
+
+    p = wash_pattern(p)
+    f = wash_field(f)
+    p1 = wash_pattern(p1)
+    f1 = wash_field(f1)
+    p2 = wash_pattern(p2)
+    f2 = wash_field(f2)
+    p3 = wash_pattern(p3)
+    f3 = wash_field(f3)
     day1, day2 = wash_dates(d1y, d1m, d1d, d2y, d2m, d2d)
-    verbose = wash_url_argument(verbose, 'int')
-    ap = wash_url_argument(ap, 'int')
-    ln = wash_language(ln)
 
     _ = gettext_set_language(ln)
 
@@ -3025,7 +2981,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         recidb = idb
     # TODO deduce passed search limiting criterias (if applicable)
     pl, pl_in_url = "", "" # no limits by default
-    if action != _("Browse") and req and req.args: # we do not want to add options while browsing or while calling via command-line
+    if action != "browse" and req and req.args: # we do not want to add options while browsing or while calling via command-line
         fieldargs = cgi.parse_qs(req.args)
         for fieldcode in get_fieldcodes():
             if fieldargs.has_key(fieldcode):
@@ -3059,7 +3015,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         else: # record does not exist
             if of.startswith("h"):
                 print_warning(req, "Requested record does not seem to exist.")
-    elif action == _("Browse"):
+    elif action == "browse":
         ## 2 - browse needed
         page_start(req, of, cc, as, ln, uid, _("Browse"))
         if of.startswith("h"):
@@ -3409,7 +3365,7 @@ def perform_request_cache(req, action="show"):
     else:
         out += "<p>Search cache is empty."
     out += "</blockquote>"
-    out += """<p><a href="%s/search.py/cache?action=clear">clear cache</a>""" % weburl
+    out += """<p><a href="%s/search/cache?action=clear">clear cache</a>""" % weburl
     # show field i18nname cache:
     out += "<h3>Field I18N names cache</h3>"
     res = run_sql("SHOW TABLE STATUS LIKE 'fieldname'")
@@ -3468,7 +3424,7 @@ def perform_request_log(req, date=""):
         for day in range(yyyymm01,yyyymmdd+1):
             p = os.popen("grep -c ^%d %s/search.log" % (day,logdir), 'r')
             for line in p.readlines():
-                req.write("""<tr><td>%s</td><td align="right"><a href="%s/search.py/log?date=%d">%s</a></td></tr>""" % (day, weburl,day,line))
+                req.write("""<tr><td>%s</td><td align="right"><a href="%s/search/log?date=%d">%s</a></td></tr>""" % (day, weburl,day,line))
             p.close()
         req.write("</table>")
     return "\n"

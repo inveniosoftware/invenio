@@ -27,7 +27,8 @@ pylib_DATA = __init__.py \
              messages.py \
              textutils.py \
              dateutils.py \
-             urlutils.py 
+	     testutils.py \
+	     urlutils.py
 
 noinst_DATA = testimport.py
 

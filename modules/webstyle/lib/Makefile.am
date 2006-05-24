@@ -18,7 +18,14 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir=$(libdir)/python/invenio
-pylib_DATA=webpage.py template.py webstyle_templates.py 
+
+pylib_DATA = 			\
+	webpage.py 		\
+	template.py 		\
+	webstyle_templates.py 	\
+	webinterface_handler.py \
+	webinterface_test.py 	\
+	webinterface_layout.py
 
 EXTRA_DIST = $(pylib_DATA)
 

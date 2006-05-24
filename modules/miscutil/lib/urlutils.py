@@ -25,10 +25,19 @@
 __lastupdated__ = """$Date$"""
 __version__ = "$Id$"
 
+from urllib import urlencode
+from urlparse import urlparse
+from cgi import parse_qs
+
+from xml.sax.saxutils import quoteattr
+
 try:
     from mod_python import apache
 except ImportError:
     pass
+
+from invenio.config import cdslang
+
 
 def wash_url_argument(var, new_type):
     """
@@ -111,3 +120,74 @@ def get_referer(req, replace_ampersands=1):
         return referer
     except KeyError:
         return ''
+
+
+def drop_default_urlargd(urlargd, default_urlargd):
+    lndefault = {}
+    lndefault.update(default_urlargd)
+    lndefault['ln'] = (str, cdslang)
+    
+    canonical = {}
+    canonical.update(urlargd)
+    
+    for k, v in urlargd.items():
+        try:
+            d = lndefault[k]
+
+            if d[1] == v:
+                del canonical[k]
+                
+        except KeyError:
+            pass
+
+    return canonical
+
+def make_canonical_urlargd(urlargd, default_urlargd):
+    """ Build up the query part of an URL from the arguments passed in
+    the 'urlargd' dictionary.  'default_urlargd' is a secondary dictionary which
+    contains tuples of the form (type, default value) for the query
+    arguments (this is the same dictionary as the one you can pass to
+    webinterface_handler.wash_urlargd).
+
+    When a query element has its default value, it is discarded, so
+    that the simplest (canonical) url query is returned.
+
+    The result contains the initial '?' if there are actual query
+    items remaining.
+    """
+
+    canonical = drop_default_urlargd(urlargd, default_urlargd)
+
+    if canonical:
+        return '?' + urlencode(canonical, doseq=True)
+
+    return ''
+
+
+def a_href(text, **kargs):
+    """ Build a properly escaped <a href="...">...</a> fragment.
+
+    - text: content of the tag, already html-escaped
+    - all the other keyword arguments are quoteattr-escaped.
+    """
+    
+    if '_class' in kargs:
+        kargs['class'] = kargs['_class']
+        del kargs['_class']
+        
+    attrs = ['%s=%s' %(k, quoteattr(kargs[k])) for k in kargs.keys()]
+
+    return '<a %s>%s</a>' % (' '.join(attrs), text)
+
+
+def same_urls_p(a, b):
+    """ Compare two URLs, ignoring reorganizing of query arguments """
+
+    ua = list(urlparse(a))
+    ub = list(urlparse(b))
+    
+    ua[4] = parse_qs(ua[4], True)
+    ub[4] = parse_qs(ub[4], True)
+
+    return ua == ub
+

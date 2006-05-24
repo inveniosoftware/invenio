@@ -25,11 +25,14 @@ import gettext
 import string
 import locale
 import sre
+from sets import ImmutableSet
 
 from invenio.config import *
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
 from invenio.search_engine_config import *
+from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, a_href
+
 
 def get_fieldvalues(recID, tag):
     """Return list of field values for field TAG inside record RECID.
@@ -73,6 +76,76 @@ class Template:
         }
     tmpl_default_locale = "en_US" # which locale to use by default, useful in case of failure
 
+
+    # Type of the allowed parameters for the web interface for search
+    search_results_default_urlargd = {
+        'cc': (str, cdsname), 'c': (list, []),
+        'p': (str, ""), 'f': (str, ""),
+        'rg': (int, 10),
+        'sf': (str, ""),
+        'so': (str, "d"),
+        'sp': (str, ""),
+        'rm': (str, ""),
+        'of': (str, "hb"),
+        'ot': (list, []),
+        'as': (int, 0),
+        'p1': (str, ""), 'f1': (str, ""), 'm1': (str, ""), 'op1':(str, ""),
+        'p2': (str, ""), 'f2': (str, ""), 'm2': (str, ""), 'op2':(str, ""),
+        'p3': (str, ""), 'f3': (str, ""), 'm3': (str, ""),
+        'sc': (int, 0),
+        'jrec': (int, 0),
+        'recid': (int, -1), 'recidb': (int, -1), 'sysno': (str, ""),
+        'id': (int, -1), 'idb': (int, -1), 'sysnb': (str, ""),
+        'action': (str, "search"),
+        'action_search': (str, ""),
+        'action_browse': (str, ""),
+        'd1y': (int, 0), 'd1m': (int, 0), 'd1d': (int, 0),
+        'd2y': (int, 0), 'd2m': (int, 0), 'd2d': (int, 0),
+        'ap': (int, 1),
+        'verbose': (int, 0),
+        }
+
+    def build_search_url(self, known_parameters={}, **kargs):
+        """ Helper for generating a canonical search
+        url. 'known_parameters' is the list of query parameters you
+        inherit from your current query. You can then pass keyword
+        arguments to modify this query.
+        
+           build_search_url(known_parameters, of="xm")
+
+        The generated URL is absolute.
+        """
+
+        parameters = {}
+        parameters.update(known_parameters)
+        parameters.update(kargs)
+
+        # Now, we only have the arguments which have _not_ their default value
+        parameters = drop_default_urlargd(parameters, self.search_results_default_urlargd)
+
+        # Asking for a recid? Return a /record/<recid> URL
+        if 'recid' in parameters:
+            target = "%s/record/%d" % (weburl, parameters['recid'])
+            del parameters['recid']
+            target += make_canonical_urlargd(parameters, self.search_results_default_urlargd)
+            return target
+
+        # Harvesting a full collection? Return a /collection/<name>?jrec=... URL
+        args = ImmutableSet(parameters.keys())
+        args_for_collection = ImmutableSet(('ln', 'jrec', 'cc', 'as'))
+
+        if args.issubset(args_for_collection):
+            try:
+                cc = parameters['cc']
+                del parameters['cc']
+            except KeyError:
+                cc = cdsname
+            
+            return "%s/collection/%s%s" % (weburl, urllib.quote(cc),
+                                           make_canonical_urlargd(parameters, self.search_results_default_urlargd))
+        
+        return "%s/search%s" % (weburl, make_canonical_urlargd(parameters, self.search_results_default_urlargd))
+
     def tmpl_navtrail_links(self, as, ln, weburl, separator, dads):
         """
         Creates the navigation bar at top of each search page (*Home > Root collection > subcollection > ...*)
@@ -93,12 +166,8 @@ class Template:
         for url, name in dads:
             if out:
                 out += separator
-            out += '''<a class="navtrail" href="%(weburl)s/?c=%(qname)s&amp;as=%(as)d&amp;ln=%(ln)s">%(longname)s</a>''' % {
-                'weburl'   : weburl,
-                'qname'    : urllib.quote_plus (url),
-                'as'       : as,
-                'ln'       : ln,
-                'longname' : name }
+
+            out += a_href(name, href=self.build_search_url(c=url, as=as, ln=ln), _class='navtrail')
         return out
 
     def tmpl_webcoll_body(self, weburl, te_portalbox, searchfor, np_portalbox, narrowsearch, focuson, ne_portalbox):
@@ -122,14 +191,14 @@ class Template:
           - 'ne_portalbox' *string* - The HTML code for the bottom of the page
         """
 
-        body = """
-                <form action="%(weburl)s/search.py" method="get">
+        body = '''
+                <form name="search" action="%(weburl)s/search" method="get">
                 %(searchfor)s
                 %(np_portalbox)s
                 <table cellspacing="0" cellpadding="0" border="0">
                   <tr>
                     <td valign="top">%(narrowsearch)s</td>
-               """ % {
+               ''' % {
                  'weburl' : weburl,
                  'searchfor' : searchfor,
                  'np_portalbox' : np_portalbox,
@@ -178,40 +247,45 @@ class Template:
         _ = gettext_set_language(ln)
 
         # print commentary start:
-        out = """<!--create_searchfor_simple()-->
-               <input type="hidden" name="sc" value="1">
-               <input type="hidden" name="ln" value="%(ln)s">
-               <table class="searchbox">
-                <thead>
-                 <tr align="left">
-                  <th colspan="3" class="searchboxheader">%(header)s</th>
-                 </tr>
-                </thead>
-                <tbody>
-                 <tr valign="baseline">
-                  <td class="searchboxbody" align="left"><input type="text" name="p" size="40" value=""></td>
-                  <td class="searchboxbody" align="left">%(middle_option)s</td>
-                  <td class="searchboxbody" align="left"><input class="formbutton" type="submit" name="action" value="%(msg_search)s"><input class="formbutton" type="submit" name="action" value="%(msg_browse)s"></td>
-                 </tr>
-                 <tr valign="baseline">
-                  <td class="searchboxbody" colspan="3" align="right"
-                    <small><a href="%(weburl)s/help/search/tips.%(ln)s.html">%(msg_search_tips)s</a> :: <a href="%(asearchurl)s">%(msg_advanced_search)s</a></small>
-                  </td>
-                 </tr>
-                </tbody>
-               </table>
-               <!--/create_searchfor_simple()-->
-                """ % {
-                 'ln' : ln,
-                 'weburl' : weburl,
-                 'asearchurl' : asearchurl,
-                 'header' : header,
-                 'middle_option' : middle_option,
-                 'msg_search' : _('Search'),
-                 'msg_browse' : _('Browse'),
-                 'msg_search_tips' : _('Search Tips'),
-                 'msg_advanced_search' : _('Advanced Search'),
-               }
+        out = '''
+        <!--create_searchfor_simple()-->
+        <input type="hidden" name="sc" value="1">
+        <input type="hidden" name="ln" value="%(ln)s">
+        <table class="searchbox">
+         <thead>
+          <tr align="left">
+           <th colspan="3" class="searchboxheader">%(header)s</th>
+          </tr>
+         </thead>
+         <tbody>
+          <tr valign="baseline">
+           <td class="searchboxbody" align="left"><input type="text" name="p" size="40" value=""></td>
+           <td class="searchboxbody" align="left">%(middle_option)s</td>
+           <td class="searchboxbody" align="left">
+             <input class="formbutton" type="submit" name="action_search" value="%(msg_search)s">
+             <input class="formbutton" type="submit" name="action_browse" value="%(msg_browse)s"></td>
+          </tr>
+          <tr valign="baseline">
+           <td class="searchboxbody" colspan="3" align="right">
+             <small>
+               <a href="%(weburl)s/help/search/tips.%(ln)s.html">%(msg_search_tips)s</a> ::
+               <a href="%(asearchurl)s">%(msg_advanced_search)s</a>
+             </small>
+           </td>
+          </tr>
+         </tbody>
+        </table>
+        <!--/create_searchfor_simple()-->
+        ''' % {'ln' : ln,
+               'weburl' : weburl,
+               'asearchurl' : asearchurl,
+               'header' : header,
+               'middle_option' : middle_option,
+               'msg_search' : _('Search'),
+               'msg_browse' : _('Browse'),
+               'msg_search_tips' : _('Search Tips'),
+               'msg_advanced_search' : _('Advanced Search')}
+        
         return out
 
     def tmpl_searchfor_advanced(self,
@@ -261,61 +335,65 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = """<!--create_searchfor_advanced()-->
-                 <input type="hidden" name="as" value="1">
-                 <input type="hidden" name="ln" value="%(ln)s">
-                 <table class="searchbox">
-                  <thead>
-                   <tr>
-                    <th class="searchboxheader" colspan="3">%(header)s</th>
-                   </tr>
-                  </thead>
-                  <tbody>
-                   <tr valign="bottom">
-                     <td class="searchboxbody" nowrap>%(matchbox_m1)s<input type="text" name="p1" size="40" value=""></td>
-                     <td class="searchboxbody">%(middle_option_1)s</td>
-                     <td class="searchboxbody">%(andornot_op1)s</td>
-                   </tr>
-                   <tr valign="bottom">
-                     <td class="searchboxbody" nowrap>%(matchbox_m2)s<input type="text" name="p2" size="40" value=""></td>
-                     <td class="searchboxbody">%(middle_option_2)s</td>
-                     <td class="searchboxbody">%(andornot_op2)s</td>
-                   </tr>
-                   <tr valign="bottom">
-                     <td class="searchboxbody" nowrap>%(matchbox_m3)s<input type="text" name="p3" size="40" value=""></td>
-                     <td class="searchboxbody">%(middle_option_3)s</td>
-                     <td class="searchboxbody" nowrap><input class="formbutton" type="submit" name="action" value="%(msg_search)s"><input class="formbutton" type="submit" name="action" value="%(msg_browse)s"></td>
-                   </tr>
-                   <tr valign="bottom">
-                     <td colspan="3" class="searchboxbody" align="right">
-                       <small><a href="%(weburl)s/help/search/tips.%(ln)s.html">%(msg_search_tips)s</a> :: <a href="%(ssearchurl)s">%(msg_simple_search)s</a></small>
-                     </td>
-                   </tr>
-                  </tbody>
-                 </table>
-                 <!-- @todo - more imports -->
-              """ % {
-                 'ln' : ln,
-                 'weburl' : weburl,
-                 'ssearchurl' : ssearchurl,
-                 'header' : header,
+        out = '''
+        <!--create_searchfor_advanced()-->
+        <input type="hidden" name="as" value="1">
+        <input type="hidden" name="ln" value="%(ln)s">
+        <table class="searchbox">
+         <thead>
+          <tr>
+           <th class="searchboxheader" colspan="3">%(header)s</th>
+          </tr>
+         </thead>
+         <tbody>
+          <tr valign="bottom">
+            <td class="searchboxbody" nowrap>%(matchbox_m1)s<input type="text" name="p1" size="40" value=""></td>
+            <td class="searchboxbody">%(middle_option_1)s</td>
+            <td class="searchboxbody">%(andornot_op1)s</td>
+          </tr>
+          <tr valign="bottom">
+            <td class="searchboxbody" nowrap>%(matchbox_m2)s<input type="text" name="p2" size="40" value=""></td>
+            <td class="searchboxbody">%(middle_option_2)s</td>
+            <td class="searchboxbody">%(andornot_op2)s</td>
+          </tr>
+          <tr valign="bottom">
+            <td class="searchboxbody" nowrap>%(matchbox_m3)s<input type="text" name="p3" size="40" value=""></td>
+            <td class="searchboxbody">%(middle_option_3)s</td>
+            <td class="searchboxbody" nowrap>
+              <input class="formbutton" type="submit" name="action_search" value="%(msg_search)s">
+              <input class="formbutton" type="submit" name="action_browse" value="%(msg_browse)s"></td>
+          </tr>
+          <tr valign="bottom">
+            <td colspan="3" class="searchboxbody" align="right">
+              <small>
+                <a href="%(weburl)s/help/search/tips.%(ln)s.html">%(msg_search_tips)s</a> ::
+                <a href="%(ssearchurl)s">%(msg_simple_search)s</a>
+              </small>
+            </td>
+          </tr>
+         </tbody>
+        </table>
+        <!-- @todo - more imports -->
+        ''' % {'ln' : ln,
+               'weburl' : weburl,
+               'ssearchurl' : ssearchurl,
+               'header' : header,
 
-                 'matchbox_m1' : self.tmpl_matchtype_box('m1', ln=ln),
-                 'middle_option_1' : middle_option_1,
-                 'andornot_op1' : self.tmpl_andornot_box('op1', ln=ln),
+               'matchbox_m1' : self.tmpl_matchtype_box('m1', ln=ln),
+               'middle_option_1' : middle_option_1,
+               'andornot_op1' : self.tmpl_andornot_box('op1', ln=ln),
 
-                 'matchbox_m2' : self.tmpl_matchtype_box('m2', ln=ln),
-                 'middle_option_2' : middle_option_2,
-                 'andornot_op2' : self.tmpl_andornot_box('op2', ln=ln),
+               'matchbox_m2' : self.tmpl_matchtype_box('m2', ln=ln),
+               'middle_option_2' : middle_option_2,
+               'andornot_op2' : self.tmpl_andornot_box('op2', ln=ln),
 
-                 'matchbox_m3' : self.tmpl_matchtype_box('m3', ln=ln),
-                 'middle_option_3' : middle_option_3,
+               'matchbox_m3' : self.tmpl_matchtype_box('m3', ln=ln),
+               'middle_option_3' : middle_option_3,
 
-                 'msg_search' : _("Search"),
-                 'msg_browse' : _("Browse"),
-                 'msg_search_tips' : _("Search Tips"),
-                 'msg_simple_search' : _("Simple Search")
-               }
+               'msg_search' : _("Search"),
+               'msg_browse' : _("Browse"),
+               'msg_search_tips' : _("Search Tips"),
+               'msg_simple_search' : _("Simple Search")}
 
         if (searchoptions):
             out += """<table class="searchbox">
@@ -592,32 +670,22 @@ class Template:
                         out += """<input type=checkbox name="c" value="%(name)s">&nbsp;</td>""" % {'name' : son.name }
                     else:
                         out += """<input type=checkbox name="c" value="%(name)s" checked>&nbsp;</td>""" % {'name' : son.name }
-                out += """<td valign="top"><a href="%(url)s/?c=%(name)s&amp;as=%(as)d&amp;ln=%(ln)s">%(prolog)s%(longname)s%(epilog)s</a>%(recs)s """ % {
-                          'url' : weburl,
-                          'name' : urllib.quote_plus(son.name),
-                          'as' : as,
-                          'ln' : ln,
-                          'prolog' : style_prolog,
-                          'longname' : son.get_name(ln),
-                          'epilog' : style_epilog,
-                          'recs' : son.create_nbrecs_info(ln)
-                       }
+                out += """<td valign="top">%(link)s%(recs)s """ % {
+                    'link': a_href(style_prolog + son.get_name(ln) + style_epilog,
+                                   href=self.build_search_url(cc=son.name, ln=ln, as=as)),
+                    'recs' : son.create_nbrecs_info(ln)}
+                
                 if son.restricted_p():
                     out += """ <small class="warning">[%(msg)s]</small>""" % { 'msg' : _("restricted") }
                 if display_grandsons and len(grandsons[i]):
                     # iterate trough grandsons:
                     out += """<br>"""
                     for grandson in grandsons[i]:
-                        out += """
-                                <a href="%(weburl)s/?c=%(name)s&amp;as=%(as)d&amp;ln=%(ln)s">%(longname)s</a>%(nbrec)s
-                               """ % {
-                                 'weburl' : weburl,
-                                 'name' : urllib.quote_plus(grandson.name),
-                                 'as' : as,
-                                 'ln' : ln,
-                                 'longname' : grandson.get_name(ln),
-                                 'nbrec' : grandson.create_nbrecs_info(ln)
-                               }
+                        out += """%(link)s%(nbrec)s""" % {
+                            'link': a_href(style_prolog + grandson.get_name(ln) + style_epilog,
+                                           href=self.build_search_url(cc=grandson.name, ln=ln, as=as)),
+                            'nbrec' : grandson.create_nbrecs_info(ln)}
+                        
                 out += """</td></tr>"""
                 i += 1
             out += "</tbody></table>"
@@ -811,20 +879,16 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out =  """
-                <br><span class="moreinfo"><a class="moreinfo" href="%(weburl)s/search.py?recid=%(recid)s&amp;ln=%(ln)s">%(msgdetail)s</a>
-                 - <a class="moreinfo" href="%(weburl)s/search.py?p=recid:%(recid)d&amp;rm=wrd&amp;ln=%(ln)s">%(msgsimilar)s</a></span>
-               """ % {
-                  'weburl' : weburl,
-                  'recid' : recid,
-                  'ln' : ln,
-                  'msgdetail' : _("Detailed record"),
-                  'msgsimilar' : _("Similar records")
-               }
+        out = '''<br><span class="moreinfo">%(detailed)s - %(similar)s</span>''' % {
+            'detailed': a_href(_("Detailed record"), _class="moreinfo",
+                               href=self.build_search_url(recid=recid, ln=ln)),
+            'similar': a_href(_("Similar records"), _class="moreinfo",
+                              href=self.build_search_url(p="recid:%d" % recid, rm='wrd', ln=ln))}
                  
         if cfg_experimental_features:
-            out += """<span class="moreinfo"> - <a class="moreinfo" href="%s/search.py?p=recid:%d&amp;rm=cit&amp;ln=%s">%s</a></span>\n""" % (
-                weburl, recid, ln, _("Cited by"))
+            out += '''<span class="moreinfo"> - %s </span>''' % \
+                   a_href(_("Cited by"), _class="moreinfo",
+                          href=self.build_search_url(p='recid:%d' % recid, rm='cit', ln=ln))
                  
         return out
 
@@ -855,15 +919,13 @@ class Template:
                    }
         if authors:
             out += " / "
-            for i in range (0,cfg_author_et_al_threshold):
-                if i < len(authors):
-                    out += """<a href="%(weburl)s/search.py?p=%(name_url)s&f=author">%(name)s</a> ;""" % {
-                             'weburl' : weburl,
-                             'name_url' : urllib.quote(authors[i]),
-                             'name' : cgi.escape(authors[i])
-                           }
+            for author in authors[:cfg_author_et_al_threshold]:
+                out += '%s; ' % \
+                       a_href(cgi.escape(authors[i]), 
+                              href=self.build_search_url(p=author, f='author', ln=ln))
+                    
             if len(authors) > cfg_author_et_al_threshold:
-                out += " <em>et al</em>"
+                out += "<em>et al</em>"
         for date in dates:
             out += " %s." % cgi.escape(date)
         for rn in rns:
@@ -906,7 +968,7 @@ class Template:
         out += nearest_box
         return out
 
-    def tmpl_nearest_term_box(self, p, ln, f, weburl, terms, termargs, termhits, intro):
+    def tmpl_nearest_term_box(self, p, ln, f, terminfo, intro):
         """
           Displays the *Nearest search terms* box
 
@@ -920,57 +982,43 @@ class Template:
 
           - 'weburl' *string* - The base URL for the site
 
-          - 'terms' *array* - the broken down related terms
-
-          - 'termargs' *array* - the URL parameters to compose the search queries for the terms
-
-          - 'termhits' *array* - the number of hits in each query
+          - 'terminfo': tuple (term, hits, argd) for each near term
 
           - 'intro' *string* - the intro HTML to prefix the box with
         """
 
-        out = """<table class="nearesttermsbox" cellpadding="0" cellspacing="0" border="0">"""
+        out = '''<table class="nearesttermsbox" cellpadding="0" cellspacing="0" border="0">'''
 
-        for i in range(0, len(terms)):
-            if terms[i] == p: # print search word for orientation:
-                if termhits[i] > 0:
-                    out += """<tr>
-                               <td class="nearesttermsboxbodyselected" align="right">%(hits)d</td>
-                               <td class="nearesttermsboxbodyselected" width="15">&nbsp;</td>
-                               <td class="nearesttermsboxbodyselected" align="left">
-                                 <a class="nearesttermsselected" href="%(weburl)s/search.py?%(urlargs)s">%(term)s</a>
-                               </td>
-                              </tr>""" % {
-                                 'hits' : termhits[i],
-                                 'weburl' : weburl,
-                                 'urlargs' : termargs[i],
-                                 'term' : terms[i]
-                              }
-                else:
-                    out += """<tr>
-                               <td class="nearesttermsboxbodyselected" align="right">-</td>
-                               <td class="nearesttermsboxbodyselected" width="15">&nbsp;</td>
-                               <td class="nearesttermsboxbodyselected" align="left">%(term)s</td>
-                              </tr>""" % {
-                                'term' : terms[i]
-                              }
+        for term, hits, argd in terminfo:
+
+            if hits:
+                hitsinfo = str(hits)
             else:
-                out += """<tr>
-                           <td class="nearesttermsboxbody" align="right">%(hits)s</td>
-                           <td class="nearesttermsboxbody" width="15">&nbsp;</td>
-                           <td class="nearesttermsboxbody" align="left">
-                             <a class="nearestterms" href="%(weburl)s/search.py?%(urlargs)s">%(term)s</a>
-                           </td>
-                          </tr>""" % {
-                             'hits' : termhits[i],
-                             'weburl' : weburl,
-                             'urlargs' : termargs[i],
-                             'term' : terms[i]
-                          }
+                hitsinfo = '-'
+            
+            term = cgi.escape(term)
+
+            if term == p: # print search word for orientation:
+                if hits > 0:
+                    term = a_href(term, href=self.build_search_url(argd),
+                                  _class="nearesttermsselected")
+            else:
+                term = a_href(term, href=self.build_search_url(argd),
+                              _class="nearestterms")
+
+            out += '''\
+            <tr>
+              <td class="nearesttermsboxbodyselected" align="right">%(hits)s</td>
+              <td class="nearesttermsboxbodyselected" width="15">&nbsp;</td>
+              <td class="nearesttermsboxbodyselected" align="left">%(term)s</td>
+            </tr>  
+            ''' % {'hits': hitsinfo,
+                   'term': term}
+
         out += "</table>"
         return intro + "<blockquote>" + out + "</blockquote>"
 
-    def tmpl_browse_pattern(self, f, ln, weburl, browsed_phrases_in_colls, urlarg_colls):
+    def tmpl_browse_pattern(self, f, ln, browsed_phrases_in_colls, colls):
         """
           Displays the *Nearest search terms* box
 
@@ -1012,6 +1060,12 @@ class Template:
         if len(browsed_phrases_in_colls) == 1:
             # one hit only found:
             phrase, nbhits = browsed_phrases_in_colls[0][0], browsed_phrases_in_colls[0][1]
+
+            query = {'c': colls,
+                     'ln': ln,
+                     'p': '"%s"' % phrase,
+                     'f': f}
+
             out += """<tr>
                        <td class="searchresultsboxbody" align="right">
                         %(nbhits)s
@@ -1020,19 +1074,19 @@ class Template:
                         &nbsp;
                        </td>
                        <td class="searchresultsboxbody" align="left">
-                        <a href="%(weburl)s/search.py?p=%%22%(phrase_qt)s%%22&f=%(f)s%(urlargs)s">%(phrase)s</a>
+                        %(link)s
                        </td>
-                      </tr>""" % {
-                        'nbhits' : nbhits,
-                        'weburl' : weburl,
-                        'phrase_qt' : urllib.quote(phrase),
-                        'phrase' : phrase,
-                        'f' : urllib.quote(f),
-                        'urlargs' : urlarg_colls,
-                      }
+                      </tr>""" % {'nbhits': nbhits,
+                                  'link': a_href(phrase, href=self.build_search_url(query))}
+                        
         elif len(browsed_phrases_in_colls) > 1:
             # first display what was found but the last one:
             for phrase, nbhits in browsed_phrases_in_colls[:-1]:
+                query = {'c': colls,
+                         'ln': ln,
+                         'p': '"%s"' % phrase,
+                         'f': f}
+                
                 out += """<tr>
                            <td class="searchresultsboxbody" align="right">
                             %(nbhits)s
@@ -1041,33 +1095,28 @@ class Template:
                             &nbsp;
                            </td>
                            <td class="searchresultsboxbody" align="left">
-                            <a href="%(weburl)s/search.py?p=%%22%(phrase_qt)s%%22&f=%(f)s%(urlargs)s">%(phrase)s</a>
+                            %(link)s
                            </td>
-                          </tr>""" % {
-                            'nbhits' : nbhits,
-                            'weburl' : weburl,
-                            'phrase_qt' : urllib.quote(phrase),
-                            'phrase' : phrase,
-                            'f' : urllib.quote(f),
-                            'urlargs' : urlarg_colls,
-                          }
+                          </tr>""" % {'nbhits' : nbhits,
+                                      'link': a_href(phrase, href=self.build_search_url(query))}
+                            
             # now display last hit as "next term":
             phrase, nbhits = browsed_phrases_in_colls[-1]
+            query = {'c': colls,
+                     'ln': ln,
+                     'p': phrase,
+                     'f': f}
+            
             out += """<tr><td colspan="2" class="normal">
                             &nbsp;
                           </td>
                           <td class="normal">
                             <img src="%(weburl)s/img/sn.gif" alt="" border="0">
-                            <a href="%(weburl)s/search.py?action=%(browse)s&p=%(phrase_qt)s&f=%(f)s%(urlargs)s">%(next)s</a>
+                            %(link)s
                           </td>
-                      </tr>""" % {
-                        'weburl' : weburl,
-                        'phrase_qt' : urllib.quote(phrase),
-                        'browse' : _("Browse"),
-                        'next' : _("next"),
-                        'f' : urllib.quote(f),
-                        'urlargs' : urlarg_colls,
-                      }
+                      </tr>""" % {'link': a_href(_("next"),
+                                                 href=self.build_search_url(query, action='browse')),
+                                  'weburl' : weburl}
         out += """</tbody>
             </table>"""
         return out
@@ -1128,7 +1177,7 @@ class Template:
         # print search box prolog:
         out += """
                 <h1 class="headline">%(ccname)s</h1>
-                <form action="%(weburl)s/search.py" method="get">
+                <form name="search" action="%(weburl)s/search" method="get">
                 <input type="hidden" name="cc" value="%(cc)s">
                 <input type="hidden" name="as" value="%(as)s">
                 <input type="hidden" name="ln" value="%(ln)s">
@@ -1143,19 +1192,20 @@ class Template:
         if sp: out += self.tmpl_input_hidden('sp', sp)
 
         leadingtext = _("Search")
-        if action == _("Browse") :
+
+        if action == 'browse':
             leadingtext = _("Browse")
 
         if as == 1:
             # print Advanced Search form:
             google = ''
             if cfg_google_box and (p1 or p2 or p3):
-                google = """<small> :: <a href="#googlebox">%(search_smwhere)s</a></small>""" % {
+                google = '<small> :: <a href="#googlebox">%(search_smwhere)s</a></small>' % {
                      'search_smwhere' : _("Try your search on...")
                    }
 
             # define search box elements:
-            out += """
+            out += '''
             <table class="searchbox">
              <thead>
               <tr>
@@ -1185,25 +1235,30 @@ class Template:
                 </td>
                 <td class="searchboxbody">%(searchwithin3)s</td>
                 <td class="searchboxbody">
-                  <input class="formbutton" type="submit" name="action" value="%(search)s"><input class="formbutton" type="submit" name="action" value="%(browse)s">&nbsp;
+                  <input class="formbutton" type="submit" name="action_search" value="%(search)s">
+                  <input class="formbutton" type="submit" name="action_browse" value="%(browse)s">&nbsp;
                 </td>
               </tr>
               <tr valign="bottom">
                 <td colspan="3" align="right" class="searchboxbody">
-                  <small><a href="%(weburl)s/help/search/tips.%(ln)s.html">%(search_tips)s</a> ::
-                         <a href="%(weburl)s/search.py?p=%(p1_qt)s&amp;f=%(f1_qt)s&amp;rm=%(rm)s&amp;cc=%(cc)s&amp;ln=%(ln)s">%(simple_search)s</a>
+                  <small>
+                    <a href="%(weburl)s/help/search/tips.%(ln)s.html">%(search_tips)s</a> ::
+                    %(simple_search)s
                   </small>
                   %(google)s
                 </td>
               </tr>
              </tbody>
             </table>
-            """ % {
-              'leading' : leadingtext,
-              'sizepattern' : cfg_advancedsearch_pattern_box_width,
-              'matchbox1' : self.tmpl_matchtype_box('m1', m1, ln=ln),
-              'p1' : cgi.escape(p1,1),
-              'searchwithin1' : self.tmpl_searchwithin_select(
+            ''' % {
+                'simple_search': a_href(_("Simple Search"),
+                                        href=self.build_search_url(p=p1, f=f1, rm=rm, cc=cc, ln=ln)),
+                
+                'leading' : leadingtext,
+                'sizepattern' : cfg_advancedsearch_pattern_box_width,
+                'matchbox1' : self.tmpl_matchtype_box('m1', m1, ln=ln),
+                'p1' : cgi.escape(p1,1),
+                'searchwithin1' : self.tmpl_searchwithin_select(
                                   ln = ln,
                                   fieldname = 'f1',
                                   selected = f1,
@@ -1240,22 +1295,17 @@ class Template:
               'weburl' : weburl,
               'ln' : ln,
               'search_tips': _("Search Tips"),
-              'p1_qt' : urllib.quote(p1),
-              'f1_qt' : urllib.quote(f1),
-              'rm' : urllib.quote(rm),
-              'cc' : urllib.quote(cc),
-              'simple_search' : _("Simple Search"),
               'google' : google,
             }
         else:
             # print Simple Search form:
             google = ''
             if cfg_google_box and (p1 or p2 or p3):
-                google = """<small> :: <a href="#googlebox">%(search_smwhere)s</a></small>""" % {
+                google = '''<small> :: <a href="#googlebox">%(search_smwhere)s</a></small>''' % {
                      'search_smwhere' : _("Try your search on...")
                    }
 
-            out += """
+            out += '''
             <table class="searchbox">
              <thead>
               <tr>
@@ -1269,21 +1319,24 @@ class Template:
                 <td class="searchboxbody"><input type="text" name="p" size="%(sizepattern)d" value="%(p)s"></td>
                 <td class="searchboxbody">%(searchwithin)s</td>
                 <td class="searchboxbody">
-                  <input class="formbutton" type="submit" name="action" value="%(search)s">
-                  <input class="formbutton" type="submit" name="action" value="%(browse)s">&nbsp;
+                  <input class="formbutton" type="submit" name="action_search" value="%(search)s">
+                  <input class="formbutton" type="submit" name="action_browse" value="%(browse)s">&nbsp;
                 </td>
               </tr>
               <tr valign="bottom">
                 <td colspan="3" align="right" class="searchboxbody">
-                  <small><a href="%(weburl)s/help/search/tips.%(ln)s.html">%(search_tips)s</a> ::
-                         <a href="%(weburl)s/search.py?p1=%(p_qt)s&amp;f1=%(f_qt)s&amp;rm=%(rm)s&amp;as=1&amp;cc=%(cc)s&amp;ln=%(ln)s">%(advanced_search)s</a>
+                  <small>
+                    <a href="%(weburl)s/help/search/tips.%(ln)s.html">%(search_tips)s</a> ::
+                    %(advanced_search)s
                   </small>
                   %(google)s
                 </td>
               </tr>
              </tbody>
             </table>
-            """ % {
+            ''' % {
+              'advanced_search': a_href(_("Advanced Search"),
+                                        href=self.build_search_url(p1=p, f1=f, rm=rm, as=1, cc=cc, ln=ln)),
               'leading' : leadingtext,
               'sizepattern' : cfg_advancedsearch_pattern_box_width,
               'p' : cgi.escape(p, 1),
@@ -1298,11 +1351,6 @@ class Template:
               'weburl' : weburl,
               'ln' : ln,
               'search_tips': _("Search Tips"),
-              'p_qt' : urllib.quote(p),
-              'f_qt' : urllib.quote(f),
-              'rm' : urllib.quote(rm),
-              'cc' : urllib.quote(cc),
-              'advanced_search' : _("Advanced Search"),
               'google' : google,
             }
             
@@ -1729,23 +1777,20 @@ class Template:
         out = ""
         # left table cells: print collection name
         if not middle_only:
-            out += """
-                  <a name="%(collection_qt)s"></a>
-                  <form action="%(weburl)s/search.py" method="get">
+            out += '''
+                  %(collection_name)s
+                  <form action="%(weburl)s/search" method="get">
                   <table class="searchresultsbox"><tr><td class="searchresultsboxheader" align="left">
-                  <strong><big>
-                  <a href="%(weburl)s/?c=%(collection_qt_plus)s&amp;as=%(as)d&amp;ln=%(ln)s">%(collection_name)s</a></big></strong></td>
-                  """ % {
-                    'collection_qt' : urllib.quote(collection),
-                    'collection_qt_plus' : urllib.quote_plus(collection),
-                    'as' : as,
-                    'ln' : ln,
-                    'collection_name' : collection_name,
+                  <strong><big>%(collection_link)s</big></strong></td>
+                  ''' % {
+                    'collection_name': a_href('', name=collection),
                     'weburl' : weburl,
+                    'collection_link': a_href(collection_name,
+                                              href=self.build_search_url(cc=collection, as=as, ln=ln)),
                   }
         else:
             out += """
-                  <form action="%(weburl)s/search.py" method="get"><div align="center">
+                  <form action="%(weburl)s/search" method="get"><div align="center">
                   """ % { 'weburl' : weburl }
 
         # middle table cell: print beg/next/prev/end arrows:
@@ -1764,75 +1809,65 @@ class Template:
               scbis = 1
             else:
               scbis = 0
-            url = """%(weburl)s/search.py?p=%(p_qt)s&amp;cc=%(coll_qt)s&amp;f=%(f)s&amp;sf=%(sf)s&amp;so=%(so)s&amp;sp=%(sp)s&amp;rm=%(rm)s&amp;of=%(of)s&amp;ot=%(ot)s&amp;as=%(as)s&amp;ln=%(ln)s&amp;p1=%(p1)s&amp;p2=%(p2)s&amp;p3=%(p3)s&amp;f1=%(f1)s&amp;f2=%(f2)s&amp;f3=%(f3)s&amp;m1=%(m1)s&amp;m2=%(m2)s&amp;m3=%(m3)s&amp;op1=%(op1)s&amp;op2=%(op2)s&amp;sc=%(sc)d&amp;d1y=%(d1y)d&amp;d1m=%(d1m)d&amp;d1d=%(d1d)d&amp;d2y=%(d2y)d&amp;d2m=%(d2m)d&amp;d2d=%(d2d)d""" % {
-                    'weburl' : weburl,
-                    'p_qt' : urllib.quote(p),
-                    'coll_qt' : urllib.quote(collection),
-                    'f' : f,
-                    'sf' : sf,
-                    'so' : so,
-                    'sp' : sp,
-                    'rm' : rm,
-                    'of' : of,
-                    'ot' : ot,
-                    'as' : as,
-                    'ln' : ln,
-                    'p1' : urllib.quote(p1),
-                    'p2' : urllib.quote(p2),
-                    'p3' : urllib.quote(p3),
-                    'f1' : f1,
-                    'f2' : f2,
-                    'f3' : f3,
-                    'm1' : m1,
-                    'm2' : m2,
-                    'm3' : m3,
-                    'op1' : op1,
-                    'op2' : op2,
-                    'sc' : scbis,
-                    'd1y' : d1y,
-                    'd1m' : d1m,
-                    'd1d' : d1d,
-                    'd2y' : d2y,
-                    'd2m' : d2m,
-                    'd2d' : d2d,
-                  }
 
+            query = {
+                'p' : p,
+                'cc' : collection,
+                'f' : f,
+                'sf' : sf,
+                'so' : so,
+                'sp' : sp,
+                'rm' : rm,
+                'of' : of,
+                'ot' : ot,
+                'as' : as,
+                'ln' : ln,
+                'p1' : p1,
+                'p2' : p2,
+                'p3' : p3,
+                'f1' : f1,
+                'f2' : f2,
+                'f3' : f3,
+                'm1' : m1,
+                'm2' : m2,
+                'm3' : m3,
+                'op1' : op1,
+                'op2' : op2,
+                'sc' : scbis,
+                'd1y' : d1y,
+                'd1m' : d1m,
+                'd1d' : d1d,
+                'd2y' : d2y,
+                'd2m' : d2m,
+                'd2d' : d2d,
+                }
+            
             # @todo here
+            def img(gif, txt):
+                return '<img src="%(weburl)s/img/%(gif)s.gif" alt="%(txt)s">' % {
+                    'txt': txt, 'gif': gif, 'weburl': weburl}
+
             if jrec-rg > 1:
-                out += """<a class="img" href="%(url)s&amp;jrec=1&amp;rg=%(rg)d"><img src="%(weburl)s/img/sb.gif" alt="%(begin)s" border="0"></a>""" % {
-                         'url' : url,
-                         'rg' : rg,
-                         'weburl' : weburl,
-                         'begin' : _("begin"),
-                       }
+                out += a_href(img('sb', _("begin")), _class='img',
+                              href=self.build_search_url(query, jrec=1, rg=rg))
+                
             if jrec > 1:
-                out += """<a class="img" href="%(url)s&amp;jrec=%(jrec)d&amp;rg=%(rg)d"><img src="%(weburl)s/img/sp.gif" alt="%(previous)s" border="0"></a>""" % {
-                         'url' : url,
-                         'jrec' : max(jrec-rg, 1),
-                         'rg' : rg,
-                         'weburl' : weburl,
-                         'previous' : _("previous")
-                       }
+                out += a_href(img('sp', _("previous")), _class='img',
+                              href=self.build_search_url(query, jrec=max(jrec-rg, 1), rg=rg))
+                
             if jrec+rg-1 < nb_found:
                 out += "%d - %d" % (jrec, jrec+rg-1)
             else:
                 out += "%d - %d" % (jrec, nb_found)
+
             if nb_found >= jrec+rg:
-                out += """<a class="img" href="%(url)s&amp;jrec=%(jrec)d&amp;rg=%(rg)d"><img src="%(weburl)s/img/sn.gif" alt="%(next)s" border="0"></a>""" % {
-                         'url' : url,
-                         'jrec' : jrec + rg,
-                         'rg' : rg,
-                         'weburl' : weburl,
-                         'next' : _("next")
-                       }
+                out += a_href(img('sn', _("next")), _class='img',
+                              href=self.build_search_url(query, jrec=jrec+rg, rg=rg))
+
             if nb_found >= jrec+rg+rg:
-                out += """<a class="img" href="%(url)s&amp;jrec=%(jrec)d&amp;rg=%(rg)d"><img src="%(weburl)s/img/se.gif" alt="%(end)s" border="0"></a>""" % {
-                         'url' : url,
-                         'jrec' : nb_found-rg+1,
-                         'rg' : rg,
-                         'weburl' : weburl,
-                         'end' : _("end")
-                       }
+                out += a_href(img('se', _("end")), _class='img',
+                              href=self.build_search_url(query, jrec=nb_found-rg+1, rg=rg))
+                
 
             # still in the navigation part
             cc = collection
@@ -1940,7 +1975,7 @@ class Template:
                }
         return out
 
-    def tmpl_records_format_other(self, ln, weburl, rows, format, url_args):
+    def tmpl_records_format_other(self, ln, weburl, rows, format, url_argd):
         """Returns other formats of the records
 
         Parameters:
@@ -1961,7 +1996,7 @@ class Template:
 
           - 'format' *string* - The current format
 
-          - 'url_args' *string* - The rest of the search query
+          - 'url_argd' *string* - Parameters of the search query
         """
 
         # load the right message language
@@ -1971,13 +2006,20 @@ class Template:
                 'format' : _("Format")
               }
 
-        if format == "hm":
-            out += """<a href="%(weburl)s/search.py?%(url_args)s">HTML</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=hx">BibTeX</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=xd">DC</a> | MARC | <a href="%(weburl)s/search.py?%(url_args)s&of=xm">MARCXML</a>""" % vars()
-        elif format == "hx":
-            out += """<a href="%(weburl)s/search.py?%(url_args)s">HTML</a> | BibTeX | <a href="%(weburl)s/search.py?%(url_args)s&of=xd">DC</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=hm">MARC</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=xm">MARCXML</a>""" % vars()
-        else:
-            out += """HTML | <a href="%(weburl)s/search.py?%(url_args)s&of=hx">BibTeX</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=xd">DC</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=hm">MARC</a> | <a href="%(weburl)s/search.py?%(url_args)s&of=xm">MARCXML</a>""" % vars()
+        result = []
+        
+        for abbrev, name in (('hd', 'HTML'),
+                             ('hx', 'BibTeX'),
+                             ('xd', 'DC'),
+                             ('hm', 'MARC'),
+                             ('xm', 'MARCXML')):
+            if format == abbrev:
+                result.append(name)
+            else:
+                result.append(a_href(name, href=self.build_search_url(url_argd, of=abbrev)))
 
+        out += " | ".join(result)
+        
         out += "</small></div>"
 
         for row in rows:
@@ -1987,36 +2029,41 @@ class Template:
                 # do not print further information but for HTML detailed formats
             
                 if row ['creationdate']:
-                    out += """<div class="recordlastmodifiedbox">%(dates)s</div>
-                              <p><span class="moreinfo"><a class="moreinfo" href="%(weburl)s/search.py?p=recid:%(recid)d&amp;rm=wrd&amp;ln=%(ln)s">%(similar)s</a></span>
-                              <form action="%(weburl)s/yourbaskets.py/add" method="post">
+                    out += '''<div class="recordlastmodifiedbox">%(dates)s</div>
+                              <p><span class="moreinfo">%(similar)s</span>
+                              <form action="%(weburl)s/yourbaskets/add" method="post">
                                 <input name="recid" type="hidden" value="%(recid)s">
-                                <br><input class="formbutton" type="submit" name="action" value="%(basket)s">
+                                <input name="ln" type="hidden" value="%(ln)s">
+                                <br>
+                                <input class="formbutton" type="submit" name="action" value="%(basket)s">
                               </form>
-                           """ % {
-                             'dates' : _("Record created %s, last modified %s") % (row['creationdate'], row['modifydate']),
-                             'weburl' : weburl,
-                             'recid' : row['recid'],
-                             'ln' : ln,
-                             'similar' : _("Similar records"),
-                             'basket' : _("ADD TO BASKET")
-                             }
+                           ''' % {
+                        'dates': _("Record created %s, last modified %s") % (row['creationdate'],
+                                                                              row['modifydate']),
+                        'weburl': weburl,
+                        'recid': row['recid'],
+                        'ln': ln,
+                        'similar': a_href(_("Similar records"), _class="moreinfo",
+                                          href=self.build_search_url(p='recid:%d' % row['recid'], rm='wrd', ln=ln)),
+                        'basket' : _("ADD TO BASKET")
+                        }
 
                 out += '<table>'
 
                 if row.has_key ('citinglist'):
                     cs = row ['citinglist']
 
-                    similar = self.tmpl_print_record_list_for_similarity_boxen (
+                    similar = self.tmpl_print_record_list_for_similarity_boxen(
                         _("Cited by: %s records") % len (cs), cs, ln)
 
                     out += '''
                     <tr><td>
-                      %(similar)s&nbsp;<a href="%(weburl)s/search.py?p=recid:%(recid)d&amp;rm=cit&amp;ln=%(ln)s">%(more)s</a>
+                      %(similar)s&nbsp;%(more)s
                       <br><br>
-                    </td></tr>''' % { 'weburl': weburl,   'recid': row ['recid'], 'ln': ln,
-                                      'similar': similar, 'more': _("more"),
-                                      }
+                    </td></tr>''' % {
+                        'more': a_href(_("more"),
+                            href=self.build_search_url(p='recid:%d' % row['recid'], rm='cit', ln=ln)),
+                        'similar': similar}
 
                 if row.has_key ('cociting'):
                     cs = row ['cociting']
@@ -2026,11 +2073,11 @@ class Template:
 
                     out += '''
                     <tr><td>
-                      %(similar)s&nbsp;<a href="%(weburl)s/search.py?p=cocitedwith:%(recid)d&amp;ln=%(ln)s">%(more)s</a>
+                      %(similar)s&nbsp;%(more)s
                       <br>
-                    </td></tr>''' % { 'weburl': weburl,   'recid': row ['recid'], 'ln': ln,
-                                      'similar': similar, 'more': _("more"),
-                                      }
+                    </td></tr>''' % { 'more': a_href(_("more"),
+                                            href=self.build_search_url(p='cocitedwith:%d' % row['recid'], ln=ln)),
+                                      'similar': similar}
 
                 if row.has_key ('citationhistory'):
                     out += '<tr><td>%s</td></tr>' % row ['citationhistory']
@@ -2106,8 +2153,8 @@ class Template:
         # then print hits per collection:
         for coll in colls:
             if results_final_nb.has_key(coll['code']) and results_final_nb[coll['code']] > 0:
-                out += """<strong><a href="#%(coll)s">%(coll_name)s</a></strong>,
-                      <a href="#%(coll)s">%(number)s</a><br>""" % {
+                out += '''<strong><a href="#%(coll)s">%(coll_name)s</a></strong>,
+                      <a href="#%(coll)s">%(number)s</a><br>''' % {
                         'coll' : urllib.quote(coll['code']),
                         'coll_name' : coll['name'],
                         'number' : _("<strong>%s</strong> records found") % self.tmpl_nice_number(results_final_nb[coll['code']], ln)
@@ -2115,7 +2162,7 @@ class Template:
         out += "</td></tr></tbody></table>"
         return out
 
-    def tmpl_search_no_boolean_hits(self, ln, weburl, nearestterms):
+    def tmpl_search_no_boolean_hits(self, ln, nearestterms):
         """No hits found, proposes alternative boolean queries
 
         Parameters:
@@ -2139,57 +2186,46 @@ class Template:
 
         out = _("Boolean query returned no hits. Please combine your search terms differently.")
 
-        out += """<blockquote><table class="nearesttermsbox" cellpadding="0" cellspacing="0" border="0">"""
-        for term in nearestterms:
-            out += """<tr><td class="nearesttermsboxbody" align="right">%(hits)s</td>
-                           <td class="nearesttermsboxbody" width="15">&nbsp;</td>
-                           <td class="nearesttermsboxbody" align="left">
-                            <a class="nearestterms" href="%(weburl)s/search.py?%(url_args)s">%(p)s</a>
-                           </td>
-                       </tr>""" % {
-                      'hits' : term['nbhits'],
-                      'weburl' : weburl,
-                      'url_args' : term['url_args'],
-                      'p' : term['p']
-                    }
+        out += '''<blockquote><table class="nearesttermsbox" cellpadding="0" cellspacing="0" border="0">'''
+        for term, hits, argd in nearestterms:
+            out += '''\
+            <tr>
+              <td class="nearesttermsboxbody" align="right">%(hits)s</td>
+              <td class="nearesttermsboxbody" width="15">&nbsp;</td>
+              <td class="nearesttermsboxbody" align="left">
+                %(link)s
+              </td>
+            </tr>''' % {'hits' : hits,
+                        'link': a_href(cgi.escape(term), _class="nearestterms",
+                                       href=self.build_search_url(argd))}
         out += """</table></blockquote>"""
         return out
 
-    def tmpl_similar_author_names(self, ln, weburl, authors):
+    def tmpl_similar_author_names(self, authors, ln):
         """No hits found, proposes alternative boolean queries
 
         Parameters:
 
+          - 'authors': a list of (name, hits) tuples
           - 'ln' *string* - The language to display
-
-          - 'weburl' *string* - The base URL for the site
-
-          - 'authors' *array* - The authors information, in the format:
-
-          - 'authors[nb]' *int* - The resulting number of hits
-
-          - 'authors[name]' *string* - The author
-
         """
 
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = """<a name="googlebox"></a>
-                 <table class="googlebox"><tr><th colspan="2" class="googleboxheader">%(similar)s</th></tr>""" % {
+        out = '''<a name="googlebox"></a>
+                 <table class="googlebox"><tr><th colspan="2" class="googleboxheader">%(similar)s</th></tr>''' % {
                 'similar' : _("See also: similar author names")
               }
-        for author in authors:
-            out += """<tr>
-                       <td class="googleboxbody">%(nb)d</td>
-                       <td class="googleboxbody">
-                          <a class="google" href="%(weburl)s/search.py?p=%(auth_qt)s&amp;f=author">%(auth)s</a>
-                       </td></tr>""" % {
-                     'nb' : author['nb'],
-                     'weburl' : weburl,
-                     'auth_qt' : urllib.quote(author['name']),
-                     'auth' : author['name'],
-                   }
+        for author, hits in authors:
+            out += '''\
+            <tr>
+              <td class="googleboxbody">%(nb)d</td>
+              <td class="googleboxbody">%(link)s</td>
+            </tr>''' % {'link': a_href(cgi.escape(author), _class="google",
+                                       href=self.build_search_url(p=author, f='author', ln=ln)),
+                        'nb' : hits}
+            
         out += """</table>"""
 
         return out
@@ -2216,7 +2252,8 @@ class Template:
         if authors:
             out += "<p><p><center>"
             for author in authors:
-                out += """<a href="%s/search.py?p=%s&f=author">%s</a> ;""" % (weburl, urllib.quote(author), author)
+                out += '%s; ' % a_href(cgi.escape(author),
+                                       href=self.build_search_url(ln=ln, p=author, f='author'))
             out += "</center>"
         # fourthly, date of creation:
         dates = get_fieldvalues(recID, "260__c")
@@ -2231,9 +2268,12 @@ class Template:
         keywords = get_fieldvalues(recID, "6531_a")
         if len(keywords):
             out += """<p style="margin-left: 15%%; width: 70%%">
-                     <small><strong>Keyword(s):</strong></small>"""
+                     <small><strong>Keyword(s):</strong>"""
             for keyword in keywords:
-                out += """<small><a href="%s/search.py?p=%s&f=keyword">%s</a> ;</small> """ % (weburl, urllib.quote(keyword), keyword)
+                out += '%s; ' % a_href(cgi.escape(keyword),
+                                       href=self.build_search_url(ln=ln, p=keyword, f='keyword'))
+                
+            out += '</small>'
         # fifthly bis bis, published in:
         prs_p = get_fieldvalues(recID, "909C4p")
         prs_v = get_fieldvalues(recID, "909C4v")
@@ -2286,7 +2326,7 @@ class Template:
             out += '''
             <tr><td><font class="rankscoreinfo"><a>(%(score)s)&nbsp;</a></font><small>&nbsp;%(info)s</small></td></tr>''' % {
                 'score': score,
-                'info' : print_record (recid, format="hs", ln=ln),
+                'info' : print_record(recid, format="hs", ln=ln),
                 }
 
         out += """</table></small></td></tr></table> """
@@ -2352,19 +2392,25 @@ class Template:
             alephsysnos = get_fieldvalues(recID, "970__a")
             if len(alephsysnos)>0:
                 alephsysno = alephsysnos[0]
-                out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?sysno=%s&amp;ln=%s">%s</a></span>""" \
-                       % (weburl, alephsysno, ln, _("Detailed record"))
+                out += '<br><span class="moreinfo">%s</span>' % \
+                    a_href(_("Detailed record"), _class="moreinfo",
+                           href=self.build_search_url(sysno=alephsysno, ln=ln))
             else:
-                out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s&amp;ln=%s">%s</a></span>""" \
-                       % (weburl, recID, ln, _("Detailed record"))
+                out += '<br><span class="moreinfo">%s</span>' % \
+                    a_href(_("Detailed record"), _class="moreinfo",
+                           href=self.build_search_url(recid=recID, ln=ln))
         else:
-            out += """<br><span class="moreinfo"><a class="moreinfo" href="%s/search.py?recid=%s&amp;ln=%s">%s</a></span>""" \
-                   % (weburl, recID, ln, _("Detailed record"))
-            out += """<span class="moreinfo"> - <a class="moreinfo" href="%s/search.py?p=recid:%d&amp;rm=wrd&amp;ln=%s">%s</a></span>\n""" % \
-                   (weburl, recID, ln, _("Similar records"))
+            out += '<br><span class="moreinfo">%s</span>' % \
+                   a_href(_("Detailed record"), _class="moreinfo",
+                          href=self.build_search_url(recid=recID, ln=ln))
+
+            out += '<span class="moreinfo"> - %s</span>' % \
+                   a_href(_("Similar records"), _class="moreinfo",
+                          href=self.build_search_url(p="recid:%d" % recID, rm="wrd", ln=ln))
 
         if cfg_experimental_features:
-            out += """<span class="moreinfo"> - <a class="moreinfo" href="%s/search.py?p=recid:%d&amp;rm=cit&amp;ln=%s">%s</a></span>\n""" % (
-                weburl, recID, ln, _("Cited by"))
+            out += '<span class="moreinfo"> - %s</span>' % \
+                   a_href(_("Cited by"), _class="moreinfo",
+                          href=self.build_search_url(p="recid:%d" % recID, rm="cit", ln=ln))
                  
         return out

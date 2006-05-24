@@ -19,9 +19,9 @@
 
 webappdir = $(localstatedir)/www
 
-webapp_DATA = sessinit.inc.php youraccount.py
+webapp_DATA = sessinit.inc.php 
 
-EXTRA_DIST = sessinit.inc.php.wml youraccount.py
+EXTRA_DIST = sessinit.inc.php.wml
 
 CLEANFILES = sessinit.inc.php *~ *.tmp
 
