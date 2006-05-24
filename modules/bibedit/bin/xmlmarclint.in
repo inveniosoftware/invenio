@@ -34,9 +34,9 @@ from invenio.bibrecord import *
 
 cmdusage = """Usage: %s [options] <marcxmlfile>
 General options:
-  -h, --help      \t\t Print this help.
-  -V, --version   \t\t Print version information.
-  -v, --verbose=LEVEL   \t Verbose level (from 0 to 9, default 0).
+  -h, --help            Print this help.
+  -V, --version         Print version information.
+  -v, --verbose=LEVEL   Verbose level (from 0 to 9, default 0).
 Description: checks the validity of MARCXML file.
 """ % (sys.argv[0])
 
