@@ -1844,7 +1844,7 @@ class Template:
             
             # @todo here
             def img(gif, txt):
-                return '<img src="%(weburl)s/img/%(gif)s.gif" alt="%(txt)s">' % {
+                return '<img src="%(weburl)s/img/%(gif)s.gif" alt="%(txt)s" border="0">' % {
                     'txt': txt, 'gif': gif, 'weburl': weburl}
 
             if jrec-rg > 1:
