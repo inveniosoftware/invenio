@@ -681,8 +681,8 @@ class Template:
                     # iterate trough grandsons:
                     out += """<br>"""
                     for grandson in grandsons[i]:
-                        out += """%(link)s%(nbrec)s""" % {
-                            'link': a_href(style_prolog + grandson.get_name(ln) + style_epilog,
+                        out += """ %(link)s%(nbrec)s """ % {
+                            'link': a_href(grandson.get_name(ln),
                                            href=self.build_search_url(cc=grandson.name, ln=ln, as=as)),
                             'nbrec' : grandson.create_nbrecs_info(ln)}
                         
