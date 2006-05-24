@@ -102,7 +102,6 @@ modules/bibupload/doc/admin/index.html.wml
 modules/elmsubmit/bin/elmsubmit.in
 modules/elmsubmit/doc/admin/guide.html.wml
 modules/elmsubmit/doc/admin/index.html.wml
-modules/elmsubmit/lib/elmsubmit_doctype_test.py
 modules/elmsubmit/lib/elmsubmit_enriched2txt.py
 modules/elmsubmit/lib/elmsubmit_EZArchive.py
 modules/elmsubmit/lib/elmsubmit_EZEmail.py
