@@ -174,6 +174,11 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                     # We simply return the cached page of the collection
                     del args['jrec']
                     args['c'] = c
+
+                    if not args['c']:
+                        # collection argument not present; display
+                        # home collection by default
+                        args['c'] = cdsname
                     
                     return display_collection(req, **args)
         
