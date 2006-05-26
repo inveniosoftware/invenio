@@ -167,7 +167,7 @@ class Template:
             if out:
                 out += separator
 
-            out += a_href(name, href=self.build_search_url(c=url, as=as, ln=ln), _class='navtrail')
+            out += a_href(name, href=self.build_search_url(cc=url, as=as, ln=ln), _class='navtrail')
         return out
 
     def tmpl_webcoll_body(self, weburl, te_portalbox, searchfor, np_portalbox, narrowsearch, focuson, ne_portalbox):
