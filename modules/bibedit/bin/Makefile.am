@@ -17,8 +17,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = xmlmarclint refextract
+bin_SCRIPTS = refextract xmlmarclint xmlmarc2textmarc
 
-EXTRA_DIST = xmlmarclint.in refextract.in
+EXTRA_DIST = refextract.in xmlmarclint.in xmlmarc2textmarc.in
 
 CLEANFILES = *~ *.tmp

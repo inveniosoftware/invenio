@@ -471,6 +471,7 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/bibedit/bin/Makefile \
 	  modules/bibedit/bin/refextract \
 	  modules/bibedit/bin/xmlmarclint \
+	  modules/bibedit/bin/xmlmarc2textmarc \
 	  modules/bibedit/doc/Makefile \
 	  modules/bibedit/doc/admin/Makefile \
 	  modules/bibedit/doc/hacking/Makefile \

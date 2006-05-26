@@ -21,7 +21,8 @@ pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibrecord.py bibrecord_config.py bibrecord_tests.py \
              refextract.py refextract_config.py \
-             bibeditadminlib.py bibedit_templates.py
+             bibeditadminlib.py bibedit_templates.py \
+             xmlmarc2textmarclib.py
 
 EXTRA_DIST = $(pylib_DATA)
 

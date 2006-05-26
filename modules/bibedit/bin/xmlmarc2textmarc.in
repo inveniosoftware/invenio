@@ -1,0 +1,101 @@
+#!@PYTHON@
+# -*- coding: utf-8 -*-
+##
+## $Id$
+##
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""
+XML MARC to TEXT MARC utility.
+"""
+
+from invenio.xmlmarc2textmarclib import *
+import getopt, sys
+
+def main():
+    """Main function - binds everything together"""
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hV", [
+            "help", "version", "text-marc", "aleph-marc="])
+    except getopt.GetoptError, err:
+        usage(1, err)
+    options = { "append-mode"  : 0,
+                "insert-mode"  : 0,
+                "delete-mode"  : 0,
+                "replace-mode" : 0,
+                "modify-mode"  : 0,
+                "aleph-marc"   : 0,
+                "text-marc"    : 0
+              }
+
+    for opt, arg in opts:
+        if opt in ["-h", "--help"]:
+            usage (0)
+        elif opt in ["-V", "--version"]:
+            print __version__
+            sys.exit(0)
+        elif opt == "--aleph-marc":
+            options["aleph-marc"] = 1
+            if arg == "a":
+                options["append-mode"] = 1
+            elif arg == "d":
+                options["delete-mode"] = 1
+            elif arg == "i":
+                options["insert-mode"] = 1
+            elif arg == "m":
+                options["modify-mode"] = 1
+            elif arg == "r":
+                options["replace-mode"] = 1
+            else:
+                ## bad aleph record mode:
+                usage(1)
+        elif opt == "--text-marc":
+            options["text-marc"] = 1
+        else:
+            print "bad option", opt
+            usage(1)
+
+    if options["aleph-marc"] + options["text-marc"] > 1:
+        sys.stderr.write("Choose either aleph-marc mode or text-marc mode - not both\n")
+        usage(1)
+    elif options["aleph-marc"] + options["text-marc"] == 0:
+        options["text-marc"] = 1
+
+    if options["aleph-marc"] == 1:
+        if options["append-mode"] + options["insert-mode"] + options["delete-mode"] + options["replace-mode"] + options["modify-mode"] != 1:
+            usage(1)
+    ## check that filename has been provided:
+    try:
+        xmlfile = args[0]
+    except IndexError:
+        usage(1)
+
+    ## open file:
+    try:
+        xmltext = open(xmlfile, 'r').read()
+    except IOError:
+        sys.stderr.out("Error: File %s not found." % (xmlfile,))
+        usage(1)
+
+    ## Process record conversion:
+    recxml2recmarc(xmltext=xmltext, options=options)
+
+
+## Begin:
+if __name__ == "__main__":
+    main()
