@@ -382,7 +382,7 @@ def recxml2recmarc(xmltext, options):
             for record in records:
                 sysno = _get_sysno(record=record[0], options=options)
                 sys.stdout.write("""%s""" % (print_record(record=record[0], sysno=sysno, options=options),))
-        except Error:
+        except:
             ## xml parsing failed:
             sys.stderr.write("""Error: Unable to parse xml file.\n""")
             sys.exit(1)
@@ -392,7 +392,7 @@ def recxml2recmarc(xmltext, options):
             (record, st, e) = create_record(xmltext, 1, 1)
             sysno = _get_sysno(record=record, options=options)
             sys.stdout.write("""%s""" % (print_record(record=record, sysno=sysno, options=options),))
-        except Error:
+        except:
             ## xml parsing failed:
             sys.stderr.write("""Error: Unable to parse xml file.\n""")
             sys.exit(1)
