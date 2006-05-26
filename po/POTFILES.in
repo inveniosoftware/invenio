@@ -205,9 +205,8 @@ modules/websearch/lib/search_engine.py
 modules/websearch/lib/search_engine_tests.py
 modules/websearch/lib/websearchadminlib.py
 modules/websearch/lib/websearch_templates.py
+modules/websearch/lib/websearch_webinterface.py
 modules/websearch/web/admin/websearchadmin.py
-modules/websearch/web/index.py
-modules/websearch/web/search.py
 modules/websession/bin/sessiongc.wml
 modules/websession/doc/admin/guide.html.wml
 modules/websession/doc/admin/index.html.wml
@@ -216,7 +215,7 @@ modules/websession/lib/webaccount.py
 modules/websession/lib/websession.py
 modules/websession/lib/websession_templates.py
 modules/websession/lib/webuser.py
-modules/websession/web/youraccount.py
+modules/websession/lib/websession_webinterface.py
 modules/webstat/bin/webstat.in
 modules/webstat/doc/admin/guide.html.wml
 modules/webstat/doc/admin/index.html.wml
