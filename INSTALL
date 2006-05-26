@@ -85,6 +85,8 @@ Contents
              <http://psyco.sourceforge.net/>
           - (optional) RDFLib, to use RDF ontologies and thesauri:
              <http://rdflib.net/>
+          - (optional) mechanize, to run regression web tests:
+             <http://wwwsearch.sourceforge.net/mechanize/>
 
      e) mod_python Apache module.  Tested mainly with versions
         3.0BETA4 and above.  mod_python 3.x is required for Apache 2.
@@ -414,19 +416,24 @@ Contents
                       ServerAdmin cds.support@cern.ch
                       DocumentRoot /opt/cds-invenio/var/www
                       <Directory /opt/cds-invenio/var/www>
-                              Options Indexes FollowSymLinks MultiViews
-                              AllowOverride None
-                              Order allow,deny
-                              allow from all
+                         Options Indexes FollowSymLinks MultiViews
+                         AllowOverride None
+                         Order allow,deny
+                         allow from all
                       </Directory>
                       ErrorLog /opt/cds-invenio/var/log/apache.err
                       LogLevel warn
                       CustomLog /opt/cds-invenio/var/log/apache.log combined
                       DirectoryIndex index.en.html index.html index.py index.en.php index.php
+                      <LocationMatch "^(/$|/collection|/record|/search|/browse|/youraccount)">
+                         SetHandler python-program
+                         PythonHandler invenio.webinterface_layout
+                         PythonDebug On
+                      </LocationMatch>  
                       <Directory /opt/cds-invenio/var/www>
-                              AddHandler python-program .py
-                              PythonHandler mod_python.publisher
-                              PythonDebug On
+                         AddHandler python-program .py
+                         PythonHandler mod_python.publisher
+                         PythonDebug On
                       </Directory>
               </VirtualHost>
              
@@ -447,19 +454,24 @@ Contents
                       SSLEngine on
                       DocumentRoot /opt/cds-invenio/var/www
                       <Directory /opt/cds-invenio/var/www>
-                              Options Indexes FollowSymLinks MultiViews
-                              AllowOverride None
-                              Order allow,deny
-                              allow from all
+                         Options Indexes FollowSymLinks MultiViews
+                         AllowOverride None
+                         Order allow,deny
+                         allow from all
                       </Directory>
                       ErrorLog /opt/cds-invenio/var/log/apache-ssl.err
                       LogLevel warn
                       CustomLog /opt/cds-invenio/var/log/apache-ssl.log combined
                       DirectoryIndex index.en.html index.html index.py index.en.php index.php
+                      <LocationMatch "^(/$|/collection|/record|/search|/browse|/youraccount)">
+                         SetHandler python-program
+                         PythonHandler invenio.webinterface_layout
+                         PythonDebug On
+                      </LocationMatch>  
                       <Directory /opt/cds-invenio/var/www>
-                              AddHandler python-program .py
-                              PythonHandler mod_python.publisher
-                              PythonDebug On
+                         AddHandler python-program .py
+                         PythonHandler mod_python.publisher
+                         PythonDebug On
                       </Directory>
               </VirtualHost>
                                 
