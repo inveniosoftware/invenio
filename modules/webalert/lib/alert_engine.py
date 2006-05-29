@@ -158,7 +158,7 @@ def email_notify(alert, records, argstr):
     if DEBUGLEVEL > 0:
         msg = "*** THIS MESSAGE WAS SENT IN DEBUG MODE ***\n\n"
 
-    url = weburl + "/search.py?" + argstr
+    url = weburl + "/search?" + argstr
 
     # Extract the pattern and catalogue list from the formatted query
     query = parse_qs(argstr)

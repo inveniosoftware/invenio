@@ -332,7 +332,7 @@ class Template:
                              <TD>%(textargs)s</TD>
                              <TD><A href="./remove?name=%(alertname)s&idu=%(userid)d&idq=%(queryid)d&idb=%(basketid)d">%(remove)s</A><BR>
                                  <A href="./modify?idq=%(queryid)d&name=%(alertname)s&freq=%(freq)s&notif=%(notif)s&idb=%(basketid)d&old_idb=%(basketid)d">%(modify)s</A><BR>
-                                 <A href="%(weburl)s/search.py?%(queryargs)s">%(search)s</A>
+                                 <A href="%(weburl)s/search?%(queryargs)s">%(search)s</A>
                              </TD>
                             </TR>""" % {
                     'index' : i,
@@ -402,7 +402,7 @@ class Template:
 
         if len(queries) == 0:
             return _("You have not executed any search yet. %(click_here)s for search.") % {
-                     'click_here' : """<a href="%(weburl)s/search.py">%(click)s</a>""" % {
+                     'click_here' : """<a href="%(weburl)s/search">%(click)s</a>""" % {
                                       'weburl' : weburl,
                                       'click' : _("Click here"),
                                     }
@@ -438,7 +438,7 @@ class Template:
             out += """<TR>
                         <TD><I>#%(index)d</I></TD>
                         <TD>%(textargs)s</TD>
-                        <TD><A href="%(weburl)s/search.py?%(args)s">%(execute_query)s</A><BR><A href="./input?idq=%(id)d">%(set_alert)s</A></TD>""" % {
+                        <TD><A href="%(weburl)s/search?%(args)s">%(execute_query)s</A><BR><A href="./input?idq=%(id)d">%(set_alert)s</A></TD>""" % {
                      'index' : i,
                      'textargs' : query['textargs'],
                      'weburl' : weburl,

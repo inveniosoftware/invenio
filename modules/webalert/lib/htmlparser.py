@@ -110,7 +110,7 @@ def get_as_text(record_id):
         return htparser.result
     except:
         #htparser.close()
-        return wrap(htparser.result + 'Detailed record: <http://cdsweb.cern.ch/search.py?recid=%s>.' % record_id)
+        return wrap(htparser.result + 'Detailed record: <%s/record/%s>.' % (weburl, record_id))
 
 
 if __name__ == "__main__":
