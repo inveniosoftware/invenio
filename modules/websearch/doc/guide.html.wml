@@ -550,7 +550,7 @@ interested in and hit return.  For example, if you are interested in
 documents on <em>standard model</em> that are written by (or mention)
 <em>Ellis</em>, you would type:
 
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <blockquote>
     <input size=40 type="text" name="p" value="ellis standard model">
     <select name="f"><option value="">any field<option>title<option>author</select>
@@ -572,7 +572,7 @@ way that contain either of the words <em>muon</em> or
 <em>2001</em>, you would type:
 
 <blockquote>
-<form action="<WEBURL>/search.py" method="get">
+<form action="<WEBURL>/search" method="get">
     <input type="hidden" name="cc" value="Atlantis Institute of Science"> 
     <input type="hidden" name="as" value="1">
         <table>
@@ -673,7 +673,7 @@ will try to always guide you in case no exact match could be found.
 For example, it would print you a list of closest indexed terms in
 case of spelling troubles:
 
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <blockquote>
     <input size=40 type="text" name="p" value="elllis muon">
     <select name="f"><option value="">any field<option>title<option>author</select>
@@ -719,7 +719,7 @@ Google does.  For example, to find all records that contain both the
 word <em>ellis</em> and the word <em>muon</em> anywhere in the record,
 type:
 
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <blockquote>
     <input size=40 type="text" name="p" value="ellis muon">
     <select name="f"><option value="">any field<option>title<option>author</select>
@@ -738,7 +738,7 @@ There are two phrase searching modes:
     pattern.  For example, to find all documents written by <em>Ellis,
     J</em> spelled exactly that way, type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="&quot;Ellis, J&quot;">
       <select name="f"><option value="">any field<option>title<option selected>author</select>
@@ -755,7 +755,7 @@ There are two phrase searching modes:
     containing the expression <em>muon decay</em> regardless of the
     position of the expression in the title, type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="'muon decay'">
       <select name="f"><option value="">any field<option selected>title<option>author</select>
@@ -768,7 +768,7 @@ There are two phrase searching modes:
     Richard</em> (and other authors, such as <em>De Lellis, Jim</em>)
     at the same time:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="'Ellis, J'">
       <select name="f"><option value="">any field<option>title<option selected>author</select>
@@ -896,7 +896,7 @@ ditto, syntactic sugar
 For example, if you want to search for documents written by Ellis on
 muons or kaons, write:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="muon or kaon and ellis">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -907,7 +907,7 @@ muons or kaons, write:
 which looks for <code>(muon or kaon) and ellis</code>.  Note that this
 gives different results from:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="ellis and muon or kaon">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -922,7 +922,7 @@ your search by adding/removing words with and/not or +/- operators.
 For example, to exclude the documents on decay from the above search,
 append <code>-decay</code>:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="muon or kaon and ellis -decay">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -957,7 +957,7 @@ satisfied.
    without punctuation, so that you should be able to search for terms
    containing special characters, such as <em>C++</em>, verbatim:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="C++">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -965,7 +965,7 @@ satisfied.
       </blockquote>
       </form>
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="O'Shea">
       <select name="f"><option value="">any field<option>title<option selected>author</select>
@@ -976,7 +976,7 @@ satisfied.
    For example, to find records containing the LaTeX expression
    <code>$e^{+}e^{-}$</code> in the title, type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="$e^{+}e^{-}$">
       <select name="f"><option value="">any field<option selected>title<option>author</select>
@@ -987,7 +987,7 @@ satisfied.
    For example, to find document with the report number
    <em>hep-ph/0204133</em>, type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="hep-ph/0204133">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -997,7 +997,7 @@ satisfied.
 
    Note that the search is case-insensitive:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="BlaCK hOlEs">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1028,7 +1028,7 @@ satisfied.
    query strings in any language stored in the database.  For
    example, to find the documents written by (or on) Пушкин, type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="пушкин">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1039,7 +1039,7 @@ satisfied.
    Note that you don't have to type accents to find accented results.  For example,
    type <code>Lemaitre</code> to find papers by <em>Lemaître</em>:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="Lemaitre">
       <select name="f"><option value="">any field<option>title<option selected>author</select>
@@ -1092,7 +1092,7 @@ satisfied.
    that contain words <em>muon</em>, <em>muons</em>, <em>muonic</em>
    etc, type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="muon*">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1104,7 +1104,7 @@ satisfied.
    example, to get all the words that start by <em>CERN-TH</em> and
    end by <em>31</em>, type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="CERN-TH*31">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1115,7 +1115,7 @@ satisfied.
    Note that the wildcard will be ignored if you try to apply it to
    very short words, such as <em>a*</em>:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="a*">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1127,7 +1127,7 @@ satisfied.
    mode.  For example, to find all the documents whose title starts by
    "Neutrino mass", type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="&quot;Neutrino mass*&quot;">
       <select name="f"><option value="">any field<option selected>title<option>author</select>
@@ -1170,7 +1170,7 @@ satisfied.
    documents containing the word <em>ellis</em> within author index,
    type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="author:ellis">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1182,7 +1182,7 @@ satisfied.
    like <em>muon</em>, <em>muons</em>, <em>muonic</em> within title,
    type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="author:ellis title:muon*">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1193,7 +1193,7 @@ satisfied.
    To select documents written by the <em>NA60</em> experiment from
    the year <em>2001</em>, type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="experiment:NA60 year:2001">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1231,7 +1231,7 @@ acquainted with the traditional Unix/POSIX regexp syntax.  In the
 Simple Search interface you can trigger it by using slashes instead of
 quotes:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="title:/^E.*s$/">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1247,7 +1247,7 @@ by any number of any characters, and end by the letter <em>s</em>.
 <p>Another example could be an author search for an author expressed
 in the database as either <em>Ellis, J</em> or <em>Ellis, John</em>:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="author:/^Ellis, (J|John)$/">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1260,7 +1260,7 @@ specific word proximity queries.  For example, let us find all titles
 containing words <em>dense</em> and <em>matter</em> that are separated
 by at most one word that doesn't contain the letter <em>l</em>:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="title:/dense ([^ l]* )?matter/">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1274,7 +1274,7 @@ For example, let us find all preprints that do not follow the year
 cataloguing policy, that is <em>YYYY</em> to denote year, optionally
 followed by <em>?</em> or by another <em>-YYYY</em>:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="collection:PREPRINT -year:/^[0-9]{4}([\?\-]|\-[0-9]{4})?$/">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1285,7 +1285,7 @@ followed by <em>?</em> or by another <em>-YYYY</em>:
 You can use also character classes such <code>[:alnum:]</code>, so
 that the above query is equivalent to:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="collection:PREPRINT -year:/^[[:digit:]]{4}([\?\-]|\-[[:digit:]]{4})?$/">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1322,7 +1322,7 @@ documentation</a>.
 example, to search for all documents on <em>muon decay</em> published
 between <em>1983</em> and <em>1992</em>, type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=30 type="text" name="p" value="muon decay year:1983->1992">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1333,7 +1333,7 @@ between <em>1983</em> and <em>1992</em>, type:
 To find all documents by authors with names ranging from <em>Ellis,
 J</em> to <em>Ellis, Qqq</em>, type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=30 type="text" name="p" value="author:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1368,7 +1368,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
    abstract fields, and that were published in year starting by digits
    '200', type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=60 type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1381,7 +1381,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
    or <code>reference</code> index to search there.  For example, to find the term <em>Higgs</em>
    in either metadata, references or fulltext files, type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=60 type="text" name="p" value="higgs or reference:higgs or fulltext:higgs">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1395,7 +1395,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
    <em>Schwarzschild</em> and <em>AdS</em>, and who cite journal
    <em>Adv. Theor. Math. Phys.</em>, type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=60 type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1416,7 +1416,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
    <tr>
    <td class="errorboxbody">
       Currently, fulltext files and references are not fully searchable on the CERN site.
-      Assumed operational time: Q1 2004.
+      Assumed operational time: Q1 2007.
    </td>
    </tr>
    </tbody>
@@ -1503,7 +1503,7 @@ J</code> within the author index, it means that two queries (for the
 words <code>Ellis</code> and <code>J</code>) are effected first and a
 boolean AND is performed next:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="Ellis J">
       <select name="f"><option value="">any field<option>title<option selected>author</select>
@@ -1524,7 +1524,7 @@ permit you to achieve higher search precisions.
 only, such as <em>Ellis, J</em>.  To get the list of publications of
 an author whose name is spelled exactly that way, type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="author:&quot;Ellis, J&quot;">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1544,7 +1544,7 @@ name: <em>Ellis, John Rolfe</em>).  To get the list of publications
 for all these forms at the same time, you could use a boolean OR
 query:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=60 type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1561,7 +1561,7 @@ fast.
 <li>To match all of the above forms in a single search term, you can
 try to use a wildcard query:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="author:&quot;Ellis, J*&quot;">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1582,7 +1582,7 @@ positives.  The search is relatively fast.
 <li>Yet another, the most general alternative is to use a partial
 phrase matching:
     
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="author:'Ellis, J'">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1606,7 +1606,7 @@ expression syntax</a> to construct any complex author query.  A simple
 example is to search for an author expressed in the database as either
 <em>Ellis, J</em> or <em>Ellis, John</em>:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="author:/^Ellis, (J|John)$/">
       <select name="f"><option value="">any field<option>title<option selected>author</select>
@@ -1654,7 +1654,7 @@ database content will ensure a proper author searching behaviour.
    that your documents have several of them.  For example, the report
    numbers <em>hep-ph/0204140</em>, <em>CERN-TH-2002-069</em> and
    <em>RM3-TH-02-4</em> all denote <a
-   href="<WEBURL>/search.py?p=CERN-TH-2002-069&amp;f=reportnumber">the
+   href="<WEBURL>/search?p=CERN-TH-2002-069&amp;f=reportnumber">the
    same document</a>.  Now if you sort your search results set
    containing this document, the system will take into consideration
    the first report number, that may be either of these three.
@@ -1680,7 +1680,7 @@ database content will ensure a proper author searching behaviour.
    and on the search results page, being satisfied with the results,
    you would add <code>&sp=CERN-TH</code> to the URL to sort the
    results preferentially by CERN-TH report numbers, to get a <a
-   href="<WEBURL>/search.py?p=reportnumber%3A%22CERN-TH-2001*%22&sf=reportnumber&so=a&sp=CERN-TH">nicely
+   href="<WEBURL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&sf=reportnumber&so=a&sp=CERN-TH">nicely
    sorted list</a> of all CERN-TH 2001 publications.
 
 <h4><a name="howto-hepdoc">
@@ -1721,7 +1721,7 @@ support it.  For example, SPIRES or KEK cannot search for terms within
     may be worthy to look there.  For example, search for <em>CERN
     ISR-MA/73-17</em> in our system:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="CERN ISR-MA/73-17">
       <select name="f"><option value="">any field<option>title<option>author<option selected>reportnumber</select>
@@ -1758,7 +1758,7 @@ tries to extract the textual information from the files and index it into a sepa
 To search for all records that contain the term <em>e-</em> in their fulltext files,
 type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="fulltext:e-">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1771,7 +1771,7 @@ but that you may freely combine a fulltext and metadata search.  For example, to
 articles written by <em>Ellis</em> that contain the word <em>muon</em> either in the
 metadata or in the fulltext, type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="muon or fulltext:muon and author:ellis">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1793,7 +1793,7 @@ metadata or in the fulltext, type:
    <tr>
    <td class="errorboxbody">
       Currently, the fulltext indexes aren't available on the CERN site.  
-      Assumed operational time: Q1 2004.
+      Assumed operational time: Q1 2007.
       Please use the
       <a href="http://weblib.cern.ch/fulltext.shtml">old fulltext interface</a>
       instead in the meantime.
@@ -1828,7 +1828,7 @@ them into a separate <code>reference</code> index.  To search for
 all records that cite <em>Ellis</em> in their reference lists,
 type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="reference:Ellis">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1839,7 +1839,7 @@ type:
 To search for all records that cite preprint <em>hep-ph/0103062</em>
 in their reference lists, type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="reference:hep-ph/0103062">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1850,7 +1850,7 @@ in their reference lists, type:
 To search for all records that cite an article from <em>Giddings</em> and <em>Ross</em> published in 
 <em>Physical Review D</em> in volume <em>61</em> in year <em>2000</em>, type:
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=70 type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:2000">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1863,7 +1863,7 @@ but that you may freely combine a citation search with a metadata search.
 For example, to find all articles on <em>standard model</em> that aren't written by
 <em>Ellis</em> but that do cite him, type: 
 
-      <form action="<WEBURL>/search.py" method="get">
+      <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input size=40 type="text" name="p" value="standard model -author:ellis reference:ellis">
       <select name="f"><option value="">any field<option>title<option>author</select>
@@ -1885,7 +1885,7 @@ For example, to find all articles on <em>standard model</em> that aren't written
    <td class="errorboxbody">
       Currently, the reference indexes aren't available on the CERN site.
       The citation search is therefore impossible at the moment.
-      Assumed operational time: Q1 2004.
+      Assumed operational time: Q1 2007.
    </td>
    </tr>
    </tbody>
