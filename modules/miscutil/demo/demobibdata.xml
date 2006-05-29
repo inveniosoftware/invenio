@@ -327,7 +327,7 @@
     </record>
     <record>
         <datafield tag="037" ind1="" ind2="">
-            <subfield code="a">CERN-HI-6002</subfield>
+            <subfield code="a">CERN-HI-6206002</subfield>
         </datafield>
         <datafield tag="041" ind1="" ind2="">
             <subfield code="a">eng</subfield>
@@ -356,11 +356,11 @@
             <subfield code="a">Nobel laureate</subfield>
         </datafield>
         <datafield tag="856" ind1="4" ind2="">
-            <subfield code="q">http://preprints.cern.ch/cgi-bin/setlink?base=PHO&amp;categ=photo-hi&amp;id=6002</subfield>
+            <subfield code="q">http://preprints.cern.ch/cgi-bin/setlink?base=PHO&amp;categ=photo-hi&amp;id=6206002</subfield>
             <subfield code="x">1</subfield>
         </datafield>
         <datafield tag="856" ind1="4" ind2="">
-            <subfield code="q">http://preprints.cern.ch/photo/photo-hi/6002.gif</subfield>
+            <subfield code="q">http://preprints.cern.ch/photo/photo-hi/6206002.gif</subfield>
             <subfield code="x">icon</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="0">
@@ -407,7 +407,7 @@
             <subfield code="p">The Nobel Prize in Physics 1961 : Robert Hofstadter</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="P">
-            <subfield code="s">6002 (1962)</subfield>
+            <subfield code="s">6206002 (1962)</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="S">
             <subfield code="s">n</subfield>
