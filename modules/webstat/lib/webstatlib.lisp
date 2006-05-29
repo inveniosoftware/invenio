@@ -168,7 +168,7 @@ a double quote, etc."
 (defun get-urlarg-value-from-url-string (url-string url-arg
                                           &optional (return-empty-value nil))
   "Return list of values of URL-ARG in the URL-STRING.  For example,
-if URL-STRING contains 'search.py?p=ellis&f=title', and URL-ARG is
+if URL-STRING contains 'search?p=ellis&f=title', and URL-ARG is
 'f', then return list of 'title'.  If URL-ARG is not present in
 URL-STRING, return list of empty string."
   (declare (type simple-base-string url-string url-arg))
@@ -728,7 +728,7 @@ count events coming from those IPs."
            (type list exclude-ip-list))
   (flet ((extract-recid-from-detailed-record-page-url (url)
            (declare (type simple-base-string url))
-           (if (search "GET /search.py?recid=" url)
+           (if (search "GET /search?recid=" url)
                (or (parse-integer (subseq url 21) :junk-allowed t) 0)
                0)))
     (format t "-- APACHE LOG FILE ANALYSIS")

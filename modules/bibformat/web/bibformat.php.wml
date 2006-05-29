@@ -59,7 +59,7 @@
 
   $t->start("TOTAL");
   $t->start("GetRecord method");
-  $file="<WEBURL>/search.py?id=$id&of=xm";
+  $file="<WEBURL>/search?recid=$id&of=xm";
 
   $fxk=new FlexElink();
   $error=$fxk->initialise("OAIMARC", $file);

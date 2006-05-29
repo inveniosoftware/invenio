@@ -9,7 +9,7 @@
 (defvar *exclude-ip-list* '("137.138.249.162"))
 (defvar *home-collection* "<CDSNAME>")
 (defvar *search-interface-url* "/?")
-(defvar *search-engine-url* "/search.py?")
+(defvar *search-engine-url* "/search?")
 (defvar *basket-url* "/yourbaskets.py/")
 (defvar *add-to-basket-url* "/yourbaskets.py/add")
 (defvar *display-basket-url* "/yourbaskets.py/display")
