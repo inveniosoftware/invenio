@@ -2536,10 +2536,6 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
             out += "        <date>%s</date>\n" % get_creation_date(recID)
         out += "    </dc>\n"
 
-    elif format.startswith("x_"):
-        # underscore means that XML formats should be called on-the-fly; suitable for testing formats
-        out += call_bibformat(recID, format)
-
     elif str(format[0:3]).isdigit():
         # user has asked to print some fields only
         if format == "001":
@@ -2581,15 +2577,10 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 # record 'recID' is formatted in 'format', so print it
                 out += "%s" % decompress(res[0][0])
             else:
-                # record 'recID' is not formatted in 'format', so either call BibFormat on the fly or use default format
-                # second, see if we are calling BibFormat on the fly:
-                if cfg_call_bibformat:
-                    xfm = call_bibformat(recID, format)
-                    dom = minidom.parseString(xfm)
-                    for e in dom.getElementsByTagName('subfield'):
-                        if e.getAttribute('code') == 'g':
-                            for t in e.childNodes:
-                                out += t.data.encode('utf-8')                    
+                # record 'recID' is not formatted in 'format', so try to call BibFormat on the fly or use default format:
+                out_record_in_format = call_bibformat(recID, format)
+                if out_record_in_format:
+                    out += out_record_in_format
                 else:
                     out += websearch_templates.tmpl_print_record_detailed(
                              ln = ln,
@@ -2668,12 +2659,24 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 # record 'recID' is formatted in 'format', so print it
                 out += "%s" % decompress(res[0][0])
             else:
-                out += websearch_templates.tmpl_print_record_brief(
-                         ln = ln,
-                         recID = recID,
-                         weburl = weburl,
-                       )
-
+                # record 'recID' is not formatted in 'format', so try to call BibFormat on the fly: or use default format:
+                if cfg_call_bibformat:
+                    out_record_in_format = call_bibformat(recID, format)
+                    if out_record_in_format:
+                        out += out_record_in_format
+                    else:
+                        out += websearch_templates.tmpl_print_record_brief(
+                                 ln = ln,
+                                 recID = recID,
+                                 weburl = weburl,
+                               )
+                else:
+                    out += websearch_templates.tmpl_print_record_brief(
+                             ln = ln,
+                             recID = recID,
+                             weburl = weburl,
+                           )
+    
             # at the end of HTML brief mode, print the "Detailed record" functionality:
             if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
                 pass # do nothing for portfolio and on-the-fly formats
@@ -2697,15 +2700,31 @@ def encode_for_xml(s):
     s = string.replace(s, '<', '&lt;')
     return s
 
-def call_bibformat(id, otype="HD"):
-    """Calls BibFormat for the record 'id'.  Desired BibFormat output type is passed in 'otype' argument.
-       This function is mainly used to display full format, if they are not stored in the 'bibfmt' table."""
-    pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % bindir, "otype=%s" % otype], 'rw')
-    pipe_input.write(print_record(id, "xm"))
+def call_bibformat(recID, format="HD"):
+    """Calls BibFormat for the record RECID in the desired output format FORMAT.
+       This function is mainly used to display all but brief formats, if they are
+       not stored in the 'bibfmt' table.
+       
+       Note: this functions always try to return HTML, so when
+       bibformat returns XML with embedded HTML format inside the tag
+       FMT $g, as is suitable for prestoring output formats, we
+       perform un-XML-izing here in order to return HTML body only.
+    """
+    out = ""
+    pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % bindir, "otype=%s" % format], 'rw')
+    pipe_input.write(print_record(recID, "xm"))
     pipe_input.close()
-    out = pipe_output.read()
+    bibformat_output = pipe_output.read()
     pipe_output.close()
     pipe_error.close()
+    if bibformat_output.startswith("<record>"):
+        dom = minidom.parseString(bibformat_output)
+        for e in dom.getElementsByTagName('subfield'):
+            if e.getAttribute('code') == 'g':
+                for t in e.childNodes:
+                    out += t.data.encode('utf-8')
+    else:
+        out = bibformat_output
     return out
 
 def log_query(hostname, query_args, uid=-1):
