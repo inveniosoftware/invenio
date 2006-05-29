@@ -119,7 +119,7 @@ cfg_google_box_servers = <CFG_GOOGLE_BOX_SERVERS>
 ## for websubmit_config:
 images = "<WEBURL>/img"
 urlpath = "<WEBURL>"
-accessurl = "<WEBURL>/search.py"
+accessurl = "<WEBURL>/search"
 counters = "<CFG_SUBMIT_COUNTER>"
 storage = "<CFG_SUBMIT_DIR>"
 filedir	 = "<CFG_FILE_DIR>"

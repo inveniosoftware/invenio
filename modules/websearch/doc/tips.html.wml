@@ -29,7 +29,7 @@
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="">
     <select name="f"><option value="">any field<option>title<option>author</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
@@ -46,7 +46,7 @@ Empty search box returns all records in the database.
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="">
     <select name="f"><option value="">any field<option>title<option>author</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
@@ -66,7 +66,7 @@ particular collection before doing the search.
 </tr>
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="NA60">
     <select name="f"><option value="">any field<option>title<option>author</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
@@ -91,7 +91,7 @@ such as NA60 documents, then enter it as a search term.
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="higgs boson">
     <select name="f"><option value="">any field<option>title<option>author</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
@@ -103,7 +103,7 @@ Returns records containing words <em>higgs</em> and <em>boson</em>.
 </tr>
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="'higgs boson'">
     <select name="f"><option value="">any field<option selected>title<option>author</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
@@ -115,7 +115,7 @@ Returns records containing phrase <em>'higgs boson'</em> in title.
 </tr>
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="&quot;higgs boson&quot;">
     <select name="f"><option value="">any field<option selected>title<option>author</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
@@ -134,7 +134,7 @@ Returns records entitled exactly <em>"Higgs boson"</em> but not records such as
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="muon*">
     <select name="f"><option value="">any field<option>title<option>author</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
@@ -152,14 +152,14 @@ Returns records containing words <em>muon</em>, <em>muons</em>, <em>muonic</em>,
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="muon kaon">
     <select name="f"><option value="">any field<option>title<option>author<option>year</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
     </form>
     or:
     <br>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="muon AND kaon">
     <select name="f"><option value="">any field<option>title<option>author<option>year</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
@@ -171,7 +171,7 @@ Returns records containing both <em>muon</em> and <em>kaon</em>.
 </tr>
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="muon OR kaon">
     <select name="f"><option value="">any field<option>title<option>author<option>year</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
@@ -183,7 +183,7 @@ Returns records containing either <em>muon</em> or <em>kaon</em>.
 </tr>
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="muon NOT kaon">
     <select name="f"><option value="">any field<option>title<option>author<option>year</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
@@ -201,7 +201,7 @@ Returns records containing <em>muon</em> but not <em>kaon</em>.
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="2003">
     <select name="f"><option value="">any field<option>title<option>author<option selected>year</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
@@ -213,7 +213,7 @@ Type 2003 and select the year field.
 </tr>
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="year:2003">
     <select name="f"><option value="">any field<option>title<option>author<option>year</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
@@ -225,7 +225,7 @@ Alternatively, type field name colon value.
 </tr>
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="year:2003->2004">
     <select name="f"><option value="">any field<option>title<option>author<option>year</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
@@ -244,7 +244,7 @@ You can enter specific year range.
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="Ellis">
     <select name="f"><option value="">any field<option>title<option>author<option>year</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
@@ -258,7 +258,7 @@ the surname in any field.
 </tr>
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="Ellis, J R">
     <select name="f"><option value="">any field<option>title<option selected>author<option>year</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
@@ -270,7 +270,7 @@ For better results, type surname comma initial(s) and select the author field.
 </tr>
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="Ellis, John Rolfe">
     <select name="f"><option value="">any field<option>title<option selected>author<option>year</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
@@ -282,7 +282,7 @@ Sometimes authors are indexed with their full name.
 </tr>
 <tr>
 <td width="50%" nowrap>
-    <form action="<WEBURL>/search.py" method="get">
+    <form action="<WEBURL>/search" method="get">
     <input size=20 type="text" name="p" value="author:&quot;Ellis, J*&quot; year:1990->1993">
     <select name="f"><option value="">any field<option>title<option>author<option>year</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
