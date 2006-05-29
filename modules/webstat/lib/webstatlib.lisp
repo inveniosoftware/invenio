@@ -241,6 +241,8 @@ HTTPD-LOG-REQUEST-STRING.  As a side effect, increment counters for
 a simple search or a detailed record page is selected."
   (declare (type simple-base-string httpd-log-request-string)
            (special *search-engine-url*
+                    *search-engine-url-old-style*
+                    *detailed-record-url*
                     *number-of-simple-searches*
                     *number-of-advanced-searches*
                     *number-of-detailed-record-pages*))
@@ -249,8 +251,11 @@ a simple search or a detailed record page is selected."
                             (position #\space httpd-log-request-string)
                             (position #\space httpd-log-request-string :from-end t))))
     ;; url-string now contains URL without leading GET and trailing HTTP/1.1 strings
-    (when (search *search-engine-url* url-string)
-      (if (or (search "?id=" url-string)
+    (when (or (search *search-engine-url* url-string)
+              (search *search-engine-url-old-style* url-string)
+              (search *detailed-record-url* url-string))
+      (if (or (search *detailed-record-url* url-string)
+              (search "?id=" url-string)
               (search "?recid=" url-string)
               (search "?sysno=" url-string)
               (search "?sysnb=" url-string))
@@ -482,9 +487,11 @@ interesting statistics."
   "Read HTTPD-ALL-LOG-ENTRIES, analyze search engine usage and print
 interesting statistics with respect to collections."
   (declare (special *search-engine-url*
+                    *search-engine-url-old-style*
                     *home-collection*
                     *nb-histogram-items-to-print*))
-  (let ((httpd-log-entries (filter-httpd-log-entries httpd-all-log-entries *search-engine-url*))
+  (let ((httpd-log-entries (append (filter-httpd-log-entries httpd-all-log-entries *search-engine-url*)
+                                   (filter-httpd-log-entries httpd-all-log-entries *search-engine-url-old-style*)))          
         (collection-histogram (make-hash-table :test #'equalp)))
     ;; build histogram:
     (dolist (httpd-log-entry httpd-log-entries)
@@ -516,6 +523,7 @@ interesting statistics with respect to collections."
   "Read HTTPD-ALL-LOG-ENTRIES, analyze search patterns and print
 interesting statistics."
   (declare (special *search-engine-url*
+                    *search-engine-url-old-style*
                     *nb-histogram-items-to-print*
                     *number-of-simple-searches*
                     *number-of-advanced-searches*
@@ -523,7 +531,8 @@ interesting statistics."
   (setf *number-of-simple-searches* 0
         *number-of-advanced-searches* 0
         *number-of-detailed-record-pages* 0)
-  (let ((httpd-log-entries (filter-httpd-log-entries httpd-all-log-entries *search-engine-url*))
+  (let ((httpd-log-entries (append (filter-httpd-log-entries httpd-all-log-entries *search-engine-url*)
+                                   (filter-httpd-log-entries httpd-all-log-entries *search-engine-url-old-style*)))
         (pattern-histogram (make-hash-table :test #'equalp)))
     ;; build histogram:
     (dolist (httpd-log-entry httpd-log-entries)
@@ -728,9 +737,11 @@ count events coming from those IPs."
            (type list exclude-ip-list))
   (flet ((extract-recid-from-detailed-record-page-url (url)
            (declare (type simple-base-string url))
-           (if (search "GET /search?recid=" url)
-               (or (parse-integer (subseq url 21) :junk-allowed t) 0)
-               0)))
+           (if (search "GET /record/" url)
+               (or (parse-integer (subseq url (length "GET /record/")) :junk-allowed t) 0)               
+               (if (search "GET /search.py?recid=" url) ; compatibility with old style URLs
+                   (or (parse-integer (subseq url (length "GET /search.py?recid=")) :junk-allowed t) 0)
+                   0))))
     (format t "-- APACHE LOG FILE ANALYSIS")
     (format t "~&-- Filename: ~A" httpd-log-filename)
     (unless (null exclude-ip-list)
@@ -764,6 +775,8 @@ instructions presented in ANALYZER-CONFIG-FILE."
                     *home-collection*
                     *search-interface-url*
                     *search-engine-url*
+                    *search-engine-url-old-style*
+                    *detailed-record-url*
                     *basket-url*
                     *add-to-basket-url*
                     *display-basket-url*
