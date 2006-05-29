@@ -70,7 +70,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         body=webaccount.perform_info(req, args['ln']),
                         description="CDS Personalize, Main page",
                         keywords="CDS, personalize",
-                        uid=uid,
+                        uid=uid, req=req,
                         secure_page_p = 1,
                         language=args['ln'],
                         lastupdated=__lastupdated__)
@@ -85,7 +85,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     body=webaccount.perform_display_account(req,data,bask,aler,sear,msgs,args['ln']),
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
-                    uid=uid,
+                    uid=uid, req=req,
                     secure_page_p = 1,
                     language=args['ln'],
                     lastupdated=__lastupdated__)
@@ -109,7 +109,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                     description="CDS Personalize, Your Settings",
                     keywords="CDS, personalize",
-                    uid=uid,
+                    uid=uid, req=req,
                     secure_page_p = 1,
                     language=args['ln'],
                     lastupdated=__lastupdated__)
@@ -180,7 +180,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
-                    uid=uid,
+                    uid=uid, req=req,
                     secure_page_p = 1,
                     language=args['ln'],
                     lastupdated=__lastupdated__)
@@ -200,7 +200,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
-                    uid=uid,
+                    uid=uid, req=req,
                     secure_page_p = 1,
                     language=args['ln'],
                     lastupdated=__lastupdated__)
@@ -226,7 +226,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             body=Msg,
                             description="CDS Personalize, Main page",
                             keywords="CDS, personalize",
-                            uid=uid,
+                            uid=uid, req=req,
                             secure_page_p = 1,
                             language=args['ln'],
                             lastupdated=__lastupdated__)
@@ -238,7 +238,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         body=webaccount.perform_emailMessage(eMsg, args['ln']),
                         description="CDS Personalize, Main page",
                         keywords="CDS, personalize",
-                        uid=uid,
+                        uid=uid, req=req,
                         secure_page_p = 1,
                         language=args['ln'],
                         lastupdated=__lastupdated__)
@@ -264,7 +264,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         body=webaccount.perform_emailMessage(eMsg, args['ln']),
                         description="CDS Personalize, Main page",
                         keywords="CDS, personalize",
-                        uid=uid,
+                        uid=uid, req=req,
                         secure_page_p = 1,
                         language=args['ln'],
                         lastupdated=__lastupdated__)
@@ -274,7 +274,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     body=webaccount.perform_emailSent(args['p_email'], args['ln']),
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
-                    uid=uid,
+                    uid=uid, req=req,
                     secure_page_p = 1,
                     language=args['ln'],
                     lastupdated=__lastupdated__)
@@ -294,7 +294,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
-                    uid=uid,
+                    uid=uid, req=req,
                     secure_page_p = 1,
                     language=args['ln'],
                     lastupdated=__lastupdated__)
@@ -314,7 +314,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
-                    uid=uid,
+                    uid=uid, req=req,
                     secure_page_p = 1,
                     language=args['ln'],
                     lastupdated=__lastupdated__)
@@ -334,7 +334,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
-                    uid=uid,
+                    uid=uid, req=req,
                     secure_page_p = 1,
                     language=args['ln'],
                     lastupdated=__lastupdated__)
@@ -365,7 +365,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                             description="CDS Personalize, Main page",
                             keywords="CDS, personalize",
-                            uid=uid,
+                            uid=uid, req=req,
                             secure_page_p = 1,
                             language=args['ln'],
                             lastupdated=__lastupdated__)
@@ -395,7 +395,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                             description="CDS Personalize, Main page",
                             keywords="CDS, personalize",
-                            uid=uid,
+                            uid=uid, req=req,
                             secure_page_p = 1,
                             language=args['ln'],
                             lastupdated=__lastupdated__)
@@ -424,7 +424,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                          navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                          description="CDS Personalize, Main page",
                          keywords="CDS, personalize",
-                         uid=uid,
+                         uid=uid, req=req,
                          secure_page_p = 1,
                          language=args['ln'],
                          lastupdated=__lastupdated__)
@@ -464,7 +464,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
-                    uid=uid,
+                    uid=uid, req=req,
                     secure_page_p = 1,
                     language=args['ln'],
                     lastupdated=__lastupdated__)

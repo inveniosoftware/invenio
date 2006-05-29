@@ -25,7 +25,7 @@ from urllib import quote
 
 from invenio.config import weburl, cdsname, cdslang, cachedir, cdsnameintl
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory, http_check_credentials
-from invenio.urlutils import redirect_to_url, make_canonical_urlargd
+from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
 from invenio.webuser import getUid, page_not_authorized
 from invenio import search_engine
 
@@ -251,6 +251,9 @@ def display_collection(req, c, as, verbose, ln):
 
     _ = gettext_set_language(ln)
 
+    req.argd = drop_default_urlargd({'as': as, 'verbose': verbose, 'ln': ln},
+                                    search_interface_default_urlargd)
+    
     # get user ID:
     try:
         uid = getUid(req)
@@ -262,7 +265,7 @@ def display_collection(req, c, as, verbose, ln):
                     description="%s - Internal Error" % cdsname, 
                     keywords="%s, CDS Invenio, Internal Error" % cdsname,
                     language=ln,
-                    urlargs=req.args)
+                    req=req)
     # start display:
     req.content_type = "text/html"
     req.send_http_header()
@@ -276,7 +279,7 @@ def display_collection(req, c, as, verbose, ln):
                     keywords="%s, CDS Invenio" % cdsname,
                     uid=uid,
                     language=ln,
-                    urlargs=req.args)
+                    req=req)
     # display collection interface page:
     try:
         fp = open("%s/collections/%d/navtrail-as=%d-ln=%s.html" % (cachedir, colID, as, ln), "r")
@@ -312,7 +315,7 @@ def display_collection(req, c, as, verbose, ln):
                     keywords="%s, CDS Invenio, %s" % (cdsname, c),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     cdspageboxlefttopadd=c_portalbox_lt,
                     cdspageboxrighttopadd=c_portalbox_rt,
                     titleprologue=c_portalbox_tp,
@@ -331,6 +334,6 @@ def display_collection(req, c, as, verbose, ln):
                     keywords="%s, CDS Invenio, Internal Error" % cdsname,
                     uid=uid,
                     language=ln,
-                    urlargs=req.args)
+                    req=req)
          
     return "\n"    

@@ -473,13 +473,12 @@ def get_email(uid):
         out = res[0][0]
     return out
 
-def create_userinfobox_body(uid, language="en"):
+def create_userinfobox_body(req, uid, language="en"):
     """Create user info box body for user UID in language LANGUAGE."""
-    out = ""
 
     return tmpl.tmpl_create_userinfobox(
              ln = language,
-             weburl = weburl,
+             origin = req.unparsed_uri,
              guest = isGuestUser(uid),
              email = get_email(uid),
              submitter = isUserSubmitter(uid),

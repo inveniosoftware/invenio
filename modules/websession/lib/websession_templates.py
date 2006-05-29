@@ -736,7 +736,7 @@ class Template:
 
         return out
 
-    def tmpl_create_userinfobox(self, ln, weburl, guest, email, submitter, referee, admin):
+    def tmpl_create_userinfobox(self, ln, origin, guest, email, submitter, referee, admin):
         """
         Displays the user block
 
@@ -744,7 +744,7 @@ class Template:
 
           - 'ln' *string* - The language to display the interface in
 
-          - 'weburl' *string* - The address of the site
+          - 'origin' *string* - URL of the page being displayed
 
           - 'guest' *boolean* - If the user is guest
 
@@ -763,10 +763,10 @@ class Template:
         out = """<img src="%s/img/head.gif" border="0" alt="">""" % weburl
         if guest:
             out += """%(guest_msg)s ::
-    	       <a class="userinfo" href="%(sweburl)s/youraccount.py/display?ln=%(ln)s">%(session)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/youralerts.py/list?ln=%(ln)s">%(alerts)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/yourbaskets.py/display?ln=%(ln)s">%(baskets)s</a> ::
-                   <a class="userinfo" href="%(sweburl)s/youraccount.py/login?ln=%(ln)s">%(login)s</a>""" % {
+    	       <a class="userinfo" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(session)s</a> ::
+                   <a class="userinfo" href="%(weburl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> ::
+                   <a class="userinfo" href="%(weburl)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a> ::
+                   <a class="userinfo" href="%(sweburl)s/youraccount/login?ln=%(ln)s">%(login)s</a>""" % {
                      'weburl' : weburl,
                      'sweburl': sweburl,
                      'ln' : ln,
@@ -778,10 +778,10 @@ class Template:
                    }
         else:
             out += """%(email)s ::
-    	       <a class="userinfo" href="%(sweburl)s/youraccount.py/display?ln=%(ln)s">%(account)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/youralerts.py/list?ln=%(ln)s">%(alerts)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/yourmessages.py/display?ln=%(ln)s">%(messages)s</a> ::
-		   <a class="userinfo" href="%(weburl)s/yourbaskets.py/display?ln=%(ln)s">%(baskets)s</a> :: """ % {
+    	       <a class="userinfo" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a> ::
+                   <a class="userinfo" href="%(weburl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> ::
+                   <a class="userinfo" href="%(weburl)s/yourmessages/display?ln=%(ln)s">%(messages)s</a> ::
+		   <a class="userinfo" href="%(weburl)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a> :: """ % {
                      'email' : email,
                      'weburl' : weburl,
                      'sweburl' : sweburl,
@@ -792,24 +792,24 @@ class Template:
                      'baskets' : _("baskets"),
                    }
             if submitter:
-                out += """<a class="userinfo" href="%(weburl)s/yoursubmissions.py?ln=%(ln)s">%(submission)s</a> :: """ % {
+                out += """<a class="userinfo" href="%(weburl)s/yoursubmissions?ln=%(ln)s">%(submission)s</a> :: """ % {
                          'weburl' : weburl,
                          'ln' : ln,
                          'submission' : _("submissions"),
                        }
             if referee:
-                out += """<a class="userinfo" href="%(weburl)s/yourapprovals.py?ln=%(ln)s">%(approvals)s</a> :: """ % {
+                out += """<a class="userinfo" href="%(weburl)s/yourapprovals?ln=%(ln)s">%(approvals)s</a> :: """ % {
                          'weburl' : weburl,
                          'ln' : ln,
                          'approvals' : _("approvals"),
                        }
             if admin:
-                out += """<a class="userinfo" href="%(sweburl)s/youraccount.py/youradminactivities?ln=%(ln)s">%(administration)s</a> :: """ % {
+                out += """<a class="userinfo" href="%(sweburl)s/youraccount/youradminactivities?ln=%(ln)s">%(administration)s</a> :: """ % {
                          'sweburl' : sweburl,
                          'ln' : ln,
                          'administration' : _("administration"),
                        }
-            out += """<a class="userinfo" href="%(sweburl)s/youraccount.py/logout?ln=%(ln)s">%(logout)s</a>""" % {
+            out += """<a class="userinfo" href="%(sweburl)s/youraccount/logout?ln=%(ln)s">%(logout)s</a>""" % {
                      'sweburl' : sweburl,
                      'ln' : ln,
                      'logout' : _("logout"),

@@ -52,7 +52,7 @@ except ImportError, e:
 try:
     from invenio.config import *
     from invenio.messages import gettext_set_language, language_list_long
-    from invenio.search_engine import HitSet, search_pattern, get_creation_date, nice_number, get_field_i18nname
+    from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname
     from invenio.search_engine_config import cfg_author_et_al_threshold, cfg_instant_browse, cfg_max_recID, cfg_narrow_search_show_grandsons
     from invenio.dbquery import run_sql
     from invenio.access_control_engine import acc_authorize_action
@@ -376,13 +376,6 @@ class Collection:
                      dads = dads)
 
 
-    def create_nbrecs_info(self, ln=cdslang, prolog = None, epilog = None):
-        "Return information on the number of records."
-
-        return websearch_templates.tmpl_nbrecs_info (number = nice_number (self.nbrecs, ln),
-                                      prolog = prolog,
-                                      epilog = epilog)
-
     def create_portalbox(self, lang=cdslang, position="rt"):
         """Creates portalboxes of language CDSLANG of the position POSITION by consulting MySQL configuration database.
            The position may be: 'lt'='left top', 'rt'='right top', etc."""
@@ -644,42 +637,22 @@ class Collection:
     def create_searchfor_simple(self, ln=cdslang):
         "Produces simple 'Search for' box for the current collection."
 
-        # load the right message language
-        _ = gettext_set_language(ln)
-
-        if self.name != cdsname:
-            ssearchurl = "?c=%s&amp;as=0&amp;ln=%s" % (urllib.quote_plus(self.name), ln)
-            asearchurl = "?c=%s&amp;as=1&amp;ln=%s" % (urllib.quote_plus(self.name), ln)
-        else: # hide cdsname for aesthetical reasons
-            ssearchurl = "?as=0&amp;ln=%s" % ln
-            asearchurl = "?as=1&amp;ln=%s" % ln
-
         return websearch_templates.tmpl_searchfor_simple(
-          ln = ln,
-          weburl = weburl,
-          asearchurl = asearchurl,
-          header = _("Search %s records for:") % self.create_nbrecs_info(ln, "",""),
+          ln=ln,
+          collection_id = self.name,
+          collection_name=self.get_name(ln=ln),
+          record_count=self.nbrecs,
           middle_option = self.create_searchwithin_selection_box(ln=ln),
         )
 
     def create_searchfor_advanced(self, ln=cdslang):
         "Produces advanced 'Search for' box for the current collection."
 
-        # load the right message language
-        _ = gettext_set_language(ln)
-
-        if self.name != cdsname:
-            ssearchurl = "?c=%s&amp;as=0&amp;ln=%s" % (urllib.quote_plus(self.name), ln)
-            asearchurl = "?c=%s&amp;as=1&amp;ln=%s" % (urllib.quote_plus(self.name), ln)
-        else: # hide cdsname for aesthetical reasons
-            ssearchurl = "?as=0&amp;ln=%s" % ln
-            asearchurl = "?as=1&amp;ln=%s" % ln
-
         return websearch_templates.tmpl_searchfor_advanced(
           ln = ln,
-          weburl = weburl,
-          ssearchurl = ssearchurl,
-          header = _("Search %s records for:") % self.create_nbrecs_info(ln, "",""),
+          collection_id = self.name,
+          collection_name=self.get_name(ln=ln),
+          record_count=self.nbrecs,
 
           middle_option_1 = self.create_searchwithin_selection_box('f1', ln=ln),
           middle_option_2 = self.create_searchwithin_selection_box('f2', ln=ln),

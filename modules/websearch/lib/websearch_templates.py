@@ -137,7 +137,7 @@ class Template:
         if args.issubset(args_for_collection):
             try:
                 cc = parameters['cc']
-                del parameters['cc']
+                del  parameters['cc']
             except KeyError:
                 cc = cdsname
             
@@ -227,16 +227,12 @@ class Template:
 
         return out
 
-    def tmpl_searchfor_simple(self, ln,weburl,asearchurl, header, middle_option):
+    def tmpl_searchfor_simple(self, ln, collection_id, collection_name, record_count, middle_option):
         """Produces simple *Search for* box for the current collection.
 
         Parameters:
 
           - 'ln' *string* - The language to display
-
-          - 'weburl' *string* - The base URL for the site
-
-          - 'asearchurl' *string* - The URL to advanced search form
 
           - 'header' *string* - header of search form
 
@@ -246,6 +242,11 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
+        header = _("Search %s records for:") % \
+                 self.tmpl_nbrecs_info(record_count, "","")
+
+        asearchurl = self.build_search_url(cc=collection_id, as=1, ln=ln)
+        
         # print commentary start:
         out = '''
         <!--create_searchfor_simple()-->
@@ -269,7 +270,7 @@ class Template:
            <td class="searchboxbody" colspan="3" align="right">
              <small>
                <a href="%(weburl)s/help/search/tips.%(ln)s.html">%(msg_search_tips)s</a> ::
-               <a href="%(asearchurl)s">%(msg_advanced_search)s</a>
+               %(asearch)s
              </small>
            </td>
           </tr>
@@ -278,22 +279,20 @@ class Template:
         <!--/create_searchfor_simple()-->
         ''' % {'ln' : ln,
                'weburl' : weburl,
-               'asearchurl' : asearchurl,
+               'asearch' : a_href(_('Advanced Search'), href=asearchurl),
                'header' : header,
                'middle_option' : middle_option,
                'msg_search' : _('Search'),
                'msg_browse' : _('Browse'),
-               'msg_search_tips' : _('Search Tips'),
-               'msg_advanced_search' : _('Advanced Search')}
+               'msg_search_tips' : _('Search Tips')}
         
         return out
 
     def tmpl_searchfor_advanced(self,
                                 ln,                  # current language
-                                weburl,              # base url
-                                ssearchurl,          # url to simple search form
-                                header,              # header of search form
-                                
+                                collection_id,
+                                collection_name,
+                                record_count,
                                 middle_option_1, middle_option_2, middle_option_3,
                                 searchoptions,
                                 sortoptions,
@@ -335,6 +334,11 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
+        header = _("Search %s records for:") % \
+                 self.tmpl_nbrecs_info(record_count, "","")
+
+        ssearchurl = self.build_search_url(cc=collection_id, as=0, ln=ln)
+
         out = '''
         <!--create_searchfor_advanced()-->
         <input type="hidden" name="as" value="1">
@@ -367,7 +371,7 @@ class Template:
             <td colspan="3" class="searchboxbody" align="right">
               <small>
                 <a href="%(weburl)s/help/search/tips.%(ln)s.html">%(msg_search_tips)s</a> ::
-                <a href="%(ssearchurl)s">%(msg_simple_search)s</a>
+                %(ssearch)s
               </small>
             </td>
           </tr>
@@ -376,7 +380,7 @@ class Template:
         <!-- @todo - more imports -->
         ''' % {'ln' : ln,
                'weburl' : weburl,
-               'ssearchurl' : ssearchurl,
+               'ssearch' : a_href(_("Simple Search"), href=ssearchurl),
                'header' : header,
 
                'matchbox_m1' : self.tmpl_matchtype_box('m1', ln=ln),
@@ -392,8 +396,7 @@ class Template:
 
                'msg_search' : _("Search"),
                'msg_browse' : _("Browse"),
-               'msg_search_tips' : _("Search Tips"),
-               'msg_simple_search' : _("Simple Search")}
+               'msg_search_tips' : _("Search Tips")}
 
         if (searchoptions):
             out += """<table class="searchbox">
@@ -673,7 +676,7 @@ class Template:
                 out += """<td valign="top">%(link)s%(recs)s """ % {
                     'link': a_href(style_prolog + son.get_name(ln) + style_epilog,
                                    href=self.build_search_url(cc=son.name, ln=ln, as=as)),
-                    'recs' : son.create_nbrecs_info(ln)}
+                    'recs' : self.tmpl_nbrecs_info(son.nbrecs, ln=ln)}
                 
                 if son.restricted_p():
                     out += """ <small class="warning">[%(msg)s]</small>""" % { 'msg' : _("restricted") }
@@ -684,7 +687,7 @@ class Template:
                         out += """ %(link)s%(nbrec)s """ % {
                             'link': a_href(grandson.get_name(ln),
                                            href=self.build_search_url(cc=grandson.name, ln=ln, as=as)),
-                            'nbrec' : grandson.create_nbrecs_info(ln)}
+                            'nbrec' : self._tmpl_nbrecs_info(grandson.nbrecs, ln=ln)}
                         
                 out += """</td></tr>"""
                 i += 1
@@ -712,7 +715,26 @@ class Template:
 
         return out
 
-    def tmpl_nbrecs_info(self, number, prolog = None, epilog = None):
+    def tmpl_nice_number(self, num, ln=cdslang):
+        "Returns nicely printed number NUM in language LN using thousands separator char defined in the I18N messages file."
+
+        if num is None: return None
+
+        _ = gettext_set_language(ln)
+
+        separator = _(",")
+
+        chars_in = list(str(num))
+        num = len(chars_in)
+        chars_out = []
+        for i in range(0,num):
+            if i % 3 == 0 and i != 0:
+                chars_out.append(separator)
+            chars_out.append(chars_in[num-i-1])
+        chars_out.reverse()
+        return ''.join(chars_out)
+
+    def tmpl_nbrecs_info(self, number, prolog=None, epilog=None, ln=cdslang):
         """
         Return information on the number of records.
 
@@ -729,10 +751,12 @@ class Template:
 
         if number is None: return ''
 
-        if prolog == None: prolog = """&nbsp;<small class="nbdoccoll">("""
-        if epilog == None: epilog = """)</small>"""
+        if prolog is None:
+            prolog = '''&nbsp;<small class="nbdoccoll">('''
+        if epilog is None:
+            epilog = ''')</small>'''
 
-        return prolog + number + epilog
+        return prolog + self.tmpl_nice_number(number, ln) + epilog
 
     def tmpl_box_restricted_content(self, ln):
         """

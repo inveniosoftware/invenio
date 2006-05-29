@@ -46,15 +46,20 @@ def create_navtrailbox_body(title,
        output: text containing the navtrail
     """
 
-    return webstyle_templates.tmpl_navtrailbox_body(weburl = weburl,
-                                                    ln = language,
+    return webstyle_templates.tmpl_navtrailbox_body(ln = language,
                                                     title = title,
                                                     previous_links = previous_links,
                                                     separator = separator,
                                                     prolog = prolog,
                                                     epilog = epilog)
 
-def page(title, body, navtrail="", description="", keywords="", uid=0, cdspageheaderadd="", cdspageboxlefttopadd="", cdspageboxleftbottomadd="", cdspageboxrighttopadd="", cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="", language=cdslang, urlargs="", verbose=1, titleprologue="", titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[]):
+def page(title, body, navtrail="", description="", keywords="", uid=0,
+         cdspageheaderadd="", cdspageboxlefttopadd="",
+         cdspageboxleftbottomadd="", cdspageboxrighttopadd="",
+         cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="",
+         language=cdslang, verbose=1, titleprologue="",
+         titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[]):
+
     """page(): display CDS web page
         input: title of the page
                body of the page in html format
@@ -81,11 +86,6 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagehe
 
     _ = gettext_set_language(language)
     
-    if title == cdsnameintl[language]:
-        headerstitle = _("Home")
-    else:
-        headerstitle = title
-
     # if there are event
     if warnings:
         warnings = get_msgs_for_code_list(warnings, 'warning', language)
@@ -97,14 +97,10 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagehe
         register_errors(errors, 'error', req)
         body = create_error_box(req, errors=errors, ln=language) 
 
-    return webstyle_templates.tmpl_page(weburl = weburl,
-                                        ln = language,
-                                        headertitle = headerstitle,
-                                        sitename = cdsnameintl[language],
-                                        supportemail = supportemail,
+    return webstyle_templates.tmpl_page(req, ln=language,
                                         description = description,
                                         keywords = keywords,                                        
-                                        userinfobox = create_userinfobox_body(uid, language),
+                                        userinfobox = create_userinfobox_body(req, uid, language),
                                         navtrailbox = create_navtrailbox_body(title, navtrail, language=language),                                        
                                         uid = uid,
                                         secure_page_p = secure_page_p,
@@ -123,41 +119,31 @@ def page(title, body, navtrail="", description="", keywords="", uid=0, cdspagehe
                                         titleepilogue = titleepilogue,                                        
                                         body = body,                                        
                                         # pagefooter = cdspagefooter,
-                                        languagebox = webstyle_templates.tmpl_language_selection_box(urlargs, language),                                        
-                                        version = version,
                                         lastupdated = lastupdated,
                                         pagefooteradd = cdspagefooteradd)
 
-def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspageheaderadd="", language=cdslang, urlargs="", secure_page_p=0, verbose=1):
+def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspageheaderadd="", language=cdslang, req=None, secure_page_p=0, verbose=1):
     """Return just the beginning of page(), with full headers.
        Suitable for the search results page and any long-taking scripts."""
 
-    return webstyle_templates.tmpl_pageheader(weburl = weburl,
+    return webstyle_templates.tmpl_pageheader(req,
                                               ln = language,
                                               headertitle = title,
-                                              sitename = cdsnameintl[language],
-                                              supportemail = supportemail,
                                               description = description,
                                               keywords = keywords,                                              
-                                              userinfobox = create_userinfobox_body(uid, language),
-                                              navtrailbox = create_navtrailbox_body(title, navtrail, language=language),                                              
+                                              userinfobox = create_userinfobox_body(req, uid, language),
+                                              navtrailbox = create_navtrailbox_body(title, navtrail, language=language),
                                               uid = uid,
                                               secure_page_p = secure_page_p,
                                               # pageheader = cdspageheader,
-                                              pageheaderadd = cdspageheaderadd,
-                                              languagebox = webstyle_templates.tmpl_language_selection_box(urlargs, language))
+                                              pageheaderadd = cdspageheaderadd)
 
-def pagefooteronly(cdspagefooteradd="", lastupdated="", language=cdslang, urlargs="", verbose=1):
+def pagefooteronly(cdspagefooteradd="", lastupdated="", language=cdslang, req=None, verbose=1):
     """Return just the ending of page(), with full footer.
        Suitable for the search results page and any long-taking scripts."""
 
-    return webstyle_templates.tmpl_pagefooter(weburl = weburl,
-                                              ln = language,
-                                              sitename = cdsnameintl[language],
-                                              supportemail = supportemail,
-                                              # pagefooter = cdspagefooter,
-                                              languagebox = webstyle_templates.tmpl_language_selection_box(urlargs, language),
-                                              version = version,
+    return webstyle_templates.tmpl_pagefooter(req,
+                                              ln=language,
                                               lastupdated = lastupdated,
                                               pagefooteradd = cdspagefooteradd)
 

@@ -368,14 +368,13 @@ def page_start(req, of, cc, as, ln, uid, title_message=None):
         # we are doing HTML output:
         req.content_type = "text/html"
         req.send_http_header()
-        req.write(pageheaderonly(title=title_message,
+        req.write(pageheaderonly(req=req, title=title_message,
                                  navtrail=create_navtrail_links(cc, as, ln, 1),
                                  description="%s %s." % (cc, _("Search Results")),
                                  keywords="CDS Invenio, WebSearch, %s" % cc,
                                  uid=uid,
-                                 language=ln,
-                                 urlargs=req.args))
-        req.write(websearch_templates.tmpl_search_pagestart(ln = ln))
+                                 language=ln))
+        req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
 
 def page_end(req, of="hb", ln=cdslang):
     "End page according to given output format: e.g. close XML tags, add HTML footer, etc."
@@ -385,7 +384,7 @@ def page_end(req, of="hb", ln=cdslang):
         return # we were called from CLI
     if of.startswith('h'):
         req.write(websearch_templates.tmpl_search_pageend(ln = ln)) # pagebody end
-        req.write(pagefooteronly(lastupdated=__lastupdated__, language=ln, urlargs=req.args))
+        req.write(pagefooteronly(lastupdated=__lastupdated__, language=ln, req=req))
     elif of.startswith('x'):
         req.write("""</collection>\n""")
     return "\n"
@@ -670,25 +669,6 @@ def create_matchtype_box(name='m', value='', ln='en'):
            is_selected('p', value), _("Partial phrase:"),
            is_selected('r', value), _("Regular expression:"))
     return out
-
-def nice_number(num, ln=cdslang):
-    "Returns nicely printed number NUM in language LN using thousands separator char defined in the I18N messages file."
-
-    if num is None: return None
-
-    _ = gettext_set_language(ln)
-
-    separator = _(",")
-    
-    chars_in = list(str(num))
-    num = len(chars_in)
-    chars_out = []
-    for i in range(0,num):
-        if i % 3 == 0 and i != 0:
-            chars_out.append(separator)
-        chars_out.append(chars_in[num-i-1])
-    chars_out.reverse()
-    return ''.join(chars_out)
 
 def is_selected(var, fld):
     "Checks if the two are equal, and if yes, returns ' selected'.  Useful for select boxes."
