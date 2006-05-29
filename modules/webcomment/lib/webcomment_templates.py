@@ -578,7 +578,7 @@ class Template:
       <h1>%(record_label)s %(recid)s</h1>
     </td>
     <td style="vertical-align:top; align=right" class="backtosearch">
-      <a href="%(weburl)s/search?recid=%(recid)s&amp;ln=%(ln)s">%(back_label)s</a>
+      <a href="%(weburl)s/record/%(recid)s?ln=%(ln)s">%(back_label)s</a>
     </td>
   </tr>
 </table>
@@ -596,7 +596,7 @@ class Template:
   <tr>
     <td>%(write_button_form_again)s</td>
     <td style="align:right;" class="reportabuse">
-      <a href="%(weburl)s/search?recid=%(recid)s&amp;ln=%(ln)s">%(back_label)s</a>
+      <a href="%(weburl)s/record/%(recid)s?ln=%(ln)s">%(back_label)s</a>
     </td>
   </tr>
 </table>
@@ -1142,7 +1142,7 @@ class Template:
         reported_label %= (reviews and _("review") or _("comment"), int(nb_reports))
         out = """
 %(reported_label)s<br />
-<a href="%(weburl)s/search?recid=%(rec_id)i&amp;ln=%(ln)s">%(rec_id_label)s</a><br />
+<a href="%(weburl)s/record/%(rec_id)i?ln=%(ln)s">%(rec_id_label)s</a><br />
 %(cmt_id_label)s"""
         out %= {'reported_label': reported_label,
                 'rec_id_label': _("Record #%s")% str(rec_id),

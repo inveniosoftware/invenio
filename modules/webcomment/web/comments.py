@@ -82,7 +82,7 @@ def display(req, recid=-1, ln=cdslang, do='od', ds='all', nb=100, p=1, voted=-1,
         (body, errors, warnings) = perform_request_display_comments_or_remarks(recID=recid, display_order=do, display_since=ds, nb_per_page=nb, page=p, ln=ln, voted=voted, reported=reported, reviews=reviews)
 
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(recid))
-        navtrail += '&gt; <a class="navtrail" href="%s/search?recid=%s&ln=%s">'% (weburl, recid, ln)
+        navtrail += '&gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (weburl, recid, ln)
         navtrail += _("Detailed record #%s") % recid
         navtrail += '</a>'
         navtrail += ' &gt; <a class="navtrail">%s</a>' % (reviews==1 and _("Reviews") or _("Comments"))
@@ -133,7 +133,7 @@ def add(req, ln=cdslang, recid=-1, action='DISPLAY', msg="", note="", score="", 
     (ok, problem) = check_recID_is_in_range(recid, check_warnings, ln) 
     if ok:
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(recid))
-        navtrail += ' &gt; <a class="navtrail" href="%s/search?recid=%s&ln=%s">'% (weburl, recid, ln)
+        navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (weburl, recid, ln)
         navtrail += _("Detailed record #%s") % recid
         navtrail += '</a>'
         navtrail += '&gt; <a class="navtrail" href="%s/comments.py/display?recid=%s&ln=%s">%s</a>' % (weburl, recid, ln, reviews==1 and _('Reviews') or _('Comments')) 

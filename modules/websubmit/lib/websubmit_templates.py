@@ -1065,7 +1065,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        title = _("record #%s") % ("<a href=\"search?recid=%s\">%s</a>" % (recid,recid))
+        title = _("record #%s") % ("<a href=\"record/%s\">%s</a>" % (recid,recid))
         if docid != "":
             title += _(" document #%s") % docid
         if version != "":
