@@ -73,7 +73,7 @@ collection, launch:
 
 <blockquote>
 <pre>
-$ bibreformat -cPictures -oHB,HD,HP
+$ bibreformat -cPictures -oHB
 </pre>
 </blockquote>
 

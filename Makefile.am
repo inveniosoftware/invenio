@@ -167,7 +167,7 @@ load-demo-records:
 	@echo "** You will be asked for a username, please enter admin email below. **"
 	@echo "***********************************************************************"
 	@echo ""
-	${prefix}/bin/bibreformat -oHB,HD,HP,HC
+	${prefix}/bin/bibreformat -oHB
 	${prefix}/bin/bibreformat 3
 	${prefix}/bin/bibupload 4
 	@echo ""

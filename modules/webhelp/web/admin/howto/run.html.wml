@@ -64,7 +64,7 @@ daemons to run periodically with a sleeping period of, say, 1 hour:
 <blockquote>
 <pre>
 $ bibindex -f50000 -s1h
-$ bibreformat -oHB,HD -s1h
+$ bibreformat -oHB -s1h
 $ webcoll -v0 -s1h
 $ bibrank -f50000 -s1h
 </pre>
