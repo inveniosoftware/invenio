@@ -400,9 +400,14 @@ default
 1000
 </define-tag>
 
-## CFG_CALL_BIBFORMAT -- if "HTML detailed" format is not found, do we
-## want to call BibFormat on the fly?  Put "1" for "yes" and "0" for
-## "no".  Usually we want to have "0' here.
+## CFG_CALL_BIBFORMAT -- if a record is being displayed but it was not
+## preformatted in the "HTML brief" format, do we want to call
+## BibFormatting on the fly?  Put "1" for "yes" and "0" for "no".
+## Note that "1" will display the record exactly as if it were fully
+## preformatted, but it may be slow due to on-the-fly processing; "0"
+## will display a default format very fast, but it may not have all
+## the fields as in the fully preformatted HTML brief format.  When
+## usure, set "0" here.
 ##  (example: "0")
 <define-tag CFG_CALL_BIBFORMAT whitespace=delete>
 0
