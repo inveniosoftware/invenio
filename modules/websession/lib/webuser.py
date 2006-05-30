@@ -478,7 +478,7 @@ def create_userinfobox_body(req, uid, language="en"):
 
     return tmpl.tmpl_create_userinfobox(
              ln = language,
-             origin = req.unparsed_uri,
+             url_referrer = req.unparsed_uri,
              guest = isGuestUser(uid),
              email = get_email(uid),
              submitter = isUserSubmitter(uid),

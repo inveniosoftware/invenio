@@ -736,7 +736,7 @@ class Template:
 
         return out
 
-    def tmpl_create_userinfobox(self, ln, origin, guest, email, submitter, referee, admin):
+    def tmpl_create_userinfobox(self, ln, url_referrer, guest, email, submitter, referee, admin):
         """
         Displays the user block
 
@@ -744,7 +744,7 @@ class Template:
 
           - 'ln' *string* - The language to display the interface in
 
-          - 'origin' *string* - URL of the page being displayed
+          - 'url_referrer' *string* - URL of the page being displayed
 
           - 'guest' *boolean* - If the user is guest
 
