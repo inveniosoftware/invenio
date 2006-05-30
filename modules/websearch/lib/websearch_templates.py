@@ -148,8 +148,12 @@ class Template:
         del parameters['c']
         
         # Now, we only have the arguments which have _not_ their default value
-        return "%s/collection/%s%s" % (
-            weburl, urllib.quote(c), make_canonical_urlargd(parameters, self.search_results_default_urlargd))
+        if c and c != cdsname:
+            base = weburl + '/collection/' + urllib.quote(c)
+        else:
+            base = weburl
+        
+        return base + make_canonical_urlargd(parameters, self.search_results_default_urlargd)
         
 
     def tmpl_navtrail_links(self, as, ln, dads):
