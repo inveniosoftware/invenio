@@ -444,7 +444,7 @@ class Collection:
         if self.restricted_p():
             return websearch_templates.tmpl_box_restricted_content(ln = ln)
         else:
-            url = websearch_templates.build_search_url(cc=self.name, jrec=rg+1, ln=ln)
+            url = websearch_templates.build_search_url(cc=self.name, jrec=rg+1, ln=ln, as=as)
             if self.nbrecs and self.reclist:
                 # firstly, get last 'rg' records:
                 recIDs = Numeric.nonzero(self.reclist._set)

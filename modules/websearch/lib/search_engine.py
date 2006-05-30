@@ -449,8 +449,11 @@ def create_google_box(cc, p, f, p1, p2, p3, ln=cdslang,
              epilog = epilog,
            )
 
-def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1, p2, f2, m2, op2, p3, f3, m3, sc, pl,
-                      d1y, d1m, d1d, d2y, d2m, d2d, action=""):
+def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
+                      ln, p1, f1, m1, op1, p2, f2, m2, op2, p3, f3,
+                      m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec,
+                      action=""):
+    
     "Create search box for 'search again in the results page' functionality."
 
     # load the right message language
@@ -542,7 +545,6 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
 
     return websearch_templates.tmpl_search_box(
              ln = ln,
-             weburl = weburl,
              as = as,
              cc_intl = cc_intl,
              cc = cc,
@@ -574,7 +576,8 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f
              rg = rg,
              formats = formats,
              of = of,
-             pl = pl
+             pl = pl,
+             jrec=jrec,
            )
 
 def create_navtrail_links(cc=cdsname,
@@ -3019,7 +3022,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         page_start(req, of, cc, as, ln, uid, _("Browse"))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, action))
         try:
             if as==1 or (p1 or p2 or p3):
                 browse_pattern(req, colls_to_search, p1, f1, rg)
@@ -3037,7 +3040,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         page_start(req, of, cc, as, ln, uid, _("Search Results"))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, action))
         if record_exists(p[6:]) != 1:
             # record does not exist
             if of.startswith("h"):
@@ -3076,7 +3079,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         page_start(req, of, cc, as, ln, uid, _("Search Results")) 
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, action))
         recID = p[12:]
         if record_exists(recID) != 1:
             # record does not exist
@@ -3110,7 +3113,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf
         page_start(req, of, cc, as, ln, uid, _("Search Results"))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, action))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, action))
         t1 = os.times()[4]
         results_in_any_collection = HitSet()
         if as == 1 or (p1 or p2 or p3):

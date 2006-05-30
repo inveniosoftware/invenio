@@ -242,16 +242,24 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
+        out = '''
+        <!--create_searchfor_simple()-->
+        '''
+
+        argd = drop_default_urlargd({'ln': ln}, self.search_results_default_urlargd)
+
+        # Only add non-default hidden values
+        for field, value in argd.items():
+            out += self.tmpl_input_hidden(field, value)
+
+
         header = _("Search %s records for:") % \
                  self.tmpl_nbrecs_info(record_count, "","")
 
         asearchurl = self.build_search_url(cc=collection_id, as=1, ln=ln)
         
         # print commentary start:
-        out = '''
-        <!--create_searchfor_simple()-->
-        <input type="hidden" name="sc" value="1">
-        <input type="hidden" name="ln" value="%(ln)s">
+        out += '''
         <table class="searchbox">
          <thead>
           <tr align="left">
@@ -334,15 +342,23 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
+        out = '''
+        <!--create_searchfor_advanced()-->
+        '''
+        
+        argd = drop_default_urlargd({'ln': ln, 'as': 1}, self.search_results_default_urlargd)
+
+        # Only add non-default hidden values
+        for field, value in argd.items():
+            out += self.tmpl_input_hidden(field, value)
+
+
         header = _("Search %s records for:") % \
                  self.tmpl_nbrecs_info(record_count, "","")
 
         ssearchurl = self.build_search_url(cc=collection_id, as=0, ln=ln)
 
-        out = '''
-        <!--create_searchfor_advanced()-->
-        <input type="hidden" name="as" value="1">
-        <input type="hidden" name="ln" value="%(ln)s">
+        out += '''
         <table class="searchbox">
          <thead>
           <tr>
@@ -609,7 +625,10 @@ class Template:
         box += """</select>"""
         return box
 
-    def tmpl_narrowsearch(self, as, ln, weburl, title, type, father, has_grandchildren, instant_browse, sons, display_grandsons, grandsons):
+    def tmpl_narrowsearch(self, as, ln, weburl, title, type, father,
+                          has_grandchildren, instant_browse, sons,
+                          display_grandsons, grandsons):
+
         """
         Creates list of collection descendants of type *type* under title *title*.
         If as==1, then links to Advanced Search interfaces; otherwise Simple Search.
@@ -687,7 +706,7 @@ class Template:
                         out += """ %(link)s%(nbrec)s """ % {
                             'link': a_href(grandson.get_name(ln),
                                            href=self.build_search_url(cc=grandson.name, ln=ln, as=as)),
-                            'nbrec' : self._tmpl_nbrecs_info(grandson.nbrecs, ln=ln)}
+                            'nbrec' : self.tmpl_nbrecs_info(grandson.nbrecs, ln=ln)}
                         
                 out += """</td></tr>"""
                 i += 1
@@ -819,11 +838,10 @@ class Template:
                       }
         out += "</table>"
         if more_link:
-            out += """<div align="right"><small><a href="%(url)s&amp;ln=%(ln)s%(advanced_search_addon)s">[&gt;&gt; %(text)s]</a></small></div>""" % {
-               'url'  : more_link,
-               'ln'   : ln,
-               'advanced_search_addon'  : as and "&amp;as=%d" % as or "",
-               'text' : _("more")}
+            out += '<div align="right"><small>' + \
+                     a_href('[&gt;&gt; %s]' % _("more"), href=more_link) + \
+                   '</small></div>'
+            
         return out
 
     def tmpl_searchwithin_select(self, ln, fieldname, selected, values):
@@ -840,9 +858,8 @@ class Template:
 
           - 'values' *list* - the list of values in the select
         """
-        out = """<select name="%(fieldname)s">""" % {
-                'fieldname' : fieldname,
-              }
+        
+        out = '<select name="%(fieldname)s">' % {'fieldname': fieldname}
 
         if values:
             for pair in values:
@@ -854,7 +871,7 @@ class Template:
         out += """</select>"""
         return out
 
-    def tmpl_select(self, fieldname, values, selected = None, css_class = ''):
+    def tmpl_select(self, fieldname, values, selected=None, css_class=''):
         """
           Produces a generic select box
 
@@ -872,18 +889,23 @@ class Template:
             class_field = ' class="%s"' % css_class
         else:
             class_field = ''
-        out = """<select name="%(fieldname)s"%(class)s>""" % {
-                'fieldname' : fieldname,
-                'class' : class_field
-              }
+        out = '<select name="%(fieldname)s"%(class)s>' % {
+            'fieldname' : fieldname,
+            'class' : class_field
+            }
 
         for pair in values:
-            out += """<option value="%(value)s"%(selected)s>%(text)s""" % {
+            if pair.get('selected', False) or pair['value'] == selected:
+                selected = ' selected'
+            else:
+                selected = ''
+            
+            out += '<option value="%(value)s"%(selected)s>%(text)s' % {
                      'value'    : pair['value'],
-                     'selected' : self.tmpl_is_selected(pair['value'], selected) or
-                                  (pair.has_key('selected') and self.tmpl_is_selected(pair['selected'], True)),
+                     'selected' : selected,
                      'text'     : pair['text']
                    }
+            
         out += """</select>"""
         return out
 
@@ -1145,7 +1167,12 @@ class Template:
             </table>"""
         return out
 
-    def tmpl_search_box(self, ln, weburl, as, cc, cc_intl, ot, sp, action, fieldslist, f1, f2, f3, m1, m2, m3, p1, p2, p3, op1, op2, rm, p, f, coll_selects, d1y, d2y, d1m, d2m, d1d, d2d, sort_formats, sf, so, ranks, sc, rg, formats, of, pl):
+    def tmpl_search_box(self, ln, as, cc, cc_intl, ot, sp,
+                        action, fieldslist, f1, f2, f3, m1, m2, m3,
+                        p1, p2, p3, op1, op2, rm, p, f, coll_selects,
+                        d1y, d2y, d1m, d2m, d1d, d2d, sort_formats,
+                        sf, so, ranks, sc, rg, formats, of, pl, jrec):
+        
         """
           Displays the *Nearest search terms* box
 
@@ -1197,24 +1224,25 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = ""
-        # print search box prolog:
-        out += """
-                <h1 class="headline">%(ccname)s</h1>
-                <form name="search" action="%(weburl)s/search" method="get">
-                <input type="hidden" name="cc" value="%(cc)s">
-                <input type="hidden" name="as" value="%(as)s">
-                <input type="hidden" name="ln" value="%(ln)s">
-               """ % {
-                 'ccname' : cc_intl,
-                 'weburl' : weburl,
-                 'cc' : cgi.escape(cc, 1),
-                 'as' : as,
-                 'ln' : ln
-               }
-        if ot: out += self.tmpl_input_hidden('ot', ot)
-        if sp: out += self.tmpl_input_hidden('sp', sp)
 
+        # These are hidden fields the user does not manipulate
+        # directly
+        argd = drop_default_urlargd({
+            'ln': ln, 'as': as,
+            'cc': cc, 'ot': ot, 'sp': sp,
+            }, self.search_results_default_urlargd)
+        
+
+        out = '''
+        <h1 class="headline">%(ccname)s</h1>
+        <form name="search" action="%(weburl)s/search" method="get">
+        ''' % {'ccname' : cc_intl,
+               'weburl' : weburl}
+        
+        # Only add non-default hidden values
+        for field, value in argd.items():
+            out += self.tmpl_input_hidden(field, value)
+        
         leadingtext = _("Search")
 
         if action == 'browse':
@@ -1276,7 +1304,7 @@ class Template:
             </table>
             ''' % {
                 'simple_search': a_href(_("Simple Search"),
-                                        href=self.build_search_url(p=p1, f=f1, rm=rm, cc=cc, ln=ln)),
+                                        href=self.build_search_url(p=p1, f=f1, rm=rm, cc=cc, ln=ln, jrec=jrec, rg=rg)),
                 
                 'leading' : leadingtext,
                 'sizepattern' : cfg_advancedsearch_pattern_box_width,
@@ -1360,7 +1388,7 @@ class Template:
             </table>
             ''' % {
               'advanced_search': a_href(_("Advanced Search"),
-                                        href=self.build_search_url(p1=p, f1=f, rm=rm, as=1, cc=cc, ln=ln)),
+                                        href=self.build_search_url(p1=p, f1=f, rm=rm, as=1, cc=cc, jrec=jrec, ln=ln, rg=rg)),
               'leading' : leadingtext,
               'sizepattern' : cfg_advancedsearch_pattern_box_width,
               'p' : cgi.escape(p, 1),
@@ -1368,7 +1396,7 @@ class Template:
                                   ln = ln,
                                   fieldname = 'f',
                                   selected = f,
-                                  values = self._add_mark_to_field(value = f, fields = fieldslist, ln = ln)
+                                  values = self._add_mark_to_field(value=f, fields=fieldslist, ln=ln)
                                 ),
               'search' : _("Search"),
               'browse' : _("Browse"),
@@ -1381,7 +1409,7 @@ class Template:
         ## secondly, print Collection(s) box:
         selects = ''
         for sel in coll_selects:
-            selects += self.tmpl_select(fieldname = 'c', values = sel)
+            selects += self.tmpl_select(fieldname='c', values=sel)
 
         out += """
             <table class="searchbox">
@@ -1746,7 +1774,14 @@ class Template:
         out += '%s</span>%s' % (msg, epilogue)
         return out
 
-    def tmpl_print_search_info(self, ln, weburl, middle_only, collection, collection_name, as, sf, so, rm, rg, nb_found, of, ot, p, f, f1, f2, f3, m1, m2, m3, op1, op2, p1, p2, p3, d1y, d1m, d1d, d2y, d2m, d2d, all_fieldcodes, cpu_time, pl_in_url, jrec, sc, sp):
+    def tmpl_print_search_info(self, ln, weburl, middle_only,
+                               collection, collection_name, as, sf,
+                               so, rm, rg, nb_found, of, ot, p, f, f1,
+                               f2, f3, m1, m2, m3, op1, op2, p1, p2,
+                               p3, d1y, d1m, d1d, d2y, d2m, d2d,
+                               all_fieldcodes, cpu_time, pl_in_url,
+                               jrec, sc, sp):
+        
         """Prints stripe with the information on 'collection' and 'nb_found' results and CPU time.
            Also, prints navigation links (beg/next/prev/end) inside the results set.
            If middle_only is set to 1, it will only print the middle box information (beg/netx/prev/end/etc) links.
@@ -1834,36 +1869,19 @@ class Template:
             else:
               scbis = 0
 
-            query = {
-                'p' : p,
-                'cc' : collection,
-                'f' : f,
-                'sf' : sf,
-                'so' : so,
-                'sp' : sp,
-                'rm' : rm,
-                'of' : of,
-                'ot' : ot,
-                'as' : as,
-                'ln' : ln,
-                'p1' : p1,
-                'p2' : p2,
-                'p3' : p3,
-                'f1' : f1,
-                'f2' : f2,
-                'f3' : f3,
-                'm1' : m1,
-                'm2' : m2,
-                'm3' : m3,
-                'op1' : op1,
-                'op2' : op2,
-                'sc' : scbis,
-                'd1y' : d1y,
-                'd1m' : d1m,
-                'd1d' : d1d,
-                'd2y' : d2y,
-                'd2m' : d2m,
-                'd2d' : d2d,
+            query = {'p': p, 'f': f,
+                     'cc': collection,
+                     'sf': sf, 'so': so,
+                     'sp': sp, 'rm': rm,
+                     'of': of, 'ot': ot,
+                     'as': as, 'ln': ln,
+                     'p1': p1, 'p2': p2, 'p3': p3,
+                     'f1': f1, 'f2': f2, 'f3': f3,
+                     'm1': m1, 'm2': m2, 'm3': m3,
+                     'op1': op1, 'op2': op2,
+                     'sc': scbis,
+                     'd1y': d1y, 'd1m': d1m, 'd1d': d1d,
+                     'd2y': d2y, 'd2m': d2m, 'd2d': d2d,
                 }
             
             # @todo here

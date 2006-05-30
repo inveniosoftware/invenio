@@ -140,12 +140,16 @@ class WebsearchTestCollections(unittest.TestCase):
             for as in (0, 1):
                 b.open(make_url('/collection/Preprints', as=as))
 
-                b.follow_link(url=make_url('/collection/Preprints', jrec=11))
-                b.follow_link(url=make_url('/collection/Preprints', jrec=21))
-                b.follow_link(url=make_url('/collection/Preprints', jrec=55))
+                for jrec in (11, 21, 11, 23):
+                    args = {'jrec': jrec}
+                    if as:
+                        args['as'] = as
+
+                    url = make_url('/collection/Preprints', **args)
+                    b.follow_link(url=url)
 
         except LinkNotFoundError:
-            self.fail('no link %r in %r' % ('', b.geturl()))
+            self.fail('no link %r in %r' % (url, b.geturl()))
             
     def test_collections_links(self):
         """ websearch - enter in collections and subcollections """
@@ -289,7 +293,7 @@ class WebsearchTestSearch(unittest.TestCase):
 
         # the target query should be the current query without any c
         # or cc specified.
-        for f in ('cc', 'c'):
+        for f in ('cc', 'c', 'action_search', 'ln'):
             if f in current_q:
                 del current_q[f]
 
@@ -308,8 +312,16 @@ class WebsearchTestSearch(unittest.TestCase):
 
         path, original = parse_url(b.geturl())
         
+        for to_drop in ('cc', 'action_search', 'f'):
+            if to_drop in original:
+                del original[to_drop]
+        
         # we should get a few searches back, which are identical
-        # except for the p field being substituted.
+        # except for the p field being substituted (and the cc field
+        # being dropped).
+        if 'cc' in original:
+            del original['cc']
+        
         for link in b.links(url_regex=re.compile(weburl + r'/search\?')):
             if link.text == 'Advanced Search':
                 continue
@@ -367,12 +379,16 @@ class WebsearchTestSearch(unittest.TestCase):
         b.submit()
 
         path, q = parse_url(b.geturl())
+
+        for to_drop in ('cc', 'action_search', 'f'):
+            del q[to_drop]
         
         for bsu in ('quasinormal', 'muon'):
             l = b.find_link(text=bsu)
             q['p'] = bsu
-            
-            self.failUnless(same_urls_p(l.url, make_url('/search', **q)))
+
+            if not same_urls_p(l.url, make_url('/search', **q)):
+                self.fail(repr((l.url, make_url('/search', **q))))
 
     def test_similar_authors(self):
         """ websearch - test similar authors box """
