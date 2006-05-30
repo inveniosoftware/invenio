@@ -356,24 +356,19 @@ class Collection:
             self.write_cache_file("last-updated-ln=%s" % lang, time.strftime("%d %b %Y %H:%M:%S %Z", time.localtime()))
         return
 
-    def create_navtrail_links(self, \
-                              as=0,
-                              ln=cdslang,
-                              separator=" &gt; "):
-        """Creates navigation trail links, i.e. links to collection ancestors (except Home collection).
-        If as==1, then links to Advanced Search interfaces; otherwise Simple Search.
+    def create_navtrail_links(self, as=0, ln=cdslang):
+        """Creates navigation trail links, i.e. links to collection
+        ancestors (except Home collection).  If as==1, then links to
+        Advanced Search interfaces; otherwise Simple Search.
         """
+        
         dads = []
         for dad in self.get_ancestors():
             if dad.name != cdsname: # exclude Home collection
-                dads.append ((dad.name, dad.get_name(ln)))
+                dads.append((dad.name, dad.get_name(ln)))
 
         return websearch_templates.tmpl_navtrail_links(
-                     as = as,
-                     ln = ln,
-                     weburl = weburl,
-                     separator = separator,
-                     dads = dads)
+            as=as, ln=ln, dads=dads)
 
 
     def create_portalbox(self, lang=cdslang, position="rt"):

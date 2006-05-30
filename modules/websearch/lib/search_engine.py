@@ -369,7 +369,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=None):
         req.content_type = "text/html"
         req.send_http_header()
         req.write(pageheaderonly(req=req, title=title_message,
-                                 navtrail=create_navtrail_links(cc, as, ln, 1),
+                                 navtrail=create_navtrail_links(cc, as, ln),
                                  description="%s %s." % (cc, _("Search Results")),
                                  keywords="CDS Invenio, WebSearch, %s" % cc,
                                  uid=uid,
@@ -580,28 +580,22 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
              jrec=jrec,
            )
 
-def create_navtrail_links(cc=cdsname,
-                          as=0,
-                          ln=cdslang,
-                          self_p=1,
-                          separator=" &gt; "):
-    """Creates navigation trail links, i.e. links to collection ancestors (except Home collection).
-    If as==1, then links to Advanced Search interfaces; otherwise Simple Search.
+def create_navtrail_links(cc=cdsname, as=0, ln=cdslang, self_p=1):
+    """Creates navigation trail links, i.e. links to collection
+    ancestors (except Home collection).  If as==1, then links to
+    Advanced Search interfaces; otherwise Simple Search.
     """
 
     dads = []
     for dad in get_coll_ancestors(cc):
         if dad != cdsname: # exclude Home collection
             dads.append ((dad, get_coll_i18nname (dad, ln)))
-
+        
     if self_p and cc != cdsname:
-        dads.append ((cc, get_coll_i18nname(cc, ln)))
+        dads.append((cc, get_coll_i18nname(cc, ln)))
 
-    return websearch_templates.tmpl_navtrail_links (as = as,
-                                     ln = ln,
-                                     weburl = weburl,
-                                     separator = separator,
-                                     dads = dads)
+    return websearch_templates.tmpl_navtrail_links(
+        as=as, ln=ln, dads=dads)
 
 def create_searchwithin_selection_box(fieldname='f', value='', ln='en'):
     "Produces 'search within' selection box for the current collection."

@@ -152,7 +152,7 @@ class Template:
             weburl, urllib.quote(c), make_canonical_urlargd(parameters, self.search_results_default_urlargd))
         
 
-    def tmpl_navtrail_links(self, as, ln, weburl, separator, dads):
+    def tmpl_navtrail_links(self, as, ln, dads):
         """
         Creates the navigation bar at top of each search page (*Home > Root collection > subcollection > ...*)
 
@@ -168,13 +168,11 @@ class Template:
 
           - 'dads' *list* - A list of parent links, eachone being a dictionary of ('name', 'longname')
         """
-        out = ""
+        out = []
         for url, name in dads:
-            if out:
-                out += separator
-
-            out += a_href(name, href=self.build_search_url(cc=url, as=as, ln=ln), _class='navtrail')
-        return out
+            out.append(a_href(name, href=self.build_search_interface_url(c=url, as=as, ln=ln), _class='navtrail'))
+            
+        return ' &gt; '.join(out)
 
     def tmpl_webcoll_body(self, weburl, te_portalbox, searchfor, np_portalbox, narrowsearch, focuson, ne_portalbox):
         """
