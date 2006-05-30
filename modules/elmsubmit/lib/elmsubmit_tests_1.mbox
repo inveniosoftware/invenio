@@ -1,0 +1,59 @@
+From kjedrzej@pcdh23.cern.ch  Mon Apr 10 17:30:27 2006
+Return-Path: <kjedrzej@pcdh23.cern.ch>
+X-Original-To: kjedrzej@pcdh23.cern.ch
+Delivered-To: kjedrzej@pcdh23.cern.ch
+Received: by pcdh23.cern.ch (Postfix, from userid 1006)
+	id 066897EC8; Mon, 10 Apr 2006 17:30:27 +0200 (CEST)
+Date: Mon, 10 Apr 2006 17:30:27 +0200
+To: kjedrzej@pcdh23.cern.ch
+Subject: test1
+Message-ID: <20060410153027.GA25270@pcdh23.cern.ch>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="Dxnq1zWXvFF0Q93v"
+Content-Disposition: inline
+User-Agent: Mutt/1.5.9i
+From: kjedrzej@pcdh23.cern.ch (Krzysztof Jedrzejek)
+Status: RO
+Content-Length: 390
+Lines: 39
+
+
+--Dxnq1zWXvFF0Q93v
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+cdson:::
+
+_author_
+
+Simko, T
+
+_affiliation_
+
+CERN
+
+_title_
+
+something
+
+_date_
+
+22/09/1983
+
+_files_
+
+in.txt
+
+cdsoff:::
+
+rest of email
+bla bla bla
+
+--Dxnq1zWXvFF0Q93v
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="in.txt"
+
+some attachment
+
+--Dxnq1zWXvFF0Q93v--
+

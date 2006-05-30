@@ -20,9 +20,16 @@
 SUBDIRS = magic
 
 pylibdir = $(libdir)/python/invenio
+pylib_DATA = elmsubmit.py elmsubmit_misc.py elmsubmit_config.py \
+             elmsubmit_enriched2txt.py elmsubmit_EZArchive.py elmsubmit_EZEmail.py \
+             elmsubmit_field_validation.py elmsubmit_filename_generator.py \
+             elmsubmit_html2txt.py elmsubmit_misc.py elmsubmit_richtext2txt.py \
+             elmsubmit_generate_marc.py elmsubmit_submission_parser.py \
+             myhtmlentitydefs.py mime.types.edited elmsubmit_tests.py
 
-pylib_DATA = elmsubmit.py elmsubmit_misc.py elmsubmit_config.py elmsubmit_enriched2txt.py elmsubmit_EZArchive.py elmsubmit_EZEmail.py elmsubmit_field_validation.py elmsubmit_filename_generator.py elmsubmit_html2txt.py elmsubmit_misc.py elmsubmit_richtext2txt.py elmsubmit_generate_marc.py elmsubmit_submission_parser.py myhtmlentitydefs.py mime.types.edited elmsubmit_tests.py
+tmpdir = $(prefix)/var/tmp
+tmp_DATA =  elmsubmit_tests_1.mbox elmsubmit_tests_2.mbox
 
-EXTRA_DIST = $(pylib_DATA) mime.types.edited
+EXTRA_DIST = $(pylib_DATA) $(tmp_DATA) mime.types.edited
 
 CLEANFILES = *~ *.tmp *.pyc

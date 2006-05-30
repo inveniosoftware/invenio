@@ -1,0 +1,166 @@
+From kjedrzej@pcdh23.cern.ch  Fri May  5 10:32:43 2006
+Return-Path: <kjedrzej@pcdh23.cern.ch>
+X-Original-To: kjedrzej@pcdh23.cern.ch
+Delivered-To: kjedrzej@pcdh23.cern.ch
+Received: by pcdh23.cern.ch (Postfix, from userid 1006)
+	id 358187E60; Fri,  5 May 2006 10:32:43 +0200 (CEST)
+Date: Fri, 5 May 2006 10:32:43 +0200
+To: kjedrzej@pcdh23.cern.ch
+Subject: test2
+Message-ID: <20060505083243.GA23037@pcdh23.cern.ch>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="VS++wcV0S1rZb1Fb"
+Content-Disposition: inline
+User-Agent: Mutt/1.5.9i
+From: kjedrzej@pcdh23.cern.ch (Krzysztof Jedrzejek)
+Status: O
+Content-Length: 5354
+Lines: 146
+
+
+--VS++wcV0S1rZb1Fb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+cdson:::
+
+_author_
+Simko, T
+Le Meur, J Y
+Jedrzejek, K J
+Favre, G
+_affiliation_
+CERN
+MIT
+CERN2
+CERN3
+_title_
+
+something
+
+_date_
+
+22/09/1983
+
+_files_
+
+in.txt
+in2.txt
+small_test_pdf.pdf
+
+_test1_
+test11
+test12
+test13
+test14
+
+_test2_
+test21
+test22
+
+_test3_
+
+test31
+test32
+test33
+
+_test4_
+
+test41
+test42
+
+_test5_
+
+test51
+test52
+
+_type_
+
+test
+
+cdsoff:::
+
+rest of email
+bla bla bla
+
+--VS++wcV0S1rZb1Fb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="in.txt"
+
+some attachment
+
+--VS++wcV0S1rZb1Fb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="in2.txt"
+
+second attachment
+
+--VS++wcV0S1rZb1Fb
+Content-Type: application/pdf
+Content-Disposition: attachment; filename="small_test_pdf.pdf"
+Content-Transfer-Encoding: base64
+
+JVBERi0xLjMKJcfsj6IKNSAwIG9iago8PC9MZW5ndGggNiAwIFIvRmlsdGVyIC9GbGF0ZURl
+Y29kZT4+CnN0cmVhbQp4nE2MvQrCQBCE+32KKW+LnHeJkmwriGBnuE4sJJo0OTDG98e9RcEd
+GL6d/VkQfKwRin4wZNr0LaaVLEZ//MJrooU635Sy4J+HjH3SQ4G+SSNFSyM68SKyQxvE6yDT
+xa1cRZe5qt2Nt24uYIZ38YdmtmEdnveRGwe+phMdEp1VHwdNJatlbmRzdHJlYW0KZW5kb2Jq
+CjYgMCBvYmoKMTMyCmVuZG9iago0IDAgb2JqCjw8L1R5cGUvUGFnZS9NZWRpYUJveCBbMCAw
+IDYxMiA3OTJdCi9Sb3RhdGUgMC9QYXJlbnQgMyAwIFIKL1Jlc291cmNlczw8L1Byb2NTZXRb
+L1BERiAvVGV4dF0KL0V4dEdTdGF0ZSAxMCAwIFIKL0ZvbnQgMTEgMCBSCj4+Ci9Db250ZW50
+cyA1IDAgUgo+PgplbmRvYmoKMyAwIG9iago8PCAvVHlwZSAvUGFnZXMgL0tpZHMgWwo0IDAg
+UgpdIC9Db3VudCAxCi9Sb3RhdGUgMD4+CmVuZG9iagoxIDAgb2JqCjw8L1R5cGUgL0NhdGFs
+b2cgL1BhZ2VzIDMgMCBSCj4+CmVuZG9iago3IDAgb2JqCjw8L1R5cGUvRXh0R1N0YXRlCi9P
+UE0gMT4+ZW5kb2JqCjEwIDAgb2JqCjw8L1I3CjcgMCBSPj4KZW5kb2JqCjExIDAgb2JqCjw8
+L1I5CjkgMCBSPj4KZW5kb2JqCjEyIDAgb2JqCjw8L1N1YnR5cGUvVHlwZTFDL0ZpbHRlci9G
+bGF0ZURlY29kZS9MZW5ndGggMTMgMCBSPj5zdHJlYW0KeJxlVG1MU1cYvqXQe4JYHV3j6kd7
+4zI/0YFzG43LdEPZDytKocAEA0Vqudov+oUtBXqhgO1pASkULJRPrWKBil8Eg8NNUJDNzSwy
+zaZIXDK3bMmyP+eSux+7LNn2Y8nJyXnP+77PyfO8Tw4Hi43BOBxOQjapVZl2yPVapW45TqLX
+cej1MfQGLmS0S51Le+M2YLIQdyVM4MKE2N71ccFE9Pw1NLsK3V6NcTmc0blnaXqDzUiqS83E
+FoU8d+v27Un/3aRIpVKi2PZPhtivMpFqHbGJPVhVGr1Bq9KZ9xBpbLVGQx4n1BqbodREKEtK
+VCXLbTlKjeoUkU5qSINBbyW2pG0ldiUnp+xgt117iAyLVmXUJxGk7gSpI802QqkrIQ5rVWol
+oVWWqJYB9mtJs9FG7E4mdf92Z5DaYouJ+JsykaGXEjJCrlJbNErj/zMYhsWXGFQnTGaNUktg
+2AEsE0vHPsGyMQV2CPsYy8A42ApWSCwWo1j1iji3YrJiwjEvubWx78S+hxr59Blqkl57kRNe
+ROULXPQrJUSbJ+M6cZvHDc9AoK4NjEvoObzel28vpQ7aRRW433sW+iG40koVS5hkXBUxBI5D
+wOA7mThmI/P6/G4Uc3e059aw5CCOOLHQ5aqmnLZyI6WDIDX7e7QKxU08/u7OREGOhH2c0XbZ
+QygzQvPvJ84vIMviGoGjld4gbPW2wFYIhluoAsmfpbhgAuY6nUfqgB0XOFB9iLfPWxWADwBK
+wUdODlA3IEDxP6FY9BZafeDHbVmFRkWh5Ale51NYS6uy7SK0bZ9w8G50/PHEXgYw3KP70grk
+0UExnz5CfYN0EYRHOXQSShXm7y3SHYRyWHRJN2UbdQ25ZwCa4dV+SV0yRrTRY7258FNYYFOR
+BcWG/VAKGPG37yL8l/l7CLshZp6iJGHg6fCVGTgDB/QduwEfLcIgvTnC+YMVdpbOETKrEOBN
+d18e7T1H6ULizrJ2qguC/u5Qf7TwwuFDOYZjZZKywlq1Zw+QnnrGPOTBj53VaQ3AgTqCuLTR
+GYDzAD1EfJxPi6i+il46paeqL/GzWSR9tEbQhb5GD4WCpAa0Ps7Jc7trXB5PAxTVQcrnbAaC
+Lr/F0lS27gN5XlpW5PiLfMn0yZHyLhPUiApP6fNITUffabH1fE1/1RSo4AlkTHIH3tLW5Gtn
+p3DO3V/HAtRdDDeE1j2Zm3502zR0OCphsDl9p+M8DIuuXb44PjVI7uoX89Fl1k4JEc4jlrKf
+pbyJZdzmaawTu2rqalyUKrsov6LB6apzwXp4xutudIM7zOe89weL7k2MDkwOiasCVqOdskDR
+CUf4gQRd/R1nIWGQ89sCt3uJKzzLC3jbvaz7Im2VrDHKcKiorJLVswo5g7isqboNfgHon/EG
+X65dRaXbRcsTnqbfGEi88jL9JXrzhzWCV3TGV0J7ZXW9AwKz69yYBOXicLL+kmPAEi3qPgKB
+4MmOj47KzD3l/QO9PX1NnmZPi8Td6vHDFhCO9F2bCOsU4gyc2XnIXlukAoJXlvJK8uRa2Vjh
+zNj13skZcXNuyHodDsPe9pFRwLz9XAg19TXWalOlvsYKQal++KakCYf3rkfRyjHAX+pmLbJh
+krO4gGTLi9tNbxR2NPq9AQgutFbkS5izyxwdWR6WozGI5/gcAXgVoBEc+vxtLS3n+292jUAw
+1ld6QMJocZjldMqXDWMO4nKvowvOAtSMD94cCo1DMBUypEoYNQ7ltbWZLrZIH8TLfFpfVQhe
+FaFiHMWX3P8wM68sUyG2TZFhBSyE+spUGZjHXb6806Qz2yHisz9GeQ+d04Oye3iD8S9WDPoT
+El6EElZi2F/ALX8fCmVuZHN0cmVhbQplbmRvYmoKMTMgMCBvYmoKMTM4MwplbmRvYmoKOSAw
+IG9iago8PC9CYXNlRm9udC9HT1BGT0grVGltZXMtUm9tYW4vRm9udERlc2NyaXB0b3IgOCAw
+IFIvVHlwZS9Gb250Ci9GaXJzdENoYXIgMzIvTGFzdENoYXIgMTE2L1dpZHRoc1sKMjUwIDAg
+MCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwCjAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAg
+MCAwIDAKMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMAowIDAgMCAwIDAgMCAwIDAg
+MCAwIDAgMCAwIDAgMCAwCjAgNDQ0IDAgMCA1MDAgNDQ0IDMzMyAwIDAgMCAwIDAgMjc4IDc3
+OCAwIDAKNTAwIDAgMCAzODkgMjc4XQovRW5jb2RpbmcvV2luQW5zaUVuY29kaW5nL1N1YnR5
+cGUvVHlwZTE+PgplbmRvYmoKOCAwIG9iago8PC9UeXBlL0ZvbnREZXNjcmlwdG9yL0ZvbnRO
+YW1lL0dPUEZPSCtUaW1lcy1Sb21hbi9Gb250QkJveFswIC0yMTcgNzc1IDY4M10vRmxhZ3Mg
+NAovQXNjZW50IDY4MwovQ2FwSGVpZ2h0IDY4MwovRGVzY2VudCAtMjE3Ci9JdGFsaWNBbmds
+ZSAwCi9TdGVtViAxMTYKL01pc3NpbmdXaWR0aCAyNTAKL0NoYXJTZXQoL2QvcC9lL2Yvcy90
+L2wvYS9tL3NwYWNlKS9Gb250RmlsZTMgMTIgMCBSPj4KZW5kb2JqCjIgMCBvYmoKPDwvUHJv
+ZHVjZXIoR1BMIEdob3N0c2NyaXB0IDguMTUpCi9DcmVhdGlvbkRhdGUoRDoyMDA2MDUwNTEw
+MjUyMykKL01vZERhdGUoRDoyMDA2MDUwNTEwMjUyMykKL1RpdGxlKE1pY3Jvc29mdCBXb3Jk
+IC0gc21hbGwgdGVzdCBwZGYuZG9jKQovQ3JlYXRvcihQU2NyaXB0NS5kbGwgVmVyc2lvbiA1
+LjIpCi9BdXRob3Ioa2plZHJ6ZWopPj5lbmRvYmoKeHJlZgowIDE0CjAwMDAwMDAwMDAgNjU1
+MzUgZiAKMDAwMDAwMDQ2NCAwMDAwMCBuIAowMDAwMDAyNjg2IDAwMDAwIG4gCjAwMDAwMDAz
+OTYgMDAwMDAgbiAKMDAwMDAwMDIzNiAwMDAwMCBuIAowMDAwMDAwMDE1IDAwMDAwIG4gCjAw
+MDAwMDAyMTcgMDAwMDAgbiAKMDAwMDAwMDUxMiAwMDAwMCBuIAowMDAwMDAyNDQ4IDAwMDAw
+IG4gCjAwMDAwMDIxMDMgMDAwMDAgbiAKMDAwMDAwMDU1MyAwMDAwMCBuIAowMDAwMDAwNTgz
+IDAwMDAwIG4gCjAwMDAwMDA2MTMgMDAwMDAgbiAKMDAwMDAwMjA4MiAwMDAwMCBuIAp0cmFp
+bGVyCjw8IC9TaXplIDE0IC9Sb290IDEgMCBSIC9JbmZvIDIgMCBSCi9JRCBbKMHcZ9mEpQcU
+HZ1V+LiV0NUpKMHcZ9mEpQcUHZ1V+LiV0NUpXQo+PgpzdGFydHhyZWYKMjg5MgolJUVPRgo=
+
+--VS++wcV0S1rZb1Fb--
+

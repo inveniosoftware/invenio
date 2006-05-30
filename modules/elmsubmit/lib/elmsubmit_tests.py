@@ -39,8 +39,8 @@ class MarcTest(unittest.TestCase):
     """ elmsubmit - test for saniy """
     def test_simple_marc(self):
         """elmsubmit - parsing simple email"""
-        try:        
-            f=open(os.path.join(tmpdir, elmsubmit_config.files['testcaseprefix'],'elmsubmit_test_mail_1.mbox'),'r')
+        try:
+            f=open(os.path.join(tmpdir, elmsubmit_config.files['test_case_1']),'r')
             email = f.read()
             f.close()
 
@@ -53,9 +53,6 @@ class MarcTest(unittest.TestCase):
             <datafield tag ="100" ind1="" ind2="">
             <subfield code="a">Simko, T</subfield>
             <subfield code="u">CERN</subfield>
-            </datafield>
-            <datafield tag ="FFT" ind1="" ind2="">
-            <subfield code="a">/soft/cdsware-PCDH23/var/data/submit/storage/mail/wndyvcmzfhsqcgs/in.txt</subfield>
             </datafield>
             </record>"""
 
@@ -70,21 +67,9 @@ class MarcTest(unittest.TestCase):
                     node.parentNode.removeChild(node)
                     node.unlink()
 
-            datafields = dom_x.getElementsByTagName("datafield")
-
             new_x = dom_x.toprettyxml("","\n")
 
-            # the same with the other xml
             dom_y = xml.dom.minidom.parseString(y)
-            datafields = dom_y.getElementsByTagName("datafield")
-
-            for node in datafields:
-                if (node.hasAttribute("tag") and  node.getAttribute("tag") == "FFT"):
-                    node.parentNode.removeChild(node)
-                    node.unlink()
-
-            datafields = dom_y.getElementsByTagName("datafield")
-
             new_y = dom_y.toprettyxml("","\n")
 
             # 'normalize' the two XML MARC files for the purpose of comparing
@@ -93,6 +78,9 @@ class MarcTest(unittest.TestCase):
 
             new_x = new_x.replace(' ','')
             new_y = new_y.replace(' ','')
+
+            new_x = new_x.replace('\n','')
+            new_y = new_y.replace('\n','')
 
             # compare the two xml marcs
             self.assertEqual(new_x,new_y)
@@ -103,7 +91,7 @@ class MarcTest(unittest.TestCase):
     def test_complex_marc(self):
         """elmsubmit - parsing complex email with multiple fields"""
         try:        
-            f=open(os.path.join(tmpdir, elmsubmit_config.files['testcaseprefix'],'elmsubmit_test_mail_2.mbox'),'r')
+            f=open(os.path.join(tmpdir, elmsubmit_config.files['test_case_2']),'r')
             email = f.read()
             f.close()
 
@@ -158,15 +146,6 @@ class MarcTest(unittest.TestCase):
             <subfield code="a">Simko, T</subfield>
             <subfield code="u">CERN</subfield>
             </datafield>
-            <datafield tag ="FFT" ind1="" ind2="">
-            <subfield code="a">/soft/cdsware-PCDH23/var/data/submit/storage/mail/qgifhtwzczykwji/in2.txt</subfield>
-            </datafield>
-            <datafield tag ="FFT" ind1="" ind2="">
-            <subfield code="a">/soft/cdsware-PCDH23/var/data/submit/storage/mail/qgifhtwzczykwji/in.txt</subfield>
-            </datafield>
-            <datafield tag ="FFT" ind1="" ind2="">
-            <subfield code="a">/soft/cdsware-PCDH23/var/data/submit/storage/mail/qgifhtwzczykwji/small_test_pdf.pdf</subfield>
-            </datafield>
             </record>"""
 
             # in order to properly compare the marc files we have to remove the FFT node, it includes a random generated file path 
@@ -180,19 +159,11 @@ class MarcTest(unittest.TestCase):
                     node.parentNode.removeChild(node)
                     node.unlink()
 
+
             new_x = dom_x.toprettyxml("","\n")
 
-            # the same with the other xml
             dom_y = xml.dom.minidom.parseString(y)
-            datafields = dom_y.getElementsByTagName("datafield")
-
-            for node in datafields:
-                if (node.hasAttribute("tag") and  node.getAttribute("tag") == "FFT"):
-                    node.parentNode.removeChild(node)
-                    node.unlink()
-
             new_y = dom_y.toprettyxml("","\n")
-
             # 'normalize' the two XML MARC files for the purpose of comparing
             new_x = expandtabs(new_x)
             new_y = expandtabs(new_y)
@@ -200,6 +171,9 @@ class MarcTest(unittest.TestCase):
             new_x = new_x.replace(' ','')
             new_y = new_y.replace(' ','')
 
+            new_x = new_x.replace('\n','')
+            new_y = new_y.replace('\n','')
+            
             # compare the two xml marcs
             self.assertEqual(new_x,new_y)
         except IOError:
@@ -211,7 +185,7 @@ class FileStorageTest(unittest.TestCase):
         """elmsubmit - reading text files"""
         try:
             
-            f=open(os.path.join(tmpdir, elmsubmit_config.files['testcaseprefix'],'elmsubmit_test_mail_2.mbox'),'r')
+            f=open(os.path.join(tmpdir, elmsubmit_config.files['test_case_2']),'r')
             email = f.read()
             f.close()
 
@@ -239,7 +213,6 @@ class FileStorageTest(unittest.TestCase):
             x.rstrip()
 
             y = """second attachment\n"""
-
 
             self.assertEqual(x,y)
 

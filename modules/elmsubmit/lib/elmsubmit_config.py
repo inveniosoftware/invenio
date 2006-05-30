@@ -17,15 +17,20 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from invenio.config import adminemail, \
+     weburl
+
 # elmsubmit configuration file:
 files = {
          'mailprefix': 'mail',
-         'testcaseprefix': 'elmsubmit_testmails'}
+         'test_case_1': 'elmsubmit_tests_1.mbox',
+         'test_case_2': 'elmsubmit_tests_2.mbox',
+         }
 # Messages we need to send to the user, before we've identified the
 # correct language to talk to them in (so we assume English!):
 
 nolangmsgs = {'bad_email': 'Your email could not be parsed correctly to discover a submission. Please check your email client is functioning correctly.',
-             'bad_submission': 'The submission data that you have provided could not be parsed correctly. Please visit <http://pcdh23.cern.ch> for a description of the correct format.',
+             'bad_submission': 'The submission data that you have provided could not be parsed correctly. Please visit <%s> for a description of the correct format.' % weburl,
               'missing_type':  'The submission data that you have provided does not contain a TYPE field. This is mandatory for all submissions.',
               'unsupported_type': 'The TYPE field of your submission does not contain a recognized value.',
               'missing_fields_1': 'Your submission of type',
@@ -37,7 +42,7 @@ nolangmsgs = {'bad_email': 'Your email could not be parsed correctly to discover
 
 servers = {'smtp': 'localhost'}
 
-people = {'admin': 'cds.support@cern.ch'}
+people = {'admin': adminemail}
 
 # fields required in the submission mail
 required_fields = ['title',

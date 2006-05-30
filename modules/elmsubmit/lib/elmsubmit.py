@@ -31,6 +31,7 @@ import invenio.elmsubmit_submission_parser as elmsubmit_submission_parser
 
 # import the config file 
 
+from invenio.config import tmpdir
 from invenio.config import storage
 import invenio.elmsubmit_config as elmsubmit_config
 
@@ -91,7 +92,16 @@ def process_email(email_string):
 
     # Get a submission directory:
     
-    storage_dir = get_storage_dir(e)
+    folder_name = 'elmsubmit_' +  _random_alphanum_string(15)
+    
+    storage_dir  = os.path.join(tmpdir, folder_name)
+
+    try:
+        os.makedirs(storage_dir)
+    except EnvironmentError:
+        _notify(e=e, response=elmsubmit_config.nolangmsgs['temp_problem'])
+        _notify_admin(response="Could not create directory: %s" % (storage_dir))
+        raise elmsubmitError("Could not create directory: %s" % (storage_dir))
 
     # Process the files list:
     
@@ -101,7 +111,20 @@ def process_email(email_string):
 
     marc_xml = elmsubmit_generate_marc.generate_marc(submission_dict)
 
-    print  marc_xml
+    # Write the Marc to a file in tmpdir
+
+    file_name = folder_name + '.xml'
+    fullpath = os.path.join(tmpdir, file_name)
+
+    try:
+        open(fullpath, 'wb').write(marc_xml)
+    except EnvironmentError:
+        response_email = elmsubmit_config.nolangmsgs['temp_problem']
+        admin_response_email = "There was a problem writing data to directory %s." % (storage_dir)
+        error = elmsubmitError("There was a problem writing data to directory %s." % (storage_dir))
+        return (response_email, admin_response_email, error)
+    
+    # print  marc_xml
 
     return marc_xml
 
@@ -119,20 +142,6 @@ def validate_submission_field(msg, submission_dict, field, value):
     except AttributeError:
         # No validation defined for this field:
         pass
-
-def get_storage_dir(msg):
-
-    path = os.path.join(storage, elmsubmit_config.files['mailprefix'], _random_alphanum_string(15))
-    while os.path.exists(path):
-        path = os.path.join(storage, elmsubmit_config.files['mailprefix'], _random_alphanum_string(15))
-
-    try:
-        os.makedirs(path)
-    except EnvironmentError:
-        _notify(msg=msg, response=elmsubmit_config.nolangmsgs['temp_problem'])
-        _notify_admin(response="Could not create directory: %s" % (path))
-        raise elmsubmitError("Could not create directory: %s" % (path))
-    return path
 
 def process_files(msg, submission_dict, storage_dir):
     """ extract the files out of the email and include them in the submission dict
