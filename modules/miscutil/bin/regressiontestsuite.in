@@ -24,10 +24,7 @@
 
 __version__ = "$Id$"
 
-
-# Harvest all the modules whose name ends in 'regression_tests', and
-# build up a complete suite to run from that list.
-
+import getopt
 import sys
 import os
 import unittest
@@ -35,21 +32,50 @@ import unittest
 import invenio
 from invenio import testutils
 
-test_modules = []
+def usage():
+    """Print usage info on standard error output."""
+    sys.stderr.write("Usage: %s [options]\n" % sys.argv[0])
+    sys.stderr.write("General options:\n")
+    sys.stderr.write("  -h, --help      \t\t Print this help.\n")
+    sys.stderr.write("  -V, --version   \t\t Print version information.\n")
+    sys.stderr.write("Description: run CDS Invenio regression test suite.\n")
+    return
 
-for candidate in os.listdir(os.path.dirname(invenio.__file__)):
-    base, ext = os.path.splitext(candidate)
-    
-    if ext != '.py' or not base.endswith('regression_tests'):
-        continue
+if __name__ == "__main__":
 
-    module = __import__('invenio.' + base, globals(), locals(), ['test_suite'])
-    test_modules.append(module.test_suite)
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hV", ["help", "version"])
+    except getopt.GetoptError:
+        usage()
+        sys.exit(2)
 
-print "regressiontestsuite: detected %d regression test modules" % len(test_modules)
-testutils.warn_user_about_tests()
+    for opt in opts:
+        if opt[0] in ("-V","--version"):
+            print __version__
+            sys.exit(0)
+        elif opt[0] in ("-h","--help"):
+            usage()
+            sys.exit(0)
 
-complete_suite = unittest.TestSuite(test_modules)
-unittest.TextTestRunner(verbosity=2).run(complete_suite)
+    ## Okay, go on and harvest all the modules whose name ends in
+    ## 'regression_tests', and build up a complete suite to run from
+    ## that list, and run it.
+            
+    test_modules = []
+
+    for candidate in os.listdir(os.path.dirname(invenio.__file__)):
+        base, ext = os.path.splitext(candidate)
+
+        if ext != '.py' or not base.endswith('regression_tests'):
+            continue
+
+        module = __import__('invenio.' + base, globals(), locals(), ['test_suite'])
+        test_modules.append(module.test_suite)
+
+    print "regressiontestsuite: detected %d regression test modules" % len(test_modules)
+    testutils.warn_user_about_tests()
+
+    complete_suite = unittest.TestSuite(test_modules)
+    unittest.TextTestRunner(verbosity=2).run(complete_suite)
 
 
