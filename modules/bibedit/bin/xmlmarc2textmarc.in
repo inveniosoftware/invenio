@@ -24,6 +24,8 @@
 XML MARC to TEXT MARC utility.
 """
 
+__version__ = "$Id$"
+
 from invenio.xmlmarc2textmarclib import *
 import getopt, sys
 

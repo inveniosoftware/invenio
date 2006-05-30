@@ -22,6 +22,8 @@ from invenio.bibrecord import create_records, create_record, record_get_field_va
 from random import randint, seed
 import sys
 
+__version__ = "$Id$"
+
 ## maximum length of an ALEPH MARC record line
 max_line_len = 1500
 
