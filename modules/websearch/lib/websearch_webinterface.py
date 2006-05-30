@@ -33,7 +33,7 @@ import invenio.template
 websearch_templates = invenio.template.load('websearch')
 
 search_results_default_urlargd = websearch_templates.search_results_default_urlargd
-
+search_interface_default_urlargd = websearch_templates.search_interface_default_urlargd
 
 def wash_search_urlargd(form):
     argd = wash_urlargd(form, search_results_default_urlargd)
@@ -128,12 +128,6 @@ legacy_collection_default_urlargd = {
     'c': (str, cdsname)}
 
 
-search_interface_default_urlargd = {
-    'as': (int, 0),
-    'jrec': (int, 0),
-    'verbose': (int, 0)}
-
-
 class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
     """ Handling of collection navigation."""
@@ -160,27 +154,15 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 
                 args = wash_urlargd(form, search_interface_default_urlargd)
 
-                if args['jrec']:
-                    # This is technically a search, but so far we did
-                    # not try to restrict the results, so we are
-                    # mostly navigating in the collection
-                    args = wash_search_urlargd(form)
-                    args['cc'] = c
-                    
-                    req.argd = args
-                    return search_engine.perform_request_search(req, **args) 
+                # We simply return the cached page of the collection
+                args['c'] = c
 
-                else:
-                    # We simply return the cached page of the collection
-                    del args['jrec']
-                    args['c'] = c
-
-                    if not args['c']:
-                        # collection argument not present; display
-                        # home collection by default
-                        args['c'] = cdsname
+                if not args['c']:
+                    # collection argument not present; display
+                    # home collection by default
+                    args['c'] = cdsname
                     
-                    return display_collection(req, **args)
+                return display_collection(req, **args)
         
             return answer, []
 

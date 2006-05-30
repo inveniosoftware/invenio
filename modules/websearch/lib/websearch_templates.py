@@ -77,7 +77,7 @@ class Template:
     tmpl_default_locale = "en_US" # which locale to use by default, useful in case of failure
 
 
-    # Type of the allowed parameters for the web interface for search
+    # Type of the allowed parameters for the web interface for search results
     search_results_default_urlargd = {
         'cc': (str, cdsname), 'c': (list, []),
         'p': (str, ""), 'f': (str, ""),
@@ -105,6 +105,11 @@ class Template:
         'verbose': (int, 0),
         }
 
+    # ...and for search interfaces
+    search_interface_default_urlargd = {
+        'as': (int, 0),
+        'verbose': (int, 0)}
+
     def build_search_url(self, known_parameters={}, **kargs):
         """ Helper for generating a canonical search
         url. 'known_parameters' is the list of query parameters you
@@ -130,21 +135,22 @@ class Template:
             target += make_canonical_urlargd(parameters, self.search_results_default_urlargd)
             return target
 
-        # Harvesting a full collection? Return a /collection/<name>?jrec=... URL
-        args = ImmutableSet(parameters.keys())
-        args_for_collection = ImmutableSet(('ln', 'jrec', 'cc', 'as'))
-
-        if args.issubset(args_for_collection):
-            try:
-                cc = parameters['cc']
-                del  parameters['cc']
-            except KeyError:
-                cc = cdsname
-            
-            return "%s/collection/%s%s" % (weburl, urllib.quote(cc),
-                                           make_canonical_urlargd(parameters, self.search_results_default_urlargd))
-        
         return "%s/search%s" % (weburl, make_canonical_urlargd(parameters, self.search_results_default_urlargd))
+
+    def build_search_interface_url(self, known_parameters={}, **kargs):
+        """ Helper for generating a canonical search interface URL."""
+
+        parameters = {}
+        parameters.update(known_parameters)
+        parameters.update(kargs)
+
+        c = parameters['c']
+        del parameters['c']
+        
+        # Now, we only have the arguments which have _not_ their default value
+        return "%s/collection/%s%s" % (
+            weburl, urllib.quote(c), make_canonical_urlargd(parameters, self.search_results_default_urlargd))
+        
 
     def tmpl_navtrail_links(self, as, ln, weburl, separator, dads):
         """
@@ -256,7 +262,7 @@ class Template:
         header = _("Search %s records for:") % \
                  self.tmpl_nbrecs_info(record_count, "","")
 
-        asearchurl = self.build_search_url(cc=collection_id, as=1, ln=ln)
+        asearchurl = self.build_search_interface_url(c=collection_id, as=1, ln=ln)
         
         # print commentary start:
         out += '''
@@ -356,7 +362,7 @@ class Template:
         header = _("Search %s records for:") % \
                  self.tmpl_nbrecs_info(record_count, "","")
 
-        ssearchurl = self.build_search_url(cc=collection_id, as=0, ln=ln)
+        ssearchurl = self.build_search_interface_url(c=collection_id, as=0, ln=ln)
 
         out += '''
         <table class="searchbox">
@@ -694,7 +700,7 @@ class Template:
                         out += """<input type=checkbox name="c" value="%(name)s" checked>&nbsp;</td>""" % {'name' : son.name }
                 out += """<td valign="top">%(link)s%(recs)s """ % {
                     'link': a_href(style_prolog + son.get_name(ln) + style_epilog,
-                                   href=self.build_search_url(cc=son.name, ln=ln, as=as)),
+                                   href=self.build_search_interface_url(c=son.name, ln=ln, as=as)),
                     'recs' : self.tmpl_nbrecs_info(son.nbrecs, ln=ln)}
                 
                 if son.restricted_p():
@@ -705,7 +711,7 @@ class Template:
                     for grandson in grandsons[i]:
                         out += """ %(link)s%(nbrec)s """ % {
                             'link': a_href(grandson.get_name(ln),
-                                           href=self.build_search_url(cc=grandson.name, ln=ln, as=as)),
+                                           href=self.build_search_interface_url(c=grandson.name, ln=ln, as=as)),
                             'nbrec' : self.tmpl_nbrecs_info(grandson.nbrecs, ln=ln)}
                         
                 out += """</td></tr>"""

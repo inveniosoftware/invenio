@@ -141,11 +141,11 @@ class WebsearchTestCollections(unittest.TestCase):
                 b.open(make_url('/collection/Preprints', as=as))
 
                 for jrec in (11, 21, 11, 23):
-                    args = {'jrec': jrec}
+                    args = {'jrec': jrec, 'cc': 'Preprints'}
                     if as:
                         args['as'] = as
 
-                    url = make_url('/collection/Preprints', **args)
+                    url = make_url('/search', **args)
                     b.follow_link(url=url)
 
         except LinkNotFoundError:
