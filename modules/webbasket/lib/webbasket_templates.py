@@ -19,7 +19,8 @@
 
 from invenio.messages import gettext_set_language
 from invenio.webbasket_config import cfg_webbasket_categories, \
-                                     cfg_webbasket_share_levels
+                                     cfg_webbasket_share_levels, \
+                                     cfg_webbasket_max_number_of_displayed_baskets
 from invenio.webmessage_mailutils import email_quoted_txt2html, email_quote_txt
 from invenio.config import weburl, sweburl, cdslang
 from invenio.textutils import indent_text
@@ -71,7 +72,7 @@ class Template:
                       nb_groups=0,
                       nb_external_baskets=0,
                       ln=cdslang):
-        """private function, display tabs (private baskets, group baskets, other's basket)."""
+        """private function, display tabs (private baskets, group baskets, others' basket)."""
         _ = gettext_set_language(ln)
         selected = ' id="bsktab_selected"'
         private = cfg_webbasket_categories['PRIVATE']
@@ -108,7 +109,7 @@ class Template:
                              topics_list=[],
                              selected_topic=0,
                              ln=cdslang):
-        """Display the topics selection area which appears on the top of external baskets category.
+        """Display the topics selection area.
         @param topics_list: list of (topic name, number of baskets) tuples
         @param selected_topic: # of selected topic in topics_list"""
         category = cfg_webbasket_categories['PRIVATE']
@@ -192,11 +193,11 @@ class Template:
             label = ''
             basket_list = ''
         out = """
-<table style="width: 100%%; vertical-align: top">
+<table style="vertical-align: top;">
   <tr>
     <td style="vertical-align: top">%s</td>
     <td>%s</td>
-    <td  style="vertical-align: top">%s</td>
+    <td style="vertical-align: top; padding-left: 80px; text-align: right">%s</td>
   </tr>
 </table>""" % (label, basket_list, create_link)
         return out
@@ -228,7 +229,9 @@ class Template:
         else:
             (bskid_owner, bsk_owner_nickname, display) = get_user_info(int(bskid_owner))
         messaging_link = self.__create_messaging_link(bsk_owner_nickname, display, ln)
-        general_label = _("This basket belongs to %s. You can freely subscribe to it by using the link below.") % messaging_link      
+        link_subscribe = '<a href="%s/yourbaskets.py/subscribe?bskid=%i&amp;ln=%s">' % (weburl, bskid, ln)
+        end_link_subscribe = '</a>'
+        general_label = _("This basket belongs to %s. You can freely %ssubscribe%s to it") % (messaging_link, link_subscribe, end_link_subscribe)      
         out = """
 %(general_label)s      
 <table class="bskbasket">
@@ -242,7 +245,7 @@ class Template:
         %(nb_items)i %(records_label)s - %(last_update_label)s: %(last_update)s
       </td>
       <td class="bskcmtcol">
-        <a href="%(weburl)s/yourbaskets.py/subscribe?bskid=%(bskid)i&amp;ln=%(ln)s">%(subscribe_label)s</a>
+        %(link_subscribe)s%(subscribe_label)s</a>
       </td>
     </tr>
   </thead>
@@ -259,11 +262,102 @@ class Template:
                'last_update': convert_datetext_to_dategui(bsk_date_modification),
                'bskid': bskid,
                'ln': ln,
+               'link_subscribe': link_subscribe,
                'subscribe_label': _("Subscribe to this basket"),
                'items': items_html}
         return out        
-            
-    
+     
+    def tmpl_display_list_public_baskets(self, baskets, inf_limit, total_baskets, order, asc, ln=cdslang):
+        """"""       
+        _ = gettext_set_language(ln)
+        name_label = _("Basket's name")
+        nb_views_label = _("Number of views")
+        owner_label = _("Owner")
+        base_url = weburl + '/yourbaskets.py/list_public_baskets?order=%i&asc=%i&amp;ln=' + ln
+        asc_image = '<img src="' + weburl + '/img/webbasket_' + (asc and 'down.png' or 'up.png') + '" style="vertical-align: middle; border: 0px;" />'
+        if order == 1:
+            name_label = '<a href="' + base_url % (1, int(not(asc))) + '">' + name_label + ' ' + asc_image + '</a>'
+            nb_views_label = '<a href="' + base_url % (2, 1) + '">' + nb_views_label + '</a>'
+            owner_label = '<a href="' + base_url % (3, 1) + '">' + owner_label + '</a>'
+        elif order == 2:
+            name_label = '<a href="' + base_url % (1, 1) + '">' + name_label + '</a>'
+            nb_views_label = '<a href="' + base_url % (2, int(not(asc))) + '">' + nb_views_label + ' ' + asc_image + '</a>'
+            owner_label = '<a href="' + base_url % (3, 1) + '">' + owner_label + '</a>'
+        else:
+            name_label = '<a href="' + base_url % (1, 1) + '">' + name_label + '</a>'
+            nb_views_label = '<a href="' + base_url % (2, 1) + '">' + nb_views_label + '</a>'
+            owner_label = '<a href="' + base_url % (3, int(not(asc))) + '">' + owner_label + ' ' + asc_image + '</a>'
+        baskets_html = ''
+        for (bskid, name, nb_views, owner_id, owner_nickname) in baskets:
+            if owner_nickname:
+                display = owner_nickname
+            else:
+                (owner_id, owner_nickname, display) = get_user_info(owner_id)
+            messaging_link = self.__create_messaging_link(owner_nickname, display, ln)
+            form_view = """
+<form action="%(weburl)s/yourbaskets.py/display_public" method="GET">
+  <input type="hidden" name="ln" value="%(ln)s" />
+  <input type="hidden" name="bskid" value="%(bskid)i" />
+  <input type="submit" value="%(display_public_label)s" class="formbutton" />
+</form>""" % {'weburl': weburl,
+              'ln': ln,
+              'bskid': bskid,
+              'display_public_label': _("View")}
+            form_subscribe = """
+<form action="%(weburl)s/yourbaskets.py/subscribe" method="GET">
+  <input type="hidden" name="ln" value="%(ln)s" />
+  <input type="hidden" name="bskid" value="%(bskid)i" />
+  <input type="submit" value="%(subscribe_label)s" class="formbutton"/>
+</form>""" % {'weburl': weburl,
+              'ln': ln,
+              'bskid': bskid,
+              'subscribe_label': _("Subscribe")}                      
+
+            baskets_html += """
+    <tr>
+      <td>%s</td><td style="text-align:center">%i</td><td>%s</td><td style="vertical-align: middle; text-align:center;">%s</td><td style="vertical-align: middle">%s</td>
+    </tr>""" % (name, nb_views, messaging_link, form_view, form_subscribe)
+        if not(len(baskets_html)):
+            baskets_html = '<tr><td colspan="5">' + _("There is currently no publicly accessible basket") + '</td></tr>'
+        change_page = '<a href="' + weburl + '/yourbaskets.py/list_public_baskets?inf_limit=%i&amp;order=' + str(order)
+        change_page += '&amp;asc=' + str(asc) + '&amp;ln=' + str(ln) + '"><img src="%s" style="border: 0px;"/></a> '
+        footer = ''
+        if inf_limit > (cfg_webbasket_max_number_of_displayed_baskets * 2)-1:
+            footer += change_page % (0, weburl + '/img/sb.gif')
+        if inf_limit > 0:
+            footer += change_page % (inf_limit - cfg_webbasket_max_number_of_displayed_baskets, weburl + '/img/sp.gif')
+        footer += ' ' + _("Displaying baskets %i-%i out of %i total baskets.") % (inf_limit+1, inf_limit + len(baskets), total_baskets) + ' '
+        if inf_limit + len(baskets) < total_baskets:
+            footer += change_page % (inf_limit + cfg_webbasket_max_number_of_displayed_baskets, weburl + '/img/sn.gif')
+        if inf_limit + len(baskets) < total_baskets - cfg_webbasket_max_number_of_displayed_baskets:
+            footer += change_page % (total_baskets - cfg_webbasket_max_number_of_displayed_baskets, weburl + '/img/se.gif')
+
+        out = """
+<table>
+  <thead class="bskbasketheader">
+    <tr>
+      <td style="vertical-align:middle; padding: 0 20 0 20"><span class="bsktopic">%(name)s</span></td>
+      <td style="vertical-align:middle; padding: 0 20 0 20""><span class="bsktopic">%(nb_views)s</span></td>
+      <td style="vertical-align:middle; padding: 0 20 0 20""><span class="bsktopic">%(user)s</span></td>
+      <td colspan="2" style="vertical-align:middle; padding: 0 20 0 20""><span class="bsktopic" style="text-weight:normal;">%(actions)s</span></td>
+    </tr>
+  </thead>
+  <tbody>
+    %(baskets)s
+  </tbody>
+  <tfooter>
+    <tr>
+      <td colspan="5" class="bskbasketfooter" style="text-align:center">%(footer)s</td>
+    </tr>
+  </tfooter>
+</table>""" % {'name': name_label,
+               'nb_views': nb_views_label, 
+               'user': owner_label, 
+               'actions': _("Actions"),
+               'baskets': baskets_html,
+               'footer': footer}
+        return out
+        
     ############################ Baskets ###################################
     
     def tmpl_basket(self, bskid,
@@ -271,7 +365,7 @@ class Template:
                     date_modification,
                     nb_views,
                     nb_items, last_added,
-                    (user_can_view_content, user_can_manage_rights, user_can_delete_basket, 
+                    (user_can_view_content, user_can_edit_basket, 
                     user_can_view_comments, user_can_add_item, user_can_delete_item),
                     nb_comments, last_comment,
                     group_sharing_level,
@@ -298,36 +392,13 @@ class Template:
         else:
             group_img_name = 'webbasket_usergroup.png'
             group_alt = _("Group shared basket")
-        manage_link = ''
+        edit_link = ''
         logo = "<img src=\"%s/img/%s\" alt=\"%s\" />" % (weburl, group_img_name, group_alt)
-        if user_can_manage_rights:
-            url = weburl + '/yourbaskets.py/manage_rights?bskid=%i&amp;topic=%i&amp;ln=%s'
+        if user_can_edit_basket:
+            url = weburl + '/yourbaskets.py/edit?bskid=%i&amp;topic=%i&amp;ln=%s'
             url %= (bskid, selected_topic, ln)
-            logo = '<a href="%s">%s</a>' % (url, logo + '<br />' + _("Manage rights")) 
+            logo = '<a href="%s">%s</a>' % (url, logo + '<br />' + _("Edit basket")) 
         actions += "<td>" + logo + "</td>"
-        if user_can_delete_basket:
-            url = "%s/yourbaskets.py/delete?bskid=%i&amp;"
-            url += "category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s"
-            url = url % (weburl,
-                         bskid,
-                         selected_category,
-                         selected_topic,
-                         selected_group,
-                         ln)
-            img = "%s/img/webbasket_delete.png" % weburl
-            action = "<a href=\"%s\"><img src=\"%s\" alt=\"%s\" /></a>"
-            actions += "<td>" + action % (url, img, _("Delete basket")) + "</td>"
-            if selected_category == cfg_webbasket_categories['PRIVATE']:
-                img = "%s/img/webbasket_move.png" % weburl
-                url = "%s/yourbaskets.py/move?bskids=%i&amp;"
-                url += "category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s"
-                url = url % (weburl,
-                             bskid,
-                             selected_category,
-                             selected_topic,
-                             selected_group,
-                             ln)
-                actions += "<td>" + action % (url, img, _("Move basket to another topic"))+ "</td>" 
         actions += "</tr></table>"
         if user_can_view_content:
             if not(len(items)):
@@ -1091,70 +1162,37 @@ class Template:
               'no_label': _("Cancel")}
         return indent_text(out, 2)
 
-    def tmpl_move(self, bskids, topics, ln=cdslang):
-        """Display a topic selection / creation for moving of give baskets.
-        @param bskids: list of basket ids
-        @param topics: list of tuples (see webbasket_db_layer: get_personal_topics
-        @param ln: language
-        """        
-        _ = gettext_set_language(ln)
-        topics_selection = zip(range(len(topics)), map(lambda x: x[0], topics))
-        topics_selection.insert(0, (-1, _("Select topic"))) 
-        topics_body = """
-<tr>
-  <td>%s</td>
-</tr>""" %  indent_text(self.__create_select_menu('selected_topic', topics_selection), 2)
-        if len(topics):
-            topics_box = self.__tmpl_basket_box(img=weburl + '/img/webbasket_user.png',
-                                                title=_("Select a topic"),
-                                                body=topics_body)
-        else:
-            topics_box = ''
-
-        create_body = """
-<tr>
-  <td>%s</td>
-  <td>
-    <input type="text" name="new_topic_name" />
-  </td>
-</tr>""" % _("New topic's name")
-        create_box = self.__tmpl_basket_box(img=weburl + '/img/webbasket_create.png',
-                                            title=_("Create a new topic"),
-                                            body=create_body)
-        action = weburl + '/yourbaskets.py/move'
-        bskids_field = reduce(lambda x, y: str(x) + ',' + str(y), bskids) 
-        out = """
-<form name="move_basket" action="%(action)s" method="POST">
-  <p>%(label)s:</p>
-  <input type="hidden" name="ln" value="%(ln)s" />
-  <input type="hidden" name="bskids" value="%(bskids)s" />
-  <table style="width:100%%;">
-    <tr>
-      <td style="width:50%%;vertical-align:top;">%(topics)s</td>
-      <td style="width:50%%;vertical-align:top;">%(create)s</td>
-    </tr>
-    <tr>
-      <td colspan="2">
-        <input type="submit" class="formbutton" value="%(submit_label)s" />
-      </td>
-    </tr>
-  </table>
-</form>""" % {'action': action,
-              'ln': ln,
-              'bskids': bskids_field,
-              'label': _("Moving %i baskets to this topic") % len(bskids),
-              'topics': topics_box,
-              'create': create_box,
-              'submit_label': _("Move to topic")}
-        return out
-
-    def tmpl_manage_rights(self, bskid, bsk_name, groups_rights, external_rights,
-                           selected_topic, ln=cdslang):
+    def tmpl_edit(self, bskid, bsk_name, topic, topics, groups_rights, external_rights,
+                  display_general=0, display_delete=0, ln=cdslang):
         """Display interface for rights management over the given basket
         @param group_rights: list of (group id, name, rights) tuples
         @param external_rights: rights as defined in cfg_webbasket_share_levels
         """
         _ = gettext_set_language(ln)
+        general_body = ''
+        if display_general:
+            general_body = """
+<tr>
+  <td class="bskcontentcol">%s</td>
+  <td class="bskcontentcol"><input type="text" name="new_name" value="%s"/></td>
+</tr>""" % (_("Basket's name"), bsk_name)
+            topics_selection = zip(range(len(topics)), map(lambda x: x[0], topics))
+            topics_selection.insert(0, (-1, _("Choose topic"))) 
+            topics_body = """
+<tr>
+  <td style="padding: 10 5 0 5;">%s</td>
+  <td style="padding: 10 5 0 0;">%s</td>
+</tr>
+<tr>
+  <td style="padding: 0 5 10 5;">%s</td>
+  <td style="padding: 0 5 10 0;"><input type="text" name="new_topic_name" />
+</tr>""" %  (_("Choose topic"), 
+             indent_text(self.__create_select_menu('new_topic', topics_selection, topic), 2),
+             _("or create a new one"))
+            general_body += topics_body
+        general_box = self.__tmpl_basket_box(img=weburl + '/img/webbasket_user.png',
+                                             title=_("General settings"),
+                                             body = general_body)
         groups_body = ''
         for (group_id, name, rights) in groups_rights:
             groups_body += """
@@ -1178,31 +1216,44 @@ class Template:
         external_box = self.__tmpl_basket_box(img=weburl + '/img/webbasket_world.png',
                                               title=_("Manage global sharing rights"),
                                               body=external_body)
+        delete_button = ''
+        if display_delete:
+            delete_button = '<input type="submit" class="nonsubmitbutton" name="delete" value="%s" />'
+            delete_button %=  _("Delete basket")
         out = """
-<form name="manage_rights" action="%(action)s" method="POST">
+<form name="edit" action="%(action)s" method="POST">
   <p>%(label)s</p>
   <input type="hidden" name="ln" value="%(ln)s" />
   <input type="hidden" name="bskid" value="%(bskid)i" />
   <input type="hidden" name="topic" value ="%(topic)i" />
-  <table style="width:100%%;">
+  <table>
     <tr>
-      <td style="width:50%%;vertical-align:top;">%(groups)s</td>
-      <td style="width:50%%;vertical-align:top;">%(external)s</td>
+      <td colspan="3">%(general)s</td>
     </tr>
     <tr>
-      <td colspan="2">
-        <input type="submit" class="formbutton" name="submit" value="%(submit_label)s" />
-      </td>
+      <td colspan="3">%(groups)s</td>
+    </tr>
+    <tr>
+      <td colspan="3">%(external)s</td>
+    </tr>
+    <tr>
+      <td><input type="submit" class="formbutton" name="submit" value="%(submit_label)s" /></td>
+      <td><input type="submit" class="nonsubmitbutton" name="cancel" value="%(cancel_label)s" /></td>
+      <td>%(delete_button)s</td>
     </tr>
   </table>
-</form>""" % {'label': _('Modifying sharing rights for basket "%s"') % bsk_name,
-              'action': weburl + '/yourbaskets.py/manage_rights',
+      
+</form>""" % {'label': _('Editing basket "%s"') % bsk_name,
+              'action': weburl + '/yourbaskets.py/edit',
               'ln': ln,
-              'topic': selected_topic,
+              'topic': topic,
               'bskid': bskid,
-              'groups': indent_text(groups_box, 4),
-              'external': indent_text(external_box, 4),
-              'submit_label': _("Change rights")}
+              'general': indent_text(general_box, 1),
+              'groups': indent_text(groups_box, 1),
+              'external': indent_text(external_box, 1),
+              'submit_label': _("Save changes"),
+              'cancel_label': _("Cancel"),
+              'delete_button': delete_button}
         return out
 
     def __create_rights_selection_menu(self, name, current_rights, ln=cdslang):
@@ -1264,7 +1315,7 @@ class Template:
     </tr>
     <tr>
       <td colspan="2">
-        <input type="submit" class="formbutton" name="cancel" value="%(cancel_label)s" />
+        <input type="submit" class="formbutton" name="group_cancel" value="%(cancel_label)s" />
         <input type="submit" class="formbutton" name="add_group" value="%(submit_label)s" />
       </td>
     </tr>
@@ -1365,4 +1416,3 @@ class Template:
 %s
 </collection>
 """ % items_xml
-            

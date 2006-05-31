@@ -44,6 +44,7 @@ cfg_webbasket_actions = {'DELETE': 'delete',
                          'DOWN': 'movedown',
                          'COPY': 'copy'}
 
+cfg_webbasket_max_number_of_displayed_baskets = 20
 cfg_webbasket_warning_messages = {
     'ERR_WEBBASKET_CMTID_INVALID': '_("%i is an invalid comment ID")',
     'WRN_WEBBASKET_NO_RECORD': '_("No records to add")'

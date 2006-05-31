@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
+
 ## $Id$
 ## 
-## Every db-related function of module webmessage
+## Every db-related function of module webbasket
 ##
-## This file is part of CDS Invenio.
+## This file is part of the CERN Document Server Software (CDSware).
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## The CDSware is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## The CDSware is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """ Database related functions for webbasket module """
 
@@ -45,6 +46,7 @@ from invenio.dateutils import convert_datestruct_to_datetext
 #    - get_all_personal_baskets_names
 #    - get_basket_name
 #    - get_personal_topics
+#    - rename_basket
 #    - rename_topic
 #    - move_baskets_to_topic
 #    - delete_basket
@@ -72,6 +74,8 @@ from invenio.dateutils import convert_datestruct_to_datetext
 # 6. Public baskets (interface to subscribe to baskets)
 #    - get_public_basket_infos
 #    - get_basket_general_infos
+#    - count_public_baskets
+#    - get_public_baskets_list
 #    - subscribe
 #    - unsubscribe
 #    - count_subscribers
@@ -115,7 +119,7 @@ def count_baskets(uid):
 
 def check_user_owns_baskets(uid, bskids):
     """ Return 1 if user is owner of every basket in list bskids"""
-    if not(type(bskids) is list or type(bskids is tuple)):
+    if not((type(bskids) is list) or (type(bskids) is tuple)):
         bskids = [bskids]
     query = """SELECT id_owner FROM bskBASKET WHERE %s GROUP BY id_owner"""
     sep = ' OR '
@@ -253,6 +257,11 @@ def get_personal_topics(uid):
     uid = int(uid)
     res = run_sql(query% uid)
     return res
+
+def rename_basket(bskid, new_name):
+    """Rename basket to new_name"""
+    query = "UPDATE bskBASKET SET name='%s' WHERE id=%i"
+    run_sql(query % (escape_string(new_name), int(bskid)))
 
 def rename_topic(uid, old_topic, new_topic):
     """Rename topic to new_topic """
@@ -724,6 +733,51 @@ def get_basket_general_infos(bskid):
         return res
     return ()
 
+def count_public_baskets():
+    """return number of public baskets"""
+    query = """SELECT count(id_bskBASKET) 
+               FROM usergroup_bskBASKET 
+               WHERE id_usergroup=0"""
+    return __wash_count(run_sql(query))
+
+def get_public_baskets_list(inf_limit, max_number, order=1, asc=1):
+    """Return list of public baskets
+    @param inf_limit: limit to baskets from number x
+    @param max_number: number of baskets to return
+    @order: 1: order by name of basket, 2: number of views, 3: owner
+    @return:
+    [(basket id, basket name, nb of views, uid of owner, nickname of owner)]"""
+        
+    query = """SELECT bsk.id,
+                      bsk.name,
+                      bsk.nb_views,
+                      u.id,
+                      u.nickname
+               FROM   bskBASKET bsk LEFT JOIN usergroup_bskBASKET ugbsk
+                                    on bsk.id=ugbsk.id_bskBASKET
+                                    LEFT JOIN user u
+                                    on bsk.id_owner=u.id
+               WHERE ugbsk.id_usergroup=0
+    """
+    if order==2:
+        query += 'ORDER BY bsk.nb_views'
+    elif order==3:
+        query += 'ORDER BY u.nickname'
+        if asc:
+            query += ' ASC'
+        else:
+            query += ' DESC'
+        query += ', u.id'
+    else:
+        query += 'ORDER BY bsk.name'
+    if asc:
+        query += ' ASC '
+    else:
+        query += ' DESC '
+    query += "LIMIT %i,%i" % (inf_limit, max_number)
+
+    return run_sql(query)
+    
 def is_public(bskid):
     """return 1 if basket is public, 0 else."""
     query = "SELECT count(id_usergroup) FROM usergroup_bskBASKET WHERE id_bskBASKET=%i AND id_usergroup=0"
