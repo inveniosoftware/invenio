@@ -178,9 +178,11 @@ class Template:
             
         return ' &gt; '.join(out)
 
-    def tmpl_webcoll_body(self, weburl, te_portalbox, searchfor, np_portalbox, narrowsearch, focuson, ne_portalbox):
-        """
-        Creates the body of the main search page.
+    def tmpl_webcoll_body(self, weburl, te_portalbox, searchfor,
+                          np_portalbox, narrowsearch, focuson,
+                          instantbrowse, ne_portalbox):
+
+        """ Creates the body of the main search page.
 
         Parameters:
 
@@ -199,6 +201,9 @@ class Template:
           - 'ne_portalbox' *string* - The HTML code for the bottom of the page
         """
 
+        if not narrowsearch:
+            narrowsearch = instantbrowse
+            
         body = '''
                 <form name="search" action="%(weburl)s/search" method="get">
                 %(searchfor)s
@@ -254,7 +259,8 @@ class Template:
         <!--create_searchfor_simple()-->
         '''
 
-        argd = drop_default_urlargd({'ln': ln}, self.search_results_default_urlargd)
+        argd = drop_default_urlargd({'ln': ln, 'cc': collection_id},
+                                    self.search_results_default_urlargd)
 
         # Only add non-default hidden values
         for field, value in argd.items():
@@ -354,7 +360,8 @@ class Template:
         <!--create_searchfor_advanced()-->
         '''
         
-        argd = drop_default_urlargd({'ln': ln, 'as': 1}, self.search_results_default_urlargd)
+        argd = drop_default_urlargd({'ln': ln, 'as': 1, 'cc': collection_id},
+                                    self.search_results_default_urlargd)
 
         # Only add non-default hidden values
         for field, value in argd.items():
@@ -633,9 +640,9 @@ class Template:
         box += """</select>"""
         return box
 
-    def tmpl_narrowsearch(self, as, ln, weburl, title, type, father,
-                          has_grandchildren, instant_browse, sons,
-                          display_grandsons, grandsons):
+    def tmpl_narrowsearch(self, as, ln, type, father,
+                          has_grandchildren, sons, display_grandsons,
+                          grandsons):
 
         """
         Creates list of collection descendants of type *type* under title *title*.
@@ -667,6 +674,10 @@ class Template:
 
         # load the right message language
         _ = gettext_set_language(ln)
+
+        title = {'r': _("Narrow by collection:"),
+                 'v': _("Focus on:")}[type]
+        
 
         if has_grandchildren:
             style_prolog = "<strong>"
@@ -815,6 +826,7 @@ class Template:
 
         return _("This collection does not contain any document yet.")
 
+
     def tmpl_instant_browse(self, as, ln, recids, more_link = None):
         """
           Formats a list of records (given in the recids list) from the database.
@@ -834,23 +846,37 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        if not len(recids): return ""
-        out = """<table class="latestadditionsbox">"""
+        body = '''<table class="latestadditionsbox">'''
         for recid in recids:
-            out += """<tr>
-                        <td class="latestadditionsboxtimebody">%(date)s</td>
-                        <td class="latestadditionsboxrecordbody">%(body)s</td>
-                      </tr>""" % {
-                        'date': recid['date'],
+            body += '''
+            <tr>
+              <td class="latestadditionsboxtimebody">%(date)s</td>
+              <td class="latestadditionsboxrecordbody">%(body)s</td>
+            </tr>''' % {'date': recid['date'],
                         'body': recid['body']
                       }
-        out += "</table>"
+        body += "</table>"
         if more_link:
-            out += '<div align="right"><small>' + \
-                     a_href('[&gt;&gt; %s]' % _("more"), href=more_link) + \
-                   '</small></div>'
-            
-        return out
+            body += '<div align="right"><small>' + \
+                    a_href('[&gt;&gt; %s]' % _("more"), href=more_link) + \
+                    '</small></div>'
+
+        return '''
+        <table class="narrowsearchbox">
+          <thead>
+            <tr>
+              <th class="narrowsearchboxheader">%(header)s</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+            <td class="narrowsearchboxbody">%(body)s</td>
+            </tr>
+          <tbody>
+        </table>''' % {'header' : _("Latest additions:"),
+                       'body' : body,
+                       }
+
 
     def tmpl_searchwithin_select(self, ln, fieldname, selected, values):
         """

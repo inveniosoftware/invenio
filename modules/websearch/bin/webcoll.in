@@ -342,8 +342,9 @@ class Collection:
                          te_portalbox = self.create_portalbox(lang, 'te'),
                          searchfor = self.create_searchfor(as, lang),
                          np_portalbox = self.create_portalbox(lang, 'np'),
-                         narrowsearch = self.create_narrowsearch(as, lang, _("Narrow by collection:")),
-                         focuson = self.create_narrowsearch(as, lang, _("Focus on:"), "v"),
+                         narrowsearch = self.create_narrowsearch(as, lang, 'r'),
+                         focuson = self.create_narrowsearch(as, lang, "v"),
+                         instantbrowse = self.create_instant_browse(as=as, ln=lang),
                          ne_portalbox = self.create_portalbox(lang, 'ne')
                        )
                 self.write_cache_file("body-as=%s-ln=%s" % (as, lang), body)
@@ -389,7 +390,7 @@ class Collection:
                 out += body
         return out
 
-    def create_narrowsearch(self, as=0, ln=cdslang, title="Narrow search", type="r"):
+    def create_narrowsearch(self, as=0, ln=cdslang, type="r"):
         """Creates list of collection descendants of type 'type' under title 'title'.
         If as==1, then links to Advanced Search interfaces; otherwise Simple Search.
         Suitable for 'Narrow search' and 'Focus on' boxes."""
@@ -397,16 +398,9 @@ class Collection:
         # get list of sons and analyse it
         sons = self.get_sons(type)
 
-        # return nothing for type 'v' (virtual collection) if there are no sons:
-        if type == 'v' and not sons:
-            return ""
-
-        # load instant browse parts, in case no descendants
-        if not len(sons) and type == 'r':
-            instant_browse = self.create_instant_browse(as=as, ln=ln)
-        else:
-            instant_browse = ''
-
+        if not sons:
+            return ''
+        
         # get descendents
         descendants = self.get_descendants(type)
 
@@ -420,49 +414,46 @@ class Collection:
         return websearch_templates.tmpl_narrowsearch(
                  as = as,
                  ln = ln,
-                 weburl = weburl,
                  type = type,
                  father = self,
                  has_grandchildren = len(descendants)>len(sons),
-                 title = title,
-                 instant_browse = instant_browse,
-
                  sons = sons,
-
                  display_grandsons = cfg_narrow_search_show_grandsons,
                  grandsons = grandsons
                )
 
     def create_instant_browse(self, rg=cfg_instant_browse, as=0, ln=cdslang):
         "Searches database and produces list of last 'rg' records."
-        box = ""
+        
         if self.restricted_p():
             return websearch_templates.tmpl_box_restricted_content(ln = ln)
+        
         else:
-            url = websearch_templates.build_search_url(cc=self.name, jrec=rg+1, ln=ln, as=as)
             if self.nbrecs and self.reclist:
                 # firstly, get last 'rg' records:
                 recIDs = Numeric.nonzero(self.reclist._set)
                 passIDs = []
-                for idx in range(self.nbrecs-1, self.nbrecs-rg-1, -1):
-                    if idx>=0:
-                        passIDs.append({'id' : recIDs[idx],
-                                        'body' : print_record(recIDs[idx], ln=ln)
-                                       })
-                if not (self.nbrecs > rg):
+
+                total = len(recIDs)
+                to_display = min(rg, total)
+                
+                for idx in range(total-1, total-to_display-1, -1):
+                    recid = recIDs[idx]
+
+                    passIDs.append({'id': recid,
+                                    'body': print_record(recid, ln=ln),
+                                    'date': get_creation_date(recid, fmt="%Y-%m-%d<br>%H:%i")})
+                    
+                if self.nbrecs > rg:
+                    url = websearch_templates.build_search_url(
+                        cc=self.name, jrec=rg+1, ln=ln, as=as)
+                else:
                     url = ""
-                recdates = []
-                for recid in passIDs:
-                    recid['date'] = get_creation_date(recid['id'], fmt="%Y-%m-%d<br>%H:%i")
+                    
                 return websearch_templates.tmpl_instant_browse(
-                                 as = as,
-                                 ln = ln,
-                                 recids = passIDs,
-                                 more_link = url
-                            )
-            else:
-                return websearch_templates.tmpl_box_no_records(ln = ln)
-        return box
+                                 as=as, ln=ln, recids=passIDs, more_link=url)
+
+        return websearch_templates.tmpl_box_no_records(ln=ln)
 
     def create_searchoptions(self):
         "Produces 'Search options' portal box."
