@@ -178,7 +178,7 @@ class Template:
             
         return ' &gt; '.join(out)
 
-    def tmpl_webcoll_body(self, weburl, te_portalbox, searchfor,
+    def tmpl_webcoll_body(self, ln, te_portalbox, searchfor,
                           np_portalbox, narrowsearch, focuson,
                           instantbrowse, ne_portalbox):
 
@@ -686,70 +686,43 @@ class Template:
             style_prolog = ""
             style_epilog = ""
 
-        out = ''
-        if type == 'r':
-            out += """<input type="hidden" name="cc" value="%(name)s">""" % {
-                     'name' : cgi.escape(father.name, 1),
-                   }
+        out = """<table class="narrowsearchbox">
+                   <thead>
+                    <tr>
+                     <th colspan="2" align="left" class="narrowsearchboxheader">
+                       %(title)s
+                     </th>
+                    </tr>
+                   </thead>
+                   <tbody>""" % {'title' : title}
+        # iterate through sons:
+        i = 0
+        for son in sons:
+            out += """<tr><td class="narrowsearchboxbody" valign="top">"""
+            if type=='r':
+                if son.restricted_p() and son.restricted_p() != father.restricted_p():
+                    out += """<input type=checkbox name="c" value="%(name)s">&nbsp;</td>""" % {'name' : son.name }
+                else:
+                    out += """<input type=checkbox name="c" value="%(name)s" checked>&nbsp;</td>""" % {'name' : son.name }
+            out += """<td valign="top">%(link)s%(recs)s """ % {
+                'link': a_href(style_prolog + son.get_name(ln) + style_epilog,
+                               href=self.build_search_interface_url(c=son.name, ln=ln, as=as)),
+                'recs' : self.tmpl_nbrecs_info(son.nbrecs, ln=ln)}
 
-        if len(sons):
-            out += """<table class="narrowsearchbox">
-                       <thead>
-                        <tr>
-                         <th colspan="2" align="left" class="narrowsearchboxheader">
-                           %(title)s
-                         </th>
-                        </tr>
-                       </thead>
-                       <tbody>""" % {'title' : title}
-            # iterate through sons:
-            i = 0
-            for son in sons:
-                out += """<tr><td class="narrowsearchboxbody" valign="top">"""
-                if type=='r':
-                    if son.restricted_p() and son.restricted_p() != father.restricted_p():
-                        out += """<input type=checkbox name="c" value="%(name)s">&nbsp;</td>""" % {'name' : son.name }
-                    else:
-                        out += """<input type=checkbox name="c" value="%(name)s" checked>&nbsp;</td>""" % {'name' : son.name }
-                out += """<td valign="top">%(link)s%(recs)s """ % {
-                    'link': a_href(style_prolog + son.get_name(ln) + style_epilog,
-                                   href=self.build_search_interface_url(c=son.name, ln=ln, as=as)),
-                    'recs' : self.tmpl_nbrecs_info(son.nbrecs, ln=ln)}
-                
-                if son.restricted_p():
-                    out += """ <small class="warning">[%(msg)s]</small>""" % { 'msg' : _("restricted") }
-                if display_grandsons and len(grandsons[i]):
-                    # iterate trough grandsons:
-                    out += """<br>"""
-                    for grandson in grandsons[i]:
-                        out += """ %(link)s%(nbrec)s """ % {
-                            'link': a_href(grandson.get_name(ln),
-                                           href=self.build_search_interface_url(c=grandson.name, ln=ln, as=as)),
-                            'nbrec' : self.tmpl_nbrecs_info(grandson.nbrecs, ln=ln)}
-                        
-                out += """</td></tr>"""
-                i += 1
-            out += "</tbody></table>"
-        else:
-            if type == 'r':
-                # no sons, and type 'r', so print info on collection content:
-                out += """<table class="narrowsearchbox">
-                           <thead>
-                            <tr>
-                             <th class="narrowsearchboxheader">
-                               %(header)s
-                             </th>
-                            </tr>
-                           </thead>
-                           <tbody>
-                            <tr>
-                             <td class="narrowsearchboxbody">%(body)s</td>
-                            </tr>
-                           <tbody>
-                          </table>""" % {
-                           'header' : _("Latest additions:"),
-                           'body' : instant_browse
-                       }
+            if son.restricted_p():
+                out += """ <small class="warning">[%(msg)s]</small>""" % { 'msg' : _("restricted") }
+            if display_grandsons and len(grandsons[i]):
+                # iterate trough grandsons:
+                out += """<br>"""
+                for grandson in grandsons[i]:
+                    out += """ %(link)s%(nbrec)s """ % {
+                        'link': a_href(grandson.get_name(ln),
+                                       href=self.build_search_interface_url(c=grandson.name, ln=ln, as=as)),
+                        'nbrec' : self.tmpl_nbrecs_info(grandson.nbrecs, ln=ln)}
+
+            out += """</td></tr>"""
+            i += 1
+        out += "</tbody></table>"
 
         return out
 

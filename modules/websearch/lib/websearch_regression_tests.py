@@ -381,7 +381,8 @@ class WebsearchTestSearch(unittest.TestCase):
         path, q = parse_url(b.geturl())
 
         for to_drop in ('cc', 'action_search', 'f'):
-            del q[to_drop]
+            if to_drop in q:
+                del q[to_drop]
         
         for bsu in ('quasinormal', 'muon'):
             l = b.find_link(text=bsu)
