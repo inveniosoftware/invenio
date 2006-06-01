@@ -259,7 +259,7 @@ class Template:
         <!--create_searchfor_simple()-->
         '''
 
-        argd = drop_default_urlargd({'ln': ln, 'cc': collection_id},
+        argd = drop_default_urlargd({'ln': ln, 'cc': collection_id, 'sc': 1},
                                     self.search_results_default_urlargd)
 
         # Only add non-default hidden values
@@ -360,7 +360,7 @@ class Template:
         <!--create_searchfor_advanced()-->
         '''
         
-        argd = drop_default_urlargd({'ln': ln, 'as': 1, 'cc': collection_id},
+        argd = drop_default_urlargd({'ln': ln, 'as': 1, 'cc': collection_id, 'sc': 1},
                                     self.search_results_default_urlargd)
 
         # Only add non-default hidden values
@@ -903,13 +903,13 @@ class Template:
 
         for pair in values:
             if pair.get('selected', False) or pair['value'] == selected:
-                selected = ' selected'
+                flag = ' selected'
             else:
-                selected = ''
+                flag = ''
             
             out += '<option value="%(value)s"%(selected)s>%(text)s' % {
                      'value'    : pair['value'],
-                     'selected' : selected,
+                     'selected' : flag,
                      'text'     : pair['text']
                    }
             
@@ -1395,7 +1395,10 @@ class Template:
             </table>
             ''' % {
               'advanced_search': a_href(_("Advanced Search"),
-                                        href=self.build_search_url(p1=p, f1=f, rm=rm, as=1, cc=cc, jrec=jrec, ln=ln, rg=rg)),
+                                        href=self.build_search_url(p1=p,
+                                                                   f1=f, rm=rm, as=1, cc=cc,
+                                                                   jrec=jrec, ln=ln, rg=rg)),
+              
               'leading' : leadingtext,
               'sizepattern' : cfg_advancedsearch_pattern_box_width,
               'p' : cgi.escape(p, 1),
@@ -1542,12 +1545,12 @@ class Template:
                   'select_rm' : self.tmpl_select(fieldname = 'rm', values = ranks, selected = rm, css_class = 'address'),
                   'select_rg' : self.tmpl_select(fieldname = 'rg', values = rgs, selected = rg, css_class = 'address'),
                   'select_sc' : self.tmpl_select(fieldname = 'sc', values = [{
-                                    'value' : '0',
+                                    'value' : 0,
                                     'text' : _("single list")
                                   }, {
-                                    'value' : '1',
+                                    'value' : 1,
                                     'text' : _("split by collection")
-                                  }], selected = so, css_class = 'address'),
+                                  }], selected = sc, css_class = 'address'),
                   'select_of' : self.tmpl_searchwithin_select(
                                   ln = ln,
                                   fieldname = 'of',
@@ -1852,7 +1855,7 @@ class Template:
                     'collection_name': a_href('', name=collection),
                     'weburl' : weburl,
                     'collection_link': a_href(collection_name,
-                                              href=self.build_search_url(cc=collection, as=as, ln=ln)),
+                                              href=self.build_search_interface_url(c=collection, as=as, ln=ln)),
                   }
         else:
             out += """
@@ -1871,10 +1874,6 @@ class Template:
                 out += "" + collection_name + " : " + _("<strong>%s</strong> records found") % self.tmpl_nice_number(nb_found, ln) + " &nbsp; "
 
         if nb_found > rg: # navig.arrows are needed, since we have many hits
-            if (pl_in_url):
-              scbis = 1
-            else:
-              scbis = 0
 
             query = {'p': p, 'f': f,
                      'cc': collection,
@@ -1886,7 +1885,7 @@ class Template:
                      'f1': f1, 'f2': f2, 'f3': f3,
                      'm1': m1, 'm2': m2, 'm3': m3,
                      'op1': op1, 'op2': op2,
-                     'sc': scbis,
+                     'sc': 0,
                      'd1y': d1y, 'd1m': d1m, 'd1d': d1d,
                      'd2y': d2y, 'd2m': d2m, 'd2d': d2d,
                 }

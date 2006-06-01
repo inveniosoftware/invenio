@@ -144,10 +144,10 @@ class WebsearchTestCollections(unittest.TestCase):
                     args = {'jrec': jrec, 'cc': 'Preprints'}
                     if as:
                         args['as'] = as
-
+                        
                     url = make_url('/search', **args)
                     b.follow_link(url=url)
-
+                    
         except LinkNotFoundError:
             self.fail('no link %r in %r' % (url, b.geturl()))
             
