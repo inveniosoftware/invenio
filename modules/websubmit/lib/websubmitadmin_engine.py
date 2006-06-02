@@ -1457,7 +1457,6 @@ def _add_submission_to_doctype(errors, warnings, doctype, action, displayed, but
     (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)    
 
-## NICK
 def _delete_submission_from_doctype(errors, warnings, doctype, action):
     """Delete a submission (action) from the document type identified by "doctype".
        @param errors:  a list of errors encountered while deleting the submission
@@ -1711,6 +1710,179 @@ def perform_request_configure_doctype(doctype,
         (title, body) = _create_configure_doctype_form(doctype)
     return (title, body, errors, warnings)
 
+def _create_configure_doctype_submission_functions_form(doctype,
+                                                        action,
+                                                        movefromfunctionname="",
+                                                        movefromfunctionstep="",
+                                                        movefromfunctionscore="",
+                                                        user_msg=""
+                                                       ):
+    title = """Functions of the "%s" Submission of the "%s" Document Type:""" % (action, doctype)
+    submission_functions = get_functionname_step_score_allfunctions_doctypesubmission(doctype=doctype, action=action)
+    all_websubmit_functions = get_funcname_allfunctions()
+    body = websubmitadmin_templates.tmpl_configuredoctype_display_submissionfunctions(doctype=doctype,
+                                                                                      action=action,
+                                                                                      movefromfunctionname=movefromfunctionname,
+                                                                                      movefromfunctionstep=movefromfunctionstep,
+                                                                                      movefromfunctionscore=movefromfunctionscore,
+                                                                                      submissionfunctions=submission_functions,
+                                                                                      allWSfunctions=all_websubmit_functions,
+                                                                                      user_msg=user_msg
+                                                                                     )
+    return (title, body)
 
+def perform_request_configure_doctype_submissionfunctions(doctype,
+                                                          action,
+                                                          moveupfunctionname="",
+                                                          moveupfunctionstep="",
+                                                          moveupfunctionscore="",
+                                                          movedownfunctionname="",
+                                                          movedownfunctionstep="",
+                                                          movedownfunctionscore="",
+                                                          movefromfunctionname="",
+                                                          movefromfunctionstep="",
+                                                          movefromfunctionscore="",
+                                                          movetofunctionname="",
+                                                          movetofunctionstep="",
+                                                          movetofunctionscore="",
+                                                          deletefunctionname="",
+                                                          deletefunctionstep="",
+                                                          deletefunctionscore=""
+                                                         ):
 
+    errors = []
+    warnings = []
+    body = ""
+    user_msg = []
+    ## ensure that there is only one doctype for this doctype ID - simply display all doctypes with warning if not
+    if doctype in ("", None):
+        user_msg.append("""Unknown Document Type""")
+        ## TODO : LOG ERROR
+        all_doctypes = get_docid_docname_alldoctypes()
+        body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
+        title = "Available WebSubmit Document Types"
+        return (title, body, errors, warnings)
 
+    numrows_doctype = get_number_doctypes_docid(docid=doctype)
+    if numrows_doctype > 1:
+        ## there are multiple doctypes with this doctype ID:
+        ## TODO : LOG ERROR
+        user_msg.append("""Multiple document types identified by "%s" exist - cannot configure at this time.""" \
+                   % (doctype,))
+        all_doctypes = get_docid_docname_alldoctypes()
+        body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
+        title = "Available WebSubmit Document Types"
+        return (title, body, errors, warnings)
+    elif numrows_doctype == 0:
+        ## this doctype does not seem to exist:
+        user_msg.append("""The document type identified by "%s" doesn't exist - cannot configure at this time.""" \
+                   % (doctype,))
+        ## TODO : LOG ERROR
+        all_doctypes = get_docid_docname_alldoctypes()
+        body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
+        title = "Available WebSubmit Document Types"
+        return (title, body, errors, warnings)
+
+    ## ensure that this submission exists for this doctype:
+    numrows_submission = get_number_submissions_doctype_action(doctype=doctype, action=action)
+    if numrows_submission > 1:
+        ## there are multiple submissions for this doctype/action ID:
+        ## TODO : LOG ERROR
+        user_msg.append("""The Submission "%s" seems to exist multiple times for the Document Type "%s" - cannot configure at this time.""" \
+                   % (action, doctype))
+        all_doctypes = get_docid_docname_alldoctypes()
+        body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
+        (title, body) = _create_configure_doctype_form(doctype)
+        return (title, body, errors, warnings)
+    elif numrows_submission == 0:
+        ## this submission does not seem to exist for this doctype:
+        user_msg.append("""The Submission "%s" doesn't exist for the "%s" Document Type - cannot configure at this time.""" \
+                   % (action, doctype))
+        ## TODO : LOG ERROR
+        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        return (title, body, errors, warnings)
+        
+
+    ## submission valid
+    if movefromfunctionname != "" and movefromfunctionstep != "" and movefromfunctionscore != "" and \
+       movetofunctionname != "" and movetofunctionstep != "" and movetofunctionscore != "":
+        ## process moving the function by jumping it to another position
+        error_code = move_position_submissionfunction_fromposn_toposn(doctype=doctype,
+                                                                      action=action,
+                                                                      movefuncname=movefromfunctionname,
+                                                                      movefuncfromstep=movefromfunctionstep,
+                                                                      movefuncfromscore=movefromfunctionscore,
+                                                                      movefunctoname=movetofunctionname,
+                                                                      movefunctostep=movetofunctionstep,
+                                                                      movefunctoscore=movetofunctionscore)
+        if error_code == 0:
+            ## success
+            user_msg.append("""The Function "%s" that was located at step %s, score %s, has been moved""" \
+                             % (movefromfunctionname, movefromfunctionstep, movefromfunctionscore))
+        else:
+            ## could not move it
+            user_msg.append("""Unable to move the Function "%s" that is located at step %s, score %s""" \
+                                % (movefromfunctionname, movefromfunctionstep, movefromfunctionscore))
+        (title, body) = _create_configure_doctype_submission_functions_form(doctype=doctype,
+                                                                            action=action,
+                                                                            user_msg=user_msg)
+    elif moveupfunctionname != "" and moveupfunctionstep != "" and moveupfunctionscore != "":
+        ## process moving the function up one position
+        error_code = move_position_submissionfunction_up(doctype=doctype,
+                                                         action=action,
+                                                         function=moveupfunctionname,
+                                                         funccurstep=moveupfunctionstep,
+                                                         funccurscore=moveupfunctionscore)
+        if error_code == 0:
+            ## success
+            user_msg.append("""The Function "%s" that was located at step %s, score %s, has been moved upwards""" \
+                             % (moveupfunctionname, moveupfunctionstep, moveupfunctionscore))
+        else:
+            ## could not move it
+            user_msg.append("""Unable to move the Function "%s" that is located at step %s, score %s""" \
+                                % (moveupfunctionname, moveupfunctionstep, moveupfunctionscore))
+        (title, body) = _create_configure_doctype_submission_functions_form(doctype=doctype,
+                                                                            action=action,
+                                                                            user_msg=user_msg)
+    elif movedownfunctionname != "" and movedownfunctionstep != "" and movedownfunctionscore != "":
+        ## process moving the function down one position
+        error_code = move_position_submissionfunction_down(doctype=doctype,
+                                                           action=action,
+                                                           function=movedownfunctionname,
+                                                           funccurstep=movedownfunctionstep,
+                                                           funccurscore=movedownfunctionscore)
+        if error_code == 0:
+            ## success
+            user_msg.append("""The Function "%s" that was located at step %s, score %s, has been moved downwards""" \
+                             % (movedownfunctionname, movedownfunctionstep, movedownfunctionscore))
+        else:
+            ## could not move it
+            user_msg.append("""Unable to move the Function "%s" that is located at step %s, score %s""" \
+                                % (movedownfunctionname, movedownfunctionstep, movedownfunctionscore))
+        (title, body) = _create_configure_doctype_submission_functions_form(doctype=doctype,
+                                                                            action=action,
+                                                                            user_msg=user_msg)
+    elif deletefunctionname != "" and deletefunctionstep != "" and deletefunctionscore != "":
+        ## process deletion of function from the given position
+        (title, body) = ("", "")
+    else:
+        ## default - display functions for this submission
+        (title, body) = _create_configure_doctype_submission_functions_form(doctype=doctype,
+                                                                            action=action,
+                                                                            movefromfunctionname=movefromfunctionname,
+                                                                            movefromfunctionstep=movefromfunctionstep,
+                                                                            movefromfunctionscore=movefromfunctionscore
+                                                                           )
+
+##         title = """Functions of the "%s" Submission of the "%s" Document Type:""" % (action, doctype)
+##         submission_functions = get_functionname_step_score_allfunctions_doctypesubmission(doctype=doctype, action=action)
+##         all_websubmit_functions = get_funcname_allfunctions()
+##         body = websubmitadmin_templates.tmpl_configuredoctype_display_submissionfunctions(doctype=doctype,
+##                                                                                           action=action,
+##                                                                                           movefromfunctionname=movefromfunctionname,
+##                                                                                           movefromfunctionstep=movefromfunctionstep,
+##                                                                                           movefromfunctionscore=movefromfunctionscore,
+##                                                                                           submissionfunctions=submission_functions,
+##                                                                                           allWSfunctions=all_websubmit_functions
+##                                                                                          )
+    return (title, body, errors, warnings)
