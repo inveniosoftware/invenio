@@ -757,7 +757,7 @@ class Template:
                'nb_items': bsk_nb_records,
                'records_label': _("records"),
                'last_update_label': _("last update"),
-               'last_update': bsk_date_modification,
+               'last_update': convert_datetext_to_dategui(bsk_date_modification),
                'body': body,
                'footer': footer}
         out += """

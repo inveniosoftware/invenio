@@ -367,7 +367,7 @@ def perform_request_delete_comment(uid, bskid, recid, cmtid):
     cmtid = wash_url_argument(cmtid, 'int')
     errors = []
     if __check_user_can_perform_action(uid, bskid, cfg_webbasket_share_levels['DELCMT']):
-        delete_comment(bskid, recid, cmtid)
+        db.delete_comment(bskid, recid, cmtid)
     else:
         errors.append('ERR_WEBBASKET_NO_RIGHTS')
     return errors
@@ -390,7 +390,7 @@ def perform_request_add(uid, recid=[], bskid=[], referer='',
     referer = wash_url_argument(referer, 'str')
     new_basket_name = wash_url_argument(new_basket_name, 'str')
     new_topic_name = wash_url_argument(new_topic_name, 'str')
-    create_in_topic = wash_url_argument(create_in_topic, 'str')
+    create_in_topic = wash_url_argument(create_in_topic, 'int')
     ln = wash_language(ln)
     
     body = ''
@@ -405,9 +405,15 @@ def perform_request_add(uid, recid=[], bskid=[], referer='',
         return (body, errors, warnings)
     
     if new_basket_name != '':
-        topic = new_topic_name
-        if create_in_topic not in ('','0'):
-            topic = create_in_topic
+        new_topic_name = new_topic_name.strip()
+        if new_topic_name:
+            topic = new_topic_name
+        elif create_in_topic != -1:
+            topics = db.get_personal_topics(uid)
+            try:
+                topic = topics[create_in_topic][0]
+            except IndexError:
+                topic = ''
         if topic:
             id_bsk = db.create_basket(uid, new_basket_name, topic)
             bskid.append(id_bsk)
@@ -653,6 +659,7 @@ def perform_request_create_basket(uid,
     ln = wash_language(ln)
     
     if new_basket_name and (new_topic_name or create_in_topic != -1):
+        new_topic_name = new_topic_name.strip()
         if new_topic_name:
             topic = new_topic_name
         else:
