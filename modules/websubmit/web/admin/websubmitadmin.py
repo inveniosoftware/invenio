@@ -434,6 +434,59 @@ def doctypeadd(req, doctype="", doctypename="", doctypedescr="", clonefrom="", d
                 errors      = errors,
                 warnings    = warnings)
 
+def doctypeconfiguresubmissionfunctions(req,
+                                        doctype="",
+                                        action="",
+                                        moveupfunctionname="",
+                                        moveupfunctionstep="",
+                                        moveupfunctionscore="",
+                                        movedownfunctionname="",
+                                        movedownfunctionstep="",
+                                        movedownfunctionscore="",
+                                        movefromfunctionname="",
+                                        movefromfunctionstep="",
+                                        movefromfunctionscore="",
+                                        movetofunctionname="",
+                                        movetofunctionstep="",
+                                        movetofunctionscore="",
+                                        deletefunctionname="",
+                                        deletefunctionstep="",
+                                        deletefunctionscore="",
+                                        ln=cdslang):
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    uid = getUid(req)
+    errors = []
+    warnings = []
+    (title, body, errors, warnings) = perform_request_configure_doctype_submissionfunctions(doctype=doctype,
+                                                                                            action=action,
+                                                                                            moveupfunctionname=moveupfunctionname,
+                                                                                            moveupfunctionstep=moveupfunctionstep,
+                                                                                            moveupfunctionscore=moveupfunctionscore,
+                                                                                            movedownfunctionname=movedownfunctionname,
+                                                                                            movedownfunctionstep=movedownfunctionstep,
+                                                                                            movedownfunctionscore=movedownfunctionscore,
+                                                                                            movefromfunctionname=movefromfunctionname,
+                                                                                            movefromfunctionstep=movefromfunctionstep,
+                                                                                            movefromfunctionscore=movefromfunctionscore,
+                                                                                            movetofunctionname=movetofunctionname,
+                                                                                            movetofunctionstep=movetofunctionstep,
+                                                                                            movetofunctionscore=movetofunctionscore,
+                                                                                            deletefunctionname=deletefunctionname,
+                                                                                            deletefunctionstep=deletefunctionstep,
+                                                                                            deletefunctionscore=deletefunctionscore
+                                                                                           )
+
+    return page(title       = title,
+                body        = body,
+                navtrail    = get_navtrail(ln),
+                uid         = uid,
+                lastupdated = __lastupdated__,
+                req         = req,
+                language    = ln,
+                errors      = errors,
+                warnings    = warnings)
+
 
 def doctypeconfigure(req,
                      doctype,
