@@ -192,12 +192,392 @@ def get_distinct_paramname_all_websubmit_function_parameters():
         all_params_list.append((param,))
     return all_params_list
 
+def get_number_functions_doctypesubmission_functionname_step_score(doctype, action, function, step, score):
+    """Get the number or rows for a particular function at a given step and score of a doctype submission"""
+    q = """SELECT COUNT(doctype) FROM sbmFUNCTIONS where doctype=%s AND action=%s AND function=%s AND step=%s AND score=%s"""
+    return int(run_sql(q, (doctype, action, function, step, score))[0][0])
+
+def get_number_functions_doctypesubmission_step_score(doctype, action, step, score):
+    """Get the number or rows for a particular function at a given step and score of a doctype submission"""
+    q = """SELECT COUNT(doctype) FROM sbmFUNCTIONS where doctype=%s AND action=%s AND step=%s AND score=%s"""
+    return int(run_sql(q, (doctype, action, step, score))[0][0])
+
+
+def update_score_allfunctions_in_step_doctypesubmission_add10(doctype, action, step):
+    q = """UPDATE sbmFUNCTIONS SET score=score+10 WHERE doctype=%s AND action=%s AND step=%s"""
+    run_sql(q, (doctype, action, step))
+    return 0 ## Everything OK
+
+def update_step_score_doctypesubmission_function(doctype, action, function, oldstep, oldscore, newstep, newscore):
+    numrows_function = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype, action=action,
+                                                                                      function=function, step=oldstep, score=oldscore)
+    if numrows_function == 1:
+        q = """UPDATE sbmFUNCTIONS SET step=%s, score=%s WHERE doctype=%s AND action=%s AND function=%s AND step=%s AND score=%s"""
+        run_sql(q, (newstep, newscore, doctype, action, function, oldstep, oldscore))
+        return 0  ## Everything OK
+    else:
+        ## Everything NOT OK - perhaps this function doesn't exist at this posn - cannot update
+        return 1
+
+def move_position_submissionfunction_up(doctype, action, function, funccurstep, funccurscore):
+    functions_above = get_functionname_step_score_allfunctions_beforereference_doctypesubmission(doctype=doctype,
+                                                                                                 action=action,
+                                                                                                 step=funccurstep,
+                                                                                                 score=funccurscore)
+    numrows_functions_above = len(functions_above)
+    if numrows_functions_above < 1:
+        ## there are no functions above this - nothing to do
+        return 0 ## Everything OK
+    ## get the details of the function above this one:
+    name_function_above = functions_above[numrows_functions_above-1][0]
+    step_function_above = int(functions_above[numrows_functions_above-1][1])
+    score_function_above = int(functions_above[numrows_functions_above-1][2])
+    if step_function_above < int(funccurstep):
+        ## the function above the function to be moved is in a lower step. Put the function to be moved in the same step
+        ## as the one above, but set its score to be greater by 10 than the one above
+        error_code = update_step_score_doctypesubmission_function(doctype=doctype,
+                                                                  action=action,
+                                                                  function=function,
+                                                                  oldstep=funccurstep,
+                                                                  oldscore=funccurscore,
+                                                                  newstep=step_function_above,
+                                                                  newscore=int(score_function_above)+10)
+        return error_code
+    else:
+        ## the function above is in the same step as the function to be moved. just switch them around (scores)
+        ## first, delete the function above:
+        error_code = delete_function_doctypesubmission_step_score(doctype=doctype,
+                                                                  action=action,
+                                                                  function=name_function_above,
+                                                                  step=step_function_above,
+                                                                  score=score_function_above)
+        if error_code == 0:
+            ## now update the function to be moved with the step and score of the function that was above it
+            error_code = update_step_score_doctypesubmission_function(doctype=doctype,
+                                                                      action=action,
+                                                                      function=function,
+                                                                      oldstep=funccurstep,
+                                                                      oldscore=funccurscore,
+                                                                      newstep=step_function_above,
+                                                                      newscore=score_function_above)
+            if error_code == 0:
+                ## now insert the function that *was* above, into the position of the function that we have just moved
+                error_code = insert_function_doctypesubmission(doctype=doctype,
+                                                               action=action,
+                                                               function=name_function_above,
+                                                               step=funccurstep,
+                                                               score=funccurscore)
+                return error_code
+            else:
+                ## could not update the function that was to be moved! Try to re-insert that which was deleted
+                error_code = insert_function_doctypesubmission(doctype=doctype,
+                                                               action=action,
+                                                               function=name_function_above,
+                                                               step=step_function_above,
+                                                               score=score_function_above)
+                return 1 ## Returning an ERROR code to signal that the move did not work
+        else:
+            ## Unable to delete the function above that which we want to move. Cannot move the function then.
+            ## Return an error code to signal that things went wrong
+            return 1
+
+def update_score_allfunctions_in_step_from_score_doctypesubmission_add10(doctype, action, step, fromscore):
+    q = """UPDATE sbmFUNCTIONS SET score=score+10 WHERE doctype=%s AND action=%s AND step=%s AND score >= %s"""
+    run_sql(q, (doctype, action, step, fromscore))
+    return 0 ## Everything OK
+
+def move_position_submissionfunction_fromposn_toposn(doctype, action, movefuncname, movefuncfromstep,
+                                                    movefuncfromscore, movefunctoname, movefunctostep,
+                                                    movefunctoscore):
+    ## first check that there is a function "movefuncname"->"movefuncfromstep";"movefuncfromscore"
+    numrows_movefunc = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
+                                                                                      action=action,
+                                                                                      function=movefuncname,
+                                                                                      step=movefuncfromstep,
+                                                                                      score=movefuncfromscore)
+    if numrows_movefunc < 1:
+        ## the function to move does not exist!
+        return 1
+    ## now check that there is a function "movefunctoname"->"movefunctostep";"movefunctoscore"
+    numrows_movefunctoposn = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
+                                                                                      action=action,
+                                                                                      function=movefunctoname,
+                                                                                      step=movefunctostep,
+                                                                                      score=movefunctoscore)
+    if numrows_movefunctoposn < 1:
+        ## the function in the position to move to does not exist!
+        return 1
+    ##
+    functions_above = get_functionname_step_score_allfunctions_beforereference_doctypesubmission(doctype=doctype,
+                                                                                                 action=action,
+                                                                                                 step=movefunctostep,
+                                                                                                 score=movefunctoscore)
+    numrows_functions_above = len(functions_above)
+    if numrows_functions_above >= 1:
+        function_above_name = functions_above[numrows_functions_above-1][0]
+        function_above_step = int(functions_above[numrows_functions_above-1][1])
+        function_above_score = int(functions_above[numrows_functions_above-1][2])
+        ## Check that the place to which we are moving our function is NOT the same place that it is currently
+        ## situated!
+##         if function_above_name == movefuncname and function_above_step == int(movefuncfromstep) and \
+##            function_above_score == int(movefuncfromscore):
+##             ## it is the same position - quietly do nothing
+##             return 1  ## NICK BELOW, ACTUALLY, NOT ABOVE!
+
+    if (numrows_functions_above < 1) or (int(functions_above[numrows_functions_above-1][1]) < int(movefunctostep)):  ### NICK SEPARATE THESE 2 OUT
+        ## EITHER: there are no functions above the destination position; -OR- the function immediately above the
+        ## destination position function is in a lower step.
+        ## So, it is not important to care about any functions above for the move
+        if ((numrows_functions_above < 1) and (int(movefunctoscore) > 10)):
+            ## There is a space of 10 or more between the score of the function into whose place we are moving
+            ## a function, and the one above it. Set the new function score for the moved function as the
+            ## score of the function whose place it is taking in the order - 10
+            error_code = update_step_score_doctypesubmission_function(doctype=doctype,
+                                                                      action=action,
+                                                                      function=movefuncname,
+                                                                      oldstep=movefuncfromstep,
+                                                                      oldscore=movefuncfromscore,
+                                                                      newstep=movefunctostep,
+                                                                      newscore=int(movefunctoscore)-10)
+            return error_code
+        elif (int(movefunctoscore) - 10 > function_above_score):
+            ## There is a space of 10 or more between the score of the function into whose place we are moving
+            ## a function, and the one above it. Set the new function score for the moved function as the
+            ## score of the function whose place it is taking in the order - 10
+            error_code = update_step_score_doctypesubmission_function(doctype=doctype,
+                                                                      action=action,
+                                                                      function=movefuncname,
+                                                                      oldstep=movefuncfromstep,
+                                                                      oldscore=movefuncfromscore,
+                                                                      newstep=movefunctostep,
+                                                                      newscore=int(movefunctoscore)-10)
+            return error_code
+        else:
+            ## There is not a space of 10 or more in the scores of the function into whose position we are moving
+            ## a function and the function above it. It is necessary to augment the score of all functions
+            ## within the step of the one into whose position our function will be moved, from that position onwards,
+            ## by 10; then the function to be moved can be inserted into the newly created space
+            ## First, delete the function to be moved so that it is not changed during any augmentation:
+            error_code = delete_function_doctypesubmission_step_score(doctype=doctype,
+                                                                      action=action,
+                                                                      function=movefuncname,
+                                                                      step=movefuncfromstep,
+                                                                      score=movefuncfromscore)
+            if error_code == 0:
+                ## deletion successful
+                ## now augment the relevant scores:
+                update_score_allfunctions_in_step_from_score_doctypesubmission_add10(doctype=doctype,
+                                                                                     action=action,
+                                                                                     step=movefunctostep,
+                                                                                     fromscore=movefunctoscore)
+                error_code = insert_function_doctypesubmission(doctype=doctype,
+                                                               action=action,
+                                                               function=movefuncname,
+                                                               step=movefunctostep,
+                                                               score=movefunctoscore)
+                return error_code
+            else:
+                ## could not delete it - cannot continue:
+                return 1
+    else:
+        ## there are functions above the destination position function and they are in the same step as it.
+        if int(movefunctoscore) - 10 > function_above_score:
+            ## the function above has a score that is more than 10 below that into whose position we are moving
+            ## a function. It is therefore possible to set the new score as movefunctoscore - 10:
+            error_code = update_step_score_doctypesubmission_function(doctype=doctype,
+                                                                      action=action,
+                                                                      function=movefuncname,
+                                                                      oldstep=movefuncfromstep,
+                                                                      oldscore=movefuncfromscore,
+                                                                      newstep=movefunctostep,
+                                                                      newscore=int(movefunctoscore)-10)
+            return error_code
+        else:
+            ## there is not a space of 10 or more in the scores of the function into whose position our function
+            ## is to be moved and the function above it. It is necessary to augment the score of all functions
+            ## within the step of the one into whose position our function will be moved, from that position onwards,
+            ## by 10; then the function to be moved can be inserted into the newly created space
+
+            ## First, delete the function to be moved so that it is not changed during any augmentation:
+            error_code = delete_function_doctypesubmission_step_score(doctype=doctype,
+                                                                      action=action,
+                                                                      function=movefuncname,
+                                                                      step=movefuncfromstep,
+                                                                      score=movefuncfromscore)
+            if error_code == 0:
+                ## deletion successful
+                ## now augment the relevant scores:
+                update_score_allfunctions_in_step_from_score_doctypesubmission_add10(doctype=doctype,
+                                                                                                  action=action,
+                                                                                                  step=movefunctostep,
+                                                                                                  fromscore=movefunctoscore)
+                error_code = insert_function_doctypesubmission(doctype=doctype,
+                                                               action=action,
+                                                               function=movefuncname,
+                                                               step=movefunctostep,
+                                                               score=movefunctoscore)
+                return error_code
+            else:
+                ## could not delete it - cannot continue:
+                return 1
+
+
+        
+
+
+## def move_position_submissionfunction_fromposn_toposn(doctype, action, movefuncname, movefuncfromstep,
+##                                                     movefuncfromscore, movefunctoname, movefunctostep,
+##                                                     movefunctoscore):
+##     ## first check that there is a function "movefuncname"->"movefuncfromstep";"movefuncfromscore"
+##     numrows_movefunc = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
+##                                                                                       action=action,
+##                                                                                       function=movefuncname,
+##                                                                                       step=movefuncfromstep,
+##                                                                                       score=movefuncfromscore)
+##     if numrows_movefunc < 1:
+##         ## the function to move does not exist!
+##         return 1
+##     ## now check that there is a function "movefunctoname"->"movefunctostep";"movefunctoscore"
+##     numrows_movefunctoposn = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
+##                                                                                       action=action,
+##                                                                                       function=movefunctoname,
+##                                                                                       step=movefunctostep,
+##                                                                                       score=movefunctoscore)
+##     if numrows_movefunctoposn < 1:
+##         ## the function in the position to move to does not exist!
+##         return 1
+
+##     ## now update all functions in the step into which the function is to be moved, with a score higher than
+##     ## or equal to the one into whose position the function is to be moved:
+##     update_score_allfunctions_in_step_from_score_doctypesubmission_add10(doctype=doctype,
+##                                                                          action=action,
+##                                                                          step=movefunctostep,
+##                                                                          fromscore=movefunctoscore)
+##     ## now check to see whether there is any function at the score of step "movefunctostep"/"movefunctoscore":
+##     numrows_functions_in_tostep_toscore = get_number_functions_doctypesubmission_step_score(doctype=doctype,
+##                                                                                             action=action,
+##                                                                                             step=movefunctostep,
+##                                                                                             score=movefunctoscore)
+##     if numrows_functions_in_tostep_toscore == 0:
+##         ## nothing there now - update the function to be moved
+##         error_code = update_step_score_doctypesubmission_function(doctype=doctype,
+##                                                                   action=action,
+##                                                                   function=movefuncname,
+##                                                                   oldstep=movefuncfromstep,
+##                                                                   oldscore=movefuncfromscore,
+##                                                                   newstep=movefunctostep,
+##                                                                   newscore=movefunctoscore)
+##         return error_code
+##     else:
+##         ## unable to move the functions below out of the way - cannot move the function
+##         return 1
+
+
+
+
+
+
+def move_position_submissionfunction_down(doctype, action, function, funccurstep, funccurscore):
+    functions_below = get_functionname_step_score_allfunctions_afterreference_doctypesubmission(doctype=doctype,
+                                                                                                action=action,
+                                                                                                step=funccurstep,
+                                                                                                score=funccurscore)
+    numrows_functions_below = len(functions_below)
+    if numrows_functions_below < 1:
+        ## there are no functions below this - nothing to do
+        return 0 ## Everything OK
+    ## get the details of the function below this one:
+    name_function_below = functions_below[0][0]
+    step_function_below = int(functions_below[0][1])
+    score_function_below = int(functions_below[0][2])
+    if step_function_below > int(funccurstep):
+        ## the function below is in a higher step: update all functions in that step with their score += 10,
+        ## then place the function to be moved into that step with a score of that which the function below had
+        if score_function_below <= 10:
+            ## the score of the function below is 10 or less: add 10 to the score of all functions in that step
+            update_score_allfunctions_in_step_doctypesubmission_add10(doctype=doctype, action=action, step=step_function_below)
+            numrows_function_stepscore_moveto = get_number_functions_doctypesubmission_step_score(doctype=doctype,
+                                                                                                    action=action,
+                                                                                                    step=step_function_below,
+                                                                                                    score=score_function_below)
+            if numrows_function_stepscore_moveto == 0:
+                ## the score of the step that the function will be moved to is empty - it's safe to move the function there:
+                error_code = update_step_score_doctypesubmission_function(doctype=doctype,
+                                                                          action=action,
+                                                                          function=function,
+                                                                          oldstep=funccurstep,
+                                                                          oldscore=funccurscore,
+                                                                          newstep=step_function_below,
+                                                                          newscore=score_function_below)
+                return error_code
+            else:
+                ## could not move the functions below? Cannot move this function then
+                return 1
+        else:
+            ## the function below is already on a score higher than 10 - just move the function into score 10 in that step
+            error_code = update_step_score_doctypesubmission_function(doctype=doctype,
+                                                                      action=action,
+                                                                      function=function,
+                                                                      oldstep=funccurstep,
+                                                                      oldscore=funccurscore,
+                                                                      newstep=step_function_below,
+                                                                      newscore=10)
+            return error_code
+    else:
+        ## the function below is in the same step. Switch it with this function
+        ## first, delete the function below:
+        error_code = delete_function_doctypesubmission_step_score(doctype=doctype,
+                                                                  action=action,
+                                                                  function=name_function_below,
+                                                                  step=step_function_below,
+                                                                  score=score_function_below)
+        if error_code == 0:
+            ## now update the function to be moved with the step and score of the function that was below it
+            error_code = update_step_score_doctypesubmission_function(doctype=doctype,
+                                                                      action=action,
+                                                                      function=function,
+                                                                      oldstep=funccurstep,
+                                                                      oldscore=funccurscore,
+                                                                      newstep=step_function_below,
+                                                                      newscore=score_function_below)
+            if error_code == 0:
+                ## now insert the function that *was* below, into the position of the function that has just been moved
+                error_code = insert_function_doctypesubmission(doctype=doctype,
+                                                               action=action,
+                                                               function=name_function_below,
+                                                               step=funccurstep,
+                                                               score=funccurscore)
+                return error_code
+            else:
+                ## could not update the function that was to be moved! Try to re-insert that which was deleted
+                error_code = insert_function_doctypesubmission(doctype=doctype,
+                                                               action=action,
+                                                               function=name_function_below,
+                                                               step=step_function_below,
+                                                               score=score_function_below)
+                return 1 ## Returning an ERROR code to signal that the move did not work
+        else:
+            ## Unable to delete the function below that which we want to move. Cannot move the function then.
+            ## Return an error code to signal that things went wrong
+            return 1
+
+
+
+def get_funcname_allfunctions():
+    """Get and return a tuple of tuples containing the "function name" (function) for each WebSubmit function
+       in the WebSubmit database.
+       @return: tuple of tuples: ((function,),(function,)[,...])
+    """
+    q = """SELECT function FROM sbmALLFUNCDESCR ORDER BY function ASC"""
+    return run_sql(q)
+    
+
 def get_funcname_funcdesc_allfunctions():
     """Get and return a tuple of tuples containing the "function name" (function) and function textual
        description (description) for each WebSubmit function in the WebSubmit database.
-       @return: tuple of tuples: (function,description)
+       @return: tuple of tuples: ((function,description),(function,description)[,...])
     """
-    q = """SELECT function,description FROM sbmALLFUNCDESCR ORDER BY function ASC"""
+    q = """SELECT function, description FROM sbmALLFUNCDESCR ORDER BY function ASC"""
     return run_sql(q)
 
 def get_doctype_docnam_actid_actnam_fstep_fscore_function(function):
@@ -514,7 +894,7 @@ def get_number_submissions_doctype_action(doctype, action):
     """Return the number of SUBMISSIONS found for a given document type/action
        @param doctype: the unique ID of the document type for which submissions are to be counted
        @param actname: the unique ID of the action that the submission implements, that is to be counted
-       @return: an integer count of the number of submissions owned by this doctype
+       @return: an integer count of the number of submissions found for this doctype/action ID
     """
     q = """SELECT COUNT(subname) FROM sbmIMPLEMENT WHERE docname=%s and actname=%s"""
     return int(run_sql(q, (doctype, action))[0][0])
@@ -740,6 +1120,58 @@ def delete_all_parameters_doctype(doctype):
             ## still unable to recover - could not delete all parameters
             return 1
 
+def get_functionname_step_score_allfunctions_afterreference_doctypesubmission(doctype, action, step, score):
+    q = """SELECT function, step, score FROM sbmFUNCTIONS WHERE (doctype=%s AND action=%s) AND ((step=%s AND score > %s)""" \
+        """ OR (step > %s)) ORDER BY step ASC, score ASC"""
+    return run_sql(q, (doctype, action, step, score, step))
+
+
+def get_functionname_step_score_allfunctions_beforereference_doctypesubmission(doctype, action, step, score):
+    q = """SELECT function, step, score FROM sbmFUNCTIONS WHERE (doctype=%s AND action=%s) AND ((step=%s AND score < %s)"""
+    if step > 1:
+        q += """ OR (step < %s)"""
+    q += """) ORDER BY step ASC, score ASC"""
+    if step > 1:
+        return run_sql(q, (doctype, action, step, score, step))
+    else:
+        return run_sql(q, (doctype, action, step, score))
+
+def get_functionname_step_score_allfunctions_doctypesubmission(doctype, action):
+    """Return the details (function name, step, score) of all functions beloning to the submission (action) of
+       doctype.
+       @param doctype: unique ID of doctype for which the details of the functions of the given submission
+        are to be retrieved
+       @param action: the action ID of the submission whose function details ore to be retrieved
+       @return: a tuple of tuples: ((function, step, score),(function, step, score),[...])
+    """
+    q = """SELECT function, step, score FROM sbmFUNCTIONS where doctype=%s AND action=%s ORDER BY step ASC, score ASC"""
+    return run_sql(q, (doctype, action))
+
+def delete_function_doctypesubmission_step_score(doctype, action, function, step, score):
+    """Delete a given function at a particular step/score for a given doctype submission"""
+    q = """DELETE FROM sbmFUNCTIONS WHERE doctype=%s AND action=%s AND function=%s AND step=%s AND score=%s"""
+    run_sql(q, (doctype, action, function, step, score))
+    numrows_function_doctypesubmission_step_score = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
+                                                                                                                   action=action,
+                                                                                                                   function=function,
+                                                                                                                   step=step,
+                                                                                                                   score=score)
+    if numrows_function_doctypesubmission_step_score == 0:
+        ## Everything OK - function deleted
+        return 0
+    else:
+        ## Everything NOT OK - still some functions remaining for doctype/action
+        ## make a last attempt to delete them:
+        run_sql(q, (doctype, action, function, step, score))
+        ## check once more to see if functions remain:
+        if get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype, action=action, function=function,
+                                                                          step=step, score=score):
+            ## Everything OK - all functions for this doctype/action were deleted successfully this time
+            return 0
+        else:
+            ## still unable to recover - could not delete all functions for this doctype/action
+            return 1
+
 def delete_all_functions_foraction_doctype(doctype, action):
     """Delete all FUNCTIONS for a given action, belonging to a given doctype.
        @param doctype: the document type for which the functions are to be deleted
@@ -749,7 +1181,7 @@ def delete_all_functions_foraction_doctype(doctype, action):
         the functions could not be deleted for some reason)
     """
     q = """DELETE FROM sbmFUNCTIONS WHERE doctype=%s AND action=%s"""
-    run_sql(q, (doctype,action))
+    run_sql(q, (doctype, action))
     numrows_functions_actiondoctype = get_number_functions_action_doctype(doctype=doctype, action=action)
     if numrows_functions_actiondoctype == 0:
         ## Everything OK - no functions remain for this doctype/action
@@ -757,9 +1189,9 @@ def delete_all_functions_foraction_doctype(doctype, action):
     else:
         ## Everything NOT OK - still some functions remaining for doctype/action
         ## make a last attempt to delete them:
-        run_sql(q, (doctype,action))
+        run_sql(q, (doctype, action))
         ## check once more to see if functions remain:
-        if get_number_functions_action_doctype(doctype) == 0:
+        if get_number_functions_action_doctype(doctype=doctype, action=action) == 0:
             ## Everything OK - all functions for this doctype/action were deleted successfully this time
             return 0
         else:
@@ -838,6 +1270,17 @@ def clone_categories_fromdoctype_todoctype(fromdoctype, todoctype):
             return 2
     else:
         ## cannot delete "todoctype"s categories - return error code of 1 to signal this
+        return 1
+
+def insert_function_doctypesubmission(doctype, action, function, step, score):
+    numrows_function = get_number_functions_with_funcname(funcname=function)
+    if numrows_function > 0:
+        ## perform the insert
+        q = """INSERT INTO sbmFUNCTIONS (doctype, action, function, step, score) VALUES(%s, %s, %s, %s, %s)"""
+        run_sql(q, (doctype, action, function, step, score))
+        return 0
+    else:
+        ## function doesnt exist - cannot insert a row for it in a submission!
         return 1
 
 def clone_functions_foraction_fromdoctype_todoctype(fromdoctype, todoctype, action):
