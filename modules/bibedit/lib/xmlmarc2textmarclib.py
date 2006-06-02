@@ -20,6 +20,8 @@
 
 from invenio.bibrecord import create_records, create_record, record_get_field_values
 from random import randint, seed
+from os.path import basename
+from __future__ import generators
 import sys
 
 __version__ = "$Id$"
@@ -110,22 +112,29 @@ def _comp_datataginstances(x, y):
     else:
         return 1
 
-def generate_random_sys():
-    """Function used to generate a random 9-digit system number.
-       @return: string (9-digits)
+def get_sysno_generator():
+    """Create and return a generator for an ALEPH system number.
+       The generator will create a 9-digit string, i.e. it the sequence will
+       end when it reaches 1000000000.
+       @return: generator.
     """
     sysno = ""
     seed()
-    for i in range(0, 9):
-        sysno += str(randint(0,9))
-    return sysno
+    ## make a 3-digit string for sysno's value:
+    for i in range(0, 3):
+        sysno += str(randint(1,9))
+    sysno = int(sysno)
+    while sysno < 1000000000:
+        yield """%09d""" % (sysno,)
+        sysno = sysno + 1
 
-
-def print_record(record, sysno, options):
+def print_record(record, sysno, options, sysno_generator=get_sysno_generator()):
     """Create a text-marc, or aleph-marc record from the contents of "record", and return it as a string.
        @param record: Internal representation of an XML MARC record, created by bibrecord.
        @param sysno: the system number to be used for the record
        @param options: the options about the MARC record to be created, as passed from command line
+       @param sysno_generator: A static parameter to act as an ALEPH system number generator. Do not provide a
+        value for this - it will be assigned upon first call to this function.
        @return: string (MARC record, either text-marc or ALEPH marc format, depending upon "options".
     """
     out = ""
@@ -136,7 +145,13 @@ def print_record(record, sysno, options):
         display_001 = 1
         ## if the SYS is None, make a random SYS
         if sysno is None:
-            sysno = generate_random_sys()
+            ## get a value for the sysno:
+            try:
+                sysno = sysno_generator.next()
+            except StopIteration:
+                ## generator counter has overstepped the MAX ALEPH SYS!
+                sys.stderr.write("""Error: Maximum ALEPH SYS has been reached - unable to continue.\n""")
+                sys.exit(1)
             display_001 = 0
         ## ALEPH record headers:
         if 1 not in (options["modify-mode"], options["append-mode"]):
@@ -344,12 +359,10 @@ def _get_sysno(record, options):
         vals001 = record_get_field_values(rec=record, tag="001")
         if len(vals001) > 1:
             ## multiple values for recid is illegal!
-            sys.stderr.write("Error: found multiple values for recid (001)\n")
-            sys.exit(1)
+            sysno = None
         elif len(vals001) < 1:
             ## no value for recid is illegal!
-            sys.stderr.write("Error: found no value for recid (001)\n")
-            sys.exit(1)
+            sysno = None
         else:
             ## get recid
             sysno = vals001[0]
@@ -380,24 +393,55 @@ def recxml2recmarc(xmltext, options):
     if xmltext.find("<collection") != -1:
         ## this is a collection of records:
         try:
+            ## parse XML into internal records structure
             records = create_records(xmltext, 1, 1)
-            for record in records:
-                sysno = _get_sysno(record=record[0], options=options)
-                sys.stdout.write("""%s""" % (print_record(record=record[0], sysno=sysno, options=options),))
         except:
             ## xml parsing failed:
             sys.stderr.write("""Error: Unable to parse xml file.\n""")
             sys.exit(1)
+        ## now loop through each record, get its sysno, and convert it:
+        for record in records:
+            sysno = _get_sysno(record=record[0], options=options)
+            if sysno is None:
+                if options["text-marc"] == 1:
+                    ## cannot create text-marc for a record with no 001 (recid)!
+                    sys.stderr.write("""Error: Unable to correctly determine recid (001) - record skipped.\n""")
+                    continue
+                elif options["aleph-marc"] ==  1 and 1 in (options["append-mode"], options["delete-mode"], \
+                                                           options["modify-mode"], options["replace-mode"]):
+                    ## cannot create ALEPH MARC to manipulate a record when SYS is unknown!
+                    sys.stderr.write("""Error: Unable to create a ALEPH MARC to manipulate a record for which SYS is unknown! """\
+                                     """Record skipped.\n""")
+                    continue
+            sys.stdout.write("""%s""" % (print_record(record=record[0], sysno=sysno, options=options),))
     else:
         ## assuming that this is just a single record - not encapsulated by collection tags:
         try:
+            ## parse XML into internal record structure
             (record, st, e) = create_record(xmltext, 1, 1)
-            sysno = _get_sysno(record=record, options=options)
-            sys.stdout.write("""%s""" % (print_record(record=record, sysno=sysno, options=options),))
         except:
             ## xml parsing failed:
             sys.stderr.write("""Error: Unable to parse xml file.\n""")
             sys.exit(1)
+        if record is None:
+            ## there was no record:
+            sys.stderr.write("""Error: Unable to read record from xml file.\n""")
+            sys.exit(1)
+
+        ## now get the sysno for the record:
+        sysno = _get_sysno(record=record, options=options)
+        if sysno is None:
+            if options["text-marc"] == 1:
+                ## cannot create text-marc for a record with no 001 (recid)!
+                sys.stderr.write("""Error: Unable to correctly determine recid (001) - record skipped.\n""")
+                sys.exit(1)
+            elif options["aleph-marc"] ==  1 and 1 in (options["append-mode"], options["delete-mode"], \
+                                                       options["modify-mode"], options["replace-mode"]):
+                ## cannot create ALEPH MARC to manipulate a record when SYS is unknown!
+                sys.stderr.write("""Error: Unable to create a ALEPH MARC to manipulate a record for which SYS is unknown! """ \
+                                 """Record skipped.\n""")
+                sys.exit(1)
+        sys.stdout.write("""%s""" % (print_record(record=record, sysno=sysno, options=options),))
 
 def usage(exitcode=1, msg=""):
     """Prints usage info."""
@@ -423,6 +467,6 @@ Command options:
 General options:
   -h, --help   \t\t\t Print this help.
   -V, --version\t\t\t Print version information.
-""" % (sys.argv[0],))
+""" % (basename(sys.argv[0]),))
     
     sys.exit(exitcode)
