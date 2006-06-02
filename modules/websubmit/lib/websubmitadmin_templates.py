@@ -140,57 +140,6 @@ def create_html_select_list(select_name, option_list, selected_values="", defaul
     return txt
 
 
-## def create_html_select_list(select_name, option_list, selected_values="", multiple="", list_size=""):
-##     """Make a HTML "select" element from the parameters passed.
-##        @param select_name: Name given to the HTML "select" element
-##        @param option_list: a tuple of tuples containing the options (their values, followed by their
-##         display text).  Thus: ( (opt_val, opt_txt), (opt_val, opt_txt) )
-##         It is also possible to provide a tuple of single-element tuples in the case when it is not desirable
-##         to have different option text to the value, thus: ( (opt_val,), (opt_val,) ).
-##        @param selected_value: can be a list/tuple of strings, or a single string/unicode string.  Treated as
-##         the "selected" values for the select list's options.  E.g. if a value in the "option_list" param was
-##         "test", and the "selected_values" parameter contained "test", then the test option would appear as
-##         follows: '<option value="test" selected>'.
-##        @param multiple: shall this be a multiple select box? If present, select box will be marked as "multiple".
-##        @param list_size: the size for a multiple select list. If mutiple is present, then this optional size can
-##         be provided.  If not provided, the list size attribute will automatically be given the value of the list
-##         length, up to 30.
-##        @return: a string containing the completed HTML Select element
-##     """
-##     ## sanity checking:
-##     if type(option_list) not in (list, tuple):
-##         option_list = ()
-##     txt = """\n   <select name="%s"%s""" % ( cgi.escape(select_name, 1),
-##                                              (multiple != "" and " multiple") or ("")
-##                                            )
-##     if multiple != "":
-##         ## Size attribute for multiple-select list
-##         if (type(list_size) is str and list_size.isdigit()) or type(list_size) is int:
-##             txt += """ size="%s\"""" % (list_size,)
-##         else:
-##             txt += """ size="%s\"""" % ( (len(option_list) <= 30 and str(len(option_list))) or ("30"),)
-##     txt += """>
-##     <option value="NO_VALUE">Select:</option>\n"""
-##     for option in option_list:
-##         try:
-##             txt += """    <option value="%(option_val)s\"""" % { 'option_val' : cgi.escape(option[0], 1) }
-##             if type(selected_values) in (list, tuple):
-##                 txt += """%(option_selected)s""" % \
-##                  { 'option_selected' : (option[0] in selected_values and " selected") or ("") }
-##             elif type(selected_values) in (str, unicode) and selected_values != "":
-##                 txt += """%(option_selected)s""" % \
-##                  { 'option_selected' : (option[0] == selected_values and " selected") or ("") }
-##             try:
-##                 txt += """>%(option_txt)s</option>\n""" % { 'option_txt' : cgi.escape(option[1], 1) }
-##             except IndexError:
-##                 txt += """>%(option_txt)s</option>\n""" % { 'option_txt' : cgi.escape(option[0], 1) }
-##         except IndexError:
-##             ## empty option tuple - skip
-##             pass
-##     txt += """   </select>\n"""
-##     return txt
-
-
 class Template:
     """CDS Invenio Template class for creating Web interface"""
     def tmpl_navtrail(self, ln=cdslang):
@@ -1577,7 +1526,7 @@ class Template:
                                                                  'formaction' : cgi.escape(perform_act, 1),
                                                                  'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1)
                                                                },
-                                               """<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/%(formaction)s">""" \
+                                               """<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionfunctions">""" \
                                                """<input class="hyperlinkformHiddenInput" name="doctype" value="%(doctype)s" type""" \
                                                """="hidden" />""" \
                                                """<input class="hyperlinkformHiddenInput" name="action" value="%(action)s" type""" \
@@ -1586,7 +1535,6 @@ class Template:
                                                """class="hyperlinkformSubmitButton" />""" \
                                                """</form>""" % { 'doctype' : cgi.escape(doctype, 1),
                                                                  'action' : cgi.escape(str(subm[2]), 1),
-                                                                 'formaction' : cgi.escape(perform_act, 1),
                                                                  'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1)
                                                                },
                                                """<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/%(formaction)s">""" \
@@ -1821,4 +1769,178 @@ class Template:
                                         datalist=[body_content])
         return output
 
+    def tmpl_configuredoctype_display_submissionfunctions(self,
+                                                          doctype,
+                                                          action,
+                                                          submissionfunctions,
+                                                          allWSfunctions,
+                                                          movefromfunctionname="",
+                                                          movefromfunctionstep="",
+                                                          movefromfunctionscore="",
+                                                          perform_act="doctypeconfiguresubmissionfunctions",
+                                                          user_msg=""
+                                                         ):
+        """Create the page body used for displaying all Websubmit functions.
+           @param functions: A tuple of tuples containing the function name, and the function
+                             description (function, description).
+           @param user_msg: Any message to be displayed on screen, such as a status report for the last task, etc.
+           return: HTML page body.
+        """
+        ## sanity checking:
+        if type(submissionfunctions) not in (list, tuple):
+            submissionfunctions = ()
+        if type(allWSfunctions) not in (list, tuple):
+            allWSfunctions = ()
+        
+        output = ""
+        output += self._create_user_message_string(user_msg)
+        body_content = """<div><br />\n"""
+        header = ["Function Name", "&nbsp;", "&nbsp;", "&nbsp;", "Step", "Score", "View Parameters", "Delete", "&nbsp;"]
+        tbody = []
+        num_functions = len(submissionfunctions)
+        for i in range(0, num_functions):
+            thisfunctionname  = submissionfunctions[i][0]
+            thisfunctionstep  = str(submissionfunctions[i][1])
+            thisfunctionscore = str(submissionfunctions[i][2])
+            t_row = ["""&nbsp;&nbsp;%s""" % (cgi.escape(thisfunctionname, 1),)]
+            ## up arrow:
+            if i != 0:
+                t_row += ["""<a href="%(websubadmin_url)s/%(performaction)s?doctype=%(doctype)s&action=%(action)s&"""\
+                          """moveupfunctionname=%(func)s&moveupfunctionstep=%(step)s&moveupfunctionscore=%(score)s">"""\
+                          """<img border="0" src="%(weburl)s/img/smallup.gif" title="Move Function Up" /></a>""" \
+                          % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                              'performaction'   : cgi.escape(perform_act, 1),
+                              'weburl'          : cgi.escape(weburl, 1),
+                              'doctype'         : cgi.escape(doctype, 1),
+                              'action'          : cgi.escape(action, 1),
+                              'func'            : cgi.escape(thisfunctionname, 1),
+                              'step'            : cgi.escape(thisfunctionstep, 1),
+                              'score'           : cgi.escape(thisfunctionscore, 1)
+                            }
+                         ]
+            else:
+                ## this is the first function - don't provide an arrow to move it up
+                t_row += ["&nbsp;"]
+            ## down arrow:
+            if num_functions > 1 and i < num_functions - 1:
+                t_row += ["""<a href="%(websubadmin_url)s/%(performaction)s?doctype=%(doctype)s&action=%(action)s&"""\
+                          """movedownfunctionname=%(func)s&movedownfunctionstep=%(step)s&movedownfunctionscore=%(score)s">"""\
+                          """<img border="0" src="%(weburl)s/img/smalldown.gif" title="Move Function Down" /></a>""" \
+                          % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                              'performaction'   : cgi.escape(perform_act, 1),
+                              'weburl'          : cgi.escape(weburl, 1),
+                              'doctype'         : cgi.escape(doctype, 1),
+                              'action'          : cgi.escape(action, 1),
+                              'func'            : cgi.escape(thisfunctionname, 1),
+                              'step'            : cgi.escape(thisfunctionstep, 1),
+                              'score'           : cgi.escape(thisfunctionscore, 1)
+                            }
+                         ]
+            else:
+                t_row += ["&nbsp;"]
+
+            if movefromfunctionname in ("", None):
+                ## provide "move from" arrows for all functions
+                if num_functions > 1:
+                    t_row += ["""<a href="%(websubadmin_url)s/%(performaction)s?doctype=%(doctype)s&action=%(action)s&"""\
+                              """movefromfunctionname=%(func)s&movefromfunctionstep=%(step)s&movefromfunctionscore=%(score)s">"""\
+                              """<img border="0" src="%(weburl)s/img/move_from.gif" title="Move %(func)s (step %(step)s, score %(score)s)"""\
+                              """ from this location" /></a>"""\
+                              % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                                  'performaction'   : cgi.escape(perform_act, 1),
+                                  'weburl'          : cgi.escape(weburl, 1),
+                                  'doctype'         : cgi.escape(doctype, 1),
+                                  'action'          : cgi.escape(action, 1),
+                                  'func'            : cgi.escape(thisfunctionname, 1),
+                                  'step'            : cgi.escape(thisfunctionstep, 1),
+                                  'score'           : cgi.escape(thisfunctionscore, 1)
+                                }
+                            ]
+                else:
+                    t_row += ["&nbsp;"]
+            else:
+                ## there is a value for "movefromfunctionname", so a "moveto" button must be provided
+                if num_functions > 1:
+                    ## is this the function that will be moved?
+                    if movefromfunctionname  == thisfunctionname and \
+                       movefromfunctionstep  == thisfunctionstep and \
+                       movefromfunctionscore == thisfunctionscore:
+                        ## yes it is - no "move-to" arrow here
+                        t_row += ["&nbsp;"]
+                    else:
+                        ## no it isn't - "move-to" arrow here
+                        t_row += ["""<a href="%(websubadmin_url)s/%(performaction)s?doctype=%(doctype)s&action=%(action)s&"""\
+                                  """movefromfunctionname=%(fromfunc)s&movefromfunctionstep=%(fromstep)s&movefromfunctionscore=%(fromscore)s&"""\
+                                  """movetofunctionname=%(tofunc)s&movetofunctionstep=%(tostep)s&movetofunctionscore=%(toscore)s">"""\
+                                  """<img border="0" src="%(weburl)s/img/move_to.gif" title="Move %(fromfunc)s (step %(fromstep)s, score %(fromscore)s)"""\
+                                  """ to this location (step %(tostep)s, score %(toscore)s)" /></a>"""\
+                                  % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                                      'performaction'   : cgi.escape(perform_act, 1),
+                                      'weburl'          : cgi.escape(weburl, 1),
+                                      'doctype'         : cgi.escape(doctype, 1),
+                                      'action'          : cgi.escape(action, 1),
+                                      'fromfunc'        : cgi.escape(movefromfunctionname, 1),
+                                      'fromstep'        : cgi.escape(movefromfunctionstep, 1),
+                                      'fromscore'       : cgi.escape(movefromfunctionscore, 1),
+                                      'tofunc'          : cgi.escape(thisfunctionname, 1),
+                                      'tostep'          : cgi.escape(thisfunctionstep, 1),
+                                      'toscore'         : cgi.escape(thisfunctionscore, 1)
+                                    }
+                                 ]
+                else:
+                    ## there is only 1 function - cannot perform a "move"!
+                    t_row += ["&nbsp;"]
+
+            ## function step:
+            t_row += ["""%s""" % (cgi.escape(thisfunctionstep, 1),) ]
+            ## function score:
+            t_row += ["""%s""" % (cgi.escape(thisfunctionscore, 1),) ]
+
+            ## "view parameters" link:
+            t_row += ["""<small><a href="%s/functionusage?funcname=%s">view parameters</a></small>""" \
+                      % (websubmitadmin_weburl, cgi.escape(submissionfunctions[i][0], 1)) ]
+            ## "delete function" link:
+            t_row += ["""<small><a href="%(websubadmin_url)s/%(performaction)s?doctype=%(doctype)s&action=%(action)s&"""\
+                      """deletefunctionname=%(func)s&deletefunctionstep=%(step)s&deletefunctionscore=%(score)s">"""\
+                      """delete</a></small>""" \
+                      % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                          'performaction'   : cgi.escape(perform_act, 1),
+                          'doctype'         : cgi.escape(doctype, 1),
+                          'action'          : cgi.escape(action, 1),
+                          'func'            : cgi.escape(thisfunctionname, 1),
+                          'step'            : cgi.escape(thisfunctionstep, 1),
+                          'score'           : cgi.escape(thisfunctionscore, 1)
+                        }
+                     ]
+
+            ## final column containing "jumping-out from" image when moving a function:
+            if movefromfunctionname not in ("", None):
+                if movefromfunctionname  == thisfunctionname and \
+                   movefromfunctionstep  == thisfunctionstep and \
+                   movefromfunctionscore == thisfunctionscore and \
+                   num_functions > 1:
+                    t_row += ["""<img border="0" src="%(weburl)s/img/move_from.gif" title="Moving %(fromfunc)s (step %(fromstep)s, """\
+                              """score %(fromscore)s) from this location" />"""\
+                              % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                                  'performaction'   : cgi.escape(perform_act, 1),
+                                  'weburl'          : cgi.escape(weburl, 1),
+                                  'fromfunc'        : cgi.escape(movefromfunctionname, 1),
+                                  'fromstep'        : cgi.escape(movefromfunctionstep, 1),
+                                  'fromscore'       : cgi.escape(movefromfunctionscore, 1),
+                                }
+                             ]
+                else:
+                    t_row += ["&nbsp;"]
+            else:
+                t_row += ["&nbsp;"]
+
+            ## finally, append the newly created row to the tbody list:
+            tbody.append(t_row)
+
+        body_content += create_html_table_from_tuple(tableheader=header, tablebody=tbody)
+        body_content += """</div>"""
+        output += self._create_websubmitadmin_main_menu_header()
+        output += self._create_adminbox(header="""Functions of the "%s" Submission of the "%s" Document Type:""" \
+                                        % (cgi.escape(action, 1), cgi.escape(doctype, 1)), datalist=[body_content])
+        return output
 
