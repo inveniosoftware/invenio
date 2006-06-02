@@ -91,7 +91,7 @@ def main():
     try:
         xmltext = open(xmlfile, 'r').read()
     except IOError:
-        sys.stderr.out("Error: File %s not found." % (xmlfile,))
+        sys.stderr.write("Error: File %s not found.\n\n" % (xmlfile,))
         usage(1)
 
     ## Process record conversion:
