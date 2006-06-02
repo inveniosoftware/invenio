@@ -5,6 +5,7 @@ from invenio.websubmitadmin_dblayer import *
 from invenio.websubmitadmin_config import *
 from invenio.access_control_admin import acc_getAllRoles, acc_getRoleUsers
 from invenio.config import cdslang
+from invenio.access_control_engine import acc_authorize_action
 
 import invenio.template
 
@@ -16,6 +17,16 @@ except:
 
 
 ## utility functions:
+
+def is_adminuser(uid, role):
+    """check if user is a registered administrator. """
+    return acc_authorize_action(uid, role)
+
+def check_user(uid, role, adminarea=2, authorized=0):
+    (auth_code, auth_message) = is_adminuser(uid, role)
+    if not authorized and auth_code != 0:
+        return ("false", auth_message)
+    return ("", auth_message)
 
 def get_navtrail(ln=cdslang):
     """gets the navtrail for title...
