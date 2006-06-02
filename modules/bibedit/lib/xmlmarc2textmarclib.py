@@ -371,9 +371,8 @@ def _get_sysno(record, options):
     else:
         vals970a = record_get_field_values(rec=record, tag="970", code="a")
         if len(vals970a) > 1:
-            ## multiple SYS is illegal:
-            sys.stderr.write("Error: found multiple values for SYS (970__a)\n")
-            sys.exit(1)
+            ## multiple SYS is illegal - return a list of them all, let other functions decide what to do
+            return vals970a
         if len(vals970a) < 1:
             ## no SYS
             sysno = None
@@ -413,6 +412,11 @@ def recxml2recmarc(xmltext, options):
                     sys.stderr.write("""Error: Unable to create a ALEPH MARC to manipulate a record for which SYS is unknown! """\
                                      """Record skipped.\n""")
                     continue
+            elif options["aleph-marc"] == 1 and type(sysno) in (list, tuple):
+                ## multiple values for SYS in aleph-mode - not permitted
+                sys.stderr.write("""Error: Multiple values for SYS (970__a) are not permitted when running in ALEPH MARC mode. """ \
+                                 """Record skipped.\n""")
+                continue
             sys.stdout.write("""%s""" % (print_record(record=record[0], sysno=sysno, options=options),))
     else:
         ## assuming that this is just a single record - not encapsulated by collection tags:
@@ -441,6 +445,11 @@ def recxml2recmarc(xmltext, options):
                 sys.stderr.write("""Error: Unable to create a ALEPH MARC to manipulate a record for which SYS is unknown! """ \
                                  """Record skipped.\n""")
                 sys.exit(1)
+        elif options["aleph-marc"] == 1 and type(sysno) in (list, tuple):
+            ## multiple values for SYS in aleph-mode - not permitted
+            sys.stderr.write("""Error: Multiple values for SYS (970__a) are not permitted when running in ALEPH MARC mode. """ \
+                             """Record skipped.\n""")
+            sys.exit(1)
         sys.stdout.write("""%s""" % (print_record(record=record, sysno=sysno, options=options),))
 
 def usage(exitcode=1, msg=""):
