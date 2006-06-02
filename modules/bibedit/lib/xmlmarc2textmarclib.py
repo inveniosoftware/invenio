@@ -288,7 +288,7 @@ def print_field(field_lines, alephmarc=0):
                                                                    }
             elif num_linesegments == 1:
                 ## strange - only a SYS?
-                out += "%(sys)s" % { 'sys' : line[0][1] }
+                out += "%(sys)s\n" % { 'sys' : line[0][1] }
     return out
 
 def create_field_lines(fieldname, field, sysno, alephmarc=0):
@@ -409,7 +409,7 @@ def recxml2recmarc(xmltext, options):
                 elif options["aleph-marc"] ==  1 and 1 in (options["append-mode"], options["delete-mode"], \
                                                            options["modify-mode"], options["replace-mode"]):
                     ## cannot create ALEPH MARC to manipulate a record when SYS is unknown!
-                    sys.stderr.write("""Error: Unable to create a ALEPH MARC to manipulate a record for which SYS is unknown! """\
+                    sys.stderr.write("""Error: Unable to create ALEPH MARC to manipulate a record for which SYS is unknown! """\
                                      """Record skipped.\n""")
                     continue
             elif options["aleph-marc"] == 1 and type(sysno) in (list, tuple):
@@ -442,7 +442,7 @@ def recxml2recmarc(xmltext, options):
             elif options["aleph-marc"] ==  1 and 1 in (options["append-mode"], options["delete-mode"], \
                                                        options["modify-mode"], options["replace-mode"]):
                 ## cannot create ALEPH MARC to manipulate a record when SYS is unknown!
-                sys.stderr.write("""Error: Unable to create a ALEPH MARC to manipulate a record for which SYS is unknown! """ \
+                sys.stderr.write("""Error: Unable to create ALEPH MARC to manipulate a record for which SYS is unknown! """ \
                                  """Record skipped.\n""")
                 sys.exit(1)
         elif options["aleph-marc"] == 1 and type(sysno) in (list, tuple):
