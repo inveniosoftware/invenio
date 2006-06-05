@@ -173,7 +173,7 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
                 keywords="",
                 uid=uid,
                 language=ln,
-                urlargs=req.args)
+                req=req)
 
 def deleteSubmission(id, action, doctype, u_email):
     global storage
@@ -192,7 +192,7 @@ def warningMsg(title,req,c=cdsname,ln=cdslang):
                 description="%s - Internal Error" % c,
                 keywords="%s, CDS Invenio, Internal Error" % c,
                 language=ln,
-                urlargs=req.args)
+                req=req)
 
 def errorMsg(title,req,c=cdsname,ln=cdslang):
     return page(title="error",
@@ -200,5 +200,5 @@ def errorMsg(title,req,c=cdsname,ln=cdslang):
                 description="%s - Internal Error" % c,
                 keywords="%s, CDS Invenio, Internal Error" % c,
                 language=ln,
-                urlargs=req.args)
+                req=req)
 

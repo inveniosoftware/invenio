@@ -69,5 +69,5 @@ def errorMsg(title,req,c=cdsname,ln=cdslang):
                     description="%s - Internal Error" % c, 
                     keywords="%s, CDS Invenio, Internal Error" % c,
                     language=ln,
-                    urlargs=req.args)
+                    req=req)
 

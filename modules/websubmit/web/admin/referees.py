@@ -97,7 +97,7 @@ def index(req,c=cdsname,ln=cdslang,todo="",id="",doctype="",categ="",addusers=""
                     keywords="",
                     uid=uid,
                     language=ln,
-                    urlargs=req.args)
+                    req=req)
 
 def displayRefereesPage(doctype,warningText):
     t=""
@@ -218,5 +218,5 @@ def errorMsg(title,req,uid,c=cdsname,ln=cdslang):
                     keywords="%s, CDS Invenio, Internal Error" % c,
                     language=ln,
                     uid=uid,
-                    urlargs=req.args)
+                    req=req)
 

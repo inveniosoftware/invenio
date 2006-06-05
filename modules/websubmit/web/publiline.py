@@ -78,7 +78,7 @@ def index(req,c=cdsname,ln=cdslang,doctype="",categ="",RN="",send=""):
                 keywords="",
                 uid=uid,
                 language=ln,
-                urlargs=req.args)
+                req=req)
 
 def selectDoctype(ln = cdslang):
     res = run_sql("select DISTINCT doctype from sbmAPPROVAL")
@@ -349,7 +349,7 @@ def errorMsg(title,req,c=cdsname,ln=cdslang):
                 description="%s - Internal Error" % c,
                 keywords="%s, CDS Invenio, Internal Error" % c,
                 language=ln,
-                urlargs=req.args)
+                req=req)
 
 def warningMsg(title,req,c=cdsname,ln=cdslang):
     return page(title="warning",
@@ -357,5 +357,5 @@ def warningMsg(title,req,c=cdsname,ln=cdslang):
                 description="%s - Internal Error" % c,
                 keywords="%s, CDS Invenio, Internal Error" % c,
                 language=ln,
-                urlargs=req.args)
+                req=req)
 

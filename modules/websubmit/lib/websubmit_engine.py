@@ -452,7 +452,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
                 keywords = "submit, CDSWare",
                 uid = uid,
                 language = ln,
-                urlargs = req.args)
+                req = req)
 
 
 def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="", \
@@ -695,7 +695,7 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
                 keywords="submit, CDSWare",
                 uid = uid,
                 language = ln,
-                urlargs = req.args)
+                req = req)
 
 def home(req, c=cdsname, ln=cdslang):
     """
@@ -726,7 +726,7 @@ def home(req, c=cdsname, ln=cdslang):
                keywords="submit, CDSWare",
                uid=uid,
                language=ln,
-               urlargs=req.args
+               req=req
                )
 
 def makeCataloguesTable(ln):
@@ -886,7 +886,7 @@ def action(req, c=cdsname, ln=cdslang, doctype=""):
                 keywords="submit, CDSWare",
                 uid=uid,
                 language=ln,
-                urlargs=req.args
+                req=req
                )
 
 
@@ -1076,7 +1076,7 @@ def errorMsg(title, req, c=cdsname, ln=cdslang):
                 description="%s - Internal Error" % c,
                 keywords="%s, CDS Invenio, Internal Error" % c,
                 language=ln,
-                urlargs=req.args)
+                req=req)
 
 def warningMsg(title, req, c=cdsname, ln=cdslang):
     # load the right message language
@@ -1087,7 +1087,7 @@ def warningMsg(title, req, c=cdsname, ln=cdslang):
                 description="%s - Internal Error" % c,
                 keywords="%s, CDS Invenio, Internal Error" % c,
                 language=ln,
-                urlargs=req.args)
+                req=req)
 
 def getCookie(name, uid):
     # these are not real http cookies but are stored in the DB

@@ -91,7 +91,7 @@ def index(req,c=cdsname,ln=cdslang,recid="",docid="",version="",name="",format="
                 keywords="keywords",
                 uid=uid,
                 language=ln,
-                urlargs=req.args
+                req=req
                )
 
 def errorMsg(title,req,c=cdsname,ln=cdslang):
@@ -101,7 +101,7 @@ def errorMsg(title,req,c=cdsname,ln=cdslang):
                     description=_("%s - Internal Error") % c,
                     keywords="%s, CDS Invenio, Internal Error" % c,
                     language=ln,
-                    urlargs=req.args)
+                    req=req)
 
 def warningMsg(title,req,c=cdsname,ln=cdslang):
     _ = gettext_set_language(ln)
@@ -110,5 +110,5 @@ def warningMsg(title,req,c=cdsname,ln=cdslang):
                     description=_("%s - Internal Error") % c,
                     keywords="%s, CDS Invenio, Internal Error" % c,
                     language=ln,
-                    urlargs=req.args)
+                    req=req)
 

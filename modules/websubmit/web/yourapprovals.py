@@ -94,7 +94,7 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
                 keywords="",
                 uid=uid,
                 language=ln,
-                urlargs=req.args)
+                req=req)
 
 def isReferee(uid,doctype="",categ=""):
     (auth_code, auth_message) = acc_authorize_action(uid, "referee",verbose=0,doctype=doctype, categ=categ)
@@ -109,5 +109,5 @@ def errorMsg(title,req,c=cdsname,ln=cdslang):
                     description="%s - Internal Error" % c,
                     keywords="%s, CDS Invenio, Internal Error" % c,
                     language=ln,
-                    urlargs=req.args)
+                    req=req)
 
