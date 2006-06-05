@@ -44,6 +44,6 @@ def send_report(req, header="NA", url="NA", time="NA", browser="NA", client="NA"
         }
     return page(title="Thanks", body=out, navtrail="", description="", keywords="",
                 cdspageheaderadd="", cdspageboxlefttopadd="", cdspageboxleftbottomadd="", cdspageboxrighttopadd="",
-                cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="", urlargs="", verbose=1, titleprologue="", titleepilogue="",
+                cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="", verbose=1, titleprologue="", titleepilogue="",
                 req=req)
 
