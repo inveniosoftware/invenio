@@ -1085,7 +1085,7 @@ class Template:
 
           - 'browsed_phrases_in_colls' *array* - the phrases to display
 
-          - 'urlargs_colls' *string* - the url parameters for the search
+          - 'colls' *array* - the list of collection parameters of the search (c's)
         """
 
         # load the right message language
