@@ -20,6 +20,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.config import *
+from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.dbquery import run_sql
 from invenio.bibrank_downloads_indexer import database_tuples_to_single_list
 
@@ -66,6 +67,9 @@ def register_page_view_event(recid, uid, client_ip_address):
        consulted by user UID from machine CLIENT_HOST_IP.
        To be called by the search engine.
     """
+    if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+        # do not register access if we are in read-only access control site mode:
+        return []
     return run_sql("INSERT INTO rnkPAGEVIEWS (id_bibrec,id_user,client_host,view_time) " \
                    "VALUES (%s,%s,INET_ATON(%s),NOW())", (recid, uid, client_ip_address))    
 
