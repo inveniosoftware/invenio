@@ -20,7 +20,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.config import *
-from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.dbquery import run_sql
 from invenio.bibrank_downloads_indexer import database_tuples_to_single_list
 
