@@ -67,6 +67,7 @@ def display(req, p="n", ln = cdslang):
                 keywords="CDS, personalize",
                 uid=uid,
                 language=ln,
+                req=req,
                 lastupdated=__lastupdated__)
 
 def input(req, idq, name="", freq="week", notif="y", idb=0, error_msg="", ln = cdslang):
@@ -95,6 +96,7 @@ def input(req, idq, name="", freq="week", notif="y", idb=0, error_msg="", ln = c
                 keywords="CDS, personalize",
                 uid=uid,
                 language=ln,
+                req=req,
                 lastupdated=__lastupdated__)
 
 def modify(req, idq, old_idb, name="", freq="week", notif="y", idb=0, error_msg="", ln = cdslang):
@@ -123,6 +125,7 @@ def modify(req, idq, old_idb, name="", freq="week", notif="y", idb=0, error_msg=
                 keywords="CDS, personalize",
                 uid=uid,
                 language=ln,
+                req=req,
                 lastupdated=__lastupdated__)
 
 def list(req, ln = cdslang):
@@ -144,6 +147,7 @@ def list(req, ln = cdslang):
                 keywords="CDS, personalize",
                 uid=uid,
                 language=ln,
+                req=req,
                 lastupdated=__lastupdated__)
 
 def add(req, name, freq, notif, idb, idq, ln = cdslang):
@@ -169,6 +173,7 @@ def add(req, name, freq, notif, idb, idq, ln = cdslang):
                 keywords="CDS, personalize",
                 uid=uid,
                 language=ln,
+                req=req,
                 lastupdated=__lastupdated__)
 
 def update(req, name, freq, notif, idb, idq, old_idb, ln = cdslang):
@@ -194,6 +199,7 @@ def update(req, name, freq, notif, idb, idq, old_idb, ln = cdslang):
                 keywords="CDS, personalize",
                 uid=uid,
                 language=ln,
+                req=req,
                 lastupdated=__lastupdated__)
 
 def remove(req, name, idu, idq, idb, ln = cdslang):
@@ -215,6 +221,7 @@ def remove(req, name, idu, idq, idb, ln = cdslang):
                 keywords="CDS, personalize",
                 uid=uid,
                 language=ln,
+                req=req,
                 lastupdated=__lastupdated__)
 
 def errorMsg(title, req, c=cdsname, ln=cdslang):
@@ -223,4 +230,4 @@ def errorMsg(title, req, c=cdsname, ln=cdslang):
                 description="%s - Internal Error" % c,
                 keywords="%s, CDS Invenio, Internal Error" % c,
                 language=ln,
-                urlargs=req.args)
+                req=req)
