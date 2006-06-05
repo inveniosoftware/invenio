@@ -180,6 +180,10 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                     # display page not found for URLs like /record/foo
                     return None, []
 
+            if recid <= 0:
+                # display page not found for URLs like /record/-5 or /record/0
+                return None, []
+
             def answer(req, form):
                 args = wash_search_urlargd(form)
                 args['recid'] = recid
