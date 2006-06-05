@@ -73,11 +73,10 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
                cdspagefooteradd is a message to be displayed on the top of the page footer
                lastupdated is a text containing the info on last update (optional)
                language is the language version of the page
-               urlargs are the URL arguments of the page to display (useful to affect languages)
                verbose is verbosity of the page (useful for debugging)
                titleprologue is to be printed right before page title
                titleepilogue is to be printed right after page title
-               req is the mod_python request
+               req is the mod_python request object
                errors is the list of error codes as defined in the moduleName_config.py file of the calling module
                log is the string of data that should be appended to the log file (errors automatically logged)
                secure_page_p is 0 or 1 and tells whether we are to use HTTPS friendly page elements or not

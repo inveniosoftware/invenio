@@ -433,7 +433,7 @@ class Template:
 
            Parameters:
 
-          - 'urlargs' *string* - The url args that helped produce this page
+          - 'req' - The mod_python request object
 
           - 'language' *string* - The selected language
 
