@@ -28,11 +28,11 @@
 import MySQLdb
 import string
 
-## FIXME: these are read here and not in config.py in order to prevent
-## them to show up in case some mod_python web script uses ``from
-## config import *''.  If we waterproof all mod_python web scripts,
-## then it may possibly be moved there.  But it's safer to read them
-## only here.
+from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE
+
+## Configured MySQL credentials are read here and not in config.py in
+## order to prevent them from appearing elsewhere, as no-one should
+## know DB credentials but us.
 dbhost = "<DBHOST>"
 dbname = "<DBNAME>"
 dbuser = "<DBUSER>"
@@ -55,8 +55,21 @@ def _db_login(relogin = 0):
             return DB_CONN
 
 def run_sql(sql, param=None, n=0, with_desc=0):
-    """Run SQL on the server and returns result."""    
+    """Run SQL on the server with PARAM and return result.
+
+       When the site is closed for maintenance (as governed by the
+       config variable CFG_ACCESS_CONTROL_LEVEL_SITE), do not attempt
+       to run any SQL queries but return empty list immediately.
+       Useful to be able to have the website up while MySQL database
+       is down for maintenance, hot copies, table repairs, etc.
+    """
+
+    if CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
+        # do not connect to the database as the site is closed for maintenance:
+        return []
+
     ### log_sql_query(sql, param) ### UNCOMMENT ONLY IF you REALLY want to log all queries
+
     db = _db_login()    
     if param:
         param = tuple(param)
