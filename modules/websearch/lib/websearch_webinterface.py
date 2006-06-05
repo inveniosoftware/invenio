@@ -148,10 +148,8 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         
             def answer(req, form):
                 # Accessing collections: this is for accessing the
-                # cached page on top of each collection, but also to
-                # browse through all the records in a collection when
-                # used in conjunction with the jrec=<start> argument.
-                
+                # cached page on top of each collection.
+
                 args = wash_urlargd(form, search_interface_default_urlargd)
 
                 # We simply return the cached page of the collection
@@ -189,6 +187,12 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 args['recid'] = recid
 
                 req.argd = args
+                from invenio.webuser import getUid, page_not_authorized
+
+                uid = getUid(req)
+                if uid == -1:
+                    return page_not_authorized(req, "../")
+
                 return search_engine.perform_request_search(req, **args) 
             
             return answer, []
