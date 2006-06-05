@@ -46,7 +46,7 @@ def index(req, ln=cdslang):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                urlargs=req.args)
+                req=req)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
@@ -68,7 +68,7 @@ def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
                 uid=uid,
                 language=ln,
                 navtrail = navtrail_previous_links,
-                urlargs=req.args,
+                req=req,
                 lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
@@ -84,16 +84,16 @@ def modifytranslations(req, rnkID='', ln=cdslang, sel_type='', trans = [], confi
     auth = brc.check_user(uid,'cfgbibrank')
     if not auth[0]:
         return page(title="Modify translations",
-                body=brc.perform_modifytranslations(rnkID=rnkID,
-                                             ln=ln,
-                                             sel_type=sel_type,
-                                             trans=trans,
-                                             confirm=confirm),
-                uid=uid,
-                language=ln,
-                urlargs=req.args,
-                navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)
+                    body=brc.perform_modifytranslations(rnkID=rnkID,
+                                                        ln=ln,
+                                                        sel_type=sel_type,
+                                                        trans=trans,
+                                                        confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
@@ -115,7 +115,7 @@ def modifycollection(req, ln=cdslang, rnkID='', func='', colID='', confirm=0):
                                                  confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)
     else:
@@ -137,7 +137,7 @@ def deleterank(req, ln=cdslang, rnkID='', confirm=0):
                                                  confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)
     else:
@@ -162,7 +162,7 @@ def modifyrank(req, ln=cdslang, rnkID='', rnkcode='', template='', cfgfile='', c
                                             confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -183,7 +183,7 @@ def showrankdetails(req, ln=cdslang, rnkID=''):
                                                  ln=ln),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -195,4 +195,4 @@ def error_page(req):
                 description="%s - Internal Error" % cdsname, 
                 keywords="%s, CDS Invenio, Internal Error" % cdsname,
                 language=ln,
-                urlargs=req.args)
+                req=req)
