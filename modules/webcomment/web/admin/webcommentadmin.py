@@ -51,7 +51,6 @@ def index(req, ln=cdslang):
                 body=perform_request_index(ln=ln),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
                 req=req)   
@@ -82,7 +81,6 @@ def delete(req, ln=cdslang, comid=""):
                 body=body,
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
                 navtrail = navtrail_previous_links,
                 req = req,
                 errors = errors, 
@@ -119,7 +117,6 @@ def comments(req, ln=cdslang, uid="", comid="", reviews=0):
                 body=perform_request_comments(ln=ln, uid=uid, comID=comid, reviews=reviews),
                 uid=auid,
                 language=ln,
-                urlargs=req.args,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
                 req=req)
@@ -148,7 +145,6 @@ def users(req, ln=cdslang):
                     body=perform_request_users(ln=ln),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__,
                     req=req)
@@ -195,7 +191,6 @@ def del_com(req, ln=cdslang, action="delete", **hidden):
                     body=body,
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__,
                     req=req)
