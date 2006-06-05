@@ -36,4 +36,4 @@ def index(req, ln=cdslang):
                 language=ln,
                 navtrail = "FIXME",
                 lastupdated=__lastupdated__,
-                urlargs=req.args)
+                req=req)
