@@ -49,7 +49,7 @@ def switchfmtscore(req, colID, type, id_1, id_2, ln=cdslang):
                                                 id_2=id_2),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -73,7 +73,7 @@ def switchfldscore(req, colID, id_1, id_2, fmeth, ln=cdslang):
                                                 fmeth=fmeth),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -97,7 +97,7 @@ def switchfldvaluescore(req, colID, id_1, id_fldvalue_1, id_fldvalue_2, ln=cdsla
                                                 id_fldvalue_2=id_fldvalue_2),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -119,7 +119,7 @@ def runwebcoll(req, colID, ln=cdslang, confirm=0):
                                                         confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -143,7 +143,7 @@ def switchpbxscore(req, colID, id_1, id_2, sel_ln,ln=cdslang):
                                                 sel_ln=sel_ln),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -166,7 +166,7 @@ def modifydbquery(req, colID, ln=cdslang, dbquery='', confirm=-1):
                                                confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -187,7 +187,7 @@ def showtree(req, colID, ln=cdslang):
                                               ln=ln),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -210,7 +210,7 @@ def modifyrestricted(req, colID, ln=cdslang, rest='', confirm=-1):
                                               confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -234,7 +234,7 @@ def modifytranslations(req, colID, ln=cdslang, sel_type='', trans = [], confirm=
                                              confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -261,7 +261,7 @@ def addcollectiontotree(req, colID, ln=cdslang, add_dad='', add_son='', rtype=''
                 uid=uid,
                 language=ln,
                 navtrail = navtrail_previous_links,
-                urlargs=req.args,
+                req=req,
                 lastupdated=__lastupdated__)   
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
@@ -287,7 +287,7 @@ def addcollection(req, colID, ln=cdslang, colNAME='', dbquery='', rest='', callb
                 uid=uid,
                 language=ln,
                 navtrail = navtrail_previous_links,
-                urlargs=req.args,
+                req=req,
                 lastupdated=__lastupdated__)   
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
@@ -310,7 +310,7 @@ def modifyrankmethods(req, colID, ln=cdslang, func='', rnkID='', confirm=0):
                                                  confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -332,7 +332,7 @@ def deletecollection(req, colID, ln=cdslang, confirm=-1):
                                                  confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -354,7 +354,7 @@ def editcollection(req, colID=1, ln=cdslang, mtype=''):
                                                 mtype=mtype),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -380,7 +380,7 @@ def addoutputformat(req, colID, ln=cdslang, code='', name='', callback='yes', co
                                                  confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -403,7 +403,7 @@ def showoutputformats(req, colID, ln=cdslang, callback='yes', confirm=0):
                                                  confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -427,7 +427,7 @@ def addexistingoutputformat(req, colID, ln=cdslang, fmtID=-1, callback='yes', co
                                                          confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)
     else:
@@ -451,7 +451,7 @@ def deleteoutputformat(req, colID, ln=cdslang, fmtID=-1, callback='yes', confirm
                                                  confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -475,7 +475,7 @@ def removeoutputformat(req, colID, ln=cdslang, fmtID='', callback='yes', confirm
                                                     confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -501,7 +501,7 @@ def removefieldvalue(req, colID, ln=cdslang, fldID='', fldvID='', fmeth='', call
                                              confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -528,7 +528,7 @@ def removefield(req, colID, ln=cdslang, fldID='', fldvID='', fmeth='', callback=
                                              confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -553,7 +553,7 @@ def modifyfield(req, colID, fldID, fldvID='', ln=cdslang, callback='yes', confir
                                              confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -578,7 +578,7 @@ def modifyoutputformat(req, colID, ln=cdslang, fmtID=-1, sel_type='', trans=[], 
                                                     confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -601,7 +601,7 @@ def showsearchoptions(req, colID, ln=cdslang, callback='yes', confirm=0):
                                                    confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -627,7 +627,7 @@ def addexistingfield(req, colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', call
                                                   confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -657,7 +657,7 @@ def rearrangefield(req, colID, ln=cdslang, fmeth='', callback='yes', confirm=-1)
                                                   confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -687,7 +687,7 @@ def addexistingfieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm
                                                   confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -717,7 +717,7 @@ def rearrangefieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm=-
                                                   confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -750,7 +750,7 @@ def addnewfieldvalue(req, colID, fldID, ln=cdslang, name='', value='', callback=
                     uid=uid,
                     language=ln,
                     navtrail = navtrail_previous_links,
-                    urlargs=req.args,
+                    req=req,
                     lastupdated=__lastupdated__)   
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
@@ -777,7 +777,7 @@ def modifyfieldvalue(req, colID, fldID, fldvID, ln=cdslang, name='', value='', c
                     uid=uid,
                     language=ln,
                     navtrail = navtrail_previous_links,
-                    urlargs=req.args,
+                    req=req,
                     lastupdated=__lastupdated__)   
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
@@ -799,7 +799,7 @@ def showsearchfields(req, colID, ln=cdslang, callback='yes', confirm=0):
                                                   confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -822,7 +822,7 @@ def showsortoptions(req, colID, ln=cdslang, callback='yes', confirm=0):
                                                  confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -851,7 +851,7 @@ def modifyportalbox(req, colID, ln=cdslang, pbxID=-1, score='', position='', sel
                                                  confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -876,7 +876,7 @@ def removeportalbox(req, colID, ln=cdslang, pbxID='', sel_ln='', callback='yes',
                                                  confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -903,7 +903,7 @@ def addexistingportalbox(req, colID, ln=cdslang, pbxID=-1, score=0, position='',
                                                       confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -934,7 +934,7 @@ def deleteportalbox(req, colID, ln=cdslang, pbxID=-1, callback='yes', confirm=-1
                                                  confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)
     else:
@@ -959,7 +959,7 @@ def showportalboxes(req, colID, ln=cdslang, callback='yes', confirm=0):
                                                  confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -984,7 +984,7 @@ def addportalbox(req, colID, ln=cdslang, title='', body='', callback='yes', conf
                                               confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -1013,7 +1013,7 @@ def modifycollectiontree(req, colID, ln=cdslang, move_up='', move_down='', move_
                                        confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)
     else:
@@ -1037,7 +1037,7 @@ def index(req, colID=1, ln=cdslang, mtype='', content='', confirm=0):
                                        confirm=confirm),
                 uid=uid,
                 language=ln,
-                urlargs=req.args,
+                req=req,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__)   
     else:
@@ -1051,4 +1051,4 @@ def error_page(req, ln = cdslang):
                 description="%s - Internal Error" % cdsname, 
                 keywords="%s, CDS Invenio, Internal Error" % cdsname,
                 language=ln,
-                urlargs=req.args)
+                req=req)
