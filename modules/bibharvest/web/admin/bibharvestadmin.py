@@ -47,7 +47,7 @@ def index(req, ln=cdslang):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                urlargs=req.args)
+                req=req)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
@@ -73,7 +73,7 @@ def editsource(req, oai_src_id, oai_src_name='', oai_src_baseurl='', oai_src_pre
                                                 confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -101,7 +101,7 @@ def modifysource(req, oai_src_id, oai_src_name, oai_src_baseurl='', oai_src_pref
                                                   confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -130,7 +130,7 @@ def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_pre
                 uid=uid,
                 language=ln,
                 navtrail = navtrail_previous_links,
-                urlargs=req.args,
+                req=req,
                 lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
@@ -152,7 +152,7 @@ def delsource(req, oai_src_id, ln=cdslang, confirm=0):
                                                     confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)    
     else:

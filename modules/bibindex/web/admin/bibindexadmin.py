@@ -48,7 +48,7 @@ def deletetag(req, fldID, ln=cdslang, tagID=-1, callback='yes', confirm=-1):
                                                confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -73,7 +73,7 @@ def addtag(req, fldID, ln=cdslang, value=['',-1], name='', callback='yes', confi
                                             confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -98,7 +98,7 @@ def modifyfieldtags(req, fldID, ln=cdslang, callback='yes', confirm=-1):
                                                    confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -122,7 +122,7 @@ def addindexfield(req, idxID, ln=cdslang, fldID='', callback='yes', confirm=-1):
                                             confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -147,7 +147,7 @@ def modifyindexfields(req, idxID, ln=cdslang, callback='yes', confirm=-1):
                                                    confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -173,7 +173,7 @@ def showdetailsfieldtag(req, fldID, tagID, ln=cdslang, callback='yes', confirm=-
                                                          confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -198,7 +198,7 @@ def showdetailsfield(req, fldID, ln=cdslang, callback='yes', confirm=-1):
                                                       confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -222,7 +222,7 @@ def modifyfield(req, fldID, ln=cdslang, code='', callback='yes', confirm=-1):
                                                  confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)
     else:
@@ -247,7 +247,7 @@ def modifyindex(req, idxID, ln=cdslang, idxNAME='', idxDESC='', callback='yes', 
                                                  confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)
     else:
@@ -273,7 +273,7 @@ def modifytag(req, fldID, tagID, ln=cdslang, name='', value='', callback='yes', 
                                                confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)
     else:
@@ -295,7 +295,7 @@ def deletefield(req, fldID, ln=cdslang, confirm=0):
                                                  confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -317,7 +317,7 @@ def deleteindex(req, idxID, ln=cdslang, confirm=0):
                                                  confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -341,7 +341,7 @@ def showfieldoverview(req, ln=cdslang, callback='yes', confirm=-1):
                                                  confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -365,7 +365,7 @@ def editfields(req, ln=cdslang, callback='yes', confirm=-1):
                                                 confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -391,7 +391,7 @@ def editfield(req, fldID, ln=cdslang, mtype='', callback='yes', confirm=-1):
                                                confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -417,7 +417,7 @@ def editindex(req, idxID, ln=cdslang, mtype='', callback='yes', confirm=-1):
                                                confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -441,7 +441,7 @@ def modifyindextranslations(req, idxID, ln=cdslang, sel_type='', trans = [], con
                                                         confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -465,7 +465,7 @@ def modifyfieldtranslations(req, fldID, ln=cdslang, sel_type='', trans = [], con
                                                         confirm=confirm),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -490,7 +490,7 @@ def addfield(req, ln=cdslang, fldNAME='', code='', callback="yes", confirm=-1):
                     uid=uid,
                     language=ln,
                     navtrail = navtrail_previous_links,
-                    urlargs=req.args,
+                    req=req,
                     lastupdated=__lastupdated__)   
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
@@ -513,7 +513,7 @@ def addindex(req, ln=cdslang, idxNAME='', callback="yes", confirm=-1):
                     uid=uid,
                     language=ln,
                     navtrail = navtrail_previous_links,
-                    urlargs=req.args,
+                    req=req,
                     lastupdated=__lastupdated__)   
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
@@ -535,7 +535,7 @@ def switchtagscore(req, fldID, id_1, id_2, ln=cdslang):
                                                     ln=ln),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -560,7 +560,7 @@ def removeindexfield(req, idxID, fldID, ln=cdslang, callback="yes", confirm=-1):
                     uid=uid,
                     language=ln,
                     navtrail = navtrail_previous_links,
-                    urlargs=req.args,
+                    req=req,
                     lastupdated=__lastupdated__)   
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
@@ -584,7 +584,7 @@ def removefieldtag(req, fldID, tagID, ln=cdslang, callback="yes", confirm=-1):
                     uid=uid,
                     language=ln,
                     navtrail = navtrail_previous_links,
-                    urlargs=req.args,
+                    req=req,
                     lastupdated=__lastupdated__)   
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
@@ -606,7 +606,7 @@ def index(req, ln=cdslang, mtype='', content=''):
                                            content=content),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -628,7 +628,7 @@ def field(req, ln=cdslang, mtype='', content=''):
                                            content=content),
                     uid=uid,
                     language=ln,
-                    urlargs=req.args,
+                    req=req,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__)   
     else:
@@ -640,4 +640,4 @@ def error_page(req):
                 description="%s - Internal Error" % cdsname, 
                 keywords="%s, CDS Invenio, Internal Error" % cdsname,
                 language=ln,
-                urlargs=req.args)
+                req=req)
