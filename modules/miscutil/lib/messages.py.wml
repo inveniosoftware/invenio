@@ -67,26 +67,5 @@ def wash_language(ln):
     else:
         return '<CDSLANG>'
 
-def create_language_selection_box(urlargs="", language="en"):
-    """Take URLARGS and LANGUAGE and return textual language
-       selection box for the given page."""
-    _ = gettext_set_language(language)
-    out = ""
-    for (lang, lang_namelong) in <: print generate_language_list_for_python("long"); :>:
-        if lang == language:
-            out += """ <span class="langinfo">%s</span> &nbsp; """ % lang_namelong
-        else:
-            if urlargs:
-                urlargs = sre.sub(r'ln=.*?(&|$)', '', urlargs)
-            if urlargs:
-                if urlargs.endswith('&'):
-                    urlargs += "ln=%s" % lang
-                else:
-                    urlargs += "&ln=%s" % lang
-            else:
-                urlargs = "ln=%s" % lang
-            out += """ <a class="langinfo" href="?%s">%s</a> &nbsp; """ % (urlargs, lang_namelong)
-    return _("This site is also available in the following languages:") + "<br>" + out
-
 def language_list_long():
     return <: print generate_language_list_for_python("long"); :>
