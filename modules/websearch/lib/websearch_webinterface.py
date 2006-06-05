@@ -169,8 +169,16 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         elif component == 'record':
             try:
                 recid = int(path[0])
-            except (ValueError, IndexError):
-                return None, []
+            except IndexError:
+                # display record #1 for URL /record without a number
+                recid = 1
+            except ValueError:
+                if path[0] == '':
+                    # display record #1 for URL /record/ without a number
+                    recid = 1
+                else:
+                    # display page not found for URLs like /record/foo
+                    return None, []
 
             def answer(req, form):
                 args = wash_search_urlargd(form)
