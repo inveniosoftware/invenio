@@ -31,6 +31,13 @@ from invenio.config import *
 from invenio.messages import gettext_set_language
 
 class Template:
+
+    # Parameters allowed in the web interface for fetching files
+    files_default_urlargd = {
+        'version': (str, "") # version "" means "latest"
+        }
+
+
     def tmpl_submit_home_page(self, ln, catalogues):
         """
         The content of the home page of the submit engine
@@ -1065,7 +1072,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        title = _("record #%s") % ("<a href=\"record/%s\">%s</a>" % (recid,recid))
+        title = _("record #%s") % ("<a href=\"/record/%s\">%s</a>" % (recid,recid))
         if docid != "":
             title += _(" document #%s") % docid
         if version != "":

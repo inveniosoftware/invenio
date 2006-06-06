@@ -30,6 +30,7 @@ from invenio.webinterface_handler import create_handler, WebInterfaceDirectory
 
 from websearch_webinterface import WebInterfaceSearchInterfacePages
 from websession_webinterface import WebInterfaceYourAccountPages
+from websubmit_webinterface import websubmit_legacy_getfile, websubmit_legacy_submit
 
 from invenio.urlutils import redirect_to_url
 
@@ -38,12 +39,18 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     the other modules."""
     
     _exports = WebInterfaceSearchInterfacePages._exports + [
-        'youraccount', ('youraccount.py', 'youraccount')
+        'youraccount', ('youraccount.py', 'youraccount'),
+        ('getfile.py', 'getfile'),
+        'submit', ('submit.py', 'submit')
         ]
 
     youraccount = WebInterfaceYourAccountPages()
 
-
+    def __init__(self):
+        self.getfile = websubmit_legacy_getfile
+        self.submit  = websubmit_legacy_submit
+        return
+    
 # This creates the 'handler' function, which will be invoked directly
 # by mod_python.
 handler = create_handler(WebInterfaceInvenio())

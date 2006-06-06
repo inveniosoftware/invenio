@@ -28,6 +28,6 @@
 from invenio.search_engine import search_pattern, perform_request_search, print_record
 
 def Get_Field(fieldname,bibrec):
-    value = string.strip(print_record(int(bibrec),'tm',fieldname))
+    value = string.strip(print_record(int(bibrec),'tm',[fieldname]))
     return value
 

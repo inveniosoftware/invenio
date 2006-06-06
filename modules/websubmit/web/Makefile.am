@@ -23,10 +23,8 @@ docdir = $(localstatedir)/www
 
 doc_DATA = approve.py \
            direct.py \
-           getfile.py \
            publiline.py \
            sub.py \
-           submit.py \
            summary.py \
            yourapprovals.py \
            yoursubmissions.py

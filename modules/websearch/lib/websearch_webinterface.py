@@ -35,6 +35,8 @@ websearch_templates = invenio.template.load('websearch')
 search_results_default_urlargd = websearch_templates.search_results_default_urlargd
 search_interface_default_urlargd = websearch_templates.search_interface_default_urlargd
 
+from websubmit_webinterface import WebInterfaceFilesPages
+
 def wash_search_urlargd(form):
     argd = wash_urlargd(form, search_results_default_urlargd)
 
@@ -62,6 +64,34 @@ def wash_search_urlargd(form):
     return argd
 
 
+class WebInterfaceRecordPages(WebInterfaceDirectory):
+    """ Handling of a /record/<recid> URL fragment """
+
+    _exports = ['', 'files']
+
+    def __init__(self, recid):
+        self.recid = recid
+        self.files = WebInterfaceFilesPages(self.recid)
+        return
+    
+    def __call__(self, req, form):
+        args = wash_search_urlargd(form)
+        args['recid'] = self.recid
+
+        req.argd = args
+
+        from invenio.webuser import getUid, page_not_authorized
+
+        uid = getUid(req)
+        if uid == -1:
+            return page_not_authorized(req, "../")
+        
+        return search_engine.perform_request_search(req, **args) 
+
+    # Return the same page wether we ask for /record/123 or /record/123/
+    index = __call__
+
+    
 class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
     """ Handling of the /search URL and its sub-pages. """
 
@@ -182,20 +212,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 # display page not found for URLs like /record/-5 or /record/0
                 return None, []
 
-            def answer(req, form):
-                args = wash_search_urlargd(form)
-                args['recid'] = recid
-
-                req.argd = args
-                from invenio.webuser import getUid, page_not_authorized
-
-                uid = getUid(req)
-                if uid == -1:
-                    return page_not_authorized(req, "../")
-
-                return search_engine.perform_request_search(req, **args) 
-            
-            return answer, []
+            return WebInterfaceRecordPages(recid), path[1:]
 
         return None, []
 
