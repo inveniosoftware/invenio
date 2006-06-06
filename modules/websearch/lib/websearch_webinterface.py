@@ -28,14 +28,13 @@ from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory, ht
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
 from invenio.webuser import getUid, page_not_authorized
 from invenio import search_engine
+from invenio.websubmit_webinterface import WebInterfaceFilesPages
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
 
 search_results_default_urlargd = websearch_templates.search_results_default_urlargd
 search_interface_default_urlargd = websearch_templates.search_interface_default_urlargd
-
-from websubmit_webinterface import WebInterfaceFilesPages
 
 def wash_search_urlargd(form):
     argd = wash_urlargd(form, search_results_default_urlargd)
