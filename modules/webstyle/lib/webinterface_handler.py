@@ -30,8 +30,16 @@ import os
 import urlparse
 import base64
 
+# The following mod_python imports are done separately in a particular
+# order (util first) because I was getting sometimes publisher import
+# error when testing weird situations, preventing util from being
+# imported and leading to a traceback later.  When this happened,
+# importing util was okay, only publisher import caused troubles, so
+# that importing in special order prevents these problems.
 try:
-    from mod_python import apache, publisher, util
+    from mod_python import util
+    from mod_python import apache
+    from mod_python import publisher
 except ImportError:
     pass
 
