@@ -191,7 +191,10 @@ class Template:
 
         return """<LI><a href="" onClick="document.forms[0].doctype.value='%(id)s';document.forms[0].submit();return false;">%(name)s</a>""" % doc
 
-    def tmpl_action_page(self, ln, guest, pid, now, doctype, description, docfulldesc, snameCateg, lnameCateg, actionShortDesc, indir, statustext):
+    def tmpl_action_page(self, ln, uid, guest, pid, now, doctype,
+                         description, docfulldesc, snameCateg,
+                         lnameCateg, actionShortDesc, indir,
+                         statustext):
         """
         Recursive function that produces a catalog's HTML display
 

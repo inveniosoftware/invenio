@@ -862,8 +862,8 @@ def action(req, c=cdsname, ln=cdslang, doctype=""):
             statustext.append(arr[6])
 
     t = websubmit_templates.tmpl_action_page(
-          ln = ln,
-          guest = (uid_email == "" or uid_email == "guest"),
+          ln=ln,
+          uid=uid, guest=(uid_email == "" or uid_email == "guest"),
           pid = os.getpid(),
           now = time.time(),
           doctype = doctype,
