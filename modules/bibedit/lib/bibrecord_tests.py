@@ -193,31 +193,31 @@ class AccentedUnicodeLettersTest(unittest.TestCase):
     """ bibrecord - testing accented UTF-8 letters """
 
     def setUp(self):
-        xml_example_record = """
-        <record>
-        <controlfield tag="001">33</controlfield>
-        <datafield tag="041" ind1="" ind2="">
-        <subfield code="a">eng</subfield>
-        </datafield>
-        <datafield tag="100" ind1="" ind2="">
-        <subfield code="a">Döè1, John</subfield>
-        </datafield>
-        <datafield tag="100" ind1="" ind2="">
-        <subfield code="a">Doe2, J>ohn</subfield>
-        <subfield code="b">editor</subfield>
-        </datafield>
-        <datafield tag="245" ind1="" ind2="1">
-        <subfield code="a">Пушкин</subfield>
-        </datafield>
-        <datafield tag="245" ind1="" ind2="2">
-        <subfield code="a">On the foo and bar2</subfield>
-        </datafield>
-        </record>
-        """
-        (self.rec, st, e) = bibrecord.create_record(xml_example_record,1,1)
+        self.xml_example_record = """<record>
+  <controlfield tag="001">33</controlfield>
+  <datafield tag="041" ind1="" ind2="">
+    <subfield code="a">eng</subfield>
+ </datafield>
+  <datafield tag="100" ind1="" ind2="">
+    <subfield code="a">Döè1, John</subfield>
+ </datafield>
+  <datafield tag="100" ind1="" ind2="">
+    <subfield code="a">Doe2, J>ohn</subfield>
+    <subfield code="b">editor</subfield>
+ </datafield>
+  <datafield tag="245" ind1="" ind2="1">
+    <subfield code="a">Пушкин</subfield>
+ </datafield>
+  <datafield tag="245" ind1="" ind2="2">
+    <subfield code="a">On the foo and bar2</subfield>
+ </datafield>
+</record>"""
+        (self.rec, st, e) = bibrecord.create_record(self.xml_example_record,1,1)
 
     def test_accented_unicode_characters(self):
         """bibrecord - accented Unicode letters"""
+        self.assertEqual(self.xml_example_record,
+                         bibrecord.record_xml_output(self.rec))
         self.assertEqual(bibrecord.record_get_field_instances(self.rec, "100", "", ""),
                          [([('a', 'Döè1, John')], '', '', '', 3), ([('a', 'Doe2, J>ohn'), ('b', 'editor')], '', '', '', 4)])
         self.assertEqual(bibrecord.record_get_field_instances(self.rec, "245", "", "1"),
