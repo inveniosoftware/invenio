@@ -19,7 +19,7 @@
 
 """PERSONAL FEATURES - YOUR ALERTS"""
 
-__lastupdated__ = """<: print `date +"%d %b %Y %H:%M:%S %Z"`; :>"""
+__lastupdated__ = """$Date$"""
 
 import sys
 import time
