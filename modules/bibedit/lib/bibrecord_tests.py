@@ -270,12 +270,64 @@ class GettingFieldValuesTest(unittest.TestCase):
         self.assertEqual(bibrecord.field_get_subfield_values(fi1, "b"), [])
         self.assertEqual(bibrecord.field_get_subfield_values(fi2, "b"), ["editor"])
 
+class AddFieldTest(unittest.TestCase):
+    """ bibrecord - testing adding field """
+
+    def setUp(self):
+        xml_example_record = """
+        <record>
+        <controlfield tag="001">33</controlfield>
+        <datafield tag="041" ind1="" ind2="">
+        <subfield code="a">eng</subfield>
+        </datafield>
+        <datafield tag="100" ind1="" ind2="">
+        <subfield code="a">Doe1, John</subfield>
+        </datafield>
+        <datafield tag="100" ind1="" ind2="">
+        <subfield code="a">Doe2, John</subfield>
+        <subfield code="b">editor</subfield>
+        </datafield>
+        <datafield tag="245" ind1="" ind2="1">
+        <subfield code="a">On the foo and bar1</subfield>
+        </datafield>
+        <datafield tag="245" ind1="" ind2="2">
+        <subfield code="a">On the foo and bar2</subfield>
+        </datafield>
+        </record>
+        """
+        (self.rec, st, e) = bibrecord.create_record(xml_example_record,1,1)
+
+    def test_add_controlfield(self):
+        """bibrecord - adding controlfield"""
+        field_number_1 = bibrecord.record_add_field(self.rec, "003", "", "", "SzGeCERN")
+        field_number_2 = bibrecord.record_add_field(self.rec, "004", "", "", "Test")
+        self.assertEqual(field_number_1, 7)
+        self.assertEqual(field_number_2, 8)
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "003", "", "", ""),
+                         ['SzGeCERN'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "004", "", "", ""),
+                         ['Test'])
+
+    def test_add_datafield(self):
+        """bibrecord - adding datafield"""
+        field_number_1 = bibrecord.record_add_field(self.rec, "100", "", "", "",
+                                                    [('a', 'Doe3, John')])
+        field_number_2 = bibrecord.record_add_field(self.rec, "100", "", "", "",
+                                                    [('a', 'Doe4, John'), ('b', 'editor')])
+        self.assertEqual(field_number_1, 7)
+        self.assertEqual(field_number_2, 8)
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "a"),
+                         ['Doe1, John', 'Doe2, John', 'Doe3, John', 'Doe4, John'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "b"),
+                         ['editor', 'editor'])
+
 def create_test_suite():
     """Return test suite for the bibrecord module"""
     return unittest.TestSuite((unittest.makeSuite(SanityTest,'test'),
                                unittest.makeSuite(SuccessTest,'test'),
                                unittest.makeSuite(BadInputTreatmentTest,'test'),
                                unittest.makeSuite(GettingFieldValuesTest,'test'),
+                               unittest.makeSuite(AddFieldTest,'test'),
                                unittest.makeSuite(AccentedUnicodeLettersTest,'test')))
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())
