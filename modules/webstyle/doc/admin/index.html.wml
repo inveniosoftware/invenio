@@ -25,7 +25,7 @@
 
 <p>
  This is the gate to the admin area for WebStyle. You need to 
- <a href="<WEBURL>/youraccount.py/login?referer=<WEBURL>/admin/webstyle/">login</a> to enter.
+ <a href="<WEBURL>/youraccount/login?referer=<WEBURL>/admin/webstyle/">login</a> to enter.
 </p>
 
 <dl>

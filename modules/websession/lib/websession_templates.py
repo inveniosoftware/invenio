@@ -100,7 +100,7 @@ class Template:
 
         out = """
                 <p><big><strong class="headline">Edit parameters</strong></big></p>
-                <form method="post" action="%(sweburl)s/youraccount.py/change">
+                <form method="post" action="%(sweburl)s/youraccount/change">
                 <p>%(change_user_pass)s</p>
                 <table>
                   <tr><td align="right"><strong>
@@ -175,7 +175,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = """
-                 <form method="post" action="%(sweburl)s/youraccount.py/change">
+                 <form method="post" action="%(sweburl)s/youraccount/change">
                    <big><strong class="headline">%(edit_method)s</strong></big>
                    <p>%(explain_method)s:</p>
                    <table>
@@ -216,7 +216,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = """
-          <form  method="post" action="../youraccount.py/send_email">
+          <form  method="post" action="../youraccount/send_email">
             %(msg)s
           <table>
                 <tr>
@@ -325,7 +325,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         msg= _("""You are logged in as a guest user, so your %s will disappear at the end of the current session. If you wish you can
-               <a href="%s/youraccount.py/login?ln=%s">login or register here</a>.""") % (type, sweburl, ln)
+               <a href="%s/youraccount/login?ln=%s">login or register here</a>.""") % (type, sweburl, ln)
         return """<table class="errorbox" summary="">
                            <thead>
                             <tr>
@@ -350,8 +350,8 @@ class Template:
 
         return _("""You are logged in as %(user)s. You may want to a) <A href="%(logout)s">logout</A>; b) edit your <A href="%(edit)s">account settings</a>.""") % {
             'user': user,
-            'logout': '%s/youraccount.py/logout?ln=%s' % (sweburl, ln),
-            'edit': '%s/youraccount.py/edit?ln=%s' % (sweburl, ln)
+            'logout': '%s/youraccount/logout?ln=%s' % (sweburl, ln),
+            'edit': '%s/youraccount/edit?ln=%s' % (sweburl, ln)
             } + "<BR><BR>"
 
     def tmpl_account_template(self, title, body, ln):
@@ -454,7 +454,7 @@ class Template:
         out =""
         out +="""
         <body>
-           %(msg)s <A href="../youraccount.py/lost?ln=%(ln)s">%(try_again)s</A>
+           %(msg)s <A href="../youraccount/lost?ln=%(ln)s">%(try_again)s</A>
 
               </body>
 
@@ -543,12 +543,12 @@ class Template:
               }
 
         if register_available:
-            out += _("""If you don't own an account yet, please <a href="../youraccount.py/register?ln=%s">register</a> an internal account.""") % ln
+            out += _("""If you don't own an account yet, please <a href="../youraccount/register?ln=%s">register</a> an internal account.""") % ln
         else:
             out += _("""It is not possible to create an account yourself. Contact %s if you want an account.""") % (
                       """<a href="mailto:%(email)s">%(email)s</a>""" % { 'email' : supportemail }
                     )
-        out += """<form method="post" action="../youraccount.py/login">
+        out += """<form method="post" action="../youraccount/login">
                   <table>
 
                """
@@ -633,7 +633,7 @@ class Template:
             if level == 1:
                 out += _("The account will not be possible to use before it has been verified and activated.")
             out += """
-              <form method="post" action="../youraccount.py/register">
+              <form method="post" action="../youraccount/register">
               <input type="hidden" name="referer" value="%(referer)s">
               <table>
                 <tr>
@@ -701,7 +701,7 @@ class Template:
         out = ""
         # guest condition
         if guest:
-            return _("""You seem to be the guest user.  You have to <a href="../youraccount.py/login?ln=%s">login</a> first.""") % ln
+            return _("""You seem to be the guest user.  You have to <a href="../youraccount/login?ln=%s">login</a> first.""") % ln
 
         # no rights condition
         if not roles:

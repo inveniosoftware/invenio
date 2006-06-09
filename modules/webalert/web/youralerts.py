@@ -59,7 +59,7 @@ def display(req, p="n", ln = cdslang):
 
     return page(title=_("Display searches"),
                 body=webalert.perform_display(p,uid, ln = ln),
-                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount.py/display">%(account)s</a>""" % {
+                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
                              'sweburl' : sweburl,
                              'account' : _("Your Account"),
                           },
@@ -88,7 +88,7 @@ def input(req, idq, name="", freq="week", notif="y", idb=0, error_msg="", ln = c
                )
     return page(title=_("Set a new alert"),
                 body=html,
-                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount.py/display">%(account)s</a>""" % {
+                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
                              'sweburl' : sweburl,
                              'account' : _("Your Account"),
                           },
@@ -117,7 +117,7 @@ def modify(req, idq, old_idb, name="", freq="week", notif="y", idb=0, error_msg=
                )
     return page(title=_("Modify alert settings"),
                 body=html,
-                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount.py/display">%(account)s</a>""" % {
+                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
                              'sweburl' : sweburl,
                              'account' : _("Your Account"),
                           },
@@ -139,7 +139,7 @@ def list(req, ln = cdslang):
 
     return page(title=_("Display alerts"),
                 body=webalert.perform_list_alerts(uid, ln = ln),
-                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount.py/display">%(account)s</a>""" % {
+                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
                              'sweburl' : sweburl,
                              'account' : _("Your Account"),
                           },
@@ -165,7 +165,7 @@ def add(req, name, freq, notif, idb, idq, ln = cdslang):
         return input(req, idq, name, freq, notif, idb, e, ln = ln)
     return page(title=_("Display alerts"),
                 body=html,
-                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount.py/display">%(account)s</a>""" % {
+                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
                              'sweburl' : sweburl,
                              'account' : _("Your Account"),
                           },
@@ -191,7 +191,7 @@ def update(req, name, freq, notif, idb, idq, old_idb, ln = cdslang):
         return modify(req, idq, old_idb, name, freq, notif, idb, e, ln = ln)
     return page(title=_("Display alerts"),
                 body=html,
-                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount.py/display">%(account)s</a>""" % {
+                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
                              'sweburl' : sweburl,
                              'account' : _("Your Account"),
                           },
@@ -213,7 +213,7 @@ def remove(req, name, idu, idq, idb, ln = cdslang):
 
     return page(title=_("Display alerts"),
                 body=webalert.perform_remove_alert(name, idu, idq, idb, uid, ln = ln),
-                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount.py/display">%(account)s</a>""" % {
+                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
                              'sweburl' : sweburl,
                              'account' : _("Your Account"),
                           },

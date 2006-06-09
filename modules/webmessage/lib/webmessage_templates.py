@@ -429,7 +429,7 @@ class Template:
         return html formatted navtrail
         """
         _ = gettext_set_language(ln)
-        nav_h1 = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+        nav_h1 = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
         nav_h2 = ""
         if (title != ""):
             nav_h2 = ' &gt; <a class="navtrail" href="%s/yourmessages.py/display">%s</a>'

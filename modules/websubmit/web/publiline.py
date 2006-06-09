@@ -69,7 +69,7 @@ def index(req,c=cdsname,ln=cdslang,doctype="",categ="",RN="",send=""):
     else:
         t = displayDocument(doctype,categ,RN,send, ln)
     return page(title="publication line",
-                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount.py/display">%(account)s</a>""" % {
+                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
                              'sweburl' : sweburl,
                              'account' : _("Your Account"),
                           },

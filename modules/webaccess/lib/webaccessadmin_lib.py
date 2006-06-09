@@ -759,7 +759,7 @@ def perform_modifybasket(req, userID, callback='yes', confirm=0):
     output = ""
     if res:
         text = """To modify the baskets for this account, you have to login as the user."""
-        output += createhiddenform(action="%s/youraccount.py/login?" % sweburl,
+        output += createhiddenform(action="%s/youraccount/login?" % sweburl,
                                    text=text,
                                    p_email=res[0][1],
                                    p_pw=res[0][2],
@@ -848,7 +848,7 @@ def perform_modifyalerts(req, userID, callback='yes', confirm=0):
     output = ""
     if res:
         text = """To modify the alerts for this account, you have to login as the user."""
-        output += createhiddenform(action="%s/youraccount.py/login?" % sweburl,
+        output += createhiddenform(action="%s/youraccount/login?" % sweburl,
                                    text=text,
                                    p_email=res[0][1],
                                    p_pw=res[0][2],

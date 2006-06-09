@@ -58,7 +58,7 @@ def display(req,
                                                        ln)
     if isGuestUser(uid):
         body = create_guest_warning_box(ln) + body
-    navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+    navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
     navtrail %= (weburl, _("Your Account"))
     navtrail_end = create_basket_navtrail(uid=uid,
                                           category=category, topic=topic, group=group,
@@ -94,7 +94,7 @@ def display_item(req,
                                                             ln=ln)
     if isGuestUser(uid):
         body = create_guest_warning_box(ln) + body
-    navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+    navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
     navtrail %= (weburl, _("Your Account"))
     navtrail_end = create_basket_navtrail(uid=uid,
                                           category=category, topic=topic, group=group,
@@ -128,7 +128,7 @@ def write_comment(req,
                                                              topic=topic,
                                                              group_id=group,
                                                              ln=ln)
-    navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+    navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
     navtrail %= (weburl, _("Your Account"))
     navtrail_end = create_basket_navtrail(uid=uid,
                                           category=category, topic=topic, group=group,
@@ -169,7 +169,7 @@ def save_comment(req, bskid=0, recid=0, title='', text='',
                                                                        infos=infos,
                                                                        ln=ln)
     errors = errors_saving.extend(errors_displaying)
-    navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+    navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
     navtrail %= (weburl, _("Your Account"))
     navtrail_end = create_basket_navtrail(uid=uid,
                                           category=category, topic=topic, group=group,
@@ -256,7 +256,7 @@ def add(req, recid=[], referer='',
         title = _("Your Baskets")
     else:
         title = _("Add records to baskets")
-    navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+    navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
     navtrail %= (weburl, _("Your Account"))
     return page(title       = title,
                 body        = body,
@@ -295,7 +295,7 @@ def delete(req, bskid=-1, confirmed=0,
                                                                                 ln)
         redirect_to_url(req, url)
     else:
-        navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+        navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
         navtrail %= (weburl, _("Your Account"))
         navtrail_end = create_basket_navtrail(uid=uid,
                                               category=category, topic=topic, group=group,
@@ -350,7 +350,7 @@ def modify(req, action='', bskid=-1, recid=0,
         body = ''
         warnings = ''
         errors = [('ERR_WEBBASKET_UNDEFINED_ACTION',)]
-    navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+    navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
     navtrail %= (weburl, _("Your Account"))
     navtrail_end = create_basket_navtrail(uid=uid,
                                           category=category, topic=topic, group=group,
@@ -405,7 +405,7 @@ def edit(req, bskid=0, topic='',
     else:
         (body, errors, warnings) = perform_request_edit(uid=uid, bskid=bskid, topic=topic, ln=ln)
     
-    navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+    navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
     navtrail %= (weburl, _("Your Account"))
     navtrail_end = create_basket_navtrail(uid=uid,
                                           category=cfg_webbasket_categories['PRIVATE'],
@@ -448,7 +448,7 @@ def create_basket(req, new_basket_name='',
                                                                  create_in_topic=create_in_topic,
                                                                  topic_number=topic_number,
                                                                  ln=ln)
-        navtrail = '<a class="navtrail" href="%s/youraccount.py/display">%s</a>'
+        navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
         navtrail %= (weburl, _("Your Account"))
         if isGuestUser(uid):
             body = create_guest_warning_box(ln) + body

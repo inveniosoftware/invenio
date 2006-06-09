@@ -1350,7 +1350,7 @@ class Template:
         """return html warning box for non registered users"""
         _ = gettext_set_language(ln)
         message = _("You are logged in as a guest user, so your baskets will disappear at the end of the current session. If you wish you can %slogin or register here%s.")
-        message %= ('<a href="%s/youraccount.py/login?ln=%s">'% (sweburl, ln), '</a>')
+        message %= ('<a href="%s/youraccount/login?ln=%s">'% (sweburl, ln), '</a>')
         out = """
 <table class="errorbox">
   <thead>

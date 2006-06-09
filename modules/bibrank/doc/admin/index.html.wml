@@ -25,7 +25,7 @@
 
 <p>
  This is the gate to the admin area for BibRank. You need to 
- <a href="<WEBURL>/youraccount.py/login?referer=<WEBURL>/admin/bibrank/">login</a> to enter.
+ <a href="<WEBURL>/youraccount/login?referer=<WEBURL>/admin/bibrank/">login</a> to enter.
 </p>
 
 <dl>

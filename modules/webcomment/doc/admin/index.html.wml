@@ -25,7 +25,7 @@
      
 <p>
  This is the gate to the admin area for WebComment. You need to 
- <a href="<WEBURL>/youraccount.py/login?referer=<WEBURL>/admin/webcomment/">login</a> to enter.
+ <a href="<WEBURL>/youraccount/login?referer=<WEBURL>/admin/webcomment/">login</a> to enter.
 </p>
 
 <dl>

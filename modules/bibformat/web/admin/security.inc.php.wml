@@ -24,7 +24,7 @@
 
   ##if ($uid_email == "guest")
   ##{
-  ##   outWarning('You seem to be guest.  Please <a href="'.$WEBURL.'/youraccount.py/login?referer='.$WEBURL.$PHP_SELF.'">login</a> first.');
+  ##   outWarning('You seem to be guest.  Please <a href="'.$WEBURL.'/youraccount/login?referer='.$WEBURL.$PHP_SELF.'">login</a> first.');
   ##   print "</td></tr></table>";
   ##   exit;
   ##}

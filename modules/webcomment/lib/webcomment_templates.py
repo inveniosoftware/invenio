@@ -780,7 +780,7 @@ class Template:
             note = _("Note: Your nickname, <i>%s</i>, will be displayed as author of this comment") % nickname
         else:
             (uid, nickname, display) = get_user_info(uid)
-            link = '<a href="%s/youraccount.py/edit">' % sweburl
+            link = '<a href="%s/youraccount/edit">' % sweburl
             note = _("Note: you currently haven't %sdefined a nickname%s.<br /><i>%s</i> will temporarly be displayed as author of this comment.")
             note %= (link, '</a>', display)
 
