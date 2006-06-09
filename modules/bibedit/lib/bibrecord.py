@@ -379,7 +379,7 @@ def record_xml_output(rec):
                 fields.append((tag,field))
         record_order_fields(fields)    
         for field in fields:
-            xmltext = "%s%s" % (xmltext,field_xml_output(field[1],field[0]))#field[0]=tag
+            xmltext += str(field_xml_output(field[1],field[0]))
     xmltext = "%s</record>" % xmltext
     return xmltext
 
@@ -770,8 +770,6 @@ def get_string_value(node):
     text_nodes = node.childNodes
     return u''.join([ n.data for n in text_nodes ])
     
-
-
 def get_childs_by_tag_name_RXP(listofchilds,tag):
     """retrieves all childs from 'listofchilds' with tag name 'tag' and returns them as a list.
        listofchilds is a list returned by the RXP parser
@@ -782,7 +780,6 @@ def get_childs_by_tag_name_RXP(listofchilds,tag):
   
     return l
     
-
 def getAttribute_RXP(root, attr):
     """ returns the attributte 'attr' from root 'root'
         root is a node returned by RXP parser
@@ -792,7 +789,6 @@ def getAttribute_RXP(root, attr):
     except KeyError,e:
         return ""
 
-
 def get_string_value_RXP(node):
     """gets all child text nodes of node 'node' and returns them as a unicode string"""
     if not node==None:
@@ -800,13 +796,11 @@ def get_string_value_RXP(node):
     else:
         return ""
 
-
 def encode_for_xml(s):
     "Encode special chars in string so that it would be XML-compliant."
     s = string.replace(s, '&', '&amp;')
     s = string.replace(s, '<', '&lt;')
     return s
-
 
 def print_errors(list):
     """ creates a unique string with the strings in list, using '\n' as a separator """
@@ -816,8 +810,6 @@ def print_errors(list):
         text = '%s\n%s'% (text,l)
 
     return text
-
-
 
 def wash(xmltext, parser=2):
     """
@@ -906,8 +898,7 @@ def wash(xmltext, parser=2):
         rec[tag]=fields
     
     return (rec,errors)
-         
-                
+                         
 def tagclose(tagname,xmltext):
     """ checks if an XML document does not hae any missing tag with name tagname
     """
@@ -925,9 +916,7 @@ def tagclose(tagname,xmltext):
         return (0,errors)
     else:
         return (1,errors)
-    
-    
-    
+        
 def testImports(c):
     """ Test if the import statements did not failed"""
     errors=[]
@@ -942,7 +931,6 @@ def testImports(c):
     else:
         i=1
     return (i,errors)
-
 
 def warning(code):
     """ It returns a warning message of code 'code'.
