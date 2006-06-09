@@ -38,7 +38,6 @@ class _FakeReq(object):
 _current_module = sys.modules.get('_apache')
 
 sys.modules['_apache'] = _FakeApache()
-from mod_python.util import FieldStorage
 
 if _current_module:
     sys.modules['_apache'] = _current_module
@@ -50,6 +49,11 @@ class TestWashArgs(unittest.TestCase):
     """webinterface - Test for washing of URL query arguments"""
 
     def _check(self, query, default, expected):
+        try:
+            from mod_python.util import FieldStorage
+        except ImportError:
+            self.fail("WARNING: cannot import mod_python.util.FieldStorage; test not run.")
+
         req = _FakeReq(query)
         form = FieldStorage(req, keep_blank_values=True)
         result = webinterface_handler.wash_urlargd(form, default)
