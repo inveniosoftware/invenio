@@ -90,7 +90,8 @@ class TestBCCL(unittest.TestCase):
 
     def test_bccl_09(self):
         """bibconvert - BCCL v.0.9 compliancy"""
-        
+
+        # FIXME: put proper tests here
         self.assertEqual(1, 1)
 
 class TestKnowledgeBase(unittest.TestCase):
@@ -99,6 +100,7 @@ class TestKnowledgeBase(unittest.TestCase):
     def test_enc(self):
         """bibconvert - knowledge base"""
         
+        # FIXME: put proper tests here
         self.assertEqual(1, 1)
 
 class TestErrorCodes(unittest.TestCase):
@@ -107,6 +109,7 @@ class TestErrorCodes(unittest.TestCase):
     def test_enc(self):
         """bibconvert - error codes"""
         
+        # FIXME: put proper tests here
         self.assertEqual(1, 1)
 
 class TestEncodings(unittest.TestCase):
@@ -115,6 +118,7 @@ class TestEncodings(unittest.TestCase):
     def test_enc(self):
         """bibconvert - encodings"""
         
+        # FIXME: put proper tests here
         self.assertEqual(1, 1)
 
 
