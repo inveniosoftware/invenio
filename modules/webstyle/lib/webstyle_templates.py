@@ -460,7 +460,7 @@ class Template:
                 parts.append(a_href(lang_namelong, href=args, _class="langinfo"))
 
         return _("This site is also available in the following languages:") + "<br>" + \
-               '&nbsp;'.join(parts)
+               ' &nbsp;'.join(parts)
 
 
     def tmpl_error_box(self, ln, title, verbose, req, supportemail, errors):
