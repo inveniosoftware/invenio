@@ -21,12 +21,9 @@ SUBDIRS = admin
 
 docdir = $(localstatedir)/www
 
-doc_DATA = approve.py \
-           direct.py \
-           publiline.py \
-           sub.py \
-           summary.py \
-           yourapprovals.py \
+doc_DATA = approve.py 		\
+           publiline.py 	\
+           yourapprovals.py 	\
            yoursubmissions.py
 
 EXTRA_DIST = $(doc_DATA)

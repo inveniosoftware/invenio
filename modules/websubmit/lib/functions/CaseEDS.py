@@ -52,7 +52,7 @@ def CaseEDS(parameters,curdir,form):
         t="<b>Please wait...</b>"
         t ="""    
 <SCRIPT LANGUAGE="JavaScript1.1">
-    document.forms[0].action="submit.py";
+    document.forms[0].action="/submit";
     document.forms[0].step.value=%s;
     document.forms[0].submit();
 </SCRIPT>""" % nextstep

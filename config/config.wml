@@ -239,7 +239,7 @@ default
              &nbsp;
        </td>
        <td class="headermoduleboxbody">
-             <a class=header href="<WEBURL>/submit.py?ln=<!--LN-->"><!--MSGSUBMIT--></a>
+             <a class=header href="<WEBURL>/submit?ln=<!--LN-->"><!--MSGSUBMIT--></a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
@@ -295,7 +295,7 @@ default
 ##  (example: "")
 <define-tag CDSPAGEFOOTER>
  <div class="pagefooterstripeleft">
-  <!--CDSNAMEINTL-->&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/?ln=<!--LN-->"><!--MSGSEARCH--></a>&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/submit.py?ln=<!--LN-->"><!--MSGSUBMIT--></a>&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/youraccount.py/display?ln=<!--LN-->"><!--MSGPERSONALIZE--></a>&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/help/index.<!--LN-->.html"><!--MSGHELP--></a>
+  <!--CDSNAMEINTL-->&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/?ln=<!--LN-->"><!--MSGSEARCH--></a>&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/submit?ln=<!--LN-->"><!--MSGSUBMIT--></a>&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/youraccount.py/display?ln=<!--LN-->"><!--MSGPERSONALIZE--></a>&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/help/index.<!--LN-->.html"><!--MSGHELP--></a>
   <br>
   <!--POWEREDBY--> <a class="footer" href="http://cdsware.cern.ch/">CDS Invenio</a> v<VERSION>
   <br>

@@ -68,7 +68,7 @@ class Template:
                     <TABLE width="100%%">
                     <TR>
                         <TD width="50%%" class="narrowsearchboxbody">
-                          <FORM method=get action="submit.py">
+                          <FORM method=get action="/submit">
                             <INPUT type="hidden" name="doctype">
                               %(catalogues)s
                         </TD>
@@ -257,14 +257,14 @@ class Template:
                     document.forms[0].act.value = docname[nb];
                 }
                 </SCRIPT>
-                <FORM method="get" action="submit.py">
+                <FORM method="get" action="/submit">
                 <INPUT type="hidden" name="doctype" value="%(doctype)s">
                 <INPUT type="hidden" name="indir">
                 <input type="hidden" name="access" value="%(now)i_%(pid)s">
 
                 <INPUT type="hidden" name="act">
                 <INPUT type="hidden" name="startPg" value="1">
-                <INPUT type="hidden" name="mainmenu" value="submit.py?doctype=%(doctype)s">
+                <INPUT type="hidden" name="mainmenu" value="/submit?doctype=%(doctype)s">
 
                 <table class="searchbox" width="100%%" summary="">
                   <tr>
@@ -325,7 +325,7 @@ class Template:
                 <BR><BR>
                 <BR>
                 </FORM>
-                <FORM action="submit.py"><HR>
+                <FORM action="/submit"><HR>
                   <font color="black"><small>%(continue_explain)s</small></FONT>
                   <TABLE border=0 bgcolor="#CCCCCC" width="100%%"><TR>
                     <TD width="100%%">
@@ -430,7 +430,7 @@ class Template:
 
         # top menu
         out = """
-                <FORM method="POST" action="submit.py" onSubmit="return tester();">
+                <FORM method="POST" action="/submit" onSubmit="return tester();">
                 <center><TABLE cellspacing="0" cellpadding="0" border="0">
                   <TR>
                     <TD class="submitHeader"><B>%(docname)s&nbsp;</B></TD>
@@ -451,7 +451,7 @@ class Template:
         out += """        <TD class="submitEmptyPage">&nbsp;&nbsp;
                         </TD></TR></TABLE>
                     </TD>
-                    <TD class="submitHeader" align="right">&nbsp;<A HREF='' onClick="window.open('summary.py?doctype=%(doctype)s&act=%(act)s&access=%(access)s&indir=%(indir)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></A>&nbsp;</TD>
+                    <TD class="submitHeader" align="right">&nbsp;<A HREF='' onClick="window.open('/submit/summary?doctype=%(doctype)s&act=%(act)s&access=%(access)s&indir=%(indir)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></A>&nbsp;</TD>
                   </TR>
                   <TR><TD colspan="5" class="submitHeader">
                     <TABLE border="0" cellspacing="0" cellpadding="15" width="100%%" class="submitBody"><TR><TD>
@@ -787,7 +787,7 @@ class Template:
                        }
             else:
                 out += """ if (tester2()) {
-                             document.forms[0].action="submit.py";
+                             document.forms[0].action="/submit";
                              document.forms[0].step.value=1;
                              document.forms[0].submit();
                            } else {
@@ -846,7 +846,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = """
-          <FORM ENCTYPE="multipart/form-data" action="submit.py" method="POST">
+          <FORM ENCTYPE="multipart/form-data" action="/submit" method="POST">
           <INPUT type="hidden" name="file" value="%(file)s">
           <INPUT type="hidden" name="nextPg" value="%(nextPg)s">
           <INPUT type="hidden" name="startPg" value="%(startPg)s">
@@ -898,9 +898,9 @@ class Template:
         else:
             for i in range(1, nbpages + 1):
                 out += """<TD class="submitPage"><small>&nbsp;
-                            <A HREF='' onClick="document.forms[0].curpage.value=%s;document.forms[0].action='submit.py';document.forms[0].step.value=0;document.forms[0].submit();return false;">%s</A>&nbsp;</small></TD>""" % (i,i)
+                            <A HREF='' onClick="document.forms[0].curpage.value=%s;document.forms[0].action='/submit';document.forms[0].step.value=0;document.forms[0].submit();return false;">%s</A>&nbsp;</small></TD>""" % (i,i)
             out += """<TD class="submitCurrentPage">%(end_action)s</TD><TD class="submitEmptyPage">&nbsp;&nbsp;</TD></TR></TABLE></TD>
-                      <TD class="submitHeader" align="right">&nbsp;<A HREF='' onClick="window.open('summary.py?doctype=%(doctype)s&act=%(act)s&access=%(access)s&indir=%(indir)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></A>&nbsp;</TD>""" % {
+                      <TD class="submitHeader" align="right">&nbsp;<A HREF='' onClick="window.open('/submit/summary?doctype=%(doctype)s&act=%(act)s&access=%(access)s&indir=%(indir)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></A>&nbsp;</TD>""" % {
                         'end_action' : _("end of action"),
                         'summary' : _("SUMMARY"),
                         'doctype' : doctype,
@@ -1050,7 +1050,7 @@ class Template:
              if i > 0:
                 out += " <b>" + _("or") + "</b> "
              i += 1
-             out += """<LI><A HREF="" onClick="document.forms[0].action='submit.py';document.forms[0].curpage.value='%(page)s';document.forms[0].startPg.value='%(page)s';document.forms[0].act.value='%(action)s';document.forms[0].doctype.value='%(doctype)s';document.forms[0].indir.value='%(nextdir)s';document.forms[0].access.value='%(access)s';document.forms[0].fromdir.value='%(indir)s';document.forms[0].submit();return false;"> %(name)s </a>""" % action
+             out += """<LI><A HREF="" onClick="document.forms[0].action='/submit';document.forms[0].curpage.value='%(page)s';document.forms[0].startPg.value='%(page)s';document.forms[0].act.value='%(action)s';document.forms[0].doctype.value='%(doctype)s';document.forms[0].indir.value='%(nextdir)s';document.forms[0].access.value='%(access)s';document.forms[0].fromdir.value='%(indir)s';document.forms[0].submit();return false;"> %(name)s </a>""" % action
 
         out += "</ul>"
         return out
@@ -1260,7 +1260,7 @@ class Template:
             out += """<tr>
                         <td align="right">
                           <small>
-                            <A HREF='' onClick="window.opener.document.forms[0].curpage.value='%(page)s';window.opener.document.forms[0].action='submit.py';window.opener.document.forms[0].submit();return false;">
+                            <A HREF='' onClick="window.opener.document.forms[0].curpage.value='%(page)s';window.opener.document.forms[0].action='/submit';window.opener.document.forms[0].submit();return false;">
                               <FONT color="%(color)s">%(name)s</FONT>
                             </A>
                           </small>

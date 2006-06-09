@@ -25,6 +25,7 @@ import re
 from mod_python import apache
 import sys
 
+from invenio.dbquery import run_sql
 from invenio.config import cdsname,cdslang
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_isRole
@@ -47,6 +48,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
         self.recid = recid
         return
     
+
     def _lookup(self, component, path):
         # after /record/<recid>/files/ every part is used as the file
         # name (with possible path in the case of archives to be
@@ -200,52 +202,172 @@ def websubmit_legacy_getfile(req, form):
     return _getfile_py(req, **args)
 
 
+# --------------------------------------------------
 
 from invenio.websubmit_engine import home, action, interface, endaction
 
-def websubmit_legacy_submit(req, form):
+class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
-    args = wash_urlargd(form, {
-        'c': (str, cdsname),
-        'doctype': (str, ''),
-        'act': (str, ''),
-        'startPg': (str, "1"),
-        'indir': (str, ''),
-        'access': (str, ''),
-        'mainmenu': (str, ''),
-        'fromdir': (str, ''),
-        'file': (str, ''),
-        'nextPg': (str, ''),
-        'nbPg': (str, ''),
-        'curpage': (str, '1'),
-        'step': (str, '0'),
-        'mode': (str, 'U'),
-        })
+    _exports = ['summary', 'sub', 'direct', '']
 
-    req.form = form
-    
-    def index(req, c, ln, doctype, act, startPg, indir, access,
-              mainmenu, fromdir, file, nextPg, nbPg, curpage, step,
-              mode):
 
+    def direct(self, req, form):
+
+        args = wash_urlargd(form, {'sub': (str, '')})
+        sub = args['sub']
+        
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../submit")
+            return page_not_authorized(req, "../direct.py/index")
 
-        if doctype=="":
-            return home(req,c,ln)
-        elif act=="":
-            return action(req,c,ln,doctype)
-        elif int(step)==0:
-            return interface(req,c,ln, doctype, act, startPg, indir,
-                             access, mainmenu, fromdir, file, nextPg,
-                             nbPg, curpage)
+        myQuery = req.args
+        if sub == "":
+            return errorMsg("Sorry parameter missing...",req)
+        res = run_sql("select docname,actname from sbmIMPLEMENT where subname=%s", (sub,))
+        if len(res)==0:
+            return errorMsg("Sorry. Can't analyse parameter",req)
         else:
-            return endaction(req,c,ln, doctype, act, startPg, indir,
-                             access,mainmenu, fromdir, file, nextPg,
-                             nbPg, curpage, step, mode)
+            # get document type
+            doctype = res[0][0]
+            # get action name
+            action = res[0][1]
+        # retrieve other parameter values
+        params = re.sub("sub=[^&]*","",myQuery)
+        # find existing access number
+        result = re.search("access=([^&]*)",params)
+        if result != None:
+            access = result.group(1)
+            params = re.sub("access=[^&]*","",params)
+        else:
+            # create 'unique' access number
+            pid = os.getpid()
+            now = time.time()
+            access = "%i_%s" % (now,pid)
+        # retrieve 'dir' value
+        res = run_sql ("select dir from sbmACTION where sactname=%s",(action,))
+        dir = res[0][0]
+        try:
+            mainmenu = req.headers_in['Referer']
+        except:
+            mainmenu = ""
+        url = "/submit?doctype=%s&dir=%s&access=%s&act=%s&startPg=1%s&mainmenu=%s" % (
+            doctype,dir,access,action,params,quote(mainmenu))
+        req.err_headers_out.add("Location", url)
+        raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
+        return ""
+
+
+    def sub(self, req, form):
+        uid = getUid(req)
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../sub.py/index")
+
+        myQuery = req.args
+        if myQuery:
+            if re.search("@",myQuery):
+                param = re.sub("@.*","",myQuery)
+                IN = re.sub(".*@","",myQuery)
+            else:
+                IN = myQuery
+            url = "%s/submit/direct?sub=%s&%s" % (urlpath,IN,param)
+            req.err_headers_out.add("Location", url)
+            raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
+            return ""
+        else:
+            return "<html>Illegal page access</html>"
+
+
+    def summary(self, req, form):
+        args = wash_urlargd(form, {
+            'doctype': (str, ''),
+            'act': (str, ''),
+            'access': (str, ''),
+            'indir': (str, '')})
         
-    return index(req, **args)
+        uid = getUid(req)
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../summary.py/index")
+
+        t=""
+        curdir  = "%s/%s/%s/%s" % (storage,args['indir'],args['doctype'],args['access'])
+        subname = "%s%s" % (args['act'], args['doctype'])
+        
+        res = run_sql("select sdesc,fidesc,pagenb,level from sbmFIELD where subname=%s "
+                      "order by pagenb,fieldnb", (subname,))
+        nbFields = 0
+
+        values = []
+        for arr in res:
+            if arr[0] != "":
+                val = {
+                       'mandatory' : (arr[3] == 'M'),
+                       'value' : '',
+                       'page' : arr[2],
+                       'name' : arr[0],
+                      }
+                if os.path.exists("%s/%s" % (curdir,arr[1])):
+                    fd = open("%s/%s" % (curdir,arr[1]),"r")
+                    value = fd.read()
+                    fd.close()
+                    value = value.replace("\n"," ")
+                    value = value.replace("Select:","")
+                else:
+                    value = ""
+                val['value'] = value
+                values.append(val)
+
+        return websubmit_templates.tmpl_submit_summary(
+                 ln = args['ln'],
+                 values = values,
+                 images = images,
+               )
+
+    def index(self, req, form):
+
+        args = wash_urlargd(form, {
+            'c': (str, cdsname),
+            'doctype': (str, ''),
+            'act': (str, ''),
+            'startPg': (str, "1"),
+            'indir': (str, ''),
+            'access': (str, ''),
+            'mainmenu': (str, ''),
+            'fromdir': (str, ''),
+            'file': (str, ''),
+            'nextPg': (str, ''),
+            'nbPg': (str, ''),
+            'curpage': (str, '1'),
+            'step': (str, '0'),
+            'mode': (str, 'U'),
+            })
+
+        req.form = form
+
+        def _index(req, c, ln, doctype, act, startPg, indir, access,
+                   mainmenu, fromdir, file, nextPg, nbPg, curpage, step,
+                   mode):
+
+            uid = getUid(req)
+            if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+                return page_not_authorized(req, "../submit")
+
+            if doctype=="":
+                return home(req,c,ln)
+            elif act=="":
+                return action(req,c,ln,doctype)
+            elif int(step)==0:
+                return interface(req,c,ln, doctype, act, startPg, indir,
+                                 access, mainmenu, fromdir, file, nextPg,
+                                 nbPg, curpage)
+            else:
+                return endaction(req,c,ln, doctype, act, startPg, indir,
+                                 access,mainmenu, fromdir, file, nextPg,
+                                 nbPg, curpage, step, mode)
+
+        return _index(req, **args)
+
+    # Answer to both /submit/ and /submit
+    __call__ = index
 
 
 def errorMsg(title,req,c=cdsname,ln=cdslang):

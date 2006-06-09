@@ -39,7 +39,7 @@ def Test_Status(parameters,curdir,form):
 def printNotRequested(rn):
     t="""
 <SCRIPT>
-   document.forms[0].action="submit.py";
+   document.forms[0].action="/submit";
    document.forms[0].curpage.value = 1;
    document.forms[0].step.value = 0;
    document.forms[0].submit();
@@ -50,7 +50,7 @@ def printNotRequested(rn):
 def printApproved(rn):
     t="""
 <SCRIPT>
-   document.forms[0].action="submit.py";
+   document.forms[0].action="/submit";
    document.forms[0].curpage.value = 1;
    document.forms[0].step.value = 0;
    document.forms[0].submit();
@@ -61,7 +61,7 @@ def printApproved(rn):
 def printRejected(rn):
     t="""
 <SCRIPT>
-   document.forms[0].action="submit.py";
+   document.forms[0].action="/submit";
    document.forms[0].curpage.value = 1;
    document.forms[0].step.value = 0;
    document.forms[0].submit();

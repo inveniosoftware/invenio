@@ -42,7 +42,7 @@ def Is_Original_Submitter(parameters,curdir,form):
     if re.search(uid_email,email,re.IGNORECASE) == None and auth_code != 0:
         raise functionStop("""
 <SCRIPT>
-   document.forms[0].action="submit.py";
+   document.forms[0].action="/submit";
    document.forms[0].curpage.value = 1;
    document.forms[0].step.value = 0;
    document.forms[0].submit();

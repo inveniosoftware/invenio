@@ -140,7 +140,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         mainmenu = fp.read()
         fp.close()
     else:
-        mainmenu = "%s/submit.py" % (urlpath,)
+        mainmenu = "%s/submit" % (urlpath,)
     # various authentication related tasks...
     if uid_email != "guest" and uid_email != "":
         #First save the username (email address) in the SuE file. This way bibconvert will be able to use it if needed
@@ -440,7 +440,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     # start display:
     req.content_type = "text/html"
     req.send_http_header()
-    p_navtrail = """<a href="submit.py">%(submit)s</a>&nbsp;>&nbsp;<a href="submit.py?doctype=%(doctype)s\">%(docname)s</a>&nbsp;""" % {
+    p_navtrail = """<a href="/submit">%(submit)s</a>&nbsp;>&nbsp;<a href="/submit?doctype=%(doctype)s\">%(docname)s</a>&nbsp;""" % {
                    'submit'  : _("Submit"),
                    'doctype' : doctype,
                    'docname' : docname,
@@ -517,7 +517,7 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         mainmenu = fp.read()
         fp.close()
     else:
-        mainmenu = "%s/submit.py" % (urlpath,)
+        mainmenu = "%s/submit" % (urlpath,)
     # retrieve the name of the file in which the reference of
     # the submitted document will be stored
     res = run_sql("SELECT value FROM sbmPARAMETERS WHERE  doctype=%s and name='edsrn'", (doctype,))
@@ -683,8 +683,8 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     req.content_type = "text/html"
     req.send_http_header()
 
-    p_navtrail = """<a href="submit.py">""" + _("Submit") +\
-                 """</a>&nbsp;>&nbsp;<a href="submit.py?doctype=%(doctype)s">%(docname)s</a>""" % {
+    p_navtrail = """<a href="/submit">""" + _("Submit") +\
+                 """</a>&nbsp;>&nbsp;<a href="/submit?doctype=%(doctype)s">%(docname)s</a>""" % {
                    'doctype' : doctype,
                    'docname' : docname,
                  }
@@ -877,7 +877,7 @@ def action(req, c=cdsname, ln=cdslang, doctype=""):
           statustext = statustext,
         )
     
-    p_navtrail = """<a href="submit.py">%(submit)s</a>""" % {'submit' : _("Submit")}
+    p_navtrail = """<a href="/submit">%(submit)s</a>""" % {'submit' : _("Submit")}
     
     return page(title = docFullDesc,
                 body=t,
