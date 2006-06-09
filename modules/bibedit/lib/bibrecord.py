@@ -216,25 +216,46 @@ def record_has_field(rec,tag):
     """checks whether record 'rec' contains tag 'tag'"""
     return rec.has_key(tag)
         
-def record_add_field(rec,tag,value,ind1="",ind2=""):
+def record_add_field(rec, tag, ind1="", ind2="", controlfield_value="", datafield_subfield_code_value_tuples=[]):
     """
-    adds new field defined by the tag|value|ind1|ind2 parameters to record 'rec'
-    returns the new field
+    Add a new field TAG to record REC with the following values:
+
+       In case of creating a controlfield, only one argument matters:
+
+           controlfield_value - value of the control field, in case
+                                this field is a controlfield.
+
+       In case of creating a datafield, only these arguments matter:
+
+           ind1, ind2 - indicators of the datafield
+
+           datafield_subfield_code_value_tuples - list of subfield code and
+             value tuples, e.g.: [('a', 'Ellis, J'), ('e', 'editor')]
+       
+    Return the field number of newly created field.
     """
-  
-    val=rec.values()
-    if val != []:
-        ord = max([f[4] for x in val for f in x])
+
+    # detect field number to be used for insertion:
+    vals=rec.values()
+    if vals != []:
+        newfield_number = 1 + max([f[4] for v in vals for f in v])
     else:
-        ord = 1
-    newfield = create_field(value,ind1,ind2,[],ord)
-  
+        newfield_number = 1
+
+    # create new field object:
+    if controlfield_value:        
+        newfield = ([], ind1, ind2, str(controlfield_value), newfield_number)
+    else:
+        newfield = (datafield_subfield_code_value_tuples, ind1, ind2, "", newfield_number)
+
+    # add it to the record structure:
     if rec.has_key(tag):
         rec[tag].append(newfield)
     else:
         rec[tag] = [newfield]
-    
-    return newfield 
+
+    # return new field number:
+    return newfield_number
         
 def record_delete_field(rec,tag,ind1="",ind2=""):
     """
@@ -700,23 +721,15 @@ def concat(list):
         newl.extend(l)
     return newl
 
-def create_field(value,ind1="",ind2="",subfields=[],ord=-1):
-    """ creates a field object and returns it"""
-    
-    name = type(value).__name__
-    if name in ["int","long"] :
+def create_subfield(code, value):
+    """Create a subfield object and return it."""
+    if type(value).__name__ in ["int","long"]:
         s = str(value)
-    elif name in ['str', 'unicode']:
-        s = value
     else:
-        err.append((7,'Type found: ' + name))
-        s=""
+        s = value
+    subfield = (code, s)    
+    return subfield
     
-        
-    field = (subfields,ind1,ind2,s,ord)
-    return field
-        
-
 def field_add_subfield(field,code,value):
     """adds a subfield to field 'field'"""
     field[0].append(create_subfield(code,value))
@@ -733,16 +746,6 @@ def field_xml_output(field,tag):
         xmltext = "%s </datafield>\n" % xmltext
     return xmltext
         
-def create_subfield(code,value):
-    """ creates a subfield object and returns it"""
-    if type(value).__name__ in ["int","long"]:
-        s = str(value)
-    else:
-        s = value
-    subfield = (code, s)
-    
-    return subfield
-    
 def subfield_xml_output(subfield):
     """generates the XML for a subfield object and return it as a string"""
     xmltext = "    <subfield code=\"%s\">%s</subfield>\n" % (subfield[0],encode_for_xml(subfield[1]))
