@@ -305,14 +305,10 @@ modules/websubmit/lib/functions/Upload_Files.py
 modules/websubmit/lib/websubmit_config.py
 modules/websubmit/lib/websubmit_engine.py
 modules/websubmit/lib/websubmit_templates.py
+modules/websubmit/lib/websubmit_webinterface.py
 modules/websubmit/web/admin/referees.py
 modules/websubmit/web/approve.py
-modules/websubmit/web/direct.py
-modules/websubmit/web/getfile.py
 modules/websubmit/web/publiline.py
-modules/websubmit/web/submit.py
-modules/websubmit/web/sub.py
-modules/websubmit/web/summary.py
 modules/websubmit/web/yourapprovals.py
 modules/websubmit/web/yoursubmissions.py
 modules/websubmit/web/admin/func.php.wml
