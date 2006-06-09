@@ -28,9 +28,9 @@ their corresponding URLs (ie, /search to the websearch modules,...)
 from invenio.config import webdir
 from invenio.webinterface_handler import create_handler, WebInterfaceDirectory
 
-from websearch_webinterface import WebInterfaceSearchInterfacePages
-from websession_webinterface import WebInterfaceYourAccountPages
-from websubmit_webinterface import websubmit_legacy_getfile, WebInterfaceSubmitPages
+from invenio.websearch_webinterface import WebInterfaceSearchInterfacePages
+from invenio.websession_webinterface import WebInterfaceYourAccountPages
+from invenio.websubmit_webinterface import websubmit_legacy_getfile, WebInterfaceSubmitPages
 
 from invenio.urlutils import redirect_to_url
 
