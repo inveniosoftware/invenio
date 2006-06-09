@@ -24,6 +24,7 @@ import types
 import re
 from mod_python import apache
 import sys
+from urllib import quote
 
 from invenio.dbquery import run_sql
 from invenio.config import cdsname,cdslang
