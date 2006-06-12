@@ -145,7 +145,7 @@ def perform_input_alert(action, id_query, alert_name, frequency, notification, i
         urlargs = "UNKNOWN"
     baskets = create_personal_baskets_selection_box(uid=uid,
                                                     html_select_box_name='idb',
-                                                    selected_bsk_id=old_id_basket,
+                                                    selected_bskid=old_id_basket,
                                                     ln=cdslang)
     return webalert_templates.tmpl_input_alert(
              ln = ln,
