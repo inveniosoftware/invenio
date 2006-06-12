@@ -37,6 +37,9 @@ from email.MIMEText import MIMEText
 
 from invenio.config import *
 from invenio.search_engine import perform_request_search
+from invenio.webinterface_handler import wash_urlargd
+import invenio.template
+websearch_templates = invenio.template.load('websearch')
 from invenio.dbquery import run_sql
 from invenio.htmlparser import *
 
@@ -201,33 +204,32 @@ def get_argument(args, argname):
         return []
 
 def _date_to_tuple(date):
-    return [str(part) for part in (date.year, date.month, date.day)]
+    return [int(part) for part in (date.year, date.month, date.day)]
 
 def get_record_ids(argstr, date_from, date_until):
-    args = parse_qs(argstr)
-    p       = get_argument(args, 'p')
-    c       = get_argument(args, 'c')
-    cc      = get_argument(args, 'cc')
-    as      = get_argument(args, 'as')
-    f       = get_argument(args, 'f')
-    rg      = get_argument(args, 'rg')
-    so      = get_argument(args, 'so')
-    sp      = get_argument(args, 'sp')
-    ot      = get_argument(args, 'ot')
-    as      = get_argument(args, 'as')
-    p1      = get_argument(args, 'p1')
-    f1      = get_argument(args, 'f1')
-    m1      = get_argument(args, 'm1')
-    op1     = get_argument(args, 'op1')
-    p2      = get_argument(args, 'p2')
-    f2      = get_argument(args, 'f2')
-    m2      = get_argument(args, 'm2')
-    op2     = get_argument(args, 'op2')
-    p3      = get_argument(args, 'p3')
-    f3      = get_argument(args, 'f3')
-    m3      = get_argument(args, 'm3')
-    sc      = get_argument(args, 'sc')
-    # search  = get_argument(args, 'search')
+    argd = wash_urlargd(parse_qs(argstr), websearch_templates.search_results_default_urlargd)
+    p       = get_argument(argd, 'p')
+    c       = get_argument(argd, 'c')
+    cc      = get_argument(argd, 'cc')
+    as      = get_argument(argd, 'as')
+    f       = get_argument(argd, 'f')
+    rg      = get_argument(argd, 'rg')
+    so      = get_argument(argd, 'so')
+    sp      = get_argument(argd, 'sp')
+    ot      = get_argument(argd, 'ot')
+    as      = get_argument(argd, 'as')
+    p1      = get_argument(argd, 'p1')
+    f1      = get_argument(argd, 'f1')
+    m1      = get_argument(argd, 'm1')
+    op1     = get_argument(argd, 'op1')
+    p2      = get_argument(argd, 'p2')
+    f2      = get_argument(argd, 'f2')
+    m2      = get_argument(argd, 'm2')
+    op2     = get_argument(argd, 'op2')
+    p3      = get_argument(argd, 'p3')
+    f3      = get_argument(argd, 'f3')
+    m3      = get_argument(argd, 'm3')
+    sc      = get_argument(argd, 'sc')
 
     d1y, d1m, d1d = _date_to_tuple(date_from)
     d2y, d2m, d2d = _date_to_tuple(date_until)
@@ -400,9 +402,3 @@ def process_alert_queries_for_user(uid, date):
         q = run_query(aq, frequency, date)
         alerts = get_alerts(q, frequency)
         process_alerts(alerts)
-
-    
-if __name__ == '__main__':
-    process_alert_queries_for_user(2571422) # erik
-    process_alert_queries_for_user(109) # tibor
-    # process_alert_queries_for_user(11040) # jean-yves
