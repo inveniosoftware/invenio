@@ -47,6 +47,12 @@ class TestWashQueryParameters(unittest.TestCase):
         self.assertEqual("Ellis, J", search_engine.wash_pattern('Ellis, J'))
         self.assertEqual("ell", search_engine.wash_pattern('ell*'))
 
+    def test_wash_dates(self):
+        """search engine - washing of date arguments"""
+        self.assertEqual(search_engine.wash_dates(1980, 1, 28, 2003, 2, 2),
+                         ('1980-01-28', '2003-02-02'))                         
+        self.assertEqual(search_engine.wash_dates(1980, 0, 28, 2003, 2, 0),
+                         ('1980-01-28', '2003-02-31'))                         
 
 class TestStripAccents(unittest.TestCase):
     """Test for handling of UTF-8 accents."""
