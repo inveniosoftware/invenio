@@ -2111,6 +2111,7 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=cdsname, nb_found
              collection = collection,
              as = as,
              collection_name = get_coll_i18nname(collection, ln),
+             collection_id = get_colID(collection),
              middle_only = middle_only,
              rg = rg,
              nb_found = nb_found,
@@ -2152,16 +2153,10 @@ def print_results_overview(req, colls, results_final_nb_total, results_final_nb,
     new_colls = []
     for coll in colls:
         new_colls.append({
-                          'code' : coll,
-                          'name' : get_coll_i18nname(coll, ln),
+                          'id': get_colID(coll),
+                          'code': coll,
+                          'name': get_coll_i18nname(coll, ln),
                          })
-
-    # deduce url without 'of' argument:
-    args = req.args or ''
-    
-    url_args = sre.sub(r'(^|\&)of=.*?(\&|$)',r'\1',args)
-    url_args = sre.sub(r'^\&+', '', url_args)
-    url_args = sre.sub(r'\&+$', '', url_args)
 
     return websearch_templates.tmpl_print_results_overview(
              ln = ln,
@@ -2170,7 +2165,6 @@ def print_results_overview(req, colls, results_final_nb_total, results_final_nb,
              results_final_nb = results_final_nb,
              cpu_time = cpu_time,
              colls = new_colls,
-             url_args = url_args,
            )
 
 def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=cdslang):

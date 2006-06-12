@@ -1785,8 +1785,8 @@ class Template:
         return out
 
     def tmpl_print_search_info(self, ln, weburl, middle_only,
-                               collection, collection_name, as, sf,
-                               so, rm, rg, nb_found, of, ot, p, f, f1,
+                               collection, collection_name, collection_id,
+                               as, sf, so, rm, rg, nb_found, of, ot, p, f, f1,
                                f2, f3, m1, m2, m3, op1, op2, p1, p2,
                                p3, d1y, d1m, d1d, d2y, d2m, d2d,
                                all_fieldcodes, cpu_time, pl_in_url,
@@ -2161,7 +2161,7 @@ class Template:
             out += "<p>&nbsp;"
         return out
 
-    def tmpl_print_results_overview(self, ln, weburl, results_final_nb_total, cpu_time, results_final_nb, colls, url_args):
+    def tmpl_print_results_overview(self, ln, weburl, results_final_nb_total, cpu_time, results_final_nb, colls):
         """Prints results overview box with links to particular collections below.
 
         Parameters:
