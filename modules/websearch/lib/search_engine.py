@@ -947,10 +947,13 @@ def wash_field(f):
         f = cfg_fields_convert[f]
     return f
 
-def wash_dates(d1y, d1m, d1d, d2y, d2m, d2d):
-    """Take user-submitted dates (day, month, year) of the web form and return (day1, day2) in YYYY-MM-DD format
-    suitable for time restricted searching.  I.e. pay attention when months are not there to put 01 or 12
-    according to if it's the starting or the ending date, etc."""
+def wash_dates(d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0):
+    """Take user-submitted washed date arguments (D1Y, D1M, D1Y) and
+    (D2Y, D2M, D2Y) and return (YYY1-M1-D2, YYY2-M2-D2) strings in the
+    YYYY-MM-DD format suitable for time restricted searching.
+    I.e. pay attention when months are not there to put 01 or 12
+    according to whether it's the starting or the ending date, etc.
+    """    
     day1, day2 =  "", ""
     # sanity checking:
     if d1y==0 and d1m==0 and d1d==0 and d2y==0 and d2m==0 and d2d==0:
@@ -2798,10 +2801,10 @@ def wash_url_argument(var, new_type):
 
 ### CALLABLES
 
-def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg="10", sf="", so="d", sp="", rm="", of="id", ot="", as="0",
-                           p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc="0", jrec="0",
-                           recid="-1", recidb="-1", sysno="", id="-1", idb="-1", sysnb="", action="",
-                           d1y="0", d1m="0", d1d="0", d2y="0", d2m="0", d2d="0", verbose="0", ap="0", ln=cdslang):
+def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="", so="d", sp="", rm="", of="id", ot="", as=0,
+                           p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
+                           recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="",
+                           d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, verbose=0, ap=0, ln=cdslang):
     """Perform search or browse request, without checking for
        authentication.  Return list of recIDs found, if of=id.
        Otherwise create web page.
@@ -3451,7 +3454,6 @@ def profile(p="", f="", c=cdsname):
 #print get_collection_reclist("Theses")
 #print log(sys.stdin)
 #print search_unit_in_bibrec('2002-12-01','2002-12-12')
-#print wash_dates('1980', '', '28', '2003','02','')
 #print type(wash_url_argument("-1",'int'))
 #print get_nearest_terms_in_bibxxx("ellis", "author", 5, 5)
 #print call_bibformat(68, "HB_FLY")
