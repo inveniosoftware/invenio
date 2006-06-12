@@ -19,8 +19,13 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = webbasket.py webbasket_templates.py webbasket_dblayer.py webbasket_config.py
+pylib_DATA = webbasket.py \
+             webbasket_config.py \
+             webbasket_dblayer.py \
+             webbasket_templates.py
 
-EXTRA_DIST = $(pylib_DATA)
+noinst_DATA = webbasket_migration_kit.py
+
+EXTRA_DIST = $(pylib_DATA) $(noinst_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc
