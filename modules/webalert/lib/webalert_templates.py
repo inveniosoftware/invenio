@@ -493,11 +493,12 @@ class Template:
 
         
         body = """\
-Hello,
+Hello:
 
-Below are the results of the email alert that you set up with the CERN
-Document Server. This is an automatic message, please don't reply to
-its address.  For any question, use <%(supportemail)s> instead.
+Below are the results of the email notification alert that
+you set up with the %(cdsname)s.
+This is an automatic message, please don't reply to it.
+For any question, please use <%(supportemail)s> instead.
 
 alert name: %(name)s
 %(pattern)s%(collections)sfrequency: %(frequency)s
@@ -508,6 +509,7 @@ url: <%(url)s>
 
 """ % {'supportemail': supportemail,
        'name': name,
+       'cdsname': cdsname,
        'pattern': pattern,
        'collections': collections,
        'frequency': frequency,
@@ -530,10 +532,10 @@ URL given at the top of this email to see all the results.
         body += '''
 
 -- 
-CDS Invenio Alert Service <%s>
+%s Alert Service <%s>
 Unsubscribe?  See <%s>
 Need human intervention?  Contact <%s>
-''' % (weburl, weburl + '/youralerts.py/list', supportemail)
+''' % (cdsname, weburl, weburl + '/youralerts.py/list', supportemail)
         
         return body
 
