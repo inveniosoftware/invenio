@@ -178,16 +178,18 @@ class Template:
             
         return ' &gt; '.join(out)
 
-    def tmpl_webcoll_body(self, ln, te_portalbox, searchfor,
-                          np_portalbox, narrowsearch, focuson,
-                          instantbrowse, ne_portalbox):
+    def tmpl_webcoll_body(self, ln, collection, te_portalbox,
+                          searchfor, np_portalbox, narrowsearch,
+                          focuson, instantbrowse, ne_portalbox):
 
         """ Creates the body of the main search page.
 
         Parameters:
 
-          - 'weburl' *string* - The base URL for the site
+          - 'ln' *string* - language of the page being generated
 
+          - 'collection' - collection id of the page being generated
+          
           - 'te_portalbox' *string* - The HTML code for the portalbox on top of search
 
           - 'searchfor' *string* - The HTML code for the search options

@@ -338,7 +338,7 @@ class Collection:
             ## second, update page body:
             for as in range(0,2): # do both simple search and advanced search pages:
                 body = websearch_templates.tmpl_webcoll_body(
-                         ln=lang,
+                         ln=lang, collection=self.name,
                          te_portalbox = self.create_portalbox(lang, 'te'),
                          searchfor = self.create_searchfor(as, lang),
                          np_portalbox = self.create_portalbox(lang, 'np'),
