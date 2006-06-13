@@ -20,21 +20,20 @@
 
 """HTML parser for records."""
 
-## rest of the Python code goes below
-
 __version__ = "$Id$"
 
+import sre
 from HTMLParser import HTMLParser
 from string import split
 
 from invenio.config import *
+from invenio.alert_engine_config import cfg_webalert_max_num_of_chars_per_line_in_alert_email
 from invenio.search_engine import print_record
+from invenio.bibindex_engine import sre_html
 from invenio import textwrap
 
-WRAPWIDTH = 72
-
 def wrap(text):
-    lines = textwrap.wrap(text, WRAPWIDTH)
+    lines = textwrap.wrap(text, cfg_webalert_max_num_of_chars_per_line_in_alert_email)
     r = ''
     for l in lines:
         r += l + '\n'
@@ -44,7 +43,7 @@ def wrap_records(text):
     lines = split(text, '\n')
     result = ''
     for l in lines:
-        newlines = textwrap.wrap(l, WRAPWIDTH)
+        newlines = textwrap.wrap(l, cfg_webalert_max_num_of_chars_per_line_in_alert_email)
         for ll in newlines:
             result += ll + '\n'
     return result
@@ -102,21 +101,20 @@ class RecordHTMLParser(HTMLParser):
 
 def get_as_text(record_id):
     """Return the plain text from RecordHTMLParser of the record."""
-
-    rec = print_record(record_id)
+    out = ""
+    rec_in_hb = print_record(record_id)
     htparser = RecordHTMLParser()
     try:
-        htparser.feed(rec)
-        return htparser.result
+        htparser.feed(rec_in_hb)
+        out = htparser.result
     except:
-        #htparser.close()
-        return wrap(htparser.result + 'Detailed record: <%s/record/%s>.' % (weburl, record_id))
-
+        out = sre_html.sub(' ', rec_in_hb)
+    out = sre.sub(r"[\-:]?\s*Detailed record\s*[\-:]?", "", out)
+    out = sre.sub(r"[\-:]?\s*Similar records\s*[\-:]?", "", out)
+    return out
 
 if __name__ == "__main__":
-    rec = print_record(619028)
-    print rec
-    
+    test_recID = 11
+    print print_record(test_recID)
     print "***"
-    
-    print get_as_text(619028)
+    print get_as_text(test_recID)
