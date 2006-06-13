@@ -19,8 +19,12 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = webalert.py alert_engine.py htmlparser.py textwrap.py	\
-             webalert_templates.py
+pylib_DATA = webalert.py \
+             webalert_templates.py \
+             alert_engine.py \
+             alert_engine_config.py \
+             htmlparser.py \
+             textwrap.py
 
 EXTRA_DIST = $(pylib_DATA)
 
