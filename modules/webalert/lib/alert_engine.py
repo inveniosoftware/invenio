@@ -37,6 +37,7 @@ from email.MIMEText import MIMEText
 
 from invenio.config import *
 from invenio.search_engine import perform_request_search
+from invenio.alert_engine_config import cfg_webalert_debug_level
 from invenio.webinterface_handler import wash_urlargd
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -45,18 +46,6 @@ from invenio.htmlparser import *
 
 import invenio.template
 webalert_templates = invenio.template.load('webalert')
-
-
-DEVELOPERADDR = [supportemail]
-
-# Debug levels:
-# 0 = production, nothing on the console, email sent
-# 1 = messages on the console, email sent
-# 2 = messages on the console, but no email sent
-# 3 = many messages on the console, no email sent
-# 4 = many messages on the console, email sent to DEVELOPERADDR
-DEBUGLEVEL = 0
-
 
 def update_date_lastrun(alert):
     return run_sql('update user_query_basket set date_lastrun=%s where id_user=%s and id_query=%s and id_basket=%s;', (strftime("%Y-%m-%d"), alert[0], alert[1], alert[2],))
@@ -74,7 +63,7 @@ def get_alerts(query, frequency):
 
     
 # def add_record_to_basket(record_id, basket_id):
-#     if DEBUGLEVEL > 0:
+#     if cfg_webalert_debug_level > 0:
 #         print "-> adding record %s into basket %s" % (record_id, basket_id)
 #     try:
 #         return run_sql('insert into basket_record (id_basket, id_record) values(%s, %s);', (basket_id, record_id,))
@@ -96,10 +85,10 @@ def add_records_to_basket(record_ids, basket_id):
         if nrec > 1:
             for i in record_ids[1:]:
                 vals += ',(%s, %s)' % (basket_id, i)
-        if DEBUGLEVEL > 0:
+        if cfg_webalert_debug_level > 0:
             print "-> adding %s records into basket %s: %s" % (nrec, basket_id, vals)
         try:
-            if DEBUGLEVEL < 4:
+            if cfg_webalert_debug_level < 4:
                 return run_sql('insert into basket_record (id_basket, id_record) values %s;' % vals) # Cannot use the run_sql(<query>, (<arg>,)) form for some reason
             else:
                 print '   NOT ADDED, DEBUG LEVEL == 4'
@@ -126,7 +115,7 @@ def send_email(fromaddr, toaddr, body, attempt=0):
     
     try:
         server = smtplib.SMTP('localhost')
-        if DEBUGLEVEL > 2:
+        if cfg_webalert_debug_level > 2:
             server.set_debuglevel(1)
         else:
             server.set_debuglevel(0)
@@ -134,7 +123,7 @@ def send_email(fromaddr, toaddr, body, attempt=0):
         server.sendmail(fromaddr, toaddr, body)
         server.quit()
     except:
-        if (DEBUGLEVEL > 1):
+        if (cfg_webalert_debug_level > 1):
             print 'Error connecting to SMTP server, attempt %s retrying in 5 minutes. Exception raised: %s' % (attempt, sys.exc_info()[0])
         sleep(300)
         send_email(fromaddr, toaddr, body, attempt+1)
@@ -158,7 +147,7 @@ def email_notify(alert, records, argstr):
 
     msg = ""
     
-    if DEBUGLEVEL > 0:
+    if cfg_webalert_debug_level > 0:
         msg = "*** THIS MESSAGE WAS SENT IN DEBUG MODE ***\n\n"
 
     url = weburl + "/search?" + argstr
@@ -186,16 +175,15 @@ def email_notify(alert, records, argstr):
     
     body = msg.as_string()
 
-    if DEBUGLEVEL > 0:
+    if cfg_webalert_debug_level > 0:
         print "********************************************************************************"
         print body
         print "********************************************************************************"
 
-    if DEBUGLEVEL < 2:
+    if cfg_webalert_debug_level < 2:
         send_email(sender, email, body)
-    if DEBUGLEVEL == 4:
-        for a in DEVELOPERADDR:
-            send_email(sender, a, body)
+    if cfg_webalert_debug_level == 4:
+        send_email(sender, supportemail, body)
 
 def get_argument(args, argname):
     if args.has_key(argname):
@@ -293,7 +281,7 @@ def run_query(query, frequency, date_until):
     if n:
         log('query %08s produced %08s records' % (query[0], len(recs)))
     
-    if DEBUGLEVEL > 2:
+    if cfg_webalert_debug_level > 2:
         print "[%s] run query: %s with dates: from=%s, until=%s\n  found rec ids: %s" % (
             strftime("%c"), query, date_from, date_until, recs)
 
