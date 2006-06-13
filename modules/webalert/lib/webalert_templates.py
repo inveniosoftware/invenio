@@ -29,6 +29,7 @@ import operator
 from invenio.config import *
 from invenio.messages import gettext_set_language
 from invenio.htmlparser import get_as_text, wrap
+from invenio.alert_engine_config import cfg_webalert_max_num_of_records_in_alert_email
 
 class Template:
     def tmpl_errorMsg(self, ln, error_msg, rest = ""):
@@ -467,9 +468,6 @@ class Template:
     def tmpl_alert_email_body(self, name, url, records, pattern,
                               catalogues, frequency):
 
-        MAXIDS = 5
-
-
         l = len(catalogues)
         if l == 0:
             collections = ''
@@ -505,8 +503,6 @@ alert name: %(name)s
 run time: %(runtime)s
 found: %(total)s
 url: <%(url)s>
-
-
 """ % {'supportemail': supportemail,
        'name': name,
        'cdsname': cdsname,
@@ -518,19 +514,19 @@ url: <%(url)s>
        'url': url}
         
         
-        for index, recid in enumerate(records[:MAXIDS]):
-            body += self.tmpl_alert_email_record(index, recid)
+        for index, recid in enumerate(records[:cfg_webalert_max_num_of_records_in_alert_email]):
+            body += "\n%i) " % (index + 1)
+            body += self.tmpl_alert_email_record(recid)
+            body += "\n"
 
-        if len(records) > MAXIDS:
+        if len(records) > cfg_webalert_max_num_of_records_in_alert_email:
             body += '''
-
 Only the first %s records were displayed.  Please consult the search
 URL given at the top of this email to see all the results.
-''' % MAXIDS
+''' % cfg_webalert_max_num_of_records_in_alert_email
 
 
         body += '''
-
 -- 
 %s Alert Service <%s>
 Unsubscribe?  See <%s>
@@ -540,7 +536,9 @@ Need human intervention?  Contact <%s>
         return body
 
 
-    def tmpl_alert_email_record(self, index, recid):
+    def tmpl_alert_email_record(self, recid):
         """ Format a single record."""
 
-        return wrap('\n\n%s) %s' % (index+1, get_as_text(recid))) + '\n'
+        out = wrap(get_as_text(recid))
+        out += "Detailed record: <%s/record/%s>" % (weburl, recid)
+        return out 
