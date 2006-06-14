@@ -38,14 +38,6 @@ from invenio.messages import gettext_set_language
 import invenio.template
 webalert_templates = invenio.template.load('webalert')
 
-def relative_redirect( req, relative_url, **args ):
-    tmp = []
-    for param in args.keys():
-        #ToDo: url encoding of the params
-        tmp.append( "%s=%s"%( param, args[param] ) )
-    req.err_headers_out.add("Location", "%s/%s?%s" % (weburl, relative_url, "&".join( tmp ) ))
-    raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
-
 ### CALLABLE INTERFACE
 
 def display(req, p="n", ln = cdslang):
@@ -223,11 +215,3 @@ def remove(req, name, idu, idq, idb, ln = cdslang):
                 language=ln,
                 req=req,
                 lastupdated=__lastupdated__)
-
-def errorMsg(title, req, c=cdsname, ln=cdslang):
-    return page(title="error",
-                body = create_error_box(req, title=title,verbose=0, ln=ln),
-                description="%s - Internal Error" % c,
-                keywords="%s, CDS Invenio, Internal Error" % c,
-                language=ln,
-                req=req)
