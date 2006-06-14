@@ -1,0 +1,282 @@
+## $Id$
+
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""PERSONAL FEATURES - YOUR ALERTS"""
+
+__lastupdated__ = """$Date$"""
+
+import sys
+import time
+import zlib
+import urllib
+from mod_python import apache
+
+from invenio.config import weburl, sweburl, cdslang, cdsname
+from invenio.webpage import page
+from invenio import webalert
+from invenio.webuser import getUid, page_not_authorized
+from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
+from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.urlutils import redirect_to_url
+
+from invenio.messages import gettext_set_language
+import invenio.template
+webalert_templates = invenio.template.load('webalert')
+
+class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
+    """Defines the set of /youralert pages."""
+
+    _exports = ['', 'display', 'input', 'modify', 'list', 'add',
+                'update', 'remove']
+
+    def index(self, req, form):
+        """Index page."""
+        redirect_to_url(req, '/youralerts/list')
+        
+    def display(self, req, form):
+        """Display search history page.  A misnomer."""
+
+        argd = wash_urlargd(form, {'p': (str, "n")
+                                   })
+
+        uid = getUid(req)
+
+        # load the right message language
+        _ = gettext_set_language(argd['ln'])
+
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../youralerts/display")
+
+        return page(title=_("Display searches"),
+                    body=webalert.perform_display(argd['p'], uid, ln=argd['ln']),
+                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
+                                 'sweburl' : sweburl,
+                                 'account' : _("Your Account"),
+                              },
+                    description="CDS Personalize, Display searches",
+                    keywords="CDS, personalize",
+                    uid=uid,
+                    language=argd['ln'],
+                    req=req,
+                    lastupdated=__lastupdated__)
+
+    def input(left, req, form):
+
+        argd = wash_urlargd(form, {'idq': (int, None),
+                                   'name': (str, ""),
+                                   'freq': (str, "week"),
+                                   'notif': (str, "y"),
+                                   'idb': (int, 0),
+                                   'error_msg': (str, ""),
+                                   })
+
+        uid = getUid(req)
+
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../youralerts/input")
+
+        # load the right message language
+        _ = gettext_set_language(argd['ln'])
+
+        html = webalert.perform_input_alert("add", argd['idq'], argd['name'], argd['freq'],
+                                            argd['notif'], argd['idb'], uid, ln=argd['ln'])
+        if argd['error_msg'] != "":
+            html = webalert_templates.tmpl_errorMsg(
+                     ln = argd['ln'],
+                     error_msg = argd['error_msg'],
+                     rest = html,
+                   )
+        return page(title=_("Set a new alert"),
+                    body=html,
+                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
+                                 'sweburl' : sweburl,
+                                 'account' : _("Your Account"),
+                              },
+                    description="CDS Personalize, Set a new alert",
+                    keywords="CDS, personalize",
+                    uid=uid,
+                    language=argd['ln'],
+                    req=req,
+                    lastupdated=__lastupdated__)
+
+    def modify(self, req, form):
+
+        argd = wash_urlargd(form, {'idq': (int, None),
+                                   'old_idb': (int, None),
+                                   'name': (str, ""),
+                                   'freq': (str, "week"),
+                                   'notif': (str, "y"),
+                                   'idb': (int, 0),
+                                   'error_msg': (str, ""),
+                                   })
+
+        uid = getUid(req)
+
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../youralerts/modify")
+
+        # load the right message language
+        _ = gettext_set_language(argd['ln'])
+
+        html = webalert.perform_input_alert("update", argd['idq'], argd['name'], argd['freq'],
+                                            argd['notif'], argd['idb'], uid, argd['old_idb'], ln=argd['ln'])
+        if argd['error_msg'] != "":
+            html = webalert_templates.tmpl_errorMsg(
+                     ln = argd['ln'],
+                     error_msg = argd['error_msg'],
+                     rest = html,
+                   )
+        return page(title=_("Modify alert settings"),
+                    body=html,
+                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
+                                 'sweburl' : sweburl,
+                                 'account' : _("Your Account"),
+                              },
+                    description="CDS Personalize, Modify alert settings",
+                    keywords="CDS, personalize",
+                    uid=uid,
+                    language=argd['ln'],
+                    req=req,
+                    lastupdated=__lastupdated__)
+
+    def list(self, req, form):
+
+        argd = wash_urlargd(form, {})
+
+        uid = getUid(req)
+
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../youralerts/list")
+
+        # load the right message language
+        _ = gettext_set_language(argd['ln'])
+
+        return page(title=_("Display alerts"),
+                    body=webalert.perform_list_alerts(uid, ln = argd['ln']),
+                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
+                                 'sweburl' : sweburl,
+                                 'account' : _("Your Account"),
+                              },
+                    description="CDS Personalize, Display alerts",
+                    keywords="CDS, personalize",
+                    uid=uid,
+                    language=argd['ln'],
+                    req=req,
+                    lastupdated=__lastupdated__)
+
+    def add(self, req, form):
+
+        argd = wash_urlargd(form, {'idq': (int, None),
+                                   'name': (str, None),
+                                   'freq': (str, None),
+                                   'notif': (str, None),
+                                   'idb': (int, None),
+                                   })
+
+        uid = getUid(req)
+
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../youralerts/add")
+
+        # load the right message language
+        _ = gettext_set_language(argd['ln'])
+
+        try:
+            html = webalert.perform_add_alert(argd['name'], argd['freq'], argd['notif'],
+                                            argd['idb'], argd['idq'], uid, ln=argd['ln'])
+        except webalert.AlertError, e:
+            return self.input(req, form)
+        return page(title=_("Display alerts"),
+                    body=html,
+                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
+                                 'sweburl' : sweburl,
+                                 'account' : _("Your Account"),
+                              },
+                    description="CDS Personalize, Display alerts",
+                    keywords="CDS, personalize",
+                    uid=uid,
+                    language=argd['ln'],
+                    req=req,
+                    lastupdated=__lastupdated__)
+
+    def update(self, req, form):
+
+        argd = wash_urlargd(form, {'name': (str, None),
+                                   'freq': (str, None),
+                                   'notif': (str, None),
+                                   'idb': (int, None),
+                                   'idq': (int, None),
+                                   'old_idb': (int, None),
+                                   })
+
+        uid = getUid(req)
+
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../youralerts/update")
+
+        # load the right message language
+        _ = gettext_set_language(argd['ln'])
+
+        try:
+            html = webalert.perform_update_alert(argd['name'], argd['freq'], argd['notif'],
+                                                 argd['idb'], argd['idq'], argd['old_idb'], uid, ln=argd['ln'])
+        except webalert.AlertError, e:
+            return self.modify(req, form)
+        return page(title=_("Display alerts"),
+                    body=html,
+                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
+                                 'sweburl' : sweburl,
+                                 'account' : _("Your Account"),
+                              },
+                    description="CDS Personalize, Display alerts",
+                    keywords="CDS, personalize",
+                    uid=uid,
+                    language=argd['ln'],
+                    req=req,
+                    lastupdated=__lastupdated__)
+
+    def remove(self, req, form):
+
+        argd = wash_urlargd(form, {'name': (str, None),
+                                   'idu': (int, None),
+                                   'idq': (int, None),
+                                   'idb': (int, None),
+                                   })
+
+        uid = getUid(req)
+
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../youralerts/remove")
+
+        # load the right message language
+        _ = gettext_set_language(argd['ln'])
+
+        return page(title=_("Display alerts"),
+                    body=webalert.perform_remove_alert(argd['name'], argd['idu'], argd['idq'],
+                                                       argd['idb'], uid, ln=argd['ln']),
+                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
+                                 'sweburl' : sweburl,
+                                 'account' : _("Your Account"),
+                              },
+                    description="CDS Personalize, Display alerts",
+                    keywords="CDS, personalize",
+                    uid=uid,
+                    language=argd['ln'],
+                    req=req,
+                    lastupdated=__lastupdated__)

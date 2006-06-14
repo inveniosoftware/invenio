@@ -153,7 +153,7 @@ modules/webalert/lib/htmlparser.py
 modules/webalert/lib/textwrap.py
 modules/webalert/lib/webalert.py
 modules/webalert/lib/webalert_templates.py
-modules/webalert/web/youralerts.py
+modules/webalert/lib/webalert_webinterface.py
 modules/webbasket/doc/admin/guide.html.wml
 modules/webbasket/doc/admin/index.html.wml
 modules/webbasket/lib/webbasket.py

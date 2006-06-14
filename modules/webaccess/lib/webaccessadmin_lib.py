@@ -852,7 +852,7 @@ def perform_modifyalerts(req, userID, callback='yes', confirm=0):
                                    text=text,
                                    p_email=res[0][1],
                                    p_pw=res[0][2],
-                                   referer="%s/youralerts.py/display" % weburl,
+                                   referer="%s/youralerts/display" % weburl,
                                    button="Login")
         output += "Remember that you will be logged out as the current user."
 

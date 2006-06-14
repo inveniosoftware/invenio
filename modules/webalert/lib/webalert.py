@@ -367,7 +367,7 @@ def account_list_searches(uid, ln=cdslang):
     _ = gettext_set_language(ln)
 
     out += _("You have made %(number)s queries. A %(detailed_list)s is available with a posibility to (a) view search results and (b) subscribe for automatic email alerting service for these queries") % {
-              'detailed_list' : """<a href="../youralerts.py/display">""" + _("detailed list") + """</a>""",
+              'detailed_list' : """<a href="../youralerts/display">""" + _("detailed list") + """</a>""",
               'number' : nb_queries_total,
             }
     return out

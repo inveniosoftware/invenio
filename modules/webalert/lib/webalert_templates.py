@@ -105,7 +105,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = """<FORM name="displayalert" action="../youralerts.py/list" method="post">
+        out = """<FORM name="displayalert" action="../youralerts/list" method="post">
                  %(you_own)s
                 <SELECT name="id_alert">
                   <OPTION value="0">- %(alert_name)s -</OPTION>""" % {
@@ -165,7 +165,7 @@ class Template:
                  'query' : query,
                }
 
-        out += """<FORM name="setalert" action="../youralerts.py/%(action)s" method="get">
+        out += """<FORM name="setalert" action="../youralerts/%(action)s" method="get">
         <TABLE style="background-color:F1F1F1; border:thin groove grey" cellspacing="0" cellpadding="0"><TR><TD>
                     <TABLE border="0" cellpadding="0" cellspacing ="10">
                       <TR>
@@ -531,7 +531,7 @@ URL given at the top of this email to see all the results.
 %s Alert Service <%s>
 Unsubscribe?  See <%s>
 Need human intervention?  Contact <%s>
-''' % (cdsname, weburl, weburl + '/youralerts.py/list', supportemail)
+''' % (cdsname, weburl, weburl + '/youralerts/list', supportemail)
         
         return body
 

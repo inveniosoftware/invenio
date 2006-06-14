@@ -29,8 +29,9 @@ from invenio.config import webdir
 from invenio.webinterface_handler import create_handler, WebInterfaceDirectory
 
 from invenio.websearch_webinterface import WebInterfaceSearchInterfacePages
-from invenio.websession_webinterface import WebInterfaceYourAccountPages
 from invenio.websubmit_webinterface import websubmit_legacy_getfile, WebInterfaceSubmitPages
+from invenio.websession_webinterface import WebInterfaceYourAccountPages
+from invenio.webalert_webinterface import WebInterfaceYourAlertsPages
 
 from invenio.urlutils import redirect_to_url
 
@@ -40,6 +41,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     
     _exports = WebInterfaceSearchInterfacePages._exports + [
         'youraccount',
+        'youralerts',
         ('getfile.py', 'getfile'),
         'submit',
         ]
@@ -52,7 +54,8 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
 
     youraccount = WebInterfaceYourAccountPages()
 
-    
+    youralerts = WebInterfaceYourAlertsPages()
+
 # This creates the 'handler' function, which will be invoked directly
 # by mod_python.
 handler = create_handler(WebInterfaceInvenio())

@@ -273,7 +273,7 @@ class Template:
                    }
 
         out += """
-        <dt><A href="../youralerts.py/display?ln=%(ln)s">%(your_searches)s</A>
+        <dt><A href="../youralerts/display?ln=%(ln)s">%(your_searches)s</A>
         <dd>%(search_explain)s
 
         <dt><A href="../yourbaskets.py/display?ln=%(ln)s">%(your_baskets)s</A>
@@ -287,7 +287,7 @@ class Template:
         if guest:
             out += self.tmpl_warning_guest_user(ln = ln, type = "baskets")
         out += """
-        <dt><A href="../youralerts.py/list?ln=%s">%(your_alerts)s</A>
+        <dt><A href="../youralerts/list?ln=%s">%(your_alerts)s</A>
         <dd>%(explain_alerts)s""" % {
           'ln' : ln,
           'your_alerts' : _("Your Alerts"),
