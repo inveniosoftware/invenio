@@ -716,16 +716,7 @@ def calculate_avg_score(res):
     @param res: tuple of tuple returned from query_retrieve_comments_or_remarks 
     @return a float of the average score rounded to the closest 0.5
     """
-
-    c_nickname = 0
-    c_date_creation = 1
-    c_body = 2
-    c_nb_votes_yes = 3
-    c_nb_votes_total = 4
-    c_star_score = 5
-    c_title = 6
-    c_id = 7
-
+    c_star_score = 6
     avg_score = 0.0
     nb_reviews = 0
     for comment in res:
