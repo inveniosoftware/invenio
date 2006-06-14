@@ -683,6 +683,7 @@ class Template:
             comments = reduce(list_to_str, comments)
         else:
             comments = ''
+        record_text = ''
         if record:
             record_text = record[-1]
         body = """
