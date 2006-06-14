@@ -40,7 +40,7 @@ import invenio.template
 webalert_templates = invenio.template.load('webalert')
 
 class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
-    """Defines the set of /youralert pages."""
+    """Defines the set of /youralerts pages."""
 
     _exports = ['', 'display', 'input', 'modify', 'list', 'add',
                 'update', 'remove']
