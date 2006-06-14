@@ -33,8 +33,6 @@ from invenio.messages import gettext_set_language
 import invenio.template
 websession_templates = invenio.template.load('websession')
 
-imagesurl = "%s/img" % weburl
-
 # perform_info(): display the main features of CDS personalize
 def perform_info(req, ln):
     out = ""
