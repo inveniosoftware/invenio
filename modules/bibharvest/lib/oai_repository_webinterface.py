@@ -65,11 +65,11 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
 
         if os.path.exists("%s/RTdata/RTdata" % cachedir):
             time_gap = int(time.time() - os.path.getmtime("%s/RTdata/RTdata" % cachedir))
-            if(time_gap < oai_sleep):
+            if(time_gap < cfg_oai_sleep):
                 req.err_headers_out["Status-Code"] = "503"
-                req.err_headers_out["Retry-After"] = "%d" % (oai_sleep - time_gap)
+                req.err_headers_out["Retry-After"] = "%d" % (cfg_oai_sleep - time_gap)
                 req.status = apache.HTTP_SERVICE_UNAVAILABLE
-                return "Retry after %d seconds" % (oai_sleep - time_gap)
+                return "Retry after %d seconds" % (cfg_oai_sleep - time_gap)
         command = "touch %s/RTdata/RTdata" % cachedir   
         os.system(command)
 

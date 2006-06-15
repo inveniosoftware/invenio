@@ -257,19 +257,19 @@ def print_record(sysno, format='marcxml'):
     
     out = out + "  <record>\n"
 
-    if is_deleted(sysno) and oaideleted != "no":
+    if is_deleted(sysno) and cfg_oai_deleted_policy != "no":
         out = out + "    <header status=\"deleted\">\n"
     else:
         out = out + "   <header>\n"
 
-    for ident in get_field(sysno, oaiidfield):
+    for ident in get_field(sysno, cfg_oai_id_field):
         out = "%s    <identifier>%s</identifier>\n" % (out, escape_space(ident))
     out = "%s    <datestamp>%s</datestamp>\n" % (out, get_modification_date(sysno))
-    for set in get_field(sysno, oaisetfield):
+    for set in get_field(sysno, cfg_oai_set_field):
         out = "%s    <setSpec>%s</setSpec>\n" % (out, set)
     out = out + "   </header>\n"
 
-    if is_deleted(sysno) and oaideleted != "no":
+    if is_deleted(sysno) and cfg_oai_deleted_policy != "no":
         pass
     else:
         out = out + "   <metadata>\n"
@@ -454,10 +454,10 @@ def oailistrecords(args):
     for sysno_ in sysnos:
         if sysno_:
             i = i + 1
-            if i > nb_records_in_resume:          # cache or write?
-                if i == nb_records_in_resume + 1: # resumptionToken?
+            if i > cfg_oai_load:          # cache or write?
+                if i == cfg_oai_load + 1: # resumptionToken?
                     arg['resumptionToken'] = oaigenresumptionToken()
-                    extdate = oaigetresponsedate(oai_rt_expire)
+                    extdate = oaigetresponsedate(cfg_oai_expire)
                     if extdate:
                         out = "%s <resumptionToken expirationDate=\"%s\">%s</resumptionToken>\n" % (out, extdate, arg['resumptionToken'])
                     else:
@@ -466,7 +466,7 @@ def oailistrecords(args):
             else:
                 out = out + print_record(sysno_, arg['metadataPrefix'])
 
-    if i > nb_records_in_resume:
+    if i > cfg_oai_load:
         oaicacheclean()
         sysno.append(arg['metadataPrefix'])
         oaicachein(arg['resumptionToken'], sysno)
@@ -548,28 +548,28 @@ def oailistidentifiers(args):
     for sysno_ in sysnos:
         if sysno_:
             i = i + 1
-            if i > nb_identifiers_in_resume:           # cache or write?
-                if i ==  nb_identifiers_in_resume + 1: # resumptionToken?
+            if i > cfg_oai_load:           # cache or write?
+                if i ==  cfg_oai_load + 1: # resumptionToken?
                     arg['resumptionToken'] = oaigenresumptionToken()
-                    extdate = oaigetresponsedate(oai_rt_expire)
+                    extdate = oaigetresponsedate(cfg_oai_expire)
                     if extdate:
                         out = "%s  <resumptionToken expirationDate=\"%s\">%s</resumptionToken>\n" % (out, extdate, arg['resumptionToken'])
                     else:
                         out = "%s  <resumptionToken>%s</resumptionToken>\n" % (out, arg['resumptionToken'])
                 sysno.append(sysno_)
             else:
-                for ident in get_field(sysno_, oaiidfield): 
-                    if is_deleted(sysno_) and oaideleted != "no":
+                for ident in get_field(sysno_, cfg_oai_id_field): 
+                    if is_deleted(sysno_) and cfg_oai_deleted_policy != "no":
                         out = out + "    <header status=\"deleted\">\n"
                     else:
                         out = out + "    <header>\n"
                     out = "%s      <identifier>%s</identifier>\n" % (out, escape_space(ident))
                     out = "%s      <datestamp>%s</datestamp>\n" % (out, get_modification_date(oaigetsysno(ident)))
-                    for set in get_field(sysno_, oaisetfield):
+                    for set in get_field(sysno_, cfg_oai_set_field):
                         out = "%s      <setSpec>%s</setSpec>\n" % (out, set)
                     out = out + "    </header>\n"
 
-    if i > nb_identifiers_in_resume:
+    if i > cfg_oai_load:
         oaicacheclean() # clean cache from expired resumptionTokens
         oaicachein(arg['resumptionToken'], sysno)
 
@@ -588,10 +588,10 @@ def oaiidentify(args):
     protocolversion       = "  <protocolVersion>2.0</protocolVersion>\n"
     adminemail            = "  <adminEmail>%s</adminEmail>\n" % supportemail
     earliestdst		  = "  <earliestDatestamp>%s</earliestDatestamp>\n" % get_earliest_datestamp()               
-    deletedrecord         = "  <deletedRecord>%s</deletedRecord>\n" % oaideleted
-    repositoryidentifier  = "%s" % oaiidprefix
-    sampleidentifier      = oaisampleidentifier
-    identifydescription   = oaiidentifydescription + "\n"
+    deletedrecord         = "  <deletedRecord>%s</deletedRecord>\n" % cfg_oai_deleted_policy
+    repositoryidentifier  = "%s" % cfg_oai_id_prefix
+    sampleidentifier      = cfg_oai_sample_identifier
+    identifydescription   = cfg_oai_identify_description + "\n"
 
     out = out + repositoryname
     out = out + baseurl
@@ -601,7 +601,7 @@ def oaiidentify(args):
     out = out + deletedrecord
     out = out + "  <granularity>YYYY-MM-DDThh:mm:ssZ</granularity>\n"
     #    print "  <compression></compression>\n"
-    out = out + oaiidentifydescription
+    out = out + cfg_oai_identify_description
 
     out = oai_header(args, "Identify") + out + oai_footer("Identify")
 
@@ -633,7 +633,7 @@ def oaigetsysno(identifier):
     "Returns the first MySQL BIB ID for the OAI identifier 'identifier', if it exists."
     sysno = None
     if identifier:
-        query = "SELECT DISTINCT(bb.id_bibrec) FROM bib%sx AS bx, bibrec_bib%sx AS bb WHERE bx.tag='%s' AND bb.id_bibxxx=bx.id AND bx.value='%s'" % (oaiidfield[0:2], oaiidfield[0:2], oaiidfield, identifier)
+        query = "SELECT DISTINCT(bb.id_bibrec) FROM bib%sx AS bx, bibrec_bib%sx AS bb WHERE bx.tag='%s' AND bb.id_bibxxx=bx.id AND bx.value='%s'" % (cfg_oai_id_field[0:2], cfg_oai_id_field[0:2], cfg_oai_id_field, identifier)
         res = run_sql(query)
         for row in res:
             sysno = row[0]
@@ -646,9 +646,9 @@ def oaigetsysnolist(set, fromdate, untildate):
     out_dict = {} # dict to hold list of out sysnos as its keys
 
     if set:
-        query = "SELECT DISTINCT bibx.id_bibrec FROM bib%sx AS bx LEFT JOIN bibrec_bib%sx AS bibx ON bx.id=bibx.id_bibxxx LEFT JOIN bibrec AS b ON b.id=bibx.id_bibrec WHERE bx.tag='%s' AND bx.value='%s'" % (oaiidfield[0:2], oaiidfield[0:2], oaisetfield, set)
+        query = "SELECT DISTINCT bibx.id_bibrec FROM bib%sx AS bx LEFT JOIN bibrec_bib%sx AS bibx ON bx.id=bibx.id_bibxxx LEFT JOIN bibrec AS b ON b.id=bibx.id_bibrec WHERE bx.tag='%s' AND bx.value='%s'" % (cfg_oai_id_field[0:2], cfg_oai_id_field[0:2], cfg_oai_set_field, set)
     else:
-        query = "SELECT DISTINCT bibx.id_bibrec FROM bib%sx AS bx LEFT JOIN bibrec_bib%sx AS bibx ON bx.id=bibx.id_bibxxx LEFT JOIN bibrec AS b ON b.id=bibx.id_bibrec WHERE bx.tag='%s'" % (oaiidfield[0:2], oaiidfield[0:2], oaiidfield)
+        query = "SELECT DISTINCT bibx.id_bibrec FROM bib%sx AS bx LEFT JOIN bibrec_bib%sx AS bibx ON bx.id=bibx.id_bibxxx LEFT JOIN bibrec AS b ON b.id=bibx.id_bibrec WHERE bx.tag='%s'" % (cfg_oai_id_field[0:2], cfg_oai_id_field[0:2], cfg_oai_id_field)
 
     if untildate:
         query = query + " AND b.modification_date <= '%s'" % untildate
@@ -718,7 +718,7 @@ def oaicacheclean():
     for file_ in files:
         filename = directory + "/" + file_
         # cache entry expires when not modified during a specified period of time
-        if ((time.time() - os.path.getmtime(filename)) > oai_rt_expire):
+        if ((time.time() - os.path.getmtime(filename)) > cfg_oai_expire):
             os.remove(filename)
 
     return 1

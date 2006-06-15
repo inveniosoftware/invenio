@@ -2425,7 +2425,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     if format == "marcxml" or format == "oai_dc":
         out += "  <record>\n"
         out += "   <header>\n"
-        for id in get_fieldvalues(recID,oaiidfield):
+        for id in get_fieldvalues(recID,cfg_oai_id_field):
             out += "    <identifier>%s</identifier>\n" % id
         out += "    <datestamp>%s</datestamp>\n" % get_modification_date(recID)
         out += "   </header>\n"

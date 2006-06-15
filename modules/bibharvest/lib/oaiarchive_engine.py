@@ -97,7 +97,7 @@ def all_sets():
 def repository_size():
     "Read repository size"
 
-    return len(perform_request_search(p1=".*", f1=oaiidfield, m1="r"))
+    return len(perform_request_search(p1=".*", f1=cfg_oai_id_field, m1="r"))
 
 def get_set_descriptions(setSpec):
     "Retrieve set descriptions from oaiARCHIVE table"
@@ -206,7 +206,7 @@ def oaiarchive_task(arg):
             oai_sets = get_set_descriptions(set[2])
             setSpec, setName, setCoverage, recID_list = get_recID_list(oai_sets, set)
     
-            oai_has_list = perform_request_search(c=cdsname, p1=set[2], f1=oaisetfield, m1="e")
+            oai_has_list = perform_request_search(c=cdsname, p1=set[2], f1=cfg_oai_set_field, m1="e")
             oai_has_list_len = "%d" % len(oai_has_list)
             
             sys.stdout.write("  ")
@@ -238,7 +238,7 @@ def oaiarchive_task(arg):
             printInfo()
         else:
     
-            oai_has_list = perform_request_search(c=cdsname, p1=set, f1=oaisetfield, m1="e")
+            oai_has_list = perform_request_search(c=cdsname, p1=set, f1=cfg_oai_set_field, m1="e")
     
             sys.stdout.write("\n setSpec            : %s\n" % setSpec)
             sys.stdout.write(" setName            : %s\n" % setName)
@@ -262,24 +262,24 @@ def oaiarchive_task(arg):
     
     ### oaiIDentry validation
             
-            query = "select b3.value from bibrec_bib%sx as br left join bib%sx as b3 on br.id_bibxxx=b3.id where b3.tag='%s' and br.id_bibrec='%s'" % (oaiidfield[0:2], oaiidfield[0:2], oaiidfield, recID)
+            query = "select b3.value from bibrec_bib%sx as br left join bib%sx as b3 on br.id_bibxxx=b3.id where b3.tag='%s' and br.id_bibrec='%s'" % (cfg_oai_id_field[0:2], cfg_oai_id_field[0:2], cfg_oai_id_field, recID)
             res = run_sql(query)        
             if(res):
                 oaiIDentry = ''
             else:
-                oaiIDentry = "<subfield code=\"%s\">oai:%s:%s</subfield>\n" % (oaiidfield[5:6], oaiidprefix, ID)
+                oaiIDentry = "<subfield code=\"%s\">oai:%s:%s</subfield>\n" % (cfg_oai_id_field[5:6], cfg_oai_id_prefix, ID)
                 oaiIDentrycount += 1
 
-            datafield_set_head = "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % (oaisetfield[0:3], oaisetfield[3:4], oaisetfield[4:5])
-            datafield_id_head  = "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % (oaiidfield[0:3], oaiidfield[3:4], oaiidfield[4:5])
+            datafield_set_head = "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % (cfg_oai_set_field[0:3], cfg_oai_set_field[3:4], cfg_oai_set_field[4:5])
+            datafield_id_head  = "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % (cfg_oai_id_field[0:3], cfg_oai_id_field[3:4], cfg_oai_id_field[4:5])
 
-            oaisetentry = "<subfield code=\"%s\">%s</subfield>\n" % (oaisetfield[5:6], set)
+            oaisetentry = "<subfield code=\"%s\">%s</subfield>\n" % (cfg_oai_set_field[5:6], set)
             oaisetentrycount += 1
 
 
             
     ### oaisetentry validation
-            query = "select b3.value from bibrec_bib%sx as br left join bib%sx as b3 on br.id_bibxxx=b3.id where b3.tag='%s' and br.id_bibrec='%s'" % (oaisetfield[0:2], oaisetfield[0:2], oaisetfield, recID)
+            query = "select b3.value from bibrec_bib%sx as br left join bib%sx as b3 on br.id_bibxxx=b3.id where b3.tag='%s' and br.id_bibrec='%s'" % (cfg_oai_set_field[0:2], cfg_oai_set_field[0:2], cfg_oai_set_field, recID)
             res = run_sql(query)
     
     
@@ -291,17 +291,17 @@ def oaiarchive_task(arg):
     
             if (mode==2):
     
-                if (oaiidfield[0:5] == oaisetfield[0:5]):
+                if (cfg_oai_id_field[0:5] == cfg_oai_set_field[0:5]):
                 
                     oai_out.write("<record>\n")
                     oai_out.write("<controlfield tag=\"001\">%s</controlfield>\n" % recID)
                     oai_out.write(datafield_id_head)
                     oai_out.write("\n")
                     oai_out.write("<subfield code=\"")
-                    oai_out.write(oaiidfield[5:6])
+                    oai_out.write(cfg_oai_id_field[5:6])
                     oai_out.write("\"></subfield>\n")
                     oai_out.write("<subfield code=\"")
-                    oai_out.write(oaisetfield[5:6])
+                    oai_out.write(cfg_oai_set_field[5:6])
                     oai_out.write("\"></subfield>\n")
                     oai_out.write("</datafield>\n")
                     oai_out.write("</record>\n")
@@ -313,14 +313,14 @@ def oaiarchive_task(arg):
                     oai_out.write(datafield_id_head)
                     oai_out.write("\n")
                     oai_out.write("<subfield code=\"")
-                    oai_out.write(oaiidfield[5:6])
+                    oai_out.write(cfg_oai_id_field[5:6])
                     oai_out.write("\"></subfield>\n")
                     oai_out.write("</datafield>\n")
 
                     oai_out.write(datafield_set_head)
                     oai_out.write("\n")
                     oai_out.write("<subfield code=\"")
-                    oai_out.write(oaisetfield[5:6])
+                    oai_out.write(cfg_oai_set_field[5:6])
                     oai_out.write("\"></subfield>\n")
                     oai_out.write("</datafield>\n")
                     oai_out.write("</record>\n")
@@ -328,7 +328,7 @@ def oaiarchive_task(arg):
             elif (mode==1):
 
                 if ((oaiIDentry)or(oaisetentry)):
-                    if (oaiidfield[0:5] == oaisetfield[0:5]):                
+                    if (cfg_oai_id_field[0:5] == cfg_oai_set_field[0:5]):                
                         oai_out.write("<record>\n")
                         oai_out.write("<controlfield tag=\"001\">%s</controlfield>\n" % recID)
                         oai_out.write(datafield_id_head)

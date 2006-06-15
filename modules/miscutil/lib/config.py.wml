@@ -111,7 +111,7 @@ cfg_fields_convert = <CFG_FIELDS_CONVERT>
 cfg_simplesearch_pattern_box_width = <CFG_SIMPLESEARCH_PATTERN_BOX_WIDTH> 
 cfg_advancedsearch_pattern_box_width = <CFG_ADVANCEDSEARCH_PATTERN_BOX_WIDTH> 
 cfg_narrow_search_show_grandsons = <CFG_NARROW_SEARCH_SHOW_GRANDSONS> 
-cfg_oaiidtag = "<OAIIDTAG>" 
+cfg_oaiidtag = "<CFG_OAI_ID_TAG>" 
 cfg_create_similarly_named_authors_link_box = <CFG_CREATE_SIMILARLY_NAMED_AUTHORS_LINK_BOX>
 cfg_google_box = <CFG_GOOGLE_BOX>
 cfg_google_box_servers = <CFG_GOOGLE_BOX_SERVERS>
@@ -142,16 +142,15 @@ CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION = <CFG_ACCESS_CONTROL_NOTIFY_USE
 CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION = <CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION>
 
 ## for oai_repository_config:
-oaiidprefix = "<OAIIDPREFIX>"
-oaisampleidentifier = "<OAISAMPLEIDENTIFIER>"
-oaiidentifydescription = """<OAIIDENTIFYDESCRIPTION>"""
-oaiidfield = "<OAIIDTAG>"
-oaisetfield = "<OAISETTAG>"
-oaideleted = "<OAIDELETEDPOLICY>"
-oai_rt_expire = <OAIEXPIRE>
-oai_sleep = <OAISLEEP>
-nb_records_in_resume = <OAILOAD>
-nb_identifiers_in_resume = <OAILOAD>
+cfg_oai_id_prefix = "<CFG_OAI_ID_PREFIX>"
+cfg_oai_sample_identifier = "<CFG_OAI_SAMPLE_IDENTIFIER>"
+cfg_oai_identify_description = """<CFG_OAI_IDENTIFY_DESCRIPTION>"""
+cfg_oai_id_field = "<CFG_OAI_ID_TAG>"
+cfg_oai_set_field = "<CFG_OAI_SET_TAG>"
+cfg_oai_deleted_policy = "<CFG_OAI_DELETED_POLICY>"
+cfg_oai_expire = <CFG_OAI_EXPIRE>
+cfg_oai_sleep = <CFG_OAI_SLEEP>
+cfg_oai_load = <CFG_OAI_LOAD>
 
 ## for bibindex_engine_config:
 cfg_bibindex_fulltext_index_local_files_only = <CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY>

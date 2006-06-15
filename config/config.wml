@@ -468,68 +468,68 @@ default
 ## This part defines parameters for the CDS Invenio OAI gateway.
 ## Useful if you are running CDS Invenio as OAI data provider.
 
-## OAIIDSCHEME -- OAI identifier scheme:  
+## CFG_OAI_ID_SCHEME -- OAI identifier scheme:  
 ##  (example: "oai")
-<define-tag OAIIDSCHEME whitespace=delete>
+<define-tag CFG_OAI_ID_SCHEME whitespace=delete>
 oai
 </define-tag>
 
-## OAIIDTAG -- OAI identifier tag:  
+## CFG_OAI_ID_TAG -- OAI identifier tag:  
 ##  (example: "0248_a")
-<define-tag OAIIDTAG whitespace=delete>
+<define-tag CFG_OAI_ID_TAG whitespace=delete>
 909COo
 </define-tag>
 
-## OAISETTAG -- OAI set tag:  
+## CFG_OAI_SET_TAG -- OAI set tag:  
 ##  (example: "0248_p")
-<define-tag OAISETTAG whitespace=delete>
+<define-tag CFG_OAI_SET_TAG whitespace=delete>
 909COp
 </define-tag>
 
-## OAIDELETEDTAG -- OAI tag for deleted records mark. OAI record is considered deleted if the value of this field is set to "DELETED" and the OAI deleted records policy is set either to ``transient'' or ``persistent''.
+## CFG_OAI_DELETED_TAG -- OAI tag for deleted records mark. OAI record is considered deleted if the value of this field is set to "DELETED" and the OAI deleted records policy is set either to ``transient'' or ``persistent''.
 ##  (example: "980__c")
-<define-tag OAIDELETEDTAG whitespace=delete>
+<define-tag CFG_OAI_DELETED_TAG whitespace=delete>
 980__c
 </define-tag>
 
-## OAIDELETEDPOLICY -- OAI deletedrecordspolicy
+## CFG_OAI_DELETED_POLICY -- OAI deletedrecordspolicy
 ##  (example: no/transient/persistent)
-<define-tag OAIDELETEDPOLICY whitespace=delete>
+<define-tag CFG_OAI_DELETED_POLICY whitespace=delete>
 no
 </define-tag>
 
-## OAIIDPREFIX -- OAI identifier prefix:  
+## CFG_OAI_ID_PREFIX -- OAI identifier prefix:  
 ##  (example: "cds.cern.ch")
-<define-tag OAIIDPREFIX whitespace=delete>
+<define-tag CFG_OAI_ID_PREFIX whitespace=delete>
 atlantis.cern.ch
 </define-tag>
 
-## OAISAMPLEIDENTIFIER -- OAI sample identifier:  
+## CFG_OAI_SAMPLE_IDENTIFIER -- OAI sample identifier:  
 ##  (example: "oai:cds.cern.ch:CERN-TH-4036")
-<define-tag OAISAMPLEIDENTIFIER whitespace=delete>
-<OAIIDSCHEME>:<OAIIDPREFIX>:CERN-TH-4036
+<define-tag CFG_OAI_SAMPLE_IDENTIFIER whitespace=delete>
+<CFG_OAI_ID_SCHEME>:<CFG_OAI_ID_PREFIX>:CERN-TH-4036
 </define-tag>
 
-## OAIIDENTIFYDESCRIPTION -- description for the OAI Identify verb (optional):
+## CFG_OAI_IDENTIFY_DESCRIPTION -- description for the OAI Identify verb (optional):
 ## (example:"")
 
-<define-tag OAIIDENTIFYDESCRIPTION whitespace=delete>
+<define-tag CFG_OAI_IDENTIFY_DESCRIPTION whitespace=delete>
  <description>
    <oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier
                                        http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">
       <scheme>
-       <OAIIDSCHEME>
+       <CFG_OAI_ID_SCHEME>
       </scheme>
       <repositoryIdentifier>
-       <OAIIDPREFIX>
+       <CFG_OAI_ID_PREFIX>
       </repositoryIdentifier>
       <delimiter>
        :
       </delimiter>
       <sampleIdentifier>
-       <OAISAMPLEIDENTIFIER>
+       <CFG_OAI_SAMPLE_IDENTIFIER>
       </sampleIdentifier>
    </oai-identifier>
  </description>
@@ -539,7 +539,7 @@ atlantis.cern.ch
            xsi:schemaLocation="http://www.openarchives.org/OAI/1.1/eprints
                                http://www.openarchives.org/OAI/1.1/eprints.xsd">
       <content>
-       <URL>http://<OAIIDPREFIX>/</URL>
+       <URL>http://<CFG_OAI_ID_PREFIX>/</URL>
       </content>
       <metadataPolicy>
        <text>Free and unlimited use by anybody with obligation to refer to original record</text>
@@ -554,21 +554,21 @@ atlantis.cern.ch
  </description>
 </define-tag>
 
-## OAILOAD -- OAI number of records in a response:
+## CFG_OAI_LOAD -- OAI number of records in a response:
 ##  (example: "1000")
-<define-tag OAILOAD whitespace=delete>
+<define-tag CFG_OAI_LOAD whitespace=delete>
 1000
 </define-tag>
 
-## OAIEXPIRE -- OAI resumptionToken expiration time:
+## CFG_OAI_EXPIRE -- OAI resumptionToken expiration time:
 ##  (example: "1000")
-<define-tag OAIEXPIRE whitespace=delete>
+<define-tag CFG_OAI_EXPIRE whitespace=delete>
 90000
 </define-tag>
 
-## OAISLEEP -- service unavailable between two consecutive requests for OAISLEEP seconds
+## CFG_OAI_SLEEP -- service unavailable between two consecutive requests for CFG_OAI_SLEEP seconds
 ##  (example: "10")
-<define-tag OAISLEEP whitespace=delete>
+<define-tag CFG_OAI_SLEEP whitespace=delete>
 10
 </define-tag>
 

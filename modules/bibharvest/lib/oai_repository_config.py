@@ -19,13 +19,13 @@
 
 """OAI repository config"""
 
-from invenio.config import oaiidprefix, \
-     oaisampleidentifier, \
-     oaiidentifydescription, \
-     oaiidfield, \
-     oaisetfield, \
-     oaideleted, \
-     oai_rt_expire, \
-     oai_sleep, \
-     nb_records_in_resume
+from invenio.config import cfg_oai_id_prefix, \
+     cfg_oai_sample_identifier, \
+     cfg_oai_identify_description, \
+     cfg_oai_id_field, \
+     cfg_oai_set_field, \
+     cfg_oai_deleted_policy, \
+     cfg_oai_expire, \
+     cfg_oai_sleep, \
+     cfg_oai_load
 
