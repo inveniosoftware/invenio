@@ -822,12 +822,12 @@ def create_basket_navtrail(uid,
     _ = gettext_set_language(ln)
     out = ''
     if category == cfg_webbasket_categories['PRIVATE']:
-        out += ' &gt; <a class="navtrail" href="%s/yourbaskets.py/display?%s">%s</a>'
+        out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
         out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Personal baskets"))
         topics = db.get_personal_topics(uid)
         if 0 <= topic < len(topics):
             out += ' &gt; '
-            out += '<a class="navtrail" href="%s/yourbaskets.py/display?%s">%s</a>'
+            out += '<a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
             out %= (weburl,
                     'category=' + category + '&amp;topic=' + str(topic) + '&amp;ln=' + ln,
                     topics[topic][0])
@@ -835,21 +835,21 @@ def create_basket_navtrail(uid,
                 basket = db.get_public_basket_infos(bskid)
                 if basket:
                     out += ' &gt; '
-                    out += '<a class="navtrail" href="%s/yourbaskets.py/display?%s">%s</a>'
+                    out += '<a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
                     out %= (weburl,
                             'category=' + category + '&amp;topic=' + str(topic) + \
                             '&amp;ln=' + ln + '#bsk' + str(bskid),
                             basket[1])
                 
     elif category == cfg_webbasket_categories['GROUP']:
-        out += ' &gt; <a class="navtrail" href="%s/yourbaskets.py/display?%s">%s</a>'
+        out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
         out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Group baskets"))
         groups = db.get_group_infos(uid)
         if group:
             groups = filter(lambda x: x[0]==group, groups)
         if len(groups):
             out += ' &gt; '
-            out += '<a class="navtrail" href="%s/yourbaskets.py/display?%s">%s</a>'
+            out += '<a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
             out %= (weburl,
                     'category=' + category + '&amp;group=' + str(group) + '&amp;ln=' + ln,
                     groups[0][1])
@@ -857,19 +857,19 @@ def create_basket_navtrail(uid,
                 basket = db.get_public_basket_infos(bskid)
                 if basket:
                     out += ' &gt; '
-                    out += '<a class="navtrail" href="%s/yourbaskets.py/display?%s"">%s</a>'
+                    out += '<a class="navtrail" href="%s/yourbaskets/display?%s"">%s</a>'
                     out %= (weburl,
                             'category=' + category + '&amp;group=' + str(group) + \
                             '&amp;ln=' + ln + '#bsk' + str(bskid),
                             basket[1])
     elif category == cfg_webbasket_categories['EXTERNAL']:
-        out += ' &gt; <a class="navtrail" href="%s/yourbaskets.py/display?%s">%s</a>'
+        out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
         out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Other's baskets"))
         if bskid:
             basket = db.get_public_basket_infos(bskid)
             if basket:
                 out += ' &gt; '
-                out += '<a class="navtrail" href="%s/yourbaskets.py/display?%s"">%s</a>'
+                out += '<a class="navtrail" href="%s/yourbaskets/display?%s"">%s</a>'
                 out %= (weburl,
                         'category=' + category + '&amp;ln=' + ln + '#bsk' + str(bskid),
                         basket[1])
@@ -883,7 +883,7 @@ def account_list_baskets(uid, ln=cdslang):
     _ = gettext_set_language(ln)
     (personal, group, external) = db.count_baskets(uid)
     link = '<a href="%s">%s</a>'
-    base_url = weburl + '/yourbaskets.py/display?category=%s&amp;ln=' + ln
+    base_url = weburl + '/yourbaskets/display?category=%s&amp;ln=' + ln
     personal_text = _("%i personal baskets") % personal
     if personal:
         url = base_url % cfg_webbasket_categories['PRIVATE']
@@ -896,7 +896,7 @@ def account_list_baskets(uid, ln=cdslang):
     if external:
         url = base_url % cfg_webbasket_categories['EXTERNAL']
     else:
-        url = weburl + '/yourbaskets.py/list_public_baskets?ln=' + ln
+        url = weburl + '/yourbaskets/list_public_baskets?ln=' + ln
     external_text = link % (url, external_text) 
     out = _("You have %s and are subscribed to %s and %s.") % (personal_text,
                                                                group_text,

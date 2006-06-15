@@ -222,9 +222,11 @@ via string comparisons.  That is, for functionality like printing of a
 basket we typically have a web-seen function
 <code>print_basket()</code> that looks, schematically:
 
+FIXME: update this to the new file structure.
+FIXME: write about regression testing suite.
 <blockquote>
 <pre>
-$ cat /opt/cds-invenio/var/www/yourbaskets.py
+$ cat /opt/cds-invenio/lib/python/invenio/webbasket_webinterface.py
 [...]
 from invenio.webbasketlib import perform_print_basket
 def print_basket(req, basket_name)

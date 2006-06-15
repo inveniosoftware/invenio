@@ -276,7 +276,7 @@ class Template:
         <dt><A href="../youralerts/display?ln=%(ln)s">%(your_searches)s</A>
         <dd>%(search_explain)s
 
-        <dt><A href="../yourbaskets.py/display?ln=%(ln)s">%(your_baskets)s</A>
+        <dt><A href="../yourbaskets/display?ln=%(ln)s">%(your_baskets)s</A>
         <dd>%(basket_explain)s""" % {
           'ln' : ln,
           'your_searches' : _("Your Searches"),

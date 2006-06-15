@@ -763,7 +763,7 @@ def perform_modifybasket(req, userID, callback='yes', confirm=0):
                                    text=text,
                                    p_email=res[0][1],
                                    p_pw=res[0][2],
-                                   referer="%s/yourbaskets.py/display" % weburl,
+                                   referer="%s/yourbaskets/display" % weburl,
                                    button="Login")
         output += "Remember that you will be logged out as the current user."
 

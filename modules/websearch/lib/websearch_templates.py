@@ -2000,7 +2000,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = """
-              <form action="%(weburl)s/yourbaskets.py/add" method="post">
+              <form action="%(weburl)s/yourbaskets/add" method="post">
               <table>
               """ % {
                 'weburl' : weburl,

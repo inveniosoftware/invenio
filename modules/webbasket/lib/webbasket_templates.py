@@ -81,7 +81,7 @@ class Template:
         tab = """
 <div class="bsktab"%(selected)s>
   <img src="%(url)s/img/%(img)s" alt="%(label)s" />
-  <a href="%(url)s/yourbaskets.py/display?category=%(cat)s&amp;ln=%(ln)s">%(label)s</a>
+  <a href="%(url)s/yourbaskets/display?category=%(cat)s&amp;ln=%(ln)s">%(label)s</a>
 </div>"""
         out = tab % {'selected': selected_category == private and selected or '',
                      'url': weburl,
@@ -121,7 +121,7 @@ class Template:
                 out += '<span class="bsktopic">'
                 topic_label = topic + ' (' + str(number_of_baskets) + ')'
                 if i != selected_topic:
-                    topic_link = '%s/yourbaskets.py/display?category=%s&amp;topic=%i&amp;ln=%s'
+                    topic_link = '%s/yourbaskets/display?category=%s&amp;topic=%i&amp;ln=%s'
                     topic_link %= (weburl, category, i, ln)
                     out += '<a href="%s">' % topic_link
                     out += topic_label + '</a>'
@@ -155,7 +155,7 @@ class Template:
                 out += '<span class="bsktopic">'
                 group_label = group_name + ' (' + str(number_of_baskets) + ')'
                 if group_id != selected_group_id:
-                    group_link = '%s/yourbaskets.py/display?category=%s&amp;group=%i&amp;ln=%s'
+                    group_link = '%s/yourbaskets/display?category=%s&amp;group=%i&amp;ln=%s'
                     group_link %= (weburl, category, group_id, ln)
                     out += '<a href="%s">' % group_link
                     out += group_label + '</a>'
@@ -229,7 +229,7 @@ class Template:
         else:
             (bskid_owner, bsk_owner_nickname, display) = get_user_info(int(bskid_owner))
         messaging_link = self.__create_messaging_link(bsk_owner_nickname, display, ln)
-        link_subscribe = '<a href="%s/yourbaskets.py/subscribe?bskid=%i&amp;ln=%s">' % (weburl, bskid, ln)
+        link_subscribe = '<a href="%s/yourbaskets/subscribe?bskid=%i&amp;ln=%s">' % (weburl, bskid, ln)
         end_link_subscribe = '</a>'
         general_label = _("This basket belongs to %s. You can freely %ssubscribe%s to it") % (messaging_link, link_subscribe, end_link_subscribe)      
         out = """
@@ -273,7 +273,7 @@ class Template:
         name_label = _("Basket's name")
         nb_views_label = _("Number of views")
         owner_label = _("Owner")
-        base_url = weburl + '/yourbaskets.py/list_public_baskets?order=%i&asc=%i&amp;ln=' + ln
+        base_url = weburl + '/yourbaskets/list_public_baskets?order=%i&asc=%i&amp;ln=' + ln
         asc_image = '<img src="' + weburl + '/img/webbasket_' + (asc and 'down.png' or 'up.png') + '" style="vertical-align: middle; border: 0px;" />'
         if order == 1:
             name_label = '<a href="' + base_url % (1, int(not(asc))) + '">' + name_label + ' ' + asc_image + '</a>'
@@ -295,7 +295,7 @@ class Template:
                 (owner_id, owner_nickname, display) = get_user_info(owner_id)
             messaging_link = self.__create_messaging_link(owner_nickname, display, ln)
             form_view = """
-<form action="%(weburl)s/yourbaskets.py/display_public" method="GET">
+<form action="%(weburl)s/yourbaskets/display_public" method="GET">
   <input type="hidden" name="ln" value="%(ln)s" />
   <input type="hidden" name="bskid" value="%(bskid)i" />
   <input type="submit" value="%(display_public_label)s" class="formbutton" />
@@ -304,7 +304,7 @@ class Template:
               'bskid': bskid,
               'display_public_label': _("View")}
             form_subscribe = """
-<form action="%(weburl)s/yourbaskets.py/subscribe" method="GET">
+<form action="%(weburl)s/yourbaskets/subscribe" method="GET">
   <input type="hidden" name="ln" value="%(ln)s" />
   <input type="hidden" name="bskid" value="%(bskid)i" />
   <input type="submit" value="%(subscribe_label)s" class="formbutton"/>
@@ -319,7 +319,7 @@ class Template:
     </tr>""" % (name, nb_views, messaging_link, form_view, form_subscribe)
         if not(len(baskets_html)):
             baskets_html = '<tr><td colspan="5">' + _("There is currently no publicly accessible basket") + '</td></tr>'
-        change_page = '<a href="' + weburl + '/yourbaskets.py/list_public_baskets?inf_limit=%i&amp;order=' + str(order)
+        change_page = '<a href="' + weburl + '/yourbaskets/list_public_baskets?inf_limit=%i&amp;order=' + str(order)
         change_page += '&amp;asc=' + str(asc) + '&amp;ln=' + str(ln) + '"><img src="%s" style="border: 0px;"/></a> '
         footer = ''
         if inf_limit > (cfg_webbasket_max_number_of_displayed_baskets * 2)-1:
@@ -395,7 +395,7 @@ class Template:
         edit_link = ''
         logo = "<img src=\"%s/img/%s\" alt=\"%s\" />" % (weburl, group_img_name, group_alt)
         if user_can_edit_basket:
-            url = weburl + '/yourbaskets.py/edit?bskid=%i&amp;topic=%i&amp;ln=%s'
+            url = weburl + '/yourbaskets/edit?bskid=%i&amp;topic=%i&amp;ln=%s'
             url %= (bskid, selected_topic, ln)
             logo = '<a href="%s">%s</a>' % (url, logo + '<br />' + _("Edit basket")) 
         actions += "<td>" + logo + "</td>"
@@ -439,7 +439,7 @@ class Template:
 </tr>""" % _("You don't have sufficient rights to view this basket's content")
         content = ''
         if selected_category == cfg_webbasket_categories['EXTERNAL']:
-            url = "%s/yourbaskets.py/unsubscribe?bskid=%i&amp;ln=%s" % (weburl, bskid, ln)
+            url = "%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s" % (weburl, bskid, ln)
             action = "<a href=\"%s\">%s</a>"
             action %= (url, _("Unsubscribe from this basket"))
             content += action
@@ -503,7 +503,7 @@ class Template:
         (recid, nb_cmt, last_cmt, val, score) = item
         actions = ''
         if uparrow:
-            url = "%s/yourbaskets.py/modify?action=moveup&amp;bskid=%i&amp;recid=%i"
+            url = "%s/yourbaskets/modify?action=moveup&amp;bskid=%i&amp;recid=%i"
             url += "&amp;category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s"
             url = url % (weburl,
                          bskid,
@@ -518,7 +518,7 @@ class Template:
                                  img,
                                  _("Bring item up"))
         if downarrow:
-            url = "%s/yourbaskets.py/modify?action=movedown&amp;bskid=%i&amp;recid=%i"
+            url = "%s/yourbaskets/modify?action=movedown&amp;bskid=%i&amp;recid=%i"
             url += "&amp;category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s"
             url = url % (weburl,
                          bskid,
@@ -533,7 +533,7 @@ class Template:
                                  img,
                                  _("Bring item down"))
         if copy_item:
-            url = "%s/yourbaskets.py/modify?action=copy&amp;bskid=%i&amp;recid=%i"
+            url = "%s/yourbaskets/modify?action=copy&amp;bskid=%i&amp;recid=%i"
             url += "&amp;category=%s&amp;topic=%i&amp;group_id=%i&amp;ln=%s"
             url = url % (weburl,
                          bskid,
@@ -548,7 +548,7 @@ class Template:
                                  img,
                                  _("Copy item"))
         if delete_item:
-            url = "%s/yourbaskets.py/modify?action=delete&amp;bskid=%i&amp;recid=%i"
+            url = "%s/yourbaskets/modify?action=delete&amp;bskid=%i&amp;recid=%i"
             url += "&amp;category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s"
             url = url % (weburl,
                          bskid,
@@ -581,7 +581,7 @@ class Template:
 %(nb_cmts)i %(cmts_label)s; %(last_cmt_label)s: %(last_cmt)s<br />
 """
             out += """
-<a href="%(weburl)s/yourbaskets.py/display_item?bskid=%(bskid)s&amp;recid=%(recid)i&amp;category=%(category)s&amp;group=%(group)i&amp;topic=%(topic)i&amp;ln=%(ln)s">%(detailed_label)s</a>
+<a href="%(weburl)s/yourbaskets/display_item?bskid=%(bskid)s&amp;recid=%(recid)i&amp;category=%(category)s&amp;group=%(group)i&amp;topic=%(topic)i&amp;ln=%(ln)s">%(detailed_label)s</a>
 """
         out += """
   </td>
@@ -614,7 +614,7 @@ class Template:
         _ = gettext_set_language(ln)
         public_infos = ''
         if group_sharing_level == 0:
-            public_url = weburl + '/yourbaskets.py/display_public?bskid=' + str(bskid)
+            public_url = weburl + '/yourbaskets/display_public?bskid=' + str(bskid)
             public_link = '<a href="%s">%s</a>' % (public_url, public_url)
             public_infos = _("This basket is publicly accessible at this adress: %s.") % public_link
         if content:
@@ -625,7 +625,7 @@ class Template:
 <tr>
   <td colspan="3" class="bskbasketfooter">
     <!-- Commented. Ready for next release
-    <form name="bsk_sort_%(bskid)i" action="%(weburl)s/yourbaskets.py/display" method="GET">
+    <form name="bsk_sort_%(bskid)i" action="%(weburl)s/yourbaskets/display" method="GET">
       <input type="hidden" name="bsk_to_sort" value="%(bskid)i" />
       <input type="hidden" name="category" value="%(category)s" />
       <input type="hidden" name="topic" value="%(topic)i" />
@@ -665,10 +665,10 @@ class Template:
         """display a specific item inside a basket. first parameter is this a big tuple which defines a basket."""
         _ = gettext_set_language(ln)
         total_comments = len(comments)
-        action = weburl + '/yourbaskets.py/write_comment?bskid=%i&amp;recid=%i'
+        action = weburl + '/yourbaskets/write_comment?bskid=%i&amp;recid=%i'
         action += '&amp;category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s'
         action %= (bskid, recid, selected_category, selected_topic, selected_group_id, ln)
-        back_url = weburl + '/yourbaskets.py/display?category=%s&amp;topic=%i&amp;group=%i'
+        back_url = weburl + '/yourbaskets/display?category=%s&amp;topic=%i&amp;group=%i'
         back_url %= (selected_category, selected_topic, selected_group_id)
                 
         def list_to_str(elt1, elt2):
@@ -716,7 +716,7 @@ class Template:
             img = '<img src="%s/img/webbasket_usergroup.png" alt="%s" />' % (weburl, _("Group shared basket"))
         content = ''
         if selected_category == cfg_webbasket_categories['EXTERNAL']:
-            url = "%s/yourbaskets.py/unsubscribe?bskid=%i&amp;ln=%s" % (weburl, bskid, ln)
+            url = "%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s" % (weburl, bskid, ln)
             action = "<a href=\"%s\">%s</a>"
             action %= (url, _("Unsubscribe from this basket"))
             content += action
@@ -733,7 +733,7 @@ class Template:
     <tr>
       <td>%(img)s</td>
       <td class="bsktitle" style="height: 65px">
-        <b><a href="%(weburl)s/yourbaskets.py/display?bskid=%(bskid)s&amp;category=%(category)s&amp;topic=%(topic)i&amp;group=%(group)i&amp;ln=%(ln)s">%(name)s</a></b><br />
+        <b><a href="%(weburl)s/yourbaskets/display?bskid=%(bskid)s&amp;category=%(category)s&amp;topic=%(topic)i&amp;group=%(group)i&amp;ln=%(ln)s">%(name)s</a></b><br />
         %(nb_items)i %(records_label)s - %(last_update_label)s: %(last_update)s
       </td>
       <td class="bskcmtcol"></td>
@@ -781,10 +781,10 @@ class Template:
   <br />"""
         if user_can_add_comment:
             out += """ 
-<a href="%(url)s/yourbaskets.py/write_comment?bskid=%(bskid)i&amp;recid=%(recid)i&amp;cmtid=%(cmtid)i&amp;category=%(category)s&amp;topic=%(topic)i&amp;group=%(group_id)i&amp;ln=%(ln)s">%(reply_label)s</a>""" 
+<a href="%(url)s/yourbaskets/write_comment?bskid=%(bskid)i&amp;recid=%(recid)i&amp;cmtid=%(cmtid)i&amp;category=%(category)s&amp;topic=%(topic)i&amp;group=%(group_id)i&amp;ln=%(ln)s">%(reply_label)s</a>""" 
         if user_can_delete_comment:
             out += """ 
-| <a href="%(url)s/yourbaskets.py/delete_comment?bskid=%(bskid)i&amp;recid=%(recid)i&amp;cmtid=%(cmtid)i&amp;category=%(category)s&amp;topic=%(topic)i&amp;group=%(group_id)i&amp;ln=%(ln)s">%(delete_label)s</a>""" 
+| <a href="%(url)s/yourbaskets/delete_comment?bskid=%(bskid)i&amp;recid=%(recid)i&amp;cmtid=%(cmtid)i&amp;category=%(category)s&amp;topic=%(topic)i&amp;group=%(group_id)i&amp;ln=%(ln)s">%(delete_label)s</a>""" 
         out += """
 </div>"""
         out %= {'title': cmt_title,
@@ -837,7 +837,7 @@ class Template:
         @param ln: language
         @param warnings: list of warnings"""
         _ = gettext_set_language(ln)
-        action = '%s/yourbaskets.py/save_comment?bskid=%i&amp;recid=%i'
+        action = '%s/yourbaskets/save_comment?bskid=%i&amp;recid=%i'
         action += '&amp;category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s'
         action %= (weburl, bskid, recid,
                    selected_category, selected_topic, selected_group_id, ln)
@@ -874,7 +874,7 @@ class Template:
     def tmpl_create_basket_link(self, selected_topic=0, ln=cdslang):
         """ Create link to basket creation """
         _ = gettext_set_language(ln)
-        url = weburl + '/yourbaskets.py/create_basket?topic_number=%i&amp;ln=%s'
+        url = weburl + '/yourbaskets/create_basket?topic_number=%i&amp;ln=%s'
         url %= (selected_topic, ln) 
         image = '<img src="%s/img/webbasket_create_small.png" style="vertical-align: middle; margin-right: 5px" />' % weburl
         out = """
@@ -962,7 +962,7 @@ class Template:
     %(create_box)s
     <input type="submit" value="%(label)s" class="formbutton"/>
   </div>
-</form>""" % {'action': weburl + '/yourbaskets.py/create_basket',
+</form>""" % {'action': weburl + '/yourbaskets/create_basket',
               'ln': ln,
               'create_box': indent_text(self.tmpl_create_box(new_basket_name=new_basket_name,
                                                              new_topic_name=new_topic_name,
@@ -984,7 +984,7 @@ class Template:
                  referer, ln=cdslang):
         """ returns HTML for the basket selection form """
         _ = gettext_set_language(ln)
-        action = weburl + '/yourbaskets.py/add?ln=' + ln
+        action = weburl + '/yourbaskets/add?ln=' + ln
         personal = ''
         group = ''
         external = ''
@@ -1004,7 +1004,7 @@ class Template:
   <td>%s</td>
 </tr>"""
                 personal_html %= (topic_name,
-                                  indent_text(self.__create_select_menu('topic ' + topic_name,
+                                  indent_text(self.__create_select_menu('bskid',
                                                                         baskets),
                                               2))
             personal = self.__tmpl_basket_box(weburl + '/img/webbasket_user.png',
@@ -1054,7 +1054,9 @@ class Template:
                                               _("%i baskets") % len(external_baskets),
                                               external_html)
         create = self.tmpl_create_box(topics=topics, ln=ln)
-        recids_field = reduce(lambda x, y: str(x) + ',' + str(y), recids)
+        out_hidden_recids = ""
+        for recid in recids:
+            out_hidden_recids += """<input type="hidden" name="recid" value="%s" />""" % recid
         fields = filter(lambda x: x != '', [personal, group, external, create])
         while (len(fields) != 4): 
             fields.append('')
@@ -1062,7 +1064,7 @@ class Template:
 <form name="add_to_basket" action="%(action)s" method="POST">
   <p>%(label)s:</p>
   <input type="hidden" name="referer" value="%(referer)s" />
-  <input type="hidden" name="recid" value="%(recids)s" />
+  %(out_hidden_recids)s
   <table style="width:100%%;">
     <tr>
     <td style="width:50%%;vertical-align:top;">%(field1)s</td>
@@ -1080,7 +1082,7 @@ class Template:
   </table>
 </form>""" % {'action': action,
               'referer': referer,
-              'recids': recids_field,
+              'out_hidden_recids': out_hidden_recids,
               'label': _("Adding %i records to these baskets") % len(recids),
               'field1': fields[0],
               'field2': fields[1],
@@ -1115,7 +1117,7 @@ class Template:
         @return html output
         """
         _ = gettext_set_language(ln)
-        message = _("Are your sure you want to delete this basket?")
+        message = _("Are you sure you want to delete this basket?")
         if nb_users:
             message += '<p>' + _("%i users have subscribed to this basket")% nb_users + '</p>'
         if nb_groups:
@@ -1245,7 +1247,7 @@ class Template:
   </table>
       
 </form>""" % {'label': _('Editing basket "%s"') % bsk_name,
-              'action': weburl + '/yourbaskets.py/edit',
+              'action': weburl + '/yourbaskets/edit',
               'ln': ln,
               'topic': topic,
               'bskid': bskid,
@@ -1322,7 +1324,7 @@ class Template:
     </tr>
   </table>
 </form>""" % {'label': _('Sharing basket to a new group'),
-              'action': weburl + '/yourbaskets.py/manage_rights',
+              'action': weburl + '/yourbaskets/edit', # FIXME: was manage_rights here
               'ln': ln,
               'topic': selected_topic,
               'bskid': bskid,
