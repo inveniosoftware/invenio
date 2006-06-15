@@ -21,6 +21,7 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = __init__.py \
              errorlib.py \
              errorlib_tests.py \
+             errorlib_webinterface.py \
              config.py \
              dbquery.py \
 	     miscutil_config.py \
@@ -38,6 +39,7 @@ phplib_DATA = errorHandling.php
 EXTRA_DIST = __init__.py \
              errorlib.py \
              errorlib_tests.py \
+             errorlib_webinterface.py \
 	     miscutil_config.py \
              config.py.wml \
              dbquery.py.wml \

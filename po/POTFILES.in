@@ -126,12 +126,12 @@ modules/miscutil/lib/dateutils.py
 modules/miscutil/lib/dbquery.py.wml
 modules/miscutil/lib/errorlib.py
 modules/miscutil/lib/errorlib_tests.py
+modules/miscutil/lib/errorlib_webinterface.py
 modules/miscutil/lib/__init__.py
 modules/miscutil/lib/miscutil_config.py
 modules/miscutil/lib/messages.py.wml
 modules/miscutil/lib/textutils.py
 modules/miscutil/sql/tabfill.sql.wml
-modules/miscutil/web/error.py
 modules/webaccess/bin/authaction.in
 modules/webaccess/bin/webaccessadmin.in
 modules/webaccess/doc/admin/guide.html.wml

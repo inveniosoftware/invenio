@@ -553,7 +553,7 @@ URI: http://%(host)s%(page)s
                   </tr>
                   <tr>
                     <td>
-                      <form action="%(weburl)s/error.py/send_report" method="POST">
+                      <form action="%(weburl)s/error/send" method="POST">
                         %(send_error_label)s
                         <input class="adminbutton" type="submit" value="%(send_label)s" />
                         <input type="hidden" name="header" value="%(title)s %(sys1)s %(sys2)s" />

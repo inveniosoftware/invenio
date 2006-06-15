@@ -277,7 +277,7 @@ The following error was seen by a user and sent to you.
 %(sys_error)s
 %(traceback)s
 
-Please see the %(logdir)s/errors.log for traceback details.""" % \
+Please see the %(logdir)s/invenio.err for traceback details.""" % \
         {   'header'    : header,
             'url'       : url,
             'time'      : time_msg,
