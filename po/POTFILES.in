@@ -167,8 +167,8 @@ modules/webcomment/lib/webcomment_config.py
 modules/webcomment/lib/webcomment.py
 modules/webcomment/lib/webcomment_templates.py
 modules/webcomment/lib/webcomment_tests.py
+modules/webcomment/lib/webcomment_webinterface.py
 modules/webcomment/web/admin/webcommentadmin.py
-modules/webcomment/web/comments.py
 modules/webhelp/web/admin/howto/index.html.wml
 modules/webhelp/web/admin/howto/marc.html.wml
 modules/webhelp/web/admin/howto/migrate.html.wml
