@@ -19,8 +19,13 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = oai_repository.py oai_repository_config.py oai_repository_tests.py \
-             bibharvestadminlib.py bibharvest_templates.py oaiharvestlib.py \
+pylib_DATA = oai_repository.py \
+             oai_repository_config.py \
+             oai_repository_tests.py \
+             oai_repository_webinterface.py \
+             bibharvestadminlib.py \
+             bibharvest_templates.py \
+             oaiharvestlib.py \
              oaiarchive_engine.py
 
 EXTRA_DIST = $(pylib_DATA)

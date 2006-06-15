@@ -584,7 +584,7 @@ def oaiidentify(args):
     out = ""
 
     repositoryname        = "  <repositoryName>" + cdsname + "</repositoryName>\n"
-    baseurl               = "  <baseURL>%s/oai2d.py/</baseURL>\n" % weburl
+    baseurl               = "  <baseURL>%s/oai2d/</baseURL>\n" % weburl
     protocolversion       = "  <protocolVersion>2.0</protocolVersion>\n"
     adminemail            = "  <adminEmail>%s</adminEmail>\n" % supportemail
     earliestdst		  = "  <earliestDatestamp>%s</earliestDatestamp>\n" % get_earliest_datestamp()               
@@ -613,7 +613,7 @@ def oaigetrequesturl(args):
 
     # re_amp = re.compile('&')
 
-    requesturl = weburl + "/" + "oai2d.py/"# + "?" + re_amp.sub("&amp;", args)
+    requesturl = weburl + "/" + "oai2d/"# + "?" + re_amp.sub("&amp;", args)
 
     return requesturl
 

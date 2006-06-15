@@ -52,7 +52,6 @@ modules/bibharvest/lib/oai_repository_config.py
 modules/bibharvest/lib/oai_repository.py
 modules/bibharvest/lib/oai_repository_tests.py
 modules/bibharvest/web/admin/bibharvestadmin.py
-modules/bibharvest/web/oai2d.py
 modules/bibindex/bin/bibindex.in
 modules/bibindex/bin/bibstat.in
 modules/bibindex/doc/admin/index.html.wml

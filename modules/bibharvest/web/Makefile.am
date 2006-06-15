@@ -18,11 +18,3 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 SUBDIRS = admin
-
-webappdir = $(localstatedir)/www
-
-webapp_DATA = oai2d.py
-
-EXTRA_DIST = $(webapp_DATA)
-
-CLEANFILES = *~ *.tmp 

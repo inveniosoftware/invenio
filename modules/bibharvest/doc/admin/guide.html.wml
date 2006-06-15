@@ -49,7 +49,7 @@ The BibHarvest Admin Interface can be used to set up a database of OAI sources a
 <blockquote>
 <pre>
 $ bibharvest -vListRecords -f2004-04-01 -u2004-04-02 -pmarcxml -o/tmp/z.xml \\
-             http://cdsweb.cern.ch/oai2d.py
+             http://cdsweb.cern.ch/oai2d
 </pre>
 </blockquote>
 
@@ -98,7 +98,7 @@ This allows fully automatised harvesting and conversion (and possibly upload) of
             </tr>
             <tr>
              <td class="admintdright">cdsweb</td>
-             <td class="admintdleft">http://cdsweb.cern.ch/oai2d.py</td>
+             <td class="admintdleft">http://cdsweb.cern.ch/oai2d</td>
              <td class="admintdleft">marcxml</td>
              <td class="admintdleft">daily</td>
              <td class="admintdleft">NULL</td>

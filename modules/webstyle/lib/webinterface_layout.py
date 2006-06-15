@@ -35,6 +35,7 @@ from invenio.webalert_webinterface import WebInterfaceYourAlertsPages
 from invenio.webbasket_webinterface import WebInterfaceYourBasketsPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
 from invenio.errorlib_webinterface import WebInterfaceErrorPages
+from invenio.oai_repository_webinterface import WebInterfaceOAIProviderPages
 
 from invenio.urlutils import redirect_to_url
 
@@ -48,6 +49,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'yourbaskets',
         'comments',
         'error',
+        'oai2d',
         ('getfile.py', 'getfile'),
         'submit',
         ]
@@ -67,6 +69,8 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     comments = WebInterfaceCommentsPages()
 
     error = WebInterfaceErrorPages()
+
+    oai2d = WebInterfaceOAIProviderPages()
 
 # This creates the 'handler' function, which will be invoked directly
 # by mod_python.
