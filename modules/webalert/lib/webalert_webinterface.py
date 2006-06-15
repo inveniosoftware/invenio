@@ -47,7 +47,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
     def index(self, req, form):
         """Index page."""
-        redirect_to_url(req, '/youralerts/list')
+        redirect_to_url(req, '%s/youralerts/list' % weburl)
         
     def display(self, req, form):
         """Display search history page.  A misnomer."""

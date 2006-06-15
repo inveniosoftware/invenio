@@ -27,7 +27,7 @@ import sys
 from urllib import quote
 
 from invenio.dbquery import run_sql
-from invenio.config import cdsname,cdslang
+from invenio.config import cdsname,cdslang,weburl
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_isRole
 from invenio.webpage import page, create_error_box
@@ -162,8 +162,8 @@ def websubmit_legacy_getfile(req, form):
 
             # redirect to this specific file, possibly dropping
             # the version if we are referring to the latest one.
-            target = '/record/%d/files/%s.%s' % (
-                doc.recid, docfile.name, docfile.format)
+            target = '%s/record/%d/files/%s.%s' % (
+                weburl, doc.recid, docfile.name, docfile.format)
 
             if version and int(version) == int(doc.getLatestVersion()):
                 version = ''
@@ -175,7 +175,7 @@ def websubmit_legacy_getfile(req, form):
         
         # all files attached to a record
         elif recid!="":
-            return redirect_to_url(req, '/record/%s/files/' % recid)
+            return redirect_to_url(req, '%s/record/%s/files/' % (weburl, recid))
 
         # a precise filename
         elif docid!="":

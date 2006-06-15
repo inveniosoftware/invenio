@@ -53,7 +53,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
     _force_https = True
 
     def index(self, req, form):
-        redirect_to_url(req, '/youraccount/display')
+        redirect_to_url(req, '%s/youraccount/display' % sweburl)
         
     def display(self, req, form):
         args = wash_urlargd(form, {})
