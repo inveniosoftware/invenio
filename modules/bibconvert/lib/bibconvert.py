@@ -39,7 +39,7 @@ except ImportError, e:
 try:
     from invenio.config import *
     from invenio.search_engine import perform_request_search
-    from invenio.oai_repository_config import oaiidprefix
+    from invenio.oai_repository_config import cfg_oai_id_prefix
 
 except ImportError, e:
     print "Error: %s" % e
@@ -685,7 +685,7 @@ def generate(keyword):
         out = strftime(par[0],localtime())
         out = par[1] + out[:string.atoi(par[2])]
     if (fn == "OAI"):
-        out = "%s:%d" % (oaiidprefix,tcounter + oai_identifier_from)
+        out = "%s:%d" % (cfg_oai_id_prefix,tcounter + oai_identifier_from)
 
     return out
 
@@ -1133,6 +1133,447 @@ def FormatField(value, fn):
         tmp3.append(line)
         out = string.join(tmp3,"\n")
         out = FormatField(out,"SHAPE()")
+
+    elif (fn == "SPLITW"):
+
+        par = set_par_defaults(par,",0,,1")
+        if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
+            par[0] = par[0][NRE:-NRE]
+
+        str = re.search(par[0], value)
+
+        header = string.atoi(par[1])
+        headerplus = par[2]
+        starting = string.atoi(par[3])
+        counter = 1
+        
+        tmp2 = []
+        tmp = re.split(par[0],value)
+
+        last = tmp.pop()
+        
+        for wrd in tmp:
+
+            counter = counter + 1
+            if (counter >= starting):
+                tmp2.append(value[:header] + headerplus + wrd + str)
+            else:
+                tmp2.append(value[:header] + wrd + str)
+        if (last != ""):
+            counter = counter + 1
+            if (counter >= starting):
+                tmp2.append(value[:header] + headerplus + last)
+            else:
+                tmp2.append(value[:header] + last)
+                
+        out = string.join(tmp2,"\n")
+
+    elif (fn == "CONF"):
+
+        par = set_par_defaults(par,",,1")
+
+        found = 0
+        par1  = ""
+
+        data = select_line(par[0],data_parsed)
+        
+        for line in data:
+            if (par[1][0:NRE] == regexp and par[1][-NRE:] == regexp):
+                par1 = par[1][NRE:-NRE]
+            else:
+                par1 = par[1]
+
+            if (par1 == ""):
+                if (line == ""):
+                    found = 1
+
+            elif (len(re.split(par1,line)) > 1 ):
+                found = 1
+
+        if ((found == 1)and(string.atoi(par[2]) == 1)):
+            out = value
+        if ((found == 1)and(string.atoi(par[2]) == 0)):
+            out = ""
+        if ((found == 0)and(string.atoi(par[2]) == 1)):
+            out = ""
+        if ((found == 0)and(string.atoi(par[2]) == 0)):
+            out = value
+              
+        return out
+    
+    elif (fn == "CONFL"):
+
+        set_par_defaults(par,",1")
+        if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
+            par[0] = par[0][NRE:-NRE]
+
+        if (re.search(par[0],value)):
+            if (string.atoi(par[1]) == 1):           
+                out = value
+            else:
+                out = ""
+        else:
+            if (string.atoi(par[1]) == 1):           
+                out = ""
+            else:
+                out = value
+        return out
+
+    elif (fn == "CUT"):
+        par = set_par_defaults(par,",")
+        left  = value[:len(par[0])]
+        right = value[-(len(par[1])):]
+
+        if (left == par[0]):
+            out = out[len(par[0]):]
+        if (right == par[1]):
+            out = out[:-(len(par[1]))]
+        
+        return out
+
+    elif (fn == "NUM"):
+        tmp = re.findall('\d',value)
+        out = string.join(tmp,"")
+
+    return out
+
+def format_field(value, fn):
+    """
+    bibconvert formatting functions:
+    ================================
+    ADD(prefix,suffix)          - add prefix/suffix                             
+    KB(kb_file,mode)            - lookup in kb_file and replace value           
+    ABR(N,suffix)               - abbreviate to N places with suffix
+    ABRX()                      - abbreviate exclusively words longer
+    ABRW()                      - abbreviate word (limit from right)
+    REP(x,y)                    - replace
+    SUP(type)                   - remove characters of certain TYPE
+    LIM(n,side)                 - limit to n letters from L/R
+    LIMW(string,side)           - L/R after split on string
+    WORDS(n,side)               - limit to n words from L/R
+    IF(value,valueT,valueF)     - replace on IF condition
+    MINL(n)                     - replace words shorter than n
+    MINLW(n)                    - replace words shorter than n
+    MAXL(n)                     - replace words longer than n
+    EXPW(type)                  - replace word from value containing TYPE
+    EXP(STR,0/1)                - replace word from value containing string
+    NUM()                       - take only digits in given string
+    SHAPE()                     - remove extra space
+    UP()                        - to uppercase
+    DOWN()                      - to lowercase
+    CAP()                       - make capitals each word
+    SPLIT(n,h,str,from)         - only for final Aleph field, i.e. AB , maintain whole words
+    SPLITW(sep,h,str,from)      - only for final Aleph field, split on string
+    CONF(filed,value,0/1)       - confirm validity of output line (check other field)
+    CONFL(substr,0/1)           - confirm validity of output line (check field being processed)
+    CUT(prefix,postfix)         - remove substring from side
+    RANGE(MIN,MAX)              - select items in repetitive fields
+    RE(regexp)                  - regular expressions
+    
+    bibconvert character TYPES
+    ==========================
+    ALPHA                       - alphabetic
+    NALPHA                      - not alpphabetic
+    NUM                         - numeric
+    NNUM                        - not numeric
+    ALNUM                       - alphanumeric
+    NALNUM                      - non alphanumeric
+    LOWER                       - lowercase
+    UPPER                       - uppercase
+    PUNCT                       - punctual
+    NPUNCT                      - non punctual
+    SPACE                       - space
+    """
+
+    global data_parsed
+
+    out     = value
+    fn      = fn + "()"
+    par     = get_pars(fn)[1]
+    fn      = get_pars(fn)[0]
+    regexp  = "//"
+    NRE     = len(regexp)
+    value   = sub_keywd(value)
+    par_tmp = []
+
+    for item in par:
+        item = sub_keywd(item)
+        par_tmp.append(item)
+    par = par_tmp    
+   
+
+    if (fn == "RE"):
+
+        new_value = ""
+        par = set_par_defaults(par,".*,0")
+
+        if (re.search(par[0],value) and (par[1] == "0")):
+            new_value = value
+
+        out = new_value
+	
+    if (fn == "KB"):
+        new_value = ""
+        
+        par = set_par_defaults(par,"KB,0")
+
+        new_value = crawl_KB(par[0],value,par[1])
+
+        out = new_value
+
+    elif (fn == "ADD"):
+        
+        par = set_par_defaults(par,",")
+        out = par[0] + value + par[1]
+        
+    elif (fn == "ABR"):
+        par = set_par_defaults(par,"1,.")       
+        out = value[:string.atoi(par[0])] + par[1]
+
+    elif (fn == "ABRW"):
+
+        tmp = format_field(value,"ABR(1,.)")
+        tmp = tmp.upper()
+        out = tmp
+
+    elif (fn == "ABRX"):
+        par = set_par_defaults(par,",")       
+        toout = [] 
+        tmp = value.split(" ")
+        for wrd in tmp:
+
+            if (len(wrd) > string.atoi(par[0])):
+                wrd = wrd[:string.atoi(par[0])] + par[1]
+            toout.append(wrd)
+        out = string.join(toout," ")
+
+    elif (fn == "SUP"):
+
+        par = set_par_defaults(par,",")
+
+        if(par[0]=="NUM"):
+            out = re.sub('\d+',par[1],value)
+            
+        if(par[0]=="NNUM"):
+            out = re.sub('\D+',par[1],value)
+
+        if(par[0]=="ALPHA"):
+            out = re.sub('[a-zA-Z]+',par[1],value)
+
+        if(par[0]=="NALPHA"):
+            out = re.sub('[^a-zA-Z]+',par[1],value)
+
+        if((par[0]=="ALNUM")or(par[0]=="NPUNCT")):
+            out = re.sub('\w+',par[1],value)
+
+        if(par[0]=="NALNUM"):
+            out = re.sub('\W+',par[1],value)
+
+        if(par[0]=="PUNCT"):
+            out = re.sub('\W+',par[1],value)
+
+           
+        if(par[0]=="LOWER"):
+            out = re.sub('[a-z]+',par[1],value)
+
+        if(par[0]=="UPPER"):
+            out = re.sub('[A-Z]+',par[1],value)
+
+        if(par[0]=="SPACE"):
+            out = re.sub('\s+',par[1],value)
+        
+    elif (fn == "LIM"):
+        par = set_par_defaults(par,",")       
+
+        if (par[1] == "L"):
+            out = value[(len(value) - string.atoi(par[0])):]           
+        if (par[1] == "R"):
+            out = value[:string.atoi(par[0])]
+
+    elif (fn == "LIMW"):
+        par = set_par_defaults(par,",")       
+        if (par[0]!= ""):
+            if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
+                par[0] = par[0][NRE:-NRE]
+                par[0] = re.search(par[0],value).group()
+        tmp = value.split(par[0])
+        if (par[1] == "L"):
+            out = par[0] + tmp[1]
+        if (par[1] == "R"):
+            out = tmp[0] + par[0]
+
+    elif (fn == "WORDS"):
+        tmp2 = [value]
+        par = set_par_defaults(par,",")               
+        if (par[1] == "R"):
+            tmp = value.split(" ")
+            tmp2 = [] 
+            i = 0
+            while (i < string.atoi(par[0])):
+                tmp2.append(tmp[i])
+                i = i + 1
+        if (par[1] == "L"):
+            tmp = value.split(" ")
+            tmp.reverse()
+            tmp2 = []
+            i = 0
+            while (i < string.atoi(par[0])):
+                tmp2.append(tmp[i])
+                i = i + 1
+            tmp2.reverse()
+        out = string.join(tmp2, " ")
+
+    elif (fn == "MINL"):
+        
+        par = set_par_defaults(par,"1")               
+
+        tmp = value.split(" ")
+        tmp2 = []
+        i = 0
+        for wrd in tmp:
+            if (len(wrd) >= string.atoi(par[0])):
+                tmp2.append(wrd)
+        out = string.join(tmp2, " ")
+
+    elif (fn == "MINLW"):
+        par = set_par_defaults(par,"1")               
+        if (len(value) >= string.atoi(par[0])):
+            out = value
+        else:
+            out = ""
+
+    elif (fn == "MAXL"):
+        par = set_par_defaults(par,"4096")               
+        tmp = value.split(" ")
+        tmp2 = []
+        i = 0
+        for wrd in tmp:
+            if (len(wrd) <= string.atoi(par[0])):
+                tmp2.append(wrd)
+        out = string.join(tmp2, " ")
+       
+    elif (fn == "REP"):
+        set_par_defaults(par,",")
+        if (par[0]!= ""):
+            if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
+                par[0] = par[0][NRE:-NRE]
+                out = re.sub(par[0],value)
+            else:
+                out = value.replace(par[0],par[1])
+
+    elif (fn == "SHAPE"):
+       
+        if (value != ""):
+            out = value.strip()
+
+    elif (fn == "UP"):
+        out = value.upper()
+
+    elif (fn == "DOWN"):
+        out = value.lower()
+
+    elif (fn == "CAP"):
+        tmp = value.split(" ")
+        out2 = []
+        for wrd in tmp:
+            wrd2 = wrd.capitalize()
+            out2.append(wrd2)
+        out = string.join(out2," ")
+
+    elif (fn == "IF"):
+        par = set_par_defaults(par,",,")
+
+        N = 0
+        while N < 3:
+            if (par[N][0:NRE] == regexp and par[N][-NRE:] == regexp):
+                par[N] = par[N][NRE:-NRE]
+                par[N] = re.search(par[N],value).group()
+            N += 1
+
+        if (value == par[0]):
+            out = par[1]
+        else:
+            out = par[2]
+        if (out == "ORIG"):
+            out = value
+
+    elif (fn == "EXP"):
+
+        par = set_par_defaults(par,",0")
+        if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
+            par[0] = par[0][NRE:-NRE]
+            par[0] = re.search(par[0],value).group()
+						     
+        tmp = value.split(" ")
+        out2 = []
+        for wrd in tmp:
+            if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
+                par[0] = par[0][NRE:-NRE]
+                if ((re.search(par[0],wrd).group() == wrd) and (par[1]=="1")):
+                    out2.append(wrd)
+                if ((re.search(par[0],wrd).group() != wrd) and (par[1]=="0")):
+                    out2.append(wrd)
+            else:
+                if ((len(wrd.split(par[0])) == 1)and(par[1]=="1")):
+                    out2.append(wrd)
+                if ((len(wrd.split(par[0])) != 1)and(par[1]=="0")):
+                    out2.append(wrd)                
+        out = string.join(out2," ")
+
+    elif (fn == "EXPW"):
+
+        par = set_par_defaults(par,",0")
+
+        tmp = value.split(" ")
+        out2 = []
+        for wrd in tmp:
+            if ((format_field(wrd,"SUP(" + par[0] + ")") == wrd)and(par[1]=="1")):
+                out2.append(wrd)
+            if ((format_field(wrd,"SUP(" + par[0] + ")") != wrd)and(par[1]=="0")):
+                out2.append(wrd)
+                
+        out = string.join(out2," ")
+        
+
+    elif (fn == "SPLIT"):
+        par = set_par_defaults(par,"%d,0,,1" % conv_setting[1])
+
+        length = string.atoi(par[0]) + (string.atoi(par[1]))
+        header = string.atoi(par[1])
+        headerplus = par[2]
+        starting = string.atoi(par[3])
+
+        line = ""
+        tmp2 = []
+        tmp3 = []
+        tmp = value.split(" ")
+
+        linenumber = 1
+        if (linenumber >= starting):
+            tmp2.append(headerplus)
+            line = line + headerplus
+            
+        for wrd in tmp:
+            line = line + " " + wrd
+
+            tmp2.append(wrd)
+            if (len(line) > length):
+                linenumber = linenumber + 1
+                line = tmp2.pop()
+                toout = string.join(tmp2)
+                tmp3.append(toout)
+                tmp2 = []
+                line2 = value[:header]
+                if (linenumber >= starting):
+                    line3 = line2 + headerplus + line
+                else:
+                    line3 = line2 + line
+                line = line3                        
+                tmp2.append(line)                            
+
+        tmp3.append(line)
+        out = string.join(tmp3,"\n")
+        out = format_field(out,"SHAPE()")
 
     elif (fn == "SPLITW"):
 

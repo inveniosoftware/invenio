@@ -64,6 +64,7 @@ output_rec_sep       = ""
 begin_header         = ""
 ending_footer        = ""
 oai_identifier_from  = 1
+extract_tpl          = ""
       
 opts, args = getopt.getopt(sys.argv[1:],"c:d:hVl:o:b:e:B:E:s:m:C:",
              [
@@ -174,6 +175,12 @@ for opt, opt_value in opts:
         if opt_value[0:1] == "s":
             source_tpl    = opt_value[1:]
             source_tpl_parsed  = bibconvert.parse_template(source_tpl)
+
+
+if(extract_tpl == ""):
+    bibconvert.printInfo()
+    sys.exit(0)
+
 
 if(separator == "EOLEOL"):
     separator = ""
