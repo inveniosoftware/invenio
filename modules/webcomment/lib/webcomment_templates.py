@@ -674,7 +674,7 @@ class Template:
 
     def create_messaging_link(self, to, display_name, ln=cdslang):
         """prints a link to the messaging system"""
-        link = "%s/yourmessages.py/write?msg_to=%s&amp;ln=%s" % (weburl, to, ln)
+        link = "%s/yourmessages/write?msg_to=%s&amp;ln=%s" % (weburl, to, ln)
         if to:
             return '<a href="%s" class="maillink">%s</a>' % (link, display_name)
         else:

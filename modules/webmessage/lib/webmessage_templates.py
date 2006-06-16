@@ -432,7 +432,7 @@ class Template:
         nav_h1 = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
         nav_h2 = ""
         if (title != ""):
-            nav_h2 = ' &gt; <a class="navtrail" href="%s/yourmessages.py/display">%s</a>'
+            nav_h2 = ' &gt; <a class="navtrail" href="%s/yourmessages/display">%s</a>'
             nav_h2 = nav_h2 % (weburl, _("Your Messages"))
 
         return  nav_h1% (weburl,_("Your Account")) + nav_h2
@@ -635,7 +635,7 @@ class Template:
         return: html output.
         """
         _ = gettext_set_language(ln)
-        out = _("You have <b>%i</b> new messages out of <a href=\"%s/yourmessages.py?ln=%s\">%i total messages</a>")% (nb_new_mail, weburl, ln, total_mail)
+        out = _("You have <b>%i</b> new messages out of <a href=\"%s/yourmessages/?ln=%s\">%i total messages</a>")% (nb_new_mail, weburl, ln, total_mail)
         return out
 
     

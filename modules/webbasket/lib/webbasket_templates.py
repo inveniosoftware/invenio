@@ -776,7 +776,7 @@ class Template:
         _ = gettext_set_language(ln)
         out = """
 <div class="bskcomment">
-  <b>%(title)s</b>, %(label_author)s <a href="%(url)s/yourmessages.py/write?msg_to=%(user)s">%(user_display)s</a> %(label_date)s <i>%(date)s</i><br/><br/>
+  <b>%(title)s</b>, %(label_author)s <a href="%(url)s/yourmessages/write?msg_to=%(user)s">%(user_display)s</a> %(label_date)s <i>%(date)s</i><br/><br/>
   %(body)s
   <br />"""
         if user_can_add_comment:
@@ -1404,7 +1404,7 @@ class Template:
        
     def __create_messaging_link(self, to, display_name, ln=cdslang):
         """prints a link to the messaging system"""
-        link = "%s/yourmessages.py/write?msg_to=%s&amp;ln=%s" % (weburl, to, ln)
+        link = "%s/yourmessages/write?msg_to=%s&amp;ln=%s" % (weburl, to, ln)
         if to:
             return '<a href="%s" class="maillink">%s</a>' % (link, display_name)
         else:

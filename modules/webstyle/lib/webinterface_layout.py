@@ -34,6 +34,7 @@ from invenio.websession_webinterface import WebInterfaceYourAccountPages
 from invenio.webalert_webinterface import WebInterfaceYourAlertsPages
 from invenio.webbasket_webinterface import WebInterfaceYourBasketsPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
+from invenio.webmessage_webinterface import WebInterfaceYourMessagesPages
 from invenio.errorlib_webinterface import WebInterfaceErrorPages
 from invenio.oai_repository_webinterface import WebInterfaceOAIProviderPages
 
@@ -47,6 +48,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'youraccount',
         'youralerts',
         'yourbaskets',
+        'yourmessages',
         'comments',
         'error',
         'oai2d',
@@ -65,6 +67,8 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     youralerts = WebInterfaceYourAlertsPages()
 
     yourbaskets = WebInterfaceYourBasketsPages()
+
+    yourmessages = WebInterfaceYourMessagesPages()
 
     comments = WebInterfaceCommentsPages()
 

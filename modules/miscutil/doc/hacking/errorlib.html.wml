@@ -133,7 +133,7 @@ you want to throw one of the errors above, error&#95;list should look like this:
 <p>Business logic should be separated from web interface. We consider three files in the
 following (real) example:
 <ol>
-<li><code>yourmessages.py</code>, which is the page as viewed by a browser,</li>
+<li><code>webmessage_webinterface.py</code>, which is the page as viewed by a browser,</li>
 <li><code>webmessage.py</code>, which contains the business logic,</li>
 <li><code>webmessage&#95;config</code>, which contains error definitions</li>
 </ol>
@@ -175,7 +175,7 @@ def perform&#95;request&#95;display&#95;msg(uid, msgid, ln=cdslang):
     return (body, errors, warnings)
 </pre>
 
-<h5>yourmessages.py: web interface</h5>
+<h5>webmessage_webinterface.py: web interface</h5>
 <pre>
 from invenio.webpage import page
 from invenio.webmessage import perform&#95;request&#95;display&#95;msg

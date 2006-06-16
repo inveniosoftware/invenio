@@ -189,7 +189,7 @@ modules/webmessage/lib/webmessage_dblayer.py
 modules/webmessage/lib/webmessage_mailutils.py
 modules/webmessage/lib/webmessage.py
 modules/webmessage/lib/webmessage_templates.py
-modules/webmessage/web/yourmessages.py
+modules/webmessage/lib/webmessage_webinterface.py
 modules/websearch/bin/webcoll.in
 modules/websearch/doc/admin/index.html.wml
 modules/websearch/doc/admin/guide.html.wml

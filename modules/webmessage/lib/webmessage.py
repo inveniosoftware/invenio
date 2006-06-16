@@ -184,7 +184,7 @@ def perform_request_write(uid,
     msg_reply_id = wash_url_argument(msg_reply_id, 'int')
     msg_to = wash_url_argument(msg_to, 'str')
     msg_to_group = wash_url_argument(msg_to_group, 'str')
-    # ln has already been washed in yourmessages.py
+    # ln has already been washed in webmessage_webinterface
 
     errors = []
     warnings = []

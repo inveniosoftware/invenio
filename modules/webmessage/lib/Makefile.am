@@ -17,9 +17,14 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir=$(libdir)/python/invenio
+pylibdir = $(libdir)/python/invenio
 
-pylib_DATA=webmessage.py webmessage_templates.py webmessage_config.py webmessage_dblayer.py webmessage_mailutils.py
+pylib_DATA = webmessage.py \
+             webmessage_templates.py \
+             webmessage_config.py \
+             webmessage_dblayer.py \
+             webmessage_mailutils.py \
+             webmessage_webinterface.py
 
 EXTRA_DIST = $(pylib_DATA)
 
