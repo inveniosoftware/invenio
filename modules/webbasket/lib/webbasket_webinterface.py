@@ -255,23 +255,14 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         req         = req)
     
     def add(self, req, form):
-        """Add records to baskets.
-        @param recid: list of records
-        @param bskid: list of baskets. If not set or empty, this function will display a form
-                      for the selection of baskets.
-        @param referer: url of the referer
-        @param ln: language
-        """
-        # FIXME: there was no bskid; last argument to this function was **args
-
+        """Add records to baskets."""
         argd = wash_urlargd(form, {'recid': (list, []),
-                                   'bskid': (list, []),
+                                   'bskids': (list, []),
                                    'referer': (str, ""),
                                    'new_basket_name': (str, ""),
                                    'new_topic_name': (str, ""),
                                    'create_in_topic': (int, -1),
                                    })
-
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
@@ -279,8 +270,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if not argd['referer']:
             argd['referer'] = get_referer(req)
         (body, errors, warnings) = perform_request_add(uid=uid,
-                                                       recid=argd['recid'],
-                                                       bskid=argd['bskid'],
+                                                       recids=argd['recid'],
+                                                       bskids=argd['bskids'],
                                                        referer=argd['referer'],
                                                        new_basket_name=argd['new_basket_name'],
                                                        new_topic_name=argd['new_topic_name'],
@@ -305,7 +296,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req)
 
     def delete(self, req, form):
-
+        """Delete basket interface"""
         argd = wash_urlargd(form, {'bskid': (int, -1),
                                    'confirmed': (int, 0),
                                    'category': (str, cfg_webbasket_categories['PRIVATE']),
@@ -352,7 +343,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         req         = req)
 
     def modify(self, req, form):
-
+        """Modify basket content interface (reorder, suppress record, etc.)"""
         argd = wash_urlargd(form, {'action': (str, ""),
                                    'bskid': (int, -1),
                                    'recid': (int, 0),
@@ -382,7 +373,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             title = _("Copy record to basket")
             referer = get_referer(req)
             (body, errors, warnings) = perform_request_add(uid=uid,
-                                                           recid=[argd['recid']], # FIXME: recid arg expect list?
+                                                           recids=argd['recid'],
                                                            referer=referer,
                                                            ln=argd['ln'])
             if isGuestUser(uid):
@@ -410,8 +401,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req)
 
     def edit(self, req, form):
-
-        # FIXME: last parameter was **groups
+        """Edit basket interface"""
         argd = wash_urlargd(form, {'bskid': (int, 0),
                                    'groups': (list, []),
                                    'topic': (int, 0),
@@ -432,7 +422,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../yourbaskets/edit")
 
         _ = gettext_set_language(argd['ln'])
-
         if argd['cancel']:
             url = weburl + '/yourbaskets/display?category=%s&topic=%i&ln=%s'
             url %= (cfg_webbasket_categories['PRIVATE'], argd['topic'], argd['ln'])
@@ -453,7 +442,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                 perform_request_add_group(uid=uid,
                                           bskid=argd['bskid'],
                                           topic=argd['topic'],
-                                          new_group=argd['new_group'],
+                                          group_id=argd['new_group'],
                                           ln=argd['ln'])
             (body, errors, warnings) = perform_request_edit(uid=uid,
                                                             bskid=argd['bskid'],
@@ -508,7 +497,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
-            return page_not_authorized(req, "../yourbaskets/edit") # FIXME: was manage_rights here
+            return page_not_authorized(req, "../yourbaskets/create_basket")
 
         _ = gettext_set_language(argd['ln'])
         if argd['new_basket_name'] and (argd['new_topic_name'] or argd['create_in_topic'] != -1):
@@ -574,7 +563,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req)
                 
     def list_public_baskets(self, req, form):
-
+        """List of public baskets interface"""
         argd = wash_urlargd(form, {'inf_limit': (int, 0),
                                    'order': (int, 1),
                                    'asc': (int, 1),
@@ -599,7 +588,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req)
 
     def unsubscribe(self, req, form):
-
+        """unsubscribe to basket"""
         argd = wash_urlargd(form, {'bskid': (int, 0),
                                    })
         
@@ -612,7 +601,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         redirect_to_url(req, url)
 
     def subscribe(self, req, form):
-
+        """subscribe to basket"""
         argd = wash_urlargd(form, {'bskid': (int, 0),
                                    })
         uid = getUid(req)

@@ -39,7 +39,7 @@ class Template:
                      nb_groups=0,
                      nb_external_baskets=0,
                      ln=cdslang):
-        """Generic display. takes formatted baskets, infobox and topicsbox, 
+        """Generic display. takes already formatted baskets (list of formatted baskets), infobox and topicsbox, 
         add tabs and returns complete interface"""
         _ = gettext_set_language(ln)
         if type(baskets) not in (list, tuple):
@@ -268,7 +268,13 @@ class Template:
         return out        
      
     def tmpl_display_list_public_baskets(self, baskets, inf_limit, total_baskets, order, asc, ln=cdslang):
-        """"""       
+        """Display list of public baskets.
+        @param baskets: list of (bskid, name, nb_views, owner_id, owner_nickname) tuples
+        @param inf limit: inferior limit
+        @param total baskets: nb of baskets in total (>len(baskets) generally
+        @param order: 1: order by name, 2: order by nb of views, 3: order by owner
+        @param asc: 1 for ascending, 0 for descending  
+        """       
         _ = gettext_set_language(ln)
         name_label = _("Basket's name")
         nb_views_label = _("Number of views")
@@ -375,9 +381,8 @@ class Template:
                     ln=cdslang):
         """
         display a basket.
-        @param access_rights: rights user has on this basket (see cfg_webbasket_share_levels)
         @param group_sharing_level: Indicate to which level a basket is shared 
-                                    (None for nobody, 0 for everybody, any other natural for group)
+                                    (None for nobody, 0 for everybody, any other positive int for group)
         @param items: list of (record id, nb of comments, last comment (date), body to display, score (int)) tuples
         """
         _ = gettext_set_language(ln)
@@ -610,7 +615,10 @@ class Template:
                            group_sharing_level=None,
                            content='',
                            ln=cdslang):
-        """display footer of a basket."""
+        """display footer of a basket.
+        @param group sharing level: None: basket is not shared, 
+                                    0: basket is publcly accessible, 
+                                    any positive int: basket is shared to groups"""
         _ = gettext_set_language(ln)
         public_infos = ''
         if group_sharing_level == 0:
@@ -654,15 +662,21 @@ class Template:
                  }
         return out
 
-    ######################### Display of items and commenting ###################################
+    ######################## Display of items and commenting ###################
    
     def tmpl_item(self,
                   (bskid, bsk_name, bsk_date_modification, bsk_nb_views, bsk_nb_records, bsk_id_owner), 
                   recid, record, comments,
-                  sharing_level, (user_can_view_comments, user_can_add_comment, user_can_delete_comment),
+                  group_sharing_level, 
+                  (user_can_view_comments, user_can_add_comment, user_can_delete_comment),
                   selected_category=cfg_webbasket_categories['PRIVATE'],
                   selected_topic=0, selected_group_id=0, ln=cdslang):
-        """display a specific item inside a basket. first parameter is this a big tuple which defines a basket."""
+        """display a specific item inside a basket. first parameter is this a big tuple which defines a basket.
+        @param group sharing level: None: basket is not shared, 
+                                    0: basket is publcly accessible, 
+                                    any positive int: basket is shared to groups
+        @param comments: list of comments  as string
+        """
         _ = gettext_set_language(ln)
         total_comments = len(comments)
         action = weburl + '/yourbaskets/write_comment?bskid=%i&amp;recid=%i'
@@ -770,9 +784,7 @@ class Template:
                                (user_can_add_comment, user_can_delete_comment),
                                selected_category=cfg_webbasket_categories['PRIVATE'],
                                selected_topic=0, selected_group_id=0, ln=cdslang):
-        """Display a given comment. 
-        @param rights: defines which links (reply, delete, ...) will be displayed. see config file for rights.
-        """
+        """Display a given comment. """
         _ = gettext_set_language(ln)
         out = """
 <div class="bskcomment">
@@ -918,15 +930,14 @@ class Template:
         """Display a HTML box for creation of a new basket
         @param new_basket_name: prefilled value (string)
         @param new_topic_name: prefilled value (string)
-        @param topic: list of topics (list of strings)
+        @param topics: list of topics (list of strings)
         @param selected_topic: preselected value for topic selection
         @param ln: language"""
         _ = gettext_set_language(ln)
         topics_html = ''
-        topics =  map(lambda x: x[0], topics)
         if selected_topic:
             try:
-                selected_topic = topics.index(selected_topic[0])
+                selected_topic = topics.index(selected_topic)
             except:
                 selected_topic = None
         if len(topics):
@@ -935,25 +946,33 @@ class Template:
             topics_html = self.__create_select_menu('create_in_topic', topics, selected_topic)
         create_html = """
 <tr>
-  <td>%s</td>
-  <td>
+  <td style="padding: 10 5 0 5;">%s</td>
+  <td style="padding: 10 5 0 0;">
     <input type="text" name="new_basket_name" value="%s"/>
   </td>
 </tr>
 <tr>
-  <td colspan="2">%s %s: <input type="text" name="new_topic_name" value="%s"/>
-</tr>""" % (_("New basket's name"), new_basket_name,
-            topics_html,
-            topics_html!='' and _("or create a new one") or _("Create a new topic"),
-            new_topic_name)
+  <td style="padding: 10 5 0 5;">%s</td>
+  <td style="padding: 10 5 0 0;">%s</td>
+</tr>
+  <td style="padding: 10 5 0 5;">%s</td>
+  <td style="padding: 10 5 0 0;"><input type="text" name="new_topic_name" value="%s"/></td>
+</tr>""" % (_("Basket's name"), new_basket_name,
+            topics_html != '' and _("Choose topic") or '', topics_html,
+            topics_html != '' and _("or create a new one") or _("Create new topic"), new_topic_name)
         return self.__tmpl_basket_box(img=weburl + '/img/webbasket_create.png',
                                       title=_("Create a new basket"),
                                       body=create_html)
 
     def tmpl_create_basket(self, new_basket_name='',
-                           new_topic_name='', create_in_topic=None, topics_list=[],
+                           new_topic_name='', create_in_topic=None, topics=[],
                            ln=cdslang):
-        """Template for basket creation"""
+        """Template for basket creation 
+        @param new_basket_name: prefilled value (string)
+        @param new_topic_name: prefilled value (string)
+        @param topics: list of topics (list of strings)
+        @param create_in_topic: preselected value for topic selection
+        @param ln: language"""
         _ = gettext_set_language(ln)
         out = """
 <form name="create_basket" action="%(action)s" method="POST">
@@ -966,7 +985,7 @@ class Template:
               'ln': ln,
               'create_box': indent_text(self.tmpl_create_box(new_basket_name=new_basket_name,
                                                              new_topic_name=new_topic_name,
-                                                             topics=topics_list,
+                                                             topics=topics,
                                                              selected_topic=create_in_topic,
                                                              ln=ln),
                                         2),
@@ -974,7 +993,7 @@ class Template:
         return out
 
     
-    ############################ functions on baskets ###################################
+    ########################## functions on baskets #########################
     
     def tmpl_add(self, recids,
                  personal_baskets,
@@ -982,9 +1001,15 @@ class Template:
                  external_baskets,
                  topics,
                  referer, ln=cdslang):
-        """ returns HTML for the basket selection form """
+        """ returns HTML for the basket selection form when adding new records
+        @param recids: list of record ids
+        @param personal_baskets: list of (basket id, basket name, topic) tuples
+        @param group_baskets: list of (bskid, bsk_name, group_name) tuples
+        @param external_baskets: list of (bskid, bsk_name) tuples
+        @param topics: list of all the topics the user owns
+        @param referer: url from where this page has been reached
+        @param ln: language"""
         _ = gettext_set_language(ln)
-        action = weburl + '/yourbaskets/add?ln=' + ln
         personal = ''
         group = ''
         external = ''
@@ -998,13 +1023,13 @@ class Template:
                 baskets = map(lambda x: (x[0], x[1]),
                               filter(lambda x: x[2]==topic_name,
                                      personal_baskets))
-                baskets.insert(0, (0, _("Select basket"))) 
+                baskets.insert(0, (-1, _("Select basket"))) 
                 personal_html += """<tr>
   <td>%s</td>
   <td>%s</td>
 </tr>"""
                 personal_html %= (topic_name,
-                                  indent_text(self.__create_select_menu('bskid',
+                                  indent_text(self.__create_select_menu('bskids',
                                                                         baskets),
                                               2))
             personal = self.__tmpl_basket_box(weburl + '/img/webbasket_user.png',
@@ -1021,13 +1046,13 @@ class Template:
                 baskets = map(lambda x: (x[0], x[1]),
                               filter(lambda x: x[2]==group_name,
                                      group_baskets))
-                baskets.insert(0, (0, _("Select basket"))) 
+                baskets.insert(0, (-1, _("Select basket"))) 
                 groups_html += """<tr>
   <td>%s</td>
   <td>%s</td>
 </tr>"""
                 groups_html %= (group_name,
-                                indent_text(self.__create_select_menu('group ' + group_name,
+                                indent_text(self.__create_select_menu('bskids',
                                                                       baskets),
                                             2))
 
@@ -1039,8 +1064,8 @@ class Template:
             external_html = """
 <tr>
   <td>
-    <select name="external_baskets">
-      <option value="0">%s</option>""" % _("Select basket")
+    <select name="bskids">
+      <option value="-1">%s</option>""" % _("Select basket")
             for basket in external_baskets:
                 value = int(basket[0])
                 label = basket[1]
@@ -1076,11 +1101,11 @@ class Template:
     </tr>
     <tr>
       <td colspan="2">
-        <input type="submit" class="formbutton" value="%(submit_label)s" />
+        <input name="submit" type="submit" class="formbutton" value="%(submit_label)s" />
       </td>
     </tr>
   </table>
-</form>""" % {'action': action,
+</form>""" % {'action': weburl + '/yourbaskets/add?ln=' + ln,
               'referer': referer,
               'out_hidden_recids': out_hidden_recids,
               'label': _("Adding %i records to these baskets") % len(recids),
@@ -1110,6 +1135,7 @@ class Template:
         """
         display a confirm message
         @param bskid: basket id
+        @param nb*: nb of users/groups/alerts linked to this basket
         @param category: private, group or external baskets are selected
         @param selected_topic: if private baskets, topic nb
         @param selected_group_id: if group: group to display baskets of
@@ -1169,7 +1195,9 @@ class Template:
                   display_general=0, display_delete=0, ln=cdslang):
         """Display interface for rights management over the given basket
         @param group_rights: list of (group id, name, rights) tuples
-        @param external_rights: rights as defined in cfg_webbasket_share_levels
+        @param external_rights: rights as defined in cfg_webbasket_share_levels for public access.
+        @param display_general: display fields name and topic, used with personal baskets
+        @param display_delete: display delete basket button
         """
         _ = gettext_set_language(ln)
         general_body = ''
@@ -1179,7 +1207,7 @@ class Template:
   <td class="bskcontentcol">%s</td>
   <td class="bskcontentcol"><input type="text" name="new_name" value="%s"/></td>
 </tr>""" % (_("Basket's name"), bsk_name)
-            topics_selection = zip(range(len(topics)), map(lambda x: x[0], topics))
+            topics_selection = zip(range(len(topics)), topics)
             topics_selection.insert(0, (-1, _("Choose topic"))) 
             topics_body = """
 <tr>
@@ -1202,7 +1230,7 @@ class Template:
 <tr>
   <td>%s</td>
   <td>%s</td>
-</tr>""" % (name, self.__create_rights_selection_menu(str(group_id), rights, ln))
+</tr>""" % (name, self.__create_group_rights_selection_menu(group_id, rights, ln))
         groups_body += """
 <tr>
   <td colspan="2">
@@ -1259,8 +1287,10 @@ class Template:
               'delete_button': delete_button}
         return out
 
+    
     def __create_rights_selection_menu(self, name, current_rights, ln=cdslang):
         """Private function. create a drop down menu for selection of rights
+        @param name: name of menu (for HTML name attribute)
         @param current_rights: rights as defined in cfg_webbasket_share_levels
         @param ln: language
         """
@@ -1282,6 +1312,30 @@ class Template:
                      '... ' + _("and") + ' ' + _("manage sharing rights"))
                     ]
         return self.__create_select_menu(name, elements, current_rights)
+
+    def __create_group_rights_selection_menu(self, group_id, current_rights, ln=cdslang):
+        """Private function. create a drop down menu for selection of rights
+        @param current_rights: rights as defined in cfg_webbasket_share_levels
+        @param ln: language
+        """
+        _ = gettext_set_language(ln)
+        elements = [(str(group_id) + '_' + 'NO', _("No rights")),
+                    (str(group_id) + '_' + cfg_webbasket_share_levels['READITM'],
+                     _("View records")),
+                    (str(group_id) + '_' + cfg_webbasket_share_levels['READCMT'],
+                     '... ' + _("and") + ' ' + _("view comments")),
+                    (str(group_id) + '_' + cfg_webbasket_share_levels['ADDCMT'],
+                     '... ' + _("and") + ' ' + _("add comments")),
+                    (str(group_id) + '_' + cfg_webbasket_share_levels['ADDITM'],
+                     '... ' + _("and") + ' ' + _("add records")),
+                    (str(group_id) + '_' + cfg_webbasket_share_levels['DELCMT'],
+                     '... ' + _("and") + ' ' + _("delete comments")),
+                    (str(group_id) + '_' + cfg_webbasket_share_levels['DELITM'],
+                     '... ' + _("and") + ' ' + _("remove records")),
+                    (str(group_id) + '_' + cfg_webbasket_share_levels['MANAGE'],
+                     '... ' + _("and") + ' ' + _("manage sharing rights"))
+                    ]
+        return self.__create_select_menu('groups', elements, str(group_id) + '_' + current_rights)
 
     def tmpl_add_group(self, bskid, selected_topic, groups=[], ln=cdslang):
         """
@@ -1324,7 +1378,7 @@ class Template:
     </tr>
   </table>
 </form>""" % {'label': _('Sharing basket to a new group'),
-              'action': weburl + '/yourbaskets/edit', # FIXME: was manage_rights here
+              'action': weburl + '/yourbaskets/edit',
               'ln': ln,
               'topic': selected_topic,
               'bskid': bskid,
@@ -1371,6 +1425,7 @@ class Template:
         """ private function, returns a popup menu
         @param name: name of HTML control
         @param elements: list of (key, value)
+        @param selected_key: item that should be selected (key of elements tuple)
         """
         out = '<select name="%s">' % name         
         for (key, label) in elements:
@@ -1393,7 +1448,7 @@ class Template:
                 out += '<div class="important" style="padding: 10px;">%s</div>' % warning_text 
         return out
 
-    def tmpl_back_link(self, link, ln):
+    def tmpl_back_link(self, link, ln=cdslang):
         """ returns HTML for a link whose label should be
         'Back to search results'
         """
@@ -1411,6 +1466,8 @@ class Template:
             return display_name
     
     def tmpl_xml_basket(self, items=[]):
+        """Template for XML output of basket
+        @param items: XML version of each item (list)"""
         items_xml = ''
         for item in items:
             items_xml += '  ' + item + '\n'

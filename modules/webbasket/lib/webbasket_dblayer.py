@@ -45,7 +45,7 @@ from invenio.dateutils import convert_datestruct_to_datetext
 #    - get_personal_baskets_infos
 #    - get_all_personal_baskets_names
 #    - get_basket_name
-#    - get_personal_topics
+#    - get_personal_topics_infos
 #    - rename_basket
 #    - rename_topic
 #    - move_baskets_to_topic
@@ -240,12 +240,12 @@ def get_basket_name(bskid):
     else:
         return ''
 
-def get_personal_topics(uid):
+def get_personal_topics_infos(uid):
     """
     Get the list of every topic user has defined,
     and the number of baskets in each topic
     @param uid: user id (int)
-    @return a tuple of topics
+    @return a list of tuples (topic name, nb of baskets)
     """
     query = """SELECT topic, count(b.id)
                FROM   user_bskBASKET ub JOIN bskBASKET b
@@ -447,6 +447,7 @@ def add_to_basket(uid, recids=[], bskids=[]):
                     WHERE    %s
                     GROUP BY id_bskBASKET"""
         sep_or = ' OR '
+        bskids = filter(lambda x: int(x) >= 0, bskids) 
         query1 %= sep_or.join(map(lambda x: 'id_bskBASKET=' + str(x), bskids))
         bsks = dict.fromkeys(bskids, 0)
         bsks.update(dict(run_sql(query1)))

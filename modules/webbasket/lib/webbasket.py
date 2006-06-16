@@ -22,11 +22,10 @@
 from zlib import decompress
 
 from invenio.config import cdslang, weburl
-from invenio.messages import gettext_set_language, wash_language
+from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui, \
                               convert_datetext_to_datestruct,\
                               convert_datestruct_to_dategui
-from invenio.urlutils import wash_url_argument
 from invenio.search_engine import print_record
 from invenio.webbasket_config import cfg_webbasket_share_levels, \
                                      cfg_webbasket_share_levels_ordered, \
@@ -58,9 +57,6 @@ def perform_request_display(uid,
     baskets_html = []
 
     _ = gettext_set_language(ln)
-    
-    selected_topic = wash_url_argument(selected_topic, 'int')
-    selected_group_id = wash_url_argument(selected_group_id, 'int')
     nb_groups = db.count_groups_user_member_of(uid)
     nb_external_baskets = db.count_external_baskets(uid)
     selectionbox = ''
@@ -90,7 +86,7 @@ def perform_request_display(uid,
         else:
             category = cfg_webbasket_categories['PRIVATE']
     if category == cfg_webbasket_categories['PRIVATE']:
-        topics_list = db.get_personal_topics(uid)
+        topics_list = db.get_personal_topics_infos(uid)
         if not selected_topic and len(topics_list):
             selected_topic = 0
         selectionbox = webbasket_templates.tmpl_topic_selection(topics_list,
@@ -153,6 +149,10 @@ def __display_basket(bskid, name, date_modification, nb_views,
                      selected_topic=0, selected_group_id=0,
                      ln=cdslang):
     """Private function. Display a basket giving its category and topic or group.
+    @param share_level: rights user has on basket
+    @param group_sharing_level: None if basket is not shared, 
+                                0 if public basket, 
+                                > 0 if shared to usergroups but not public. 
     @param category: selected category (see webbasket_config.py)
     @param selected_topic: # of selected topic to display baskets
     @param selected_group_id: id of group to display baskets
@@ -203,29 +203,18 @@ def __display_basket(bskid, name, date_modification, nb_views,
                                            ln)
     return (body, errors, warnings)
 
-def perform_request_display_item(uid, bskid, recid, format='hd',
+def perform_request_display_item(uid, bskid, recid, format='hb',
                                  category=cfg_webbasket_categories['PRIVATE'],
-                                 topic=0, group_id=0,
-                                 infos=[],
-                                 ln=cdslang):
+                                 topic=0, group_id=0, ln=cdslang):
     """Display an item of a basket of given category, topic or group.
     @param uid: user id
     @param bskid: basket_id
     @param recid: record id
     @param format: format of the record (hb, hd, etc.)
     @param category: selected category (see webbasket_config.py)
-    @param selected_topic: # of selected topic to display baskets
-    @param selected_group_id: id of group to display baskets
+    @param topic: # of selected topic to display baskets
+    @param group_id: id of group to display baskets
     @param ln: language""" 
-
-    bskid = wash_url_argument(bskid, 'int')
-    recid = wash_url_argument(recid, 'int')
-    category = wash_url_argument(category, 'str')
-    topic = wash_url_argument(topic, 'int')
-    group_id = wash_url_argument(group_id, 'int')
-    infos = wash_url_argument(infos, 'list')
-    ln = wash_language(ln)
-    
     body = ''   
     errors = []
     warnings = []
@@ -235,7 +224,7 @@ def perform_request_display_item(uid, bskid, recid, format='hd',
         errors.append('ERR_WEBBASKET_NO_RIGHTS')
         return (body, errors, warnings)    
     if category == cfg_webbasket_categories['PRIVATE']:
-        topics_list = db.get_personal_topics(uid)
+        topics_list = db.get_personal_topics_infos(uid)
         if not topic and len(topics_list):
             topic = 0
         topicsbox = webbasket_templates.tmpl_topic_selection(topics_list, topic, ln)
@@ -277,16 +266,16 @@ def perform_request_write_comment(uid, bskid, recid, cmtid=0,
                                   category=cfg_webbasket_categories['PRIVATE'],
                                   topic=0, group_id=0,
                                   ln=cdslang):
-    """Display a comment writing form"""
-    uid = wash_url_argument(uid, 'int')
-    bskid = wash_url_argument(bskid, 'int')
-    recid = wash_url_argument(recid, 'int')
-    cmtid = wash_url_argument(cmtid, 'int')
-    category = wash_url_argument(category, 'str')
-    topic = wash_url_argument(topic, 'int')
-    group_id = wash_url_argument(group_id, 'int')
-    ln = wash_language(ln)
-
+    """Display a comment writing form
+    @param uid: user id
+    @param bskid: basket id
+    @param recid: record id (comments are on a specific record in a specific basket)
+    @param cmtid: if provided this comment is a reply to comment cmtid.
+    @param category: selected category
+    @param topic: selected topic
+    @param group id: selected group id
+    @param ln: language
+    """
     body = ''
     warnings = []
     errors = []
@@ -317,7 +306,7 @@ def perform_request_write_comment(uid, bskid, recid, cmtid=0,
                                                   selected_group_id=group_id,
                                                   warnings=warnings)
     if category == cfg_webbasket_categories['PRIVATE']:
-        topics_list = db.get_personal_topics(uid)
+        topics_list = db.get_personal_topics_infos(uid)
         if not topic and len(topics_list):
             topic = 0
         topicsbox = webbasket_templates.tmpl_topic_selection(topics_list, topic, ln)
@@ -341,12 +330,6 @@ def perform_request_save_comment(uid, bskid, recid, title='', text='', ln=cdslan
     @param ln: language (string)
     @return (errors, infos) where errors: list of errors while saving
                                   infos: list of informations to display"""
-    uid = wash_url_argument(uid, 'int')
-    bskid = wash_url_argument(bskid, 'int')
-    recid = wash_url_argument(recid, 'int')
-    text = wash_url_argument(text, 'str')
-    ln = wash_language(ln)
-    
     _ = gettext_set_language(ln)
     errors = []
     infos = []
@@ -361,10 +344,6 @@ def perform_request_save_comment(uid, bskid, recid, title='', text='', ln=cdslan
 
 def perform_request_delete_comment(uid, bskid, recid, cmtid):
     """Delete comment cmtid on record recid for basket bskid."""
-    uid = wash_url_argument(uid, 'int')
-    bskid = wash_url_argument(bskid, 'int')
-    recid = wash_url_argument(recid, 'int')
-    cmtid = wash_url_argument(cmtid, 'int')
     errors = []
     if __check_user_can_perform_action(uid, bskid, cfg_webbasket_share_levels['DELCMT']):
         db.delete_comment(bskid, recid, cmtid)
@@ -372,32 +351,27 @@ def perform_request_delete_comment(uid, bskid, recid, cmtid):
         errors.append('ERR_WEBBASKET_NO_RIGHTS')
     return errors
 
-def perform_request_add(uid, recid=[], bskid=[], referer='',
+def perform_request_add(uid, recids=[], bskids=[], referer='',
                         new_basket_name='', new_topic_name='', create_in_topic='',
                         ln=cdslang):
     """Add records to baskets
     @param uid: user id
-    @param recid: list of records to add
-    @param bskid: list of baskets to add records to. if not provided, will return a
-                  page where user can select baskets
+    @param recids: list of records to add
+    @param bskids: list of baskets to add records to. if not provided, will return a
+                   page where user can select baskets
     @param referer: URL of the referring page
+    @param new_basket_name: add record to new basket
+    @param new_topic_name: new basket goes into new topic
+    @param create_in_topic: # of topic to put basket into
     @param ln: language
     @return (body, errors, warnings) tuple
     """
-    uid = wash_url_argument(uid, 'int')
-    recid = wash_url_argument(recid, 'list')
-    bskid = wash_url_argument(bskid, 'list')
-    referer = wash_url_argument(referer, 'str')
-    new_basket_name = wash_url_argument(new_basket_name, 'str')
-    new_topic_name = wash_url_argument(new_topic_name, 'str')
-    create_in_topic = wash_url_argument(create_in_topic, 'int')
-    ln = wash_language(ln)
-    
     body = ''
     errors = []
     warnings = []
-    
-    if not(len(recid)):
+    if not(type(recids) == list):
+        recids = [recids]
+    if not(len(recids)):
         warnings.append('WRN_WEBBASKET_NO_RECORD')
         body += webbasket_templates.tmpl_warnings(warnings, ln)
         if referer and not(referer.find(weburl) == -1):
@@ -409,17 +383,17 @@ def perform_request_add(uid, recid=[], bskid=[], referer='',
         if new_topic_name:
             topic = new_topic_name
         elif create_in_topic != -1:
-            topics = db.get_personal_topics(uid)
+            topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
             try:
-                topic = topics[create_in_topic][0]
+                topic = topics[create_in_topic]
             except IndexError:
                 topic = ''
         if topic:
             id_bsk = db.create_basket(uid, new_basket_name, topic)
-            bskid.append(id_bsk)
-    if len(bskid):       
+            bskids.append(id_bsk)
+    if len(bskids):       
         # save
-        nb_modified_baskets = db.add_to_basket(uid, recid, bskid)
+        nb_modified_baskets = db.add_to_basket(uid, recids, bskids)
         body = webbasket_templates.tmpl_added_to_basket(nb_modified_baskets, ln)
         body += webbasket_templates.tmpl_back_link(referer, ln)
     else:
@@ -427,11 +401,12 @@ def perform_request_add(uid, recid=[], bskid=[], referer='',
         personal_baskets = db.get_all_personal_baskets_names(uid)
         group_baskets = db.get_all_group_baskets_names(uid)
         external_baskets = db.get_all_external_baskets_names(uid)
-        body = webbasket_templates.tmpl_add(recids=recid,
+        topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
+        body = webbasket_templates.tmpl_add(recids=recids,
                                             personal_baskets=personal_baskets,
                                             group_baskets=group_baskets,
                                             external_baskets=external_baskets,
-                                            topics=db.get_personal_topics(uid), #topics
+                                            topics=topics,
                                             referer=referer,
                                             ln=ln)
         body += webbasket_templates.tmpl_back_link(referer, ln)
@@ -444,24 +419,14 @@ def perform_request_delete(uid, bskid, confirmed=0,
     """Delete a given basket.
     @param uid: user id (user has to be owner of this basket)
     @param bskid: basket id
-    @param confirmed: if 0 will return a confirmation page; if 1 will delete it.
+    @param confirmed: if 0 will return a confirmation page; if 1 will delete basket.
     @param category: category currently displayed
     @param selected_topic: topic currently displayed
     @param selected_group id: if category is group, id of the group currently displayed
-    @param ln: language
-    """
-    uid = wash_url_argument(uid, 'int')
-    bskid = wash_url_argument(bskid, 'int')
-    confirmed = wash_url_argument(confirmed, 'int')
-    category = wash_url_argument(category, 'str')
-    selected_topic = wash_url_argument(selected_topic, 'int')
-    selected_group_id = wash_url_argument(selected_group_id, 'int')
-    ln = wash_language(ln)
-    
+    @param ln: language"""
     body = ''
     errors = []
     warnings = []
-
     if not(db.check_user_owns_baskets(uid, [bskid])):
         errors.append(('ERR_WEBBASKET_NO_RIGHTS',))
         return (body, errors, warnings)
@@ -483,9 +448,6 @@ def delete_record(uid, bskid, recid):
     @param bskid: basket id
     @param recid: record id
     """
-    uid = wash_url_argument(uid, 'int')
-    bskid = wash_url_argument(bskid, 'int')
-    recid = wash_url_argument(recid, 'int')
     if __check_user_can_perform_action(uid, bskid, cfg_webbasket_share_levels['DELITM']):
         db.delete_item(bskid, recid)
 
@@ -494,18 +456,14 @@ def move_record(uid, bskid, recid, direction):
     @param uid: user id (user has to have manage rights over this basket)
     @param bskid: basket id
     @param recid: record we want to move
-    @param direction: cfg_webbasket_actions['UP'] or  cfg_webbasket_actions['DOWN'] (default)
+    @param direction: cfg_webbasket_actions['UP'] or cfg_webbasket_actions['DOWN']
     """
-    uid = wash_url_argument(uid, 'int')
-    bskid = wash_url_argument(bskid, 'int')
-    recid = wash_url_argument(recid, 'int')
-    direction = wash_url_argument(direction, 'str')
     if __check_user_can_perform_action(uid, bskid, cfg_webbasket_share_levels['MANAGE']):
         db.move_item(bskid, recid, direction)
 
 def perform_request_edit(uid, bskid, topic=0, new_name='', 
                          new_topic = '', new_topic_name='',
-                         groups={}, external='', 
+                         groups=[], external='', 
                          ln=cdslang):
     """Interface for management of basket. If names, groups or external is provided, 
     will save new rights into database, else will provide interface.
@@ -515,21 +473,10 @@ def perform_request_edit(uid, bskid, topic=0, new_name='',
     @param new_name: new name of basket
     @param new_topic: topic in which to move basket (int), new_topic_name must be left blank
     @param new_topic_name: new topic in which to move basket (will overwrite param new_topic)
-    @param groups: dictionary of {usergroup id: new rights}
+    @param groups: list of strings formed in this way: group_id + '_' + rights
     @param external: rights for everybody (can be 'NO')
     @param ln: language
     """
-    uid = wash_url_argument(uid, 'int')
-    bskid = wash_url_argument(bskid, 'int')
-    topic = wash_url_argument(topic, 'int')
-    new_name = wash_url_argument(new_name, 'str')
-    new_topic = wash_url_argument(new_topic, 'int')
-    new_topic_name = wash_url_argument(new_topic_name, 'str')
-    if not(type(groups) is dict):
-        groups = {}
-    external = wash_url_argument(external, 'str')
-    ln = wash_language(ln)
-
     body = ''
     errors = []
     warnings = []
@@ -541,7 +488,7 @@ def perform_request_edit(uid, bskid, topic=0, new_name='',
     bsk_name = db.get_basket_name(bskid)
     if not(groups) and not(external) and not(new_name) and not(new_topic) and not(new_topic_name):
         # display interface
-        topics = db.get_personal_topics(uid)
+        topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
         groups_rights = db.get_groups_subscribing_to_basket(bskid)
         external_rights = ''
         if groups_rights and groups_rights[0][0] == 0:
@@ -555,17 +502,22 @@ def perform_request_edit(uid, bskid, topic=0, new_name='',
                                              groups_rights=groups_rights, external_rights=external_rights, 
                                              ln=ln)
     else:
-        groups['0'] = external
-        db.update_rights(bskid, groups)
+        out_groups = {}
+        if len(groups):
+            for group in groups:
+                (group_id, group_rights) = group.split('_')
+                out_groups[group_id] = group_rights
+        out_groups['0'] = external
+        db.update_rights(bskid, out_groups)
         if new_name != bsk_name:
             db.rename_basket(bskid, new_name)
         if new_topic_name:
             db.move_baskets_to_topic(uid, bskid, new_topic_name)            
         elif new_topic != -1:
             if db.check_user_owns_baskets(uid, bskid):
-                topics = db.get_personal_topics(uid)
+                topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
                 try:
-                    new_topic_name = topics[new_topic][0]
+                    new_topic_name = topics[new_topic]
                     db.move_baskets_to_topic(uid, bskid, new_topic_name)
                 except:
                     errors.append(('ERR_WEBBASKET_DB_ERROR'))
@@ -574,63 +526,15 @@ def perform_request_edit(uid, bskid, topic=0, new_name='',
             errors.append(('ERR_WEBBASKET_NOT_OWNER')) 
     return (body, errors, warnings)
     
-    
-def perform_request_manage_rights(uid, bskid, topic=0,
-                                  groups={}, external='', ln=cdslang):
-    """Interface for management of rights. If groups or external is provided, will save new
-    rights into database, else will provide interface.
-    @param uid: user id (user has to have sufficient rights on this basket
-    @param bskid: basket id to change rights on
-    @param topic: topic currently used
-    @param groups: dictionary of {usergroup id: new rights}
-    @param external: rights for everybody (can be 'NO')
-    @param ln: language
-    """
-    uid = wash_url_argument(uid, 'int')
-    bskid = wash_url_argument(bskid, 'int')
-    topic = wash_url_argument(topic, 'int')
-    if not(type(groups) is dict):
-        groups = {}
-    external = wash_url_argument(external, 'str')
-    ln = wash_language(ln)
-
-    body = ''
-    errors = []
-    warnings = []
-
-    rights = db.get_max_user_rights_on_basket(uid, bskid)
-    if rights != cfg_webbasket_share_levels['MANAGE']:
-        errors.append(('ERR_WEBBASKET_NO_RIGHTS',))
-        return (body, errors, warnings)
-    if not(groups) and not(external):
-        bsk_name = db.get_basket_name(bskid)
-        groups_rights = db.get_groups_subscribing_to_basket(bskid)
-        external_rights = ''
-        if groups_rights and groups_rights[0][0] == 0:
-            external_rights = groups_rights[0][2]
-            groups_rights = groups_rights[1:]
-        body = webbasket_templates.tmpl_manage_rights(bskid, bsk_name,
-                                                      groups_rights, external_rights,
-                                                      topic, ln)
-    else:
-        groups['0'] = external
-        db.update_rights(bskid, groups)
-    return (body, errors, warnings)
-
 def perform_request_add_group(uid, bskid, topic=0, group_id=0, ln=cdslang):
-    """If group id is specified, share basket bskid to this group;
+    """If group id is specified, share basket bskid to this group with READITM rights;
     else return a page for selection of a group.
     @param uid: user id (selection only of groups user is member of)
     @param bskid: basket id
     @param topic: topic currently displayed
+    @param group_id: id of group to share basket to
     @param ln: language
     """
-    uid = wash_url_argument(uid, 'int')
-    bskid = wash_url_argument(bskid, 'int')
-    group_id = wash_url_argument(group_id, 'int')
-    topic = wash_url_argument(topic, 'int')
-    ln = wash_language(ln)
-    
     if group_id:
         db.share_basket_with_group(bskid, group_id, cfg_webbasket_share_levels['READITM'])
     else:
@@ -651,34 +555,26 @@ def perform_request_create_basket(uid,
     @param topic_number: number of topic to preselect on the creation form.
     @pram ln: language
     """
-    uid = wash_url_argument(uid, 'int')
-    new_basket_name = wash_url_argument(new_basket_name, 'str')
-    new_topic_name = wash_url_argument(new_topic_name, 'str')
-    create_in_topic = wash_url_argument(create_in_topic, 'int')
-    topic_number = wash_url_argument(topic_number, 'int')
-    ln = wash_language(ln)
-    
     if new_basket_name and (new_topic_name or create_in_topic != -1):
+        topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
         new_topic_name = new_topic_name.strip()
         if new_topic_name:
             topic = new_topic_name
         else:
-            topics = db.get_personal_topics(uid)
             try:
-                topic = topics[create_in_topic][0]
+                topic = topics_infos[create_in_topic]
             except IndexError:
                 return 0
         db.create_basket(uid, new_basket_name, topic)
-        topics_list = map(lambda x: x[0], db.get_personal_topics(uid))
+        topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
         try:
-            return topics_list.index(topic)
+            return topics.index(topic)
         except ValueError:
             return 0
     else:
-        topics = db.get_personal_topics(uid)
-        if topic_number > -1 and topic_number < len(topics):
+        topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
+        if topic_number in range (0, len(topics)):
             create_in_topic = topics[topic_number]
-            
         body = webbasket_templates.tmpl_create_basket(new_basket_name,
                                                       new_topic_name, create_in_topic,
                                                       topics,
@@ -686,12 +582,11 @@ def perform_request_create_basket(uid,
         return (body, [], [])
       
 def perform_request_display_public(bskid=0, of='hb', ln=cdslang):
-    """return html representation of a public basket """
-    bskid = wash_url_argument(bskid, 'int')
-    of = wash_url_argument(of, 'str')
-    ln = wash_language(ln)
+    """return html representation of a public basket 
+    @param bskid: basket id
+    @param of: format
+    @param ln: language"""
     _ = gettext_set_language(ln)
-    
     body = ''
     errors = []
     warnings = []
@@ -718,7 +613,7 @@ def perform_request_display_public(bskid=0, of='hb', ln=cdslang):
                     val = decompress(ext_val)
             else:
                 if int_val:
-                    val = decompress(int_val)
+                    val = print_record(recid)
             records.append((recid, nb_cmt, last_cmt, val, score))
         body = webbasket_templates.tmpl_display_public(basket, records, ln)        
     else:
@@ -726,14 +621,14 @@ def perform_request_display_public(bskid=0, of='hb', ln=cdslang):
     return (body, errors, warnings)
     
 def perform_request_list_public_baskets(inf_limit=0, order=1, asc=1, ln=cdslang):
-    """"""
-    inf_limit = wash_url_argument(inf_limit, 'int')
-    order = wash_url_argument(order, 'int')
-    asc = wash_url_argument(asc, 'int')
-    ln = wash_language(ln)
+    """Display list of public baskets.
+    @param inf_limit: display baskets from inf_limit
+    @param order: 1: order by name of basket, 2: number of views, 3: owner
+    @param asc: ascending order if 1, descending if 0
+    @param ln: language
+    """
     errors = []
     warnings = []
-    
     total_baskets = db.count_public_baskets()
     baskets = db.get_public_baskets_list(inf_limit, cfg_webbasket_max_number_of_displayed_baskets, order, asc)
     body = webbasket_templates.tmpl_display_list_public_baskets(baskets, inf_limit, total_baskets, order, asc, ln)
@@ -741,8 +636,6 @@ def perform_request_list_public_baskets(inf_limit=0, order=1, asc=1, ln=cdslang)
         
 def perform_request_subscribe(uid, bskid):
     """subscribe to external basket bskid"""
-    uid = wash_url_argument(uid, 'int')
-    bskid = wash_url_argument(bskid, 'int')
     errors = []
     if db.is_public(bskid):
         db.subscribe(uid, bskid)
@@ -752,9 +645,7 @@ def perform_request_subscribe(uid, bskid):
         
 def perform_request_unsubscribe(uid, bskid):
     """unsubscribe from external basket bskid"""
-    uid = wash_url_argument(uid, 'int')
-    bskid = wash_url_argument(bskid, 'int')
-    unsubscribe(uid, bskid)
+    db.unsubscribe(uid, bskid)
     
 def __check_user_can_comment(uid, bskid):
     """ Private function. check if a user can comment """
@@ -784,7 +675,6 @@ def __check_sufficient_rights(rights_user_has, rights_needed):
 
 def create_guest_warning_box(ln=cdslang):
     """return a warning message about logging into system"""
-    ln = wash_language(ln)
     return webbasket_templates.tmpl_create_guest_warning_box(ln)
 
 def create_personal_baskets_selection_box(uid,
@@ -813,24 +703,18 @@ def create_basket_navtrail(uid,
     @param group: selected group id for displaying (int)
     @param bskid: basket id (int)
     @param ln: language"""
-    uid = wash_url_argument(uid, 'int')
-    category = wash_url_argument(category, 'str')
-    topic = wash_url_argument(topic, 'int')
-    group = wash_url_argument(group, 'int')
-    bskid = wash_url_argument(bskid, 'int')
-    ln = wash_language(ln)
     _ = gettext_set_language(ln)
     out = ''
     if category == cfg_webbasket_categories['PRIVATE']:
         out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
         out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Personal baskets"))
-        topics = db.get_personal_topics(uid)
-        if 0 <= topic < len(topics):
+        topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
+        if topic in range(0, len(topics)):
             out += ' &gt; '
             out += '<a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
             out %= (weburl,
                     'category=' + category + '&amp;topic=' + str(topic) + '&amp;ln=' + ln,
-                    topics[topic][0])
+                    topics[topic])
             if bskid:
                 basket = db.get_public_basket_infos(bskid)
                 if basket:
@@ -876,10 +760,7 @@ def create_basket_navtrail(uid,
     return out
 
 def account_list_baskets(uid, ln=cdslang):
-    """Display baskets informations on account page"""
-    ln = wash_language(ln)
-    uid = wash_url_argument(uid, 'int')
-    
+    """Display baskets informations on account page"""    
     _ = gettext_set_language(ln)
     (personal, group, external) = db.count_baskets(uid)
     link = '<a href="%s">%s</a>'
