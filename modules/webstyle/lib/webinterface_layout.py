@@ -51,7 +51,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'yourmessages',
         'comments',
         'error',
-        'oai2d',
+        'oai2d', ('oai2d.py', 'oai2d'),
         ('getfile.py', 'getfile'),
         'submit',
         ]
