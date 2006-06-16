@@ -491,12 +491,18 @@ def get_nicknames_like(pattern):
         return res
     return ()
 
-def get_groupnames_like(pattern):
-    """Get groupnames like pattern"""
+def get_groupnames_like(pattern, also_return_id=0):
+    """Get groupnames like pattern
+    if also_return_id provided: 
+    will return tuples of (group name, group id)
+    """
     if pattern:
-        query = "SELECT name FROM usergroup WHERE name RLIKE '%s'"
+        query = "SELECT name%s FROM usergroup WHERE name RLIKE '%s'"
+        id_field = ''
+        if also_return_id:
+            id_field = ', id'
         pattern = escape_string(pattern)
-        res = run_sql(query%pattern)
+        res = run_sql(query% (id_field, pattern))
         return res
     return ()
 
