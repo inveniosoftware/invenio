@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from invenio.dbquery import run_sql
+from invenio.websubmitadmin_config import *
 from MySQLdb import escape
+from random import seed, randint
 
 ## Functions relating to WebSubmit ACTIONS, their addition, and their modification:
 
@@ -77,8 +79,14 @@ def get_number_jschecks_with_chname(chname):
        @param chname: Check name/id (chname) to query for
        @return an integer count of the number of Checks in the WebSubmit database for this chname.
     """
-    q = """SELECT COUNT(chname) FROM sbmCHECKS where chname=%s"""
+    q = """SELECT COUNT(chname) FROM sbmCHECKS where chname=%s COLLATE latin1_general_cs"""
     return int(run_sql(q, (chname,))[0][0])
+
+def get_all_jscheck_names():
+    """Return a list of the names of all WebSubmit JSChecks"""
+    q = """SELECT DISTINCT(chname) FROM sbmCHECKS ORDER BY chname ASC"""
+    res = run_sql(q)
+    return map(lambda x: str(x[0]), res)
 
 def get_chname_alljschecks():
     """Get and return a tuple of tuples containing the "check name" (chname) for each JavaScript Check
@@ -192,6 +200,20 @@ def get_distinct_paramname_all_websubmit_function_parameters():
         all_params_list.append((param,))
     return all_params_list
 
+def regulate_score_of_all_functions_in_step_to_ascending_multiples_of_10_for_submission(doctype, action, step):
+    q = """SELECT function, score, step FROM sbmFUNCTIONS WHERE doctype=%s AND action=%s AND step=%s ORDER BY step ASC"""
+    functnres = run_sql(q, (doctype, action, step))
+    i = 1
+    for functn in functnres:
+        functn_name  = functn[0]
+        functn_score = functn[1]
+        functn_step  = functn[2]
+        if functn_score != i*10:
+            ## the score of this function is not a good multiple of 10. delete the function and reinsert it with a regulated score
+            NICK
+
+zoram
+def get_number_of_functions_in_submission_(doctype, action, function, step, score):
 def get_number_functions_doctypesubmission_functionname_step_score(doctype, action, function, step, score):
     """Get the number or rows for a particular function at a given step and score of a doctype submission"""
     q = """SELECT COUNT(doctype) FROM sbmFUNCTIONS where doctype=%s AND action=%s AND function=%s AND step=%s AND score=%s"""
@@ -280,6 +302,11 @@ def move_position_submissionfunction_up(doctype, action, function, funccurstep, 
             ## Unable to delete the function above that which we want to move. Cannot move the function then.
             ## Return an error code to signal that things went wrong
             return 1
+
+def update_score_of_allfunctions_from_score_within_step_in_submission_reduce_by_val(doctype, action, step, fromscore, val):
+    q = """UPDATE sbmFUNCTIONS SET score=score-%s WHERE doctype=%s AND action=%s AND step=%s AND score >= %s"""
+    run_sql(q, (val, doctype, action, step, fromscore))
+    return
 
 def update_score_allfunctions_in_step_from_score_doctypesubmission_add10(doctype, action, step, fromscore):
     q = """UPDATE sbmFUNCTIONS SET score=score+10 WHERE doctype=%s AND action=%s AND step=%s AND score >= %s"""
@@ -666,8 +693,20 @@ def get_number_elements_with_elname(elname):
        @param elname: Element name/id (name) to query for
        @return an integer count of the number of Elements in the WebSubmit database for this elname.
     """
-    q = """SELECT COUNT(name) FROM sbmFIELDDESC where name=%s"""
+    q = """SELECT COUNT(name) FROM sbmFIELDDESC where name=%s COLLATE latin1_general_cs"""
     return int(run_sql(q, (elname,))[0][0])
+
+def get_doctype_action_pagenb_for_submissions_using_element(elname):
+    """Get and return a tuple of tuples containing the doctype, the action, and the
+       page number (pagenb) for the instances of use of the element identified by "elname".
+       I.e. get the information about which submission pages the element is used on.
+       @param elname: The unique identifier for an element ("name" in "sbmFIELDDESC",
+                      "fidesc" in "sbmFIELD").
+       @return: tuple of tuples (doctype, action, pagenb)
+    """
+    q = """SELECT subm.docname, subm.actname, sf.pagenb FROM sbmIMPLEMENT AS subm LEFT JOIN sbmFIELD AS sf ON sf.subname=CONCAT(subm.actname, subm.docname) WHERE sf.fidesc=%s ORDER BY sf.subname ASC, sf.pagenb ASC"""
+    return run_sql(q, (elname,))
+
 
 def get_subname_pagenb_element_use(elname):
     """Get and return a tuple of tuples containing the "submission name" (subname) and the
@@ -687,6 +726,14 @@ def get_elename_allelements():
     """
     q = """SELECT name FROM sbmFIELDDESC ORDER BY name"""
     return run_sql(q)
+
+def get_all_element_names():
+    """Return a list of the names of all "elements" in the WebSubmit DB.
+       @return: a list of strings, where each string is a WebSubmit element
+    """
+    q = """SELECT DISTINCT(name) FROM sbmFIELDDESC ORDER BY name"""
+    res = run_sql(q)
+    return map(lambda x: str(x[0]), res)    
 
 def get_element_details(elname):
     """Get and return a tuple of tuples for all ELEMENTS with the element name "elname".
@@ -1171,6 +1218,80 @@ def delete_function_doctypesubmission_step_score(doctype, action, function, step
         else:
             ## still unable to recover - could not delete all functions for this doctype/action
             return 1
+
+def delete_the_function_at_step_and_score_from_a_submission(doctype, action, function, step, score):
+## THIS SHOULD REPLACE "delete_function_doctypesubmission_step_score(doctype, action, function, step, score)"
+    """Delete a given function at a particular step/score for a given submission"""
+    q = """DELETE FROM sbmFUNCTIONS WHERE doctype=%s AND action=%s AND function=%s AND step=%s AND score=%s"""
+    run_sql(q, (doctype, action, function, step, score))
+    numrows_deletedfunc = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
+                                                                                         action=action,
+                                                                                         function=function,
+                                                                                         step=step,
+                                                                                         score=score)
+    if numrows_deletedfunc == 0:
+        ## Everything OK - function deleted
+        return
+    else:
+        ## Everything NOT OK - still some functions remaining for doctype/action
+        ## make a last attempt to delete them:
+        run_sql(q, (doctype, action, function, step, score))
+        ## check once more to see if functions remain:
+        numrows_deletedfunc = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
+                                                                                             action=action,
+                                                                                             function=function,
+                                                                                             step=step,
+                                                                                             score=score)
+        if numrows_deletedfunc == 0:
+            ## Everything OK - all functions for this doctype/action were deleted successfully this time
+            return
+        else:
+            ## still unable to recover - could not delete all functions for this doctype/action
+            msg = """Failed to delete the function [%s] at score [%s] of step [%s], from submission [%s]"""\
+                  % (function, score, step, "%s%s" % (action, doctype))
+            raise InvenioWebSubmitAdminDeleteFailed(msg)
+
+zoram
+
+def delete_function_at_step_and_score_from_submission(doctype, action, function, step, score):
+    """Delete the function at a particular step/score from a submission.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param function: (string) the name of the function to be deleted
+       @param step: (integer) the step in which the function to be deleted is found
+       @param score: (integer) the score at which the function to be deleted is found
+       @return: None
+       @Exceptions raised:
+         InvenioWebSubmitAdminDeleteFailed - when unable to delete the function
+    """
+    q = """DELETE FROM sbmFUNCTIONS WHERE doctype=%s AND action=%s AND function=%s AND step=%s AND score=%s"""
+    run_sql(q, (doctype, action, function, step, score))
+    numrows_function_at_stepscore = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
+                                                                                                   action=action,
+                                                                                                   function=function,
+                                                                                                   step=step,
+                                                                                                   score=score)
+    if numrows_function_at_stepscore == 0:
+        ## Everything OK - function deleted
+        return
+    else:
+        ## Everything NOT OK - still some functions remaining for doctype/action
+        ## make a last attempt to delete them:
+        run_sql(q, (doctype, action, function, step, score))
+        ## check once more to see if functions remain:
+        numrows_function_at_stepscore = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
+                                                                                                       action=action,
+                                                                                                       function=function,
+                                                                                                       step=step,
+                                                                                                       score=score)
+        if numrows_function_at_stepscore == 0:
+            ## Everything OK - all functions for this doctype/action were deleted successfully this time
+            return
+        else:
+            ## still unable to recover - could not delete all functions for this doctype/action
+            msg = """Failed to delete function [%s] from step [%s] and score [%s] from submission [%s]""" \
+                  % (function, step, score, "%s%s" % (action, doctype))
+            raise InvenioWebSubmitAdminDeleteFailed(msg)
 
 def delete_all_functions_foraction_doctype(doctype, action):
     """Delete all FUNCTIONS for a given action, belonging to a given doctype.
@@ -1712,5 +1833,481 @@ def insert_submission_details(doctype, action, displayed, nbpg, buttonorder, sta
         ## this submission already exists for the doctype - do not insert it
         return 1
 
+def get_cd_md_numbersubmissionpages_doctype_action(doctype, action):
+    """Return the creation date (cd), the modification date (md), and the number of submission pages
+       for a given submission (action) of a given  document type (doctype).
+       @param doctype: the document type for which the number of pages of a given submission is to be
+        determined.
+       @param action: the submission (action) for which the number of pages is to be determined.
+       @return: a tuple of tuples, where each tuple contains the creation date, the modification date, and
+        the number of pages for the given submission: ((cd, md, nbpg), (cd, md, nbpg)[,...])
+    """
+    q = """SELECT cd, md, nbpg FROM sbmIMPLEMENT WHERE docname=%s AND actname=%s LIMIT 1"""
+    return run_sql(q, (doctype, action))
 
+def get_numbersubmissionpages_doctype_action(doctype, action):
+    """Return the number of submission pages belonging to a given submission (action) of a document type
+       (doctype) as an integer. In the case that the submission does not exist, 0 (ZERO) will be returned.
+       In the case that an error occurs, -1 will be returned.
+       @param doctype: (string) the unique ID of a document type.
+       @param action: (string) the unique name/ID of an action.
+       @return: an integer - the number of pages found for the submission
+    """
+    q = """SELECT nbpg FROM sbmIMPLEMENT WHERE docname=%s AND actname=%s LIMIT 1"""
+    res = run_sql(q, (doctype, action))
+    if len(res) > 0:
+        try:
+            return int(res[0][0])
+        except (IndexError, ValueError):
+            ## unexpected result
+            return -1
+    else:
+        return 0
+
+def get_numberfields_submissionpage_doctype_action(doctype, action, pagenum):
+    """Return the number of fields on a given page of a given submission.
+       @param doctype: (string) the unique ID of the document type to which the submission belongs
+       @param action: (string) the unique name/ID of the action
+       @param pagenum: (integer) the number of the page on which fields are to be counted
+       @return: (integer) the number of fields found on the page
+    """
+    q = """SELECT COUNT(subname) FROM sbmFIELD WHERE pagenb=%s AND subname=%s"""
+    return int(run_sql(q, (pagenum, """%s%s""" % (action, doctype)))[0][0])
+
+def get_number_of_fields_on_submissionpage_at_positionx(doctype, action, pagenum, positionx):
+    """Return the number of fields at positionx on a given page of a given submission.
+       @param doctype: (string) the unique ID of the document type to which the submission belongs
+       @param action: (string) the unique name/ID of the action
+       @param pagenum: (integer) the number of the page on which fields are to be counted
+       @return: (integer) the number of fields found on the page
+    """
+    q = """SELECT COUNT(subname) FROM sbmFIELD WHERE pagenb=%s AND subname=%s AND fieldnb=%s"""
+    return int(run_sql(q, (pagenum, """%s%s""" % (action, doctype), positionx))[0][0])
+
+def swap_elements_adjacent_pages_doctype_action(doctype, action, page1, page2):
+    ## get number pages belonging to submission:
+    num_pages = get_numbersubmissionpages_doctype_action(doctype=doctype, action=action)
+    tmp_page = num_pages + randint(3,10)
+    if page1 - page2 not in (1, -1):
+        ## pages are not adjacent - cannot swap
+        return 1
+    if page1 > num_pages or page2 > num_pages or page1 < 1 or page2 < 1:
+        ## atl least one page is out of range of legal pages:
+        return 2
+    
+    q = """UPDATE sbmFIELD SET pagenb=%s WHERE subname=%s AND pagenb=%s"""
+
+    ## move fields from p1 to tmp
+    run_sql(q, (tmp_page, "%s%s" % (action, doctype), page1))
+    num_fields_p1 = get_numberfields_submissionpage_doctype_action(doctype=doctype, action=action, pagenum=page1)
+    if num_fields_p1 != 0:
+        ## problem moving some fields from page 1 - move them back from tmp
+        run_sql(q, (page1, "%s%s" % (action, doctype), tmp_page))
+        return 3
+    ## move fields from p2 to p1
+    run_sql(q, (page1, "%s%s" % (action, doctype), page2))
+    num_fields_p2 = get_numberfields_submissionpage_doctype_action(doctype=doctype, action=action, pagenum=page2)
+    if num_fields_p2 != 0:
+        ## problem moving some fields from page 2 to page 1 - try to move everything back
+        run_sql(q, (page2, "%s%s" % (action, doctype), page1))
+        run_sql(q, (page1, "%s%s" % (action, doctype), tmp_page))
+        return 4
+    ## move fields from tmp_page to page2:
+    run_sql(q, (page2, "%s%s" % (action, doctype), tmp_page))
+    num_fields_tmp_page = get_numberfields_submissionpage_doctype_action(doctype=doctype, action=action, pagenum=tmp_page)
+    if num_fields_tmp_page != 0:
+        ## problem moving some fields from tmp_page to page 2
+        ## stop - this problem should be examined by admin
+        return 5
+    ## success - update modification date for all fields on the swapped pages
+    update_modificationdate_fields_submissionpage(doctype=doctype, action=action, subpage=page1)
+    update_modificationdate_fields_submissionpage(doctype=doctype, action=action, subpage=page2)
+    return 0
+
+def update_modificationdate_fields_submissionpage(doctype, action, subpage):
+    q = """UPDATE sbmFIELD SET md=CURDATE() WHERE subname=%s AND pagenb=%s"""
+    run_sql(q, ("%s%s" % (action, doctype), subpage))
+    return 0
+
+def update_modificationdate_of_field_on_submissionpage(doctype, action, subpage, fieldnb):
+    q = """UPDATE sbmFIELD SET md=CURDATE() WHERE subname=%s AND pagenb=%s AND fieldnb=%s"""
+    run_sql(q, ("%s%s" % (action, doctype), subpage, fieldnb))
+    return 0
+
+def decrement_by_one_pagenumber_submissionelements_abovepage(doctype, action, frompage):
+    q = """UPDATE sbmFIELD SET pagenb=pagenb-1, md=CURDATE() WHERE subname=%s AND pagenb > %s"""
+    run_sql(q, ("%s%s" % (action, doctype), frompage))
+    return 0
+
+def get_details_and_description_of_all_fields_on_submissionpage(doctype, action, pagenum):
+    """Get the details and descriptions of all fields on a given submission page, ordered by ascending field number.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param pagenum: (integer) the number of the page on which the fields to be displayed are found
+       @return: a tuple of tuples. Each tuple represents one field on the page.
+        (fieldname, field-label, check-name, field-type, size, rows, cols, field-description, field-default-value)
+    """
+    q = """SELECT field.fidesc, field.fitext, field.checkn, el.type, el.size, el.rows, el.cols, el.fidesc, IFNULL(el.val,"") """\
+        """FROM sbmFIELD AS field """\
+        """LEFT JOIN sbmFIELDDESC AS el ON el.name=field.fidesc """\
+        """WHERE field.subname=%s AND field.pagenb=%s """\
+        """ORDER BY field.fieldnb ASC"""
+    res = run_sql(q, ("%s%s" % (action, doctype), pagenum))
+    return res
+
+
+def insert_field_onto_submissionpage(doctype, action, pagenum, fieldname, fieldtext, fieldlevel, fieldshortdesc, fieldcheck):
+    """Insert a field onto a given submission page, in the last position.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param pagenum: (integer) the number of the page onto which the field is to be added
+       @param fieldname: (string) the "element name" of the field to be added to the page
+       @param fieldtext: (string) the label to be displayed for the fieldon a submission page
+       @param fieldlevel: (char) the level of a field ('M' or 'O') - Mandatory or Optional
+       @param fieldshortdesc: (string) the short description for a field
+       @param fieldcheck: (string) the name of a check to be associated with a field
+       @return: None
+       @Exceptions raised:
+            InvenioWebSubmitAdminInsertFailed - raised if it was not possible to insert the row for the field
+    """
+    ## get the number of fields on the page onto which the new field is to be inserted:
+    numfields_preinsert = get_numberfields_submissionpage_doctype_action(doctype=doctype, action=action, pagenum=pagenum)
+    q = """INSERT INTO sbmFIELD (subname, pagenb, fieldnb, fidesc, fitext, level, sdesc, checkn, cd, md, """ \
+        """fiefi1, fiefi2) """\
+        """(SELECT %s, %s, COUNT(subname)+1, %s, %s, %s, %s, %s, CURDATE(), CURDATE(), NULL, NULL FROM sbmFIELD """ \
+        """WHERE subname=%s AND pagenb=%s)"""
+    run_sql(q, ("%s%s" % (action, doctype), pagenum, fieldname, fieldtext,
+                fieldlevel, fieldshortdesc, fieldcheck, "%s%s" % (action, doctype), pagenum))
+    numfields_postinsert = get_numberfields_submissionpage_doctype_action(doctype=doctype, action=action, pagenum=pagenum)
+    if not (numfields_postinsert > numfields_preinsert):
+        ## seems as though the new field was not inserted:
+        msg = """Failed when trying to add a new field to page %s of submission %s""" % (pagenum, "%s%s" % (action, doctype))
+        raise InvenioWebSubmitAdminInsertFailed(msg)
+    return
+
+def delete_a_field_from_submissionpage(doctype, action, pagenum, fieldposn):
+    q = """DELETE FROM sbmFIELD WHERE subname=%s AND pagenb=%s AND fieldnb=%s"""
+    run_sql(q, ("""%s%s""" % (action, doctype), pagenum, fieldposn))
+    ## check number of fields at deleted field's position. If 0, promote all fields below it by 1 posn;
+    ## If field(s) still exists at deleted field's posn, report error.
+    numfields_deletedfieldposn = \
+        get_number_of_fields_on_submissionpage_at_positionx(doctype=doctype, action=action, pagenum=pagenum, positionx=fieldposn)
+
+    if numfields_deletedfieldposn == 0:
+        ## everything OK - field was successfully deleted
+        return 0
+    else:
+        ## everything NOT OK - couldn't delete field - retry
+        run_sql(q, ("""%s%s""" % (action, doctype), pagenum, fieldposn))
+        numfields_deletedfieldposn = \
+            get_number_of_fields_on_submissionpage_at_positionx(doctype=doctype, action=action, pagenum=pagenum, positionx=fieldposn)
+        if numfields_deletedfieldposn == 0:
+            ## success this time
+            return 0
+        else:
+            ## still unable to delete all fields - return fail code
+            return 'WRN_WEBSUBMITADMIN_UNABLE_TO_DELETE_FIELD_FROM_SUBMISSION_PAGE'
+
+def update_details_of_a_field_on_a_submissionpage(doctype, action, pagenum, fieldposn,
+                                                  fieldtext, fieldlevel, fieldshortdesc, fieldcheck):
+    """Update the details of one field, as found at a given location on a given submission page.
+       @param doctype: (string) unique ID for a document type
+       @param action: (string) unique ID for an action
+       @param pagenum: (integer) number of page on which field is found
+       @param fieldposn: (integer) number of field on page
+       @param fieldtext: (string) text label for field on page
+       @param fieldlevel: (char) level of field (should be 'M' or 'O' - mandatory or optional)
+       @param fieldshortdesc: (string) short description of field
+       @param fieldcheck: (string) name of JavaScript Check to be applied to field
+       @return: None
+       @Exceptions raised:
+           InvenioWebSubmitAdminTooManyRows - when multiple rows found for field
+           InvenioWebSubmitAdminNoRowsFound - when no rows found for field
+    """
+    q = """UPDATE sbmFIELD SET fitext=%s, level=%s, sdesc=%s, checkn=%s, md=CURDATE() WHERE subname=%s AND pagenb=%s AND fieldnb=%s"""
+    queryargs = (fieldtext, fieldlevel, fieldshortdesc, fieldcheck, "%s%s" % (action, doctype), pagenum, fieldposn)
+    ## get number of rows found for field:
+    numrows_field = get_number_of_fields_on_submissionpage_at_positionx(doctype=doctype, action=action,
+                                                                        pagenum=pagenum, positionx=fieldposn)
+    if numrows_field == 1:
+        run_sql(q, queryargs)
+        return
+    elif numrows_field > 1:
+        ## multiple rows found for the field at this position - not safe to edit
+        msg = """When trying to update the field in position %s on page %s of the submission %s, %s rows were found for the field""" \
+              % (fieldposn, pagenum, "%s%s" % (action, doctype), numrows_field)
+        raise InvenioWebSubmitAdminTooManyRows(msg)
+    else:
+        ## no row for field found
+        msg = """When trying to update the field in position %s on page %s of the submission %s, no rows were found for the field""" \
+              % (fieldposn, pagenum, "%s%s" % (action, doctype))
+        raise InvenioWebSubmitAdminNoRowsFound(msg)
+
+def delete_a_field_from_submissionpage_then_reorder_fields_below_to_fill_vacant_position(doctype,
+                                                                                         action,
+                                                                                         pagenum,
+                                                                                         fieldposn):
+    """Delete a submission field from a given page of a given document-type submission.
+       E.g. Delete the field in position 3, from page 2 of the "SBI" submission of the
+       "TEST" document-type.
+       @param doctype: (string) the unique ID of the document type
+       @param action: (string) the unique name/ID of the submission/action
+       @param pagenum: (integer) the number of the page from which the field is to be
+        deleted
+       @param fieldposn: (integer) the number of the field to be deleted (e.g. field at position
+        number 1, or number 2, etc.)
+       @return: An integer number containing the number of rows deleted; -OR-
+        An error string in the event that something goes wrong.
+    """
+    delete_res = delete_a_field_from_submissionpage(doctype=doctype, action=action, pagenum=pagenum, fieldposn=fieldposn)
+    if delete_res == 0:
+        ## deletion was successful - demote fields below deleted field into gap:
+        update_res = decrement_position_of_all_fields_atposition_greaterthan_positionx_on_submissionpage(doctype=doctype,
+                                                                                                         action=action,
+                                                                                                         pagenum=pagenum,
+                                                                                                         positionx=fieldposn,
+                                                                                                         decrement=1)
+        ## update the modification date of the page:
+        update_modification_date_for_submission(doctype=doctype, action=action)
+        return 0
+    else:
+        ## could not delete field! return an appropriate error message
+        return delete_res
+        
+def update_modification_date_for_submission(doctype, action):
+    q = """UPDATE sbmIMPLEMENT SET md=CURDATE() WHERE docname=%s AND actname=%s"""
+    run_sql(q, (doctype, action))
+    return
+
+def move_field_on_submissionpage_from_positionx_to_positiony(doctype, action, pagenum, movefieldfrom, movefieldto):
+    ## get number of fields on submission page:
+    try:
+        movefieldfrom = int(movefieldfrom)
+        movefieldto = int(movefieldto)
+    except ValueError:
+        return 'WRN_WEBSUBMITADMIN_INVALID_FIELD_NUMBERS_SUPPLIED_WHEN_TRYING_TO_MOVE_FIELD_ON_SUBMISSION_PAGE'
+    numfields_page = get_numberfields_submissionpage_doctype_action(doctype=doctype, action=action, pagenum=pagenum)
+
+    if movefieldfrom > numfields_page or movefieldto > numfields_page or movefieldfrom < 1 or \
+           movefieldto < 1 or movefieldfrom == movefieldto:
+        ## invalid move-field coordinates:
+        return 'WRN_WEBSUBMITADMIN_INVALID_FIELD_NUMBERS_SUPPLIED_WHEN_TRYING_TO_MOVE_FIELD_ON_SUBMISSION_PAGE'
+
+    q = """UPDATE sbmFIELD SET fieldnb=%s WHERE subname=%s AND pagenb=%s AND fieldnb=%s"""
+    ## process movement:
+    if movefieldfrom - movefieldto in (1, -1):
+        ## fields are adjacent - swap them around:
+        tmp_fieldnb = numfields_page + randint(3,10)
+
+        ## move field from position 'movefieldfrom' to tempoary position 'tmp_fieldnb':
+        run_sql(q, (tmp_fieldnb, "%s%s" % (action, doctype), pagenum, movefieldfrom))
+        num_fields_posn_movefieldfrom = \
+              get_number_of_fields_on_submissionpage_at_positionx(doctype=doctype, action=action, pagenum=pagenum, positionx=movefieldfrom)
+
+        if num_fields_posn_movefieldfrom != 0:
+            ## problem moving the field from its position to the temporary position
+            ## try to move it back, and return with an error
+            return 'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_TEMP_POSITION'
+
+        ## move field from position 'movefieldto' to position 'movefieldfrom':
+        run_sql(q, (movefieldfrom, "%s%s" % (action, doctype), pagenum, movefieldto))
+        num_fields_posn_movefieldto = \
+              get_number_of_fields_on_submissionpage_at_positionx(doctype=doctype, action=action, pagenum=pagenum, positionx=movefieldto)
+        if num_fields_posn_movefieldto != 0:
+            ## problem moving the field at 'movefieldto' into the position 'movefieldfrom'
+            ## try to reverse the changes made so far, then return with an error:
+
+            ## move field at temporary posn back to 'movefieldfrom' position:
+            run_sql(q, (movefieldfrom, "%s%s" % (action, doctype), pagenum, tmp_fieldnb))
+            return 'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD2_TO_FIELD1_POSITION'
+
+        ## move field from temporary position 'tmp_fieldnb' to position 'movefieldto':
+        run_sql(q, (movefieldto, "%s%s" % (action, doctype), pagenum, tmp_fieldnb))
+        num_fields_posn_tmp_fieldnb = \
+              get_number_of_fields_on_submissionpage_at_positionx(doctype=doctype, action=action, pagenum=pagenum, positionx=tmp_fieldnb)
+        if num_fields_posn_tmp_fieldnb != 0:
+            ## problem moving the field from the temporary position to position 'movefieldto'
+            ## stop - admin should examine and fix this problem
+            return 'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_POSITION_FIELD2_FROM_TEMPORARY_POSITION'
+        ## successfully swapped fields - update modification date of the swapped fields and of the submission
+        update_modificationdate_of_field_on_submissionpage(doctype=doctype, action=action, subpage=pagenum, fieldnb=movefieldfrom)
+        update_modificationdate_of_field_on_submissionpage(doctype=doctype, action=action, subpage=pagenum, fieldnb=movefieldto)
+        update_modification_date_for_submission(doctype=doctype, action=action)
+        return 0
+    else:
+        ## fields not adjacent - perform a move:
+        tmp_fieldnb = 0 - randint(3,10)
+
+        ## move field from position 'movefieldfrom' to tempoary position 'tmp_fieldnb':
+        run_sql(q, (tmp_fieldnb, "%s%s" % (action, doctype), pagenum, movefieldfrom))
+        num_fields_posn_movefieldfrom = \
+              get_number_of_fields_on_submissionpage_at_positionx(doctype=doctype, action=action, pagenum=pagenum, positionx=movefieldfrom)
+
+        if num_fields_posn_movefieldfrom != 0:
+            ## problem moving the field from its position to the temporary position
+            ## try to move it back, and return with an error
+            return 'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_TEMP_POSITION'
+
+        ## fill the gap created by the moved field by decrementing by one the position of all fields below it:
+        qres = decrement_position_of_all_fields_atposition_greaterthan_positionx_on_submissionpage(doctype=doctype, action=action,
+                                                                                                   pagenum=pagenum, positionx=movefieldfrom,
+                                                                                                   decrement=1)
+        if movefieldfrom < numfields_page:
+            ## check that there is now a field in the position of "movefieldfrom":
+            num_fields_posn_movefieldfrom = \
+              get_number_of_fields_on_submissionpage_at_positionx(doctype=doctype, action=action, pagenum=pagenum, positionx=movefieldfrom)
+            if num_fields_posn_movefieldfrom == 0:
+                ## no field there - it was not possible to decrement the field position of all fields below the field moved 'tmp_fieldnb'
+                ## try to move the field back from 'tmp_fieldnb'
+                run_sql(q, (movefieldfrom, "%s%s" % (action, doctype), pagenum, tmp_fieldnb))
+                ## return an ERROR message
+                return 'WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_DECREMENT_POSITION_OF_FIELDS_BELOW_FIELD1'
+
+        ## now increment (by one) the position of the fields at and below the field at position 'movefieldto':
+        qres = increment_position_of_all_fields_atposition_greaterthan_positionx_on_submissionpage(doctype=doctype, action=action,
+                                                                                                   pagenum=pagenum, positionx=movefieldto-1,
+                                                                                                   increment=1)
+        ## there should now be an empty space at position 'movefieldto':
+        num_fields_posn_movefieldto = \
+          get_number_of_fields_on_submissionpage_at_positionx(doctype=doctype, action=action, pagenum=pagenum, positionx=movefieldto)
+        if num_fields_posn_movefieldto != 0:
+            ## there isn't! the increment of position has failed - return warning:
+            return 'WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_INCREMENT_POSITION_OF_FIELDS_AT_AND_BELOW_FIELD2'
+
+        ## Move field from temporary position to position 'movefieldto':
+        run_sql(q, (movefieldto, "%s%s" % (action, doctype), pagenum, tmp_fieldnb))
+        num_fields_posn_movefieldto = \
+          get_number_of_fields_on_submissionpage_at_positionx(doctype=doctype, action=action, pagenum=pagenum, positionx=movefieldto)
+        if num_fields_posn_movefieldto == 0:
+            ## failed to move field1 from temp posn to final posn
+            return 'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_POSITION_FIELD2_FROM_TEMPORARY_POSITION'
+
+        ## successfully moved field - update modification date of the moved field and of the submission
+        update_modificationdate_of_field_on_submissionpage(doctype=doctype, action=action, subpage=pagenum, fieldnb=movefieldfrom)
+        update_modification_date_for_submission(doctype=doctype, action=action)
+        return 0
+
+def increment_position_of_all_fields_atposition_greaterthan_positionx_on_submissionpage(doctype, action, pagenum, positionx, increment=1):
+    """Increment (by the number provided via the "increment" parameter) the position of all fields (on a given submission page)
+       found at a position greater than that of positionx
+       @param doctype:   (string)  the unique ID of a document type
+       @param action:    (string)  the unique name/ID of the action
+       @param pagenum:   (integer) the number of the submission page on which the fields are situated
+       @param positionx: (integer) the position after which fields' positions are to be promoted
+       @param increment: (integer) the number by which to increment the field positions (defaults to 1)
+       @return:
+    """
+    if type(increment) is not int:
+        increment = 1
+    q = """UPDATE sbmFIELD SET fieldnb=fieldnb+%s WHERE subname=%s AND pagenb=%s AND fieldnb > %s"""
+    res = run_sql(q, (increment, "%s%s" % (action, doctype), pagenum, positionx))
+    try:
+        return int(res)
+    except ValueError:
+        return None
+
+def decrement_position_of_all_fields_atposition_greaterthan_positionx_on_submissionpage(doctype, action, pagenum, positionx, decrement=1):
+    """Decrement (by the number provided via the "decrement" parameter) the position of all fields (on a given submission page)
+       found at a position greater than that of positionx
+       @param doctype:   (string)  the unique ID of a document type
+       @param action:    (string)  the unique name/ID of the action
+       @param pagenum:   (integer) the number of the submission page on which the fields are situated
+       @param positionx: (integer) the position after which fields' positions are to be promoted
+       @param decrement: (integer) the number by which to increment the field positions (defaults to 1)
+       @return:
+    """
+    if type(decrement) is not int:
+        decrement = 1
+    q = """UPDATE sbmFIELD SET fieldnb=fieldnb-%s WHERE subname=%s AND pagenb=%s AND fieldnb > %s"""
+    res = run_sql(q, (decrement, "%s%s" % (action, doctype), pagenum, positionx))
+    try:
+        return int(res)
+    except ValueError:
+        return None
+
+
+def delete_allfields_submissionpage_doctype_action(doctype, action, pagenum):
+    q = """DELETE FROM sbmFIELD WHERE pagenb=%s AND subname=%s"""
+    run_sql(q, (pagenum, """%s%s""" % (action, doctype)))
+    numrows_fields = get_numberfields_submissionpage_doctype_action(doctype=doctype,
+                                                                        action=action, pagenum=pagenum)
+    if numrows_fields == 0:
+        ## everything OK - all fields deleted
+        return 0
+    else:
+        ## everything NOT OK - couldn't delete all fields for page
+        ## retry
+        run_sql(q, (pagenum, doctype, action))
+        numrows_fields = get_numberfields_submissionpage_doctype_action(doctype=doctype,
+                                                                            action=action, pagenum=pagenum)
+        if numrows_fields == 0:
+            ## success this time
+            return 0
+        else:
+            ## still unable to delete all fields - return fail code
+            return 1
+
+def get_details_allsubmissionfields_on_submission_page(doctype, action, pagenum):
+    """Get the details of all submission elements belonging to a particular page of the submission.
+       Results are returned ordered by field number.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique name/ID of an action
+       @param pagenum: (string/integer): the integer number of the page for which element details are
+        to be retrieved
+       @return: a tuple of tuples: (subname, fieldnb, fidesc, fitext, level, sdesc, checkn, cd, md). Each
+        tuple contains the details of one element.
+    """
+    q = """SELECT subname, fieldnb, fidesc, fitext, level, sdesc, checkn, cd, md FROM sbmFIELD """\
+        """WHERE subname=%s AND pagenb=%s ORDER BY fieldnb ASC"""
+    return run_sql(q, ("%s%s" % (action, doctype), pagenum))
+
+def get_details_of_field_at_positionx_on_submissionpage(doctype, action, pagenum, fieldposition):
+    """Get the details of a particular field in a submission page.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique name/ID of an action
+       @param pagenum: (integer) the number of the submission page on which the field is found
+       @param fieldposition: (integer) the position on the submission page of the field for which details
+        are to be retrieved.
+       @return: a tuple of the field's details: (subname, fieldnb, fidesc, fitext, level, sdesc, checkn, cd, md). Each
+        tuple contains the details of one element.
+    """
+    fielddets = []
+    q = """SELECT subname, fieldnb, fidesc, fitext, level, sdesc, checkn, cd, md FROM sbmFIELD """\
+        """WHERE subname=%s AND pagenb=%s AND fieldnb=%s LIMIT 1"""
+    res = run_sql(q, ("%s%s" % (action, doctype), pagenum, fieldposition))
+    if len(res) > 0:
+        fielddets = res[0]
+    return fielddets
+
+def decrement_by_one_number_submissionpages_doctype_action(doctype, action):
+    numrows_submission = get_number_submissions_doctype_action(doctype, action)
+    if numrows_submission == 1:
+        ## there is only one row for this submission - can update
+        q = """UPDATE sbmIMPLEMENT SET nbpg=IFNULL(nbpg, 1)-1, md=CURDATE() WHERE docname=%s AND actname=%s and IFNULL(nbpg, 1) > 0"""
+        run_sql(q, (doctype, action))
+        return 0 ## Everything OK
+    else:
+        ## Everything NOT OK - either multiple rows exist for submission, or submission doesn't exist
+        return 1
+
+
+def add_submission_page_doctype_action(doctype, action):
+    """Increment the number of pages associated with a given submission by 1
+       @param doctype: the unique ID of the document type that owns the submission.
+       @param action: the action name/ID of the given submission of the document type, for which the number
+        of pages is to be incremented.
+       @return: an integer error code. 0 (ZERO) means that the update was performed without error; 1 (ONE) means
+        that there was a problem and the update could not be performed. Problems could be: multiple rows found for
+        the submission; no rows found for the submission.
+    """
+    numrows_submission = get_number_submissions_doctype_action(doctype, action)
+    if numrows_submission == 1:
+        ## there is only one row for this submission - can update
+        q = """UPDATE sbmIMPLEMENT SET nbpg=IFNULL(nbpg, 0)+1, md=CURDATE() WHERE docname=%s AND actname=%s"""
+        run_sql(q, (doctype, action))
+        return 0 ## Everything OK
+    else:
+        ## Everything NOT OK - either multiple rows exist for submission, or submission doesn't exist
+        return 1
+    
 
