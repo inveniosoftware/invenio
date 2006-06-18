@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+from random import randint, seed
 from invenio.websubmitadmin_dblayer import *
 from invenio.websubmitadmin_config import *
 from invenio.access_control_admin import acc_getAllRoles, acc_getRoleUsers
@@ -388,7 +389,7 @@ def perform_request_edit_element(elname, elmarccode="", eltype="", elsize="", \
             ## Element Updated: Show All Element Details Again
             user_msg = """'%s' Element Updated""" % (elname,)
             ## Get submission page usage of element:
-            el_use = get_subname_pagenb_element_use(elname)
+            el_use = get_doctype_action_pagenb_for_submissions_using_element(elname)
             element_dets = get_element_details(elname)
             element_dets = stringify_listvars(element_dets)
             ## Take elements from results tuple:
@@ -426,7 +427,7 @@ def perform_request_edit_element(elname, elmarccode="", eltype="", elsize="", \
         ## Display Web form containing existing details of element:
         element_dets = get_element_details(elname)
         ## Get submission page usage of element:
-        el_use = get_subname_pagenb_element_use(elname)
+        el_use = get_doctype_action_pagenb_for_submissions_using_element(elname)
         num_rows_ret = len(element_dets)
         element_dets = stringify_listvars(element_dets)
         if num_rows_ret == 1:
@@ -1742,6 +1743,7 @@ def _create_configure_doctype_submission_functions_form(doctype,
                                                                                      )
     return (title, body)
 
+
 def perform_request_configure_doctype_submissionfunctions(doctype,
                                                           action,
                                                           moveupfunctionname="",
@@ -1801,9 +1803,7 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
         ## TODO : LOG ERROR
         user_msg.append("""The Submission "%s" seems to exist multiple times for the Document Type "%s" - cannot configure at this time.""" \
                    % (action, doctype))
-        all_doctypes = get_docid_docname_alldoctypes()
-        body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
-        (title, body) = _create_configure_doctype_form(doctype)
+        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
         return (title, body, errors, warnings)
     elif numrows_submission == 0:
         ## this submission does not seem to exist for this doctype:
@@ -1875,7 +1875,8 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
                                                                             user_msg=user_msg)
     elif deletefunctionname != "" and deletefunctionstep != "" and deletefunctionscore != "":
         ## process deletion of function from the given position
-        (title, body) = ("", "")
+        (title, body) = _delete_submission_function(doctype=doctype, action=action, deletefunctionname=deletefunctionname,
+                                                    deletefunctionstep=deletefunctionstep, deletefunctionscore=deletefunctionscore)
     else:
         ## default - display functions for this submission
         (title, body) = _create_configure_doctype_submission_functions_form(doctype=doctype,
@@ -1884,16 +1885,679 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
                                                                             movefromfunctionstep=movefromfunctionstep,
                                                                             movefromfunctionscore=movefromfunctionscore
                                                                            )
-
-##         title = """Functions of the "%s" Submission of the "%s" Document Type:""" % (action, doctype)
-##         submission_functions = get_functionname_step_score_allfunctions_doctypesubmission(doctype=doctype, action=action)
-##         all_websubmit_functions = get_funcname_allfunctions()
-##         body = websubmitadmin_templates.tmpl_configuredoctype_display_submissionfunctions(doctype=doctype,
-##                                                                                           action=action,
-##                                                                                           movefromfunctionname=movefromfunctionname,
-##                                                                                           movefromfunctionstep=movefromfunctionstep,
-##                                                                                           movefromfunctionscore=movefromfunctionscore,
-##                                                                                           submissionfunctions=submission_functions,
-##                                                                                           allWSfunctions=all_websubmit_functions
-##                                                                                          )
     return (title, body, errors, warnings)
+
+
+def _delete_submission_function(doctype, action, deletefunctionname, deletefunctionstep, deletefunctionscore):
+    """Delete a submission function from a given submission. Re-order all functions below it (within the same step)
+       to fill the gap left by the deleted function.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param deletefunctionname: (string) the name of the function to be deleted from the submission
+       @param deletefunctionstep: (string) the step of the function to be deleted from the submission
+       @param deletefunctionscore: (string) the score of the function to be deleted from the submission
+       @return: tuple containing 2 strings: (page-title, page-body)
+    """
+    user_msg = []
+    try:
+        ## get the step of the function before that which we are about to delete:
+        pass
+        ## delete the function:
+        delete_function_at_step_and_score_from_submission(doctype, action, function, step, score)
+        ## now reorder all functions below it (in the same step) to fill the gap left by this function:
+##         update_score_of_allfunctions_from_score_within_step_in_submission_reduce_by_val(doctype=doctype, action=action,
+##                                                                                         step=deletefunctionstep,
+##                                                                                         fromscore=deletefunctionscore,
+##                                                                                         val=)
+    except InvenioWebSubmitAdminDeleteFailed, e:
+        ## unable to delete function!
+        user_msg.append("""Unable to delete function [%s] at step [%s], score [%s] from submission [%s]""" \
+                        % (deletefunctionname, deletefunctionstep, deletefunctionscore, "%s%s" % (action, doctype)))
+    (title, body) = _create_configure_doctype_submission_functions_form(doctype=doctype, action=action, user_msg=user_msg)
+    return (title, body)
+
+
+
+
+## NICK
+
+def perform_request_configure_doctype_submissionpage_preview(doctype, action, pagenum):
+    """Display a preview of a Submission Page and its fields.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param pagenum: (integer) the number of the submission page to be previewed
+       @return: a tuple of four elements. (page-title, page-body, errors, warnings)
+    """
+    errors = []
+    warnings = []
+    body = ""
+    user_msg = []
+    ## get details of all fields on submission page:
+    fields = get_details_and_description_of_all_fields_on_submissionpage(doctype=doctype, action=action, pagenum=pagenum)
+    ## ensure all values for each field are strings:
+    string_fields = []
+    for field in fields:
+        string_fields.append(stringify_list_elements(field))
+    title = """A preview of Page %s of the %s Submission""" % (pagenum, "%s%s" % (action, doctype))
+    body = websubmitadmin_templates.tmpl_configuredoctype_display_submissionpage_preview(doctype=doctype,
+                                                                                         action=action,
+                                                                                         pagenum=pagenum,
+                                                                                         fields=string_fields)
+    return (title, body, errors, warnings)
+
+def perform_request_configure_doctype_submissionpage_elements(doctype, action, pagenum, movefieldfromposn="",
+                                                              movefieldtoposn="", deletefieldposn="", editfieldposn="",
+                                                              editfieldposncommit="", fieldname="", fieldtext="", fieldlevel="",
+                                                              fieldshortdesc="", fieldcheck="", addfield="", addfieldcommit=""):
+    """Process requests relating to the elements of a particular submission page"""
+    errors = []
+    warnings = []
+    body = ""
+    user_msg = []
+    try:
+        pagenum = str(pagenum)
+    except ValueError:
+        pagenum = ""
+
+    ## ensure that there is only one doctype for this doctype ID - simply display all doctypes with warning if not
+    if doctype in ("", None):
+        user_msg.append("""Unknown Document Type""")
+        ## TODO : LOG ERROR
+        all_doctypes = get_docid_docname_alldoctypes()
+        body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
+        title = "Available WebSubmit Document Types"
+        return (title, body, errors, warnings)
+
+    numrows_doctype = get_number_doctypes_docid(docid=doctype)
+    if numrows_doctype > 1:
+        ## there are multiple doctypes with this doctype ID:
+        ## TODO : LOG ERROR
+        user_msg.append("""Multiple document types identified by "%s" exist - cannot configure at this time.""" \
+                   % (doctype,))
+        all_doctypes = get_docid_docname_alldoctypes()
+        body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
+        title = "Available WebSubmit Document Types"
+        return (title, body, errors, warnings)
+    elif numrows_doctype == 0:
+        ## this doctype does not seem to exist:
+        user_msg.append("""The document type identified by "%s" doesn't exist - cannot configure at this time.""" \
+                   % (doctype,))
+        ## TODO : LOG ERROR
+        all_doctypes = get_docid_docname_alldoctypes()
+        body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
+        title = "Available WebSubmit Document Types"
+        return (title, body, errors, warnings)
+
+    ## ensure that this submission exists for this doctype:
+    numrows_submission = get_number_submissions_doctype_action(doctype=doctype, action=action)
+    if numrows_submission > 1:
+        ## there are multiple submissions for this doctype/action ID:
+        ## TODO : LOG ERROR
+        user_msg.append("""The Submission "%s" seems to exist multiple times for the Document Type "%s" - cannot configure at this time.""" \
+                   % (action, doctype))
+        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        return (title, body, errors, warnings)
+    elif numrows_submission == 0:
+        ## this submission does not seem to exist for this doctype:
+        user_msg.append("""The Submission "%s" doesn't exist for the "%s" Document Type - cannot configure at this time.""" \
+                   % (action, doctype))
+        ## TODO : LOG ERROR
+        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        return (title, body, errors, warnings)
+
+    ## submission valid
+    if editfieldposn != "" and editfieldposncommit == "":
+        ## display form for editing field
+        (title, body) = _configure_doctype_edit_field_on_submissionpage_display_field_details(errors=errors, warnings=warnings,
+                                                                                              doctype=doctype, action=action,
+                                                                                              pagenum=pagenum, fieldposn=editfieldposn)
+    elif editfieldposn != "" and editfieldposncommit != "":
+        ## commit changes to element
+        (title, body) = _configure_doctype_edit_field_on_submissionpage(errors=errors, warnings=warnings, doctype=doctype, action=action,
+                                                                        pagenum=pagenum, fieldposn=editfieldposn, fieldtext=fieldtext,
+                                                                        fieldlevel=fieldlevel, fieldshortdesc=fieldshortdesc, fieldcheck=fieldcheck)
+    elif movefieldfromposn != "" and movefieldtoposn != "":
+        ## move a field
+        (title, body) = _configure_doctype_move_field_on_submissionpage(errors=errors, warnings=warnings, doctype=doctype,
+                                                                        action=action, pagenum=pagenum, movefieldfromposn=movefieldfromposn,
+                                                                        movefieldtoposn=movefieldtoposn)
+    elif addfield != "":
+        ## request to add a new field to a page - display form
+        (title, body) = _configure_doctype_add_field_to_submissionpage_display_form(doctype=doctype, action=action, pagenum=pagenum)
+    elif addfieldcommit != "":
+        ## commit a new field to the page
+        (title, body) = _configure_doctype_add_field_to_submissionpage(errors=errors, warnings=warnings, doctype=doctype, action=action,
+                                                                       pagenum=pagenum, fieldname=fieldname, fieldtext=fieldtext,
+                                                                       fieldlevel=fieldlevel, fieldshortdesc=fieldshortdesc, fieldcheck=fieldcheck)
+    elif deletefieldposn != "":
+        ## user wishes to delete a field from the page:
+        (title, body) = _configure_doctype_delete_field_from_submissionpage(errors=errors, warnings=warnings, doctype=doctype,
+                                                                            action=action, pagenum=pagenum, fieldnum=deletefieldposn)
+    else:
+        ## default visit to page - list its elements:
+        (title, body) = _create_configure_doctype_submission_page_elements_form(doctype=doctype, action=action,
+                                                                                pagenum=pagenum, movefieldfromposn=movefieldfromposn)
+    return (title, body, errors, warnings)
+
+def stringify_list_elements(elementslist):
+    o = []
+    for el in elementslist:
+        o.append(str(el))
+    return o
+
+def _configure_doctype_edit_field_on_submissionpage(errors, warnings, doctype, action, pagenum, fieldposn,
+                                                    fieldtext, fieldlevel, fieldshortdesc, fieldcheck):
+    """Perform an update to the details of a field on a submission page.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param pagenum: (integer) the number of the page on which the element to be updated is found
+       @param fieldposn: (integer) the numeric position of the field to be editied
+       @param fieldtext: (string) the text label displayed with a field
+       @param fieldlevel: (char) M or O (whether the field is mandatory or optional)
+       @param fieldshortdesc: (string) the short description of a field
+       @param fieldcheck: (string) the name of a JavaScript check to be applied to a field
+       @return: a tuple containing 2 strings - (page-title, page-body)
+    """
+    user_msg = []
+    if fieldcheck not in ("", None):
+        ## ensure check exists:
+        checkres = get_number_jschecks_with_chname(chname=fieldcheck)
+        if checkres < 1:
+            user_msg.append("The Check '%s' does not exist in WebSubmit - changes to field not saved" % (fieldcheck,))
+            (title, body) = _configure_doctype_edit_field_on_submissionpage_display_field_details(errors=errors, warnings=warnings,
+                                                                                                  doctype=doctype, action=action,
+                                                                                                  pagenum=pagenum, fieldposn=fieldposn,
+                                                                                                  fieldtext=fieldtext, fieldlevel=fieldlevel,
+                                                                                                  fieldshortdesc=fieldshortdesc, user_msg=user_msg)
+            return (title, body)
+
+    try:
+        update_details_of_a_field_on_a_submissionpage(doctype=doctype, action=action, pagenum=pagenum, fieldposn=fieldposn,
+                                                      fieldtext=fieldtext, fieldlevel=fieldlevel, fieldshortdesc=fieldshortdesc,
+                                                      fieldcheck=fieldcheck)
+        user_msg.append("The details of the field at position %s have been updated successfully" % (fieldposn,))
+        update_modification_date_for_submission(doctype=doctype, action=action)
+    except InvenioWebSubmitAdminTooManyRows, e:
+        ## multiple rows found at page position - not safe to edit:
+        user_msg.append("Unable to update details of field at position %s on submission page %s - multiple fields found at this position" \
+                        % (fieldposn, pagenum))
+        ## TODO : LOG WARNING
+    except InvenioWebSubmitAdminNoRowsFound, e:
+        ## field not found - cannot edit
+        user_msg.append("Unable to update details of field at position %s on submission page %s - field doesn't seem to exist there!" \
+                        % (fieldposn, pagenum))
+        ## TODO : LOG WARNING
+
+    (title, body) = _create_configure_doctype_submission_page_elements_form(doctype=doctype, action=action, pagenum=pagenum, user_msg=user_msg)
+    return (title, body)        
+
+def _configure_doctype_edit_field_on_submissionpage_display_field_details(errors, warnings, doctype, action, pagenum, fieldposn,
+                                                                          fieldtext=None, fieldlevel=None, fieldshortdesc=None,
+                                                                          fieldcheck=None, user_msg=""):
+    """Display a form used to edit a field on a submission page.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param pagenum: (integer) the number of the page on which the element to be updated is found
+       @param fieldposn: (integer) the numeric position of the field to be editied
+       @param fieldtext: (string) the text label displayed with a field
+       @param fieldlevel: (char) M or O (whether the field is mandatory or optional)
+       @param fieldshortdesc: (string) the short description of a field
+       @param fieldcheck: (string) the name of a JavaScript check to be applied to a field
+       @param user_msg: (list of strings, or string) any warning/error message to be displayed to the user
+       @return: a tuple containing 2 strings (page-title, page-body)
+    """
+    if type(user_msg) not in (list, tuple) or user_msg == "":
+        user_msg = []
+    ## get a list of all check names:
+    checks_res = get_all_jscheck_names()
+    allchecks=[]
+    for check in checks_res:
+        allchecks.append((check,))
+    ## get the details for the field to be edited:
+    fielddets = get_details_of_field_at_positionx_on_submissionpage(doctype=doctype, action=action, pagenum=pagenum, fieldposition=fieldposn)
+    fieldname = str(fielddets[2])
+    if fieldtext is not None:
+        fieldtext = str(fieldtext)
+    else:
+        fieldtext = str(fielddets[3])
+    if fieldlevel is not None:
+        fieldlevel = str(fieldlevel)
+    else:
+        fieldlevel = str(fielddets[4])
+    if fieldshortdesc is not None:
+        fieldshortdesc = str(fieldshortdesc)
+    else:
+        fieldshortdesc = str(fielddets[5])
+    if fieldcheck is not None:
+        fieldcheck = str(fieldcheck)
+    else:
+        fieldcheck = str(fielddets[6])
+    cd = str(fielddets[7])
+    md = str(fielddets[8])
+    title = """Edit the %(fieldname)s field as it appears at position %(fieldnum)s on Page %(pagenum)s of the %(submission)s Submission""" \
+            % { 'fieldname' : fieldname, 'fieldnum' : fieldposn, 'pagenum' : pagenum, 'submission' : "%s%s" % (action, doctype) }
+
+    body = websubmitadmin_templates.tmpl_configuredoctype_edit_submissionfield(doctype=doctype,
+                                                                               action=action,
+                                                                               pagenum=pagenum,
+                                                                               fieldnum=fieldposn,
+                                                                               fieldname=fieldname,
+                                                                               fieldtext=fieldtext,
+                                                                               fieldlevel=fieldlevel,
+                                                                               fieldshortdesc=fieldshortdesc,
+                                                                               fieldcheck=fieldcheck,
+                                                                               cd=cd,
+                                                                               md=md,
+                                                                               allchecks=allchecks,
+                                                                               user_msg=user_msg)
+    return (title, body)
+
+
+def _configure_doctype_add_field_to_submissionpage(errors, warnings, doctype, action, pagenum, fieldname="",
+                                                   fieldtext="", fieldlevel="", fieldshortdesc="", fieldcheck=""):
+    """Add a field to a submission page.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param pagenum: (integer) the number of the page on which the element to be updated is found
+       @param fieldname: (string) the name of the field to be added to the page
+       @param fieldtext: (string) the text label displayed with a field
+       @param fieldlevel: (char) M or O (whether the field is mandatory or optional)
+       @param fieldshortdesc: (string) the short description of a field
+       @param fieldcheck: (string) the name of a JavaScript check to be applied to a field
+       @return: a tuple containing 2 strings - (page-title, page-body)
+    """
+    user_msg = []
+    ## ensure that a field "fieldname" actually exists:
+    numelements_elname = get_number_elements_with_elname(elname=fieldname)
+    if numelements_elname < 1:
+        ## the field to be added has no element description in the WebSubmit DB - cannot add
+        user_msg.append("""The field that you have chosen to add (%s) does not seem to exist in WebSubmit - cannot add""" % (fieldname,))
+        (title, body) = _configure_doctype_add_field_to_submissionpage_display_form(doctype, action, pagenum,
+                                                                                    fieldtext=fieldtext,
+                                                                                    fieldlevel=fieldlevel, fieldshortdesc=fieldshortdesc,
+                                                                                    fieldcheck=fieldcheck, user_msg=user_msg)
+        return (title, body)
+    ## if fieldcheck has been provided, ensure that it is a valid check name:
+    if fieldcheck not in ("", None):
+        ## ensure check exists:
+        checkres = get_number_jschecks_with_chname(chname=fieldcheck)
+        if checkres < 1:
+            user_msg.append("The Check '%s' does not exist in WebSubmit - new field not saved to page" % (fieldcheck,))
+            (title, body) = _configure_doctype_add_field_to_submissionpage_display_form(doctype, action, pagenum,
+                                                                                        fieldname=fieldname, fieldtext=fieldtext,
+                                                                                        fieldlevel=fieldlevel, fieldshortdesc=fieldshortdesc,
+                                                                                        user_msg=user_msg)
+            return (title, body)
+    ## now add the new field to the page:
+    try:
+        insert_field_onto_submissionpage(doctype=doctype, action=action, pagenum=pagenum, fieldname=fieldname, fieldtext=fieldtext,
+                                         fieldlevel=fieldlevel, fieldshortdesc=fieldshortdesc, fieldcheck=fieldcheck)
+        user_msg.append("""Successfully added the field "%s" to the last position on page %s of submission %s""" \
+                        % (fieldname, pagenum, "%s%s" % (action, doctype)))
+        update_modification_date_for_submission(doctype=doctype, action=action)
+        (title, body) = _create_configure_doctype_submission_page_elements_form(doctype=doctype, action=action, pagenum=pagenum, user_msg=user_msg)
+    except InvenioWebSubmitAdminInsertFailed, e:
+        ## the insert of the new field failed for some reason
+        ## TODO : LOG ERROR
+        user_msg.append("""Couldn't add the field "%s" to page %s of submission %s - please try again""" \
+                        % (fieldname, pagenum, "%s%s" % (action, doctype)))
+        (title, body) = _configure_doctype_add_field_to_submissionpage_display_form(doctype, action, pagenum,
+                                                                                    fieldname=fieldname, fieldtext=fieldtext,
+                                                                                    fieldlevel=fieldlevel, fieldshortdesc=fieldshortdesc,
+                                                                                    fieldcheck=fieldcheck, user_msg=user_msg)
+    return (title, body)        
+
+
+def _configure_doctype_add_field_to_submissionpage_display_form(doctype, action, pagenum, fieldname="", fieldtext="",
+                                                                fieldlevel="", fieldshortdesc="", fieldcheck="", user_msg=""):
+    title = """Add a Field to Page %(pagenum)s of the %(submission)s Submission""" \
+            % { 'pagenum' : pagenum, 'submission' : "%s%s" % (action, doctype) }
+
+    ## sanity checking:
+    if type(user_msg) not in (list, tuple) or user_msg == "":
+        user_msg = []
+    ## get a list of all check names:
+    checks_res = get_all_jscheck_names()
+    allchecks=[]
+    for check in checks_res:
+        allchecks.append((check,))
+    ## get a list of all WebSubmit element names:
+    elements_res = get_all_element_names()
+    allelements = []
+    for el in elements_res:
+        allelements.append((el,))
+
+    ## get form:
+    body = websubmitadmin_templates.tmpl_configuredoctype_add_submissionfield(doctype=doctype,
+                                                                              action=action,
+                                                                              pagenum=pagenum,
+                                                                              fieldname=fieldname,
+                                                                              fieldtext=fieldtext,
+                                                                              fieldlevel=fieldlevel,
+                                                                              fieldshortdesc=fieldshortdesc,
+                                                                              fieldcheck=fieldcheck,
+                                                                              allchecks=allchecks,
+                                                                              allelements=allelements,
+                                                                              user_msg=user_msg)
+    return (title, body)
+
+
+
+def _configure_doctype_move_field_on_submissionpage(errors, warnings, doctype, action, pagenum, movefieldfromposn, movefieldtoposn):
+    user_msg = []
+    movefield_res = move_field_on_submissionpage_from_positionx_to_positiony(doctype=doctype, action=action, pagenum=pagenum,
+                                                                             movefieldfrom=movefieldfromposn, movefieldto=movefieldtoposn)
+    if movefield_res == \
+       'WRN_WEBSUBMITADMIN_INVALID_FIELD_NUMBERS_SUPPLIED_WHEN_TRYING_TO_MOVE_FIELD_ON_SUBMISSION_PAGE':
+        ## invalid field numbers
+        warnings.append(('WRN_WEBSUBMITADMIN_INVALID_FIELD_NUMBERS_SUPPLIED_WHEN_TRYING_TO_MOVE_FIELD_ON_SUBMISSION_PAGE', \
+                         movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype)))
+        user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s - field position numbers invalid""" \
+                        % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
+    elif movefield_res == \
+         'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_TEMP_POSITION':
+        ## failed to swap 2 fields - couldn't move field1 to temp position
+        warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_TEMP_POSITION', \
+                         movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype)))
+        user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s""" \
+                        % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
+    elif movefield_res == \
+         'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD2_TO_FIELD1_POSITION':
+        ## failed to swap 2 fields on submission page - couldn't move field2 to field1 position
+        warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD2_TO_FIELD1_POSITION', \
+                          movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype), movefieldtoposn, movefieldfromposn))
+        user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s - See Admin if field order is broken""" \
+                        % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
+    elif movefield_res == \
+         'WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_POSITION_FIELD2_FROM_TEMPORARY_POSITION':
+        ## failed to swap 2 fields in submission page - couldnt swap field at temp position to field2 position
+        warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_SWAP_TWO_FIELDS_ON_SUBMISSION_PAGE_COULDNT_MOVE_FIELD1_TO_POSITION_FIELD2_FROM_TEMPORARY_POSITION', \
+                         movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype), movefieldfromposn, movefieldtoposn))
+        user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s - Field-order is now broken and must be corrected by Admin""" \
+                        % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
+    elif movefield_res == \
+         'WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_DECREMENT_POSITION_OF_FIELDS_BELOW_FIELD1':
+        ## failed to decrement the position of all fields below the field that was moved to a temp position
+        warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_DECREMENT_POSITION_OF_FIELDS_BELOW_FIELD1', \
+                         movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype), movefieldfromposn))
+        user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s - See Admin if field-order is broken""" \
+                        % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
+    elif movefield_res == \
+         'WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_INCREMENT_POSITION_OF_FIELDS_AT_AND_BELOW_FIELD2':
+        ## failed to increment position of fields in and below position into which 'movefromfieldposn' is to be inserted
+        warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_MOVE_FIELD_TO_NEW_POSITION_ON_SUBMISSION_PAGE_COULDNT_INCREMENT_POSITION_OF_FIELDS_AT_AND_BELOW_FIELD2', \
+                         movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype), movefieldtoposn, movefieldfromposn))
+        user_msg.append("""Unable to move field from position %s to position %s on page %s of submission %s%s - Field-order is now broken and must be corrected by Admin""" \
+                        % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
+    else:
+        ## successful update:
+        warnings.append(('WRN_WEBSUBMITADMIN_MOVED_FIELD_ON_SUBMISSION_PAGE', movefieldfromposn, movefieldtoposn, pagenum, "%s%s" % (action, doctype)))
+        user_msg.append("""Successfully moved field from position %s to position %s on page %s of submission %s%s""" \
+                        % (movefieldfromposn, movefieldtoposn, pagenum, action, doctype))
+
+    (title, body) = _create_configure_doctype_submission_page_elements_form(doctype=doctype, action=action, pagenum=pagenum, user_msg=user_msg)
+    return (title, body)
+
+def _configure_doctype_delete_field_from_submissionpage(errors, warnings, doctype, action, pagenum, fieldnum):
+    """Delete a field from a submission page"""
+    user_msg = []
+    del_res = delete_a_field_from_submissionpage_then_reorder_fields_below_to_fill_vacant_position(doctype=doctype,
+                                                                                                   action=action,
+                                                                                                   pagenum=pagenum,
+                                                                                                   fieldposn=fieldnum)
+    if del_res == 'WRN_WEBSUBMITADMIN_UNABLE_TO_DELETE_FIELD_FROM_SUBMISSION_PAGE':
+        warnings.append(('WRN_WEBSUBMITADMIN_UNABLE_TO_DELETE_FIELD_FROM_SUBMISSION_PAGE', fieldnum, pagenum, "%s%s" % (action, doctype)))
+        user_msg.append("Unable to delete field at position %s from page number %s of submission %s%s" % (fieldnum, pagenum, action, doctype))
+    else:
+        ## deletion was OK
+        user_msg.append("Field deleted")
+        warnings.append(('WRN_WEBSUBMITADMIN_DELETED_FIELD_FROM_SUBMISSION_PAGE', fieldnum, pagenum, "%s%s" % (action, doctype)))
+    (title, body) = _create_configure_doctype_submission_page_elements_form(doctype=doctype, action=action, pagenum=pagenum, user_msg=user_msg)
+    return (title, body)
+
+def _create_configure_doctype_submission_page_elements_form(doctype, action, pagenum, movefieldfromposn="", user_msg=""):
+    ## get list of elements for page:
+    title = """Submission Elements found on Page %s of the "%s" Submission of the "%s" Document Type:"""\
+            % (pagenum, action, doctype)
+    body = ""
+    raw_page_elements = get_details_allsubmissionfields_on_submission_page(doctype=doctype, action=action, pagenum=pagenum)
+    ## correctly stringify page elements for the template:
+    page_elements = []
+    for element in raw_page_elements:
+        page_elements.append(stringify_list_elements(element))
+    body = websubmitadmin_templates.tmpl_configuredoctype_list_submissionelements(doctype=doctype,
+                                                                                  action=action,
+                                                                                  pagenum=pagenum,
+                                                                                  page_elements=page_elements,
+                                                                                  movefieldfromposn=movefieldfromposn,
+                                                                                  user_msg=user_msg)
+    return (title, body)
+
+
+
+def perform_request_configure_doctype_submissionpages(doctype,
+                                                      action,
+                                                      pagenum="",
+                                                      movepage="",
+                                                      movepagedirection="",
+                                                      deletepage="",
+                                                      deletepageconfirm="",
+                                                      addpage=""):
+    """Process requests relating to the submission pages of a doctype/submission"""
+    errors = []
+    warnings = []
+    body = ""
+    user_msg = []
+    try:
+        pagenum = int(pagenum)
+    except ValueError:
+        pagenum = ""
+    
+    ## ensure that there is only one doctype for this doctype ID - simply display all doctypes with warning if not
+    if doctype in ("", None):
+        user_msg.append("""Unknown Document Type""")
+        ## TODO : LOG ERROR
+        all_doctypes = get_docid_docname_alldoctypes()
+        body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
+        title = "Available WebSubmit Document Types"
+        return (title, body, errors, warnings)
+
+    numrows_doctype = get_number_doctypes_docid(docid=doctype)
+    if numrows_doctype > 1:
+        ## there are multiple doctypes with this doctype ID:
+        ## TODO : LOG ERROR
+        user_msg.append("""Multiple document types identified by "%s" exist - cannot configure at this time.""" \
+                   % (doctype,))
+        all_doctypes = get_docid_docname_alldoctypes()
+        body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
+        title = "Available WebSubmit Document Types"
+        return (title, body, errors, warnings)
+    elif numrows_doctype == 0:
+        ## this doctype does not seem to exist:
+        user_msg.append("""The document type identified by "%s" doesn't exist - cannot configure at this time.""" \
+                   % (doctype,))
+        ## TODO : LOG ERROR
+        all_doctypes = get_docid_docname_alldoctypes()
+        body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
+        title = "Available WebSubmit Document Types"
+        return (title, body, errors, warnings)
+
+    ## ensure that this submission exists for this doctype:
+    numrows_submission = get_number_submissions_doctype_action(doctype=doctype, action=action)
+    if numrows_submission > 1:
+        ## there are multiple submissions for this doctype/action ID:
+        ## TODO : LOG ERROR
+        user_msg.append("""The Submission "%s" seems to exist multiple times for the Document Type "%s" - cannot configure at this time.""" \
+                   % (action, doctype))
+        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        return (title, body, errors, warnings)
+    elif numrows_submission == 0:
+        ## this submission does not seem to exist for this doctype:
+        user_msg.append("""The Submission "%s" doesn't exist for the "%s" Document Type - cannot configure at this time.""" \
+                   % (action, doctype))
+        ## TODO : LOG ERROR
+        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        return (title, body, errors, warnings)
+
+    ## submission valid
+    if addpage != "":
+        ## add a new page to a submission:
+        error_code = add_submission_page_doctype_action(doctype=doctype, action=action)
+        if error_code == 0:
+            ## success
+            user_msg.append("""A new Submission Page has been added into the last position""")
+        else:
+            ## could not move it
+            user_msg.append("""Unable to add a new Submission Page""")
+        (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype,
+                                                                        action=action,
+                                                                        user_msg=user_msg)
+    elif movepage != "":
+        ## user wants to move a page upwards in the order
+        (title, body) = _configure_doctype_move_submission_page(errors=errors, warnings=warnings, doctype=doctype,
+                                                                action=action, pagenum=pagenum, direction=movepagedirection)
+    elif deletepage != "":
+        ## user wants to delete a page:
+        if deletepageconfirm != "":
+            ## confirmation of deletion has been provided - proceed
+            (title, body) = _configure_doctype_delete_submission_page(errors=errors, warnings=warnings, doctype=doctype,
+                                                                      action=action, pagenum=pagenum)
+        else:
+            ## user has not yet confirmed the deletion of a page - prompt for confirmation
+            (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype,
+                                                                            action=action,
+                                                                            deletepagenum=pagenum)
+    else:
+        ## default - display details of submission pages for this submission:
+        (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype, action=action)
+    return (title, body, errors, warnings)
+
+
+def _configure_doctype_move_submission_page(errors, warnings, doctype, action, pagenum, direction):
+    """
+    """
+    ## Sanity checking:
+    if direction.lower() not in ("up", "down"):
+        ## invalid direction:
+        user_msg.append("""Invalid Page destination - no action was taken""")
+        (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype,
+                                                                        action=action,
+                                                                        user_msg=user_msg)
+        return (title, body)
+    user_msg = []
+    ## swap the pages:
+    if direction.lower() == "up":
+        error_code = swap_elements_adjacent_pages_doctype_action(doctype=doctype, action=action,
+                                                                 page1=pagenum, page2=pagenum-1)
+    else:
+        error_code = swap_elements_adjacent_pages_doctype_action(doctype=doctype, action=action,
+                                                                 page1=pagenum, page2=pagenum+1)
+    if error_code == 0:
+        ## pages swapped successfully:
+        ## TODO : LOG PAGE SWAP
+        user_msg.append("""Page %s was successfully moved %swards""" % (pagenum, direction.capitalize()))
+    elif error_code == 1:
+        ## pages are not adjacent:
+        user_msg.append("""Unable to move page - only adjacent pages can be swapped around""")
+    elif error_code == 2:
+        ## at least one page out of legal range (e.g. trying to move a page to a position higher or lower
+        ## than the number of pages:
+        user_msg.append("""Unable to move page to illegal position""")
+    elif error_code in (3, 4):
+        ## Some sort of problem moving fields around!
+        ## TODO : LOG ERROR
+        user_msg.append("""Error: there was a problem swapping the submission elements to their new pages.""")
+        user_msg.append("""An attempt was made to return the elements to their original pages - you """\
+                        """should verify that this was successful, or ask your administrator"""\
+                        """ to fix the problem manually""")
+    elif error_code == 5:
+        ## the elements from the first page were left stranded in the temporary page!
+        ## TODO : LOG ERROR
+        user_msg.append("""Error: there was a problem swapping the submission elements to their new pages.""")
+        user_msg.append("""Some elements were left stranded on a temporary page. Please ask your administrator to"""\
+                        """ fix this problem manually""")
+    (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype, action=action, user_msg=user_msg)
+    return (title, body)
+
+
+
+def _configure_doctype_delete_submission_page(errors, warnings, doctype, action, pagenum):
+    user_msg = []
+    num_pages = get_numbersubmissionpages_doctype_action(doctype=doctype, action=action)
+    if num_pages > 0:
+        ## proceed with deletion
+        error_code = delete_allfields_submissionpage_doctype_action(doctype=doctype, action=action, pagenum=pagenum)
+        if error_code == 0:
+            ## everything OK
+            ## move elements from pages above the deleted page down by one page:
+            decrement_by_one_pagenumber_submissionelements_abovepage(doctype=doctype, action=action, frompage=pagenum)
+            ## now decrement the number of pages associated with the submission:
+            error_code = decrement_by_one_number_submissionpages_doctype_action(doctype=doctype, action=action)
+            if error_code == 0:
+                ## successfully deleted submission page
+                ## TODO : LOG DELETION
+                user_msg.append("""Page number %s of Submission %s was successfully deleted."""\
+                                % (pagenum, action))
+                (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype,
+                                                                                action=action,
+                                                                                user_msg=user_msg)
+            else:
+                ## error - either submission didn't exist, or multiple instances found
+                ## TODO : LOG ERROR
+                user_msg.append("""The Submission elements were deleted from Page %s of the Submission "%s"."""\
+                                """ However, it was not possible to delete the page itself."""\
+                                % (pagenum, action))
+                (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype,
+                                                                                action=action,
+                                                                                user_msg=user_msg)
+        else:
+            ## unable to delete some or all fields from the page
+            ## TODO : LOG ERROR
+            user_msg.append("""Error: Unable to delete some field elements from Page %s of Submission %s%s - """\
+                            """Page not deleted!""" % (pagenum, action, doctype))
+            (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype,
+                                                                            action=action,
+                                                                            user_msg=user_msg)
+    elif numpages == 0:
+        ## no pages to delete for this submission
+        user_msg.append("""This Submission has no Pages - Cannot delete a Page!""")
+        (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype,
+                                                                        action=action,
+                                                                        user_msg=user_msg)
+    else:
+        ## error - couldn't determine the number of pages for submission
+        ## TODO : LOG ERROR
+        user_msg.append("""Unable to determine number of Submission Pages for Submission "%s" - """\
+                        """Cannot delete page %s"""\
+                        % (action, pagenum))
+        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+    return (title, body)
+
+
+def _create_configure_doctype_submission_pages_form(doctype,
+                                                    action,
+                                                    deletepagenum="",
+                                                    user_msg=""):
+    """Perform the necessary steps in order to display a list of the pages belonging to a given
+       submission of a given document type.
+       @param doctype: (string) the unique ID of the document type.
+       @param action: (string) the unique name/ID of the action.
+       @param user_msg: (string, or list) any message(s) to be displayed to the user.
+       @return: a tuple containing 2 strings - the page title and the page body.
+    """
+    title = """Details of the Pages of the "%s" Submission of the "%s" Document Type:""" % (action, doctype)
+    submission_dets = get_cd_md_numbersubmissionpages_doctype_action(doctype=doctype, action=action)
+    if len(submission_dets) > 0:
+        cd = str(submission_dets[0][0])
+        md = str(submission_dets[0][1])
+        num_pages = submission_dets[0][2]
+    else:
+        (cd, md, num_pages) = ("", "", "0")
+    body = websubmitadmin_templates.tmpl_configuredoctype_list_submissionpages(doctype=doctype,
+                                                                               action=action,
+                                                                               number_pages=num_pages,
+                                                                               cd=cd,
+                                                                               md=md,
+                                                                               deletepagenum=deletepagenum,
+                                                                               user_msg=user_msg)
+    return (title, body)
