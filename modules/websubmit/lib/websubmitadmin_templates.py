@@ -246,6 +246,37 @@ class Template:
         """ % {'adminurl' : websubmitadmin_weburl}
         return self._create_adminbox(header="Main Menu", datalist=[menu_body])
 
+    def _element_display_preview_get_element(self,
+                                             elname="",
+                                             eltype="",
+                                             elsize="",
+                                             elrows="",
+                                             elcols="",
+                                             elval="",
+                                             elfidesc="",
+                                             ellabel=""):
+        """Return the raw display-code for an individual element.
+           @param 
+        """
+        preview = "%s" % (ellabel,)
+        try:
+            preview += {"D" : """&nbsp;&nbsp;%s&nbsp;&nbsp;""" % (elfidesc,),
+                       "F" : """<input type="file" %sname="dummyfile">""" % \
+                           ( (elsize != "" and """size="%s" """ % (cgi.escape(elsize, 1),) ) or (""),),
+                       "H" : """<span class="info">Hidden Input. Contains Following Value: %s</span>""" % (cgi.escape(elval, 1),),
+                       "I" : """<input type="text" %sname="dummyinput" value="%s">""" % \
+                         ( (elsize != "" and """size="%s" """ % (cgi.escape(elsize, 1),) ) or (""), cgi.escape(elval, 1)),
+                       "R" : """<span class="info">Cannot Display Response Element - See Element Description</span>""",
+                       "S" : """&nbsp;%s&nbsp;""" % (elfidesc,),
+                       "T" : """<textarea name="dummytextarea" %s%s></textarea>""" % \
+                           ( (elrows != "" and """rows="%s" """ % (cgi.escape(elrows, 1),) ) or (""),
+                             (elcols != "" and """cols="%s" """ % (cgi.escape(elcols, 1),) ) or (""),)
+                      }[eltype]
+        except KeyError:
+            ## Unknown element type - display warning:
+            preview += """<span class="info">Element Type not Recognised - Cannot Display</span>"""
+        return preview
+
     def _element_display_preview(self,
                                  elname="",
                                  eltype="",
@@ -282,23 +313,8 @@ class Template:
         <br />&nbsp;&nbsp;
         """ % {'adminurl' : websubmitadmin_weburl}
         ## Based on element type, display a preview of element:
-        try:
-            preview = {"D" : """&nbsp;&nbsp;%s&nbsp;&nbsp;""" % (elfidesc,),
-                       "F" : """<input type="file" %sname="dummyfile">""" % \
-                           ( (elsize != "" and """size="%s" """ % (cgi.escape(elsize, 1),) ) or (""),),
-                       "H" : """<span class="info">Hidden Input. Contains Following Value: %s</span>""" % (cgi.escape(elval, 1),),
-                       "I" : """<input type="text" %sname="dummyinput" value="%s">""" % \
-                         ( (elsize != "" and """size="%s" """ % (cgi.escape(elsize, 1),) ) or (""), cgi.escape(elval, 1)),
-                       "R" : """<span class="info">Cannot Display Response Element - See Element Description</span>""",
-                       "S" : """&nbsp;%s&nbsp;""" % (elfidesc,),
-                       "T" : """<textarea name="dummytextarea" %s%s></textarea>""" % \
-                           ( (elrows != "" and """rows="%s" """ % (cgi.escape(elrows, 1),) ) or (""),
-                             (elcols != "" and """cols="%s" """ % (cgi.escape(elcols, 1),) ) or (""),)
-                      }[eltype]
-        except KeyError:
-            ## Unknown element type - display warning:
-            preview = """<span class="info">Element Type not Recognised - Cannot Display</span>"""
-        body += preview
+        body += self._element_display_preview_get_element(eltype=eltype, elsize=elsize, elrows=elrows, elcols=elcols,
+                                                          elval=elval, elfidesc=elfidesc)
         ## Close dummy form and preview table:
         body += """&nbsp;&nbsp;<br />
         </td>
@@ -497,7 +513,14 @@ class Template:
               <td width="80%%">"""
             for usecase in el_use_tuple:
                 try:
-                    body_content += """<small>&nbsp;%(subname)s: Page %(pageno)s</small><br />\n""" % {'subname' : usecase[0], 'pageno' : usecase[1]}
+                    body_content += """<small><a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s"""\
+                                    """&action=%(action)s&pagenum=%(pageno)s">&nbsp;%(subname)s: Page %(pageno)s</a></small><br />\n"""\
+                                    % { 'websubadmin_url'       : websubmitadmin_weburl,
+                                        'doctype'               : usecase[0],
+                                        'action'                : usecase[1],
+                                        'subname'               : "%s%s" % (usecase[1], usecase[0]),
+                                        'pageno'                : usecase[2]
+                                      }
                 except KeyError, e:
                     pass
             body_content += """&nbsp;</td>
@@ -656,53 +679,6 @@ class Template:
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="Enter Action Details:", datalist=[body_content])
         return output
-
-
-##     def tmpl_display_adddoctype_form(self, doctype="", doctypename="", doctypedescr="", clonefrom="", alldoctypes="", user_msg=""):
-##         """TODO : DOCSTRING"""
-##         output = ""
-##         body_content = ""
-##         output += self._create_user_message_string(user_msg)
-##         if type(alldoctypes) not in (list, tuple):
-##             ## bad list of document types - reset
-##             alldoctypes = ()
-##         body_content += """<form method="get" action="%(websubadmin_url)s/doctypeadd">""" \
-##                    % { 'websubadmin_url' : websubmitadmin_weburl }
-##         body_content += """
-##         <table width="90%%">
-##          <tr>
-##           <td width="20%%"><span class="adminlabel">Document Type ID:</span></td>
-##           <td width="80%%"><input type="text" size="15" name="doctype" value="%(doctype_id)s" /></td>
-##          </tr>
-##          <tr>
-##           <td width="20%%"><span class="adminlabel">Document Type Name:</span></td>
-##           <td width="80%%"><input type="text" size="60" name="doctypename" value="%(doctype_name)s" /></td>
-##          </tr>
-##          <tr>
-##           <td width="20%%"><span class="adminlabel">Document Type Description:</span></td>
-##           <td width="80%%"><textarea name="doctypedescr" cols="60" rows="8">%(doctype_description)s</textarea></td>
-##          </tr>
-##          <tr>
-##           <td width="20%%"><span class="adminlabel">Document Type to Clone:</span></td>
-##           <td width="80%%">%(doctype_select_list)s</td>
-##          </tr>
-##          <tr>
-##           <td width="20%%">&nbsp;</td>
-##           <td width="80%%"><input name="doctypeaddcommit" class="adminbutton" type="submit" value="Save Details" /></td>
-##          </tr>
-##         </table>
-##         </form>
-##         """ % { 'doctype_id' : cgi.escape(doctype, 1),
-##                 'doctype_name' : cgi.escape(doctypename, 1),
-##                 'doctype_description' : cgi.escape(doctypedescr, 1),
-##                 'doctype_select_list' : create_html_select_list(select_name="clonefrom", option_list=alldoctypes, selected_values=clonefrom, default_opt=('None', 'Select:'))
-##               }
-
-##         output += self._create_websubmitadmin_main_menu_header()
-##         output += self._create_adminbox(header="Add a new Document Type:", datalist=[body_content])
-##         return output
-
-        
 
     def tmpl_display_addfunctionform(self,
                                      funcname="",
@@ -1514,7 +1490,7 @@ class Template:
                                                "%s" % (cgi.escape(str(subm[10]), 1),),
                                                "%s" % (cgi.escape(str(subm[11]), 1),),
                                                "%s" % (cgi.escape(str(subm[12]), 1),),
-                                               """<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/%(formaction)s">""" \
+                                               """<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionpages">""" \
                                                """<input class="hyperlinkformHiddenInput" name="doctype" value="%(doctype)s" type""" \
                                                """="hidden" />""" \
                                                """<input class="hyperlinkformHiddenInput" name="action" value="%(action)s" type""" \
@@ -1523,7 +1499,6 @@ class Template:
                                                """class="hyperlinkformSubmitButton" />""" \
                                                """</form>""" % { 'doctype' : cgi.escape(doctype, 1),
                                                                  'action' : cgi.escape(str(subm[2]), 1),
-                                                                 'formaction' : cgi.escape(perform_act, 1),
                                                                  'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1)
                                                                },
                                                """<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionfunctions">""" \
@@ -1939,8 +1914,832 @@ class Template:
 
         body_content += create_html_table_from_tuple(tableheader=header, tablebody=tbody)
         body_content += """</div>"""
+
+        ## buttons for "add a function" and "finished":
+        body_content += """
+         <table>
+          <tr>
+           <td>
+            <br />
+            <form method="post" action="%(websubadmin_url)s/doctypeconfiguresubmissionfunctions">
+             <input name="doctype" type="hidden" value="%(doctype)s" />
+             <input name="action" type="hidden" value="%(action)s" />
+             <input name="configuresubmissionaddfunction" class="adminbutton" type="submit" value="Add a Function" />
+            </form>
+           </td>
+           <td>
+            <br />
+            <form method="post" action="%(websubadmin_url)s/doctypeconfigure">
+             <input name="doctype" type="hidden" value="%(doctype)s" />
+             <input name="funishedviewsubmissionfunctions" class="adminbutton" type="submit" value="Finished" />
+            </form>
+           </td>
+          </tr>
+         </table>""" % { 'doctype' : cgi.escape(doctype, 1),
+                         'action'  : cgi.escape(action, 1),
+                         'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1)
+                       }
+
+        
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="""Functions of the "%s" Submission of the "%s" Document Type:""" \
                                         % (cgi.escape(action, 1), cgi.escape(doctype, 1)), datalist=[body_content])
         return output
+
+
+
+    def _tmpl_configuredoctype_submissionfield_display_changeable_fields(self,
+                                                                         fieldtext="",
+                                                                         fieldlevel="",
+                                                                         fieldshortdesc="",
+                                                                         fieldcheck="",
+                                                                         allchecks=""):
+        """Used when displaying the details of a submission field that is to be edited or inserted onto a
+           submission page.
+           This function creates the form elements for the values that can be edited by the user, such as the field's
+           label, short description, etc. (Examples of details of the submission field that could not be edited by the
+           user and are therefore not included in this function, are the creation-date/modification-date of the field,
+           etc.
+           @param fieldtext: (string) the label used for a field
+           @param fieldlevel: (char) 'M' or 'O' - whether a field is Mandatory or Optional
+           @param fieldshortdesc: (string) the short description of a field
+           @param fieldcheck: (string) the JavaScript checking function applied to a field
+           @param allchecks: (tuple of strings) the names of all WebSubmit JavaScript checks
+           @return: (string) a section of a form
+        """
+        ## sanity checking
+        if type(allchecks) not in (tuple, list):
+            allchecks = []
+        ## make form-section
+        txt = """
+         <tr>
+          <td width="20%%"><span class="adminlabel">Field Label:</span></td>
+          <td width="80%%"><br /><textarea name="fieldtext" rows="5" cols="50">%(fieldtext)s</textarea><br /><br /></td>
+         </tr>
+         <tr>
+          <td width="20%%"><span class="adminlabel">Field Level:</span></td>
+          <td width="80%%"><span>%(fieldlevel)s</span></td>
+         </tr>
+         <tr>
+          <td width="20%%"><span class="adminlabel">Field Short Description:</span></td>
+          <td width="80%%"><br /><input type="text" size="35" name="fieldshortdesc" value="%(fieldshortdesc)s" /><br /><br /></td>
+         </tr>
+         <tr>
+          <td width="20%%"><span class="adminlabel">JavaScript Check:</span></td>
+          <td width="80%%"><span>%(fieldcheck)s</span></td>
+         </tr>""" % { 'fieldtext'      : cgi.escape(fieldtext, 1),
+                      'fieldlevel'     : create_html_select_list(select_name="fieldlevel",
+                                                                 option_list=(("M", "Mandatory"), ("O", "Optional")),
+                                                                 selected_values=fieldlevel
+                                                                ),
+                      'fieldshortdesc' : cgi.escape(fieldshortdesc, 1),
+                      'fieldcheck'     : create_html_select_list(select_name="fieldcheck",
+                                                                 option_list=allchecks,
+                                                                 selected_values=fieldcheck,
+                                                                 default_opt=("", "--NO CHECK--")
+                                                                )
+
+                    }
+        return txt
+
+
+    def tmpl_configuredoctype_add_submissionfield(self,
+                                                  doctype="",
+                                                  action="",
+                                                  pagenum="",
+                                                  fieldname="",
+                                                  fieldtext="",
+                                                  fieldlevel="",
+                                                  fieldshortdesc="",
+                                                  fieldcheck="",
+                                                  allchecks="",
+                                                  allelements="",
+                                                  user_msg="",
+                                                  perform_act="doctypeconfiguresubmissionpageelements"):
+        ## sanity checking
+        if type(allelements) not in (tuple, list):
+            allelements = []
+        ## begin template:
+        output = ""
+        body_content = ""
+        output += self._create_user_message_string(user_msg)
+
+        body_content += """
+        <table class="admin_wvar" width="95%%">
+         <thead>
+         <tr>
+         <th class="adminheaderleft" colspan="2">
+           Add a field to page %(pagenum)s of submission %(submission)s
+          </th>
+         </tr>
+         </thead>
+         <tbody>
+         <tr>
+          <td width="20%%">&nbsp;</td>
+          <td width="80%%">&nbsp;<form method="get" action="%(websubadmin_url)s/%(performaction)s"></td>
+         </tr>
+         <tr>
+          <td width="20%%"><span class="adminlabel">Page Number:</span></td>
+          <td width="80%%"><span class="info">%(pagenum)s</span></td>
+         </tr>
+         <tr>
+          <td width="20%%"><span class="adminlabel">Field Name:</span></td>
+          <td width="80%%">%(fieldname)s</td>
+         </tr>""" % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                      'fieldname'       : create_html_select_list(select_name="fieldname",
+                                                                  option_list=allelements,
+                                                                  selected_values=fieldname,
+                                                                  default_opt=("", "Select a Field:")
+                                                                 ),
+                      'pagenum'         : cgi.escape(pagenum, 1),
+                      'submission'      : cgi.escape("%s%s" % (action, doctype), 1),
+                      'performaction'   : cgi.escape(perform_act, 1)
+                    }
+        body_content += self._tmpl_configuredoctype_submissionfield_display_changeable_fields(fieldtext=fieldtext,
+                                                                                              fieldlevel=fieldlevel,
+                                                                                              fieldshortdesc=fieldshortdesc,
+                                                                                              fieldcheck=fieldcheck,
+                                                                                              allchecks=allchecks)
+        body_content += """
+         <tr>
+          <td colspan="2">
+           <table>
+            <tr>
+             <td>
+               <input name="doctype" type="hidden" value="%(doctype)s" />
+               <input name="action" type="hidden" value="%(action)s" />
+               <input name="pagenum" type="hidden" value="%(pagenum)s" />
+               <input name="addfieldcommit" class="adminbutton" type="submit" value="Add Field" />
+              </form>
+             </td>
+             <td>
+              <br />
+              <form method="post" action="%(websubadmin_url)s/%(performaction)s">
+               <input name="doctype" type="hidden" value="%(doctype)s" />
+               <input name="action" type="hidden" value="%(action)s" />
+               <input name="pagenum" type="hidden" value="%(pagenum)s" />
+               <input name="canceladdsubmissionfield" class="adminbutton" type="submit" value="Cancel" />
+              </form>
+             </td>
+            </tr>
+           </table>
+          </td>
+         </tr>
+         </tbody>
+        </table>\n""" % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                          'performaction'   : cgi.escape(perform_act, 1),
+                          'doctype'         : cgi.escape(doctype, 1),
+                          'action'          : cgi.escape(action, 1),
+                          'pagenum'         : cgi.escape(pagenum, 1)
+                        }
+        output += self._create_websubmitadmin_main_menu_header()
+        output += self._create_adminbox(header="Field Details:", datalist=[body_content])
+        return output
+
+
+    def tmpl_configuredoctype_edit_submissionfield(self,
+                                                   doctype="",
+                                                   action="",
+                                                   pagenum="",
+                                                   fieldnum="",
+                                                   fieldname="",
+                                                   fieldtext="",
+                                                   fieldlevel="",
+                                                   fieldshortdesc="",
+                                                   fieldcheck="",
+                                                   cd="",
+                                                   md="",
+                                                   allchecks="",
+                                                   user_msg="",
+                                                   perform_act="doctypeconfiguresubmissionpageelements"):
+        ## begin template:
+        output = ""
+        body_content = ""
+        output += self._create_user_message_string(user_msg)
+        
+        body_content += """
+        <table class="admin_wvar" width="95%%">
+         <thead>
+         <tr>
+         <th class="adminheaderleft" colspan="2">
+           Details of the %(fieldname)s field as it appears at position %(fieldnum)s on Page %(pagenum)s of the %(submission)s Submission:
+          </th>
+         </tr>
+         </thead>
+         <tbody>
+         <tr>
+          <td width="20%%">&nbsp;</td>
+          <td width="80%%">&nbsp;<form method="get" action="%(websubadmin_url)s/%(performaction)s"></td>
+         </tr>
+         <tr>
+          <td width="20%%"><span class="adminlabel">Page Number:</span></td>
+          <td width="80%%"><span class="info">%(pagenum)s</span></td>
+         </tr>
+         <tr>
+          <td width="20%%"><span class="adminlabel">Field Number:</span></td>
+          <td width="80%%"><span class="info">%(fieldnum)s</span></td>
+         </tr>
+         <tr>
+          <td width="20%%"><span class="adminlabel">Field Name:</span></td>
+          <td width="80%%"><span class="info">%(fieldname)s</span></td>
+         </tr>""" % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                      'pagenum'         : cgi.escape(pagenum, 1),
+                      'fieldnum'        : cgi.escape(fieldnum, 1),
+                      'fieldname'       : cgi.escape(fieldname, 1),
+                      'submission'      : cgi.escape("%s%s" % (action, doctype), 1),
+                      'performaction'   : cgi.escape(perform_act, 1)
+                    }
+          
+        ## field creation date:
+        if cd not in ("", None):
+            body_content += """
+         <tr>
+          <td width="20%%"><span class="adminlabel">Creation Date:</span></td>
+          <td width="80%%"><span class="info">%s</span></td>
+         </tr>""" % (cgi.escape(str(cd), 1),)
+        ## field last-modified date:
+        if md not in ("", None):
+            body_content += """
+         <tr>
+          <td width="20%%"><span class="adminlabel">Last Modification Date:</span></td>
+          <td width="80%%"><span class="info">%s</span></td>
+         </tr>""" % (cgi.escape(str(md), 1), )
+
+        body_content += self._tmpl_configuredoctype_submissionfield_display_changeable_fields(fieldtext=fieldtext,
+                                                                                              fieldlevel=fieldlevel,
+                                                                                              fieldshortdesc=fieldshortdesc,
+                                                                                              fieldcheck=fieldcheck,
+                                                                                              allchecks=allchecks)
+        body_content += """
+         <tr>
+          <td colspan="2">
+           <table>
+            <tr>
+             <td>
+               <input name="doctype" type="hidden" value="%(doctype)s" />
+               <input name="action" type="hidden" value="%(action)s" />
+               <input name="pagenum" type="hidden" value="%(pagenum)s" />
+               <input name="editfieldposn" type="hidden" value="%(fieldnum)s" />
+               <input name="editfieldposncommit" class="adminbutton" type="submit" value="Save Changes" />
+              </form>
+             </td>
+             <td>
+              <br />
+              <form method="post" action="%(websubadmin_url)s/%(performaction)s">
+               <input name="doctype" type="hidden" value="%(doctype)s" />
+               <input name="action" type="hidden" value="%(action)s" />
+               <input name="pagenum" type="hidden" value="%(pagenum)s" />
+               <input name="canceleditsubmissionfield" class="adminbutton" type="submit" value="Cancel" />
+              </form>
+             </td>
+            </tr>
+           </table>
+          </td>
+         </tr>
+         </tbody>
+        </table>\n""" % { 'doctype'         : cgi.escape(doctype, 1),
+                          'action'          : cgi.escape(action, 1),
+                          'pagenum'         : cgi.escape(pagenum, 1),
+                          'fieldnum'        : cgi.escape(fieldnum, 1),
+                          'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                          'performaction'   : cgi.escape(perform_act, 1)
+                        }
+
+        output += self._create_websubmitadmin_main_menu_header()
+        output += self._create_adminbox(header="Field Details:", datalist=[body_content])
+        return output
+
+
+
+    def tmpl_configuredoctype_display_submissionpage_preview(self, doctype, action, pagenum, fields, user_msg=""):
+        """Create a page displaying a simple preview of a submission page
+           @param doctype: (string) the unique ID of a document type
+           @param action: (string) the unique ID of an action
+           @param pagenum: (string) the number of the page that is to be previewed
+           @param fields: a tuple of tuples, whereby each tuple contains the details of a field on the submission page:
+               (fieldname, check-name, field-type, size, rows, cols, field-description)
+           @param user_msg: a tuple or string, containing any message(s) to be displayed to the user
+           @return: a string, which makes up the page body
+        """
+        ## Sanity Checking of elements:
+        if type(fields) not in (list, tuple):
+            fields = ()
+        try:
+            if type(fields[0]) not in (tuple, list):
+                fields = ()
+        except IndexError:
+            pass
+        ## begin template:
+        output = ""
+        body_content = ""
+        output += self._create_user_message_string(user_msg)
+
+        body_content += """<div><br />
+        <form name="dummyeldisplay" action="%(websubadmin_url)s">
+        <table class="admin_wvar" align="center">
+        <thead>
+         <tr>
+          <th class="adminheaderleft" colspan="1">
+           Page Preview:
+          </th>
+         </tr>
+        </thead>
+        <tbody>
+        <tr bgcolor="#f1f1f1">
+        <td>
+        <br />&nbsp;&nbsp;
+        """ % {'websubadmin_url' : websubmitadmin_weburl}
+
+        for field in fields:
+            body_content += self._element_display_preview_get_element(elname=field[0], eltype=field[3], elsize=field[4],
+                                                                      elrows=field[5], elcols=field[6], elval=field[8],
+                                                                      elfidesc=field[7], ellabel=field[1])
+            body_content += "\n"
+
+        body_content += """&nbsp;&nbsp;<br />
+        </td>
+        </tr>
+        </tbody>
+        </table>
+        </form>
+        </div>"""
+        ## hyperlink back to page details:
+        body_content += """
+        <hr />
+        <div style="text-align: center;">
+        <a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s&action=%(action)s&pagenum=%(pagenum)s">
+         Return to details of page %(pagenum)s of submission %(submission)s</a>
+        </div>""" % { 'websubadmin_url' : websubmitadmin_weburl,
+                      'doctype'         : cgi.escape(doctype, 1),
+                      'action'          : cgi.escape(action, 1),
+                      'pagenum'         : cgi.escape(pagenum, 1),
+                      'submission'      : cgi.escape("%s%s" % (action, doctype), 1)
+                    }
+         
+        output += self._create_websubmitadmin_main_menu_header()
+        output += self._create_adminbox(header="Preview of Page %s of Submission %s:" \
+                                        % (pagenum, "%s%s" % (action, doctype)), datalist=[body_content])
+        return output
+
+
+
+    def tmpl_configuredoctype_list_submissionelements(self,
+                                                      doctype,
+                                                      action,
+                                                      pagenum,
+                                                      page_elements,
+                                                      movefieldfromposn="",
+                                                      user_msg=""):
+        ## Sanity Checking of elements:
+        if type(page_elements) not in (list, tuple):
+            page_elements = ()
+        try:
+            if type(page_elements[0]) not in (tuple, list):
+                page_elements = ()
+        except IndexError:
+            pass
+        try:
+            int(movefieldfromposn)
+        except ValueError:
+            movefieldfromposn = ""
+
+        ## begin template:
+        output = ""
+        body_content = ""
+        output += self._create_user_message_string(user_msg)
+        number_elements = len(page_elements)
+
+        if number_elements > 0:
+            body_content += """
+            <table width="100%%" class="admin_wvar">
+             <tbody>
+             <tr>
+              <td style="text-align: center;">
+               <br />
+               <form method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionpagespreview">
+                <input type="hidden" name="doctype" value="%(doctype_id)s" />
+                <input type="hidden" name="action" value="%(action)s" />
+                <input type="hidden" name="pagenum" value="%(pagenum)s" />
+                <input name="viewsubmissionpagepreview" class="adminbutton" type="submit" value="View Page Preview" />
+               </form>
+              </td>
+             </tr>
+            </table>""" % { 'websubadmin_url' : websubmitadmin_weburl,
+                            'doctype_id'      : cgi.escape(doctype, 1),
+                            'action'          : cgi.escape(action, 1),
+                            'pagenum'         : cgi.escape(pagenum, 1)
+                          }
+
+
+        t_header = ["&nbsp;", "&nbsp;", "&nbsp;", "&nbsp;", "Name", "Element Label",
+                    "Level", "Short Descr.", "Check", "Creation Date", "Modification Date", "&nbsp;",
+                    "&nbsp;", "&nbsp;", "&nbsp;"]
+        t_body = []
+        for i in range(0, number_elements):
+            ## Field number:
+            t_row = ["""%s""" % (cgi.escape(page_elements[i][1], 1),) ]
+            ## Move a field from posn - to posn arrows:
+            if movefieldfromposn in ("", None):
+                ## provide "move from" arrow for all element
+                if number_elements > 1:
+                    t_row += ["""<a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s&action=%(action)s&"""\
+                              """pagenum=%(pagenum)s&movefieldfromposn=%(fieldnum)s">"""\
+                              """<img border="0" src="%(weburl)s/img/move_from.gif" title="Move field at position %(fieldnum)s"""\
+                              """ from this location" /></a>"""\
+                              % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                                  'weburl'          : cgi.escape(weburl, 1),
+                                  'doctype'         : cgi.escape(doctype, 1),
+                                  'action'          : cgi.escape(action, 1),
+                                  'pagenum'         : cgi.escape(pagenum, 1),
+                                  'fieldnum'        : cgi.escape(page_elements[i][1], 1)
+                                }
+                             ]
+                else:
+                    t_row += ["&nbsp;"]
+            else:
+                ## there is a value for "movefieldfromposn", so a "moveto" button must be provided
+                if number_elements > 1:
+                    ## is this the field that will be moved?
+                    if movefieldfromposn  == page_elements[i][1]:
+                        ## yes it is - no "move-to" arrow here
+                        t_row += ["&nbsp;"]
+                    else:
+                        ## no it isn't - "move-to" arrow here
+                        t_row += ["""<a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s&action=%(action)s&"""\
+                                  """pagenum=%(pagenum)s&movefieldfromposn=%(movefieldfromposn)s&movefieldtoposn=%(fieldnum)s">"""\
+                                  """<img border="0" src="%(weburl)s/img/move_to.gif" title="Move field at position %(movefieldfromposn)s"""\
+                                  """ to this location at position %(fieldnum)s" /></a>"""\
+                                  % { 'websubadmin_url'  : cgi.escape(websubmitadmin_weburl, 1),
+                                      'weburl'           : cgi.escape(weburl, 1),
+                                      'doctype'          : cgi.escape(doctype, 1),
+                                      'action'           : cgi.escape(action, 1),
+                                      'pagenum'          : cgi.escape(pagenum, 1),
+                                      'fieldnum'         : cgi.escape(page_elements[i][1], 1),
+                                      'movefieldfromposn' : cgi.escape(movefieldfromposn, 1)
+                                    }
+                                 ]
+                else:
+                    ## there is only 1 field - cannot perform a "move"!
+                    t_row += ["&nbsp;"]
+
+            ## up arrow:
+            if i != 0:
+                t_row += ["""<a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s&action=%(action)s&"""\
+                          """pagenum=%(pagenum)s&movefieldfromposn=%(fieldnum)s&movefieldtoposn=%(previousfield)s">"""\
+                          """<img border="0" src="%(weburl)s/img/smallup.gif" title="Move Element Up" /></a>"""\
+                          % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                              'weburl'          : cgi.escape(weburl, 1),
+                              'doctype'         : cgi.escape(doctype, 1),
+                              'action'          : cgi.escape(action, 1),
+                              'pagenum'         : cgi.escape(pagenum, 1),
+                              'fieldnum'        : cgi.escape(page_elements[i][1], 1),
+                              'previousfield'   : cgi.escape(str(int(page_elements[i][1])-1), 1)
+                            }
+                         ]
+            else:
+                ## first element - don't provide up arrow:
+                t_row += ["&nbsp;"]
+            ## down arrow:
+            if number_elements > 1 and i < number_elements - 1:
+                t_row += ["""<a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s&action=%(action)s&"""\
+                          """pagenum=%(pagenum)s&movefieldfromposn=%(fieldnum)s&movefieldtoposn=%(nextfield)s">"""\
+                          """<img border="0" src="%(weburl)s/img/smalldown.gif" title="Move Element Down" /></a>"""\
+                          % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                              'weburl'          : cgi.escape(weburl, 1),
+                              'doctype'         : cgi.escape(doctype, 1),
+                              'action'          : cgi.escape(action, 1),
+                              'pagenum'         : cgi.escape(pagenum, 1),
+                              'fieldnum'        : cgi.escape(page_elements[i][1], 1),
+                              'nextfield'       : cgi.escape(str(int(page_elements[i][1])+1), 1)
+                            }
+                         ]
+            else:
+                t_row += ["&nbsp;"]
+
+            ## Element Name:
+            t_row += ["""<span class="info">%s</span>""" % (cgi.escape(str(page_elements[i][2]), 1),) ]
+
+            ## Element Label:
+            t_row += ["""%s""" % (cgi.escape(str(page_elements[i][3]), 1),) ]
+
+            ## Level:
+            t_row += ["""%s""" % (cgi.escape(str(page_elements[i][4]), 1),) ]
+
+            ## Short Descr:
+            t_row += ["""%s""" % (cgi.escape(str(page_elements[i][5]), 1),) ]
+
+            ## Check:
+            t_row += ["""%s""" % (cgi.escape(str(page_elements[i][6]), 1),) ]
+
+            ## Creation Date:
+            if page_elements[i][7] not in ("", None):
+                t_row += ["%s" % (cgi.escape(str(page_elements[i][7]), 1),)]
+            else:
+                t_row += ["&nbsp;"]
+                
+            ## Modification Date:
+            if page_elements[i][8] not in ("", None):
+                t_row += ["%s" % (cgi.escape(str(page_elements[i][8]), 1),)]
+            else:
+                t_row += ["&nbsp;"]
+
+            ## View/Edit field:
+            t_row += ["""<a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s&action=%(action)s&"""\
+                      """pagenum=%(pagenum)s&editfieldposn=%(fieldnum)s"><small>edit</small></a>"""\
+                      % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                          'weburl'          : cgi.escape(weburl, 1),
+                          'doctype'         : cgi.escape(doctype, 1),
+                          'action'          : cgi.escape(action, 1),
+                          'pagenum'         : cgi.escape(pagenum, 1),
+                          'fieldnum'        : cgi.escape(page_elements[i][1], 1)
+                        }
+                     ]
+
+            ## Delete Element from page:
+            t_row += ["""<a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s&action=%(action)s&"""\
+                      """pagenum=%(pagenum)s&deletefieldposn=%(fieldnum)s"><small>delete</small></a>"""\
+                      % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                          'weburl'          : cgi.escape(weburl, 1),
+                          'doctype'         : cgi.escape(doctype, 1),
+                          'action'          : cgi.escape(action, 1),
+                          'pagenum'         : cgi.escape(pagenum, 1),
+                          'fieldnum'        : cgi.escape(page_elements[i][1], 1)
+                        }
+                     ]
+
+            ## View/Edit Element Definition:
+            t_row += ["""<a href="%(websubadmin_url)s/elementedit?elname=%(elementname)s&doctype=%(doctype)s&action=%(action)s&"""\
+                      """pagenum=%(pagenum)s"><small>element</small></a>"""\
+                      % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                          'weburl'          : cgi.escape(weburl, 1),
+                          'doctype'         : cgi.escape(doctype, 1),
+                          'action'          : cgi.escape(action, 1),
+                          'pagenum'         : cgi.escape(pagenum, 1),
+                          'elementname'     : cgi.escape(page_elements[i][2], 1)
+                        }
+                     ]
+
+            ## Jump element out-from:
+            t_row += ["&nbsp;"]
+
+            ## final column containing "jumping-out from" image when moving a field:
+            if movefieldfromposn not in ("", None):
+                if movefieldfromposn  == page_elements[i][1] and number_elements > 1:
+                    t_row += ["""<img border="0" src="%(weburl)s/img/move_from.gif" title="Move field at position %(fieldnum)s"""\
+                              """ from this location" />"""\
+                              % { 'weburl'           : cgi.escape(weburl, 1),
+                                  'fieldnum'         : cgi.escape(page_elements[i][1], 1)
+                                }
+                             ]
+                else:
+                    t_row += ["&nbsp;"]
+            else:
+                t_row += ["&nbsp;"]
+
+            ## finally, append the newly created row to the tbody list:
+            t_body.append(t_row)
+
+        ## now create the table and include it into the page body:
+
+        body_content += """
+        <table width="100%%">
+         <tr>
+          <td colspan="2"><br />"""
+        body_content += create_html_table_from_tuple(tableheader=t_header, tablebody=t_body)
+        body_content += """
+           <br />
+          </td>
+         </tr>"""
+        body_content += """
+         <tr>
+          <td width="20%%">&nbsp;</td>
+          <td width="80%%">
+           <table>
+            <tr>
+             <td>
+              <form method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements">
+               <input type="hidden" name="doctype" value="%(doctype_id)s" />
+               <input type="hidden" name="action" value="%(action)s" />
+               <input type="hidden" name="pagenum" value="%(pagenum)s" />
+               <input name="addfield" class="adminbutton" type="submit" value="Add a Field" />
+              </form>
+             </td>
+             <td>
+              <form method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionpages">
+               <input type="hidden" name="doctype" value="%(doctype_id)s" />
+               <input type="hidden" name="action" value="%(action)s" />
+               <input name="finishedviewfields" class="adminbutton" type="submit" value="Finished" />
+              </form>
+             </td>
+            </tr>
+           </table>
+          </td>
+         </tr>""" % { 'websubadmin_url' : websubmitadmin_weburl,
+                      'doctype_id'      : cgi.escape(doctype, 1),
+                      'action'          : cgi.escape(action, 1),
+                      'pagenum'         : cgi.escape(pagenum, 1)
+                    }
+
+        body_content += """
+        </table>"""
+
+        output += self._create_websubmitadmin_main_menu_header()
+        output += self._create_adminbox(header="Submission Page Details:", datalist=[body_content])
+        return output
+
+
+    def tmpl_configuredoctype_list_submissionpages(self,
+                                                   doctype,
+                                                   action,
+                                                   number_pages,
+                                                   cd="",
+                                                   md="",
+                                                   deletepagenum="",
+                                                   user_msg=""):
+        ## sanity checking:
+        try:
+            number_pages = int(number_pages)
+        except ValueError:
+            number_pages = 0
+        deletepagenum = str(deletepagenum)
+
+        output = ""
+        body_content = ""
+        output += self._create_user_message_string(user_msg)
+
+        body_content += """
+        <table width="90%%">
+         <tr>
+          <td width="20%%"><span class="adminlabel">Document Type ID:</span></td>
+          <td width="80%%"><span class="info">%(doctype_id)s</span></td>
+         </tr>
+         <tr>
+          <td width="20%%"><span class="adminlabel">Submission ID:</span></td>
+          <td width="80%%"><span class="info">%(action)s</span></td>
+         </tr>
+         <tr>
+          <td width="20%%"><span class="adminlabel">Number of Pages:</span></td>
+          <td width="80%%"><span class="info">%(num_pages)s</span></td>
+         </tr>""" % { 'doctype_id' : cgi.escape(doctype, 1),
+                      'action'     : cgi.escape(action, 1),
+                      'num_pages'  : cgi.escape(str(number_pages), 1)
+                    }
+        if cd not in ("", None):
+            body_content += """
+         <tr>
+          <td width="20%%"><span class="adminlabel">Creation Date:</span></td>
+          <td width="80%%"><span class="info">%s</span></td>
+         </tr>""" % (cgi.escape(str(cd), 1),)
+        if md not in ("", None):
+            body_content += """
+         <tr>
+          <td width="20%%"><span class="adminlabel">Last Modification Date:</span></td>
+          <td width="80%%"><span class="info">%s</span></td>
+         </tr>""" % (cgi.escape(str(md), 1), )
+
+        ## EITHER: Make a table of links to each page -OR-
+        ## prompt for confirmation of deletion of a page:
+        if deletepagenum == "":
+            ## This is a normal visit to display details of a submission's pages
+            ## make a table of links to each page:
+            t_header = ["Page", "&nbsp;", "&nbsp;", "View Page", "Delete"]
+            t_body = []
+            for i in range(1, number_pages + 1):
+                t_row = ["""Page %d""" % (i,)]
+                ## up arrow:
+                if i != 1:
+                    t_row += ["""<a href="%(websubadmin_url)s/doctypeconfiguresubmissionpages?doctype=%(doctype)s&action=%(action)s&"""\
+                              """pagenum=%(pagenum)s&movepage=true&movepagedirection=up">"""\
+                              """<img border="0" src="%(weburl)s/img/smallup.gif" title="Move Page Up" /></a>""" \
+                              % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                                  'weburl'          : cgi.escape(weburl, 1),
+                                  'doctype'         : cgi.escape(doctype, 1),
+                                  'action'          : cgi.escape(action, 1),
+                                  'pagenum'         : cgi.escape(str(i), 1)
+                                }
+                             ]
+                else:
+                    ## this is the first function - don't provide an arrow to move it up
+                    t_row += ["&nbsp;"]
+                ## down arrow:
+                if number_pages > 1 and i < number_pages:
+                    t_row += ["""<a href="%(websubadmin_url)s/doctypeconfiguresubmissionpages?doctype=%(doctype)s&action=%(action)s&"""\
+                              """pagenum=%(pagenum)s&movepage=true&movepagedirection=down">"""\
+                              """<img border="0" src="%(weburl)s/img/smalldown.gif" title="Move Page Down" /></a>""" \
+                              % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                                  'weburl'          : cgi.escape(weburl, 1),
+                                  'doctype'         : cgi.escape(doctype, 1),
+                                  'action'          : cgi.escape(action, 1),
+                                  'pagenum'         : cgi.escape(str(i), 1)
+                                }
+                             ]
+                else:
+                    t_row += ["&nbsp;"]
+
+                ## "view page" link:
+                t_row += ["""<small><a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s&action=%(action)s&"""\
+                          """pagenum=%(pagenum)s">view page</a></small>""" \
+                          % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                              'doctype'         : cgi.escape(doctype, 1),
+                              'action'          : cgi.escape(action, 1),
+                              'pagenum'         : cgi.escape(str(i), 1)
+                            }
+                         ]
+
+                ## "delete page" link:
+                t_row += ["""<small><a href="%(websubadmin_url)s/doctypeconfiguresubmissionpages?doctype=%(doctype)s&action=%(action)s&"""\
+                          """pagenum=%(pagenum)s&deletepage=true">delete page</a></small>""" \
+                          % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                              'doctype'         : cgi.escape(doctype, 1),
+                              'action'          : cgi.escape(action, 1),
+                              'pagenum'         : cgi.escape(str(i), 1)
+                            }
+                         ]
+
+                ## finally, append the newly created row to the tbody list:
+                t_body.append(t_row)
+
+            ## now create the table and include it into the page body:
+            body_content += """
+             <tr>
+              <td colspan="2"><br />"""
+            body_content += create_html_table_from_tuple(tableheader=t_header, tablebody=t_body)
+            body_content += """
+               <br />
+              </td>
+             </tr>"""
+            body_content += """
+             <tr>
+              <td width="20%%">&nbsp;</td>
+              <td width="80%%">
+               <table>
+                <tr>
+                 <td>
+                  <form method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionpages">
+                   <input type="hidden" name="doctype" value="%(doctype_id)s" />
+                   <input type="hidden" name="action" value="%(action)s" />
+                   <input name="addpage" class="adminbutton" type="submit" value="Add a Page" />
+                  </form>
+                 </td>
+                 <td>
+                  <form method="get" action="%(websubadmin_url)s/doctypeconfigure">
+                   <input type="hidden" name="doctype" value="%(doctype_id)s" />
+                   <input name="finishedviewpages" class="adminbutton" type="submit" value="Finished" />
+                  </form>
+                 </td>
+                </tr>
+               </table>
+              </td>
+             </tr>""" % { 'websubadmin_url' : websubmitadmin_weburl,
+                          'doctype_id' : cgi.escape(doctype, 1),
+                          'action'     : cgi.escape(action, 1)
+                        }
+        else:
+            ## user has requested the deletion of a page from the current submission, and this visit should
+            ## simply prompt them for confirmation:
+            body_content += """
+             <tr>
+              <td width="20%%">&nbsp;</td>
+              <td width="80%%"><br /><span class="info">REALLY delete page %(pagenum)s and all of its associated interface elements from """\
+            """this submission? You CANNOT undo this!</span></td>
+             </tr>
+             <tr>
+              <td width="20%%">&nbsp;</td>
+              <td width="80%%">
+               <table>
+                <tr>
+                 <td>
+                  <form method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionpages">
+                   <input type="hidden" name="doctype" value="%(doctype_id)s" />
+                   <input type="hidden" name="action" value="%(action)s" />
+                   <input type="hidden" name="deletepage" value="true" />
+                   <input type="hidden" name="pagenum" value="%(pagenum)s" />
+                   <input name="deletepageconfirm" class="adminbutton" type="submit" value="Confirm" />
+                  </form>
+                 </td>
+                 <td>
+                  <form method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionpages">
+                   <input type="hidden" name="doctype" value="%(doctype_id)s" />
+                   <input type="hidden" name="action" value="%(action)s" />
+                   <input name="cancelpagedelete" class="adminbutton" type="submit" value="No! Stop!" />
+                  </form>
+                 </td>
+                </tr>
+               </table>
+              </td>
+             </tr>""" % { 'websubadmin_url' : websubmitadmin_weburl,
+                          'doctype_id' : cgi.escape(doctype, 1),
+                          'action'     : cgi.escape(action, 1),
+                          'pagenum'    : cgi.escape(deletepagenum, 1)
+                        }
+        body_content += """
+        </table>
+        """
+
+
+        output += self._create_websubmitadmin_main_menu_header()
+        output += self._create_adminbox(header="Submission Page Details:", datalist=[body_content])
+        return output
+
+
 
