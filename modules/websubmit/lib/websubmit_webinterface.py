@@ -26,7 +26,7 @@ from mod_python import apache
 import sys
 from urllib import quote
 
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, Error
 from invenio.config import cdsname,cdslang,weburl
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_isRole
@@ -143,7 +143,7 @@ def websubmit_legacy_getfile(req, form):
             if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
                 return page_not_authorized(req, "../getfile.py/index")
             uid_email = get_email(uid)
-        except MySQLdb.Error, e:
+        except Error, e:
             return errorMsg(e.value,req)
 
         filelist=""

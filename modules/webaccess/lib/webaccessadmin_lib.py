@@ -27,7 +27,6 @@ __lastupdated__ = """$Date$"""
 import cgi
 import re
 import random
-import MySQLdb
 import string
 import smtplib
 from mod_python import apache
@@ -36,7 +35,7 @@ import invenio.access_control_engine as acce
 import invenio.access_control_admin as acca
 from invenio.bibrankadminlib import adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform
 from invenio.access_control_config import * 
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, escape_string
 from invenio.config import *
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email, page_not_authorized
@@ -605,9 +604,9 @@ def perform_createaccount(req, email='', password='', callback='yes', confirm=0)
                                 button="Create")
 
     if confirm in [1, "1"] and email and checkemail(email):
-        res = run_sql("SELECT * FROM user WHERE email='%s'" % MySQLdb.escape_string(email))
+        res = run_sql("SELECT * FROM user WHERE email='%s'" % escape_string(email))
         if not res:
-            res = run_sql("INSERT INTO user (email,password, note) values('%s','%s', '1')" % (MySQLdb.escape_string(email), MySQLdb.escape_string(password)))
+            res = run_sql("INSERT INTO user (email,password, note) values('%s','%s', '1')" % (escape_string(email), escape_string(password)))
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
                 emailsent = sendNewUserAccountWarning(email, email, password)
             if password:
@@ -817,8 +816,8 @@ def perform_modifylogindata(req, userID, email='', password='', callback='yes', 
                                    confirm=1,
                                    button="Modify")
         if confirm in [1, "1"] and email and checkemail(email):
-            res = run_sql("UPDATE user SET email='%s' WHERE id=%s" % (MySQLdb.escape_string(email), userID))
-            res = run_sql("UPDATE user SET password='%s' WHERE id=%s" % (MySQLdb.escape_string(password), userID))
+            res = run_sql("UPDATE user SET email='%s' WHERE id=%s" % (escape_string(email), userID))
+            res = run_sql("UPDATE user SET password='%s' WHERE id=%s" % (escape_string(password), userID))
             output += '<b><span class="info">Email and/or password modified.</span></b>'
         elif confirm in [1, "1"]:
             output += '<b><span class="info">Please specify an valid email-address.</span></b>'

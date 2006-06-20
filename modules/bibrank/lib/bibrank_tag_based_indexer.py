@@ -32,7 +32,6 @@ import os
 import sre
 import sys
 import time
-import MySQLdb
 import Numeric
 import urllib
 import signal
@@ -51,7 +50,7 @@ from invenio.search_engine import perform_request_search, strip_accents
 from invenio.search_engine import HitSet, get_index_id, create_basic_search_units
 from invenio.bibrank_citation_indexer import get_citation_weight
 from invenio.bibrank_downloads_indexer import *
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, escape_string
 
 options = {}
 def citation_exec(rank_method_code, name, config):
@@ -363,7 +362,7 @@ def task_sig_unknown(sig, frame):
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
-    query = "UPDATE schTASK SET progress='%s' where id=%d" % (MySQLdb.escape_string(msg), task_id)
+    query = "UPDATE schTASK SET progress='%s' where id=%d" % (escape_string(msg), task_id)
     if options["verbose"]>= 9:
         write_message(query)
     run_sql(query)
@@ -371,7 +370,7 @@ def task_update_progress(msg):
 
 def task_update_status(val):
     """Updates state information in the BibSched task table."""
-    query = "UPDATE schTASK SET status='%s' where id=%d" % (MySQLdb.escape_string(val), task_id)
+    query = "UPDATE schTASK SET status='%s' where id=%d" % (escape_string(val), task_id)
     if options["verbose"]>= 9:
         write_message(query)
     run_sql(query)
@@ -573,7 +572,7 @@ def serialize_via_numeric_array_dumps(arr):
 def serialize_via_numeric_array_compr(str):
     return compress(str)
 def serialize_via_numeric_array_escape(str):
-    return MySQLdb.escape_string(str)
+    return escape_string(str)
 def serialize_via_numeric_array(arr):
     """Serialize Numeric array into a compressed string."""
     return serialize_via_numeric_array_escape(serialize_via_numeric_array_compr(serialize_via_numeric_array_dumps(arr)))
@@ -582,7 +581,7 @@ def deserialize_via_numeric_array(string):
     return Numeric.loads(decompress(string))
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
-    return MySQLdb.escape_string(compress(dumps(obj)))
+    return escape_string(compress(dumps(obj)))
 def deserialize_via_marshal(string):
     """Decompress and deserialize string into a Python object via marshal."""
     return loads(decompress(string))

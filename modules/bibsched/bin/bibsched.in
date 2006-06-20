@@ -35,7 +35,6 @@ try:
     import imp
     import string
     import sys
-    import MySQLdb
     import time
     import sre
     import getopt

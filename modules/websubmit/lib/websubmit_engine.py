@@ -24,12 +24,11 @@ import sys
 import time
 import types
 import re
-import MySQLdb
 import shutil
 from mod_python import apache
 
 from invenio.config import *
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_isRole
 from invenio.webpage import page, create_error_box
@@ -52,7 +51,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     try:
         uid = getUid(req)
         uid_email = get_email(uid)
-    except MySQLdb.Error, e:
+    except Error, e:
         return errorMsg(e.value, req, c, ln)
     # variable initialisation
     t = ""
@@ -474,7 +473,7 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     try:
         uid = getUid(req)
         uid_email = get_email(uid)
-    except MySQLdb.Error, e:
+    except Error, e:
         return errorMsg(e.value, req, c, ln)
     # Preliminary tasks
     # check that the user is logged in
@@ -705,7 +704,7 @@ def home(req, c=cdsname, ln=cdslang):
     # get user ID:
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return errorMsg(e.value)
     # start display:
     req.content_type = "text/html"
@@ -832,7 +831,7 @@ def action(req, c=cdsname, ln=cdslang, doctype=""):
     try:
         uid = getUid(req)
         uid_email = get_email(uid)
-    except MySQLdb.Error, e:
+    except Error, e:
         return errorMsg(e.value, req, ln)
     #parses database to get all data
     #first the list of categories

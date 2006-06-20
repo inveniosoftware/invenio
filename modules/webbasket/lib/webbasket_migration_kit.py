@@ -33,9 +33,7 @@ duplicates entries).
 Main function: migrate_v071_baskets()
 """
 
-from MySQLdb import escape_string
-
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, escape_string
 from invenio.webbasket_config import cfg_webbasket_share_levels
 
 import sys

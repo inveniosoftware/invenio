@@ -19,11 +19,11 @@
 
 import sys
 import sre
-import MySQLdb
 
 from urllib import quote
 
 from invenio.config import weburl, cdsname, cdslang, cachedir, cdsnameintl
+from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory, http_check_credentials
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
 from invenio.webuser import getUid, page_not_authorized
@@ -273,7 +273,7 @@ def display_collection(req, c, as, verbose, ln):
         uid = getUid(req)
         if uid == -1:
             return page_not_authorized(req, "../")
-    except MySQLdb.Error, e:
+    except Error, e:
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=verbose, ln=ln),
                     description="%s - Internal Error" % cdsname, 

@@ -24,10 +24,9 @@ import sys
 import time
 import types
 import re
-import MySQLdb
 import shutil
 from invenio.config import cdsname,cdslang
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import *
 from invenio.webpage import page, create_error_box
@@ -41,7 +40,7 @@ def index(req,c=cdsname,ln=cdslang,todo="",id="",doctype="",categ="",addusers=""
     try:
         uid = getUid(req)
         uid_email = get_email(uid)
-    except MySQLdb.Error, e:
+    except Error, e:
         return errorMsg(e.value,req)
     (auth_code, auth_message) = acc_authorize_action(uid, "cfgwebsubmit",verbose=0)
     if auth_code != 0:

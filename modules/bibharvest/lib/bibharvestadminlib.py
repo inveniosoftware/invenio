@@ -22,7 +22,6 @@
 
 import cgi
 import re
-import MySQLdb
 import Numeric
 import os, sys, string
 import ConfigParser
@@ -33,7 +32,7 @@ import sre
 from mod_python import apache
 
 from invenio.bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, escape_string
 from invenio.config import *
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
@@ -317,17 +316,17 @@ def modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oa
     """Modifies a row's parameters"""
     
     try:
-        sql = "UPDATE oaiHARVEST SET name='%s' WHERE id=%s" % (MySQLdb.escape_string(oai_src_name), oai_src_id)
+        sql = "UPDATE oaiHARVEST SET name='%s' WHERE id=%s" % (escape_string(oai_src_name), oai_src_id)
         res = run_sql(sql)
-        sql = "UPDATE oaiHARVEST SET baseurl='%s' WHERE id=%s" % (MySQLdb.escape_string(oai_src_baseurl), oai_src_id)
+        sql = "UPDATE oaiHARVEST SET baseurl='%s' WHERE id=%s" % (escape_string(oai_src_baseurl), oai_src_id)
         res = run_sql(sql)
-        sql = "UPDATE oaiHARVEST SET metadataprefix='%s' WHERE id=%s" % (MySQLdb.escape_string(oai_src_prefix), oai_src_id)
+        sql = "UPDATE oaiHARVEST SET metadataprefix='%s' WHERE id=%s" % (escape_string(oai_src_prefix), oai_src_id)
         res = run_sql(sql)
-        sql = "UPDATE oaiHARVEST SET frequency='%s' WHERE id=%s" % (MySQLdb.escape_string(oai_src_frequency), oai_src_id)
+        sql = "UPDATE oaiHARVEST SET frequency='%s' WHERE id=%s" % (escape_string(oai_src_frequency), oai_src_id)
         res = run_sql(sql)
-        sql = "UPDATE oaiHARVEST SET bibconvertcfgfile='%s' WHERE id=%s" % (MySQLdb.escape_string(oai_src_config), oai_src_id)
+        sql = "UPDATE oaiHARVEST SET bibconvertcfgfile='%s' WHERE id=%s" % (escape_string(oai_src_config), oai_src_id)
         res = run_sql(sql)
-        sql = "UPDATE oaiHARVEST SET postprocess='%s' WHERE id=%s" % (MySQLdb.escape_string(oai_src_post), oai_src_id)
+        sql = "UPDATE oaiHARVEST SET postprocess='%s' WHERE id=%s" % (escape_string(oai_src_post), oai_src_id)
         res = run_sql(sql)
         return (1, "")
     except StandardError, e:
@@ -340,7 +339,7 @@ def add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency
         else:
             lastrun_mode = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             # lastrun_mode = "'"+lastrun_mode+"'"
-        sql = "insert into oaiHARVEST values (0, '%s', '%s', NULL, NULL, '%s', '%s', '%s', '%s', '%s')" % (MySQLdb.escape_string(oai_src_baseurl), MySQLdb.escape_string(oai_src_prefix), MySQLdb.escape_string(oai_src_config), MySQLdb.escape_string(oai_src_name), MySQLdb.escape_string(lastrun_mode), MySQLdb.escape_string(oai_src_frequency), MySQLdb.escape_string(oai_src_post))
+        sql = "insert into oaiHARVEST values (0, '%s', '%s', NULL, NULL, '%s', '%s', '%s', '%s', '%s')" % (escape_string(oai_src_baseurl), escape_string(oai_src_prefix), escape_string(oai_src_config), escape_string(oai_src_name), escape_string(lastrun_mode), escape_string(oai_src_frequency), escape_string(oai_src_post))
         res = run_sql(sql)
         return (1, "")
     except StandardError, e:

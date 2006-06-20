@@ -40,7 +40,6 @@ try:
     import string
     import urllib
     import zlib
-    import MySQLdb
     import Numeric
     import time
     import traceback
@@ -54,7 +53,7 @@ try:
     from invenio.messages import gettext_set_language, language_list_long
     from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname
     from invenio.search_engine_config import cfg_author_et_al_threshold, cfg_instant_browse, cfg_max_recID, cfg_narrow_search_show_grandsons
-    from invenio.dbquery import run_sql
+    from invenio.dbquery import run_sql, escape_string, Error
     from invenio.access_control_engine import acc_authorize_action
     from invenio.bibrank_record_sorter import get_bibrank_methods
     import invenio.template
@@ -107,11 +106,6 @@ def mymkdir(newdir, mode=0777):
         if tail:
 	    os.umask(022)
             os.mkdir(newdir, mode)
-
-def escape_string(s):
-    "Escapes special chars in string.  For MySQL queries."
-    s = MySQLdb.escape_string(s)
-    return s
 
 def is_selected(var, fld):
     "Checks if the two are equal, and if yes, returns ' selected'.  Useful for select boxes."
@@ -193,7 +187,7 @@ class Collection:
     "Holds the information on collections (id,name,dbquery)."
 
     def __init__(self, name=""):
-        "Creates collection instance by querying the MySQL configuration database about 'name'."
+        "Creates collection instance by querying the DB configuration database about 'name'."
         self.calculate_reclist_run_already = 0 # to speed things up wihtout much refactoring
         self.update_reclist_run_already = 0 # to speed things up wihtout much refactoring
         self.reclist_with_nonpublic_subcolls = HitSet()
@@ -222,7 +216,7 @@ class Collection:
                     self.dbquery = None
                     self.nbrecs = None
                     self.reclist = HitSet()
-            except MySQLdb.Error, e:
+            except Error, e:
                 print "Error %d: %s" % (e.args[0], e.args[1])
                 sys.exit(1)
 
@@ -373,7 +367,7 @@ class Collection:
 
 
     def create_portalbox(self, lang=cdslang, position="rt"):
-        """Creates portalboxes of language CDSLANG of the position POSITION by consulting MySQL configuration database.
+        """Creates portalboxes of language CDSLANG of the position POSITION by consulting DB configuration database.
            The position may be: 'lt'='left top', 'rt'='right top', etc."""
         out = ""
         query = "SELECT p.title,p.body FROM portalbox AS p, collection_portalbox AS cp "\
@@ -700,7 +694,7 @@ class Collection:
                     (self.nbrecs, escape_string(zlib.compress(Numeric.dumps(self.reclist._set))), self.id)
             res = run_sql(query)
             self.reclist_updated_since_start = 1
-        except MySQLdb.Error, e:
+        except Error, e:
             print "Database Query Error %d: %s." % (e.args[0], e.args[1])
             sys.exit(1)
         # last but not least, update the speed-up flag:
@@ -1025,7 +1019,7 @@ def usage(exitcode=1, msg=""):
     sys.stderr.write("  -v, --verbose=LEVEL   \t Verbose level (from 0 to 9, default 1).\n")
     sys.stderr.write("""Description: %s updates the collection cache
     (record universe for a given collection plus web page elements)
-    based on WML and MySQL configuration parameters.
+    based on WML and DB configuration parameters.
     If the collection name is passed as the second argument, it'll update
     this collection only.  If the collection name is immediately followed
     by a plus sign, it will also update all its desdendants.  The

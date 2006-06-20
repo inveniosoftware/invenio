@@ -31,7 +31,6 @@ import os
 import sre
 import sys
 import time
-import MySQLdb
 import Numeric
 import signal
 import traceback
@@ -39,7 +38,7 @@ import calendar
 
 from invenio.config import *
 from invenio.bibindex_engine_config import *
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, escape_string
 from invenio.access_control_engine import acc_authorize_action
 
 ## precompile some often-used regexp for speed reasons:
@@ -356,7 +355,7 @@ def call_bibupload(convertpath):
 def get_row_from_reposname(reposname):
     """ Returns all information about a row (OAI source) from the source name """
     try:
-        sql = 'select * from oaiHARVEST where name="%s"' % MySQLdb.escape_string(reposname)
+        sql = 'select * from oaiHARVEST where name="%s"' % escape_string(reposname)
         res = run_sql(sql)
         reposdata = []
         for element in res:

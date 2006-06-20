@@ -36,10 +36,9 @@ import os
 import crypt
 import string
 import smtplib
-import MySQLdb
 
 from invenio import session, websession
-from invenio.dbquery import run_sql, OperationalError
+from invenio.dbquery import run_sql, escape_string, OperationalError
 from invenio.websession import pSession, pSessionMapping
 from invenio.session import SessionError
 from invenio.config import *
@@ -537,7 +536,7 @@ def list_users_in_role(role):
                FROM user_accROLE uacc JOIN accROLE acc
                     ON uacc.id_accROLE=acc.id
                WHERE acc.name='%s'"""
-    res = run_sql(query% MySQLdb.escape_string(role))
+    res = run_sql(query% escape_string(role))
     if res:
         return map(lambda x: int(x[0]), res)
     return []
@@ -557,8 +556,8 @@ def list_users_in_roles(role_list):
     if len(role_list) > 0:
         params = 'WHERE '
         for role in role_list[:-1]:
-            params += "acc.name='%s' OR " % MySQLdb.escape_string(role)
-        params += "acc.name='%s'" % MySQLdb.escape_string(role_list[-1])
+            params += "acc.name='%s' OR " % escape_string(role)
+        params += "acc.name='%s'" % escape_string(role_list[-1])
     res = run_sql(query% params)
     if res:
         return map(lambda x: int(x[0]), res)
@@ -633,7 +632,7 @@ def get_default_user_preferences():
 
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
-    return MySQLdb.escape_string(compress(dumps(obj)))
+    return escape_string(compress(dumps(obj)))
 def deserialize_via_marshal(string):
     """Decompress and deserialize string into a Python object via marshal."""
     return loads(decompress(string))

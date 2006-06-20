@@ -22,7 +22,6 @@
 
 import cgi
 import re
-import MySQLdb
 import Numeric
 import os
 import urllib
@@ -33,7 +32,7 @@ from zlib import compress,decompress
 from mod_python import apache
 
 from invenio.bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, escape_string
 from invenio.config import *
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
@@ -2883,9 +2882,9 @@ def add_fmt(code, name, rtype):
     rtype - the default nametype"""
     
     try:
-        res = run_sql("INSERT INTO format (code, name) values ('%s','%s')" % (MySQLdb.escape_string(code), MySQLdb.escape_string(name)))
-        fmtID = run_sql("SELECT id FROM format WHERE code='%s'" % MySQLdb.escape_string(code))
-        res = run_sql("INSERT INTO formatname(id_format, type, ln, value) VALUES (%s,'%s','%s','%s')" % (fmtID[0][0], rtype, cdslang, MySQLdb.escape_string(name)))
+        res = run_sql("INSERT INTO format (code, name) values ('%s','%s')" % (escape_string(code), escape_string(name)))
+        fmtID = run_sql("SELECT id FROM format WHERE code='%s'" % escape_string(code))
+        res = run_sql("INSERT INTO formatname(id_format, type, ln, value) VALUES (%s,'%s','%s','%s')" % (fmtID[0][0], rtype, cdslang, escape_string(name)))
         return (1, fmtID)
     except StandardError, e:
         return (0, e)
@@ -2897,8 +2896,8 @@ def update_fldv(fldvID, name, value):
     name - the name of the fieldvalue."""
     
     try:
-        res = run_sql("UPDATE fieldvalue set name='%s' where id=%s" % (MySQLdb.escape_string(name), fldvID))
-        res = run_sql("UPDATE fieldvalue set value='%s' where id=%s" % (MySQLdb.escape_string(value), fldvID))
+        res = run_sql("UPDATE fieldvalue set name='%s' where id=%s" % (escape_string(name), fldvID))
+        res = run_sql("UPDATE fieldvalue set value='%s' where id=%s" % (escape_string(value), fldvID))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -2909,10 +2908,10 @@ def add_fldv(name, value):
     name - the name of the fieldvalue."""
     
     try:
-        res = run_sql("SELECT id FROM fieldvalue WHERE name='%s' and value='%s'" % (MySQLdb.escape_string(name), MySQLdb.escape_string(value)))
+        res = run_sql("SELECT id FROM fieldvalue WHERE name='%s' and value='%s'" % (escape_string(name), escape_string(value)))
         if not res:
-            res = run_sql("INSERT INTO fieldvalue (name, value) values ('%s','%s')" % (MySQLdb.escape_string(name), MySQLdb.escape_string(value)))
-            res = run_sql("SELECT id FROM fieldvalue WHERE name='%s' and value='%s'" % (MySQLdb.escape_string(name), MySQLdb.escape_string(value)))
+            res = run_sql("INSERT INTO fieldvalue (name, value) values ('%s','%s')" % (escape_string(name), escape_string(value)))
+            res = run_sql("SELECT id FROM fieldvalue WHERE name='%s' and value='%s'" % (escape_string(name), escape_string(value)))
         if res:
             return (1, res[0][0])
         else:
@@ -2922,8 +2921,8 @@ def add_fldv(name, value):
 
 def add_pbx(title, body):
     try:
-        res = run_sql("INSERT INTO portalbox (title, body) values ('%s','%s')" % (MySQLdb.escape_string(title), MySQLdb.escape_string(body)))
-        res = run_sql("SELECT id FROM portalbox WHERE title='%s' AND body='%s'" % (MySQLdb.escape_string(title), MySQLdb.escape_string(body)))
+        res = run_sql("INSERT INTO portalbox (title, body) values ('%s','%s')" % (escape_string(title), escape_string(body)))
+        res = run_sql("SELECT id FROM portalbox WHERE title='%s' AND body='%s'" % (escape_string(title), escape_string(body)))
         if res:
             return (1, res[0][0])
         else:
@@ -2941,21 +2940,21 @@ def add_col(colNAME, dbquery, rest):
         rtype = get_col_nametypes()[0][0]
         colID = run_sql("SELECT id FROM collection WHERE id=1")
         if colID:
-            sql = "INSERT INTO collection(name,dbquery,restricted) VALUES('%s'" % MySQLdb.escape_string(colNAME)
+            sql = "INSERT INTO collection(name,dbquery,restricted) VALUES('%s'" % escape_string(colNAME)
         else:
-            sql = "INSERT INTO collection(id,name,dbquery,restricted) VALUES(1,'%s'" % MySQLdb.escape_string(colNAME)
+            sql = "INSERT INTO collection(id,name,dbquery,restricted) VALUES(1,'%s'" % escape_string(colNAME)
         if dbquery:
-            sql += ",'%s'" % MySQLdb.escape_string(dbquery)
+            sql += ",'%s'" % escape_string(dbquery)
         else:
             sql += ",null"
         if rest:
-            sql += ",'%s'" % MySQLdb.escape_string(rest)
+            sql += ",'%s'" % escape_string(rest)
         else:
             sql += ",null"
         sql += ")"
         res = run_sql(sql)
-        colID = run_sql("SELECT id FROM collection WHERE name='%s'" % MySQLdb.escape_string(colNAME))
-        res = run_sql("INSERT INTO collectionname(id_collection, type, ln, value) VALUES (%s,'%s','%s','%s')" % (colID[0][0], rtype, cdslang, MySQLdb.escape_string(colNAME)))
+        colID = run_sql("SELECT id FROM collection WHERE name='%s'" % escape_string(colNAME))
+        res = run_sql("INSERT INTO collectionname(id_collection, type, ln, value) VALUES (%s,'%s','%s','%s')" % (colID[0][0], rtype, cdslang, escape_string(colNAME)))
         if colID:
             return (1, colID[0][0])
         else:
@@ -3054,7 +3053,7 @@ def modify_restricted(colID, rest):
     try:
         sql = "UPDATE collection SET restricted="
         if rest:
-            sql += "'%s'" % MySQLdb.escape_string(rest)
+            sql += "'%s'" % escape_string(rest)
         else:
             sql += "null"
         sql += " WHERE id=%s" % colID
@@ -3071,7 +3070,7 @@ def modify_dbquery(colID, dbquery):
     try:
         sql = "UPDATE collection SET dbquery="
         if dbquery:
-            sql += "'%s'" % MySQLdb.escape_string(dbquery)
+            sql += "'%s'" % escape_string(dbquery)
         else:
             sql += "null"
         sql += " WHERE id=%s" % colID
@@ -3092,9 +3091,9 @@ def modify_pbx(colID, pbxID, sel_ln, score='', position='', title='', body=''):
     
     try:
         if title:
-            res = run_sql("UPDATE portalbox SET title='%s' WHERE id=%s" % (MySQLdb.escape_string(title), pbxID))
+            res = run_sql("UPDATE portalbox SET title='%s' WHERE id=%s" % (escape_string(title), pbxID))
         if body:
-            res = run_sql("UPDATE portalbox SET body='%s' WHERE id=%s" % (MySQLdb.escape_string(body), pbxID))
+            res = run_sql("UPDATE portalbox SET body='%s' WHERE id=%s" % (escape_string(body), pbxID))
         if score:
             res = run_sql("UPDATE collection_portalbox SET score='%s' WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (score, colID, pbxID, sel_ln))
         if position:

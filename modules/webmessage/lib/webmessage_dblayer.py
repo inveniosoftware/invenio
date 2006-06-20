@@ -20,10 +20,9 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MySQLdb import escape_string
 from time import localtime, mktime
 
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, escape_string
 from invenio.webmessage_config import cfg_webmessage_status_code, \
                                       cfg_webmessage_max_nb_of_messages, \
                                       cfg_webmessage_roles_without_quota, \

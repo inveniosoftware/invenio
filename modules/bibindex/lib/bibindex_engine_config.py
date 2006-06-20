@@ -60,7 +60,7 @@ conv_programs = {#"ps": [pstotext,pstoascii],  # switched off at the moment, sin
 conv_programs_helpers =  {"html": htmltotext,
                           "gz": gzip}
 
-## safety parameters concerning MySQL thread-multiplication problem:
+## safety parameters concerning DB thread-multiplication problem:
 cfg_check_mysql_threads = 0 # to check or not to check the problem? 
 cfg_max_mysql_threads = 50 # how many threads (connections) we consider as still safe
 cfg_mysql_thread_timeout = 20 # we'll kill threads that were sleeping for more than X seconds

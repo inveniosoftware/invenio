@@ -26,6 +26,7 @@ import sys
 import invenio.bibharvestadminlib as bhc
 from invenio.webpage import page, create_error_box
 from invenio.config import weburl,cdslang
+from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 
 __version__ = "$Id$"
@@ -35,7 +36,7 @@ def index(req, ln=cdslang):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
 
@@ -56,7 +57,7 @@ def editsource(req, oai_src_id, oai_src_name='', oai_src_baseurl='', oai_src_pre
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = bhc.check_user(uid,'cfgbibharvest')
@@ -84,7 +85,7 @@ def modifysource(req, oai_src_id, oai_src_name, oai_src_baseurl='', oai_src_pref
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = bhc.check_user(uid,'cfgbibharvest')
@@ -112,7 +113,7 @@ def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_pre
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = bhc.check_user(uid,'cfgbibharvest')
@@ -141,7 +142,7 @@ def delsource(req, oai_src_id, ln=cdslang, confirm=0):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = bhc.check_user(uid,'cfgbibharvest')

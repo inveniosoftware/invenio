@@ -26,6 +26,7 @@ import invenio.websearchadminlib as wsc
 #reload(wsc)
 from invenio.webpage import page, create_error_box
 from invenio.config import weburl, sweburl, cdslang
+from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import gettext_set_language
 
@@ -36,7 +37,7 @@ def switchfmtscore(req, colID, type, id_1, id_2, ln=cdslang):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -60,7 +61,7 @@ def switchfldscore(req, colID, id_1, id_2, fmeth, ln=cdslang):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -84,7 +85,7 @@ def switchfldvaluescore(req, colID, id_1, id_fldvalue_1, id_fldvalue_2, ln=cdsla
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -108,7 +109,7 @@ def runwebcoll(req, colID, ln=cdslang, confirm=0):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -130,7 +131,7 @@ def switchpbxscore(req, colID, id_1, id_2, sel_ln,ln=cdslang):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -154,7 +155,7 @@ def modifydbquery(req, colID, ln=cdslang, dbquery='', confirm=-1):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -177,7 +178,7 @@ def showtree(req, colID, ln=cdslang):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -198,7 +199,7 @@ def modifyrestricted(req, colID, ln=cdslang, rest='', confirm=-1):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -221,7 +222,7 @@ def modifytranslations(req, colID, ln=cdslang, sel_type='', trans = [], confirm=
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -245,7 +246,7 @@ def addcollectiontotree(req, colID, ln=cdslang, add_dad='', add_son='', rtype=''
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
   
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -271,7 +272,7 @@ def addcollection(req, colID, ln=cdslang, colNAME='', dbquery='', rest='', callb
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
     
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -297,7 +298,7 @@ def modifyrankmethods(req, colID, ln=cdslang, func='', rnkID='', confirm=0):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -321,7 +322,7 @@ def deletecollection(req, colID, ln=cdslang, confirm=-1):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -343,7 +344,7 @@ def editcollection(req, colID=1, ln=cdslang, mtype=''):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -365,7 +366,7 @@ def addoutputformat(req, colID, ln=cdslang, code='', name='', callback='yes', co
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
    
 
@@ -391,7 +392,7 @@ def showoutputformats(req, colID, ln=cdslang, callback='yes', confirm=0):
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -414,7 +415,7 @@ def addexistingoutputformat(req, colID, ln=cdslang, fmtID=-1, callback='yes', co
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -438,7 +439,7 @@ def deleteoutputformat(req, colID, ln=cdslang, fmtID=-1, callback='yes', confirm
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -462,7 +463,7 @@ def removeoutputformat(req, colID, ln=cdslang, fmtID='', callback='yes', confirm
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -486,7 +487,7 @@ def removefieldvalue(req, colID, ln=cdslang, fldID='', fldvID='', fmeth='', call
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -513,7 +514,7 @@ def removefield(req, colID, ln=cdslang, fldID='', fldvID='', fmeth='', callback=
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -539,7 +540,7 @@ def modifyfield(req, colID, fldID, fldvID='', ln=cdslang, callback='yes', confir
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -564,7 +565,7 @@ def modifyoutputformat(req, colID, ln=cdslang, fmtID=-1, sel_type='', trans=[], 
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -589,7 +590,7 @@ def showsearchoptions(req, colID, ln=cdslang, callback='yes', confirm=0):
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -612,7 +613,7 @@ def addexistingfield(req, colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', call
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -644,7 +645,7 @@ def rearrangefield(req, colID, ln=cdslang, fmeth='', callback='yes', confirm=-1)
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -674,7 +675,7 @@ def addexistingfieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -704,7 +705,7 @@ def rearrangefieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm=-
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -734,7 +735,7 @@ def addnewfieldvalue(req, colID, fldID, ln=cdslang, name='', value='', callback=
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
     
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -760,7 +761,7 @@ def modifyfieldvalue(req, colID, fldID, fldvID, ln=cdslang, name='', value='', c
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
     
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -787,7 +788,7 @@ def showsearchfields(req, colID, ln=cdslang, callback='yes', confirm=0):
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -810,7 +811,7 @@ def showsortoptions(req, colID, ln=cdslang, callback='yes', confirm=0):
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -833,7 +834,7 @@ def modifyportalbox(req, colID, ln=cdslang, pbxID=-1, score='', position='', sel
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -862,7 +863,7 @@ def removeportalbox(req, colID, ln=cdslang, pbxID='', sel_ln='', callback='yes',
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -887,7 +888,7 @@ def addexistingportalbox(req, colID, ln=cdslang, pbxID=-1, score=0, position='',
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -920,7 +921,7 @@ def deleteportalbox(req, colID, ln=cdslang, pbxID=-1, callback='yes', confirm=-1
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
 
@@ -946,7 +947,7 @@ def showportalboxes(req, colID, ln=cdslang, callback='yes', confirm=0):
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
 
@@ -970,7 +971,7 @@ def addportalbox(req, colID, ln=cdslang, title='', body='', callback='yes', conf
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
    
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -995,7 +996,7 @@ def modifycollectiontree(req, colID, ln=cdslang, move_up='', move_down='', move_
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')
@@ -1024,7 +1025,7 @@ def index(req, colID=1, ln=cdslang, mtype='', content='', confirm=0):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = wsc.check_user(uid,'cfgwebsearch')

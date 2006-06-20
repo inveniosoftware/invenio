@@ -26,7 +26,6 @@ __lastupdated__ = """$Date$"""
 
 import cgi
 import re
-import MySQLdb
 import Numeric
 import os
 import ConfigParser
@@ -36,6 +35,7 @@ from mod_python import apache
 import invenio.access_control_engine as acce
 from invenio.messages import language_list_long
 from invenio.config import *
+from invenio.dbquery import run_sql, escape_string
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
 
@@ -702,7 +702,7 @@ def modify_rnk(rnkID, rnkcode):
     rnkcode - new value for field 'name' in rnkMETHOD """
     
     try:
-        res = run_sql("UPDATE rnkMETHOD set name='%s' WHERE id=%s" % (MySQLdb.escape_string(rnkcode), rnkID))
+        res = run_sql("UPDATE rnkMETHOD set name='%s' WHERE id=%s" % (escape_string(rnkcode), rnkID))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -712,8 +712,8 @@ def add_rnk(rnkcode):
     rnkcode - the "code" for the rank method, to be used by bibrank daemon """
     
     try:
-        res = run_sql("INSERT INTO rnkMETHOD(name) VALUES('%s')" % MySQLdb.escape_string(rnkcode))
-        res = run_sql("SELECT id FROM rnkMETHOD WHERE name='%s'" % MySQLdb.escape_string(rnkcode))
+        res = run_sql("INSERT INTO rnkMETHOD(name) VALUES('%s')" % escape_string(rnkcode))
+        res = run_sql("SELECT id FROM rnkMETHOD WHERE name='%s'" % escape_string(rnkcode))
         if res:
             return (1, res[0][0])
         else:
@@ -940,7 +940,7 @@ def serialize_via_numeric_array_dumps(arr):
 def serialize_via_numeric_array_compr(str):
     return compress(str)
 def serialize_via_numeric_array_escape(str):
-    return MySQLdb.escape_string(str)
+    return escape_string(str)
 def serialize_via_numeric_array(arr):
     """Serialize Numeric array into a compressed string."""
     return serialize_via_numeric_array_escape(serialize_via_numeric_array_compr(serialize_via_numeric_array_dumps(arr)))
@@ -949,7 +949,7 @@ def deserialize_via_numeric_array(string):
     return Numeric.loads(decompress(string))
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
-    return MySQLdb.escape_string(compress(dumps(obj)))
+    return escape_string(compress(dumps(obj)))
 def deserialize_via_marshal(string):
     """Decompress and deserialize string into a Python object via marshal."""
     return loads(decompress(string))
@@ -1049,12 +1049,12 @@ def modify_translations(ID, langs, sel_type, trans, table):
             res = run_sql("SELECT value FROM %s%s WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, name, table, ID, sel_type, langs[nr][0]))
             if res:
                 if trans[nr]:
-                    res = run_sql("UPDATE %s%s SET value='%s' WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, name, MySQLdb.escape_string(trans[nr]), table, ID, sel_type, langs[nr][0]))
+                    res = run_sql("UPDATE %s%s SET value='%s' WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, name, escape_string(trans[nr]), table, ID, sel_type, langs[nr][0]))
                 else:
                     res = run_sql("DELETE FROM %s%s WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, name, table, ID, sel_type, langs[nr][0]))    
             else:
                 if trans[nr]:
-                    res = run_sql("INSERT INTO %s%s(id_%s, type, ln, value) VALUES (%s,'%s','%s','%s')" % (table, name, table, ID, sel_type, langs[nr][0], MySQLdb.escape_string(trans[nr])))
+                    res = run_sql("INSERT INTO %s%s(id_%s, type, ln, value) VALUES (%s,'%s','%s','%s')" % (table, name, table, ID, sel_type, langs[nr][0], escape_string(trans[nr])))
         return (1, "")
     except StandardError, e:
 	return (0, e)

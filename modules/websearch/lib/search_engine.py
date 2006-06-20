@@ -41,7 +41,6 @@ import time
 import traceback
 import urllib
 import zlib
-import MySQLdb
 import Numeric
 import md5
 import base64
@@ -59,7 +58,7 @@ if cfg_experimental_features:
     from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
     from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
     from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
-from invenio.dbquery import run_sql, Error
+from invenio.dbquery import run_sql, escape_string, Error
 try:
     from mod_python import apache
     from invenio.webuser import getUid
@@ -163,7 +162,7 @@ def get_index_id(field):
     out = 0
     query = """SELECT w.id FROM idxINDEX AS w, idxINDEX_field AS wf, field AS f
                 WHERE f.code='%s' AND wf.id_field=f.id AND w.id=wf.id_idxINDEX
-                LIMIT 1""" % MySQLdb.escape_string(field)
+                LIMIT 1""" % escape_string(field)
     res = run_sql(query, None, 1)
     if res:
         out = res[0][0]
@@ -782,11 +781,6 @@ try:
 except:
     pass
 
-def escape_string(s):
-    "Escapes special chars in string.  For MySQL queries."
-    s = MySQLdb.escape_string(s)
-    return s
-
 def wash_colls(cc, c, split_colls=0):
 
     """Wash collection list by checking whether user has deselected
@@ -843,7 +837,7 @@ def wash_colls(cc, c, split_colls=0):
         colls = [cc]
 
     # then let us check the list of non-restricted "real" sons of 'cc' and compare it to 'coll':
-    query = "SELECT c.name FROM collection AS c, collection_collection AS cc, collection AS ccc WHERE c.id=cc.id_son AND cc.id_dad=ccc.id AND ccc.name='%s' AND cc.type='r' AND c.restricted IS NULL" % MySQLdb.escape_string(cc)
+    query = "SELECT c.name FROM collection AS c, collection_collection AS cc, collection AS ccc WHERE c.id=cc.id_son AND cc.id_dad=ccc.id AND ccc.name='%s' AND cc.type='r' AND c.restricted IS NULL" % escape_string(cc)
     res = run_sql(query)
     l_cc_nonrestricted_sons = []
     l_c = colls
@@ -1122,7 +1116,7 @@ def coll_restricted_p(coll):
     "Predicate to test if the collection coll is restricted or not."
     if not coll:
         return 0
-    query = "SELECT restricted FROM collection WHERE name='%s'" % MySQLdb.escape_string(coll)
+    query = "SELECT restricted FROM collection WHERE name='%s'" % escape_string(coll)
     res = run_sql(query, None, 1)
     if res and res[0][0] != None:
         return 1
@@ -1133,7 +1127,7 @@ def coll_restricted_group(coll):
     "Return Apache group to which the collection is restricted.  Return None if it's public."
     if not coll:
         return None
-    query = "SELECT restricted FROM collection WHERE name='%s'" % MySQLdb.escape_string(coll)
+    query = "SELECT restricted FROM collection WHERE name='%s'" % escape_string(coll)
     res = run_sql(query, None, 1)
     if res:
         return res[0][0]
@@ -1535,17 +1529,17 @@ def search_unit_in_bibxxx(p, f, type):
     # wash arguments:
     f = string.replace(f, '*', '%') # replace truncation char '*' in field definition
     if type == 'r':
-        pattern = "REGEXP '%s'" % MySQLdb.escape_string(p)
+        pattern = "REGEXP '%s'" % escape_string(p)
     else:
         p = string.replace(p, '*', '%') # we now use '*' as the truncation character
         ps = string.split(p, "->", 1) # check for span query:
         if len(ps) == 2:
-            pattern = "BETWEEN '%s' AND '%s'" % (MySQLdb.escape_string(ps[0]), MySQLdb.escape_string(ps[1]))
+            pattern = "BETWEEN '%s' AND '%s'" % (escape_string(ps[0]), escape_string(ps[1]))
         else:
             if string.find(p, '%') > -1:
-                pattern = "LIKE '%s'" % MySQLdb.escape_string(ps[0])
+                pattern = "LIKE '%s'" % escape_string(ps[0])
             else:
-                pattern = "='%s'" % MySQLdb.escape_string(ps[0])
+                pattern = "='%s'" % escape_string(ps[0])
     # construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
     if str(f[0]).isdigit() and str(f[1]).isdigit():
@@ -1923,7 +1917,7 @@ def get_nbhits_in_bibxxx(p, f):
     return len(recIDs)
 
 def get_mysql_recid_from_aleph_sysno(sysno):
-    """Returns MySQL's recID for ALEPH sysno passed in the argument (e.g. "002379334CER").
+    """Returns DB's recID for ALEPH sysno passed in the argument (e.g. "002379334CER").
        Returns None in case of failure."""
     out = None
     query = "SELECT bb.id_bibrec FROM bibrec_bib97x AS bb, bib97x AS b WHERE b.value='%s' AND b.tag='970__a' AND bb.id_bibxxx=b.id" %\
@@ -3000,7 +2994,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                     pl += "+%s:\"%s\" " % (fieldcode, val)
                     pl_in_url += "&amp;%s=%s" % (urllib.quote(fieldcode), urllib.quote(val))
     # deduce recid from sysno argument (if applicable):
-    if sysno: # ALEPH SYS number was passed, so deduce MySQL recID for the record:
+    if sysno: # ALEPH SYS number was passed, so deduce DB recID for the record:
         recid = get_mysql_recid_from_aleph_sysno(sysno)
     # deduce collection we are in (if applicable):
     if recid>0:

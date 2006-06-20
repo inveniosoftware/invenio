@@ -26,6 +26,7 @@ import invenio.bibrankadminlib as brc
 #reload(brc)
 from invenio.webpage import page, create_error_box
 from invenio.config import weburl,cdslang
+from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 
 __version__ = "$Id$"
@@ -35,7 +36,7 @@ def index(req, ln=cdslang):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = brc.check_user(uid,'cfgbibrank')
@@ -55,7 +56,7 @@ def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = brc.check_user(uid,'cfgbibrank')
@@ -78,7 +79,7 @@ def modifytranslations(req, rnkID='', ln=cdslang, sel_type='', trans = [], confi
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = brc.check_user(uid,'cfgbibrank')
@@ -102,7 +103,7 @@ def modifycollection(req, ln=cdslang, rnkID='', func='', colID='', confirm=0):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = brc.check_user(uid,'cfgbibrank')
@@ -126,7 +127,7 @@ def deleterank(req, ln=cdslang, rnkID='', confirm=0):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = brc.check_user(uid,'cfgbibrank')
@@ -148,7 +149,7 @@ def modifyrank(req, ln=cdslang, rnkID='', rnkcode='', template='', cfgfile='', c
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = brc.check_user(uid,'cfgbibrank')
@@ -173,7 +174,7 @@ def showrankdetails(req, ln=cdslang, rnkID=''):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = brc.check_user(uid,'cfgbibrank')

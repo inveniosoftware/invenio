@@ -29,7 +29,6 @@ import os
 import sre
 import sys
 import time
-import MySQLdb
 import Numeric
 import signal
 import traceback

@@ -26,6 +26,7 @@ import sys
 import invenio.bibindexadminlib as bic
 from invenio.webpage import page, create_error_box
 from invenio.config import weburl,cdslang
+from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 
 __version__ = "$Id$"
@@ -35,7 +36,7 @@ def deletetag(req, fldID, ln=cdslang, tagID=-1, callback='yes', confirm=-1):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = bic.check_user(uid,'cfgbibindex')
@@ -59,7 +60,7 @@ def addtag(req, fldID, ln=cdslang, value=['',-1], name='', callback='yes', confi
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
    
     auth = bic.check_user(uid,'cfgbibindex')
@@ -85,7 +86,7 @@ def modifyfieldtags(req, fldID, ln=cdslang, callback='yes', confirm=-1):
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
 
@@ -109,7 +110,7 @@ def addindexfield(req, idxID, ln=cdslang, fldID='', callback='yes', confirm=-1):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
    
     auth = bic.check_user(uid,'cfgbibindex')
@@ -134,7 +135,7 @@ def modifyindexfields(req, idxID, ln=cdslang, callback='yes', confirm=-1):
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
 
@@ -159,7 +160,7 @@ def showdetailsfieldtag(req, fldID, tagID, ln=cdslang, callback='yes', confirm=-
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
 
@@ -185,7 +186,7 @@ def showdetailsfield(req, fldID, ln=cdslang, callback='yes', confirm=-1):
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
 
@@ -209,7 +210,7 @@ def modifyfield(req, fldID, ln=cdslang, code='', callback='yes', confirm=-1):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = bic.check_user(uid,'cfgbibindex')
@@ -233,7 +234,7 @@ def modifyindex(req, idxID, ln=cdslang, idxNAME='', idxDESC='', callback='yes', 
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = bic.check_user(uid,'cfgbibindex')
@@ -258,7 +259,7 @@ def modifytag(req, fldID, tagID, ln=cdslang, name='', value='', callback='yes', 
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = bic.check_user(uid,'cfgbibindex')
@@ -284,7 +285,7 @@ def deletefield(req, fldID, ln=cdslang, confirm=0):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = bic.check_user(uid,'cfgbibindex')
@@ -306,7 +307,7 @@ def deleteindex(req, idxID, ln=cdslang, confirm=0):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = bic.check_user(uid,'cfgbibindex')
@@ -329,7 +330,7 @@ def showfieldoverview(req, ln=cdslang, callback='yes', confirm=-1):
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
 
@@ -353,7 +354,7 @@ def editfields(req, ln=cdslang, callback='yes', confirm=-1):
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
 
@@ -377,7 +378,7 @@ def editfield(req, fldID, ln=cdslang, mtype='', callback='yes', confirm=-1):
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
 
@@ -403,7 +404,7 @@ def editindex(req, idxID, ln=cdslang, mtype='', callback='yes', confirm=-1):
  
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
 
@@ -428,7 +429,7 @@ def modifyindextranslations(req, idxID, ln=cdslang, sel_type='', trans = [], con
         
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = bic.check_user(uid,'cfgbibindex')
@@ -452,7 +453,7 @@ def modifyfieldtranslations(req, fldID, ln=cdslang, sel_type='', trans = [], con
         
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = bic.check_user(uid,'cfgbibindex')
@@ -476,7 +477,7 @@ def addfield(req, ln=cdslang, fldNAME='', code='', callback="yes", confirm=-1):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
     
     auth = bic.check_user(uid,'cfgbibindex')
@@ -500,7 +501,7 @@ def addindex(req, ln=cdslang, idxNAME='', callback="yes", confirm=-1):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
     
     auth = bic.check_user(uid,'cfgbibindex')
@@ -523,7 +524,7 @@ def switchtagscore(req, fldID, id_1, id_2, ln=cdslang):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = bic.check_user(uid,'cfgbibindex')
@@ -546,7 +547,7 @@ def removeindexfield(req, idxID, fldID, ln=cdslang, callback="yes", confirm=-1):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
     
     auth = bic.check_user(uid,'cfgbibindex')
@@ -570,7 +571,7 @@ def removefieldtag(req, fldID, tagID, ln=cdslang, callback="yes", confirm=-1):
     
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
     
     auth = bic.check_user(uid,'cfgbibindex')
@@ -595,7 +596,7 @@ def index(req, ln=cdslang, mtype='', content=''):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = bic.check_user(uid,'cfgbibindex')
@@ -617,7 +618,7 @@ def field(req, ln=cdslang, mtype='', content=''):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     auth = bic.check_user(uid,'cfgbibindex')

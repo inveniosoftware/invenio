@@ -30,7 +30,6 @@ import os
 import sre
 import sys
 import time
-import MySQLdb
 import Numeric
 import urllib
 import signal
@@ -45,12 +44,12 @@ import ConfigParser
 from invenio.config import *
 from invenio.search_engine_config import cfg_max_recID
 from invenio.search_engine import perform_request_search, strip_accents, HitSet
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, escape_string, DatabaseError
 from invenio.bibindex_engine_stemmer import is_stemmer_available_for_language, stem
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibindex_engine_config import conv_programs, conv_programs_helpers
 
-## safety parameters concerning MySQL thread-multiplication problem:
+## safety parameters concerning DB thread-multiplication problem:
 cfg_check_mysql_threads = 0 # to check or not to check the problem? 
 cfg_max_mysql_threads = 50 # how many threads (connections) we consider as still safe
 cfg_mysql_thread_timeout = 20 # we'll kill threads that were sleeping for more than X seconds
@@ -94,9 +93,9 @@ def dict_union(list1, list2):
     #return list1
     return union_dict
 
-## safety function for killing slow MySQL threads:
+## safety function for killing slow DB threads:
 def kill_sleepy_mysql_threads(max_threads=cfg_max_mysql_threads, thread_timeout=cfg_mysql_thread_timeout):
-    """Check the number of MySQL threads and if there are more than
+    """Check the number of DB threads and if there are more than
        MAX_THREADS of them, lill all threads that are in a sleeping
        state for more than THREAD_TIMEOUT seconds.  (This is useful
        for working around the the max_connection problem that appears
@@ -110,7 +109,7 @@ def kill_sleepy_mysql_threads(max_threads=cfg_max_mysql_threads, thread_timeout=
             if r_command == "Sleep" and int(r_time) > thread_timeout:
                 run_sql("KILL %s", (r_id,))
                 if options["verbose"] >= 1:                
-                    write_message("WARNING: too many MySQL threads, killing thread %s" % r_id)
+                    write_message("WARNING: too many DB threads, killing thread %s" % r_id)
     return
 
 # tagToFunctions mapping. It offers an indirection level necesary for
@@ -257,7 +256,7 @@ def deserialize_via_numeric_array(string):
 
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
-    return MySQLdb.escape_string(compress(marshal.dumps(obj)))
+    return escape_string(compress(marshal.dumps(obj)))
 
 def deserialize_via_marshal(string):
     """Decompress and deserialize string into a Python object via marshal."""
@@ -294,7 +293,7 @@ class WordTable:
         self.value={}
 
     def put_into_db(self, mode="normal", split=string.split):
-        """Updates the current words table in the corresponding MySQL's
+        """Updates the current words table in the corresponding DB
            rnkWORD table.  Mode 'normal' means normal execution,
            mode 'emergency' means words index reverting to old state.
            """
@@ -421,7 +420,7 @@ class WordTable:
                 # yes there were some new words:
                 if options["verbose"] >= 9:
                     write_message("......... updating hitlist for ``%s''" % word)
-		run_sql("UPDATE %s SET hitlist='%s' WHERE term='%s'" % (self.tablename, serialize_via_marshal(set), MySQLdb.escape_string(word)))
+		run_sql("UPDATE %s SET hitlist='%s' WHERE term='%s'" % (self.tablename, serialize_via_marshal(set), escape_string(word)))
         else: # the word is new, will create new set:
             if options["verbose"] >= 9:
                 write_message("......... inserting hitlist for ``%s''" % word)
@@ -429,7 +428,7 @@ class WordTable:
 	    if len(set) > 0:   
                 #new word, add to list
                 options["modified_words"][word] = 1
-	        run_sql("INSERT INTO %s (term, hitlist) VALUES ('%s', '%s')" % (self.tablename, MySQLdb.escape_string(word), serialize_via_marshal(set)))       
+	        run_sql("INSERT INTO %s (term, hitlist) VALUES ('%s', '%s')" % (self.tablename, escape_string(word), serialize_via_marshal(set)))       
         if not set: # never store empty words
             run_sql("DELETE from %s WHERE term=%%s" % self.tablename,
                     (word,))
@@ -655,7 +654,7 @@ class WordTable:
 
         try:
             run_sql(query)
-        except MySQLdb.DatabaseError:
+        except DatabaseError:
             pass
         
         put = self.put
@@ -1335,7 +1334,7 @@ def update_rnkWORD(table, terms):
             if Git >= 0:
                 Git += 1
             term_docs["Gi"] = (0, Git)
-            run_sql("UPDATE %s SET hitlist='%s' WHERE term='%s'" % (table, serialize_via_marshal(term_docs), MySQLdb.escape_string(t)))
+            run_sql("UPDATE %s SET hitlist='%s' WHERE term='%s'" % (table, serialize_via_marshal(term_docs), escape_string(t)))
         write_message("Phase 5: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
         i += 5000
     write_message("Phase 5:  Finished updating %s with new normalization values" % table)

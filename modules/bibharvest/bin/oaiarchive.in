@@ -52,7 +52,7 @@
      oaiarchive --oaiset=global --add --upload
      oaiarchive -apo global
 
-     Print OAI repository status"
+     Print OAI repository status
      oaiarchive -r
 
 """
@@ -63,9 +63,7 @@ try:
     import sys
     from invenio.oaiarchive_engine import oaiarchive_task
     from invenio.oaiarchive_engine import printInfo
-    pylibdir = "@prefix@/lib/python"
-    sys.path.append('%s' % pylibdir)
-    from invenio.dbquery import run_sql
+    from invenio.dbquery import run_sql, escape_string
     from invenio.config import *
     from invenio.search_engine import perform_request_search
     from invenio.search_engine import print_record
@@ -74,7 +72,6 @@ try:
     import string
     import marshal
     import signal
-    import MySQLdb
     import time
     import re
 
@@ -209,7 +206,7 @@ def task_submit(options):
     ## submit task:
 
     task_id = run_sql("""INSERT INTO schTASK (id,proc,user,status,arguments,sleeptime,runtime) VALUES (NULL,'oaiarchive',%s,'WAITING',%s,%s,%s)""",
-                      (user, marshal.dumps(options),sleeptime,MySQLdb.escape_string(sched_time)))
+                      (user, marshal.dumps(options),sleeptime,escape_string(sched_time)))
     ## update task number:
     options["task"] = task_id
     run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""", (marshal.dumps(options),task_id))

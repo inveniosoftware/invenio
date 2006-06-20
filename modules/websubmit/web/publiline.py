@@ -24,11 +24,10 @@ import sys
 import time
 import types
 import re
-import MySQLdb
 import shutil
 
 from invenio.config import cdsname,cdslang,supportemail,pylibdir, sweburl
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import *
 from invenio.webpage import page, create_error_box
@@ -58,7 +57,7 @@ def index(req,c=cdsname,ln=cdslang,doctype="",categ="",RN="",send=""):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../publiline.py/index")
         uid_email = get_email(uid)
-    except MySQLdb.Error, e:
+    except Error, e:
         return errorMsg(e.value,req, ln = ln)
     if doctype == "":
         t = selectDoctype(ln)

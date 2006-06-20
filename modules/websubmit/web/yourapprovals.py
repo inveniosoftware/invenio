@@ -22,7 +22,7 @@ import os
 import sys
 
 from invenio.config import weburl, sweburl, cdsname, cdslang
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import *
 from invenio.webpage import page, create_error_box
@@ -49,7 +49,7 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourapprovals.py/index")
         u_email = get_email(uid)
-    except MySQLdb.Error, e:
+    except Error, e:
         return errorMsg(e.value,req, ln = ln)
 
     res = run_sql("select sdocname,ldocname from sbmDOCTYPE")

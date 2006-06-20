@@ -22,11 +22,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """ Database related functions for webbasket module """
 
-from MySQLdb import escape_string
 from zlib import decompress
 from time import localtime
 
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, escape_string
 from invenio.webbasket_config import cfg_webbasket_share_levels, \
                                      cfg_webbasket_actions, \
                                      cfg_webbasket_share_levels_ordered

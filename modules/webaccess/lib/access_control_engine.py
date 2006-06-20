@@ -22,10 +22,8 @@
 
 __version__ = "$Id$"
 
-from MySQLdb import ProgrammingError
-
 from invenio.config import *
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, ProgrammingError
 from invenio.access_control_config import SUPERADMINROLE, cfg_webaccess_warning_msgs, cfg_webaccess_msgs, CFG_ACCESS_CONTROL_LEVEL_GUESTS, CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS#, CFG_EXTERNAL_ACCESS_CONTROL
 
 called_from = 1 #1=web,0=cli

@@ -2,7 +2,6 @@
 
 from invenio.dbquery import run_sql
 from invenio.websubmitadmin_config import *
-from MySQLdb import escape
 from random import seed, randint
 
 ## Functions relating to WebSubmit ACTIONS, their addition, and their modification:

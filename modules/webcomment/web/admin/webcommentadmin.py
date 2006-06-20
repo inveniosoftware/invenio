@@ -25,6 +25,7 @@ from invenio.webcommentadminlib import *
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
 from invenio.config import weburl,cdslang
+from invenio.dbquery import Error 
 from invenio.webuser import getUid, page_not_authorized
 from invenio.urlutils import wash_url_argument, redirect_to_url
 from invenio.messages import wash_language, gettext_set_language
@@ -42,7 +43,7 @@ def index(req, ln=cdslang):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebcomment')
@@ -71,7 +72,7 @@ def delete(req, ln=cdslang, comid=""):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
                                                                                                                                                                                                      
     (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
@@ -106,7 +107,7 @@ def comments(req, ln=cdslang, uid="", comid="", reviews=0):
     
     try:
         auid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
     
     (auth_code, auth_msg) = check_user(auid,'cfgwebcomment')
@@ -137,7 +138,7 @@ def users(req, ln=cdslang):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
     (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
     if not auth_code:
@@ -168,7 +169,7 @@ def del_com(req, ln=cdslang, action="delete", **hidden):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
+    except Error, e:
         return error_page(req)
     (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
     if not auth_code:

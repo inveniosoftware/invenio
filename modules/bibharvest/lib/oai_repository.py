@@ -1,5 +1,4 @@
 ## $Id$
-## OAI interface for CDS Invenio/MySQL written in Python compliant with OAI-PMH2.0
 
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
@@ -18,7 +17,7 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""OAI interface for CDS Invenio/MySQL written in Python compliant with OAI-PMH2.0"""
+"""OAI interface for CDS Invenio written in Python compliant with OAI-PMH2.0"""
 
 import cPickle
 import string
@@ -630,7 +629,7 @@ def oai_error(code, msg):
 
 
 def oaigetsysno(identifier):
-    "Returns the first MySQL BIB ID for the OAI identifier 'identifier', if it exists."
+    "Returns the first database BIB ID for the OAI identifier 'identifier', if it exists."
     sysno = None
     if identifier:
         query = "SELECT DISTINCT(bb.id_bibrec) FROM bib%sx AS bx, bibrec_bib%sx AS bb WHERE bx.tag='%s' AND bb.id_bibxxx=bx.id AND bx.value='%s'" % (cfg_oai_id_field[0:2], cfg_oai_id_field[0:2], cfg_oai_id_field, identifier)

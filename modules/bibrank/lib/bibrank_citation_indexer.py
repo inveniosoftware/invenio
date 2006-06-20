@@ -19,13 +19,12 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import MySQLdb
 import time
 import os
 from marshal import loads, dumps
 from zlib import decompress, compress
 
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, escape_string
 from invenio.search_engine import print_record, search_pattern
 from invenio.bibrecord import create_records, record_get_field_values
 
@@ -292,4 +291,4 @@ def insert_cit_ref_list_intodb(citation_dic, reference_dic):
                                         (get_compressed_dictionary(reference_dic)))
 def get_compressed_dictionary(dic):
     """Serialize Python object vi a marshal into a compressed string."""
-    return MySQLdb.escape_string(compress(dumps(dic)))
+    return escape_string(compress(dumps(dic)))

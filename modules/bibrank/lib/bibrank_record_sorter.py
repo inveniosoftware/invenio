@@ -26,7 +26,6 @@ import marshal
 import string
 import time
 import math
-import MySQLdb
 import Numeric
 import re
 import ConfigParser
@@ -34,7 +33,7 @@ import traceback
 import copy
 
 from invenio.config import *
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, escape_string
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.search_engine_config import cfg_max_recID
@@ -119,7 +118,7 @@ def serialize_via_numeric_array_dumps(arr):
 def serialize_via_numeric_array_compr(str):
     return zlib.compress(str)
 def serialize_via_numeric_array_escape(str):
-    return MySQLdb.escape_string(str)
+    return escape_string(str)
 def serialize_via_numeric_array(arr):
     """Serialize Numeric array into a compressed string."""
     return serialize_via_numeric_array_escape(serialize_via_numeric_array_compr(serialize_via_numeric_array_dumps(arr)))
@@ -128,7 +127,7 @@ def deserialize_via_numeric_array(string):
     return Numeric.loads(zlib.decompress(string))
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
-    return MySQLdb.escape_string(zlib.compress(marshal.dumps(obj)))
+    return escape_string(zlib.compress(marshal.dumps(obj)))
 def deserialize_via_marshal(string):
     """Decompress and deserialize string into a Python object via marshal."""
     return marshal.loads(zlib.decompress(string))
@@ -532,7 +531,7 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
     #For each term, if accepted, get a list of the records using the term
     #calculate then relevance for each term before sorting the list of records
     for (term, table) in lwords:
-	term_recs = run_sql("SELECT term, hitlist FROM %s WHERE term='%s'" % (methods[rank_method_code]["rnkWORD_table"], MySQLdb.escape_string(term)))
+	term_recs = run_sql("SELECT term, hitlist FROM %s WHERE term='%s'" % (methods[rank_method_code]["rnkWORD_table"], escape_string(term)))
         if term_recs: #if term exists in database, use for ranking
 	    term_recs = deserialize_via_marshal(term_recs[0][1])
             (recdict, rec_termcount) = calculate_record_relevance((term, int(term_recs["Gi"][1])) , term_recs, hitset, recdict, rec_termcount, verbose, quick=None)

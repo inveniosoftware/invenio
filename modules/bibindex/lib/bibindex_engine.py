@@ -34,7 +34,6 @@ import os
 import sre
 import sys
 import time
-import MySQLdb
 import Numeric
 import urllib
 import signal
@@ -47,7 +46,7 @@ from invenio.config import *
 from invenio.bibindex_engine_config import *
 from invenio.search_engine_config import cfg_max_recID
 from invenio.search_engine import perform_request_search, strip_accents
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, escape_string, DatabaseError
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibindex_engine_stemmer import stem
@@ -142,9 +141,9 @@ def list_union(list1, list2):
         union_dict[e] = 1
     return union_dict.keys()
 
-## safety function for killing slow MySQL threads:
+## safety function for killing slow DB threads:
 def kill_sleepy_mysql_threads(max_threads=cfg_max_mysql_threads, thread_timeout=cfg_mysql_thread_timeout):
-    """Check the number of MySQL threads and if there are more than
+    """Check the number of DB threads and if there are more than
        MAX_THREADS of them, lill all threads that are in a sleeping
        state for more than THREAD_TIMEOUT seconds.  (This is useful
        for working around the the max_connection problem that appears
@@ -158,7 +157,7 @@ def kill_sleepy_mysql_threads(max_threads=cfg_max_mysql_threads, thread_timeout=
             if r_command == "Sleep" and int(r_time) > thread_timeout:
                 run_sql("KILL %s", (r_id,))
                 if options["verbose"] >= 1:                
-                    write_message("WARNING: too many MySQL threads, killing thread %s" % r_id)
+                    write_message("WARNING: too many DB threads, killing thread %s" % r_id)
     return
 
 ## MARC-21 tag/field access functions
@@ -680,7 +679,7 @@ def deserialize_via_numeric_array(string):
 
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
-    return MySQLdb.escape_string(compress(dumps(obj)))
+    return escape_string(compress(dumps(obj)))
 
 def deserialize_via_marshal(string):
     """Decompress and deserialize string into a Python object via marshal."""
@@ -717,7 +716,7 @@ class WordTable:
         self.value={}
 
     def put_into_db(self, mode="normal", split=string.split):
-        """Updates the current words table in the corresponding MySQL's
+        """Updates the current words table in the corresponding DB
            idxFOO table.  Mode 'normal' means normal execution,
            mode 'emergency' means words index reverting to old state.
            """
@@ -1098,7 +1097,7 @@ class WordTable:
         
         try:
             run_sql(query)
-        except MySQLdb.DatabaseError:
+        except DatabaseError:
             # ok, we tried to add an existent record. No problem
             pass
 
