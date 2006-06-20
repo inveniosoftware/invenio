@@ -31,7 +31,6 @@ from invenio.config import cdslang
 from invenio.messages import gettext_set_language
 from invenio.dateutils import datetext_default, get_datetext
 from invenio.webuser import list_users_in_roles
-from invenio.search_engine import wash_url_argument
 
 import invenio.template
 
@@ -47,11 +46,7 @@ def perform_request_display_msg(uid, msgid, ln = cdslang):
     @param msgid: message id
     
     @return a (body, errors[], warnings[]) formed tuple
-    """
-    # Wash the arguments...
-    uid   = wash_url_argument(uid, 'int')
-    msgid = wash_url_argument(msgid, 'int')
-    
+    """    
     errors = []
     warnings = []
     body = ""
@@ -97,21 +92,21 @@ def perform_request_display(uid, errors=[], warnings=[], infos=[], ln=cdslang):
 
     @return a (body, [errors], [warnings]) formed tuple
     """
-    # Wash the arguments...
-    uid = wash_url_argument(uid, 'int')
-
     body = ""    
     rows = []
     rows = get_all_messages_for_user(uid)
     nb_messages = 0
+    nb_messages = count_nb_messages(uid)
     no_quota_users = list_users_in_roles(cfg_webmessage_roles_without_quota)
-    if (not(uid in no_quota_users)):
-        nb_messages = count_nb_messages(uid)
+    no_quota = 0
+    if uid in no_quota_users:
+       no_quota = 1
         
     body = webmessage_templates.tmpl_display_inbox(messages=rows,
                                                    infos=infos,
                                                    warnings=warnings,
                                                    nb_messages=nb_messages,
+                                                   no_quota=no_quota,
                                                    ln=ln)
     return (body, errors, warnings)
 
@@ -123,10 +118,6 @@ def perform_request_delete_msg(uid, msgid, ln=cdslang):
     @param ln: language
     @return a (body, errors, warning tuple)
     """
-     # Wash the arguments...
-    uid   = wash_url_argument(uid, 'int')
-    msgid = wash_url_argument(msgid, 'int')
-
     _ = gettext_set_language(ln)
     
     errors = []
@@ -154,8 +145,6 @@ def perform_request_delete_all(uid, confirmed=0, ln=cdslang):
     infos = []
     warnings = []
     errors = []
-    confirmed = wash_url_argument(confirmed, 'int')
-
     _ = gettext_set_language(ln)
     if confirmed:
         delete_all_messages(uid)
@@ -179,13 +168,6 @@ def perform_request_write(uid,
     @param ln: language
     @return a (body, errors, warnings) tuple
     """
-    # wash arguments
-    uid = wash_url_argument(uid, 'int')
-    msg_reply_id = wash_url_argument(msg_reply_id, 'int')
-    msg_to = wash_url_argument(msg_to, 'str')
-    msg_to_group = wash_url_argument(msg_to_group, 'str')
-    # ln has already been washed in webmessage_webinterface
-
     errors = []
     warnings = []
     body = ""
@@ -227,16 +209,17 @@ def perform_request_write(uid,
                                            ln=ln)
     return (body, errors, warnings)
 
-def perform_request_write_with_search(msg_to_user="",
+def perform_request_write_with_search(uid,
+                                      msg_to_user="",
                                       msg_to_group="",
                                       msg_subject="",
                                       msg_body="",
                                       msg_send_year=0,
-                                      msg_send_month=0,
+                                      msg_send_month=0, 
                                       msg_send_day=0,
                                       names_selected=[],
                                       search_pattern="",
-                                      results_field='none',
+                                      results_field=cfg_webmessage_results_field['NONE'],
                                       add_values=0,
                                       ln=cdslang):
     """
@@ -257,21 +240,14 @@ def perform_request_write_with_search(msg_to_user="",
     @param ln: language
     @return a (body, errors, warnings) formed tuple.
     """    
-    # wash arguments
-    names_selected = wash_url_argument(names_selected, 'list')
-    msg_send_year = wash_url_argument(msg_send_year, 'int')
-    msg_send_month = wash_url_argument(msg_send_month, 'int')
-    msg_send_day = wash_url_argument(msg_send_day, 'int')
-    
     warnings = []
     errors = []
     search_results_list = []
-    
     def cat_names(name1, name2):
         """ name1, name2 => 'name1, name2' """
         return name1 + cfg_webmessage_separator + " " + name2
     
-    if results_field == 'user':
+    if results_field == cfg_webmessage_results_field['USER']:
         if add_values and len(names_selected):
             usernames_to_add = reduce(cat_names, names_selected)
             if msg_to_user:
@@ -284,18 +260,18 @@ def perform_request_write_with_search(msg_to_user="",
             for user_name in users_found:
                 search_results_list.append((user_name[0], user_name[0] in names_selected))
         
-    elif results_field == 'group':
+    elif results_field == cfg_webmessage_results_field['GROUP']:
         if add_values and len(names_selected):
             groupnames_to_add = reduce(cat_names, names_selected)
             if msg_to_group:
                 msg_to_group = cat_names(msg_to_group, groupnames_to_add)
             else:
                 msg_to_group = groupnames_to_add
-                
-        groups_found = get_groupnames_like(search_pattern)
+        groups_dict = get_groupnames_like(uid, search_pattern)
+        groups_found = groups_dict.values()
         if groups_found:
             for group_name in groups_found:
-                search_results_list.append((group_name[0], group_name[0] in names_selected))
+                search_results_list.append((group_name, group_name in names_selected))
        
     body = webmessage_templates.tmpl_write(msg_to=msg_to_user,
                                            msg_to_group=msg_to_group,
@@ -333,15 +309,6 @@ def perform_request_send(uid,
     @param ln: language
     @return a (body, errors, warnings) tuple
     """
-    # wash arguments
-    msg_to_user = wash_url_argument(msg_to_user, 'str')
-    msg_to_group = wash_url_argument(msg_to_group, 'str')
-    msg_subject = wash_url_argument(msg_subject, 'str')
-    msg_body = wash_url_argument(msg_body, 'str')
-    msg_send_year = wash_url_argument(msg_send_year, 'int')
-    msg_send_month = wash_url_argument(msg_send_month, 'int')
-    msg_send_day = wash_url_argument(msg_send_day, 'int')
-
     _ = gettext_set_language(ln)
 
     def strip_spaces(str):

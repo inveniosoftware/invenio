@@ -30,6 +30,7 @@ from invenio.webmessage_config import cfg_webmessage_status_code, \
 from invenio.dateutils import datetext_default, \
                               convert_datestruct_to_datetext
 from invenio.webuser import list_users_in_roles
+from invenio.webbasket_dblayer import get_groups_user_member_of
 
 def check_user_owns_message(uid, msgid):
     """
@@ -490,20 +491,23 @@ def get_nicknames_like(pattern):
         return res
     return ()
 
-def get_groupnames_like(pattern, also_return_id=0):
-    """Get groupnames like pattern
-    if also_return_id provided: 
-    will return tuples of (group name, group id)
+def get_groupnames_like(uid, pattern):
+    """Get groupnames like pattern. Will return only groups that user is allowed to see
     """
+    groups = {}
     if pattern:
-        query = "SELECT name%s FROM usergroup WHERE name RLIKE '%s'"
-        id_field = ''
-        if also_return_id:
-            id_field = ', id'
+        query1 = "SELECT id, name FROM usergroup WHERE name RLIKE '%s' AND join_policy like 'V%%'"
         pattern = escape_string(pattern)
-        res = run_sql(query% (id_field, pattern))
-        return res
-    return ()
+        res = run_sql(query1 % pattern)
+        # The line belows inserts into groups dictionary every tuple the database returned, 
+        # assuming field0=key and field1=value
+        map(lambda x: groups.setdefault(x[0], x[1]), res)
+        query2 = """SELECT g.id, g.name 
+                    FROM usergroup g, user_usergroup ug 
+                    WHERE g.id=ug.id_usergroup AND ug.id_user=%i AND g.name RLIKE '%s'"""
+        res = run_sql(query2 % (uid, pattern))
+        map(lambda x: groups.setdefault(x[0], x[1]), res)
+    return groups
 
 def get_element(sql_res):
     """convert mySQL output

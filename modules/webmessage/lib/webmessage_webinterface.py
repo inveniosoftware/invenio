@@ -27,8 +27,9 @@ from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.config import weburl, cdslang
 from invenio.webuser import getUid, isGuestUser, page_not_authorized
 from invenio.webmessage import *
+from invenio.webmessage_config import cfg_webmessage_results_field
 from invenio.webpage import page
-from invenio.messages import wash_language, gettext_set_language
+from invenio.messages import gettext_set_language
 from invenio.urlutils import redirect_to_url
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 
@@ -49,7 +50,6 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         @param ln:  language
         @return the page for inbox
         """
-
         argd = wash_urlargd(form, {})
 
         # Check if user is logged
@@ -81,12 +81,9 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         @param ln: language
         @return the compose page
         """
-
-        argd = wash_urlargd(form, {'msg_reply_id': (str, ""),
+        argd = wash_urlargd(form, {'msg_reply_id': (int, 0),
                                    'msg_to': (str, ""),
-                                   'msg_to_group': (str, ""),
-                                   'mode_user': (int, 1), # FIXME: unused?
-                                   })
+                                   'msg_to_group': (str, "")})
 
         # Check if user is logged
         uid = getUid(req)
@@ -120,10 +117,12 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         @param msg_to_user: comma separated usernames (str)
         @param msg_to_group: comma separated groupnames (str)
         @param msg_subject: message subject (str)
-        @param msg_bidy: message body (string)
+        @param msg_body: message body (string)
         @param msg_send_year: year to send this message on (int)
         @param_msg_send_month: month to send this message on (int)
         @param_msg_send_day: day to send this message on (int)
+        @param results_field: value determining which results field to display. 
+                              See cfg_webmessage_results_field in webmessage_config.py
         @param names_to_add: list of usernames ['str'] to add to msg_to_user / group
         @param search_pattern: will search for users/groups with this pattern (str)
         @param add_values: if 1 users_to_add will be added to msg_to_user field..
@@ -131,15 +130,14 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         @param ln: language
         @return a (body, errors, warnings) formed tuple.
         """
-
         argd = wash_urlargd(form, {'msg_to_user': (str, ""),
                                    'msg_to_group': (str, ""),
                                    'msg_subject': (str, ""),
                                    'msg_body': (str, ""),
-                                   'msg_send_year': (str, "0000"),
-                                   'msg_send_month': (str, "00"),
-                                   'msg_send_day': (str, "00"),
-                                   'results_field': (str, "none"), # FIXME: docstring? for others too
+                                   'msg_send_year': (int, 0),
+                                   'msg_send_month': (int, 0),
+                                   'msg_send_day': (int, 0),
+                                   'results_field': (str, cfg_webmessage_results_field['NONE']),
                                    'names_selected': (list, []), 
                                    'search_pattern': (str, ""), 
                                    'send_button': (str, ""), 
@@ -148,45 +146,44 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                    'add_user': (str, ""), 
                                    'add_group': (str, ""), 
                                    })
-
         # Check if user is logged
         uid = getUid(req)
         if uid == -1 or isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
             return page_not_authorized(req, "%s/yourmessages/send" % (weburl,))
-
         _ = gettext_set_language(argd['ln'])
-
         if argd['send_button']:
-           (body, errors, warnings, title, navtrail) = perform_request_send(uid,
-                                                                            argd['msg_to_user'],
-                                                                            argd['msg_to_group'],
-                                                                            argd['msg_subject'],
-                                                                            argd['msg_body'],
-                                                                            argd['msg_send_year'],
-                                                                            argd['msg_send_month'],
-                                                                            argd['msg_send_day'],
-                                                                            argd['ln'])
+           (body, errors, warnings, title, navtrail) = perform_request_send(uid=uid,
+                                                                            msg_to_user=argd['msg_to_user'],
+                                                                            msg_to_group=argd['msg_to_group'],
+                                                                            msg_subject=argd['msg_subject'],
+                                                                            msg_body=argd['msg_body'],
+                                                                            msg_send_year=argd['msg_send_year'],
+                                                                            msg_send_month=argd['msg_send_month'],
+                                                                            msg_send_day=argd['msg_send_day'],
+                                                                            ln=argd['ln'])
         else:
             title = _('Write a message')
             navtrail = get_navtrail(argd['ln'], title)
             if argd['search_user']:
-                argd['results_field'] = 'user'
+                argd['results_field'] = cfg_webmessage_results_field['USER']
             elif argd['search_group']:
-                argd['results_field'] = 'group'
+                argd['results_field'] = cfg_webmessage_results_field['GROUP']
             add_values = 0
             if argd['add_group'] or argd['add_user']:
                 add_values = 1
-            (body, errors, warnings) = perform_request_write_with_search(argd['msg_to_user'],
-                                                                         argd['msg_to_group'],
-                                                                         argd['msg_subject'],
-                                                                         argd['msg_body'],
-                                                                         argd['msg_send_year'],
-                                                                         argd['msg_send_month'],
-                                                                         argd['msg_send_day'],
-                                                                         argd['names_selected'],
-                                                                         argd['search_pattern'],
-                                                                         argd['results_field'],
-                                                                         add_values,
+            
+            (body, errors, warnings) = perform_request_write_with_search(uid=uid,
+                                                                         msg_to_user=argd['msg_to_user'],
+                                                                         msg_to_group=argd['msg_to_group'],
+                                                                         msg_subject=argd['msg_subject'],
+                                                                         msg_body=argd['msg_body'],
+                                                                         msg_send_year=argd['msg_send_year'],
+                                                                         msg_send_month=argd['msg_send_month'],
+                                                                         msg_send_day=argd['msg_send_day'],
+                                                                         names_selected=argd['names_selected'],
+                                                                         search_pattern=argd['search_pattern'],
+                                                                         results_field=argd['results_field'],
+                                                                         add_values=add_values,
                                                                          ln=argd['ln'])
         return page(title       = title,
                     body        = body,
@@ -205,7 +202,6 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         @param ln: language
         @return page
         """
-
         argd = wash_urlargd(form, {'msgid': (int, -1),
                                    })
 
@@ -234,8 +230,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         @param confimed: 1 if message is confirmed
         @param ln: language
         \return page
-        """
-        
+        """        
         argd = wash_urlargd(form, {'confirmed': (int, 0),
                                    })
 
@@ -265,7 +260,6 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         @param ln: languae
         @return page
         """
-
         argd = wash_urlargd(form, {'msgid': (int, -1),
                                    })
 

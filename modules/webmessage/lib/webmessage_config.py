@@ -39,6 +39,13 @@ cfg_webmessage_status_code = \
     'READ': 'R',
     'REMINDER': 'M'
 }
+# values indicating which results field to display while writing a message
+cfg_webmessage_results_field = \
+{
+    'USER': 'user',
+    'GROUP': 'group',
+    'NONE': 'none'
+}
 
 # separator used in every list of recipients
 cfg_webmessage_separator = ','

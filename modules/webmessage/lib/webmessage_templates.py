@@ -25,7 +25,8 @@
 from invenio.webmessage_mailutils import email_quoted_txt2html, email_quote_txt
 from invenio.webmessage_config import cfg_webmessage_status_code, \
                                       cfg_webmessage_separator, \
-                                      cfg_webmessage_max_nb_of_messages
+                                      cfg_webmessage_max_nb_of_messages, \
+                                      cfg_webmessage_results_field
 from invenio.textutils import indent_text
 from invenio.dateutils import convert_datetext_to_dategui, \
                               datetext_default, \
@@ -37,7 +38,7 @@ from invenio.messages import gettext_set_language
 from invenio.webuser import get_user_info
 
 class Template:
-    def tmpl_display_inbox(self, messages, infos=[], warnings=[], nb_messages=0, ln=cdslang):
+    def tmpl_display_inbox(self, messages, infos=[], warnings=[], nb_messages=0, no_quota=0, ln=cdslang):
         """
         Displays a list of messages, with the appropriate links and buttons
         @param messages: a list of tuples:
@@ -48,6 +49,9 @@ class Template:
                            sent_date,
                            status=]
         @param infos: a list of informations to print on top of page
+        @param warnings: a list of warnings to display
+        @param nb_messages: number of messages user has
+        @param no_quota: 1 if user has no quota (admin) or 0 else.
         @param ln: language of the page.
         @return the list in HTML format                                            
         """
@@ -55,7 +59,8 @@ class Template:
         junk = 0
         inbox = self.tmpl_warning(warnings, ln)
         inbox += self.tmpl_infobox(infos, ln)
-        inbox += self.tmpl_quota(nb_messages, ln)
+        if not(no_quota):
+            inbox += self.tmpl_quota(nb_messages, ln)
         inbox += """
 <table class="mailbox">
   <thead class="mailboxheader">
@@ -141,7 +146,7 @@ class Template:
                    warnings=[],
                    search_results_list=[],
                    search_pattern="",
-                   results_field='none',
+                   results_field=cfg_webmessage_results_field['NONE'],
                    ln=cdslang):
         """
         Displays a writing message form with optional prefilled fields
@@ -154,11 +159,10 @@ class Template:
         @param warnings: display warnings on top of page
         @param search_results_list: list of tuples. (user/groupname, is_selected)
         @param search_pattern: pattern used for searching
-        @param results_field: 'none', 'user' or 'group'
+        @param results_field: 'none', 'user' or 'group', see cfg_webmessage_results_field
         @param ln: language of the form
         @return the form in HTML format
         """
-        
         _ = gettext_set_language(ln)
         write_box = self.tmpl_warning(warnings)
 
@@ -528,7 +532,7 @@ class Template:
 %(quota_label)s<br/>
 <div class="quotabox">
   <div class="quotabar" style="width:%(width)ipx"></div>
-</div>""" %{'quota_label' : _("Quota: %.1f%%")%(ratio * 100.0),
+</div>""" %{'quota_label' : _("You're using %.1f%% of your quota (%i messages / %i).")%(ratio * 100.0, nb_messages, cfg_webmessage_max_nb_of_messages),
             'width' : int(ratio * 200)
             }
 
@@ -544,9 +548,8 @@ class Template:
         if not((type(tuples_list) is list) or (type(tuples_list) is tuple)):
             tuples_list = [tuples_list]
         out = """
-<select name="%s" multiple="multiple" style="width:100%%">"""% (select_name)
-        if len(tuples_list) > 0:
-            out += '  <option disabled="disabled">%s</option>\n' % _("Please select one or more:")
+        %s
+<select name="%s" multiple="multiple" style="width:100%%">"""% (_("Please select one or more:"), select_name)
         for (value, is_selected) in tuples_list:
             out += '  <option value="%s"'% value
             if is_selected:
@@ -559,29 +562,29 @@ class Template:
     def tmpl_user_or_group_search(self,
                                   tuples_list=[],
                                   search_pattern="",
-                                  results_field='none',
+                                  results_field=cfg_webmessage_results_field['NONE'],
                                   ln=cdslang):
         """
         Display a box for user searching
         @param tuples_list: list of (value, is_selected) tuples
         @param search_pattern: text to display in this field
-        @param results_field: either 'none', 'user', 'group' 
+        @param results_field: either 'none', 'user', 'group', look at cfg_webmessage_results_field
         @param ln: language
         @return html output
         """
         _ = gettext_set_language(ln)
         multiple_select = ''
         add_button = ''
-        if results_field != 'none' and results_field in ('user', 'group'):
+        if results_field != cfg_webmessage_results_field['NONE'] and results_field in cfg_webmessage_results_field.values():
             if len(tuples_list):
                 multiple_select = self.tmpl_multiple_select('names_selected', tuples_list)
                 add_button = '<input type="submit" name="%s" value="%s" class="nonsubmitbutton" />'
-                if results_field == 'user':
+                if results_field == cfg_webmessage_results_field['USER']:
                     add_button = add_button % ('add_user', _("Add to users"))
                 else:
                     add_button = add_button % ('add_group', _("Add to groups"))
             else:
-                if results_field == 'user':
+                if results_field == cfg_webmessage_results_field['USER']:
                     multiple_select = _("No matching user")
                 else:
                     multiple_select = _("No matching group")
