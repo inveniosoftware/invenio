@@ -3,16 +3,19 @@ from invenio.config import weburl
 websubmitadmin_weburl = "%s/admin/websubmit/websubmitadmin.py" % (weburl,)
 
 
-class InvenioWebSubmitAdminDeleteFailed(Exception):
+class InvenioWebSubmitAdminWarningDeleteFailed(Exception):
     pass
 
-class InvenioWebSubmitAdminInsertFailed(Exception):
+class InvenioWebSubmitAdminWarningInsertFailed(Exception):
     pass
 
-class InvenioWebSubmitAdminTooManyRows(Exception):
+class InvenioWebSubmitAdminWarningTooManyRows(Exception):
     pass
 
-class InvenioWebSubmitAdminNoRowsFound(Exception):
+class InvenioWebSubmitAdminWarningNoRowsFound(Exception):
+    pass
+
+class InvenioWebSubmitAdminWarningForeignKeyViolation(Exception):
     pass
 
 
