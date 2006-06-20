@@ -30,7 +30,7 @@ import cPickle
 import time
 from UserDict import UserDict
 
-from invenio.dbquery import run_sql, blob_to_string
+from invenio.dbquery import run_sql, blob_to_string, OperationalError, IntegrityError
 from invenio.session import Session
 
 class SessionNotInDb(Exception):
@@ -41,7 +41,7 @@ class SessionNotInDb(Exception):
 
 class pSession(Session):
     """Specialisation of the class Session which adds persistence to sessions 
-        by using a MySQL table (it pickles itself into the corresponding row of 
+        by using a database table (it pickles itself into the corresponding row of 
         the table). The class provides methods to save and retrieve an instance 
         to/from the DB and to access the main session attributes (uid). The 
         table in the DB must have the following structure:
@@ -71,15 +71,23 @@ class pSession(Session):
         return self.__uid
 
     def setUid( self, newUid ):
-        self.__uid = int(newUid)
-        self.__dirty = 1    
+        if newUid:
+            self.__uid = int(newUid)
+            self.__dirty = 1
+        else:
+            # something bad happened, e.g. database down, so return user id -1
+            self.__uid = -1
+            self.__dirty = 1
 
     def retrieve( cls, sessionId ):
         """method for retrieving a session from the DB for the given id. If the
              id has no corresponding session an exception is raised
         """
         sql = "select session_object from %s where session_key='%s'"%(cls.__tableName, sessionId)
-        res = run_sql(sql)
+        try:            
+            res = run_sql(sql)
+        except OperationalError:
+            raise SessionNotInDb("Session %s doesn't exist"%sessionId)            
         if len(res)==0:
             raise SessionNotInDb("Session %s doesn't exist"%sessionId)
         s = cPickle.loads(blob_to_string(res[0][0]))
@@ -102,14 +110,16 @@ class pSession(Session):
             sql = 'INSERT INTO %s (session_key, session_expiry, session_object, uid) values ("%s","%s","%s","%s")' % \
                   (self.__class__.__tableName, self.id, self.get_access_time()+60*60*24*2, repr, int(self.getUid()))
             res = run_sql(sql)
-        # FIXME. WARNING!! it should be "except IntegrityError, e:" but this will 
-        #   create a dependency on package MySQL. I'll leave it like this for
-        #   the time being but this can lead to Exception masking
-        except Exception, e:
-            sql = 'UPDATE %s SET uid=%s, session_expiry=%s, session_object="%s" WHERE session_key="%s"' % \
-                  (self.__class__.__tableName, int(self.getUid()), self.get_access_time()+60*60*24*2, repr, self.id)
-            res = run_sql(sql)
+        except IntegrityError:
+            try:
+                sql = 'UPDATE %s SET uid=%s, session_expiry=%s, session_object="%s" WHERE session_key="%s"' % \
+                      (self.__class__.__tableName, int(self.getUid()), self.get_access_time()+60*60*24*2, repr, self.id)
+                res = run_sql(sql)
+            except OperationalError:
+                pass
             self.__dirty=0
+        except OperationalError:
+            self.__dirty=0            
 
 class pSessionMapping(UserDict):
     """Only the necessary methods to make it work with the session manager 
