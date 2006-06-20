@@ -59,7 +59,7 @@ if cfg_experimental_features:
     from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
     from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
     from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, Error
 try:
     from mod_python import apache
     from invenio.webuser import getUid
@@ -1144,11 +1144,17 @@ def create_collection_reclist_cache():
     """Creates list of records belonging to collections.  Called on startup
     and used later for intersecting search results with collection universe."""
     global collection_reclist_cache_timestamp
+    # populate collection reclist cache:
     collrecs = {}
-    res = run_sql("SELECT name,reclist FROM collection")
+    try:
+        res = run_sql("SELECT name,reclist FROM collection")
+    except Error:
+        # database problems, set timestamp to zero and return empty cache
+        collection_reclist_cache_timestamp = 0
+        return collrecs    
     for name,reclist in res:
         collrecs[name] = None # this will be filled later during runtime by calling get_collection_reclist(coll)
-    # update timestamp
+    # update timestamp:
     try:
         collection_reclist_cache_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     except NameError:
@@ -1167,8 +1173,14 @@ def create_collection_i18nname_cache():
     """Create cache of I18N collection names of type 'ln' (=long name).
     Called on startup and used later during the search time."""
     global collection_i18nname_cache_timestamp
+    # populate collection I18N name cache:
     names = {}
-    res = run_sql("SELECT c.name,cn.ln,cn.value FROM collectionname AS cn, collection AS c WHERE cn.id_collection=c.id AND cn.type='ln'") # ln=long name
+    try:
+        res = run_sql("SELECT c.name,cn.ln,cn.value FROM collectionname AS cn, collection AS c WHERE cn.id_collection=c.id AND cn.type='ln'") # ln=long name
+    except Error:
+        # database problems, set timestamp to zero and return empty cache
+        collection_i18nname_cache_timestamp = 0
+        return names
     for c,ln,i18nname in res:
         if i18nname:
             try:
@@ -1176,7 +1188,7 @@ def create_collection_i18nname_cache():
             except KeyError:
                 names[c] = {}
             names[c][ln] = i18nname
-    # update timestamp
+    # update timestamp:
     try:
         collection_i18nname_cache_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     except NameError:
@@ -1195,8 +1207,14 @@ def create_field_i18nname_cache():
     """Create cache of I18N field names of type 'ln' (=long name).
     Called on startup and used later during the search time."""
     global field_i18nname_cache_timestamp
+    # populate field I18 name cache:
     names = {}
-    res = run_sql("SELECT f.name,fn.ln,fn.value FROM fieldname AS fn, field AS f WHERE fn.id_field=f.id AND fn.type='ln'") # ln=long name
+    try:
+        res = run_sql("SELECT f.name,fn.ln,fn.value FROM fieldname AS fn, field AS f WHERE fn.id_field=f.id AND fn.type='ln'") # ln=long name
+    except Error:
+        # database problems, set timestamp to zero and return empty cache
+        field_i18nname_cache_timestamp = 0
+        return names
     for f,ln,i18nname in res:
         if i18nname:
             try:
@@ -1204,7 +1222,7 @@ def create_field_i18nname_cache():
             except KeyError:
                 names[f] = {}
             names[f][ln] = i18nname
-    # update timestamp
+    # update timestamp:
     try:
         field_i18nname_cache_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     except NameError:
