@@ -22,13 +22,16 @@
 from marshal import loads
 from zlib import decompress
 
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, OperationalError
 
 def init_cited_by_dictionary():
     """return citation list dictionary from rnkCITATIONDATA
     """
     query = "select citation_data from rnkCITATIONDATA"
-    compressed_citation_dic = run_sql(query)
+    try:
+        compressed_citation_dic = run_sql(query)
+    except OperationalError:
+        compressed_citation_dic = []
     citation_dic = None
     if compressed_citation_dic and compressed_citation_dic[0]:
         citation_dic = loads(decompress(compressed_citation_dic[0][0]))
@@ -38,7 +41,10 @@ def init_reference_list_dictionary():
     """return reference list dictionary from rnkCITATIONDATA
     """
     query = "select citation_data_reversed from rnkCITATIONDATA"
-    compressed_ref_dic = run_sql(query)
+    try:
+        compressed_ref_dic = run_sql(query)
+    except OperationalError:
+        compressed_ref_dic = []
     ref_dic = None
     if compressed_ref_dic and compressed_ref_dic[0]:
         ref_dic = loads(decompress(compressed_ref_dic[0][0]))
