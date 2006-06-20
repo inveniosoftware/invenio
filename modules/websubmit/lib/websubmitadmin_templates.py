@@ -368,9 +368,9 @@ class Template:
         etypeids = etypes.keys()
         etypeids.sort()
         body_content = ""
-        if user_msg != "":
-            ## Status message to display:
-            output += """<div align="center"><span class="info">%s</span></div><br />""" % (cgi.escape(user_msg, 1),)
+
+        output += self._create_user_message_string(user_msg)
+
         if perform_act != "elementadd":
             body_content += self._element_display_preview(elname=elname, eltype=eltype, elsize=elsize, \
                                                          elrows=elrows, elcols=elcols, elval=elval, elfidesc=elfidesc)
@@ -554,9 +554,8 @@ class Template:
            @return: HTML page body.
         """
         output = ""
-        if user_msg != "":
-            ## Status message to display:
-            output += """<div align="center"><span class="info">%s</span></div><br>""" % (cgi.escape(user_msg, 1),)
+        output += self._create_user_message_string(user_msg)
+
         body_content = """<form method="post" action="%(websubadmin_url)s/%(perform_action)s">""" \
                        % {'websubadmin_url': websubmitadmin_weburl, 'perform_action': perform_act}
         body_content += """
@@ -630,9 +629,8 @@ class Template:
            @return: HTML page body.
         """
         output = ""
-        if user_msg != "":
-            ## Status message to display:
-            output += """<div align="center"><span class="info">%s</span></div><br>""" % (cgi.escape(user_msg, 1),)
+        output += self._create_user_message_string(user_msg)
+
         body_content = """<form method="post" action="%(websubadmin_url)s/%(perform_action)s">""" \
                        % {'websubadmin_url': websubmitadmin_weburl, 'perform_action': perform_act}
         body_content += """
@@ -702,9 +700,7 @@ class Template:
             all_websubmit_func_parameters = ()
 
         output = ""
-        if user_msg != "":
-            ## Status message to display:
-            output += """<div align="center"><span class="info">%s</span></div><br>""" % (cgi.escape(user_msg, 1),)
+        output += self._create_user_message_string(user_msg)
 
         body_content = """<form method="post" action="%(websubadmin_url)s/%(perform_action)s">""" \
                        % {'websubadmin_url' : websubmitadmin_weburl, 'perform_action': perform_act}
@@ -810,20 +806,18 @@ class Template:
         """Display a table containing the details of a function's usage in the various actions of the various doctypes.
            Displayed will be information about the document type and action, and the score and step at which
            the function is called within that action.
-           @param funcname: function name.
-           @param func_usage: A tuple of tuples, each containing details of the function usage:
+           @param funcname: (string) function name.
+           @param func_usage: (tuple) A tuple of tuples, each containing details of the function usage:
                (doctype, docname, function-step, function-score, action id, action name)
            @param user_msg: Any message to be displayed on screen, such as a status report for the last task, etc.
-           @return: HTML page body.
+           @return: (string) HTML page body.
         """
         output = ""
         body_content = ""
         header = ["Doctype", "&nbsp;", "Action", "&nbsp;", "Score", "Step", "Show Details"]
         tbody = []
-        
-        if user_msg != "":
-            ## Status message to display:
-            output += """<div align="center"><span class="info">%s</span></div><br>""" % (cgi.escape(user_msg, 1),)
+
+        output += self._create_user_message_string(user_msg)
 
         body_content += "<br />"
         for usage in func_usage:
@@ -833,7 +827,9 @@ class Template:
                            "<small>%s</small>" % (cgi.escape(usage[3], 1),),
                            "<small>%s</small>" % (cgi.escape(usage[4], 1),),
                            "<small>%s</small>" % (cgi.escape(usage[5], 1),),
-                           """<small><a href="%s/XXXXX">Show</a></small>""" % (websubmitadmin_weburl,)
+                           """<small><a href="%s/doctypeconfiguresubmissionfunctions?doctype=%s&action=%s"""\
+                           """&viewSubmissionFunctions=true">Show</a></small>"""\
+                           % (websubmitadmin_weburl, cgi.escape(usage[0], 1), cgi.escape(usage[2], 1))
                           )
                         )
         body_content += create_html_table_from_tuple(tableheader=header, tablebody=tbody)
@@ -851,9 +847,7 @@ class Template:
            @return: HTML page body.
         """
         output = ""
-        if user_msg != "":
-            ## Status message to display:
-            output += """<div align="center"><span class="info">%s</span></div><br>""" % (cgi.escape(user_msg, 1),)
+        output += self._create_user_message_string(user_msg)
         body_content = """<div>
 <table>
 """
@@ -910,9 +904,7 @@ class Template:
            return: HTML page body.
         """
         output = ""
-        if user_msg != "":
-            ## Status message to display:
-            output += """<div align="center"><span class="info">%s</span></div><br>""" % (cgi.escape(user_msg, 1),)
+        output += self._create_user_message_string(user_msg)
         body_content = """<div>
 <table>
 """
@@ -942,9 +934,7 @@ class Template:
         """
         output = ""
         header = ["Function Name", "View Usage", "Edit Details"]
-        if user_msg != "":
-            ## Status message to display:
-            output += """<div align="center"><span class="info">%s</span></div><br>""" % (cgi.escape(user_msg, 1),)
+        output += self._create_user_message_string(user_msg)
         body_content = """<div><br />\n"""
         tbody = []
         for function in functions:
@@ -973,9 +963,8 @@ class Template:
            return: HTML page body.
         """
         output = ""
-        if user_msg != "":
-            ## Status message to display:
-            output += """<div align="center"><span class="info">%s</span></div><br>""" % (cgi.escape(user_msg, 1),)
+        output += self._create_user_message_string(user_msg)
+
         body_content = """<div>
 <table style="align:center;">
 """
@@ -1744,17 +1733,101 @@ class Template:
                                         datalist=[body_content])
         return output
 
+    def tmpl_configuredoctype_add_submissionfunction(self,
+                                                     doctype,
+                                                     action,
+                                                     cursubmissionfunctions,
+                                                     allWSfunctions,
+                                                     addfunctionname="",
+                                                     addfunctionstep="",
+                                                     addfunctionscore="",
+                                                     perform_act="doctypeconfiguresubmissionfunctions",
+                                                     user_msg=""):
+        ## sanity checking:
+        if type(cursubmissionfunctions) not in (list, tuple):
+            submissionfunctions = ()
+        if type(allWSfunctions) not in (list, tuple):
+            allWSfunctions = ()
+        output = ""
+        output += self._create_user_message_string(user_msg)
+
+        body_content = """
+        <br />
+        <table class="admin_wvar" width="55%%">
+         <thead>
+         <tr>
+         <th class="adminheaderleft" colspan="2">
+           Add function:
+          </th>
+         </tr>
+         </thead>
+         <tbody>
+         <tr>
+          <td width="20%%">&nbsp;</td>
+          <td width="80%%">&nbsp;
+           <form method="get" action="%(websubadmin_url)s/%(performaction)s">
+           <input name="doctype" type="hidden" value="%(doctype)s" />
+           <input name="action" type="hidden" value="%(action)s" />
+          </td>
+         </tr>
+         <tr>
+          <td width="20%%"><span class="adminlabel">Function Name:</span></td>
+          <td width="80%%"><span class="info">&nbsp;</span></td>
+         </tr>
+         <tr>
+          <td width="20%%"><span class="adminlabel">Step:</span></td>
+          <td width="80%%"><span class="info"><input name="addfunctionstep" type="text" value="%(step)s" size="5" /></span></td>
+         </tr>
+         <tr>
+          <td width="20%%"><span class="adminlabel">Score:</span></td>
+          <td width="80%%"><span class="info"><input name="addfunctionscore" type="text" value="%(score)s" size="5" /></span></td>
+         </tr>
+         <tr>
+          <td colspan="2">
+           <table>
+            <tr>
+             <td>
+              <br />
+               <input name="configuresubmissionaddfunctioncommit" class="adminbutton" type="submit" value="Save Details" />
+              </form>
+             </td>
+             <td>
+              <br />
+              <form method="post" action="%(websubadmin_url)s/%(performaction)s">
+               <input name="doctype" type="hidden" value="%(doctype)s" />
+               <input name="action" type="hidden" value="%(action)s" />
+               <input name="configuresubmissionaddfunctioncommit" class="adminbutton" type="submit" value="Cancel" />
+              </form>
+             </td>
+            </tr>
+           </table>
+          </td>
+         </tr>
+        </table>""" % { 'doctype'         : cgi.escape(doctype, 1),
+                        'action'          : cgi.escape(action, 1),
+                        'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                        'performaction'   : cgi.escape(perform_act, 1),
+                        'step'            : cgi.escape(addfunctionstep, 1),
+                        'score'           : cgi.escape(addfunctionscore, 1)
+                      }
+
+
+
+
+        output += self._create_websubmitadmin_main_menu_header()
+        output += self._create_adminbox(header="""Add a function to the [%s] submission of the [%s] document type""" \
+                                        % (cgi.escape(action, 1), cgi.escape(doctype, 1)), datalist=[body_content])
+        return output
+
     def tmpl_configuredoctype_display_submissionfunctions(self,
                                                           doctype,
                                                           action,
                                                           submissionfunctions,
-                                                          allWSfunctions,
                                                           movefromfunctionname="",
                                                           movefromfunctionstep="",
                                                           movefromfunctionscore="",
                                                           perform_act="doctypeconfiguresubmissionfunctions",
-                                                          user_msg=""
-                                                         ):
+                                                          user_msg=""):
         """Create the page body used for displaying all Websubmit functions.
            @param functions: A tuple of tuples containing the function name, and the function
                              description (function, description).
@@ -1764,8 +1837,6 @@ class Template:
         ## sanity checking:
         if type(submissionfunctions) not in (list, tuple):
             submissionfunctions = ()
-        if type(allWSfunctions) not in (list, tuple):
-            allWSfunctions = ()
         
         output = ""
         output += self._create_user_message_string(user_msg)
@@ -2234,6 +2305,19 @@ class Template:
         body_content = ""
         output += self._create_user_message_string(user_msg)
 
+        ## hyperlink back to page details:
+        body_content += """
+        <div style="text-align: center;">
+        <a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s&action=%(action)s&pagenum=%(pagenum)s">
+         Return to details of page [%(pagenum)s] of submission [%(submission)s]</a>
+        </div>
+        <hr />""" % { 'websubadmin_url' : websubmitadmin_weburl,
+                      'doctype'         : cgi.escape(doctype, 1),
+                      'action'          : cgi.escape(action, 1),
+                      'pagenum'         : cgi.escape(pagenum, 1),
+                      'submission'      : cgi.escape("%s%s" % (action, doctype), 1)
+                    }
+
         body_content += """<div><br />
         <form name="dummyeldisplay" action="%(websubadmin_url)s">
         <table class="admin_wvar" align="center">
@@ -2263,18 +2347,6 @@ class Template:
         </table>
         </form>
         </div>"""
-        ## hyperlink back to page details:
-        body_content += """
-        <hr />
-        <div style="text-align: center;">
-        <a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s&action=%(action)s&pagenum=%(pagenum)s">
-         Return to details of page %(pagenum)s of submission %(submission)s</a>
-        </div>""" % { 'websubadmin_url' : websubmitadmin_weburl,
-                      'doctype'         : cgi.escape(doctype, 1),
-                      'action'          : cgi.escape(action, 1),
-                      'pagenum'         : cgi.escape(pagenum, 1),
-                      'submission'      : cgi.escape("%s%s" % (action, doctype), 1)
-                    }
          
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="Preview of Page %s of Submission %s:" \
