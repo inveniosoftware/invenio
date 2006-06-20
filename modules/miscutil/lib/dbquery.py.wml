@@ -4,6 +4,12 @@
 ## modpython FAQ and modified to suit our needs.  The insert_id() is
 ## inspired by Erik Forsberg's mod_python slides.
 
+## FIXME: note that this version of persistent connectivity to the
+## database is not thread-safe; it works allright in the prefork model
+## only (apache2-mpm-prefork).  We should rather replace it with the
+## connection pool technique when time permits.  See:
+## http://modpython.org/FAQ/faqw.py?req=show&file=faq03.003.htp
+
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -25,9 +31,15 @@
 
 """CDS Invenio utility to run SQL queries."""
 
-import MySQLdb
-import string
+# dbquery clients can import these from here:
+from MySQLdb import escape_string 
+from MySQLdb import Warning, Error, InterfaceError, DataError, \
+                    DatabaseError, OperationalError, IntegrityError, \
+                    InternalError, NotSupportedError, \
+                    ProgrammingError
 
+import string
+from MySQLdb import connect
 from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
 ## Configured MySQL credentials are read here and not in config.py in
@@ -44,14 +56,14 @@ def _db_login(relogin = 0):
     """Login to the database."""
     global DB_CONN
     if relogin:
-        DB_CONN = MySQLdb.connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
+        DB_CONN = connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
         return DB_CONN
     else:
         try:
             d = DB_CONN
             return d
         except NameError:
-            DB_CONN = MySQLdb.connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
+            DB_CONN = connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
             return DB_CONN
 
 def run_sql(sql, param=None, n=0, with_desc=0):
@@ -62,6 +74,10 @@ def run_sql(sql, param=None, n=0, with_desc=0):
        to run any SQL queries but return empty list immediately.
        Useful to be able to have the website up while MySQL database
        is down for maintenance, hot copies, table repairs, etc.
+
+       In case of problems, exceptions are returned according to the
+       Python DB API 2.0.  The client code can import them from this
+       file and catch them.
     """
 
     if CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
@@ -70,17 +86,21 @@ def run_sql(sql, param=None, n=0, with_desc=0):
 
     ### log_sql_query(sql, param) ### UNCOMMENT ONLY IF you REALLY want to log all queries
 
-    db = _db_login()    
     if param:
         param = tuple(param)
+
     try:
+        db = _db_login()    
         cur = db.cursor()
         rc = cur.execute(sql, param)   
-    except MySQLdb.OperationalError, e: # unexpected disconnect, bad malloc error, etc
+    except OperationalError: # unexpected disconnect, bad malloc error, etc
         # FIXME: now reconnect is always forced, we may perhaps want to ping() first?
-        db = _db_login(relogin = 1) 
-        cur = db.cursor()        
-        rc = cur.execute(sql, param)                 
+        try:
+            db = _db_login(relogin = 1) 
+            cur = db.cursor()        
+            rc = cur.execute(sql, param)
+        except OperationalError: # again an unexpected disconnect, bad malloc error, etc
+            raise 
     if string.upper(string.split(sql)[0]) in ("SELECT", "SHOW", "DESC", "DESCRIBE"):
         if n:
             recset = cur.fetchmany(n)
