@@ -116,8 +116,16 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=cdslan
                 req=req)
 
 def getUid (req):
-    """It gives the userId taking it from the cookie of the request,also has the control mechanism for the guest users,
-       inserting in the MySql table when need it, and raise the cookie to the client.
+    """Return user ID taking it from the cookie of the request.
+       Includes control mechanism for the guest users, inserting in
+       the database table when need be, raising the cookie back to the
+       client.
+
+       User ID is set to 0 when client refuses cookie or we are in the
+       read-only site operation mode.
+
+       User ID is set to -1 when we are in the permission denied site
+       operation mode.
 
        getUid(req) -> userId
     """
