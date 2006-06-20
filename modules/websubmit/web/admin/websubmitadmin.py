@@ -19,7 +19,7 @@ def index(req, ln=cdslang):
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (body, errors, warnings) = perform_request_list_doctypes()
         return page(title       = "Available WebSubmit Document Types",
@@ -43,7 +43,7 @@ def doctypelist(req, ln=cdslang):
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (body, errors, warnings) = perform_request_list_doctypes()
         return page(title       = "Available WebSubmit Document Types",
@@ -68,7 +68,7 @@ def jschecklist(req, ln=cdslang):
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (body, errors, warnings) = perform_request_list_jschecks()
         return page(title       = "Available WebSubmit Checking Functions",
@@ -93,7 +93,7 @@ def actionlist(req, ln=cdslang):
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (body, errors, warnings) = perform_request_list_actions()
         return page(title       = "Available WebSubmit Actions",
@@ -118,7 +118,7 @@ def functionlist(req, ln=cdslang):
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (body, errors, warnings) = perform_request_list_functions()
         return page(title       = "Available WebSubmit Functions",
@@ -142,7 +142,7 @@ def elementlist(req, ln=cdslang):
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (body, errors, warnings) = perform_request_list_elements()
         return page(title       = "Available WebSubmit Elements",
@@ -175,7 +175,7 @@ def actionadd(req, actid="", actname="", working_dir="", status_text="", actcomm
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
         (title, body, errors, warnings) = perform_request_add_action(actid, actname, working_dir, status_text, actcommit)
@@ -206,7 +206,7 @@ def actionedit(req, actid, actname="", working_dir="", status_text="", actcommit
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
         (title, body, errors, warnings) = perform_request_edit_action(actid, actname, working_dir, status_text, actcommit)
@@ -239,7 +239,7 @@ def jscheckadd(req, chname="", chdesc="", chcommit="", ln=cdslang):
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
         (title, body, errors, warnings) = perform_request_add_jscheck(chname, chdesc, chcommit)
@@ -270,7 +270,7 @@ def jscheckedit(req, chname, chdesc="", chcommit="", ln=cdslang):
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
         (title, body, errors, warnings) = perform_request_edit_jscheck(chname, chdesc, chcommit)
@@ -312,7 +312,7 @@ def elementadd(req, elname="", elmarccode="", eltype="", elsize="", elrows="", e
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
         (title, body, errors, warnings) = perform_request_add_element(elname, elmarccode, eltype, \
@@ -358,7 +358,7 @@ def elementedit(req, elname, elmarccode="", eltype="", elsize="", elrows="", elc
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
         (title, body, errors, warnings) = perform_request_edit_element(elname, elmarccode, eltype, \
@@ -385,7 +385,7 @@ def functionadd(req, funcname="", funcdescr="", funcaddcommit="", ln=cdslang):
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
         (title, body, errors, warnings) = perform_request_add_function(funcname=funcname,
@@ -414,7 +414,7 @@ def functionedit(req, funcname="", funcdescr="", funceditaddparam="", funceditad
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
         (title, body, errors, warnings) = perform_request_edit_function(funcname=funcname,
@@ -452,7 +452,7 @@ def functionusage(req, funcname, ln=cdslang):
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (body, errors, warnings) = perform_request_function_usage(funcname)
         return page(title       = "WebSubmit Function Usage",
@@ -480,7 +480,7 @@ def doctyperemove(req, doctype="", doctypedelete="", doctypedeleteconfirm="", ln
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (title, body, errors, warnings) = perform_request_remove_doctype(doctype=doctype,
                                                                          doctypedelete=doctypedelete,
@@ -505,7 +505,7 @@ def doctypeadd(req, doctype="", doctypename="", doctypedescr="", clonefrom="", d
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (title, body, errors, warnings) = perform_request_add_doctype(doctype=doctype,
                                                                       doctypename=doctypename,
@@ -549,7 +549,7 @@ def doctypeconfiguresubmissionpageelements(req,
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (title, body, errors, warnings) = perform_request_configure_doctype_submissionpage_elements(doctype=doctype,
                                                                                                     action=action,
@@ -590,7 +590,7 @@ def doctypeconfiguresubmissionpagespreview(req,
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (title, body, errors, warnings) = perform_request_configure_doctype_submissionpage_preview(doctype=doctype,
                                                                                                    action=action,
@@ -627,7 +627,7 @@ def doctypeconfiguresubmissionpages(req,
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (title, body, errors, warnings) = perform_request_configure_doctype_submissionpages(doctype=doctype,
                                                                                             action=action,
@@ -669,32 +669,36 @@ def doctypeconfiguresubmissionfunctions(req,
                                         deletefunctionname="",
                                         deletefunctionstep="",
                                         deletefunctionscore="",
+                                        configuresubmissionaddfunction="",
+                                        configuresubmissionaddfunctioncommit="",
                                         ln=cdslang):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
-        (title, body, errors, warnings) = perform_request_configure_doctype_submissionfunctions(doctype=doctype,
-                                                                                                action=action,
-                                                                                                moveupfunctionname=moveupfunctionname,
-                                                                                                moveupfunctionstep=moveupfunctionstep,
-                                                                                                moveupfunctionscore=moveupfunctionscore,
-                                                                                                movedownfunctionname=movedownfunctionname,
-                                                                                                movedownfunctionstep=movedownfunctionstep,
-                                                                                                movedownfunctionscore=movedownfunctionscore,
-                                                                                                movefromfunctionname=movefromfunctionname,
-                                                                                                movefromfunctionstep=movefromfunctionstep,
-                                                                                                movefromfunctionscore=movefromfunctionscore,
-                                                                                                movetofunctionname=movetofunctionname,
-                                                                                                movetofunctionstep=movetofunctionstep,
-                                                                                                movetofunctionscore=movetofunctionscore,
-                                                                                                deletefunctionname=deletefunctionname,
-                                                                                                deletefunctionstep=deletefunctionstep,
-                                                                                                deletefunctionscore=deletefunctionscore
-                                                                                               )
+        (title, body, errors, warnings) = \
+                perform_request_configure_doctype_submissionfunctions(doctype=doctype,
+                                                                      action=action,
+                                                                      moveupfunctionname=moveupfunctionname,
+                                                                      moveupfunctionstep=moveupfunctionstep,
+                                                                      moveupfunctionscore=moveupfunctionscore,
+                                                                      movedownfunctionname=movedownfunctionname,
+                                                                      movedownfunctionstep=movedownfunctionstep,
+                                                                      movedownfunctionscore=movedownfunctionscore,
+                                                                      movefromfunctionname=movefromfunctionname,
+                                                                      movefromfunctionstep=movefromfunctionstep,
+                                                                      movefromfunctionscore=movefromfunctionscore,
+                                                                      movetofunctionname=movetofunctionname,
+                                                                      movetofunctionstep=movetofunctionstep,
+                                                                      movetofunctionscore=movetofunctionscore,
+                                                                      deletefunctionname=deletefunctionname,
+                                                                      deletefunctionstep=deletefunctionstep,
+                                                                      deletefunctionscore=deletefunctionscore,
+                                                                      configuresubmissionaddfunction=configuresubmissionaddfunction,
+                                                                      configuresubmissionaddfunctioncommit=configuresubmissionaddfunctioncommit)
 
         return page(title       = title,
                     body        = body,
@@ -747,7 +751,7 @@ def doctypeconfigure(req,
     uid = getUid(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
-    if auth_code:
+    if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (title, body, errors, warnings) = perform_request_configure_doctype(doctype=doctype,
                                                                             doctypename=doctypename,
