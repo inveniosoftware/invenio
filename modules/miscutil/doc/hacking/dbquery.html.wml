@@ -24,65 +24,90 @@
 
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
-<p>
-DBQuery handles connection to database and queries.
-</p>
-<h2>Contents</h2>
-<ol>
-<li><a href="#overview">Overview</a></li>
-<li><a href="#usage">Usage</a></li>
-<li><a href="#notes">Notes</a></li>
-</ol>
+<p>dbquery module handles automatically connection (and reconnection)
+to the database and provides the <code>run_sql()</code> function to
+perform SQL queries.  It also exports <code>escape_string()</code> and
+DB exceptions for the client code to use (see below).
 
-<h2>1. <a name="overview">Overview</a></h2>
+<h3><code>run_sql()</code> API</h3>
 
-<p>DBQuery provides a method, <code>run&#95;sql</code> which handles SQL requests. It establishes
-a connection if necessary, sends requests and returns tuples.</p>
+<p><code>run_sql()</code> signature:
 
-
-<h2>2. <a name="usage">Usage</a></h2>
-
-<p>As DBQuery automatically handles connection establishment, usage of a single
-function is necessary:</p>
+<blockquote>
 <pre>
-    run&#95;sql(sql, param=None, n=0, with&#95;desc=0)
-        Run SQL on the server and returns result.
+def run_sql(sql, param=None, n=0, with_desc=0):
+    """Run SQL on the server with PARAM and return result.
+
         @param param: tuple of string params to insert in the query
                       (see notes below)
         @param n: number of tuples in result (0 for unbounded)
-        @param with&#95;desc: if true, will return a
+        @param with_desc: if true, will return a
                           DB API 7-tuple describing columns in query
         @return: if SELECT, SHOW, DESCRIBE statements: tuples of data, followed
                                                        by description if parameter
                                                        provided
                  if INSERT: last row id.
                  else: SQL result as provided by database
+
+       When the site is closed for maintenance (as governed by the
+       config variable CFG_ACCESS_CONTROL_LEVEL_SITE), do not attempt
+       to run any SQL queries but return empty list immediately.
+       Useful to be able to have the website up while MySQL database
+       is down for maintenance, hot copies, table repairs, etc.
+
+       In case of problems, exceptions are returned according to the
+       Python DB API 2.0.  The client code can import them from this
+       file and catch them.
+    """
 </pre>
+</blockquote>
 
-<h2>3. <a name="notes">Notes</a></h2>
+<p><code>run_sql()</code> normally escapes its parameters if you
+pass them in a tuple.  Usually the params must be of type string:
 
-<h3>3.1 Params</h3>
-As said before, params must be of type string. Trying to pass non character data
-may lead to an error. Developers should consider converting to string, or render
-string before sending, giving no param:
+<blockquote>
 <pre>
-    initial&#95;params=(1234,)
-    query = "SELECT id FROM user where id>%s"
-    params = (str(initial&#95;params[0]),)
-    run&#95;sql(query, params)
+from invenio.dbquery import run_sql
+[...]
+res = run_sql("SELECT id FROM collection WHERE name=%s", (c,), 1)
+if res:
+    colID = res[0][0]
 </pre>
-    or
-<pre>
-    query = "SELECT id FROM user where id>%d" % 1234
-    run&#95;sql(query)
-</pre>
-<p>When using this last technique, be careful with SQL injection problem. One should
-use the <code>MySQLdb.escape&#95;string()</code> method.
+</blockquote>
 
-<h3>3.2 Dates</h3>
-<p>Switching from MySQLdb 0.9 to MySQLdb 1.2, while using Python 2.2 or 2.3
-led to discovery of incompatibilities</p>
-<p>If a date field is in the received tuple, its format will be:</p>
+If you want to escape the parameters yourself in the client code, you
+should import and make use of the function <code>escape_string()</code> function:
+
+<blockquote>
+<pre>
+from invenio.dbquery import run_sql, escape_string
+[...]
+res = run_sql("SELECT id FROM collection WHERE name='%s'" % escape_string(c), None, 1)
+if res:
+    colID = res[0][0]
+</pre>
+</blockquote>
+
+<p><code>run_sql()</code> raises Python DB API 2.0 exceptions that
+the client code should catch and handle.  An example:
+
+<blockquote>
+<pre>
+from invenio.dbquery import run_sql, OperationalError
+[...]
+query = "select citation_data from rnkCITATIONDATA"
+try:
+    compressed_citation_dic = run_sql(query)
+except OperationalError:
+    compressed_citation_dic = []
+</pre>
+</blockquote>
+
+<p>For the list of all exceptions and the conditions when they are
+raised, see <a href="http://www.python.org/dev/peps/pep-0249/">PEP 249</a>.
+
+<h3>Note for handling date types</h3>
+<p>There is an incompatibility in handling date types between MySQLdb 0.9 and MySQLdb 1.2 (while using Python 2.2 or 2.3).  If a date field is in the received tuple, its format will be:</p>
 <ul>
 <li>string with MySQLdb 0.9</li>
 <li>datetime with MySQLdb 1.2</li>
@@ -93,4 +118,4 @@ solution is to force MySQL to convert date to a textual format:</p>
 <pre>
     SELECT DATE&#95;FORMAT(date&#95;field,'%%Y-%%m-%%d %%H:%%i:%%s') FROM table
 </pre>
-<p>This conversion will return a datetext format as described in <a href="./dateutils.html">dateutils library</a><code>(YEAR-MONTH-DAY HOUR:MINUTE:SECOND)</code></p>
+<p>This conversion will return a datetext format as described in <a href="./dateutils.html">dateutils library</a><code>(YEAR-MONTH-DAY HOUR:MINUTE:SECOND)</code>.</p>

@@ -69,6 +69,17 @@ def _db_login(relogin = 0):
 def run_sql(sql, param=None, n=0, with_desc=0):
     """Run SQL on the server with PARAM and return result.
 
+        @param param: tuple of string params to insert in the query
+                      (see notes below)
+        @param n: number of tuples in result (0 for unbounded)
+        @param with_desc: if true, will return a
+                          DB API 7-tuple describing columns in query
+        @return: if SELECT, SHOW, DESCRIBE statements: tuples of data, followed
+                                                       by description if parameter
+                                                       provided
+                 if INSERT: last row id.
+                 else: SQL result as provided by database
+
        When the site is closed for maintenance (as governed by the
        config variable CFG_ACCESS_CONTROL_LEVEL_SITE), do not attempt
        to run any SQL queries but return empty list immediately.
