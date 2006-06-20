@@ -39,7 +39,7 @@ import smtplib
 import MySQLdb
 
 from invenio import session, websession
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, OperationalError
 from invenio.websession import pSession, pSessionMapping
 from invenio.session import SessionError
 from invenio.config import *
@@ -57,27 +57,54 @@ def createGuestUser():
        createGuestUser() -> GuestUserID
     """
     if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0:
-        return run_sql("insert into user (email, note) values ('', '1')")
+        try:
+            return run_sql("insert into user (email, note) values ('', '1')")
+        except OperationalError:
+            return None
+            
     elif CFG_ACCESS_CONTROL_LEVEL_GUESTS >= 1:
-        return run_sql("insert into user (email, note) values ('', '0')")
+        try:
+            return run_sql("insert into user (email, note) values ('', '0')")
+        except OperationalError:
+            return None
 
-def page_not_authorized(req, referer='', uid='', text='', navtrail=''):
+def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=cdslang):
     """Show error message when account is not activated"""
+
     from invenio.webpage import page
+
+    _ = gettext_set_language(ln)
 
     if not CFG_ACCESS_CONTROL_LEVEL_SITE:
         title = cfg_webaccess_msgs[5]
-        if not uid: uid = getUid(req)
-        res = run_sql("SELECT email FROM user WHERE id=%s" % uid)
-        if res and res[0][0]:
-            if text: body = text
-            else: body = "%s %s" % (cfg_webaccess_warning_msgs[9] % res[0][0], ("%s %s" % (cfg_webaccess_msgs[0] % referer, cfg_webaccess_msgs[1])))
-        else:
-            if text: body = text
-            else: body = cfg_webaccess_msgs[3]
+        if not uid:
+            uid = getUid(req)
+        try:
+            res = run_sql("SELECT email FROM user WHERE id=%s" % uid)
+
+            if res and res[0][0]:
+                if text:
+                    body = text
+                else:
+                    body = "%s %s" % (cfg_webaccess_warning_msgs[9] % res[0][0],
+                                      ("%s %s" % (cfg_webaccess_msgs[0] % referer, cfg_webaccess_msgs[1])))
+            else:
+                if text:
+                    body = text
+                else:
+                    if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 1:
+                        body = cfg_webaccess_msgs[3]
+                    else:
+                        body = cfg_webaccess_warning_msgs[4] + cfg_webaccess_msgs[2]
+
+        except OperationalError, e:
+            body = _("Database problem: %s") % str(e)
+
+
     elif CFG_ACCESS_CONTROL_LEVEL_SITE == 1:
         title = cfg_webaccess_msgs[8]
         body = "%s %s" % (cfg_webaccess_msgs[7], cfg_webaccess_msgs[2])
+
     elif CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
         title = cfg_webaccess_msgs[6]
         body = "%s %s" % (cfg_webaccess_msgs[4], cfg_webaccess_msgs[2])
@@ -174,7 +201,7 @@ def isGuestUser(uid):
         if res:
             if res[0][0]:
                 out = 0
-    except:
+    except OperationalError:
         pass
     return out
 
@@ -244,7 +271,7 @@ def checkemail(email):
     return 1
 
 def getDataUid(req,uid):
-    """It takes the email and password from a given userId, from the MySQL database, if don't exist it just returns
+    """It takes the email and password from a given userId, from the database, if don't exist it just returns
        guest values for email and password
 
        getDataUid(req,uid) -> [email,password]
@@ -268,7 +295,7 @@ def getDataUid(req,uid):
 
 
 def registerUser(req,user,passw):
-    """It registers the user, inserting into the user table of MySQL database, the email and the pasword
+    """It registers the user, inserting into the user table of database, the email and the pasword
 	of the user. It returns 1 if the insertion is done, 0 if there is any failure with the email
 	and -1 if the user is already on the data base
 
@@ -477,15 +504,17 @@ def get_email(uid):
 def create_userinfobox_body(req, uid, language="en"):
     """Create user info box body for user UID in language LANGUAGE."""
 
-    return tmpl.tmpl_create_userinfobox(
-             ln = language,
-             url_referrer = req.unparsed_uri,
-             guest = isGuestUser(uid),
-             email = get_email(uid),
-             submitter = isUserSubmitter(uid),
-             referee = isUserReferee(uid),
-             admin = isUserAdmin(uid),
-           )
+    try:
+        return tmpl.tmpl_create_userinfobox(ln = language,
+                                            url_referrer = req.unparsed_uri,
+                                            guest = isGuestUser(uid),
+                                            email = get_email(uid),
+                                            submitter = isUserSubmitter(uid),
+                                            referee = isUserReferee(uid),
+                                            admin = isUserAdmin(uid),
+                                            )
+    except OperationalError:
+        return ""
 
 def list_registered_users():
     """List all registered users."""
