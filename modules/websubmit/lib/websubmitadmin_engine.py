@@ -787,13 +787,12 @@ def perform_request_edit_function(funcname, funcdescr="", funceditaddparam="", f
 
 def perform_request_function_usage(funcname):
     """Display a page containing the usage details of a given function.
-       @param function: the function name
+       @param funcname: the function name
        @return: page body
     """
     errors = []
     warnings = []
-    body = ""
-    func_usage = get_doctype_docnam_actid_actnam_fstep_fscore_function(funcname)
+    func_usage = get_function_usage_details(function=funcname)
     func_usage = stringify_listvars(func_usage)
     body = websubmitadmin_templates.tmpl_display_function_usage(funcname, func_usage)
     return (body, errors, warnings)
@@ -1727,20 +1726,41 @@ def _create_configure_doctype_submission_functions_form(doctype,
                                                         movefromfunctionname="",
                                                         movefromfunctionstep="",
                                                         movefromfunctionscore="",
-                                                        user_msg=""
-                                                       ):
+                                                        user_msg=""):
     title = """Functions of the "%s" Submission of the "%s" Document Type:""" % (action, doctype)
     submission_functions = get_functionname_step_score_allfunctions_doctypesubmission(doctype=doctype, action=action)
-    all_websubmit_functions = get_funcname_allfunctions()
     body = websubmitadmin_templates.tmpl_configuredoctype_display_submissionfunctions(doctype=doctype,
                                                                                       action=action,
                                                                                       movefromfunctionname=movefromfunctionname,
                                                                                       movefromfunctionstep=movefromfunctionstep,
                                                                                       movefromfunctionscore=movefromfunctionscore,
                                                                                       submissionfunctions=submission_functions,
-                                                                                      allWSfunctions=all_websubmit_functions,
-                                                                                      user_msg=user_msg
-                                                                                     )
+                                                                                      user_msg=user_msg)
+    return (title, body)
+
+def _create_configure_doctype_submission_functions_add_function_form(doctype, action, addfunctionname="",
+                                                                     addfunctionstep="", addfunctionscore="", user_msg=""):
+    """Create a form that allows a user to add a function a submission.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param addfunctionname: (string) the name of the function to be added to the submission (passed in case of page refresh)
+       @param addfunctionstep: (integer) the step of the submission into which the function is to be added (passed in case of
+        page refresh)
+       @param addfunctionscore: (integer) the score at at which the function is to be added (passed in case of page refresh)
+       @param user_msg: (string or list of strings) any message(s) to be displayed to the user
+       @return: (tuple) containing 2 strings - (page-title, HTML page-body)
+    """
+    title = """Add a function to the [%s] submission of the [%s] document type""" % (action, doctype)
+    submission_functions = get_functionname_step_score_allfunctions_doctypesubmission(doctype=doctype, action=action)
+    all_websubmit_functions = get_names_of_all_functions()
+    body = websubmitadmin_templates.tmpl_configuredoctype_add_submissionfunction(doctype=doctype,
+                                                                                 action=action,
+                                                                                 cursubmissionfunctions=submission_functions,
+                                                                                 allWSfunctions=all_websubmit_functions,
+                                                                                 addfunctionname=addfunctionname,
+                                                                                 addfunctionstep=addfunctionstep,
+                                                                                 addfunctionscore=addfunctionscore,
+                                                                                 user_msg=user_msg)
     return (title, body)
 
 
@@ -1760,8 +1780,9 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
                                                           movetofunctionscore="",
                                                           deletefunctionname="",
                                                           deletefunctionstep="",
-                                                          deletefunctionscore=""
-                                                         ):
+                                                          deletefunctionscore="",
+                                                          configuresubmissionaddfunction="",
+                                                          configuresubmissionaddfunctioncommit=""):
 
     errors = []
     warnings = []
@@ -1877,6 +1898,10 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
         ## process deletion of function from the given position
         (title, body) = _delete_submission_function(doctype=doctype, action=action, deletefunctionname=deletefunctionname,
                                                     deletefunctionstep=deletefunctionstep, deletefunctionscore=deletefunctionscore)
+    elif configuresubmissionaddfunction != "":
+        ## display a form that allows the addition of a new WebSubmit function
+        (title, body) = _create_configure_doctype_submission_functions_add_function_form(doctype=doctype,
+                                                                                         action=action)
     else:
         ## default - display functions for this submission
         (title, body) = _create_configure_doctype_submission_functions_form(doctype=doctype,
@@ -1886,7 +1911,6 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
                                                                             movefromfunctionscore=movefromfunctionscore
                                                                            )
     return (title, body, errors, warnings)
-
 
 def _delete_submission_function(doctype, action, deletefunctionname, deletefunctionstep, deletefunctionscore):
     """Delete a submission function from a given submission. Re-order all functions below it (within the same step)
@@ -1899,27 +1923,44 @@ def _delete_submission_function(doctype, action, deletefunctionname, deletefunct
        @return: tuple containing 2 strings: (page-title, page-body)
     """
     user_msg = []
+    ## first, delete the function:
     try:
-        ## get the step of the function before that which we are about to delete:
-        pass
-        ## delete the function:
-        delete_function_at_step_and_score_from_submission(doctype, action, function, step, score)
-        ## now reorder all functions below it (in the same step) to fill the gap left by this function:
-##         update_score_of_allfunctions_from_score_within_step_in_submission_reduce_by_val(doctype=doctype, action=action,
-##                                                                                         step=deletefunctionstep,
-##                                                                                         fromscore=deletefunctionscore,
-##                                                                                         val=)
-    except InvenioWebSubmitAdminDeleteFailed, e:
-        ## unable to delete function!
+        delete_function_at_step_and_score_from_submission(doctype=doctype, action=action,
+                                                          function=deletefunctionname, step=deletefunctionstep,
+                                                          score=deletefunctionscore)
+    except InvenioWebSubmitAdminWarningDeleteFailed, e:
+        ## unable to delete function - error message and return
         user_msg.append("""Unable to delete function [%s] at step [%s], score [%s] from submission [%s]""" \
                         % (deletefunctionname, deletefunctionstep, deletefunctionscore, "%s%s" % (action, doctype)))
+        ## TODO : LOG ERROR
+        (title, body) = _create_configure_doctype_submission_functions_form(doctype=doctype, action=action, user_msg=user_msg)
+        return (title, body)
+    ## now, correct the scores of all functions in the step from which a function was just deleted:
+    try:
+        regulate_score_of_all_functions_in_step_to_ascending_multiples_of_10_for_submission(doctype=doctype,
+                                                                                            action=action,
+                                                                                            step=deletefunctionstep)
+    except InvenioWebSubmitAdminWarningDeleteFailed, e:
+        ## couldnt delete the functions before reordering them
+        user_msg.append("""Deleted function [%s] at step [%s], score [%s] from submission [%s], but could not re-order""" \
+                        """ scores of remaining functions within step [%s]""" \
+                        % (deleterfunctionname, deletefunctionstep, deletefunctionscore,
+                           "%s%s" % (action, doctype), deletefunctionstep))
+        ## TODO : LOG ERROR
+        (title, body) = _create_configure_doctype_submission_functions_form(doctype=doctype, action=action, user_msg=user_msg)
+        return (title, body)
+    ## update submission "last-modification" date:
+    update_modification_date_for_submission(doctype=doctype, action=action)
+    ## success message:
+    user_msg.append("""Successfully deleted function [%s] at step [%s], score [%s] from submission [%s]""" \
+                    % (deletefunctionname, deletefunctionstep, deletefunctionscore, "%s%s" % (action, doctype)))
+    ## TODO : LOG function Deletion
     (title, body) = _create_configure_doctype_submission_functions_form(doctype=doctype, action=action, user_msg=user_msg)
     return (title, body)
 
 
 
 
-## NICK
 
 def perform_request_configure_doctype_submissionpage_preview(doctype, action, pagenum):
     """Display a preview of a Submission Page and its fields.
