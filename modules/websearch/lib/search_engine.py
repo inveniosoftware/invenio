@@ -2002,18 +2002,24 @@ def get_fieldvalues_alephseq_like(recID, tags_in):
         ## case B: print our "text MARC" format; works safely all the time
         # find out which tags to output:
         dict_of_tags_out = {}
-        for tag in tags_in:
-            if len(tag) == 0:
-                for i in range(0,10):
-                    for j in range(0,10):
-                        dict_of_tags_out["%d%d%%" % (i, j)] = 1
-            elif len(tag) == 1:
+
+        if not tags_in:
+            for i in range(0,10):
                 for j in range(0,10):
-                    dict_of_tags_out["%s%d%%" % (tag, j)] = 1
-            elif len(tag) < 5:
-                dict_of_tags_out["%s%%" % tag] = 1
-            elif tag >= 6:
-                dict_of_tags_out[tag[0:5]] = 1
+                    dict_of_tags_out["%d%d%%" % (i, j)] = 1
+        else:
+            for tag in tags_in:
+                if len(tag) == 0:
+                    for i in range(0,10):
+                        for j in range(0,10):
+                            dict_of_tags_out["%d%d%%" % (i, j)] = 1
+                elif len(tag) == 1:
+                    for j in range(0,10):
+                        dict_of_tags_out["%s%d%%" % (tag, j)] = 1
+                elif len(tag) < 5:
+                    dict_of_tags_out["%s%%" % tag] = 1
+                elif tag >= 6:
+                    dict_of_tags_out[tag[0:5]] = 1
         tags_out = dict_of_tags_out.keys()
         tags_out.sort()
         # search all bibXXx tables as needed:
