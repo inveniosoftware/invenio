@@ -200,20 +200,64 @@ def get_distinct_paramname_all_websubmit_function_parameters():
     return all_params_list
 
 def regulate_score_of_all_functions_in_step_to_ascending_multiples_of_10_for_submission(doctype, action, step):
-    q = """SELECT function, score, step FROM sbmFUNCTIONS WHERE doctype=%s AND action=%s AND step=%s ORDER BY step ASC"""
-    functnres = run_sql(q, (doctype, action, step))
+    """Within a step of a submission, regulate the scores of all functions to multiples of 10.  For example, for
+       the following:
+          Submission   Func           Step     Score
+           SBITEST      Print           2        10
+           SBITEST      Run             2        11
+           SBITEST      Alert           2        20
+           SBITEST      End             2        50
+       ...regulate the scores like this:
+          Submission   Func           Step     Score
+           SBITEST      Print           2        10
+           SBITEST      Run             2        20
+           SBITEST      Alert           2        30
+           SBITEST      End             2        40
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param step: (integer) the number of the step in which functions scores are to be regulated
+       @return: None
+       @Exceptions raised:
+          InvenioWebSubmitAdminWarningDeleteFailed - in the case that it wasn't possible to delete functions
+    """
+    functnres = get_name_step_score_of_all_functions_in_step_of_submission(doctype=doctype, action=action, step=step)
     i = 1
-    for functn in functnres:
-        functn_name  = functn[0]
-        functn_score = functn[1]
-        functn_step  = functn[2]
-        if functn_score != i*10:
-            ## the score of this function is not a good multiple of 10. delete the function and reinsert it with a regulated score
-            NICK
+    score_order_broken = 0
 
-zoram
-def get_number_of_functions_in_submission_(doctype, action, function, step, score):
-def get_number_functions_doctypesubmission_functionname_step_score(doctype, action, function, step, score):
+    for functn in functnres:
+        cur_functn_score = int(functn[2])
+        if cur_functn_score != i * 10:
+            ## this score is not a correct multiple of 10 for its place in the order
+            score_order_broken = 1
+        i += 1
+
+    if score_order_broken == 1:
+        ## the function scores were not good.
+        ## delete the functions within this step
+        try:
+            delete_all_functions_in_step_of_submission(doctype=doctype, action=action, step=step)
+        except InvenioWebSubmitAdminWarningDeleteFailed, e:
+            ## unable to delete some or all functions
+            ## pass the exception back up to the caller
+            raise e
+
+        ## re-insert them with the correct scores
+        i = 10
+        for functn in functnres:
+            insert_functn_name = functn[0]
+            try:
+                insert_function_into_submission_at_step_and_score(doctype=doctype, action=action,
+                                                                  function=insert_functn_name,
+                                                                  step=step, score=i)
+            except InvenioWebSubmitAdminWarningForeignKeyViolation, e:
+                ## tried to insert a function that doesn't exist in WebSubmit DB
+                ## TODO : LOG ERROR
+                ## continue onto next loop iteration - don't increment value of I
+                continue
+            i += 10
+    return
+
+def get_number_of_functions_with_functionname_in_submission_at_step_and_score(doctype, action, function, step, score):
     """Get the number or rows for a particular function at a given step and score of a doctype submission"""
     q = """SELECT COUNT(doctype) FROM sbmFUNCTIONS where doctype=%s AND action=%s AND function=%s AND step=%s AND score=%s"""
     return int(run_sql(q, (doctype, action, function, step, score))[0][0])
@@ -230,7 +274,7 @@ def update_score_allfunctions_in_step_doctypesubmission_add10(doctype, action, s
     return 0 ## Everything OK
 
 def update_step_score_doctypesubmission_function(doctype, action, function, oldstep, oldscore, newstep, newscore):
-    numrows_function = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype, action=action,
+    numrows_function = get_number_of_functions_with_functionname_in_submission_at_step_and_score(doctype=doctype, action=action,
                                                                                       function=function, step=oldstep, score=oldscore)
     if numrows_function == 1:
         q = """UPDATE sbmFUNCTIONS SET step=%s, score=%s WHERE doctype=%s AND action=%s AND function=%s AND step=%s AND score=%s"""
@@ -283,19 +327,23 @@ def move_position_submissionfunction_up(doctype, action, function, funccurstep, 
                                                                       newscore=score_function_above)
             if error_code == 0:
                 ## now insert the function that *was* above, into the position of the function that we have just moved
-                error_code = insert_function_doctypesubmission(doctype=doctype,
-                                                               action=action,
-                                                               function=name_function_above,
-                                                               step=funccurstep,
-                                                               score=funccurscore)
-                return error_code
+                try:
+                    insert_function_into_submission_at_step_and_score(doctype=doctype, action=action,
+                                                                      function=name_function_above,
+                                                                      step=funccurstep,
+                                                                      score=funccurscore)
+                    return 0
+                except InvenioWebSubmitAdminWarningForeignKeyViolation, e:
+                    return 1
             else:
                 ## could not update the function that was to be moved! Try to re-insert that which was deleted
-                error_code = insert_function_doctypesubmission(doctype=doctype,
-                                                               action=action,
-                                                               function=name_function_above,
-                                                               step=step_function_above,
-                                                               score=score_function_above)
+                try:
+                    insert_function_into_submission_at_step_and_score(doctype=doctype, action=action,
+                                                                      function=name_function_above,
+                                                                      step=step_function_above,
+                                                                      score=score_function_above)
+                except InvenioWebSubmitAdminWarningForeignKeyViolation, e:
+                    pass
                 return 1 ## Returning an ERROR code to signal that the move did not work
         else:
             ## Unable to delete the function above that which we want to move. Cannot move the function then.
@@ -316,20 +364,20 @@ def move_position_submissionfunction_fromposn_toposn(doctype, action, movefuncna
                                                     movefuncfromscore, movefunctoname, movefunctostep,
                                                     movefunctoscore):
     ## first check that there is a function "movefuncname"->"movefuncfromstep";"movefuncfromscore"
-    numrows_movefunc = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
-                                                                                      action=action,
-                                                                                      function=movefuncname,
-                                                                                      step=movefuncfromstep,
-                                                                                      score=movefuncfromscore)
+    numrows_movefunc = get_number_of_functions_with_functionname_in_submission_at_step_and_score(doctype=doctype,
+                                                                                                 action=action,
+                                                                                                 function=movefuncname,
+                                                                                                 step=movefuncfromstep,
+                                                                                                 score=movefuncfromscore)
     if numrows_movefunc < 1:
         ## the function to move does not exist!
         return 1
     ## now check that there is a function "movefunctoname"->"movefunctostep";"movefunctoscore"
-    numrows_movefunctoposn = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
-                                                                                      action=action,
-                                                                                      function=movefunctoname,
-                                                                                      step=movefunctostep,
-                                                                                      score=movefunctoscore)
+    numrows_movefunctoposn = get_number_of_functions_with_functionname_in_submission_at_step_and_score(doctype=doctype,
+                                                                                                       action=action,
+                                                                                                       function=movefunctoname,
+                                                                                                       step=movefunctostep,
+                                                                                                       score=movefunctoscore)
     if numrows_movefunctoposn < 1:
         ## the function in the position to move to does not exist!
         return 1
@@ -396,12 +444,14 @@ def move_position_submissionfunction_fromposn_toposn(doctype, action, movefuncna
                                                                                      action=action,
                                                                                      step=movefunctostep,
                                                                                      fromscore=movefunctoscore)
-                error_code = insert_function_doctypesubmission(doctype=doctype,
-                                                               action=action,
-                                                               function=movefuncname,
-                                                               step=movefunctostep,
-                                                               score=movefunctoscore)
-                return error_code
+                try:
+                    insert_function_into_submission_at_step_and_score(doctype=doctype, action=action,
+                                                                      function=movefuncname,
+                                                                      step=movefunctostep,
+                                                                      score=movefunctoscore)
+                except InvenioWebSubmitAdminWarningForeignKeyViolation, e:
+                    return 1
+                return 0
             else:
                 ## could not delete it - cannot continue:
                 return 1
@@ -437,71 +487,17 @@ def move_position_submissionfunction_fromposn_toposn(doctype, action, movefuncna
                                                                                                   action=action,
                                                                                                   step=movefunctostep,
                                                                                                   fromscore=movefunctoscore)
-                error_code = insert_function_doctypesubmission(doctype=doctype,
-                                                               action=action,
-                                                               function=movefuncname,
-                                                               step=movefunctostep,
-                                                               score=movefunctoscore)
-                return error_code
+                try:
+                    insert_function_into_submission_at_step_and_score(doctype=doctype, action=action,
+                                                                      function=movefuncname,
+                                                                      step=movefunctostep,
+                                                                      score=movefunctoscore)
+                except InvenioWebSubmitAdminWarningForeignKeyViolation, e:
+                    return 1
+                return 0
             else:
                 ## could not delete it - cannot continue:
                 return 1
-
-
-        
-
-
-## def move_position_submissionfunction_fromposn_toposn(doctype, action, movefuncname, movefuncfromstep,
-##                                                     movefuncfromscore, movefunctoname, movefunctostep,
-##                                                     movefunctoscore):
-##     ## first check that there is a function "movefuncname"->"movefuncfromstep";"movefuncfromscore"
-##     numrows_movefunc = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
-##                                                                                       action=action,
-##                                                                                       function=movefuncname,
-##                                                                                       step=movefuncfromstep,
-##                                                                                       score=movefuncfromscore)
-##     if numrows_movefunc < 1:
-##         ## the function to move does not exist!
-##         return 1
-##     ## now check that there is a function "movefunctoname"->"movefunctostep";"movefunctoscore"
-##     numrows_movefunctoposn = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
-##                                                                                       action=action,
-##                                                                                       function=movefunctoname,
-##                                                                                       step=movefunctostep,
-##                                                                                       score=movefunctoscore)
-##     if numrows_movefunctoposn < 1:
-##         ## the function in the position to move to does not exist!
-##         return 1
-
-##     ## now update all functions in the step into which the function is to be moved, with a score higher than
-##     ## or equal to the one into whose position the function is to be moved:
-##     update_score_allfunctions_in_step_from_score_doctypesubmission_add10(doctype=doctype,
-##                                                                          action=action,
-##                                                                          step=movefunctostep,
-##                                                                          fromscore=movefunctoscore)
-##     ## now check to see whether there is any function at the score of step "movefunctostep"/"movefunctoscore":
-##     numrows_functions_in_tostep_toscore = get_number_functions_doctypesubmission_step_score(doctype=doctype,
-##                                                                                             action=action,
-##                                                                                             step=movefunctostep,
-##                                                                                             score=movefunctoscore)
-##     if numrows_functions_in_tostep_toscore == 0:
-##         ## nothing there now - update the function to be moved
-##         error_code = update_step_score_doctypesubmission_function(doctype=doctype,
-##                                                                   action=action,
-##                                                                   function=movefuncname,
-##                                                                   oldstep=movefuncfromstep,
-##                                                                   oldscore=movefuncfromscore,
-##                                                                   newstep=movefunctostep,
-##                                                                   newscore=movefunctoscore)
-##         return error_code
-##     else:
-##         ## unable to move the functions below out of the way - cannot move the function
-##         return 1
-
-
-
-
-
 
 def move_position_submissionfunction_down(doctype, action, function, funccurstep, funccurscore):
     functions_below = get_functionname_step_score_allfunctions_afterreference_doctypesubmission(doctype=doctype,
@@ -568,19 +564,22 @@ def move_position_submissionfunction_down(doctype, action, function, funccurstep
                                                                       newscore=score_function_below)
             if error_code == 0:
                 ## now insert the function that *was* below, into the position of the function that has just been moved
-                error_code = insert_function_doctypesubmission(doctype=doctype,
-                                                               action=action,
-                                                               function=name_function_below,
-                                                               step=funccurstep,
-                                                               score=funccurscore)
-                return error_code
+                try:
+                    insert_function_into_submission_at_step_and_score(doctype=doctype, action=action,
+                                                                      function=name_function_below,
+                                                                      step=funccurstep, score=funccurscore)
+                except InvenioWebSubmitAdminWarningForeignKeyViolation, e:
+                    return 1
+                return 0
             else:
                 ## could not update the function that was to be moved! Try to re-insert that which was deleted
-                error_code = insert_function_doctypesubmission(doctype=doctype,
-                                                               action=action,
-                                                               function=name_function_below,
-                                                               step=step_function_below,
-                                                               score=score_function_below)
+                try:
+                    insert_function_into_submission_at_step_and_score(doctype=doctype, action=action,
+                                                                      function=name_function_below,
+                                                                      step=step_function_below,
+                                                                      score=score_function_below)
+                except InvenioWebSubmitAdminWarningForeignKeyViolation, e:
+                    pass
                 return 1 ## Returning an ERROR code to signal that the move did not work
         else:
             ## Unable to delete the function below that which we want to move. Cannot move the function then.
@@ -589,14 +588,14 @@ def move_position_submissionfunction_down(doctype, action, function, funccurstep
 
 
 
-def get_funcname_allfunctions():
-    """Get and return a tuple of tuples containing the "function name" (function) for each WebSubmit function
-       in the WebSubmit database.
-       @return: tuple of tuples: ((function,),(function,)[,...])
+def get_names_of_all_functions():
+    """Return a list of the names of all WebSubmit functions (as strings).
+       The function names will be sorted in ascending alphabetical order.
+       @return: a list of strings 
     """
     q = """SELECT function FROM sbmALLFUNCDESCR ORDER BY function ASC"""
-    return run_sql(q)
-    
+    res = run_sql(q)
+    return map(lambda x: str(x[0]), res)
 
 def get_funcname_funcdesc_allfunctions():
     """Get and return a tuple of tuples containing the "function name" (function) and function textual
@@ -606,10 +605,19 @@ def get_funcname_funcdesc_allfunctions():
     q = """SELECT function, description FROM sbmALLFUNCDESCR ORDER BY function ASC"""
     return run_sql(q)
 
-def get_doctype_docnam_actid_actnam_fstep_fscore_function(function):
-    """Get the details of a function's usage.
-       @param function: The name of the function whose WebSubmit usage is to be examined.
-       @return: tuple of tuples: (doctype, docname, action id, action name, function-step, function-score)
+def get_function_usage_details(function):
+    """Get the details of a function's usage in WebSubmit.
+        This means get the following usage details:
+         - doctype: the unique ID of the document type with which the usage is associated
+         - docname: the long-name of the document type
+         - action id: the unique ID of the action of the doctype, with which the usage is associated
+         - action name: the long name of this action
+         - function step: the step in which the instance of function usage occurs
+         - function score: the score (of the above-mentioned step) at which the function is called
+         
+       @param function: (string) the name of the function whose WebSubmit usage is to be examined.
+       @return: tuple of tuples whereby each tuple represents one instance of the function's usage:
+            (doctype, docname, action id, action name, function-step, function-score)
     """
     q = """SELECT fun.doctype, dt.ldocname, fun.action, actn.lactname, fun.step, fun.score """ +\
         """FROM sbmDOCTYPE AS dt LEFT JOIN sbmFUNCTIONS AS fun ON (fun.doctype=dt.sdocname) """ +\
@@ -618,17 +626,17 @@ def get_doctype_docnam_actid_actnam_fstep_fscore_function(function):
         """ORDER BY dt.sdocname ASC, fun.action ASC, fun.step ASC, fun.score ASC"""
     return run_sql(q, (function,))
 
-def get_number_functions_with_funcname(funcname):
-    """Return the number of Functions found for a given function name.
-       @param funcname: Function name (function) to query for
-       @return an integer count of the number of Functions in the WebSubmit database for this function name.
+def get_number_of_functions_with_funcname(funcname):
+    """Return the number of Functions found in the WebSubmit DB for a given function name.
+       @param funcname: (string) the name of the function
+       @return: an integer count of the number of Functions in the WebSubmit database for this function name.
     """
     q = """SELECT COUNT(function) FROM sbmALLFUNCDESCR where function=%s"""
     return int(run_sql(q, (funcname,))[0][0])
 
 def insert_function_details(function, fundescr):
     """"""
-    numrows_function = get_number_functions_with_funcname(function)
+    numrows_function = get_number_of_functions_with_funcname(function)
     if numrows_function == 0:
         ## Insert new function
         q = """INSERT INTO sbmALLFUNCDESCR (function, description) VALUES (%s, %s)"""
@@ -644,7 +652,7 @@ def update_function_description(funcname, funcdescr):
        @param funcdescr: the new, updated description of the function
        @return: error code (0 is OK, 1 is BAD insert)
     """
-    numrows_function = get_number_functions_with_funcname(funcname)
+    numrows_function = get_number_of_functions_with_funcname(funcname)
     if numrows_function == 1:
         ## perform update of description
         q = """UPDATE sbmALLFUNCDESCR SET description=%s WHERE function=%s"""
@@ -867,7 +875,18 @@ def get_number_functions_action_doctype(doctype, action):
        @return an integer count of the number of functions in the WebSubmit database for this doctype/action.
     """
     q = """SELECT COUNT(doctype) FROM sbmFUNCTIONS where doctype=%s AND action=%s"""
-    return int(run_sql(q, (doctype,action))[0][0])
+    return int(run_sql(q, (doctype, action))[0][0])
+
+def get_number_of_functions_in_step_of_submission(doctype, action, step):
+    """Return the number of FUNCTIONS within a step of a submission.
+       @param doctype: (string) unique ID of a doctype
+       @param action:  (string) unique ID of an action
+       @param step:   (integer) the number of the step in which the functions to be counted are situated
+       @return an integer count of the number of functions found within the step of the submission
+    """
+    q = """SELECT COUNT(doctype) FROM sbmFUNCTIONS where doctype=%s AND action=%s AND step=%s"""
+    return int(run_sql(q, (doctype, action, step))[0][0])
+
 
 def get_number_categories_doctype(doctype):
     """Return the number of CATEGORIES (used to distinguish between submissions) found for a given DOCUMENT TYPE.
@@ -1193,15 +1212,28 @@ def get_functionname_step_score_allfunctions_doctypesubmission(doctype, action):
     q = """SELECT function, step, score FROM sbmFUNCTIONS where doctype=%s AND action=%s ORDER BY step ASC, score ASC"""
     return run_sql(q, (doctype, action))
 
+def get_name_step_score_of_all_functions_in_step_of_submission(doctype, action, step):
+    """Return a list of the details of all functions within a given step of a submission.
+       The functions will be ordered in ascending order of score.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param step: (integer) the step in which the functions are located
+       @return: a tuple of tuples (function-name, step, score)
+    """
+    q = """SELECT function, step, score FROM sbmFUNCTIONS WHERE doctype=%s AND action=%s AND step=%s ORDER BY score ASC"""
+    res = run_sql(q, (doctype, action, step))
+    return res
+
 def delete_function_doctypesubmission_step_score(doctype, action, function, step, score):
     """Delete a given function at a particular step/score for a given doctype submission"""
     q = """DELETE FROM sbmFUNCTIONS WHERE doctype=%s AND action=%s AND function=%s AND step=%s AND score=%s"""
     run_sql(q, (doctype, action, function, step, score))
-    numrows_function_doctypesubmission_step_score = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
-                                                                                                                   action=action,
-                                                                                                                   function=function,
-                                                                                                                   step=step,
-                                                                                                                   score=score)
+    numrows_function_doctypesubmission_step_score = \
+                get_number_of_functions_with_functionname_in_submission_at_step_and_score(doctype=doctype,
+                                                                                          action=action,
+                                                                                          function=function,
+                                                                                          step=step,
+                                                                                          score=score)
     if numrows_function_doctypesubmission_step_score == 0:
         ## Everything OK - function deleted
         return 0
@@ -1210,8 +1242,9 @@ def delete_function_doctypesubmission_step_score(doctype, action, function, step
         ## make a last attempt to delete them:
         run_sql(q, (doctype, action, function, step, score))
         ## check once more to see if functions remain:
-        if get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype, action=action, function=function,
-                                                                          step=step, score=score):
+        if get_number_of_functions_with_functionname_in_submission_at_step_and_score(doctype=doctype, action=action,
+                                                                                     function=function, step=step,
+                                                                                     score=score):
             ## Everything OK - all functions for this doctype/action were deleted successfully this time
             return 0
         else:
@@ -1223,11 +1256,12 @@ def delete_the_function_at_step_and_score_from_a_submission(doctype, action, fun
     """Delete a given function at a particular step/score for a given submission"""
     q = """DELETE FROM sbmFUNCTIONS WHERE doctype=%s AND action=%s AND function=%s AND step=%s AND score=%s"""
     run_sql(q, (doctype, action, function, step, score))
-    numrows_deletedfunc = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
-                                                                                         action=action,
-                                                                                         function=function,
-                                                                                         step=step,
-                                                                                         score=score)
+    numrows_deletedfunc = \
+           get_number_of_functions_with_functionname_in_submission_at_step_and_score(doctype=doctype,
+                                                                                     action=action,
+                                                                                     function=function,
+                                                                                     step=step,
+                                                                                     score=score)
     if numrows_deletedfunc == 0:
         ## Everything OK - function deleted
         return
@@ -1236,11 +1270,12 @@ def delete_the_function_at_step_and_score_from_a_submission(doctype, action, fun
         ## make a last attempt to delete them:
         run_sql(q, (doctype, action, function, step, score))
         ## check once more to see if functions remain:
-        numrows_deletedfunc = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
-                                                                                             action=action,
-                                                                                             function=function,
-                                                                                             step=step,
-                                                                                             score=score)
+        numrows_deletedfunc = \
+                get_number_of_functions_with_functionname_in_submission_at_step_and_score(doctype=doctype,
+                                                                                          action=action,
+                                                                                          function=function,
+                                                                                          step=step,
+                                                                                          score=score)
         if numrows_deletedfunc == 0:
             ## Everything OK - all functions for this doctype/action were deleted successfully this time
             return
@@ -1248,9 +1283,8 @@ def delete_the_function_at_step_and_score_from_a_submission(doctype, action, fun
             ## still unable to recover - could not delete all functions for this doctype/action
             msg = """Failed to delete the function [%s] at score [%s] of step [%s], from submission [%s]"""\
                   % (function, score, step, "%s%s" % (action, doctype))
-            raise InvenioWebSubmitAdminDeleteFailed(msg)
+            raise InvenioWebSubmitAdminWarningDeleteFailed(msg)
 
-zoram
 
 def delete_function_at_step_and_score_from_submission(doctype, action, function, step, score):
     """Delete the function at a particular step/score from a submission.
@@ -1265,11 +1299,12 @@ def delete_function_at_step_and_score_from_submission(doctype, action, function,
     """
     q = """DELETE FROM sbmFUNCTIONS WHERE doctype=%s AND action=%s AND function=%s AND step=%s AND score=%s"""
     run_sql(q, (doctype, action, function, step, score))
-    numrows_function_at_stepscore = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
-                                                                                                   action=action,
-                                                                                                   function=function,
-                                                                                                   step=step,
-                                                                                                   score=score)
+    numrows_function_at_stepscore = \
+            get_number_of_functions_with_functionname_in_submission_at_step_and_score(doctype=doctype,
+                                                                                      action=action,
+                                                                                      function=function,
+                                                                                      step=step,
+                                                                                      score=score)
     if numrows_function_at_stepscore == 0:
         ## Everything OK - function deleted
         return
@@ -1278,11 +1313,12 @@ def delete_function_at_step_and_score_from_submission(doctype, action, function,
         ## make a last attempt to delete them:
         run_sql(q, (doctype, action, function, step, score))
         ## check once more to see if functions remain:
-        numrows_function_at_stepscore = get_number_functions_doctypesubmission_functionname_step_score(doctype=doctype,
-                                                                                                       action=action,
-                                                                                                       function=function,
-                                                                                                       step=step,
-                                                                                                       score=score)
+        numrows_function_at_stepscore = \
+           get_number_of_functions_with_functionname_in_submission_at_step_and_score(doctype=doctype,
+                                                                                     action=action,
+                                                                                     function=function,
+                                                                                     step=step,
+                                                                                     score=score)
         if numrows_function_at_stepscore == 0:
             ## Everything OK - all functions for this doctype/action were deleted successfully this time
             return
@@ -1291,6 +1327,38 @@ def delete_function_at_step_and_score_from_submission(doctype, action, function,
             msg = """Failed to delete function [%s] from step [%s] and score [%s] from submission [%s]""" \
                   % (function, step, score, "%s%s" % (action, doctype))
             raise InvenioWebSubmitAdminDeleteFailed(msg)
+
+def delete_all_functions_in_step_of_submission(doctype, action, step):
+    """Delete all functions from a given step of a submission.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param step: (integer) the number of the step in which the functions are to be deleted
+       @return: None
+       @Exceptions raised:
+           InvenioWebSubmitAdminWarningDeleteFailed - when unable to delete some or all of the functions
+    """
+    q = """DELETE FROM sbmFUNCTIONS WHERE doctype=%s AND action=%s AND step=%s"""
+    run_sql(q, (doctype, action, step))
+    numrows_functions_in_step = get_number_of_functions_in_step_of_submission(doctype=doctype,
+                                                                              action=action,
+                                                                              step=step)
+    if numrows_functions_in_step == 0:
+        ## all functions in step of submission deleted
+        return
+    else:
+        ## couldn't delete all of the functions - try again
+        run_sql(q, (doctype, action, step))
+        numrows_functions_in_step = get_number_of_functions_in_step_of_submission(doctype=doctype,
+                                                                                  action=action,
+                                                                                  step=step)
+        if numrows_functions_in_step == 0:
+            ## success this time
+            return
+        else:
+            msg = """Failed to delete all functions in step [%s] of submission [%s]""" % (step,
+                                                                                          "%s%s" % (action, doctype))
+            raise InvenioWebSubmitAdminWarningDeleteFailed(msg)
+
 
 def delete_all_functions_foraction_doctype(doctype, action):
     """Delete all FUNCTIONS for a given action, belonging to a given doctype.
@@ -1392,16 +1460,28 @@ def clone_categories_fromdoctype_todoctype(fromdoctype, todoctype):
         ## cannot delete "todoctype"s categories - return error code of 1 to signal this
         return 1
 
-def insert_function_doctypesubmission(doctype, action, function, step, score):
-    numrows_function = get_number_functions_with_funcname(funcname=function)
+def insert_function_into_submission_at_step_and_score(doctype, action, function, step, score):
+    """Insert a function into a submission, at the position dictated by step/score.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param function: (string) the unique name of a function
+       @param step: (integer) the step into which the function should be inserted
+       @param score: (integer) the score at which the function should be inserted
+       @return:
+    """
+    ## check that the function exists in WebSubmit:
+    numrows_function = get_number_of_functions_with_funcname(function)
     if numrows_function > 0:
         ## perform the insert
         q = """INSERT INTO sbmFUNCTIONS (doctype, action, function, step, score) VALUES(%s, %s, %s, %s, %s)"""
         run_sql(q, (doctype, action, function, step, score))
-        return 0
+        return
     else:
         ## function doesnt exist - cannot insert a row for it in a submission!
-        return 1
+        msg = """Failed to insert the function [%s] into submission [%s] at step [%s] and score [%s] - """\
+              """Could not find function [%s] in WebSubmit DB""" % (function, "%s%s" % (action, doctype),
+                                                                    step, score, function)
+        raise InvenioWebSubmitAdminWarningForeignKeyViolation(msg)
 
 def clone_functions_foraction_fromdoctype_todoctype(fromdoctype, todoctype, action):
     ## delete all functions that 
@@ -2074,6 +2154,11 @@ def delete_a_field_from_submissionpage_then_reorder_fields_below_to_fill_vacant_
         return delete_res
         
 def update_modification_date_for_submission(doctype, action):
+    """Update the "last-modification" date for a submission to the current date (today).
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @return: None
+    """
     q = """UPDATE sbmIMPLEMENT SET md=CURDATE() WHERE docname=%s AND actname=%s"""
     run_sql(q, (doctype, action))
     return
