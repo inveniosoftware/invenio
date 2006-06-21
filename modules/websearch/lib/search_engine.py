@@ -339,7 +339,8 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
     ## return search units:
     return opfts
 
-def page_start(req, of, cc, as, ln, uid, title_message=None):
+def page_start(req, of, cc, as, ln, uid, title_message=None,
+               description='', keywords=''):
     "Start page according to given output format."
 
     _ = gettext_set_language(ln)
@@ -367,10 +368,17 @@ def page_start(req, of, cc, as, ln, uid, title_message=None):
         # we are doing HTML output:
         req.content_type = "text/html"
         req.send_http_header()
+
+        if not description:
+            description = "%s %s." % (cc, _("Search Results"))
+            
+        if not keywords:
+            keywords = "CDS Invenio, WebSearch, %s" % cc
+            
         req.write(pageheaderonly(req=req, title=title_message,
                                  navtrail=create_navtrail_links(cc, as, ln),
-                                 description="%s %s." % (cc, _("Search Results")),
-                                 keywords="CDS Invenio, WebSearch, %s" % cc,
+                                 description=description,
+                                 keywords=keywords,
                                  uid=uid,
                                  language=ln))
         req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
@@ -3013,7 +3021,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
     ## 0 - start output
     if recid>0:
         ## 1 - detailed record display
-        page_start(req, of, cc, as, ln, uid, _("Detailed record") + " #%d" % recid)
+        title, description, keywords = \
+               websearch_templates.tmpl_record_page_header_content(req, recid, ln)
+        
+        page_start(req, of, cc, as, ln, uid, title, description, keywords)
         if of == "hb":
             of = "hd"
         if record_exists(recid):

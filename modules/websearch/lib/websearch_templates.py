@@ -25,7 +25,6 @@ import gettext
 import string
 import locale
 import sre
-from sets import ImmutableSet
 
 from invenio.config import *
 from invenio.dbquery import run_sql
@@ -155,7 +154,23 @@ class Template:
         
         return base + make_canonical_urlargd(parameters, self.search_results_default_urlargd)
         
+    def tmpl_record_page_header_content(self, req, recid, ln):
+        """ Provide extra information in the header of /record pages """
+        
+        _ = gettext_set_language(ln)
 
+        title = get_fieldvalues(recid, "245__a")
+        
+        if title:
+            title = _("Record #%d: %s") %(recid, title[0])
+        else:
+            title = _("Record #%d") % recid
+
+        keywords = '; '.join(get_fieldvalues(recid, "6531_a"))
+        description = '; '.join(get_fieldvalues(recid, "700__a"))
+        
+        return [cgi.escape(x, True) for x in (title, description, keywords)]
+                             
     def tmpl_navtrail_links(self, as, ln, dads):
         """
         Creates the navigation bar at top of each search page (*Home > Root collection > subcollection > ...*)
