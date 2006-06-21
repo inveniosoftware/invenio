@@ -759,6 +759,10 @@ def create_basket_navtrail(uid,
                         basket[1])
     return out
 
+def create_infobox(infos=[]):
+    """Create an infos box. infos param should be a list of strings. Return formatted infos"""
+    return webbasket_templates.tmpl_create_infobox(infos)
+
 def account_list_baskets(uid, ln=cdslang):
     """Display baskets informations on account page"""    
     _ = gettext_set_language(ln)

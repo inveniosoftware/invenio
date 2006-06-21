@@ -60,7 +60,7 @@ class Template:
       <div id="bskinfos">%s
       </div>""" % indent_text(baskets_infobox, 5)
         for basket in baskets:
-            out += indent_text(basket, 4)
+            out += basket
         out += """
     </div>
   </div>
@@ -486,7 +486,7 @@ class Template:
                 'records_label': _('records'),
                 'last_update_label': _("last update"),
                 'last_update': date_modification,
-                'comments_field': user_can_view_comments and indent_text(comments_field, 4) or '',
+                'comments_field': user_can_view_comments and comments_field or '',
                 'items': items_html,
                 'footer': footer}
         return out
@@ -722,9 +722,9 @@ class Template:
                 'action': action,
                 'button_label': _("Write a comment"),
                 'comments': comments}
-        if sharing_level == None:
+        if group_sharing_level == None:
             img = '<img src="%s/img/webbasket_user.png" alt="%s" />' % (weburl, _("Non shared basket"))
-        elif sharing_level == 0:
+        elif group_sharing_level == 0:
             img = '<img src="%s/img/webbasket_world.png" alt="%s" />' % (weburl, _("Shared basket"))
         else:
             img = '<img src="%s/img/webbasket_usergroup.png" alt="%s" />' % (weburl, _("Group shared basket"))
@@ -738,7 +738,7 @@ class Template:
                                          selected_category,
                                          selected_topic,
                                          selected_group_id,
-                                         sharing_level,
+                                         group_sharing_level,
                                          content,
                                          ln)
         out = """      
@@ -866,7 +866,7 @@ class Template:
     <p class="bsklabel">%(title_label)s:</p>
     <input type="text" name="title" size="80" />
     <p class="bsklabel">%(comment_label)s:</p>
-    <textarea name="text" rows="20" cols="80">%(cmt_body)s</textarea><br />
+<textarea name="text" rows="20" cols="80">%(cmt_body)s</textarea><br />
     <input type="submit" class="formbutton" value="%(button_label)s" />
   </form>
 </div>""" % {'warnings': warnings_box,
@@ -921,7 +921,7 @@ class Template:
 </table>"""
         out %= {'logo': img,
               'label': title, 'count': subtitle,
-              'basket_list': indent_text(body, 5)}
+              'basket_list': body}
         return out
 
     def tmpl_create_box(self, new_basket_name='', new_topic_name='',
@@ -983,12 +983,11 @@ class Template:
   </div>
 </form>""" % {'action': weburl + '/yourbaskets/create_basket',
               'ln': ln,
-              'create_box': indent_text(self.tmpl_create_box(new_basket_name=new_basket_name,
-                                                             new_topic_name=new_topic_name,
-                                                             topics=topics,
-                                                             selected_topic=create_in_topic,
-                                                             ln=ln),
-                                        2),
+              'create_box': self.tmpl_create_box(new_basket_name=new_basket_name,
+                                                 new_topic_name=new_topic_name,
+                                                 topics=topics,
+                                                 selected_topic=create_in_topic,
+                                                 ln=ln),
               'label': _("Create new basket")}
         return out
 
@@ -1029,9 +1028,7 @@ class Template:
   <td>%s</td>
 </tr>"""
                 personal_html %= (topic_name,
-                                  indent_text(self.__create_select_menu('bskids',
-                                                                        baskets),
-                                              2))
+                                  self.__create_select_menu('bskids', baskets))
             personal = self.__tmpl_basket_box(weburl + '/img/webbasket_user.png',
                                               _("Add to a personal basket"),
                                               _("%i baskets") % len(personal_baskets),
@@ -1052,10 +1049,7 @@ class Template:
   <td>%s</td>
 </tr>"""
                 groups_html %= (group_name,
-                                indent_text(self.__create_select_menu('bskids',
-                                                                      baskets),
-                                            2))
-
+                                self.__create_select_menu('bskids', baskets))
             group = self.__tmpl_basket_box(weburl + '/img/webbasket_usergroup.png',
                                            _("Add to a group shared basket"),
                                            _("%i baskets") % len(group_baskets),
@@ -1189,7 +1183,7 @@ class Template:
               'ln':ln,
               'yes_label': _("Yes"),
               'no_label': _("Cancel")}
-        return indent_text(out, 2)
+        return out
 
     def tmpl_edit(self, bskid, bsk_name, topic, topics, groups_rights, external_rights,
                   display_general=0, display_delete=0, ln=cdslang):
@@ -1447,6 +1441,18 @@ class Template:
             for (warning_code, warning_text) in warnings_parsed:
                 out += '<div class="important" style="padding: 10px;">%s</div>' % warning_text 
         return out
+    
+    def tmpl_create_infobox(self, infos = []):
+        """ returns html for general informations
+        @param infos: list of strings to display"""
+        out = ''
+        if len(infos):
+            out += '<div>'
+            for info in infos:
+                out += info + '<br />'
+            out += '</div>'
+        return out
+         
 
     def tmpl_back_link(self, link, ln=cdslang):
         """ returns HTML for a link whose label should be

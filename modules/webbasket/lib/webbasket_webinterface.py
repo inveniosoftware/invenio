@@ -197,8 +197,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                                            category=argd['category'],
                                                                            topic=argd['topic'],
                                                                            group_id=argd['group'],
-                                                                           infos=infos,
                                                                            ln=argd['ln'])
+        body = create_infobox(infos) + body                                                                   
         errors = errors_saving.extend(errors_displaying)
         navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
         navtrail %= (weburl, _("Your Account"))
@@ -255,7 +255,15 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         req         = req)
     
     def add(self, req, form):
-        """Add records to baskets."""
+        """Add records to baskets.
+        @param recid: list of records to add
+        @param bskids: list of baskets to add records to. if not provided, will return a
+                       page where user can select baskets
+        @param referer: URL of the referring page
+        @param new_basket_name: add record to new basket
+        @param new_topic_name: new basket goes into new topic
+        @param create_in_topic: # of topic to put basket into
+        @param ln: language"""
         argd = wash_urlargd(form, {'recid': (list, []),
                                    'bskids': (list, []),
                                    'referer': (str, ""),
