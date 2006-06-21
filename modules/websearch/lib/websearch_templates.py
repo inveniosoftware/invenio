@@ -32,7 +32,6 @@ from invenio.messages import gettext_set_language
 from invenio.search_engine_config import *
 from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, a_href
 
-
 def get_fieldvalues(recID, tag):
     """Return list of field values for field TAG inside record RECID.
        FIXME: should be imported commonly for search_engine too."""
@@ -166,8 +165,10 @@ class Template:
         else:
             title = _("Record #%d") % recid
 
-        keywords = '; '.join(get_fieldvalues(recid, "6531_a"))
-        description = '; '.join(get_fieldvalues(recid, "700__a"))
+        keywords = ', '.join(get_fieldvalues(recid, "6531_a"))
+        description = ' '.join(get_fieldvalues(recid, "520__a"))
+        description += "\n"
+        description += '; '.join(get_fieldvalues(recid, "100__a") + get_fieldvalues(recid, "700__a"))
         
         return [cgi.escape(x, True) for x in (title, description, keywords)]
                              
