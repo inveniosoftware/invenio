@@ -1070,20 +1070,23 @@ class Template:
             term = cgi.escape(term)
 
             if term == p: # print search word for orientation:
+                nearesttermsboxbody_class = "nearesttermsboxbodyselected"
                 if hits > 0:
                     term = a_href(term, href=self.build_search_url(argd),
                                   _class="nearesttermsselected")
             else:
+                nearesttermsboxbody_class = "nearesttermsboxbody"
                 term = a_href(term, href=self.build_search_url(argd),
                               _class="nearestterms")
 
             out += '''\
             <tr>
-              <td class="nearesttermsboxbodyselected" align="right">%(hits)s</td>
-              <td class="nearesttermsboxbodyselected" width="15">&nbsp;</td>
-              <td class="nearesttermsboxbodyselected" align="left">%(term)s</td>
+              <td class="%(nearesttermsboxbody_class)s" align="right">%(hits)s</td>
+              <td class="%(nearesttermsboxbody_class)s" width="15">&nbsp;</td>
+              <td class="%(nearesttermsboxbody_class)s" align="left">%(term)s</td>
             </tr>  
             ''' % {'hits': hitsinfo,
+                   'nearesttermsboxbody_class': nearesttermsboxbody_class,
                    'term': term}
 
         out += "</table>"
