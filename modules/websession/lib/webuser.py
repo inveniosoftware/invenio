@@ -515,13 +515,13 @@ def create_userinfobox_body(req, uid, language="en"):
                     and req.subprocess_env['HTTPS'] == 'on'
 
     if is_over_https:
-        url_referrer = sweburl + req.unparsed_uri
+        url_referer = sweburl + req.unparsed_uri
     else:
-        url_referrer = weburl + req.unparsed_uri
+        url_referer = weburl + req.unparsed_uri
 
     try:
         return tmpl.tmpl_create_userinfobox(ln=language,
-                                            url_referrer=url_referrer,
+                                            url_referer=url_referer,
                                             guest = isGuestUser(uid),
                                             email = get_email(uid),
                                             submitter = isUserSubmitter(uid),
