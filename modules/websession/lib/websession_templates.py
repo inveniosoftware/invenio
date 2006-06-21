@@ -411,9 +411,8 @@ class Template:
 
         out = ""
         out += self.tmpl_account_template(_("Your Account"), accBody, ln)
-        #your baskets
-        out += self.tmpl_account_template(_("Your Baskets"), baskets, ln)
         out += self.tmpl_account_template(_("Your Messages"), messages, ln)
+        out += self.tmpl_account_template(_("Your Baskets"), baskets, ln)
         out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln)
         out += self.tmpl_account_template(_("Your Searches"), searches, ln)
         out += self.tmpl_account_template(_("Your Submissions"),
@@ -764,8 +763,8 @@ class Template:
         if guest:
             out += """%(guest_msg)s ::
     	       <a class="userinfo" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(session)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> ::
                    <a class="userinfo" href="%(weburl)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a> ::
+                   <a class="userinfo" href="%(weburl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> ::
                    <a class="userinfo" href="%(sweburl)s/youraccount/login?ln=%(ln)s">%(login)s</a>""" % {
                      'weburl' : weburl,
                      'sweburl': sweburl,
@@ -779,9 +778,9 @@ class Template:
         else:
             out += """%(email)s ::
     	       <a class="userinfo" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> ::
                    <a class="userinfo" href="%(weburl)s/yourmessages/display?ln=%(ln)s">%(messages)s</a> ::
-		   <a class="userinfo" href="%(weburl)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a> :: """ % {
+                   <a class="userinfo" href="%(weburl)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a> ::
+                   <a class="userinfo" href="%(weburl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> :: """ % {
                      'email' : email,
                      'weburl' : weburl,
                      'sweburl' : sweburl,
