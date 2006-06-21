@@ -86,7 +86,7 @@ class Template:
       <td colspan="4" style="text-align: center;">
         <b>%s</b>
       </td>
-    </tr>""" %(_("No new mail"),)
+    </tr>""" %(_("No messages"),)
         for (msgid, id_user_from, user_from_nick, subject, sent_date, status) in messages:
             if not(subject):
                 subject = _("[No subject]")
@@ -471,7 +471,7 @@ class Template:
       </form>
     </td>
   </tr>
-</table>"""% {'message': _("Are your sure you want to empty your whole mailbox?"),
+</table>"""% {'message': _("Are you sure you want to empty your whole mailbox?"),
               'ln':ln,
               'yes_label': _("Yes"),
               'no_label': _("No")}
@@ -532,7 +532,7 @@ class Template:
 %(quota_label)s<br/>
 <div class="quotabox">
   <div class="quotabar" style="width:%(width)ipx"></div>
-</div>""" %{'quota_label' : _("You're using %.1f%% of your quota (%i messages / %i).")%(ratio * 100.0, nb_messages, cfg_webmessage_max_nb_of_messages),
+</div>""" %{'quota_label' : _("Quota used: %i messages out of max. %i")%(nb_messages, cfg_webmessage_max_nb_of_messages),
             'width' : int(ratio * 200)
             }
 
@@ -638,7 +638,7 @@ class Template:
         return: html output.
         """
         _ = gettext_set_language(ln)
-        out = _("You have <b>%i</b> new messages out of <a href=\"%s/yourmessages/?ln=%s\">%i total messages</a>")% (nb_new_mail, weburl, ln, total_mail)
+        out = _("You have <b>%i</b> new messages out of <a href=\"%s/yourmessages/?ln=%s\">%i messages</a>.")% (nb_new_mail, weburl, ln, total_mail)
         return out
 
     

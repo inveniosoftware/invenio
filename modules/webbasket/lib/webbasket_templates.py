@@ -624,7 +624,7 @@ class Template:
         if group_sharing_level == 0:
             public_url = weburl + '/yourbaskets/display_public?bskid=' + str(bskid)
             public_link = '<a href="%s">%s</a>' % (public_url, public_url)
-            public_infos = _("This basket is publicly accessible at this adress: %s.") % public_link
+            public_infos = _("This basket is publicly accessible at this address: %s.") % public_link
         if content:
             content += '<br />'
         if not(content) and not(public_infos):
@@ -1232,7 +1232,7 @@ class Template:
   </td>
 </tr>""" % _("Add group")
         groups_box = self.__tmpl_basket_box(img=weburl + '/img/webbasket_usergroup.png',
-                                            title=_("Manage groups rights"),
+                                            title=_("Manage group rights"),
                                             body=groups_body)
         external_body = """
 <tr>

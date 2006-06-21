@@ -138,7 +138,7 @@ following (real) example:
 <li><code>webmessage&#95;config</code>, which contains error definitions</li>
 </ol>
 <p>In this example, a user tries to read a message. We must ensure he doesn't
-read another's message, and that this message really exist in the system. For
+read another message, and that this message really exist in the system. For
 a more convenient reading, some (non error-related) parts of code have been suppressed.</p>
 <h5>webmessage&#95;config.py</h5>
 <pre>

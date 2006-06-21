@@ -306,7 +306,7 @@ def perform_resetdefaultsettings(req, superusers=[], confirm=0):
     <p>
      before you reset the settings, we need some users<br>
      to connect to <strong>%s</strong>.<br>
-     enter as many e-mail adresses you want and press <strong>reset</strong>.<br>
+     enter as many e-mail addresses you want and press <strong>reset</strong>.<br>
      <strong>confirm reset settings</strong> when you have added enough e-mails.<br>
      <strong>%s</strong> is added as default.
     </p>""" % (SUPERADMINROLE, supportemail)
@@ -385,7 +385,7 @@ def perform_adddefaultsettings(req, superusers=[], confirm=0):
     <p>
      before you add the settings, we need some users<br>
      to connect to <strong>%s</strong>.<br>
-     enter as many e-mail adresses you want and press <strong>add</strong>.<br>
+     enter as many e-mail addresses you want and press <strong>add</strong>.<br>
      <strong>confirm add settings</strong> when you have added enough e-mails.<br>
      <strong>%s</strong> is added as default.
     </p>""" % (SUPERADMINROLE, supportemail)

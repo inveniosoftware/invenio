@@ -748,7 +748,7 @@ def create_basket_navtrail(uid,
                             basket[1])
     elif category == cfg_webbasket_categories['EXTERNAL']:
         out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
-        out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Other's baskets"))
+        out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Others' baskets"))
         if bskid:
             basket = db.get_public_basket_infos(bskid)
             if basket:
@@ -777,7 +777,7 @@ def account_list_baskets(uid, ln=cdslang):
     if group:
         url = base_url % cfg_webbasket_categories['GROUP']
         group_text = link % (url, group_text)
-    external_text = _("%i other's baskets") % external
+    external_text = _("%i others' baskets") % external
     if external:
         url = base_url % cfg_webbasket_categories['EXTERNAL']
     else:
