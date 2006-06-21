@@ -36,6 +36,16 @@ import string
 import sys
 import getpass
 
+def wait_for_user(msg):
+    try:
+        raw_input(msg)
+    except KeyboardInterrupt:
+        print "\n\nInstallation aborted."
+        sys.exit(1)
+    except EOFError:
+        print " (continuing in batch mode)"
+        return
+    
 ## 1) check Python version:
 if sys.version < cfg_min_python_version:
     print """
@@ -108,11 +118,8 @@ except ImportError, e:
     ** into production.)                               **
     *****************************************************
     """ % e
-    try:
-        getpass.getpass("Press ENTER to continue the installation...")
-    except KeyboardInterrupt:
-        print "\n\nInstallation aborted."
-        sys.exit(1)
+
+    wait_for_user("Press ENTER to continue the installation...")
 
 try:
     import Stemmer
@@ -132,11 +139,7 @@ except ImportError, e:
     ** into production.)                               **
     *****************************************************
     """ % e
-    try:
-        getpass.getpass("Press ENTER to continue the installation...")
-    except KeyboardInterrupt:
-        print "\n\nInstallation aborted."
-        sys.exit(1)
+    wait_for_user("Press ENTER to continue the installation...")
 
 try:
     import pyRXP
@@ -154,11 +157,7 @@ except ImportError, e:
     ** into production.)                               **
     *****************************************************
     """ % e
-    try:
-        getpass.getpass("Press ENTER to continue the installation...")
-    except KeyboardInterrupt:
-        print "\n\nInstallation aborted."
-        sys.exit(1)
+    wait_for_user("Press ENTER to continue the installation...")
 
 try:
     import Gnuplot
@@ -178,11 +177,7 @@ except ImportError, e:
     ** into production.)                               **
     *****************************************************
     """ % e
-    try:
-        getpass.getpass("Press ENTER to continue the installation...")
-    except KeyboardInterrupt:
-        print "\n\nInstallation aborted."
-        sys.exit(1)
+    wait_for_user("Press ENTER to continue the installation...")
 
 ## 4) check for versions of some important modules:
 if MySQLdb.__version__ < cfg_min_mysqldb_version:
@@ -195,11 +190,8 @@ if MySQLdb.__version__ < cfg_min_mysqldb_version:
     ** file for more details.                          **
     *****************************************************
     """ % (MySQLdb.__version__, cfg_min_mysqldb_version)
-    try:
-        getpass.getpass("Press ENTER to continue the installation anyhow...")
-    except KeyboardInterrupt:
-        print "\n\nInstallation aborted."
-        sys.exit(1)
+
+    wait_for_user("Press ENTER to continue the installation anyhow...")
 
 if Numeric.__version__ < cfg_min_numeric_version:
     print """
@@ -211,9 +203,6 @@ if Numeric.__version__ < cfg_min_numeric_version:
     ** file for more details.                          **
     *****************************************************
     """ % (Numeric.__version__, cfg_min_numeric_version)
-    try:
-        getpass.getpass("Press ENTER to continue the installation anyhow...")
-    except KeyboardInterrupt:
-        print "\n\nInstallation aborted."
-        sys.exit(1)
+
+    wait_for_user("Press ENTER to continue the installation anyhow...")
 
