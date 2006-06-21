@@ -321,6 +321,61 @@ class AddFieldTest(unittest.TestCase):
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "b"),
                          ['editor', 'editor'])
 
+class DeleteFieldTest(unittest.TestCase):
+    """ bibrecord - testing field deletion """
+
+    def setUp(self):
+        xml_example_record = """
+        <record>
+        <controlfield tag="001">33</controlfield>
+        <datafield tag="041" ind1="" ind2="">
+        <subfield code="a">eng</subfield>
+        </datafield>
+        <datafield tag="100" ind1="" ind2="">
+        <subfield code="a">Doe1, John</subfield>
+        </datafield>
+        <datafield tag="100" ind1="" ind2="">
+        <subfield code="a">Doe2, John</subfield>
+        <subfield code="b">editor</subfield>
+        </datafield>
+        <datafield tag="245" ind1="" ind2="1">
+        <subfield code="a">On the foo and bar1</subfield>
+        </datafield>
+        <datafield tag="245" ind1="" ind2="2">
+        <subfield code="a">On the foo and bar2</subfield>
+        </datafield>
+        </record>
+        """
+        (self.rec, st, e) = bibrecord.create_record(xml_example_record,1,1)
+
+    def test_delete_controlfield(self):
+        """bibrecord - deleting controlfield"""
+        bibrecord.record_delete_field(self.rec, "001", "", "")
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "001", "", "", ""),
+                         [])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "b"),
+                         ['editor'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", "", "2", "a"),
+                         ['On the foo and bar2'])
+
+    def test_delete_datafield(self):
+        """bibrecord - deleting datafield"""
+        bibrecord.record_delete_field(self.rec, "100", "", "")
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "001", "", "", ""),
+                         ['33'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "b"),
+                         [])
+        bibrecord.record_delete_field(self.rec, "245", "", "")
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", "", "1", "a"),
+                         ['On the foo and bar1'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", "", "2", "a"),
+                         ['On the foo and bar2'])
+        bibrecord.record_delete_field(self.rec, "245", "", "2")
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", "", "1", "a"),
+                         ['On the foo and bar1'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", "", "2", "a"),
+                         [])
+
 def create_test_suite():
     """Return test suite for the bibrecord module"""
     return unittest.TestSuite((unittest.makeSuite(SanityTest,'test'),
@@ -328,6 +383,7 @@ def create_test_suite():
                                unittest.makeSuite(BadInputTreatmentTest,'test'),
                                unittest.makeSuite(GettingFieldValuesTest,'test'),
                                unittest.makeSuite(AddFieldTest,'test'),
+                               unittest.makeSuite(DeleteFieldTest,'test'),
                                unittest.makeSuite(AccentedUnicodeLettersTest,'test')))
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())
