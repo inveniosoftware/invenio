@@ -25,7 +25,7 @@ from invenio.messages        import gettext_set_language, language_list_long
 ## Link of edit and delete button:
 btn_delete_url = "../../../img/iconcross.gif"
 btn_edit_url   = "../../../img/edit1.gif"
-weburl_bibedit = "%sadmin/bibedit/bibeditadmin.py" % weburl
+weburl_bibedit = "%s/admin/bibedit/bibeditadmin.py" % weburl
 
 class Template:
     
