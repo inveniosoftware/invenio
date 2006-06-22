@@ -40,8 +40,13 @@ single record, do global replacements, and other cataloguing tasks.
 
 <a name="2"></a><h2>2. Edit records via Web interface</h2>
 
-<p>Bibliographic Metadata Editor on Web is not implemented yet.
-Please use the command-line technique describe below.
+<p>To edit records via a powerful Web interface, please go to <a
+href="<WEBURL>/admin/bibedit/bibeditadmin.py">BibEdit Admin
+Interface</a>.  This interface will permit you to add, change or
+delete fields in a record.
+
+<p>If you want to change several records at once, please use the batch
+command-line techniques describe below.
 
 <a name="3"></a><h2>3. Edit records via command line</h2>
 

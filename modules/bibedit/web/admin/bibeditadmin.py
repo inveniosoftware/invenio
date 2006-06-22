@@ -20,20 +20,86 @@
 """CDS Invenio BibEdit Administrator Interface."""
 
 __lastupdated__ = """$Date$"""
+__version__     = "$Id$"
 
-from invenio.config import cdslang
-from invenio.webpage import page
-from invenio.webuser import getUid
+from invenio.config         import cdslang, weburl
+from invenio.webpage        import page
+from invenio.webuser        import getUid
+from invenio.bibedit_engine import perform_request_index, perform_request_edit, perform_request_submit
+from invenio.search_engine  import wash_url_argument
 
-__version__ = "$Id$"
+navtrail    = """ <a class=navtrail href=\"%s/admin/\">Admin Area</a> &gt;
+                  <a class=navtrail href=\"%s/admin/bibedit/\">BibEdit Admin</a> """ % (weburl, weburl)
+
+def index(req, ln=cdslang, recID=None, temp="false", format_tag='s',
+          edit_tag=None, delete_tag=None, num_field=None, add=0, delete_record=0, **args):    
+    """ BibEdit Admin interface. """
+
+    uid            = getUid(req)
+    recID          = wash_url_argument(recID,         "int")
+    add            = wash_url_argument(add,           "int")
+    delete_record  = wash_url_argument(delete_record, "int")
+
+    (body, errors, warnings) = perform_request_index(recID, delete_record, uid, temp, format_tag, edit_tag,
+                                                     delete_tag, num_field, add, args)
+
+    if recID != 0:
+        title = "Record #%i" % recID
+        if add == 3:
+            title += " - Add Field"
+    else:
+        title = "BibEdit Admin Interface"
+        
+    return page(title       = title,
+                body        = body,
+                errors      = errors,
+                warnings    = warnings,
+                uid         = getUid(req),
+                language    = ln,
+                navtrail    = navtrail,               
+                lastupdated = __lastupdated__,
+                req         = req) 
+
+
+def edit(req, recID, tag, num_field='0', format_tag='s',
+         del_subfield=None, temp="false", add=0, ln=cdslang, **args):    
+    """ Edit Field page. """
+
+    uid       = getUid(req)
+    recID     = wash_url_argument(recID,     "int")
+    num_field = wash_url_argument(num_field, "int")
+    add       = wash_url_argument(add,       "int")
     
-def index(req, ln=cdslang):
-    "BibEdit Admin interface."
-    uid = getUid(req)
-    return page(title="BibEdit Admin Interface",
-                body="TODO",
-                uid=uid,
-                language=ln,
-                navtrail = "FIXME",
-                lastupdated=__lastupdated__,
-                req=req)
+    (body, errors, warnings) = perform_request_edit(recID, uid, tag, num_field, format_tag, temp, del_subfield, add, args)
+
+    title = "Edit Record #%i Field #%s" % (recID, str(tag[:3]))
+    if add == 1:
+        title += " - Add Subfield"
+    return page(title       = title,
+                body        = body,
+                errors      = errors,
+                warnings    = warnings,
+                uid         = getUid(req),
+                language    = ln,
+                navtrail    = navtrail,
+                lastupdated = __lastupdated__,
+                req         = req)    
+
+
+def submit(req, recID, ln=cdslang):
+    """ Submit temp_record on database. """
+
+    uid   = getUid(req)
+    recID = wash_url_argument(recID, "int")
+    
+    (body, errors, warnings) = perform_request_submit(recID)
+    
+    return page(title       = "Submit and save record #%i" % recID,
+                body        = body,
+                errors      = errors,
+                warnings    = warnings,
+                uid         = getUid(req),
+                language    = ln,
+                navtrail    = navtrail,
+                lastupdated = __lastupdated__,
+                req         = req) 

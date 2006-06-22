@@ -1,5 +1,5 @@
 ## $Id$
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -11,25 +11,16 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/invenio
+## When a user edits a record, this record is locked to prevent other
+## users to edit it at the same time.  After how many seconds the
+## locked record will be again free for other people to edit?
+cfg_bibedit_timeout = 3600 # 1 hour
 
-pylib_DATA = bibrecord_config.py \
-             bibrecord.py \
-             bibrecord_tests.py \
-             refextract_config.py \
-             refextract.py \
-             xmlmarc2textmarclib.py \
-             bibedit_config.py \
-             bibedit_engine.py \
-             bibedit_dblayer.py \
-             bibedit_templates.py
-
-EXTRA_DIST = $(pylib_DATA)
-
-CLEANFILES = *~ *.tmp *.pyc
+## Beginning of the name of the temporary files:
+cfg_bibedit_tmpfilenameprefix = "bibedit_record"
