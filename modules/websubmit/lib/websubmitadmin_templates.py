@@ -1751,6 +1751,7 @@ class Template:
         output = ""
         output += self._create_user_message_string(user_msg)
 
+        ## display a form to add a function to the submission:
         body_content = """
         <br />
         <table class="admin_wvar" width="55%%">
@@ -1772,7 +1773,7 @@ class Template:
          </tr>
          <tr>
           <td width="20%%"><span class="adminlabel">Function Name:</span></td>
-          <td width="80%%"><span class="info">&nbsp;</span></td>
+          <td width="80%%"><span class="info">%(allWSfunctions)s</span></td>
          </tr>
          <tr>
           <td width="20%%"><span class="adminlabel">Step:</span></td>
@@ -1796,7 +1797,7 @@ class Template:
               <form method="post" action="%(websubadmin_url)s/%(performaction)s">
                <input name="doctype" type="hidden" value="%(doctype)s" />
                <input name="action" type="hidden" value="%(action)s" />
-               <input name="configuresubmissionaddfunctioncommit" class="adminbutton" type="submit" value="Cancel" />
+               <input name="configuresubmissionaddfunctioncancel" class="adminbutton" type="submit" value="Cancel" />
               </form>
              </td>
             </tr>
@@ -1808,11 +1809,52 @@ class Template:
                         'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
                         'performaction'   : cgi.escape(perform_act, 1),
                         'step'            : cgi.escape(addfunctionstep, 1),
-                        'score'           : cgi.escape(addfunctionscore, 1)
+                        'score'           : cgi.escape(addfunctionscore, 1),
+                        'allWSfunctions'  : create_html_select_list(select_name="addfunctionname",
+                                                                    option_list=allWSfunctions,
+                                                                    selected_values=addfunctionname,
+                                                                    default_opt=("", "Select function to add:"))
                       }
 
+        ## build a table of the functions currently associated with the submission:
+        body_content += """<hr />\n"""
+        header = ["Function Name", "Step", "Score"]
+        tbody = []
+        for functn in cursubmissionfunctions:
+            thisfunctionname  = functn[0]
+            thisfunctionstep  = str(functn[1])
+            thisfunctionscore = str(functn[2])
+            ## function name:
+            t_row = ["""&nbsp;&nbsp;%s""" % (cgi.escape(thisfunctionname, 1),)]
+            ## function step:
+            t_row += ["""%s""" % (cgi.escape(thisfunctionstep, 1),) ]
+            ## function score:
+            t_row += ["""%s""" % (cgi.escape(thisfunctionscore, 1),) ]
 
+            ## finally, append the newly created row to the tbody list:
+            tbody.append(t_row)
 
+        body_content += """
+        <table class="admin_wvar" width="55%%">
+         <thead>
+         <tr>
+         <th class="adminheaderleft">
+           Current submission function configuration:
+          </th>
+         </tr>
+         </thead>
+         <tbody>
+         <tr>
+          <td width="100%%">&nbsp;</td>
+         </tr>
+         <tr>
+          <td width="100%%">"""
+
+        body_content += create_html_table_from_tuple(tableheader=header, tablebody=tbody)
+        body_content += """
+          </td>
+         </tr>
+        </table>"""
 
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="""Add a function to the [%s] submission of the [%s] document type""" \
