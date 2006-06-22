@@ -158,7 +158,7 @@ modules/webbasket/doc/admin/index.html.wml
 modules/webbasket/lib/webbasket.py
 modules/webbasket/lib/webbasket_config.py
 modules/webbasket/lib/webbasket_templates.py
-modules/webbasket/web/webbasket_webinterface.py
+modules/webbasket/lib/webbasket_webinterface.py
 modules/webcomment/doc/admin/index.html.wml
 modules/webcomment/doc/admin/guide.html.wml
 modules/webcomment/lib/webcommentadminlib.py
