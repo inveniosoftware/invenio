@@ -381,8 +381,8 @@ class Template:
         return result
 
     def tmpl_submit(self):        
-        """ Return a end message of Bibedit. """
+        """ Return an end message of BibEdit. """
         
-        return """ Your modifications have now been submitted.  They will be processed as soon as the task queue is empty.<br\>
-                   <br\>You can now go back to <a href=\"%s/admin/bibedit/index\">BibEdit Admin Interface</a>.""" % (weburl)
+        return """ <p>Your modifications have now been submitted.  They will be processed as soon as the task queue is empty.
+                   <p>You can now go back to <a href="%s/admin/bibedit/bibeditadmin.py">BibEdit Admin Interface</a>.""" % (weburl)
 
