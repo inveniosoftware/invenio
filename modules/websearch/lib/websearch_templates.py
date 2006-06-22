@@ -744,25 +744,6 @@ class Template:
 
         return out
 
-    def tmpl_nice_number(self, num, ln=cdslang):
-        "Returns nicely printed number NUM in language LN using thousands separator char defined in the I18N messages file."
-
-        if num is None: return None
-
-        _ = gettext_set_language(ln)
-
-        separator = _(",")
-
-        chars_in = list(str(num))
-        num = len(chars_in)
-        chars_out = []
-        for i in range(0,num):
-            if i % 3 == 0 and i != 0:
-                chars_out.append(separator)
-            chars_out.append(chars_in[num-i-1])
-        chars_out.reverse()
-        return ''.join(chars_out)
-
     def tmpl_nbrecs_info(self, number, prolog=None, epilog=None, ln=cdslang):
         """
         Return information on the number of records.
@@ -1975,7 +1956,7 @@ class Template:
         out += "</form>"
         return out
 
-    def tmpl_nice_number(self, number, ln):
+    def tmpl_nice_number(self, number, ln=cdslang):
         "Returns nicely printed number NUM in language LN using the locale."
         if number is None:
             return None
