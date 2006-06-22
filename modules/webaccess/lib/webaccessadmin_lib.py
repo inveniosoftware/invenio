@@ -88,6 +88,7 @@ def index(req, title='', body='', subtitle='', adminarea=2, authorized=0):
 
     return page(title=title,
                 uid=id_user,
+                req=req,
                 body=body,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)                
