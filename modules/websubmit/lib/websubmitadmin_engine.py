@@ -1752,7 +1752,11 @@ def _create_configure_doctype_submission_functions_add_function_form(doctype, ac
     """
     title = """Add a function to the [%s] submission of the [%s] document type""" % (action, doctype)
     submission_functions = get_functionname_step_score_allfunctions_doctypesubmission(doctype=doctype, action=action)
+    ## get names of all WebSubmit functions:
     all_websubmit_functions = get_names_of_all_functions()
+    ## put names into a list of single-element tuples, so that template can make HTML select list with them:
+    all_websubmit_functions = map(lambda x: (str(x),), all_websubmit_functions)
+    ## create page body:
     body = websubmitadmin_templates.tmpl_configuredoctype_add_submissionfunction(doctype=doctype,
                                                                                  action=action,
                                                                                  cursubmissionfunctions=submission_functions,
@@ -1782,7 +1786,10 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
                                                           deletefunctionstep="",
                                                           deletefunctionscore="",
                                                           configuresubmissionaddfunction="",
-                                                          configuresubmissionaddfunctioncommit=""):
+                                                          configuresubmissionaddfunctioncommit="",
+                                                          addfunctionname="",
+                                                          addfunctionstep="",
+                                                          addfunctionscore=""):
 
     errors = []
     warnings = []
@@ -1902,6 +1909,10 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
         ## display a form that allows the addition of a new WebSubmit function
         (title, body) = _create_configure_doctype_submission_functions_add_function_form(doctype=doctype,
                                                                                          action=action)
+    elif configuresubmissionaddfunctioncommit != "":
+        ## process the addition of the new WebSubmit function to the submission:
+        (title, body) = _add_function_to_submission(doctype=doctype, action=action, addfunctionname=addfunctionname,
+                                                    addfunctionstep=addfunctionstep, addfunctionscore=addfunctionscore)
     else:
         ## default - display functions for this submission
         (title, body) = _create_configure_doctype_submission_functions_form(doctype=doctype,
@@ -1911,6 +1922,57 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
                                                                             movefromfunctionscore=movefromfunctionscore
                                                                            )
     return (title, body, errors, warnings)
+
+def _add_function_to_submission(doctype, action, addfunctionname, addfunctionstep, addfunctionscore):
+    """Process the addition of a function to a submission.
+       The user can decide in which step and at which score to insert the function.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param addfunctionname: (string) the name of the function to be added to the submission
+       @param addfunctionstep: (integer) the step at which the function is to be added
+       @param addfunctionscore: (integer) the score at which the function is to be added
+       @return: a tuple containing 2 strings: (page-title, page-body)
+    """
+    user_msg = []
+    try:
+        insert_function_into_submission_at_step_and_score_then_regulate_scores_of_functions_in_step(doctype=doctype,
+                                                                                                    action=action,
+                                                                                                    function=addfunctionname,
+                                                                                                    step=addfunctionstep,
+                                                                                                    score=addfunctionscore)
+    except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
+        ## Function didn't exist in WebSubmit! Not added to submission.
+        user_msg.append(str(e))
+        ## TODO : LOG ERROR
+        (title, body) = _create_configure_doctype_submission_functions_add_function_form(doctype=doctype,
+                                                                                         action=action,
+                                                                                         addfunctionstep=addfunctionstep,
+                                                                                         addfunctionscore=addfunctionscore,
+                                                                                         user_msg=user_msg)
+        return (title, body)
+    except InvenioWebSubmitAdminWarningInsertFailed, e:
+        ## insert failed - some functions within the step may have been corrupted!
+        user_msg.append(str(e))
+        ## TODO : LOG ERROR
+        (title, body) = \
+                _create_configure_doctype_submission_functions_form(doctype=doctype, action=action, user_msg=user_msg)
+        return (title, body)
+    except InvenioWebSubmitAdminWarningDeleteFailed, e:
+        ## when regulating the scores of functions within the step, could not delete some or all of the functions
+        ## within the step that the function was added to. Some functions may have been lost!
+        user_msg.append(str(e))
+        ## TODO : LOG ERROR
+        (title, body) = \
+                _create_configure_doctype_submission_functions_form(doctype=doctype, action=action, user_msg=user_msg)
+        return (title, body)
+
+    ## Successfully added
+    user_msg.append("""The function [%s] has been added to submission [%s] at step [%s], score [%s]."""\
+                    % (addfunctionname, "%s%s" % (action, doctype), addfunctionstep, addfunctionscore))
+    (title, body) = \
+            _create_configure_doctype_submission_functions_form(doctype=doctype, action=action, user_msg=user_msg)
+    return (title, body)
+
 
 def _delete_submission_function(doctype, action, deletefunctionname, deletefunctionstep, deletefunctionscore):
     """Delete a submission function from a given submission. Re-order all functions below it (within the same step)

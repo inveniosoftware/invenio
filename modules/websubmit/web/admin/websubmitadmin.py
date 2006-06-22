@@ -671,6 +671,9 @@ def doctypeconfiguresubmissionfunctions(req,
                                         deletefunctionscore="",
                                         configuresubmissionaddfunction="",
                                         configuresubmissionaddfunctioncommit="",
+                                        addfunctionname="",
+                                        addfunctionstep="",
+                                        addfunctionscore="",
                                         ln=cdslang):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -698,7 +701,10 @@ def doctypeconfiguresubmissionfunctions(req,
                                                                       deletefunctionstep=deletefunctionstep,
                                                                       deletefunctionscore=deletefunctionscore,
                                                                       configuresubmissionaddfunction=configuresubmissionaddfunction,
-                                                                      configuresubmissionaddfunctioncommit=configuresubmissionaddfunctioncommit)
+                                                                      configuresubmissionaddfunctioncommit=configuresubmissionaddfunctioncommit,
+                                                                      addfunctionname=addfunctionname,
+                                                                      addfunctionstep=addfunctionstep,
+                                                                      addfunctionscore=addfunctionscore)
 
         return page(title       = title,
                     body        = body,
