@@ -511,14 +511,15 @@ def get_email(uid):
 def create_userinfobox_body(req, uid, language="en"):
     """Create user info box body for user UID in language LANGUAGE."""
 
-    is_over_https = req.subprocess_env.has_key('HTTPS') \
-                    and req.subprocess_env['HTTPS'] == 'on'
-
-    if is_over_https:
-        url_referer = sweburl + req.unparsed_uri
+    if req:
+        if req.subprocess_env.has_key('HTTPS') \
+           and req.subprocess_env['HTTPS'] == 'on':
+            url_referer = sweburl + req.unparsed_uri
+        else:
+            url_referer = weburl + req.unparsed_uri
     else:
-        url_referer = weburl + req.unparsed_uri
-
+        url_referer = weburl
+        
     try:
         return tmpl.tmpl_create_userinfobox(ln=language,
                                             url_referer=url_referer,

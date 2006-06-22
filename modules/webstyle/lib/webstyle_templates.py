@@ -444,7 +444,7 @@ class Template:
 
         # Work on a copy in order not to bork the arguments of the caller
         argd = {}
-        if req.args:
+        if req and req.args:
             argd.update(cgi.parse_qs(req.args))
 
         parts = []
@@ -455,7 +455,10 @@ class Template:
             else:
                 # Update the 'ln' argument in the initial request
                 argd['ln'] = lang
-                args = req.uri + make_canonical_urlargd(argd, {})
+                if req and req.uri:
+                    args = req.uri + make_canonical_urlargd(argd, {})
+                else:
+                    args = ""
 
                 parts.append(a_href(lang_namelong, href=args, _class="langinfo"))
 
