@@ -35,7 +35,8 @@ from invenio.dbquery import run_sql, escape_string
 from invenio.config import *
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
-from invenio.search_engine import nice_number
+import invenio.template
+websearch_templates = invenio.template.load('websearch')
     
 __version__ = "$Id$"
 
@@ -233,11 +234,11 @@ def perform_showindexoverview(ln=cdslang, callback='', confirm=0):
 
     
         if table_status_forward and table_status_reverse:
-            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (idxID, """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s" title="%s">%s</A>""" % (weburl, idxID, ln, idxDESC, idx_dict.get(idxID, idxNAME)), "%s MB" % nice_number(table_status_forward[0][5] / 1048576), "%s MB" % nice_number(table_status_reverse[0][5] / 1048576), nice_number(table_status_forward[0][3]), nice_number(table_status_reverse[0][3]), date, fld, lang)
+            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (idxID, """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s" title="%s">%s</A>""" % (weburl, idxID, ln, idxDESC, idx_dict.get(idxID, idxNAME)), "%s MB" % websearch_templates.tmpl_nice_number(table_status_forward[0][5] / 1048576), "%s MB" % websearch_templates.tmpl_nice_number(table_status_reverse[0][5] / 1048576), websearch_templates.tmpl_nice_number(table_status_forward[0][3]), websearch_templates.tmpl_nice_number(table_status_reverse[0][3]), date, fld, lang)
         elif not table_status_forward:
-            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (idxID, """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</A>""" % (weburl, idxID, ln, idx_dict.get(idxID, idxNAME)), "Error", "%s MB" % nice_number(table_status_reverse[0][5] / 1048576),"Error", nice_number(table_status_reverse[0][3]), date, "", lang)
+            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (idxID, """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</A>""" % (weburl, idxID, ln, idx_dict.get(idxID, idxNAME)), "Error", "%s MB" % websearch_templates.tmpl_nice_number(table_status_reverse[0][5] / 1048576),"Error", websearch_templates.tmpl_nice_number(table_status_reverse[0][3]), date, "", lang)
         elif not table_status_reverse:
-            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (idxID, """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</A>""" % (weburl, idxID, ln, idx_dict.get(idxID, idxNAME)), "%s MB" % nice_number(table_status_forward[0][5] / 1048576), "Error", nice_number(table_status_forward[0][3]), "Error", date, "", lang)
+            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (idxID, """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</A>""" % (weburl, idxID, ln, idx_dict.get(idxID, idxNAME)), "%s MB" % websearch_templates.tmpl_nice_number(table_status_forward[0][5] / 1048576), "Error", websearch_templates.tmpl_nice_number(table_status_forward[0][3]), "Error", date, "", lang)
     output += "</table>"
 
     try:
