@@ -78,7 +78,7 @@ def get_number_jschecks_with_chname(chname):
        @param chname: Check name/id (chname) to query for
        @return an integer count of the number of Checks in the WebSubmit database for this chname.
     """
-    q = """SELECT COUNT(chname) FROM sbmCHECKS where chname=%s COLLATE latin1_general_cs"""
+    q = """SELECT COUNT(chname) FROM sbmCHECKS where chname=%s"""
     return int(run_sql(q, (chname,))[0][0])
 
 def get_all_jscheck_names():
@@ -249,7 +249,7 @@ def regulate_score_of_all_functions_in_step_to_ascending_multiples_of_10_for_sub
                 insert_function_into_submission_at_step_and_score(doctype=doctype, action=action,
                                                                   function=insert_functn_name,
                                                                   step=step, score=i)
-            except InvenioWebSubmitAdminWarningForeignKeyViolation, e:
+            except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
                 ## tried to insert a function that doesn't exist in WebSubmit DB
                 ## TODO : LOG ERROR
                 ## continue onto next loop iteration - don't increment value of I
@@ -266,12 +266,6 @@ def get_number_functions_doctypesubmission_step_score(doctype, action, step, sco
     """Get the number or rows for a particular function at a given step and score of a doctype submission"""
     q = """SELECT COUNT(doctype) FROM sbmFUNCTIONS where doctype=%s AND action=%s AND step=%s AND score=%s"""
     return int(run_sql(q, (doctype, action, step, score))[0][0])
-
-
-def update_score_allfunctions_in_step_doctypesubmission_add10(doctype, action, step):
-    q = """UPDATE sbmFUNCTIONS SET score=score+10 WHERE doctype=%s AND action=%s AND step=%s"""
-    run_sql(q, (doctype, action, step))
-    return 0 ## Everything OK
 
 def update_step_score_doctypesubmission_function(doctype, action, function, oldstep, oldscore, newstep, newscore):
     numrows_function = get_number_of_functions_with_functionname_in_submission_at_step_and_score(doctype=doctype, action=action,
@@ -333,7 +327,7 @@ def move_position_submissionfunction_up(doctype, action, function, funccurstep, 
                                                                       step=funccurstep,
                                                                       score=funccurscore)
                     return 0
-                except InvenioWebSubmitAdminWarningForeignKeyViolation, e:
+                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
                     return 1
             else:
                 ## could not update the function that was to be moved! Try to re-insert that which was deleted
@@ -342,7 +336,7 @@ def move_position_submissionfunction_up(doctype, action, function, funccurstep, 
                                                                       function=name_function_above,
                                                                       step=step_function_above,
                                                                       score=score_function_above)
-                except InvenioWebSubmitAdminWarningForeignKeyViolation, e:
+                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
                     pass
                 return 1 ## Returning an ERROR code to signal that the move did not work
         else:
@@ -350,15 +344,34 @@ def move_position_submissionfunction_up(doctype, action, function, funccurstep, 
             ## Return an error code to signal that things went wrong
             return 1
 
+def add_10_to_score_of_all_functions_in_step_of_submission(doctype, action, step):
+    """Add 10 to the score of all functions within a particular step of a submission.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param step: (integer) the step in which all function scores are to be incremented by 10
+       @return: None
+    """
+    q = """UPDATE sbmFUNCTIONS SET score=score+10 WHERE doctype=%s AND action=%s AND step=%s"""
+    run_sql(q, (doctype, action, step))
+    return
+
 def update_score_of_allfunctions_from_score_within_step_in_submission_reduce_by_val(doctype, action, step, fromscore, val):
     q = """UPDATE sbmFUNCTIONS SET score=score-%s WHERE doctype=%s AND action=%s AND step=%s AND score >= %s"""
     run_sql(q, (val, doctype, action, step, fromscore))
     return
 
-def update_score_allfunctions_in_step_from_score_doctypesubmission_add10(doctype, action, step, fromscore):
+def add_10_to_score_of_all_functions_in_step_of_submission_and_with_score_equalto_or_above_val(doctype, action, step, fromscore):
+    """Add 10 to the score of all functions within a particular step of a submission, but with a score equal-to,
+       or higher than a given value (fromscore).
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param step: (integer) the step in which all function scores are to be incremented by 10
+       @param fromscore: (integer) the score from which all scores are incremented by 10
+       @return: None
+    """
     q = """UPDATE sbmFUNCTIONS SET score=score+10 WHERE doctype=%s AND action=%s AND step=%s AND score >= %s"""
     run_sql(q, (doctype, action, step, fromscore))
-    return 0 ## Everything OK
+    return
 
 def move_position_submissionfunction_fromposn_toposn(doctype, action, movefuncname, movefuncfromstep,
                                                     movefuncfromscore, movefunctoname, movefunctostep,
@@ -440,16 +453,16 @@ def move_position_submissionfunction_fromposn_toposn(doctype, action, movefuncna
             if error_code == 0:
                 ## deletion successful
                 ## now augment the relevant scores:
-                update_score_allfunctions_in_step_from_score_doctypesubmission_add10(doctype=doctype,
-                                                                                     action=action,
-                                                                                     step=movefunctostep,
-                                                                                     fromscore=movefunctoscore)
+                add_10_to_score_of_all_functions_in_step_of_submission_and_with_score_equalto_or_above_val(doctype=doctype,
+                                                                                                           action=action,
+                                                                                                           step=movefunctostep,
+                                                                                                           fromscore=movefunctoscore)
                 try:
                     insert_function_into_submission_at_step_and_score(doctype=doctype, action=action,
                                                                       function=movefuncname,
                                                                       step=movefunctostep,
                                                                       score=movefunctoscore)
-                except InvenioWebSubmitAdminWarningForeignKeyViolation, e:
+                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
                     return 1
                 return 0
             else:
@@ -483,16 +496,16 @@ def move_position_submissionfunction_fromposn_toposn(doctype, action, movefuncna
             if error_code == 0:
                 ## deletion successful
                 ## now augment the relevant scores:
-                update_score_allfunctions_in_step_from_score_doctypesubmission_add10(doctype=doctype,
-                                                                                                  action=action,
-                                                                                                  step=movefunctostep,
-                                                                                                  fromscore=movefunctoscore)
+                add_10_to_score_of_all_functions_in_step_of_submission_and_with_score_equalto_or_above_val(doctype=doctype,
+                                                                                                           action=action,
+                                                                                                           step=movefunctostep,
+                                                                                                           fromscore=movefunctoscore)
                 try:
                     insert_function_into_submission_at_step_and_score(doctype=doctype, action=action,
                                                                       function=movefuncname,
                                                                       step=movefunctostep,
                                                                       score=movefunctoscore)
-                except InvenioWebSubmitAdminWarningForeignKeyViolation, e:
+                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
                     return 1
                 return 0
             else:
@@ -517,7 +530,7 @@ def move_position_submissionfunction_down(doctype, action, function, funccurstep
         ## then place the function to be moved into that step with a score of that which the function below had
         if score_function_below <= 10:
             ## the score of the function below is 10 or less: add 10 to the score of all functions in that step
-            update_score_allfunctions_in_step_doctypesubmission_add10(doctype=doctype, action=action, step=step_function_below)
+            add_10_to_score_of_all_functions_in_step_of_submission(doctype=doctype, action=action, step=step_function_below)
             numrows_function_stepscore_moveto = get_number_functions_doctypesubmission_step_score(doctype=doctype,
                                                                                                     action=action,
                                                                                                     step=step_function_below,
@@ -568,7 +581,7 @@ def move_position_submissionfunction_down(doctype, action, function, funccurstep
                     insert_function_into_submission_at_step_and_score(doctype=doctype, action=action,
                                                                       function=name_function_below,
                                                                       step=funccurstep, score=funccurscore)
-                except InvenioWebSubmitAdminWarningForeignKeyViolation, e:
+                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
                     return 1
                 return 0
             else:
@@ -578,7 +591,7 @@ def move_position_submissionfunction_down(doctype, action, function, funccurstep
                                                                       function=name_function_below,
                                                                       step=step_function_below,
                                                                       score=score_function_below)
-                except InvenioWebSubmitAdminWarningForeignKeyViolation, e:
+                except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
                     pass
                 return 1 ## Returning an ERROR code to signal that the move did not work
         else:
@@ -700,7 +713,7 @@ def get_number_elements_with_elname(elname):
        @param elname: Element name/id (name) to query for
        @return an integer count of the number of Elements in the WebSubmit database for this elname.
     """
-    q = """SELECT COUNT(name) FROM sbmFIELDDESC where name=%s COLLATE latin1_general_cs"""
+    q = """SELECT COUNT(name) FROM sbmFIELDDESC where name=%s"""
     return int(run_sql(q, (elname,))[0][0])
 
 def get_doctype_action_pagenb_for_submissions_using_element(elname):
@@ -1295,7 +1308,7 @@ def delete_function_at_step_and_score_from_submission(doctype, action, function,
        @param score: (integer) the score at which the function to be deleted is found
        @return: None
        @Exceptions raised:
-         InvenioWebSubmitAdminDeleteFailed - when unable to delete the function
+         InvenioWebSubmitAdminWarningDeleteFailed - when unable to delete the function
     """
     q = """DELETE FROM sbmFUNCTIONS WHERE doctype=%s AND action=%s AND function=%s AND step=%s AND score=%s"""
     run_sql(q, (doctype, action, function, step, score))
@@ -1326,7 +1339,7 @@ def delete_function_at_step_and_score_from_submission(doctype, action, function,
             ## still unable to recover - could not delete all functions for this doctype/action
             msg = """Failed to delete function [%s] from step [%s] and score [%s] from submission [%s]""" \
                   % (function, step, score, "%s%s" % (action, doctype))
-            raise InvenioWebSubmitAdminDeleteFailed(msg)
+            raise InvenioWebSubmitAdminWarningDeleteFailed(msg)
 
 def delete_all_functions_in_step_of_submission(doctype, action, step):
     """Delete all functions from a given step of a submission.
@@ -1460,6 +1473,68 @@ def clone_categories_fromdoctype_todoctype(fromdoctype, todoctype):
         ## cannot delete "todoctype"s categories - return error code of 1 to signal this
         return 1
 
+def insert_function_into_submission_at_step_and_score_then_regulate_scores_of_functions_in_step(doctype, action,
+                                                                                                function, step, score):
+    """Insert a function into a submission at a particular score within a particular step, then regulate the scores
+       of all functions within that step to spaces of 10.
+       @param doctype: (string)
+       @param action: (string)
+       @param function: (string)
+       @param step: (integer)
+       @param score: (integer)
+       @return: None
+    """
+    ## check whether function exists in WebSubmit DB:
+    numrows_function = get_number_of_functions_with_funcname(funcname=function)
+    if numrows_function < 1:
+        msg = """Failed to insert the function [%s] into submission [%s] at step [%s] and score [%s] - """\
+              """Could not find function [%s] in WebSubmit DB""" % (function, "%s%s" % (action, doctype),
+                                                                    step, score, function)
+        raise InvenioWebSubmitAdminWarningReferentialIntegrityViolation(msg)
+
+    ## add 10 to the score of all functions at or below the position of this new function and within the same step
+    ## (this ensures there is a vacant slot where the function is to be added)
+    add_10_to_score_of_all_functions_in_step_of_submission_and_with_score_equalto_or_above_val(doctype=doctype,
+                                                                                               action=action,
+                                                                                               step=step,
+                                                                                               fromscore=score)
+    ## now insert the new function into its position:
+    try:
+        insert_function_into_submission_at_step_and_score(doctype=doctype, action=action,
+                                                          function=function, step=step, score=score)
+    except InvenioWebSubmitAdminWarningReferentialIntegrityViolation, e:
+        ## The function doesn't exist in WebSubmit and therefore cannot be used in the submission
+        ## regulate the scores of all functions within the step, to correct the "hole" that was made
+        try:
+            regulate_score_of_all_functions_in_step_to_ascending_multiples_of_10_for_submission(doctype=doctype,
+                                                                                                action=action,
+                                                                                                step=step)
+        except InvenioWebSubmitAdminWarningDeleteFailed, f:
+            ## can't regulate the functions' scores - couldn't delete some or all of them before re-inserting
+            ## them in the correct position. Cannot fix this - report that some functions may have been lost.
+            msg = """It wasn't possible to add the function [%s] to submission [%s] at step [%s], score [%s]."""\
+                  """ Firstly, the function doesn't exist in WebSubmit. Secondly, when trying to correct the """\
+                  """score of the functions within step [%s], it was not possible to delete some or all of them."""\
+                  """ Some functions may have been lost - please check."""\
+                  % (function, "%s%s" % (action, doctype), step, score, step)
+            raise InvenioWebSubmitAdminWarningInsertFailed(msg)
+        raise e
+
+    ## try to regulate the scores of the functions in the step that the new function was just inserted into:
+    try:
+        regulate_score_of_all_functions_in_step_to_ascending_multiples_of_10_for_submission(doctype=doctype,
+                                                                                            action=action,
+                                                                                            step=step)
+    except InvenioWebSubmitAdminWarningDeleteFailed, e:
+        ## could not correctly regulate the functions - could not delete all functions in the step
+        msg = """Could not regulate the scores of all functions within step [%s] of submission [%s]."""\
+              """ It was not possible to delete some or all of them. Some functions may have been lost -"""\
+              """ please chack.""" % (step, "%s%s" % (action, doctype))
+        raise InvenioWebSubmitAdminWarningDeleteFailed(msg)
+    ## success
+    return
+
+
 def insert_function_into_submission_at_step_and_score(doctype, action, function, step, score):
     """Insert a function into a submission, at the position dictated by step/score.
        @param doctype: (string) the unique ID of a document type
@@ -1481,7 +1556,7 @@ def insert_function_into_submission_at_step_and_score(doctype, action, function,
         msg = """Failed to insert the function [%s] into submission [%s] at step [%s] and score [%s] - """\
               """Could not find function [%s] in WebSubmit DB""" % (function, "%s%s" % (action, doctype),
                                                                     step, score, function)
-        raise InvenioWebSubmitAdminWarningForeignKeyViolation(msg)
+        raise InvenioWebSubmitAdminWarningReferentialIntegrityViolation(msg)
 
 def clone_functions_foraction_fromdoctype_todoctype(fromdoctype, todoctype, action):
     ## delete all functions that 
