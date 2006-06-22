@@ -15,7 +15,7 @@ class InvenioWebSubmitAdminWarningTooManyRows(Exception):
 class InvenioWebSubmitAdminWarningNoRowsFound(Exception):
     pass
 
-class InvenioWebSubmitAdminWarningForeignKeyViolation(Exception):
+class InvenioWebSubmitAdminWarningReferentialIntegrityViolation(Exception):
     pass
 
 
