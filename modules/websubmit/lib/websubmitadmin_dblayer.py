@@ -373,6 +373,107 @@ def add_10_to_score_of_all_functions_in_step_of_submission_and_with_score_equalt
     run_sql(q, (doctype, action, step, fromscore))
     return
 
+def get_number_of_submission_functions_in_step_between_two_scores(doctype, action, step, score1, score2):
+    """Return the number of submission functions found within a particular step of a submission, and between
+       two scores.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param step: (integer) the number of the step
+       @param score1: (integer) the first score boundary
+       @param score2: (integer) the second score boundary
+       @return: (integer) the number of functions found
+    """
+    q = """SELECT COUNT(doctype) FROM sbmFUNCTIONS WHERE doctype=%s AND action=%s AND step=%s AND (score BETWEEN %s AND %s)"""
+    return int(run_sql(q, (doctype, action, step,
+                           ((score1 <= score2 and score1) or (score2)),
+                           ((score1 <= score2 and score2) or (score1))))[0][0])
+
+
+
+def move_submission_function_from_one_position_to_another_position(doctype, action, movefuncname, movefuncfromstep,
+                                                                   movefuncfromscore, movefunctostep, movefunctoscore):
+    """Move a submission function from one score/step to another position.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param movefuncname: (string) the name of the function to be moved
+       @param movefuncfromstep: (integer) the step in which the function to be moved is located
+       @param movefuncfromscore: (integer) the score at which the function to be moved is located
+       @parm movefunctostep: (integer) the step to which the function is to be moved
+       @param movefunctoscore: (integer) the to which the function is to be moved
+       @return: None
+       @exceptions raised:
+          InvenioWebSubmitAdminWarningDeleteFailed - when unable to delete functions when regulating their scores
+          InvenioWebSubmitAdminWarningNoRowsFound - when the function to be moved is not found
+          InvenioWebSubmitAdminWarningInsertFailed - when regulating the scores of functions, and unable to insert
+            a function
+          InvenioWebSubmitAdminWarningReferentialIntegrityViolation - when the function to be inserted does not
+            exist in WebSubmit
+          InvenioWebSubmitAdminWarningNoUpdate - when the function was not moved because there would have been no
+            change in its position, or because the function could not be moved for some reason
+          
+    """
+    ## first check that there is a function "movefuncname"->"movefuncfromstep";"movefuncfromscore"
+    numrows_movefunc = \
+      get_number_of_functions_with_functionname_in_submission_at_step_and_score(doctype=doctype,
+                                                                                action=action,
+                                                                                function=movefuncname,
+                                                                                step=movefuncfromstep,
+                                                                                score=movefuncfromscore)
+    if numrows_movefunc < 1:
+        ## the function to move doesn't exist
+        msg = """Could not move function [%s] at step [%s], score [%s] in submission [%s] to another position. """\
+              """This function does not exist at this position."""\
+              % (movefuncname, movefuncfromstep, movefuncfromscore, "%s%s" % (action, doctype))
+        raise InvenioWebSubmitAdminWarningNoRowsFound(msg)
+
+    ## check that the function is not being moved to the same position:
+    if movefuncfromstep == movefunctostep:
+        num_functs_between_old_and_new_posn =\
+         get_number_of_submission_functions_in_step_between_two_scores(doctype=doctype,
+                                                                       action=action,
+                                                                       step=movefuncfromstep,
+                                                                       score1=movefuncfromscore,
+                                                                       score2=movefunctoscore)
+        if num_functs_between_old_and_new_posn < 3:
+            ## moving the function to the same position - no point
+            msg = """The function [%s] of the submission [%s] was not moved from step [%s], score [%s] to """\
+                  """step [%s], score [%s] as there would have been no change in position."""\
+                  % (movefuncname, "%s%s" % (action, doctype), movefuncfromstep,
+                     movefuncfromscore, movefunctostep, movefunctoscore)
+            raise InvenioWebSubmitAdminWarningNoUpdate(msg)
+
+    ## delete the function that is being moved:
+    try:
+        delete_the_function_at_step_and_score_from_a_submission(doctype=doctype, action=action,
+                                                                function=movefuncname, step=movefuncfromstep,
+                                                                score=movefuncfromscore)
+    except InvenioWebSubmitAdminWarningDeleteFailed, e:
+        ## unable to delete the function - cannot perform the move.
+        msg = """Unable to move function [%s] at step [%s], score [%s] of submission [%s] - couldn't """\
+              """delete the function from its current position."""\
+              % (movefuncname, movefuncfromstep, movefuncfromscore, "%s%s" % (action, doctype))
+        raise InvenioWebSubmitAdminWarningNoUpdate(msg)
+    ## now insert the function into its new position and correct the order of all functions within that step:
+    insert_function_into_submission_at_step_and_score_then_regulate_scores_of_functions_in_step(doctype=doctype,
+                                                                                                action=action,
+                                                                                                function=movefuncname,
+                                                                                                step=movefunctostep,
+                                                                                                score=movefunctoscore)
+    ## regulate the scores of the functions in the step from which the function was moved
+    try:
+        regulate_score_of_all_functions_in_step_to_ascending_multiples_of_10_for_submission(doctype=doctype,
+                                                                                            action=action,
+                                                                                            step=movefuncfromstep)
+    except InvenioWebSubmitAdminWarningDeleteFailed, e:
+        ## couldn't delete some or all functions
+        msg = """Moved function [%s] to step [%s], score [%s] of submission [%s]. However, when trying to regulate"""\
+              """ scores of functions in step [%s], failed to delete some functions. Check that they have not been lost."""\
+              % (movefuncname, movefuncfromstep, movefuncfromscore, "%s%s" % (action, doctype), movefuncfromstep)
+        raise InvenioWebSubmitAdminWarningDeleteFailed(msg)
+    ## finished
+    return
+
+
 def move_position_submissionfunction_fromposn_toposn(doctype, action, movefuncname, movefuncfromstep,
                                                     movefuncfromscore, movefunctoname, movefunctostep,
                                                     movefunctoscore):
