@@ -29,13 +29,16 @@ The CERN development group currently consists of:
 
  - Diane Berkovits <diane.berkovits@epfl.ch>
      Ranking by downloads, for the BibRank and WebSubmit
-     modules. 
+     modules.  Group management for WebSession.
 
  - Gregory Favre <gregory.favre@cern.ch>
      WebBasket, WebMessage.  Improvements to WebComment.
 
  - Krzysztof Jedrzejek <krzysztof.jedrzejek@cern.ch>
-     Improvements to ElmSubmit.
+     Improvements to ElmSubmit.  Rewrite of BibUpload.
+
+ - Yohann Paris <paris.yohann@gmail.com>
+     BibEdit Admin.
 
  - Chris Montarbaud <christiane.montarbaud@cern.ch>
      Multimedia and photo management.
