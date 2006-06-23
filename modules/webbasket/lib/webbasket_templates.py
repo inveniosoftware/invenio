@@ -569,11 +569,11 @@ class Template:
                                  _("Remove item"))
         if recid < 0:
             actions += "<img src=\"%s/img/webbasket_extern.png\" alt=\"%s\" />"
-            actions = actions % (weburl, _("Extern record"))
+            actions = actions % (weburl, _("External record"))
         else:
             pass
             #actions += "<img src=\"%s/img/webbasket_intern.png\" alt=\"%s\" />"
-            #actions = actions % (weburl, _("Intern record"))
+            #actions = actions % (weburl, _("Internal record"))
         out = """
 <tr>
   <td class="bskactions">%(actions)s</td>
@@ -723,11 +723,11 @@ class Template:
                 'button_label': _("Write a comment"),
                 'comments': comments}
         if group_sharing_level == None:
-            img = '<img src="%s/img/webbasket_user.png" alt="%s" />' % (weburl, _("Non shared basket"))
+            img = '<img src="%s/img/webbasket_user.png" alt="%s" />' % (weburl, _("Non-shared basket"))
         elif group_sharing_level == 0:
             img = '<img src="%s/img/webbasket_world.png" alt="%s" />' % (weburl, _("Shared basket"))
         else:
-            img = '<img src="%s/img/webbasket_usergroup.png" alt="%s" />' % (weburl, _("Group shared basket"))
+            img = '<img src="%s/img/webbasket_usergroup.png" alt="%s" />' % (weburl, _("Group-shared basket"))
         content = ''
         if selected_category == cfg_webbasket_categories['EXTERNAL']:
             url = "%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s" % (weburl, bskid, ln)
