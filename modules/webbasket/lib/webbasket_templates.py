@@ -390,13 +390,13 @@ class Template:
         actions = '<table class="bskbasketheaderactions"><tr>'
         if group_sharing_level == None:
             group_img_name = 'webbasket_user.png'
-            group_alt = _("Non shared basket")
+            group_alt = _("Non-shared basket")
         elif group_sharing_level == 0:
             group_img_name = 'webbasket_world.png'
             group_alt = _("Shared basket")
         else:
             group_img_name = 'webbasket_usergroup.png'
-            group_alt = _("Group shared basket")
+            group_alt = _("Group-shared basket")
         edit_link = ''
         logo = "<img src=\"%s/img/%s\" alt=\"%s\" />" % (weburl, group_img_name, group_alt)
         if user_can_edit_basket:
