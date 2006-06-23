@@ -2,6 +2,9 @@ from invenio.config import weburl
 
 websubmitadmin_weburl = "%s/admin/websubmit/websubmitadmin.py" % (weburl,)
 
+class InvenioWebSubmitAdminWarningNoUpdate(Exception):
+    """Exception used when a no update was made as a result of an action"""
+    pass
 
 class InvenioWebSubmitAdminWarningDeleteFailed(Exception):
     pass
