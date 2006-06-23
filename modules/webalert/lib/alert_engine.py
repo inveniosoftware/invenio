@@ -37,7 +37,7 @@ from email.MIMEText import MIMEText
 
 from invenio.config import *
 from invenio.search_engine import perform_request_search
-from invenio.alert_engine_config import cfg_webalert_debug_level
+from invenio.alert_engine_config import *
 from invenio.webinterface_handler import wash_urlargd
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -107,11 +107,20 @@ def get_query(alert_id):
     r = run_sql('select urlargs from query where id=%s', (alert_id,))
     return r[0][0]
 
-def send_email(fromaddr, toaddr, body, attempt=0):
+def send_email(fromaddr, toaddr, body,
+               attempt_times=1,
+               attempt_sleeptime=10):
+    """Send email to TOADDR from FROMADDR with message BODY.
 
-    if attempt > 2:
-        log('error sending email to %s: SMTP error; gave up after 3 attempts' % toaddr)
-        return
+       If sending fails, try to send it ATTEMPT_TIMES, and wait for
+       ATTEMPT_SLEEPTIME seconds in between tries.
+
+       Return 0 if email was sent okay, 1 if it was not.
+    """
+
+    if attempt_times < 1:
+        log('Not attempting to send email to %s.' % toaddr)
+        return 1
     
     try:
         server = smtplib.SMTP('localhost')
@@ -119,16 +128,19 @@ def send_email(fromaddr, toaddr, body, attempt=0):
             server.set_debuglevel(1)
         else:
             server.set_debuglevel(0)
-            
         server.sendmail(fromaddr, toaddr, body)
         server.quit()
     except:
-        if (cfg_webalert_debug_level > 1):
-            print 'Error connecting to SMTP server, attempt %s retrying in 5 minutes. Exception raised: %s' % (attempt, sys.exc_info()[0])
-        sleep(300)
-        send_email(fromaddr, toaddr, body, attempt+1)
-        return
+        if attempt_times > 1:
+            if (cfg_webalert_debug_level > 1):
+                print 'Error connecting to SMTP server, retrying in %d seconds. Exception raised: %s' % (attempt_sleeptime, sys.exc_info()[0])
+            sleep(attempt_sleeptime)
+            return send_email(fromaddr, toaddr, body, attempt_times-1, attempt_sleeptime)
+        else:
+            log('Error sending email to %s.  Giving up.' % toaddr)
+            return 1
 
+    return 0
 
 def forge_email(fromaddr, toaddr, subject, content):
     msg = MIMEText(content, _charset='utf-8')
@@ -181,9 +193,13 @@ def email_notify(alert, records, argstr):
         print "********************************************************************************"
 
     if cfg_webalert_debug_level < 2:
-        send_email(sender, email, body)
+        send_email(sender, email, body,
+                   cfg_webalert_send_email_number_of_tries,
+                   cfg_webalert_send_email_sleeptime_between_tries)
     if cfg_webalert_debug_level == 4:
-        send_email(sender, supportemail, body)
+        send_email(sender, supportemail, body,
+                   cfg_webalert_send_email_number_of_tries,
+                   cfg_webalert_send_email_sleeptime_between_tries)
 
 def get_argument(args, argname):
     if args.has_key(argname):
