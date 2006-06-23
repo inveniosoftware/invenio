@@ -1846,22 +1846,18 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
     if movefromfunctionname != "" and movefromfunctionstep != "" and movefromfunctionscore != "" and \
        movetofunctionname != "" and movetofunctionstep != "" and movetofunctionscore != "":
         ## process moving the function by jumping it to another position
-        error_code = move_position_submissionfunction_fromposn_toposn(doctype=doctype,
-                                                                      action=action,
-                                                                      movefuncname=movefromfunctionname,
-                                                                      movefuncfromstep=movefromfunctionstep,
-                                                                      movefuncfromscore=movefromfunctionscore,
-                                                                      movefunctoname=movetofunctionname,
-                                                                      movefunctostep=movetofunctionstep,
-                                                                      movefunctoscore=movetofunctionscore)
-        if error_code == 0:
-            ## success
-            user_msg.append("""The Function "%s" that was located at step %s, score %s, has been moved""" \
-                             % (movefromfunctionname, movefromfunctionstep, movefromfunctionscore))
-        else:
-            ## could not move it
-            user_msg.append("""Unable to move the Function "%s" that is located at step %s, score %s""" \
-                                % (movefromfunctionname, movefromfunctionstep, movefromfunctionscore))
+        try:
+            move_submission_function_from_one_position_to_another_position(doctype=doctype, action=action,
+                                                                           movefuncname=movefromfunctionname,
+                                                                           movefuncfromstep=movefromfunctionstep,
+                                                                           movefuncfromscore=movefromfunctionscore,
+                                                                           movefunctostep=movetofunctionstep,
+                                                                           movefunctoscore=movetofunctionscore)
+            user_msg.append("""The function [%s] at step [%s], score [%s] was successfully moved."""\
+                            % (movefromfunctionname, movefromfunctionstep, movefromfunctionscore))
+        except Exception, e:
+            ## there was a problem
+            user_msg.append(str(e))
         (title, body) = _create_configure_doctype_submission_functions_form(doctype=doctype,
                                                                             action=action,
                                                                             user_msg=user_msg)
