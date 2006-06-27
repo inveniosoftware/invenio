@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.89\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2006-06-23 17:02+0200\n"
-"PO-Revision-Date: 2006-06-23 17:58+0200\n"
+"PO-Revision-Date: 2006-06-27 10:07+0200\n"
 "Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
 "Language-Team: SK <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -723,15 +723,15 @@ msgstr "kolekcia"
 
 #: modules/webalert/lib/webalert_templates.py:112
 msgid "You own following alerts:"
-msgstr ""
+msgstr "Vlastníte nasledujúce avíza:"
 
 #: modules/webalert/lib/webalert_templates.py:113
 msgid "alert name"
-msgstr "meno alertu"
+msgstr "meno avíza"
 
 #: modules/webalert/lib/webalert_templates.py:121
 msgid "SHOW"
-msgstr ""
+msgstr "ZOBRAZ"
 
 #: modules/webalert/lib/webalert_templates.py:163
 msgid ""
@@ -984,7 +984,7 @@ msgstr "Košíky ostatných"
 #: modules/webbasket/lib/webbasket.py:772
 #, python-format
 msgid "%i personal baskets"
-msgstr ""
+msgstr "%i osobných košíkov"
 
 #: modules/webbasket/lib/webbasket.py:776
 #, python-format
@@ -999,7 +999,7 @@ msgstr "%i košíkov ostatných"
 #: modules/webbasket/lib/webbasket.py:786
 #, python-format
 msgid "You have %s and are subscribed to %s and %s."
-msgstr ""
+msgstr "Máte %s a ste zapísaný na %s a %s."
 
 #: modules/webbasket/lib/webbasket_templates.py:183
 #, python-format
@@ -1430,6 +1430,8 @@ msgid ""
 "You are logged in as a guest user, so your baskets will disappear at the end "
 "of the current session. If you wish you can %slogin or register here%s."
 msgstr ""
+"Ste prihlásený ako anonymný hosť, takže Vaše košíky zmiznú na konci\n"
+"terajšej seanse.  Ak si prajete, môžete sa %sprihlásiť alebo zaregistrovať tu%s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1462
 #: modules/webcomment/lib/webcomment_templates.py:605
@@ -1895,7 +1897,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:373
 #: modules/websession/lib/websession_webinterface.py:404
 msgid "Login"
-msgstr "prihlásiť"
+msgstr "Prihlásiť"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:42
 #: modules/webcomment/web/admin/webcommentadmin.py:51
@@ -2060,7 +2062,7 @@ msgstr "Od"
 
 #: modules/webmessage/lib/webmessage_templates.py:419
 msgid "Sent on"
-msgstr "Poslané"
+msgstr "Poslané kedy"
 
 #: modules/webmessage/lib/webmessage_templates.py:420
 msgid "Received on"
@@ -2068,7 +2070,7 @@ msgstr "Obdržané"
 
 #: modules/webmessage/lib/webmessage_templates.py:421
 msgid "Sent to"
-msgstr "Poslané"
+msgstr "Poslané komu"
 
 #: modules/webmessage/lib/webmessage_templates.py:422
 msgid "Sent to groups"
@@ -2093,7 +2095,7 @@ msgstr "Použitá kvóta: %i správ z max. %i"
 
 #: modules/webmessage/lib/webmessage_templates.py:552
 msgid "Please select one or more:"
-msgstr ""
+msgstr "Prosíme vyberte jeden alebo viac:"
 
 #: modules/webmessage/lib/webmessage_templates.py:583
 msgid "Add to users"
@@ -2128,7 +2130,7 @@ msgstr "Nájdi grupu"
 msgid ""
 "You have <b>%i</b> new messages out of <a href=\"%s/yourmessages/?ln=%s\">%i "
 "messages</a>."
-msgstr ""
+msgstr "Máte <b>%i</b> nových správ z celkového počtu <a href=\"%s/yourmessages/?ln=%s\">%i správ</a>."
 
 #: modules/webmessage/lib/webmessage_webinterface.py:274
 msgid "Read a message"
@@ -2267,7 +2269,9 @@ msgstr ""
 msgid ""
 "No match found in collection %s. Other public collections gave <a class="
 "\"nearestterms\" href=\"%s\">%d hits</a>."
-msgstr "Žiaden záznam nebol nájdený v kolekcii %s. Ostatné verejne dostupné kolekcie dali <a class=\"nearestterms\" href=\"%s\">%d záznamov</a>."
+msgstr ""
+"Žiaden záznam nebol nájdený v kolekcii %s. Ostatné verejne dostupné kolekcie "
+"dali <a class=\"nearestterms\" href=\"%s\">%d záznamov</a>."
 
 #: modules/websearch/lib/search_engine.py:1640
 msgid ""
@@ -2626,7 +2630,7 @@ msgstr "Viď tiež: podobné mená autorov"
 #: modules/websubmit/lib/websubmit_webinterface.py:378
 #: modules/websubmit/lib/websubmit_webinterface.py:387
 msgid "Internal Error"
-msgstr "Vnútorná Chyba"
+msgstr "Interná Chyba"
 
 #: modules/websearch/lib/websearch_webinterface.py:289
 #, python-format
@@ -2648,36 +2652,43 @@ msgid ""
 "You are logged in as guest. You may want to <A href=\"%s\">login</A> as a "
 "regular user"
 msgstr ""
+"Ste prihlásený ako anonymný hosť.  Môžete sa <A\n"
+"href=\"%s\">prihlásiť</a> ako riadny užívateľ"
 
 #: modules/websession/lib/webaccount.py:90
 #, python-format
 msgid ""
 "The <strong class=\"headline\">guest</strong> users need to <A href=\"%s"
 "\">register</A> first"
-msgstr ""
+msgstr "<strong class=\"headline\">Anonymní hostia</strong> sa musia najprv <A href=\"%s\">zaregistrovať</A>"
 
 #: modules/websession/lib/webaccount.py:91
 msgid "No queries found"
-msgstr ""
+msgstr "Nenájdené žiadne hľadania"
 
 #: modules/websession/lib/websession_templates.py:45
 msgid ""
 "If you have lost password for your CDS Invenio internal account, then please "
 "enter your email address below and the lost password will be emailed to you."
 msgstr ""
+"Ak ste stratili heslo k internému kontu CDS Invenio, tak prosíme\n"
+"vyplňte Vašu adresu elektronickej pošty do formulára nižšie. Vaše\n"
+"heslo Vám bude obratom zaslané elektronickou poštou."
 
 #: modules/websession/lib/websession_templates.py:47
 msgid ""
 "Note that if you have been using an external login system (such as CERN "
 "NICE), then we cannot do anything and you have to ask there."
 msgstr ""
+"Ak ste používali externý systém pre prihlásenie sa (napr. CERN NICE),\n"
+"tak Vám nemôžeme poslúžiť a musíte sa spýtať tam."
 
 #: modules/websession/lib/websession_templates.py:48
 #, python-format
 msgid ""
 "Alternatively, you can ask %s to change your login system from external to "
 "internal."
-msgstr ""
+msgstr "Alternatívne môžete požiadať %s aby Vám zmenil prihlasovací systém z externého na interný."
 
 #: modules/websession/lib/websession_templates.py:140
 msgid ""
@@ -2697,44 +2708,46 @@ msgstr "nutné"
 #: modules/websession/lib/websession_templates.py:143
 #: modules/websession/lib/websession_templates.py:669
 msgid "Example"
-msgstr ""
+msgstr "Príklad"
 
 #: modules/websession/lib/websession_templates.py:144
 msgid "New password"
-msgstr ""
+msgstr "Nové heslo"
 
 #: modules/websession/lib/websession_templates.py:145
 #: modules/websession/lib/websession_templates.py:668
 msgid "optional"
-msgstr ""
+msgstr "voliteľné"
 
 #: modules/websession/lib/websession_templates.py:146
 #: modules/websession/lib/websession_templates.py:670
 msgid "Note"
-msgstr ""
+msgstr "Poznámka"
 
 #: modules/websession/lib/websession_templates.py:147
 #: modules/websession/lib/websession_templates.py:671
 msgid "The password phrase may contain punctuation, spaces, etc."
-msgstr ""
+msgstr "Heslo môže obsahovať punktuáciu, medzery, atď."
 
 #: modules/websession/lib/websession_templates.py:148
 msgid "Retype password"
-msgstr ""
+msgstr "Opakujte heslo"
 
 #: modules/websession/lib/websession_templates.py:149
 msgid "Set new values"
-msgstr ""
+msgstr "Nastavte nové hodnoty"
 
 #: modules/websession/lib/websession_templates.py:184
 msgid "Edit login method"
-msgstr ""
+msgstr "Editujte prihlasovaciu metódu"
 
 #: modules/websession/lib/websession_templates.py:185
 msgid ""
 "Please select which login method you would like to use to authenticate "
 "yourself"
 msgstr ""
+"Prosíme vyberte si metódu ktorú by ste chceli používať na prihlásenie\n"
+"sa"
 
 #: modules/websession/lib/websession_templates.py:186
 #: modules/websession/lib/websession_templates.py:199
@@ -2744,11 +2757,11 @@ msgstr "Vyber metódu"
 #: modules/websession/lib/websession_templates.py:235
 #: modules/websession/lib/websession_templates.py:665
 msgid "Email address"
-msgstr ""
+msgstr "Elektronická adresa"
 
 #: modules/websession/lib/websession_templates.py:236
 msgid "Send lost password"
-msgstr ""
+msgstr "Pošli stratené heslo"
 
 #: modules/websession/lib/websession_templates.py:262
 msgid ""
@@ -2812,6 +2825,8 @@ msgid ""
 "               <a href=\"%s/youraccount/login?ln=%s\">login or register "
 "here</a>."
 msgstr ""
+"Ste prihlásený ako anonymný hosť, takže Vaše %s zmiznú na konci\n"
+"terajšej seanse.  Ak si prajete, môžete sa <a href=\"%s/youraccount/login?ln=%s\">prihlásiť alebo zaregistrovať tu</a>."
 
 #: modules/websession/lib/websession_templates.py:351
 #, python-format
@@ -2819,6 +2834,8 @@ msgid ""
 "You are logged in as %(user)s. You may want to a) <A href=\"%(logout)s"
 "\">logout</A>; b) edit your <A href=\"%(edit)s\">account settings</a>."
 msgstr ""
+"Ste prihlásený ako %(user)s.  Môžete a)\n"
+"a) <A href=\"%(logout)s\">sa odhlásiť</A>; b) editovať <A href=\"%(edit)s\">parametre Vášho konta</a>."
 
 #: modules/websession/lib/websession_templates.py:416
 msgid "Your Alert Searches"
@@ -2878,25 +2895,25 @@ msgstr "Výmaz vášho konta"
 msgid ""
 "You are no longer recognized.  If you wish you can <A href=\"./login?ln=%s"
 "\">login here</A>."
-msgstr ""
+msgstr "Už nie ste prihlásený.  Ak chcete môžete sa <A href=\"./login?ln=%s\">prihlásiť tu</A>."
 
 #: modules/websession/lib/websession_templates.py:541
 msgid "If you already have an account, please login using the form below."
-msgstr ""
+msgstr "Ak už máte konto, prihláste sa doleuvedeným formulárom."
 
 #: modules/websession/lib/websession_templates.py:545
 #, python-format
 msgid ""
 "If you don't own an account yet, please <a href=\"../youraccount/register?ln="
 "%s\">register</a> an internal account."
-msgstr ""
+msgstr "Ak ešte konto nemáte, prosím <a href=\"../youraccount/register?ln=%s\">zaregistrujte</a> interné konto."
 
 #: modules/websession/lib/websession_templates.py:547
 #, python-format
 msgid ""
 "It is not possible to create an account yourself. Contact %s if you want an "
 "account."
-msgstr ""
+msgstr "Nie je možné vytvoriť si konto sám.  Obráťte sa na %s ak chcete konto."
 
 #: modules/websession/lib/websession_templates.py:569
 msgid "Login via:"
@@ -2909,7 +2926,7 @@ msgstr "Užívateľské meno"
 #: modules/websession/lib/websession_templates.py:596
 #: modules/websession/lib/websession_templates.py:666
 msgid "Password"
-msgstr ""
+msgstr "Heslo"
 
 #: modules/websession/lib/websession_templates.py:597
 #: modules/websession/lib/websession_templates.py:776
@@ -2921,11 +2938,11 @@ msgstr "prihlásiť"
 #: modules/websession/lib/websession_templates.py:602
 #: modules/websession/lib/websession_webinterface.py:202
 msgid "Lost your password?"
-msgstr ""
+msgstr "Stratili ste heslo?"
 
 #: modules/websession/lib/websession_templates.py:631
 msgid "Please enter your email address and desired password:"
-msgstr ""
+msgstr "Prosíme zadajte Vašu elektronickú adresu a žiadané heslo:"
 
 #: modules/websession/lib/websession_templates.py:633
 msgid ""
@@ -2935,12 +2952,12 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:672
 msgid "Retype Password"
-msgstr ""
+msgstr "Opakujte heslo"
 
 #: modules/websession/lib/websession_templates.py:673
 #: modules/websession/lib/websession_webinterface.py:476
 msgid "register"
-msgstr ""
+msgstr "zaregistrujte sa"
 
 #: modules/websession/lib/websession_templates.py:674
 #, python-format
@@ -3034,7 +3051,7 @@ msgstr "konto"
 
 #: modules/websession/lib/websession_templates.py:790
 msgid "messages"
-msgstr ""
+msgstr "správy"
 
 #: modules/websession/lib/websession_templates.py:797
 msgid "submissions"
@@ -3060,7 +3077,7 @@ msgstr ""
 #: modules/websession/lib/webuser.py:196
 #, python-format
 msgid "user #%i"
-msgstr ""
+msgstr "užívateľ #%i"
 
 #: modules/websession/lib/websession_webinterface.py:137
 #: modules/websession/lib/websession_webinterface.py:159
@@ -3162,15 +3179,15 @@ msgstr "Odhlásiť"
 
 #: modules/websession/lib/websession_webinterface.py:434
 msgid "Register"
-msgstr ""
+msgstr "Registrácia"
 
 #: modules/websession/lib/websession_webinterface.py:453
 msgid "Your account has been successfully created."
-msgstr ""
+msgstr "Vaše konto bolo úspešne vytvorené."
 
 #: modules/websession/lib/websession_webinterface.py:454
 msgid "Account created"
-msgstr ""
+msgstr "Konto vytvorené"
 
 #: modules/websession/lib/websession_webinterface.py:456
 msgid ""
@@ -3196,21 +3213,21 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:469
 #: modules/websession/lib/websession_webinterface.py:473
 msgid "Register failure"
-msgstr ""
+msgstr "Registrácia zlyhala"
 
 #: modules/websession/lib/websession_webinterface.py:467
 msgid "Both passwords must match, please try again."
-msgstr ""
+msgstr "Heslá musia byť rovnaké, prosíme skúste znovu."
 
 #: modules/websession/lib/websession_webinterface.py:471
 msgid "The email address given is not valid, please try again."
-msgstr ""
+msgstr "Elektronická adresa nie je platná, prosíme skúste znovu."
 
 #: modules/webstyle/lib/webstyle_templates.py:495
 #: modules/webstyle/lib/webstyle_templates.py:529
 #, python-format
 msgid "Error: %s"
-msgstr ""
+msgstr "Chyba: %s"
 
 #: modules/webstyle/lib/webstyle_templates.py:499
 msgid "Browser"
@@ -3219,12 +3236,12 @@ msgstr "Prehliadač"
 #: modules/webstyle/lib/webstyle_templates.py:520
 #, python-format
 msgid "System Error: %s %s\n"
-msgstr ""
+msgstr "Systémová chyba: %s %s\n"
 
 #: modules/webstyle/lib/webstyle_templates.py:531
 #: modules/websubmit/lib/websubmit_webinterface.py:376
 msgid "Error"
-msgstr ""
+msgstr "Chyba"
 
 #: modules/webstyle/lib/webstyle_templates.py:533
 #, python-format
@@ -3235,11 +3252,11 @@ msgstr ""
 
 #: modules/webstyle/lib/webstyle_templates.py:578
 msgid "Time"
-msgstr ""
+msgstr "Čas"
 
 #: modules/webstyle/lib/webstyle_templates.py:579
 msgid "Client"
-msgstr ""
+msgstr "Klient"
 
 #: modules/webstyle/lib/webstyle_templates.py:580
 msgid "Please send an error report to the Administrator"
