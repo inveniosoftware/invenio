@@ -1533,7 +1533,7 @@ function displayhelp()
    -z, --ref           update references (update only 999 fields and check 037 field
                        against both 037 and 088.)
   Example:
-       ./bibupload -t '2004-10-24 05:00' -i toto.xml\n");
+       ./bibupload -t '2004-10-24 05:00' -i foo.xml\n");
 }
 
 
