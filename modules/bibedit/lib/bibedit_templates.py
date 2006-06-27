@@ -24,12 +24,12 @@ from invenio.messages        import gettext_set_language, language_list_long
 
 ## Link of edit and delete button:
 btn_delete_url = "../../../img/iconcross.gif"
-btn_edit_url   = "../../../img/edit1.gif"
+btn_edit_url   = "../../../img/iconpen.gif"
 weburl_bibedit = "%s/admin/bibedit/bibeditadmin.py" % weburl
 
 class Template:
     
-    def tmpl_table_header(self, type_table, recID, temp="false", format_tag='s',
+    def tmpl_table_header(self, type_table, recID, temp="false", format_tag='marc',
                           tag='', format_view='s', num_field=None, add=0):        
         """ Return the Header of table. """
         
@@ -50,7 +50,6 @@ class Template:
                                             
             if add != 1:
                 print_action_add_subfield = """
-                    Action :
                     <a href=\"%s/edit?recID=%s&tag=%s&num_field=%s&format_tag=%s&temp=true&add=1\">
                       Add Subfield
                     </a>&nbsp; """ % (weburl_bibedit, str(recID), tag[:3], str(num_field), format_tag)
@@ -65,9 +64,13 @@ class Template:
                            <input type=\"hidden\" value=\"true\" name=\"temp\">
                          <div align=\"right\">
                            <font size=\"2\">
+                           Record:
+                           <a href=\"%s/index?cancel=%s\">Cancel</a>
+                           &nbsp;&nbsp;&nbsp;
+                           Action :
                            %s
                            </font>
-                         </div> """ % (weburl_bibedit, link_form, recID, print_action_add_subfield)
+                         </div> """ % (weburl_bibedit, link_form, recID, weburl_bibedit, recID, print_action_add_subfield)
                      
         else:
             
@@ -85,13 +88,17 @@ class Template:
                                <font size=\"2\">
                                  Action :
                                  %s
+                                 <a href=\"%s/index?cancel=%s\">Cancel</a>
+                                 &nbsp;&nbsp;&nbsp;
+                                 Record :
                                  %s
-                                 <a href=\"%s/index?delete_record=%s\">Cancel</a>
+                                 <a href=\"%s/index?confirm_delete=1&delete=%s\">Delete</a> 
                                  &nbsp;&nbsp;&nbsp;
                                  Display : %s | %s
                                  &nbsp;
                                </font>
-                             </div> """  % (link_submit, link_add_field, weburl_bibedit, str(recID),
+                             </div> """  % (link_submit,    weburl_bibedit, str(recID),
+                                            link_add_field, weburl_bibedit, str(recID),
                                             self.tmpl_link_view("Verbose", recID, temp, "s",    format_view),
                                             self.tmpl_link_view("MARC",    recID, temp, "marc", format_view))
                                         
@@ -220,14 +227,16 @@ class Template:
                    </table> """ % form
     
 
-    def tmpl_subfields(self, temp, recID='', tag_subfield='', value='', tag_field='', format_tag='',
+    def tmpl_subfields(self, temp, recID='', tag_subfield='', value='', tag_field='', format_tag='marc',
                        type_table='', num_value='', num_field='', len_subfields='', add=0):        
         """ This function return the content of subfield. """
 
         if add == 1 or add == 3:
-            print_tag_subfield = """ $$&nbsp;<input type=\"text\" name=\"add_subcode\" maxlength=\"1\" size=\"1\"> """ 
+            print_tag_subfield = """ $$&nbsp;<input type=\"text\" name=\"add_subcode\" maxlength=\"1\" size=\"1\"> """
         else:
-            if format_tag != 's':
+            if type_table != "record":
+                print_tag_subfield = """ $$&nbsp;<input type=\"text\" value=\"%s\" name=\"subcode%s\" maxlength=\"1\" size=\"1\"> """ % (tag_subfield, str(num_value))
+            elif format_tag != 's':
                 print_tag_subfield = "$$&nbsp;%s" % tag_subfield
             else:
                 print_tag_subfield = "%s%s" % (tag_field[:-1], tag_subfield)
@@ -239,11 +248,11 @@ class Template:
                 
         value = self.tmpl_clean_value(value, "record")
         
-        print_value        = ''
-        print_old_value    = ''
-        print_btn          = ''
-        print_bgcolor      = ''
-        print_subcode_form = ''
+        print_value       = ''
+        print_old_value   = ''
+        print_btn         = ''
+        print_bgcolor     = ''
+        print_old_subcode = ''
         
         if type_table != "record" or add == 3:
                 
@@ -251,10 +260,10 @@ class Template:
                 print_value = " <input type=\"text\" name=\"add_value\" size=\"115%c\"> " % ('%')
                 
             else:
-                print_subcode_form = " <input type=\"hidden\" value=\"%s\" name=\"subcode%s\"> " \
+                print_old_subcode = " <input type=\"hidden\" value=\"%s\" name=\"old_subcode%s\"> " \
                                      % (tag_subfield, str(num_value))
-                print_old_value = " <input type=\"hidden\" value=\"%s\" name=\"old_value%s\"> " \
-                                  % (value, str(num_value))
+                print_old_value   = " <input type=\"hidden\" value=\"%s\" name=\"old_value%s\"> " \
+                                     % (value, str(num_value))
                 
                 if len(value) < 75:
                     print_value = """ <input type=\"text\" value=\"%s\" name=\"value%s\" style=\"width:100%c;\"> """ \
@@ -288,7 +297,7 @@ class Template:
                        %s
                    </td>
                    %s  
-                   <td></td> """ % (print_tag_subfield, print_subcode_form, print_bgcolor, print_value,
+                   <td></td> """ % (print_tag_subfield, print_old_subcode, print_bgcolor, print_value,
                                     print_old_value, print_btn)
 
 
@@ -296,11 +305,11 @@ class Template:
         """ Print button function to edit and delete information. """
         
         btn_edit = """ <a href=\"%s/edit?recID=%i&tag=%s&num_field=%s&format_tag=%s&temp=true\">
-                         <img border=\"0\" src=\"%s\">
+                         <img border=\"0\" src=\"%s\" alt=\"edit\">
                        </a> """ % (weburl_bibedit, recID, tag, num_field, format_tag, btn_edit_url)
         
         btn_delete = """ <a href=\"%s/index?recID=%i&delete_tag=%s&num_field=%s&format_tag=%s&temp=true\">
-                           <img border=\"0\" src=\"%s\">
+                              <img border=\"0\" src=\"%s\" alt=\"delete\">
                          </a> """ % (weburl_bibedit, recID, tag, num_field, format_tag, btn_delete_url)
         
         return """ <td rowspan=\"%i\" align=\"center\" valign=\"top\">
@@ -381,8 +390,22 @@ class Template:
         return result
 
     def tmpl_submit(self):        
-        """ Return an end message of BibEdit. """
+        """ Return a end message of Bibedit. """
         
-        return """ <p>Your modifications have now been submitted.  They will be processed as soon as the task queue is empty.
-                   <p>You can now go back to <a href="%s/admin/bibedit/bibeditadmin.py">BibEdit Admin Interface</a>.""" % (weburl)
+        return """ Your modifications have now been submitted.  They will be processed as soon as the task queue is empty.<br\>
+                   <br\>You can now go back to <a href=\"%s/admin/bibedit/index\">BibEdit Admin Interface</a>.""" % (weburl)
 
+    def tmpl_deleted(self, message='', recID=''):
+        """ Return a deleted message of Bibedit. """
+
+        if message == 1:
+            return """ Do you really want to delete this record ? <br\>
+                       <a href=\"%s/index?delete=%s\">YES</a>&nbsp;&nbsp;&nbsp;<a href=\"\">NO</a>
+                   """ % (weburl_bibedit, str(recID))
+            
+        else:    
+            return """ The record as soon deleted when the task queue is empty.<br\>
+                        <br\>You can now go back to <a href=\"%s/admin/bibedit/index\">
+                        BibEdit Admin Interface</a>.""" % (weburl)
+
+ 

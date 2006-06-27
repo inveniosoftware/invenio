@@ -22,26 +22,35 @@
 __lastupdated__ = """$Date$"""
 __version__     = "$Id$"
 
-from invenio.config         import cdslang, weburl
-from invenio.webpage        import page
-from invenio.webuser        import getUid
+from invenio.config import cdslang, weburl
+from invenio.webpage import page
+from invenio.webuser import getUid, page_not_authorized
 from invenio.bibedit_engine import perform_request_index, perform_request_edit, perform_request_submit
-from invenio.search_engine  import wash_url_argument
+from invenio.search_engine import wash_url_argument
+from invenio.access_control_engine import acc_authorize_action
 
 navtrail    = """ <a class=navtrail href=\"%s/admin/\">Admin Area</a> &gt;
                   <a class=navtrail href=\"%s/admin/bibedit/\">BibEdit Admin</a> """ % (weburl, weburl)
 
-def index(req, ln=cdslang, recID=None, temp="false", format_tag='s',
-          edit_tag=None, delete_tag=None, num_field=None, add=0, delete_record=0, **args):    
+def index(req, ln=cdslang, recID=None, temp="false", format_tag='marc',
+          edit_tag=None, delete_tag=None, num_field=None, add=0, cancel=0,
+          delete=0 ,confirm_delete=0,  **args):    
     """ BibEdit Admin interface. """
 
-    uid            = getUid(req)
-    recID          = wash_url_argument(recID,         "int")
-    add            = wash_url_argument(add,           "int")
-    delete_record  = wash_url_argument(delete_record, "int")
-
-    (body, errors, warnings) = perform_request_index(recID, delete_record, uid, temp, format_tag, edit_tag,
-                                                     delete_tag, num_field, add, args)
+    uid = getUid(req)
+    
+    recID          = wash_url_argument(recID,          "int")
+    add            = wash_url_argument(add,            "int")
+    cancel         = wash_url_argument(cancel,         "int")
+    delete         = wash_url_argument(delete,         "int")
+    confirm_delete = wash_url_argument(confirm_delete, "int")
+    
+    #(auth_code, auth_message) = acc_authorize_action(uid,'runbibedit')
+    #if auth_code == 0:
+    (body, errors, warnings) = perform_request_index(recID, cancel, delete, confirm_delete, uid, temp, format_tag,
+                                                     edit_tag, delete_tag, num_field, add, args)
+    #else:
+    #    return page_not_authorized(req=req, text=auth_message, navtrail=navtrail)
 
     if recID != 0:
         title = "Record #%i" % recID
@@ -61,7 +70,7 @@ def index(req, ln=cdslang, recID=None, temp="false", format_tag='s',
                 req         = req) 
 
 
-def edit(req, recID, tag, num_field='0', format_tag='s',
+def edit(req, recID, tag, num_field='0', format_tag='marc',
          del_subfield=None, temp="false", add=0, ln=cdslang, **args):    
     """ Edit Field page. """
 

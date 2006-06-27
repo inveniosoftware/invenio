@@ -30,7 +30,7 @@ import invenio.template
 
 bibedit_templates = invenio.template.load('bibedit')
 
-def perform_request_index(recID, delete_record, uid, temp, format_tag, edit_tag,
+def perform_request_index(recID, cancel, delete, confirm_delete, uid, temp, format_tag, edit_tag,
                           delete_tag, num_field, add, dict_value=None):    
     """ This function return the body of main page. """
     
@@ -38,62 +38,73 @@ def perform_request_index(recID, delete_record, uid, temp, format_tag, edit_tag,
     warnings = []
     body     = ''
 
-    if delete_record != 0:
-        os.system("rm %s.tmp" % get_file_path(delete_record))
-        
-    if recID != 0 :
-        if record_exists(recID) != 0:
-            (record, body) = get_record(recID, uid, temp)
-            
-            if record != '':
-                if add == 3:
-                    body = ''
+    if cancel != 0:
+        os.system("rm %s.tmp" % get_file_path(cancel))
 
-                if edit_tag != None and dict_value != None:
-                    record = edit_record(recID, uid, record, edit_tag, dict_value, num_field)
+    if delete != 0:
+        if confirm_delete != 0:
+            body = bibedit_templates.tmpl_deleted(1, delete)
+        else:
+            (record, junk) = get_record(delete, uid, "false")
+            add_field(delete, uid, record, "980", "", "", "c", "DELETED")
+            save_temp_record(record, uid, "%s.tmp" % get_file_path(delete))
+            save_xml_record(delete)
+            body = bibedit_templates.tmpl_deleted()
 
-                if delete_tag != None and num_field != None:
-                    record = delete_field(recID, uid, record, delete_tag, num_field)
+    else:
+        if recID != 0 :
+            if record_exists(recID) > 0:
+                (record, body) = get_record(recID, uid, temp)
 
-                if add == 4:
+                if record != '':
+                    if add == 3:
+                        body = ''
 
-                    tag     = dict_value.get("add_tag"    , '')
-                    ind1    = dict_value.get("add_ind1"   , '')
-                    ind2    = dict_value.get("add_ind2"   , '')
-                    subcode = dict_value.get("add_subcode", '')
-                    value   = dict_value.get("add_value"  , '')
+                    if edit_tag != None and dict_value != None:
+                        record = edit_record(recID, uid, record, edit_tag, dict_value, num_field)
 
-                    if tag != '' and subcode != '' and value != '':
-                        record = add_field(recID, uid, record, tag, ind1, ind2, subcode, value)
+                    if delete_tag != None and num_field != None:
+                        record = delete_field(recID, uid, record, delete_tag, num_field)
 
-                body += bibedit_templates.tmpl_table_header("record", recID, temp, format_tag, add=add)
+                    if add == 4:
 
-                keys = record.keys()
-                keys.sort()
+                        tag     = dict_value.get("add_tag"    , '')
+                        ind1    = dict_value.get("add_ind1"   , '')
+                        ind2    = dict_value.get("add_ind2"   , '')
+                        subcode = dict_value.get("add_subcode", '')
+                        value   = dict_value.get("add_value"  , '')
 
-                for tag in keys:
+                        if tag != '' and subcode != '' and value != '':
+                            record = add_field(recID, uid, record, tag, ind1, ind2, subcode, value)
 
-                    fields = record.get(str(tag), "empty")
+                    body += bibedit_templates.tmpl_table_header("record", recID, temp, format_tag, add=add)
 
-                    if fields != "empty":
-                        for field in fields:
-                            if tag != '001':
-                                body += bibedit_templates.tmpl_table_value(recID, temp, tag,
-                                                                           field, format_tag, "record", add)
+                    keys = record.keys()
+                    keys.sort()
 
-                if add == 3:
-                    body += bibedit_templates.tmpl_table_value(recID, temp, '', [], format_tag, "record", add, 1)
+                    for tag in keys:
 
-                body += bibedit_templates.tmpl_table_footer("record", add)
+                        fields = record.get(str(tag), "empty")
+
+                        if fields != "empty":
+                            for field in fields:
+                                if tag != '001':
+                                    body += bibedit_templates.tmpl_table_value(recID, temp, tag,
+                                                                               field, format_tag, "record", add)
+
+                    if add == 3:
+                        body += bibedit_templates.tmpl_table_value(recID, temp, '', [], format_tag, "record", add, 1)
+
+                    body += bibedit_templates.tmpl_table_footer("record", add)
+
+                else:
+                   body = bibedit_templates.tmpl_record_choice_box(2)
 
             else:
-               body = bibedit_templates.tmpl_record_choice_box(2)
-               
+                body = bibedit_templates.tmpl_record_choice_box(1)
+
         else:
-            body = bibedit_templates.tmpl_record_choice_box(1)
-                
-    else:
-        body = bibedit_templates.tmpl_record_choice_box(0)
+            body = bibedit_templates.tmpl_record_choice_box(0)
         
     return (body, errors, warnings)
 
@@ -229,30 +240,30 @@ def edit_record(recID, uid, record, edit_tag, dict_value, num_field):
     
     for subfield in range( len(dict_value.keys())/3 ):
         
-        subcode   = dict_value.get("subcode%s"   % int(subfield), "empty")
-        value     = dict_value.get("value%s"     % int(subfield), "empty")
-        old_value = dict_value.get("old_value%s" % int(subfield), "empty")
+        subcode     = dict_value.get("subcode%s"     % int(subfield), "empty")
+        old_subcode = dict_value.get("old_subcode%s" % int(subfield), "empty")
+        value       = dict_value.get("value%s"       % int(subfield), "empty")
+        old_value   = dict_value.get("old_value%s"   % int(subfield), "empty")
         
         if value != "empty" and old_value != "empty" and subcode != "empty":
-            if value != old_value:
+            if value != old_value or \
+               subcode != old_subcode:
                 
-                edit_tag = edit_tag[:5]
-                edit_tag += subcode
-                
-                record = edit_subfield(record, edit_tag, value, old_value)
+                edit_tag = edit_tag[:5]                
+                record = edit_subfield(record, edit_tag, subcode, old_subcode, value, old_value)
        
     save_temp_record(record, uid, "%s.tmp" % get_file_path(recID))
     
     return record
 
 
-def edit_subfield(record, tag, value, old_value):
+def edit_subfield(record, tag, subcode, old_subcode, value, old_value):
     """ This function edit the value of subfield. """
+
+    value       = bibedit_templates.tmpl_clean_value(str(value),     "html")
+    old_value   = bibedit_templates.tmpl_clean_value(str(old_value), "html")
     
-    value     = bibedit_templates.tmpl_clean_value(str(value),     "html")
-    old_value = bibedit_templates.tmpl_clean_value(str(old_value), "html")
-    
-    (tag, ind1, ind2, subcode) = marc_to_split_tag(tag)
+    (tag, ind1, ind2, junk) = marc_to_split_tag(tag)
     
     fields = record.get(str(tag), "empty")
     
@@ -265,7 +276,7 @@ def edit_subfield(record, tag, value, old_value):
                 j = -1
                 for subfield in subfields:
                     j += 1
-                    if subfield[0] == subcode and \
+                    if subfield[0] == old_subcode and \
                        subfield[1] == old_value:
                         record[tag][i][0][j] = (subcode, value)
                         break
@@ -280,8 +291,8 @@ def add_field(recID, uid, record, tag, ind1, ind2, subcode, value_subfield):
     
     tag = tag[:3]
 
-    new_field = record_add_field(record, tag, "", ind1, ind2)
-    record    = add_subfield(recID, uid, tag, record, new_field[4], subcode, value_subfield)
+    new_field_number = record_add_field(record, tag, ind1, ind2)
+    record  = add_subfield(recID, uid, tag, record, new_field_number, subcode, value_subfield)
     
     save_temp_record(record, uid, "%s.tmp" % get_file_path(recID))
     
