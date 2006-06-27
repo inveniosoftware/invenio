@@ -28,7 +28,12 @@ import getopt
 import unittest
 import sys
 
+# we first import webinterface_tests to be sure to have the fake
+# Apache environment working:
 from invenio import webinterface_tests
+
+# now we import the rest:
+from invenio.config import version
 from invenio import search_engine_tests 
 from invenio import bibindex_engine_tests 
 from invenio import bibindex_engine_stemmer_tests 
@@ -42,8 +47,6 @@ from invenio import oai_repository_tests
 from invenio import bibconvert_tests 
 from invenio import errorlib_tests
 from invenio import elmsubmit_tests
-
-from invenio.config import version
 
 def usage():
     """Print usage info on standard error output."""
