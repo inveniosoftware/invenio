@@ -12,7 +12,6 @@ modules/bibedit/bin/refextract.in
 modules/bibedit/bin/xmlmarclint.in
 modules/bibedit/doc/admin/guide.html.wml
 modules/bibedit/doc/admin/index.html.wml
-modules/bibedit/lib/bibeditadminlib.py
 modules/bibedit/lib/bibedit_templates.py
 modules/bibedit/lib/bibrecord_config.py
 modules/bibedit/lib/bibrecord.py
