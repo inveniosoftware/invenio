@@ -28,7 +28,6 @@ import getopt
 import unittest
 import sys
 
-from invenio.config import version
 from invenio import webinterface_tests
 from invenio import search_engine_tests 
 from invenio import bibindex_engine_tests 
@@ -43,6 +42,8 @@ from invenio import oai_repository_tests
 from invenio import bibconvert_tests 
 from invenio import errorlib_tests
 from invenio import elmsubmit_tests
+
+from invenio.config import version
 
 def usage():
     """Print usage info on standard error output."""

@@ -15,12 +15,25 @@ __version__ = "$Id$"
 
 import unittest, sys, cgi
 
-from invenio import webinterface_handler
-from invenio.config import cdslang
-
+# SLIPPERY SLOPE AHEAD
+#
 # Trick mod_python into believing there is already an _apache module
 # available, which is used only for its parse_qs functions anyway.
+#
+# This must be done early, as many imports somehow end up importing
+# apache in turn, which makes the trick useless.
+
 class _FakeApache(object):
+
+    SERVER_RETURN = 'RETURN'
+    
+    def __init__(self):
+        self.table = None
+        self.log_error = None
+        self.table = None
+        self.config_tree = None
+        self.server_root = None
+        self.mpm_query = None
 
     def parse_qs(self, *args, **kargs):
         return cgi.parse_qs(*args, **kargs)
@@ -35,25 +48,28 @@ class _FakeReq(object):
         self.method = "GET"
         return
 
-_current_module = sys.modules.get('_apache')
+_current_module = sys.modules.get('mod_python._apache')
 
-sys.modules['_apache'] = _FakeApache()
+sys.modules['mod_python._apache'] = _FakeApache()
+
+from mod_python.util import FieldStorage
 
 if _current_module:
-    sys.modules['_apache'] = _current_module
+    sys.modules['mod_python._apache'] = _current_module
 else:
-    del sys.modules['_apache']
+    del sys.modules['mod_python._apache']
+
+
+# --------------------------------------------------
+
+from invenio import webinterface_handler
+from invenio.config import cdslang
 
 
 class TestWashArgs(unittest.TestCase):
     """webinterface - Test for washing of URL query arguments"""
 
     def _check(self, query, default, expected):
-        try:
-            from mod_python.util import FieldStorage
-        except ImportError:
-            self.fail("WARNING: cannot import mod_python.util.FieldStorage; test not run.")
-
         req = _FakeReq(query)
         form = FieldStorage(req, keep_blank_values=True)
         result = webinterface_handler.wash_urlargd(form, default)
