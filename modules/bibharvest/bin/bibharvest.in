@@ -181,8 +181,12 @@ def OAI_Request(server, script, params, method="POST"):
             return data
 
         elif response.status == 503:
-            sys.stderr.write("Retry in %d seconds...\n" % string.atoi(response.getheader("Retry-After","%d" % (i*i))))
-            time.sleep(string.atoi(response.getheader("Retry-After","%d" % (i*i))))
+            try:
+                nb_seconds_to_wait = string.atoi(response.getheader("Retry-After","%d" % (i*i)))
+            except ValueError:
+                nb_seconds_to_wait = 10
+            sys.stderr.write("Retry in %d seconds...\n" % nb_seconds_to_wait)
+            time.sleep(nb_seconds_to_wait)
 
         elif response.status == 302:
             sys.stderr.write("Redirecting...\n")
@@ -194,7 +198,9 @@ def OAI_Request(server, script, params, method="POST"):
             time.sleep(10)
 
 
-    sys.stderr.write("Harvesting interrupted (after 10 attempts) at %s: %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime())),params)
+    sys.stderr.write("Harvesting interrupted (after 10 attempts) at %s: %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S --> ",
+                                                                                               time.localtime()),
+                                                                                 params))
 
     sys.exit(1)
 
