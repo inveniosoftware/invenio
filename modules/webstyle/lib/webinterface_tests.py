@@ -68,18 +68,18 @@ class TestWashArgs(unittest.TestCase):
 
         default = {'c': (str, 'default')}
         
-        self._check('c=Invenio', default, {'c': 'Invenio'})
-        self._check('d=Invenio', default, {'c': 'default'})
-        self._check('c=Invenio&c=CDSware', default, {'c': 'Invenio'})
+        self._check('c=Test1', default, {'c': 'Test1'})
+        self._check('d=Test1', default, {'c': 'default'})
+        self._check('c=Test1&c=Test2', default, {'c': 'Test1'})
 
     def test_string_list(self):
         """ webinterface - check retrieval of a list of values """
 
         default = {'c': (list, ['default'])}
         
-        self._check('c=Invenio', default, {'c': ['Invenio']})
-        self._check('c=Invenio&c=CDSware', default, {'c': ['Invenio', 'CDSware']})
-        self._check('d=Invenio', default, {'c': ['default']})
+        self._check('c=Test1', default, {'c': ['Test1']})
+        self._check('c=Test1&c=Test2', default, {'c': ['Test1', 'Test2']})
+        self._check('d=Test1', default, {'c': ['default']})
 
     def test_int_casting(self):
         """ webinterface - check casting into an int. """
@@ -88,9 +88,9 @@ class TestWashArgs(unittest.TestCase):
         
         self._check('jrec=12', default, {'jrec': 12})
         self._check('jrec=', default, {'jrec': -1})
-        self._check('jrec=toto', default, {'jrec': -1})
-        self._check('jrec=toto&jrec=1', default, {'jrec': -1})
-        self._check('jrec=12&jrec=toto', default, {'jrec': 12})
+        self._check('jrec=foo', default, {'jrec': -1})
+        self._check('jrec=foo&jrec=1', default, {'jrec': -1})
+        self._check('jrec=12&jrec=foo', default, {'jrec': 12})
 
 
 def create_test_suite():
