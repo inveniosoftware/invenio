@@ -67,8 +67,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                            argd['ln'])
         if isGuestUser(uid):
             body = create_guest_warning_box(argd['ln']) + body
-        navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
-        navtrail %= (weburl, _("Your Account"))
+        navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">%s</a>'
+        navtrail %= (weburl, argd['ln'], _("Your Account"))
         navtrail_end = create_basket_navtrail(uid=uid,
                                               category=argd['category'],
                                               topic=argd['topic'],
@@ -109,8 +109,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                                 ln=argd['ln'])
         if isGuestUser(uid):
             body = create_guest_warning_box(argd['ln']) + body
-        navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
-        navtrail %= (weburl, _("Your Account"))
+        navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">%s</a>'
+        navtrail %= (weburl, argd['ln'], _("Your Account"))
         navtrail_end = create_basket_navtrail(uid=uid,
                                               category=argd['category'],
                                               topic=argd['topic'],
@@ -150,8 +150,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                                  topic=argd['topic'],
                                                                  group_id=argd['group'],
                                                                  ln=argd['ln'])
-        navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
-        navtrail %= (weburl, _("Your Account"))
+        navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">%s</a>'
+        navtrail %= (weburl, argd['ln'], _("Your Account"))
         navtrail_end = create_basket_navtrail(uid=uid,
                                               category=argd['category'],
                                               topic=argd['topic'],
@@ -200,8 +200,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                                            ln=argd['ln'])
         body = create_infobox(infos) + body                                                                   
         errors = errors_saving.extend(errors_displaying)
-        navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
-        navtrail %= (weburl, _("Your Account"))
+        navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">%s</a>'
+        navtrail %= (weburl, argd['ln'], _("Your Account"))
         navtrail_end = create_basket_navtrail(uid=uid,
                                               category=argd['category'],
                                               topic=argd['topic'],
@@ -291,8 +291,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             title = _("Your Baskets")
         else:
             title = _("Add records to baskets")
-        navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
-        navtrail %= (weburl, _("Your Account"))
+        navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">%s</a>'
+        navtrail %= (weburl, argd['ln'], _("Your Account"))
         return page(title       = title,
                     body        = body,
                     navtrail    = navtrail,
@@ -330,8 +330,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                                                  argd['ln'])
             redirect_to_url(req, url)
         else:
-            navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
-            navtrail %= (weburl, _("Your Account"))
+            navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">%s</a>'
+            navtrail %= (weburl, argd['ln'], _("Your Account"))
             navtrail_end = create_basket_navtrail(uid=uid,
                                                   category=argd['category'],
                                                   topic=argd['topic'],
@@ -391,8 +391,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             body = ''
             warnings = ''
             errors = [('ERR_WEBBASKET_UNDEFINED_ACTION',)]
-        navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
-        navtrail %= (weburl, _("Your Account"))
+        navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">%s</a>'
+        navtrail %= (weburl, argd['ln'], _("Your Account"))
         navtrail_end = create_basket_navtrail(uid=uid,
                                               category=argd['category'],
                                               topic=argd['topic'],
@@ -474,8 +474,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         else:
             (body, errors, warnings) = perform_request_edit(uid=uid, bskid=argd['bskid'], topic=argd['topic'], ln=argd['ln'])
 
-        navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
-        navtrail %= (weburl, _("Your Account"))
+        navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">%s</a>'
+        navtrail %= (weburl, argd['ln'], _("Your Account"))
         navtrail_end = create_basket_navtrail(uid=uid,
                                               category=cfg_webbasket_categories['PRIVATE'],
                                               topic=argd['topic'],
@@ -523,8 +523,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                                      create_in_topic=argd['create_in_topic'],
                                                                      topic_number=argd['topic_number'],
                                                                      ln=argd['ln'])
-            navtrail = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
-            navtrail %= (weburl, _("Your Account"))
+            navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">%s</a>'
+            navtrail %= (weburl, argd['ln'], _("Your Account"))
             if isGuestUser(uid):
                 body = create_guest_warning_box(argd['ln']) + body
             return page(title = _("Create basket"),

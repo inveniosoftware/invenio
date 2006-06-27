@@ -65,8 +65,9 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         return page(title=_("Display searches"),
                     body=webalert.perform_display(argd['p'], uid, ln=argd['ln']),
-                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
+                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
                                  'sweburl' : sweburl,
+                                 'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
                     description="CDS Personalize, Display searches",
@@ -104,8 +105,9 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                    )
         return page(title=_("Set a new alert"),
                     body=html,
-                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
+                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
                                  'sweburl' : sweburl,
+                                 'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
                     description="CDS Personalize, Set a new alert",
@@ -144,8 +146,9 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                    )
         return page(title=_("Modify alert settings"),
                     body=html,
-                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
+                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
                                  'sweburl' : sweburl,
+                                 'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
                     description="CDS Personalize, Modify alert settings",
@@ -169,8 +172,9 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         return page(title=_("Display alerts"),
                     body=webalert.perform_list_alerts(uid, ln = argd['ln']),
-                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
+                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
                                  'sweburl' : sweburl,
+                                 'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
                     description="CDS Personalize, Display alerts",
@@ -204,8 +208,9 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
             return self.input(req, form)
         return page(title=_("Display alerts"),
                     body=html,
-                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
+                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
                                  'sweburl' : sweburl,
+                                 'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
                     description="CDS Personalize, Display alerts",
@@ -240,8 +245,9 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
             return self.modify(req, form)
         return page(title=_("Display alerts"),
                     body=html,
-                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
+                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
                                  'sweburl' : sweburl,
+                                 'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
                     description="CDS Personalize, Display alerts",
@@ -270,8 +276,9 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         return page(title=_("Display alerts"),
                     body=webalert.perform_remove_alert(argd['name'], argd['idu'], argd['idq'],
                                                        argd['idb'], uid, ln=argd['ln']),
-                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
+                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
                                  'sweburl' : sweburl,
+                                 'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
                     description="CDS Personalize, Display alerts",
