@@ -165,7 +165,7 @@ class Template:
 
         body += "<br /><br />"
         link = "<a href=\"%s?ln=%s\">%s</a>." % (weburl, ln, cdsnameintl[ln])
-        body += _("You may want to start browsing from &s") % link
+        body += _("You may want to start browsing from %s") % link
         return body
 
     def tmpl_get_first_comments_with_ranking(self, recID, ln, comments=None, nb_comments_total=None, avg_score=None, warnings=[]):
