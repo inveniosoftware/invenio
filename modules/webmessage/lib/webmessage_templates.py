@@ -433,14 +433,13 @@ class Template:
         return html formatted navtrail
         """
         _ = gettext_set_language(ln)
-        nav_h1 = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
+        nav_h1 = '<a class="navtrail" href="%s/youraccount/display?ln=%s">%s</a>'
         nav_h2 = ""
         if (title != ""):
-            nav_h2 = ' &gt; <a class="navtrail" href="%s/yourmessages/display">%s</a>'
-            nav_h2 = nav_h2 % (weburl, _("Your Messages"))
+            nav_h2 = ' &gt; <a class="navtrail" href="%s/yourmessages/display?ln=%s">%s</a>'
+            nav_h2 = nav_h2 % (weburl, ln, _("Your Messages"))
 
-        return  nav_h1% (weburl,_("Your Account")) + nav_h2
-
+        return nav_h1 % (weburl, ln, _("Your Account")) + nav_h2
     
     def tmpl_confirm_delete(self, ln=cdslang):
         """
