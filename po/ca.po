@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.89\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2006-06-23 17:02+0200\n"
-"PO-Revision-Date: 2006-06-26 18:18+0200\n"
+"PO-Revision-Date: 2006-06-27 11:50+0200\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.es>\n"
 "Language-Team: CA <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -617,9 +617,8 @@ msgstr "Any"
 #: modules/miscutil/lib/errorlib_webinterface.py:61
 #: modules/miscutil/lib/errorlib_webinterface.py:63
 #: modules/miscutil/lib/errorlib_webinterface.py:65
-#, fuzzy
 msgid "Sorry"
-msgstr "Ordenar per:"
+msgstr "Ho sentim"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:59
 #: modules/miscutil/lib/errorlib_webinterface.py:61
@@ -627,24 +626,25 @@ msgstr "Ordenar per:"
 #: modules/miscutil/lib/errorlib_webinterface.py:65
 #, python-format
 msgid "Cannot send error request, %s parameter missing."
-msgstr ""
+msgstr "No es pot enviar la petició d'error, falta el paràmetre %s."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:82
-#, fuzzy
 msgid "The error report has been sent."
-msgstr "El registre ha estat esborrat."
+msgstr "S'ha enviat l'informe d'error."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:83
 msgid "Many thanks for helping us make CDS Invenio better."
-msgstr ""
+msgstr "Moltes gràcies per ajudar-nos a fer un CDS Invenio millor."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:85
 msgid "Use the back button of your browser to return to the previous page."
 msgstr ""
+"Useu el botó d'enrera del vostre navegador per retornar a la pàgina "
+"anterior."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:87
 msgid "Thank you!"
-msgstr ""
+msgstr "Gràcies!"
 
 #: modules/webalert/lib/webalert.py:53
 #, python-format
@@ -1038,7 +1038,7 @@ msgstr "El cistell està buit"
 #, fuzzy, python-format
 msgid "This basket belongs to %s. You can freely %ssubscribe%s to it"
 msgstr ""
-"Aquest cistell pertany a %s. Us hi podeu subscriureu lliurement usant "
+"Aquest cistell pertany a %s. Us hi podeu subscriure lliurement usant "
 "l'enllaç d'aquí sota"
 
 #: modules/webbasket/lib/webbasket_templates.py:257
@@ -1065,49 +1065,43 @@ msgstr "Subscriure's a aquest cistell"
 #: modules/webbasket/lib/webbasket_templates.py:279
 #: modules/webbasket/lib/webbasket_templates.py:960
 #: modules/webbasket/lib/webbasket_templates.py:1203
-#, fuzzy
 msgid "Basket's name"
-msgstr "cistells"
+msgstr "Nom del cistell"
 
 # falta 'of'?
 #: modules/webbasket/lib/webbasket_templates.py:280
-#, fuzzy
 msgid "Number of views"
-msgstr "Número de vots positius"
+msgstr "Número de vistes"
 
 #: modules/webbasket/lib/webbasket_templates.py:281
 msgid "Owner"
-msgstr ""
+msgstr "Propietari"
 
 #: modules/webbasket/lib/webbasket_templates.py:311
-#, fuzzy
 msgid "View"
-msgstr "més"
+msgstr "Visualitzar"
 
 #: modules/webbasket/lib/webbasket_templates.py:320
 msgid "Subscribe"
-msgstr ""
+msgstr "Subscriure's"
 
 #: modules/webbasket/lib/webbasket_templates.py:327
-#, fuzzy
 msgid "There is currently no publicly accessible basket"
-msgstr "El registre ha estat esborrat."
+msgstr "No hi ha ara mateix cap cistell públicament accessible"
 
 #: modules/webbasket/lib/webbasket_templates.py:335
 #, python-format
 msgid "Displaying baskets %i-%i out of %i total baskets."
-msgstr ""
+msgstr "Visualitzant els cistells %i-%i d'un total de %i cistells."
 
 #: modules/webbasket/lib/webbasket_templates.py:362
-#, fuzzy
 msgid "Actions"
-msgstr "col·leccions"
+msgstr "Accions"
 
 #: modules/webbasket/lib/webbasket_templates.py:393
 #: modules/webbasket/lib/webbasket_templates.py:726
-#, fuzzy
 msgid "Non-shared basket"
-msgstr "Cistells no compartits"
+msgstr "Cistell no compartits"
 
 #: modules/webbasket/lib/webbasket_templates.py:396
 #: modules/webbasket/lib/webbasket_templates.py:728
@@ -1116,15 +1110,13 @@ msgstr "Cistells compartits"
 
 #: modules/webbasket/lib/webbasket_templates.py:399
 #: modules/webbasket/lib/webbasket_templates.py:730
-#, fuzzy
 msgid "Group-shared basket"
 msgstr "Cistell compartit en grup"
 
 #: modules/webbasket/lib/webbasket_templates.py:405
 #: modules/webbasket/lib/webbasket_webinterface.py:487
-#, fuzzy
 msgid "Edit basket"
-msgstr "cistells"
+msgstr "Editar cistell"
 
 #: modules/webbasket/lib/webbasket_templates.py:444
 msgid "You don't have sufficient rights to view this basket's content"
@@ -1170,7 +1162,6 @@ msgid "Remove item"
 msgstr "Esborrar l'item"
 
 #: modules/webbasket/lib/webbasket_templates.py:572
-#, fuzzy
 msgid "External record"
 msgstr "Registre extern"
 
@@ -1187,7 +1178,7 @@ msgid "Details and comments"
 msgstr "Detalls i comentaris"
 
 #: modules/webbasket/lib/webbasket_templates.py:627
-#, fuzzy, python-format
+#, python-format
 msgid "This basket is publicly accessible at this address: %s."
 msgstr "Aquest cistell és públicament accessible a aquesta adreça: %s."
 
@@ -1272,9 +1263,8 @@ msgstr "Seleccioneu el tema"
 #: modules/webbasket/lib/webbasket_templates.py:961
 #: modules/webbasket/lib/webbasket_templates.py:1205
 #: modules/webbasket/lib/webbasket_templates.py:1214
-#, fuzzy
 msgid "Choose topic"
-msgstr "Moure un tema"
+msgstr "Escolliu un tema"
 
 #: modules/webbasket/lib/webbasket_templates.py:962
 #: modules/webbasket/lib/webbasket_templates.py:1216
@@ -1282,7 +1272,6 @@ msgid "or create a new one"
 msgstr "o creeu-ne un de nou"
 
 #: modules/webbasket/lib/webbasket_templates.py:962
-#, fuzzy
 msgid "Create new topic"
 msgstr "Creeu un nou tema"
 
@@ -1334,7 +1323,6 @@ msgid "No records were added to the selected baskets."
 msgstr "No s'han afegit registres als cistells seleccionats."
 
 #: modules/webbasket/lib/webbasket_templates.py:1140
-#, fuzzy
 msgid "Are you sure you want to delete this basket?"
 msgstr "Esteu segur que voleu esborrar aquest cistell?"
 
@@ -1369,9 +1357,8 @@ msgid "Cancel"
 msgstr "Cancel·lar"
 
 #: modules/webbasket/lib/webbasket_templates.py:1219
-#, fuzzy
 msgid "General settings"
-msgstr "cistells"
+msgstr "Paràmetres generals"
 
 #: modules/webbasket/lib/webbasket_templates.py:1233
 #: modules/webbasket/lib/webbasket_templates.py:1354
@@ -1380,7 +1367,6 @@ msgid "Add group"
 msgstr "Afegir un grup"
 
 #: modules/webbasket/lib/webbasket_templates.py:1235
-#, fuzzy
 msgid "Manage group rights"
 msgstr "Gestionar permisos del grup"
 
@@ -1397,11 +1383,11 @@ msgstr "Esborrar cistell"
 #: modules/webbasket/lib/webbasket_templates.py:1271
 #, fuzzy, python-format
 msgid "Editing basket \"%s\""
-msgstr "cistells"
+msgstr "Editar cistell \"%s\""
 
 #: modules/webbasket/lib/webbasket_templates.py:1279
 msgid "Save changes"
-msgstr ""
+msgstr "Guardar els canvis"
 
 # O 'permisos'?
 #: modules/webbasket/lib/webbasket_templates.py:1292
@@ -1519,9 +1505,8 @@ msgstr "Crear un cistell"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:562
 #: modules/webbasket/lib/webbasket_webinterface.py:588
-#, fuzzy
 msgid "List of public baskets"
-msgstr "cistells"
+msgstr "Llista de cistells públics"
 
 #: modules/webcomment/lib/webcommentadminlib.py:38
 msgid "WebComment Admin"
@@ -1707,7 +1692,7 @@ msgstr "Registre"
 #: modules/webcomment/lib/webcomment_templates.py:661
 #, fuzzy
 msgid "Viewing"
-msgstr "Visualitzant"
+msgstr "Visualització"
 
 #: modules/webcomment/lib/webcomment_templates.py:662
 msgid "Page: "
@@ -1893,7 +1878,7 @@ msgstr "Visualitzar tots els comentaris/crítiques dels usuaris"
 
 #: modules/webcomment/lib/webcomment_templates.py:1134
 msgid "email"
-msgstr "acreça electrònica"
+msgstr "adreça electrònica"
 
 # Gènere, aquest[a]?  Segons el codi font, tan pot ser 'review' com 'comment'
 #: modules/webcomment/lib/webcomment_templates.py:1141
@@ -2118,9 +2103,8 @@ msgid "Sender"
 msgstr "Remitent"
 
 #: modules/webmessage/lib/webmessage_templates.py:89
-#, fuzzy
 msgid "No messages"
-msgstr "Cercar"
+msgstr "No hi ha missatges"
 
 #: modules/webmessage/lib/webmessage_templates.py:92
 msgid "[No subject]"
@@ -2214,7 +2198,7 @@ msgstr "Esteu segur que voleu buidar tota la vostra bústia?"
 #: modules/webmessage/lib/webmessage_templates.py:535
 #, python-format
 msgid "Quota used: %i messages out of max. %i"
-msgstr ""
+msgstr "Quota usada: %i missatges d'un màxim de %i"
 
 # Una?
 #: modules/webmessage/lib/webmessage_templates.py:552
@@ -2350,7 +2334,6 @@ msgid "add another collection"
 msgstr "afegir una altra col·lecció"
 
 #: modules/websearch/lib/search_engine.py:550
-#, fuzzy
 msgid "HTML brief"
 msgstr "HTML breu"
 
@@ -2500,12 +2483,12 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:164
 #, fuzzy, python-format
 msgid "Record #%d: %s"
-msgstr "Registre #%s"
+msgstr "Registre #%d: %s"
 
 #: modules/websearch/lib/websearch_templates.py:166
-#, fuzzy, python-format
+#, python-format
 msgid "Record #%d"
-msgstr "No s'ha trobat la col·lecció %s"
+msgstr "Registre #%d"
 
 #: modules/websearch/lib/websearch_templates.py:288
 #: modules/websearch/lib/websearch_templates.py:389
@@ -2796,8 +2779,9 @@ msgid ""
 "You are logged in as guest. You may want to <A href=\"%s\">login</A> as a "
 "regular user"
 msgstr ""
-"Esteu identificats com a visitant.  Potser voleu <A href=\"../youraccount.py/"
-"login?ln=%s\">identificar-vos</A> com a usuari conegut"
+"Esteu connectat com a visitant.  Potser voleu "
+"<A href=\"../youraccount.py/login?ln=%s\">identificar-vos</A> com a usuari "
+"conegut"
 
 #: modules/websession/lib/webaccount.py:90
 #, fuzzy, python-format
@@ -2805,8 +2789,8 @@ msgid ""
 "The <strong class=\"headline\">guest</strong> users need to <A href=\"%s"
 "\">register</A> first"
 msgstr ""
-"Els usuaris <strong class=\"headline\">visitants</strong> han d'<A href=\"../"
-"youraccount.py/login?ln=%s\">identificar-se</A> primer"
+"Els usuaris <strong class=\"headline\">visitants</strong> abans han "
+"d'<A href=\"../youraccount.py/login?ln=%s\">identificar-se</A>"
 
 #: modules/websession/lib/webaccount.py:91
 msgid "No queries found"
@@ -3265,7 +3249,7 @@ msgstr "sortir"
 #: modules/websession/lib/webuser.py:100
 #, python-format
 msgid "Database problem: %s"
-msgstr ""
+msgstr "Problema a la base de dades: %s"
 
 # Potser canviar el # per un n. ?
 #: modules/websession/lib/webuser.py:196
@@ -3784,6 +3768,7 @@ msgstr "esborrar lliuraments %(id)s a %(docname)s"
 msgid "reference not yet given"
 msgstr "encara no se li ha assignat referència"
 
+# Refereed, Referee?
 #: modules/websubmit/lib/websubmit_templates.py:1502
 msgid "Refereed Documents"
 msgstr ""
@@ -3998,7 +3983,7 @@ msgstr "Falta el paràmetre docid"
 #: modules/websubmit/lib/websubmit_webinterface.py:385
 #, fuzzy
 msgid "Warning"
-msgstr "atenció"
+msgstr "Atenció"
 
 #: modules/websubmit/web/publiline.py:178
 msgid "This document has never been requested for approval!"
