@@ -20,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2006-06-23 17:02+0200\n"
 "PO-Revision-Date: 2006-06-23 17:03+0200\n"
-"Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
+"Last-Translator: Ferran Jorba <Ferran.Jorba@uab.es>\n"
 "Language-Team: ES <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -232,7 +232,7 @@ msgstr "Administración de WebSubmit"
 
 #: config/cdspage.wml:55
 msgid "Convert"
-msgstr ""
+msgstr "Convertir"
 
 #: config/cdspage.wml:54 config/cdspage.wml:140
 #: modules/webstyle/lib/webstyle_templates.py:343
@@ -279,13 +279,12 @@ msgstr "Personalizar"
 #: modules/websubmit/doc/submission.html.wml:23
 #: modules/websubmit/doc/subnumber.html.wml:23
 msgid "Help Central"
-msgstr "Ayuda"
+msgstr "Centro de ayuda"
 
 #: config/cdspage.wml:144 modules/webstyle/lib/webstyle_templates.py:154
 #: modules/webstyle/lib/webstyle_templates.py:381
-#, fuzzy
 msgid "Last updated:"
-msgstr "Última actualización"
+msgstr "Última actualización:"
 
 #: modules/webhelp/web/index.html.wml:65
 #: modules/websubmit/doc/access.html.wml:23
@@ -305,7 +304,7 @@ msgstr "Última actualización"
 #: modules/websubmit/doc/submission.html.wml:23
 #: modules/websubmit/doc/subnumber.html.wml:23
 msgid "Submit Help"
-msgstr "Ayuda para el Envio"
+msgstr "Ayuda para el envio"
 
 #: modules/websubmit/doc/admin/actionimplement.html.wml:23
 #: modules/websubmit/doc/admin/actionmodify.html.wml:23
@@ -336,12 +335,10 @@ msgid "Guide"
 msgstr "Guía"
 
 #: config/cdspage.wml:59
-#, fuzzy
 msgid "Library"
-msgstr "Febrero"
+msgstr "Biblioteca"
 
 #: config/cdspage.wml:56
-#, fuzzy
 msgid "Agenda"
 msgstr "Agenda"
 
@@ -352,11 +349,11 @@ msgstr "Agenda"
 #: modules/websearch/lib/websearch_templates.py:1358
 #: modules/websearch/lib/websearch_templates.py:1417
 msgid "Search Tips"
-msgstr "Consejos para la Búsqueda"
+msgstr "Consejos para la búsqueda"
 
 #: config/cdspage.wml:57
 msgid "Webcast"
-msgstr ""
+msgstr "Webcast"
 
 #: config/cdspage.wml:64 config/cdspage.wml:66
 #: modules/webstyle/lib/webstyle_templates.py:67
@@ -370,9 +367,8 @@ msgid "Maintained by"
 msgstr "Mantenido por"
 
 #: config/cdspage.wml:58
-#, fuzzy
 msgid "Bulletin"
-msgstr "colecciones"
+msgstr "Boletín"
 
 #: config/cdspage.wml:146 modules/webstyle/lib/webstyle_templates.py:418
 msgid "Powered by"
@@ -380,49 +376,48 @@ msgstr "Powered by"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:51
 #: modules/bibharvest/lib/bibharvest_templates.py:69
-#, fuzzy
 msgid "See Guide"
-msgstr "Guía"
+msgstr "Véase la guía"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:106
 msgid "OAI sources currently present in the database"
-msgstr ""
+msgstr "Fuentes OAI actualmente presentes en la base de datos"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:107
 msgid "No OAI sources currently present in the database"
-msgstr ""
+msgstr "No hay fuentes OAI presentes actualmente en la base de datos"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:117
 msgid "Next oaiharvest task"
-msgstr ""
+msgstr "Siguiente tarea oaiharvest"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:118
 msgid "scheduled time:"
-msgstr ""
+msgstr "previsto para"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:119
 msgid "current status:"
-msgstr ""
+msgstr "status actual:"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:120
 msgid "No oaiharvest task currently scheduled"
-msgstr ""
+msgstr "No hay ninguna tarea oaiharvest programada"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:221
 msgid "successfully validated!"
-msgstr ""
+msgstr "validado correctamente!"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:222
 msgid "does not seem to be a OAI-compliant baseURL..."
-msgstr ""
+msgstr "no parece una baseURL que compla con OAI"
 
 #: modules/bibrank/lib/bibrank_citation_grapher.py:118
 msgid "Citation history:"
-msgstr "Historia de citas:"
+msgstr "Histórico de citas:"
 
 #: modules/bibrank/lib/bibrank_downloads_grapher.py:95
 msgid "Downloads history:"
-msgstr "Historia de descargas:"
+msgstr "Histórico de descargas:"
 
 #: modules/miscutil/lib/dateutils.py:69 modules/miscutil/lib/dateutils.py:96
 #: modules/webbasket/lib/webbasket.py:166
@@ -430,132 +425,117 @@ msgstr "Historia de descargas:"
 #: modules/websession/lib/webuser.py:198
 #: modules/webstyle/lib/webstyle_templates.py:491
 msgid "N/A"
-msgstr ""
+msgstr "N/D"
 
 #: modules/miscutil/lib/dateutils.py:139
-#, fuzzy
 msgid "Sun"
-msgstr "Junio"
+msgstr "Dom"
 
 #: modules/miscutil/lib/dateutils.py:140
-#, fuzzy
 msgid "Mon"
-msgstr "Mayo"
+msgstr "Lun"
 
 #: modules/miscutil/lib/dateutils.py:141
 msgid "Tue"
-msgstr ""
+msgstr "Mar"
 
 #: modules/miscutil/lib/dateutils.py:142
-#, fuzzy
 msgid "Wed"
-msgstr "Agenda"
+msgstr "Mié"
 
 #: modules/miscutil/lib/dateutils.py:143
 msgid "Thu"
-msgstr ""
+msgstr "Jue"
 
 #: modules/miscutil/lib/dateutils.py:144
 msgid "Fri"
-msgstr ""
+msgstr "Vie"
 
 #: modules/miscutil/lib/dateutils.py:145
 msgid "Sat"
-msgstr ""
+msgstr "Sáb"
 
 #: modules/miscutil/lib/dateutils.py:147
-#, fuzzy
 msgid "Sunday"
-msgstr "cualquier día"
+msgstr "Domingo"
 
 #: modules/miscutil/lib/dateutils.py:148
-#, fuzzy
 msgid "Monday"
-msgstr "Mayo"
+msgstr "Lunes"
 
 #: modules/miscutil/lib/dateutils.py:149
-#, fuzzy
 msgid "Tuesday"
-msgstr "cualquier día"
+msgstr "Martes"
 
 #: modules/miscutil/lib/dateutils.py:150
 msgid "Wednesday"
-msgstr ""
+msgstr "Miércoles"
 
 #: modules/miscutil/lib/dateutils.py:151
 msgid "Thursday"
-msgstr ""
+msgstr "Jueves"
 
 #: modules/miscutil/lib/dateutils.py:152
 msgid "Friday"
-msgstr ""
+msgstr "Viernes"
 
 #: modules/miscutil/lib/dateutils.py:153
-#, fuzzy
 msgid "Saturday"
-msgstr "cualquier día"
+msgstr "Sábado"
 
 #: modules/miscutil/lib/dateutils.py:167 modules/miscutil/lib/dateutils.py:181
-#, fuzzy
 msgid "Month"
-msgstr "cualquier mes"
+msgstr "Mes"
 
 #: modules/miscutil/lib/dateutils.py:168
-#, fuzzy
 msgid "Jan"
-msgstr "Enero"
+msgstr "Ene"
 
 #: modules/miscutil/lib/dateutils.py:169
 msgid "Feb"
-msgstr ""
+msgstr "Feb"
 
 #: modules/miscutil/lib/dateutils.py:170
-#, fuzzy
 msgid "Mar"
-msgstr "Marzo"
+msgstr "Mar"
 
 #: modules/miscutil/lib/dateutils.py:171
-#, fuzzy
 msgid "Apr"
-msgstr "Abril"
+msgstr "Abr"
 
 #: modules/miscutil/lib/dateutils.py:172 modules/miscutil/lib/dateutils.py:186
 #: modules/websearch/lib/search_engine.py:415
 #: modules/websearch/lib/websearch_templates.py:642
 msgid "May"
-msgstr "Mayo"
+msgstr "May"
 
 #: modules/miscutil/lib/dateutils.py:173
-#, fuzzy
 msgid "Jun"
-msgstr "Junio"
+msgstr "Jun"
 
 #: modules/miscutil/lib/dateutils.py:174
-#, fuzzy
 msgid "Jul"
-msgstr "Julio"
+msgstr "Jul"
 
 #: modules/miscutil/lib/dateutils.py:175
-#, fuzzy
 msgid "Aug"
-msgstr "Agosto"
+msgstr "Ago"
 
 #: modules/miscutil/lib/dateutils.py:176
 msgid "Sep"
-msgstr ""
+msgstr "Sep"
 
 #: modules/miscutil/lib/dateutils.py:177
-#, fuzzy
 msgid "Oct"
-msgstr "Octubre"
+msgstr "Oct"
 
 #: modules/miscutil/lib/dateutils.py:178
 msgid "Nov"
-msgstr ""
+msgstr "Nov"
 
 #: modules/miscutil/lib/dateutils.py:179
 msgid "Dec"
-msgstr ""
+msgstr "Dic"
 
 #: modules/miscutil/lib/dateutils.py:182
 #: modules/websearch/lib/search_engine.py:414
@@ -624,22 +604,19 @@ msgid "December"
 msgstr "Diciembre"
 
 #: modules/miscutil/lib/dateutils.py:211
-#, fuzzy
 msgid "Day"
-msgstr "Mayo"
+msgstr "Día"
 
 #: modules/miscutil/lib/dateutils.py:262
-#, fuzzy
 msgid "Year"
-msgstr "Buscar"
+msgstr "Año"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:59
 #: modules/miscutil/lib/errorlib_webinterface.py:61
 #: modules/miscutil/lib/errorlib_webinterface.py:63
 #: modules/miscutil/lib/errorlib_webinterface.py:65
-#, fuzzy
 msgid "Sorry"
-msgstr "Ordenar por:"
+msgstr "Lo sentimos"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:59
 #: modules/miscutil/lib/errorlib_webinterface.py:61
@@ -647,51 +624,54 @@ msgstr "Ordenar por:"
 #: modules/miscutil/lib/errorlib_webinterface.py:65
 #, python-format
 msgid "Cannot send error request, %s parameter missing."
-msgstr ""
+msgstr "No ha sido posible enviar la petición de error, falta el parámetro %s."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:82
-#, fuzzy
 msgid "The error report has been sent."
-msgstr "The record has been deleted."
+msgstr "Se ha enviado el informe de error."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:83
 msgid "Many thanks for helping us make CDS Invenio better."
-msgstr ""
+msgstr "Muchas gracias por ayudarnos a mejorar CDS Invenio."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:85
 msgid "Use the back button of your browser to return to the previous page."
 msgstr ""
+"Use el botón de retroceso de su navegador para volver a la página "
+"anterior."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:87
 msgid "Thank you!"
-msgstr ""
+msgstr "¡Gracias!"
 
 #: modules/webalert/lib/webalert.py:53
 #, python-format
 msgid "You already have an alert which name is <b>%(name)s</b>"
-msgstr ""
+msgstr "Ya tiene una alerta con el nombre de <b>%(name)s</b>"
 
+# O desconocida?
 #: modules/webalert/lib/webalert.py:110
+#, fuzzy
 msgid "unknown"
-msgstr ""
+msgstr "desconocido"
 
 #: modules/webalert/lib/webalert.py:172
 msgid "You already have an alert defined for the specified query and basket"
-msgstr ""
+msgstr "Ya tiene una alerta definida para esta búsqueda y cesta"
 
 #: modules/webalert/lib/webalert.py:191 modules/webalert/lib/webalert.py:289
 msgid "The alert name cannot be <b>empty</b>."
-msgstr ""
+msgstr "La alerta no puede estar <b>vacía</b>."
 
 #: modules/webalert/lib/webalert.py:206
 #, python-format
 msgid "The alert %s has been added to your profile."
-msgstr ""
+msgstr "La alerta %s ha sido añadida a su perfil"
 
 #: modules/webalert/lib/webalert.py:314
-#, fuzzy, python-format
+#, python-format
 msgid "The alert %s has been successfully updated."
-msgstr "The record has been deleted."
+msgstr "La alerta %s se ha actualitzado correctamente."
 
 #: modules/webalert/lib/webalert.py:369
 #, python-format
@@ -700,62 +680,62 @@ msgid ""
 "posibility to (a) view search results and (b) subscribe for automatic email "
 "alerting service for these queries."
 msgstr ""
+"Ha hecho %(number)s búsquedas.  Hay una %(detailed_list)s disponible "
+"con la posibilidad de (a) ver los resultados de la búsqueda y (b) "
+"subscribir-se para recibir notificaciones por correo electrónic de estas "
+"búsquedas"
 
 #: modules/webalert/lib/webalert.py:370
-#, fuzzy
 msgid "detailed list"
-msgstr "detallado"
+msgstr "lista detallada"
 
 #: modules/webalert/lib/webalert_templates.py:73
 msgid "Pattern"
-msgstr ""
+msgstr "Patrón"
 
 #: modules/webalert/lib/webalert_templates.py:75
 msgid "Field"
-msgstr ""
+msgstr "Campo"
 
 #: modules/webalert/lib/webalert_templates.py:77
 msgid "Pattern 1"
-msgstr ""
+msgstr "Patrón 1"
 
 #: modules/webalert/lib/webalert_templates.py:79
 msgid "Field 1"
-msgstr ""
+msgstr "Campo 1"
 
 #: modules/webalert/lib/webalert_templates.py:81
 msgid "Pattern 2"
-msgstr ""
+msgstr "Patrón 2"
 
 #: modules/webalert/lib/webalert_templates.py:83
 msgid "Field 2"
-msgstr ""
+msgstr "Campo 2"
 
 #: modules/webalert/lib/webalert_templates.py:85
 msgid "Pattern 3"
-msgstr ""
+msgstr "Patrón 3"
 
 #: modules/webalert/lib/webalert_templates.py:87
 msgid "Field 3"
-msgstr ""
+msgstr "Campo 3"
 
 #: modules/webalert/lib/webalert_templates.py:89
-#, fuzzy
 msgid "Collections"
-msgstr "colecciones"
+msgstr "Colecciones"
 
 #: modules/webalert/lib/webalert_templates.py:91
-#, fuzzy
 msgid "Collection"
-msgstr "colecciones"
+msgstr "Colección"
 
 #: modules/webalert/lib/webalert_templates.py:112
 msgid "You own following alerts:"
-msgstr ""
+msgstr "Tiene las siguientes alertas:"
 
 #: modules/webalert/lib/webalert_templates.py:113
-#, fuzzy
 msgid "alert name"
-msgstr "avisos"
+msgstr "nombre de la alerta"
 
 #: modules/webalert/lib/webalert_templates.py:121
 msgid "SHOW"
