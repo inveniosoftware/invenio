@@ -60,6 +60,10 @@ sources get installed to, what is the visible URL policy, etc.</dd>
 <blockquote>
 <dl>
 
+<dt><a href="bibconvert/index.html">BibConvert Internals</a></dt>
+<dd>Describes information useful to understand how BibConvert works,
+ and the BibConvert functions can be reused.</dd>
+
 <dt><a href="bibrank/index.html">BibRank Internals</a></dt>
 <dd>Describes information useful to understand how the various
 ranking methods available in bibrank works, and how they can

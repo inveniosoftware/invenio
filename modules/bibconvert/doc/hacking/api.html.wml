@@ -1,0 +1,67 @@
+## $Id$
+
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="BibConvert API" \
+    navbar_name="hacking-bibconvert" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDS Invenio</a> &gt; <a class=navtrail href=index.html>BibConvert Internals</a> " \
+    navbar_select="hacking-bibconvert-api" 
+
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
+<protect> 
+<pre> 
+CDS Invenio BibConvert can be called from within your Python 
+programs via a high-level API.
+
+BibConvert High-level API
+
+   Description:
+
+      The high-level access to the BibConvert formatting and value generation 
+      allows to perform basic text formatting basde on BibConvert's metadata 
+      conversion configuration language. There are two main functions accessible 
+      via the BibConvert API: (i) The BibConvert formatter and (ii) The BibConvert 
+      value generator. For detailed description of formatting functions and 
+      generated values please have a look at the <a href=</protect><WEBURL><protect>/admin/bibconvert/guide.html>BibConvert Admin Guide</a>.
+
+   Signature:
+
+      def format_field(value_raw, "function(parameters)"):
+       """
+       value_raw     - text to be formatted
+       function      - BibConvert formatting function
+       parameters    - Comma separated parameters
+       output        - formated text
+
+      def generate():
+       """
+       """
+       
+   Examples:
+ 
+      >>> # import the function:
+      >>> from invenio.bibconvert import format_field, generate
+      >>> # format field
+      >>> out = format_field(value_raw,"")
+      >>> # generate value in requested format
+      >>> out = generate("DATE(%Y-%m-%dT%H:%M:%SZ)")
+
+</pre>
+</protect>
