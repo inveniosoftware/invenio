@@ -30,7 +30,7 @@ import invenio.template
 
 bibedit_templates = invenio.template.load('bibedit')
 
-def perform_request_index(recID, cancel, delete, confirm_delete, uid, temp, format_tag, edit_tag,
+def perform_request_index(ln, recID, cancel, delete, confirm_delete, uid, temp, format_tag, edit_tag,
                           delete_tag, num_field, add, dict_value=None):    
     """ This function return the body of main page. """
     
@@ -43,18 +43,18 @@ def perform_request_index(recID, cancel, delete, confirm_delete, uid, temp, form
 
     if delete != 0:
         if confirm_delete != 0:
-            body = bibedit_templates.tmpl_deleted(1, delete)
+            body = bibedit_templates.tmpl_deleted(ln, 1, delete, temp, format_tag)
         else:
-            (record, junk) = get_record(delete, uid, "false")
+            (record, junk) = get_record(ln, delete, uid, "false")
             add_field(delete, uid, record, "980", "", "", "c", "DELETED")
             save_temp_record(record, uid, "%s.tmp" % get_file_path(delete))
             save_xml_record(delete)
-            body = bibedit_templates.tmpl_deleted()
+            body = bibedit_templates.tmpl_deleted(ln)
 
     else:
         if recID != 0 :
             if record_exists(recID) > 0:
-                (record, body) = get_record(recID, uid, temp)
+                (record, body) = get_record(ln, recID, uid, temp)
 
                 if record != '':
                     if add == 3:
@@ -77,7 +77,7 @@ def perform_request_index(recID, cancel, delete, confirm_delete, uid, temp, form
                         if tag != '' and subcode != '' and value != '':
                             record = add_field(recID, uid, record, tag, ind1, ind2, subcode, value)
 
-                    body += bibedit_templates.tmpl_table_header("record", recID, temp, format_tag, add=add)
+                    body += bibedit_templates.tmpl_table_header(ln, "record", recID, temp, format_tag, add=add)
 
                     keys = record.keys()
                     keys.sort()
@@ -95,28 +95,28 @@ def perform_request_index(recID, cancel, delete, confirm_delete, uid, temp, form
                     if add == 3:
                         body += bibedit_templates.tmpl_table_value(recID, temp, '', [], format_tag, "record", add, 1)
 
-                    body += bibedit_templates.tmpl_table_footer("record", add)
+                    body += bibedit_templates.tmpl_table_footer(ln, "record",recID, temp, format_tag, add)
 
                 else:
-                   body = bibedit_templates.tmpl_record_choice_box(2)
+                   body = bibedit_templates.tmpl_record_choice_box(ln, 2)
 
             else:
-                body = bibedit_templates.tmpl_record_choice_box(1)
+                body = bibedit_templates.tmpl_record_choice_box(ln, 1)
 
         else:
-            body = bibedit_templates.tmpl_record_choice_box(0)
+            body = bibedit_templates.tmpl_record_choice_box(ln, 0)
         
     return (body, errors, warnings)
 
 
-def perform_request_edit(recID, uid, tag, num_field, format_tag, temp, del_subfield, add, dict_value):    
+def perform_request_edit(ln, recID, uid, tag, num_field, format_tag, temp, del_subfield, add, dict_value):    
     """ This function return the body of edit page. """
     
     errors = []
     warnings = []
     body = ''
     
-    (record, _) = get_record(recID, uid, temp)
+    (record, junk) = get_record(ln, recID, uid, temp)
     
     if del_subfield != None:
         record = delete_subfield(recID, uid, record, tag, num_field)
@@ -131,7 +131,8 @@ def perform_request_edit(recID, uid, tag, num_field, format_tag, temp, del_subfi
         if value != "empty" and subcode != "empty":
             record = add_subfield(recID, uid, tag, record, num_field, subcode, value)
         
-    body += bibedit_templates.tmpl_table_header("edit", recID, temp=temp, tag=tag, num_field=num_field, add=add)
+    body += bibedit_templates.tmpl_table_header(ln, "edit", recID, temp=temp,
+                                                tag=tag, num_field=num_field, add=add)
     
     tag = tag[:3]
     fields = record.get(str(tag), "empty")
@@ -142,19 +143,19 @@ def perform_request_edit(recID, uid, tag, num_field, format_tag, temp, del_subfi
                 body += bibedit_templates.tmpl_table_value(recID, temp, tag, field, format_tag, "edit", add)
                 break
             
-    body += bibedit_templates.tmpl_table_footer("edit")
+    body += bibedit_templates.tmpl_table_footer(ln, "edit", recID, temp, format_tag)
     
     return (body, errors, warnings)    
     
     
-def perform_request_submit(recID):    
+def perform_request_submit(ln, recID):    
     """ This function submit record on database. """
     
     save_xml_record(recID)
     
     errors   = []
     warnings = []
-    body     = bibedit_templates.tmpl_submit()
+    body     = bibedit_templates.tmpl_submit(ln)
     
     return (body, errors, warnings)
 
@@ -195,14 +196,14 @@ def get_temp_record(file_path):
     return (uid, record)
 
 
-def get_record(recID, uid, temp):    
+def get_record(ln, recID, uid, temp):    
     """ This function return a record dict,
         and warning message in case of. """
 
     file_path = get_file_path(recID)
     
     if temp != "false":
-        warning_temp_file = bibedit_templates.tmpl_warning_temp_file()         
+        warning_temp_file = bibedit_templates.tmpl_warning_temp_file(ln)         
     else:
         warning_temp_file = ''
     
