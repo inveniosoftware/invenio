@@ -22,11 +22,11 @@
 __lastupdated__ = """$Date$"""
 __version__     = "$Id$"
 
-from invenio.config import cdslang, weburl
-from invenio.webpage import page
-from invenio.webuser import getUid, page_not_authorized
-from invenio.bibedit_engine import perform_request_index, perform_request_edit, perform_request_submit
-from invenio.search_engine import wash_url_argument
+from invenio.config                import cdslang, weburl
+from invenio.webpage               import page
+from invenio.webuser               import getUid, page_not_authorized
+from invenio.bibedit_engine        import perform_request_index, perform_request_edit, perform_request_submit
+from invenio.search_engine         import wash_url_argument
 from invenio.access_control_engine import acc_authorize_action
 
 navtrail    = """ <a class=navtrail href=\"%s/admin/\">Admin Area</a> &gt;
@@ -45,12 +45,12 @@ def index(req, ln=cdslang, recID=None, temp="false", format_tag='marc',
     delete         = wash_url_argument(delete,         "int")
     confirm_delete = wash_url_argument(confirm_delete, "int")
     
-    #(auth_code, auth_message) = acc_authorize_action(uid,'runbibedit')
-    #if auth_code == 0:
-    (body, errors, warnings) = perform_request_index(recID, cancel, delete, confirm_delete, uid, temp, format_tag,
-                                                     edit_tag, delete_tag, num_field, add, args)
-    #else:
-    #    return page_not_authorized(req=req, text=auth_message, navtrail=navtrail)
+    (auth_code, auth_message) = acc_authorize_action(uid,'runbibedit')
+    if auth_code == 0:
+        (body, errors, warnings) = perform_request_index(ln, recID, cancel, delete, confirm_delete, uid, temp, format_tag,
+                                                         edit_tag, delete_tag, num_field, add, args)
+    else:
+        return page_not_authorized(req=req, text=auth_message, navtrail=navtrail)
 
     if recID != 0:
         title = "Record #%i" % recID
@@ -79,11 +79,13 @@ def edit(req, recID, tag, num_field='0', format_tag='marc',
     num_field = wash_url_argument(num_field, "int")
     add       = wash_url_argument(add,       "int")
     
-    (body, errors, warnings) = perform_request_edit(recID, uid, tag, num_field, format_tag, temp, del_subfield, add, args)
+    (body, errors, warnings) = perform_request_edit(ln, recID, uid, tag, num_field,
+                                                    format_tag, temp, del_subfield, add, args)
 
     title = "Edit Record #%i Field #%s" % (recID, str(tag[:3]))
     if add == 1:
         title += " - Add Subfield"
+        
     return page(title       = title,
                 body        = body,
                 errors      = errors,
@@ -101,7 +103,7 @@ def submit(req, recID, ln=cdslang):
     uid   = getUid(req)
     recID = wash_url_argument(recID, "int")
     
-    (body, errors, warnings) = perform_request_submit(recID)
+    (body, errors, warnings) = perform_request_submit(ln, recID)
     
     return page(title       = "Submit and save record #%i" % recID,
                 body        = body,
