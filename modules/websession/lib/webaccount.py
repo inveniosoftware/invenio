@@ -76,7 +76,7 @@ def perform_youradminactivities(uid, ln):
            )
 
 # perform_display_account(): display a dynamic page that shows the user's account
-def perform_display_account(req,data,bask,aler,sear,msgs,ln):
+def perform_display_account(req,username,bask,aler,sear,msgs,ln):
 
     # load the right message language
     _ = gettext_set_language(ln)
@@ -90,7 +90,7 @@ def perform_display_account(req,data,bask,aler,sear,msgs,ln):
         bask=aler=msgs= _("""The <strong class="headline">guest</strong> users need to <A href="%s">register</A> first""") % login
         sear= _("No queries found")
     else:
-        user = data[0]
+        user = username
         accBody = websession_templates.tmpl_account_body(
                     ln = ln,
                     user = user,
@@ -134,10 +134,12 @@ def perform_delete(ln):
 def perform_set(email,password, ln):
 
     try:
-        uid = run_sql("SELECT id FROM user where email=%s", (email,))
-        uid = uid[0][0]
+        res = run_sql("SELECT id, nickname FROM user WHERE email=%s", (email,))
+        uid = res[0][0]
+        nickname = res[0][1]
     except:
         uid = 0
+        nickname = ""
 
     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL = CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
     prefs = get_user_preferences(uid)
@@ -149,7 +151,8 @@ def perform_set(email,password, ln):
              email = email,
              email_disabled = (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL >= 2),
              password = password,
-             password_disabled = (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL >= 3)
+             password_disabled = (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL >= 3),
+             nickname = nickname,
            )
 
     if len(CFG_EXTERNAL_AUTHENTICATION) >= 1:

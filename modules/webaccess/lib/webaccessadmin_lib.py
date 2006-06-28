@@ -40,7 +40,7 @@ from invenio.config import *
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email, page_not_authorized
 from invenio.search_engine import print_record
-from invenio.webuser import checkemail, get_user_preferences, set_user_preferences
+from invenio.webuser import email_valid_p, get_user_preferences, set_user_preferences
 
 __version__ = "$Id$"
 
@@ -604,7 +604,7 @@ def perform_createaccount(req, email='', password='', callback='yes', confirm=0)
                                 confirm=1,
                                 button="Create")
 
-    if confirm in [1, "1"] and email and checkemail(email):
+    if confirm in [1, "1"] and email and email_valid_p(email):
         res = run_sql("SELECT * FROM user WHERE email='%s'" % escape_string(email))
         if not res:
             res = run_sql("INSERT INTO user (email,password, note) values('%s','%s', '1')" % (escape_string(email), escape_string(password)))
@@ -816,7 +816,7 @@ def perform_modifylogindata(req, userID, email='', password='', callback='yes', 
 				   userID=userID,
                                    confirm=1,
                                    button="Modify")
-        if confirm in [1, "1"] and email and checkemail(email):
+        if confirm in [1, "1"] and email and email_valid_p(email):
             res = run_sql("UPDATE user SET email='%s' WHERE id=%s" % (escape_string(email), userID))
             res = run_sql("UPDATE user SET password='%s' WHERE id=%s" % (escape_string(password), userID))
             output += '<b><span class="info">Email and/or password modified.</span></b>'

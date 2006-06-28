@@ -243,110 +243,106 @@ def isUserAdmin(uid):
         out = 1
     return out
 
-def checkRegister(user,passw):
-    """It checks if the user is register with the correct password
+def nickname_valid_p(nickname):
+    """Check whether wanted NICKNAME supplied by the user is valid.
+       At the moment we just check whether it is not empty, does not
+       contain blanks or @, is not equal to `guest', etc.
 
-       checkRegister(user,passw) -> boolean
+       Return 1 if nickname is okay, return 0 if it is not.
     """
-
-    query_result = run_sql("select * from user where email=%s and password=%s", (user,passw))
-    if len(query_result)> 0 :
+    if not nickname \
+       or len(nickname) < 1 \
+       or string.find(nickname, " ") > 0 \
+       or string.find(nickname, "@") > 0 \
+       or nickname == "guest":
         return 0
     return 1
 
-def userOnSystem(user):
-    """It checks if the user is registered already on the system
+def email_valid_p(email):
+    """Check whether wanted EMAIL address supplied by the user is valid.
+       At the moment we just check whether it contains '@' and whether
+       it doesn't contain blanks.  We also check the email domain if
+       CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN is set.
+
+       Return 1 if email is okay, return 0 if it is not.
     """
-    query_register = run_sql("select * from user where email=%s", (user,))
-    if len(query_register)>0:
-	return 1
-    return 0
-
-def checkemail(email):
-    """Check whether the EMAIL address supplied by the user is valid.
-       At the moment we just check whether it contains '@' and
-       whether it doesn't contain blanks.
-
-       checkemail(email) -> boolean
-    """
-
     if (string.find(email, "@") <= 0) or (string.find(email, " ") > 0):
-       return 0
+        return 0
     elif CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN:
         if not email.endswith(CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN):
             return 0
     return 1
 
-def getDataUid(req,uid):
-    """It takes the email and password from a given userId, from the database, if don't exist it just returns
-       guest values for email and password
+def registerUser(req, email, passw, nickname=""):
+    """Register user with used-wished values of NICKNAME, EMAIL and
+       PASSW.
+       
+       Return 0 if the registration is successful, 1 if email is not
+       valid, 2 if nickname is not valid, 3 if email is already in the
+       database, 4 if nickname is already in the database, 5 when
+       users cannot register themselves because of the site policy.
+       """
 
-       getDataUid(req,uid) -> [email,password]
+    # is email valid?
+    if not email_valid_p(email):
+        return 1
 
-    """
+    # is nickname valid?
+    if not nickname_valid_p(nickname):
+        return 2
 
-    email = 'guest'
-    password = 'none'
+    # is email already taken?
+    res = run_sql("SELECT * FROM user WHERE email=%s", (email,))
+    if len(res) > 0:
+	return 3
 
-    query_result = run_sql("select email, password from user where id=%s", (uid,))
+    # is nickname already taken?
+    res = run_sql("SELECT * FROM user WHERE nickname=%s", (nickname,))
+    if len(res) > 0:
+	return 4
 
-    if len(query_result)>0:
+    # okay, go on and register the user:
+    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 0:
+        activated = 1
+    elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
+        activated = 0
+    elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
+        return 5
 
-        email = query_result[0][0]
-        password = query_result[0][1]
+    user_preference = get_default_user_preferences()
 
-    if password == None or  email =='':
-        email = 'guest'
-    list = [email] +[password]
-    return list
+    setUid(req, run_sql("INSERT INTO user (nickname, email, password, note, settings) VALUES (%s,%s,%s,%s,%s)",
+                        (nickname, email, passw, activated, serialize_via_marshal(user_preference),)))
 
-
-def registerUser(req,user,passw):
-    """It registers the user, inserting into the user table of database, the email and the pasword
-	of the user. It returns 1 if the insertion is done, 0 if there is any failure with the email
-	and -1 if the user is already on the data base
-
-       registerUser(req,user,passw) -> int
-    """
-    if userOnSystem(user) and  user !='':
-	return -1
-    if checkRegister(user,passw) and checkemail(user):
-        if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 0:
-            activated = 1
-        elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
-            activated = 0
-        elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
-            return 0
-
-        user_preference = get_default_user_preferences()
-
-	setUid(req, run_sql("INSERT INTO user (email, password, note, settings) VALUES (%s,%s,%s,%s)",
-                                (user,passw,activated,serialize_via_marshal(user_preference),)))
-
-        if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
-            sendNewUserAccountWarning(user, user, passw)
-        if CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS:
-            sendNewAdminAccountWarning(user, adminemail)
-	return 1
+    if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
+        sendNewUserAccountWarning(email, email, passw)
+    if CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS:
+        sendNewAdminAccountWarning(email, adminemail)
     return 0
 
-def updateDataUser(req,uid,email,password):
-    """It updates the data from the user. It is used when a user set his email and password
+def updateDataUser(req,uid,email,password,nickname):
+    """Update user data.  Used when a user changed his email or password or nickname.
     """
-    if email =='guest':
+    if email == 'guest':
         return 0
 
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
         query_result = run_sql("update user set password=%s where id=%s", (password,uid))
     else:
         query_result = run_sql("update user set email=%s,password=%s where id=%s", (email,password,uid))
+    if nickname and nickname != '':
+        query_result = run_sql("update user set nickname=%s where id=%s", (nickname,uid))
     return 1
 
-def loginUser(req, p_email,p_pw, login_method):
+def loginUser(req, p_un, p_pw, login_method):
     """It is a first simple version for the authentication of user. It returns the id of the user,
        for checking afterwards if the login is correct
     """
 
+    # p_un passed may be an email or a nickname:
+    p_email = get_email_from_username(p_un)
+
+    # go on with the old stuff based on p_email:
     user_prefs = get_user_preferences(emailUnique(p_email))
     if user_prefs and login_method != user_prefs["login_method"]:
         if CFG_EXTERNAL_AUTHENTICATION.has_key(user_prefs["login_method"]):
@@ -362,17 +358,17 @@ def loginUser(req, p_email,p_pw, login_method):
             if not p_pw or p_pw < 0:
                 import random
                 p_pw = int(random.random() * 1000000)
-                if not registerUser(req,p_email,p_pw):
+                if registerUser(req, p_email, p_pw) != 0:
                     return ([], p_email, p_pw, 13)
                 else:
-                    query_result = run_sql("SELECT id from user where email=%s and password=%s", (p_email,p_pw,))
+                    query_result = run_sql("SELECT id from user where email=%s and password=%s", (p_email, p_pw,))
                     user_prefs = get_user_preferences(query_result[0][0])
                     user_prefs["login_method"] = login_method
                     set_user_preferences(query_result[0][0], user_prefs)
         else:
             return ([], p_email, p_pw, 10)
 
-    query_result = run_sql("SELECT id from user where email=%s and password=%s", (p_email,p_pw,))
+    query_result = run_sql("SELECT id from user where email=%s and password=%s", (p_email, p_pw,))
     if query_result:
         prefered_login_method = get_user_preferences(query_result[0][0])['login_method']
     else:
@@ -400,20 +396,38 @@ def logoutUser(req):
     sm.maintain_session(req,s)
     return id1
 
-def userNotExist(p_email,p_pw):
-    """Check if the user exists or not in the system
+def username_exists_p(username):
+    """Check if USERNAME exists in the system.  Username may be either
+    nickname or email.
+    
+    Return 1 if it does exist, 0 if it does not. 
     """
 
-    query_result = run_sql("select email from user where email=%s", (p_email,))
-    if len(query_result)>0 and query_result[0]!='':
+    if username == "":
+        # return not exists if asked for guest users
         return 0
-    return 1
+    res = run_sql("SELECT email FROM user WHERE nickname=%s OR email=%s",
+                  (username, username,))
+    if len(res) > 0:
+        return 1
+    return 0
 
 def emailUnique(p_email):
     """Check if the email address only exists once. If yes, return userid, if not, -1
     """
 
     query_result = run_sql("select id, email from user where email=%s", (p_email,))
+    if len(query_result) == 1:
+        return query_result[0][0]
+    elif len(query_result) == 0:
+        return 0
+    return -1
+
+def nicknameUnique(p_nickname):
+    """Check if the nickname only exists once. If yes, return userid, if not, -1
+    """
+
+    query_result = run_sql("select id, nickname from user where nickname=%s", (p_nickname,))
     if len(query_result) == 1:
         return query_result[0][0]
     elif len(query_result) == 0:
@@ -508,6 +522,39 @@ def get_email(uid):
         out = res[0][0]
     return out
 
+def get_email_from_username(username):
+    """Return email address of the user corresponding to USERNAME.
+    The username may be either nickname or email.  Return USERNAME
+    untouched if not found in the database or if found several
+    matching entries.
+    """
+    out = username
+    res = run_sql("SELECT email FROM user WHERE email=%s OR nickname=%s", (username, username,), 1)
+    if res and len(res) == 1:
+        out = res[0][0]
+    return out
+
+def get_password(uid):
+    """Return password of the user uid.  Return None in case
+    the user is not found."""
+    out = None
+    res = run_sql("SELECT password FROM user WHERE id=%s", (uid,), 1)
+    if res and res[0][0]:
+        out = res[0][0]
+    return out
+
+def get_nickname_or_email(uid):
+    """Return nickname (preferred) or the email address of the user uid.
+    Return string 'guest' in case the user is not found."""
+    out = "guest"
+    res = run_sql("SELECT nickname, email FROM user WHERE id=%s", (uid,), 1)
+    if res and res[0]:
+        if res[0][0]:
+            out = res[0][0]
+        elif res[0][1]:
+            out = res[0][1]
+    return out
+
 def create_userinfobox_body(req, uid, language="en"):
     """Create user info box body for user UID in language LANGUAGE."""
 
@@ -524,7 +571,7 @@ def create_userinfobox_body(req, uid, language="en"):
         return tmpl.tmpl_create_userinfobox(ln=language,
                                             url_referer=url_referer,
                                             guest = isGuestUser(uid),
-                                            email = get_email(uid),
+                                            username = get_nickname_or_email(uid),
                                             submitter = isUserSubmitter(uid),
                                             referee = isUserReferee(uid),
                                             admin = isUserAdmin(uid),

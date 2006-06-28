@@ -77,7 +77,7 @@ class Template:
 
         return out
 
-    def tmpl_user_preferences(self, ln, email, email_disabled, password, password_disabled):
+    def tmpl_user_preferences(self, ln, email, email_disabled, password, password_disabled, nickname):
         """
         Displays a form for the user to change his email/password.
 
@@ -93,23 +93,33 @@ class Template:
 
           - 'password_disabled' *boolean* - If the user has the right to edit his password
 
+          - 'nickname' *string* - The nickname of the user (empty string if user does not have it)
+
         """
 
         # load the right message language
         _ = gettext_set_language(ln)
 
         out = """
-                <p><big><strong class="headline">Edit parameters</strong></big></p>
+                <p><big><strong class="headline">%(edit_params)s</strong></big></p>
                 <form method="post" action="%(sweburl)s/youraccount/change">
                 <p>%(change_user_pass)s</p>
                 <table>
+                  <tr><td align="right"><strong>
+                      %(nickname_label)s:</strong><br/>
+                      <small class="important">(%(mandatory)s)</small>
+                    </td><td>
+                      %(nickname_prefix)s%(nickname)s%(nickname_suffix)s
+                    </td>
+                    <td></td>
+                  </tr>
                   <tr><td align="right"><strong>
                       %(new_email)s:</strong><br/>
                       <small class="important">(%(mandatory)s)</small>
                     </td><td>
                       <input type="text" size="25" name="email" %(email_disabled)s value="%(email)s"><br>
                       <small><span class="quicknote">%(example)s:</span>
-                        <span class="example">johndoe@example.com</span>
+                        <span class="example">john.doe@example.com</span>
                       </small>
                     </td>
                     <td></td>
@@ -138,6 +148,11 @@ class Template:
               </form>
         """ % {
           'change_user_pass' : _("If you want to change your email address or password, please set new values in the form below."),
+          'edit_params' : _("Edit parameters"),
+          'nickname_label' : _("Nickname"),
+          'nickname' : nickname,
+          'nickname_prefix' : nickname=='' and '<input type="text" size="25" name="nickname" value=""' or '',
+          'nickname_suffix' : nickname=='' and '"><br><small><span class="quicknote">'+_("Example")+':</span><span class="example">johnd</span></small>' or '',
           'new_email' : _("New email address"),
           'mandatory' : _("mandatory"),
           'example' : _("Example"),
@@ -342,7 +357,7 @@ class Template:
 
           - 'ln' *string* - The language to display the interface in
 
-          - 'user' *string* - The user name
+          - 'user' *string* - The username (nickname or email)
         """
 
         # load the right message language
@@ -579,7 +594,7 @@ class Template:
                      <input type="hidden" name="referer" value="%(referer)s">
                      <strong>%(username)s:</strong>
                    </td>
-                   <td><input type="text" size="25" name="p_email" value=""></td>
+                   <td><input type="text" size="25" name="p_un" value=""></td>
                    <td></td>
                   </tr>
                   <tr>
@@ -606,6 +621,20 @@ class Template:
                   </table></form>"""
         return out
 
+    def tmpl_lost_your_password_teaser(self, ln=cdslang):
+        """Displays a short sentence to attract user to the fact that
+        maybe he lost his password.  Used by the registration page.
+        """
+
+        _ = gettext_set_language(ln)
+
+        out = ""
+        out += """<a href="./lost?ln=%(ln)s">%(maybe_lost_pass)s</a>""" % {
+                     'ln' : ln,
+                     'maybe_lost_pass': ("Maybe you have lost your password?") 
+                     }
+        return out
+
     def tmpl_register_page(self, ln, referer, level, supportemail, cdsname):
         """
         Displays a login form
@@ -628,7 +657,7 @@ class Template:
 
         out = ""
         if level <= 1:
-            out += _("""Please enter your email address and desired password:""")
+            out += _("""Please enter your email address and desired nickname and password:""")
             if level == 1:
                 out += _("The account will not be possible to use before it has been verified and activated.")
             out += """
@@ -639,7 +668,15 @@ class Template:
                  <td align="right"><strong>%(email_address)s:</strong><br><small class="important">(%(mandatory)s)</small></td>
                  <td><input type="text" size="25" name="p_email" value=""><br>
                      <small><span class="quicknote">%(example)s:</span>
-                     <span class="example">johndoe@example.com</span></small>
+                     <span class="example">john.doe@example.com</span></small>
+                 </td>
+                 <td></td>
+                </tr>
+                <tr>
+                 <td align="right"><strong>%(nickname)s:</strong><br><small class="important">(%(mandatory)s)</small></td>
+                 <td><input type="text" size="25" name="p_nickname" value=""><br>
+                     <small><span class="quicknote">%(example)s:</span>
+                     <span class="example">johnd</span></small>
                  </td>
                  <td></td>
                 </tr>
@@ -663,6 +700,7 @@ class Template:
               <p><strong>%(note)s:</strong> %(explain_acc)s""" % {
                 'referer' : cgi.escape(referer),
                 'email_address' : _("Email address"),
+                'nickname' : _("Nickname"),
                 'password' : _("Password"),
                 'mandatory' : _("mandatory"),
                 'optional' : _("optional"),
@@ -737,7 +775,7 @@ class Template:
 
         return out
 
-    def tmpl_create_userinfobox(self, ln, url_referer, guest, email, submitter, referee, admin):
+    def tmpl_create_userinfobox(self, ln, url_referer, guest, username, submitter, referee, admin):
         """
         Displays the user block
 
@@ -749,7 +787,7 @@ class Template:
 
           - 'guest' *boolean* - If the user is guest
 
-          - 'email' *string* - The user email (if known)
+          - 'username' *string* - The username (nickname or email)
 
           - 'submitter' *boolean* - If the user is submitter
 
@@ -778,12 +816,12 @@ class Template:
                      'login' : _("login"),
                    }
         else:
-            out += """%(email)s ::
+            out += """%(username)s ::
     	       <a class="userinfo" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a> ::
                    <a class="userinfo" href="%(weburl)s/yourmessages/display?ln=%(ln)s">%(messages)s</a> ::
                    <a class="userinfo" href="%(weburl)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a> ::
                    <a class="userinfo" href="%(weburl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> :: """ % {
-                     'email' : email,
+                     'username' : username,
                      'weburl' : weburl,
                      'sweburl' : sweburl,
                      'ln' : ln,

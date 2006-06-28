@@ -76,14 +76,14 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         language=args['ln'],
                         lastupdated=__lastupdated__)
 
-        data = webuser.getDataUid(req,uid)
+        username = webuser.get_nickname_or_email(uid)
         bask = webbasket.account_list_baskets(uid, ln=args['ln'])
         aler = webalert.account_list_alerts(uid, ln=args['ln'])
         sear = webalert.account_list_searches(uid, ln=args['ln'])
         msgs = account_new_mail(uid, ln=args['ln'])
         
         return page(title=_("Your Account"),
-                    body=webaccount.perform_display_account(req,data,bask,aler,sear,msgs,args['ln']),
+                    body=webaccount.perform_display_account(req,username,bask,aler,sear,msgs,args['ln']),
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
                     uid=uid,
@@ -103,11 +103,10 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../youraccount/edit")
 
-        data = webuser.getDataUid(req,uid)
-        email = data[0]
-        passw = data[1]
         return page(title= _("Your Settings"),
-                    body=webaccount.perform_set(email,passw, args['ln']),
+                    body=webaccount.perform_set(webuser.get_email(uid),
+                                                webuser.get_password(uid),
+                                                args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                     description="CDS Personalize, Your Settings",
                     keywords="CDS, personalize",
@@ -119,6 +118,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
     def change(self, req, form):
         args = wash_urlargd(form, {
+            'nickname': (str, None),
             'email': (str, None),
             'password': (str, None),
             'password2': (str, None),
@@ -145,9 +145,15 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             return webuser.page_not_authorized(req, "../youraccount/change")
         elif args['email']:
             uid2 = webuser.emailUnique(args['email'])
-            if (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2 or (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1 and webuser.checkemail(args['email']))) and uid2 != -1 and (uid2 == uid or uid2 == 0) and args['password'] == args['password2']:
+            uid_with_the_same_nickname = webuser.nicknameUnique(args['nickname']) 
+            if (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2 or (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1 and \
+                                                           webuser.email_valid_p(args['email']))) \
+               and (args['nickname'] is None or webuser.nickname_valid_p(args['nickname'])) \
+               and uid2 != -1 and (uid2 == uid or uid2 == 0) \
+               and uid_with_the_same_nickname != -1 and (uid_with_the_same_nickname == uid or uid_with_the_same_nickname == 0) \
+               and args['password'] == args['password2']:
                 if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
-                    change = webuser.updateDataUser(req,uid,args['email'],args['password'])
+                    change = webuser.updateDataUser(req,uid,args['email'],args['password'],args['nickname'],)
                 else:
                     return webuser.page_not_authorized(req, "../youraccount/change")
                 if change and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
@@ -157,18 +163,34 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 act = "display"
                 linkname = _("Show account")
                 title = _("Settings edited")
-            elif uid2 == -1 or uid2 != uid and not uid2 == 0:
-                mess = _("The email address is already in use, please try again.")
+            elif not webuser.nickname_valid_p(args['nickname']):
+                mess = _("Desired nickname %s is invalid.") % args['nickname']
+                mess += " " + _("Please try again.")
                 act = "edit"
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
-            elif not webuser.checkemail(args['email']):
-                mess = _("The email address is not valid, please try again.")
+            elif not webuser.email_valid_p(args['email']):
+                mess = _("Supplied email address %s is invalid.") % args['email']
+                mess += " " + _("Please try again.")
+                act = "edit"
+                linkname = _("Edit settings")
+                title = _("Editing settings failed")
+            elif uid2 == -1 or uid2 != uid and not uid2 == 0:
+                mess = _("Supplied email address %s already exists in the database.") % args['p_email']
+                mess += " " + websession_templates.tmpl_lost_your_password_teaser(args['ln'])
+                mess += " " + _("Or please try again.")
+                act = "edit"
+                linkname = _("Edit settings")
+                title = _("Editing settings failed")
+            elif uid_with_the_same_nickname == -1 or uid_with_the_same_nickname != uid and not uid_with_the_same_nickname == 0:
+                mess = _("Desired nickname %s is already in use.") % args['nickname']
+                mess += " " + _("Please try again.")
                 act = "edit"
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
             elif args['password'] != args['password2']:
-                mess = _("The passwords do not match, please try again.")
+                mess = _("Both passwords must match.")
+                mess += " " + _("Please try again.")
                 act = "edit"
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
@@ -351,7 +373,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
     def login(self, req, form):
         args = wash_urlargd(form, {
-            'p_email': (str, None),
+            'p_un': (str, None),
             'p_pw': (str, None),
             'login_method': (str, None),
             'action': (str, 'login'),
@@ -369,7 +391,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         #return action+_("login")
         if args['action'] == "login" or args['action'] == _("login"):
-            if args['p_email']==None or not args['login_method']:
+            if args['p_un']==None or not args['login_method']:
                 return page(title=_("Login"),
                             body=webaccount.create_login_page_box(args['referer'], args['ln']),
                             navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
@@ -380,10 +402,10 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             secure_page_p = 1,
                             language=args['ln'],
                             lastupdated=__lastupdated__)
-            (iden, args['p_email'], args['p_pw'], msgcode) = webuser.loginUser(req,args['p_email'],args['p_pw'], args['login_method'])
+            (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, args['p_un'], args['p_pw'], args['login_method'])
             if len(iden)>0:
 
-                uid = webuser.update_Uid(req,args['p_email'],args['p_pw'])
+                uid = webuser.update_Uid(req,args['p_un'], args['p_pw'])
                 uid2 = webuser.getUid(req)
                 if uid2 == -1:
                     webuser.logoutUser(req)
@@ -398,11 +420,11 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             else:
                 mess = cfg_webaccess_warning_msgs[msgcode] % args['login_method']
                 if msgcode == 14:
-                    if not webuser.userNotExist(args['p_email'],args['p_pw']) or args['p_email']=='' or args['p_email']==' ':
+                    if webuser.username_exists_p(args['p_un']):
                         mess = cfg_webaccess_warning_msgs[15] % args['login_method']
                 act = "login"
                 return page(title=_("Login"),
-                            body=webaccount.perform_back(mess,act, _("login"), args['ln']),
+                            body=webaccount.perform_back(mess, act, _("login"), args['ln']),
                             navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                             description="CDS Personalize, Main page",
                             keywords="CDS, personalize",
@@ -416,11 +438,12 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
     def register(self, req, form):
         args = wash_urlargd(form, {
+            'p_nickname': (str, None),
             'p_email': (str, None),
             'p_pw': (str, None),
             'p_pw2': (str, None),
-            'action': (str, 'login'),
-            'referer': (str, '')})
+            'action': (str, "login"),
+            'referer': (str, "")})
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
             return webuser.page_not_authorized(req, "../youraccount/register?ln=%s" % args['ln'])
@@ -430,7 +453,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         # load the right message language
         _ = gettext_set_language(args['ln'])
 
-        if args['p_email']==None:
+        if args['p_nickname']==None or args['p_email']==None:
             return  page(title=_("Register"),
                          body=webaccount.create_register_page_box(args['referer'], args['ln']),
                          navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
@@ -445,10 +468,10 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         mess=""
         act=""
         if args['p_pw'] == args['p_pw2']:
-            ruid = webuser.registerUser(req,args['p_email'],args['p_pw'])
+            ruid = webuser.registerUser(req, args['p_email'], args['p_pw'], args['p_nickname'])
         else:
             ruid = -2
-        if ruid == 1:
+        if ruid == 0:
             uid = webuser.update_Uid(req,args['p_email'],args['p_pw'])
             mess = _("Your account has been successfully created.")
             title = _("Account created")
@@ -459,16 +482,39 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             else:
                 mess += _(""" You can now access your <a href="%s">account</a>.""") % (
                           "%s/youraccount/display?ln=%s" % (sweburl, args['ln']))
-        elif ruid == -1:
-            mess = _("The user already exists in the database, please try again.")
+        elif ruid == -2:
+            mess = _("Both passwords must match.")
+            mess += " " + _("Please try again.")
             act = "register"
             title = _("Register failure")
-        elif ruid == -2:
-            mess = _("Both passwords must match, please try again.")
+        elif ruid == 1:
+            mess = _("Supplied email address %s is invalid.") % args['p_email']
+            mess += " " + _("Please try again.")
+            act = "register"
+            title = _("Register failure")
+        elif ruid == 2:
+            mess = _("Desired nickname %s is invalid.") % args['p_nickname']
+            mess += " " + _("Please try again.")
+            act = "register"
+            title = _("Register failure")
+        elif ruid == 3:
+            mess = _("Supplied email address %s already exists in the database.") % args['p_email']
+            mess += " " + websession_templates.tmpl_lost_your_password_teaser(args['ln'])
+            mess += " " + _("Or please try again.")
+            act = "register"
+            title = _("Register failure")
+        elif ruid == 4:
+            mess = _("Desired nickname %s already exists in the database.") % args['p_nickname']
+            mess += " " + _("Please try again.")
+            act = "register"
+            title = _("Register failure")
+        elif ruid == 5:
+            mess = _("Users cannot register themselves, only admin can register them.")
             act = "register"
             title = _("Register failure")
         else:
-            mess = _("The email address given is not valid, please try again.")
+            # this should never happen
+            mess = _("Internal Error")
             act = "register"
             title = _("Register failure")
 
