@@ -19,8 +19,8 @@
 
 webappdir = $(localstatedir)/www/admin/bibharvest
 
-webapp_DATA = bibharvestadmin.py
+webapp_DATA = bibharvestadmin.py oaiarchiveadmin.py
 
-EXTRA_DIST = bibharvestadmin.py
+EXTRA_DIST = bibharvestadmin.py oaiarchiveadmin.py
 
 CLEANFILES = *~ *.tmp

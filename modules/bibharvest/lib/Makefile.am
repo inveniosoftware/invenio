@@ -24,6 +24,7 @@ pylib_DATA = oai_repository.py \
              oai_repository_tests.py \
              oai_repository_webinterface.py \
              bibharvestadminlib.py \
+             oaiarchiveadminlib.py \
              bibharvest_templates.py \
              oaiharvestlib.py \
              oaiarchive_engine.py
