@@ -148,8 +148,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'recid': (int, -1),
                                    'action': (str, "DISPLAY"),
                                    'msg': (str, ""),
-                                   'note': (str, ""),
-                                   'score': (str, ""),
+                                   'note': (str, ''),
+                                   'score': (int, 0),
                                    'reviews': (int, 0),
                                    'comid': (int, -1),
                                    })
@@ -160,7 +160,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         uid = getUid(req)
         client_ip_address = get_client_ip_address(req)
         check_warnings = []
-
         (ok, problem) = check_recID_is_in_range(argd['recid'], check_warnings, argd['ln']) 
         if ok:
             navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(argd['recid']))
@@ -329,7 +328,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                                                                               argd['ds'],
                                                                                                                               argd['nb'],
                                                                                                                               argd['p'],
-                                                                                                                              argd['success'],
+                                                                                                                              str(success),
                                                                                                                               argd['reviews'])
             redirect_to_url(req, argd['referer'])
         else:

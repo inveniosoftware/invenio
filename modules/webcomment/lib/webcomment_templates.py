@@ -64,8 +64,6 @@ class Template:
         c_id = 4
 
         warnings = self.tmpl_warnings(warnings, ln)
-
-        report_link = '%s/comments/report?recid=%s&amp;ln=%s&amp;comid=%%(comid)s&amp;reviews=0' % (weburl, recID, ln)
         
         # comments
         comment_rows = ''
@@ -79,9 +77,15 @@ class Template:
             comment_rows += """
                     <tr>
                         <td>"""
-            comment_rows += self.tmpl_get_comment_without_ranking(ln, messaging_link, comment[c_date_creation], comment[c_body])
+            report_link = '%s/comments/report?recid=%s&amp;ln=%s&amp;comid=%s&amp;reviews=0' % (weburl, recID, ln, comment[c_id])
+            reply_link='%s/comments/add?recid=%s&amp;ln=%s&amp;comid=%s&amp;action=REPLY' % (weburl, recID, ln, comment[c_id])
+            comment_rows += self.tmpl_get_comment_without_ranking(ln=ln, nickname=messaging_link, 
+                                                                  date_creation=comment[c_date_creation], 
+                                                                  body=comment[c_body], 
+                                                                  report_link=report_link, reply_link=reply_link)
             comment_rows += """
-                            <br><br>
+                            <br />
+                            <br />
                         </td>
                     </tr>"""
         
@@ -156,10 +160,8 @@ class Template:
         _ = gettext_set_language(ln)
         if status == 'inexistant':
             body = _("Sorry, the record %s does not seem to exist.") % (recID,)
-        elif status == 'nan':
-            body = _("Sorry, the record %s does not seem to be a number.") % (recID,)
-        elif status == 'invalid':
-            body = _("Sorry, the record %s is not a valid ID value.") % (recID,)
+        elif status in ('nan', 'invalid'):
+            body = _("Sorry, %s is not a valid ID value.") % (recID,)
         else:
             body = _("Sorry, no record ID was provided.")
 
@@ -210,7 +212,6 @@ class Template:
         link = '<a href="%(weburl)s/comments/vote?recid=%(recID)s&amp;ln=%(ln)s&amp;comid=%%(comid)s&amp;reviews=1' % useful_dict
         useful_yes = link + '&amp;com_value=1">' + _("Yes") + '</a>'
         useful_no = link + '&amp;com_value=-1">' + _("No") + '</a>'
-        report_link = '%(weburl)s/comments/report?recid=%(recID)s&amp;ln=%(ln)s&amp;comid=%%(comid)s&amp;reviews=1' % useful_dict
 
         #comment row
         comment_rows = ' '
@@ -225,7 +226,14 @@ class Template:
             comment_rows += '''
                     <tr>
                         <td>'''
-            comment_rows += self.tmpl_get_comment_with_ranking(ln, messaging_link, comment[c_date_creation], comment[c_body], comment[c_nb_votes_total], comment[c_nb_votes_yes], comment[c_star_score], comment[c_title])
+            report_link = '%s/comments/report?recid=%s&amp;ln=%s&amp;comid=%s&amp;reviews=0' % (weburl, recID, ln, comment[c_id])
+            comment_rows += self.tmpl_get_comment_with_ranking(ln=ln, nickname=messaging_link, 
+                                                               date_creation=comment[c_date_creation], 
+                                                               body=comment[c_body], 
+                                                               nb_votes_total=comment[c_nb_votes_total], 
+                                                               nb_votes_yes=comment[c_nb_votes_yes], 
+                                                               star_score=comment[c_star_score], 
+                                                               title=comment[c_title], report_link=report_link)
             comment_rows += '''
                           %s %s / %s<br />''' % (_("Was this review helpful?"), useful_yes % {'comid':comment[c_id]}, useful_no % {'comid':comment[c_id]})
             comment_rows +=  '''
@@ -274,8 +282,8 @@ class Template:
                 'score_label'           : score,
                 'useful_label'          : useful_label,
                 'recID'                 : recID,
-                'view_all_comments'     : _("view all %s reviews") % (nb_comments_total,),
-                'write_comment'         : _("write a review"),
+                'view_all_comments'     : _("View all %s reviews") % (nb_comments_total,),
+                'write_comment'         : _("Write a review"),
                 'comment_rows'          : comment_rows,
                 'tab'                   : '&nbsp;'*4,
                 'weburl'                : weburl,   
@@ -314,28 +322,25 @@ class Template:
         out = ''
         final_body = email_quoted_txt2html(body)
         title = nickname + ' ' + _("wrote on") + ' <i>' + date_creation + '</i>'
-        links = '<a href="%s">' + _("Reply") +'</a>'
-        links += ' | '
-        links += '<a href="%s">' + _("Report abuse") + '</a>'
+        links = ''
+        if reply_link:
+            links += '<a href="' + reply_link +'">' + _("Reply") +'</a>'
+            if report_link:
+                links += ' | '
+        if report_link:
+            links += '<a href="' + report_link +'">' + _("Report abuse") + '</a>'
         out += """
-<table style="width: 100%%">
-  <tr>
-    <td>%(title)s</td>
-    <td align=right>%(links)s</td>
-  </tr>
-  <tr>
-    <td class="commentbox" colspan="2">
+<div style="margin-bottom: 20px;">%(title)s<br />
 %(body)s
-    </td>
-  </tr>
-</table>""" % \
+<br />
+%(links)s
+</div>""" % \
                 {'title'         : title,
-                 'body'          : indent_text(final_body, 3),
-                 'links'         : (report_link!=None and reply_link!=None) and links % (reply_link, report_link) or ""
-            }
+                 'body'          : final_body,
+                 'links'         : links}
         return out
 
-    def tmpl_get_comment_with_ranking(self, ln, nickname, date_creation, body, nb_votes_total, nb_votes_yes, star_score, title):
+    def tmpl_get_comment_with_ranking(self, ln, nickname, date_creation, body, nb_votes_total, nb_votes_yes, star_score, title, report_link=None):
         """
         private function
         @param ln: language
@@ -358,9 +363,12 @@ class Template:
 
         out = ""
         date_creation = convert_datetext_to_dategui(date_creation)
-        reviewed_label = _("Reviewed by %s on %s") % (nickname, date_creation)
+        reviewed_label = _("Reviewed by %(nickname)s on %(date)s") % {'nickname': nickname, 'date':date_creation}
         useful_label = _("%i out of %i people found this review useful")
         useful_label %= (nb_votes_yes, nb_votes_total)
+        links = ''
+        if report_link:
+            links += '<a href="' + report_link +'">' + _("Report abuse") + '</a>'
         out += """
 <table width="100%%">
   <tr>
@@ -376,6 +384,9 @@ class Template:
 %(body)s
       </blockquote>
     </td>
+    </tr>
+    <tr>
+      <td>%(abuse)s</td>
   </tr>
 </table>""" % {'weburl'        : weburl,
                'star_score_img': star_score_img,
@@ -383,7 +394,8 @@ class Template:
                'title'         : title,
                'reviewed_label': reviewed_label,
                'useful_label'  : useful_label,
-               'body'          : indent_text(body, 4)
+               'body'          : body,
+               'abuse'         : links
                }
         return out
 
@@ -562,14 +574,11 @@ class Template:
                                 <input type="hidden" name="reviews" value="%s"/>''' % (recID, ln, reviews)
         write_button_form = self.createhiddenform(action=write_button_link, method="Get", text=write_button_form, button=_('Write a %s') % comments_or_reviews)
 
-        cmts_label = comments_or_reviews
-        if comments_or_reviews == _("comment"):
-            if total_nb_comments > 1:
-                cmts_label = _("comments")
+        if reviews:
+            total_label = _("There is a total of %s reviews")
         else:
-            if total_nb_comments > 1:
-                cmts_label = _("reviews")
-        total_label = _("There is a total of %s %s") % (total_nb_comments, cmts_label)
+           total_label = _("There is a total of %s comments")
+        total_label %= total_nb_comments
         # do NOT remove the HTML comments below. Used for parsing
         body = """
 <table style="width: 100%%;">
@@ -660,7 +669,7 @@ class Template:
 """ % \
         {'v_label': _("Viewing"),
          'page_links': _("Page: ") + page_links ,
-         'comments_or_reviews': cmts_label,
+         'comments_or_reviews': comments_or_reviews,
          'results_nb_lower': len(comments)>0 and ((page-1) * nb_per_page)+1 or 0,
          'results_nb_higher': page == nb_pages and (((page-1) * nb_per_page) + len(comments)) or (page * nb_per_page)   }
 
@@ -700,7 +709,7 @@ class Template:
     <tr>
       <td style="vertical-align: top">
 """
-        output += indent_text(text + '\n', 4)
+        output += text + '\n'
         if cnfrm:
             output += """
         <input type="checkbox" name="confirm" value="1" />""" 
@@ -777,12 +786,14 @@ class Template:
                         'arguments' : 'recid=%s&amp;ln=%s&amp;action=%s&amp;reviews=0' % (recID, ln, 'SUBMIT')  }
 
         if nickname:
-            note = _("Note: Your nickname, <i>%s</i>, will be displayed as author of this comment") % nickname
+            note = _("Note: Your nickname, %s, will be displayed as author of this comment") % ('<i>' + nickname + '</i>')
         else:
             (uid, nickname, display) = get_user_info(uid)
             link = '<a href="%s/youraccount/edit">' % sweburl
-            note = _("Note: you currently haven't %sdefined a nickname%s.<br /><i>%s</i> will temporarly be displayed as author of this comment.")
-            note %= (link, '</a>', display)
+            note = _("Note: you currently haven't %(link_open)sdefined a nickname%(link_close)s.")
+            note += '<br />'
+            note += _("%s will temporarly be displayed as author of this comment.")
+            note %= (link, '</a>', '<i>' + display + '</i>')
 
         from invenio.search_engine import print_record
         record_details = print_record(recID=recID, format='hb')
@@ -793,7 +804,9 @@ class Template:
                     <tr><td>%(record_label)s</td></tr>
                     <tr><td><blockquote>%(record)s<br><br></blockquote></td></tr>
                     <tr><td>%(comment_label)s</td></tr>
-                    <tr><td><textarea name="msg" rows="20" cols="80">%(msg)s</textarea></td></tr>
+                    <tr><td>
+<textarea name="msg" rows="20" cols="80">%(msg)s</textarea>
+                    </td></tr>
                     <tr><td class="reportabuse">%(note)s</td></tr>
                 </table>
                 <br><br>""" % {'msg': msg,
@@ -802,7 +815,7 @@ class Template:
                                'record_label': _("Article:"),
                                'comment_label': _("Comment:")} 
         form_link = "%(weburl)s/%(module)s/%(function)s?%(arguments)s" % link_dic
-        form = self.createhiddenform(action=form_link, method="Post", text=form, button='Add comment')
+        form = self.createhiddenform(action=form_link, method="POST", text=form, button='Add comment')
         return warnings + form
 
     def tmpl_add_comment_form_with_ranking(self, recID, uid, nickname, ln, msg, score, note, warnings):
@@ -827,8 +840,8 @@ class Template:
         from search_engine import print_record
         record_details = print_record(recID=recID, format='hb')
 
-        note_label = _("Note: Your nickname, <i>%s</i>, will be displayed as the author of this review")
-        note_label %= nickname
+        note_label = _("Note: Your nickname, %s, will be displayed as the author of this review")
+        note_label %= ('<i>' + nickname + '</i>')
         form = """
                 <table style="width: 100%%">
                     <tr>
@@ -866,7 +879,7 @@ class Template:
                     </tr>
                     <tr>
                       <td>
-                        <textarea name="msg" rows="20" cols="80">%(msg)s</textarea>
+<textarea name="msg" rows="20" cols="80">%(msg)s</textarea>
                       </td>
                     </tr>
                     <tr>
@@ -886,7 +899,7 @@ class Template:
         form = self.createhiddenform(action=form_link, method="Post", text=form, button=_('Add Review'))
         return warnings + form
 
-    def tmpl_add_comment_successful(self, recID, ln, reviews): 
+    def tmpl_add_comment_successful(self, recID, ln, reviews, warnings): 
         """
         @param recID: record id
         @param ln: language
@@ -898,10 +911,15 @@ class Template:
                         'function'  : 'display',
                         'arguments' : 'recid=%s&amp;ln=%s&amp;do=od&amp;reviews=%s' % (recID, ln, reviews)  }
         link = "%(weburl)s/%(module)s/%(function)s?%(arguments)s" % link_dic
-        out = _("Your %s was successfully added") + '<br /><br />'
+        if warnings:
+            out = self.tmpl_warnings(warnings, ln)  + '<br /><br />'
+        else:
+            if reviews:
+                out = _("Your review was successfully added") + '<br /><br />'
+            else:
+                out = _("Your comment was successfully added") + '<br /><br />'
         out += '<a href="%s">' % link
         out += _('Back to record') + '</a>'
-        out %= (reviews==1 and _('review') or _('comment'))
         return out
 
     def tmpl_create_multiple_actions_form(self,
@@ -934,7 +952,7 @@ class Template:
     <tr>
       <td style="vertical-align: top" colspan="2">
 """
-        output += indent_text(content + '\n', 4)
+        output += content + '\n'
         for key in hidden.keys():
             if type(hidden[key]) is list:
                 for value in hidden[key]:
@@ -1138,17 +1156,20 @@ class Template:
     def tmpl_admin_review_info(self, ln, reviews, nb_reports, cmt_id, rec_id):
         """ outputs information about a review """
         _ = gettext_set_language(ln)
-        reported_label = _("This %s has been reported %i times")
-        reported_label %= (reviews and _("review") or _("comment"), int(nb_reports))
+        if reviews:
+            reported_label = _("This review has been reported %i times")
+        else:
+            reported_label = _("This comment has been reported %i times")
+        reported_label %= int(nb_reports)
         out = """
 %(reported_label)s<br />
 <a href="%(weburl)s/record/%(rec_id)i?ln=%(ln)s">%(rec_id_label)s</a><br />
 %(cmt_id_label)s"""
         out %= {'reported_label': reported_label,
-                'rec_id_label': _("Record #%s")% str(rec_id),
+                'rec_id_label': _("Record") + ' #' + str(rec_id),
                 'weburl': weburl,
                 'rec_id': int(rec_id),
-                'cmt_id_label': _("Comment #%s") % str(cmt_id),
+                'cmt_id_label': _("Comment") + ' #' + str(cmt_id),
                 'ln': ln}
         return out
         
@@ -1229,11 +1250,17 @@ class Template:
   </tbody>""" % (comments[i], users[i], comments_info[i], checkboxes[i])
         out += """
 </table>"""
-        reviews = reviews and _('reviews') or _('comments')
-        action_display = {
-            'delete': _('Delete selected %s') % reviews,
+        if reviews:
+            action_display = {
+            'delete': _('Delete selected reviews'),
             'unreport': _('Suppress selected abuse report')
             }
+        else:
+            action_display = {
+            'delete': _('Delete selected comments'),
+            'unreport': _('Suppress selected abuse report')
+            }
+
         form = self.tmpl_create_multiple_actions_form(form_name="admin_comment",
                                                       form_action=form_link,
                                                       method="POST",
@@ -1244,7 +1271,10 @@ class Template:
                                                       content=out)
         if uid > 0:
             header = '<br />'
-            header += _("Here are the reported %s of user %s") % (reviews>0 and _("reviews") or _("comments"), uid)
+            if reviews:
+                header += _("Here are the reported reviews of user %s") %  uid
+            else:
+                header += _("Here are the reported comments of user %s") %  uid
             header += '<br /><br />'
         if comID > 0:
             header = '<br />' +_("Here is comment/review %s")% comID + '<br /><br />'
@@ -1253,8 +1283,10 @@ class Template:
             header += '<br/ ><br />'
         if uid == 0 and comID == 0:
             header = '<br />'
-            header += _("Here are all reported %s sorted by most reported")
-            header %= (reviews>0 and _("reviews") or _("comments"))
+            if reviews:
+                header += _("Here are all reported reviews sorted by most reported")
+            else:
+                header += _("Here are all reported comments sorted by most reported")
             header += "<br /><br />"
 
         return header + form

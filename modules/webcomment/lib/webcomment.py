@@ -220,18 +220,12 @@ def check_user_can_review(recID, client_ip_address, uid=-1):
     @param client_ip_address: IP => use: str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
     @param uid: user id, as given by invenio.webuser.getUid(req)
     """
-    recID = wash_url_argument(recID, 'int')
-    client_ip_address = wash_url_argument(client_ip_address, 'str')
-    uid = wash_url_argument(uid, 'int')
-    max_action_time = time.time() - cfg_webcomment_timelimit_processing_reviews_in_seconds
-    max_action_time = convert_datestruct_to_datetext(time.localtime(max_action_time))
     action_code = cfg_webcomment_action_code['ADD_REVIEW']
     query = """SELECT id_bibrec
                FROM cmtACTIONHISTORY
                WHERE id_bibrec=%i AND
-                     action_code='%s' AND
-                     action_time>'%s'
-            """ % (recID, action_code, max_action_time)
+                     action_code='%s'
+            """ % (recID, action_code)
     if uid < 0:
         query += " AND client_host=inet_aton('%s')" % client_ip_address 
     else:
@@ -759,7 +753,7 @@ def perform_request_add_comment_or_remark(recID=0,
     @param msg: the body of the comment/review or remark
     @param score: star score of the review
     @param note: title of the review
-    @param priority: priority of remark
+    @param priority: priority of remark (int)
     @param reviews: boolean, if enabled will add a review, if disabled will add a comment
     @param comID: if replying, this is the comment id of the commetn are replying to
     @return html add form if action is display or reply 
@@ -768,18 +762,7 @@ def perform_request_add_comment_or_remark(recID=0,
     warnings = []
     errors = []
 
-    actions = ['DISPLAY', 'REPLY', 'SUBMIT']
-    ## wash arguments
-    recID = wash_url_argument(recID, 'int')
-    uid   = wash_url_argument(uid, 'int')
-    msg   = wash_url_argument(msg, 'str')
-    score = wash_url_argument(score, 'int')     
-    note  = wash_url_argument(note, 'str')
-    priority = wash_url_argument(priority, 'int')
-    reviews = wash_url_argument(reviews, 'int')
-    comID = wash_url_argument(comID, 'int')
-    ln = wash_language(ln)
-    
+    actions = ['DISPLAY', 'REPLY', 'SUBMIT'] 
     _ = gettext_set_language(ln)
 
     ## check arguments
@@ -832,19 +815,25 @@ def perform_request_add_comment_or_remark(recID=0,
         # if no warnings, submit
         if len(warnings) == 0:
             if reviews:
-                can_submit = check_user_can_review(recID, client_ip_address, uid)
-            else:
-                can_submit = check_user_can_comment(recID, client_ip_address, uid)
-            if can_submit:
-                success = query_add_comment_or_remark(reviews, recID=recID, uid=uid, msg=msg,
+                if check_user_can_review(recID, client_ip_address, uid):
+                    success = query_add_comment_or_remark(reviews, recID=recID, uid=uid, msg=msg,
                                                       note=note, score=score, priority=0,
                                                       client_ip_address=client_ip_address)
+                else:
+                    warnings.append('WRN_WEBCOMMENT_CANNOT_REVIEW_TWICE')
+                    success = 1
             else:
-                success = 1 #already added!
+                if check_user_can_comment(recID, client_ip_address, uid):
+                    success = query_add_comment_or_remark(reviews, recID=recID, uid=uid, msg=msg,
+                                                      note=note, score=score, priority=0,
+                                                      client_ip_address=client_ip_address)
+                else:
+                    warnings.append('WRN_WEBCOMMENT_TIMELIMIT')
+                    success = 1
             if success > 0:
                 if cfg_webcomment_admin_notification_level > 0:
                     notify_admin_of_new_comment(comID=success)
-                return (webcomment_templates.tmpl_add_comment_successful(recID, ln, reviews), errors, warnings)
+                return (webcomment_templates.tmpl_add_comment_successful(recID, ln, reviews, warnings), errors, warnings)
             else:
                 errors.append(('ERR_WEBCOMMENT_DB_INSERT_ERROR'))
         # if are warnings or if inserting comment failed, show user where warnings are
@@ -932,7 +921,7 @@ To delete comment go to %(weburl)s/admin/webcomment/webcommentadmin.py/delete?co
             'weburl'                : weburl
         }
 
-    from_addr = 'CDS Alert Engine <%s>' % alertengineemail
+    from_addr = 'CDS Invenio WebComment <%s>' % alertengineemail
     to_addr = adminemail
     subject = "A new comment/review has just been posted"
  

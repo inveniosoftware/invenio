@@ -53,7 +53,9 @@ cfg_webcomment_warning_messages = \
     'ERR_WEBCOMMENT_RECID_MISSING': '_("No record ID was given")',
     'ERR_WEBCOMMENT_RECID_INEXISTANT': '_("Record ID %s does not exist in the database")',
     'ERR_WEBCOMMENT_RECID_INVALID': '_("Record ID %s is an invalid ID")',
-    'ERR_WEBCOMMENT_RECID_NAN': '_("Record ID %s is not a number")'
+    'ERR_WEBCOMMENT_RECID_NAN': '_("Record ID %s is not a number")',
+    'WRN_WEBCOMMENT_TIMELIMIT': '_("You already posted a comment short ago. Please retry later")',
+    'WRN_WEBCOMMENT_CANNOT_REVIEW_TWICE': '_("You already wrote a review for this record.")'
 }
 
 cfg_webcomment_action_code = {    
