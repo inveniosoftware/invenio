@@ -33,6 +33,10 @@
  <dd>Configure your OAI sources and harvesting periodicity.</dd>
 </dl>
 <dl>
+ <dt><a href="oaiarchiveadmin.py">OAI Repository Admin Interface</a></dt>
+ <dd>Define OAI repository.</dd>
+</dl>
+<dl>
  <dt><a href="guide.html">BibHarvest Admin Guide</a></dt>
  <dd>Everything you want to know about configuring and running BibHarvest.</dd>
 </dl>

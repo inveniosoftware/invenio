@@ -56,13 +56,13 @@ def perform_request_index(ln=cdslang):
 
     titlebar = bibharvest_templates.tmpl_draw_titlebar(ln = cdslang,
                                                        weburl = weburl,
-                                                       title = "OAI archive",
+                                                       title = "OAI repository",
                                                        guideurl = guideurl,
                                                        extraname = "add new OAI set",
                                                        extraurl = "admin/bibharvest/oaiarchiveadmin.py/addset")
 
     header = ['id','setSpec','setName','setCollection','p1','f1','m1','p2','f2','m2','p3','f3','m3','','','']
-    
+
     oai_set = get_oai_set()
 
     sets = []
@@ -96,7 +96,7 @@ def perform_request_addset(oai_set_name, oai_set_spec, oai_set_collection, oai_s
         out = createform(action="addset",
                                   text=text,
                                   ln=ln,
-                                  button="Add new OAI archive definition line",
+                                  button="Add new OAI set definition line",
                                   func=1)
         lnargs = [["ln", ln]]
 
@@ -108,7 +108,7 @@ def perform_request_addset(oai_set_name, oai_set_spec, oai_set_collection, oai_s
 
         lnargs = [["ln", ln]]
         out += "<br><br>"
-        out += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/oaiarchiveadmin.py/index", title = "Return to main selection", args = lnargs )
+        out += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/oaiarchiveadmin.py/index", title = "Return to main selection", args = lnargs)
 
     try:
         body = [out, extra]
@@ -395,7 +395,7 @@ def createform(action="", text="", button="func", cnfrm='', **hidden):
 def oai_table(ln=cdslang):
     """"""
     
-    titlebar = bibharvest_templates.tmpl_draw_titlebar(ln = cdslang, weburl = weburl, title = "OAI archive", guideurl = guideurl, extraname = "add new OAI set" , extraurl = "admin/bibharvest/oaiarchiveadmin.py/addset" )
+    titlebar = bibharvest_templates.tmpl_draw_titlebar(ln = cdslang, weburl = weburl, title = "OAI repository", guideurl = guideurl, extraname = "add new OAI set" , extraurl = "admin/bibharvest/oaiarchiveadmin.py/addset" )
     header = ['id', 'setSpec', 'setName', 'setCollection', 'p1', 'f1', 'm1', 'p2', 'f2', 'm2', 'p3', 'f3', 'm3', '', '']
     oai_set = get_oai_set()
 
@@ -449,12 +449,12 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
 
     text = "<br>"
     text += "<table><tr><td>"
-    text += input_text(ln = cdslang, title = "OAI Set name:", name = "oai_set_name", value = oai_set_name)
-    text += "</td></tr><tr><td>"
     text += input_text(ln = cdslang, title = "OAI Set spec:", name = "oai_set_spec", value = oai_set_spec)
+    text += "</td></tr><tr><td>"
+    text += input_text(ln = cdslang, title = "OAI Set name:", name = "oai_set_name", value = oai_set_name)
 
     text += "</td></tr><tr><td>"
-    text += input_text(ln = cdslang, title = "OAI Set description", name = "oai_set_description", value = oai_set_description)
+#    text += input_text(ln = cdslang, title = "OAI Set description", name = "oai_set_description", value = oai_set_description)
     text += "</td><td colspan=2>"
 
     menu = create_drop_down_menu("SELECT distinct(name) from collection")
@@ -494,11 +494,11 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
     text += input_text(ln = cdslang, title = "Phrase:", name = "oai_set_p2", value = oai_set_p2)
     text += "</td><td>"
 
-    fields = create_drop_down_menu("SELECT distinct(name) from field")
+    fields = create_drop_down_menu("SELECT distinct(code) from field")
     fields.append(['','',''])
     if (oai_set_f2):
         fields.append([oai_set_f2,'selected',oai_set_f2])
-    else:    
+    else:
         fields.append(['','selected','Field'])
     if (oai_set_m2):
         mode_dropdown.append([oai_set_m2,'selected',modes[oai_set_m2]])
@@ -515,7 +515,7 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
     text += input_text(ln = cdslang, title = "Phrase:", name = "oai_set_p3", value = oai_set_p3)
     text += "</td><td>"
 
-    fields = create_drop_down_menu("SELECT distinct(name) from field")
+    fields = create_drop_down_menu("SELECT distinct(code) from field")
     fields.append(['','',''])
     if (oai_set_f3):
         fields.append([oai_set_f3,'selected',oai_set_f3])
@@ -545,7 +545,7 @@ def transform_tuple(header=[], tuple=[], start='', end='', extracolumn=''):
     """"""
 
     align = []
-    try: 
+    try:
         firstrow = tuple[0]
     
         if type(firstrow) in [int, long]: 
