@@ -89,13 +89,13 @@ def perform_request_index(ln, recID, cancel, delete, confirm_delete, uid, temp, 
                         if fields != "empty":
                             for field in fields:
                                 if tag != '001':
-                                    body += bibedit_templates.tmpl_table_value(recID, temp, tag,
+                                    body += bibedit_templates.tmpl_table_value(ln, recID, temp, tag,
                                                                                field, format_tag, "record", add)
 
                     if add == 3:
-                        body += bibedit_templates.tmpl_table_value(recID, temp, '', [], format_tag, "record", add, 1)
+                        body += bibedit_templates.tmpl_table_value(ln, recID, temp, '', [], format_tag, "record", add, 1)
 
-                    body += bibedit_templates.tmpl_table_footer(ln, "record",recID, temp, format_tag, add)
+                    body += bibedit_templates.tmpl_table_footer(ln, "record", add)
 
                 else:
                    body = bibedit_templates.tmpl_record_choice_box(ln, 2)
@@ -120,7 +120,7 @@ def perform_request_edit(ln, recID, uid, tag, num_field, format_tag, temp, del_s
     
     if del_subfield != None:
         record = delete_subfield(recID, uid, record, tag, num_field)
-        
+                
     if add == 2:
         
         subcode = dict_value.get("add_subcode", "empty")
@@ -140,10 +140,10 @@ def perform_request_edit(ln, recID, uid, tag, num_field, format_tag, temp, del_s
     if fields != "empty":
         for field in fields:
             if field[4] == int(num_field) :
-                body += bibedit_templates.tmpl_table_value(recID, temp, tag, field, format_tag, "edit", add)
+                body += bibedit_templates.tmpl_table_value(ln, recID, temp, tag, field, format_tag, "edit", add)
                 break
             
-    body += bibedit_templates.tmpl_table_footer(ln, "edit", recID, temp, format_tag)
+    body += bibedit_templates.tmpl_table_footer(ln, "edit", add)
     
     return (body, errors, warnings)    
     
@@ -247,11 +247,12 @@ def edit_record(recID, uid, record, edit_tag, dict_value, num_field):
         old_value   = dict_value.get("old_value%s"   % int(subfield), "empty")
         
         if value != "empty" and old_value != "empty" and subcode != "empty":
-            if value != old_value or \
-               subcode != old_subcode:
+            if value != '' and subcode != '':
+                if value != old_value or \
+                   subcode != old_subcode:
                 
-                edit_tag = edit_tag[:5]                
-                record = edit_subfield(record, edit_tag, subcode, old_subcode, value, old_value)
+                    edit_tag = edit_tag[:5]                
+                    record = edit_subfield(record, edit_tag, subcode, old_subcode, value, old_value)
        
     save_temp_record(record, uid, "%s.tmp" % get_file_path(recID))
     
@@ -310,8 +311,16 @@ def add_subfield(recID, uid, tag, record, num_field, subcode, value):
     for field in fields:
         i += 1
         if field[4] == int(num_field) :
-            field_add_subfield(record[tag][i], subcode, value)
-            break
+
+            subfields = field[0]
+            same_subfield = False
+            for subfield in subfields:
+                if subfield[0] == subcode:
+                    same_subfield = True
+
+            if same_subfield == False:     
+                field_add_subfield(record[tag][i], subcode, value)
+                break
 
     save_temp_record(record, uid, "%s.tmp" % get_file_path(recID))
     
@@ -354,6 +363,7 @@ def delete_subfield(recID, uid, record, tag, num_field):
             for subfield in field[0]:
                 if subfield[0] != subcode:
                     tmp.append((subfield[0], subfield[1]))
+            break
                     
     record[tag][i] = (tmp, record[tag][i][1], record[tag][i][2], record[tag][i][3], record[tag][i][4])
     

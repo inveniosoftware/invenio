@@ -31,7 +31,7 @@ weburl_bibedit = "%s/admin/bibedit/bibeditadmin.py" % weburl
 class Template:
     
     def tmpl_table_header(self, ln, type_table, recID, temp="false", format_tag='marc',
-                          tag='', format_view='s', num_field=None, add=0):        
+                          tag='', num_field=None, add=0):        
         """ Return the Header of table. """
 
         _ = gettext_set_language(ln)
@@ -53,17 +53,19 @@ class Template:
                                                          'print_input_add_form' : print_input_add_form}
                                             
             if add != 1:
-                print_action_add_subfield = """
-                    %(field)s: 
-                    <a href=\"%(weburl_bibedit)s/edit?recID=%(recID)s&tag=%(tag)s&num_field=%(num_field)s&format_tag=%(format_tag)s&temp=true&add=1\">
-                      %(add_subfield)s
-                    </a>&nbsp; """ % {'field'          : _("Field"),
-                                      'add_subfield'   : _("Add Subfield"),
-                                      'weburl_bibedit' : weburl_bibedit,
-                                      'recID'          : str(recID),
-                                      'tag'            : tag[:3],
-                                      'num_field'      : str(num_field),
-                                      'format_tag'     : format_tag}
+                link_add_subfields = self.tmpl_link(ln, _("Add Subfield"), weburl_bibedit, 'edit',
+                                                    {'recID'      : str(recID),
+                                                     'tag'        : tag[:3],
+                                                     'num_field'  : str(num_field),
+                                                     'format_tag' : format_tag,
+                                                     'temp'       : 'true',
+                                                     'add'        : 1})
+                
+                print_action_add_subfield = """ %(field)s: 
+                                                %(link_add_subfields)s
+                                                &nbsp;
+                                            """ % {'field'              : _("Field"),
+                                                   'link_add_subfields' : link_add_subfields}
                 
             if add == 1:
                 link_form = "edit"
@@ -73,6 +75,7 @@ class Template:
             result = """ <form action=\"%(weburl_bibedit)s/%(link_form)s\" method=\"POST\">
                            <input type=\"hidden\" value=\"%(recID)s\" name=\"recID\">
                            <input type=\"hidden\" value=\"true\" name=\"temp\">
+                           <input type=\"hidden\" value=\"%(ln)s\" name=\"ln\">
                          <div align=\"right\">
                            <font size=\"2\">
                            &nbsp;&nbsp;&nbsp;
@@ -81,57 +84,59 @@ class Template:
                          </div>
                      """ % {'weburl_bibedit'            : weburl_bibedit,
                             'recID'                     : str(recID),
+                            'ln'                        : ln,
                             'link_form'                 : link_form,
                             'print_action_add_subfield' : print_action_add_subfield}
                      
         else:
-            link_submit    = ''
-            link_add_field = """ <a href=\"%(weburl_bibedit)s/index?recID=%(recID)s&temp=true&add=3&format_tag=%(format_tag)s#add\">
-                                   %(add_field)s
-                                 </a> |
-                             """ % {'add_field'      : _("Add Field"),
-                                    'weburl_bibedit' : weburl_bibedit,
-                                    'recID'          : str(recID),
-                                    'format_tag'     : format_tag}
+            link_submit         = ''
+            link_add_field      = self.tmpl_link(ln, _("Add Field"), weburl_bibedit, 'index',
+                                                 {'recID'      : str(recID),
+                                                  'tag'        : tag[:3],
+                                                  'format_tag' : format_tag,
+                                                  'temp'       : 'true',
+                                                  'add'        : 3}, 'add') + " | "
             
-            link_diplay    = "%s | %s" % (self.tmpl_link_view(_("Verbose"), recID, temp, "s",    format_view),
-                                          self.tmpl_link_view(_("MARC"),    recID, temp, "marc", format_view))
+            link_diplay_verbose = self.tmpl_link(ln, _("Verbose"), weburl_bibedit, 'index',
+                                                 {'recID'      : str(recID),
+                                                  'format_tag' : 's',
+                                                  'temp'       : temp})
             
+            link_diplay_marc    = self.tmpl_link(ln, _("MARC"), weburl_bibedit, 'index',
+                                                 {'recID'      : str(recID),
+                                                  'format_tag' : 'marc',
+                                                  'temp'       : temp})                              
+                                                     
             if temp != "false" and add != 3:
-                link_submit = """ <a href=\"%(weburl_bibedit)s/submit?recID=%(recID)s\">%(submit)s</a> |
-                              """ % {'submit'         : _("Submit"),
-                                     'weburl_bibedit' : weburl_bibedit,
-                                     'recID'          : str(recID)}
+                link_submit = self.tmpl_link(ln, _("Submit"), weburl_bibedit, 'submit',{'recID' : str(recID)}) + " | "
+                
             if add == 3:
                 link_add_field = ''
                 result = ''
             else:
+                link_cancel = self.tmpl_link(ln, _("Cancel"), weburl_bibedit, 'index',{'cancel' : str(recID)}) 
+                link_delete = self.tmpl_link(ln, _("Delete"), weburl_bibedit, 'index',{'delete' : str(recID),
+                                                                                   'confirm_delete' :1,
+                                                                                   'temp' : temp})
+                
                 result = """ <div align=\"right\">
                                <font size=\"2\">
-                                 %(action)s :
-                                 %(link_submit)s
-                                 <a href=\"%(weburl_bibedit)s/index?cancel=%(recID)s\">%(cancel)s</a>
+                                 %(action)s : %(link_submit)s%(link_cancel)s
                                  &nbsp;&nbsp;&nbsp;
-                                 %(record)s :
-                                 %(link_add_field)s
-                                 <a href=\"%(weburl_bibedit)s/index?confirm_delete=1&delete=%(recID)s&temp=%(temp)s\">
-                                   %(delete)s
-                                 </a> 
+                                 %(record)s : %(link_add_field)s%(link_delete)s
                                  &nbsp;&nbsp;&nbsp;
-                                 %(display)s : %(link_diplay)s
+                                 %(display)s : %(link_diplay_verbose)s | %(link_diplay_marc)s
                                  &nbsp;
                                </font>
-                             </div> """  % {'action'         : _("Action"),
-                                            'record'         : _("Record"),
-                                            'display'        : _("Display"),
-                                            'cancel'         : _("Cancel"),
-                                            'delete'         : _("Delete"),
-                                            'link_submit'    : link_submit,
-                                            'link_add_field' : link_add_field,
-                                            'link_diplay'    : link_diplay,
-                                            'recID'          : str(recID),
-                                            'temp'           : temp,
-                                            'weburl_bibedit' : weburl_bibedit}
+                             </div> """  % {'action'              : _("Action"),
+                                            'record'              : _("Record"),
+                                            'display'             : _("Display"),
+                                            'link_submit'         : link_submit,
+                                            'link_add_field'      : link_add_field,
+                                            'link_diplay_verbose' : link_diplay_verbose,
+                                            'link_diplay_marc'    : link_diplay_marc,
+                                            'link_cancel'         : link_cancel,
+                                            'link_delete'         : link_delete}
                                         
         return """ <table bgcolor=\"#ECECEC\" border=\"0\" cellspacing=\"0\">
                      <tr bgcolor=\"#CCCCCC\">
@@ -144,7 +149,7 @@ class Template:
                                   'result' : result}
 
         
-    def tmpl_table_value(self, recID, temp, tag, field, format_tag, type_table, add, form_add=0):        
+    def tmpl_table_value(self, ln, recID, temp, tag, field, format_tag, type_table, add, form_add=0):        
         """ Return a field to print in table. """
 
         if form_add == 0:
@@ -167,7 +172,7 @@ class Template:
             len_subfields = len(subfields)
 
             if type_table == "record" and add != 3:
-                print_link_function = self.tmpl_link_function(len_subfields, recID, tag, num_field, format_tag, temp)
+                print_link_function = self.tmpl_link_function(ln, len_subfields, recID, tag, num_field, format_tag, temp)
                 print_tag_form = ''
             else:
                 print_link_function = ''
@@ -194,7 +199,7 @@ class Template:
                      """ % {'len_subfields'       : len_subfields,
                             'print_tag_field'     : print_tag_field,
                             'print_tag_form'      : print_tag_form,
-                            'subfield'            : self.tmpl_subfields(temp, recID,
+                            'subfield'            : self.tmpl_subfields(ln, temp, recID,
                                                                         subfields[0][0], subfields[0][1],
                                                                         tag_field, format_tag, type_table,
                                                                         0, num_field, len_subfields),
@@ -207,14 +212,14 @@ class Template:
                     if num_value != 0:
                         result += """ <tr>
                                         %s
-                                      </tr> """ % self.tmpl_subfields(temp, recID, subfield[0], subfield[1],
+                                      </tr> """ % self.tmpl_subfields(ln, temp, recID, subfield[0], subfield[1],
                                                                       tag_field, format_tag,
                                                                       type_table, num_value,
                                                                       num_field, len_subfields)
             if add == 1:
                 result += """ <tr>
                                 %s
-                              </tr> """ % self.tmpl_subfields(temp, add=add)
+                              </tr> """ % self.tmpl_subfields(ln, temp, add=add)
                 
         else:
             result = """ <td valign=\"top\" align=\"right\">
@@ -223,6 +228,7 @@ class Template:
                                <input type=\"hidden\" value=\"%(recID)s\" name=\"recID\">
                                <input type=\"hidden\" value=4 name=\"add\">
                                <input type=\"hidden\" value=true name=\"temp\">
+                               <input type=\"hidden\" value=\"%(ln)s\" name=\"ln\">
                                <b>
                                  &nbsp;<a name=\"add\">Tag</a>:
                                  <input type=\"text\" name=\"add_tag\"  maxlength=\"3\" size=\"3\">
@@ -233,11 +239,12 @@ class Template:
                                </b>
                            </font>
                          </td> """ % {'weburl_bibedit' : weburl_bibedit,
-                                      'recID' : str(recID)}
+                                      'recID'          : str(recID),
+                                      'ln'             : ln}
             
             result += """ 
                           %s
-                           """ % self.tmpl_subfields(temp, add=add)
+                           """ % self.tmpl_subfields(ln, temp, add=add)
             
         return """ <tr><td></td></tr>                   
                    <tr>
@@ -245,39 +252,32 @@ class Template:
                    </tr> """ % result
 
         
-    def tmpl_table_footer(self, ln, type_table, recID='', temp='', format_tag='', add=0):        
+    def tmpl_table_footer(self, ln, type_table, add=0):        
         """ Return a footer of table. """
 
         _ = gettext_set_language(ln)
-        
+
+        if add == 1 or add == 3:
+           button  = _("Save")
+        else:
+           button  = _("Return to Record")
+            
         if type_table != "record" or add == 3:
-            form = """ <div style=\"float:right;\">
-                         <input class=\"formbutton\" type=\"submit\" value=\"%(save)s\">&nbsp;</div>
+            form = """   <input class=\"formbutton\" type=\"submit\" value=\"%(button)s\">&nbsp;
                        </form>
-                      
-                       <form action=\"%(weburl_bibedit)s/index?recID=%(recID)s&temp=%(temp)s&format_tag=%(format_tag)s\"  method=\"POST\">
-                          <div style=\"float:right;\">
-                           <input class=\"formbutton\" type=\"submit\" value=\"%(cancel)s\">&nbsp;
-                          </div>
-                       </form>
-                   """ % {'cancel'         : _("Cancel"),
-                          'save'           : _("Save"),
-                          'weburl_bibedit' : weburl_bibedit,
-                          'recID'          : str(recID),
-                          'format_tag'     : format_tag,
-                          'temp'           : temp}
+                   """ % {'button' : button}
         else:
             form = ''
             
         return """   <tr>
                        <td align=\"right\" colspan=\"6\">
-                         %s
+                         %(form)s
                        </td>
                      </tr>
-                   </table> """ % form
+                   </table> """ % {'form' : form}
     
 
-    def tmpl_subfields(self, temp, recID='', tag_subfield='', value='', tag_field='', format_tag='marc',
+    def tmpl_subfields(self, ln, temp, recID='', tag_subfield='', value='', tag_field='', format_tag='marc',
                        type_table='', num_value='', num_field='', len_subfields='', add=0):        
         """ This function return the content of subfield. """
 
@@ -327,25 +327,22 @@ class Template:
                              'pourcentage' : '%',
                              'value'       : value}
                 else:
-                    print_value = """ <textarea name=\"value%(num_value)s\" cols=\"70\" rows=\"5\" style=\"width:100%(pourcentage)c;\">
-                                        %(value)s
-                                      </textarea> """ % {'num_valu)'   : str(num_value),
-                                                         'pourcentage' : '%',
-                                                         'value'       : value}
+                    print_value = """ <textarea name=\"value%(num_value)s\" cols=\"70\" rows=\"5\" style=\"width:100%(pourcentage)c;\">%(value)s</textarea> """ \
+                                  % {'num_value'   : str(num_value),
+                                     'pourcentage' : '%',
+                                     'value'       : value}
                     
                 if len_subfields > 1:
-                    print_btn = """
-                            <td>
-                              <a href=\"%(weburl_bibedit)s/edit?recID=%(recID)s&tag=%(tag)s&num_field=%(num_field)s&format_tag=%(format_tag)s&temp=true&del_subfield=1\">
-                                <img border=\"0\" src=\"%(btn_url)s\">
-                              </a>
-                            </td> """ % {'weburl_bibedit' : weburl_bibedit,
-                                         'recID'          : str(recID),
-                                         'tag'            : tag_field[:-1]+ tag_subfield,
-                                         'num_field'      : num_field,
-                                         'format_tag'     : format_tag,
-                                         'btn_url'        : btn_delete_url}
-            
+
+                   print_btn = "<td>%s</td>" \
+                               % self.tmpl_link(ln, "<img border=\"0\" src=\"%s\" alt=\"delete\">" % btn_delete_url,
+                                                weburl_bibedit, 'edit',
+                                                {'recID'        : str(recID),
+                                                 'tag'          : tag_field[:-1]+ tag_subfield,
+                                                 'num_field'    : num_field,
+                                                 'format_tag'   : format_tag,
+                                                 'temp'         : 'true',
+                                                 'del_subfield' : 1})           
                 
         else:
             print_value = value
@@ -370,28 +367,24 @@ class Template:
                                     'print_btn'          : print_btn}
 
 
-    def tmpl_link_function(self, len_subfields, recID, tag, num_field, format_tag, temp):        
+    def tmpl_link_function(self, ln, len_subfields, recID, tag, num_field, format_tag, temp):        
         """ Print button function to edit and delete information. """
-        
-        btn_edit   = """ <a href=\"%(weburl_bibedit)s/edit?recID=%(recID)s&tag=%(tag)s&num_field=%(num_field)s&format_tag=%(format_tag)s&temp=true\">
-                           <img border=\"0\" src=\"%(btn_url)s\" alt=\"edit\">
-                         </a>
-                     """ % {'weburl_bibedit' : weburl_bibedit,
-                            'recID'          : str(recID),
-                            'tag'            : tag,
-                            'num_field'      : num_field,
-                            'format_tag'     : format_tag,
-                            'btn_url'        : btn_edit_url}
-        
-        btn_delete = """ <a href=\"%(weburl_bibedit)s/index?recID=%(recID)s&delete_tag=%(tag)s&num_field=%(num_field)s&format_tag=%(format_tag)s&temp=true\">
-                           <img border=\"0\" src=\"%(btn_url)s\" alt=\"delete\">
-                         </a>
-                     """ % {'weburl_bibedit' : weburl_bibedit,
-                            'recID'          : str(recID),
-                            'tag'            : tag,
-                            'num_field'      : num_field,
-                            'format_tag'     : format_tag,
-                            'btn_url'        : btn_delete_url}
+
+        btn_edit = self.tmpl_link(ln, "<img border=\"0\" src=\"%s\" alt=\"edit\">" % btn_edit_url,
+                                  weburl_bibedit, 'edit',
+                                  {'recID'        : str(recID),
+                                   'tag'          : tag,
+                                   'num_field'    : num_field,
+                                   'format_tag'   : format_tag,
+                                   'temp'         : 'true'})
+
+        btn_delete = self.tmpl_link(ln, "<img border=\"0\" src=\"%s\" alt=\"edit\">" % btn_delete_url,
+                                    weburl_bibedit, 'index',
+                                    {'recID'      : str(recID),
+                                     'delete_tag' : tag,
+                                     'num_field'  : num_field,
+                                     'format_tag' : format_tag,
+                                     'temp'       : 'true'})
                                     
         return """ <td rowspan=\"%(len_subfields)s\" align=\"center\" valign=\"top\">
                      %(btn_edit)s
@@ -402,20 +395,6 @@ class Template:
                """ % {'len_subfields' : len_subfields,
                       'btn_edit'      : btn_edit,
                       'btn_delete'    : btn_delete}
-    
-
-    def tmpl_link_view(self, name, recID, temp, format_tag, format_view='s'):        
-        """ Print link ti change user display. """
-        
-        return """ <a href=\"%(weburl_bibedit)s/index?recID=%(recID)s&temp=%(temp)s&format_tag=%(format_tag)s\">
-                     %(name)s
-                   </a>
-               """ % {'weburl_bibedit' : weburl_bibedit,
-                      'recID'          : recID,
-                      'temp'           : temp,
-                      'format_tag'     : format_tag,
-                      'name'           : name}
-
 
     def tmpl_clean_value(self, value, format):        
         """ This function clean value for HTML interface and inverse. """
@@ -477,6 +456,7 @@ class Template:
             result = ''
             
         result += """ <form action=\"%(weburl_bibedit)s/index\"  method=\"POST\">
+                        <input type=\"hidden\" value=\"%(ln)s\" name=\"ln\">
                         <table bgcolor=\"#DDDDDD\">
                           <tr><td></td></tr>
                           <tr>
@@ -490,6 +470,7 @@ class Template:
                           <tr><td></td></tr>
                         </table>
                       </form> """ % {'weburl_bibedit' : weburl_bibedit,
+                                     'ln'             : ln,
                                      'message1'       : _("Please enter"),
                                      'message2'       : _("record ID"),
                                      'message3'       : _("to edit"),
@@ -505,12 +486,13 @@ class Template:
         return """  %(message1)s<br\>
                     %(message2)s<br\><br\>
                     %(message3)s:
-                   <a href=\"%(weburl)s/admin/bibedit/index\">%(link)s</a>.
+                   <a href=\"%(weburl)s/admin/bibedit/index?ln=%(ln)s\">%(link)s</a>.
                """ % {'message1': _("Your modifications have now been submitted."),
                       'message2': _("They will be processed as soon as the task queue is empty."),
                       'message3': _("You can now go back to"),
                       'link'    : _("BibEdit Admin Interface"),
-                      'weburl':weburl}
+                      'weburl'  : weburl,
+                      'ln'      : ln}
     
     def tmpl_deleted(self, ln, message='', recID='', temp='', format_tag=''):
         """ Return a deleted message of Bibedit. """
@@ -521,11 +503,13 @@ class Template:
             return """ %(message)s
                        <div style=\"float:left;\">
                          <form action=\"%(weburl_bibedit)s/index?delete=%(recID)s\" method=\"POST\">
+                           <input type=\"hidden\" value=\"%(ln)s\" name=\"ln\">
                            <input class=\"formbutton\" type=\"submit\" value=\"%(yes)s\"/>
                          </form>
                        </div>
                        <div style=\"float:left;\">
                          <form action=\"%(weburl_bibedit)s/index?recID=%(recID)s&temp=%(temp)s&format_tag=%(format_tag)s\" method=\"POST\">
+                           <input type=\"hidden\" value=\"%(ln)s\" name=\"ln\">
                            <input class=\"formbutton\" type=\"submit\" value=\"%(no)s\"/>
                          </form>
                        </div>
@@ -534,15 +518,38 @@ class Template:
                           'no'             : _("no"), 
                           'weburl_bibedit' : weburl_bibedit,
                           'recID'          : str(recID),
+                          'ln'             : ln,
                           'temp'           : temp,
                           'format_tag'     : format_tag}
         
         else:    
             return """ %(message)s:
-                       <a href=\"%(weburl)s/admin/bibedit/index\">
-                         %(link)s
-                       </a>.
+                       <a href=\"%(weburl)s/admin/bibedit/index?ln=&(ln)s\">%(link)s</a>.
                    """ % {'message': _("The record as soon deleted when the task queue is empty.You can now go back to"),
                           'link'   : _("BibEdit Admin Interface"),
-                          'weburl' : weburl}
+                          'weburl' : weburl,
+                          'ln'     : ln}
                        
+    def tmpl_link(self, ln, object, weburl, dest, dict_args={}, ancre=''):
+        """ Return a link. """
+
+        list_args = dict_args.items()
+        
+        if len(list_args) == 0:
+            link_args = ''
+        else:
+            link_args = '?'
+            for arg in list_args:
+                link_args += "%(name)s=%(value)s&" % {'name'  : str(arg[0]),
+                                                      'value' : str(arg[1])} 
+            link_args += "ln=%s" % ln
+            
+        if ancre != '':
+            ancre = '#' + ancre
+            
+        return  """ <a href=\"%(weburl)s/%(dest)s%(args)s%(ancre)s\"> %(object)s </a>
+                """ % {'object' : object,
+                       'weburl' : weburl,
+                       'dest'   : dest,
+                       'args'   : link_args,
+                       'ancre'  : ancre}
