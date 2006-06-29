@@ -2,10 +2,13 @@
 
 import re
 from random import randint, seed
+from os.path import split, basename, isfile
+from os import access, F_OK, R_OK, W_OK, getpid, rename, unlink
+from time import strftime, localtime
 from invenio.websubmitadmin_dblayer import *
 from invenio.websubmitadmin_config import *
 from invenio.access_control_admin import acc_getAllRoles, acc_getRoleUsers
-from invenio.config import cdslang
+from invenio.config import cdslang, bibconvertconf
 from invenio.access_control_engine import acc_authorize_action
 
 import invenio.template
@@ -14,7 +17,6 @@ try:
     websubmitadmin_templates = invenio.template.load('websubmitadmin')
 except:
     pass
-
 
 
 ## utility functions:
@@ -55,6 +57,103 @@ def stringify_listvars(mylist):
     except IndexError:
         pass
     return string_list
+
+def save_update_to_file(filepath, filecontent, notruncate=0, appendmode=0):
+    """Save a string value to a file.
+       Save will create a new file if the file does not exist. Mode can be set to truncate an older file
+       or to refuse to create the file if it already exists.  There is also a mode to "append" the string value
+       to a file.
+       @param filepath: (string) the full path to the file
+       @param filecontent: (string) the content to be written to the file
+       @param notruncate: (integer) should be 1 or 0, defaults to 0 (ZERO). If 0, existing file will be truncated;
+        if 1, file will not be written if it already exists
+       @param appendmode: (integer) should be 1 or 0, defaults to 0 (ZERO). If 1, data will be appended to the file
+        if it exists; if 0, file will be truncated (or not, depending on the notruncate mode) by new data.
+       @return: None
+       @exceptions raised:
+             - InvenioWebSubmitAdminWarningIOError: when operations involving writing to file failed.
+    """
+    ## sanity checking:
+    if notruncate not in (0, 1):
+        notruncate = 0
+    if appendmode not in (0, 1):
+        appendmode = 0
+
+    (fpath, fname) = split(filepath)
+    if fname == "":
+        ## error opening file
+        msg = """Unable to open filepath [%s] - couldn't determine a valid filename""" % (filepath,)
+        raise InvenioWebSubmitAdminWarningIOError(msg)
+
+    ## if fpath is not empty, append the trailing "/":
+    if fpath != "":
+        fpath += "/"
+
+    if appendmode == 0:
+        if notruncate != 0 and access("%s%s" % (fpath, fname), F_OK):
+            ## in no-truncate mode, but file already exists!
+            msg = """Unable to write to file [%s] in "no-truncate mode" because file already exists"""\
+                  % (fname,)
+            raise InvenioWebSubmitAdminWarningIOError(msg)
+
+        ## file already exists, make temporary file first, then move it later
+        tmpfname = "%s_%s_%s" % (fname, strftime("%Y%m%d%H%M%S", localtime()), getpid())
+
+        ## open temp file for writing:
+        try:
+            fp = open("%s%s" % (fpath, tmpfname), "w")
+        except IOError, e:
+            ## cannot open file
+            msg = """Unable to write to file [%s%s] - cannot open file for writing""" % (fpath, fname)
+            raise InvenioWebSubmitAdminWarningIOError(msg)
+        ## write contents to temp file:
+        try:
+            fp.write(filecontent)
+            fp.flush()
+            fp.close()
+        except IOError, e:
+            ## could not write to temp file
+            msg = """Unable to write to file [%s]""" % (tmpfname,)
+            ## remove the "temp file"
+            try:
+                fp.close()
+                unlink("%s%s" % (fpath, tmpfname))
+            except IOError:
+                pass
+            raise InvenioWebSubmitAdminWarningIOError(msg)
+
+        ## rename temp file to final filename:
+        try:
+            rename("%s%s" % (fpath, tmpfname), "%s%s" % (fpath, fname))
+        except OSError:
+            ## couldnt rename the tmp file to final file name
+            msg = """Unable to write to file [%s] - created temporary file [%s], but could not then rename it to [%s]"""\
+                  % (fname, tmpfname, fname)
+            raise InvenioWebSubmitAdminWarningIOError(msg)
+    else:
+        ## append mode:
+        try:
+            fp = open("%s%s" % (fpath, fname), "a")
+        except IOError, e:
+            ## cannot open file
+            msg = """Unable to write to file [%s] - cannot open file for writing in append mode""" % (fname,)
+            raise InvenioWebSubmitAdminWarningIOError(msg)
+
+        ## write contents to temp file:
+        try:
+            fp.write(filecontent)
+            fp.flush()
+            fp.close()
+        except IOError, e:
+            ## could not write to temp file
+            msg = """Unable to write to file [%s] in append mode""" % (fname,)
+            ## close the file
+            try:
+                fp.close()
+            except IOError:
+                pass
+            raise InvenioWebSubmitAdminWarningIOError(msg)
+    return
 
 ## def wash_form_var(var, test_type, force_convert=0, minlen=None, maxlen=None):
 ##     """Intended to be used to test values submitted to a form, to see whether they
@@ -167,9 +266,7 @@ def _add_new_action(actid,actname,working_dir,status_text):
     err_code = insert_action_details(actid,actname,working_dir,status_text)
     return err_code
 
-
 def perform_request_add_function(funcname="", funcdescr="", funcaddcommit=""):
-    """(title, body, errors, warnings) = perform_request_add_function(function)"""
     errors = []
     warnings = []
     body = ""
@@ -198,7 +295,6 @@ def perform_request_add_function(funcname="", funcdescr="", funcaddcommit=""):
         body = websubmitadmin_templates.tmpl_display_addfunctionform(funcdescr=funcdescr)
 
     return (title, body, errors, warnings)
-
 
 def perform_request_add_action(actid="",actname="",working_dir="",status_text="", actcommit=""):
     """An interface for the addition of a new WebSubmit action.
@@ -282,7 +378,6 @@ def perform_request_add_jscheck(chname="", chdesc="", chcommit=""):
         body = websubmitadmin_templates.tmpl_display_addjscheckform(chname=chname, chdesc=chdesc, user_msg=user_msg)
     return (title, body, errors, warnings)
 
-
 def perform_request_add_element(elname="", elmarccode="", eltype="", elsize="", elrows="", \
                                 elcols="", elmaxlength="", elval="", elfidesc="", \
                                 elmodifytext="", elcookie="", elcommit=""):
@@ -354,7 +449,6 @@ def perform_request_add_element(elname="", elmarccode="", eltype="", elsize="", 
                                                                     user_msg=user_msg,
                                                                    )
     return (title, body, errors, warnings)
-        
 
 def perform_request_edit_element(elname, elmarccode="", eltype="", elsize="", \
                                  elrows="", elcols="", elmaxlength="", elval="", \
@@ -471,7 +565,6 @@ def perform_request_edit_element(elname, elmarccode="", eltype="", elsize="", \
             body = websubmitadmin_templates.tmpl_display_allelements(all_elements, user_msg=user_msg)
     return (title, body, errors, warnings)
 
-
 def perform_request_edit_jscheck(chname, chdesc="", chcommit=""):
     """Interface for editing and updating the details of a WebSubmit Check.
        If only "chname" provided, will display the details of a Check in a Web form.
@@ -536,7 +629,6 @@ def perform_request_edit_jscheck(chname, chdesc="", chcommit=""):
                 ## LOG MESSAGE
             body = websubmitadmin_templates.tmpl_display_alljschecks(all_jschecks, user_msg=user_msg)
     return (title, body, errors, warnings)
-
 
 def perform_request_edit_action(actid, actname="", working_dir="", status_text="", actcommit=""):
     """Interface for editing and updating the details of a WebSubmit action.
@@ -609,7 +701,6 @@ def perform_request_edit_action(actid, actname="", working_dir="", status_text="
             body = websubmitadmin_templates.tmpl_display_allactions(all_actions, user_msg=user_msg)
     return (title, body, errors, warnings)
 
-
 def _functionedit_display_function_details(errors, warnings, funcname, user_msg=""):
     """Display the details of a function, along with any message to the user that may have been provided.
        @param errors: LIST of errors (passed by reference from caller) - errors will be appended to it
@@ -656,7 +747,6 @@ def _functionedit_display_function_details(errors, warnings, funcname, user_msg=
         body = websubmitadmin_templates.tmpl_display_allfunctions(all_functions, user_msg=user_msg)
     return (title, body)
 
-
 def _functionedit_update_description(errors, warnings, funcname, funcdescr):
     """Perform an update of the description for a given function.
        @param errors: LIST of errors (passed by reference from caller) - errors will be appended to it
@@ -676,7 +766,6 @@ def _functionedit_update_description(errors, warnings, funcname, funcdescr):
     ## Display function details
     (title, body) = _functionedit_display_function_details(errors=errors, warnings=warnings, funcname=funcname, user_msg=user_msg)
     return (title, body)
-
 
 def _functionedit_delete_parameter(errors, warnings, funcname, deleteparam):
     """Delete a parameter from a given function.
@@ -702,7 +791,6 @@ def _functionedit_delete_parameter(errors, warnings, funcname, deleteparam):
     ## Display function details
     (title, body) = _functionedit_display_function_details(errors=errors, warnings=warnings, funcname=funcname, user_msg=user_msg)
     return (title, body)
-
 
 def _functionedit_add_parameter(errors, warnings, funcname, funceditaddparam="", funceditaddparamfree=""):
     """Add (connect) a parameter to a given WebSubmit function.
@@ -749,7 +837,6 @@ def _functionedit_add_parameter(errors, warnings, funcname, funceditaddparam="",
     (title, body) = _functionedit_display_function_details(errors=errors, warnings=warnings, funcname=funcname, user_msg=user_msg)
     return (title, body)
 
-
 def perform_request_edit_function(funcname, funcdescr="", funceditaddparam="", funceditaddparamfree="",
                                   funceditdelparam="", funcdescreditcommit="", funcparamdelcommit="",
                                   funcparamaddcommit=""):
@@ -784,7 +871,6 @@ def perform_request_edit_function(funcname, funcdescr="", funceditaddparam="", f
         (title, body) = _functionedit_display_function_details(errors=errors, warnings=warnings, funcname=funcname)
     return (title, body, errors, warnings)
 
-
 def perform_request_function_usage(funcname):
     """Display a page containing the usage details of a given function.
        @param funcname: the function name
@@ -796,7 +882,6 @@ def perform_request_function_usage(funcname):
     func_usage = stringify_listvars(func_usage)
     body = websubmitadmin_templates.tmpl_display_function_usage(funcname, func_usage)
     return (body, errors, warnings)
-
 
 def perform_request_list_actions():
     """Display a list of all WebSubmit actions.
@@ -1259,7 +1344,6 @@ def _create_delete_submission_form(errors, warnings, doctype, action):
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
-
 def _create_edit_submission_form(errors, warnings, doctype, action, user_msg=""):
     if user_msg == "" or type(user_msg) not in (list, tuple, str, unicode):
         user_msg = []
@@ -1510,7 +1594,6 @@ def _delete_submission_from_doctype(errors, warnings, doctype, action):
         ## TODO : LOG ERROR
     (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
-
 
 def _edit_submission_for_doctype(errors, warnings, doctype, action, displayed, buttonorder,
                                  statustext, level, score, stpage, endtxt):
@@ -1767,6 +1850,259 @@ def _create_configure_doctype_submission_functions_add_function_form(doctype, ac
                                                                                  user_msg=user_msg)
     return (title, body)
 
+def _create_configure_doctype_submission_functions_list_parameters_form(doctype,
+                                                                        action,
+                                                                        functionname,
+                                                                        user_msg=""):
+    title = """Parameters of the %s function, as used in the %s document type"""\
+            % (functionname, doctype)
+    params = get_parameters_name_and_value_for_function_of_doctype(doctype=doctype, function=functionname)
+    body = websubmitadmin_templates.tmpl_configuredoctype_list_functionparameters(doctype=doctype,
+                                                                                  action=action,
+                                                                                  function=functionname,
+                                                                                  params=params,
+                                                                                  user_msg=user_msg)
+    return (title, body)
+
+def _update_submission_function_parameter_file(doctype, action, functionname,
+                                               paramname, paramfilecontent):
+    user_msg = []
+    ## get the filename:
+    paramval_res = get_value_of_parameter_for_doctype(doctype=doctype, parameter=paramname)
+    if paramval_res is None:
+        ## this parameter doesn't exist for this doctype!
+        user_msg.append("The parameter [%s] doesn't exist for the document type [%s]!" % (paramname, doctype))
+        (title, body) = _create_configure_doctype_submission_functions_list_parameters_form(doctype=doctype,
+                                                                                            action=action,
+                                                                                            functionname=functionname,
+                                                                                            user_msg=user_msg)
+        return (title, body)
+    paramval = str(paramval_res)
+    filename = basename(paramval)
+    if filename == "":
+        ## invalid filename
+        user_msg.append("[%s] is an invalid filename - cannot save details" % (paramval,))
+        (title, body) = _create_configure_doctype_submission_functions_list_parameters_form(doctype=doctype,
+                                                                                            action=action,
+                                                                                            functionname=functionname,
+                                                                                            user_msg=user_msg)
+        return (title, body)
+
+    ## save file:
+    try:
+        save_update_to_file(filepath="%s/%s" % (bibconvertconf, filename), filecontent=paramfilecontent)
+    except InvenioWebSubmitAdminWarningIOError, e:
+        ## could not correctly update the file!
+        user_msg.append(str(e))
+        (title, body) = _create_configure_doctype_submission_functions_list_parameters_form(doctype=doctype,
+                                                                                            action=action,
+                                                                                            functionname=functionname,
+                                                                                            user_msg=user_msg)
+        return (title, body)
+
+    ## redisplay form
+    user_msg.append("""[%s] file updated""" % (filename,))
+    (title, body) = _create_configure_doctype_submission_functions_edit_parameter_file_form(doctype=doctype,
+                                                                                            action=action,
+                                                                                            functionname=functionname,
+                                                                                            paramname=paramname,
+                                                                                            user_msg=user_msg)
+    return (title, body)
+
+def _create_configure_doctype_submission_functions_edit_parameter_file_form(doctype,
+                                                                            action,
+                                                                            functionname,
+                                                                            paramname,
+                                                                            user_msg=""):
+    if type(user_msg) is not list:
+        user_msg = []
+
+    paramval_res = get_value_of_parameter_for_doctype(doctype=doctype, parameter=paramname)
+    if paramval_res is None:
+        ## this parameter doesn't exist for this doctype!
+        user_msg.append("The parameter [%s] doesn't exist for the document type [%s]!" % (paramname, doctype))
+        (title, body) = _create_configure_doctype_submission_functions_list_parameters_form(doctype=doctype,
+                                                                                            action=action,
+                                                                                            functionname=functionname)
+        return (title, body)
+    paramval = str(paramval_res)
+    title = "Edit the [%s] file for the [%s] document type" % (paramval, doctype)
+    ## get basename of file:
+    filecontent = ""
+    filename = basename(paramval)
+    if filename == "":
+        ## invalid filename
+        user_msg.append("[%s] is an invalid filename" % (paramval,))
+        (title, body) = _create_configure_doctype_submission_functions_list_parameters_form(doctype=doctype,
+                                                                                            action=action,
+                                                                                            functionname=functionname,
+                                                                                            user_msg=user_msg)
+        return (title, body)
+    ## try to read file contents:
+    if access("%s/%s" % (bibconvertconf, filename), F_OK):
+        ## file exists
+        if access("%s/%s" % (bibconvertconf, filename), R_OK) and \
+               isfile("%s/%s" % (bibconvertconf, filename)):
+            ## file is a regular file and is readable - get contents
+            filecontent = open("%s/%s" % (bibconvertconf, filename), "r").read()
+        else:
+            if not isfile("%s/%s" % (bibconvertconf, filename)):
+                ## file is not a regular file
+                user_msg.append("The parameter file [%s] is not  regular file - unable to read" % (filename,))
+            else:
+                ## file is not readable - error message
+                user_msg.append("The parameter file [%s] could not be read - check permissions" % (filename,))
+
+            ## display page listing the parameters of this function:
+            (title, body) = _create_configure_doctype_submission_functions_list_parameters_form(doctype=doctype,
+                                                                                                action=action,
+                                                                                                functionname=functionname,
+                                                                                                user_msg=user_msg)
+            return (title, body)
+    else:
+        ## file does not exist:
+        user_msg.append("The parameter file [%s] does not exist - it will be created" % (filename,))
+
+    ## make page body:
+    body = websubmitadmin_templates.tmpl_configuredoctype_edit_functionparameter_file(doctype=doctype,
+                                                                                      action=action,
+                                                                                      function=functionname,
+                                                                                      paramname=paramname,
+                                                                                      paramfilename=filename,
+                                                                                      paramfilecontent=filecontent,
+                                                                                      user_msg=user_msg)
+    return (title, body)
+
+def _create_configure_doctype_submission_functions_edit_parameter_value_form(doctype,
+                                                                             action,
+                                                                             functionname,
+                                                                             paramname,
+                                                                             paramval="",
+                                                                             user_msg=""):
+    title = """Edit the value of the [%s] Parameter""" % (paramname,)
+    ## get the parameter's value from the DB:
+    paramval_res = get_value_of_parameter_for_doctype(doctype=doctype, parameter=paramname)
+    if paramval_res is None:
+        ## this parameter doesn't exist for this doctype!
+        (title, body) = _create_configure_doctype_submission_functions_list_parameters_form(doctype=doctype,
+                                                                                            action=action,
+                                                                                            functionname=functionname)
+    if paramval == "":
+        ## use whatever retrieved paramval_res contains:
+        paramval = str(paramval_res)
+
+    body = websubmitadmin_templates.tmpl_configuredoctype_edit_functionparameter_value(doctype=doctype,
+                                                                                           action=action,
+                                                                                           function=functionname,
+                                                                                           paramname=paramname,
+                                                                                           paramval=paramval)
+    return (title, body)
+
+def _update_submissionfunction_parameter_value(doctype, action, functionname, paramname, paramval):
+    user_msg = []
+    try:
+        update_value_of_function_parameter_for_doctype(doctype=doctype, paramname=paramname, paramval=paramval)
+        user_msg.append("""The value of the parameter [%s] was updated for document type [%s]""" % (paramname, doctype))
+    except InvenioWebSubmitAdminWarningTooManyRows, e:
+        ## multiple rows found for param - update not carried out
+        user_msg.append(str(e))
+    except InvenioWebSubmitAdminWarningNoRowsFound, e:
+        ## no rows found - parameter does not exist for doctype, therefore no update
+        user_msg.append(str(e))
+    (title, body) = \
+      _create_configure_doctype_submission_functions_list_parameters_form(doctype=doctype, action=action,
+                                                                          functionname=functionname, user_msg=user_msg)
+    return (title, body)
+
+def perform_request_configure_doctype_submissionfunctions_parameters(doctype,
+                                                                     action,
+                                                                     functionname,
+                                                                     functionstep,
+                                                                     functionscore,
+                                                                     paramname="",
+                                                                     paramval="",
+                                                                     editfunctionparametervalue="",
+                                                                     editfunctionparametervaluecommit="",
+                                                                     editfunctionparameterfile="",
+                                                                     editfunctionparameterfilecommit="",
+                                                                     paramfilename="",
+                                                                     paramfilecontent=""):
+    errors = []
+    warnings = []
+    body = ""
+    user_msg = []
+    ## ensure that there is only one doctype for this doctype ID - simply display all doctypes with warning if not
+    if doctype in ("", None):
+        user_msg.append("""Unknown Document Type""")
+        ## TODO : LOG ERROR
+        all_doctypes = get_docid_docname_alldoctypes()
+        body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
+        title = "Available WebSubmit Document Types"
+        return (title, body, errors, warnings)
+
+    numrows_doctype = get_number_doctypes_docid(docid=doctype)
+    if numrows_doctype > 1:
+        ## there are multiple doctypes with this doctype ID:
+        ## TODO : LOG ERROR
+        user_msg.append("""Multiple document types identified by "%s" exist - cannot configure at this time.""" \
+                   % (doctype,))
+        all_doctypes = get_docid_docname_alldoctypes()
+        body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
+        title = "Available WebSubmit Document Types"
+        return (title, body, errors, warnings)
+    elif numrows_doctype == 0:
+        ## this doctype does not seem to exist:
+        user_msg.append("""The document type identified by "%s" doesn't exist - cannot configure at this time.""" \
+                   % (doctype,))
+        ## TODO : LOG ERROR
+        all_doctypes = get_docid_docname_alldoctypes()
+        body = websubmitadmin_templates.tmpl_display_alldoctypes(doctypes=all_doctypes, user_msg=user_msg)
+        title = "Available WebSubmit Document Types"
+        return (title, body, errors, warnings)
+
+    ## ensure that this submission exists for this doctype:
+    numrows_submission = get_number_submissions_doctype_action(doctype=doctype, action=action)
+    if numrows_submission > 1:
+        ## there are multiple submissions for this doctype/action ID:
+        ## TODO : LOG ERROR
+        user_msg.append("""The Submission "%s" seems to exist multiple times for the Document Type "%s" - cannot configure at this time.""" \
+                   % (action, doctype))
+        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        return (title, body, errors, warnings)
+    elif numrows_submission == 0:
+        ## this submission does not seem to exist for this doctype:
+        user_msg.append("""The Submission "%s" doesn't exist for the "%s" Document Type - cannot configure at this time.""" \
+                   % (action, doctype))
+        ## TODO : LOG ERROR
+        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        return (title, body, errors, warnings)
+
+    if editfunctionparametervaluecommit not in ("", None):
+        ## commit an update to a function parameter:
+        (title, body) = _update_submissionfunction_parameter_value(doctype=doctype, action=action, functionname=functionname,
+                                                                   paramname=paramname, paramval=paramval)
+    elif editfunctionparametervalue not in ("", None):
+        ## display a form for editing the value of a parameter:
+        (title, body) = _create_configure_doctype_submission_functions_edit_parameter_value_form(doctype=doctype,
+                                                                                                 action=action,
+                                                                                                 functionname=functionname,
+                                                                                                 paramname=paramname,
+                                                                                                 paramval=paramval)
+    elif editfunctionparameterfile not in ("", None):
+        ## display a form for editing the contents of a file, named by the parameter's value:
+        (title, body) = _create_configure_doctype_submission_functions_edit_parameter_file_form(doctype=doctype,
+                                                                                                action=action,
+                                                                                                functionname=functionname,
+                                                                                                paramname=paramname)
+    elif editfunctionparameterfilecommit not in ("", None):
+        (title, body) = _update_submission_function_parameter_file(doctype=doctype, action=action, functionname=functionname,
+                                                                    paramname=paramname, paramfilecontent=paramfilecontent)
+    else:
+        ## default - display list of parameters for function:
+        (title, body) = _create_configure_doctype_submission_functions_list_parameters_form(doctype=doctype,
+                                                                                            action=action,
+                                                                                            functionname=functionname)
+    return (title, body, errors, warnings)
 
 def perform_request_configure_doctype_submissionfunctions(doctype,
                                                           action,
@@ -1969,7 +2305,6 @@ def _add_function_to_submission(doctype, action, addfunctionname, addfunctionste
             _create_configure_doctype_submission_functions_form(doctype=doctype, action=action, user_msg=user_msg)
     return (title, body)
 
-
 def _delete_submission_function(doctype, action, deletefunctionname, deletefunctionstep, deletefunctionscore):
     """Delete a submission function from a given submission. Re-order all functions below it (within the same step)
        to fill the gap left by the deleted function.
@@ -2015,10 +2350,6 @@ def _delete_submission_function(doctype, action, deletefunctionname, deletefunct
     ## TODO : LOG function Deletion
     (title, body) = _create_configure_doctype_submission_functions_form(doctype=doctype, action=action, user_msg=user_msg)
     return (title, body)
-
-
-
-
 
 def perform_request_configure_doctype_submissionpage_preview(doctype, action, pagenum):
     """Display a preview of a Submission Page and its fields.
@@ -2251,7 +2582,6 @@ def _configure_doctype_edit_field_on_submissionpage_display_field_details(errors
                                                                                user_msg=user_msg)
     return (title, body)
 
-
 def _configure_doctype_add_field_to_submissionpage(errors, warnings, doctype, action, pagenum, fieldname="",
                                                    fieldtext="", fieldlevel="", fieldshortdesc="", fieldcheck=""):
     """Add a field to a submission page.
@@ -2306,7 +2636,6 @@ def _configure_doctype_add_field_to_submissionpage(errors, warnings, doctype, ac
                                                                                     fieldcheck=fieldcheck, user_msg=user_msg)
     return (title, body)        
 
-
 def _configure_doctype_add_field_to_submissionpage_display_form(doctype, action, pagenum, fieldname="", fieldtext="",
                                                                 fieldlevel="", fieldshortdesc="", fieldcheck="", user_msg=""):
     title = """Add a Field to Page %(pagenum)s of the %(submission)s Submission""" \
@@ -2339,8 +2668,6 @@ def _configure_doctype_add_field_to_submissionpage_display_form(doctype, action,
                                                                               allelements=allelements,
                                                                               user_msg=user_msg)
     return (title, body)
-
-
 
 def _configure_doctype_move_field_on_submissionpage(errors, warnings, doctype, action, pagenum, movefieldfromposn, movefieldtoposn):
     user_msg = []
@@ -2431,8 +2758,6 @@ def _create_configure_doctype_submission_page_elements_form(doctype, action, pag
                                                                                   movefieldfromposn=movefieldfromposn,
                                                                                   user_msg=user_msg)
     return (title, body)
-
-
 
 def perform_request_configure_doctype_submissionpages(doctype,
                                                       action,
@@ -2531,10 +2856,7 @@ def perform_request_configure_doctype_submissionpages(doctype,
         (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype, action=action)
     return (title, body, errors, warnings)
 
-
 def _configure_doctype_move_submission_page(errors, warnings, doctype, action, pagenum, direction):
-    """
-    """
     ## Sanity checking:
     if direction.lower() not in ("up", "down"):
         ## invalid direction:
@@ -2577,8 +2899,6 @@ def _configure_doctype_move_submission_page(errors, warnings, doctype, action, p
                         """ fix this problem manually""")
     (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype, action=action, user_msg=user_msg)
     return (title, body)
-
-
 
 def _configure_doctype_delete_submission_page(errors, warnings, doctype, action, pagenum):
     user_msg = []
@@ -2631,7 +2951,6 @@ def _configure_doctype_delete_submission_page(errors, warnings, doctype, action,
                         % (action, pagenum))
         (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
     return (title, body)
-
 
 def _create_configure_doctype_submission_pages_form(doctype,
                                                     action,
