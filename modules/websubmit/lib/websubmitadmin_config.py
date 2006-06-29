@@ -1,6 +1,11 @@
 from invenio.config import weburl
 
 websubmitadmin_weburl = "%s/admin/websubmit/websubmitadmin.py" % (weburl,)
+websubmitadmin_oldweburl = "%s/admin/websubmit" % (weburl,)
+
+
+class InvenioWebSubmitAdminWarningIOError(Exception):
+    pass
 
 class InvenioWebSubmitAdminWarningNoUpdate(Exception):
     """Exception used when a no update was made as a result of an action"""
@@ -21,6 +26,10 @@ class InvenioWebSubmitAdminWarningNoRowsFound(Exception):
 class InvenioWebSubmitAdminWarningReferentialIntegrityViolation(Exception):
     pass
 
+
+## List of the names of functions for which the parameters are files that can be edited.
+## In particular, this applies to the record creation functions that make use of bibconvert.
+functions_with_file_params = ["Make_Record", "Make_Modify_Record"]
 
 
 
