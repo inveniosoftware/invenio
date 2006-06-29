@@ -108,9 +108,10 @@ update-v0.7.1-tables: local-dbexec
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runoaiharvest','run BibHarvest oaiharvest','','no');" | ./modules/miscutil/bin/dbexec 
 	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgbibharvest','configure BibHarvest','','no');" | ./modules/miscutil/bin/dbexec 
-	echo "ALTER TABLE user add nickname varchar(255) NOT NULL default '';" | ./modules/miscutil/bin/dbexec 
+	echo "ALTER TABLE user ADD nickname varchar(255) NOT NULL default '';" | ./modules/miscutil/bin/dbexec 
 	echo "ALTER TABLE user ADD last_login datetime NOT NULL default '0000-00-00 00:00:00';" | ./modules/miscutil/bin/dbexec 
 	echo "ALTER TABLE user ADD INDEX nickname (nickname);" | ./modules/miscutil/bin/dbexec 
+	echo "ALTER TABLE sbmFIELD CHANGE subname subname varchar(13) default NULL;" | ./modules/miscutil/bin/dbexec 
 	echo "TRUNCATE TABLE session;" | ./modules/miscutil/bin/dbexec
 
 drop-tables: local-dbexec 
