@@ -35,6 +35,30 @@ def index(req, ln=cdslang):
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
+def showall(req, ln=cdslang):
+    """Placeholder for the showall functionality"""
+    
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    uid = getUid(req)
+
+    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    if not auth_code:
+        ## user is authorised to use WebSubmit Admin:
+        (body, errors, warnings) = perform_request_list_doctypes()
+        return page(title       = "Available WebSubmit Document Types",
+                    body        = body,
+                    navtrail    = get_navtrail(ln),
+                    uid         = uid,
+                    lastupdated = __lastupdated__,
+                    req         = req,
+                    language    = ln,
+                    errors      = errors,
+                    warnings    = warnings)
+    else:
+        ## user is not authorised to use WebSubmit Admin:
+        return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
+
 def doctypelist(req, ln=cdslang):
     """List all WebSubmit document types."""
     
@@ -650,6 +674,74 @@ def doctypeconfiguresubmissionpages(req,
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
+def doctypeconfiguresubmissionfunctionsparameters(req,
+                                                  doctype="",
+                                                  action="",
+                                                  functionname="",
+                                                  functionstep="",
+                                                  functionscore="",
+                                                  paramname="",
+                                                  paramval="",
+                                                  editfunctionparametervalue="",
+                                                  editfunctionparametervaluecommit="",
+                                                  editfunctionparameterfile="",
+                                                  editfunctionparameterfilecommit="",
+                                                  paramfilename="",
+                                                  paramfilecontent="",
+                                                  ln=cdslang):
+    """Configure the parameters for a function belonging to a given submission.
+       @param doctype: (string) the unique ID of a document type
+       @param action: (string) the unique ID of an action
+       @param functionname: (string) the name of a WebSubmit function
+       @param functionstep: (integer) the step at which a WebSubmit function is located
+       @param functionscore: (integer) the score (within a step) at which a WebSubmit function is located
+       @param paramname: (string) the name of a parameter being edited
+       @param paramval: (string) the value to be allocated to a parameter that is being editied
+       @param editfunctionparametervalue: (string) a flag to signal that a form should be displayed for editing the value
+        of a parameter
+       @param editfunctionparametervaluecommit: (string) a flag to signal that a parameter value has been edited and should
+        be committed
+       @param editfunctionparameterfile: (string) a flag to signal that a form containing a parameter file is to be displayed
+       @param editfunctionparameterfilecommit: (string) a flag to signal that a modified parameter file is to be committed
+       @param paramfilename: (string) the name of a parameter file
+       @param paramfilecontent: (string) the contents of a parameter file
+       @param ln: (string) the language code (e.g. en, fr, de, etc); defaults to the default installation language
+       @return: (string) HTML-page body
+    """
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    uid = getUid(req)
+
+    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    if not auth_code:
+        ## user is authorised to use WebSubmit Admin:
+        (title, body, errors, warnings) =\
+          perform_request_configure_doctype_submissionfunctions_parameters(doctype=doctype,
+                                                                           action=action,
+                                                                           functionname=functionname,
+                                                                           functionstep=functionstep,
+                                                                           functionscore=functionscore,
+                                                                           paramname=paramname,
+                                                                           paramval=paramval,
+                                                                           editfunctionparametervalue=editfunctionparametervalue,
+                                                                           editfunctionparametervaluecommit=editfunctionparametervaluecommit,
+                                                                           editfunctionparameterfile=editfunctionparameterfile,
+                                                                           editfunctionparameterfilecommit=editfunctionparameterfilecommit,
+                                                                           paramfilename=paramfilename,
+                                                                           paramfilecontent=paramfilecontent)
+        return page(title       = title,
+                    body        = body,
+                    navtrail    = get_navtrail(ln),
+                    uid         = uid,
+                    lastupdated = __lastupdated__,
+                    req         = req,
+                    language    = ln,
+                    errors      = errors,
+                    warnings    = warnings)
+    else:
+        ## user is not authorised to use WebSubmit Admin:
+        return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
+    
 
 def doctypeconfiguresubmissionfunctions(req,
                                         doctype="",
