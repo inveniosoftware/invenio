@@ -2384,7 +2384,7 @@ CREATE TABLE IF NOT EXISTS usergroup (
   id int(15) unsigned NOT NULL auto_increment,
   name varchar(50) NOT NULL default '',
   description text default '',
-  join_policy tinyint(4) unsigned NOT NULL default '0',
+  join_policy char(2) NOT NULL default '',
   PRIMARY KEY  (id),
   KEY name (name)
 ) TYPE=MyISAM;
@@ -2393,13 +2393,11 @@ CREATE TABLE IF NOT EXISTS usergroup (
 CREATE TABLE IF NOT EXISTS user_usergroup (
   id_user int(15) unsigned NOT NULL default '0',
   id_usergroup int(15) unsigned NOT NULL default '0',
-  user_status tinyint(4) NOT NULL default '0',
+  user_status char(1) NOT NULL default '',
   user_status_date datetime NOT NULL default '0000-00-00 00:00:00',  
   KEY id_user (id_user),
   KEY id_usergroup (id_usergroup)
 ) TYPE=MyISAM;
-
-
 
 -- tables for access control engine
 
@@ -2841,7 +2839,7 @@ CREATE TABLE IF NOT EXISTS sbmDOCTYPE (
 ) TYPE=MyISAM PACK_KEYS=1;
 
 CREATE TABLE IF NOT EXISTS sbmFIELD (
-  subname varchar(10) default NULL,
+  subname varchar(13) default NULL,
   pagenb int(11) default NULL,
   fieldnb int(11) default NULL,
   fidesc varchar(15) default NULL,
