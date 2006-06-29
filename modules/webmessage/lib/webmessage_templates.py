@@ -637,7 +637,10 @@ class Template:
         return: html output.
         """
         _ = gettext_set_language(ln)
-        out = _("You have <b>%i</b> new messages out of <a href=\"%s/yourmessages/?ln=%s\">%i messages</a>.")% (nb_new_mail, weburl, ln, total_mail)
+        out = _("You have %s new messages out of %s messages")
+        out %= ('<b>' + str(nb_new_mail) + '</b>', 
+                '<a href="' + weburl + '/yourmessages/?ln=' + ln + '">' + str(total_mail))
+        out += '</a>.'
         return out
 
     
