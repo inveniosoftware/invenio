@@ -77,7 +77,9 @@ def get_visible_group_list(uid, pattern=""):
     map(lambda x: grpID.append(int(x[0])), res)
     query2 = """SELECT id,name
                 FROM usergroup"""
-    if len(grpID) == 1 :
+    if len(grpID) == 0 :
+        query2 += " WHERE 1=1"
+    elif len(grpID) == 1 :
         query2 += """ WHERE id!=%i""" % grpID[0]
     else:
         query2 += """ WHERE id NOT IN %s""" % str(tuple(grpID))

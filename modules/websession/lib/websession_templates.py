@@ -431,6 +431,15 @@ class Template:
         out += self.tmpl_account_template(_("Your Baskets"), baskets, ln)
         out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln)
         out += self.tmpl_account_template(_("Your Searches"), searches, ln)
+        out += self.tmpl_account_template(_("Your Groups"), 
+                               _("You can consult the list of %(your_groups)s you are administering or are a member of.") % {
+                                 'your_groups' :
+                                    """<a href="%(weburl)s/yourgroups/display?ln=%(ln)s">%(your_groups_text)s</a>""" % {
+                                      'ln' : ln,
+                                      'weburl' : weburl,
+                                      'your_groups_text' : _("your groups")
+                                    }
+                               }, ln)
         out += self.tmpl_account_template(_("Your Submissions"),
                                _("You can consult the list of %(your_submissions)s and inquire about their status.") % {
                                  'your_submissions' :
@@ -821,7 +830,8 @@ class Template:
     	       <a class="userinfo" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a> ::
                    <a class="userinfo" href="%(weburl)s/yourmessages/display?ln=%(ln)s">%(messages)s</a> ::
                    <a class="userinfo" href="%(weburl)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> :: """ % {
+                   <a class="userinfo" href="%(weburl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> ::
+                   <a class="userinfo" href="%(weburl)s/yourgroups/display?ln=%(ln)s">%(groups)s</a> :: """ % {
                      'username' : username,
                      'weburl' : weburl,
                      'sweburl' : sweburl,
@@ -830,6 +840,7 @@ class Template:
                      'alerts' : _("alerts"),
 		     'messages': _("messages"),
                      'baskets' : _("baskets"),
+                     'groups' : _("groups"),
                    }
             if submitter:
                 out += """<a class="userinfo" href="%(weburl)s/yoursubmissions?ln=%(ln)s">%(submission)s</a> :: """ % {

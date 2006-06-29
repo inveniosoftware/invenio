@@ -30,7 +30,7 @@ from invenio.webinterface_handler import create_handler, WebInterfaceDirectory
 
 from invenio.websearch_webinterface import WebInterfaceSearchInterfacePages
 from invenio.websubmit_webinterface import websubmit_legacy_getfile, WebInterfaceSubmitPages
-from invenio.websession_webinterface import WebInterfaceYourAccountPages
+from invenio.websession_webinterface import WebInterfaceYourAccountPages, WebInterfaceYourGroupsPages
 from invenio.webalert_webinterface import WebInterfaceYourAlertsPages
 from invenio.webbasket_webinterface import WebInterfaceYourBasketsPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
@@ -49,6 +49,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'youralerts',
         'yourbaskets',
         'yourmessages',
+        'yourgroups',
         'comments',
         'error',
         'oai2d', ('oai2d.py', 'oai2d'),
@@ -69,6 +70,8 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     yourbaskets = WebInterfaceYourBasketsPages()
 
     yourmessages = WebInterfaceYourMessagesPages()
+
+    yourgroups = WebInterfaceYourGroupsPages()
 
     comments = WebInterfaceCommentsPages()
 

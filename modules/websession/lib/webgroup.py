@@ -23,7 +23,7 @@ from invenio.config import cdslang
 from invenio.messages import gettext_set_language, wash_language
 from invenio.websession_config import cfg_websession_info_messages, cfg_websession_usergroup_status
 from invenio.webmessage import perform_request_send
-import invenio.group_dblayer as db
+import invenio.webgroup_dblayer as db
 try:
     import invenio.template
     websession_templates = invenio.template.load('websession')

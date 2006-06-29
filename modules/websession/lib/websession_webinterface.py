@@ -38,11 +38,10 @@ from invenio.access_control_config import *
 from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE, cfg_webaccess_warning_msgs, CFG_EXTERNAL_AUTHENTICATION
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
-from invenio import group
+from invenio import webgroup
 from invenio.messages import gettext_set_language
 import invenio.template
 websession_templates = invenio.template.load('websession')
-
 
 class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
@@ -529,12 +528,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     language=args['ln'],
                     lastupdated=__lastupdated__)
 
-
-class WebInterfaceYourGroups(WebInterfaceDirectory):
+class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
 
     _exports = ['', 'display', 'create', 'join', 'leave', 'edit', 'members']
-
-    _force_https = True
 
     def index(self, req, form):
         redirect_to_url(req, '/yourgroups/display')
@@ -555,16 +551,15 @@ class WebInterfaceYourGroups(WebInterfaceDirectory):
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../yourgroups/display")
 
-        (body, errors, warnings) = group.perform_request_group_display(uid=uid,
+        (body, errors, warnings) = webgroup.perform_request_group_display(uid=uid,
                                                                        info=args['info'],
                                                                        ln=args['ln'])
         
         return page(title=_("Your Groups"),
                     body          = body,
-                    navtrail      = group.get_navtrail(args['ln']),
+                    navtrail      = webgroup.get_navtrail(args['ln']),
                     uid           = uid,
                     req           = req,
-                    secure_page_p = 1,
                     language      = args['ln'],
                     lastupdated   = __lastupdated__,
                     errors        = errors,
@@ -601,7 +596,7 @@ class WebInterfaceYourGroups(WebInterfaceDirectory):
             redirect_to_url(req, url)
             
         if argd['create_button'] :
-            (body, errors, warnings)= group.perform_request_create_group(uid=uid,
+            (body, errors, warnings)= webgroup.perform_request_create_group(uid=uid,
                                                                           group_name=argd['group_name'],
                                                                           group_description=argd['group_description'],
                                                                           join_policy=argd['join_policy'],
@@ -609,7 +604,7 @@ class WebInterfaceYourGroups(WebInterfaceDirectory):
             
             
         else: 
-            (body, errors, warnings) = group.perform_request_input_create_group(group_name=argd['group_name'],
+            (body, errors, warnings) = webgroup.perform_request_input_create_group(group_name=argd['group_name'],
                                                                                 group_description=argd['group_description'],
                                                                                 join_policy=argd['join_policy'],
                                                                                 ln=argd['ln'])
@@ -623,10 +618,9 @@ class WebInterfaceYourGroups(WebInterfaceDirectory):
         else :
             return page(title         = title,
                         body          = body,
-                        navtrail      = group.get_navtrail(argd['ln'], title),
+                        navtrail      = webgroup.get_navtrail(argd['ln'], title),
                         uid           = uid,
                         req           = req,
-                        secure_page_p = 1,
                         language      = argd['ln'],
                         lastupdated   = __lastupdated__,
                         errors        = errors,
@@ -664,7 +658,7 @@ class WebInterfaceYourGroups(WebInterfaceDirectory):
             search = 0
             if argd['group_name']:
                 search = 1
-            (body, errors, warnings) = group.perform_request_join_group(uid,
+            (body, errors, warnings) = webgroup.perform_request_join_group(uid,
                                                                         argd['grpID'],
                                                                         argd['group_name'],
                                                                         search,
@@ -673,7 +667,7 @@ class WebInterfaceYourGroups(WebInterfaceDirectory):
             search = 0
             if argd['find_button']:
                 search = 1
-            (body, errors, warnings) = group.perform_request_input_join_group(uid,
+            (body, errors, warnings) = webgroup.perform_request_input_join_group(uid,
                                                                               argd['group_name'],
                                                                               search,
                                                                               ln=argd['ln'])
@@ -687,10 +681,9 @@ class WebInterfaceYourGroups(WebInterfaceDirectory):
             title = _("Join New Group")
             return page(title         = title,
                         body          = body,
-                        navtrail      = group.get_navtrail(argd['ln'], title),
+                        navtrail      = webgroup.get_navtrail(argd['ln'], title),
                         uid           = uid,
                         req           = req,
-                        secure_page_p = 1,
                         language      = argd['ln'],
                         lastupdated   = __lastupdated__,
                         errors        = errors,
@@ -724,12 +717,12 @@ class WebInterfaceYourGroups(WebInterfaceDirectory):
             redirect_to_url(req, url)
             
         if argd['leave_button']:
-            (body, errors, warnings) = group.perform_request_leave_group(uid,
+            (body, errors, warnings) = webgroup.perform_request_leave_group(uid,
                                                                          argd['grpID'],
                                                                          argd['confirmed'],
                                                                          argd['ln'])
         else:
-            (body, errors, warnings) = group.perform_request_input_leave_group(uid=uid,
+            (body, errors, warnings) = webgroup.perform_request_input_leave_group(uid=uid,
                                                                                ln=argd['ln'])
         if body in (2,7,8):
             url = weburl + '/yourgroups/display?info=%s&ln=%s'
@@ -740,10 +733,9 @@ class WebInterfaceYourGroups(WebInterfaceDirectory):
             title = _("Leave Group")
             return page(title         = title,
                         body          = body,
-                        navtrail      = group.get_navtrail(argd['ln'], title),
+                        navtrail      = webgroup.get_navtrail(argd['ln'], title),
                         uid           = uid,
                         req           = req,
-                        secure_page_p = 1,
                         language      = argd['ln'],
                         lastupdated   = __lastupdated__,
                         errors        = errors,
@@ -771,13 +763,13 @@ class WebInterfaceYourGroups(WebInterfaceDirectory):
             redirect_to_url(req, url)
             
         elif argd['delete']:
-            (body, errors, warnings) = group.perform_request_delete_group(uid=uid,
+            (body, errors, warnings) = webgroup.perform_request_delete_group(uid=uid,
                                                                           grpID=argd['grpID'],
                                                                           confirmed=argd['confirmed'])
             
         elif argd['update']:
             
-            (body, errors, warnings) = group.perform_request_update_group(uid= uid,
+            (body, errors, warnings) = webgroup.perform_request_update_group(uid= uid,
                                                                           grpID=argd['grpID'],
                                                                           group_name=argd['group_name'],
                                                                           group_description=argd['group_description'],
@@ -785,7 +777,7 @@ class WebInterfaceYourGroups(WebInterfaceDirectory):
                                                                           ln=argd['ln'])
             
         else :
-            (body, errors, warnings)= group.perform_request_edit_group(uid=uid,
+            (body, errors, warnings)= webgroup.perform_request_edit_group(uid=uid,
                                                                        grpID=argd['grpID'],
                                                                        ln=argd['ln'])
                                                                  
@@ -800,10 +792,9 @@ class WebInterfaceYourGroups(WebInterfaceDirectory):
             title = _("Edit Group")
             return page(title = title,
                         body          = body,
-                        navtrail      = group.get_navtrail(argd['ln'], title),
+                        navtrail      = webgroup.get_navtrail(argd['ln'], title),
                         uid           = uid,
                         req           = req,
-                        secure_page_p = 1,
                         language      = argd['ln'],
                         lastupdated   = __lastupdated__,
                         errors        = errors,
@@ -828,7 +819,7 @@ class WebInterfaceYourGroups(WebInterfaceDirectory):
         
         if argd['remove_member']:
             title = _("Manage group's members")
-            (body, errors, warnings) = group.perform_request_remove_member(uid=uid,
+            (body, errors, warnings) = webgroup.perform_request_remove_member(uid=uid,
                                                                            grpID=argd['grpID'],
                                                                            member_id=argd['member_id'],
                                                                            ln=argd['ln'])    
@@ -836,14 +827,14 @@ class WebInterfaceYourGroups(WebInterfaceDirectory):
 
         elif argd['add_member']:
             title = _("Manage group's members")
-            (body, errors, warnings) = group.perform_request_add_member(uid=uid,
+            (body, errors, warnings) = webgroup.perform_request_add_member(uid=uid,
                                                                         grpID=argd['grpID'],
                                                                         user_id=argd['pending_member_id'],
                                                                         ln=argd['ln'])
 
         else: 
             title = _("Manage group's members")
-            (body, errors, warnings)= group.perform_request_manage_member(uid=uid,
+            (body, errors, warnings)= webgroup.perform_request_manage_member(uid=uid,
                                                                           grpID=argd['grpID'],
                                                                           info=argd['info'],
                                                                           ln=argd['ln'])
@@ -854,10 +845,9 @@ class WebInterfaceYourGroups(WebInterfaceDirectory):
             
         return page(title         = title,
                     body          = body,
-                    navtrail      = group.get_navtrail(argd['ln'], title),
+                    navtrail      = webgroup.get_navtrail(argd['ln'], title),
                     uid           = uid,
                     req           = req,
-                    secure_page_p = 1,
                     language      = argd['ln'],
                     lastupdated   = __lastupdated__,
                     errors        = errors,
