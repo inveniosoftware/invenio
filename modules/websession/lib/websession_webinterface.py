@@ -38,7 +38,7 @@ from invenio.access_control_config import *
 from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE, cfg_webaccess_warning_msgs, CFG_EXTERNAL_AUTHENTICATION
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
-
+from invenio import group
 from invenio.messages import gettext_set_language
 import invenio.template
 websession_templates = invenio.template.load('websession')
@@ -129,7 +129,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         # load the right message language
         _ = gettext_set_language(args['ln'])
-
+	
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../youraccount/change")
 
@@ -528,3 +528,339 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     secure_page_p = 1,
                     language=args['ln'],
                     lastupdated=__lastupdated__)
+
+
+class WebInterfaceYourGroups(WebInterfaceDirectory):
+
+    _exports = ['', 'display', 'create', 'join', 'leave', 'edit', 'members']
+
+    _force_https = True
+
+    def index(self, req, form):
+        redirect_to_url(req, '/yourgroups/display')
+        
+    def display(self, req, form):
+        """
+        Displays the groups the user is admin of
+        and the groups the user is member of(but not admin)
+        @param ln:  language
+        @return the page for all the groups
+        """
+        args = wash_urlargd(form, {'info':(int, 0)})
+        uid = webuser.getUid(req)
+
+        # load the right message language
+        _ = gettext_set_language(args['ln'])
+
+        if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return webuser.page_not_authorized(req, "../yourgroups/display")
+
+        (body, errors, warnings) = group.perform_request_group_display(uid=uid,
+                                                                       info=args['info'],
+                                                                       ln=args['ln'])
+        
+        return page(title=_("Your Groups"),
+                    body          = body,
+                    navtrail      = group.get_navtrail(args['ln']),
+                    uid           = uid,
+                    req           = req,
+                    secure_page_p = 1,
+                    language      = args['ln'],
+                    lastupdated   = __lastupdated__,
+                    errors        = errors,
+                    warnings      = warnings)
+    
+
+    
+    def create(self, req, form):
+        """create(): interface for creating a new group
+        @param group_name : name of the new group.Must be filled
+        @param group_name : description of the new group.(optionnal)
+        @param group_name : join policy of the new group.Must be chosen
+        @param *button: which button was pressed
+        @param ln: language
+        @return the compose page Create group
+        """
+        
+        argd = wash_urlargd(form, {'group_name': (str, ""),
+                                   'group_description': (str, ""),
+                                   'join_policy': (str, ""),
+                                   'create_button':(str, ""),
+                                   'cancel':(str, "")
+                                   })
+        uid = webuser.getUid(req)
+        # load the right message language
+        _ = gettext_set_language(argd['ln'])
+
+        if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return webuser.page_not_authorized(req, "../yourgroups/create")
+        
+        if argd['cancel']:
+            url = weburl + '/yourgroups/display?ln=%s'
+            url %= argd['ln']
+            redirect_to_url(req, url)
+            
+        if argd['create_button'] :
+            (body, errors, warnings)= group.perform_request_create_group(uid=uid,
+                                                                          group_name=argd['group_name'],
+                                                                          group_description=argd['group_description'],
+                                                                          join_policy=argd['join_policy'],
+                                                                          ln = argd['ln'])
+            
+            
+        else: 
+            (body, errors, warnings) = group.perform_request_input_create_group(group_name=argd['group_name'],
+                                                                                group_description=argd['group_description'],
+                                                                                join_policy=argd['join_policy'],
+                                                                                ln=argd['ln'])
+        title = _("Create New Group")
+
+        if body == 1:
+            url = weburl + '/yourgroups/display?info=1&ln=%s'
+            url %= argd['ln']
+            redirect_to_url(req, url)
+            
+        else :
+            return page(title         = title,
+                        body          = body,
+                        navtrail      = group.get_navtrail(argd['ln'], title),
+                        uid           = uid,
+                        req           = req,
+                        secure_page_p = 1,
+                        language      = argd['ln'],
+                        lastupdated   = __lastupdated__,
+                        errors        = errors,
+                        warnings      = warnings)
+    
+    def join(self, req, form):
+        """join(): interface for joining a new group
+        @param grpID : list of the group the user wants to become a member.
+        The user must select only one group.
+        @param group_name :  will search for groups with this pattern 
+        @param *button: which button was pressed
+        @param ln: language
+        @return the compose page Join group
+        """
+        
+        argd = wash_urlargd(form, {'grpID':(list, []),
+                                   'group_name':(str, ""),
+                                   'find_button':(str, ""),
+                                   'join_button':(str, ""),
+                                   'cancel':(str, "")
+                                   })
+        uid = webuser.getUid(req)
+        # load the right message language
+        _ = gettext_set_language(argd['ln'])
+
+        if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return webuser.page_not_authorized(req, "../yourgroups/join")
+        
+        if argd['cancel']:
+            url = weburl + '/yourgroups/display?ln=%s'
+            url %= argd['ln']
+            redirect_to_url(req, url)
+            
+        if argd['join_button']:
+            search = 0
+            if argd['group_name']:
+                search = 1
+            (body, errors, warnings) = group.perform_request_join_group(uid,
+                                                                        argd['grpID'],
+                                                                        argd['group_name'],
+                                                                        search,
+                                                                        argd['ln'])
+        else:
+            search = 0
+            if argd['find_button']:
+                search = 1
+            (body, errors, warnings) = group.perform_request_input_join_group(uid,
+                                                                              argd['group_name'],
+                                                                              search,
+                                                                              ln=argd['ln'])
+                        
+        if body in (2,7):
+            url = weburl + '/yourgroups/display?info=%s&ln=%s'
+            url %= (body, argd['ln'])
+            redirect_to_url(req, url)
+            
+        else :
+            title = _("Join New Group")
+            return page(title         = title,
+                        body          = body,
+                        navtrail      = group.get_navtrail(argd['ln'], title),
+                        uid           = uid,
+                        req           = req,
+                        secure_page_p = 1,
+                        language      = argd['ln'],
+                        lastupdated   = __lastupdated__,
+                        errors        = errors,
+                        warnings      = warnings)
+    def leave(self, req, form):
+        """leave(): interface for leaving a group
+        @param grpID : list of the group the user wants to become a member.
+        The user must select only one group.
+        @param group_name :  will search for groups with this pattern 
+        @param *button: which button was pressed
+        @param ln: language
+        @return the compose page Join group
+        """
+        
+        argd = wash_urlargd(form, {'grpID':(str, ""),
+                                   'group_name':(str, ""),
+                                   'leave_button':(str, ""),
+                                   'cancel':(str, ""),
+                                   'confirmed': (int, 0)
+                                   })
+        uid = webuser.getUid(req)
+        # load the right message language
+        _ = gettext_set_language(argd['ln'])
+
+        if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return webuser.page_not_authorized(req, "../yourgroups/leave")
+        
+        if argd['cancel']:
+            url = weburl + '/yourgroups/display?ln=%s'
+            url %= argd['ln']
+            redirect_to_url(req, url)
+            
+        if argd['leave_button']:
+            (body, errors, warnings) = group.perform_request_leave_group(uid,
+                                                                         argd['grpID'],
+                                                                         argd['confirmed'],
+                                                                         argd['ln'])
+        else:
+            (body, errors, warnings) = group.perform_request_input_leave_group(uid=uid,
+                                                                               ln=argd['ln'])
+        if body in (2,7,8):
+            url = weburl + '/yourgroups/display?info=%s&ln=%s'
+            url %= (body, argd['ln'])
+            redirect_to_url(req, url)
+            
+        else :
+            title = _("Leave Group")
+            return page(title         = title,
+                        body          = body,
+                        navtrail      = group.get_navtrail(argd['ln'], title),
+                        uid           = uid,
+                        req           = req,
+                        secure_page_p = 1,
+                        language      = argd['ln'],
+                        lastupdated   = __lastupdated__,
+                        errors        = errors,
+                        warnings      = warnings)
+        
+    def edit(self, req, form):
+        argd = wash_urlargd(form, {'grpID': (int, 0),
+                                   'update': (str, ""),
+                                   'cancel': (str, ""),
+                                   'delete': (str, ""),
+                                   'group_name': (str, ""),
+                                   'group_description': (str, ""),
+                                   'join_policy': (str, ""),
+                                   'confirmed': (int, 0)
+                                   })
+        uid = webuser.getUid(req)
+        # load the right message language
+        _ = gettext_set_language(argd['ln'])
+        if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return webuser.page_not_authorized(req, "../yourgroups/display")               
+        
+        if argd['cancel']:
+            url = weburl + '/yourgroups/display?ln=%s'
+            url %= argd['ln']
+            redirect_to_url(req, url)
+            
+        elif argd['delete']:
+            (body, errors, warnings) = group.perform_request_delete_group(uid=uid,
+                                                                          grpID=argd['grpID'],
+                                                                          confirmed=argd['confirmed'])
+            
+        elif argd['update']:
+            
+            (body, errors, warnings) = group.perform_request_update_group(uid= uid,
+                                                                          grpID=argd['grpID'],
+                                                                          group_name=argd['group_name'],
+                                                                          group_description=argd['group_description'],
+                                                                          join_policy=argd['join_policy'],
+                                                                          ln=argd['ln'])
+            
+        else :
+            (body, errors, warnings)= group.perform_request_edit_group(uid=uid,
+                                                                       grpID=argd['grpID'],
+                                                                       ln=argd['ln'])
+                                                                 
+
+
+        if body in (3,4):
+            url = weburl + '/yourgroups/display?info=%s&ln=%s'
+            url %= (body, argd['ln'])
+            redirect_to_url(req, url)
+            
+        else :
+            title = _("Edit Group")
+            return page(title = title,
+                        body          = body,
+                        navtrail      = group.get_navtrail(argd['ln'], title),
+                        uid           = uid,
+                        req           = req,
+                        secure_page_p = 1,
+                        language      = argd['ln'],
+                        lastupdated   = __lastupdated__,
+                        errors        = errors,
+                        warnings      = warnings)
+    
+
+    def members(self, req, form):
+        argd = wash_urlargd(form, {'grpID': (int, 0),
+                                   'cancel': (str, ""),
+                                   'add_member': (str, ""),
+                                   'remove_member': (str, ""),
+                                   'member_id': (int, ""),
+                                   'pending_member_id': (int, ""),
+                                   'info': (int, "")
+                                   })
+        uid = webuser.getUid(req)
+        # load the right message language
+        _ = gettext_set_language(argd['ln'])
+        if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return webuser.page_not_authorized(req, "../yourgroups/display")
+
+        
+        if argd['remove_member']:
+            title = _("Manage group's members")
+            (body, errors, warnings) = group.perform_request_remove_member(uid=uid,
+                                                                           grpID=argd['grpID'],
+                                                                           member_id=argd['member_id'],
+                                                                           ln=argd['ln'])    
+            
+
+        elif argd['add_member']:
+            title = _("Manage group's members")
+            (body, errors, warnings) = group.perform_request_add_member(uid=uid,
+                                                                        grpID=argd['grpID'],
+                                                                        user_id=argd['pending_member_id'],
+                                                                        ln=argd['ln'])
+
+        else: 
+            title = _("Manage group's members")
+            (body, errors, warnings)= group.perform_request_manage_member(uid=uid,
+                                                                          grpID=argd['grpID'],
+                                                                          info=argd['info'],
+                                                                          ln=argd['ln'])
+        if body in (5,6):
+            url = weburl + '/yourgroups/members?grpID=%i&info=%s&ln=%s'
+            url %= (argd['grpID'], body, argd['ln'])
+            redirect_to_url(req, url)
+            
+        return page(title         = title,
+                    body          = body,
+                    navtrail      = group.get_navtrail(argd['ln'], title),
+                    uid           = uid,
+                    req           = req,
+                    secure_page_p = 1,
+                    language      = argd['ln'],
+                    lastupdated   = __lastupdated__,
+                    errors        = errors,
+                    warnings      = warnings)
+
+    

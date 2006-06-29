@@ -26,7 +26,8 @@ import locale
 
 from invenio.config import *
 from invenio.messages import gettext_set_language
-
+from invenio.textutils import indent_text
+from invenio.websession_config import cfg_websession_group_join_policy,cfg_websession_usergroup_status
 class Template:
     def tmpl_lost_password_message(self, ln, supportemail):
         """
@@ -854,3 +855,690 @@ class Template:
                      'logout' : _("logout"),
                    }
         return out
+
+    def tmpl_warning(self, warnings, ln=cdslang):
+        """
+        Display len(warnings) warning fields
+        @param infos: list of strings
+        @param ln=language
+        @return html output
+        """
+        if not((type(warnings) is list) or (type(warnings) is tuple)):
+            warnings = [warnings]
+        warningbox = ""
+        if warnings != []:
+            warningbox = "<div class=\"warningbox\">\n  <b>Warning:</b>\n"
+            for warning in warnings:
+                lines = warning.split("\n")
+                warningbox += "  <p>"
+                for line in lines[0:-1]:
+                    warningbox += line + "    <br/>\n"
+                warningbox += lines[-1] + "  </p>"
+            warningbox += "</div><br/>\n"
+        return warningbox
+    
+    def tmpl_display_all_groups(self,
+                                admin_group_html,
+                                member_group_html,
+                                ln=cdslang):
+        """
+        Displays the 2 tables of groups: admin and member 
+
+        Parameters:
+
+          - 'ln' *string* - The language to display the interface in
+          
+          - 'admin_group_html' *string* - Html code for displaying all the groups
+          the user is the administrator
+          
+          - 'member_group_html' *string* - Html code for displaying all the groups
+          the user is member of
+
+        """
+        
+        _ = gettext_set_language(ln)
+        #group_text = self.tmpl_warning(warnings, ln)
+        group_text = """
+<table>
+  <tr>
+    <td>%s</td>
+  </tr>
+  <tr>
+    <td><br/></br>%s</td>
+  </tr>
+</table>""" %(admin_group_html, member_group_html)
+        return group_text
+
+    def tmpl_display_admin_group(self, groups, infos, ln=cdslang):
+        """
+        Display the groups the user is admin of.
+        
+        Parameters:
+
+        - 'ln' *string* - The language to display the interface in
+        - 'groups' *list* - All the group the user is admin of
+        - 'infos' *list* - Display infos on top of admin group table
+        """
+
+        _ = gettext_set_language(ln)
+        img_link = """
+        <a href="%(weburl)s/yourgroups/%(action)s?grpID=%(grpID)s&amp;ln=%(ln)s">
+        <img src="%(weburl)s/img/%(img)s" alt="%(text)s" style="border:0" width="25" 
+        height="25"><br/><small>%(text)s</small></img>
+        </a>""" 
+        
+        out = self.tmpl_group_table_title(img="/img/group_admin.png",
+                                          text="Groups you are administrator of")        
+
+        out += self.tmpl_infobox(infos)
+
+        out += """
+<table class="mailbox">
+  <thead class="mailboxheader">
+    <tr class="inboxheader">
+      <td>%s</td>
+      <td>%s</td>
+      <td style="width: 20px;" >&nbsp;</td>
+      <td style="width: 20px;">&nbsp;</td>
+    </tr>
+  </thead>
+  <tfoot>
+    <tr style="height:0px;">
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tfoot>
+  <tbody class="mailboxbody">""" %(_("Name"), _("Description"))
+        if len(groups) == 0:
+            out += """
+    <tr class="mailboxrecord" style="height: 100px;">
+      <td colspan="4" style="text-align: center;">
+        %s
+      </td>
+    </tr>""" %(_("No Group you are the administrator"),)
+        for group_data in groups:
+            (grpID, name, description) = group_data
+            edit_link = img_link % {'weburl' : weburl,
+                                    'grpID' : grpID,
+                                    'ln': ln,
+                                    'img':"webbasket_create_small.png",
+                                    'text':_("Edit group"),
+                                    'action':"edit"
+                                    }
+            members_link = img_link % {'weburl' : weburl,
+                                       'grpID' : grpID,
+                                       'ln': ln,
+                                       'img':"webbasket_usergroup.png",
+                                       'text':_("Edit<br/>members"),
+                                       'action':"members"
+                                       }                     
+            out += """
+    <tr class="mailboxrecord">
+      <td>%s</td>
+      <td>%s</td>
+      <td style="text-align: center;" >%s</td>
+      <td style="text-align: center;" >%s</td>
+    </tr>""" %(name, description, edit_link, members_link)
+        out += """
+    <tr class="mailboxfooter">
+      <td colspan="2">
+        <form name="newGroup" action="create?ln=%(ln)s" method="post">
+          <input type="submit" name="create_group" value="%(write_label)s" class="formbutton" />
+        </form>
+      </td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+     </tr> 
+  </tbody>
+</table>""" % {'ln': ln,
+               'write_label': _("Create new group"),
+               }
+        return indent_text(out, 2)
+
+    def tmpl_display_member_group(self, groups, infos, ln=cdslang):
+        _ = gettext_set_language(ln)
+        group_text = self.tmpl_group_table_title(img="/img/webbasket_us.png", text="Groups you are member of")
+        group_text += self.tmpl_infobox(infos)
+        group_text += """
+<table class="mailbox">
+  <thead class="mailboxheader">
+    <tr class="inboxheader"> 
+      <td>%s</td>
+      <td>%s</td>
+    </tr>
+  </thead>
+  <tfoot>
+    <tr style="height:0px;">
+      <td></td>
+      <td></td>
+    </tr>
+  </tfoot>
+  <tbody class="mailboxbody">""" % (_("Name"), _("Description"))
+        if len(groups) == 0:
+            group_text += """
+    <tr class="mailboxrecord" style="height: 100px;">
+      <td colspan="2" style="text-align: center;">
+        <small>%s</small>
+      </td>
+    </tr>""" %(_("No Group you are member of"),)
+        for group_data in groups:
+            (id, name, description) = group_data
+            group_text += """
+    <tr class="mailboxrecord">
+      <td>%s</td>
+      <td>%s</td>
+    </tr>""" %(name, description)
+        group_text += """
+    <tr class="mailboxfooter">
+      <td>
+      <table>
+       <tr>
+        <td>
+          <form name="newGroup" action="join?ln=%(ln)s" method="post">
+           <input type="submit" name="join_group" value="%(join_label)s" class="formbutton" />
+          </form>
+        </td>
+        <td>
+         <form name="newGroup" action="leave?ln=%(ln)s" method="post">
+          <input type="submit" name="leave" value="%(leave_label)s" class="formbutton" />
+         </form>
+        </td>
+       </tr>
+       </table>
+       </td>
+      <td>&nbsp;</td>
+     </tr> 
+  </tbody>
+</table>
+ """ % {'ln': ln,
+               'join_label': _("Join new group"),
+               'leave_label':_("Leave group")
+               }
+        return indent_text(group_text, 2)
+
+    def tmpl_display_input_group_info(self,
+                                        group_name,
+                                        group_description,
+                                        join_policy,
+                                        act_type="create",
+                                        grpID="",
+                                        warnings=[],
+                                        ln=cdslang):
+        _ = gettext_set_language(ln)
+        #default
+        hidden_id =""
+        form_name = "create_group"
+        action = weburl + '/yourgroups/create'
+        button_label = _("Create a new group")
+        button_name = "create_button"
+        label = _("Create New Group")
+        delete_text = ""
+        
+        if act_type == "update":
+            form_name = "update_group"
+            action = weburl + '/yourgroups/edit'
+            button_label = _("Update group")
+            button_name = "update"
+            label = _("Edit Group")
+            delete_text = """<input type="submit" value="%s" class="formbutton" name="%s"/>"""
+            delete_text %= (_("Delete group"),"delete")
+            if grpID != "":
+                hidden_id = """<input type="hidden" name="grpID" value="%s"/>"""
+                hidden_id %= grpID
+            
+        out = self.tmpl_warning(warnings)
+        out += """
+<form name="%(form_name)s" action="%(action)s" method="POST">
+  <input type="hidden" name="ln" value="%(ln)s" />
+  <div style="padding:10px;">
+  <table class="bskbasket">
+    <thead class="bskbasketheader">
+      <tr>
+        <td class="bskactions">
+          <img src="%(logo)s" alt="%(label)s" />
+        </td>
+        <td class="bsktitle">
+          <b>%(label)s</b><br />
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="2">
+          <table>
+            <tr>
+              <td>%(name_label)s</td>
+              <td>
+               <input type="text" name="group_name" value="%(group_name)s"/>
+              </td>
+            </tr>
+            <tr>
+              <td>%(description_label)s</td>
+              <td>
+               <input type="text" name="group_description" value="%(group_description)s"/>
+              </td>
+            </tr>
+            <tr>
+              <td>%(join_policy_label)s</td>
+              <td>
+               %(join_policy)s
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  %(hidden_id)s
+  <table>
+   <tr>
+    <td>
+     <input type="submit" value="%(button_label)s" class="formbutton" name="%(button_name)s"/>
+    </td>
+    <td>
+    %(delete_text)s
+    </td>
+    <td>
+     <input type="submit" value="%(cancel_label)s" class="formbutton" name="cancel"/>
+    </td>
+   </tr>
+  </table 
+  </div>
+</form>
+
+"""
+        out %= {'action' : action,
+                'logo': weburl + '/img/webbasket_create.png',
+                'label': label,
+                'form_name' : form_name,
+                'name_label': _("Group's name"),
+                'delete_text': delete_text,
+                'description_label': _("Group's description"),
+                'join_policy_label': _("Group's join policy"),
+                'group_name': group_name,
+                'group_description': group_description,
+                'button_label': button_label,
+                'button_name':button_name,
+                'cancel_label':_("Cancel"),
+                'hidden_id':hidden_id,
+                'ln': ln,
+                'join_policy' :self.__create_join_policy_selection_menu("join_policy",
+                                                                        join_policy,
+                                                                        ln)
+               } 
+        return out
+
+    def tmpl_display_input_join_group(self,
+                                      group_list,
+                                      group_name,
+                                      group_from_search,
+                                      search,
+                                      warnings=[],
+                                      ln=cdslang):
+        _ = gettext_set_language(ln)
+        out = self.tmpl_warning(warnings)
+        search_content = ""
+        if search:
+            search_content = """<tr><td>&nbsp;</td><td>"""
+            if group_from_search != []:
+                search_content += self.__create_select_menu('grpID', group_from_search, _("Please select:"))
+            else:
+                search_content += _("No matching Group")
+        
+            search_content += """</td><td>&nbsp;</td></tr>"""
+            
+        out += """
+<form name="join_group" action="%(action)s" method="POST">
+  <input type="hidden" name="ln" value="%(ln)s" />
+  <div style="padding:10px;">
+  <table class="bskbasket">
+    <thead class="bskbasketheader">
+      <tr>
+        <td class="bskactions">
+          <img src="%(logo)s" alt="%(label)s" />
+        </td>
+        <td class="bsktitle">
+          <b>%(label)s</b><br />
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="2">
+          <table>
+            <tr>
+              <td>%(list_label)s</td>
+              <td>
+               %(group_list)s
+               </td>
+              <td>
+               &nbsp;
+              </td>
+            </tr>
+            <tr>
+              <td><br>%(label2)s</td>
+              <td><br><input type="text" name="group_name" value="%(group_name)s"/></td>
+              <td><br>
+               <input type="submit" name="find_button" value="%(find_label)s" class="nonsubmitbutton"/>
+              </td>
+            </tr>
+            %(search_content)s</td>
+              
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <table>
+  <tr>
+   <td>
+    <input type="submit" name="join_button" value="%(label)s" class="formbutton"/>
+   </td>
+   <td>
+    <input type="submit" value="%(cancel_label)s" class="formbutton" name="cancel"/>
+   </td>
+   </tr>
+  </table>
+ </div>
+</form>
+
+"""
+        out %= {'action' : weburl + '/yourgroups/join',
+                'logo': weburl + '/img/webbasket_create.png',
+                'label': _("Join group"),
+                'group_name': group_name,
+                'label2':_("Or find it:"),
+                'list_label':_("Group list"),
+                'ln': ln,
+                'find_label': _("Find a group"),
+                'cancel_label':_("Cancel"),
+                'group_list' :self.__create_select_menu("grpID",group_list, _("Please Select:")),
+                'search_content' : search_content
+               } 
+        return out
+    
+    def tmpl_display_manage_member(self,
+                                   grpID,
+                                   group_name,
+                                   members,
+                                   pending_members,
+                                   infos=([], []),
+                                   warnings=[],
+                                   ln=cdslang):
+        
+        _ = gettext_set_language(ln)
+        out = self.tmpl_warning(warnings)
+        out += """
+<form name="member" action="%(action)s" method="POST">
+ <input type="hidden" name="grpID" value="%(grpID)s"/>
+ <table>
+  <tr>
+   <td>
+    %(header1)s
+    <table>
+    <tr>
+     <td>"""
+        if infos[0]:
+            out += self.tmpl_infobox(infos[0])
+        out += """
+        %(member_list)s
+     </td>
+     <td>
+      <input type="submit" name="remove_member" value="%(label_remove)s" class="nonsubmitbutton"/>
+     </td>
+    </tr>
+   </table>
+   </td>
+  </tr>
+  <tr>
+   <td>
+    %(header2)s
+    <table>
+     <tr>
+      <td>"""
+        if infos[1]:
+            out += self.tmpl_infobox(infos[1])
+        out += """
+        %(pending_list)s
+      </td>
+      <td>
+       <input type="submit" name="add_member" value="%(label_add)s" class="nonsubmitbutton"/>
+      </td>
+     </tr>
+    </table>
+   </td>
+  </tr>
+ </table>
+</form>
+ """
+        member_list =   self.__create_select_menu("member_id", members, _("Please Select:"))
+        pending_list =   self.__create_select_menu("pending_member_id", pending_members, _("Please Select:"))
+        header1 = self.tmpl_group_table_title(text="Current members")
+        header2 = self.tmpl_group_table_title(text="Waiting members")
+        action = weburl + '/yourgroups/members?ln=%s'
+        action %= (ln)
+        out %= {'member_list' : member_list,
+                'pending_list' : pending_list,
+                'action':action,
+                'grpID':grpID,
+                'label_remove' : _("Remove member"),
+                'label_add' : _("Add Member"),
+                'header1': header1,
+                'header2': header2
+                }
+        return out
+    
+    def tmpl_display_input_leave_group(self,
+                                       groups,
+                                       warnings=[],
+                                       ln=cdslang):
+        _ = gettext_set_language(ln)
+        out = self.tmpl_warning(warnings)
+        out += """
+<form name="leave" action="%(action)s" method="POST">
+ <table>
+  <tr>
+   <td>
+    %(groups)s
+   </td>
+   <td>
+    <input type="submit" name="leave_button" value="%(label)s" class="formbutton"/>
+   </td>
+  </tr>
+ </table>
+</form>
+ """
+        groups =   self.__create_select_menu("grpID", groups, _("Please Select:"))
+        action = weburl + '/yourgroups/leave?ln=%s'
+        action %= (ln)
+        out %= {'groups' : groups,
+                'action':action,
+                'label' : _("Leave Group"),
+                }
+        return out
+        
+
+    def tmpl_confirm_delete(self, grpID, ln=cdslang):
+        """
+        display a confirm message
+        @param ln: language
+        @return html output
+        """
+        _ = gettext_set_language(ln)
+        action = weburl + '/yourgroups/edit'
+        out = """
+<form name="delete_group" action="%(action)s" method="post">
+<table class="confirmoperation">
+  <tr>
+    <td colspan="2" class="confirmmessage">
+      %(message)s
+    </td>
+  </tr>
+  <tr>
+    <td>
+        <input type="hidden" name="confirmed" value="1" />
+        <input type="hidden" name="ln" value="%(ln)s" />
+        <input type="hidden" name="grpID" value="%(grpID)s" />
+        <input type="submit" name="delete" value="%(yes_label)s" class="formbutton" />
+    </td>
+    <td>
+        <input type="hidden" name="ln" value="%(ln)s" />
+        <input type="hidden" name="grpID" value="%(grpID)s" />
+        <input type="submit" value="%(no_label)s" class="formbutton" />
+    </td>
+  </tr>
+</table>
+</form>"""% {'message': _("Are your sure you want to delete this group?"),
+              'ln':ln,
+              'yes_label': _("Yes"),
+              'no_label': _("No"),
+              'grpID':grpID,
+              'action': action
+              }
+        return indent_text(out, 2)
+
+    def tmpl_confirm_leave(self, uid, grpID, ln=cdslang):
+        """
+        display a confirm message
+        @param ln: language
+        @return html output
+        """
+        _ = gettext_set_language(ln)
+        action = weburl + '/yourgroups/leave'
+        out = """
+<form name="leave_group" action="%(action)s" method="post">
+<table class="confirmoperation">
+  <tr>
+    <td colspan="2" class="confirmmessage">
+      %(message)s
+    </td>
+  </tr>
+  <tr>
+    <td>
+        <input type="hidden" name="confirmed" value="1" />
+        <input type="hidden" name="ln" value="%(ln)s" />
+        <input type="hidden" name="grpID" value="%(grpID)s" />
+        <input type="submit" name="leave_button" value="%(yes_label)s" class="formbutton" />
+    </td>
+    <td>
+        <input type="hidden" name="ln" value="%(ln)s" />
+        <input type="hidden" name="grpID" value="%(grpID)s" />
+        <input type="submit" value="%(no_label)s" class="formbutton" />
+    </td>
+  </tr>
+</table>
+</form>"""% {'message': _("Are your sure you want to leave this group?"),
+              'ln':ln,
+              'yes_label': _("Yes"),
+              'no_label': _("No"),
+              'grpID':grpID,
+              'action': action
+              }
+        return indent_text(out, 2)
+    
+    def __create_join_policy_selection_menu(self, name, current_join_policy, ln=cdslang):
+        """Private function. create a drop down menu for selection of join policy
+        @param current_join_policy: join policy as defined in cfg_websession_group_join_policy
+        @param ln: language
+        """
+        _ = gettext_set_language(ln)
+        elements = [(cfg_websession_group_join_policy['VISIBLEOPEN'],
+                     _("Visible and open for new member")),
+                    (cfg_websession_group_join_policy['VISIBLEMAIL'],
+                     _("Visible but need approval for new member")),
+                    (cfg_websession_group_join_policy['INVISIBLEOPEN'],
+                     _("Not visible and open for new member")),
+                    (cfg_websession_group_join_policy['INVISIBLEMAIL'],
+                     _("Not Visible and need approval for new member")),
+                    ]
+        select_text = _("Please select")
+        return self.__create_select_menu(name, elements, select_text, selected_key=current_join_policy)
+
+    def __create_select_menu(self, name, elements, select_text, multiple=0, selected_key=None):
+        """ private function, returns a popup menu
+        @param name: name of HTML control
+        @param elements: list of (key, value)
+        """
+        if multiple :
+            out = """
+<select name="%s" multiple="multiple" style="width:100%%">"""% (name)
+        else :
+            out = """<select name="%s" style="width:100%%">""" % name         
+        out += indent_text('<option value="-1">%s</option>' % (select_text))
+        for (key, label) in elements:
+            selected = ''
+            if key == selected_key:
+                selected = ' selected="selected"'
+            out += indent_text('<option value="%s"%s>%s</option>'% (key, selected, label), 1)
+        out += '</select>'
+        return out
+
+
+    def tmpl_infobox(self, infos, ln=cdslang):
+        """Display len(infos) information fields
+        @param infos: list of strings
+        @param ln=language
+        @return html output
+        """
+        _ = gettext_set_language(ln)
+        if not((type(infos) is list) or (type(infos) is tuple)):
+            infos = [infos]       
+        infobox = ""
+        for info in infos:
+            infobox += "<div class=\"infobox\">"
+            lines = info.split("\n")
+            for line in lines[0:-1]:
+                infobox += line + "<br/>\n"
+            infobox += lines[-1] + "</div>\n"
+        return infobox
+
+    def tmpl_navtrail(self, ln=cdslang, title=""):
+        """
+        display the navtrail, e.g.:
+        Your account > Your group > title
+        @param title: the last part of the navtrail. Is not a link
+        @param ln: language
+        return html formatted navtrail
+        """
+        _ = gettext_set_language(ln)
+        nav_h1 = '<a class="navtrail" href="%s/youraccount/display">%s</a>'
+        nav_h2 = ""
+        if (title != ""):
+            nav_h2 = ' &gt; <a class="navtrail" href="%s/yourgroups/display">%s</a>'
+            nav_h2 = nav_h2 % (weburl, _("Your Groups"))
+
+        return  nav_h1 % (weburl, _("Your Account")) + nav_h2
+
+    def tmpl_group_table_title(self, img="", text="", ln=cdslang):
+        out = "<div>"
+        if img:
+            out += """
+            <img src="%(logo)s"/>
+            """
+        out += """
+        <b>%(text)s</b>
+        </div>
+        
+        """
+        out %= {'logo': weburl + img,
+                'text':text
+                } 
+        return out
+ 
+    def tmpl_new_member_msg(self,
+                            group_name,
+                            grpID,
+                            ln=cdslang):
+        
+        _ = gettext_set_language(ln)
+        sujet = "%s : New user is pending" % group_name
+        url = weburl + "/yourgroups/members?grpID=%i&ln=%s"
+        url %= (int(grpID), ln)
+        body = """A new user wants to join %s .<br/>
+                  <br/>You can add him by clicking on:<br/>
+                  <a href="%s">%s</a>"""
+        body %= (group_name, url, _("Edit Members"))
+        return sujet, body
