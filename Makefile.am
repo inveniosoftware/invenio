@@ -132,12 +132,7 @@ create-demo-site:
 # 	done
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/demo/democfgdata.sql
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
-	@echo ""
-	@echo "***********************************************************************"
-	@echo "** You will be asked for a username, please enter admin email below. **"
-	@echo "***********************************************************************"
-	@echo ""
-	${prefix}/bin/webcoll
+	${prefix}/bin/webcoll -uadmin
 	${prefix}/bin/webcoll 1
 	@echo "***********************************************************************"
 	@echo "** The demo site has been successfully created.                      **"
@@ -155,34 +150,14 @@ load-demo-records:
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
 	${prefix}/bin/bibupload -i $(srcdir)/modules/miscutil/demo/demobibdata.xml
 	${prefix}/bin/bibupload 1
-	@echo ""
-	@echo "***********************************************************************"
-	@echo "** You will be asked for a username, please enter admin email below. **"
-	@echo "***********************************************************************"
-	@echo ""
-	${prefix}/bin/bibindex
+	${prefix}/bin/bibindex -uadmin 
 	${prefix}/bin/bibindex 2
-	@echo ""
-	@echo "***********************************************************************"
-	@echo "** You will be asked for a username, please enter admin email below. **"
-	@echo "***********************************************************************"
-	@echo ""
-	${prefix}/bin/bibreformat -oHB
+	${prefix}/bin/bibreformat -uadmin -oHB
 	${prefix}/bin/bibreformat 3
 	${prefix}/bin/bibupload 4
-	@echo ""
-	@echo "***********************************************************************"
-	@echo "** You will be asked for a username, please enter admin email below. **"
-	@echo "***********************************************************************"
-	@echo ""
-	${prefix}/bin/webcoll
+	${prefix}/bin/webcoll -uadmin
 	${prefix}/bin/webcoll 5
-	@echo ""
-	@echo "***********************************************************************"
-	@echo "** You will be asked for a username, please enter admin email below. **"
-	@echo "***********************************************************************"
-	@echo ""
-	${prefix}/bin/bibrank
+	${prefix}/bin/bibrank -uadmin
 	${prefix}/bin/bibrank 6
 	@echo "***********************************************************************"
 	@echo "** The demo records have been successfully loaded.                   **"
@@ -201,12 +176,7 @@ drop-demo-site:
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabcreate.sql
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
-	@echo ""
-	@echo "***********************************************************************"
-	@echo "** You will be asked for a username, please enter admin email below. **"
-	@echo "***********************************************************************"
-	@echo ""
-	${prefix}/bin/webcoll
+	${prefix}/bin/webcoll -uadmin
 	${prefix}/bin/webcoll 1
 #	for f in $(sbmdat); do rm -f $(sbmdir)/$$f.shtml ; done
 	@echo "***************************************************************"
@@ -216,12 +186,7 @@ drop-demo-site:
 remove-demo-records: 
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabbibclean.sql
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
-	@echo ""
-	@echo "***********************************************************************"
-	@echo "** You will be asked for a username, please enter admin email below. **"
-	@echo "***********************************************************************"
-	@echo ""
-	${prefix}/bin/webcoll 
+	${prefix}/bin/webcoll -uadmin
 	${prefix}/bin/webcoll 1
 	@echo "**********************************************************"
 	@echo "** The demo records have been successfully removed.     **"
