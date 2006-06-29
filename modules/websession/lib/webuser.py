@@ -545,6 +545,15 @@ def get_password(uid):
         out = res[0][0]
     return out
 
+def get_nickname(uid):
+    """Return nickname of the user uid.  Return None in case
+    the user is not found."""
+    out = None
+    res = run_sql("SELECT nickname FROM user WHERE id=%s", (uid,), 1)
+    if res and res[0][0]:
+        out = res[0][0]
+    return out
+
 def get_nickname_or_email(uid):
     """Return nickname (preferred) or the email address of the user uid.
     Return string 'guest' in case the user is not found."""
