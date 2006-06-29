@@ -176,7 +176,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
             elif uid2 == -1 or uid2 != uid and not uid2 == 0:
-                mess = _("Supplied email address %s already exists in the database.") % args['p_email']
+                mess = _("Supplied email address %s already exists in the database.") % args['email']
                 mess += " " + websession_templates.tmpl_lost_your_password_teaser(args['ln'])
                 mess += " " + _("Or please try again.")
                 act = "edit"
