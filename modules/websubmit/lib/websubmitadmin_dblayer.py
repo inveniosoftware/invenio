@@ -388,8 +388,6 @@ def get_number_of_submission_functions_in_step_between_two_scores(doctype, actio
                            ((score1 <= score2 and score1) or (score2)),
                            ((score1 <= score2 and score2) or (score1))))[0][0])
 
-
-
 def move_submission_function_from_one_position_to_another_position(doctype, action, movefuncname, movefuncfromstep,
                                                                    movefuncfromscore, movefunctostep, movefunctoscore):
     """Move a submission function from one score/step to another position.
@@ -434,7 +432,7 @@ def move_submission_function_from_one_position_to_another_position(doctype, acti
                                                                        step=movefuncfromstep,
                                                                        score1=movefuncfromscore,
                                                                        score2=movefunctoscore)
-        if num_functs_between_old_and_new_posn < 3:
+        if num_functs_between_old_and_new_posn < 3 and (movefuncfromscore <= movefunctoscore):
             ## moving the function to the same position - no point
             msg = """The function [%s] of the submission [%s] was not moved from step [%s], score [%s] to """\
                   """step [%s], score [%s] as there would have been no change in position."""\
@@ -473,7 +471,6 @@ def move_submission_function_from_one_position_to_another_position(doctype, acti
     ## finished
     return
 
-
 def move_position_submissionfunction_fromposn_toposn(doctype, action, movefuncname, movefuncfromstep,
                                                     movefuncfromscore, movefunctoname, movefunctostep,
                                                     movefunctoscore):
@@ -507,10 +504,6 @@ def move_position_submissionfunction_fromposn_toposn(doctype, action, movefuncna
         function_above_score = int(functions_above[numrows_functions_above-1][2])
         ## Check that the place to which we are moving our function is NOT the same place that it is currently
         ## situated!
-##         if function_above_name == movefuncname and function_above_step == int(movefuncfromstep) and \
-##            function_above_score == int(movefuncfromscore):
-##             ## it is the same position - quietly do nothing
-##             return 1  ## NICK BELOW, ACTUALLY, NOT ABOVE!
 
     if (numrows_functions_above < 1) or (int(functions_above[numrows_functions_above-1][1]) < int(movefunctostep)):  ### NICK SEPARATE THESE 2 OUT
         ## EITHER: there are no functions above the destination position; -OR- the function immediately above the
@@ -700,8 +693,6 @@ def move_position_submissionfunction_down(doctype, action, function, funccurstep
             ## Return an error code to signal that things went wrong
             return 1
 
-
-
 def get_names_of_all_functions():
     """Return a list of the names of all WebSubmit functions (as strings).
        The function names will be sorted in ascending alphabetical order.
@@ -828,7 +819,6 @@ def get_doctype_action_pagenb_for_submissions_using_element(elname):
     q = """SELECT subm.docname, subm.actname, sf.pagenb FROM sbmIMPLEMENT AS subm LEFT JOIN sbmFIELD AS sf ON sf.subname=CONCAT(subm.actname, subm.docname) WHERE sf.fidesc=%s ORDER BY sf.subname ASC, sf.pagenb ASC"""
     return run_sql(q, (elname,))
 
-
 def get_subname_pagenb_element_use(elname):
     """Get and return a tuple of tuples containing the "submission name" (subname) and the
        page number (pagenb) for the instances of use of the element identified by "elname".
@@ -904,7 +894,6 @@ def update_element_details(elname, elmarccode, eltype, elsize, elrows, elcols, e
         return 0 # Everything is OK
     else:
         return 1 # Everything not OK: Either no rows or more than one row for element "elname"
-
 
 def insert_element_details(elname, elmarccode, eltype, elsize, elrows, elcols, \
                            elmaxlength, elval, elfidesc, elmodifytext, elcookie):
@@ -1001,7 +990,6 @@ def get_number_of_functions_in_step_of_submission(doctype, action, step):
     q = """SELECT COUNT(doctype) FROM sbmFUNCTIONS where doctype=%s AND action=%s AND step=%s"""
     return int(run_sql(q, (doctype, action, step))[0][0])
 
-
 def get_number_categories_doctype(doctype):
     """Return the number of CATEGORIES (used to distinguish between submissions) found for a given DOCUMENT TYPE.
        @param doctype: unique ID of doctype for which submission categories are to be counted
@@ -1059,7 +1047,6 @@ def get_doctypeid_doctypes_implementing_action(action):
         """WHERE subm.actname=%s """\
         """ORDER BY doc.sdocname ASC"""
     return run_sql(q, (action,))
-
 
 def get_number_submissions_doctype(doctype):
     """Return the number of SUBMISSIONS found for a given document type
@@ -1187,7 +1174,6 @@ def update_doctype_details(doctype, doctypename, doctypedescr):
         ## Everything NOT OK - either doctype does not exists, or key is duplicated
         return 1
 
-
 def get_submissiondetails_all_submissions_doctype(doctype):
     """Get the details of all submissions for a given document type, ordered by the action name.
        @param doctype: details of the document type for which the details of all submissions are to be
@@ -1304,7 +1290,6 @@ def get_functionname_step_score_allfunctions_afterreference_doctypesubmission(do
         """ OR (step > %s)) ORDER BY step ASC, score ASC"""
     return run_sql(q, (doctype, action, step, score, step))
 
-
 def get_functionname_step_score_allfunctions_beforereference_doctypesubmission(doctype, action, step, score):
     q = """SELECT function, step, score FROM sbmFUNCTIONS WHERE (doctype=%s AND action=%s) AND ((step=%s AND score < %s)"""
     if step > 1:
@@ -1399,7 +1384,6 @@ def delete_the_function_at_step_and_score_from_a_submission(doctype, action, fun
                   % (function, score, step, "%s%s" % (action, doctype))
             raise InvenioWebSubmitAdminWarningDeleteFailed(msg)
 
-
 def delete_function_at_step_and_score_from_submission(doctype, action, function, step, score):
     """Delete the function at a particular step/score from a submission.
        @param doctype: (string) the unique ID of a document type
@@ -1473,7 +1457,6 @@ def delete_all_functions_in_step_of_submission(doctype, action, step):
                                                                                           "%s%s" % (action, doctype))
             raise InvenioWebSubmitAdminWarningDeleteFailed(msg)
 
-
 def delete_all_functions_foraction_doctype(doctype, action):
     """Delete all FUNCTIONS for a given action, belonging to a given doctype.
        @param doctype: the document type for which the functions are to be deleted
@@ -1499,7 +1482,6 @@ def delete_all_functions_foraction_doctype(doctype, action):
         else:
             ## still unable to recover - could not delete all functions for this doctype/action
             return 1
-    
 
 def delete_all_functions_doctype(doctype):
     """Delete all FUNCTIONS for a given document type.
@@ -1635,7 +1617,6 @@ def insert_function_into_submission_at_step_and_score_then_regulate_scores_of_fu
     ## success
     return
 
-
 def insert_function_into_submission_at_step_and_score(doctype, action, function, step, score):
     """Insert a function into a submission, at the position dictated by step/score.
        @param doctype: (string) the unique ID of a document type
@@ -1739,6 +1720,53 @@ def delete_functionparameters_doctype_submission(doctype, action):
     ## no parameters to delete
     return 0
 
+def update_value_of_function_parameter_for_doctype(doctype, paramname, paramval):
+    """Update the value of a parameter as used by a document type.
+       @param doctype: (string) the unique ID of a document type
+       @param paramname: (string) the name of the parameter whose value is to be updated
+       @param paramval: (string) the new value for the parameter
+       @Exceptions raised:
+           InvenioWebSubmitAdminTooManyRows - when multiple rows found for parameter
+           InvenioWebSubmitAdminNoRowsFound - when no rows found for parameter
+    """
+    q = """UPDATE sbmPARAMETERS SET value=%s WHERE doctype=%s AND name=%s"""
+    ## get number of rows found for the parameter: 
+    numrows_param = get_numberparams_doctype_paramname(doctype=doctype, paramname=paramname)
+    if numrows_param == 1:
+        run_sql(q, (paramval, doctype, paramname))
+        return
+    elif numrows_param > 1:
+        ## multiple rows found for the parameter - not safe to edit
+        msg = """When trying to update the [%s] parameter for the [%s] document type, [%s] rows were found for the parameter """\
+              """- not safe to update""" % (paramname, doctype, numrows_param)
+        raise InvenioWebSubmitAdminWarningTooManyRows(msg)
+    else:
+        ## no row for parameter found
+        msg = """When trying to update the [%s] parameter for the [%s] document type, no rows were found for the parameter"""\
+              % (paramname, doctype)
+        raise InvenioWebSubmitAdminWarningNoRowsFound(msg)
+
+def get_parameters_name_and_value_for_function_of_doctype(doctype, function):
+    """Get the names and values of all parameters of a given function, as they have been set for a particular document
+       type.
+       @param doctype: (string) the unique ID of a document type
+       @param function: the name of the function from which the parameters names/values are to be retrieved
+       @return: a tuple of 2-celled tuples, each tuple containing 2 strings: (parameter-name, parameter-value)
+    """
+    q = """SELECT param.name, param.value FROM sbmPARAMETERS AS param """\
+        """LEFT JOIN sbmFUNDESC AS func ON func.param=param.name """\
+        """WHERE func.function=%s AND param.doctype=%s """\
+        """ORDER BY param.name ASC"""
+    return run_sql(q, (function, doctype))
+
+def get_value_of_parameter_for_doctype(doctype, parameter):
+    q = """SELECT value FROM sbmPARAMETERS WHERE doctype=%s AND name=%s"""
+    res = run_sql(q, (doctype, parameter))
+    if len(res) > 0:
+        return res[0][0]
+    else:
+        return None
+
 def get_functionparameternames_doctype_action(doctype, action):
     """Get the unique NAMES function parameters for a given action of a given doctype.
        @param doctype: the document type with which the parameters are associated
@@ -1768,7 +1796,6 @@ def get_functionparameternames_doctype_not_action(doctype, action):
            """GROUP BY par.name """ \
            """ORDER BY fundesc.function ASC, par.name ASC"""
     return run_sql(q, (doctype, action))
-
 
 def get_functionparameters_for_action_doctype(action, doctype):
     """Get the details of all function parameter values for a given action of a given doctype.
@@ -1805,8 +1832,6 @@ def get_actions_sname_lname_not_linked_to_doctype(doctype):
         """WHERE subm.actname IS NULL"""
     return run_sql(q, (doctype,))
 
-
-
 def insert_parameter_doctype(doctype, paramname, paramval):
     """Insert a new parameter and its value into the parameters table (sbmPARAMETERS) for a given
        document type.
@@ -1823,7 +1848,6 @@ def insert_parameter_doctype(doctype, paramname, paramval):
         return 0 ## Everything is OK
     else:
         return 1 ## Everything NOT OK - this param already exists, so not inserted
-        
 
 def clone_functionparameters_foraction_fromdoctype_todoctype(fromdoctype, todoctype, action):
     ## get a list of all function-parameters/values for fromdoctype/action
@@ -2210,7 +2234,6 @@ def get_details_and_description_of_all_fields_on_submissionpage(doctype, action,
     res = run_sql(q, ("%s%s" % (action, doctype), pagenum))
     return res
 
-
 def insert_field_onto_submissionpage(doctype, action, pagenum, fieldname, fieldtext, fieldlevel, fieldshortdesc, fieldcheck):
     """Insert a field onto a given submission page, in the last position.
        @param doctype: (string) the unique ID of a document type
@@ -2485,7 +2508,6 @@ def decrement_position_of_all_fields_atposition_greaterthan_positionx_on_submiss
     except ValueError:
         return None
 
-
 def delete_allfields_submissionpage_doctype_action(doctype, action, pagenum):
     q = """DELETE FROM sbmFIELD WHERE pagenb=%s AND subname=%s"""
     run_sql(q, (pagenum, """%s%s""" % (action, doctype)))
@@ -2550,7 +2572,6 @@ def decrement_by_one_number_submissionpages_doctype_action(doctype, action):
         ## Everything NOT OK - either multiple rows exist for submission, or submission doesn't exist
         return 1
 
-
 def add_submission_page_doctype_action(doctype, action):
     """Increment the number of pages associated with a given submission by 1
        @param doctype: the unique ID of the document type that owns the submission.
@@ -2569,5 +2590,3 @@ def add_submission_page_doctype_action(doctype, action):
     else:
         ## Everything NOT OK - either multiple rows exist for submission, or submission doesn't exist
         return 1
-    
-
