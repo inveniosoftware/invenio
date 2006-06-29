@@ -36,6 +36,7 @@ import os
 import crypt
 import string
 import smtplib
+import sre
 
 from invenio import session, websession
 from invenio.dbquery import run_sql, escape_string, OperationalError
@@ -45,10 +46,11 @@ from invenio.config import *
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_findUserRoleActions
 from invenio.access_control_config import *
-
 from invenio.messages import gettext_set_language
 import invenio.template
 tmpl = invenio.template.load('websession')
+
+sre_invalid_nickname = sre.compile(""".*[,'@]+.*""")
 
 def createGuestUser():
     """Create a guest user , insert into user null values in all fields
@@ -247,16 +249,16 @@ def nickname_valid_p(nickname):
     """Check whether wanted NICKNAME supplied by the user is valid.
        At the moment we just check whether it is not empty, does not
        contain blanks or @, is not equal to `guest', etc.
-
+      
+       This check relies on sre_invalid_nickname regexp (see above)
        Return 1 if nickname is okay, return 0 if it is not.
     """
-    if not nickname \
-       or len(nickname) < 1 \
-       or string.find(nickname, " ") > 0 \
-       or string.find(nickname, "@") > 0 \
-       or nickname == "guest":
-        return 0
-    return 1
+    if nickname and \
+       not(nickname.startswith(' ') or nickname.endswith(' ')) and \
+       nickname.lower() != 'guest':
+        if not sre_invalid_nickname.match(nickname):
+            return 1
+    return 0
 
 def email_valid_p(email):
     """Check whether wanted EMAIL address supplied by the user is valid.
