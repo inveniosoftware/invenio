@@ -2,7 +2,7 @@
 
 import cgi
 from invenio.config import weburl, cdslang
-from invenio.websubmitadmin_config import websubmitadmin_weburl
+from invenio.websubmitadmin_config import websubmitadmin_weburl, functions_with_file_params, websubmitadmin_oldweburl
 
 def create_html_table_from_tuple(tableheader=None, tablebody=None, start="", end=""):
     """Create a table from a tuple or a list.
@@ -1588,7 +1588,7 @@ class Template:
           <td><br />""" % { 'doctype_id' : cgi.escape(doctype, 1) }
 
         try:
-            referees_tableheader = ["Referee", "Delete"]
+            referees_tableheader = ["Referee"]
             referees_tablebody = []
             referee_roles = doctype_referees.keys()
             referee_roles.sort()
@@ -1601,20 +1601,7 @@ class Template:
                                                                                            cgi.escape(doctype_referees[role][1], 1)),
                                                 "&nbsp;") )
                 for referee in doctype_referees[role][2]:
-                    referees_tablebody.append( ("""<small>%s</small>""" % (cgi.escape(referee[1], 1),),
-                                                """<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/%(performaction)s">""" \
-                                                """<input class="hyperlinkformHiddenInput" name="doctype" value="%(doctype)s" type="hidden" />""" \
-                                                """<input class="hyperlinkformHiddenInput" name="categid" value="%(categ)s" type="hidden" />""" \
-                                                """<input class="hyperlinkformHiddenInput" name="refereeid" value="%(refereeid)s" type="hidden" />""" \
-                                                """<input type="submit" name="doctyperefereedelete" class="hyperlinkformSubmitButton" value="delete" />""" \
-                                                """</form>""" \
-                                                % { 'doctype' : cgi.escape(doctype, 1),
-                                                    'categ' : cgi.escape(doctype_referees[role][0], 1),
-                                                    'refereeid' : cgi.escape(str(int(referee[0])), 1),
-                                                    'performaction' : cgi.escape(perform_act, 1),
-                                                    'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1)
-                                                  }
-                                             ) )
+                    referees_tablebody.append( ("""<small>%s</small>""" % (cgi.escape(referee[1], 1),),))
 
             txt += create_html_table_from_tuple(tableheader=referees_tableheader, tablebody=referees_tablebody)
         except IndexError:
@@ -1626,15 +1613,16 @@ class Template:
          </tr>
          <tr>
           <td>
-           <form method="post" action="%(websubadmin_url)s/%(performaction)s">
-            <input name="managerefereesdoctype" class="adminbutton" type="submit" value="Add Referees" />
+           <form method="post" action="%(websubadmin_url)s/referees.py">
+            <input type="hidden" name="doctype" value="%(doctype_id)s" />
+            <input name="managerefereesdoctype" class="adminbutton" type="submit" value="Manage Referees" />
            </form>
           </td>
          </tr>
          </tbody>
         </table>""" % { 'doctype_id' : cgi.escape(doctype, 1),
                         'performaction' : cgi.escape(perform_act, 1),
-                        'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1)
+                        'websubadmin_url' : cgi.escape(websubmitadmin_oldweburl, 1)
                       }
         return txt
 
@@ -1788,7 +1776,6 @@ class Template:
            <table>
             <tr>
              <td>
-              <br />
                <input name="configuresubmissionaddfunctioncommit" class="adminbutton" type="submit" value="Save Details" />
               </form>
              </td>
@@ -1839,7 +1826,7 @@ class Template:
          <thead>
          <tr>
          <th class="adminheaderleft">
-           Current submission function configuration:
+           Current submission functions configuration:
           </th>
          </tr>
          </thead>
@@ -1985,21 +1972,36 @@ class Template:
             t_row += ["""%s""" % (cgi.escape(thisfunctionscore, 1),) ]
 
             ## "view parameters" link:
-            t_row += ["""<small><a href="%s/functionusage?funcname=%s">view parameters</a></small>""" \
-                      % (websubmitadmin_weburl, cgi.escape(submissionfunctions[i][0], 1)) ]
+            t_row += ["""<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionfunctionsparameters">"""\
+                      """<input class="hyperlinkformHiddenInput" name="doctype" value="%(doctype)s" type="hidden" />"""\
+                      """<input class="hyperlinkformHiddenInput" name="action" value="%(action)s" type="hidden" />"""\
+                      """<input class="hyperlinkformHiddenInput" name="functionname" value="%(thisfunctionname)s" type="hidden" />"""\
+                      """<input type="submit" name="viewfunctionparameters" value="view parameters" class="hyperlinkformSubmitButton" />"""\
+                      """</form>\n"""\
+                      % { 'websubadmin_url'  : cgi.escape(websubmitadmin_weburl, 1),
+                          'doctype'          : cgi.escape(doctype, 1),
+                          'action'           : cgi.escape(action, 1),
+                          'thisfunctionname' : cgi.escape(thisfunctionname, 1)
+                        } ]
+
+
             ## "delete function" link:
-            t_row += ["""<small><a href="%(websubadmin_url)s/%(performaction)s?doctype=%(doctype)s&action=%(action)s&"""\
-                      """deletefunctionname=%(func)s&deletefunctionstep=%(step)s&deletefunctionscore=%(score)s">"""\
-                      """delete</a></small>""" \
-                      % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+            t_row += ["""<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/%(performaction)s">"""\
+                      """<input class="hyperlinkformHiddenInput" name="doctype" value="%(doctype)s" type="hidden" />"""\
+                      """<input class="hyperlinkformHiddenInput" name="action" value="%(action)s" type="hidden" />"""\
+                      """<input class="hyperlinkformHiddenInput" name="deletefunctionname" value="%(thisfunctionname)s" type="hidden" />"""\
+                      """<input class="hyperlinkformHiddenInput" name="deletefunctionstep" value="%(step)s" type="hidden" />"""\
+                      """<input class="hyperlinkformHiddenInput" name="deletefunctionscore" value="%(score)s" type="hidden" />"""\
+                      """<input type="submit" name="deletefunction" value="delete" class="hyperlinkformSubmitButton" />"""\
+                      """</form>\n"""\
+                      % { 'websubadmin_url'  : cgi.escape(websubmitadmin_weburl, 1),
                           'performaction'   : cgi.escape(perform_act, 1),
-                          'doctype'         : cgi.escape(doctype, 1),
-                          'action'          : cgi.escape(action, 1),
-                          'func'            : cgi.escape(thisfunctionname, 1),
+                          'doctype'          : cgi.escape(doctype, 1),
+                          'action'           : cgi.escape(action, 1),
+                          'thisfunctionname' : cgi.escape(thisfunctionname, 1),
                           'step'            : cgi.escape(thisfunctionstep, 1),
                           'score'           : cgi.escape(thisfunctionscore, 1)
-                        }
-                     ]
+                        } ]
 
             ## final column containing "jumping-out from" image when moving a function:
             if movefromfunctionname not in ("", None):
@@ -2014,7 +2016,7 @@ class Template:
                                   'weburl'          : cgi.escape(weburl, 1),
                                   'fromfunc'        : cgi.escape(movefromfunctionname, 1),
                                   'fromstep'        : cgi.escape(movefromfunctionstep, 1),
-                                  'fromscore'       : cgi.escape(movefromfunctionscore, 1),
+                                  'fromscore'       : cgi.escape(movefromfunctionscore, 1)
                                 }
                              ]
                 else:
@@ -2659,6 +2661,220 @@ class Template:
 
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="Submission Page Details:", datalist=[body_content])
+        return output
+
+    def tmpl_configuredoctype_edit_functionparameter_file(self, doctype, action, function, paramfilename,
+                                                          paramfilecontent, paramname="", user_msg=""):
+        ## begin template:
+        output = ""
+        body_content = ""
+        output += self._create_user_message_string(user_msg)
+        
+        body_content += """
+        <table class="admin_wvar" width="95%%">
+         <tbody>
+         <tr>
+          <td width="20%%">&nbsp;</td>
+          <td width="80%%">&nbsp;<form method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionfunctionsparameters"></td>
+         </tr>
+         <tr>
+          <td width="20%%"><span class="adminlabel">Parameter Value:</span></td>
+          <td width="80%%"><textarea cols="115" rows="22" name="paramfilecontent">%(paramfilecontent)s</textarea></td>
+         </tr>
+         <tr>
+          <td colspan="2">
+           <table>
+            <tr>
+             <td>
+               <input name="doctype" type="hidden" value="%(doctype)s" />
+               <input name="action" type="hidden" value="%(action)s" />
+               <input name="functionname" type="hidden" value="%(function)s" />
+               <input name="paramname" type="hidden" value="%(paramname)s" />
+               <input name="paramfilename" type="hidden" value="%(paramfilename)s" />
+               <input name="editfunctionparameterfilecommit" class="adminbutton" type="submit" value="Save Changes" />
+              </form>
+             </td>
+             <td>
+              <br />
+              <form method="post" action="%(websubadmin_url)s/doctypeconfiguresubmissionfunctionsparameters">
+               <input name="doctype" type="hidden" value="%(doctype)s" />
+               <input name="action" type="hidden" value="%(action)s" />
+               <input name="functionname" type="hidden" value="%(function)s" />
+               <input name="editfunctionparameterfilecancel" class="adminbutton" type="submit" value="Cancel" />
+              </form>
+             </td>
+            </tr>
+           </table>
+          </td>
+         </tr>
+         </tbody>
+        </table>\n""" % { 'websubadmin_url'  : cgi.escape(websubmitadmin_weburl, 1),
+                          'doctype'          : cgi.escape(doctype, 1),
+                          'action'           : cgi.escape(action, 1),
+                          'function'         : cgi.escape(function, 1),
+                          'paramname'        : cgi.escape(paramname, 1),
+                          'paramfilename'    : cgi.escape(paramfilename, 1),
+                          'paramfilecontent' : cgi.escape(paramfilecontent, 1)
+                        }
+
+        output += self._create_websubmitadmin_main_menu_header()
+        output += self._create_adminbox(header="Edit the [%s] parameter file:" % (paramfilename,), datalist=[body_content])
+        return output
+          
+    def tmpl_configuredoctype_edit_functionparameter_value(self,
+                                                           doctype,
+                                                           action,
+                                                           function,
+                                                           paramname,
+                                                           paramval,
+                                                           user_msg=""):
+        ## begin template:
+        output = ""
+        body_content = ""
+        output += self._create_user_message_string(user_msg)
+        
+        body_content += """
+        <table class="admin_wvar" width="95%%">
+         <tbody>
+         <tr>
+          <td width="20%%">&nbsp;</td>
+          <td width="80%%">&nbsp;<form method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionfunctionsparameters"></td>
+         </tr>
+         <tr>
+          <td width="20%%"><span class="adminlabel">Parameter Value:</span></td>
+          <td width="80%%"><input type="text" size="35" name="paramval" value="%(paramval)s" /></td>
+         </tr>
+         <tr>
+          <td colspan="2">
+           <table>
+            <tr>
+             <td>
+               <input name="doctype" type="hidden" value="%(doctype)s" />
+               <input name="action" type="hidden" value="%(action)s" />
+               <input name="functionname" type="hidden" value="%(function)s" />
+               <input name="paramname" type="hidden" value="%(paramname)s" />
+               <input name="editfunctionparametervaluecommit" class="adminbutton" type="submit" value="Save Changes" />
+              </form>
+             </td>
+             <td>
+              <br />
+              <form method="post" action="%(websubadmin_url)s/doctypeconfiguresubmissionfunctionsparameters">
+               <input name="doctype" type="hidden" value="%(doctype)s" />
+               <input name="action" type="hidden" value="%(action)s" />
+               <input name="functionname" type="hidden" value="%(function)s" />
+               <input name="editfunctionparametervaluecancel" class="adminbutton" type="submit" value="Cancel" />
+              </form>
+             </td>
+            </tr>
+           </table>
+          </td>
+         </tr>
+         </tbody>
+        </table>\n""" % { 'websubadmin_url'  : cgi.escape(websubmitadmin_weburl, 1),
+                          'doctype'          : cgi.escape(doctype, 1),
+                          'action'           : cgi.escape(action, 1),
+                          'function'         : cgi.escape(function, 1),
+                          'paramname'        : cgi.escape(paramname, 1),
+                          'paramval'         : cgi.escape(paramval, 1)
+                        }
+
+        output += self._create_websubmitadmin_main_menu_header()
+        output += self._create_adminbox(header="Edit the value of the %s Parameter:" % (paramname,), datalist=[body_content])
+        return output
+
+    def tmpl_configuredoctype_list_functionparameters(self,
+                                                      doctype,
+                                                      action,
+                                                      function,
+                                                      params,
+                                                      user_msg=""):
+        """Display the parameters and their values for a given function as applied to a given document type
+        """
+        linktoparamfile = 0
+        ## sanity checking:
+        if type(params) not in (list, tuple):
+            params = ()
+
+        ## make table of function parameters:
+        if function in functions_with_file_params:
+            linktoparamfile = 1
+        t_header = ["Parameter Name", "Parameter Value", "Edit Parameter", "%s" \
+                  % ((linktoparamfile == 1 and "Edit File") or ("&nbsp;"),)]
+        t_body = []
+        num_params = len(params)
+        for i in range(0, num_params):
+            thisparamname  = params[i][0]
+            thisparamval   = params[i][1]
+            ## parameter name:
+            t_row = ["""&nbsp;&nbsp;%s""" % (cgi.escape(thisparamname, 1),)]
+            ## parameter value:
+            t_row += ["""&nbsp;&nbsp;<span class="info">%s</span>""" % (cgi.escape(thisparamval, 1),)]
+
+            ## button to edit parameter value:
+            t_row += ["""<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionfunctionsparameters">"""\
+                      """<input class="hyperlinkformHiddenInput" name="doctype" value="%(doctype)s" type="hidden" />"""\
+                      """<input class="hyperlinkformHiddenInput" name="action" value="%(action)s" type="hidden" />"""\
+                      """<input class="hyperlinkformHiddenInput" name="functionname" value="%(function)s" type="hidden" />"""\
+                      """<input class="hyperlinkformHiddenInput" name="paramname" value="%(thisparamname)s" type="hidden" />"""\
+                      """<input type="submit" name="editfunctionparametervalue" value="edit value" class="hyperlinkformSubmitButton" />"""\
+                      """</form>\n"""\
+                      % { 'websubadmin_url'  : cgi.escape(websubmitadmin_weburl, 1),
+                          'doctype'          : cgi.escape(doctype, 1),
+                          'action'           : cgi.escape(action, 1),
+                          'function'         : cgi.escape(function, 1),
+                          'thisparamname'    : cgi.escape(thisparamname, 1)
+                        } ]
+
+            ## button to edit the value of a parameter's file:
+            editstr = """<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionfunctionsparameters">"""\
+                      """<input class="hyperlinkformHiddenInput" name="doctype" value="%(doctype)s" type="hidden" />"""\
+                      """<input class="hyperlinkformHiddenInput" name="action" value="%(action)s" type="hidden" />"""\
+                      """<input class="hyperlinkformHiddenInput" name="functionname" value="%(function)s" type="hidden" />"""\
+                      """<input class="hyperlinkformHiddenInput" name="paramname" value="%(thisparamname)s" type="hidden" />"""\
+                      """<input type="submit" name="editfunctionparameterfile" value="edit file" class="hyperlinkformSubmitButton" />"""\
+                      """</form>\n"""\
+                      % { 'websubadmin_url'  : cgi.escape(websubmitadmin_weburl, 1),
+                          'doctype'          : cgi.escape(doctype, 1),
+                          'action'           : cgi.escape(action, 1),
+                          'function'         : cgi.escape(function, 1),
+                          'thisparamname'    : cgi.escape(thisparamname, 1)
+                        }
+            t_row += ["%s" % ((linktoparamfile == 1 and editstr) or ("&nbsp;"),)]
+
+            ## finally, append the newly created row to the tbody list:
+            t_body.append(t_row)
+
+        ## create display of page
+        output = ""
+        output += self._create_user_message_string(user_msg)
+        body_content = """
+        <table class="admin_wvar" width="100%%">
+         <tbody>
+         <tr>
+          <td>
+           <br />
+           %(paramstable)s
+           <br />
+          </td>
+         </tr>
+         <tr>
+          <td>
+            <form method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionfunctions">
+             <input type="hidden" name="doctype" value="%(doctype)s" />
+             <input type="hidden" name="action" value="%(action)s" />
+             <input name="finishedviewfields" class="adminbutton" type="submit" value="Finished" />
+            </form>
+          </td>
+         </tr>
+        </table>""" % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                        'doctype'         : cgi.escape(doctype, 1),
+                        'action'          : cgi.escape(action, 1),
+                        'paramstable'     : create_html_table_from_tuple(tableheader=t_header, tablebody=t_body)
+                      }
+        output += self._create_websubmitadmin_main_menu_header()
+        output += self._create_adminbox(header="""Parameters of the %(function)s Function, belonging to the %(doctype)s Document Type:"""\
+                                        % { 'function' : cgi.escape(function, 1), 'doctype' : cgi.escape(doctype, 1) },
+                                        datalist=[body_content])
         return output
 
 
