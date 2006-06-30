@@ -47,6 +47,7 @@ EXTRA_DIST = __init__.py \
              errorHandling.php.wml \
              textutils.py \
              dateutils.py \
+	     testutils.py \
              urlutils.py \
              testimport.py
 
