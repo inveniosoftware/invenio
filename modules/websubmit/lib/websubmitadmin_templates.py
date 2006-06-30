@@ -237,13 +237,13 @@ class Template:
          <tr>
           <td>6.&nbsp;<small><a href="%(adminurl)s/elementlist">Available Element descriptions</a></small></td>
           <td>&nbsp;7.&nbsp;<small><a href="%(adminurl)s/functionlist">Available Functions</a></small></td>
-          <td>&nbsp;8.&nbsp;<small><a href="%(adminurl)s/cataloguelist">Organise Main Page</a></small></td>
+          <td>&nbsp;8.&nbsp;<small><a href="%(oldadminurl)s/editCatalogues.php">Organise Main Page</a></small></td>
           <td colspan=2>&nbsp;9.&nbsp;<small><a href="%(adminurl)s/">WebSubmit Admin Guide</a></small></td>
          </tr>
         </table>
         </div>
         <br />
-        """ % {'adminurl' : websubmitadmin_weburl}
+        """ % {'adminurl' : websubmitadmin_weburl, 'oldadminurl' : websubmitadmin_oldweburl}
         return self._create_adminbox(header="Main Menu", datalist=[menu_body])
 
     def _element_display_preview_get_element(self,
@@ -600,12 +600,27 @@ class Template:
                      's_txt' : cgi.escape(status_text, 1)}
         body_content += """
          <tr>
-          <td width="20%%">&nbsp;</td>
-          <td width="80%%"><input name="actcommit" class="adminbutton" type="submit" value="Save Details" /></td>
+          <td colspan="2">
+           <table>
+            <tr>
+             <td>
+               <input name="actcommit" class="adminbutton" type="submit" value="Save Details" />
+              </form>
+             </td>
+             <td>
+              <br />
+              <form method="post" action="%(websubadmin_url)s/actionlist">
+               <input name="actcommitcancel" class="adminbutton" type="submit" value="Cancel" />
+              </form>
+             </td>
+            </tr>
+           </table>
+          </td>
          </tr>
         </table>
         </form>
-        """
+        """ % { 'websubadmin_url' : websubmitadmin_weburl }
+
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="Enter Action Details:", datalist=[body_content])
         return output
