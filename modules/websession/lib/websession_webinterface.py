@@ -533,9 +533,6 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
     
     _exports = ['', 'display', 'create', 'join', 'leave', 'edit', 'members']
     
-    _force_https = False
-
-
     def index(self, req, form):
         redirect_to_url(req, '/yourgroups/display')
         
