@@ -2246,7 +2246,7 @@ def insert_field_onto_submissionpage(doctype, action, pagenum, fieldname, fieldt
        @param fieldcheck: (string) the name of a check to be associated with a field
        @return: None
        @Exceptions raised:
-            InvenioWebSubmitAdminInsertFailed - raised if it was not possible to insert the row for the field
+            InvenioWebSubmitAdminWarningInsertFailed - raised if it was not possible to insert the row for the field
     """
     ## get the number of fields on the page onto which the new field is to be inserted:
     numfields_preinsert = get_numberfields_submissionpage_doctype_action(doctype=doctype, action=action, pagenum=pagenum)
@@ -2260,7 +2260,7 @@ def insert_field_onto_submissionpage(doctype, action, pagenum, fieldname, fieldt
     if not (numfields_postinsert > numfields_preinsert):
         ## seems as though the new field was not inserted:
         msg = """Failed when trying to add a new field to page %s of submission %s""" % (pagenum, "%s%s" % (action, doctype))
-        raise InvenioWebSubmitAdminInsertFailed(msg)
+        raise InvenioWebSubmitAdminWarningInsertFailed(msg)
     return
 
 def delete_a_field_from_submissionpage(doctype, action, pagenum, fieldposn):
@@ -2299,8 +2299,8 @@ def update_details_of_a_field_on_a_submissionpage(doctype, action, pagenum, fiel
        @param fieldcheck: (string) name of JavaScript Check to be applied to field
        @return: None
        @Exceptions raised:
-           InvenioWebSubmitAdminTooManyRows - when multiple rows found for field
-           InvenioWebSubmitAdminNoRowsFound - when no rows found for field
+           InvenioWebSubmitAdminWarningTooManyRows - when multiple rows found for field
+           InvenioWebSubmitAdminWarningNoRowsFound - when no rows found for field
     """
     q = """UPDATE sbmFIELD SET fitext=%s, level=%s, sdesc=%s, checkn=%s, md=CURDATE() WHERE subname=%s AND pagenb=%s AND fieldnb=%s"""
     queryargs = (fieldtext, fieldlevel, fieldshortdesc, fieldcheck, "%s%s" % (action, doctype), pagenum, fieldposn)
@@ -2314,12 +2314,12 @@ def update_details_of_a_field_on_a_submissionpage(doctype, action, pagenum, fiel
         ## multiple rows found for the field at this position - not safe to edit
         msg = """When trying to update the field in position %s on page %s of the submission %s, %s rows were found for the field""" \
               % (fieldposn, pagenum, "%s%s" % (action, doctype), numrows_field)
-        raise InvenioWebSubmitAdminTooManyRows(msg)
+        raise InvenioWebSubmitAdminWarningTooManyRows(msg)
     else:
         ## no row for field found
         msg = """When trying to update the field in position %s on page %s of the submission %s, no rows were found for the field""" \
               % (fieldposn, pagenum, "%s%s" % (action, doctype))
-        raise InvenioWebSubmitAdminNoRowsFound(msg)
+        raise InvenioWebSubmitAdminWarningNoRowsFound(msg)
 
 def delete_a_field_from_submissionpage_then_reorder_fields_below_to_fill_vacant_position(doctype,
                                                                                          action,
