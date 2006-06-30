@@ -261,7 +261,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
     def sub(self, req, form):
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../sub.py/index")
+            return page_not_authorized(req, "../sub/")
 
         myQuery = req.args
         if myQuery:

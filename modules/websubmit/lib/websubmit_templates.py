@@ -1404,7 +1404,7 @@ class Template:
                          'last' : _("last access"),
                        }
             if submission['pending']:
-                idtext = """<a href="sub.py?access=%(id)s@%(action)s%(doctype)s">%(id)s</a>
+                idtext = """<a href="submit/sub/access=%(id)s@%(action)s%(doctype)s">%(id)s</a>
                             &nbsp;<a onClick='if (confirm("%(sure)s")){document.forms[0].deletedId.value="%(id)s";document.forms[0].deletedDoctype.value="%(doctype)s";document.forms[0].deletedAction.value="%(action)s";document.forms[0].submit();return true;}else{return false;}' href=''><img src="%(images)s/smallbin.gif" border="0" alt='%(delete)s'></a>
                          """ % {
                            'images' : images,
