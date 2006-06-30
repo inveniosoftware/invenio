@@ -79,6 +79,11 @@ function displayDoctypeList()
          
       # Begin outputting a table to display the document types in.
       # The table has no border.
+
+      print("<h3>NEW VERSION</h3>");
+      print("<p>Please use the <a href=\"websubmitadmin.py\">new WebSubmit Admin</a> in preference to the old one.");
+      print("<h3>OLD VERSION</h3>");
+      print("<p>Please fall back to this version only if you experience problems with the <a href=\"websubmitadmin.py\">new WebSubmit Admin</a>.");
     
       print('<TABLE ALIGN="center" BORDER=0 WIDTH="100%"><TR>'
           . '<TH>&nbsp;<SPAN STYLE="color: navy; font-size: large; '
